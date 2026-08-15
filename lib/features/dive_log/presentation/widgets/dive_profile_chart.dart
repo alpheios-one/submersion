@@ -26,6 +26,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/chart_series_c
 import 'package:submersion/features/dive_log/presentation/widgets/chart_touch_recognizer.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/deco_stop_band.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_legend.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/o2_cell_readout.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_decimator.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_metric_band.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/gas_colors.dart';
@@ -1344,21 +1345,33 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
           bulletColor: const Color(0xFF00ACC1),
         ),
       );
-      final sensorCurves = widget.o2SensorCurves;
-      if (sensorCurves != null) {
-        for (var cell = 0; cell < sensorCurves.length; cell++) {
-          final readings = sensorCurves[cell];
-          if (spot.spotIndex >= readings.length) continue;
-          final reading = readings[spot.spotIndex];
-          if (reading == null) continue;
-          rows.add(
-            TooltipRow(
-              label: '${context.l10n.diveLog_tooltip_sensor} ${cell + 1}',
-              value: '${reading.toStringAsFixed(2)} ${l10n.units_pressure_bar}',
-              bulletColor: const Color(0xFF80DEEA),
-            ),
-          );
-        }
+      // One row per physical cell: ppO2 when the calibration is trustworthy,
+      // the raw output when it is not, both when both are available (#810).
+      final cellCount = o2CellCount(
+        barCurves: widget.o2SensorCurves,
+        mvCurves: widget.o2CellMvCurves,
+      );
+      for (var cell = 0; cell < cellCount; cell++) {
+        final readout = formatO2CellReadout(
+          bar: valueAtSample(
+            curves: widget.o2SensorCurves,
+            cell: cell,
+            sampleIndex: spot.spotIndex,
+          ),
+          millivolt: valueAtSample(
+            curves: widget.o2CellMvCurves,
+            cell: cell,
+            sampleIndex: spot.spotIndex,
+          ),
+        );
+        if (readout == null) continue;
+        rows.add(
+          TooltipRow(
+            label: '${context.l10n.diveLog_tooltip_sensor} ${cell + 1}',
+            value: readout,
+            bulletColor: const Color(0xFF80DEEA),
+          ),
+        );
       }
     }
 
@@ -3271,19 +3284,29 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                         ppO2Value,
                         const Color(0xFF00ACC1),
                       );
-                      final sensorCurves = widget.o2SensorCurves;
-                      if (sensorCurves != null) {
-                        for (var cell = 0; cell < sensorCurves.length; cell++) {
-                          final readings = sensorCurves[cell];
-                          if (spot.spotIndex >= readings.length) continue;
-                          final reading = readings[spot.spotIndex];
-                          if (reading == null) continue;
-                          addRow(
-                            '${context.l10n.diveLog_tooltip_sensor} ${cell + 1}',
-                            '${reading.toStringAsFixed(2)} $bar',
-                            const Color(0xFF80DEEA),
-                          );
-                        }
+                      final cellCount = o2CellCount(
+                        barCurves: widget.o2SensorCurves,
+                        mvCurves: widget.o2CellMvCurves,
+                      );
+                      for (var cell = 0; cell < cellCount; cell++) {
+                        final readout = formatO2CellReadout(
+                          bar: valueAtSample(
+                            curves: widget.o2SensorCurves,
+                            cell: cell,
+                            sampleIndex: spot.spotIndex,
+                          ),
+                          millivolt: valueAtSample(
+                            curves: widget.o2CellMvCurves,
+                            cell: cell,
+                            sampleIndex: spot.spotIndex,
+                          ),
+                        );
+                        if (readout == null) continue;
+                        addRow(
+                          '${context.l10n.diveLog_tooltip_sensor} ${cell + 1}',
+                          readout,
+                          const Color(0xFF80DEEA),
+                        );
                       }
                     }
 

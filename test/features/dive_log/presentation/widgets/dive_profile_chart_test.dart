@@ -2731,6 +2731,92 @@ void main() {
       await tester.pump();
     });
 
+    testWidgets('tooltip pairs each cell ppO2 with its millivolt reading', (
+      tester,
+    ) async {
+      List<TooltipRow>? receivedRows;
+
+      await tester.pumpWidget(
+        _buildChartAllMetrics(
+          profile: makeTouchProfile(),
+          tooltipBelow: true,
+          onTooltipData: (rows) => receivedRows = rows,
+          ppO2Curve: List.generate(20, (i) => 0.96),
+          o2SensorCurves: <List<double?>>[List.generate(20, (i) => 0.98)],
+          o2CellMvCurves: <List<int?>>[List.generate(20, (i) => 49)],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(LineChart)),
+      );
+      await tester.pump(const Duration(milliseconds: 600));
+      await gesture.moveBy(const Offset(5, 0));
+      await tester.pump();
+      await gesture.moveBy(const Offset(5, 0));
+      await tester.pump();
+
+      // Matches the sibling tooltip tests: fl_chart has to resolve a nearby
+      // spot for rows to be emitted at all.
+      if (receivedRows != null) {
+        final sensorRow = receivedRows!.firstWhere(
+          (r) => r.label == 'Sensor 1',
+        );
+        expect(sensorRow.value, '0.98 bar (49 mV)');
+      }
+
+      await gesture.up();
+      await tester.pump();
+    });
+
+    testWidgets('tooltip shows millivolts alone when the cell has no ppO2', (
+      tester,
+    ) async {
+      // The #810 case end to end: cells report millivolts, the per-cell
+      // partial pressure is withheld for want of a trusted calibration.
+      List<TooltipRow>? receivedRows;
+
+      await tester.pumpWidget(
+        _buildChartAllMetrics(
+          profile: makeTouchProfile(),
+          tooltipBelow: true,
+          onTooltipData: (rows) => receivedRows = rows,
+          ppO2Curve: List.generate(20, (i) => 1.19),
+          o2CellMvCurves: <List<int?>>[
+            List.generate(20, (i) => 58),
+            List.generate(20, (i) => 61),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(LineChart)),
+      );
+      await tester.pump(const Duration(milliseconds: 600));
+      await gesture.moveBy(const Offset(5, 0));
+      await tester.pump();
+      await gesture.moveBy(const Offset(5, 0));
+      await tester.pump();
+
+      if (receivedRows != null) {
+        final labels = receivedRows!.map((r) => r.label).toList();
+        expect(labels, contains('Sensor 1'));
+        expect(
+          receivedRows!.firstWhere((r) => r.label == 'Sensor 1').value,
+          '58 mV',
+        );
+        expect(
+          receivedRows!.firstWhere((r) => r.label == 'Sensor 2').value,
+          '61 mV',
+        );
+      }
+
+      await gesture.up();
+      await tester.pump();
+    });
+
     testWidgets(
       'tooltip exposes per-cell sensor rows and the calculated-average ppO2 '
       'label',
