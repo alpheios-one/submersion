@@ -439,6 +439,7 @@ ProfileAnalysisService _resolveAnalysisService(
   final resolvedPpO2 = resolved?.curve;
   final o2SensorCurves = resolved?.sensorCurves;
   final ppO2FromSensorAverage = resolved?.fromSensorAverage ?? false;
+  final o2CellMvCurves = resolveO2CellMvCurves(profile);
 
   // Report actual source used (fallback to calculated if no data)
   final sourceInfo = (
@@ -459,6 +460,11 @@ ProfileAnalysisService _resolveAnalysisService(
       !useTts &&
       !useCns &&
       resolvedPpO2 == null) {
+    // Millivolts stand alone: a dive can carry them with no ppO2, cells or
+    // setpoint to overlay, and they must not be dropped on this path (#810).
+    if (o2CellMvCurves != null) {
+      return (analysis.copyWith(o2CellMvCurves: o2CellMvCurves), sourceInfo);
+    }
     return (analysis, sourceInfo);
   }
 
@@ -513,6 +519,7 @@ ProfileAnalysisService _resolveAnalysisService(
     // ppO2 from sensor/setpoint (null keeps the calculated curve).
     ppO2Curve: resolvedPpO2,
     o2SensorCurves: o2SensorCurves,
+    o2CellMvCurves: o2CellMvCurves,
     ppO2FromSensorAverage: resolvedPpO2 != null ? ppO2FromSensorAverage : null,
   );
 
@@ -535,6 +542,43 @@ const _cellAccessors = <double? Function(DiveProfilePoint)>[
   _o2Sensor5,
   _o2Sensor6,
 ];
+
+int? _o2SensorMv1(DiveProfilePoint p) => p.o2SensorMv1;
+int? _o2SensorMv2(DiveProfilePoint p) => p.o2SensorMv2;
+int? _o2SensorMv3(DiveProfilePoint p) => p.o2SensorMv3;
+int? _o2SensorMv4(DiveProfilePoint p) => p.o2SensorMv4;
+int? _o2SensorMv5(DiveProfilePoint p) => p.o2SensorMv5;
+int? _o2SensorMv6(DiveProfilePoint p) => p.o2SensorMv6;
+
+const _cellMvAccessors = <int? Function(DiveProfilePoint)>[
+  _o2SensorMv1,
+  _o2SensorMv2,
+  _o2SensorMv3,
+  _o2SensorMv4,
+  _o2SensorMv5,
+  _o2SensorMv6,
+];
+
+/// Exposes each O2 cell's raw output as its own per-sample curve, indexed by
+/// physical cell position (curve index i == cell i+1), or null when no cell
+/// reports millivolts.
+///
+/// Deliberately independent of [resolveRebreatherPpO2]: that resolver gates on
+/// the cells' bar values, which are absent whenever the logged calibration
+/// could not be trusted (issue #810). Deriving these from it would make the
+/// graph depend on an unrelated aggregate ppO2 sample happening to exist.
+/// Gaps stay null so a cell that stops reporting breaks its line.
+List<List<int?>>? resolveO2CellMvCurves(List<DiveProfilePoint> profile) {
+  var highestCell = -1;
+  for (var i = 0; i < _cellMvAccessors.length; i++) {
+    if (profile.any((p) => _cellMvAccessors[i](p) != null)) highestCell = i;
+  }
+  if (highestCell < 0) return null;
+  return [
+    for (var i = 0; i <= highestCell; i++)
+      profile.map(_cellMvAccessors[i]).toList(),
+  ];
+}
 
 double? _cellAverage(DiveProfilePoint p) {
   var sum = 0.0;
