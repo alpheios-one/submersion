@@ -1316,6 +1316,14 @@ class UddfEntityImporter {
                   o2Sensor4: asDoubleOrNull(p['o2Sensor4']),
                   o2Sensor5: asDoubleOrNull(p['o2Sensor5']),
                   o2Sensor6: asDoubleOrNull(p['o2Sensor6']),
+                  // UDDF carries no millivolt field; these arrive only via the
+                  // libdivecomputer path that shares this map (issue #810).
+                  o2SensorMv1: p['o2SensorMv1'] as int?,
+                  o2SensorMv2: p['o2SensorMv2'] as int?,
+                  o2SensorMv3: p['o2SensorMv3'] as int?,
+                  o2SensorMv4: p['o2SensorMv4'] as int?,
+                  o2SensorMv5: p['o2SensorMv5'] as int?,
+                  o2SensorMv6: p['o2SensorMv6'] as int?,
                 ),
               )
               .toList() ??

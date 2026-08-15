@@ -1310,6 +1310,12 @@ class DiveComputerRepository {
               o2Sensor4: Value(point.o2Sensor4),
               o2Sensor5: Value(point.o2Sensor5),
               o2Sensor6: Value(point.o2Sensor6),
+              o2SensorMv1: Value(point.o2SensorMv1),
+              o2SensorMv2: Value(point.o2SensorMv2),
+              o2SensorMv3: Value(point.o2SensorMv3),
+              o2SensorMv4: Value(point.o2SensorMv4),
+              o2SensorMv5: Value(point.o2SensorMv5),
+              o2SensorMv6: Value(point.o2SensorMv6),
             ),
           );
         }
@@ -1906,6 +1912,15 @@ class ProfilePointData {
   final double? o2Sensor5;
   final double? o2Sensor6;
 
+  /// Raw O2 cell output in millivolts (sensor 1..6), reported even when the
+  /// matching ppO2 is absent for want of a trusted calibration (issue #810)
+  final int? o2SensorMv1;
+  final int? o2SensorMv2;
+  final int? o2SensorMv3;
+  final int? o2SensorMv4;
+  final int? o2SensorMv5;
+  final int? o2SensorMv6;
+
   const ProfilePointData({
     required this.timestamp,
     required this.depth,
@@ -1931,6 +1946,12 @@ class ProfilePointData {
     this.o2Sensor4,
     this.o2Sensor5,
     this.o2Sensor6,
+    this.o2SensorMv1,
+    this.o2SensorMv2,
+    this.o2SensorMv3,
+    this.o2SensorMv4,
+    this.o2SensorMv5,
+    this.o2SensorMv6,
   });
 }
 
