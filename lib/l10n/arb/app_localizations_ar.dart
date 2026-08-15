@@ -31881,4 +31881,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'في قائمة انتظار الرفع';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'خلايا الأكسجين';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'الخلايا';
 }

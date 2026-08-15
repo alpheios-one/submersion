@@ -9476,5 +9476,7 @@
   "media_info_checkFound": "Sorgente trovata",
   "media_info_checkMissing": "Sorgente mancante",
   "media_info_checkUnavailable": "Impossibile verificare ora",
-  "media_info_backupQueued": "In coda per il caricamento"
+  "media_info_backupQueued": "In coda per il caricamento",
+  "enum_profileMetric_o2CellMv": "Celle O2",
+  "enum_profileMetric_o2CellMv_short": "Celle"
 }

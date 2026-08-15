@@ -241,6 +241,10 @@ class DiveProfileChart extends ConsumerStatefulWidget {
   /// Shown in the tooltip alongside the resolved ppO2.
   final List<List<double?>>? o2SensorCurves;
 
+  /// Raw O2 cell output (mV), one curve per cell. Drawn as its own right-axis
+  /// metric and shown in the tooltip beside the per-cell ppO2 (issue #810).
+  final List<List<int?>>? o2CellMvCurves;
+
   /// True when [ppO2Curve] is a cell average (no computer-supplied ppO2),
   /// used to label the tooltip "ppO2 (avg)".
   final bool ppO2FromSensorAverage;
@@ -542,6 +546,7 @@ class DiveProfileChart extends ConsumerStatefulWidget {
     this.onSafetyFindingDetails,
     this.ppO2Curve,
     this.o2SensorCurves,
+    this.o2CellMvCurves,
     this.ppO2FromSensorAverage = false,
     this.ppN2Curve,
     this.ppHeCurve,
@@ -5627,6 +5632,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         return widget.cnsCurve != null && widget.cnsCurve!.isNotEmpty;
       case ProfileRightAxisMetric.otu:
         return widget.otuCurve != null && widget.otuCurve!.isNotEmpty;
+      case ProfileRightAxisMetric.o2CellMv:
+        return widget.o2CellMvCurves != null &&
+            widget.o2CellMvCurves!.any((c) => c.any((v) => v != null));
     }
   }
 
@@ -5731,6 +5739,21 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       case ProfileRightAxisMetric.otu:
         if (widget.otuCurve == null || widget.otuCurve!.isEmpty) return null;
         return (min: 0.0, max: _getOtuMaxScale());
+
+      case ProfileRightAxisMetric.o2CellMv:
+        // Zero-anchored and data-driven: cells sit around 30-70 mV, so this
+        // still separates a cell drifting to 40 from siblings at 55 while
+        // keeping the scale comparable across dives.
+        final curves = widget.o2CellMvCurves;
+        if (curves == null) return null;
+        int? maxMv;
+        for (final curve in curves) {
+          for (final v in curve) {
+            if (v != null && (maxMv == null || v > maxMv)) maxMv = v;
+          }
+        }
+        if (maxMv == null) return null;
+        return (min: 0.0, max: maxMv * 1.2);
     }
   }
 
@@ -5775,6 +5798,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         return (value / 60).round().toString();
       case ProfileRightAxisMetric.cns:
       case ProfileRightAxisMetric.otu:
+      case ProfileRightAxisMetric.o2CellMv:
         return value.toStringAsFixed(0);
     }
   }
@@ -5828,6 +5852,7 @@ String profileMetricName(
   ProfileRightAxisMetric.tts => l10n.enum_profileMetric_tts,
   ProfileRightAxisMetric.cns => l10n.enum_profileMetric_cns,
   ProfileRightAxisMetric.otu => l10n.enum_profileMetric_otu,
+  ProfileRightAxisMetric.o2CellMv => l10n.enum_profileMetric_o2CellMv,
 };
 
 /// Localized short name for a right-axis metric, used on the axis itself
@@ -5853,6 +5878,7 @@ String profileMetricShortName(
   ProfileRightAxisMetric.tts => l10n.enum_profileMetric_tts_short,
   ProfileRightAxisMetric.cns => l10n.enum_profileMetric_cns_short,
   ProfileRightAxisMetric.otu => l10n.enum_profileMetric_otu_short,
+  ProfileRightAxisMetric.o2CellMv => l10n.enum_profileMetric_o2CellMv_short,
 };
 
 /// Localized unit suffix for the metrics whose unit is fixed rather than

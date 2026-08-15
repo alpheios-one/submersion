@@ -31544,4 +31544,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'בתור להעלאה';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'תאי O2';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'תאים';
 }

@@ -53285,6 +53285,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Queued for upload'**
   String get media_info_backupQueued;
+
+  /// No description provided for @enum_profileMetric_o2CellMv.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 Cells'**
+  String get enum_profileMetric_o2CellMv;
+
+  /// No description provided for @enum_profileMetric_o2CellMv_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Cells'**
+  String get enum_profileMetric_o2CellMv_short;
 }
 
 class _AppLocalizationsDelegate

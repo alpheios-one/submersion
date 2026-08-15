@@ -30341,4 +30341,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => '已加入上传队列';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'O2 电池';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => '电池';
 }

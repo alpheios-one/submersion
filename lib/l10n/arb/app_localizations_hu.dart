@@ -32065,4 +32065,10 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Feltöltési sorban';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'O2-cellák';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Cellák';
 }

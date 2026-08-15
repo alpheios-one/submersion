@@ -9476,5 +9476,7 @@
   "media_info_checkFound": "A forrás megtalálható",
   "media_info_checkMissing": "A forrás hiányzik",
   "media_info_checkUnavailable": "Most nem ellenőrizhető",
-  "media_info_backupQueued": "Feltöltési sorban"
+  "media_info_backupQueued": "Feltöltési sorban",
+  "enum_profileMetric_o2CellMv": "O2-cellák",
+  "enum_profileMetric_o2CellMv_short": "Cellák"
 }

@@ -18076,5 +18076,7 @@
   "media_info_backupQueued": "Queued for upload",
   "@media_info_backupQueued": {
     "description": "Confirmation shown after queueing an upload"
-  }
+  },
+  "enum_profileMetric_o2CellMv": "O2 Cells",
+  "enum_profileMetric_o2CellMv_short": "Cells"
 }

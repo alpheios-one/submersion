@@ -32264,4 +32264,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Mis en file pour téléversement';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'Cellules O2';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Cellules';
 }

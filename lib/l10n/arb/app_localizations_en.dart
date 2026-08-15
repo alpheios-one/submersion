@@ -31678,4 +31678,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Queued for upload';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'O2 Cells';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Cells';
 }

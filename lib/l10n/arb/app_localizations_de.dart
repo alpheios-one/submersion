@@ -32119,4 +32119,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Zum Upload eingereiht';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'O2-Zellen';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Zellen';
 }

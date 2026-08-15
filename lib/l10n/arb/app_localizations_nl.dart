@@ -31960,4 +31960,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'In wachtrij voor upload';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'O2-cellen';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Cellen';
 }

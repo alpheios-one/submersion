@@ -32176,4 +32176,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'In coda per il caricamento';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'Celle O2';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Celle';
 }

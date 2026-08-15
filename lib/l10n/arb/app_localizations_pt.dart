@@ -32194,4 +32194,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Na fila para envio';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'Células O2';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Células';
 }
