@@ -105,6 +105,71 @@ static void test_parse_cressi_leonardo(void) {
     free(data);
 }
 
+/* Issue #810: the wrapper must carry the raw O2 cell output through to
+   libdc_sample_t, not just the ppO2 conversion. On this Petrel 3 the logged
+   calibration is a factory default, so libdivecomputer withholds the per-cell
+   ppO2 (NAN) and reports the millivolts instead. */
+static void test_o2_cell_millivolts_reach_the_sample(void) {
+    unsigned char *data = NULL;
+    unsigned int size = load_fixture("fixtures/petrel3_ccr_o2_cells.bin", &data);
+    assert(size == 22400);
+    assert(data != NULL);
+
+    libdc_parsed_dive_t result;
+    char err[256] = {0};
+
+    int rc = libdc_parse_raw_dive("Shearwater", "Petrel 3", 10, data, size,
+                                  &result, err, sizeof(err));
+    if (rc != 0) {
+        fprintf(stderr, "FAIL: parse returned %d: %s\n", rc, err);
+        free(data);
+        assert(0 && "libdc_parse_raw_dive failed for Petrel 3");
+    }
+
+    assert(result.sample_count == 419);
+
+    unsigned int with_mv = 0;
+    unsigned int mv_min = 0xFFFFFFFF, mv_max = 0;
+    unsigned int samples_with_differing_cells = 0;
+    for (unsigned int i = 0; i < result.sample_count; i++) {
+        const libdc_sample_t *s = &result.samples[i];
+        /* Only the first three cells are calibrated on this unit. */
+        for (int c = 3; c < 6; c++) {
+            assert(s->o2_sensor_mv[c] == UINT32_MAX);
+        }
+        for (int c = 0; c < 3; c++) {
+            assert(s->o2_sensor_mv[c] != UINT32_MAX);
+            with_mv++;
+            if (s->o2_sensor_mv[c] < mv_min) mv_min = s->o2_sensor_mv[c];
+            if (s->o2_sensor_mv[c] > mv_max) mv_max = s->o2_sensor_mv[c];
+        }
+        if (!(s->o2_sensor_mv[0] == s->o2_sensor_mv[1] &&
+              s->o2_sensor_mv[1] == s->o2_sensor_mv[2])) {
+            samples_with_differing_cells++;
+        }
+    }
+
+    assert(with_mv == 419 * 3);
+    /* A healthy cell reads 30-70 mV in 100% O2 at 1 ata. */
+    assert(mv_min >= 10 && mv_max <= 120);
+    /* Global min/max alone would pass on one cell's variation over time. */
+    assert(samples_with_differing_cells > 0);
+
+    /* The conversion stays withheld: a default calibration is not an anchor. */
+    for (unsigned int i = 0; i < result.sample_count; i++) {
+        for (int c = 0; c < 3; c++) {
+            assert(isnan(result.samples[i].o2_sensor[c]));
+        }
+    }
+
+    printf("PASS: test_o2_cell_millivolts_reach_the_sample (%u..%u mV)\n",
+           mv_min, mv_max);
+
+    free(result.samples);
+    free(result.events);
+    free(data);
+}
+
 /* --- Ratio iX3M synthetic dive (issue #926) ------------------------------
    The iX3M/iDive family does not implement DC_FIELD_LOCATION. It reports GPS
    as DC_SAMPLE_LOCATION entries inside the profile stream: an "info" record
@@ -605,6 +670,7 @@ int main(void) {
     test_load_fixture_missing();
     test_unknown_descriptor();
     test_parse_cressi_leonardo();
+    test_o2_cell_millivolts_reach_the_sample();
     test_parse_ratio_ix3m_sample_gps();
     test_parse_ratio_ix3m_single_fix();
     test_parse_ratio_ix3m_null_island_ignored();
