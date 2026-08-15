@@ -3883,6 +3883,12 @@
   "diveLog_tooltip_rate": "Rate",
   "diveLog_tooltip_sac": "SAC",
   "diveLog_tooltip_sensor": "Sensor",
+  "diveLog_legend_label_o2Cells": "O2 cells",
+  "diveLog_legend_o2Cells_agreement": "Agreement",
+  "diveLog_legend_o2Cells_cells": "Cells",
+  "diveLog_tooltip_o2CellsTight": "tight",
+  "diveLog_tooltip_o2CellsDrifting": "drifting",
+  "diveLog_tooltip_o2CellsWide": "wide",
   "diveLog_tooltip_srfGf": "SrfGF",
   "diveLog_tooltip_temp": "Temp",
   "diveLog_tooltip_time": "Time",
@@ -4526,7 +4532,9 @@
   "divePlanner_message_deleteConfirmation": "Delete '{name}'?",
   "@divePlanner_message_deleteConfirmation": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "divePlanner_message_planDeleted": "Plan deleted",
@@ -10681,8 +10689,12 @@
   "tides_source_noaaStation": "NOAA station: {name} ({distance})",
   "@tides_source_noaaStation": {
     "placeholders": {
-      "name": {"type": "String"},
-      "distance": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
     }
   },
   "tides_source_modelEstimate": "Ocean-model estimate",
@@ -11766,14 +11778,50 @@
       }
     }
   },
-  "@transfer_computers_diveCount": {"description": "Dive count on a known-computer card", "placeholders": {"count": {"type": "num"}}},
-  "@transfer_computers_downloadTooltip": {"description": "Tooltip on the per-computer download button"},
-  "@transfer_computers_knownComputersHeader": {"description": "Section header above previously used dive computers"},
-  "@transfer_computers_lastDownloadDaysAgo": {"description": "Relative last-download label, days", "placeholders": {"days": {"type": "int"}}},
-  "@transfer_computers_lastDownloadHoursAgo": {"description": "Relative last-download label, hours", "placeholders": {"hours": {"type": "int"}}},
-  "@transfer_computers_lastDownloadMinutesAgo": {"description": "Relative last-download label, minutes", "placeholders": {"minutes": {"type": "int"}}},
-  "@transfer_computers_lastDownloadNever": {"description": "Shown when a computer has never been downloaded from"},
-  "@transfer_computers_lastDownloadYesterday": {"description": "Relative last-download label, yesterday"},
+  "@transfer_computers_diveCount": {
+    "description": "Dive count on a known-computer card",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "@transfer_computers_downloadTooltip": {
+    "description": "Tooltip on the per-computer download button"
+  },
+  "@transfer_computers_knownComputersHeader": {
+    "description": "Section header above previously used dive computers"
+  },
+  "@transfer_computers_lastDownloadDaysAgo": {
+    "description": "Relative last-download label, days",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@transfer_computers_lastDownloadHoursAgo": {
+    "description": "Relative last-download label, hours",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "@transfer_computers_lastDownloadMinutesAgo": {
+    "description": "Relative last-download label, minutes",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@transfer_computers_lastDownloadNever": {
+    "description": "Shown when a computer has never been downloaded from"
+  },
+  "@transfer_computers_lastDownloadYesterday": {
+    "description": "Relative last-download label, yesterday"
+  },
   "@universalImport_entityAction_linkBadge": {
     "description": "Collapsed-header badge on a duplicate row whose action is link-to-existing"
   },
@@ -14342,10 +14390,18 @@
   "settings_mediaStorage_verify_summary": "Checked {checked} objects: removed {removed} orphans, queued {repaired} repairs, aborted {aborted} stale uploads",
   "@settings_mediaStorage_verify_summary": {
     "placeholders": {
-      "checked": {"type": "int"},
-      "removed": {"type": "int"},
-      "repaired": {"type": "int"},
-      "aborted": {"type": "int"}
+      "checked": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      },
+      "repaired": {
+        "type": "int"
+      },
+      "aborted": {
+        "type": "int"
+      }
     }
   },
   "settings_mediaStorage_backfill_action": "Upload existing library",
@@ -14602,8 +14658,12 @@
   "dive3d_seascape_seafloorSource": "Seafloor: {source} (~{resolution} m)",
   "@dive3d_seascape_seafloorSource": {
     "placeholders": {
-      "source": {"type": "String"},
-      "resolution": {"type": "String"}
+      "source": {
+        "type": "String"
+      },
+      "resolution": {
+        "type": "String"
+      }
     }
   },
   "dive3d_seascape_noCoordinates": "This site has no GPS coordinates",
@@ -14612,7 +14672,11 @@
   "@dive3d_seascape_noData": {},
   "dive3d_seascape_axis_distance": "Distance ({unitSymbol})",
   "@dive3d_seascape_axis_distance": {
-    "placeholders": {"unitSymbol": {"type": "String"}}
+    "placeholders": {
+      "unitSymbol": {
+        "type": "String"
+      }
+    }
   },
   "settings_about_bathymetryCredit": "Bathymetry data: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022",
   "@settings_about_bathymetryCredit": {},
@@ -15557,7 +15621,13 @@
   "reef_habitat_title": "Reef habitat",
   "reef_habitat_onReef": "On a coral reef",
   "reef_habitat_onReefWithThreat": "On a coral reef, threat level {threat}",
-  "@reef_habitat_onReefWithThreat": {"placeholders": {"threat": {"type": "String"}}},
+  "@reef_habitat_onReefWithThreat": {
+    "placeholders": {
+      "threat": {
+        "type": "String"
+      }
+    }
+  },
   "reef_habitat_noReef": "No mapped coral reef at this location",
   "reef_habitat_unavailable": "Could not check reef habitat right now",
   "water_conditions_title": "Water conditions",
@@ -15565,13 +15635,37 @@
   "water_conditions_noData": "No satellite water data for this location",
   "water_conditions_freshwater": "Satellite water temperature covers oceans only",
   "water_conditions_anomaly": "Anomaly {value}",
-  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
+  "@water_conditions_anomaly": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "reef_health_degreeHeatingWeeks": "Degree Heating Weeks {value} C-weeks",
-  "@reef_health_degreeHeatingWeeks": {"placeholders": {"value": {"type": "String"}}},
+  "@reef_health_degreeHeatingWeeks": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "reef_health_seaSurface": "Sea surface {value}",
-  "@reef_health_seaSurface": {"placeholders": {"value": {"type": "String"}}},
+  "@reef_health_seaSurface": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "reef_health_asOf": "As of {date}",
-  "@reef_health_asOf": {"placeholders": {"date": {"type": "String"}}},
+  "@reef_health_asOf": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "reef_health_levelNoStress": "No thermal stress",
   "reef_health_levelWatch": "Bleaching watch",
   "reef_health_levelWarning": "Bleaching warning",
@@ -15585,7 +15679,13 @@
   "reef_protection_unavailable": "Could not check protected status right now",
   "reef_protection_viewRegulations": "View regulations",
   "reef_protection_iucn": "IUCN {category}",
-  "@reef_protection_iucn": {"placeholders": {"category": {"type": "String"}}},
+  "@reef_protection_iucn": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
   "reef_species_recordedNearby": "Recorded nearby",
   "reef_species_addToExpected": "Add to expected species",
   "reef_attribution_title": "Reef data sources",
@@ -15665,7 +15765,9 @@
   "common_selection_deselectAllTooltip": "Deselect all",
   "@common_selection_countSelected": {
     "placeholders": {
-      "count": { "type": "Object" }
+      "count": {
+        "type": "Object"
+      }
     }
   },
   "common_bulkDelete_title": "{count, plural, one{Delete {count} item?} other{Delete {count} items?}}",
@@ -15673,12 +15775,16 @@
   "common_bulkDelete_snackbar": "{count, plural, one{{count} deleted} other{{count} deleted}}",
   "@common_bulkDelete_title": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "@common_bulkDelete_snackbar": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "marineLife_species_delete_confirmTitle": "Delete species?",
@@ -15688,22 +15794,30 @@
   "marineLife_species_delete_error": "Error deleting species: {error}",
   "@marineLife_species_delete_confirmBody": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@marineLife_species_delete_inUseError": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@marineLife_species_delete_snackbar": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@marineLife_species_delete_error": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "enum_diveField_diveNumber": "Dive Number",

@@ -7185,6 +7185,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_tooltip_sensor => 'חיישן';
 
   @override
+  String get diveLog_legend_label_o2Cells => 'תאי O2';
+
+  @override
+  String get diveLog_legend_o2Cells_agreement => 'התאמה';
+
+  @override
+  String get diveLog_legend_o2Cells_cells => 'תאים';
+
+  @override
+  String get diveLog_tooltip_o2CellsTight => 'צמוד';
+
+  @override
+  String get diveLog_tooltip_o2CellsDrifting => 'סטייה';
+
+  @override
+  String get diveLog_tooltip_o2CellsWide => 'רחב';
+
+  @override
   String get diveLog_tooltip_srfGf => 'SrfGF';
 
   @override

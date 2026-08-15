@@ -2532,6 +2532,12 @@
   "diveLog_tooltip_rate": "速率",
   "diveLog_tooltip_sac": "SAC",
   "diveLog_tooltip_sensor": "传感器",
+  "diveLog_legend_label_o2Cells": "氧电池",
+  "diveLog_legend_o2Cells_agreement": "一致性",
+  "diveLog_legend_o2Cells_cells": "电池",
+  "diveLog_tooltip_o2CellsTight": "接近",
+  "diveLog_tooltip_o2CellsDrifting": "偏移",
+  "diveLog_tooltip_o2CellsWide": "偏差大",
   "diveLog_tooltip_srfGf": "水面GF",
   "diveLog_tooltip_temp": "温度",
   "diveLog_tooltip_time": "时间",
@@ -7311,7 +7317,13 @@
   "water_conditions_noData": "此位置没有卫星水文数据",
   "water_conditions_freshwater": "卫星水温仅覆盖海洋",
   "water_conditions_anomaly": "距平 {value}",
-  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
+  "@water_conditions_anomaly": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "reef_health_degreeHeatingWeeks": "热度周 {value} 摄氏度周",
   "reef_health_seaSurface": "海表温度 {value}",
   "reef_health_asOf": "数据日期 {date}",

@@ -12451,6 +12451,42 @@ abstract class AppLocalizations {
   /// **'Sensor'**
   String get diveLog_tooltip_sensor;
 
+  /// No description provided for @diveLog_legend_label_o2Cells.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 cells'**
+  String get diveLog_legend_label_o2Cells;
+
+  /// No description provided for @diveLog_legend_o2Cells_agreement.
+  ///
+  /// In en, this message translates to:
+  /// **'Agreement'**
+  String get diveLog_legend_o2Cells_agreement;
+
+  /// No description provided for @diveLog_legend_o2Cells_cells.
+  ///
+  /// In en, this message translates to:
+  /// **'Cells'**
+  String get diveLog_legend_o2Cells_cells;
+
+  /// No description provided for @diveLog_tooltip_o2CellsTight.
+  ///
+  /// In en, this message translates to:
+  /// **'tight'**
+  String get diveLog_tooltip_o2CellsTight;
+
+  /// No description provided for @diveLog_tooltip_o2CellsDrifting.
+  ///
+  /// In en, this message translates to:
+  /// **'drifting'**
+  String get diveLog_tooltip_o2CellsDrifting;
+
+  /// No description provided for @diveLog_tooltip_o2CellsWide.
+  ///
+  /// In en, this message translates to:
+  /// **'wide'**
+  String get diveLog_tooltip_o2CellsWide;
+
   /// No description provided for @diveLog_tooltip_srfGf.
   ///
   /// In en, this message translates to:

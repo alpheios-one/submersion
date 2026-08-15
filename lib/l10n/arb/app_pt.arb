@@ -2399,6 +2399,12 @@
   "diveLog_tooltip_rate": "Taxa",
   "diveLog_tooltip_sac": "SAC",
   "diveLog_tooltip_sensor": "Sensor",
+  "diveLog_legend_label_o2Cells": "Células O2",
+  "diveLog_legend_o2Cells_agreement": "Concordância",
+  "diveLog_legend_o2Cells_cells": "Células",
+  "diveLog_tooltip_o2CellsTight": "estreita",
+  "diveLog_tooltip_o2CellsDrifting": "em deriva",
+  "diveLog_tooltip_o2CellsWide": "ampla",
   "diveLog_tooltip_srfGf": "SrfGF",
   "diveLog_tooltip_temp": "Temp",
   "diveLog_tooltip_time": "Tempo",
@@ -7311,7 +7317,13 @@
   "water_conditions_noData": "Sem dados de satélite da água para este local",
   "water_conditions_freshwater": "A temperatura da água por satélite cobre apenas os oceanos",
   "water_conditions_anomaly": "Anomalia {value}",
-  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
+  "@water_conditions_anomaly": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "reef_health_degreeHeatingWeeks": "Semanas de aquecimento {value} C-semanas",
   "reef_health_seaSurface": "Superfície do mar {value}",
   "reef_health_asOf": "Em {date}",

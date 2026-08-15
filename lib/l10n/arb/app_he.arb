@@ -2327,6 +2327,12 @@
   "diveLog_tooltip_rate": "קצב",
   "diveLog_tooltip_sac": "SAC",
   "diveLog_tooltip_sensor": "חיישן",
+  "diveLog_legend_label_o2Cells": "תאי O2",
+  "diveLog_legend_o2Cells_agreement": "התאמה",
+  "diveLog_legend_o2Cells_cells": "תאים",
+  "diveLog_tooltip_o2CellsTight": "צמוד",
+  "diveLog_tooltip_o2CellsDrifting": "סטייה",
+  "diveLog_tooltip_o2CellsWide": "רחב",
   "diveLog_tooltip_srfGf": "SrfGF",
   "diveLog_tooltip_temp": "טמפ'",
   "diveLog_tooltip_time": "זמן",
@@ -7311,7 +7317,13 @@
   "water_conditions_noData": "אין נתוני לוויין על המים למיקום זה",
   "water_conditions_freshwater": "טמפרטורת מים לוויינית מכסה אוקיינוסים בלבד",
   "water_conditions_anomaly": "סטייה {value}",
-  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
+  "@water_conditions_anomaly": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "reef_health_degreeHeatingWeeks": "שבועות חום מצטברים {value} מעלות-שבוע",
   "reef_health_seaSurface": "פני הים {value}",
   "reef_health_asOf": "נכון ל-{date}",

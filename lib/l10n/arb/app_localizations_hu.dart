@@ -7351,6 +7351,24 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_tooltip_sensor => 'Érzékelő';
 
   @override
+  String get diveLog_legend_label_o2Cells => 'O2 cellák';
+
+  @override
+  String get diveLog_legend_o2Cells_agreement => 'Egyezés';
+
+  @override
+  String get diveLog_legend_o2Cells_cells => 'Cellák';
+
+  @override
+  String get diveLog_tooltip_o2CellsTight => 'szoros';
+
+  @override
+  String get diveLog_tooltip_o2CellsDrifting => 'elsodródó';
+
+  @override
+  String get diveLog_tooltip_o2CellsWide => 'széles';
+
+  @override
   String get diveLog_tooltip_srfGf => 'SrfGF';
 
   @override

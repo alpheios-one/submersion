@@ -7014,6 +7014,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_tooltip_sensor => '传感器';
 
   @override
+  String get diveLog_legend_label_o2Cells => '氧电池';
+
+  @override
+  String get diveLog_legend_o2Cells_agreement => '一致性';
+
+  @override
+  String get diveLog_legend_o2Cells_cells => '电池';
+
+  @override
+  String get diveLog_tooltip_o2CellsTight => '接近';
+
+  @override
+  String get diveLog_tooltip_o2CellsDrifting => '偏移';
+
+  @override
+  String get diveLog_tooltip_o2CellsWide => '偏差大';
+
+  @override
   String get diveLog_tooltip_srfGf => '水面GF';
 
   @override

@@ -8,6 +8,7 @@ import 'package:submersion/features/dive_log/presentation/providers/profile_lege
 import 'package:submersion/features/dive_log/presentation/widgets/deco_stop_band.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/gas_colors.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/legend_candidates.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/o2_cell_readout.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_legend_config.dart';
 
 /// Persistent dialog for chart toggle options.
@@ -301,6 +302,7 @@ class ChartOptionsDialog extends StatelessWidget {
           onTap: legendNotifier.toggleDecoStops,
           currentSource: legendState.decoStopSource,
           onSourceChanged: legendNotifier.setDecoStopSource,
+          segments: _sourceSegments(context),
           isAreaSwatch: true,
         ),
       if (config.hasCeilingCurve)
@@ -325,6 +327,7 @@ class ChartOptionsDialog extends StatelessWidget {
           onTap: legendNotifier.toggleNdl,
           currentSource: legendState.ndlSource,
           onSourceChanged: legendNotifier.setNdlSource,
+          segments: _sourceSegments(context),
         ),
       if (config.hasTtsData)
         _buildToggleWithSource(
@@ -335,6 +338,7 @@ class ChartOptionsDialog extends StatelessWidget {
           onTap: legendNotifier.toggleTts,
           currentSource: legendState.ttsSource,
           onSourceChanged: legendNotifier.setTtsSource,
+          segments: _sourceSegments(context),
         ),
       if (config.hasCnsData)
         _buildToggleWithSource(
@@ -345,6 +349,7 @@ class ChartOptionsDialog extends StatelessWidget {
           onTap: legendNotifier.toggleCns,
           currentSource: legendState.cnsSource,
           onSourceChanged: legendNotifier.setCnsSource,
+          segments: _sourceSegments(context),
         ),
       if (config.hasOtuData)
         _buildToggleItem(
@@ -395,12 +400,25 @@ class ChartOptionsDialog extends StatelessWidget {
           onTap: legendNotifier.togglePpHe,
         ),
       if (config.hasO2CellMvData)
-        _buildToggleItem(
+        _buildToggleWithSource(
           context,
-          label: ProfileRightAxisMetric.o2CellMv.displayName,
-          color: ProfileRightAxisMetric.o2CellMv.color!,
+          label: context.l10n.diveLog_legend_label_o2Cells,
+          // Cell 1's colour, so the swatch belongs to the same set as the lines.
+          color: o2CellColor(0),
           isEnabled: legendState.showO2CellMv,
           onTap: legendNotifier.toggleO2CellMv,
+          currentSource: legendState.o2CellMode,
+          onSourceChanged: legendNotifier.setO2CellMode,
+          segments: [
+            (
+              O2CellDisplayMode.agreement,
+              context.l10n.diveLog_legend_o2Cells_agreement,
+            ),
+            (
+              O2CellDisplayMode.cells,
+              context.l10n.diveLog_legend_o2Cells_cells,
+            ),
+          ],
         ),
       if (config.hasModData)
         _buildToggleItem(
@@ -525,14 +543,24 @@ class ChartOptionsDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildToggleWithSource(
+  /// Computer/Calculated segments, shared by every deco source switch.
+  List<(MetricDataSource, String)> _sourceSegments(BuildContext context) => [
+    (MetricDataSource.computer, context.l10n.diveLog_legend_source_dc),
+    (MetricDataSource.calculated, context.l10n.diveLog_legend_source_calc),
+  ];
+
+  /// A toggle row with a segmented mode switch on the right. Generic over the
+  /// mode enum so the deco source switches and the O2 cell display mode share
+  /// one row implementation.
+  Widget _buildToggleWithSource<T>(
     BuildContext context, {
     required String label,
     required Color color,
     required bool isEnabled,
     required VoidCallback onTap,
-    required MetricDataSource currentSource,
-    required ValueChanged<MetricDataSource> onSourceChanged,
+    required T currentSource,
+    required ValueChanged<T> onSourceChanged,
+    required List<(T, String)> segments,
     bool isAreaSwatch = false,
   }) {
     return InkWell(
@@ -583,22 +611,13 @@ class ChartOptionsDialog extends StatelessWidget {
               onTap: () {}, // absorb tap to prevent parent InkWell from firing
               child: SizedBox(
                 height: 28,
-                child: SegmentedButton<MetricDataSource>(
+                child: SegmentedButton<T>(
                   segments: [
-                    ButtonSegment(
-                      value: MetricDataSource.computer,
-                      label: Text(
-                        context.l10n.diveLog_legend_source_dc,
-                        style: const TextStyle(fontSize: 11),
+                    for (final (value, text) in segments)
+                      ButtonSegment(
+                        value: value,
+                        label: Text(text, style: const TextStyle(fontSize: 11)),
                       ),
-                    ),
-                    ButtonSegment(
-                      value: MetricDataSource.calculated,
-                      label: Text(
-                        context.l10n.diveLog_legend_source_calc,
-                        style: const TextStyle(fontSize: 11),
-                      ),
-                    ),
                   ],
                   selected: {currentSource},
                   onSelectionChanged: (selected) =>
