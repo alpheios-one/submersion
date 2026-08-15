@@ -1788,6 +1788,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final hasPpHeData =
         widget.ppHeCurve != null && widget.ppHeCurve!.any((v) => v > 0.001);
     final hasModData = widget.modCurve != null && widget.modCurve!.isNotEmpty;
+    final hasO2CellMvData = _hasDataForMetric(ProfileRightAxisMetric.o2CellMv);
     final hasDensityData =
         widget.densityCurve != null && widget.densityCurve!.isNotEmpty;
     final hasGfData = widget.gfCurve != null && widget.gfCurve!.isNotEmpty;
@@ -1829,6 +1830,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       hasPpO2Data: hasPpO2Data,
       hasPpN2Data: hasPpN2Data,
       hasPpHeData: hasPpHeData,
+      hasO2CellMvData: hasO2CellMvData,
       hasModData: hasModData,
       hasDensityData: hasDensityData,
       hasGfData: hasGfData,

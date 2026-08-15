@@ -54,6 +54,10 @@ class ProfileLegendState {
   final bool showCns;
   final bool showOtu;
 
+  /// Raw O2 cell output lines (issue #810). Session-only: no persisted
+  /// default backs it, following the showMod precedent.
+  final bool showO2CellMv;
+
   // Per-metric data source preferences (session overrides).
   // The ceiling line has no source toggle: every import path stores only the
   // computer's stepped stop depth in `ceiling`, so a "computer" ceiling line
@@ -108,6 +112,7 @@ class ProfileLegendState {
     this.showTts = false,
     this.showCns = false,
     this.showOtu = false,
+    this.showO2CellMv = false,
     this.ndlSource = MetricDataSource.calculated,
     this.ttsSource = MetricDataSource.calculated,
     this.cnsSource = MetricDataSource.calculated,
@@ -152,6 +157,7 @@ class ProfileLegendState {
     if (showTts) count++;
     if (showCns) count++;
     if (showOtu) count++;
+    if (showO2CellMv) count++;
     count += showTankPressure.values.where((v) => v).length;
     return count;
   }
@@ -188,6 +194,7 @@ class ProfileLegendState {
     bool? showTts,
     bool? showCns,
     bool? showOtu,
+    bool? showO2CellMv,
     MetricDataSource? ndlSource,
     MetricDataSource? ttsSource,
     MetricDataSource? cnsSource,
@@ -227,6 +234,7 @@ class ProfileLegendState {
       showTts: showTts ?? this.showTts,
       showCns: showCns ?? this.showCns,
       showOtu: showOtu ?? this.showOtu,
+      showO2CellMv: showO2CellMv ?? this.showO2CellMv,
       ndlSource: ndlSource ?? this.ndlSource,
       ttsSource: ttsSource ?? this.ttsSource,
       cnsSource: cnsSource ?? this.cnsSource,
@@ -271,6 +279,7 @@ class ProfileLegendState {
           showTts == other.showTts &&
           showCns == other.showCns &&
           showOtu == other.showOtu &&
+          showO2CellMv == other.showO2CellMv &&
           ndlSource == other.ndlSource &&
           ttsSource == other.ttsSource &&
           cnsSource == other.cnsSource &&
@@ -309,6 +318,7 @@ class ProfileLegendState {
     showTts,
     showCns,
     showOtu,
+    showO2CellMv,
     ndlSource,
     ttsSource,
     cnsSource,
@@ -538,6 +548,10 @@ class ProfileLegend extends _$ProfileLegend {
 
   void toggleOtu() {
     state = state.copyWith(showOtu: !state.showOtu);
+  }
+
+  void toggleO2CellMv() {
+    state = state.copyWith(showO2CellMv: !state.showO2CellMv);
   }
 
   // Data source set methods (for SegmentedButton)

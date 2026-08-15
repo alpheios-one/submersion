@@ -394,6 +394,14 @@ class ChartOptionsDialog extends StatelessWidget {
           isEnabled: legendState.showPpHe,
           onTap: legendNotifier.togglePpHe,
         ),
+      if (config.hasO2CellMvData)
+        _buildToggleItem(
+          context,
+          label: ProfileRightAxisMetric.o2CellMv.displayName,
+          color: ProfileRightAxisMetric.o2CellMv.color!,
+          isEnabled: legendState.showO2CellMv,
+          onTap: legendNotifier.toggleO2CellMv,
+        ),
       if (config.hasModData)
         _buildToggleItem(
           context,
