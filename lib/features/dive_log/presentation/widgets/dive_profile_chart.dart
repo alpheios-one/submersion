@@ -607,6 +607,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   bool _showPpO2 = false;
   bool _showPpN2 = false;
   bool _showPpHe = false;
+  bool _showO2CellMv = false;
   bool _showMod = false;
   bool _showDensity = false;
   bool _showGf = false;
@@ -1704,6 +1705,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     _showPpO2 = legendState.showPpO2;
     _showPpN2 = legendState.showPpN2;
     _showPpHe = legendState.showPpHe;
+    _showO2CellMv = legendState.showO2CellMv;
     _showMod = legendState.showMod;
     _showDensity = legendState.showDensity;
     _showGf = legendState.showGf;
@@ -2740,6 +2742,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                         widget.ppHeCurve != null &&
                         widget.ppHeCurve!.any((v) => v > 0.001))
                       _buildPpHeLine(metricBand),
+
+                    // O2 cell millivolt lines, one per reporting cell
+                    if (_showO2CellMv && widget.o2CellMvCurves != null)
+                      ..._buildO2CellMvLines(metricBand, units),
 
                     // MOD line (if showing)
                     if (_showMod && widget.modCurve != null)
@@ -4830,6 +4836,60 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       dotData: const FlDotData(show: false),
       dashArray: [5, 3],
     );
+  }
+
+  /// One line per O2 cell, in graded shades of a single hue so the cells read
+  /// as one metric with several members.
+  ///
+  /// Gaps stay gaps: unlike the ppO2 line there is no surface lead-in and no
+  /// carry-forward, because a cell that stops reporting is a real dropout and
+  /// bridging it would hide the failure this graph exists to show (issue #810).
+  /// Like the multi-tank pressure lines, these are not decimated -- the
+  /// decimation cache is keyed by list identity and expects a stable list.
+  List<LineChartBarData> _buildO2CellMvLines(
+    MetricBand band,
+    UnitFormatter units,
+  ) {
+    final curves = widget.o2CellMvCurves;
+    if (curves == null) return const [];
+    final range = _getMetricRange(ProfileRightAxisMetric.o2CellMv, units);
+    if (range == null || range.max <= range.min) return const [];
+
+    const cellColors = [
+      Color(0xFF4DD0E1), // Cyan 300
+      Color(0xFF0097A7), // Cyan 700
+      Color(0xFF006064), // Cyan 900
+    ];
+
+    final lines = <LineChartBarData>[];
+    for (var cell = 0; cell < curves.length; cell++) {
+      final curve = curves[cell];
+      final n = math.min(curve.length, widget.profile.length);
+      final spots = <FlSpot>[];
+      for (var i = 0; i < n; i++) {
+        final mv = curve[i];
+        if (mv == null) continue;
+        final yValue = band.map(
+          mv.toDouble().clamp(range.min, range.max),
+          range.min,
+          range.max,
+        );
+        spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
+      }
+      if (spots.isEmpty) continue;
+      lines.add(
+        LineChartBarData(
+          spots: spots,
+          isCurved: true,
+          curveSmoothness: 0.2,
+          color: cellColors[cell % cellColors.length],
+          barWidth: 1.5,
+          isStrokeCapRound: true,
+          dotData: const FlDotData(show: false),
+        ),
+      );
+    }
+    return lines;
   }
 
   /// Build ppN2 (partial pressure of nitrogen) line

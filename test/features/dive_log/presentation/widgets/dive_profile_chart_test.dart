@@ -102,6 +102,7 @@ Widget _buildChart({
   double sacNormalizationFactor = 1.0,
   List<double>? ppO2Curve,
   List<List<double?>>? o2SensorCurves,
+  List<List<int?>>? o2CellMvCurves,
   bool ppO2FromSensorAverage = false,
   List<double>? ppN2Curve,
   List<double>? ppHeCurve,
@@ -154,6 +155,7 @@ Widget _buildChart({
             sacNormalizationFactor: sacNormalizationFactor,
             ppO2Curve: ppO2Curve,
             o2SensorCurves: o2SensorCurves,
+            o2CellMvCurves: o2CellMvCurves,
             ppO2FromSensorAverage: ppO2FromSensorAverage,
             ppN2Curve: ppN2Curve,
             ppHeCurve: ppHeCurve,
@@ -199,6 +201,7 @@ Widget _buildChartAllMetrics({
   double sacNormalizationFactor = 1.0,
   List<double>? ppO2Curve,
   List<List<double?>>? o2SensorCurves,
+  List<List<int?>>? o2CellMvCurves,
   bool ppO2FromSensorAverage = false,
   List<double>? ppN2Curve,
   List<double>? ppHeCurve,
@@ -246,6 +249,7 @@ Widget _buildChartAllMetrics({
             sacNormalizationFactor: sacNormalizationFactor,
             ppO2Curve: ppO2Curve,
             o2SensorCurves: o2SensorCurves,
+            o2CellMvCurves: o2CellMvCurves,
             ppO2FromSensorAverage: ppO2FromSensorAverage,
             ppN2Curve: ppN2Curve,
             ppHeCurve: ppHeCurve,
@@ -1429,6 +1433,90 @@ void main() {
       );
       expect(chart.o2SensorCurves, sensors);
       expect(chart.ppO2FromSensorAverage, isFalse);
+    });
+
+    testWidgets('forwards O2 cell millivolt curves to the chart', (
+      tester,
+    ) async {
+      final profile = makeRichProfile();
+      final mv = <List<int?>>[
+        List.generate(10, (i) => 58 + i % 3),
+        List.generate(10, (i) => 61 - i % 3),
+        List.generate(10, (i) => 43),
+      ];
+
+      await tester.pumpWidget(
+        _buildChart(profile: profile, o2CellMvCurves: mv),
+      );
+      await tester.pumpAndSettle();
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      expect(chart.o2CellMvCurves, mv);
+    });
+
+    testWidgets('draws one line per O2 cell once the toggle is on', (
+      tester,
+    ) async {
+      final profile = makeRichProfile();
+      final mv = <List<int?>>[
+        List.generate(10, (i) => 58 + i % 3),
+        List.generate(10, (i) => 61 - i % 3),
+        List.generate(10, (i) => 43),
+      ];
+
+      await tester.pumpWidget(
+        _buildChart(profile: profile, o2CellMvCurves: mv),
+      );
+      await tester.pumpAndSettle();
+
+      int barCount() => tester
+          .widget<LineChart>(find.byType(LineChart).first)
+          .data
+          .lineBarsData
+          .length;
+
+      final before = barCount();
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DiveProfileChart)),
+      );
+      container.read(profileLegendProvider.notifier).toggleO2CellMv();
+      await tester.pumpAndSettle();
+
+      // One new line per cell, and nothing else appears or disappears.
+      expect(barCount(), before + 3);
+    });
+
+    testWidgets('a cell gap breaks its line instead of interpolating', (
+      tester,
+    ) async {
+      final profile = makeRichProfile();
+      // One cell, reporting on 6 of 10 samples.
+      final mv = <List<int?>>[
+        [58, null, 57, null, 56, null, 55, null, 54, 53],
+      ];
+
+      await tester.pumpWidget(
+        _buildChart(profile: profile, o2CellMvCurves: mv),
+      );
+      await tester.pumpAndSettle();
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DiveProfileChart)),
+      );
+      container.read(profileLegendProvider.notifier).toggleO2CellMv();
+      await tester.pumpAndSettle();
+
+      final bars = tester
+          .widget<LineChart>(find.byType(LineChart).first)
+          .data
+          .lineBarsData;
+      // The millivolt line carries only the six reported samples; a carried or
+      // interpolated value would give it all ten.
+      final mvBar = bars.firstWhere((b) => b.spots.length == 6);
+      expect(mvBar.spots, hasLength(6));
     });
 
     testWidgets('forwards ppO2FromSensorAverage flag to the chart', (
