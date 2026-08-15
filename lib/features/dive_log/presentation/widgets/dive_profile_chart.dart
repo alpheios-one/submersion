@@ -1345,8 +1345,13 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
           bulletColor: const Color(0xFF00ACC1),
         ),
       );
-      // One row per physical cell: ppO2 when the calibration is trustworthy,
-      // the raw output when it is not, both when both are available (#810).
+    }
+
+    // One row per physical cell: ppO2 when the calibration is trustworthy, the
+    // raw output when it is not, both when both are available (#810). Gated on
+    // the cells' own toggles, not on the ppO2 line: hiding the loop ppO2 must
+    // not take the sensor readings with it.
+    if (_showPpO2 || _showO2CellMv) {
       final cellCount = o2CellCount(
         barCurves: widget.o2SensorCurves,
         mvCurves: widget.o2CellMvCurves,
@@ -3284,6 +3289,11 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                         ppO2Value,
                         const Color(0xFF00ACC1),
                       );
+                    }
+
+                    // Cell rows follow the cells' own toggles, not the ppO2
+                    // line: hiding the loop ppO2 must not hide the sensors.
+                    if (_showPpO2 || _showO2CellMv) {
                       final cellCount = o2CellCount(
                         barCurves: widget.o2SensorCurves,
                         mvCurves: widget.o2CellMvCurves,

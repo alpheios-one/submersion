@@ -2770,6 +2770,58 @@ void main() {
       await tester.pump();
     });
 
+    testWidgets('sensor rows survive turning the ppO2 line off', (
+      tester,
+    ) async {
+      // Regression: the cell rows used to live inside the ppO2 gate, so hiding
+      // the loop ppO2 curve took the sensor readings with it.
+      List<TooltipRow>? receivedRows;
+
+      await tester.pumpWidget(
+        _buildChartAllMetrics(
+          profile: makeTouchProfile(),
+          tooltipBelow: true,
+          onTooltipData: (rows) => receivedRows = rows,
+          ppO2Curve: List.generate(20, (i) => 1.19),
+          o2CellMvCurves: <List<int?>>[
+            List.generate(20, (i) => 63),
+            List.generate(20, (i) => 65),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DiveProfileChart)),
+      );
+      final notifier = container.read(profileLegendProvider.notifier);
+      notifier.toggleO2CellMv();
+      if (container.read(profileLegendProvider).showPpO2) {
+        notifier.togglePpO2();
+      }
+      await tester.pumpAndSettle();
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(LineChart)),
+      );
+      await tester.pump(const Duration(milliseconds: 600));
+      await gesture.moveBy(const Offset(5, 0));
+      await tester.pump();
+      await gesture.moveBy(const Offset(5, 0));
+      await tester.pump();
+
+      if (receivedRows != null) {
+        final labels = receivedRows!.map((r) => r.label).toList();
+        expect(labels, contains('Sensor 1'));
+        expect(labels, contains('Sensor 2'));
+        // ...and the ppO2 row itself is gone, as asked.
+        expect(labels.any((l) => l.startsWith('ppO2')), isFalse);
+      }
+
+      await gesture.up();
+      await tester.pump();
+    });
+
     testWidgets('tooltip shows millivolts alone when the cell has no ppO2', (
       tester,
     ) async {
