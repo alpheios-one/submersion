@@ -815,6 +815,14 @@ class DiveProfilePoint extends Equatable {
   final double? o2Sensor4;
   final double? o2Sensor5;
   final double? o2Sensor6;
+  // Raw O2 cell output (mV); null when absent. Present even when the matching
+  // o2SensorN is null because the logged calibration was untrusted (#810)
+  final int? o2SensorMv1;
+  final int? o2SensorMv2;
+  final int? o2SensorMv3;
+  final int? o2SensorMv4;
+  final int? o2SensorMv5;
+  final int? o2SensorMv6;
   // Wearable integration (v2.0)
   final String? heartRateSource; // 'diveComputer', 'appleWatch', 'garmin'
   // Decompression data
@@ -840,6 +848,12 @@ class DiveProfilePoint extends Equatable {
     this.o2Sensor4,
     this.o2Sensor5,
     this.o2Sensor6,
+    this.o2SensorMv1,
+    this.o2SensorMv2,
+    this.o2SensorMv3,
+    this.o2SensorMv4,
+    this.o2SensorMv5,
+    this.o2SensorMv6,
     this.heartRateSource,
     this.cns,
     this.ndl,
@@ -864,6 +878,12 @@ class DiveProfilePoint extends Equatable {
     double? o2Sensor4,
     double? o2Sensor5,
     double? o2Sensor6,
+    int? o2SensorMv1,
+    int? o2SensorMv2,
+    int? o2SensorMv3,
+    int? o2SensorMv4,
+    int? o2SensorMv5,
+    int? o2SensorMv6,
     String? heartRateSource,
     double? cns,
     int? ndl,
@@ -887,6 +907,12 @@ class DiveProfilePoint extends Equatable {
       o2Sensor4: o2Sensor4 ?? this.o2Sensor4,
       o2Sensor5: o2Sensor5 ?? this.o2Sensor5,
       o2Sensor6: o2Sensor6 ?? this.o2Sensor6,
+      o2SensorMv1: o2SensorMv1 ?? this.o2SensorMv1,
+      o2SensorMv2: o2SensorMv2 ?? this.o2SensorMv2,
+      o2SensorMv3: o2SensorMv3 ?? this.o2SensorMv3,
+      o2SensorMv4: o2SensorMv4 ?? this.o2SensorMv4,
+      o2SensorMv5: o2SensorMv5 ?? this.o2SensorMv5,
+      o2SensorMv6: o2SensorMv6 ?? this.o2SensorMv6,
       heartRateSource: heartRateSource ?? this.heartRateSource,
       cns: cns ?? this.cns,
       ndl: ndl ?? this.ndl,
@@ -913,6 +939,12 @@ class DiveProfilePoint extends Equatable {
     o2Sensor4,
     o2Sensor5,
     o2Sensor6,
+    o2SensorMv1,
+    o2SensorMv2,
+    o2SensorMv3,
+    o2SensorMv4,
+    o2SensorMv5,
+    o2SensorMv6,
     heartRateSource,
     cns,
     ndl,
