@@ -96,7 +96,7 @@ String _validDb(String dir, String name) {
   final db = sqlite3.sqlite3.open(path);
   db.execute('CREATE TABLE dives (id TEXT PRIMARY KEY)');
   db.execute('CREATE TABLE dive_sites (id TEXT PRIMARY KEY)');
-  db.dispose();
+  db.close();
   return path;
 }
 

@@ -417,7 +417,7 @@ class DatabaseService {
       }
       rethrow;
     } finally {
-      db.dispose();
+      db.close();
     }
   }
 
@@ -438,7 +438,7 @@ class DatabaseService {
       try {
         db.execute(cipherKeyPragma(keyHex));
       } catch (_) {
-        db.dispose();
+        db.close();
         rethrow;
       }
     }
@@ -468,7 +468,7 @@ class DatabaseService {
       try {
         db.select('PRAGMA user_version');
       } finally {
-        db.dispose();
+        db.close();
       }
       return true;
     } on sqlite3.SqliteException {

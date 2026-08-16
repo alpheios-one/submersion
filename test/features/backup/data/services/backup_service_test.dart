@@ -222,7 +222,21 @@ class FakeCloudStorageProvider implements CloudStorageProvider {
 // Tests
 // =============================================================================
 
+/// Per-file temp root, so the backup service's fixed `Submersion/Backups`
+/// subtree does not collide with the other suites that mock path_provider the
+/// same way. `flutter test` runs files in parallel isolates against one real
+/// $TMPDIR, so sharing it let one suite truncate or encrypt another's artifact
+/// mid-assert.
+final _isolatedTempDir = Directory.systemTemp.createTempSync(
+  'backup_svc_test_',
+);
+
 void main() {
+  tearDownAll(() {
+    if (_isolatedTempDir.existsSync()) {
+      _isolatedTempDir.deleteSync(recursive: true);
+    }
+  });
   group('BackupService', () {
     late BackupPreferences preferences;
     late FakeCloudStorageProvider fakeCloud;
@@ -235,10 +249,10 @@ void main() {
             const MethodChannel('plugins.flutter.io/path_provider'),
             (MethodCall methodCall) async {
               if (methodCall.method == 'getTemporaryDirectory') {
-                return Directory.systemTemp.path;
+                return _isolatedTempDir.path;
               }
               if (methodCall.method == 'getApplicationDocumentsDirectory') {
-                return Directory.systemTemp.path;
+                return _isolatedTempDir.path;
               }
               return null;
             },
@@ -702,7 +716,7 @@ void main() {
         final db = sqlite3.sqlite3.open(dbFile.path);
         db.execute('CREATE TABLE dives (id TEXT PRIMARY KEY)');
         db.execute('CREATE TABLE dive_sites (id TEXT PRIMARY KEY)');
-        db.dispose();
+        db.close();
 
         final service = BackupService(
           dbAdapter: fakeDb,
@@ -734,7 +748,7 @@ void main() {
             'CREATE TABLE dive_sites (id TEXT PRIMARY KEY, name TEXT)',
           );
           db.execute('PRAGMA user_version = 20');
-          db.dispose();
+          db.close();
 
           final service = BackupService(
             dbAdapter: fakeDb,
@@ -758,7 +772,7 @@ void main() {
                   .toList();
               expect(columnNames, isNot(contains('wearable_source')));
             } finally {
-              verifyDb.dispose();
+              verifyDb.close();
             }
           } finally {
             await tempDir.delete(recursive: true);
@@ -793,7 +807,7 @@ void main() {
 
           final db = sqlite3.sqlite3.open(dbFile.path);
           db.execute('CREATE TABLE some_other_table (id TEXT PRIMARY KEY)');
-          db.dispose();
+          db.close();
 
           final service = BackupService(
             dbAdapter: fakeDb,

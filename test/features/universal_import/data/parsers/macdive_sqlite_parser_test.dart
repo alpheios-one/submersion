@@ -53,7 +53,7 @@ void main() {
 
       final db = sqlite3.sqlite3.open(tmp.path);
       db.execute('CREATE TABLE foo (id INTEGER PRIMARY KEY);');
-      db.dispose();
+      db.close();
 
       final otherBytes = Uint8List.fromList(await tmp.readAsBytes());
       final payload = await const MacDiveSqliteParser().parse(otherBytes);

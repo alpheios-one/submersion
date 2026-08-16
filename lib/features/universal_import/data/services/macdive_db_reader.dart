@@ -41,7 +41,7 @@ class MacDiveDbReader {
         final tables = rows.map<String>((r) => r['name'] as String).toSet();
         return _requiredTables.every(tables.contains);
       } finally {
-        db.dispose();
+        db.close();
       }
     } catch (_) {
       return false;
@@ -141,7 +141,7 @@ class MacDiveDbReader {
           diversByPk: {for (final d in divers) d.pk: d},
         );
       } finally {
-        db.dispose();
+        db.close();
       }
     } finally {
       _deleteTempFile(tmpFile);

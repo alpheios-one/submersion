@@ -12,7 +12,6 @@ import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 
 import 'package:submersion/app.dart';
-import 'package:submersion/core/database/sqlcipher_setup.dart';
 import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/presentation/pages/startup_page.dart';
 import 'package:submersion/features/data_quality/presentation/providers/quality_detector_toggles.dart';
@@ -33,10 +32,6 @@ void main() {
 Future<void> _bootstrap() async {
   // coverage:ignore-end
   WidgetsFlutterBinding.ensureInitialized();
-
-  // SQLCipher loader override for this (main) isolate — must run before
-  // anything can touch the database, including the startup schema probe.
-  setupSqlcipher();
 
   // Route uncaught Flutter framework and platform errors into the debug log so
   // future crashes are diagnosable from the user-shared log (issue #318).

@@ -67,7 +67,7 @@ void main() {
         seed.execute('CREATE TABLE sentinel (id INTEGER PRIMARY KEY)');
         seed.execute('INSERT INTO sentinel VALUES (42)');
       } finally {
-        seed.dispose();
+        seed.close();
       }
 
       // Stand-in for the fabricated Drive path: nesting under a regular file

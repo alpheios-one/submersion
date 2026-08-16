@@ -1341,8 +1341,8 @@ void main() {
                 (needsMigration: false, totalSteps: 0),
             initializerOverride: (_) async {
               throw sqlite3.SqliteException(
-                776,
-                'attempt to write a readonly database',
+                extendedResultCode: 776,
+                message: 'attempt to write a readonly database',
               );
             },
           ),
@@ -1378,7 +1378,10 @@ void main() {
             schemaVersionProbeOverride: (_) =>
                 (needsMigration: false, totalSteps: 0),
             initializerOverride: (_) async {
-              throw sqlite3.SqliteException(776, 'readonly');
+              throw sqlite3.SqliteException(
+                extendedResultCode: 776,
+                message: 'readonly',
+              );
             },
           ),
         );
@@ -1402,7 +1405,10 @@ void main() {
                 (needsMigration: false, totalSteps: 0),
             initializerOverride: (_) async {
               // SQLITE_BUSY — primary code 5; not in the READONLY family.
-              throw sqlite3.SqliteException(5, 'database is locked');
+              throw sqlite3.SqliteException(
+                extendedResultCode: 5,
+                message: 'database is locked',
+              );
             },
           ),
         );
@@ -1428,7 +1434,10 @@ void main() {
             schemaVersionProbeOverride: (_) =>
                 (needsMigration: false, totalSteps: 0),
             initializerOverride: (_) async {
-              throw sqlite3.SqliteException(776, 'readonly');
+              throw sqlite3.SqliteException(
+                extendedResultCode: 776,
+                message: 'readonly',
+              );
             },
             closeAppOverride: () => closeCalled++,
           ),
@@ -1467,7 +1476,10 @@ void main() {
             schemaVersionProbeOverride: (_) =>
                 (needsMigration: false, totalSteps: 0),
             initializerOverride: (_) async {
-              throw sqlite3.SqliteException(776, 'readonly');
+              throw sqlite3.SqliteException(
+                extendedResultCode: 776,
+                message: 'readonly',
+              );
             },
           ),
         );
@@ -1511,7 +1523,10 @@ void main() {
             schemaVersionProbeOverride: (_) =>
                 (needsMigration: false, totalSteps: 0),
             initializerOverride: (_) async {
-              throw sqlite3.SqliteException(776, 'readonly');
+              throw sqlite3.SqliteException(
+                extendedResultCode: 776,
+                message: 'readonly',
+              );
             },
           ),
         );
@@ -1558,7 +1573,10 @@ void main() {
           schemaVersionProbeOverride: (_) =>
               (needsMigration: false, totalSteps: 0),
           initializerOverride: (_) async {
-            throw sqlite3.SqliteException(776, 'readonly');
+            throw sqlite3.SqliteException(
+              extendedResultCode: 776,
+              message: 'readonly',
+            );
           },
         ),
       );
@@ -1602,7 +1620,10 @@ void main() {
           schemaVersionProbeOverride: (_) =>
               (needsMigration: false, totalSteps: 0),
           initializerOverride: (_) async {
-            throw sqlite3.SqliteException(776, 'readonly');
+            throw sqlite3.SqliteException(
+              extendedResultCode: 776,
+              message: 'readonly',
+            );
           },
           closeAppOverride: () => closeCalled++,
         ),
@@ -1640,7 +1661,10 @@ void main() {
           initializerOverride: (_) async {
             calls++;
             if (calls == 1) {
-              throw sqlite3.SqliteException(776, 'readonly');
+              throw sqlite3.SqliteException(
+                extendedResultCode: 776,
+                message: 'readonly',
+              );
             }
             await Completer<void>().future;
           },

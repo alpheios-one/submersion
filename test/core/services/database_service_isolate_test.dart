@@ -101,7 +101,7 @@ void main() {
     raw.execute(
       'PRAGMA user_version = ${AppDatabase.currentSchemaVersion - 1}',
     );
-    raw.dispose();
+    raw.close();
 
     await DatabaseService.instance.initialize(
       locationService: _FakeLocation(dbPath),
@@ -132,7 +132,7 @@ void main() {
       raw.execute(
         'PRAGMA user_version = ${AppDatabase.currentSchemaVersion + 1}',
       );
-      raw.dispose();
+      raw.close();
 
       await expectLater(
         DatabaseService.instance.initialize(
@@ -215,7 +215,7 @@ void main() {
     await seed.close();
     final raw = sqlite3.sqlite3.open(dbPath);
     raw.execute('PRAGMA user_version = 58');
-    raw.dispose();
+    raw.close();
 
     await expectLater(
       DatabaseService.instance.initialize(

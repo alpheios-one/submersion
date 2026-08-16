@@ -1158,7 +1158,7 @@ void main() {
           try {
             db.execute('CREATE TABLE dive_details (DiveId INTEGER)');
             db.execute('CREATE TABLE log_data (DiveId INTEGER)');
-            db.dispose();
+            db.close();
 
             final bytes = await File(dbPath).readAsBytes();
             final result = await notifier.loadFileFromBytes(

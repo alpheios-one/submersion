@@ -21,23 +21,19 @@ dependencies:
   riverpod: ^3.1.0
 
   # Database
-  drift: ^2.30.0
-  sqlite3: ^2.9.4
-  # SQLCipher-enabled replacement for sqlite3_flutter_libs (same maintainer,
-  # same sqlite3 Dart API). One native lib serves both plaintext and encrypted
-  # databases; the codec only engages when PRAGMA key is set.
-  # Pinned to 0.6.x on purpose: 0.7.0+eol is an empty tombstone release that
-  # removes the native SQLCipher bundling entirely (same pattern as the old
-  # sqlite3_flutter_libs 0.6.0+eol, issue #433). It is only safe once we
-  # migrate to sqlite3 3.x (UPGRADING_TO_V3.md). Build-time note: Windows and
-  # Linux builds compile SQLCipher and need OpenSSL installed on the build
-  # machine (choco install openssl / apt install libssl-dev).
-  sqlcipher_flutter_libs: ">=0.6.8 <0.7.0"
+  drift: ^2.34.3
+  sqlite3: ^3.5.1
+  # SQLCipher now arrives through the sqlite3 build hook rather than a
+  # separate `sqlcipher_flutter_libs` dependency -- see the `hooks:` section
+  # at the bottom of this file. sqlite3 3.x dropped the DynamicLibrary loader
+  # (`package:sqlite3/open.dart`) that the old override needed, and both
+  # `sqlite3_flutter_libs` and `sqlcipher_flutter_libs` are tombstoned as a
+  # result (issue #433). One native lib still serves both plaintext and
+  # encrypted databases; the codec only engages when PRAGMA key is set.
   path_provider: ^2.1.5
   path: ^1.9.0
 
   # Serialization
-  freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
 
   # Navigation
@@ -59,7 +55,7 @@ dependencies:
   http: ^1.2.2
   # Network-type detection for media store transfer policies (Wi-Fi vs
   # cellular vs offline).
-  connectivity_plus: ^6.1.0
+  connectivity_plus: ^7.3.1
   # FFI for reading the Windows certificate store (TLS trust on Windows).
   ffi: ^2.1.0
 
@@ -89,7 +85,7 @@ dependencies:
   url_launcher: ^6.3.1
   flutter_contacts: ^2.0.2
   geolocator: ^14.0.2
-  geocoding: ^4.0.0
+  geocoding: ^5.0.0
   photo_manager: ^3.6.0
   native_exif: ^0.8.0
   # Pure-Dart decode/resize/JPEG-encode for media store thumbnails.
@@ -125,7 +121,7 @@ dependencies:
 
   # Notifications
   flutter_local_notifications: ^22.0.1
-  workmanager: ^0.9.0+3
+  workmanager: ^0.10.7
   timezone: ^0.11.0
   google_fonts: ^8.0.2
   linked_scroll_controller: ^0.2.0
@@ -145,19 +141,19 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
   build_runner: ^2.10.4
-  drift_dev: ^2.30.0
-  freezed: ^3.2.3
+  drift_dev: ^2.34.0
   json_serializable: ^6.11.2
   riverpod_generator: ^4.0.0+1
   mockito: ^5.6.1
   plugin_platform_interface: ^2.1.8
   path_provider_platform_interface: ^2.1.3  # mock docs dir in db service tests
   permission_handler_platform_interface: ^4.3.0  # mock BLE scan permission grants
+  geocoding_platform_interface: ^5.0.0  # fake geocoder in location service tests
   flutter_web_auth_2_platform_interface: ^5.0.0  # mock auth in redirect-capture test
   share_plus_platform_interface: ^6.1.0  # fake share sheet in media share tests
   video_player_platform_interface: ^6.7.0  # fake player in media viewer tests
   fake_async: ^1.3.3  # synthetic clock + Timer driving for unit tests
-  analyzer: ^9.0.0  # AST parsing for the provider change-tick architecture test
+  analyzer: ^12.0.0  # AST parsing for the provider change-tick architecture test
 
 dependency_overrides:
   # fit_tool (3 years unmaintained) has stale deps; overrides are safe because:
@@ -170,6 +166,19 @@ dependency_overrides:
   # platform channel threading requirement.
   auto_updater_windows:
     path: packages/auto_updater_windows
+
+# Selects the SQLCipher build of SQLite for `package:sqlite3`, replacing the
+# retired `sqlcipher_flutter_libs`. sqlite3 downloads prebuilt SQLCipher
+# libraries (verified against sha256 references baked into the package) for
+# every target, so no local OpenSSL toolchain is needed to build any more --
+# the SQLCipher binaries link OpenSSL on Windows, Linux and Android.
+#
+# Note: upstream warns the SQLCipher build may track a slightly older SQLite
+# version than the default `sqlite3` build.
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlcipher
 
 flutter:
   generate: true
