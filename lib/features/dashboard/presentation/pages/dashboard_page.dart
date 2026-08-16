@@ -9,7 +9,7 @@ import 'package:submersion/features/dashboard/presentation/home_layout.dart';
 import 'package:submersion/features/dashboard/presentation/providers/dashboard_providers.dart';
 import 'package:submersion/features/dashboard/presentation/providers/gauge_providers.dart';
 import 'package:submersion/features/dashboard/presentation/providers/milestone_providers.dart';
-import 'package:submersion/features/dashboard/presentation/providers/photo_providers.dart';
+import 'package:submersion/features/dashboard/presentation/providers/media_ribbon_providers.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/dashboard_grid.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/urgent_banner.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -37,7 +37,7 @@ class DashboardPage extends ConsumerWidget {
 
     final alerts = ref.watch(dashboardAlertsProvider);
     final milestones = ref.watch(milestonesProvider);
-    final photos = ref.watch(recentPhotosProvider);
+    final media = ref.watch(recentMediaProvider);
     final onThisDay = ref.watch(onThisDayProvider);
     final yearInReview = ref.watch(yearInReviewProvider);
     final courses = ref.watch(activeCoursesProgressProvider);
@@ -52,7 +52,7 @@ class DashboardPage extends ConsumerWidget {
 
     bool hasContent(HomeCardType card) => switch (card) {
       HomeCardType.milestones => show(milestones, (m) => !m.isEmpty),
-      HomeCardType.photoRibbon => show(photos, (p) => p.isNotEmpty),
+      HomeCardType.photoRibbon => show(media, (m) => m.isNotEmpty),
       HomeCardType.onThisDay => show(onThisDay, (d) => d.isNotEmpty),
       HomeCardType.yearInReview => show(yearInReview, (y) => y != null),
       HomeCardType.activeCourses => show(courses, (c) => c.isNotEmpty),
@@ -92,7 +92,7 @@ class DashboardPage extends ConsumerWidget {
             ref.invalidate(daysSinceLastDiveProvider);
             ref.invalidate(dashboardQuickStatsProvider);
             ref.invalidate(milestonesProvider);
-            ref.invalidate(recentPhotosProvider);
+            ref.invalidate(recentMediaProvider);
             ref.invalidate(onThisDayProvider);
             ref.invalidate(yearInReviewProvider);
             ref.invalidate(recentSitesProvider);

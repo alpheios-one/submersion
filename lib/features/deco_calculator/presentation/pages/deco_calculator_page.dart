@@ -14,80 +14,97 @@ import 'package:submersion/features/deco_calculator/presentation/widgets/environ
 import 'package:submersion/features/deco_calculator/presentation/widgets/gas_mix_selector.dart';
 import 'package:submersion/features/deco_calculator/presentation/widgets/gas_warnings_display.dart';
 import 'package:submersion/features/deco_calculator/presentation/widgets/time_slider.dart';
+import 'package:submersion/features/planning/presentation/widgets/planning_tool_pane.dart';
 
 /// Interactive deco calculator page with real-time calculations.
 ///
 /// Provides sliders for depth, time, and gas mix with instant feedback
 /// on NDL, ceiling, TTS, and tissue loading.
 class DecoCalculatorPage extends ConsumerWidget {
-  const DecoCalculatorPage({super.key});
+  /// Renders without its own Scaffold and AppBar, for the Planning detail
+  /// pane. See [PlanningToolPane].
+  final bool embedded;
+
+  const DecoCalculatorPage({super.key, this.embedded = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final decoStatus = ref.watch(calcDecoStatusProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.decoCalculator_title),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => resetCalculator(ref),
-            tooltip: context.l10n.decoCalculator_resetToDefaults,
-          ),
-          Tooltip(
-            message: context.l10n.decoCalculator_createPlanTooltip,
-            child: TextButton.icon(
-              icon: const Icon(Icons.edit_calendar),
-              label: Text(context.l10n.decoCalculator_addToPlanner),
-              onPressed: () => _addToPlan(context, ref),
+    final actions = [
+      IconButton(
+        icon: const Icon(Icons.refresh),
+        onPressed: () => resetCalculator(ref),
+        tooltip: context.l10n.decoCalculator_resetToDefaults,
+      ),
+      Tooltip(
+        message: context.l10n.decoCalculator_createPlanTooltip,
+        child: TextButton.icon(
+          icon: const Icon(Icons.edit_calendar),
+          label: Text(context.l10n.decoCalculator_addToPlanner),
+          onPressed: () => _addToPlan(context, ref),
+        ),
+      ),
+    ];
+
+    final content = SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Input parameters card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.l10n.decoCalculator_diveParameters,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const DepthSlider(),
+                  const SizedBox(height: 16),
+                  const TimeSlider(),
+                  const SizedBox(height: 16),
+                  const GasMixSelector(),
+                  const SizedBox(height: 16),
+                  const EnvironmentInputs(),
+                ],
+              ),
             ),
+          ),
+          const SizedBox(height: 12),
+          const GasWarningsDisplay(),
+          const SizedBox(height: 12),
+          DecoInfoPanel(
+            status: decoStatus,
+            showTissueChart: true,
+            showDecoStops: true,
+            showHeader: true,
+            useCard: true,
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Input parameters card
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      context.l10n.decoCalculator_diveParameters,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    const DepthSlider(),
-                    const SizedBox(height: 16),
-                    const TimeSlider(),
-                    const SizedBox(height: 16),
-                    const GasMixSelector(),
-                    const SizedBox(height: 16),
-                    const EnvironmentInputs(),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            const GasWarningsDisplay(),
-            const SizedBox(height: 12),
-            DecoInfoPanel(
-              status: decoStatus,
-              showTissueChart: true,
-              showDecoStops: true,
-              showHeader: true,
-              useCard: true,
-            ),
-          ],
-        ),
+    );
+
+    if (embedded) {
+      return PlanningToolPane(
+        title: context.l10n.decoCalculator_title,
+        actions: actions,
+        child: content,
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(context.l10n.decoCalculator_title),
+        actions: actions,
       ),
+      body: content,
     );
   }
 

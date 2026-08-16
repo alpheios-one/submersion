@@ -91,6 +91,16 @@ class CertificationListPage extends ConsumerWidget {
               onPressed: () => context.push('/certifications/wallet'),
             ),
             IconButton(
+              icon: const Icon(Icons.search, size: 20),
+              tooltip: context.l10n.certifications_list_tooltip_search,
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: CertificationSearchDelegate(ref),
+                );
+              },
+            ),
+            IconButton(
               icon: const Icon(Icons.sort, size: 20),
               tooltip: context.l10n.certifications_list_tooltip_sort,
               onPressed: () {
@@ -107,16 +117,6 @@ class CertificationListPage extends ConsumerWidget {
                     ref.read(certificationSortProvider.notifier).state =
                         SortState(field: field, direction: direction);
                   },
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.search, size: 20),
-              tooltip: context.l10n.certifications_list_tooltip_search,
-              onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: CertificationSearchDelegate(ref),
                 );
               },
             ),

@@ -388,23 +388,21 @@ class DeviceDetailPage extends ConsumerWidget {
     ref.read(diveComputerNotifierProvider.notifier).setFavorite(computer.id);
   }
 
+  /// Shows the dive list restricted to this computer.
+  ///
+  /// Filters on the computer id, not its serial number. Keying this on the
+  /// serial used to dead-end with a "no serial number" snackbar on every
+  /// computer whose firmware never reported one (issue #1064), even though the
+  /// dives were downloaded and attributed correctly.
   void _viewDivesFromComputer(
     BuildContext context,
     WidgetRef ref,
     DiveComputer computer,
   ) {
-    if (computer.serialNumber != null && computer.serialNumber!.isNotEmpty) {
-      ref.read(diveFilterProvider.notifier).state = DiveFilterState(
-        computerSerial: computer.serialNumber,
-      );
-      context.go('/dives');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.diveComputer_detail_cannotFilterNoSerial),
-        ),
-      );
-    }
+    ref.read(diveFilterProvider.notifier).state = DiveFilterState(
+      computerId: computer.id,
+    );
+    context.go('/dives');
   }
 
   Future<void> _confirmReimportAll(

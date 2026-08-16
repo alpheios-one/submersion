@@ -242,11 +242,6 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                   ),
                   actions: [
                     IconButton(
-                      icon: const Icon(Icons.sort),
-                      tooltip: context.l10n.equipment_list_sortTooltip,
-                      onPressed: () => _showSortSheet(context),
-                    ),
-                    IconButton(
                       icon: const Icon(Icons.search),
                       tooltip: context.l10n.equipment_list_searchTooltip,
                       onPressed: () {
@@ -255,6 +250,11 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                           delegate: EquipmentSearchDelegate(),
                         );
                       },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.sort),
+                      tooltip: context.l10n.equipment_list_sortTooltip,
+                      onPressed: () => _showSortSheet(context),
                     ),
                     // The only way into bulk actions: entry by long-press was removed,
                     // so nothing but this control opens selection mode on touch.
@@ -547,8 +547,10 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          // Flexible so the title yields before the action row overflows.
-          Flexible(
+          // Expanded, and no Spacer: the title must be the row's only flexible
+          // child, or Spacer takes half the free space and the leftover half
+          // lands after the last icon (see trip_list_content for the detail).
+          Expanded(
             child: FeatureAppBarTitle(
               featureId: 'equipment',
               title: context.l10n.equipment_appBar_title,
@@ -557,18 +559,17 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
-          const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.sort, size: 20),
-            tooltip: context.l10n.equipment_list_sortTooltip,
-            onPressed: () => _showSortSheet(context),
-          ),
           IconButton(
             icon: const Icon(Icons.search, size: 20),
             tooltip: context.l10n.equipment_list_searchTooltip,
             onPressed: () {
               showSearch(context: context, delegate: EquipmentSearchDelegate());
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.sort, size: 20),
+            tooltip: context.l10n.equipment_list_sortTooltip,
+            onPressed: () => _showSortSheet(context),
           ),
           // The only way into bulk actions: entry by long-press was removed,
           // so nothing but this control opens selection mode on touch.

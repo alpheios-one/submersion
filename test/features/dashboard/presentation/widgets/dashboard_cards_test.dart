@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dashboard/presentation/providers/dashboard_providers.dart';
 import 'package:submersion/features/dashboard/presentation/providers/milestone_providers.dart';
-import 'package:submersion/features/dashboard/presentation/providers/photo_providers.dart';
+import 'package:submersion/features/dashboard/presentation/providers/media_ribbon_providers.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/milestones_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/on_this_day_card.dart';
-import 'package:submersion/features/dashboard/presentation/widgets/photo_ribbon_card.dart';
+import 'package:submersion/features/dashboard/presentation/widgets/media_ribbon_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/quick_actions_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/year_in_review_card.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -277,24 +277,55 @@ void main() {
     });
   });
 
-  group('PhotoRibbonCard', () {
-    testWidgets('hidden without photos', (tester) async {
+  group('MediaRibbonCard', () {
+    testWidgets('hidden without media', (tester) async {
       await pumpCard(
         tester,
-        const PhotoRibbonCard(),
+        const MediaRibbonCard(),
         overrides: [
-          recentPhotosProvider.overrideWith((ref) async => <MediaItem>[]),
+          recentMediaProvider.overrideWith((ref) async => <MediaItem>[]),
         ],
       );
-      expect(find.text('Recent photos'), findsNothing);
+      expect(find.text('Recent media'), findsNothing);
     });
 
-    testWidgets('renders a tile per photo', (tester) async {
+    // A video thumbnail is a still frame, so the badge is the only thing
+    // distinguishing it from a photo in the ribbon.
+    testWidgets('badges videos but not photos', (tester) async {
+      MediaItem entry(String id, MediaType type) => MediaItem(
+        id: id,
+        mediaType: type,
+        sourceType: MediaSourceType.platformGallery,
+        filePath: '/tmp/$id',
+        diveId: 'd1',
+        takenAt: _t0,
+        createdAt: _t0,
+        updatedAt: _t0,
+      );
+
       await pumpCard(
         tester,
-        const PhotoRibbonCard(),
+        const MediaRibbonCard(),
         overrides: [
-          recentPhotosProvider.overrideWith(
+          recentMediaProvider.overrideWith(
+            (ref) async => [
+              entry('v1', MediaType.video),
+              entry('p1', MediaType.photo),
+              entry('v2', MediaType.video),
+            ],
+          ),
+        ],
+      );
+
+      expect(find.byIcon(Icons.play_arrow), findsNWidgets(2));
+    });
+
+    testWidgets('renders a tile per item', (tester) async {
+      await pumpCard(
+        tester,
+        const MediaRibbonCard(),
+        overrides: [
+          recentMediaProvider.overrideWith(
             (ref) async => [
               MediaItem(
                 id: 'p1',
@@ -320,7 +351,7 @@ void main() {
           ),
         ],
       );
-      expect(find.text('Recent photos'), findsOneWidget);
+      expect(find.text('Recent media'), findsOneWidget);
       expect(find.byType(ClipRRect), findsNWidgets(2));
     });
 
@@ -329,9 +360,9 @@ void main() {
     ) async {
       final spy = await pumpCard(
         tester,
-        const PhotoRibbonCard(),
+        const MediaRibbonCard(),
         overrides: [
-          recentPhotosProvider.overrideWith(
+          recentMediaProvider.overrideWith(
             (ref) async => [
               MediaItem(
                 id: 'p1',

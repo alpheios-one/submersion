@@ -9,12 +9,12 @@ import 'package:submersion/features/dashboard/presentation/pages/dashboard_page.
 import 'package:submersion/features/dashboard/presentation/providers/dashboard_providers.dart';
 import 'package:submersion/features/dashboard/presentation/providers/gauge_providers.dart';
 import 'package:submersion/features/dashboard/presentation/providers/milestone_providers.dart';
-import 'package:submersion/features/dashboard/presentation/providers/photo_providers.dart';
+import 'package:submersion/features/dashboard/presentation/providers/media_ribbon_providers.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/gauge_strip.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/hero_header.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/milestones_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/on_this_day_card.dart';
-import 'package:submersion/features/dashboard/presentation/widgets/photo_ribbon_card.dart';
+import 'package:submersion/features/dashboard/presentation/widgets/media_ribbon_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/quick_actions_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/recent_dives_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/recent_sites_map_card.dart';
@@ -110,7 +110,7 @@ Future<void> pumpDashboard(
                 anniversaries: [],
               ),
         ),
-        recentPhotosProvider.overrideWith((ref) async => photos),
+        recentMediaProvider.overrideWith((ref) async => photos),
         onThisDayProvider.overrideWith((ref) async => onThisDay),
         yearInReviewProvider.overrideWith((ref) async => yearInReview),
         activeCoursesProgressProvider.overrideWith((ref) async => []),
@@ -143,7 +143,7 @@ void main() {
 
     expect(find.byType(UrgentBanner), findsNothing);
     expect(find.byType(MilestonesCard), findsNothing);
-    expect(find.byType(PhotoRibbonCard), findsNothing);
+    expect(find.byType(MediaRibbonCard), findsNothing);
     expect(find.byType(OnThisDayCard), findsNothing);
     expect(find.byType(YearInReviewCard), findsNothing);
     expect(find.byType(RecentSitesMapCard), findsNothing);
@@ -218,7 +218,7 @@ void main() {
     );
 
     expect(find.byType(MilestonesCard), findsOneWidget);
-    expect(find.byType(PhotoRibbonCard), findsOneWidget);
+    expect(find.byType(MediaRibbonCard), findsOneWidget);
     expect(find.byType(OnThisDayCard), findsOneWidget);
     expect(find.byType(YearInReviewCard), findsOneWidget);
   });

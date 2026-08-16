@@ -75,17 +75,17 @@ class AssetResolutionService {
     // Check cache first
     final cachedId = await _cacheRepository.getCachedAssetId(item.id);
     if (cachedId != null) {
-      // Verify the cached asset is still loadable (may have been deleted)
-      final stillLoadable = await _verifyAssetLoadable(cachedId);
-      if (stillLoadable) {
-        return ResolutionResult(
-          localAssetId: cachedId,
-          status: ResolutionStatus.resolved,
-        );
-      }
-      // Cached ID is stale -- clear it and fall through to re-resolution
-      _log.info('Cached asset $cachedId no longer loadable, clearing cache');
-      await _cacheRepository.clearEntry(item.id);
+      // The cached mapping is trusted rather than proven. Verifying it here
+      // meant fetching a 50px thumbnail and discarding the bytes, on every
+      // resolution, purely to learn something the caller's real thumbnail
+      // fetch discovers for free moments later -- 1,568 wasted PhotoKit
+      // round-trips and 150s of wall time in one measured scroll of a
+      // 434-photo library. A caller whose fetch comes back empty calls
+      // [reresolve] to drop the mapping and search again.
+      return ResolutionResult(
+        localAssetId: cachedId,
+        status: ResolutionStatus.resolved,
+      );
     }
 
     // Check if we have an unexpired unresolved entry
@@ -110,6 +110,25 @@ class AssetResolutionService {
     } finally {
       _pendingResolutions.remove(item.id);
     }
+  }
+
+  /// Drops [item]'s cached mapping and resolves again from the gallery.
+  ///
+  /// Called when a cached asset id failed to produce bytes -- the signal that
+  /// used to come from the speculative pre-check in [resolveAssetId]. Going
+  /// straight to [_resolveFromGallery] (rather than back through the cache
+  /// read we just invalidated) keeps the intent explicit.
+  ///
+  /// Self-limiting: a genuinely dead item ends up cached as `unresolved`, and
+  /// the backoff branch in [resolveAssetId] then short-circuits later renders
+  /// before any caller can reach this method again.
+  Future<ResolutionResult> reresolve(MediaItem item) async {
+    if (item.platformAssetId == null) {
+      return const ResolutionResult(status: ResolutionStatus.unavailable);
+    }
+    _log.info('Re-resolving media ${item.id} after a failed thumbnail fetch');
+    await _cacheRepository.clearEntry(item.id);
+    return _resolveFromGallery(item);
   }
 
   /// Attempt to resolve by trying the original ID, then metadata matching.
@@ -249,6 +268,10 @@ class AssetResolutionService {
   }
 
   /// Verify that a platformAssetId actually loads on this device.
+  ///
+  /// Only used during cold resolution, where the answer decides whether to
+  /// fall through to a gallery search. It is deliberately NOT used to
+  /// re-prove an already-cached mapping -- see [resolveAssetId].
   Future<bool> _verifyAssetLoadable(String assetId) async {
     try {
       final thumbnail = await _photoPickerService.getThumbnail(
@@ -276,6 +299,45 @@ class AssetResolutionService {
     }
   }
 
+  /// The 1-minute local bucket enclosing [start]..[end], used both as the
+  /// gallery query window and as the coalescing cache key.
+  ///
+  /// **`toLocal()` is the load-bearing part.** `DateTime(y, m, d, h, min)`
+  /// always builds a LOCAL instant out of whatever calendar fields it is
+  /// handed, so feeding it a UTC `DateTime` silently reinterprets those UTC
+  /// fields as local -- shifting the window by the whole UTC offset. That is
+  /// exactly the transformation [_galleryReadings] applies to produce its
+  /// *restated* reading, so without this conversion both readings collapsed
+  /// onto the same bucket and the RAW-instant reading was never queried at
+  /// all. On this developer's library that silently stranded 112 of 116
+  /// unresolvable rows: every one had exactly one matching asset sitting in
+  /// the Photos library at its raw capture second, 4-5 hours outside the only
+  /// window ever searched.
+  ///
+  /// Note the bug is invisible at UTC, where the two readings coincide -- see
+  /// the tests for what that means for coverage.
+  static (DateTime, DateTime) galleryQueryBucket(DateTime start, DateTime end) {
+    final localStart = start.toLocal();
+    final localEnd = end.toLocal();
+    return (
+      DateTime(
+        localStart.year,
+        localStart.month,
+        localStart.day,
+        localStart.hour,
+        localStart.minute,
+      ),
+      // minute + 1 so the bucket encloses `end`; Dart normalises the overflow.
+      DateTime(
+        localEnd.year,
+        localEnd.month,
+        localEnd.day,
+        localEnd.hour,
+        localEnd.minute + 1,
+      ),
+    );
+  }
+
   /// Get gallery assets for a time range, coalescing concurrent queries.
   ///
   /// When opening a dive with many photos, all providers fire near-simultaneously
@@ -285,22 +347,7 @@ class AssetResolutionService {
     DateTime start,
     DateTime end,
   ) async {
-    // Round to 1-minute buckets to maximize cache hits across photos
-    // from the same dive (whose +-5s windows will overlap heavily)
-    final bucketStart = DateTime(
-      start.year,
-      start.month,
-      start.day,
-      start.hour,
-      start.minute,
-    );
-    final bucketEnd = DateTime(
-      end.year,
-      end.month,
-      end.day,
-      end.hour,
-      end.minute + 1,
-    );
+    final (bucketStart, bucketEnd) = galleryQueryBucket(start, end);
     final cacheKey =
         '${bucketStart.millisecondsSinceEpoch}~${bucketEnd.millisecondsSinceEpoch}';
 

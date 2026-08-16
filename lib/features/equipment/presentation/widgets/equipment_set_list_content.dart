@@ -74,13 +74,18 @@ class EquipmentSetListContent extends ConsumerWidget {
       child: Row(
         children: [
           const SizedBox(width: 8, height: 40),
-          Text(
-            context.l10n.equipment_appBar_title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          // This bar carries no actions, so the Spacer that used to trail the
+          // title had nothing to push and only the title needs to flex.
+          Expanded(
+            child: Text(
+              context.l10n.equipment_appBar_title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            ),
           ),
-          const Spacer(),
         ],
       ),
     );

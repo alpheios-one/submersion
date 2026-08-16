@@ -13,8 +13,11 @@ import 'package:submersion/features/trips/presentation/providers/surface_day_wea
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Two compact lines - "Day 3 - Wed, Jul 8" plus the day-type/port/sites
-/// subtitle - on an opaque surface so day cards scroll underneath cleanly.
+/// A leading day-number badge plus two compact lines - "Wed, Jul 8" and the
+/// day-type/port/sites subtitle - on an opaque tinted band
+/// (surfaceContainer, one step above the page surface) so the sticky headers
+/// read as chapter anchors and day cards scroll underneath cleanly. The badge
+/// echoes the map's primary-colored day pins, tying header and pin together.
 /// Days with logged weather get a trailing badge: conditions icon plus air
 /// temperature in the diver's temperature unit.
 ///
@@ -68,21 +71,22 @@ class TripStoryDayHeader extends ConsumerWidget {
     final weatherBadge = _weatherBadge(context, theme, units, weather);
 
     return Material(
-      color: theme.colorScheme.surface,
+      color: theme.colorScheme.surfaceContainer,
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: minHeight),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           child: Row(
             children: [
+              _DayNumberBadge(dayNumber: day.dayNumber),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${context.l10n.trips_story_dayLabel(day.dayNumber)}'
-                      ' - ${DateFormat.MMMEd().format(day.date)}',
+                      DateFormat.MMMEd().format(day.date),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -165,5 +169,48 @@ class TripStoryDayHeader extends ConsumerWidget {
       return precipitation.localizedName(l10n);
     }
     return weather.cloudCover?.localizedName(l10n);
+  }
+}
+
+/// Round day-number chip leading the header, echoing the map's day pins so
+/// the sticky headers give the story a scannable chapter rhythm. Visually it
+/// is just the number; assistive tech hears the full "Day N" label instead.
+class _DayNumberBadge extends StatelessWidget {
+  final int dayNumber;
+
+  const _DayNumberBadge({required this.dayNumber});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Semantics(
+      label: context.l10n.trips_story_dayLabel(dayNumber),
+      excludeSemantics: true,
+      // A Container given an alignment fills loose bounded constraints (here
+      // the whole band height); unbounding it makes it shrink-wrap the number
+      // while still honoring the minimum size below.
+      child: UnconstrainedBox(
+        child: Container(
+          key: const Key('day-number-badge'),
+          // Min sizes with padding (not a fixed box) so scaled accessibility
+          // text grows the badge instead of clipping the number; the near-round
+          // corner radius keeps it pill-shaped if it does grow.
+          constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            '$dayNumber',
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.onPrimaryContainer,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -86,6 +86,16 @@ class BuddyListPage extends ConsumerWidget {
           ),
           appBarActions: [
             IconButton(
+              icon: const Icon(Icons.search, size: 20),
+              tooltip: context.l10n.buddies_action_search,
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: BuddySearchDelegate(ref),
+                );
+              },
+            ),
+            IconButton(
               icon: const Icon(Icons.sort, size: 20),
               tooltip: context.l10n.buddies_action_sort,
               onPressed: () {
@@ -104,16 +114,6 @@ class BuddyListPage extends ConsumerWidget {
                       direction: direction,
                     );
                   },
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.search, size: 20),
-              tooltip: context.l10n.buddies_action_search,
-              onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: BuddySearchDelegate(ref),
                 );
               },
             ),

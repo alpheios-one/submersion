@@ -123,6 +123,16 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
           ),
           appBarActions: [
             IconButton(
+              icon: const Icon(Icons.search, size: 20),
+              tooltip: context.l10n.equipment_list_searchTooltip,
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: EquipmentSearchDelegate(),
+                );
+              },
+            ),
+            IconButton(
               icon: const Icon(Icons.sort, size: 20),
               tooltip: context.l10n.equipment_list_sortTooltip,
               onPressed: () {
@@ -141,16 +151,6 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
                       direction: direction,
                     );
                   },
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.search, size: 20),
-              tooltip: context.l10n.equipment_list_searchTooltip,
-              onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: EquipmentSearchDelegate(),
                 );
               },
             ),

@@ -175,9 +175,9 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
     params.add(filter.maxBottomTimeMinutes);
   }
 
-  if (filter.computerSerial != null) {
-    conditions.add('dive_computer_serial = ?');
-    params.add(filter.computerSerial);
+  if (filter.computerId != null) {
+    conditions.add('computer_id = ?');
+    params.add(filter.computerId);
   }
 
   // Custom fields: key match + optional value substring.

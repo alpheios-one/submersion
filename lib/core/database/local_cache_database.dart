@@ -108,6 +108,35 @@ class ReefDataCache extends Table {
   Set<Column> get primaryKey => {provider, coordKey, variant};
 }
 
+/// Folders the repair watcher scans (Media section Phase 5). Per-device by
+/// construction: a path from another machine is meaningless here, and a
+/// cache wipe costs a re-add, never user data.
+class WatchedRoots extends Table {
+  TextColumn get path => text()();
+  IntColumn get addedAt => integer()();
+  IntColumn get lastScanAt => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {path};
+}
+
+/// The watcher's file index (Media section Phase 5). Size and mtime are the
+/// change detector: a rescan re-hashes only files whose stat differs, so a
+/// NAS full of unchanged photos costs one stat each instead of one full
+/// read each.
+class WatchedFolderIndex extends Table {
+  TextColumn get rootPath => text()();
+  TextColumn get relativePath => text()();
+  IntColumn get sizeBytes => integer()();
+  IntColumn get mtimeMillis => integer()();
+
+  /// Null until first hashed.
+  TextColumn get contentHash => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {rootPath, relativePath};
+}
+
 /// Simplified GPS track geometry, cached per level of detail.
 ///
 /// NOT synced and never backed up: every device can re-derive this from the
@@ -166,13 +195,15 @@ class NoaaTideStations extends Table {
     ReefDataCache,
     NoaaTideStations,
     GpsTrackGeometryCache,
+    WatchedRoots,
+    WatchedFolderIndex,
   ],
 )
 class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -226,6 +257,35 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       if (from < 10) {
         await m.createTable(gpsTrackGeometryCache);
       }
+      // v11: repair watcher state (Media section Phase 5). Renumbered from v9
+      // at merge time: main had meanwhile taken 9 for the tide cache and 10
+      // for the GPS geometry cache. A dev DB that already ran this branch at
+      // v9 is healed by the beforeOpen backstop below.
+      if (from < 11) {
+        await m.createTable(watchedRoots);
+        await m.createTable(watchedFolderIndex);
+      }
+      // v12: drop poisoned negative resolutions. Renumbered from v10 at merge
+      // time for the same reason as v11 above. The gallery search window was
+      // computed by copying a UTC DateTime's calendar fields into a LOCAL
+      // DateTime, which shifted it by the whole UTC offset and meant the
+      // raw-instant reading of taken_at was never actually queried. Rows that
+      // only match on that reading were therefore recorded `unresolved` and
+      // locked behind a 24h/3d/7d backoff, so the fix would not take effect
+      // for up to a week. These entries are a pure derived negative cache --
+      // deleting them costs one gallery re-scan each and nothing else.
+      //
+      // Resolved mappings are deliberately left alone: they are correct, and
+      // re-deriving them would cost a full gallery scan per row for nothing.
+      //
+      // No beforeOpen backstop, unlike the createTable steps above: if a
+      // ladder collision skips this, the only consequence is that the stale
+      // negatives expire on their own within 7 days.
+      if (from < 12) {
+        await customStatement(
+          "DELETE FROM local_asset_cache WHERE resolution_method = 'unresolved'",
+        );
+      }
     },
     beforeOpen: (details) async {
       // Ladder-collision self-heal: a parallel branch that also claimed v7
@@ -278,6 +338,24 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           status TEXT NOT NULL,
           fetched_at INTEGER NOT NULL,
           PRIMARY KEY (station_id)
+        )
+      ''');
+      await customStatement('''
+        CREATE TABLE IF NOT EXISTS watched_roots (
+          path TEXT NOT NULL,
+          added_at INTEGER NOT NULL,
+          last_scan_at INTEGER,
+          PRIMARY KEY (path)
+        )
+      ''');
+      await customStatement('''
+        CREATE TABLE IF NOT EXISTS watched_folder_index (
+          root_path TEXT NOT NULL,
+          relative_path TEXT NOT NULL,
+          size_bytes INTEGER NOT NULL,
+          mtime_millis INTEGER NOT NULL,
+          content_hash TEXT,
+          PRIMARY KEY (root_path, relative_path)
         )
       ''');
     },

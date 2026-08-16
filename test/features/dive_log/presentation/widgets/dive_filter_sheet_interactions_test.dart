@@ -48,13 +48,9 @@ void main() {
       createdAt: now,
       updatedAt: now,
     ),
-    DiveComputer(
-      id: 'c2',
-      name: 'Teric',
-      serialNumber: 'SN456',
-      createdAt: now,
-      updatedAt: now,
-    ),
+    // Issue #1064: firmware that never reports a serial. The dropdown used to
+    // drop these entirely, leaving them unfilterable.
+    DiveComputer(id: 'c2', name: 'Teric', createdAt: now, updatedAt: now),
   ];
 
   late AppDatabase db;
@@ -205,11 +201,11 @@ void main() {
   testWidgets('dive type, site and computer dropdowns write selections', (
     tester,
   ) async {
-    // Prefill a stale computer serial so the "reset unknown serial to null"
+    // Prefill a stale computer id so the "reset unknown computer to null"
     // branch runs before selection.
     final ref = await openSheet(
       tester,
-      initial: const DiveFilterState(computerSerial: 'GHOST'),
+      initial: const DiveFilterState(computerId: 'GHOST'),
     );
 
     Future<void> selectFrom(String hint, String option) async {
@@ -228,7 +224,28 @@ void main() {
     final applied = ref.read(filterProvider);
     expect(applied.diveTypeId, 'wreck');
     expect(applied.siteId, 'site-1');
-    expect(applied.computerSerial, 'SN123');
+    expect(applied.computerId, 'c1');
+  });
+
+  // Issue #1064: the dropdown was built from computers.where(serialNumber !=
+  // null), so a computer whose firmware never reported one was absent from the
+  // list and could not be filtered on at all.
+  testWidgets('computer dropdown offers computers that have no serial', (
+    tester,
+  ) async {
+    final ref = await openSheet(tester);
+
+    // Pass the unqualified finder: scrollTo probes it before the lazy ListView
+    // has built the row, and a `.first` finder throws on an empty match.
+    await scrollTo(tester, find.text('All computers'));
+    await tester.tap(find.text('All computers').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Teric').last, findsOneWidget);
+    await tester.tap(find.text('Teric').last);
+    await tester.pumpAndSettle();
+
+    await tapText(tester, 'Apply Filters');
+    expect(ref.read(filterProvider).computerId, 'c2');
   });
 
   testWidgets('depth, buddy and duration text fields write values', (

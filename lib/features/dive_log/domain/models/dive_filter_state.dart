@@ -28,7 +28,14 @@ class DiveFilterState {
   final int? minRating;
   final int? minBottomTimeMinutes;
   final int? maxBottomTimeMinutes;
-  final String? computerSerial;
+
+  /// Registered dive computer to restrict the list to, matched on
+  /// `dives.computer_id`.
+  ///
+  /// Keyed on the computer id rather than its serial number: firmware often
+  /// reports no serial, which used to leave those computers unfilterable
+  /// (issue #1064).
+  final String? computerId;
   final String? customFieldKey;
   final String? customFieldValue;
 
@@ -59,7 +66,7 @@ class DiveFilterState {
     this.minRating,
     this.minBottomTimeMinutes,
     this.maxBottomTimeMinutes,
-    this.computerSerial,
+    this.computerId,
     this.customFieldKey,
     this.customFieldValue,
     this.equipmentAttrKey,
@@ -88,7 +95,7 @@ class DiveFilterState {
       minRating != null ||
       minBottomTimeMinutes != null ||
       maxBottomTimeMinutes != null ||
-      computerSerial != null ||
+      computerId != null ||
       (customFieldKey != null && customFieldKey!.isNotEmpty) ||
       equipmentAttrKey != null;
 
@@ -112,7 +119,7 @@ class DiveFilterState {
     int? minRating,
     int? minBottomTimeMinutes,
     int? maxBottomTimeMinutes,
-    String? computerSerial,
+    String? computerId,
     String? customFieldKey,
     String? customFieldValue,
     String? equipmentAttrKey,
@@ -138,7 +145,7 @@ class DiveFilterState {
     bool clearMinRating = false,
     bool clearMinBottomTimeMinutes = false,
     bool clearMaxBottomTimeMinutes = false,
-    bool clearComputerSerial = false,
+    bool clearComputerId = false,
     bool clearCustomFieldKey = false,
     bool clearCustomFieldValue = false,
     bool clearEquipmentAttr = false,
@@ -179,9 +186,7 @@ class DiveFilterState {
       maxBottomTimeMinutes: clearMaxBottomTimeMinutes
           ? null
           : (maxBottomTimeMinutes ?? this.maxBottomTimeMinutes),
-      computerSerial: clearComputerSerial
-          ? null
-          : (computerSerial ?? this.computerSerial),
+      computerId: clearComputerId ? null : (computerId ?? this.computerId),
       customFieldKey: clearCustomFieldKey
           ? null
           : (customFieldKey ?? this.customFieldKey),
@@ -301,8 +306,8 @@ class DiveFilterState {
           return false;
         }
       }
-      if (computerSerial != null) {
-        if (dive.diveComputerSerial != computerSerial) return false;
+      if (computerId != null) {
+        if (dive.computerId != computerId) return false;
       }
       if (customFieldKey != null && customFieldKey!.isNotEmpty) {
         final hasMatch = dive.customFields.any((cf) {

@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/checklists/domain/entities/trip_checklist_item.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/trips/domain/entities/liveaboard_details.dart';
@@ -326,7 +327,50 @@ void main() {
         tester.getTopLeft(find.byWidget(element.widget)).dy,
     ];
     expect(pinnedTops, anyElement(closeTo(180.0, 1.0)));
-    expect(find.textContaining('Day 1 -'), findsNothing);
+    // The first day's header (its badge shows "Mar 25") has been pushed out.
+    expect(find.textContaining('Mar 25'), findsNothing);
+  });
+
+  testWidgets('checklist and notes closers share the section title style', (
+    tester,
+  ) async {
+    // Both end-of-story cards must read as the same family: the checklist
+    // ExpansionTile's title gets the notes card's bold section-title style
+    // instead of the ListTile default.
+    final trip = Trip(
+      id: 'trip-1',
+      name: 'Bonaire',
+      startDate: DateTime(2026, 3, 27),
+      endDate: DateTime(2026, 3, 28),
+      tripType: TripType.resort,
+      notes: 'Great vis all week',
+      createdAt: DateTime(2026, 1, 1),
+      updatedAt: DateTime(2026, 1, 1),
+    );
+    final story = buildTripStory(
+      trip: trip,
+      dives: [_dive('d1', DateTime(2026, 3, 27, 9))],
+      itineraryDays: [],
+      mediaByDiveId: {},
+      sightingsByDiveId: {},
+      checklistItems: [
+        TripChecklistItem(
+          id: 'c1',
+          tripId: 'trip-1',
+          title: 'Pack fins',
+          isDone: true,
+          createdAt: DateTime(2026, 1, 1),
+          updatedAt: DateTime(2026, 1, 1),
+        ),
+      ],
+      today: DateTime(2026, 6, 1),
+    );
+    await pumpView(tester, story);
+
+    final notesStyle = tester.widget<Text>(find.text('Notes')).style;
+    final checklistStyle = tester.widget<Text>(find.text('1 of 1 done')).style;
+    expect(checklistStyle?.fontWeight, FontWeight.bold);
+    expect(checklistStyle?.fontSize, notesStyle?.fontSize);
   });
 
   testWidgets('surface days get the same sticky header as dive days', (
@@ -350,7 +394,14 @@ void main() {
     // Tall harness viewport: all three days are mounted, and every one of them
     // contributes a sticky header, surface day included.
     expect(find.byType(TripStoryDayHeader), findsNWidgets(3));
-    expect(find.textContaining('Day 2 -'), findsOneWidget);
+    // The surface day's header carries the same day-number badge as dive days.
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('day-number-badge')).at(1),
+        matching: find.text('2'),
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Surface day'), findsOneWidget);
   });
 

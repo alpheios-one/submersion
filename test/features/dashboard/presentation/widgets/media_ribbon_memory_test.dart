@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:submersion/features/dashboard/presentation/providers/photo_providers.dart';
-import 'package:submersion/features/dashboard/presentation/widgets/photo_ribbon_card.dart';
+import 'package:submersion/features/dashboard/presentation/providers/media_ribbon_providers.dart';
+import 'package:submersion/features/dashboard/presentation/widgets/media_ribbon_card.dart';
 import 'package:submersion/features/media/data/services/media_source_resolver_registry.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -53,7 +53,7 @@ void main() {
               MediaSourceType.platformGallery: resolver,
             }),
           ),
-          recentPhotosProvider.overrideWith(
+          recentMediaProvider.overrideWith(
             (ref) async => [for (var i = 0; i < 12; i++) _photo('p$i')],
           ),
         ],
@@ -61,7 +61,7 @@ void main() {
           locale: Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: Scaffold(body: SingleChildScrollView(child: PhotoRibbonCard())),
+          home: Scaffold(body: SingleChildScrollView(child: MediaRibbonCard())),
         ),
       ),
     );

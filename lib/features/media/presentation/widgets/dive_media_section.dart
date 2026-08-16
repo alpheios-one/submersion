@@ -2,18 +2,19 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/constants/feature_flags.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/media_store/store_keys.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/media/presentation/helpers/lightroom_scan_helper.dart';
 import 'package:submersion/features/media/presentation/providers/lightroom_providers.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
+import 'package:submersion/features/media/domain/services/media_repair_types.dart';
 import 'package:submersion/features/media/presentation/pages/photo_viewer_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
-import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_repair_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/lightroom_suggestions_row.dart';
 import 'package:submersion/features/media/presentation/widgets/media_grid.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -198,9 +199,11 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
 
     if (confirmed == true && context.mounted) {
       try {
+        // True unlink: the FK clears but the rows stay in the library,
+        // exactly what this dialog's copy has always promised.
         await ref
             .read(mediaListNotifierProvider(widget.diveId).notifier)
-            .deleteMultipleMedia(selectedIds);
+            .unlinkMultipleMedia(selectedIds);
 
         _exitSelectionMode();
 
@@ -250,10 +253,12 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
     }
   }
 
-  /// Prompts the user to pick a replacement file for [item] and updates the
-  /// existing media row's `localPath` (and on macOS regenerates the keychain
-  /// bookmark blob so resolution lands on the new file). Desktop-only by
-  /// virtue of the right-click gating in the cell builder.
+  /// Prompts the user to pick a replacement file for [item] and routes the
+  /// re-link through the repair engine (Media section Phase 3): the picked
+  /// file is hash-verified against the row's content identity, bookmark
+  /// regeneration is engine-owned, and picking DIFFERENT bytes requires an
+  /// explicit confirm because accepting re-uploads them to the media store.
+  /// Desktop-only by virtue of the right-click gating in the cell builder.
   ///
   /// Phase 2 photo-only constraint: picker is restricted to `FileType.image`
   /// (videos aren't supported as local-file media yet, see [FilesTab]).
@@ -263,25 +268,46 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
     final newPath = result.files.first.path;
     if (newPath == null) return;
 
-    final notifier = ref.read(
-      mediaListNotifierProvider(widget.diveId).notifier,
-    );
+    final digest = await sha256OfFile(File(newPath));
+    final rowHash = item.contentHash;
+    final sameBytes = rowHash == null || digest.hash == rowHash;
 
-    if (Platform.isMacOS && item.sourceType == MediaSourceType.localFile) {
-      // Regenerate the security-scoped bookmark for the new path. Reuse the
-      // existing bookmarkRef as the keychain key (LocalBookmarkStorage.write
-      // is an idempotent overwrite) so we don't orphan the prior entry.
-      final platform = ref.read(localMediaPlatformProvider);
-      final storage = ref.read(localBookmarkStorageProvider);
-      final blob = await platform.createBookmark(newPath);
-      final newRef = item.bookmarkRef ?? const Uuid().v4();
-      await storage.write(newRef, blob);
-      await notifier.updateMedia(
-        item.copyWith(localPath: newPath, bookmarkRef: newRef),
+    if (!sameBytes) {
+      if (!mounted) return;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(ctx.l10n.media_diveMediaSection_replaceEditedTitle),
+          content: Text(ctx.l10n.media_diveMediaSection_replaceEditedContent),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(ctx.l10n.media_diveMediaSection_cancelButton),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(ctx.l10n.media_diveMediaSection_replaceButton),
+            ),
+          ],
+        ),
       );
-    } else {
-      await notifier.updateMedia(item.copyWith(localPath: newPath));
+      if (confirmed != true) return;
     }
+
+    await ref.read(mediaRepairServiceProvider).apply([
+      RepairProposal(
+        item: item,
+        confidence: sameBytes
+            ? RepairConfidence.exact
+            : RepairConfidence.edited,
+        candidate: RepairCandidate.file(
+          path: newPath,
+          sizeBytes: digest.sizeBytes,
+          hash: digest.hash,
+        ),
+      ),
+    ]);
+    await ref.read(mediaListNotifierProvider(widget.diveId).notifier).refresh();
   }
 
   /// Opens the right-click context menu for a local-file media item.

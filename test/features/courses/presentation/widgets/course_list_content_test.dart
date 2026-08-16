@@ -504,6 +504,38 @@ void main() {
   });
 
   group('CourseListContent in phone mode', () {
+    // The compact bar used to pair a Flexible title with a Spacer. Both carry
+    // flex: 1, so the Spacer took exactly half the free space rather than the
+    // remainder, and the unclaimed half fell after the last icon under the
+    // default MainAxisAlignment.start. Courses shows it worst because it has
+    // the fewest actions, hence the most free space to halve.
+    testWidgets('compact bar keeps its actions hard right', (tester) async {
+      final overrides = await _buildPhoneOverrides(
+        courses: [_makeCourse(id: 'co1', name: 'Deep Diver')],
+      );
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const CourseListContent(showAppBar: false),
+        ),
+      );
+      await tester.pump();
+
+      final barRight = tester.getBottomRight(find.byType(CourseListContent)).dx;
+      final lastActionRight = tester
+          .getBottomRight(find.byType(PopupMenuButton<String>))
+          .dx;
+
+      // Only the bar's own 8px horizontal padding may remain. Before the fix
+      // the Spacer's unclaimed half left a gap of well over a hundred pixels.
+      expect(
+        barRight - lastActionRight,
+        lessThanOrEqualTo(8.0),
+        reason: 'action row is left-shifted by unabsorbed free space',
+      );
+    });
+
     testWidgets(
       'phone view highlights course when highlightedCourseIdProvider is set',
       (tester) async {

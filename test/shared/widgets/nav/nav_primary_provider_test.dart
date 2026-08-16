@@ -157,6 +157,7 @@ void main() {
           'dives',
           'sites',
           'trips',
+          'media',
           'dive-centers',
           'certifications',
           'courses',

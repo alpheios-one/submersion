@@ -229,5 +229,64 @@ void main() {
       expect(find.text('Other'), findsOneWidget);
       expect(find.byType(Icon), findsNothing);
     });
+
+    // A list pane is a fixed 440px, so a long single-token title competing
+    // with five trailing icons can be squeezed to a few dozen logical pixels.
+    // Without maxLines the paragraph broke mid-word ("Certifica" / "tions")
+    // and grew the bar's height instead of ellipsising.
+    group('never wraps to a second line', () {
+      /// Height of one line of the title's text style, for comparison.
+      const singleLineCeiling = 30.0;
+
+      for (final headerOn in [false, true]) {
+        testWidgets('with the accent toggle ${headerOn ? "on" : "off"}', (
+          tester,
+        ) async {
+          await tester.pumpWidget(
+            _harness(
+              const SizedBox(
+                width: 56,
+                child: FeatureAppBarTitle(
+                  featureId: 'certifications',
+                  title: 'Certifications',
+                ),
+              ),
+              headerOn: headerOn,
+            ),
+          );
+
+          final height = tester
+              .renderObject<RenderBox>(find.text('Certifications'))
+              .size
+              .height;
+          expect(
+            height,
+            lessThan(singleLineCeiling),
+            reason: 'title occupied more than one line in a 56px box',
+          );
+        });
+      }
+
+      for (final headerOn in [false, true]) {
+        testWidgets(
+          'declares ellipsis overflow (accent ${headerOn ? "on" : "off"})',
+          (tester) async {
+            await tester.pumpWidget(
+              _harness(
+                const FeatureAppBarTitle(
+                  featureId: 'certifications',
+                  title: 'Certifications',
+                ),
+                headerOn: headerOn,
+              ),
+            );
+
+            final text = tester.widget<Text>(find.text('Certifications'));
+            expect(text.maxLines, 1);
+            expect(text.overflow, TextOverflow.ellipsis);
+          },
+        );
+      }
+    });
   });
 }

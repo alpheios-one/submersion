@@ -2020,9 +2020,9 @@ class DiveRepository {
         args.add(Variable(diveId));
       }
     }
-    if (filter.computerSerial != null) {
-      clauses.add('d.dive_computer_serial = ?');
-      args.add(Variable(filter.computerSerial!));
+    if (filter.computerId != null) {
+      clauses.add('d.computer_id = ?');
+      args.add(Variable(filter.computerId!));
     }
     if (filter.minO2Percent != null || filter.maxO2Percent != null) {
       final tankClauses = <String>[];
@@ -3047,6 +3047,7 @@ class DiveRepository {
       diveComputerModel: row.diveComputerModel,
       diveComputerSerial: row.diveComputerSerial,
       diveComputerFirmware: row.diveComputerFirmware,
+      computerId: row.computerId,
       weightAmount: row.weightAmount,
       weightType: row.weightType != null
           ? WeightType.values.firstWhere(
@@ -3419,6 +3420,7 @@ class DiveRepository {
       diveComputerModel: row.diveComputerModel,
       diveComputerSerial: row.diveComputerSerial,
       diveComputerFirmware: row.diveComputerFirmware,
+      computerId: row.computerId,
       // Weight system fields
       weightAmount: row.weightAmount,
       weightType: row.weightType != null

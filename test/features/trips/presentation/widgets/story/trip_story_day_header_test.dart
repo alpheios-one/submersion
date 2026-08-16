@@ -78,7 +78,7 @@ Future<void> pumpHeader(
 }
 
 void main() {
-  testWidgets('shows the day number and date', (tester) async {
+  testWidgets('shows the day number badge and date', (tester) async {
     final day = TripStoryDay(
       date: DateTime(2026, 3, 8),
       dayNumber: 2,
@@ -86,9 +86,52 @@ void main() {
     );
     await pumpHeader(tester, day);
 
-    expect(find.textContaining('Day 2'), findsOneWidget);
+    // The day number lives in the leading badge; the title is the date alone,
+    // so the number is not announced or drawn twice.
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('day-number-badge')),
+        matching: find.text('2'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Day 2'), findsNothing);
     // MMMEd for en locale: "Sun, Mar 8".
     expect(find.textContaining('Mar 8'), findsOneWidget);
+  });
+
+  testWidgets('day number badge keeps the "Day N" screen-reader label', (
+    tester,
+  ) async {
+    final day = TripStoryDay(
+      date: DateTime(2026, 3, 8),
+      dayNumber: 2,
+      kind: TripStoryDayKind.past,
+    );
+    await pumpHeader(tester, day);
+
+    // Visually the badge is a bare "2"; assistive tech still hears "Day 2".
+    expect(find.bySemanticsLabel('Day 2'), findsOneWidget);
+  });
+
+  testWidgets('header band is tinted to anchor its chapter', (tester) async {
+    final day = TripStoryDay(
+      date: DateTime(2026, 3, 8),
+      dayNumber: 2,
+      kind: TripStoryDayKind.past,
+    );
+    await pumpHeader(tester, day);
+
+    final material = tester.widget<Material>(
+      find
+          .descendant(
+            of: find.byType(TripStoryDayHeader),
+            matching: find.byType(Material),
+          )
+          .first,
+    );
+    final context = tester.element(find.byType(TripStoryDayHeader));
+    expect(material.color, Theme.of(context).colorScheme.surfaceContainer);
   });
 
   testWidgets('subtitle joins day type, port, and site names', (tester) async {
@@ -147,8 +190,8 @@ void main() {
     );
     await pumpHeader(tester, day);
 
-    // Only the title line renders.
-    expect(find.byType(Text), findsOneWidget);
+    // Only the badge number and the title line render.
+    expect(find.byType(Text), findsNWidgets(2));
   });
 
   group('surface day', () {
@@ -163,10 +206,18 @@ void main() {
       longitude: -68.2,
     );
 
-    testWidgets('gets the same title line as any other day', (tester) async {
+    testWidgets('gets the same badge and title line as any other day', (
+      tester,
+    ) async {
       await pumpHeader(tester, surfaceDay());
 
-      expect(find.textContaining('Day 2'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('day-number-badge')),
+          matching: find.text('2'),
+        ),
+        findsOneWidget,
+      );
       expect(find.textContaining('Mar 8'), findsOneWidget);
     });
 
@@ -181,7 +232,7 @@ void main() {
       // lesser, smaller entry than the dive day above or below it.
       await pumpHeader(tester, surfaceDay());
       final surfaceStyle = tester
-          .widget<Text>(find.textContaining('Day 2'))
+          .widget<Text>(find.textContaining('Mar 8'))
           .style;
 
       await pumpHeader(
@@ -199,7 +250,7 @@ void main() {
           ],
         ),
       );
-      final diveStyle = tester.widget<Text>(find.textContaining('Day 2')).style;
+      final diveStyle = tester.widget<Text>(find.textContaining('Mar 8')).style;
 
       expect(surfaceStyle, diveStyle);
       expect(surfaceStyle?.fontWeight, FontWeight.bold);

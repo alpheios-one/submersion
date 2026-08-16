@@ -16,6 +16,7 @@ Dive _makeDive({
   String? diveTypeId,
   bool isFavorite = false,
   String? diveComputerSerial,
+  String? computerId,
   int? rating,
   Duration? duration,
   String? tripId,
@@ -29,6 +30,7 @@ Dive _makeDive({
     diveTypeIds: [diveTypeId ?? 'recreational'],
     isFavorite: isFavorite,
     diveComputerSerial: diveComputerSerial,
+    computerId: computerId,
     rating: rating,
     bottomTime: duration,
     tripId: tripId,
@@ -83,7 +85,7 @@ void main() {
         expect(filter.minRating, isNull);
         expect(filter.minBottomTimeMinutes, isNull);
         expect(filter.maxBottomTimeMinutes, isNull);
-        expect(filter.computerSerial, isNull);
+        expect(filter.computerId, isNull);
         expect(filter.customFieldKey, isNull);
         expect(filter.customFieldValue, isNull);
       });
@@ -96,8 +98,8 @@ void main() {
         expect(filter.hasActiveFilters, isFalse);
       });
 
-      test('returns true when computerSerial is set', () {
-        const filter = DiveFilterState(computerSerial: 'SN12345');
+      test('returns true when computerId is set', () {
+        const filter = DiveFilterState(computerId: 'computer-a');
 
         expect(filter.hasActiveFilters, isTrue);
       });
@@ -170,57 +172,57 @@ void main() {
     });
 
     group('copyWith', () {
-      test('sets computerSerial', () {
+      test('sets computerId', () {
         const original = DiveFilterState();
 
-        final updated = original.copyWith(computerSerial: 'SN999');
+        final updated = original.copyWith(computerId: 'computer-a');
 
-        expect(updated.computerSerial, 'SN999');
+        expect(updated.computerId, 'computer-a');
       });
 
-      test('preserves computerSerial when not specified', () {
-        const original = DiveFilterState(computerSerial: 'SN999');
+      test('preserves computerId when not specified', () {
+        const original = DiveFilterState(computerId: 'computer-a');
 
         final updated = original.copyWith(minRating: 3);
 
-        expect(updated.computerSerial, 'SN999');
+        expect(updated.computerId, 'computer-a');
         expect(updated.minRating, 3);
       });
 
-      test('clears computerSerial with clearComputerSerial', () {
-        const original = DiveFilterState(computerSerial: 'SN999');
+      test('clears computerId with clearComputerId', () {
+        const original = DiveFilterState(computerId: 'computer-a');
 
-        final updated = original.copyWith(clearComputerSerial: true);
+        final updated = original.copyWith(clearComputerId: true);
 
-        expect(updated.computerSerial, isNull);
+        expect(updated.computerId, isNull);
       });
 
-      test('clearComputerSerial takes precedence over new value', () {
-        const original = DiveFilterState(computerSerial: 'SN999');
+      test('clearComputerId takes precedence over new value', () {
+        const original = DiveFilterState(computerId: 'computer-a');
 
         final updated = original.copyWith(
-          computerSerial: 'SN111',
-          clearComputerSerial: true,
+          computerId: 'computer-b',
+          clearComputerId: true,
         );
 
-        expect(updated.computerSerial, isNull);
+        expect(updated.computerId, isNull);
       });
 
       test('sets and clears multiple fields simultaneously', () {
         const original = DiveFilterState(
           minRating: 3,
-          computerSerial: 'SN999',
+          computerId: 'computer-a',
           minBottomTimeMinutes: 30,
         );
 
         final updated = original.copyWith(
           clearMinRating: true,
           maxBottomTimeMinutes: 60,
-          clearComputerSerial: true,
+          clearComputerId: true,
         );
 
         expect(updated.minRating, isNull);
-        expect(updated.computerSerial, isNull);
+        expect(updated.computerId, isNull);
         expect(updated.minBottomTimeMinutes, 30);
         expect(updated.maxBottomTimeMinutes, 60);
       });
@@ -236,18 +238,33 @@ void main() {
         expect(result, hasLength(2));
       });
 
-      test('filters by computerSerial', () {
-        const filter = DiveFilterState(computerSerial: 'SN12345');
+      test('filters by computerId', () {
+        const filter = DiveFilterState(computerId: 'computer-a');
         final dives = [
-          _makeDive(id: 'd1', diveComputerSerial: 'SN12345'),
-          _makeDive(id: 'd2', diveComputerSerial: 'SN99999'),
-          _makeDive(id: 'd3'), // no serial
+          _makeDive(id: 'd1', computerId: 'computer-a'),
+          _makeDive(id: 'd2', computerId: 'computer-b'),
+          _makeDive(id: 'd3'), // not attributed to any computer
         ];
 
         final result = filter.apply(dives);
 
         expect(result, hasLength(1));
         expect(result.first.id, 'd1');
+      });
+
+      // Issue #1064: computers whose firmware never reports a serial were
+      // unfilterable. Attribution rides the computer id, never the serial.
+      test('filters by computerId when the dives carry no serial', () {
+        const filter = DiveFilterState(computerId: 'computer-a');
+        final dives = [
+          _makeDive(id: 'd1', computerId: 'computer-a'),
+          _makeDive(id: 'd2', computerId: 'computer-a'),
+          _makeDive(id: 'd3', computerId: 'computer-b'),
+        ];
+
+        final result = filter.apply(dives);
+
+        expect(result.map((d) => d.id), ['d1', 'd2']);
       });
 
       test('filters by minRating', () {
@@ -420,11 +437,11 @@ void main() {
       });
 
       test('combines multiple filters', () {
-        const filter = DiveFilterState(computerSerial: 'SN12345', minRating: 3);
+        const filter = DiveFilterState(computerId: 'computer-a', minRating: 3);
         final dives = [
-          _makeDive(id: 'd1', diveComputerSerial: 'SN12345', rating: 5),
-          _makeDive(id: 'd2', diveComputerSerial: 'SN12345', rating: 2),
-          _makeDive(id: 'd3', diveComputerSerial: 'SN999', rating: 5),
+          _makeDive(id: 'd1', computerId: 'computer-a', rating: 5),
+          _makeDive(id: 'd2', computerId: 'computer-a', rating: 2),
+          _makeDive(id: 'd3', computerId: 'computer-b', rating: 5),
         ];
 
         final result = filter.apply(dives);

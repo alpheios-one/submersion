@@ -23,6 +23,7 @@ import 'package:submersion/features/tank_presets/domain/entities/tank_preset_ent
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/features/weight_planner/presentation/providers/weight_planner_providers.dart';
 import 'package:submersion/features/weight_planner/presentation/widgets/rig_composer.dart';
+import 'package:submersion/features/planning/presentation/widgets/planning_tool_pane.dart';
 import 'package:submersion/features/weight_planner/presentation/widgets/weight_prediction_card.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/twin_summary_rows.dart';
@@ -30,7 +31,11 @@ import 'package:submersion/shared/widgets/twin_summary_rows.dart';
 /// The Weight Planner tool: compose a rig, get a personalized weight
 /// prediction from the diver's history, and swap gear to see the change.
 class WeightPlannerPage extends ConsumerStatefulWidget {
-  const WeightPlannerPage({super.key});
+  /// Renders without its own Scaffold and AppBar, for the Planning detail
+  /// pane. See [PlanningToolPane].
+  final bool embedded;
+
+  const WeightPlannerPage({super.key, this.embedded = false});
 
   @override
   ConsumerState<WeightPlannerPage> createState() => _WeightPlannerPageState();
@@ -319,76 +324,83 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
         enteredKg != null &&
         (savedWeightKg == null || (enteredKg - savedWeightKg).abs() > 0.05);
 
+    final content = SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (prediction != null)
+            WeightPredictionCard(
+              prediction: prediction,
+              placement: placement,
+              units: units,
+              deltaText: _deltaText,
+            )
+          else
+            const Card(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
+          const SizedBox(height: 8),
+          RigComposer(
+            gear: _gear,
+            tanks: _tanks,
+            waterType: _water,
+            bodyWeightController: _bodyWeightController,
+            units: units,
+            showSaveBodyWeight: showSave,
+            onGearAdded: (item) => _mutate(units, () => _gear.add(item)),
+            onGearSetAdded: (items) => _mutate(units, () {
+              for (final item in items) {
+                if (!_gear.any((g) => g.id == item.id)) {
+                  _gear.add(item);
+                }
+              }
+            }),
+            onGearRemoved: (item) =>
+                _mutate(units, () => _gear.removeWhere((g) => g.id == item.id)),
+            onTankAdded: (preset) => _mutate(units, () => _tanks.add(preset)),
+            onTankRemoved: (index) =>
+                _mutate(units, () => _tanks.removeAt(index)),
+            onTankChanged: (index, preset) =>
+                _mutate(units, () => _tanks[index] = preset),
+            onWaterChanged: (water) => _mutate(units, () => _water = water),
+            onSaveBodyWeight: () => _saveBodyWeightToProfile(units),
+            onChanged: () => setState(() {}),
+          ),
+          if (buoyancy != null) ...[
+            const SizedBox(height: 16),
+            _throughDivePanel(context, units, buoyancy),
+          ],
+          const SizedBox(height: 16),
+          Card(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                context.l10n.tools_weight_disclaimer,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (widget.embedded) {
+      return PlanningToolPane(
+        title: context.l10n.tools_weight_title,
+        child: content,
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.tools_weight_title)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (prediction != null)
-              WeightPredictionCard(
-                prediction: prediction,
-                placement: placement,
-                units: units,
-                deltaText: _deltaText,
-              )
-            else
-              const Card(
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-              ),
-            const SizedBox(height: 8),
-            RigComposer(
-              gear: _gear,
-              tanks: _tanks,
-              waterType: _water,
-              bodyWeightController: _bodyWeightController,
-              units: units,
-              showSaveBodyWeight: showSave,
-              onGearAdded: (item) => _mutate(units, () => _gear.add(item)),
-              onGearSetAdded: (items) => _mutate(units, () {
-                for (final item in items) {
-                  if (!_gear.any((g) => g.id == item.id)) {
-                    _gear.add(item);
-                  }
-                }
-              }),
-              onGearRemoved: (item) => _mutate(
-                units,
-                () => _gear.removeWhere((g) => g.id == item.id),
-              ),
-              onTankAdded: (preset) => _mutate(units, () => _tanks.add(preset)),
-              onTankRemoved: (index) =>
-                  _mutate(units, () => _tanks.removeAt(index)),
-              onTankChanged: (index, preset) =>
-                  _mutate(units, () => _tanks[index] = preset),
-              onWaterChanged: (water) => _mutate(units, () => _water = water),
-              onSaveBodyWeight: () => _saveBodyWeightToProfile(units),
-              onChanged: () => setState(() {}),
-            ),
-            if (buoyancy != null) ...[
-              const SizedBox(height: 16),
-              _throughDivePanel(context, units, buoyancy),
-            ],
-            const SizedBox(height: 16),
-            Card(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  context.l10n.tools_weight_disclaimer,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      body: content,
     );
   }
 }
