@@ -72,7 +72,14 @@ class MediaStoreResolver {
     File? staging;
     try {
       final cached = await _cache.get(hash, MediaCacheKind.thumb);
-      if (cached != null) return FileData(file: cached, isPoster: isPoster);
+      if (cached != null) {
+        return FileData(
+          file: cached,
+          isPoster: isPoster,
+          servedFrom: ServedFrom.storeCache,
+          servedTier: ServedTier.thumbnail,
+        );
+      }
       staging = await _cache.stagingFile();
       await _store.getFile(StoreKeys.thumbKey(hash), staging);
       // No hash verification: thumb bytes are derived; the key carries the
@@ -83,7 +90,12 @@ class MediaStoreResolver {
         staging,
         extension: 'jpg',
       );
-      return FileData(file: file, isPoster: isPoster);
+      return FileData(
+        file: file,
+        isPoster: isPoster,
+        servedFrom: ServedFrom.storeNetwork,
+        servedTier: ServedTier.thumbnail,
+      );
     } on Exception catch (e) {
       _log.warning('Thumb fetch failed for ${item.id}: $e');
       return null;
@@ -104,7 +116,13 @@ class MediaStoreResolver {
         MediaCacheKind.rendition,
         freshAfter: item.remoteCompressedUploadedAt,
       );
-      if (cached != null) return FileData(file: cached);
+      if (cached != null) {
+        return FileData(
+          file: cached,
+          servedFrom: ServedFrom.storeCache,
+          servedTier: ServedTier.rendition,
+        );
+      }
       staging = await _cache.stagingFile();
       await _store.getFile(StoreKeys.renditionKey(hash, ext: ext), staging);
       final file = await _cache.put(
@@ -114,7 +132,11 @@ class MediaStoreResolver {
         sourceVersion: item.remoteCompressedUploadedAt?.millisecondsSinceEpoch,
         extension: ext,
       );
-      return FileData(file: file);
+      return FileData(
+        file: file,
+        servedFrom: ServedFrom.storeNetwork,
+        servedTier: ServedTier.rendition,
+      );
     } on Exception catch (e) {
       _log.warning('Rendition fetch failed for ${item.id}: $e');
       return null;
@@ -127,7 +149,13 @@ class MediaStoreResolver {
     File? staging;
     try {
       final cached = await _cache.get(hash, MediaCacheKind.original);
-      if (cached != null) return FileData(file: cached);
+      if (cached != null) {
+        return FileData(
+          file: cached,
+          servedFrom: ServedFrom.storeCache,
+          servedTier: ServedTier.original,
+        );
+      }
 
       staging = await _cache.stagingFile();
       final extension = StoreKeys.extensionFor(item.originalFilename);
@@ -146,7 +174,11 @@ class MediaStoreResolver {
         staging,
         extension: _cacheExtensionFor(item, extension),
       );
-      return FileData(file: file);
+      return FileData(
+        file: file,
+        servedFrom: ServedFrom.storeNetwork,
+        servedTier: ServedTier.original,
+      );
     } on Exception catch (e) {
       _log.warning('Store fallback failed for ${item.id}: $e');
       return null;
