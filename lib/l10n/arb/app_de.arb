@@ -6716,7 +6716,7 @@
   "attrLabel_diluent_cylinder_l": "Diluent-Flasche",
   "attrLabel_o2_cylinder_l": "O2-Flasche",
   "attrLabel_dpv_style": "Bauart",
-  "attrLabel_burn_time_h": "Laufzeit (h)",
+  "attrLabel_burn_time_h": "Laufzeit",
   "attrLabel_battery_type": "Akku",
   "attrLabel_battery_capacity_wh": "Akkukapazität (Wh)",
   "attrLabel_motor_type": "Motor",

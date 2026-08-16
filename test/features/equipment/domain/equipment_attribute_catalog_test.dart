@@ -152,15 +152,22 @@ void main() {
       expect(def.dimension, AttributeDimension.speedMps);
     });
 
-    test('burn time and battery capacity are dimensionless numbers', () {
-      // Hours are hours and watt-hours are watt-hours in every market, the
-      // same call scrubber_duration_h makes.
-      for (final key in ['burn_time_h', 'battery_capacity_wh']) {
-        final def = EquipmentAttributeCatalog.defFor(key);
-        expect(def, isNotNull, reason: key);
-        expect(def!.kind, AttributeKind.number, reason: key);
-        expect(def.dimension, AttributeDimension.none, reason: key);
-      }
+    test('burn time carries the duration dimension so it reads in minutes', () {
+      // A scooter's rated run time is quoted in minutes, not fractions of an
+      // hour (issue #1096); storage stays in hours, the dimension converts.
+      final def = EquipmentAttributeCatalog.defFor('burn_time_h');
+      expect(def, isNotNull);
+      expect(def!.kind, AttributeKind.number);
+      expect(def.dimension, AttributeDimension.durationH);
+    });
+
+    test('battery capacity is a dimensionless number', () {
+      // Watt-hours are watt-hours in every market, the same call
+      // scrubber_duration_h makes.
+      final def = EquipmentAttributeCatalog.defFor('battery_capacity_wh');
+      expect(def, isNotNull);
+      expect(def!.kind, AttributeKind.number);
+      expect(def.dimension, AttributeDimension.none);
     });
 
     test('reuses the shared depth_rating_m definition', () {

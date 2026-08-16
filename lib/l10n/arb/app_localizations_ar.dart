@@ -22584,7 +22584,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get attrLabel_dpv_style => 'النمط';
 
   @override
-  String get attrLabel_burn_time_h => 'زمن التشغيل (ساعة)';
+  String get attrLabel_burn_time_h => 'زمن التشغيل';
 
   @override
   String get attrLabel_battery_type => 'البطارية';

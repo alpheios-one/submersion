@@ -15,8 +15,11 @@ enum AttributeKind { text, number, thickness, choice, flag, date }
 /// thicknessMm always displays in mm (industry convention in every market).
 ///
 /// Every dimension stores its canonical metric value, which for all of them
-/// except [speedMps] is also what a metric diver reads. Speed is stored in m/s
-/// to match wind speed and GPS track speed, and displays as km/h or knots.
+/// except the two per-time ones is also what a metric diver reads:
+/// - [speedMps] stores m/s (matching wind speed and GPS track speed) and
+///   displays as m/min or ft/min, the way a DPV's rated speed is quoted.
+/// - [durationH] stores hours and displays as minutes, the way a scooter's
+///   rated run time is quoted.
 enum AttributeDimension {
   none,
   thicknessMm,
@@ -26,6 +29,7 @@ enum AttributeDimension {
   lengthM,
   depthM,
   speedMps,
+  durationH,
 }
 
 /// Stable attribute keys referenced from more than one file.
@@ -269,9 +273,15 @@ abstract final class EquipmentAttributeCatalog {
         kind: AttributeKind.choice,
         choiceKeys: ['tow_behind', 'ride_on', 'handheld'],
       ),
-      // Rated run time in hours, dimensionless for the same reason as the
-      // rebreather's scrubber duration.
-      EquipmentAttributeDef(key: 'burn_time_h', kind: AttributeKind.number),
+      // Rated run time. Stored in hours (hence the key), but shown in minutes
+      // because that is how every scooter's burn time is specced -- "90 min",
+      // not "1.5 h" (issue #1096). The rebreather's scrubber duration keeps
+      // hours: those are quoted as "3 h", not "180 min".
+      EquipmentAttributeDef(
+        key: 'burn_time_h',
+        kind: AttributeKind.number,
+        dimension: AttributeDimension.durationH,
+      ),
       EquipmentAttributeDef(
         key: 'battery_type',
         kind: AttributeKind.choice,
@@ -288,6 +298,8 @@ abstract final class EquipmentAttributeCatalog {
         kind: AttributeKind.choice,
         choiceKeys: ['brushless', 'brushed'],
       ),
+      // Stored in m/s, read as m/min or ft/min: a DPV's speed is quoted per
+      // minute on every manufacturer's sheet, never in km/h or knots.
       EquipmentAttributeDef(
         key: 'speed_mps',
         kind: AttributeKind.number,
