@@ -22423,7 +22423,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attrLabel_dpv_style => 'סגנון';
 
   @override
-  String get attrLabel_burn_time_h => 'זמן פעולה (שעות)';
+  String get attrLabel_burn_time_h => 'זמן פעולה';
 
   @override
   String get attrLabel_battery_type => 'סוללה';

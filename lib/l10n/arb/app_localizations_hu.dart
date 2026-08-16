@@ -22915,7 +22915,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get attrLabel_dpv_style => 'Fazon';
 
   @override
-  String get attrLabel_burn_time_h => 'Üzemidő (ó)';
+  String get attrLabel_burn_time_h => 'Üzemidő';
 
   @override
   String get attrLabel_battery_type => 'Akkumulátor';

@@ -22951,7 +22951,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get attrLabel_dpv_style => 'Bauart';
 
   @override
-  String get attrLabel_burn_time_h => 'Laufzeit (h)';
+  String get attrLabel_burn_time_h => 'Laufzeit';
 
   @override
   String get attrLabel_battery_type => 'Akku';

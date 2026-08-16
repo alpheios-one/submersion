@@ -6716,7 +6716,7 @@
   "attrLabel_diluent_cylinder_l": "稀释气瓶",
   "attrLabel_o2_cylinder_l": "O2 气瓶",
   "attrLabel_dpv_style": "款式",
-  "attrLabel_burn_time_h": "续航时间（小时）",
+  "attrLabel_burn_time_h": "续航时间",
   "attrLabel_battery_type": "电池",
   "attrLabel_battery_capacity_wh": "电池容量（瓦时）",
   "attrLabel_motor_type": "电机",

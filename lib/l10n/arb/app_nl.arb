@@ -6716,7 +6716,7 @@
   "attrLabel_diluent_cylinder_l": "Diluentfles",
   "attrLabel_o2_cylinder_l": "O2-fles",
   "attrLabel_dpv_style": "Stijl",
-  "attrLabel_burn_time_h": "Looptijd (u)",
+  "attrLabel_burn_time_h": "Looptijd",
   "attrLabel_battery_type": "Accu",
   "attrLabel_battery_capacity_wh": "Accucapaciteit (Wh)",
   "attrLabel_motor_type": "Motor",

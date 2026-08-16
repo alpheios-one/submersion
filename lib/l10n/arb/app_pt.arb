@@ -6716,7 +6716,7 @@
   "attrLabel_diluent_cylinder_l": "Cilindro de diluente",
   "attrLabel_o2_cylinder_l": "Cilindro de O2",
   "attrLabel_dpv_style": "Estilo",
-  "attrLabel_burn_time_h": "Autonomia (h)",
+  "attrLabel_burn_time_h": "Autonomia",
   "attrLabel_battery_type": "Bateria",
   "attrLabel_battery_capacity_wh": "Capacidade da bateria (Wh)",
   "attrLabel_motor_type": "Motor",

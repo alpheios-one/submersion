@@ -22990,7 +22990,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get attrLabel_dpv_style => 'Stile';
 
   @override
-  String get attrLabel_burn_time_h => 'Autonomia (h)';
+  String get attrLabel_burn_time_h => 'Autonomia';
 
   @override
   String get attrLabel_battery_type => 'Batteria';

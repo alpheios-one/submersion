@@ -38332,7 +38332,7 @@ abstract class AppLocalizations {
   /// No description provided for @attrLabel_burn_time_h.
   ///
   /// In en, this message translates to:
-  /// **'Burn time (h)'**
+  /// **'Burn time'**
   String get attrLabel_burn_time_h;
 
   /// No description provided for @attrLabel_battery_type.
