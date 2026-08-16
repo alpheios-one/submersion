@@ -5725,7 +5725,7 @@
   "trips_detail_stat_seaDays": "出海天数",
   "trips_detail_stat_sitesVisited": "已访问潜水点",
   "trips_detail_stat_speciesSeen": "已发现物种",
-  "trips_detail_stat_totalBottomTime": "总计底部时间",
+  "trips_detail_stat_totalRuntime": "总运行时间",
   "trips_detail_stat_totalDives": "总计潜水",
   "trips_detail_tab_dives": "潜水",
   "trips_detail_tab_itinerary": "行程",

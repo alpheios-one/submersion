@@ -807,11 +807,11 @@ class TripListTile extends StatelessWidget {
 
     final subtitleStr = trip.subtitle != null ? ', ${trip.subtitle}' : '';
     final diveCountStr = '${tripWithStats.diveCount} dives';
-    final bottomTimeStr = tripWithStats.totalBottomTime > 0
-        ? ', ${tripWithStats.formattedBottomTime}'
+    final runtimeStr = tripWithStats.totalRuntime > 0
+        ? ', ${tripWithStats.formattedRuntime}'
         : '';
     final tripLabel =
-        '${trip.name}, ${dateFormat.format(trip.startDate)} to ${dateFormat.format(trip.endDate)}$subtitleStr, $diveCountStr$bottomTimeStr${isSelected ? ', selected' : ''}';
+        '${trip.name}, ${dateFormat.format(trip.startDate)} to ${dateFormat.format(trip.endDate)}$subtitleStr, $diveCountStr$runtimeStr${isSelected ? ', selected' : ''}';
 
     return Semantics(
       label: tripLabel,
@@ -910,7 +910,7 @@ class TripListTile extends StatelessWidget {
                       color: theme.colorScheme.primary,
                     ),
                   ),
-                  if (tripWithStats.totalBottomTime > 0) ...[
+                  if (tripWithStats.totalRuntime > 0) ...[
                     const SizedBox(width: 12),
                     Icon(
                       Icons.timer,
@@ -919,7 +919,7 @@ class TripListTile extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      tripWithStats.formattedBottomTime,
+                      tripWithStats.formattedRuntime,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.primary,
                       ),

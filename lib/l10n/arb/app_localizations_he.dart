@@ -17770,7 +17770,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'עומק מרבי';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'סה\"כ זמן תחתית';
+  String get trips_detail_stat_totalRuntime => 'סה\"כ זמן ריצה';
 
   @override
   String get trips_detail_stat_totalDives => 'סה\"כ צלילות';

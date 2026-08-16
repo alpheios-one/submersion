@@ -30,7 +30,7 @@ List<dynamic> _settingsOverrides([AppSettings settings = const AppSettings()]) {
 TripWithStats _makeTrip({
   String name = 'Test Trip',
   int diveCount = 5,
-  int totalBottomTime = 0,
+  int totalRuntime = 0,
 }) {
   final now = DateTime(2025, 6, 1);
   return TripWithStats(
@@ -44,7 +44,7 @@ TripWithStats _makeTrip({
       updatedAt: now,
     ),
     diveCount: diveCount,
-    totalBottomTime: totalBottomTime,
+    totalRuntime: totalRuntime,
   );
 }
 

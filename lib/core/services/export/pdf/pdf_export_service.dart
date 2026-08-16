@@ -83,7 +83,7 @@ class PdfExportService {
               if (stats != null) ...[
                 pw.SizedBox(height: 10),
                 pw.Text(
-                  'Total Bottom Time: ${stats.formattedBottomTime}',
+                  'Total Runtime: ${stats.formattedRuntime}',
                   style: const pw.TextStyle(fontSize: 14),
                 ),
               ],

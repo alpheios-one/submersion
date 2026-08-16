@@ -18242,7 +18242,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'Prof. Maxima';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'Tempo de Fundo Total';
+  String get trips_detail_stat_totalRuntime => 'Tempo Total';
 
   @override
   String get trips_detail_stat_totalDives => 'Total de Mergulhos';

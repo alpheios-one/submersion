@@ -17,7 +17,7 @@ enum TripField implements EntityField {
   resortName,
   liveaboardName,
   diveCount,
-  totalBottomTime,
+  totalRuntime,
   maxDepth,
   avgDepth,
   notes;
@@ -36,7 +36,7 @@ enum TripField implements EntityField {
     TripField.resortName => 'Resort',
     TripField.liveaboardName => 'Liveaboard',
     TripField.diveCount => 'Dive Count',
-    TripField.totalBottomTime => 'Total Bottom Time',
+    TripField.totalRuntime => 'Total Runtime',
     TripField.maxDepth => 'Max Depth',
     TripField.avgDepth => 'Avg Depth',
     TripField.notes => 'Notes',
@@ -53,7 +53,7 @@ enum TripField implements EntityField {
     TripField.resortName => 'Resort',
     TripField.liveaboardName => 'Liveaboard',
     TripField.diveCount => 'Dives',
-    TripField.totalBottomTime => 'BT Total',
+    TripField.totalRuntime => 'RT Total',
     TripField.maxDepth => 'Max D',
     TripField.avgDepth => 'Avg D',
     TripField.notes => 'Notes',
@@ -70,7 +70,7 @@ enum TripField implements EntityField {
     TripField.resortName => Icons.hotel,
     TripField.liveaboardName => Icons.directions_boat,
     TripField.diveCount => Icons.scuba_diving,
-    TripField.totalBottomTime => Icons.access_time,
+    TripField.totalRuntime => Icons.access_time,
     TripField.maxDepth => Icons.arrow_downward,
     TripField.avgDepth => Icons.trending_down,
     TripField.notes => Icons.notes,
@@ -87,7 +87,7 @@ enum TripField implements EntityField {
     TripField.resortName => 120,
     TripField.liveaboardName => 120,
     TripField.diveCount => 80,
-    TripField.totalBottomTime => 90,
+    TripField.totalRuntime => 90,
     TripField.maxDepth => 80,
     TripField.avgDepth => 80,
     TripField.notes => 150,
@@ -104,7 +104,7 @@ enum TripField implements EntityField {
     TripField.resortName => 70,
     TripField.liveaboardName => 70,
     TripField.diveCount => 50,
-    TripField.totalBottomTime => 60,
+    TripField.totalRuntime => 60,
     TripField.maxDepth => 50,
     TripField.avgDepth => 50,
     TripField.notes => 60,
@@ -127,7 +127,7 @@ enum TripField implements EntityField {
     TripField.resortName => 'accommodation',
     TripField.liveaboardName => 'accommodation',
     TripField.diveCount => 'statistics',
-    TripField.totalBottomTime => 'statistics',
+    TripField.totalRuntime => 'statistics',
     TripField.maxDepth => 'statistics',
     TripField.avgDepth => 'statistics',
     TripField.notes => 'other',
@@ -137,7 +137,7 @@ enum TripField implements EntityField {
   bool get isRightAligned => switch (this) {
     TripField.durationDays => true,
     TripField.diveCount => true,
-    TripField.totalBottomTime => true,
+    TripField.totalRuntime => true,
     TripField.maxDepth => true,
     TripField.avgDepth => true,
     _ => false,
@@ -180,7 +180,7 @@ class TripFieldAdapter extends EntityFieldAdapter<TripWithStats, TripField> {
       TripField.resortName => entity.trip.resortName,
       TripField.liveaboardName => entity.trip.liveaboardName,
       TripField.diveCount => entity.diveCount,
-      TripField.totalBottomTime => entity.totalBottomTime,
+      TripField.totalRuntime => entity.totalRuntime,
       TripField.maxDepth => entity.maxDepth,
       TripField.avgDepth => entity.avgDepth,
       TripField.notes => entity.trip.notes,
@@ -196,14 +196,14 @@ class TripFieldAdapter extends EntityFieldAdapter<TripWithStats, TripField> {
       TripField.durationDays => '${value as int} days',
       TripField.tripType => (value as TripType).name,
       TripField.diveCount => (value as int).toString(),
-      TripField.totalBottomTime => _formatBottomTime(value as int),
+      TripField.totalRuntime => _formatRuntime(value as int),
       TripField.maxDepth => units.formatDepth(value as double),
       TripField.avgDepth => units.formatDepth(value as double),
       _ => value is String ? (value.isEmpty ? '--' : value) : value.toString(),
     };
   }
 
-  String _formatBottomTime(int seconds) {
+  String _formatRuntime(int seconds) {
     if (seconds <= 0) return '--';
     final hours = seconds ~/ 3600;
     final mins = (seconds % 3600) ~/ 60;
@@ -211,8 +211,21 @@ class TripFieldAdapter extends EntityFieldAdapter<TripWithStats, TripField> {
     return '${mins}m';
   }
 
+  /// Field names persisted by table layouts written before a rename, mapped to
+  /// the field that replaced them.
+  ///
+  /// Saved layouts store [TripField.name] verbatim, and an unresolved name
+  /// throws out of `EntityTableViewConfig.fromJson`, so dropping an old name
+  /// would break the trips table for anyone who had customized it.
+  static const Map<String, TripField> _legacyNames = {
+    // Renamed when trip totals moved from bottom time to runtime (#889).
+    'totalBottomTime': TripField.totalRuntime,
+  };
+
   @override
   TripField fieldFromName(String name) {
+    final legacy = _legacyNames[name];
+    if (legacy != null) return legacy;
     return TripField.values.firstWhere((e) => e.name == name);
   }
 }

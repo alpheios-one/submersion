@@ -28,7 +28,7 @@ final _trip = Trip(
 final _stats = TripWithStats(
   trip: _trip,
   diveCount: 2,
-  totalBottomTime: 75 * 60,
+  totalRuntime: 75 * 60,
   maxDepth: 30.0,
 );
 

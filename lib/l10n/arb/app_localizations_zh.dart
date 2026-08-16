@@ -17307,7 +17307,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_detail_stat_maxDepth => '最大深度';
 
   @override
-  String get trips_detail_stat_totalBottomTime => '总计底部时间';
+  String get trips_detail_stat_totalRuntime => '总运行时间';
 
   @override
   String get trips_detail_stat_totalDives => '总计潜水';

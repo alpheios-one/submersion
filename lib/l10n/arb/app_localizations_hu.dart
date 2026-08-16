@@ -18180,7 +18180,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'Max. melyseg';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'Osszes fenekido';
+  String get trips_detail_stat_totalRuntime => 'Osszes futasido';
 
   @override
   String get trips_detail_stat_totalDives => 'Osszes merüles';
