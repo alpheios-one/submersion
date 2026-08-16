@@ -121,9 +121,12 @@ class FileReviewPane extends ConsumerWidget {
       children: [
         Padding(
           padding: const EdgeInsets.all(8),
+          // "item", not "photo": the Files tab picks with FileType.media and
+          // the folder scan admits .mp4/.mov/.m4v, so a staged set can be all
+          // video. Matches the commit button's wording.
           // TODO(media): l10n, pluralization
           child: Text(
-            '$count photo${count == 1 ? '' : 's'}',
+            '$count item${count == 1 ? '' : 's'}',
             style: theme.textTheme.titleMedium,
           ),
         ),

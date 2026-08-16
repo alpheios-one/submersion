@@ -816,6 +816,62 @@ void main() {
     });
   });
 
+  // A row that names both owners shows up in a dive's grid and a site's; one
+  // that names neither shows up in nothing, which is indistinguishable from
+  // the import having silently failed. Neither announces itself, so the
+  // one-owner rule is asserted at the write.
+  group('one-owner invariant', () {
+    test('a site commit never also stamps a dive', () async {
+      final notifier = container.read(filesTabNotifierProvider.notifier);
+      final a = _ef('/a.jpg');
+      notifier.setFiles([a], match: MatchedSelection.empty());
+      when(
+        mockPlatform.createBookmark(any),
+      ).thenAnswer((_) async => Uint8List.fromList([1]));
+      when(mockBookmarkStorage.write(any, any)).thenAnswer((_) async {});
+      final captured = <MediaItem>[];
+      when(mockRepo.createMedia(any)).thenAnswer((invocation) async {
+        captured.add(invocation.positionalArguments.first as MediaItem);
+        return _saved('saved-1');
+      });
+
+      await notifier.commit(target: const SiteAttachTarget('site-1'));
+
+      // The assert in _persistOne would have thrown before reaching here had
+      // commit passed both; this pins the resulting row shape too.
+      expect(captured.single.siteId, 'site-1');
+      expect(captured.single.diveId, isNull);
+    });
+
+    test('a dive commit never also stamps a site', () async {
+      final notifier = container.read(filesTabNotifierProvider.notifier);
+      final a = _ef('/a.jpg');
+      notifier.setFiles(
+        [a],
+        match: MatchedSelection(
+          matched: {
+            'd1': [a],
+          },
+          unmatched: const [],
+        ),
+      );
+      when(
+        mockPlatform.createBookmark(any),
+      ).thenAnswer((_) async => Uint8List.fromList([1]));
+      when(mockBookmarkStorage.write(any, any)).thenAnswer((_) async {});
+      final captured = <MediaItem>[];
+      when(mockRepo.createMedia(any)).thenAnswer((invocation) async {
+        captured.add(invocation.positionalArguments.first as MediaItem);
+        return _saved('saved-1');
+      });
+
+      await notifier.commit(target: const DiveAttachTarget('d1'));
+
+      expect(captured.single.diveId, 'd1');
+      expect(captured.single.siteId, isNull);
+    });
+  });
+
   // A dive target must keep routing through the matcher's grouping: a file
   // the user assigned to dive B stays on dive B even though the picker was
   // opened from dive A.

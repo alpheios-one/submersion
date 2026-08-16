@@ -441,6 +441,20 @@ void main() {
       expect(find.text('Unmatched'), findsNothing);
     });
 
+    testWidgets('counts staged files as items, not photos', (tester) async {
+      // FileType.media admits video, and the folder scan admits
+      // .mp4/.mov/.m4v, so a staged set can be entirely video.
+      final clip = ExtractedFile(
+        sourcePath: '/clip.mp4',
+        file: File('/clip.mp4'),
+        metadata: const MediaSourceMetadata(mimeType: 'video/mp4'),
+      );
+      await tester.pumpWidget(wrap(staged([clip])));
+
+      expect(find.text('1 item'), findsOneWidget);
+      expect(find.textContaining('photo'), findsNothing);
+    });
+
     testWidgets('lists every staged file flat', (tester) async {
       await tester.pumpWidget(wrap(staged([_ef('/a.jpg'), _ef('/b.jpg')])));
 

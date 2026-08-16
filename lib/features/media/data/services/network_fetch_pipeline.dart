@@ -133,16 +133,23 @@ class NetworkFetchPipeline {
   /// and Lightroom auto-linking).
   ///
   /// [siteId] attaches every row directly to a dive site, for URLs added
-  /// from that site's attachment picker. Callers passing it should also pass
-  /// `autoMatch: false`: a site has no time window of its own, so the dive
-  /// matcher would route the photo to whichever unrelated dive happened to
-  /// span its timestamp instead of to the site the user was looking at
-  /// (issue #1098).
+  /// from that site's attachment picker (issue #1098).
+  ///
+  /// A site id **overrides** [autoMatch]: a site has no time window of its
+  /// own, so the dive matcher would stamp `diveId` from whichever unrelated
+  /// dive happened to span the photo's timestamp, leaving a row owned by both
+  /// a site and a dive it has nothing to do with. Rather than leave that to
+  /// every caller to remember, the two are mutually exclusive here.
   Future<List<String>> ingest(
     List<Uri> urls, {
     bool autoMatch = true,
     String? siteId,
   }) async {
+    // Site attachment and dive matching are two answers to "who owns this
+    // row", so a caller cannot ask for both. Enforced rather than documented
+    // because the failure is silent: the row lands on a dive the user never
+    // named and simply does not appear on the site.
+    final matchDives = autoMatch && siteId == null;
     final ids = <String>[];
     final specs = <_FillSpec>[];
     final nowMillis = _now().millisecondsSinceEpoch;
@@ -163,7 +170,7 @@ class NetworkFetchPipeline {
             ),
           );
       ids.add(id);
-      specs.add(_FillSpec(id: id, uri: uri, autoMatch: autoMatch));
+      specs.add(_FillSpec(id: id, uri: uri, autoMatch: matchDives));
     }
     _scheduleFill(specs);
     return ids;

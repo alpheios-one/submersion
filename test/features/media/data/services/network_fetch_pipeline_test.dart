@@ -571,6 +571,37 @@ void main() {
       expect(await diveIdOf(ids.single), isNull);
     });
 
+    // A site id and dive matching are two answers to "who owns this row".
+    // A caller that asks for both would otherwise get a row attached to the
+    // site AND stamped with a dive it has nothing to do with, so siteId wins
+    // without the caller having to remember to turn matching off.
+    test('a site id suppresses matching even with autoMatch on', () async {
+      await seedDive('d1');
+      await db
+          .into(db.diveSites)
+          .insert(
+            DiveSitesCompanion.insert(
+              id: 'site-1',
+              name: 'Blue Hole',
+              createdAt: 1700000000000,
+              updatedAt: 1700000000000,
+            ),
+          );
+      final pipeline = pipelineWith([window('d1')]);
+
+      final ids = await pipeline.ingest([
+        Uri.parse('https://example.com/a.jpg'),
+      ], siteId: 'site-1');
+      await pipeline.idle();
+
+      // Without the override this row would have matched d1 confidently.
+      expect(await diveIdOf(ids.single), isNull);
+      final row = await (db.select(
+        db.media,
+      )..where((t) => t.id.equals(ids.single))).getSingle();
+      expect(row.siteId, 'site-1');
+    });
+
     test('a confident match marks the media row pending for sync', () async {
       await seedDive('d1');
       final pipeline = pipelineWith([window('d1')]);

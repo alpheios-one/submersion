@@ -306,6 +306,15 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
     String? diveId,
     String? siteId,
   }) async {
+    // Asserted, not just documented: neither mistake announces itself. Both
+    // set puts the photo in a dive's grid and a site's; neither set writes an
+    // ownerless row that shows up in no grid at all, which reads to the user
+    // exactly like the import having silently failed.
+    assert(
+      (diveId == null) != (siteId == null),
+      'a Files-tab row belongs to exactly one owner, got '
+      'diveId=$diveId siteId=$siteId',
+    );
     String? localPath;
     String? bookmarkRef;
 
