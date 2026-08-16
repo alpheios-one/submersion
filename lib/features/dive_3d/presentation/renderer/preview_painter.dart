@@ -328,12 +328,19 @@ class Dive3dScenePainter extends CustomPainter {
   void _paintMarkers(Canvas canvas, SceneProjector projector) {
     final paint = Paint()..style = PaintingStyle.fill;
     for (final marker in scene.markers) {
+      // Diver-placed features have their own overlay gate, so they can be
+      // hidden without losing the site and nearby-site pins.
+      if (marker.kind == SceneMarkerKind.siteFeature &&
+          !_visible(SceneOverlay.features)) {
+        continue;
+      }
       paint.color = switch (marker.kind) {
         SceneMarkerKind.gasSwitch => const Color(0xFF22C55E),
         SceneMarkerKind.bookmark => const Color(0xFFF59E0B),
         SceneMarkerKind.photo => const Color(0xFF00D4FF),
         SceneMarkerKind.site => const Color(0xFFF43F5E),
         SceneMarkerKind.nearbySite => const Color(0xFF94A3B8),
+        SceneMarkerKind.siteFeature => const Color(0xFF14B8A6),
       };
       canvas.drawCircle(
         projector.project(marker.x, marker.y, marker.z),

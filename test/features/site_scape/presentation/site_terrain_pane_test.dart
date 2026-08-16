@@ -215,6 +215,22 @@ void main() {
     expect(find.textContaining('Esri'), findsNothing);
   });
 
+  testWidgets('the Features chip is on by default and toggles the overlay', (
+    tester,
+  ) async {
+    await tester.pumpWidget(page(readyState()));
+    await tester.pump();
+    await tester.pump();
+    Dive3dInteractiveViewport viewport() =>
+        tester.widget<Dive3dInteractiveViewport>(
+          find.byType(Dive3dInteractiveViewport),
+        );
+    expect(viewport().visibleOverlays, contains(SceneOverlay.features));
+    await tester.tap(find.text('Features'));
+    await tester.pump();
+    expect(viewport().visibleOverlays, isNot(contains(SceneOverlay.features)));
+  });
+
   testWidgets('no-coordinates state shows the message, not a spinner', (
     tester,
   ) async {

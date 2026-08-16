@@ -2,7 +2,9 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/bathymetry/domain/grid_sampling.dart';
 import 'package:submersion/features/bathymetry/domain/terrain_imagery_frame.dart';
 import 'package:submersion/features/dive_3d/domain/entities/mesh_data.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
@@ -31,6 +33,27 @@ class SiteDivePathInput {
   });
 }
 
+/// A diver-placed annotation, flattened to plain sendable data for the
+/// compute() boundary: the domain entity and its lat/lon stay UI-side.
+class SiteFeatureMarkerInput {
+  final String id;
+  final String typeName;
+  final String label;
+  final ({double east, double north}) offset;
+
+  /// Meters, when the diver recorded one; null drapes the marker on the
+  /// sampled seafloor instead.
+  final double? depthMeters;
+
+  const SiteFeatureMarkerInput({
+    required this.id,
+    required this.typeName,
+    required this.label,
+    required this.offset,
+    this.depthMeters,
+  });
+}
+
 /// Another site whose pin falls inside the fetched terrain.
 class NearbySiteInput {
   final String siteId;
@@ -53,6 +76,7 @@ class SiteSeascapeInput {
   final double? siteMaxDepth;
   final List<SiteDivePathInput> divePaths;
   final List<NearbySiteInput> nearbySites;
+  final List<SiteFeatureMarkerInput> features;
   final SeascapeAppearance appearance;
   final double displayUnitInMeters;
   final String depthSymbol;
@@ -69,6 +93,7 @@ class SiteSeascapeInput {
     this.siteMaxDepth,
     required this.divePaths,
     required this.nearbySites,
+    this.features = const [],
     this.appearance = const SeascapeAppearance(),
     this.displayUnitInMeters = 1.0,
     this.depthSymbol = 'm',
@@ -194,6 +219,18 @@ class SiteSeascapeGeometryService {
           z: proj.zOf(n.offset.north),
           timestampSeconds: 0,
         ),
+      for (final f in input.features)
+        SceneMarker(
+          kind: SceneMarkerKind.siteFeature,
+          refId: f.id,
+          label: f.label.isNotEmpty ? f.label : f.typeName,
+          x: proj.xOf(f.offset.east),
+          y: f.depthMeters != null
+              ? proj.yOf(f.depthMeters!)
+              : _featureY(input.grid, input.center, f.offset, proj),
+          z: proj.zOf(f.offset.north),
+          timestampSeconds: 0,
+        ),
     ];
 
     final zHalf = proj.zHalfExtent + SceneBounds.zHalfWidth;
@@ -210,6 +247,26 @@ class SiteSeascapeGeometryService {
       ),
     );
     return (scene: scene, contourLabels: contours.labels);
+  }
+
+  /// Scene y for a feature with no recorded depth: the measured seafloor
+  /// under it, so the marker sits ON the terrain rather than floating at
+  /// an invented depth. Falls back to the surface float when the grid has
+  /// nothing there (nodata, land, or outside).
+  double _featureY(
+    BathymetryGrid grid,
+    GeoPoint center,
+    ({double east, double north}) offset,
+    SpatialProjection proj,
+  ) {
+    final lat =
+        center.latitude +
+        offset.north / BathymetryTerrainBuilder.metersPerDegLat;
+    final lon =
+        center.longitude +
+        offset.east / metersPerDegreeLongitude(center.latitude);
+    final depth = sampleGridDepth(grid, lat, lon);
+    return depth == null ? _markerFloat : proj.yOf(depth);
   }
 
   /// A thin vertical quad from the surface down to the site's recorded max

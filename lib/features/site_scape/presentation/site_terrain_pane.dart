@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/constants/map_tile_config.dart';
 import 'package:submersion/core/constants/units.dart';
@@ -7,7 +7,11 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_labels.dart';
 import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
+import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
+import 'package:submersion/features/site_scape/presentation/site_feature_marker_layer.dart';
+import 'package:submersion/features/site_scape/presentation/site_feature_sheet.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_surface.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
@@ -43,6 +47,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     SceneOverlay.markers,
     SceneOverlay.paths,
     SceneOverlay.contours,
+    SceneOverlay.features,
   };
   bool _chartMode = false;
 
@@ -114,6 +119,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                               scene.layers.first.mesh,
                             ),
                             hoverPick: _hoverPick,
+                            onMarkerTap: _onMarkerTap,
                             terrainImagery: imagery?.image,
                             imageryWhiteTexel: imagery == null
                                 ? null
@@ -209,6 +215,67 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
             ],
           ),
       },
+    );
+  }
+
+  /// Feature markers are read-only in 3D (placement and editing live on
+  /// the 2D map): a tap shows what the diver recorded, nothing more.
+  void _onMarkerTap(SceneMarker marker) {
+    if (marker.kind != SceneMarkerKind.siteFeature) return;
+    final feature = ref
+        .read(siteFeaturesProvider(widget.siteId))
+        .valueOrNull
+        ?.where((f) => f.id == marker.refId)
+        .firstOrNull;
+    if (feature == null) return;
+    final l10n = context.l10n;
+    final depthUnit = ref.read(settingsProvider).depthUnit;
+    final unitInMeters = depthUnit == DepthUnit.feet ? 0.3048 : 1.0;
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  SiteFeatureGlyph(typeName: feature.typeName, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      feature.name.isNotEmpty
+                          ? feature.name
+                          : siteFeatureTypeLabel(l10n, feature.typeName),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(siteFeatureTypeLabel(l10n, feature.typeName)),
+              if (feature.depthMeters != null)
+                Text(
+                  '${l10n.siteFeature_field_depth}: '
+                  '${(feature.depthMeters! / unitInMeters).toStringAsFixed(1)} '
+                  '${depthUnit.symbol}',
+                ),
+              if (feature.bearingDeg != null)
+                Text(
+                  '${l10n.siteFeature_field_bearing}: '
+                  '${feature.bearingDeg!.round()}',
+                ),
+              if (feature.notes.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(feature.notes),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -317,6 +384,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
             SceneOverlay.steepWalls,
             context.l10n.dive3d_seascape_overlay_walls,
           ),
+          chip(SceneOverlay.features, context.l10n.siteFeature_sectionTitle),
         ],
       ),
     );

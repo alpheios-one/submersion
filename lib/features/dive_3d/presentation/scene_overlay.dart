@@ -8,4 +8,5 @@ enum SceneOverlay {
   contours,
   water,
   steepWalls,
+  features,
 }
