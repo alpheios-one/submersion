@@ -22605,7 +22605,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attrLabel_dpv_style => 'Style';
 
   @override
-  String get attrLabel_burn_time_h => 'Burn time (h)';
+  String get attrLabel_burn_time_h => 'Burn time';
 
   @override
   String get attrLabel_battery_type => 'Battery';

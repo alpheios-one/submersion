@@ -6716,7 +6716,7 @@
   "attrLabel_diluent_cylinder_l": "בלון מדלל",
   "attrLabel_o2_cylinder_l": "בלון O2",
   "attrLabel_dpv_style": "סגנון",
-  "attrLabel_burn_time_h": "זמן פעולה (שעות)",
+  "attrLabel_burn_time_h": "זמן פעולה",
   "attrLabel_battery_type": "סוללה",
   "attrLabel_battery_capacity_wh": "קיבולת סוללה (Wh)",
   "attrLabel_motor_type": "מנוע",

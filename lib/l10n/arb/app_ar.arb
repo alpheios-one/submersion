@@ -6716,7 +6716,7 @@
   "attrLabel_diluent_cylinder_l": "أسطوانة المخفف",
   "attrLabel_o2_cylinder_l": "أسطوانة O2",
   "attrLabel_dpv_style": "النمط",
-  "attrLabel_burn_time_h": "زمن التشغيل (ساعة)",
+  "attrLabel_burn_time_h": "زمن التشغيل",
   "attrLabel_battery_type": "البطارية",
   "attrLabel_battery_capacity_wh": "سعة البطارية (واط·ساعة)",
   "attrLabel_motor_type": "المحرك",

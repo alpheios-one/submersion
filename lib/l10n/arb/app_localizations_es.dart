@@ -23006,7 +23006,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get attrLabel_dpv_style => 'Estilo';
 
   @override
-  String get attrLabel_burn_time_h => 'Autonomía (h)';
+  String get attrLabel_burn_time_h => 'Autonomía';
 
   @override
   String get attrLabel_battery_type => 'Batería';

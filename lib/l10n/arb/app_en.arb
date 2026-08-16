@@ -14795,7 +14795,7 @@
   "attrLabel_diluent_cylinder_l": "Diluent cylinder",
   "attrLabel_o2_cylinder_l": "O2 cylinder",
   "attrLabel_dpv_style": "Style",
-  "attrLabel_burn_time_h": "Burn time (h)",
+  "attrLabel_burn_time_h": "Burn time",
   "attrLabel_battery_type": "Battery",
   "attrLabel_battery_capacity_wh": "Battery capacity (Wh)",
   "attrLabel_motor_type": "Motor",

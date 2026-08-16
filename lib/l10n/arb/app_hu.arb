@@ -6716,7 +6716,7 @@
   "attrLabel_diluent_cylinder_l": "Diluent palack",
   "attrLabel_o2_cylinder_l": "O2 palack",
   "attrLabel_dpv_style": "Fazon",
-  "attrLabel_burn_time_h": "Üzemidő (ó)",
+  "attrLabel_burn_time_h": "Üzemidő",
   "attrLabel_battery_type": "Akkumulátor",
   "attrLabel_battery_capacity_wh": "Akkukapacitás (Wh)",
   "attrLabel_motor_type": "Motor",

@@ -22817,7 +22817,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get attrLabel_dpv_style => 'Stijl';
 
   @override
-  String get attrLabel_burn_time_h => 'Looptijd (u)';
+  String get attrLabel_burn_time_h => 'Looptijd';
 
   @override
   String get attrLabel_battery_type => 'Accu';
