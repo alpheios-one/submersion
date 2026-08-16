@@ -54,6 +54,9 @@ Future<void> _pump(
         ),
       ],
       child: MaterialApp(
+        // Pinned: the morph test finds the terrain button by its English
+        // tooltip.
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(

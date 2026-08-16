@@ -79,6 +79,8 @@ void main() {
         ],
         child: MaterialApp.router(
           routerConfig: router,
+          // Pinned: pills are found by their English labels.
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
         ),

@@ -76,6 +76,7 @@ Future<void> _pumpPage(WidgetTester tester, SiteMapPage page) async {
         ),
       ],
       child: MaterialApp(
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: page,
@@ -115,5 +116,21 @@ void main() {
     expect(find.byType(SiteTerrainPane), findsNothing);
     // The info card for the seeded selection is visible.
     expect(find.text('Blue Hole'), findsOneWidget);
+  });
+
+  testWidgets('unknown deep-link site resolves the seed without zoom or 3D', (
+    tester,
+  ) async {
+    await _pumpPage(
+      tester,
+      const SiteMapPage(initialSiteId: 'no-such-site', initialScape3d: true),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    // The seed cannot resolve to a site: the page stays a plain 2D map
+    // (no pane, no info card) and throws nothing.
+    expect(find.byType(SiteTerrainPane), findsNothing);
+    expect(find.byType(FlutterMap), findsWidgets);
+    expect(tester.takeException(), isNull);
   });
 }

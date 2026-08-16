@@ -103,13 +103,22 @@ class _SiteMapPageState extends ConsumerState<SiteMapPage>
       },
     );
 
-    // Center the 2D map on a deep-linked selection once its data lands.
-    if (_seedZoomPending && selectedSite?.hasCoordinates == true) {
+    // Center the 2D map on the DEEP-LINKED site once the data lands. The
+    // seed resolves exactly once, against the seeded id (never the live
+    // selection), so an unknown or coordinate-less seed cannot leave the
+    // flag armed to zoom on a later unrelated user selection.
+    if (_seedZoomPending && sitesAsync.hasValue) {
       _seedZoomPending = false;
-      final loc = selectedSite!.location!;
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => _animateToLocation(loc.latitude, loc.longitude),
-      );
+      final seeded = sitesAsync.value!
+          .where((s) => s.site.id == widget.initialSiteId)
+          .firstOrNull
+          ?.site;
+      if (seeded?.hasCoordinates == true) {
+        final loc = seeded!.location!;
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _animateToLocation(loc.latitude, loc.longitude),
+        );
+      }
     }
 
     return MapListScaffold(

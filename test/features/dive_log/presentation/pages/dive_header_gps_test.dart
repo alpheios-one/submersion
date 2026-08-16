@@ -57,6 +57,8 @@ Future<void> _pump(WidgetTester tester, Dive dive) async {
         ).overrideWith((ref) async => <DiveDataSource>[]),
       ],
       child: MaterialApp(
+        // Pinned: assertions match English strings (pill labels).
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: DiveDetailPage(diveId: dive.id, embedded: true),
