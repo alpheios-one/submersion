@@ -27,19 +27,14 @@ const _loc = GeoPoint(12.15, -68.3);
 class _Host extends StatefulWidget {
   final String? selectedSiteId;
   final GeoPoint? selectedSiteLocation;
-  final SiteScapeMode initialMode;
-  const _Host({
-    this.selectedSiteId,
-    this.selectedSiteLocation,
-    this.initialMode = SiteScapeMode.map2d,
-  });
+  const _Host({this.selectedSiteId, this.selectedSiteLocation});
 
   @override
   State<_Host> createState() => _HostState();
 }
 
 class _HostState extends State<_Host> {
-  late SiteScapeMode mode = widget.initialMode;
+  SiteScapeMode mode = SiteScapeMode.map2d;
 
   @override
   Widget build(BuildContext context) {
