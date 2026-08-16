@@ -424,7 +424,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'map',
                 name: 'sitesMap',
-                builder: (context, state) => const SiteMapPage(),
+                builder: (context, state) => SiteMapPage(
+                  initialSiteId: state.uri.queryParameters['site'],
+                  initialScape3d: state.uri.queryParameters['scape'] == '3d',
+                ),
               ),
               GoRoute(
                 path: 'import',
