@@ -12,7 +12,7 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/built_in_sites_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_depth_overlay_layer.dart';
-import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
+import 'package:submersion/features/site_scape/presentation/site_scape_view.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/built_in_site_info_card.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/built_in_site_marker_layer.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/built_in_sites_toggle_button.dart';
@@ -63,6 +63,9 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
     with TickerProviderStateMixin {
   final MapController _mapController = MapController();
   bool _mapReady = false;
+
+  // Ephemeral morph state: each entry to this widget starts in 2D.
+  SiteScapeMode _scapeMode = SiteScapeMode.map2d;
 
   /// Externally-keyed selection for a tapped built-in (bundled) site. Held
   /// locally rather than in the shared selection, which is keyed to the user's
@@ -173,63 +176,70 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
               ?.site
         : null;
 
-    return Stack(
-      children: [
-        _buildMap(context, sitesWithCounts, heatMapAsync, heatMapSettings),
-        // Heat map toggle and fit all sites controls
-        Positioned(
-          top: 8,
-          right: 8,
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const BuiltInSitesToggleButton(),
-                  const HeatMapToggleButton(),
-                  IconButton(
-                    icon: const Icon(Icons.my_location, size: 20),
-                    tooltip: context.l10n.diveSites_map_tooltip_fitAllSites,
-                    onPressed: () => _fitAllSites(
-                      sitesWithCounts.map((s) => s.site).toList(),
+    return SiteScapeView(
+      mode: _scapeMode,
+      onModeChanged: (m) => setState(() => _scapeMode = m),
+      selectedSiteId: selectedSite?.id,
+      selectedSiteLocation: selectedSite?.location,
+      mapController: _mapController,
+      mapBuilder: (context) => Stack(
+        children: [
+          _buildMap(context, sitesWithCounts, heatMapAsync, heatMapSettings),
+          // Heat map toggle and fit all sites controls
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const BuiltInSitesToggleButton(),
+                    const HeatMapToggleButton(),
+                    IconButton(
+                      icon: const Icon(Icons.my_location, size: 20),
+                      tooltip: context.l10n.diveSites_map_tooltip_fitAllSites,
+                      onPressed: () => _fitAllSites(
+                        sitesWithCounts.map((s) => s.site).toList(),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        if (_selectedBuiltInId != null)
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 16,
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 400),
-                child:
-                    _buildBuiltInInfoCard(context) ?? const SizedBox.shrink(),
-              ),
-            ),
-          )
-        else if (selectedSite != null)
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 16,
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 400),
-                child: _buildMapInfoCard(
-                  context,
-                  selectedSite,
-                  sitesWithCounts,
+                  ],
                 ),
               ),
             ),
           ),
-      ],
+          if (_selectedBuiltInId != null)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child:
+                      _buildBuiltInInfoCard(context) ?? const SizedBox.shrink(),
+                ),
+              ),
+            )
+          else if (selectedSite != null)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: _buildMapInfoCard(
+                    context,
+                    selectedSite,
+                    sitesWithCounts,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -481,11 +491,8 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
           ? IconButton(
               icon: const Icon(Icons.terrain),
               tooltip: context.l10n.dive3d_seascape_siteTitle,
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => SiteSeascapePage(siteId: site.id),
-                ),
-              ),
+              onPressed: () =>
+                  setState(() => _scapeMode = SiteScapeMode.terrain3d),
             )
           : null,
       onDetailsTap: widget.onDetailsTap != null
