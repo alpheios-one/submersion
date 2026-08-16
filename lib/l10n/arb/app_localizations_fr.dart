@@ -22111,6 +22111,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Mélange';
 
   @override
+  String get siteScape_mode2d => 'Carte';
+
+  @override
+  String get siteScape_mode3d => '3D';
+
+  @override
   String get dive3d_seascape_appearance_rampRange =>
       'Limiter la plage de profondeur des couleurs';
 

@@ -1,0 +1,155 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
+import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/site_scape/presentation/site_scape_view.dart';
+import 'package:submersion/features/site_scape/presentation/site_terrain_pane.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+
+import '../../../helpers/mock_providers.dart' show Override;
+
+class _TestSettingsNotifier extends StateNotifier<AppSettings>
+    implements SettingsNotifier {
+  _TestSettingsNotifier([super.initial = const AppSettings()]);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+const _loc = GeoPoint(12.15, -68.3);
+
+class _Host extends StatefulWidget {
+  final String? selectedSiteId;
+  final GeoPoint? selectedSiteLocation;
+  final SiteScapeMode initialMode;
+  const _Host({
+    this.selectedSiteId,
+    this.selectedSiteLocation,
+    this.initialMode = SiteScapeMode.map2d,
+  });
+
+  @override
+  State<_Host> createState() => _HostState();
+}
+
+class _HostState extends State<_Host> {
+  late SiteScapeMode mode = widget.initialMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return SiteScapeView(
+      mode: mode,
+      onModeChanged: (m) => setState(() => mode = m),
+      selectedSiteId: widget.selectedSiteId,
+      selectedSiteLocation: widget.selectedSiteLocation,
+      mapController: null,
+      mapBuilder: (_) =>
+          const ColoredBox(color: Colors.green, child: Text('MAP_STACK')),
+    );
+  }
+}
+
+Widget _app(Widget child, {List<Override> overrides = const []}) {
+  return ProviderScope(
+    overrides: [
+      settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+      // The pane resolves via its own provider; park it on no-data so the
+      // pane renders a terminal message without touching the network.
+      siteSeascapeProvider.overrideWith(
+        (ref, id) async => const SiteSeascapeNoData(),
+      ),
+      ...overrides,
+    ],
+    child: MaterialApp(
+      locale: const Locale('en'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(body: child),
+    ),
+  );
+}
+
+void main() {
+  testWidgets('known-absent grid keeps the map and disables 3D', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(
+        const _Host(selectedSiteId: 'site-1', selectedSiteLocation: _loc),
+        overrides: [
+          bathymetryGridProvider.overrideWith((ref, key) async => null),
+        ],
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('MAP_STACK'), findsOneWidget);
+    expect(find.byType(SiteTerrainPane), findsNothing);
+    // Known-absent grid: the 3D button is disabled.
+    final disabled = tester.widget<IconButton>(
+      find.byKey(const ValueKey('siteScape3dButton')),
+    );
+    expect(disabled.onPressed, isNull);
+  });
+
+  testWidgets('with a grid the toggle enters 3D and Offstage hides the map', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(
+        const _Host(selectedSiteId: 'site-1', selectedSiteLocation: _loc),
+        overrides: [
+          // A never-completing fetch: the grid stays LOADING, so the 3D
+          // button stays enabled (only a known-absent grid disables it).
+          bathymetryGridProvider.overrideWith(
+            (ref, key) => Completer<BathymetryGrid?>().future,
+          ),
+        ],
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+    final b3 = tester.widget<IconButton>(
+      find.byKey(const ValueKey('siteScape3dButton')),
+    );
+    expect(
+      b3.onPressed,
+      isNotNull,
+      reason: 'a still-loading grid must keep 3D enabled',
+    );
+    await tester.tap(find.byKey(const ValueKey('siteScape3dButton')));
+    await tester.pump();
+    await tester.pump();
+    expect(find.byType(SiteTerrainPane), findsOneWidget);
+    // Nearest Offstage ancestor is the view's own (Navigator adds more
+    // further up the tree); default finders skip offstage subtrees, so
+    // both finders must opt out of that.
+    final offstage = tester.widget<Offstage>(
+      find
+          .ancestor(
+            of: find.text('MAP_STACK', skipOffstage: false),
+            matching: find.byType(Offstage, skipOffstage: false),
+          )
+          .first,
+    );
+    expect(offstage.offstage, isTrue);
+    await tester.tap(find.byKey(const ValueKey('siteScape2dButton')));
+    await tester.pump();
+    expect(find.byType(SiteTerrainPane), findsNothing);
+  });
+
+  testWidgets('no selection disables 3D', (tester) async {
+    await tester.pumpWidget(_app(const _Host()));
+    await tester.pump();
+    final button = tester.widget<IconButton>(
+      find.byKey(const ValueKey('siteScape3dButton')),
+    );
+    expect(button.onPressed, isNull);
+  });
+}

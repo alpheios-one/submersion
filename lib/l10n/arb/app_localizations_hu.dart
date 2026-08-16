@@ -21965,6 +21965,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Keverék';
 
   @override
+  String get siteScape_mode2d => 'Térkép';
+
+  @override
+  String get siteScape_mode3d => '3D';
+
+  @override
   String get dive3d_seascape_appearance_rampRange =>
       'Színmélység-tartomány korlátozása';
 

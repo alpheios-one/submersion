@@ -20921,6 +20921,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => '混合';
 
   @override
+  String get siteScape_mode2d => '地图';
+
+  @override
+  String get siteScape_mode3d => '3D';
+
+  @override
   String get dive3d_seascape_appearance_rampRange => '限制颜色深度范围';
 
   @override

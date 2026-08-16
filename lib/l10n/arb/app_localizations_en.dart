@@ -21663,6 +21663,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Blend';
 
   @override
+  String get siteScape_mode2d => 'Map';
+
+  @override
+  String get siteScape_mode3d => '3D';
+
+  @override
   String get dive3d_seascape_appearance_rampRange => 'Limit color depth range';
 
   @override

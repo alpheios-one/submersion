@@ -36639,6 +36639,18 @@ abstract class AppLocalizations {
   /// **'Blend'**
   String get dive3d_seascape_appearance_surfaceBlend;
 
+  /// No description provided for @siteScape_mode2d.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get siteScape_mode2d;
+
+  /// No description provided for @siteScape_mode3d.
+  ///
+  /// In en, this message translates to:
+  /// **'3D'**
+  String get siteScape_mode3d;
+
   /// No description provided for @dive3d_seascape_appearance_rampRange.
   ///
   /// In en, this message translates to:

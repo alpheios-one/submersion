@@ -22039,6 +22039,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Mistura';
 
   @override
+  String get siteScape_mode2d => 'Mapa';
+
+  @override
+  String get siteScape_mode3d => '3D';
+
+  @override
   String get dive3d_seascape_appearance_rampRange =>
       'Limitar intervalo de profundidade das cores';
 
