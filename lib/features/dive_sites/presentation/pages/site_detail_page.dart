@@ -12,6 +12,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_depth_overlay_layer.dart';
 import 'package:submersion/features/dive_3d/application/career_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/career_terrain_page.dart';
+import 'package:submersion/features/site_scape/presentation/site_feature_marker_layer.dart';
 import 'package:submersion/features/site_scape/presentation/site_scape_view.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -547,6 +548,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                           : null,
                     ),
                     BathymetryDepthOverlayLayer(location: site.location),
+                    SiteFeatureMarkerLayer(siteId: site.id),
                     MarkerLayer(
                       markers: [
                         Marker(
@@ -1625,6 +1627,7 @@ class _FullscreenSiteScapePageState
                     : null,
               ),
               BathymetryDepthOverlayLayer(location: site.location),
+              SiteFeatureMarkerLayer(siteId: site.id),
               MarkerLayer(
                 markers: [
                   Marker(
