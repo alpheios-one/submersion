@@ -8,6 +8,7 @@ import 'package:submersion/features/media/data/services/asset_resolution_service
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_serving_providers.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 
@@ -32,9 +33,19 @@ const _log = LoggerService('mediaBytesProvider');
 /// purpose, indistinguishable from an absent one.
 final mediaBytesProvider =
     FutureProvider.family<ResolvedAssetResult, MediaItem>((ref, item) async {
+      // Always thumbnail: false. This provider resolves full-resolution
+      // bytes only; grid thumbnails go through MediaItemView.
+      final recorder = ref.read(mediaServingRecorderProvider);
+
       final native = await _resolveNative(ref, item);
       final bytes = await _bytesOf(native, item);
       if (bytes != null) {
+        recorder.record(
+          item.id,
+          thumbnail: false,
+          servedFrom: native.servedFrom,
+          servedTier: native.servedTier,
+        );
         return ResolvedAssetResult(
           bytes: bytes,
           status: ResolutionStatus.resolved,
@@ -48,12 +59,34 @@ final mediaBytesProvider =
       final remote = await _resolveRemote(ref, item);
       final remoteBytes = await _bytesOf(remote, item);
       if (remoteBytes != null) {
+        recorder.record(
+          item.id,
+          thumbnail: false,
+          servedFrom: remote?.servedFrom,
+          servedTier: remote?.servedTier ?? ServedTier.original,
+          storeFallbackUsed: true,
+        );
         return ResolvedAssetResult(
           bytes: remoteBytes,
           status: ResolutionStatus.resolved,
         );
       }
 
+      // A native NetworkData yields no bytes without being an
+      // UnavailableData: this provider deliberately does not fetch URLs (see
+      // [_bytesOf]). For a byte consumer that is indistinguishable from an
+      // absent source, so it collapses to notFound.
+      //
+      // storeFallbackUsed is true because the store WAS asked and could not
+      // help. It records that the fallback ran, not that it succeeded.
+      recorder.record(
+        item.id,
+        thumbnail: false,
+        failure: native is UnavailableData
+            ? native.kind
+            : UnavailableKind.notFound,
+        storeFallbackUsed: true,
+      );
       return const ResolvedAssetResult(status: ResolutionStatus.unavailable);
     });
 
