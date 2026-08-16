@@ -33,7 +33,11 @@ class MeshData {
     this.opacity = 1.0,
     this.textureCoordinates,
     this.sortHeights,
-  });
+  }) : assert(
+         sortHeights == null || sortHeights.length * 3 == positions.length,
+         'sortHeights needs exactly one entry per vertex: the renderer '
+         'indexes it by vertex while building the depth key',
+       );
 
   int get vertexCount => positions.length ~/ 3;
   int get triangleCount => indices.length ~/ 3;

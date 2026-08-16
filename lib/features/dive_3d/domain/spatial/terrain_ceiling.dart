@@ -21,6 +21,10 @@ class TerrainCeiling {
   final GeoPoint _center;
   final double _metersPerDegLon;
 
+  /// Hoisted out of [atScene]: this runs per draped vertex, four corners
+  /// each, and the cap is fixed for the whole scene.
+  final double _landCap;
+
   TerrainCeiling({
     required BathymetryGrid grid,
     required GeoPoint center,
@@ -28,7 +32,8 @@ class TerrainCeiling {
   }) : _grid = grid,
        _center = center,
        _projection = projection,
-       _metersPerDegLon = metersPerDegreeLongitude(center.latitude);
+       _metersPerDegLon = metersPerDegreeLongitude(center.latitude),
+       _landCap = BathymetryTerrainBuilder.landHeightCap(projection);
 
   /// The shallowest surface height of the cell containing scene [x], [z].
   /// Points outside the grid clamp to the nearest edge cell.
@@ -46,19 +51,22 @@ class TerrainCeiling {
       _grid.rows,
     );
 
-    var ceiling = double.negativeInfinity;
+    // Shallowest corner = greatest scene Y, and yOf is monotonic, so take
+    // the minimum DEPTH and convert once.
+    var shallowest = double.infinity;
     for (var dr = 0; dr <= 1; dr++) {
       for (var dc = 0; dc <= 1; dc++) {
-        final y = BathymetryTerrainBuilder.surfaceY(
-          _grid,
-          _projection,
-          (r + dr).clamp(0, _grid.rows - 1),
-          (c + dc).clamp(0, _grid.cols - 1),
+        final depth = BathymetryTerrainBuilder.surfaceDepth(
+          _grid.depthAt(
+            (r + dr).clamp(0, _grid.rows - 1),
+            (c + dc).clamp(0, _grid.cols - 1),
+          ),
+          _landCap,
         );
-        if (y > ceiling) ceiling = y;
+        if (depth < shallowest) shallowest = depth;
       }
     }
-    return ceiling;
+    return _projection.yOf(shallowest);
   }
 
   /// The lower corner of the cell holding fractional index [t], clamped so

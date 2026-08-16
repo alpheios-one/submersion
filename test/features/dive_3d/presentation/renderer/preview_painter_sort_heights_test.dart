@@ -82,6 +82,20 @@ Future<({int r, int g})> _pixelAtDrape(ui.Image image) async {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  test('sort heights must carry one entry per vertex', () {
+    // The renderer indexes sortHeights by vertex; a short list would throw a
+    // RangeError deep in the paint loop instead of at the mistake.
+    expect(
+      () => MeshData(
+        positions: Float32List.fromList([0, 0, 0, 1, 0, 0, 0, 1, 0]),
+        indices: Uint32List.fromList([0, 1, 2]),
+        colors: Float32List.fromList([1, 1, 1, 1, 1, 1, 1, 1, 1]),
+        sortHeights: Float32List.fromList([0, 0]),
+      ),
+      throwsA(isA<AssertionError>()),
+    );
+  });
+
   test('a drape sorted at the cell ceiling paints over the terrain', () async {
     final image = await _render(_drape());
     addTearDown(image.dispose);

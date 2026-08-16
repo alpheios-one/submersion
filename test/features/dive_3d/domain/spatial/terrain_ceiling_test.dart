@@ -100,7 +100,8 @@ void main() {
   });
 
   test('land and nodata report the surface the mesh actually draws', () {
-    // nodata renders at the waterline; land is capped, not raw elevation.
+    // A -5000 m sample is land far above any real cap: the mesh clamps it,
+    // and the ceiling has to report the clamped height, not the raw one.
     final grid = _grid([null, -5000, 20, 30, 40, 45, 50, 55, 60]);
     final proj = _projectionFor(grid);
     final ceiling = TerrainCeiling(
@@ -108,8 +109,22 @@ void main() {
       center: _center,
       projection: proj,
     );
-    final capped = BathymetryTerrainBuilder.surfaceY(grid, proj, 0, 1);
-    expect(capped, greaterThan(0), reason: 'land sits above the waterline');
-    expect(ceiling.atScene(proj.xOf(0), proj.zOf(0)), greaterThan(0));
+    final mesh = BathymetryTerrainBuilder.build(
+      grid: grid,
+      center: _center,
+      projection: proj,
+    ).terrain;
+    final drawnLandY = mesh.positions[1 * 3 + 1]; // node (row 0, col 1)
+    expect(drawnLandY, greaterThan(0), reason: 'land sits above the waterline');
+    expect(
+      drawnLandY,
+      lessThan(5000),
+      reason: 'and is capped, not raw elevation',
+    );
+    // The south-west cell holds that land node, so its ceiling is that height.
+    expect(
+      ceiling.atScene(mesh.positions[0], mesh.positions[2]),
+      closeTo(drawnLandY, 1e-6),
+    );
   });
 }
