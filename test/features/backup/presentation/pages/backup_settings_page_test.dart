@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -381,9 +380,9 @@ void main() {
     testWidgets(
       'restore-from-file confirms via the dialog and threads merge mode',
       (tester) async {
-        mockPicker.pickFilesResult = FilePickerResult([
-          PlatformFile(name: 'picked.db', size: 2, path: pickedPath),
-        ]);
+        mockPicker.pickFilesResult = [
+          FakePlatformFile(pickedPath, name: 'picked.db'),
+        ];
 
         await tester.pumpWidget(buildApp());
         await tester.pumpAndSettle();
@@ -407,9 +406,9 @@ void main() {
     testWidgets('cancelling the file-restore dialog restores nothing', (
       tester,
     ) async {
-      mockPicker.pickFilesResult = FilePickerResult([
-        PlatformFile(name: 'picked.db', size: 2, path: pickedPath),
-      ]);
+      mockPicker.pickFilesResult = [
+        FakePlatformFile(pickedPath, name: 'picked.db'),
+      ];
 
       await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();

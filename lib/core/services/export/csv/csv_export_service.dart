@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:csv/csv.dart';
@@ -320,18 +319,12 @@ class CsvExportService {
       dialogTitle: 'Save Dives CSV',
       fileName: fileName,
       type: FileType.custom,
-      allowedExtensions: ['csv'],
       bytes: Uint8List.fromList(utf8.encode(csvContent)),
+      mimeType: 'text/csv',
     );
 
     if (result == null) return null;
-
-    if (!Platform.isAndroid) {
-      final file = File(result);
-      await file.writeAsString(csvContent);
-    }
-
-    return result;
+    return savedFileLocation(result);
   }
 
   /// Save sites CSV to a user-selected location.
@@ -344,18 +337,12 @@ class CsvExportService {
       dialogTitle: 'Save Sites CSV',
       fileName: fileName,
       type: FileType.custom,
-      allowedExtensions: ['csv'],
       bytes: Uint8List.fromList(utf8.encode(csvContent)),
+      mimeType: 'text/csv',
     );
 
     if (result == null) return null;
-
-    if (!Platform.isAndroid) {
-      final file = File(result);
-      await file.writeAsString(csvContent);
-    }
-
-    return result;
+    return savedFileLocation(result);
   }
 
   /// Save equipment CSV to a user-selected location.
@@ -368,17 +355,11 @@ class CsvExportService {
       dialogTitle: 'Save Equipment CSV',
       fileName: fileName,
       type: FileType.custom,
-      allowedExtensions: ['csv'],
       bytes: Uint8List.fromList(utf8.encode(csvContent)),
+      mimeType: 'text/csv',
     );
 
     if (result == null) return null;
-
-    if (!Platform.isAndroid) {
-      final file = File(result);
-      await file.writeAsString(csvContent);
-    }
-
-    return result;
+    return savedFileLocation(result);
   }
 }

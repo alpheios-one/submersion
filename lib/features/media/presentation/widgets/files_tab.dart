@@ -64,20 +64,17 @@ class FilesTab extends ConsumerWidget {
     // FileType.media admits both images and videos at the OS picker layer.
     // Their capture time is recovered by ExifExtractor (JPEG EXIF or the
     // MP4/MOV mvhd) so both match dives; see class doc.
-    final result = await FilePicker.pickFiles(
-      type: FileType.media,
-      allowMultiple: true,
-    );
-    if (result == null) return;
+    final result = await FilePicker.pickFiles(type: FileType.media);
+    if (result.isEmpty) return;
 
     final notifier = ref.read(filesTabNotifierProvider.notifier);
     final extractor = ref.read(exifExtractorProvider);
 
-    notifier.setExtractionProgress(done: 0, total: result.files.length);
+    notifier.setExtractionProgress(done: 0, total: result.length);
 
     final extracted = <ExtractedFile>[];
-    for (var i = 0; i < result.files.length; i++) {
-      final pf = result.files[i];
+    for (var i = 0; i < result.length; i++) {
+      final pf = result[i];
       final path = pf.path;
       if (path != null) {
         final file = File(path);
@@ -91,7 +88,7 @@ class FilesTab extends ConsumerWidget {
       // Advance progress unconditionally so isExtracting flips false even
       // when files are skipped (null path or null metadata). `done` here
       // means "files processed", not "files successfully extracted".
-      notifier.setExtractionProgress(done: i + 1, total: result.files.length);
+      notifier.setExtractionProgress(done: i + 1, total: result.length);
     }
 
     await _applyMatchAndStash(ref, extracted);

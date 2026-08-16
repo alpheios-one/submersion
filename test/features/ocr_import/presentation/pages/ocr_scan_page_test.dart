@@ -18,6 +18,8 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../fixtures/logbook_fixtures.dart';
 
+import '../../../../helpers/mock_file_picker_platform.dart';
+
 class FakeEngine implements OcrEngine {
   final OcrResult result;
   final bool available;
@@ -35,14 +37,25 @@ void main() {
   late Directory tmpDir;
   late String photoPath;
 
+  late FilePickerPlatform originalPicker;
+
   setUp(() async {
     tmpDir = await Directory.systemTemp.createTemp('ocr_scan_test');
     final file = File('${tmpDir.path}/page.jpg');
     await file.writeAsBytes([0xFF, 0xD8, 0xFF, 0xE0]);
     photoPath = file.path;
+
+    // file_picker 12's default platform throws UnimplementedError for every
+    // method: the real ones ship in the per-platform packages, which do not
+    // register in unit tests. The desktop pick path therefore has to be
+    // stubbed rather than left to the default.
+    originalPicker = FilePickerPlatform.instance;
+    FilePickerPlatform.instance = MockFilePickerPlatform()
+      ..pickFilesResult = [FakePlatformFile(photoPath)];
   });
 
   tearDown(() async {
+    FilePickerPlatform.instance = originalPicker;
     await tmpDir.delete(recursive: true);
   });
 

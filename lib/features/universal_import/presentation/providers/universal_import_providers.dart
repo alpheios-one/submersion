@@ -283,18 +283,15 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     );
 
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.any,
-        allowMultiple: true,
-      );
+      final result = await FilePicker.pickFiles(type: FileType.any);
 
-      if (result == null || result.files.isEmpty) {
+      if (result.isEmpty) {
         state = state.copyWith(isLoading: false);
         return;
       }
 
       final pickedPaths = [
-        for (final f in result.files)
+        for (final f in result)
           if (f.path != null) f.path!,
       ];
       final expansion = await _zipExpansion.expandAll(pickedPaths);
@@ -619,17 +616,13 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.any,
-        allowMultiple: false,
-      );
+      final pickedFile = await FilePicker.pickFile(type: FileType.any);
 
-      if (result == null || result.files.isEmpty) {
+      if (pickedFile == null) {
         state = state.copyWith(isLoading: false);
         return;
       }
 
-      final pickedFile = result.files.first;
       final filePath = pickedFile.path;
       if (filePath == null) {
         state = state.copyWith(

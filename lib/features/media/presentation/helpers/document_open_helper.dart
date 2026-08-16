@@ -82,17 +82,24 @@ class DocumentOpenHelper {
     final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: DocumentImportService.allowedExtensions,
-      allowMultiple: true,
     );
-    if (result == null || !context.mounted) return;
+    if (result.isEmpty || !context.mounted) return;
     // identifier travels with path: on Android it is the SAF content URI of
     // the original, and path is only a cached copy file_picker made. The
     // import service needs the URI to take a persistable permission
     // (issue #1002); it is null on every other platform.
+    //
+    // file_picker 12 dropped PlatformFile.identifier and exposes the SAF URI
+    // as `uri` instead, so a non-file scheme IS the identifier; a plain
+    // file: pick has none, matching the old null on other platforms.
     final picked = [
-      for (final f in result.files)
+      for (final f in result)
         if (f.path != null)
-          (path: f.path!, filename: f.name, identifier: f.identifier),
+          (
+            path: f.path!,
+            filename: f.name,
+            identifier: f.uri.isScheme('file') ? null : f.uri.toString(),
+          ),
     ];
     if (picked.isEmpty) return;
 
