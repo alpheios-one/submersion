@@ -87,7 +87,12 @@ class _SiteMediaViewerPageState extends ConsumerState<SiteMediaViewerPage> {
   /// the second of two quick presses instead of advancing two items.
   void _stepPage(int delta, int totalCount) {
     if (!_pageController.hasClients) return;
-    final target = _navTargetIndex + delta;
+    if (totalCount == 0) return;
+    // The list is live and can shrink under the viewer, stranding the nav
+    // target past the new end. Clamp to the same bounds the arrows and the
+    // page indicator are drawn from, or every press would fall out of range
+    // and navigation would freeze with the controls still showing.
+    final target = _navTargetIndex.clamp(0, totalCount - 1) + delta;
     // Out-of-range steps do nothing: the ends of the list do not wrap.
     if (target < 0 || target >= totalCount) return;
     _navTargetIndex = target;
@@ -157,7 +162,14 @@ class _SiteMediaViewerPageState extends ConsumerState<SiteMediaViewerPage> {
             _pageController = PageController(initialPage: initialIndex);
           }
 
-          final currentItem = mediaList[_currentIndex];
+          // The list is live: a media delete or a sync pull can shrink it
+          // under the open viewer, leaving _currentIndex past the end.
+          // Clamp once here and use it everywhere rather than writing it back
+          // during build -- the pager corrects _currentIndex itself on the
+          // next settle via onPageChanged, so the clamp only has to survive
+          // one frame. Same guard MediaViewerPage carries.
+          final currentIndex = _currentIndex.clamp(0, mediaList.length - 1);
+          final currentItem = mediaList[currentIndex];
 
           final viewer = GestureDetector(
             // Swipe down to close (common pattern for fullscreen viewers)
@@ -196,7 +208,7 @@ class _SiteMediaViewerPageState extends ConsumerState<SiteMediaViewerPage> {
 
                 if (_showOverlay) ...[
                   _TopOverlay(
-                    currentIndex: _currentIndex,
+                    currentIndex: currentIndex,
                     totalCount: mediaList.length,
                     onClose: () => Navigator.of(context).pop(),
                     onShare: () => _shareCurrentItem(currentItem),
@@ -204,7 +216,7 @@ class _SiteMediaViewerPageState extends ConsumerState<SiteMediaViewerPage> {
                   // Previous / next controls. Mounted with the rest of the
                   // chrome, so the tap-to-hide gesture takes them away too.
                   MediaNavArrows(
-                    currentIndex: _currentIndex,
+                    currentIndex: currentIndex,
                     totalCount: mediaList.length,
                     onPrevious: () => _stepPage(-1, mediaList.length),
                     onNext: () => _stepPage(1, mediaList.length),

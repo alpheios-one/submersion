@@ -249,6 +249,88 @@ void main() {
     expect(find.text('Open viewer'), findsOneWidget);
   });
 
+  /// The viewer over a list the test can shrink underneath it.
+  ///
+  /// Re-pumping with a different override does NOT do this: the FutureProvider
+  /// keeps its cached value, so the pager never sees the shorter list. The
+  /// live path is the provider recomputing, so drive that instead.
+  Future<void Function(List<MediaItem>)> pumpShrinkableViewer(
+    WidgetTester tester,
+    List<MediaItem> initialItems, {
+    required String initialMediaId,
+  }) async {
+    var items = initialItems;
+    await tester.pumpWidget(
+      await mediaTestApp(
+        overrides: [
+          mediaForSiteProvider('site-1').overrideWith((ref) async => items),
+        ],
+        home: SiteMediaViewerPage(
+          siteId: 'site-1',
+          initialMediaId: initialMediaId,
+          scope: SiteViewerScope.attachments,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SiteMediaViewerPage)),
+    );
+    return (next) {
+      items = next;
+      container.invalidate(mediaForSiteProvider('site-1'));
+    };
+  }
+
+  testWidgets('a site list that shrinks under the viewer keeps working', (
+    tester,
+  ) async {
+    final third = testMediaItem(
+      id: 'm3',
+      siteId: 'site-1',
+      originalFilename: 'kelp.png',
+      takenAt: DateTime(2026, 3, 3, 9),
+    );
+    final shrinkTo = await pumpShrinkableViewer(tester, [
+      first,
+      second,
+      third,
+    ], initialMediaId: 'm3');
+    expect(find.text('3 / 3'), findsOneWidget);
+
+    // A delete or a sync pull can shrink the list while the viewer is open.
+    // Indexing it with the stale page would throw a RangeError out of build.
+    shrinkTo([first]);
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('1 / 1'), findsOneWidget);
+  });
+
+  testWidgets('navigation recovers after the site list shrinks', (
+    tester,
+  ) async {
+    final third = testMediaItem(id: 'm3', siteId: 'site-1');
+    final shrinkTo = await pumpShrinkableViewer(tester, [
+      first,
+      second,
+      third,
+    ], initialMediaId: 'm3');
+    expect(find.text('3 / 3'), findsOneWidget);
+
+    shrinkTo([first, second]);
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 2'), findsOneWidget);
+
+    // The nav target is still on the departed third item; stepping from it
+    // unclamped would put every press out of range and freeze navigation.
+    await tester.tap(find.byTooltip('Previous media'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 / 2'), findsOneWidget);
+  });
+
   testWidgets('arrows hide with the rest of the chrome', (tester) async {
     await pumpViewer(tester);
     expect(find.byTooltip('Next media'), findsOneWidget);

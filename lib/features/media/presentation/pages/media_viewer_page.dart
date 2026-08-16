@@ -147,9 +147,15 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
   /// the second of two quick presses instead of advancing two items.
   void _stepPage(int delta) {
     if (!_pageController.hasClients) return;
-    final target = _navTargetIndex + delta;
+    final count = _pageableMedia.length;
+    if (count == 0) return;
+    // The gallery is live and can shrink under the viewer, stranding the nav
+    // target past the new end. Clamp to the same bounds the arrows and the
+    // page indicator are drawn from, or every press would fall out of range
+    // and navigation would freeze with the controls still showing.
+    final target = _navTargetIndex.clamp(0, count - 1) + delta;
     // Out-of-range steps do nothing: the ends of the list do not wrap.
-    if (target < 0 || target >= _pageableMedia.length) return;
+    if (target < 0 || target >= count) return;
     _navTargetIndex = target;
     _pageController.animateToPage(
       target,

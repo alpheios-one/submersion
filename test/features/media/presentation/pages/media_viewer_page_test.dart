@@ -226,6 +226,29 @@ void main() {
     expect(find.text('1 / 2'), findsOneWidget);
   });
 
+  testWidgets('a gallery that shrinks under the viewer still navigates', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      mediaList: [item('a'), item('b'), item('c'), item('d'), item('e')],
+      initialMediaId: 'e',
+    );
+    expect(find.text('5 / 5'), findsOneWidget);
+
+    // The list is live: a delete elsewhere, a dive-deletion cascade or a sync
+    // pull can shrink it under the open viewer. Re-pumping the same widget
+    // position keeps the State, and with it a nav target past the new end.
+    await pump(tester, mediaList: [item('a'), item('b')], initialMediaId: 'e');
+    expect(find.text('2 / 2'), findsOneWidget);
+
+    await settlePager(
+      tester,
+      () => tester.tap(find.byTooltip('Previous media')),
+    );
+    expect(find.text('1 / 2'), findsOneWidget);
+  });
+
   testWidgets('arrows hide with the rest of the chrome', (tester) async {
     await pump(tester, mediaList: [item('a'), item('b')], initialMediaId: 'a');
     expect(find.byTooltip('Next media'), findsOneWidget);
