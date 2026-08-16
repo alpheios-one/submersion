@@ -14,8 +14,11 @@ import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/pages/site_detail_page.dart';
+import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/site_scape/presentation/site_scape_view.dart';
+import 'package:submersion/features/site_scape/presentation/site_terrain_pane.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -311,6 +314,43 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.byType(OverlayImageLayer), findsNothing);
+    });
+
+    testWidgets('embedded seascape button opens the fullscreen scape in 3D', (
+      tester,
+    ) async {
+      const gpsSite = DiveSite(
+        id: 'gps-site',
+        name: 'Salt Pier',
+        location: GeoPoint(12.151, -68.299),
+      );
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(gpsSite.id).overrideWith((ref) async => gpsSite),
+            siteDiveCountProvider(gpsSite.id).overrideWith((ref) async => 0),
+            // Entering 3D must not fire the real seascape pipeline.
+            siteSeascapeProvider.overrideWith(
+              (ref, id) async => const SiteSeascapeNoData(),
+            ),
+          ],
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SiteDetailPage(siteId: gpsSite.id, embedded: true),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.byTooltip('Site Seascape'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.byType(SiteScapeView), findsOneWidget);
+      expect(find.byType(SiteTerrainPane), findsOneWidget);
     });
 
     testWidgets('embedded header hides the seascape button without '

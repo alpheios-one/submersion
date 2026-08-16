@@ -12,7 +12,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_depth_overlay_layer.dart';
 import 'package:submersion/features/dive_3d/application/career_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/career_terrain_page.dart';
-import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
+import 'package:submersion/features/site_scape/presentation/site_scape_view.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
@@ -154,6 +154,9 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
   final MapController _previewController = MapController();
   final MapController _fullController = MapController();
 
+  // Ephemeral morph state for the embedded map card; starts in 2D.
+  SiteScapeMode _previewScapeMode = SiteScapeMode.map2d;
+
   @override
   Widget build(BuildContext context) {
     final site = widget.site;
@@ -283,11 +286,8 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
             IconButton(
               icon: const Icon(Icons.terrain),
               tooltip: context.l10n.dive3d_seascape_siteTitle,
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => SiteSeascapePage(siteId: siteId),
-                ),
-              ),
+              onPressed: () =>
+                  _showFullscreenMap(context, ref, site, initialScape3d: true),
             ),
           IconButton(
             icon: const Icon(Icons.view_in_ar),
@@ -372,11 +372,8 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
             IconButton(
               icon: const Icon(Icons.terrain, size: 20),
               tooltip: context.l10n.dive3d_seascape_siteTitle,
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => SiteSeascapePage(siteId: widget.siteId),
-                ),
-              ),
+              onPressed: () =>
+                  _showFullscreenMap(context, ref, site, initialScape3d: true),
             ),
           // Unconditional, matching the standalone AppBar: career terrain is
           // built from dive profiles, not from the site's coordinates.
@@ -516,173 +513,122 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
         height: 200,
-        child: Stack(
-          children: [
-            TrackpadZoomMap(
-              controller: _previewController,
-              child: FlutterMap(
-                mapController: _previewController,
-                key: ValueKey(
-                  '${site.location!.latitude}_${site.location!.longitude}',
-                ),
-                options: MapOptions(
-                  initialCenter: siteLocation,
-                  initialZoom: 14.0,
-                  minZoom: 2.0,
-                  maxZoom: 18.0,
-                  interactionOptions: const InteractionOptions(
-                    flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+        child: SiteScapeView(
+          mode: _previewScapeMode,
+          onModeChanged: (m) => setState(() => _previewScapeMode = m),
+          selectedSiteId: site.id,
+          selectedSiteLocation: site.location,
+          mapController: _previewController,
+          mapBuilder: (context) => Stack(
+            children: [
+              TrackpadZoomMap(
+                controller: _previewController,
+                child: FlutterMap(
+                  mapController: _previewController,
+                  key: ValueKey(
+                    '${site.location!.latitude}_${site.location!.longitude}',
                   ),
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate: ref.watch(mapTileUrlProvider),
-                    userAgentPackageName: 'app.submersion',
-                    maxZoom: ref.watch(mapTileMaxZoomProvider),
-                    tileProvider: TileCacheService.instance.isInitialized
-                        ? TileCacheService.instance.getTileProvider()
-                        : null,
+                  options: MapOptions(
+                    initialCenter: siteLocation,
+                    initialZoom: 14.0,
+                    minZoom: 2.0,
+                    maxZoom: 18.0,
+                    interactionOptions: const InteractionOptions(
+                      flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                    ),
                   ),
-                  BathymetryDepthOverlayLayer(location: site.location),
-                  MarkerLayer(
-                    markers: [
-                      Marker(
-                        point: siteLocation,
-                        width: 50,
-                        height: 50,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colorScheme.onPrimary,
-                              width: 2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
+                  children: [
+                    TileLayer(
+                      urlTemplate: ref.watch(mapTileUrlProvider),
+                      userAgentPackageName: 'app.submersion',
+                      maxZoom: ref.watch(mapTileMaxZoomProvider),
+                      tileProvider: TileCacheService.instance.isInitialized
+                          ? TileCacheService.instance.getTileProvider()
+                          : null,
+                    ),
+                    BathymetryDepthOverlayLayer(location: site.location),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: siteLocation,
+                          width: 50,
+                          height: 50,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: colorScheme.onPrimary,
+                                width: 2,
                               ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Icon(
-                              Icons.scuba_diving,
-                              size: 24,
-                              color: colorScheme.onPrimary,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.scuba_diving,
+                                size: 24,
+                                color: colorScheme.onPrimary,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const MapAttribution(),
-                ],
+                      ],
+                    ),
+                    const MapAttribution(),
+                  ],
+                ),
               ),
-            ),
-            Positioned(
-              right: 8,
-              top: 8,
-              child: Material(
-                color: colorScheme.surface.withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(4),
-                child: Semantics(
-                  button: true,
-                  label:
-                      context.l10n.diveSites_detail_semantics_viewFullscreenMap,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(4),
-                    onTap: () => _showFullscreenMap(context, ref, site),
-                    child: Padding(
-                      padding: const EdgeInsets.all(6),
-                      child: Icon(
-                        Icons.fullscreen,
-                        size: 20,
-                        color: colorScheme.primary,
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Material(
+                  color: colorScheme.surface.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(4),
+                  child: Semantics(
+                    button: true,
+                    label: context
+                        .l10n
+                        .diveSites_detail_semantics_viewFullscreenMap,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(4),
+                      onTap: () => _showFullscreenMap(context, ref, site),
+                      child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: Icon(
+                          Icons.fullscreen,
+                          size: 20,
+                          color: colorScheme.primary,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _showFullscreenMap(BuildContext context, WidgetRef ref, DiveSite site) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final siteLocation = LatLng(
-      site.location!.latitude,
-      site.location!.longitude,
-    );
-
+  void _showFullscreenMap(
+    BuildContext context,
+    WidgetRef ref,
+    DiveSite site, {
+    bool initialScape3d = false,
+  }) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(title: Text(site.name)),
-          body: TrackpadZoomMap(
-            controller: _fullController,
-            child: FlutterMap(
-              mapController: _fullController,
-              options: MapOptions(
-                initialCenter: siteLocation,
-                initialZoom: 14.0,
-                minZoom: 2.0,
-                maxZoom: 18.0,
-                interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-                ),
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: ref.watch(mapTileUrlProvider),
-                  userAgentPackageName: 'app.submersion',
-                  maxZoom: ref.watch(mapTileMaxZoomProvider),
-                  tileProvider: TileCacheService.instance.isInitialized
-                      ? TileCacheService.instance.getTileProvider()
-                      : null,
-                ),
-                BathymetryDepthOverlayLayer(location: site.location),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: siteLocation,
-                      width: 50,
-                      height: 50,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: colorScheme.onPrimary,
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.scuba_diving,
-                            size: 24,
-                            color: colorScheme.onPrimary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const MapAttribution(),
-              ],
-            ),
-          ),
+        builder: (context) => _FullscreenSiteScapePage(
+          site: site,
+          controller: _fullController,
+          initialScape3d: initialScape3d,
         ),
       ),
     );
@@ -1609,6 +1555,112 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Fullscreen morphable site scape pushed from the detail page: the same
+/// single-pin map the embedded card shows, with the 2D/3D toggle, and it
+/// can open directly in 3D (the app-bar terrain action).
+class _FullscreenSiteScapePage extends ConsumerStatefulWidget {
+  final DiveSite site;
+  final MapController controller;
+  final bool initialScape3d;
+
+  const _FullscreenSiteScapePage({
+    required this.site,
+    required this.controller,
+    required this.initialScape3d,
+  });
+
+  @override
+  ConsumerState<_FullscreenSiteScapePage> createState() =>
+      _FullscreenSiteScapePageState();
+}
+
+class _FullscreenSiteScapePageState
+    extends ConsumerState<_FullscreenSiteScapePage> {
+  late SiteScapeMode _mode = widget.initialScape3d
+      ? SiteScapeMode.terrain3d
+      : SiteScapeMode.map2d;
+
+  @override
+  Widget build(BuildContext context) {
+    final site = widget.site;
+    final colorScheme = Theme.of(context).colorScheme;
+    final siteLocation = LatLng(
+      site.location!.latitude,
+      site.location!.longitude,
+    );
+    return Scaffold(
+      appBar: AppBar(title: Text(site.name)),
+      body: SiteScapeView(
+        mode: _mode,
+        onModeChanged: (m) => setState(() => _mode = m),
+        selectedSiteId: site.id,
+        selectedSiteLocation: site.location,
+        mapController: widget.controller,
+        mapBuilder: (context) => TrackpadZoomMap(
+          controller: widget.controller,
+          child: FlutterMap(
+            mapController: widget.controller,
+            options: MapOptions(
+              initialCenter: siteLocation,
+              initialZoom: 14.0,
+              minZoom: 2.0,
+              maxZoom: 18.0,
+              interactionOptions: const InteractionOptions(
+                flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+              ),
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: ref.watch(mapTileUrlProvider),
+                userAgentPackageName: 'app.submersion',
+                maxZoom: ref.watch(mapTileMaxZoomProvider),
+                tileProvider: TileCacheService.instance.isInitialized
+                    ? TileCacheService.instance.getTileProvider()
+                    : null,
+              ),
+              BathymetryDepthOverlayLayer(location: site.location),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: siteLocation,
+                    width: 50,
+                    height: 50,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: colorScheme.onPrimary,
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.scuba_diving,
+                          size: 24,
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const MapAttribution(),
+            ],
+          ),
         ),
       ),
     );
