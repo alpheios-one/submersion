@@ -1,8 +1,10 @@
 import 'package:submersion/features/planner/presentation/chart/plan_chart_series_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_planner/presentation/providers/dive_planner_providers.dart';
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     as domain;
@@ -164,6 +166,113 @@ void main() {
     );
     expect(find.text('+5m'), findsOneWidget);
   });
+
+  testWidgets(
+    'marking a tank lost ghosts a profile line and clears the deviation '
+    'selection',
+    (tester) async {
+      // A tall physical surface (not just a tall SizedBox, which a Scaffold
+      // body would just clamp back down) so the whole results sheet fits
+      // without scrolling -- the section's content height changes as
+      // contingencies are selected/collapsed, which would otherwise make
+      // scroll-to-find flaky against a virtualized ListView.
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(520, 3000);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: _overrides(),
+          child: SizedBox(
+            width: 520,
+            height: 3000,
+            child: Column(
+              children: [
+                const SizedBox(height: 250, child: PlanProfileChart()),
+                const ContingencyChips(),
+                Expanded(
+                  child: PlanResultsSheet(controller: ScrollController()),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(PlanProfileChart)),
+      );
+      final notifier = container.read(divePlanNotifierProvider.notifier);
+      notifier.addSimplePlan(maxDepth: 45, bottomTimeMinutes: 25);
+      notifier.addTank(
+        const DiveTank(
+          id: 'deco',
+          volume: 11.1,
+          startPressure: 200,
+          gasMix: GasMix(o2: 50),
+          role: TankRole.deco,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      PlanChartSeriesPainter seriesPainter() =>
+          tester
+                  .widget<CustomPaint>(find.byKey(const Key('planChartSeries')))
+                  .painter
+              as PlanChartSeriesPainter;
+      expect(seriesPainter().ghost, isNull);
+
+      await tester.tap(find.text('CONTINGENCIES'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Lost EAN50'));
+      await tester.pumpAndSettle();
+
+      expect(container.read(selectedLostGasTankIdProvider), 'deco');
+      expect(seriesPainter().ghost, isNotNull);
+      // Selecting a row for preview does not affect its own collapse state.
+      expect(
+        container.read(collapsedContingencyKeysProvider),
+        isNot(contains('deco')),
+      );
+
+      // Tapping again deselects.
+      await tester.tap(find.text('Lost EAN50'));
+      await tester.pumpAndSettle();
+      expect(container.read(selectedLostGasTankIdProvider), isNull);
+      expect(seriesPainter().ghost, isNull);
+
+      // Collapsing the row hides its runtime table but keeps the chip.
+      await tester.tap(find.byIcon(Icons.expand_more).last);
+      await tester.pumpAndSettle();
+      expect(
+        container.read(collapsedContingencyKeysProvider),
+        contains('deco'),
+      );
+      expect(find.text('Lost EAN50'), findsOneWidget);
+
+      // Re-expand, re-select, then pick a deviation chip -- only one
+      // ghost/preview at a time.
+      await tester.tap(find.byIcon(Icons.chevron_right).last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Lost EAN50'));
+      await tester.pumpAndSettle();
+      expect(container.read(selectedLostGasTankIdProvider), 'deco');
+
+      await tester.tap(
+        find.descendant(
+          of: find.byType(ContingencyChips),
+          matching: find.text('+5m'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(container.read(selectedLostGasTankIdProvider), isNull);
+      expect(container.read(selectedDeviationProvider), 'deeper');
+      expect(seriesPainter().ghost, isNotNull);
+    },
+  );
 
   testWidgets('settings section edits deltas, turn rule, and custom fraction', (
     tester,

@@ -3,6 +3,8 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_planner/domain/entities/plan_segment.dart';
 import 'package:submersion/features/dive_planner/presentation/providers/dive_planner_providers.dart';
+import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
+    as domain;
 import 'package:submersion/features/planner/domain/entities/plan_outcome.dart';
 import 'package:submersion/features/planner/domain/services/bailout_solver.dart';
 import 'package:submersion/features/planner/domain/services/contingency_service.dart';
@@ -261,6 +263,12 @@ final planLostGasProvider = Provider<List<LostGasOutcome>>((ref) {
   return service.lostGas(divePlanFromState(state));
 });
 
+/// Which per-contingency mini tables (keyed by deviation key or tank id) are
+/// collapsed within the Contingencies section; everything starts expanded.
+final collapsedContingencyKeysProvider = StateProvider<Set<String>>(
+  (_) => const {},
+);
+
 /// The classic slate range table (depth x time variants) for the current
 /// plan; null when there is nothing to vary.
 final planRangeTableProvider = Provider<RangeTable?>((ref) {
@@ -274,23 +282,57 @@ final planRangeTableProvider = Provider<RangeTable?>((ref) {
 });
 
 /// Which deviation is ghosted on the chart ('deeper'|'longer'|'both'; null =
-/// none).
+/// none). Mutually exclusive with [selectedLostGasTankIdProvider] -- only one
+/// contingency can be previewed at a time.
 final selectedDeviationProvider = StateProvider<String?>((_) => null);
 
-/// Chart series for the selected deviation, drawn as a ghost overlay. Runs
-/// ONLY the one selected variant (not the full deviation set), so ghosting a
-/// contingency from the chips costs a single engine run.
-final deviationGhostSeriesProvider = Provider<PlanCanvasSeries?>((ref) {
-  final key = ref.watch(selectedDeviationProvider);
-  if (key == null) return null;
-  final state = ref.watch(divePlanNotifierProvider);
-  final service = ContingencyService(
-    config: ref.watch(planEngineConfigProvider),
-  );
-  final deviation = service.deviationFor(divePlanFromState(state), key);
-  if (deviation == null) return null;
+/// Which carried cylinder is being marked lost and previewed; null = none.
+/// Mutually exclusive with [selectedDeviationProvider].
+final selectedLostGasTankIdProvider = StateProvider<String?>((_) => null);
+
+/// The variant plan + outcome for whichever contingency is currently
+/// selected (a deviation or a lost-gas tank); null when neither is selected,
+/// meaning every consumer should fall back to the live [planOutcomeProvider].
+/// Losing a deco/stage/travel gas changes the whole deco schedule -- not just
+/// the chart ghost -- so this is the single source both the ghost series and
+/// the headline stats read from, keeping them in sync and to a single engine
+/// run per selection.
+final selectedContingencyProvider =
+    Provider<({domain.DivePlan plan, PlanOutcome outcome})?>((ref) {
+      final deviationKey = ref.watch(selectedDeviationProvider);
+      final lostGasTankId = ref.watch(selectedLostGasTankIdProvider);
+      if (deviationKey == null && lostGasTankId == null) return null;
+
+      final state = ref.watch(divePlanNotifierProvider);
+      final service = ContingencyService(
+        config: ref.watch(planEngineConfigProvider),
+      );
+      final plan = divePlanFromState(state);
+
+      if (deviationKey != null) {
+        final deviation = service.deviationFor(plan, deviationKey);
+        if (deviation == null) return null;
+        return (plan: deviation.plan, outcome: deviation.outcome);
+      }
+      final lost = service.lostGasFor(plan, lostGasTankId!);
+      if (lost == null) return null;
+      return (plan: lost.plan, outcome: lost.outcome);
+    });
+
+/// Chart series for the selected contingency, drawn as a ghost overlay.
+final contingencyGhostSeriesProvider = Provider<PlanCanvasSeries?>((ref) {
+  final preview = ref.watch(selectedContingencyProvider);
+  if (preview == null) return null;
   return buildCanvasSeries(
-    segments: deviation.plan.segments,
-    outcome: deviation.outcome,
+    segments: preview.plan.segments,
+    outcome: preview.outcome,
   );
+});
+
+/// The outcome to display everywhere the headline stats (runtime, TTS/NDL,
+/// deco time, CNS, issues) are shown: the selected contingency's outcome when
+/// one is being previewed, else the live plan's outcome.
+final activePlanOutcomeProvider = Provider<PlanOutcome>((ref) {
+  return ref.watch(selectedContingencyProvider)?.outcome ??
+      ref.watch(planOutcomeProvider);
 });

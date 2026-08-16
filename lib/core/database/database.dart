@@ -528,6 +528,10 @@ class DivePlanTanks extends Table {
   /// Deco gas-switch depth override in meters; null = auto (MOD at deco pO2).
   /// Subsurface per-cylinder "Deco switch at" (v120).
   RealColumn get decoSwitchDepth => real().nullable()();
+
+  /// Whether this cylinder also doubles as travel gas, breathed on the
+  /// descent before switching to its primary role's gas (v153).
+  BoolColumn get isTravelGas => boolean().withDefault(const Constant(false))();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -3061,7 +3065,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 152;
+  static const int currentSchemaVersion = 153;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3281,6 +3285,10 @@ class AppDatabase extends _$AppDatabase {
     // v152: site_features (seascape program slice 2): diver-placed
     // annotations on a site, synced LWW.
     152,
+    // v153: dive_plan_tanks.is_travel_gas: flags a cylinder as also breathed
+    // on the descent, independent of its role, so the lost-gas contingency
+    // can cover stage/deco/diluent/pony/etc. cylinders used that way.
+    153,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4699,6 +4707,23 @@ class AppDatabase extends _$AppDatabase {
     if (!names.contains('seascape_appearance')) {
       await customStatement(
         'ALTER TABLE diver_settings ADD COLUMN seascape_appearance TEXT',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v153 dive_plan_tanks travel-gas flag. Same
+  /// dual-call contract (onUpgrade + beforeOpen backstop) as the other
+  /// column-assert helpers.
+  Future<void> _assertTravelGasColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('dive_plan_tanks')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('is_travel_gas')) {
+      await customStatement(
+        'ALTER TABLE dive_plan_tanks ADD COLUMN is_travel_gas '
+        'INTEGER NOT NULL DEFAULT 0',
       );
     }
   }
@@ -8060,6 +8085,12 @@ class AppDatabase extends _$AppDatabase {
           await createMigrator().createTable(siteFeatures);
         }
         if (from < 152) await reportProgress();
+        // v153: dive_plan_tanks travel-gas flag (lost-gas contingency
+        // planning for stage/deco/diluent cylinders also used on descent).
+        if (from < 153) {
+          await _assertTravelGasColumn();
+        }
+        if (from < 153) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8206,6 +8237,9 @@ class AppDatabase extends _$AppDatabase {
         // shared-dev-machine ladder-collision trap: a DB already at this
         // version number from a parallel branch skips onUpgrade).
         await _assertSeascapeAppearanceColumn();
+
+        // v153 backstop: re-assert the dive_plan_tanks travel-gas column.
+        await _assertTravelGasColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

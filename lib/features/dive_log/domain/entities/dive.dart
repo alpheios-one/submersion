@@ -968,6 +968,14 @@ class DiveTank extends Equatable {
   /// Unused for logged-dive tanks.
   final double? decoSwitchDepth;
 
+  /// Whether this cylinder also doubles as travel gas: breathed during the
+  /// descent (typically to bypass a hypoxic back gas's minimum depth) before
+  /// switching to its primary role's gas. Independent of [role] -- a stage,
+  /// deco, or diluent cylinder can be flagged as travel gas without changing
+  /// what it is otherwise used for. Planning only; unused for logged-dive
+  /// tanks.
+  final bool isTravelGas;
+
   const DiveTank({
     required this.id,
     this.name,
@@ -982,6 +990,7 @@ class DiveTank extends Equatable {
     this.presetName,
     this.computerId,
     this.decoSwitchDepth,
+    this.isTravelGas = false,
   });
 
   /// Pressure consumed during dive
@@ -1007,6 +1016,7 @@ class DiveTank extends Equatable {
     String? computerId,
     double? decoSwitchDepth,
     bool clearDecoSwitchDepth = false,
+    bool? isTravelGas,
   }) {
     return DiveTank(
       id: id ?? this.id,
@@ -1024,6 +1034,7 @@ class DiveTank extends Equatable {
       decoSwitchDepth: clearDecoSwitchDepth
           ? null
           : (decoSwitchDepth ?? this.decoSwitchDepth),
+      isTravelGas: isTravelGas ?? this.isTravelGas,
     );
   }
 
@@ -1042,6 +1053,7 @@ class DiveTank extends Equatable {
     presetName,
     computerId,
     decoSwitchDepth,
+    isTravelGas,
   ];
 }
 

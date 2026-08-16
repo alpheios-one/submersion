@@ -12751,6 +12751,12 @@ abstract class AppLocalizations {
   /// **'Start ({pressureSymbol})'**
   String divePlanner_field_startPressure(Object pressureSymbol);
 
+  /// No description provided for @divePlanner_field_travelGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Also used as travel gas'**
+  String get divePlanner_field_travelGas;
+
   /// No description provided for @divePlanner_field_volume.
   ///
   /// In en, this message translates to:
@@ -22060,6 +22066,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lost {gas}'**
   String plannerCanvas_contingency_lostGas(String gas);
+
+  /// No description provided for @plannerCanvas_contingency_previewing.
+  ///
+  /// In en, this message translates to:
+  /// **'Previewing: {label}'**
+  String plannerCanvas_contingency_previewing(String label);
 
   /// No description provided for @plannerCanvas_contingency_timeDelta.
   ///
