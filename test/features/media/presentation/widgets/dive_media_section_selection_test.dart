@@ -28,16 +28,28 @@ final _mediaProvider = StateProvider<List<MediaItem>>((ref) => const []);
 
 /// Captures the ids an unlink actually acts on, which is the only place the
 /// difference between id-based and index-based selection becomes observable.
+///
+/// Both entry points are captured on purpose. This surface's Unlink used to
+/// call [deleteMultipleMedia] -- a hard delete behind copy that promised the
+/// files were kept -- so recording the two separately lets a test assert not
+/// just which ids were acted on but that the row was unlinked rather than
+/// destroyed.
 class _CapturingMediaListNotifier
     extends StateNotifier<AsyncValue<List<MediaItem>>>
     implements MediaListNotifier {
   _CapturingMediaListNotifier() : super(const AsyncValue.data(<MediaItem>[]));
 
   List<String>? unlinkedIds;
+  List<String>? deletedIds;
+
+  @override
+  Future<void> unlinkMultipleMedia(List<String> ids) async {
+    unlinkedIds = List<String>.from(ids);
+  }
 
   @override
   Future<void> deleteMultipleMedia(List<String> ids) async {
-    unlinkedIds = List<String>.from(ids);
+    deletedIds = List<String>.from(ids);
   }
 
   @override
@@ -196,6 +208,11 @@ void main() {
       expect(notifier.unlinkedIds, [
         'c',
       ], reason: 'unlink must act on the checked id, not the checked position');
+      expect(
+        notifier.deletedIds,
+        isNull,
+        reason: 'unlink must clear the link, never destroy the row',
+      );
     });
 
     testWidgets('an explicit entry survives unchecking the last thumbnail', (

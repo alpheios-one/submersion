@@ -461,10 +461,13 @@ class _TripListContentState extends ConsumerState<TripListContent> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          // Flexible so the title yields before the action row overflows;
-          // a fixed-width title made any longer localized title overflow the
-          // narrow pane.
-          Flexible(
+          // Expanded, and no Spacer: the title must be the row's only flexible
+          // child. Pairing Flexible with Spacer gave each flex: 1, so the
+          // Spacer took exactly half the free space instead of the remainder
+          // and the leftover half fell after the last icon, left-shifting the
+          // whole action row. The title still yields before the row overflows,
+          // because FeatureAppBarTitle ellipsises.
+          Expanded(
             child: FeatureAppBarTitle(
               featureId: 'trips',
               title: context.l10n.trips_appBar_title,
@@ -473,7 +476,6 @@ class _TripListContentState extends ConsumerState<TripListContent> {
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
-          const Spacer(),
           IconButton(
             icon: const Icon(Icons.search, size: 20),
             tooltip: context.l10n.trips_list_tooltip_search,

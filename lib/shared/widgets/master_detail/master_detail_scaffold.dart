@@ -6,6 +6,13 @@ import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 
+/// Width of the master (list) pane in a split view.
+///
+/// Exposed because it is the app's list-card width: anything rendering the
+/// same list rows outside a split view (the dashboard's recent dives, for
+/// one) has to match it or the same card appears at two different widths.
+const double kMasterPaneWidth = 440;
+
 /// Mode for the detail pane in master-detail layout.
 enum DetailPaneMode {
   /// Viewing item details (default)
@@ -119,7 +126,7 @@ class MasterDetailScaffold extends ConsumerStatefulWidget {
   /// When provided, this replaces the default create-mode navigation.
   final VoidCallback? onFabPressed;
 
-  /// Fixed width of the master pane in pixels (default 440).
+  /// Fixed width of the master pane in pixels (default [kMasterPaneWidth]).
   final double masterWidth;
 
   /// Route path to navigate to on mobile when an item is selected.
@@ -149,7 +156,7 @@ class MasterDetailScaffold extends ConsumerStatefulWidget {
     this.createBuilder,
     this.floatingActionButton,
     this.onFabPressed,
-    this.masterWidth = 440,
+    this.masterWidth = kMasterPaneWidth,
     this.mobileDetailRoute,
     this.mobileEditRoute,
     this.mobileCreateRoute,

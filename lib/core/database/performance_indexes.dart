@@ -64,6 +64,16 @@ const List<PerformanceIndex> kPerformanceIndexes = [
     name: 'idx_dives_course_id',
     ddl: 'CREATE INDEX IF NOT EXISTS idx_dives_course_id ON dives(course_id)',
   ),
+  // Attribution to a registered dive computer. Backs the "dives from this
+  // computer" filter axis (issue #1064) and the beforeOpen self-heal that
+  // adopts the column from dive_data_sources, which both drive off the null
+  // side of this column.
+  (
+    name: 'idx_dives_computer_id',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_dives_computer_id '
+        'ON dives(computer_id)',
+  ),
   (
     name: 'idx_dives_favorite',
     ddl:
@@ -250,6 +260,24 @@ const List<PerformanceIndex> kPerformanceIndexes = [
     ddl:
         'CREATE INDEX IF NOT EXISTS idx_media_origin_device '
         'ON media(origin_device_id)',
+  ),
+  (
+    name: 'idx_media_local_path',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_media_local_path '
+        'ON media(local_path)',
+  ),
+  (
+    name: 'idx_media_file_path',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_media_file_path '
+        'ON media(file_path)',
+  ),
+  (
+    name: 'idx_media_is_orphaned',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_media_is_orphaned '
+        'ON media(is_orphaned)',
   ),
   (
     name: 'idx_checklist_template_items_template_id',

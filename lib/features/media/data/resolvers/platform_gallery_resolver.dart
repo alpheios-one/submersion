@@ -1,8 +1,10 @@
+import 'dart:typed_data';
 import 'dart:ui' show Size;
 
 import 'package:photo_manager/photo_manager.dart';
 
 import 'package:submersion/features/media/data/services/asset_resolution_service.dart';
+import 'package:submersion/features/media/data/services/gallery_thumbnail_cache.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/services/media_source_resolver.dart';
@@ -22,8 +24,17 @@ import 'package:submersion/features/media/domain/value_objects/verify_result.dar
 class PlatformGalleryResolver implements MediaSourceResolver {
   final AssetResolutionService _resolutionService;
 
-  PlatformGalleryResolver({required AssetResolutionService resolutionService})
-    : _resolutionService = resolutionService;
+  /// Memoizes thumbnail bytes across tile recycling and caps concurrent
+  /// PhotoKit traffic. Must be shared process-wide to be worth anything -- a
+  /// per-resolver instance would be discarded on every provider rebuild -- so
+  /// production injects the singleton from [galleryThumbnailCacheProvider].
+  final GalleryThumbnailCache _thumbnailCache;
+
+  PlatformGalleryResolver({
+    required AssetResolutionService resolutionService,
+    GalleryThumbnailCache? thumbnailCache,
+  }) : _resolutionService = resolutionService,
+       _thumbnailCache = thumbnailCache ?? GalleryThumbnailCache();
 
   @override
   MediaSourceType get sourceType => MediaSourceType.platformGallery;
@@ -65,24 +76,48 @@ class PlatformGalleryResolver implements MediaSourceResolver {
     if (assetId == null || assetId.isEmpty) {
       return const UnavailableData(kind: UnavailableKind.notFound);
     }
-    final resolvedId = await _resolveId(item);
-    if (resolvedId == null) {
-      return const UnavailableData(kind: UnavailableKind.notFound);
-    }
-    // coverage:ignore-start
-    final asset = await AssetEntity.fromId(resolvedId);
-    if (asset == null) {
-      return const UnavailableData(kind: UnavailableKind.notFound);
-    }
-    final thumbBytes = await asset.thumbnailDataWithSize(
-      ThumbnailSize(target.width.toInt(), target.height.toInt()),
+    final width = target.width.toInt();
+    final height = target.height.toInt();
+    // Keyed by size as well as item: the grid and the viewer ask for different
+    // targets and must not serve each other's bytes.
+    final bytes = await _thumbnailCache.getOrFetch(
+      '${item.id}@${width}x$height',
+      () => _fetchThumbnail(item, width, height),
     );
-    if (thumbBytes == null) {
+    if (bytes == null) {
       return const UnavailableData(kind: UnavailableKind.notFound);
     }
-    return BytesData(bytes: thumbBytes);
-    // coverage:ignore-end
+    return BytesData(bytes: bytes);
   }
+
+  /// Runs only on a cache miss.
+  Future<Uint8List?> _fetchThumbnail(
+    MediaItem item,
+    int width,
+    int height,
+  ) async {
+    final resolvedId = await _resolveId(item);
+    if (resolvedId == null) return null;
+    final bytes = await _thumbBytes(resolvedId, width, height);
+    if (bytes != null) return bytes;
+    // The mapping produced no bytes. That is now the ONLY staleness signal:
+    // resolveAssetId no longer pre-checks with a throwaway fetch. Drop the
+    // mapping, search the gallery again, and retry once against a genuinely
+    // different id.
+    final retry = await _resolutionService.reresolve(item);
+    final retryId = retry.localAssetId;
+    if (retryId == null || retryId == resolvedId) return null;
+    return _thumbBytes(retryId, width, height);
+  }
+
+  // coverage:ignore-start
+  // photo_manager AssetEntity APIs require a real device gallery.
+  Future<Uint8List?> _thumbBytes(String id, int width, int height) async {
+    final asset = await AssetEntity.fromId(id);
+    if (asset == null) return null;
+    return asset.thumbnailDataWithSize(ThumbnailSize(width, height));
+  }
+  // coverage:ignore-end
 
   @override
   Future<MediaSourceMetadata?> extractMetadata(MediaItem item) async {

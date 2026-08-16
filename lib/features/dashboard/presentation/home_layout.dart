@@ -7,7 +7,7 @@ import 'package:submersion/features/dashboard/presentation/widgets/gauge_strip.d
 import 'package:submersion/features/dashboard/presentation/widgets/hero_header.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/milestones_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/on_this_day_card.dart';
-import 'package:submersion/features/dashboard/presentation/widgets/photo_ribbon_card.dart';
+import 'package:submersion/features/dashboard/presentation/widgets/media_ribbon_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/quick_actions_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/recent_dives_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/recent_sites_map_card.dart';
@@ -33,7 +33,10 @@ DashboardEntry _standaloneEntry(HomeCardType card) => switch (card) {
   HomeCardType.recentDives => const FullBlock(RecentDivesCard()),
   HomeCardType.quickActions => const ThirdBlock(QuickActionsCard()),
   HomeCardType.milestones => const ThirdBlock(MilestonesCard()),
-  HomeCardType.photoRibbon => const FullBlock(PhotoRibbonCard()),
+  // The enum value keeps its photoRibbon name: it is persisted verbatim in
+  // SharedPreferences as the user's home-card order, so renaming it would
+  // drop the card from every existing layout and re-append it as new.
+  HomeCardType.photoRibbon => const FullBlock(MediaRibbonCard()),
   HomeCardType.onThisDay => const ThirdBlock(OnThisDayCard()),
   HomeCardType.yearInReview => const ThirdBlock(YearInReviewCard()),
   HomeCardType.activeCourses => const ThirdBlock(ActiveCourseProgressCard()),

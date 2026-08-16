@@ -69,14 +69,16 @@ class TripStoryDayCard extends ConsumerWidget {
         opacity: _isPlanned ? 0.85 : 1,
         child: Padding(
           padding: const EdgeInsets.all(16),
+          // Three zones with deliberate visual weight: a tinted day-at-a-glance
+          // band (stats + rhythm), the untinted dive rows as the dominant
+          // middle, and captioned photo/species clusters at the tail. Gaps
+          // follow the grouping: tight inside a zone, 16 between zones.
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (day.dives.isNotEmpty) ...[
-                _DayStatStrip(day: day, units: units),
+                _DaySummaryBand(day: day, units: units),
                 const SizedBox(height: 12),
-                DayRhythmBar(dives: day.dives),
-                const SizedBox(height: 8),
                 ...day.dives.mapIndexed(
                   (index, dive) => DiveListItem(
                     summary: DiveSummary.fromDive(dive),
@@ -91,17 +93,74 @@ class TripStoryDayCard extends ConsumerWidget {
                 ),
               ],
               if (day.media.isNotEmpty) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
+                _SectionCaption(text: context.l10n.trips_photos_sectionTitle),
+                const SizedBox(height: 6),
                 _PhotoStrip(tripId: tripId, media: day.media),
               ],
               if (day.sightings.isNotEmpty) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
+                _SectionCaption(
+                  text: context.l10n.trips_detail_stat_speciesSeen,
+                ),
+                const SizedBox(height: 6),
                 _SightingChips(day: day),
               ],
               if (_isPlanned) _PlannedExtras(day: day, units: units),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The day-at-a-glance cluster: stat strip plus 24h rhythm bar, visually
+/// bounded by a subtle tint so it reads as one summary unit above the dive
+/// rows rather than as loose siblings of them.
+class _DaySummaryBand extends StatelessWidget {
+  final TripStoryDay day;
+  final UnitFormatter units;
+
+  const _DaySummaryBand({required this.day, required this.units});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('day-summary-band'),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _DayStatStrip(day: day, units: units),
+          const SizedBox(height: 10),
+          DayRhythmBar(dives: day.dives),
+        ],
+      ),
+    );
+  }
+}
+
+/// Tiny muted heading over a tail-of-card cluster (photos, species) so those
+/// strips stop reading as unlabeled debris after the dive rows.
+class _SectionCaption extends StatelessWidget {
+  final String text;
+
+  const _SectionCaption({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Text(
+      text,
+      style: theme.textTheme.labelSmall?.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.5,
       ),
     );
   }

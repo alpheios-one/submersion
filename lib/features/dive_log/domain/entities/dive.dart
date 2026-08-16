@@ -94,6 +94,19 @@ class Dive extends Equatable {
   final String? diveComputerModel;
   final String? diveComputerSerial;
   final String? diveComputerFirmware;
+
+  /// Id of the registered [DiveComputer] this dive was downloaded from, i.e.
+  /// the `dives.computer_id` foreign key.
+  ///
+  /// This is the attribution key: unlike [diveComputerSerial], which is a
+  /// display/export snapshot that firmware may never report (issue #1064), it
+  /// is always set for a dive that came off a registered computer.
+  ///
+  /// Read-only projection. The insert/update companions deliberately omit the
+  /// column, so saving a dive never rewrites it: attribution is owned by the
+  /// download, consolidation, split, and reparse paths, which set it with
+  /// explicit intent.
+  final String? computerId;
   // Weight system fields (legacy single weight - kept for backward compatibility)
   final double? weightAmount; // kg
   final WeightType? weightType;
@@ -212,6 +225,7 @@ class Dive extends Equatable {
     this.diveComputerModel,
     this.diveComputerSerial,
     this.diveComputerFirmware,
+    this.computerId,
     this.weightAmount,
     this.weightType,
     this.weights = const [],
@@ -545,6 +559,7 @@ class Dive extends Equatable {
     String? diveComputerModel,
     String? diveComputerSerial,
     String? diveComputerFirmware,
+    String? computerId,
     double? weightAmount,
     WeightType? weightType,
     List<DiveWeight>? weights,
@@ -639,6 +654,7 @@ class Dive extends Equatable {
       diveComputerModel: diveComputerModel ?? this.diveComputerModel,
       diveComputerSerial: diveComputerSerial ?? this.diveComputerSerial,
       diveComputerFirmware: diveComputerFirmware ?? this.diveComputerFirmware,
+      computerId: computerId ?? this.computerId,
       weightAmount: weightAmount ?? this.weightAmount,
       weightType: weightType ?? this.weightType,
       weights: weights ?? this.weights,
@@ -736,6 +752,7 @@ class Dive extends Equatable {
     diveComputerModel,
     diveComputerSerial,
     diveComputerFirmware,
+    computerId,
     weightAmount,
     weightType,
     weights,

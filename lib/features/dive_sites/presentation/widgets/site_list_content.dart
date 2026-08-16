@@ -714,10 +714,12 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          // Flexible so the title yields before the action row overflows.
-          // The pane is narrow and this bar carries up to seven controls; a
-          // fixed-width title made any longer localized title overflow too.
-          Flexible(
+          // Expanded, and no Spacer: the title must be the row's only flexible
+          // child, or Spacer takes half the free space and the leftover half
+          // lands after the last icon (see trip_list_content for the detail).
+          // The pane is narrow and this bar carries up to seven controls, so
+          // the title still has to yield; FeatureAppBarTitle ellipsises.
+          Expanded(
             child: FeatureAppBarTitle(
               featureId: 'sites',
               title: context.l10n.diveSites_list_appBar_title,
@@ -726,7 +728,6 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
-          const Spacer(),
           // Map toggle: shown in detailed/compact mode only.
           // In table mode, TableModeLayout manages the map toggle.
           if (widget.onMapViewToggle != null)

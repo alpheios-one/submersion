@@ -3238,7 +3238,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Traguardi';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Foto recenti';
+  String get settings_homeCards_card_photoRibbon => 'Media recenti';
 
   @override
   String get settings_homeCards_card_onThisDay => 'In questo giorno';
@@ -3360,7 +3360,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dashboard_urgent_title => 'Richiede attenzione';
 
   @override
-  String get dashboard_photos_title => 'Foto recenti';
+  String get dashboard_media_title => 'Media recenti';
 
   @override
   String get dashboard_recentSites_title => 'Siti recenti';
@@ -3479,6 +3479,23 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get dashboard_recentDives_errorLoading =>
       'Impossibile caricare le immersioni';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle =>
+      'Profilo dell\'ultima immersione';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Nessun dato di profilo per questa immersione';
+
+  @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Impossibile caricare il profilo dell\'immersione';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes min';
+  }
 
   @override
   String get dashboard_recentDives_logFirst =>
@@ -4024,9 +4041,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get diveCenters_summary_selectPrompt =>
       'Seleziona un centro immersioni dalla lista per vedere i dettagli';
-
-  @override
-  String get diveCenters_summary_topRated => 'Più Votati';
 
   @override
   String get diveCenters_summary_totalCenters => 'Centri Totali';
@@ -11508,6 +11522,104 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
+  String get gasCalculators_tab_blender => 'Miscelatore';
+
+  @override
+  String get gasCalculators_blender_cylinder => 'Bombola';
+
+  @override
+  String get gasCalculators_blender_startCylinder => 'Nella bombola';
+
+  @override
+  String get gasCalculators_blender_targetFill => 'Riempimento target';
+
+  @override
+  String get gasCalculators_blender_fillGases => 'Gas di riempimento';
+
+  @override
+  String get gasCalculators_blender_pressure => 'Pressione';
+
+  @override
+  String get gasCalculators_blender_o2 => 'O₂';
+
+  @override
+  String get gasCalculators_blender_he => 'He';
+
+  @override
+  String get gasCalculators_blender_air => 'Aria';
+
+  @override
+  String get gasCalculators_blender_helium => 'Elio';
+
+  @override
+  String get gasCalculators_blender_procedure => 'Procedura di riempimento';
+
+  @override
+  String get gasCalculators_blender_amounts => 'Gas da aggiungere';
+
+  @override
+  String gasCalculators_blender_stepStart(String pressure, String gas) {
+    return 'Inizia con $pressure $gas';
+  }
+
+  @override
+  String gasCalculators_blender_stepFill(
+    String gas,
+    String pressure,
+    String mix,
+  ) {
+    return 'Riempi $gas fino a $pressure → $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_error_targetPressure =>
+      'La pressione target deve essere maggiore di quella iniziale.';
+
+  @override
+  String get gasCalculators_blender_error_invalidMix =>
+      'O₂ + He di una miscela non può superare il 100%.';
+
+  @override
+  String get gasCalculators_blender_error_identicalGases =>
+      'I due gas di riempimento sono identici: niente da miscelare.';
+
+  @override
+  String get gasCalculators_blender_error_linearlyDependent =>
+      'Questi gas non possono produrre la miscela target: un target trimix richiede una fonte di elio.';
+
+  @override
+  String get gasCalculators_blender_error_negativeAmount =>
+      'Questa miscela non è realizzabile con questi gas: richiederebbe di rimuovere gas.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Troppo gas nella bombola per questa miscela: scarica fino a $pressure, poi riempi.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'Il gas presente nella bombola non è utilizzabile per questa miscela: svuotala completamente, poi riempi.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'La bombola contiene elio mentre la miscela target no. Il rabbocco diluisce l\'elio ma non lo rimuove: la bombola va prima svuotata.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'Un target senza elio richiede due gas di riempimento senza elio con contenuto di O₂ diverso.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Questi gas di riempimento non raggiungono esattamente la miscela target. Controlla i gas e il loro ordine.';
+
+  @override
+  String get gasCalculators_blender_about => 'Informazioni sulla miscelazione';
+
+  @override
+  String get gasCalculators_blender_aboutBody =>
+      'Miscelazione per pressioni parziali per la miscela target, con comportamento di gas reale (Van der Waals). Aggiungi ogni gas di riempimento in ordine, fino alla pressione indicata. I gas e il loro ordine sono configurabili; analizza sempre la miscela finale prima di immergerti.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override
@@ -11837,6 +11949,39 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_title => 'Foto e video';
+
+  @override
+  String get media_diveMediaSection_deleteButton => 'Elimina';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Eliminazione non riuscita: $error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'Questo li rimuove dall\'app e da qualsiasi archivio multimediale. Non può essere annullato.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '$count elementi eliminati';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return 'Eliminare $count elementi?';
+  }
+
+  @override
+  String get media_diveMediaSection_replaceButton => 'Ricollega';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'Il contenuto di questo file differisce dall\'originale. Ricollegarlo lo ricaricherà nel tuo archivio multimediale.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'Il contenuto del file differisce';
 
   @override
   String get media_diveMediaSection_unlinkButton => 'Scollega';
@@ -12441,7 +12586,314 @@ class AppLocalizationsIt extends AppLocalizations {
   String get nav_gpsLog => 'Registro GPS';
 
   @override
+  String get media_console_library => 'Libreria';
+
+  @override
+  String get media_console_transfers => 'Trasferimenti';
+
+  @override
+  String get media_console_import => 'Importa';
+
+  @override
+  String get media_import_launch => 'Importa contenuti...';
+
+  @override
+  String get media_import_intro =>
+      'I contenuti importati restano nella tua libreria e possono essere collegati automaticamente alle immersioni.';
+
+  @override
+  String get media_console_sources => 'Origini';
+
+  @override
+  String get media_sources_browseHeader => 'Sfoglia per origine';
+
+  @override
+  String get media_sources_watchedHeader => 'Cartelle monitorate';
+
+  @override
+  String get media_sources_addWatched => 'Aggiungi cartella...';
+
+  @override
+  String get media_sources_scanFailed => 'Scansione non riuscita';
+
+  @override
+  String get media_sources_scanNow => 'Scansiona ora';
+
+  @override
+  String get media_sources_autoApply =>
+      'Ricollega automaticamente le corrispondenze esatte';
+
+  @override
+  String get media_sources_neverScanned => 'Mai scansionata';
+
+  @override
+  String get media_source_gallery => 'Libreria foto';
+
+  @override
+  String get media_source_localFile => 'File locali';
+
+  @override
+  String get media_source_networkUrl => 'Link web';
+
+  @override
+  String get media_source_manifest => 'Abbonamenti';
+
+  @override
+  String get media_source_connector => 'Servizi collegati';
+
+  @override
+  String get media_source_mediaStore => 'Archivio multimediale cloud';
+
+  @override
+  String get media_source_signature => 'Firme';
+
+  @override
+  String get media_repairHistory_title => 'Cronologia riparazioni';
+
+  @override
+  String get media_repairHistory_empty => 'Nessuna riparazione';
+
+  @override
+  String get media_repairHistory_action_relink => 'Ricollegato';
+
+  @override
+  String get media_repairHistory_action_cloudBacked => 'Su cloud';
+
+  @override
+  String get media_repairHistory_action_autoRelink =>
+      'Ricollegato automaticamente';
+
+  @override
+  String get media_smartAlbum_save => 'Salva come album';
+
+  @override
+  String get media_smartAlbum_saveTitle => 'Assegna un nome';
+
+  @override
+  String get media_smartAlbum_albums => 'Album';
+
+  @override
+  String get media_smartAlbum_delete => 'Elimina album';
+
+  @override
+  String get media_smartAlbum_deleteFailed => 'Impossibile eliminare l\'album';
+
+  @override
+  String get media_smartAlbum_saved => 'Album salvato';
+
+  @override
+  String media_sources_lastScanned(String date) {
+    return 'Ultima scansione $date';
+  }
+
+  @override
+  String media_sources_scanResult(int indexed, int repaired) {
+    return '$indexed file indicizzati, $repaired ricollegati';
+  }
+
+  @override
+  String get media_repairHistory_sourceFolder => 'scansione cartelle';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => 'libreria foto';
+
+  @override
+  String get media_repairHistory_sourceStore => 'archivio multimediale cloud';
+
+  @override
+  String get media_repairHistory_sourceWatcher => 'cartelle monitorate';
+
+  @override
+  String get media_repairHistory_sourceManual => 'ricollegamento manuale';
+
+  @override
+  String media_repairHistory_source(String source) {
+    return 'via $source';
+  }
+
+  @override
+  String get media_console_missing => 'Mancanti';
+
+  @override
+  String get media_missing_empty => 'Nessun file mancante';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count su volumi non in linea';
+  }
+
+  @override
+  String get media_missing_repair => 'Ripara...';
+
+  @override
+  String get media_repair_title => 'Ripara i file mancanti';
+
+  @override
+  String get media_repair_addFolder => 'Aggiungi cartella...';
+
+  @override
+  String get media_repair_usePhotoLibrary => 'Cerca nella libreria foto';
+
+  @override
+  String get media_repair_useStore => 'Usa l\'archivio multimediale cloud';
+
+  @override
+  String get media_repair_scan => 'Scansiona';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return 'Spostamento cartella rilevato: $from a $to copre $count file';
+  }
+
+  @override
+  String get media_repair_confidence_exact => 'Esatto';
+
+  @override
+  String get media_repair_confidence_probable => 'Nome e dimensione';
+
+  @override
+  String get media_repair_confidence_edited => 'File modificato';
+
+  @override
+  String get media_repair_confidence_unmatched => 'Nessun candidato';
+
+  @override
+  String get media_repair_unverified => 'Non verificato con l\'archivio';
+
+  @override
+  String media_repair_apply(int count) {
+    return 'Ricollega $count file';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked ricollegati, $cloudBacked su cloud, $reuploads ricaricamenti in coda, $failed falliti, $skipped saltati';
+  }
+
+  @override
+  String get media_console_unlinked => 'Non collegati';
+
+  @override
+  String get media_import_linkTitle => 'Collega i contenuti importati';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return 'Collega $count elementi';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'Resta tra i non collegati';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count elementi collegati';
+  }
+
+  @override
+  String get media_inbox_chooseDive => 'Scegli immersione';
+
+  @override
+  String get media_inbox_empty => 'Nessun contenuto multimediale non collegato';
+
+  @override
+  String get media_inbox_keep => 'Mantieni';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Collega a #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Collega a un\'immersione';
+
+  @override
+  String get media_inbox_linkToSite => 'Collega a un sito';
+
+  @override
+  String get media_library_empty => 'Ancora nessun contenuto multimediale';
+
+  @override
+  String get media_library_filter_all => 'Tutti';
+
+  @override
+  String get media_library_filter_photos => 'Foto';
+
+  @override
+  String get media_library_filter_videos => 'Video';
+
+  @override
+  String get media_library_filter_site => 'Sito';
+
+  @override
+  String get media_library_filter_trip => 'Viaggio';
+
+  @override
+  String get media_library_filter_dates => 'Date';
+
+  @override
+  String get media_library_filter_clear => 'Cancella filtri';
+
+  @override
+  String get media_divePicker_title => 'Sposta in un\'immersione';
+
+  @override
+  String get media_divePicker_search => 'Cerca immersioni';
+
+  @override
+  String get media_library_deleteConfirmBody =>
+      'Questo li rimuove dall\'app e da qualsiasi archivio multimediale. Non può essere annullato.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return 'Eliminare $count elementi?';
+  }
+
+  @override
+  String get media_library_moveToDive => 'Sposta in un\'immersione';
+
+  @override
+  String get media_library_unlinkFromSite => 'Scollega dal sito';
+
+  @override
+  String get media_library_unlinkSelected => 'Scollega';
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count selezionati';
+  }
+
+  @override
+  String get media_library_unlinkedHeader => 'Non collegati';
+
+  @override
+  String get media_library_diveHeaderHint => 'Apri questa immersione';
+
+  @override
+  String get media_library_untitledDiveHeader => 'Immersione senza titolo';
+
+  @override
+  String get media_library_viewMode_byDive => 'Per immersione';
+
+  @override
+  String get media_library_viewMode_grid => 'Griglia';
+
+  @override
+  String get media_library_viewMode_timeline => 'Cronologia';
+
+  @override
+  String get media_viewer_goToDive => 'Vai all\'immersione';
+
+  @override
   String get nav_home => 'Home';
+
+  @override
+  String get nav_media => 'Media';
 
   @override
   String get nav_more => 'Altro';
@@ -12820,6 +13272,15 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get planning_section_tools => 'Strumenti';
+
+  @override
+  String get planning_summary_prompt => 'Seleziona uno strumento per iniziare';
+
+  @override
+  String get planning_summary_savedPlans => 'Piani salvati';
+
+  @override
+  String get planning_summary_noPlans => 'Nessun piano salvato';
 
   @override
   String get planning_sidebar_appBar_title => 'Pianificazione';
@@ -19025,10 +19486,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveComputer_connectionType_wifi => 'Wi-Fi';
-
-  @override
-  String get diveComputer_detail_cannotFilterNoSerial =>
-      'Impossibile filtrare: nessun numero di serie per questo computer.';
 
   @override
   String diveComputer_detail_deleteDialogContent(String name) {

@@ -506,10 +506,13 @@ class _DiveCenterListContentState extends ConsumerState<DiveCenterListContent> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          // Flexible so the title yields before the action row overflows.
+          // Expanded, and no Spacer: the title must be the row's only flexible
+          // child, or Spacer takes half the free space and the leftover half
+          // lands after the last icon (see trip_list_content for the detail).
           // This bar is the most crowded of the five: map, search, sort,
-          // select and overflow.
-          Flexible(
+          // select and overflow, which is why the gap was small enough here to
+          // look right-aligned while still being wrong.
+          Expanded(
             child: FeatureAppBarTitle(
               featureId: 'dive-centers',
               title: context.l10n.diveCenters_title,
@@ -518,7 +521,6 @@ class _DiveCenterListContentState extends ConsumerState<DiveCenterListContent> {
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
-          const Spacer(),
           // Map toggle: shown in detailed/compact mode only.
           // In table mode, TableModeLayout manages the map toggle.
           if (widget.onMapViewToggle != null)

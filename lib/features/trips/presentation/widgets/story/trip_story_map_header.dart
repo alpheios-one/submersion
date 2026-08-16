@@ -272,7 +272,9 @@ class TripStatStrip extends ConsumerWidget {
     ];
 
     return Container(
-      color: theme.colorScheme.surface,
+      // One tonal step above the page surface: welds the strip to the map
+      // above it so the two read as a single trip-summary region.
+      color: theme.colorScheme.surfaceContainerLow,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [

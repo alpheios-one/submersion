@@ -101,6 +101,11 @@ class MediaItem extends Equatable {
   final String? compressedLevel;
   final int? compressedSizeBytes;
   final DateTime? remoteCompressedUploadedAt;
+
+  /// Media section Phase 2: explicitly kept in the library while unlinked.
+  /// The orphan sweep never GCs retained rows' store blobs.
+  final bool retainInLibrary;
+
   final DateTime createdAt;
   final DateTime updatedAt;
   final MediaEnrichment? enrichment;
@@ -144,6 +149,7 @@ class MediaItem extends Equatable {
     this.compressedLevel,
     this.compressedSizeBytes,
     this.remoteCompressedUploadedAt,
+    this.retainInLibrary = false,
     required this.createdAt,
     required this.updatedAt,
     this.enrichment,
@@ -276,6 +282,7 @@ class MediaItem extends Equatable {
     Object? compressedLevel = _undefined,
     Object? compressedSizeBytes = _undefined,
     Object? remoteCompressedUploadedAt = _undefined,
+    bool? retainInLibrary,
     DateTime? createdAt,
     DateTime? updatedAt,
     Object? enrichment = _undefined,
@@ -363,6 +370,7 @@ class MediaItem extends Equatable {
       remoteCompressedUploadedAt: remoteCompressedUploadedAt == _undefined
           ? this.remoteCompressedUploadedAt
           : remoteCompressedUploadedAt as DateTime?,
+      retainInLibrary: retainInLibrary ?? this.retainInLibrary,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       enrichment: enrichment == _undefined
@@ -411,6 +419,7 @@ class MediaItem extends Equatable {
     compressedLevel,
     compressedSizeBytes,
     remoteCompressedUploadedAt,
+    retainInLibrary,
     createdAt,
     updatedAt,
     enrichment,

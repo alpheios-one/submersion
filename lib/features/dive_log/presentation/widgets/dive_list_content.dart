@@ -988,14 +988,19 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          FeatureAppBarTitle(
-            featureId: 'dives',
-            title: context.l10n.diveLog_listPage_compactTitle,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          // Expanded, and no Spacer: the title must be the row's only flexible
+          // child (see trip_list_content for the detail). This bar was already
+          // right-aligned with a bare title plus Spacer, but a non-flexible
+          // title overflows rather than yielding once a locale makes it long.
+          Expanded(
+            child: FeatureAppBarTitle(
+              featureId: 'dives',
+              title: context.l10n.diveLog_listPage_compactTitle,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            ),
           ),
-          const Spacer(),
           // Map toggle: shown in detailed/compact mode only.
           // In table mode, TableModeLayout manages the map toggle.
           if (widget.onMapViewToggle != null)

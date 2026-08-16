@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/courses/domain/entities/course.dart';
+import 'package:submersion/features/courses/presentation/course_status_colors.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/shared/selection/selection_leading.dart';
 
@@ -63,18 +64,20 @@ class CourseCard extends ConsumerWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: course.isCompleted
-                          ? Colors.green.withValues(alpha: 0.15)
-                          : colorScheme.primary.withValues(alpha: 0.15),
+                      color: courseStatusAccent(
+                        colorScheme,
+                        completed: course.isCompleted,
+                      ).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       course.isCompleted
                           ? Icons.check_circle_outline
                           : Icons.school_outlined,
-                      color: course.isCompleted
-                          ? Colors.green
-                          : colorScheme.primary,
+                      color: courseStatusAccent(
+                        colorScheme,
+                        completed: course.isCompleted,
+                      ),
                     ),
                   ),
                 ),
@@ -165,16 +168,17 @@ class CourseCard extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     if (course.isCompleted) {
+      final accent = courseStatusAccent(colorScheme, completed: true);
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.green.withValues(alpha: 0.15),
+          color: accent.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           context.l10n.courses_status_completed,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: Colors.green,
+            color: accent,
             fontWeight: FontWeight.w600,
           ),
         ),

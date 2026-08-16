@@ -3070,7 +3070,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_homeCards_card_milestones => '里程碑';
 
   @override
-  String get settings_homeCards_card_photoRibbon => '最近照片';
+  String get settings_homeCards_card_photoRibbon => '最近媒体';
 
   @override
   String get settings_homeCards_card_onThisDay => '历史上的今天';
@@ -3189,7 +3189,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_urgent_title => '需要注意';
 
   @override
-  String get dashboard_photos_title => '最近照片';
+  String get dashboard_media_title => '最近媒体';
 
   @override
   String get dashboard_recentSites_title => '最近潜点';
@@ -3303,6 +3303,20 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dashboard_recentDives_errorLoading => '加载潜水记录失败';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle => '最近潜水剖面';
+
+  @override
+  String get dashboard_recentDives_noProfileData => '此次潜水没有剖面数据';
+
+  @override
+  String get dashboard_recentDives_profileLoadError => '无法加载潜水剖面';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes 分钟';
+  }
 
   @override
   String get dashboard_recentDives_logFirst => '记录您的第一次潜水';
@@ -3816,9 +3830,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveCenters_summary_selectPrompt => '从列表中选择潜水中心以查看详情';
-
-  @override
-  String get diveCenters_summary_topRated => '评分最高';
 
   @override
   String get diveCenters_summary_totalCenters => '中心总数';
@@ -10986,6 +10997,102 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_tab_mnd => '最大麻醉深度/等效麻醉深度';
 
   @override
+  String get gasCalculators_tab_blender => '配气';
+
+  @override
+  String get gasCalculators_blender_cylinder => '气瓶';
+
+  @override
+  String get gasCalculators_blender_startCylinder => '瓶内现有';
+
+  @override
+  String get gasCalculators_blender_targetFill => '目标充填';
+
+  @override
+  String get gasCalculators_blender_fillGases => '充填气体';
+
+  @override
+  String get gasCalculators_blender_pressure => '压力';
+
+  @override
+  String get gasCalculators_blender_o2 => 'O₂';
+
+  @override
+  String get gasCalculators_blender_he => 'He';
+
+  @override
+  String get gasCalculators_blender_air => '空气';
+
+  @override
+  String get gasCalculators_blender_helium => '氦气';
+
+  @override
+  String get gasCalculators_blender_procedure => '充填步骤';
+
+  @override
+  String get gasCalculators_blender_amounts => '需充入的气体';
+
+  @override
+  String gasCalculators_blender_stepStart(String pressure, String gas) {
+    return '从 $pressure $gas 开始';
+  }
+
+  @override
+  String gasCalculators_blender_stepFill(
+    String gas,
+    String pressure,
+    String mix,
+  ) {
+    return '充 $gas 至 $pressure → $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_error_targetPressure => '目标压力必须高于初始压力。';
+
+  @override
+  String get gasCalculators_blender_error_invalidMix =>
+      '混合气的 O₂ + He 不能超过 100%。';
+
+  @override
+  String get gasCalculators_blender_error_identicalGases => '两种充填气体相同——无需混合。';
+
+  @override
+  String get gasCalculators_blender_error_linearlyDependent =>
+      '这些充填气体无法配出目标混合气——三混目标需要氦气源。';
+
+  @override
+  String get gasCalculators_blender_error_negativeAmount =>
+      '用这些气体无法配成此混合气——需要放出气体。';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return '瓶内气体过多，无法配成此混合气。请先放气至 $pressure，再充填。';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      '瓶内现有气体无法用于此混合气。请先完全排空，再充填。';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      '瓶内含氦气，而目标混合气不含。补充充填只会稀释氦气而无法去除，需先排空气瓶。';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      '无氦目标需要两种不含氦、含氧量不同的充填气体。';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      '这些充填气体无法精确达到目标混合气。请检查充填气体及其顺序。';
+
+  @override
+  String get gasCalculators_blender_about => '关于配气';
+
+  @override
+  String get gasCalculators_blender_aboutBody =>
+      '按分压法配制目标混合气，采用真实气体（范德华）模型。按顺序充入每种气体至所示压力。充填气体及其顺序可配置；下水前务必分析最终混合气。';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override
@@ -11295,6 +11402,38 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_title => '照片 & 视频';
+
+  @override
+  String get media_diveMediaSection_deleteButton => '删除';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return '删除失败：$error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '已删除 $count 个项目';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return '删除 $count 个项目？';
+  }
+
+  @override
+  String get media_diveMediaSection_replaceButton => '重新关联';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      '此文件的内容与原始文件不同。重新关联会将其重新上传到您的媒体存储。';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle => '文件内容不同';
 
   @override
   String get media_diveMediaSection_unlinkButton => '取消关联';
@@ -11874,7 +12013,310 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nav_gpsLog => 'GPS 记录';
 
   @override
+  String get media_console_library => '媒体库';
+
+  @override
+  String get media_console_transfers => '传输';
+
+  @override
+  String get media_console_import => '导入';
+
+  @override
+  String get media_import_launch => '导入媒体...';
+
+  @override
+  String get media_import_intro => '导入的媒体会保留在您的媒体库中，并可自动关联到潜水。';
+
+  @override
+  String get media_console_sources => '来源';
+
+  @override
+  String get media_sources_browseHeader => '按来源浏览';
+
+  @override
+  String get media_sources_watchedHeader => '监视的文件夹';
+
+  @override
+  String get media_sources_addWatched => '添加文件夹...';
+
+  @override
+  String get media_sources_scanFailed => '扫描失败';
+
+  @override
+  String get media_sources_scanNow => '立即扫描';
+
+  @override
+  String get media_sources_autoApply => '自动重新关联完全匹配项';
+
+  @override
+  String get media_sources_neverScanned => '从未扫描';
+
+  @override
+  String get media_source_gallery => '照片图库';
+
+  @override
+  String get media_source_localFile => '本地文件';
+
+  @override
+  String get media_source_networkUrl => '网络链接';
+
+  @override
+  String get media_source_manifest => '订阅';
+
+  @override
+  String get media_source_connector => '已连接的服务';
+
+  @override
+  String get media_source_mediaStore => '云媒体存储';
+
+  @override
+  String get media_source_signature => '签名';
+
+  @override
+  String get media_repairHistory_title => '修复历史';
+
+  @override
+  String get media_repairHistory_empty => '尚无修复记录';
+
+  @override
+  String get media_repairHistory_action_relink => '已重新关联';
+
+  @override
+  String get media_repairHistory_action_cloudBacked => '云端备份';
+
+  @override
+  String get media_repairHistory_action_autoRelink => '已自动重新关联';
+
+  @override
+  String get media_smartAlbum_save => '保存为相册';
+
+  @override
+  String get media_smartAlbum_saveTitle => '为相册命名';
+
+  @override
+  String get media_smartAlbum_albums => '相册';
+
+  @override
+  String get media_smartAlbum_delete => '删除相册';
+
+  @override
+  String get media_smartAlbum_deleteFailed => '无法删除相册';
+
+  @override
+  String get media_smartAlbum_saved => '相册已保存';
+
+  @override
+  String media_sources_lastScanned(String date) {
+    return '上次扫描 $date';
+  }
+
+  @override
+  String media_sources_scanResult(int indexed, int repaired) {
+    return '已索引 $indexed 个文件，重新关联 $repaired 个';
+  }
+
+  @override
+  String get media_repairHistory_sourceFolder => '文件夹扫描';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => '照片图库';
+
+  @override
+  String get media_repairHistory_sourceStore => '云媒体存储';
+
+  @override
+  String get media_repairHistory_sourceWatcher => '监视的文件夹';
+
+  @override
+  String get media_repairHistory_sourceManual => '手动重新关联';
+
+  @override
+  String media_repairHistory_source(String source) {
+    return '通过 $source';
+  }
+
+  @override
+  String get media_console_missing => '缺失';
+
+  @override
+  String get media_missing_empty => '没有缺失的文件';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count 个位于离线卷上';
+  }
+
+  @override
+  String get media_missing_repair => '修复...';
+
+  @override
+  String get media_repair_title => '修复缺失的文件';
+
+  @override
+  String get media_repair_addFolder => '添加文件夹...';
+
+  @override
+  String get media_repair_usePhotoLibrary => '搜索照片图库';
+
+  @override
+  String get media_repair_useStore => '使用云媒体存储';
+
+  @override
+  String get media_repair_scan => '扫描';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return '检测到文件夹移动：$from 至 $to，涵盖 $count 个文件';
+  }
+
+  @override
+  String get media_repair_confidence_exact => '完全匹配';
+
+  @override
+  String get media_repair_confidence_probable => '名称和大小';
+
+  @override
+  String get media_repair_confidence_edited => '已编辑的文件';
+
+  @override
+  String get media_repair_confidence_unmatched => '无候选项';
+
+  @override
+  String get media_repair_unverified => '未通过存储验证';
+
+  @override
+  String media_repair_apply(int count) {
+    return '重新关联 $count 个文件';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked 个已重新关联，$cloudBacked 个云端备份，$reuploads 个重新上传已排队，$failed 个失败，$skipped 个已跳过';
+  }
+
+  @override
+  String get media_console_unlinked => '未关联';
+
+  @override
+  String get media_import_linkTitle => '关联导入的媒体';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return '关联 $count 个项目';
+  }
+
+  @override
+  String get media_import_staysUnlinked => '保留在未关联中';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '已关联 $count 个项目';
+  }
+
+  @override
+  String get media_inbox_chooseDive => '选择潜水';
+
+  @override
+  String get media_inbox_empty => '没有未关联的媒体';
+
+  @override
+  String get media_inbox_keep => '保留';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return '关联到 #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => '关联到潜水';
+
+  @override
+  String get media_inbox_linkToSite => '关联到潜点';
+
+  @override
+  String get media_library_empty => '暂无媒体';
+
+  @override
+  String get media_library_filter_all => '全部';
+
+  @override
+  String get media_library_filter_photos => '照片';
+
+  @override
+  String get media_library_filter_videos => '视频';
+
+  @override
+  String get media_library_filter_site => '潜点';
+
+  @override
+  String get media_library_filter_trip => '行程';
+
+  @override
+  String get media_library_filter_dates => '日期';
+
+  @override
+  String get media_library_filter_clear => '清除筛选';
+
+  @override
+  String get media_divePicker_title => '移至潜水';
+
+  @override
+  String get media_divePicker_search => '搜索潜水';
+
+  @override
+  String get media_library_deleteConfirmBody => '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return '删除 $count 个项目？';
+  }
+
+  @override
+  String get media_library_moveToDive => '移至潜水';
+
+  @override
+  String get media_library_unlinkFromSite => '取消关联潜点';
+
+  @override
+  String get media_library_unlinkSelected => '取消关联';
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '已选择 $count 项';
+  }
+
+  @override
+  String get media_library_unlinkedHeader => '未关联';
+
+  @override
+  String get media_library_diveHeaderHint => '打开此潜水';
+
+  @override
+  String get media_library_untitledDiveHeader => '未命名潜水';
+
+  @override
+  String get media_library_viewMode_byDive => '按潜水';
+
+  @override
+  String get media_library_viewMode_grid => '网格';
+
+  @override
+  String get media_library_viewMode_timeline => '时间线';
+
+  @override
+  String get media_viewer_goToDive => '前往潜水';
+
+  @override
   String get nav_home => '首页';
+
+  @override
+  String get nav_media => '媒体';
 
   @override
   String get nav_more => '更多';
@@ -12237,6 +12679,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get planning_section_tools => '工具';
+
+  @override
+  String get planning_summary_prompt => '选择一个工具开始';
+
+  @override
+  String get planning_summary_savedPlans => '已保存的计划';
+
+  @override
+  String get planning_summary_noPlans => '尚无已保存的计划';
 
   @override
   String get planning_sidebar_appBar_title => '计划';
@@ -18057,9 +18508,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveComputer_connectionType_wifi => 'Wi-Fi';
-
-  @override
-  String get diveComputer_detail_cannotFilterNoSerial => '无法筛选:此电脑没有序列号。';
 
   @override
   String diveComputer_detail_deleteDialogContent(String name) {

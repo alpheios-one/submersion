@@ -251,9 +251,9 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
     // not: it carries _dayKeys[index], which _onScroll and _scrollToDay read
     // positions from, and they skip days whose key context is unmounted -- so
     // dropping it would quietly take those days out of active-day resolution.
-    // Its 8px bottom inset is also the gap between consecutive chapters, and
-    // is painted in the same surface color as the headers, so it separates
-    // them rather than showing as a blank band.
+    // Its 8px bottom inset is also the gap between consecutive chapters; the
+    // headers carry a surfaceContainer tint, so the page-surface gap reads as
+    // air between one chapter's card and the next chapter's tinted band.
     final body = SliverPadding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       sliver: SliverToBoxAdapter(
@@ -303,14 +303,14 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
       // underway. The card hides itself once the flight departs.
       if (trip.returnFlightAt != null && trip.isInProgress)
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
           sliver: SliverToBoxAdapter(
             child: TripFlightCountdownCard(tripId: trip.id),
           ),
         ),
       if (trip.isLiveaboard)
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
           sliver: SliverToBoxAdapter(child: TripVesselSection(tripId: trip.id)),
         ),
       for (var index = 0; index < story.days.length; index++)
@@ -350,6 +350,12 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
                   context.l10n.trips_story_checklistProgress(
                     story.checklist.done,
                     story.checklist.total,
+                  ),
+                  // Match the notes card's section title so the two closers
+                  // read as one family (ListTile would otherwise swap in its
+                  // own font role).
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 children: [

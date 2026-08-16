@@ -2,7 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/features/dashboard/presentation/providers/photo_providers.dart';
+import 'package:submersion/features/dashboard/presentation/providers/media_ribbon_providers.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -20,7 +20,7 @@ void main() {
   });
   tearDown(tearDownTestDatabase);
 
-  test('recentPhotosProvider returns newest dive-attached photos', () async {
+  test('recentMediaProvider returns newest dive-attached photos', () async {
     await db
         .into(db.dives)
         .insert(
@@ -45,13 +45,13 @@ void main() {
       ),
     );
 
-    final photos = await container.read(recentPhotosProvider.future);
+    final photos = await container.read(recentMediaProvider.future);
     expect(photos, hasLength(1));
     expect(photos.single.diveId, 'd1');
   });
 
-  test('recentPhotosProvider is empty when there are no photos', () async {
-    final photos = await container.read(recentPhotosProvider.future);
+  test('recentMediaProvider is empty when there are no photos', () async {
+    final photos = await container.read(recentMediaProvider.future);
     expect(photos, isEmpty);
   });
 }

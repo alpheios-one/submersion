@@ -2,7 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/features/dashboard/presentation/providers/photo_providers.dart';
+import 'package:submersion/features/dashboard/presentation/providers/media_ribbon_providers.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -12,7 +12,7 @@ import '../../../../helpers/test_database.dart';
 /// Regression tests for the home-page photo ribbon showing photos that no
 /// longer exist. Deleting a photo (from the dive detail gallery, the files
 /// tab, a dive deletion cascade, or an incoming sync) removes the `media`
-/// row, but `recentPhotosProvider` is a kept-alive [FutureProvider] that used
+/// row, but `recentMediaProvider` is a kept-alive [FutureProvider] that used
 /// to have no change-tick subscription: it held its cached slice until
 /// pull-to-refresh or an app restart, so the deleted photo stayed on the
 /// ribbon as a dead tile.
@@ -73,24 +73,24 @@ void main() {
     final budget = MediaRepository.changeTickDebounce * 20;
     final deadline = DateTime.now().add(budget);
 
-    var photos = await container.read(recentPhotosProvider.future);
+    var photos = await container.read(recentMediaProvider.future);
     while (!settled(photos) && DateTime.now().isBefore(deadline)) {
       await Future<void>.delayed(interval);
-      photos = await container.read(recentPhotosProvider.future);
+      photos = await container.read(recentMediaProvider.future);
     }
 
     if (!settled(photos)) {
       fail(
         'Timed out after ${budget.inMilliseconds}ms waiting for $awaiting. '
         'The media-table tick -> invalidateSelfWhen -> rebuild round trip '
-        'never settled; recentPhotosProvider still holds '
+        'never settled; recentMediaProvider still holds '
         '${photos.map((p) => p.filePath).toList()}.',
       );
     }
     return photos;
   }
 
-  test('recentPhotosProvider drops a photo deleted while off screen', () async {
+  test('recentMediaProvider drops a photo deleted while off screen', () async {
     await insertDive('d1');
     final repo = MediaRepository();
     final keep = await addPhoto(
@@ -110,9 +110,9 @@ void main() {
     addTearDown(container.dispose);
 
     // Dashboard on screen: an active listener builds the ribbon's provider,
-    // exactly like PhotoRibbonCard watching recentPhotosProvider.
-    final onScreen = container.listen(recentPhotosProvider, (_, _) {});
-    final initial = await container.read(recentPhotosProvider.future);
+    // exactly like MediaRibbonCard watching recentMediaProvider.
+    final onScreen = container.listen(recentMediaProvider, (_, _) {});
+    final initial = await container.read(recentMediaProvider.future);
     expect(initial.map((p) => p.id).toList(), [
       doomed.id,
       keep.id,
@@ -123,7 +123,7 @@ void main() {
     await repo.deleteMedia(doomed.id);
 
     // User returns to the dashboard: the ribbon re-subscribes.
-    final backOnScreen = container.listen(recentPhotosProvider, (_, _) {});
+    final backOnScreen = container.listen(recentMediaProvider, (_, _) {});
     addTearDown(backOnScreen.close);
 
     final photos = await pollPhotos(
@@ -141,43 +141,40 @@ void main() {
     );
   });
 
-  test(
-    'recentPhotosProvider picks up a photo added while off screen',
-    () async {
-      await insertDive('d1');
-      final repo = MediaRepository();
-      final existing = await addPhoto(
-        repo,
-        diveId: 'd1',
-        path: '/tmp/existing.jpg',
-        takenAt: DateTime(2026, 3, 1),
-      );
+  test('recentMediaProvider picks up a photo added while off screen', () async {
+    await insertDive('d1');
+    final repo = MediaRepository();
+    final existing = await addPhoto(
+      repo,
+      diveId: 'd1',
+      path: '/tmp/existing.jpg',
+      takenAt: DateTime(2026, 3, 1),
+    );
 
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
 
-      final onScreen = container.listen(recentPhotosProvider, (_, _) {});
-      expect(await container.read(recentPhotosProvider.future), hasLength(1));
-      onScreen.close();
+    final onScreen = container.listen(recentMediaProvider, (_, _) {});
+    expect(await container.read(recentMediaProvider.future), hasLength(1));
+    onScreen.close();
 
-      // An import or an incoming sync writes a newer photo straight to the DB.
-      final imported = await addPhoto(
-        repo,
-        diveId: 'd1',
-        path: '/tmp/imported.jpg',
-        takenAt: DateTime(2026, 3, 2),
-      );
+    // An import or an incoming sync writes a newer photo straight to the DB.
+    final imported = await addPhoto(
+      repo,
+      diveId: 'd1',
+      path: '/tmp/imported.jpg',
+      takenAt: DateTime(2026, 3, 2),
+    );
 
-      final backOnScreen = container.listen(recentPhotosProvider, (_, _) {});
-      addTearDown(backOnScreen.close);
+    final backOnScreen = container.listen(recentMediaProvider, (_, _) {});
+    addTearDown(backOnScreen.close);
 
-      final photos = await pollPhotos(
-        container,
-        (p) => p.any((item) => item.id == imported.id),
-        awaiting: 'the newly added photo to appear on the ribbon',
-      );
+    final photos = await pollPhotos(
+      container,
+      (p) => p.any((item) => item.id == imported.id),
+      awaiting: 'the newly added photo to appear on the ribbon',
+    );
 
-      expect(photos.map((p) => p.id).toList(), [imported.id, existing.id]);
-    },
-  );
+    expect(photos.map((p) => p.id).toList(), [imported.id, existing.id]);
+  });
 }

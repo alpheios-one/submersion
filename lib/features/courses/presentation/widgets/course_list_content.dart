@@ -422,8 +422,10 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          // Flexible so the title yields before the action row overflows.
-          Flexible(
+          // Expanded, and no Spacer: the title must be the row's only flexible
+          // child, or Spacer takes half the free space and the leftover half
+          // lands after the last icon (see trip_list_content for the detail).
+          Expanded(
             child: FeatureAppBarTitle(
               featureId: 'courses',
               title: context.l10n.courses_title,
@@ -432,7 +434,6 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
-          const Spacer(),
           if (viewMode != ListViewMode.table)
             IconButton(
               icon: const Icon(Icons.sort, size: 20),

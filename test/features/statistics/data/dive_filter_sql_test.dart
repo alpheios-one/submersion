@@ -31,7 +31,7 @@ void main() {
     int? rating,
     int? bottomTimeSeconds,
     bool favorite = false,
-    String? computerSerial,
+    String? computerId,
     String? buddy,
   }) async {
     await db
@@ -49,10 +49,26 @@ void main() {
             rating: Value(rating),
             bottomTime: Value(bottomTimeSeconds),
             isFavorite: Value(favorite),
-            diveComputerSerial: Value(computerSerial),
+            computerId: Value(computerId),
             buddy: Value(buddy),
             createdAt: Value(now),
             updatedAt: Value(now),
+          ),
+        );
+  }
+
+  /// Registers a dive computer. Issue #1064: these carry no serial number,
+  /// mirroring the firmware that never reports one -- attribution must still
+  /// work.
+  Future<void> insertComputer(String id) async {
+    await db
+        .into(db.diveComputers)
+        .insert(
+          DiveComputersCompanion.insert(
+            id: id,
+            name: 'Computer $id',
+            createdAt: now,
+            updatedAt: now,
           ),
         );
   }
@@ -378,6 +394,9 @@ void main() {
     await insertTag('night');
     await insertEquipment('eq1');
     await insertEquipment('eq2');
+    await insertComputer('dc-a');
+    await insertComputer('dc-b');
+    await insertComputer('dc-c');
 
     // --- Dives: deliberately varied so every axis below both includes and
     // excludes at least one dive (a filter that trivially matches
@@ -402,10 +421,10 @@ void main() {
       rating: 5,
       bottomTimeSeconds: 3300, // 55 min
       favorite: true,
-      computerSerial: 'BBB222',
+      computerId: 'dc-b',
       buddy: 'Bob Buddy',
     );
-    // d3: nulls across depth/rating/computerSerial, and no tanks/tags/
+    // d3: nulls across depth/rating/computerId, and no tanks/tags/
     // equipment/custom fields at all -- exercises every null-exclusion and
     // empty-membership branch on both sides.
     await insertDive(
@@ -422,7 +441,7 @@ void main() {
       maxDepth: 45.0,
       rating: 2,
       bottomTimeSeconds: 1200, // 20 min
-      computerSerial: 'AAA111',
+      computerId: 'dc-a',
     );
     // d5: two tanks (100% and 21%) so the O2 axis actually exercises
     // ANY-tank-matches semantics rather than a single-tank dive.
@@ -435,7 +454,7 @@ void main() {
       rating: 4,
       bottomTimeSeconds: 3600, // 60 min
       favorite: true,
-      computerSerial: 'CCC333',
+      computerId: 'dc-c',
     );
     await insertDive(
       'd6',
@@ -443,7 +462,7 @@ void main() {
       siteId: 's2',
       maxDepth: 25.0,
       bottomTimeSeconds: 480, // 8 min
-      computerSerial: 'BBB222',
+      computerId: 'dc-b',
     );
     await insertDive(
       'd7',
@@ -529,7 +548,7 @@ void main() {
       'minRating (null-exclusion)': const DiveFilterState(minRating: 4),
       'minBottomTimeMinutes': const DiveFilterState(minBottomTimeMinutes: 30),
       'maxBottomTimeMinutes': const DiveFilterState(maxBottomTimeMinutes: 20),
-      'computerSerial': const DiveFilterState(computerSerial: 'AAA111'),
+      'computerId': const DiveFilterState(computerId: 'dc-a'),
       'customFieldKey only': const DiveFilterState(customFieldKey: 'visMeters'),
       'customFieldKey + value substring': const DiveFilterState(
         customFieldKey: 'visMeters',
@@ -565,7 +584,7 @@ void main() {
 
     // Hand-verified expected sets for the axes prioritized by the review
     // (O2 any-tank, equipment any-match, multi-tag, custom field
-    // key/value, computerSerial, diveCenterId, depth/rating
+    // key/value, computerId, diveCenterId, depth/rating
     // null-exclusion), so a bug shared by BOTH apply() and the SQL builder
     // can't hide behind their mutual agreement.
     expect(await idsMatching(battery['siteId']!), {'d1', 'd4', 'd7'});
@@ -591,7 +610,7 @@ void main() {
       'd2',
       'd5',
     }, reason: 'ANY-tank semantics: d5 matches via its second (100%) tank');
-    expect(await idsMatching(battery['computerSerial']!), {'d4'});
+    expect(await idsMatching(battery['computerId']!), {'d4'});
     expect(
       await idsMatching(battery['buddyNameFilter']!),
       {'d1', 'd6'},

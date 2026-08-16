@@ -318,7 +318,7 @@ void main() {
     });
 
     // Column settings are now provided by TableModeLayout, not the content
-    // widget. The compact bar provides wallet, sort, search, and view mode
+    // widget. The compact bar provides wallet, search, sort, and view mode
     // controls.
 
     testWidgets('renders with showAppBar false (compact bar)', (tester) async {
@@ -542,6 +542,54 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(pushedPath, '/certifications/c1');
+    });
+  });
+
+  // The canonical action order across every entity list, taken from the
+  // Dives/Sites baseline:
+  //
+  //   [view switches: map, wallet] search  filter  sort  select  overflow
+  //
+  // Certifications is the strictest case in the app: it is the only bar
+  // carrying a view switch (wallet) alongside search, sort, select and
+  // overflow, so it pins every neighbour pair in the sequence. It used to
+  // render sort before search.
+  group('compact bar action order', () {
+    testWidgets('follows the canonical order', (tester) async {
+      final overrides = await _buildPhoneOverrides(
+        certs: [_makeCert(id: 'c1', name: 'Nitrox Diver')],
+      );
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const CertificationListContent(showAppBar: false),
+        ),
+      );
+      await tester.pump();
+
+      const expected = <IconData>[
+        Icons.wallet,
+        Icons.search,
+        Icons.sort,
+        Icons.checklist,
+        Icons.more_vert,
+      ];
+
+      final xs = [
+        for (final icon in expected)
+          tester.getCenter(find.byIcon(icon).first).dx,
+      ];
+
+      for (var i = 1; i < xs.length; i++) {
+        expect(
+          xs[i],
+          greaterThan(xs[i - 1]),
+          reason:
+              '${expected[i]} must sit right of ${expected[i - 1]} '
+              '(got ${xs[i]} vs ${xs[i - 1]})',
+        );
+      }
     });
   });
 

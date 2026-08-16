@@ -476,11 +476,6 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
                   ),
                   actions: [
                     IconButton(
-                      icon: const Icon(Icons.sort),
-                      tooltip: context.l10n.buddies_action_sort,
-                      onPressed: () => _showSortSheet(context),
-                    ),
-                    IconButton(
                       icon: const Icon(Icons.search),
                       tooltip: context.l10n.buddies_action_search,
                       onPressed: () {
@@ -489,6 +484,11 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
                           delegate: BuddySearchDelegate(ref),
                         );
                       },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.sort),
+                      tooltip: context.l10n.buddies_action_sort,
+                      onPressed: () => _showSortSheet(context),
                     ),
                     // The only way into bulk actions: entry by long-press was removed,
                     // so nothing but this control opens selection mode on touch.
@@ -679,10 +679,10 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          // Flexible so the title yields before the action row overflows.
-          // A fixed-width title made any longer localized title overflow the
-          // narrow pane, independent of the Select button added here.
-          Flexible(
+          // Expanded, and no Spacer: the title must be the row's only flexible
+          // child, or Spacer takes half the free space and the leftover half
+          // lands after the last icon (see trip_list_content for the detail).
+          Expanded(
             child: FeatureAppBarTitle(
               featureId: 'buddies',
               title: context.l10n.buddies_title,
@@ -691,18 +691,17 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
-          const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.sort, size: 20),
-            tooltip: context.l10n.buddies_action_sort,
-            onPressed: () => _showSortSheet(context),
-          ),
           IconButton(
             icon: const Icon(Icons.search, size: 20),
             tooltip: context.l10n.buddies_action_search,
             onPressed: () {
               showSearch(context: context, delegate: BuddySearchDelegate(ref));
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.sort, size: 20),
+            tooltip: context.l10n.buddies_action_sort,
+            onPressed: () => _showSortSheet(context),
           ),
           // The only way into bulk actions: entry by long-press was removed,
           // so nothing but this control opens selection mode on touch.

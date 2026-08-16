@@ -76,6 +76,21 @@ class FeatureAppBarTitle extends ConsumerWidget {
   /// own title, so it has to survive the accent wrapping unchanged.
   final TextStyle? style;
 
+  /// A title is a single line that ellipsises, never a paragraph.
+  ///
+  /// The master pane is a fixed 440px, so a long single-token title competing
+  /// with the pane's trailing icons can be squeezed to a few dozen logical
+  /// pixels. Left to wrap, "Certifications" broke mid-word and grew the bar's
+  /// height; the accent branch made it worse, since the icon and its gap take
+  /// 32px out of that budget before the text gets any.
+  Widget _titleText() => Text(
+    title,
+    style: style,
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+    softWrap: false,
+  );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final color = resolveFeatureAccent(
@@ -84,7 +99,7 @@ class FeatureAppBarTitle extends ConsumerWidget {
       surface: AccentSurface.header,
       featureId: featureId,
     );
-    if (color == null) return Text(title, style: style);
+    if (color == null) return _titleText();
 
     NavDestination? destination;
     for (final candidate in kNavDestinations) {
@@ -93,14 +108,14 @@ class FeatureAppBarTitle extends ConsumerWidget {
         break;
       }
     }
-    if (destination == null) return Text(title, style: style);
+    if (destination == null) return _titleText();
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(destination.selectedIcon, color: color),
         const SizedBox(width: 8),
-        Flexible(child: Text(title, style: style)),
+        Flexible(child: _titleText()),
       ],
     );
   }

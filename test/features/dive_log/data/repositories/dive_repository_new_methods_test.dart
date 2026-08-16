@@ -42,6 +42,7 @@ void main() {
     int? diveNumber,
     String? diveComputerModel,
     String? diveComputerSerial,
+    String? computerId,
     double? maxDepth,
     double? avgDepth,
     int? duration,
@@ -68,6 +69,7 @@ void main() {
             diveNumber: Value(diveNumber),
             diveComputerModel: Value(diveComputerModel),
             diveComputerSerial: Value(diveComputerSerial),
+            computerId: Value(computerId),
             maxDepth: Value(maxDepth),
             avgDepth: Value(avgDepth),
             bottomTime: Value(duration),
@@ -1347,62 +1349,78 @@ void main() {
   // computerSerial filter in getDiveSummaries
   // ---------------------------------------------------------------------------
 
-  group('computerSerial filter', () {
-    test('filters dives by computer serial number', () async {
-      await insertTestDive(
-        id: 'dive-serial-a',
-        diveNumber: 1,
-        diveComputerSerial: 'SN-AAA',
-        diveComputerModel: 'Computer A',
-      );
-      await insertTestDive(
-        id: 'dive-serial-b',
-        diveNumber: 2,
-        diveComputerSerial: 'SN-BBB',
-        diveComputerModel: 'Computer B',
-      );
-      await insertTestDive(
-        id: 'dive-serial-a2',
-        diveNumber: 3,
-        diveComputerSerial: 'SN-AAA',
-        diveComputerModel: 'Computer A',
-      );
+  group('computerId filter', () {
+    test('filters dives by dive computer', () async {
+      await insertComputer(id: 'dc-a', name: 'Computer A');
+      await insertComputer(id: 'dc-b', name: 'Computer B');
+      await insertTestDive(id: 'dive-a', diveNumber: 1, computerId: 'dc-a');
+      await insertTestDive(id: 'dive-b', diveNumber: 2, computerId: 'dc-b');
+      await insertTestDive(id: 'dive-a2', diveNumber: 3, computerId: 'dc-a');
 
       final summaries = await repository.getDiveSummaries(
-        filter: const DiveFilterState(computerSerial: 'SN-AAA'),
+        filter: const DiveFilterState(computerId: 'dc-a'),
       );
 
       expect(summaries.length, equals(2));
       final ids = summaries.map((s) => s.id).toSet();
-      expect(ids, contains('dive-serial-a'));
-      expect(ids, contains('dive-serial-a2'));
-      expect(ids, isNot(contains('dive-serial-b')));
+      expect(ids, contains('dive-a'));
+      expect(ids, contains('dive-a2'));
+      expect(ids, isNot(contains('dive-b')));
     });
 
-    test('returns empty list when no dives match the serial', () async {
+    // Issue #1064: the filter used to key on dives.dive_computer_serial, so
+    // every computer whose firmware never reported a serial matched nothing.
+    test('filters dives whose computer reported no serial number', () async {
+      await insertComputer(id: 'dc-noserial', name: 'Petrel 3');
+      await insertTestDive(
+        id: 'dive-noserial-1',
+        diveNumber: 1,
+        computerId: 'dc-noserial',
+      );
+      await insertTestDive(
+        id: 'dive-noserial-2',
+        diveNumber: 2,
+        computerId: 'dc-noserial',
+      );
+      await insertTestDive(id: 'dive-manual', diveNumber: 3);
+
+      final summaries = await repository.getDiveSummaries(
+        filter: const DiveFilterState(computerId: 'dc-noserial'),
+      );
+
+      expect(summaries.map((s) => s.id).toSet(), {
+        'dive-noserial-1',
+        'dive-noserial-2',
+      });
+    });
+
+    test('returns empty list when no dives match the computer', () async {
+      await insertComputer(id: 'dc-c', name: 'Computer C');
       await insertTestDive(
         id: 'dive-no-match',
         diveNumber: 1,
-        diveComputerSerial: 'SN-CCC',
+        computerId: 'dc-c',
       );
 
       final summaries = await repository.getDiveSummaries(
-        filter: const DiveFilterState(computerSerial: 'SN-NONEXISTENT'),
+        filter: const DiveFilterState(computerId: 'dc-nonexistent'),
       );
 
       expect(summaries, isEmpty);
     });
 
-    test('returns all dives when computerSerial filter is null', () async {
+    test('returns all dives when computerId filter is null', () async {
+      await insertComputer(id: 'dc-1', name: 'Computer 1');
+      await insertComputer(id: 'dc-2', name: 'Computer 2');
       await insertTestDive(
         id: 'dive-unfiltered-1',
         diveNumber: 1,
-        diveComputerSerial: 'SN-111',
+        computerId: 'dc-1',
       );
       await insertTestDive(
         id: 'dive-unfiltered-2',
         diveNumber: 2,
-        diveComputerSerial: 'SN-222',
+        computerId: 'dc-2',
       );
 
       final summaries = await repository.getDiveSummaries(
