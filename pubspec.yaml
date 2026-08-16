@@ -139,6 +139,10 @@ dev_dependencies:
 
   cross_file: ^0.3.5
   flutter_lints: ^6.0.0
+  # Test-only: lets google_sign_in_authenticator_test swap in a fake
+  # GoogleSignInPlatform, so the mobile/macOS auth path is exercisable
+  # without a device or a real Google session.
+  google_sign_in_platform_interface: ^3.1.0
   flutter_launcher_icons: ^0.14.4
   build_runner: ^2.10.4
   drift_dev: ^2.34.0
