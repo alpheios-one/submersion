@@ -21948,6 +21948,62 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'שילוב';
 
   @override
+  String get siteFeature_type_wreck => 'ספינה טרופה';
+
+  @override
+  String get siteFeature_type_mooring => 'מצוף עגינה';
+
+  @override
+  String get siteFeature_type_entry => 'נקודת כניסה';
+
+  @override
+  String get siteFeature_type_exit => 'נקודת יציאה';
+
+  @override
+  String get siteFeature_type_swimThrough => 'מעבר';
+
+  @override
+  String get siteFeature_type_hazard => 'סכנה';
+
+  @override
+  String get siteFeature_type_current => 'זרם';
+
+  @override
+  String get siteFeature_sectionTitle => 'מאפיינים';
+
+  @override
+  String get siteFeature_addAction => 'הוספת מאפיין';
+
+  @override
+  String get siteFeature_placeHint => 'הקישו על המפה למיקום המאפיין';
+
+  @override
+  String get siteFeature_addTitle => 'הוספת מאפיין';
+
+  @override
+  String get siteFeature_editTitle => 'עריכת מאפיין';
+
+  @override
+  String get siteFeature_field_name => 'שם';
+
+  @override
+  String get siteFeature_field_bearing => 'כיוון (°)';
+
+  @override
+  String get siteFeature_field_depth => 'עומק';
+
+  @override
+  String get siteFeature_field_notes => 'הערות';
+
+  @override
+  String get siteFeature_deleteAction => 'מחיקה';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'למחוק את $name?';
+  }
+
+  @override
   String get siteScape_mode2d => 'מפה';
 
   @override

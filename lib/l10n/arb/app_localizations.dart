@@ -37441,6 +37441,114 @@ abstract class AppLocalizations {
   /// **'Blend'**
   String get dive3d_seascape_appearance_surfaceBlend;
 
+  /// No description provided for @siteFeature_type_wreck.
+  ///
+  /// In en, this message translates to:
+  /// **'Wreck'**
+  String get siteFeature_type_wreck;
+
+  /// No description provided for @siteFeature_type_mooring.
+  ///
+  /// In en, this message translates to:
+  /// **'Mooring'**
+  String get siteFeature_type_mooring;
+
+  /// No description provided for @siteFeature_type_entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry point'**
+  String get siteFeature_type_entry;
+
+  /// No description provided for @siteFeature_type_exit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit point'**
+  String get siteFeature_type_exit;
+
+  /// No description provided for @siteFeature_type_swimThrough.
+  ///
+  /// In en, this message translates to:
+  /// **'Swim-through'**
+  String get siteFeature_type_swimThrough;
+
+  /// No description provided for @siteFeature_type_hazard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hazard'**
+  String get siteFeature_type_hazard;
+
+  /// No description provided for @siteFeature_type_current.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get siteFeature_type_current;
+
+  /// No description provided for @siteFeature_sectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Features'**
+  String get siteFeature_sectionTitle;
+
+  /// No description provided for @siteFeature_addAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add feature'**
+  String get siteFeature_addAction;
+
+  /// No description provided for @siteFeature_placeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the map to place the feature'**
+  String get siteFeature_placeHint;
+
+  /// No description provided for @siteFeature_addTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add feature'**
+  String get siteFeature_addTitle;
+
+  /// No description provided for @siteFeature_editTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit feature'**
+  String get siteFeature_editTitle;
+
+  /// No description provided for @siteFeature_field_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get siteFeature_field_name;
+
+  /// No description provided for @siteFeature_field_bearing.
+  ///
+  /// In en, this message translates to:
+  /// **'Bearing (°)'**
+  String get siteFeature_field_bearing;
+
+  /// No description provided for @siteFeature_field_depth.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth'**
+  String get siteFeature_field_depth;
+
+  /// No description provided for @siteFeature_field_notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get siteFeature_field_notes;
+
+  /// No description provided for @siteFeature_deleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get siteFeature_deleteAction;
+
+  /// No description provided for @siteFeature_deleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}?'**
+  String siteFeature_deleteConfirm(String name);
+
   /// No description provided for @siteScape_mode2d.
   ///
   /// In en, this message translates to:

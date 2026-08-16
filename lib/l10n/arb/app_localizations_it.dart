@@ -22501,6 +22501,63 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Miscela';
 
   @override
+  String get siteFeature_type_wreck => 'Relitto';
+
+  @override
+  String get siteFeature_type_mooring => 'Boa di ormeggio';
+
+  @override
+  String get siteFeature_type_entry => 'Punto d\'ingresso';
+
+  @override
+  String get siteFeature_type_exit => 'Punto d\'uscita';
+
+  @override
+  String get siteFeature_type_swimThrough => 'Passaggio';
+
+  @override
+  String get siteFeature_type_hazard => 'Pericolo';
+
+  @override
+  String get siteFeature_type_current => 'Corrente';
+
+  @override
+  String get siteFeature_sectionTitle => 'Elementi';
+
+  @override
+  String get siteFeature_addAction => 'Aggiungi elemento';
+
+  @override
+  String get siteFeature_placeHint =>
+      'Tocca la mappa per posizionare l\'elemento';
+
+  @override
+  String get siteFeature_addTitle => 'Aggiungi elemento';
+
+  @override
+  String get siteFeature_editTitle => 'Modifica elemento';
+
+  @override
+  String get siteFeature_field_name => 'Nome';
+
+  @override
+  String get siteFeature_field_bearing => 'Rilevamento (°)';
+
+  @override
+  String get siteFeature_field_depth => 'Profondità';
+
+  @override
+  String get siteFeature_field_notes => 'Note';
+
+  @override
+  String get siteFeature_deleteAction => 'Elimina';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'Eliminare $name?';
+  }
+
+  @override
   String get siteScape_mode2d => 'Mappa';
 
   @override

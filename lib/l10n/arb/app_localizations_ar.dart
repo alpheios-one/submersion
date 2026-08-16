@@ -22104,6 +22104,62 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'مزيج';
 
   @override
+  String get siteFeature_type_wreck => 'حطام';
+
+  @override
+  String get siteFeature_type_mooring => 'مربط';
+
+  @override
+  String get siteFeature_type_entry => 'نقطة الدخول';
+
+  @override
+  String get siteFeature_type_exit => 'نقطة الخروج';
+
+  @override
+  String get siteFeature_type_swimThrough => 'ممر';
+
+  @override
+  String get siteFeature_type_hazard => 'خطر';
+
+  @override
+  String get siteFeature_type_current => 'تيار';
+
+  @override
+  String get siteFeature_sectionTitle => 'معالم';
+
+  @override
+  String get siteFeature_addAction => 'إضافة معلم';
+
+  @override
+  String get siteFeature_placeHint => 'انقر على الخريطة لوضع المعلم';
+
+  @override
+  String get siteFeature_addTitle => 'إضافة معلم';
+
+  @override
+  String get siteFeature_editTitle => 'تحرير المعلم';
+
+  @override
+  String get siteFeature_field_name => 'الاسم';
+
+  @override
+  String get siteFeature_field_bearing => 'الاتجاه (°)';
+
+  @override
+  String get siteFeature_field_depth => 'العمق';
+
+  @override
+  String get siteFeature_field_notes => 'ملاحظات';
+
+  @override
+  String get siteFeature_deleteAction => 'حذف';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'حذف $name؟';
+  }
+
+  @override
   String get siteScape_mode2d => 'خريطة';
 
   @override
