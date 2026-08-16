@@ -135,6 +135,17 @@ Hosts and entry points:
 Mode is ephemeral: each entry starts where the caller asked (default 2D);
 persistent knobs stay in the appearance sheet.
 
+Corrections at planning time (PR 3): the sites surface has no `?site=`
+mechanism; master-detail uses `?selected=` + `?view=map`, so the deep
+link lives on the standalone route `/sites/map?site=<id>&scape=3d`.
+Chart stays an internal toggle of `SiteTerrainPane`, not a third
+`SiteScapeView` mode. BOTH sites-map surfaces host the pane: the
+master-detail `SiteMapContent` AND the standalone `SiteMapPage`, which
+also gains the `BathymetryDepthOverlayLayer` its toggle was flipping
+without rendering (PR 1 gap). `SiteScapeView` is mode-controlled: hosts
+hold the ephemeral mode in their own state, and the 2D stack stays
+alive under `Offstage` so the map camera survives mode flips.
+
 ## Testing
 
 - PR 1: image-builder unit tests on tiny grids (transparent land pixels,
