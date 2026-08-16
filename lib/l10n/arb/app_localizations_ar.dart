@@ -4819,6 +4819,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'عرض بملء الشاشة';
 
   @override
+  String get diveLog_detail_viewMap => 'خريطة';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => 'عرض الموقع';
 
   @override
@@ -22096,6 +22102,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dive3d_seascape_appearance_surfaceBlend => 'مزيج';
+
+  @override
+  String get siteScape_mode2d => 'خريطة';
+
+  @override
+  String get siteScape_mode3d => '3D';
 
   @override
   String get dive3d_seascape_appearance_rampRange => 'تحديد نطاق عمق الألوان';

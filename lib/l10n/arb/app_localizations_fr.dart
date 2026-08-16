@@ -4934,6 +4934,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'Voir en plein ecran';
 
   @override
+  String get diveLog_detail_viewMap => 'Carte';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => 'Voir le site';
 
   @override
@@ -22566,6 +22572,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dive3d_seascape_appearance_surfaceBlend => 'Mélange';
+
+  @override
+  String get siteScape_mode2d => 'Carte';
+
+  @override
+  String get siteScape_mode3d => '3D';
 
   @override
   String get dive3d_seascape_appearance_rampRange =>

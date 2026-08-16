@@ -4791,6 +4791,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'הצגה במסך מלא';
 
   @override
+  String get diveLog_detail_viewMap => 'מפה';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => 'הצגת אתר';
 
   @override
@@ -21940,6 +21946,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get dive3d_seascape_appearance_surfaceBlend => 'שילוב';
+
+  @override
+  String get siteScape_mode2d => 'מפה';
+
+  @override
+  String get siteScape_mode3d => '3D';
 
   @override
   String get dive3d_seascape_appearance_rampRange => 'הגבלת טווח עומק הצבעים';

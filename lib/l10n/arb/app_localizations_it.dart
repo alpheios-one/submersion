@@ -4915,6 +4915,12 @@ class AppLocalizationsIt extends AppLocalizations {
       'Visualizza a schermo intero';
 
   @override
+  String get diveLog_detail_viewMap => 'Mappa';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => 'Visualizza sito';
 
   @override
@@ -22493,6 +22499,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get dive3d_seascape_appearance_surfaceBlend => 'Miscela';
+
+  @override
+  String get siteScape_mode2d => 'Mappa';
+
+  @override
+  String get siteScape_mode3d => '3D';
 
   @override
   String get dive3d_seascape_appearance_rampRange =>

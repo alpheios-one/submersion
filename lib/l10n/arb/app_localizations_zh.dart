@@ -4673,6 +4673,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => '查看全屏';
 
   @override
+  String get diveLog_detail_viewMap => '地图';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => '查看潜水点';
 
   @override
@@ -21367,6 +21373,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dive3d_seascape_appearance_surfaceBlend => '混合';
+
+  @override
+  String get siteScape_mode2d => '地图';
+
+  @override
+  String get siteScape_mode3d => '3D';
 
   @override
   String get dive3d_seascape_appearance_rampRange => '限制颜色深度范围';

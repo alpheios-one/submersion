@@ -22,19 +22,20 @@ import 'package:submersion/features/dive_3d/presentation/widgets/tissue_tooltip_
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Fullscreen site seascape: real bathymetry around the site pin with the
-/// site's dives draped in place. Every terminal state renders something —
-/// a scene, or an explicit message; never a permanent spinner.
-class SiteSeascapePage extends ConsumerStatefulWidget {
+/// Host-agnostic site seascape pane: real bathymetry around the site pin
+/// with the site's dives draped in place, plus its own appearance and
+/// chart-mode controls (no Scaffold or AppBar; hosts embed it anywhere).
+/// Every terminal state renders something, never a permanent spinner.
+class SiteTerrainPane extends ConsumerStatefulWidget {
   final String siteId;
 
-  const SiteSeascapePage({super.key, required this.siteId});
+  const SiteTerrainPane({super.key, required this.siteId});
 
   @override
-  ConsumerState<SiteSeascapePage> createState() => _SiteSeascapePageState();
+  ConsumerState<SiteTerrainPane> createState() => _SiteTerrainPaneState();
 }
 
-class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
+class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
   // No timeline at site level: the scrub cursor stays parked.
   final ValueNotifier<double> _scrub = ValueNotifier(0);
   final ValueNotifier<TissuePick?> _hoverPick = ValueNotifier(null);
@@ -59,136 +60,155 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
       settingsProvider.select((s) => s.seascapeAppearance),
     );
     final depthUnit = ref.watch(settingsProvider.select((s) => s.depthUnit));
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.dive3d_seascape_siteTitle),
-        actions: [
-          IconButton(
-            key: const ValueKey('seascapeAppearanceButton'),
-            icon: const Icon(Icons.tune),
-            tooltip: context.l10n.dive3d_seascape_appearance,
-            onPressed: () => showTerrainAppearanceSheet(context),
-          ),
-          IconButton(
-            key: const ValueKey('seascapeChartToggle'),
-            icon: Icon(_chartMode ? Icons.view_in_ar : Icons.map_outlined),
-            tooltip: _chartMode
-                ? context.l10n.dive3d_seascape_orbitView
-                : context.l10n.dive3d_seascape_chartView,
-            onPressed: () => setState(() => _chartMode = !_chartMode),
-          ),
-        ],
-      ),
-      body: stateAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) {
-          // The fallback text blames missing data; surface the real error
-          // in debug builds so a provider failure is never mistaken for it.
-          assert(() {
-            debugPrint('siteSeascapeProvider failed: $e');
-            return true;
-          }());
-          return Center(child: Text(context.l10n.dive3d_seascape_noData));
-        },
-        data: (state) => switch (state) {
-          SiteSeascapeNoCoordinates() => Center(
-            child: Text(context.l10n.dive3d_seascape_noCoordinates),
-          ),
-          SiteSeascapeNoData() => Center(
-            child: Text(context.l10n.dive3d_seascape_noData),
-          ),
-          SiteSeascapeReady(
-            :final scene,
-            :final sourceId,
-            :final resolutionMeters,
-            :final axisInputs,
-            :final grid,
-            :final contourLabels,
-            :final imagery,
-          ) =>
-            Column(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Builder(
-                          builder: (context) {
-                            final axes = _buildAxes(axisInputs);
-                            return Dive3dInteractiveViewport(
-                              scene: scene,
-                              scrubPosition: _scrub,
-                              visibleOverlays: {
-                                ..._visible,
-                                if (!_chartMode) SceneOverlay.water,
-                              },
-                              chartMode: _chartMode,
-                              contourLabels: contourLabels,
-                              axisFrame: axes.frame,
-                              axisLabels: axes.labels,
-                              chromeStyle: seascapeChromeStyle(context),
-                              axisChromeOnly: true,
-                              surfaceGrid: seascapePickGrid(
-                                grid,
-                                scene.layers.first.mesh,
-                              ),
-                              hoverPick: _hoverPick,
-                              terrainImagery: imagery?.image,
-                              imageryWhiteTexel: imagery == null
-                                  ? null
-                                  : (
-                                      u: imagery.frame.whiteU,
-                                      v: imagery.frame.whiteV,
-                                    ),
-                            );
-                          },
-                        ),
+    return stateAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) {
+        // The fallback text blames missing data; surface the real error
+        // in debug builds so a provider failure is never mistaken for it.
+        assert(() {
+          debugPrint('siteSeascapeProvider failed: $e');
+          return true;
+        }());
+        return Center(child: Text(context.l10n.dive3d_seascape_noData));
+      },
+      data: (state) => switch (state) {
+        SiteSeascapeNoCoordinates() => Center(
+          child: Text(context.l10n.dive3d_seascape_noCoordinates),
+        ),
+        SiteSeascapeNoData() => Center(
+          child: Text(context.l10n.dive3d_seascape_noData),
+        ),
+        SiteSeascapeReady(
+          :final scene,
+          :final sourceId,
+          :final resolutionMeters,
+          :final axisInputs,
+          :final grid,
+          :final contourLabels,
+          :final imagery,
+        ) =>
+          Column(
+            children: [
+              Expanded(
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Builder(
+                        builder: (context) {
+                          final axes = _buildAxes(axisInputs);
+                          return Dive3dInteractiveViewport(
+                            scene: scene,
+                            scrubPosition: _scrub,
+                            visibleOverlays: {
+                              ..._visible,
+                              if (!_chartMode) SceneOverlay.water,
+                            },
+                            chartMode: _chartMode,
+                            contourLabels: contourLabels,
+                            axisFrame: axes.frame,
+                            axisLabels: axes.labels,
+                            chromeStyle: seascapeChromeStyle(context),
+                            axisChromeOnly: true,
+                            surfaceGrid: seascapePickGrid(
+                              grid,
+                              scene.layers.first.mesh,
+                            ),
+                            hoverPick: _hoverPick,
+                            terrainImagery: imagery?.image,
+                            imageryWhiteTexel: imagery == null
+                                ? null
+                                : (
+                                    u: imagery.frame.whiteU,
+                                    v: imagery.frame.whiteV,
+                                  ),
+                          );
+                        },
                       ),
+                    ),
+                    Positioned(
+                      top: 56,
+                      left: 8,
+                      right: 8,
+                      child: _sourceChip(sourceId, resolutionMeters),
+                    ),
+                    // The legend describes the depth ramp; a photographed
+                    // surface has no ramp to explain.
+                    if (appearance.surfaceMode != SeascapeSurfaceMode.imagery)
                       Positioned(
-                        top: 8,
-                        left: 8,
+                        top: 96,
                         right: 8,
-                        child: _sourceChip(sourceId, resolutionMeters),
+                        child: SeascapeDepthLegend(
+                          maxDepthMeters: axisInputs.maxDepth,
+                          hasLand: grid.depthsMeters.any(
+                            (d) => d == null || d <= 0,
+                          ),
+                          appearance: appearance,
+                          displayUnitInMeters: depthUnit == DepthUnit.feet
+                              ? 0.3048
+                              : 1.0,
+                          depthSymbol: depthUnit.symbol,
+                        ),
                       ),
-                      // The legend describes the depth ramp; a photographed
-                      // surface has no ramp to explain.
-                      if (appearance.surfaceMode != SeascapeSurfaceMode.imagery)
-                        Positioned(
-                          top: 40,
-                          right: 8,
-                          child: SeascapeDepthLegend(
-                            maxDepthMeters: axisInputs.maxDepth,
-                            hasLand: grid.depthsMeters.any(
-                              (d) => d == null || d <= 0,
+                    if (imagery != null)
+                      Positioned(
+                        bottom: 8,
+                        right: 8,
+                        child: _attributionChip(
+                          MapTileConfig.attribution(
+                            ref.watch(
+                              settingsProvider.select((s) => s.mapStyle),
                             ),
-                            appearance: appearance,
-                            displayUnitInMeters: depthUnit == DepthUnit.feet
-                                ? 0.3048
-                                : 1.0,
-                            depthSymbol: depthUnit.symbol,
                           ),
                         ),
-                      if (imagery != null)
-                        Positioned(
-                          bottom: 8,
-                          right: 8,
-                          child: _attributionChip(
-                            MapTileConfig.attribution(
-                              ref.watch(
-                                settingsProvider.select((s) => s.mapStyle),
+                      ),
+                    _hoverTooltip(grid),
+                    // Former AppBar actions, docked so any host gets them.
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 2,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                key: const ValueKey('seascapeAppearanceButton'),
+                                icon: const Icon(Icons.tune, size: 20),
+                                tooltip:
+                                    context.l10n.dive3d_seascape_appearance,
+                                onPressed: () =>
+                                    showTerrainAppearanceSheet(context),
                               ),
-                            ),
+                              IconButton(
+                                key: const ValueKey('seascapeChartToggle'),
+                                icon: Icon(
+                                  _chartMode
+                                      ? Icons.view_in_ar
+                                      : Icons.map_outlined,
+                                  size: 20,
+                                ),
+                                tooltip: _chartMode
+                                    ? context.l10n.dive3d_seascape_orbitView
+                                    : context.l10n.dive3d_seascape_chartView,
+                                onPressed: () =>
+                                    setState(() => _chartMode = !_chartMode),
+                              ),
+                            ],
                           ),
                         ),
-                      _hoverTooltip(grid),
-                    ],
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
-                SafeArea(top: false, child: _overlayChips()),
-              ],
-            ),
-        },
-      ),
+              ),
+              SafeArea(top: false, child: _overlayChips()),
+            ],
+          ),
+      },
     );
   }
 

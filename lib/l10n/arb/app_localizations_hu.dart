@@ -4900,6 +4900,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'Teljes kepernyo';
 
   @override
+  String get diveLog_detail_viewMap => 'Térkép';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => 'Merulohely megtekintese';
 
   @override
@@ -22420,6 +22426,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get dive3d_seascape_appearance_surfaceBlend => 'Keverék';
+
+  @override
+  String get siteScape_mode2d => 'Térkép';
+
+  @override
+  String get siteScape_mode3d => '3D';
 
   @override
   String get dive3d_seascape_appearance_rampRange =>
