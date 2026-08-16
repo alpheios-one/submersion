@@ -24039,4 +24039,7573 @@ class AppLocalizationsAr extends AppLocalizations {
   String marineLife_species_delete_error(String error) {
     return 'خطأ في حذف النوع: $error';
   }
+
+  @override
+  String get enum_diveField_diveNumber => 'رقم الغوصة';
+
+  @override
+  String get enum_diveField_dateTime => 'التاريخ والوقت';
+
+  @override
+  String get enum_diveField_siteName => 'اسم الموقع';
+
+  @override
+  String get enum_diveField_diveName => 'اسم الغوصة';
+
+  @override
+  String get enum_diveField_maxDepth => 'أقصى عمق';
+
+  @override
+  String get enum_diveField_avgDepth => 'متوسط العمق';
+
+  @override
+  String get enum_diveField_bottomTime => 'وقت القاع';
+
+  @override
+  String get enum_diveField_runtime => 'وقت التشغيل';
+
+  @override
+  String get enum_diveField_waterTemp => 'حرارة الماء';
+
+  @override
+  String get enum_diveField_airTemp => 'حرارة الهواء';
+
+  @override
+  String get enum_diveField_visibility => 'الرؤية';
+
+  @override
+  String get enum_diveField_currentDirection => 'اتجاه التيار';
+
+  @override
+  String get enum_diveField_currentStrength => 'قوة التيار';
+
+  @override
+  String get enum_diveField_swellHeight => 'ارتفاع الموج';
+
+  @override
+  String get enum_diveField_entryMethod => 'طريقة الدخول';
+
+  @override
+  String get enum_diveField_exitMethod => 'طريقة الخروج';
+
+  @override
+  String get enum_diveField_waterType => 'نوع المياه';
+
+  @override
+  String get enum_diveField_altitude => 'الارتفاع';
+
+  @override
+  String get enum_diveField_surfacePressure => 'ضغط السطح';
+
+  @override
+  String get enum_diveField_windSpeed => 'سرعة الرياح';
+
+  @override
+  String get enum_diveField_cloudCover => 'الغطاء السحابي';
+
+  @override
+  String get enum_diveField_precipitation => 'هطول الأمطار';
+
+  @override
+  String get enum_diveField_humidity => 'الرطوبة';
+
+  @override
+  String get enum_diveField_weatherDescription => 'الطقس';
+
+  @override
+  String get enum_diveField_primaryGas => 'الغاز الأساسي';
+
+  @override
+  String get enum_diveField_diluentGas => 'غاز المخفف';
+
+  @override
+  String get enum_diveField_tankCount => 'عدد الأسطوانات';
+
+  @override
+  String get enum_diveField_startPressure => 'ضغط البداية';
+
+  @override
+  String get enum_diveField_endPressure => 'ضغط النهاية';
+
+  @override
+  String get enum_diveField_sacRate => 'معدل SAC';
+
+  @override
+  String get enum_diveField_gasConsumed => 'الغاز المستهلك';
+
+  @override
+  String get enum_diveField_totalWeight => 'الوزن الإجمالي';
+
+  @override
+  String get enum_diveField_diveComputerModel => 'حاسوب الغوص';
+
+  @override
+  String get enum_diveField_gradientFactorLow => 'GF منخفض';
+
+  @override
+  String get enum_diveField_gradientFactorHigh => 'GF مرتفع';
+
+  @override
+  String get enum_diveField_decoAlgorithm => 'خوارزمية إزالة التشبع';
+
+  @override
+  String get enum_diveField_decoConservatism => 'التحفظ';
+
+  @override
+  String get enum_diveField_cnsStart => 'CNS البداية';
+
+  @override
+  String get enum_diveField_cnsEnd => 'CNS النهاية';
+
+  @override
+  String get enum_diveField_otu => 'OTU';
+
+  @override
+  String get enum_diveField_diveMode => 'وضع الغوص';
+
+  @override
+  String get enum_diveField_setpointLow => 'النقطة المحددة المنخفضة';
+
+  @override
+  String get enum_diveField_setpointHigh => 'النقطة المحددة المرتفعة';
+
+  @override
+  String get enum_diveField_setpointDeco => 'النقطة المحددة للتخفيف';
+
+  @override
+  String get enum_diveField_buddy => 'زميل الغوص';
+
+  @override
+  String get enum_diveField_diveMaster => 'دايف ماستر';
+
+  @override
+  String get enum_diveField_siteLocation => 'موقع الغوصة';
+
+  @override
+  String get enum_diveField_diveCenterName => 'مركز الغوص';
+
+  @override
+  String get enum_diveField_siteLatitude => 'خط العرض';
+
+  @override
+  String get enum_diveField_siteLongitude => 'خط الطول';
+
+  @override
+  String get enum_diveField_tripName => 'الرحلة';
+
+  @override
+  String get enum_diveField_ratingStars => 'التقييم';
+
+  @override
+  String get enum_diveField_isFavorite => 'مفضّل';
+
+  @override
+  String get enum_diveField_notes => 'ملاحظات';
+
+  @override
+  String get enum_diveField_tags => 'الوسوم';
+
+  @override
+  String get enum_diveField_importSource => 'مصدر الاستيراد';
+
+  @override
+  String get enum_diveField_diveTypeName => 'نوع الغوصة';
+
+  @override
+  String get enum_diveField_surfaceInterval => 'فترة السطح';
+
+  @override
+  String get enum_diveField_diveNumber_short => '#';
+
+  @override
+  String get enum_diveField_dateTime_short => 'التاريخ';
+
+  @override
+  String get enum_diveField_siteName_short => 'الموقع';
+
+  @override
+  String get enum_diveField_diveName_short => 'الاسم';
+
+  @override
+  String get enum_diveField_maxDepth_short => 'أقصى عمق';
+
+  @override
+  String get enum_diveField_avgDepth_short => 'متوسط عمق';
+
+  @override
+  String get enum_diveField_bottomTime_short => 'القاع';
+
+  @override
+  String get enum_diveField_runtime_short => 'التشغيل';
+
+  @override
+  String get enum_diveField_waterTemp_short => 'حرارة ماء';
+
+  @override
+  String get enum_diveField_airTemp_short => 'حرارة هواء';
+
+  @override
+  String get enum_diveField_visibility_short => 'الرؤية';
+
+  @override
+  String get enum_diveField_currentDirection_short => 'اتجاه';
+
+  @override
+  String get enum_diveField_currentStrength_short => 'التيار';
+
+  @override
+  String get enum_diveField_swellHeight_short => 'الموج';
+
+  @override
+  String get enum_diveField_entryMethod_short => 'الدخول';
+
+  @override
+  String get enum_diveField_exitMethod_short => 'الخروج';
+
+  @override
+  String get enum_diveField_waterType_short => 'المياه';
+
+  @override
+  String get enum_diveField_altitude_short => 'الارتفاع';
+
+  @override
+  String get enum_diveField_surfacePressure_short => 'ضغط السطح';
+
+  @override
+  String get enum_diveField_windSpeed_short => 'الرياح';
+
+  @override
+  String get enum_diveField_cloudCover_short => 'السحب';
+
+  @override
+  String get enum_diveField_precipitation_short => 'الأمطار';
+
+  @override
+  String get enum_diveField_humidity_short => 'الرطوبة';
+
+  @override
+  String get enum_diveField_weatherDescription_short => 'الطقس';
+
+  @override
+  String get enum_diveField_primaryGas_short => 'الغاز';
+
+  @override
+  String get enum_diveField_diluentGas_short => 'المخفف';
+
+  @override
+  String get enum_diveField_tankCount_short => 'أسطوانات';
+
+  @override
+  String get enum_diveField_startPressure_short => 'البداية';
+
+  @override
+  String get enum_diveField_endPressure_short => 'النهاية';
+
+  @override
+  String get enum_diveField_sacRate_short => 'SAC';
+
+  @override
+  String get enum_diveField_gasConsumed_short => 'المستهلك';
+
+  @override
+  String get enum_diveField_totalWeight_short => 'الوزن';
+
+  @override
+  String get enum_diveField_diveComputerModel_short => 'الحاسوب';
+
+  @override
+  String get enum_diveField_gradientFactorLow_short => 'GFL';
+
+  @override
+  String get enum_diveField_gradientFactorHigh_short => 'GFH';
+
+  @override
+  String get enum_diveField_decoAlgorithm_short => 'خوارزمية';
+
+  @override
+  String get enum_diveField_decoConservatism_short => 'التحفظ';
+
+  @override
+  String get enum_diveField_cnsStart_short => 'CNS بداية';
+
+  @override
+  String get enum_diveField_cnsEnd_short => 'CNS نهاية';
+
+  @override
+  String get enum_diveField_otu_short => 'OTU';
+
+  @override
+  String get enum_diveField_diveMode_short => 'الوضع';
+
+  @override
+  String get enum_diveField_setpointLow_short => 'SP منخفض';
+
+  @override
+  String get enum_diveField_setpointHigh_short => 'SP مرتفع';
+
+  @override
+  String get enum_diveField_setpointDeco_short => 'SP تخفيف';
+
+  @override
+  String get enum_diveField_buddy_short => 'الزميل';
+
+  @override
+  String get enum_diveField_diveMaster_short => 'DM';
+
+  @override
+  String get enum_diveField_siteLocation_short => 'المكان';
+
+  @override
+  String get enum_diveField_diveCenterName_short => 'المركز';
+
+  @override
+  String get enum_diveField_siteLatitude_short => 'العرض';
+
+  @override
+  String get enum_diveField_siteLongitude_short => 'الطول';
+
+  @override
+  String get enum_diveField_tripName_short => 'الرحلة';
+
+  @override
+  String get enum_diveField_ratingStars_short => 'التقييم';
+
+  @override
+  String get enum_diveField_isFavorite_short => 'مفضّل';
+
+  @override
+  String get enum_diveField_notes_short => 'ملاحظات';
+
+  @override
+  String get enum_diveField_tags_short => 'الوسوم';
+
+  @override
+  String get enum_diveField_importSource_short => 'المصدر';
+
+  @override
+  String get enum_diveField_diveTypeName_short => 'النوع';
+
+  @override
+  String get enum_diveField_surfaceInterval_short => 'السطح';
+
+  @override
+  String get enum_siteField_siteName => 'الاسم';
+
+  @override
+  String get enum_siteField_location => 'الموقع';
+
+  @override
+  String get enum_siteField_country => 'الدولة';
+
+  @override
+  String get enum_siteField_region => 'المنطقة';
+
+  @override
+  String get enum_siteField_city => 'المدينة';
+
+  @override
+  String get enum_siteField_island => 'الجزيرة';
+
+  @override
+  String get enum_siteField_bodyOfWater => 'مسطح مائي';
+
+  @override
+  String get enum_siteField_diveCount => 'عدد الغوصات';
+
+  @override
+  String get enum_siteField_maxDepth => 'أقصى عمق';
+
+  @override
+  String get enum_siteField_minDepth => 'أدنى عمق';
+
+  @override
+  String get enum_siteField_altitude => 'الارتفاع';
+
+  @override
+  String get enum_siteField_waterType => 'نوع المياه';
+
+  @override
+  String get enum_siteField_typicalVisibility => 'الرؤية المعتادة';
+
+  @override
+  String get enum_siteField_typicalCurrent => 'التيار المعتاد';
+
+  @override
+  String get enum_siteField_difficulty => 'الصعوبة';
+
+  @override
+  String get enum_siteField_entryType => 'نوع الدخول';
+
+  @override
+  String get enum_siteField_bestSeason => 'أفضل موسم';
+
+  @override
+  String get enum_siteField_mooringNumber => 'رقم المرسى';
+
+  @override
+  String get enum_siteField_hazards => 'المخاطر';
+
+  @override
+  String get enum_siteField_rating => 'التقييم';
+
+  @override
+  String get enum_siteField_notes => 'ملاحظات';
+
+  @override
+  String get enum_siteField_latitude => 'خط العرض';
+
+  @override
+  String get enum_siteField_longitude => 'خط الطول';
+
+  @override
+  String get enum_siteField_siteName_short => 'الاسم';
+
+  @override
+  String get enum_siteField_location_short => 'الموقع';
+
+  @override
+  String get enum_siteField_country_short => 'الدولة';
+
+  @override
+  String get enum_siteField_region_short => 'المنطقة';
+
+  @override
+  String get enum_siteField_city_short => 'المدينة';
+
+  @override
+  String get enum_siteField_island_short => 'الجزيرة';
+
+  @override
+  String get enum_siteField_bodyOfWater_short => 'مسطح مائي';
+
+  @override
+  String get enum_siteField_diveCount_short => 'الغوصات';
+
+  @override
+  String get enum_siteField_maxDepth_short => 'أقصى عمق';
+
+  @override
+  String get enum_siteField_minDepth_short => 'أدنى عمق';
+
+  @override
+  String get enum_siteField_altitude_short => 'الارتفاع';
+
+  @override
+  String get enum_siteField_waterType_short => 'المياه';
+
+  @override
+  String get enum_siteField_typicalVisibility_short => 'الرؤية';
+
+  @override
+  String get enum_siteField_typicalCurrent_short => 'التيار';
+
+  @override
+  String get enum_siteField_difficulty_short => 'الصعوبة';
+
+  @override
+  String get enum_siteField_entryType_short => 'الدخول';
+
+  @override
+  String get enum_siteField_bestSeason_short => 'الموسم';
+
+  @override
+  String get enum_siteField_mooringNumber_short => 'المرسى';
+
+  @override
+  String get enum_siteField_hazards_short => 'المخاطر';
+
+  @override
+  String get enum_siteField_rating_short => 'التقييم';
+
+  @override
+  String get enum_siteField_notes_short => 'ملاحظات';
+
+  @override
+  String get enum_siteField_latitude_short => 'العرض';
+
+  @override
+  String get enum_siteField_longitude_short => 'الطول';
+
+  @override
+  String get enum_buddyField_buddyName => 'الاسم';
+
+  @override
+  String get enum_buddyField_email => 'البريد الإلكتروني';
+
+  @override
+  String get enum_buddyField_phone => 'الهاتف';
+
+  @override
+  String get enum_buddyField_certificationLevel => 'مستوى الاعتماد';
+
+  @override
+  String get enum_buddyField_certificationAgency => 'جهة الاعتماد';
+
+  @override
+  String get enum_buddyField_diveCount => 'عدد الغوصات';
+
+  @override
+  String get enum_buddyField_notes => 'ملاحظات';
+
+  @override
+  String get enum_buddyField_buddyName_short => 'الاسم';
+
+  @override
+  String get enum_buddyField_email_short => 'البريد';
+
+  @override
+  String get enum_buddyField_phone_short => 'الهاتف';
+
+  @override
+  String get enum_buddyField_certificationLevel_short => 'المستوى';
+
+  @override
+  String get enum_buddyField_certificationAgency_short => 'الجهة';
+
+  @override
+  String get enum_buddyField_diveCount_short => 'الغوصات';
+
+  @override
+  String get enum_buddyField_notes_short => 'ملاحظات';
+
+  @override
+  String get enum_tripField_tripName => 'الاسم';
+
+  @override
+  String get enum_tripField_startDate => 'تاريخ البدء';
+
+  @override
+  String get enum_tripField_endDate => 'تاريخ الانتهاء';
+
+  @override
+  String get enum_tripField_durationDays => 'المدة';
+
+  @override
+  String get enum_tripField_location => 'الموقع';
+
+  @override
+  String get enum_tripField_tripType => 'نوع الرحلة';
+
+  @override
+  String get enum_tripField_resortName => 'المنتجع';
+
+  @override
+  String get enum_tripField_liveaboardName => 'سفينة غوص';
+
+  @override
+  String get enum_tripField_diveCount => 'عدد الغوصات';
+
+  @override
+  String get enum_tripField_totalBottomTime => 'إجمالي وقت القاع';
+
+  @override
+  String get enum_tripField_maxDepth => 'أقصى عمق';
+
+  @override
+  String get enum_tripField_avgDepth => 'متوسط العمق';
+
+  @override
+  String get enum_tripField_notes => 'ملاحظات';
+
+  @override
+  String get enum_tripField_tripName_short => 'الاسم';
+
+  @override
+  String get enum_tripField_startDate_short => 'البداية';
+
+  @override
+  String get enum_tripField_endDate_short => 'النهاية';
+
+  @override
+  String get enum_tripField_durationDays_short => 'الأيام';
+
+  @override
+  String get enum_tripField_location_short => 'الموقع';
+
+  @override
+  String get enum_tripField_tripType_short => 'النوع';
+
+  @override
+  String get enum_tripField_resortName_short => 'المنتجع';
+
+  @override
+  String get enum_tripField_liveaboardName_short => 'السفينة';
+
+  @override
+  String get enum_tripField_diveCount_short => 'الغوصات';
+
+  @override
+  String get enum_tripField_totalBottomTime_short => 'إجمالي القاع';
+
+  @override
+  String get enum_tripField_maxDepth_short => 'أقصى عمق';
+
+  @override
+  String get enum_tripField_avgDepth_short => 'متوسط عمق';
+
+  @override
+  String get enum_tripField_notes_short => 'ملاحظات';
+
+  @override
+  String get enum_equipmentField_itemName => 'الاسم';
+
+  @override
+  String get enum_equipmentField_fullName => 'الاسم الكامل';
+
+  @override
+  String get enum_equipmentField_type => 'النوع';
+
+  @override
+  String get enum_equipmentField_brand => 'العلامة التجارية';
+
+  @override
+  String get enum_equipmentField_model => 'الطراز';
+
+  @override
+  String get enum_equipmentField_serialNumber => 'الرقم التسلسلي';
+
+  @override
+  String get enum_equipmentField_size => 'المقاس';
+
+  @override
+  String get enum_equipmentField_status => 'الحالة';
+
+  @override
+  String get enum_equipmentField_isActive => 'نشط';
+
+  @override
+  String get enum_equipmentField_purchaseDate => 'تاريخ الشراء';
+
+  @override
+  String get enum_equipmentField_purchasePrice => 'سعر الشراء';
+
+  @override
+  String get enum_equipmentField_lastServiceDate => 'آخر صيانة';
+
+  @override
+  String get enum_equipmentField_nextServiceDue => 'موعد الصيانة القادمة';
+
+  @override
+  String get enum_equipmentField_daysUntilService => 'أيام حتى الصيانة';
+
+  @override
+  String get enum_equipmentField_serviceIntervalDays => 'فترة الصيانة';
+
+  @override
+  String get enum_equipmentField_notes => 'ملاحظات';
+
+  @override
+  String get enum_equipmentField_itemName_short => 'الاسم';
+
+  @override
+  String get enum_equipmentField_fullName_short => 'اسم كامل';
+
+  @override
+  String get enum_equipmentField_type_short => 'النوع';
+
+  @override
+  String get enum_equipmentField_brand_short => 'العلامة';
+
+  @override
+  String get enum_equipmentField_model_short => 'الطراز';
+
+  @override
+  String get enum_equipmentField_serialNumber_short => 'التسلسلي';
+
+  @override
+  String get enum_equipmentField_size_short => 'المقاس';
+
+  @override
+  String get enum_equipmentField_status_short => 'الحالة';
+
+  @override
+  String get enum_equipmentField_isActive_short => 'نشط';
+
+  @override
+  String get enum_equipmentField_purchaseDate_short => 'الشراء';
+
+  @override
+  String get enum_equipmentField_purchasePrice_short => 'السعر';
+
+  @override
+  String get enum_equipmentField_lastServiceDate_short => 'آخر صيانة';
+
+  @override
+  String get enum_equipmentField_nextServiceDue_short => 'القادمة';
+
+  @override
+  String get enum_equipmentField_daysUntilService_short => 'المتبقية';
+
+  @override
+  String get enum_equipmentField_serviceIntervalDays_short => 'الفترة';
+
+  @override
+  String get enum_equipmentField_notes_short => 'ملاحظات';
+
+  @override
+  String get enum_diveCenterField_centerName => 'الاسم';
+
+  @override
+  String get enum_diveCenterField_city => 'المدينة';
+
+  @override
+  String get enum_diveCenterField_country => 'الدولة';
+
+  @override
+  String get enum_diveCenterField_stateProvince => 'الولاية / المقاطعة';
+
+  @override
+  String get enum_diveCenterField_street => 'الشارع';
+
+  @override
+  String get enum_diveCenterField_postalCode => 'الرمز البريدي';
+
+  @override
+  String get enum_diveCenterField_phone => 'الهاتف';
+
+  @override
+  String get enum_diveCenterField_email => 'البريد الإلكتروني';
+
+  @override
+  String get enum_diveCenterField_website => 'الموقع الإلكتروني';
+
+  @override
+  String get enum_diveCenterField_affiliations => 'الانتماءات';
+
+  @override
+  String get enum_diveCenterField_rating => 'التقييم';
+
+  @override
+  String get enum_diveCenterField_latitude => 'خط العرض';
+
+  @override
+  String get enum_diveCenterField_longitude => 'خط الطول';
+
+  @override
+  String get enum_diveCenterField_diveCount => 'عدد الغوصات';
+
+  @override
+  String get enum_diveCenterField_notes => 'ملاحظات';
+
+  @override
+  String get enum_diveCenterField_centerName_short => 'الاسم';
+
+  @override
+  String get enum_diveCenterField_city_short => 'المدينة';
+
+  @override
+  String get enum_diveCenterField_country_short => 'الدولة';
+
+  @override
+  String get enum_diveCenterField_stateProvince_short => 'الولاية';
+
+  @override
+  String get enum_diveCenterField_street_short => 'الشارع';
+
+  @override
+  String get enum_diveCenterField_postalCode_short => 'الرمز';
+
+  @override
+  String get enum_diveCenterField_phone_short => 'الهاتف';
+
+  @override
+  String get enum_diveCenterField_email_short => 'البريد';
+
+  @override
+  String get enum_diveCenterField_website_short => 'الويب';
+
+  @override
+  String get enum_diveCenterField_affiliations_short => 'الانتماءات';
+
+  @override
+  String get enum_diveCenterField_rating_short => 'التقييم';
+
+  @override
+  String get enum_diveCenterField_latitude_short => 'العرض';
+
+  @override
+  String get enum_diveCenterField_longitude_short => 'الطول';
+
+  @override
+  String get enum_diveCenterField_diveCount_short => 'الغوصات';
+
+  @override
+  String get enum_diveCenterField_notes_short => 'ملاحظات';
+
+  @override
+  String get enum_certificationField_certName => 'الاسم';
+
+  @override
+  String get enum_certificationField_agency => 'الجهة';
+
+  @override
+  String get enum_certificationField_level => 'الشهادة';
+
+  @override
+  String get enum_certificationField_cardNumber => 'رقم البطاقة';
+
+  @override
+  String get enum_certificationField_issueDate => 'تاريخ الإصدار';
+
+  @override
+  String get enum_certificationField_expiryDate => 'تاريخ الانتهاء';
+
+  @override
+  String get enum_certificationField_instructorName => 'اسم المدرب';
+
+  @override
+  String get enum_certificationField_instructorNumber => 'رقم المدرب';
+
+  @override
+  String get enum_certificationField_expiryStatus => 'حالة الصلاحية';
+
+  @override
+  String get enum_certificationField_notes => 'ملاحظات';
+
+  @override
+  String get enum_certificationField_certName_short => 'الاسم';
+
+  @override
+  String get enum_certificationField_agency_short => 'الجهة';
+
+  @override
+  String get enum_certificationField_level_short => 'الشهادة';
+
+  @override
+  String get enum_certificationField_cardNumber_short => 'البطاقة';
+
+  @override
+  String get enum_certificationField_issueDate_short => 'الإصدار';
+
+  @override
+  String get enum_certificationField_expiryDate_short => 'الانتهاء';
+
+  @override
+  String get enum_certificationField_instructorName_short => 'المدرب';
+
+  @override
+  String get enum_certificationField_instructorNumber_short => 'المدرب #';
+
+  @override
+  String get enum_certificationField_expiryStatus_short => 'الحالة';
+
+  @override
+  String get enum_certificationField_notes_short => 'ملاحظات';
+
+  @override
+  String get enum_courseField_courseName => 'الاسم';
+
+  @override
+  String get enum_courseField_agency => 'الجهة';
+
+  @override
+  String get enum_courseField_startDate => 'تاريخ البدء';
+
+  @override
+  String get enum_courseField_completionDate => 'تاريخ الإكمال';
+
+  @override
+  String get enum_courseField_durationDays => 'المدة';
+
+  @override
+  String get enum_courseField_instructorName => 'اسم المدرب';
+
+  @override
+  String get enum_courseField_instructorNumber => 'رقم المدرب';
+
+  @override
+  String get enum_courseField_location => 'الموقع';
+
+  @override
+  String get enum_courseField_isCompleted => 'مكتمل';
+
+  @override
+  String get enum_courseField_notes => 'ملاحظات';
+
+  @override
+  String get enum_courseField_courseName_short => 'الاسم';
+
+  @override
+  String get enum_courseField_agency_short => 'الجهة';
+
+  @override
+  String get enum_courseField_startDate_short => 'البداية';
+
+  @override
+  String get enum_courseField_completionDate_short => 'الإكمال';
+
+  @override
+  String get enum_courseField_durationDays_short => 'المدة';
+
+  @override
+  String get enum_courseField_instructorName_short => 'المدرب';
+
+  @override
+  String get enum_courseField_instructorNumber_short => 'المدرب #';
+
+  @override
+  String get enum_courseField_location_short => 'الموقع';
+
+  @override
+  String get enum_courseField_isCompleted_short => 'تم';
+
+  @override
+  String get enum_courseField_notes_short => 'ملاحظات';
+
+  @override
+  String get enum_fieldCategory_accommodation => 'الإقامة';
+
+  @override
+  String get enum_fieldCategory_address => 'العنوان';
+
+  @override
+  String get enum_fieldCategory_certification => 'الشهادة';
+
+  @override
+  String get enum_fieldCategory_conditions => 'الظروف';
+
+  @override
+  String get enum_fieldCategory_contact => 'الاتصال';
+
+  @override
+  String get enum_fieldCategory_coordinates => 'الإحداثيات';
+
+  @override
+  String get enum_fieldCategory_dates => 'التواريخ';
+
+  @override
+  String get enum_fieldCategory_depth => 'العمق';
+
+  @override
+  String get enum_fieldCategory_details => 'التفاصيل';
+
+  @override
+  String get enum_fieldCategory_instructor => 'المدرب';
+
+  @override
+  String get enum_fieldCategory_other => 'أخرى';
+
+  @override
+  String get enum_fieldCategory_purchase => 'الشراء';
+
+  @override
+  String get enum_fieldCategory_service => 'الصيانة';
+
+  @override
+  String get enum_fieldCategory_statistics => 'الإحصائيات';
+
+  @override
+  String get species_whale_shark_name => 'القرش الحوتي';
+
+  @override
+  String get species_whale_shark_desc =>
+      'أكبر سمكة في المحيط، وهو مرشِّح لطيف يتغذى بالترشيح ويتميز بنمط منقّط فريد.';
+
+  @override
+  String get species_great_white_shark_name => 'القرش الأبيض الكبير';
+
+  @override
+  String get species_great_white_shark_desc =>
+      'مفترس قمة أيقوني يشاهده أحيانًا الغواصون من داخل الأقفاص في المياه المعتدلة.';
+
+  @override
+  String get species_great_hammerhead_shark_name => 'قرش المطرقة العظيم';
+
+  @override
+  String get species_great_hammerhead_shark_desc =>
+      'أكبر أنواع أسماك المطرقة، برأس عريض مسطح وزعنفة ظهرية مرتفعة.';
+
+  @override
+  String get species_scalloped_hammerhead_shark_name => 'قرش المطرقة المسنن';
+
+  @override
+  String get species_scalloped_hammerhead_shark_desc =>
+      'كثيرًا ما يُشاهد في أسراب كبيرة عند الجبال البحرية ومحطات التنظيف.';
+
+  @override
+  String get species_smooth_hammerhead_shark_name => 'قرش المطرقة الأملس';
+
+  @override
+  String get species_smooth_hammerhead_shark_desc =>
+      'قرش مطرقة بحافة رأس ملساء مستديرة يعيش في البحار المعتدلة.';
+
+  @override
+  String get species_whitetip_reef_shark_name => 'قرش الشعاب أبيض الأطراف';
+
+  @override
+  String get species_whitetip_reef_shark_desc =>
+      'ساكن شعاب وديع يُشاهد غالبًا مستريحًا في الكهوف وتحت الحواف الصخرية نهارًا.';
+
+  @override
+  String get species_blacktip_reef_shark_name => 'قرش الشعاب أسود الأطراف';
+
+  @override
+  String get species_blacktip_reef_shark_desc =>
+      'قرش شعاب شائع في المياه الضحلة يتميز بزعانف سوداء الأطراف.';
+
+  @override
+  String get species_grey_reef_shark_name => 'قرش الشعاب الرمادي';
+
+  @override
+  String get species_grey_reef_shark_desc =>
+      'مفترس شعاب نشط يُصادَف غالبًا في مجموعات على طول المنحدرات والقنوات.';
+
+  @override
+  String get species_caribbean_reef_shark_name => 'قرش شعاب الكاريبي';
+
+  @override
+  String get species_caribbean_reef_shark_desc =>
+      'أكثر أسماك قرش الشعاب مصادفةً في الكاريبي، متين البنية وفضولي تجاه الغواصين.';
+
+  @override
+  String get species_nurse_shark_name => 'القرش الممرض';
+
+  @override
+  String get species_nurse_shark_desc =>
+      'ساكن قاع بطيء الحركة يُشاهد غالبًا مستريحًا تحت حواف المرجان.';
+
+  @override
+  String get species_tawny_nurse_shark_name => 'القرش الممرض الأسمر';
+
+  @override
+  String get species_tawny_nurse_shark_desc =>
+      'ساكن قاع من المحيطين الهندي والهادئ يستريح في كهوف الشعاب والمناطق الرملية.';
+
+  @override
+  String get species_bull_shark_name => 'القرش الثور';
+
+  @override
+  String get species_bull_shark_desc =>
+      'قرش ممتلئ وقوي يوجد في البيئات الساحلية والمياه العذبة حول العالم.';
+
+  @override
+  String get species_tiger_shark_name => 'القرش النمر';
+
+  @override
+  String get species_tiger_shark_desc =>
+      'مفترس كبير بنمط مخطط مميز، يُصادَف في غوصات الشعاب العميقة.';
+
+  @override
+  String get species_oceanic_whitetip_shark_name =>
+      'القرش المحيطي أبيض الأطراف';
+
+  @override
+  String get species_oceanic_whitetip_shark_desc =>
+      'قرش من أعالي البحار بزعانف مستديرة بيضاء الأطراف، يُشاهد في غوصات المحيط المفتوح.';
+
+  @override
+  String get species_thresher_shark_name => 'القرش الدرّاس';
+
+  @override
+  String get species_thresher_shark_desc =>
+      'يُعرف بزعنفة ذيله الطويلة للغاية، ويُشاهد أحيانًا عند محطات التنظيف.';
+
+  @override
+  String get species_pelagic_thresher_shark_name => 'القرش الدرّاس المحيطي';
+
+  @override
+  String get species_pelagic_thresher_shark_desc =>
+      'أصغر أنواع القرش الدرّاس، ويشتهر بمشاهدته عند ضحل موناد في الفلبين.';
+
+  @override
+  String get species_shortfin_mako_shark_name => 'قرش الماكو قصير الزعنفة';
+
+  @override
+  String get species_shortfin_mako_shark_desc =>
+      'أسرع قرش في المحيط، مفترس أنيق في المياه المفتوحة بلون أزرق معدني.';
+
+  @override
+  String get species_blue_shark_name => 'القرش الأزرق';
+
+  @override
+  String get species_blue_shark_desc =>
+      'قرش نحيل أزرق داكن من أعالي البحار يُصادَف غالبًا في غوصات المياه الزرقاء.';
+
+  @override
+  String get species_spotted_wobbegong_name => 'قرش السجاد المرقّط';
+
+  @override
+  String get species_spotted_wobbegong_desc =>
+      'قرش سجاد مسطح ومموّه يرقد بلا حراك على الشعاب الصخرية في أستراليا.';
+
+  @override
+  String get species_tasselled_wobbegong_name => 'قرش السجاد المهدّب';
+
+  @override
+  String get species_tasselled_wobbegong_desc =>
+      'قرش سجاد مزخرف بفصوص مهدّبة حول رأسه، يعيش في الشعاب المرجانية.';
+
+  @override
+  String get species_epaulette_shark_name => 'قرش الكتفية';
+
+  @override
+  String get species_epaulette_shark_desc =>
+      'قرش صغير يسير على قاع الشعاب مستخدمًا زعانفه الصدرية.';
+
+  @override
+  String get species_horn_shark_name => 'القرش القرني';
+
+  @override
+  String get species_horn_shark_desc =>
+      'ساكن قاع ليلي النشاط بحواف بارزة فوق عينيه، يوجد قبالة كاليفورنيا.';
+
+  @override
+  String get species_leopard_shark_name => 'قرش الفهد';
+
+  @override
+  String get species_leopard_shark_desc =>
+      'قرش بنقوش جميلة يعيش في الخلجان الضحلة على طول ساحل المحيط الهادئ الأمريكي.';
+
+  @override
+  String get species_pacific_angel_shark_name => 'قرش الملاك الهادئي';
+
+  @override
+  String get species_pacific_angel_shark_desc =>
+      'مفترس كمين مسطح الجسم يرقد مدفونًا في الرمال على قاع البحر.';
+
+  @override
+  String get species_sand_tiger_shark_name => 'قرش نمر الرمال';
+
+  @override
+  String get species_sand_tiger_shark_desc =>
+      'قرش مخيف المظهر لكنه وديع، يُشاهد غالبًا محلّقًا في الكهوف وحطام السفن.';
+
+  @override
+  String get species_zebra_shark_name => 'قرش الزرد';
+
+  @override
+  String get species_zebra_shark_desc =>
+      'قرش شعاب منقّط يستريح على القيعان الرملية، وشائع في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_blacktip_shark_name => 'القرش أسود الأطراف';
+
+  @override
+  String get species_blacktip_shark_desc =>
+      'قرش ساحلي سريع يشتهر بقفزاته الدوّارة، ويوجد في المياه الدافئة حول العالم.';
+
+  @override
+  String get species_silvertip_shark_name => 'القرش فضي الأطراف';
+
+  @override
+  String get species_silvertip_shark_desc =>
+      'قرش شعاب جريء بزعانف بيضاء الحواف، يوجد قرب المنحدرات العميقة والجزر المرجانية.';
+
+  @override
+  String get species_silky_shark_name => 'القرش الحريري';
+
+  @override
+  String get species_silky_shark_desc =>
+      'قرش أنيق من أعالي البحار بجلد ناعم، يوجد غالبًا قرب الشعاب البعيدة عن الساحل.';
+
+  @override
+  String get species_lemon_shark_name => 'قرش الليمون';
+
+  @override
+  String get species_lemon_shark_desc =>
+      'قرش بلون بني مصفرّ يُشاهد عادةً في غابات المانغروف الضحلة والسهول الرملية.';
+
+  @override
+  String get species_galapagos_shark_name => 'قرش غالاباغوس';
+
+  @override
+  String get species_galapagos_shark_desc =>
+      'قرش شعاب كبير يوجد حول الجزر المحيطية، وفضولي تجاه الغواصين.';
+
+  @override
+  String get species_port_jackson_shark_name => 'قرش بورت جاكسون';
+
+  @override
+  String get species_port_jackson_shark_desc =>
+      'ساكن قاع ليلي النشاط بعلامات تشبه الحزام، متوطن في أستراليا.';
+
+  @override
+  String get species_bamboo_shark_name => 'قرش الخيزران بنّي الأشرطة';
+
+  @override
+  String get species_bamboo_shark_desc =>
+      'قرش صغير وديع يعيش على القاع وينتشر في الشعاب المرجانية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_basking_shark_name => 'القرش المتشمس';
+
+  @override
+  String get species_basking_shark_desc =>
+      'ثاني أكبر سمكة في العالم، يتغذى بالترشيح ويُشاهد في المياه السطحية المعتدلة.';
+
+  @override
+  String get species_greenland_shark_name => 'قرش غرينلاند';
+
+  @override
+  String get species_greenland_shark_desc =>
+      'قرش أعماق بطيء الحركة، وأحد أطول الفقاريات عمرًا على وجه الأرض.';
+
+  @override
+  String get species_cookiecutter_shark_name => 'القرش قاطع البسكويت';
+
+  @override
+  String get species_cookiecutter_shark_desc =>
+      'قرش أعماق صغير يقتطع عضّات دائرية من الحيوانات البحرية الأكبر منه.';
+
+  @override
+  String get species_sevengill_shark_name => 'القرش سباعي الخياشيم عريض الأنف';
+
+  @override
+  String get species_sevengill_shark_desc =>
+      'قرش بدائي بسبعة شقوق خيشومية، يُصادَف في غوصات غابات عشب البحر المعتدلة.';
+
+  @override
+  String get species_pyjama_shark_name => 'قرش البيجاما';
+
+  @override
+  String get species_pyjama_shark_desc =>
+      'قرش قطي مخطط متوطن في جنوب أفريقيا، يعيش في الشعاب الصخرية وغابات عشب البحر.';
+
+  @override
+  String get species_spiny_dogfish_name => 'كلب البحر الشوكي';
+
+  @override
+  String get species_spiny_dogfish_desc =>
+      'قرش صغير وفير العدد بأشواك ظهرية سامة، يوجد في المياه المعتدلة.';
+
+  @override
+  String get species_swell_shark_name => 'القرش المنتفخ';
+
+  @override
+  String get species_swell_shark_desc =>
+      'قرش قطي ليلي النشاط ينفخ جسمه عند شعوره بالتهديد، ويوجد قبالة كاليفورنيا.';
+
+  @override
+  String get species_giant_oceanic_manta_ray_name =>
+      'شفنين المانتا المحيطي العملاق';
+
+  @override
+  String get species_giant_oceanic_manta_ray_desc =>
+      'أكبر أنواع الشفنين، مرشِّح مهيب يتغذى بالترشيح ويبلغ باع جناحيه سبعة أمتار.';
+
+  @override
+  String get species_reef_manta_ray_name => 'شفنين المانتا الشعابي';
+
+  @override
+  String get species_reef_manta_ray_desc =>
+      'نوع مانتا أصغر حجمًا يُشاهد عادةً عند محطات التنظيف في الشعاب الاستوائية.';
+
+  @override
+  String get species_spotted_eagle_ray_name => 'الشفنين النسري المرقّط';
+
+  @override
+  String get species_spotted_eagle_ray_desc =>
+      'شفنين أنيق ببقع بيضاء وذيل طويل يشبه السوط، يُشاهد غالبًا في وسط الماء.';
+
+  @override
+  String get species_common_eagle_ray_name => 'الشفنين النسري الشائع';
+
+  @override
+  String get species_common_eagle_ray_desc =>
+      'شفنين معيّن الشكل يوجد في المياه المعتدلة بشرق الأطلسي والبحر المتوسط.';
+
+  @override
+  String get species_blue_spotted_ribbontail_ray_name =>
+      'الشفنين الشريطي الذيل ذو البقع الزرقاء';
+
+  @override
+  String get species_blue_spotted_ribbontail_ray_desc =>
+      'شفنين زاهي الألوان ببقع زرقاء ساطعة، شائع في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_blue_spotted_stingray_name => 'الشفنين اللاسع أزرق البقع';
+
+  @override
+  String get species_blue_spotted_stingray_desc =>
+      'شفنين لاسع صغير من الشعاب ببقع زرقاء متناثرة، يُدفن غالبًا في الرقع الرملية.';
+
+  @override
+  String get species_southern_stingray_name => 'الشفنين اللاسع الجنوبي';
+
+  @override
+  String get species_southern_stingray_desc =>
+      'شفنين لاسع كبير يعيش على السهول الرملية في الكاريبي، ويشتهر في موقع ستينغراي سيتي.';
+
+  @override
+  String get species_round_stingray_name => 'الشفنين اللاسع المستدير';
+
+  @override
+  String get species_round_stingray_desc =>
+      'شفنين لاسع صغير دائري الشكل شائع في المناطق الرملية الضحلة بشرق المحيط الهادئ.';
+
+  @override
+  String get species_short_tail_stingray_name => 'الشفنين اللاسع قصير الذيل';
+
+  @override
+  String get species_short_tail_stingray_desc =>
+      'أحد أكبر أنواع الشفنين اللاسع، ويوجد في المياه المعتدلة بنصف الكرة الجنوبي.';
+
+  @override
+  String get species_cowtail_stingray_name => 'الشفنين اللاسع ذو ذيل البقرة';
+
+  @override
+  String get species_cowtail_stingray_desc =>
+      'شفنين لاسع كبير داكن بطية ذيل مميزة تشبه الراية، يوجد على الشعاب الرملية.';
+
+  @override
+  String get species_atlantic_torpedo_ray_name => 'الشفنين الرعّاد الأطلسي';
+
+  @override
+  String get species_atlantic_torpedo_ray_desc =>
+      'شفنين كهربائي قادر على توليد صدمات قوية، يوجد على القيعان الرملية في الأطلسي.';
+
+  @override
+  String get species_marbled_electric_ray_name => 'الشفنين الكهربائي المرمّري';
+
+  @override
+  String get species_marbled_electric_ray_desc =>
+      'شفنين كهربائي متوسطي بنمط مرمّري، يُطلق صدمة كهربائية ملحوظة.';
+
+  @override
+  String get species_giant_guitarfish_name => 'سمكة الجيتار العملاقة';
+
+  @override
+  String get species_giant_guitarfish_desc =>
+      'شفنين بهيئة القرش يوجد على القيعان الرملية قرب الشعاب المرجانية في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_shovelnose_guitarfish_name => 'سمكة الجيتار مجرفية الأنف';
+
+  @override
+  String get species_shovelnose_guitarfish_desc =>
+      'هيئة مسطحة تجمع بين الشفنين والقرش، وتنتشر في الضحال الرملية بشرق المحيط الهادئ.';
+
+  @override
+  String get species_smalltooth_sawfish_name => 'سمكة المنشار صغيرة الأسنان';
+
+  @override
+  String get species_smalltooth_sawfish_desc =>
+      'شفنين مهدد بالانقراض بشدة بمنقار مسنن، يوجد في المياه الساحلية الاستوائية.';
+
+  @override
+  String get species_green_sawfish_name => 'سمكة المنشار الخضراء';
+
+  @override
+  String get species_green_sawfish_desc =>
+      'سمكة منشار كبيرة بجسم أخضر زيتوني، تعيش في مصبات الأنهار بغرب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_devil_ray_name => 'شفنين الشيطان العملاق';
+
+  @override
+  String get species_devil_ray_desc =>
+      'شفنين موبولا كبير بزعانف رأسية، يُشاهد وهو يقفز من الماء في مجموعات.';
+
+  @override
+  String get species_spinetail_devil_ray_name => 'شفنين الشيطان شوكي الذيل';
+
+  @override
+  String get species_spinetail_devil_ray_desc =>
+      'شفنين شيطاني من أعالي البحار يُشاهد غالبًا في تجمعات كبيرة قرب السطح.';
+
+  @override
+  String get species_lesser_devil_ray_name => 'شفنين الشيطان القزم';
+
+  @override
+  String get species_lesser_devil_ray_desc =>
+      'أصغر أنواع الموبولا، ويشكّل أسرابًا كبيرة في خليج كاليفورنيا.';
+
+  @override
+  String get species_bat_ray_name => 'شفنين الخفاش';
+
+  @override
+  String get species_bat_ray_desc =>
+      'شفنين معيّن الشكل شائع في غابات عشب البحر والخلجان الرملية بكاليفورنيا.';
+
+  @override
+  String get species_undulate_ray_name => 'الشفنين المتموّج';
+
+  @override
+  String get species_undulate_ray_desc =>
+      'شفنين ذو نقوش جميلة بخطوط متموجة، يوجد في شرق المحيط الأطلسي.';
+
+  @override
+  String get species_thornback_ray_name => 'الشفنين الشوكي الظهر';
+
+  @override
+  String get species_thornback_ray_desc =>
+      'شفنين أوروبي شائع بأشواك حادة على طول ظهره وذيله.';
+
+  @override
+  String get species_cownose_ray_name => 'الشفنين ذو أنف البقرة';
+
+  @override
+  String get species_cownose_ray_desc =>
+      'يتميز برأس مشقوق مميز، ويُشاهد غالبًا في أسراب كبيرة خلال الهجرات الموسمية.';
+
+  @override
+  String get species_marble_ray_name => 'الشفنين المرمّري';
+
+  @override
+  String get species_marble_ray_desc =>
+      'شفنين لاسع كبير داكن ببقع بيضاء، يُشاهد كثيرًا عند محطات التنظيف في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_ocellate_river_stingray_name => 'شفنين النهر ذو العيون';
+
+  @override
+  String get species_ocellate_river_stingray_desc =>
+      'شفنين لاسع من المياه العذبة ببقع لافتة محاطة بحلقات برتقالية، موطنه أنهار أمريكا الجنوبية.';
+
+  @override
+  String get species_ocellaris_clownfish_name => 'سمكة المهرج';
+
+  @override
+  String get species_ocellaris_clownfish_desc =>
+      'سمكة صغيرة برتقالية بخطوط بيضاء تعيش عادةً في تكافل مع شقائق النعمان البحرية على الشعاب المرجانية.';
+
+  @override
+  String get species_clarkii_clownfish_name => 'سمكة مهرج كلارك';
+
+  @override
+  String get species_clarkii_clownfish_desc =>
+      'سمكة شقائق قوية البنية بجسم داكن وشريطين أبيضين، توجد في أنحاء المحيطين الهندي والهادئ ضمن أنواع مختلفة من شقائق النعمان.';
+
+  @override
+  String get species_tomato_clownfish_name => 'سمكة المهرج الطماطمية';
+
+  @override
+  String get species_tomato_clownfish_desc =>
+      'سمكة شقائق حمراء برتقالية زاهية بشريط أبيض واحد على الرأس، شائعة في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_regal_blue_tang_name => 'سمكة الجراح الزرقاء الملكية';
+
+  @override
+  String get species_regal_blue_tang_desc =>
+      'سمكة جراح زرقاء زاهية بعلامة سوداء تشبه لوحة الألوان وذيل أصفر، توجد في الشعاب المرجانية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_yellow_tang_name => 'سمكة الجراح الصفراء';
+
+  @override
+  String get species_yellow_tang_desc =>
+      'سمكة جراح صفراء زاهية شائعة في شعاب هاواي والمحيط الهادئ، وتُشاهد غالبًا وهي ترعى الطحالب في مجموعات.';
+
+  @override
+  String get species_powder_blue_surgeonfish_name =>
+      'سمكة الجراح الزرقاء الفاتحة';
+
+  @override
+  String get species_powder_blue_surgeonfish_desc =>
+      'سمكة جراح لافتة بلون أزرق فاتح ووجه أسود وزعنفة ظهرية صفراء، توجد في المحيط الهندي.';
+
+  @override
+  String get species_sohal_surgeonfish_name => 'سمكة السوهال';
+
+  @override
+  String get species_sohal_surgeonfish_desc =>
+      'سمكة جراح مخططة جريئة بشوكة برتقالية حادة، متوطنة في شعاب البحر الأحمر والخليج العربي.';
+
+  @override
+  String get species_blue_tang_name => 'سمكة الجراح الزرقاء';
+
+  @override
+  String get species_blue_tang_desc =>
+      'سمكة جراح زرقاء داكنة شائعة في شعاب الكاريبي، وصغارها صفراء زاهية.';
+
+  @override
+  String get species_emperor_angelfish_name => 'سمكة الملاك الإمبراطور';
+
+  @override
+  String get species_emperor_angelfish_desc =>
+      'سمكة ملاك كبيرة بخطوط أفقية زرقاء وصفراء لافتة. وتُظهر صغارها دوائر متحدة المركز بالأزرق والأبيض.';
+
+  @override
+  String get species_french_angelfish_name => 'سمكة الملاك الفرنسية';
+
+  @override
+  String get species_french_angelfish_desc =>
+      'سمكة ملاك كبيرة داكنة بحراشف مذهّبة الحواف، تُشاهد عادةً في أزواج على شعاب الكاريبي وغرب الأطلسي.';
+
+  @override
+  String get species_queen_angelfish_name => 'سمكة الملاك الملكة';
+
+  @override
+  String get species_queen_angelfish_desc =>
+      'سمكة ملاك مذهلة بالأزرق والأصفر مع بقعة تشبه التاج، توجد في الشعاب المرجانية بالكاريبي.';
+
+  @override
+  String get species_regal_angelfish_name => 'سمكة الملاك الملكية';
+
+  @override
+  String get species_regal_angelfish_desc =>
+      'سمكة ملاك أنيقة بأشرطة عمودية متناوبة برتقالية بيضاء وزرقاء، توجد في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_rock_beauty_name => 'جميلة الصخور';
+
+  @override
+  String get species_rock_beauty_desc =>
+      'سمكة ملاك كاريبية لافتة نصفها الأمامي أصفر ونصفها الخلفي أسود، توجد قرب الشعاب الصخرية والحواف.';
+
+  @override
+  String get species_gray_angelfish_name => 'سمكة الملاك الرمادية';
+
+  @override
+  String get species_gray_angelfish_desc =>
+      'سمكة ملاك رمادية كبيرة بوجه شاحب وزعنفة صدرية صفراء من الداخل، شائعة في شعاب الكاريبي.';
+
+  @override
+  String get species_copperband_butterflyfish_name =>
+      'سمكة الفراشة نحاسية الأشرطة';
+
+  @override
+  String get species_copperband_butterflyfish_desc =>
+      'سمكة فراشة مميزة بأشرطة برتقالية عمودية وخطم مستطيل، توجد في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_raccoon_butterflyfish_name => 'سمكة الفراشة الراكونية';
+
+  @override
+  String get species_raccoon_butterflyfish_desc =>
+      'سمكة فراشة صفراء بقناع داكن حول العينين يشبه قناع الراكون، شائعة في شعاب المحيطين الهندي والهادئ وهاواي.';
+
+  @override
+  String get species_longnose_butterflyfish_name => 'سمكة الفراشة طويلة الأنف';
+
+  @override
+  String get species_longnose_butterflyfish_desc =>
+      'سمكة فراشة صفراء زاهية بخطم طويل جدًا تستخدمه لالتقاط الطعام من الشقوق في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_threadfin_butterflyfish_name =>
+      'سمكة الفراشة خيطية الزعنفة';
+
+  @override
+  String get species_threadfin_butterflyfish_desc =>
+      'سمكة فراشة بيضاء بنمط على شكل شارات وخيط ظهري متدلٍ، منتشرة في أنحاء المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_foureye_butterflyfish_name => 'سمكة الفراشة رباعية العيون';
+
+  @override
+  String get species_foureye_butterflyfish_desc =>
+      'سمكة فراشة شاحبة ببقعة عين كاذبة بارزة قرب الذيل، شائعة في شعاب الكاريبي.';
+
+  @override
+  String get species_spotfin_butterflyfish_name =>
+      'سمكة الفراشة منقّطة الزعنفة';
+
+  @override
+  String get species_spotfin_butterflyfish_desc =>
+      'سمكة فراشة بيضاء وصفراء ببقعة داكنة صغيرة على الزعنفة الظهرية، توجد في غرب الأطلسي.';
+
+  @override
+  String get species_banner_butterflyfish_name => 'سمكة الراية في البحر الأحمر';
+
+  @override
+  String get species_banner_butterflyfish_desc =>
+      'سمكة راية بيضاء وسوداء بزعنفة ظهرية مستطيلة وبطن أصفر، متوطنة في البحر الأحمر.';
+
+  @override
+  String get species_moorish_idol_name => 'سمكة المعبود المورية';
+
+  @override
+  String get species_moorish_idol_desc =>
+      'سمكة شعاب أيقونية بأشرطة سوداء وبيضاء وصفراء جريئة وخيط ظهري طويل متدلٍ.';
+
+  @override
+  String get species_green_moray_eel_name => 'ثعبان البحر المورَي الأخضر';
+
+  @override
+  String get species_green_moray_eel_desc =>
+      'مورَي أخضر كبير يبلغ طوله 2.5 متر، ويُشاهد غالبًا فاغرًا فمه في شقوق الشعاب عبر غرب الأطلسي.';
+
+  @override
+  String get species_giant_moray_eel_name => 'ثعبان البحر المورَي العملاق';
+
+  @override
+  String get species_giant_moray_eel_desc =>
+      'أكبر أنواع المورَي، ويتجاوز طوله ثلاثة أمتار وله بقع تشبه بقع الفهد. يوجد في الشعاب المرجانية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_spotted_moray_eel_name => 'ثعبان البحر المورَي المرقّط';
+
+  @override
+  String get species_spotted_moray_eel_desc =>
+      'مورَي أبيض ببقع بنية داكنة، يُصادَف عادةً وهو يطل من ثقوب الشعاب في الكاريبي.';
+
+  @override
+  String get species_ribbon_eel_name => 'ثعبان البحر الشريطي';
+
+  @override
+  String get species_ribbon_eel_desc =>
+      'ثعبان بحر نحيل بمناخر متسعة؛ الذكور زرقاء زاهية والإناث صفراء. يوجد في البحيرات الرملية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_spotted_garden_eel_name => 'ثعبان البحر الحديقي المرقّط';
+
+  @override
+  String get species_spotted_garden_eel_desc =>
+      'ثعبان بحر أبيض رفيع ببقع سوداء يعيش في مستعمرات رملية، ويتمايل مع التيار لالتقاط العوالق.';
+
+  @override
+  String get species_splendid_garden_eel_name => 'ثعبان البحر الحديقي البهي';
+
+  @override
+  String get species_splendid_garden_eel_desc =>
+      'ثعبان بحر حديقي بأشرطة برتقالية وبيضاء يعيش في مستعمرات رملية كبيرة في غرب المحيط الهادئ.';
+
+  @override
+  String get species_snowflake_moray_name => 'ثعبان البحر المورَي ندفي النقوش';
+
+  @override
+  String get species_snowflake_moray_desc =>
+      'مورَي صغير بجسم أبيض وعلامات سوداء تشبه ندف الثلج، شائع في حطام الشعاب بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_mandarin_dragonet_name => 'سمكة التنين المندرين';
+
+  @override
+  String get species_mandarin_dragonet_desc =>
+      'سمكة صغيرة زاهية الألوان بنقوش زرقاء وبرتقالية مبهرة، توجد في مناطق الحطام المرجاني بغرب المحيط الهادئ.';
+
+  @override
+  String get species_common_lionfish_name => 'سمكة الأسد الشائعة';
+
+  @override
+  String get species_common_lionfish_desc =>
+      'سمكة عقربية سامة بزعانف صدرية مروحية مذهلة وخطوط حمراء وبيضاء. وهي نوع غازٍ في الكاريبي.';
+
+  @override
+  String get species_leaf_scorpionfish_name => 'السمكة العقربية الورقية';
+
+  @override
+  String get species_leaf_scorpionfish_desc =>
+      'سمكة عقربية شديدة التسطّح على شكل ورقة تتمايل مع التيار لتحاكي الحطام على شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_stonefish_name => 'سمكة الحجر الشعابية';
+
+  @override
+  String get species_stonefish_desc =>
+      'أشد أسماك العالم سُمّية، وتتمويه تام كصخرة على أرضيات الشعاب بالمحيطين الهندي والهادئ. خطيرة للغاية.';
+
+  @override
+  String get species_painted_frogfish_name => 'سمكة الضفدع المرسومة';
+
+  @override
+  String get species_painted_frogfish_desc =>
+      'مفترس كمين ممتلئ الجسم بطُعم على رأسه، شديد التباين في اللون. يوجد في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_giant_frogfish_name => 'سمكة الضفدع العملاقة';
+
+  @override
+  String get species_giant_frogfish_desc =>
+      'أكبر أنواع سمك الضفدع، ويبلغ طولها 40 سم، وتتمتع بتمويه ممتاز بين الإسفنجيات وحطام المرجان.';
+
+  @override
+  String get species_hairy_frogfish_name => 'سمكة الضفدع الشعرية';
+
+  @override
+  String get species_hairy_frogfish_desc =>
+      'سمكة ضفدع مغطاة بزوائد لحمية تشبه الديدان وتحاكي الطحالب، وهي صيد ثمين لمصوري ما تحت الماء.';
+
+  @override
+  String get species_clown_triggerfish_name => 'سمكة الزناد المهرجة';
+
+  @override
+  String get species_clown_triggerfish_desc =>
+      'سمكة زناد ذات نقوش جريئة ببقع بيضاء كبيرة على جسم داكن وشفاه صفراء، توجد في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_titan_triggerfish_name => 'سمكة الزناد التيتانية';
+
+  @override
+  String get species_titan_triggerfish_desc =>
+      'سمكة زناد كبيرة عدوانية معروفة بمهاجمة الغواصين قرب عشها. وهي شائعة في الشعاب المرجانية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_queen_triggerfish_name => 'سمكة الزناد الملكة';
+
+  @override
+  String get species_queen_triggerfish_desc =>
+      'سمكة زناد كاريبية ملونة بعلامات زرقاء على الوجه وخيوط ذيل طويلة.';
+
+  @override
+  String get species_picasso_triggerfish_name => 'سمكة زناد بيكاسو';
+
+  @override
+  String get species_picasso_triggerfish_desc =>
+      'سمكة زناد بنمط تجريدي من الخطوط الزرقاء والصفراء والسوداء، شائعة على مسطحات الشعاب بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_yellowmargin_triggerfish_name =>
+      'سمكة الزناد صفراء الحواف';
+
+  @override
+  String get species_yellowmargin_triggerfish_desc =>
+      'سمكة زناد كبيرة بلون بيج وزعانف صفراء الحواف، معروفة بحراسة عشها بعدوانية في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_porcupinefish_name => 'سمكة النيص';
+
+  @override
+  String get species_porcupinefish_desc =>
+      'سمكة شوكية كبيرة تنتفخ لتصير كرة عند شعورها بالتهديد، وتوجد في الشعاب الاستوائية حول العالم.';
+
+  @override
+  String get species_guineafowl_pufferfish_name => 'سمكة المنفاخ الغينية';
+
+  @override
+  String get species_guineafowl_pufferfish_desc =>
+      'سمكة منفاخ داكنة مغطاة ببقع بيضاء صغيرة، وتظهر أحيانًا في طور لوني ذهبي أصفر على شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_map_pufferfish_name => 'سمكة المنفاخ الخريطية';
+
+  @override
+  String get species_map_pufferfish_desc =>
+      'سمكة منفاخ كبيرة شاحبة بعلامات داكنة متشابكة تشبه الخرائط على جسمها، توجد في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_sharpnose_pufferfish_name => 'سمكة المنفاخ حادة الأنف';
+
+  @override
+  String get species_sharpnose_pufferfish_desc =>
+      'سمكة منفاخ صغيرة بخطوط زرقاء على الوجه وذيل برتقالي، تُشاهد عادةً في شعاب الكاريبي.';
+
+  @override
+  String get species_boxfish_name => 'سمكة الصندوق الصفراء';
+
+  @override
+  String get species_boxfish_desc =>
+      'الصغار مكعبات صفراء زاهية ببقع سوداء، وتتحول البالغة إلى الرمادي المزرق. توجد في أنحاء المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_cowfish_name => 'سمكة البقرة طويلة القرون';
+
+  @override
+  String get species_cowfish_desc =>
+      'سمكة صفراء صندوقية الشكل بنتوءات مميزة تشبه القرون فوق كل عين، توجد في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_napoleon_wrasse_name => 'سمكة نابليون';
+
+  @override
+  String get species_napoleon_wrasse_desc =>
+      'سمكة حريد ضخمة يبلغ طولها مترين بنتوء جبهي بارز. وهي مهددة بالانقراض ومحمية، وتوجد في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_cleaner_wrasse_name => 'سمكة الحريد المنظفة زرقاء الخط';
+
+  @override
+  String get species_cleaner_wrasse_desc =>
+      'سمكة حريد صغيرة مخططة بالأزرق تدير محطات التنظيف وتزيل الطفيليات عن الأسماك الأكبر في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_yellowtail_coris_name => 'حريد الكوريس أصفر الذيل';
+
+  @override
+  String get species_yellowtail_coris_desc =>
+      'سمكة حريد ملونة بجسم منقّط وذيل أصفر، وصغارها برتقالية حمراء زاهية بعلامات بيضاء.';
+
+  @override
+  String get species_bluehead_wrasse_name => 'الحريد أزرق الرأس';
+
+  @override
+  String get species_bluehead_wrasse_desc =>
+      'سمكة حريد وفيرة في الكاريبي؛ وللذكور في الطور النهائي رأس أزرق زاهٍ وجسم أخضر بأشرطة سوداء وبيضاء.';
+
+  @override
+  String get species_spanish_hogfish_name => 'سمكة الخنزير الإسبانية';
+
+  @override
+  String get species_spanish_hogfish_desc =>
+      'سمكة حريد أرجوانية وصفراء شائعة في شعاب الكاريبي؛ وتعمل صغارها كأسماك منظفة.';
+
+  @override
+  String get species_bumphead_parrotfish_name =>
+      'سمكة الببغاء ذات الرأس الناتئ';
+
+  @override
+  String get species_bumphead_parrotfish_desc =>
+      'أكبر أنواع سمك الببغاء ويبلغ طولها 1.3 متر، بنتوء جبهي ضخم. وتتنقل في أسراب على شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_stoplight_parrotfish_name => 'سمكة الببغاء إشارة المرور';
+
+  @override
+  String get species_stoplight_parrotfish_desc =>
+      'سمكة ببغاء كاريبية شائعة بتغيرات لونية كبيرة بين الطورين الأولي والنهائي.';
+
+  @override
+  String get species_queen_parrotfish_name => 'سمكة الببغاء الملكة';
+
+  @override
+  String get species_queen_parrotfish_desc =>
+      'سمكة ببغاء كبيرة زرقاء مخضرّة توجد في شعاب الكاريبي، وتُشاهد غالبًا وهي تقضم المرجان لتتغذى على الطحالب.';
+
+  @override
+  String get species_yellowtail_damselfish_name => 'سمكة الدمسل صفراء الذيل';
+
+  @override
+  String get species_yellowtail_damselfish_desc =>
+      'سمكة دمسل زرقاء داكنة بذيل أصفر زاهٍ، شائعة على قمم وحواف شعاب الكاريبي.';
+
+  @override
+  String get species_sergeant_major_name => 'سمكة الرقيب';
+
+  @override
+  String get species_sergeant_major_desc =>
+      'سمكة دمسل فضية مصفرّة بخمسة أشرطة سوداء جريئة، توجد في تجمعات كبيرة على شعاب الأطلسي الاستوائي.';
+
+  @override
+  String get species_three_spot_damselfish_name => 'سمكة الدمسل ثلاثية البقع';
+
+  @override
+  String get species_three_spot_damselfish_desc =>
+      'سمكة دمسل بنية داكنة شديدة التمسك بمنطقتها تدافع بشراسة عن حديقتها من الطحالب في شعاب الكاريبي.';
+
+  @override
+  String get species_chromis_viridis_name => 'الكروميس الأزرق المخضرّ';
+
+  @override
+  String get species_chromis_viridis_desc =>
+      'سمكة دمسل صغيرة خضراء لامعة تُشاهد في أسراب كبيرة تحوم فوق المرجان المتفرع في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_blue_chromis_name => 'الكروميس الأزرق';
+
+  @override
+  String get species_blue_chromis_desc =>
+      'سمكة دمسل زرقاء لامعة تتغذى على العوالق وتوجد في تجمعات كبيرة في وسط الماء فوق جدران شعاب الكاريبي.';
+
+  @override
+  String get species_nassau_grouper_name => 'هامور ناسو';
+
+  @override
+  String get species_nassau_grouper_desc =>
+      'هامور كاريبي كبير بخط داكن مميز عبر العين ونمط مخطط، وهو الآن مهدد بالانقراض بسبب الصيد الجائر.';
+
+  @override
+  String get species_giant_grouper_name => 'الهامور العملاق';
+
+  @override
+  String get species_giant_grouper_desc =>
+      'أكبر سمكة شعاب عظمية، يبلغ طولها 2.7 متر ووزنها 400 كغ. توجد في الكهوف وحطام السفن عبر المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_coral_grouper_name => 'الهامور المرجاني';
+
+  @override
+  String get species_coral_grouper_desc =>
+      'هامور أحمر برتقالي زاهٍ مغطى ببقع زرقاء، وهو نوع مميز لشعاب المحيطين الهندي والهادئ المرجانية.';
+
+  @override
+  String get species_goliath_grouper_name => 'الهامور الجالوتي';
+
+  @override
+  String get species_goliath_grouper_desc =>
+      'هامور أطلسي ضخم يبلغ طوله 2.5 متر، ويُصادَف غالبًا قرب الحطام والحواف الصخرية في فلوريدا والكاريبي.';
+
+  @override
+  String get species_potato_grouper_name => 'هامور البطاطا';
+
+  @override
+  String get species_potato_grouper_desc =>
+      'هامور كبير ودود ببقع داكنة بحجم حبات البطاطا، ويشتهر في موقع كود هول بالحاجز المرجاني العظيم.';
+
+  @override
+  String get species_peacock_grouper_name => 'الهامور الطاووسي';
+
+  @override
+  String get species_peacock_grouper_desc =>
+      'هامور بني داكن ببقع زرقاء زاهية وأشرطة عمودية فاتحة في المؤخرة، شائع في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_yellowfin_tuna_name => 'التونة صفراء الزعانف';
+
+  @override
+  String get species_yellowfin_tuna_desc =>
+      'مفترس سريع من أعالي البحار بزعنفتين ظهرية وشرجية صفراوين طويلتين، يشاهده الغواصون أحيانًا في المواقع البعيدة عن الساحل.';
+
+  @override
+  String get species_dogtooth_tuna_name => 'تونة ناب الكلب';
+
+  @override
+  String get species_dogtooth_tuna_desc =>
+      'تونة قوية ملازمة للشعاب بأسنان بارزة، تُصادَف عند المنحدرات العميقة في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_great_barracuda_name => 'الباراكودا الكبيرة';
+
+  @override
+  String get species_great_barracuda_desc =>
+      'مفترس فضي انسيابي يبلغ طوله 1.8 متر بأسنان بارزة، ويُشاهد غالبًا محلّقًا بلا حراك قرب الشعاب الاستوائية.';
+
+  @override
+  String get species_blackfin_barracuda_name => 'الباراكودا سوداء الزعانف';
+
+  @override
+  String get species_blackfin_barracuda_desc =>
+      'باراكودا من المحيطين الهندي والهادئ تشتهر بتشكيل أسراب ضخمة تشبه الإعصار في مواقع مثل باراكودا بوينت.';
+
+  @override
+  String get species_mahi_mahi_name => 'سمكة الماهي ماهي';
+
+  @override
+  String get species_mahi_mahi_desc =>
+      'سمكة من أعالي البحار بألوان زرقاء مخضرّة وذهبية باهرة وجبهة عريضة، تُشاهد أحيانًا في مواقع الغوص البعيدة عن الساحل.';
+
+  @override
+  String get species_giant_trevally_name => 'التريفالي العملاق';
+
+  @override
+  String get species_giant_trevally_desc =>
+      'مفترس فضي قوي يبلغ طوله 1.7 متر، ويشتهر بالصيد في قنوات الشعاب والمنحدرات عبر المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_bluefin_trevally_name => 'التريفالي أزرق الزعانف';
+
+  @override
+  String get species_bluefin_trevally_desc =>
+      'سمكة جاك انسيابية ببقع زرقاء تُشاهد عادةً وهي تجوب حواف الشعاب في المحيطين الهندي والهادئ ضمن مجموعات صيد صغيرة.';
+
+  @override
+  String get species_bigeye_trevally_name => 'التريفالي كبير العينين';
+
+  @override
+  String get species_bigeye_trevally_desc =>
+      'سمكة جاك فضية بعينين كبيرتين تشكّل أسرابًا دوّامية مذهلة قرب جدران الشعاب ومحطات التنظيف.';
+
+  @override
+  String get species_bar_jack_name => 'سمكة الجاك المخططة';
+
+  @override
+  String get species_bar_jack_desc =>
+      'سمكة جاك كاريبية فضية انسيابية بخط أزرق داكن مميز يمتد على طول الظهر حتى أسفل الذيل.';
+
+  @override
+  String get species_horse_eye_jack_name => 'سمكة الجاك ذات عين الحصان';
+
+  @override
+  String get species_horse_eye_jack_desc =>
+      'سمكة جاك فضية كبيرة العينين تشكّل أسرابًا قرب الشعاب والحطام في الكاريبي وغرب الأطلسي.';
+
+  @override
+  String get species_yellowtail_snapper_name => 'النهّاش أصفر الذيل';
+
+  @override
+  String get species_yellowtail_snapper_desc =>
+      'نهّاش انسيابي بخط جانبي وذيل أصفرين، يُشاهد غالبًا في أسراب وسط الماء على شعاب الكاريبي.';
+
+  @override
+  String get species_schoolmaster_snapper_name => 'النهّاش معلّم المدرسة';
+
+  @override
+  String get species_schoolmaster_snapper_desc =>
+      'نهّاش أصفر فضي بخطوط زرقاء تحت العين، يوجد في مجموعات تحت الحواف الصخرية في شعاب الكاريبي.';
+
+  @override
+  String get species_bluestripe_snapper_name => 'النهّاش أزرق الخطوط';
+
+  @override
+  String get species_bluestripe_snapper_desc =>
+      'نهّاش أصفر زاهٍ بأربعة خطوط أفقية زرقاء، يشكّل أسرابًا كثيفة في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_twinspot_snapper_name => 'النهّاش ثنائي البقعة';
+
+  @override
+  String get species_twinspot_snapper_desc =>
+      'نهّاش أحمر كبير يوجد في الشعاب الخارجية بالمحيطين الهندي والهادئ، ويشكّل أحيانًا أسرابًا على الجدران العميقة والقنوات.';
+
+  @override
+  String get species_humphead_snapper_name => 'نهّاش منتصف الليل';
+
+  @override
+  String get species_humphead_snapper_desc =>
+      'نهّاش داكن كبير يوجد في أسراب قرب المنحدرات الحادة بالمحيطين الهندي والهادئ، وصغاره بنقوش سوداء وبيضاء جريئة.';
+
+  @override
+  String get species_longfin_bannerfish_name => 'سمكة الراية طويلة الزعنفة';
+
+  @override
+  String get species_longfin_bannerfish_desc =>
+      'سمكة بيضاء وسوداء بزعنفة ظهرية طويلة متدلية وذيل أصفر، تُشاهد غالبًا في أزواج على شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_batfish_orbicular_name => 'سمكة الخفاش المستديرة';
+
+  @override
+  String get species_batfish_orbicular_desc =>
+      'سمكة فضية قرصية الشكل بزعانف مرتفعة تقترب من الغواصين بفضول. شائعة في حطام السفن والشعاب بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_batfish_teira_name => 'سمكة الخفاش طويلة الزعنفة';
+
+  @override
+  String get species_batfish_teira_desc =>
+      'سمكة خفاش مرتفعة الزعانف ببقعة داكنة قرب الزعنفة الصدرية، تُشاهد غالبًا عند محطات التنظيف وحطام السفن.';
+
+  @override
+  String get species_batfish_pinnatus_name => 'سمكة الخفاش الريشية';
+
+  @override
+  String get species_batfish_pinnatus_desc =>
+      'صغارها سوداء حالكة بحواف برتقالية زاهية تشبه الدودة المفلطحة السامة. توجد في غرب المحيط الهادئ.';
+
+  @override
+  String get species_banggai_cardinalfish_name => 'سمكة الكاردينال البانغّاية';
+
+  @override
+  String get species_banggai_cardinalfish_desc =>
+      'سمكة كاردينال لافتة بلونين فضي وأسود وزعانف مستطيلة، متوطنة في جزر بانغّاي بإندونيسيا.';
+
+  @override
+  String get species_pajama_cardinalfish_name => 'سمكة الكاردينال البيجامية';
+
+  @override
+  String get species_pajama_cardinalfish_desc =>
+      'سمكة كاردينال غير مألوفة بوجه أصفر وحزام داكن في الوسط ومؤخرة منقّطة، توجد بين المرجان في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_longnose_hawkfish_name => 'سمكة الصقر طويلة الأنف';
+
+  @override
+  String get species_longnose_hawkfish_desc =>
+      'سمكة بيضاء صغيرة بنمط شبكي أحمر وخطم مستطيل، ترتكز على المرجان المروحي والمرجان الأسود.';
+
+  @override
+  String get species_arc_eye_hawkfish_name => 'سمكة الصقر ذات قوس العين';
+
+  @override
+  String get species_arc_eye_hawkfish_desc =>
+      'سمكة صقر صغيرة بقوس برتقالي مميز خلف العين، ترتكز عادةً على رؤوس المرجان في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_flame_hawkfish_name => 'سمكة الصقر اللهبية';
+
+  @override
+  String get species_flame_hawkfish_desc =>
+      'سمكة صقر حمراء زاهية بعلامات داكنة حول العين، ترتكز بين مرجان Pocillopora عبر غرب المحيط الهادئ.';
+
+  @override
+  String get species_fire_goby_name => 'سمكة القوبيون النارية';
+
+  @override
+  String get species_fire_goby_desc =>
+      'سمكة قوبيون بيضاء أنيقة بزعنفة ظهرية أولى مرتفعة وذيل أحمر برتقالي، تحوم فوق حطام الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_purple_firefish_name => 'سمكة النار الأرجوانية';
+
+  @override
+  String get species_purple_firefish_desc =>
+      'سمكة قوبيون رقيقة بزعانف أرجوانية وشوكة ظهرية مرتفعة، تحوم قرب جحورها في الشعاب الخارجية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_yellownose_goby_name => 'سمكة القوبيون صفراء الأنف';
+
+  @override
+  String get species_yellownose_goby_desc =>
+      'سمكة قوبيون منظفة كاريبية صغيرة بخطم أصفر وخط جانبي أزرق، توجد على الإسفنجيات ورؤوس المرجان.';
+
+  @override
+  String get species_citron_goby_name => 'سمكة القوبيون الليمونية';
+
+  @override
+  String get species_citron_goby_desc =>
+      'سمكة قوبيون صغيرة صفراء زاهية تعيش بين أفرع مرجان Acropora في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_shrimp_goby_name => 'سمكة قوبيون الروبيان الشتاينيتزية';
+
+  @override
+  String get species_shrimp_goby_desc =>
+      'سمكة قوبيون بلون الرمال تتشارك الجحر مع روبيان من فصيلة Alpheidae في علاقة تكافلية على السهول الرملية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_neon_goby_name => 'سمكة القوبيون النيونية';
+
+  @override
+  String get species_neon_goby_desc =>
+      'سمكة قوبيون داكنة صغيرة بخط أزرق نيوني لامع، تدير محطات التنظيف على رؤوس المرجان في الكاريبي.';
+
+  @override
+  String get species_bluestriped_fangblenny_name =>
+      'سمكة البليني نابية الأسنان زرقاء الخطوط';
+
+  @override
+  String get species_bluestriped_fangblenny_desc =>
+      'سمكة بليني صغيرة مخططة بالأزرق تحاكي أسماك الحريد المنظفة لتقتطع الحراشف من الأسماك الغافلة.';
+
+  @override
+  String get species_sailfin_blenny_name => 'سمكة البليني شراعية الزعنفة';
+
+  @override
+  String get species_sailfin_blenny_desc =>
+      'سمكة بليني كاريبية صغيرة ترفع زعنفة ظهرية كبيرة تشبه الشراع من جحرها الأنبوبي لجذب الشريك.';
+
+  @override
+  String get species_bicolor_blenny_name => 'سمكة البليني ثنائية اللون';
+
+  @override
+  String get species_bicolor_blenny_desc =>
+      'سمكة بليني صغيرة نصفها الأمامي بني داكن ونصفها الخلفي برتقالي، تطل من الثقوب في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_redlip_blenny_name => 'سمكة البليني حمراء الشفاه';
+
+  @override
+  String get species_redlip_blenny_desc =>
+      'سمكة بليني داكنة بشفاه حمراء برتقالية بارزة تدافع عن رقع الطحالب على قمم شعاب الكاريبي.';
+
+  @override
+  String get species_pygmy_seahorse_name => 'حصان البحر القزم البارغيباني';
+
+  @override
+  String get species_pygmy_seahorse_desc =>
+      'حصان بحر ضئيل يقل طوله عن سنتيمترين ويطابق تمامًا المرجان المروحي الذي يعيش عليه، وهو هدف ثمين للتصوير الماكرو.';
+
+  @override
+  String get species_common_seahorse_name => 'حصان البحر الشائع';
+
+  @override
+  String get species_common_seahorse_desc =>
+      'حصان بحر متوسط الحجم يوجد في مروج الأعشاب البحرية وحطام المرجان عبر المحيطين الهندي والهادئ، ويتباين لونه كثيرًا.';
+
+  @override
+  String get species_thorny_seahorse_name => 'حصان البحر الشوكي';
+
+  @override
+  String get species_thorny_seahorse_desc =>
+      'حصان بحر مغطى بأشواك طويلة يوجد في مروج الأعشاب البحرية والقيعان الطرية عبر المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_ornate_ghost_pipefish_name =>
+      'السمكة الأنبوبية الشبح المزخرفة';
+
+  @override
+  String get species_ornate_ghost_pipefish_desc =>
+      'سمكة أنبوبية بتمويه بديع تحوم ورأسها إلى الأسفل قرب زنابق البحر والمرجان الطري في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_robust_ghost_pipefish_name =>
+      'السمكة الأنبوبية الشبح القوية';
+
+  @override
+  String get species_robust_ghost_pipefish_desc =>
+      'سمكة أنبوبية شبح كبيرة تحاكي الأعشاب البحرية أو الطحالب، وتوجد غالبًا في أزواج في المياه الساحلية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_trumpetfish_name => 'سمكة البوق';
+
+  @override
+  String get species_trumpetfish_desc =>
+      'سمكة طويلة نحيلة تصطاد بمرافقة الأسماك الأكبر والاختباء خلفها، وتوجد بألوان متعددة في شعاب الكاريبي والأطلسي.';
+
+  @override
+  String get species_cornetfish_name => 'سمكة المزمار';
+
+  @override
+  String get species_cornetfish_desc =>
+      'سمكة شديدة الاستطالة يبلغ طولها 1.5 متر بخيط ذيلي متدلٍ، وتُشاهد غالبًا وهي تنساب فوق مسطحات الشعاب.';
+
+  @override
+  String get species_yellowhead_jawfish_name => 'سمكة الفك صفراء الرأس';
+
+  @override
+  String get species_yellowhead_jawfish_desc =>
+      'سمكة صغيرة زرقاء الجسم برأس أصفر تحوم فوق جحرها الرملي في شعاب الكاريبي. وتحضن الذكور البيض داخل أفواهها.';
+
+  @override
+  String get species_flamefish_name => 'سمكة اللهب';
+
+  @override
+  String get species_flamefish_desc =>
+      'سمكة كاردينال صغيرة حمراء زاهية ببقعة داكنة تحت الزعنفة الظهرية الثانية، تختبئ نهارًا في شقوق شعاب الكاريبي.';
+
+  @override
+  String get species_longspine_squirrelfish_name => 'سمكة السنجاب طويلة الشوكة';
+
+  @override
+  String get species_longspine_squirrelfish_desc =>
+      'سمكة حمراء ليلية النشاط بعينين كبيرتين وشوكة ظهرية طويلة، توجد نهارًا تحت الحواف الصخرية في شعاب الكاريبي.';
+
+  @override
+  String get species_soldierfish_name => 'سمكة الجندي كبيرة الحراشف';
+
+  @override
+  String get species_soldierfish_desc =>
+      'سمكة حمراء ليلية النشاط بعينين داكنتين ضخمتين وحراشف كبيرة، تتجمع نهارًا في الكهوف وتحت النتوءات الصخرية.';
+
+  @override
+  String get species_flame_angelfish_name => 'سمكة الملاك اللهبية';
+
+  @override
+  String get species_flame_angelfish_desc =>
+      'سمكة ملاك قزمة حمراء برتقالية زاهية بأشرطة عمودية سوداء وزعانف زرقاء الأطراف، توجد عبر المحيط الهادئ.';
+
+  @override
+  String get species_royal_gramma_name => 'سمكة الغراما الملكية';
+
+  @override
+  String get species_royal_gramma_desc =>
+      'سمكة باسليت كاريبية صغيرة ثنائية اللون نصفها الأمامي أرجواني ونصفها الخلفي أصفر، توجد تحت الحواف الصخرية.';
+
+  @override
+  String get species_anthias_lyretail_name => 'الأنثياس قيثاري الذيل';
+
+  @override
+  String get species_anthias_lyretail_desc =>
+      'سمكة شعاب وفيرة تشكّل سحبًا برتقالية ووردية كبيرة فوق التكوينات المرجانية بالمحيطين الهندي والهادئ. والذكور أرجوانية اللون.';
+
+  @override
+  String get species_mediterranean_grouper_name => 'الهامور الداكن';
+
+  @override
+  String get species_mediterranean_grouper_desc =>
+      'هامور كبير بني داكن ببقع فاتحة، وهو المفترس الأيقوني للشعاب الصخرية في البحر المتوسط.';
+
+  @override
+  String get species_mediterranean_moray_name => 'المورَي المتوسطي';
+
+  @override
+  String get species_mediterranean_moray_desc =>
+      'ثعبان بحر مورَي بني داكن ببقع صفراء، يُشاهد عادةً وهو يطل من الشقوق الصخرية في البحر المتوسط.';
+
+  @override
+  String get species_ornate_wrasse_name => 'الحريد المزخرف';
+
+  @override
+  String get species_ornate_wrasse_desc =>
+      'سمكة حريد خضراء ملونة بعلامات حمراء على الرأس، وهي من أكثر أسماك الحريد شيوعًا في شعاب البحر المتوسط.';
+
+  @override
+  String get species_red_sea_bannerfish_name => 'سمكة الفراشة المقنّعة';
+
+  @override
+  String get species_red_sea_bannerfish_desc =>
+      'سمكة فراشة صفراء زاهية برقعة داكنة على العين، متوطنة في البحر الأحمر. وتُشاهد غالبًا في أزواج.';
+
+  @override
+  String get species_red_sea_anemonefish_name => 'سمكة شقائق البحر الأحمر';
+
+  @override
+  String get species_red_sea_anemonefish_desc =>
+      'سمكة شقائق برتقالية مصفرّة بشريطين أبيضين، متوطنة في البحر الأحمر وخليج عدن.';
+
+  @override
+  String get species_arabian_angelfish_name => 'سمكة الملاك العربية';
+
+  @override
+  String get species_arabian_angelfish_desc =>
+      'سمكة ملاك كبيرة زرقاء داكنة بشريط عمودي أصفر جريء وذيل أصفر، متوطنة في غرب المحيط الهندي.';
+
+  @override
+  String get species_king_angelfish_name => 'سمكة الملاك الملك';
+
+  @override
+  String get species_king_angelfish_desc =>
+      'سمكة ملاك كبيرة زرقاء داكنة بشريط عمودي أبيض وذيل أصفر، توجد في شرق المحيط الهادئ وجزر غالاباغوس.';
+
+  @override
+  String get species_ocean_sunfish_name => 'سمكة الشمس المحيطية';
+
+  @override
+  String get species_ocean_sunfish_desc =>
+      'أثقل سمكة عظمية في العالم ويتجاوز وزنها طنّين. ويشاهدها الغواصون أحيانًا عند محطات التنظيف في بالي وغالاباغوس.';
+
+  @override
+  String get species_lingcod_name => 'سمكة اللينغكود';
+
+  @override
+  String get species_lingcod_desc =>
+      'سمكة مفترسة كبيرة مبقّعة من فصيلة الغرينلينغ تعيش في الشعاب الصخرية بشمال غرب المحيط الهادئ، وتُشاهد غالبًا وهي تحرس كتل البيض.';
+
+  @override
+  String get species_wolf_eel_name => 'ثعبان الذئب';
+
+  @override
+  String get species_wolf_eel_desc =>
+      'ثعبان ذئب رمادي كبير برأس منتفخ وفكين قويين، يعيش في أوكار صخرية بشمال غرب المحيط الهادئ.';
+
+  @override
+  String get species_giant_sea_bass_name => 'القاروص العملاق';
+
+  @override
+  String get species_giant_sea_bass_desc =>
+      'سمكة قاروص ضخمة يتجاوز طولها مترين ووزنها 250 كغ، وتعيش في الشعاب الصخرية وغابات عشب البحر قبالة جنوب كاليفورنيا.';
+
+  @override
+  String get species_garibaldi_name => 'سمكة غاريبالدي';
+
+  @override
+  String get species_garibaldi_desc =>
+      'سمكة دمسل برتقالية زاهية وهي السمكة البحرية الرسمية لولاية كاليفورنيا، شديدة التمسك بمنطقتها في شعاب غابات عشب البحر.';
+
+  @override
+  String get species_sheephead_name => 'سمكة رأس الخروف الكاليفورنية';
+
+  @override
+  String get species_sheephead_desc =>
+      'سمكة حريد كبيرة برأس وذيل أسودين ووسط أحمر وذقن بيضاء. توجد في غابات عشب البحر بكاليفورنيا.';
+
+  @override
+  String get species_copper_rockfish_name => 'سمكة الصخور النحاسية';
+
+  @override
+  String get species_copper_rockfish_desc =>
+      'سمكة صخور برتقالية نحاسية برقع فاتحة، وهي مشهد مألوف في الشعاب الصخرية وغابات عشب البحر بشمال غرب المحيط الهادئ.';
+
+  @override
+  String get species_oriental_sweetlips_name => 'سمكة الشفاه الحلوة الشرقية';
+
+  @override
+  String get species_oriental_sweetlips_desc =>
+      'سمكة شعاب كبيرة من المحيطين الهندي والهادئ بخطوط سوداء وبيضاء جريئة وزعانف صفراء. وتؤدي صغارها رقصة متلوّية.';
+
+  @override
+  String get species_harlequin_sweetlips_name => 'سمكة الشفاه الحلوة المهرجة';
+
+  @override
+  String get species_harlequin_sweetlips_desc =>
+      'البالغة رمادية ببقع داكنة؛ أما الصغار فبنية ببقع بيضاء كبيرة وتسبح بحركة متموجة.';
+
+  @override
+  String get species_blue_ringed_angelfish_name =>
+      'سمكة الملاك ذات الحلقة الزرقاء';
+
+  @override
+  String get species_blue_ringed_angelfish_desc =>
+      'سمكة ملاك بنية كبيرة بخطوط زرقاء منحنية وحلقة زرقاء مميزة فوق غطاء الخياشيم.';
+
+  @override
+  String get species_yellowbar_angelfish_name =>
+      'سمكة الملاك ذات الشريط الأصفر';
+
+  @override
+  String get species_yellowbar_angelfish_desc =>
+      'سمكة ملاك كبيرة رمادية مزرقّة برقعة صفراء بارزة على الجسم، توجد في البحر الأحمر وغرب المحيط الهندي.';
+
+  @override
+  String get species_filefish_scrawled_name => 'سمكة المبرد المخربشة';
+
+  @override
+  String get species_filefish_scrawled_desc =>
+      'سمكة مبرد كبيرة بنية زيتونية بعلامات زرقاء تشبه الخربشات وزائدة جلدية برتقالية، توجد في الشعاب الاستوائية حول العالم.';
+
+  @override
+  String get species_clown_filefish_name => 'سمكة المبرد برتقالية البقع';
+
+  @override
+  String get species_clown_filefish_desc =>
+      'سمكة مبرد خضراء صغيرة ببقع برتقالية وخطم طويل، تتغذى حصرًا على سلائل مرجان Acropora.';
+
+  @override
+  String get species_unicornfish_name => 'سمكة وحيد القرن زرقاء الشوكة';
+
+  @override
+  String get species_unicornfish_desc =>
+      'سمكة جراح رمادية بقرن جبهي بارز وشوكتين زرقاوين عند الذيل، شائعة على مسطحات الشعاب بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_surgeonfish_sailfin_name => 'سمكة الجراح الشراعية';
+
+  @override
+  String get species_surgeonfish_sailfin_desc =>
+      'سمكة جراح بأشرطة جريئة وزعنفتين ظهرية وشرجية متسعتين للغاية، توجد عبر المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_achilles_tang_name => 'سمكة جراح أخيل';
+
+  @override
+  String get species_achilles_tang_desc =>
+      'سمكة جراح بنية داكنة ببقعة برتقالية جريئة على شكل دمعة قرب الذيل، توجد في مناطق الأمواج القوية بوسط المحيط الهادئ.';
+
+  @override
+  String get species_doctorfish_name => 'سمكة الطبيب';
+
+  @override
+  String get species_doctorfish_desc =>
+      'سمكة جراح رمادية بنية بأشرطة داكنة خفيفة وشوكة ذيلية بارزة، شائعة في شعاب الكاريبي.';
+
+  @override
+  String get species_checkerboard_wrasse_name => 'الحريد رقعة الشطرنج';
+
+  @override
+  String get species_checkerboard_wrasse_desc =>
+      'سمكة حريد ملونة بنمط شبيه برقعة الشطرنج من المربعات الخضراء والوردية والسوداء على طول الجسم.';
+
+  @override
+  String get species_bird_wrasse_name => 'حريد الطائر';
+
+  @override
+  String get species_bird_wrasse_desc =>
+      'سمكة حريد بخطم شديد الاستطالة يشبه منقار الطائر، والذكور خضراء داكنة والإناث بنية.';
+
+  @override
+  String get species_sling_jaw_wrasse_name => 'الحريد ذو الفك المقذوف';
+
+  @override
+  String get species_sling_jaw_wrasse_desc =>
+      'سمكة حريد بفك قابل للامتداد ينطلق إلى الأمام لالتقاط الفريسة، وتوجد بطورين لونيين أصفر أو بني.';
+
+  @override
+  String get species_peacock_flounder_name => 'سمكة موسى الطاووسية';
+
+  @override
+  String get species_peacock_flounder_desc =>
+      'سمكة مفلطحة تعيش على القاع بحلقات وبقع زرقاء، ويمكنها تغيير لونها لتطابق قاع البحر.';
+
+  @override
+  String get species_hogfish_name => 'سمكة الخنزير';
+
+  @override
+  String get species_hogfish_desc =>
+      'سمكة حريد كبيرة من غرب الأطلسي بخطم يشبه خطم الخنزير وأشواك ظهرية مستطيلة، توجد قرب الشعاب والحطام.';
+
+  @override
+  String get species_tarpon_name => 'التاربون الأطلسي';
+
+  @override
+  String get species_tarpon_desc =>
+      'سمكة فضية ضخمة بحراشف كبيرة تشبه المرايا، ويصادفها الغواصون أحيانًا في كهوف الكاريبي وقنواته.';
+
+  @override
+  String get species_permit_name => 'سمكة البيرمِت';
+
+  @override
+  String get species_permit_desc =>
+      'سمكة جاك فضية عميقة الجسم بذيل داكن مشقوق، توجد على السهول الرملية وقرب الشعاب في الكاريبي.';
+
+  @override
+  String get species_spotted_drum_name => 'سمكة الطبل المرقّطة';
+
+  @override
+  String get species_spotted_drum_desc =>
+      'سمكة كاريبية لافتة بزعنفة ظهرية مرتفعة مستطيلة ونمط منقّط جريء بالأسود والأبيض.';
+
+  @override
+  String get species_jackknife_fish_name => 'سمكة المطواة';
+
+  @override
+  String get species_jackknife_fish_desc =>
+      'سمكة كاريبية أنيقة بخط أسود مرتفع على الزعنفة الظهرية وشريط مائل على الجسم، توجد تحت الحواف الصخرية.';
+
+  @override
+  String get species_bigeye_name => 'سمكة العين الزجاجية';
+
+  @override
+  String get species_bigeye_desc =>
+      'سمكة حمراء زاهية ليلية النشاط بعينين كبيرتين عاكستين، تختبئ في كهوف شعاب الكاريبي والأطلسي.';
+
+  @override
+  String get species_remora_name => 'سمكة الريمورا';
+
+  @override
+  String get species_remora_desc =>
+      'سمكة نحيلة بقرص ماص على رأسها تلتصق بأسماك القرش والشفنين والسلاحف وغيرها من الحيوانات الكبيرة.';
+
+  @override
+  String get species_tilefish_sand_name => 'سمكة البلاط الرملية';
+
+  @override
+  String get species_tilefish_sand_desc =>
+      'سمكة مستطيلة زرقاء فاتحة تبني أكوامًا من الحطام فوق المناطق الرملية في شعاب الكاريبي.';
+
+  @override
+  String get species_weedy_seadragon_name => 'تنين البحر العشبي';
+
+  @override
+  String get species_weedy_seadragon_desc =>
+      'قريب مزخرف لأحصنة البحر بزوائد تشبه الأوراق، متوطن في المياه المعتدلة بجنوب أستراليا.';
+
+  @override
+  String get species_leafy_seadragon_name => 'تنين البحر الورقي';
+
+  @override
+  String get species_leafy_seadragon_desc =>
+      'تنين بحر مذهل مغطى بنتوءات ورقية معقدة، متوطن في جنوب أستراليا. وهو من أبرز مشاهدات الغوص التي يحلم بها الغواصون.';
+
+  @override
+  String get species_sailfin_snapper_name => 'النهّاش الشراعي';
+
+  @override
+  String get species_sailfin_snapper_desc =>
+      'نهّاش أنيق بلونين أصفر وأزرق وزعنفتين ظهرية وشرجية مستطيلتين، يوجد على منحدرات الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_sweetlip_emperor_name => 'الشعري المرصّع';
+
+  @override
+  String get species_sweetlip_emperor_desc =>
+      'سمكة شعري فضية كبيرة بخطوط زرقاء على الوجه وحواف زعانف صفراء، شائعة فوق المناطق الرملية للشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_crocodilefish_name => 'سمكة التمساح';
+
+  @override
+  String get species_crocodilefish_desc =>
+      'مفترس كمين مسطح الرأس بأهداب عينية معقدة، يرقد بتمويه تام على أرضيات الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_devil_scorpionfish_name => 'السمكة العقربية الشيطانية';
+
+  @override
+  String get species_devil_scorpionfish_desc =>
+      'سمكة عقربية ممتلئة ومموّهة بزعانف صدرية ملونة من الداخل تكشفها كإنذار للمفترسات.';
+
+  @override
+  String get species_spiny_devilfish_name => 'لاسع الشيطان';
+
+  @override
+  String get species_spiny_devilfish_desc =>
+      'ساكن قاع سام يمشي على أشعة زعنفية معدّلة ويكشف زعانفه الصدرية الزاهية عند إزعاجه.';
+
+  @override
+  String get species_waspfish_name => 'سمكة الدبور الكوكاتو';
+
+  @override
+  String get species_waspfish_desc =>
+      'سمكة عقربية صغيرة مضغوطة الجسم تتمايل مع التيار كورقة ذابلة فوق القيعان الطينية في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_stargazer_name => 'سمكة راصد النجوم بيضاء الحواف';
+
+  @override
+  String get species_stargazer_desc =>
+      'مفترس كمين يدفن نفسه في الرمال ولا تظهر منه سوى عينيه، ويمكنه إطلاق صدمات كهربائية. يوجد في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_striped_catfish_name => 'سمكة السلور المخططة';
+
+  @override
+  String get species_striped_catfish_desc =>
+      'سمكة سلور بأشواك سامة؛ وتشكّل صغارها أسرابًا كثيفة كروية الشكل تتدحرج فوق أرضيات الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_red_emperor_name => 'الشعري الأحمر';
+
+  @override
+  String get species_red_emperor_desc =>
+      'نهّاش كبير؛ البالغة حمراء وردية والصغار بأشرطة حمراء وبيضاء جريئة. يوجد في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_mangrove_snapper_name => 'نهّاش المانغروف';
+
+  @override
+  String get species_mangrove_snapper_desc =>
+      'نهّاش رمادي يوجد في غابات المانغروف والأعشاب البحرية والشعاب بالكاريبي، ويتجمع غالبًا قرب البنى القائمة.';
+
+  @override
+  String get species_dottyback_orchid_name => 'سمكة الدوتيباك الأوركيدية';
+
+  @override
+  String get species_dottyback_orchid_desc =>
+      'سمكة صغيرة أرجوانية زاهية متوطنة في البحر الأحمر، تندفع داخل الشقوق وخارجها على الجدران المرجانية الحادة.';
+
+  @override
+  String get species_dottyback_royal_name => 'سمكة الدوتيباك الملكية';
+
+  @override
+  String get species_dottyback_royal_desc =>
+      'سمكة صغيرة ثنائية اللون بمقدمة قرمزية ومؤخرة صفراء زاهية، توجد على جدران الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_coral_trout_name => 'التروتة المرجانية';
+
+  @override
+  String get species_coral_trout_desc =>
+      'مفترس ثمين في الحاجز المرجاني العظيم بجسم أحمر برتقالي مغطى ببقع زرقاء.';
+
+  @override
+  String get species_barramundi_cod_name => 'هامور البراموندي';
+
+  @override
+  String get species_barramundi_cod_desc =>
+      'هامور مميز برأس صغير وجسم محدودب ونقاط داكنة على خلفية فاتحة.';
+
+  @override
+  String get species_spadefish_atlantic_name => 'سمكة المجرفة الأطلسية';
+
+  @override
+  String get species_spadefish_atlantic_desc =>
+      'سمكة فضية قرصية الشكل بأشرطة عمودية داكنة، تُشاهد غالبًا في أسراب كبيرة حول حطام السفن في الكاريبي.';
+
+  @override
+  String get species_fusilier_yellowback_name => 'سمكة الفوزلير صفراء الظهر';
+
+  @override
+  String get species_fusilier_yellowback_desc =>
+      'سمكة زرقاء انسيابية تتغذى على العوالق وظهرها أصفر، وتشكّل أسرابًا ضخمة فوق منحدرات الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_fusilier_bluestreak_name => 'سمكة الفوزلير زرقاء الخط';
+
+  @override
+  String get species_fusilier_bluestreak_desc =>
+      'سمكة فوزلير زرقاء صغيرة بخط جانبي داكن، تُشاهد في أسراب سريعة الحركة على طول جدران الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_porkfish_name => 'سمكة الخنزير الهادرة';
+
+  @override
+  String get species_porkfish_desc =>
+      'سمكة هدير كاريبية ملونة بخطوط زرقاء وصفراء وشريطين أسودين على الرأس، توجد قرب الشعاب والحطام.';
+
+  @override
+  String get species_blue_striped_grunt_name => 'سمكة الهدير زرقاء الخطوط';
+
+  @override
+  String get species_blue_striped_grunt_desc =>
+      'سمكة هدير كاريبية صفراء بخطوط أفقية زرقاء زاهية، تشكّل نهارًا أسرابًا كبيرة ساكنة تحت الحواف الصخرية.';
+
+  @override
+  String get species_french_grunt_name => 'سمكة الهدير الفرنسية';
+
+  @override
+  String get species_french_grunt_desc =>
+      'سمكة هدير صغيرة بخطوط صفراء تشكّل أسرابًا ساكنة كثيفة على شعاب الكاريبي خلال ساعات النهار.';
+
+  @override
+  String get species_convict_tang_name => 'سمكة الجراح السجينة';
+
+  @override
+  String get species_convict_tang_desc =>
+      'سمكة جراح فاتحة اللون بستة أشرطة عمودية سوداء، تُشاهد غالبًا وهي ترعى في أسراب كبيرة على مسطحات الشعاب بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_great_hammerhead_name => 'قرش المطرقة المسنن';
+
+  @override
+  String get species_great_hammerhead_desc =>
+      'قرش مميز برأس مطرقي مسنن الحواف، يشكّل أسرابًا كبيرة عند الجبال البحرية والجزر البعيدة عن الساحل.';
+
+  @override
+  String get species_wobbegong_name => 'قرش السجاد المرقّط';
+
+  @override
+  String get species_wobbegong_desc =>
+      'قرش سجاد مسطح جيد التمويه بفصوص مهدّبة حول الفم، يوجد في الشعاب المعتدلة بأستراليا.';
+
+  @override
+  String get species_manta_ray_name => 'شفنين المانتا الشعابي';
+
+  @override
+  String get species_manta_ray_desc =>
+      'عملاق رشيق يبلغ باع جناحيه خمسة أمتار، يزور محطات التنظيف ويتغذى على العوالق في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_oceanic_manta_name => 'شفنين المانتا المحيطي';
+
+  @override
+  String get species_oceanic_manta_desc =>
+      'أكبر أنواع الشفنين ويتجاوز باع جناحيه سبعة أمتار، ويُصادَف عند الجبال البحرية البعيدة عن الساحل ومحطات التنظيف.';
+
+  @override
+  String get species_undulated_moray_name => 'ثعبان البحر المورَي المتموّج';
+
+  @override
+  String get species_undulated_moray_desc =>
+      'مورَي أخضر مصفرّ بعلامات داكنة متموجة، يُشاهد عادةً وهو يصطاد ليلًا في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_whitemouth_moray_name => 'ثعبان البحر المورَي أبيض الفم';
+
+  @override
+  String get species_whitemouth_moray_desc =>
+      'مورَي بني داكن ببقع بيضاء صغيرة وداخل فم أبيض مميز، يوجد عبر المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_dragon_moray_name => 'ثعبان البحر المورَي التنيني';
+
+  @override
+  String get species_dragon_moray_desc =>
+      'مورَي لافت بقرون تشبه قرون التنين فوق منخريه وبقع برتقالية حمراء تشبه بقع الفهد، يوجد في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_lyretail_grouper_name => 'الهامور قيثاري الذيل';
+
+  @override
+  String get species_lyretail_grouper_desc =>
+      'هامور أحمر وردي ببقع زرقاء وذيل هلالي مميز، يوجد على جدران الشعاب الخارجية في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_banded_butterflyfish_name => 'سمكة الفراشة المخططة';
+
+  @override
+  String get species_banded_butterflyfish_desc =>
+      'سمكة فراشة بيضاء بأربعة أشرطة عمودية سوداء جريئة، وهي من أكثر أسماك الفراشة شيوعًا في شعاب الكاريبي.';
+
+  @override
+  String get species_ringed_pipefish_name => 'السمكة الأنبوبية ذات الحلقات';
+
+  @override
+  String get species_ringed_pipefish_desc =>
+      'سمكة أنبوبية نحيلة بحلقات حمراء وبيضاء متناوبة، توجد في الكهوف وتحت الحواف الصخرية في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_razorfish_name => 'سمكة الموسى';
+
+  @override
+  String get species_razorfish_desc =>
+      'سمكة ضئيلة تسبح عموديًا ورأسها إلى الأسفل ضمن مجموعات، وتختبئ غالبًا بين أشواك قنافذ البحر في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_harlequin_tuskfish_name => 'سمكة الناب المهرجة';
+
+  @override
+  String get species_harlequin_tuskfish_desc =>
+      'سمكة حريد ملونة بأنياب زرقاء زاهية وأشرطة حمراء برتقالية ورقع بيضاء، توجد في شعاب غرب المحيط الهادئ.';
+
+  @override
+  String get species_blue_groper_name => 'الحريد الأزرق الأسترالي';
+
+  @override
+  String get species_blue_groper_desc =>
+      'سمكة حريد زرقاء كبيرة متوطنة في شرق أستراليا، وديعة وكثيرًا ما تقترب من الغواصين في الشعاب المعتدلة.';
+
+  @override
+  String get species_red_lipped_batfish_name => 'سمكة الخفاش حمراء الشفاه';
+
+  @override
+  String get species_red_lipped_batfish_desc =>
+      'سمكة غريبة مسطحة الجسم بشفاه حمراء زاهية تمشي على زعانف معدّلة على قاع بحر غالاباغوس.';
+
+  @override
+  String get species_orangeband_surgeonfish_name =>
+      'سمكة الجراح ذات الشريط البرتقالي';
+
+  @override
+  String get species_orangeband_surgeonfish_desc =>
+      'سمكة جراح رمادية بنية بشريط أفقي برتقالي خلف العين، توجد على منحدرات الشعاب في المحيط الهادئ.';
+
+  @override
+  String get species_maori_wrasse_name => 'الحريد الماوري';
+
+  @override
+  String get species_maori_wrasse_desc =>
+      'سمكة حريد متوسطة الحجم بشريط داكن خلف الزعنفة الصدرية، شائعة في شعاب المحيط الهادئ والمحيط الهندي.';
+
+  @override
+  String get species_blue_ringed_octopus_name => 'الأخطبوط ذو الحلقات الزرقاء';
+
+  @override
+  String get species_blue_ringed_octopus_desc =>
+      'أخطبوط صغير لكنه شديد السمّية بحلقات زرقاء زاهية تتوهج عند شعوره بالتهديد.';
+
+  @override
+  String get species_common_octopus_name => 'الأخطبوط الشائع';
+
+  @override
+  String get species_common_octopus_desc =>
+      'أخطبوط عالي الذكاء يشتهر بتغيير ألوانه السريع وقدرته على حل المشكلات.';
+
+  @override
+  String get species_giant_pacific_octopus_name => 'الأخطبوط الهادئي العملاق';
+
+  @override
+  String get species_giant_pacific_octopus_desc =>
+      'أكبر أنواع الأخطبوط، ويتجاوز امتداد أذرعه أربعة أمتار في مياه المحيط الهادئ الباردة.';
+
+  @override
+  String get species_mimic_octopus_name => 'الأخطبوط المحاكي';
+
+  @override
+  String get species_mimic_octopus_desc =>
+      'أخطبوط مذهل يقلّد مظهر أنواع بحرية أخرى وسلوكها.';
+
+  @override
+  String get species_coconut_octopus_name => 'أخطبوط جوز الهند';
+
+  @override
+  String get species_coconut_octopus_desc =>
+      'أخطبوط صغير يشتهر بحمل قشور جوز الهند واستخدامها ملاجئ متنقلة.';
+
+  @override
+  String get species_day_octopus_name => 'الأخطبوط النهاري';
+
+  @override
+  String get species_day_octopus_desc =>
+      'صياد نشط في النهار شائع في شعاب المحيطين الهندي والهادئ ويتمتع بقدرات تمويه مذهلة.';
+
+  @override
+  String get species_wonderpus_octopus_name => 'الأخطبوط العجيب';
+
+  @override
+  String get species_wonderpus_octopus_desc =>
+      'أخطبوط لافت بأشرطة بيضاء وبنية فريدة يوجد في مواقع الغوص الرملية الطينية.';
+
+  @override
+  String get species_broadclub_cuttlefish_name => 'السبيدج عريض المجسّات';
+
+  @override
+  String get species_broadclub_cuttlefish_desc =>
+      'سبيدج كبير بعروض لونية آسرة، ويُشاهد عادةً في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_pharaoh_cuttlefish_name => 'السبيدج الفرعوني';
+
+  @override
+  String get species_pharaoh_cuttlefish_desc =>
+      'سبيدج كبير يوجد في أنحاء المحيط الهندي ويشتهر بأنماطه اللونية النابضة.';
+
+  @override
+  String get species_flamboyant_cuttlefish_name => 'السبيدج المتباهي';
+
+  @override
+  String get species_flamboyant_cuttlefish_desc =>
+      'سبيدج ضئيل الحجم يمشي على قاع البحر عارضًا نبضات أرجوانية ووردية وصفراء زاهية.';
+
+  @override
+  String get species_giant_cuttlefish_name => 'السبيدج العملاق';
+
+  @override
+  String get species_giant_cuttlefish_desc =>
+      'أكبر سبيدج في العالم، ويشتهر بتجمعات التكاثر الجماعية في جنوب أستراليا.';
+
+  @override
+  String get species_bigfin_reef_squid_name => 'حبّار الشعاب كبير الزعانف';
+
+  @override
+  String get species_bigfin_reef_squid_desc =>
+      'حبّار يعيش في أسراب ويُصادَف كثيرًا في الغوصات الليلية، وتجذبه أضواء الغواصين.';
+
+  @override
+  String get species_caribbean_reef_squid_name => 'حبّار شعاب الكاريبي';
+
+  @override
+  String get species_caribbean_reef_squid_desc =>
+      'حبّار فضولي يُشاهد غالبًا وهو يحوم في مجموعات صغيرة قرب حواف الشعاب في الكاريبي.';
+
+  @override
+  String get species_bobtail_squid_name => 'الحبّار قصير الذيل';
+
+  @override
+  String get species_bobtail_squid_desc =>
+      'حبّار ضئيل ليلي النشاط يدفن نفسه في الرمال نهارًا، وهو صيد ثمين في غوصات القيعان الطينية.';
+
+  @override
+  String get species_chambered_nautilus_name => 'النوتيلوس ذو الحجرات';
+
+  @override
+  String get species_chambered_nautilus_desc =>
+      'أحفورة حية قديمة بصدفة ملتفة، نادرًا ما يراها الغواصون في المياه العميقة عند الفجر.';
+
+  @override
+  String get species_spanish_dancer_name => 'الراقصة الإسبانية';
+
+  @override
+  String get species_spanish_dancer_desc =>
+      'أكبر أنواع الرخويات عارية الخياشيم، تسبح بتموّج عباءتها الحمراء كراقصة فلامنكو.';
+
+  @override
+  String get species_chromodoris_willani_name => 'كروموذوريس ويلان';
+
+  @override
+  String get species_chromodoris_willani_desc =>
+      'رخوية عارية الخياشيم لافتة بلونين أزرق وأسود وحافة بيضاء، شائعة في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_chromodoris_lochi_name => 'كروموذوريس لوخ';
+
+  @override
+  String get species_chromodoris_lochi_desc =>
+      'رخوية زرقاء عارية الخياشيم بخطوط داكنة وحافة بيضاء، توجد في أنحاء المحيط الهادئ الاستوائي.';
+
+  @override
+  String get species_chromodoris_magnifica_name => 'الكروموذوريس البديع';
+
+  @override
+  String get species_chromodoris_magnifica_desc =>
+      'رخوية عارية الخياشيم زاهية بالأزرق والأبيض والبرتقالي، توجد في الشعاب المرجانية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_chromodoris_annae_name => 'كروموذوريس آنا';
+
+  @override
+  String get species_chromodoris_annae_desc =>
+      'رخوية عارية الخياشيم زرقاء داكنة بخطوط سوداء وقرون شمية وخياشيم برتقالية الأطراف.';
+
+  @override
+  String get species_nembrotha_kubaryana_name => 'بزاقة النيون المتغيّرة';
+
+  @override
+  String get species_nembrotha_kubaryana_desc =>
+      'رخوية عارية الخياشيم خضراء داكنة بعلامات برتقالية أو حمراء زاهية، تتغذى على البخّاسات.';
+
+  @override
+  String get species_nembrotha_cristata_name => 'النمبروثا المعرّفة';
+
+  @override
+  String get species_nembrotha_cristata_desc =>
+      'رخوية عارية الخياشيم سوداء ببثرات وخطوط خضراء زاهية، توجد في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_phyllidia_varicosa_name => 'الفيليديا الدوالية';
+
+  @override
+  String get species_phyllidia_varicosa_desc =>
+      'رخوية عارية الخياشيم رمادية مزرقّة بحديبات ناتئة صفراء الأطراف، وهي سامة للمفترسات.';
+
+  @override
+  String get species_phyllidia_ocellata_name => 'الفيليديا ذات العيون';
+
+  @override
+  String get species_phyllidia_ocellata_desc =>
+      'رخوية عارية الخياشيم بيضاء بحديبات ناتئة محاطة بحلقات وردية، توجد في الشعاب الاستوائية.';
+
+  @override
+  String get species_pikachu_nudibranch_name => 'رخوية بيكاتشو عارية الخياشيم';
+
+  @override
+  String get species_pikachu_nudibranch_desc =>
+      'بزاقة بحر ضئيلة صفراء وسوداء تشبه شخصية كرتونية، توجد في المحيط الهادئ.';
+
+  @override
+  String get species_anna_rosefieldi_name => 'رخوية الروبوأسترا';
+
+  @override
+  String get species_anna_rosefieldi_desc =>
+      'رخوية عارية الخياشيم مفترسة بجسم داكن وخطوط طولية زاهية تصطاد البزاقات الأخرى.';
+
+  @override
+  String get species_lettuce_sea_slug_name => 'بزاقة البحر الخسّية';
+
+  @override
+  String get species_lettuce_sea_slug_desc =>
+      'بزاقة بحر خضراء مكشكشة تحتفظ بالصانعات الخضراء من الطحالب لإجراء التمثيل الضوئي.';
+
+  @override
+  String get species_blue_dragon_nudibranch_name => 'رخوية التنين الأزرق';
+
+  @override
+  String get species_blue_dragon_nudibranch_desc =>
+      'رخوية عارية الخياشيم طويلة بزوائد ظهرية زرقاء الأطراف تحتضن طحالب زوزانثيلا متكافلة.';
+
+  @override
+  String get species_gloomy_nudibranch_name => 'الرخوية الكئيبة عارية الخياشيم';
+
+  @override
+  String get species_gloomy_nudibranch_desc =>
+      'رخوية عارية الخياشيم زرقاء مخضرّة داكنة بحواف زرقاء بارزة، شائعة في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_ocellined_nudibranch_name => 'الرخوية ذات الحواف المعيّنة';
+
+  @override
+  String get species_ocellined_nudibranch_desc =>
+      'رخوية عارية الخياشيم بيضاء بحواف مبطنة بالبرتقالي تشكّل أنماطًا هندسية على عباءتها.';
+
+  @override
+  String get species_glossodoris_cincta_name => 'رخوية الغلوسودوريس';
+
+  @override
+  String get species_glossodoris_cincta_desc =>
+      'رخوية عارية الخياشيم بلون كريمي بإطار بني داكن وحافة برتقالية على العباءة.';
+
+  @override
+  String get species_jorunna_funebris_name => 'الرخوية المنقّطة';
+
+  @override
+  String get species_jorunna_funebris_desc =>
+      'رخوية عارية الخياشيم بيضاء مغطاة بحُليمات caryophyllidia سوداء الأطراف، تشبه أرنبًا وبريًا.';
+
+  @override
+  String get species_ceratosoma_trilobatum_name => 'الرخوية ثلاثية الفصوص';
+
+  @override
+  String get species_ceratosoma_trilobatum_desc =>
+      'رخوية عارية الخياشيم كبيرة بقرن ظهري مرتفع وفصوص جانبية بدرجات أرجوانية وصفراء.';
+
+  @override
+  String get species_hypselodoris_apolegma_name => 'الهيبسيلودوريس الأرجواني';
+
+  @override
+  String get species_hypselodoris_apolegma_desc =>
+      'رخوية عارية الخياشيم أرجوانية أنيقة بحافة عباءة بيضاء، توجد في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_hypselodoris_bullockii_name => 'هيبسيلودوريس بولوك';
+
+  @override
+  String get species_hypselodoris_bullockii_desc =>
+      'رخوية عارية الخياشيم وردية وأرجوانية بقرون شمية صفراء الأطراف في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_flabellina_exoptata_name => 'الفلابيلينا المرغوبة';
+
+  @override
+  String get species_flabellina_exoptata_desc =>
+      'رخوية عارية الخياشيم شفافة بزوائد ظهرية برتقالية أرجوانية الأطراف، توجد في المياه الاستوائية.';
+
+  @override
+  String get species_risbecia_tryoni_name => 'ريسبيسيا ترايون';
+
+  @override
+  String get species_risbecia_tryoni_desc =>
+      'رخوية عارية الخياشيم كبيرة بنية وزرقاء تُشاهد غالبًا في أزواج متزاوجة على شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_goniobranchus_kuniei_name => 'رخوية كوني';
+
+  @override
+  String get species_goniobranchus_kuniei_desc =>
+      'رخوية عارية الخياشيم بيضاء ببقع برتقالية وحافة عباءة أرجوانية، توجد في غرب المحيط الهادئ.';
+
+  @override
+  String get species_mexichromis_multituberculata_name =>
+      'الرخوية متعددة الحديبات';
+
+  @override
+  String get species_mexichromis_multituberculata_desc =>
+      'رخوية عارية الخياشيم أرجوانية وبيضاء بحديبات ناتئة وزوائد برتقالية الأطراف.';
+
+  @override
+  String get species_chromodoris_dianae_name => 'كروموذوريس ديانا';
+
+  @override
+  String get species_chromodoris_dianae_desc =>
+      'رخوية عارية الخياشيم زرقاء زاهية بخطوط سوداء وخياشيم برتقالية، توجد في غرب المحيط الهادئ.';
+
+  @override
+  String get species_phyllodesmium_poindimiei_name =>
+      'الرخوية العاملة بالطاقة الشمسية';
+
+  @override
+  String get species_phyllodesmium_poindimiei_desc =>
+      'رخوية عارية الخياشيم شفافة بزوائد ظهرية متفرعة تحتضن طحالب الزوزانثيلا.';
+
+  @override
+  String get species_chromodoris_elisabethina_name => 'كروموذوريس إليزابيث';
+
+  @override
+  String get species_chromodoris_elisabethina_desc =>
+      'رخوية عارية الخياشيم بخطوط زرقاء وصفراء وحافة عباءة بيضاء، شائعة في جنوب شرق آسيا.';
+
+  @override
+  String get species_doridella_batava_name => 'الدوريد الباتافي';
+
+  @override
+  String get species_doridella_batava_desc =>
+      'رخوية دوريدية عارية الخياشيم يتراوح لونها بين الأسود والبني، توجد تحت الصخور وبين الحطام في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_tiger_cowrie_name => 'ودع النمر';
+
+  @override
+  String get species_tiger_cowrie_desc =>
+      'صدفة ودع كبيرة منقّطة توجد في الشعاب الاستوائية، وتغطيها عباءتها جزئيًا في الغالب.';
+
+  @override
+  String get species_tritons_trumpet_name => 'بوق ترايتون';
+
+  @override
+  String get species_tritons_trumpet_desc =>
+      'حلزون مفترس كبير وهو العدو الطبيعي لنجم البحر إكليل الشوك.';
+
+  @override
+  String get species_queen_conch_name => 'القوقع الملكي';
+
+  @override
+  String get species_queen_conch_desc =>
+      'قوقع كبير أيقوني في مروج الأعشاب البحرية بالكاريبي بشفة داخلية وردية مميزة.';
+
+  @override
+  String get species_banded_coral_shrimp_name => 'روبيان المرجان المخطط';
+
+  @override
+  String get species_banded_coral_shrimp_desc =>
+      'روبيان منظف بأشرطة حمراء وبيضاء وقرون استشعار بيضاء طويلة، يوجد في شقوق الشعاب.';
+
+  @override
+  String get species_mantis_shrimp_name => 'روبيان السرعوف الطاووسي';
+
+  @override
+  String get species_mantis_shrimp_desc =>
+      'مفترس ملوّن بزوائد قوية تشبه الهراوات قادرة على تحطيم الأصداف.';
+
+  @override
+  String get species_cleaner_shrimp_name => 'الروبيان المنظف القرمزي';
+
+  @override
+  String get species_cleaner_shrimp_desc =>
+      'روبيان أحمر وأبيض زاهٍ ينشئ محطات تنظيف لخدمة أسماك الشعاب.';
+
+  @override
+  String get species_pederson_cleaner_shrimp_name => 'روبيان بيدرسون المنظف';
+
+  @override
+  String get species_pederson_cleaner_shrimp_desc =>
+      'روبيان منظف كاريبي شفاف يعيش بين مجسّات شقائق النعمان البحرية.';
+
+  @override
+  String get species_harlequin_shrimp_name => 'الروبيان المهرج';
+
+  @override
+  String get species_harlequin_shrimp_desc =>
+      'روبيان بنقوش لافتة وكلّابات مسطحة يتغذى حصرًا على نجوم البحر.';
+
+  @override
+  String get species_coleman_shrimp_name => 'روبيان كولمان';
+
+  @override
+  String get species_coleman_shrimp_desc =>
+      'روبيان ضئيل يعيش في أزواج على قنافذ البحر النارية، وهو مطلب ثمين لمصوري ما تحت الماء.';
+
+  @override
+  String get species_emperor_shrimp_name => 'الروبيان الإمبراطور';
+
+  @override
+  String get species_emperor_shrimp_desc =>
+      'روبيان متعايش ملوّن يمتطي خيار البحر والرخويات عارية الخياشيم.';
+
+  @override
+  String get species_sexy_shrimp_name => 'الروبيان الراقص';
+
+  @override
+  String get species_sexy_shrimp_desc =>
+      'روبيان شقائق ضئيل يشتهر برقصة تلويح ذيله، وهو مفضل في التصوير الماكرو.';
+
+  @override
+  String get species_marble_shrimp_name => 'الروبيان المرمّري';
+
+  @override
+  String get species_marble_shrimp_desc =>
+      'روبيان ليلي النشاط مبقّع بأرجل ريشية، يختبئ نهارًا في شقوق الشعاب.';
+
+  @override
+  String get species_spiny_lobster_name => 'الكركند الشوكي الكاريبي';
+
+  @override
+  String get species_spiny_lobster_desc =>
+      'كركند كبير بلا كلّابات وبقرون استشعار طويلة، يحتمي تحت حواف الشعاب.';
+
+  @override
+  String get species_painted_spiny_lobster_name => 'الكركند الشوكي المرسوم';
+
+  @override
+  String get species_painted_spiny_lobster_desc =>
+      'كركند زاهي الألوان بأرجل مخططة بالأزرق والأخضر والأبيض في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_slipper_lobster_name => 'كركند النعل';
+
+  @override
+  String get species_slipper_lobster_desc =>
+      'كركند ليلي النشاط مسطح الجسم بصفائح استشعار عريضة بدلًا من القرون الطويلة.';
+
+  @override
+  String get species_squat_lobster_name => 'الكركند القرفصائي';
+
+  @override
+  String get species_squat_lobster_desc =>
+      'قشري ضئيل بلون وردي أرجواني يعيش على الإسفنج البرميلي العملاق، وهو مفضل في التصوير الماكرو.';
+
+  @override
+  String get species_hermit_crab_name => 'السرطان الناسك أزرق الأرجل';
+
+  @override
+  String get species_hermit_crab_desc =>
+      'سرطان ناسك صغير بأرجل زرقاء زاهية يُشاهد عادةً في شعاب الكاريبي.';
+
+  @override
+  String get species_orangutan_crab_name => 'سرطان الأورانغوتان';
+
+  @override
+  String get species_orangutan_crab_desc =>
+      'سرطان ضئيل كثيف الشعر يعيش في المرجان الفقاعي، وسُمّي بذلك لشبهه بالأورانغوتان.';
+
+  @override
+  String get species_decorator_crab_name => 'السرطان المزخرِف';
+
+  @override
+  String get species_decorator_crab_desc =>
+      'سيد التنكّر الذي يثبّت الإسفنج والطحالب والهيدرات على درعه.';
+
+  @override
+  String get species_porcelain_crab_name => 'سرطان الشقائق الخزفي';
+
+  @override
+  String get species_porcelain_crab_desc =>
+      'سرطان مسطح منقّط يعيش في شقائق النعمان البحرية ويتغذى بالترشيح بأجزاء فم ريشية.';
+
+  @override
+  String get species_arrow_crab_name => 'سرطان السهم';
+
+  @override
+  String get species_arrow_crab_desc =>
+      'سرطان كاريبي نحيل الأطراف بمنقار مدبب طويل وأرجل مخططة.';
+
+  @override
+  String get species_channel_clinging_crab_name => 'سرطان القنوات المتشبث';
+
+  @override
+  String get species_channel_clinging_crab_desc =>
+      'سرطان شعاب كاريبي كبير بجسم داكن وكلّابات حمراء برتقالية، يوجد في الشقوق.';
+
+  @override
+  String get species_coral_crab_name => 'سرطان حراسة المرجان';
+
+  @override
+  String get species_coral_crab_desc =>
+      'سرطان صغير منقّط يعيش في تكافل داخل مرجان Pocillopora ويدافع عن مضيفه.';
+
+  @override
+  String get species_crown_of_thorns_starfish_name => 'نجم البحر إكليل الشوك';
+
+  @override
+  String get species_crown_of_thorns_starfish_desc =>
+      'نجم بحر سام متعدد الأذرع يتغذى على المرجان ويمكنه تدمير الشعاب عند تفشّيه.';
+
+  @override
+  String get species_blue_linckia_starfish_name => 'نجم البحر لينكيا الأزرق';
+
+  @override
+  String get species_blue_linckia_starfish_desc =>
+      'نجم بحر أزرق زاهٍ يُشاهد عادةً على مسطحات ومنحدرات الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_red_knob_starfish_name => 'نجم البحر أحمر النتوءات';
+
+  @override
+  String get species_red_knob_starfish_desc =>
+      'نجم بحر رمادي كبير بأشواك بارزة حمراء الأطراف، يوجد في المناطق الرملية من الشعاب.';
+
+  @override
+  String get species_chocolate_chip_starfish_name =>
+      'نجم البحر برقائق الشوكولاتة';
+
+  @override
+  String get species_chocolate_chip_starfish_desc =>
+      'نجم بحر بلون بيج بعقيدات داكنة ناتئة تشبه رقائق الشوكولاتة على القيعان الرملية.';
+
+  @override
+  String get species_cushion_star_name => 'نجم البحر الوسادي';
+
+  @override
+  String get species_cushion_star_desc =>
+      'نجم بحر منتفخ خماسي الشكل بأذرع قصيرة، يوجد على مسطحات الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_fromia_starfish_name => 'نجم البحر الأنيق';
+
+  @override
+  String get species_fromia_starfish_desc =>
+      'نجم بحر صغير أحمر برتقالي بحواف صفائح فاتحة تشكّل نمطًا يشبه البلاط.';
+
+  @override
+  String get species_basket_star_name => 'نجم السلة';
+
+  @override
+  String get species_basket_star_desc =>
+      'أذرع شديدة التفرع تنفرد ليلًا للتغذي بالترشيح من التيار.';
+
+  @override
+  String get species_brittle_star_name => 'نجم البحر الهش المخطط';
+
+  @override
+  String get species_brittle_star_desc =>
+      'نجم بحر هش مخطط يوجد تحت الصخور وفي الشقوق بأذرع رشيقة تشبه الأفاعي.';
+
+  @override
+  String get species_feather_star_name => 'نجم الريش';
+
+  @override
+  String get species_feather_star_desc =>
+      'زنبق بحر متعدد الأذرع يرتكز على نتوءات الشعاب ويتغذى بالترشيح بأذرعه الريشية.';
+
+  @override
+  String get species_black_feather_star_name => 'نجم الريش الأسود';
+
+  @override
+  String get species_black_feather_star_desc =>
+      'زنبق بحر داكن يمكنه السباحة لفترات قصيرة بتلويح أذرعه العديدة بإيقاع منتظم.';
+
+  @override
+  String get species_long_spined_sea_urchin_name => 'قنفذ البحر طويل الأشواك';
+
+  @override
+  String get species_long_spined_sea_urchin_desc =>
+      'قنفذ بحر أسود بأشواك طويلة سامة، وهو راعٍ أساسي للطحالب في شعاب الكاريبي.';
+
+  @override
+  String get species_fire_urchin_name => 'قنفذ البحر الناري';
+
+  @override
+  String get species_fire_urchin_desc =>
+      'قنفذ بحر طري الجسم بأشواك سامة تسبب لسعات مؤلمة عند ملامستها.';
+
+  @override
+  String get species_pencil_urchin_name => 'قنفذ البحر القلمي';
+
+  @override
+  String get species_pencil_urchin_desc =>
+      'قنفذ بحر متين بأشواك غليظة غير مدببة، يوجد محشورًا في شقوق الشعاب.';
+
+  @override
+  String get species_collector_urchin_name => 'قنفذ البحر الجامع';
+
+  @override
+  String get species_collector_urchin_desc =>
+      'قنفذ بحر يغطي نفسه بالحطام وشظايا الطحالب من أجل التمويه.';
+
+  @override
+  String get species_sea_apple_name => 'تفاحة البحر';
+
+  @override
+  String get species_sea_apple_desc =>
+      'خيار بحر زاهي الألوان بمجسّات فموية يستخدمها للتغذي بالترشيح.';
+
+  @override
+  String get species_pineapple_sea_cucumber_name => 'خيار البحر الأناناسي';
+
+  @override
+  String get species_pineapple_sea_cucumber_desc =>
+      'خيار بحر كبير أحمر برتقالي بحُليمات نجمية الشكل، يوجد على منحدرات الشعاب.';
+
+  @override
+  String get species_black_sea_cucumber_name => 'خيار البحر الأسود';
+
+  @override
+  String get species_black_sea_cucumber_desc =>
+      'خيار بحر أسود شائع يوجد على مسطحات الشعاب الرملية في أنحاء المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_leopard_sea_cucumber_name => 'خيار البحر الفهدي';
+
+  @override
+  String get species_leopard_sea_cucumber_desc =>
+      'خيار بحر منقّط يقذف أنابيب كوفييه البيضاء اللزجة عند إزعاجه.';
+
+  @override
+  String get species_sand_dollar_name => 'دولار الرمل';
+
+  @override
+  String get species_sand_dollar_desc =>
+      'قنفذ بحر مسطح قرصي الشكل يوجد مدفونًا جزئيًا في القيعان الرملية.';
+
+  @override
+  String get species_moon_jellyfish_name => 'قنديل البحر القمري';
+
+  @override
+  String get species_moon_jellyfish_desc =>
+      'قنديل بحر شفاف جرسي الشكل بأربع غدد تناسلية على شكل حدوة حصان تُرى عبر جسمه.';
+
+  @override
+  String get species_lions_mane_jellyfish_name => 'قنديل بحر عرف الأسد';
+
+  @override
+  String get species_lions_mane_jellyfish_desc =>
+      'أحد أكبر أنواع قناديل البحر بمجسّات طويلة متدلية، ويعيش في المياه الباردة.';
+
+  @override
+  String get species_box_jellyfish_name => 'قنديل البحر الصندوقي';
+
+  @override
+  String get species_box_jellyfish_desc =>
+      'قنديل بحر شديد الخطورة بسم قوي، يوجد في المياه الاستوائية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_upside_down_jellyfish_name => 'قنديل البحر المقلوب';
+
+  @override
+  String get species_upside_down_jellyfish_desc =>
+      'قنديل بحر غير مألوف يستقر وجرسه إلى الأسفل على القيعان الرملية ليتيح لطحالبه التمثيل الضوئي.';
+
+  @override
+  String get species_blue_blubber_jellyfish_name =>
+      'قنديل البحر الأزرق الهلامي';
+
+  @override
+  String get species_blue_blubber_jellyfish_desc =>
+      'قنديل بحر أزرق مائل للبياض بجرس متماسك وأذرع فموية مكشكشة، شائع في المياه الأسترالية.';
+
+  @override
+  String get species_fried_egg_jellyfish_name => 'قنديل البحر بيضة مقلية';
+
+  @override
+  String get species_fried_egg_jellyfish_desc =>
+      'قنديل بحر متوسطي بقبة صفراء تشبه البيضة المقلية ولسعته خفيفة.';
+
+  @override
+  String get species_pacific_sea_nettle_name => 'قرّاص البحر الهادئي';
+
+  @override
+  String get species_pacific_sea_nettle_desc =>
+      'قنديل بحر بني ذهبي بمجسّات طويلة متدلية، يوجد على طول ساحل المحيط الهادئ.';
+
+  @override
+  String get species_compass_jellyfish_name => 'قنديل البحر البوصلي';
+
+  @override
+  String get species_compass_jellyfish_desc =>
+      'قنديل بحر بني وأبيض بعلامات على شكل حرف V تتشعع كوردة البوصلة.';
+
+  @override
+  String get species_spotted_jellyfish_name => 'قنديل البحر المنقّط';
+
+  @override
+  String get species_spotted_jellyfish_desc =>
+      'قنديل بحر ذهبي ببقع بيضاء يشتهر بملء بحيرة قناديل البحر في بالاو.';
+
+  @override
+  String get species_barrel_jellyfish_name => 'قنديل البحر البرميلي';
+
+  @override
+  String get species_barrel_jellyfish_desc =>
+      'قنديل بحر كبير قبّي الشكل بأذرع فموية مكشكشة ولسعة خفيفة، وهو شائع في المحيط الأطلسي.';
+
+  @override
+  String get species_persian_carpet_flatworm_name =>
+      'الدودة المفلطحة السجادة الفارسية';
+
+  @override
+  String get species_persian_carpet_flatworm_desc =>
+      'دودة مفلطحة سوداء مزخرفة بحواف صفراء برتقالية، وكثيرًا ما تُخلط مع الرخويات عارية الخياشيم.';
+
+  @override
+  String get species_leopard_flatworm_name => 'الدودة المفلطحة الفهدية';
+
+  @override
+  String get species_leopard_flatworm_desc =>
+      'دودة مفلطحة شفافة ببقع تشبه بقع الفهد تنساب فوق أسطح الشعاب.';
+
+  @override
+  String get species_divided_flatworm_name => 'الدودة المفلطحة المقسّمة';
+
+  @override
+  String get species_divided_flatworm_desc =>
+      'دودة مفلطحة لافتة بالأسود والبرتقالي تحاكي الرخويات السامة عارية الخياشيم لحماية نفسها.';
+
+  @override
+  String get species_blue_pseudoceros_flatworm_name =>
+      'الدودة المفلطحة الزرقاء بسودوسيروس';
+
+  @override
+  String get species_blue_pseudoceros_flatworm_desc =>
+      'دودة مفلطحة زرقاء داكنة بحافة برتقالية تنساب فوق أسطح الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_racing_stripe_flatworm_name =>
+      'الدودة المفلطحة ذات الخط السباقي';
+
+  @override
+  String get species_racing_stripe_flatworm_desc =>
+      'دودة مفلطحة بلون كريمي بخط مركزي داكن واضح وحافة مكشكشة.';
+
+  @override
+  String get species_christmas_tree_worm_name => 'دودة شجرة الميلاد';
+
+  @override
+  String get species_christmas_tree_worm_desc =>
+      'دودة ملوّنة بتاج حلزوني مغروسة في المرجان وتنكمش فورًا عند الاقتراب منها.';
+
+  @override
+  String get species_feather_duster_worm_name => 'الدودة الريشية';
+
+  @override
+  String get species_feather_duster_worm_desc =>
+      'دودة تعيش في أنبوب ولها تاج مروحي من الأشعة الريشية تستخدمه للتغذي بالترشيح.';
+
+  @override
+  String get species_fire_worm_name => 'الدودة النارية الملتحية';
+
+  @override
+  String get species_fire_worm_desc =>
+      'دودة ذات أشواك بيضاء لاسعة تسبب تهيّجًا مؤلمًا عند ملامستها.';
+
+  @override
+  String get species_bobbit_worm_name => 'دودة بوبيت';
+
+  @override
+  String get species_bobbit_worm_desc =>
+      'مفترس كمين يختبئ في الرمال بفكين قويين ينقضّان بسرعة البرق.';
+
+  @override
+  String get species_social_feather_duster_name => 'الدودة الريشية الاجتماعية';
+
+  @override
+  String get species_social_feather_duster_desc =>
+      'دودة أنبوبية مستعمرة تشكّل تجمعات من التيجان الرقيقة المخططة في شعاب الكاريبي.';
+
+  @override
+  String get species_giant_clam_name => 'المحار العملاق';
+
+  @override
+  String get species_giant_clam_desc =>
+      'أكبر ذوات المصراعين الحية، وعباءتها متقزّحة الألوان وتحتضن طحالب متكافلة.';
+
+  @override
+  String get species_boring_clam_name => 'المحار الحافر';
+
+  @override
+  String get species_boring_clam_desc =>
+      'محار صغير ملوّن يحفر داخل الصخر المرجاني ولا تظهر منه سوى عباءته الزاهية.';
+
+  @override
+  String get species_maxima_clam_name => 'المحار الأقصى';
+
+  @override
+  String get species_maxima_clam_desc =>
+      'محار زاهي الألوان مغروس في صخر الشعاب بعباءات زرقاء وخضراء براقة.';
+
+  @override
+  String get species_flame_scallop_name => 'الأسقلوب اللهبي';
+
+  @override
+  String get species_flame_scallop_desc =>
+      'من ذوات المصراعين الحمراء بوميض ضوئي أبيض على طول حافة عباءتها، توجد في شقوق الشعاب.';
+
+  @override
+  String get species_thorny_oyster_name => 'المحار الشوكي';
+
+  @override
+  String get species_thorny_oyster_desc =>
+      'من ذوات المصراعين بصدفة شوكية ملتصقة بصخر الشعاب، وغالبًا ما يكسوها الإسفنج والطحالب.';
+
+  @override
+  String get species_magnificent_sea_anemone_name =>
+      'شقائق النعمان البحرية البديعة';
+
+  @override
+  String get species_magnificent_sea_anemone_desc =>
+      'شقائق نعمان كبيرة ملوّنة تستضيف أسماك المهرج، بعمود بارز ومجسّات منسابة.';
+
+  @override
+  String get species_bubble_tip_anemone_name => 'شقائق النعمان فقاعية الأطراف';
+
+  @override
+  String get species_bubble_tip_anemone_desc =>
+      'مضيف شائع لأسماك المهرج بمجسّات منتفخة الأطراف بألوان خضراء أو بنية أو وردية.';
+
+  @override
+  String get species_giant_carpet_anemone_name =>
+      'شقائق النعمان السجادية العملاقة';
+
+  @override
+  String get species_giant_carpet_anemone_desc =>
+      'شقائق نعمان ضخمة بمجسّات قصيرة لزجة يمكن أن يتجاوز عرضها المتر الواحد.';
+
+  @override
+  String get species_haddon_carpet_anemone_name =>
+      'شقائق النعمان السجادية الهادونية';
+
+  @override
+  String get species_haddon_carpet_anemone_desc =>
+      'شقائق نعمان سجادية مسطحة على القيعان الرملية تستضيف أنواعًا مختلفة من أسماك المهرج والسرطانات الخزفية.';
+
+  @override
+  String get species_long_tentacle_anemone_name =>
+      'شقائق النعمان طويلة المجسّات';
+
+  @override
+  String get species_long_tentacle_anemone_desc =>
+      'شقائق نعمان تعيش في القيعان الرملية بمجسّات طويلة منسابة، وتستضيف أسماك المهرج غالبًا.';
+
+  @override
+  String get species_tube_anemone_name => 'شقائق النعمان الأنبوبية';
+
+  @override
+  String get species_tube_anemone_desc =>
+      'شقائق نعمان أنيقة تسكن أنبوبًا رقّيًا في الرمال ولها حلقتان من المجسّات.';
+
+  @override
+  String get species_hell_fire_anemone_name => 'شقائق نعمان نار الجحيم';
+
+  @override
+  String get species_hell_fire_anemone_desc =>
+      'شقائق نعمان شديدة اللسع بمجسّات متفرعة تشبه المرجان الطري.';
+
+  @override
+  String get species_beaded_sea_anemone_name => 'شقائق النعمان البحرية الخرزية';
+
+  @override
+  String get species_beaded_sea_anemone_desc =>
+      'شقائق نعمان بأطراف مجسّات منتفخة تشبه الخرز، توجد في المناطق الرملية من شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_condylactis_anemone_name =>
+      'شقائق النعمان الكاريبية العملاقة';
+
+  @override
+  String get species_condylactis_anemone_desc =>
+      'شقائق نعمان كاريبية كبيرة بمجسّات أرجوانية الأطراف، توجد على قيعان الشعاب الصخرية.';
+
+  @override
+  String get species_sand_anemone_name => 'شقائق النعمان الرملية';
+
+  @override
+  String get species_sand_anemone_desc =>
+      'شقائق نعمان رقيقة مدفونة جزئيًا في الرمال بمجسّات أرجوانية الأطراف.';
+
+  @override
+  String get species_barrel_sponge_name => 'الإسفنج البرميلي العملاق';
+
+  @override
+  String get species_barrel_sponge_desc =>
+      'إسفنج ضخم برميلي الشكل يمكن أن يعيش قرونًا على جدران الشعاب في الكاريبي.';
+
+  @override
+  String get species_azure_vase_sponge_name => 'الإسفنج المزهري اللازوردي';
+
+  @override
+  String get species_azure_vase_sponge_desc =>
+      'إسفنج مزهري الشكل بلون أزرق أرجواني زاهٍ يوجد على جدران الشعاب في الكاريبي.';
+
+  @override
+  String get species_yellow_tube_sponge_name => 'الإسفنج الأنبوبي الأصفر';
+
+  @override
+  String get species_yellow_tube_sponge_desc =>
+      'إسفنج أنبوبي أصفر زاهٍ ينمو في تجمعات على جدران الشعاب في الكاريبي.';
+
+  @override
+  String get species_elephant_ear_sponge_name => 'إسفنج أذن الفيل';
+
+  @override
+  String get species_elephant_ear_sponge_desc =>
+      'إسفنج برتقالي كبير مروحي الشكل ينمو على الجدران وتحت النتوءات الصخرية في الكاريبي.';
+
+  @override
+  String get species_rope_sponge_name => 'الإسفنج الحبلي';
+
+  @override
+  String get species_rope_sponge_desc =>
+      'إسفنج أحمر منتصب متفرع ينمو في تكوينات تشبه الحبال على شعاب الكاريبي.';
+
+  @override
+  String get species_portuguese_man_o_war_name => 'السفينة الحربية البرتغالية';
+
+  @override
+  String get species_portuguese_man_o_war_desc =>
+      'مستعمرة هيدروزوية بعوّامة مملوءة بالغاز ومجسّات متدلية شديدة الإيلام.';
+
+  @override
+  String get species_fire_coral_name => 'المرجان الناري';
+
+  @override
+  String get species_fire_coral_desc =>
+      'ليس مرجانًا حقيقيًا بل كائن هيدروزوي يسبب لسعات مؤلمة للغواصين عند ملامسته.';
+
+  @override
+  String get species_by_the_wind_sailor_name => 'بحّار الريح';
+
+  @override
+  String get species_by_the_wind_sailor_desc =>
+      'مستعمرة هيدروزوية زرقاء طافية بشراع مائل يلتقط الرياح.';
+
+  @override
+  String get species_blue_button_name => 'الزر الأزرق';
+
+  @override
+  String get species_blue_button_desc =>
+      'مستعمرة هيدروزوية طافية بقرص مسطح وهيدرات زرقاء تشبه المجسّات.';
+
+  @override
+  String get species_giant_sea_hare_name => 'أرنب البحر العملاق';
+
+  @override
+  String get species_giant_sea_hare_desc =>
+      'أحد أكبر بزاقات البحر، لونه بني داكن إلى أسود، ويوجد في مروج عشب البحر.';
+
+  @override
+  String get species_sea_hare_name => 'أرنب البحر المرقّط';
+
+  @override
+  String get species_sea_hare_desc =>
+      'أرنب بحر كبير ببقع خضراء يطلق حبرًا أرجوانيًا عند إزعاجه.';
+
+  @override
+  String get species_nudibranch_berghia_name => 'رخوية البيرغيا عارية الخياشيم';
+
+  @override
+  String get species_nudibranch_berghia_desc =>
+      'رخوية عارية الخياشيم شفافة بزوائد ظهرية بيضاء الأطراف تتغذى على شقائق النعمان البحرية.';
+
+  @override
+  String get species_sea_pen_name => 'قلم البحر';
+
+  @override
+  String get species_sea_pen_desc =>
+      'مرجان ثماني مستعمر ريشي الشكل مثبّت في الرمال وينكمش عند إزعاجه.';
+
+  @override
+  String get species_blue_sea_star_name => 'نجم البحر الأزرق';
+
+  @override
+  String get species_blue_sea_star_desc =>
+      'نجم بحر متعدد الألوان يتجدد من شظية ذراع واحدة في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_reef_squid_name => 'حبّار الشعاب';
+
+  @override
+  String get species_reef_squid_desc =>
+      'حبّار الشعاب الجنوبي الذي يُصادَف عادةً في المياه الأسترالية المعتدلة.';
+
+  @override
+  String get species_tiger_shrimp_name => 'روبيان النمر';
+
+  @override
+  String get species_tiger_shrimp_desc =>
+      'روبيان كبير مخطط يوجد على القيعان الرملية ومروج الأعشاب البحرية في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_candy_crab_name => 'سرطان الحلوى';
+
+  @override
+  String get species_candy_crab_desc =>
+      'سرطان ضئيل ملوّن يطابق المرجان الطري الذي يسكنه بنتوءات شوكية وردية أو صفراء.';
+
+  @override
+  String get species_spider_crab_name => 'السرطان العنكبوتي المزخرِف';
+
+  @override
+  String get species_spider_crab_desc =>
+      'سرطان بطيء الحركة مغطى بالإسفنج والطحالب التي يثبّتها على جسمه للتمويه.';
+
+  @override
+  String get species_anemone_shrimp_name => 'روبيان الشقائق البديعة';
+
+  @override
+  String get species_anemone_shrimp_desc =>
+      'روبيان شفاف بعلامات بيضاء وأرجوانية يعيش بين مجسّات شقائق النعمان البحرية.';
+
+  @override
+  String get species_snapping_shrimp_name => 'الروبيان الطقّاق';
+
+  @override
+  String get species_snapping_shrimp_desc =>
+      'روبيان صغير يُصدر طقّة عالية بكلّابته الضخمة، وكثيرًا ما يقترن بأسماك القوبيون.';
+
+  @override
+  String get species_glass_sponge_name => 'سلة زهرة فينوس';
+
+  @override
+  String get species_glass_sponge_desc =>
+      'إسفنج زجاجي رقيق بهيكل سيليكوني معقد يوجد في المياه العميقة.';
+
+  @override
+  String get species_toxic_sea_urchin_name => 'قنفذ البحر الزهري';
+
+  @override
+  String get species_toxic_sea_urchin_desc =>
+      'قنفذ بحر خادع الجمال مغطى بزوائد كمّاشية تشبه الأزهار وتحمل سمًّا قويًا.';
+
+  @override
+  String get species_slate_pencil_urchin_name => 'قنفذ البحر قلم الأردواز';
+
+  @override
+  String get species_slate_pencil_urchin_desc =>
+      'قنفذ بحر بأشواك غليظة مستديرة يوجد على قيعان الشعاب في الكاريبي والأطلسي.';
+
+  @override
+  String get species_spiny_sea_star_name => 'نجم البحر الشوكي';
+
+  @override
+  String get species_spiny_sea_star_desc =>
+      'نجم بحر كبير من المياه المعتدلة بأشواك بارزة، يوجد في المياه الأوروبية والأطلسية.';
+
+  @override
+  String get species_bat_star_name => 'نجم البحر الخفاشي';
+
+  @override
+  String get species_bat_star_desc =>
+      'نجم بحر هادئي بأذرع موصولة بغشاء بلون برتقالي أو أحمر أو أرجواني، يوجد في غابات عشب البحر.';
+
+  @override
+  String get species_sunflower_star_name => 'نجم عبّاد الشمس';
+
+  @override
+  String get species_sunflower_star_desc =>
+      'نجم بحر ضخم سريع الحركة له حتى 24 ذراعًا، يوجد في غابات عشب البحر بالمحيط الهادئ.';
+
+  @override
+  String get species_blood_star_name => 'نجم الدم';
+
+  @override
+  String get species_blood_star_desc =>
+      'نجم بحر أحمر برتقالي زاهٍ بأذرع نحيلة، يوجد في المياه المعتدلة بالمحيط الهادئ.';
+
+  @override
+  String get species_common_cuttlefish_name => 'السبيدج الشائع';
+
+  @override
+  String get species_common_cuttlefish_desc =>
+      'سيد التمويه الذي يوجد في المياه الأوروبية والمتوسطية، وحدقتاه على شكل حرف W.';
+
+  @override
+  String get species_blue_spotted_crab_name => 'السرطان السابح أزرق البقع';
+
+  @override
+  String get species_blue_spotted_crab_desc =>
+      'سرطان سابح نشط ببقع زرقاء على درعه، يوجد على القيعان الرملية في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_sponge_crab_name => 'سرطان الإسفنج';
+
+  @override
+  String get species_sponge_crab_desc =>
+      'سرطان ينحت إسفنجة حية ويحملها على ظهره للتمويه.';
+
+  @override
+  String get species_horseshoe_crab_name => 'سرطان حدوة الحصان';
+
+  @override
+  String get species_horseshoe_crab_desc =>
+      'مفصلي أرجل قديم من كلابيات القرون بصدفة تشبه الخوذة، يوجد على القيعان الرملية في الأطلسي.';
+
+  @override
+  String get species_sea_spider_name => 'عنكبوت البحر';
+
+  @override
+  String get species_sea_spider_desc =>
+      'مفصلي أرجل بحري رقيق طويل الأرجل يُشاهد وهو يزحف على الهيدرات والبريوزوا.';
+
+  @override
+  String get species_sea_lily_name => 'زنبق البحر';
+
+  @override
+  String get species_sea_lily_desc =>
+      'أحفورة حية من زنابق البحر المعنّقة توجد في المياه العميقة وتتغذى بالترشيح بأذرعها الريشية.';
+
+  @override
+  String get species_mantis_shrimp_lysiosquilla_name => 'روبيان السرعوف الرامح';
+
+  @override
+  String get species_mantis_shrimp_lysiosquilla_desc =>
+      'روبيان سرعوف كبير حافر للجحور بزوائد رمحية، يوجد على القيعان الرملية.';
+
+  @override
+  String get species_purple_sea_urchin_name => 'قنفذ البحر الأرجواني';
+
+  @override
+  String get species_purple_sea_urchin_desc =>
+      'قنفذ بحر أرجواني وفير العدد يوجد في غابات عشب البحر وبرك المد الصخرية بالمحيط الهادئ.';
+
+  @override
+  String get species_crown_jellyfish_name => 'قنديل البحر المتوّج';
+
+  @override
+  String get species_crown_jellyfish_desc =>
+      'قنديل بحر أرجواني داكن بجرس مرتفع يشبه التاج، يوجد في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_comb_jelly_name => 'عنبة البحر';
+
+  @override
+  String get species_comb_jelly_desc =>
+      'كائن مشطي صغير مضيء حيويًا بصفوف مشطية متقزّحة الألوان ومجسّين طويلين.';
+
+  @override
+  String get species_warty_sea_slug_name => 'بزاقة البحر الثؤلولية';
+
+  @override
+  String get species_warty_sea_slug_desc =>
+      'رخوية عارية الخياشيم زرقاء وسوداء بحديبات صفراء القمم، تُشاهد عادةً في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_doris_nudibranch_name => 'ليمونة البحر';
+
+  @override
+  String get species_doris_nudibranch_desc =>
+      'رخوية دوريدية عارية الخياشيم صفراء منقّطة توجد في مياه المحيط الهادئ المعتدلة وتتغذى على الإسفنج.';
+
+  @override
+  String get species_opalescent_nudibranch_name =>
+      'الرخوية العقيقية عارية الخياشيم';
+
+  @override
+  String get species_opalescent_nudibranch_desc =>
+      'رخوية شفافة بزوائد ظهرية برتقالية زاهية وخطوط ظهرية زرقاء في مياه المحيط الهادئ.';
+
+  @override
+  String get species_clown_nudibranch_name => 'الرخوية المهرجة عارية الخياشيم';
+
+  @override
+  String get species_clown_nudibranch_desc =>
+      'رخوية عارية الخياشيم وردية برتقالية ببقع زرقاء وبيضاء، توجد في المياه الأسترالية المعتدلة.';
+
+  @override
+  String get species_bottlenose_dolphin_name => 'الدلفين قاروري الأنف';
+
+  @override
+  String get species_bottlenose_dolphin_desc =>
+      'دلفين فضولي ومرح يصادفه الغواصون كثيرًا في المياه الاستوائية والمعتدلة.';
+
+  @override
+  String get species_spinner_dolphin_name => 'الدلفين الدوّار';
+
+  @override
+  String get species_spinner_dolphin_desc =>
+      'دلفين بهلواني يشتهر بدورانه في الهواء، ويُشاهد غالبًا في مجموعات كبيرة قرب الشعاب المرجانية.';
+
+  @override
+  String get species_common_dolphin_name => 'الدلفين الشائع';
+
+  @override
+  String get species_common_dolphin_desc =>
+      'دلفين سريع السباحة بنمط مميز يشبه الساعة الرملية، يوجد في المحيط المفتوح والمياه الساحلية.';
+
+  @override
+  String get species_spotted_dolphin_name => 'الدلفين المرقّط الأطلسي';
+
+  @override
+  String get species_spotted_dolphin_desc =>
+      'دلفين مرقّط ودود كثيرًا ما يقترب من الغواصين في جزر البهاما والكاريبي.';
+
+  @override
+  String get species_rissos_dolphin_name => 'دلفين ريسو';
+
+  @override
+  String get species_rissos_dolphin_desc =>
+      'دلفين كبير بجسم رمادي تغطيه الندوب بكثافة، يوجد في المياه العميقة البعيدة عن الساحل حول العالم.';
+
+  @override
+  String get species_humpback_whale_name => 'الحوت الأحدب';
+
+  @override
+  String get species_humpback_whale_desc =>
+      'حوت مهيب يشتهر بقفزاته من الماء وأغانيه المعقدة، ويُشاهد خلال هجراته الموسمية.';
+
+  @override
+  String get species_grey_whale_name => 'الحوت الرمادي';
+
+  @override
+  String get species_grey_whale_desc =>
+      'حوت بالييني يتغذى من القاع ويهاجر على طول ساحل المحيط الهادئ، وغالبًا ما تكسوه البرنقيلات.';
+
+  @override
+  String get species_blue_whale_name => 'الحوت الأزرق';
+
+  @override
+  String get species_blue_whale_desc =>
+      'أضخم حيوان عاش على الإطلاق، ويصادفه الغواصون أحيانًا في المياه الزرقاء العميقة.';
+
+  @override
+  String get species_sperm_whale_name => 'حوت العنبر';
+
+  @override
+  String get species_sperm_whale_desc =>
+      'حوت غوّاص إلى الأعماق برأس ضخم، ويُشاهد أحيانًا مستريحًا عند السطح بين غوصاته.';
+
+  @override
+  String get species_orca_name => 'الأوركا';
+
+  @override
+  String get species_orca_desc =>
+      'مفترس قمة بعلامات سوداء وبيضاء مميزة، يوجد في جميع أحواض المحيطات.';
+
+  @override
+  String get species_minke_whale_name => 'حوت المنك';
+
+  @override
+  String get species_minke_whale_desc =>
+      'حوت بالييني أصغر حجمًا يبدي فضولًا تجاه الغواصين، خصوصًا في الحاجز المرجاني العظيم.';
+
+  @override
+  String get species_beluga_whale_name => 'حوت البيلوغا';
+
+  @override
+  String get species_beluga_whale_desc =>
+      'حوت قطبي أبيض يشتهر بأصواته وسلوكه الاجتماعي في المياه الباردة.';
+
+  @override
+  String get species_pilot_whale_name => 'الحوت القائد قصير الزعانف';
+
+  @override
+  String get species_pilot_whale_desc =>
+      'حوت اجتماعي غوّاص إلى الأعماق يُشاهد غالبًا في مجموعات كبيرة في البحار الاستوائية والدافئة المعتدلة.';
+
+  @override
+  String get species_false_killer_whale_name => 'الحوت القاتل الكاذب';
+
+  @override
+  String get species_false_killer_whale_desc =>
+      'دلفين محيطي كبير يقترب أحيانًا من الغواصين في المياه المفتوحة.';
+
+  @override
+  String get species_dugong_name => 'الأطوم';
+
+  @override
+  String get species_dugong_desc =>
+      'عاشب وديع يرعى في مروج الأعشاب البحرية بالمحيطين الهندي والهادئ، وهو قريب الصلة بخراف البحر.';
+
+  @override
+  String get species_west_indian_manatee_name => 'خروف بحر الهند الغربية';
+
+  @override
+  String get species_west_indian_manatee_desc =>
+      'عاشب بطيء الحركة يوجد في المياه الضحلة الدافئة ومصبات الأنهار والينابيع في الكاريبي.';
+
+  @override
+  String get species_sea_otter_name => 'قضاعة البحر';
+
+  @override
+  String get species_sea_otter_desc =>
+      'ثديي بحري محبب يوجد في غابات عشب البحر على طول ساحل شمال المحيط الهادئ.';
+
+  @override
+  String get species_california_sea_lion_name => 'أسد بحر كاليفورنيا';
+
+  @override
+  String get species_california_sea_lion_desc =>
+      'من زعنفيات الأقدام المرحة والرشيقة التي كثيرًا ما تتفاعل مع الغواصين على طول ساحل المحيط الهادئ.';
+
+  @override
+  String get species_steller_sea_lion_name => 'أسد بحر ستيلر';
+
+  @override
+  String get species_steller_sea_lion_desc =>
+      'أكبر أنواع أسود البحر، يوجد في المياه الباردة بشمال المحيط الهادئ قرب السواحل الصخرية.';
+
+  @override
+  String get species_harbor_seal_name => 'فقمة الموانئ';
+
+  @override
+  String get species_harbor_seal_desc =>
+      'فقمة فضولية تُشاهد عادةً في المياه الساحلية المعتدلة، وغالبًا ما تستريح على الصخور قرب مواقع الغوص.';
+
+  @override
+  String get species_grey_seal_name => 'الفقمة الرمادية';
+
+  @override
+  String get species_grey_seal_desc =>
+      'فقمة كبيرة مرحة توجد في شمال الأطلسي، وتشتهر باقترابها من الغواصين تحت الماء.';
+
+  @override
+  String get species_northern_elephant_seal_name => 'فقمة الفيل الشمالية';
+
+  @override
+  String get species_northern_elephant_seal_desc =>
+      'فقمة ضخمة تغوص إلى أعماق كبيرة، وللذكور خرطوم كبير. توجد على طول ساحل شرق المحيط الهادئ.';
+
+  @override
+  String get species_hawaiian_monk_seal_name => 'فقمة الراهب الهاوايية';
+
+  @override
+  String get species_hawaiian_monk_seal_desc =>
+      'فقمة مهددة بالانقراض بشدة ومتوطنة في هاواي، ويراها الغواصون أحيانًا على الشعاب.';
+
+  @override
+  String get species_leopard_seal_name => 'الفقمة النمرية';
+
+  @override
+  String get species_leopard_seal_desc =>
+      'مفترس قوي في القطب الجنوبي بفروة منقّطة، يصادفه غواصو المياه الباردة.';
+
+  @override
+  String get species_narwhal_name => 'النارويل';
+
+  @override
+  String get species_narwhal_desc =>
+      'حوت قطبي بناب حلزوني طويل، نادر المشاهدة لكنه أيقوني بين الثدييات البحرية.';
+
+  @override
+  String get species_green_sea_turtle_name => 'السلحفاة البحرية الخضراء';
+
+  @override
+  String get species_green_sea_turtle_desc =>
+      'سلحفاة بحرية كبيرة تُشاهد عادةً وهي ترعى الأعشاب البحرية في المياه الاستوائية.';
+
+  @override
+  String get species_hawksbill_sea_turtle_name =>
+      'السلحفاة البحرية صقرية المنقار';
+
+  @override
+  String get species_hawksbill_sea_turtle_desc =>
+      'سلحفاة تسكن الشعاب بمنقار مدبب، وتتغذى على الإسفنج بين التكوينات المرجانية.';
+
+  @override
+  String get species_loggerhead_sea_turtle_name =>
+      'السلحفاة البحرية ضخمة الرأس';
+
+  @override
+  String get species_loggerhead_sea_turtle_desc =>
+      'سلحفاة كبيرة الرأس توجد في البحار المعتدلة والاستوائية، وغالبًا قرب الشعاب الصخرية.';
+
+  @override
+  String get species_leatherback_sea_turtle_name =>
+      'السلحفاة البحرية جلدية الظهر';
+
+  @override
+  String get species_leatherback_sea_turtle_desc =>
+      'أكبر سلحفاة حية بصدفة جلدية مرنة، وتغوص إلى أعماق سحيقة.';
+
+  @override
+  String get species_olive_ridley_sea_turtle_name => 'سلحفاة ريدلي الزيتونية';
+
+  @override
+  String get species_olive_ridley_sea_turtle_desc =>
+      'أصغر أنواع السلاحف البحرية، وتشتهر بمواسم التعشيش الجماعي المتزامن المعروفة باسم arribadas.';
+
+  @override
+  String get species_kemps_ridley_sea_turtle_name => 'سلحفاة كيمب ريدلي';
+
+  @override
+  String get species_kemps_ridley_sea_turtle_desc =>
+      'سلحفاة بحرية مهددة بالانقراض بشدة توجد أساسًا في خليج المكسيك.';
+
+  @override
+  String get species_flatback_sea_turtle_name => 'السلحفاة البحرية مسطحة الظهر';
+
+  @override
+  String get species_flatback_sea_turtle_desc =>
+      'متوطنة في المياه الأسترالية، وتتميز بدرعها المسطح وموطنها الساحلي.';
+
+  @override
+  String get species_brain_coral_name => 'المرجان الدماغي';
+
+  @override
+  String get species_brain_coral_desc =>
+      'مرجان ضخم بانٍ للشعاب بسطح محزّز يشبه الدماغ، وهو شائع في شعاب الكاريبي.';
+
+  @override
+  String get species_staghorn_coral_name => 'مرجان قرن الأيل';
+
+  @override
+  String get species_staghorn_coral_desc =>
+      'مرجان متفرع سريع النمو يشكّل أدغالًا كثيفة تمثّل موئلًا حيويًا لأسماك الشعاب.';
+
+  @override
+  String get species_elkhorn_coral_name => 'مرجان قرن الموظ';
+
+  @override
+  String get species_elkhorn_coral_desc =>
+      'مرجان متفرع كبير بأفرع مسطحة كفّية الشكل، وهو بانٍ رئيسي للشعاب في الكاريبي.';
+
+  @override
+  String get species_table_coral_name => 'المرجان الطاولي';
+
+  @override
+  String get species_table_coral_desc =>
+      'مرجان يشكّل صفائح مسطحة في شعاب المحيطين الهندي والهادئ، ويوفر مأوى لأنواع كثيرة من الأسماك.';
+
+  @override
+  String get species_mushroom_coral_name => 'المرجان الفطري';
+
+  @override
+  String get species_mushroom_coral_desc =>
+      'مرجان منفرد حر المعيشة على شكل قرص، يوجد في المناطق الرملية قرب شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_bubble_coral_name => 'المرجان الفقاعي';
+
+  @override
+  String get species_bubble_coral_desc =>
+      'مرجان مميز بحويصلات تشبه حبات العنب تنتفخ نهارًا لالتقاط الضوء.';
+
+  @override
+  String get species_plate_coral_name => 'المرجان الصفائحي';
+
+  @override
+  String get species_plate_coral_desc =>
+      'مرجان صفائحي رقيق يشكّل رفوفًا حلزونية، وهو شائع على منحدرات الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_pillar_coral_name => 'المرجان العمودي';
+
+  @override
+  String get species_pillar_coral_desc =>
+      'مرجان نادر ينمو إلى الأعلى مشكّلًا أعمدة مرتفعة، ويوجد في الكاريبي.';
+
+  @override
+  String get species_star_coral_name => 'المرجان النجمي';
+
+  @override
+  String get species_star_coral_desc =>
+      'بانٍ رئيسي لشعاب الكاريبي يشكّل مستعمرات كبيرة تشبه الصخور بسلائل نجمية الشكل.';
+
+  @override
+  String get species_lettuce_coral_name => 'المرجان الخسّي';
+
+  @override
+  String get species_lettuce_coral_desc =>
+      'مرجان صفائحي رقيق بطيّات تشبه الأوراق، وهو شائع على جدران ومنحدرات شعاب الكاريبي.';
+
+  @override
+  String get species_finger_coral_name => 'المرجان الإصبعي';
+
+  @override
+  String get species_finger_coral_desc =>
+      'مرجان متفرع متين بنتوءات غليظة تشبه الأصابع، يوجد في الشعاب الضحلة.';
+
+  @override
+  String get species_massive_porites_name => 'مرجان Porites الضخم';
+
+  @override
+  String get species_massive_porites_desc =>
+      'مرجان صخري كبير يمكن أن ينمو لقرون، وهو بانٍ مهيمن للشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_cauliflower_coral_name => 'مرجان القرنبيط';
+
+  @override
+  String get species_cauliflower_coral_desc =>
+      'مرجان متفرع متراص على شكل القرنبيط، منتشر في ضحال الشعاب الاستوائية.';
+
+  @override
+  String get species_flower_pot_coral_name => 'مرجان أصيص الزهور';
+
+  @override
+  String get species_flower_pot_coral_desc =>
+      'مستعمرة من السلائل طويلة المجسّات تمتد نهارًا فتبدو كباقة من الزهور.';
+
+  @override
+  String get species_cup_coral_name => 'المرجان الكأسي البرتقالي';
+
+  @override
+  String get species_cup_coral_desc =>
+      'مرجان برتقالي زاهٍ غير قائم على التمثيل الضوئي، يوجد على الجدران وتحت النتوءات في المياه الاستوائية.';
+
+  @override
+  String get species_scroll_coral_name => 'المرجان اللفائفي';
+
+  @override
+  String get species_scroll_coral_desc =>
+      'مرجان يشكّل صفائح ملتفة كبيرة، وهو شائع على منحدرات الشعاب والبحيرات في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_cabbage_coral_name => 'المرجان الملفوفي';
+
+  @override
+  String get species_cabbage_coral_desc =>
+      'مرجان صفائحي قرصي الشكل يشبه أوراق الملفوف، يوجد في مناطق الشعاب المحمية.';
+
+  @override
+  String get species_hammer_coral_name => 'المرجان المطرقي';
+
+  @override
+  String get species_hammer_coral_desc =>
+      'مرجان كبير السلائل بأطراف مجسّات تشبه المرساة أو المطرقة، وهو مألوف في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_torch_coral_name => 'المرجان المشعلي';
+
+  @override
+  String get species_torch_coral_desc =>
+      'مرجان متفرع بمجسّات طويلة منسابة تنتهي بأطراف منتفخة متوهجة.';
+
+  @override
+  String get species_frogspawn_coral_name => 'مرجان بيض الضفادع';
+
+  @override
+  String get species_frogspawn_coral_desc =>
+      'مرجان كبير السلائل بأطراف مجسّات متفرعة تشبه بيض الضفادع.';
+
+  @override
+  String get species_sea_fan_name => 'المروحة البحرية الشائعة';
+
+  @override
+  String get species_sea_fan_desc =>
+      'مرجان مروحي مسطح يتخذ وضعًا عموديًا على اتجاه التيار، وهو أيقوني في شعاب الكاريبي.';
+
+  @override
+  String get species_venus_sea_fan_name => 'مروحة فينوس البحرية';
+
+  @override
+  String get species_venus_sea_fan_desc =>
+      'مرجان مروحي رقيق يوجد في شعاب الكاريبي الضحلة ضمن مناطق التيار المعتدل.';
+
+  @override
+  String get species_deepwater_sea_fan_name => 'المروحة البحرية عميقة المياه';
+
+  @override
+  String get species_deepwater_sea_fan_desc =>
+      'مرجان مروحي كبير كثيف التفرع يوجد على جدران الشعاب العميقة في الكاريبي.';
+
+  @override
+  String get species_sea_whip_name => 'سوط البحر';
+
+  @override
+  String get species_sea_whip_desc =>
+      'مرجان مروحي نحيل قضيبي الشكل يُشاهد وهو يتمايل مع التيارات في شعاب الأطلسي والكاريبي.';
+
+  @override
+  String get species_sea_plume_name => 'ريشة البحر';
+
+  @override
+  String get species_sea_plume_desc =>
+      'مرجان مروحي مرتفع ريشي المظهر يشكّل مستعمرات تشبه الريش على قمم شعاب الكاريبي.';
+
+  @override
+  String get species_organ_pipe_coral_name => 'مرجان أنابيب الأرغن';
+
+  @override
+  String get species_organ_pipe_coral_desc =>
+      'أنابيب هيكلية حمراء زاهية بسلائل رقيقة، توجد في الشعاب المحمية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_leather_coral_name => 'المرجان الجلدي';
+
+  @override
+  String get species_leather_coral_desc =>
+      'مرجان طري بسطح أملس يشبه الجلد يشكّل مستعمرات كبيرة على هيئة الفطر.';
+
+  @override
+  String get species_toadstool_leather_coral_name => 'المرجان الجلدي الفطري';
+
+  @override
+  String get species_toadstool_leather_coral_desc =>
+      'مرجان طري بساق غليظة وقبعة مسطحة، وهو شائع على مسطحات الشعاب في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_pulsing_xenia_name => 'الزينيا النابضة';
+
+  @override
+  String get species_pulsing_xenia_desc =>
+      'مرجان طري بسلائل تنبض بإيقاع منتظم، يوجد في المياه المحمية بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get species_tree_coral_name => 'المرجان الشجري';
+
+  @override
+  String get species_tree_coral_desc =>
+      'مرجان طري زاهي الألوان يشكّل تجمعات شجرية الشكل على الجدران وتحت النتوءات في البحر الأحمر.';
+
+  @override
+  String get species_blue_coral_name => 'المرجان الأزرق';
+
+  @override
+  String get species_blue_coral_desc =>
+      'مرجان ثماني فريد بهيكل أزرق، يوجد على مسطحات الشعاب الضحلة في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_black_coral_name => 'المرجان الأسود';
+
+  @override
+  String get species_black_coral_desc =>
+      'مرجان أعماق بهيكل داكن، يوجد على الجدران والمنحدرات دون عمق 30 مترًا.';
+
+  @override
+  String get species_carnation_coral_name => 'مرجان القرنفل';
+
+  @override
+  String get species_carnation_coral_desc =>
+      'مرجان طري زاهي الألوان يوجد تحت الحواف الصخرية وعلى الجدران في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_wire_coral_name => 'المرجان السلكي';
+
+  @override
+  String get species_wire_coral_desc =>
+      'مرجان أسود طويل حلزوني يشكّل سياطًا ملتفة، ويستضيف أسماك القوبيون والروبيان.';
+
+  @override
+  String get species_dead_mans_fingers_name => 'أصابع الرجل الميت';
+
+  @override
+  String get species_dead_mans_fingers_desc =>
+      'مرجان طري لحمي بفصوص تشبه الأصابع، شائع في شعاب شمال الأطلسي المعتدلة.';
+
+  @override
+  String get species_sun_coral_name => 'المرجان الشمسي';
+
+  @override
+  String get species_sun_coral_desc =>
+      'مرجان أصفر برتقالي غير قائم على التمثيل الضوئي يفتح سلائله ليلًا على جدران المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_lace_coral_name => 'المرجان الدانتيلي';
+
+  @override
+  String get species_lace_coral_desc =>
+      'مرجان هيدروزوي وردي رقيق بأفرع تشبه الدانتيل، يوجد في الشقوق وتحت الحواف الصخرية.';
+
+  @override
+  String get species_kenya_tree_coral_name => 'مرجان كينيا الشجري';
+
+  @override
+  String get species_kenya_tree_coral_desc =>
+      'مرجان طري قوي التحمل بأفرع شجرية الشكل، وهو شائع في المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_colt_coral_name => 'مرجان الكولت';
+
+  @override
+  String get species_colt_coral_desc =>
+      'مرجان طري بأفرع غليظة مطاطية مغطاة بسلائل صغيرة في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_turtle_grass_name => 'عشب السلاحف';
+
+  @override
+  String get species_turtle_grass_desc =>
+      'العشب البحري المهيمن في الكاريبي بأنصال عريضة مسطحة، وهو مصدر غذاء حيوي للسلاحف البحرية.';
+
+  @override
+  String get species_eelgrass_name => 'العشب الثعباني';
+
+  @override
+  String get species_eelgrass_desc =>
+      'عشب بحري من المياه المعتدلة يشكّل مروجًا كثيفة تحت الماء تعمل موئلًا لتربية الصغار.';
+
+  @override
+  String get species_manatee_grass_name => 'عشب خروف البحر';
+
+  @override
+  String get species_manatee_grass_desc =>
+      'عشب بحري بأنصال أسطوانية يوجد في المناطق الرملية بالكاريبي، وغالبًا قرب مروج عشب السلاحف.';
+
+  @override
+  String get species_shoal_grass_name => 'عشب الضحال';
+
+  @override
+  String get species_shoal_grass_desc =>
+      'عشب بحري رائد بأنصال ضيقة يستوطن المناطق الرملية المضطربة في الكاريبي.';
+
+  @override
+  String get species_paddle_grass_name => 'العشب المجدافي';
+
+  @override
+  String get species_paddle_grass_desc =>
+      'عشب بحري صغير رقيق بأوراق بيضوية، يوجد في المياه الأعمق عبر المناطق الاستوائية.';
+
+  @override
+  String get species_neptune_grass_name => 'عشب نبتون';
+
+  @override
+  String get species_neptune_grass_desc =>
+      'عشب بحري متوسطي يشكّل مروجًا شاسعة بالغة الأهمية للنظم البيئية البحرية الساحلية.';
+
+  @override
+  String get species_giant_kelp_name => 'عشب البحر العملاق';
+
+  @override
+  String get species_giant_kelp_desc =>
+      'نوع يشكّل غابات شاهقة تحت الماء ينمو حتى 60 مترًا، وهو أيقوني في غوصات كاليفورنيا.';
+
+  @override
+  String get species_bull_kelp_name => 'عشب البحر الثوري';
+
+  @override
+  String get species_bull_kelp_desc =>
+      'عشب بحر هادئي بساق واحدة طويلة وعوّامة منتفخة، يشكّل غابات كثيفة المظلة.';
+
+  @override
+  String get species_bladder_wrack_name => 'الطحلب المثاني';
+
+  @override
+  String get species_bladder_wrack_desc =>
+      'طحلب بني شائع بمثانات هوائية مزدوجة، يوجد في مناطق المد والجزر بشمال الأطلسي.';
+
+  @override
+  String get species_sargassum_name => 'السرغسوم';
+
+  @override
+  String get species_sargassum_desc =>
+      'طحلب بني حر الطفو يشكّل أطوافًا تحتمي بها صغار الأسماك واللافقاريات.';
+
+  @override
+  String get species_kelp_forest_ecklonia_name => 'عشب البحر الإكلوني';
+
+  @override
+  String get species_kelp_forest_ecklonia_desc =>
+      'عشب البحر المهيمن في مياه نصف الكرة الجنوبي، ويشكّل غابات مهمة تحت الماء.';
+
+  @override
+  String get species_coralline_algae_name => 'الطحالب المرجانية';
+
+  @override
+  String get species_coralline_algae_desc =>
+      'طحلب أحمر صلب يكسو الأسطح ويلحم بنى الشعاب ويمنحها لونًا ورديًا.';
+
+  @override
+  String get species_irish_moss_name => 'الطحلب الإيرلندي';
+
+  @override
+  String get species_irish_moss_desc =>
+      'طحلب أحمر مروحي الشكل يوجد على الشواطئ الصخرية في منطقة المد والجزر بشمال الأطلسي.';
+
+  @override
+  String get species_dulse_name => 'الدلس';
+
+  @override
+  String get species_dulse_desc =>
+      'طحلب مسطح أحمر أرجواني ينمو على الصخور وسيقان عشب البحر في المياه الشمالية الباردة.';
+
+  @override
+  String get species_halimeda_name => 'الهاليميدا';
+
+  @override
+  String get species_halimeda_desc =>
+      'طحلب أخضر متكلّس بقطع قرصية الشكل، وهو مساهم رئيسي في تكوين رمال الشعاب.';
+
+  @override
+  String get species_sea_lettuce_name => 'خس البحر';
+
+  @override
+  String get species_sea_lettuce_desc =>
+      'طحلب أخضر زاهٍ على هيئة صفائح يوجد في المياه الساحلية الضحلة حول العالم.';
+
+  @override
+  String get species_caulerpa_name => 'طحلب العنب الأخضر';
+
+  @override
+  String get species_caulerpa_desc =>
+      'طحلب أخضر زاحف بسعوف تشبه حبات العنب، يوجد على الحطام المرجاني والرمال في الشعاب الاستوائية.';
+
+  @override
+  String get species_mermaid_fan_name => 'مروحة الحورية';
+
+  @override
+  String get species_mermaid_fan_desc =>
+      'طحلب أخضر متكلّس على شكل مروحة صغيرة، وهو شائع على القيعان الرملية في الكاريبي.';
+
+  @override
+  String get species_shaving_brush_algae_name => 'طحلب فرشاة الحلاقة';
+
+  @override
+  String get species_shaving_brush_algae_desc =>
+      'طحلب أخضر متكلّس بخصلة تشبه الفرشاة فوق ساق، يوجد على القيعان الرملية في الكاريبي.';
+
+  @override
+  String get species_finger_kelp_name => 'طحلب المجداف';
+
+  @override
+  String get species_finger_kelp_desc =>
+      'طحلب بني بسعوف تشبه الأصابع يشكّل مروج عشب البحر في المياه الساحلية بشمال الأطلسي.';
+
+  @override
+  String get species_banded_sea_krait_name => 'ثعبان البحر المخطط';
+
+  @override
+  String get species_banded_sea_krait_desc =>
+      'ثعبان بحر سام بأشرطة زرقاء رمادية وسوداء، وديع ويُشاهد عادةً في شعاب المحيطين الهندي والهادئ.';
+
+  @override
+  String get species_olive_sea_snake_name => 'ثعبان البحر الزيتوني';
+
+  @override
+  String get species_olive_sea_snake_desc =>
+      'ثعبان بحر فضولي يوجد في الشعاب الأسترالية ويشتهر باقترابه من الغواصين.';
+
+  @override
+  String get species_yellow_bellied_sea_snake_name => 'ثعبان البحر أصفر البطن';
+
+  @override
+  String get species_yellow_bellied_sea_snake_desc =>
+      'ثعبان بحر من أعالي البحار ببطن أصفر، وهو أوسع أنواع الثعابين انتشارًا على وجه الأرض.';
+
+  @override
+  String get species_marine_iguana_name => 'الإغوانا البحرية';
+
+  @override
+  String get species_marine_iguana_desc =>
+      'متوطنة في جزر غالاباغوس، وهي السحلية الوحيدة التي ترعى الطحالب تحت الماء.';
+
+  @override
+  String get species_saltwater_crocodile_name => 'تمساح المياه المالحة';
+
+  @override
+  String get species_saltwater_crocodile_desc =>
+      'أكبر الزواحف الحية، ويوجد في المياه الساحلية ومصبات الأنهار بالمحيطين الهندي والهادئ.';
+
+  @override
+  String get common_action_done => 'تم';
+
+  @override
+  String get common_action_more => 'المزيد';
+
+  @override
+  String get common_label_displayName => 'الاسم المعروض';
+
+  @override
+  String common_relativeTime_daysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'منذ $count يوم',
+      many: 'منذ $count يومًا',
+      few: 'منذ $count أيام',
+      two: 'منذ يومين',
+      one: 'منذ يوم',
+      zero: 'منذ $count يوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_hoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'منذ $count ساعة',
+      many: 'منذ $count ساعة',
+      few: 'منذ $count ساعات',
+      two: 'منذ ساعتين',
+      one: 'منذ ساعة',
+      zero: 'منذ $count ساعة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_inDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'خلال $count يوم',
+      many: 'خلال $count يومًا',
+      few: 'خلال $count أيام',
+      two: 'خلال يومين',
+      one: 'خلال يوم',
+      zero: 'خلال $count يوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_inHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'خلال $count ساعة',
+      many: 'خلال $count ساعة',
+      few: 'خلال $count ساعات',
+      two: 'خلال ساعتين',
+      one: 'خلال ساعة',
+      zero: 'خلال $count ساعة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_inLessThanMinute => 'خلال أقل من دقيقة';
+
+  @override
+  String common_relativeTime_inMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'خلال $count دقيقة',
+      many: 'خلال $count دقيقة',
+      few: 'خلال $count دقائق',
+      two: 'خلال دقيقتين',
+      one: 'خلال دقيقة',
+      zero: 'خلال $count دقيقة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_justNow => 'الآن';
+
+  @override
+  String common_relativeTime_minutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'منذ $count دقيقة',
+      many: 'منذ $count دقيقة',
+      few: 'منذ $count دقائق',
+      two: 'منذ دقيقتين',
+      one: 'منذ دقيقة',
+      zero: 'منذ $count دقيقة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_monthsAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'منذ $count شهر',
+      many: 'منذ $count شهرًا',
+      few: 'منذ $count أشهر',
+      two: 'منذ شهرين',
+      one: 'منذ شهر',
+      zero: 'منذ $count شهر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_overdue => 'متأخر';
+
+  @override
+  String get media_cache_calculating => 'جارٍ حساب حجم التخزين المؤقت…';
+
+  @override
+  String get media_cache_cardTitle => 'إدارة التخزين المؤقت';
+
+  @override
+  String get media_cache_clearAction => 'مسح التخزين المؤقت';
+
+  @override
+  String get media_cache_clearBody =>
+      'يزيل الصور المصغرة وصور الشبكة بالحجم الكامل التي جرى تنزيلها. تبقى عناصر الوسائط المرتبطة كما هي، وسيعاد تنزيل الصور عند العرض التالي.';
+
+  @override
+  String get media_cache_clearConfirm => 'مسح';
+
+  @override
+  String media_cache_clearError(String error) {
+    return 'فشل المسح: $error';
+  }
+
+  @override
+  String get media_cache_clearTitle => 'مسح التخزين المؤقت لصور الشبكة؟';
+
+  @override
+  String get media_cache_cleared => 'تم مسح التخزين المؤقت';
+
+  @override
+  String get media_cache_diskCache => 'التخزين المؤقت على القرص';
+
+  @override
+  String media_cache_error(String error) {
+    return 'خطأ: $error';
+  }
+
+  @override
+  String get media_credentials_actionTest => 'اختبار بيانات الاعتماد';
+
+  @override
+  String media_credentials_authLabel(String authType) {
+    return 'المصادقة: $authType';
+  }
+
+  @override
+  String get media_credentials_deleteBody =>
+      'يزيل بيانات الاعتماد المحفوظة. ستعرض العناصر المرتبطة عبر هذا المضيف عبارة \"يتطلب تسجيل الدخول\" إلى أن تعيد إضافتها.';
+
+  @override
+  String media_credentials_deleteError(String error) {
+    return 'فشل الحذف: $error';
+  }
+
+  @override
+  String media_credentials_deleteTitle(String host) {
+    return 'حذف $host؟';
+  }
+
+  @override
+  String media_credentials_deleted(String host) {
+    return 'تم حذف $host';
+  }
+
+  @override
+  String media_credentials_editTitle(String host) {
+    return 'تعديل $host';
+  }
+
+  @override
+  String get media_credentials_emptySubtitle =>
+      'تظهر هنا بيانات الاعتماد الخاصة بكل مضيف التي تُضاف أثناء الاستيراد من عنوان URL أو من قائمة.';
+
+  @override
+  String get media_credentials_emptyTitle => 'لا توجد بيانات اعتماد محفوظة';
+
+  @override
+  String media_credentials_lastUsed(String when) {
+    return 'آخر استخدام $when';
+  }
+
+  @override
+  String get media_credentials_loadError => 'تعذر تحميل المضيفين المحفوظين';
+
+  @override
+  String get media_credentials_loading => 'جارٍ تحميل المضيفين المحفوظين...';
+
+  @override
+  String media_credentials_saveError(String error) {
+    return 'فشل الحفظ: $error';
+  }
+
+  @override
+  String get media_credentials_savedHostsTitle => 'المضيفون المحفوظون';
+
+  @override
+  String media_credentials_testError(String error) {
+    return 'فشل الاختبار: $error';
+  }
+
+  @override
+  String media_credentials_testFailed(String host) {
+    return 'فشلت بيانات الاعتماد الخاصة بـ $host';
+  }
+
+  @override
+  String media_credentials_testOk(String host) {
+    return 'بيانات الاعتماد صالحة لـ $host';
+  }
+
+  @override
+  String get media_manifest_actionPollNow => 'استعلام الآن';
+
+  @override
+  String get media_manifest_cardTitle => 'اشتراكات القوائم';
+
+  @override
+  String get media_manifest_deleteBody =>
+      'يزيل الاشتراك. ستبقى الإدخالات المستوردة بالفعل (يمكنك تنظيفها من قائمة العناصر اليتيمة).';
+
+  @override
+  String media_manifest_deleteError(String error) {
+    return 'فشل الحذف: $error';
+  }
+
+  @override
+  String media_manifest_deleteTitle(String name) {
+    return 'حذف $name؟';
+  }
+
+  @override
+  String get media_manifest_editTitle => 'تعديل الاشتراك';
+
+  @override
+  String get media_manifest_emptySubtitle =>
+      'اشترك في قائمة Atom/RSS أو JSON أو CSV من علامة تبويب URL للحفاظ على تزامن مكتبتك.';
+
+  @override
+  String get media_manifest_emptyTitle => 'لا توجد اشتراكات قوائم';
+
+  @override
+  String media_manifest_lastError(String error) {
+    return 'آخر خطأ: $error';
+  }
+
+  @override
+  String media_manifest_lastPolled(String when) {
+    return 'آخر استعلام $when';
+  }
+
+  @override
+  String get media_manifest_loadError => 'تعذر تحميل الاشتراكات';
+
+  @override
+  String get media_manifest_loading => 'جارٍ تحميل الاشتراكات...';
+
+  @override
+  String get media_manifest_neverPolled => 'لم يتم الاستعلام مطلقًا';
+
+  @override
+  String media_manifest_nextPoll(String when) {
+    return 'التالي $when';
+  }
+
+  @override
+  String get media_manifest_notFound => 'الاشتراك غير موجود';
+
+  @override
+  String media_manifest_pollError(String error) {
+    return 'فشل الاستعلام: $error';
+  }
+
+  @override
+  String media_manifest_polled(String name) {
+    return 'تم الاستعلام عن $name';
+  }
+
+  @override
+  String media_manifest_polling(String name) {
+    return 'جارٍ الاستعلام عن $name...';
+  }
+
+  @override
+  String media_manifest_saveError(String error) {
+    return 'فشل الحفظ: $error';
+  }
+
+  @override
+  String media_manifest_updateError(String error) {
+    return 'تعذر التحديث: $error';
+  }
+
+  @override
+  String get media_manifest_urlLabel => 'عنوان URL للقائمة';
+
+  @override
+  String media_scan_failed(String error) {
+    return 'فشل الفحص: $error';
+  }
+
+  @override
+  String media_scan_progressItems(int done, int total) {
+    return '$done / $total عنصر';
+  }
+
+  @override
+  String media_scan_progressReachability(int available, int unreachable) {
+    return '$available متاح  ·  $unreachable غير متاح';
+  }
+
+  @override
+  String media_scan_summary(
+    int total,
+    String seconds,
+    int available,
+    int unreachable,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other:
+          'تم فحص $total عنصر في $seconds ثانية: $available متاح، $unreachable غير متاح',
+      many:
+          'تم فحص $total عنصرًا في $seconds ثانية: $available متاح، $unreachable غير متاح',
+      few:
+          'تم فحص $total عناصر في $seconds ثانية: $available متاح، $unreachable غير متاح',
+      two:
+          'تم فحص عنصرين في $seconds ثانية: $available متاح، $unreachable غير متاح',
+      one:
+          'تم فحص عنصر واحد في $seconds ثانية: $available متاح، $unreachable غير متاح',
+      zero:
+          'تم فحص $total عنصر في $seconds ثانية: $available متاح، $unreachable غير متاح',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_scan_summarySkipped(String base, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تخطي $count عنصر (بدون عنوان URL)',
+      many: 'تم تخطي $count عنصرًا (بدون عنوان URL)',
+      few: 'تم تخطي $count عناصر (بدون عنوان URL)',
+      two: 'تم تخطي عنصرين (بدون عنوان URL)',
+      one: 'تم تخطي عنصر واحد (بدون عنوان URL)',
+      zero: 'تم تخطي $count عنصر (بدون عنوان URL)',
+    );
+    return '$base، $_temp0';
+  }
+
+  @override
+  String get media_scan_title => 'فحص جميع وسائط الشبكة';
+
+  @override
+  String get settings_mediaSources_androidUriTitle => 'أذونات URI في أندرويد';
+
+  @override
+  String settings_mediaSources_androidUriUsage(int used, int limit) {
+    return '$used / $limit من معرفات URI الدائمة قيد الاستخدام';
+  }
+
+  @override
+  String get settings_mediaSources_counting => 'جارٍ العد…';
+
+  @override
+  String settings_mediaSources_error(String error) {
+    return 'خطأ: $error';
+  }
+
+  @override
+  String get settings_mediaSources_loading => 'جارٍ التحميل…';
+
+  @override
+  String settings_mediaSources_localFilesCounts(
+    int available,
+    int unavailable,
+  ) {
+    return '$available متاح، $unavailable غير متاح';
+  }
+
+  @override
+  String get settings_mediaSources_photoLibrarySubtitle =>
+      'Apple Photos / Google Photos / iCloud';
+
+  @override
+  String get settings_mediaSources_reverifyAll =>
+      'إعادة التحقق من جميع الملفات المحلية';
+
+  @override
+  String settings_mediaSources_reverifyFailed(String error) {
+    return 'فشلت إعادة التحقق: $error';
+  }
+
+  @override
+  String settings_mediaSources_reverifyResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تحديث $count عنصر',
+      many: 'تم تحديث $count عنصرًا',
+      few: 'تم تحديث $count عناصر',
+      two: 'تم تحديث عنصرين',
+      one: 'تم تحديث عنصر واحد',
+      zero: 'تم تحديث $count عنصر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_mediaSources_title => 'مصادر الوسائط';
+
+  @override
+  String get settings_networkSources_scanDescription =>
+      'يعيد فحص كل صورة مستوردة عبر عنوان URL أو قائمة مقابل مضيفها. ويضع علامة على العناصر غير المتاحة لتظهر بحالة \"مفقودة\" في مكتبتك ويمكن تنظيفها.';
+
+  @override
+  String statistics_conditions_entryMethod_semanticLabel(String description) {
+    return 'مخطط أعمدة. طرق الدخول. $description';
+  }
+
+  @override
+  String statistics_conditions_visibility_semanticLabel(String description) {
+    return 'مخطط دائري. توزيع الرؤية. $description';
+  }
+
+  @override
+  String statistics_conditions_waterType_semanticLabel(String description) {
+    return 'مخطط دائري. توزيع نوع الماء. $description';
+  }
+
+  @override
+  String statistics_progression_divesBySuitThickness_semanticLabel(
+    String description,
+  ) {
+    return 'مخطط أعمدة. الغوصات حسب سماكة البدلة. $description';
+  }
+
+  @override
+  String statistics_progression_divesPerYear_countInYear(
+    int count,
+    String year,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غوصة في $year',
+      many: '$count غوصة في $year',
+      few: '$count غوصات في $year',
+      two: 'غوصتان في $year',
+      one: 'غوصة واحدة في $year',
+      zero: '$count غوصة في $year',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String statistics_progression_divesPerYear_semanticLabel(String description) {
+    return 'مخطط أعمدة. الغوصات لكل سنة. $description';
+  }
+
+  @override
+  String get statistics_records_unavailable => 'الأرقام القياسية غير متاحة';
+
+  @override
+  String statistics_summary_depthBucket_over(String min, String unit) {
+    return '$min$unit+';
+  }
+
+  @override
+  String statistics_summary_depthBucket_range(
+    String min,
+    String max,
+    String unit,
+  ) {
+    return '$min-$max$unit';
+  }
+
+  @override
+  String get statistics_summary_distributions_title => 'التوزيعات';
+
+  @override
+  String get statistics_summary_diveTypes_error =>
+      'تعذر تحميل بيانات أنواع الغوص';
+
+  @override
+  String get statistics_summary_diveTypes_unknown => 'غير معروف';
+
+  @override
+  String get statistics_summary_divesPerMonth => 'الغوصات / الشهر';
+
+  @override
+  String get statistics_summary_divesPerYear => 'الغوصات / السنة';
+
+  @override
+  String statistics_timePatterns_dayOfWeek_semanticLabel(String description) {
+    return 'مخطط أعمدة. الغوصات حسب يوم الأسبوع. $description';
+  }
+
+  @override
+  String statistics_timePatterns_seasonal_semanticLabel(String description) {
+    return 'مخطط أعمدة. الغوصات حسب الشهر. $description';
+  }
+
+  @override
+  String statistics_timePatterns_surfaceInterval_statLabel(
+    String label,
+    String value,
+  ) {
+    return 'فترة السطح $label: $value';
+  }
+
+  @override
+  String get statistics_timePatterns_timeOfDay_afternoon => 'بعد الظهر';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_evening => 'المساء';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_morning => 'الصباح';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_night => 'الليل';
+
+  @override
+  String statistics_timePatterns_timeOfDay_semanticLabel(String description) {
+    return 'مخطط دائري. الغوصات حسب وقت اليوم. $description';
+  }
+
+  @override
+  String get columnConfig_displayOptions => 'خيارات العرض';
+
+  @override
+  String get columnConfig_noExtraFields =>
+      'لم يتم إعداد أي حقول إضافية. أضف حقولاً أدناه.';
+
+  @override
+  String get columnConfig_savePresetTitle => 'حفظ الإعداد المسبق';
+
+  @override
+  String get columnConfig_section => 'القسم';
+
+  @override
+  String get columnConfig_showTags => 'إظهار الوسوم';
+
+  @override
+  String get columnConfig_showTags_subtitle =>
+      'عرض شارات الوسوم على بطاقات الغوص المفصّلة';
+
+  @override
+  String get columnConfig_slot_date => 'التاريخ / العنوان الفرعي';
+
+  @override
+  String get columnConfig_slot_slot1 => 'الخانة 1';
+
+  @override
+  String get columnConfig_slot_slot2 => 'الخانة 2';
+
+  @override
+  String get columnConfig_slot_slot3 => 'الخانة 3';
+
+  @override
+  String get columnConfig_slot_slot4 => 'الخانة 4';
+
+  @override
+  String get columnConfig_slot_stat1 => 'الإحصاء 1';
+
+  @override
+  String get columnConfig_slot_stat2 => 'الإحصاء 2';
+
+  @override
+  String get columnConfig_slot_subtitle => 'العنوان الفرعي';
+
+  @override
+  String get columnConfig_slot_title => 'العنوان';
+
+  @override
+  String get columnConfig_tooltip_columnSettings => 'إعدادات الأعمدة';
+
+  @override
+  String get common_action_add => 'إضافة';
+
+  @override
+  String get common_action_pin => 'تثبيت';
+
+  @override
+  String get common_action_remove => 'إزالة';
+
+  @override
+  String get common_action_unpin => 'إلغاء التثبيت';
+
+  @override
+  String diveLog_filterChip_dateRange(String end, String start) {
+    return '$start إلى $end';
+  }
+
+  @override
+  String diveLog_filterChip_equipmentCount(int count) {
+    return '$count معدات';
+  }
+
+  @override
+  String get diveLog_filter_allComputers => 'جميع حواسيب الغوص';
+
+  @override
+  String get diveLog_filter_noComputersRegistered =>
+      'لا توجد حواسيب غوص مسجَّلة';
+
+  @override
+  String diveLog_filter_sectionDepthRangeUnit(String unit) {
+    return 'نطاق العمق ($unit)';
+  }
+
+  @override
+  String get diveLog_filter_sectionDiveComputer => 'حاسوب الغوص';
+
+  @override
+  String diveLog_listPage_semanticsDiveAtSite(int diveNumber, String siteName) {
+    return 'الغوصة $diveNumber في $siteName';
+  }
+
+  @override
+  String get enum_listViewMode_compact => 'مضغوط';
+
+  @override
+  String get enum_listViewMode_dense => 'كثيف';
+
+  @override
+  String get enum_listViewMode_detailed => 'مفصّل';
+
+  @override
+  String get enum_listViewMode_table => 'جدول';
+
+  @override
+  String get enum_profileMetric_ascentRate => 'معدل الصعود';
+
+  @override
+  String get enum_profileMetric_cns => 'CNS%';
+
+  @override
+  String get enum_profileMetric_otu => 'OTU';
+
+  @override
+  String get enum_sortField_bottomTime => 'وقت القاع';
+
+  @override
+  String get enum_sortField_serviceDue => 'الصيانة مستحقة';
+
+  @override
+  String get listViewMode_tooltip => 'وضع العرض';
+
+  @override
+  String marineLife_speciesManage_errorLoading(Object error) {
+    return 'خطأ أثناء تحميل الأنواع: $error';
+  }
+
+  @override
+  String get settings_appearance_header_cards => 'البطاقات';
+
+  @override
+  String get settings_appearance_header_listView => 'عرض القائمة';
+
+  @override
+  String get settings_appearance_header_tableMode => 'وضع الجدول';
+
+  @override
+  String get settings_appearance_listFields_buddies => 'حقول قائمة الرفاق';
+
+  @override
+  String get settings_appearance_listFields_certifications =>
+      'حقول قائمة الشهادات';
+
+  @override
+  String get settings_appearance_listFields_courses => 'حقول قائمة الدورات';
+
+  @override
+  String get settings_appearance_listFields_diveCenters =>
+      'حقول قائمة مراكز الغوص';
+
+  @override
+  String get settings_appearance_listFields_dives => 'حقول قائمة الغوصات';
+
+  @override
+  String get settings_appearance_listFields_equipment => 'حقول قائمة المعدات';
+
+  @override
+  String get settings_appearance_listFields_sites => 'حقول قائمة المواقع';
+
+  @override
+  String get settings_appearance_listFields_subtitle =>
+      'خصّص الحقول المعروضة في عروض القوائم';
+
+  @override
+  String get settings_appearance_listFields_trips => 'حقول قائمة الرحلات';
+
+  @override
+  String get settings_appearance_listView_buddies => 'عرض قائمة الرفاق';
+
+  @override
+  String get settings_appearance_listView_buddies_subtitle =>
+      'التخطيط الافتراضي لقائمة الرفاق';
+
+  @override
+  String get settings_appearance_listView_certifications =>
+      'عرض قائمة الشهادات';
+
+  @override
+  String get settings_appearance_listView_certifications_subtitle =>
+      'التخطيط الافتراضي لقائمة الشهادات';
+
+  @override
+  String get settings_appearance_listView_courses => 'عرض قائمة الدورات';
+
+  @override
+  String get settings_appearance_listView_courses_subtitle =>
+      'التخطيط الافتراضي لقائمة الدورات';
+
+  @override
+  String get settings_appearance_listView_diveCenters =>
+      'عرض قائمة مراكز الغوص';
+
+  @override
+  String get settings_appearance_listView_diveCenters_subtitle =>
+      'التخطيط الافتراضي لقائمة مراكز الغوص';
+
+  @override
+  String get settings_appearance_listView_dives => 'عرض قائمة الغوصات';
+
+  @override
+  String get settings_appearance_listView_dives_subtitle =>
+      'التخطيط الافتراضي لقائمة الغوصات';
+
+  @override
+  String get settings_appearance_listView_equipment => 'عرض قائمة المعدات';
+
+  @override
+  String get settings_appearance_listView_equipment_subtitle =>
+      'التخطيط الافتراضي لقائمة المعدات';
+
+  @override
+  String get settings_appearance_listView_sites => 'عرض قائمة المواقع';
+
+  @override
+  String get settings_appearance_listView_sites_subtitle =>
+      'التخطيط الافتراضي لقائمة المواقع';
+
+  @override
+  String get settings_appearance_listView_trips => 'عرض قائمة الرحلات';
+
+  @override
+  String get settings_appearance_listView_trips_subtitle =>
+      'التخطيط الافتراضي لقائمة الرحلات';
+
+  @override
+  String get settings_appearance_showDataSourceBadges =>
+      'إظهار شارات مصدر البيانات';
+
+  @override
+  String get settings_appearance_showDataSourceBadges_subtitle =>
+      'عرض نسبة المصدر على مقاييس الغوص';
+
+  @override
+  String get settings_appearance_title_buddies => 'مظهر الرفاق';
+
+  @override
+  String get settings_appearance_title_certifications => 'مظهر الشهادات';
+
+  @override
+  String get settings_appearance_title_courses => 'مظهر الدورات';
+
+  @override
+  String get settings_appearance_title_diveCenters => 'مظهر مراكز الغوص';
+
+  @override
+  String get settings_appearance_title_dives => 'مظهر الغوصات';
+
+  @override
+  String get settings_appearance_title_equipment => 'مظهر المعدات';
+
+  @override
+  String get settings_appearance_title_sites => 'مظهر المواقع';
+
+  @override
+  String get settings_appearance_title_trips => 'مظهر الرحلات';
+
+  @override
+  String get settings_cloudSync_troubleshoot_tileSubtitle =>
+      'أصلح مزامنة متوقفة أو حرّر مساحة سحابية';
+
+  @override
+  String get settings_data_header_dataTools => 'أدوات البيانات';
+
+  @override
+  String get settings_decompression_ascentGasLabel => 'خطّط الصعود باستخدام';
+
+  @override
+  String get settings_decompression_ascentGas_allCarried =>
+      'جميع الأسطوانات المحمولة';
+
+  @override
+  String get settings_decompression_ascentGas_decoStage =>
+      'غاز الديكو/الستيج + الغاز الخلفي';
+
+  @override
+  String get settings_decompression_cnsSource => 'مصدر الـ CNS';
+
+  @override
+  String get settings_decompression_decoStopSource => 'مصدر محطات تخفيف الضغط';
+
+  @override
+  String get settings_decompression_header_ascent => 'تخطيط الصعود';
+
+  @override
+  String get settings_decompression_header_ascent_subtitle =>
+      'أي الأسطوانات المحمولة يمكن للصعود المحاكى (TTS والسقف والمحطات) التبديل إليها عند كل عمق. تؤخذ في الاعتبار الغازات المسجَّلة في الغوصة فقط.';
+
+  @override
+  String get settings_decompression_header_dataSources =>
+      'تفضيلات مصدر البيانات';
+
+  @override
+  String get settings_decompression_header_dataSources_subtitle =>
+      'عند ضبطه على حاسوب الغوص، يستخدم التطبيق البيانات التي يبلّغ عنها حاسوب الغوص عند توفرها. ويرجع إلى القيم المحسوبة عند عدم توفر بيانات الحاسوب.';
+
+  @override
+  String get settings_decompression_ndlSource => 'مصدر NDL';
+
+  @override
+  String get settings_decompression_sourceCalculated => 'محسوب';
+
+  @override
+  String get settings_decompression_sourceComputer => 'حاسوب الغوص';
+
+  @override
+  String get settings_decompression_ttsSource => 'مصدر TTS';
+
+  @override
+  String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تحديث $count غوصة',
+      many: 'تم تحديث $count غوصة',
+      few: 'تم تحديث $count غوصات',
+      two: 'تم تحديث غوصتين',
+      one: 'تم تحديث غوصة واحدة',
+      zero: 'تم تحديث $count غوصة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'ساعة',
+      many: 'ساعة',
+      few: 'ساعات',
+      two: 'ساعتان',
+      one: 'ساعة',
+      zero: 'ساعة',
+    );
+    return '$_temp0 بمقدار $hours $_temp1.';
+  }
+
+  @override
+  String settings_fixDiveTimes_apply(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تطبيق على $count غوصة',
+      many: 'تطبيق على $count غوصة',
+      few: 'تطبيق على $count غوصات',
+      two: 'تطبيق على غوصتين',
+      one: 'تطبيق على غوصة واحدة',
+      zero: 'تطبيق على $count غوصة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_fixDiveTimes_clearRange => 'مسح نطاق التاريخ';
+
+  @override
+  String get settings_fixDiveTimes_confirmApply => 'تطبيق';
+
+  @override
+  String settings_fixDiveTimes_confirmBody(
+    int count,
+    String hours,
+    int hoursAbs,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتين',
+      one: 'غوصة واحدة',
+      zero: '$count غوصة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'ساعة',
+      many: 'ساعة',
+      few: 'ساعات',
+      two: 'ساعتان',
+      one: 'ساعة',
+      zero: 'ساعة',
+    );
+    return 'سيؤدي هذا إلى إزاحة $_temp0 بمقدار $hours $_temp1. لا يمكن التراجع عن ذلك تلقائياً.';
+  }
+
+  @override
+  String get settings_fixDiveTimes_confirmTitle => 'تطبيق إزاحة الوقت';
+
+  @override
+  String get settings_fixDiveTimes_dateRangeFilter => 'مرشّح نطاق التاريخ';
+
+  @override
+  String get settings_fixDiveTimes_deselectAll => 'إلغاء تحديد الكل';
+
+  @override
+  String get settings_fixDiveTimes_diveFallback => 'غوصة';
+
+  @override
+  String settings_fixDiveTimes_diveNumber(int number) {
+    return 'الغوصة رقم $number';
+  }
+
+  @override
+  String get settings_fixDiveTimes_empty => 'لم يتم العثور على غوصات.';
+
+  @override
+  String get settings_fixDiveTimes_emptyFiltered =>
+      'لم يتم العثور على غوصات في نطاق التاريخ هذا.';
+
+  @override
+  String get settings_fixDiveTimes_enterOffsetHint => 'أدخل إزاحة بالساعات';
+
+  @override
+  String get settings_fixDiveTimes_from => 'من';
+
+  @override
+  String get settings_fixDiveTimes_hourOffset => 'إزاحة الساعات';
+
+  @override
+  String get settings_fixDiveTimes_hoursField => 'الساعات (مثال: +7، -5)';
+
+  @override
+  String settings_fixDiveTimes_loadError(String error) {
+    return 'تعذّر تحميل الغوصات: $error';
+  }
+
+  @override
+  String get settings_fixDiveTimes_noSelection => 'لم يتم تحديد أي غوصة.';
+
+  @override
+  String get settings_fixDiveTimes_offsetHint =>
+      'أدخل عدداً صحيحاً موجباً أو سالباً لإزاحة أوقات الغوصات.';
+
+  @override
+  String settings_fixDiveTimes_preview(int count, String hours, int hoursAbs) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غوصة',
+      many: '$count غوصة',
+      few: '$count غوصات',
+      two: 'غوصتان',
+      one: 'غوصة واحدة',
+      zero: '$count غوصة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'ساعة',
+      many: 'ساعة',
+      few: 'ساعات',
+      two: 'ساعتان',
+      one: 'ساعة',
+      zero: 'ساعة',
+    );
+    return 'معاينة: $_temp0 ستُزاح بمقدار $hours $_temp1.';
+  }
+
+  @override
+  String get settings_fixDiveTimes_selectAll => 'تحديد الكل';
+
+  @override
+  String get settings_fixDiveTimes_selectDivesHint =>
+      'اختر الغوصات المراد تطبيق التغيير عليها';
+
+  @override
+  String get settings_fixDiveTimes_subtitle => 'اضبط أوقات الغوصات المستوردة';
+
+  @override
+  String get settings_fixDiveTimes_title => 'إصلاح أوقات الغوص';
+
+  @override
+  String get settings_fixDiveTimes_to => 'إلى';
+
+  @override
+  String get settings_fixDiveTimes_zeroOffset =>
+      'إزاحة الساعات هي 0، لا يوجد ما يتغير.';
+
+  @override
+  String get settings_syncDevices_appBar_refreshTooltip => 'تحديث';
+
+  @override
+  String get settings_syncDevices_appBar_title => 'الأجهزة على هذه الخدمة';
+
+  @override
+  String get settings_syncDevices_empty =>
+      'لا توجد ملفات مزامنة على هذه الخدمة.';
+
+  @override
+  String settings_syncDevices_readError(String error) {
+    return 'تعذّرت قراءة الخدمة.\n$error';
+  }
+
+  @override
+  String get settings_syncDevices_removal_noBackend =>
+      'لم يتم إعداد أي خدمة سحابية';
+
+  @override
+  String get settings_syncDevices_removal_unreachable =>
+      'تعذّر الوصول إلى الخدمة. لم تتم إزالة أي شيء.';
+
+  @override
+  String settings_syncDevices_removeDialog_bodyRisky(
+    int count,
+    String name,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'سيؤدي هذا إلى حذف $count ملف ($size) تخص $name.\n\nما زال ذلك الجهاز جزءاً من هذه المزامنة. إذا عاد إلى الاتصال فسيعيد البناء من الخدمة بدلاً من إحياء البيانات القديمة، لكن أي تغييرات لم ينشرها بعد ستُفقد. بيانات الغوص الخاصة بك على هذا الجهاز لن تتأثر.',
+      many:
+          'سيؤدي هذا إلى حذف $count ملفًا ($size) تخص $name.\n\nما زال ذلك الجهاز جزءاً من هذه المزامنة. إذا عاد إلى الاتصال فسيعيد البناء من الخدمة بدلاً من إحياء البيانات القديمة، لكن أي تغييرات لم ينشرها بعد ستُفقد. بيانات الغوص الخاصة بك على هذا الجهاز لن تتأثر.',
+      few:
+          'سيؤدي هذا إلى حذف $count ملفات ($size) تخص $name.\n\nما زال ذلك الجهاز جزءاً من هذه المزامنة. إذا عاد إلى الاتصال فسيعيد البناء من الخدمة بدلاً من إحياء البيانات القديمة، لكن أي تغييرات لم ينشرها بعد ستُفقد. بيانات الغوص الخاصة بك على هذا الجهاز لن تتأثر.',
+      two:
+          'سيؤدي هذا إلى حذف ملفين ($size) تخص $name.\n\nما زال ذلك الجهاز جزءاً من هذه المزامنة. إذا عاد إلى الاتصال فسيعيد البناء من الخدمة بدلاً من إحياء البيانات القديمة، لكن أي تغييرات لم ينشرها بعد ستُفقد. بيانات الغوص الخاصة بك على هذا الجهاز لن تتأثر.',
+      one:
+          'سيؤدي هذا إلى حذف ملف واحد ($size) تخص $name.\n\nما زال ذلك الجهاز جزءاً من هذه المزامنة. إذا عاد إلى الاتصال فسيعيد البناء من الخدمة بدلاً من إحياء البيانات القديمة، لكن أي تغييرات لم ينشرها بعد ستُفقد. بيانات الغوص الخاصة بك على هذا الجهاز لن تتأثر.',
+      zero:
+          'سيؤدي هذا إلى حذف $count ملف ($size) تخص $name.\n\nما زال ذلك الجهاز جزءاً من هذه المزامنة. إذا عاد إلى الاتصال فسيعيد البناء من الخدمة بدلاً من إحياء البيانات القديمة، لكن أي تغييرات لم ينشرها بعد ستُفقد. بيانات الغوص الخاصة بك على هذا الجهاز لن تتأثر.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_removeDialog_bodySafe(
+    int count,
+    String name,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'سيؤدي هذا إلى حذف $count ملف ($size) تخص $name. وهي متبقية من مكتبة لم يعد أي جهاز يزامن منها. بيانات الغوص الخاصة بك لن تتأثر.',
+      many:
+          'سيؤدي هذا إلى حذف $count ملفًا ($size) تخص $name. وهي متبقية من مكتبة لم يعد أي جهاز يزامن منها. بيانات الغوص الخاصة بك لن تتأثر.',
+      few:
+          'سيؤدي هذا إلى حذف $count ملفات ($size) تخص $name. وهي متبقية من مكتبة لم يعد أي جهاز يزامن منها. بيانات الغوص الخاصة بك لن تتأثر.',
+      two:
+          'سيؤدي هذا إلى حذف ملفين ($size) تخص $name. وهي متبقية من مكتبة لم يعد أي جهاز يزامن منها. بيانات الغوص الخاصة بك لن تتأثر.',
+      one:
+          'سيؤدي هذا إلى حذف ملف واحد ($size) تخص $name. وهي متبقية من مكتبة لم يعد أي جهاز يزامن منها. بيانات الغوص الخاصة بك لن تتأثر.',
+      zero:
+          'سيؤدي هذا إلى حذف $count ملف ($size) تخص $name. وهي متبقية من مكتبة لم يعد أي جهاز يزامن منها. بيانات الغوص الخاصة بك لن تتأثر.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_removeDialog_title(String name) {
+    return 'إزالة ملفات $name؟';
+  }
+
+  @override
+  String settings_syncDevices_removeProgressTitle(String name) {
+    return 'جارٍ إزالة ملفات $name';
+  }
+
+  @override
+  String get settings_syncDevices_removeTooltip => 'إزالة ملفات هذا الجهاز';
+
+  @override
+  String get settings_syncDevices_state_active => 'تتم المزامنة بشكل طبيعي';
+
+  @override
+  String get settings_syncDevices_state_retired => 'متقاعد';
+
+  @override
+  String get settings_syncDevices_state_staleEpoch =>
+      'متبقٍ من مكتبة سابقة؛ لا يقرأه أي جهاز';
+
+  @override
+  String get settings_syncDevices_state_thisDevice => 'هذا الجهاز';
+
+  @override
+  String get settings_syncDevices_state_unreadable =>
+      'لا يوجد بيان قابل للقراءة؛ رفع غير مكتمل أو مشفَّر';
+
+  @override
+  String settings_syncDevices_summary(
+    int deviceCount,
+    int fileCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      deviceCount,
+      locale: localeName,
+      other: '$deviceCount جهاز',
+      many: '$deviceCount جهازًا',
+      few: '$deviceCount أجهزة',
+      two: 'جهازان',
+      one: 'جهاز واحد',
+      zero: '$deviceCount جهاز',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount ملف',
+      many: '$fileCount ملفًا',
+      few: '$fileCount ملفات',
+      two: 'ملفان',
+      one: 'ملف واحد',
+      zero: '$fileCount ملف',
+    );
+    return '$_temp0، $_temp1، $size';
+  }
+
+  @override
+  String settings_syncDevices_summary_removable(int count, String size) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count جهاز متبقٍ من مكتبة مستبدَلة أو متقاعدة، ويشغل $size.',
+      many: '$count جهازًا متبقيًا من مكتبة مستبدَلة أو متقاعدة، ويشغل $size.',
+      few: '$count أجهزة متبقية من مكتبة مستبدَلة أو متقاعدة، ويشغل $size.',
+      two: 'جهازان متبقيان من مكتبة مستبدَلة أو متقاعدة، ويشغل $size.',
+      one: 'جهاز واحد متبقٍ من مكتبة مستبدَلة أو متقاعدة، ويشغل $size.',
+      zero: '$count جهاز متبقٍ من مكتبة مستبدَلة أو متقاعدة، ويشغل $size.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_tile_filesSize(int count, String size) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ملف',
+      many: '$count ملفًا',
+      few: '$count ملفات',
+      two: 'ملفان',
+      one: 'ملف واحد',
+      zero: '$count ملف',
+    );
+    return '$_temp0، $size';
+  }
+
+  @override
+  String settings_syncDevices_tile_filesSizeSeen(
+    int count,
+    String size,
+    String when,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ملف',
+      many: '$count ملفًا',
+      few: '$count ملفات',
+      two: 'ملفان',
+      one: 'ملف واحد',
+      zero: '$count ملف',
+    );
+    return '$_temp0، $size · $when';
+  }
+
+  @override
+  String settings_syncDevices_unnamedDevice(String shortId) {
+    return 'الجهاز $shortId';
+  }
+
+  @override
+  String get settings_syncMaintenance_keepAppOpen =>
+      'أبقِ التطبيق مفتوحاً حتى تنتهي هذه العملية. إغلاقه الآن يترك الخدمة ممسوحة جزئياً، وستضطر المزامنة التالية إلى البدء من جديد.';
+
+  @override
+  String get settings_syncMaintenance_phase_clearingOldFiles =>
+      'جارٍ مسح الملفات القديمة';
+
+  @override
+  String get settings_syncMaintenance_phase_deleting => 'جارٍ الحذف';
+
+  @override
+  String get settings_syncMaintenance_phase_publishingLibrary =>
+      'جارٍ نشر المكتبة';
+
+  @override
+  String get settings_syncMaintenance_phase_working => 'جارٍ العمل...';
+
+  @override
+  String settings_syncMaintenance_progress_filesOfTotal(int done, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$done من $total ملف',
+      many: '$done من $total ملفًا',
+      few: '$done من $total ملفات',
+      two: '$done من ملفين',
+      one: '$done من ملف واحد',
+      zero: '$done من $total ملف',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_removedFiles(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تمت إزالة $count ملف',
+      many: 'تمت إزالة $count ملفًا',
+      few: 'تمت إزالة $count ملفات',
+      two: 'تمت إزالة ملفين',
+      one: 'تمت إزالة ملف واحد',
+      zero: 'تمت إزالة $count ملف',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_removedFilesPartial(
+    int count,
+    String trouble,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'تمت إزالة $count ملف، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+      many:
+          'تمت إزالة $count ملفًا، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+      few:
+          'تمت إزالة $count ملفات، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+      two:
+          'تمت إزالة ملفين، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+      one:
+          'تمت إزالة ملف واحد، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+      zero:
+          'تمت إزالة $count ملف، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_trouble_failed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تعذّر حذف $count',
+      many: 'تعذّر حذف $count',
+      few: 'تعذّر حذف $count',
+      two: 'تعذّر حذف اثنين',
+      one: 'تعذّر حذف واحد',
+      zero: 'تعذّر حذف $count',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_syncMaintenance_trouble_listIncomplete =>
+      'تعذّر سرد بعض الملفات';
+
+  @override
+  String settings_syncMaintenance_wipedFiles(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم مسح $count ملف',
+      many: 'تم مسح $count ملفًا',
+      few: 'تم مسح $count ملفات',
+      two: 'تم مسح ملفين',
+      one: 'تم مسح ملف واحد',
+      zero: 'تم مسح $count ملف',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_wipedFilesPartial(int count, String trouble) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'تم مسح $count ملف، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+      many:
+          'تم مسح $count ملفًا، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+      few:
+          'تم مسح $count ملفات، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+      two: 'تم مسح ملفين، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+      one:
+          'تم مسح ملف واحد، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+      zero:
+          'تم مسح $count ملف، لكن $trouble. حاول مرة أخرى أثناء الاتصال بالإنترنت.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_troubleshootSync_appBar_title => 'استكشاف أخطاء المزامنة';
+
+  @override
+  String get settings_troubleshootSync_devices_subtitle =>
+      'اطّلع على كل جهاز يحتفظ بملفات هنا، ومقدار المساحة التي يستخدمها كل منها، وأزل المخلفات من المكتبات التي لم يعد أي جهاز يزامن منها. بيانات الغوص الخاصة بك لن تتأثر.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirm => 'إعادة البناء';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirmBody =>
+      'يجعل هذا مكتبة هذا الجهاز هي المكتبة الحالية على الخدمة ويعيد نشرها، بحيث تزامن الأجهزة الأخرى منك. استخدمه عندما يتعثر استبدال قادم من جهاز آخر. بيانات الغوص الخاصة بك لن تتأثر.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirmTitle =>
+      'إعادة بناء الخدمة من هذا الجهاز؟';
+
+  @override
+  String get settings_troubleshootSync_rebuild_doneSnack =>
+      'تمت إعادة بناء الخدمة من هذا الجهاز';
+
+  @override
+  String get settings_troubleshootSync_rebuild_failedSnack =>
+      'فشلت إعادة البناء';
+
+  @override
+  String get settings_troubleshootSync_rebuild_progressTitle =>
+      'جارٍ إعادة بناء الخدمة';
+
+  @override
+  String get settings_troubleshootSync_rebuild_subtitle =>
+      'استخدمه إذا كانت المزامنة متوقفة في انتظار مكتبة استبدلها جهاز آخر لكنه لم يُكمل رفعها أبداً (قد يكون ذلك الجهاز غير متصل). ينشر مكتبة هذا الجهاز باعتبارها الحالية.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_title =>
+      'إعادة بناء الخدمة من هذا الجهاز';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_confirmBody =>
+      'يحذف هذا من الخدمة ملفات المزامنة الخاصة بهذا الجهاز فقط. تستمر الأجهزة الأخرى في المزامنة، وبيانات الغوص الخاصة بك لن تتأثر.';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_confirmTitle =>
+      'إزالة ملفات هذا الجهاز السحابية؟';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_progressTitle =>
+      'جارٍ إزالة ملفات هذا الجهاز السحابية';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_subtitle =>
+      'حرّر مساحة هذا الجهاز على الخدمة. تستمر الأجهزة الأخرى في المزامنة. بيانات الغوص الخاصة بك لن تتأثر.';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_title =>
+      'إزالة ملفات هذا الجهاز السحابية';
+
+  @override
+  String get settings_troubleshootSync_repair_confirm => 'إصلاح';
+
+  @override
+  String get settings_troubleshootSync_repair_confirmBody =>
+      'يمسح هذا كل حالة المزامنة المحلية ويمنح هذا الجهاز هوية مزامنة جديدة، ثم يعيد الاتصال من جديد عند المزامنة التالية. بيانات الغوص الخاصة بك آمنة ولن تُحذف.';
+
+  @override
+  String get settings_troubleshootSync_repair_confirmTitle => 'إصلاح المزامنة؟';
+
+  @override
+  String get settings_troubleshootSync_repair_doneSnack => 'تم إصلاح المزامنة';
+
+  @override
+  String get settings_troubleshootSync_repair_subtitle =>
+      'أصلح مزامنة متوقفة. يمسح حالة المزامنة الخاصة بهذا الجهاز ويمنحه هوية مزامنة جديدة، ثم يعيد الاتصال عند المزامنة التالية. بيانات الغوص الخاصة بك لن تتأثر.';
+
+  @override
+  String get settings_troubleshootSync_repair_title => 'إصلاح المزامنة';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_confirm => 'مسح كل شيء';
+
+  @override
+  String settings_troubleshootSync_wipeAll_confirmBody(String word) {
+    return 'يحذف هذا بيانات المزامنة الخاصة بكل جهاز من هذه الخدمة، بما في ذلك علامات المكتبة. سيتعين على كل جهاز إعادة إنشاء المزامنة من الصفر. بيانات الغوص الخاصة بك لن تتأثر.\n\nاكتب الكلمة $word تماماً للتأكيد.';
+  }
+
+  @override
+  String get settings_troubleshootSync_wipeAll_confirmTitle =>
+      'مسح جميع بيانات المزامنة؟';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_progressTitle =>
+      'جارٍ مسح بيانات المزامنة';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_subtitle =>
+      'احذف بيانات المزامنة الخاصة بكل جهاز من هذه الخدمة، بما في ذلك علامات المكتبة. يعيد كل جهاز إنشاء المزامنة من الصفر. بيانات الغوص الخاصة بك لن تتأثر.';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_title =>
+      'مسح جميع بيانات المزامنة على هذه الخدمة';
+
+  @override
+  String get tableMode_tooltip_toggleDetailPane => 'تبديل لوحة التفاصيل';
+
+  @override
+  String get tableMode_tooltip_toggleProfilePanel => 'تبديل لوحة المخطط';
+
+  @override
+  String get maps_regionDownload_title => 'تنزيل منطقة';
+
+  @override
+  String get maps_regionDownload_nameRequired => 'يرجى إدخال اسم لهذه المنطقة';
+
+  @override
+  String get maps_regionDownload_nameLabel => 'اسم المنطقة';
+
+  @override
+  String get maps_regionDownload_nameHint => 'مثال: كوزوميل، المكسيك';
+
+  @override
+  String get maps_regionDownload_zoomLevels => 'مستويات التكبير';
+
+  @override
+  String get maps_regionDownload_zoomHint =>
+      'تكبير أعلى = تفاصيل أكثر وحجم تنزيل أكبر';
+
+  @override
+  String maps_regionDownload_minZoom(int zoom) {
+    return 'الأدنى: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_minZoomSemantics(int zoom) {
+    return 'أدنى تكبير: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_maxZoom(int zoom) {
+    return 'الأقصى: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_maxZoomSemantics(int zoom) {
+    return 'أقصى تكبير: $zoom';
+  }
+
+  @override
+  String get maps_regionDownload_estimatingSemantics =>
+      'جارٍ تقدير حجم التنزيل';
+
+  @override
+  String maps_regionDownload_estimateSemantics(int count, Object size) {
+    return 'التنزيل المقدر: $count بلاطة، $size';
+  }
+
+  @override
+  String get maps_regionDownload_estimateUnavailableSemantics =>
+      'تعذر تقدير حجم التنزيل';
+
+  @override
+  String get maps_regionDownload_estimating => 'جارٍ التقدير...';
+
+  @override
+  String maps_regionDownload_tileCount(int count) {
+    return '~$count بلاطة';
+  }
+
+  @override
+  String get maps_regionDownload_estimateUnavailable => 'تعذر التقدير';
+
+  @override
+  String get maps_regionDownload_largeWarningSemantics =>
+      'تحذير: تنزيل كبير. فكّر في خفض مستويات التكبير أو اختيار منطقة أصغر.';
+
+  @override
+  String get maps_regionDownload_largeWarning =>
+      'تنزيل كبير. فكّر في خفض مستويات التكبير أو اختيار منطقة أصغر.';
+
+  @override
+  String get maps_regionDownload_downloadButton => 'تنزيل';
+
+  @override
+  String get diveLog_map_title => 'نشاط الغوص';
+
+  @override
+  String diveLog_map_infoCard_minutes(int minutes) {
+    return '$minutes دقيقة';
+  }
+
+  @override
+  String trips_gallery_diveSection_subtitle(
+    Object date,
+    int count,
+    Object photoLabel,
+  ) {
+    return '$date ($count $photoLabel)';
+  }
+
+  @override
+  String get trips_gallery_thumbnail_photo =>
+      'صورة مصغّرة لصورة. انقر للعرض بملء الشاشة';
+
+  @override
+  String get trips_gallery_thumbnail_video =>
+      'صورة مصغّرة لفيديو. انقر للعرض بملء الشاشة';
+
+  @override
+  String get trips_gallery_thumbnail_photoMissing =>
+      'صورة مصغّرة لصورة، مفقودة من الجهاز. انقر للعرض بملء الشاشة';
+
+  @override
+  String get trips_gallery_thumbnail_videoMissing =>
+      'صورة مصغّرة لفيديو، مفقود من الجهاز. انقر للعرض بملء الشاشة';
+
+  @override
+  String get trips_photos_thumbnail_photo =>
+      'صورة مصغّرة لصورة. انقر لفتح المعرض';
+
+  @override
+  String get trips_photos_thumbnail_video =>
+      'صورة مصغّرة لفيديو. انقر لفتح المعرض';
+
+  @override
+  String trips_picker_suggestedSemantics(Object name) {
+    return 'رحلة مقترحة: $name. انقر للاستخدام';
+  }
+
+  @override
+  String trips_picker_tileSemantics(
+    Object name,
+    Object startDate,
+    Object endDate,
+  ) {
+    return '$name، من $startDate إلى $endDate';
+  }
+
+  @override
+  String trips_picker_tileSemanticsSelected(
+    Object name,
+    Object startDate,
+    Object endDate,
+  ) {
+    return '$name، من $startDate إلى $endDate، محددة';
+  }
+
+  @override
+  String get divePlanner_quickPlan_subtitle => 'أنشئ ملف غوص مستطيلاً بسيطاً';
+
+  @override
+  String get divePlanner_quickPlan_depthLabel => 'العمق:';
+
+  @override
+  String divePlanner_quickPlan_depthSemantics(Object depth) {
+    return 'العمق: $depth';
+  }
+
+  @override
+  String get divePlanner_quickPlan_timeLabel => 'الوقت:';
+
+  @override
+  String divePlanner_quickPlan_bottomTimeSemantics(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'وقت القاع: $minutes دقيقة',
+      many: 'وقت القاع: $minutes دقيقة',
+      few: 'وقت القاع: $minutes دقائق',
+      two: 'وقت القاع: دقيقتان',
+      one: 'وقت القاع: دقيقة واحدة',
+      zero: 'وقت القاع: $minutes دقيقة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String divePlanner_quickPlan_minutes(int minutes) {
+    return '$minutes دقيقة';
+  }
+
+  @override
+  String divePlanner_quickPlan_previewSemantics(Object depth, int minutes) {
+    return 'معاينة الخطة: نزول إلى $depth، وقت القاع $minutes دقيقة، صعود مع توقف أمان';
+  }
+
+  @override
+  String get divePlanner_quickPlan_previewTitle => 'معاينة الخطة:';
+
+  @override
+  String divePlanner_quickPlan_previewDescent(Object depth) {
+    return 'نزول إلى $depth';
+  }
+
+  @override
+  String divePlanner_quickPlan_previewBottomTime(int minutes) {
+    return 'وقت القاع: $minutes دقيقة';
+  }
+
+  @override
+  String get divePlanner_quickPlan_previewAscent => 'صعود مع توقف أمان';
+
+  @override
+  String get divePlanner_quickPlan_create => 'إنشاء';
+
+  @override
+  String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
+    return 'معدل SAC: $value $volumeSymbol في الدقيقة';
+  }
+
+  @override
+  String divePlanner_semantics_reservePressure(Object pressureSymbol) {
+    return 'ضغط الاحتياطي بوحدة $pressureSymbol';
+  }
+
+  @override
+  String divePlanner_semantics_altitudeGroup(Object group) {
+    return 'مجموعة الارتفاع: $group';
+  }
+
+  @override
+  String diveSites_import_detail_maxDepth(Object depth) {
+    return 'أقصى $depth';
+  }
+
+  @override
+  String get autoUpdate_banner_download => 'تنزيل';
+
+  @override
+  String get settings_cloudSync_provider_icloud_subtitle =>
+      'المزامنة عبر Apple iCloud';
+
+  @override
+  String get settings_debugLog_search_hint => 'البحث في السجلات...';
+
+  @override
+  String get settings_debugLog_appBar_title => 'سجلات التصحيح';
+
+  @override
+  String get settings_debugLog_disableDebugMode => 'تعطيل وضع التصحيح';
+
+  @override
+  String get settings_debugLog_clearLogs => 'مسح السجلات';
+
+  @override
+  String get settings_debugLog_empty =>
+      'لا توجد إدخالات سجل تطابق عوامل التصفية الحالية';
+
+  @override
+  String settings_debugLog_loadError(Object error) {
+    return 'خطأ في تحميل السجلات: $error';
+  }
+
+  @override
+  String get settings_debugLog_copiedSnack =>
+      'تم نسخ السجلات المصفاة إلى الحافظة';
+
+  @override
+  String settings_debugLog_savedSnack(String path) {
+    return 'تم حفظ السجلات في $path';
+  }
+
+  @override
+  String get common_action_copy => 'نسخ';
+
+  @override
+  String get settings_appearance_customGradient_title => 'تدرج مخصص';
+
+  @override
+  String get settings_appearance_customGradient_start => 'البداية';
+
+  @override
+  String get settings_appearance_customGradient_end => 'النهاية';
+
+  @override
+  String get settings_appearance_customGradient_hue => 'درجة اللون';
+
+  @override
+  String get settings_appearance_customGradient_saturation => 'التشبع';
+
+  @override
+  String get settings_appearance_customGradient_brightness => 'السطوع';
+
+  @override
+  String get settings_appearance_customGradient_preview => 'معاينة';
+
+  @override
+  String get common_action_apply => 'تطبيق';
+
+  @override
+  String settings_cloudSync_message_loadStateFailed(Object error) {
+    return 'فشل تحميل حالة المزامنة: $error';
+  }
+
+  @override
+  String get settings_cloudSync_message_noProviderConfigured =>
+      'لم يتم إعداد أي مزود سحابي';
+
+  @override
+  String get settings_cloudSync_message_adopting =>
+      'جارٍ اعتماد المكتبة المستعادة...';
+
+  @override
+  String get settings_cloudSync_message_adoptFailed =>
+      'فشل اعتماد المكتبة المستعادة';
+
+  @override
+  String get settings_cloudSync_message_firstSyncNeedsConfirm =>
+      'المزامنة الأولى تحتاج إلى تأكيد. اضغط على مزامنة الآن للمراجعة.';
+
+  @override
+  String get settings_cloudSync_message_startingSync => 'جارٍ بدء المزامنة...';
+
+  @override
+  String get settings_cloudSync_message_replacePaused =>
+      'المزامنة متوقفة مؤقتًا: تم استبدال المكتبة من نسخة احتياطية. اضغط على مزامنة الآن للمراجعة.';
+
+  @override
+  String get settings_cloudSync_message_encryptedPaused =>
+      'المزامنة متوقفة مؤقتًا: هذه المكتبة مشفرة. أدخل عبارة المرور للمتابعة.';
+
+  @override
+  String get settings_cloudSync_message_completedWithConflicts =>
+      'اكتملت المزامنة مع وجود تعارضات';
+
+  @override
+  String get settings_cloudSync_message_completedSuccessfully =>
+      'اكتملت المزامنة بنجاح';
+
+  @override
+  String get settings_cloudSync_message_syncFailed => 'فشلت المزامنة';
+
+  @override
+  String get settings_cloudSync_message_phaseDefault => 'المزامنة';
+
+  @override
+  String settings_cloudSync_message_syncErrorDuring(
+    String phase,
+    Object error,
+  ) {
+    return 'خطأ في المزامنة أثناء $phase: $error';
+  }
+
+  @override
+  String get settings_section_debug_title => 'التصحيح';
+
+  @override
+  String get settings_section_debug_subtitle => 'السجلات والتشخيصات';
+
+  @override
+  String get settings_debugLog_minSeverityLabel => 'أدنى خطورة:';
+
+  @override
+  String get settings_debugLog_shareSubject => 'سجلات تصحيح Submersion';
+
+  @override
+  String get settings_debugLog_saveDialogTitle => 'حفظ سجلات التصحيح';
+
+  @override
+  String get universalImport_preset_saveTitle => 'حفظ كإعداد مسبق';
+
+  @override
+  String get universalImport_preset_nameLabel => 'اسم الإعداد المسبق';
+
+  @override
+  String get universalImport_preset_nameHint => 'مثال: ملف CSV لسجل غوصي';
+
+  @override
+  String get universalImport_preset_nameRequired => 'الاسم مطلوب';
+
+  @override
+  String get universalImport_preset_sourceAppLabel => 'التطبيق المصدر';
+
+  @override
+  String get universalImport_preset_sourceAppNone => 'بدون';
+
+  @override
+  String get universalImport_preset_entityTypesLabel => 'أنواع الكيانات';
+
+  @override
+  String get universalImport_preset_matchThresholdLabel => 'عتبة التطابق';
+
+  @override
+  String get universalImport_preset_matchThresholdHelp =>
+      'مدى التطابق المطلوب في رؤوس أعمدة CSV للكشف التلقائي';
+
+  @override
+  String universalImport_preset_signatureHeaders(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count رأس تعريف من الملف الحالي',
+      many: '$count رأس تعريف من الملف الحالي',
+      few: '$count رؤوس تعريف من الملف الحالي',
+      two: 'رأسا تعريف من الملف الحالي',
+      one: 'رأس تعريف واحد من الملف الحالي',
+      zero: '$count رأس تعريف من الملف الحالي',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_preset_selectTitle => 'اختيار إعداد مسبق';
+
+  @override
+  String universalImport_preset_loadFailed(String error) {
+    return 'فشل تحميل الإعدادات المسبقة: $error';
+  }
+
+  @override
+  String get universalImport_preset_sectionSaved =>
+      'الإعدادات المسبقة المحفوظة';
+
+  @override
+  String get universalImport_preset_sectionBuiltIn =>
+      'الإعدادات المسبقة المدمجة';
+
+  @override
+  String get universalImport_preset_deleteTitle => 'حذف الإعداد المسبق';
+
+  @override
+  String universalImport_preset_deleteConfirm(String name) {
+    return 'حذف \"$name\"؟ لا يمكن التراجع عن هذا.';
+  }
+
+  @override
+  String universalImport_preset_headersMatched(
+    int matched,
+    int total,
+    int percent,
+  ) {
+    return '$matched/$total رؤوس متطابقة ($percent%)';
+  }
+
+  @override
+  String get universalImport_preset_noSignatureHeaders => 'لا توجد رؤوس تعريف';
+
+  @override
+  String get universalImport_preset_deleteTooltip => 'حذف الإعداد المسبق';
+
+  @override
+  String get universalImport_preset_presetsButton => 'الإعدادات المسبقة';
+
+  @override
+  String universalImport_preset_savedSnackbar(String name) {
+    return 'تم حفظ الإعداد المسبق \"$name\"';
+  }
+
+  @override
+  String get universalImport_step_done => 'تم';
+
+  @override
+  String get universalImport_cancel_inProgressTitle => 'جارٍ الإلغاء';
+
+  @override
+  String get universalImport_cancel_inProgressBody =>
+      'سيتم إنهاء الغوصة الحالية قبل التوقف. تبقى الغوصات المستوردة بالفعل محفوظة.';
+
+  @override
+  String get universalImport_cancel_confirmTitle => 'إلغاء الاستيراد؟';
+
+  @override
+  String get universalImport_cancel_confirmBody =>
+      'سيتوقف بعد انتهاء الغوصة الحالية. تبقى الغوصات المستوردة بالفعل محفوظة.';
+
+  @override
+  String get universalImport_cancel_keepImporting => 'متابعة الاستيراد';
+
+  @override
+  String get universalImport_cancel_confirmAction => 'إلغاء الاستيراد';
+
+  @override
+  String get universalImport_cancel_discardSelections =>
+      'تجاهل التحديدات والإلغاء؟';
+
+  @override
+  String get universalImport_action_importSelected => 'استيراد المحدد';
+
+  @override
+  String get universalImport_action_next => 'التالي';
+
+  @override
+  String get common_action_yes => 'نعم';
+
+  @override
+  String get common_action_no => 'لا';
+
+  @override
+  String universalImport_counts_new(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count جديد',
+      many: '$count جديدًا',
+      few: '$count جديدة',
+      two: '$count جديدان',
+      one: '$count جديد',
+      zero: '$count جديد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_merging(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count قيد الدمج',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_replacing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count قيد الاستبدال',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_skipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count متخطى',
+      many: '$count متخطى',
+      few: '$count متخطاة',
+      two: '$count متخطيان',
+      one: '$count متخطى',
+      zero: '$count متخطى',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_counts_nothingSelected => 'لم يتم تحديد أي شيء';
+
+  @override
+  String get universalImport_section_potentialDuplicates => 'تكرارات محتملة';
+
+  @override
+  String get universalImport_section_possibleDuplicates => 'تكرارات ممكنة';
+
+  @override
+  String universalImport_count_duplicates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count تكرار',
+      many: '$count تكرارًا',
+      few: '$count تكرارات',
+      two: 'تكراران',
+      one: 'تكرار واحد',
+      zero: 'لا تكرارات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_entityAction_importBadge => 'استيراد';
+
+  @override
+  String get universalImport_entityAction_skipBadge => 'تخطي';
+
+  @override
+  String get universalImport_compare_existing => 'الحالي';
+
+  @override
+  String get universalImport_compare_incoming => 'الوارد';
+
+  @override
+  String get universalImport_label_skipped => 'متخطى';
+
+  @override
+  String get universalImport_action_viewDives => 'عرض الغوصات';
+
+  @override
+  String get diveImport_healthkit_accessGranted =>
+      'تم منح الوصول إلى HealthKit';
+
+  @override
+  String get diveImport_healthkit_accessGrantedBody =>
+      'يمكنك الانتقال إلى الخطوة التالية.';
+
+  @override
+  String get diveImport_healthkit_requesting => 'جارٍ الطلب...';
+
+  @override
+  String get diveImport_healthkit_grantAccessButton =>
+      'منح الوصول إلى HealthKit';
+
+  @override
+  String get diveImport_healthkit_selectDateRange => 'اختيار النطاق الزمني';
+
+  @override
+  String get diveImport_healthkit_selectDateRangeBody =>
+      'اختر النطاق الزمني للبحث عن الغوصات في Apple Health.';
+
+  @override
+  String get diveImport_healthkit_fetchingDives =>
+      'جارٍ جلب الغوصات من Apple Health...';
+
+  @override
+  String get diveImport_healthkit_fetchFailed => 'فشل الجلب';
+
+  @override
+  String diveImport_healthkit_fetchFailedBody(String error) {
+    return 'فشل جلب الغوصات: $error';
+  }
+
+  @override
+  String diveImport_healthkit_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم العثور على $count غوصة',
+      many: 'تم العثور على $count غوصة',
+      few: 'تم العثور على $count غوصات',
+      two: 'تم العثور على غوصتين',
+      one: 'تم العثور على غوصة واحدة',
+      zero: 'لم يتم العثور على غوصات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveImport_healthkit_proceedingToReview =>
+      'جارٍ الانتقال إلى المراجعة...';
+
+  @override
+  String get importWizard_dc_knownComputer => 'كمبيوتر غوص معروف';
+
+  @override
+  String importWizard_dc_knownComputerBody(String name) {
+    return 'محفوظ باسم \"$name\". سيتم تنزيل الغوصات الجديدة فقط.';
+  }
+
+  @override
+  String get importWizard_dc_noNewDives => 'لا توجد غوصات جديدة للتنزيل';
+
+  @override
+  String get importWizard_dc_noNewDivesBody =>
+      'تم استيراد جميع الغوصات من هذا الكمبيوتر بالفعل.';
+
+  @override
+  String get universalImport_compare_noDiveData =>
+      'بيانات الغوصة غير متوفرة للمقارنة.';
+
+  @override
+  String get universalImport_entityAction_consolidateBadge => 'دمج';
+
+  @override
+  String get diveCenters_import_quickSearch_egypt => 'مصر';
+
+  @override
+  String get diveCenters_import_quickSearch_mexico => 'المكسيك';
+
+  @override
+  String get accessibility_shortcut_switchDiver => 'تبديل الغواص';
+
+  @override
+  String get lock_recoveryCode_title => 'استخدام رمز الاسترداد';
+
+  @override
+  String get lock_recoveryCode_body =>
+      'أدخل رمز الاسترداد المكوَّن من 8 كلمات الذي حفظته عند إعداد كلمة مرور التطبيق.';
+
+  @override
+  String get lock_recoveryCode_error => 'رمز الاسترداد غير صحيح.';
+
+  @override
+  String get lock_forcedReset_title => 'تعيين كلمة مرور جديدة';
+
+  @override
+  String get lock_forcedReset_body =>
+      'لقد فتحت القفل باستخدام رمز الاسترداد، لذلك لم تعد كلمة مرورك القديمة موثوقة. اختر كلمة مرور جديدة الآن.';
+
+  @override
+  String get lock_forcedReset_submit => 'تعيين كلمة المرور';
+
+  @override
+  String get lock_forcedReset_error =>
+      'تعذّر تعيين كلمة المرور الجديدة. حاول مرة أخرى.';
+
+  @override
+  String get lock_sidecarRepair_title => 'إصلاح ملف مفتاح الأمان';
+
+  @override
+  String get lock_sidecarRepair_body =>
+      'كان ملف مفتاح الأمان مفقودًا، وما زالت سلسلة مفاتيح هذا الجهاز تحتفظ بالمفتاح. أكِّد كلمة مرورك لكتابة ملف مفتاح جديد. ملاحظة: كلمة المرور التي تدخلها هنا تصبح كلمة مرور التطبيق من الآن فصاعدًا، وستتلقى رمز استرداد جديدًا.';
+
+  @override
+  String get lock_sidecarRepair_submit => 'إصلاح';
+
+  @override
+  String get lock_sidecarRepair_error => 'فشل الإصلاح. حاول مرة أخرى.';
+
+  @override
+  String get lock_newRecoveryCode_title => 'رمز الاسترداد الجديد الخاص بك';
+
+  @override
+  String get lock_startFresh_title => 'فتح قاعدة بيانات أخرى';
+
+  @override
+  String lock_startFresh_body(Object token) {
+    return 'تبقى قاعدة بياناتك الحالية على القرص، بعد إعادة تسميتها باللاحقة .locked؛ لا يُحذف أي شيء. يمكنك استردادها لاحقًا بكلمة مرورك أو بالتواصل مع الدعم. سيتم إيقاف مزامنة السحابة حتى لا تختلط قاعدة البيانات الجديدة بالقديمة.\n\nسيبدأ التطبيق بقاعدة بيانات جديدة وفارغة. يمكنك الاستعادة من نسخة احتياطية في معالج الإعداد.\n\nاكتب $token للتأكيد.';
+  }
+
+  @override
+  String get lock_startFresh_confirm => 'وضعها جانبًا والبدء من جديد';
+
+  @override
+  String get lock_biometric_reason => 'فتح قفل سجل الغوص';
+
+  @override
+  String startup_migrating_progress(Object currentStep, Object totalSteps) {
+    return 'جارٍ ترقية قاعدة البيانات... الخطوة $currentStep من $totalSteps';
+  }
+
+  @override
+  String get startup_error_title => 'فشلت ترقية قاعدة البيانات';
+
+  @override
+  String get startup_error_body =>
+      'حاول إعادة تشغيل التطبيق. إذا استمرت المشكلة، تواصل مع الدعم: بياناتك ما زالت على القرص ولا تتطلب إعادة تثبيت.';
+
+  @override
+  String get startup_recovering_title => 'جارٍ استرداد قاعدة البيانات...';
+
+  @override
+  String get startup_recovering_body =>
+      'جارٍ التراجع عن المعاملة المتوقفة. يستغرق ذلك عادةً بضع ثوانٍ.';
+
+  @override
+  String get startup_recoveryFailed_title => 'لم يكتمل الاسترداد';
+
+  @override
+  String get startup_recoveryFailed_body =>
+      'تعذّر التراجع عن قاعدة البيانات تلقائيًا. بياناتك ما زالت على القرص؛ تواصل مع الدعم قبل إعادة التثبيت حتى نتمكن من مساعدتك في استردادها.';
+
+  @override
+  String get startup_recoveryRequired_title =>
+      'قاعدة البيانات بحاجة إلى استرداد';
+
+  @override
+  String get startup_recoveryRequired_body =>
+      'انقطعت جلسة سابقة أثناء الكتابة في قاعدة البيانات. بياناتك ما زالت على القرص؛ نحتاج فقط إلى إتمام التراجع عن التغيير الملغى قبل أن يتمكن التطبيق من الفتح.';
+
+  @override
+  String startup_recovery_sqliteCode(Object code) {
+    return 'رمز SQLite $code';
+  }
+
+  @override
+  String get startup_recovery_action => 'استرداد قاعدة البيانات';
+
+  @override
+  String get startup_recovery_closeWithoutRecovering =>
+      'الإغلاق من دون استرداد';
+
+  @override
+  String get common_action_tryAgain => 'حاول مرة أخرى';
+
+  @override
+  String get lock_screen_title => 'التطبيق Submersion مقفل';
+
+  @override
+  String get lock_screen_forgotPassword => 'هل نسيت كلمة المرور؟';
+
+  @override
+  String get lock_incorrectPassword => 'كلمة المرور غير صحيحة. حاول مرة أخرى.';
+
+  @override
+  String get startup_backup_semanticsLabel => 'جارٍ النسخ الاحتياطي';
+
+  @override
+  String get startup_backup_title => 'جارٍ عمل نسخة احتياطية من بياناتك';
+
+  @override
+  String get startup_backup_body =>
+      'نحفظ نسخة من سجل الغوص الخاص بك قبل تحديث قاعدة بياناتك.';
+
+  @override
+  String get startup_backupFailed_title => 'تعذّر عمل نسخة احتياطية من بياناتك';
+
+  @override
+  String get startup_backupFailed_body =>
+      'لم يتغيّر سجل الغوص الخاص بك؛ لم نقم بتحديثه. حرِّر مساحة (أو عالج المشكلة) ثم حاول مرة أخرى.';
+
+  @override
+  String get startup_backupFailed_quit => 'إنهاء';
+
+  @override
+  String get startup_backupFailed_technicalDetails => 'تفاصيل تقنية';
+
+  @override
+  String get common_action_retry => 'إعادة المحاولة';
+
+  @override
+  String get startup_versionMismatch_title => 'التحديث مطلوب';
+
+  @override
+  String startup_versionMismatch_body(
+    Object databaseVersion,
+    Object appVersion,
+  ) {
+    return 'حُفظت بيانات غوصك بإصدار أحدث من Submersion (المخطط v$databaseVersion). هذا الإصدار يدعم حتى المخطط v$appVersion فقط.';
+  }
+
+  @override
+  String get startup_versionMismatch_instructions =>
+      'يرجى تحديث Submersion إلى أحدث إصدار. بياناتك آمنة ولم تُعدَّل. إذا أُخذت نسخة احتياطية قبل الترقية، فهي موجودة في مجلد Backups ويمكن استعادتها بعد التحديث.';
+
+  @override
+  String get startup_versionMismatch_download => 'تنزيل أحدث إصدار';
+
+  @override
+  String get startup_versionMismatch_manualLink =>
+      'إذا لم يفتح ذلك متصفحًا، فتفضل بزيارة:';
+
+  @override
+  String get universalImport_compare_downloaded => 'المنزَّلة';
+
+  @override
+  String get universalImport_compare_errorLoading =>
+      'خطأ في تحميل بيانات الغوصة';
+
+  @override
+  String get universalImport_compare_diveNotFound =>
+      'لم يتم العثور على الغوصة الموجودة';
+
+  @override
+  String universalImport_compare_sameFields(Object fields) {
+    return 'متطابق: $fields';
+  }
+
+  @override
+  String get universalImport_compare_differences => 'الاختلافات';
+
+  @override
+  String get universalImport_compare_notRecorded => 'غير مسجل';
+
+  @override
+  String universalImport_compare_serial(Object serial) {
+    return 'S/N: $serial';
+  }
+
+  @override
+  String get universalImport_compare_skipSubtitle => 'تجاهل هذا التنزيل';
+
+  @override
+  String get universalImport_compare_importAsNewSubtitle =>
+      'الحفظ كغوصة منفصلة';
+
+  @override
+  String get universalImport_compare_consolidateSubtitle =>
+      'الإضافة كقراءة حاسوب ثانٍ';
+
+  @override
+  String get diveLog_tooltip_ndlOverMax => '>60 min';
+
+  @override
+  String diveLog_tooltip_interpolated(String value) {
+    return '$value (بالاستيفاء)';
+  }
+
+  @override
+  String get enum_profileMetric_ascentRate_short => 'المعدل';
+
+  @override
+  String get enum_profileMetric_cns_short => 'CNS';
+
+  @override
+  String get enum_profileMetric_otu_short => 'OTU';
+
+  @override
+  String get diveLog_profileEditor_rangeOperations => 'عمليات النطاق';
+
+  @override
+  String get diveLog_profileEditor_selectRangeHint =>
+      'حدّد نطاقًا على الرسم البياني لتفعيل العمليات';
+
+  @override
+  String get diveLog_profileEditor_depthPlusOneMeter => 'العمق +1m';
+
+  @override
+  String get diveLog_profileEditor_depthMinusOneMeter => 'العمق -1m';
+
+  @override
+  String get diveLog_profileEditor_timePlusFiveSeconds => 'الوقت +5s';
+
+  @override
+  String get diveLog_profileEditor_timeMinusFiveSeconds => 'الوقت -5s';
+
+  @override
+  String get diveLog_profileEditor_smoothing => 'التنعيم';
+
+  @override
+  String get diveLog_profileEditor_smoothLight => 'خفيف';
+
+  @override
+  String get diveLog_profileEditor_smoothMedium => 'متوسط';
+
+  @override
+  String get diveLog_profileEditor_smoothHeavy => 'قوي';
+
+  @override
+  String get diveLog_profileEditor_applyToAll => 'تطبيق على الكل';
+
+  @override
+  String get diveLog_profileEditor_applyToSelection => 'تطبيق على التحديد';
+
+  @override
+  String get diveLog_profileEditor_outlierDetection => 'كشف القيم الشاذة';
+
+  @override
+  String get diveLog_profileEditor_detect => 'كشف';
+
+  @override
+  String get diveLog_profileEditor_removeAll => 'إزالة الكل';
+
+  @override
+  String diveLog_profileEditor_outliersDetected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم العثور على $count قيمة شاذة محتملة',
+      many: 'تم العثور على $count قيمة شاذة محتملة',
+      few: 'تم العثور على $count قيم شاذة محتملة',
+      two: 'تم العثور على قيمتين شاذتين محتملتين',
+      one: 'تم العثور على قيمة شاذة محتملة واحدة',
+      zero: 'لم يتم العثور على قيم شاذة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_profileEditor_manualDrawing => 'الرسم اليدوي';
+
+  @override
+  String get diveLog_profileEditor_drawHint =>
+      'انقر على الرسم البياني لوضع نقاط المسار';
+
+  @override
+  String get diveLog_profileEditor_clearWaypoints => 'مسح';
+
+  @override
+  String get diveLog_profileEditor_generateProfile => 'إنشاء ملف الغوصة';
+
+  @override
+  String get diveLog_profileEditor_trimMode => 'وضع القص';
+
+  @override
+  String get diveLog_profileEditor_trimHint => 'قص أطراف ملف الغوصة';
+
+  @override
+  String get diveLog_profileEditor_trimEnd => 'قص النهاية';
+
+  @override
+  String get diveLog_profileEditor_mode_smooth => 'تنعيم';
+
+  @override
+  String get diveLog_profileEditor_title => 'تعديل ملف الغوصة';
+
+  @override
+  String get diveLog_profileEditor_discardBody =>
+      'لديك تغييرات غير محفوظة على ملف الغوصة هذا. هل تريد بالتأكيد تجاهلها؟';
+
+  @override
+  String get diveLog_profileEditor_saveTitle => 'حفظ ملف الغوصة؟';
+
+  @override
+  String get diveLog_profileEditor_saveBody =>
+      'سيؤدي هذا إلى حفظ الملف المعدَّل كملف أساسي لهذه الغوصة. سيبقى الملف الأصلي محفوظًا ويمكن استعادته لاحقًا.';
+
+  @override
+  String diveLog_profileEditor_saveFailed(String error) {
+    return 'فشل حفظ ملف الغوصة: $error';
+  }
+
+  @override
+  String diveLog_profileEditor_errorLoadingDive(String error) {
+    return 'خطأ في تحميل الغوصة: $error';
+  }
+
+  @override
+  String get diveLog_profileEditor_noProfileData =>
+      'لا تتوفر بيانات ملف الغوصة';
+
+  @override
+  String get diveLog_profileEditor_undo => 'تراجع';
+
+  @override
+  String get diveLog_profileEditor_mode_select => 'تحديد';
+
+  @override
+  String get diveLog_profileEditor_mode_outlier => 'قيمة شاذة';
+
+  @override
+  String get diveLog_profileEditor_mode_draw => 'رسم';
+
+  @override
+  String get diveLog_profileEditor_mode_trim => 'قص';
+
+  @override
+  String diveLog_sources_sectionTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'مصادر البيانات',
+      many: 'مصادر البيانات',
+      few: 'مصادر البيانات',
+      two: 'مصدرا البيانات',
+      one: 'مصدر البيانات',
+      zero: 'مصدر البيانات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_badge_manual => 'يدوي';
+
+  @override
+  String get diveLog_sources_badge_viewing => 'قيد العرض';
+
+  @override
+  String get diveLog_sources_badge_secondary => 'ثانوي';
+
+  @override
+  String diveLog_sources_created(String date) {
+    return 'أُنشئ في $date';
+  }
+
+  @override
+  String get diveLog_sources_detail_serial => 'الرقم التسلسلي';
+
+  @override
+  String get diveLog_sources_detail_format => 'الصيغة';
+
+  @override
+  String get diveLog_sources_detail_imported => 'تاريخ الاستيراد';
+
+  @override
+  String diveLog_detail_semantics_viewDiveComputer(String name) {
+    return 'عرض حاسوب الغوص $name';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewTrip(String name) {
+    return 'عرض الرحلة $name';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewDiveCenter(String name) {
+    return 'عرض مركز الغوص $name';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewSpecies(String name) {
+    return 'عرض النوع $name';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewCourse(String name) {
+    return 'عرض الدورة $name';
+  }
+
+  @override
+  String diveLog_detail_serialNumber(String serial) {
+    return 'S/N $serial';
+  }
+
+  @override
+  String diveLog_detail_errorLoadingSignature(String error) {
+    return 'خطأ في تحميل التوقيع: $error';
+  }
+
+  @override
+  String get diveLog_profilePanel_selectDive => 'اختر غوصة لعرض ملفها';
+
+  @override
+  String get diveLog_profilePanel_noProfileData =>
+      'لا توجد بيانات ملف لهذه الغوصة';
+
+  @override
+  String get settings_export_progress_divesCsv =>
+      'جارٍ تصدير الغوصات إلى CSV...';
+
+  @override
+  String get settings_export_progress_sitesCsv =>
+      'جارٍ تصدير المواقع إلى CSV...';
+
+  @override
+  String get settings_export_progress_equipmentCsv =>
+      'جارٍ تصدير المعدات إلى CSV...';
+
+  @override
+  String get settings_export_progress_pdf =>
+      'جارٍ إنشاء سجل الغوص بصيغة PDF...';
+
+  @override
+  String get settings_export_progress_loadingSignatures =>
+      'جارٍ تحميل التوقيعات...';
+
+  @override
+  String get settings_export_progress_loadingCertifications =>
+      'جارٍ تحميل الشهادات...';
+
+  @override
+  String get settings_export_progress_loadingFonts => 'جارٍ تحميل الخطوط...';
+
+  @override
+  String settings_export_progress_templatePdf(String template) {
+    return 'جارٍ إنشاء ملف PDF بقالب $template...';
+  }
+
+  @override
+  String get settings_export_progress_uddf => 'جارٍ إنشاء ملف UDDF...';
+
+  @override
+  String get settings_export_progress_collectingData =>
+      'جارٍ جمع كل البيانات...';
+
+  @override
+  String get settings_export_progress_excel => 'جارٍ إنشاء ملف Excel...';
+
+  @override
+  String get settings_export_progress_buildingExcel =>
+      'جارٍ بناء مصنّف Excel...';
+
+  @override
+  String get settings_export_progress_kml => 'جارٍ إنشاء ملف KML...';
+
+  @override
+  String get settings_export_progress_buildingKml => 'جارٍ بناء ملف KML...';
+
+  @override
+  String get settings_export_progress_preparingExcel =>
+      'جارٍ تحضير ملف Excel...';
+
+  @override
+  String get settings_export_progress_preparingKml => 'جارٍ تحضير ملف KML...';
+
+  @override
+  String get settings_export_progress_chooseLocation => 'اختر موقع الحفظ...';
+
+  @override
+  String get settings_export_progress_preparingDivesCsv =>
+      'جارٍ تحضير ملف CSV للغوصات...';
+
+  @override
+  String get settings_export_progress_preparingSitesCsv =>
+      'جارٍ تحضير ملف CSV للمواقع...';
+
+  @override
+  String get settings_export_progress_preparingEquipmentCsv =>
+      'جارٍ تحضير ملف CSV للمعدات...';
+
+  @override
+  String get settings_export_progress_preparingUddf => 'جارٍ تحضير ملف UDDF...';
+
+  @override
+  String get settings_export_progress_preparingPdf => 'جارٍ تحضير ملف PDF...';
+
+  @override
+  String get settings_export_progress_selectingBackup =>
+      'جارٍ اختيار ملف النسخة الاحتياطية...';
+
+  @override
+  String get settings_export_progress_restoringBackup =>
+      'جارٍ الاستعادة من النسخة الاحتياطية...';
+
+  @override
+  String get settings_export_empty_dives => 'لا توجد غوصات للتصدير';
+
+  @override
+  String get settings_export_empty_sites => 'لا توجد مواقع للتصدير';
+
+  @override
+  String get settings_export_empty_equipment => 'لا توجد معدات للتصدير';
+
+  @override
+  String get settings_export_empty_data => 'لا توجد بيانات للتصدير';
+
+  @override
+  String get settings_export_empty_diveSites => 'لا توجد مواقع غوص للتصدير';
+
+  @override
+  String settings_export_saveFailed(String error) {
+    return 'فشل الحفظ: $error';
+  }
+
+  @override
+  String settings_export_backupFailed(String error) {
+    return 'فشل النسخ الاحتياطي: $error';
+  }
+
+  @override
+  String settings_export_restoreFailed(String error) {
+    return 'فشلت الاستعادة: $error';
+  }
+
+  @override
+  String get settings_export_fileUnreadable => 'تعذّر الوصول إلى الملف';
+
+  @override
+  String get settings_export_notADbFile =>
+      'يُرجى اختيار ملف نسخة احتياطية بامتداد .db';
+
+  @override
+  String get settings_export_success_dives => 'تم تصدير الغوصات بنجاح';
+
+  @override
+  String get settings_export_success_sites => 'تم تصدير المواقع بنجاح';
+
+  @override
+  String get settings_export_success_equipment => 'تم تصدير المعدات بنجاح';
+
+  @override
+  String get settings_export_success_pdf =>
+      'تم إنشاء سجل الغوص بصيغة PDF بنجاح';
+
+  @override
+  String get settings_export_success_uddf => 'تم إنشاء ملف UDDF بنجاح';
+
+  @override
+  String get settings_export_success_excel => 'تم تصدير ملف Excel بنجاح';
+
+  @override
+  String settings_export_success_kml(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تصدير ملف KML بنجاح (تم تخطي $count موقع بلا إحداثيات)',
+      many: 'تم تصدير ملف KML بنجاح (تم تخطي $count موقعًا بلا إحداثيات)',
+      few: 'تم تصدير ملف KML بنجاح (تم تخطي $count مواقع بلا إحداثيات)',
+      two: 'تم تصدير ملف KML بنجاح (تم تخطي موقعين بلا إحداثيات)',
+      one: 'تم تصدير ملف KML بنجاح (تم تخطي موقع واحد بلا إحداثيات)',
+      zero: 'تم تصدير ملف KML بنجاح',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_export_saved_excel => 'تم حفظ ملف Excel بنجاح';
+
+  @override
+  String settings_export_saved_kml(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم حفظ ملف KML بنجاح (تم تخطي $count موقع بلا إحداثيات)',
+      many: 'تم حفظ ملف KML بنجاح (تم تخطي $count موقعًا بلا إحداثيات)',
+      few: 'تم حفظ ملف KML بنجاح (تم تخطي $count مواقع بلا إحداثيات)',
+      two: 'تم حفظ ملف KML بنجاح (تم تخطي موقعين بلا إحداثيات)',
+      one: 'تم حفظ ملف KML بنجاح (تم تخطي موقع واحد بلا إحداثيات)',
+      zero: 'تم حفظ ملف KML بنجاح',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_export_saved_divesCsv => 'تم حفظ ملف CSV للغوصات بنجاح';
+
+  @override
+  String get settings_export_saved_sitesCsv => 'تم حفظ ملف CSV للمواقع بنجاح';
+
+  @override
+  String get settings_export_saved_equipmentCsv =>
+      'تم حفظ ملف CSV للمعدات بنجاح';
+
+  @override
+  String get settings_export_saved_uddf => 'تم حفظ ملف UDDF بنجاح';
+
+  @override
+  String get settings_export_saved_pdf => 'تم حفظ ملف PDF بنجاح';
+
+  @override
+  String get settings_export_saved_backup => 'تم حفظ النسخة الاحتياطية بنجاح';
+
+  @override
+  String get settings_export_restoreComplete => 'اكتملت الاستعادة';
+
+  @override
+  String get settings_export_cancelled_save => 'تم إلغاء الحفظ';
+
+  @override
+  String get settings_export_cancelled_backup => 'تم إلغاء النسخ الاحتياطي';
+
+  @override
+  String get settings_export_cancelled_restore => 'تم إلغاء الاستعادة';
+
+  @override
+  String get settings_export_pdfDocumentTitle => 'سجل الغوص';
+
+  @override
+  String get settings_export_saveBackupDialogTitle => 'حفظ النسخة الاحتياطية';
+
+  @override
+  String backup_operation_created(String size) {
+    return 'تم إنشاء نسخة احتياطية: $size';
+  }
+
+  @override
+  String backup_operation_backupFailed(String error) {
+    return 'فشل النسخ الاحتياطي: $error';
+  }
+
+  @override
+  String get backup_operation_restoring => 'جارٍ استعادة النسخة الاحتياطية...';
+
+  @override
+  String backup_operation_restoreFailed(String error) {
+    return 'فشلت الاستعادة: $error';
+  }
+
+  @override
+  String get backup_operation_deleting => 'جارٍ حذف النسخة الاحتياطية...';
+
+  @override
+  String get backup_operation_deleted => 'تم حذف النسخة الاحتياطية';
+
+  @override
+  String backup_operation_deleteFailed(String error) {
+    return 'فشل الحذف: $error';
+  }
+
+  @override
+  String get backup_operation_exporting => 'جارٍ تصدير النسخة الاحتياطية...';
+
+  @override
+  String backup_operation_exported(String size) {
+    return 'تم تصدير النسخة الاحتياطية: $size';
+  }
+
+  @override
+  String backup_operation_exportFailed(String error) {
+    return 'فشل التصدير: $error';
+  }
+
+  @override
+  String get backup_operation_preparingShare =>
+      'جارٍ تحضير النسخة الاحتياطية للمشاركة...';
+
+  @override
+  String get backup_operation_shareReady => 'النسخة الاحتياطية جاهزة للمشاركة';
+
+  @override
+  String backup_operation_upgrading(int step, int total) {
+    return 'جارٍ ترقية قاعدة البيانات (الخطوة $step من $total)...';
+  }
+
+  @override
+  String backup_restore_dialog_counts(int diveCount, int siteCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount غوصة',
+      many: '$diveCount غوصة',
+      few: '$diveCount غوصات',
+      two: 'غوصتان',
+      one: 'غوصة واحدة',
+      zero: '$diveCount غوصة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount موقع',
+      many: '$siteCount موقعًا',
+      few: '$siteCount مواقع',
+      two: 'موقعان',
+      one: 'موقع واحد',
+      zero: '$siteCount موقع',
+    );
+    return '$_temp0، $_temp1';
+  }
+
+  @override
+  String get backup_restore_preMigration_title =>
+      'استعادة نسخة احتياطية سابقة للترحيل';
+
+  @override
+  String get backup_restore_preMigration_unknownVersion => 'إصدار غير معروف';
+
+  @override
+  String get backup_restore_preMigration_restoreAnyway => 'استعادة على أي حال';
+
+  @override
+  String backup_restore_preMigration_incompleteMetadata(
+    String timestamp,
+    String appVersion,
+  ) {
+    return 'أُنشئت هذه النسخة الاحتياطية في $timestamp بواسطة إصدار التطبيق $appVersion، لكن بياناتها الوصفية الخاصة بترحيل قاعدة البيانات غير مكتملة.\n\nلا يستطيع التطبيق التحقق مما إذا كانت استعادة هذه النسخة الاحتياطية آمنة، لذا فإن الاستعادة معطّلة.';
+  }
+
+  @override
+  String backup_restore_preMigration_newerApp(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+  ) {
+    return 'هذه النسخة الاحتياطية أحدث من تطبيقك. ثبّت إصدارًا أحدث من التطبيق لاستعادتها.\n\nأُنشئت النسخة الاحتياطية في $timestamp بواسطة إصدار التطبيق $appVersion (قاعدة البيانات v$fromVersion).';
+  }
+
+  @override
+  String backup_restore_preMigration_safe(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+    int toVersion,
+  ) {
+    return 'أُنشئت هذه النسخة الاحتياطية في $timestamp بواسطة إصدار التطبيق $appVersion، قبل ترقية قاعدة البيانات من v$fromVersion إلى v$toVersion مباشرة.\n\nمخطط قاعدة بيانات تطبيقك يطابق هذه النسخة الاحتياطية، لذا فإن الاستعادة آمنة.';
+  }
+
+  @override
+  String backup_restore_preMigration_warning(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+    int toVersion,
+    int currentVersion,
+  ) {
+    return 'أُنشئت هذه النسخة الاحتياطية في $timestamp بواسطة إصدار التطبيق $appVersion، قبل ترقية قاعدة البيانات من v$fromVersion إلى v$toVersion مباشرة.\n\nأنت تستخدم تطبيقًا أحدث (قاعدة البيانات v$currentVersion).\n\nالاستعادة الآن ستعيد تشغيل ترقية قاعدة البيانات v$fromVersion → v$toVersion على بياناتك المستعادة: وهي نفس الترقية التي كانت على وشك التشغيل في الأصل. فإذا كانت تلك الترقية هي سبب المشكلة، فستواجه المشكلة نفسها مرة أخرى.\n\nللاستعادة بأمان: ثبّت التطبيق بالإصدار $appVersion أو أقدم، ثم استعد هذه النسخة الاحتياطية من ذلك التطبيق الأقدم.';
+  }
+
+  @override
+  String get settings_cloudSync_progress_preparing => 'جارٍ تحضير المزامنة...';
+
+  @override
+  String get settings_cloudSync_progress_pulling => 'جارٍ سحب التغييرات...';
+
+  @override
+  String get settings_cloudSync_progress_publishing => 'جارٍ نشر التغييرات...';
+
+  @override
+  String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total) {
+    return 'جارٍ رفع المكتبة ($uploaded من $total)';
+  }
+
+  @override
+  String get settings_cloudSync_result_noProvider =>
+      'لم يتم إعداد أي مزود تخزين سحابي';
+
+  @override
+  String get settings_cloudSync_result_notAuthenticated =>
+      'لم تتم المصادقة مع مزود التخزين السحابي';
+
+  @override
+  String get settings_cloudSync_result_timedOut => 'انتهت مهلة المزامنة';
+
+  @override
+  String get settings_cloudSync_result_epochMarkerUnreadable =>
+      'تعذّرت قراءة علامة حقبة المكتبة';
+
+  @override
+  String get settings_cloudSync_result_epochMarkerEncrypted =>
+      'علامة حقبة المكتبة مشفّرة';
+
+  @override
+  String get settings_cloudSync_result_libraryReplacedRemotely =>
+      'تم استبدال مكتبة السحابة من نسخة احتياطية';
+
+  @override
+  String get settings_cloudSync_result_noReplacementToRebuild =>
+      'لا يوجد استبدال للمكتبة يمكن إعادة البناء منه';
+
+  @override
+  String get settings_cloudSync_result_rebuiltFromThisDevice =>
+      'تمت إعادة بناء هذه الخدمة من مكتبة هذا الجهاز';
+
+  @override
+  String settings_cloudSync_result_rebuildFailed(String error) {
+    return 'فشلت إعادة البناء: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_libraryReplaced => 'تم استبدال المكتبة';
+
+  @override
+  String settings_cloudSync_result_libraryReplaceFailed(String error) {
+    return 'فشل استبدال المكتبة: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_noReplacementMarker =>
+      'لم يتم العثور على علامة استبدال المكتبة';
+
+  @override
+  String get settings_cloudSync_result_adoptedRestoredLibrary =>
+      'تم اعتماد المكتبة المستعادة';
+
+  @override
+  String settings_cloudSync_result_adoptFailed(String error) {
+    return 'فشل اعتماد المكتبة المستعادة: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_previousLibraryUnreadable =>
+      'تعذّرت قراءة المكتبة السابقة؛ وأُعيد إنشاء هذه الخدمة من مكتبة هذا الجهاز.';
+
+  @override
+  String get settings_cloudSync_result_replacementStillUploading =>
+      'لا يزال رفع المكتبة المستبدَلة جاريًا. حاول مرة أخرى بعد قليل.';
+
+  @override
+  String settings_cloudSync_result_recordsFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'فشل تطبيق $count سجل',
+      many: 'فشل تطبيق $count سجلًا',
+      few: 'فشل تطبيق $count سجلات',
+      two: 'فشل تطبيق سجلين',
+      one: 'فشل تطبيق سجل واحد',
+      zero: 'فشل تطبيق $count سجل',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_result_adoptedFreshIdentity =>
+      'كان جهاز آخر يتزامن باستخدام هوية هذا الجهاز. اعتمد هذا الجهاز هوية جديدة ودمج بيانات السحابة.';
+
+  @override
+  String settings_cloudSync_launchCheck_unavailable(String provider) {
+    return '$provider غير متاح على هذا الجهاز';
+  }
+
+  @override
+  String settings_cloudSync_launchCheck_notSignedIn(String provider) {
+    return 'لم يتم تسجيل الدخول إلى $provider';
+  }
+
+  @override
+  String settings_cloudSync_launchCheck_localChanges(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count تغيير محلي بانتظار الرفع',
+      many: '$count تغييرًا محليًا بانتظار الرفع',
+      few: '$count تغييرات محلية بانتظار الرفع',
+      two: 'تغييران محليان بانتظار الرفع',
+      one: 'تغيير محلي واحد بانتظار الرفع',
+      zero: '$count تغيير محلي بانتظار الرفع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_launchCheck_noRemoteData =>
+      'لم يتم العثور على بيانات مزامنة في السحابة';
+
+  @override
+  String get settings_cloudSync_launchCheck_cloudDataAvailable =>
+      'بيانات السحابة متاحة';
+
+  @override
+  String get settings_cloudSync_launchCheck_updatesAvailable =>
+      'تتوفر تحديثات من السحابة';
+
+  @override
+  String get settings_cloudSync_launchCheck_upToDate => 'كل شيء محدّث';
+
+  @override
+  String settings_cloudSync_launchCheck_failed(String error) {
+    return 'فشل التحقق من المزامنة: $error';
+  }
 }

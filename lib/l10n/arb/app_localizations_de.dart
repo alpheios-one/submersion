@@ -24425,4 +24425,7418 @@ class AppLocalizationsDe extends AppLocalizations {
   String marineLife_species_delete_error(String error) {
     return 'Fehler beim Löschen der Art: $error';
   }
+
+  @override
+  String get enum_diveField_diveNumber => 'Tauchgangnummer';
+
+  @override
+  String get enum_diveField_dateTime => 'Datum & Zeit';
+
+  @override
+  String get enum_diveField_siteName => 'Tauchplatzname';
+
+  @override
+  String get enum_diveField_diveName => 'Tauchgangname';
+
+  @override
+  String get enum_diveField_maxDepth => 'Max. Tiefe';
+
+  @override
+  String get enum_diveField_avgDepth => 'Durchschnittliche Tiefe';
+
+  @override
+  String get enum_diveField_bottomTime => 'Grundzeit';
+
+  @override
+  String get enum_diveField_runtime => 'Laufzeit';
+
+  @override
+  String get enum_diveField_waterTemp => 'Wassertemperatur';
+
+  @override
+  String get enum_diveField_airTemp => 'Lufttemperatur';
+
+  @override
+  String get enum_diveField_visibility => 'Sichtweite';
+
+  @override
+  String get enum_diveField_currentDirection => 'Strömungsrichtung';
+
+  @override
+  String get enum_diveField_currentStrength => 'Strömungsstärke';
+
+  @override
+  String get enum_diveField_swellHeight => 'Wellenhöhe';
+
+  @override
+  String get enum_diveField_entryMethod => 'Einstiegsmethode';
+
+  @override
+  String get enum_diveField_exitMethod => 'Ausstiegsmethode';
+
+  @override
+  String get enum_diveField_waterType => 'Wasserart';
+
+  @override
+  String get enum_diveField_altitude => 'Höhe';
+
+  @override
+  String get enum_diveField_surfacePressure => 'Oberflächendruck';
+
+  @override
+  String get enum_diveField_windSpeed => 'Windgeschwindigkeit';
+
+  @override
+  String get enum_diveField_cloudCover => 'Bewölkung';
+
+  @override
+  String get enum_diveField_precipitation => 'Niederschlag';
+
+  @override
+  String get enum_diveField_humidity => 'Luftfeuchtigkeit';
+
+  @override
+  String get enum_diveField_weatherDescription => 'Wetter';
+
+  @override
+  String get enum_diveField_primaryGas => 'Hauptgas';
+
+  @override
+  String get enum_diveField_diluentGas => 'Diluentgas';
+
+  @override
+  String get enum_diveField_tankCount => 'Anzahl Flaschen';
+
+  @override
+  String get enum_diveField_startPressure => 'Anfangsdruck';
+
+  @override
+  String get enum_diveField_endPressure => 'Enddruck';
+
+  @override
+  String get enum_diveField_sacRate => 'AMV';
+
+  @override
+  String get enum_diveField_gasConsumed => 'Gasverbrauch';
+
+  @override
+  String get enum_diveField_totalWeight => 'Gesamtgewicht';
+
+  @override
+  String get enum_diveField_diveComputerModel => 'Tauchcomputer';
+
+  @override
+  String get enum_diveField_gradientFactorLow => 'GF Niedrig';
+
+  @override
+  String get enum_diveField_gradientFactorHigh => 'GF Hoch';
+
+  @override
+  String get enum_diveField_decoAlgorithm => 'Deko-Algorithmus';
+
+  @override
+  String get enum_diveField_decoConservatism => 'Konservatismus';
+
+  @override
+  String get enum_diveField_cnsStart => 'CNS Start';
+
+  @override
+  String get enum_diveField_cnsEnd => 'CNS Ende';
+
+  @override
+  String get enum_diveField_otu => 'OTU';
+
+  @override
+  String get enum_diveField_diveMode => 'Tauchmodus';
+
+  @override
+  String get enum_diveField_setpointLow => 'Setpoint niedrig';
+
+  @override
+  String get enum_diveField_setpointHigh => 'Setpoint hoch';
+
+  @override
+  String get enum_diveField_setpointDeco => 'Setpoint Deko';
+
+  @override
+  String get enum_diveField_buddy => 'Tauchpartner';
+
+  @override
+  String get enum_diveField_diveMaster => 'Divemaster';
+
+  @override
+  String get enum_diveField_siteLocation => 'Tauchplatz-Ort';
+
+  @override
+  String get enum_diveField_diveCenterName => 'Tauchbasis';
+
+  @override
+  String get enum_diveField_siteLatitude => 'Breitengrad';
+
+  @override
+  String get enum_diveField_siteLongitude => 'Längengrad';
+
+  @override
+  String get enum_diveField_tripName => 'Reise';
+
+  @override
+  String get enum_diveField_ratingStars => 'Bewertung';
+
+  @override
+  String get enum_diveField_isFavorite => 'Favorit';
+
+  @override
+  String get enum_diveField_notes => 'Notizen';
+
+  @override
+  String get enum_diveField_tags => 'Tags';
+
+  @override
+  String get enum_diveField_importSource => 'Importquelle';
+
+  @override
+  String get enum_diveField_diveTypeName => 'Tauchgangart';
+
+  @override
+  String get enum_diveField_surfaceInterval => 'Oberflächenintervall';
+
+  @override
+  String get enum_diveField_diveNumber_short => '#';
+
+  @override
+  String get enum_diveField_dateTime_short => 'Datum';
+
+  @override
+  String get enum_diveField_siteName_short => 'Platz';
+
+  @override
+  String get enum_diveField_diveName_short => 'Name';
+
+  @override
+  String get enum_diveField_maxDepth_short => 'Max T';
+
+  @override
+  String get enum_diveField_avgDepth_short => 'Ø T';
+
+  @override
+  String get enum_diveField_bottomTime_short => 'GZ';
+
+  @override
+  String get enum_diveField_runtime_short => 'LZ';
+
+  @override
+  String get enum_diveField_waterTemp_short => 'W-Temp';
+
+  @override
+  String get enum_diveField_airTemp_short => 'L-Temp';
+
+  @override
+  String get enum_diveField_visibility_short => 'Sicht';
+
+  @override
+  String get enum_diveField_currentDirection_short => 'Str. Ri.';
+
+  @override
+  String get enum_diveField_currentStrength_short => 'Str.';
+
+  @override
+  String get enum_diveField_swellHeight_short => 'Welle';
+
+  @override
+  String get enum_diveField_entryMethod_short => 'Einst.';
+
+  @override
+  String get enum_diveField_exitMethod_short => 'Ausst.';
+
+  @override
+  String get enum_diveField_waterType_short => 'Wasser';
+
+  @override
+  String get enum_diveField_altitude_short => 'Höhe';
+
+  @override
+  String get enum_diveField_surfacePressure_short => 'O-Druck';
+
+  @override
+  String get enum_diveField_windSpeed_short => 'Wind';
+
+  @override
+  String get enum_diveField_cloudCover_short => 'Wolken';
+
+  @override
+  String get enum_diveField_precipitation_short => 'Nieders.';
+
+  @override
+  String get enum_diveField_humidity_short => 'Luftf.';
+
+  @override
+  String get enum_diveField_weatherDescription_short => 'Wetter';
+
+  @override
+  String get enum_diveField_primaryGas_short => 'Gas';
+
+  @override
+  String get enum_diveField_diluentGas_short => 'Dil';
+
+  @override
+  String get enum_diveField_tankCount_short => 'Flaschen';
+
+  @override
+  String get enum_diveField_startPressure_short => 'Anf.-Dr.';
+
+  @override
+  String get enum_diveField_endPressure_short => 'End-Dr.';
+
+  @override
+  String get enum_diveField_sacRate_short => 'AMV';
+
+  @override
+  String get enum_diveField_gasConsumed_short => 'Gasverbr.';
+
+  @override
+  String get enum_diveField_totalWeight_short => 'Gew.';
+
+  @override
+  String get enum_diveField_diveComputerModel_short => 'Computer';
+
+  @override
+  String get enum_diveField_gradientFactorLow_short => 'GFL';
+
+  @override
+  String get enum_diveField_gradientFactorHigh_short => 'GFH';
+
+  @override
+  String get enum_diveField_decoAlgorithm_short => 'Algo';
+
+  @override
+  String get enum_diveField_decoConservatism_short => 'Konserv.';
+
+  @override
+  String get enum_diveField_cnsStart_short => 'CNS Start';
+
+  @override
+  String get enum_diveField_cnsEnd_short => 'CNS Ende';
+
+  @override
+  String get enum_diveField_otu_short => 'OTU';
+
+  @override
+  String get enum_diveField_diveMode_short => 'Modus';
+
+  @override
+  String get enum_diveField_setpointLow_short => 'SP nied.';
+
+  @override
+  String get enum_diveField_setpointHigh_short => 'SP hoch';
+
+  @override
+  String get enum_diveField_setpointDeco_short => 'SP Deko';
+
+  @override
+  String get enum_diveField_buddy_short => 'Partner';
+
+  @override
+  String get enum_diveField_diveMaster_short => 'DM';
+
+  @override
+  String get enum_diveField_siteLocation_short => 'Ort';
+
+  @override
+  String get enum_diveField_diveCenterName_short => 'Basis';
+
+  @override
+  String get enum_diveField_siteLatitude_short => 'Breite';
+
+  @override
+  String get enum_diveField_siteLongitude_short => 'Länge';
+
+  @override
+  String get enum_diveField_tripName_short => 'Reise';
+
+  @override
+  String get enum_diveField_ratingStars_short => 'Bew.';
+
+  @override
+  String get enum_diveField_isFavorite_short => 'Fav';
+
+  @override
+  String get enum_diveField_notes_short => 'Notizen';
+
+  @override
+  String get enum_diveField_tags_short => 'Tags';
+
+  @override
+  String get enum_diveField_importSource_short => 'Quelle';
+
+  @override
+  String get enum_diveField_diveTypeName_short => 'Art';
+
+  @override
+  String get enum_diveField_surfaceInterval_short => 'OI';
+
+  @override
+  String get enum_siteField_siteName => 'Name';
+
+  @override
+  String get enum_siteField_location => 'Ort';
+
+  @override
+  String get enum_siteField_country => 'Land';
+
+  @override
+  String get enum_siteField_region => 'Region';
+
+  @override
+  String get enum_siteField_city => 'Stadt';
+
+  @override
+  String get enum_siteField_island => 'Insel';
+
+  @override
+  String get enum_siteField_bodyOfWater => 'Gewässer';
+
+  @override
+  String get enum_siteField_diveCount => 'Anzahl Tauchgänge';
+
+  @override
+  String get enum_siteField_maxDepth => 'Max. Tiefe';
+
+  @override
+  String get enum_siteField_minDepth => 'Min. Tiefe';
+
+  @override
+  String get enum_siteField_altitude => 'Höhe';
+
+  @override
+  String get enum_siteField_waterType => 'Wasserart';
+
+  @override
+  String get enum_siteField_typicalVisibility => 'Typische Sichtweite';
+
+  @override
+  String get enum_siteField_typicalCurrent => 'Typische Strömung';
+
+  @override
+  String get enum_siteField_difficulty => 'Schwierigkeitsgrad';
+
+  @override
+  String get enum_siteField_entryType => 'Einstiegsart';
+
+  @override
+  String get enum_siteField_bestSeason => 'Beste Saison';
+
+  @override
+  String get enum_siteField_mooringNumber => 'Bojen-Nummer';
+
+  @override
+  String get enum_siteField_hazards => 'Gefahren';
+
+  @override
+  String get enum_siteField_rating => 'Bewertung';
+
+  @override
+  String get enum_siteField_notes => 'Notizen';
+
+  @override
+  String get enum_siteField_latitude => 'Breitengrad';
+
+  @override
+  String get enum_siteField_longitude => 'Längengrad';
+
+  @override
+  String get enum_siteField_siteName_short => 'Name';
+
+  @override
+  String get enum_siteField_location_short => 'Ort';
+
+  @override
+  String get enum_siteField_country_short => 'Land';
+
+  @override
+  String get enum_siteField_region_short => 'Region';
+
+  @override
+  String get enum_siteField_city_short => 'Stadt';
+
+  @override
+  String get enum_siteField_island_short => 'Insel';
+
+  @override
+  String get enum_siteField_bodyOfWater_short => 'Gewässer';
+
+  @override
+  String get enum_siteField_diveCount_short => 'Tauchg.';
+
+  @override
+  String get enum_siteField_maxDepth_short => 'Max T';
+
+  @override
+  String get enum_siteField_minDepth_short => 'Min T';
+
+  @override
+  String get enum_siteField_altitude_short => 'Höhe';
+
+  @override
+  String get enum_siteField_waterType_short => 'Wasser';
+
+  @override
+  String get enum_siteField_typicalVisibility_short => 'Sicht';
+
+  @override
+  String get enum_siteField_typicalCurrent_short => 'Strömung';
+
+  @override
+  String get enum_siteField_difficulty_short => 'Schw.';
+
+  @override
+  String get enum_siteField_entryType_short => 'Einst.';
+
+  @override
+  String get enum_siteField_bestSeason_short => 'Saison';
+
+  @override
+  String get enum_siteField_mooringNumber_short => 'Boje';
+
+  @override
+  String get enum_siteField_hazards_short => 'Gefahren';
+
+  @override
+  String get enum_siteField_rating_short => 'Bew.';
+
+  @override
+  String get enum_siteField_notes_short => 'Notizen';
+
+  @override
+  String get enum_siteField_latitude_short => 'Breite';
+
+  @override
+  String get enum_siteField_longitude_short => 'Länge';
+
+  @override
+  String get enum_buddyField_buddyName => 'Name';
+
+  @override
+  String get enum_buddyField_email => 'E-Mail';
+
+  @override
+  String get enum_buddyField_phone => 'Telefon';
+
+  @override
+  String get enum_buddyField_certificationLevel => 'Zertifizierungsstufe';
+
+  @override
+  String get enum_buddyField_certificationAgency => 'Zertifizierungsverband';
+
+  @override
+  String get enum_buddyField_diveCount => 'Anzahl Tauchgänge';
+
+  @override
+  String get enum_buddyField_notes => 'Notizen';
+
+  @override
+  String get enum_buddyField_buddyName_short => 'Name';
+
+  @override
+  String get enum_buddyField_email_short => 'E-Mail';
+
+  @override
+  String get enum_buddyField_phone_short => 'Telefon';
+
+  @override
+  String get enum_buddyField_certificationLevel_short => 'Stufe';
+
+  @override
+  String get enum_buddyField_certificationAgency_short => 'Verband';
+
+  @override
+  String get enum_buddyField_diveCount_short => 'Tauchg.';
+
+  @override
+  String get enum_buddyField_notes_short => 'Notizen';
+
+  @override
+  String get enum_tripField_tripName => 'Name';
+
+  @override
+  String get enum_tripField_startDate => 'Startdatum';
+
+  @override
+  String get enum_tripField_endDate => 'Enddatum';
+
+  @override
+  String get enum_tripField_durationDays => 'Dauer';
+
+  @override
+  String get enum_tripField_location => 'Ort';
+
+  @override
+  String get enum_tripField_tripType => 'Reiseart';
+
+  @override
+  String get enum_tripField_resortName => 'Resort';
+
+  @override
+  String get enum_tripField_liveaboardName => 'Tauchsafari';
+
+  @override
+  String get enum_tripField_diveCount => 'Anzahl Tauchgänge';
+
+  @override
+  String get enum_tripField_totalBottomTime => 'Gesamte Grundzeit';
+
+  @override
+  String get enum_tripField_maxDepth => 'Max. Tiefe';
+
+  @override
+  String get enum_tripField_avgDepth => 'Ø Tiefe';
+
+  @override
+  String get enum_tripField_notes => 'Notizen';
+
+  @override
+  String get enum_tripField_tripName_short => 'Name';
+
+  @override
+  String get enum_tripField_startDate_short => 'Start';
+
+  @override
+  String get enum_tripField_endDate_short => 'Ende';
+
+  @override
+  String get enum_tripField_durationDays_short => 'Tage';
+
+  @override
+  String get enum_tripField_location_short => 'Ort';
+
+  @override
+  String get enum_tripField_tripType_short => 'Art';
+
+  @override
+  String get enum_tripField_resortName_short => 'Resort';
+
+  @override
+  String get enum_tripField_liveaboardName_short => 'Safari';
+
+  @override
+  String get enum_tripField_diveCount_short => 'Tauchg.';
+
+  @override
+  String get enum_tripField_totalBottomTime_short => 'GZ ges.';
+
+  @override
+  String get enum_tripField_maxDepth_short => 'Max T';
+
+  @override
+  String get enum_tripField_avgDepth_short => 'Ø T';
+
+  @override
+  String get enum_tripField_notes_short => 'Notizen';
+
+  @override
+  String get enum_equipmentField_itemName => 'Name';
+
+  @override
+  String get enum_equipmentField_fullName => 'Vollständiger Name';
+
+  @override
+  String get enum_equipmentField_type => 'Typ';
+
+  @override
+  String get enum_equipmentField_brand => 'Marke';
+
+  @override
+  String get enum_equipmentField_model => 'Modell';
+
+  @override
+  String get enum_equipmentField_serialNumber => 'Seriennummer';
+
+  @override
+  String get enum_equipmentField_size => 'Größe';
+
+  @override
+  String get enum_equipmentField_status => 'Status';
+
+  @override
+  String get enum_equipmentField_isActive => 'Aktiv';
+
+  @override
+  String get enum_equipmentField_purchaseDate => 'Kaufdatum';
+
+  @override
+  String get enum_equipmentField_purchasePrice => 'Kaufpreis';
+
+  @override
+  String get enum_equipmentField_lastServiceDate => 'Letzte Wartung';
+
+  @override
+  String get enum_equipmentField_nextServiceDue => 'Nächste Wartung fällig';
+
+  @override
+  String get enum_equipmentField_daysUntilService => 'Tage bis zur Wartung';
+
+  @override
+  String get enum_equipmentField_serviceIntervalDays => 'Wartungsintervall';
+
+  @override
+  String get enum_equipmentField_notes => 'Notizen';
+
+  @override
+  String get enum_equipmentField_itemName_short => 'Name';
+
+  @override
+  String get enum_equipmentField_fullName_short => 'Vollname';
+
+  @override
+  String get enum_equipmentField_type_short => 'Typ';
+
+  @override
+  String get enum_equipmentField_brand_short => 'Marke';
+
+  @override
+  String get enum_equipmentField_model_short => 'Modell';
+
+  @override
+  String get enum_equipmentField_serialNumber_short => 'Ser.-Nr.';
+
+  @override
+  String get enum_equipmentField_size_short => 'Größe';
+
+  @override
+  String get enum_equipmentField_status_short => 'Status';
+
+  @override
+  String get enum_equipmentField_isActive_short => 'Aktiv';
+
+  @override
+  String get enum_equipmentField_purchaseDate_short => 'Gekauft';
+
+  @override
+  String get enum_equipmentField_purchasePrice_short => 'Preis';
+
+  @override
+  String get enum_equipmentField_lastServiceDate_short => 'Gewartet';
+
+  @override
+  String get enum_equipmentField_nextServiceDue_short => 'Fällig';
+
+  @override
+  String get enum_equipmentField_daysUntilService_short => 'Rest-Tage';
+
+  @override
+  String get enum_equipmentField_serviceIntervalDays_short => 'Intervall';
+
+  @override
+  String get enum_equipmentField_notes_short => 'Notizen';
+
+  @override
+  String get enum_diveCenterField_centerName => 'Name';
+
+  @override
+  String get enum_diveCenterField_city => 'Stadt';
+
+  @override
+  String get enum_diveCenterField_country => 'Land';
+
+  @override
+  String get enum_diveCenterField_stateProvince => 'Bundesland / Provinz';
+
+  @override
+  String get enum_diveCenterField_street => 'Straße';
+
+  @override
+  String get enum_diveCenterField_postalCode => 'Postleitzahl';
+
+  @override
+  String get enum_diveCenterField_phone => 'Telefon';
+
+  @override
+  String get enum_diveCenterField_email => 'E-Mail';
+
+  @override
+  String get enum_diveCenterField_website => 'Website';
+
+  @override
+  String get enum_diveCenterField_affiliations => 'Verbindungen';
+
+  @override
+  String get enum_diveCenterField_rating => 'Bewertung';
+
+  @override
+  String get enum_diveCenterField_latitude => 'Breitengrad';
+
+  @override
+  String get enum_diveCenterField_longitude => 'Längengrad';
+
+  @override
+  String get enum_diveCenterField_diveCount => 'Anzahl Tauchgänge';
+
+  @override
+  String get enum_diveCenterField_notes => 'Notizen';
+
+  @override
+  String get enum_diveCenterField_centerName_short => 'Name';
+
+  @override
+  String get enum_diveCenterField_city_short => 'Stadt';
+
+  @override
+  String get enum_diveCenterField_country_short => 'Land';
+
+  @override
+  String get enum_diveCenterField_stateProvince_short => 'Provinz';
+
+  @override
+  String get enum_diveCenterField_street_short => 'Straße';
+
+  @override
+  String get enum_diveCenterField_postalCode_short => 'PLZ';
+
+  @override
+  String get enum_diveCenterField_phone_short => 'Telefon';
+
+  @override
+  String get enum_diveCenterField_email_short => 'E-Mail';
+
+  @override
+  String get enum_diveCenterField_website_short => 'Website';
+
+  @override
+  String get enum_diveCenterField_affiliations_short => 'Verbindungen';
+
+  @override
+  String get enum_diveCenterField_rating_short => 'Bew.';
+
+  @override
+  String get enum_diveCenterField_latitude_short => 'Breite';
+
+  @override
+  String get enum_diveCenterField_longitude_short => 'Länge';
+
+  @override
+  String get enum_diveCenterField_diveCount_short => 'Tauchg.';
+
+  @override
+  String get enum_diveCenterField_notes_short => 'Notizen';
+
+  @override
+  String get enum_certificationField_certName => 'Name';
+
+  @override
+  String get enum_certificationField_agency => 'Verband';
+
+  @override
+  String get enum_certificationField_level => 'Zertifizierung';
+
+  @override
+  String get enum_certificationField_cardNumber => 'Kartennummer';
+
+  @override
+  String get enum_certificationField_issueDate => 'Ausstellungsdatum';
+
+  @override
+  String get enum_certificationField_expiryDate => 'Ablaufdatum';
+
+  @override
+  String get enum_certificationField_instructorName => 'Tauchlehrername';
+
+  @override
+  String get enum_certificationField_instructorNumber => 'Tauchlehrernummer';
+
+  @override
+  String get enum_certificationField_expiryStatus => 'Ablaufstatus';
+
+  @override
+  String get enum_certificationField_notes => 'Notizen';
+
+  @override
+  String get enum_certificationField_certName_short => 'Name';
+
+  @override
+  String get enum_certificationField_agency_short => 'Verband';
+
+  @override
+  String get enum_certificationField_level_short => 'Zertifizierung';
+
+  @override
+  String get enum_certificationField_cardNumber_short => 'Kartennr.';
+
+  @override
+  String get enum_certificationField_issueDate_short => 'Ausgest.';
+
+  @override
+  String get enum_certificationField_expiryDate_short => 'Ablauf';
+
+  @override
+  String get enum_certificationField_instructorName_short => 'Tauchlehrer';
+
+  @override
+  String get enum_certificationField_instructorNumber_short => 'TL-Nr.';
+
+  @override
+  String get enum_certificationField_expiryStatus_short => 'Status';
+
+  @override
+  String get enum_certificationField_notes_short => 'Notizen';
+
+  @override
+  String get enum_courseField_courseName => 'Name';
+
+  @override
+  String get enum_courseField_agency => 'Verband';
+
+  @override
+  String get enum_courseField_startDate => 'Startdatum';
+
+  @override
+  String get enum_courseField_completionDate => 'Abschlussdatum';
+
+  @override
+  String get enum_courseField_durationDays => 'Dauer';
+
+  @override
+  String get enum_courseField_instructorName => 'Tauchlehrername';
+
+  @override
+  String get enum_courseField_instructorNumber => 'Tauchlehrernummer';
+
+  @override
+  String get enum_courseField_location => 'Ort';
+
+  @override
+  String get enum_courseField_isCompleted => 'Abgeschlossen';
+
+  @override
+  String get enum_courseField_notes => 'Notizen';
+
+  @override
+  String get enum_courseField_courseName_short => 'Name';
+
+  @override
+  String get enum_courseField_agency_short => 'Verband';
+
+  @override
+  String get enum_courseField_startDate_short => 'Beginn';
+
+  @override
+  String get enum_courseField_completionDate_short => 'Abschluss';
+
+  @override
+  String get enum_courseField_durationDays_short => 'Dauer';
+
+  @override
+  String get enum_courseField_instructorName_short => 'Tauchlehrer';
+
+  @override
+  String get enum_courseField_instructorNumber_short => 'TL-Nr.';
+
+  @override
+  String get enum_courseField_location_short => 'Ort';
+
+  @override
+  String get enum_courseField_isCompleted_short => 'Fertig';
+
+  @override
+  String get enum_courseField_notes_short => 'Notizen';
+
+  @override
+  String get enum_fieldCategory_accommodation => 'Unterkunft';
+
+  @override
+  String get enum_fieldCategory_address => 'Adresse';
+
+  @override
+  String get enum_fieldCategory_certification => 'Zertifizierung';
+
+  @override
+  String get enum_fieldCategory_conditions => 'Bedingungen';
+
+  @override
+  String get enum_fieldCategory_contact => 'Kontakt';
+
+  @override
+  String get enum_fieldCategory_coordinates => 'Koordinaten';
+
+  @override
+  String get enum_fieldCategory_dates => 'Daten';
+
+  @override
+  String get enum_fieldCategory_depth => 'Tiefe';
+
+  @override
+  String get enum_fieldCategory_details => 'Details';
+
+  @override
+  String get enum_fieldCategory_instructor => 'Tauchlehrer';
+
+  @override
+  String get enum_fieldCategory_other => 'Sonstige';
+
+  @override
+  String get enum_fieldCategory_purchase => 'Kauf';
+
+  @override
+  String get enum_fieldCategory_service => 'Wartung';
+
+  @override
+  String get enum_fieldCategory_statistics => 'Statistiken';
+
+  @override
+  String get species_whale_shark_name => 'Walhai';
+
+  @override
+  String get species_whale_shark_desc =>
+      'Größter Fisch der Ozeane, ein sanfter Filtrierer mit markantem Punktmuster.';
+
+  @override
+  String get species_great_white_shark_name => 'Weißer Hai';
+
+  @override
+  String get species_great_white_shark_desc =>
+      'Ikonischer Spitzenjäger, den Käfigtaucher gelegentlich in gemäßigten Gewässern zu sehen bekommen.';
+
+  @override
+  String get species_great_hammerhead_shark_name => 'Großer Hammerhai';
+
+  @override
+  String get species_great_hammerhead_shark_desc =>
+      'Größte Hammerhai-Art mit breitem, flachem Kopf und hoher Rückenflosse.';
+
+  @override
+  String get species_scalloped_hammerhead_shark_name => 'Bogenstirn-Hammerhai';
+
+  @override
+  String get species_scalloped_hammerhead_shark_desc =>
+      'Oft in großen Schulen an Seebergen und Putzerstationen zu sehen.';
+
+  @override
+  String get species_smooth_hammerhead_shark_name => 'Glatter Hammerhai';
+
+  @override
+  String get species_smooth_hammerhead_shark_desc =>
+      'Hammerhai mit glattem, abgerundetem Kopfrand, in gemäßigten Meeren verbreitet.';
+
+  @override
+  String get species_whitetip_reef_shark_name => 'Weißspitzen-Riffhai';
+
+  @override
+  String get species_whitetip_reef_shark_desc =>
+      'Friedlicher Riffbewohner, der tagsüber häufig in Höhlen und unter Überhängen ruht.';
+
+  @override
+  String get species_blacktip_reef_shark_name => 'Schwarzspitzen-Riffhai';
+
+  @override
+  String get species_blacktip_reef_shark_desc =>
+      'Häufiger Riffhai des Flachwassers mit auffällig schwarz gespitzten Flossen.';
+
+  @override
+  String get species_grey_reef_shark_name => 'Grauer Riffhai';
+
+  @override
+  String get species_grey_reef_shark_desc =>
+      'Aktiver Riffjäger, dem man oft in Gruppen an Steilwänden und in Kanälen begegnet.';
+
+  @override
+  String get species_caribbean_reef_shark_name => 'Karibischer Riffhai';
+
+  @override
+  String get species_caribbean_reef_shark_desc =>
+      'Der am häufigsten anzutreffende Riffhai der Karibik, kräftig gebaut und neugierig.';
+
+  @override
+  String get species_nurse_shark_name => 'Ammenhai';
+
+  @override
+  String get species_nurse_shark_desc =>
+      'Langsamer Bodenbewohner, der oft unter Korallenüberhängen ruht.';
+
+  @override
+  String get species_tawny_nurse_shark_name => 'Großer Ammenhai';
+
+  @override
+  String get species_tawny_nurse_shark_desc =>
+      'Indopazifischer Bodenbewohner, der in Riffhöhlen und auf Sandflächen ruht.';
+
+  @override
+  String get species_bull_shark_name => 'Bullenhai';
+
+  @override
+  String get species_bull_shark_desc =>
+      'Gedrungener, kräftiger Hai, der weltweit in Küstengewässern und im Süßwasser vorkommt.';
+
+  @override
+  String get species_tiger_shark_name => 'Tigerhai';
+
+  @override
+  String get species_tiger_shark_desc =>
+      'Großer Räuber mit markanter Streifenzeichnung, dem man bei tiefen Riff-Tauchgängen begegnet.';
+
+  @override
+  String get species_oceanic_whitetip_shark_name => 'Weißspitzen-Hochseehai';
+
+  @override
+  String get species_oceanic_whitetip_shark_desc =>
+      'Hochseehai mit abgerundeten, weiß gespitzten Flossen, bei Tauchgängen im offenen Ozean zu sehen.';
+
+  @override
+  String get species_thresher_shark_name => 'Fuchshai';
+
+  @override
+  String get species_thresher_shark_desc =>
+      'An seiner extrem langen Schwanzflosse zu erkennen, gelegentlich an Putzerstationen zu sehen.';
+
+  @override
+  String get species_pelagic_thresher_shark_name => 'Pelagischer Fuchshai';
+
+  @override
+  String get species_pelagic_thresher_shark_desc =>
+      'Kleinste Fuchshai-Art, berühmt für ihre Sichtungen am Monad Shoal auf den Philippinen.';
+
+  @override
+  String get species_shortfin_mako_shark_name => 'Kurzflossen-Makohai';
+
+  @override
+  String get species_shortfin_mako_shark_desc =>
+      'Schnellster Hai der Meere, ein schlanker Freiwasserjäger mit metallisch blauer Färbung.';
+
+  @override
+  String get species_blue_shark_name => 'Blauhai';
+
+  @override
+  String get species_blue_shark_desc =>
+      'Schlanker, tiefblauer Hochseehai, dem man häufig bei Blauwasser-Tauchgängen begegnet.';
+
+  @override
+  String get species_spotted_wobbegong_name => 'Gefleckter Teppichhai';
+
+  @override
+  String get species_spotted_wobbegong_desc =>
+      'Flacher, getarnter Teppichhai, der bewegungslos auf Felsriffen in Australien liegt.';
+
+  @override
+  String get species_tasselled_wobbegong_name => 'Fransenteppichhai';
+
+  @override
+  String get species_tasselled_wobbegong_desc =>
+      'Prächtig gezeichneter Teppichhai mit Hautfransen rund um den Kopf, in Korallenriffen zu Hause.';
+
+  @override
+  String get species_epaulette_shark_name => 'Epaulettenhai';
+
+  @override
+  String get species_epaulette_shark_desc =>
+      'Kleiner Hai, der mit seinen Brustflossen über den Riffboden läuft.';
+
+  @override
+  String get species_horn_shark_name => 'Hornhai';
+
+  @override
+  String get species_horn_shark_desc =>
+      'Nachtaktiver Bodenbewohner mit Wülsten über den Augen, vor Kalifornien verbreitet.';
+
+  @override
+  String get species_leopard_shark_name => 'Leopardenhai';
+
+  @override
+  String get species_leopard_shark_desc =>
+      'Wunderschön gezeichneter Hai in flachen Buchten entlang der US-Pazifikküste.';
+
+  @override
+  String get species_pacific_angel_shark_name => 'Pazifischer Engelhai';
+
+  @override
+  String get species_pacific_angel_shark_desc =>
+      'Flach gebauter Lauerjäger, der eingegraben im Sand des Meeresbodens liegt.';
+
+  @override
+  String get species_sand_tiger_shark_name => 'Sandtigerhai';
+
+  @override
+  String get species_sand_tiger_shark_desc =>
+      'Furchterregend aussehender, aber friedlicher Hai, der oft in Höhlen und Wracks schwebt.';
+
+  @override
+  String get species_zebra_shark_name => 'Zebrahai';
+
+  @override
+  String get species_zebra_shark_desc =>
+      'Gefleckter Riffhai, der auf Sandböden ruht und im Indopazifik häufig ist.';
+
+  @override
+  String get species_blacktip_shark_name => 'Schwarzspitzenhai';
+
+  @override
+  String get species_blacktip_shark_desc =>
+      'Schneller Küstenhai, bekannt für seine Drehsprünge, weltweit in warmen Gewässern verbreitet.';
+
+  @override
+  String get species_silvertip_shark_name => 'Silberspitzenhai';
+
+  @override
+  String get species_silvertip_shark_desc =>
+      'Selbstbewusster Riffhai mit weiß gesäumten Flossen, nahe tiefen Steilwänden und Atollen.';
+
+  @override
+  String get species_silky_shark_name => 'Seidenhai';
+
+  @override
+  String get species_silky_shark_desc =>
+      'Schlanker Hochseehai mit glatter Haut, oft in der Nähe vorgelagerter Riffe.';
+
+  @override
+  String get species_lemon_shark_name => 'Zitronenhai';
+
+  @override
+  String get species_lemon_shark_desc =>
+      'Gelbbrauner Hai, der häufig in flachen Mangroven und auf Sandflächen zu sehen ist.';
+
+  @override
+  String get species_galapagos_shark_name => 'Galapagoshai';
+
+  @override
+  String get species_galapagos_shark_desc =>
+      'Großer Riffhai rund um ozeanische Inseln, Tauchern gegenüber neugierig.';
+
+  @override
+  String get species_port_jackson_shark_name => 'Portjackson-Stierkopfhai';
+
+  @override
+  String get species_port_jackson_shark_desc =>
+      'Nachtaktiver Bodenbewohner mit geschirrartiger Zeichnung, endemisch in Australien.';
+
+  @override
+  String get species_bamboo_shark_name => 'Braungebänderter Bambushai';
+
+  @override
+  String get species_bamboo_shark_desc =>
+      'Kleiner, friedlicher Bodenhai, häufig auf Korallenriffen des Indopazifiks.';
+
+  @override
+  String get species_basking_shark_name => 'Riesenhai';
+
+  @override
+  String get species_basking_shark_desc =>
+      'Zweitgrößter Fisch, ein Filtrierer, den man in gemäßigten Oberflächengewässern sieht.';
+
+  @override
+  String get species_greenland_shark_name => 'Grönlandhai';
+
+  @override
+  String get species_greenland_shark_desc =>
+      'Langsamer Tiefwasserhai und eines der langlebigsten Wirbeltiere der Erde.';
+
+  @override
+  String get species_cookiecutter_shark_name => 'Zigarrenhai';
+
+  @override
+  String get species_cookiecutter_shark_desc =>
+      'Kleiner Tiefwasserhai, der kreisrunde Bissstücke aus größeren Meerestieren herausschneidet.';
+
+  @override
+  String get species_sevengill_shark_name => 'Breitnasen-Siebenkiemerhai';
+
+  @override
+  String get species_sevengill_shark_desc =>
+      'Urtümlicher Hai mit sieben Kiemenspalten, bei Tauchgängen in gemäßigten Kelpwäldern anzutreffen.';
+
+  @override
+  String get species_pyjama_shark_name => 'Pyjama-Katzenhai';
+
+  @override
+  String get species_pyjama_shark_desc =>
+      'Gestreifter Katzenhai, endemisch in Südafrika, in Felsriffen und Kelpwäldern zu finden.';
+
+  @override
+  String get species_spiny_dogfish_name => 'Dornhai';
+
+  @override
+  String get species_spiny_dogfish_desc =>
+      'Kleiner, häufiger Hai mit giftigen Rückenstacheln, in gemäßigten Gewässern verbreitet.';
+
+  @override
+  String get species_swell_shark_name => 'Schwellhai';
+
+  @override
+  String get species_swell_shark_desc =>
+      'Nachtaktiver Katzenhai, der sich bei Gefahr aufbläht, vor Kalifornien verbreitet.';
+
+  @override
+  String get species_giant_oceanic_manta_ray_name => 'Riesenmanta';
+
+  @override
+  String get species_giant_oceanic_manta_ray_desc =>
+      'Größte Rochenart, ein majestätischer Filtrierer mit bis zu 7 Metern Spannweite.';
+
+  @override
+  String get species_reef_manta_ray_name => 'Riffmanta';
+
+  @override
+  String get species_reef_manta_ray_desc =>
+      'Kleinere Mantaart, die häufig an Putzerstationen tropischer Riffe zu sehen ist.';
+
+  @override
+  String get species_spotted_eagle_ray_name => 'Gefleckter Adlerrochen';
+
+  @override
+  String get species_spotted_eagle_ray_desc =>
+      'Eleganter Rochen mit weißen Punkten und langem peitschenartigem Schwanz, oft im Freiwasser.';
+
+  @override
+  String get species_common_eagle_ray_name => 'Gemeiner Adlerrochen';
+
+  @override
+  String get species_common_eagle_ray_desc =>
+      'Rautenförmiger Rochen in den gemäßigten Gewässern des Ostatlantiks und des Mittelmeers.';
+
+  @override
+  String get species_blue_spotted_ribbontail_ray_name => 'Blaupunktrochen';
+
+  @override
+  String get species_blue_spotted_ribbontail_ray_desc =>
+      'Leuchtend gefärbter Rochen mit kräftig blauen Punkten, häufig an Riffen des Indopazifiks.';
+
+  @override
+  String get species_blue_spotted_stingray_name => 'Blaupunkt-Stechrochen';
+
+  @override
+  String get species_blue_spotted_stingray_desc =>
+      'Kleiner Riff-Stechrochen mit verstreuten blauen Punkten, oft in Sandflächen eingegraben.';
+
+  @override
+  String get species_southern_stingray_name => 'Südlicher Stechrochen';
+
+  @override
+  String get species_southern_stingray_desc =>
+      'Großer Stechrochen auf den Sandflächen der Karibik, berühmt aus Stingray City.';
+
+  @override
+  String get species_round_stingray_name => 'Rundstechrochen';
+
+  @override
+  String get species_round_stingray_desc =>
+      'Kleiner, runder Stechrochen, häufig in flachen Sandbereichen des Ostpazifiks.';
+
+  @override
+  String get species_short_tail_stingray_name => 'Kurzschwanz-Stechrochen';
+
+  @override
+  String get species_short_tail_stingray_desc =>
+      'Einer der größten Stechrochen, in gemäßigten Gewässern der Südhalbkugel zu Hause.';
+
+  @override
+  String get species_cowtail_stingray_name => 'Kuhschwanz-Stechrochen';
+
+  @override
+  String get species_cowtail_stingray_desc =>
+      'Großer dunkler Stechrochen mit auffälliger fahnenartiger Schwanzfalte, auf sandigen Riffen.';
+
+  @override
+  String get species_atlantic_torpedo_ray_name => 'Atlantischer Zitterrochen';
+
+  @override
+  String get species_atlantic_torpedo_ray_desc =>
+      'Zitterrochen, der starke Stromschläge erzeugen kann, auf den Sandböden des Atlantiks.';
+
+  @override
+  String get species_marbled_electric_ray_name => 'Marmorierter Zitterrochen';
+
+  @override
+  String get species_marbled_electric_ray_desc =>
+      'Mediterraner Zitterrochen mit marmorierter Zeichnung, der einen spürbaren Stromschlag austeilt.';
+
+  @override
+  String get species_giant_guitarfish_name => 'Riesen-Geigenrochen';
+
+  @override
+  String get species_giant_guitarfish_desc =>
+      'Haiförmiger Rochen auf den Sandböden des Indopazifiks nahe Korallenriffen.';
+
+  @override
+  String get species_shovelnose_guitarfish_name => 'Schaufelnasen-Geigenrochen';
+
+  @override
+  String get species_shovelnose_guitarfish_desc =>
+      'Abgeflachte Mischform aus Rochen und Hai, häufig im sandigen Flachwasser des Ostpazifiks.';
+
+  @override
+  String get species_smalltooth_sawfish_name => 'Kleinzahn-Sägefisch';
+
+  @override
+  String get species_smalltooth_sawfish_desc =>
+      'Vom Aussterben bedrohter Rochen mit bezahntem Rostrum, in tropischen Küstengewässern.';
+
+  @override
+  String get species_green_sawfish_name => 'Grüner Sägefisch';
+
+  @override
+  String get species_green_sawfish_desc =>
+      'Großer Sägefisch mit olivgrünem Körper, der Ästuare des Indo-Westpazifiks bewohnt.';
+
+  @override
+  String get species_devil_ray_name => 'Riesenteufelsrochen';
+
+  @override
+  String get species_devil_ray_desc =>
+      'Großer Mobula-Rochen mit Kopfflossen, der in Gruppen aus dem Wasser springt.';
+
+  @override
+  String get species_spinetail_devil_ray_name => 'Stachelschwanz-Teufelsrochen';
+
+  @override
+  String get species_spinetail_devil_ray_desc =>
+      'Pelagischer Teufelsrochen, der oft in großen Ansammlungen nahe der Oberfläche zu sehen ist.';
+
+  @override
+  String get species_lesser_devil_ray_name => 'Zwerg-Teufelsrochen';
+
+  @override
+  String get species_lesser_devil_ray_desc =>
+      'Kleinste Mobula-Art, bildet große Schulen im Golf von Kalifornien.';
+
+  @override
+  String get species_bat_ray_name => 'Fledermausrochen';
+
+  @override
+  String get species_bat_ray_desc =>
+      'Rautenförmiger Rochen, häufig in Kelpwäldern und sandigen Buchten Kaliforniens.';
+
+  @override
+  String get species_undulate_ray_name => 'Marmorrochen';
+
+  @override
+  String get species_undulate_ray_desc =>
+      'Wunderschön gezeichneter Rochen mit welligen Linien, im Ostatlantik verbreitet.';
+
+  @override
+  String get species_thornback_ray_name => 'Nagelrochen';
+
+  @override
+  String get species_thornback_ray_desc =>
+      'Häufiger europäischer Rochen mit dornigen Stacheln auf Rücken und Schwanz.';
+
+  @override
+  String get species_cownose_ray_name => 'Kuhnasenrochen';
+
+  @override
+  String get species_cownose_ray_desc =>
+      'Auffällig eingekerbter Kopf, oft in großen Schulen während der saisonalen Wanderungen.';
+
+  @override
+  String get species_marble_ray_name => 'Marmor-Stechrochen';
+
+  @override
+  String get species_marble_ray_desc =>
+      'Großer dunkler Stechrochen mit weißen Punkten, häufig an Putzerstationen im Indopazifik.';
+
+  @override
+  String get species_ocellate_river_stingray_name => 'Motoro-Stechrochen';
+
+  @override
+  String get species_ocellate_river_stingray_desc =>
+      'Süßwasser-Stechrochen mit auffälligen orange umrandeten Punkten, heimisch in südamerikanischen Flüssen.';
+
+  @override
+  String get species_ocellaris_clownfish_name => 'Falscher Clownfisch';
+
+  @override
+  String get species_ocellaris_clownfish_desc =>
+      'Kleiner orange-weiß gestreifter Fisch, der auf Korallenriffen in Symbiose mit Seeanemonen lebt.';
+
+  @override
+  String get species_clarkii_clownfish_name => 'Clarks Anemonenfisch';
+
+  @override
+  String get species_clarkii_clownfish_desc =>
+      'Robuster Anemonenfisch mit dunklem Körper und zwei weißen Binden, im gesamten Indopazifik in verschiedenen Anemonenarten.';
+
+  @override
+  String get species_tomato_clownfish_name => 'Tomaten-Anemonenfisch';
+
+  @override
+  String get species_tomato_clownfish_desc =>
+      'Leuchtend rotoranger Anemonenfisch mit einer einzelnen weißen Kopfbinde, häufig an Riffen des Indopazifiks.';
+
+  @override
+  String get species_regal_blue_tang_name => 'Paletten-Doktorfisch';
+
+  @override
+  String get species_regal_blue_tang_desc =>
+      'Leuchtend blauer Doktorfisch mit schwarzer Palettenzeichnung und gelber Schwanzflosse, auf Korallenriffen des Indopazifiks.';
+
+  @override
+  String get species_yellow_tang_name => 'Gelber Segelflossen-Doktorfisch';
+
+  @override
+  String get species_yellow_tang_desc =>
+      'Leuchtend gelber Doktorfisch, häufig an hawaiianischen und pazifischen Riffen, oft in Gruppen beim Abweiden von Algen.';
+
+  @override
+  String get species_powder_blue_surgeonfish_name => 'Weißkehl-Doktorfisch';
+
+  @override
+  String get species_powder_blue_surgeonfish_desc =>
+      'Auffälliger hellblauer Doktorfisch mit schwarzem Gesicht und gelber Rückenflosse, im Indischen Ozean verbreitet.';
+
+  @override
+  String get species_sohal_surgeonfish_name => 'Sohal-Doktorfisch';
+
+  @override
+  String get species_sohal_surgeonfish_desc =>
+      'Markant gestreifter Doktorfisch mit orangefarbenem Skalpelldorn, endemisch an den Riffen des Roten Meeres und des Arabischen Golfs.';
+
+  @override
+  String get species_blue_tang_name => 'Blauer Doktorfisch';
+
+  @override
+  String get species_blue_tang_desc =>
+      'Tiefblauer Doktorfisch, häufig an karibischen Riffen; Jungtiere sind leuchtend gelb.';
+
+  @override
+  String get species_emperor_angelfish_name => 'Imperator-Kaiserfisch';
+
+  @override
+  String get species_emperor_angelfish_desc =>
+      'Großer Kaiserfisch mit auffälligen blauen und gelben Längsstreifen. Jungtiere zeigen konzentrische blau-weiße Ringe.';
+
+  @override
+  String get species_french_angelfish_name => 'Franzosen-Kaiserfisch';
+
+  @override
+  String get species_french_angelfish_desc =>
+      'Großer dunkler Kaiserfisch mit goldgesäumten Schuppen, meist paarweise an Riffen der Karibik und des Westatlantiks.';
+
+  @override
+  String get species_queen_angelfish_name => 'Königin-Kaiserfisch';
+
+  @override
+  String get species_queen_angelfish_desc =>
+      'Prächtiger blau-gelber Kaiserfisch mit markantem Kronenfleck, auf karibischen Korallenriffen.';
+
+  @override
+  String get species_regal_angelfish_name => 'Pfauen-Kaiserfisch';
+
+  @override
+  String get species_regal_angelfish_desc =>
+      'Eleganter Kaiserfisch mit abwechselnd orange-weißen und blauen Querbinden, an Riffen des Indopazifiks.';
+
+  @override
+  String get species_rock_beauty_name => 'Dreifarben-Kaiserfisch';
+
+  @override
+  String get species_rock_beauty_desc =>
+      'Auffälliger karibischer Kaiserfisch mit gelber Vorder- und schwarzer Hinterhälfte, nahe Felsriffen und Überhängen.';
+
+  @override
+  String get species_gray_angelfish_name => 'Grauer Kaiserfisch';
+
+  @override
+  String get species_gray_angelfish_desc =>
+      'Großer grauer Kaiserfisch mit heller Gesichtspartie und gelber Brustflossen-Innenseite, häufig an karibischen Riffen.';
+
+  @override
+  String get species_copperband_butterflyfish_name =>
+      'Kupferstreifen-Pinzettfisch';
+
+  @override
+  String get species_copperband_butterflyfish_desc =>
+      'Markanter Falterfisch mit orangefarbenen Querbinden und langgezogener Schnauze, an Riffen des Indopazifiks.';
+
+  @override
+  String get species_raccoon_butterflyfish_name => 'Waschbär-Falterfisch';
+
+  @override
+  String get species_raccoon_butterflyfish_desc =>
+      'Gelber Falterfisch mit dunkler, waschbärartiger Augenmaske, häufig an Riffen des Indopazifiks und Hawaiis.';
+
+  @override
+  String get species_longnose_butterflyfish_name => 'Gelber Pinzettfisch';
+
+  @override
+  String get species_longnose_butterflyfish_desc =>
+      'Leuchtend gelber Falterfisch, der mit extrem langer Schnauze Nahrung aus Spalten der Riffe des Indopazifiks pickt.';
+
+  @override
+  String get species_threadfin_butterflyfish_name => 'Fähnchen-Falterfisch';
+
+  @override
+  String get species_threadfin_butterflyfish_desc =>
+      'Weißer Falterfisch mit Chevronmuster und fadenförmigem Fortsatz an der Rückenflosse, im gesamten Indopazifik verbreitet.';
+
+  @override
+  String get species_foureye_butterflyfish_name => 'Vieraugen-Falterfisch';
+
+  @override
+  String get species_foureye_butterflyfish_desc =>
+      'Heller Falterfisch mit auffälligem falschem Augenfleck nahe der Schwanzwurzel, häufig an karibischen Riffen.';
+
+  @override
+  String get species_spotfin_butterflyfish_name => 'Fleckflossen-Falterfisch';
+
+  @override
+  String get species_spotfin_butterflyfish_desc =>
+      'Weiß-gelber Falterfisch mit kleinem dunklem Fleck an der Rückenflosse, im Westatlantik verbreitet.';
+
+  @override
+  String get species_banner_butterflyfish_name => 'Rotmeer-Wimpelfisch';
+
+  @override
+  String get species_banner_butterflyfish_desc =>
+      'Schwarz-weißer Wimpelfisch mit verlängerter Rückenflosse und gelbem Bauch, endemisch im Roten Meer.';
+
+  @override
+  String get species_moorish_idol_name => 'Halfterfisch';
+
+  @override
+  String get species_moorish_idol_desc =>
+      'Ikonischer Rifffisch mit kräftigen schwarzen, weißen und gelben Binden und langem fadenförmigem Flossenfortsatz.';
+
+  @override
+  String get species_green_moray_eel_name => 'Grüne Muräne';
+
+  @override
+  String get species_green_moray_eel_desc =>
+      'Große grüne Muräne von bis zu 2,5 m, oft mit geöffnetem Maul in Riffspalten des Westatlantiks.';
+
+  @override
+  String get species_giant_moray_eel_name => 'Riesenmuräne';
+
+  @override
+  String get species_giant_moray_eel_desc =>
+      'Die größte Muränenart mit über 3 m Länge und leopardenartiger Fleckung. An Korallenriffen des Indopazifiks.';
+
+  @override
+  String get species_spotted_moray_eel_name => 'Gefleckte Muräne';
+
+  @override
+  String get species_spotted_moray_eel_desc =>
+      'Weiße Muräne mit dunkelbraunen Flecken, die in der Karibik häufig aus Riffhöhlen hervorlugt.';
+
+  @override
+  String get species_ribbon_eel_name => 'Bandmuräne';
+
+  @override
+  String get species_ribbon_eel_desc =>
+      'Schlanke Muräne mit gefransten Nasenlöchern; Männchen sind leuchtend blau, Weibchen gelb. In sandigen Lagunen des Indopazifiks.';
+
+  @override
+  String get species_spotted_garden_eel_name => 'Gefleckter Röhrenaal';
+
+  @override
+  String get species_spotted_garden_eel_desc =>
+      'Dünner weißer Aal mit schwarzen Punkten, der in sandigen Kolonien lebt und sich in der Strömung wiegt, um Plankton zu fangen.';
+
+  @override
+  String get species_splendid_garden_eel_name => 'Prächtiger Röhrenaal';
+
+  @override
+  String get species_splendid_garden_eel_desc =>
+      'Orange-weiß gebänderter Röhrenaal, der im Westpazifik große Kolonien im Sand bildet.';
+
+  @override
+  String get species_snowflake_moray_name => 'Schneeflocken-Muräne';
+
+  @override
+  String get species_snowflake_moray_desc =>
+      'Kleine Muräne mit weißem Körper und schwarzer Schneeflockenzeichnung, häufig im Riffschutt des Indopazifiks.';
+
+  @override
+  String get species_mandarin_dragonet_name => 'Mandarinfisch';
+
+  @override
+  String get species_mandarin_dragonet_desc =>
+      'Winziger, prächtig gefärbter Fisch mit psychedelischen blau-orangen Mustern, in den Geröllzonen des Westpazifiks.';
+
+  @override
+  String get species_common_lionfish_name => 'Rotfeuerfisch';
+
+  @override
+  String get species_common_lionfish_desc =>
+      'Giftiger Skorpionfisch mit fächerartigen Brustflossen und rot-weißen Streifen. In der Karibik invasiv.';
+
+  @override
+  String get species_leaf_scorpionfish_name => 'Schaukelfisch';
+
+  @override
+  String get species_leaf_scorpionfish_desc =>
+      'Stark abgeflachter, blattförmiger Skorpionfisch, der sich in der Strömung wiegt und an Riffen des Indopazifiks Treibgut nachahmt.';
+
+  @override
+  String get species_stonefish_name => 'Riff-Steinfisch';
+
+  @override
+  String get species_stonefish_desc =>
+      'Giftigster Fisch der Welt, perfekt als Stein getarnt auf den Riffböden des Indopazifiks. Äußerst gefährlich.';
+
+  @override
+  String get species_painted_frogfish_name => 'Bemalter Anglerfisch';
+
+  @override
+  String get species_painted_frogfish_desc =>
+      'Gedrungener Lauerjäger mit einer Angel auf dem Kopf und sehr variabler Färbung. An Riffen des Indopazifiks.';
+
+  @override
+  String get species_giant_frogfish_name => 'Riesen-Anglerfisch';
+
+  @override
+  String get species_giant_frogfish_desc =>
+      'Die größte Anglerfischart mit bis zu 40 cm, hervorragend zwischen Schwämmen und Korallenschutt getarnt.';
+
+  @override
+  String get species_hairy_frogfish_name => 'Haariger Anglerfisch';
+
+  @override
+  String get species_hairy_frogfish_desc =>
+      'Anglerfisch, dessen wurmartige Hautanhänge Algen nachahmen, ein begehrtes Motiv für Unterwasserfotografen.';
+
+  @override
+  String get species_clown_triggerfish_name => 'Leoparden-Drückerfisch';
+
+  @override
+  String get species_clown_triggerfish_desc =>
+      'Auffällig gezeichneter Drückerfisch mit großen weißen Flecken auf dunklem Körper und gelben Lippen, an Riffen des Indopazifiks.';
+
+  @override
+  String get species_titan_triggerfish_name => 'Riesendrückerfisch';
+
+  @override
+  String get species_titan_triggerfish_desc =>
+      'Großer aggressiver Drückerfisch, der Taucher in Nestnähe angreift. Häufig an Korallenriffen des Indopazifiks.';
+
+  @override
+  String get species_queen_triggerfish_name => 'Königin-Drückerfisch';
+
+  @override
+  String get species_queen_triggerfish_desc =>
+      'Farbenprächtiger karibischer Drückerfisch mit blauen Gesichtszeichnungen und langen Schwanzfäden.';
+
+  @override
+  String get species_picasso_triggerfish_name => 'Picasso-Drückerfisch';
+
+  @override
+  String get species_picasso_triggerfish_desc =>
+      'Drückerfisch mit abstraktem Muster aus blauen, gelben und schwarzen Streifen, häufig auf den Riffdächern des Indopazifiks.';
+
+  @override
+  String get species_yellowmargin_triggerfish_name => 'Gelbsaum-Drückerfisch';
+
+  @override
+  String get species_yellowmargin_triggerfish_desc =>
+      'Großer beigefarbener Drückerfisch mit gelb gesäumten Flossen, bekannt für aggressive Nestverteidigung an Riffen des Indopazifiks.';
+
+  @override
+  String get species_porcupinefish_name => 'Igelfisch';
+
+  @override
+  String get species_porcupinefish_desc =>
+      'Großer stacheliger Fisch, der sich bei Gefahr zur Kugel aufbläht, an tropischen Riffen weltweit.';
+
+  @override
+  String get species_guineafowl_pufferfish_name => 'Perlhuhn-Kugelfisch';
+
+  @override
+  String get species_guineafowl_pufferfish_desc =>
+      'Dunkler Kugelfisch mit vielen kleinen weißen Punkten, an Riffen des Indopazifiks gelegentlich auch in einer goldgelben Farbphase.';
+
+  @override
+  String get species_map_pufferfish_name => 'Landkarten-Kugelfisch';
+
+  @override
+  String get species_map_pufferfish_desc =>
+      'Großer heller Kugelfisch mit verschlungener dunkler Landkartenzeichnung über den ganzen Körper, an Riffen des Indopazifiks.';
+
+  @override
+  String get species_sharpnose_pufferfish_name => 'Spitzkopf-Kugelfisch';
+
+  @override
+  String get species_sharpnose_pufferfish_desc =>
+      'Winziger Kugelfisch mit blauen Linien im Gesicht und orangefarbener Schwanzflosse, häufig an karibischen Riffen.';
+
+  @override
+  String get species_boxfish_name => 'Gelber Kofferfisch';
+
+  @override
+  String get species_boxfish_desc =>
+      'Jungtiere sind leuchtend gelbe Würfel mit schwarzen Punkten. Adulte färben sich blaugrau. Im gesamten Indopazifik verbreitet.';
+
+  @override
+  String get species_cowfish_name => 'Langhorn-Kuhfisch';
+
+  @override
+  String get species_cowfish_desc =>
+      'Kastenförmiger gelber Fisch mit auffälligen hornartigen Fortsätzen über jedem Auge, an Riffen des Indopazifiks.';
+
+  @override
+  String get species_napoleon_wrasse_name => 'Napoleon-Lippfisch';
+
+  @override
+  String get species_napoleon_wrasse_desc =>
+      'Riesiger Lippfisch von bis zu 2 m mit ausgeprägtem Stirnbuckel. Gefährdet und geschützt, an Riffen des Indopazifiks.';
+
+  @override
+  String get species_cleaner_wrasse_name => 'Gewöhnlicher Putzerlippfisch';
+
+  @override
+  String get species_cleaner_wrasse_desc =>
+      'Kleiner blau gestreifter Lippfisch, der Putzerstationen betreibt und größere Fische an Riffen des Indopazifiks von Parasiten befreit.';
+
+  @override
+  String get species_yellowtail_coris_name => 'Gelbschwanz-Junker';
+
+  @override
+  String get species_yellowtail_coris_desc =>
+      'Farbenprächtiger Lippfisch mit geflecktem Körper und gelber Schwanzflosse; Jungtiere sind leuchtend orangerot mit weißen Zeichnungen.';
+
+  @override
+  String get species_bluehead_wrasse_name => 'Blaukopf-Lippfisch';
+
+  @override
+  String get species_bluehead_wrasse_desc =>
+      'Häufiger karibischer Lippfisch; Terminalmännchen haben einen leuchtend blauen Kopf und grünen Körper mit schwarz-weißen Binden.';
+
+  @override
+  String get species_spanish_hogfish_name => 'Spanischer Schweinslippfisch';
+
+  @override
+  String get species_spanish_hogfish_desc =>
+      'Violett-gelber Lippfisch, häufig an karibischen Riffen; Jungtiere arbeiten als Putzerfische.';
+
+  @override
+  String get species_bumphead_parrotfish_name => 'Büffelkopf-Papageifisch';
+
+  @override
+  String get species_bumphead_parrotfish_desc =>
+      'Größte Papageifischart mit bis zu 1,3 m Länge und mächtigem Stirnbuckel. Zieht in Schulen über die Riffe des Indopazifiks.';
+
+  @override
+  String get species_stoplight_parrotfish_name => 'Ampel-Papageifisch';
+
+  @override
+  String get species_stoplight_parrotfish_desc =>
+      'Häufiger karibischer Papageifisch mit auffälligem Farbwechsel zwischen Initial- und Terminalphase.';
+
+  @override
+  String get species_queen_parrotfish_name => 'Königin-Papageifisch';
+
+  @override
+  String get species_queen_parrotfish_desc =>
+      'Großer blaugrüner Papageifisch an karibischen Riffen, oft beim Abbeißen von Korallen zur Algenaufnahme zu beobachten.';
+
+  @override
+  String get species_yellowtail_damselfish_name => 'Gelbschwanz-Riffbarsch';
+
+  @override
+  String get species_yellowtail_damselfish_desc =>
+      'Dunkelblauer Riffbarsch mit leuchtend gelber Schwanzflosse, häufig auf karibischen Riffdächern und Riffkanten.';
+
+  @override
+  String get species_sergeant_major_name => 'Fünfbinden-Riffbarsch';
+
+  @override
+  String get species_sergeant_major_desc =>
+      'Silbrig-gelber Riffbarsch mit fünf kräftigen schwarzen Binden, in großen Ansammlungen an tropischen Atlantikriffen.';
+
+  @override
+  String get species_three_spot_damselfish_name => 'Dreipunkt-Riffbarsch';
+
+  @override
+  String get species_three_spot_damselfish_desc =>
+      'Dunkelbrauner, territorialer Riffbarsch, der seinen Algengarten an karibischen Riffen energisch verteidigt.';
+
+  @override
+  String get species_chromis_viridis_name => 'Blaugrüner Riffbarsch';
+
+  @override
+  String get species_chromis_viridis_desc =>
+      'Kleiner schillernd grüner Riffbarsch, der in großen Schwärmen über Astkorallen an Riffen des Indopazifiks steht.';
+
+  @override
+  String get species_blue_chromis_name => 'Blauer Riffbarsch';
+
+  @override
+  String get species_blue_chromis_desc =>
+      'Leuchtend blauer, planktonfressender Riffbarsch in großen Ansammlungen im Freiwasser über karibischen Riffwänden.';
+
+  @override
+  String get species_nassau_grouper_name => 'Nassau-Zackenbarsch';
+
+  @override
+  String get species_nassau_grouper_desc =>
+      'Großer karibischer Zackenbarsch mit markantem dunklem Augenstreifen und Bänderzeichnung, durch Überfischung inzwischen gefährdet.';
+
+  @override
+  String get species_giant_grouper_name => 'Riesenzackenbarsch';
+
+  @override
+  String get species_giant_grouper_desc =>
+      'Der größte Knochenfisch der Riffe, bis zu 2,7 m lang und 400 kg schwer. In Höhlen und Wracks im gesamten Indopazifik.';
+
+  @override
+  String get species_coral_grouper_name => 'Juwelen-Zackenbarsch';
+
+  @override
+  String get species_coral_grouper_desc =>
+      'Leuchtend rotoranger Zackenbarsch mit blauen Punkten, eine Leitart der Korallenriffe des Indopazifiks.';
+
+  @override
+  String get species_goliath_grouper_name => 'Goliath-Zackenbarsch';
+
+  @override
+  String get species_goliath_grouper_desc =>
+      'Riesiger atlantischer Zackenbarsch von bis zu 2,5 m, häufig an Wracks und Überhängen in Florida und der Karibik anzutreffen.';
+
+  @override
+  String get species_potato_grouper_name => 'Kartoffel-Zackenbarsch';
+
+  @override
+  String get species_potato_grouper_desc =>
+      'Großer zutraulicher Zackenbarsch mit dunklen kartoffelförmigen Flecken, berühmt aus dem Cod Hole am Great Barrier Reef.';
+
+  @override
+  String get species_peacock_grouper_name => 'Pfauen-Zackenbarsch';
+
+  @override
+  String get species_peacock_grouper_desc =>
+      'Dunkelbrauner Zackenbarsch mit leuchtend blauen Punkten und hellen Querbinden am Körperende, häufig an Riffen des Indopazifiks.';
+
+  @override
+  String get species_yellowfin_tuna_name => 'Gelbflossen-Thunfisch';
+
+  @override
+  String get species_yellowfin_tuna_desc =>
+      'Schneller pelagischer Jäger mit langen gelben Rücken- und Afterflossen, den Taucher gelegentlich an vorgelagerten Plätzen sehen.';
+
+  @override
+  String get species_dogtooth_tuna_name => 'Hundszahn-Thunfisch';
+
+  @override
+  String get species_dogtooth_tuna_desc =>
+      'Kräftiger riffnaher Thunfisch mit auffälligen Zähnen, an tiefen Riffabbrüchen im Indopazifik anzutreffen.';
+
+  @override
+  String get species_great_barracuda_name => 'Großer Barrakuda';
+
+  @override
+  String get species_great_barracuda_desc =>
+      'Schlanker silbriger Jäger von bis zu 1,8 m mit markanten Zähnen, der oft reglos nahe tropischen Riffen steht.';
+
+  @override
+  String get species_blackfin_barracuda_name => 'Schwarzflossen-Barrakuda';
+
+  @override
+  String get species_blackfin_barracuda_desc =>
+      'Indopazifischer Barrakuda, bekannt für gewaltige tornadoartige Schwärme an Tauchplätzen wie Barracuda Point.';
+
+  @override
+  String get species_mahi_mahi_name => 'Goldmakrele';
+
+  @override
+  String get species_mahi_mahi_desc =>
+      'Schillernd blaugrün-goldener Hochseefisch mit stumpfer Stirn, gelegentlich an vorgelagerten Tauchplätzen zu sehen.';
+
+  @override
+  String get species_giant_trevally_name => 'Riesen-Stachelmakrele';
+
+  @override
+  String get species_giant_trevally_desc =>
+      'Kräftiger silbriger Jäger von bis zu 1,7 m, bekannt für seine Jagd in Riffkanälen und an Steilwänden des Indopazifiks.';
+
+  @override
+  String get species_bluefin_trevally_name => 'Blaupunkt-Stachelmakrele';
+
+  @override
+  String get species_bluefin_trevally_desc =>
+      'Schlanke, blau gepunktete Stachelmakrele, die in kleinen Jagdgruppen die Riffkanten des Indopazifiks abpatrouilliert.';
+
+  @override
+  String get species_bigeye_trevally_name => 'Großaugen-Stachelmakrele';
+
+  @override
+  String get species_bigeye_trevally_desc =>
+      'Silbrige Stachelmakrele mit großen Augen, die eindrucksvolle wirbelnde Schwärme an Riffwänden und Putzerstationen bildet.';
+
+  @override
+  String get species_bar_jack_name => 'Blaustreifen-Stachelmakrele';
+
+  @override
+  String get species_bar_jack_desc =>
+      'Schlanke silbrige Stachelmakrele der Karibik mit markantem dunkelblauem Streifen über Rücken und untere Schwanzflosse.';
+
+  @override
+  String get species_horse_eye_jack_name => 'Pferdeaugen-Stachelmakrele';
+
+  @override
+  String get species_horse_eye_jack_desc =>
+      'Silbrige Stachelmakrele mit großen Augen, die in der Karibik und im Westatlantik Schwärme nahe Riffen und Wracks bildet.';
+
+  @override
+  String get species_yellowtail_snapper_name => 'Gelbschwanz-Schnapper';
+
+  @override
+  String get species_yellowtail_snapper_desc =>
+      'Schlanker Schnapper mit gelbem Längsstreifen und gelber Schwanzflosse, oft in Freiwasserschwärmen an karibischen Riffen.';
+
+  @override
+  String get species_schoolmaster_snapper_name => 'Schulmeister-Schnapper';
+
+  @override
+  String get species_schoolmaster_snapper_desc =>
+      'Gelb-silbriger Schnapper mit blauen Linien unter dem Auge, in Gruppen unter Überhängen karibischer Riffe.';
+
+  @override
+  String get species_bluestripe_snapper_name => 'Blaustreifen-Schnapper';
+
+  @override
+  String get species_bluestripe_snapper_desc =>
+      'Leuchtend gelber Schnapper mit vier blauen Längsstreifen, der an Riffen des Indopazifiks dichte Schwärme bildet.';
+
+  @override
+  String get species_twinspot_snapper_name => 'Zweifleck-Schnapper';
+
+  @override
+  String get species_twinspot_snapper_desc =>
+      'Großer roter Schnapper an Außenriffen des Indopazifiks, der an tiefen Wänden und in Kanälen mitunter Schwärme bildet.';
+
+  @override
+  String get species_humphead_snapper_name => 'Mitternachts-Schnapper';
+
+  @override
+  String get species_humphead_snapper_desc =>
+      'Großer dunkler Schnapper in Schwärmen an steilen Abbrüchen des Indopazifiks, Jungtiere sind kontrastreich schwarz-weiß.';
+
+  @override
+  String get species_longfin_bannerfish_name => 'Gemeiner Wimpelfisch';
+
+  @override
+  String get species_longfin_bannerfish_desc =>
+      'Schwarz-weißer Fisch mit langem fadenförmigem Rückenflossenstrahl und gelber Schwanzflosse, oft paarweise an Riffen des Indopazifiks.';
+
+  @override
+  String get species_batfish_orbicular_name => 'Rundkopf-Fledermausfisch';
+
+  @override
+  String get species_batfish_orbicular_desc =>
+      'Silbriger scheibenförmiger Fisch mit hohen Flossen, der sich Tauchern neugierig nähert. Häufig an Wracks und Riffen des Indopazifiks.';
+
+  @override
+  String get species_batfish_teira_name => 'Langflossen-Fledermausfisch';
+
+  @override
+  String get species_batfish_teira_desc =>
+      'Fledermausfisch mit hohen Flossen und einem dunklen Fleck nahe der Brustflosse, oft an Putzerstationen und Wracks zu sehen.';
+
+  @override
+  String get species_batfish_pinnatus_name => 'Rotsaum-Fledermausfisch';
+
+  @override
+  String get species_batfish_pinnatus_desc =>
+      'Jungtiere sind tiefschwarz mit leuchtend orangefarbenen Säumen und ähneln einem giftigen Plattwurm. Im Westpazifik verbreitet.';
+
+  @override
+  String get species_banggai_cardinalfish_name => 'Banggai-Kardinalbarsch';
+
+  @override
+  String get species_banggai_cardinalfish_desc =>
+      'Auffälliger silber-schwarzer Kardinalbarsch mit verlängerten Flossen, endemisch auf den Banggai-Inseln Indonesiens.';
+
+  @override
+  String get species_pajama_cardinalfish_name => 'Pyjama-Kardinalbarsch';
+
+  @override
+  String get species_pajama_cardinalfish_desc =>
+      'Ungewöhnlicher Kardinalbarsch mit gelbem Gesicht, dunklem Gürtelband und geflecktem Hinterkörper, zwischen Korallen im Indopazifik.';
+
+  @override
+  String get species_longnose_hawkfish_name => 'Langnasen-Büschelbarsch';
+
+  @override
+  String get species_longnose_hawkfish_desc =>
+      'Kleiner weißer Fisch mit rotem Gittermuster und langgezogener Schnauze, der auf Gorgonien und Schwarzen Korallen sitzt.';
+
+  @override
+  String get species_arc_eye_hawkfish_name => 'Bogenaugen-Büschelbarsch';
+
+  @override
+  String get species_arc_eye_hawkfish_desc =>
+      'Kleiner Büschelbarsch mit markantem orangefarbenem Bogen hinter dem Auge, häufig auf Korallenstöcken der Riffe des Indopazifiks.';
+
+  @override
+  String get species_flame_hawkfish_name => 'Flammen-Büschelbarsch';
+
+  @override
+  String get species_flame_hawkfish_desc =>
+      'Leuchtend roter Büschelbarsch mit dunklen Augenzeichnungen, der im Westpazifik in Pocillopora-Korallen sitzt.';
+
+  @override
+  String get species_fire_goby_name => 'Feuergrundel';
+
+  @override
+  String get species_fire_goby_desc =>
+      'Elegante weiße Grundel mit hoher erster Rückenflosse und rotoranger Schwanzflosse, die über dem Riffschutt des Indopazifiks schwebt.';
+
+  @override
+  String get species_purple_firefish_name => 'Purpur-Feuergrundel';
+
+  @override
+  String get species_purple_firefish_desc =>
+      'Zierliche Grundel mit violetten Flossen und hohem Rückenflossenstachel, die nahe ihrer Wohnröhre an Außenriffen des Indopazifiks schwebt.';
+
+  @override
+  String get species_yellownose_goby_name => 'Gelbnasen-Grundel';
+
+  @override
+  String get species_yellownose_goby_desc =>
+      'Winzige karibische Putzergrundel mit gelber Schnauze und blauem Längsstreifen, auf Schwämmen und Korallenstöcken.';
+
+  @override
+  String get species_citron_goby_name => 'Zitronen-Korallengrundel';
+
+  @override
+  String get species_citron_goby_desc =>
+      'Winzige leuchtend gelbe Grundel, die zwischen den Ästen von Acropora-Korallen an Riffen des Indopazifiks lebt.';
+
+  @override
+  String get species_shrimp_goby_name => 'Steinitz-Partnergrundel';
+
+  @override
+  String get species_shrimp_goby_desc =>
+      'Sandfarbene Grundel, die auf den Sandflächen des Indopazifiks in einer Lebensgemeinschaft mit Knallkrebsen eine Wohnröhre teilt.';
+
+  @override
+  String get species_neon_goby_name => 'Neongrundel';
+
+  @override
+  String get species_neon_goby_desc =>
+      'Winzige dunkle Grundel mit leuchtend neonblauem Streifen, die auf karibischen Korallenstöcken Putzerstationen betreibt.';
+
+  @override
+  String get species_bluestriped_fangblenny_name =>
+      'Blaustreifen-Säbelzahnschleimfisch';
+
+  @override
+  String get species_bluestriped_fangblenny_desc =>
+      'Kleiner blau gestreifter Schleimfisch, der Putzerlippfische nachahmt, um ahnungslosen Fischen Schuppen abzubeißen.';
+
+  @override
+  String get species_sailfin_blenny_name => 'Segelflossen-Schleimfisch';
+
+  @override
+  String get species_sailfin_blenny_desc =>
+      'Winziger karibischer Schleimfisch, der aus seiner Wohnröhre eine große segelartige Rückenflosse aufstellt, um Partner anzulocken.';
+
+  @override
+  String get species_bicolor_blenny_name => 'Zweifarben-Schleimfisch';
+
+  @override
+  String get species_bicolor_blenny_desc =>
+      'Kleiner Schleimfisch mit dunkelbrauner Vorder- und orangefarbener Hinterhälfte, der aus Löchern an Riffen des Indopazifiks lugt.';
+
+  @override
+  String get species_redlip_blenny_name => 'Rotlippen-Schleimfisch';
+
+  @override
+  String get species_redlip_blenny_desc =>
+      'Dunkler Schleimfisch mit auffällig rotorangen Lippen, der Algenflächen auf karibischen Riffkanten verteidigt.';
+
+  @override
+  String get species_pygmy_seahorse_name => 'Bargibants Zwergseepferdchen';
+
+  @override
+  String get species_pygmy_seahorse_desc =>
+      'Winziges Seepferdchen unter 2 cm, das seiner Wirtsgorgonie perfekt gleicht, ein begehrtes Motiv für die Makrofotografie.';
+
+  @override
+  String get species_common_seahorse_name => 'Gewöhnliches Seepferdchen';
+
+  @override
+  String get species_common_seahorse_desc =>
+      'Mittelgroßes Seepferdchen in Seegraswiesen und Korallenschutt des Indopazifiks, in der Färbung sehr variabel.';
+
+  @override
+  String get species_thorny_seahorse_name => 'Dorniges Seepferdchen';
+
+  @override
+  String get species_thorny_seahorse_desc =>
+      'Mit langen Stacheln besetztes Seepferdchen in Seegraswiesen und auf Weichböden des Indopazifiks.';
+
+  @override
+  String get species_ornate_ghost_pipefish_name =>
+      'Harlekin-Geisterpfeifenfisch';
+
+  @override
+  String get species_ornate_ghost_pipefish_desc =>
+      'Aufwendig getarnter Pfeifenfisch, der kopfüber nahe Haarsternen und Weichkorallen im Indopazifik schwebt.';
+
+  @override
+  String get species_robust_ghost_pipefish_name =>
+      'Robuster Geisterpfeifenfisch';
+
+  @override
+  String get species_robust_ghost_pipefish_desc =>
+      'Großer Geisterpfeifenfisch, der Seegras oder Algen nachahmt und oft paarweise in Küstengewässern des Indopazifiks zu finden ist.';
+
+  @override
+  String get species_trumpetfish_name => 'Trompetenfisch';
+
+  @override
+  String get species_trumpetfish_desc =>
+      'Langer schlanker Fisch, der im Schatten größerer Fische jagt, an karibischen und atlantischen Riffen in verschiedenen Farben.';
+
+  @override
+  String get species_cornetfish_name => 'Flötenfisch';
+
+  @override
+  String get species_cornetfish_desc =>
+      'Extrem langgestreckter Fisch von bis zu 1,5 m mit fadenförmigem Schwanzanhang, der oft über Riffdächer gleitet.';
+
+  @override
+  String get species_yellowhead_jawfish_name => 'Gelbkopf-Kieferfisch';
+
+  @override
+  String get species_yellowhead_jawfish_desc =>
+      'Kleiner Fisch mit blauem Körper und gelbem Kopf, der über seiner Sandröhre an karibischen Riffen schwebt. Männchen tragen die Eier im Maul.';
+
+  @override
+  String get species_flamefish_name => 'Flammen-Kardinalbarsch';
+
+  @override
+  String get species_flamefish_desc =>
+      'Kleiner leuchtend roter Kardinalbarsch mit dunklem Fleck unter der zweiten Rückenflosse, tagsüber in karibischen Riffspalten versteckt.';
+
+  @override
+  String get species_longspine_squirrelfish_name => 'Langstachel-Husarenfisch';
+
+  @override
+  String get species_longspine_squirrelfish_desc =>
+      'Roter nachtaktiver Fisch mit großen Augen und langem Rückenflossenstachel, tagsüber unter Überhängen karibischer Riffe.';
+
+  @override
+  String get species_soldierfish_name => 'Großschuppen-Soldatenfisch';
+
+  @override
+  String get species_soldierfish_desc =>
+      'Roter nachtaktiver Fisch mit riesigen dunklen Augen und großen Schuppen, tagsüber in Gruppen in Höhlen und unter Überhängen.';
+
+  @override
+  String get species_flame_angelfish_name => 'Flammen-Zwergkaiserfisch';
+
+  @override
+  String get species_flame_angelfish_desc =>
+      'Leuchtend rotoranger Zwergkaiserfisch mit schwarzen Querbinden und blau gesäumten Flossen, im gesamten Pazifik verbreitet.';
+
+  @override
+  String get species_royal_gramma_name => 'Königs-Feenbarsch';
+
+  @override
+  String get species_royal_gramma_desc =>
+      'Kleiner zweifarbiger karibischer Feenbarsch mit violetter Vorder- und gelber Hinterhälfte, unter Überhängen zu finden.';
+
+  @override
+  String get species_anthias_lyretail_name => 'Juwelen-Fahnenbarsch';
+
+  @override
+  String get species_anthias_lyretail_desc =>
+      'Häufiger Rifffisch, der große orange und rosa Wolken über den Korallenstöcken des Indopazifiks bildet. Männchen sind violett.';
+
+  @override
+  String get species_mediterranean_grouper_name => 'Brauner Zackenbarsch';
+
+  @override
+  String get species_mediterranean_grouper_desc =>
+      'Großer dunkelbrauner Zackenbarsch mit heller Marmorierung, der ikonische Jäger der Felsriffe des Mittelmeers.';
+
+  @override
+  String get species_mediterranean_moray_name => 'Mittelmeer-Muräne';
+
+  @override
+  String get species_mediterranean_moray_desc =>
+      'Dunkelbraune Muräne mit gelber Marmorierung, die im Mittelmeer häufig aus Felsspalten hervorlugt.';
+
+  @override
+  String get species_ornate_wrasse_name => 'Meerpfau';
+
+  @override
+  String get species_ornate_wrasse_desc =>
+      'Farbenprächtiger grüner Lippfisch mit roten Kopfzeichnungen, einer der häufigsten Lippfische an Mittelmeerriffen.';
+
+  @override
+  String get species_red_sea_bannerfish_name => 'Masken-Falterfisch';
+
+  @override
+  String get species_red_sea_bannerfish_desc =>
+      'Leuchtend gelber Falterfisch mit dunklem Augenfleck, endemisch im Roten Meer. Oft paarweise zu sehen.';
+
+  @override
+  String get species_red_sea_anemonefish_name => 'Rotmeer-Anemonenfisch';
+
+  @override
+  String get species_red_sea_anemonefish_desc =>
+      'Orangegelber Anemonenfisch mit zwei weißen Binden, endemisch im Roten Meer und im Golf von Aden.';
+
+  @override
+  String get species_arabian_angelfish_name => 'Arabischer Kaiserfisch';
+
+  @override
+  String get species_arabian_angelfish_desc =>
+      'Großer dunkelblauer Kaiserfisch mit kräftiger gelber Querbinde und gelber Schwanzflosse, endemisch im westlichen Indischen Ozean.';
+
+  @override
+  String get species_king_angelfish_name => 'Königs-Kaiserfisch';
+
+  @override
+  String get species_king_angelfish_desc =>
+      'Großer dunkelblauer Kaiserfisch mit weißer Querbinde und gelber Schwanzflosse, im Ostpazifik und um Galapagos verbreitet.';
+
+  @override
+  String get species_ocean_sunfish_name => 'Mondfisch';
+
+  @override
+  String get species_ocean_sunfish_desc =>
+      'Der schwerste Knochenfisch mit über 2 Tonnen Gewicht. Gelegentlich von Tauchern an Putzerstationen vor Bali und Galapagos gesichtet.';
+
+  @override
+  String get species_lingcod_name => 'Lingcod';
+
+  @override
+  String get species_lingcod_desc =>
+      'Großer gefleckter Raubgrünling an den Felsriffen des pazifischen Nordwestens, oft beim Bewachen seiner Laichballen.';
+
+  @override
+  String get species_wolf_eel_name => 'Wolfsaal';
+
+  @override
+  String get species_wolf_eel_desc =>
+      'Großer grauer Wolfsaal mit wulstigem Kopf und kräftigen Kiefern, in Felshöhlen des pazifischen Nordwestens.';
+
+  @override
+  String get species_giant_sea_bass_name => 'Kalifornischer Riesenbarsch';
+
+  @override
+  String get species_giant_sea_bass_desc =>
+      'Gewaltiger Barsch von über 2 m und 250 kg, an Felsriffen und in Kelpwäldern vor Südkalifornien.';
+
+  @override
+  String get species_garibaldi_name => 'Garibaldi';
+
+  @override
+  String get species_garibaldi_desc =>
+      'Leuchtend oranger Riffbarsch und offizieller Meeresfisch Kaliforniens, territorial an den Riffen der Kelpwälder.';
+
+  @override
+  String get species_sheephead_name => 'Kalifornischer Schafskopf-Lippfisch';
+
+  @override
+  String get species_sheephead_desc =>
+      'Großer Lippfisch mit schwarzem Kopf und Schwanz, rotem Mittelteil und weißem Kinn. In den Kelpwäldern Kaliforniens.';
+
+  @override
+  String get species_copper_rockfish_name => 'Kupfer-Rotbarsch';
+
+  @override
+  String get species_copper_rockfish_desc =>
+      'Kupferorangefarbener Rotbarsch mit hellen Flecken, ein häufiger Anblick an Felsriffen und in Kelpwäldern des pazifischen Nordwestens.';
+
+  @override
+  String get species_oriental_sweetlips_name => 'Orientalische Süßlippe';
+
+  @override
+  String get species_oriental_sweetlips_desc =>
+      'Großer Rifffisch des Indopazifiks mit kräftigen schwarz-weißen Streifen und gelben Flossen. Jungtiere vollführen einen wackelnden Tanz.';
+
+  @override
+  String get species_harlequin_sweetlips_name => 'Harlekin-Süßlippe';
+
+  @override
+  String get species_harlequin_sweetlips_desc =>
+      'Adulte sind grau mit dunklen Punkten; Jungtiere sind braun mit großen weißen Flecken und schwimmen in wogenden Bewegungen.';
+
+  @override
+  String get species_blue_ringed_angelfish_name => 'Blauring-Kaiserfisch';
+
+  @override
+  String get species_blue_ringed_angelfish_desc =>
+      'Großer brauner Kaiserfisch mit blauen Bogenlinien und einem markanten blauen Ring über dem Kiemendeckel.';
+
+  @override
+  String get species_yellowbar_angelfish_name => 'Gelbband-Kaiserfisch';
+
+  @override
+  String get species_yellowbar_angelfish_desc =>
+      'Großer graublauer Kaiserfisch mit auffälligem gelbem Fleck am Körper, im Roten Meer und im westlichen Indischen Ozean.';
+
+  @override
+  String get species_filefish_scrawled_name => 'Gekritzelter Feilenfisch';
+
+  @override
+  String get species_filefish_scrawled_desc =>
+      'Großer olivbrauner Feilenfisch mit blauen Kritzelzeichnungen und orangefarbenem Kehlsack, an tropischen Riffen weltweit.';
+
+  @override
+  String get species_clown_filefish_name => 'Orangepunkt-Feilenfisch';
+
+  @override
+  String get species_clown_filefish_desc =>
+      'Kleiner grüner Feilenfisch mit orangefarbenen Punkten und langer Schnauze, der sich ausschließlich von Acropora-Korallenpolypen ernährt.';
+
+  @override
+  String get species_unicornfish_name => 'Blaudorn-Nasendoktorfisch';
+
+  @override
+  String get species_unicornfish_desc =>
+      'Grauer Doktorfisch mit markantem Stirnhorn und zwei blauen Schwanzdornen, häufig auf den Riffdächern des Indopazifiks.';
+
+  @override
+  String get species_surgeonfish_sailfin_name => 'Segelflossen-Doktorfisch';
+
+  @override
+  String get species_surgeonfish_sailfin_desc =>
+      'Kräftig gebänderter Doktorfisch mit stark vergrößerter Rücken- und Afterflosse, im gesamten Indopazifik verbreitet.';
+
+  @override
+  String get species_achilles_tang_name => 'Achilles-Doktorfisch';
+
+  @override
+  String get species_achilles_tang_desc =>
+      'Dunkelbrauner Doktorfisch mit auffälligem orangefarbenem Tropfen nahe der Schwanzflosse, in den Brandungszonen des Zentralpazifiks.';
+
+  @override
+  String get species_doctorfish_name => 'Karibischer Doktorfisch';
+
+  @override
+  String get species_doctorfish_desc =>
+      'Graubrauner Doktorfisch mit schwachen dunklen Querbinden und markantem Skalpell am Schwanz, häufig an karibischen Riffen.';
+
+  @override
+  String get species_checkerboard_wrasse_name => 'Schachbrett-Lippfisch';
+
+  @override
+  String get species_checkerboard_wrasse_desc =>
+      'Farbenprächtiger Lippfisch mit einem Schachbrettmuster aus grünen, rosafarbenen und schwarzen Feldern über den ganzen Körper.';
+
+  @override
+  String get species_bird_wrasse_name => 'Vogel-Lippfisch';
+
+  @override
+  String get species_bird_wrasse_desc =>
+      'Lippfisch mit extrem langgezogener, schnabelartiger Schnauze; Männchen sind dunkelgrün, Weibchen braun.';
+
+  @override
+  String get species_sling_jaw_wrasse_name => 'Schleuderkiefer-Lippfisch';
+
+  @override
+  String get species_sling_jaw_wrasse_desc =>
+      'Lippfisch mit ausfahrbarem Kiefer, der zum Beutefang vorschnellt, in gelben oder braunen Farbvarianten.';
+
+  @override
+  String get species_peacock_flounder_name => 'Pfauenaugen-Flunder';
+
+  @override
+  String get species_peacock_flounder_desc =>
+      'Flacher Bodenfisch mit blauen Ringen und Punkten, der seine Färbung dem Meeresboden anpassen kann.';
+
+  @override
+  String get species_hogfish_name => 'Schweinslippfisch';
+
+  @override
+  String get species_hogfish_desc =>
+      'Großer Lippfisch des Westatlantiks mit schweineartiger Schnauze und verlängerten Rückenflossenstacheln, nahe Riffen und Wracks.';
+
+  @override
+  String get species_tarpon_name => 'Atlantischer Tarpun';
+
+  @override
+  String get species_tarpon_desc =>
+      'Riesiger silbriger Fisch mit großen spiegelnden Schuppen, dem Taucher gelegentlich in karibischen Höhlen und Kanälen begegnen.';
+
+  @override
+  String get species_permit_name => 'Permit';
+
+  @override
+  String get species_permit_desc =>
+      'Hochrückige silbrige Stachelmakrele mit dunkler Gabelschwanzflosse, auf karibischen Sandflächen und nahe Riffen.';
+
+  @override
+  String get species_spotted_drum_name => 'Gepunkteter Ritterfisch';
+
+  @override
+  String get species_spotted_drum_desc =>
+      'Auffälliger karibischer Fisch mit hoher, langgezogener Rückenflosse und kräftigem schwarz-weißem Punktmuster.';
+
+  @override
+  String get species_jackknife_fish_name => 'Lanzen-Ritterfisch';
+
+  @override
+  String get species_jackknife_fish_desc =>
+      'Eleganter karibischer Fisch mit hohem schwarzem Rückenflossenstreifen und diagonaler Körperbinde, unter Überhängen zu finden.';
+
+  @override
+  String get species_bigeye_name => 'Glasaugenbarsch';
+
+  @override
+  String get species_bigeye_desc =>
+      'Leuchtend roter nachtaktiver Fisch mit großen reflektierenden Augen, tagsüber in Höhlen karibischer und atlantischer Riffe versteckt.';
+
+  @override
+  String get species_remora_name => 'Schiffshalter';
+
+  @override
+  String get species_remora_desc =>
+      'Schlanker Fisch mit einer Saugscheibe auf dem Kopf, der sich an Haien, Rochen, Schildkröten und anderen großen Tieren anheftet.';
+
+  @override
+  String get species_tilefish_sand_name => 'Sand-Ziegelbarsch';
+
+  @override
+  String get species_tilefish_sand_desc =>
+      'Langgestreckter hellblauer Fisch, der über den Sandflächen karibischer Riffe Hügel aus Geröll aufschichtet.';
+
+  @override
+  String get species_weedy_seadragon_name => 'Gemeiner Seedrache';
+
+  @override
+  String get species_weedy_seadragon_desc =>
+      'Prächtiger Verwandter der Seepferdchen mit blattartigen Anhängen, endemisch in den gemäßigten Gewässern Südaustraliens.';
+
+  @override
+  String get species_leafy_seadragon_name => 'Fetzenfisch';
+
+  @override
+  String get species_leafy_seadragon_desc =>
+      'Spektakulärer Seedrache mit ausladenden blattartigen Fortsätzen, endemisch in Südaustralien. Eine Sichtung für die Wunschliste.';
+
+  @override
+  String get species_sailfin_snapper_name => 'Segelflossen-Schnapper';
+
+  @override
+  String get species_sailfin_snapper_desc =>
+      'Eleganter gelb-blauer Schnapper mit verlängerten Rücken- und Afterflossen, an den Riffhängen des Indopazifiks.';
+
+  @override
+  String get species_sweetlip_emperor_name => 'Gefleckte Kaiserbrasse';
+
+  @override
+  String get species_sweetlip_emperor_desc =>
+      'Große silbrige Kaiserbrasse mit blauen Linien im Gesicht und gelb gesäumten Flossen, häufig über sandigen Riffbereichen des Indopazifiks.';
+
+  @override
+  String get species_crocodilefish_name => 'Krokodilfisch';
+
+  @override
+  String get species_crocodilefish_desc =>
+      'Flachköpfiger Lauerjäger mit kunstvollen Augenfransen, der perfekt getarnt auf den Riffböden des Indopazifiks liegt.';
+
+  @override
+  String get species_devil_scorpionfish_name => 'Teufels-Drachenkopf';
+
+  @override
+  String get species_devil_scorpionfish_desc =>
+      'Gedrungener getarnter Skorpionfisch, der Fressfeinden die farbigen Innenseiten seiner Brustflossen als Warnung zeigt.';
+
+  @override
+  String get species_spiny_devilfish_name => 'Teufelsfisch';
+
+  @override
+  String get species_spiny_devilfish_desc =>
+      'Giftiger Bodenbewohner, der auf umgebildeten Flossenstrahlen läuft und bei Störung leuchtende Brustflossen aufblitzen lässt.';
+
+  @override
+  String get species_waspfish_name => 'Kakadu-Wespenfisch';
+
+  @override
+  String get species_waspfish_desc =>
+      'Kleiner hochrückiger Skorpionfisch, der sich auf den Schlickböden des Indopazifiks wie ein totes Blatt in der Strömung wiegt.';
+
+  @override
+  String get species_stargazer_name => 'Weißsaum-Himmelsgucker';
+
+  @override
+  String get species_stargazer_desc =>
+      'Lauerjäger, der sich bis auf die Augen im Sand eingräbt und Stromschläge austeilen kann. Im Indopazifik verbreitet.';
+
+  @override
+  String get species_striped_catfish_name => 'Gestreifter Korallenwels';
+
+  @override
+  String get species_striped_catfish_desc =>
+      'Wels mit Giftstacheln; Jungtiere bilden dichte kugelförmige Schwärme, die über die Riffböden des Indopazifiks rollen.';
+
+  @override
+  String get species_red_emperor_name => 'Kaiserschnapper';
+
+  @override
+  String get species_red_emperor_desc =>
+      'Großer Schnapper; Adulte sind rosarot, Jungtiere tragen kräftige rot-weiße Binden. An Riffen des Indopazifiks.';
+
+  @override
+  String get species_mangrove_snapper_name => 'Mangroven-Schnapper';
+
+  @override
+  String get species_mangrove_snapper_desc =>
+      'Grauer Schnapper in karibischen Mangroven, Seegraswiesen und Riffen, oft in Ansammlungen nahe Strukturen.';
+
+  @override
+  String get species_dottyback_orchid_name => 'Orchideen-Zwergbarsch';
+
+  @override
+  String get species_dottyback_orchid_desc =>
+      'Kleiner leuchtend violetter Fisch, endemisch im Roten Meer, der an steilen Riffwänden in Spalten hinein- und hinausschießt.';
+
+  @override
+  String get species_dottyback_royal_name => 'Königs-Zwergbarsch';
+
+  @override
+  String get species_dottyback_royal_desc =>
+      'Kleiner zweifarbiger Fisch mit magentafarbener Vorder- und leuchtend gelber Hinterhälfte, an Riffwänden des Indopazifiks.';
+
+  @override
+  String get species_coral_trout_name => 'Forellen-Zackenbarsch';
+
+  @override
+  String get species_coral_trout_desc =>
+      'Begehrter Jäger des Great Barrier Reef mit orangerotem Körper voller blauer Punkte.';
+
+  @override
+  String get species_barramundi_cod_name => 'Masken-Zackenbarsch';
+
+  @override
+  String get species_barramundi_cod_desc =>
+      'Markanter Zackenbarsch mit kleinem Kopf, gebuckeltem Körper und dunklen Tupfen auf hellem Grund.';
+
+  @override
+  String get species_spadefish_atlantic_name => 'Atlantischer Fledermausfisch';
+
+  @override
+  String get species_spadefish_atlantic_desc =>
+      'Silbriger scheibenförmiger Fisch mit dunklen Querbinden, oft in großen Schwärmen an karibischen Wracks.';
+
+  @override
+  String get species_fusilier_yellowback_name => 'Gelbrücken-Füsilier';
+
+  @override
+  String get species_fusilier_yellowback_desc =>
+      'Schlanker blauer Planktonfresser mit gelbem Rücken, der gewaltige Schwärme über den Riffhängen des Indopazifiks bildet.';
+
+  @override
+  String get species_fusilier_bluestreak_name => 'Blaustreifen-Füsilier';
+
+  @override
+  String get species_fusilier_bluestreak_desc =>
+      'Kleiner blauer Füsilier mit dunklem Längsstreifen, in schnellen Schwärmen entlang der Riffwände des Indopazifiks.';
+
+  @override
+  String get species_porkfish_name => 'Ferkelfisch';
+
+  @override
+  String get species_porkfish_desc =>
+      'Farbenprächtiger karibischer Grunzer mit blauen und gelben Streifen und zwei schwarzen Kopfbinden, nahe Riffen und Wracks.';
+
+  @override
+  String get species_blue_striped_grunt_name => 'Blaustreifen-Grunzer';
+
+  @override
+  String get species_blue_striped_grunt_desc =>
+      'Gelber karibischer Grunzer mit kräftigen blauen Längsstreifen, der tagsüber große Ruheschwärme unter Überhängen bildet.';
+
+  @override
+  String get species_french_grunt_name => 'Franzosen-Grunzer';
+
+  @override
+  String get species_french_grunt_desc =>
+      'Kleiner gelb gestreifter Grunzer, der tagsüber dichte Ruheschwärme an karibischen Riffen bildet.';
+
+  @override
+  String get species_convict_tang_name => 'Sträflings-Doktorfisch';
+
+  @override
+  String get species_convict_tang_desc =>
+      'Heller Doktorfisch mit sechs senkrechten schwarzen Binden, oft in großen Schwärmen beim Weiden auf den Riffdächern des Indopazifiks.';
+
+  @override
+  String get species_great_hammerhead_name => 'Bogenstirn-Hammerhai';
+
+  @override
+  String get species_great_hammerhead_desc =>
+      'Markanter Hai mit gebogenem hammerförmigem Kopf, der an Seebergen und vorgelagerten Inseln große Schulen bildet.';
+
+  @override
+  String get species_wobbegong_name => 'Gefleckter Teppichhai';
+
+  @override
+  String get species_wobbegong_desc =>
+      'Flacher, gut getarnter Teppichhai mit Hautfransen rund um das Maul, an den gemäßigten Riffen Australiens.';
+
+  @override
+  String get species_manta_ray_name => 'Riffmanta';
+
+  @override
+  String get species_manta_ray_desc =>
+      'Anmutiger Riese mit bis zu 5 m Spannweite, der Putzerstationen aufsucht und an Riffen des Indopazifiks Plankton frisst.';
+
+  @override
+  String get species_oceanic_manta_name => 'Riesenmanta';
+
+  @override
+  String get species_oceanic_manta_desc =>
+      'Die größte Rochenart mit über 7 m Spannweite, an vorgelagerten Seebergen und Putzerstationen anzutreffen.';
+
+  @override
+  String get species_undulated_moray_name => 'Wellenlinien-Muräne';
+
+  @override
+  String get species_undulated_moray_desc =>
+      'Gelbgrüne Muräne mit dunkler Wellenzeichnung, die nachts häufig an Riffen des Indopazifiks jagt.';
+
+  @override
+  String get species_whitemouth_moray_name => 'Weißmaul-Muräne';
+
+  @override
+  String get species_whitemouth_moray_desc =>
+      'Dunkelbraune Muräne mit kleinen weißen Punkten und auffällig weißem Maulinneren, im gesamten Indopazifik verbreitet.';
+
+  @override
+  String get species_dragon_moray_name => 'Drachenmuräne';
+
+  @override
+  String get species_dragon_moray_desc =>
+      'Auffällige Muräne mit drachenartigen Hörnern über den Nasenlöchern und orangeroten Leopardenflecken, im Indopazifik verbreitet.';
+
+  @override
+  String get species_lyretail_grouper_name => 'Mondsichel-Zackenbarsch';
+
+  @override
+  String get species_lyretail_grouper_desc =>
+      'Rotrosa Zackenbarsch mit blauen Punkten und markanter sichelförmiger Schwanzflosse, an den Außenriffwänden des Indopazifiks.';
+
+  @override
+  String get species_banded_butterflyfish_name => 'Gebänderter Falterfisch';
+
+  @override
+  String get species_banded_butterflyfish_desc =>
+      'Weißer Falterfisch mit vier kräftigen schwarzen Querbinden, einer der häufigsten Falterfische karibischer Riffe.';
+
+  @override
+  String get species_ringed_pipefish_name => 'Ringel-Seenadel';
+
+  @override
+  String get species_ringed_pipefish_desc =>
+      'Schlanke Seenadel mit abwechselnd roten und weißen Ringen, in Höhlen und unter Überhängen an Riffen des Indopazifiks.';
+
+  @override
+  String get species_razorfish_name => 'Rasiermesserfisch';
+
+  @override
+  String get species_razorfish_desc =>
+      'Winziger Fisch, der in Gruppen kopfüber senkrecht schwimmt und sich oft zwischen Seeigelstacheln an Riffen des Indopazifiks versteckt.';
+
+  @override
+  String get species_harlequin_tuskfish_name => 'Harlekin-Lippfisch';
+
+  @override
+  String get species_harlequin_tuskfish_desc =>
+      'Farbenprächtiger Lippfisch mit leuchtend blauen Hauzähnen, rotorangen Binden und weißen Feldern, an Riffen des Westpazifiks.';
+
+  @override
+  String get species_blue_groper_name => 'Blauer Riesenlippfisch';
+
+  @override
+  String get species_blue_groper_desc =>
+      'Großer blauer Lippfisch, endemisch in Ostaustralien, zutraulich und Tauchern an gemäßigten Riffen oft nahe kommend.';
+
+  @override
+  String get species_red_lipped_batfish_name => 'Rotlippen-Fledermausfisch';
+
+  @override
+  String get species_red_lipped_batfish_desc =>
+      'Bizarrer flachgebauter Fisch mit leuchtend roten Lippen, der auf umgebildeten Flossen über den Meeresboden von Galapagos läuft.';
+
+  @override
+  String get species_orangeband_surgeonfish_name => 'Orangeband-Doktorfisch';
+
+  @override
+  String get species_orangeband_surgeonfish_desc =>
+      'Graubrauner Doktorfisch mit orangefarbenem Längsband hinter dem Auge, an den Riffhängen des Pazifiks.';
+
+  @override
+  String get species_maori_wrasse_name => 'Maori-Lippfisch';
+
+  @override
+  String get species_maori_wrasse_desc =>
+      'Mittelgroßer Lippfisch mit dunkler Binde hinter der Brustflosse, häufig an Riffen des Pazifiks und des Indischen Ozeans.';
+
+  @override
+  String get species_blue_ringed_octopus_name => 'Blaugeringelter Krake';
+
+  @override
+  String get species_blue_ringed_octopus_desc =>
+      'Kleiner, aber extrem giftiger Krake mit leuchtend blauen Ringen, die bei Bedrohung aufblitzen.';
+
+  @override
+  String get species_common_octopus_name => 'Gewöhnlicher Krake';
+
+  @override
+  String get species_common_octopus_desc =>
+      'Hochintelligenter Krake, bekannt für schnelle Farbwechsel und seine Fähigkeit, Probleme zu lösen.';
+
+  @override
+  String get species_giant_pacific_octopus_name => 'Riesenkrake';
+
+  @override
+  String get species_giant_pacific_octopus_desc =>
+      'Die größte Krakenart mit Armspannweiten von über 4 Metern in den kalten Gewässern des Pazifiks.';
+
+  @override
+  String get species_mimic_octopus_name => 'Mimik-Krake';
+
+  @override
+  String get species_mimic_octopus_desc =>
+      'Bemerkenswerter Krake, der Aussehen und Verhalten anderer Meerestiere nachahmt.';
+
+  @override
+  String get species_coconut_octopus_name => 'Kokosnuss-Krake';
+
+  @override
+  String get species_coconut_octopus_desc =>
+      'Kleiner Krake, berühmt dafür, Kokosnussschalen mitzutragen und als tragbaren Unterschlupf zu nutzen.';
+
+  @override
+  String get species_day_octopus_name => 'Tagkrake';
+
+  @override
+  String get species_day_octopus_desc =>
+      'Tagaktiver Jäger mit beeindruckenden Tarnfähigkeiten, häufig an Riffen des Indopazifiks.';
+
+  @override
+  String get species_wonderpus_octopus_name => 'Wunderpus-Krake';
+
+  @override
+  String get species_wonderpus_octopus_desc =>
+      'Auffälliger Krake mit einzigartiger weiß-brauner Bänderung, an sandigen Muck-Tauchplätzen zu finden.';
+
+  @override
+  String get species_broadclub_cuttlefish_name => 'Breitkeulen-Sepia';
+
+  @override
+  String get species_broadclub_cuttlefish_desc =>
+      'Große Sepia mit hypnotisierenden Farbspielen, häufig an Riffen des Indopazifiks zu sehen.';
+
+  @override
+  String get species_pharaoh_cuttlefish_name => 'Pharao-Sepia';
+
+  @override
+  String get species_pharaoh_cuttlefish_desc =>
+      'Große Sepia aus dem Indischen Ozean, bekannt für ihre pulsierenden Farbmuster.';
+
+  @override
+  String get species_flamboyant_cuttlefish_name => 'Pfeffers Prachtsepia';
+
+  @override
+  String get species_flamboyant_cuttlefish_desc =>
+      'Winzige Sepia, die über den Meeresboden läuft und dabei kräftige violette, rosa und gelbe Farbwellen zeigt.';
+
+  @override
+  String get species_giant_cuttlefish_name => 'Riesensepia';
+
+  @override
+  String get species_giant_cuttlefish_desc =>
+      'Die größte Sepia der Welt, berühmt für ihre Massenlaichansammlungen in Südaustralien.';
+
+  @override
+  String get species_bigfin_reef_squid_name => 'Großflossen-Riffkalmar';
+
+  @override
+  String get species_bigfin_reef_squid_desc =>
+      'Schwarmbildender Kalmar, dem man häufig bei Nachttauchgängen begegnet, angezogen von Tauchlampen.';
+
+  @override
+  String get species_caribbean_reef_squid_name => 'Karibischer Riffkalmar';
+
+  @override
+  String get species_caribbean_reef_squid_desc =>
+      'Neugieriger Kalmar, der in der Karibik oft in kleinen Gruppen nahe Riffkanten schwebt.';
+
+  @override
+  String get species_bobtail_squid_name => 'Zwergtintenfisch';
+
+  @override
+  String get species_bobtail_squid_desc =>
+      'Winziger nachtaktiver Tintenfisch, der sich tagsüber im Sand eingräbt, ein begehrter Fund beim Muck-Tauchen.';
+
+  @override
+  String get species_chambered_nautilus_name => 'Perlboot';
+
+  @override
+  String get species_chambered_nautilus_desc =>
+      'Urtümliches lebendes Fossil mit gewundener Schale, das Taucher nur selten im tiefen Wasser bei Tagesanbruch sehen.';
+
+  @override
+  String get species_spanish_dancer_name => 'Spanische Tänzerin';
+
+  @override
+  String get species_spanish_dancer_desc =>
+      'Größte Nacktschneckenart, die mit wogendem rotem Mantel schwimmt und dabei an eine Flamencotänzerin erinnert.';
+
+  @override
+  String get species_chromodoris_willani_name => 'Willans Sternschnecke';
+
+  @override
+  String get species_chromodoris_willani_desc =>
+      'Auffällige blau-schwarze Nacktschnecke mit weißem Saum, im Indopazifik häufig.';
+
+  @override
+  String get species_chromodoris_lochi_name => 'Lochs Sternschnecke';
+
+  @override
+  String get species_chromodoris_lochi_desc =>
+      'Blaue Nacktschnecke mit dunklen Linien und weißem Rand, im gesamten tropischen Pazifik verbreitet.';
+
+  @override
+  String get species_chromodoris_magnifica_name => 'Prächtige Sternschnecke';
+
+  @override
+  String get species_chromodoris_magnifica_desc =>
+      'Leuchtend blaue, weiße und orangefarbene Nacktschnecke auf Korallenriffen des Indopazifiks.';
+
+  @override
+  String get species_chromodoris_annae_name => 'Annas Sternschnecke';
+
+  @override
+  String get species_chromodoris_annae_desc =>
+      'Tiefblaue Nacktschnecke mit schwarzen Linien und orange gespitzten Rhinophoren und Kiemen.';
+
+  @override
+  String get species_nembrotha_kubaryana_name => 'Variable Neon-Nacktschnecke';
+
+  @override
+  String get species_nembrotha_kubaryana_desc =>
+      'Dunkelgrüne Nacktschnecke mit leuchtend orangen oder roten Zeichnungen, die sich von Manteltieren ernährt.';
+
+  @override
+  String get species_nembrotha_cristata_name => 'Kamm-Nembrotha';
+
+  @override
+  String get species_nembrotha_cristata_desc =>
+      'Schwarze Nacktschnecke mit leuchtend grünen Pusteln und Streifen, an Riffen des Indopazifiks.';
+
+  @override
+  String get species_phyllidia_varicosa_name => 'Warzige Phyllidia';
+
+  @override
+  String get species_phyllidia_varicosa_desc =>
+      'Blaugraue Nacktschnecke mit erhabenen, gelb gespitzten Höckern, für Fressfeinde giftig.';
+
+  @override
+  String get species_phyllidia_ocellata_name => 'Augenfleck-Phyllidia';
+
+  @override
+  String get species_phyllidia_ocellata_desc =>
+      'Weiße Nacktschnecke mit erhabenen, rosa umringten Höckern, an tropischen Riffen.';
+
+  @override
+  String get species_pikachu_nudibranch_name => 'Pikachu-Nacktschnecke';
+
+  @override
+  String get species_pikachu_nudibranch_desc =>
+      'Winzige gelb-schwarze Meeresschnecke, die einer Zeichentrickfigur ähnelt, im Pazifik verbreitet.';
+
+  @override
+  String get species_anna_rosefieldi_name => 'Roboastra-Nacktschnecke';
+
+  @override
+  String get species_anna_rosefieldi_desc =>
+      'Räuberische Nacktschnecke mit dunklem Körper und leuchtenden Längsstreifen, die andere Schnecken jagt.';
+
+  @override
+  String get species_lettuce_sea_slug_name => 'Salat-Meeresschnecke';
+
+  @override
+  String get species_lettuce_sea_slug_desc =>
+      'Gekräuselte grüne Meeresschnecke, die Chloroplasten aus Algen für die Photosynthese behält.';
+
+  @override
+  String get species_blue_dragon_nudibranch_name => 'Blaudrachen-Nacktschnecke';
+
+  @override
+  String get species_blue_dragon_nudibranch_desc =>
+      'Lange Fadenschnecke mit blau gespitzten Cerata, die symbiotische Zooxanthellen beherbergt.';
+
+  @override
+  String get species_gloomy_nudibranch_name => 'Düstere Nacktschnecke';
+
+  @override
+  String get species_gloomy_nudibranch_desc =>
+      'Dunkel blaugrüne Nacktschnecke mit blau gesäumten Leisten, häufig an Riffen des Indopazifiks.';
+
+  @override
+  String get species_ocellined_nudibranch_name => 'Ozellierte Nacktschnecke';
+
+  @override
+  String get species_ocellined_nudibranch_desc =>
+      'Weiße Nacktschnecke mit orange gesäumten Leisten, die geometrische Muster auf ihrem Mantel bilden.';
+
+  @override
+  String get species_glossodoris_cincta_name => 'Glossodoris-Nacktschnecke';
+
+  @override
+  String get species_glossodoris_cincta_desc =>
+      'Cremefarbene Nacktschnecke mit dunkelbraunem Rand und orangefarbenem Saum am Mantel.';
+
+  @override
+  String get species_jorunna_funebris_name => 'Getupfte Nacktschnecke';
+
+  @override
+  String get species_jorunna_funebris_desc =>
+      'Weiße Nacktschnecke, übersät mit schwarz gespitzten Caryophyllidien, die an ein flauschiges Häschen erinnert.';
+
+  @override
+  String get species_ceratosoma_trilobatum_name => 'Dreilappige Nacktschnecke';
+
+  @override
+  String get species_ceratosoma_trilobatum_desc =>
+      'Große Nacktschnecke mit hohem Rückenhorn und seitlichen Lappen in violetten und gelben Tönen.';
+
+  @override
+  String get species_hypselodoris_apolegma_name => 'Violette Hypselodoris';
+
+  @override
+  String get species_hypselodoris_apolegma_desc =>
+      'Elegante violette Nacktschnecke mit weißem Mantelsaum, an Riffen des Indopazifiks.';
+
+  @override
+  String get species_hypselodoris_bullockii_name => 'Bullocks Hypselodoris';
+
+  @override
+  String get species_hypselodoris_bullockii_desc =>
+      'Rosa-violette Nacktschnecke mit gelb gespitzten Rhinophoren an Riffen des Indopazifiks.';
+
+  @override
+  String get species_flabellina_exoptata_name => 'Begehrte Flabellina';
+
+  @override
+  String get species_flabellina_exoptata_desc =>
+      'Durchscheinende Fadenschnecke mit violett gespitzten orangefarbenen Cerata, in tropischen Gewässern.';
+
+  @override
+  String get species_risbecia_tryoni_name => 'Tryons Risbecia';
+
+  @override
+  String get species_risbecia_tryoni_desc =>
+      'Große braun-blaue Nacktschnecke, oft als Paar an Riffen des Indopazifiks zu finden.';
+
+  @override
+  String get species_goniobranchus_kuniei_name => 'Kunies Nacktschnecke';
+
+  @override
+  String get species_goniobranchus_kuniei_desc =>
+      'Weiße Nacktschnecke mit orangefarbenen Punkten und violettem Mantelsaum, im Westpazifik verbreitet.';
+
+  @override
+  String get species_mexichromis_multituberculata_name =>
+      'Vielhöckrige Nacktschnecke';
+
+  @override
+  String get species_mexichromis_multituberculata_desc =>
+      'Violett-weiße Nacktschnecke mit erhabenen Höckern und orange gespitzten Anhängen.';
+
+  @override
+  String get species_chromodoris_dianae_name => 'Dianas Sternschnecke';
+
+  @override
+  String get species_chromodoris_dianae_desc =>
+      'Leuchtend blaue Nacktschnecke mit schwarzen Streifen und orangefarbenen Kiemen, im Westpazifik verbreitet.';
+
+  @override
+  String get species_phyllodesmium_poindimiei_name =>
+      'Sonnenbetriebene Nacktschnecke';
+
+  @override
+  String get species_phyllodesmium_poindimiei_desc =>
+      'Durchscheinende Fadenschnecke mit verzweigten Cerata, die Zooxanthellen beherbergt.';
+
+  @override
+  String get species_chromodoris_elisabethina_name =>
+      'Elisabeths Sternschnecke';
+
+  @override
+  String get species_chromodoris_elisabethina_desc =>
+      'Blau und gelb gestreifte Nacktschnecke mit weißem Mantelsaum, in Südostasien häufig.';
+
+  @override
+  String get species_doridella_batava_name => 'Batavische Doridenschnecke';
+
+  @override
+  String get species_doridella_batava_desc =>
+      'In der Färbung variable, schwarze bis braune Doridenschnecke unter Steinen und im Geröll an Riffen des Indopazifiks.';
+
+  @override
+  String get species_tiger_cowrie_name => 'Tiger-Kaurischnecke';
+
+  @override
+  String get species_tiger_cowrie_desc =>
+      'Große gefleckte Kaurischnecke tropischer Riffe, oft teilweise vom eigenen Mantel bedeckt.';
+
+  @override
+  String get species_tritons_trumpet_name => 'Tritonshorn';
+
+  @override
+  String get species_tritons_trumpet_desc =>
+      'Große Raubschnecke und natürlicher Feind des Dornenkronenseesterns.';
+
+  @override
+  String get species_queen_conch_name => 'Große Fechterschnecke';
+
+  @override
+  String get species_queen_conch_desc =>
+      'Ikonische große Flügelschnecke der karibischen Seegraswiesen mit markant rosafarbener Mündungslippe.';
+
+  @override
+  String get species_banded_coral_shrimp_name => 'Gebänderte Scherengarnele';
+
+  @override
+  String get species_banded_coral_shrimp_desc =>
+      'Rot-weiß gebänderte Putzergarnele mit langen weißen Fühlern, in Riffspalten zu finden.';
+
+  @override
+  String get species_mantis_shrimp_name => 'Pfauen-Fangschreckenkrebs';
+
+  @override
+  String get species_mantis_shrimp_desc =>
+      'Farbenprächtiger Jäger mit kräftigen keulenartigen Fangbeinen, die Schalen zertrümmern können.';
+
+  @override
+  String get species_cleaner_shrimp_name => 'Weißband-Putzergarnele';
+
+  @override
+  String get species_cleaner_shrimp_desc =>
+      'Leuchtend rot-weiße Garnele, die Putzerstationen einrichtet, um Rifffische zu versorgen.';
+
+  @override
+  String get species_pederson_cleaner_shrimp_name => 'Pederson-Putzergarnele';
+
+  @override
+  String get species_pederson_cleaner_shrimp_desc =>
+      'Durchscheinende karibische Putzergarnele, die zwischen Anemonententakeln lebt.';
+
+  @override
+  String get species_harlequin_shrimp_name => 'Harlekingarnele';
+
+  @override
+  String get species_harlequin_shrimp_desc =>
+      'Auffällig gemusterte Garnele mit flachen Scheren, die sich ausschließlich von Seesternen ernährt.';
+
+  @override
+  String get species_coleman_shrimp_name => 'Coleman-Garnele';
+
+  @override
+  String get species_coleman_shrimp_desc =>
+      'Winzige, paarweise lebende Garnele auf Feuerseeigeln, bei Unterwasserfotografen sehr begehrt.';
+
+  @override
+  String get species_emperor_shrimp_name => 'Kaisergarnele';
+
+  @override
+  String get species_emperor_shrimp_desc =>
+      'Farbenprächtige Kommensalgarnele, die auf Seegurken und Nacktschnecken mitreist.';
+
+  @override
+  String get species_sexy_shrimp_name => 'Sexy-Garnele';
+
+  @override
+  String get species_sexy_shrimp_desc =>
+      'Winzige Anemonengarnele, bekannt für ihren wippenden Schwanztanz, beliebt in der Makrofotografie.';
+
+  @override
+  String get species_marble_shrimp_name => 'Marmorgarnele';
+
+  @override
+  String get species_marble_shrimp_desc =>
+      'Nachtaktive, marmorierte Garnele mit befiederten Beinen, die sich tagsüber in Riffspalten versteckt.';
+
+  @override
+  String get species_spiny_lobster_name => 'Karibische Languste';
+
+  @override
+  String get species_spiny_lobster_desc =>
+      'Große scherenlose Languste mit langen Fühlern, die unter Riffüberhängen Schutz sucht.';
+
+  @override
+  String get species_painted_spiny_lobster_name => 'Bunte Languste';
+
+  @override
+  String get species_painted_spiny_lobster_desc =>
+      'Leuchtend gefärbte Languste mit blau, grün und weiß gestreiften Beinen an Riffen des Indopazifiks.';
+
+  @override
+  String get species_slipper_lobster_name => 'Bärenkrebs';
+
+  @override
+  String get species_slipper_lobster_desc =>
+      'Flachgebauter nachtaktiver Krebs mit breiten Fühlerplatten anstelle langer Peitschenfühler.';
+
+  @override
+  String get species_squat_lobster_name => 'Springkrebs';
+
+  @override
+  String get species_squat_lobster_desc =>
+      'Winziges rosa-violettes Krebstier, das auf riesigen Fassschwämmen lebt, ein Liebling der Makrofotografie.';
+
+  @override
+  String get species_hermit_crab_name => 'Blaubein-Einsiedlerkrebs';
+
+  @override
+  String get species_hermit_crab_desc =>
+      'Kleiner Einsiedlerkrebs mit leuchtend blauen Beinen, häufig an karibischen Riffen.';
+
+  @override
+  String get species_orangutan_crab_name => 'Orang-Utan-Krabbe';
+
+  @override
+  String get species_orangutan_crab_desc =>
+      'Winzige haarige Krabbe, die in Blasenkorallen lebt und nach ihrer Ähnlichkeit mit einem Orang-Utan benannt ist.';
+
+  @override
+  String get species_decorator_crab_name => 'Dekorateurkrabbe';
+
+  @override
+  String get species_decorator_crab_desc =>
+      'Meisterin der Tarnung, die Schwämme, Algen und Hydrozoen auf ihrem Panzer befestigt.';
+
+  @override
+  String get species_porcelain_crab_name => 'Anemonen-Porzellankrebs';
+
+  @override
+  String get species_porcelain_crab_desc =>
+      'Flacher gefleckter Krebs, der in Anemonen lebt und mit befiederten Mundwerkzeugen filtriert.';
+
+  @override
+  String get species_arrow_crab_name => 'Pfeilkrabbe';
+
+  @override
+  String get species_arrow_crab_desc =>
+      'Spinnenartige karibische Krabbe mit langem spitzem Rostrum und gestreiften Beinen.';
+
+  @override
+  String get species_channel_clinging_crab_name =>
+      'Karibische Riesenspinnenkrabbe';
+
+  @override
+  String get species_channel_clinging_crab_desc =>
+      'Große karibische Riffkrabbe mit dunklem Körper und rotorangen Scheren, in Spalten zu finden.';
+
+  @override
+  String get species_coral_crab_name => 'Korallenwächter-Krabbe';
+
+  @override
+  String get species_coral_crab_desc =>
+      'Kleine gefleckte Krabbe, die in Symbiose in Pocillopora-Korallen lebt und ihren Wirt verteidigt.';
+
+  @override
+  String get species_crown_of_thorns_starfish_name => 'Dornenkronenseestern';
+
+  @override
+  String get species_crown_of_thorns_starfish_desc =>
+      'Giftiger vielarmiger Seestern, der Korallen frisst und bei Massenvermehrungen ganze Riffe verwüsten kann.';
+
+  @override
+  String get species_blue_linckia_starfish_name => 'Blauer Seestern';
+
+  @override
+  String get species_blue_linckia_starfish_desc =>
+      'Leuchtend blauer Seestern, häufig auf Riffdächern und Riffhängen des Indopazifiks.';
+
+  @override
+  String get species_red_knob_starfish_name => 'Rotknoten-Seestern';
+
+  @override
+  String get species_red_knob_starfish_desc =>
+      'Großer grauer Seestern mit auffälligen rot gespitzten Stacheln in sandigen Riffbereichen.';
+
+  @override
+  String get species_chocolate_chip_starfish_name => 'Knotenseestern';
+
+  @override
+  String get species_chocolate_chip_starfish_desc =>
+      'Beigefarbener Seestern mit dunklen erhabenen Knoten, die an Schokoladenstückchen erinnern, auf sandigem Untergrund.';
+
+  @override
+  String get species_cushion_star_name => 'Kissenseestern';
+
+  @override
+  String get species_cushion_star_desc =>
+      'Aufgeblähter fünfeckiger Seestern mit zurückgebildeten Armen auf den Riffdächern des Indopazifiks.';
+
+  @override
+  String get species_fromia_starfish_name => 'Eleganter Seestern';
+
+  @override
+  String get species_fromia_starfish_desc =>
+      'Kleiner orangeroter Seestern mit hellen Plattenrändern, die ein Fliesenmuster ergeben.';
+
+  @override
+  String get species_basket_star_name => 'Gorgonenhaupt';
+
+  @override
+  String get species_basket_star_desc =>
+      'Kunstvoll verzweigte Arme entfalten sich nachts, um in der Strömung Nahrung zu filtrieren.';
+
+  @override
+  String get species_brittle_star_name => 'Gebänderter Schlangenstern';
+
+  @override
+  String get species_brittle_star_desc =>
+      'Gestreifter Schlangenstern unter Steinen und in Spalten, mit beweglichen, schlangenartigen Armen.';
+
+  @override
+  String get species_feather_star_name => 'Haarstern';
+
+  @override
+  String get species_feather_star_desc =>
+      'Vielarmiger Haarstern, der auf Riffvorsprüngen sitzt und mit befiederten Armen filtriert.';
+
+  @override
+  String get species_black_feather_star_name => 'Schwarzer Haarstern';
+
+  @override
+  String get species_black_feather_star_desc =>
+      'Dunkler Haarstern, der durch rhythmisches Schwingen seiner vielen Arme kurze Strecken schwimmen kann.';
+
+  @override
+  String get species_long_spined_sea_urchin_name => 'Langstachel-Seeigel';
+
+  @override
+  String get species_long_spined_sea_urchin_desc =>
+      'Schwarzer Seeigel mit langen giftigen Stacheln, ein entscheidender Algenweider der karibischen Riffe.';
+
+  @override
+  String get species_fire_urchin_name => 'Feuerseeigel';
+
+  @override
+  String get species_fire_urchin_desc =>
+      'Weichkörperiger Seeigel mit giftigen Stacheln, die bei Berührung schmerzhafte Verletzungen verursachen.';
+
+  @override
+  String get species_pencil_urchin_name => 'Griffelseeigel';
+
+  @override
+  String get species_pencil_urchin_desc =>
+      'Robuster Seeigel mit dicken, stumpfen Stacheln, der sich in Riffspalten verkeilt.';
+
+  @override
+  String get species_collector_urchin_name => 'Sammler-Seeigel';
+
+  @override
+  String get species_collector_urchin_desc =>
+      'Seeigel, der sich zur Tarnung mit Geröll und Algenstücken bedeckt.';
+
+  @override
+  String get species_sea_apple_name => 'Seeapfel';
+
+  @override
+  String get species_sea_apple_desc =>
+      'Leuchtend gefärbte Seegurke mit Mundtentakeln, mit denen sie Nahrung aus dem Wasser filtert.';
+
+  @override
+  String get species_pineapple_sea_cucumber_name => 'Ananas-Seegurke';
+
+  @override
+  String get species_pineapple_sea_cucumber_desc =>
+      'Große orangerote Seegurke mit sternförmigen Papillen an Riffhängen.';
+
+  @override
+  String get species_black_sea_cucumber_name => 'Schwarze Seegurke';
+
+  @override
+  String get species_black_sea_cucumber_desc =>
+      'Häufige schwarze Seegurke auf sandigen Riffdächern im gesamten Indopazifik.';
+
+  @override
+  String get species_leopard_sea_cucumber_name => 'Leoparden-Seegurke';
+
+  @override
+  String get species_leopard_sea_cucumber_desc =>
+      'Gefleckte Seegurke, die bei Störung klebrige weiße Cuvier-Schläuche ausstößt.';
+
+  @override
+  String get species_sand_dollar_name => 'Sanddollar';
+
+  @override
+  String get species_sand_dollar_desc =>
+      'Flacher scheibenförmiger Seeigel, der teilweise eingegraben im Sand liegt.';
+
+  @override
+  String get species_moon_jellyfish_name => 'Ohrenqualle';
+
+  @override
+  String get species_moon_jellyfish_desc =>
+      'Durchscheinende glockenförmige Qualle mit vier hufeisenförmigen Gonaden, die durch den Körper schimmern.';
+
+  @override
+  String get species_lions_mane_jellyfish_name => 'Gelbe Haarqualle';
+
+  @override
+  String get species_lions_mane_jellyfish_desc =>
+      'Eine der größten Quallenarten mit langen nachziehenden Tentakeln in kalten Gewässern.';
+
+  @override
+  String get species_box_jellyfish_name => 'Seewespe';
+
+  @override
+  String get species_box_jellyfish_desc =>
+      'Äußerst gefährliche Qualle mit hochwirksamem Gift, in tropischen Gewässern des Indopazifiks.';
+
+  @override
+  String get species_upside_down_jellyfish_name => 'Kopfüber-Qualle';
+
+  @override
+  String get species_upside_down_jellyfish_desc =>
+      'Ungewöhnliche Qualle, die mit der Glocke nach unten auf Sandböden liegt, damit ihre Algen Photosynthese betreiben können.';
+
+  @override
+  String get species_blue_blubber_jellyfish_name => 'Blaue Blubberqualle';
+
+  @override
+  String get species_blue_blubber_jellyfish_desc =>
+      'Blau-weiße Qualle mit fester Glocke und gekräuselten Mundarmen, häufig in australischen Gewässern.';
+
+  @override
+  String get species_fried_egg_jellyfish_name => 'Spiegeleiqualle';
+
+  @override
+  String get species_fried_egg_jellyfish_desc =>
+      'Mediterrane Qualle mit gelber Kuppel, die an ein Spiegelei erinnert, mit schwachem Nesselgift.';
+
+  @override
+  String get species_pacific_sea_nettle_name => 'Pazifische Nesselqualle';
+
+  @override
+  String get species_pacific_sea_nettle_desc =>
+      'Goldbraune Qualle mit langen nachziehenden Tentakeln entlang der Pazifikküste.';
+
+  @override
+  String get species_compass_jellyfish_name => 'Kompassqualle';
+
+  @override
+  String get species_compass_jellyfish_desc =>
+      'Braun-weiße Qualle mit V-förmigen Zeichnungen, die wie eine Kompassrose ausstrahlen.';
+
+  @override
+  String get species_spotted_jellyfish_name => 'Gefleckte Qualle';
+
+  @override
+  String get species_spotted_jellyfish_desc =>
+      'Goldene Qualle mit weißen Punkten, berühmt dafür, den Jellyfish Lake in Palau zu füllen.';
+
+  @override
+  String get species_barrel_jellyfish_name => 'Lungenqualle';
+
+  @override
+  String get species_barrel_jellyfish_desc =>
+      'Große kuppelförmige Qualle mit gekräuselten Mundarmen und schwachem Nesselgift, im Atlantik häufig.';
+
+  @override
+  String get species_persian_carpet_flatworm_name => 'Perserteppich-Plattwurm';
+
+  @override
+  String get species_persian_carpet_flatworm_desc =>
+      'Kunstvoll gezeichneter schwarzer Plattwurm mit gelborangem Saum, oft für eine Nacktschnecke gehalten.';
+
+  @override
+  String get species_leopard_flatworm_name => 'Leoparden-Plattwurm';
+
+  @override
+  String get species_leopard_flatworm_desc =>
+      'Durchscheinender Plattwurm mit leopardenartigen Flecken, der über Riffuntergründe gleitet.';
+
+  @override
+  String get species_divided_flatworm_name => 'Geteilter Plattwurm';
+
+  @override
+  String get species_divided_flatworm_desc =>
+      'Auffälliger schwarz-oranger Plattwurm, der zum Schutz giftige Nacktschnecken nachahmt.';
+
+  @override
+  String get species_blue_pseudoceros_flatworm_name =>
+      'Blauer Pseudoceros-Plattwurm';
+
+  @override
+  String get species_blue_pseudoceros_flatworm_desc =>
+      'Tiefblauer Plattwurm mit orangefarbenem Saum, der über die Riffoberflächen des Indopazifiks gleitet.';
+
+  @override
+  String get species_racing_stripe_flatworm_name => 'Rennstreifen-Plattwurm';
+
+  @override
+  String get species_racing_stripe_flatworm_desc =>
+      'Cremefarbener Plattwurm mit deutlichem dunklem Mittelstreifen und gekräuseltem Rand.';
+
+  @override
+  String get species_christmas_tree_worm_name => 'Weihnachtsbaumwurm';
+
+  @override
+  String get species_christmas_tree_worm_desc =>
+      'Farbenfroher Röhrenwurm mit spiralförmiger Krone in Korallen, der sich bei Annäherung blitzschnell zurückzieht.';
+
+  @override
+  String get species_feather_duster_worm_name => 'Federbuschwurm';
+
+  @override
+  String get species_feather_duster_worm_desc =>
+      'In einer Röhre lebender Wurm mit fächerförmiger Krone aus federartigen Radiolen zum Filtrieren.';
+
+  @override
+  String get species_fire_worm_name => 'Bärtiger Feuerwurm';
+
+  @override
+  String get species_fire_worm_desc =>
+      'Borstenwurm mit weißen Nesselborsten, die bei Berührung schmerzhafte Reizungen verursachen.';
+
+  @override
+  String get species_bobbit_worm_name => 'Bobbit-Wurm';
+
+  @override
+  String get species_bobbit_worm_desc =>
+      'Lauerjäger, der im Sand versteckt liegt und mit kräftigen Kiefern blitzschnell zuschlägt.';
+
+  @override
+  String get species_social_feather_duster_name => 'Geselliger Federbuschwurm';
+
+  @override
+  String get species_social_feather_duster_desc =>
+      'Kolonienbildender Röhrenwurm, der an karibischen Riffen Büschel zarter gebänderter Kronen bildet.';
+
+  @override
+  String get species_giant_clam_name => 'Riesenmuschel';
+
+  @override
+  String get species_giant_clam_desc =>
+      'Die größte lebende Muschel, deren schillerndes Mantelgewebe symbiotische Algen beherbergt.';
+
+  @override
+  String get species_boring_clam_name => 'Bohrmuschel';
+
+  @override
+  String get species_boring_clam_desc =>
+      'Kleine farbenprächtige Muschel, die sich in Korallenfels bohrt und nur ihren leuchtenden Mantel zeigt.';
+
+  @override
+  String get species_maxima_clam_name => 'Maxima-Riesenmuschel';
+
+  @override
+  String get species_maxima_clam_desc =>
+      'Leuchtend gefärbte Muschel im Riffgestein mit elektrisch blauen und grünen Mänteln.';
+
+  @override
+  String get species_flame_scallop_name => 'Flammen-Feilenmuschel';
+
+  @override
+  String get species_flame_scallop_desc =>
+      'Rote Muschel mit blitzendem weißem Lichtband am Mantelrand, in Riffspalten zu finden.';
+
+  @override
+  String get species_thorny_oyster_name => 'Stachelauster';
+
+  @override
+  String get species_thorny_oyster_desc =>
+      'Muschel mit stacheliger Schale, die am Riffgestein festzementiert ist, oft von Schwämmen und Algen überwachsen.';
+
+  @override
+  String get species_magnificent_sea_anemone_name => 'Prachtanemone';
+
+  @override
+  String get species_magnificent_sea_anemone_desc =>
+      'Große farbenprächtige Anemone, die Anemonenfische beherbergt, mit auffälliger Säule und wogenden Tentakeln.';
+
+  @override
+  String get species_bubble_tip_anemone_name => 'Blasenanemone';
+
+  @override
+  String get species_bubble_tip_anemone_desc =>
+      'Beliebter Wirt für Anemonenfische, mit blasenförmig verdickten Tentakelspitzen in Grün-, Braun- oder Rosatönen.';
+
+  @override
+  String get species_giant_carpet_anemone_name => 'Riesen-Teppichanemone';
+
+  @override
+  String get species_giant_carpet_anemone_desc =>
+      'Gewaltige Anemone mit kurzen, klebrigen Tentakeln, die über einen Meter Durchmesser erreichen kann.';
+
+  @override
+  String get species_haddon_carpet_anemone_name => 'Haddons Teppichanemone';
+
+  @override
+  String get species_haddon_carpet_anemone_desc =>
+      'Flache Teppichanemone auf sandigem Untergrund, Wirt für verschiedene Anemonenfische und Porzellankrebse.';
+
+  @override
+  String get species_long_tentacle_anemone_name => 'Langtentakel-Anemone';
+
+  @override
+  String get species_long_tentacle_anemone_desc =>
+      'Anemone sandiger Böden mit langen wogenden Tentakeln, oft mit Anemonenfischen besetzt.';
+
+  @override
+  String get species_tube_anemone_name => 'Zylinderrose';
+
+  @override
+  String get species_tube_anemone_desc =>
+      'Elegante Anemone, die in einer pergamentartigen Röhre im Sand lebt und zwei Tentakelkränze trägt.';
+
+  @override
+  String get species_hell_fire_anemone_name => 'Höllenfeuer-Anemone';
+
+  @override
+  String get species_hell_fire_anemone_desc =>
+      'Stark nesselnde Anemone mit verzweigten Tentakeln, die einer Weichkoralle ähnelt.';
+
+  @override
+  String get species_beaded_sea_anemone_name => 'Perlen-Seeanemone';
+
+  @override
+  String get species_beaded_sea_anemone_desc =>
+      'Anemone mit perlartig verdickten Tentakelspitzen in sandigen Riffbereichen des Indopazifiks.';
+
+  @override
+  String get species_condylactis_anemone_name => 'Karibische Riesenanemone';
+
+  @override
+  String get species_condylactis_anemone_desc =>
+      'Große karibische Anemone mit violett gespitzten Tentakeln auf felsigem Riffuntergrund.';
+
+  @override
+  String get species_sand_anemone_name => 'Sandanemone';
+
+  @override
+  String get species_sand_anemone_desc =>
+      'Zarte Anemone, die teilweise im Sand eingegraben ist und violett gespitzte Tentakel trägt.';
+
+  @override
+  String get species_barrel_sponge_name => 'Riesen-Fassschwamm';
+
+  @override
+  String get species_barrel_sponge_desc =>
+      'Gewaltiger fassförmiger Schwamm, der an karibischen Riffwänden Jahrhunderte alt werden kann.';
+
+  @override
+  String get species_azure_vase_sponge_name => 'Azurblauer Vasenschwamm';
+
+  @override
+  String get species_azure_vase_sponge_desc =>
+      'Leuchtend blauvioletter vasenförmiger Schwamm an karibischen Riffwänden.';
+
+  @override
+  String get species_yellow_tube_sponge_name => 'Gelber Röhrenschwamm';
+
+  @override
+  String get species_yellow_tube_sponge_desc =>
+      'Leuchtend gelber Röhrenschwamm, der in Büscheln an karibischen Riffwänden wächst.';
+
+  @override
+  String get species_elephant_ear_sponge_name => 'Elefantenohr-Schwamm';
+
+  @override
+  String get species_elephant_ear_sponge_desc =>
+      'Großer orangefarbener fächerförmiger Schwamm, der in der Karibik an Wänden und unter Überhängen wächst.';
+
+  @override
+  String get species_rope_sponge_name => 'Seilschwamm';
+
+  @override
+  String get species_rope_sponge_desc =>
+      'Roter aufrecht verzweigter Schwamm, der an karibischen Riffen seilartige Gebilde formt.';
+
+  @override
+  String get species_portuguese_man_o_war_name => 'Portugiesische Galeere';
+
+  @override
+  String get species_portuguese_man_o_war_desc =>
+      'Hydrozoen-Kolonie mit gasgefüllter Schwimmblase und äußerst schmerzhaft nesselnden Schleppfäden.';
+
+  @override
+  String get species_fire_coral_name => 'Feuerkoralle';
+
+  @override
+  String get species_fire_coral_desc =>
+      'Keine echte Koralle, sondern ein Hydrozoon, das Tauchern bei Berührung schmerzhafte Verbrennungen zufügt.';
+
+  @override
+  String get species_by_the_wind_sailor_name => 'Segelqualle';
+
+  @override
+  String get species_by_the_wind_sailor_desc =>
+      'Blaue treibende Hydrozoenkolonie mit einem diagonalen Segel, das den Wind einfängt.';
+
+  @override
+  String get species_blue_button_name => 'Blauer Knopf';
+
+  @override
+  String get species_blue_button_desc =>
+      'Treibende Hydrozoenkolonie mit flacher Scheibe und blauen, tentakelartigen Polypen.';
+
+  @override
+  String get species_giant_sea_hare_name => 'Riesen-Seehase';
+
+  @override
+  String get species_giant_sea_hare_desc =>
+      'Eine der größten Meeresschnecken, dunkelbraun bis schwarz, in Kelpwäldern zu finden.';
+
+  @override
+  String get species_sea_hare_name => 'Gefleckter Seehase';
+
+  @override
+  String get species_sea_hare_desc =>
+      'Großer, grün gefleckter Seehase, der bei Störung violette Tinte ausstößt.';
+
+  @override
+  String get species_nudibranch_berghia_name => 'Berghia-Nacktschnecke';
+
+  @override
+  String get species_nudibranch_berghia_desc =>
+      'Durchscheinende Fadenschnecke mit weiß gespitzten Cerata, die sich von Anemonen ernährt.';
+
+  @override
+  String get species_sea_pen_name => 'Seefeder';
+
+  @override
+  String get species_sea_pen_desc =>
+      'Federförmige Oktokorallen-Kolonie, die im Sand verankert ist und sich bei Störung zurückzieht.';
+
+  @override
+  String get species_blue_sea_star_name => 'Vielfarbiger Seestern';
+
+  @override
+  String get species_blue_sea_star_desc =>
+      'Vielfarbiger Seestern, der sich an Riffen des Indopazifiks aus einzelnen Armstücken regeneriert.';
+
+  @override
+  String get species_reef_squid_name => 'Riffkalmar';
+
+  @override
+  String get species_reef_squid_desc =>
+      'Südlicher Riffkalmar, dem man häufig in den gemäßigten Gewässern Australiens begegnet.';
+
+  @override
+  String get species_tiger_shrimp_name => 'Tigergarnele';
+
+  @override
+  String get species_tiger_shrimp_desc =>
+      'Große gebänderte Garnele auf Sandböden und in Seegraswiesen des Indopazifiks.';
+
+  @override
+  String get species_candy_crab_name => 'Bonbonkrabbe';
+
+  @override
+  String get species_candy_crab_desc =>
+      'Winzige farbige Krabbe, die mit rosa oder gelben Stachelfortsätzen ihrer Wirtsweichkoralle gleicht.';
+
+  @override
+  String get species_spider_crab_name => 'Dekorateur-Spinnenkrabbe';
+
+  @override
+  String get species_spider_crab_desc =>
+      'Langsame Krabbe, die sich zur Tarnung mit angehefteten Schwämmen und Algen bedeckt.';
+
+  @override
+  String get species_anemone_shrimp_name => 'Prachtanemonen-Garnele';
+
+  @override
+  String get species_anemone_shrimp_desc =>
+      'Durchsichtige Garnele mit weißen und violetten Zeichnungen, die zwischen Anemonententakeln lebt.';
+
+  @override
+  String get species_snapping_shrimp_name => 'Knallkrebs';
+
+  @override
+  String get species_snapping_shrimp_desc =>
+      'Kleiner Krebs, der mit seiner übergroßen Schere ein lautes Knallen erzeugt, oft in Partnerschaft mit Grundeln.';
+
+  @override
+  String get species_glass_sponge_name => 'Venuskörbchen';
+
+  @override
+  String get species_glass_sponge_desc =>
+      'Zarter Glasschwamm mit filigranem Kieselskelett, im tiefen Wasser zu finden.';
+
+  @override
+  String get species_toxic_sea_urchin_name => 'Blumenseeigel';
+
+  @override
+  String get species_toxic_sea_urchin_desc =>
+      'Trügerisch hübscher Seeigel, bedeckt mit blütenartigen Pedicellarien und hochwirksamem Gift.';
+
+  @override
+  String get species_slate_pencil_urchin_name => 'Schiefergriffel-Seeigel';
+
+  @override
+  String get species_slate_pencil_urchin_desc =>
+      'Seeigel mit dicken, abgerundeten Stacheln auf Riffuntergründen der Karibik und des Atlantiks.';
+
+  @override
+  String get species_spiny_sea_star_name => 'Dorniger Seestern';
+
+  @override
+  String get species_spiny_sea_star_desc =>
+      'Großer Seestern der gemäßigten Zonen mit auffälligen Stacheln, in europäischen und atlantischen Gewässern.';
+
+  @override
+  String get species_bat_star_name => 'Fledermaus-Seestern';
+
+  @override
+  String get species_bat_star_desc =>
+      'Pazifischer Seestern mit häutig verbundenen Armen in Orange, Rot oder Violett, in Kelpwäldern zu finden.';
+
+  @override
+  String get species_sunflower_star_name => 'Sonnenblumenstern';
+
+  @override
+  String get species_sunflower_star_desc =>
+      'Gewaltiger, schnell kriechender Seestern mit bis zu 24 Armen in den Kelpwäldern des Pazifiks.';
+
+  @override
+  String get species_blood_star_name => 'Blutstern';
+
+  @override
+  String get species_blood_star_desc =>
+      'Leuchtend rotoranger Seestern mit schlanken Armen in den gemäßigten Gewässern des Pazifiks.';
+
+  @override
+  String get species_common_cuttlefish_name => 'Gemeine Sepia';
+
+  @override
+  String get species_common_cuttlefish_desc =>
+      'Meister der Tarnung mit W-förmigen Pupillen, in europäischen Gewässern und im Mittelmeer.';
+
+  @override
+  String get species_blue_spotted_crab_name => 'Blaupunkt-Schwimmkrabbe';
+
+  @override
+  String get species_blue_spotted_crab_desc =>
+      'Bewegliche Schwimmkrabbe mit blauen Punkten auf dem Panzer, auf sandigen Böden des Indopazifiks.';
+
+  @override
+  String get species_sponge_crab_name => 'Schwammkrabbe';
+
+  @override
+  String get species_sponge_crab_desc =>
+      'Krabbe, die sich einen lebenden Schwamm zurechtschneidet und ihn zur Tarnung auf dem Rücken trägt.';
+
+  @override
+  String get species_horseshoe_crab_name => 'Pfeilschwanzkrebs';
+
+  @override
+  String get species_horseshoe_crab_desc =>
+      'Urtümlicher Gliederfüßer aus der Gruppe der Kieferklauenträger mit helmförmigem Panzer, auf Sandböden des Atlantiks.';
+
+  @override
+  String get species_sea_spider_name => 'Asselspinne';
+
+  @override
+  String get species_sea_spider_desc =>
+      'Zarter langbeiniger Meeresgliederfüßer, der auf Hydrozoen und Moostierchen umherkriecht.';
+
+  @override
+  String get species_sea_lily_name => 'Seelilie';
+
+  @override
+  String get species_sea_lily_desc =>
+      'Gestieltes lebendes Fossil aus der Gruppe der Haarsterne, das in tieferem Wasser mit befiederten Armen filtriert.';
+
+  @override
+  String get species_mantis_shrimp_lysiosquilla_name =>
+      'Speer-Fangschreckenkrebs';
+
+  @override
+  String get species_mantis_shrimp_lysiosquilla_desc =>
+      'Großer, im Sand grabender Fangschreckenkrebs mit Speerfangbeinen, auf sandigem Untergrund.';
+
+  @override
+  String get species_purple_sea_urchin_name => 'Violetter Seeigel';
+
+  @override
+  String get species_purple_sea_urchin_desc =>
+      'Häufiger violetter Seeigel in den Kelpwäldern und Felstümpeln des Pazifiks.';
+
+  @override
+  String get species_crown_jellyfish_name => 'Kronenqualle';
+
+  @override
+  String get species_crown_jellyfish_desc =>
+      'Tiefviolette Qualle mit kronenartig aufgewölbter Glocke, im Indopazifik verbreitet.';
+
+  @override
+  String get species_comb_jelly_name => 'Seestachelbeere';
+
+  @override
+  String get species_comb_jelly_desc =>
+      'Kleine biolumineszente Rippenqualle mit schillernden Wimpernreihen und zwei langen Tentakeln.';
+
+  @override
+  String get species_warty_sea_slug_name => 'Warzige Meeresschnecke';
+
+  @override
+  String get species_warty_sea_slug_desc =>
+      'Blau-schwarze Nacktschnecke mit gelb gekappten Höckern, häufig an Riffen des Indopazifiks zu sehen.';
+
+  @override
+  String get species_doris_nudibranch_name => 'Meereszitrone';
+
+  @override
+  String get species_doris_nudibranch_desc =>
+      'Gelb gefleckte Doridenschnecke der gemäßigten Pazifikgewässer, die sich von Schwämmen ernährt.';
+
+  @override
+  String get species_opalescent_nudibranch_name =>
+      'Opalisierende Nacktschnecke';
+
+  @override
+  String get species_opalescent_nudibranch_desc =>
+      'Durchscheinende Fadenschnecke mit leuchtend orangefarbenen Cerata und blauen Rückenlinien in pazifischen Gewässern.';
+
+  @override
+  String get species_clown_nudibranch_name => 'Clown-Nacktschnecke';
+
+  @override
+  String get species_clown_nudibranch_desc =>
+      'Rosaorange Nacktschnecke mit blauen und weißen Punkten in den gemäßigten Gewässern Australiens.';
+
+  @override
+  String get species_bottlenose_dolphin_name => 'Großer Tümmler';
+
+  @override
+  String get species_bottlenose_dolphin_desc =>
+      'Neugieriger und verspielter Delfin, dem Taucher in tropischen und gemäßigten Gewässern häufig begegnen.';
+
+  @override
+  String get species_spinner_dolphin_name => 'Spinnerdelfin';
+
+  @override
+  String get species_spinner_dolphin_desc =>
+      'Akrobatischer Delfin, bekannt für seine Drehsprünge, oft in großen Schulen nahe Korallenriffen.';
+
+  @override
+  String get species_common_dolphin_name => 'Gemeiner Delfin';
+
+  @override
+  String get species_common_dolphin_desc =>
+      'Schnell schwimmender Delfin mit markanter Sanduhrzeichnung, im offenen Ozean und in Küstengewässern.';
+
+  @override
+  String get species_spotted_dolphin_name => 'Atlantischer Fleckendelfin';
+
+  @override
+  String get species_spotted_dolphin_desc =>
+      'Zutraulicher Fleckendelfin, der sich Tauchern auf den Bahamas und in der Karibik häufig nähert.';
+
+  @override
+  String get species_rissos_dolphin_name => 'Rundkopfdelfin';
+
+  @override
+  String get species_rissos_dolphin_desc =>
+      'Großer Delfin mit stark vernarbtem grauem Körper, weltweit in tiefen Gewässern fernab der Küste.';
+
+  @override
+  String get species_humpback_whale_name => 'Buckelwal';
+
+  @override
+  String get species_humpback_whale_desc =>
+      'Majestätischer Wal, bekannt für seine Sprünge und komplexen Gesänge, auf saisonalen Wanderungen zu sehen.';
+
+  @override
+  String get species_grey_whale_name => 'Grauwal';
+
+  @override
+  String get species_grey_whale_desc =>
+      'Am Boden fressender Bartenwal, der entlang der Pazifikküste wandert und oft mit Seepocken bewachsen ist.';
+
+  @override
+  String get species_blue_whale_name => 'Blauwal';
+
+  @override
+  String get species_blue_whale_desc =>
+      'Das größte Tier, das je gelebt hat, gelegentlich von Tauchern im tiefen Blauwasser angetroffen.';
+
+  @override
+  String get species_sperm_whale_name => 'Pottwal';
+
+  @override
+  String get species_sperm_whale_desc =>
+      'Tieftauchender Wal mit gewaltigem Kopf, der zwischen den Tauchgängen mitunter an der Oberfläche ruht.';
+
+  @override
+  String get species_orca_name => 'Schwertwal';
+
+  @override
+  String get species_orca_desc =>
+      'Spitzenprädator mit markanter schwarz-weißer Zeichnung, in allen Ozeanbecken zu Hause.';
+
+  @override
+  String get species_minke_whale_name => 'Zwergwal';
+
+  @override
+  String get species_minke_whale_desc =>
+      'Kleinerer Bartenwal, der Tauchern gegenüber neugierig ist, besonders am Great Barrier Reef.';
+
+  @override
+  String get species_beluga_whale_name => 'Weißwal';
+
+  @override
+  String get species_beluga_whale_desc =>
+      'Weißer arktischer Wal, bekannt für seine Lautäußerungen und sein geselliges Verhalten in kalten Gewässern.';
+
+  @override
+  String get species_pilot_whale_name => 'Kurzflossen-Grindwal';
+
+  @override
+  String get species_pilot_whale_desc =>
+      'Geselliger, tieftauchender Wal, oft in großen Schulen in tropischen und warmgemäßigten Meeren.';
+
+  @override
+  String get species_false_killer_whale_name => 'Kleiner Schwertwal';
+
+  @override
+  String get species_false_killer_whale_desc =>
+      'Großer Hochseedelfin, der sich Tauchern im Freiwasser gelegentlich nähert.';
+
+  @override
+  String get species_dugong_name => 'Dugong';
+
+  @override
+  String get species_dugong_desc =>
+      'Sanfter Pflanzenfresser, der im Indopazifik Seegraswiesen abweidet, nah verwandt mit den Rundschwanzseekühen.';
+
+  @override
+  String get species_west_indian_manatee_name => 'Karibik-Manati';
+
+  @override
+  String get species_west_indian_manatee_desc =>
+      'Langsamer Pflanzenfresser in warmen Flachgewässern, Ästuaren und Quellen der Karibik.';
+
+  @override
+  String get species_sea_otter_name => 'Seeotter';
+
+  @override
+  String get species_sea_otter_desc =>
+      'Charismatisches Meeressäugetier in den Kelpwäldern entlang der Küste des Nordpazifiks.';
+
+  @override
+  String get species_california_sea_lion_name => 'Kalifornischer Seelöwe';
+
+  @override
+  String get species_california_sea_lion_desc =>
+      'Verspielter und wendiger Robbenverwandter, der entlang der Pazifikküste oft mit Tauchern spielt.';
+
+  @override
+  String get species_steller_sea_lion_name => 'Stellerscher Seelöwe';
+
+  @override
+  String get species_steller_sea_lion_desc =>
+      'Größte Seelöwenart, in den kalten Gewässern des Nordpazifiks nahe felsigen Küsten.';
+
+  @override
+  String get species_harbor_seal_name => 'Seehund';
+
+  @override
+  String get species_harbor_seal_desc =>
+      'Neugierige Robbe in gemäßigten Küstengewässern, die oft auf Felsen nahe Tauchplätzen ruht.';
+
+  @override
+  String get species_grey_seal_name => 'Kegelrobbe';
+
+  @override
+  String get species_grey_seal_desc =>
+      'Große verspielte Robbe des Nordatlantiks, bekannt dafür, sich Tauchern unter Wasser zu nähern.';
+
+  @override
+  String get species_northern_elephant_seal_name => 'Nördlicher See-Elefant';
+
+  @override
+  String get species_northern_elephant_seal_desc =>
+      'Gewaltige, tieftauchende Robbe, deren Männchen einen großen Rüssel tragen. Entlang der ostpazifischen Küste verbreitet.';
+
+  @override
+  String get species_hawaiian_monk_seal_name => 'Hawaii-Mönchsrobbe';
+
+  @override
+  String get species_hawaiian_monk_seal_desc =>
+      'Vom Aussterben bedrohte Robbe, endemisch auf Hawaii, gelegentlich von Tauchern an Riffen gesichtet.';
+
+  @override
+  String get species_leopard_seal_name => 'Seeleopard';
+
+  @override
+  String get species_leopard_seal_desc =>
+      'Kräftiger antarktischer Jäger mit geflecktem Fell, dem Kaltwassertaucher begegnen.';
+
+  @override
+  String get species_narwhal_name => 'Narwal';
+
+  @override
+  String get species_narwhal_desc =>
+      'Arktischer Wal mit langem spiralförmigem Stoßzahn, selten zu sehen, aber ikonisch unter den Meeressäugern.';
+
+  @override
+  String get species_green_sea_turtle_name => 'Suppenschildkröte';
+
+  @override
+  String get species_green_sea_turtle_desc =>
+      'Große Meeresschildkröte, die häufig beim Abweiden von Seegras in tropischen Gewässern zu sehen ist.';
+
+  @override
+  String get species_hawksbill_sea_turtle_name => 'Echte Karettschildkröte';
+
+  @override
+  String get species_hawksbill_sea_turtle_desc =>
+      'Riffbewohnende Schildkröte mit spitzem Schnabel, die zwischen Korallen Schwämme frisst.';
+
+  @override
+  String get species_loggerhead_sea_turtle_name => 'Unechte Karettschildkröte';
+
+  @override
+  String get species_loggerhead_sea_turtle_desc =>
+      'Großköpfige Schildkröte in gemäßigten und tropischen Meeren, oft nahe Felsriffen.';
+
+  @override
+  String get species_leatherback_sea_turtle_name => 'Lederschildkröte';
+
+  @override
+  String get species_leatherback_sea_turtle_desc =>
+      'Größte lebende Schildkröte mit biegsamem Lederpanzer, die in extreme Tiefen taucht.';
+
+  @override
+  String get species_olive_ridley_sea_turtle_name => 'Oliv-Bastardschildkröte';
+
+  @override
+  String get species_olive_ridley_sea_turtle_desc =>
+      'Kleinste Meeresschildkrötenart, bekannt für ihre synchronen Massenablagen, die Arribadas.';
+
+  @override
+  String get species_kemps_ridley_sea_turtle_name =>
+      'Atlantik-Bastardschildkröte';
+
+  @override
+  String get species_kemps_ridley_sea_turtle_desc =>
+      'Vom Aussterben bedrohte Meeresschildkröte, die vor allem im Golf von Mexiko vorkommt.';
+
+  @override
+  String get species_flatback_sea_turtle_name =>
+      'Australische Plattrückenschildkröte';
+
+  @override
+  String get species_flatback_sea_turtle_desc =>
+      'Endemisch in australischen Gewässern, erkennbar an ihrem flachen Panzer und ihrem küstennahen Lebensraum.';
+
+  @override
+  String get species_brain_coral_name => 'Hirnkoralle';
+
+  @override
+  String get species_brain_coral_desc =>
+      'Massive riffbildende Koralle mit gefurchter Oberfläche, die an ein Gehirn erinnert, häufig an karibischen Riffen.';
+
+  @override
+  String get species_staghorn_coral_name => 'Geweihkoralle';
+
+  @override
+  String get species_staghorn_coral_desc =>
+      'Schnell wachsende verzweigte Koralle, die dichte Dickichte bildet, ein entscheidender Lebensraum für Rifffische.';
+
+  @override
+  String get species_elkhorn_coral_name => 'Elchgeweihkoralle';
+
+  @override
+  String get species_elkhorn_coral_desc =>
+      'Große verzweigte Koralle mit flachen handförmigen Ästen, ein wichtiger Riffbildner der Karibik.';
+
+  @override
+  String get species_table_coral_name => 'Tischkoralle';
+
+  @override
+  String get species_table_coral_desc =>
+      'Flach plattenbildende Koralle an Riffen des Indopazifiks, die vielen Fischarten Schutz bietet.';
+
+  @override
+  String get species_mushroom_coral_name => 'Pilzkoralle';
+
+  @override
+  String get species_mushroom_coral_desc =>
+      'Frei lebende Einzelkoralle in Scheibenform, auf Sandflächen nahe Riffen des Indopazifiks.';
+
+  @override
+  String get species_bubble_coral_name => 'Blasenkoralle';
+
+  @override
+  String get species_bubble_coral_desc =>
+      'Markante Koralle mit traubenartigen Bläschen, die sich tagsüber aufblähen, um Licht einzufangen.';
+
+  @override
+  String get species_plate_coral_name => 'Plattenkoralle';
+
+  @override
+  String get species_plate_coral_desc =>
+      'Dünn plattenbildende Koralle, die gewundene Stufen formt, häufig an den Riffhängen des Indopazifiks.';
+
+  @override
+  String get species_pillar_coral_name => 'Säulenkoralle';
+
+  @override
+  String get species_pillar_coral_desc =>
+      'Seltene aufrecht wachsende Koralle, die hohe Säulen bildet, in der Karibik verbreitet.';
+
+  @override
+  String get species_star_coral_name => 'Sternkoralle';
+
+  @override
+  String get species_star_coral_desc =>
+      'Wichtiger karibischer Riffbildner, der große felsblockartige Kolonien mit sternförmigen Polypen formt.';
+
+  @override
+  String get species_lettuce_coral_name => 'Salatkoralle';
+
+  @override
+  String get species_lettuce_coral_desc =>
+      'Dünn plattenbildende Koralle mit blattartigen Falten, häufig an karibischen Riffwänden und Riffhängen.';
+
+  @override
+  String get species_finger_coral_name => 'Fingerkoralle';
+
+  @override
+  String get species_finger_coral_desc =>
+      'Robuste verzweigte Koralle mit dicken fingerartigen Fortsätzen an flachen Riffen.';
+
+  @override
+  String get species_massive_porites_name => 'Massive Porites-Koralle';
+
+  @override
+  String get species_massive_porites_desc =>
+      'Große Blockkoralle, die Jahrhunderte alt werden kann, ein dominierender Riffbildner im Indopazifik.';
+
+  @override
+  String get species_cauliflower_coral_name => 'Blumenkohlkoralle';
+
+  @override
+  String get species_cauliflower_coral_desc =>
+      'Kompakte verzweigte Koralle in Blumenkohlform, weit verbreitet im flachen Wasser tropischer Riffe.';
+
+  @override
+  String get species_flower_pot_coral_name => 'Blumentopfkoralle';
+
+  @override
+  String get species_flower_pot_coral_desc =>
+      'Kolonie langtentakliger Polypen, die sich tagsüber ausstrecken und an einen Blumenstrauß erinnern.';
+
+  @override
+  String get species_cup_coral_name => 'Orange Kelchkoralle';
+
+  @override
+  String get species_cup_coral_desc =>
+      'Leuchtend orangefarbene, nicht photosynthetische Koralle an Wänden und unter Überhängen tropischer Gewässer.';
+
+  @override
+  String get species_scroll_coral_name => 'Schriftrollenkoralle';
+
+  @override
+  String get species_scroll_coral_desc =>
+      'Koralle, die große eingerollte Platten bildet, häufig an Riffhängen und in Lagunen des Indopazifiks.';
+
+  @override
+  String get species_cabbage_coral_name => 'Kohlkoralle';
+
+  @override
+  String get species_cabbage_coral_desc =>
+      'Scheibenförmig plattenbildende Koralle, die an Kohlblätter erinnert, in geschützten Riffbereichen.';
+
+  @override
+  String get species_hammer_coral_name => 'Hammerkoralle';
+
+  @override
+  String get species_hammer_coral_desc =>
+      'Großpolypige Koralle mit anker- oder hammerförmigen Tentakelspitzen, beliebt an Riffen des Indopazifiks.';
+
+  @override
+  String get species_torch_coral_name => 'Fackelkoralle';
+
+  @override
+  String get species_torch_coral_desc =>
+      'Verzweigte Koralle mit langen wogenden Tentakeln, die in leuchtenden Knollen enden.';
+
+  @override
+  String get species_frogspawn_coral_name => 'Froschlaichkoralle';
+
+  @override
+  String get species_frogspawn_coral_desc =>
+      'Großpolypige Koralle mit verzweigten Tentakelspitzen, die an Froschlaich erinnern.';
+
+  @override
+  String get species_sea_fan_name => 'Gemeine Fächergorgonie';
+
+  @override
+  String get species_sea_fan_desc =>
+      'Flache fächerförmige Gorgonie, quer zur Strömung ausgerichtet, ikonisch an karibischen Riffen.';
+
+  @override
+  String get species_venus_sea_fan_name => 'Venus-Fächergorgonie';
+
+  @override
+  String get species_venus_sea_fan_desc =>
+      'Zarte fächerförmige Gorgonie an flachen karibischen Riffen mit mäßiger Strömung.';
+
+  @override
+  String get species_deepwater_sea_fan_name => 'Tiefwasser-Fächergorgonie';
+
+  @override
+  String get species_deepwater_sea_fan_desc =>
+      'Große buschige Gorgonie an tiefen Riffwänden der Karibik.';
+
+  @override
+  String get species_sea_whip_name => 'Peitschengorgonie';
+
+  @override
+  String get species_sea_whip_desc =>
+      'Schlanke stabförmige Gorgonie, die sich in der Strömung an atlantischen und karibischen Riffen wiegt.';
+
+  @override
+  String get species_sea_plume_name => 'Federgorgonie';
+
+  @override
+  String get species_sea_plume_desc =>
+      'Hohe befiederte Gorgonie, die federbuschartige Kolonien auf karibischen Riffdächern bildet.';
+
+  @override
+  String get species_organ_pipe_coral_name => 'Orgelkoralle';
+
+  @override
+  String get species_organ_pipe_coral_desc =>
+      'Leuchtend rote Skelettröhren mit zarten Polypen, an geschützten Riffen des Indopazifiks.';
+
+  @override
+  String get species_leather_coral_name => 'Lederkoralle';
+
+  @override
+  String get species_leather_coral_desc =>
+      'Weichkoralle mit glatter, lederartiger Oberfläche, die große pilzförmige Kolonien bildet.';
+
+  @override
+  String get species_toadstool_leather_coral_name => 'Pilz-Lederkoralle';
+
+  @override
+  String get species_toadstool_leather_coral_desc =>
+      'Weichkoralle mit dickem Stiel und flachem Schirm, häufig auf den Riffdächern des Indopazifiks.';
+
+  @override
+  String get species_pulsing_xenia_name => 'Pulsierende Xenia';
+
+  @override
+  String get species_pulsing_xenia_desc =>
+      'Weichkoralle mit rhythmisch pulsierenden Polypen, in geschützten Gewässern des Indopazifiks.';
+
+  @override
+  String get species_tree_coral_name => 'Baumkoralle';
+
+  @override
+  String get species_tree_coral_desc =>
+      'Leuchtende Weichkoralle, die an Wänden und unter Überhängen im Roten Meer baumartige Büschel bildet.';
+
+  @override
+  String get species_blue_coral_name => 'Blaue Koralle';
+
+  @override
+  String get species_blue_coral_desc =>
+      'Einzigartige Oktokoralle mit blauem Skelett, auf flachen Riffdächern des Indopazifiks.';
+
+  @override
+  String get species_black_coral_name => 'Schwarze Koralle';
+
+  @override
+  String get species_black_coral_desc =>
+      'Tiefwasserkoralle mit dunklem Skelett, an Wänden und Abbrüchen unterhalb von 30 Metern.';
+
+  @override
+  String get species_carnation_coral_name => 'Nelkenkoralle';
+
+  @override
+  String get species_carnation_coral_desc =>
+      'Leuchtend gefärbte Weichkoralle unter Überhängen und an Wänden im Indopazifik.';
+
+  @override
+  String get species_wire_coral_name => 'Drahtkoralle';
+
+  @override
+  String get species_wire_coral_desc =>
+      'Lange spiralige Schwarze Koralle, die gewundene Peitschen bildet und Grundeln und Garnelen beherbergt.';
+
+  @override
+  String get species_dead_mans_fingers_name => 'Tote Meerhand';
+
+  @override
+  String get species_dead_mans_fingers_desc =>
+      'Fleischige Weichkoralle mit fingerartigen Lappen, häufig an gemäßigten Riffen des Nordatlantiks.';
+
+  @override
+  String get species_sun_coral_name => 'Sonnenkoralle';
+
+  @override
+  String get species_sun_coral_desc =>
+      'Gelborange, nicht photosynthetische Koralle, die nachts an den Wänden des Indopazifiks ihre Polypen öffnet.';
+
+  @override
+  String get species_lace_coral_name => 'Spitzenkoralle';
+
+  @override
+  String get species_lace_coral_desc =>
+      'Zarte rosafarbene Hydrokoralle mit spitzenartigen Ästen, in Spalten und unter Überhängen.';
+
+  @override
+  String get species_kenya_tree_coral_name => 'Kenia-Baumkoralle';
+
+  @override
+  String get species_kenya_tree_coral_desc =>
+      'Robuste Weichkoralle mit baumartigen Ästen, im Indopazifik häufig.';
+
+  @override
+  String get species_colt_coral_name => 'Colt-Koralle';
+
+  @override
+  String get species_colt_coral_desc =>
+      'Weichkoralle mit dicken, gummiartigen Ästen voller kleiner Polypen an Riffen des Indopazifiks.';
+
+  @override
+  String get species_turtle_grass_name => 'Schildkrötengras';
+
+  @override
+  String get species_turtle_grass_desc =>
+      'Vorherrschendes karibisches Seegras mit breiten flachen Halmen, eine wichtige Nahrungsquelle für Meeresschildkröten.';
+
+  @override
+  String get species_eelgrass_name => 'Gemeines Seegras';
+
+  @override
+  String get species_eelgrass_desc =>
+      'Seegras der gemäßigten Zonen, das dichte Unterwasserwiesen bildet und als Kinderstube dient.';
+
+  @override
+  String get species_manatee_grass_name => 'Manatigras';
+
+  @override
+  String get species_manatee_grass_desc =>
+      'Seegras mit zylindrischen Halmen in sandigen Bereichen der Karibik, oft nahe Schildkrötengraswiesen.';
+
+  @override
+  String get species_shoal_grass_name => 'Schmalblättriges Seegras';
+
+  @override
+  String get species_shoal_grass_desc =>
+      'Als Pionier auftretendes Seegras mit schmalen Halmen, das gestörte Sandflächen in der Karibik besiedelt.';
+
+  @override
+  String get species_paddle_grass_name => 'Paddelgras';
+
+  @override
+  String get species_paddle_grass_desc =>
+      'Kleines zartes Seegras mit ovalen Blättern, in tieferen Gewässern der Tropen.';
+
+  @override
+  String get species_neptune_grass_name => 'Neptungras';
+
+  @override
+  String get species_neptune_grass_desc =>
+      'Mediterranes Seegras, das ausgedehnte Wiesen bildet und für die Küstenökosysteme entscheidend ist.';
+
+  @override
+  String get species_giant_kelp_name => 'Riesentang';
+
+  @override
+  String get species_giant_kelp_desc =>
+      'Bildet bis zu 60 Meter hohe Unterwasserwälder und steht sinnbildlich für das Tauchen in Kalifornien.';
+
+  @override
+  String get species_bull_kelp_name => 'Riesenblasentang';
+
+  @override
+  String get species_bull_kelp_desc =>
+      'Pazifischer Tang mit einem einzelnen langen Stiel und blasenförmigem Schwimmkörper, der dichte Kronendächer bildet.';
+
+  @override
+  String get species_bladder_wrack_name => 'Blasentang';
+
+  @override
+  String get species_bladder_wrack_desc =>
+      'Häufige Braunalge mit paarigen Luftblasen, in den Gezeitenzonen des Nordatlantiks.';
+
+  @override
+  String get species_sargassum_name => 'Beerentang';
+
+  @override
+  String get species_sargassum_desc =>
+      'Frei treibende Braunalge, die Teppiche bildet, in denen Jungfische und Wirbellose Schutz finden.';
+
+  @override
+  String get species_kelp_forest_ecklonia_name => 'Ecklonia-Kelp';
+
+  @override
+  String get species_kelp_forest_ecklonia_desc =>
+      'Vorherrschender Kelp in den Gewässern der Südhalbkugel, der bedeutende Unterwasserwälder bildet.';
+
+  @override
+  String get species_coralline_algae_name => 'Kalkrotalgen';
+
+  @override
+  String get species_coralline_algae_desc =>
+      'Hart verkrustende Rotalge, die Riffstrukturen verkittet und den Riffen einen rosafarbenen Ton verleiht.';
+
+  @override
+  String get species_irish_moss_name => 'Knorpeltang';
+
+  @override
+  String get species_irish_moss_desc =>
+      'Fächerförmige Rotalge an den Felsküsten der Gezeitenzone des Nordatlantiks.';
+
+  @override
+  String get species_dulse_name => 'Lappentang';
+
+  @override
+  String get species_dulse_desc =>
+      'Flache rotviolette Alge, die auf Felsen und Kelpstielen in kalten nördlichen Gewässern wächst.';
+
+  @override
+  String get species_halimeda_name => 'Halimeda-Kalkalge';
+
+  @override
+  String get species_halimeda_desc =>
+      'Verkalkte Grünalge mit scheibenförmigen Segmenten, ein wichtiger Lieferant von Riffsand.';
+
+  @override
+  String get species_sea_lettuce_name => 'Meersalat';
+
+  @override
+  String get species_sea_lettuce_desc =>
+      'Leuchtend grüne, blattartige Alge in flachen Küstengewässern weltweit.';
+
+  @override
+  String get species_caulerpa_name => 'Meerestraube';
+
+  @override
+  String get species_caulerpa_desc =>
+      'Kriechende Grünalge mit traubenartigen Wedeln, auf Korallenschutt und Sand tropischer Riffe.';
+
+  @override
+  String get species_mermaid_fan_name => 'Meerjungfrauenfächer';
+
+  @override
+  String get species_mermaid_fan_desc =>
+      'Verkalkte Grünalge in Form eines kleinen Fächers, häufig auf karibischen Sandböden.';
+
+  @override
+  String get species_shaving_brush_algae_name => 'Rasierpinselalge';
+
+  @override
+  String get species_shaving_brush_algae_desc =>
+      'Verkalkte Grünalge mit pinselartigem Büschel auf einem Stiel, auf karibischen Sandböden.';
+
+  @override
+  String get species_finger_kelp_name => 'Fingertang';
+
+  @override
+  String get species_finger_kelp_desc =>
+      'Braunalge mit fingerartigen Wedeln, die in den Küstengewässern des Nordatlantiks Tangwälder bildet.';
+
+  @override
+  String get species_banded_sea_krait_name => 'Gebänderter Plattschwanz';
+
+  @override
+  String get species_banded_sea_krait_desc =>
+      'Giftige Seeschlange mit blaugrauen und schwarzen Binden, friedlich und häufig an Riffen des Indopazifiks zu sehen.';
+
+  @override
+  String get species_olive_sea_snake_name => 'Olivgrüne Seeschlange';
+
+  @override
+  String get species_olive_sea_snake_desc =>
+      'Neugierige Seeschlange an australischen Riffen, bekannt dafür, sich Tauchern zu nähern.';
+
+  @override
+  String get species_yellow_bellied_sea_snake_name => 'Gelbbauch-Seeschlange';
+
+  @override
+  String get species_yellow_bellied_sea_snake_desc =>
+      'Pelagische Seeschlange mit gelber Unterseite, die am weitesten verbreitete Schlangenart der Erde.';
+
+  @override
+  String get species_marine_iguana_name => 'Meerechse';
+
+  @override
+  String get species_marine_iguana_desc =>
+      'Endemisch auf Galapagos, die einzige Echse, die unter Wasser nach Algen sucht.';
+
+  @override
+  String get species_saltwater_crocodile_name => 'Leistenkrokodil';
+
+  @override
+  String get species_saltwater_crocodile_desc =>
+      'Größtes lebendes Reptil, in Küsten- und Ästuargewässern des Indopazifiks.';
+
+  @override
+  String get common_action_done => 'Fertig';
+
+  @override
+  String get common_action_more => 'Mehr';
+
+  @override
+  String get common_label_displayName => 'Anzeigename';
+
+  @override
+  String common_relativeTime_daysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'vor ${count}T',
+      one: 'vor ${count}T',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_hoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'vor ${count}Std',
+      one: 'vor ${count}Std',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_inDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'in ${count}T',
+      one: 'in ${count}T',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_inHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'in ${count}Std',
+      one: 'in ${count}Std',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_inLessThanMinute => 'in <1Min';
+
+  @override
+  String common_relativeTime_inMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'in ${count}Min',
+      one: 'in ${count}Min',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_justNow => 'gerade eben';
+
+  @override
+  String common_relativeTime_minutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'vor ${count}Min',
+      one: 'vor ${count}Min',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_monthsAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'vor ${count}Mon',
+      one: 'vor ${count}Mon',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_overdue => 'überfällig';
+
+  @override
+  String get media_cache_calculating => 'Cache-Größe wird berechnet…';
+
+  @override
+  String get media_cache_cardTitle => 'Cache-Verwaltung';
+
+  @override
+  String get media_cache_clearAction => 'Cache leeren';
+
+  @override
+  String get media_cache_clearBody =>
+      'Entfernt heruntergeladene Miniaturansichten und Netzwerkbilder in voller Größe. Verknüpfte Medieneinträge bleiben erhalten; Bilder werden beim nächsten Anzeigen erneut heruntergeladen.';
+
+  @override
+  String get media_cache_clearConfirm => 'Leeren';
+
+  @override
+  String media_cache_clearError(String error) {
+    return 'Leeren fehlgeschlagen: $error';
+  }
+
+  @override
+  String get media_cache_clearTitle => 'Netzwerkbild-Cache leeren?';
+
+  @override
+  String get media_cache_cleared => 'Cache geleert';
+
+  @override
+  String get media_cache_diskCache => 'Festplatten-Cache';
+
+  @override
+  String media_cache_error(String error) {
+    return 'Fehler: $error';
+  }
+
+  @override
+  String get media_credentials_actionTest => 'Zugangsdaten testen';
+
+  @override
+  String media_credentials_authLabel(String authType) {
+    return 'Auth: $authType';
+  }
+
+  @override
+  String get media_credentials_deleteBody =>
+      'Entfernt die gespeicherten Zugangsdaten. Über diesen Host verknüpfte Elemente zeigen „Zum Anzeigen anmelden“, bis du sie erneut hinzufügst.';
+
+  @override
+  String media_credentials_deleteError(String error) {
+    return 'Löschen fehlgeschlagen: $error';
+  }
+
+  @override
+  String media_credentials_deleteTitle(String host) {
+    return '$host löschen?';
+  }
+
+  @override
+  String media_credentials_deleted(String host) {
+    return '$host gelöscht';
+  }
+
+  @override
+  String media_credentials_editTitle(String host) {
+    return '$host bearbeiten';
+  }
+
+  @override
+  String get media_credentials_emptySubtitle =>
+      'Host-spezifische Zugangsdaten, die beim URL- oder Manifest-Import hinzugefügt werden, erscheinen hier.';
+
+  @override
+  String get media_credentials_emptyTitle => 'Keine gespeicherten Zugangsdaten';
+
+  @override
+  String media_credentials_lastUsed(String when) {
+    return 'Zuletzt verwendet $when';
+  }
+
+  @override
+  String get media_credentials_loadError =>
+      'Gespeicherte Hosts konnten nicht geladen werden';
+
+  @override
+  String get media_credentials_loading =>
+      'Gespeicherte Hosts werden geladen...';
+
+  @override
+  String media_credentials_saveError(String error) {
+    return 'Speichern fehlgeschlagen: $error';
+  }
+
+  @override
+  String get media_credentials_savedHostsTitle => 'Gespeicherte Hosts';
+
+  @override
+  String media_credentials_testError(String error) {
+    return 'Test fehlgeschlagen: $error';
+  }
+
+  @override
+  String media_credentials_testFailed(String host) {
+    return 'Zugangsdaten für $host fehlgeschlagen';
+  }
+
+  @override
+  String media_credentials_testOk(String host) {
+    return 'Zugangsdaten für $host OK';
+  }
+
+  @override
+  String get media_manifest_actionPollNow => 'Jetzt abrufen';
+
+  @override
+  String get media_manifest_cardTitle => 'Manifest-Abonnements';
+
+  @override
+  String get media_manifest_deleteBody =>
+      'Entfernt das Abonnement. Bereits importierte Einträge bleiben erhalten (du kannst sie über die Warteschlange verwaister Elemente bereinigen).';
+
+  @override
+  String media_manifest_deleteError(String error) {
+    return 'Löschen fehlgeschlagen: $error';
+  }
+
+  @override
+  String media_manifest_deleteTitle(String name) {
+    return '$name löschen?';
+  }
+
+  @override
+  String get media_manifest_editTitle => 'Abonnement bearbeiten';
+
+  @override
+  String get media_manifest_emptySubtitle =>
+      'Abonniere im URL-Tab ein Atom/RSS-, JSON- oder CSV-Manifest, um deine Mediathek synchron zu halten.';
+
+  @override
+  String get media_manifest_emptyTitle => 'Keine Manifest-Abonnements';
+
+  @override
+  String media_manifest_lastError(String error) {
+    return 'Letzter Fehler: $error';
+  }
+
+  @override
+  String media_manifest_lastPolled(String when) {
+    return 'Zuletzt abgerufen $when';
+  }
+
+  @override
+  String get media_manifest_loadError =>
+      'Abonnements konnten nicht geladen werden';
+
+  @override
+  String get media_manifest_loading => 'Abonnements werden geladen...';
+
+  @override
+  String get media_manifest_neverPolled => 'Nie abgerufen';
+
+  @override
+  String media_manifest_nextPoll(String when) {
+    return 'Nächster Abruf $when';
+  }
+
+  @override
+  String get media_manifest_notFound => 'Abonnement nicht gefunden';
+
+  @override
+  String media_manifest_pollError(String error) {
+    return 'Abruf fehlgeschlagen: $error';
+  }
+
+  @override
+  String media_manifest_polled(String name) {
+    return '$name abgerufen';
+  }
+
+  @override
+  String media_manifest_polling(String name) {
+    return '$name wird abgerufen...';
+  }
+
+  @override
+  String media_manifest_saveError(String error) {
+    return 'Speichern fehlgeschlagen: $error';
+  }
+
+  @override
+  String media_manifest_updateError(String error) {
+    return 'Aktualisierung nicht möglich: $error';
+  }
+
+  @override
+  String get media_manifest_urlLabel => 'Manifest-URL';
+
+  @override
+  String media_scan_failed(String error) {
+    return 'Scan fehlgeschlagen: $error';
+  }
+
+  @override
+  String media_scan_progressItems(int done, int total) {
+    return '$done / $total Elemente';
+  }
+
+  @override
+  String media_scan_progressReachability(int available, int unreachable) {
+    return '$available erreichbar  ·  $unreachable nicht erreichbar';
+  }
+
+  @override
+  String media_scan_summary(
+    int total,
+    String seconds,
+    int available,
+    int unreachable,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other:
+          '$total Elemente in ${seconds}s gescannt: $available erreichbar, $unreachable nicht erreichbar',
+      one:
+          '$total Element in ${seconds}s gescannt: $available erreichbar, $unreachable nicht erreichbar',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_scan_summarySkipped(String base, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count übersprungen (keine URL)',
+      one: '$count übersprungen (keine URL)',
+    );
+    return '$base, $_temp0';
+  }
+
+  @override
+  String get media_scan_title => 'Alle Netzwerkmedien scannen';
+
+  @override
+  String get settings_mediaSources_androidUriTitle =>
+      'Android-URI-Berechtigungen';
+
+  @override
+  String settings_mediaSources_androidUriUsage(int used, int limit) {
+    return '$used / $limit dauerhafte URIs in Verwendung';
+  }
+
+  @override
+  String get settings_mediaSources_counting => 'Wird gezählt…';
+
+  @override
+  String settings_mediaSources_error(String error) {
+    return 'Fehler: $error';
+  }
+
+  @override
+  String get settings_mediaSources_loading => 'Wird geladen…';
+
+  @override
+  String settings_mediaSources_localFilesCounts(
+    int available,
+    int unavailable,
+  ) {
+    return '$available verfügbar, $unavailable nicht verfügbar';
+  }
+
+  @override
+  String get settings_mediaSources_photoLibrarySubtitle =>
+      'Apple Photos / Google Photos / iCloud';
+
+  @override
+  String get settings_mediaSources_reverifyAll =>
+      'Alle lokalen Dateien erneut prüfen';
+
+  @override
+  String settings_mediaSources_reverifyFailed(String error) {
+    return 'Erneute Prüfung fehlgeschlagen: $error';
+  }
+
+  @override
+  String settings_mediaSources_reverifyResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente aktualisiert',
+      one: '$count Element aktualisiert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_mediaSources_title => 'Medienquellen';
+
+  @override
+  String get settings_networkSources_scanDescription =>
+      'Prüft jedes über URL oder Manifest importierte Foto erneut bei seinem Host. Nicht erreichbare Elemente werden markiert, sodass sie in deiner Mediathek als „fehlend“ erscheinen und bereinigt werden können.';
+
+  @override
+  String statistics_conditions_entryMethod_semanticLabel(String description) {
+    return 'Balkendiagramm. Einstiegsmethoden. $description';
+  }
+
+  @override
+  String statistics_conditions_visibility_semanticLabel(String description) {
+    return 'Kreisdiagramm. Sichtverteilung. $description';
+  }
+
+  @override
+  String statistics_conditions_waterType_semanticLabel(String description) {
+    return 'Kreisdiagramm. Verteilung der Wasserarten. $description';
+  }
+
+  @override
+  String statistics_progression_divesBySuitThickness_semanticLabel(
+    String description,
+  ) {
+    return 'Balkendiagramm. Tauchgänge nach Anzugdicke. $description';
+  }
+
+  @override
+  String statistics_progression_divesPerYear_countInYear(
+    int count,
+    String year,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge in $year',
+      one: '1 Tauchgang in $year',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String statistics_progression_divesPerYear_semanticLabel(String description) {
+    return 'Balkendiagramm. Tauchgänge pro Jahr. $description';
+  }
+
+  @override
+  String get statistics_records_unavailable => 'Rekorde nicht verfügbar';
+
+  @override
+  String statistics_summary_depthBucket_over(String min, String unit) {
+    return '$min$unit+';
+  }
+
+  @override
+  String statistics_summary_depthBucket_range(
+    String min,
+    String max,
+    String unit,
+  ) {
+    return '$min-$max$unit';
+  }
+
+  @override
+  String get statistics_summary_distributions_title => 'Verteilungen';
+
+  @override
+  String get statistics_summary_diveTypes_error =>
+      'Daten zu Tauchgangarten können nicht geladen werden';
+
+  @override
+  String get statistics_summary_diveTypes_unknown => 'Unbekannt';
+
+  @override
+  String get statistics_summary_divesPerMonth => 'Tauchgänge / Monat';
+
+  @override
+  String get statistics_summary_divesPerYear => 'Tauchgänge / Jahr';
+
+  @override
+  String statistics_timePatterns_dayOfWeek_semanticLabel(String description) {
+    return 'Balkendiagramm. Tauchgänge nach Wochentag. $description';
+  }
+
+  @override
+  String statistics_timePatterns_seasonal_semanticLabel(String description) {
+    return 'Balkendiagramm. Tauchgänge nach Monat. $description';
+  }
+
+  @override
+  String statistics_timePatterns_surfaceInterval_statLabel(
+    String label,
+    String value,
+  ) {
+    return 'Oberflächenintervall $label: $value';
+  }
+
+  @override
+  String get statistics_timePatterns_timeOfDay_afternoon => 'Nachmittag';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_evening => 'Abend';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_morning => 'Morgen';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_night => 'Nacht';
+
+  @override
+  String statistics_timePatterns_timeOfDay_semanticLabel(String description) {
+    return 'Kreisdiagramm. Tauchgänge nach Tageszeit. $description';
+  }
+
+  @override
+  String get columnConfig_displayOptions => 'Anzeigeoptionen';
+
+  @override
+  String get columnConfig_noExtraFields =>
+      'Keine zusätzlichen Felder konfiguriert. Fügen Sie unten Felder hinzu.';
+
+  @override
+  String get columnConfig_savePresetTitle => 'Voreinstellung speichern';
+
+  @override
+  String get columnConfig_section => 'Abschnitt';
+
+  @override
+  String get columnConfig_showTags => 'Tags anzeigen';
+
+  @override
+  String get columnConfig_showTags_subtitle =>
+      'Tag-Chips auf detaillierten Tauchgangskarten anzeigen';
+
+  @override
+  String get columnConfig_slot_date => 'Datum / Untertitel';
+
+  @override
+  String get columnConfig_slot_slot1 => 'Slot 1';
+
+  @override
+  String get columnConfig_slot_slot2 => 'Slot 2';
+
+  @override
+  String get columnConfig_slot_slot3 => 'Slot 3';
+
+  @override
+  String get columnConfig_slot_slot4 => 'Slot 4';
+
+  @override
+  String get columnConfig_slot_stat1 => 'Kennzahl 1';
+
+  @override
+  String get columnConfig_slot_stat2 => 'Kennzahl 2';
+
+  @override
+  String get columnConfig_slot_subtitle => 'Untertitel';
+
+  @override
+  String get columnConfig_slot_title => 'Titel';
+
+  @override
+  String get columnConfig_tooltip_columnSettings => 'Spalteneinstellungen';
+
+  @override
+  String get common_action_add => 'Hinzufügen';
+
+  @override
+  String get common_action_pin => 'Anheften';
+
+  @override
+  String get common_action_remove => 'Entfernen';
+
+  @override
+  String get common_action_unpin => 'Lösen';
+
+  @override
+  String diveLog_filterChip_dateRange(String end, String start) {
+    return '$start - $end';
+  }
+
+  @override
+  String diveLog_filterChip_equipmentCount(int count) {
+    return '$count Ausrüstungsteile';
+  }
+
+  @override
+  String get diveLog_filter_allComputers => 'Alle Computer';
+
+  @override
+  String get diveLog_filter_noComputersRegistered =>
+      'Keine Tauchcomputer registriert';
+
+  @override
+  String diveLog_filter_sectionDepthRangeUnit(String unit) {
+    return 'Tiefenbereich ($unit)';
+  }
+
+  @override
+  String get diveLog_filter_sectionDiveComputer => 'Tauchcomputer';
+
+  @override
+  String diveLog_listPage_semanticsDiveAtSite(int diveNumber, String siteName) {
+    return 'Tauchgang $diveNumber bei $siteName';
+  }
+
+  @override
+  String get enum_listViewMode_compact => 'Kompakt';
+
+  @override
+  String get enum_listViewMode_dense => 'Dicht';
+
+  @override
+  String get enum_listViewMode_detailed => 'Detailliert';
+
+  @override
+  String get enum_listViewMode_table => 'Tabelle';
+
+  @override
+  String get enum_profileMetric_ascentRate => 'Aufstiegsgeschwindigkeit';
+
+  @override
+  String get enum_profileMetric_cns => 'CNS%';
+
+  @override
+  String get enum_profileMetric_otu => 'OTU';
+
+  @override
+  String get enum_sortField_bottomTime => 'Grundzeit';
+
+  @override
+  String get enum_sortField_serviceDue => 'Wartung fällig';
+
+  @override
+  String get listViewMode_tooltip => 'Ansichtsmodus';
+
+  @override
+  String marineLife_speciesManage_errorLoading(Object error) {
+    return 'Fehler beim Laden der Arten: $error';
+  }
+
+  @override
+  String get settings_appearance_header_cards => 'Karten';
+
+  @override
+  String get settings_appearance_header_listView => 'Listenansicht';
+
+  @override
+  String get settings_appearance_header_tableMode => 'Tabellenmodus';
+
+  @override
+  String get settings_appearance_listFields_buddies =>
+      'Listenfelder für Tauchpartner';
+
+  @override
+  String get settings_appearance_listFields_certifications =>
+      'Listenfelder für Zertifizierungen';
+
+  @override
+  String get settings_appearance_listFields_courses => 'Listenfelder für Kurse';
+
+  @override
+  String get settings_appearance_listFields_diveCenters =>
+      'Listenfelder für Tauchcenter';
+
+  @override
+  String get settings_appearance_listFields_dives =>
+      'Listenfelder für Tauchgänge';
+
+  @override
+  String get settings_appearance_listFields_equipment =>
+      'Listenfelder für Ausrüstung';
+
+  @override
+  String get settings_appearance_listFields_sites =>
+      'Listenfelder für Tauchplätze';
+
+  @override
+  String get settings_appearance_listFields_subtitle =>
+      'Felder in Listenansichten anpassen';
+
+  @override
+  String get settings_appearance_listFields_trips => 'Listenfelder für Reisen';
+
+  @override
+  String get settings_appearance_listView_buddies =>
+      'Listenansicht Tauchpartner';
+
+  @override
+  String get settings_appearance_listView_buddies_subtitle =>
+      'Standardlayout für die Tauchpartnerliste';
+
+  @override
+  String get settings_appearance_listView_certifications =>
+      'Listenansicht Zertifizierungen';
+
+  @override
+  String get settings_appearance_listView_certifications_subtitle =>
+      'Standardlayout für die Zertifizierungsliste';
+
+  @override
+  String get settings_appearance_listView_courses => 'Listenansicht Kurse';
+
+  @override
+  String get settings_appearance_listView_courses_subtitle =>
+      'Standardlayout für die Kursliste';
+
+  @override
+  String get settings_appearance_listView_diveCenters =>
+      'Listenansicht Tauchcenter';
+
+  @override
+  String get settings_appearance_listView_diveCenters_subtitle =>
+      'Standardlayout für die Tauchcenterliste';
+
+  @override
+  String get settings_appearance_listView_dives => 'Listenansicht Tauchgänge';
+
+  @override
+  String get settings_appearance_listView_dives_subtitle =>
+      'Standardlayout für die Tauchgangsliste';
+
+  @override
+  String get settings_appearance_listView_equipment =>
+      'Listenansicht Ausrüstung';
+
+  @override
+  String get settings_appearance_listView_equipment_subtitle =>
+      'Standardlayout für die Ausrüstungsliste';
+
+  @override
+  String get settings_appearance_listView_sites => 'Listenansicht Tauchplätze';
+
+  @override
+  String get settings_appearance_listView_sites_subtitle =>
+      'Standardlayout für die Tauchplatzliste';
+
+  @override
+  String get settings_appearance_listView_trips => 'Listenansicht Reisen';
+
+  @override
+  String get settings_appearance_listView_trips_subtitle =>
+      'Standardlayout für die Reiseliste';
+
+  @override
+  String get settings_appearance_showDataSourceBadges =>
+      'Datenquellen-Badges anzeigen';
+
+  @override
+  String get settings_appearance_showDataSourceBadges_subtitle =>
+      'Quellenangabe bei Tauchgangswerten anzeigen';
+
+  @override
+  String get settings_appearance_title_buddies => 'Darstellung Tauchpartner';
+
+  @override
+  String get settings_appearance_title_certifications =>
+      'Darstellung Zertifizierungen';
+
+  @override
+  String get settings_appearance_title_courses => 'Darstellung Kurse';
+
+  @override
+  String get settings_appearance_title_diveCenters => 'Darstellung Tauchcenter';
+
+  @override
+  String get settings_appearance_title_dives => 'Darstellung Tauchgänge';
+
+  @override
+  String get settings_appearance_title_equipment => 'Darstellung Ausrüstung';
+
+  @override
+  String get settings_appearance_title_sites => 'Darstellung Tauchplätze';
+
+  @override
+  String get settings_appearance_title_trips => 'Darstellung Reisen';
+
+  @override
+  String get settings_cloudSync_troubleshoot_tileSubtitle =>
+      'Hängende Synchronisierung beheben oder Cloud-Speicher freigeben';
+
+  @override
+  String get settings_data_header_dataTools => 'Datenwerkzeuge';
+
+  @override
+  String get settings_decompression_ascentGasLabel => 'Aufstieg planen mit';
+
+  @override
+  String get settings_decompression_ascentGas_allCarried =>
+      'Alle mitgeführten Flaschen';
+
+  @override
+  String get settings_decompression_ascentGas_decoStage =>
+      'Deko-/Stage-Flasche + Rückengas';
+
+  @override
+  String get settings_decompression_cnsSource => 'CNS-Quelle';
+
+  @override
+  String get settings_decompression_decoStopSource => 'Quelle für Dekostopps';
+
+  @override
+  String get settings_decompression_header_ascent => 'Aufstiegsplanung';
+
+  @override
+  String get settings_decompression_header_ascent_subtitle =>
+      'Auf welche mitgeführten Flaschen der simulierte Aufstieg (TTS, Ceiling und Stopps) in der jeweiligen Tiefe wechseln darf. Berücksichtigt werden nur Gase, die im Tauchgang erfasst sind.';
+
+  @override
+  String get settings_decompression_header_dataSources =>
+      'Bevorzugte Datenquellen';
+
+  @override
+  String get settings_decompression_header_dataSources_subtitle =>
+      'Bei der Einstellung Tauchcomputer verwendet die App die vom Tauchcomputer gemeldeten Daten, sofern verfügbar. Liegen keine Computerdaten vor, werden berechnete Werte verwendet.';
+
+  @override
+  String get settings_decompression_ndlSource => 'NDL-Quelle';
+
+  @override
+  String get settings_decompression_sourceCalculated => 'Berechnet';
+
+  @override
+  String get settings_decompression_sourceComputer => 'Tauchcomputer';
+
+  @override
+  String get settings_decompression_ttsSource => 'TTS-Quelle';
+
+  @override
+  String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tauchgänge',
+      one: 'Tauchgang',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'Stunden',
+      one: 'Stunde',
+    );
+    return '$count $_temp0 um $hours $_temp1 angepasst.';
+  }
+
+  @override
+  String settings_fixDiveTimes_apply(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tauchgänge',
+      one: 'Tauchgang',
+    );
+    return 'Auf $count $_temp0 anwenden';
+  }
+
+  @override
+  String get settings_fixDiveTimes_clearRange => 'Datumsbereich löschen';
+
+  @override
+  String get settings_fixDiveTimes_confirmApply => 'Anwenden';
+
+  @override
+  String settings_fixDiveTimes_confirmBody(
+    int count,
+    String hours,
+    int hoursAbs,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tauchgänge',
+      one: 'Tauchgang',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'Stunden',
+      one: 'Stunde',
+    );
+    return 'Dadurch werden $count $_temp0 um $hours $_temp1 verschoben. Dies kann nicht automatisch rückgängig gemacht werden.';
+  }
+
+  @override
+  String get settings_fixDiveTimes_confirmTitle => 'Zeitverschiebung anwenden';
+
+  @override
+  String get settings_fixDiveTimes_dateRangeFilter => 'Datumsbereichsfilter';
+
+  @override
+  String get settings_fixDiveTimes_deselectAll => 'Alle abwählen';
+
+  @override
+  String get settings_fixDiveTimes_diveFallback => 'Tauchgang';
+
+  @override
+  String settings_fixDiveTimes_diveNumber(int number) {
+    return 'Tauchgang Nr. $number';
+  }
+
+  @override
+  String get settings_fixDiveTimes_empty => 'Keine Tauchgänge gefunden.';
+
+  @override
+  String get settings_fixDiveTimes_emptyFiltered =>
+      'Keine Tauchgänge in diesem Datumsbereich gefunden.';
+
+  @override
+  String get settings_fixDiveTimes_enterOffsetHint =>
+      'Geben Sie eine Stundenverschiebung ein';
+
+  @override
+  String get settings_fixDiveTimes_from => 'Von';
+
+  @override
+  String get settings_fixDiveTimes_hourOffset => 'Stundenverschiebung';
+
+  @override
+  String get settings_fixDiveTimes_hoursField => 'Stunden (z. B. +7, -5)';
+
+  @override
+  String settings_fixDiveTimes_loadError(String error) {
+    return 'Tauchgänge konnten nicht geladen werden: $error';
+  }
+
+  @override
+  String get settings_fixDiveTimes_noSelection =>
+      'Keine Tauchgänge ausgewählt.';
+
+  @override
+  String get settings_fixDiveTimes_offsetHint =>
+      'Geben Sie eine positive oder negative ganze Zahl ein, um die Tauchzeiten zu verschieben.';
+
+  @override
+  String settings_fixDiveTimes_preview(int count, String hours, int hoursAbs) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tauchgänge werden',
+      one: 'Tauchgang wird',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'Stunden',
+      one: 'Stunde',
+    );
+    return 'Vorschau: $count $_temp0 um $hours $_temp1 verschoben.';
+  }
+
+  @override
+  String get settings_fixDiveTimes_selectAll => 'Alle auswählen';
+
+  @override
+  String get settings_fixDiveTimes_selectDivesHint =>
+      'Tauchgänge zum Anwenden auswählen';
+
+  @override
+  String get settings_fixDiveTimes_subtitle =>
+      'Zeiten importierter Tauchgänge anpassen';
+
+  @override
+  String get settings_fixDiveTimes_title => 'Tauchzeiten korrigieren';
+
+  @override
+  String get settings_fixDiveTimes_to => 'Bis';
+
+  @override
+  String get settings_fixDiveTimes_zeroOffset =>
+      'Die Stundenverschiebung ist 0, es gibt nichts zu ändern.';
+
+  @override
+  String get settings_syncDevices_appBar_refreshTooltip => 'Aktualisieren';
+
+  @override
+  String get settings_syncDevices_appBar_title => 'Geräte auf diesem Backend';
+
+  @override
+  String get settings_syncDevices_empty =>
+      'Keine Synchronisierungsdateien auf diesem Backend.';
+
+  @override
+  String settings_syncDevices_readError(String error) {
+    return 'Das Backend konnte nicht gelesen werden.\n$error';
+  }
+
+  @override
+  String get settings_syncDevices_removal_noBackend =>
+      'Es ist kein Cloud-Backend konfiguriert';
+
+  @override
+  String get settings_syncDevices_removal_unreachable =>
+      'Das Backend war nicht erreichbar. Es wurde nichts entfernt.';
+
+  @override
+  String settings_syncDevices_removeDialog_bodyRisky(
+    int count,
+    String name,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Dadurch werden $count Dateien ($size) von $name gelöscht.\n\nDieses Gerät gehört weiterhin zu dieser Synchronisierung. Wenn es wieder online geht, baut es sich aus dem Backend neu auf, statt alte Daten wiederherzustellen, aber alle Änderungen, die es noch nicht veröffentlicht hat, gehen verloren. Ihre Tauchdaten auf DIESEM Gerät sind nicht betroffen.',
+      one:
+          'Dadurch wird 1 Datei ($size) von $name gelöscht.\n\nDieses Gerät gehört weiterhin zu dieser Synchronisierung. Wenn es wieder online geht, baut es sich aus dem Backend neu auf, statt alte Daten wiederherzustellen, aber alle Änderungen, die es noch nicht veröffentlicht hat, gehen verloren. Ihre Tauchdaten auf DIESEM Gerät sind nicht betroffen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_removeDialog_bodySafe(
+    int count,
+    String name,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Dadurch werden $count Dateien ($size) von $name gelöscht. Sie stammen noch aus einer Bibliothek, mit der sich kein Gerät mehr synchronisiert. Ihre Tauchdaten sind nicht betroffen.',
+      one:
+          'Dadurch wird 1 Datei ($size) von $name gelöscht. Sie stammt noch aus einer Bibliothek, mit der sich kein Gerät mehr synchronisiert. Ihre Tauchdaten sind nicht betroffen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_removeDialog_title(String name) {
+    return 'Dateien von $name entfernen?';
+  }
+
+  @override
+  String settings_syncDevices_removeProgressTitle(String name) {
+    return 'Dateien von $name werden entfernt';
+  }
+
+  @override
+  String get settings_syncDevices_removeTooltip =>
+      'Dateien dieses Geräts entfernen';
+
+  @override
+  String get settings_syncDevices_state_active => 'Synchronisiert normal';
+
+  @override
+  String get settings_syncDevices_state_retired => 'Ausgemustert';
+
+  @override
+  String get settings_syncDevices_state_staleEpoch =>
+      'Rest einer früheren Bibliothek, kein Gerät liest dies';
+
+  @override
+  String get settings_syncDevices_state_thisDevice => 'Dieses Gerät';
+
+  @override
+  String get settings_syncDevices_state_unreadable =>
+      'Kein lesbares Manifest, ein unvollständiger Upload oder verschlüsselt';
+
+  @override
+  String settings_syncDevices_summary(
+    int deviceCount,
+    int fileCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      deviceCount,
+      locale: localeName,
+      other: '$deviceCount Geräte',
+      one: '1 Gerät',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount Dateien',
+      one: '1 Datei',
+    );
+    return '$_temp0, $_temp1, $size';
+  }
+
+  @override
+  String settings_syncDevices_summary_removable(int count, String size) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Reste ersetzter oder ausgemusterter Bibliotheken, belegen $size.',
+      one:
+          '1 Rest einer ersetzten oder ausgemusterten Bibliothek, belegt $size.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_tile_filesSize(int count, String size) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Dateien',
+      one: '1 Datei',
+    );
+    return '$_temp0, $size';
+  }
+
+  @override
+  String settings_syncDevices_tile_filesSizeSeen(
+    int count,
+    String size,
+    String when,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Dateien',
+      one: '1 Datei',
+    );
+    return '$_temp0, $size, $when';
+  }
+
+  @override
+  String settings_syncDevices_unnamedDevice(String shortId) {
+    return 'Gerät $shortId';
+  }
+
+  @override
+  String get settings_syncMaintenance_keepAppOpen =>
+      'Lassen Sie die App geöffnet, bis dies abgeschlossen ist. Wenn Sie sie jetzt schließen, bleibt das Backend teilweise geleert und die nächste Synchronisierung muss von vorn beginnen.';
+
+  @override
+  String get settings_syncMaintenance_phase_clearingOldFiles =>
+      'Alte Dateien werden gelöscht';
+
+  @override
+  String get settings_syncMaintenance_phase_deleting => 'Wird gelöscht';
+
+  @override
+  String get settings_syncMaintenance_phase_publishingLibrary =>
+      'Bibliothek wird veröffentlicht';
+
+  @override
+  String get settings_syncMaintenance_phase_working => 'Wird ausgeführt...';
+
+  @override
+  String settings_syncMaintenance_progress_filesOfTotal(int done, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$done von $total Dateien',
+      one: '$done von 1 Datei',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_removedFiles(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Dateien entfernt',
+      one: '1 Datei entfernt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_removedFilesPartial(
+    int count,
+    String trouble,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Dateien entfernt, aber $trouble. Versuchen Sie es erneut, während Sie online sind.',
+      one:
+          '1 Datei entfernt, aber $trouble. Versuchen Sie es erneut, während Sie online sind.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_trouble_failed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count konnten nicht gelöscht werden',
+      one: '1 konnte nicht gelöscht werden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_syncMaintenance_trouble_listIncomplete =>
+      'einige Dateien konnten nicht aufgelistet werden';
+
+  @override
+  String settings_syncMaintenance_wipedFiles(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Dateien gelöscht',
+      one: '1 Datei gelöscht',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_wipedFilesPartial(int count, String trouble) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Dateien gelöscht, aber $trouble. Versuchen Sie es erneut, während Sie online sind.',
+      one:
+          '1 Datei gelöscht, aber $trouble. Versuchen Sie es erneut, während Sie online sind.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_troubleshootSync_appBar_title =>
+      'Synchronisierungsprobleme beheben';
+
+  @override
+  String get settings_troubleshootSync_devices_subtitle =>
+      'Sehen Sie jedes Gerät, das hier Dateien hält, wie viel Speicher jedes belegt, und entfernen Sie Reste von Bibliotheken, mit denen sich kein Gerät mehr synchronisiert. Ihre Tauchdaten sind nicht betroffen.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirm => 'Neu aufbauen';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirmBody =>
+      'Dadurch wird die Bibliothek dieses Geräts zur aktuellen Bibliothek auf dem Backend und wird neu veröffentlicht, sodass andere Geräte von Ihnen synchronisieren. Verwenden Sie dies, wenn eine Ersetzung durch ein anderes Gerät hängen bleibt. Ihre Tauchdaten sind nicht betroffen.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirmTitle =>
+      'Backend von diesem Gerät neu aufbauen?';
+
+  @override
+  String get settings_troubleshootSync_rebuild_doneSnack =>
+      'Backend von diesem Gerät neu aufgebaut';
+
+  @override
+  String get settings_troubleshootSync_rebuild_failedSnack =>
+      'Neuaufbau fehlgeschlagen';
+
+  @override
+  String get settings_troubleshootSync_rebuild_progressTitle =>
+      'Backend wird neu aufgebaut';
+
+  @override
+  String get settings_troubleshootSync_rebuild_subtitle =>
+      'Verwenden Sie dies, wenn die Synchronisierung auf eine Bibliothek wartet, die ein anderes Gerät ersetzt, aber nie fertig hochgeladen hat (dieses Gerät ist möglicherweise offline). Veröffentlicht die Bibliothek dieses Geräts als die aktuelle.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_title =>
+      'Backend von diesem Gerät neu aufbauen';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_confirmBody =>
+      'Dadurch werden nur die Synchronisierungsdateien dieses Geräts vom Backend gelöscht. Andere Geräte synchronisieren weiterhin, und Ihre Tauchdaten sind nicht betroffen.';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_confirmTitle =>
+      'Cloud-Dateien dieses Geräts entfernen?';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_progressTitle =>
+      'Cloud-Dateien dieses Geräts werden entfernt';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_subtitle =>
+      'Geben Sie den Speicher dieses Geräts auf dem Backend frei. Andere Geräte synchronisieren weiterhin. Ihre Tauchdaten sind nicht betroffen.';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_title =>
+      'Cloud-Dateien dieses Geräts entfernen';
+
+  @override
+  String get settings_troubleshootSync_repair_confirm => 'Reparieren';
+
+  @override
+  String get settings_troubleshootSync_repair_confirmBody =>
+      'Dadurch wird der gesamte lokale Synchronisierungsstatus gelöscht und dieses Gerät erhält eine neue Synchronisierungsidentität; bei der nächsten Synchronisierung verbindet es sich neu. Ihre Tauchdaten sind sicher und werden nicht gelöscht.';
+
+  @override
+  String get settings_troubleshootSync_repair_confirmTitle =>
+      'Synchronisierung reparieren?';
+
+  @override
+  String get settings_troubleshootSync_repair_doneSnack =>
+      'Synchronisierung repariert';
+
+  @override
+  String get settings_troubleshootSync_repair_subtitle =>
+      'Hängende Synchronisierung beheben. Löscht den Synchronisierungsstatus dieses Geräts und gibt ihm eine neue Synchronisierungsidentität; bei der nächsten Synchronisierung verbindet es sich neu. Ihre Tauchdaten sind nicht betroffen.';
+
+  @override
+  String get settings_troubleshootSync_repair_title =>
+      'Synchronisierung reparieren';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_confirm => 'Alles löschen';
+
+  @override
+  String settings_troubleshootSync_wipeAll_confirmBody(String word) {
+    return 'Dadurch werden die Synchronisierungsdaten JEDES Geräts von diesem Backend gelöscht, einschließlich der Bibliotheksmarkierungen. Jedes Gerät muss die Synchronisierung von Grund auf neu einrichten. Ihre Tauchdaten sind nicht betroffen.\n\nGeben Sie zur Bestätigung $word ein.';
+  }
+
+  @override
+  String get settings_troubleshootSync_wipeAll_confirmTitle =>
+      'Alle Synchronisierungsdaten löschen?';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_progressTitle =>
+      'Synchronisierungsdaten werden gelöscht';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_subtitle =>
+      'Löschen Sie die Synchronisierungsdaten jedes Geräts von diesem Backend, einschließlich der Bibliotheksmarkierungen. Jedes Gerät richtet die Synchronisierung von Grund auf neu ein. Ihre Tauchdaten sind nicht betroffen.';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_title =>
+      'Alle Synchronisierungsdaten auf diesem Backend löschen';
+
+  @override
+  String get tableMode_tooltip_toggleDetailPane => 'Detailbereich umschalten';
+
+  @override
+  String get tableMode_tooltip_toggleProfilePanel => 'Profilbereich umschalten';
+
+  @override
+  String get maps_regionDownload_title => 'Region herunterladen';
+
+  @override
+  String get maps_regionDownload_nameRequired =>
+      'Bitte geben Sie einen Namen für diese Region ein';
+
+  @override
+  String get maps_regionDownload_nameLabel => 'Regionsname';
+
+  @override
+  String get maps_regionDownload_nameHint => 'z.B. Cozumel, Mexiko';
+
+  @override
+  String get maps_regionDownload_zoomLevels => 'Zoomstufen';
+
+  @override
+  String get maps_regionDownload_zoomHint =>
+      'Höherer Zoom = mehr Details, größerer Download';
+
+  @override
+  String maps_regionDownload_minZoom(int zoom) {
+    return 'Min.: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_minZoomSemantics(int zoom) {
+    return 'Minimaler Zoom: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_maxZoom(int zoom) {
+    return 'Max.: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_maxZoomSemantics(int zoom) {
+    return 'Maximaler Zoom: $zoom';
+  }
+
+  @override
+  String get maps_regionDownload_estimatingSemantics =>
+      'Download-Größe wird geschätzt';
+
+  @override
+  String maps_regionDownload_estimateSemantics(int count, Object size) {
+    return 'Geschätzter Download: $count Kacheln, $size';
+  }
+
+  @override
+  String get maps_regionDownload_estimateUnavailableSemantics =>
+      'Download-Größe kann nicht geschätzt werden';
+
+  @override
+  String get maps_regionDownload_estimating => 'Wird geschätzt...';
+
+  @override
+  String maps_regionDownload_tileCount(int count) {
+    return '~$count Kacheln';
+  }
+
+  @override
+  String get maps_regionDownload_estimateUnavailable =>
+      'Schätzung nicht möglich';
+
+  @override
+  String get maps_regionDownload_largeWarningSemantics =>
+      'Warnung: Großer Download. Reduzieren Sie die Zoomstufen oder wählen Sie eine kleinere Region.';
+
+  @override
+  String get maps_regionDownload_largeWarning =>
+      'Großer Download. Reduzieren Sie die Zoomstufen oder wählen Sie eine kleinere Region.';
+
+  @override
+  String get maps_regionDownload_downloadButton => 'Herunterladen';
+
+  @override
+  String get diveLog_map_title => 'Tauchaktivität';
+
+  @override
+  String diveLog_map_infoCard_minutes(int minutes) {
+    return '$minutes Min.';
+  }
+
+  @override
+  String trips_gallery_diveSection_subtitle(
+    Object date,
+    int count,
+    Object photoLabel,
+  ) {
+    return '$date ($count $photoLabel)';
+  }
+
+  @override
+  String get trips_gallery_thumbnail_photo =>
+      'Fotovorschau. Tippen, um im Vollbild anzuzeigen';
+
+  @override
+  String get trips_gallery_thumbnail_video =>
+      'Videovorschau. Tippen, um im Vollbild anzuzeigen';
+
+  @override
+  String get trips_gallery_thumbnail_photoMissing =>
+      'Fotovorschau, auf dem Gerät nicht vorhanden. Tippen, um im Vollbild anzuzeigen';
+
+  @override
+  String get trips_gallery_thumbnail_videoMissing =>
+      'Videovorschau, auf dem Gerät nicht vorhanden. Tippen, um im Vollbild anzuzeigen';
+
+  @override
+  String get trips_photos_thumbnail_photo =>
+      'Fotovorschau. Tippen, um die Galerie zu öffnen';
+
+  @override
+  String get trips_photos_thumbnail_video =>
+      'Videovorschau. Tippen, um die Galerie zu öffnen';
+
+  @override
+  String trips_picker_suggestedSemantics(Object name) {
+    return 'Vorgeschlagene Reise: $name. Tippen, um sie zu verwenden';
+  }
+
+  @override
+  String trips_picker_tileSemantics(
+    Object name,
+    Object startDate,
+    Object endDate,
+  ) {
+    return '$name, $startDate bis $endDate';
+  }
+
+  @override
+  String trips_picker_tileSemanticsSelected(
+    Object name,
+    Object startDate,
+    Object endDate,
+  ) {
+    return '$name, $startDate bis $endDate, ausgewählt';
+  }
+
+  @override
+  String get divePlanner_quickPlan_subtitle =>
+      'Ein einfaches rechteckiges Tauchprofil erstellen';
+
+  @override
+  String get divePlanner_quickPlan_depthLabel => 'Tiefe:';
+
+  @override
+  String divePlanner_quickPlan_depthSemantics(Object depth) {
+    return 'Tiefe: $depth';
+  }
+
+  @override
+  String get divePlanner_quickPlan_timeLabel => 'Zeit:';
+
+  @override
+  String divePlanner_quickPlan_bottomTimeSemantics(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Grundzeit: $minutes Minuten',
+      one: 'Grundzeit: 1 Minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String divePlanner_quickPlan_minutes(int minutes) {
+    return '$minutes Min.';
+  }
+
+  @override
+  String divePlanner_quickPlan_previewSemantics(Object depth, int minutes) {
+    return 'Planvorschau: Abstieg auf $depth, Grundzeit $minutes Minuten, Aufstieg mit Sicherheitsstopp';
+  }
+
+  @override
+  String get divePlanner_quickPlan_previewTitle => 'Planvorschau:';
+
+  @override
+  String divePlanner_quickPlan_previewDescent(Object depth) {
+    return 'Abstieg auf $depth';
+  }
+
+  @override
+  String divePlanner_quickPlan_previewBottomTime(int minutes) {
+    return 'Grundzeit: $minutes Min.';
+  }
+
+  @override
+  String get divePlanner_quickPlan_previewAscent =>
+      'Aufstieg mit Sicherheitsstopp';
+
+  @override
+  String get divePlanner_quickPlan_create => 'Erstellen';
+
+  @override
+  String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
+    return 'AMV: $value $volumeSymbol pro Minute';
+  }
+
+  @override
+  String divePlanner_semantics_reservePressure(Object pressureSymbol) {
+    return 'Reservedruck in $pressureSymbol';
+  }
+
+  @override
+  String divePlanner_semantics_altitudeGroup(Object group) {
+    return 'Höhengruppe: $group';
+  }
+
+  @override
+  String diveSites_import_detail_maxDepth(Object depth) {
+    return 'Max. $depth';
+  }
+
+  @override
+  String get autoUpdate_banner_download => 'Herunterladen';
+
+  @override
+  String get settings_cloudSync_provider_icloud_subtitle =>
+      'Über Apple iCloud synchronisieren';
+
+  @override
+  String get settings_debugLog_search_hint => 'Protokolle durchsuchen...';
+
+  @override
+  String get settings_debugLog_appBar_title => 'Debug-Protokolle';
+
+  @override
+  String get settings_debugLog_disableDebugMode => 'Debug-Modus deaktivieren';
+
+  @override
+  String get settings_debugLog_clearLogs => 'Protokolle löschen';
+
+  @override
+  String get settings_debugLog_empty =>
+      'Keine Protokolleinträge entsprechen den aktuellen Filtern';
+
+  @override
+  String settings_debugLog_loadError(Object error) {
+    return 'Fehler beim Laden der Protokolle: $error';
+  }
+
+  @override
+  String get settings_debugLog_copiedSnack =>
+      'Gefilterte Protokolle in die Zwischenablage kopiert';
+
+  @override
+  String settings_debugLog_savedSnack(String path) {
+    return 'Protokolle gespeichert unter $path';
+  }
+
+  @override
+  String get common_action_copy => 'Kopieren';
+
+  @override
+  String get settings_appearance_customGradient_title => 'Eigener Farbverlauf';
+
+  @override
+  String get settings_appearance_customGradient_start => 'Start';
+
+  @override
+  String get settings_appearance_customGradient_end => 'Ende';
+
+  @override
+  String get settings_appearance_customGradient_hue => 'Farbton';
+
+  @override
+  String get settings_appearance_customGradient_saturation => 'Sättigung';
+
+  @override
+  String get settings_appearance_customGradient_brightness => 'Helligkeit';
+
+  @override
+  String get settings_appearance_customGradient_preview => 'Vorschau';
+
+  @override
+  String get common_action_apply => 'Übernehmen';
+
+  @override
+  String settings_cloudSync_message_loadStateFailed(Object error) {
+    return 'Synchronisierungsstatus konnte nicht geladen werden: $error';
+  }
+
+  @override
+  String get settings_cloudSync_message_noProviderConfigured =>
+      'Kein Cloud-Anbieter konfiguriert';
+
+  @override
+  String get settings_cloudSync_message_adopting =>
+      'Wiederhergestellte Bibliothek wird übernommen...';
+
+  @override
+  String get settings_cloudSync_message_adoptFailed =>
+      'Wiederhergestellte Bibliothek konnte nicht übernommen werden';
+
+  @override
+  String get settings_cloudSync_message_firstSyncNeedsConfirm =>
+      'Die erste Synchronisierung muss bestätigt werden. Tippen Sie auf „Jetzt synchronisieren“, um sie zu prüfen.';
+
+  @override
+  String get settings_cloudSync_message_startingSync =>
+      'Synchronisierung wird gestartet...';
+
+  @override
+  String get settings_cloudSync_message_replacePaused =>
+      'Synchronisierung pausiert: Die Bibliothek wurde aus einer Sicherung ersetzt. Tippen Sie auf „Jetzt synchronisieren“, um sie zu prüfen.';
+
+  @override
+  String get settings_cloudSync_message_encryptedPaused =>
+      'Synchronisierung pausiert: Diese Bibliothek ist verschlüsselt. Geben Sie die Passphrase ein, um fortzufahren.';
+
+  @override
+  String get settings_cloudSync_message_completedWithConflicts =>
+      'Synchronisierung mit Konflikten abgeschlossen';
+
+  @override
+  String get settings_cloudSync_message_completedSuccessfully =>
+      'Synchronisierung erfolgreich abgeschlossen';
+
+  @override
+  String get settings_cloudSync_message_syncFailed =>
+      'Synchronisierung fehlgeschlagen';
+
+  @override
+  String get settings_cloudSync_message_phaseDefault => 'Synchronisierung';
+
+  @override
+  String settings_cloudSync_message_syncErrorDuring(
+    String phase,
+    Object error,
+  ) {
+    return 'Synchronisierungsfehler bei $phase: $error';
+  }
+
+  @override
+  String get settings_section_debug_title => 'Debug';
+
+  @override
+  String get settings_section_debug_subtitle => 'Protokolle & Diagnose';
+
+  @override
+  String get settings_debugLog_minSeverityLabel => 'Min. Schweregrad:';
+
+  @override
+  String get settings_debugLog_shareSubject => 'Submersion-Debug-Protokolle';
+
+  @override
+  String get settings_debugLog_saveDialogTitle => 'Debug-Protokolle speichern';
+
+  @override
+  String get universalImport_preset_saveTitle => 'Als Vorlage speichern';
+
+  @override
+  String get universalImport_preset_nameLabel => 'Vorlagenname';
+
+  @override
+  String get universalImport_preset_nameHint => 'z.B. Mein Tauchlogbuch-CSV';
+
+  @override
+  String get universalImport_preset_nameRequired => 'Name ist erforderlich';
+
+  @override
+  String get universalImport_preset_sourceAppLabel => 'Quellanwendung';
+
+  @override
+  String get universalImport_preset_sourceAppNone => 'Keine';
+
+  @override
+  String get universalImport_preset_entityTypesLabel => 'Datentypen';
+
+  @override
+  String get universalImport_preset_matchThresholdLabel =>
+      'Übereinstimmungsschwelle';
+
+  @override
+  String get universalImport_preset_matchThresholdHelp =>
+      'Wie genau CSV-Überschriften für die automatische Erkennung übereinstimmen müssen';
+
+  @override
+  String universalImport_preset_signatureHeaders(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Signaturüberschriften aus der aktuellen Datei',
+      one: '1 Signaturüberschrift aus der aktuellen Datei',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_preset_selectTitle => 'Vorlage auswählen';
+
+  @override
+  String universalImport_preset_loadFailed(String error) {
+    return 'Vorlagen konnten nicht geladen werden: $error';
+  }
+
+  @override
+  String get universalImport_preset_sectionSaved => 'Gespeicherte Vorlagen';
+
+  @override
+  String get universalImport_preset_sectionBuiltIn => 'Integrierte Vorlagen';
+
+  @override
+  String get universalImport_preset_deleteTitle => 'Vorlage löschen';
+
+  @override
+  String universalImport_preset_deleteConfirm(String name) {
+    return '„$name“ löschen? Dies kann nicht rückgängig gemacht werden.';
+  }
+
+  @override
+  String universalImport_preset_headersMatched(
+    int matched,
+    int total,
+    int percent,
+  ) {
+    return '$matched/$total Überschriften übereinstimmend ($percent%)';
+  }
+
+  @override
+  String get universalImport_preset_noSignatureHeaders =>
+      'Keine Signaturüberschriften';
+
+  @override
+  String get universalImport_preset_deleteTooltip => 'Vorlage löschen';
+
+  @override
+  String get universalImport_preset_presetsButton => 'Vorlagen';
+
+  @override
+  String universalImport_preset_savedSnackbar(String name) {
+    return 'Vorlage „$name“ gespeichert';
+  }
+
+  @override
+  String get universalImport_step_done => 'Fertig';
+
+  @override
+  String get universalImport_cancel_inProgressTitle => 'Wird abgebrochen';
+
+  @override
+  String get universalImport_cancel_inProgressBody =>
+      'Der aktuelle Tauchgang wird noch abgeschlossen, dann wird gestoppt. Bereits importierte Tauchgänge bleiben erhalten.';
+
+  @override
+  String get universalImport_cancel_confirmTitle => 'Import abbrechen?';
+
+  @override
+  String get universalImport_cancel_confirmBody =>
+      'Nach Abschluss des aktuellen Tauchgangs stoppen. Bereits importierte Tauchgänge bleiben erhalten.';
+
+  @override
+  String get universalImport_cancel_keepImporting => 'Weiter importieren';
+
+  @override
+  String get universalImport_cancel_confirmAction => 'Import abbrechen';
+
+  @override
+  String get universalImport_cancel_discardSelections =>
+      'Auswahl verwerfen und abbrechen?';
+
+  @override
+  String get universalImport_action_importSelected => 'Auswahl importieren';
+
+  @override
+  String get universalImport_action_next => 'Weiter';
+
+  @override
+  String get common_action_yes => 'Ja';
+
+  @override
+  String get common_action_no => 'Nein';
+
+  @override
+  String universalImport_counts_new(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count neu',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_merging(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count zusammenführen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_replacing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ersetzen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_skipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count übersprungen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_counts_nothingSelected => 'Nichts ausgewählt';
+
+  @override
+  String get universalImport_section_potentialDuplicates =>
+      'Potenzielle Duplikate';
+
+  @override
+  String get universalImport_section_possibleDuplicates => 'Mögliche Duplikate';
+
+  @override
+  String universalImport_count_duplicates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Duplikate',
+      one: '1 Duplikat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_entityAction_importBadge => 'IMPORTIEREN';
+
+  @override
+  String get universalImport_entityAction_skipBadge => 'ÜBERSPRINGEN';
+
+  @override
+  String get universalImport_compare_existing => 'Vorhanden';
+
+  @override
+  String get universalImport_compare_incoming => 'Eingehend';
+
+  @override
+  String get universalImport_label_skipped => 'Übersprungen';
+
+  @override
+  String get universalImport_action_viewDives => 'Tauchgänge anzeigen';
+
+  @override
+  String get diveImport_healthkit_accessGranted => 'HealthKit-Zugriff gewährt';
+
+  @override
+  String get diveImport_healthkit_accessGrantedBody =>
+      'Sie können mit dem nächsten Schritt fortfahren.';
+
+  @override
+  String get diveImport_healthkit_requesting => 'Wird angefragt...';
+
+  @override
+  String get diveImport_healthkit_grantAccessButton =>
+      'HealthKit-Zugriff gewähren';
+
+  @override
+  String get diveImport_healthkit_selectDateRange => 'Zeitraum auswählen';
+
+  @override
+  String get diveImport_healthkit_selectDateRangeBody =>
+      'Wählen Sie den Zeitraum, in dem in Apple Health nach Tauchgängen gesucht werden soll.';
+
+  @override
+  String get diveImport_healthkit_fetchingDives =>
+      'Tauchgänge werden aus Apple Health abgerufen...';
+
+  @override
+  String get diveImport_healthkit_fetchFailed => 'Abruf fehlgeschlagen';
+
+  @override
+  String diveImport_healthkit_fetchFailedBody(String error) {
+    return 'Tauchgänge konnten nicht abgerufen werden: $error';
+  }
+
+  @override
+  String diveImport_healthkit_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge gefunden',
+      one: '1 Tauchgang gefunden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveImport_healthkit_proceedingToReview =>
+      'Weiter zur Überprüfung...';
+
+  @override
+  String get importWizard_dc_knownComputer => 'Bekannter Computer';
+
+  @override
+  String importWizard_dc_knownComputerBody(String name) {
+    return 'Gespeichert als „$name“. Es werden nur neue Tauchgänge heruntergeladen.';
+  }
+
+  @override
+  String get importWizard_dc_noNewDives =>
+      'Keine neuen Tauchgänge zum Herunterladen';
+
+  @override
+  String get importWizard_dc_noNewDivesBody =>
+      'Alle Tauchgänge von diesem Computer wurden bereits importiert.';
+
+  @override
+  String get universalImport_compare_noDiveData =>
+      'Tauchdaten für den Vergleich nicht verfügbar.';
+
+  @override
+  String get universalImport_entityAction_consolidateBadge => 'ZUSAMMENFÜHREN';
+
+  @override
+  String get diveCenters_import_quickSearch_egypt => 'Ägypten';
+
+  @override
+  String get diveCenters_import_quickSearch_mexico => 'Mexiko';
+
+  @override
+  String get accessibility_shortcut_switchDiver => 'Taucher wechseln';
+
+  @override
+  String get lock_recoveryCode_title => 'Wiederherstellungscode verwenden';
+
+  @override
+  String get lock_recoveryCode_body =>
+      'Geben Sie den 8-Wort-Wiederherstellungscode ein, den Sie beim Einrichten des App-Passworts gespeichert haben.';
+
+  @override
+  String get lock_recoveryCode_error => 'Falscher Wiederherstellungscode.';
+
+  @override
+  String get lock_forcedReset_title => 'Neues Passwort festlegen';
+
+  @override
+  String get lock_forcedReset_body =>
+      'Sie haben mit Ihrem Wiederherstellungscode entsperrt, daher gilt Ihr altes Passwort nicht mehr als vertrauenswürdig. Wählen Sie jetzt ein neues.';
+
+  @override
+  String get lock_forcedReset_submit => 'Passwort festlegen';
+
+  @override
+  String get lock_forcedReset_error =>
+      'Das neue Passwort konnte nicht festgelegt werden. Versuchen Sie es erneut.';
+
+  @override
+  String get lock_sidecarRepair_title => 'Sicherheitsschlüsseldatei reparieren';
+
+  @override
+  String get lock_sidecarRepair_body =>
+      'Ihre Sicherheitsschlüsseldatei fehlte, und der Schlüsselbund dieses Geräts enthält den Schlüssel noch. Bestätigen Sie Ihr Passwort, um eine neue Schlüsseldatei zu schreiben. Hinweis: Das hier eingegebene Passwort wird ab sofort zum App-Passwort, und Sie erhalten einen neuen Wiederherstellungscode.';
+
+  @override
+  String get lock_sidecarRepair_submit => 'Reparieren';
+
+  @override
+  String get lock_sidecarRepair_error =>
+      'Reparatur fehlgeschlagen. Versuchen Sie es erneut.';
+
+  @override
+  String get lock_newRecoveryCode_title => 'Ihr neuer Wiederherstellungscode';
+
+  @override
+  String get lock_startFresh_title => 'Eine andere Datenbank öffnen';
+
+  @override
+  String lock_startFresh_body(Object token) {
+    return 'Ihre aktuelle Datenbank bleibt auf dem Datenträger, umbenannt mit der Endung .locked; es wird nichts gelöscht. Sie können sie später mit Ihrem Passwort oder über den Support wiederherstellen. Die Cloud-Synchronisierung wird deaktiviert, damit sich die neue Datenbank nicht mit der alten vermischen kann.\n\nDie App startet mit einer neuen, leeren Datenbank. Im Einrichtungsassistenten können Sie eine Sicherung wiederherstellen.\n\nGeben Sie zur Bestätigung $token ein.';
+  }
+
+  @override
+  String get lock_startFresh_confirm => 'Beiseitelegen und neu beginnen';
+
+  @override
+  String get lock_biometric_reason => 'Entsperren Sie Ihr Tauchlogbuch';
+
+  @override
+  String startup_migrating_progress(Object currentStep, Object totalSteps) {
+    return 'Datenbank wird aktualisiert... Schritt $currentStep von $totalSteps';
+  }
+
+  @override
+  String get startup_error_title => 'Datenbank-Upgrade fehlgeschlagen';
+
+  @override
+  String get startup_error_body =>
+      'Starten Sie die App neu. Falls das Problem weiterhin besteht, kontaktieren Sie den Support: Ihre Daten befinden sich weiterhin auf dem Datenträger und eine Neuinstallation ist nicht erforderlich.';
+
+  @override
+  String get startup_recovering_title => 'Datenbank wird wiederhergestellt...';
+
+  @override
+  String get startup_recovering_body =>
+      'Die unterbrochene Transaktion wird zurückgesetzt. Das dauert normalerweise einige Sekunden.';
+
+  @override
+  String get startup_recoveryFailed_title =>
+      'Wiederherstellung nicht abgeschlossen';
+
+  @override
+  String get startup_recoveryFailed_body =>
+      'Die Datenbank konnte nicht automatisch zurückgesetzt werden. Ihre Daten befinden sich weiterhin auf dem Datenträger; kontaktieren Sie den Support, bevor Sie neu installieren, damit wir Ihnen bei der Wiederherstellung helfen können.';
+
+  @override
+  String get startup_recoveryRequired_title =>
+      'Datenbank muss wiederhergestellt werden';
+
+  @override
+  String get startup_recoveryRequired_body =>
+      'Eine frühere Sitzung wurde beim Schreiben in die Datenbank unterbrochen. Ihre Daten befinden sich weiterhin auf dem Datenträger; wir müssen nur das Zurücksetzen der abgebrochenen Änderung abschließen, bevor die App geöffnet werden kann.';
+
+  @override
+  String startup_recovery_sqliteCode(Object code) {
+    return 'SQLite-Code $code';
+  }
+
+  @override
+  String get startup_recovery_action => 'Datenbank wiederherstellen';
+
+  @override
+  String get startup_recovery_closeWithoutRecovering =>
+      'Ohne Wiederherstellung schließen';
+
+  @override
+  String get common_action_tryAgain => 'Erneut versuchen';
+
+  @override
+  String get lock_screen_title => 'Submersion ist gesperrt';
+
+  @override
+  String get lock_screen_forgotPassword => 'Passwort vergessen?';
+
+  @override
+  String get lock_incorrectPassword =>
+      'Falsches Passwort. Versuchen Sie es erneut.';
+
+  @override
+  String get startup_backup_semanticsLabel => 'Sicherung läuft';
+
+  @override
+  String get startup_backup_title => 'Ihre Daten werden gesichert';
+
+  @override
+  String get startup_backup_body =>
+      'Wir speichern eine Kopie Ihres Tauchlogbuchs, bevor wir Ihre Datenbank aktualisieren.';
+
+  @override
+  String get startup_backupFailed_title =>
+      'Ihre Daten konnten nicht gesichert werden';
+
+  @override
+  String get startup_backupFailed_body =>
+      'Ihr Tauchlogbuch wurde nicht verändert; wir haben es nicht aktualisiert. Geben Sie Speicherplatz frei (oder beheben Sie das Problem) und versuchen Sie es erneut.';
+
+  @override
+  String get startup_backupFailed_quit => 'Beenden';
+
+  @override
+  String get startup_backupFailed_technicalDetails => 'Technische Details';
+
+  @override
+  String get common_action_retry => 'Wiederholen';
+
+  @override
+  String get startup_versionMismatch_title => 'Update erforderlich';
+
+  @override
+  String startup_versionMismatch_body(
+    Object databaseVersion,
+    Object appVersion,
+  ) {
+    return 'Ihre Tauchdaten wurden mit einer neueren Version von Submersion gespeichert (Schema v$databaseVersion). Diese Version unterstützt Schemata nur bis v$appVersion.';
+  }
+
+  @override
+  String get startup_versionMismatch_instructions =>
+      'Bitte aktualisieren Sie Submersion auf die neueste Version. Ihre Daten sind sicher und wurden nicht verändert. Falls vor dem Upgrade eine Sicherung erstellt wurde, liegt sie in Ihrem Ordner Backups und kann nach dem Update wiederhergestellt werden.';
+
+  @override
+  String get startup_versionMismatch_download =>
+      'Neueste Version herunterladen';
+
+  @override
+  String get startup_versionMismatch_manualLink =>
+      'Falls sich dadurch kein Browser öffnet, besuchen Sie:';
+
+  @override
+  String get universalImport_compare_downloaded => 'Heruntergeladen';
+
+  @override
+  String get universalImport_compare_errorLoading =>
+      'Fehler beim Laden der Tauchgangsdaten';
+
+  @override
+  String get universalImport_compare_diveNotFound =>
+      'Vorhandener Tauchgang nicht gefunden';
+
+  @override
+  String universalImport_compare_sameFields(Object fields) {
+    return 'Gleich: $fields';
+  }
+
+  @override
+  String get universalImport_compare_differences => 'UNTERSCHIEDE';
+
+  @override
+  String get universalImport_compare_notRecorded => 'nicht erfasst';
+
+  @override
+  String universalImport_compare_serial(Object serial) {
+    return 'S/N: $serial';
+  }
+
+  @override
+  String get universalImport_compare_skipSubtitle =>
+      'Diesen Download verwerfen';
+
+  @override
+  String get universalImport_compare_importAsNewSubtitle =>
+      'Als separaten Tauchgang speichern';
+
+  @override
+  String get universalImport_compare_consolidateSubtitle =>
+      'Als 2. Computermessung hinzufügen';
+
+  @override
+  String get diveLog_tooltip_ndlOverMax => '>60 min';
+
+  @override
+  String diveLog_tooltip_interpolated(String value) {
+    return '$value (interpoliert)';
+  }
+
+  @override
+  String get enum_profileMetric_ascentRate_short => 'Rate';
+
+  @override
+  String get enum_profileMetric_cns_short => 'CNS';
+
+  @override
+  String get enum_profileMetric_otu_short => 'OTU';
+
+  @override
+  String get diveLog_profileEditor_rangeOperations => 'Bereichsaktionen';
+
+  @override
+  String get diveLog_profileEditor_selectRangeHint =>
+      'Wählen Sie im Diagramm einen Bereich aus, um Aktionen zu aktivieren';
+
+  @override
+  String get diveLog_profileEditor_depthPlusOneMeter => 'Tiefe +1 m';
+
+  @override
+  String get diveLog_profileEditor_depthMinusOneMeter => 'Tiefe -1 m';
+
+  @override
+  String get diveLog_profileEditor_timePlusFiveSeconds => 'Zeit +5 s';
+
+  @override
+  String get diveLog_profileEditor_timeMinusFiveSeconds => 'Zeit -5 s';
+
+  @override
+  String get diveLog_profileEditor_smoothing => 'Glättung';
+
+  @override
+  String get diveLog_profileEditor_smoothLight => 'Leicht';
+
+  @override
+  String get diveLog_profileEditor_smoothMedium => 'Mittel';
+
+  @override
+  String get diveLog_profileEditor_smoothHeavy => 'Stark';
+
+  @override
+  String get diveLog_profileEditor_applyToAll => 'Auf alle anwenden';
+
+  @override
+  String get diveLog_profileEditor_applyToSelection => 'Auf Auswahl anwenden';
+
+  @override
+  String get diveLog_profileEditor_outlierDetection => 'Ausreißererkennung';
+
+  @override
+  String get diveLog_profileEditor_detect => 'Erkennen';
+
+  @override
+  String get diveLog_profileEditor_removeAll => 'Alle entfernen';
+
+  @override
+  String diveLog_profileEditor_outliersDetected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mögliche Ausreißer erkannt',
+      one: '$count möglicher Ausreißer erkannt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_profileEditor_manualDrawing => 'Manuelles Zeichnen';
+
+  @override
+  String get diveLog_profileEditor_drawHint =>
+      'Tippen Sie auf das Diagramm, um Wegpunkte zu setzen';
+
+  @override
+  String get diveLog_profileEditor_clearWaypoints => 'Löschen';
+
+  @override
+  String get diveLog_profileEditor_generateProfile => 'Profil erzeugen';
+
+  @override
+  String get diveLog_profileEditor_trimMode => 'Zuschneidemodus';
+
+  @override
+  String get diveLog_profileEditor_trimHint => 'Profilenden zuschneiden';
+
+  @override
+  String get diveLog_profileEditor_trimEnd => 'Ende zuschneiden';
+
+  @override
+  String get diveLog_profileEditor_mode_smooth => 'Glätten';
+
+  @override
+  String get diveLog_profileEditor_title => 'Profil bearbeiten';
+
+  @override
+  String get diveLog_profileEditor_discardBody =>
+      'Sie haben nicht gespeicherte Änderungen an diesem Tauchprofil. Möchten Sie diese wirklich verwerfen?';
+
+  @override
+  String get diveLog_profileEditor_saveTitle => 'Profil speichern?';
+
+  @override
+  String get diveLog_profileEditor_saveBody =>
+      'Dadurch wird das bearbeitete Profil als primäres Profil für diesen Tauchgang gespeichert. Das ursprüngliche Profil bleibt erhalten und kann später wiederhergestellt werden.';
+
+  @override
+  String diveLog_profileEditor_saveFailed(String error) {
+    return 'Profil konnte nicht gespeichert werden: $error';
+  }
+
+  @override
+  String diveLog_profileEditor_errorLoadingDive(String error) {
+    return 'Fehler beim Laden des Tauchgangs: $error';
+  }
+
+  @override
+  String get diveLog_profileEditor_noProfileData =>
+      'Keine Profildaten verfügbar';
+
+  @override
+  String get diveLog_profileEditor_undo => 'Rückgängig';
+
+  @override
+  String get diveLog_profileEditor_mode_select => 'Auswählen';
+
+  @override
+  String get diveLog_profileEditor_mode_outlier => 'Ausreißer';
+
+  @override
+  String get diveLog_profileEditor_mode_draw => 'Zeichnen';
+
+  @override
+  String get diveLog_profileEditor_mode_trim => 'Zuschneiden';
+
+  @override
+  String diveLog_sources_sectionTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Datenquellen',
+      one: 'Datenquelle',
+      zero: 'Datenquelle',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_badge_manual => 'Manuell';
+
+  @override
+  String get diveLog_sources_badge_viewing => 'Angezeigt';
+
+  @override
+  String get diveLog_sources_badge_secondary => 'Sekundär';
+
+  @override
+  String diveLog_sources_created(String date) {
+    return 'Erstellt $date';
+  }
+
+  @override
+  String get diveLog_sources_detail_serial => 'Seriennummer';
+
+  @override
+  String get diveLog_sources_detail_format => 'Format';
+
+  @override
+  String get diveLog_sources_detail_imported => 'Importiert';
+
+  @override
+  String diveLog_detail_semantics_viewDiveComputer(String name) {
+    return 'Tauchcomputer $name anzeigen';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewTrip(String name) {
+    return 'Reise $name anzeigen';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewDiveCenter(String name) {
+    return 'Tauchbasis $name anzeigen';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewSpecies(String name) {
+    return 'Art $name anzeigen';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewCourse(String name) {
+    return 'Kurs $name anzeigen';
+  }
+
+  @override
+  String diveLog_detail_serialNumber(String serial) {
+    return 'S/N $serial';
+  }
+
+  @override
+  String diveLog_detail_errorLoadingSignature(String error) {
+    return 'Fehler beim Laden der Unterschrift: $error';
+  }
+
+  @override
+  String get diveLog_profilePanel_selectDive =>
+      'Wählen Sie einen Tauchgang, um sein Profil anzuzeigen';
+
+  @override
+  String get diveLog_profilePanel_noProfileData =>
+      'Keine Profildaten für diesen Tauchgang';
+
+  @override
+  String get settings_export_progress_divesCsv =>
+      'Tauchgänge werden nach CSV exportiert...';
+
+  @override
+  String get settings_export_progress_sitesCsv =>
+      'Tauchplätze werden nach CSV exportiert...';
+
+  @override
+  String get settings_export_progress_equipmentCsv =>
+      'Ausrüstung wird nach CSV exportiert...';
+
+  @override
+  String get settings_export_progress_pdf => 'PDF-Logbuch wird erstellt...';
+
+  @override
+  String get settings_export_progress_loadingSignatures =>
+      'Signaturen werden geladen...';
+
+  @override
+  String get settings_export_progress_loadingCertifications =>
+      'Zertifizierungen werden geladen...';
+
+  @override
+  String get settings_export_progress_loadingFonts =>
+      'Schriftarten werden geladen...';
+
+  @override
+  String settings_export_progress_templatePdf(String template) {
+    return '$template-PDF wird erstellt...';
+  }
+
+  @override
+  String get settings_export_progress_uddf => 'UDDF-Datei wird erstellt...';
+
+  @override
+  String get settings_export_progress_collectingData =>
+      'Alle Daten werden gesammelt...';
+
+  @override
+  String get settings_export_progress_excel => 'Excel-Datei wird erstellt...';
+
+  @override
+  String get settings_export_progress_buildingExcel =>
+      'Excel-Arbeitsmappe wird aufgebaut...';
+
+  @override
+  String get settings_export_progress_kml => 'KML-Datei wird erstellt...';
+
+  @override
+  String get settings_export_progress_buildingKml =>
+      'KML-Datei wird aufgebaut...';
+
+  @override
+  String get settings_export_progress_preparingExcel =>
+      'Excel-Datei wird vorbereitet...';
+
+  @override
+  String get settings_export_progress_preparingKml =>
+      'KML-Datei wird vorbereitet...';
+
+  @override
+  String get settings_export_progress_chooseLocation => 'Speicherort wählen...';
+
+  @override
+  String get settings_export_progress_preparingDivesCsv =>
+      'Tauchgänge-CSV wird vorbereitet...';
+
+  @override
+  String get settings_export_progress_preparingSitesCsv =>
+      'Tauchplätze-CSV wird vorbereitet...';
+
+  @override
+  String get settings_export_progress_preparingEquipmentCsv =>
+      'Ausrüstungs-CSV wird vorbereitet...';
+
+  @override
+  String get settings_export_progress_preparingUddf =>
+      'UDDF-Datei wird vorbereitet...';
+
+  @override
+  String get settings_export_progress_preparingPdf => 'PDF wird vorbereitet...';
+
+  @override
+  String get settings_export_progress_selectingBackup =>
+      'Sicherungsdatei wird ausgewählt...';
+
+  @override
+  String get settings_export_progress_restoringBackup =>
+      'Wiederherstellung aus der Sicherung...';
+
+  @override
+  String get settings_export_empty_dives => 'Keine Tauchgänge zum Exportieren';
+
+  @override
+  String get settings_export_empty_sites => 'Keine Tauchplätze zum Exportieren';
+
+  @override
+  String get settings_export_empty_equipment =>
+      'Keine Ausrüstung zum Exportieren';
+
+  @override
+  String get settings_export_empty_data => 'Keine Daten zum Exportieren';
+
+  @override
+  String get settings_export_empty_diveSites =>
+      'Keine Tauchplätze zum Exportieren';
+
+  @override
+  String settings_export_saveFailed(String error) {
+    return 'Speichern fehlgeschlagen: $error';
+  }
+
+  @override
+  String settings_export_backupFailed(String error) {
+    return 'Sicherung fehlgeschlagen: $error';
+  }
+
+  @override
+  String settings_export_restoreFailed(String error) {
+    return 'Wiederherstellung fehlgeschlagen: $error';
+  }
+
+  @override
+  String get settings_export_fileUnreadable =>
+      'Auf die Datei konnte nicht zugegriffen werden';
+
+  @override
+  String get settings_export_notADbFile =>
+      'Bitte wählen Sie eine .db-Sicherungsdatei aus';
+
+  @override
+  String get settings_export_success_dives =>
+      'Tauchgänge erfolgreich exportiert';
+
+  @override
+  String get settings_export_success_sites =>
+      'Tauchplätze erfolgreich exportiert';
+
+  @override
+  String get settings_export_success_equipment =>
+      'Ausrüstung erfolgreich exportiert';
+
+  @override
+  String get settings_export_success_pdf => 'PDF-Logbuch erfolgreich erstellt';
+
+  @override
+  String get settings_export_success_uddf => 'UDDF-Datei erfolgreich erstellt';
+
+  @override
+  String get settings_export_success_excel =>
+      'Excel-Datei erfolgreich exportiert';
+
+  @override
+  String settings_export_success_kml(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'KML-Datei erfolgreich exportiert ($count Tauchplätze ohne Koordinaten übersprungen)',
+      one:
+          'KML-Datei erfolgreich exportiert (1 Tauchplatz ohne Koordinaten übersprungen)',
+      zero: 'KML-Datei erfolgreich exportiert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_export_saved_excel =>
+      'Excel-Datei erfolgreich gespeichert';
+
+  @override
+  String settings_export_saved_kml(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'KML-Datei erfolgreich gespeichert ($count Tauchplätze ohne Koordinaten übersprungen)',
+      one:
+          'KML-Datei erfolgreich gespeichert (1 Tauchplatz ohne Koordinaten übersprungen)',
+      zero: 'KML-Datei erfolgreich gespeichert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_export_saved_divesCsv =>
+      'Tauchgänge-CSV erfolgreich gespeichert';
+
+  @override
+  String get settings_export_saved_sitesCsv =>
+      'Tauchplätze-CSV erfolgreich gespeichert';
+
+  @override
+  String get settings_export_saved_equipmentCsv =>
+      'Ausrüstungs-CSV erfolgreich gespeichert';
+
+  @override
+  String get settings_export_saved_uddf => 'UDDF-Datei erfolgreich gespeichert';
+
+  @override
+  String get settings_export_saved_pdf => 'PDF erfolgreich gespeichert';
+
+  @override
+  String get settings_export_saved_backup =>
+      'Sicherung erfolgreich gespeichert';
+
+  @override
+  String get settings_export_restoreComplete =>
+      'Wiederherstellung abgeschlossen';
+
+  @override
+  String get settings_export_cancelled_save => 'Speichern abgebrochen';
+
+  @override
+  String get settings_export_cancelled_backup => 'Sicherung abgebrochen';
+
+  @override
+  String get settings_export_cancelled_restore =>
+      'Wiederherstellung abgebrochen';
+
+  @override
+  String get settings_export_pdfDocumentTitle => 'Tauchlogbuch';
+
+  @override
+  String get settings_export_saveBackupDialogTitle => 'Sicherung speichern';
+
+  @override
+  String backup_operation_created(String size) {
+    return 'Sicherung erstellt: $size';
+  }
+
+  @override
+  String backup_operation_backupFailed(String error) {
+    return 'Sicherung fehlgeschlagen: $error';
+  }
+
+  @override
+  String get backup_operation_restoring =>
+      'Sicherung wird wiederhergestellt...';
+
+  @override
+  String backup_operation_restoreFailed(String error) {
+    return 'Wiederherstellung fehlgeschlagen: $error';
+  }
+
+  @override
+  String get backup_operation_deleting => 'Sicherung wird gelöscht...';
+
+  @override
+  String get backup_operation_deleted => 'Sicherung gelöscht';
+
+  @override
+  String backup_operation_deleteFailed(String error) {
+    return 'Löschen fehlgeschlagen: $error';
+  }
+
+  @override
+  String get backup_operation_exporting => 'Sicherung wird exportiert...';
+
+  @override
+  String backup_operation_exported(String size) {
+    return 'Sicherung exportiert: $size';
+  }
+
+  @override
+  String backup_operation_exportFailed(String error) {
+    return 'Export fehlgeschlagen: $error';
+  }
+
+  @override
+  String get backup_operation_preparingShare =>
+      'Sicherung wird zum Teilen vorbereitet...';
+
+  @override
+  String get backup_operation_shareReady => 'Sicherung bereit zum Teilen';
+
+  @override
+  String backup_operation_upgrading(int step, int total) {
+    return 'Datenbank wird aktualisiert (Schritt $step von $total)...';
+  }
+
+  @override
+  String backup_restore_dialog_counts(int diveCount, int siteCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount Tauchgänge',
+      one: '1 Tauchgang',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount Tauchplätze',
+      one: '1 Tauchplatz',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get backup_restore_preMigration_title =>
+      'Vor-Migrations-Backup wiederherstellen';
+
+  @override
+  String get backup_restore_preMigration_unknownVersion => 'unbekannte Version';
+
+  @override
+  String get backup_restore_preMigration_restoreAnyway =>
+      'Trotzdem wiederherstellen';
+
+  @override
+  String backup_restore_preMigration_incompleteMetadata(
+    String timestamp,
+    String appVersion,
+  ) {
+    return 'Diese Sicherung wurde am $timestamp von App $appVersion erstellt, aber ihre Metadaten zur Datenbankmigration sind unvollständig.\n\nDie App kann nicht überprüfen, ob die Wiederherstellung dieser Sicherung sicher ist, daher ist die Wiederherstellung deaktiviert.';
+  }
+
+  @override
+  String backup_restore_preMigration_newerApp(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+  ) {
+    return 'Diese Sicherung ist neuer als Ihre App. Installieren Sie eine neuere App-Version, um sie wiederherzustellen.\n\nSicherung erstellt am $timestamp von App $appVersion (Datenbank v$fromVersion).';
+  }
+
+  @override
+  String backup_restore_preMigration_safe(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+    int toVersion,
+  ) {
+    return 'Diese Sicherung wurde am $timestamp von App $appVersion erstellt, kurz vor der Aktualisierung der Datenbank von v$fromVersion auf v$toVersion.\n\nDas Datenbankschema Ihrer App stimmt mit dieser Sicherung überein, die Wiederherstellung ist daher sicher.';
+  }
+
+  @override
+  String backup_restore_preMigration_warning(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+    int toVersion,
+    int currentVersion,
+  ) {
+    return 'Diese Sicherung wurde am $timestamp von App $appVersion erstellt, kurz vor der Aktualisierung der Datenbank von v$fromVersion auf v$toVersion.\n\nSie verwenden eine neuere App (Datenbank v$currentVersion).\n\nEine Wiederherstellung führt die Datenbankaktualisierung von v$fromVersion auf v$toVersion erneut auf Ihren wiederhergestellten Daten aus, also genau die Aktualisierung, die ursprünglich anstand. Wenn diese Aktualisierung das Problem verursacht hat, tritt es erneut auf.\n\nSo stellen Sie sicher wieder her: Installieren Sie App $appVersion oder älter und stellen Sie diese Sicherung aus dieser älteren App wieder her.';
+  }
+
+  @override
+  String get settings_cloudSync_progress_preparing =>
+      'Synchronisierung wird vorbereitet...';
+
+  @override
+  String get settings_cloudSync_progress_pulling =>
+      'Änderungen werden abgerufen...';
+
+  @override
+  String get settings_cloudSync_progress_publishing =>
+      'Änderungen werden veröffentlicht...';
+
+  @override
+  String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total) {
+    return 'Bibliothek wird hochgeladen ($uploaded von $total)';
+  }
+
+  @override
+  String get settings_cloudSync_result_noProvider =>
+      'Kein Cloud-Anbieter konfiguriert';
+
+  @override
+  String get settings_cloudSync_result_notAuthenticated =>
+      'Nicht beim Cloud-Anbieter authentifiziert';
+
+  @override
+  String get settings_cloudSync_result_timedOut =>
+      'Zeitüberschreitung bei der Synchronisierung';
+
+  @override
+  String get settings_cloudSync_result_epochMarkerUnreadable =>
+      'Der Epochenmarker der Bibliothek konnte nicht gelesen werden';
+
+  @override
+  String get settings_cloudSync_result_epochMarkerEncrypted =>
+      'Der Epochenmarker der Bibliothek ist verschlüsselt';
+
+  @override
+  String get settings_cloudSync_result_libraryReplacedRemotely =>
+      'Die Cloud-Bibliothek wurde aus einer Sicherung ersetzt';
+
+  @override
+  String get settings_cloudSync_result_noReplacementToRebuild =>
+      'Kein Bibliotheksersatz vorhanden, aus dem neu aufgebaut werden könnte';
+
+  @override
+  String get settings_cloudSync_result_rebuiltFromThisDevice =>
+      'Dieses Backend wurde aus der Bibliothek dieses Geräts neu aufgebaut';
+
+  @override
+  String settings_cloudSync_result_rebuildFailed(String error) {
+    return 'Neuaufbau fehlgeschlagen: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_libraryReplaced => 'Bibliothek ersetzt';
+
+  @override
+  String settings_cloudSync_result_libraryReplaceFailed(String error) {
+    return 'Ersetzen der Bibliothek fehlgeschlagen: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_noReplacementMarker =>
+      'Kein Marker für einen Bibliotheksersatz gefunden';
+
+  @override
+  String get settings_cloudSync_result_adoptedRestoredLibrary =>
+      'Wiederhergestellte Bibliothek übernommen';
+
+  @override
+  String settings_cloudSync_result_adoptFailed(String error) {
+    return 'Wiederhergestellte Bibliothek konnte nicht übernommen werden: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_previousLibraryUnreadable =>
+      'Die vorherige Bibliothek konnte nicht gelesen werden; dieses Backend wurde aus der Bibliothek dieses Geräts neu eingerichtet.';
+
+  @override
+  String get settings_cloudSync_result_replacementStillUploading =>
+      'Die ersetzte Bibliothek wird noch hochgeladen. Versuchen Sie es in Kürze erneut.';
+
+  @override
+  String settings_cloudSync_result_recordsFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Datensätze konnten nicht angewendet werden',
+      one: '1 Datensatz konnte nicht angewendet werden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_result_adoptedFreshIdentity =>
+      'Ein anderes Gerät hat mit der Identität dieses Geräts synchronisiert. Dieses Gerät hat eine neue Identität übernommen und die Cloud-Daten zusammengeführt.';
+
+  @override
+  String settings_cloudSync_launchCheck_unavailable(String provider) {
+    return '$provider ist auf diesem Gerät nicht verfügbar';
+  }
+
+  @override
+  String settings_cloudSync_launchCheck_notSignedIn(String provider) {
+    return 'Nicht bei $provider angemeldet';
+  }
+
+  @override
+  String settings_cloudSync_launchCheck_localChanges(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count lokale Änderungen zum Hochladen',
+      one: '1 lokale Änderung zum Hochladen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_launchCheck_noRemoteData =>
+      'Keine Synchronisierungsdaten in der Cloud gefunden';
+
+  @override
+  String get settings_cloudSync_launchCheck_cloudDataAvailable =>
+      'Cloud-Daten verfügbar';
+
+  @override
+  String get settings_cloudSync_launchCheck_updatesAvailable =>
+      'Aktualisierungen aus der Cloud verfügbar';
+
+  @override
+  String get settings_cloudSync_launchCheck_upToDate =>
+      'Alles ist auf dem neuesten Stand';
+
+  @override
+  String settings_cloudSync_launchCheck_failed(String error) {
+    return 'Synchronisierungsprüfung fehlgeschlagen: $error';
+  }
 }
