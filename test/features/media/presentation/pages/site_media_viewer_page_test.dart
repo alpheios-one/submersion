@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -170,6 +171,95 @@ void main() {
     // The overlay tracks the page the pager settled on.
     expect(find.text('Mooring line'), findsNothing);
     expect(find.text(_metadataLine(second.takenAt)), findsOneWidget);
+  });
+
+  testWidgets('arrow buttons page forward and back', (tester) async {
+    await pumpViewer(tester);
+    expect(find.text('1 / 2'), findsOneWidget);
+    // Nothing to go back to on the first item.
+    expect(find.byTooltip('Previous media'), findsNothing);
+
+    await tester.tap(find.byTooltip('Next media'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('2 / 2'), findsOneWidget);
+    expect(find.text(_metadataLine(second.takenAt)), findsOneWidget);
+    expect(find.byTooltip('Next media'), findsNothing);
+
+    await tester.tap(find.byTooltip('Previous media'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 / 2'), findsOneWidget);
+    expect(find.text('Mooring line'), findsOneWidget);
+  });
+
+  testWidgets('a single item gets no arrows', (tester) async {
+    await pumpViewer(tester, items: [first]);
+
+    expect(find.text('1 / 1'), findsOneWidget);
+    expect(find.byTooltip('Previous media'), findsNothing);
+    expect(find.byTooltip('Next media'), findsNothing);
+  });
+
+  testWidgets('left/right arrow keys page through the gallery', (tester) async {
+    await pumpViewer(tester);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 2'), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pumpAndSettle();
+    expect(find.text('1 / 2'), findsOneWidget);
+  });
+
+  testWidgets('Escape closes the viewer', (tester) async {
+    await tester.pumpWidget(
+      await mediaTestApp(
+        overrides: [
+          mediaForSiteProvider(
+            'site-1',
+          ).overrideWith((ref) async => [first, second]),
+        ],
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SiteMediaViewerPage(
+                  siteId: 'site-1',
+                  initialMediaId: 'm1',
+                  scope: SiteViewerScope.attachments,
+                ),
+              ),
+            ),
+            child: const Text('Open viewer'),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open viewer'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SiteMediaViewerPage), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SiteMediaViewerPage), findsNothing);
+    expect(find.text('Open viewer'), findsOneWidget);
+  });
+
+  testWidgets('arrows hide with the rest of the chrome', (tester) async {
+    await pumpViewer(tester);
+    expect(find.byTooltip('Next media'), findsOneWidget);
+
+    // The tap lands between the arrows: they cover the viewer so they can pin
+    // themselves to its edges, and must not swallow the chrome toggle.
+    await tester.tapAt(tester.getCenter(find.byType(PhotoViewGallery)));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Next media'), findsNothing);
   });
 
   testWidgets('tapping the photo toggles the overlays off and back on', (

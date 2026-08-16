@@ -11824,6 +11824,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => '下一个媒体';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => '无照片可用';
 
   @override
@@ -11833,6 +11836,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_photoViewer_playPauseVideoLabel => '播放或暂停视频';
+
+  @override
+  String get media_photoViewer_previousTooltip => '上一个媒体';
 
   @override
   String get media_photoViewer_seekVideoLabel => '调整视频位置';

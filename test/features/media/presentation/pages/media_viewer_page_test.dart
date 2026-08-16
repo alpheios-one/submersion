@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -58,6 +59,26 @@ void main() {
 
   tearDown(tearDownTestDatabase);
 
+  /// The viewer's provider scope + a locale-pinned MaterialApp around [home].
+  Widget host(Widget home) => ProviderScope(
+    overrides: [
+      sharedPreferencesProvider.overrideWithValue(prefs),
+      mediaSourceResolverRegistryProvider.overrideWithValue(
+        MediaSourceResolverRegistry({
+          MediaSourceType.platformGallery: _UnavailableResolver(
+            MediaSourceType.platformGallery,
+          ),
+        }),
+      ),
+    ],
+    child: MaterialApp(
+      locale: const Locale('en'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: home,
+    ),
+  );
+
   Future<void> pump(
     WidgetTester tester, {
     required List<MediaItem> mediaList,
@@ -96,6 +117,22 @@ void main() {
     });
   }
 
+  /// Runs [action] and lets the page animation finish.
+  ///
+  /// Deliberately NOT inside runAsync, unlike the initial pump: pumping from
+  /// the real-async zone does not drive the fake-async clock the page
+  /// animation ticks on, so animateToPage never settles and the indicator
+  /// stays on the old page.
+  Future<void> settlePager(
+    WidgetTester tester,
+    Future<void> Function() action,
+  ) async {
+    await action();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump();
+  }
+
   testWidgets('opens on the initial item and swipes between items', (
     tester,
   ) async {
@@ -112,6 +149,130 @@ void main() {
       await tester.pump();
     });
     expect(find.text('1 / 2'), findsOneWidget);
+  });
+
+  testWidgets('arrow buttons page forward and back', (tester) async {
+    await pump(tester, mediaList: [item('a'), item('b')], initialMediaId: 'a');
+    expect(find.text('1 / 2'), findsOneWidget);
+    // Nothing to go back to on the first item.
+    expect(find.byTooltip('Previous media'), findsNothing);
+
+    await settlePager(tester, () => tester.tap(find.byTooltip('Next media')));
+    expect(find.text('2 / 2'), findsOneWidget);
+    expect(find.byTooltip('Next media'), findsNothing);
+
+    await settlePager(
+      tester,
+      () => tester.tap(find.byTooltip('Previous media')),
+    );
+    expect(find.text('1 / 2'), findsOneWidget);
+  });
+
+  testWidgets('a single item gets no arrows', (tester) async {
+    await pump(tester, mediaList: [item('a')], initialMediaId: 'a');
+
+    expect(find.text('1 / 1'), findsOneWidget);
+    expect(find.byTooltip('Previous media'), findsNothing);
+    expect(find.byTooltip('Next media'), findsNothing);
+  });
+
+  testWidgets('left/right arrow keys page through the gallery', (tester) async {
+    await pump(tester, mediaList: [item('a'), item('b')], initialMediaId: 'a');
+
+    await settlePager(
+      tester,
+      () => tester.sendKeyEvent(LogicalKeyboardKey.arrowRight),
+    );
+    expect(find.text('2 / 2'), findsOneWidget);
+
+    await settlePager(
+      tester,
+      () => tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft),
+    );
+    expect(find.text('1 / 2'), findsOneWidget);
+  });
+
+  testWidgets('a second press mid-animation advances a second item', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      mediaList: [item('a'), item('b'), item('c')],
+      initialMediaId: 'a',
+    );
+
+    // Two presses inside one 250ms page animation. Stepping from the last
+    // SETTLED page would re-target item 2 and swallow the second press.
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 40));
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump();
+
+    expect(find.text('3 / 3'), findsOneWidget);
+  });
+
+  testWidgets('arrow keys stop at the ends rather than wrapping', (
+    tester,
+  ) async {
+    await pump(tester, mediaList: [item('a'), item('b')], initialMediaId: 'a');
+
+    await settlePager(
+      tester,
+      () => tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft),
+    );
+    expect(find.text('1 / 2'), findsOneWidget);
+  });
+
+  testWidgets('arrows hide with the rest of the chrome', (tester) async {
+    await pump(tester, mediaList: [item('a'), item('b')], initialMediaId: 'a');
+    expect(find.byTooltip('Next media'), findsOneWidget);
+
+    // Tapping the photo toggles the chrome off; the arrows are chrome. The
+    // tap lands between the arrows, which must not swallow it. The extra
+    // elapsed time lets PhotoView's double-tap recognizer time out and
+    // release the gesture arena.
+    await tester.tapAt(tester.getCenter(find.byType(Scaffold)));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump();
+
+    expect(find.byTooltip('Next media'), findsNothing);
+    expect(find.text('1 / 2'), findsNothing);
+  });
+
+  testWidgets('Escape closes the viewer', (tester) async {
+    // Pushed over a host page (not pumped as home) so there is a route to
+    // pop back to. No runAsync here: pumpAndSettle drives the fake clock,
+    // and mixing the two leaks async work past the end of the test.
+    await tester.pumpWidget(
+      host(
+        Builder(
+          builder: (context) => TextButton(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => MediaViewerPage(
+                  mediaList: [item('a'), item('b')],
+                  initialMediaId: 'a',
+                ),
+              ),
+            ),
+            child: const Text('Open viewer'),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open viewer'));
+    await tester.pumpAndSettle();
+    expect(find.byType(MediaViewerPage), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MediaViewerPage), findsNothing);
+    expect(find.text('Open viewer'), findsOneWidget);
   });
 
   testWidgets('empty list shows the localized empty message', (tester) async {

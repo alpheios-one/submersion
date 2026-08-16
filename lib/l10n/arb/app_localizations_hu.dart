@@ -12346,6 +12346,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'Következő médiaelem';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'Nincsenek elerheto fotok';
 
   @override
@@ -12356,6 +12359,9 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get media_photoViewer_playPauseVideoLabel =>
       'Video lejatszasa vagy szüneteltetese';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'Előző médiaelem';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'Video pozicio keresese';

@@ -11,6 +11,7 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media/presentation/providers/site_media_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
+import 'package:submersion/features/media/presentation/widgets/media_nav_arrows.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Which list of site-related media backs the viewer's pager.
@@ -48,6 +49,11 @@ class SiteMediaViewerPage extends ConsumerStatefulWidget {
 class _SiteMediaViewerPageState extends ConsumerState<SiteMediaViewerPage> {
   late PageController _pageController;
   int _currentIndex = 0;
+
+  /// The page the last nav request aimed at, which runs ahead of
+  /// [_currentIndex] while the pager is still animating. See [_stepPage].
+  int _navTargetIndex = 0;
+
   bool _showOverlay = true;
 
   @override
@@ -71,6 +77,48 @@ class _SiteMediaViewerPageState extends ConsumerState<SiteMediaViewerPage> {
       overlays: SystemUiOverlay.values,
     );
     super.dispose();
+  }
+
+  /// Steps [delta] pages from the last page *requested*, not the last one
+  /// settled on.
+  ///
+  /// onPageChanged only fires once the pager crosses the halfway point, so
+  /// [_currentIndex] lags an in-flight animation; stepping from it would drop
+  /// the second of two quick presses instead of advancing two items.
+  void _stepPage(int delta, int totalCount) {
+    if (!_pageController.hasClients) return;
+    final target = _navTargetIndex + delta;
+    // Out-of-range steps do nothing: the ends of the list do not wrap.
+    if (target < 0 || target >= totalCount) return;
+    _navTargetIndex = target;
+    _pageController.animateToPage(
+      target,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// Keyboard navigation for pointer platforms: arrows page, Escape closes.
+  ///
+  /// Arrow presses are reported handled even at the ends of the list, which
+  /// keeps them from falling through to default directional focus traversal.
+  KeyEventResult _handleKeyEvent(KeyEvent event, int totalCount) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+      _stepPage(-1, totalCount);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+      _stepPage(1, totalCount);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      Navigator.of(context).maybePop();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -101,6 +149,7 @@ class _SiteMediaViewerPageState extends ConsumerState<SiteMediaViewerPage> {
           );
           if (initialIndex != -1 && _pageController.hasClients == false) {
             _currentIndex = initialIndex;
+            _navTargetIndex = initialIndex;
             // hasClients == false means no PageView is attached, so the
             // outgoing controller is safe to dispose; without this the one
             // built in initState leaks.
@@ -110,7 +159,7 @@ class _SiteMediaViewerPageState extends ConsumerState<SiteMediaViewerPage> {
 
           final currentItem = mediaList[_currentIndex];
 
-          return GestureDetector(
+          final viewer = GestureDetector(
             // Swipe down to close (common pattern for fullscreen viewers)
             onVerticalDragEnd: (details) {
               if (details.primaryVelocity != null &&
@@ -124,7 +173,12 @@ class _SiteMediaViewerPageState extends ConsumerState<SiteMediaViewerPage> {
                   mediaList: mediaList,
                   pageController: _pageController,
                   onPageChanged: (index) {
-                    setState(() => _currentIndex = index);
+                    // Swipes and settles both land here, which is what
+                    // re-syncs the nav target after a gesture.
+                    setState(() {
+                      _currentIndex = index;
+                      _navTargetIndex = index;
+                    });
                   },
                 ),
 
@@ -147,10 +201,28 @@ class _SiteMediaViewerPageState extends ConsumerState<SiteMediaViewerPage> {
                     onClose: () => Navigator.of(context).pop(),
                     onShare: () => _shareCurrentItem(currentItem),
                   ),
+                  // Previous / next controls. Mounted with the rest of the
+                  // chrome, so the tap-to-hide gesture takes them away too.
+                  MediaNavArrows(
+                    currentIndex: _currentIndex,
+                    totalCount: mediaList.length,
+                    onPrevious: () => _stepPage(-1, mediaList.length),
+                    onNext: () => _stepPage(1, mediaList.length),
+                  ),
                   _BottomMetadataOverlay(item: currentItem),
                 ],
               ],
             ),
+          );
+
+          // Keyboard nav has to wrap the whole viewer to see its key events.
+          // Built as a local above rather than nested inline so the tree it
+          // wraps stays where it is.
+          return Focus(
+            autofocus: true,
+            onKeyEvent: (node, event) =>
+                _handleKeyEvent(event, mediaList.length),
+            child: viewer,
           );
         },
         loading: () =>

@@ -20963,6 +20963,12 @@ abstract class AppLocalizations {
   /// **'Failed to write metadata: {error}'**
   String media_photoViewer_failedToWriteMetadataError(Object error);
 
+  /// No description provided for @media_photoViewer_nextTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Next media'**
+  String get media_photoViewer_nextTooltip;
+
   /// No description provided for @media_photoViewer_noPhotosAvailable.
   ///
   /// In en, this message translates to:
@@ -20980,6 +20986,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Play or pause video'**
   String get media_photoViewer_playPauseVideoLabel;
+
+  /// No description provided for @media_photoViewer_previousTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous media'**
+  String get media_photoViewer_previousTooltip;
 
   /// No description provided for @media_photoViewer_seekVideoLabel.
   ///
