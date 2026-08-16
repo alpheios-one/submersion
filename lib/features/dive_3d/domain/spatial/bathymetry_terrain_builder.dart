@@ -27,6 +27,21 @@ class BathymetryTerrainBuilder {
 
   static const double metersPerDegLat = 110540.0;
 
+  /// The scene Y of grid node [r],[c] on the rendered surface, applying the
+  /// same nodata-to-shoreline and land-height-cap rules [build] bakes into
+  /// the mesh. Anything draped on the terrain asks through here so it never
+  /// drifts from where the surface is actually drawn.
+  static double surfaceY(
+    BathymetryGrid grid,
+    SpatialProjection projection,
+    int r,
+    int c,
+  ) {
+    final landCap = _landHeightCapFraction * math.max(projection.maxDepth, 1.0);
+    final raw = grid.depthAt(r, c);
+    return projection.yOf(raw == null ? 0.0 : math.max(raw, -landCap));
+  }
+
   /// The ramp color at normalized depth [t] (0 = shallow, 1 = ramp max).
   /// Banded mode quantizes into 10 equal segments sampled at their centers
   /// so the seascape reads like a stepped nautical chart tint.
@@ -88,7 +103,7 @@ class BathymetryTerrainBuilder {
         final depth = raw == null ? 0.0 : math.max(raw, -landCap);
         final vi = (r * cols + c) * 3;
         positions[vi] = projection.xOf(east);
-        positions[vi + 1] = projection.yOf(depth);
+        positions[vi + 1] = surfaceY(grid, projection, r, c);
         positions[vi + 2] = projection.zOf(north);
         if (uvs != null) {
           final f = imageryFrame!;
