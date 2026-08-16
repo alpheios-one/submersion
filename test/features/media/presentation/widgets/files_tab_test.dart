@@ -8,6 +8,7 @@ import 'package:submersion/features/media/data/services/local_bookmark_storage.d
 import 'package:submersion/features/media/data/services/local_media_platform.dart';
 import 'package:submersion/features/media/domain/value_objects/extracted_file.dart';
 import 'package:submersion/features/media/domain/value_objects/matched_selection.dart';
+import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_metadata.dart';
 import 'package:submersion/features/media/presentation/providers/files_tab_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/file_review_pane.dart';
@@ -202,7 +203,13 @@ void main() {
     expect(find.text('Link 2 items'), findsOneWidget);
   });
 
-  testWidgets('hides Link button when match.matched is empty', (tester) async {
+  // Issue #1098: the button used to disappear entirely when nothing was
+  // assignable, which read as "there is no way to save these". It now stays
+  // put and disables, matching the URL tab, so the affordance is always
+  // discoverable and its disabled state is the honest signal.
+  testWidgets('shows a disabled Link button when match.matched is empty', (
+    tester,
+  ) async {
     final seeded = FilesTabState.initial().copyWith(
       files: [_ef('/a.jpg')],
       match: MatchedSelection(matched: const {}, unmatched: [_ef('/a.jpg')]),
@@ -215,6 +222,21 @@ void main() {
           ),
         ],
         child: const MaterialApp(home: Scaffold(body: FilesTab())),
+      ),
+    );
+    expect(find.text('Link 0 items'), findsOneWidget);
+    final button = tester.widget<FilledButton>(find.byType(FilledButton).last);
+    expect(button.onPressed, isNull);
+  });
+
+  testWidgets('shows no commit button before any file is staged', (
+    tester,
+  ) async {
+    // A permanently-greyed button over an empty canvas is noise; the button
+    // earns its place only once there is something staged to act on.
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(home: Scaffold(body: FilesTab())),
       ),
     );
     expect(find.textContaining('Link '), findsNothing);
@@ -281,7 +303,11 @@ void main() {
         ),
       ],
       child: MaterialApp(
-        home: Scaffold(body: FilesTab(diveId: diveId)),
+        home: Scaffold(
+          body: FilesTab(
+            target: diveId == null ? null : DiveAttachTarget(diveId),
+          ),
+        ),
       ),
     );
 
@@ -318,7 +344,7 @@ void main() {
         ProviderScope(
           overrides: [filesTabNotifierProvider.overrideWith((ref) => notifier)],
           child: const MaterialApp(
-            home: Scaffold(body: FilesTab(diveId: 'd1')),
+            home: Scaffold(body: FilesTab(target: DiveAttachTarget('d1'))),
           ),
         ),
       );
@@ -346,6 +372,96 @@ void main() {
       // Without an assign affordance the unchecked checkbox made the whole
       // tab a no-op: nothing could ever reach commit().
       expect(find.text('Add all 1 to this dive'), findsOneWidget);
+    });
+  });
+
+  // Issue #1098. Opened from a dive site, the tab offered no way to accept the
+  // picked files: the commit button was gated on the dive matcher having
+  // produced a group, and a site never produces one. The site is now the
+  // target, so dive matching does not apply at all.
+  group('site target', () {
+    Widget wrap(FilesTabState seed) => ProviderScope(
+      overrides: [
+        filesTabNotifierProvider.overrideWith(
+          (ref) => _SeededFilesTabNotifier(seed),
+        ),
+      ],
+      child: const MaterialApp(
+        home: Scaffold(body: FilesTab(target: SiteAttachTarget('site-1'))),
+      ),
+    );
+
+    FilesTabState staged(List<ExtractedFile> files) =>
+        FilesTabState.initial().copyWith(
+          files: files,
+          // What auto-match leaves behind when nothing lines up with a dive,
+          // which is the normal outcome for a site.
+          match: MatchedSelection(matched: const {}, unmatched: files),
+        );
+
+    testWidgets('offers an enabled commit button for unmatched files', (
+      tester,
+    ) async {
+      await tester.pumpWidget(wrap(staged([_ef('/a.jpg')])));
+
+      expect(find.text('Attach 1 item to this site'), findsOneWidget);
+      final button = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Attach 1 item to this site'),
+      );
+      expect(button.onPressed, isNotNull);
+    });
+
+    testWidgets('pluralises the commit button label', (tester) async {
+      await tester.pumpWidget(wrap(staged([_ef('/a.jpg'), _ef('/b.jpg')])));
+
+      expect(find.text('Attach 2 items to this site'), findsOneWidget);
+    });
+
+    testWidgets('shows no commit button before any file is staged', (
+      tester,
+    ) async {
+      await tester.pumpWidget(wrap(FilesTabState.initial()));
+
+      expect(find.textContaining('Attach '), findsNothing);
+    });
+
+    testWidgets('hides the dive auto-match checkbox', (tester) async {
+      // A site has no time window, so matching photos to dives by date would
+      // silently route them somewhere the user did not ask for.
+      await tester.pumpWidget(wrap(staged([_ef('/a.jpg')])));
+
+      expect(find.byType(Checkbox), findsNothing);
+      expect(find.textContaining('Auto-match'), findsNothing);
+    });
+
+    testWidgets('offers no dive assignment affordances', (tester) async {
+      await tester.pumpWidget(wrap(staged([_ef('/a.jpg')])));
+
+      expect(find.textContaining('to this dive'), findsNothing);
+      expect(find.text('Unmatched'), findsNothing);
+    });
+
+    testWidgets('counts staged files as items, not photos', (tester) async {
+      // FileType.media admits video, and the folder scan admits
+      // .mp4/.mov/.m4v, so a staged set can be entirely video.
+      final clip = ExtractedFile(
+        sourcePath: '/clip.mp4',
+        file: File('/clip.mp4'),
+        metadata: const MediaSourceMetadata(mimeType: 'video/mp4'),
+      );
+      await tester.pumpWidget(wrap(staged([clip])));
+
+      expect(find.text('1 item'), findsOneWidget);
+      expect(find.textContaining('photo'), findsNothing);
+    });
+
+    testWidgets('lists every staged file flat', (tester) async {
+      await tester.pumpWidget(wrap(staged([_ef('/a.jpg'), _ef('/b.jpg')])));
+
+      expect(find.text('a.jpg'), findsOneWidget);
+      expect(find.text('b.jpg'), findsOneWidget);
+      // No dive grouping to expand or collapse.
+      expect(find.byType(ExpansionTile), findsNothing);
     });
   });
 }

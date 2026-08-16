@@ -36,6 +36,7 @@ import 'package:submersion/features/media/data/services/url_metadata_extractor.d
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/utils/url_validator.dart';
 import 'package:submersion/features/media/domain/entities/extracted_metadata.dart';
+import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
@@ -162,7 +163,13 @@ class UrlTabNotifier extends StateNotifier<UrlTabState> {
   /// the ingest call — the UI is expected to disable the "Add" button when
   /// any line fails validation, so reaching here with invalid lines is
   /// degenerate (we still skip them defensively rather than throw).
-  Future<List<String>> commit() async {
+  ///
+  /// A [SiteAttachTarget] attaches every row to that site and turns dive
+  /// matching off: a site has no time window, so matching would hand the
+  /// photo to whichever unrelated dive spanned its timestamp rather than to
+  /// the site the picker was opened from (issue #1098). Any other target
+  /// leaves the user's auto-match preference alone.
+  Future<List<String>> commit({MediaAttachTarget? target}) async {
     final uris = <Uri>[];
     for (final raw in state.draftLines) {
       final result = UrlValidator.parse(raw);
@@ -170,7 +177,15 @@ class UrlTabNotifier extends StateNotifier<UrlTabState> {
         uris.add(result.uri);
       }
     }
-    final ids = await _pipeline.ingest(uris, autoMatch: state.autoMatchByDate);
+    final siteId = switch (target) {
+      SiteAttachTarget(:final siteId) => siteId,
+      DiveAttachTarget() || null => null,
+    };
+    final ids = await _pipeline.ingest(
+      uris,
+      autoMatch: siteId == null && state.autoMatchByDate,
+      siteId: siteId,
+    );
     state = state.copyWith(committedIds: ids, draftLines: const []);
     return ids;
   }
