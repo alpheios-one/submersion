@@ -4920,6 +4920,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'Voir en plein ecran';
 
   @override
+  String get diveLog_detail_viewMap => 'Carte';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => 'Voir le site';
 
   @override

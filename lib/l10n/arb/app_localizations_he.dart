@@ -4777,6 +4777,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'הצגה במסך מלא';
 
   @override
+  String get diveLog_detail_viewMap => 'מפה';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => 'הצגת אתר';
 
   @override

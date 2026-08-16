@@ -4886,6 +4886,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'Teljes kepernyo';
 
   @override
+  String get diveLog_detail_viewMap => 'Térkép';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => 'Merulohely megtekintese';
 
   @override

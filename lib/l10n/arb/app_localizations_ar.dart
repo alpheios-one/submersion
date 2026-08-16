@@ -4807,6 +4807,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'عرض بملء الشاشة';
 
   @override
+  String get diveLog_detail_viewMap => 'خريطة';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => 'عرض الموقع';
 
   @override

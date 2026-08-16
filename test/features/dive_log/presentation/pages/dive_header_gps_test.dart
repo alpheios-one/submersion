@@ -128,7 +128,8 @@ void main() {
     expect(find.byType(PolylineLayer), findsNothing);
     expect(find.byKey(const ValueKey('gps-entry-marker')), findsNothing);
     expect(find.byKey(const ValueKey('gps-exit-marker')), findsNothing);
-    // The site affordance (badge + semantics) is present.
-    expect(find.text('View Site'), findsWidgets);
+    // The site affordances (Map + 3D deep-link pills) are present.
+    expect(find.text('Map'), findsWidgets);
+    expect(find.text('3D'), findsWidgets);
   });
 }

@@ -4907,6 +4907,12 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ver en pantalla completa';
 
   @override
+  String get diveLog_detail_viewMap => 'Mapa';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => 'Ver punto de buceo';
 
   @override

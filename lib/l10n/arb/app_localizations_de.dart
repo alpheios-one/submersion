@@ -4907,6 +4907,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'Vollbild anzeigen';
 
   @override
+  String get diveLog_detail_viewMap => 'Karte';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
   String get diveLog_detail_viewSite => 'Tauchplatz anzeigen';
 
   @override
