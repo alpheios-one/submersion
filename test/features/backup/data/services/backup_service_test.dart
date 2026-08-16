@@ -702,7 +702,7 @@ void main() {
         final db = sqlite3.sqlite3.open(dbFile.path);
         db.execute('CREATE TABLE dives (id TEXT PRIMARY KEY)');
         db.execute('CREATE TABLE dive_sites (id TEXT PRIMARY KEY)');
-        db.dispose();
+        db.close();
 
         final service = BackupService(
           dbAdapter: fakeDb,
@@ -734,7 +734,7 @@ void main() {
             'CREATE TABLE dive_sites (id TEXT PRIMARY KEY, name TEXT)',
           );
           db.execute('PRAGMA user_version = 20');
-          db.dispose();
+          db.close();
 
           final service = BackupService(
             dbAdapter: fakeDb,
@@ -758,7 +758,7 @@ void main() {
                   .toList();
               expect(columnNames, isNot(contains('wearable_source')));
             } finally {
-              verifyDb.dispose();
+              verifyDb.close();
             }
           } finally {
             await tempDir.delete(recursive: true);
@@ -793,7 +793,7 @@ void main() {
 
           final db = sqlite3.sqlite3.open(dbFile.path);
           db.execute('CREATE TABLE some_other_table (id TEXT PRIMARY KEY)');
-          db.dispose();
+          db.close();
 
           final service = BackupService(
             dbAdapter: fakeDb,

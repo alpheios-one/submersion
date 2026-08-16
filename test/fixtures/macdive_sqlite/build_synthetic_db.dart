@@ -35,7 +35,7 @@ File buildSyntheticMacDiveDb(String path) {
     _createSchema(db);
     _insertFixtureRows(db);
   } finally {
-    db.dispose();
+    db.close();
   }
   return f;
 }

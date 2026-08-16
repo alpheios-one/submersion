@@ -112,6 +112,15 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
   // resolver — becomes a Future error caught by FutureBuilder's hasError
   // branch in [build] instead of escaping initState/didUpdateWidget.
   Future<_Resolution> _resolve() async {
+    // Yield before the first `ref` touch. Both callers (initState and
+    // didUpdateWidget) run inside the build phase, and an `async` body still
+    // executes synchronously up to its first await -- so reading a provider
+    // here initialized it mid-build. Riverpod 3.3.2 marks the enclosing
+    // ProviderScope dirty when that happens, which Flutter rejects with
+    // "setState() or markNeedsBuild() called during build". Surfaced by the
+    // shrinking-gallery case in photo_viewer_gallery_change_test.dart, where
+    // an invalidate rebuilds the gallery and fires didUpdateWidget.
+    await null;
     final registry = ref.read(mediaSourceResolverRegistryProvider);
     final resolver = registry.resolverFor(widget.item.sourceType);
     // A PDF tile draws page 1. Rendering is the only way raw document bytes

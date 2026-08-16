@@ -41,7 +41,7 @@ Future<void> sqlcipherExport({
     db.execute('PRAGMA target.user_version = $v');
     db.execute('DETACH DATABASE target');
   } finally {
-    db.dispose();
+    db.close();
   }
 }
 

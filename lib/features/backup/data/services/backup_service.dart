@@ -616,7 +616,7 @@ class BackupService {
 
         return BackupValidationResult.valid(sizeBytes: sizeBytes);
       } finally {
-        testDb.dispose();
+        testDb.close();
       }
     } catch (e) {
       return BackupValidationResult.invalid('File is not a valid database: $e');

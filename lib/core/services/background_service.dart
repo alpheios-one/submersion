@@ -5,7 +5,6 @@ import 'package:workmanager/workmanager.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart'
     show CloudProviderType;
-import 'package:submersion/core/database/sqlcipher_setup.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/headless_cloud_provider.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -33,8 +32,6 @@ const String kBackupTask = 'com.submersion.backup';
 Future<bool> prepareHeadlessDatabaseKey({
   required SharedPreferences prefs,
 }) async {
-  // Fresh isolate: re-apply the per-isolate sqlite3 loader override.
-  setupSqlcipher();
   final security = DatabaseSecurityService.instance;
   await security.configure(prefs: prefs);
   if (!security.encryptionEnabled) return true;

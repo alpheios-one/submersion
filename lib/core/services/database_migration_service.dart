@@ -578,7 +578,7 @@ class DatabaseMigrationService {
         debugInfo?.writeln('DEBUG: Parsed status: "$status"');
         return status == 'ok';
       } finally {
-        db.dispose();
+        db.close();
         // Small delay to ensure SQLite fully releases the file lock
         await Future.delayed(const Duration(milliseconds: 50));
       }
@@ -725,7 +725,7 @@ class DatabaseMigrationService {
         buddyCount: buddyCount,
       );
     } finally {
-      db.dispose();
+      db.close();
       await Future.delayed(const Duration(milliseconds: 50));
     }
   }

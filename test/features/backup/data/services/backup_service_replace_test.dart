@@ -216,7 +216,7 @@ void main() {
       final db = sqlite3.sqlite3.open(dbFile.path);
       db.execute('CREATE TABLE dives (id TEXT PRIMARY KEY)');
       db.execute('CREATE TABLE dive_sites (id TEXT PRIMARY KEY)');
-      db.dispose();
+      db.close();
       final record = BackupRecord(
         id: 'r3',
         filename: 'valid_replace.db',
@@ -259,7 +259,7 @@ void main() {
       final db = sqlite3.sqlite3.open(dbFile.path);
       db.execute('CREATE TABLE dives (id TEXT PRIMARY KEY)');
       db.execute('CREATE TABLE dive_sites (id TEXT PRIMARY KEY)');
-      db.dispose();
+      db.close();
       final record = BackupRecord(
         id: 'r2',
         filename: 'valid.db',
@@ -291,7 +291,7 @@ void main() {
       final db = sqlite3.sqlite3.open(dbFile.path);
       db.execute('CREATE TABLE dives (id TEXT PRIMARY KEY)');
       db.execute('CREATE TABLE dive_sites (id TEXT PRIMARY KEY)');
-      db.dispose();
+      db.close();
 
       final cloud = FakeCloudStorageProvider();
       final upload = await cloud.uploadFile(

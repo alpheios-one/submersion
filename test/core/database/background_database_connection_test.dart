@@ -227,7 +227,7 @@ void main() {
     try {
       expect(reopened.select('SELECT id FROM t').single['id'], 1);
     } finally {
-      reopened.dispose();
+      reopened.close();
     }
 
     subscription.resume();
@@ -266,7 +266,7 @@ void main() {
     try {
       expect(reopened.select('SELECT id FROM t').single['id'], 7);
     } finally {
-      reopened.dispose();
+      reopened.close();
     }
   }, timeout: const Timeout(Duration(seconds: 60)));
 }

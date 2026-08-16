@@ -62,8 +62,9 @@ PODS:
   - gal (1.0.0):
     - Flutter
     - FlutterMacOS
-  - geocoding_ios (1.0.5):
+  - geocoding_darwin (0.0.1):
     - Flutter
+    - FlutterMacOS
   - geolocator_apple (1.2.0):
     - Flutter
     - FlutterMacOS
@@ -118,7 +119,7 @@ PODS:
     - FlutterMacOS
   - permission_handler_apple (9.4.8):
     - Flutter
-  - photo_manager (3.9.0):
+  - photo_manager (3.12.0):
     - Flutter
     - FlutterMacOS
   - printing (1.0.0):
@@ -137,14 +138,6 @@ PODS:
   - sqflite_darwin (0.0.4):
     - Flutter
     - FlutterMacOS
-  - SQLCipher (4.10.0):
-    - SQLCipher/standard (= 4.10.0)
-  - SQLCipher/common (4.10.0)
-  - SQLCipher/standard (4.10.0):
-    - SQLCipher/common
-  - sqlcipher_flutter_libs (0.0.1):
-    - Flutter
-    - SQLCipher (~> 4.10.0)
   - submersion_ocr (0.1.0):
     - Flutter
     - FlutterMacOS
@@ -171,7 +164,7 @@ DEPENDENCIES:
   - flutter_secure_storage_darwin (from `.symlinks/plugins/flutter_secure_storage_darwin/darwin`)
   - flutter_web_auth_2 (from `.symlinks/plugins/flutter_web_auth_2/ios`)
   - gal (from `.symlinks/plugins/gal/darwin`)
-  - geocoding_ios (from `.symlinks/plugins/geocoding_ios/ios`)
+  - geocoding_darwin (from `.symlinks/plugins/geocoding_darwin/darwin`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/darwin`)
   - health (from `.symlinks/plugins/health/ios`)
@@ -190,7 +183,6 @@ DEPENDENCIES:
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
-  - sqlcipher_flutter_libs (from `.symlinks/plugins/sqlcipher_flutter_libs/ios`)
   - submersion_ocr (from `.symlinks/plugins/submersion_ocr/darwin`)
   - submersion_transcoder (from `.symlinks/plugins/submersion_transcoder/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
@@ -210,7 +202,6 @@ SPEC REPOS:
     - ObjectBox
     - PromisesObjC
     - SDWebImage
-    - SQLCipher
     - SwiftyGif
 
 EXTERNAL SOURCES:
@@ -234,8 +225,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_web_auth_2/ios"
   gal:
     :path: ".symlinks/plugins/gal/darwin"
-  geocoding_ios:
-    :path: ".symlinks/plugins/geocoding_ios/ios"
+  geocoding_darwin:
+    :path: ".symlinks/plugins/geocoding_darwin/darwin"
   geolocator_apple:
     :path: ".symlinks/plugins/geolocator_apple/darwin"
   google_sign_in_ios:
@@ -272,8 +263,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sqflite_darwin:
     :path: ".symlinks/plugins/sqflite_darwin/darwin"
-  sqlcipher_flutter_libs:
-    :path: ".symlinks/plugins/sqlcipher_flutter_libs/ios"
   submersion_ocr:
     :path: ".symlinks/plugins/submersion_ocr/darwin"
   submersion_transcoder:
@@ -300,7 +289,7 @@ SPEC CHECKSUMS:
   flutter_secure_storage_darwin: acdb3f316ed05a3e68f856e0353b133eec373a23
   flutter_web_auth_2: 646fc9df97a01c59e5eea99b237da2c6360f8439
   gal: baecd024ebfd13c441269ca7404792a7152fde89
-  geocoding_ios: 33776c9ebb98d037b5e025bb0e7537f6dd19646e
+  geocoding_darwin: 968545604e6896deeef55517d53a81b3b9801971
   geolocator_apple: ab36aa0e8b7d7a2d7639b3b4e48308394e8cef5e
   google_sign_in_ios: 000870aa06da9b28d1d0bf7ef70ff0213059dd28
   GoogleSignIn: fcee2257188d5eda57a5e2b6a715550ffff9206d
@@ -318,22 +307,20 @@ SPEC CHECKSUMS:
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   pdfium_flutter: e5a6e881af0b182d5b0465ebad23a8a20caa28d4
   permission_handler_apple: 92d754bbaa7361d436db2d6c3c1c2a0fdcec462e
-  photo_manager: 25fd77df14f4f0ba5ef99e2c61814dde77e2bceb
-  printing: 54ff03f28fe9ba3aa93358afb80a8595a071dd07
+  photo_manager: c303e4476f6c220274119f0212a7753e45edd4a2
+  printing: a8960104e6c1a2b4bd3483a2f79c69be60830d08
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   receive_sharing_intent: 222384f00ffe7e952bbfabaa9e3967cb87e5fe00
   SDWebImage: e9fc87c1aab89a8ab1bbd74eba378c6f53be8abf
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
-  SQLCipher: eb79c64049cb002b4e9fcb30edb7979bf4706dfc
-  sqlcipher_flutter_libs: ae224763b087bffb3a5955fe295a1c460d458cb1
   submersion_ocr: c16e8aa86fee22293c92688fcf97c5293b6b159f
   submersion_transcoder: c0bc7bb59ce039c73dcd24cb7797b390cfd2dab6
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
   video_player_avfoundation: 3453f792138786248960ca029747fcd9f318ef52
-  workmanager_apple: 904529ae31e97fc5be632cf628507652294a0778
+  workmanager_apple: 1fc2a64e6a63ed3540fbb91b65f0c0d501881248
 
 PODFILE CHECKSUM: bf695f1d88cb8e6048580a51c30afd927d095aa6
 

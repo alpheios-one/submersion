@@ -24,7 +24,7 @@ void main() {
       seed.execute('CREATE TABLE sentinel (id INTEGER PRIMARY KEY)');
       seed.execute('INSERT INTO sentinel VALUES (42)');
     } finally {
-      seed.dispose();
+      seed.close();
     }
 
     SharedPreferences.setMockInitialValues({});
@@ -61,7 +61,7 @@ void main() {
       expect(verify.select('PRAGMA user_version').first.values.first, 63);
       expect(verify.select('SELECT id FROM sentinel').first.values.first, 42);
     } finally {
-      verify.dispose();
+      verify.close();
     }
 
     // Assert the BackupRecord is in the registry with the right shape.

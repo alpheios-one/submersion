@@ -18,9 +18,6 @@ import 'package:submersion/core/database/sqlcipher_setup.dart';
 /// Strings, so they cross the isolate boundary.
 DatabaseConnection Function() _openerFor(String path, String? keyHex) {
   return () {
-    // Fresh isolate: the sqlite3 loader override is per-isolate state and
-    // must be re-applied here or Android loads the non-cipher system lib.
-    setupSqlcipher();
     return DatabaseConnection(
       NativeDatabase(
         File(path),

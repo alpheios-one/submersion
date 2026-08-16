@@ -21,7 +21,7 @@ void main() {
       final path = '${tmp.path}/plain.db';
       final db = DatabaseService.openRaw(path, mode: OpenMode.readWriteCreate);
       db.execute('PRAGMA user_version = 42');
-      db.dispose();
+      db.close();
       expect(DatabaseService.getStoredSchemaVersion(path), 42);
     },
   );
