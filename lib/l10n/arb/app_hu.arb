@@ -3338,6 +3338,7 @@
   "equipment_edit_purchaseDateLabel": "Vasarlas datuma",
   "equipment_edit_purchaseInfoTitle": "Vasarlasi informaciok",
   "equipment_edit_purchasePriceLabel": "Vasarlasi ar",
+  "equipment_edit_purchasePriceValidation": "Adjon meg ervenyes osszeget",
   "equipment_edit_remindMeBeforeServiceDue": "Emlekeztetss a szerviz esedekesseg elott:",
   "equipment_edit_reminderDays": "{days} nap",
   "equipment_edit_saveButton_edit": "Valtozasok mentese",

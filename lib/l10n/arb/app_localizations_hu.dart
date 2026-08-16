@@ -10677,6 +10677,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_edit_purchasePriceLabel => 'Vasarlasi ar';
 
   @override
+  String get equipment_edit_purchasePriceValidation =>
+      'Adjon meg ervenyes osszeget';
+
+  @override
   String get equipment_edit_remindMeBeforeServiceDue =>
       'Emlekeztetss a szerviz esedekesseg elott:';
 

@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -11,6 +12,16 @@ import 'package:submersion/features/dive_planner/presentation/providers/dive_pla
 import 'package:submersion/l10n/l10n_extension.dart';
 
 const _uuid = Uuid();
+
+/// [value] rounded to [decimals] places, rendered in the diver's locale for
+/// seeding a text field.
+///
+/// These fields were seeded with `toStringAsFixed`, which always emits '.', so
+/// a diver in a comma-decimal locale could not read the value back (#1091).
+/// Rounding before formatting keeps the terse display fixed-point seeding gave:
+/// a psi or cuft conversion otherwise arrives with a long fractional tail.
+String _seedFixed(double value, int decimals) =>
+    formatDecimalForInput(double.parse(value.toStringAsFixed(decimals)));
 
 /// Widget for managing tanks in a dive plan.
 class PlanTankList extends ConsumerWidget {
@@ -198,22 +209,22 @@ class _TankEditDialogState extends State<_TankEditDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.tank?.name ?? '');
     _volumeController = TextEditingController(
-      text: widget.tank?.volume != null
-          ? widget.units.convertVolume(widget.tank!.volume!).toStringAsFixed(1)
-          : widget.units.convertVolume(11.1).toStringAsFixed(1),
+      text: _seedFixed(
+        widget.units.convertVolume(widget.tank?.volume ?? 11.1),
+        1,
+      ),
     );
     _pressureController = TextEditingController(
-      text: widget.tank?.startPressure != null
-          ? widget.units
-                .convertPressure(widget.tank!.startPressure!)
-                .toStringAsFixed(0)
-          : widget.units.convertPressure(200).toStringAsFixed(0),
+      text: _seedFixed(
+        widget.units.convertPressure(widget.tank?.startPressure ?? 200),
+        0,
+      ),
     );
     _o2Controller = TextEditingController(
-      text: widget.tank?.gasMix.o2.toString() ?? '21',
+      text: formatDecimalForInput(widget.tank?.gasMix.o2 ?? 21),
     );
     _heController = TextEditingController(
-      text: widget.tank?.gasMix.he.toString() ?? '0',
+      text: formatDecimalForInput(widget.tank?.gasMix.he ?? 0),
     );
     _role = widget.tank?.role ?? TankRole.backGas;
   }
@@ -340,8 +351,8 @@ class _TankEditDialogState extends State<_TankEditDialog> {
   }
 
   void _save() {
-    final parsedVolume = double.tryParse(_volumeController.text);
-    final parsedPressure = double.tryParse(_pressureController.text);
+    final parsedVolume = parseUserDecimal(_volumeController.text);
+    final parsedPressure = parseUserDecimal(_pressureController.text);
 
     final tank = DiveTank(
       id: widget.tank?.id ?? _uuid.v4(),
@@ -353,8 +364,8 @@ class _TankEditDialogState extends State<_TankEditDialog> {
           ? widget.units.pressureToBar(parsedPressure)
           : null,
       gasMix: GasMix(
-        o2: double.tryParse(_o2Controller.text) ?? 21,
-        he: double.tryParse(_heController.text) ?? 0,
+        o2: parseUserDecimal(_o2Controller.text) ?? 21,
+        he: parseUserDecimal(_heController.text) ?? 0,
       ),
       role: _role,
       order: widget.tank?.order ?? 0,

@@ -10699,6 +10699,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipment_edit_purchasePriceLabel => 'Prezzo di acquisto';
 
   @override
+  String get equipment_edit_purchasePriceValidation =>
+      'Inserisci un importo valido';
+
+  @override
   String get equipment_edit_remindMeBeforeServiceDue =>
       'Ricordami prima della scadenza della manutenzione:';
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
@@ -111,20 +112,16 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
 
   /// Suit thickness can be fractional (e.g. 2.5 mm), so keep decimals rather
   /// than truncating with toStringAsFixed(0); integers still render cleanly.
+  /// Rendered in the diver's locale to match [_parseThicknessBound].
   String _formatThicknessBound(double? value) {
     if (value == null) return '';
-    return value == value.roundToDouble()
-        ? value.toStringAsFixed(0)
-        : value.toString();
+    return formatDecimalForInput(value);
   }
 
-  /// Parse a user-entered thickness bound, tolerating a comma decimal
-  /// separator (common in many locales). Empty/invalid input clears the bound.
-  double? _parseThicknessBound(String value) {
-    final trimmed = value.trim().replaceAll(',', '.');
-    if (trimmed.isEmpty) return null;
-    return double.tryParse(trimmed);
-  }
+  /// Parse a user-entered thickness bound in the diver's locale. Empty or
+  /// invalid input clears the bound. A blanket replaceAll(',', '.') would
+  /// misread the en_US thousands separator, turning "1,250" into 1.25 (#1091).
+  double? _parseThicknessBound(String value) => parseUserDecimal(value);
 
   @override
   Widget build(BuildContext context) {
@@ -442,7 +439,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        _minDepth = double.tryParse(value);
+                        _minDepth = parseUserDecimal(value);
                       },
                     ),
                   ),
@@ -457,7 +454,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        _maxDepth = double.tryParse(value);
+                        _maxDepth = parseUserDecimal(value);
                       },
                     ),
                   ),
@@ -813,7 +810,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        _minDurationMinutes = int.tryParse(value);
+                        _minDurationMinutes = parseUserInt(value);
                       },
                     ),
                   ),
@@ -828,7 +825,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        _maxDurationMinutes = int.tryParse(value);
+                        _maxDurationMinutes = parseUserInt(value);
                       },
                     ),
                   ),

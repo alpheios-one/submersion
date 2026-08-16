@@ -10224,6 +10224,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_edit_purchasePriceLabel => '购买价格';
 
   @override
+  String get equipment_edit_purchasePriceValidation => '请输入有效金额';
+
+  @override
   String get equipment_edit_remindMeBeforeServiceDue => '在维护到期前提醒我：';
 
   @override

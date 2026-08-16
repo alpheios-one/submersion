@@ -1,3 +1,4 @@
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
@@ -53,15 +54,20 @@ String attributeUnitSymbol(AttributeDimension d, UnitFormatter units) =>
 /// label, with no unit symbol: integers render without decimals, otherwise one
 /// decimal place. Keeps edit fields readable after a unit conversion (e.g.
 /// kg->lbs) instead of leaking full floating-point precision.
+///
+/// Rendered in the diver's locale, matching how the field is read back with
+/// [parseUserDecimal]. Seeding "7.5" where ',' is the decimal separator and '.'
+/// groups thousands would make an untouched re-save store 75 (#1091).
 String formatAttributeNumberForEditing(
   AttributeDimension dimension,
   UnitFormatter units,
   double metricValue,
 ) {
   final display = attributeDisplayFromMetric(dimension, units, metricValue);
-  return display == display.roundToDouble()
-      ? display.toStringAsFixed(0)
-      : display.toStringAsFixed(1);
+  final rounded = display == display.roundToDouble()
+      ? display
+      : (display * 10).roundToDouble() / 10;
+  return formatDecimalForInput(rounded);
 }
 
 /// Display string for a stored attribute value (detail page, CSV).

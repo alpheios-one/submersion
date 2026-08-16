@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_planner/presentation/providers/dive_planner_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+
+/// [value] rounded to [decimals] places, rendered in the diver's locale for
+/// seeding a text field. Rounding first keeps the terse display fixed-point
+/// seeding gave: a foot conversion otherwise arrives with a fractional tail.
+String _seedFixed(double value, int decimals) =>
+    formatDecimalForInput(double.parse(value.toStringAsFixed(decimals)));
 
 /// Setpoint controls for a CCR plan: low/high setpoints (bar) and the
 /// depth below which the high setpoint is in force (display units).
@@ -25,16 +32,19 @@ class _CcrSettingsSectionState extends ConsumerState<CcrSettingsSection> {
     super.initState();
     final state = ref.read(divePlanNotifierProvider);
     final units = UnitFormatter(ref.read(settingsProvider));
+    // A setpoint is decimal by nature (1,2 bar for a comma-decimal diver), so
+    // the seed and the parse both go through the locale helpers (#1091).
     _lowController = TextEditingController(
-      text: (state.setpointLow ?? 0.7).toStringAsFixed(1),
+      text: _seedFixed(state.setpointLow ?? 0.7, 1),
     );
     _highController = TextEditingController(
-      text: (state.setpointHigh ?? 1.3).toStringAsFixed(1),
+      text: _seedFixed(state.setpointHigh ?? 1.3, 1),
     );
     _switchController = TextEditingController(
-      text: units
-          .convertDepth(state.setpointSwitchDepth ?? 10.0)
-          .toStringAsFixed(0),
+      text: _seedFixed(
+        units.convertDepth(state.setpointSwitchDepth ?? 10.0),
+        0,
+      ),
     );
   }
 
@@ -68,7 +78,7 @@ class _CcrSettingsSectionState extends ConsumerState<CcrSettingsSection> {
           ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           onChanged: (text) {
-            final parsed = double.tryParse(text);
+            final parsed = parseUserDecimal(text);
             // Setpoints must be positive; a switch depth of 0 (surface) is a
             // valid, useful configuration, so it opts into allowZero.
             if (parsed == null || (allowZero ? parsed < 0 : parsed <= 0)) {

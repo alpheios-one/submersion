@@ -5,11 +5,21 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+
+/// [value] rounded to [decimals] places, rendered in the diver's locale for
+/// seeding a text field.
+///
+/// Volume is decimal by nature (an 11,1 L cylinder for a comma-decimal diver),
+/// so seed, validator, and save all go through the locale helpers (#1091).
+/// Rounding first keeps the terse display fixed-point seeding gave.
+String _seedFixed(double value, int decimals) =>
+    formatDecimalForInput(double.parse(value.toStringAsFixed(decimals)));
 
 class TankPresetEditPage extends ConsumerStatefulWidget {
   final String? presetId;
@@ -67,15 +77,16 @@ class _TankPresetEditPageState extends ConsumerState<TankPresetEditPage> {
 
           // Convert volume to user's preferred units
           if (settings.volumeUnit == VolumeUnit.cubicFeet) {
-            _volumeController.text = preset.volumeCuft.toStringAsFixed(1);
+            _volumeController.text = _seedFixed(preset.volumeCuft, 1);
           } else {
-            _volumeController.text = preset.volumeLiters.toStringAsFixed(1);
+            _volumeController.text = _seedFixed(preset.volumeLiters, 1);
           }
 
           // Convert pressure to user's preferred units
-          _workingPressureController.text = units
-              .convertPressure(preset.workingPressureBar)
-              .toStringAsFixed(0);
+          _workingPressureController.text = _seedFixed(
+            units.convertPressure(preset.workingPressureBar),
+            0,
+          );
         });
       }
     } catch (e) {
@@ -178,7 +189,7 @@ class _TankPresetEditPageState extends ConsumerState<TankPresetEditPage> {
                             if (value == null || value.isEmpty) {
                               return context.l10n.tankPresets_edit_required;
                             }
-                            final parsed = double.tryParse(value);
+                            final parsed = parseUserDecimal(value);
                             if (parsed == null || parsed <= 0) {
                               return context.l10n.tankPresets_edit_validVolume;
                             }
@@ -202,7 +213,7 @@ class _TankPresetEditPageState extends ConsumerState<TankPresetEditPage> {
                             if (value == null || value.isEmpty) {
                               return context.l10n.tankPresets_edit_required;
                             }
-                            final parsed = int.tryParse(value);
+                            final parsed = parseUserInt(value);
                             if (parsed == null || parsed <= 0) {
                               return context
                                   .l10n
@@ -258,8 +269,8 @@ class _TankPresetEditPageState extends ConsumerState<TankPresetEditPage> {
   }
 
   Widget _buildInfoCard(AppSettings settings, UnitFormatter units) {
-    final volumeDisplay = double.tryParse(_volumeController.text);
-    final pressureDisplay = double.tryParse(_workingPressureController.text);
+    final volumeDisplay = parseUserDecimal(_volumeController.text);
+    final pressureDisplay = parseUserDecimal(_workingPressureController.text);
 
     if (volumeDisplay == null || pressureDisplay == null) {
       return const SizedBox.shrink();
@@ -327,8 +338,12 @@ class _TankPresetEditPageState extends ConsumerState<TankPresetEditPage> {
 
       // Parse form values
       final displayName = _displayNameController.text.trim();
-      final volumeDisplay = double.parse(_volumeController.text);
-      final pressureDisplay = double.parse(_workingPressureController.text);
+      // The validators above already rejected anything unreadable in the
+      // diver's locale, so both fields parse here.
+      final volumeDisplay = parseUserDecimal(_volumeController.text)!;
+      final pressureDisplay = parseUserDecimal(
+        _workingPressureController.text,
+      )!;
       final description = _descriptionController.text.trim();
 
       // Convert to storage units (metric)

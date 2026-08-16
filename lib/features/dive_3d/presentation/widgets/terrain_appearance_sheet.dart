@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -210,12 +211,15 @@ class TerrainAppearanceSheet extends ConsumerWidget {
           width: 96,
           child: TextFormField(
             key: ValueKey('seascapeLevelField$index'),
-            initialValue: display % 1 == 0
-                ? display.toStringAsFixed(0)
-                : display.toStringAsFixed(1),
+            // Seeded and read in the same locale convention, or a diver whose
+            // locale groups thousands with '.' would see "12.5" and have an
+            // untouched resubmit store 125 (#1091).
+            initialValue: formatDecimalForInput(
+              display % 1 == 0 ? display : (display * 10).roundToDouble() / 10,
+            ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             onFieldSubmitted: (text) {
-              final v = double.tryParse(text.replaceAll(',', '.'));
+              final v = parseUserDecimal(text);
               if (v == null || v <= 0) return;
               update(
                 appearance.copyWith(

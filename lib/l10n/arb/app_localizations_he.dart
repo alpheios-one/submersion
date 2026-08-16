@@ -10455,6 +10455,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_edit_purchasePriceLabel => 'מחיר רכישה';
 
   @override
+  String get equipment_edit_purchasePriceValidation => 'הזן סכום חוקי';
+
+  @override
   String get equipment_edit_remindMeBeforeServiceDue =>
       'הזכר לי לפני מועד הטיפול:';
 

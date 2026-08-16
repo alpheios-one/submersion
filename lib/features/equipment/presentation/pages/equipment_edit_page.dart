@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/utils/currency.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -125,7 +126,14 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
     _brandController.text = equipment.brand ?? '';
     _modelController.text = equipment.model ?? '';
     _serialController.text = equipment.serialNumber ?? '';
-    _purchasePriceController.text = equipment.purchasePrice?.toString() ?? '';
+    // Seeded in the diver's locale convention, matching how the field is read
+    // back on save. double.toString() would seed "12.5" even where ',' is the
+    // decimal separator and '.' groups thousands, so an untouched re-save
+    // would store 125 (#1091).
+    final price = equipment.purchasePrice;
+    _purchasePriceController.text = price == null
+        ? ''
+        : formatDecimalForInput(price);
     _initialCurrencyCode = equipment.purchaseCurrency;
     _purchaseCurrencyController.text = _initialCurrencyCode;
     _notesController.text = equipment.notes;
@@ -595,6 +603,7 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
                     builder: (context, value, _) {
                       final symbol = currencySymbol(value.text);
                       return TextFormField(
+                        key: const ValueKey('equipment-purchase-price'),
                         controller: _purchasePriceController,
                         decoration: InputDecoration(
                           labelText:
@@ -604,6 +613,19 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
+                        // A price that cannot be read has to be reported. The
+                        // repository writes Value(null) rather than
+                        // Value.absent(), so accepting the save would erase
+                        // the stored price instead of leaving it alone.
+                        validator: (value) {
+                          final text = value?.trim() ?? '';
+                          if (text.isEmpty) return null;
+                          return parseUserDecimal(text) == null
+                              ? context
+                                    .l10n
+                                    .equipment_edit_purchasePriceValidation
+                              : null;
+                        },
                       );
                     },
                   ),
@@ -826,9 +848,9 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
             ? null
             : _serialController.text.trim(),
         purchaseDate: _purchaseDate,
-        purchasePrice: _purchasePriceController.text.isNotEmpty
-            ? double.tryParse(_purchasePriceController.text)
-            : null,
+        // Blank means "no price"; anything unreadable was already stopped by
+        // the field validator, so null here can only mean blank.
+        purchasePrice: parseUserDecimal(_purchasePriceController.text),
         purchaseCurrency: _purchaseCurrencyController.text.trim().isEmpty
             ? _fallbackCurrencyCode()
             : _purchaseCurrencyController.text.trim(),

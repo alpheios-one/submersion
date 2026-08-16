@@ -3410,6 +3410,7 @@
   "equipment_edit_purchaseDateLabel": "Data de Compra",
   "equipment_edit_purchaseInfoTitle": "Informacoes de Compra",
   "equipment_edit_purchasePriceLabel": "Preco de Compra",
+  "equipment_edit_purchasePriceValidation": "Insira um valor valido",
   "equipment_edit_remindMeBeforeServiceDue": "Lembrar-me antes da manutencao:",
   "equipment_edit_reminderDays": "{days} dias",
   "equipment_edit_saveButton_edit": "Salvar Alteracoes",

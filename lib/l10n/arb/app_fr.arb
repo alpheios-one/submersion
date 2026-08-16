@@ -3338,6 +3338,7 @@
   "equipment_edit_purchaseDateLabel": "Date d'achat",
   "equipment_edit_purchaseInfoTitle": "Informations d'achat",
   "equipment_edit_purchasePriceLabel": "Prix d'achat",
+  "equipment_edit_purchasePriceValidation": "Entrez un montant valide",
   "equipment_edit_remindMeBeforeServiceDue": "Me rappeler avant l'echeance de revision :",
   "equipment_edit_reminderDays": "{days} jours",
   "equipment_edit_saveButton_edit": "Enregistrer les modifications",

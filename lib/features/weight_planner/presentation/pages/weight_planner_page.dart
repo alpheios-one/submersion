@@ -8,6 +8,7 @@ import 'package:submersion/core/buoyancy/weight_prediction_engine.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/divers/domain/entities/diver_weight_entry.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
@@ -69,7 +70,7 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
   int get _displayBottomMinutes => _bottomMinutesDraft ?? _bottomMinutes;
 
   double? _bodyWeightKg(UnitFormatter units) {
-    final parsed = double.tryParse(_bodyWeightController.text);
+    final parsed = parseUserDecimal(_bodyWeightController.text);
     return parsed != null ? units.weightToKg(parsed) : null;
   }
 
@@ -289,9 +290,13 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
     final latestWeight = ref.watch(latestDiverWeightProvider).valueOrNull;
     if (!_bodyWeightSeeded && latestWeight != null) {
       _bodyWeightSeeded = true;
-      _bodyWeightController.text = units
-          .convertWeight(latestWeight.weightKg)
-          .toStringAsFixed(1);
+      // Rounded to a tenth, then rendered by the locale formatter: a
+      // toStringAsFixed seed would put a dot in the field that the parser in
+      // [_bodyWeightKg] reads as a grouping separator under de/es/it.
+      final shown = units.convertWeight(latestWeight.weightKg);
+      _bodyWeightController.text = formatDecimalForInput(
+        (shown * 10).roundToDouble() / 10,
+      );
     }
     // Start with one tank once presets load.
     final presets = ref.watch(tankPresetsProvider).valueOrNull;

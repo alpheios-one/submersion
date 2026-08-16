@@ -10694,6 +10694,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_edit_purchasePriceLabel => 'Preco de Compra';
 
   @override
+  String get equipment_edit_purchasePriceValidation => 'Insira um valor valido';
+
+  @override
   String get equipment_edit_remindMeBeforeServiceDue =>
       'Lembrar-me antes da manutencao:';
 
