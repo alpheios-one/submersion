@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io' show Platform, HttpClient;
+import 'dart:ui' show Locale;
 
 import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 import 'package:geolocator/geolocator.dart';
@@ -50,42 +51,27 @@ class LocationService {
     '&accept-language=en',
   );
 
-  /// The platform geocoder answers in the DEVICE locale unless pinned,
-  /// which stored 'Spanien' on German phones and 'España' on Spanish ones
-  /// for the same country (#214). Pin once per process.
+  /// The platform geocoder answers in the DEVICE locale unless a locale is
+  /// supplied, which stored 'Spanien' on German phones and 'España' on
+  /// Spanish ones for the same country (#214).
   ///
-  /// Memoizes the in-flight future rather than a bool so concurrent callers
-  /// share one `setLocaleIdentifier` call instead of racing past a flag that
-  /// is only set after the await.
-  static Future<void>? _geocoderLocalePin;
+  /// geocoding 5 takes the locale per call, which retires the old
+  /// pin-once-per-process memo. Do NOT pin via `Geocoding(locale: ...)`
+  /// instead: that constructor parameter is dropped upstream (the redirecting
+  /// constructor never forwards it to the field), so it would silently
+  /// reintroduce #214.
+  static const Locale _geocoderLocale = Locale('en');
 
   /// Routes reverse geocoding through the platform geocoder.
   ///
   /// True on mobile in production. `Platform.isIOS`/`isAndroid` are
   /// natively-resolved statics with no override hook, so the mobile branch
   /// is otherwise unreachable on a desktop test host -- including the
-  /// locale pin below, whose single-call and retry-after-failure contracts
-  /// are the part of #214 most worth asserting.
+  /// English-locale contract below, the part of #214 most worth asserting.
   @visibleForTesting
   static bool debugForceNativeGeocoder = false;
 
   static bool get _useNativeGeocoder => debugForceNativeGeocoder || _isMobile;
-
-  /// Resets the memoized locale pin. Tests only.
-  @visibleForTesting
-  static void debugResetGeocoderLocalePin() => _geocoderLocalePin = null;
-
-  /// Pin the platform geocoder to English, at most once per process.
-  ///
-  /// A failed attempt clears the memo so a later call retries. Callers treat
-  /// a failed pin as non-fatal: geocoding still runs, just unpinned.
-  static Future<void> _pinGeocoderLocale() {
-    return _geocoderLocalePin ??= Future<void>(() => setLocaleIdentifier('en'))
-        .onError<Object>((error, stackTrace) {
-          _geocoderLocalePin = null;
-          Error.throwWithStackTrace(error, stackTrace);
-        });
-  }
 
   static final _log = LoggerService.forClass(LocationService);
   static LocationService? _instance;
@@ -247,10 +233,13 @@ class LocationService {
       // Try native geocoding first (works on iOS/Android)
       if (_useNativeGeocoder) {
         try {
-          await _pinGeocoderLocale();
-          final placemarks = await placemarkFromCoordinates(
+          // Built per call rather than cached in a static: construction only
+          // asks the platform factory for an implementation, and a cached
+          // instance would outlive the per-test factory fakes.
+          final placemarks = await Geocoding().placemarkFromCoordinates(
             latitude,
             longitude,
+            locale: _geocoderLocale,
           );
           if (placemarks.isNotEmpty) {
             final place = placemarks.first;
