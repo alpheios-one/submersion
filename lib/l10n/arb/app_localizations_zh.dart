@@ -21842,7 +21842,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get attrLabel_dpv_style => '款式';
 
   @override
-  String get attrLabel_burn_time_h => '续航时间（小时）';
+  String get attrLabel_burn_time_h => '续航时间';
 
   @override
   String get attrLabel_battery_type => '电池';
