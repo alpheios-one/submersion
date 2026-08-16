@@ -34,8 +34,10 @@ class PlanGasSection extends ConsumerWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Semantics(
-                label:
-                    'SAC Rate: ${planState.sacRate.toStringAsFixed(0)} ${units.volumeSymbol} per minute',
+                label: context.l10n.divePlanner_semantics_sacRate(
+                  planState.sacRate.toStringAsFixed(0),
+                  units.volumeSymbol,
+                ),
                 child: Slider(
                   value: planState.sacRate,
                   min: 8,
@@ -222,7 +224,9 @@ class _ReservePressureInputState extends State<_ReservePressureInput> {
     final textField = SizedBox(
       width: 80,
       child: Semantics(
-        label: 'Reserve pressure in ${widget.units.pressureSymbol}',
+        label: context.l10n.divePlanner_semantics_reservePressure(
+          widget.units.pressureSymbol,
+        ),
         child: TextField(
           controller: _controller,
           decoration: InputDecoration(

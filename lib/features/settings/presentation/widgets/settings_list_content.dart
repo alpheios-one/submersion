@@ -299,7 +299,7 @@ class _SettingsSectionTile extends StatelessWidget {
       case 'security':
         return context.l10n.settings_section_security_title;
       case 'debug':
-        return 'Debug';
+        return context.l10n.settings_section_debug_title;
       default:
         return section.title;
     }
@@ -332,7 +332,7 @@ class _SettingsSectionTile extends StatelessWidget {
       case 'security':
         return context.l10n.settings_section_security_subtitle;
       case 'debug':
-        return 'Logs & diagnostics';
+        return context.l10n.settings_section_debug_subtitle;
       default:
         return section.subtitle;
     }

@@ -17,17 +17,19 @@ class MediaSourcesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Media Sources')),
+      appBar: AppBar(title: Text(context.l10n.settings_mediaSources_title)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Card(
+          Card(
             child: Column(
               children: [
                 ListTile(
-                  leading: Icon(Icons.photo_library_outlined),
-                  title: Text('Photo library'),
-                  subtitle: Text('Apple Photos / Google Photos / iCloud'),
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: Text(context.l10n.media_source_gallery),
+                  subtitle: Text(
+                    context.l10n.settings_mediaSources_photoLibrarySubtitle,
+                  ),
                 ),
               ],
             ),
@@ -41,15 +43,19 @@ class MediaSourcesPage extends ConsumerWidget {
                     final asyncDiag = ref.watch(localFilesDiagnosticsProvider);
                     return ListTile(
                       leading: const Icon(Icons.folder_outlined),
-                      title: const Text('Local files'),
+                      title: Text(context.l10n.media_source_localFile),
                       subtitle: asyncDiag.when(
-                        data: (d) =>
-                            // TODO(media): l10n
-                            Text(
-                              '${d.available} available, ${d.unavailable} unavailable',
-                            ),
-                        loading: () => const Text('Counting…'),
-                        error: (e, _) => Text('Error: $e'),
+                        data: (d) => Text(
+                          context.l10n.settings_mediaSources_localFilesCounts(
+                            d.available,
+                            d.unavailable,
+                          ),
+                        ),
+                        loading: () =>
+                            Text(context.l10n.settings_mediaSources_counting),
+                        error: (e, _) => Text(
+                          context.l10n.settings_mediaSources_error('$e'),
+                        ),
                       ),
                     );
                   },
@@ -59,25 +65,35 @@ class MediaSourcesPage extends ConsumerWidget {
                   builder: (context, ref, _) {
                     return ListTile(
                       leading: const Icon(Icons.refresh),
-                      // TODO(media): l10n
-                      title: const Text('Re-verify all local files'),
+                      title: Text(
+                        context.l10n.settings_mediaSources_reverifyAll,
+                      ),
                       onTap: () async {
                         final messenger = ScaffoldMessenger.of(context);
+                        final l10n = context.l10n;
                         final service = ref.read(
                           localFilesDiagnosticsServiceProvider,
                         );
                         try {
                           final updated = await service.reverifyAll();
                           if (!context.mounted) return;
-                          // TODO(media): l10n, pluralization
                           messenger.showSnackBar(
-                            SnackBar(content: Text('$updated items updated')),
+                            SnackBar(
+                              content: Text(
+                                l10n.settings_mediaSources_reverifyResult(
+                                  updated,
+                                ),
+                              ),
+                            ),
                           );
                           ref.invalidate(localFilesDiagnosticsProvider);
                         } catch (e) {
-                          // TODO(media): l10n
                           messenger.showSnackBar(
-                            SnackBar(content: Text('Re-verify failed: $e')),
+                            SnackBar(
+                              content: Text(
+                                l10n.settings_mediaSources_reverifyFailed('$e'),
+                              ),
+                            ),
                           );
                         }
                       },
@@ -96,13 +112,21 @@ class MediaSourcesPage extends ConsumerWidget {
                       final asyncUsage = ref.watch(androidUriUsageProvider);
                       return ListTile(
                         leading: const Icon(Icons.lock_outline),
-                        title: const Text('Android URI permissions'),
+                        title: Text(
+                          context.l10n.settings_mediaSources_androidUriTitle,
+                        ),
                         subtitle: asyncUsage.when(
-                          data: (usage) =>
-                              // TODO(media): l10n
-                              Text('$usage / 128 persistable URIs in use'),
-                          loading: () => const Text('Loading…'),
-                          error: (e, _) => Text('Error: $e'),
+                          data: (usage) => Text(
+                            context.l10n.settings_mediaSources_androidUriUsage(
+                              usage,
+                              128,
+                            ),
+                          ),
+                          loading: () =>
+                              Text(context.l10n.settings_mediaSources_loading),
+                          error: (e, _) => Text(
+                            context.l10n.settings_mediaSources_error('$e'),
+                          ),
                         ),
                       );
                     },
@@ -116,11 +140,11 @@ class MediaSourcesPage extends ConsumerWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.cloud_outlined),
-              // TODO(media): l10n
-              title: const Text('Network sources'),
-              // TODO(media): l10n
-              subtitle: const Text(
-                'Saved hosts, manifest subscriptions, cache, and scan.',
+              title: Text(
+                context.l10n.settings_photosMedia_networkSources_title,
+              ),
+              subtitle: Text(
+                context.l10n.settings_photosMedia_networkSources_subtitle,
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () =>

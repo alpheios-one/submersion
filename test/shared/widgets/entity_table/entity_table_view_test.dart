@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/constants/entity_field.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_view.dart';
@@ -56,6 +57,11 @@ class _TestField implements EntityField {
   bool get sortable => true;
   @override
   String get categoryName => 'basic';
+
+  @override
+  String localizedDisplayName(AppLocalizations l10n) => displayName;
+  @override
+  String localizedShortLabel(AppLocalizations l10n) => shortLabel;
 
   @override
   bool operator ==(Object other) => other is _TestField && other.name == name;

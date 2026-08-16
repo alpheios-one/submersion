@@ -210,6 +210,7 @@ void main() {
     Widget buildApp(BackupService service) {
       return ProviderScope(
         overrides: [
+          localeProvider.overrideWithValue('en'),
           sharedPreferencesProvider.overrideWithValue(prefs),
           backupServiceProvider.overrideWithValue(service),
           cloudStorageProviderProvider.overrideWithValue(null),
@@ -352,6 +353,7 @@ void main() {
     Widget buildApp() {
       return ProviderScope(
         overrides: [
+          localeProvider.overrideWithValue('en'),
           sharedPreferencesProvider.overrideWithValue(prefs),
           backupServiceProvider.overrideWithValue(service),
           cloudStorageProviderProvider.overrideWithValue(null),
@@ -503,6 +505,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            localeProvider.overrideWithValue('en'),
             sharedPreferencesProvider.overrideWithValue(prefs),
             backupServiceProvider.overrideWithValue(
               _RecordingRestoreService(

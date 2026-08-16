@@ -5,8 +5,10 @@ import 'package:intl/intl.dart';
 
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
+import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_view.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
@@ -139,7 +141,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
       currentField: sort.field,
       currentDirection: sort.direction,
       fields: TripSortField.values,
-      getFieldDisplayName: (field) => field.displayName,
+      getFieldDisplayName: (field) => field.localizedName(context.l10n),
       getFieldIcon: (field) => field.icon,
       onSortChanged: (field, direction) {
         ref.read(tripSortProvider.notifier).state = SortState(
@@ -220,7 +222,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
                       onPressed: () {
                         showSearch(
                           context: context,
-                          delegate: TripSearchDelegate(),
+                          delegate: TripSearchDelegate(context.l10n),
                         );
                       },
                     ),
@@ -480,7 +482,10 @@ class _TripListContentState extends ConsumerState<TripListContent> {
             icon: const Icon(Icons.search, size: 20),
             tooltip: context.l10n.trips_list_tooltip_search,
             onPressed: () {
-              showSearch(context: context, delegate: TripSearchDelegate());
+              showSearch(
+                context: context,
+                delegate: TripSearchDelegate(context.l10n),
+              );
             },
           ),
           IconButton(
@@ -533,7 +538,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
     if (filter.equipmentId != null) {
       final equipmentName =
           ref.watch(equipmentItemProvider(filter.equipmentId!)).value?.name ??
-          'Equipment';
+          context.l10n.equipment_appBar_title;
       chips.add(
         InputChip(
           label: Text(equipmentName),
@@ -806,7 +811,9 @@ class TripListTile extends StatelessWidget {
     final theme = Theme.of(context);
 
     final subtitleStr = trip.subtitle != null ? ', ${trip.subtitle}' : '';
-    final diveCountStr = '${tripWithStats.diveCount} dives';
+    final diveCountStr = context.l10n.trips_list_tile_diveCount(
+      tripWithStats.diveCount,
+    );
     final bottomTimeStr = tripWithStats.totalBottomTime > 0
         ? ', ${tripWithStats.formattedBottomTime}'
         : '';
@@ -939,10 +946,12 @@ class TripListTile extends StatelessWidget {
 
 /// Search delegate for trips
 class TripSearchDelegate extends SearchDelegate<Trip?> {
-  TripSearchDelegate();
+  TripSearchDelegate(this._l10n);
+
+  final AppLocalizations _l10n;
 
   @override
-  String get searchFieldLabel => 'Search trips...';
+  String get searchFieldLabel => _l10n.trips_search_fieldLabel;
 
   @override
   List<Widget> buildActions(BuildContext context) {

@@ -1529,8 +1529,12 @@ class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
       data: (computer) {
         if (computer == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Download')),
-            body: const Center(child: Text('Computer not found')),
+            appBar: AppBar(
+              title: Text(context.l10n.diveComputer_download_title),
+            ),
+            body: Center(
+              child: Text(context.l10n.diveComputer_download_computerNotFound),
+            ),
           );
         }
         return UnifiedImportWizard(
@@ -1549,8 +1553,12 @@ class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(
-        appBar: AppBar(title: const Text('Download')),
-        body: Center(child: Text('Error: $e')),
+        appBar: AppBar(title: Text(context.l10n.diveComputer_download_title)),
+        body: Center(
+          child: Text(
+            context.l10n.diveComputer_download_errorWithMessage('$e'),
+          ),
+        ),
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:submersion/core/presentation/widgets/lock_barrier.dart';
 import 'package:submersion/core/presentation/widgets/unlock_form.dart';
 import 'package:submersion/core/services/security/database_security_key_store.dart';
 import 'package:submersion/core/services/security/database_security_service.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../support/fake_keychain_storage.dart';
 
@@ -38,6 +39,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
           home: Consumer(
             builder: (context, ref, _) {
               capturedRef = ref;
@@ -83,6 +87,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
           home: Consumer(
             builder: (context, ref, _) {
               capturedRef = ref;

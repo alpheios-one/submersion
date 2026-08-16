@@ -39,6 +39,8 @@ import 'package:submersion/core/services/sync/library_moved.dart';
 import 'package:submersion/core/services/sync/sync_clock.dart';
 import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/core/services/sync/sync_initializer.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:uuid/uuid.dart';
 
 /// Sync operation result
@@ -242,6 +244,21 @@ class SyncService {
   Future<BaseParseClient> Function(String filePath) baseParseClientSpawn =
       BaseParseClient.spawn;
 
+  /// Resolves localizations for the user-facing strings this service puts on
+  /// [SyncResult] and [SyncProgress] (the Cloud Sync page renders them
+  /// verbatim through SyncState.message).
+  ///
+  /// A service has no BuildContext and its notifier is a StateNotifier, so the
+  /// locale arrives as a resolver injected by `syncServiceProvider`:
+  /// `() => l10nForLocaleTag(ref.read(localeProvider))`. It defaults to
+  /// English rather than the platform locale so an un-wired caller -- a unit
+  /// test, or a background isolate with no settings -- stays deterministic.
+  final AppLocalizations Function() _localizations;
+
+  static AppLocalizations _englishLocalizations() => l10nForLocaleTag('en');
+
+  AppLocalizations get _l10n => _localizations();
+
   SyncService({
     required SyncRepository syncRepository,
     required SyncDataSerializer serializer,
@@ -249,12 +266,14 @@ class SyncService {
     SyncInitializer? syncInitializer,
     LibraryEpochStore? epochStore,
     SyncEncryptionService? encryptionService,
+    AppLocalizations Function()? localizations,
   }) : _syncRepository = syncRepository,
        _serializer = serializer,
        _cloudProvider = cloudProvider,
        _syncInitializer = syncInitializer,
        _epochStore = epochStore,
-       _encryptionService = encryptionService;
+       _encryptionService = encryptionService,
+       _localizations = localizations ?? _englishLocalizations;
 
   /// Set a callback to receive progress updates during sync
   void setProgressCallback(SyncProgressCallback? callback) {
@@ -395,6 +414,7 @@ class SyncService {
   /// precedence rule stays expressible.
   @visibleForTesting
   static List<String> pullResultMessages({
+    required AppLocalizations l10n,
     required int recordsFailed,
     required Set<String> skippedPeerDeviceIds,
     required Set<String> newerSchemaPeerDeviceIds,
@@ -402,15 +422,13 @@ class SyncService {
   }) {
     final resultMessages = <String>[];
     if (recordsFailed > 0) {
-      final recordWord = recordsFailed == 1 ? 'record' : 'records';
-      resultMessages.add('$recordsFailed $recordWord failed to apply');
+      resultMessages.add(
+        l10n.settings_cloudSync_result_recordsFailed(recordsFailed),
+      );
       return resultMessages;
     }
     if (adoptedFreshIdentity) {
-      resultMessages.add(
-        'Another device was syncing with this device\'s identity. '
-        'This device adopted a new identity and merged the cloud data.',
-      );
+      resultMessages.add(l10n.settings_cloudSync_result_adoptedFreshIdentity);
     }
     return resultMessages;
   }
@@ -418,17 +436,21 @@ class SyncService {
   Future<SyncResult> performSync() async {
     final provider = _cloudProvider;
     if (provider == null) {
-      return const SyncResult(
+      return SyncResult(
         status: SyncResultStatus.error,
-        message: 'No cloud provider configured',
+        message: _l10n.settings_cloudSync_result_noProvider,
       );
     }
     try {
-      _reportProgress(SyncPhase.preparing, 0.0, 'Preparing sync...');
+      _reportProgress(
+        SyncPhase.preparing,
+        0.0,
+        _l10n.settings_cloudSync_progress_preparing,
+      );
       if (!await provider.isAuthenticated()) {
-        return const SyncResult(
+        return SyncResult(
           status: SyncResultStatus.authError,
-          message: 'Not authenticated with cloud provider',
+          message: _l10n.settings_cloudSync_result_notAuthenticated,
         );
       }
       var deviceId = await _syncRepository.getDeviceId();
@@ -498,7 +520,11 @@ class SyncService {
       }
 
       // ---- Download: pull peers, applying through the existing merge ----
-      _reportProgress(SyncPhase.downloading, 0.4, 'Pulling changes...');
+      _reportProgress(
+        SyncPhase.downloading,
+        0.4,
+        _l10n.settings_cloudSync_progress_pulling,
+      );
       var recordsSynced = 0;
       var conflictsFound = 0;
       var recordsFailed = 0;
@@ -556,7 +582,11 @@ class SyncService {
       }
 
       // ---- Upload: publish our delta ----
-      _reportProgress(SyncPhase.uploading, 0.8, 'Publishing changes...');
+      _reportProgress(
+        SyncPhase.uploading,
+        0.8,
+        _l10n.settings_cloudSync_progress_publishing,
+      );
       final deletions = await _syncRepository.getAllDeletions();
       var publishAttempted = false;
       if (await _shouldSkipPublishAfterAdopt(provider.providerId, deletions)) {
@@ -601,7 +631,10 @@ class SyncService {
             onBasePartUploaded: (uploaded, total) => _reportProgress(
               SyncPhase.uploading,
               0.8 + 0.2 * (uploaded / total),
-              'Uploading library ($uploaded of $total)',
+              _l10n.settings_cloudSync_progress_uploadingLibrary(
+                uploaded,
+                total,
+              ),
             ),
           );
           // A publish that did not stamp this nonce into the manifest -- a
@@ -681,8 +714,13 @@ class SyncService {
         }
       }
 
-      _reportProgress(SyncPhase.complete, 1.0, 'Sync complete');
+      _reportProgress(
+        SyncPhase.complete,
+        1.0,
+        _l10n.settings_cloudSync_status_syncComplete,
+      );
       final resultMessages = pullResultMessages(
+        l10n: _l10n,
         recordsFailed: recordsFailed,
         skippedPeerDeviceIds: pullResult.skippedPeerDeviceIds,
         newerSchemaPeerDeviceIds: pullResult.newerSchemaPeerDeviceIds,
@@ -708,9 +746,9 @@ class SyncService {
       );
     } on TimeoutException {
       _log.warning('Sync timed out');
-      return const SyncResult(
+      return SyncResult(
         status: SyncResultStatus.networkError,
-        message: 'Sync timed out',
+        message: _l10n.settings_cloudSync_result_timedOut,
       );
     } on SyncEncryptionRequired catch (e) {
       _log.info('Sync halted: encrypted library requires a passphrase');
@@ -771,10 +809,10 @@ class SyncService {
       rethrow;
     } catch (e) {
       _log.warning('Library epoch marker unreadable; failing closed: $e');
-      return const _EpochGate.halt(
+      return _EpochGate.halt(
         SyncResult(
           status: SyncResultStatus.error,
-          message: 'Could not read the library epoch marker',
+          message: _l10n.settings_cloudSync_result_epochMarkerUnreadable,
         ),
       );
     }
@@ -826,7 +864,7 @@ class SyncService {
     return _EpochGate.halt(
       SyncResult(
         status: SyncResultStatus.awaitingAdoption,
-        message: 'The cloud library was replaced from a backup',
+        message: _l10n.settings_cloudSync_result_libraryReplacedRemotely,
         replaceMarker: marker,
       ),
     );
@@ -896,16 +934,16 @@ class SyncService {
   }) async {
     final provider = _cloudProvider;
     if (provider == null) {
-      return const SyncResult(
+      return SyncResult(
         status: SyncResultStatus.error,
-        message: 'No cloud provider configured',
+        message: _l10n.settings_cloudSync_result_noProvider,
       );
     }
     final marker = await readLibraryEpochMarker(provider);
     if (marker == null) {
-      return const SyncResult(
+      return SyncResult(
         status: SyncResultStatus.error,
-        message: 'No library replacement to rebuild from',
+        message: _l10n.settings_cloudSync_result_noReplacementToRebuild,
       );
     }
     try {
@@ -915,9 +953,9 @@ class SyncService {
         onProgress: onProgress,
       );
       _log.info('Rebuilt backend from this device for epoch ${marker.epochId}');
-      return const SyncResult(
+      return SyncResult(
         status: SyncResultStatus.success,
-        message: 'Rebuilt this backend from this device’s library',
+        message: _l10n.settings_cloudSync_result_rebuiltFromThisDevice,
       );
     } catch (e, stackTrace) {
       _log.error(
@@ -927,7 +965,7 @@ class SyncService {
       );
       return SyncResult(
         status: SyncResultStatus.error,
-        message: 'Rebuild failed: $e',
+        message: _l10n.settings_cloudSync_result_rebuildFailed('$e'),
       );
     }
   }
@@ -2717,16 +2755,16 @@ class SyncService {
     final provider = _cloudProvider;
     final store = _epochStore;
     if (provider == null || store == null) {
-      return const SyncResult(
+      return SyncResult(
         status: SyncResultStatus.error,
-        message: 'No cloud provider configured',
+        message: _l10n.settings_cloudSync_result_noProvider,
       );
     }
     try {
       if (!await provider.isAuthenticated()) {
-        return const SyncResult(
+        return SyncResult(
           status: SyncResultStatus.authError,
-          message: 'Not authenticated with cloud provider',
+          message: _l10n.settings_cloudSync_result_notAuthenticated,
         );
       }
       final deviceId = await _syncRepository.getDeviceId();
@@ -2774,7 +2812,7 @@ class SyncService {
       _log.info('Library replace executed under epoch ${marker.epochId}');
       return SyncResult(
         status: SyncResultStatus.success,
-        message: 'Library replaced',
+        message: _l10n.settings_cloudSync_result_libraryReplaced,
         lastSyncTime: now,
       );
     } catch (e, stackTrace) {
@@ -2785,7 +2823,7 @@ class SyncService {
       );
       return SyncResult(
         status: SyncResultStatus.error,
-        message: 'Library replace failed: $e',
+        message: _l10n.settings_cloudSync_result_libraryReplaceFailed('$e'),
       );
     }
   }
@@ -3004,17 +3042,17 @@ class SyncService {
     final provider = _cloudProvider;
     final store = _epochStore;
     if (provider == null || store == null) {
-      return const SyncResult(
+      return SyncResult(
         status: SyncResultStatus.error,
-        message: 'No cloud provider configured',
+        message: _l10n.settings_cloudSync_result_noProvider,
       );
     }
     try {
       final marker = await readLibraryEpochMarker(provider);
       if (marker == null) {
-        return const SyncResult(
+        return SyncResult(
           status: SyncResultStatus.error,
-          message: 'No library replacement marker found',
+          message: _l10n.settings_cloudSync_result_noReplacementMarker,
         );
       }
 
@@ -3034,17 +3072,14 @@ class SyncService {
         // then publishes our base. Otherwise it is a replace in flight --
         // applying an empty set would wipe this library to zero, so wait.
         if (await _recoverUnreadableEpoch(provider, marker)) {
-          return const SyncResult(
+          return SyncResult(
             status: SyncResultStatus.success,
-            message:
-                'The previous library could not be read; re-established this '
-                'backend from this device\'s library.',
+            message: _l10n.settings_cloudSync_result_previousLibraryUnreadable,
           );
         }
-        return const SyncResult(
+        return SyncResult(
           status: SyncResultStatus.error,
-          message:
-              'The replaced library is still uploading. Try again shortly.',
+          message: _l10n.settings_cloudSync_result_replacementStillUploading,
         );
       }
 
@@ -3092,9 +3127,9 @@ class SyncService {
       await store.setLastAccepted(marker);
       SyncClock.instance.reset();
       _log.info('Adopted replaced library (epoch ${marker.epochId})');
-      return const SyncResult(
+      return SyncResult(
         status: SyncResultStatus.success,
-        message: 'Adopted the restored library',
+        message: _l10n.settings_cloudSync_result_adoptedRestoredLibrary,
       );
     } catch (e, stackTrace) {
       _log.error(
@@ -3104,7 +3139,7 @@ class SyncService {
       );
       return SyncResult(
         status: SyncResultStatus.error,
-        message: 'Failed to adopt the restored library: $e',
+        message: _l10n.settings_cloudSync_result_adoptFailed('$e'),
       );
     }
   }
@@ -3443,7 +3478,7 @@ class SyncService {
       // from corruption so the caller can prompt for the passphrase.
       throw SyncEncryptionRequired(
         libraryKeyId: SyncEnvelope.libraryKeyIdOf(bytes),
-        message: 'The library epoch marker is encrypted',
+        message: _l10n.settings_cloudSync_result_epochMarkerEncrypted,
       );
     }
     final decoded = jsonDecode(utf8.decode(bytes));

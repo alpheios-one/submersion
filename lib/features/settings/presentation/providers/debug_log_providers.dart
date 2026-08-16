@@ -7,6 +7,7 @@ import 'package:submersion/core/models/log_entry.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 /// Provider for the LogFileService singleton.
 /// Must be overridden in ProviderScope with the initialized instance.
@@ -121,7 +122,7 @@ final filteredLogEntriesProvider = Provider<AsyncValue<List<LogEntry>>>((ref) {
 });
 
 /// Share the full log file via system share sheet.
-Future<void> shareLogFile(LogFileService service) async {
+Future<void> shareLogFile(LogFileService service, AppLocalizations l10n) async {
   final path = service.logFilePath;
   final file = File(path);
   if (!file.existsSync()) return;
@@ -129,7 +130,7 @@ Future<void> shareLogFile(LogFileService service) async {
   await SharePlus.instance.share(
     ShareParams(
       files: [XFile(path, mimeType: 'text/plain')],
-      subject: 'Submersion Debug Logs',
+      subject: l10n.settings_debugLog_shareSubject,
     ),
   );
 }
@@ -141,14 +142,17 @@ Future<void> copyFilteredLogs(List<LogEntry> entries) async {
 }
 
 /// Save the full log file to a user-chosen location.
-Future<String?> saveLogFile(LogFileService service) async {
+Future<String?> saveLogFile(
+  LogFileService service,
+  AppLocalizations l10n,
+) async {
   final path = service.logFilePath;
   final file = File(path);
   if (!file.existsSync()) return null;
 
   final bytes = await file.readAsBytes();
   final result = await FilePicker.saveFile(
-    dialogTitle: 'Save Debug Logs',
+    dialogTitle: l10n.settings_debugLog_saveDialogTitle,
     fileName: 'submersion-debug-logs.txt',
     type: FileType.custom,
     allowedExtensions: ['txt', 'log'],

@@ -160,14 +160,15 @@ class _DcConfirmDeviceStepState extends ConsumerState<DcConfirmDeviceStep> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Known Computer',
+                            l10n.importWizard_dc_knownComputer,
                             style: theme.textTheme.titleSmall?.copyWith(
                               color: colorScheme.primary,
                             ),
                           ),
                           Text(
-                            'Saved as "${knownComputer.displayName}". '
-                            'Only new dives will be downloaded.',
+                            l10n.importWizard_dc_knownComputerBody(
+                              knownComputer.displayName,
+                            ),
                             style: theme.textTheme.bodySmall,
                           ),
                         ],
@@ -184,7 +185,7 @@ class _DcConfirmDeviceStepState extends ConsumerState<DcConfirmDeviceStep> {
               decoration: InputDecoration(
                 labelText: l10n.diveComputer_discovery_deviceNameLabel,
                 hintText: l10n.diveComputer_discovery_deviceNameHint(
-                  device.model ?? 'Dive Computer',
+                  device.model ?? l10n.diveComputer_title,
                 ),
                 prefixIcon: const Icon(Icons.edit),
                 border: const OutlineInputBorder(),
@@ -214,8 +215,8 @@ class _DcConfirmDeviceStepState extends ConsumerState<DcConfirmDeviceStep> {
                         children: [
                           Text(
                             isRecognized
-                                ? 'Recognized Device'
-                                : 'Unknown Device',
+                                ? l10n.diveComputer_discovery_recognizedDevice
+                                : l10n.diveComputer_discovery_unknownDevice,
                             style: theme.textTheme.titleSmall?.copyWith(
                               color: isRecognized
                                   ? colorScheme.primary
@@ -224,10 +225,8 @@ class _DcConfirmDeviceStepState extends ConsumerState<DcConfirmDeviceStep> {
                           ),
                           Text(
                             isRecognized
-                                ? 'This device is in our supported devices '
-                                      'library. Dive download should work '
-                                      'automatically.'
-                                : 'This device may not be fully supported.',
+                                ? l10n.diveComputer_discovery_recognizedDeviceDescription
+                                : l10n.diveComputer_discovery_unknownDeviceDescription,
                             style: theme.textTheme.bodySmall,
                           ),
                         ],
@@ -497,6 +496,7 @@ class DcNoNewDivesView extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     return Center(
       child: Padding(
@@ -519,19 +519,22 @@ class DcNoNewDivesView extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'No new dives to download',
+              l10n.importWizard_dc_noNewDives,
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              'All dives from this computer have already been imported.',
+              l10n.importWizard_dc_noNewDivesBody,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            FilledButton(onPressed: onDone, child: const Text('Done')),
+            FilledButton(
+              onPressed: onDone,
+              child: Text(l10n.universalImport_action_done),
+            ),
           ],
         ),
       ),

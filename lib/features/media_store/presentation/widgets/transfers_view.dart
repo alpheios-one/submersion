@@ -35,7 +35,8 @@ class TransfersView extends ConsumerWidget {
     final entries = ref.watch(mediaTransferEntriesProvider);
     return entries.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('$e')),
+      error: (e, _) =>
+          Center(child: Text('${context.l10n.common_label_error}: $e')),
       data: (rows) => rows.isEmpty
           ? Center(child: Text(l10n.settings_mediaStorage_transfers_empty))
           : ListView.separated(

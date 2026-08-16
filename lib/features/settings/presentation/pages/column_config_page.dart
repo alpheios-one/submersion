@@ -30,17 +30,35 @@ import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 // Section metadata
 // ---------------------------------------------------------------------------
 
-/// All configurable entity sections with display names.
-const _sectionEntries = [
-  ('dives', 'Dives'),
-  ('sites', 'Sites'),
-  ('buddies', 'Buddies'),
-  ('trips', 'Trips'),
-  ('equipment', 'Equipment'),
-  ('diveCenters', 'Dive Centers'),
-  ('certifications', 'Certifications'),
-  ('courses', 'Courses'),
+/// All configurable entity sections, in dropdown order.
+///
+/// Labels resolve through [_sectionDisplayName] so the picker follows the app
+/// language instead of hard-coded English.
+const _sectionKeys = [
+  'dives',
+  'sites',
+  'buddies',
+  'trips',
+  'equipment',
+  'diveCenters',
+  'certifications',
+  'courses',
 ];
+
+String _sectionDisplayName(BuildContext context, String key) {
+  final l10n = context.l10n;
+  return switch (key) {
+    'dives' => l10n.nav_dives,
+    'sites' => l10n.nav_sites,
+    'buddies' => l10n.nav_buddies,
+    'trips' => l10n.nav_trips,
+    'equipment' => l10n.nav_equipment,
+    'diveCenters' => l10n.nav_diveCenters,
+    'certifications' => l10n.nav_certifications,
+    'courses' => l10n.nav_courses,
+    _ => key,
+  };
+}
 
 class ColumnConfigPage extends ConsumerStatefulWidget {
   /// When true, hides the Scaffold/AppBar for embedding in a detail pane.
@@ -82,7 +100,7 @@ class _ColumnConfigPageState extends ConsumerState<ColumnConfigPage> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
             child: Row(
               children: [
-                const Text('Section'),
+                Text(context.l10n.columnConfig_section),
                 const SizedBox(width: 16),
                 DropdownButton<String>(
                   value: _selectedSection,
@@ -98,10 +116,10 @@ class _ColumnConfigPageState extends ConsumerState<ColumnConfigPage> {
                       });
                     }
                   },
-                  items: _sectionEntries.map((entry) {
+                  items: _sectionKeys.map((key) {
                     return DropdownMenuItem(
-                      value: entry.$1,
-                      child: Text(entry.$2),
+                      value: key,
+                      child: Text(_sectionDisplayName(context, key)),
                     );
                   }).toList(),
                 ),
@@ -125,7 +143,7 @@ class _ColumnConfigPageState extends ConsumerState<ColumnConfigPage> {
                 items: _availableModes().map((mode) {
                   return DropdownMenuItem(
                     value: mode,
-                    child: Text(_modeDisplayName(mode)),
+                    child: Text(_modeDisplayName(context, mode)),
                   );
                 }).toList(),
               ),
@@ -287,12 +305,13 @@ class _ColumnConfigPageState extends ConsumerState<ColumnConfigPage> {
     };
   }
 
-  String _modeDisplayName(ListViewMode mode) {
+  String _modeDisplayName(BuildContext context, ListViewMode mode) {
+    final l10n = context.l10n;
     return switch (mode) {
-      ListViewMode.table => 'Table',
-      ListViewMode.detailed => 'Detailed',
-      ListViewMode.compact => 'Compact',
-      ListViewMode.dense => 'Dense',
+      ListViewMode.table => l10n.enum_listViewMode_table,
+      ListViewMode.detailed => l10n.enum_listViewMode_detailed,
+      ListViewMode.compact => l10n.enum_listViewMode_compact,
+      ListViewMode.dense => l10n.enum_listViewMode_dense,
     };
   }
 }
@@ -337,7 +356,7 @@ class _TableColumnConfigSection extends ConsumerWidget {
             children: [
               Expanded(
                 child: DropdownButton<FieldPreset>(
-                  hint: const Text('Load Preset'),
+                  hint: Text(context.l10n.columnConfig_preset),
                   isExpanded: true,
                   value: null,
                   onChanged: (preset) {
@@ -372,7 +391,7 @@ class _TableColumnConfigSection extends ConsumerWidget {
               const SizedBox(width: 8),
               TextButton(
                 onPressed: () => _showSavePresetDialog(context, ref, diverId),
-                child: const Text('Save As'),
+                child: Text(context.l10n.columnConfig_presetSaveAs),
               ),
             ],
           ),
@@ -397,7 +416,7 @@ class _TableColumnConfigSection extends ConsumerWidget {
                         index: index,
                         child: const Icon(Icons.drag_handle),
                       ),
-                      title: Text(col.field.displayName),
+                      title: Text(col.field.localizedDisplayName(context.l10n)),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -407,13 +426,15 @@ class _TableColumnConfigSection extends ConsumerWidget {
                                   ? Icons.push_pin
                                   : Icons.push_pin_outlined,
                             ),
-                            tooltip: col.isPinned ? 'Unpin' : 'Pin',
+                            tooltip: col.isPinned
+                                ? context.l10n.common_action_unpin
+                                : context.l10n.common_action_pin,
                             onPressed: () => notifier.togglePin(col.field),
                           ),
                           if (!col.isPinned)
                             IconButton(
                               icon: const Icon(Icons.remove_circle_outline),
-                              tooltip: 'Remove',
+                              tooltip: context.l10n.common_action_remove,
                               onPressed: () => notifier.toggleColumn(col.field),
                             ),
                         ],
@@ -433,15 +454,20 @@ class _TableColumnConfigSection extends ConsumerWidget {
                     for (final category in DiveFieldCategory.values)
                       if (grouped.containsKey(category)) ...[
                         _CategoryHeader(
-                          label: category.name.toUpperCase(),
+                          label: localizedFieldCategory(
+                            context.l10n,
+                            category.name,
+                          ).toUpperCase(),
                           theme: theme,
                         ),
                         for (final field in grouped[category]!)
                           ListTile(
-                            title: Text(field.displayName),
+                            title: Text(
+                              field.localizedDisplayName(context.l10n),
+                            ),
                             trailing: IconButton(
                               icon: const Icon(Icons.add_circle_outline),
-                              tooltip: 'Add',
+                              tooltip: context.l10n.common_action_add,
                               onPressed: () => notifier.toggleColumn(field),
                             ),
                           ),
@@ -479,19 +505,19 @@ void _showSavePresetDialog(
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text('Save Preset'),
+      title: Text(context.l10n.columnConfig_savePresetTitle),
       content: TextField(
         controller: controller,
-        decoration: const InputDecoration(
-          labelText: 'Preset Name',
-          hintText: 'e.g., Tech Diving',
+        decoration: InputDecoration(
+          labelText: context.l10n.columnConfig_presetName,
+          hintText: context.l10n.columnConfig_presetNameHint,
         ),
         autofocus: true,
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.columnConfig_presetCancel),
         ),
         FilledButton(
           onPressed: () {
@@ -511,7 +537,7 @@ void _showSavePresetDialog(
             }
             Navigator.pop(context);
           },
-          child: const Text('Save'),
+          child: Text(context.l10n.columnConfig_presetSave),
         ),
       ],
     ),
@@ -545,10 +571,13 @@ class _DetailedCardConfigSection extends ConsumerWidget {
     return ListView(
       children: [
         // -- Display options (card-wide toggles) --
-        _SectionHeader(title: 'DISPLAY OPTIONS', theme: theme),
+        _SectionHeader(
+          title: context.l10n.columnConfig_displayOptions.toUpperCase(),
+          theme: theme,
+        ),
         SwitchListTile(
-          title: const Text('Show tags'),
-          subtitle: const Text('Display tag chips on detailed dive cards'),
+          title: Text(context.l10n.columnConfig_showTags),
+          subtitle: Text(context.l10n.columnConfig_showTags_subtitle),
           value: config.showTags,
           onChanged: notifier.setShowTags,
         ),
@@ -556,10 +585,13 @@ class _DetailedCardConfigSection extends ConsumerWidget {
         const Divider(),
 
         // -- Slot assignments (fixed card area) --
-        _SectionHeader(title: 'SLOT ASSIGNMENTS', theme: theme),
+        _SectionHeader(
+          title: context.l10n.columnConfig_slotAssignments.toUpperCase(),
+          theme: theme,
+        ),
         ...config.slots.map((slot) {
           return ListTile(
-            title: Text(_slotDisplayName(slot.slotId)),
+            title: Text(_slotDisplayName(context, slot.slotId)),
             trailing: DropdownButton<DiveField>(
               value: slot.field,
               underline: const SizedBox(),
@@ -571,7 +603,7 @@ class _DetailedCardConfigSection extends ConsumerWidget {
               items: DiveField.values.map((field) {
                 return DropdownMenuItem(
                   value: field,
-                  child: Text(field.displayName),
+                  child: Text(field.localizedDisplayName(context.l10n)),
                 );
               }).toList(),
             ),
@@ -581,11 +613,14 @@ class _DetailedCardConfigSection extends ConsumerWidget {
         const Divider(),
 
         // -- Extra fields (flexible area below card) --
-        _SectionHeader(title: 'EXTRA FIELDS', theme: theme),
+        _SectionHeader(
+          title: context.l10n.columnConfig_extraFields.toUpperCase(),
+          theme: theme,
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: Text(
-            'Additional fields shown below the standard card content.',
+            context.l10n.columnConfig_extraFields_description,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -595,10 +630,10 @@ class _DetailedCardConfigSection extends ConsumerWidget {
           final field = entry.value;
           return ListTile(
             key: ValueKey(field),
-            title: Text(field.displayName),
+            title: Text(field.localizedDisplayName(context.l10n)),
             trailing: IconButton(
               icon: const Icon(Icons.remove_circle_outline),
-              tooltip: 'Remove',
+              tooltip: context.l10n.common_action_remove,
               onPressed: () => notifier.removeExtraField(field),
             ),
           );
@@ -607,7 +642,7 @@ class _DetailedCardConfigSection extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              'No extra fields configured. Add fields below.',
+              context.l10n.columnConfig_noExtraFields,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -623,13 +658,19 @@ class _DetailedCardConfigSection extends ConsumerWidget {
         ),
         for (final category in DiveFieldCategory.values)
           if (grouped.containsKey(category)) ...[
-            _CategoryHeader(label: category.name.toUpperCase(), theme: theme),
+            _CategoryHeader(
+              label: localizedFieldCategory(
+                context.l10n,
+                category.name,
+              ).toUpperCase(),
+              theme: theme,
+            ),
             for (final field in grouped[category]!)
               ListTile(
-                title: Text(field.displayName),
+                title: Text(field.localizedDisplayName(context.l10n)),
                 trailing: IconButton(
                   icon: const Icon(Icons.add_circle_outline),
-                  tooltip: 'Add',
+                  tooltip: context.l10n.common_action_add,
                   onPressed: () => notifier.addExtraField(field),
                 ),
               ),
@@ -639,7 +680,7 @@ class _DetailedCardConfigSection extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: OutlinedButton(
             onPressed: notifier.resetToDefault,
-            child: const Text('Reset to Default'),
+            child: Text(context.l10n.columnConfig_resetToDefault),
           ),
         ),
         const SizedBox(height: 16),
@@ -647,12 +688,13 @@ class _DetailedCardConfigSection extends ConsumerWidget {
     );
   }
 
-  String _slotDisplayName(String slotId) {
+  String _slotDisplayName(BuildContext context, String slotId) {
+    final l10n = context.l10n;
     return switch (slotId) {
-      'title' => 'Title',
-      'date' => 'Date / Subtitle',
-      'stat1' => 'Stat 1',
-      'stat2' => 'Stat 2',
+      'title' => l10n.columnConfig_slot_title,
+      'date' => l10n.columnConfig_slot_date,
+      'stat1' => l10n.columnConfig_slot_stat1,
+      'stat2' => l10n.columnConfig_slot_stat2,
       _ => slotId,
     };
   }
@@ -685,7 +727,10 @@ class _SlotCardConfigSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'SLOT ASSIGNMENTS', theme: theme),
+        _SectionHeader(
+          title: context.l10n.columnConfig_slotAssignments.toUpperCase(),
+          theme: theme,
+        ),
         Expanded(
           child: Column(
             children: [
@@ -693,7 +738,7 @@ class _SlotCardConfigSection extends ConsumerWidget {
                 child: ListView(
                   children: config.slots.map((slot) {
                     return ListTile(
-                      title: Text(_slotDisplayName(slot.slotId)),
+                      title: Text(_slotDisplayName(context, slot.slotId)),
                       trailing: DropdownButton<DiveField>(
                         value: slot.field,
                         underline: const SizedBox(),
@@ -705,7 +750,9 @@ class _SlotCardConfigSection extends ConsumerWidget {
                         items: allFields.map((field) {
                           return DropdownMenuItem(
                             value: field,
-                            child: Text(field.displayName),
+                            child: Text(
+                              field.localizedDisplayName(context.l10n),
+                            ),
                           );
                         }).toList(),
                       ),
@@ -727,16 +774,17 @@ class _SlotCardConfigSection extends ConsumerWidget {
     );
   }
 
-  String _slotDisplayName(String slotId) {
+  String _slotDisplayName(BuildContext context, String slotId) {
+    final l10n = context.l10n;
     return switch (slotId) {
-      'title' => 'Title',
-      'date' => 'Date / Subtitle',
-      'stat1' => 'Stat 1',
-      'stat2' => 'Stat 2',
-      'slot1' => 'Slot 1',
-      'slot2' => 'Slot 2',
-      'slot3' => 'Slot 3',
-      'slot4' => 'Slot 4',
+      'title' => l10n.columnConfig_slot_title,
+      'date' => l10n.columnConfig_slot_date,
+      'stat1' => l10n.columnConfig_slot_stat1,
+      'stat2' => l10n.columnConfig_slot_stat2,
+      'slot1' => l10n.columnConfig_slot_slot1,
+      'slot2' => l10n.columnConfig_slot_slot2,
+      'slot3' => l10n.columnConfig_slot_slot3,
+      'slot4' => l10n.columnConfig_slot_slot4,
       _ => slotId,
     };
   }
@@ -800,7 +848,7 @@ class _EntityTableConfigSection<F extends EntityField> extends ConsumerWidget {
                         index: index,
                         child: const Icon(Icons.drag_handle),
                       ),
-                      title: Text(col.field.displayName),
+                      title: Text(col.field.localizedDisplayName(context.l10n)),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -810,13 +858,15 @@ class _EntityTableConfigSection<F extends EntityField> extends ConsumerWidget {
                                   ? Icons.push_pin
                                   : Icons.push_pin_outlined,
                             ),
-                            tooltip: col.isPinned ? 'Unpin' : 'Pin',
+                            tooltip: col.isPinned
+                                ? context.l10n.common_action_unpin
+                                : context.l10n.common_action_pin,
                             onPressed: () => notifier.togglePin(col.field),
                           ),
                           if (!col.isPinned)
                             IconButton(
                               icon: const Icon(Icons.remove_circle_outline),
-                              tooltip: 'Remove',
+                              tooltip: context.l10n.common_action_remove,
                               onPressed: () => notifier.toggleColumn(col.field),
                             ),
                         ],
@@ -836,15 +886,20 @@ class _EntityTableConfigSection<F extends EntityField> extends ConsumerWidget {
                     for (final category in fieldsByCategory.keys)
                       if (grouped.containsKey(category)) ...[
                         _CategoryHeader(
-                          label: category.toUpperCase(),
+                          label: localizedFieldCategory(
+                            context.l10n,
+                            category,
+                          ).toUpperCase(),
                           theme: theme,
                         ),
                         for (final field in grouped[category]!)
                           ListTile(
-                            title: Text(field.displayName),
+                            title: Text(
+                              field.localizedDisplayName(context.l10n),
+                            ),
                             trailing: IconButton(
                               icon: const Icon(Icons.add_circle_outline),
-                              tooltip: 'Add',
+                              tooltip: context.l10n.common_action_add,
                               onPressed: () => notifier.toggleColumn(field),
                             ),
                           ),
@@ -884,10 +939,13 @@ class _EntityCardConfigSection<F extends EntityField> extends ConsumerWidget {
 
     return ListView(
       children: [
-        _SectionHeader(title: 'SLOT ASSIGNMENTS', theme: theme),
+        _SectionHeader(
+          title: context.l10n.columnConfig_slotAssignments.toUpperCase(),
+          theme: theme,
+        ),
         ...config.slots.map((slot) {
           return ListTile(
-            title: Text(_slotDisplayName(slot.slotId)),
+            title: Text(_slotDisplayName(context, slot.slotId)),
             trailing: DropdownButton<F>(
               value: slot.field,
               underline: const SizedBox(),
@@ -907,7 +965,7 @@ class _EntityCardConfigSection<F extends EntityField> extends ConsumerWidget {
               items: allFields.map((field) {
                 return DropdownMenuItem(
                   value: field,
-                  child: Text(field.displayName),
+                  child: Text(field.localizedDisplayName(context.l10n)),
                 );
               }).toList(),
             ),
@@ -916,11 +974,14 @@ class _EntityCardConfigSection<F extends EntityField> extends ConsumerWidget {
 
         if (showExtraFields) ...[
           const Divider(),
-          _SectionHeader(title: 'EXTRA FIELDS', theme: theme),
+          _SectionHeader(
+            title: context.l10n.columnConfig_extraFields.toUpperCase(),
+            theme: theme,
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Text(
-              'Additional fields shown below the standard card content.',
+              context.l10n.columnConfig_extraFields_description,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -929,10 +990,10 @@ class _EntityCardConfigSection<F extends EntityField> extends ConsumerWidget {
           ...config.extraFields.map((field) {
             return ListTile(
               key: ValueKey(field.name),
-              title: Text(field.displayName),
+              title: Text(field.localizedDisplayName(context.l10n)),
               trailing: IconButton(
                 icon: const Icon(Icons.remove_circle_outline),
-                tooltip: 'Remove',
+                tooltip: context.l10n.common_action_remove,
                 onPressed: () {
                   ref.read(configProvider.notifier).state = config.copyWith(
                     extraFields: config.extraFields
@@ -947,7 +1008,7 @@ class _EntityCardConfigSection<F extends EntityField> extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
-                'No extra fields configured. Add fields below.',
+                context.l10n.columnConfig_noExtraFields,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -960,13 +1021,19 @@ class _EntityCardConfigSection<F extends EntityField> extends ConsumerWidget {
           ),
           for (final category in fieldsByCategory.keys)
             if (_availableInCategory(config, category).isNotEmpty) ...[
-              _CategoryHeader(label: category.toUpperCase(), theme: theme),
+              _CategoryHeader(
+                label: localizedFieldCategory(
+                  context.l10n,
+                  category,
+                ).toUpperCase(),
+                theme: theme,
+              ),
               for (final field in _availableInCategory(config, category))
                 ListTile(
-                  title: Text(field.displayName),
+                  title: Text(field.localizedDisplayName(context.l10n)),
                   trailing: IconButton(
                     icon: const Icon(Icons.add_circle_outline),
-                    tooltip: 'Add',
+                    tooltip: context.l10n.common_action_add,
                     onPressed: () {
                       ref.read(configProvider.notifier).state = config.copyWith(
                         extraFields: [...config.extraFields, field],
@@ -992,17 +1059,18 @@ class _EntityCardConfigSection<F extends EntityField> extends ConsumerWidget {
         .toList();
   }
 
-  String _slotDisplayName(String slotId) {
+  String _slotDisplayName(BuildContext context, String slotId) {
+    final l10n = context.l10n;
     return switch (slotId) {
-      'title' => 'Title',
-      'subtitle' => 'Subtitle',
-      'date' => 'Date / Subtitle',
-      'stat1' => 'Stat 1',
-      'stat2' => 'Stat 2',
-      'slot1' => 'Slot 1',
-      'slot2' => 'Slot 2',
-      'slot3' => 'Slot 3',
-      'slot4' => 'Slot 4',
+      'title' => l10n.columnConfig_slot_title,
+      'subtitle' => l10n.columnConfig_slot_subtitle,
+      'date' => l10n.columnConfig_slot_date,
+      'stat1' => l10n.columnConfig_slot_stat1,
+      'stat2' => l10n.columnConfig_slot_stat2,
+      'slot1' => l10n.columnConfig_slot_slot1,
+      'slot2' => l10n.columnConfig_slot_slot2,
+      'slot3' => l10n.columnConfig_slot_slot3,
+      'slot4' => l10n.columnConfig_slot_slot4,
       _ => slotId,
     };
   }
