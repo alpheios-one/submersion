@@ -296,6 +296,91 @@ void main() {
       expect(levelFieldText(tester, 0), '65.6'); // 20 m
     });
 
+    testWidgets('moving to the next row commits the one being left', (
+      tester,
+    ) async {
+      final container = await pumpSheet(tester, initial: twoLevels);
+      await tester.enterText(
+        find.byKey(const ValueKey('seascapeLevelField0')),
+        '25',
+      );
+      await tester.tap(find.byKey(const ValueKey('seascapeLevelField1')));
+      await tester.pump();
+      expect(levelsOf(container).first.depthMeters, 25.0);
+    });
+
+    testWidgets('the tap-outside hook drops focus and commits', (tester) async {
+      // On mobile a TextField does NOT give up focus when the diver taps the
+      // sheet's own chrome, so the row wires onTapOutside itself. TapRegion's
+      // pointer routing is framework behaviour and does not reproduce under
+      // the test harness, so this drives the wired callback directly and
+      // asserts the chain it is responsible for: unfocus, then commit.
+      final container = await pumpSheet(tester, initial: twoLevels);
+      final field = find.byKey(const ValueKey('seascapeLevelField0'));
+      await tester.enterText(field, '27');
+      expect(levelsOf(container).first.depthMeters, 20.0, reason: 'not yet');
+
+      final onTapOutside = tester.widget<TextField>(field).onTapOutside;
+      expect(onTapOutside, isNotNull);
+      onTapOutside!(PointerDownEvent(position: tester.getCenter(field)));
+      await tester.pump();
+
+      expect(levelsOf(container).first.depthMeters, 27.0);
+      expect(tester.widget<TextField>(field).focusNode?.hasFocus, isFalse);
+    });
+
+    testWidgets('the keyboard done action commits the level', (tester) async {
+      final container = await pumpSheet(tester, initial: twoLevels);
+      await tester.enterText(
+        find.byKey(const ValueKey('seascapeLevelField0')),
+        '28',
+      );
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(levelsOf(container).first.depthMeters, 28.0);
+    });
+
+    testWidgets('choosing a colour keeps the level depth', (tester) async {
+      const blue = Color(0xFF3B82F6);
+      final container = await pumpSheet(tester, initial: twoLevels);
+      await tester.tap(find.byKey(const ValueKey('seascapeLevelColor0')));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find
+            .byWidgetPredicate(
+              (w) => w is CircleAvatar && w.backgroundColor == blue,
+            )
+            .last,
+      );
+      await tester.pumpAndSettle();
+      final level = levelsOf(container).first;
+      expect(level.colorArgb, blue.toARGB32());
+      expect(level.depthMeters, 20.0);
+    });
+
+    testWidgets('an edit pending when the rows unmount is still adopted', (
+      tester,
+    ) async {
+      // Dismissing the sheet unfocuses first, so the focus path handles it.
+      // This is the case that path cannot see: the rows leave the tree with
+      // no focus change at all, which is what the dispose commit is for.
+      final container = await pumpSheet(tester, initial: twoLevels);
+      await tester.enterText(
+        find.byKey(const ValueKey('seascapeLevelField0')),
+        '55',
+      );
+      final notifier = container.read(settingsProvider.notifier);
+      await notifier.setSeascapeAppearance(
+        container
+            .read(settingsProvider)
+            .seascapeAppearance
+            .copyWith(contourMode: SeascapeContourMode.auto),
+      );
+      await tester.pump(); // unmounts the rows
+      await tester.pump(); // lets the deferred commit land
+      expect(levelsOf(container).first.depthMeters, 55.0);
+    });
+
     testWidgets('a de diver dismissing an untouched sheet changes nothing', (
       tester,
     ) async {

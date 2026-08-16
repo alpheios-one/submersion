@@ -250,8 +250,14 @@ class _LevelRowState extends State<_LevelRow> {
 
   double get _display => widget.level.depthMeters / widget.unitInMeters;
 
-  SeascapeAppearance get _appearance =>
-      _container.read(settingsProvider).seascapeAppearance;
+  /// Null once the scope is gone. The disposal commit runs during teardown,
+  /// which in tests can land after the container has been torn down, and
+  /// reading a disposed container throws. Disposing a container disposes its
+  /// notifiers too, so the notifier's mounted flag is the public proxy for
+  /// "is this container still readable".
+  SeascapeAppearance? get _appearance => widget.notifier.mounted
+      ? _container.read(settingsProvider).seascapeAppearance
+      : null;
 
   @override
   void initState() {
@@ -309,7 +315,9 @@ class _LevelRowState extends State<_LevelRow> {
     final typed = double.tryParse(_controller.text.trim().replaceAll(',', '.'));
     if (typed == null || !typed.isFinite || typed <= 0) return null;
     final appearance = _appearance;
-    if (widget.index >= appearance.customLevels.length) return null;
+    if (appearance == null || widget.index >= appearance.customLevels.length) {
+      return null;
+    }
     final current = appearance.customLevels[widget.index];
     // Compare in DISPLAY space at the precision the box actually shows. The
     // box renders one decimal, so 30 m reads as "98.4" ft and parsing that
@@ -338,7 +346,9 @@ class _LevelRowState extends State<_LevelRow> {
 
   void _write(SeascapeContourLevel? next) {
     final appearance = _appearance;
-    if (widget.index >= appearance.customLevels.length) return;
+    if (appearance == null || widget.index >= appearance.customLevels.length) {
+      return;
+    }
     widget.notifier.setSeascapeAppearance(
       appearance.copyWith(customLevels: _replace(appearance, next)),
     );
