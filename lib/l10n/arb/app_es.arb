@@ -7171,6 +7171,7 @@
   "dataQuality_action_undo": "Deshacer",
   "dataQuality_repair_applied": "Corrección aplicada",
   "dataQuality_repair_noChange": "Aquí no hay nada que corregir",
+  "dataQuality_repair_needsReview": "Sin corrección automática. Abre la inmersión para corregirlo.",
   "dataQuality_repair_failed": "La corrección falló",
   "dataQuality_chip_all": "Todos",
   "dataQuality_chip_time": "Tiempo",

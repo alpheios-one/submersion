@@ -39811,6 +39811,12 @@ abstract class AppLocalizations {
   /// **'Nothing to repair here'**
   String get dataQuality_repair_noChange;
 
+  /// No description provided for @dataQuality_repair_needsReview.
+  ///
+  /// In en, this message translates to:
+  /// **'No automatic fix. Open the dive to correct this.'**
+  String get dataQuality_repair_needsReview;
+
   /// No description provided for @dataQuality_repair_failed.
   ///
   /// In en, this message translates to:

@@ -7171,6 +7171,7 @@
   "dataQuality_action_undo": "تراجع",
   "dataQuality_repair_applied": "تم تطبيق الإصلاح",
   "dataQuality_repair_noChange": "لا يوجد ما يمكن إصلاحه هنا",
+  "dataQuality_repair_needsReview": "لا يوجد إصلاح تلقائي. افتح الغطسة لتصحيح ذلك.",
   "dataQuality_repair_failed": "فشل الإصلاح",
   "dataQuality_chip_all": "الكل",
   "dataQuality_chip_time": "الوقت",

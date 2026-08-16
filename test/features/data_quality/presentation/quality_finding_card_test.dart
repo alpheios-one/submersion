@@ -203,6 +203,64 @@ void main() {
     });
   });
 
+  group('no-automatic-fix note', () {
+    // A card with no repair button used to render as a bare row, which reads
+    // as a broken button rather than a deliberate judgment call (issue #1035).
+    testWidgets('explains itself when the only option is go-to-dive', (
+      tester,
+    ) async {
+      await pumpCard(
+        tester,
+        finding: _finding(
+          detectorId: 'gas_mod',
+          params: const {'o2Percent': 10},
+        ),
+      );
+      expect(find.byIcon(Icons.build_circle_outlined), findsOneWidget);
+    });
+
+    testWidgets('absent when a repair is offered', (tester) async {
+      await pumpCard(tester, finding: _finding());
+      expect(find.byIcon(Icons.build_circle_outlined), findsNothing);
+    });
+
+    testWidgets('shown for a temperature step that cannot be smoothed', (
+      tester,
+    ) async {
+      await pumpCard(
+        tester,
+        finding: _finding(
+          detectorId: 'temp_anomaly',
+          params: const {'deltaC': 9.0, 'spikeShaped': false},
+        ),
+      );
+      expect(find.byIcon(Icons.build_circle_outlined), findsOneWidget);
+    });
+  });
+
+  group('scalar water temperature repair', () {
+    testWidgets('a Fahrenheit reading offers a one-tap conversion', (
+      tester,
+    ) async {
+      final repaired = <QualityRepairAction>[];
+      await pumpCard(
+        tester,
+        finding: _finding(
+          detectorId: 'temp_anomaly',
+          params: const {'waterTempC': 78.0, 'fahrenheitSuspected': true},
+        ),
+        onRepair: repaired.add,
+      );
+
+      expect(find.byIcon(Icons.build_circle_outlined), findsNothing);
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+      final action = repaired.single as ConvertWaterTempRepair;
+      expect(action.diveId, 'd1');
+      expect(action.kelvinScale, isFalse);
+    });
+  });
+
   group('footer actions when expanded', () {
     testWidgets('go-to-dive button invokes callback with dive id', (
       tester,

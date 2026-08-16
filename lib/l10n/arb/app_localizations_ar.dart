@@ -23429,6 +23429,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dataQuality_repair_noChange => 'لا يوجد ما يمكن إصلاحه هنا';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'لا يوجد إصلاح تلقائي. افتح الغطسة لتصحيح ذلك.';
+
+  @override
   String get dataQuality_repair_failed => 'فشل الإصلاح';
 
   @override

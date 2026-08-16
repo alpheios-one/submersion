@@ -207,9 +207,10 @@ class ProfileRepairService {
       p.temperature == null
           ? p
           : p.copyWith(
-              temperature: kelvinScale
-                  ? p.temperature! - 273.15
-                  : (p.temperature! - 32) * 5 / 9,
+              temperature: RepairPredicates.convertToCelsius(
+                p.temperature!,
+                kelvinScale: kelvinScale,
+              ),
             ),
   ];
 

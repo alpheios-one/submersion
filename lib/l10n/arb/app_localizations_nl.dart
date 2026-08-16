@@ -23667,6 +23667,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dataQuality_repair_noChange => 'Hier valt niets te herstellen';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'Geen automatische correctie. Open de duik om dit te corrigeren.';
+
+  @override
   String get dataQuality_repair_failed => 'Herstel mislukt';
 
   @override

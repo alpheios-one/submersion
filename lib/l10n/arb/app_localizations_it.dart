@@ -23846,6 +23846,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dataQuality_repair_noChange => 'Non c\'è nulla da correggere';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'Nessuna correzione automatica. Apri l\'immersione per correggerla.';
+
+  @override
   String get dataQuality_repair_failed => 'Correzione non riuscita';
 
   @override

@@ -23767,6 +23767,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dataQuality_repair_noChange => 'Itt nincs mit javítani';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'Nincs automatikus javítás. Nyisd meg a merülést a javításhoz.';
+
+  @override
   String get dataQuality_repair_failed => 'A javítás sikertelen';
 
   @override

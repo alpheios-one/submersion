@@ -12,7 +12,7 @@ class TempAnomalyDetector extends QualityDetector {
   @override
   String get id => 'temp_anomaly';
   @override
-  int get version => 2;
+  int get version => 3;
   @override
   QualityCategory get category => QualityCategory.temperature;
 
@@ -99,12 +99,27 @@ class TempAnomalyDetector extends QualityDetector {
     if (scalar != null &&
         (scalar < QualityThresholds.waterTempMinC ||
             scalar > QualityThresholds.waterTempMaxC)) {
+      // The recorded water temperature is a single reading, so the same
+      // whole-channel plausibility test decides whether the wrong scale
+      // explains it -- and, because it is the exact condition re-tested
+      // above, guarantees the conversion clears this finding.
       out.add(
         make(
           ctx,
           discriminator: 'scalar',
           severity: QualitySeverity.warning,
-          params: {'waterTempC': scalar},
+          params: {
+            'waterTempC': scalar,
+            'fahrenheitAsKelvinSuspected':
+                scalar > 250 &&
+                RepairPredicates.convertedChannelIsPlausible([
+                  scalar,
+                ], kelvinScale: true),
+            'fahrenheitSuspected': RepairPredicates.convertedChannelIsPlausible(
+              [scalar],
+              kelvinScale: false,
+            ),
+          },
         ),
       );
     }

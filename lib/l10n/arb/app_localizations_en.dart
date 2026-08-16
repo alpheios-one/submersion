@@ -23449,6 +23449,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dataQuality_repair_noChange => 'Nothing to repair here';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'No automatic fix. Open the dive to correct this.';
+
+  @override
   String get dataQuality_repair_failed => 'Repair failed';
 
   @override

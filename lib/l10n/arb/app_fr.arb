@@ -7171,6 +7171,7 @@
   "dataQuality_action_undo": "Annuler",
   "dataQuality_repair_applied": "Correction appliquée",
   "dataQuality_repair_noChange": "Rien à corriger ici",
+  "dataQuality_repair_needsReview": "Pas de correction automatique. Ouvrez la plongée pour la corriger.",
   "dataQuality_repair_failed": "Échec de la correction",
   "dataQuality_chip_all": "Tous",
   "dataQuality_chip_time": "Heure",
