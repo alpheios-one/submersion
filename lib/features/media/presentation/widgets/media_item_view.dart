@@ -6,6 +6,7 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_serving_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/unavailable_media_placeholder.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 
@@ -73,10 +74,17 @@ class MediaItemView extends ConsumerStatefulWidget {
 /// back as the store's THUMB. Every other document resolution (local
 /// original, store original) is raw document bytes that Image widgets
 /// cannot decode, and draws the placeholder instead.
+///
+/// [storeFallbackUsed] records that the row's own source could not produce
+/// bytes here and the media store was asked to cover. No resolver can report
+/// this: it is a fact about the SEQUENCE of attempts rather than about any
+/// single one, and it is what lets the info panel say "the photo library
+/// lookup failed" instead of merely "served from cloud".
 typedef _Resolution = ({
   MediaSourceData data,
   bool videoPosterMissing,
   bool documentRenderable,
+  bool storeFallbackUsed,
 });
 
 class _MediaItemViewState extends ConsumerState<MediaItemView> {
@@ -106,12 +114,38 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
       old.thumbnail != widget.thumbnail ||
       old.targetSize != widget.targetSize;
 
+  /// Resolves and records the outcome.
+  ///
+  /// Recording once here rather than at each of [_resolveInner]'s seven exits
+  /// means a new exit added later cannot silently skip it: the record type
+  /// forces every return to supply `storeFallbackUsed`, so an omission is a
+  /// compile error rather than a quietly missing observation.
+  ///
+  /// The `ref` read is safe despite both callers running inside the build
+  /// phase: it happens after [_resolveInner] has completed, which is well
+  /// past that method's own opening yield.
+  Future<_Resolution> _resolve() async {
+    final resolution = await _resolveInner();
+    final data = resolution.data;
+    ref
+        .read(mediaServingRecorderProvider)
+        .record(
+          widget.item.id,
+          thumbnail: widget.thumbnail,
+          servedFrom: data.servedFrom,
+          servedTier: data.servedTier,
+          failure: data is UnavailableData ? data.kind : null,
+          storeFallbackUsed: resolution.storeFallbackUsed,
+        );
+    return resolution;
+  }
+
   // Declared `async` (not just returning a Future from a sync body) so any
   // synchronous throw — e.g. `MediaSourceResolverRegistry.resolverFor`
   // throwing UnsupportedError when a row's source_type has no registered
   // resolver — becomes a Future error caught by FutureBuilder's hasError
   // branch in [build] instead of escaping initState/didUpdateWidget.
-  Future<_Resolution> _resolve() async {
+  Future<_Resolution> _resolveInner() async {
     // Yield before the first `ref` touch. Both callers (initState and
     // didUpdateWidget) run inside the build phase, and an `async` body still
     // executes synchronously up to its first await -- so reading a provider
@@ -131,14 +165,31 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
     // back across a platform channel) happens once per document instead of
     // once per tile that scrolls into view.
     if (widget.thumbnail && widget.item.isPdf) {
+      // The render is built from the source's bytes, so it inherits the
+      // source's provenance. thumbFor caches its output, and on a cache hit
+      // the closure is never called, leaving this null: the honest answer,
+      // because on that pass the bytes did not come from anywhere.
+      ServedFrom? sourceFrom;
       final page1 = await ref
           .read(pdfThumbnailServiceProvider)
-          .thumbFor(widget.item, source: () => resolver.resolve(widget.item));
+          .thumbFor(
+            widget.item,
+            source: () async {
+              final resolved = await resolver.resolve(widget.item);
+              sourceFrom = resolved.servedFrom;
+              return resolved;
+            },
+          );
       if (page1 != null) {
         return (
-          data: BytesData(bytes: page1),
+          data: BytesData(
+            bytes: page1,
+            servedFrom: sourceFrom,
+            servedTier: ServedTier.thumbnail,
+          ),
           videoPosterMissing: false,
           documentRenderable: true,
+          storeFallbackUsed: false,
         );
       }
       // No local render (bytes unavailable here, or an unreadable PDF):
@@ -161,6 +212,7 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
         data: native,
         videoPosterMissing: false,
         documentRenderable: false,
+        storeFallbackUsed: false,
       );
     }
     // Media store fallback (design spec section 10): only engages when the
@@ -186,6 +238,9 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
         data: native,
         videoPosterMissing: false,
         documentRenderable: false,
+        // The store was never consulted: the row carries no stamp saying it
+        // would have anything to offer.
+        storeFallbackUsed: false,
       );
     }
     try {
@@ -198,6 +253,10 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
           data: native,
           videoPosterMissing: false,
           documentRenderable: false,
+          // True on purpose: the fallback was attempted and there was no
+          // store here to answer it, which is a different situation from
+          // never having looked.
+          storeFallbackUsed: true,
         );
       }
       final remote = await runtime.resolver.tryResolveRemote(
@@ -215,6 +274,7 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
           // it handed back, and isPoster is how it says so.
           documentRenderable:
               widget.thumbnail && remote is FileData && remote.isPoster,
+          storeFallbackUsed: true,
         );
       }
       // The movie tile claims something specific -- this video has no poster
@@ -231,12 +291,14 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
             widget.item.isVideo &&
             widget.item.remoteThumbUploadedAt == null,
         documentRenderable: false,
+        storeFallbackUsed: true,
       );
     } catch (_) {
       return (
         data: native,
         videoPosterMissing: false,
         documentRenderable: false,
+        storeFallbackUsed: true,
       );
     }
   }
