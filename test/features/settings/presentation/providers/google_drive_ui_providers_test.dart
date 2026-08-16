@@ -58,6 +58,32 @@ void main() {
     },
   );
 
+  test(
+    'googleDriveAccountEmailProvider is null while not authenticated',
+    () async {
+      // A revoked grant leaves GoogleSignInAuthenticator._currentUser set on
+      // purpose, so getUserEmail() still returns an address. The provider must
+      // gate on the auth flag or the tile advertises an account that cannot
+      // sync. Regression guard for the PR #1105 review.
+      final container = ProviderContainer(
+        overrides: [
+          selectedCloudProviderTypeProvider.overrideWith(
+            (ref) => CloudProviderType.googledrive,
+          ),
+          syncStateProvider.overrideWith(
+            (ref) => _FakeSyncNotifier(const SyncState(isAuthenticated: false)),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      expect(
+        await container.read(googleDriveAccountEmailProvider.future),
+        isNull,
+      );
+    },
+  );
+
   test('googleDriveAccountEmailProvider recomputes on isAuthenticated flips '
       'but not on progress ticks', () async {
     var syncState = const SyncState();

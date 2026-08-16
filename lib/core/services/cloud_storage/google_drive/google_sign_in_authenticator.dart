@@ -15,8 +15,11 @@ import 'package:submersion/core/services/logger_service.dart';
 ///
 /// Token persistence across launches is handled by google_sign_in's own
 /// cache via attemptLightweightAuthentication(); nothing is stored by the
-/// app. Silent sign-in is deferred until the user has opted in once
-/// (_allowSilentAuth) because it touches the platform keychain.
+/// app. That cache is the entire reason cold-launch sync works, so silent
+/// sign-in must NOT be gated behind an in-process opt-in flag: such a flag is
+/// false in every fresh process, which would report sync as unauthenticated
+/// after every restart. See [GoogleDriveAuthenticator.attemptSilentAuth] for
+/// where the pre-opt-in guarantee actually lives.
 class GoogleSignInAuthenticator implements GoogleDriveAuthenticator {
   static final _log = LoggerService.forClass(GoogleSignInAuthenticator);
 
@@ -26,7 +29,6 @@ class GoogleSignInAuthenticator implements GoogleDriveAuthenticator {
   // hints.
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   bool _initialized = false;
-  bool _allowSilentAuth = false;
   gapis_auth.AuthClient? _authClient;
   GoogleSignInAccount? _currentUser;
 
@@ -48,16 +50,9 @@ class GoogleSignInAuthenticator implements GoogleDriveAuthenticator {
   }
 
   @override
-  Future<void> allowSilentAuth() async => _allowSilentAuth = true;
-
-  @override
   Future<bool> attemptSilentAuth() async {
     try {
       if (_authClient != null) return true;
-
-      // Defer any silent sign-in (which triggers Keychain access) until the
-      // user has explicitly opted in by signing in once.
-      if (!_allowSilentAuth) return false;
 
       await _ensureInitialized();
       final futureAccount = _googleSignIn.attemptLightweightAuthentication();
@@ -88,7 +83,6 @@ class GoogleSignInAuthenticator implements GoogleDriveAuthenticator {
       );
 
       _installClient(account, authorization);
-      _allowSilentAuth = true;
       _log.info('Authenticated with Google Drive as ${account.email}');
     } on GoogleSignInException catch (e, stackTrace) {
       if (e.code == GoogleSignInExceptionCode.canceled) {
@@ -127,14 +121,13 @@ class GoogleSignInAuthenticator implements GoogleDriveAuthenticator {
     _authClient?.close();
     _authClient = null;
     _currentUser = null;
-    _allowSilentAuth = false;
     _log.info('Signed out from Google Drive');
   }
 
   @override
   Future<void> handleAuthFailure() async {
-    // Drop the stale client; keep _allowSilentAuth so the next
-    // attemptSilentAuth() can rebuild authorization without UI.
+    // Drop the stale client so the next attemptSilentAuth() rebuilds
+    // authorization without UI.
     //
     // Deliberately leaves _currentUser set (unlike DesktopOAuthAuthenticator,
     // which clears _email): silent re-auth here normally restores the same

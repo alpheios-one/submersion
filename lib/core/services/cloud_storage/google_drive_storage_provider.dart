@@ -85,10 +85,8 @@ class GoogleDriveStorageProvider
   Future<String?> getUserEmail() => _authenticator.userEmail;
 
   /// Authenticated HTTP client for the media store's raw REST calls.
-  /// Attaching media is itself the opt-in, so this lifts the silent-auth
-  /// gate; returns null when no Google session can be established.
+  /// Returns null when no Google session can be established.
   Future<http.Client?> mediaHttpClient() async {
-    await _authenticator.allowSilentAuth();
     if (await isAuthenticated()) return _authenticator.authClient;
     return null;
   }

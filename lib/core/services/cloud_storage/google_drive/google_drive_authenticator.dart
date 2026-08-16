@@ -16,18 +16,17 @@ abstract class GoogleDriveAuthenticator {
   /// auth, or a stored refresh token). Never shows UI. Returns false when
   /// re-auth is not possible; must not throw.
   ///
-  /// Implementations must not touch secure storage before the user has
-  /// opted in by authenticating once (no keychain prompt before opt-in).
-  Future<bool> attemptSilentAuth();
-
-  /// Records that the user has opted in to silent re-auth through some
-  /// entry point other than [authenticate] -- specifically the media store
-  /// attach, which is itself the opt-in gesture.
+  /// This MAY touch secure storage. The "don't prompt a user who never asked
+  /// for Google Drive" guarantee is enforced upstream, by reachability rather
+  /// than by a flag: GoogleDriveStorageProvider is only ever asked for its
+  /// auth state when Drive is the selected sync provider, the chosen media
+  /// backend, or a registered connected account. All three are persisted user
+  /// choices, so arriving here at all means the user already opted in.
   ///
-  /// Exists because the opt-in gate guards a keychain read, and only the
-  /// implementation knows whether it has one. A no-op is a valid
-  /// implementation.
-  Future<void> allowSilentAuth();
+  /// Deliberately NOT an in-process opt-in flag. Such a flag is false in every
+  /// fresh process, which would make cold-launch silent auth impossible and
+  /// leave sync reporting itself unauthenticated after every restart.
+  Future<bool> attemptSilentAuth();
 
   /// The authorized HTTP client, or null when not authenticated.
   http.Client? get authClient;

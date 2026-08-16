@@ -104,12 +104,6 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
     }
   }
 
-  /// No-op: there is no opt-in gate to lift here. The token store is only
-  /// ever populated by [authenticate], so a pre-opt-in read finds nothing
-  /// and cannot surface a credential prompt the user did not ask for.
-  @override
-  Future<void> allowSilentAuth() async {}
-
   @override
   Future<bool> attemptSilentAuth() async {
     try {

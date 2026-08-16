@@ -258,13 +258,24 @@ final googleDriveAvailableProvider = FutureProvider<bool>((ref) {
 });
 
 /// Signed-in Google account email for the provider tile subtitle, or null
-/// when Google Drive is not the selected provider or no account is known.
-/// Watches the authentication flag so connect/sign-out refresh the subtitle
-/// without re-running on every sync progress tick.
+/// when Google Drive is not the selected provider, is not authenticated, or
+/// no account is known.
+///
+/// Selecting `isAuthenticated` serves two purposes, and the value matters as
+/// much as the subscription. As a subscription it re-runs on connect and
+/// sign-out without re-running on every sync progress tick. As a value it
+/// suppresses a STALE subtitle: GoogleSignInAuthenticator.handleAuthFailure()
+/// deliberately keeps `_currentUser` so a transient token refresh cannot blank
+/// a still-valid account, which means getUserEmail() keeps returning an
+/// address after a revoked grant. Without this gate the tile would keep
+/// advertising a connected account that can no longer sync.
 final googleDriveAccountEmailProvider = FutureProvider<String?>((ref) async {
   final type = ref.watch(selectedCloudProviderTypeProvider);
   if (type != CloudProviderType.googledrive) return null;
-  ref.watch(syncStateProvider.select((s) => s.isAuthenticated));
+  final isAuthenticated = ref.watch(
+    syncStateProvider.select((s) => s.isAuthenticated),
+  );
+  if (!isAuthenticated) return null;
   return cloudProviderInstanceFor(CloudProviderType.googledrive).getUserEmail();
 });
 

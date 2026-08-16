@@ -22,7 +22,6 @@ class _FakeAuthenticator implements GoogleDriveAuthenticator {
   int authenticateCalls = 0;
   int silentAuthCalls = 0;
   int authFailures = 0;
-  int allowSilentAuthCalls = 0;
   bool silentAuthResult = true;
   bool signedOut = false;
 
@@ -37,9 +36,6 @@ class _FakeAuthenticator implements GoogleDriveAuthenticator {
     silentAuthCalls++;
     return silentAuthResult;
   }
-
-  @override
-  Future<void> allowSilentAuth() async => allowSilentAuthCalls++;
 
   @override
   Future<void> handleAuthFailure() async => authFailures++;
@@ -184,20 +180,28 @@ void main() {
     expect(await provider.getUserEmail(), 'diver@example.com');
   });
 
-  test(
-    'mediaHttpClient lifts the silent-auth gate and yields the client',
-    () async {
-      final client = await provider.mediaHttpClient();
-      expect(auth.allowSilentAuthCalls, 1);
-      expect(client, isNotNull);
-    },
-  );
+  test('mediaHttpClient yields the authenticated client', () async {
+    expect(await provider.mediaHttpClient(), isNotNull);
+  });
 
   test('mediaHttpClient returns null when no session can be built', () async {
-    final fake = _FakeAuthenticator(null)..silentAuthResult = false;
-    final offline = GoogleDriveStorageProvider(authenticator: fake);
+    final offline = GoogleDriveStorageProvider(
+      authenticator: _FakeAuthenticator(null)..silentAuthResult = false,
+    );
     expect(await offline.mediaHttpClient(), isNull);
-    expect(fake.allowSilentAuthCalls, 1);
+  });
+
+  test('a fresh process re-authenticates silently without authenticate()', () {
+    // Cold-launch regression guard. isSyncAvailable() -> isAuthenticated() is
+    // the FIRST thing sync does after a restart, with no authenticate() call
+    // in this process. An in-process opt-in flag here would report sync as
+    // unauthenticated after every launch, which is checklist item 2.
+    return expectLater(
+      GoogleDriveStorageProvider(
+        authenticator: _FakeAuthenticator(drive_.client()),
+      ).isAuthenticated(),
+      completion(isTrue),
+    );
   });
 
   test('an injected DriveApi outranks the authenticator client', () async {
@@ -312,6 +316,109 @@ void main() {
           contains('storage is full'),
         ),
       ),
+    );
+  });
+
+  group('authenticate', () {
+    test('delegates and binds a DriveApi to the fresh client', () async {
+      await provider.authenticate();
+
+      expect(auth.authenticateCalls, 1);
+      // Proven by the api actually working, not by inspecting private state.
+      expect(await provider.getFileInfo('file-1'), isNotNull);
+    });
+
+    test('throws when sign-in yields no authorized client', () async {
+      final clientless = GoogleDriveStorageProvider(
+        authenticator: _FakeAuthenticator(null),
+      );
+
+      await expectLater(
+        clientless.authenticate(),
+        throwsA(
+          isA<CloudStorageException>().having(
+            (e) => e.message,
+            'message',
+            contains('did not produce an authorized client'),
+          ),
+        ),
+      );
+    });
+  });
+
+  group('transport failures map to CloudStorageException', () {
+    /// A provider whose every Drive call fails with a non-auth transport
+    /// error, exercising each operation's generic catch + _mapDriveError.
+    GoogleDriveStorageProvider failing() => GoogleDriveStorageProvider(
+      authenticator: _FakeAuthenticator(
+        MockClient((_) async => http.Response('upstream exploded', 500)),
+      ),
+    );
+
+    test('listFiles', () async {
+      await expectLater(
+        failing().listFiles(folderId: 'folder-7'),
+        throwsA(isA<CloudStorageException>()),
+      );
+    });
+
+    test('deleteFile', () async {
+      await expectLater(
+        failing().deleteFile('f1'),
+        throwsA(isA<CloudStorageException>()),
+      );
+    });
+
+    test('createFolder', () async {
+      await expectLater(
+        failing().createFolder('Submersion Sync'),
+        throwsA(isA<CloudStorageException>()),
+      );
+    });
+
+    test('getOrCreateSyncFolder', () async {
+      await expectLater(
+        failing().getOrCreateSyncFolder(),
+        throwsA(isA<CloudStorageException>()),
+      );
+    });
+
+    test('uploadFile', () async {
+      await expectLater(
+        failing().uploadFile(Uint8List.fromList([1]), 'a.json'),
+        throwsA(isA<CloudStorageException>()),
+      );
+    });
+
+    test('downloadFile', () async {
+      await expectLater(
+        failing().downloadFile('file-1'),
+        throwsA(isA<CloudStorageException>()),
+      );
+    });
+
+    test('fileExists reports false rather than throwing', () async {
+      expect(await failing().fileExists('file-1'), isFalse);
+    });
+
+    test(
+      'createFolder maps a full-quota 403 to a storage-is-full error',
+      () async {
+        drive_.failuresRemaining = 1;
+        drive_.failureStatus = 403;
+        drive_.failureReason = 'storageQuotaExceeded';
+
+        await expectLater(
+          provider.createFolder('Submersion Sync'),
+          throwsA(
+            isA<CloudStorageException>().having(
+              (e) => e.message,
+              'message',
+              contains('storage is full'),
+            ),
+          ),
+        );
+      },
     );
   });
 
