@@ -104,6 +104,54 @@ void main() {
     },
   );
 
+  // Issue #1098: a URL added from a dive site's attachment picker has to land
+  // on that site. Without siteId on the insert the row was site-less and the
+  // site's grid stayed empty no matter what the user pasted.
+  test('ingest stamps siteId when the session targets a site', () async {
+    const url = 'https://example.com/a.jpg';
+    final extractor = _StubExtractor(results: {url: _ok(url)});
+    final pipeline = NetworkFetchPipeline(db: db, extractor: extractor);
+    // media.site_id carries a real FK, so the row has to point at a real
+    // site. Inserting one also proves the stamp survives that constraint.
+    await db
+        .into(db.diveSites)
+        .insert(
+          DiveSitesCompanion.insert(
+            id: 'site-1',
+            name: 'Blue Hole',
+            createdAt: 1700000000000,
+            updatedAt: 1700000000000,
+          ),
+        );
+
+    final ids = await pipeline.ingest(
+      [Uri.parse(url)],
+      autoMatch: false,
+      siteId: 'site-1',
+    );
+    await pipeline.idle();
+
+    final row = await (db.select(
+      db.media,
+    )..where((t) => t.id.equals(ids.single))).getSingle();
+    expect(row.siteId, 'site-1');
+    expect(row.diveId, isNull);
+  });
+
+  test('ingest leaves siteId null when the session has no site', () async {
+    const url = 'https://example.com/a.jpg';
+    final extractor = _StubExtractor(results: {url: _ok(url)});
+    final pipeline = NetworkFetchPipeline(db: db, extractor: extractor);
+
+    final ids = await pipeline.ingest([Uri.parse(url)], autoMatch: false);
+    await pipeline.idle();
+
+    final row = await (db.select(
+      db.media,
+    )..where((t) => t.id.equals(ids.single))).getSingle();
+    expect(row.siteId, isNull);
+  });
+
   test('background success patches row + sets lastVerifiedAt', () async {
     const url = 'https://example.com/a.jpg';
     final extractor = _StubExtractor(results: {url: _ok(url)});

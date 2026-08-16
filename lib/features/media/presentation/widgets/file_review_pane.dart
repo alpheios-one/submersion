@@ -26,11 +26,27 @@ class FileReviewPane extends ConsumerWidget {
   /// assign affordance; null hides both.
   final String? assignableDiveId;
 
-  const FileReviewPane({super.key, required this.state, this.assignableDiveId});
+  /// Renders one flat list of every staged file instead of the matched /
+  /// unmatched dive grouping.
+  ///
+  /// Used when the session attaches to a dive site: matched-vs-unmatched is
+  /// a statement about dives, so on a site it is both meaningless and
+  /// alarming: the user sees "0 dives, N unmatched" and reasonably concludes
+  /// the app rejected their photos (issue #1098).
+  final bool flat;
+
+  const FileReviewPane({
+    super.key,
+    required this.state,
+    this.assignableDiveId,
+    this.flat = false,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    if (flat) return _buildFlat(context, theme);
+
     // TODO(media): l10n
     final summary =
         '${state.files.length} photos → '
@@ -89,6 +105,33 @@ class FileReviewPane extends ConsumerWidget {
                       ),
                   ],
                 ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Flat variant: a count and one card per staged file, with no dive
+  /// grouping and no assign affordances (there is no dive to assign to).
+  Widget _buildFlat(BuildContext context, ThemeData theme) {
+    final count = state.files.length;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          // TODO(media): l10n, pluralization
+          child: Text(
+            '$count photo${count == 1 ? '' : 's'}',
+            style: theme.textTheme.titleMedium,
+          ),
+        ),
+        Expanded(
+          child: ListView(
+            children: [
+              for (final f in state.files)
+                FileReviewCard(file: f, targetDiveId: null),
             ],
           ),
         ),

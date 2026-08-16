@@ -131,7 +131,18 @@ class NetworkFetchPipeline {
   /// dive's time window are attached to that dive after the background
   /// fill completes (same DivePhotoMatcher semantics as the gallery scan
   /// and Lightroom auto-linking).
-  Future<List<String>> ingest(List<Uri> urls, {bool autoMatch = true}) async {
+  ///
+  /// [siteId] attaches every row directly to a dive site, for URLs added
+  /// from that site's attachment picker. Callers passing it should also pass
+  /// `autoMatch: false`: a site has no time window of its own, so the dive
+  /// matcher would route the photo to whichever unrelated dive happened to
+  /// span its timestamp instead of to the site the user was looking at
+  /// (issue #1098).
+  Future<List<String>> ingest(
+    List<Uri> urls, {
+    bool autoMatch = true,
+    String? siteId,
+  }) async {
     final ids = <String>[];
     final specs = <_FillSpec>[];
     final nowMillis = _now().millisecondsSinceEpoch;
@@ -145,6 +156,7 @@ class NetworkFetchPipeline {
               filePath: '',
               sourceType: const Value('networkUrl'),
               url: Value(uri.toString()),
+              siteId: Value(siteId),
               isOrphaned: const Value(false),
               createdAt: nowMillis,
               updatedAt: nowMillis,

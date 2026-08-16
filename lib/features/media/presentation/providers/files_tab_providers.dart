@@ -12,6 +12,7 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/value_objects/extracted_file.dart';
 import 'package:submersion/features/media/domain/value_objects/matched_selection.dart';
+import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
@@ -81,8 +82,9 @@ class FilesTabState extends Equatable {
 /// Phase 2 actions: [toggleAutoMatch], [clear], [setFiles],
 /// [setExtractionProgress], [removeFile], [commit], [undoCommit].
 ///
-/// [commit] iterates the matcher's assignment and persists each
-/// [ExtractedFile] as a [MediaItem] row via [MediaRepository.createMedia].
+/// [commit] persists each staged [ExtractedFile] as a [MediaItem] row via
+/// [MediaRepository.createMedia]: walking the matcher's per-dive assignment
+/// for a dive session, or the flat file list for a site one (see [commit]).
 /// On iOS / macOS it first creates a security-scoped bookmark blob via
 /// [LocalMediaPlatform.createBookmark] and stores it in the keychain via
 /// [LocalBookmarkStorage.write] keyed by a freshly-generated UUID; that
@@ -90,7 +92,9 @@ class FilesTabState extends Equatable {
 /// Android alike — it stores the absolute filesystem path in `localPath`;
 /// see [_persistOne] for why Android has no persistable URI to take.
 ///
-/// Unmatched files are skipped — assignment UI for them is Phase 3.
+/// In a dive session, unmatched files are skipped; the review pane's assign
+/// actions are what move them into a dive group. A site session has no
+/// unmatched bucket to skip; every staged file belongs to the site.
 ///
 /// [undoCommit] takes the list of IDs returned by [commit] and deletes
 /// each row. The keychain bookmark blob (if any) is intentionally left
@@ -130,6 +134,25 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
 
   void clear() {
     state = FilesTabState.initial();
+  }
+
+  /// Drops the staged files and their grouping while keeping the user's
+  /// auto-match preference.
+  ///
+  /// Called when the picker opens. The notifier is not autoDispose, so files
+  /// picked and then abandoned (backing out without committing) outlive the
+  /// session that picked them, and the next session may attach to a
+  /// different dive, or to a site. Offering yesterday's leftovers as
+  /// "attach these to this site" is wrong regardless of what the user then
+  /// taps, so the staged set starts empty every time.
+  void clearStagedFiles() {
+    state = state.copyWith(
+      files: const [],
+      match: MatchedSelection.empty(),
+      isExtracting: false,
+      extractedCount: 0,
+      totalToExtract: 0,
+    );
   }
 
   void setFiles(List<ExtractedFile> files, {required MatchedSelection match}) {
@@ -223,21 +246,40 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
     );
   }
 
-  /// Persists the matcher's per-dive assignment as [MediaItem] rows and
-  /// returns the list of created IDs. Pass the list back to [undoCommit]
-  /// to roll back. State is reset via [clear] before returning.
+  /// Persists the staged files as [MediaItem] rows and returns the list of
+  /// created IDs. Pass the list back to [undoCommit] to roll back. State is
+  /// reset via [clear] before returning.
+  ///
+  /// What gets persisted depends on [target]:
+  ///
+  /// - [SiteAttachTarget]: every file in [FilesTabState.files], each stamped
+  ///   with the site id. The dive matcher's grouping is ignored outright:
+  ///   `matched` is keyed by dive id and a site session has no dives to key
+  ///   on, so honouring it would either persist nothing (the issue #1098
+  ///   symptom) or scatter the user's photos across whatever dives their
+  ///   timestamps happened to fall inside.
+  /// - [DiveAttachTarget], or no target at all: the matcher's per-dive
+  ///   assignment, which the review pane lets the user correct first.
+  ///   Unmatched files are skipped; the pane's assign actions are how they
+  ///   get out of that bucket.
   ///
   /// Both photos and videos are persisted; [_persistOne] tags each row with
   /// the right [MediaType] from its MIME. On desktop a local-file video
   /// resolves by localPath and plays via `VideoPlayerController.file`
   /// (see [FilesTab] class doc for the iOS caveat).
-  Future<List<String>> commit() async {
+  Future<List<String>> commit({MediaAttachTarget? target}) async {
     final created = <String>[];
-    for (final entry in state.match.matched.entries) {
-      for (final file in entry.value) {
-        final id = await _persistOne(file, entry.key);
-        created.add(id);
-      }
+    switch (target) {
+      case SiteAttachTarget(:final siteId):
+        for (final file in state.files) {
+          created.add(await _persistOne(file, siteId: siteId));
+        }
+      case DiveAttachTarget() || null:
+        for (final entry in state.match.matched.entries) {
+          for (final file in entry.value) {
+            created.add(await _persistOne(file, diveId: entry.key));
+          }
+        }
     }
     clear();
     return created;
@@ -256,7 +298,14 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
     }
   }
 
-  Future<String> _persistOne(ExtractedFile file, String diveId) async {
+  /// Writes one row. Exactly one of [diveId] / [siteId] is supplied by
+  /// [commit]; the other stays null so the row belongs to one owner and does
+  /// not surface in both a dive's grid and a site's.
+  Future<String> _persistOne(
+    ExtractedFile file, {
+    String? diveId,
+    String? siteId,
+  }) async {
     String? localPath;
     String? bookmarkRef;
 
@@ -289,6 +338,7 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
       // Empty id triggers UUID generation in MediaRepository.createMedia.
       id: '',
       diveId: diveId,
+      siteId: siteId,
       mediaType: file.metadata.mimeType.startsWith('video/')
           ? MediaType.video
           : MediaType.photo,
