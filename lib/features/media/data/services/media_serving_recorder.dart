@@ -59,6 +59,14 @@ class MediaServingRecorder extends ChangeNotifier {
   @visibleForTesting
   int get entryCount => _entries.length;
 
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
   /// A thumbnail and an original are separate observations of the same row:
   /// a grid tile resolves the first while the viewer resolves the second,
   /// and they can legitimately come from different places.
@@ -73,6 +81,11 @@ class MediaServingRecorder extends ChangeNotifier {
     UnavailableKind? failure,
     bool storeFallbackUsed = false,
   }) {
+    // A resolution can outlive the container that owns this recorder: a
+    // FutureProvider still in flight when a ProviderContainer is disposed
+    // runs its continuation afterwards. notifyListeners asserts once the
+    // notifier is disposed, so a late write is dropped rather than attempted.
+    if (_disposed) return;
     final key = _key(mediaId, thumbnail);
     _entries.remove(key);
     _entries[key] = ServingObservation(
