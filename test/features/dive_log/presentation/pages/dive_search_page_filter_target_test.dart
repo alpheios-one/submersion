@@ -151,6 +151,36 @@ void main() {
     expect(find.text('dive list'), findsOneWidget);
   });
 
+  testWidgets('a section-targeted page with nothing to pop falls back to the '
+      'dive list', (tester) async {
+    // Only reachable from a hand-built route or a stale deep link, since the
+    // sections always push. The page must still lead somewhere.
+    final overrides = await buildOverrides();
+    final router = GoRouter(
+      initialLocation: '/search',
+      routes: [
+        GoRoute(
+          path: '/dives',
+          builder: (_, _) => const Scaffold(body: Text('dive list')),
+        ),
+        GoRoute(
+          path: '/search',
+          builder: (_, _) =>
+              DiveSearchPage(filterProvider: statisticsFilterProvider),
+        ),
+      ],
+    );
+    await pumpApp(tester, router: router, overrides: overrides);
+    expect(find.byType(DiveSearchPage), findsOneWidget);
+
+    await tapFiveStars(tester);
+    await tester.tap(find.byType(FilledButton));
+    await tester.pumpAndSettle();
+
+    expect(containerOf(tester).read(statisticsFilterProvider).minRating, 5);
+    expect(find.text('dive list'), findsOneWidget);
+  });
+
   testWidgets('the filter sheet forwards its target provider to the page', (
     tester,
   ) async {
