@@ -1,6 +1,6 @@
 # Media Provenance PR 3: The Status Badge Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Make media health scannable at a glance in the grids, and give the library grid a route into the info panel.
 
@@ -76,7 +76,7 @@ Two rules that are easy to get wrong:
 
 A pure function so the ladder is table-testable without pumping a widget.
 
-- [ ] **Step 1: Write the failing test.** Table-driven over every state, plus these specifically:
+- [x] **Step 1: Write the failing test.** Table-driven over every state, plus these specifically:
 
 ```dart
 test('a missing row with no backup is broken', ...);
@@ -91,10 +91,10 @@ test('a healthy backed-up row is silent', ...);
 test('a healthy unbacked row with no store attached is silent', ...);
 ```
 
-- [ ] **Step 2: Run and confirm failure.**
-- [ ] **Step 3: Implement**, exhaustive over the queue-state strings with a default of "no transfer in flight".
-- [ ] **Step 4: Run.** Expected PASS.
-- [ ] **Step 5: Format, analyze, commit.**
+- [x] **Step 2: Run and confirm failure.**
+- [x] **Step 3: Implement**, exhaustive over the queue-state strings with a default of "no transfer in flight".
+- [x] **Step 4: Run.** Expected PASS.
+- [x] **Step 5: Format, analyze, commit.**
 
 ---
 
@@ -114,10 +114,10 @@ media_status_notBackedUp    "Not backed up"
 media_tile_infoMenuItem     "Media info"
 ```
 
-- [ ] **Step 1** Extend the strings test, expecting failure.
-- [ ] **Step 2** Add keys to all 11, `flutter pub get` to regenerate.
-- [ ] **Step 3** `flutter test test/l10n/`. Expected PASS.
-- [ ] **Step 4** Format and commit with the regenerated files.
+- [x] **Step 1** Extend the strings test, expecting failure.
+- [x] **Step 2** Add keys to all 11, `flutter pub get` to regenerate.
+- [x] **Step 3** `flutter test test/l10n/`. Expected PASS.
+- [x] **Step 4** Format and commit with the regenerated files.
 
 ---
 
@@ -137,11 +137,11 @@ Keeps `MediaStoreBadge`'s visual contract: a 10-radius `CircleAvatar`, 13px icon
 
 The tap must not also open the viewer. Wrap the badge in its own `GestureDetector` with `behavior: HitTestBehavior.opaque`, which claims the gesture before the tile's `onTap`.
 
-- [ ] **Step 1: Write the failing test.** Cover: silent state renders nothing; each visible state renders its icon; the tooltip resolves; tapping opens `MediaInfoPanel` and does NOT fire the tile's onTap.
-- [ ] **Step 2: Run and confirm failure.**
-- [ ] **Step 3: Implement,** then swap `media_grid.dart:138` and perform the deletions.
-- [ ] **Step 4: Run** the media and media_store suites. Expected: PASS with the deleted tests' counts removed and the new ones added.
-- [ ] **Step 5: Format, analyze, commit.**
+- [x] **Step 1: Write the failing test.** Cover: silent state renders nothing; each visible state renders its icon; the tooltip resolves; tapping opens `MediaInfoPanel` and does NOT fire the tile's onTap.
+- [x] **Step 2: Run and confirm failure.**
+- [x] **Step 3: Implement,** then swap `media_grid.dart:138` and perform the deletions.
+- [x] **Step 4: Run** the media and media_store suites. Expected: PASS with the deleted tests' counts removed and the new ones added.
+- [x] **Step 5: Format, analyze, commit.**
 
 ---
 
@@ -153,26 +153,26 @@ The tap must not also open the viewer. Wrap the badge in its own `GestureDetecto
 
 Adds the badge in the free top-left corner, and `onSecondaryTapDown` opening a `showMenu` with a single Media info item. Desktop-only, matching `dive_media_section`: `onSecondaryTapDown` does not fire on touchscreens, so this is a desktop affordance and mobile keeps the viewer's info button as its route in.
 
-- [ ] **Step 1: Write the failing test.** Cover: the badge renders for an unhealthy entry; long-press still reaches `onLongPress` (selection must not regress); tap still reaches `onTap`.
-- [ ] **Step 2: Run and confirm failure.**
-- [ ] **Step 3: Implement.**
-- [ ] **Step 4: Run** the media presentation suites. Expected: PASS, existing counts unchanged.
-- [ ] **Step 5: Format, analyze, commit.**
+- [x] **Step 1: Write the failing test.** Cover: the badge renders for an unhealthy entry; long-press still reaches `onLongPress` (selection must not regress); tap still reaches `onTap`.
+- [x] **Step 2: Run and confirm failure.**
+- [x] **Step 3: Implement.**
+- [x] **Step 4: Run** the media presentation suites. Expected: PASS, existing counts unchanged.
+- [x] **Step 5: Format, analyze, commit.**
 
 ---
 
 ### Task 5: Full verification
 
-- [ ] `dart format --set-exit-if-changed .` exits 0.
-- [ ] `flutter analyze` reports no issues. Do not pipe through `tail`.
-- [ ] `flutter test` redirected to a file, exit code captured explicitly.
-- [ ] `git diff --stat origin/main...HEAD -- lib/core/database lib/features/sync` is empty.
-- [ ] No em-dash entered source:
+- [x] `dart format --set-exit-if-changed .` exits 0.
+- [x] `flutter analyze` reports no issues. Do not pipe through `tail`.
+- [x] `flutter test` redirected to a file, exit code captured explicitly.
+- [x] `git diff --stat origin/main...HEAD -- lib/core/database lib/features/sync` is empty.
+- [x] No em-dash entered source:
   ```bash
   EMDASH=$(printf '\xe2\x80\x94')
   git diff origin/main...HEAD -- lib test | grep -n "^+.*$EMDASH" || echo "clean"
   ```
-- [ ] Push and open the PR against `worktree-media-provenance-pr2b`.
+- [x] Push and open the PR against `worktree-media-provenance-pr2b`.
 
 ## Self-Review
 
