@@ -24458,28 +24458,28 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get media_info_title => 'Media info';
+  String get media_info_title => 'Média infó';
 
   @override
-  String get media_info_fileSection => 'Fajl';
+  String get media_info_fileSection => 'Fájl';
 
   @override
-  String get media_info_filename => 'Fajlnev';
+  String get media_info_filename => 'Fájlnév';
 
   @override
-  String get media_info_type => 'Tipus';
+  String get media_info_type => 'Típus';
 
   @override
-  String get media_info_dimensions => 'Meretek';
+  String get media_info_dimensions => 'Méretek';
 
   @override
-  String get media_info_size => 'Meret';
+  String get media_info_size => 'Méret';
 
   @override
-  String get media_info_taken => 'Keszult';
+  String get media_info_taken => 'Készült';
 
   @override
-  String get media_info_coordinates => 'Koordinatak';
+  String get media_info_coordinates => 'Koordináták';
 
   @override
   String get media_info_unknown => 'Ismeretlen';
@@ -24488,59 +24488,59 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_info_originSection => 'Eredet';
 
   @override
-  String get media_info_source => 'Forras';
+  String get media_info_source => 'Forrás';
 
   @override
-  String get media_info_reference => 'Hivatkozas';
+  String get media_info_reference => 'Hivatkozás';
 
   @override
-  String get media_info_linkedOn => 'Osszekapcsolva';
+  String get media_info_linkedOn => 'Összekapcsolva';
 
   @override
-  String get media_info_thisDevice => 'Ez az eszkoz';
+  String get media_info_thisDevice => 'Ez az eszköz';
 
   @override
-  String get media_info_otherDevice => 'Egy masik eszkoz';
+  String get media_info_otherDevice => 'Egy másik eszköz';
 
   @override
-  String get media_info_status => 'Allapot';
+  String get media_info_status => 'Állapot';
 
   @override
-  String get media_info_statusFound => 'Megtalalhato ezen az eszkozon';
+  String get media_info_statusFound => 'Megtalálható ezen az eszközön';
 
   @override
-  String get media_info_statusMissing => 'Hianyzik errol az eszkozrol';
+  String get media_info_statusMissing => 'Hiányzik erről az eszközről';
 
   @override
-  String get media_info_statusUnchecked => 'Meg nincs ellenorizve';
+  String get media_info_statusUnchecked => 'Még nincs ellenőrizve';
 
   @override
   String media_info_lastChecked(String date) {
-    return 'Utoljara ellenorizve $date';
+    return 'Utoljára ellenőrizve $date';
   }
 
   @override
-  String get media_info_backupSection => 'Biztonsagi mentes';
+  String get media_info_backupSection => 'Biztonsági mentés';
 
   @override
-  String get media_info_store => 'Felho tarhely';
+  String get media_info_store => 'Felhő tárhely';
 
   @override
   String get media_info_storeNotConnected =>
-      'Nincs csatlakoztatott felho tarhely';
+      'Nincs csatlakoztatott felhő tárhely';
 
   @override
-  String get media_info_notEligible => 'Ez a forras nem menthato';
+  String get media_info_notEligible => 'Ez a forrás nem menthető';
 
   @override
   String get media_info_backupFull => 'Eredeti feltoltve';
 
   @override
   String get media_info_backupThumbOnly =>
-      'Csak belyegkep, az eredeti nincs elkuldve';
+      'Csak bélyegkép, az eredeti nincs elküldve';
 
   @override
-  String get media_info_backupRenditionOnly => 'Tomoritett valtozat feltoltve';
+  String get media_info_backupRenditionOnly => 'Tömörített változat feltöltve';
 
   @override
   String get media_info_backupNone => 'Nincs mentve';
@@ -24558,106 +24558,118 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String media_info_queueFailed(Object error) {
-    return 'A feltoltes sikertelen: $error';
+    return 'A feltöltés sikertelen: $error';
   }
 
   @override
-  String get media_info_servingSection => 'Jelenlegi forras';
+  String get media_info_servingSection => 'Jelenlegi forrás';
 
   @override
-  String get media_info_servingUnobserved => 'Meg nincs betoltve';
+  String get media_info_servingUnobserved => 'Még nincs betöltve';
 
   @override
-  String get media_info_servingFailed => 'Nem sikerult betolteni';
+  String get media_info_servingFailed => 'Nem sikerült betölteni';
 
   @override
-  String get media_info_servedLocalDisk => 'Helyi fajl ezen az eszkozon';
+  String get media_info_servedLocalDisk => 'Helyi fájl ezen az eszközön';
 
   @override
-  String get media_info_servedGallery => 'Fotokonyvtar';
+  String get media_info_servedGallery => 'Fotókönyvtár';
 
   @override
   String get media_info_servedStoreCache =>
-      'Helyi gyorsitotar, a felho tarhelyrol';
+      'Helyi gyorsítótár, a felhő tárhelyről';
 
   @override
-  String get media_info_servedStoreNetwork => 'Letoltve a felho tarhelyrol';
+  String get media_info_servedStoreNetwork => 'Letöltve a felhő tárhelyről';
 
   @override
-  String get media_info_servedNetworkUrl => 'Streameles URL-cimrol';
+  String get media_info_servedNetworkUrl => 'Streamelés URL-címről';
 
   @override
   String get media_info_servedConnectorCache =>
-      'Helyi gyorsitotar, a csatlakoztatott szolgaltatasbol';
+      'Helyi gyorsítótár, a csatlakoztatott szolgáltatásból';
 
   @override
   String get media_info_servedConnectorNetwork =>
-      'Letoltve a csatlakoztatott szolgaltatasbol';
+      'Letöltve a csatlakoztatott szolgáltatásból';
 
   @override
-  String get media_info_servedEmbedded => 'Ebben a naploban tarolva';
+  String get media_info_servedEmbedded => 'Ebben a naplóban tárolva';
 
   @override
   String get media_info_servingFallbackNote =>
-      'Az eredeti forras nem volt elerheto, ezert a felho tarhely szolgalta ki.';
+      'Az eredeti forrás nem volt elérhető, ezért a felhő tárhely szolgálta ki.';
 
   @override
-  String get media_info_servingTierThumbnail => 'Belyegkep';
+  String get media_info_servingTierThumbnail => 'Bélyegkép';
 
   @override
-  String get media_info_servingTierRendition => 'Tomoritett valtozat';
+  String get media_info_servingTierRendition => 'Tömörített változat';
 
   @override
-  String get media_info_actionCheckNow => 'Ellenorzes most';
+  String get media_info_typePhoto => 'Fénykép';
 
   @override
-  String get media_info_actionLocate => 'Fajl keresese...';
+  String get media_info_typeVideo => 'Videó';
 
   @override
-  String get media_info_actionBackUpNow => 'Mentes most';
+  String get media_info_typeDocument => 'Dokumentum';
 
   @override
-  String get media_info_actionRetryUpload => 'Feltoltes ujra';
+  String get media_info_typeSignature => 'Aláírás';
 
   @override
-  String get media_info_actionReveal => 'Megjelenites a fajlkezeloben';
+  String get media_info_actionCheckNow => 'Ellenőrzés most';
 
   @override
-  String get media_info_actionCopyPath => 'Hivatkozas masolasa';
+  String get media_info_actionLocate => 'Fájl keresése...';
 
   @override
-  String get media_info_referenceCopied => 'Hivatkozas masolva';
+  String get media_info_actionBackUpNow => 'Mentés most';
 
   @override
-  String get media_info_checkFound => 'A forras megtalalhato';
+  String get media_info_actionRetryUpload => 'Feltöltés újra';
 
   @override
-  String get media_info_checkMissing => 'A forras hianyzik';
+  String get media_info_actionReveal => 'Megjelenítés a fájlkezelőben';
 
   @override
-  String get media_info_checkUnavailable => 'Most nem ellenorizheto';
+  String get media_info_actionCopyPath => 'Hivatkozás másolása';
 
   @override
-  String get media_info_backupQueued => 'Feltoltesi sorban';
+  String get media_info_referenceCopied => 'Hivatkozás másolva';
 
   @override
-  String get media_status_broken => 'Hianyzik es nincs mentve';
+  String get media_info_checkFound => 'A forrás megtalálható';
 
   @override
-  String get media_status_transferFailed => 'A feltoltes sikertelen';
+  String get media_info_checkMissing => 'A forrás hiányzik';
 
   @override
-  String get media_status_transferring => 'Feltoltes folyamatban';
+  String get media_info_checkUnavailable => 'Most nem ellenőrizhető';
 
   @override
-  String get media_status_queued => 'Feltoltesre var';
+  String get media_info_backupQueued => 'Feltöltési sorban';
 
   @override
-  String get media_status_cloudOnly => 'Csak a felhoben tarolva';
+  String get media_status_broken => 'Hiányzik és nincs mentve';
+
+  @override
+  String get media_status_transferFailed => 'A feltöltés sikertelen';
+
+  @override
+  String get media_status_transferring => 'Feltöltés folyamatban';
+
+  @override
+  String get media_status_queued => 'Feltöltésre vár';
+
+  @override
+  String get media_status_cloudOnly => 'Csak a felhőben tárolva';
 
   @override
   String get media_status_notBackedUp => 'Nincs mentve';
 
   @override
-  String get media_tile_infoMenuItem => 'Media info';
+  String get media_tile_infoMenuItem => 'Média infó';
 }

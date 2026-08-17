@@ -41,7 +41,12 @@ MediaLibraryGroup diveGroup({
 );
 
 /// The status badge each tile now renders is a ConsumerWidget, so every tree
-/// here needs a scope. Its dependencies are stubbed to the quiet state so the
+/// here needs a scope.
+///
+/// Typed `List<dynamic>` rather than `List<Override>` because Riverpod 3 does
+/// not export the `Override` type: naming it fails to compile with
+/// "The name 'Override' isn't a type". The `.cast()` at each call site is the
+/// established workaround in this repo, not an oversight. Its dependencies are stubbed to the quiet state so the
 /// badge stays invisible and these tests keep asserting only about grouping.
 List<dynamic> _badgeOverrides() => [
   mediaStoreAttachedProvider.overrideWith((ref) async => false),

@@ -20,12 +20,18 @@ Future<void> revealInFileManager(String path) async {
   // Shells out to Process.run, which flutter_test cannot exercise. Covered
   // by manual desktop smoke tests; the platform predicate above is what is
   // unit-tested.
-  if (Platform.isMacOS) {
-    await Process.run('open', ['-R', path]);
-  } else if (Platform.isWindows) {
-    await Process.run('explorer', ['/select,', path]);
-  } else if (Platform.isLinux) {
-    await Process.run('xdg-open', [File(path).parent.path]);
+  try {
+    if (Platform.isMacOS) {
+      await Process.run('open', ['-R', path]);
+    } else if (Platform.isWindows) {
+      await Process.run('explorer', ['/select,', path]);
+    } else if (Platform.isLinux) {
+      await Process.run('xdg-open', [File(path).parent.path]);
+    }
+  } on ProcessException {
+    // The doc above promises failures are swallowed, and Process.run throws
+    // rather than returning non-zero when the executable is absent, which is
+    // routine on a minimal Linux desktop with no xdg-open.
   }
   // coverage:ignore-end
 }

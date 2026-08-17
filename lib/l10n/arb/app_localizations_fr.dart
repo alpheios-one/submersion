@@ -24615,7 +24615,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get media_info_title => 'Infos du media';
+  String get media_info_title => 'Infos du média';
 
   @override
   String get media_info_fileSection => 'Fichier';
@@ -24636,7 +24636,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_info_taken => 'Prise le';
 
   @override
-  String get media_info_coordinates => 'Coordonnees';
+  String get media_info_coordinates => 'Coordonnées';
 
   @override
   String get media_info_unknown => 'Inconnu';
@@ -24648,10 +24648,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_info_source => 'Source';
 
   @override
-  String get media_info_reference => 'Reference';
+  String get media_info_reference => 'Référence';
 
   @override
-  String get media_info_linkedOn => 'Liee sur';
+  String get media_info_linkedOn => 'Liée sur';
 
   @override
   String get media_info_thisDevice => 'Cet appareil';
@@ -24660,20 +24660,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_info_otherDevice => 'Un autre appareil';
 
   @override
-  String get media_info_status => 'Etat';
+  String get media_info_status => 'État';
 
   @override
-  String get media_info_statusFound => 'Trouvee sur cet appareil';
+  String get media_info_statusFound => 'Trouvée sur cet appareil';
 
   @override
   String get media_info_statusMissing => 'Absente de cet appareil';
 
   @override
-  String get media_info_statusUnchecked => 'Pas encore verifiee';
+  String get media_info_statusUnchecked => 'Pas encore vérifiée';
 
   @override
   String media_info_lastChecked(String date) {
-    return 'Derniere verification $date';
+    return 'Dernière vérification $date';
   }
 
   @override
@@ -24683,49 +24683,49 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_info_store => 'Stockage cloud';
 
   @override
-  String get media_info_storeNotConnected => 'Aucun stockage cloud connecte';
+  String get media_info_storeNotConnected => 'Aucun stockage cloud connecté';
 
   @override
   String get media_info_notEligible =>
-      'Cette source ne peut pas etre sauvegardee';
+      'Cette source ne peut pas être sauvegardée';
 
   @override
-  String get media_info_backupFull => 'Original televerse';
+  String get media_info_backupFull => 'Original téléversé';
 
   @override
   String get media_info_backupThumbOnly =>
-      'Miniature seulement, original non envoye';
+      'Miniature seulement, original non envoyé';
 
   @override
-  String get media_info_backupRenditionOnly => 'Version compressee televersee';
+  String get media_info_backupRenditionOnly => 'Version compressée téléversée';
 
   @override
-  String get media_info_backupNone => 'Non sauvegardee';
+  String get media_info_backupNone => 'Non sauvegardée';
 
   @override
   String media_info_uploadedOn(String date) {
-    return 'Televersee $date';
+    return 'Téléversée $date';
   }
 
   @override
-  String get media_info_queuePending => 'En attente de televersement';
+  String get media_info_queuePending => 'En attente de téléversement';
 
   @override
-  String get media_info_queueTransferring => 'Televersement en cours';
+  String get media_info_queueTransferring => 'Téléversement en cours';
 
   @override
   String media_info_queueFailed(Object error) {
-    return 'Echec du televersement : $error';
+    return 'Échec du téléversement : $error';
   }
 
   @override
   String get media_info_servingSection => 'Source actuelle';
 
   @override
-  String get media_info_servingUnobserved => 'Pas encore chargee';
+  String get media_info_servingUnobserved => 'Pas encore chargée';
 
   @override
-  String get media_info_servingFailed => 'Impossible a charger';
+  String get media_info_servingFailed => 'Impossible à charger';
 
   @override
   String get media_info_servedLocalDisk => 'Fichier local sur cet appareil';
@@ -24739,34 +24739,46 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_info_servedStoreNetwork =>
-      'Telechargee depuis le stockage cloud';
+      'Téléchargée depuis le stockage cloud';
 
   @override
   String get media_info_servedNetworkUrl => 'Diffusion depuis une URL';
 
   @override
   String get media_info_servedConnectorCache =>
-      'Cache local, depuis le service connecte';
+      'Cache local, depuis le service connecté';
 
   @override
   String get media_info_servedConnectorNetwork =>
-      'Telechargee depuis le service connecte';
+      'Téléchargée depuis le service connecté';
 
   @override
-  String get media_info_servedEmbedded => 'Stockee dans ce carnet';
+  String get media_info_servedEmbedded => 'Stockée dans ce carnet';
 
   @override
   String get media_info_servingFallbackNote =>
-      'La source d origine etait inaccessible, le stockage cloud a donc pris le relais.';
+      'La source d\'origine était inaccessible, le stockage cloud a donc pris le relais.';
 
   @override
   String get media_info_servingTierThumbnail => 'Miniature';
 
   @override
-  String get media_info_servingTierRendition => 'Version compressee';
+  String get media_info_servingTierRendition => 'Version compressée';
 
   @override
-  String get media_info_actionCheckNow => 'Verifier maintenant';
+  String get media_info_typePhoto => 'Photo';
+
+  @override
+  String get media_info_typeVideo => 'Vidéo';
+
+  @override
+  String get media_info_typeDocument => 'Document';
+
+  @override
+  String get media_info_typeSignature => 'Signature';
+
+  @override
+  String get media_info_actionCheckNow => 'Vérifier maintenant';
 
   @override
   String get media_info_actionLocate => 'Localiser le fichier...';
@@ -24775,49 +24787,49 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_info_actionBackUpNow => 'Sauvegarder maintenant';
 
   @override
-  String get media_info_actionRetryUpload => 'Reessayer le televersement';
+  String get media_info_actionRetryUpload => 'Réessayer le téléversement';
 
   @override
   String get media_info_actionReveal =>
       'Afficher dans le gestionnaire de fichiers';
 
   @override
-  String get media_info_actionCopyPath => 'Copier la reference';
+  String get media_info_actionCopyPath => 'Copier la référence';
 
   @override
-  String get media_info_referenceCopied => 'Reference copiee';
+  String get media_info_referenceCopied => 'Référence copiée';
 
   @override
-  String get media_info_checkFound => 'Source trouvee';
+  String get media_info_checkFound => 'Source trouvée';
 
   @override
   String get media_info_checkMissing => 'Source introuvable';
 
   @override
   String get media_info_checkUnavailable =>
-      'Verification impossible pour le moment';
+      'Vérification impossible pour le moment';
 
   @override
-  String get media_info_backupQueued => 'Mis en file pour televersement';
+  String get media_info_backupQueued => 'Mis en file pour téléversement';
 
   @override
-  String get media_status_broken => 'Absent et non sauvegarde';
+  String get media_status_broken => 'Absent et non sauvegardé';
 
   @override
-  String get media_status_transferFailed => 'Echec du televersement';
+  String get media_status_transferFailed => 'Échec du téléversement';
 
   @override
-  String get media_status_transferring => 'Televersement en cours';
+  String get media_status_transferring => 'Téléversement en cours';
 
   @override
-  String get media_status_queued => 'En attente de televersement';
+  String get media_status_queued => 'En attente de téléversement';
 
   @override
-  String get media_status_cloudOnly => 'Stocke uniquement dans le cloud';
+  String get media_status_cloudOnly => 'Stocké uniquement dans le cloud';
 
   @override
   String get media_status_notBackedUp => 'Non sauvegarde';
 
   @override
-  String get media_tile_infoMenuItem => 'Infos du media';
+  String get media_tile_infoMenuItem => 'Infos du média';
 }

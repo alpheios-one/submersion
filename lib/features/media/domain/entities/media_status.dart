@@ -43,9 +43,13 @@ enum MediaStatus {
 MediaStatus mediaStatusFor(MediaProvenance provenance) {
   final missing = provenance.origin.health == OriginHealth.missing;
   final backup = provenance.backup;
-  // Reachable here, not merely uploaded somewhere: bytes in a store this
-  // device cannot talk to cannot cover for a missing local file.
-  final coveredByStore = backup.tier != BackupTier.none && backup.storeAttached;
+  // Two conditions, both load-bearing. The store must be REACHABLE, since
+  // bytes in a store this device cannot talk to cannot cover for a missing
+  // local file. And "backed up" must be the upload pipeline's own predicate,
+  // not tier != none: a thumb-only stamp yields BackupTier.thumbOnly while
+  // isBackedUp stays false, and treating that as covered would report a
+  // photo as cloud-only when only its thumbnail was ever uploaded.
+  final coveredByStore = backup.backedUp && backup.storeAttached;
 
   if (missing && !coveredByStore) return MediaStatus.broken;
 
@@ -68,7 +72,7 @@ MediaStatus mediaStatusFor(MediaProvenance provenance) {
   }
 
   if (missing) return MediaStatus.cloudOnly;
-  if (backup.storeAttached && backup.tier == BackupTier.none) {
+  if (backup.storeAttached && !backup.backedUp) {
     return MediaStatus.notBackedUp;
   }
   return MediaStatus.none;

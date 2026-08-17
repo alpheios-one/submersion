@@ -10,16 +10,13 @@ void main() {
     expect(canRevealInFileManager, expected);
   });
 
-  test(
-    'revealing on an unsupported platform is a no-op, not a throw',
-    () async {
-      // On a desktop host this does shell out, so point it at a path that
-      // certainly does not exist: the helper swallows process failures by
-      // design and the assertion is only that nothing escapes.
-      await expectLater(
-        revealInFileManager('/definitely/not/a/real/path/reef.jpg'),
-        completes,
-      );
-    },
-  );
+  // Named for what is actually exercised. On a desktop host this DOES shell
+  // out, so the old name ("no-op on an unsupported platform") described a
+  // branch the test never took and implied coverage it did not have.
+  test('revealing a path that does not exist does not throw', () async {
+    await expectLater(
+      revealInFileManager('/definitely/not/a/real/path/reef.jpg'),
+      completes,
+    );
+  });
 }

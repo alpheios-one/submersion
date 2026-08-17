@@ -23456,6 +23456,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_info_servingTierRendition => '压缩版本';
 
   @override
+  String get media_info_typePhoto => '照片';
+
+  @override
+  String get media_info_typeVideo => '视频';
+
+  @override
+  String get media_info_typeDocument => '文档';
+
+  @override
+  String get media_info_typeSignature => '签名';
+
+  @override
   String get media_info_actionCheckNow => '立即检查';
 
   @override

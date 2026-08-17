@@ -8,6 +8,7 @@ MediaStatus _status({
   MediaSourceType sourceType = MediaSourceType.platformGallery,
   bool missing = false,
   bool uploaded = false,
+  bool thumbOnly = false,
   bool storeAttached = true,
   String? queueState,
 }) {
@@ -19,6 +20,7 @@ MediaStatus _status({
     isOrphaned: missing,
     lastVerifiedAt: DateTime.utc(2026),
     remoteUploadedAt: uploaded ? DateTime.utc(2026, 7) : null,
+    remoteThumbUploadedAt: thumbOnly ? DateTime.utc(2026, 7) : null,
     takenAt: DateTime.utc(2026),
     createdAt: DateTime.utc(2026),
     updatedAt: DateTime.utc(2026),
@@ -68,6 +70,15 @@ void main() {
     // nothing can display is broken whether or not a store is configured.
     test('broken renders with no store attached', () {
       expect(_status(missing: true, storeAttached: false), MediaStatus.broken);
+    });
+
+    // A thumbnail is not a backup. BackupTier.thumbOnly is non-none, so
+    // inferring coverage from the tier would report a photo as cloud-only
+    // when only its thumbnail ever reached the store, and the original is
+    // gone for good. isBackedUp is the pipeline's own predicate and says
+    // false here, which is what the ladder must follow.
+    test('a missing row with only a thumbnail uploaded is broken', () {
+      expect(_status(missing: true, thumbOnly: true), MediaStatus.broken);
     });
 
     // Backed up but unreachable is not "cloud only", it is unviewable.
@@ -129,6 +140,17 @@ void main() {
     test('a settled queue row falls through to the resting state', () {
       expect(_status(queueState: 'done'), MediaStatus.notBackedUp);
       expect(_status(queueState: 'done', uploaded: true), MediaStatus.none);
+    });
+  });
+
+  group('the ladder follows isBackedUp, not the tier', () {
+    test('a thumb-only row still reads notBackedUp', () {
+      expect(_status(thumbOnly: true), MediaStatus.notBackedUp);
+    });
+
+    test('a compressed rendition does count as backed up', () {
+      // isBackedUp accepts the rendition stamp, so the badge must too.
+      expect(_status(uploaded: true), MediaStatus.none);
     });
   });
 

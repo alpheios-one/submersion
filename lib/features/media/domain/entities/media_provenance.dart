@@ -126,6 +126,7 @@ class BackupFacts {
     required this.storeAttached,
     required this.eligible,
     required this.tier,
+    required this.backedUp,
     required this.originalUploadedAt,
     required this.thumbUploadedAt,
     required this.renditionUploadedAt,
@@ -140,6 +141,16 @@ class BackupFacts {
   final bool eligible;
 
   final BackupTier tier;
+
+  /// The upload pipeline's own definition of "the store has this".
+  ///
+  /// NOT derivable from [tier] being non-none: a thumb-only stamp yields
+  /// [BackupTier.thumbOnly] while [isBackedUp] stays false for ordinary
+  /// media, because a thumbnail cannot stand in for the original. Callers
+  /// deciding whether the store can cover for a missing local file must use
+  /// this, not the tier, or they will promise bytes that are not there.
+  final bool backedUp;
+
   final DateTime? originalUploadedAt;
   final DateTime? thumbUploadedAt;
   final DateTime? renditionUploadedAt;
@@ -156,6 +167,7 @@ class BackupFacts {
       storeAttached: storeAttached,
       eligible: eligible,
       tier: eligible ? _tierFor(item) : BackupTier.none,
+      backedUp: eligible && isBackedUp(item),
       originalUploadedAt: item.remoteUploadedAt,
       thumbUploadedAt: item.remoteThumbUploadedAt,
       renditionUploadedAt: item.remoteCompressedUploadedAt,
