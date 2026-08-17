@@ -18102,7 +18102,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'Max. diepte';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'Totale bodemtijd';
+  String get trips_detail_stat_totalRuntime => 'Totale looptijd';
 
   @override
   String get trips_detail_stat_totalDives => 'Totaal duiken';
@@ -22346,6 +22346,63 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Mengeling';
 
   @override
+  String get siteFeature_type_wreck => 'Wrak';
+
+  @override
+  String get siteFeature_type_mooring => 'Meerboei';
+
+  @override
+  String get siteFeature_type_entry => 'Instappunt';
+
+  @override
+  String get siteFeature_type_exit => 'Uitstappunt';
+
+  @override
+  String get siteFeature_type_swimThrough => 'Doorzwemplek';
+
+  @override
+  String get siteFeature_type_hazard => 'Gevaar';
+
+  @override
+  String get siteFeature_type_current => 'Stroming';
+
+  @override
+  String get siteFeature_sectionTitle => 'Kenmerken';
+
+  @override
+  String get siteFeature_addAction => 'Kenmerk toevoegen';
+
+  @override
+  String get siteFeature_placeHint =>
+      'Tik op de kaart om het kenmerk te plaatsen';
+
+  @override
+  String get siteFeature_addTitle => 'Kenmerk toevoegen';
+
+  @override
+  String get siteFeature_editTitle => 'Kenmerk bewerken';
+
+  @override
+  String get siteFeature_field_name => 'Naam';
+
+  @override
+  String get siteFeature_field_bearing => 'Peiling (°)';
+
+  @override
+  String get siteFeature_field_depth => 'Diepte';
+
+  @override
+  String get siteFeature_field_notes => 'Notities';
+
+  @override
+  String get siteFeature_deleteAction => 'Verwijderen';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return '$name verwijderen?';
+  }
+
+  @override
   String get siteScape_mode2d => 'Kaart';
 
   @override
@@ -23685,6 +23742,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dataQuality_repair_noChange => 'Hier valt niets te herstellen';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'Geen automatische correctie. Open de duik om dit te corrigeren.';
+
+  @override
   String get dataQuality_repair_failed => 'Herstel mislukt';
 
   @override
@@ -24856,7 +24917,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_tripField_diveCount => 'Aantal duiken';
 
   @override
-  String get enum_tripField_totalBottomTime => 'Totale bodemtijd';
+  String get enum_tripField_totalRuntime => 'Totale looptijd';
 
   @override
   String get enum_tripField_maxDepth => 'Max diepte';
@@ -24895,7 +24956,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_tripField_diveCount_short => 'Duiken';
 
   @override
-  String get enum_tripField_totalBottomTime_short => 'BT totaal';
+  String get enum_tripField_totalRuntime_short => 'LT totaal';
 
   @override
   String get enum_tripField_maxDepth_short => 'Max D';

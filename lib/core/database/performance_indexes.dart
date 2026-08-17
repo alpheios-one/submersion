@@ -180,6 +180,12 @@ const List<PerformanceIndex> kPerformanceIndexes = [
         'ON site_species(site_id)',
   ),
   (
+    name: 'idx_site_features_site',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_site_features_site '
+        'ON site_features(site_id)',
+  ),
+  (
     name: 'idx_courses_diver',
     ddl: 'CREATE INDEX IF NOT EXISTS idx_courses_diver ON courses(diver_id)',
   ),

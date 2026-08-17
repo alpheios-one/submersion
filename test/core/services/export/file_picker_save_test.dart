@@ -121,7 +121,7 @@ void main() {
       final dir = await Directory.systemTemp.createTemp('uddf_save_test');
       addTearDown(() => dir.delete(recursive: true));
       final target = '${dir.path}/dives.uddf';
-      mockPicker.saveFileResult = target;
+      mockPicker.saveFileResult = Uri.file(target);
 
       expect(await service.saveDivesToUddfFile([]), target);
       expect(await File(target).readAsString(), contains('<uddf'));
@@ -133,7 +133,7 @@ void main() {
       final dir = await Directory.systemTemp.createTemp('uddf_facade_test');
       addTearDown(() => dir.delete(recursive: true));
       final target = '${dir.path}/facade.uddf';
-      mockPicker.saveFileResult = target;
+      mockPicker.saveFileResult = Uri.file(target);
 
       expect(await ExportService().saveDivesToUddfFile([]), target);
       expect(await File(target).readAsString(), contains('<uddf'));

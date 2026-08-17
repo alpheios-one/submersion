@@ -17937,7 +17937,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'Max Depth';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'Total Bottom Time';
+  String get trips_detail_stat_totalRuntime => 'Total Runtime';
 
   @override
   String get trips_detail_stat_totalDives => 'Total Dives';
@@ -22141,6 +22141,62 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Blend';
 
   @override
+  String get siteFeature_type_wreck => 'Wreck';
+
+  @override
+  String get siteFeature_type_mooring => 'Mooring';
+
+  @override
+  String get siteFeature_type_entry => 'Entry point';
+
+  @override
+  String get siteFeature_type_exit => 'Exit point';
+
+  @override
+  String get siteFeature_type_swimThrough => 'Swim-through';
+
+  @override
+  String get siteFeature_type_hazard => 'Hazard';
+
+  @override
+  String get siteFeature_type_current => 'Current';
+
+  @override
+  String get siteFeature_sectionTitle => 'Features';
+
+  @override
+  String get siteFeature_addAction => 'Add feature';
+
+  @override
+  String get siteFeature_placeHint => 'Tap the map to place the feature';
+
+  @override
+  String get siteFeature_addTitle => 'Add feature';
+
+  @override
+  String get siteFeature_editTitle => 'Edit feature';
+
+  @override
+  String get siteFeature_field_name => 'Name';
+
+  @override
+  String get siteFeature_field_bearing => 'Bearing (°)';
+
+  @override
+  String get siteFeature_field_depth => 'Depth';
+
+  @override
+  String get siteFeature_field_notes => 'Notes';
+
+  @override
+  String get siteFeature_deleteAction => 'Delete';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
   String get siteScape_mode2d => 'Map';
 
   @override
@@ -23467,6 +23523,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dataQuality_repair_noChange => 'Nothing to repair here';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'No automatic fix. Open the dive to correct this.';
+
+  @override
   String get dataQuality_repair_failed => 'Repair failed';
 
   @override
@@ -24632,7 +24692,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_tripField_diveCount => 'Dive Count';
 
   @override
-  String get enum_tripField_totalBottomTime => 'Total Bottom Time';
+  String get enum_tripField_totalRuntime => 'Total Runtime';
 
   @override
   String get enum_tripField_maxDepth => 'Max Depth';
@@ -24671,7 +24731,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_tripField_diveCount_short => 'Dives';
 
   @override
-  String get enum_tripField_totalBottomTime_short => 'BT Total';
+  String get enum_tripField_totalRuntime_short => 'RT Total';
 
   @override
   String get enum_tripField_maxDepth_short => 'Max D';

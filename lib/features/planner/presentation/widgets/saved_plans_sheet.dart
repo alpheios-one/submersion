@@ -172,8 +172,8 @@ class _SavedPlansSheetState extends ConsumerState<SavedPlansSheet> {
     final router = GoRouter.of(context);
     final navigator = Navigator.of(context);
 
-    final result = await FilePicker.pickFiles(type: FileType.any);
-    final path = result?.files.single.path;
+    final result = await FilePicker.pickFile(type: FileType.any);
+    final path = result?.path;
     if (path == null) return;
 
     try {

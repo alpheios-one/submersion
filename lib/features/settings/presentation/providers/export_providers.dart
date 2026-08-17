@@ -39,6 +39,7 @@ import 'package:submersion/features/dive_log/domain/entities/profile_event.dart'
 import 'package:submersion/features/dive_log/domain/services/profile_event_mapper.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_repository.dart';
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
+import 'package:submersion/core/services/export/shared/file_export_utils.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -1082,6 +1083,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
         fileName: fileName,
         type: FileType.any,
         bytes: await File(tempBackupPath).readAsBytes(),
+        mimeType: 'application/vnd.sqlite3',
       );
 
       if (savePath == null) {
@@ -1094,20 +1096,14 @@ class ExportNotifier extends StateNotifier<ExportState> {
         return;
       }
 
-      // On non-Android platforms, FilePicker doesn't write the bytes automatically
-      if (!Platform.isAndroid) {
-        await File(
-          savePath,
-        ).writeAsBytes(await File(tempBackupPath).readAsBytes());
-      }
-
-      // Clean up temporary file
+      // file_picker 12 writes the bytes itself on every platform, so the
+      // former non-Android manual write is gone.
       await File(tempBackupPath).delete();
 
       state = state.copyWith(
         status: ExportStatus.success,
         message: _l10n.settings_export_saved_backup,
-        filePath: savePath,
+        filePath: savedFileLocation(savePath),
       );
     } catch (e) {
       state = state.copyWith(
@@ -1125,13 +1121,12 @@ class ExportNotifier extends StateNotifier<ExportState> {
     try {
       // Use FileType.any on iOS/macOS since custom extensions don't work reliably
       final useAnyType = Platform.isIOS || Platform.isMacOS;
-      final result = await FilePicker.pickFiles(
+      final picked = await FilePicker.pickFile(
         type: useAnyType ? FileType.any : FileType.custom,
         allowedExtensions: useAnyType ? null : ['db'],
-        allowMultiple: false,
       );
 
-      if (result == null || result.files.isEmpty) {
+      if (picked == null) {
         state = state.copyWith(
           status: ExportStatus.idle,
           message: _l10n.settings_export_cancelled_restore,
@@ -1139,7 +1134,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
         return;
       }
 
-      final filePath = result.files.first.path;
+      final filePath = picked.path;
       if (filePath == null) {
         state = state.copyWith(
           status: ExportStatus.error,

@@ -176,13 +176,13 @@ class _DayStatStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final bottom = day.totalBottomTime;
-    final bottomLabel = bottom.inHours > 0
-        ? '${bottom.inHours}h ${bottom.inMinutes % 60}m'
-        : '${bottom.inMinutes}m';
+    final runtime = day.totalRuntime;
+    final runtimeLabel = runtime.inHours > 0
+        ? '${runtime.inHours}h ${runtime.inMinutes % 60}m'
+        : '${runtime.inMinutes}m';
     final stats = <(String, String)>[
       (l10n.trips_detail_stat_totalDives, '${day.diveCount}'),
-      (l10n.trips_detail_stat_totalBottomTime, bottomLabel),
+      (l10n.trips_detail_stat_totalRuntime, runtimeLabel),
       if (day.maxDepth != null)
         (l10n.trips_detail_stat_maxDepth, units.formatDepth(day.maxDepth)),
       // siteCount dedupes by site id (siteNames dedupes by display name), so two

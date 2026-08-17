@@ -32,9 +32,16 @@ class TripStoryDay extends Equatable {
 
   int get diveCount => dives.length;
 
-  Duration get totalBottomTime => dives.fold(
+  /// Total time in the water for the day.
+  ///
+  /// Runtime (surface to surface) is what divers add up when they talk about
+  /// how long they were in the water, and it is what the rest of the app sums
+  /// (`COALESCE(runtime, bottom_time)` in the statistics and dive-log
+  /// queries). Bottom time stays as the fallback so hand-logged dives that
+  /// only carry one still contribute.
+  Duration get totalRuntime => dives.fold(
     Duration.zero,
-    (sum, dive) => sum + (dive.bottomTime ?? Duration.zero),
+    (sum, dive) => sum + (dive.runtime ?? dive.bottomTime ?? Duration.zero),
   );
 
   double? get maxDepth {

@@ -281,6 +281,7 @@ class SyncData {
   final List<Map<String, dynamic>> diveCustomFields;
   final List<Map<String, dynamic>> diveDataSources;
   final List<Map<String, dynamic>> siteSpecies;
+  final List<Map<String, dynamic>> siteFeatures;
   final List<Map<String, dynamic>> csvPresets;
   final List<Map<String, dynamic>> viewConfigs;
   final List<Map<String, dynamic>> fieldPresets;
@@ -355,6 +356,7 @@ class SyncData {
     this.diveCustomFields = const [],
     this.diveDataSources = const [],
     this.siteSpecies = const [],
+    this.siteFeatures = const [],
     this.csvPresets = const [],
     this.viewConfigs = const [],
     this.fieldPresets = const [],
@@ -430,6 +432,7 @@ class SyncData {
     'diveCustomFields': diveCustomFields,
     'diveDataSources': diveDataSources,
     'siteSpecies': siteSpecies,
+    'siteFeatures': siteFeatures,
     'csvPresets': csvPresets,
     'viewConfigs': viewConfigs,
     'fieldPresets': fieldPresets,
@@ -508,6 +511,7 @@ class SyncData {
       diveCustomFields: _parseList(json['diveCustomFields']),
       diveDataSources: _parseList(json['diveDataSources']),
       siteSpecies: _parseList(json['siteSpecies']),
+      siteFeatures: _parseList(json['siteFeatures']),
       csvPresets: _parseList(json['csvPresets']),
       viewConfigs: _parseList(json['viewConfigs']),
       fieldPresets: _parseList(json['fieldPresets']),
@@ -908,6 +912,7 @@ class SyncDataSerializer {
       full: null,
     ),
     (key: 'siteSpecies', table: _db.siteSpecies, blob: false, full: null),
+    (key: 'siteFeatures', table: _db.siteFeatures, blob: false, full: null),
     (key: 'csvPresets', table: _db.csvPresets, blob: false, full: null),
     (key: 'viewConfigs', table: _db.viewConfigs, blob: false, full: null),
     (
@@ -1387,6 +1392,10 @@ class SyncDataSerializer {
       siteSpecies: await _safeExport(
         'siteSpecies',
         () => _exportSiteSpecies(hlcSince),
+      ),
+      siteFeatures: await _safeExport(
+        'siteFeatures',
+        () => _exportSiteFeatures(hlcSince),
       ),
       csvPresets: await _safeExport(
         'csvPresets',
@@ -1873,6 +1882,11 @@ class SyncDataSerializer {
       case 'siteSpecies':
         final row = await (_db.select(
           _db.siteSpecies,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'siteFeatures':
+        final row = await (_db.select(
+          _db.siteFeatures,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
       case 'csvPresets':
@@ -2798,6 +2812,13 @@ class SyncDataSerializer {
               SiteSpecy.fromJson(_withTimestampDefaults(data)),
             );
         return;
+      case 'siteFeatures':
+        await _db
+            .into(_db.siteFeatures)
+            .insertOnConflictUpdate(
+              SiteFeature.fromJson(_withTimestampDefaults(data)),
+            );
+        return;
       case 'csvPresets':
         await _db
             .into(_db.csvPresets)
@@ -3514,6 +3535,16 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'siteFeatures':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.siteFeatures,
+            records
+                .map((r) => SiteFeature.fromJson(_withTimestampDefaults(r)))
+                .toList(),
+          ),
+        );
+        return;
       case 'csvPresets':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
@@ -3737,6 +3768,8 @@ class SyncDataSerializer {
         return plain(_db.diveDataSources, _db.diveDataSources.id);
       case 'siteSpecies':
         return plain(_db.siteSpecies, _db.siteSpecies.id);
+      case 'siteFeatures':
+        return plain(_db.siteFeatures, _db.siteFeatures.id);
       case 'csvPresets':
         return plain(_db.csvPresets, _db.csvPresets.id);
       case 'viewConfigs':
@@ -3962,6 +3995,8 @@ class SyncDataSerializer {
         return _db.diveDataSources;
       case 'siteSpecies':
         return _db.siteSpecies;
+      case 'siteFeatures':
+        return _db.siteFeatures;
       case 'csvPresets':
         return _db.csvPresets;
       case 'viewConfigs':
@@ -4339,6 +4374,11 @@ class SyncDataSerializer {
       case 'siteSpecies':
         await (_db.delete(
           _db.siteSpecies,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'siteFeatures':
+        await (_db.delete(
+          _db.siteFeatures,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'csvPresets':
@@ -4760,6 +4800,19 @@ class SyncDataSerializer {
       return rows.map((r) => r.toJson()).toList();
     }
     final rows = await _db.select(_db.courseRequirementDives).get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// Site features carry their own hlc (mutable LWW entity), so the delta
+  /// filters on the row's clock rather than joining the parent site.
+  Future<List<Map<String, dynamic>>> _exportSiteFeatures(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.siteFeatures);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
     return rows.map((r) => r.toJson()).toList();
   }
 

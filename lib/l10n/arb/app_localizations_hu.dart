@@ -18198,7 +18198,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'Max. melyseg';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'Osszes fenekido';
+  String get trips_detail_stat_totalRuntime => 'Osszes futasido';
 
   @override
   String get trips_detail_stat_totalDives => 'Osszes merüles';
@@ -22446,6 +22446,63 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Keverék';
 
   @override
+  String get siteFeature_type_wreck => 'Roncs';
+
+  @override
+  String get siteFeature_type_mooring => 'Kikötőbója';
+
+  @override
+  String get siteFeature_type_entry => 'Beszállási pont';
+
+  @override
+  String get siteFeature_type_exit => 'Kiszállási pont';
+
+  @override
+  String get siteFeature_type_swimThrough => 'Átúszó';
+
+  @override
+  String get siteFeature_type_hazard => 'Veszély';
+
+  @override
+  String get siteFeature_type_current => 'Áramlás';
+
+  @override
+  String get siteFeature_sectionTitle => 'Jellemzők';
+
+  @override
+  String get siteFeature_addAction => 'Jellemző hozzáadása';
+
+  @override
+  String get siteFeature_placeHint =>
+      'Koppintson a térképre a jellemző elhelyezéséhez';
+
+  @override
+  String get siteFeature_addTitle => 'Jellemző hozzáadása';
+
+  @override
+  String get siteFeature_editTitle => 'Jellemző szerkesztése';
+
+  @override
+  String get siteFeature_field_name => 'Név';
+
+  @override
+  String get siteFeature_field_bearing => 'Irány (°)';
+
+  @override
+  String get siteFeature_field_depth => 'Mélység';
+
+  @override
+  String get siteFeature_field_notes => 'Jegyzetek';
+
+  @override
+  String get siteFeature_deleteAction => 'Törlés';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'Törli: $name?';
+  }
+
+  @override
   String get siteScape_mode2d => 'Térkép';
 
   @override
@@ -23785,6 +23842,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dataQuality_repair_noChange => 'Itt nincs mit javítani';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'Nincs automatikus javítás. Nyisd meg a merülést a javításhoz.';
+
+  @override
   String get dataQuality_repair_failed => 'A javítás sikertelen';
 
   @override
@@ -24956,7 +25017,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_tripField_diveCount => 'Merülésszám';
 
   @override
-  String get enum_tripField_totalBottomTime => 'Összes fenékidő';
+  String get enum_tripField_totalRuntime => 'Összes futásidő';
 
   @override
   String get enum_tripField_maxDepth => 'Max mélység';
@@ -24995,7 +25056,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_tripField_diveCount_short => 'Mer.';
 
   @override
-  String get enum_tripField_totalBottomTime_short => 'Össz FI';
+  String get enum_tripField_totalRuntime_short => 'Össz fut.';
 
   @override
   String get enum_tripField_maxDepth_short => 'Max mély';

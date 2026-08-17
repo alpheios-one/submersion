@@ -17787,7 +17787,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'עומק מרבי';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'סה\"כ זמן תחתית';
+  String get trips_detail_stat_totalRuntime => 'סה\"כ זמן ריצה';
 
   @override
   String get trips_detail_stat_totalDives => 'סה\"כ צלילות';
@@ -21965,6 +21965,62 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'שילוב';
 
   @override
+  String get siteFeature_type_wreck => 'ספינה טרופה';
+
+  @override
+  String get siteFeature_type_mooring => 'מצוף עגינה';
+
+  @override
+  String get siteFeature_type_entry => 'נקודת כניסה';
+
+  @override
+  String get siteFeature_type_exit => 'נקודת יציאה';
+
+  @override
+  String get siteFeature_type_swimThrough => 'מעבר';
+
+  @override
+  String get siteFeature_type_hazard => 'סכנה';
+
+  @override
+  String get siteFeature_type_current => 'זרם';
+
+  @override
+  String get siteFeature_sectionTitle => 'מאפיינים';
+
+  @override
+  String get siteFeature_addAction => 'הוספת מאפיין';
+
+  @override
+  String get siteFeature_placeHint => 'הקישו על המפה למיקום המאפיין';
+
+  @override
+  String get siteFeature_addTitle => 'הוספת מאפיין';
+
+  @override
+  String get siteFeature_editTitle => 'עריכת מאפיין';
+
+  @override
+  String get siteFeature_field_name => 'שם';
+
+  @override
+  String get siteFeature_field_bearing => 'כיוון (°)';
+
+  @override
+  String get siteFeature_field_depth => 'עומק';
+
+  @override
+  String get siteFeature_field_notes => 'הערות';
+
+  @override
+  String get siteFeature_deleteAction => 'מחיקה';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'למחוק את $name?';
+  }
+
+  @override
   String get siteScape_mode2d => 'מפה';
 
   @override
@@ -23281,6 +23337,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dataQuality_repair_noChange => 'אין כאן מה לתקן';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'אין תיקון אוטומטי. פתח את הצלילה כדי לתקן זאת.';
+
+  @override
   String get dataQuality_repair_failed => 'התיקון נכשל';
 
   @override
@@ -24437,7 +24497,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_tripField_diveCount => 'מספר צלילות';
 
   @override
-  String get enum_tripField_totalBottomTime => 'סה\"כ זמן תחתית';
+  String get enum_tripField_totalRuntime => 'סה\"כ זמן ריצה';
 
   @override
   String get enum_tripField_maxDepth => 'עומק מרבי';
@@ -24476,7 +24536,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_tripField_diveCount_short => 'צלילות';
 
   @override
-  String get enum_tripField_totalBottomTime_short => 'סה\"כ תחתית';
+  String get enum_tripField_totalRuntime_short => 'סה\"כ ריצה';
 
   @override
   String get enum_tripField_maxDepth_short => 'ע. מרבי';

@@ -17922,7 +17922,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'أقصى عمق';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'إجمالي وقت القاع';
+  String get trips_detail_stat_totalRuntime => 'إجمالي وقت التشغيل';
 
   @override
   String get trips_detail_stat_totalDives => 'إجمالي الغوصات';
@@ -22122,6 +22122,62 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'مزيج';
 
   @override
+  String get siteFeature_type_wreck => 'حطام';
+
+  @override
+  String get siteFeature_type_mooring => 'مربط';
+
+  @override
+  String get siteFeature_type_entry => 'نقطة الدخول';
+
+  @override
+  String get siteFeature_type_exit => 'نقطة الخروج';
+
+  @override
+  String get siteFeature_type_swimThrough => 'ممر';
+
+  @override
+  String get siteFeature_type_hazard => 'خطر';
+
+  @override
+  String get siteFeature_type_current => 'تيار';
+
+  @override
+  String get siteFeature_sectionTitle => 'معالم';
+
+  @override
+  String get siteFeature_addAction => 'إضافة معلم';
+
+  @override
+  String get siteFeature_placeHint => 'انقر على الخريطة لوضع المعلم';
+
+  @override
+  String get siteFeature_addTitle => 'إضافة معلم';
+
+  @override
+  String get siteFeature_editTitle => 'تحرير المعلم';
+
+  @override
+  String get siteFeature_field_name => 'الاسم';
+
+  @override
+  String get siteFeature_field_bearing => 'الاتجاه (°)';
+
+  @override
+  String get siteFeature_field_depth => 'العمق';
+
+  @override
+  String get siteFeature_field_notes => 'ملاحظات';
+
+  @override
+  String get siteFeature_deleteAction => 'حذف';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'حذف $name؟';
+  }
+
+  @override
   String get siteScape_mode2d => 'خريطة';
 
   @override
@@ -23447,6 +23503,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dataQuality_repair_noChange => 'لا يوجد ما يمكن إصلاحه هنا';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'لا يوجد إصلاح تلقائي. افتح الغطسة لتصحيح ذلك.';
+
+  @override
   String get dataQuality_repair_failed => 'فشل الإصلاح';
 
   @override
@@ -24614,7 +24674,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_tripField_diveCount => 'عدد الغوصات';
 
   @override
-  String get enum_tripField_totalBottomTime => 'إجمالي وقت القاع';
+  String get enum_tripField_totalRuntime => 'إجمالي وقت التشغيل';
 
   @override
   String get enum_tripField_maxDepth => 'أقصى عمق';
@@ -24653,7 +24713,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_tripField_diveCount_short => 'الغوصات';
 
   @override
-  String get enum_tripField_totalBottomTime_short => 'إجمالي القاع';
+  String get enum_tripField_totalRuntime_short => 'إجمالي التشغيل';
 
   @override
   String get enum_tripField_maxDepth_short => 'أقصى عمق';

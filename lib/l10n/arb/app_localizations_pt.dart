@@ -18260,7 +18260,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'Prof. Maxima';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'Tempo de Fundo Total';
+  String get trips_detail_stat_totalRuntime => 'Tempo Total';
 
   @override
   String get trips_detail_stat_totalDives => 'Total de Mergulhos';
@@ -22522,6 +22522,63 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Mistura';
 
   @override
+  String get siteFeature_type_wreck => 'Naufrágio';
+
+  @override
+  String get siteFeature_type_mooring => 'Boia de amarração';
+
+  @override
+  String get siteFeature_type_entry => 'Ponto de entrada';
+
+  @override
+  String get siteFeature_type_exit => 'Ponto de saída';
+
+  @override
+  String get siteFeature_type_swimThrough => 'Passagem';
+
+  @override
+  String get siteFeature_type_hazard => 'Perigo';
+
+  @override
+  String get siteFeature_type_current => 'Correnteza';
+
+  @override
+  String get siteFeature_sectionTitle => 'Características';
+
+  @override
+  String get siteFeature_addAction => 'Adicionar característica';
+
+  @override
+  String get siteFeature_placeHint =>
+      'Toque no mapa para posicionar a característica';
+
+  @override
+  String get siteFeature_addTitle => 'Adicionar característica';
+
+  @override
+  String get siteFeature_editTitle => 'Editar característica';
+
+  @override
+  String get siteFeature_field_name => 'Nome';
+
+  @override
+  String get siteFeature_field_bearing => 'Rumo (°)';
+
+  @override
+  String get siteFeature_field_depth => 'Profundidade';
+
+  @override
+  String get siteFeature_field_notes => 'Notas';
+
+  @override
+  String get siteFeature_deleteAction => 'Excluir';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'Excluir $name?';
+  }
+
+  @override
   String get siteScape_mode2d => 'Mapa';
 
   @override
@@ -23865,6 +23922,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dataQuality_repair_noChange => 'Não há nada a corrigir aqui';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'Sem correção automática. Abra o mergulho para corrigir.';
+
+  @override
   String get dataQuality_repair_failed => 'Falha na correção';
 
   @override
@@ -25037,7 +25098,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_tripField_diveCount => 'Número de Mergulhos';
 
   @override
-  String get enum_tripField_totalBottomTime => 'Tempo de Fundo Total';
+  String get enum_tripField_totalRuntime => 'Tempo Total Acumulado';
 
   @override
   String get enum_tripField_maxDepth => 'Profundidade Máxima';
@@ -25076,7 +25137,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_tripField_diveCount_short => 'Merg.';
 
   @override
-  String get enum_tripField_totalBottomTime_short => 'TF Total';
+  String get enum_tripField_totalRuntime_short => 'TT Acum.';
 
   @override
   String get enum_tripField_maxDepth_short => 'P. Máx';

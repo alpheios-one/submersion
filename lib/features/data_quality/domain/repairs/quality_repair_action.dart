@@ -75,6 +75,18 @@ class ConvertTemperatureRepair extends QualityRepairAction {
   final bool kelvinScale;
 }
 
+/// Reinterpret the dive's recorded water temperature on another scale. The
+/// sibling of [ConvertTemperatureRepair], which converts the sample channel;
+/// this one rewrites the single `dives.water_temp` value.
+class ConvertWaterTempRepair extends QualityRepairAction {
+  const ConvertWaterTempRepair({
+    required this.diveId,
+    required this.kelvinScale,
+  });
+  final String diveId;
+  final bool kelvinScale;
+}
+
 class RecomputeMetricsRepair extends QualityRepairAction {
   const RecomputeMetricsRepair(this.diveId);
   final String diveId;
@@ -221,6 +233,31 @@ List<QualityRepairAction> repairOptionsFor(QualityFinding f) {
       return [GoToDiveRepair(diveId)];
 
     case 'temp_anomaly':
+      // The scalar and range findings carry the same conversion flags, so
+      // dispatch on the shape first: `waterTempC` is the dive's recorded
+      // temperature, `minTempC`/`maxTempC` the sample channel.
+      if (p.containsKey('waterTempC')) {
+        if (p['fahrenheitAsKelvinSuspected'] == true) {
+          return [
+            ConvertWaterTempRepair(diveId: diveId, kelvinScale: true),
+            GoToDiveRepair(diveId),
+          ];
+        }
+        if (p['fahrenheitSuspected'] == true) {
+          return [
+            ConvertWaterTempRepair(diveId: diveId, kelvinScale: false),
+            GoToDiveRepair(diveId),
+          ];
+        }
+        return [GoToDiveRepair(diveId)];
+      }
+      if (p.containsKey('deltaC')) {
+        // A one-sided step survives smoothing, so it navigates instead.
+        if (p['spikeShaped'] == true) {
+          return [SmoothTemperatureRepair(diveId), GoToDiveRepair(diveId)];
+        }
+        return [GoToDiveRepair(diveId)];
+      }
       if (p['fahrenheitAsKelvinSuspected'] == true) {
         return [
           ConvertTemperatureRepair(diveId: diveId, kelvinScale: true),
@@ -232,13 +269,6 @@ List<QualityRepairAction> repairOptionsFor(QualityFinding f) {
           ConvertTemperatureRepair(diveId: diveId, kelvinScale: false),
           GoToDiveRepair(diveId),
         ];
-      }
-      if (p.containsKey('deltaC')) {
-        // A one-sided step survives smoothing, so it navigates instead.
-        if (p['spikeShaped'] == true) {
-          return [SmoothTemperatureRepair(diveId), GoToDiveRepair(diveId)];
-        }
-        return [GoToDiveRepair(diveId)];
       }
       return [GoToDiveRepair(diveId)];
 

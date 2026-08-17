@@ -1337,6 +1337,11 @@ class SyncService {
             hasUpdatedAt: false,
           ),
           (type: 'siteSpecies', records: data.siteSpecies, hasUpdatedAt: false),
+          (
+            type: 'siteFeatures',
+            records: data.siteFeatures,
+            hasUpdatedAt: true,
+          ),
           (type: 'csvPresets', records: data.csvPresets, hasUpdatedAt: true),
           (type: 'viewConfigs', records: data.viewConfigs, hasUpdatedAt: true),
           (
@@ -1946,6 +1951,7 @@ class SyncService {
     'diveCustomFields': false,
     'diveDataSources': false,
     'siteSpecies': false,
+    'siteFeatures': true,
     'csvPresets': true,
     'viewConfigs': true,
     'fieldPresets': false,
@@ -2053,6 +2059,7 @@ class SyncService {
       (field: 'siteId', parent: 'diveSites', nullable: false),
       (field: 'speciesId', parent: 'species', nullable: false),
     ],
+    'siteFeatures': [(field: 'siteId', parent: 'diveSites', nullable: false)],
     'liveaboardDetails': [(field: 'tripId', parent: 'trips', nullable: false)],
     'itineraryDays': [(field: 'tripId', parent: 'trips', nullable: false)],
     'checklistTemplateItems': [

@@ -17323,7 +17323,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_detail_stat_maxDepth => '最大深度';
 
   @override
-  String get trips_detail_stat_totalBottomTime => '总计底部时间';
+  String get trips_detail_stat_totalRuntime => '总运行时间';
 
   @override
   String get trips_detail_stat_totalDives => '总计潜水';
@@ -21391,6 +21391,62 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => '混合';
 
   @override
+  String get siteFeature_type_wreck => '沉船';
+
+  @override
+  String get siteFeature_type_mooring => '系泊浮标';
+
+  @override
+  String get siteFeature_type_entry => '入水点';
+
+  @override
+  String get siteFeature_type_exit => '出水点';
+
+  @override
+  String get siteFeature_type_swimThrough => '穿越通道';
+
+  @override
+  String get siteFeature_type_hazard => '危险';
+
+  @override
+  String get siteFeature_type_current => '水流';
+
+  @override
+  String get siteFeature_sectionTitle => '特征';
+
+  @override
+  String get siteFeature_addAction => '添加特征';
+
+  @override
+  String get siteFeature_placeHint => '点按地图放置特征';
+
+  @override
+  String get siteFeature_addTitle => '添加特征';
+
+  @override
+  String get siteFeature_editTitle => '编辑特征';
+
+  @override
+  String get siteFeature_field_name => '名称';
+
+  @override
+  String get siteFeature_field_bearing => '方位 (°)';
+
+  @override
+  String get siteFeature_field_depth => '深度';
+
+  @override
+  String get siteFeature_field_notes => '备注';
+
+  @override
+  String get siteFeature_deleteAction => '删除';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return '删除 $name？';
+  }
+
+  @override
   String get siteScape_mode2d => '地图';
 
   @override
@@ -22674,6 +22730,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dataQuality_repair_noChange => '这里没有需要修正的内容';
 
   @override
+  String get dataQuality_repair_needsReview => '无法自动修复。打开该次潜水进行更正。';
+
+  @override
   String get dataQuality_repair_failed => '修复失败';
 
   @override
@@ -23811,7 +23870,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_tripField_diveCount => '潜水次数';
 
   @override
-  String get enum_tripField_totalBottomTime => '总计底部时间';
+  String get enum_tripField_totalRuntime => '总计运行时间';
 
   @override
   String get enum_tripField_maxDepth => '最大深度';
@@ -23850,7 +23909,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_tripField_diveCount_short => '次数';
 
   @override
-  String get enum_tripField_totalBottomTime_short => '总底时';
+  String get enum_tripField_totalRuntime_short => '总运行时';
 
   @override
   String get enum_tripField_maxDepth_short => '最深';

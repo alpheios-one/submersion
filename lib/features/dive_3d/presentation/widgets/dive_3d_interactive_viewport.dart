@@ -298,6 +298,11 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
     SceneMarker? best;
     var bestDistance = 24.0;
     for (final marker in widget.scene.markers) {
+      // A hidden feature marker is not tappable either.
+      if (marker.kind == SceneMarkerKind.siteFeature &&
+          !widget.visibleOverlays.contains(SceneOverlay.features)) {
+        continue;
+      }
       final d =
           (projector.project(marker.x, marker.y, marker.z) - cursor).distance;
       if (d < bestDistance) {
