@@ -31,10 +31,8 @@ import 'package:submersion/features/media_store/data/media_transfer_queue_reposi
 import 'package:submersion/features/media_store/data/media_verify_service.dart';
 import 'package:submersion/features/media_store/data/media_upload_pipeline.dart';
 import 'package:submersion/features/media_store/data/platform_video_transcoder.dart';
-import 'package:submersion/features/media_store/domain/media_backup_status.dart';
 import 'package:submersion/features/media_store/domain/media_transfer_summary.dart';
 import 'package:submersion/features/media_store/domain/media_upload_quality.dart';
-import 'package:submersion/features/media_store/presentation/widgets/media_store_badge.dart';
 
 /// Everything a configured media store needs at runtime. Built once per
 /// attach; disposed and rebuilt on connect/disconnect via provider
@@ -233,68 +231,6 @@ void invalidateMediaStoreAttachment(WidgetRef ref) {
 /// pipeline calls stampRemoteUploaded before markDone, so the emission
 /// reporting done always follows the stamp write.
 ///
-/// Defensive against an uninitialized local cache database or an absent
-/// media repository (widget tests): any error reads as none.
-// no-tick: already reactive on a real change stream (watchLatestForMedia), and
-// the getMediaById below runs inside the async* generator, re-evaluated per
-// settled emission. Re-creating the stream on every media write would thrash
-// the badge rather than fix staleness.
-final mediaBadgeStateProvider =
-    StreamProvider.family<MediaBadgeState, MediaItem>((ref, item) {
-      // Synchronous build phase. Every ref.watch must happen here, not in
-      // the generator below: an async* body does not start running until
-      // Riverpod subscribes to the stream it returns, by which point the
-      // build phase is over and a watched dependency's failure becomes
-      // this provider's error state instead of a catchable exception.
-      // That is what makes the StateError guard below work at all.
-      // The repository constructor resolves its database lazily, so the
-      // StateError surfaces from watchLatestForMedia, not from the watch.
-      // Both must sit inside the guard.
-      final Stream<MediaTransferQueueEntry?> rows;
-      try {
-        rows = ref
-            .watch(mediaTransferQueueRepositoryProvider)
-            .watchLatestForMedia(item.id);
-      } on StateError {
-        return Stream.value(MediaBadgeState.none);
-      }
-      final mediaRepository = ref.watch(mediaRepositoryProvider);
-      final attachedFuture = ref.watch(mediaStoreAttachedProvider.future);
-      final eligible = kUploadableSources.contains(item.sourceType);
-
-      return () async* {
-        final attached = await attachedFuture;
-
-        // Re-evaluated per settled emission so a just-completed upload
-        // clears the badge without waiting for the tile snapshot to
-        // refresh. getMediaById is a plain call, so its failure on an
-        // uninitialized database is catchable here.
-        Future<MediaBadgeState> settled() async {
-          if (!attached || !eligible) return MediaBadgeState.none;
-          try {
-            final fresh = await mediaRepository.getMediaById(item.id);
-            if (fresh == null || isBackedUp(fresh)) return MediaBadgeState.none;
-            return MediaBadgeState.notBackedUp;
-          } on Object {
-            return MediaBadgeState.none;
-          }
-        }
-
-        await for (final row in rows) {
-          switch (row?.state) {
-            case 'failed':
-              yield MediaBadgeState.failed;
-            case 'transferring':
-              yield MediaBadgeState.transferring;
-            case 'pending':
-              yield MediaBadgeState.queued;
-            default:
-              yield await settled();
-          }
-        }
-      }();
-    });
-
 final mediaStoresRepositoryProvider = Provider<MediaStoresRepository>(
   (ref) => MediaStoresRepository(),
 );
