@@ -4,6 +4,7 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/constants/entity_field.dart';
 import 'package:submersion/features/certifications/domain/certification_title.dart';
 
@@ -49,6 +50,43 @@ enum CertificationField implements EntityField {
     CertificationField.instructorNumber => 'Instr. #',
     CertificationField.expiryStatus => 'Status',
     CertificationField.notes => 'Notes',
+  };
+
+  @override
+  String localizedDisplayName(AppLocalizations l10n) => switch (this) {
+    CertificationField.certName => l10n.enum_certificationField_certName,
+    CertificationField.agency => l10n.enum_certificationField_agency,
+    CertificationField.level => l10n.enum_certificationField_level,
+    CertificationField.cardNumber => l10n.enum_certificationField_cardNumber,
+    CertificationField.issueDate => l10n.enum_certificationField_issueDate,
+    CertificationField.expiryDate => l10n.enum_certificationField_expiryDate,
+    CertificationField.instructorName =>
+      l10n.enum_certificationField_instructorName,
+    CertificationField.instructorNumber =>
+      l10n.enum_certificationField_instructorNumber,
+    CertificationField.expiryStatus =>
+      l10n.enum_certificationField_expiryStatus,
+    CertificationField.notes => l10n.enum_certificationField_notes,
+  };
+
+  @override
+  String localizedShortLabel(AppLocalizations l10n) => switch (this) {
+    CertificationField.certName => l10n.enum_certificationField_certName_short,
+    CertificationField.agency => l10n.enum_certificationField_agency_short,
+    CertificationField.level => l10n.enum_certificationField_level_short,
+    CertificationField.cardNumber =>
+      l10n.enum_certificationField_cardNumber_short,
+    CertificationField.issueDate =>
+      l10n.enum_certificationField_issueDate_short,
+    CertificationField.expiryDate =>
+      l10n.enum_certificationField_expiryDate_short,
+    CertificationField.instructorName =>
+      l10n.enum_certificationField_instructorName_short,
+    CertificationField.instructorNumber =>
+      l10n.enum_certificationField_instructorNumber_short,
+    CertificationField.expiryStatus =>
+      l10n.enum_certificationField_expiryStatus_short,
+    CertificationField.notes => l10n.enum_certificationField_notes_short,
   };
 
   @override

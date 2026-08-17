@@ -154,28 +154,28 @@ class _DiveCenterImportPageState extends ConsumerState<DiveCenterImportPage> {
                     },
                   ),
                   _QuickSearchChip(
-                    label: 'Thailand',
+                    label: context.l10n.diveSites_import_quickSearch_thailand,
                     onTap: () {
                       _searchController.text = 'Thailand';
                       _onSearch();
                     },
                   ),
                   _QuickSearchChip(
-                    label: 'Indonesia',
+                    label: context.l10n.diveSites_import_quickSearch_indonesia,
                     onTap: () {
                       _searchController.text = 'Indonesia';
                       _onSearch();
                     },
                   ),
                   _QuickSearchChip(
-                    label: 'Egypt',
+                    label: context.l10n.diveCenters_import_quickSearch_egypt,
                     onTap: () {
                       _searchController.text = 'Egypt';
                       _onSearch();
                     },
                   ),
                   _QuickSearchChip(
-                    label: 'Mexico',
+                    label: context.l10n.diveCenters_import_quickSearch_mexico,
                     onTap: () {
                       _searchController.text = 'Mexico';
                       _onSearch();

@@ -7,6 +7,7 @@ import 'package:submersion/features/data_quality/data/repositories/quality_findi
 import 'package:submersion/features/data_quality/data/services/profile_repair_service.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 import 'package:submersion/features/data_quality/domain/entities/quality_finding.dart';
+import 'package:submersion/features/data_quality/domain/repairs/repair_predicates.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
@@ -149,6 +150,50 @@ class QualityRepairExecutor {
         ),
       );
       SyncEventBus.notifyLocalChange();
+      scheduleQualityScan([diveId]);
+    });
+  }
+
+  /// Reinterpret the dive's recorded water temperature on the scale it was
+  /// really logged on. The sample-channel equivalent goes through
+  /// [applyProfileRepair] with ProfileRepairService.convertTemperature; this
+  /// one rewrites the single scalar column and nothing else.
+  Future<RepairResult> convertWaterTemp({
+    required String diveId,
+    required bool kelvinScale,
+    required String findingId,
+  }) async {
+    final dive = await _diveRepo.getDiveById(diveId);
+    final prior = dive?.waterTemp;
+    if (prior == null) return const RepairResult.noChange();
+    // Re-test convergence against the CURRENT value rather than trusting the
+    // finding's params. The dive may have been corrected by hand since the
+    // scan, and converting an already-plausible reading would corrupt it.
+    // Refusing also subsumes the degenerate -40 case, where Celsius and
+    // Fahrenheit coincide and the conversion could never change anything.
+    if (!RepairPredicates.convertedChannelIsPlausible([
+      prior,
+    ], kelvinScale: kelvinScale)) {
+      return const RepairResult.noChange();
+    }
+    final converted = RepairPredicates.convertToCelsius(
+      prior,
+      kelvinScale: kelvinScale,
+    );
+
+    Future<void> write(double value) async {
+      await _db.transaction(
+        () => _diveRepo.bulkUpdateFields([
+          diveId,
+        ], DivesCompanion(waterTemp: Value(value))),
+      );
+      SyncEventBus.notifyLocalChange();
+    }
+
+    await write(converted);
+    await _finish(findingId, [diveId]);
+    return RepairResult.applied(() async {
+      await write(prior);
       scheduleQualityScan([diveId]);
     });
   }

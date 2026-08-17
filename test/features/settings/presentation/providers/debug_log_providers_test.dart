@@ -7,10 +7,15 @@ import 'package:submersion/core/models/log_entry.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/settings/presentation/providers/debug_log_providers.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/// English localizations for the share/save helpers, which now take their
+/// subject and dialog title from the app's translations.
+final _l10n = l10nForLocaleTag('en');
 
 LogEntry _entry({
   required String message,
@@ -735,7 +740,7 @@ void main() {
       await service.initialize();
 
       // No entries written, so log file doesn't exist
-      await shareLogFile(service);
+      await shareLogFile(service, _l10n);
       // Should complete without error
     });
 
@@ -751,7 +756,7 @@ void main() {
       // SharePlus may throw MissingPluginException in test env.
       // The key is that we reach the share call (covering those lines).
       try {
-        await shareLogFile(service);
+        await shareLogFile(service, _l10n);
       } catch (_) {
         // Expected in test environment
       }
@@ -766,7 +771,7 @@ void main() {
       final service = LogFileService(logDirectory: tempDir.path);
       await service.initialize();
 
-      final result = await saveLogFile(service);
+      final result = await saveLogFile(service, _l10n);
       expect(result, isNull);
     });
 
@@ -782,7 +787,7 @@ void main() {
       // FilePicker may throw MissingPluginException in test env.
       // The key is that we reach the FilePicker call (covering those lines).
       try {
-        final result = await saveLogFile(service);
+        final result = await saveLogFile(service, _l10n);
         // If it somehow succeeds (returns null from picker), that's fine
         expect(result, anything);
       } catch (_) {

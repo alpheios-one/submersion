@@ -74,7 +74,7 @@ dependencies:
     path: packages/submersion_ocr
   submersion_transcoder:
     path: packages/submersion_transcoder
-  permission_handler: ^12.0.1
+  permission_handler: ^13.0.1
   file_picker: ^12.0.0
   image_picker: ^1.1.2
   share_plus: ^13.3.0
@@ -94,7 +94,21 @@ dependencies:
 
   # Storage
   shared_preferences: ^2.3.2
-  flutter_secure_storage: ^10.0.0
+  # v11 removed the legacy Android ciphers (RSA_ECB_PKCS1Padding,
+  # AES_CBC_PKCS7Padding). v10 rewrites existing entries to the new ciphers on
+  # first access (migrateOnAlgorithmChange defaults to true, and we pass no
+  # AndroidOptions), so anyone who has run a v10 build is already migrated.
+  # A user who skips v10 entirely -- last ran a pre-2026-06-21 build, then
+  # jumps here -- loses the Android entries. That degrades rather than
+  # destroys: every secret in this store is a CACHE or MIRROR whose durable
+  # copy lives elsewhere (the database sidecar, the self-decrypting .sbe, the
+  # cloud keyslot file), so the worst case is the lock screen asking for the
+  # passphrase and cloud accounts needing re-auth. Apple/Windows/Linux are
+  # untouched: everything v11 removed is Android-only.
+  #
+  # Costs compileSdk 37, which the module hardcodes -- see
+  # android/app/build.gradle.kts.
+  flutter_secure_storage: ^11.0.0
 
   # PDF/Printing
   printing: ^5.14.2
@@ -151,7 +165,7 @@ dev_dependencies:
   mockito: ^5.6.1
   plugin_platform_interface: ^2.1.8
   path_provider_platform_interface: ^2.1.3  # mock docs dir in db service tests
-  permission_handler_platform_interface: ^4.3.0  # mock BLE scan permission grants
+  permission_handler_platform_interface: ^4.4.0  # mock BLE scan permission grants
   file_picker_platform_interface: ^3.0.1  # fake picker in file/import tests
   geocoding_platform_interface: ^5.0.0  # fake geocoder in location service tests
   flutter_web_auth_2_platform_interface: ^5.0.0  # mock auth in redirect-capture test

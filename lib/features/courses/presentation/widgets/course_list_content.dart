@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
@@ -638,7 +639,7 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
       currentField: sort.field,
       currentDirection: sort.direction,
       fields: CourseSortField.values,
-      getFieldDisplayName: (field) => field.displayName,
+      getFieldDisplayName: (field) => field.localizedName(context.l10n),
       getFieldIcon: (field) => field.icon,
       onSortChanged: (field, direction) {
         ref.read(courseSortProvider.notifier).state = SortState(

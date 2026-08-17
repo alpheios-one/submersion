@@ -504,7 +504,9 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
                   }
                   return const Center(child: CircularProgressIndicator());
                 },
-                error: (error, _) => Center(child: Text('Error: $error')),
+                error: (error, _) => Center(
+                  child: Text('${context.l10n.common_label_error}: $error'),
+                ),
               ),
             ),
           ],

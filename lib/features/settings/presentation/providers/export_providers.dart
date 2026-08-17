@@ -40,6 +40,8 @@ import 'package:submersion/features/dive_log/domain/services/profile_event_mappe
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_repository.dart';
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
 import 'package:submersion/core/services/export/shared/file_export_utils.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Load per-tank pressure data for a list of dives.
 ///
@@ -152,30 +154,37 @@ class ExportNotifier extends StateNotifier<ExportState> {
 
   ExportNotifier(this._exportService, this._ref) : super(const ExportState());
 
+  /// Localizations for the status messages this notifier publishes.
+  ///
+  /// A provider has no BuildContext, so the persisted locale setting is
+  /// resolved through the same helper SyncNotifier uses. Read (not cached) so
+  /// a locale change is picked up by the next operation.
+  AppLocalizations get _l10n => l10nForLocaleTag(_ref.read(localeProvider));
+
   Future<void> exportDivesToCsv() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Exporting dives to CSV...',
+      message: _l10n.settings_export_progress_divesCsv,
     );
     try {
       final dives = await _ref.read(divesProvider.future);
       if (dives.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No dives to export',
+          message: _l10n.settings_export_empty_dives,
         );
         return;
       }
       final path = await _exportService.exportDivesToCsv(dives);
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'Dives exported successfully',
+        message: _l10n.settings_export_success_dives,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Export failed: $e',
+        message: _l10n.settings_data_export_failed('$e'),
       );
     }
   }
@@ -183,27 +192,27 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> exportSitesToCsv() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Exporting sites to CSV...',
+      message: _l10n.settings_export_progress_sitesCsv,
     );
     try {
       final sites = _ref.read(sitesProvider).value ?? [];
       if (sites.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No sites to export',
+          message: _l10n.settings_export_empty_sites,
         );
         return;
       }
       final path = await _exportService.exportSitesToCsv(sites);
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'Sites exported successfully',
+        message: _l10n.settings_export_success_sites,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Export failed: $e',
+        message: _l10n.settings_data_export_failed('$e'),
       );
     }
   }
@@ -211,27 +220,27 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> exportEquipmentToCsv() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Exporting equipment to CSV...',
+      message: _l10n.settings_export_progress_equipmentCsv,
     );
     try {
       final equipment = _ref.read(allEquipmentProvider).value ?? [];
       if (equipment.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No equipment to export',
+          message: _l10n.settings_export_empty_equipment,
         );
         return;
       }
       final path = await _exportService.exportEquipmentToCsv(equipment);
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'Equipment exported successfully',
+        message: _l10n.settings_export_success_equipment,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Export failed: $e',
+        message: _l10n.settings_data_export_failed('$e'),
       );
     }
   }
@@ -245,14 +254,14 @@ class ExportNotifier extends StateNotifier<ExportState> {
 
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Generating PDF logbook...',
+      message: _l10n.settings_export_progress_pdf,
     );
     try {
       final dives = await _ref.read(divesProvider.future);
       if (dives.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No dives to export',
+          message: _l10n.settings_export_empty_dives,
         );
         return;
       }
@@ -267,13 +276,13 @@ class ExportNotifier extends StateNotifier<ExportState> {
 
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'PDF logbook generated successfully',
+        message: _l10n.settings_export_success_pdf,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Export failed: $e',
+        message: _l10n.settings_data_export_failed('$e'),
       );
     }
   }
@@ -286,7 +295,9 @@ class ExportNotifier extends StateNotifier<ExportState> {
     List<Dive> dives,
   ) async {
     // Load signatures for all dives
-    state = state.copyWith(message: 'Loading signatures...');
+    state = state.copyWith(
+      message: _l10n.settings_export_progress_loadingSignatures,
+    );
     final signatureService = SignatureStorageService();
     final diveSignatures = <String, List<Signature>>{};
     for (final dive in dives) {
@@ -299,7 +310,9 @@ class ExportNotifier extends StateNotifier<ExportState> {
     // Load certifications if requested
     List<Certification>? certifications;
     if (exportOptions.includeCertificationCards) {
-      state = state.copyWith(message: 'Loading certifications...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_loadingCertifications,
+      );
       certifications = await _ref.read(allCertificationsProvider.future);
     }
 
@@ -307,12 +320,16 @@ class ExportNotifier extends StateNotifier<ExportState> {
     final diver = await _ref.read(currentDiverProvider.future);
 
     // Initialize fonts for proper Unicode support
-    state = state.copyWith(message: 'Loading fonts...');
+    state = state.copyWith(
+      message: _l10n.settings_export_progress_loadingFonts,
+    );
     await PdfFonts.instance.initialize();
 
     // Get the appropriate template builder
     state = state.copyWith(
-      message: 'Generating ${exportOptions.template.displayName} PDF...',
+      message: _l10n.settings_export_progress_templatePdf(
+        exportOptions.template.displayName,
+      ),
     );
     final factory = PdfTemplateFactory();
     final builder = factory.getBuilder(exportOptions.template);
@@ -328,7 +345,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
         dateFormat: settings.dateFormat,
         timeFormat: settings.timeFormat,
       ),
-      title: 'Dive Logbook',
+      title: _l10n.settings_export_pdfDocumentTitle,
       diveSignatures: diveSignatures.isNotEmpty ? diveSignatures : null,
       certifications: certifications,
       diver: diver,
@@ -338,20 +355,22 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> exportDivesToUddf() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Generating UDDF file...',
+      message: _l10n.settings_export_progress_uddf,
     );
     try {
       final dives = await _ref.read(divesProvider.future);
       if (dives.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No dives to export',
+          message: _l10n.settings_export_empty_dives,
         );
         return;
       }
 
       // Collect all data for comprehensive export
-      state = state.copyWith(message: 'Collecting all data...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_collectingData,
+      );
       final sites = await _ref.read(sitesProvider.future);
       final equipment = await _ref.read(allEquipmentProvider.future);
       final buddies = await _ref.read(allBuddiesProvider.future);
@@ -440,7 +459,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
         dives,
       );
 
-      state = state.copyWith(message: 'Generating UDDF file...');
+      state = state.copyWith(message: _l10n.settings_export_progress_uddf);
       final path = await _exportService.exportAllDataToUddf(
         dives: dives,
         sites: sites,
@@ -467,13 +486,13 @@ class ExportNotifier extends StateNotifier<ExportState> {
       );
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'UDDF file generated successfully',
+        message: _l10n.settings_export_success_uddf,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Export failed: $e',
+        message: _l10n.settings_data_export_failed('$e'),
       );
     }
   }
@@ -485,7 +504,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> exportToExcel() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Generating Excel file...',
+      message: _l10n.settings_export_progress_excel,
     );
     try {
       final dives = await _ref.read(divesProvider.future);
@@ -501,7 +520,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
       if (dives.isEmpty && sites.isEmpty && equipment.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No data to export',
+          message: _l10n.settings_export_empty_data,
         );
         return;
       }
@@ -509,7 +528,9 @@ class ExportNotifier extends StateNotifier<ExportState> {
       // Get user's unit preferences
       final settings = _ref.read(settingsProvider);
 
-      state = state.copyWith(message: 'Building Excel workbook...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_buildingExcel,
+      );
       final path = await _exportService.exportToExcel(
         dives: dives,
         sites: sites,
@@ -525,13 +546,13 @@ class ExportNotifier extends StateNotifier<ExportState> {
 
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'Excel file exported successfully',
+        message: _l10n.settings_export_success_excel,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Export failed: $e',
+        message: _l10n.settings_data_export_failed('$e'),
       );
     }
   }
@@ -543,7 +564,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> exportToKml() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Generating KML file...',
+      message: _l10n.settings_export_progress_kml,
     );
     try {
       final sites = await _ref.read(sitesProvider.future);
@@ -552,7 +573,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
       if (sites.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No dive sites to export',
+          message: _l10n.settings_export_empty_diveSites,
         );
         return;
       }
@@ -560,7 +581,9 @@ class ExportNotifier extends StateNotifier<ExportState> {
       // Get user's unit preferences
       final settings = _ref.read(settingsProvider);
 
-      state = state.copyWith(message: 'Building KML file...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_buildingKml,
+      );
       final (path, skippedCount) = await _exportService.exportToKml(
         sites: sites,
         dives: dives,
@@ -568,18 +591,15 @@ class ExportNotifier extends StateNotifier<ExportState> {
         dateFormat: settings.dateFormat,
       );
 
-      final skippedMsg = skippedCount > 0
-          ? ' ($skippedCount sites without coordinates skipped)'
-          : '';
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'KML file exported successfully$skippedMsg',
+        message: _l10n.settings_export_success_kml(skippedCount),
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Export failed: $e',
+        message: _l10n.settings_data_export_failed('$e'),
       );
     }
   }
@@ -590,7 +610,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> saveExcelToFile() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Preparing Excel file...',
+      message: _l10n.settings_export_progress_preparingExcel,
     );
     try {
       final dives = await _ref.read(divesProvider.future);
@@ -606,7 +626,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
       if (dives.isEmpty && sites.isEmpty && equipment.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No data to export',
+          message: _l10n.settings_export_empty_data,
         );
         return;
       }
@@ -614,7 +634,9 @@ class ExportNotifier extends StateNotifier<ExportState> {
       // Get user's unit preferences
       final settings = _ref.read(settingsProvider);
 
-      state = state.copyWith(message: 'Choose save location...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_chooseLocation,
+      );
       final path = await _exportService.saveExcelToFile(
         dives: dives,
         sites: sites,
@@ -631,20 +653,20 @@ class ExportNotifier extends StateNotifier<ExportState> {
       if (path == null) {
         state = state.copyWith(
           status: ExportStatus.idle,
-          message: 'Save cancelled',
+          message: _l10n.settings_export_cancelled_save,
         );
         return;
       }
 
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'Excel file saved successfully',
+        message: _l10n.settings_export_saved_excel,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Save failed: $e',
+        message: _l10n.settings_export_saveFailed('$e'),
       );
     }
   }
@@ -655,7 +677,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> saveKmlToFile() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Preparing KML file...',
+      message: _l10n.settings_export_progress_preparingKml,
     );
     try {
       final sites = await _ref.read(sitesProvider.future);
@@ -664,7 +686,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
       if (sites.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No dive sites to export',
+          message: _l10n.settings_export_empty_diveSites,
         );
         return;
       }
@@ -672,7 +694,9 @@ class ExportNotifier extends StateNotifier<ExportState> {
       // Get user's unit preferences
       final settings = _ref.read(settingsProvider);
 
-      state = state.copyWith(message: 'Choose save location...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_chooseLocation,
+      );
       final (path, skippedCount) = await _exportService.saveKmlToFile(
         sites: sites,
         dives: dives,
@@ -683,23 +707,20 @@ class ExportNotifier extends StateNotifier<ExportState> {
       if (path == null) {
         state = state.copyWith(
           status: ExportStatus.idle,
-          message: 'Save cancelled',
+          message: _l10n.settings_export_cancelled_save,
         );
         return;
       }
 
-      final skippedMsg = skippedCount > 0
-          ? ' ($skippedCount sites without coordinates skipped)'
-          : '';
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'KML file saved successfully$skippedMsg',
+        message: _l10n.settings_export_saved_kml(skippedCount),
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Save failed: $e',
+        message: _l10n.settings_export_saveFailed('$e'),
       );
     }
   }
@@ -710,38 +731,40 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> saveDivesCsvToFile() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Preparing dives CSV...',
+      message: _l10n.settings_export_progress_preparingDivesCsv,
     );
     try {
       final dives = await _ref.read(divesProvider.future);
       if (dives.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No dives to export',
+          message: _l10n.settings_export_empty_dives,
         );
         return;
       }
 
-      state = state.copyWith(message: 'Choose save location...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_chooseLocation,
+      );
       final path = await _exportService.saveDivesCsvToFile(dives);
 
       if (path == null) {
         state = state.copyWith(
           status: ExportStatus.idle,
-          message: 'Save cancelled',
+          message: _l10n.settings_export_cancelled_save,
         );
         return;
       }
 
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'Dives CSV saved successfully',
+        message: _l10n.settings_export_saved_divesCsv,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Save failed: $e',
+        message: _l10n.settings_export_saveFailed('$e'),
       );
     }
   }
@@ -750,38 +773,40 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> saveSitesCsvToFile() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Preparing sites CSV...',
+      message: _l10n.settings_export_progress_preparingSitesCsv,
     );
     try {
       final sites = _ref.read(sitesProvider).value ?? [];
       if (sites.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No sites to export',
+          message: _l10n.settings_export_empty_sites,
         );
         return;
       }
 
-      state = state.copyWith(message: 'Choose save location...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_chooseLocation,
+      );
       final path = await _exportService.saveSitesCsvToFile(sites);
 
       if (path == null) {
         state = state.copyWith(
           status: ExportStatus.idle,
-          message: 'Save cancelled',
+          message: _l10n.settings_export_cancelled_save,
         );
         return;
       }
 
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'Sites CSV saved successfully',
+        message: _l10n.settings_export_saved_sitesCsv,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Save failed: $e',
+        message: _l10n.settings_export_saveFailed('$e'),
       );
     }
   }
@@ -790,38 +815,40 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> saveEquipmentCsvToFile() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Preparing equipment CSV...',
+      message: _l10n.settings_export_progress_preparingEquipmentCsv,
     );
     try {
       final equipment = _ref.read(allEquipmentProvider).value ?? [];
       if (equipment.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No equipment to export',
+          message: _l10n.settings_export_empty_equipment,
         );
         return;
       }
 
-      state = state.copyWith(message: 'Choose save location...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_chooseLocation,
+      );
       final path = await _exportService.saveEquipmentCsvToFile(equipment);
 
       if (path == null) {
         state = state.copyWith(
           status: ExportStatus.idle,
-          message: 'Save cancelled',
+          message: _l10n.settings_export_cancelled_save,
         );
         return;
       }
 
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'Equipment CSV saved successfully',
+        message: _l10n.settings_export_saved_equipmentCsv,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Save failed: $e',
+        message: _l10n.settings_export_saveFailed('$e'),
       );
     }
   }
@@ -833,20 +860,22 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> saveUddfToFile() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Preparing UDDF file...',
+      message: _l10n.settings_export_progress_preparingUddf,
     );
     try {
       final dives = await _ref.read(divesProvider.future);
       if (dives.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No dives to export',
+          message: _l10n.settings_export_empty_dives,
         );
         return;
       }
 
       // Collect all data for comprehensive export
-      state = state.copyWith(message: 'Collecting all data...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_collectingData,
+      );
       final sites = await _ref.read(sitesProvider.future);
       final equipment = await _ref.read(allEquipmentProvider.future);
       final buddies = await _ref.read(allBuddiesProvider.future);
@@ -928,7 +957,9 @@ class ExportNotifier extends StateNotifier<ExportState> {
         dives,
       );
 
-      state = state.copyWith(message: 'Choose save location...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_chooseLocation,
+      );
       final path = await _exportService.saveAllDataToUddfFile(
         dives: dives,
         sites: sites,
@@ -957,20 +988,20 @@ class ExportNotifier extends StateNotifier<ExportState> {
       if (path == null) {
         state = state.copyWith(
           status: ExportStatus.idle,
-          message: 'Save cancelled',
+          message: _l10n.settings_export_cancelled_save,
         );
         return;
       }
 
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'UDDF file saved successfully',
+        message: _l10n.settings_export_saved_uddf,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Save failed: $e',
+        message: _l10n.settings_export_saveFailed('$e'),
       );
     }
   }
@@ -981,14 +1012,14 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> savePdfToFile(PdfExportOptions options) async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Preparing PDF...',
+      message: _l10n.settings_export_progress_preparingPdf,
     );
     try {
       final dives = await _ref.read(divesProvider.future);
       if (dives.isEmpty) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'No dives to export',
+          message: _l10n.settings_export_empty_dives,
         );
         return;
       }
@@ -999,7 +1030,9 @@ class ExportNotifier extends StateNotifier<ExportState> {
       // single-layout builder produced identical PDFs for every level).
       final pdfBytes = await _buildLogbookPdfBytes(options, dives);
 
-      state = state.copyWith(message: 'Choose save location...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_chooseLocation,
+      );
       final fileName =
           'dive_logbook_${options.template.name}_${DateFormat('yyyy-MM-dd').format(DateTime.now())}.pdf';
       final path = await _exportService.savePdfBytesToFile(pdfBytes, fileName);
@@ -1007,20 +1040,20 @@ class ExportNotifier extends StateNotifier<ExportState> {
       if (path == null) {
         state = state.copyWith(
           status: ExportStatus.idle,
-          message: 'Save cancelled',
+          message: _l10n.settings_export_cancelled_save,
         );
         return;
       }
 
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'PDF saved successfully',
+        message: _l10n.settings_export_saved_pdf,
         filePath: path,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Save failed: $e',
+        message: _l10n.settings_export_saveFailed('$e'),
       );
     }
   }
@@ -1032,7 +1065,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> createBackup() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Creating backup...',
+      message: _l10n.backup_backingUp,
     );
     try {
       final dateFormat = DateFormat('yyyy-MM-dd_HHmmss');
@@ -1046,7 +1079,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
 
       // Let user choose where to save the file
       final savePath = await FilePicker.saveFile(
-        dialogTitle: 'Save Backup',
+        dialogTitle: _l10n.settings_export_saveBackupDialogTitle,
         fileName: fileName,
         type: FileType.any,
         bytes: await File(tempBackupPath).readAsBytes(),
@@ -1058,7 +1091,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
         await File(tempBackupPath).delete();
         state = state.copyWith(
           status: ExportStatus.idle,
-          message: 'Backup cancelled',
+          message: _l10n.settings_export_cancelled_backup,
         );
         return;
       }
@@ -1069,13 +1102,13 @@ class ExportNotifier extends StateNotifier<ExportState> {
 
       state = state.copyWith(
         status: ExportStatus.success,
-        message: 'Backup saved successfully',
+        message: _l10n.settings_export_saved_backup,
         filePath: savedFileLocation(savePath),
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Backup failed: $e',
+        message: _l10n.settings_export_backupFailed('$e'),
       );
     }
   }
@@ -1083,7 +1116,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
   Future<void> restoreBackup() async {
     state = state.copyWith(
       status: ExportStatus.exporting,
-      message: 'Selecting backup file...',
+      message: _l10n.settings_export_progress_selectingBackup,
     );
     try {
       // Use FileType.any on iOS/macOS since custom extensions don't work reliably
@@ -1096,7 +1129,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
       if (picked == null) {
         state = state.copyWith(
           status: ExportStatus.idle,
-          message: 'Restore cancelled',
+          message: _l10n.settings_export_cancelled_restore,
         );
         return;
       }
@@ -1105,7 +1138,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
       if (filePath == null) {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'Could not access file',
+          message: _l10n.settings_export_fileUnreadable,
         );
         return;
       }
@@ -1115,22 +1148,24 @@ class ExportNotifier extends StateNotifier<ExportState> {
       if (extension != 'db') {
         state = state.copyWith(
           status: ExportStatus.error,
-          message: 'Please select a .db backup file',
+          message: _l10n.settings_export_notADbFile,
         );
         return;
       }
 
-      state = state.copyWith(message: 'Restoring from backup...');
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_restoringBackup,
+      );
       await DatabaseService.instance.restore(filePath);
 
       state = state.copyWith(
         status: ExportStatus.restoreComplete,
-        message: 'Restore complete',
+        message: _l10n.settings_export_restoreComplete,
       );
     } catch (e) {
       state = state.copyWith(
         status: ExportStatus.error,
-        message: 'Restore failed: $e',
+        message: _l10n.settings_export_restoreFailed('$e'),
       );
     }
   }

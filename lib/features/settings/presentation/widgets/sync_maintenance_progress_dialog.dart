@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/services/sync/sync_cleanup_outcome.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// One progress reading: [done] of [total] units, under an optional [phase]
 /// label. A [total] of 0 means the phase has no countable units and the bar
@@ -49,6 +50,7 @@ class SyncMaintenanceProgressDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -66,12 +68,15 @@ class SyncMaintenanceProgressDialog extends StatelessWidget {
               ? null
               : value.done / value.total;
           final label = value == null
-              ? 'Preparing...'
+              ? l10n.settings_import_phase_preparing
               : value.total == 0
-              ? (value.phase ?? 'Working...')
+              ? (value.phase ?? l10n.settings_syncMaintenance_phase_working)
               : [
                   if (value.phase != null) value.phase!,
-                  '${value.done} of ${value.total} files',
+                  l10n.settings_syncMaintenance_progress_filesOfTotal(
+                    value.done,
+                    value.total,
+                  ),
                 ].join(' - ');
           return Semantics(
             liveRegion: true,
@@ -99,9 +104,7 @@ class SyncMaintenanceProgressDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Keep the app open until this finishes. Closing it now '
-                    'leaves the backend partly cleared, and the next sync has '
-                    'to start over.',
+                    l10n.settings_syncMaintenance_keepAppOpen,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                       fontStyle: FontStyle.italic,

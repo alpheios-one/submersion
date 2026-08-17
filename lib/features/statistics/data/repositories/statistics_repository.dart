@@ -721,7 +721,12 @@ class StatisticsRepository {
     }
   }
 
-  /// Get dive type distribution (recreational, night, deep, wreck, etc.)
+  /// Get dive type distribution (recreational, night, deep, wreck, etc.).
+  ///
+  /// Emits the dive-type id as a stable key, not display text: the
+  /// presentation layer resolves it through the built-in translation table
+  /// (see `diveTypeDistributionLabel`). Capitalizing the slug here is what
+  /// left this chart English under every locale.
   Future<List<DistributionSegment>> getDiveTypeDistribution({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -750,11 +755,7 @@ class StatisticsRepository {
 
       return results.map((row) {
         final count = row.read<int>('count');
-        final rawType = row.read<String>('dive_type');
-        // Capitalize first letter for display
-        final label = rawType.isNotEmpty
-            ? '${rawType[0].toUpperCase()}${rawType.substring(1)}'
-            : 'Unknown';
+        final label = row.read<String>('dive_type');
         return DistributionSegment(
           label: label,
           count: count,
@@ -1131,7 +1132,10 @@ class StatisticsRepository {
     }
   }
 
-  /// Get water type distribution (salt/fresh)
+  /// Get water type distribution (salt/fresh).
+  ///
+  /// Emits the stored WaterType enum name as a stable key; the presentation
+  /// layer translates it (see `waterTypeDistributionLabel`).
   Future<List<DistributionSegment>> getWaterTypeDistribution({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -1143,7 +1147,7 @@ class StatisticsRepository {
 
       final results = await _db.customSelect('''
         SELECT
-          COALESCE(water_type, 'Unknown') AS water_type,
+          water_type,
           COUNT(*) AS count
         FROM dives
         WHERE water_type IS NOT NULL AND water_type != '' $diverFilter ${df.clause}
@@ -1175,7 +1179,10 @@ class StatisticsRepository {
     }
   }
 
-  /// Get entry method distribution
+  /// Get entry method distribution.
+  ///
+  /// Emits the stored EntryMethod enum name as a stable key; the
+  /// presentation layer translates it (see `entryMethodDistributionLabel`).
   Future<List<DistributionSegment>> getEntryMethodDistribution({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -1789,7 +1796,13 @@ class StatisticsRepository {
     }
   }
 
-  /// Get dives by time of day (morning, afternoon, evening, night)
+  /// Get dives by time of day (morning, afternoon, evening, night).
+  ///
+  /// The bucket names are stable keys, not display text: the same literals
+  /// are the ORDER BY sort keys below, so translating them in SQL would
+  /// reorder the chart per locale (and break the fixed colour order in the
+  /// legend). The presentation layer translates them instead, through
+  /// `timeOfDayDistributionLabel`.
   Future<List<DistributionSegment>> getDivesByTimeOfDay({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),

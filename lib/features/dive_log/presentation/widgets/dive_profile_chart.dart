@@ -33,6 +33,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/gas_timeline_s
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_layout.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_overlay.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/safety_findings_overlay.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_chart_viewport.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_event_labels.dart';
@@ -1137,6 +1138,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final point = onLeadIn
         ? _surfaceReadoutPoint()
         : widget.profile[spot.spotIndex];
+    final l10n = context.l10n;
     final rows = <TooltipRow>[];
     final onSurface = colorScheme.onInverseSurface;
 
@@ -1145,7 +1147,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final seconds = point.timestamp % 60;
     rows.add(
       TooltipRow(
-        label: 'Time',
+        label: l10n.diveLog_tooltip_time,
         value: '$minutes:${seconds.toString().padLeft(2, '0')}',
         bulletColor: onSurface.withValues(alpha: 0.5),
       ),
@@ -1154,7 +1156,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     // Depth
     rows.add(
       TooltipRow(
-        label: 'Depth',
+        label: l10n.diveLog_tooltip_depth,
         value: units.formatDepth(point.depth),
         bulletColor: AppColors.chartDepth,
       ),
@@ -1167,7 +1169,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       if (overlayPoint == null) continue;
       rows.add(
         TooltipRow(
-          label: 'Depth · ${overlay.name}',
+          label: '${l10n.diveLog_tooltip_depth} · ${overlay.name}',
           value: units.formatDepth(overlayPoint.depth),
           bulletColor: overlay.color,
         ),
@@ -1178,7 +1180,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     if (_showTemperature) {
       rows.add(
         TooltipRow(
-          label: 'Temp',
+          label: l10n.diveLog_tooltip_temp,
           value: point.temperature != null
               ? units.formatTemperature(point.temperature)
               : '-',
@@ -1193,7 +1195,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         if (overlayTemp == null) continue;
         rows.add(
           TooltipRow(
-            label: 'Temp · ${overlay.name}',
+            label: '${l10n.diveLog_tooltip_temp} · ${overlay.name}',
             value: units.formatTemperature(overlayTemp),
             bulletColor: overlay.color.withValues(alpha: 0.6),
           ),
@@ -1208,7 +1210,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       final ceiling = widget.ceilingCurve![spot.spotIndex];
       rows.add(
         TooltipRow(
-          label: 'Ceiling',
+          label: l10n.diveLog_tooltip_ceiling,
           value: ceiling > 0 ? units.formatDepth(ceiling) : '-',
           bulletColor: const Color(0xFFD32F2F),
         ),
@@ -1223,7 +1225,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       final stop = widget.decoStopCurve![spot.spotIndex];
       rows.add(
         TooltipRow(
-          label: 'Deco stop',
+          label: l10n.diveLog_tooltip_decoStop,
           value: stop > 0 ? units.formatDepth(stop) : '-',
           bulletColor: decoStopBandColor,
         ),
@@ -1250,7 +1252,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       }
       rows.add(
         TooltipRow(
-          label: 'Rate',
+          label: l10n.diveLog_tooltip_rate,
           value:
               '$arrow ${convertedRate.toStringAsFixed(1)} ${units.depthSymbol}/min',
           bulletColor: rateColor,
@@ -1262,8 +1264,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     if (_showHeartRate) {
       rows.add(
         TooltipRow(
-          label: 'HR',
-          value: point.heartRate != null ? '${point.heartRate} bpm' : '-',
+          label: l10n.diveLog_tooltip_hr,
+          value: point.heartRate != null
+              ? '${point.heartRate} ${l10n.units_profileMetric_bpm}'
+              : '-',
           bulletColor: Colors.red,
         ),
       );
@@ -1303,17 +1307,17 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       final ndl = widget.ndlCurve![spot.spotIndex];
       String ndlValue;
       if (ndl < 0) {
-        ndlValue = 'DECO';
+        ndlValue = l10n.diveLog_playbackStats_deco;
       } else if (ndl < 3600) {
         final min = ndl ~/ 60;
         final sec = ndl % 60;
         ndlValue = '$min:${sec.toString().padLeft(2, '0')}';
       } else {
-        ndlValue = '>60 min';
+        ndlValue = l10n.diveLog_tooltip_ndlOverMax;
       }
       rows.add(
         TooltipRow(
-          label: 'NDL',
+          label: l10n.diveLog_tooltip_ndl,
           value: ndlValue,
           bulletColor: Colors.yellow.shade700,
         ),
@@ -1330,7 +1334,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
               ? '${context.l10n.diveLog_tooltip_ppO2} ${context.l10n.diveLog_tooltip_avgCalculated}'
               : context.l10n.diveLog_tooltip_ppO2,
           value:
-              '${_readoutValue(widget.ppO2Curve![spot.spotIndex], onLeadIn).toStringAsFixed(2)} bar',
+              '${_readoutValue(widget.ppO2Curve![spot.spotIndex], onLeadIn).toStringAsFixed(2)} ${l10n.units_pressure_bar}',
           bulletColor: const Color(0xFF00ACC1),
         ),
       );
@@ -1344,7 +1348,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
           rows.add(
             TooltipRow(
               label: '${context.l10n.diveLog_tooltip_sensor} ${cell + 1}',
-              value: '${reading.toStringAsFixed(2)} bar',
+              value: '${reading.toStringAsFixed(2)} ${l10n.units_pressure_bar}',
               bulletColor: const Color(0xFF80DEEA),
             ),
           );
@@ -1358,9 +1362,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         spot.spotIndex < widget.ppN2Curve!.length) {
       rows.add(
         TooltipRow(
-          label: 'ppN2',
+          label: l10n.diveLog_tooltip_ppN2,
           value:
-              '${_readoutValue(widget.ppN2Curve![spot.spotIndex], onLeadIn).toStringAsFixed(2)} bar',
+              '${_readoutValue(widget.ppN2Curve![spot.spotIndex], onLeadIn).toStringAsFixed(2)} ${l10n.units_pressure_bar}',
           bulletColor: Colors.indigo,
         ),
       );
@@ -1374,8 +1378,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       if (ppHe > 0.001) {
         rows.add(
           TooltipRow(
-            label: 'ppHe',
-            value: '${_readoutValue(ppHe, onLeadIn).toStringAsFixed(2)} bar',
+            label: l10n.diveLog_tooltip_ppHe,
+            value:
+                '${_readoutValue(ppHe, onLeadIn).toStringAsFixed(2)} ${l10n.units_pressure_bar}',
             bulletColor: Colors.pink.shade300,
           ),
         );
@@ -1390,7 +1395,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       if (mod > 0 && mod < 200) {
         rows.add(
           TooltipRow(
-            label: 'MOD',
+            label: l10n.diveLog_tooltip_mod,
             value: units.formatDepth(mod),
             bulletColor: Colors.deepOrange,
           ),
@@ -1404,9 +1409,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         spot.spotIndex < widget.densityCurve!.length) {
       rows.add(
         TooltipRow(
-          label: 'Density',
+          label: l10n.diveLog_tooltip_density,
           value:
-              '${_readoutValue(widget.densityCurve![spot.spotIndex], onLeadIn).toStringAsFixed(2)} g/L',
+              '${_readoutValue(widget.densityCurve![spot.spotIndex], onLeadIn).toStringAsFixed(2)} ${l10n.units_profileMetric_gPerL}',
           bulletColor: Colors.brown,
         ),
       );
@@ -1418,7 +1423,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         spot.spotIndex < widget.gfCurve!.length) {
       rows.add(
         TooltipRow(
-          label: 'GF',
+          label: l10n.diveLog_tooltip_gfPercent,
           value: '${widget.gfCurve![spot.spotIndex].toStringAsFixed(0)}%',
           bulletColor: Colors.deepPurple,
         ),
@@ -1431,7 +1436,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         spot.spotIndex < widget.surfaceGfCurve!.length) {
       rows.add(
         TooltipRow(
-          label: 'Srf GF',
+          label: l10n.diveLog_tooltip_srfGf,
           value:
               '${widget.surfaceGfCurve![spot.spotIndex].toStringAsFixed(0)}%',
           bulletColor: Colors.purple.shade300,
@@ -1445,7 +1450,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         spot.spotIndex < widget.meanDepthCurve!.length) {
       rows.add(
         TooltipRow(
-          label: 'Mean',
+          label: l10n.diveLog_tooltip_mean,
           value: units.formatDepth(widget.meanDepthCurve![spot.spotIndex]),
           bulletColor: Colors.blueGrey,
         ),
@@ -1459,8 +1464,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       final tts = widget.ttsCurve![spot.spotIndex];
       rows.add(
         TooltipRow(
-          label: 'TTS',
-          value: tts > 0 ? '${(tts / 60).ceil()} min' : '0 min',
+          label: l10n.diveLog_tooltip_tts,
+          value: tts > 0
+              ? '${(tts / 60).ceil()} ${l10n.units_profileMetric_min}'
+              : '0 ${l10n.units_profileMetric_min}',
           bulletColor: const Color(0xFFAD1457),
         ),
       );
@@ -1472,7 +1479,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         spot.spotIndex < widget.cnsCurve!.length) {
       rows.add(
         TooltipRow(
-          label: 'CNS',
+          label: l10n.diveLog_tooltip_cns,
           value: '${widget.cnsCurve![spot.spotIndex].toStringAsFixed(1)}%',
           bulletColor: const Color(0xFFE65100),
         ),
@@ -1485,7 +1492,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         spot.spotIndex < widget.otuCurve!.length) {
       rows.add(
         TooltipRow(
-          label: 'OTU',
+          label: l10n.diveLog_tooltip_otu,
           value: widget.otuCurve![spot.spotIndex].toStringAsFixed(0),
           bulletColor: const Color(0xFF6D4C41),
         ),
@@ -1513,7 +1520,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
             ? GasColors.forGasMix(tank.gasMix)
             : _getTankColor(i);
         final tankLabel =
-            DiveProfileChart.tankTooltipLabel(tank, 'Tank ${i + 1}') +
+            DiveProfileChart.tankTooltipLabel(
+              tank,
+              l10n.diveLog_tank_title(i + 1),
+            ) +
             _tankSourceSuffix(
               tankId,
               tankComputerIds,
@@ -1546,7 +1556,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         if ((marker.timestamp - timestamp).abs() <= timestampThreshold) {
           rows.add(
             TooltipRow(
-              label: 'Marker',
+              label: l10n.diveLog_tooltip_marker,
               value: marker.chartLabel,
               bulletColor: marker.getColor(),
             ),
@@ -2986,6 +2996,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     // Build tooltip with all enabled metrics
                     // Text style constants for consistent column layout
                     final onSurface = colorScheme.onInverseSurface;
+                    final l10n = context.l10n;
+                    final bar = l10n.units_pressure_bar;
+                    final gPerL = l10n.units_profileMetric_gPerL;
+                    final minUnit = l10n.units_profileMetric_min;
                     final rowStyle = TextStyle(
                       fontFamily: 'RobotoMono',
                       fontSize: 14,
@@ -3090,8 +3104,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
                     // Heart rate (if enabled - always show row)
                     if (_showHeartRate) {
+                      final bpm = l10n.units_profileMetric_bpm;
                       final hrValue = point.heartRate != null
-                          ? '${point.heartRate} bpm'
+                          ? '${point.heartRate} $bpm'
                           : '—';
                       addRow(
                         context.l10n.diveLog_tooltip_hr,
@@ -3215,7 +3230,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                           final sec = ndl % 60;
                           ndlValue = '$min:${sec.toString().padLeft(2, '0')}';
                         } else {
-                          ndlValue = '>60 min';
+                          ndlValue = l10n.diveLog_tooltip_ndlOverMax;
                         }
                       }
                       addRow(
@@ -3234,7 +3249,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                           widget.ppO2Curve![spot.spotIndex],
                           onLeadIn,
                         );
-                        ppO2Value = '${ppO2.toStringAsFixed(2)} bar';
+                        ppO2Value = '${ppO2.toStringAsFixed(2)} $bar';
                       }
                       addRow(
                         widget.ppO2FromSensorAverage
@@ -3252,7 +3267,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                           if (reading == null) continue;
                           addRow(
                             '${context.l10n.diveLog_tooltip_sensor} ${cell + 1}',
-                            '${reading.toStringAsFixed(2)} bar',
+                            '${reading.toStringAsFixed(2)} $bar',
                             const Color(0xFF80DEEA),
                           );
                         }
@@ -3268,7 +3283,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                           widget.ppN2Curve![spot.spotIndex],
                           onLeadIn,
                         );
-                        ppN2Value = '${ppN2.toStringAsFixed(2)} bar';
+                        ppN2Value = '${ppN2.toStringAsFixed(2)} $bar';
                       }
                       addRow(
                         context.l10n.diveLog_tooltip_ppN2,
@@ -3285,7 +3300,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                         final ppHe = widget.ppHeCurve![spot.spotIndex];
                         if (ppHe > 0.001) {
                           ppHeValue =
-                              '${_readoutValue(ppHe, onLeadIn).toStringAsFixed(2)} bar';
+                              '${_readoutValue(ppHe, onLeadIn).toStringAsFixed(2)} $bar';
                         }
                       }
                       addRow(
@@ -3321,7 +3336,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                           widget.densityCurve![spot.spotIndex],
                           onLeadIn,
                         );
-                        densityValue = '${density.toStringAsFixed(2)} g/L';
+                        densityValue = '${density.toStringAsFixed(2)} $gPerL';
                       }
                       addRow(
                         context.l10n.diveLog_tooltip_density,
@@ -3385,9 +3400,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                         final tts = widget.ttsCurve![spot.spotIndex];
                         if (tts > 0) {
                           final min = (tts / 60).ceil();
-                          ttsValue = '$min min';
+                          ttsValue = '$min $minUnit';
                         } else {
-                          ttsValue = '0 min';
+                          ttsValue = '0 $minUnit';
                         }
                       }
                       addRow(
@@ -3528,7 +3543,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                               else
                                 (
                                   label: row.label,
-                                  value: '${row.value} (interpolated)',
+                                  value: l10n.diveLog_tooltip_interpolated(
+                                    row.value,
+                                  ),
                                   bulletColor: row.bulletColor,
                                   bullet: row.bullet,
                                   bulletSize: row.bulletSize,
@@ -3845,7 +3862,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
           enabled: false,
           height: 32,
           child: Text(
-            category.displayName,
+            profileMetricCategoryName(context.l10n, category),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.bold,
@@ -3882,7 +3899,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  metric.displayName,
+                  profileMetricName(context.l10n, metric),
                   style: TextStyle(
                     fontWeight: isSelected
                         ? FontWeight.bold
@@ -4247,14 +4264,6 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   /// Built at the call site because some labels are localized: matching
   /// hardcoded English would silently mark them interpolated in other locales.
   Set<String> _exactAtSurfaceLabels(BuildContext context) => {
-    // The overlay readout uses hardcoded labels; the inline (fl_chart) readout
-    // uses localized ones. Both forms are exempt so neither is mislabelled.
-    'Time',
-    'Depth',
-    'ppN2',
-    'ppHe',
-    'Density',
-    'MOD',
     context.l10n.diveLog_tooltip_time,
     context.l10n.diveLog_tooltip_depth,
     context.l10n.diveLog_tooltip_ppN2,
@@ -4274,12 +4283,13 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     Set<String> exactLabels,
   ) => [
     for (final row in rows)
-      if (exactLabels.contains(row.label) || row.label.startsWith('Depth ·'))
+      if (exactLabels.contains(row.label) ||
+          row.label.startsWith(context.l10n.diveLog_tooltip_depth))
         row
       else
         TooltipRow(
           label: row.label,
-          value: '${row.value} (interpolated)',
+          value: context.l10n.diveLog_tooltip_interpolated(row.value),
           bulletColor: row.bulletColor,
         ),
   ];
@@ -5771,7 +5781,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
   /// Build axis label text for the right axis (e.g. "Temp (°C)").
   String _rightAxisLabel(ProfileRightAxisMetric metric, UnitFormatter units) {
-    final name = metric.shortName;
+    final l10n = context.l10n;
+    final name = profileMetricShortName(l10n, metric);
+    final perMin = l10n.units_profileMetric_min;
     switch (metric) {
       case ProfileRightAxisMetric.temperature:
         return '$name (${units.temperatureSymbol})';
@@ -5780,16 +5792,104 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       case ProfileRightAxisMetric.meanDepth:
         return '$name (${units.depthSymbol})';
       case ProfileRightAxisMetric.sac:
-        return '$name (${units.pressureSymbol}/min)';
+        return '$name (${units.pressureSymbol}/$perMin)';
       case ProfileRightAxisMetric.ascentRate:
-        return '$name (${units.depthSymbol}/min)';
+        return '$name (${units.depthSymbol}/$perMin)';
       default:
-        final suffix = metric.unitSuffix;
+        final suffix = profileMetricUnitSuffix(l10n, metric);
         if (suffix != null) return '$name ($suffix)';
         return name;
     }
   }
 }
+
+/// Localized display name for a right-axis metric.
+///
+/// [ProfileRightAxisMetric.displayName] is a hardcoded English literal baked
+/// into the enum, so the axis picker rendered English under every locale.
+/// The `enum_profileMetric_*` keys already ship translated.
+String profileMetricName(
+  AppLocalizations l10n,
+  ProfileRightAxisMetric metric,
+) => switch (metric) {
+  ProfileRightAxisMetric.temperature => l10n.enum_profileMetric_temperature,
+  ProfileRightAxisMetric.pressure => l10n.enum_profileMetric_pressure,
+  ProfileRightAxisMetric.heartRate => l10n.enum_profileMetric_heartRate,
+  ProfileRightAxisMetric.sac => l10n.enum_profileMetric_sacRate,
+  ProfileRightAxisMetric.ascentRate => l10n.enum_profileMetric_ascentRate,
+  ProfileRightAxisMetric.ndl => l10n.enum_profileMetric_ndl,
+  ProfileRightAxisMetric.ppO2 => l10n.enum_profileMetric_ppO2,
+  ProfileRightAxisMetric.ppN2 => l10n.enum_profileMetric_ppN2,
+  ProfileRightAxisMetric.ppHe => l10n.enum_profileMetric_ppHe,
+  ProfileRightAxisMetric.gasDensity => l10n.enum_profileMetric_gasDensity,
+  ProfileRightAxisMetric.gf => l10n.enum_profileMetric_gf,
+  ProfileRightAxisMetric.surfaceGf => l10n.enum_profileMetric_surfaceGf,
+  ProfileRightAxisMetric.meanDepth => l10n.enum_profileMetric_meanDepth,
+  ProfileRightAxisMetric.tts => l10n.enum_profileMetric_tts,
+  ProfileRightAxisMetric.cns => l10n.enum_profileMetric_cns,
+  ProfileRightAxisMetric.otu => l10n.enum_profileMetric_otu,
+};
+
+/// Localized short name for a right-axis metric, used on the axis itself
+/// where there is only room for an abbreviation.
+String profileMetricShortName(
+  AppLocalizations l10n,
+  ProfileRightAxisMetric metric,
+) => switch (metric) {
+  ProfileRightAxisMetric.temperature =>
+    l10n.enum_profileMetric_temperature_short,
+  ProfileRightAxisMetric.pressure => l10n.enum_profileMetric_pressure_short,
+  ProfileRightAxisMetric.heartRate => l10n.enum_profileMetric_heartRate_short,
+  ProfileRightAxisMetric.sac => l10n.enum_profileMetric_sacRate_short,
+  ProfileRightAxisMetric.ascentRate => l10n.enum_profileMetric_ascentRate_short,
+  ProfileRightAxisMetric.ndl => l10n.enum_profileMetric_ndl_short,
+  ProfileRightAxisMetric.ppO2 => l10n.enum_profileMetric_ppO2_short,
+  ProfileRightAxisMetric.ppN2 => l10n.enum_profileMetric_ppN2_short,
+  ProfileRightAxisMetric.ppHe => l10n.enum_profileMetric_ppHe_short,
+  ProfileRightAxisMetric.gasDensity => l10n.enum_profileMetric_gasDensity_short,
+  ProfileRightAxisMetric.gf => l10n.enum_profileMetric_gf_short,
+  ProfileRightAxisMetric.surfaceGf => l10n.enum_profileMetric_surfaceGf_short,
+  ProfileRightAxisMetric.meanDepth => l10n.enum_profileMetric_meanDepth_short,
+  ProfileRightAxisMetric.tts => l10n.enum_profileMetric_tts_short,
+  ProfileRightAxisMetric.cns => l10n.enum_profileMetric_cns_short,
+  ProfileRightAxisMetric.otu => l10n.enum_profileMetric_otu_short,
+};
+
+/// Localized unit suffix for the metrics whose unit is fixed rather than
+/// taken from the diver's unit settings. Metrics that go through
+/// [UnitFormatter] (temperature, pressure, mean depth, SAC, ascent rate)
+/// return null: the caller appends the formatter's own symbol.
+String? profileMetricUnitSuffix(
+  AppLocalizations l10n,
+  ProfileRightAxisMetric metric,
+) => switch (metric) {
+  ProfileRightAxisMetric.heartRate => l10n.units_profileMetric_bpm,
+  ProfileRightAxisMetric.ndl ||
+  ProfileRightAxisMetric.tts => l10n.units_profileMetric_min,
+  ProfileRightAxisMetric.ppO2 ||
+  ProfileRightAxisMetric.ppN2 ||
+  ProfileRightAxisMetric.ppHe => l10n.units_pressure_bar,
+  ProfileRightAxisMetric.gasDensity => l10n.units_profileMetric_gPerL,
+  ProfileRightAxisMetric.gf ||
+  ProfileRightAxisMetric.surfaceGf ||
+  ProfileRightAxisMetric.cns => l10n.units_profileMetric_percent,
+  _ => null,
+};
+
+/// Localized header for a metric category in the right-axis picker.
+String profileMetricCategoryName(
+  AppLocalizations l10n,
+  ProfileMetricCategory category,
+) => switch (category) {
+  ProfileMetricCategory.primary => l10n.enum_profileMetricCategory_primary,
+  ProfileMetricCategory.decompression =>
+    l10n.enum_profileMetricCategory_decompression,
+  ProfileMetricCategory.gasAnalysis =>
+    l10n.enum_profileMetricCategory_gasAnalysis,
+  ProfileMetricCategory.gradientFactor =>
+    l10n.enum_profileMetricCategory_gradientFactor,
+  ProfileMetricCategory.other => l10n.enum_profileMetricCategory_other,
+};
 
 /// Compact version of the dive profile chart for list previews
 class DiveProfileMiniChart extends StatelessWidget {

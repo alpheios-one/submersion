@@ -7,6 +7,7 @@ import 'package:submersion/features/data_quality/domain/detectors/temp_anomaly_d
 import 'package:submersion/features/data_quality/domain/entities/dive_quality_context.dart';
 import 'package:submersion/features/data_quality/domain/entities/quality_finding.dart';
 import 'package:submersion/features/data_quality/domain/repairs/quality_repair_action.dart';
+import 'package:submersion/features/data_quality/domain/repairs/repair_predicates.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 
@@ -211,6 +212,45 @@ void main() {
       expect(findings.single.params['fahrenheitSuspected'], isFalse);
       expect(findings.single.params['fahrenheitAsKelvinSuspected'], isFalse);
       expect(offeredRepair(findings.single), isNull);
+    });
+
+    /// The scalar repair rewrites `dives.water_temp` rather than the sample
+    /// channel, so it converges through the dive instead of `repairAndRedetect`.
+    List<QualityFinding>? repairScalarAndRedetect(double waterTemp) {
+      List<QualityFinding> run(double t) => const TempAnomalyDetector()
+          .detect(makeContext(dive: makeTestDive(waterTemp: t)))
+          .where((f) => f.params.containsKey('waterTempC'))
+          .toList();
+
+      final before = run(waterTemp);
+      expect(before, isNotEmpty, reason: 'test vector must trip the detector');
+      final action = repairOptionsFor(
+        before.single,
+      ).whereType<ConvertWaterTempRepair>().firstOrNull;
+      if (action == null) return null;
+      return run(
+        RepairPredicates.convertToCelsius(
+          waterTemp,
+          kelvinScale: action.kelvinScale,
+        ),
+      );
+    }
+
+    test('the offered repair clears a Fahrenheit water temperature', () {
+      final after = repairScalarAndRedetect(78);
+      expect(after, isNotNull, reason: 'a unit error must be repairable');
+      expect(after, isEmpty);
+    });
+
+    test('the offered repair clears a Fahrenheit-as-Kelvin temperature', () {
+      final after = repairScalarAndRedetect(297);
+      expect(after, isNotNull, reason: 'a unit error must be repairable');
+      expect(after, isEmpty);
+    });
+
+    test('an unexplainable water temperature is offered no repair', () {
+      // No reinterpretation lands -50 in range, so nothing is offered.
+      expect(repairScalarAndRedetect(-50), isNull);
     });
   });
 

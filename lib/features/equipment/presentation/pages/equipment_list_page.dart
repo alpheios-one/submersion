@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -114,7 +115,7 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
           },
           columnSettingsAction: IconButton(
             icon: const Icon(Icons.view_column_outlined),
-            tooltip: 'Column settings',
+            tooltip: context.l10n.columnConfig_tooltip_columnSettings,
             onPressed: () => showEntityTableColumnPicker<EquipmentField>(
               context,
               configProvider: equipmentTableConfigProvider,
@@ -128,7 +129,7 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
               onPressed: () {
                 showSearch(
                   context: context,
-                  delegate: EquipmentSearchDelegate(),
+                  delegate: EquipmentSearchDelegate(context.l10n),
                 );
               },
             ),
@@ -143,7 +144,8 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
                   currentField: sort.field,
                   currentDirection: sort.direction,
                   fields: EquipmentSortField.values,
-                  getFieldDisplayName: (field) => field.displayName,
+                  getFieldDisplayName: (field) =>
+                      field.localizedName(context.l10n),
                   getFieldIcon: (field) => field.icon,
                   onSortChanged: (field, direction) {
                     ref.read(equipmentSortProvider.notifier).state = SortState(

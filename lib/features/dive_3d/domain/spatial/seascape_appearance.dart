@@ -54,7 +54,10 @@ class SeascapeAppearance extends Equatable {
   /// contours) as a translucent overlay. Synced per-diver like the rest.
   final bool mapDepthOverlay;
 
-  /// The 3D terrain surface: depth ramp, map imagery, or a blend.
+  /// The 3D terrain surface: depth ramp, map imagery, or a blend. Defaults to
+  /// blend, which reads as terrain rather than a colour chart while keeping
+  /// the depth ramp legible; the drape loads non-blocking, so a diver who is
+  /// offline still gets the plain ramp until it lands.
   final SeascapeSurfaceMode surfaceMode;
 
   const SeascapeAppearance({
@@ -64,7 +67,7 @@ class SeascapeAppearance extends Equatable {
     this.customLevels = const [],
     this.wallAngleDeg = 22.0,
     this.mapDepthOverlay = false,
-    this.surfaceMode = SeascapeSurfaceMode.depth,
+    this.surfaceMode = SeascapeSurfaceMode.blend,
   });
 
   SeascapeAppearance copyWith({

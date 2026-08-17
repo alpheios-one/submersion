@@ -102,17 +102,32 @@ void main() {
     },
   );
 
-  test('surfaceMode defaults to depth, round-trips, decodes defensively', () {
-    expect(const SeascapeAppearance().surfaceMode, SeascapeSurfaceMode.depth);
-    const blend = SeascapeAppearance(surfaceMode: SeascapeSurfaceMode.blend);
+  test('surfaceMode defaults to blend, round-trips, decodes defensively', () {
+    expect(const SeascapeAppearance().surfaceMode, SeascapeSurfaceMode.blend);
+    const depth = SeascapeAppearance(surfaceMode: SeascapeSurfaceMode.depth);
     expect(
-      SeascapeAppearance.decode(blend.encode()).surfaceMode,
-      SeascapeSurfaceMode.blend,
+      SeascapeAppearance.decode(depth.encode()).surfaceMode,
+      SeascapeSurfaceMode.depth,
     );
     expect(
       SeascapeAppearance.decode('{"surfaceMode":"hologram"}').surfaceMode,
+      SeascapeSurfaceMode.blend,
+    );
+    expect(depth, isNot(const SeascapeAppearance()));
+  });
+
+  test('a stored surface choice survives the change of default', () {
+    // encode() always writes the field, so a diver who already has a saved
+    // appearance keeps whatever they had. The new default only reaches
+    // installs with nothing stored, or a blob written before the field
+    // existed.
+    expect(
+      SeascapeAppearance.decode('{"surfaceMode":"depth"}').surfaceMode,
       SeascapeSurfaceMode.depth,
     );
-    expect(blend, isNot(const SeascapeAppearance()));
+    expect(
+      SeascapeAppearance.decode('{"rampBanded":true}').surfaceMode,
+      SeascapeSurfaceMode.blend,
+    );
   });
 }

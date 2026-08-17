@@ -289,7 +289,7 @@ class SettingsSectionDetailPage extends ConsumerWidget {
       'about' => context.l10n.settings_section_about_title,
       'dataSources' => context.l10n.settings_section_dataSources_title,
       'sharedData' => context.l10n.settings_sharedData_sectionTitle,
-      'debug' => 'Debug',
+      'debug' => context.l10n.settings_section_debug_title,
       _ => context.l10n.settings_appBar_title,
     };
   }
@@ -380,6 +380,7 @@ class _MobileSettingsTile extends StatelessWidget {
       'sharedData' => context.l10n.settings_sharedData_sectionTitle,
       'safety' => context.l10n.settings_section_safety_title,
       'security' => context.l10n.settings_section_security_title,
+      'debug' => context.l10n.settings_section_debug_title,
       _ => section.title,
     };
   }
@@ -397,6 +398,7 @@ class _MobileSettingsTile extends StatelessWidget {
       'dataSources' => context.l10n.settings_section_dataSources_subtitle,
       'safety' => context.l10n.settings_section_safety_subtitle,
       'security' => context.l10n.settings_section_security_subtitle,
+      'debug' => context.l10n.settings_section_debug_subtitle,
       _ => section.subtitle,
     };
   }
@@ -1057,14 +1059,15 @@ class _DecompressionSectionContent extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          _buildSectionHeader(context, 'Data Source Preferences'),
+          _buildSectionHeader(
+            context,
+            context.l10n.settings_decompression_header_dataSources,
+          ),
           const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Text(
-              'When set to Dive Computer, the app uses data reported by the '
-              'dive computer when available. Falls back to calculated values '
-              'when computer data is not present.',
+              context.l10n.settings_decompression_header_dataSources_subtitle,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -1076,7 +1079,7 @@ class _DecompressionSectionContent extends ConsumerWidget {
               children: [
                 _buildSourceDropdownTile(
                   context,
-                  title: 'NDL Source',
+                  title: context.l10n.settings_decompression_ndlSource,
                   value: settings.defaultNdlSource,
                   onChanged: (source) => ref
                       .read(settingsProvider.notifier)
@@ -1088,7 +1091,7 @@ class _DecompressionSectionContent extends ConsumerWidget {
                 // choice remains meaningful for the deco stop schedule below.
                 _buildSourceDropdownTile(
                   context,
-                  title: 'Deco Stop Source',
+                  title: context.l10n.settings_decompression_decoStopSource,
                   value: settings.defaultDecoStopSource,
                   onChanged: (source) => ref
                       .read(settingsProvider.notifier)
@@ -1097,7 +1100,7 @@ class _DecompressionSectionContent extends ConsumerWidget {
                 const Divider(height: 1),
                 _buildSourceDropdownTile(
                   context,
-                  title: 'TTS Source',
+                  title: context.l10n.settings_decompression_ttsSource,
                   value: settings.defaultTtsSource,
                   onChanged: (source) => ref
                       .read(settingsProvider.notifier)
@@ -1106,7 +1109,7 @@ class _DecompressionSectionContent extends ConsumerWidget {
                 const Divider(height: 1),
                 _buildSourceDropdownTile(
                   context,
-                  title: 'CNS Source',
+                  title: context.l10n.settings_decompression_cnsSource,
                   value: settings.defaultCnsSource,
                   onChanged: (source) => ref
                       .read(settingsProvider.notifier)
@@ -1154,14 +1157,15 @@ class _DecompressionSectionContent extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          _buildSectionHeader(context, 'Ascent planning'),
+          _buildSectionHeader(
+            context,
+            context.l10n.settings_decompression_header_ascent,
+          ),
           const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Text(
-              'Which carried cylinders the simulated ascent (TTS, ceiling and '
-              'stops) may switch to at each depth. Only gases recorded on the '
-              'dive are considered.',
+              context.l10n.settings_decompression_header_ascent_subtitle,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -1171,19 +1175,23 @@ class _DecompressionSectionContent extends ConsumerWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.swap_vert),
-              title: const Text('Plan ascent with'),
+              title: Text(context.l10n.settings_decompression_ascentGasLabel),
               dense: true,
               trailing: DropdownButton<AscentGasSet>(
                 value: settings.ascentGasSet,
                 underline: const SizedBox.shrink(),
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: AscentGasSet.allCarried,
-                    child: Text('All carried cylinders'),
+                    child: Text(
+                      context.l10n.settings_decompression_ascentGas_allCarried,
+                    ),
                   ),
                   DropdownMenuItem(
                     value: AscentGasSet.decoStageOnly,
-                    child: Text('Deco/stage + back gas'),
+                    child: Text(
+                      context.l10n.settings_decompression_ascentGas_decoStage,
+                    ),
                   ),
                 ],
                 onChanged: (value) {
@@ -1211,14 +1219,14 @@ class _DecompressionSectionContent extends ConsumerWidget {
       trailing: DropdownButton<MetricDataSource>(
         value: value,
         underline: const SizedBox.shrink(),
-        items: const [
+        items: [
           DropdownMenuItem(
             value: MetricDataSource.calculated,
-            child: Text('Calculated'),
+            child: Text(context.l10n.settings_decompression_sourceCalculated),
           ),
           DropdownMenuItem(
             value: MetricDataSource.computer,
-            child: Text('Dive Computer'),
+            child: Text(context.l10n.settings_decompression_sourceComputer),
           ),
         ],
         onChanged: (newValue) {
@@ -1586,7 +1594,7 @@ class _AppearanceSectionContentState
     if (_showColumnConfig) {
       final backLabel = _columnConfigSection != null
           ? _getSectionDisplayName(context, _columnConfigSection!)
-          : 'Appearance';
+          : context.l10n.settings_section_appearance_title;
       return Column(
         children: [
           Align(
@@ -1623,7 +1631,7 @@ class _AppearanceSectionContentState
               key: const Key('sectionBackButton'),
               onPressed: () => setState(() => _activeSectionKey = null),
               icon: const Icon(Icons.arrow_back, size: 18),
-              label: const Text('Appearance'),
+              label: Text(context.l10n.settings_section_appearance_title),
             ),
           ),
           Expanded(
@@ -1651,7 +1659,10 @@ class _AppearanceSectionContentState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // -- General --
-          _buildSectionHeader(context, 'General'),
+          _buildSectionHeader(
+            context,
+            context.l10n.settings_appearance_general,
+          ),
           const SizedBox(height: 8),
           Card(
             child: Column(
@@ -1685,7 +1696,10 @@ class _AppearanceSectionContentState
                   leading: const Icon(Icons.language),
                   title: Text(context.l10n.settings_appearance_header_language),
                   subtitle: Text(
-                    LanguageSettingsPage.getDisplayName(settings.locale),
+                    LanguageSettingsPage.getDisplayName(
+                      context.l10n,
+                      settings.locale,
+                    ),
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => setState(() => _showLanguageList = true),
@@ -1782,7 +1796,10 @@ class _AppearanceSectionContentState
           ),
           const SizedBox(height: 24),
           // -- Sections --
-          _buildSectionHeader(context, 'Sections'),
+          _buildSectionHeader(
+            context,
+            context.l10n.settings_appearance_sections,
+          ),
           const SizedBox(height: 8),
           Card(
             child: Column(
@@ -2554,15 +2571,18 @@ class _DataSectionContent extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _buildSectionHeader(context, 'Data Tools'),
+          _buildSectionHeader(
+            context,
+            context.l10n.settings_data_header_dataTools,
+          ),
           const SizedBox(height: 8),
           Card(
             child: Column(
               children: [
                 ListTile(
                   leading: const Icon(Icons.access_time),
-                  title: const Text('Fix Dive Times'),
-                  subtitle: const Text('Adjust times for imported dives'),
+                  title: Text(context.l10n.settings_fixDiveTimes_title),
+                  subtitle: Text(context.l10n.settings_fixDiveTimes_subtitle),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => context.push('/settings/fix-dive-times'),
                 ),

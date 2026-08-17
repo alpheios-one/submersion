@@ -18,6 +18,7 @@ import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/backup/data/services/pre_migration_backup_service.dart';
 import 'package:submersion/features/backup/domain/exceptions/backup_failed_exception.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -136,6 +137,9 @@ Widget _buildSplashContent({
   ),
 }) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('en'),
     home: Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -192,6 +196,9 @@ Widget _buildVersionMismatchError({
   // Renders the real production widget so these tests cannot drift from the
   // screen users actually see (the previous inline replica did exactly that).
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('en'),
     home: Scaffold(
       key: const ValueKey('error'),
       body: SafeArea(
@@ -218,6 +225,9 @@ Widget _buildGenericError({
   const subtitleColor = Colors.black54;
 
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('en'),
     home: Scaffold(
       key: const ValueKey('error'),
       body: SafeArea(
@@ -492,6 +502,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
           home: Scaffold(
             body: ValueListenableBuilder<MigrationProgress>(
               valueListenable: progressNotifier,
@@ -535,6 +548,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
           home: Scaffold(
             body: LinearProgressIndicator(value: progress.fraction),
           ),

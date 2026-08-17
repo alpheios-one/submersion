@@ -7,6 +7,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_templates.dart';
 import 'package:submersion/core/constants/tank_presets.dart';
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
@@ -85,35 +86,42 @@ class _TankEditorState extends ConsumerState<TankEditor> {
         final cuft =
             match?.ratedCapacityCuft ??
             (widget.tank.volume! * widget.tank.workingPressure!) / 28.3168;
-        volumeText = cuft.toStringAsFixed(1);
+        volumeText = formatRoundedForInput(cuft, 1);
       } else {
-        volumeText = widget.tank.volume!.toStringAsFixed(1);
+        volumeText = formatRoundedForInput(widget.tank.volume!, 1);
       }
     }
 
     _volumeController = TextEditingController(text: volumeText);
     _workingPressureController = TextEditingController(
       text: widget.tank.workingPressure != null
-          ? units
-                .convertPressure(widget.tank.workingPressure!)
-                .toStringAsFixed(0)
+          ? formatRoundedForInput(
+              units.convertPressure(widget.tank.workingPressure!),
+              0,
+            )
           : '',
     );
     _startPressureController = TextEditingController(
       text: widget.tank.startPressure != null
-          ? units.convertPressure(widget.tank.startPressure!).toStringAsFixed(0)
+          ? formatRoundedForInput(
+              units.convertPressure(widget.tank.startPressure!),
+              0,
+            )
           : '',
     );
     _endPressureController = TextEditingController(
       text: widget.tank.endPressure != null
-          ? units.convertPressure(widget.tank.endPressure!).toStringAsFixed(0)
+          ? formatRoundedForInput(
+              units.convertPressure(widget.tank.endPressure!),
+              0,
+            )
           : '',
     );
     _o2Controller = TextEditingController(
-      text: widget.tank.gasMix.o2.toString(),
+      text: formatDecimalForInput(widget.tank.gasMix.o2),
     );
     _heController = TextEditingController(
-      text: widget.tank.gasMix.he.toString(),
+      text: formatDecimalForInput(widget.tank.gasMix.he),
     );
     _mndController = TextEditingController();
     _role = widget.tank.role;
@@ -155,7 +163,7 @@ class _TankEditorState extends ConsumerState<TankEditor> {
   /// imperial mode AND working pressure is available, otherwise "L".
   String _effectiveVolumeSuffix(UnitFormatter units) {
     final settings = ref.read(settingsProvider);
-    final wp = double.tryParse(_workingPressureController.text);
+    final wp = parseUserDecimal(_workingPressureController.text);
     if (settings.volumeUnit == VolumeUnit.cubicFeet && wp != null && wp > 0) {
       return units.volumeSymbol;
     }
@@ -168,8 +176,8 @@ class _TankEditorState extends ConsumerState<TankEditor> {
   ({double? volumeLiters, double? workingPressureBar}) _metricSpecs() {
     final settings = ref.read(settingsProvider);
     final units = UnitFormatter(settings);
-    final volumeDisplay = double.tryParse(_volumeController.text);
-    final workingPressureDisplay = double.tryParse(
+    final volumeDisplay = parseUserDecimal(_volumeController.text);
+    final workingPressureDisplay = parseUserDecimal(
       _workingPressureController.text,
     );
     // Convert working pressure to bar first (needed for cuft->liters).
@@ -262,8 +270,10 @@ class _TankEditorState extends ConsumerState<TankEditor> {
     final units = UnitFormatter(settings);
     final specs = _metricSpecs();
 
-    final startPressureDisplay = double.tryParse(_startPressureController.text);
-    final endPressureDisplay = double.tryParse(_endPressureController.text);
+    final startPressureDisplay = parseUserDecimal(
+      _startPressureController.text,
+    );
+    final endPressureDisplay = parseUserDecimal(_endPressureController.text);
 
     widget.onChanged(
       DiveTank(
@@ -278,8 +288,8 @@ class _TankEditorState extends ConsumerState<TankEditor> {
             ? units.pressureToBar(endPressureDisplay)
             : null,
         gasMix: GasMix(
-          o2: double.tryParse(_o2Controller.text) ?? 21.0,
-          he: double.tryParse(_heController.text) ?? 0.0,
+          o2: parseUserDecimal(_o2Controller.text) ?? 21.0,
+          he: parseUserDecimal(_heController.text) ?? 0.0,
         ),
         role: _role,
         material: _material,
@@ -298,8 +308,8 @@ class _TankEditorState extends ConsumerState<TankEditor> {
     final units = UnitFormatter(settings);
 
     final gasMix = GasMix(
-      o2: double.tryParse(_o2Controller.text) ?? 21.0,
-      he: double.tryParse(_heController.text) ?? 0.0,
+      o2: parseUserDecimal(_o2Controller.text) ?? 21.0,
+      he: parseUserDecimal(_heController.text) ?? 0.0,
     );
 
     return Card(
@@ -633,8 +643,8 @@ class _TankEditorState extends ConsumerState<TankEditor> {
                 ),
                 child: Text(
                   GasMix(
-                    o2: double.tryParse(_o2Controller.text) ?? 21.0,
-                    he: double.tryParse(_heController.text) ?? 0.0,
+                    o2: parseUserDecimal(_o2Controller.text) ?? 21.0,
+                    he: parseUserDecimal(_heController.text) ?? 0.0,
                   ).n2.toStringAsFixed(0),
                 ),
               ),
@@ -646,8 +656,8 @@ class _TankEditorState extends ConsumerState<TankEditor> {
   }
 
   Widget _buildGasChip(GasTemplate template) {
-    final currentO2 = double.tryParse(_o2Controller.text) ?? 21.0;
-    final currentHe = double.tryParse(_heController.text) ?? 0.0;
+    final currentO2 = parseUserDecimal(_o2Controller.text) ?? 21.0;
+    final currentHe = parseUserDecimal(_heController.text) ?? 0.0;
     final isSelected = currentO2 == template.o2 && currentHe == template.he;
 
     return FilterChip(
@@ -702,7 +712,9 @@ class _TankEditorState extends ConsumerState<TankEditor> {
     // Sync controller if not actively editing MND
     if (!_mndDriven) {
       final displayValue = currentMnd.isFinite
-          ? units.convertDepth(currentMnd).round().toString()
+          ? formatDecimalForInput(
+              units.convertDepth(currentMnd).roundToDouble(),
+            )
           : '';
       if (_mndController.text != displayValue) {
         _mndController.text = displayValue;
@@ -723,7 +735,7 @@ class _TankEditorState extends ConsumerState<TankEditor> {
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             onChanged: (value) {
-              final parsed = double.tryParse(value);
+              final parsed = parseUserDecimal(value);
               if (parsed != null && parsed > 0) {
                 _mndDriven = true;
                 final mndMeters = units.depthToMeters(parsed);
@@ -733,7 +745,9 @@ class _TankEditorState extends ConsumerState<TankEditor> {
                   endLimit: settings.endLimit,
                   o2Narcotic: settings.o2Narcotic,
                 );
-                _heController.text = newHe.round().toString();
+                _heController.text = formatDecimalForInput(
+                  newHe.roundToDouble(),
+                );
                 setState(() {});
                 _notifyChange();
               } else {
@@ -801,13 +815,14 @@ class _TankEditorState extends ConsumerState<TankEditor> {
       // This is because "tank size" in imperial is rated by gas capacity (e.g., AL80 = 80 cuft),
       // while metric uses physical water volume (e.g., 11.1L)
       if (settings.volumeUnit == VolumeUnit.cubicFeet) {
-        _volumeController.text = preset.volumeCuft.toStringAsFixed(1);
+        _volumeController.text = formatRoundedForInput(preset.volumeCuft, 1);
       } else {
-        _volumeController.text = preset.volumeLiters.toStringAsFixed(1);
+        _volumeController.text = formatRoundedForInput(preset.volumeLiters, 1);
       }
-      _workingPressureController.text = units
-          .convertPressure(preset.workingPressureBar)
-          .toStringAsFixed(0);
+      _workingPressureController.text = formatRoundedForInput(
+        units.convertPressure(preset.workingPressureBar),
+        0,
+      );
       // Don't overwrite startPressure with workingPressure — a tank's rated
       // pressure is its physical spec, not the actual fill pressure for a dive.
       // Profile data or user entry should set start pressure instead.
@@ -826,8 +841,8 @@ class _TankEditorState extends ConsumerState<TankEditor> {
   void _applyGasTemplate(GasTemplate template) {
     _mndDriven = false;
     setState(() {
-      _o2Controller.text = template.o2.toString();
-      _heController.text = template.he.toString();
+      _o2Controller.text = formatDecimalForInput(template.o2);
+      _heController.text = formatDecimalForInput(template.he);
     });
     _notifyChange();
   }

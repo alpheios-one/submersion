@@ -20,8 +20,11 @@ import 'package:submersion/core/services/export/uddf/uddf_export_service.dart';
 import 'package:submersion/core/services/export/uddf/uddf_full_export_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 import '../../../helpers/mock_file_picker_platform.dart';
+
+final _l10n = l10nForLocaleTag('en');
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -172,7 +175,10 @@ void main() {
       await source.writeAsString('boot\nsync ok\n');
       final target = chooses('submersion-debug-logs.txt');
 
-      expect(await saveLogFile(_FixedLogFileService(source.path)), target);
+      expect(
+        await saveLogFile(_FixedLogFileService(source.path), _l10n),
+        target,
+      );
       expect(await File(target).readAsString(), contains('sync ok'));
     });
 
@@ -180,7 +186,10 @@ void main() {
       picker.saveFileResult = Uri.file('${workDir.path}/unused.txt');
 
       expect(
-        await saveLogFile(_FixedLogFileService('${workDir.path}/absent.log')),
+        await saveLogFile(
+          _FixedLogFileService('${workDir.path}/absent.log'),
+          _l10n,
+        ),
         isNull,
       );
       expect(picker.lastSavedFileName, isNull);

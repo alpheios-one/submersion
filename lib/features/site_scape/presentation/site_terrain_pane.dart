@@ -10,8 +10,7 @@ import 'package:submersion/features/dive_3d/application/site_seascape_providers.
 import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
-import 'package:submersion/features/site_scape/presentation/site_feature_marker_layer.dart';
-import 'package:submersion/features/site_scape/presentation/site_feature_sheet.dart';
+import 'package:submersion/features/site_scape/presentation/site_feature_info_sheet.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_surface.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
@@ -33,7 +32,17 @@ import 'package:submersion/l10n/l10n_extension.dart';
 class SiteTerrainPane extends ConsumerStatefulWidget {
   final String siteId;
 
-  const SiteTerrainPane({super.key, required this.siteId});
+  /// Extra actions seated at the START of the pane's docked control card,
+  /// ahead of appearance and chart mode. Hosts use this so their own pane
+  /// controls (the 2D/3D toggle) read as one cluster with the pane's,
+  /// instead of a second card floating over the terrain.
+  final List<Widget> leadingActions;
+
+  const SiteTerrainPane({
+    super.key,
+    required this.siteId,
+    this.leadingActions = const [],
+  });
 
   @override
   ConsumerState<SiteTerrainPane> createState() => _SiteTerrainPaneState();
@@ -65,6 +74,60 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
       settingsProvider.select((s) => s.seascapeAppearance),
     );
     final depthUnit = ref.watch(settingsProvider.select((s) => s.depthUnit));
+    // The docked card wraps EVERY state, not just the ready one: hosts
+    // inject the way back to 2D through leadingActions, and a site whose
+    // seascape comes back empty would otherwise be a dead end. The pane's
+    // own actions still need a scene, so they appear only when ready.
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        _paneBody(stateAsync, appearance, depthUnit),
+        if (widget.leadingActions.isNotEmpty ||
+            stateAsync.valueOrNull is SiteSeascapeReady)
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ...widget.leadingActions,
+                    if (stateAsync.valueOrNull is SiteSeascapeReady) ...[
+                      IconButton(
+                        key: const ValueKey('seascapeAppearanceButton'),
+                        icon: const Icon(Icons.tune, size: 20),
+                        tooltip: context.l10n.dive3d_seascape_appearance,
+                        onPressed: () => showTerrainAppearanceSheet(context),
+                      ),
+                      IconButton(
+                        key: const ValueKey('seascapeChartToggle'),
+                        icon: Icon(
+                          _chartMode ? Icons.view_in_ar : Icons.map_outlined,
+                          size: 20,
+                        ),
+                        tooltip: _chartMode
+                            ? context.l10n.dive3d_seascape_orbitView
+                            : context.l10n.dive3d_seascape_chartView,
+                        onPressed: () =>
+                            setState(() => _chartMode = !_chartMode),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _paneBody(
+    AsyncValue<SiteSeascapeState> stateAsync,
+    SeascapeAppearance appearance,
+    DepthUnit depthUnit,
+  ) {
     return stateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) {
@@ -168,46 +231,6 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                         ),
                       ),
                     _hoverTooltip(grid),
-                    // Former AppBar actions, docked so any host gets them.
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 2,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                key: const ValueKey('seascapeAppearanceButton'),
-                                icon: const Icon(Icons.tune, size: 20),
-                                tooltip:
-                                    context.l10n.dive3d_seascape_appearance,
-                                onPressed: () =>
-                                    showTerrainAppearanceSheet(context),
-                              ),
-                              IconButton(
-                                key: const ValueKey('seascapeChartToggle'),
-                                icon: Icon(
-                                  _chartMode
-                                      ? Icons.view_in_ar
-                                      : Icons.map_outlined,
-                                  size: 20,
-                                ),
-                                tooltip: _chartMode
-                                    ? context.l10n.dive3d_seascape_orbitView
-                                    : context.l10n.dive3d_seascape_chartView,
-                                onPressed: () =>
-                                    setState(() => _chartMode = !_chartMode),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -228,55 +251,8 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     final features = await ref.read(siteFeaturesProvider(widget.siteId).future);
     final feature = features.where((f) => f.id == marker.refId).firstOrNull;
     if (feature == null || !mounted) return;
-    final l10n = context.l10n;
-    final depthUnit = ref.read(settingsProvider).depthUnit;
-    final unitInMeters = depthUnit == DepthUnit.feet ? 0.3048 : 1.0;
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (sheetContext) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  SiteFeatureGlyph(typeName: feature.typeName, size: 16),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      feature.name.isNotEmpty
-                          ? feature.name
-                          : siteFeatureTypeLabel(l10n, feature.typeName),
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(siteFeatureTypeLabel(l10n, feature.typeName)),
-              if (feature.depthMeters != null)
-                Text(
-                  '${l10n.siteFeature_field_depth}: '
-                  '${(feature.depthMeters! / unitInMeters).toStringAsFixed(1)} '
-                  '${depthUnit.symbol}',
-                ),
-              if (feature.bearingDeg != null)
-                Text(
-                  '${l10n.siteFeature_field_bearing}: '
-                  '${feature.bearingDeg!.round()}',
-                ),
-              if (feature.notes.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(feature.notes),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
+    // No onEdit: the 2D map owns placement and editing.
+    await showSiteFeatureInfoSheet(context, ref, feature);
   }
 
   /// The hover readout, clamped inside the viewport by the shared layout

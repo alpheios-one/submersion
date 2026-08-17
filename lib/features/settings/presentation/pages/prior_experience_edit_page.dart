@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -56,11 +57,16 @@ class _PriorExperienceEditPageState
   void _populateFromDiver(Diver diver) {
     if (_populated) return;
     _populated = true;
-    _diveCountCtrl.text = diver.priorDiveCount?.toString() ?? '';
+    final count = diver.priorDiveCount;
+    _diveCountCtrl.text = count == null
+        ? ''
+        : formatDecimalForInput(count.toDouble());
     final seconds = diver.priorDiveTimeSeconds;
     if (seconds != null) {
-      _hoursCtrl.text = (seconds ~/ 3600).toString();
-      _minutesCtrl.text = ((seconds % 3600) ~/ 60).toString();
+      _hoursCtrl.text = formatDecimalForInput((seconds ~/ 3600).toDouble());
+      _minutesCtrl.text = formatDecimalForInput(
+        ((seconds % 3600) ~/ 60).toDouble(),
+      );
     }
     _divingSince = diver.divingSince;
     _hasChanges = false;
@@ -72,12 +78,12 @@ class _PriorExperienceEditPageState
     setState(() => _isSaving = true);
 
     try {
-      final priorCount = int.tryParse(_diveCountCtrl.text.trim());
+      final priorCount = parseUserInt(_diveCountCtrl.text);
       final hStr = _hoursCtrl.text.trim();
       final mStr = _minutesCtrl.text.trim();
       final priorSeconds = (hStr.isEmpty && mStr.isEmpty)
           ? null
-          : (int.tryParse(hStr) ?? 0) * 3600 + (int.tryParse(mStr) ?? 0) * 60;
+          : (parseUserInt(hStr) ?? 0) * 3600 + (parseUserInt(mStr) ?? 0) * 60;
 
       final updated = existingDiver.copyWith(
         priorDiveCount: priorCount,
@@ -219,7 +225,7 @@ class _PriorExperienceEditPageState
 
   String? _nonNegativeInt(String? v, {int? max}) {
     if (v == null || v.trim().isEmpty) return null;
-    final n = int.tryParse(v.trim());
+    final n = parseUserInt(v);
     if (n == null || n < 0) {
       return context.l10n.divers_edit_priorInvalidNumber;
     }

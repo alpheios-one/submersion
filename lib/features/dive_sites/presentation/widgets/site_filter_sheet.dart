@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
@@ -278,7 +279,7 @@ class _SiteFilterSheetState extends ConsumerState<SiteFilterSheet> {
                 ),
                 onChanged: (value) {
                   setState(() {
-                    _minDepth = double.tryParse(value);
+                    _minDepth = parseUserDecimal(value);
                   });
                 },
               ),
@@ -298,7 +299,7 @@ class _SiteFilterSheetState extends ConsumerState<SiteFilterSheet> {
                 ),
                 onChanged: (value) {
                   setState(() {
-                    _maxDepth = double.tryParse(value);
+                    _maxDepth = parseUserDecimal(value);
                   });
                 },
               ),
