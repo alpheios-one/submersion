@@ -136,7 +136,9 @@ class EntityTableColumnPicker<F extends EntityField> extends ConsumerWidget {
                           index: index,
                           child: const Icon(Icons.drag_handle),
                         ),
-                        title: Text(col.field.displayName),
+                        title: Text(
+                          col.field.localizedDisplayName(context.l10n),
+                        ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -148,7 +150,9 @@ class EntityTableColumnPicker<F extends EntityField> extends ConsumerWidget {
                                 size: 18,
                               ),
                               visualDensity: VisualDensity.compact,
-                              tooltip: col.isPinned ? 'Unpin' : 'Pin',
+                              tooltip: col.isPinned
+                                  ? context.l10n.common_action_unpin
+                                  : context.l10n.common_action_pin,
                               onPressed: () => notifier.togglePin(col.field),
                             ),
                             if (!col.isPinned)
@@ -158,7 +162,7 @@ class EntityTableColumnPicker<F extends EntityField> extends ConsumerWidget {
                                   size: 18,
                                 ),
                                 visualDensity: VisualDensity.compact,
-                                tooltip: 'Remove',
+                                tooltip: context.l10n.common_action_remove,
                                 onPressed: () =>
                                     notifier.toggleColumn(col.field),
                               ),
@@ -230,7 +234,7 @@ class _AvailableCategorySection<F extends EntityField> extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
           child: Text(
-            categoryName.toUpperCase(),
+            localizedFieldCategory(context.l10n, categoryName).toUpperCase(),
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               letterSpacing: 0.8,
@@ -241,11 +245,11 @@ class _AvailableCategorySection<F extends EntityField> extends StatelessWidget {
           ListTile(
             dense: true,
             leading: field.icon != null ? Icon(field.icon, size: 18) : null,
-            title: Text(field.displayName),
+            title: Text(field.localizedDisplayName(context.l10n)),
             trailing: IconButton(
               icon: const Icon(Icons.add_circle_outline, size: 18),
               visualDensity: VisualDensity.compact,
-              tooltip: 'Add',
+              tooltip: context.l10n.common_action_add,
               onPressed: () => onAdd(field),
             ),
           ),

@@ -42,6 +42,7 @@ import 'package:submersion/features/dive_log/presentation/providers/gas_switch_p
 import 'package:submersion/features/dive_log/presentation/providers/profile_analysis_provider.dart';
 import 'package:submersion/features/dive_log/presentation/pages/fullscreen_profile_page.dart';
 import 'package:submersion/features/dive_log/presentation/utils/sac_normalization.dart';
+import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_overlay_provider.dart';
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart';
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
@@ -1355,68 +1356,54 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               ),
               // Content
               content,
-              // Map / 3D pills: deep links into the unified sites map.
+              // View Site button
               if (site != null)
                 Positioned(
                   right: 8,
                   top: 8,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _sitePill(
-                        context,
-                        icon: Icons.map_outlined,
-                        label: context.l10n.diveLog_detail_viewMap,
-                        onTap: () => context.push('/sites/map?site=${site.id}'),
-                      ),
-                      const SizedBox(width: 6),
-                      _sitePill(
-                        context,
-                        icon: Icons.terrain,
-                        label: context.l10n.diveLog_detail_view3d,
-                        onTap: () =>
-                            context.push('/sites/map?site=${site.id}&scape=3d'),
-                      ),
-                    ],
+                  // Decorative label only: no gesture recognizer of its own.
+                  // It is a DESCENDANT of the card's InkWell, so the hit path
+                  // still reaches that ancestor and the whole card stays one
+                  // tap target. Giving this badge its own onTap would carve a
+                  // competing recognizer out of the card (see the badge tap
+                  // test).
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.arrow_forward,
+                          size: 14,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          context.l10n.diveLog_detail_viewSite,
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// One compact tappable header pill (Map or 3D), styled like the old
-  /// "View Site" badge but carrying its own deep-link tap.
-  Widget _sitePill(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      color: colorScheme.primaryContainer,
-      borderRadius: BorderRadius.circular(16),
-      elevation: 2,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 14, color: colorScheme.onPrimaryContainer),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ],
           ),
         ),
@@ -3511,7 +3498,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${(pressure * 1000).toStringAsFixed(0)} mbar',
+                        units.formatSurfacePressure(pressure),
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.secondary,
@@ -4117,7 +4104,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   Widget _buildLinkedComputerRow(BuildContext context, DiveComputer computer) {
     return Semantics(
       button: true,
-      label: 'View dive computer ${computer.displayName}',
+      label: context.l10n.diveLog_detail_semantics_viewDiveComputer(
+        computer.displayName,
+      ),
       child: InkWell(
         onTap: () => context.push('/dive-computers/${computer.id}'),
         child: Padding(
@@ -4147,7 +4136,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                           if (computer.serialNumber != null &&
                               computer.serialNumber!.isNotEmpty)
                             Text(
-                              'S/N ${computer.serialNumber}',
+                              context.l10n.diveLog_detail_serialNumber(
+                                computer.serialNumber!,
+                              ),
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: Theme.of(
@@ -4181,7 +4172,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     final trip = dive.trip!;
     return Semantics(
       button: true,
-      label: 'View trip ${trip.name}',
+      label: context.l10n.diveLog_detail_semantics_viewTrip(trip.name),
       child: InkWell(
         onTap: () => context.push('/trips/${trip.id}'),
         child: Padding(
@@ -4243,7 +4234,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   Widget _buildDiveCenterRow(BuildContext context, Dive dive) {
     return Semantics(
       button: true,
-      label: 'View dive center ${dive.diveCenter!.name}',
+      label: context.l10n.diveLog_detail_semantics_viewDiveCenter(
+        dive.diveCenter!.name,
+      ),
       child: InkWell(
         onTap: () => context.push('/dive-centers/${dive.diveCenter!.id}'),
         child: Padding(
@@ -4511,7 +4504,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   Widget _buildSightingTile(BuildContext context, Sighting sighting) {
     return Semantics(
       button: true,
-      label: 'View species ${sighting.speciesName}',
+      label: context.l10n.diveLog_detail_semantics_viewSpecies(
+        localizedSpeciesName(
+          context.l10n,
+          sighting.speciesId,
+          sighting.speciesName,
+        ),
+      ),
       child: InkWell(
         onTap: () => context.push('/species/${sighting.speciesId}'),
         borderRadius: BorderRadius.circular(8),
@@ -4536,7 +4535,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      sighting.speciesName,
+                      localizedSpeciesName(
+                        context.l10n,
+                        sighting.speciesId,
+                        sighting.speciesName,
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
@@ -4850,7 +4853,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 if (courseAsync.hasValue && courseAsync.value != null) ...[
                   Semantics(
                     button: true,
-                    label: 'View course ${courseAsync.value!.name}',
+                    label: context.l10n.diveLog_detail_semantics_viewCourse(
+                      courseAsync.value!.name,
+                    ),
                     child: InkWell(
                       onTap: () =>
                           context.push('/courses/${courseAsync.value!.id}'),
@@ -4913,7 +4918,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               error: (error, _) => Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  'Error loading signature: $error',
+                  context.l10n.diveLog_detail_errorLoadingSignature('$error'),
                   style: TextStyle(color: colorScheme.error),
                 ),
               ),

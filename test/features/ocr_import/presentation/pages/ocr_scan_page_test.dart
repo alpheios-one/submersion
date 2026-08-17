@@ -59,10 +59,16 @@ void main() {
     await tmpDir.delete(recursive: true);
   });
 
-  // Taps a button whose handler does real file IO (readAsBytes), which
-  // only progresses inside runAsync in the FakeAsync test zone. Bounded
-  // pumps instead of pumpAndSettle: the processing spinner animates
-  // until navigation replaces the page.
+  // Taps a button whose handler does real file IO (readAsBytes) and awaits a
+  // database-backed provider, both of which only progress inside runAsync in
+  // the FakeAsync test zone. Bounded pumps instead of pumpAndSettle: the
+  // processing spinner animates until navigation replaces the page.
+  //
+  // The handler's duration is real wall-clock time and scales with machine
+  // load, so a single fixed delay is a race: when it expires early the widget
+  // unmounts mid-flight and the handler's `ref` use throws. Wait for the
+  // spinner to actually clear instead, with a ceiling so a genuine hang still
+  // fails rather than spinning forever.
   Future<void> tapAndProcess(WidgetTester tester, String label) async {
     await tester.runAsync(() async {
       await tester.tap(find.text(label));
@@ -70,6 +76,15 @@ void main() {
     });
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
+
+    for (var i = 0; i < 100; i++) {
+      if (find.byType(CircularProgressIndicator).evaluate().isEmpty) return;
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+    }
   }
 
   Future<({List<Object?> pushedExtras})> pumpScanPage(

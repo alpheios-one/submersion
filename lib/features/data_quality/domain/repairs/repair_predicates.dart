@@ -45,6 +45,12 @@ abstract final class RepairPredicates {
     return (c - a).abs() / 2 <= QualityThresholds.tempJumpPerSampleC;
   }
 
+  /// Reinterpret a reading stored as Celsius on the scale it was really
+  /// recorded on. The single definition behind both the plausibility test
+  /// and the conversion repairs, so what is checked is what is applied.
+  static double convertToCelsius(double t, {required bool kelvinScale}) =>
+      kelvinScale ? t - 273.15 : (t - 32) * 5 / 9;
+
   /// Whether reinterpreting a whole temperature channel on another scale
   /// lands every reading inside the plausible water-temperature range. Only
   /// then is a unit conversion the explanation for an out-of-range channel --
@@ -55,7 +61,7 @@ abstract final class RepairPredicates {
   }) {
     if (temps.isEmpty) return false;
     for (final t in temps) {
-      final c = kelvinScale ? t - 273.15 : (t - 32) * 5 / 9;
+      final c = convertToCelsius(t, kelvinScale: kelvinScale);
       if (c < QualityThresholds.waterTempMinC ||
           c > QualityThresholds.waterTempMaxC) {
         return false;

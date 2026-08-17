@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -12,8 +15,17 @@ void showTerrainAppearanceSheet(BuildContext context) {
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => const SafeArea(
-      child: SingleChildScrollView(child: TerrainAppearanceSheet()),
+    // The custom-level rows open a keypad. Without a viewInsets pad the sheet
+    // keeps its full height, so the lower rows and the add button sit behind
+    // the keyboard with no scroll extent left to bring them up (issue #1094).
+    builder: (sheetContext) => SafeArea(
+      child: Padding(
+        key: const ValueKey('terrainAppearanceSheetInsets'),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
+        ),
+        child: const SingleChildScrollView(child: TerrainAppearanceSheet()),
+      ),
     ),
   );
 }
@@ -41,6 +53,13 @@ class TerrainAppearanceSheet extends ConsumerWidget {
   /// diver with 32.8 rather than a round number.
   static const double _defaultNewLevelDisplay = 10.0;
 
+  /// Vertical rhythm. The sheet stacks segmented buttons, switches, sliders
+  /// and a row editor, each of which brings its own padding, so the gaps are
+  /// named here to keep one consistent scale instead of ad-hoc spacers.
+  static const _labelGap = SizedBox(height: 8);
+  static const _controlGap = SizedBox(height: 16);
+  static const _sectionRule = Divider(height: 40);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
@@ -53,11 +72,8 @@ class TerrainAppearanceSheet extends ConsumerWidget {
     void update(SeascapeAppearance next) =>
         notifier.setSeascapeAppearance(next);
 
-    String depthText(double meters) {
-      final v = meters / unitInMeters;
-      final text = v % 1 == 0 ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
-      return '$text ${depthUnit.symbol}';
-    }
+    String depthText(double meters) =>
+        '${_formatDisplay(meters / unitInMeters)} ${depthUnit.symbol}';
 
     final rampMax = appearance.rampMaxDepthMeters;
     return Padding(
@@ -70,9 +86,9 @@ class TerrainAppearanceSheet extends ConsumerWidget {
             l10n.dive3d_seascape_appearance,
             style: Theme.of(context).textTheme.titleMedium,
           ),
-          const SizedBox(height: 12),
+          _controlGap,
           Text(l10n.dive3d_seascape_appearance_surface),
-          const SizedBox(height: 8),
+          _labelGap,
           SegmentedButton<SeascapeSurfaceMode>(
             key: const ValueKey('seascapeSurfaceModeSegments'),
             segments: [
@@ -93,6 +109,7 @@ class TerrainAppearanceSheet extends ConsumerWidget {
             onSelectionChanged: (sel) =>
                 update(appearance.copyWith(surfaceMode: sel.single)),
           ),
+          _controlGap,
           SwitchListTile(
             key: const ValueKey('seascapeRampRangeSwitch'),
             contentPadding: EdgeInsets.zero,
@@ -130,9 +147,9 @@ class TerrainAppearanceSheet extends ConsumerWidget {
             value: appearance.rampBanded,
             onChanged: (on) => update(appearance.copyWith(rampBanded: on)),
           ),
-          const Divider(),
+          _sectionRule,
           Text(l10n.dive3d_seascape_appearance_contours),
-          const SizedBox(height: 8),
+          _labelGap,
           SegmentedButton<SeascapeContourMode>(
             key: const ValueKey('seascapeContourModeSegments'),
             segments: [
@@ -150,8 +167,16 @@ class TerrainAppearanceSheet extends ConsumerWidget {
                 update(appearance.copyWith(contourMode: sel.single)),
           ),
           if (appearance.contourMode == SeascapeContourMode.custom) ...[
+            _labelGap,
             for (var i = 0; i < appearance.customLevels.length; i++)
-              _levelRow(context, appearance, i, unitInMeters, update),
+              _LevelRow(
+                key: ValueKey('seascapeLevelRow$i'),
+                index: i,
+                level: appearance.customLevels[i],
+                unitInMeters: unitInMeters,
+                unitSymbol: depthUnit.symbol,
+                notifier: notifier,
+              ),
             TextButton.icon(
               key: const ValueKey('seascapeAddLevelButton'),
               icon: const Icon(Icons.add),
@@ -168,6 +193,7 @@ class TerrainAppearanceSheet extends ConsumerWidget {
               ),
             ),
           ],
+          _sectionRule,
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(l10n.dive3d_seascape_appearance_wallAngle),
@@ -190,78 +216,228 @@ class TerrainAppearanceSheet extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _levelRow(
-    BuildContext context,
+/// Depth in the diver's unit, trimmed to a whole number when it is one and
+/// written with the diver's decimal separator so the field can be read back
+/// (#1091).
+String _formatDisplay(double display) => formatRoundedForInput(display, 1);
+
+/// One custom contour level. Stateful because the depth box owns a controller:
+/// a decimal keypad offers no submit key, so the row commits when the field
+/// loses focus and again if the sheet is dismissed with an edit still pending
+/// (issue #1094 — typed levels used to be discarded outright).
+///
+/// Every mutation reads the CURRENT appearance out of the container rather
+/// than a value captured at build time, so a commit that lands after the row
+/// is gone cannot resurrect a level the diver just deleted.
+class _LevelRow extends StatefulWidget {
+  final int index;
+  final SeascapeContourLevel level;
+  final double unitInMeters;
+  final String unitSymbol;
+  final SettingsNotifier notifier;
+
+  const _LevelRow({
+    super.key,
+    required this.index,
+    required this.level,
+    required this.unitInMeters,
+    required this.unitSymbol,
+    required this.notifier,
+  });
+
+  @override
+  State<_LevelRow> createState() => _LevelRowState();
+}
+
+class _LevelRowState extends State<_LevelRow> {
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+
+  /// Captured once so a commit deferred past disposal still has a live handle
+  /// to read the settings from; `listen: false` because this runs outside
+  /// build. The app-level container outlives the sheet.
+  late final ProviderContainer _container;
+
+  double get _display => widget.level.depthMeters / widget.unitInMeters;
+
+  /// Null once the scope is gone. The disposal commit runs during teardown,
+  /// which in tests can land after the container has been torn down, and
+  /// reading a disposed container throws. Disposing a container disposes its
+  /// notifiers too, so the notifier's mounted flag is the public proxy for
+  /// "is this container still readable".
+  SeascapeAppearance? get _appearance => widget.notifier.mounted
+      ? _container.read(settingsProvider).seascapeAppearance
+      : null;
+
+  @override
+  void initState() {
+    super.initState();
+    _container = ProviderScope.containerOf(context, listen: false);
+    _controller = TextEditingController(text: _formatDisplay(_display));
+    _focusNode = FocusNode()..addListener(_onFocusChange);
+  }
+
+  @override
+  void didUpdateWidget(covariant _LevelRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Rows are keyed by index, so a deleted row shifts its neighbours up and a
+    // unit switch restates every level. Re-seed whenever the value this row
+    // represents actually moved; mid-typing it never does, so this cannot
+    // clobber the diver's keystrokes.
+    final wasDisplay = oldWidget.level.depthMeters / oldWidget.unitInMeters;
+    if ((wasDisplay - _display).abs() > 1e-9) {
+      _controller.text = _formatDisplay(_display);
+    }
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    final pending = _pendingAppearance();
+    if (pending != null) {
+      // Unmounting runs inside a state-locked finalizeTree, so notifying
+      // Riverpod here directly would trip markNeedsBuild. Land it after.
+      final notifier = widget.notifier;
+      scheduleMicrotask(() {
+        if (notifier.mounted) notifier.setSeascapeAppearance(pending);
+      });
+    }
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (_focusNode.hasFocus || !mounted) return;
+    final pending = _pendingAppearance();
+    if (pending != null) {
+      widget.notifier.setSeascapeAppearance(pending);
+    } else {
+      // Unparseable or non-positive: put the stored level back on screen
+      // rather than leaving a number that will never be adopted.
+      _controller.text = _formatDisplay(_display);
+    }
+  }
+
+  /// The appearance this row's box would produce, or null when the text is
+  /// unusable or already matches what is stored.
+  SeascapeAppearance? _pendingAppearance() {
+    // Read in the diver's locale, matching _formatDisplay. A blanket
+    // replaceAll(',', '.') would misread the en_US thousands separator,
+    // turning "1,250" into 1.25 (#1091).
+    final typed = parseUserDecimal(_controller.text);
+    if (typed == null || !typed.isFinite || typed <= 0) return null;
+    final appearance = _appearance;
+    if (appearance == null || widget.index >= appearance.customLevels.length) {
+      return null;
+    }
+    final current = appearance.customLevels[widget.index];
+    // Compare in DISPLAY space at the precision the box actually shows. The
+    // box renders one decimal, so 30 m reads as "98.4" ft and parsing that
+    // back gives 29.99232 m; a metres comparison would call that an edit and
+    // shave the level a little on every blur and every dismissal.
+    if (_formatDisplay(current.depthMeters / widget.unitInMeters) ==
+        _formatDisplay(typed)) {
+      return null;
+    }
+    final meters = typed * widget.unitInMeters;
+    return appearance.copyWith(
+      customLevels: _replace(
+        appearance,
+        SeascapeContourLevel(depthMeters: meters, colorArgb: current.colorArgb),
+      ),
+    );
+  }
+
+  List<SeascapeContourLevel> _replace(
     SeascapeAppearance appearance,
-    int index,
-    double unitInMeters,
-    void Function(SeascapeAppearance) update,
-  ) {
-    final level = appearance.customLevels[index];
-    List<SeascapeContourLevel> withLevel(SeascapeContourLevel? next) => [
-      for (var i = 0; i < appearance.customLevels.length; i++)
-        if (i != index) appearance.customLevels[i] else ?next,
-    ];
-    final display = level.depthMeters / unitInMeters;
-    return Row(
-      children: [
-        SizedBox(
-          width: 96,
-          child: TextFormField(
-            key: ValueKey('seascapeLevelField$index'),
-            initialValue: display % 1 == 0
-                ? display.toStringAsFixed(0)
-                : display.toStringAsFixed(1),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            onFieldSubmitted: (text) {
-              final v = double.tryParse(text.replaceAll(',', '.'));
-              if (v == null || v <= 0) return;
-              update(
-                appearance.copyWith(
-                  customLevels: withLevel(
-                    SeascapeContourLevel(
-                      depthMeters: v * unitInMeters,
-                      colorArgb: level.colorArgb,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(width: 12),
-        DropdownButton<int?>(
-          key: ValueKey('seascapeLevelColor$index'),
-          value: level.colorArgb,
-          items: [
-            for (final c in _palette)
-              DropdownMenuItem(
-                value: c,
-                child: c == null
-                    ? Text(context.l10n.dive3d_seascape_appearance_defaultColor)
-                    : CircleAvatar(radius: 8, backgroundColor: Color(c)),
+    SeascapeContourLevel? next,
+  ) => [
+    for (var i = 0; i < appearance.customLevels.length; i++)
+      if (i != widget.index) appearance.customLevels[i] else ?next,
+  ];
+
+  void _write(SeascapeContourLevel? next) {
+    final appearance = _appearance;
+    if (appearance == null || widget.index >= appearance.customLevels.length) {
+      return;
+    }
+    widget.notifier.setSeascapeAppearance(
+      appearance.copyWith(customLevels: _replace(appearance, next)),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      // The boxes carry their own border, so without this the rows read as
+      // one dense block rather than a list.
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 120,
+            child: TextField(
+              key: ValueKey('seascapeLevelField${widget.index}'),
+              controller: _controller,
+              focusNode: _focusNode,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
               ),
-          ],
-          onChanged: (c) => update(
-            appearance.copyWith(
-              customLevels: withLevel(
+              textInputAction: TextInputAction.done,
+              // The bare number read as ambiguous between metres and feet
+              // (issue #1094); the box now carries the diver's own unit.
+              decoration: InputDecoration(suffixText: widget.unitSymbol),
+              onTapOutside: (_) => _focusNode.unfocus(),
+              onEditingComplete: _focusNode.unfocus,
+              onSubmitted: (_) => _focusNode.unfocus(),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Expanded rather than a trailing Spacer: the "default ink" entry is a
+          // translated phrase, and a Spacer cannot give back space once the row
+          // is full, so a long translation used to overflow a phone row.
+          Expanded(
+            child: DropdownButton<int?>(
+              key: ValueKey('seascapeLevelColor${widget.index}'),
+              value: widget.level.colorArgb,
+              isExpanded: true,
+              items: [
+                for (final c in TerrainAppearanceSheet._palette)
+                  DropdownMenuItem(
+                    value: c,
+                    child: c == null
+                        ? Text(
+                            context
+                                .l10n
+                                .dive3d_seascape_appearance_defaultColor,
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        : CircleAvatar(radius: 8, backgroundColor: Color(c)),
+                  ),
+              ],
+              onChanged: (c) => _write(
                 SeascapeContourLevel(
-                  depthMeters: level.depthMeters,
+                  depthMeters: widget.level.depthMeters,
                   colorArgb: c,
                 ),
               ),
             ),
           ),
-        ),
-        const Spacer(),
-        IconButton(
-          key: ValueKey('seascapeLevelRemove$index'),
-          icon: const Icon(Icons.delete_outline),
-          onPressed: () =>
-              update(appearance.copyWith(customLevels: withLevel(null))),
-        ),
-      ],
+          IconButton(
+            key: ValueKey('seascapeLevelRemove${widget.index}'),
+            icon: const Icon(Icons.delete_outline),
+            onPressed: () {
+              // Drop focus first so the row being removed cannot commit its old
+              // text back over the shifted list on the way out.
+              _focusNode.unfocus();
+              _write(null);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

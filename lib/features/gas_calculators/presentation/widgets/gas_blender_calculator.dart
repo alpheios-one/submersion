@@ -4,6 +4,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
@@ -108,7 +109,9 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
     super.dispose();
   }
 
-  double _num(String s) => double.tryParse(s.replaceAll(',', '.')) ?? 0;
+  /// Read in the diver's locale. A blanket replaceAll(',', '.') would misread
+  /// the en_US thousands separator, turning "1,250" into 1.25 (#1091).
+  double _num(String s) => parseUserDecimal(s) ?? 0;
 
   void _updateMix(
     StateProvider<GasMix> provider,

@@ -5,6 +5,7 @@ import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/constants/entity_field.dart';
 
 /// Enumeration of every field from the [EquipmentItem] entity that can appear
@@ -81,6 +82,53 @@ enum EquipmentField implements EntityField {
     EquipmentField.daysUntilService => 'Days Left',
     EquipmentField.serviceIntervalDays => 'Interval',
     EquipmentField.notes => 'Notes',
+  };
+
+  @override
+  String localizedDisplayName(AppLocalizations l10n) => switch (this) {
+    EquipmentField.itemName => l10n.enum_equipmentField_itemName,
+    EquipmentField.fullName => l10n.enum_equipmentField_fullName,
+    EquipmentField.type => l10n.enum_equipmentField_type,
+    EquipmentField.brand => l10n.enum_equipmentField_brand,
+    EquipmentField.model => l10n.enum_equipmentField_model,
+    EquipmentField.serialNumber => l10n.enum_equipmentField_serialNumber,
+    EquipmentField.size => l10n.enum_equipmentField_size,
+    EquipmentField.status => l10n.enum_equipmentField_status,
+    EquipmentField.isActive => l10n.enum_equipmentField_isActive,
+    EquipmentField.purchaseDate => l10n.enum_equipmentField_purchaseDate,
+    EquipmentField.purchasePrice => l10n.enum_equipmentField_purchasePrice,
+    EquipmentField.lastServiceDate => l10n.enum_equipmentField_lastServiceDate,
+    EquipmentField.nextServiceDue => l10n.enum_equipmentField_nextServiceDue,
+    EquipmentField.daysUntilService =>
+      l10n.enum_equipmentField_daysUntilService,
+    EquipmentField.serviceIntervalDays =>
+      l10n.enum_equipmentField_serviceIntervalDays,
+    EquipmentField.notes => l10n.enum_equipmentField_notes,
+  };
+
+  @override
+  String localizedShortLabel(AppLocalizations l10n) => switch (this) {
+    EquipmentField.itemName => l10n.enum_equipmentField_itemName_short,
+    EquipmentField.fullName => l10n.enum_equipmentField_fullName_short,
+    EquipmentField.type => l10n.enum_equipmentField_type_short,
+    EquipmentField.brand => l10n.enum_equipmentField_brand_short,
+    EquipmentField.model => l10n.enum_equipmentField_model_short,
+    EquipmentField.serialNumber => l10n.enum_equipmentField_serialNumber_short,
+    EquipmentField.size => l10n.enum_equipmentField_size_short,
+    EquipmentField.status => l10n.enum_equipmentField_status_short,
+    EquipmentField.isActive => l10n.enum_equipmentField_isActive_short,
+    EquipmentField.purchaseDate => l10n.enum_equipmentField_purchaseDate_short,
+    EquipmentField.purchasePrice =>
+      l10n.enum_equipmentField_purchasePrice_short,
+    EquipmentField.lastServiceDate =>
+      l10n.enum_equipmentField_lastServiceDate_short,
+    EquipmentField.nextServiceDue =>
+      l10n.enum_equipmentField_nextServiceDue_short,
+    EquipmentField.daysUntilService =>
+      l10n.enum_equipmentField_daysUntilService_short,
+    EquipmentField.serviceIntervalDays =>
+      l10n.enum_equipmentField_serviceIntervalDays_short,
+    EquipmentField.notes => l10n.enum_equipmentField_notes_short,
   };
 
   @override

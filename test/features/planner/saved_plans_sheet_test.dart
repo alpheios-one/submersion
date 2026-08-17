@@ -241,6 +241,31 @@ void main() {
     expect(find.text('Compare'), findsOneWidget);
   });
 
+  /// Taps Import and waits for the handler to actually finish.
+  ///
+  /// The import does real file and database I/O, which only progresses inside
+  /// runAsync. Its duration is wall-clock and scales with machine load, so a
+  /// single fixed delay is a race rather than a wait: poll until [done] holds,
+  /// with a ceiling so a genuine hang still fails.
+  Future<void> tapImportAndSettle(WidgetTester tester) async {
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Import'));
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    });
+    await tester.pumpAndSettle();
+
+    for (var i = 0; i < 100; i++) {
+      final done =
+          find.textContaining('plan:').evaluate().isNotEmpty ||
+          find.byType(SnackBar).evaluate().isNotEmpty;
+      if (done) return;
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await tester.pumpAndSettle();
+    }
+  }
+
   testWidgets('import reads a .subplan file and opens the imported plan', (
     tester,
   ) async {
@@ -255,11 +280,7 @@ void main() {
 
     await openSheet(tester);
     // The import does real file + DB I/O; runAsync lets it complete.
-    await tester.runAsync(() async {
-      await tester.tap(find.text('Import'));
-      await Future<void>.delayed(const Duration(milliseconds: 200));
-    });
-    await tester.pumpAndSettle();
+    await tapImportAndSettle(tester);
 
     // Imported with a fresh id, so the route lands on the new plan page.
     expect(find.textContaining('plan:'), findsOneWidget);
@@ -279,11 +300,7 @@ void main() {
       ..pickFilesResult = [FakePlatformFile(file.path, name: 'bad.subplan')];
 
     await openSheet(tester);
-    await tester.runAsync(() async {
-      await tester.tap(find.text('Import'));
-      await Future<void>.delayed(const Duration(milliseconds: 200));
-    });
-    await tester.pumpAndSettle();
+    await tapImportAndSettle(tester);
 
     // The FormatException is caught and surfaced, not thrown out of the sheet.
     expect(find.byType(SnackBar), findsOneWidget);

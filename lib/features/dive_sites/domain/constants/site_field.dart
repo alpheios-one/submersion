@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/constants/entity_field.dart';
 
 /// Wrapper pairing a [DiveSite] with its computed dive count.
@@ -156,6 +157,60 @@ enum SiteField implements EntityField {
         return 'Lon';
     }
   }
+
+  @override
+  String localizedDisplayName(AppLocalizations l10n) => switch (this) {
+    SiteField.siteName => l10n.enum_siteField_siteName,
+    SiteField.location => l10n.enum_siteField_location,
+    SiteField.country => l10n.enum_siteField_country,
+    SiteField.region => l10n.enum_siteField_region,
+    SiteField.city => l10n.enum_siteField_city,
+    SiteField.island => l10n.enum_siteField_island,
+    SiteField.bodyOfWater => l10n.enum_siteField_bodyOfWater,
+    SiteField.diveCount => l10n.enum_siteField_diveCount,
+    SiteField.maxDepth => l10n.enum_siteField_maxDepth,
+    SiteField.minDepth => l10n.enum_siteField_minDepth,
+    SiteField.altitude => l10n.enum_siteField_altitude,
+    SiteField.waterType => l10n.enum_siteField_waterType,
+    SiteField.typicalVisibility => l10n.enum_siteField_typicalVisibility,
+    SiteField.typicalCurrent => l10n.enum_siteField_typicalCurrent,
+    SiteField.difficulty => l10n.enum_siteField_difficulty,
+    SiteField.entryType => l10n.enum_siteField_entryType,
+    SiteField.bestSeason => l10n.enum_siteField_bestSeason,
+    SiteField.mooringNumber => l10n.enum_siteField_mooringNumber,
+    SiteField.hazards => l10n.enum_siteField_hazards,
+    SiteField.rating => l10n.enum_siteField_rating,
+    SiteField.notes => l10n.enum_siteField_notes,
+    SiteField.latitude => l10n.enum_siteField_latitude,
+    SiteField.longitude => l10n.enum_siteField_longitude,
+  };
+
+  @override
+  String localizedShortLabel(AppLocalizations l10n) => switch (this) {
+    SiteField.siteName => l10n.enum_siteField_siteName_short,
+    SiteField.location => l10n.enum_siteField_location_short,
+    SiteField.country => l10n.enum_siteField_country_short,
+    SiteField.region => l10n.enum_siteField_region_short,
+    SiteField.city => l10n.enum_siteField_city_short,
+    SiteField.island => l10n.enum_siteField_island_short,
+    SiteField.bodyOfWater => l10n.enum_siteField_bodyOfWater_short,
+    SiteField.diveCount => l10n.enum_siteField_diveCount_short,
+    SiteField.maxDepth => l10n.enum_siteField_maxDepth_short,
+    SiteField.minDepth => l10n.enum_siteField_minDepth_short,
+    SiteField.altitude => l10n.enum_siteField_altitude_short,
+    SiteField.waterType => l10n.enum_siteField_waterType_short,
+    SiteField.typicalVisibility => l10n.enum_siteField_typicalVisibility_short,
+    SiteField.typicalCurrent => l10n.enum_siteField_typicalCurrent_short,
+    SiteField.difficulty => l10n.enum_siteField_difficulty_short,
+    SiteField.entryType => l10n.enum_siteField_entryType_short,
+    SiteField.bestSeason => l10n.enum_siteField_bestSeason_short,
+    SiteField.mooringNumber => l10n.enum_siteField_mooringNumber_short,
+    SiteField.hazards => l10n.enum_siteField_hazards_short,
+    SiteField.rating => l10n.enum_siteField_rating_short,
+    SiteField.notes => l10n.enum_siteField_notes_short,
+    SiteField.latitude => l10n.enum_siteField_latitude_short,
+    SiteField.longitude => l10n.enum_siteField_longitude_short,
+  };
 
   @override
   IconData? get icon {

@@ -6,6 +6,7 @@ import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_field.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
+import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -732,7 +733,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       currentField: sort.field,
       currentDirection: sort.direction,
       fields: DiveSortField.values,
-      getFieldDisplayName: (field) => field.displayName,
+      getFieldDisplayName: (field) => field.localizedName(context.l10n),
       getFieldIcon: (field) => field.icon,
       onSortChanged: (field, direction) {
         ref.read(diveSortProvider.notifier).state = SortState(
@@ -1438,8 +1439,10 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     if (filter.startDate != null || filter.endDate != null) {
       String dateText;
       if (filter.startDate != null && filter.endDate != null) {
-        dateText =
-            '${units.formatMonthDay(filter.startDate)} - ${units.formatMonthDay(filter.endDate)}';
+        dateText = context.l10n.diveLog_filterChip_dateRange(
+          units.formatMonthDay(filter.startDate),
+          units.formatMonthDay(filter.endDate),
+        );
       } else if (filter.startDate != null) {
         dateText = context.l10n.diveLog_filterChip_from(
           units.formatMonthDay(filter.startDate),
@@ -1478,7 +1481,8 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
     if (filter.siteId != null) {
       final siteName =
-          ref.watch(siteProvider(filter.siteId!)).value?.name ?? 'Site';
+          ref.watch(siteProvider(filter.siteId!)).value?.name ??
+          context.l10n.diveLog_edit_row_site;
       chips.add(
         _buildFilterChip(context, siteName, () {
           ref.read(diveFilterProvider.notifier).state = filter.copyWith(
@@ -1490,7 +1494,8 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
     if (filter.tripId != null) {
       final tripName =
-          ref.watch(tripByIdProvider(filter.tripId!)).value?.name ?? 'Trip';
+          ref.watch(tripByIdProvider(filter.tripId!)).value?.name ??
+          context.l10n.diveLog_edit_row_trip;
       chips.add(
         _buildFilterChip(context, tripName, () {
           ref.read(diveFilterProvider.notifier).state = filter.copyWith(
@@ -1503,7 +1508,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     if (filter.diveCenterId != null) {
       final centerName =
           ref.watch(diveCenterByIdProvider(filter.diveCenterId!)).value?.name ??
-          'Dive Center';
+          context.l10n.diveLog_search_label_diveCenter;
       chips.add(
         _buildFilterChip(context, centerName, () {
           ref.read(diveFilterProvider.notifier).state = filter.copyWith(
@@ -1519,8 +1524,10 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                     .watch(equipmentItemProvider(filter.equipmentIds.first))
                     .value
                     ?.name ??
-                'Equipment')
-          : '${filter.equipmentIds.length} Equipment';
+                context.l10n.diveLog_edit_section_equipment)
+          : context.l10n.diveLog_filterChip_equipmentCount(
+              filter.equipmentIds.length,
+            );
       chips.add(
         _buildFilterChip(context, label, () {
           ref.read(diveFilterProvider.notifier).state = filter.copyWith(
@@ -1531,13 +1538,21 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     }
 
     if (filter.minDepth != null || filter.maxDepth != null) {
+      // Bounds are stored in meters; show them in the diver's depth unit.
+      final unit = units.depthSymbol;
+      final minValue = filter.minDepth == null
+          ? null
+          : units.convertDepth(filter.minDepth!).round();
+      final maxValue = filter.maxDepth == null
+          ? null
+          : units.convertDepth(filter.maxDepth!).round();
       String depthText;
-      if (filter.minDepth != null && filter.maxDepth != null) {
-        depthText = '${filter.minDepth!.toInt()}-${filter.maxDepth!.toInt()}m';
-      } else if (filter.minDepth != null) {
-        depthText = '>${filter.minDepth!.toInt()}m';
+      if (minValue != null && maxValue != null) {
+        depthText = '$minValue-$maxValue$unit';
+      } else if (minValue != null) {
+        depthText = '>$minValue$unit';
       } else {
-        depthText = '<${filter.maxDepth!.toInt()}m';
+        depthText = '<${maxValue!}$unit';
       }
       chips.add(
         _buildFilterChip(context, depthText, () {
@@ -1568,7 +1583,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       chips.add(
         _buildFilterChip(
           context,
-          '$tagCount tag${tagCount > 1 ? 's' : ''}',
+          context.l10n.diveLog_detail_tagCount(tagCount),
           () {
             ref.read(diveFilterProvider.notifier).state = filter.copyWith(
               clearTagIds: true,

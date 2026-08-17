@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/dive_sites/domain/entities/site_feature.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -106,10 +107,10 @@ class _SiteFeatureSheetState extends ConsumerState<SiteFeatureSheet> {
   );
   TextEditingController? _depth;
 
-  static String _formatNumber(double? v) {
-    if (v == null) return '';
-    return v % 1 == 0 ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
-  }
+  /// Seeded with the diver's decimal separator so the sheet can read the value
+  /// back; the seed and the parse must share one convention (#1091).
+  static String _formatNumber(double? v) =>
+      v == null ? '' : formatRoundedForInput(v, 1);
 
   @override
   void dispose() {
@@ -233,8 +234,11 @@ class _SiteFeatureSheetState extends ConsumerState<SiteFeatureSheet> {
   }
 
   void _save(BuildContext context, double unitInMeters) {
-    final bearing = double.tryParse(_bearing.text.replaceAll(',', '.'));
-    final depth = double.tryParse(_depth!.text.replaceAll(',', '.'));
+    // Read in the diver's locale, matching _formatNumber. A blanket
+    // replaceAll(',', '.') would misread the en_US thousands separator,
+    // turning "1,250" into 1.25 (#1091).
+    final bearing = parseUserDecimal(_bearing.text);
+    final depth = parseUserDecimal(_depth!.text);
     Navigator.of(context).pop(
       SiteFeatureSheetSave(
         typeName: _typeName,

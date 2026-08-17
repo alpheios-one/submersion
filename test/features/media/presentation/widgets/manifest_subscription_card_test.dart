@@ -33,6 +33,8 @@ import 'package:submersion/features/media/data/services/subscription_poller.dart
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/manifest_subscription_card.dart';
 
+import '../../../../helpers/l10n_test_helpers.dart';
+
 class _FakeRepo implements ManifestSubscriptionRepository {
   _FakeRepo(this.subs);
   final List<ManifestSubscription> subs;
@@ -159,7 +161,10 @@ Widget _wrap(
     manifestSubscriptionRepositoryProvider.overrideWithValue(repo),
     subscriptionPollerProvider.overrideWithValue(poller),
   ],
-  child: MaterialApp(home: Scaffold(body: child)),
+  child: localizedMaterialApp(
+    locale: const Locale('en'),
+    home: Scaffold(body: child),
+  ),
 );
 
 void main() {

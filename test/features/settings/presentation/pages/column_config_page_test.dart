@@ -376,7 +376,7 @@ void main() {
       await tester.pumpWidget(_buildColumnConfigPage());
       await tester.pump();
 
-      expect(find.text('Load Preset'), findsOneWidget);
+      expect(find.text('Preset'), findsOneWidget);
     });
 
     testWidgets('shows Save As button', (tester) async {
@@ -702,12 +702,12 @@ void main() {
 
       // Help text sits after the slot section; scroll to ensure it is visible
       await tester.scrollUntilVisible(
-        find.textContaining('Additional fields shown below'),
+        find.textContaining('Shown below main card content'),
         200,
         scrollable: find.byType(Scrollable).last,
       );
       expect(
-        find.textContaining('Additional fields shown below'),
+        find.textContaining('Shown below main card content'),
         findsOneWidget,
       );
     });
@@ -1137,7 +1137,7 @@ void main() {
         // Detailed mode shows extra fields section
         expect(find.text('EXTRA FIELDS'), findsOneWidget);
         expect(
-          find.textContaining('Additional fields shown below'),
+          find.textContaining('Shown below main card content'),
           findsOneWidget,
         );
       });

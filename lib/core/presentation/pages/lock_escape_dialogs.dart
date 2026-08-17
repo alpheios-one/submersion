@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:submersion/l10n/l10n_extension.dart';
+
 /// Escape-hatch dialogs for the startup lock screen. Rendered inside the
-/// pre-l10n splash MaterialApp, so strings are plain English by the same
-/// precedent as the rest of the startup UI.
+/// splash MaterialApp, which now carries the localization delegates (see
+/// `StartupWrapper.build`), so these strings resolve through `context.l10n`
+/// like the rest of the app.
 
 /// Recovery-code entry. [onSubmit] returns true when the code unlocked the
 /// database. The dialog pops with true on success, false/null on cancel.
@@ -13,13 +16,11 @@ Future<bool?> showRecoveryCodeUnlockDialog(
   return showDialog<bool>(
     context: context,
     builder: (context) => _SecretPromptDialog(
-      title: 'Use recovery code',
-      body:
-          'Enter the 8-word recovery code you saved when you set up the '
-          'app password.',
-      fieldLabel: 'Recovery code',
-      submitLabel: 'Unlock',
-      errorText: 'Incorrect recovery code.',
+      title: context.l10n.lock_recoveryCode_title,
+      body: context.l10n.lock_recoveryCode_body,
+      fieldLabel: context.l10n.settings_cloudSync_encryption_recoveryTitle,
+      submitLabel: context.l10n.settings_cloudSync_encryption_unlock,
+      errorText: context.l10n.lock_recoveryCode_error,
       obscure: false,
       onSubmit: onSubmit,
     ),
@@ -44,10 +45,8 @@ Future<void> showForcedPasswordResetDialog(
     context: context,
     barrierDismissible: false,
     builder: (context) => _NewPasswordDialog(
-      title: 'Set a new password',
-      body:
-          'You unlocked with your recovery code, so your old password is '
-          'no longer trusted. Choose a new one now.',
+      title: context.l10n.lock_forcedReset_title,
+      body: context.l10n.lock_forcedReset_body,
       onSubmit: onSubmit,
     ),
   );
@@ -63,15 +62,11 @@ Future<bool?> showSidecarRepairDialog(
   return showDialog<bool>(
     context: context,
     builder: (context) => _SecretPromptDialog(
-      title: 'Repair security key file',
-      body:
-          'Your security key file was missing and this device\'s keychain '
-          'still holds the key. Confirm your password to write a new key '
-          'file. Note: the password you enter here becomes the app password '
-          'going forward, and you will receive a new recovery code.',
-      fieldLabel: 'Password',
-      submitLabel: 'Repair',
-      errorText: 'Repair failed. Try again.',
+      title: context.l10n.lock_sidecarRepair_title,
+      body: context.l10n.lock_sidecarRepair_body,
+      fieldLabel: context.l10n.settings_security_password,
+      submitLabel: context.l10n.lock_sidecarRepair_submit,
+      errorText: context.l10n.lock_sidecarRepair_error,
       obscure: true,
       onSubmit: onSubmit,
     ),
@@ -84,16 +79,12 @@ Future<void> showNewRecoveryCodeDialog(BuildContext context, String code) {
     context: context,
     barrierDismissible: false,
     builder: (context) => AlertDialog(
-      title: const Text('Your new recovery code'),
+      title: Text(context.l10n.lock_newRecoveryCode_title),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Write this down and keep it safe. It is the only way to '
-            'unlock if you forget your password, and it replaces any '
-            'previous recovery code.',
-          ),
+          Text(context.l10n.settings_security_recoveryCode_explain),
           const SizedBox(height: 16),
           SelectableText(
             code,
@@ -107,7 +98,7 @@ Future<void> showNewRecoveryCodeDialog(BuildContext context, String code) {
       actions: [
         FilledButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('I saved it'),
+          child: Text(context.l10n.settings_security_recoveryCode_savedConfirm),
         ),
       ],
     ),
@@ -195,7 +186,7 @@ class _SecretPromptDialogState extends State<_SecretPromptDialog> {
       actions: [
         TextButton(
           onPressed: _busy ? null : () => Navigator.of(context).pop(false),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.common_action_cancel),
         ),
         FilledButton(
           onPressed: _busy ? null : _submit,
@@ -205,6 +196,12 @@ class _SecretPromptDialogState extends State<_SecretPromptDialog> {
     );
   }
 }
+
+/// The typed confirmation token. Deliberately NOT localized: the comparison
+/// below is exact, the same literal is shown as the field hint, and keeping
+/// one ASCII token avoids putting a locale-dependent gate in front of a
+/// destructive action.
+const String _startFreshToken = 'START FRESH';
 
 class _StartFreshConfirmDialog extends StatefulWidget {
   const _StartFreshConfirmDialog();
@@ -222,7 +219,7 @@ class _StartFreshConfirmDialogState extends State<_StartFreshConfirmDialog> {
   void initState() {
     super.initState();
     _controller.addListener(() {
-      final match = _controller.text.trim() == 'START FRESH';
+      final match = _controller.text.trim() == _startFreshToken;
       if (match != _confirmed) setState(() => _confirmed = match);
     });
   }
@@ -236,26 +233,18 @@ class _StartFreshConfirmDialogState extends State<_StartFreshConfirmDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Open a different database'),
+      title: Text(context.l10n.lock_startFresh_title),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Your current database stays on disk, renamed with a .locked '
-            'suffix — nothing is deleted. You can recover it later with '
-            'your password or by contacting support. Cloud sync will be '
-            'turned off so the new database cannot mix with the old one.\n\n'
-            'The app will start with a fresh, empty database. You can '
-            'restore from a backup in the setup wizard.\n\n'
-            'Type START FRESH to confirm.',
-          ),
+          Text(context.l10n.lock_startFresh_body(_startFreshToken)),
           const SizedBox(height: 16),
           TextField(
             controller: _controller,
             autofocus: true,
             decoration: const InputDecoration(
-              hintText: 'START FRESH',
+              hintText: _startFreshToken,
               border: OutlineInputBorder(),
             ),
           ),
@@ -264,11 +253,11 @@ class _StartFreshConfirmDialogState extends State<_StartFreshConfirmDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.common_action_cancel),
         ),
         FilledButton(
           onPressed: _confirmed ? () => Navigator.of(context).pop(true) : null,
-          child: const Text('Set aside and start fresh'),
+          child: Text(context.l10n.lock_startFresh_confirm),
         ),
       ],
     );
@@ -307,11 +296,11 @@ class _NewPasswordDialogState extends State<_NewPasswordDialog> {
   Future<void> _submit() async {
     if (_busy) return;
     if (_password.text.length < 4) {
-      setState(() => _error = 'Password must be at least 4 characters.');
+      setState(() => _error = context.l10n.settings_security_passwordTooShort);
       return;
     }
     if (_password.text != _confirm.text) {
-      setState(() => _error = 'Passwords do not match.');
+      setState(() => _error = context.l10n.settings_security_passwordMismatch);
       return;
     }
     setState(() {
@@ -323,7 +312,7 @@ class _NewPasswordDialogState extends State<_NewPasswordDialog> {
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (mounted) {
-        setState(() => _error = 'Could not set the new password. Try again.');
+        setState(() => _error = context.l10n.lock_forcedReset_error);
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -345,9 +334,9 @@ class _NewPasswordDialogState extends State<_NewPasswordDialog> {
             obscureText: true,
             autofocus: true,
             enabled: !_busy,
-            decoration: const InputDecoration(
-              labelText: 'New password',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: context.l10n.settings_security_newPassword,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
@@ -357,7 +346,7 @@ class _NewPasswordDialogState extends State<_NewPasswordDialog> {
             enabled: !_busy,
             onSubmitted: (_) => _submit(),
             decoration: InputDecoration(
-              labelText: 'Confirm password',
+              labelText: context.l10n.settings_security_confirmPassword,
               border: const OutlineInputBorder(),
               errorText: _error,
             ),
@@ -367,7 +356,7 @@ class _NewPasswordDialogState extends State<_NewPasswordDialog> {
       actions: [
         FilledButton(
           onPressed: _busy ? null : _submit,
-          child: const Text('Set password'),
+          child: Text(context.l10n.lock_forcedReset_submit),
         ),
       ],
     );

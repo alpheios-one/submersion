@@ -1,5 +1,6 @@
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -19,11 +20,14 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 /// empty, unparseable, or negative.
 ///
 /// Never coerces a bad value to zero. Text that fails to parse (stray
-/// characters, a locale decimal comma) means visibility is unknown, not that
-/// the diver measured zero visibility; persisting 0 would record a
-/// measurement nobody took and bin the dive into the worst band.
+/// characters) means visibility is unknown, not that the diver measured zero
+/// visibility; persisting 0 would record a measurement nobody took and bin the
+/// dive into the worst band.
+///
+/// A decimal comma is read, not rejected: it is what the diver's own locale
+/// displays, and treating "12,5" as unknown discarded the entry (#1091).
 double? parseVisibilityInput(String text, UnitFormatter units) {
-  final parsed = double.tryParse(text.trim());
+  final parsed = parseUserDecimal(text);
   if (parsed == null || parsed < 0) return null;
   return units.depthToMeters(parsed);
 }

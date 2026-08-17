@@ -225,11 +225,76 @@ void main() {
       expect(actions.single, isA<GoToDiveRepair>());
     });
 
-    test('scalar water temp gets navigation only', () {
+    test('a scalar water temp stored before the rescan navigates', () {
+      // Written by detector v2, which reported no conversion facts; the
+      // finding stays navigation-only until a rescan fills them in.
       final actions = repairOptionsFor(
         f(detectorId: 'temp_anomaly', params: {'waterTempC': 60.0}),
       );
       expect(actions.single, isA<GoToDiveRepair>());
+    });
+
+    test('a Fahrenheit scalar water temp offers a scalar conversion', () {
+      final actions = repairOptionsFor(
+        f(
+          detectorId: 'temp_anomaly',
+          params: {'waterTempC': 78.0, 'fahrenheitSuspected': true},
+        ),
+      );
+      final c = actions.whereType<ConvertWaterTempRepair>().single;
+      expect(c.kelvinScale, isFalse);
+      expect(c.diveId, 'd1');
+      // The dive's recorded temperature is not a sample channel.
+      expect(actions.whereType<ConvertTemperatureRepair>(), isEmpty);
+    });
+
+    test(
+      'a Fahrenheit-as-Kelvin scalar water temp offers a kelvin conversion',
+      () {
+        final actions = repairOptionsFor(
+          f(
+            detectorId: 'temp_anomaly',
+            params: {
+              'waterTempC': 297.0,
+              'fahrenheitAsKelvinSuspected': true,
+              'fahrenheitSuspected': false,
+            },
+          ),
+        );
+        final c = actions.whereType<ConvertWaterTempRepair>().single;
+        expect(c.kelvinScale, isTrue);
+      },
+    );
+
+    test('an unexplainable scalar water temp navigates', () {
+      final actions = repairOptionsFor(
+        f(
+          detectorId: 'temp_anomaly',
+          params: {
+            'waterTempC': -50.0,
+            'fahrenheitSuspected': false,
+            'fahrenheitAsKelvinSuspected': false,
+          },
+        ),
+      );
+      expect(actions.single, isA<GoToDiveRepair>());
+    });
+
+    test('a range finding still routes to the sample-channel conversion', () {
+      // The scalar and range findings now carry the same conversion flags,
+      // so the mapping must dispatch on the shape, not on the flags.
+      final actions = repairOptionsFor(
+        f(
+          detectorId: 'temp_anomaly',
+          params: {
+            'minTempC': 60.0,
+            'maxTempC': 80.0,
+            'fahrenheitSuspected': true,
+          },
+        ),
+      );
+      expect(actions.whereType<ConvertTemperatureRepair>(), hasLength(1));
+      expect(actions.whereType<ConvertWaterTempRepair>(), isEmpty);
     });
 
     test('a Fahrenheit channel offers a non-kelvin conversion', () {

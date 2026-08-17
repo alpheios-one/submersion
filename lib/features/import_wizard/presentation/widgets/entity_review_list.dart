@@ -6,6 +6,7 @@ import 'package:submersion/features/import_wizard/domain/models/entity_match_res
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/duplicate_action_card.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/needs_decision_pill.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// A scrollable review list for a single entity type.
@@ -83,6 +84,7 @@ class EntityReviewList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     final autoSkipIndices = group.autoSkipIndices ?? const <int>{};
 
@@ -115,6 +117,7 @@ class EntityReviewList extends StatelessWidget {
               Expanded(
                 child: Text(
                   _itemCountText(
+                    l10n,
                     nonDuplicateCount,
                     duplicateCount,
                     selectedIndices.length,
@@ -131,7 +134,7 @@ class EntityReviewList extends StatelessWidget {
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: const Text('Select All'),
+                child: Text(l10n.universalImport_action_selectAll),
               ),
               TextButton(
                 onPressed: onDeselectAll,
@@ -140,7 +143,7 @@ class EntityReviewList extends StatelessWidget {
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: const Text('Deselect All'),
+                child: Text(l10n.universalImport_action_deselectAll),
               ),
             ],
           ),
@@ -160,7 +163,7 @@ class EntityReviewList extends StatelessWidget {
         // that need user attention are at the top of the tab.
         if (likelyDuplicateIndices.isNotEmpty) ...[
           _SectionLabel(
-            label: 'Potential Duplicates',
+            label: l10n.universalImport_section_potentialDuplicates,
             color: colorScheme.error,
           ),
           for (final index in likelyDuplicateIndices)
@@ -168,8 +171,8 @@ class EntityReviewList extends StatelessWidget {
         ],
 
         if (possibleDuplicateIndices.isNotEmpty) ...[
-          const _SectionLabel(
-            label: 'Possible Duplicates',
+          _SectionLabel(
+            label: l10n.universalImport_section_possibleDuplicates,
             color: Colors.orange,
           ),
           for (final index in possibleDuplicateIndices)
@@ -179,7 +182,7 @@ class EntityReviewList extends StatelessWidget {
         // Unscored duplicates (non-dive entities without matchResults)
         if (unscoredDuplicateIndices.isNotEmpty) ...[
           _SectionLabel(
-            label: 'Potential Duplicates',
+            label: l10n.universalImport_section_potentialDuplicates,
             color: colorScheme.error,
           ),
           for (final index in unscoredDuplicateIndices)
@@ -381,13 +384,20 @@ class EntityReviewList extends StatelessWidget {
     }).length;
   }
 
-  String _itemCountText(int nonDuplicates, int duplicates, int selectedCount) {
+  String _itemCountText(
+    AppLocalizations l10n,
+    int nonDuplicates,
+    int duplicates,
+    int selectedCount,
+  ) {
     final parts = <String>[];
     if (nonDuplicates > 0) {
-      parts.add('$selectedCount / $nonDuplicates selected');
+      parts.add(
+        l10n.universalImport_label_xOfYSelected(selectedCount, nonDuplicates),
+      );
     }
     if (duplicates > 0) {
-      parts.add('$duplicates duplicate${duplicates == 1 ? '' : 's'}');
+      parts.add(l10n.universalImport_count_duplicates(duplicates));
     }
     return parts.join(' \u00b7 ');
   }
@@ -487,7 +497,7 @@ class _NonDuplicateRow extends StatelessWidget {
                   border: Border.all(color: Colors.green, width: 1),
                 ),
                 child: Text(
-                  'IMPORT',
+                  context.l10n.universalImport_entityAction_importBadge,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
@@ -507,7 +517,7 @@ class _NonDuplicateRow extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'SKIP',
+                  context.l10n.universalImport_entityAction_skipBadge,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurface.withValues(alpha: 0.4),
                     fontWeight: FontWeight.bold,
@@ -740,7 +750,7 @@ class _EntityComparisonPanel extends StatelessWidget {
               const SizedBox(width: 80),
               Expanded(
                 child: Text(
-                  'Existing',
+                  context.l10n.universalImport_compare_existing,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
@@ -750,7 +760,7 @@ class _EntityComparisonPanel extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  'Incoming',
+                  context.l10n.universalImport_compare_incoming,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
@@ -997,7 +1007,10 @@ class _SimpleActionBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final (label, color) = switch (action) {
-      DuplicateAction.importAsNew => ('IMPORT', Colors.green.shade700),
+      DuplicateAction.importAsNew => (
+        context.l10n.universalImport_entityAction_importBadge,
+        Colors.green.shade700,
+      ),
       DuplicateAction.consolidate => (
         context.l10n.universalImport_entityAction_linkBadge,
         theme.colorScheme.primary,
@@ -1008,7 +1021,10 @@ class _SimpleActionBadge extends StatelessWidget {
         context.l10n.universalImport_entityAction_replaceBadge,
         Colors.blue.shade700,
       ),
-      DuplicateAction.skip => ('SKIP', theme.colorScheme.error),
+      DuplicateAction.skip => (
+        context.l10n.universalImport_entityAction_skipBadge,
+        theme.colorScheme.error,
+      ),
     };
 
     return Container(

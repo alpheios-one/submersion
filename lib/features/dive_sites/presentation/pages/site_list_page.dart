@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
+import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/features/dive_sites/domain/constants/site_field.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
@@ -117,7 +118,7 @@ class _SiteListPageState extends ConsumerState<SiteListPage> {
         onMapViewToggle: _toggleMapView,
         columnSettingsAction: IconButton(
           icon: const Icon(Icons.view_column_outlined),
-          tooltip: 'Column settings',
+          tooltip: context.l10n.columnConfig_tooltip_columnSettings,
           onPressed: () => showEntityTableColumnPicker<SiteField>(
             context,
             configProvider: siteTableConfigProvider,
@@ -157,7 +158,8 @@ class _SiteListPageState extends ConsumerState<SiteListPage> {
                 currentField: sort.field,
                 currentDirection: sort.direction,
                 fields: SiteSortField.values,
-                getFieldDisplayName: (field) => field.displayName,
+                getFieldDisplayName: (field) =>
+                    field.localizedName(context.l10n),
                 getFieldIcon: (field) => field.icon,
                 onSortChanged: (field, direction) {
                   ref.read(siteSortProvider.notifier).state = SortState(

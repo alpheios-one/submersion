@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
@@ -78,8 +79,15 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
     _maxDepth = filter.maxDepth;
     _favoritesOnly = filter.favoritesOnly ?? false;
     _selectedTagIds = List.from(filter.tagIds);
-    _minDepthController.text = _minDepth?.toStringAsFixed(0) ?? '';
-    _maxDepthController.text = _maxDepth?.toStringAsFixed(0) ?? '';
+    // Depth bounds live in meters; the fields show and accept the diver's
+    // configured depth unit.
+    final units = UnitFormatter(widget.ref.read(settingsProvider));
+    _minDepthController.text = _minDepth == null
+        ? ''
+        : formatRoundedForInput(units.convertDepth(_minDepth!), 0);
+    _maxDepthController.text = _maxDepth == null
+        ? ''
+        : formatRoundedForInput(units.convertDepth(_maxDepth!), 0);
 
     // v1.5 filters
     _buddyNameFilter = filter.buddyNameFilter;
@@ -111,20 +119,16 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
 
   /// Suit thickness can be fractional (e.g. 2.5 mm), so keep decimals rather
   /// than truncating with toStringAsFixed(0); integers still render cleanly.
+  /// Rendered in the diver's locale to match [_parseThicknessBound].
   String _formatThicknessBound(double? value) {
     if (value == null) return '';
-    return value == value.roundToDouble()
-        ? value.toStringAsFixed(0)
-        : value.toString();
+    return formatDecimalForInput(value);
   }
 
-  /// Parse a user-entered thickness bound, tolerating a comma decimal
-  /// separator (common in many locales). Empty/invalid input clears the bound.
-  double? _parseThicknessBound(String value) {
-    final trimmed = value.trim().replaceAll(',', '.');
-    if (trimmed.isEmpty) return null;
-    return double.tryParse(trimmed);
-  }
+  /// Parse a user-entered thickness bound in the diver's locale. Empty or
+  /// invalid input clears the bound. A blanket replaceAll(',', '.') would
+  /// misread the en_US thousands separator, turning "1,250" into 1.25 (#1091).
+  double? _parseThicknessBound(String value) => parseUserDecimal(value);
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +304,8 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                   final diveTypesAsync = ref.watch(diveTypesProvider);
                   return diveTypesAsync.when(
                     loading: () => const LinearProgressIndicator(),
-                    error: (e, st) => Text('Error: $e'),
+                    error: (e, st) =>
+                        Text(context.l10n.diveLog_listPage_errorLoading(e)),
                     data: (diveTypes) => DropdownButtonFormField<String?>(
                       initialValue: _diveTypeId,
                       decoration: InputDecoration(
@@ -365,7 +370,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
 
               // Dive Computer Section
               Text(
-                'Dive Computer',
+                context.l10n.diveLog_filter_sectionDiveComputer,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -374,7 +379,8 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                   final computersAsync = ref.watch(allDiveComputersProvider);
                   return computersAsync.when(
                     loading: () => const LinearProgressIndicator(),
-                    error: (_, _) => const Text('Error loading computers'),
+                    error: (_, _) =>
+                        Text(context.l10n.transfer_computers_errorLoading),
                     data: (computers) {
                       // Every registered computer is offered. The list used to
                       // be restricted to computers carrying a serial number,
@@ -383,7 +389,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                       // is always present.
                       if (computers.isEmpty) {
                         return Text(
-                          'No dive computers registered',
+                          context.l10n.diveLog_filter_noComputersRegistered,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: Theme.of(
@@ -402,14 +408,16 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                       }
                       return DropdownButtonFormField<String?>(
                         initialValue: validId,
-                        decoration: const InputDecoration(
-                          hintText: 'All computers',
-                          prefixIcon: Icon(Icons.watch),
+                        decoration: InputDecoration(
+                          hintText: context.l10n.diveLog_filter_allComputers,
+                          prefixIcon: const Icon(Icons.watch),
                         ),
                         items: [
-                          const DropdownMenuItem(
+                          DropdownMenuItem(
                             value: null,
-                            child: Text('All computers'),
+                            child: Text(
+                              context.l10n.diveLog_filter_allComputers,
+                            ),
                           ),
                           ...computers.map(
                             (c) => DropdownMenuItem(
@@ -430,7 +438,9 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
 
               // Depth Range Section
               Text(
-                context.l10n.diveLog_filter_sectionDepthRange,
+                context.l10n.diveLog_filter_sectionDepthRangeUnit(
+                  units.depthSymbol,
+                ),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -442,11 +452,14 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                       decoration: InputDecoration(
                         labelText: context.l10n.diveLog_filter_min,
                         prefixIcon: const Icon(Icons.arrow_downward),
-                        suffixText: 'm',
+                        suffixText: units.depthSymbol,
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        _minDepth = double.tryParse(value);
+                        final entered = parseUserDecimal(value);
+                        _minDepth = entered == null
+                            ? null
+                            : units.depthToMeters(entered);
                       },
                     ),
                   ),
@@ -457,11 +470,14 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                       decoration: InputDecoration(
                         labelText: context.l10n.diveLog_filter_max,
                         prefixIcon: const Icon(Icons.arrow_downward),
-                        suffixText: 'm',
+                        suffixText: units.depthSymbol,
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        _maxDepth = double.tryParse(value);
+                        final entered = parseUserDecimal(value);
+                        _maxDepth = entered == null
+                            ? null
+                            : units.depthToMeters(entered);
                       },
                     ),
                   ),
@@ -776,7 +792,9 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                       color: isSelected ? Colors.amber : null,
                       size: 32,
                     ),
-                    tooltip: '$rating star${rating > 1 ? 's' : ''}',
+                    tooltip: context.l10n.diveSites_edit_rating_starTooltip(
+                      rating,
+                    ),
                     onPressed: () {
                       setState(() {
                         if (_minRating == rating) {
@@ -813,11 +831,11 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                       decoration: InputDecoration(
                         labelText: context.l10n.diveLog_filter_min,
                         prefixIcon: const Icon(Icons.timer),
-                        suffixText: 'min',
+                        suffixText: context.l10n.units_profileMetric_min,
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        _minDurationMinutes = int.tryParse(value);
+                        _minDurationMinutes = parseUserInt(value);
                       },
                     ),
                   ),
@@ -828,11 +846,11 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                       decoration: InputDecoration(
                         labelText: context.l10n.diveLog_filter_max,
                         prefixIcon: const Icon(Icons.timer),
-                        suffixText: 'min',
+                        suffixText: context.l10n.units_profileMetric_min,
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        _maxDurationMinutes = int.tryParse(value);
+                        _maxDurationMinutes = parseUserInt(value);
                       },
                     ),
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/deco/altitude_calculator.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/edit_sections/merge_field_extras.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -125,7 +126,7 @@ class LocationSection extends StatelessWidget {
         ValueListenableBuilder<TextEditingValue>(
           valueListenable: altitudeController,
           builder: (context, altitude, _) {
-            final altitudeInput = double.tryParse(altitude.text);
+            final altitudeInput = parseUserDecimal(altitude.text);
             final altitudeMeters = altitudeInput != null
                 ? units.altitudeToMeters(altitudeInput)
                 : null;
