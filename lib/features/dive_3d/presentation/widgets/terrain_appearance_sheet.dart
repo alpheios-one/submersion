@@ -52,6 +52,13 @@ class TerrainAppearanceSheet extends ConsumerWidget {
   /// diver with 32.8 rather than a round number.
   static const double _defaultNewLevelDisplay = 10.0;
 
+  /// Vertical rhythm. The sheet stacks segmented buttons, switches, sliders
+  /// and a row editor, each of which brings its own padding, so the gaps are
+  /// named here to keep one consistent scale instead of ad-hoc spacers.
+  static const _labelGap = SizedBox(height: 8);
+  static const _controlGap = SizedBox(height: 16);
+  static const _sectionRule = Divider(height: 40);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
@@ -78,9 +85,9 @@ class TerrainAppearanceSheet extends ConsumerWidget {
             l10n.dive3d_seascape_appearance,
             style: Theme.of(context).textTheme.titleMedium,
           ),
-          const SizedBox(height: 12),
+          _controlGap,
           Text(l10n.dive3d_seascape_appearance_surface),
-          const SizedBox(height: 8),
+          _labelGap,
           SegmentedButton<SeascapeSurfaceMode>(
             key: const ValueKey('seascapeSurfaceModeSegments'),
             segments: [
@@ -101,6 +108,7 @@ class TerrainAppearanceSheet extends ConsumerWidget {
             onSelectionChanged: (sel) =>
                 update(appearance.copyWith(surfaceMode: sel.single)),
           ),
+          _controlGap,
           SwitchListTile(
             key: const ValueKey('seascapeRampRangeSwitch'),
             contentPadding: EdgeInsets.zero,
@@ -138,9 +146,9 @@ class TerrainAppearanceSheet extends ConsumerWidget {
             value: appearance.rampBanded,
             onChanged: (on) => update(appearance.copyWith(rampBanded: on)),
           ),
-          const Divider(),
+          _sectionRule,
           Text(l10n.dive3d_seascape_appearance_contours),
-          const SizedBox(height: 8),
+          _labelGap,
           SegmentedButton<SeascapeContourMode>(
             key: const ValueKey('seascapeContourModeSegments'),
             segments: [
@@ -158,6 +166,7 @@ class TerrainAppearanceSheet extends ConsumerWidget {
                 update(appearance.copyWith(contourMode: sel.single)),
           ),
           if (appearance.contourMode == SeascapeContourMode.custom) ...[
+            _labelGap,
             for (var i = 0; i < appearance.customLevels.length; i++)
               _LevelRow(
                 key: ValueKey('seascapeLevelRow$i'),
@@ -183,6 +192,7 @@ class TerrainAppearanceSheet extends ConsumerWidget {
               ),
             ),
           ],
+          _sectionRule,
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(l10n.dive3d_seascape_appearance_wallAngle),
@@ -356,64 +366,73 @@ class _LevelRowState extends State<_LevelRow> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 120,
-          child: TextField(
-            key: ValueKey('seascapeLevelField${widget.index}'),
-            controller: _controller,
-            focusNode: _focusNode,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            textInputAction: TextInputAction.done,
-            // The bare number read as ambiguous between metres and feet
-            // (issue #1094); the box now carries the diver's own unit.
-            decoration: InputDecoration(suffixText: widget.unitSymbol),
-            onTapOutside: (_) => _focusNode.unfocus(),
-            onEditingComplete: _focusNode.unfocus,
-            onSubmitted: (_) => _focusNode.unfocus(),
+    return Padding(
+      // The boxes carry their own border, so without this the rows read as
+      // one dense block rather than a list.
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 120,
+            child: TextField(
+              key: ValueKey('seascapeLevelField${widget.index}'),
+              controller: _controller,
+              focusNode: _focusNode,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              textInputAction: TextInputAction.done,
+              // The bare number read as ambiguous between metres and feet
+              // (issue #1094); the box now carries the diver's own unit.
+              decoration: InputDecoration(suffixText: widget.unitSymbol),
+              onTapOutside: (_) => _focusNode.unfocus(),
+              onEditingComplete: _focusNode.unfocus,
+              onSubmitted: (_) => _focusNode.unfocus(),
+            ),
           ),
-        ),
-        const SizedBox(width: 12),
-        // Expanded rather than a trailing Spacer: the "default ink" entry is a
-        // translated phrase, and a Spacer cannot give back space once the row
-        // is full, so a long translation used to overflow a phone row.
-        Expanded(
-          child: DropdownButton<int?>(
-            key: ValueKey('seascapeLevelColor${widget.index}'),
-            value: widget.level.colorArgb,
-            isExpanded: true,
-            items: [
-              for (final c in TerrainAppearanceSheet._palette)
-                DropdownMenuItem(
-                  value: c,
-                  child: c == null
-                      ? Text(
-                          context.l10n.dive3d_seascape_appearance_defaultColor,
-                          overflow: TextOverflow.ellipsis,
-                        )
-                      : CircleAvatar(radius: 8, backgroundColor: Color(c)),
+          const SizedBox(width: 12),
+          // Expanded rather than a trailing Spacer: the "default ink" entry is a
+          // translated phrase, and a Spacer cannot give back space once the row
+          // is full, so a long translation used to overflow a phone row.
+          Expanded(
+            child: DropdownButton<int?>(
+              key: ValueKey('seascapeLevelColor${widget.index}'),
+              value: widget.level.colorArgb,
+              isExpanded: true,
+              items: [
+                for (final c in TerrainAppearanceSheet._palette)
+                  DropdownMenuItem(
+                    value: c,
+                    child: c == null
+                        ? Text(
+                            context
+                                .l10n
+                                .dive3d_seascape_appearance_defaultColor,
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        : CircleAvatar(radius: 8, backgroundColor: Color(c)),
+                  ),
+              ],
+              onChanged: (c) => _write(
+                SeascapeContourLevel(
+                  depthMeters: widget.level.depthMeters,
+                  colorArgb: c,
                 ),
-            ],
-            onChanged: (c) => _write(
-              SeascapeContourLevel(
-                depthMeters: widget.level.depthMeters,
-                colorArgb: c,
               ),
             ),
           ),
-        ),
-        IconButton(
-          key: ValueKey('seascapeLevelRemove${widget.index}'),
-          icon: const Icon(Icons.delete_outline),
-          onPressed: () {
-            // Drop focus first so the row being removed cannot commit its old
-            // text back over the shifted list on the way out.
-            _focusNode.unfocus();
-            _write(null);
-          },
-        ),
-      ],
+          IconButton(
+            key: ValueKey('seascapeLevelRemove${widget.index}'),
+            icon: const Icon(Icons.delete_outline),
+            onPressed: () {
+              // Drop focus first so the row being removed cannot commit its old
+              // text back over the shifted list on the way out.
+              _focusNode.unfocus();
+              _write(null);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

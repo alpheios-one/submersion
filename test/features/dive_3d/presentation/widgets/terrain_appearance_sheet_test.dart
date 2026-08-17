@@ -185,7 +185,7 @@ void main() {
     final container = await pumpSheet(tester);
     expect(
       container.read(settingsProvider).seascapeAppearance.surfaceMode,
-      SeascapeSurfaceMode.depth,
+      SeascapeSurfaceMode.blend,
     );
     await tester.tap(find.text('Map imagery'));
     await tester.pump();
@@ -193,11 +193,11 @@ void main() {
       container.read(settingsProvider).seascapeAppearance.surfaceMode,
       SeascapeSurfaceMode.imagery,
     );
-    await tester.tap(find.text('Blend'));
+    await tester.tap(find.text('Depth colors'));
     await tester.pump();
     expect(
       container.read(settingsProvider).seascapeAppearance.surfaceMode,
-      SeascapeSurfaceMode.blend,
+      SeascapeSurfaceMode.depth,
     );
   });
 
@@ -401,6 +401,19 @@ void main() {
         closeTo(20.0, 1e-9),
         closeTo(30.0, 1e-9),
       ]);
+    });
+
+    testWidgets('rows are separated rather than stacked flush', (tester) async {
+      // The rows read as one dense block when they touch; the boxes already
+      // carry their own border, so they need real air between them.
+      await pumpSheet(tester, initial: twoLevels);
+      final first = tester.getRect(
+        find.byKey(const ValueKey('seascapeLevelField0')),
+      );
+      final second = tester.getRect(
+        find.byKey(const ValueKey('seascapeLevelField1')),
+      );
+      expect(second.top - first.bottom, greaterThanOrEqualTo(12.0));
     });
 
     testWidgets('a row lays out on a narrow phone without overflowing', (
