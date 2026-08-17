@@ -13,7 +13,10 @@ import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometr
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/domain/entities/site_feature.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/site_scape/presentation/site_terrain_pane.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -92,10 +95,12 @@ SiteSeascapeReady readyState({TerrainImagery? imagery}) {
 Widget page(
   SiteSeascapeState state, {
   AppSettings settings = const AppSettings(),
+  List<SiteFeature> features = const [],
 }) => ProviderScope(
   overrides: [
     settingsProvider.overrideWith((ref) => _TestSettingsNotifier(settings)),
     siteSeascapeProvider.overrideWith((ref, id) async => state),
+    siteFeaturesProvider('site-1').overrideWith((ref) async => features),
   ],
   child: const MaterialApp(
     locale: Locale('en'),
@@ -229,6 +234,133 @@ void main() {
     await tester.tap(find.text('Features'));
     await tester.pump();
     expect(viewport().visibleOverlays, isNot(contains(SceneOverlay.features)));
+  });
+
+  testWidgets('tapping a feature marker shows a read-only info sheet', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      page(
+        readyState(),
+        features: const [
+          SiteFeature(
+            id: 'f-1',
+            siteId: 'site-1',
+            typeName: 'wreck',
+            name: 'Hilma Hooker',
+            latitude: 12.151,
+            longitude: -68.299,
+            depthMeters: 30,
+            bearingDeg: 135,
+            notes: 'Bow points north',
+          ),
+        ],
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    // Drive the viewport's marker callback the way a 24px hit test would.
+    final viewport = tester.widget<Dive3dInteractiveViewport>(
+      find.byType(Dive3dInteractiveViewport),
+    );
+    viewport.onMarkerTap!(
+      const SceneMarker(
+        kind: SceneMarkerKind.siteFeature,
+        refId: 'f-1',
+        label: 'Hilma Hooker',
+        x: 0,
+        y: 0,
+        timestampSeconds: 0,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text('Hilma Hooker'), findsOneWidget);
+    expect(find.text('Wreck'), findsWidgets);
+    expect(find.textContaining('30.0'), findsOneWidget);
+    expect(find.textContaining('135'), findsOneWidget);
+    expect(find.text('Bow points north'), findsOneWidget);
+    // Read-only: no save or delete affordance in 3D.
+    expect(find.byKey(const ValueKey('siteFeatureSaveButton')), findsNothing);
+  });
+
+  testWidgets('an unnamed feature falls back to its type label in 3D', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      page(
+        readyState(),
+        features: const [
+          SiteFeature(
+            id: 'f-2',
+            siteId: 'site-1',
+            typeName: 'mooring',
+            latitude: 12.151,
+            longitude: -68.299,
+          ),
+        ],
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    final viewport = tester.widget<Dive3dInteractiveViewport>(
+      find.byType(Dive3dInteractiveViewport),
+    );
+    viewport.onMarkerTap!(
+      const SceneMarker(
+        kind: SceneMarkerKind.siteFeature,
+        refId: 'f-2',
+        label: '',
+        x: 0,
+        y: 0,
+        timestampSeconds: 0,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text('Mooring'), findsWidgets);
+  });
+
+  testWidgets('non-feature markers and unknown ids open nothing', (
+    tester,
+  ) async {
+    await tester.pumpWidget(page(readyState()));
+    await tester.pump();
+    await tester.pump();
+
+    final viewport = tester.widget<Dive3dInteractiveViewport>(
+      find.byType(Dive3dInteractiveViewport),
+    );
+    // The site pin is not a feature.
+    viewport.onMarkerTap!(
+      const SceneMarker(
+        kind: SceneMarkerKind.site,
+        refId: null,
+        label: 'Salt Pier',
+        x: 0,
+        y: 0,
+        timestampSeconds: 0,
+      ),
+    );
+    // A feature id with no matching row (deleted mid-frame).
+    viewport.onMarkerTap!(
+      const SceneMarker(
+        kind: SceneMarkerKind.siteFeature,
+        refId: 'gone',
+        label: 'gone',
+        x: 0,
+        y: 0,
+        timestampSeconds: 0,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.byType(BottomSheet), findsNothing);
   });
 
   testWidgets('no-coordinates state shows the message, not a spinner', (

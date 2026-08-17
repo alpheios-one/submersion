@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/features/dive_sites/data/repositories/site_feature_repository.dart';
 import 'package:submersion/features/dive_sites/domain/entities/site_feature.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -28,6 +29,7 @@ Future<void> _pumpMap(
   WidgetTester tester, {
   required String? siteId,
   List<SiteFeature> features = const [_feature],
+  SiteFeatureRepository? repository,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -39,6 +41,8 @@ Future<void> _pumpMap(
           (ref) => MockSettingsNotifier(const AppSettings()),
         ),
         siteFeaturesProvider('site-1').overrideWith((ref) async => features),
+        if (repository != null)
+          siteFeatureRepositoryProvider.overrideWithValue(repository),
       ],
       child: MaterialApp(
         locale: const Locale('en'),
@@ -61,7 +65,102 @@ Future<void> _pumpMap(
   await tester.pump(const Duration(seconds: 1));
 }
 
+/// Records what the edit flow asks the repository to do.
+class _RecordingFeatureRepository implements SiteFeatureRepository {
+  final List<SiteFeature> updated = [];
+  final List<String> deleted = [];
+
+  @override
+  Future<void> updateFeature(SiteFeature feature) async => updated.add(feature);
+
+  @override
+  Future<void> deleteFeature(String id) async => deleted.add(id);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 void main() {
+  testWidgets('saving from a marker tap writes the edit through', (
+    tester,
+  ) async {
+    final repo = _RecordingFeatureRepository();
+    await _pumpMap(tester, siteId: 'site-1', repository: repo);
+
+    await tester.tap(find.byKey(const ValueKey('siteFeatureMarker-f-1')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.enterText(
+      find.byKey(const ValueKey('siteFeatureNameField')),
+      'Flood tide',
+    );
+    await tester.tap(find.byKey(const ValueKey('siteFeatureSaveButton')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(repo.updated, hasLength(1));
+    expect(repo.updated.single.id, 'f-1');
+    expect(repo.updated.single.name, 'Flood tide');
+    expect(repo.deleted, isEmpty);
+  });
+
+  testWidgets('deleting from a marker tap removes the feature', (tester) async {
+    final repo = _RecordingFeatureRepository();
+    await _pumpMap(tester, siteId: 'site-1', repository: repo);
+
+    await tester.tap(find.byKey(const ValueKey('siteFeatureMarker-f-1')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byKey(const ValueKey('siteFeatureDeleteButton')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.byKey(const ValueKey('siteFeatureDeleteConfirm')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(repo.deleted, ['f-1']);
+    expect(repo.updated, isEmpty);
+  });
+
+  testWidgets('dismissing the sheet from a marker writes nothing', (
+    tester,
+  ) async {
+    final repo = _RecordingFeatureRepository();
+    await _pumpMap(tester, siteId: 'site-1', repository: repo);
+
+    await tester.tap(find.byKey(const ValueKey('siteFeatureMarker-f-1')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    Navigator.of(
+      tester.element(find.byKey(const ValueKey('siteFeatureSaveButton'))),
+    ).pop();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(repo.updated, isEmpty);
+    expect(repo.deleted, isEmpty);
+  });
+
+  testWidgets('an unknown type still renders a marker', (tester) async {
+    await _pumpMap(
+      tester,
+      siteId: 'site-1',
+      features: const [
+        SiteFeature(
+          id: 'f-1',
+          siteId: 'site-1',
+          // A type this build does not know, synced from a newer one.
+          typeName: 'lavaTube',
+          latitude: 12.15,
+          longitude: -68.3,
+        ),
+      ],
+    );
+
+    expect(find.byKey(const ValueKey('siteFeatureMarker-f-1')), findsOneWidget);
+    expect(find.byIcon(Icons.place), findsOneWidget);
+  });
+
   testWidgets('renders one rotated marker per feature and edits on tap', (
     tester,
   ) async {

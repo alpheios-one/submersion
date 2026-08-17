@@ -220,14 +220,14 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
 
   /// Feature markers are read-only in 3D (placement and editing live on
   /// the 2D map): a tap shows what the diver recorded, nothing more.
-  void _onMarkerTap(SceneMarker marker) {
+  Future<void> _onMarkerTap(SceneMarker marker) async {
     if (marker.kind != SceneMarkerKind.siteFeature) return;
-    final feature = ref
-        .read(siteFeaturesProvider(widget.siteId))
-        .valueOrNull
-        ?.where((f) => f.id == marker.refId)
-        .firstOrNull;
-    if (feature == null) return;
+    // Await rather than read: the pane itself never watches the feature
+    // list, so a plain read can land on an unresolved provider and drop
+    // the tap silently.
+    final features = await ref.read(siteFeaturesProvider(widget.siteId).future);
+    final feature = features.where((f) => f.id == marker.refId).firstOrNull;
+    if (feature == null || !mounted) return;
     final l10n = context.l10n;
     final depthUnit = ref.read(settingsProvider).depthUnit;
     final unitInMeters = depthUnit == DepthUnit.feet ? 0.3048 : 1.0;

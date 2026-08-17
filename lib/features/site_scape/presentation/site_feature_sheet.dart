@@ -61,11 +61,14 @@ Future<SiteFeatureSheetResult?> showSiteFeatureSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => SafeArea(
+    // The inset padding reads the SHEET's context, not the caller's, so it
+    // tracks the keyboard as it opens instead of freezing at the value
+    // captured when the sheet was requested.
+    builder: (sheetContext) => SafeArea(
       child: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
+            bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
           ),
           child: SiteFeatureSheet(
             existing: existing,
@@ -236,6 +239,8 @@ class _SiteFeatureSheetState extends ConsumerState<SiteFeatureSheet> {
       SiteFeatureSheetSave(
         typeName: _typeName,
         name: _name.text.trim(),
+        // Dart's % is euclidean (always non-negative for a positive
+        // divisor), so -10 normalizes to 350, not -10.
         bearingDeg: bearing == null ? null : bearing % 360,
         depthMeters: depth == null ? null : depth * unitInMeters,
         notes: _notes.text.trim(),

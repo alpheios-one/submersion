@@ -30,9 +30,12 @@ const _features = [
   ),
 ];
 
-Future<int> _pumpSection(
+/// Pumps the section and returns a getter for how many times the host's
+/// add callback has fired (a snapshot int would always read zero).
+Future<int Function()> _pumpSection(
   WidgetTester tester, {
   AppSettings settings = const AppSettings(),
+  List<SiteFeature> features = _features,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -42,7 +45,7 @@ Future<int> _pumpSection(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         settingsProvider.overrideWith((ref) => MockSettingsNotifier(settings)),
-        siteFeaturesProvider('site-1').overrideWith((ref) async => _features),
+        siteFeaturesProvider('site-1').overrideWith((ref) async => features),
       ],
       child: MaterialApp(
         locale: const Locale('en'),
@@ -59,7 +62,7 @@ Future<int> _pumpSection(
   );
   await tester.pump();
   await tester.pump();
-  return addTaps;
+  return () => addTaps;
 }
 
 void main() {
@@ -76,6 +79,26 @@ void main() {
     expect(find.textContaining('6 m'), findsOneWidget);
   });
 
+  testWidgets('an unknown type shows its raw name rather than vanishing', (
+    tester,
+  ) async {
+    await _pumpSection(
+      tester,
+      features: const [
+        SiteFeature(
+          id: 'f-9',
+          siteId: 'site-1',
+          // Synced from a newer build whose vocabulary this one lacks.
+          typeName: 'lavaTube',
+          latitude: 12.15,
+          longitude: -68.3,
+        ),
+      ],
+    );
+
+    expect(find.text('lavaTube'), findsWidgets);
+  });
+
   testWidgets('a feet diver reads depths in feet', (tester) async {
     await _pumpSection(
       tester,
@@ -86,10 +109,13 @@ void main() {
   });
 
   testWidgets('the add action hands control back to the host', (tester) async {
-    await _pumpSection(tester);
+    final addTaps = await _pumpSection(tester);
+    expect(addTaps(), 0);
     await tester.tap(find.byKey(const ValueKey('siteFeatureAddButton')));
     await tester.pump();
-    // The section itself never places: the host opens the map.
+    // The host callback fired, and the section itself never places: the
+    // host is what opens the map armed for placement.
+    expect(addTaps(), 1);
     expect(find.byKey(const ValueKey('siteFeatureSaveButton')), findsNothing);
   });
 
