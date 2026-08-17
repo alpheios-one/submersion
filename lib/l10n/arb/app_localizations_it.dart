@@ -4915,12 +4915,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Visualizza a schermo intero';
 
   @override
-  String get diveLog_detail_viewMap => 'Mappa';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => 'Visualizza sito';
 
   @override

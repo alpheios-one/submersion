@@ -8203,18 +8203,6 @@ abstract class AppLocalizations {
   /// **'View fullscreen'**
   String get diveLog_detail_tooltip_viewFullscreen;
 
-  /// No description provided for @diveLog_detail_viewMap.
-  ///
-  /// In en, this message translates to:
-  /// **'Map'**
-  String get diveLog_detail_viewMap;
-
-  /// No description provided for @diveLog_detail_view3d.
-  ///
-  /// In en, this message translates to:
-  /// **'3D'**
-  String get diveLog_detail_view3d;
-
   /// No description provided for @diveLog_detail_viewSite.
   ///
   /// In en, this message translates to:
