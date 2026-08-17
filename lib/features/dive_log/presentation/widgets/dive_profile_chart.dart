@@ -988,6 +988,46 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     if (scope == _decimationScope) return;
     _decimationScope = scope;
     _decimatedIndicesCache.clear();
+    _decimatedNullableIndicesCache.clear();
+  }
+
+  /// Sibling of [_decimatedIndicesCache] for curves with real gaps (a cell
+  /// that stopped reporting), which [_decimatedCurveIndices]'s `List<num>`
+  /// cannot represent. Cleared alongside it in [_syncDecimationScope].
+  final Map<List<int?>, List<int>> _decimatedNullableIndicesCache =
+      HashMap<List<int?>, List<int>>.identity();
+
+  /// Indices of [curve] to render: gaps excluded before decimation ever sees
+  /// them (envelope decimation has no "this doesn't count" input, so a
+  /// present-only view is the only way to keep it from treating a gap as a
+  /// value), then decimated to [_curvePointBudget] over the same
+  /// visible-window slice [_decimatedCurveIndices] uses.
+  List<int> _decimatedNullableCurveIndices(List<int?> curve) =>
+      _decimatedNullableIndicesCache.putIfAbsent(
+        curve,
+        () => _computeDecimatedNullableCurveIndices(curve),
+      );
+
+  List<int> _computeDecimatedNullableCurveIndices(List<int?> curve) {
+    final n = math.min(widget.profile.length, curve.length);
+    if (n == 0) return const [];
+    final (start, end) = _viewportSampleWindow(n);
+
+    final presentIndices = <int>[];
+    final presentValues = <double>[];
+    for (var i = start; i < end; i++) {
+      final v = curve[i];
+      if (v == null) continue;
+      presentIndices.add(i);
+      presentValues.add(v.toDouble());
+    }
+    if (presentValues.isEmpty) return const [];
+
+    final kept = decimateSeriesIndices(
+      presentValues,
+      targetPoints: _curvePointBudget,
+    );
+    return [for (final k in kept) presentIndices[k]];
   }
 
   /// Indices of [values] (parallel to [widget.profile]) to render: clipped
@@ -1000,28 +1040,30 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   List<int> _computeDecimatedCurveIndices(List<num> values) {
     final n = math.min(widget.profile.length, values.length);
     if (n == 0) return const [];
-    var start = 0;
-    var end = n;
-    if (_viewport.isZoomed) {
-      final t0 = widget.profile.first.timestamp;
-      final span = (widget.profile[n - 1].timestamp - t0).toDouble();
-      if (span > 0) {
-        final w = _viewport.visibleWidth;
-        final loT = t0 + span * (_viewport.offsetX - w / 2);
-        final hiT = t0 + span * (_viewport.offsetX + w * 1.5);
-        start = _firstProfileIndexAtOrAfter(loT, n);
-        end = _lastProfileIndexAtOrBefore(hiT, n) + 1;
-        if (end - start < 2) {
-          start = 0;
-          end = n;
-        }
-      }
-    }
+    final (start, end) = _viewportSampleWindow(n);
     final kept = decimateSeriesIndices([
       for (var i = start; i < end; i++) values[i].toDouble(),
     ], targetPoints: _curvePointBudget);
     if (start == 0) return kept;
     return [for (final k in kept) k + start];
+  }
+
+  /// The visible-window slice of the first [n] samples, expanded by half a
+  /// window on each side, or the full `[0, n)` range when not zoomed (or the
+  /// window collapses to fewer than 2 samples). Shared by every per-sample
+  /// decimation variant so the windowing math lives in exactly one place.
+  (int start, int end) _viewportSampleWindow(int n) {
+    if (!_viewport.isZoomed) return (0, n);
+    final t0 = widget.profile.first.timestamp;
+    final span = (widget.profile[n - 1].timestamp - t0).toDouble();
+    if (span <= 0) return (0, n);
+    final w = _viewport.visibleWidth;
+    final loT = t0 + span * (_viewport.offsetX - w / 2);
+    final hiT = t0 + span * (_viewport.offsetX + w * 1.5);
+    final start = _firstProfileIndexAtOrAfter(loT, n);
+    final end = _lastProfileIndexAtOrBefore(hiT, n) + 1;
+    if (end - start < 2) return (0, n);
+    return (start, end);
   }
 
   int _firstProfileIndexAtOrAfter(double t, int n) {
@@ -1348,49 +1390,11 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       );
     }
 
-    // One row per physical cell: ppO2 when the calibration is trustworthy, the
-    // raw output when it is not, both when both are available (#810). Gated on
+    // One row per physical cell, plus the agreement verdict (#810). Gated on
     // the cells' own toggles, not on the ppO2 line: hiding the loop ppO2 must
     // not take the sensor readings with it.
     if (_showPpO2 || _showO2CellMv) {
-      final cellCount = o2CellCount(
-        barCurves: widget.o2SensorCurves,
-        mvCurves: widget.o2CellMvCurves,
-      );
-      for (var cell = 0; cell < cellCount; cell++) {
-        final readout = formatO2CellReadout(
-          bar: valueAtSample(
-            curves: widget.o2SensorCurves,
-            cell: cell,
-            sampleIndex: spot.spotIndex,
-          ),
-          millivolt: valueAtSample(
-            curves: widget.o2CellMvCurves,
-            cell: cell,
-            sampleIndex: spot.spotIndex,
-          ),
-        );
-        if (readout == null) continue;
-        rows.add(
-          TooltipRow(
-            label: '${context.l10n.diveLog_tooltip_sensor} ${cell + 1}',
-            value: readout,
-            bulletColor: o2CellColor(cell),
-          ),
-        );
-      }
-      final agreement = _o2CellAgreementReadout(spot.spotIndex);
-      if (agreement != null) {
-        rows.add(
-          TooltipRow(
-            label: _l10nO2CellSpreadLabel,
-            value: agreement,
-            bulletColor: _agreementColor(
-              o2CellAgreementFor(_o2CellRangeAt(spot.spotIndex)!),
-            ),
-          ),
-        );
-      }
+      rows.addAll(_buildO2CellTooltipRows(spot.spotIndex));
     }
 
     // ppN2
@@ -1803,6 +1807,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       identityHashCode(widget.ttsCurve),
       identityHashCode(widget.cnsCurve),
       identityHashCode(widget.otuCurve),
+      identityHashCode(widget.o2CellMvCurves),
       vpBucket,
     ]);
     _markersSig = _sigOf([
@@ -3310,39 +3315,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     // Cell rows follow the cells' own toggles, not the ppO2
                     // line: hiding the loop ppO2 must not hide the sensors.
                     if (_showPpO2 || _showO2CellMv) {
-                      final cellCount = o2CellCount(
-                        barCurves: widget.o2SensorCurves,
-                        mvCurves: widget.o2CellMvCurves,
-                      );
-                      for (var cell = 0; cell < cellCount; cell++) {
-                        final readout = formatO2CellReadout(
-                          bar: valueAtSample(
-                            curves: widget.o2SensorCurves,
-                            cell: cell,
-                            sampleIndex: spot.spotIndex,
-                          ),
-                          millivolt: valueAtSample(
-                            curves: widget.o2CellMvCurves,
-                            cell: cell,
-                            sampleIndex: spot.spotIndex,
-                          ),
-                        );
-                        if (readout == null) continue;
-                        addRow(
-                          '${context.l10n.diveLog_tooltip_sensor} ${cell + 1}',
-                          readout,
-                          o2CellColor(cell),
-                        );
-                      }
-                      final agreement = _o2CellAgreementReadout(spot.spotIndex);
-                      if (agreement != null) {
-                        addRow(
-                          _l10nO2CellSpreadLabel,
-                          agreement,
-                          _agreementColor(
-                            o2CellAgreementFor(_o2CellRangeAt(spot.spotIndex)!),
-                          ),
-                        );
+                      for (final row in _buildO2CellTooltipRows(
+                        spot.spotIndex,
+                      )) {
+                        addRow(row.label, row.value, row.bulletColor);
                       }
                     }
 
@@ -4957,6 +4933,58 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     return '${_agreementWord(level)} (${spread.toStringAsFixed(0)} mV)';
   }
 
+  /// One row per physical cell -- ppO2 when the calibration is trustworthy,
+  /// the raw output when it is not, both when both are available -- plus the
+  /// agreement verdict row (#810). Shared by both tooltip layouts so they
+  /// cannot drift apart; callers must gate this on `_showPpO2 || _showO2CellMv`
+  /// themselves, since a mobile-vs-desktop caller may need to skip building an
+  /// empty section wrapper when there is nothing to show.
+  List<TooltipRow> _buildO2CellTooltipRows(int spotIndex) {
+    final l10n = context.l10n;
+    final rows = <TooltipRow>[];
+    final cellCount = o2CellCount(
+      barCurves: widget.o2SensorCurves,
+      mvCurves: widget.o2CellMvCurves,
+    );
+    for (var cell = 0; cell < cellCount; cell++) {
+      final readout = formatO2CellReadout(
+        bar: valueAtSample(
+          curves: widget.o2SensorCurves,
+          cell: cell,
+          sampleIndex: spotIndex,
+        ),
+        millivolt: valueAtSample(
+          curves: widget.o2CellMvCurves,
+          cell: cell,
+          sampleIndex: spotIndex,
+        ),
+        barUnit: l10n.units_pressure_bar,
+        millivoltUnit: l10n.units_profileMetric_millivolts,
+      );
+      if (readout == null) continue;
+      rows.add(
+        TooltipRow(
+          label: '${l10n.diveLog_tooltip_sensor} ${cell + 1}',
+          value: readout,
+          bulletColor: o2CellColor(cell),
+        ),
+      );
+    }
+    final agreement = _o2CellAgreementReadout(spotIndex);
+    if (agreement != null) {
+      rows.add(
+        TooltipRow(
+          label: _l10nO2CellSpreadLabel,
+          value: agreement,
+          bulletColor: _agreementColor(
+            o2CellAgreementFor(_o2CellRangeAt(spotIndex)!),
+          ),
+        ),
+      );
+    }
+    return rows;
+  }
+
   /// Depth, in the band's units, at which the agreement rug sits.
   double _o2CellRugDepth(MetricBand band) => band.top + band.span * 0.985;
 
@@ -5052,11 +5080,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final lines = <LineChartBarData>[];
     for (var cell = 0; cell < mvCurves.length; cell++) {
       final curve = mvCurves[cell];
-      final n = math.min(curve.length, widget.profile.length);
       final spots = <FlSpot>[];
-      for (var i = 0; i < n; i++) {
-        final mv = curve[i];
-        if (mv == null) continue;
+      for (final i in _decimatedNullableCurveIndices(curve)) {
+        final mv = curve[i]!;
         spots.add(
           FlSpot(
             widget.profile[i].timestamp.toDouble(),
@@ -5912,6 +5938,28 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     return null;
   }
 
+  /// Memo for the o2CellMv case of [_getMetricRange], keyed by curve-list
+  /// identity. That case is the only one in the switch that scans nested
+  /// (cells x samples) data rather than a single flat curve, and the range is
+  /// read from three call sites -- including [_plotInsets], which runs on
+  /// gesture callbacks outside the normal build path -- so an unmemoized scan
+  /// there repeats real work on every pan/zoom frame.
+  final Map<List<List<int?>>, int> _o2CellMvMaxCache =
+      HashMap<List<List<int?>>, int>.identity();
+
+  int? _o2CellMvMax(List<List<int?>> curves) {
+    final cached = _o2CellMvMaxCache[curves];
+    if (cached != null) return cached;
+    int? maxMv;
+    for (final curve in curves) {
+      for (final v in curve) {
+        if (v != null && (maxMv == null || v > maxMv)) maxMv = v;
+      }
+    }
+    if (maxMv != null) _o2CellMvMaxCache[curves] = maxMv;
+    return maxMv;
+  }
+
   /// Get the min/max value range for a metric
   ({double min, double max})? _getMetricRange(
     ProfileRightAxisMetric metric,
@@ -5999,12 +6047,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         if (curves == null) return null;
         // Zero-anchored and data-driven, so levels stay comparable across
         // dives. Cells sit around 30-70 mV.
-        int? maxMv;
-        for (final curve in curves) {
-          for (final v in curve) {
-            if (v != null && (maxMv == null || v > maxMv)) maxMv = v;
-          }
-        }
+        final maxMv = _o2CellMvMax(curves);
         if (maxMv == null) return null;
         return (min: 0.0, max: maxMv * 1.2);
     }

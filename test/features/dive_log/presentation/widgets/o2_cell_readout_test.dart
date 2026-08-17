@@ -32,6 +32,18 @@ void main() {
       // zero that reaches here is a real (dead-cell) reading.
       expect(formatO2CellReadout(bar: null, millivolt: 0), '0 mV');
     });
+
+    test('uses the caller-supplied unit strings when provided', () {
+      expect(
+        formatO2CellReadout(
+          bar: 0.98,
+          millivolt: 58,
+          barUnit: 'Bar',
+          millivoltUnit: 'MilliVolt',
+        ),
+        '0.98 Bar (58 MilliVolt)',
+      );
+    });
   });
 
   group('o2CellCount', () {

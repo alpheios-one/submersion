@@ -4554,6 +4554,36 @@ void main() {
       },
     );
 
+    testWidgets('a dense O2 cell millivolt curve renders decimated', (
+      tester,
+    ) async {
+      const samples = 5000;
+      final profile = _makeProfile(points: samples);
+      final mv = <List<int?>>[List<int?>.generate(samples, (i) => 58 + i % 3)];
+
+      await tester.pumpWidget(
+        _buildChart(profile: profile, o2CellMvCurves: mv),
+      );
+      await tester.pumpAndSettle();
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DiveProfileChart)),
+      );
+      container.read(profileLegendProvider.notifier).toggleO2CellMv();
+      await tester.pumpAndSettle();
+
+      final cellLines = tester
+          .widget<LineChart>(find.byType(LineChart).first)
+          .data
+          .lineBarsData
+          .where((b) => b.color != null && kO2CellColors.contains(b.color));
+      expect(cellLines, hasLength(1));
+      // The decimator targets ~2000 points; endpoints and the global
+      // extreme can add a couple beyond the bucket envelope.
+      expect(cellLines.single.spots.length, lessThanOrEqualTo(2008));
+      expect(cellLines.single.spots.length, lessThan(samples ~/ 2));
+    });
+
     testWidgets('zooming a dense profile decimates analysis curves through the '
         'viewport-clipped path', (tester) async {
       // Exercises the _viewport.isZoomed branch of _decimatedCurveIndices:

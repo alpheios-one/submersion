@@ -31699,6 +31699,12 @@ abstract class AppLocalizations {
   /// **'%'**
   String get units_profileMetric_percent;
 
+  /// No description provided for @units_profileMetric_millivolts.
+  ///
+  /// In en, this message translates to:
+  /// **'mV'**
+  String get units_profileMetric_millivolts;
+
   /// Symbol for SAC rate in liters per minute
   ///
   /// In en, this message translates to:

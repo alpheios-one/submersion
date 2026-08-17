@@ -6,26 +6,14 @@
 /// is the only part worth looking at.
 ///
 /// The answer here is the spread -- the gap between the highest and lowest
-/// cell -- drawn as a ribbon whose thickness is that gap. Thickness is
-/// pre-attentive: a thin ribbon reads as agreement without the eye having to
-/// compare three separate lines. It also needs no baseline of any kind, so
-/// unlike a per-cell deviation it cannot suffer a reference artifact.
+/// cell -- smoothed and then run-length encoded into discrete tight/drifting/
+/// wide agreement levels, drawn as a status rug rather than a continuously
+/// scaled ribbon: a discrete verdict needs no axis of its own to read at a
+/// glance, and the rug can sit on the depth chart's own coordinate space
+/// instead of claiming a second one.
 library;
 
 import 'dart:math' as math;
-
-/// Full-scale half-range for the agreement axis, in mV.
-///
-/// Fixed rather than fitted to the data, and that is the whole point: a ribbon
-/// only reads as "thin means healthy" if thickness means the same thing on
-/// every dive. Scaling the axis to the observed spread makes the ribbon fill
-/// the same fraction of the chart whether the cells differ by 1 mV or 20, which
-/// is exactly the information the view exists to convey.
-///
-/// At this scale a 2 mV spread is a tenth of the height and reads as tight; a
-/// 20 mV spread fills the frame. The axis only grows beyond this when a dive
-/// genuinely exceeds it.
-const double kO2CellSpreadFullScaleMv = 10.0;
 
 /// Time span the divergence is smoothed over, in seconds.
 ///
@@ -36,10 +24,6 @@ const int kO2CellSpreadSmoothingSeconds = 120;
 /// Upper bound on the smoothing window, so a very densely sampled profile does
 /// not turn the rolling median into a whole-dive average.
 const int _maxWindowSamples = 121;
-
-/// Headroom above the largest deviation so the extreme is not drawn on the
-/// axis edge.
-const double _spreadPadding = 1.25;
 
 /// Spread between the highest and lowest reporting cell at each sample.
 ///
@@ -141,29 +125,6 @@ int o2CellSpreadWindowSamples(List<int> timestamps) {
   var window = (kO2CellSpreadSmoothingSeconds / interval).round();
   if (window.isEven) window += 1;
   return window.clamp(1, _maxWindowSamples);
-}
-
-/// Half-range for the symmetric agreement axis.
-///
-/// [kO2CellSpreadFullScaleMv] unless the dive genuinely exceeds it, in which
-/// case the axis grows to fit rather than clipping the ribbon.
-double o2CellSpreadBound(
-  List<List<double?>> spreadCurves, {
-  List<double?> rangeCurve = const [],
-}) {
-  var maxAbs = 0.0;
-  void consider(double? value) {
-    if (value == null) return;
-    final abs = value.abs();
-    if (abs > maxAbs) maxAbs = abs;
-  }
-
-  for (final curve in spreadCurves) {
-    curve.forEach(consider);
-  }
-  rangeCurve.forEach(consider);
-
-  return math.max(kO2CellSpreadFullScaleMv, maxAbs * _spreadPadding);
 }
 
 /// How well the cells agree at a point in time.

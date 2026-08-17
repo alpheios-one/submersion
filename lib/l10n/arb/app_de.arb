@@ -5723,6 +5723,7 @@
   "units_profileMetric_gPerL": "g/L",
   "units_profileMetric_min": "min",
   "units_profileMetric_percent": "%",
+  "units_profileMetric_millivolts": "mV",
   "units_sac_litersPerMin": "L/min",
   "units_sac_pressurePerMin": "Druck/min",
   "units_temperature_celsius": "C",

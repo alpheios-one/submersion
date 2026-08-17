@@ -559,6 +559,26 @@ const _cellMvAccessors = <int? Function(DiveProfilePoint)>[
   _o2SensorMv6,
 ];
 
+/// Builds one curve per cell, indexed by physical cell position (curve index
+/// i == cell i+1), up to the highest-numbered cell that has any reading. A
+/// lower cell with no readings at all is omitted rather than padded with an
+/// all-null curve, which keeps physical cell numbering correct even when
+/// cells are absent or non-contiguous (e.g. a failed/unreported cell). Null
+/// when no cell reports anything.
+List<List<T?>>? _resolveCellCurves<T>(
+  List<DiveProfilePoint> profile,
+  List<T? Function(DiveProfilePoint)> accessors,
+) {
+  var highestCell = -1;
+  for (var i = 0; i < accessors.length; i++) {
+    if (profile.any((p) => accessors[i](p) != null)) highestCell = i;
+  }
+  if (highestCell < 0) return null;
+  return [
+    for (var i = 0; i <= highestCell; i++) profile.map(accessors[i]).toList(),
+  ];
+}
+
 /// Exposes each O2 cell's raw output as its own per-sample curve, indexed by
 /// physical cell position (curve index i == cell i+1), or null when no cell
 /// reports millivolts.
@@ -568,17 +588,8 @@ const _cellMvAccessors = <int? Function(DiveProfilePoint)>[
 /// could not be trusted (issue #810). Deriving these from it would make the
 /// graph depend on an unrelated aggregate ppO2 sample happening to exist.
 /// Gaps stay null so a cell that stops reporting breaks its line.
-List<List<int?>>? resolveO2CellMvCurves(List<DiveProfilePoint> profile) {
-  var highestCell = -1;
-  for (var i = 0; i < _cellMvAccessors.length; i++) {
-    if (profile.any((p) => _cellMvAccessors[i](p) != null)) highestCell = i;
-  }
-  if (highestCell < 0) return null;
-  return [
-    for (var i = 0; i <= highestCell; i++)
-      profile.map(_cellMvAccessors[i]).toList(),
-  ];
-}
+List<List<int?>>? resolveO2CellMvCurves(List<DiveProfilePoint> profile) =>
+    _resolveCellCurves(profile, _cellMvAccessors);
 
 double? _cellAverage(DiveProfilePoint p) {
   var sum = 0.0;
@@ -642,21 +653,8 @@ RebreatherPpO2? resolveRebreatherPpO2(List<DiveProfilePoint> profile) {
 
   // Expose each cell as its own per-sample curve, indexed by physical cell
   // position so the tooltip labels them correctly (curve index i == Sensor
-  // i+1). Build curves up to the highest-numbered cell that has any reading;
-  // any lower cell with no readings stays an all-null curve, which the chart
-  // skips per-sample. This keeps labels right even when cells are absent or
-  // non-contiguous (e.g. a failed/unreported cell).
-  List<List<double?>>? sensorCurves;
-  var highestCell = -1;
-  for (var i = 0; i < _cellAccessors.length; i++) {
-    if (profile.any((p) => _cellAccessors[i](p) != null)) highestCell = i;
-  }
-  if (highestCell >= 0) {
-    sensorCurves = [
-      for (var i = 0; i <= highestCell; i++)
-        profile.map(_cellAccessors[i]).toList(),
-    ];
-  }
+  // i+1).
+  final sensorCurves = _resolveCellCurves(profile, _cellAccessors);
 
   return (
     curve: curve,

@@ -5907,6 +5907,7 @@
   "units_profileMetric_gPerL": "g/L",
   "units_profileMetric_min": "分",
   "units_profileMetric_percent": "%",
+  "units_profileMetric_millivolts": "mV",
   "units_sac_litersPerMin": "L/分钟",
   "units_sac_pressurePerMin": "压力/分",
   "units_temperature_celsius": "C",

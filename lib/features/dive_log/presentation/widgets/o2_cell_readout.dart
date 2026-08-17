@@ -29,11 +29,20 @@ Color o2CellColor(int cell) => kO2CellColors[cell % kO2CellColors.length];
 
 /// One tooltip row's value for a single cell, or null when the cell reported
 /// nothing at this sample.
-String? formatO2CellReadout({required double? bar, required int? millivolt}) {
+///
+/// [barUnit]/[millivoltUnit] default to the raw symbols so existing callers
+/// and tests keep working; pass the localized strings (`l10n.units_pressure_bar`,
+/// `l10n.units_profileMetric_millivolts`) from a `BuildContext` when available.
+String? formatO2CellReadout({
+  required double? bar,
+  required int? millivolt,
+  String barUnit = 'bar',
+  String millivoltUnit = 'mV',
+}) {
   if (bar == null && millivolt == null) return null;
-  if (bar == null) return '$millivolt mV';
-  if (millivolt == null) return '${bar.toStringAsFixed(2)} bar';
-  return '${bar.toStringAsFixed(2)} bar ($millivolt mV)';
+  if (bar == null) return '$millivolt $millivoltUnit';
+  if (millivolt == null) return '${bar.toStringAsFixed(2)} $barUnit';
+  return '${bar.toStringAsFixed(2)} $barUnit ($millivolt $millivoltUnit)';
 }
 
 /// How many physical cells to render rows for: the two curve sets can differ in
