@@ -35,7 +35,7 @@ class GpxExportService {
       buildGpxDocument(track, creator: 'Submersion'),
       fileNameFor(track),
       dialogTitle: 'Save GPX',
-      allowedExtensions: const ['gpx'],
+      mimeType: 'application/gpx+xml',
     );
   }
 }

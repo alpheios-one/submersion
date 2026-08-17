@@ -13,6 +13,7 @@ import 'package:submersion/features/media/presentation/providers/media_bytes_pro
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/site_media_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/core/services/files/picked_file_materializer.dart';
 
 /// Routes document attachments: PDFs to the in-app viewer, other formats
 /// to the platform; and hosts the pick-and-attach flow shared by dives and
@@ -82,17 +83,42 @@ class DocumentOpenHelper {
     final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: DocumentImportService.allowedExtensions,
-      allowMultiple: true,
     );
-    if (result == null || !context.mounted) return;
+    if (result.isEmpty || !context.mounted) return;
     // identifier travels with path: on Android it is the SAF content URI of
-    // the original, and path is only a cached copy file_picker made. The
-    // import service needs the URI to take a persistable permission
-    // (issue #1002); it is null on every other platform.
+    // the original, and path is only a local copy. The import service needs
+    // the URI to take a persistable permission (issue #1002); it is null on
+    // every other platform.
+    //
+    // file_picker 12 dropped PlatformFile.identifier and exposes the SAF URI
+    // as `uri` instead, so a non-file scheme IS the identifier; a plain
+    // file: pick has none, matching the old null on other platforms. It also
+    // leaves `path` null for those picks, so materialize them rather than
+    // skipping: silently dropping would make Attach document look like it
+    // did nothing.
+    final List<LocalPickedFile> local;
+    try {
+      local = await materializePickedFiles(result);
+    } on PickedFileMaterializationException catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.l10n.media_import_failedToImportError(e.toString()),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+      return;
+    }
     final picked = [
-      for (final f in result.files)
-        if (f.path != null)
-          (path: f.path!, filename: f.name, identifier: f.identifier),
+      for (final f in local)
+        (
+          path: f.path,
+          filename: f.name,
+          identifier: f.uri.isScheme('file') ? null : f.uri.toString(),
+        ),
     ];
     if (picked.isEmpty) return;
 

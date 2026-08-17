@@ -39,6 +39,7 @@ ReckonedPath path() => const ReckonedPath(
 SiteSeascapeInput input({
   List<SiteDivePathInput> paths = const [],
   List<NearbySiteInput> nearby = const [],
+  List<SiteFeatureMarkerInput> features = const [],
 }) => SiteSeascapeInput(
   grid: grid(),
   center: const GeoPoint(12.151, -68.299),
@@ -46,6 +47,7 @@ SiteSeascapeInput input({
   siteMaxDepth: 30,
   divePaths: paths,
   nearbySites: nearby,
+  features: features,
 );
 
 /// Layers minus the contour/wall overlays this feature added, so the
@@ -237,6 +239,70 @@ void main() {
           .firstWhere((l) => l.overlay == SceneOverlay.steepWalls)
           .drapedOnTerrain,
       isTrue,
+    );
+  });
+
+  test('a feature with a recorded depth is placed at that depth', () {
+    final result = const SiteSeascapeGeometryService().buildWithLabels(
+      input(
+        features: const [
+          SiteFeatureMarkerInput(
+            id: 'f-1',
+            typeName: 'wreck',
+            label: 'Hilma Hooker',
+            offset: (east: 10, north: 10),
+            depthMeters: 15,
+          ),
+        ],
+      ),
+    );
+
+    final marker = result.scene.markers.firstWhere(
+      (m) => m.kind == SceneMarkerKind.siteFeature,
+    );
+    expect(marker.refId, 'f-1');
+    expect(marker.label, 'Hilma Hooker');
+    // The scene's own projection maps 15 m; deeper is more negative, and
+    // the marker must sit below the surface float used for site pins.
+    final sitePin = result.scene.markers.firstWhere(
+      (m) => m.kind == SceneMarkerKind.site,
+    );
+    expect(marker.y, lessThan(sitePin.y));
+  });
+
+  test('a depthless feature drapes on the sampled seafloor', () {
+    final result = const SiteSeascapeGeometryService().buildWithLabels(
+      input(
+        features: const [
+          // Grid origin cell (20 m of water) sits at the site's
+          // south-west corner, about 111 m south and west of center.
+          SiteFeatureMarkerInput(
+            id: 'f-2',
+            typeName: 'mooring',
+            label: '',
+            offset: (east: -109, north: -111),
+          ),
+        ],
+      ),
+    );
+
+    final marker = result.scene.markers.firstWhere(
+      (m) => m.kind == SceneMarkerKind.siteFeature,
+    );
+    // Label falls back to the type name when the diver left it blank.
+    expect(marker.label, 'mooring');
+    // Draped, not floating: below the surface pin height.
+    final sitePin = result.scene.markers.firstWhere(
+      (m) => m.kind == SceneMarkerKind.site,
+    );
+    expect(marker.y, lessThan(sitePin.y));
+  });
+
+  test('no features means no feature markers', () {
+    final result = const SiteSeascapeGeometryService().buildWithLabels(input());
+    expect(
+      result.scene.markers.where((m) => m.kind == SceneMarkerKind.siteFeature),
+      isEmpty,
     );
   });
 }

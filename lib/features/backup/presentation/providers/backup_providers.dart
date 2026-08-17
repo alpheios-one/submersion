@@ -20,6 +20,7 @@ import 'package:submersion/features/backup/presentation/providers/post_restore_s
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
+import 'package:submersion_saf/submersion_saf.dart';
 
 // =============================================================================
 // Repository & Service Providers
@@ -434,6 +435,58 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
         message: 'Export failed: $e',
       );
       return null;
+    }
+  }
+
+  /// Export a backup into an Android SAF tree, streaming it in.
+  ///
+  /// The Android counterpart to [exportToPath]. Scoped storage gives no
+  /// writable filesystem path for a user-chosen folder, and file_picker 12's
+  /// `saveFile` requires the whole artifact in memory as bytes, which a large
+  /// dive library cannot afford. So the artifact is built in temp (encrypted
+  /// when backup encryption is on, exactly as every other export path does)
+  /// and then streamed into the tree by the same platform channel the
+  /// scheduled backup uses.
+  Future<void> exportToSafTree({
+    required String treeUri,
+    required String fileName,
+  }) async {
+    if (state.status == BackupOperationStatus.inProgress) return;
+
+    state = const BackupOperationState(
+      status: BackupOperationStatus.inProgress,
+      message: 'Exporting backup...',
+    );
+
+    File? temp;
+    try {
+      temp = await _service.exportBackupToTemp();
+      await SubmersionSaf.writeBackup(
+        treeUri: treeUri,
+        fileName: fileName,
+        sourcePath: temp.path,
+      );
+      state = const BackupOperationState(
+        status: BackupOperationStatus.success,
+        message: 'Backup exported',
+      );
+      _ref.read(backupSettingsProvider.notifier).refresh();
+      _ref.invalidate(backupHistoryProvider);
+    } catch (e) {
+      state = BackupOperationState(
+        status: BackupOperationStatus.error,
+        message: 'Export failed: $e',
+      );
+    } finally {
+      // The temp artifact is a full copy of the library, and when encryption
+      // is off it is plaintext. Never leave it behind.
+      if (temp != null && await temp.exists()) {
+        try {
+          await temp.delete();
+        } catch (_) {
+          // best-effort temp cleanup
+        }
+      }
     }
   }
 

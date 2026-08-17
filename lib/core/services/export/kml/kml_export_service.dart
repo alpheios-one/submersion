@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -85,18 +84,12 @@ class KmlExportService {
       dialogTitle: 'Save KML File',
       fileName: fileName,
       type: FileType.custom,
-      allowedExtensions: ['kml'],
       bytes: Uint8List.fromList(utf8.encode(kmlContent)),
+      mimeType: 'application/vnd.google-earth.kml+xml',
     );
 
     if (result == null) return (null, skippedCount);
-
-    if (!Platform.isAndroid) {
-      final file = File(result);
-      await file.writeAsString(kmlContent);
-    }
-
-    return (result, skippedCount);
+    return (savedFileLocation(result), skippedCount);
   }
 
   // ==================== Internal Helpers ====================
@@ -361,7 +354,7 @@ class KmlExportService {
       await generateTrackKml(track),
       _trackFileName(track),
       dialogTitle: 'Save KML',
-      allowedExtensions: const ['kml'],
+      mimeType: 'application/vnd.google-earth.kml+xml',
     );
   }
 }

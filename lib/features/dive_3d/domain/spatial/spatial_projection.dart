@@ -35,6 +35,14 @@ class SpatialProjection {
 
   double zOf(double north) => (north - centerNorth) * horizScale;
 
+  /// Inverses of [xOf] and [zOf], for lookups that start from a scene
+  /// position and need the ground coordinate under it. [horizScale] is
+  /// always positive (its divisor is floored at 1), so no guard is needed.
+  double eastAt(double x) =>
+      (x - SceneBounds.xSpan / 2) / horizScale + centerEast;
+
+  double northAt(double z) => z / horizScale + centerNorth;
+
   double yOf(double depth) =>
       maxDepth <= 0 ? 0 : -(depth / maxDepth) * SceneBounds.ySpan;
 

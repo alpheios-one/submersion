@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -32,10 +33,14 @@ const _onePixelPngBase64 =
 
 /// Returns whatever it is handed, so a test can pin the stamp that reaches
 /// the recorder without depending on any real source.
+///
+/// When [gate] is supplied, resolution parks on it until the test completes
+/// it, which is how the disposal test gets a tile unmounted mid-resolution.
 class _StubResolver implements MediaSourceResolver {
-  const _StubResolver(this._data);
+  const _StubResolver(this._data, {this.gate});
 
   final MediaSourceData _data;
+  final Future<void>? gate;
 
   @override
   MediaSourceType get sourceType => MediaSourceType.platformGallery;
@@ -44,13 +49,19 @@ class _StubResolver implements MediaSourceResolver {
   bool canResolveOnThisDevice(MediaItem item) => true;
 
   @override
-  Future<MediaSourceData> resolve(MediaItem item) async => _data;
+  Future<MediaSourceData> resolve(MediaItem item) async {
+    if (gate != null) await gate;
+    return _data;
+  }
 
   @override
   Future<MediaSourceData> resolveThumbnail(
     MediaItem item, {
     required Size target,
-  }) async => _data;
+  }) async {
+    if (gate != null) await gate;
+    return _data;
+  }
 
   @override
   Future<MediaSourceMetadata?> extractMetadata(MediaItem item) async => null;
@@ -84,11 +95,15 @@ void main() {
     required MediaSourceData nativeData,
     required bool thumbnail,
     MediaStoreRuntime? runtime,
+    Future<void>? gate,
   }) => ProviderScope(
     overrides: [
       mediaSourceResolverRegistryProvider.overrideWithValue(
         MediaSourceResolverRegistry({
-          MediaSourceType.platformGallery: _StubResolver(nativeData),
+          MediaSourceType.platformGallery: _StubResolver(
+            nativeData,
+            gate: gate,
+          ),
         }),
       ),
       mediaStoreRuntimeProvider.overrideWith((ref) async => runtime),
@@ -187,6 +202,46 @@ void main() {
       expect(obs.servedTier, ServedTier.original);
       expect(obs.storeFallbackUsed, isTrue);
       expect(obs.failure, isNull);
+    });
+  });
+
+  // Riverpod's WidgetRef.read throws StateError once the element is unmounted
+  // (flutter_riverpod consumer.dart, read -> _assertNotDisposed). Recording
+  // happens after the resolution await, so a tile scrolled out of a grid
+  // mid-resolution reaches that read while disposed. Nothing awaits the
+  // Future at that point either, so the throw would surface as an unhandled
+  // async error rather than anything the FutureBuilder could render.
+  testWidgets('a tile disposed mid-resolution does not record or throw', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      final gate = Completer<void>();
+      final bytes = base64Decode(_onePixelPngBase64);
+
+      await tester.pumpWidget(
+        app(
+          galleryItem(),
+          nativeData: BytesData(
+            bytes: bytes,
+            servedFrom: ServedFrom.platformGallery,
+            servedTier: ServedTier.thumbnail,
+          ),
+          thumbnail: true,
+          gate: gate.future,
+        ),
+      );
+      await tester.pump();
+
+      // Replace the tree, disposing the view while resolution is parked.
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+
+      gate.complete();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(recorder.lastFor('m1', thumbnail: true), isNull);
     });
   });
 

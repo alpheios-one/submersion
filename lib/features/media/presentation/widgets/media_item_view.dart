@@ -126,6 +126,16 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
   /// past that method's own opening yield.
   Future<_Resolution> _resolve() async {
     final resolution = await _resolveInner();
+    // A grid tile can scroll out and be disposed while its resolution is
+    // still in flight. Riverpod's WidgetRef.read asserts the element is still
+    // mounted and throws StateError otherwise (flutter_riverpod
+    // consumer.dart, read -> _assertNotDisposed), and because FutureBuilder
+    // keeps an onError callback registered across dispose, that throw is
+    // silently swallowed rather than surfaced. The observable cost is a
+    // thrown-and-discarded exception per tile on every fast scroll, and a
+    // real error here would be just as invisible. Nothing to record anyway:
+    // no one is watching this resolution.
+    if (!mounted) return resolution;
     final data = resolution.data;
     ref
         .read(mediaServingRecorderProvider)

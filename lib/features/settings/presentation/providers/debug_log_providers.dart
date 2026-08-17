@@ -7,6 +7,7 @@ import 'package:submersion/core/models/log_entry.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/export/shared/file_export_utils.dart';
 
 /// Provider for the LogFileService singleton.
 /// Must be overridden in ProviderScope with the initialized instance.
@@ -151,17 +152,10 @@ Future<String?> saveLogFile(LogFileService service) async {
     dialogTitle: 'Save Debug Logs',
     fileName: 'submersion-debug-logs.txt',
     type: FileType.custom,
-    allowedExtensions: ['txt', 'log'],
     bytes: bytes,
+    mimeType: 'text/plain',
   );
 
   if (result == null) return null;
-
-  // On some platforms, saveFile returns a path but doesn't write
-  if (!Platform.isAndroid) {
-    final outFile = File(result);
-    await outFile.writeAsBytes(bytes);
-  }
-
-  return result;
+  return savedFileLocation(result);
 }

@@ -44,6 +44,7 @@ import 'package:submersion/features/media/data/repositories/media_repository.dar
 import 'package:submersion/features/media/data/services/manifest_fetch_service.dart';
 import 'package:submersion/features/media/data/services/network_credentials_service.dart';
 import 'package:submersion/features/media/data/services/network_fetch_pipeline.dart';
+import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/providers/url_tab_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/network_signin_sheet.dart';
@@ -362,5 +363,50 @@ void main() {
         displayName: anyNamed('displayName'),
       ),
     ).called(1);
+  });
+
+  // Issue #1098. Opened from a dive site, the URL tab's "Add" button ingested
+  // rows that could only ever land on a dive, so the site never gained the
+  // attachment the user asked for.
+  group('site target', () {
+    testWidgets('hides the dive auto-match checkbox', (tester) async {
+      await tester.pumpWidget(
+        wrap(const UrlTab(target: SiteAttachTarget('site-1'))),
+      );
+
+      expect(find.byType(Checkbox), findsNothing);
+      expect(find.textContaining('Auto-match'), findsNothing);
+    });
+
+    testWidgets('ingests against the site with dive matching off', (
+      tester,
+    ) async {
+      when(
+        pipeline.ingest(
+          any,
+          autoMatch: anyNamed('autoMatch'),
+          siteId: anyNamed('siteId'),
+        ),
+      ).thenAnswer((_) async => ['id-1']);
+
+      await tester.pumpWidget(
+        wrap(
+          const UrlTab(target: SiteAttachTarget('site-1')),
+          seed: const UrlTabState(draftLines: ['https://example.com/a.jpg']),
+        ),
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Add'));
+      await tester.pump();
+
+      verify(
+        pipeline.ingest(
+          argThat(equals([Uri.parse('https://example.com/a.jpg')])),
+          // A site has no time window, so a date match here would attach the
+          // photo to some unrelated dive instead of to the site.
+          autoMatch: false,
+          siteId: 'site-1',
+        ),
+      ).called(1);
+    });
   });
 }

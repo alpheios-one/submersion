@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,17 +77,25 @@ class _RecordingPicker extends MockFilePickerPlatform {
   String? requestedFileName;
 
   @override
-  Future<String?> saveFile({
+  Future<Uri?> saveFile({
+    required String fileName,
+    required Uint8List bytes,
+    required String mimeType,
     String? dialogTitle,
-    String? fileName,
     String? initialDirectory,
-    FileType type = FileType.any,
-    List<String>? allowedExtensions,
-    Uint8List? bytes,
-    bool lockParentWindow = false,
+    Function(FilePickerStatus)? onFileSaving,
+    WindowsOptions windowsOptions = const WindowsOptions(),
+    LinuxOptions linuxOptions = const LinuxOptions(),
+    WebOptions webOptions = const WebOptions(),
   }) async {
     requestedFileName = fileName;
-    return saveFileResult;
+    return super.saveFile(
+      fileName: fileName,
+      bytes: bytes,
+      mimeType: mimeType,
+      dialogTitle: dialogTitle,
+      initialDirectory: initialDirectory,
+    );
   }
 }
 
@@ -342,7 +349,7 @@ void main() {
   group('savePdfToFile', () {
     test('saves the template the user picked, not the legacy layout', () async {
       final target = '${workDir.path}/saved_simple.pdf';
-      picker.saveFileResult = target;
+      picker.saveFileResult = Uri.file(target);
 
       final container = makeContainer();
       await notifierOf(
@@ -372,7 +379,7 @@ void main() {
 
     test('the detailed template saves a different document', () async {
       final target = '${workDir.path}/saved_detailed.pdf';
-      picker.saveFileResult = target;
+      picker.saveFileResult = Uri.file(target);
 
       final container = makeContainer();
       await notifierOf(

@@ -11824,6 +11824,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => '下一个媒体';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => '无照片可用';
 
   @override
@@ -11833,6 +11836,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_photoViewer_playPauseVideoLabel => '播放或暂停视频';
+
+  @override
+  String get media_photoViewer_previousTooltip => '上一个媒体';
 
   @override
   String get media_photoViewer_seekVideoLabel => '调整视频位置';
@@ -13829,6 +13835,16 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_cloudSync_provider_googleDrive_subtitle =>
       '通过 Google Drive 同步';
+
+  @override
+  String get settings_cloudSync_googleDrive_desktopNotConfigured => '此版本不可用';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_title => '请在浏览器中继续';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_message =>
+      '请在网页浏览器中完成 Google 登录，然后返回 Submersion。';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -17307,7 +17323,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_detail_stat_maxDepth => '最大深度';
 
   @override
-  String get trips_detail_stat_totalBottomTime => '总计底部时间';
+  String get trips_detail_stat_totalRuntime => '总运行时间';
 
   @override
   String get trips_detail_stat_totalDives => '总计潜水';
@@ -21375,6 +21391,62 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => '混合';
 
   @override
+  String get siteFeature_type_wreck => '沉船';
+
+  @override
+  String get siteFeature_type_mooring => '系泊浮标';
+
+  @override
+  String get siteFeature_type_entry => '入水点';
+
+  @override
+  String get siteFeature_type_exit => '出水点';
+
+  @override
+  String get siteFeature_type_swimThrough => '穿越通道';
+
+  @override
+  String get siteFeature_type_hazard => '危险';
+
+  @override
+  String get siteFeature_type_current => '水流';
+
+  @override
+  String get siteFeature_sectionTitle => '特征';
+
+  @override
+  String get siteFeature_addAction => '添加特征';
+
+  @override
+  String get siteFeature_placeHint => '点按地图放置特征';
+
+  @override
+  String get siteFeature_addTitle => '添加特征';
+
+  @override
+  String get siteFeature_editTitle => '编辑特征';
+
+  @override
+  String get siteFeature_field_name => '名称';
+
+  @override
+  String get siteFeature_field_bearing => '方位 (°)';
+
+  @override
+  String get siteFeature_field_depth => '深度';
+
+  @override
+  String get siteFeature_field_notes => '备注';
+
+  @override
+  String get siteFeature_deleteAction => '删除';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return '删除 $name？';
+  }
+
+  @override
   String get siteScape_mode2d => '地图';
 
   @override
@@ -21842,7 +21914,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get attrLabel_dpv_style => '款式';
 
   @override
-  String get attrLabel_burn_time_h => '续航时间（小时）';
+  String get attrLabel_burn_time_h => '续航时间';
 
   @override
   String get attrLabel_battery_type => '电池';

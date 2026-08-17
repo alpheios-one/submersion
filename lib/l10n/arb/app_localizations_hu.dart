@@ -12346,6 +12346,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'Következő médiaelem';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'Nincsenek elerheto fotok';
 
   @override
@@ -12356,6 +12359,9 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get media_photoViewer_playPauseVideoLabel =>
       'Video lejatszasa vagy szüneteltetese';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'Előző médiaelem';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'Video pozicio keresese';
@@ -14470,6 +14476,18 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_cloudSync_provider_googleDrive_subtitle =>
       'Szinkronizalas Google Drive-on keresztül';
+
+  @override
+  String get settings_cloudSync_googleDrive_desktopNotConfigured =>
+      'Ebben a buildben nem érhető el';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_title =>
+      'Folytassa a böngészőjében';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_message =>
+      'Fejezze be a Google-bejelentkezést a webböngészőjében, majd térjen vissza a Submersionbe.';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -18180,7 +18198,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'Max. melyseg';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'Osszes fenekido';
+  String get trips_detail_stat_totalRuntime => 'Osszes futasido';
 
   @override
   String get trips_detail_stat_totalDives => 'Osszes merüles';
@@ -22428,6 +22446,63 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Keverék';
 
   @override
+  String get siteFeature_type_wreck => 'Roncs';
+
+  @override
+  String get siteFeature_type_mooring => 'Kikötőbója';
+
+  @override
+  String get siteFeature_type_entry => 'Beszállási pont';
+
+  @override
+  String get siteFeature_type_exit => 'Kiszállási pont';
+
+  @override
+  String get siteFeature_type_swimThrough => 'Átúszó';
+
+  @override
+  String get siteFeature_type_hazard => 'Veszély';
+
+  @override
+  String get siteFeature_type_current => 'Áramlás';
+
+  @override
+  String get siteFeature_sectionTitle => 'Jellemzők';
+
+  @override
+  String get siteFeature_addAction => 'Jellemző hozzáadása';
+
+  @override
+  String get siteFeature_placeHint =>
+      'Koppintson a térképre a jellemző elhelyezéséhez';
+
+  @override
+  String get siteFeature_addTitle => 'Jellemző hozzáadása';
+
+  @override
+  String get siteFeature_editTitle => 'Jellemző szerkesztése';
+
+  @override
+  String get siteFeature_field_name => 'Név';
+
+  @override
+  String get siteFeature_field_bearing => 'Irány (°)';
+
+  @override
+  String get siteFeature_field_depth => 'Mélység';
+
+  @override
+  String get siteFeature_field_notes => 'Jegyzetek';
+
+  @override
+  String get siteFeature_deleteAction => 'Törlés';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'Törli: $name?';
+  }
+
+  @override
   String get siteScape_mode2d => 'Térkép';
 
   @override
@@ -22915,7 +22990,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get attrLabel_dpv_style => 'Fazon';
 
   @override
-  String get attrLabel_burn_time_h => 'Üzemidő (ó)';
+  String get attrLabel_burn_time_h => 'Üzemidő';
 
   @override
   String get attrLabel_battery_type => 'Akkumulátor';

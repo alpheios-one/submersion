@@ -176,12 +176,16 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                     // The router is captured BEFORE the pop: after it, this
                     // sheet's context is deactivated and cannot be looked up
                     // through.
+                    //
+                    // The target filter travels with the push so the advanced
+                    // form edits the same filter this sheet does, instead of
+                    // always hijacking the dive list's (#1079).
                     final router = GoRouter.of(context);
                     Navigator.of(context).pop();
-                    router.push('/dives/search');
+                    router.push('/dives/search', extra: widget.filterProvider);
                   },
                   icon: const Icon(Icons.manage_search, size: 18),
-                  label: const Text('Advanced Search'),
+                  label: Text(context.l10n.diveLog_search_appBar),
                 ),
               ),
               const SizedBox(height: 16),

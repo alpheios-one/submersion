@@ -12288,6 +12288,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'Volgende media';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'Geen foto\'s beschikbaar';
 
   @override
@@ -12298,6 +12301,9 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get media_photoViewer_playPauseVideoLabel =>
       'Video afspelen of pauzeren';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'Vorige media';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'Videopositie zoeken';
@@ -14404,6 +14410,18 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_cloudSync_provider_googleDrive_subtitle =>
       'Synchroniseren via Google Drive';
+
+  @override
+  String get settings_cloudSync_googleDrive_desktopNotConfigured =>
+      'Niet beschikbaar in deze build';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_title =>
+      'Ga verder in je browser';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_message =>
+      'Rond het inloggen bij Google af in je webbrowser en keer dan terug naar Submersion.';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -18084,7 +18102,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'Max. diepte';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'Totale bodemtijd';
+  String get trips_detail_stat_totalRuntime => 'Totale looptijd';
 
   @override
   String get trips_detail_stat_totalDives => 'Totaal duiken';
@@ -22328,6 +22346,63 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Mengeling';
 
   @override
+  String get siteFeature_type_wreck => 'Wrak';
+
+  @override
+  String get siteFeature_type_mooring => 'Meerboei';
+
+  @override
+  String get siteFeature_type_entry => 'Instappunt';
+
+  @override
+  String get siteFeature_type_exit => 'Uitstappunt';
+
+  @override
+  String get siteFeature_type_swimThrough => 'Doorzwemplek';
+
+  @override
+  String get siteFeature_type_hazard => 'Gevaar';
+
+  @override
+  String get siteFeature_type_current => 'Stroming';
+
+  @override
+  String get siteFeature_sectionTitle => 'Kenmerken';
+
+  @override
+  String get siteFeature_addAction => 'Kenmerk toevoegen';
+
+  @override
+  String get siteFeature_placeHint =>
+      'Tik op de kaart om het kenmerk te plaatsen';
+
+  @override
+  String get siteFeature_addTitle => 'Kenmerk toevoegen';
+
+  @override
+  String get siteFeature_editTitle => 'Kenmerk bewerken';
+
+  @override
+  String get siteFeature_field_name => 'Naam';
+
+  @override
+  String get siteFeature_field_bearing => 'Peiling (°)';
+
+  @override
+  String get siteFeature_field_depth => 'Diepte';
+
+  @override
+  String get siteFeature_field_notes => 'Notities';
+
+  @override
+  String get siteFeature_deleteAction => 'Verwijderen';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return '$name verwijderen?';
+  }
+
+  @override
   String get siteScape_mode2d => 'Kaart';
 
   @override
@@ -22817,7 +22892,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get attrLabel_dpv_style => 'Stijl';
 
   @override
-  String get attrLabel_burn_time_h => 'Looptijd (u)';
+  String get attrLabel_burn_time_h => 'Looptijd';
 
   @override
   String get attrLabel_battery_type => 'Accu';

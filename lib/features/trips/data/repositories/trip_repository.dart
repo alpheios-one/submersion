@@ -518,7 +518,7 @@ class TripRepository {
     final statsResult = await _db.customSelect('''
       SELECT
         COUNT(*) as dive_count,
-        COALESCE(SUM(bottom_time), 0) as total_bottom_time,
+        COALESCE(SUM(COALESCE(runtime, bottom_time)), 0) as total_runtime,
         MAX(max_depth) as max_depth,
         AVG(max_depth) as avg_depth
       FROM dives
@@ -529,7 +529,7 @@ class TripRepository {
     return domain.TripWithStats(
       trip: trip,
       diveCount: statsResult.data['dive_count'] as int? ?? 0,
-      totalBottomTime: statsResult.data['total_bottom_time'] as int? ?? 0,
+      totalRuntime: statsResult.data['total_runtime'] as int? ?? 0,
       maxDepth: statsResult.data['max_depth'] as double?,
       avgDepth: statsResult.data['avg_depth'] as double?,
     );
@@ -597,7 +597,7 @@ class TripRepository {
       SELECT
         t.*,
         COUNT(DISTINCT d.id) AS dive_count,
-        COALESCE(SUM(d.bottom_time), 0) AS total_bottom_time,
+        COALESCE(SUM(COALESCE(d.runtime, d.bottom_time)), 0) AS total_runtime,
         MAX(d.max_depth) AS max_depth,
         AVG(d.avg_depth) AS avg_depth
       FROM trips t
@@ -612,7 +612,7 @@ class TripRepository {
       return domain.TripWithStats(
         trip: trip,
         diveCount: row.data['dive_count'] as int,
-        totalBottomTime: row.data['total_bottom_time'] as int,
+        totalRuntime: row.data['total_runtime'] as int,
         maxDepth: row.data['max_depth'] as double?,
         avgDepth: row.data['avg_depth'] as double?,
       );

@@ -88,4 +88,19 @@ void main() {
 
     expect(notifications, 1);
   });
+
+  // A resolution can outlive the container that owns the recorder: a
+  // FutureProvider still in flight when a ProviderContainer is disposed runs
+  // its continuation afterwards and records into a notifier that is already
+  // gone. notifyListeners asserts in that state, so the write has to be
+  // dropped rather than attempted.
+  test('recording after dispose is a no-op rather than a throw', () {
+    final r = MediaServingRecorder()..dispose();
+
+    expect(
+      () => r.record('m1', thumbnail: false, servedFrom: ServedFrom.localDisk),
+      returnsNormally,
+    );
+    expect(r.lastFor('m1', thumbnail: false), isNull);
+  });
 }

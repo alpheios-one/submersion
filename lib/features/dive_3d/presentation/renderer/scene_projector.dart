@@ -88,4 +88,12 @@ class SceneProjector {
 
   /// Larger = nearer to camera. Used for back-to-front triangle sorting.
   double viewDepth(double x, double y, double z) => _view(x, y, z).$3;
+
+  /// How much view depth one scene-Y unit buys at this pitch, exactly (view
+  /// depth is affine in y). Lets the renderer re-sort a vertex at a
+  /// different height without projecting it twice, and makes the shift
+  /// self-scaling: straight down it is the whole depth axis, edge-on it is
+  /// nothing -- which is also where the ordering it corrects stops
+  /// mattering. See [MeshData.sortHeights].
+  double get depthPerUnitY => _sp;
 }

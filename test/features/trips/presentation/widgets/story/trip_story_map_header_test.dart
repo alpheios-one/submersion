@@ -181,6 +181,20 @@ void main() {
     expect(find.text('14'), findsOneWidget);
   });
 
+  testWidgets('stat strip totals runtime, not bottom time (issue #889)', (
+    tester,
+  ) async {
+    final stats = TripWithStats(
+      trip: _trip(),
+      diveCount: 14,
+      totalRuntime: 12 * 3600 + 40 * 60,
+    );
+    await pumpStrip(tester, stats);
+
+    expect(find.text('Total Runtime'), findsOneWidget);
+    expect(find.text('12h 40m'), findsOneWidget);
+  });
+
   testWidgets('stat strip shows sites visited when siteCount > 0', (
     tester,
   ) async {

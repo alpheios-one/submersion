@@ -20963,6 +20963,12 @@ abstract class AppLocalizations {
   /// **'Failed to write metadata: {error}'**
   String media_photoViewer_failedToWriteMetadataError(Object error);
 
+  /// No description provided for @media_photoViewer_nextTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Next media'**
+  String get media_photoViewer_nextTooltip;
+
   /// No description provided for @media_photoViewer_noPhotosAvailable.
   ///
   /// In en, this message translates to:
@@ -20980,6 +20986,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Play or pause video'**
   String get media_photoViewer_playPauseVideoLabel;
+
+  /// No description provided for @media_photoViewer_previousTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous media'**
+  String get media_photoViewer_previousTooltip;
 
   /// No description provided for @media_photoViewer_seekVideoLabel.
   ///
@@ -24413,6 +24425,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync via Google Drive'**
   String get settings_cloudSync_provider_googleDrive_subtitle;
+
+  /// No description provided for @settings_cloudSync_googleDrive_desktopNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available in this build'**
+  String get settings_cloudSync_googleDrive_desktopNotConfigured;
+
+  /// No description provided for @settings_cloudSync_googleDrive_browserWait_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue in your browser'**
+  String get settings_cloudSync_googleDrive_browserWait_title;
+
+  /// No description provided for @settings_cloudSync_googleDrive_browserWait_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish signing in to Google in your web browser, then return to Submersion.'**
+  String get settings_cloudSync_googleDrive_browserWait_message;
 
   /// No description provided for @settings_cloudSync_provider_icloud.
   ///
@@ -30481,11 +30511,11 @@ abstract class AppLocalizations {
   /// **'Max Depth'**
   String get trips_detail_stat_maxDepth;
 
-  /// No description provided for @trips_detail_stat_totalBottomTime.
+  /// No description provided for @trips_detail_stat_totalRuntime.
   ///
   /// In en, this message translates to:
-  /// **'Total Bottom Time'**
-  String get trips_detail_stat_totalBottomTime;
+  /// **'Total Runtime'**
+  String get trips_detail_stat_totalRuntime;
 
   /// No description provided for @trips_detail_stat_totalDives.
   ///
@@ -37441,6 +37471,114 @@ abstract class AppLocalizations {
   /// **'Blend'**
   String get dive3d_seascape_appearance_surfaceBlend;
 
+  /// No description provided for @siteFeature_type_wreck.
+  ///
+  /// In en, this message translates to:
+  /// **'Wreck'**
+  String get siteFeature_type_wreck;
+
+  /// No description provided for @siteFeature_type_mooring.
+  ///
+  /// In en, this message translates to:
+  /// **'Mooring'**
+  String get siteFeature_type_mooring;
+
+  /// No description provided for @siteFeature_type_entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry point'**
+  String get siteFeature_type_entry;
+
+  /// No description provided for @siteFeature_type_exit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit point'**
+  String get siteFeature_type_exit;
+
+  /// No description provided for @siteFeature_type_swimThrough.
+  ///
+  /// In en, this message translates to:
+  /// **'Swim-through'**
+  String get siteFeature_type_swimThrough;
+
+  /// No description provided for @siteFeature_type_hazard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hazard'**
+  String get siteFeature_type_hazard;
+
+  /// No description provided for @siteFeature_type_current.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get siteFeature_type_current;
+
+  /// No description provided for @siteFeature_sectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Features'**
+  String get siteFeature_sectionTitle;
+
+  /// No description provided for @siteFeature_addAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add feature'**
+  String get siteFeature_addAction;
+
+  /// No description provided for @siteFeature_placeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the map to place the feature'**
+  String get siteFeature_placeHint;
+
+  /// No description provided for @siteFeature_addTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add feature'**
+  String get siteFeature_addTitle;
+
+  /// No description provided for @siteFeature_editTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit feature'**
+  String get siteFeature_editTitle;
+
+  /// No description provided for @siteFeature_field_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get siteFeature_field_name;
+
+  /// No description provided for @siteFeature_field_bearing.
+  ///
+  /// In en, this message translates to:
+  /// **'Bearing (°)'**
+  String get siteFeature_field_bearing;
+
+  /// No description provided for @siteFeature_field_depth.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth'**
+  String get siteFeature_field_depth;
+
+  /// No description provided for @siteFeature_field_notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get siteFeature_field_notes;
+
+  /// No description provided for @siteFeature_deleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get siteFeature_deleteAction;
+
+  /// No description provided for @siteFeature_deleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}?'**
+  String siteFeature_deleteConfirm(String name);
+
   /// No description provided for @siteScape_mode2d.
   ///
   /// In en, this message translates to:
@@ -38332,7 +38470,7 @@ abstract class AppLocalizations {
   /// No description provided for @attrLabel_burn_time_h.
   ///
   /// In en, this message translates to:
-  /// **'Burn time (h)'**
+  /// **'Burn time'**
   String get attrLabel_burn_time_h;
 
   /// No description provided for @attrLabel_battery_type.

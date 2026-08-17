@@ -12367,6 +12367,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'Elemento siguiente';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'No hay fotos disponibles';
 
   @override
@@ -12377,6 +12380,9 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get media_photoViewer_playPauseVideoLabel =>
       'Reproducir o pausar video';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'Elemento anterior';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'Buscar posicion del video';
@@ -14509,6 +14515,18 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_cloudSync_provider_googleDrive_subtitle =>
       'Sincronizar via Google Drive';
+
+  @override
+  String get settings_cloudSync_googleDrive_desktopNotConfigured =>
+      'No disponible en esta versión';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_title =>
+      'Continúa en tu navegador';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_message =>
+      'Termina de iniciar sesión en Google en tu navegador web y luego vuelve a Submersion.';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -18247,7 +18265,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'Prof. max.';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'Tiempo de fondo total';
+  String get trips_detail_stat_totalRuntime => 'Tiempo total';
 
   @override
   String get trips_detail_stat_totalDives => 'Total de inmersiones';
@@ -22515,6 +22533,63 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Mezcla';
 
   @override
+  String get siteFeature_type_wreck => 'Pecio';
+
+  @override
+  String get siteFeature_type_mooring => 'Boya de amarre';
+
+  @override
+  String get siteFeature_type_entry => 'Punto de entrada';
+
+  @override
+  String get siteFeature_type_exit => 'Punto de salida';
+
+  @override
+  String get siteFeature_type_swimThrough => 'Pasadizo';
+
+  @override
+  String get siteFeature_type_hazard => 'Peligro';
+
+  @override
+  String get siteFeature_type_current => 'Corriente';
+
+  @override
+  String get siteFeature_sectionTitle => 'Características';
+
+  @override
+  String get siteFeature_addAction => 'Añadir característica';
+
+  @override
+  String get siteFeature_placeHint =>
+      'Toca el mapa para colocar la característica';
+
+  @override
+  String get siteFeature_addTitle => 'Añadir característica';
+
+  @override
+  String get siteFeature_editTitle => 'Editar característica';
+
+  @override
+  String get siteFeature_field_name => 'Nombre';
+
+  @override
+  String get siteFeature_field_bearing => 'Rumbo (°)';
+
+  @override
+  String get siteFeature_field_depth => 'Profundidad';
+
+  @override
+  String get siteFeature_field_notes => 'Notas';
+
+  @override
+  String get siteFeature_deleteAction => 'Eliminar';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return '¿Eliminar $name?';
+  }
+
+  @override
   String get siteScape_mode2d => 'Mapa';
 
   @override
@@ -23006,7 +23081,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get attrLabel_dpv_style => 'Estilo';
 
   @override
-  String get attrLabel_burn_time_h => 'Autonomía (h)';
+  String get attrLabel_burn_time_h => 'Autonomía';
 
   @override
   String get attrLabel_battery_type => 'Batería';
