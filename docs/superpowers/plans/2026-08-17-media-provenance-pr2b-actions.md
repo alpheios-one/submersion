@@ -1,6 +1,6 @@
 # Media Provenance PR 2b: The Actions Layer Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Make the media info panel actionable, so a problem it surfaces can be fixed from the same place, without adding any new repair or upload machinery.
 
@@ -59,7 +59,7 @@
 
 The reveal itself shells out to `Process.run` and cannot be unit-tested, so the test covers only the platform predicate. Do not fake `Process.run` to manufacture coverage; mark the shell-out `coverage:ignore` with the same reasoning the original carries.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```dart
 import 'dart:io';
@@ -76,18 +76,18 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run it and confirm it fails** with "Target of URI doesn't exist".
+- [x] **Step 2: Run it and confirm it fails** with "Target of URI doesn't exist".
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Move the body of `_showInFinder` verbatim into a top-level function, keeping its swallow-failures comment, and add the predicate. Then replace the private method in `dive_media_section.dart` with a call to it and delete the private version. Leave the `coverage:ignore` block covering the shell-out.
 
-- [ ] **Step 4: Run the test and the dive media section suite.**
+- [x] **Step 4: Run the test and the dive media section suite.**
 
 Run: `flutter test test/shared/utils/file_reveal_test.dart test/features/media/presentation/widgets/`
 Expected: PASS, unchanged counts. Extraction must not change behaviour.
 
-- [ ] **Step 5: Format, analyze, commit.**
+- [x] **Step 5: Format, analyze, commit.**
 
 ---
 
@@ -113,7 +113,7 @@ final mediaItemVerifierProvider = Provider<MediaItemVerifier>(...);
 
 This is the ONE piece of new capability in this PR. It exists because the only caller that persists a verify result today is a bulk sweep wired to a single concrete resolver.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Use a fake registry whose resolver returns a configurable `VerifyResult`, and a fake repository capturing writes. Cover:
 
@@ -129,9 +129,9 @@ test('transientError stamps the date but leaves the orphan flag alone', ...);
 test('an unregistered source type reports transientError and writes nothing', ...);
 ```
 
-- [ ] **Step 2: Run it and confirm it fails.**
+- [x] **Step 2: Run it and confirm it fails.**
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```dart
 Future<VerifyResult> verify(MediaItem item) async {
@@ -164,9 +164,9 @@ Future<VerifyResult> verify(MediaItem item) async {
 
 Mirror `LocalFilesDiagnosticsService`'s contract exactly; a divergence here would make one-off checks and the bulk sweep disagree about the same row.
 
-- [ ] **Step 4: Run the test.** Expected: PASS.
+- [x] **Step 4: Run the test.** Expected: PASS.
 
-- [ ] **Step 5: Format, analyze, commit.**
+- [x] **Step 5: Format, analyze, commit.**
 
 ---
 
@@ -182,7 +182,7 @@ Mirror `LocalFilesDiagnosticsService`'s contract exactly; a divergence here woul
 
 The extracted helper must NOT refresh any list: that is the caller's concern, and the dive section's refresh is dive-scoped. Keep the file picker injectable so a test can drive it without a native dialog.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Inject a picker returning a temp file, plus a fake `MediaRepairService`, and assert:
 
@@ -194,13 +194,13 @@ test('returns false and applies nothing when the picker is cancelled', ...);
 test('different bytes require confirmation before applying', ...);
 ```
 
-- [ ] **Step 2: Run it and confirm it fails.**
+- [x] **Step 2: Run it and confirm it fails.**
 
-- [ ] **Step 3: Write the implementation.** Move the body verbatim, minus the `mediaListNotifierProvider` refresh, and add the injectable picker. Then rewrite `_replaceLink` as a call to the helper followed by its existing refresh.
+- [x] **Step 3: Write the implementation.** Move the body verbatim, minus the `mediaListNotifierProvider` refresh, and add the injectable picker. Then rewrite `_replaceLink` as a call to the helper followed by its existing refresh.
 
-- [ ] **Step 4: Run the helper test and the dive media section suite.** Expected: PASS, unchanged counts.
+- [x] **Step 4: Run the helper test and the dive media section suite.** Expected: PASS, unchanged counts.
 
-- [ ] **Step 5: Format, analyze, commit.**
+- [x] **Step 5: Format, analyze, commit.**
 
 ---
 
@@ -226,10 +226,10 @@ media_info_checkUnavailable    "Could not check right now"
 media_info_backupQueued        "Queued for upload"
 ```
 
-- [ ] **Step 1** Extend the strings test with the 11 new getters, expecting failure.
-- [ ] **Step 2** Add the keys to all 11 catalogs and run `flutter pub get` to regenerate.
-- [ ] **Step 3** Run `flutter test test/l10n/`. Expected: parity and strings tests PASS.
-- [ ] **Step 4** Format and commit, including the regenerated `app_localizations*.dart`.
+- [x] **Step 1** Extend the strings test with the 11 new getters, expecting failure.
+- [x] **Step 2** Add the keys to all 11 catalogs and run `flutter pub get` to regenerate.
+- [x] **Step 3** Run `flutter test test/l10n/`. Expected: parity and strings tests PASS.
+- [x] **Step 4** Format and commit, including the regenerated `app_localizations*.dart`.
 
 ---
 
@@ -244,7 +244,7 @@ Placement, one action row per block:
 - **Origin block:** Check now (always). Locate (only when health is `missing` AND the source type is `localFile`, because the repair engine's file candidate only makes sense there). Show in file manager and Copy reference (only when the pointer is a path and the platform can reveal).
 - **Backup block:** Back up now / Retry upload, shown only when `eligible` AND `storeAttached` AND the tier is not `full`. The label is Retry when the queue state is `failed`, otherwise Back up now. Hidden entirely while `pending` or `transferring`, because the answer to "is it uploading" is already on screen.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```dart
 testWidgets('Check now is always offered', ...);
@@ -262,28 +262,28 @@ For the clipboard assertion, intercept `SystemChannels.platform` with
 `tester.binding.defaultBinaryMessenger.setMockMethodCallHandler` and capture
 `Clipboard.setData`.
 
-- [ ] **Step 2: Run and confirm failure.**
+- [x] **Step 2: Run and confirm failure.**
 
-- [ ] **Step 3: Implement.** Actions render as `TextButton`s in a trailing `Wrap` inside each section. Every handler captures `context.l10n` and the messenger BEFORE its first await, then guards on `context.mounted` after, matching the repo's async-gap convention.
+- [x] **Step 3: Implement.** Actions render as `TextButton`s in a trailing `Wrap` inside each section. Every handler captures `context.l10n` and the messenger BEFORE its first await, then guards on `context.mounted` after, matching the repo's async-gap convention.
 
-- [ ] **Step 4: Run the panel suite.** Expected: PASS.
+- [x] **Step 4: Run the panel suite.** Expected: PASS.
 
-- [ ] **Step 5: Format, analyze, commit.**
+- [x] **Step 5: Format, analyze, commit.**
 
 ---
 
 ### Task 6: Full verification
 
-- [ ] **Step 1** `dart format --set-exit-if-changed .` exits 0.
-- [ ] **Step 2** `flutter analyze` reports no issues. Do not pipe through `tail`: a pipeline's exit status comes from the last command, which masks the real one.
-- [ ] **Step 3** `flutter test`, redirected to a file rather than piped, with the exit code captured explicitly. Expect zero failures.
-- [ ] **Step 4** `git diff --stat origin/main...HEAD -- lib/core/database lib/features/sync` is empty.
-- [ ] **Step 5** No em-dash entered source:
+- [x] **Step 1** `dart format --set-exit-if-changed .` exits 0.
+- [x] **Step 2** `flutter analyze` reports no issues. Do not pipe through `tail`: a pipeline's exit status comes from the last command, which masks the real one.
+- [x] **Step 3** `flutter test`, redirected to a file rather than piped, with the exit code captured explicitly. Expect zero failures.
+- [x] **Step 4** `git diff --stat origin/main...HEAD -- lib/core/database lib/features/sync` is empty.
+- [x] **Step 5** No em-dash entered source:
   ```bash
   EMDASH=$(printf '\xe2\x80\x94')
   git diff origin/main...HEAD -- lib test | grep -n "^+.*$EMDASH" || echo "clean"
   ```
-- [ ] **Step 6** Push and open the PR against `worktree-media-provenance-pr2a`, retargeting to `main` once 2a merges. No attribution line, no session URL.
+- [x] **Step 6** Push and open the PR against `worktree-media-provenance-pr2a`, retargeting to `main` once 2a merges. No attribution line, no session URL.
 
 ## Self-Review
 
