@@ -24539,7 +24539,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_info_title => 'Informacoes da midia';
+  String get media_info_title => 'Informações da mídia';
 
   @override
   String get media_info_fileSection => 'Arquivo';
@@ -24551,7 +24551,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_info_type => 'Tipo';
 
   @override
-  String get media_info_dimensions => 'Dimensoes';
+  String get media_info_dimensions => 'Dimensões';
 
   @override
   String get media_info_size => 'Tamanho';
@@ -24572,7 +24572,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_info_source => 'Fonte';
 
   @override
-  String get media_info_reference => 'Referencia';
+  String get media_info_reference => 'Referência';
 
   @override
   String get media_info_linkedOn => 'Vinculada em';
@@ -24593,11 +24593,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_info_statusMissing => 'Ausente neste dispositivo';
 
   @override
-  String get media_info_statusUnchecked => 'Ainda nao verificada';
+  String get media_info_statusUnchecked => 'Ainda não verificada';
 
   @override
   String media_info_lastChecked(String date) {
-    return 'Ultima verificacao $date';
+    return 'Última verificação $date';
   }
 
   @override
@@ -24611,17 +24611,17 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhum armazenamento na nuvem conectado';
 
   @override
-  String get media_info_notEligible => 'Esta fonte nao pode ser copiada';
+  String get media_info_notEligible => 'Esta fonte não pode ser copiada';
 
   @override
   String get media_info_backupFull => 'Original enviado';
 
   @override
   String get media_info_backupThumbOnly =>
-      'Apenas miniatura, original nao enviado';
+      'Apenas miniatura, original não enviado';
 
   @override
-  String get media_info_backupRenditionOnly => 'Versao comprimida enviada';
+  String get media_info_backupRenditionOnly => 'Versão comprimida enviada';
 
   @override
   String get media_info_backupNone => 'Sem backup';
@@ -24646,10 +24646,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_info_servingSection => 'Servindo agora';
 
   @override
-  String get media_info_servingUnobserved => 'Ainda nao carregada';
+  String get media_info_servingUnobserved => 'Ainda não carregada';
 
   @override
-  String get media_info_servingFailed => 'Nao foi possivel carregar';
+  String get media_info_servingFailed => 'Não foi possível carregar';
 
   @override
   String get media_info_servedLocalDisk => 'Arquivo local neste dispositivo';
@@ -24670,24 +24670,36 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_info_servedConnectorCache =>
-      'Cache local, do servico conectado';
+      'Cache local, do serviço conectado';
 
   @override
   String get media_info_servedConnectorNetwork =>
-      'Baixada do servico conectado';
+      'Baixada do serviço conectado';
 
   @override
-  String get media_info_servedEmbedded => 'Armazenada neste diario';
+  String get media_info_servedEmbedded => 'Armazenada neste diário';
 
   @override
   String get media_info_servingFallbackNote =>
-      'A fonte original nao pode ser acessada, entao o armazenamento na nuvem forneceu isto.';
+      'A fonte original não pôde ser acessada, então o armazenamento na nuvem forneceu isto.';
 
   @override
   String get media_info_servingTierThumbnail => 'Miniatura';
 
   @override
-  String get media_info_servingTierRendition => 'Versao comprimida';
+  String get media_info_servingTierRendition => 'Versão comprimida';
+
+  @override
+  String get media_info_typePhoto => 'Foto';
+
+  @override
+  String get media_info_typeVideo => 'Vídeo';
+
+  @override
+  String get media_info_typeDocument => 'Documento';
+
+  @override
+  String get media_info_typeSignature => 'Assinatura';
 
   @override
   String get media_info_actionCheckNow => 'Verificar agora';
@@ -24705,19 +24717,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_info_actionReveal => 'Mostrar no gerenciador de arquivos';
 
   @override
-  String get media_info_actionCopyPath => 'Copiar referencia';
+  String get media_info_actionCopyPath => 'Copiar referência';
 
   @override
-  String get media_info_referenceCopied => 'Referencia copiada';
+  String get media_info_referenceCopied => 'Referência copiada';
 
   @override
   String get media_info_checkFound => 'Fonte encontrada';
 
   @override
-  String get media_info_checkMissing => 'Fonte ausente';
+  String get media_info_checkMissing => 'A fonte está ausente';
 
   @override
-  String get media_info_checkUnavailable => 'Nao foi possivel verificar agora';
+  String get media_info_checkUnavailable => 'Não foi possível verificar agora';
 
   @override
   String get media_info_backupQueued => 'Na fila para envio';

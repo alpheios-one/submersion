@@ -24507,6 +24507,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_info_servingTierRendition => 'Gecomprimeerde versie';
 
   @override
+  String get media_info_typePhoto => 'Foto';
+
+  @override
+  String get media_info_typeVideo => 'Video';
+
+  @override
+  String get media_info_typeDocument => 'Document';
+
+  @override
+  String get media_info_typeSignature => 'Handtekening';
+
+  @override
   String get media_info_actionCheckNow => 'Nu controleren';
 
   @override
@@ -24522,7 +24534,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_info_actionReveal => 'Tonen in bestandsbeheer';
 
   @override
-  String get media_info_actionCopyPath => 'Referentie kopieren';
+  String get media_info_actionCopyPath => 'Referentie kopiëren';
 
   @override
   String get media_info_referenceCopied => 'Referentie gekopieerd';

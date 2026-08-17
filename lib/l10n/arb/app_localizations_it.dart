@@ -24611,7 +24611,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get media_info_notEligible =>
-      'Questa sorgente non puo essere sottoposta a backup';
+      'Questa sorgente non può essere sottoposta a backup';
 
   @override
   String get media_info_backupFull => 'Originale caricato';
@@ -24658,10 +24658,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_info_servedGallery => 'Libreria foto';
 
   @override
-  String get media_info_servedStoreCache => 'Cache locale, dall archivio cloud';
+  String get media_info_servedStoreCache =>
+      'Cache locale, dall\'archivio cloud';
 
   @override
-  String get media_info_servedStoreNetwork => 'Scaricata dall archivio cloud';
+  String get media_info_servedStoreNetwork => 'Scaricata dall\'archivio cloud';
 
   @override
   String get media_info_servedNetworkUrl => 'Streaming da un URL';
@@ -24679,13 +24680,25 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get media_info_servingFallbackNote =>
-      'La sorgente originale non era raggiungibile, quindi ha risposto l archivio cloud.';
+      'La sorgente originale non era raggiungibile, quindi ha risposto l\'archivio cloud.';
 
   @override
   String get media_info_servingTierThumbnail => 'Miniatura';
 
   @override
   String get media_info_servingTierRendition => 'Versione compressa';
+
+  @override
+  String get media_info_typePhoto => 'Foto';
+
+  @override
+  String get media_info_typeVideo => 'Video';
+
+  @override
+  String get media_info_typeDocument => 'Documento';
+
+  @override
+  String get media_info_typeSignature => 'Firma';
 
   @override
   String get media_info_actionCheckNow => 'Verifica ora';

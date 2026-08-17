@@ -24083,6 +24083,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_info_servingTierRendition => 'גרסה דחוסה';
 
   @override
+  String get media_info_typePhoto => 'תמונה';
+
+  @override
+  String get media_info_typeVideo => 'וידאו';
+
+  @override
+  String get media_info_typeDocument => 'מסמך';
+
+  @override
+  String get media_info_typeSignature => 'חתימה';
+
+  @override
   String get media_info_actionCheckNow => 'בדוק עכשיו';
 
   @override

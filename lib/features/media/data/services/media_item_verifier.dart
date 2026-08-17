@@ -38,25 +38,39 @@ class MediaItemVerifier {
       return VerifyResult.transientError;
     }
 
-    final result = await resolver.verify(item);
+    final VerifyResult result;
+    try {
+      result = await resolver.verify(item);
+    } on Object {
+      // reverifyAll catches per item so one bad row cannot abort the sweep;
+      // a single-item check invoked from a button needs the same guarantee,
+      // and nothing was learned, so no verification date is owed either.
+      return VerifyResult.transientError;
+    }
     final stamp = _now();
 
     // A volume that is not mounted, or a file that is present but
     // momentarily unreadable, is a recoverable condition rather than a dead
     // pointer. The orphan flag is sticky, so setting it here would leave the
     // row marked missing after the share came back.
-    if (result == VerifyResult.volumeOffline ||
-        result == VerifyResult.transientError) {
-      await _repository.updateMedia(item.copyWith(lastVerifiedAt: stamp));
-      return result;
+    // A write failure must not surface as a crash either. The check itself
+    // succeeded, but its outcome was not persisted, so reporting a transient
+    // failure is the honest answer rather than claiming a durable result.
+    try {
+      if (result == VerifyResult.volumeOffline ||
+          result == VerifyResult.transientError) {
+        await _repository.updateMedia(item.copyWith(lastVerifiedAt: stamp));
+        return result;
+      }
+      await _repository.updateMedia(
+        item.copyWith(
+          isOrphaned: result != VerifyResult.available,
+          lastVerifiedAt: stamp,
+        ),
+      );
+    } on Object {
+      return VerifyResult.transientError;
     }
-
-    await _repository.updateMedia(
-      item.copyWith(
-        isOrphaned: result != VerifyResult.available,
-        lastVerifiedAt: stamp,
-      ),
-    );
     return result;
   }
 }

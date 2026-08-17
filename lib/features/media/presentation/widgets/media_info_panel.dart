@@ -126,7 +126,10 @@ class _FileSection extends StatelessWidget {
           label: l10n.media_info_filename,
           value: item.originalFilename ?? unknown,
         ),
-        DiveDetailRow(label: l10n.media_info_type, value: item.mediaType.name),
+        DiveDetailRow(
+          label: l10n.media_info_type,
+          value: mediaTypeLabel(l10n, item.mediaType),
+        ),
         DiveDetailRow(
           label: l10n.media_info_dimensions,
           // Pixels are unit-system invariant, so this is one of the few
@@ -185,7 +188,10 @@ class _OriginSection extends ConsumerWidget {
           _LocateButton(item: item),
         if (pointer != null && isLocalFile && canRevealInFileManager)
           TextButton(
-            onPressed: () => revealInFileManager(pointer),
+            // Explicitly unawaited: revealInFileManager swallows its own
+            // failures, so there is nothing to surface and nothing to wait
+            // for before the sheet stays put.
+            onPressed: () => unawaited(revealInFileManager(pointer)),
             child: Text(l10n.media_info_actionReveal),
           ),
         if (pointer != null) _CopyReferenceButton(pointer: pointer),
@@ -403,6 +409,9 @@ class _CheckNowButtonState extends ConsumerState<_CheckNowButton> {
       final result = await ref
           .read(mediaItemVerifierProvider)
           .verify(widget.item);
+      // The sheet can be dismissed while the check runs. ref after dispose
+      // throws, and there is no one left to show a snack bar to.
+      if (!mounted) return;
       final message = switch (result) {
         VerifyResult.available => l10n.media_info_checkFound,
         VerifyResult.notFound ||
@@ -458,14 +467,23 @@ class _BackUpButton extends ConsumerWidget {
     onPressed: () async {
       final messenger = ScaffoldMessenger.of(context);
       final queued = context.l10n.media_info_backupQueued;
-      await ref
-          .read(mediaTransferQueueRepositoryProvider)
-          .enqueueRepairUpload(mediaId: item.id);
-      // Kick the worker so a queued row starts moving rather than waiting
-      // for the next incidental drain. Unawaited: the drain is long-running
-      // and the queue row is already durable.
-      final runtime = await ref.read(mediaStoreRuntimeProvider.future);
-      unawaited(runtime?.worker?.drain() ?? Future<void>.value());
+      try {
+        await ref
+            .read(mediaTransferQueueRepositoryProvider)
+            .enqueueRepairUpload(mediaId: item.id);
+        // Kick the worker so a queued row starts moving rather than waiting
+        // for the next incidental drain. Unawaited: the drain is
+        // long-running and the queue row is already durable.
+        final runtime = await ref.read(mediaStoreRuntimeProvider.future);
+        unawaited(runtime?.worker?.drain() ?? Future<void>.value());
+      } on Object {
+        // Building the store runtime reads the keychain and can fail for
+        // reasons unrelated to this item. This is a convenience affordance,
+        // not a promise, so a failure leaves the queue untouched rather than
+        // throwing out of a button tap.
+        return;
+      }
+      if (!context.mounted) return;
       messenger.showSnackBar(SnackBar(content: Text(queued)));
     },
     child: Text(
@@ -489,11 +507,25 @@ class _CopyReferenceButton extends StatelessWidget {
       final messenger = ScaffoldMessenger.of(context);
       final copied = context.l10n.media_info_referenceCopied;
       await Clipboard.setData(ClipboardData(text: pointer));
+      if (!context.mounted) return;
       messenger.showSnackBar(SnackBar(content: Text(copied)));
     },
     child: Text(context.l10n.media_info_actionCopyPath),
   );
 }
+
+/// Localized name for a media type.
+///
+/// MediaType.name would render the raw enum identifier, so a signature would
+/// read as "instructorSignature" in every language. MediaType.displayName is
+/// hardcoded English, which is no better in a panel that is localized
+/// everywhere else.
+String mediaTypeLabel(AppLocalizations l10n, MediaType type) => switch (type) {
+  MediaType.photo => l10n.media_info_typePhoto,
+  MediaType.video => l10n.media_info_typeVideo,
+  MediaType.document => l10n.media_info_typeDocument,
+  MediaType.instructorSignature => l10n.media_info_typeSignature,
+};
 
 /// Localized name for a source type.
 ///
