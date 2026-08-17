@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:submersion/features/media/presentation/providers/media_provenance_providers.dart';
+import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
@@ -37,6 +40,14 @@ MediaLibraryGroup diveGroup({
   entries: entries ?? [entry('a')],
 );
 
+/// The status badge each tile now renders is a ConsumerWidget, so every tree
+/// here needs a scope. Its dependencies are stubbed to the quiet state so the
+/// badge stays invisible and these tests keep asserting only about grouping.
+List<dynamic> _badgeOverrides() => [
+  mediaStoreAttachedProvider.overrideWith((ref) async => false),
+  mediaQueueFactsProvider.overrideWith((ref, id) => Stream.value(null)),
+];
+
 void main() {
   Widget host(
     List<MediaLibraryGroup> groups, {
@@ -45,17 +56,20 @@ void main() {
     void Function(MediaLibraryEntry)? onTileTap,
     Set<String> selectedIds = const {},
   }) {
-    return MaterialApp(
-      locale: const Locale('en'),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(
-        body: MediaLibraryGroupedList(
-          groups: groups,
-          hasMore: hasMore,
-          onLoadMore: onLoadMore ?? () {},
-          onTileTap: onTileTap ?? (_) {},
-          selectedIds: selectedIds,
+    return ProviderScope(
+      overrides: _badgeOverrides().cast(),
+      child: MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: MediaLibraryGroupedList(
+            groups: groups,
+            hasMore: hasMore,
+            onLoadMore: onLoadMore ?? () {},
+            onTileTap: onTileTap ?? (_) {},
+            selectedIds: selectedIds,
+          ),
         ),
       ),
     );
@@ -156,11 +170,14 @@ void main() {
     addTearDown(router.dispose);
 
     await tester.pumpWidget(
-      MaterialApp.router(
-        routerConfig: router,
-        locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
+      ProviderScope(
+        overrides: _badgeOverrides().cast(),
+        child: MaterialApp.router(
+          routerConfig: router,
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pumpAndSettle();
