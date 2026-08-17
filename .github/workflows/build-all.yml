@@ -416,6 +416,13 @@ jobs:
       - name: Build Windows release
         run: flutter build windows --release --dart-define=UPDATE_CHANNEL=github
 
+      - name: Check bundled native assets
+        # Runs before the installer is compiled: the .iss packages whatever is
+        # in the Release directory, so a native asset missing here ships to
+        # every user and takes the app down at startup (issue #1129). Windows
+        # runners expose the interpreter as `python`, not `python3`.
+        run: python scripts/check_bundled_native_assets.py build\windows\x64\runner\Release
+
       - name: Build Windows installer
         env:
           TAG_NAME: ${{ inputs.version-tag }}
@@ -552,6 +559,12 @@ jobs:
 
       - name: Build Linux release
         run: flutter build linux --release --dart-define=UPDATE_CHANNEL=github
+
+      - name: Check bundled native assets
+        # Runs before the tarball is rolled, for the same reason as the Windows
+        # job: a missing native asset is invisible until a user launches the
+        # app (issue #1129).
+        run: python3 scripts/check_bundled_native_assets.py build/linux/x64/release/bundle
 
       - name: Create tarball
         env:
