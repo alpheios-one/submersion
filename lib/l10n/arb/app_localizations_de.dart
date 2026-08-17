@@ -31912,4 +31912,178 @@ class AppLocalizationsDe extends AppLocalizations {
   String settings_cloudSync_launchCheck_failed(String error) {
     return 'Synchronisierungsprüfung fehlgeschlagen: $error';
   }
+
+  @override
+  String get diveLog_detail_viewMap => 'Karte';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
+  String get setup_sync_icloudUnavailable =>
+      'iCloud ist auf diesem Gerät nicht verfügbar';
+
+  @override
+  String get media_info_title => 'Medieninfo';
+
+  @override
+  String get media_info_fileSection => 'Datei';
+
+  @override
+  String get media_info_filename => 'Dateiname';
+
+  @override
+  String get media_info_type => 'Typ';
+
+  @override
+  String get media_info_dimensions => 'Abmessungen';
+
+  @override
+  String get media_info_size => 'Größe';
+
+  @override
+  String get media_info_taken => 'Aufgenommen';
+
+  @override
+  String get media_info_coordinates => 'Koordinaten';
+
+  @override
+  String get media_info_unknown => 'Unbekannt';
+
+  @override
+  String get media_info_originSection => 'Herkunft';
+
+  @override
+  String get media_info_source => 'Quelle';
+
+  @override
+  String get media_info_reference => 'Referenz';
+
+  @override
+  String get media_info_linkedOn => 'Verknüpft auf';
+
+  @override
+  String get media_info_thisDevice => 'Dieses Gerät';
+
+  @override
+  String get media_info_otherDevice => 'Ein anderes Gerät';
+
+  @override
+  String get media_info_status => 'Status';
+
+  @override
+  String get media_info_statusFound => 'Auf diesem Gerät gefunden';
+
+  @override
+  String get media_info_statusMissing => 'Auf diesem Gerät nicht vorhanden';
+
+  @override
+  String get media_info_statusUnchecked => 'Noch nicht geprüft';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Zuletzt geprüft $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Sicherung';
+
+  @override
+  String get media_info_store => 'Cloud-Speicher';
+
+  @override
+  String get media_info_storeNotConnected => 'Kein Cloud-Speicher verbunden';
+
+  @override
+  String get media_info_notEligible =>
+      'Diese Quelle kann nicht gesichert werden';
+
+  @override
+  String get media_info_backupFull => 'Original hochgeladen';
+
+  @override
+  String get media_info_backupThumbOnly =>
+      'Nur Miniaturbild, Original nicht gesendet';
+
+  @override
+  String get media_info_backupRenditionOnly =>
+      'Komprimierte Version hochgeladen';
+
+  @override
+  String get media_info_backupNone => 'Nicht gesichert';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Hochgeladen $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'Warten auf Upload';
+
+  @override
+  String get media_info_queueTransferring => 'Wird hochgeladen';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'Upload fehlgeschlagen: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'Wird geliefert von';
+
+  @override
+  String get media_info_servingUnobserved => 'Noch nicht geladen';
+
+  @override
+  String get media_info_servingFailed => 'Konnte nicht geladen werden';
+
+  @override
+  String get media_info_servedLocalDisk => 'Lokale Datei auf diesem Gerät';
+
+  @override
+  String get media_info_servedGallery => 'Fotomediathek';
+
+  @override
+  String get media_info_servedStoreCache =>
+      'Lokaler Cache, aus dem Cloud-Speicher';
+
+  @override
+  String get media_info_servedStoreNetwork =>
+      'Aus dem Cloud-Speicher heruntergeladen';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Streaming von einer URL';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Lokaler Cache, vom verbundenen Dienst';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Vom verbundenen Dienst heruntergeladen';
+
+  @override
+  String get media_info_servedEmbedded => 'In diesem Logbuch gespeichert';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'Die ursprüngliche Quelle war nicht erreichbar, daher kam dies aus dem Cloud-Speicher.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Miniaturbild';
+
+  @override
+  String get media_info_servingTierRendition => 'Komprimierte Version';
+
+  @override
+  String get media_info_typePhoto => 'Foto';
+
+  @override
+  String get media_info_typeVideo => 'Video';
+
+  @override
+  String get media_info_typeDocument => 'Dokument';
+
+  @override
+  String get media_info_typeSignature => 'Unterschrift';
 }

@@ -32056,4 +32056,177 @@ class AppLocalizationsFr extends AppLocalizations {
   String settings_cloudSync_launchCheck_failed(String error) {
     return 'Échec de la vérification de synchronisation : $error';
   }
+
+  @override
+  String get diveLog_detail_viewMap => 'Carte';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
+  String get setup_sync_icloudUnavailable =>
+      'iCloud n\'est pas disponible sur cet appareil';
+
+  @override
+  String get media_info_title => 'Infos du média';
+
+  @override
+  String get media_info_fileSection => 'Fichier';
+
+  @override
+  String get media_info_filename => 'Nom du fichier';
+
+  @override
+  String get media_info_type => 'Type';
+
+  @override
+  String get media_info_dimensions => 'Dimensions';
+
+  @override
+  String get media_info_size => 'Taille';
+
+  @override
+  String get media_info_taken => 'Prise le';
+
+  @override
+  String get media_info_coordinates => 'Coordonnées';
+
+  @override
+  String get media_info_unknown => 'Inconnu';
+
+  @override
+  String get media_info_originSection => 'Origine';
+
+  @override
+  String get media_info_source => 'Source';
+
+  @override
+  String get media_info_reference => 'Référence';
+
+  @override
+  String get media_info_linkedOn => 'Liée sur';
+
+  @override
+  String get media_info_thisDevice => 'Cet appareil';
+
+  @override
+  String get media_info_otherDevice => 'Un autre appareil';
+
+  @override
+  String get media_info_status => 'État';
+
+  @override
+  String get media_info_statusFound => 'Trouvée sur cet appareil';
+
+  @override
+  String get media_info_statusMissing => 'Absente de cet appareil';
+
+  @override
+  String get media_info_statusUnchecked => 'Pas encore vérifiée';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Dernière vérification $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Sauvegarde';
+
+  @override
+  String get media_info_store => 'Stockage cloud';
+
+  @override
+  String get media_info_storeNotConnected => 'Aucun stockage cloud connecté';
+
+  @override
+  String get media_info_notEligible =>
+      'Cette source ne peut pas être sauvegardée';
+
+  @override
+  String get media_info_backupFull => 'Original téléversé';
+
+  @override
+  String get media_info_backupThumbOnly =>
+      'Miniature seulement, original non envoyé';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Version compressée téléversée';
+
+  @override
+  String get media_info_backupNone => 'Non sauvegardée';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Téléversée $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'En attente de téléversement';
+
+  @override
+  String get media_info_queueTransferring => 'Téléversement en cours';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'Échec du téléversement : $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'Source actuelle';
+
+  @override
+  String get media_info_servingUnobserved => 'Pas encore chargée';
+
+  @override
+  String get media_info_servingFailed => 'Impossible à charger';
+
+  @override
+  String get media_info_servedLocalDisk => 'Fichier local sur cet appareil';
+
+  @override
+  String get media_info_servedGallery => 'Photheque';
+
+  @override
+  String get media_info_servedStoreCache =>
+      'Cache local, depuis le stockage cloud';
+
+  @override
+  String get media_info_servedStoreNetwork =>
+      'Téléchargée depuis le stockage cloud';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Diffusion depuis une URL';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Cache local, depuis le service connecté';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Téléchargée depuis le service connecté';
+
+  @override
+  String get media_info_servedEmbedded => 'Stockée dans ce carnet';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'La source d\'origine était inaccessible, le stockage cloud a donc pris le relais.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Miniature';
+
+  @override
+  String get media_info_servingTierRendition => 'Version compressée';
+
+  @override
+  String get media_info_typePhoto => 'Photo';
+
+  @override
+  String get media_info_typeVideo => 'Vidéo';
+
+  @override
+  String get media_info_typeDocument => 'Document';
+
+  @override
+  String get media_info_typeSignature => 'Signature';
 }

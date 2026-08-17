@@ -31476,4 +31476,173 @@ class AppLocalizationsEn extends AppLocalizations {
   String settings_cloudSync_launchCheck_failed(String error) {
     return 'Sync check failed: $error';
   }
+
+  @override
+  String get diveLog_detail_viewMap => 'Map';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
+  String get setup_sync_icloudUnavailable =>
+      'iCloud is not available on this device';
+
+  @override
+  String get media_info_title => 'Media info';
+
+  @override
+  String get media_info_fileSection => 'File';
+
+  @override
+  String get media_info_filename => 'Filename';
+
+  @override
+  String get media_info_type => 'Type';
+
+  @override
+  String get media_info_dimensions => 'Dimensions';
+
+  @override
+  String get media_info_size => 'Size';
+
+  @override
+  String get media_info_taken => 'Taken';
+
+  @override
+  String get media_info_coordinates => 'Coordinates';
+
+  @override
+  String get media_info_unknown => 'Unknown';
+
+  @override
+  String get media_info_originSection => 'Origin';
+
+  @override
+  String get media_info_source => 'Source';
+
+  @override
+  String get media_info_reference => 'Reference';
+
+  @override
+  String get media_info_linkedOn => 'Linked on';
+
+  @override
+  String get media_info_thisDevice => 'This device';
+
+  @override
+  String get media_info_otherDevice => 'Another device';
+
+  @override
+  String get media_info_status => 'Status';
+
+  @override
+  String get media_info_statusFound => 'Found on this device';
+
+  @override
+  String get media_info_statusMissing => 'Missing from this device';
+
+  @override
+  String get media_info_statusUnchecked => 'Not checked yet';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Last checked $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Backup';
+
+  @override
+  String get media_info_store => 'Cloud store';
+
+  @override
+  String get media_info_storeNotConnected => 'No cloud store connected';
+
+  @override
+  String get media_info_notEligible => 'This source is not eligible for backup';
+
+  @override
+  String get media_info_backupFull => 'Original uploaded';
+
+  @override
+  String get media_info_backupThumbOnly => 'Thumbnail only, original not sent';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Compressed version uploaded';
+
+  @override
+  String get media_info_backupNone => 'Not backed up';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Uploaded $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'Waiting to upload';
+
+  @override
+  String get media_info_queueTransferring => 'Uploading now';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'Upload failed: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'Serving now';
+
+  @override
+  String get media_info_servingUnobserved => 'Not loaded yet';
+
+  @override
+  String get media_info_servingFailed => 'Could not be loaded';
+
+  @override
+  String get media_info_servedLocalDisk => 'Local file on this device';
+
+  @override
+  String get media_info_servedGallery => 'Photo library';
+
+  @override
+  String get media_info_servedStoreCache => 'Local cache, from the cloud store';
+
+  @override
+  String get media_info_servedStoreNetwork => 'Downloaded from the cloud store';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Streaming from a URL';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Local cache, from the connected service';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Downloaded from the connected service';
+
+  @override
+  String get media_info_servedEmbedded => 'Stored inside this logbook';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'The original source could not be reached, so the cloud store served this.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Thumbnail';
+
+  @override
+  String get media_info_servingTierRendition => 'Compressed version';
+
+  @override
+  String get media_info_typePhoto => 'Photo';
+
+  @override
+  String get media_info_typeVideo => 'Video';
+
+  @override
+  String get media_info_typeDocument => 'Document';
+
+  @override
+  String get media_info_typeSignature => 'Signature';
 }

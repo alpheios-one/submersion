@@ -32015,4 +32015,177 @@ class AppLocalizationsEs extends AppLocalizations {
   String settings_cloudSync_launchCheck_failed(String error) {
     return 'Error al comprobar la sincronización: $error';
   }
+
+  @override
+  String get diveLog_detail_viewMap => 'Mapa';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
+  String get setup_sync_icloudUnavailable =>
+      'iCloud no está disponible en este dispositivo';
+
+  @override
+  String get media_info_title => 'Información del medio';
+
+  @override
+  String get media_info_fileSection => 'Archivo';
+
+  @override
+  String get media_info_filename => 'Nombre del archivo';
+
+  @override
+  String get media_info_type => 'Tipo';
+
+  @override
+  String get media_info_dimensions => 'Dimensiones';
+
+  @override
+  String get media_info_size => 'Tamaño';
+
+  @override
+  String get media_info_taken => 'Capturada';
+
+  @override
+  String get media_info_coordinates => 'Coordenadas';
+
+  @override
+  String get media_info_unknown => 'Desconocido';
+
+  @override
+  String get media_info_originSection => 'Origen';
+
+  @override
+  String get media_info_source => 'Fuente';
+
+  @override
+  String get media_info_reference => 'Referencia';
+
+  @override
+  String get media_info_linkedOn => 'Vinculada en';
+
+  @override
+  String get media_info_thisDevice => 'Este dispositivo';
+
+  @override
+  String get media_info_otherDevice => 'Otro dispositivo';
+
+  @override
+  String get media_info_status => 'Estado';
+
+  @override
+  String get media_info_statusFound => 'Encontrada en este dispositivo';
+
+  @override
+  String get media_info_statusMissing => 'No esta en este dispositivo';
+
+  @override
+  String get media_info_statusUnchecked => 'Aun sin comprobar';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Última comprobación $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Copia de seguridad';
+
+  @override
+  String get media_info_store => 'Almacén en la nube';
+
+  @override
+  String get media_info_storeNotConnected => 'Sin almacén en la nube conectado';
+
+  @override
+  String get media_info_notEligible =>
+      'Esta fuente no admite copia de seguridad';
+
+  @override
+  String get media_info_backupFull => 'Original subido';
+
+  @override
+  String get media_info_backupThumbOnly =>
+      'Solo miniatura, el original no se envió';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Versión comprimida subida';
+
+  @override
+  String get media_info_backupNone => 'Sin copia de seguridad';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Subida $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'Esperando para subir';
+
+  @override
+  String get media_info_queueTransferring => 'Subiendo ahora';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'Falló la subida: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'Sirviendo ahora';
+
+  @override
+  String get media_info_servingUnobserved => 'Aún no cargada';
+
+  @override
+  String get media_info_servingFailed => 'No se pudo cargar';
+
+  @override
+  String get media_info_servedLocalDisk => 'Archivo local en este dispositivo';
+
+  @override
+  String get media_info_servedGallery => 'Fototeca';
+
+  @override
+  String get media_info_servedStoreCache =>
+      'Caché local, desde el almacén en la nube';
+
+  @override
+  String get media_info_servedStoreNetwork =>
+      'Descargada del almacén en la nube';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Transmitiendo desde una URL';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Caché local, del servicio conectado';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Descargada del servicio conectado';
+
+  @override
+  String get media_info_servedEmbedded => 'Guardada dentro de este cuaderno';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'No se pudo acceder a la fuente original, así que el almacén en la nube la sirvió.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Miniatura';
+
+  @override
+  String get media_info_servingTierRendition => 'Versión comprimida';
+
+  @override
+  String get media_info_typePhoto => 'Foto';
+
+  @override
+  String get media_info_typeVideo => 'Vídeo';
+
+  @override
+  String get media_info_typeDocument => 'Documento';
+
+  @override
+  String get media_info_typeSignature => 'Firma';
 }

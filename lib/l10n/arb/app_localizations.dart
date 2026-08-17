@@ -52901,6 +52901,324 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync check failed: {error}'**
   String settings_cloudSync_launchCheck_failed(String error);
+
+  /// No description provided for @diveLog_detail_viewMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get diveLog_detail_viewMap;
+
+  /// No description provided for @diveLog_detail_view3d.
+  ///
+  /// In en, this message translates to:
+  /// **'3D'**
+  String get diveLog_detail_view3d;
+
+  /// No description provided for @setup_sync_icloudUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'iCloud is not available on this device'**
+  String get setup_sync_icloudUnavailable;
+
+  /// No description provided for @media_info_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Media info'**
+  String get media_info_title;
+
+  /// No description provided for @media_info_fileSection.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get media_info_fileSection;
+
+  /// No description provided for @media_info_filename.
+  ///
+  /// In en, this message translates to:
+  /// **'Filename'**
+  String get media_info_filename;
+
+  /// No description provided for @media_info_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get media_info_type;
+
+  /// No description provided for @media_info_dimensions.
+  ///
+  /// In en, this message translates to:
+  /// **'Dimensions'**
+  String get media_info_dimensions;
+
+  /// No description provided for @media_info_size.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get media_info_size;
+
+  /// No description provided for @media_info_taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken'**
+  String get media_info_taken;
+
+  /// No description provided for @media_info_coordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates'**
+  String get media_info_coordinates;
+
+  /// No description provided for @media_info_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get media_info_unknown;
+
+  /// No description provided for @media_info_originSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Origin'**
+  String get media_info_originSection;
+
+  /// No description provided for @media_info_source.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get media_info_source;
+
+  /// No description provided for @media_info_reference.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference'**
+  String get media_info_reference;
+
+  /// No description provided for @media_info_linkedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked on'**
+  String get media_info_linkedOn;
+
+  /// No description provided for @media_info_thisDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'This device'**
+  String get media_info_thisDevice;
+
+  /// No description provided for @media_info_otherDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Another device'**
+  String get media_info_otherDevice;
+
+  /// No description provided for @media_info_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get media_info_status;
+
+  /// No description provided for @media_info_statusFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Found on this device'**
+  String get media_info_statusFound;
+
+  /// No description provided for @media_info_statusMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing from this device'**
+  String get media_info_statusMissing;
+
+  /// No description provided for @media_info_statusUnchecked.
+  ///
+  /// In en, this message translates to:
+  /// **'Not checked yet'**
+  String get media_info_statusUnchecked;
+
+  /// Origin block: when the media source was last verified
+  ///
+  /// In en, this message translates to:
+  /// **'Last checked {date}'**
+  String media_info_lastChecked(String date);
+
+  /// No description provided for @media_info_backupSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get media_info_backupSection;
+
+  /// No description provided for @media_info_store.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud store'**
+  String get media_info_store;
+
+  /// No description provided for @media_info_storeNotConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'No cloud store connected'**
+  String get media_info_storeNotConnected;
+
+  /// No description provided for @media_info_notEligible.
+  ///
+  /// In en, this message translates to:
+  /// **'This source is not eligible for backup'**
+  String get media_info_notEligible;
+
+  /// No description provided for @media_info_backupFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Original uploaded'**
+  String get media_info_backupFull;
+
+  /// No description provided for @media_info_backupThumbOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail only, original not sent'**
+  String get media_info_backupThumbOnly;
+
+  /// No description provided for @media_info_backupRenditionOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Compressed version uploaded'**
+  String get media_info_backupRenditionOnly;
+
+  /// No description provided for @media_info_backupNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not backed up'**
+  String get media_info_backupNone;
+
+  /// Backup block: when the item reached the cloud store
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded {date}'**
+  String media_info_uploadedOn(String date);
+
+  /// No description provided for @media_info_queuePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting to upload'**
+  String get media_info_queuePending;
+
+  /// No description provided for @media_info_queueTransferring.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading now'**
+  String get media_info_queueTransferring;
+
+  /// Backup block: the transfer queue's failure message
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed: {error}'**
+  String media_info_queueFailed(Object error);
+
+  /// No description provided for @media_info_servingSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Serving now'**
+  String get media_info_servingSection;
+
+  /// No description provided for @media_info_servingUnobserved.
+  ///
+  /// In en, this message translates to:
+  /// **'Not loaded yet'**
+  String get media_info_servingUnobserved;
+
+  /// No description provided for @media_info_servingFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not be loaded'**
+  String get media_info_servingFailed;
+
+  /// No description provided for @media_info_servedLocalDisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Local file on this device'**
+  String get media_info_servedLocalDisk;
+
+  /// No description provided for @media_info_servedGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo library'**
+  String get media_info_servedGallery;
+
+  /// No description provided for @media_info_servedStoreCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Local cache, from the cloud store'**
+  String get media_info_servedStoreCache;
+
+  /// No description provided for @media_info_servedStoreNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded from the cloud store'**
+  String get media_info_servedStoreNetwork;
+
+  /// No description provided for @media_info_servedNetworkUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Streaming from a URL'**
+  String get media_info_servedNetworkUrl;
+
+  /// No description provided for @media_info_servedConnectorCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Local cache, from the connected service'**
+  String get media_info_servedConnectorCache;
+
+  /// No description provided for @media_info_servedConnectorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded from the connected service'**
+  String get media_info_servedConnectorNetwork;
+
+  /// No description provided for @media_info_servedEmbedded.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored inside this logbook'**
+  String get media_info_servedEmbedded;
+
+  /// No description provided for @media_info_servingFallbackNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The original source could not be reached, so the cloud store served this.'**
+  String get media_info_servingFallbackNote;
+
+  /// No description provided for @media_info_servingTierThumbnail.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail'**
+  String get media_info_servingTierThumbnail;
+
+  /// No description provided for @media_info_servingTierRendition.
+  ///
+  /// In en, this message translates to:
+  /// **'Compressed version'**
+  String get media_info_servingTierRendition;
+
+  /// No description provided for @media_info_typePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get media_info_typePhoto;
+
+  /// No description provided for @media_info_typeVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get media_info_typeVideo;
+
+  /// No description provided for @media_info_typeDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get media_info_typeDocument;
+
+  /// No description provided for @media_info_typeSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Signature'**
+  String get media_info_typeSignature;
 }
 
 class _AppLocalizationsDelegate

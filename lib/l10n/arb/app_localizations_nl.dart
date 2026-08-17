@@ -31756,4 +31756,175 @@ class AppLocalizationsNl extends AppLocalizations {
   String settings_cloudSync_launchCheck_failed(String error) {
     return 'Synchronisatiecontrole mislukt: $error';
   }
+
+  @override
+  String get diveLog_detail_viewMap => 'Kaart';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
+  String get setup_sync_icloudUnavailable =>
+      'iCloud is niet beschikbaar op dit apparaat';
+
+  @override
+  String get media_info_title => 'Media-info';
+
+  @override
+  String get media_info_fileSection => 'Bestand';
+
+  @override
+  String get media_info_filename => 'Bestandsnaam';
+
+  @override
+  String get media_info_type => 'Type';
+
+  @override
+  String get media_info_dimensions => 'Afmetingen';
+
+  @override
+  String get media_info_size => 'Grootte';
+
+  @override
+  String get media_info_taken => 'Gemaakt';
+
+  @override
+  String get media_info_coordinates => 'Coordinaten';
+
+  @override
+  String get media_info_unknown => 'Onbekend';
+
+  @override
+  String get media_info_originSection => 'Herkomst';
+
+  @override
+  String get media_info_source => 'Bron';
+
+  @override
+  String get media_info_reference => 'Referentie';
+
+  @override
+  String get media_info_linkedOn => 'Gekoppeld op';
+
+  @override
+  String get media_info_thisDevice => 'Dit apparaat';
+
+  @override
+  String get media_info_otherDevice => 'Een ander apparaat';
+
+  @override
+  String get media_info_status => 'Status';
+
+  @override
+  String get media_info_statusFound => 'Gevonden op dit apparaat';
+
+  @override
+  String get media_info_statusMissing => 'Ontbreekt op dit apparaat';
+
+  @override
+  String get media_info_statusUnchecked => 'Nog niet gecontroleerd';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Laatst gecontroleerd $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Back-up';
+
+  @override
+  String get media_info_store => 'Cloudopslag';
+
+  @override
+  String get media_info_storeNotConnected => 'Geen cloudopslag verbonden';
+
+  @override
+  String get media_info_notEligible =>
+      'Deze bron komt niet in aanmerking voor back-up';
+
+  @override
+  String get media_info_backupFull => 'Origineel geupload';
+
+  @override
+  String get media_info_backupThumbOnly =>
+      'Alleen miniatuur, origineel niet verzonden';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Gecomprimeerde versie geupload';
+
+  @override
+  String get media_info_backupNone => 'Geen back-up';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Geupload $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'Wacht op uploaden';
+
+  @override
+  String get media_info_queueTransferring => 'Nu aan het uploaden';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'Uploaden mislukt: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'Nu geleverd door';
+
+  @override
+  String get media_info_servingUnobserved => 'Nog niet geladen';
+
+  @override
+  String get media_info_servingFailed => 'Kon niet worden geladen';
+
+  @override
+  String get media_info_servedLocalDisk => 'Lokaal bestand op dit apparaat';
+
+  @override
+  String get media_info_servedGallery => 'Fotobibliotheek';
+
+  @override
+  String get media_info_servedStoreCache => 'Lokale cache, uit de cloudopslag';
+
+  @override
+  String get media_info_servedStoreNetwork => 'Gedownload uit de cloudopslag';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Streamen vanaf een URL';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Lokale cache, van de verbonden dienst';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Gedownload van de verbonden dienst';
+
+  @override
+  String get media_info_servedEmbedded => 'Opgeslagen in dit logboek';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'De oorspronkelijke bron was niet bereikbaar, dus leverde de cloudopslag dit.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Miniatuur';
+
+  @override
+  String get media_info_servingTierRendition => 'Gecomprimeerde versie';
+
+  @override
+  String get media_info_typePhoto => 'Foto';
+
+  @override
+  String get media_info_typeVideo => 'Video';
+
+  @override
+  String get media_info_typeDocument => 'Document';
+
+  @override
+  String get media_info_typeSignature => 'Handtekening';
 }

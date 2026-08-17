@@ -31860,4 +31860,176 @@ class AppLocalizationsHu extends AppLocalizations {
   String settings_cloudSync_launchCheck_failed(String error) {
     return 'A szinkronizálás ellenőrzése nem sikerült: $error';
   }
+
+  @override
+  String get diveLog_detail_viewMap => 'Térkép';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
+  String get setup_sync_icloudUnavailable =>
+      'Az iCloud nem érhető el ezen az eszközön';
+
+  @override
+  String get media_info_title => 'Média infó';
+
+  @override
+  String get media_info_fileSection => 'Fájl';
+
+  @override
+  String get media_info_filename => 'Fájlnév';
+
+  @override
+  String get media_info_type => 'Típus';
+
+  @override
+  String get media_info_dimensions => 'Méretek';
+
+  @override
+  String get media_info_size => 'Méret';
+
+  @override
+  String get media_info_taken => 'Készült';
+
+  @override
+  String get media_info_coordinates => 'Koordináták';
+
+  @override
+  String get media_info_unknown => 'Ismeretlen';
+
+  @override
+  String get media_info_originSection => 'Eredet';
+
+  @override
+  String get media_info_source => 'Forrás';
+
+  @override
+  String get media_info_reference => 'Hivatkozás';
+
+  @override
+  String get media_info_linkedOn => 'Összekapcsolva';
+
+  @override
+  String get media_info_thisDevice => 'Ez az eszköz';
+
+  @override
+  String get media_info_otherDevice => 'Egy másik eszköz';
+
+  @override
+  String get media_info_status => 'Állapot';
+
+  @override
+  String get media_info_statusFound => 'Megtalálható ezen az eszközön';
+
+  @override
+  String get media_info_statusMissing => 'Hiányzik erről az eszközről';
+
+  @override
+  String get media_info_statusUnchecked => 'Még nincs ellenőrizve';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Utoljára ellenőrizve $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Biztonsági mentés';
+
+  @override
+  String get media_info_store => 'Felhő tárhely';
+
+  @override
+  String get media_info_storeNotConnected =>
+      'Nincs csatlakoztatott felhő tárhely';
+
+  @override
+  String get media_info_notEligible => 'Ez a forrás nem menthető';
+
+  @override
+  String get media_info_backupFull => 'Eredeti feltoltve';
+
+  @override
+  String get media_info_backupThumbOnly =>
+      'Csak bélyegkép, az eredeti nincs elküldve';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Tömörített változat feltöltve';
+
+  @override
+  String get media_info_backupNone => 'Nincs mentve';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Feltoltve $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'Feltoltesre var';
+
+  @override
+  String get media_info_queueTransferring => 'Feltoltes folyamatban';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'A feltöltés sikertelen: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'Jelenlegi forrás';
+
+  @override
+  String get media_info_servingUnobserved => 'Még nincs betöltve';
+
+  @override
+  String get media_info_servingFailed => 'Nem sikerült betölteni';
+
+  @override
+  String get media_info_servedLocalDisk => 'Helyi fájl ezen az eszközön';
+
+  @override
+  String get media_info_servedGallery => 'Fotókönyvtár';
+
+  @override
+  String get media_info_servedStoreCache =>
+      'Helyi gyorsítótár, a felhő tárhelyről';
+
+  @override
+  String get media_info_servedStoreNetwork => 'Letöltve a felhő tárhelyről';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Streamelés URL-címről';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Helyi gyorsítótár, a csatlakoztatott szolgáltatásból';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Letöltve a csatlakoztatott szolgáltatásból';
+
+  @override
+  String get media_info_servedEmbedded => 'Ebben a naplóban tárolva';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'Az eredeti forrás nem volt elérhető, ezért a felhő tárhely szolgálta ki.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Bélyegkép';
+
+  @override
+  String get media_info_servingTierRendition => 'Tömörített változat';
+
+  @override
+  String get media_info_typePhoto => 'Fénykép';
+
+  @override
+  String get media_info_typeVideo => 'Videó';
+
+  @override
+  String get media_info_typeDocument => 'Dokumentum';
+
+  @override
+  String get media_info_typeSignature => 'Aláírás';
 }

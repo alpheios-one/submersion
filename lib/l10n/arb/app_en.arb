@@ -17953,5 +17953,84 @@
   "@settings_cloudSync_launchCheck_unavailable": {"placeholders": {"provider": {"type": "String"}}},
   "@settings_cloudSync_launchCheck_notSignedIn": {"placeholders": {"provider": {"type": "String"}}},
   "@settings_cloudSync_launchCheck_localChanges": {"placeholders": {"count": {"type": "int"}}},
-  "@settings_cloudSync_launchCheck_failed": {"placeholders": {"error": {"type": "String"}}}
+  "@settings_cloudSync_launchCheck_failed": {"placeholders": {"error": {"type": "String"}}},
+  "diveLog_detail_viewMap": "Map",
+  "@diveLog_detail_viewMap": {},
+  "diveLog_detail_view3d": "3D",
+  "@diveLog_detail_view3d": {},
+  "setup_sync_icloudUnavailable": "iCloud is not available on this device",
+  "media_info_title": "Media info",
+  "media_info_fileSection": "File",
+  "media_info_filename": "Filename",
+  "media_info_type": "Type",
+  "media_info_dimensions": "Dimensions",
+  "media_info_size": "Size",
+  "media_info_taken": "Taken",
+  "media_info_coordinates": "Coordinates",
+  "media_info_unknown": "Unknown",
+  "media_info_originSection": "Origin",
+  "media_info_source": "Source",
+  "media_info_reference": "Reference",
+  "media_info_linkedOn": "Linked on",
+  "media_info_thisDevice": "This device",
+  "media_info_otherDevice": "Another device",
+  "media_info_status": "Status",
+  "media_info_statusFound": "Found on this device",
+  "media_info_statusMissing": "Missing from this device",
+  "media_info_statusUnchecked": "Not checked yet",
+  "media_info_lastChecked": "Last checked {date}",
+  "@media_info_lastChecked": {
+    "description": "Origin block: when the media source was last verified",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "media_info_backupSection": "Backup",
+  "media_info_store": "Cloud store",
+  "media_info_storeNotConnected": "No cloud store connected",
+  "media_info_notEligible": "This source is not eligible for backup",
+  "media_info_backupFull": "Original uploaded",
+  "media_info_backupThumbOnly": "Thumbnail only, original not sent",
+  "media_info_backupRenditionOnly": "Compressed version uploaded",
+  "media_info_backupNone": "Not backed up",
+  "media_info_uploadedOn": "Uploaded {date}",
+  "@media_info_uploadedOn": {
+    "description": "Backup block: when the item reached the cloud store",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "media_info_queuePending": "Waiting to upload",
+  "media_info_queueTransferring": "Uploading now",
+  "media_info_queueFailed": "Upload failed: {error}",
+  "@media_info_queueFailed": {
+    "description": "Backup block: the transfer queue's failure message",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "media_info_servingSection": "Serving now",
+  "media_info_servingUnobserved": "Not loaded yet",
+  "media_info_servingFailed": "Could not be loaded",
+  "media_info_servedLocalDisk": "Local file on this device",
+  "media_info_servedGallery": "Photo library",
+  "media_info_servedStoreCache": "Local cache, from the cloud store",
+  "media_info_servedStoreNetwork": "Downloaded from the cloud store",
+  "media_info_servedNetworkUrl": "Streaming from a URL",
+  "media_info_servedConnectorCache": "Local cache, from the connected service",
+  "media_info_servedConnectorNetwork": "Downloaded from the connected service",
+  "media_info_servedEmbedded": "Stored inside this logbook",
+  "media_info_servingFallbackNote": "The original source could not be reached, so the cloud store served this.",
+  "media_info_servingTierThumbnail": "Thumbnail",
+  "media_info_servingTierRendition": "Compressed version",
+  "media_info_typePhoto": "Photo",
+  "media_info_typeVideo": "Video",
+  "media_info_typeDocument": "Document",
+  "media_info_typeSignature": "Signature"
 }

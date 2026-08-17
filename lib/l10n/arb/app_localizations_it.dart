@@ -31971,4 +31971,176 @@ class AppLocalizationsIt extends AppLocalizations {
   String settings_cloudSync_launchCheck_failed(String error) {
     return 'Controllo della sincronizzazione non riuscito: $error';
   }
+
+  @override
+  String get diveLog_detail_viewMap => 'Mappa';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
+  String get setup_sync_icloudUnavailable =>
+      'iCloud non è disponibile su questo dispositivo';
+
+  @override
+  String get media_info_title => 'Info media';
+
+  @override
+  String get media_info_fileSection => 'File';
+
+  @override
+  String get media_info_filename => 'Nome file';
+
+  @override
+  String get media_info_type => 'Tipo';
+
+  @override
+  String get media_info_dimensions => 'Dimensioni';
+
+  @override
+  String get media_info_size => 'Dimensione';
+
+  @override
+  String get media_info_taken => 'Scattata';
+
+  @override
+  String get media_info_coordinates => 'Coordinate';
+
+  @override
+  String get media_info_unknown => 'Sconosciuto';
+
+  @override
+  String get media_info_originSection => 'Origine';
+
+  @override
+  String get media_info_source => 'Sorgente';
+
+  @override
+  String get media_info_reference => 'Riferimento';
+
+  @override
+  String get media_info_linkedOn => 'Collegata su';
+
+  @override
+  String get media_info_thisDevice => 'Questo dispositivo';
+
+  @override
+  String get media_info_otherDevice => 'Un altro dispositivo';
+
+  @override
+  String get media_info_status => 'Stato';
+
+  @override
+  String get media_info_statusFound => 'Trovata su questo dispositivo';
+
+  @override
+  String get media_info_statusMissing => 'Assente da questo dispositivo';
+
+  @override
+  String get media_info_statusUnchecked => 'Non ancora verificata';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Ultimo controllo $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Backup';
+
+  @override
+  String get media_info_store => 'Archivio cloud';
+
+  @override
+  String get media_info_storeNotConnected => 'Nessun archivio cloud collegato';
+
+  @override
+  String get media_info_notEligible =>
+      'Questa sorgente non può essere sottoposta a backup';
+
+  @override
+  String get media_info_backupFull => 'Originale caricato';
+
+  @override
+  String get media_info_backupThumbOnly =>
+      'Solo miniatura, originale non inviato';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Versione compressa caricata';
+
+  @override
+  String get media_info_backupNone => 'Nessun backup';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Caricata $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'In attesa di caricamento';
+
+  @override
+  String get media_info_queueTransferring => 'Caricamento in corso';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'Caricamento non riuscito: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'In uso ora';
+
+  @override
+  String get media_info_servingUnobserved => 'Non ancora caricata';
+
+  @override
+  String get media_info_servingFailed => 'Impossibile caricare';
+
+  @override
+  String get media_info_servedLocalDisk => 'File locale su questo dispositivo';
+
+  @override
+  String get media_info_servedGallery => 'Libreria foto';
+
+  @override
+  String get media_info_servedStoreCache =>
+      'Cache locale, dall\'archivio cloud';
+
+  @override
+  String get media_info_servedStoreNetwork => 'Scaricata dall\'archivio cloud';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Streaming da un URL';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Cache locale, dal servizio collegato';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Scaricata dal servizio collegato';
+
+  @override
+  String get media_info_servedEmbedded => 'Salvata in questo diario';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'La sorgente originale non era raggiungibile, quindi ha risposto l\'archivio cloud.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Miniatura';
+
+  @override
+  String get media_info_servingTierRendition => 'Versione compressa';
+
+  @override
+  String get media_info_typePhoto => 'Foto';
+
+  @override
+  String get media_info_typeVideo => 'Video';
+
+  @override
+  String get media_info_typeDocument => 'Documento';
+
+  @override
+  String get media_info_typeSignature => 'Firma';
 }
