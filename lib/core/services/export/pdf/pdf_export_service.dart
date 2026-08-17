@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -221,18 +220,12 @@ class PdfExportService {
       dialogTitle: 'Save PDF File',
       fileName: fileName,
       type: FileType.custom,
-      allowedExtensions: ['pdf'],
       bytes: Uint8List.fromList(bytes),
+      mimeType: 'application/pdf',
     );
 
     if (saveResult == null) return null;
-
-    if (!Platform.isAndroid) {
-      final file = File(saveResult);
-      await file.writeAsBytes(bytes);
-    }
-
-    return saveResult;
+    return savedFileLocation(saveResult);
   }
 
   // ==================== Internal PDF Building ====================

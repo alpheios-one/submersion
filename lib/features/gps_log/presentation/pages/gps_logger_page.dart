@@ -150,16 +150,15 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
 
-    final picked = await FilePicker.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: const ['gpx', 'kml', 'csv', 'fit'],
-      // Needed so FIT, which is binary, arrives intact rather than as a path
-      // we would then have to read separately on every platform.
-      withData: true,
     );
-    final file = picked?.files.singleOrNull;
-    final bytes = file?.bytes;
-    if (file == null || bytes == null) return;
+    if (file == null) return;
+    // FIT is binary, so read the bytes through the handle rather than via a
+    // path: file_picker 12 retired `withData`, and on Android SAF there may
+    // be no local path at all.
+    final bytes = await file.readAsBytes();
 
     final TrackImportCandidate candidate;
     try {

@@ -263,9 +263,9 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
   /// Phase 2 photo-only constraint: picker is restricted to `FileType.image`
   /// (videos aren't supported as local-file media yet, see [FilesTab]).
   Future<void> _replaceLink(MediaItem item) async {
-    final result = await FilePicker.pickFiles(type: FileType.image);
+    final result = await FilePicker.pickFile(type: FileType.image);
     if (result == null) return;
-    final newPath = result.files.first.path;
+    final newPath = result.path;
     if (newPath == null) return;
 
     final digest = await sha256OfFile(File(newPath));

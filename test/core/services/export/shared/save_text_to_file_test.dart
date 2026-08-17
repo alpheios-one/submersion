@@ -31,20 +31,20 @@ void main() {
       '<gpx/>',
       'track.gpx',
       dialogTitle: 'Save GPX',
-      allowedExtensions: const ['gpx'],
+      mimeType: 'text/plain',
     );
     expect(result, isNull);
   });
 
   test('returns the chosen path and writes the content', () async {
     final target = '${tempDir.path}/track.gpx';
-    mockPicker.saveFileResult = target;
+    mockPicker.saveFileResult = Uri.file(target);
 
     final result = await saveTextToFile(
       '<gpx>hello</gpx>',
       'track.gpx',
       dialogTitle: 'Save GPX',
-      allowedExtensions: const ['gpx'],
+      mimeType: 'text/plain',
     );
 
     expect(result, target);
@@ -53,13 +53,13 @@ void main() {
 
   test('writes UTF-8 so non-ASCII track names survive', () async {
     final target = '${tempDir.path}/track.gpx';
-    mockPicker.saveFileResult = target;
+    mockPicker.saveFileResult = Uri.file(target);
 
     await saveTextToFile(
       '<name>Cozumel – Palancar</name>',
       'track.gpx',
       dialogTitle: 'Save GPX',
-      allowedExtensions: const ['gpx'],
+      mimeType: 'text/plain',
     );
 
     expect(File(target).readAsStringSync(), '<name>Cozumel – Palancar</name>');

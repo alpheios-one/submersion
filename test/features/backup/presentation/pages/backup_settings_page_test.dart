@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -378,12 +377,68 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    testWidgets('save-to-file picks a folder and streams into it', (
+      tester,
+    ) async {
+      // file_picker 12's saveFile wants the whole artifact as bytes, which a
+      // large library cannot afford, so the export picks a DIRECTORY and
+      // streams into it instead. Only the non-Android branch is reachable on
+      // a test host; the SAF branch is coverage-ignored.
+      mockPicker.directoryPathResult = tempDir.path;
+
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Export Backup'));
+      await tester.pumpAndSettle();
+
+      await tester.runAsync(() async {
+        await tester.tap(find.text('Save to File'));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      });
+      await tester.pumpAndSettle();
+
+      expect(service.calls, contains('exportBackupToPath'));
+      expect(
+        service.exportedTo,
+        startsWith(tempDir.path),
+        reason: 'the chosen folder is the destination root',
+      );
+      expect(
+        service.exportedTo,
+        contains('submersion_backup_'),
+        reason:
+            'the default filename is composed by the page, since a folder '
+            'pick cannot supply one',
+      );
+    });
+
+    testWidgets('save-to-file does nothing when the folder pick is cancelled', (
+      tester,
+    ) async {
+      mockPicker.directoryPathResult = null;
+
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Export Backup'));
+      await tester.pumpAndSettle();
+
+      await tester.runAsync(() async {
+        await tester.tap(find.text('Save to File'));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      });
+      await tester.pumpAndSettle();
+
+      expect(service.calls, isNot(contains('exportBackupToPath')));
+    });
+
     testWidgets(
       'restore-from-file confirms via the dialog and threads merge mode',
       (tester) async {
-        mockPicker.pickFilesResult = FilePickerResult([
-          PlatformFile(name: 'picked.db', size: 2, path: pickedPath),
-        ]);
+        mockPicker.pickFilesResult = [
+          FakePlatformFile(pickedPath, name: 'picked.db'),
+        ];
 
         await tester.pumpWidget(buildApp());
         await tester.pumpAndSettle();
@@ -407,9 +462,9 @@ void main() {
     testWidgets('cancelling the file-restore dialog restores nothing', (
       tester,
     ) async {
-      mockPicker.pickFilesResult = FilePickerResult([
-        PlatformFile(name: 'picked.db', size: 2, path: pickedPath),
-      ]);
+      mockPicker.pickFilesResult = [
+        FakePlatformFile(pickedPath, name: 'picked.db'),
+      ];
 
       await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();
@@ -651,6 +706,25 @@ class _RecordingRestoreService extends BackupService {
   }) async {
     calls.add('restoreFromFile');
     lastMode = mode;
+  }
+
+  /// Destination the manual export was pointed at.
+  String? exportedTo;
+
+  @override
+  Future<BackupRecord> exportBackupToPath(String destinationPath) async {
+    calls.add('exportBackupToPath');
+    exportedTo = destinationPath;
+    return BackupRecord(
+      id: 'exported',
+      filename: destinationPath.split(Platform.pathSeparator).last,
+      timestamp: DateTime(2026, 8, 16),
+      sizeBytes: 1,
+      location: BackupLocation.local,
+      type: BackupType.manual,
+      diveCount: 0,
+      siteCount: 0,
+    );
   }
 }
 

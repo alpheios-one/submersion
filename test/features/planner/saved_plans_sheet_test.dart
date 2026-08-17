@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -252,9 +251,7 @@ void main() {
     final original = FilePickerPlatform.instance;
     addTearDown(() => FilePickerPlatform.instance = original);
     FilePickerPlatform.instance = MockFilePickerPlatform()
-      ..pickFilesResult = FilePickerResult([
-        PlatformFile(path: file.path, name: 'plan.subplan', size: 0),
-      ]);
+      ..pickFilesResult = [FakePlatformFile(file.path, name: 'plan.subplan')];
 
     await openSheet(tester);
     // The import does real file + DB I/O; runAsync lets it complete.
@@ -279,9 +276,7 @@ void main() {
     final original = FilePickerPlatform.instance;
     addTearDown(() => FilePickerPlatform.instance = original);
     FilePickerPlatform.instance = MockFilePickerPlatform()
-      ..pickFilesResult = FilePickerResult([
-        PlatformFile(path: file.path, name: 'bad.subplan', size: 0),
-      ]);
+      ..pickFilesResult = [FakePlatformFile(file.path, name: 'bad.subplan')];
 
     await openSheet(tester);
     await tester.runAsync(() async {

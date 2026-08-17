@@ -57,7 +57,7 @@ void main() {
 
     test('saveTrackToFile writes GPX to the chosen path', () async {
       final target = '${tempDir.path}/track.gpx';
-      mockPicker.saveFileResult = target;
+      mockPicker.saveFileResult = Uri.file(target);
 
       final result = await service.saveTrackToFile(_track());
 
@@ -79,7 +79,7 @@ void main() {
 
     test('saveTrackKmlToFile writes a gx:Track to the chosen path', () async {
       final target = '${tempDir.path}/track.kml';
-      mockPicker.saveFileResult = target;
+      mockPicker.saveFileResult = Uri.file(target);
 
       final result = await service.saveTrackKmlToFile(_track());
 

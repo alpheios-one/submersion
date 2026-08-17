@@ -75,9 +75,9 @@ dependencies:
   submersion_transcoder:
     path: packages/submersion_transcoder
   permission_handler: ^12.0.1
-  file_picker: ^11.0.2
+  file_picker: ^12.0.0
   image_picker: ^1.1.2
-  share_plus: ^12.0.1
+  share_plus: ^13.3.0
   desktop_drop: ^0.7.0
   # Pinned <1.9.0: 1.9.0 is Swift Package Manager-only and drops CocoaPods
   # support, which breaks the iOS/macOS build (this project uses CocoaPods).
@@ -117,7 +117,7 @@ dependencies:
 
   # Auto-Update
   auto_updater: ^1.0.0
-  package_info_plus: ^9.0.1
+  package_info_plus: ^10.2.1
 
   # Notifications
   flutter_local_notifications: ^22.0.1
@@ -152,9 +152,10 @@ dev_dependencies:
   plugin_platform_interface: ^2.1.8
   path_provider_platform_interface: ^2.1.3  # mock docs dir in db service tests
   permission_handler_platform_interface: ^4.3.0  # mock BLE scan permission grants
+  file_picker_platform_interface: ^3.0.1  # fake picker in file/import tests
   geocoding_platform_interface: ^5.0.0  # fake geocoder in location service tests
   flutter_web_auth_2_platform_interface: ^5.0.0  # mock auth in redirect-capture test
-  share_plus_platform_interface: ^6.1.0  # fake share sheet in media share tests
+  share_plus_platform_interface: ^7.2.0  # fake share sheet in media share tests
   video_player_platform_interface: ^6.7.0  # fake player in media viewer tests
   fake_async: ^1.3.3  # synthetic clock + Timer driving for unit tests
   analyzer: ^12.0.0  # AST parsing for the provider change-tick architecture test
