@@ -64,17 +64,24 @@ def find_matches(text, terms):
     return sorted(hits)
 
 
-# A list member is exactly one word. Allowing multi-word members looks more
-# general but is actively wrong: the leading member is greedy, so
-# "broken on Windows, Linux, and Android" would parse its first member as
-# "broken on Windows", which is not *entirely* a banned term, and the platform
-# name would survive. Real platform lists are single tokens (macOS, Windows,
-# iOS, Android). The one multi-word banned term that shows up in a list,
-# "Google Play", is left to the replacement pass instead.
+# A list member is one word, or one whole multi-word banned term.
+#
+# A member may not be an arbitrary run of words. That looks more general but is
+# actively wrong: the leading member is greedy, so "broken on Windows, Linux,
+# and Android" would parse its first member as "broken on Windows", which is
+# not *entirely* a banned term, and the platform name would survive.
+#
+# Restricting the multi-word case to the banned terms themselves keeps that
+# property, because such a branch can only ever match a banned term and so can
+# never absorb the prose in front of the list. It is what makes a two-word
+# distro name work in a list: without it "Rocky Linux, AlmaLinux, and CentOS"
+# fails to match at "Rocky", matches from "Linux" instead, and collapses to
+# "Rocky other platforms", stranding the half of the name that is not itself a
+# banned term. Nothing reports that, either: bare "Rocky" is not banned, so the
+# survivor check at the end of main() sees a clean result.
 #
 # The negative lookahead stops "and"/"or" being parsed as a member.
 _WORD = r"(?!(?:and|or)\b)[A-Za-z0-9][A-Za-z0-9.+/-]*"
-_MEMBER = _WORD
 
 # Horizontal whitespace only. \s matches a newline, and release notes are
 # wrapped Markdown prose, so a list can straddle a line break. A pattern that
@@ -83,11 +90,44 @@ _MEMBER = _WORD
 # potentially merging two items into one.
 _H = r"[ \t]"
 
-_LIST_RE = re.compile(
-    r"\b" + _MEMBER +
-    r"(?:" + _H + r"*," + _H + r"*" + _MEMBER + r")*"
-    + _H + r"*,?" + _H + r"+(?:and|or)" + _H + r"+" + _MEMBER + r"\b"
-)
+
+def _member_pattern(terms):
+    """The member sub-pattern: multi-word banned terms first, then one word.
+
+    A term counts as multi-word when its pattern contains the [ \\t] the JSON
+    mandates for whitespace inside a term; \\s is banned there, so there is no
+    other spelling to look for.
+
+    Declaration order is carried through into the alternation, which is what
+    the JSON's longest-spelling-first rule already guarantees: Python tries
+    alternatives left to right, so "Red Hat Enterprise Linux" is offered before
+    "Red Hat" and wins where both could match.
+
+    Per-term case sensitivity is preserved with a scoped (?i:...) group rather
+    than a flag on the whole list pattern. A single flag would have to be wrong
+    for one term or the other, since Microsoft is case-sensitive and Arch Linux
+    is not.
+    """
+    alternatives = []
+    for pattern, _cls in terms:
+        if "[ \\t]" not in pattern.pattern:
+            continue
+        if pattern.flags & re.IGNORECASE:
+            alternatives.append("(?i:" + pattern.pattern + ")")
+        else:
+            alternatives.append("(?:" + pattern.pattern + ")")
+    alternatives.append(_WORD)
+    return "(?:" + "|".join(alternatives) + ")"
+
+
+def _list_re(terms):
+    """The list pattern for these terms. re.compile caches by pattern text."""
+    member = _member_pattern(terms)
+    return re.compile(
+        r"\b" + member +
+        r"(?:" + _H + r"*," + _H + r"*" + member + r")*"
+        + _H + r"*,?" + _H + r"+(?:and|or)" + _H + r"+" + member + r"\b"
+    )
 
 # The conjunction alternative must come first. Python tries alternatives left
 # to right, so a leading plain-comma branch would consume the ", " of ", and "
@@ -124,6 +164,8 @@ def repair_lists(text, terms):
     members are all banned collapses to the neutral phrase, and the tidy pass
     removes the parentheses that are left empty around it.
     """
+    list_re = _list_re(terms)
+
     def substitute(match):
         raw = match.group(0)
         members = [m for m in _SPLIT_RE.split(raw) if m]
@@ -134,7 +176,7 @@ def repair_lists(text, terms):
             return REPLACEMENT["platform"]
         return _join(kept)
 
-    return _LIST_RE.sub(substitute, text)
+    return list_re.sub(substitute, text)
 
 
 # A sentence or line boundary immediately before the match position.
