@@ -566,7 +566,22 @@ Format `takenAt` with `units.formatDateTime(item.takenAt, l10n: context.l10n)`. 
 
 For the source label, copy the `switch` from `media_sources_section_view.dart:61-71`.
 
-`originDeviceId` handling: null or equal to this device is `media_info_thisDevice`; any other value is `media_info_otherDevice`. Do not render a raw device id; it is a UUID and means nothing to a reader. Find how the current device id is obtained (grep for `originDeviceId` writers) rather than guessing.
+`originDeviceId` handling. **CORRECTED 2026-08-16 after reading the writer.**
+The original instruction here said to treat null as "this device". That is
+wrong. `MediaRepository._effectiveOriginDeviceId` (`media_repository.dart:187-201`)
+stamps a device id for `localFile` and `serviceConnector` ONLY, and returns
+null for `platformGallery`, `networkUrl`, `manifestEntry`, `signature` and
+`mediaStore`. So null means "this source type does not track an origin
+device", not "this device". Rendering it as "This device" would state a fact
+the app never recorded, and it would say it on every gallery photo.
+
+The rule is therefore three-way:
+
+- `originDeviceId == null`: omit the row entirely. Nothing is known.
+- equal to `SyncRepository.getDeviceId()`: `media_info_thisDevice`.
+- anything else: `media_info_otherDevice`.
+
+Never render the raw id; it is a UUID and means nothing to a reader.
 
 - [ ] **Step 4: Run to verify it passes**
 
@@ -794,3 +809,18 @@ missing item could not tell you anything about it."
 **Type consistency.** `ServingFacts.from(ServingObservation?)` is defined in Task 2 and called in Task 7. `formatBytes(int)` is defined in Task 1 and called in Task 6. `mediaProvenanceProvider` is `Provider.family<MediaProvenance, MediaItem>` in Task 3 and consumed with that exact family type in Task 7. `showMediaInfoSheet(BuildContext, MediaItem)` is defined in Task 8 and called in Task 9.
 
 **Places the plan says look rather than telling.** The `MediaStoresRepository` provider symbol (Task 4), the provider-tick contract test's registration site (Task 3), the current-device-id accessor (Task 6), and `MediaLibraryGrid`'s entry field name (Task 9). Each was not verifiable from the files read while planning, and guessing would produce code that does not compile.
+
+**Three of those four were resolved before implementation began, and one of
+them changed the design:**
+
+- `mediaStoresRepositoryProvider` exists at `media_store_providers.dart:298`.
+- The device id comes from `SyncRepository.getDeviceId()`. Reading its caller
+  revealed that `originDeviceId` is null for five of the seven source types by
+  design, which corrected Task 6's rule from two-way to three-way. Had the
+  plan asserted a guess instead, every gallery photo would have claimed
+  "Linked on: This device".
+- `MediaLibraryEntry` (`media_library_filter.dart:167-179`) exposes `.item`,
+  so Task 9's assumption holds.
+
+The provider-tick registration site stays a "read the failure text" item,
+because only the failing test names it precisely.

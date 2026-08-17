@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_provenance.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
@@ -53,6 +54,14 @@ final mediaProvenanceProvider = Provider.family<MediaProvenance, MediaItem>((
   final queue = ref.watch(mediaQueueFactsProvider(item.id)).value;
   return MediaProvenance.from(item, storeAttached: attached, queue: queue);
 });
+
+/// This device's sync id, for deciding whether a row was linked here.
+///
+/// Panel-only, like [mediaStoreIdentityProvider]. Overridable in tests, which
+/// is the reason it is a provider rather than a direct call.
+final currentDeviceIdProvider = FutureProvider<String>(
+  (ref) => SyncRepository().getDeviceId(),
+);
 
 /// Which cloud store is attached, for display.
 class MediaStoreIdentity {
