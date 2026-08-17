@@ -2451,6 +2451,7 @@
   "divePlanner_field_planName": "Planname",
   "divePlanner_field_role": "Rolle",
   "divePlanner_field_startPressure": "Startdruck ({pressureSymbol})",
+  "divePlanner_field_travelGas": "Wird auch als Reisegas verwendet",
   "divePlanner_field_volume": "Volumen ({volumeSymbol})",
   "divePlanner_hint_tankName": "Flaschenname eingeben",
   "divePlanner_label_altitude": "Höhe:",
@@ -4151,6 +4152,7 @@
   "plannerCanvas_contingency_base": "Basis",
   "plannerCanvas_contingency_depthDelta": "Zusatztiefe",
   "plannerCanvas_contingency_lostGas": "{gas} verloren",
+  "plannerCanvas_contingency_previewing": "Vorschau: {label}",
   "plannerCanvas_contingency_timeDelta": "Zusatzminuten",
   "plannerCanvas_chart_meanDepth": "Mittel {depth}",
   "@plannerCanvas_chart_meanDepth": {

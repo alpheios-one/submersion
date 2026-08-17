@@ -193,6 +193,50 @@ void main() {
     expect(service.lostGas(plan), isEmpty);
   });
 
+  test('falls back to the first remaining tank when none is back gas', () {
+    // Both carried cylinders are lost-gas-eligible and neither is back gas
+    // (an all-travel/deco loadout); losing one must still remap onto
+    // whatever is left rather than finding no fallback at all.
+    const pony = DiveTank(
+      id: 'pony',
+      volume: 3.0,
+      startPressure: 200,
+      gasMix: GasMix(o2: 32),
+      role: TankRole.pony,
+      isTravelGas: true,
+    );
+    final plan = domain.DivePlan(
+      id: 'plan-no-backgas',
+      name: 'No back gas',
+      gfLow: 50,
+      gfHigh: 80,
+      tanks: const [_ean50, pony],
+      segments: [
+        PlanSegment.descent(
+          id: 'seg-1',
+          targetDepth: 30.0,
+          tankId: 'ean50',
+          gasMix: const GasMix(o2: 50),
+          order: 0,
+        ),
+        PlanSegment.bottom(
+          id: 'seg-2',
+          depth: 30.0,
+          durationMinutes: 20,
+          tankId: 'ean50',
+          gasMix: const GasMix(o2: 50),
+          order: 1,
+        ),
+      ],
+      createdAt: DateTime(2026, 7, 5),
+      updatedAt: DateTime(2026, 7, 5),
+    );
+
+    final lost = service.lostGasFor(plan, 'ean50');
+    expect(lost, isNotNull);
+    expect(lost!.plan.segments.every((s) => s.tankId == 'pony'), isTrue);
+  });
+
   test('losing the only cylinder yields no lost-gas outcome', () {
     final plan = _plan(tanks: const [_ean50]);
     expect(service.lostGas(plan), isEmpty);

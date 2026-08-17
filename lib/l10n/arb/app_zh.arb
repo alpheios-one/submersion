@@ -2583,6 +2583,7 @@
   "divePlanner_field_planName": "计划名称",
   "divePlanner_field_role": "角色",
   "divePlanner_field_startPressure": "开始 ({pressureSymbol})",
+  "divePlanner_field_travelGas": "也用作过渡气",
   "divePlanner_field_volume": "容积 ({volumeSymbol})",
   "divePlanner_hint_tankName": "输入气瓶名称",
   "divePlanner_info_reserveDefault": "未输入 — 假设为 {value} {unit}",
@@ -4306,6 +4307,7 @@
   "plannerCanvas_contingency_base": "基准",
   "plannerCanvas_contingency_depthDelta": "额外深度",
   "plannerCanvas_contingency_lostGas": "失去 {gas}",
+  "plannerCanvas_contingency_previewing": "预览：{label}",
   "plannerCanvas_contingency_timeDelta": "额外分钟",
   "plannerCanvas_chart_meanDepth": "平均 {depth}",
   "@plannerCanvas_chart_meanDepth": {

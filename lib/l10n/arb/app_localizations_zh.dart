@@ -7177,7 +7177,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get divePlanner_field_travelGas => 'Also used as travel gas';
+  String get divePlanner_field_travelGas => '也用作过渡气';
 
   @override
   String divePlanner_field_volume(Object volumeSymbol) {
@@ -12441,7 +12441,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String plannerCanvas_contingency_previewing(String label) {
-    return 'Previewing: $label';
+    return '预览：$label';
   }
 
   @override

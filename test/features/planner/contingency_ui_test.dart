@@ -168,6 +168,63 @@ void main() {
   });
 
   testWidgets(
+    'tapping a deviation row in the sheet selects it and collapsing hides '
+    'its table',
+    (tester) async {
+      // Tall physical surface so the whole sheet fits without scrolling --
+      // see the "marking a tank lost" test below for why.
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(520, 3000);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: _overrides(),
+          child: SizedBox(
+            width: 520,
+            height: 3000,
+            child: PlanResultsSheet(controller: ScrollController()),
+          ),
+        ),
+      );
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(PlanResultsSheet)),
+      );
+      container
+          .read(divePlanNotifierProvider.notifier)
+          .addSimplePlan(maxDepth: 45, bottomTimeMinutes: 25);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('CONTINGENCIES'));
+      await tester.pumpAndSettle();
+
+      // Selecting the row's own chip (not the separate ContingencyChips
+      // widget, which isn't in this tree) drives the same provider.
+      await tester.tap(find.text('+5m'));
+      await tester.pumpAndSettle();
+      expect(container.read(selectedDeviationProvider), 'deeper');
+      expect(container.read(selectedLostGasTankIdProvider), isNull);
+
+      // Tapping again deselects.
+      await tester.tap(find.text('+5m'));
+      await tester.pumpAndSettle();
+      expect(container.read(selectedDeviationProvider), isNull);
+
+      // Collapsing hides the row's runtime table but keeps its chip.
+      await tester.tap(find.byIcon(Icons.expand_more).first);
+      await tester.pumpAndSettle();
+      expect(
+        container.read(collapsedContingencyKeysProvider),
+        contains('deeper'),
+      );
+      expect(find.text('+5m'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'marking a tank lost ghosts a profile line and clears the deviation '
     'selection',
     (tester) async {
