@@ -51,6 +51,8 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/storage_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Sync repository provider
 final syncRepositoryProvider = Provider<SyncRepository>((ref) {
@@ -249,6 +251,35 @@ final syncBehaviorProvider =
 final selectedCloudProviderTypeProvider = StateProvider<CloudProviderType?>(
   (ref) => null,
 );
+
+/// Whether Google Drive can be offered on this platform/build. True on
+/// iOS/macOS/Android; on Windows/Linux only when the Desktop-app OAuth
+/// client is compiled in (GoogleDriveClientConfig).
+final googleDriveAvailableProvider = FutureProvider<bool>((ref) {
+  return cloudProviderInstanceFor(CloudProviderType.googledrive).isAvailable();
+});
+
+/// Signed-in Google account email for the provider tile subtitle, or null
+/// when Google Drive is not the selected provider, is not authenticated, or
+/// no account is known.
+///
+/// Selecting `isAuthenticated` serves two purposes, and the value matters as
+/// much as the subscription. As a subscription it re-runs on connect and
+/// sign-out without re-running on every sync progress tick. As a value it
+/// suppresses a STALE subtitle: GoogleSignInAuthenticator.handleAuthFailure()
+/// deliberately keeps `_currentUser` so a transient token refresh cannot blank
+/// a still-valid account, which means getUserEmail() keeps returning an
+/// address after a revoked grant. Without this gate the tile would keep
+/// advertising a connected account that can no longer sync.
+final googleDriveAccountEmailProvider = FutureProvider<String?>((ref) async {
+  final type = ref.watch(selectedCloudProviderTypeProvider);
+  if (type != CloudProviderType.googledrive) return null;
+  final isAuthenticated = ref.watch(
+    syncStateProvider.select((s) => s.isAuthenticated),
+  );
+  if (!isAuthenticated) return null;
+  return cloudProviderInstanceFor(CloudProviderType.googledrive).getUserEmail();
+});
 
 /// The sync account for [type]. The pre-account selection UI picks provider
 /// TYPES; this shim maps a type onto the accounts model so selection state
@@ -455,6 +486,7 @@ final syncServiceProvider = Provider<SyncService>((ref) {
     syncInitializer: ref.watch(syncInitializerProvider),
     epochStore: ref.watch(libraryEpochStoreProvider),
     encryptionService: ref.watch(syncEncryptionServiceProvider),
+    localizations: () => l10nForLocaleTag(ref.read(localeProvider)),
   );
 });
 
@@ -631,6 +663,12 @@ class SyncNotifier extends StateNotifier<SyncState> {
 
   /// Get the current sync service (reads dynamically to get latest cloudProvider)
   SyncService get _syncService => _ref.read(syncServiceProvider);
+
+  /// Localizations for the status text this notifier writes into
+  /// [SyncState.message]. The notifier runs outside the widget tree
+  /// (launch sync, resume sync, post-write debounce), so there is no
+  /// BuildContext; resolve from the same locale setting MaterialApp uses.
+  AppLocalizations get _l10n => l10nForLocaleTag(_ref.read(localeProvider));
 
   Future<void> _initialize() async {
     if (!mounted) return;
@@ -811,7 +849,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
       if (!mounted) return;
       state = state.copyWith(
         status: SyncStatus.error,
-        message: 'Failed to load sync state: $e',
+        message: _l10n.settings_cloudSync_message_loadStateFailed(e),
       );
     }
   }
@@ -966,7 +1004,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
     if (provider == null) {
       state = state.copyWith(
         status: SyncStatus.error,
-        message: 'No cloud provider configured',
+        message: _l10n.settings_cloudSync_message_noProviderConfigured,
       );
       return;
     }
@@ -1115,13 +1153,13 @@ class SyncNotifier extends StateNotifier<SyncState> {
     if (_syncInFlight || state.status == SyncStatus.syncing) return;
     state = state.copyWith(
       status: SyncStatus.syncing,
-      message: 'Adopting the restored library...',
+      message: _l10n.settings_cloudSync_message_adopting,
     );
     final result = await _syncService.adoptReplacedLibrary();
     if (!result.isSuccess) {
       state = state.copyWith(
         status: SyncStatus.error,
-        message: result.message ?? 'Failed to adopt the restored library',
+        message: result.message ?? _l10n.settings_cloudSync_message_adoptFailed,
       );
       return;
     }
@@ -1165,7 +1203,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
           );
           state = state.copyWith(
             firstSyncAwaitingConfirmation: true,
-            message: 'First sync needs confirmation. Tap Sync Now to review.',
+            message: _l10n.settings_cloudSync_message_firstSyncNeedsConfirm,
           );
           return;
         }
@@ -1173,7 +1211,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
 
       state = state.copyWith(
         status: SyncStatus.syncing,
-        message: 'Starting sync...',
+        message: _l10n.settings_cloudSync_message_startingSync,
         progress: 0.0,
         newerSchemaPeerCount: 0,
         skippedPeerLabels: const [],
@@ -1217,9 +1255,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
               status: SyncStatus.idle,
               replaceAwaitingAdoption: true,
               replaceMarker: result.replaceMarker,
-              message:
-                  'Sync paused: the library was replaced from a backup. '
-                  'Tap Sync Now to review.',
+              message: _l10n.settings_cloudSync_message_replacePaused,
               progress: null,
             );
             return;
@@ -1232,8 +1268,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
             needsPassphrase: true,
             message:
                 result.message ??
-                'Sync paused: this library is encrypted. '
-                    'Enter the passphrase to continue.',
+                _l10n.settings_cloudSync_message_encryptedPaused,
             progress: null,
           );
           return;
@@ -1241,8 +1276,8 @@ class SyncNotifier extends StateNotifier<SyncState> {
 
         if (result.isSuccess) {
           final defaultMessage = result.conflictsFound > 0
-              ? 'Sync completed with conflicts'
-              : 'Sync completed successfully';
+              ? _l10n.settings_cloudSync_message_completedWithConflicts
+              : _l10n.settings_cloudSync_message_completedSuccessfully;
           state = state.copyWith(
             status: result.conflictsFound > 0
                 ? SyncStatus.hasConflicts
@@ -1287,16 +1322,19 @@ class SyncNotifier extends StateNotifier<SyncState> {
         } else {
           state = state.copyWith(
             status: SyncStatus.error,
-            message: result.message ?? 'Sync failed',
+            message:
+                result.message ?? _l10n.settings_cloudSync_message_syncFailed,
             progress: null,
           );
         }
       } catch (e) {
         if (!mounted) return;
-        final phase = state.message ?? 'sync';
+        final l10n = _l10n;
+        final phase =
+            state.message ?? l10n.settings_cloudSync_message_phaseDefault;
         state = state.copyWith(
           status: SyncStatus.error,
-          message: 'Sync error during $phase: $e',
+          message: l10n.settings_cloudSync_message_syncErrorDuring(phase, e),
           progress: null,
         );
       }
@@ -1577,6 +1615,7 @@ final syncInitializerProvider = Provider<SyncInitializer>((ref) {
   return SyncInitializer(
     syncRepository: ref.watch(syncRepositoryProvider),
     prefs: prefs,
+    localizations: () => l10nForLocaleTag(ref.read(localeProvider)),
   );
 });
 

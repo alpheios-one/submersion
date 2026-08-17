@@ -12085,6 +12085,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'המדיה הבאה';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'אין תמונות זמינות';
 
   @override
@@ -12094,6 +12097,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_photoViewer_playPauseVideoLabel => 'הפעל או השהה סרטון';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'המדיה הקודמת';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'דלג למיקום בסרטון';
@@ -14167,6 +14173,17 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_cloudSync_provider_googleDrive_subtitle =>
       'סנכרון באמצעות Google Drive';
+
+  @override
+  String get settings_cloudSync_googleDrive_desktopNotConfigured =>
+      'לא זמין בגרסה זו';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_title => 'המשך בדפדפן';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_message =>
+      'סיים את ההתחברות לחשבון Google בדפדפן האינטרנט שלך, ולאחר מכן חזור אל Submersion.';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -17773,7 +17790,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'עומק מרבי';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'סה\"כ זמן תחתית';
+  String get trips_detail_stat_totalRuntime => 'סה\"כ זמן ריצה';
 
   @override
   String get trips_detail_stat_totalDives => 'סה\"כ צלילות';
@@ -21951,6 +21968,62 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'שילוב';
 
   @override
+  String get siteFeature_type_wreck => 'ספינה טרופה';
+
+  @override
+  String get siteFeature_type_mooring => 'מצוף עגינה';
+
+  @override
+  String get siteFeature_type_entry => 'נקודת כניסה';
+
+  @override
+  String get siteFeature_type_exit => 'נקודת יציאה';
+
+  @override
+  String get siteFeature_type_swimThrough => 'מעבר';
+
+  @override
+  String get siteFeature_type_hazard => 'סכנה';
+
+  @override
+  String get siteFeature_type_current => 'זרם';
+
+  @override
+  String get siteFeature_sectionTitle => 'מאפיינים';
+
+  @override
+  String get siteFeature_addAction => 'הוספת מאפיין';
+
+  @override
+  String get siteFeature_placeHint => 'הקישו על המפה למיקום המאפיין';
+
+  @override
+  String get siteFeature_addTitle => 'הוספת מאפיין';
+
+  @override
+  String get siteFeature_editTitle => 'עריכת מאפיין';
+
+  @override
+  String get siteFeature_field_name => 'שם';
+
+  @override
+  String get siteFeature_field_bearing => 'כיוון (°)';
+
+  @override
+  String get siteFeature_field_depth => 'עומק';
+
+  @override
+  String get siteFeature_field_notes => 'הערות';
+
+  @override
+  String get siteFeature_deleteAction => 'מחיקה';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'למחוק את $name?';
+  }
+
+  @override
   String get siteScape_mode2d => 'מפה';
 
   @override
@@ -22426,7 +22499,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attrLabel_dpv_style => 'סגנון';
 
   @override
-  String get attrLabel_burn_time_h => 'זמן פעולה (שעות)';
+  String get attrLabel_burn_time_h => 'זמן פעולה';
 
   @override
   String get attrLabel_battery_type => 'סוללה';
@@ -23267,6 +23340,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dataQuality_repair_noChange => 'אין כאן מה לתקן';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'אין תיקון אוטומטי. פתח את הצלילה כדי לתקן זאת.';
+
+  @override
   String get dataQuality_repair_failed => 'התיקון נכשל';
 
   @override
@@ -23865,5 +23942,7416 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String marineLife_species_delete_error(String error) {
     return 'שגיאה במחיקת המין: $error';
+  }
+
+  @override
+  String get enum_diveField_diveNumber => 'מספר צלילה';
+
+  @override
+  String get enum_diveField_dateTime => 'תאריך ושעה';
+
+  @override
+  String get enum_diveField_siteName => 'שם האתר';
+
+  @override
+  String get enum_diveField_diveName => 'שם הצלילה';
+
+  @override
+  String get enum_diveField_maxDepth => 'עומק מרבי';
+
+  @override
+  String get enum_diveField_avgDepth => 'עומק ממוצע';
+
+  @override
+  String get enum_diveField_bottomTime => 'זמן תחתית';
+
+  @override
+  String get enum_diveField_runtime => 'זמן ריצה';
+
+  @override
+  String get enum_diveField_waterTemp => 'טמפרטורת מים';
+
+  @override
+  String get enum_diveField_airTemp => 'טמפרטורת אוויר';
+
+  @override
+  String get enum_diveField_visibility => 'ראות';
+
+  @override
+  String get enum_diveField_currentDirection => 'כיוון זרם';
+
+  @override
+  String get enum_diveField_currentStrength => 'עוצמת זרם';
+
+  @override
+  String get enum_diveField_swellHeight => 'גובה גלים';
+
+  @override
+  String get enum_diveField_entryMethod => 'שיטת כניסה';
+
+  @override
+  String get enum_diveField_exitMethod => 'שיטת יציאה';
+
+  @override
+  String get enum_diveField_waterType => 'סוג מים';
+
+  @override
+  String get enum_diveField_altitude => 'גובה';
+
+  @override
+  String get enum_diveField_surfacePressure => 'לחץ פני שטח';
+
+  @override
+  String get enum_diveField_windSpeed => 'מהירות רוח';
+
+  @override
+  String get enum_diveField_cloudCover => 'כיסוי עננים';
+
+  @override
+  String get enum_diveField_precipitation => 'משקעים';
+
+  @override
+  String get enum_diveField_humidity => 'לחות';
+
+  @override
+  String get enum_diveField_weatherDescription => 'מזג אוויר';
+
+  @override
+  String get enum_diveField_primaryGas => 'גז ראשי';
+
+  @override
+  String get enum_diveField_diluentGas => 'גז מדלל';
+
+  @override
+  String get enum_diveField_tankCount => 'מספר מכלים';
+
+  @override
+  String get enum_diveField_startPressure => 'לחץ התחלה';
+
+  @override
+  String get enum_diveField_endPressure => 'לחץ סיום';
+
+  @override
+  String get enum_diveField_sacRate => 'קצב SAC';
+
+  @override
+  String get enum_diveField_gasConsumed => 'צריכת גז';
+
+  @override
+  String get enum_diveField_totalWeight => 'משקל כולל';
+
+  @override
+  String get enum_diveField_diveComputerModel => 'מחשב צלילה';
+
+  @override
+  String get enum_diveField_gradientFactorLow => 'GF נמוך';
+
+  @override
+  String get enum_diveField_gradientFactorHigh => 'GF גבוה';
+
+  @override
+  String get enum_diveField_decoAlgorithm => 'אלגוריתם דקומפרסיה';
+
+  @override
+  String get enum_diveField_decoConservatism => 'שמרנות';
+
+  @override
+  String get enum_diveField_cnsStart => 'CNS התחלה';
+
+  @override
+  String get enum_diveField_cnsEnd => 'CNS סיום';
+
+  @override
+  String get enum_diveField_otu => 'OTU';
+
+  @override
+  String get enum_diveField_diveMode => 'מצב צלילה';
+
+  @override
+  String get enum_diveField_setpointLow => 'ערך יעד נמוך';
+
+  @override
+  String get enum_diveField_setpointHigh => 'ערך יעד גבוה';
+
+  @override
+  String get enum_diveField_setpointDeco => 'ערך יעד דקומפרסיה';
+
+  @override
+  String get enum_diveField_buddy => 'שותף';
+
+  @override
+  String get enum_diveField_diveMaster => 'דייבמאסטר';
+
+  @override
+  String get enum_diveField_siteLocation => 'מיקום האתר';
+
+  @override
+  String get enum_diveField_diveCenterName => 'מרכז צלילה';
+
+  @override
+  String get enum_diveField_siteLatitude => 'קו רוחב';
+
+  @override
+  String get enum_diveField_siteLongitude => 'קו אורך';
+
+  @override
+  String get enum_diveField_tripName => 'טיול';
+
+  @override
+  String get enum_diveField_ratingStars => 'דירוג';
+
+  @override
+  String get enum_diveField_isFavorite => 'מועדף';
+
+  @override
+  String get enum_diveField_notes => 'הערות';
+
+  @override
+  String get enum_diveField_tags => 'תגיות';
+
+  @override
+  String get enum_diveField_importSource => 'מקור ייבוא';
+
+  @override
+  String get enum_diveField_diveTypeName => 'סוג צלילה';
+
+  @override
+  String get enum_diveField_surfaceInterval => 'מרווח פני שטח';
+
+  @override
+  String get enum_diveField_diveNumber_short => '#';
+
+  @override
+  String get enum_diveField_dateTime_short => 'תאריך';
+
+  @override
+  String get enum_diveField_siteName_short => 'אתר';
+
+  @override
+  String get enum_diveField_diveName_short => 'שם';
+
+  @override
+  String get enum_diveField_maxDepth_short => 'ע. מרבי';
+
+  @override
+  String get enum_diveField_avgDepth_short => 'ע. ממוצע';
+
+  @override
+  String get enum_diveField_bottomTime_short => 'תחתית';
+
+  @override
+  String get enum_diveField_runtime_short => 'ריצה';
+
+  @override
+  String get enum_diveField_waterTemp_short => 'טמפ\' מים';
+
+  @override
+  String get enum_diveField_airTemp_short => 'טמפ\' אוויר';
+
+  @override
+  String get enum_diveField_visibility_short => 'ראות';
+
+  @override
+  String get enum_diveField_currentDirection_short => 'כיוון';
+
+  @override
+  String get enum_diveField_currentStrength_short => 'זרם';
+
+  @override
+  String get enum_diveField_swellHeight_short => 'גלים';
+
+  @override
+  String get enum_diveField_entryMethod_short => 'כניסה';
+
+  @override
+  String get enum_diveField_exitMethod_short => 'יציאה';
+
+  @override
+  String get enum_diveField_waterType_short => 'מים';
+
+  @override
+  String get enum_diveField_altitude_short => 'גובה';
+
+  @override
+  String get enum_diveField_surfacePressure_short => 'לחץ שטח';
+
+  @override
+  String get enum_diveField_windSpeed_short => 'רוח';
+
+  @override
+  String get enum_diveField_cloudCover_short => 'עננים';
+
+  @override
+  String get enum_diveField_precipitation_short => 'משקעים';
+
+  @override
+  String get enum_diveField_humidity_short => 'לחות';
+
+  @override
+  String get enum_diveField_weatherDescription_short => 'מזג אוויר';
+
+  @override
+  String get enum_diveField_primaryGas_short => 'גז';
+
+  @override
+  String get enum_diveField_diluentGas_short => 'מדלל';
+
+  @override
+  String get enum_diveField_tankCount_short => 'מכלים';
+
+  @override
+  String get enum_diveField_startPressure_short => 'התחלה';
+
+  @override
+  String get enum_diveField_endPressure_short => 'סיום';
+
+  @override
+  String get enum_diveField_sacRate_short => 'SAC';
+
+  @override
+  String get enum_diveField_gasConsumed_short => 'צריכת גז';
+
+  @override
+  String get enum_diveField_totalWeight_short => 'משקל';
+
+  @override
+  String get enum_diveField_diveComputerModel_short => 'מחשב';
+
+  @override
+  String get enum_diveField_gradientFactorLow_short => 'GFL';
+
+  @override
+  String get enum_diveField_gradientFactorHigh_short => 'GFH';
+
+  @override
+  String get enum_diveField_decoAlgorithm_short => 'אלגו\'';
+
+  @override
+  String get enum_diveField_decoConservatism_short => 'שמרנות';
+
+  @override
+  String get enum_diveField_cnsStart_short => 'CNS התחלה';
+
+  @override
+  String get enum_diveField_cnsEnd_short => 'CNS סיום';
+
+  @override
+  String get enum_diveField_otu_short => 'OTU';
+
+  @override
+  String get enum_diveField_diveMode_short => 'מצב';
+
+  @override
+  String get enum_diveField_setpointLow_short => 'SP נמוך';
+
+  @override
+  String get enum_diveField_setpointHigh_short => 'SP גבוה';
+
+  @override
+  String get enum_diveField_setpointDeco_short => 'SP דקו';
+
+  @override
+  String get enum_diveField_buddy_short => 'שותף';
+
+  @override
+  String get enum_diveField_diveMaster_short => 'DM';
+
+  @override
+  String get enum_diveField_siteLocation_short => 'מיקום';
+
+  @override
+  String get enum_diveField_diveCenterName_short => 'מרכז';
+
+  @override
+  String get enum_diveField_siteLatitude_short => 'רוחב';
+
+  @override
+  String get enum_diveField_siteLongitude_short => 'אורך';
+
+  @override
+  String get enum_diveField_tripName_short => 'טיול';
+
+  @override
+  String get enum_diveField_ratingStars_short => 'דירוג';
+
+  @override
+  String get enum_diveField_isFavorite_short => 'מועדף';
+
+  @override
+  String get enum_diveField_notes_short => 'הערות';
+
+  @override
+  String get enum_diveField_tags_short => 'תגיות';
+
+  @override
+  String get enum_diveField_importSource_short => 'מקור';
+
+  @override
+  String get enum_diveField_diveTypeName_short => 'סוג';
+
+  @override
+  String get enum_diveField_surfaceInterval_short => 'מרווח';
+
+  @override
+  String get enum_siteField_siteName => 'שם';
+
+  @override
+  String get enum_siteField_location => 'מיקום';
+
+  @override
+  String get enum_siteField_country => 'מדינה';
+
+  @override
+  String get enum_siteField_region => 'אזור';
+
+  @override
+  String get enum_siteField_city => 'עיר';
+
+  @override
+  String get enum_siteField_island => 'אי';
+
+  @override
+  String get enum_siteField_bodyOfWater => 'מקווה מים';
+
+  @override
+  String get enum_siteField_diveCount => 'מספר צלילות';
+
+  @override
+  String get enum_siteField_maxDepth => 'עומק מרבי';
+
+  @override
+  String get enum_siteField_minDepth => 'עומק מזערי';
+
+  @override
+  String get enum_siteField_altitude => 'גובה';
+
+  @override
+  String get enum_siteField_waterType => 'סוג מים';
+
+  @override
+  String get enum_siteField_typicalVisibility => 'ראות אופיינית';
+
+  @override
+  String get enum_siteField_typicalCurrent => 'זרם אופייני';
+
+  @override
+  String get enum_siteField_difficulty => 'רמת קושי';
+
+  @override
+  String get enum_siteField_entryType => 'סוג כניסה';
+
+  @override
+  String get enum_siteField_bestSeason => 'עונה מיטבית';
+
+  @override
+  String get enum_siteField_mooringNumber => 'מספר עגינה';
+
+  @override
+  String get enum_siteField_hazards => 'סכנות';
+
+  @override
+  String get enum_siteField_rating => 'דירוג';
+
+  @override
+  String get enum_siteField_notes => 'הערות';
+
+  @override
+  String get enum_siteField_latitude => 'קו רוחב';
+
+  @override
+  String get enum_siteField_longitude => 'קו אורך';
+
+  @override
+  String get enum_siteField_siteName_short => 'שם';
+
+  @override
+  String get enum_siteField_location_short => 'מיקום';
+
+  @override
+  String get enum_siteField_country_short => 'מדינה';
+
+  @override
+  String get enum_siteField_region_short => 'אזור';
+
+  @override
+  String get enum_siteField_city_short => 'עיר';
+
+  @override
+  String get enum_siteField_island_short => 'אי';
+
+  @override
+  String get enum_siteField_bodyOfWater_short => 'מקווה מים';
+
+  @override
+  String get enum_siteField_diveCount_short => 'צלילות';
+
+  @override
+  String get enum_siteField_maxDepth_short => 'ע. מרבי';
+
+  @override
+  String get enum_siteField_minDepth_short => 'ע. מזערי';
+
+  @override
+  String get enum_siteField_altitude_short => 'גובה';
+
+  @override
+  String get enum_siteField_waterType_short => 'מים';
+
+  @override
+  String get enum_siteField_typicalVisibility_short => 'ראות';
+
+  @override
+  String get enum_siteField_typicalCurrent_short => 'זרם';
+
+  @override
+  String get enum_siteField_difficulty_short => 'קושי';
+
+  @override
+  String get enum_siteField_entryType_short => 'כניסה';
+
+  @override
+  String get enum_siteField_bestSeason_short => 'עונה';
+
+  @override
+  String get enum_siteField_mooringNumber_short => 'עגינה';
+
+  @override
+  String get enum_siteField_hazards_short => 'סכנות';
+
+  @override
+  String get enum_siteField_rating_short => 'דירוג';
+
+  @override
+  String get enum_siteField_notes_short => 'הערות';
+
+  @override
+  String get enum_siteField_latitude_short => 'רוחב';
+
+  @override
+  String get enum_siteField_longitude_short => 'אורך';
+
+  @override
+  String get enum_buddyField_buddyName => 'שם';
+
+  @override
+  String get enum_buddyField_email => 'דוא\"ל';
+
+  @override
+  String get enum_buddyField_phone => 'טלפון';
+
+  @override
+  String get enum_buddyField_certificationLevel => 'רמת הסמכה';
+
+  @override
+  String get enum_buddyField_certificationAgency => 'גוף הסמכה';
+
+  @override
+  String get enum_buddyField_diveCount => 'מספר צלילות';
+
+  @override
+  String get enum_buddyField_notes => 'הערות';
+
+  @override
+  String get enum_buddyField_buddyName_short => 'שם';
+
+  @override
+  String get enum_buddyField_email_short => 'דוא\"ל';
+
+  @override
+  String get enum_buddyField_phone_short => 'טלפון';
+
+  @override
+  String get enum_buddyField_certificationLevel_short => 'רמת הסמכה';
+
+  @override
+  String get enum_buddyField_certificationAgency_short => 'גוף';
+
+  @override
+  String get enum_buddyField_diveCount_short => 'צלילות';
+
+  @override
+  String get enum_buddyField_notes_short => 'הערות';
+
+  @override
+  String get enum_tripField_tripName => 'שם';
+
+  @override
+  String get enum_tripField_startDate => 'תאריך התחלה';
+
+  @override
+  String get enum_tripField_endDate => 'תאריך סיום';
+
+  @override
+  String get enum_tripField_durationDays => 'משך';
+
+  @override
+  String get enum_tripField_location => 'מיקום';
+
+  @override
+  String get enum_tripField_tripType => 'סוג טיול';
+
+  @override
+  String get enum_tripField_resortName => 'אתר נופש';
+
+  @override
+  String get enum_tripField_liveaboardName => 'ספינת צלילה';
+
+  @override
+  String get enum_tripField_diveCount => 'מספר צלילות';
+
+  @override
+  String get enum_tripField_totalRuntime => 'סה\"כ זמן ריצה';
+
+  @override
+  String get enum_tripField_maxDepth => 'עומק מרבי';
+
+  @override
+  String get enum_tripField_avgDepth => 'עומק ממוצע';
+
+  @override
+  String get enum_tripField_notes => 'הערות';
+
+  @override
+  String get enum_tripField_tripName_short => 'שם';
+
+  @override
+  String get enum_tripField_startDate_short => 'התחלה';
+
+  @override
+  String get enum_tripField_endDate_short => 'סיום';
+
+  @override
+  String get enum_tripField_durationDays_short => 'ימים';
+
+  @override
+  String get enum_tripField_location_short => 'מיקום';
+
+  @override
+  String get enum_tripField_tripType_short => 'סוג';
+
+  @override
+  String get enum_tripField_resortName_short => 'נופש';
+
+  @override
+  String get enum_tripField_liveaboardName_short => 'ספינה';
+
+  @override
+  String get enum_tripField_diveCount_short => 'צלילות';
+
+  @override
+  String get enum_tripField_totalRuntime_short => 'סה\"כ ריצה';
+
+  @override
+  String get enum_tripField_maxDepth_short => 'ע. מרבי';
+
+  @override
+  String get enum_tripField_avgDepth_short => 'ע. ממוצע';
+
+  @override
+  String get enum_tripField_notes_short => 'הערות';
+
+  @override
+  String get enum_equipmentField_itemName => 'שם';
+
+  @override
+  String get enum_equipmentField_fullName => 'שם מלא';
+
+  @override
+  String get enum_equipmentField_type => 'סוג';
+
+  @override
+  String get enum_equipmentField_brand => 'מותג';
+
+  @override
+  String get enum_equipmentField_model => 'דגם';
+
+  @override
+  String get enum_equipmentField_serialNumber => 'מספר סידורי';
+
+  @override
+  String get enum_equipmentField_size => 'מידה';
+
+  @override
+  String get enum_equipmentField_status => 'סטטוס';
+
+  @override
+  String get enum_equipmentField_isActive => 'פעיל';
+
+  @override
+  String get enum_equipmentField_purchaseDate => 'תאריך רכישה';
+
+  @override
+  String get enum_equipmentField_purchasePrice => 'מחיר רכישה';
+
+  @override
+  String get enum_equipmentField_lastServiceDate => 'טיפול אחרון';
+
+  @override
+  String get enum_equipmentField_nextServiceDue => 'הטיפול הבא';
+
+  @override
+  String get enum_equipmentField_daysUntilService => 'ימים עד הטיפול';
+
+  @override
+  String get enum_equipmentField_serviceIntervalDays => 'מרווח טיפול';
+
+  @override
+  String get enum_equipmentField_notes => 'הערות';
+
+  @override
+  String get enum_equipmentField_itemName_short => 'שם';
+
+  @override
+  String get enum_equipmentField_fullName_short => 'שם מלא';
+
+  @override
+  String get enum_equipmentField_type_short => 'סוג';
+
+  @override
+  String get enum_equipmentField_brand_short => 'מותג';
+
+  @override
+  String get enum_equipmentField_model_short => 'דגם';
+
+  @override
+  String get enum_equipmentField_serialNumber_short => 'סידורי';
+
+  @override
+  String get enum_equipmentField_size_short => 'מידה';
+
+  @override
+  String get enum_equipmentField_status_short => 'סטטוס';
+
+  @override
+  String get enum_equipmentField_isActive_short => 'פעיל';
+
+  @override
+  String get enum_equipmentField_purchaseDate_short => 'נרכש';
+
+  @override
+  String get enum_equipmentField_purchasePrice_short => 'מחיר';
+
+  @override
+  String get enum_equipmentField_lastServiceDate_short => 'טופל';
+
+  @override
+  String get enum_equipmentField_nextServiceDue_short => 'טיפול הבא';
+
+  @override
+  String get enum_equipmentField_daysUntilService_short => 'ימים נותרו';
+
+  @override
+  String get enum_equipmentField_serviceIntervalDays_short => 'מרווח';
+
+  @override
+  String get enum_equipmentField_notes_short => 'הערות';
+
+  @override
+  String get enum_diveCenterField_centerName => 'שם';
+
+  @override
+  String get enum_diveCenterField_city => 'עיר';
+
+  @override
+  String get enum_diveCenterField_country => 'מדינה';
+
+  @override
+  String get enum_diveCenterField_stateProvince => 'מדינה / מחוז';
+
+  @override
+  String get enum_diveCenterField_street => 'רחוב';
+
+  @override
+  String get enum_diveCenterField_postalCode => 'מיקוד';
+
+  @override
+  String get enum_diveCenterField_phone => 'טלפון';
+
+  @override
+  String get enum_diveCenterField_email => 'דוא\"ל';
+
+  @override
+  String get enum_diveCenterField_website => 'אתר אינטרנט';
+
+  @override
+  String get enum_diveCenterField_affiliations => 'השתייכויות';
+
+  @override
+  String get enum_diveCenterField_rating => 'דירוג';
+
+  @override
+  String get enum_diveCenterField_latitude => 'קו רוחב';
+
+  @override
+  String get enum_diveCenterField_longitude => 'קו אורך';
+
+  @override
+  String get enum_diveCenterField_diveCount => 'מספר צלילות';
+
+  @override
+  String get enum_diveCenterField_notes => 'הערות';
+
+  @override
+  String get enum_diveCenterField_centerName_short => 'שם';
+
+  @override
+  String get enum_diveCenterField_city_short => 'עיר';
+
+  @override
+  String get enum_diveCenterField_country_short => 'מדינה';
+
+  @override
+  String get enum_diveCenterField_stateProvince_short => 'מחוז';
+
+  @override
+  String get enum_diveCenterField_street_short => 'רחוב';
+
+  @override
+  String get enum_diveCenterField_postalCode_short => 'מיקוד';
+
+  @override
+  String get enum_diveCenterField_phone_short => 'טלפון';
+
+  @override
+  String get enum_diveCenterField_email_short => 'דוא\"ל';
+
+  @override
+  String get enum_diveCenterField_website_short => 'אתר';
+
+  @override
+  String get enum_diveCenterField_affiliations_short => 'השתייכויות';
+
+  @override
+  String get enum_diveCenterField_rating_short => 'דירוג';
+
+  @override
+  String get enum_diveCenterField_latitude_short => 'רוחב';
+
+  @override
+  String get enum_diveCenterField_longitude_short => 'אורך';
+
+  @override
+  String get enum_diveCenterField_diveCount_short => 'צלילות';
+
+  @override
+  String get enum_diveCenterField_notes_short => 'הערות';
+
+  @override
+  String get enum_certificationField_certName => 'שם';
+
+  @override
+  String get enum_certificationField_agency => 'גוף הסמכה';
+
+  @override
+  String get enum_certificationField_level => 'הסמכה';
+
+  @override
+  String get enum_certificationField_cardNumber => 'מספר כרטיס';
+
+  @override
+  String get enum_certificationField_issueDate => 'תאריך הנפקה';
+
+  @override
+  String get enum_certificationField_expiryDate => 'תאריך תפוגה';
+
+  @override
+  String get enum_certificationField_instructorName => 'שם המדריך';
+
+  @override
+  String get enum_certificationField_instructorNumber => 'מספר המדריך';
+
+  @override
+  String get enum_certificationField_expiryStatus => 'סטטוס תפוגה';
+
+  @override
+  String get enum_certificationField_notes => 'הערות';
+
+  @override
+  String get enum_certificationField_certName_short => 'שם';
+
+  @override
+  String get enum_certificationField_agency_short => 'גוף';
+
+  @override
+  String get enum_certificationField_level_short => 'הסמכה';
+
+  @override
+  String get enum_certificationField_cardNumber_short => 'כרטיס #';
+
+  @override
+  String get enum_certificationField_issueDate_short => 'הונפק';
+
+  @override
+  String get enum_certificationField_expiryDate_short => 'תפוגה';
+
+  @override
+  String get enum_certificationField_instructorName_short => 'מדריך';
+
+  @override
+  String get enum_certificationField_instructorNumber_short => 'מדריך #';
+
+  @override
+  String get enum_certificationField_expiryStatus_short => 'סטטוס';
+
+  @override
+  String get enum_certificationField_notes_short => 'הערות';
+
+  @override
+  String get enum_courseField_courseName => 'שם';
+
+  @override
+  String get enum_courseField_agency => 'גוף הסמכה';
+
+  @override
+  String get enum_courseField_startDate => 'תאריך התחלה';
+
+  @override
+  String get enum_courseField_completionDate => 'תאריך השלמה';
+
+  @override
+  String get enum_courseField_durationDays => 'משך';
+
+  @override
+  String get enum_courseField_instructorName => 'שם המדריך';
+
+  @override
+  String get enum_courseField_instructorNumber => 'מספר המדריך';
+
+  @override
+  String get enum_courseField_location => 'מיקום';
+
+  @override
+  String get enum_courseField_isCompleted => 'הושלם';
+
+  @override
+  String get enum_courseField_notes => 'הערות';
+
+  @override
+  String get enum_courseField_courseName_short => 'שם';
+
+  @override
+  String get enum_courseField_agency_short => 'גוף';
+
+  @override
+  String get enum_courseField_startDate_short => 'התחיל';
+
+  @override
+  String get enum_courseField_completionDate_short => 'הושלם';
+
+  @override
+  String get enum_courseField_durationDays_short => 'משך';
+
+  @override
+  String get enum_courseField_instructorName_short => 'מדריך';
+
+  @override
+  String get enum_courseField_instructorNumber_short => 'מדריך #';
+
+  @override
+  String get enum_courseField_location_short => 'מיקום';
+
+  @override
+  String get enum_courseField_isCompleted_short => 'בוצע';
+
+  @override
+  String get enum_courseField_notes_short => 'הערות';
+
+  @override
+  String get enum_fieldCategory_accommodation => 'לינה';
+
+  @override
+  String get enum_fieldCategory_address => 'כתובת';
+
+  @override
+  String get enum_fieldCategory_certification => 'הסמכה';
+
+  @override
+  String get enum_fieldCategory_conditions => 'תנאים';
+
+  @override
+  String get enum_fieldCategory_contact => 'יצירת קשר';
+
+  @override
+  String get enum_fieldCategory_coordinates => 'קואורדינטות';
+
+  @override
+  String get enum_fieldCategory_dates => 'תאריכים';
+
+  @override
+  String get enum_fieldCategory_depth => 'עומק';
+
+  @override
+  String get enum_fieldCategory_details => 'פרטים';
+
+  @override
+  String get enum_fieldCategory_instructor => 'מדריך';
+
+  @override
+  String get enum_fieldCategory_other => 'אחר';
+
+  @override
+  String get enum_fieldCategory_purchase => 'רכישה';
+
+  @override
+  String get enum_fieldCategory_service => 'טיפול';
+
+  @override
+  String get enum_fieldCategory_statistics => 'סטטיסטיקות';
+
+  @override
+  String get species_whale_shark_name => 'כריש לווייתן';
+
+  @override
+  String get species_whale_shark_desc =>
+      'הדג הגדול ביותר באוקיינוס, מסנן מזון עדין בעל דוגמת נקודות ייחודית.';
+
+  @override
+  String get species_great_white_shark_name => 'כריש לבן';
+
+  @override
+  String get species_great_white_shark_desc =>
+      'טורף-על אייקוני שנצפה מדי פעם על ידי צוללני כלוב במים ממוזגים.';
+
+  @override
+  String get species_great_hammerhead_shark_name => 'כריש פטיש גדול';
+
+  @override
+  String get species_great_hammerhead_shark_desc =>
+      'מין כריש הפטיש הגדול ביותר, בעל ראש רחב ושטוח וסנפיר גב גבוה.';
+
+  @override
+  String get species_scalloped_hammerhead_shark_name => 'כריש פטיש משונן';
+
+  @override
+  String get species_scalloped_hammerhead_shark_desc =>
+      'נצפה לעיתים קרובות בלהקות גדולות סביב הרי ים ותחנות ניקוי.';
+
+  @override
+  String get species_smooth_hammerhead_shark_name => 'כריש פטיש חלק';
+
+  @override
+  String get species_smooth_hammerhead_shark_desc =>
+      'כריש פטיש בעל שולי ראש חלקים ומעוגלים, מצוי בימים ממוזגים.';
+
+  @override
+  String get species_whitetip_reef_shark_name => 'כריש שונית לבן-קצה';
+
+  @override
+  String get species_whitetip_reef_shark_desc =>
+      'דייר שונית נוח שנמצא לרוב נח במערות ומתחת למדפי סלע במהלך היום.';
+
+  @override
+  String get species_blacktip_reef_shark_name => 'כריש שונית שחור-קצה';
+
+  @override
+  String get species_blacktip_reef_shark_desc =>
+      'כריש שונית נפוץ במים רדודים, בעל קצות סנפירים שחורים אופייניים.';
+
+  @override
+  String get species_grey_reef_shark_name => 'כריש שונית אפור';
+
+  @override
+  String get species_grey_reef_shark_desc =>
+      'טורף שונית פעיל שנפגשים בו לרוב בקבוצות לאורך מדרונות תלולים ותעלות.';
+
+  @override
+  String get species_caribbean_reef_shark_name => 'כריש שונית קריבי';
+
+  @override
+  String get species_caribbean_reef_shark_desc =>
+      'כריש השונית הנפוץ ביותר בקריביים, חסון וסקרן.';
+
+  @override
+  String get species_nurse_shark_name => 'כריש אומנת';
+
+  @override
+  String get species_nurse_shark_desc =>
+      'דייר קרקעית איטי שנמצא לרוב נח מתחת למדפי אלמוגים.';
+
+  @override
+  String get species_tawny_nurse_shark_name => 'כריש אומנת שחום';
+
+  @override
+  String get species_tawny_nurse_shark_desc =>
+      'דייר קרקעית הודו-פסיפי הנח במערות שונית ובאזורי חול.';
+
+  @override
+  String get species_bull_shark_name => 'כריש שור';
+
+  @override
+  String get species_bull_shark_desc =>
+      'כריש חסון ורב-עוצמה המצוי בסביבות חוף ובמים מתוקים בכל העולם.';
+
+  @override
+  String get species_tiger_shark_name => 'כריש טיגריס';
+
+  @override
+  String get species_tiger_shark_desc =>
+      'טורף גדול בעל דוגמת פסים אופיינית, נפגש בצלילות שונית עמוקות.';
+
+  @override
+  String get species_oceanic_whitetip_shark_name => 'כריש לבן-קצה אוקייני';
+
+  @override
+  String get species_oceanic_whitetip_shark_desc =>
+      'כריש פלגי בעל סנפירים מעוגלים לבני-קצה, נצפה בצלילות באוקיינוס הפתוח.';
+
+  @override
+  String get species_thresher_shark_name => 'כריש שועל';
+
+  @override
+  String get species_thresher_shark_desc =>
+      'ניכר בסנפיר הזנב הארוך במיוחד שלו, ולעיתים נצפה בתחנות ניקוי.';
+
+  @override
+  String get species_pelagic_thresher_shark_name => 'כריש שועל פלגי';
+
+  @override
+  String get species_pelagic_thresher_shark_desc =>
+      'המין הקטן ביותר בקרב כרישי השועל, מפורסם בתצפיות במונאד שול שבפיליפינים.';
+
+  @override
+  String get species_shortfin_mako_shark_name => 'כריש מאקו קצר-סנפיר';
+
+  @override
+  String get species_shortfin_mako_shark_desc =>
+      'הכריש המהיר ביותר באוקיינוס, טורף מים פתוחים חלקלק בגוון כחול מתכתי.';
+
+  @override
+  String get species_blue_shark_name => 'כריש כחול';
+
+  @override
+  String get species_blue_shark_desc =>
+      'כריש פלגי תמיר בגוון כחול עמוק, נפגש לעיתים קרובות בצלילות מים כחולים.';
+
+  @override
+  String get species_spotted_wobbegong_name => 'וובגונג מנוקד';
+
+  @override
+  String get species_spotted_wobbegong_desc =>
+      'כריש שטיח שטוח ומוסווה השוכב ללא תנועה על שוניות סלע באוסטרליה.';
+
+  @override
+  String get species_tasselled_wobbegong_name => 'וובגונג מצויץ';
+
+  @override
+  String get species_tasselled_wobbegong_desc =>
+      'כריש שטיח מקושט בעל אונות משוננות סביב הראש, מצוי בשוניות אלמוגים.';
+
+  @override
+  String get species_epaulette_shark_name => 'כריש כתפייה';
+
+  @override
+  String get species_epaulette_shark_desc =>
+      'כריש קטן הצועד על קרקעית השונית בעזרת סנפירי החזה שלו.';
+
+  @override
+  String get species_horn_shark_name => 'כריש קרן';
+
+  @override
+  String get species_horn_shark_desc =>
+      'דייר קרקעית לילי בעל רכסים מעל העיניים, מצוי מול חופי קליפורניה.';
+
+  @override
+  String get species_leopard_shark_name => 'כריש נמר';
+
+  @override
+  String get species_leopard_shark_desc =>
+      'כריש בעל דוגמה יפהפייה המצוי במפרצים רדודים לאורך חופי האוקיינוס השקט של ארצות הברית.';
+
+  @override
+  String get species_pacific_angel_shark_name => 'כריש מלאך פסיפי';
+
+  @override
+  String get species_pacific_angel_shark_desc =>
+      'טורף מארב שטוח-גוף השוכב טמון בחול על קרקעית הים.';
+
+  @override
+  String get species_sand_tiger_shark_name => 'כריש חול';
+
+  @override
+  String get species_sand_tiger_shark_desc =>
+      'כריש בעל מראה מאיים אך אופי נוח, נצפה לעיתים קרובות מרחף במערות ובספינות טרופות.';
+
+  @override
+  String get species_zebra_shark_name => 'כריש זברה';
+
+  @override
+  String get species_zebra_shark_desc =>
+      'כריש שונית מנוקד הנח על קרקעיות חול, נפוץ בהודו-פסיפי.';
+
+  @override
+  String get species_blacktip_shark_name => 'כריש שחור-קצה';
+
+  @override
+  String get species_blacktip_shark_desc =>
+      'כריש חופי מהיר הידוע בקפיצות המסתובבות שלו, מצוי במים חמים בכל העולם.';
+
+  @override
+  String get species_silvertip_shark_name => 'כריש כסוף-קצה';
+
+  @override
+  String get species_silvertip_shark_desc =>
+      'כריש שונית נועז בעל סנפירים לבני-שוליים, מצוי ליד מדרונות עמוקים ואטולים.';
+
+  @override
+  String get species_silky_shark_name => 'כריש משיי';
+
+  @override
+  String get species_silky_shark_desc =>
+      'כריש פלגי חלקלק בעל עור חלק, מצוי לרוב סמוך לשוניות מרוחקות מהחוף.';
+
+  @override
+  String get species_lemon_shark_name => 'כריש לימון';
+
+  @override
+  String get species_lemon_shark_desc =>
+      'כריש בגוון חום-צהבהב הנצפה לרוב במנגרובים רדודים ובמישורי חול.';
+
+  @override
+  String get species_galapagos_shark_name => 'כריש גלפגוס';
+
+  @override
+  String get species_galapagos_shark_desc =>
+      'כריש שונית גדול המצוי סביב איים אוקייניים, סקרן כלפי צוללנים.';
+
+  @override
+  String get species_port_jackson_shark_name => 'כריש פורט ג\'קסון';
+
+  @override
+  String get species_port_jackson_shark_desc =>
+      'דייר קרקעית לילי בעל סימנים דמויי רתמה, אנדמי לאוסטרליה.';
+
+  @override
+  String get species_bamboo_shark_name => 'כריש במבוק חום-פסים';
+
+  @override
+  String get species_bamboo_shark_desc =>
+      'כריש קרקעית קטן ונוח, נפוץ בשוניות האלמוגים של ההודו-פסיפי.';
+
+  @override
+  String get species_basking_shark_name => 'כריש מתחמם';
+
+  @override
+  String get species_basking_shark_desc =>
+      'הדג השני בגודלו בעולם, מסנן מזון הנצפה במים ממוזגים סמוך לפני השטח.';
+
+  @override
+  String get species_greenland_shark_name => 'כריש גרינלנד';
+
+  @override
+  String get species_greenland_shark_desc =>
+      'כריש מים עמוקים איטי, אחד מבעלי החוליות המאריכים ימים ביותר על פני כדור הארץ.';
+
+  @override
+  String get species_cookiecutter_shark_name => 'כריש חותך העוגיות';
+
+  @override
+  String get species_cookiecutter_shark_desc =>
+      'כריש מים עמוקים קטן הנוגס נגיסות עגולות מבעלי חיים ימיים גדולים ממנו.';
+
+  @override
+  String get species_sevengill_shark_name => 'כריש שבעת הזימים רחב-חוטם';
+
+  @override
+  String get species_sevengill_shark_desc =>
+      'כריש קדום בעל שבעה חריצי זימים, נפגש בצלילות ביערות קלפ ממוזגים.';
+
+  @override
+  String get species_pyjama_shark_name => 'כריש פיג\'מה';
+
+  @override
+  String get species_pyjama_shark_desc =>
+      'כריש חתול מפוספס האנדמי לדרום אפריקה, מצוי בשוניות סלע וביערות קלפ.';
+
+  @override
+  String get species_spiny_dogfish_name => 'כלבתן קוצני';
+
+  @override
+  String get species_spiny_dogfish_desc =>
+      'כריש קטן ונפוץ בעל קוצי גב ארסיים, מצוי במים ממוזגים.';
+
+  @override
+  String get species_swell_shark_name => 'כריש מתנפח';
+
+  @override
+  String get species_swell_shark_desc =>
+      'כריש חתול לילי המנפח את גופו כשהוא מאוים, מצוי מול חופי קליפורניה.';
+
+  @override
+  String get species_giant_oceanic_manta_ray_name => 'מנטה אוקיינית ענקית';
+
+  @override
+  String get species_giant_oceanic_manta_ray_desc =>
+      'מין הטריגון הגדול ביותר, מסנן מזון מלכותי בעל מוטת כנפיים של עד 7 מטרים.';
+
+  @override
+  String get species_reef_manta_ray_name => 'מנטת שונית';
+
+  @override
+  String get species_reef_manta_ray_desc =>
+      'מין מנטה קטן יותר הנצפה לרוב בתחנות ניקוי בשוניות טרופיות.';
+
+  @override
+  String get species_spotted_eagle_ray_name => 'טריגון נשר מנוקד';
+
+  @override
+  String get species_spotted_eagle_ray_desc =>
+      'טריגון אלגנטי בעל נקודות לבנות וזנב ארוך דמוי שוט, נצפה לרוב באמצע המים.';
+
+  @override
+  String get species_common_eagle_ray_name => 'טריגון נשר מצוי';
+
+  @override
+  String get species_common_eagle_ray_desc =>
+      'טריגון בצורת מעוין המצוי במים הממוזגים של מזרח האוקיינוס האטלנטי ושל הים התיכון.';
+
+  @override
+  String get species_blue_spotted_ribbontail_ray_name =>
+      'טריגון סרט-זנב כחול-נקודות';
+
+  @override
+  String get species_blue_spotted_ribbontail_ray_desc =>
+      'טריגון עז-צבעים בעל נקודות כחולות זוהרות, נפוץ בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_blue_spotted_stingray_name => 'טריגון כחול-נקודות';
+
+  @override
+  String get species_blue_spotted_stingray_desc =>
+      'טריגון שונית קטן בעל נקודות כחולות פזורות, טמון לעיתים קרובות בכתמי חול.';
+
+  @override
+  String get species_southern_stingray_name => 'טריגון דרומי';
+
+  @override
+  String get species_southern_stingray_desc =>
+      'טריגון גדול המצוי במישורי החול של הקריביים, מפורסם באתר סטינגריי סיטי.';
+
+  @override
+  String get species_round_stingray_name => 'טריגון עגול';
+
+  @override
+  String get species_round_stingray_desc =>
+      'טריגון עגול קטן, נפוץ באזורי חול רדודים במזרח האוקיינוס השקט.';
+
+  @override
+  String get species_short_tail_stingray_name => 'טריגון קצר-זנב';
+
+  @override
+  String get species_short_tail_stingray_desc =>
+      'אחד הטריגונים הגדולים בעולם, מצוי במים ממוזגים של חצי הכדור הדרומי.';
+
+  @override
+  String get species_cowtail_stingray_name => 'טריגון זנב-פרה';
+
+  @override
+  String get species_cowtail_stingray_desc =>
+      'טריגון כהה וגדול בעל קפל זנב אופייני דמוי דגל, מצוי בשוניות חוליות.';
+
+  @override
+  String get species_atlantic_torpedo_ray_name => 'טריגון חשמלי אטלנטי';
+
+  @override
+  String get species_atlantic_torpedo_ray_desc =>
+      'טריגון חשמלי המסוגל לייצר מכות חשמל חזקות, מצוי בקרקעיות חול באוקיינוס האטלנטי.';
+
+  @override
+  String get species_marbled_electric_ray_name => 'טריגון חשמלי משויש';
+
+  @override
+  String get species_marbled_electric_ray_desc =>
+      'טריגון חשמלי ים-תיכוני בעל דוגמת שיש, ומכת החשמל שלו מורגשת היטב.';
+
+  @override
+  String get species_giant_guitarfish_name => 'דג גיטרה ענק';
+
+  @override
+  String get species_giant_guitarfish_desc =>
+      'טריגון בעל צורת כריש המצוי בקרקעיות חול בהודו-פסיפי סמוך לשוניות אלמוגים.';
+
+  @override
+  String get species_shovelnose_guitarfish_name => 'דג גיטרה חוטם-את';
+
+  @override
+  String get species_shovelnose_guitarfish_desc =>
+      'בעל מבנה שטוח המשלב מראה של כריש וטריגון, נפוץ ברדודי החול של מזרח האוקיינוס השקט.';
+
+  @override
+  String get species_smalltooth_sawfish_name => 'דג מסור קטן-שיניים';
+
+  @override
+  String get species_smalltooth_sawfish_desc =>
+      'טריגון בסכנת הכחדה חמורה בעל מסור משונן בקדמת הראש, מצוי במים חופיים טרופיים.';
+
+  @override
+  String get species_green_sawfish_name => 'דג מסור ירוק';
+
+  @override
+  String get species_green_sawfish_desc =>
+      'דג מסור גדול בעל גוף ירוק-זית, החי בשפכי נהרות בהודו-מערב פסיפי.';
+
+  @override
+  String get species_devil_ray_name => 'טריגון שטן ענק';
+
+  @override
+  String get species_devil_ray_desc =>
+      'מובולה גדולה בעלת סנפירי ראש, נצפית קופצת מהמים בקבוצות.';
+
+  @override
+  String get species_spinetail_devil_ray_name => 'טריגון שטן קוץ-זנב';
+
+  @override
+  String get species_spinetail_devil_ray_desc =>
+      'טריגון שטן פלגי הנצפה לעיתים קרובות בהתקהלויות גדולות סמוך לפני המים.';
+
+  @override
+  String get species_lesser_devil_ray_name => 'טריגון שטן גמדי';
+
+  @override
+  String get species_lesser_devil_ray_desc =>
+      'מין המובולה הקטן ביותר, יוצר להקות גדולות במפרץ קליפורניה.';
+
+  @override
+  String get species_bat_ray_name => 'טריגון עטלף';
+
+  @override
+  String get species_bat_ray_desc =>
+      'טריגון בצורת מעוין, נפוץ ביערות הקלפ ובמפרצי החול של קליפורניה.';
+
+  @override
+  String get species_undulate_ray_name => 'טריגון גלי';
+
+  @override
+  String get species_undulate_ray_desc =>
+      'טריגון בעל דוגמת קווים גליים יפהפייה, מצוי במזרח האוקיינוס האטלנטי.';
+
+  @override
+  String get species_thornback_ray_name => 'טריגון קוצני';
+
+  @override
+  String get species_thornback_ray_desc =>
+      'טריגון אירופי נפוץ בעל קוצים חדים לאורך הגב והזנב.';
+
+  @override
+  String get species_cownose_ray_name => 'טריגון אף-פרה';
+
+  @override
+  String get species_cownose_ray_desc =>
+      'ניכר בראשו המחורץ, ונצפה לרוב בלהקות גדולות בעת נדידות עונתיות.';
+
+  @override
+  String get species_marble_ray_name => 'טריגון משויש';
+
+  @override
+  String get species_marble_ray_desc =>
+      'טריגון כהה וגדול בעל נקודות לבנות, נצפה תכופות בתחנות ניקוי בהודו-פסיפי.';
+
+  @override
+  String get species_ocellate_river_stingray_name => 'טריגון נהרות עינוני';
+
+  @override
+  String get species_ocellate_river_stingray_desc =>
+      'טריגון מים מתוקים בעל נקודות מוקפות טבעות כתומות בולטות, מקורו בנהרות דרום אמריקה.';
+
+  @override
+  String get species_ocellaris_clownfish_name => 'דג ליצן מצוי';
+
+  @override
+  String get species_ocellaris_clownfish_desc =>
+      'דג קטן בפסים כתומים ולבנים החי בסימביוזה עם שושנות ים בשוניות אלמוגים.';
+
+  @override
+  String get species_clarkii_clownfish_name => 'דג ליצן של קלארק';
+
+  @override
+  String get species_clarkii_clownfish_desc =>
+      'דג שושנון עמיד בעל גוף כהה ושני פסים לבנים, מצוי ברחבי ההודו-פסיפי במגוון מיני שושנות ים.';
+
+  @override
+  String get species_tomato_clownfish_name => 'דג ליצן עגבנייה';
+
+  @override
+  String get species_tomato_clownfish_desc =>
+      'דג שושנון בגוון אדום-כתום עז עם פס לבן יחיד בראש, נפוץ בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_regal_blue_tang_name => 'דג כירורג כחול מלכותי';
+
+  @override
+  String get species_regal_blue_tang_desc =>
+      'דג כירורג בכחול עז בעל סימן שחור דמוי לוח צבעים וזנב צהוב, מצוי בשוניות האלמוגים של ההודו-פסיפי.';
+
+  @override
+  String get species_yellow_tang_name => 'דג כירורג צהוב';
+
+  @override
+  String get species_yellow_tang_desc =>
+      'דג כירורג בצהוב עז הנפוץ בשוניות הוואי והאוקיינוס השקט, נצפה לרוב רועה אצות בקבוצות.';
+
+  @override
+  String get species_powder_blue_surgeonfish_name => 'דג כירורג תכול';
+
+  @override
+  String get species_powder_blue_surgeonfish_desc =>
+      'דג כירורג תכול ומרשים בעל פנים שחורות וסנפיר גב צהוב, מצוי באוקיינוס ההודי.';
+
+  @override
+  String get species_sohal_surgeonfish_name => 'דג כירורג ים סוף';
+
+  @override
+  String get species_sohal_surgeonfish_desc =>
+      'דג כירורג מפוספס ונועז בעל קוץ אזמל כתום, אנדמי לשוניות ים סוף והמפרץ הערבי.';
+
+  @override
+  String get species_blue_tang_name => 'דג כירורג כחול';
+
+  @override
+  String get species_blue_tang_desc =>
+      'דג כירורג בגוון כחול עמוק הנפוץ בשוניות הקריביים; הצעירים צהובים בוהקים.';
+
+  @override
+  String get species_emperor_angelfish_name => 'דג מלאך קיסרי';
+
+  @override
+  String get species_emperor_angelfish_desc =>
+      'דג מלאך גדול בעל פסים אופקיים כחולים וצהובים מרשימים; הצעירים מציגים מעגלים קונצנטריים כחולים ולבנים.';
+
+  @override
+  String get species_french_angelfish_name => 'דג מלאך צרפתי';
+
+  @override
+  String get species_french_angelfish_desc =>
+      'דג מלאך גדול וכהה בעל קשקשים משוליים בזהב, נצפה לרוב בזוגות בשוניות הקריביים ומערב האטלנטי.';
+
+  @override
+  String get species_queen_angelfish_name => 'דג מלאך מלכה';
+
+  @override
+  String get species_queen_angelfish_desc =>
+      'דג מלאך מרהיב בכחול וצהוב בעל כתם כתר אופייני, מצוי בשוניות האלמוגים של הקריביים.';
+
+  @override
+  String get species_regal_angelfish_name => 'דג מלאך מלכותי';
+
+  @override
+  String get species_regal_angelfish_desc =>
+      'דג מלאך אלגנטי בעל פסים אנכיים לסירוגין בכתום-לבן ובכחול, מצוי בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_rock_beauty_name => 'יפהפיית הסלעים';
+
+  @override
+  String get species_rock_beauty_desc =>
+      'דג מלאך קריבי מרשים שחציו הקדמי צהוב וחציו האחורי שחור, מצוי ליד שוניות סלע ומדפי סלע.';
+
+  @override
+  String get species_gray_angelfish_name => 'דג מלאך אפור';
+
+  @override
+  String get species_gray_angelfish_desc =>
+      'דג מלאך אפור וגדול בעל פנים בהירות וצדם הפנימי הצהוב של סנפירי החזה, נפוץ בשוניות הקריביים.';
+
+  @override
+  String get species_copperband_butterflyfish_name => 'דג פרפר נחושת-פסים';
+
+  @override
+  String get species_copperband_butterflyfish_desc =>
+      'דג פרפר ייחודי בעל פסים אנכיים כתומים וחרטום מוארך, מצוי בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_raccoon_butterflyfish_name => 'דג פרפר רקון';
+
+  @override
+  String get species_raccoon_butterflyfish_desc =>
+      'דג פרפר צהוב בעל מסכת עיניים כהה דמוית רקון, נפוץ בשוניות ההודו-פסיפי והוואי.';
+
+  @override
+  String get species_longnose_butterflyfish_name => 'דג פרפר ארוך-חרטום';
+
+  @override
+  String get species_longnose_butterflyfish_desc =>
+      'דג פרפר צהוב בוהק בעל חרטום ארוך במיוחד שבעזרתו הוא לוקט מזון מנקיקים בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_threadfin_butterflyfish_name => 'דג פרפר חוטי-סנפיר';
+
+  @override
+  String get species_threadfin_butterflyfish_desc =>
+      'דג פרפר לבן בעל דוגמת שברונים וחוט נגרר בסנפיר הגב, נפוץ ברחבי ההודו-פסיפי.';
+
+  @override
+  String get species_foureye_butterflyfish_name => 'דג פרפר ארבע-עיניים';
+
+  @override
+  String get species_foureye_butterflyfish_desc =>
+      'דג פרפר בהיר בעל כתם עין מדומה בולט סמוך לזנב, נפוץ בשוניות הקריביים.';
+
+  @override
+  String get species_spotfin_butterflyfish_name => 'דג פרפר מנוקד-סנפיר';
+
+  @override
+  String get species_spotfin_butterflyfish_desc =>
+      'דג פרפר לבן-צהוב בעל כתם כהה קטן על סנפיר הגב, מצוי במערב האוקיינוס האטלנטי.';
+
+  @override
+  String get species_banner_butterflyfish_name => 'דגלן ים סוף';
+
+  @override
+  String get species_banner_butterflyfish_desc =>
+      'דגלן שחור-לבן בעל סנפיר גב מוארך ובטן צהובה, אנדמי לים סוף.';
+
+  @override
+  String get species_moorish_idol_name => 'אליל מורי';
+
+  @override
+  String get species_moorish_idol_desc =>
+      'דג שונית אייקוני בעל פסים נועזים בשחור, לבן וצהוב וחוט ארוך נגרר בסנפיר הגב.';
+
+  @override
+  String get species_green_moray_eel_name => 'מורנה ירוקה';
+
+  @override
+  String get species_green_moray_eel_desc =>
+      'מורנה ירוקה גדולה המגיעה ל-2.5 מטר, נצפית לרוב בפה פעור בנקיקי שונית ברחבי מערב האטלנטי.';
+
+  @override
+  String get species_giant_moray_eel_name => 'מורנה ענקית';
+
+  @override
+  String get species_giant_moray_eel_desc =>
+      'מין המורנה הגדול ביותר, מגיע ליותר מ-3 מטרים ומעוטר בכתמים דמויי נמר, ומצוי בשוניות האלמוגים של ההודו-פסיפי.';
+
+  @override
+  String get species_spotted_moray_eel_name => 'מורנה מנוקדת';
+
+  @override
+  String get species_spotted_moray_eel_desc =>
+      'מורנה לבנה בעלת נקודות חום כהה, נצפית לרוב מציצה מחורי השונית בקריביים.';
+
+  @override
+  String get species_ribbon_eel_name => 'צלופח סרט';
+
+  @override
+  String get species_ribbon_eel_desc =>
+      'צלופח תמיר בעל נחיריים מתרחבים; הזכרים כחולים עזים והנקבות צהובות, והוא מצוי בלגונות חול בהודו-פסיפי.';
+
+  @override
+  String get species_spotted_garden_eel_name => 'צלופח גן מנוקד';
+
+  @override
+  String get species_spotted_garden_eel_desc =>
+      'צלופח דק ולבן בנקודות שחורות החי במושבות בקרקעית חול ומתנועע בזרם כדי ללכוד פלנקטון.';
+
+  @override
+  String get species_splendid_garden_eel_name => 'צלופח גן מפואר';
+
+  @override
+  String get species_splendid_garden_eel_desc =>
+      'צלופח גן בפסים כתומים ולבנים, מצוי במושבות חול גדולות במערב האוקיינוס השקט.';
+
+  @override
+  String get species_snowflake_moray_name => 'מורנת פתית שלג';
+
+  @override
+  String get species_snowflake_moray_desc =>
+      'מורנה קטנה בעלת גוף לבן וסימנים שחורים דמויי פתיתי שלג, נפוצה בשברי אלמוגים בהודו-פסיפי.';
+
+  @override
+  String get species_mandarin_dragonet_name => 'דרקונית מנדרין';
+
+  @override
+  String get species_mandarin_dragonet_desc =>
+      'דג זעיר וצבעוני להפליא בדוגמאות פסיכדליות של כחול וכתום, מצוי באזורי שברי אלמוגים במערב האוקיינוס השקט.';
+
+  @override
+  String get species_common_lionfish_name => 'דג אריה מצוי';
+
+  @override
+  String get species_common_lionfish_desc =>
+      'דג עקרב ארסי בעל סנפירי חזה מרהיבים דמויי מניפה ופסים אדומים ולבנים, ומין פולש בקריביים.';
+
+  @override
+  String get species_leaf_scorpionfish_name => 'דג עקרב עלה';
+
+  @override
+  String get species_leaf_scorpionfish_desc =>
+      'דג עקרב שטוח מאוד בצורת עלה, מתנועע עם הזרם כדי להיראות כשריד צמחי נסחף בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_stonefish_name => 'דג אבן';
+
+  @override
+  String get species_stonefish_desc =>
+      'הדג הארסי ביותר בעולם, מוסווה להפליא כסלע על קרקעיות השונית בהודו-פסיפי ומסוכן ביותר.';
+
+  @override
+  String get species_painted_frogfish_name => 'דג צפרדע מצויר';
+
+  @override
+  String get species_painted_frogfish_desc =>
+      'טורף מארב מגושם בעל פתיון על ראשו, צבעו משתנה מאוד, והוא מצוי בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_giant_frogfish_name => 'דג צפרדע ענק';
+
+  @override
+  String get species_giant_frogfish_desc =>
+      'מין דג הצפרדע הגדול ביותר, מגיע ל-40 ס\"מ ומצטיין בהסוואה בין ספוגים ושברי אלמוגים.';
+
+  @override
+  String get species_hairy_frogfish_name => 'דג צפרדע שעיר';
+
+  @override
+  String get species_hairy_frogfish_desc =>
+      'דג צפרדע המכוסה בתוספות בשרניות דמויות תולעים המחקות אצות, מציאה נחשקת לצלמי תת-מים.';
+
+  @override
+  String get species_clown_triggerfish_name => 'דג הדק ליצן';
+
+  @override
+  String get species_clown_triggerfish_desc =>
+      'דג הדק בעל דוגמה נועזת של נקודות לבנות גדולות על גוף כהה ושפתיים צהובות, מצוי בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_titan_triggerfish_name => 'דג הדק טיטאן';
+
+  @override
+  String get species_titan_triggerfish_desc =>
+      'דג הדק גדול ותוקפני הידוע בהסתערות על צוללנים בקרבת הקן שלו, ונפוץ בשוניות האלמוגים של ההודו-פסיפי.';
+
+  @override
+  String get species_queen_triggerfish_name => 'דג הדק מלכותי';
+
+  @override
+  String get species_queen_triggerfish_desc =>
+      'דג הדק קריבי צבעוני בעל סימנים כחולים בפנים וסרטי זנב ארוכים.';
+
+  @override
+  String get species_picasso_triggerfish_name => 'דג הדק פיקאסו';
+
+  @override
+  String get species_picasso_triggerfish_desc =>
+      'דג הדק בעל דוגמה מופשטת של פסים כחולים, צהובים ושחורים, נפוץ במישורי השונית של ההודו-פסיפי.';
+
+  @override
+  String get species_yellowmargin_triggerfish_name => 'דג הדק צהוב-שוליים';
+
+  @override
+  String get species_yellowmargin_triggerfish_desc =>
+      'דג הדק גדול בגוון חום בהיר ובעל סנפירים משוליים בצהוב, ידוע בשמירה תוקפנית על הקן בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_porcupinefish_name => 'דג דורבן';
+
+  @override
+  String get species_porcupinefish_desc =>
+      'דג קוצני גדול המתנפח לכדור כשהוא מאוים, מצוי בשוניות טרופיות בכל העולם.';
+
+  @override
+  String get species_guineafowl_pufferfish_name => 'דג נפוח פנינייה';
+
+  @override
+  String get species_guineafowl_pufferfish_desc =>
+      'דג נפוח כהה המכוסה בנקודות לבנות קטנות, ולעיתים מופיע בגוון זהוב-צהוב בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_map_pufferfish_name => 'דג נפוח מפה';
+
+  @override
+  String get species_map_pufferfish_desc =>
+      'דג נפוח בהיר וגדול בעל סימנים כהים ומורכבים דמויי מפה על גופו, מצוי בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_sharpnose_pufferfish_name => 'דג נפוח חד-חרטום';
+
+  @override
+  String get species_sharpnose_pufferfish_desc =>
+      'דג נפוח זעיר בעל קווים כחולים בפנים וזנב כתום, נצפה לרוב בשוניות הקריביים.';
+
+  @override
+  String get species_boxfish_name => 'דג קופסה צהוב';
+
+  @override
+  String get species_boxfish_desc =>
+      'הצעירים הם קוביות צהובות בוהקות בנקודות שחורות והבוגרים מכהים לכחול-אפור, והמין מצוי ברחבי ההודו-פסיפי.';
+
+  @override
+  String get species_cowfish_name => 'דג פרה ארוך-קרניים';
+
+  @override
+  String get species_cowfish_desc =>
+      'דג צהוב ומרובע בעל בליטות אופייניות דמויות קרניים מעל כל עין, מצוי בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_napoleon_wrasse_name => 'דג נפוליאון';
+
+  @override
+  String get species_napoleon_wrasse_desc =>
+      'דג נסיכה ענק המגיע ל-2 מטרים ובעל גבשושית מצח בולטת, נמצא בסכנת הכחדה ומוגן, ומצוי בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_cleaner_wrasse_name => 'דג מנקה כחול-פס';
+
+  @override
+  String get species_cleaner_wrasse_desc =>
+      'דג נסיכה קטן בפס כחול המפעיל תחנות ניקוי ומסיר טפילים מדגים גדולים ממנו בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_yellowtail_coris_name => 'קוריס צהוב-זנב';
+
+  @override
+  String get species_yellowtail_coris_desc =>
+      'דג נסיכה צבעוני בעל גוף מנוקד וזנב צהוב; הצעירים כתומים-אדומים בוהקים עם סימנים לבנים.';
+
+  @override
+  String get species_bluehead_wrasse_name => 'דג נסיכה כחול-ראש';
+
+  @override
+  String get species_bluehead_wrasse_desc =>
+      'דג נסיכה נפוץ בקריביים; לזכרים הבוגרים ראש כחול עז וגוף ירוק עם פסים שחורים ולבנים.';
+
+  @override
+  String get species_spanish_hogfish_name => 'דג חזיר ספרדי';
+
+  @override
+  String get species_spanish_hogfish_desc =>
+      'דג נסיכה סגול-צהוב הנפוץ בשוניות הקריביים; הצעירים משמשים כדגי ניקוי.';
+
+  @override
+  String get species_bumphead_parrotfish_name => 'דג תוכי גבנוני';
+
+  @override
+  String get species_bumphead_parrotfish_desc =>
+      'מין דג התוכי הגדול ביותר, מגיע ל-1.3 מטר ובעל גבשושית מצח עצומה, ונע בלהקות בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_stoplight_parrotfish_name => 'דג תוכי רמזור';
+
+  @override
+  String get species_stoplight_parrotfish_desc =>
+      'דג תוכי נפוץ בקריביים שצבעיו משתנים באופן דרמטי בין שלב הצעירות לשלב הבגרות.';
+
+  @override
+  String get species_queen_parrotfish_name => 'דג תוכי מלכותי';
+
+  @override
+  String get species_queen_parrotfish_desc =>
+      'דג תוכי גדול בגוון כחול-ירוק המצוי בשוניות הקריביים, ונצפה לרוב נוגס באלמוגים כדי לאכול אצות.';
+
+  @override
+  String get species_yellowtail_damselfish_name => 'דג עלמה צהוב-זנב';
+
+  @override
+  String get species_yellowtail_damselfish_desc =>
+      'דג עלמה כחול כהה בעל זנב צהוב בוהק, נפוץ בפסגות שוניות הקריביים.';
+
+  @override
+  String get species_sergeant_major_name => 'דג סמל';
+
+  @override
+  String get species_sergeant_major_desc =>
+      'דג עלמה כסוף-צהוב בעל חמישה פסים שחורים בולטים, מצוי בהתקהלויות גדולות בשוניות האטלנטי הטרופי.';
+
+  @override
+  String get species_three_spot_damselfish_name => 'דג עלמה תלת-נקודה';
+
+  @override
+  String get species_three_spot_damselfish_desc =>
+      'דג עלמה חום כהה וטריטוריאלי המגן בתוקפנות על גינת האצות שלו בשוניות הקריביים.';
+
+  @override
+  String get species_chromis_viridis_name => 'כרומיס כחול-ירוק';
+
+  @override
+  String get species_chromis_viridis_desc =>
+      'דג עלמה ירוק ונוצץ קטן הנצפה בלהקות גדולות המרחפות מעל אלמוגים מסועפים בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_blue_chromis_name => 'כרומיס כחול';
+
+  @override
+  String get species_blue_chromis_desc =>
+      'דג עלמה כחול וזוהר הניזון מפלנקטון, מצוי בהתקהלויות גדולות באמצע המים מעל קירות השונית בקריביים.';
+
+  @override
+  String get species_nassau_grouper_name => 'דקר נסאו';
+
+  @override
+  String get species_nassau_grouper_desc =>
+      'דקר קריבי גדול בעל פס עין כהה אופייני ודוגמת פסים, וכיום בסכנת הכחדה בשל דיג יתר.';
+
+  @override
+  String get species_giant_grouper_name => 'דקר ענק';
+
+  @override
+  String get species_giant_grouper_desc =>
+      'דג השונית הגרמי הגדול ביותר, מגיע ל-2.7 מטרים ו-400 ק\"ג, ומצוי במערות ובספינות טרופות ברחבי ההודו-פסיפי.';
+
+  @override
+  String get species_coral_grouper_name => 'דקר אלמוגים';
+
+  @override
+  String get species_coral_grouper_desc =>
+      'דקר בגוון אדום-כתום בוהק המכוסה בנקודות כחולות, מין מובהק של שוניות האלמוגים בהודו-פסיפי.';
+
+  @override
+  String get species_goliath_grouper_name => 'דקר גוליית';
+
+  @override
+  String get species_goliath_grouper_desc =>
+      'דקר אטלנטי ענק המגיע ל-2.5 מטרים, נפגש לרוב סמוך לספינות טרופות ולמדפי סלע בפלורידה ובקריביים.';
+
+  @override
+  String get species_potato_grouper_name => 'דקר תפוח אדמה';
+
+  @override
+  String get species_potato_grouper_desc =>
+      'דקר גדול וידידותי בעל כתמים כהים בצורת תפוח אדמה, מפורסם באתר קוד הול שבשונית המחסום הגדולה.';
+
+  @override
+  String get species_peacock_grouper_name => 'דקר טווס';
+
+  @override
+  String get species_peacock_grouper_desc =>
+      'דקר חום כהה בעל נקודות כחולות בוהקות ופסים אנכיים בהירים בחלקו האחורי, נפוץ בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_yellowfin_tuna_name => 'טונה צהובת-סנפיר';
+
+  @override
+  String get species_yellowfin_tuna_desc =>
+      'טורף פלגי מהיר בעל סנפירי גב ופי הטבעת צהובים וארוכים, נצפה מדי פעם על ידי צוללנים באתרים מרוחקים מהחוף.';
+
+  @override
+  String get species_dogtooth_tuna_name => 'טונה שיני-כלב';
+
+  @override
+  String get species_dogtooth_tuna_desc =>
+      'טונה חזקה הקשורה לשוניות ובעלת שיניים בולטות, נפגשת במדרונות שונית עמוקים בהודו-פסיפי.';
+
+  @override
+  String get species_great_barracuda_name => 'ברקודה גדולה';
+
+  @override
+  String get species_great_barracuda_desc =>
+      'טורף כסוף וחלקלק באורך של עד 1.8 מטרים בעל שיניים בולטות, נצפה לרוב מרחף ללא תנועה סמוך לשוניות טרופיות.';
+
+  @override
+  String get species_blackfin_barracuda_name => 'ברקודה שחורת-סנפיר';
+
+  @override
+  String get species_blackfin_barracuda_desc =>
+      'ברקודה הודו-פסיפית הידועה בלהקות ענק דמויות טורנדו באתרי צלילה כמו ברקודה פוינט.';
+
+  @override
+  String get species_mahi_mahi_name => 'מהי-מהי';
+
+  @override
+  String get species_mahi_mahi_desc =>
+      'דג פלגי מסנוור בגוני כחול-ירוק וזהב בעל מצח קהה, נצפה מדי פעם באתרי צלילה מרוחקים מהחוף.';
+
+  @override
+  String get species_giant_trevally_name => 'טרוואלי ענק';
+
+  @override
+  String get species_giant_trevally_desc =>
+      'טורף כסוף רב-עוצמה באורך של עד 1.7 מטרים, ידוע בציד בתעלות ובמדרונות שונית ברחבי ההודו-פסיפי.';
+
+  @override
+  String get species_bluefin_trevally_name => 'טרוואלי כחול-סנפיר';
+
+  @override
+  String get species_bluefin_trevally_desc =>
+      'טרוואלי חלקלק בנקודות כחולות הנצפה לרוב סורק את שולי השוניות בהודו-פסיפי בקבוצות ציד קטנות.';
+
+  @override
+  String get species_bigeye_trevally_name => 'טרוואלי גדול-עין';
+
+  @override
+  String get species_bigeye_trevally_desc =>
+      'טרוואלי כסוף בעל עיניים גדולות היוצר להקות מסתחררות ומרשימות סמוך לקירות שונית ולתחנות ניקוי.';
+
+  @override
+  String get species_bar_jack_name => 'ג\'ק מפוספס';
+
+  @override
+  String get species_bar_jack_desc =>
+      'ג\'ק קריבי כסוף וחלקלק בעל פס כחול כהה אופייני לאורך הגב ועד לאונה התחתונה של הזנב.';
+
+  @override
+  String get species_horse_eye_jack_name => 'ג\'ק עין-סוס';
+
+  @override
+  String get species_horse_eye_jack_desc =>
+      'ג\'ק כסוף בעל עיניים גדולות היוצר להקות סמוך לשוניות ולספינות טרופות בקריביים ובמערב האטלנטי.';
+
+  @override
+  String get species_yellowtail_snapper_name => 'לוציאן צהוב-זנב';
+
+  @override
+  String get species_yellowtail_snapper_desc =>
+      'לוציאן חלקלק בעל פס וזנב צהובים, נצפה לרוב בלהקות באמצע המים בשוניות הקריביים.';
+
+  @override
+  String get species_schoolmaster_snapper_name => 'לוציאן מורה';
+
+  @override
+  String get species_schoolmaster_snapper_desc =>
+      'לוציאן צהוב-כסוף בעל קווים כחולים מתחת לעין, מצוי בקבוצות מתחת למדפי סלע בשוניות הקריביים.';
+
+  @override
+  String get species_bluestripe_snapper_name => 'לוציאן כחול-פסים';
+
+  @override
+  String get species_bluestripe_snapper_desc =>
+      'לוציאן צהוב בוהק בעל ארבעה פסים כחולים אופקיים, יוצר להקות צפופות בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_twinspot_snapper_name => 'לוציאן דו-כתמי';
+
+  @override
+  String get species_twinspot_snapper_desc =>
+      'לוציאן אדום גדול המצוי בשוניות חיצוניות בהודו-פסיפי, ולעיתים יוצר להקות בקירות עמוקים ובתעלות.';
+
+  @override
+  String get species_humphead_snapper_name => 'לוציאן חצות';
+
+  @override
+  String get species_humphead_snapper_desc =>
+      'לוציאן כהה וגדול המצוי בלהקות ליד מדרונות תלולים בהודו-פסיפי; הצעירים שחורים ולבנים בניגוד חד.';
+
+  @override
+  String get species_longfin_bannerfish_name => 'דגלן ארוך-סנפיר';
+
+  @override
+  String get species_longfin_bannerfish_desc =>
+      'דג שחור-לבן בעל סנפיר גב ארוך ונגרר וזנב צהוב, נצפה לרוב בזוגות בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_batfish_orbicular_name => 'דג עטלף עגול';
+
+  @override
+  String get species_batfish_orbicular_desc =>
+      'דג כסוף בצורת דיסקה בעל סנפירים גבוהים המתקרב לצוללנים בסקרנות, נפוץ בספינות טרופות ובשוניות בהודו-פסיפי.';
+
+  @override
+  String get species_batfish_teira_name => 'דג עטלף ארוך-סנפיר';
+
+  @override
+  String get species_batfish_teira_desc =>
+      'דג עטלף בעל סנפירים גבוהים וכתם כהה סמוך לסנפיר החזה, נצפה לרוב בתחנות ניקוי ובספינות טרופות.';
+
+  @override
+  String get species_batfish_pinnatus_name => 'דג עטלף מכונף';
+
+  @override
+  String get species_batfish_pinnatus_desc =>
+      'הצעירים שחורים כפחם עם שוליים כתומים עזים המזכירים תולעת שטוחה רעילה, והמין מצוי במערב האוקיינוס השקט.';
+
+  @override
+  String get species_banggai_cardinalfish_name => 'דג חשמן בנגאי';
+
+  @override
+  String get species_banggai_cardinalfish_desc =>
+      'דג חשמן מרשים בכסוף ושחור בעל סנפירים מוארכים, אנדמי לאיי בנגאי שבאינדונזיה.';
+
+  @override
+  String get species_pajama_cardinalfish_name => 'דג חשמן פיג\'מה';
+
+  @override
+  String get species_pajama_cardinalfish_desc =>
+      'דג חשמן יוצא דופן בעל פנים צהובות, פס מותניים כהה וחלק אחורי מנוקד, מצוי בין אלמוגים בהודו-פסיפי.';
+
+  @override
+  String get species_longnose_hawkfish_name => 'דג נץ ארוך-חרטום';
+
+  @override
+  String get species_longnose_hawkfish_desc =>
+      'דג לבן קטן בעל דוגמת רשת אדומה וחרטום מוארך, נח על גורגוניות ואלמוגים שחורים.';
+
+  @override
+  String get species_arc_eye_hawkfish_name => 'דג נץ קשת-עין';
+
+  @override
+  String get species_arc_eye_hawkfish_desc =>
+      'דג נץ קטן בעל קשת כתומה אופיינית מאחורי העין, נח לרוב על ראשי אלמוג בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_flame_hawkfish_name => 'דג נץ להבה';
+
+  @override
+  String get species_flame_hawkfish_desc =>
+      'דג נץ אדום זוהר בעל סימנים כהים סביב העין, נח בין אלמוגי Pocillopora ברחבי מערב האוקיינוס השקט.';
+
+  @override
+  String get species_fire_goby_name => 'גובי אש';
+
+  @override
+  String get species_fire_goby_desc =>
+      'גובי לבן אלגנטי בעל סנפיר גב קדמי גבוה וזנב אדום-כתום, מרחף מעל שברי אלמוגים בהודו-פסיפי.';
+
+  @override
+  String get species_purple_firefish_name => 'דג אש סגול';
+
+  @override
+  String get species_purple_firefish_desc =>
+      'גובי עדין בעל סנפירים סגולים וקוץ גב גבוה, מרחף סמוך למחילות בשוניות החיצוניות של ההודו-פסיפי.';
+
+  @override
+  String get species_yellownose_goby_name => 'גובי צהוב-חרטום';
+
+  @override
+  String get species_yellownose_goby_desc =>
+      'גובי מנקה קריבי זעיר בעל חרטום צהוב ופס צדדי כחול, מצוי על ספוגים וראשי אלמוג.';
+
+  @override
+  String get species_citron_goby_name => 'גובי לימוני';
+
+  @override
+  String get species_citron_goby_desc =>
+      'גובי זעיר בצהוב בוהק החי בין ענפי אלמוגי Acropora בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_shrimp_goby_name => 'גובי חסילונים של שטייניץ';
+
+  @override
+  String get species_shrimp_goby_desc =>
+      'גובי בגוון חול החולק מחילה עם חסילון אלפאידי ביחסי גומלין, במישורי החול של ההודו-פסיפי.';
+
+  @override
+  String get species_neon_goby_name => 'גובי ניאון';
+
+  @override
+  String get species_neon_goby_desc =>
+      'גובי כהה וזעיר בעל פס כחול ניאוני זוהר, מפעיל תחנות ניקוי על ראשי אלמוג בקריביים.';
+
+  @override
+  String get species_bluestriped_fangblenny_name => 'בלני ניבים כחול-פס';
+
+  @override
+  String get species_bluestriped_fangblenny_desc =>
+      'בלני קטן בפס כחול המחקה דגי ניקוי כדי לנשוך קשקשים מדגים תמימים.';
+
+  @override
+  String get species_sailfin_blenny_name => 'בלני מפרשי';
+
+  @override
+  String get species_sailfin_blenny_desc =>
+      'בלני קריבי זעיר המרים סנפיר גב גדול דמוי מפרש מתוך מחילתו כדי למשוך בנות זוג.';
+
+  @override
+  String get species_bicolor_blenny_name => 'בלני דו-גוני';
+
+  @override
+  String get species_bicolor_blenny_desc =>
+      'בלני קטן שחציו הקדמי חום כהה וחציו האחורי כתום, מציץ מחורים בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_redlip_blenny_name => 'בלני אדום-שפתיים';
+
+  @override
+  String get species_redlip_blenny_desc =>
+      'בלני כהה בעל שפתיים אדומות-כתומות בולטות המגן על כתמי אצות בפסגות השוניות בקריביים.';
+
+  @override
+  String get species_pygmy_seahorse_name => 'סוסון ים גמדי של ברגיבנט';
+
+  @override
+  String get species_pygmy_seahorse_desc =>
+      'סוסון ים זעיר באורך של פחות מ-2 ס\"מ המתמזג באופן מושלם עם הגורגוניה המארחת, נושא מבוקש לצילומי מאקרו.';
+
+  @override
+  String get species_common_seahorse_name => 'סוסון ים מצוי';
+
+  @override
+  String get species_common_seahorse_desc =>
+      'סוסון ים בינוני המצוי בערוגות עשב ים ובשברי אלמוגים ברחבי ההודו-פסיפי, וצבעו משתנה.';
+
+  @override
+  String get species_thorny_seahorse_name => 'סוסון ים קוצני';
+
+  @override
+  String get species_thorny_seahorse_desc =>
+      'סוסון ים המכוסה בקוצים ארוכים, מצוי בערוגות עשב ים ובקרקעיות רכות ברחבי ההודו-פסיפי.';
+
+  @override
+  String get species_ornate_ghost_pipefish_name => 'דג צינור רפאים מקושט';
+
+  @override
+  String get species_ornate_ghost_pipefish_desc =>
+      'דג צינור מוסווה להפליא המרחף עם הראש כלפי מטה סמוך לקרינואידים ולאלמוגים רכים בהודו-פסיפי.';
+
+  @override
+  String get species_robust_ghost_pipefish_name => 'דג צינור רפאים חסון';
+
+  @override
+  String get species_robust_ghost_pipefish_desc =>
+      'דג צינור רפאים גדול המחקה עשב ים או אצות, ונמצא לרוב בזוגות במים חופיים בהודו-פסיפי.';
+
+  @override
+  String get species_trumpetfish_name => 'דג חצוצרה';
+
+  @override
+  String get species_trumpetfish_desc =>
+      'דג ארוך ותמיר הצד בהסתתרות בצל דגים גדולים, מצוי בשוניות הקריביים והאטלנטי במגוון צבעים.';
+
+  @override
+  String get species_cornetfish_name => 'דג חליל';
+
+  @override
+  String get species_cornetfish_desc =>
+      'דג מוארך במיוחד באורך של עד 1.5 מטרים בעל חוט זנב נגרר, נצפה לרוב גולש מעל מישורי שונית.';
+
+  @override
+  String get species_yellowhead_jawfish_name => 'דג לסת צהוב-ראש';
+
+  @override
+  String get species_yellowhead_jawfish_desc =>
+      'דג קטן בעל גוף כחול וראש צהוב המרחף מעל מחילת החול שלו בשוניות הקריביים, והזכרים דוגרים על הביצים בפיהם.';
+
+  @override
+  String get species_flamefish_name => 'דג להבה';
+
+  @override
+  String get species_flamefish_desc =>
+      'דג חשמן קטן ואדום בוהק בעל כתם כהה מתחת לסנפיר הגב השני, מסתתר בנקיקי שונית בקריביים במשך היום.';
+
+  @override
+  String get species_longspine_squirrelfish_name => 'דג סנאי ארוך-קוץ';
+
+  @override
+  String get species_longspine_squirrelfish_desc =>
+      'דג לילי אדום בעל עיניים גדולות וקוץ גב ארוך, מצוי ביום מתחת למדפי סלע בשוניות הקריביים.';
+
+  @override
+  String get species_soldierfish_name => 'דג חייל גדול-קשקש';
+
+  @override
+  String get species_soldierfish_desc =>
+      'דג לילי אדום בעל עיניים כהות ענקיות וקשקשים גדולים, מתקבץ ביום במערות ומתחת לגגונים.';
+
+  @override
+  String get species_flame_angelfish_name => 'דג מלאך להבה';
+
+  @override
+  String get species_flame_angelfish_desc =>
+      'דג מלאך ננסי באדום-כתום זוהר בעל פסים אנכיים שחורים וסנפירים כחולי-קצה, מצוי ברחבי האוקיינוס השקט.';
+
+  @override
+  String get species_royal_gramma_name => 'גרמה מלכותית';
+
+  @override
+  String get species_royal_gramma_desc =>
+      'דג בסלט קריבי קטן ודו-גוני שחציו הקדמי סגול וחציו האחורי צהוב, מצוי מתחת למדפי סלע.';
+
+  @override
+  String get species_anthias_lyretail_name => 'אנתיאס נבל-זנב';
+
+  @override
+  String get species_anthias_lyretail_desc =>
+      'דג שונית נפוץ היוצר ענני כתום וורוד גדולים מעל מבני אלמוג בהודו-פסיפי, והזכרים סגולים.';
+
+  @override
+  String get species_mediterranean_grouper_name => 'לוקוס';
+
+  @override
+  String get species_mediterranean_grouper_desc =>
+      'דקר גדול בחום כהה עם כתמים בהירים, הטורף האייקוני של שוניות הסלע בים התיכון.';
+
+  @override
+  String get species_mediterranean_moray_name => 'מורנה ים-תיכונית';
+
+  @override
+  String get species_mediterranean_moray_desc =>
+      'מורנה בחום כהה עם כתמים צהובים, נצפית לרוב מציצה מנקיקי סלע בים התיכון.';
+
+  @override
+  String get species_ornate_wrasse_name => 'דג נסיכה מקושט';
+
+  @override
+  String get species_ornate_wrasse_desc =>
+      'דג נסיכה ירוק וצבעוני בעל סימנים אדומים בראש, אחד מדגי הנסיכה הנפוצים ביותר בשוניות הים התיכון.';
+
+  @override
+  String get species_red_sea_bannerfish_name => 'דג פרפר ממוסך';
+
+  @override
+  String get species_red_sea_bannerfish_desc =>
+      'דג פרפר צהוב בוהק בעל כתם עין כהה, אנדמי לים סוף ונצפה לרוב בזוגות.';
+
+  @override
+  String get species_red_sea_anemonefish_name => 'דג שושנון ים סוף';
+
+  @override
+  String get species_red_sea_anemonefish_desc =>
+      'דג שושנון בגוון כתום-צהוב עם שני פסים לבנים, אנדמי לים סוף ולמפרץ עדן.';
+
+  @override
+  String get species_arabian_angelfish_name => 'דג מלאך ערבי';
+
+  @override
+  String get species_arabian_angelfish_desc =>
+      'דג מלאך גדול בכחול כהה בעל פס אנכי וזנב צהובים ובולטים, אנדמי למערב האוקיינוס ההודי.';
+
+  @override
+  String get species_king_angelfish_name => 'דג מלאך מלך';
+
+  @override
+  String get species_king_angelfish_desc =>
+      'דג מלאך גדול בכחול כהה בעל פס אנכי לבן וזנב צהוב, מצוי במזרח האוקיינוס השקט ובגלפגוס.';
+
+  @override
+  String get species_ocean_sunfish_name => 'דג שמש';
+
+  @override
+  String get species_ocean_sunfish_desc =>
+      'הדג הגרמי הכבד ביותר, מגיע למשקל של יותר משני טונות ונצפה מדי פעם על ידי צוללנים בתחנות ניקוי בבאלי ובגלפגוס.';
+
+  @override
+  String get species_lingcod_name => 'לינגקוד';
+
+  @override
+  String get species_lingcod_desc =>
+      'דג טורף גדול ומנומר ממשפחת הגרינלינגים, מצוי בשוניות סלע בצפון-מערב האוקיינוס השקט ולרוב שומר על גושי ביצים.';
+
+  @override
+  String get species_wolf_eel_name => 'צלופח זאב';
+
+  @override
+  String get species_wolf_eel_desc =>
+      'צלופח זאב אפור וגדול בעל ראש בולבוסי ולסתות חזקות, מצוי במאורות סלע בצפון-מערב האוקיינוס השקט.';
+
+  @override
+  String get species_giant_sea_bass_name => 'בס ים ענק';
+
+  @override
+  String get species_giant_sea_bass_desc =>
+      'בס ענק המגיע ליותר מ-2 מטרים ו-250 ק\"ג, מצוי בשוניות סלע וביערות קלפ מול חופי דרום קליפורניה.';
+
+  @override
+  String get species_garibaldi_name => 'גריבלדי';
+
+  @override
+  String get species_garibaldi_desc =>
+      'דג עלמה כתום בוהק והדג הימי הרשמי של קליפורניה, טריטוריאלי בשוניות שביערות הקלפ.';
+
+  @override
+  String get species_sheephead_name => 'דג ראש-כבש קליפורני';
+
+  @override
+  String get species_sheephead_desc =>
+      'דג נסיכה גדול בעל ראש וזנב שחורים, גוף אמצעי אדום וסנטר לבן, מצוי ביערות הקלפ של קליפורניה.';
+
+  @override
+  String get species_copper_rockfish_name => 'דג סלע נחושתי';
+
+  @override
+  String get species_copper_rockfish_desc =>
+      'דג סלע בגוון נחושת-כתום עם כתמים בהירים, מראה נפוץ בשוניות הסלע וביערות הקלפ של צפון-מערב האוקיינוס השקט.';
+
+  @override
+  String get species_oriental_sweetlips_name => 'דג שפתיים מתוקות מזרחי';
+
+  @override
+  String get species_oriental_sweetlips_desc =>
+      'דג שונית הודו-פסיפי גדול בעל פסים שחורים ולבנים נועזים וסנפירים צהובים, והצעירים מבצעים ריקוד מתפתל.';
+
+  @override
+  String get species_harlequin_sweetlips_name => 'דג שפתיים מתוקות הרלקין';
+
+  @override
+  String get species_harlequin_sweetlips_desc =>
+      'הבוגרים אפורים עם נקודות כהות והצעירים חומים עם נקודות לבנות גדולות ושוחים בתנועה גלית.';
+
+  @override
+  String get species_blue_ringed_angelfish_name => 'דג מלאך כחול-טבעת';
+
+  @override
+  String get species_blue_ringed_angelfish_desc =>
+      'דג מלאך חום וגדול בעל קווים כחולים מעוקלים וטבעת כחולה אופיינית מעל מכסה הזימים.';
+
+  @override
+  String get species_yellowbar_angelfish_name => 'דג מלאך צהוב-פס';
+
+  @override
+  String get species_yellowbar_angelfish_desc =>
+      'דג מלאך גדול בגוון אפור-כחול בעל כתם גוף צהוב בולט, מצוי בים סוף ובמערב האוקיינוס ההודי.';
+
+  @override
+  String get species_filefish_scrawled_name => 'דג פצירה משורבט';
+
+  @override
+  String get species_filefish_scrawled_desc =>
+      'דג פצירה גדול בגוון חום-זית בעל סימנים כחולים דמויי שרבוט וזפק כתום, מצוי בשוניות טרופיות בכל העולם.';
+
+  @override
+  String get species_clown_filefish_name => 'דג פצירה כתום-נקודות';
+
+  @override
+  String get species_clown_filefish_desc =>
+      'דג פצירה ירוק וקטן בעל נקודות כתומות וחרטום ארוך, ניזון אך ורק מפוליפים של אלמוגי Acropora.';
+
+  @override
+  String get species_unicornfish_name => 'דג חד-קרן כחול-קוץ';
+
+  @override
+  String get species_unicornfish_desc =>
+      'דג כירורג אפור בעל קרן מצח בולטת ושני קוצי זנב כחולים, נפוץ במישורי השונית של ההודו-פסיפי.';
+
+  @override
+  String get species_surgeonfish_sailfin_name => 'דג כירורג מפרשי';
+
+  @override
+  String get species_surgeonfish_sailfin_desc =>
+      'דג כירורג בעל פסים נועזים וסנפירי גב ופי הטבעת מורחבים מאוד, מצוי ברחבי ההודו-פסיפי.';
+
+  @override
+  String get species_achilles_tang_name => 'דג כירורג אכילס';
+
+  @override
+  String get species_achilles_tang_desc =>
+      'דג כירורג בחום כהה בעל כתם דמעה כתום בולט סמוך לזנב, מצוי באזורי גלים סוערים במרכז האוקיינוס השקט.';
+
+  @override
+  String get species_doctorfish_name => 'דג רופא';
+
+  @override
+  String get species_doctorfish_desc =>
+      'דג כירורג בגוון אפרפר-חום בעל פסים כהים עדינים ואזמל זנב בולט, נפוץ בשוניות הקריביים.';
+
+  @override
+  String get species_checkerboard_wrasse_name => 'דג נסיכה משבצות';
+
+  @override
+  String get species_checkerboard_wrasse_desc =>
+      'דג נסיכה צבעוני בעל דוגמת משבצות ירוקות, ורודות ושחורות לאורך הגוף.';
+
+  @override
+  String get species_bird_wrasse_name => 'דג נסיכה ציפור';
+
+  @override
+  String get species_bird_wrasse_desc =>
+      'דג נסיכה בעל חרטום מוארך במיוחד המזכיר מקור של ציפור; הזכרים ירוקים כהים והנקבות חומות.';
+
+  @override
+  String get species_sling_jaw_wrasse_name => 'דג נסיכה מקלע-לסת';
+
+  @override
+  String get species_sling_jaw_wrasse_desc =>
+      'דג נסיכה בעל לסת נשלפת הנורית קדימה כדי ללכוד טרף, ומופיע בגרסאות צבע צהובה או חומה.';
+
+  @override
+  String get species_peacock_flounder_name => 'דג שטוח טווסי';
+
+  @override
+  String get species_peacock_flounder_desc =>
+      'דג קרקעית שטוח בעל טבעות ונקודות כחולות המסוגל לשנות את צבעו כדי להתמזג עם קרקעית הים.';
+
+  @override
+  String get species_hogfish_name => 'דג חזיר';
+
+  @override
+  String get species_hogfish_desc =>
+      'דג נסיכה גדול ממערב האטלנטי בעל חרטום דמוי חזיר וקוצי גב מוארכים, מצוי סמוך לשוניות ולספינות טרופות.';
+
+  @override
+  String get species_tarpon_name => 'טרפון אטלנטי';
+
+  @override
+  String get species_tarpon_desc =>
+      'דג כסוף ענק בעל קשקשים גדולים דמויי מראה, נפגש לעיתים על ידי צוללנים במערות ובתעלות בקריביים.';
+
+  @override
+  String get species_permit_name => 'פרמיט';
+
+  @override
+  String get species_permit_desc =>
+      'דג ג\'ק כסוף בעל גוף גבוה וזנב מפוצל כהה, מצוי במישורי החול של הקריביים וסמוך לשוניות.';
+
+  @override
+  String get species_spotted_drum_name => 'דג תוף מנוקד';
+
+  @override
+  String get species_spotted_drum_desc =>
+      'דג קריבי מרשים בעל סנפיר גב גבוה ומוארך ודוגמת נקודות נועזת בשחור ולבן.';
+
+  @override
+  String get species_jackknife_fish_name => 'דג אולר';
+
+  @override
+  String get species_jackknife_fish_desc =>
+      'דג קריבי אלגנטי בעל פס שחור גבוה בסנפיר הגב ופס אלכסוני בגוף, מצוי מתחת למדפי סלע.';
+
+  @override
+  String get species_bigeye_name => 'עין-זכוכית';
+
+  @override
+  String get species_bigeye_desc =>
+      'דג לילי אדום בוהק בעל עיניים גדולות ומחזירות אור, מסתתר במערות בשוניות הקריביים והאטלנטי.';
+
+  @override
+  String get species_remora_name => 'רמורה';
+
+  @override
+  String get species_remora_desc =>
+      'דג תמיר בעל דיסקת יניקה על ראשו הנטפל לכרישים, לטריגונים, לצבים ולבעלי חיים גדולים אחרים.';
+
+  @override
+  String get species_tilefish_sand_name => 'דג אריח חולי';
+
+  @override
+  String get species_tilefish_sand_desc =>
+      'דג מוארך בכחול בהיר הבונה תלוליות משברי אלמוגים מעל אזורי חול בשוניות הקריביים.';
+
+  @override
+  String get species_weedy_seadragon_name => 'דרקון ים עשבי';
+
+  @override
+  String get species_weedy_seadragon_desc =>
+      'קרוב משפחה מקושט של סוסוני הים בעל תוספות דמויות עלים, אנדמי למים הממוזגים של דרום אוסטרליה.';
+
+  @override
+  String get species_leafy_seadragon_name => 'דרקון ים עלים';
+
+  @override
+  String get species_leafy_seadragon_desc =>
+      'דרקון ים מרהיב המכוסה בבליטות מורכבות דמויות עלים, אנדמי לדרום אוסטרליה ותצפית שכל צוללן חולם עליה.';
+
+  @override
+  String get species_sailfin_snapper_name => 'לוציאן מפרשי';
+
+  @override
+  String get species_sailfin_snapper_desc =>
+      'לוציאן אלגנטי בצהוב וכחול בעל סנפירי גב ופי הטבעת מוארכים, מצוי במדרונות שונית בהודו-פסיפי.';
+
+  @override
+  String get species_sweetlip_emperor_name => 'דג קיסר מנצנץ';
+
+  @override
+  String get species_sweetlip_emperor_desc =>
+      'דג קיסר כסוף וגדול בעל קווים כחולים בפנים ושולי סנפירים צהובים, נפוץ מעל אזורי חול סמוך לשוניות בהודו-פסיפי.';
+
+  @override
+  String get species_crocodilefish_name => 'דג תנין';
+
+  @override
+  String get species_crocodilefish_desc =>
+      'טורף מארב שטוח-ראש בעל גדילים מורכבים סביב העיניים, שוכב מוסווה להפליא על קרקעיות השונית בהודו-פסיפי.';
+
+  @override
+  String get species_devil_scorpionfish_name => 'דג עקרב שטן';
+
+  @override
+  String get species_devil_scorpionfish_desc =>
+      'דג עקרב חסון ומוסווה החושף צבעים עזים בצדם הפנימי של סנפירי החזה כאזהרה לטורפים.';
+
+  @override
+  String get species_spiny_devilfish_name => 'עוקצן שד';
+
+  @override
+  String get species_spiny_devilfish_desc =>
+      'דייר קרקעית ארסי הצועד על קרני סנפיר מותאמות וחושף סנפירי חזה בוהקים כשמפריעים לו.';
+
+  @override
+  String get species_waspfish_name => 'דג צרעה קקדו';
+
+  @override
+  String get species_waspfish_desc =>
+      'דג עקרב קטן ושטוח המתנועע בזרם כמו עלה מת מעל קרקעיות בוציות בהודו-פסיפי.';
+
+  @override
+  String get species_stargazer_name => 'צופה בכוכבים לבן-שוליים';
+
+  @override
+  String get species_stargazer_desc =>
+      'טורף מארב הטומן את עצמו בחול כשרק עיניו גלויות, ומסוגל לתת מכות חשמל; מצוי בהודו-פסיפי.';
+
+  @override
+  String get species_striped_catfish_name => 'שפמנון ים מפוספס';
+
+  @override
+  String get species_striped_catfish_desc =>
+      'שפמנון בעל קוצים ארסיים; הצעירים יוצרים להקות כדוריות צפופות המתגלגלות על קרקעיות השונית בהודו-פסיפי.';
+
+  @override
+  String get species_red_emperor_name => 'קיסר אדום';
+
+  @override
+  String get species_red_emperor_desc =>
+      'לוציאן גדול; הבוגרים בגוון אדום-ורדרד והצעירים בעלי פסים אדומים ולבנים בולטים, והמין מצוי בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_mangrove_snapper_name => 'לוציאן מנגרובים';
+
+  @override
+  String get species_mangrove_snapper_desc =>
+      'לוציאן אפור המצוי במנגרובים, בערוגות עשב ים ובשוניות בקריביים, ולרוב מתקבץ סמוך למבנים.';
+
+  @override
+  String get species_dottyback_orchid_name => 'דוטיבק סחלב';
+
+  @override
+  String get species_dottyback_orchid_desc =>
+      'דג קטן בסגול עז האנדמי לים סוף, מזנק פנימה והחוצה מנקיקים בקירות שונית תלולים.';
+
+  @override
+  String get species_dottyback_royal_name => 'דוטיבק מלכותי';
+
+  @override
+  String get species_dottyback_royal_desc =>
+      'דג קטן ודו-גוני שחלקו הקדמי מג\'נטה וחלקו האחורי צהוב בוהק, מצוי בקירות שונית בהודו-פסיפי.';
+
+  @override
+  String get species_coral_trout_name => 'דקר נמרי';
+
+  @override
+  String get species_coral_trout_desc =>
+      'טורף נחשק של שונית המחסום הגדולה, בעל גוף אדום-כתום המכוסה בנקודות כחולות.';
+
+  @override
+  String get species_barramundi_cod_name => 'דקר ברמונדי';
+
+  @override
+  String get species_barramundi_cod_desc =>
+      'דקר ייחודי בעל ראש קטן, גוף גבנוני ונקודות כהות גדולות על רקע בהיר.';
+
+  @override
+  String get species_spadefish_atlantic_name => 'דג את אטלנטי';
+
+  @override
+  String get species_spadefish_atlantic_desc =>
+      'דג כסוף בצורת דיסקה בעל פסים אנכיים כהים, נצפה לרוב בלהקות גדולות סביב ספינות טרופות בקריביים.';
+
+  @override
+  String get species_fusilier_yellowback_name => 'פוזיליר צהוב-גב';
+
+  @override
+  String get species_fusilier_yellowback_desc =>
+      'דג כחול וחלקלק הניזון מפלנקטון ובעל גב צהוב, יוצר להקות ענק מעל מדרונות שונית בהודו-פסיפי.';
+
+  @override
+  String get species_fusilier_bluestreak_name => 'פוזיליר כחול-פס';
+
+  @override
+  String get species_fusilier_bluestreak_desc =>
+      'פוזיליר כחול קטן בעל פס צדדי כהה, נצפה בלהקות מהירות לאורך קירות שונית בהודו-פסיפי.';
+
+  @override
+  String get species_porkfish_name => 'דג נוהם חזירי';
+
+  @override
+  String get species_porkfish_desc =>
+      'דג נוהם קריבי צבעוני בעל פסים כחולים וצהובים ושני פסי ראש שחורים, מצוי סמוך לשוניות ולספינות טרופות.';
+
+  @override
+  String get species_blue_striped_grunt_name => 'דג נוהם כחול-פסים';
+
+  @override
+  String get species_blue_striped_grunt_desc =>
+      'דג נוהם קריבי צהוב בעל פסים אופקיים כחולים עזים, יוצר ביום להקות מנוחה גדולות מתחת למדפי סלע.';
+
+  @override
+  String get species_french_grunt_name => 'דג נוהם צרפתי';
+
+  @override
+  String get species_french_grunt_desc =>
+      'דג נוהם קטן בפסים צהובים היוצר להקות מנוחה צפופות בשוניות הקריביים בשעות היום.';
+
+  @override
+  String get species_convict_tang_name => 'דג כירורג אסיר';
+
+  @override
+  String get species_convict_tang_desc =>
+      'דג כירורג בהיר בעל שישה פסים שחורים אנכיים, נצפה לרוב רועה בלהקות גדולות במישורי השונית של ההודו-פסיפי.';
+
+  @override
+  String get species_great_hammerhead_name => 'כריש פטיש משונן';
+
+  @override
+  String get species_great_hammerhead_desc =>
+      'כריש ייחודי בעל ראש משונן בצורת פטיש, יוצר להקות גדולות סביב הרי ים ואיים מרוחקים מהחוף.';
+
+  @override
+  String get species_wobbegong_name => 'וובגונג מנוקד';
+
+  @override
+  String get species_wobbegong_desc =>
+      'כריש שטיח שטוח ומוסווה היטב בעל אונות משוננות סביב הפה, מצוי בשוניות ממוזגות באוסטרליה.';
+
+  @override
+  String get species_manta_ray_name => 'מנטת שונית';
+
+  @override
+  String get species_manta_ray_desc =>
+      'ענק חינני במוטת כנפיים של עד 5 מטרים המבקר בתחנות ניקוי וניזון מפלנקטון בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_oceanic_manta_name => 'מנטה אוקיינית';
+
+  @override
+  String get species_oceanic_manta_desc =>
+      'מין הטריגון הגדול ביותר, במוטת כנפיים של יותר מ-7 מטרים, נפגש בהרי ים מרוחקים מהחוף ובתחנות ניקוי.';
+
+  @override
+  String get species_undulated_moray_name => 'מורנה גלית';
+
+  @override
+  String get species_undulated_moray_desc =>
+      'מורנה בגוון ירוק-צהבהב עם סימנים גליים כהים, נצפית לרוב צדה בלילה בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_whitemouth_moray_name => 'מורנה לבנת-פה';
+
+  @override
+  String get species_whitemouth_moray_desc =>
+      'מורנה בחום כהה עם נקודות לבנות קטנות וחלל פה לבן אופייני, מצויה ברחבי ההודו-פסיפי.';
+
+  @override
+  String get species_dragon_moray_name => 'מורנת דרקון';
+
+  @override
+  String get species_dragon_moray_desc =>
+      'מורנה מרשימה בעלת קרניים דמויות דרקון מעל הנחיריים וכתמי נמר אדומים-כתומים, מצויה בהודו-פסיפי.';
+
+  @override
+  String get species_lyretail_grouper_name => 'דקר נבל-זנב';
+
+  @override
+  String get species_lyretail_grouper_desc =>
+      'דקר בגוון אדום-ורוד בעל נקודות כחולות וזנב אופייני בצורת סהר, מצוי בקירות שונית חיצוניים בהודו-פסיפי.';
+
+  @override
+  String get species_banded_butterflyfish_name => 'דג פרפר מפוספס';
+
+  @override
+  String get species_banded_butterflyfish_desc =>
+      'דג פרפר לבן בעל ארבעה פסים אנכיים שחורים בולטים, אחד מדגי הפרפר הנפוצים ביותר בשוניות הקריביים.';
+
+  @override
+  String get species_ringed_pipefish_name => 'דג צינור טבעות';
+
+  @override
+  String get species_ringed_pipefish_desc =>
+      'דג צינור תמיר בטבעות אדומות ולבנות לסירוגין, מצוי במערות ומתחת למדפי סלע בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_razorfish_name => 'דג תער';
+
+  @override
+  String get species_razorfish_desc =>
+      'דג זעיר השוחה בקבוצות במאונך כשראשו כלפי מטה, ומסתתר לרוב בין קוצי קיפודי ים בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_harlequin_tuskfish_name => 'דג ניבים הרלקין';
+
+  @override
+  String get species_harlequin_tuskfish_desc =>
+      'דג נסיכה צבעוני בעל ניבים כחולים בוהקים, פסים אדומים-כתומים וכתמים לבנים, מצוי בשוניות מערב האוקיינוס השקט.';
+
+  @override
+  String get species_blue_groper_name => 'גרופר כחול';
+
+  @override
+  String get species_blue_groper_desc =>
+      'דג נסיכה כחול וגדול האנדמי למזרח אוסטרליה, ידידותי ומתקרב לעיתים קרובות לצוללנים בשוניות ממוזגות.';
+
+  @override
+  String get species_red_lipped_batfish_name => 'דג עטלף אדום-שפתיים';
+
+  @override
+  String get species_red_lipped_batfish_desc =>
+      'דג מוזר ושטוח-גוף בעל שפתיים אדומות בוהקות הצועד על סנפירים מותאמים על קרקעית הים בגלפגוס.';
+
+  @override
+  String get species_orangeband_surgeonfish_name => 'דג כירורג כתום-פס';
+
+  @override
+  String get species_orangeband_surgeonfish_desc =>
+      'דג כירורג בגוון אפור-חום בעל פס אופקי כתום מאחורי העין, מצוי במדרונות שונית באוקיינוס השקט.';
+
+  @override
+  String get species_maori_wrasse_name => 'דג נסיכה מאורי';
+
+  @override
+  String get species_maori_wrasse_desc =>
+      'דג נסיכה בינוני בעל פס כהה מאחורי סנפיר החזה, נפוץ בשוניות האוקיינוס השקט והאוקיינוס ההודי.';
+
+  @override
+  String get species_blue_ringed_octopus_name => 'תמנון כחול-טבעות';
+
+  @override
+  String get species_blue_ringed_octopus_desc =>
+      'תמנון קטן אך ארסי ביותר בעל טבעות כחולות בוהקות המהבהבות כשהוא מאוים.';
+
+  @override
+  String get species_common_octopus_name => 'תמנון מצוי';
+
+  @override
+  String get species_common_octopus_desc =>
+      'תמנון אינטליגנטי מאוד הידוע בשינויי צבע מהירים וביכולות פתרון בעיות.';
+
+  @override
+  String get species_giant_pacific_octopus_name => 'תמנון פסיפי ענק';
+
+  @override
+  String get species_giant_pacific_octopus_desc =>
+      'מין התמנון הגדול ביותר, מוטת זרועותיו מגיעה ליותר מ-4 מטרים במים הקרים של האוקיינוס השקט.';
+
+  @override
+  String get species_mimic_octopus_name => 'תמנון מחקה';
+
+  @override
+  String get species_mimic_octopus_desc =>
+      'תמנון יוצא דופן המחקה את מראם ואת התנהגותם של מינים ימיים אחרים.';
+
+  @override
+  String get species_coconut_octopus_name => 'תמנון קוקוס';
+
+  @override
+  String get species_coconut_octopus_desc =>
+      'תמנון קטן המפורסם בנשיאת קליפות קוקוס ובשימוש בהן כמחסה נייד.';
+
+  @override
+  String get species_day_octopus_name => 'תמנון יום';
+
+  @override
+  String get species_day_octopus_desc =>
+      'צייד פעיל בשעות היום, נפוץ בשוניות ההודו-פסיפי ובעל יכולות הסוואה מרשימות.';
+
+  @override
+  String get species_wonderpus_octopus_name => 'תמנון וונדרפוס';
+
+  @override
+  String get species_wonderpus_octopus_desc =>
+      'תמנון מרשים בעל פסים לבנים וחומים ייחודיים, מצוי באתרי צלילת מאק חוליים.';
+
+  @override
+  String get species_broadclub_cuttlefish_name => 'ספיה רחבת-אלה';
+
+  @override
+  String get species_broadclub_cuttlefish_desc =>
+      'ספיה גדולה בעלת מופעי צבע מהפנטים, נצפית לרוב בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_pharaoh_cuttlefish_name => 'ספיית פרעה';
+
+  @override
+  String get species_pharaoh_cuttlefish_desc =>
+      'ספיה גדולה המצויה ברחבי האוקיינוס ההודי, ידועה בדוגמאות צבע פועמות.';
+
+  @override
+  String get species_flamboyant_cuttlefish_name => 'ספיה ראוותנית';
+
+  @override
+  String get species_flamboyant_cuttlefish_desc =>
+      'ספיה זעירה הצועדת על קרקעית הים ומציגה פעימות עזות של סגול, ורוד וצהוב.';
+
+  @override
+  String get species_giant_cuttlefish_name => 'ספיה ענקית';
+
+  @override
+  String get species_giant_cuttlefish_desc =>
+      'הספיה הגדולה בעולם, מפורסמת בהתקהלויות הרבייה ההמוניות בדרום אוסטרליה.';
+
+  @override
+  String get species_bigfin_reef_squid_name => 'דיונון שונית גדול-סנפיר';
+
+  @override
+  String get species_bigfin_reef_squid_desc =>
+      'דיונון להקתי הנפגש תכופות בצלילות לילה ונמשך אל פנסי הצוללנים.';
+
+  @override
+  String get species_caribbean_reef_squid_name => 'דיונון שונית קריבי';
+
+  @override
+  String get species_caribbean_reef_squid_desc =>
+      'דיונון סקרן המרחף לרוב בקבוצות קטנות סמוך לשולי השוניות בקריביים.';
+
+  @override
+  String get species_bobtail_squid_name => 'דיונון קטום-זנב';
+
+  @override
+  String get species_bobtail_squid_desc =>
+      'דיונון לילי זעיר הטומן את עצמו בחול ביום, מציאה נחשקת בצלילות מאק.';
+
+  @override
+  String get species_chambered_nautilus_name => 'נאוטילוס תאי';
+
+  @override
+  String get species_chambered_nautilus_desc =>
+      'מאובן חי קדום בעל קונכייה מסולסלת, נצפה לעיתים רחוקות בידי צוללנים במים עמוקים עם שחר.';
+
+  @override
+  String get species_spanish_dancer_name => 'הרקדנית הספרדייה';
+
+  @override
+  String get species_spanish_dancer_desc =>
+      'מין חשופית הים הגדול ביותר, שוחה בתנועות גליות של מעטפת אדומה המזכירות רקדנית פלמנקו.';
+
+  @override
+  String get species_chromodoris_willani_name => 'כרומודוריס של וילן';
+
+  @override
+  String get species_chromodoris_willani_desc =>
+      'חשופית ים מרשימה בכחול ושחור עם שוליים לבנים, נפוצה בהודו-פסיפי.';
+
+  @override
+  String get species_chromodoris_lochi_name => 'כרומודוריס של לוך';
+
+  @override
+  String get species_chromodoris_lochi_desc =>
+      'חשופית ים כחולה בעלת קווים כהים ומסגרת לבנה, מצויה ברחבי האוקיינוס השקט הטרופי.';
+
+  @override
+  String get species_chromodoris_magnifica_name => 'כרומודוריס מפואר';
+
+  @override
+  String get species_chromodoris_magnifica_desc =>
+      'חשופית ים זוהרת בכחול, לבן וכתום, מצויה בשוניות האלמוגים של ההודו-פסיפי.';
+
+  @override
+  String get species_chromodoris_annae_name => 'כרומודוריס של אנה';
+
+  @override
+  String get species_chromodoris_annae_desc =>
+      'חשופית ים בכחול עמוק בעלת קווים שחורים וקרנוני חוש וזימים כתומי-קצה.';
+
+  @override
+  String get species_nembrotha_kubaryana_name => 'חשופית ניאון משתנה';
+
+  @override
+  String get species_nembrotha_kubaryana_desc =>
+      'חשופית ים ירוקה כהה בעלת סימנים כתומים או אדומים עזים, ניזונה מנרתיקיות.';
+
+  @override
+  String get species_nembrotha_cristata_name => 'נמברותה מצויצת';
+
+  @override
+  String get species_nembrotha_cristata_desc =>
+      'חשופית ים שחורה בעלת יבלות ופסים בירוק זוהר, מצויה בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_phyllidia_varicosa_name => 'פילידיה מגובששת';
+
+  @override
+  String get species_phyllidia_varicosa_desc =>
+      'חשופית ים בגוון כחול-אפור בעלת יבלות מורמות צהובות-קצה, רעילה לטורפים.';
+
+  @override
+  String get species_phyllidia_ocellata_name => 'פילידיה עינונית';
+
+  @override
+  String get species_phyllidia_ocellata_desc =>
+      'חשופית ים לבנה בעלת יבלות מורמות מוקפות טבעות ורודות, מצויה בשוניות טרופיות.';
+
+  @override
+  String get species_pikachu_nudibranch_name => 'חשופית פיקאצ\'ו';
+
+  @override
+  String get species_pikachu_nudibranch_desc =>
+      'חשופית ים זעירה בצהוב ושחור המזכירה דמות מצוירת, מצויה באוקיינוס השקט.';
+
+  @override
+  String get species_anna_rosefieldi_name => 'חשופית רובואסטרה';
+
+  @override
+  String get species_anna_rosefieldi_desc =>
+      'חשופית ים טורפת בעלת גוף כהה ופסים אורכיים בוהקים, הצדה חשופיות אחרות.';
+
+  @override
+  String get species_lettuce_sea_slug_name => 'חשופית חסה';
+
+  @override
+  String get species_lettuce_sea_slug_desc =>
+      'חשופית ים ירוקה ומקומטת השומרת בגופה כלורופלסטים מאצות לצורך פוטוסינתזה.';
+
+  @override
+  String get species_blue_dragon_nudibranch_name => 'חשופית דרקון כחול';
+
+  @override
+  String get species_blue_dragon_nudibranch_desc =>
+      'חשופית ים ארוכה ממשפחת האאוליד בעלת בליטות כחולות-קצה המאכסנות אצות סימביוטיות.';
+
+  @override
+  String get species_gloomy_nudibranch_name => 'חשופית קודרת';
+
+  @override
+  String get species_gloomy_nudibranch_desc =>
+      'חשופית ים בגוון כחול-ירוק כהה בעלת רכסים כחולי-שוליים, נפוצה בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_ocellined_nudibranch_name => 'חשופית מקווקוות';
+
+  @override
+  String get species_ocellined_nudibranch_desc =>
+      'חשופית ים לבנה בעלת רכסים בקווים כתומים היוצרים דוגמאות גיאומטריות על המעטפת.';
+
+  @override
+  String get species_glossodoris_cincta_name => 'חשופית גלוסודוריס';
+
+  @override
+  String get species_glossodoris_cincta_desc =>
+      'חשופית ים בגוון שמנת בעלת מסגרת חומה כהה ושוליים כתומים במעטפת.';
+
+  @override
+  String get species_jorunna_funebris_name => 'חשופית מנוקדת';
+
+  @override
+  String get species_jorunna_funebris_desc =>
+      'חשופית ים לבנה המכוסה בפקעיות שחורות-קצה, ומזכירה ארנבון פרוותי.';
+
+  @override
+  String get species_ceratosoma_trilobatum_name => 'חשופית תלת-אונתית';
+
+  @override
+  String get species_ceratosoma_trilobatum_desc =>
+      'חשופית ים גדולה בעלת קרן גב גבוהה ואונות צדדיות בגווני סגול וצהוב.';
+
+  @override
+  String get species_hypselodoris_apolegma_name => 'היפסלודוריס סגולה';
+
+  @override
+  String get species_hypselodoris_apolegma_desc =>
+      'חשופית ים סגולה ואלגנטית בעלת שוליים לבנים במעטפת, מצויה בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_hypselodoris_bullockii_name => 'היפסלודוריס של בולוק';
+
+  @override
+  String get species_hypselodoris_bullockii_desc =>
+      'חשופית ים בוורוד וסגול בעלת קרנוני חוש צהובי-קצה, בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_flabellina_exoptata_name => 'פלבלינה נחשקת';
+
+  @override
+  String get species_flabellina_exoptata_desc =>
+      'חשופית ים שקופה למחצה ממשפחת האאוליד בעלת בליטות כתומות סגולות-קצה, מצויה במים טרופיים.';
+
+  @override
+  String get species_risbecia_tryoni_name => 'ריסבקיה של טריון';
+
+  @override
+  String get species_risbecia_tryoni_desc =>
+      'חשופית ים גדולה בחום וכחול, נמצאת לרוב בזוגות הזדווגות בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_goniobranchus_kuniei_name => 'חשופית של קוניה';
+
+  @override
+  String get species_goniobranchus_kuniei_desc =>
+      'חשופית ים לבנה בנקודות כתומות ובעלת שולי מעטפת סגולים, מצויה במערב האוקיינוס השקט.';
+
+  @override
+  String get species_mexichromis_multituberculata_name => 'חשופית רבת-פקעיות';
+
+  @override
+  String get species_mexichromis_multituberculata_desc =>
+      'חשופית ים בסגול ולבן בעלת פקעיות מורמות ותוספות כתומות-קצה.';
+
+  @override
+  String get species_chromodoris_dianae_name => 'כרומודוריס של דיאנה';
+
+  @override
+  String get species_chromodoris_dianae_desc =>
+      'חשופית ים כחולה בוהקת בעלת פסים שחורים וזימים כתומים, מצויה במערב האוקיינוס השקט.';
+
+  @override
+  String get species_phyllodesmium_poindimiei_name => 'חשופית סולארית';
+
+  @override
+  String get species_phyllodesmium_poindimiei_desc =>
+      'חשופית ים שקופה למחצה ממשפחת האאוליד בעלת בליטות מסועפות המאכסנות אצות סימביוטיות.';
+
+  @override
+  String get species_chromodoris_elisabethina_name => 'כרומודוריס של אליזבת';
+
+  @override
+  String get species_chromodoris_elisabethina_desc =>
+      'חשופית ים בעלת קווים כחולים וצהובים ושוליים לבנים במעטפת, נפוצה בדרום-מזרח אסיה.';
+
+  @override
+  String get species_doridella_batava_name => 'דורית בטאבית';
+
+  @override
+  String get species_doridella_batava_desc =>
+      'חשופית ים ממשפחת הדורידים שצבעה משתנה משחור לחום, מצויה מתחת לסלעים ולשברי אלמוגים בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_tiger_cowrie_name => 'קאורית טיגריס';
+
+  @override
+  String get species_tiger_cowrie_desc =>
+      'קונכיית קאורי גדולה ומנוקדת המצויה בשוניות טרופיות, ולרוב מכוסה חלקית במעטפת שלה.';
+
+  @override
+  String get species_tritons_trumpet_name => 'חצוצרת טריטון';
+
+  @override
+  String get species_tritons_trumpet_desc =>
+      'חילזון טורף גדול ואויבו הטבעי של כוכב ים כתר הקוצים.';
+
+  @override
+  String get species_queen_conch_name => 'קונכיית המלכה';
+
+  @override
+  String get species_queen_conch_desc =>
+      'קונכייה גדולה ואייקונית של ערוגות עשב הים בקריביים, בעלת שפה פנימית ורודה אופיינית.';
+
+  @override
+  String get species_banded_coral_shrimp_name => 'חסילון אלמוגים מפוספס';
+
+  @override
+  String get species_banded_coral_shrimp_desc =>
+      'חסילון מנקה בפסים אדומים ולבנים ובעל מחושים לבנים ארוכים, מצוי בנקיקי שונית.';
+
+  @override
+  String get species_mantis_shrimp_name => 'חסילון גמל שלמה טווסי';
+
+  @override
+  String get species_mantis_shrimp_desc =>
+      'טורף צבעוני בעל תוספות חזקות דמויות אלה המסוגלות לנפץ קונכיות.';
+
+  @override
+  String get species_cleaner_shrimp_name => 'חסילון מנקה ארגמן';
+
+  @override
+  String get species_cleaner_shrimp_desc =>
+      'חסילון אדום ולבן בוהק המקים תחנות ניקוי לשירות דגי השונית.';
+
+  @override
+  String get species_pederson_cleaner_shrimp_name => 'חסילון מנקה של פדרסון';
+
+  @override
+  String get species_pederson_cleaner_shrimp_desc =>
+      'חסילון מנקה קריבי שקוף למחצה החי בין זרועות שושנות ים.';
+
+  @override
+  String get species_harlequin_shrimp_name => 'חסילון הרלקין';
+
+  @override
+  String get species_harlequin_shrimp_desc =>
+      'חסילון בעל דוגמה מרהיבה וצבתות שטוחות הניזון אך ורק מכוכבי ים.';
+
+  @override
+  String get species_coleman_shrimp_name => 'חסילון קולמן';
+
+  @override
+  String get species_coleman_shrimp_desc =>
+      'חסילון זעיר החי בזוגות על קיפודי אש, נחשק מאוד בקרב צלמי תת-מים.';
+
+  @override
+  String get species_emperor_shrimp_name => 'חסילון קיסרי';
+
+  @override
+  String get species_emperor_shrimp_desc =>
+      'חסילון קומנסלי צבעוני הרוכב על מלפפוני ים ועל חשופיות ים.';
+
+  @override
+  String get species_sexy_shrimp_name => 'חסילון סקסי';
+
+  @override
+  String get species_sexy_shrimp_desc =>
+      'חסילון שושנות ים זעיר הידוע בריקוד נענוע הזנב שלו, פופולרי בצילומי מאקרו.';
+
+  @override
+  String get species_marble_shrimp_name => 'חסילון שיש';
+
+  @override
+  String get species_marble_shrimp_desc =>
+      'חסילון לילי מנומר בעל רגליים נוצתיות, מסתתר ביום בנקיקי שונית.';
+
+  @override
+  String get species_spiny_lobster_name => 'לובסטר קוצני קריבי';
+
+  @override
+  String get species_spiny_lobster_desc =>
+      'לובסטר גדול נטול צבתות בעל מחושים ארוכים, מסתתר מתחת למדפי שונית.';
+
+  @override
+  String get species_painted_spiny_lobster_name => 'לובסטר קוצני מצויר';
+
+  @override
+  String get species_painted_spiny_lobster_desc =>
+      'לובסטר צבעוני להפליא בעל רגליים מפוספסות בכחול, ירוק ולבן בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_slipper_lobster_name => 'לובסטר נעל';
+
+  @override
+  String get species_slipper_lobster_desc =>
+      'לובסטר לילי שטוח-גוף בעל לוחות מחושים רחבים במקום שוטים ארוכים.';
+
+  @override
+  String get species_squat_lobster_name => 'לובסטר גוץ';
+
+  @override
+  String get species_squat_lobster_desc =>
+      'סרטן זעיר בגוון ורוד-סגול החי על ספוגי חבית ענקיים, אהוב על צלמי מאקרו.';
+
+  @override
+  String get species_hermit_crab_name => 'סרטן נזיר כחול-רגליים';
+
+  @override
+  String get species_hermit_crab_desc =>
+      'סרטן נזיר קטן בעל רגליים כחולות בוהקות, נצפה לרוב בשוניות הקריביים.';
+
+  @override
+  String get species_orangutan_crab_name => 'סרטן אורנגאוטן';
+
+  @override
+  String get species_orangutan_crab_desc =>
+      'סרטן שעיר וזעיר החי באלמוג בועות, ושמו ניתן לו בשל דמיונו לאורנגאוטן.';
+
+  @override
+  String get species_decorator_crab_name => 'סרטן מקשט';
+
+  @override
+  String get species_decorator_crab_desc =>
+      'אמן התחפושות המצמיד ספוגים, אצות והידרואידים אל שריון הגב שלו.';
+
+  @override
+  String get species_porcelain_crab_name => 'סרטן חרסינה של שושנות ים';
+
+  @override
+  String get species_porcelain_crab_desc =>
+      'סרטן שטוח ומנוקד החי בשושנות ים ומסנן מזון בעזרת איברי פה נוצתיים.';
+
+  @override
+  String get species_arrow_crab_name => 'סרטן חץ';
+
+  @override
+  String get species_arrow_crab_desc =>
+      'סרטן קריבי דקיק בעל חרטום מחודד ארוך ורגליים מפוספסות.';
+
+  @override
+  String get species_channel_clinging_crab_name => 'סרטן נאחז';
+
+  @override
+  String get species_channel_clinging_crab_desc =>
+      'סרטן שונית קריבי גדול בעל גוף כהה וצבתות אדומות-כתומות, מצוי בנקיקים.';
+
+  @override
+  String get species_coral_crab_name => 'סרטן שומר אלמוגים';
+
+  @override
+  String get species_coral_crab_desc =>
+      'סרטן קטן ומנוקד החי בסימביוזה באלמוגי Pocillopora ומגן על מארחו.';
+
+  @override
+  String get species_crown_of_thorns_starfish_name => 'כוכב ים כתר הקוצים';
+
+  @override
+  String get species_crown_of_thorns_starfish_desc =>
+      'כוכב ים ארסי רב-זרועות הניזון מאלמוגים ומסוגל להחריב שוניות בעת התפרצויות.';
+
+  @override
+  String get species_blue_linckia_starfish_name => 'כוכב ים לינקיה כחול';
+
+  @override
+  String get species_blue_linckia_starfish_desc =>
+      'כוכב ים בכחול עז הנצפה לרוב במישורי ובמדרונות השוניות של ההודו-פסיפי.';
+
+  @override
+  String get species_red_knob_starfish_name => 'כוכב ים אדום-פקעות';
+
+  @override
+  String get species_red_knob_starfish_desc =>
+      'כוכב ים אפור וגדול בעל קוצים בולטים אדומי-קצה, מצוי באזורי חול בשוניות.';
+
+  @override
+  String get species_chocolate_chip_starfish_name => 'כוכב ים שוקולד צ\'יפס';
+
+  @override
+  String get species_chocolate_chip_starfish_desc =>
+      'כוכב ים בגוון חול בעל פקעות כהות מורמות המזכירות שבבי שוקולד, מצוי במצעים חוליים.';
+
+  @override
+  String get species_cushion_star_name => 'כוכב ים כרית';
+
+  @override
+  String get species_cushion_star_desc =>
+      'כוכב ים תפוח ומחומש בעל זרועות מקוצרות, מצוי במישורי השונית של ההודו-פסיפי.';
+
+  @override
+  String get species_fromia_starfish_name => 'כוכב ים אלגנטי';
+
+  @override
+  String get species_fromia_starfish_desc =>
+      'כוכב ים קטן בגוון כתום-אדום בעל שולי לוחיות בהירים היוצרים דוגמה דמויית ריצוף.';
+
+  @override
+  String get species_basket_star_name => 'כוכב סל';
+
+  @override
+  String get species_basket_star_desc =>
+      'זרועותיו המסועפות להפליא נפרשות בלילה כדי לסנן מזון מן הזרם.';
+
+  @override
+  String get species_brittle_star_name => 'כוכב שביר מפוספס';
+
+  @override
+  String get species_brittle_star_desc =>
+      'כוכב שביר מפוספס המצוי מתחת לסלעים ובנקיקים, בעל זרועות זריזות דמויות נחש.';
+
+  @override
+  String get species_feather_star_name => 'כוכב נוצה';
+
+  @override
+  String get species_feather_star_desc =>
+      'קרינואיד רב-זרועות הנח על בליטות בשונית ומסנן מזון בעזרת זרועותיו הנוצתיות.';
+
+  @override
+  String get species_black_feather_star_name => 'כוכב נוצה שחור';
+
+  @override
+  String get species_black_feather_star_desc =>
+      'קרינואיד כהה המסוגל לשחות למרחקים קצרים בנפנוף קצבי של זרועותיו הרבות.';
+
+  @override
+  String get species_long_spined_sea_urchin_name => 'קיפוד ים ארוך-קוצים';
+
+  @override
+  String get species_long_spined_sea_urchin_desc =>
+      'קיפוד ים שחור בעל קוצים ארוכים וארסיים, רועה חיוני בשוניות הקריביים.';
+
+  @override
+  String get species_fire_urchin_name => 'קיפוד ים אש';
+
+  @override
+  String get species_fire_urchin_desc =>
+      'קיפוד ים רך-גוף בעל קוצים ארסיים הגורמים לעקיצות כואבות במגע.';
+
+  @override
+  String get species_pencil_urchin_name => 'קיפוד ים עיפרון';
+
+  @override
+  String get species_pencil_urchin_desc =>
+      'קיפוד ים חסון בעל קוצים עבים וקהים, נתקע בנקיקי השונית.';
+
+  @override
+  String get species_collector_urchin_name => 'קיפוד ים אספן';
+
+  @override
+  String get species_collector_urchin_desc =>
+      'קיפוד ים המכסה את עצמו בשברי פסולת ובקטעי אצות לצורך הסוואה.';
+
+  @override
+  String get species_sea_apple_name => 'תפוח ים';
+
+  @override
+  String get species_sea_apple_desc =>
+      'מלפפון ים צבעוני להפליא בעל זרועות פה המשמשות לסינון מזון.';
+
+  @override
+  String get species_pineapple_sea_cucumber_name => 'מלפפון ים אננס';
+
+  @override
+  String get species_pineapple_sea_cucumber_desc =>
+      'מלפפון ים גדול בגוון כתום-אדום בעל פטמיות בצורת כוכב, מצוי במדרונות שונית.';
+
+  @override
+  String get species_black_sea_cucumber_name => 'מלפפון ים שחור';
+
+  @override
+  String get species_black_sea_cucumber_desc =>
+      'מלפפון ים שחור ונפוץ המצוי במישורי חול בשוניות ברחבי ההודו-פסיפי.';
+
+  @override
+  String get species_leopard_sea_cucumber_name => 'מלפפון ים מנומר';
+
+  @override
+  String get species_leopard_sea_cucumber_desc =>
+      'מלפפון ים מנוקד הפולט צינוריות קובייריאניות לבנות ודביקות כשמפריעים לו.';
+
+  @override
+  String get species_sand_dollar_name => 'דולר החול';
+
+  @override
+  String get species_sand_dollar_desc =>
+      'קיפוד ים שטוח בצורת דיסקה, מצוי טמון חלקית במצעים חוליים.';
+
+  @override
+  String get species_moon_jellyfish_name => 'מדוזת ירח';
+
+  @override
+  String get species_moon_jellyfish_desc =>
+      'מדוזה שקופה למחצה בצורת פעמון שארבע בלוטות המין שלה, בצורת פרסה, נראות דרך גופה.';
+
+  @override
+  String get species_lions_mane_jellyfish_name => 'מדוזת רעמת האריה';
+
+  @override
+  String get species_lions_mane_jellyfish_desc =>
+      'אחד ממיני המדוזות הגדולים בעולם, בעל זרועות ארוכות ונגררות במים קרים.';
+
+  @override
+  String get species_box_jellyfish_name => 'מדוזת קופסה';
+
+  @override
+  String get species_box_jellyfish_desc =>
+      'מדוזה מסוכנת ביותר בעלת ארס רב-עוצמה, מצויה במים הטרופיים של ההודו-פסיפי.';
+
+  @override
+  String get species_upside_down_jellyfish_name => 'מדוזה הפוכה';
+
+  @override
+  String get species_upside_down_jellyfish_desc =>
+      'מדוזה יוצאת דופן הנחה על קרקעיות חול כשפעמונה כלפי מטה כדי לאפשר פוטוסינתזה לאצות שבגופה.';
+
+  @override
+  String get species_blue_blubber_jellyfish_name => 'מדוזה כחולה אוסטרלית';
+
+  @override
+  String get species_blue_blubber_jellyfish_desc =>
+      'מדוזה בכחול-לבן בעלת פעמון מוצק וזרועות פה מסולסלות, נפוצה במים האוסטרליים.';
+
+  @override
+  String get species_fried_egg_jellyfish_name => 'מדוזת ביצת עין';
+
+  @override
+  String get species_fried_egg_jellyfish_desc =>
+      'מדוזה ים-תיכונית בעלת כיפה צהובה המזכירה ביצת עין, ועקיצתה קלה.';
+
+  @override
+  String get species_pacific_sea_nettle_name => 'סרפד ים פסיפי';
+
+  @override
+  String get species_pacific_sea_nettle_desc =>
+      'מדוזה בגוון חום-זהוב בעלת זרועות ארוכות ונגררות, מצויה לאורך חופי האוקיינוס השקט.';
+
+  @override
+  String get species_compass_jellyfish_name => 'מדוזת מצפן';
+
+  @override
+  String get species_compass_jellyfish_desc =>
+      'מדוזה חומה-לבנה בעלת סימנים בצורת V המתפצלים כמו שושנת רוחות.';
+
+  @override
+  String get species_spotted_jellyfish_name => 'מדוזה מנוקדת';
+
+  @override
+  String get species_spotted_jellyfish_desc =>
+      'מדוזה זהובה בנקודות לבנות, מפורסמת במילוי אגם המדוזות שבפלאו.';
+
+  @override
+  String get species_barrel_jellyfish_name => 'מדוזת חבית';
+
+  @override
+  String get species_barrel_jellyfish_desc =>
+      'מדוזה גדולה בצורת כיפה בעלת זרועות פה מסולסלות ועקיצה קלה, נפוצה באוקיינוס האטלנטי.';
+
+  @override
+  String get species_persian_carpet_flatworm_name => 'תולעת שטוחה שטיח פרסי';
+
+  @override
+  String get species_persian_carpet_flatworm_desc =>
+      'תולעת שטוחה שחורה ומקושטת בעלת שוליים צהובים-כתומים, ולרוב מבלבלים בינה לבין חשופית ים.';
+
+  @override
+  String get species_leopard_flatworm_name => 'תולעת שטוחה מנומרת';
+
+  @override
+  String get species_leopard_flatworm_desc =>
+      'תולעת שטוחה שקופה למחצה בעלת כתמים דמויי נמר, גולשת על מצעי השונית.';
+
+  @override
+  String get species_divided_flatworm_name => 'תולעת שטוחה מחולקת';
+
+  @override
+  String get species_divided_flatworm_desc =>
+      'תולעת שטוחה מרשימה בשחור וכתום המחקה חשופיות ים רעילות לשם הגנה.';
+
+  @override
+  String get species_blue_pseudoceros_flatworm_name =>
+      'תולעת שטוחה פסאודוצרוס כחולה';
+
+  @override
+  String get species_blue_pseudoceros_flatworm_desc =>
+      'תולעת שטוחה בכחול עמוק בעלת שוליים כתומים, גולשת על פני השונית בהודו-פסיפי.';
+
+  @override
+  String get species_racing_stripe_flatworm_name => 'תולעת שטוחה פס מרוץ';
+
+  @override
+  String get species_racing_stripe_flatworm_desc =>
+      'תולעת שטוחה בגוון שמנת בעלת פס מרכזי כהה ובולט ושוליים מסולסלים.';
+
+  @override
+  String get species_christmas_tree_worm_name => 'תולעת עץ חג המולד';
+
+  @override
+  String get species_christmas_tree_worm_desc =>
+      'תולעת צבעונית בעלת כתר לולייני הנעוצה באלמוג ונסוגה מיד עם התקרבות.';
+
+  @override
+  String get species_feather_duster_worm_name => 'תולעת מטאטא נוצות';
+
+  @override
+  String get species_feather_duster_worm_desc =>
+      'תולעת החיה בצינור ובעלת כתר מניפתי של שערות נוצתיות לסינון מזון.';
+
+  @override
+  String get species_fire_worm_name => 'תולעת אש מזוקנת';
+
+  @override
+  String get species_fire_worm_desc =>
+      'תולעת זיפים בעלת זיפים עוקצניים לבנים הגורמים לגירוי כואב במגע.';
+
+  @override
+  String get species_bobbit_worm_name => 'תולעת בוביט';
+
+  @override
+  String get species_bobbit_worm_desc =>
+      'טורף מארב המסתתר בחול ובעל לסתות חזקות המכות במהירות הבזק.';
+
+  @override
+  String get species_social_feather_duster_name => 'תולעת מטאטא נוצות חברתית';
+
+  @override
+  String get species_social_feather_duster_desc =>
+      'תולעת צינור מושבתית היוצרת אשכולות של כתרים עדינים ומפוספסים בשוניות הקריביים.';
+
+  @override
+  String get species_giant_clam_name => 'צדפת ענק';
+
+  @override
+  String get species_giant_clam_desc =>
+      'הצדפה הדו-קשוותית הגדולה ביותר בעולם, ורקמת המעטפת הנוצצת שלה מאכסנת אצות סימביוטיות.';
+
+  @override
+  String get species_boring_clam_name => 'צדפה קודחת';
+
+  @override
+  String get species_boring_clam_desc =>
+      'צדפה קטנה וצבעונית הקודחת אל תוך סלע האלמוג וחושפת רק את מעטפתה העזה.';
+
+  @override
+  String get species_maxima_clam_name => 'צדפת מקסימה';
+
+  @override
+  String get species_maxima_clam_desc =>
+      'צדפה צבעונית להפליא הנעוצה בסלע השונית ובעלת מעטפת בכחול וירוק חשמליים.';
+
+  @override
+  String get species_flame_scallop_name => 'צדפת להבה';
+
+  @override
+  String get species_flame_scallop_desc =>
+      'צדפה דו-קשוותית אדומה ובה הבזקי אור לבנים לאורך שולי המעטפת, מצויה בנקיקי שונית.';
+
+  @override
+  String get species_thorny_oyster_name => 'צדפת קוצים';
+
+  @override
+  String get species_thorny_oyster_desc =>
+      'צדפה דו-קשוותית קוצנית המחוברת לסלע השונית, ולרוב מכוסה בספוגים ובאצות.';
+
+  @override
+  String get species_magnificent_sea_anemone_name => 'שושנת ים מפוארת';
+
+  @override
+  String get species_magnificent_sea_anemone_desc =>
+      'שושנת ים גדולה וצבעונית המארחת דגי ליצן, בעלת עמוד בולט וזרועות מתנופפות.';
+
+  @override
+  String get species_bubble_tip_anemone_name => 'שושנת ים בועות';
+
+  @override
+  String get species_bubble_tip_anemone_desc =>
+      'מארחת פופולרית של דגי ליצן, בעלת זרועות עם קצוות בולבוסיים בירוק, חום או ורוד.';
+
+  @override
+  String get species_giant_carpet_anemone_name => 'שושנת ים שטיח ענקית';
+
+  @override
+  String get species_giant_carpet_anemone_desc =>
+      'שושנת ים ענקית בעלת זרועות קצרות ודביקות, שקוטרה עשוי לעלות על מטר.';
+
+  @override
+  String get species_haddon_carpet_anemone_name => 'שושנת ים שטיח של האדון';
+
+  @override
+  String get species_haddon_carpet_anemone_desc =>
+      'שושנת שטיח שטוחה במצעים חוליים המארחת מגוון דגי ליצן וסרטני חרסינה.';
+
+  @override
+  String get species_long_tentacle_anemone_name => 'שושנת ים ארוכת-זרועות';
+
+  @override
+  String get species_long_tentacle_anemone_desc =>
+      'שושנת ים של קרקעיות חול בעלת זרועות ארוכות ומתנופפות, ולרוב מארחת דגי ליצן.';
+
+  @override
+  String get species_tube_anemone_name => 'שושנת ים צינורית';
+
+  @override
+  String get species_tube_anemone_desc =>
+      'שושנת ים אלגנטית החיה בצינור קלפי בחול ובעלת שני מעגלי זרועות.';
+
+  @override
+  String get species_hell_fire_anemone_name => 'שושנת ים אש הגיהינום';
+
+  @override
+  String get species_hell_fire_anemone_desc =>
+      'שושנת ים עוקצנית ביותר בעלת זרועות מסועפות הדומות לאלמוג רך.';
+
+  @override
+  String get species_beaded_sea_anemone_name => 'שושנת ים חרוזים';
+
+  @override
+  String get species_beaded_sea_anemone_desc =>
+      'שושנת ים בעלת קצות זרועות תפוחים דמויי חרוזים, מצויה באזורי חול בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_condylactis_anemone_name => 'שושנת ים קריבית ענקית';
+
+  @override
+  String get species_condylactis_anemone_desc =>
+      'שושנת ים קריבית גדולה בעלת זרועות סגולות-קצה, מצויה על מצעי שונית סלעיים.';
+
+  @override
+  String get species_sand_anemone_name => 'שושנת ים חולית';
+
+  @override
+  String get species_sand_anemone_desc =>
+      'שושנת ים עדינה הטמונה חלקית בחול ובעלת זרועות סגולות-קצה.';
+
+  @override
+  String get species_barrel_sponge_name => 'ספוג חבית ענק';
+
+  @override
+  String get species_barrel_sponge_desc =>
+      'ספוג עצום בצורת חבית המסוגל לחיות מאות שנים על קירות השונית בקריביים.';
+
+  @override
+  String get species_azure_vase_sponge_name => 'ספוג אגרטל תכול';
+
+  @override
+  String get species_azure_vase_sponge_desc =>
+      'ספוג תוסס בצורת אגרטל בגוון כחול-סגול, מצוי על קירות השונית בקריביים.';
+
+  @override
+  String get species_yellow_tube_sponge_name => 'ספוג צינור צהוב';
+
+  @override
+  String get species_yellow_tube_sponge_desc =>
+      'ספוג צינורי בצהוב בוהק הגדל באשכולות על קירות השונית בקריביים.';
+
+  @override
+  String get species_elephant_ear_sponge_name => 'ספוג אוזן פיל';
+
+  @override
+  String get species_elephant_ear_sponge_desc =>
+      'ספוג כתום גדול בצורת מניפה הגדל על קירות ומתחת לגגונים בקריביים.';
+
+  @override
+  String get species_rope_sponge_name => 'ספוג חבל';
+
+  @override
+  String get species_rope_sponge_desc =>
+      'ספוג אדום זקוף ומסועף הגדל במבנים דמויי חבל בשוניות הקריביים.';
+
+  @override
+  String get species_portuguese_man_o_war_name => 'ספינת המלחמה הפורטוגזית';
+
+  @override
+  String get species_portuguese_man_o_war_desc =>
+      'מושבת הידרוזואה בעלת מצוף מלא גז וזרועות נגררות שעקיצתן כואבת ביותר.';
+
+  @override
+  String get species_fire_coral_name => 'אלמוג אש';
+
+  @override
+  String get species_fire_coral_desc =>
+      'אינו אלמוג אמיתי אלא הידרוזואה הגורמת לצוללנים עקיצות כואבות במגע.';
+
+  @override
+  String get species_by_the_wind_sailor_name => 'מפרשן הרוח';
+
+  @override
+  String get species_by_the_wind_sailor_desc =>
+      'מושבת הידרוזואה כחולה וצפה בעלת מפרש אלכסוני התופס את הרוח.';
+
+  @override
+  String get species_blue_button_name => 'כפתור כחול';
+
+  @override
+  String get species_blue_button_desc =>
+      'מושבת הידרוזואה צפה בעלת דיסקה שטוחה והידרואידים כחולים דמויי זרועות.';
+
+  @override
+  String get species_giant_sea_hare_name => 'ארנבת ים ענקית';
+
+  @override
+  String get species_giant_sea_hare_desc =>
+      'אחת מחשופיות הים הגדולות בעולם, בגוון חום כהה עד שחור, מצויה בערוגות קלפ.';
+
+  @override
+  String get species_sea_hare_name => 'ארנבת ים מנוקדת';
+
+  @override
+  String get species_sea_hare_desc =>
+      'ארנבת ים גדולה בנקודות ירוקות הפולטת דיו סגול כשמפריעים לה.';
+
+  @override
+  String get species_nudibranch_berghia_name => 'חשופית ברגיה';
+
+  @override
+  String get species_nudibranch_berghia_desc =>
+      'חשופית ים שקופה למחצה ממשפחת האאוליד בעלת בליטות לבנות-קצה, ניזונה משושנות ים.';
+
+  @override
+  String get species_sea_pen_name => 'עט ים';
+
+  @override
+  String get species_sea_pen_desc =>
+      'אלמוג רך מושבתי בצורת נוצה המעוגן בחול ונסוג פנימה כשמפריעים לו.';
+
+  @override
+  String get species_blue_sea_star_name => 'כוכב ים כחול';
+
+  @override
+  String get species_blue_sea_star_desc =>
+      'כוכב ים רב-גוני המתחדש משבר של זרוע בודדת, מצוי בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_reef_squid_name => 'דיונון שונית';
+
+  @override
+  String get species_reef_squid_desc =>
+      'דיונון שונית דרומי הנפגש לרוב במים הממוזגים של אוסטרליה.';
+
+  @override
+  String get species_tiger_shrimp_name => 'חסילון טיגריס';
+
+  @override
+  String get species_tiger_shrimp_desc =>
+      'חסילון גדול ומפוספס המצוי בקרקעיות חול ובערוגות עשב ים בהודו-פסיפי.';
+
+  @override
+  String get species_candy_crab_name => 'סרטן סוכריות';
+
+  @override
+  String get species_candy_crab_desc =>
+      'סרטן זעיר וצבעוני המתמזג עם האלמוג הרך המארח בעזרת בליטות קוצניות ורודות או צהובות.';
+
+  @override
+  String get species_spider_crab_name => 'סרטן עכביש מקשט';
+
+  @override
+  String get species_spider_crab_desc =>
+      'סרטן איטי המכוסה בספוגים ובאצות שהצמיד לגופו לצורך הסוואה.';
+
+  @override
+  String get species_anemone_shrimp_name => 'חסילון שושנת ים מפואר';
+
+  @override
+  String get species_anemone_shrimp_desc =>
+      'חסילון שקוף בעל סימנים לבנים וסגולים החי בין זרועות שושנות ים.';
+
+  @override
+  String get species_snapping_shrimp_name => 'חסילון מקיש';
+
+  @override
+  String get species_snapping_shrimp_desc =>
+      'חסילון קטן המפיק נקישה רועמת בעזרת צבתו הענקית, ולרוב חי בשותפות עם גוביים.';
+
+  @override
+  String get species_glass_sponge_name => 'סל הפרחים של ונוס';
+
+  @override
+  String get species_glass_sponge_desc =>
+      'ספוג זכוכית עדין בעל שלד צורן מורכב, מצוי במים עמוקים.';
+
+  @override
+  String get species_toxic_sea_urchin_name => 'קיפוד ים פרח';
+
+  @override
+  String get species_toxic_sea_urchin_desc =>
+      'קיפוד ים מושך למראה אך מטעה, מכוסה בצבתונים דמויי פרחים ובעל ארס רב-עוצמה.';
+
+  @override
+  String get species_slate_pencil_urchin_name => 'קיפוד ים עיפרון צפחה';
+
+  @override
+  String get species_slate_pencil_urchin_desc =>
+      'קיפוד ים בעל קוצים עבים ומעוגלים, מצוי על מצעי שונית בקריביים ובאוקיינוס האטלנטי.';
+
+  @override
+  String get species_spiny_sea_star_name => 'כוכב ים קוצני';
+
+  @override
+  String get species_spiny_sea_star_desc =>
+      'כוכב ים ממוזג וגדול בעל קוצים בולטים, מצוי במים האירופיים והאטלנטיים.';
+
+  @override
+  String get species_bat_star_name => 'כוכב ים עטלף';
+
+  @override
+  String get species_bat_star_desc =>
+      'כוכב ים פסיפי בעל זרועות מחוברות בקרום, בגוני כתום, אדום או סגול, מצוי ביערות קלפ.';
+
+  @override
+  String get species_sunflower_star_name => 'כוכב ים חמנייה';
+
+  @override
+  String get species_sunflower_star_desc =>
+      'כוכב ים ענק ומהיר בעל עד 24 זרועות, מצוי ביערות הקלפ של האוקיינוס השקט.';
+
+  @override
+  String get species_blood_star_name => 'כוכב ים דם';
+
+  @override
+  String get species_blood_star_desc =>
+      'כוכב ים בגוון אדום-כתום בוהק בעל זרועות דקות, מצוי במים הממוזגים של האוקיינוס השקט.';
+
+  @override
+  String get species_common_cuttlefish_name => 'ספיה מצויה';
+
+  @override
+  String get species_common_cuttlefish_desc =>
+      'אמנית הסוואה המצויה במים האירופיים ובים התיכון, ואישוניה בצורת האות W.';
+
+  @override
+  String get species_blue_spotted_crab_name => 'סרטן שחייה כחול-נקודות';
+
+  @override
+  String get species_blue_spotted_crab_desc =>
+      'סרטן שחייה פעיל בעל נקודות כחולות על שריון הגב, מצוי במצעים חוליים בהודו-פסיפי.';
+
+  @override
+  String get species_sponge_crab_name => 'סרטן ספוג';
+
+  @override
+  String get species_sponge_crab_desc =>
+      'סרטן החוצב ספוג חי ונושא אותו על גבו לצורך הסוואה.';
+
+  @override
+  String get species_horseshoe_crab_name => 'סרטן פרסה';
+
+  @override
+  String get species_horseshoe_crab_desc =>
+      'פרוק רגליים קדום ממערכת הצבתניים בעל שריון דמוי קסדה, מצוי בקרקעיות חול באוקיינוס האטלנטי.';
+
+  @override
+  String get species_sea_spider_name => 'עכביש ים';
+
+  @override
+  String get species_sea_spider_desc =>
+      'פרוק רגליים ימי עדין בעל רגליים ארוכות, נצפה זוחל על הידרואידים ועל טחביתנים.';
+
+  @override
+  String get species_sea_lily_name => 'שושן ים';
+
+  @override
+  String get species_sea_lily_desc =>
+      'קרינואיד מגובעל ומאובן חי המצוי במים עמוקים ומסנן מזון בזרועותיו הנוצתיות.';
+
+  @override
+  String get species_mantis_shrimp_lysiosquilla_name => 'חסילון גמל שלמה דוקרן';
+
+  @override
+  String get species_mantis_shrimp_lysiosquilla_desc =>
+      'חסילון גמל שלמה גדול וחופר בעל תוספות דוקרניות, מצוי במצעים חוליים.';
+
+  @override
+  String get species_purple_sea_urchin_name => 'קיפוד ים סגול';
+
+  @override
+  String get species_purple_sea_urchin_desc =>
+      'קיפוד ים סגול ונפוץ המצוי ביערות הקלפ ובשלוליות הסלע של האוקיינוס השקט.';
+
+  @override
+  String get species_crown_jellyfish_name => 'מדוזת כתר';
+
+  @override
+  String get species_crown_jellyfish_desc =>
+      'מדוזה בסגול עמוק בעלת פעמון מורם דמוי כתר, מצויה בהודו-פסיפי.';
+
+  @override
+  String get species_comb_jelly_name => 'דומדמנית ים';
+
+  @override
+  String get species_comb_jelly_desc =>
+      'מסרקן זעיר וזוהר-ביולוגית בעל טורי מסרק נוצצים ושתי זרועות ארוכות.';
+
+  @override
+  String get species_warty_sea_slug_name => 'חשופית ים יבלולית';
+
+  @override
+  String get species_warty_sea_slug_desc =>
+      'חשופית ים בכחול ושחור בעלת יבלות בכיפות צהובות, נצפית לרוב בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_doris_nudibranch_name => 'לימון ים';
+
+  @override
+  String get species_doris_nudibranch_desc =>
+      'חשופית ים צהובה ומנוקדת ממשפחת הדורידים, מצויה במים הממוזגים של האוקיינוס השקט וניזונה מספוגים.';
+
+  @override
+  String get species_opalescent_nudibranch_name => 'חשופית אופלית';
+
+  @override
+  String get species_opalescent_nudibranch_desc =>
+      'חשופית שקופה למחצה ממשפחת האאוליד בעלת בליטות כתומות בוהקות וקווי גב כחולים, במימי האוקיינוס השקט.';
+
+  @override
+  String get species_clown_nudibranch_name => 'חשופית ליצן';
+
+  @override
+  String get species_clown_nudibranch_desc =>
+      'חשופית ים בגוון ורוד-כתום בעלת נקודות כחולות ולבנות, מצויה במים הממוזגים של אוסטרליה.';
+
+  @override
+  String get species_bottlenose_dolphin_name => 'דולפין אף-בקבוק';
+
+  @override
+  String get species_bottlenose_dolphin_desc =>
+      'דולפין סקרן ושובב הנפגש תכופות על ידי צוללנים במים טרופיים וממוזגים.';
+
+  @override
+  String get species_spinner_dolphin_name => 'דולפין מסתחרר';
+
+  @override
+  String get species_spinner_dolphin_desc =>
+      'דולפין אקרובטי הידוע בסיבובי האוויר שלו, נצפה לרוב בעדרים גדולים סמוך לשוניות אלמוגים.';
+
+  @override
+  String get species_common_dolphin_name => 'דולפין מצוי';
+
+  @override
+  String get species_common_dolphin_desc =>
+      'דולפין מהיר בעל דוגמת שעון חול אופיינית, מצוי באוקיינוס הפתוח ובמים חופיים.';
+
+  @override
+  String get species_spotted_dolphin_name => 'דולפין מנוקד אטלנטי';
+
+  @override
+  String get species_spotted_dolphin_desc =>
+      'דולפין מנוקד וידידותי המתקרב תכופות לצוללנים באיי בהאמה ובקריביים.';
+
+  @override
+  String get species_rissos_dolphin_name => 'דולפין של ריסו';
+
+  @override
+  String get species_rissos_dolphin_desc =>
+      'דולפין גדול בעל גוף אפור מצולק היטב, מצוי במים עמוקים ומרוחקים מהחוף בכל העולם.';
+
+  @override
+  String get species_humpback_whale_name => 'לווייתן גדול-סנפיר';
+
+  @override
+  String get species_humpback_whale_desc =>
+      'לווייתן מלכותי הידוע בקפיצותיו מהמים ובשירים מורכבים, נצפה בנדידות עונתיות.';
+
+  @override
+  String get species_grey_whale_name => 'לווייתן אפור';
+
+  @override
+  String get species_grey_whale_desc =>
+      'לווייתן מזיפים הניזון מהקרקעית ונודד לאורך חופי האוקיינוס השקט, ולרוב מכוסה בברנקלים.';
+
+  @override
+  String get species_blue_whale_name => 'לווייתן כחול';
+
+  @override
+  String get species_blue_whale_desc =>
+      'בעל החיים הגדול ביותר שחי אי פעם, נפגש מדי פעם על ידי צוללנים במים כחולים עמוקים.';
+
+  @override
+  String get species_sperm_whale_name => 'לווייתן הזרע';
+
+  @override
+  String get species_sperm_whale_desc =>
+      'לווייתן צולל עמוק בעל ראש עצום, נצפה לעיתים נח על פני המים בין צלילה לצלילה.';
+
+  @override
+  String get species_orca_name => 'לווייתן קטלן';
+
+  @override
+  String get species_orca_desc =>
+      'טורף-על בעל סימנים אופייניים בשחור ולבן, מצוי בכל אגני האוקיינוס.';
+
+  @override
+  String get species_minke_whale_name => 'לווייתן מינקי';
+
+  @override
+  String get species_minke_whale_desc =>
+      'לווייתן מזיפים קטן יחסית המגלה סקרנות כלפי צוללנים, במיוחד בשונית המחסום הגדולה.';
+
+  @override
+  String get species_beluga_whale_name => 'בלוגה';
+
+  @override
+  String get species_beluga_whale_desc =>
+      'לווייתן ארקטי לבן הידוע בקולותיו ובהתנהגותו החברתית במים קרים.';
+
+  @override
+  String get species_pilot_whale_name => 'לווייתן טייס קצר-סנפיר';
+
+  @override
+  String get species_pilot_whale_desc =>
+      'לווייתן חברתי הצולל לעומק ונצפה לרוב בעדרים גדולים בימים טרופיים וממוזגים-חמים.';
+
+  @override
+  String get species_false_killer_whale_name => 'לווייתן קטלן מדומה';
+
+  @override
+  String get species_false_killer_whale_desc =>
+      'דולפין אוקייני גדול המתקרב מדי פעם לצוללנים במים פתוחים.';
+
+  @override
+  String get species_dugong_name => 'דוגונג';
+
+  @override
+  String get species_dugong_desc =>
+      'אוכל עשב עדין הרועה בערוגות עשב ים בהודו-פסיפי, קרוב משפחה של פרות הים.';
+
+  @override
+  String get species_west_indian_manatee_name => 'פרת ים מערב-הודית';
+
+  @override
+  String get species_west_indian_manatee_desc =>
+      'אוכל עשב איטי המצוי במים חמים ורדודים, בשפכי נהרות ובמעיינות של הקריביים.';
+
+  @override
+  String get species_sea_otter_name => 'לוטרת ים';
+
+  @override
+  String get species_sea_otter_desc =>
+      'יונק ימי כריזמטי המצוי ביערות הקלפ לאורך חופי צפון האוקיינוס השקט.';
+
+  @override
+  String get species_california_sea_lion_name => 'אריה ים קליפורני';
+
+  @override
+  String get species_california_sea_lion_desc =>
+      'יונק סנפירי שובב וזריז המשחק לא פעם עם צוללנים לאורך חופי האוקיינוס השקט.';
+
+  @override
+  String get species_steller_sea_lion_name => 'אריה ים של שטלר';
+
+  @override
+  String get species_steller_sea_lion_desc =>
+      'מין אריה הים הגדול ביותר, מצוי במים הקרים של צפון האוקיינוס השקט סמוך לחופים סלעיים.';
+
+  @override
+  String get species_harbor_seal_name => 'כלב ים נמל';
+
+  @override
+  String get species_harbor_seal_desc =>
+      'כלב ים סקרן הנצפה לרוב במים חופיים ממוזגים, ולעיתים נח על סלעים סמוך לאתרי צלילה.';
+
+  @override
+  String get species_grey_seal_name => 'כלב ים אפור';
+
+  @override
+  String get species_grey_seal_desc =>
+      'כלב ים גדול ושובב המצוי בצפון האוקיינוס האטלנטי, ידוע בהתקרבותו לצוללנים מתחת למים.';
+
+  @override
+  String get species_northern_elephant_seal_name => 'פיל ים צפוני';
+
+  @override
+  String get species_northern_elephant_seal_desc =>
+      'כלב ים ענק הצולל לעומק רב, ולזכרים חדק גדול; מצוי לאורך חופי מזרח האוקיינוס השקט.';
+
+  @override
+  String get species_hawaiian_monk_seal_name => 'כלב ים נזירי הוואי';
+
+  @override
+  String get species_hawaiian_monk_seal_desc =>
+      'כלב ים בסכנת הכחדה חמורה האנדמי להוואי, נצפה מדי פעם על ידי צוללנים בשוניות.';
+
+  @override
+  String get species_leopard_seal_name => 'כלב ים מנומר';
+
+  @override
+  String get species_leopard_seal_desc =>
+      'טורף אנטארקטי רב-עוצמה בעל פרווה מנוקדת, נפגש על ידי צוללני מים קרים.';
+
+  @override
+  String get species_narwhal_name => 'נרוול';
+
+  @override
+  String get species_narwhal_desc =>
+      'לווייתן ארקטי בעל חט לולייני ארוך, נצפה לעיתים רחוקות אך אייקוני בקרב היונקים הימיים.';
+
+  @override
+  String get species_green_sea_turtle_name => 'צב ים ירוק';
+
+  @override
+  String get species_green_sea_turtle_desc =>
+      'צב ים גדול הנצפה לרוב רועה עשב ים במים טרופיים.';
+
+  @override
+  String get species_hawksbill_sea_turtle_name => 'צב ים חד-מקור';
+
+  @override
+  String get species_hawksbill_sea_turtle_desc =>
+      'צב דייר שונית בעל מקור מחודד, ניזון מספוגים בין מבני האלמוגים.';
+
+  @override
+  String get species_loggerhead_sea_turtle_name => 'צב ים חום';
+
+  @override
+  String get species_loggerhead_sea_turtle_desc =>
+      'צב בעל ראש גדול המצוי בימים ממוזגים וטרופיים, לרוב סמוך לשוניות סלע.';
+
+  @override
+  String get species_leatherback_sea_turtle_name => 'צב ים עורי';
+
+  @override
+  String get species_leatherback_sea_turtle_desc =>
+      'הצב הגדול ביותר החי כיום, בעל שריון עורי וגמיש, וצולל לעומקים קיצוניים.';
+
+  @override
+  String get species_olive_ridley_sea_turtle_name => 'צב ים זיתי';
+
+  @override
+  String get species_olive_ridley_sea_turtle_desc =>
+      'מין צב הים הקטן ביותר, ידוע באירועי הטלה המוניים ומתואמים המכונים arribadas.';
+
+  @override
+  String get species_kemps_ridley_sea_turtle_name => 'צב ים של קמפ';
+
+  @override
+  String get species_kemps_ridley_sea_turtle_desc =>
+      'צב ים בסכנת הכחדה חמורה המצוי בעיקר במפרץ מקסיקו.';
+
+  @override
+  String get species_flatback_sea_turtle_name => 'צב ים שטוח-גב';
+
+  @override
+  String get species_flatback_sea_turtle_desc =>
+      'אנדמי למים האוסטרליים, ניכר בשריונו השטוח ובבית הגידול החופי שלו.';
+
+  @override
+  String get species_brain_coral_name => 'אלמוג מוח';
+
+  @override
+  String get species_brain_coral_desc =>
+      'אלמוג בונה שונית מסיבי בעל פני שטח מחורצים המזכירים מוח, נפוץ בשוניות הקריביים.';
+
+  @override
+  String get species_staghorn_coral_name => 'אלמוג קרן צבי';
+
+  @override
+  String get species_staghorn_coral_desc =>
+      'אלמוג מסועף מהיר צמיחה היוצר סבכים צפופים, בית גידול קריטי לדגי השונית.';
+
+  @override
+  String get species_elkhorn_coral_name => 'אלמוג קרן איל';
+
+  @override
+  String get species_elkhorn_coral_desc =>
+      'אלמוג מסועף גדול בעל ענפים שטוחים ומורחבים, בונה שונית מרכזי בקריביים.';
+
+  @override
+  String get species_table_coral_name => 'אלמוג שולחן';
+
+  @override
+  String get species_table_coral_desc =>
+      'אלמוג שטוח היוצר לוחות, מצוי בשוניות ההודו-פסיפי ומספק מחסה למיני דגים רבים.';
+
+  @override
+  String get species_mushroom_coral_name => 'אלמוג פטרייה';
+
+  @override
+  String get species_mushroom_coral_desc =>
+      'אלמוג בודד וחופשי בצורת דיסקה, מצוי באזורי חול סמוך לשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_bubble_coral_name => 'אלמוג בועות';
+
+  @override
+  String get species_bubble_coral_desc =>
+      'אלמוג ייחודי בעל שלפוחיות דמויות ענבים המתנפחות ביום כדי לקלוט אור.';
+
+  @override
+  String get species_plate_coral_name => 'אלמוג צלחת';
+
+  @override
+  String get species_plate_coral_desc =>
+      'אלמוג לוחי דק היוצר מדפים מסולסלים, נפוץ במדרונות השונית של ההודו-פסיפי.';
+
+  @override
+  String get species_pillar_coral_name => 'אלמוג עמוד';
+
+  @override
+  String get species_pillar_coral_desc =>
+      'אלמוג נדיר הצומח כלפי מעלה ויוצר עמודים גבוהים, מצוי בקריביים.';
+
+  @override
+  String get species_star_coral_name => 'אלמוג כוכב';
+
+  @override
+  String get species_star_coral_desc =>
+      'בונה שונית מרכזי בקריביים היוצר מושבות גדולות בצורת גוש ופוליפים בצורת כוכב.';
+
+  @override
+  String get species_lettuce_coral_name => 'אלמוג חסה';
+
+  @override
+  String get species_lettuce_coral_desc =>
+      'אלמוג לוחי דק בעל קפלים דמויי עלים, נפוץ בקירות ובמדרונות השונית בקריביים.';
+
+  @override
+  String get species_finger_coral_name => 'אלמוג אצבע';
+
+  @override
+  String get species_finger_coral_desc =>
+      'אלמוג מסועף וחסון בעל בליטות עבות דמויות אצבעות, מצוי בשוניות רדודות.';
+
+  @override
+  String get species_massive_porites_name => 'אלמוג פוריטס מסיבי';
+
+  @override
+  String get species_massive_porites_desc =>
+      'אלמוג גושי גדול שיכול לגדול במשך מאות שנים, בונה שונית דומיננטי בהודו-פסיפי.';
+
+  @override
+  String get species_cauliflower_coral_name => 'אלמוג כרובית';
+
+  @override
+  String get species_cauliflower_coral_desc =>
+      'אלמוג מסועף וקומפקטי בצורת כרובית, נפוץ ברדודי השוניות הטרופיות.';
+
+  @override
+  String get species_flower_pot_coral_name => 'אלמוג עציץ';
+
+  @override
+  String get species_flower_pot_coral_desc =>
+      'מושבה של פוליפים ארוכי זרועות הנפרשים ביום ומזכירים זר פרחים.';
+
+  @override
+  String get species_cup_coral_name => 'אלמוג גביע כתום';
+
+  @override
+  String get species_cup_coral_desc =>
+      'אלמוג כתום בוהק שאינו מבצע פוטוסינתזה, מצוי על קירות ומתחת לגגונים במים טרופיים.';
+
+  @override
+  String get species_scroll_coral_name => 'אלמוג מגילה';
+
+  @override
+  String get species_scroll_coral_desc =>
+      'אלמוג היוצר לוחות מגולגלים גדולים, נפוץ במדרונות השונית ובלגונות של ההודו-פסיפי.';
+
+  @override
+  String get species_cabbage_coral_name => 'אלמוג כרוב';
+
+  @override
+  String get species_cabbage_coral_desc =>
+      'אלמוג לוחי בצורת דיסקה המזכיר עלי כרוב, מצוי באזורי שונית מוגנים.';
+
+  @override
+  String get species_hammer_coral_name => 'אלמוג פטיש';
+
+  @override
+  String get species_hammer_coral_desc =>
+      'אלמוג בעל פוליפים גדולים וקצות זרועות בצורת עוגן או פטיש, פופולרי בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_torch_coral_name => 'אלמוג לפיד';
+
+  @override
+  String get species_torch_coral_desc =>
+      'אלמוג מסועף בעל זרועות ארוכות ומתנופפות שקצותיהן זוהרים כנורות.';
+
+  @override
+  String get species_frogspawn_coral_name => 'אלמוג ביצי צפרדע';
+
+  @override
+  String get species_frogspawn_coral_desc =>
+      'אלמוג בעל פוליפים גדולים וקצות זרועות מסועפים המזכירים ביצי צפרדע.';
+
+  @override
+  String get species_sea_fan_name => 'מניפת ים מצויה';
+
+  @override
+  String get species_sea_fan_desc =>
+      'גורגוניה שטוחה בצורת מניפה הניצבת בניצב לזרם, אייקונית בשוניות הקריביים.';
+
+  @override
+  String get species_venus_sea_fan_name => 'מניפת ים של ונוס';
+
+  @override
+  String get species_venus_sea_fan_desc =>
+      'גורגוניה עדינה בצורת מניפה, מצויה בשוניות רדודות בקריביים באזורי זרם מתון.';
+
+  @override
+  String get species_deepwater_sea_fan_name => 'מניפת ים של מים עמוקים';
+
+  @override
+  String get species_deepwater_sea_fan_desc =>
+      'גורגוניה גדולה ושיחנית המצויה בקירות שונית עמוקים בקריביים.';
+
+  @override
+  String get species_sea_whip_name => 'שוט ים';
+
+  @override
+  String get species_sea_whip_desc =>
+      'גורגוניה תמירה בצורת מוט, נצפית מתנועעת בזרם בשוניות האטלנטי והקריביים.';
+
+  @override
+  String get species_sea_plume_name => 'נוצת ים';
+
+  @override
+  String get species_sea_plume_desc =>
+      'גורגוניה גבוהה ונוצתית היוצרת מושבות דמויות נוצה בפסגות השוניות בקריביים.';
+
+  @override
+  String get species_organ_pipe_coral_name => 'אלמוג עוגב';
+
+  @override
+  String get species_organ_pipe_coral_desc =>
+      'צינורות שלד אדומים בוהקים עם פוליפים עדינים, מצוי בשוניות מוגנות בהודו-פסיפי.';
+
+  @override
+  String get species_leather_coral_name => 'אלמוג עור';
+
+  @override
+  String get species_leather_coral_desc =>
+      'אלמוג רך בעל פני שטח חלקים ועוריים היוצר מושבות גדולות בצורת פטרייה.';
+
+  @override
+  String get species_toadstool_leather_coral_name => 'אלמוג עור פטרייה';
+
+  @override
+  String get species_toadstool_leather_coral_desc =>
+      'אלמוג רך בעל גבעול עבה וכיפה שטוחה, נפוץ במישורי השונית של ההודו-פסיפי.';
+
+  @override
+  String get species_pulsing_xenia_name => 'קסניה פועמת';
+
+  @override
+  String get species_pulsing_xenia_desc =>
+      'אלמוג רך בעל פוליפים הפועמים בקצב, מצוי במים מוגנים בהודו-פסיפי.';
+
+  @override
+  String get species_tree_coral_name => 'אלמוג עץ';
+
+  @override
+  String get species_tree_coral_desc =>
+      'אלמוג רך ותוסס היוצר אשכולות דמויי עץ על קירות ומתחת לגגונים בים סוף.';
+
+  @override
+  String get species_blue_coral_name => 'אלמוג כחול';
+
+  @override
+  String get species_blue_coral_desc =>
+      'אלמוג רך ייחודי בעל שלד כחול, מצוי במישורי שונית רדודים בהודו-פסיפי.';
+
+  @override
+  String get species_black_coral_name => 'אלמוג שחור';
+
+  @override
+  String get species_black_coral_desc =>
+      'אלמוג מים עמוקים בעל שלד כהה, מצוי בקירות ובמדרונות תלולים מתחת ל-30 מטרים.';
+
+  @override
+  String get species_carnation_coral_name => 'אלמוג ציפורן';
+
+  @override
+  String get species_carnation_coral_desc =>
+      'אלמוג רך וצבעוני להפליא המצוי מתחת למדפי סלע ועל קירות בהודו-פסיפי.';
+
+  @override
+  String get species_wire_coral_name => 'אלמוג חוט';
+
+  @override
+  String get species_wire_coral_desc =>
+      'אלמוג שחור וארוך היוצר שוטים מסולסלים, ומארח גוביים וחסילונים.';
+
+  @override
+  String get species_dead_mans_fingers_name => 'אצבעות המת';
+
+  @override
+  String get species_dead_mans_fingers_desc =>
+      'אלמוג רך ובשרני בעל אונות דמויות אצבעות, נפוץ בשוניות ממוזגות בצפון האטלנטי.';
+
+  @override
+  String get species_sun_coral_name => 'אלמוג שמש';
+
+  @override
+  String get species_sun_coral_desc =>
+      'אלמוג בגוון צהוב-כתום שאינו מבצע פוטוסינתזה ופורש את פוליפיו בלילה על קירות בהודו-פסיפי.';
+
+  @override
+  String get species_lace_coral_name => 'אלמוג תחרה';
+
+  @override
+  String get species_lace_coral_desc =>
+      'הידרו-אלמוג ורוד ועדין בעל ענפים דמויי תחרה, מצוי בנקיקים ומתחת למדפי סלע.';
+
+  @override
+  String get species_kenya_tree_coral_name => 'אלמוג עץ קניה';
+
+  @override
+  String get species_kenya_tree_coral_desc =>
+      'אלמוג רך ועמיד בעל ענפים דמויי עץ, נפוץ בהודו-פסיפי.';
+
+  @override
+  String get species_colt_coral_name => 'אלמוג סייח';
+
+  @override
+  String get species_colt_coral_desc =>
+      'אלמוג רך בעל ענפים עבים וגמישים המכוסים בפוליפים קטנים, בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_turtle_grass_name => 'עשב צבים';
+
+  @override
+  String get species_turtle_grass_desc =>
+      'עשב הים הדומיננטי בקריביים, בעל עלים רחבים ושטוחים ומקור מזון חיוני לצבי ים.';
+
+  @override
+  String get species_eelgrass_name => 'זוסטרה';
+
+  @override
+  String get species_eelgrass_desc =>
+      'עשב ים ממוזג היוצר אחווי מים צפופים המשמשים בית גידול לגידול צאצאים.';
+
+  @override
+  String get species_manatee_grass_name => 'עשב פרות ים';
+
+  @override
+  String get species_manatee_grass_desc =>
+      'עשב ים בעל עלים גליליים המצוי באזורי חול בקריביים, לרוב סמוך לערוגות עשב צבים.';
+
+  @override
+  String get species_shoal_grass_name => 'עשב שרטון';
+
+  @override
+  String get species_shoal_grass_desc =>
+      'עשב ים חלוץ בעל עלים צרים המאכלס אזורי חול שהופרו בקריביים.';
+
+  @override
+  String get species_paddle_grass_name => 'עשב משוט';
+
+  @override
+  String get species_paddle_grass_desc =>
+      'עשב ים קטן ועדין בעל עלים סגלגלים, מצוי במים עמוקים יותר ברחבי האזורים הטרופיים.';
+
+  @override
+  String get species_neptune_grass_name => 'עשב נפטון';
+
+  @override
+  String get species_neptune_grass_desc =>
+      'עשב ים ים-תיכוני היוצר אחווים נרחבים החיוניים למערכות האקולוגיות של החוף.';
+
+  @override
+  String get species_giant_kelp_name => 'קלפ ענק';
+
+  @override
+  String get species_giant_kelp_desc =>
+      'מין היוצר יערות תת-מימיים מתנשאים לגובה של עד 60 מטרים, אייקוני לצלילה בקליפורניה.';
+
+  @override
+  String get species_bull_kelp_name => 'קלפ שור';
+
+  @override
+  String get species_bull_kelp_desc =>
+      'קלפ של האוקיינוס השקט בעל גבעול ארוך יחיד ומצוף בולבוסי, יוצר יערות בעלי חופה צפופה.';
+
+  @override
+  String get species_bladder_wrack_name => 'פוקוס שלפוחי';
+
+  @override
+  String get species_bladder_wrack_desc =>
+      'אצה חומה נפוצה בעלת שלפוחיות אוויר בזוגות, מצויה באזורי הגאות והשפל של צפון האטלנטי.';
+
+  @override
+  String get species_sargassum_name => 'סרגסום';
+
+  @override
+  String get species_sargassum_desc =>
+      'אצה חומה צפה חופשית היוצרת רפסודות המספקות מחסה לדגים צעירים ולחסרי חוליות.';
+
+  @override
+  String get species_kelp_forest_ecklonia_name => 'קלפ אקלוניה';
+
+  @override
+  String get species_kelp_forest_ecklonia_desc =>
+      'הקלפ הדומיננטי במימי חצי הכדור הדרומי, יוצר יערות תת-מימיים חשובים.';
+
+  @override
+  String get species_coralline_algae_name => 'אצות גיריות';
+
+  @override
+  String get species_coralline_algae_desc =>
+      'אצה אדומה קשה ומצפה המלכדת את מבני השונית ומעניקה לשוניות גוון ורדרד.';
+
+  @override
+  String get species_irish_moss_name => 'טחב אירי';
+
+  @override
+  String get species_irish_moss_desc =>
+      'אצה אדומה בצורת מניפה המצויה בחופי הסלע של אזור הגאות והשפל בצפון האטלנטי.';
+
+  @override
+  String get species_dulse_name => 'דולסה';
+
+  @override
+  String get species_dulse_desc =>
+      'אצה שטוחה בגוון אדמדם-סגול הגדלה על סלעים ועל גבעולי קלפ במים צפוניים קרים.';
+
+  @override
+  String get species_halimeda_name => 'הלימדה';
+
+  @override
+  String get species_halimeda_desc =>
+      'אצה ירוקה מסויידת בעלת פרקים בצורת דיסקה, תורמת מרכזית לחול השונית.';
+
+  @override
+  String get species_sea_lettuce_name => 'חסת ים';
+
+  @override
+  String get species_sea_lettuce_desc =>
+      'אצה ירוקה בוהקת דמוית יריעה, מצויה במים חופיים רדודים בכל העולם.';
+
+  @override
+  String get species_caulerpa_name => 'אצת ענבי ים';
+
+  @override
+  String get species_caulerpa_desc =>
+      'אצה ירוקה זוחלת בעלת גבעולונים דמויי ענבים, מצויה על שברי אלמוגים וחול בשוניות טרופיות.';
+
+  @override
+  String get species_mermaid_fan_name => 'מניפת בת הים';
+
+  @override
+  String get species_mermaid_fan_desc =>
+      'אצה ירוקה מסויידת בצורת מניפה קטנה, נפוצה בקרקעיות החול של הקריביים.';
+
+  @override
+  String get species_shaving_brush_algae_name => 'אצת מברשת גילוח';
+
+  @override
+  String get species_shaving_brush_algae_desc =>
+      'אצה ירוקה מסויידת בעלת ציצית דמוית מברשת על גבעול, מצויה בקרקעיות החול של הקריביים.';
+
+  @override
+  String get species_finger_kelp_name => 'אצת משוט';
+
+  @override
+  String get species_finger_kelp_desc =>
+      'אצה חומה בעלת גבעולונים דמויי אצבעות היוצרת ערוגות קלפ במים החופיים של צפון האטלנטי.';
+
+  @override
+  String get species_banded_sea_krait_name => 'נחש ים מפוספס';
+
+  @override
+  String get species_banded_sea_krait_desc =>
+      'נחש ים ארסי בעל טבעות בכחול-אפור ושחור, נוח אופי ונצפה לרוב בשוניות ההודו-פסיפי.';
+
+  @override
+  String get species_olive_sea_snake_name => 'נחש ים זיתי';
+
+  @override
+  String get species_olive_sea_snake_desc =>
+      'נחש ים סקרן המצוי בשוניות אוסטרליה, ידוע בהתקרבותו לצוללנים.';
+
+  @override
+  String get species_yellow_bellied_sea_snake_name => 'נחש ים צהוב-בטן';
+
+  @override
+  String get species_yellow_bellied_sea_snake_desc =>
+      'נחש ים פלגי בעל בטן צהובה, מין הנחשים הנפוץ ביותר בעולם.';
+
+  @override
+  String get species_marine_iguana_name => 'איגואנה ימית';
+
+  @override
+  String get species_marine_iguana_desc =>
+      'אנדמית לאיי גלפגוס, והלטאה היחידה המלקטת אצות מתחת למים.';
+
+  @override
+  String get species_saltwater_crocodile_name => 'תנין ימי';
+
+  @override
+  String get species_saltwater_crocodile_desc =>
+      'הזוחל הגדול ביותר החי כיום, מצוי במים חופיים ובשפכי נהרות בהודו-פסיפי.';
+
+  @override
+  String get common_action_done => 'סיום';
+
+  @override
+  String get common_action_more => 'עוד';
+
+  @override
+  String get common_label_displayName => 'שם תצוגה';
+
+  @override
+  String common_relativeTime_daysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לפני $count ימים',
+      many: 'לפני $count ימים',
+      two: 'לפני יומיים',
+      one: 'לפני יום',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_hoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לפני $count שעות',
+      many: 'לפני $count שעות',
+      two: 'לפני שעתיים',
+      one: 'לפני שעה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_inDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'בעוד $count ימים',
+      many: 'בעוד $count ימים',
+      two: 'בעוד יומיים',
+      one: 'בעוד יום',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_inHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'בעוד $count שעות',
+      many: 'בעוד $count שעות',
+      two: 'בעוד שעתיים',
+      one: 'בעוד שעה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_inLessThanMinute => 'בעוד פחות מדקה';
+
+  @override
+  String common_relativeTime_inMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'בעוד $count דקות',
+      many: 'בעוד $count דקות',
+      two: 'בעוד שתי דקות',
+      one: 'בעוד דקה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_justNow => 'הרגע';
+
+  @override
+  String common_relativeTime_minutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לפני $count דקות',
+      many: 'לפני $count דקות',
+      two: 'לפני שתי דקות',
+      one: 'לפני דקה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_monthsAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לפני $count חודשים',
+      many: 'לפני $count חודשים',
+      two: 'לפני חודשיים',
+      one: 'לפני חודש',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_overdue => 'באיחור';
+
+  @override
+  String get media_cache_calculating => 'מחשב את גודל המטמון…';
+
+  @override
+  String get media_cache_cardTitle => 'ניהול מטמון';
+
+  @override
+  String get media_cache_clearAction => 'ניקוי מטמון';
+
+  @override
+  String get media_cache_clearBody =>
+      'מסיר תמונות ממוזערות ותמונות רשת בגודל מלא שהורדו. פריטי המדיה המקושרים נשמרים; התמונות יורדו מחדש בצפייה הבאה.';
+
+  @override
+  String get media_cache_clearConfirm => 'ניקוי';
+
+  @override
+  String media_cache_clearError(String error) {
+    return 'הניקוי נכשל: $error';
+  }
+
+  @override
+  String get media_cache_clearTitle => 'לנקות את מטמון תמונות הרשת?';
+
+  @override
+  String get media_cache_cleared => 'המטמון נוקה';
+
+  @override
+  String get media_cache_diskCache => 'מטמון בדיסק';
+
+  @override
+  String media_cache_error(String error) {
+    return 'שגיאה: $error';
+  }
+
+  @override
+  String get media_credentials_actionTest => 'בדיקת פרטי התחברות';
+
+  @override
+  String media_credentials_authLabel(String authType) {
+    return 'אימות: $authType';
+  }
+
+  @override
+  String get media_credentials_deleteBody =>
+      'מסיר את פרטי ההתחברות השמורים. פריטים המקושרים דרך מארח זה יציגו \"נדרשת כניסה\" עד שתוסיף אותם מחדש.';
+
+  @override
+  String media_credentials_deleteError(String error) {
+    return 'המחיקה נכשלה: $error';
+  }
+
+  @override
+  String media_credentials_deleteTitle(String host) {
+    return 'למחוק את $host?';
+  }
+
+  @override
+  String media_credentials_deleted(String host) {
+    return '$host נמחק';
+  }
+
+  @override
+  String media_credentials_editTitle(String host) {
+    return 'עריכת $host';
+  }
+
+  @override
+  String get media_credentials_emptySubtitle =>
+      'פרטי התחברות לכל מארח שנוספו במהלך ייבוא מכתובת URL או ממניפסט מופיעים כאן.';
+
+  @override
+  String get media_credentials_emptyTitle => 'אין פרטי התחברות שמורים';
+
+  @override
+  String media_credentials_lastUsed(String when) {
+    return 'שימוש אחרון $when';
+  }
+
+  @override
+  String get media_credentials_loadError => 'לא ניתן לטעון את המארחים השמורים';
+
+  @override
+  String get media_credentials_loading => 'טוען מארחים שמורים...';
+
+  @override
+  String media_credentials_saveError(String error) {
+    return 'השמירה נכשלה: $error';
+  }
+
+  @override
+  String get media_credentials_savedHostsTitle => 'מארחים שמורים';
+
+  @override
+  String media_credentials_testError(String error) {
+    return 'הבדיקה נכשלה: $error';
+  }
+
+  @override
+  String media_credentials_testFailed(String host) {
+    return 'פרטי ההתחברות ל-$host נכשלו';
+  }
+
+  @override
+  String media_credentials_testOk(String host) {
+    return 'פרטי ההתחברות ל-$host תקינים';
+  }
+
+  @override
+  String get media_manifest_actionPollNow => 'תשאול עכשיו';
+
+  @override
+  String get media_manifest_cardTitle => 'מנויי מניפסט';
+
+  @override
+  String get media_manifest_deleteBody =>
+      'מסיר את המנוי. הרשומות שכבר יובאו יישארו (אפשר לנקות אותן דרך תור הפריטים היתומים).';
+
+  @override
+  String media_manifest_deleteError(String error) {
+    return 'המחיקה נכשלה: $error';
+  }
+
+  @override
+  String media_manifest_deleteTitle(String name) {
+    return 'למחוק את $name?';
+  }
+
+  @override
+  String get media_manifest_editTitle => 'עריכת מנוי';
+
+  @override
+  String get media_manifest_emptySubtitle =>
+      'הירשם למניפסט Atom/RSS, JSON או CSV מלשונית ה-URL כדי לשמור על סנכרון הספרייה.';
+
+  @override
+  String get media_manifest_emptyTitle => 'אין מנויי מניפסט';
+
+  @override
+  String media_manifest_lastError(String error) {
+    return 'שגיאה אחרונה: $error';
+  }
+
+  @override
+  String media_manifest_lastPolled(String when) {
+    return 'תשאול אחרון $when';
+  }
+
+  @override
+  String get media_manifest_loadError => 'לא ניתן לטעון את המנויים';
+
+  @override
+  String get media_manifest_loading => 'טוען מנויים...';
+
+  @override
+  String get media_manifest_neverPolled => 'מעולם לא תושאל';
+
+  @override
+  String media_manifest_nextPoll(String when) {
+    return 'הבא $when';
+  }
+
+  @override
+  String get media_manifest_notFound => 'המנוי לא נמצא';
+
+  @override
+  String media_manifest_pollError(String error) {
+    return 'התשאול נכשל: $error';
+  }
+
+  @override
+  String media_manifest_polled(String name) {
+    return '$name תושאל';
+  }
+
+  @override
+  String media_manifest_polling(String name) {
+    return 'מתשאל את $name...';
+  }
+
+  @override
+  String media_manifest_saveError(String error) {
+    return 'השמירה נכשלה: $error';
+  }
+
+  @override
+  String media_manifest_updateError(String error) {
+    return 'לא ניתן לעדכן: $error';
+  }
+
+  @override
+  String get media_manifest_urlLabel => 'כתובת URL של מניפסט';
+
+  @override
+  String media_scan_failed(String error) {
+    return 'הסריקה נכשלה: $error';
+  }
+
+  @override
+  String media_scan_progressItems(int done, int total) {
+    return '$done / $total פריטים';
+  }
+
+  @override
+  String media_scan_progressReachability(int available, int unreachable) {
+    return '$available נגישים  ·  $unreachable לא נגישים';
+  }
+
+  @override
+  String media_scan_summary(
+    int total,
+    String seconds,
+    int available,
+    int unreachable,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other:
+          'נסרקו $total פריטים ב-$seconds שניות: $available נגישים, $unreachable לא נגישים',
+      many:
+          'נסרקו $total פריטים ב-$seconds שניות: $available נגישים, $unreachable לא נגישים',
+      two:
+          'נסרקו שני פריטים ב-$seconds שניות: $available נגישים, $unreachable לא נגישים',
+      one:
+          'נסרק פריט אחד ב-$seconds שניות: $available נגישים, $unreachable לא נגישים',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_scan_summarySkipped(String base, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטים דולגו (ללא כתובת URL)',
+      many: '$count פריטים דולגו (ללא כתובת URL)',
+      two: 'שני פריטים דולגו (ללא כתובת URL)',
+      one: 'פריט אחד דולג (ללא כתובת URL)',
+    );
+    return '$base, $_temp0';
+  }
+
+  @override
+  String get media_scan_title => 'סריקת כל מדיית הרשת';
+
+  @override
+  String get settings_mediaSources_androidUriTitle => 'הרשאות URI ב-Android';
+
+  @override
+  String settings_mediaSources_androidUriUsage(int used, int limit) {
+    return '$used / $limit כתובות URI קבועות בשימוש';
+  }
+
+  @override
+  String get settings_mediaSources_counting => 'סופר…';
+
+  @override
+  String settings_mediaSources_error(String error) {
+    return 'שגיאה: $error';
+  }
+
+  @override
+  String get settings_mediaSources_loading => 'טוען…';
+
+  @override
+  String settings_mediaSources_localFilesCounts(
+    int available,
+    int unavailable,
+  ) {
+    return '$available זמינים, $unavailable לא זמינים';
+  }
+
+  @override
+  String get settings_mediaSources_photoLibrarySubtitle =>
+      'Apple Photos / Google Photos / iCloud';
+
+  @override
+  String get settings_mediaSources_reverifyAll =>
+      'אימות מחדש של כל הקבצים המקומיים';
+
+  @override
+  String settings_mediaSources_reverifyFailed(String error) {
+    return 'האימות מחדש נכשל: $error';
+  }
+
+  @override
+  String settings_mediaSources_reverifyResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטים עודכנו',
+      many: '$count פריטים עודכנו',
+      two: 'שני פריטים עודכנו',
+      one: 'פריט אחד עודכן',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_mediaSources_title => 'מקורות מדיה';
+
+  @override
+  String get settings_networkSources_scanDescription =>
+      'בודק מחדש כל תמונה שיובאה מכתובת URL או ממניפסט מול המארח שלה. מסמן פריטים לא נגישים כך שיוצגו כ\"חסרים\" בספרייה וניתן יהיה לנקות אותם.';
+
+  @override
+  String statistics_conditions_entryMethod_semanticLabel(String description) {
+    return 'תרשים עמודות. שיטות כניסה. $description';
+  }
+
+  @override
+  String statistics_conditions_visibility_semanticLabel(String description) {
+    return 'תרשים עוגה. התפלגות ראות. $description';
+  }
+
+  @override
+  String statistics_conditions_waterType_semanticLabel(String description) {
+    return 'תרשים עוגה. התפלגות סוג מים. $description';
+  }
+
+  @override
+  String statistics_progression_divesBySuitThickness_semanticLabel(
+    String description,
+  ) {
+    return 'תרשים עמודות. צלילות לפי עובי חליפה. $description';
+  }
+
+  @override
+  String statistics_progression_divesPerYear_countInYear(
+    int count,
+    String year,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות ב-$year',
+      many: '$count צלילות ב-$year',
+      two: 'שתי צלילות ב-$year',
+      one: 'צלילה אחת ב-$year',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String statistics_progression_divesPerYear_semanticLabel(String description) {
+    return 'תרשים עמודות. צלילות לפי שנה. $description';
+  }
+
+  @override
+  String get statistics_records_unavailable => 'השיאים אינם זמינים';
+
+  @override
+  String statistics_summary_depthBucket_over(String min, String unit) {
+    return '$min$unit+';
+  }
+
+  @override
+  String statistics_summary_depthBucket_range(
+    String min,
+    String max,
+    String unit,
+  ) {
+    return '$min-$max$unit';
+  }
+
+  @override
+  String get statistics_summary_distributions_title => 'התפלגויות';
+
+  @override
+  String get statistics_summary_diveTypes_error =>
+      'לא ניתן לטעון נתוני סוגי צלילה';
+
+  @override
+  String get statistics_summary_diveTypes_unknown => 'לא ידוע';
+
+  @override
+  String get statistics_summary_divesPerMonth => 'צלילות / חודש';
+
+  @override
+  String get statistics_summary_divesPerYear => 'צלילות / שנה';
+
+  @override
+  String statistics_timePatterns_dayOfWeek_semanticLabel(String description) {
+    return 'תרשים עמודות. צלילות לפי יום בשבוע. $description';
+  }
+
+  @override
+  String statistics_timePatterns_seasonal_semanticLabel(String description) {
+    return 'תרשים עמודות. צלילות לפי חודש. $description';
+  }
+
+  @override
+  String statistics_timePatterns_surfaceInterval_statLabel(
+    String label,
+    String value,
+  ) {
+    return 'מרווח פני שטח $label: $value';
+  }
+
+  @override
+  String get statistics_timePatterns_timeOfDay_afternoon => 'צהריים';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_evening => 'ערב';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_morning => 'בוקר';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_night => 'לילה';
+
+  @override
+  String statistics_timePatterns_timeOfDay_semanticLabel(String description) {
+    return 'תרשים עוגה. צלילות לפי שעה ביום. $description';
+  }
+
+  @override
+  String get columnConfig_displayOptions => 'אפשרויות תצוגה';
+
+  @override
+  String get columnConfig_noExtraFields =>
+      'לא הוגדרו שדות נוספים. הוסיפו שדות למטה.';
+
+  @override
+  String get columnConfig_savePresetTitle => 'שמירת הגדרה';
+
+  @override
+  String get columnConfig_section => 'מקטע';
+
+  @override
+  String get columnConfig_showTags => 'הצגת תגיות';
+
+  @override
+  String get columnConfig_showTags_subtitle =>
+      'הצגת תגיות על כרטיסי צלילה מפורטים';
+
+  @override
+  String get columnConfig_slot_date => 'תאריך / כותרת משנה';
+
+  @override
+  String get columnConfig_slot_slot1 => 'משבצת 1';
+
+  @override
+  String get columnConfig_slot_slot2 => 'משבצת 2';
+
+  @override
+  String get columnConfig_slot_slot3 => 'משבצת 3';
+
+  @override
+  String get columnConfig_slot_slot4 => 'משבצת 4';
+
+  @override
+  String get columnConfig_slot_stat1 => 'נתון 1';
+
+  @override
+  String get columnConfig_slot_stat2 => 'נתון 2';
+
+  @override
+  String get columnConfig_slot_subtitle => 'כותרת משנה';
+
+  @override
+  String get columnConfig_slot_title => 'כותרת';
+
+  @override
+  String get columnConfig_tooltip_columnSettings => 'הגדרות עמודות';
+
+  @override
+  String get common_action_add => 'הוסף';
+
+  @override
+  String get common_action_pin => 'הצמד';
+
+  @override
+  String get common_action_remove => 'הסר';
+
+  @override
+  String get common_action_unpin => 'בטל הצמדה';
+
+  @override
+  String diveLog_filterChip_dateRange(String end, String start) {
+    return '$start עד $end';
+  }
+
+  @override
+  String diveLog_filterChip_equipmentCount(int count) {
+    return '$count פריטי ציוד';
+  }
+
+  @override
+  String get diveLog_filter_allComputers => 'כל מחשבי הצלילה';
+
+  @override
+  String get diveLog_filter_noComputersRegistered => 'לא רשומים מחשבי צלילה';
+
+  @override
+  String diveLog_filter_sectionDepthRangeUnit(String unit) {
+    return 'טווח עומק ($unit)';
+  }
+
+  @override
+  String get diveLog_filter_sectionDiveComputer => 'מחשב צלילה';
+
+  @override
+  String diveLog_listPage_semanticsDiveAtSite(int diveNumber, String siteName) {
+    return 'צלילה $diveNumber באתר $siteName';
+  }
+
+  @override
+  String get enum_listViewMode_compact => 'קומפקטי';
+
+  @override
+  String get enum_listViewMode_dense => 'צפוף';
+
+  @override
+  String get enum_listViewMode_detailed => 'מפורט';
+
+  @override
+  String get enum_listViewMode_table => 'טבלה';
+
+  @override
+  String get enum_profileMetric_ascentRate => 'קצב עלייה';
+
+  @override
+  String get enum_profileMetric_cns => 'CNS%';
+
+  @override
+  String get enum_profileMetric_otu => 'OTU';
+
+  @override
+  String get enum_sortField_bottomTime => 'זמן תחתית';
+
+  @override
+  String get enum_sortField_serviceDue => 'טיפול נדרש';
+
+  @override
+  String get listViewMode_tooltip => 'מצב תצוגה';
+
+  @override
+  String marineLife_speciesManage_errorLoading(Object error) {
+    return 'שגיאה בטעינת המינים: $error';
+  }
+
+  @override
+  String get settings_appearance_header_cards => 'כרטיסים';
+
+  @override
+  String get settings_appearance_header_listView => 'תצוגת רשימה';
+
+  @override
+  String get settings_appearance_header_tableMode => 'מצב טבלה';
+
+  @override
+  String get settings_appearance_listFields_buddies =>
+      'שדות רשימת חברי הצוללים';
+
+  @override
+  String get settings_appearance_listFields_certifications =>
+      'שדות רשימת ההסמכות';
+
+  @override
+  String get settings_appearance_listFields_courses => 'שדות רשימת הקורסים';
+
+  @override
+  String get settings_appearance_listFields_diveCenters =>
+      'שדות רשימת מרכזי הצלילה';
+
+  @override
+  String get settings_appearance_listFields_dives => 'שדות רשימת הצלילות';
+
+  @override
+  String get settings_appearance_listFields_equipment => 'שדות רשימת הציוד';
+
+  @override
+  String get settings_appearance_listFields_sites => 'שדות רשימת האתרים';
+
+  @override
+  String get settings_appearance_listFields_subtitle =>
+      'התאמת השדות המוצגים בתצוגות הרשימה';
+
+  @override
+  String get settings_appearance_listFields_trips => 'שדות רשימת הטיולים';
+
+  @override
+  String get settings_appearance_listView_buddies => 'תצוגת רשימת חברי הצוללים';
+
+  @override
+  String get settings_appearance_listView_buddies_subtitle =>
+      'פריסת ברירת המחדל לרשימת חברי הצוללים';
+
+  @override
+  String get settings_appearance_listView_certifications =>
+      'תצוגת רשימת ההסמכות';
+
+  @override
+  String get settings_appearance_listView_certifications_subtitle =>
+      'פריסת ברירת המחדל לרשימת ההסמכות';
+
+  @override
+  String get settings_appearance_listView_courses => 'תצוגת רשימת הקורסים';
+
+  @override
+  String get settings_appearance_listView_courses_subtitle =>
+      'פריסת ברירת המחדל לרשימת הקורסים';
+
+  @override
+  String get settings_appearance_listView_diveCenters =>
+      'תצוגת רשימת מרכזי הצלילה';
+
+  @override
+  String get settings_appearance_listView_diveCenters_subtitle =>
+      'פריסת ברירת המחדל לרשימת מרכזי הצלילה';
+
+  @override
+  String get settings_appearance_listView_dives => 'תצוגת רשימת הצלילות';
+
+  @override
+  String get settings_appearance_listView_dives_subtitle =>
+      'פריסת ברירת המחדל לרשימת הצלילות';
+
+  @override
+  String get settings_appearance_listView_equipment => 'תצוגת רשימת הציוד';
+
+  @override
+  String get settings_appearance_listView_equipment_subtitle =>
+      'פריסת ברירת המחדל לרשימת הציוד';
+
+  @override
+  String get settings_appearance_listView_sites => 'תצוגת רשימת האתרים';
+
+  @override
+  String get settings_appearance_listView_sites_subtitle =>
+      'פריסת ברירת המחדל לרשימת האתרים';
+
+  @override
+  String get settings_appearance_listView_trips => 'תצוגת רשימת הטיולים';
+
+  @override
+  String get settings_appearance_listView_trips_subtitle =>
+      'פריסת ברירת המחדל לרשימת הטיולים';
+
+  @override
+  String get settings_appearance_showDataSourceBadges =>
+      'הצגת תגי מקור הנתונים';
+
+  @override
+  String get settings_appearance_showDataSourceBadges_subtitle =>
+      'הצגת ייחוס המקור על מדדי הצלילה';
+
+  @override
+  String get settings_appearance_title_buddies => 'מראה חברי הצוללים';
+
+  @override
+  String get settings_appearance_title_certifications => 'מראה ההסמכות';
+
+  @override
+  String get settings_appearance_title_courses => 'מראה הקורסים';
+
+  @override
+  String get settings_appearance_title_diveCenters => 'מראה מרכזי הצלילה';
+
+  @override
+  String get settings_appearance_title_dives => 'מראה הצלילות';
+
+  @override
+  String get settings_appearance_title_equipment => 'מראה הציוד';
+
+  @override
+  String get settings_appearance_title_sites => 'מראה האתרים';
+
+  @override
+  String get settings_appearance_title_trips => 'מראה הטיולים';
+
+  @override
+  String get settings_cloudSync_troubleshoot_tileSubtitle =>
+      'תיקון סנכרון תקוע או פינוי שטח בענן';
+
+  @override
+  String get settings_data_header_dataTools => 'כלי נתונים';
+
+  @override
+  String get settings_decompression_ascentGasLabel => 'תכנון העלייה עם';
+
+  @override
+  String get settings_decompression_ascentGas_allCarried =>
+      'כל הבלונים הנישאים';
+
+  @override
+  String get settings_decompression_ascentGas_decoStage =>
+      'בלוני דקו/סטייג + גז גב';
+
+  @override
+  String get settings_decompression_cnsSource => 'מקור CNS';
+
+  @override
+  String get settings_decompression_decoStopSource => 'מקור עצירות הדקו';
+
+  @override
+  String get settings_decompression_header_ascent => 'תכנון העלייה';
+
+  @override
+  String get settings_decompression_header_ascent_subtitle =>
+      'לאילו בלונים נישאים העלייה המדומה (TTS, תקרה ועצירות) יכולה לעבור בכל עומק. נלקחים בחשבון רק גזים שנרשמו בצלילה.';
+
+  @override
+  String get settings_decompression_header_dataSources => 'העדפות מקור נתונים';
+
+  @override
+  String get settings_decompression_header_dataSources_subtitle =>
+      'כאשר ההגדרה היא מחשב צלילה, האפליקציה משתמשת בנתונים שמדווח מחשב הצלילה כשהם זמינים. בהיעדר נתוני מחשב, היא חוזרת לערכים המחושבים.';
+
+  @override
+  String get settings_decompression_ndlSource => 'מקור NDL';
+
+  @override
+  String get settings_decompression_sourceCalculated => 'מחושב';
+
+  @override
+  String get settings_decompression_sourceComputer => 'מחשב צלילה';
+
+  @override
+  String get settings_decompression_ttsSource => 'מקור TTS';
+
+  @override
+  String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות עודכנו',
+      many: '$count צלילות עודכנו',
+      two: 'שתי צלילות עודכנו',
+      one: 'צלילה אחת עודכנה',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'שעות',
+      many: 'שעות',
+      two: 'שעות',
+      one: 'שעה',
+    );
+    return '$_temp0 ב-$hours $_temp1.';
+  }
+
+  @override
+  String settings_fixDiveTimes_apply(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'החל על $count צלילות',
+      many: 'החל על $count צלילות',
+      two: 'החל על שתי צלילות',
+      one: 'החל על צלילה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_fixDiveTimes_clearRange => 'ניקוי טווח התאריכים';
+
+  @override
+  String get settings_fixDiveTimes_confirmApply => 'החל';
+
+  @override
+  String settings_fixDiveTimes_confirmBody(
+    int count,
+    String hours,
+    int hoursAbs,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות',
+      many: '$count צלילות',
+      two: 'שתי צלילות',
+      one: 'צלילה אחת',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'שעות',
+      many: 'שעות',
+      two: 'שעות',
+      one: 'שעה',
+    );
+    return 'פעולה זו תזיז $_temp0 ב-$hours $_temp1. לא ניתן לבטל זאת אוטומטית.';
+  }
+
+  @override
+  String get settings_fixDiveTimes_confirmTitle => 'החלת היסט זמן';
+
+  @override
+  String get settings_fixDiveTimes_dateRangeFilter => 'מסנן טווח תאריכים';
+
+  @override
+  String get settings_fixDiveTimes_deselectAll => 'בטל בחירת הכל';
+
+  @override
+  String get settings_fixDiveTimes_diveFallback => 'צלילה';
+
+  @override
+  String settings_fixDiveTimes_diveNumber(int number) {
+    return 'צלילה מספר $number';
+  }
+
+  @override
+  String get settings_fixDiveTimes_empty => 'לא נמצאו צלילות.';
+
+  @override
+  String get settings_fixDiveTimes_emptyFiltered =>
+      'לא נמצאו צלילות בטווח תאריכים זה.';
+
+  @override
+  String get settings_fixDiveTimes_enterOffsetHint => 'הזינו היסט בשעות';
+
+  @override
+  String get settings_fixDiveTimes_from => 'מתאריך';
+
+  @override
+  String get settings_fixDiveTimes_hourOffset => 'היסט שעות';
+
+  @override
+  String get settings_fixDiveTimes_hoursField => 'שעות (לדוגמה: +7, -5)';
+
+  @override
+  String settings_fixDiveTimes_loadError(String error) {
+    return 'טעינת הצלילות נכשלה: $error';
+  }
+
+  @override
+  String get settings_fixDiveTimes_noSelection => 'לא נבחרו צלילות.';
+
+  @override
+  String get settings_fixDiveTimes_offsetHint =>
+      'הזינו מספר שלם חיובי או שלילי כדי להזיז את זמני הצלילות.';
+
+  @override
+  String settings_fixDiveTimes_preview(int count, String hours, int hoursAbs) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות יוזזו',
+      many: '$count צלילות יוזזו',
+      two: 'שתי צלילות יוזזו',
+      one: 'צלילה אחת תוזז',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'שעות',
+      many: 'שעות',
+      two: 'שעות',
+      one: 'שעה',
+    );
+    return 'תצוגה מקדימה: $_temp0 ב-$hours $_temp1.';
+  }
+
+  @override
+  String get settings_fixDiveTimes_selectAll => 'בחר הכל';
+
+  @override
+  String get settings_fixDiveTimes_selectDivesHint => 'בחרו את הצלילות להחלה';
+
+  @override
+  String get settings_fixDiveTimes_subtitle => 'התאמת הזמנים של צלילות מיובאות';
+
+  @override
+  String get settings_fixDiveTimes_title => 'תיקון זמני צלילה';
+
+  @override
+  String get settings_fixDiveTimes_to => 'עד תאריך';
+
+  @override
+  String get settings_fixDiveTimes_zeroOffset =>
+      'היסט השעות הוא 0, אין מה לשנות.';
+
+  @override
+  String get settings_syncDevices_appBar_refreshTooltip => 'רענון';
+
+  @override
+  String get settings_syncDevices_appBar_title => 'מכשירים בשירות זה';
+
+  @override
+  String get settings_syncDevices_empty => 'אין קובצי סנכרון בשירות זה.';
+
+  @override
+  String settings_syncDevices_readError(String error) {
+    return 'לא ניתן היה לקרוא את השירות.\n$error';
+  }
+
+  @override
+  String get settings_syncDevices_removal_noBackend => 'לא הוגדר שירות ענן';
+
+  @override
+  String get settings_syncDevices_removal_unreachable =>
+      'לא ניתן היה להגיע לשירות. דבר לא הוסר.';
+
+  @override
+  String settings_syncDevices_removeDialog_bodyRisky(
+    int count,
+    String name,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'פעולה זו תמחק $count קבצים ($size) השייכים ל-$name.\n\nהמכשיר הזה עדיין חלק מהסנכרון הזה. אם הוא יחזור לחיבור, הוא ייבנה מחדש מהשירות במקום להחיות נתונים ישנים, אך כל שינוי שטרם פרסם יאבד. נתוני הצלילה שלך במכשיר הזה אינם מושפעים.',
+      many:
+          'פעולה זו תמחק $count קבצים ($size) השייכים ל-$name.\n\nהמכשיר הזה עדיין חלק מהסנכרון הזה. אם הוא יחזור לחיבור, הוא ייבנה מחדש מהשירות במקום להחיות נתונים ישנים, אך כל שינוי שטרם פרסם יאבד. נתוני הצלילה שלך במכשיר הזה אינם מושפעים.',
+      two:
+          'פעולה זו תמחק שני קבצים ($size) השייכים ל-$name.\n\nהמכשיר הזה עדיין חלק מהסנכרון הזה. אם הוא יחזור לחיבור, הוא ייבנה מחדש מהשירות במקום להחיות נתונים ישנים, אך כל שינוי שטרם פרסם יאבד. נתוני הצלילה שלך במכשיר הזה אינם מושפעים.',
+      one:
+          'פעולה זו תמחק קובץ אחד ($size) השייכים ל-$name.\n\nהמכשיר הזה עדיין חלק מהסנכרון הזה. אם הוא יחזור לחיבור, הוא ייבנה מחדש מהשירות במקום להחיות נתונים ישנים, אך כל שינוי שטרם פרסם יאבד. נתוני הצלילה שלך במכשיר הזה אינם מושפעים.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_removeDialog_bodySafe(
+    int count,
+    String name,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'פעולה זו תמחק $count קבצים ($size) השייכים ל-$name. הם שרידים מספרייה שאף מכשיר כבר אינו מסנכרן ממנה. נתוני הצלילה שלך אינם מושפעים.',
+      many:
+          'פעולה זו תמחק $count קבצים ($size) השייכים ל-$name. הם שרידים מספרייה שאף מכשיר כבר אינו מסנכרן ממנה. נתוני הצלילה שלך אינם מושפעים.',
+      two:
+          'פעולה זו תמחק שני קבצים ($size) השייכים ל-$name. הם שרידים מספרייה שאף מכשיר כבר אינו מסנכרן ממנה. נתוני הצלילה שלך אינם מושפעים.',
+      one:
+          'פעולה זו תמחק קובץ אחד ($size) השייכים ל-$name. הם שרידים מספרייה שאף מכשיר כבר אינו מסנכרן ממנה. נתוני הצלילה שלך אינם מושפעים.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_removeDialog_title(String name) {
+    return 'להסיר את הקבצים של $name?';
+  }
+
+  @override
+  String settings_syncDevices_removeProgressTitle(String name) {
+    return 'מסיר את הקבצים של $name';
+  }
+
+  @override
+  String get settings_syncDevices_removeTooltip => 'הסרת הקבצים של מכשיר זה';
+
+  @override
+  String get settings_syncDevices_state_active => 'מסתנכרן כרגיל';
+
+  @override
+  String get settings_syncDevices_state_retired => 'הוצא משימוש';
+
+  @override
+  String get settings_syncDevices_state_staleEpoch =>
+      'שריד מספרייה קודמת; אף מכשיר אינו קורא אותו';
+
+  @override
+  String get settings_syncDevices_state_thisDevice => 'המכשיר הזה';
+
+  @override
+  String get settings_syncDevices_state_unreadable =>
+      'אין מניפסט קריא; העלאה שלא הושלמה או מוצפנת';
+
+  @override
+  String settings_syncDevices_summary(
+    int deviceCount,
+    int fileCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      deviceCount,
+      locale: localeName,
+      other: '$deviceCount מכשירים',
+      many: '$deviceCount מכשירים',
+      two: 'שני מכשירים',
+      one: 'מכשיר אחד',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount קבצים',
+      many: '$fileCount קבצים',
+      two: 'שני קבצים',
+      one: 'קובץ אחד',
+    );
+    return '$_temp0, $_temp1, $size';
+  }
+
+  @override
+  String settings_syncDevices_summary_removable(int count, String size) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נותרו מספרייה שהוחלפה או הוצאה משימוש, ותופסים $size.',
+      many: '$count נותרו מספרייה שהוחלפה או הוצאה משימוש, ותופסים $size.',
+      two: 'שניים נותרו מספרייה שהוחלפה או הוצאה משימוש, ותופסים $size.',
+      one: 'אחד נותר מספרייה שהוחלפה או הוצאה משימוש, ותופסים $size.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_tile_filesSize(int count, String size) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count קבצים',
+      many: '$count קבצים',
+      two: 'שני קבצים',
+      one: 'קובץ אחד',
+    );
+    return '$_temp0, $size';
+  }
+
+  @override
+  String settings_syncDevices_tile_filesSizeSeen(
+    int count,
+    String size,
+    String when,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count קבצים',
+      many: '$count קבצים',
+      two: 'שני קבצים',
+      one: 'קובץ אחד',
+    );
+    return '$_temp0, $size · $when';
+  }
+
+  @override
+  String settings_syncDevices_unnamedDevice(String shortId) {
+    return 'מכשיר $shortId';
+  }
+
+  @override
+  String get settings_syncMaintenance_keepAppOpen =>
+      'השאירו את האפליקציה פתוחה עד לסיום. סגירה עכשיו תשאיר את השירות מנוקה חלקית, והסנכרון הבא ייאלץ להתחיל מחדש.';
+
+  @override
+  String get settings_syncMaintenance_phase_clearingOldFiles =>
+      'מנקה קבצים ישנים';
+
+  @override
+  String get settings_syncMaintenance_phase_deleting => 'מוחק';
+
+  @override
+  String get settings_syncMaintenance_phase_publishingLibrary =>
+      'מפרסם את הספרייה';
+
+  @override
+  String get settings_syncMaintenance_phase_working => 'מעבד...';
+
+  @override
+  String settings_syncMaintenance_progress_filesOfTotal(int done, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$done מתוך $total קבצים',
+      many: '$done מתוך $total קבצים',
+      two: '$done מתוך שני קבצים',
+      one: '$done מתוך קובץ אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_removedFiles(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'הוסרו $count קבצים',
+      many: 'הוסרו $count קבצים',
+      two: 'הוסרו שני קבצים',
+      one: 'הוסר קובץ אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_removedFilesPartial(
+    int count,
+    String trouble,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'הוסרו $count קבצים, אך $trouble. נסו שוב כשיש חיבור לאינטרנט.',
+      many: 'הוסרו $count קבצים, אך $trouble. נסו שוב כשיש חיבור לאינטרנט.',
+      two: 'הוסרו שני קבצים, אך $trouble. נסו שוב כשיש חיבור לאינטרנט.',
+      one: 'הוסר קובץ אחד, אך $trouble. נסו שוב כשיש חיבור לאינטרנט.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_trouble_failed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count לא ניתנו למחיקה',
+      many: '$count לא ניתנו למחיקה',
+      two: 'שניים לא ניתנו למחיקה',
+      one: 'אחד לא ניתן היה למחיקה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_syncMaintenance_trouble_listIncomplete =>
+      'לא ניתן היה להציג חלק מהקבצים';
+
+  @override
+  String settings_syncMaintenance_wipedFiles(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'נמחקו $count קבצים',
+      many: 'נמחקו $count קבצים',
+      two: 'נמחקו שני קבצים',
+      one: 'נמחק קובץ אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_wipedFilesPartial(int count, String trouble) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'נמחקו $count קבצים, אך $trouble. נסו שוב כשיש חיבור לאינטרנט.',
+      many: 'נמחקו $count קבצים, אך $trouble. נסו שוב כשיש חיבור לאינטרנט.',
+      two: 'נמחקו שני קבצים, אך $trouble. נסו שוב כשיש חיבור לאינטרנט.',
+      one: 'נמחק קובץ אחד, אך $trouble. נסו שוב כשיש חיבור לאינטרנט.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_troubleshootSync_appBar_title => 'פתרון תקלות סנכרון';
+
+  @override
+  String get settings_troubleshootSync_devices_subtitle =>
+      'צפו בכל מכשיר שמחזיק כאן קבצים, בכמות השטח שכל אחד תופס, והסירו שרידים מספריות שאף מכשיר כבר אינו מסנכרן מהן. נתוני הצלילה שלכם אינם מושפעים.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirm => 'בנייה מחדש';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirmBody =>
+      'פעולה זו הופכת את הספרייה של מכשיר זה לספרייה הנוכחית בשירות ומפרסמת אותה מחדש, כך שמכשירים אחרים יסתנכרנו ממך. השתמשו בה כאשר החלפה ממכשיר אחר תקועה. נתוני הצלילה שלכם אינם מושפעים.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirmTitle =>
+      'לבנות מחדש את השירות ממכשיר זה?';
+
+  @override
+  String get settings_troubleshootSync_rebuild_doneSnack =>
+      'השירות נבנה מחדש ממכשיר זה';
+
+  @override
+  String get settings_troubleshootSync_rebuild_failedSnack =>
+      'הבנייה מחדש נכשלה';
+
+  @override
+  String get settings_troubleshootSync_rebuild_progressTitle =>
+      'בונה מחדש את השירות';
+
+  @override
+  String get settings_troubleshootSync_rebuild_subtitle =>
+      'השתמשו בכך אם הסנכרון תקוע בהמתנה לספרייה שמכשיר אחר החליף אך מעולם לא סיים להעלות (ייתכן שאותו מכשיר מנותק). פעולה זו מפרסמת את הספרייה של מכשיר זה כספרייה הנוכחית.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_title =>
+      'בנייה מחדש של השירות ממכשיר זה';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_confirmBody =>
+      'פעולה זו מוחקת מהשירות רק את קובצי הסנכרון של מכשיר זה. מכשירים אחרים ימשיכו להסתנכרן, ונתוני הצלילה שלכם אינם מושפעים.';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_confirmTitle =>
+      'להסיר את קובצי הענן של מכשיר זה?';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_progressTitle =>
+      'מסיר את קובצי הענן של מכשיר זה';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_subtitle =>
+      'פינוי השטח של מכשיר זה בשירות. מכשירים אחרים ימשיכו להסתנכרן. נתוני הצלילה שלכם אינם מושפעים.';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_title =>
+      'הסרת קובצי הענן של מכשיר זה';
+
+  @override
+  String get settings_troubleshootSync_repair_confirm => 'תיקון';
+
+  @override
+  String get settings_troubleshootSync_repair_confirmBody =>
+      'פעולה זו מנקה את כל מצב הסנכרון המקומי ומעניקה למכשיר זה זהות סנכרון חדשה, ואז מתחברת מחדש מאפס בסנכרון הבא. נתוני הצלילה שלכם בטוחים ואינם נמחקים.';
+
+  @override
+  String get settings_troubleshootSync_repair_confirmTitle =>
+      'לתקן את הסנכרון?';
+
+  @override
+  String get settings_troubleshootSync_repair_doneSnack => 'הסנכרון תוקן';
+
+  @override
+  String get settings_troubleshootSync_repair_subtitle =>
+      'תיקון סנכרון תקוע. מנקה את מצב הסנכרון של מכשיר זה ומעניק לו זהות סנכרון חדשה, ואז מתחבר מחדש בסנכרון הבא. נתוני הצלילה שלכם אינם מושפעים.';
+
+  @override
+  String get settings_troubleshootSync_repair_title => 'תיקון הסנכרון';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_confirm => 'מחיקת הכול';
+
+  @override
+  String settings_troubleshootSync_wipeAll_confirmBody(String word) {
+    return 'פעולה זו מוחקת את נתוני הסנכרון של כל מכשיר מהשירות הזה, כולל סמני הספרייה. כל מכשיר יצטרך להקים את הסנכרון מחדש מאפס. נתוני הצלילה שלכם אינם מושפעים.\n\nהקלידו בדיוק $word כדי לאשר.';
+  }
+
+  @override
+  String get settings_troubleshootSync_wipeAll_confirmTitle =>
+      'למחוק את כל נתוני הסנכרון?';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_progressTitle =>
+      'מוחק את נתוני הסנכרון';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_subtitle =>
+      'מחיקת נתוני הסנכרון של כל מכשיר מהשירות הזה, כולל סמני הספרייה. כל מכשיר יקים את הסנכרון מחדש מאפס. נתוני הצלילה שלכם אינם מושפעים.';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_title =>
+      'מחיקת כל נתוני הסנכרון בשירות זה';
+
+  @override
+  String get tableMode_tooltip_toggleDetailPane => 'הצגת חלונית הפרטים';
+
+  @override
+  String get tableMode_tooltip_toggleProfilePanel => 'הצגת חלונית הפרופיל';
+
+  @override
+  String get maps_regionDownload_title => 'הורדת אזור';
+
+  @override
+  String get maps_regionDownload_nameRequired => 'יש להזין שם לאזור זה';
+
+  @override
+  String get maps_regionDownload_nameLabel => 'שם האזור';
+
+  @override
+  String get maps_regionDownload_nameHint => 'לדוגמה, קוזומל, מקסיקו';
+
+  @override
+  String get maps_regionDownload_zoomLevels => 'רמות זום';
+
+  @override
+  String get maps_regionDownload_zoomHint =>
+      'זום גבוה יותר = יותר פרטים, הורדה גדולה יותר';
+
+  @override
+  String maps_regionDownload_minZoom(int zoom) {
+    return 'מינימום: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_minZoomSemantics(int zoom) {
+    return 'זום מינימלי: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_maxZoom(int zoom) {
+    return 'מקסימום: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_maxZoomSemantics(int zoom) {
+    return 'זום מקסימלי: $zoom';
+  }
+
+  @override
+  String get maps_regionDownload_estimatingSemantics => 'מעריך את גודל ההורדה';
+
+  @override
+  String maps_regionDownload_estimateSemantics(int count, Object size) {
+    return 'הורדה משוערת: $count אריחים, $size';
+  }
+
+  @override
+  String get maps_regionDownload_estimateUnavailableSemantics =>
+      'לא ניתן להעריך את גודל ההורדה';
+
+  @override
+  String get maps_regionDownload_estimating => 'מעריך...';
+
+  @override
+  String maps_regionDownload_tileCount(int count) {
+    return '~$count אריחים';
+  }
+
+  @override
+  String get maps_regionDownload_estimateUnavailable => 'לא ניתן להעריך';
+
+  @override
+  String get maps_regionDownload_largeWarningSemantics =>
+      'אזהרה: הורדה גדולה. כדאי להקטין את רמות הזום או לבחור אזור קטן יותר.';
+
+  @override
+  String get maps_regionDownload_largeWarning =>
+      'הורדה גדולה. כדאי להקטין את רמות הזום או לבחור אזור קטן יותר.';
+
+  @override
+  String get maps_regionDownload_downloadButton => 'הורדה';
+
+  @override
+  String get diveLog_map_title => 'פעילות צלילה';
+
+  @override
+  String diveLog_map_infoCard_minutes(int minutes) {
+    return '$minutes דקות';
+  }
+
+  @override
+  String trips_gallery_diveSection_subtitle(
+    Object date,
+    int count,
+    Object photoLabel,
+  ) {
+    return '$date ($count $photoLabel)';
+  }
+
+  @override
+  String get trips_gallery_thumbnail_photo =>
+      'תמונה ממוזערת של תמונה. הקש לצפייה במסך מלא';
+
+  @override
+  String get trips_gallery_thumbnail_video =>
+      'תמונה ממוזערת של סרטון. הקש לצפייה במסך מלא';
+
+  @override
+  String get trips_gallery_thumbnail_photoMissing =>
+      'תמונה ממוזערת של תמונה, חסרה במכשיר. הקש לצפייה במסך מלא';
+
+  @override
+  String get trips_gallery_thumbnail_videoMissing =>
+      'תמונה ממוזערת של סרטון, חסר במכשיר. הקש לצפייה במסך מלא';
+
+  @override
+  String get trips_photos_thumbnail_photo =>
+      'תמונה ממוזערת של תמונה. הקש לפתיחת הגלריה';
+
+  @override
+  String get trips_photos_thumbnail_video =>
+      'תמונה ממוזערת של סרטון. הקש לפתיחת הגלריה';
+
+  @override
+  String trips_picker_suggestedSemantics(Object name) {
+    return 'טיול מוצע: $name. הקש לשימוש';
+  }
+
+  @override
+  String trips_picker_tileSemantics(
+    Object name,
+    Object startDate,
+    Object endDate,
+  ) {
+    return '$name, מ-$startDate עד $endDate';
+  }
+
+  @override
+  String trips_picker_tileSemanticsSelected(
+    Object name,
+    Object startDate,
+    Object endDate,
+  ) {
+    return '$name, מ-$startDate עד $endDate, נבחר';
+  }
+
+  @override
+  String get divePlanner_quickPlan_subtitle => 'יצירת פרופיל צלילה מלבני פשוט';
+
+  @override
+  String get divePlanner_quickPlan_depthLabel => 'עומק:';
+
+  @override
+  String divePlanner_quickPlan_depthSemantics(Object depth) {
+    return 'עומק: $depth';
+  }
+
+  @override
+  String get divePlanner_quickPlan_timeLabel => 'זמן:';
+
+  @override
+  String divePlanner_quickPlan_bottomTimeSemantics(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'זמן תחתית: $minutes דקות',
+      many: 'זמן תחתית: $minutes דקות',
+      two: 'זמן תחתית: שתי דקות',
+      one: 'זמן תחתית: דקה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String divePlanner_quickPlan_minutes(int minutes) {
+    return '$minutes דקות';
+  }
+
+  @override
+  String divePlanner_quickPlan_previewSemantics(Object depth, int minutes) {
+    return 'תצוגה מקדימה של התכנית: ירידה ל-$depth, זמן תחתית $minutes דקות, עלייה עם עצירת בטיחות';
+  }
+
+  @override
+  String get divePlanner_quickPlan_previewTitle => 'תצוגה מקדימה של התכנית:';
+
+  @override
+  String divePlanner_quickPlan_previewDescent(Object depth) {
+    return 'ירידה ל-$depth';
+  }
+
+  @override
+  String divePlanner_quickPlan_previewBottomTime(int minutes) {
+    return 'זמן תחתית: $minutes דקות';
+  }
+
+  @override
+  String get divePlanner_quickPlan_previewAscent => 'עלייה עם עצירת בטיחות';
+
+  @override
+  String get divePlanner_quickPlan_create => 'יצירה';
+
+  @override
+  String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
+    return 'קצב SAC: $value $volumeSymbol לדקה';
+  }
+
+  @override
+  String divePlanner_semantics_reservePressure(Object pressureSymbol) {
+    return 'לחץ רזרבה ביחידות $pressureSymbol';
+  }
+
+  @override
+  String divePlanner_semantics_altitudeGroup(Object group) {
+    return 'קבוצת גובה: $group';
+  }
+
+  @override
+  String diveSites_import_detail_maxDepth(Object depth) {
+    return 'מקסימום $depth';
+  }
+
+  @override
+  String get autoUpdate_banner_download => 'הורדה';
+
+  @override
+  String get settings_cloudSync_provider_icloud_subtitle =>
+      'סנכרון באמצעות Apple iCloud';
+
+  @override
+  String get settings_debugLog_search_hint => 'חיפוש ביומנים...';
+
+  @override
+  String get settings_debugLog_appBar_title => 'יומני ניפוי באגים';
+
+  @override
+  String get settings_debugLog_disableDebugMode => 'כיבוי מצב ניפוי באגים';
+
+  @override
+  String get settings_debugLog_clearLogs => 'ניקוי יומנים';
+
+  @override
+  String get settings_debugLog_empty =>
+      'אין רשומות יומן התואמות למסננים הנוכחיים';
+
+  @override
+  String settings_debugLog_loadError(Object error) {
+    return 'שגיאה בטעינת היומנים: $error';
+  }
+
+  @override
+  String get settings_debugLog_copiedSnack => 'היומנים המסוננים הועתקו ללוח';
+
+  @override
+  String settings_debugLog_savedSnack(String path) {
+    return 'היומנים נשמרו אל $path';
+  }
+
+  @override
+  String get common_action_copy => 'העתקה';
+
+  @override
+  String get settings_appearance_customGradient_title =>
+      'מעבר צבעים מותאם אישית';
+
+  @override
+  String get settings_appearance_customGradient_start => 'התחלה';
+
+  @override
+  String get settings_appearance_customGradient_end => 'סיום';
+
+  @override
+  String get settings_appearance_customGradient_hue => 'גוון';
+
+  @override
+  String get settings_appearance_customGradient_saturation => 'רוויה';
+
+  @override
+  String get settings_appearance_customGradient_brightness => 'בהירות';
+
+  @override
+  String get settings_appearance_customGradient_preview => 'תצוגה מקדימה';
+
+  @override
+  String get common_action_apply => 'החל';
+
+  @override
+  String settings_cloudSync_message_loadStateFailed(Object error) {
+    return 'טעינת מצב הסנכרון נכשלה: $error';
+  }
+
+  @override
+  String get settings_cloudSync_message_noProviderConfigured =>
+      'לא הוגדר ספק ענן';
+
+  @override
+  String get settings_cloudSync_message_adopting =>
+      'מאמץ את הספרייה ששוחזרה...';
+
+  @override
+  String get settings_cloudSync_message_adoptFailed =>
+      'אימוץ הספרייה ששוחזרה נכשל';
+
+  @override
+  String get settings_cloudSync_message_firstSyncNeedsConfirm =>
+      'הסנכרון הראשון דורש אישור. הקש על סנכרן עכשיו לבדיקה.';
+
+  @override
+  String get settings_cloudSync_message_startingSync => 'מתחיל סנכרון...';
+
+  @override
+  String get settings_cloudSync_message_replacePaused =>
+      'הסנכרון מושהה: הספרייה הוחלפה מגיבוי. הקש על סנכרן עכשיו לבדיקה.';
+
+  @override
+  String get settings_cloudSync_message_encryptedPaused =>
+      'הסנכרון מושהה: ספרייה זו מוצפנת. הזן את משפט הסיסמה כדי להמשיך.';
+
+  @override
+  String get settings_cloudSync_message_completedWithConflicts =>
+      'הסנכרון הושלם עם התנגשויות';
+
+  @override
+  String get settings_cloudSync_message_completedSuccessfully =>
+      'הסנכרון הושלם בהצלחה';
+
+  @override
+  String get settings_cloudSync_message_syncFailed => 'הסנכרון נכשל';
+
+  @override
+  String get settings_cloudSync_message_phaseDefault => 'סנכרון';
+
+  @override
+  String settings_cloudSync_message_syncErrorDuring(
+    String phase,
+    Object error,
+  ) {
+    return 'שגיאת סנכרון במהלך $phase: $error';
+  }
+
+  @override
+  String get settings_section_debug_title => 'ניפוי באגים';
+
+  @override
+  String get settings_section_debug_subtitle => 'יומנים ואבחון';
+
+  @override
+  String get settings_debugLog_minSeverityLabel => 'חומרה מינימלית:';
+
+  @override
+  String get settings_debugLog_shareSubject =>
+      'יומני ניפוי באגים של Submersion';
+
+  @override
+  String get settings_debugLog_saveDialogTitle => 'שמירת יומני ניפוי באגים';
+
+  @override
+  String get universalImport_preset_saveTitle => 'שמירה כתבנית';
+
+  @override
+  String get universalImport_preset_nameLabel => 'שם התבנית';
+
+  @override
+  String get universalImport_preset_nameHint =>
+      'לדוגמה, CSV של יומן הצלילה שלי';
+
+  @override
+  String get universalImport_preset_nameRequired => 'שם הוא שדה חובה';
+
+  @override
+  String get universalImport_preset_sourceAppLabel => 'אפליקציית מקור';
+
+  @override
+  String get universalImport_preset_sourceAppNone => 'ללא';
+
+  @override
+  String get universalImport_preset_entityTypesLabel => 'סוגי ישויות';
+
+  @override
+  String get universalImport_preset_matchThresholdLabel => 'סף התאמה';
+
+  @override
+  String get universalImport_preset_matchThresholdHelp =>
+      'עד כמה כותרות ה-CSV חייבות להתאים לזיהוי אוטומטי';
+
+  @override
+  String universalImport_preset_signatureHeaders(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count כותרות חתימה מהקובץ הנוכחי',
+      many: '$count כותרות חתימה מהקובץ הנוכחי',
+      two: 'שתי כותרות חתימה מהקובץ הנוכחי',
+      one: 'כותרת חתימה אחת מהקובץ הנוכחי',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_preset_selectTitle => 'בחירת תבנית';
+
+  @override
+  String universalImport_preset_loadFailed(String error) {
+    return 'טעינת התבניות נכשלה: $error';
+  }
+
+  @override
+  String get universalImport_preset_sectionSaved => 'תבניות שמורות';
+
+  @override
+  String get universalImport_preset_sectionBuiltIn => 'תבניות מובנות';
+
+  @override
+  String get universalImport_preset_deleteTitle => 'מחיקת תבנית';
+
+  @override
+  String universalImport_preset_deleteConfirm(String name) {
+    return 'למחוק את \"$name\"? לא ניתן לבטל פעולה זו.';
+  }
+
+  @override
+  String universalImport_preset_headersMatched(
+    int matched,
+    int total,
+    int percent,
+  ) {
+    return '$matched/$total כותרות תואמות ($percent%)';
+  }
+
+  @override
+  String get universalImport_preset_noSignatureHeaders => 'אין כותרות חתימה';
+
+  @override
+  String get universalImport_preset_deleteTooltip => 'מחק תבנית';
+
+  @override
+  String get universalImport_preset_presetsButton => 'תבניות';
+
+  @override
+  String universalImport_preset_savedSnackbar(String name) {
+    return 'התבנית \"$name\" נשמרה';
+  }
+
+  @override
+  String get universalImport_step_done => 'סיום';
+
+  @override
+  String get universalImport_cancel_inProgressTitle => 'מבטל';
+
+  @override
+  String get universalImport_cancel_inProgressBody =>
+      'מסיים את הצלילה הנוכחית לפני העצירה. צלילות שכבר יובאו יישמרו.';
+
+  @override
+  String get universalImport_cancel_confirmTitle => 'לבטל את הייבוא?';
+
+  @override
+  String get universalImport_cancel_confirmBody =>
+      'עצירה לאחר סיום הצלילה הנוכחית. צלילות שכבר יובאו יישמרו.';
+
+  @override
+  String get universalImport_cancel_keepImporting => 'המשך הייבוא';
+
+  @override
+  String get universalImport_cancel_confirmAction => 'ביטול הייבוא';
+
+  @override
+  String get universalImport_cancel_discardSelections =>
+      'להשליך את הבחירות ולבטל?';
+
+  @override
+  String get universalImport_action_importSelected => 'ייבוא הנבחרים';
+
+  @override
+  String get universalImport_action_next => 'הבא';
+
+  @override
+  String get common_action_yes => 'כן';
+
+  @override
+  String get common_action_no => 'לא';
+
+  @override
+  String universalImport_counts_new(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count חדשים',
+      many: '$count חדשים',
+      two: '$count חדשים',
+      one: '$count חדש',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_merging(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count במיזוג',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_replacing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count בהחלפה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_skipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count דולגו',
+      many: '$count דולגו',
+      two: '$count דולגו',
+      one: '$count דולג',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_counts_nothingSelected => 'לא נבחר דבר';
+
+  @override
+  String get universalImport_section_potentialDuplicates =>
+      'כפילויות פוטנציאליות';
+
+  @override
+  String get universalImport_section_possibleDuplicates => 'כפילויות אפשריות';
+
+  @override
+  String universalImport_count_duplicates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count כפילויות',
+      many: '$count כפילויות',
+      two: 'שתי כפילויות',
+      one: 'כפילות אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_entityAction_importBadge => 'ייבוא';
+
+  @override
+  String get universalImport_entityAction_skipBadge => 'דילוג';
+
+  @override
+  String get universalImport_compare_existing => 'קיים';
+
+  @override
+  String get universalImport_compare_incoming => 'נכנס';
+
+  @override
+  String get universalImport_label_skipped => 'דולג';
+
+  @override
+  String get universalImport_action_viewDives => 'הצג צלילות';
+
+  @override
+  String get diveImport_healthkit_accessGranted => 'הגישה ל-HealthKit אושרה';
+
+  @override
+  String get diveImport_healthkit_accessGrantedBody => 'אפשר להמשיך לשלב הבא.';
+
+  @override
+  String get diveImport_healthkit_requesting => 'מבקש...';
+
+  @override
+  String get diveImport_healthkit_grantAccessButton => 'אשר גישה ל-HealthKit';
+
+  @override
+  String get diveImport_healthkit_selectDateRange => 'בחירת טווח תאריכים';
+
+  @override
+  String get diveImport_healthkit_selectDateRangeBody =>
+      'בחר את טווח התאריכים לחיפוש צלילות ב-Apple Health.';
+
+  @override
+  String get diveImport_healthkit_fetchingDives =>
+      'מאחזר צלילות מ-Apple Health...';
+
+  @override
+  String get diveImport_healthkit_fetchFailed => 'האחזור נכשל';
+
+  @override
+  String diveImport_healthkit_fetchFailedBody(String error) {
+    return 'אחזור הצלילות נכשל: $error';
+  }
+
+  @override
+  String diveImport_healthkit_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'נמצאו $count צלילות',
+      many: 'נמצאו $count צלילות',
+      two: 'נמצאו שתי צלילות',
+      one: 'נמצאה צלילה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveImport_healthkit_proceedingToReview => 'ממשיך לסקירה...';
+
+  @override
+  String get importWizard_dc_knownComputer => 'מחשב צלילה מוכר';
+
+  @override
+  String importWizard_dc_knownComputerBody(String name) {
+    return 'נשמר בשם \"$name\". רק צלילות חדשות יורדו.';
+  }
+
+  @override
+  String get importWizard_dc_noNewDives => 'אין צלילות חדשות להורדה';
+
+  @override
+  String get importWizard_dc_noNewDivesBody =>
+      'כל הצלילות ממחשב הצלילה הזה כבר יובאו.';
+
+  @override
+  String get universalImport_compare_noDiveData =>
+      'נתוני הצלילה אינם זמינים להשוואה.';
+
+  @override
+  String get universalImport_entityAction_consolidateBadge => 'איחוד';
+
+  @override
+  String get diveCenters_import_quickSearch_egypt => 'מצרים';
+
+  @override
+  String get diveCenters_import_quickSearch_mexico => 'מקסיקו';
+
+  @override
+  String get accessibility_shortcut_switchDiver => 'החלף צולל';
+
+  @override
+  String get lock_recoveryCode_title => 'שימוש בקוד שחזור';
+
+  @override
+  String get lock_recoveryCode_body =>
+      'הזינו את קוד השחזור בן 8 המילים ששמרתם בעת הגדרת סיסמת האפליקציה.';
+
+  @override
+  String get lock_recoveryCode_error => 'קוד השחזור שגוי.';
+
+  @override
+  String get lock_forcedReset_title => 'הגדרת סיסמה חדשה';
+
+  @override
+  String get lock_forcedReset_body =>
+      'ביטלתם את הנעילה באמצעות קוד השחזור, ולכן הסיסמה הישנה שלכם אינה אמינה עוד. בחרו סיסמה חדשה כעת.';
+
+  @override
+  String get lock_forcedReset_submit => 'הגדרת סיסמה';
+
+  @override
+  String get lock_forcedReset_error =>
+      'לא ניתן היה להגדיר את הסיסמה החדשה. נסו שוב.';
+
+  @override
+  String get lock_sidecarRepair_title => 'תיקון קובץ מפתח האבטחה';
+
+  @override
+  String get lock_sidecarRepair_body =>
+      'קובץ מפתח האבטחה שלכם היה חסר, ומחזיק המפתחות של מכשיר זה עדיין מחזיק את המפתח. אשרו את הסיסמה שלכם כדי לכתוב קובץ מפתח חדש. שימו לב: הסיסמה שתזינו כאן הופכת לסיסמת האפליקציה מכאן ואילך, ותקבלו קוד שחזור חדש.';
+
+  @override
+  String get lock_sidecarRepair_submit => 'תיקון';
+
+  @override
+  String get lock_sidecarRepair_error => 'התיקון נכשל. נסו שוב.';
+
+  @override
+  String get lock_newRecoveryCode_title => 'קוד השחזור החדש שלכם';
+
+  @override
+  String get lock_startFresh_title => 'פתיחת מסד נתונים אחר';
+
+  @override
+  String lock_startFresh_body(Object token) {
+    return 'מסד הנתונים הנוכחי שלכם נשאר בדיסק, בשם חדש עם הסיומת .locked; שום דבר אינו נמחק. תוכלו לשחזר אותו מאוחר יותר באמצעות הסיסמה שלכם או בפנייה לתמיכה. סנכרון הענן יכובה כדי שמסד הנתונים החדש לא יתערבב עם הישן.\n\nהאפליקציה תיפתח עם מסד נתונים חדש וריק. תוכלו לשחזר מגיבוי באשף ההגדרה.\n\nהקלידו $token לאישור.';
+  }
+
+  @override
+  String get lock_startFresh_confirm => 'לשים בצד ולהתחיל מחדש';
+
+  @override
+  String get lock_biometric_reason => 'ביטול נעילת יומן הצלילה שלכם';
+
+  @override
+  String startup_migrating_progress(Object currentStep, Object totalSteps) {
+    return 'משדרג את מסד הנתונים... שלב $currentStep מתוך $totalSteps';
+  }
+
+  @override
+  String get startup_error_title => 'שדרוג מסד הנתונים נכשל';
+
+  @override
+  String get startup_error_body =>
+      'נסו להפעיל מחדש את האפליקציה. אם הבעיה נמשכת, פנו לתמיכה: הנתונים שלכם עדיין בדיסק ואין צורך בהתקנה מחדש.';
+
+  @override
+  String get startup_recovering_title => 'משחזר את מסד הנתונים...';
+
+  @override
+  String get startup_recovering_body =>
+      'מבטל את הפעולה שנקטעה. זה נמשך בדרך כלל כמה שניות.';
+
+  @override
+  String get startup_recoveryFailed_title => 'השחזור לא הושלם';
+
+  @override
+  String get startup_recoveryFailed_body =>
+      'לא ניתן היה לבטל את השינויים במסד הנתונים באופן אוטומטי. הנתונים שלכם עדיין בדיסק; פנו לתמיכה לפני התקנה מחדש כדי שנוכל לעזור לכם לשחזר אותם.';
+
+  @override
+  String get startup_recoveryRequired_title => 'מסד הנתונים זקוק לשחזור';
+
+  @override
+  String get startup_recoveryRequired_body =>
+      'הפעלה קודמת נקטעה בזמן כתיבה למסד הנתונים. הנתונים שלכם עדיין בדיסק; עלינו רק להשלים את ביטול השינוי שבוטל לפני שהאפליקציה תוכל להיפתח.';
+
+  @override
+  String startup_recovery_sqliteCode(Object code) {
+    return 'קוד SQLite $code';
+  }
+
+  @override
+  String get startup_recovery_action => 'שחזור מסד הנתונים';
+
+  @override
+  String get startup_recovery_closeWithoutRecovering => 'סגירה ללא שחזור';
+
+  @override
+  String get common_action_tryAgain => 'נסו שוב';
+
+  @override
+  String get lock_screen_title => 'האפליקציה Submersion נעולה';
+
+  @override
+  String get lock_screen_forgotPassword => 'שכחתם את הסיסמה?';
+
+  @override
+  String get lock_incorrectPassword => 'סיסמה שגויה. נסו שוב.';
+
+  @override
+  String get startup_backup_semanticsLabel => 'מגבה';
+
+  @override
+  String get startup_backup_title => 'מגבה את הנתונים שלכם';
+
+  @override
+  String get startup_backup_body =>
+      'אנחנו שומרים עותק של יומן הצלילות שלכם לפני עדכון מסד הנתונים.';
+
+  @override
+  String get startup_backupFailed_title => 'לא ניתן היה לגבות את הנתונים שלכם';
+
+  @override
+  String get startup_backupFailed_body =>
+      'יומן הצלילות שלכם לא השתנה; לא עדכנו אותו. פנו מקום (או תקנו את התקלה) ונסו שוב.';
+
+  @override
+  String get startup_backupFailed_quit => 'יציאה';
+
+  @override
+  String get startup_backupFailed_technicalDetails => 'פרטים טכניים';
+
+  @override
+  String get common_action_retry => 'נסה שוב';
+
+  @override
+  String get startup_versionMismatch_title => 'נדרש עדכון';
+
+  @override
+  String startup_versionMismatch_body(
+    Object databaseVersion,
+    Object appVersion,
+  ) {
+    return 'נתוני הצלילה שלכם נשמרו בגרסה חדשה יותר של Submersion (סכמה v$databaseVersion). גרסה זו תומכת רק עד סכמה v$appVersion.';
+  }
+
+  @override
+  String get startup_versionMismatch_instructions =>
+      'עדכנו את Submersion לגרסה האחרונה. הנתונים שלכם בטוחים ולא שונו. אם נוצר גיבוי לפני השדרוג, הוא נמצא בתיקיית Backups וניתן לשחזר אותו לאחר העדכון.';
+
+  @override
+  String get startup_versionMismatch_download => 'הורדת הגרסה האחרונה';
+
+  @override
+  String get startup_versionMismatch_manualLink =>
+      'אם פעולה זו אינה פותחת דפדפן, בקרו בכתובת:';
+
+  @override
+  String get universalImport_compare_downloaded => 'הורד';
+
+  @override
+  String get universalImport_compare_errorLoading =>
+      'שגיאה בטעינת נתוני הצלילה';
+
+  @override
+  String get universalImport_compare_diveNotFound => 'הצלילה הקיימת לא נמצאה';
+
+  @override
+  String universalImport_compare_sameFields(Object fields) {
+    return 'זהה: $fields';
+  }
+
+  @override
+  String get universalImport_compare_differences => 'הבדלים';
+
+  @override
+  String get universalImport_compare_notRecorded => 'לא הוקלט';
+
+  @override
+  String universalImport_compare_serial(Object serial) {
+    return 'S/N: $serial';
+  }
+
+  @override
+  String get universalImport_compare_skipSubtitle => 'השלכת הורדה זו';
+
+  @override
+  String get universalImport_compare_importAsNewSubtitle =>
+      'שמירה כצלילה נפרדת';
+
+  @override
+  String get universalImport_compare_consolidateSubtitle =>
+      'הוספה כקריאה של מחשב שני';
+
+  @override
+  String get diveLog_tooltip_ndlOverMax => '>60 min';
+
+  @override
+  String diveLog_tooltip_interpolated(String value) {
+    return '$value (אינטרפולציה)';
+  }
+
+  @override
+  String get enum_profileMetric_ascentRate_short => 'קצב';
+
+  @override
+  String get enum_profileMetric_cns_short => 'CNS';
+
+  @override
+  String get enum_profileMetric_otu_short => 'OTU';
+
+  @override
+  String get diveLog_profileEditor_rangeOperations => 'פעולות על טווח';
+
+  @override
+  String get diveLog_profileEditor_selectRangeHint =>
+      'בחרו טווח בגרף כדי לאפשר פעולות';
+
+  @override
+  String get diveLog_profileEditor_depthPlusOneMeter => 'עומק +1m';
+
+  @override
+  String get diveLog_profileEditor_depthMinusOneMeter => 'עומק -1m';
+
+  @override
+  String get diveLog_profileEditor_timePlusFiveSeconds => 'זמן +5s';
+
+  @override
+  String get diveLog_profileEditor_timeMinusFiveSeconds => 'זמן -5s';
+
+  @override
+  String get diveLog_profileEditor_smoothing => 'החלקה';
+
+  @override
+  String get diveLog_profileEditor_smoothLight => 'קלה';
+
+  @override
+  String get diveLog_profileEditor_smoothMedium => 'בינונית';
+
+  @override
+  String get diveLog_profileEditor_smoothHeavy => 'חזקה';
+
+  @override
+  String get diveLog_profileEditor_applyToAll => 'החלה על הכל';
+
+  @override
+  String get diveLog_profileEditor_applyToSelection => 'החלה על הבחירה';
+
+  @override
+  String get diveLog_profileEditor_outlierDetection => 'זיהוי חריגות';
+
+  @override
+  String get diveLog_profileEditor_detect => 'זיהוי';
+
+  @override
+  String get diveLog_profileEditor_removeAll => 'הסרת הכל';
+
+  @override
+  String diveLog_profileEditor_outliersDetected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'זוהו $count חריגות אפשריות',
+      many: 'זוהו $count חריגות אפשריות',
+      two: 'זוהו שתי חריגות אפשריות',
+      one: 'זוהתה חריגה אפשרית אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_profileEditor_manualDrawing => 'ציור ידני';
+
+  @override
+  String get diveLog_profileEditor_drawHint =>
+      'הקישו על הגרף כדי למקם נקודות ציון';
+
+  @override
+  String get diveLog_profileEditor_clearWaypoints => 'ניקוי';
+
+  @override
+  String get diveLog_profileEditor_generateProfile => 'יצירת פרופיל';
+
+  @override
+  String get diveLog_profileEditor_trimMode => 'מצב חיתוך';
+
+  @override
+  String get diveLog_profileEditor_trimHint => 'חיתוך קצות הפרופיל';
+
+  @override
+  String get diveLog_profileEditor_trimEnd => 'חיתוך הסוף';
+
+  @override
+  String get diveLog_profileEditor_mode_smooth => 'החלקה';
+
+  @override
+  String get diveLog_profileEditor_title => 'עריכת פרופיל';
+
+  @override
+  String get diveLog_profileEditor_discardBody =>
+      'יש לכם שינויים שלא נשמרו בפרופיל הצלילה הזה. בטוחים שברצונכם לבטל אותם?';
+
+  @override
+  String get diveLog_profileEditor_saveTitle => 'לשמור את הפרופיל?';
+
+  @override
+  String get diveLog_profileEditor_saveBody =>
+      'פעולה זו תשמור את הפרופיל הערוך כפרופיל הראשי של הצלילה הזו. הפרופיל המקורי יישמר וניתן יהיה לשחזר אותו מאוחר יותר.';
+
+  @override
+  String diveLog_profileEditor_saveFailed(String error) {
+    return 'שמירת הפרופיל נכשלה: $error';
+  }
+
+  @override
+  String diveLog_profileEditor_errorLoadingDive(String error) {
+    return 'שגיאה בטעינת הצלילה: $error';
+  }
+
+  @override
+  String get diveLog_profileEditor_noProfileData => 'אין נתוני פרופיל זמינים';
+
+  @override
+  String get diveLog_profileEditor_undo => 'ביטול פעולה';
+
+  @override
+  String get diveLog_profileEditor_mode_select => 'בחירה';
+
+  @override
+  String get diveLog_profileEditor_mode_outlier => 'חריגה';
+
+  @override
+  String get diveLog_profileEditor_mode_draw => 'ציור';
+
+  @override
+  String get diveLog_profileEditor_mode_trim => 'חיתוך';
+
+  @override
+  String diveLog_sources_sectionTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'מקורות נתונים',
+      many: 'מקורות נתונים',
+      two: 'מקורות נתונים',
+      one: 'מקור נתונים',
+      zero: 'מקור נתונים',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_badge_manual => 'ידני';
+
+  @override
+  String get diveLog_sources_badge_viewing => 'בתצוגה';
+
+  @override
+  String get diveLog_sources_badge_secondary => 'משני';
+
+  @override
+  String diveLog_sources_created(String date) {
+    return 'נוצר ב-$date';
+  }
+
+  @override
+  String get diveLog_sources_detail_serial => 'מספר סידורי';
+
+  @override
+  String get diveLog_sources_detail_format => 'פורמט';
+
+  @override
+  String get diveLog_sources_detail_imported => 'יובא';
+
+  @override
+  String diveLog_detail_semantics_viewDiveComputer(String name) {
+    return 'הצגת מחשב הצלילה $name';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewTrip(String name) {
+    return 'הצגת הטיול $name';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewDiveCenter(String name) {
+    return 'הצגת מרכז הצלילה $name';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewSpecies(String name) {
+    return 'הצגת המין $name';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewCourse(String name) {
+    return 'הצגת הקורס $name';
+  }
+
+  @override
+  String diveLog_detail_serialNumber(String serial) {
+    return 'S/N $serial';
+  }
+
+  @override
+  String diveLog_detail_errorLoadingSignature(String error) {
+    return 'שגיאה בטעינת החתימה: $error';
+  }
+
+  @override
+  String get diveLog_profilePanel_selectDive =>
+      'בחרו צלילה כדי לראות את הפרופיל שלה';
+
+  @override
+  String get diveLog_profilePanel_noProfileData => 'אין נתוני פרופיל לצלילה זו';
+
+  @override
+  String get settings_export_progress_divesCsv => 'מייצא צלילות ל-CSV...';
+
+  @override
+  String get settings_export_progress_sitesCsv => 'מייצא אתרים ל-CSV...';
+
+  @override
+  String get settings_export_progress_equipmentCsv => 'מייצא ציוד ל-CSV...';
+
+  @override
+  String get settings_export_progress_pdf => 'יוצר יומן צלילות בפורמט PDF...';
+
+  @override
+  String get settings_export_progress_loadingSignatures => 'טוען חתימות...';
+
+  @override
+  String get settings_export_progress_loadingCertifications => 'טוען הסמכות...';
+
+  @override
+  String get settings_export_progress_loadingFonts => 'טוען גופנים...';
+
+  @override
+  String settings_export_progress_templatePdf(String template) {
+    return 'יוצר PDF בתבנית $template...';
+  }
+
+  @override
+  String get settings_export_progress_uddf => 'יוצר קובץ UDDF...';
+
+  @override
+  String get settings_export_progress_collectingData => 'אוסף את כל הנתונים...';
+
+  @override
+  String get settings_export_progress_excel => 'יוצר קובץ Excel...';
+
+  @override
+  String get settings_export_progress_buildingExcel =>
+      'בונה חוברת עבודה של Excel...';
+
+  @override
+  String get settings_export_progress_kml => 'יוצר קובץ KML...';
+
+  @override
+  String get settings_export_progress_buildingKml => 'בונה קובץ KML...';
+
+  @override
+  String get settings_export_progress_preparingExcel => 'מכין קובץ Excel...';
+
+  @override
+  String get settings_export_progress_preparingKml => 'מכין קובץ KML...';
+
+  @override
+  String get settings_export_progress_chooseLocation => 'בחר מיקום לשמירה...';
+
+  @override
+  String get settings_export_progress_preparingDivesCsv =>
+      'מכין CSV של צלילות...';
+
+  @override
+  String get settings_export_progress_preparingSitesCsv =>
+      'מכין CSV של אתרים...';
+
+  @override
+  String get settings_export_progress_preparingEquipmentCsv =>
+      'מכין CSV של ציוד...';
+
+  @override
+  String get settings_export_progress_preparingUddf => 'מכין קובץ UDDF...';
+
+  @override
+  String get settings_export_progress_preparingPdf => 'מכין PDF...';
+
+  @override
+  String get settings_export_progress_selectingBackup => 'בוחר קובץ גיבוי...';
+
+  @override
+  String get settings_export_progress_restoringBackup => 'משחזר מגיבוי...';
+
+  @override
+  String get settings_export_empty_dives => 'אין צלילות לייצוא';
+
+  @override
+  String get settings_export_empty_sites => 'אין אתרים לייצוא';
+
+  @override
+  String get settings_export_empty_equipment => 'אין ציוד לייצוא';
+
+  @override
+  String get settings_export_empty_data => 'אין נתונים לייצוא';
+
+  @override
+  String get settings_export_empty_diveSites => 'אין אתרי צלילה לייצוא';
+
+  @override
+  String settings_export_saveFailed(String error) {
+    return 'השמירה נכשלה: $error';
+  }
+
+  @override
+  String settings_export_backupFailed(String error) {
+    return 'הגיבוי נכשל: $error';
+  }
+
+  @override
+  String settings_export_restoreFailed(String error) {
+    return 'השחזור נכשל: $error';
+  }
+
+  @override
+  String get settings_export_fileUnreadable => 'לא ניתן לגשת לקובץ';
+
+  @override
+  String get settings_export_notADbFile => 'יש לבחור קובץ גיבוי בסיומת .db';
+
+  @override
+  String get settings_export_success_dives => 'הצלילות יוצאו בהצלחה';
+
+  @override
+  String get settings_export_success_sites => 'האתרים יוצאו בהצלחה';
+
+  @override
+  String get settings_export_success_equipment => 'הציוד יוצא בהצלחה';
+
+  @override
+  String get settings_export_success_pdf =>
+      'יומן הצלילות בפורמט PDF נוצר בהצלחה';
+
+  @override
+  String get settings_export_success_uddf => 'קובץ UDDF נוצר בהצלחה';
+
+  @override
+  String get settings_export_success_excel => 'קובץ Excel יוצא בהצלחה';
+
+  @override
+  String settings_export_success_kml(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'קובץ KML יוצא בהצלחה ($count אתרים ללא קואורדינטות דולגו)',
+      many: 'קובץ KML יוצא בהצלחה ($count אתרים ללא קואורדינטות דולגו)',
+      two: 'קובץ KML יוצא בהצלחה (שני אתרים ללא קואורדינטות דולגו)',
+      one: 'קובץ KML יוצא בהצלחה (אתר אחד ללא קואורדינטות דולג)',
+      zero: 'קובץ KML יוצא בהצלחה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_export_saved_excel => 'קובץ Excel נשמר בהצלחה';
+
+  @override
+  String settings_export_saved_kml(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'קובץ KML נשמר בהצלחה ($count אתרים ללא קואורדינטות דולגו)',
+      many: 'קובץ KML נשמר בהצלחה ($count אתרים ללא קואורדינטות דולגו)',
+      two: 'קובץ KML נשמר בהצלחה (שני אתרים ללא קואורדינטות דולגו)',
+      one: 'קובץ KML נשמר בהצלחה (אתר אחד ללא קואורדינטות דולג)',
+      zero: 'קובץ KML נשמר בהצלחה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_export_saved_divesCsv => 'CSV של הצלילות נשמר בהצלחה';
+
+  @override
+  String get settings_export_saved_sitesCsv => 'CSV של האתרים נשמר בהצלחה';
+
+  @override
+  String get settings_export_saved_equipmentCsv => 'CSV של הציוד נשמר בהצלחה';
+
+  @override
+  String get settings_export_saved_uddf => 'קובץ UDDF נשמר בהצלחה';
+
+  @override
+  String get settings_export_saved_pdf => 'קובץ PDF נשמר בהצלחה';
+
+  @override
+  String get settings_export_saved_backup => 'הגיבוי נשמר בהצלחה';
+
+  @override
+  String get settings_export_restoreComplete => 'השחזור הושלם';
+
+  @override
+  String get settings_export_cancelled_save => 'השמירה בוטלה';
+
+  @override
+  String get settings_export_cancelled_backup => 'הגיבוי בוטל';
+
+  @override
+  String get settings_export_cancelled_restore => 'השחזור בוטל';
+
+  @override
+  String get settings_export_pdfDocumentTitle => 'יומן צלילות';
+
+  @override
+  String get settings_export_saveBackupDialogTitle => 'שמירת גיבוי';
+
+  @override
+  String backup_operation_created(String size) {
+    return 'נוצר גיבוי: $size';
+  }
+
+  @override
+  String backup_operation_backupFailed(String error) {
+    return 'הגיבוי נכשל: $error';
+  }
+
+  @override
+  String get backup_operation_restoring => 'משחזר גיבוי...';
+
+  @override
+  String backup_operation_restoreFailed(String error) {
+    return 'השחזור נכשל: $error';
+  }
+
+  @override
+  String get backup_operation_deleting => 'מוחק גיבוי...';
+
+  @override
+  String get backup_operation_deleted => 'הגיבוי נמחק';
+
+  @override
+  String backup_operation_deleteFailed(String error) {
+    return 'המחיקה נכשלה: $error';
+  }
+
+  @override
+  String get backup_operation_exporting => 'מייצא גיבוי...';
+
+  @override
+  String backup_operation_exported(String size) {
+    return 'הגיבוי יוצא: $size';
+  }
+
+  @override
+  String backup_operation_exportFailed(String error) {
+    return 'הייצוא נכשל: $error';
+  }
+
+  @override
+  String get backup_operation_preparingShare => 'מכין את הגיבוי לשיתוף...';
+
+  @override
+  String get backup_operation_shareReady => 'הגיבוי מוכן לשיתוף';
+
+  @override
+  String backup_operation_upgrading(int step, int total) {
+    return 'משדרג את מסד הנתונים (שלב $step מתוך $total)...';
+  }
+
+  @override
+  String backup_restore_dialog_counts(int diveCount, int siteCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount צלילות',
+      many: '$diveCount צלילות',
+      two: 'שתי צלילות',
+      one: 'צלילה אחת',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount אתרים',
+      many: '$siteCount אתרים',
+      two: 'שני אתרים',
+      one: 'אתר אחד',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get backup_restore_preMigration_title =>
+      'שחזור גיבוי שנוצר לפני המיגרציה';
+
+  @override
+  String get backup_restore_preMigration_unknownVersion => 'גרסה לא ידועה';
+
+  @override
+  String get backup_restore_preMigration_restoreAnyway => 'שחזר בכל זאת';
+
+  @override
+  String backup_restore_preMigration_incompleteMetadata(
+    String timestamp,
+    String appVersion,
+  ) {
+    return 'גיבוי זה נוצר בתאריך $timestamp על ידי גרסת האפליקציה $appVersion, אך מטא-הנתונים של מיגרציית מסד הנתונים שלו חסרים.\n\nהאפליקציה אינה יכולה לוודא אם שחזור הגיבוי הזה בטוח, ולכן השחזור מושבת.';
+  }
+
+  @override
+  String backup_restore_preMigration_newerApp(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+  ) {
+    return 'גיבוי זה חדש יותר מהאפליקציה שלך. התקן גרסת אפליקציה חדשה יותר כדי לשחזר אותו.\n\nהגיבוי נוצר בתאריך $timestamp על ידי גרסת האפליקציה $appVersion (מסד נתונים v$fromVersion).';
+  }
+
+  @override
+  String backup_restore_preMigration_safe(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+    int toVersion,
+  ) {
+    return 'גיבוי זה נוצר בתאריך $timestamp על ידי גרסת האפליקציה $appVersion, ממש לפני שדרוג מסד הנתונים מגרסה v$fromVersion לגרסה v$toVersion.\n\nסכמת מסד הנתונים של האפליקציה שלך תואמת לגיבוי הזה, ולכן השחזור בטוח.';
+  }
+
+  @override
+  String backup_restore_preMigration_warning(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+    int toVersion,
+    int currentVersion,
+  ) {
+    return 'גיבוי זה נוצר בתאריך $timestamp על ידי גרסת האפליקציה $appVersion, ממש לפני שדרוג מסד הנתונים מגרסה v$fromVersion לגרסה v$toVersion.\n\nאתה מריץ אפליקציה חדשה יותר (מסד נתונים v$currentVersion).\n\nשחזור עכשיו יריץ מחדש את שדרוג מסד הנתונים v$fromVersion → v$toVersion על הנתונים המשוחזרים: בדיוק אותו שדרוג שעמד לרוץ במקור. אם השדרוג הזה גרם לבעיה, תיתקל באותה תקלה שוב.\n\nכדי לשחזר בבטחה: התקן את האפליקציה בגרסה $appVersion או קודמת לה, ואז שחזר את הגיבוי הזה מאותה אפליקציה ישנה יותר.';
+  }
+
+  @override
+  String get settings_cloudSync_progress_preparing => 'מכין סנכרון...';
+
+  @override
+  String get settings_cloudSync_progress_pulling => 'מושך שינויים...';
+
+  @override
+  String get settings_cloudSync_progress_publishing => 'מפרסם שינויים...';
+
+  @override
+  String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total) {
+    return 'מעלה את הספרייה ($uploaded מתוך $total)';
+  }
+
+  @override
+  String get settings_cloudSync_result_noProvider => 'לא הוגדר ספק ענן';
+
+  @override
+  String get settings_cloudSync_result_notAuthenticated =>
+      'אין אימות מול ספק הענן';
+
+  @override
+  String get settings_cloudSync_result_timedOut => 'תם הזמן המוקצב לסנכרון';
+
+  @override
+  String get settings_cloudSync_result_epochMarkerUnreadable =>
+      'לא ניתן היה לקרוא את סמן העידן של הספרייה';
+
+  @override
+  String get settings_cloudSync_result_epochMarkerEncrypted =>
+      'סמן העידן של הספרייה מוצפן';
+
+  @override
+  String get settings_cloudSync_result_libraryReplacedRemotely =>
+      'ספריית הענן הוחלפה מגיבוי';
+
+  @override
+  String get settings_cloudSync_result_noReplacementToRebuild =>
+      'אין החלפת ספרייה שניתן לבנות ממנה מחדש';
+
+  @override
+  String get settings_cloudSync_result_rebuiltFromThisDevice =>
+      'השירות הזה נבנה מחדש מהספרייה של מכשיר זה';
+
+  @override
+  String settings_cloudSync_result_rebuildFailed(String error) {
+    return 'הבנייה מחדש נכשלה: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_libraryReplaced => 'הספרייה הוחלפה';
+
+  @override
+  String settings_cloudSync_result_libraryReplaceFailed(String error) {
+    return 'החלפת הספרייה נכשלה: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_noReplacementMarker =>
+      'לא נמצא סמן להחלפת ספרייה';
+
+  @override
+  String get settings_cloudSync_result_adoptedRestoredLibrary =>
+      'הספרייה המשוחזרת אומצה';
+
+  @override
+  String settings_cloudSync_result_adoptFailed(String error) {
+    return 'אימוץ הספרייה המשוחזרת נכשל: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_previousLibraryUnreadable =>
+      'לא ניתן היה לקרוא את הספרייה הקודמת; השירות הזה הוקם מחדש מהספרייה של מכשיר זה.';
+
+  @override
+  String get settings_cloudSync_result_replacementStillUploading =>
+      'הספרייה שהוחלפה עדיין בהעלאה. נסה שוב בעוד רגע.';
+
+  @override
+  String settings_cloudSync_result_recordsFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'החלת $count רשומות נכשלה',
+      many: 'החלת $count רשומות נכשלה',
+      two: 'החלת שתי רשומות נכשלה',
+      one: 'החלת רשומה אחת נכשלה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_result_adoptedFreshIdentity =>
+      'מכשיר אחר סנכרן באמצעות הזהות של מכשיר זה. מכשיר זה אימץ זהות חדשה ומיזג את נתוני הענן.';
+
+  @override
+  String settings_cloudSync_launchCheck_unavailable(String provider) {
+    return '$provider אינו זמין במכשיר זה';
+  }
+
+  @override
+  String settings_cloudSync_launchCheck_notSignedIn(String provider) {
+    return 'לא מחובר אל $provider';
+  }
+
+  @override
+  String settings_cloudSync_launchCheck_localChanges(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count שינויים מקומיים להעלאה',
+      many: '$count שינויים מקומיים להעלאה',
+      two: 'שני שינויים מקומיים להעלאה',
+      one: 'שינוי מקומי אחד להעלאה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_launchCheck_noRemoteData =>
+      'לא נמצאו נתוני סנכרון בענן';
+
+  @override
+  String get settings_cloudSync_launchCheck_cloudDataAvailable =>
+      'נתוני ענן זמינים';
+
+  @override
+  String get settings_cloudSync_launchCheck_updatesAvailable =>
+      'יש עדכונים זמינים מהענן';
+
+  @override
+  String get settings_cloudSync_launchCheck_upToDate => 'הכול מעודכן';
+
+  @override
+  String settings_cloudSync_launchCheck_failed(String error) {
+    return 'בדיקת הסנכרון נכשלה: $error';
   }
 }

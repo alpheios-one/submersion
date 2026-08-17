@@ -5,6 +5,7 @@ import 'package:flutter/material.dart' hide Visibility;
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/number_input.dart';
+import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:uuid/uuid.dart';
 
@@ -4312,7 +4313,13 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                     size: 20,
                   ),
                 ),
-                title: Text(sighting.speciesName),
+                title: Text(
+                  localizedSpeciesName(
+                    context.l10n,
+                    sighting.speciesId,
+                    sighting.speciesName,
+                  ),
+                ),
                 subtitle: sighting.notes.isNotEmpty
                     ? Text(
                         sighting.notes,

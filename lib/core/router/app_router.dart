@@ -327,7 +327,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'search',
                 name: 'diveSearch',
-                builder: (context, state) => const DiveSearchPage(),
+                // Sections with their own filter (Statistics) push this page
+                // with their filter provider as `extra` so the form edits and
+                // applies to that filter (#1079). Every other entry point,
+                // such as a deep link or the keyboard shortcut, gets the dive
+                // list's filter.
+                builder: (context, state) => DiveSearchPage(
+                  filterProvider: state.extra is StateProvider<DiveFilterState>
+                      ? state.extra as StateProvider<DiveFilterState>
+                      : null,
+                ),
               ),
               GoRoute(
                 path: 'match-sites',
@@ -1529,8 +1538,12 @@ class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
       data: (computer) {
         if (computer == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Download')),
-            body: const Center(child: Text('Computer not found')),
+            appBar: AppBar(
+              title: Text(context.l10n.diveComputer_download_title),
+            ),
+            body: Center(
+              child: Text(context.l10n.diveComputer_download_computerNotFound),
+            ),
           );
         }
         return UnifiedImportWizard(
@@ -1549,8 +1562,12 @@ class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(
-        appBar: AppBar(title: const Text('Download')),
-        body: Center(child: Text('Error: $e')),
+        appBar: AppBar(title: Text(context.l10n.diveComputer_download_title)),
+        body: Center(
+          child: Text(
+            context.l10n.diveComputer_download_errorWithMessage('$e'),
+          ),
+        ),
       ),
     );
   }

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:excel_community/excel_community.dart' as xl;
@@ -151,18 +150,13 @@ class ExcelExportService {
       dialogTitle: 'Save Excel File',
       fileName: fileName,
       type: FileType.custom,
-      allowedExtensions: ['xlsx'],
       bytes: Uint8List.fromList(bytes),
+      mimeType:
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     );
 
     if (result == null) return null;
-
-    if (!Platform.isAndroid) {
-      final file = File(result);
-      await file.writeAsBytes(Uint8List.fromList(bytes));
-    }
-
-    return result;
+    return savedFileLocation(result);
   }
 
   // ==================== Sheet Builders ====================

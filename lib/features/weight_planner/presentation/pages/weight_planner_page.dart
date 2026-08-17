@@ -205,7 +205,7 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
             ),
             Text(
               '${context.l10n.diveLog_detail_stat_bottomTime}: '
-              '$_displayBottomMinutes min',
+              '${context.l10n.diveLog_sources_minutes(_displayBottomMinutes)}',
               style: theme.textTheme.bodySmall,
             ),
             Slider(

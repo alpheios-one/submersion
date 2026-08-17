@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/features/media/data/utils/url_validator.dart';
+import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 import 'package:submersion/features/media/presentation/providers/url_tab_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/manifest_mode_panel.dart';
 import 'package:submersion/features/media/presentation/widgets/network_signin_sheet.dart';
@@ -29,7 +30,17 @@ import 'package:submersion/features/media/presentation/widgets/url_review_pane.d
 /// The Manifest mode segment renders [ManifestModePanel] (Phase 3b,
 /// Task 13).
 class UrlTab extends ConsumerStatefulWidget {
-  const UrlTab({super.key});
+  const UrlTab({super.key, this.target});
+
+  /// What this picker session attaches its rows to, when it has an owner.
+  ///
+  /// A [SiteAttachTarget] attaches every added URL to that site and drops the
+  /// dive auto-match option: a site has no time window, so matching would
+  /// route the photo to an unrelated dive rather than to the site the picker
+  /// was opened from (issue #1098). Null, or a [DiveAttachTarget], leaves the
+  /// existing date-matching behavior alone: a dive session's rows are
+  /// assigned by the matcher, not by the dive the picker came from.
+  final MediaAttachTarget? target;
 
   @override
   ConsumerState<UrlTab> createState() => _UrlTabState();
@@ -55,10 +66,12 @@ class _UrlTabState extends ConsumerState<UrlTab> {
     super.dispose();
   }
 
+  bool get _isSiteSession => widget.target is SiteAttachTarget;
+
   Future<void> _commit() async {
     final notifier = ref.read(urlTabNotifierProvider.notifier);
     final messenger = ScaffoldMessenger.of(context);
-    final ids = await notifier.commit();
+    final ids = await notifier.commit(target: widget.target);
     if (!mounted) return;
     if (!context.mounted) return;
     // Sync the multi-line controller with the cleared draft state so
@@ -174,20 +187,23 @@ class _UrlTabState extends ConsumerState<UrlTab> {
         },
       ),
       const SizedBox(height: 12),
-      Row(
-        children: [
-          Checkbox(
-            value: state.autoMatchByDate,
-            onChanged: (value) => ref
-                .read(urlTabNotifierProvider.notifier)
-                .setAutoMatchByDate(value ?? true),
-          ),
-          const Expanded(
-            // TODO(media): l10n
-            child: Text('Auto-match URLs to dives by date'),
-          ),
-        ],
-      ),
+      // Dives are not this session's business when a site is the target, so
+      // the option is hidden rather than shown-and-ignored.
+      if (!_isSiteSession)
+        Row(
+          children: [
+            Checkbox(
+              value: state.autoMatchByDate,
+              onChanged: (value) => ref
+                  .read(urlTabNotifierProvider.notifier)
+                  .setAutoMatchByDate(value ?? true),
+            ),
+            const Expanded(
+              // TODO(media): l10n
+              child: Text('Auto-match URLs to dives by date'),
+            ),
+          ],
+        ),
       const SizedBox(height: 16),
       Expanded(child: UrlReviewPane(state: state)),
       const SizedBox(height: 12),

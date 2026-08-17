@@ -230,6 +230,14 @@ class _DataQualityInboxPageState extends ConsumerState<DataQualityInboxPage> {
             ),
           ),
         );
+      case ConvertWaterTempRepair(:final diveId, :final kelvinScale):
+        await withUndo(
+          () => executor.convertWaterTemp(
+            diveId: diveId,
+            kelvinScale: kelvinScale,
+            findingId: f.id,
+          ),
+        );
       case RecomputeMetricsRepair(:final diveId):
         await withUndo(
           () => executor.recomputeMetrics(diveId: diveId, findingId: f.id),

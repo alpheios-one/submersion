@@ -27,6 +27,17 @@ class BathymetryTerrainBuilder {
 
   static const double metersPerDegLat = 110540.0;
 
+  /// How far above the waterline land is allowed to rise, so shorelines
+  /// read without dominating the scene. Hoist it out of per-node loops.
+  static double landHeightCap(SpatialProjection projection) =>
+      _landHeightCapFraction * math.max(projection.maxDepth, 1.0);
+
+  /// The depth one raw grid sample renders at: nodata fills as shoreline,
+  /// land elevation is capped. THE definition of the rendered surface, so
+  /// the mesh and anything draped on it cannot drift apart.
+  static double surfaceDepth(double? raw, double landCap) =>
+      raw == null ? 0.0 : math.max(raw, -landCap);
+
   /// The ramp color at normalized depth [t] (0 = shallow, 1 = ramp max).
   /// Banded mode quantizes into 10 equal segments sampled at their centers
   /// so the seascape reads like a stepped nautical chart tint.
@@ -72,7 +83,7 @@ class BathymetryTerrainBuilder {
     final rows = grid.rows, cols = grid.cols;
     final mLon = metersPerDegreeLongitude(center.latitude);
     final maxDepth = math.max(projection.maxDepth, 1.0);
-    final landCap = _landHeightCapFraction * maxDepth;
+    final landCap = landHeightCap(projection);
 
     final positions = Float32List(rows * cols * 3);
     final colors = Float32List(rows * cols * 3);
@@ -84,8 +95,7 @@ class BathymetryTerrainBuilder {
         final lon = grid.originLon + grid.cellSizeLonDeg * c;
         final east = (lon - center.longitude) * mLon;
         final raw = grid.depthAt(r, c);
-        // nodata -> shoreline; land elevation capped so peaks stay modest.
-        final depth = raw == null ? 0.0 : math.max(raw, -landCap);
+        final depth = surfaceDepth(raw, landCap);
         final vi = (r * cols + c) * 3;
         positions[vi] = projection.xOf(east);
         positions[vi + 1] = projection.yOf(depth);

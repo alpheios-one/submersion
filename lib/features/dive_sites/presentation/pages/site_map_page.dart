@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_depth_overlay_layer.dart';
 import 'package:submersion/features/bathymetry/presentation/depth_overlay_toggle_button.dart';
+import 'package:submersion/features/site_scape/presentation/site_feature_marker_layer.dart';
 import 'package:submersion/features/site_scape/presentation/site_scape_view.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
@@ -353,6 +354,7 @@ class _SiteMapPageState extends ConsumerState<SiteMapPage>
                     ?.site
                     .location,
               ),
+              SiteFeatureMarkerLayer(siteId: selectionState.selectedId),
               // Built-in (bundled) sites layer - below the user markers so the
               // user's own sites always draw on top. Shown only when toggled.
               Consumer(

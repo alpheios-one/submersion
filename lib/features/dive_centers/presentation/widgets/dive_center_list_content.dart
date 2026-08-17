@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -604,7 +605,7 @@ class _DiveCenterListContentState extends ConsumerState<DiveCenterListContent> {
       currentField: sort.field,
       currentDirection: sort.direction,
       fields: DiveCenterSortField.values,
-      getFieldDisplayName: (field) => field.displayName,
+      getFieldDisplayName: (field) => field.localizedName(context.l10n),
       getFieldIcon: (field) => field.icon,
       onSortChanged: (field, direction) {
         ref.read(diveCenterSortProvider.notifier).state = SortState(

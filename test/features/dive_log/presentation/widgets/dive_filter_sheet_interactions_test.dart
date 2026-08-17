@@ -261,7 +261,9 @@ void main() {
       (w) => w is TextField && w.decoration?.suffixText == 'min',
     );
 
-    await scrollTo(tester, find.text('Depth Range (meters)'));
+    // The header now carries the diver's depth unit symbol rather than the
+    // word "meters", since the filter renders in the configured unit.
+    await scrollTo(tester, find.text('Depth Range (m)'));
     await tester.enterText(depthFields.first, '12');
     await tester.enterText(depthFields.last, '30');
     await tester.pumpAndSettle();

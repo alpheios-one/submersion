@@ -463,10 +463,15 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
                     value: CloudProviderType.dropbox,
                     label: Text('Dropbox'),
                   ),
-                  const ButtonSegment(
-                    value: CloudProviderType.googledrive,
-                    label: Text('Google Drive'),
-                  ),
+                  // Hidden where Google sign-in cannot run (a Windows/Linux
+                  // build with no Desktop-app OAuth client compiled in);
+                  // otherwise the connect flow offers an account it can
+                  // never obtain. Same gate as the Cloud Sync tile.
+                  if (ref.watch(googleDriveAvailableProvider).value ?? false)
+                    const ButtonSegment(
+                      value: CloudProviderType.googledrive,
+                      label: Text('Google Drive'),
+                    ),
                   if (ref.watch(isApplePlatformProvider))
                     const ButtonSegment(
                       value: CloudProviderType.icloud,

@@ -4,6 +4,7 @@ import 'package:submersion/features/dive_log/data/services/profile_editing_servi
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_editor_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/editor_context_panel.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 class _TrackingProfileEditorNotifier extends ProfileEditorNotifier {
   int trimEndZerosCallCount = 0;
@@ -32,6 +33,9 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         home: Scaffold(
           body: EditorContextPanel(mode: EditorMode.trim, notifier: notifier),
         ),

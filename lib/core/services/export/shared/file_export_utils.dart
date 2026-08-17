@@ -86,27 +86,31 @@ Future<String> saveImageToPhotos(List<int> pngBytes, String fileName) async {
   return filePath;
 }
 
+/// A user-visible location for a file [FilePicker.saveFile] has just written.
+///
+/// file_picker 12 writes the bytes itself on every platform and returns a
+/// [Uri] whose scheme varies: `file` on the desktops and iOS, `content` for an
+/// Android SAF document. Only a `file` Uri can become a filesystem path, so
+/// anything else is surfaced as the Uri string. Callers use this purely for
+/// display and for "reveal in folder" affordances, never to re-open the file.
+String savedFileLocation(Uri uri) =>
+    uri.isScheme('file') ? uri.toFilePath() : uri.toString();
+
 /// Save an image to a user-selected file location.
 ///
 /// Opens a file picker dialog allowing the user to choose where to save.
-/// Returns the saved file path, or null if the user cancelled.
+/// Returns the saved file location, or null if the user cancelled.
 Future<String?> saveImageToFile(List<int> pngBytes, String fileName) async {
   final result = await FilePicker.saveFile(
     dialogTitle: 'Save Profile Image',
     fileName: fileName,
     type: FileType.image,
     bytes: Uint8List.fromList(pngBytes),
+    mimeType: 'image/png',
   );
 
   if (result == null) return null;
-
-  // On some platforms, saveFile returns a path but doesn't write the file
-  if (!Platform.isAndroid) {
-    final file = File(result);
-    await file.writeAsBytes(Uint8List.fromList(pngBytes));
-  }
-
-  return result;
+  return savedFileLocation(result);
 }
 
 /// Share PDF bytes via the system share sheet.
@@ -126,26 +130,19 @@ Future<String?> saveTextToFile(
   String content,
   String fileName, {
   required String dialogTitle,
-  required List<String> allowedExtensions,
+  required String mimeType,
 }) async {
   final bytes = Uint8List.fromList(utf8.encode(content));
   final result = await FilePicker.saveFile(
     dialogTitle: dialogTitle,
     fileName: fileName,
     type: FileType.custom,
-    allowedExtensions: allowedExtensions,
     bytes: bytes,
+    mimeType: mimeType,
   );
 
   if (result == null) return null;
-
-  // Matching savePdfToFile: on some platforms saveFile returns a path but
-  // does not write the bytes itself.
-  if (!Platform.isAndroid) {
-    await File(result).writeAsBytes(bytes);
-  }
-
-  return result;
+  return savedFileLocation(result);
 }
 
 /// Save PDF bytes to a user-selected file location.
@@ -157,17 +154,10 @@ Future<String?> savePdfToFile(List<int> pdfBytes, String fileName) async {
     dialogTitle: 'Save PDF',
     fileName: fileName,
     type: FileType.custom,
-    allowedExtensions: ['pdf'],
     bytes: Uint8List.fromList(pdfBytes),
+    mimeType: 'application/pdf',
   );
 
   if (result == null) return null;
-
-  // On some platforms, saveFile returns a path but doesn't write the file
-  if (!Platform.isAndroid) {
-    final file = File(result);
-    await file.writeAsBytes(Uint8List.fromList(pdfBytes));
-  }
-
-  return result;
+  return savedFileLocation(result);
 }

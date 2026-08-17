@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/presentation/pages/lock_escape_dialogs.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 /// Pumps a host with a button that opens [open] and records its result.
 Future<List<Object?>> _pumpDialogHost(
@@ -11,6 +12,9 @@ Future<List<Object?>> _pumpDialogHost(
   final results = <Object?>[];
   await tester.pumpWidget(
     MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
       home: Scaffold(
         body: Builder(
           builder: (context) => ElevatedButton(
@@ -174,7 +178,9 @@ void main() {
         (context) => showNewRecoveryCodeDialog(context, 'alpha-bravo-charlie'),
       );
       expect(find.text('alpha-bravo-charlie'), findsOneWidget);
-      await tester.tap(find.widgetWithText(FilledButton, 'I saved it'));
+      await tester.tap(
+        find.widgetWithText(FilledButton, 'I saved my recovery code'),
+      );
       await tester.pumpAndSettle();
       expect(find.text('alpha-bravo-charlie'), findsNothing);
     });

@@ -195,6 +195,8 @@ class Dive3dScenePainter extends CustomPainter {
     final vx = Float32List(vn);
     final vy = Float32List(vn);
     final vz = Float32List(vn);
+    // Depth the sort uses: vz, except where a mesh declares sort heights.
+    final vzSort = Float32List(vn);
     final sx = Float32List(vn);
     final sy = Float32List(vn);
     final vColors = Float32List(vn * 3);
@@ -204,6 +206,7 @@ class Dive3dScenePainter extends CustomPainter {
     var tOff = 0;
     for (final mesh in meshes) {
       final alpha = (mesh.opacity * 255).round() << 24;
+      final sortHeights = mesh.sortHeights;
       for (var i = 0; i < mesh.vertexCount; i++) {
         final gi = vOff + i;
         final v = projector.viewOf(
@@ -214,6 +217,11 @@ class Dive3dScenePainter extends CustomPainter {
         vx[gi] = v.$1;
         vy[gi] = v.$2;
         vz[gi] = v.$3;
+        vzSort[gi] = sortHeights == null
+            ? v.$3
+            : v.$3 +
+                  (sortHeights[i] - mesh.positions[i * 3 + 1]) *
+                      projector.depthPerUnitY;
         final o = projector.projectView(v);
         sx[gi] = o.dx;
         sy[gi] = o.dy;
@@ -232,14 +240,15 @@ class Dive3dScenePainter extends CustomPainter {
       tOff += mesh.triangleCount;
     }
 
-    // Depth-sort triangles back-to-front by mean view depth.
+    // Depth-sort triangles back-to-front by mean view depth, taken at each
+    // mesh's sort heights where it declares them.
     final order = List<int>.generate(triCount, (i) => i);
     final depths = Float32List(triCount);
     for (var t = 0; t < triCount; t++) {
       final i0 = triIndices[t * 3];
       final i1 = triIndices[t * 3 + 1];
       final i2 = triIndices[t * 3 + 2];
-      depths[t] = (vz[i0] + vz[i1] + vz[i2]) / 3;
+      depths[t] = (vzSort[i0] + vzSort[i1] + vzSort[i2]) / 3;
     }
     order.sort((a, b) => depths[a].compareTo(depths[b]));
 
@@ -328,12 +337,19 @@ class Dive3dScenePainter extends CustomPainter {
   void _paintMarkers(Canvas canvas, SceneProjector projector) {
     final paint = Paint()..style = PaintingStyle.fill;
     for (final marker in scene.markers) {
+      // Diver-placed features have their own overlay gate, so they can be
+      // hidden without losing the site and nearby-site pins.
+      if (marker.kind == SceneMarkerKind.siteFeature &&
+          !_visible(SceneOverlay.features)) {
+        continue;
+      }
       paint.color = switch (marker.kind) {
         SceneMarkerKind.gasSwitch => const Color(0xFF22C55E),
         SceneMarkerKind.bookmark => const Color(0xFFF59E0B),
         SceneMarkerKind.photo => const Color(0xFF00D4FF),
         SceneMarkerKind.site => const Color(0xFFF43F5E),
         SceneMarkerKind.nearbySite => const Color(0xFF94A3B8),
+        SceneMarkerKind.siteFeature => const Color(0xFF14B8A6),
       };
       canvas.drawCircle(
         projector.project(marker.x, marker.y, marker.z),

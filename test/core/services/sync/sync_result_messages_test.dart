@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/services/sync/sync_service.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Peer notices are rendered as localized banners from the structured fields
 /// on SyncResult, not as English sentences built in the service layer. This
@@ -7,6 +8,7 @@ import 'package:submersion/core/services/sync/sync_service.dart';
 void main() {
   test('stale-epoch peers are left to their banner, not the message', () {
     final messages = SyncService.pullResultMessages(
+      l10n: l10nForLocaleTag('en'),
       recordsFailed: 0,
       skippedPeerDeviceIds: const {'peer-1', 'peer-2'},
       newerSchemaPeerDeviceIds: const {},
@@ -20,6 +22,7 @@ void main() {
     // This one used to appear twice: once here as untranslated English and
     // once in the localized banner the page already rendered.
     final messages = SyncService.pullResultMessages(
+      l10n: l10nForLocaleTag('en'),
       recordsFailed: 0,
       skippedPeerDeviceIds: const {},
       newerSchemaPeerDeviceIds: const {'peer-1', 'peer-2'},
@@ -31,6 +34,7 @@ void main() {
 
   test('failed records still surface, and suppress everything else', () {
     final messages = SyncService.pullResultMessages(
+      l10n: l10nForLocaleTag('en'),
       recordsFailed: 3,
       skippedPeerDeviceIds: const {'peer-1'},
       newerSchemaPeerDeviceIds: const {'peer-2'},
@@ -42,6 +46,7 @@ void main() {
 
   test('singular phrasing for a single failed record', () {
     final messages = SyncService.pullResultMessages(
+      l10n: l10nForLocaleTag('en'),
       recordsFailed: 1,
       skippedPeerDeviceIds: const {},
       newerSchemaPeerDeviceIds: const {},
@@ -53,6 +58,7 @@ void main() {
 
   test('a fresh identity adoption still surfaces (it has no banner)', () {
     final messages = SyncService.pullResultMessages(
+      l10n: l10nForLocaleTag('en'),
       recordsFailed: 0,
       skippedPeerDeviceIds: const {},
       newerSchemaPeerDeviceIds: const {},
@@ -65,6 +71,7 @@ void main() {
 
   test('a clean pull says nothing at all', () {
     final messages = SyncService.pullResultMessages(
+      l10n: l10nForLocaleTag('en'),
       recordsFailed: 0,
       skippedPeerDeviceIds: const {},
       newerSchemaPeerDeviceIds: const {},

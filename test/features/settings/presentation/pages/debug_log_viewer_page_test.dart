@@ -13,6 +13,7 @@ import 'package:submersion/features/settings/presentation/providers/debug_mode_p
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/widgets/log_entry_tile.dart';
 import 'package:submersion/features/settings/presentation/widgets/log_filter_bar.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 void main() {
   late Directory tempDir;
@@ -40,7 +41,12 @@ void main() {
         logFileServiceProvider.overrideWithValue(service),
         sharedPreferencesProvider.overrideWithValue(prefs),
       ],
-      child: const MaterialApp(home: DebugLogViewerPage()),
+      child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: Locale('en'),
+        home: DebugLogViewerPage(),
+      ),
     );
   }
 
@@ -96,7 +102,12 @@ void main() {
               const AsyncValue.loading(),
             ),
           ],
-          child: const MaterialApp(home: DebugLogViewerPage()),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: DebugLogViewerPage(),
+          ),
         ),
       );
       await tester.pump();
@@ -130,7 +141,12 @@ void main() {
             sharedPreferencesProvider.overrideWithValue(prefs),
             logEntriesProvider.overrideWith((ref) async => entries),
           ],
-          child: const MaterialApp(home: DebugLogViewerPage()),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: DebugLogViewerPage(),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -206,7 +222,12 @@ void main() {
               (ref) async => cleared ? <LogEntry>[] : entries,
             ),
           ],
-          child: const MaterialApp(home: DebugLogViewerPage()),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: DebugLogViewerPage(),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -270,7 +291,12 @@ void main() {
               AsyncValue.error('Test error', StackTrace.current),
             ),
           ],
-          child: const MaterialApp(home: DebugLogViewerPage()),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: DebugLogViewerPage(),
+          ),
         ),
       );
       await tester.pump();
@@ -334,7 +360,12 @@ void main() {
             sharedPreferencesProvider.overrideWithValue(prefs),
             logEntriesProvider.overrideWith((ref) async => entries),
           ],
-          child: const MaterialApp(home: DebugLogViewerPage()),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: DebugLogViewerPage(),
+          ),
         ),
       );
       await tester.pumpAndSettle();

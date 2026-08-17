@@ -236,10 +236,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Network sources'), findsOneWidget);
-    expect(
-      find.text('Saved hosts, manifest subscriptions, cache, and scan.'),
-      findsOneWidget,
-    );
+    expect(find.text('URLs and manifest feeds (advanced)'), findsOneWidget);
 
     await tester.tap(find.text('Network sources'));
     await tester.pumpAndSettle();

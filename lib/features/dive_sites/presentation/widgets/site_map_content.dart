@@ -12,6 +12,7 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/built_in_sites_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_depth_overlay_layer.dart';
+import 'package:submersion/features/site_scape/presentation/site_feature_marker_layer.dart';
 import 'package:submersion/features/site_scape/presentation/site_scape_view.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/built_in_site_info_card.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/built_in_site_marker_layer.dart';
@@ -329,6 +330,7 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
               // Depth overlay: the selected site's bathymetry as a
               // translucent ramp + contours, above tiles, below markers.
               BathymetryDepthOverlayLayer(location: selectedSite?.location),
+              SiteFeatureMarkerLayer(siteId: selectedSite?.id),
               // Built-in (bundled) sites layer - below the user markers so the
               // user's own sites always draw on top. Shown only when toggled.
               Consumer(

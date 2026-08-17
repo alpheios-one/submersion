@@ -387,7 +387,7 @@ void main() {
 
           expect(stats.trip.id, equals(trip.id));
           expect(stats.diveCount, equals(0));
-          expect(stats.totalBottomTime, equals(0));
+          expect(stats.totalRuntime, equals(0));
           expect(stats.maxDepth, isNull);
           expect(stats.avgDepth, isNull);
         },
@@ -398,6 +398,86 @@ void main() {
           () => repository.getTripWithStats('non-existent-id'),
           throwsException,
         );
+      });
+    });
+
+    group('trip time totals (issue #889)', () {
+      const ts = 1700000000000;
+
+      Future<void> insertDive({
+        required String tripId,
+        required String diveId,
+        int? bottomTime,
+        int? runtime,
+      }) async {
+        final db = DatabaseService.instance.database;
+        await db
+            .into(db.dives)
+            .insert(
+              DivesCompanion.insert(
+                id: diveId,
+                diveDateTime: ts,
+                tripId: Value(tripId),
+                bottomTime: Value(bottomTime),
+                runtime: Value(runtime),
+                createdAt: ts,
+                updatedAt: ts,
+              ),
+            );
+      }
+
+      test('getTripWithStats totals runtime rather than bottom time', () async {
+        final trip = await repository.createTrip(
+          createTestTrip(name: 'Runtime Trip'),
+        );
+        // Two dives whose ascent adds 10 minutes each on top of bottom time.
+        await insertDive(
+          tripId: trip.id,
+          diveId: 'r1',
+          bottomTime: 2400,
+          runtime: 3000,
+        );
+        await insertDive(
+          tripId: trip.id,
+          diveId: 'r2',
+          bottomTime: 1800,
+          runtime: 2400,
+        );
+
+        final stats = await repository.getTripWithStats(trip.id);
+
+        expect(stats.totalRuntime, equals(5400));
+      });
+
+      test('getTripWithStats falls back to bottom time when runtime is '
+          'missing', () async {
+        final trip = await repository.createTrip(
+          createTestTrip(name: 'Mixed Trip'),
+        );
+        await insertDive(tripId: trip.id, diveId: 'm1', bottomTime: 2400);
+        await insertDive(tripId: trip.id, diveId: 'm2', runtime: 3000);
+
+        final stats = await repository.getTripWithStats(trip.id);
+
+        expect(stats.totalRuntime, equals(5400));
+      });
+
+      test('getAllTripsWithStats totals runtime rather than bottom '
+          'time', () async {
+        final trip = await repository.createTrip(
+          createTestTrip(name: 'Listed Trip'),
+        );
+        await insertDive(
+          tripId: trip.id,
+          diveId: 'l1',
+          bottomTime: 2400,
+          runtime: 3000,
+        );
+
+        final results = await repository.getAllTripsWithStats();
+        final row = results.firstWhere((r) => r.trip.id == trip.id);
+
+        expect(row.totalRuntime, equals(3000));
       });
     });
 

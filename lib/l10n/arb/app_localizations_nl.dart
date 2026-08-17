@@ -12292,6 +12292,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'Volgende media';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'Geen foto\'s beschikbaar';
 
   @override
@@ -12302,6 +12305,9 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get media_photoViewer_playPauseVideoLabel =>
       'Video afspelen of pauzeren';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'Vorige media';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'Videopositie zoeken';
@@ -14408,6 +14414,18 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_cloudSync_provider_googleDrive_subtitle =>
       'Synchroniseren via Google Drive';
+
+  @override
+  String get settings_cloudSync_googleDrive_desktopNotConfigured =>
+      'Niet beschikbaar in deze build';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_title =>
+      'Ga verder in je browser';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_message =>
+      'Rond het inloggen bij Google af in je webbrowser en keer dan terug naar Submersion.';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -18088,7 +18106,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'Max. diepte';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'Totale bodemtijd';
+  String get trips_detail_stat_totalRuntime => 'Totale looptijd';
 
   @override
   String get trips_detail_stat_totalDives => 'Totaal duiken';
@@ -22332,6 +22350,63 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Mengeling';
 
   @override
+  String get siteFeature_type_wreck => 'Wrak';
+
+  @override
+  String get siteFeature_type_mooring => 'Meerboei';
+
+  @override
+  String get siteFeature_type_entry => 'Instappunt';
+
+  @override
+  String get siteFeature_type_exit => 'Uitstappunt';
+
+  @override
+  String get siteFeature_type_swimThrough => 'Doorzwemplek';
+
+  @override
+  String get siteFeature_type_hazard => 'Gevaar';
+
+  @override
+  String get siteFeature_type_current => 'Stroming';
+
+  @override
+  String get siteFeature_sectionTitle => 'Kenmerken';
+
+  @override
+  String get siteFeature_addAction => 'Kenmerk toevoegen';
+
+  @override
+  String get siteFeature_placeHint =>
+      'Tik op de kaart om het kenmerk te plaatsen';
+
+  @override
+  String get siteFeature_addTitle => 'Kenmerk toevoegen';
+
+  @override
+  String get siteFeature_editTitle => 'Kenmerk bewerken';
+
+  @override
+  String get siteFeature_field_name => 'Naam';
+
+  @override
+  String get siteFeature_field_bearing => 'Peiling (°)';
+
+  @override
+  String get siteFeature_field_depth => 'Diepte';
+
+  @override
+  String get siteFeature_field_notes => 'Notities';
+
+  @override
+  String get siteFeature_deleteAction => 'Verwijderen';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return '$name verwijderen?';
+  }
+
+  @override
   String get siteScape_mode2d => 'Kaart';
 
   @override
@@ -22821,7 +22896,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get attrLabel_dpv_style => 'Stijl';
 
   @override
-  String get attrLabel_burn_time_h => 'Looptijd (u)';
+  String get attrLabel_burn_time_h => 'Looptijd';
 
   @override
   String get attrLabel_battery_type => 'Accu';
@@ -23671,6 +23746,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dataQuality_repair_noChange => 'Hier valt niets te herstellen';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'Geen automatische correctie. Open de duik om dit te corrigeren.';
+
+  @override
   String get dataQuality_repair_failed => 'Herstel mislukt';
 
   @override
@@ -24284,5 +24363,7407 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String marineLife_species_delete_error(String error) {
     return 'Fout bij verwijderen van soort: $error';
+  }
+
+  @override
+  String get enum_diveField_diveNumber => 'Duiknummer';
+
+  @override
+  String get enum_diveField_dateTime => 'Datum en tijd';
+
+  @override
+  String get enum_diveField_siteName => 'Naam duikstek';
+
+  @override
+  String get enum_diveField_diveName => 'Duiknaam';
+
+  @override
+  String get enum_diveField_maxDepth => 'Max diepte';
+
+  @override
+  String get enum_diveField_avgDepth => 'Gemiddelde diepte';
+
+  @override
+  String get enum_diveField_bottomTime => 'Bodemtijd';
+
+  @override
+  String get enum_diveField_runtime => 'Looptijd';
+
+  @override
+  String get enum_diveField_waterTemp => 'Watertemperatuur';
+
+  @override
+  String get enum_diveField_airTemp => 'Luchttemperatuur';
+
+  @override
+  String get enum_diveField_visibility => 'Zicht';
+
+  @override
+  String get enum_diveField_currentDirection => 'Stromingsrichting';
+
+  @override
+  String get enum_diveField_currentStrength => 'Stromingssterkte';
+
+  @override
+  String get enum_diveField_swellHeight => 'Deiningshoogte';
+
+  @override
+  String get enum_diveField_entryMethod => 'Instapmethode';
+
+  @override
+  String get enum_diveField_exitMethod => 'Uitstapmethode';
+
+  @override
+  String get enum_diveField_waterType => 'Watertype';
+
+  @override
+  String get enum_diveField_altitude => 'Hoogte';
+
+  @override
+  String get enum_diveField_surfacePressure => 'Oppervlaktedruk';
+
+  @override
+  String get enum_diveField_windSpeed => 'Windsnelheid';
+
+  @override
+  String get enum_diveField_cloudCover => 'Bewolking';
+
+  @override
+  String get enum_diveField_precipitation => 'Neerslag';
+
+  @override
+  String get enum_diveField_humidity => 'Luchtvochtigheid';
+
+  @override
+  String get enum_diveField_weatherDescription => 'Weer';
+
+  @override
+  String get enum_diveField_primaryGas => 'Hoofdgas';
+
+  @override
+  String get enum_diveField_diluentGas => 'Diluent gas';
+
+  @override
+  String get enum_diveField_tankCount => 'Aantal flessen';
+
+  @override
+  String get enum_diveField_startPressure => 'Begindruk';
+
+  @override
+  String get enum_diveField_endPressure => 'Einddruk';
+
+  @override
+  String get enum_diveField_sacRate => 'SAC-verbruik';
+
+  @override
+  String get enum_diveField_gasConsumed => 'Gasverbruik';
+
+  @override
+  String get enum_diveField_totalWeight => 'Totaal gewicht';
+
+  @override
+  String get enum_diveField_diveComputerModel => 'Duikcomputer';
+
+  @override
+  String get enum_diveField_gradientFactorLow => 'GF laag';
+
+  @override
+  String get enum_diveField_gradientFactorHigh => 'GF hoog';
+
+  @override
+  String get enum_diveField_decoAlgorithm => 'Deco-algoritme';
+
+  @override
+  String get enum_diveField_decoConservatism => 'Conservatisme';
+
+  @override
+  String get enum_diveField_cnsStart => 'CNS begin';
+
+  @override
+  String get enum_diveField_cnsEnd => 'CNS eind';
+
+  @override
+  String get enum_diveField_otu => 'OTU';
+
+  @override
+  String get enum_diveField_diveMode => 'Duikmodus';
+
+  @override
+  String get enum_diveField_setpointLow => 'Setpoint laag';
+
+  @override
+  String get enum_diveField_setpointHigh => 'Setpoint hoog';
+
+  @override
+  String get enum_diveField_setpointDeco => 'Setpoint deco';
+
+  @override
+  String get enum_diveField_buddy => 'Buddy';
+
+  @override
+  String get enum_diveField_diveMaster => 'Divemaster';
+
+  @override
+  String get enum_diveField_siteLocation => 'Locatie duikstek';
+
+  @override
+  String get enum_diveField_diveCenterName => 'Duikcentrum';
+
+  @override
+  String get enum_diveField_siteLatitude => 'Breedtegraad';
+
+  @override
+  String get enum_diveField_siteLongitude => 'Lengtegraad';
+
+  @override
+  String get enum_diveField_tripName => 'Reis';
+
+  @override
+  String get enum_diveField_ratingStars => 'Beoordeling';
+
+  @override
+  String get enum_diveField_isFavorite => 'Favoriet';
+
+  @override
+  String get enum_diveField_notes => 'Notities';
+
+  @override
+  String get enum_diveField_tags => 'Tags';
+
+  @override
+  String get enum_diveField_importSource => 'Importbron';
+
+  @override
+  String get enum_diveField_diveTypeName => 'Duiktype';
+
+  @override
+  String get enum_diveField_surfaceInterval => 'Oppervlakte-interval';
+
+  @override
+  String get enum_diveField_diveNumber_short => '#';
+
+  @override
+  String get enum_diveField_dateTime_short => 'Datum';
+
+  @override
+  String get enum_diveField_siteName_short => 'Stek';
+
+  @override
+  String get enum_diveField_diveName_short => 'Naam';
+
+  @override
+  String get enum_diveField_maxDepth_short => 'Max D';
+
+  @override
+  String get enum_diveField_avgDepth_short => 'Gem D';
+
+  @override
+  String get enum_diveField_bottomTime_short => 'BT';
+
+  @override
+  String get enum_diveField_runtime_short => 'LT';
+
+  @override
+  String get enum_diveField_waterTemp_short => 'W-temp';
+
+  @override
+  String get enum_diveField_airTemp_short => 'L-temp';
+
+  @override
+  String get enum_diveField_visibility_short => 'Zicht';
+
+  @override
+  String get enum_diveField_currentDirection_short => 'Str. ri.';
+
+  @override
+  String get enum_diveField_currentStrength_short => 'Str.';
+
+  @override
+  String get enum_diveField_swellHeight_short => 'Deining';
+
+  @override
+  String get enum_diveField_entryMethod_short => 'Instap';
+
+  @override
+  String get enum_diveField_exitMethod_short => 'Uitstap';
+
+  @override
+  String get enum_diveField_waterType_short => 'Water';
+
+  @override
+  String get enum_diveField_altitude_short => 'Hoogte';
+
+  @override
+  String get enum_diveField_surfacePressure_short => 'Opp.druk';
+
+  @override
+  String get enum_diveField_windSpeed_short => 'Wind';
+
+  @override
+  String get enum_diveField_cloudCover_short => 'Wolken';
+
+  @override
+  String get enum_diveField_precipitation_short => 'Neersl.';
+
+  @override
+  String get enum_diveField_humidity_short => 'Vocht';
+
+  @override
+  String get enum_diveField_weatherDescription_short => 'Weer';
+
+  @override
+  String get enum_diveField_primaryGas_short => 'Gas';
+
+  @override
+  String get enum_diveField_diluentGas_short => 'Dil';
+
+  @override
+  String get enum_diveField_tankCount_short => 'Flessen';
+
+  @override
+  String get enum_diveField_startPressure_short => 'Begindr.';
+
+  @override
+  String get enum_diveField_endPressure_short => 'Einddr.';
+
+  @override
+  String get enum_diveField_sacRate_short => 'SAC';
+
+  @override
+  String get enum_diveField_gasConsumed_short => 'Gasverbr.';
+
+  @override
+  String get enum_diveField_totalWeight_short => 'Gew.';
+
+  @override
+  String get enum_diveField_diveComputerModel_short => 'Computer';
+
+  @override
+  String get enum_diveField_gradientFactorLow_short => 'GFL';
+
+  @override
+  String get enum_diveField_gradientFactorHigh_short => 'GFH';
+
+  @override
+  String get enum_diveField_decoAlgorithm_short => 'Algo';
+
+  @override
+  String get enum_diveField_decoConservatism_short => 'Conserv.';
+
+  @override
+  String get enum_diveField_cnsStart_short => 'CNS begin';
+
+  @override
+  String get enum_diveField_cnsEnd_short => 'CNS eind';
+
+  @override
+  String get enum_diveField_otu_short => 'OTU';
+
+  @override
+  String get enum_diveField_diveMode_short => 'Modus';
+
+  @override
+  String get enum_diveField_setpointLow_short => 'SP laag';
+
+  @override
+  String get enum_diveField_setpointHigh_short => 'SP hoog';
+
+  @override
+  String get enum_diveField_setpointDeco_short => 'SP deco';
+
+  @override
+  String get enum_diveField_buddy_short => 'Buddy';
+
+  @override
+  String get enum_diveField_diveMaster_short => 'DM';
+
+  @override
+  String get enum_diveField_siteLocation_short => 'Locatie';
+
+  @override
+  String get enum_diveField_diveCenterName_short => 'Centrum';
+
+  @override
+  String get enum_diveField_siteLatitude_short => 'Breedte';
+
+  @override
+  String get enum_diveField_siteLongitude_short => 'Lengte';
+
+  @override
+  String get enum_diveField_tripName_short => 'Reis';
+
+  @override
+  String get enum_diveField_ratingStars_short => 'Beoord.';
+
+  @override
+  String get enum_diveField_isFavorite_short => 'Fav';
+
+  @override
+  String get enum_diveField_notes_short => 'Notities';
+
+  @override
+  String get enum_diveField_tags_short => 'Tags';
+
+  @override
+  String get enum_diveField_importSource_short => 'Bron';
+
+  @override
+  String get enum_diveField_diveTypeName_short => 'Type';
+
+  @override
+  String get enum_diveField_surfaceInterval_short => 'OI';
+
+  @override
+  String get enum_siteField_siteName => 'Naam';
+
+  @override
+  String get enum_siteField_location => 'Locatie';
+
+  @override
+  String get enum_siteField_country => 'Land';
+
+  @override
+  String get enum_siteField_region => 'Regio';
+
+  @override
+  String get enum_siteField_city => 'Stad';
+
+  @override
+  String get enum_siteField_island => 'Eiland';
+
+  @override
+  String get enum_siteField_bodyOfWater => 'Wateroppervlak';
+
+  @override
+  String get enum_siteField_diveCount => 'Aantal duiken';
+
+  @override
+  String get enum_siteField_maxDepth => 'Max diepte';
+
+  @override
+  String get enum_siteField_minDepth => 'Min diepte';
+
+  @override
+  String get enum_siteField_altitude => 'Hoogte';
+
+  @override
+  String get enum_siteField_waterType => 'Watertype';
+
+  @override
+  String get enum_siteField_typicalVisibility => 'Typisch zicht';
+
+  @override
+  String get enum_siteField_typicalCurrent => 'Typische stroming';
+
+  @override
+  String get enum_siteField_difficulty => 'Moeilijkheidsgraad';
+
+  @override
+  String get enum_siteField_entryType => 'Instaptype';
+
+  @override
+  String get enum_siteField_bestSeason => 'Beste seizoen';
+
+  @override
+  String get enum_siteField_mooringNumber => 'Boeinummer';
+
+  @override
+  String get enum_siteField_hazards => 'Gevaren';
+
+  @override
+  String get enum_siteField_rating => 'Beoordeling';
+
+  @override
+  String get enum_siteField_notes => 'Notities';
+
+  @override
+  String get enum_siteField_latitude => 'Breedtegraad';
+
+  @override
+  String get enum_siteField_longitude => 'Lengtegraad';
+
+  @override
+  String get enum_siteField_siteName_short => 'Naam';
+
+  @override
+  String get enum_siteField_location_short => 'Locatie';
+
+  @override
+  String get enum_siteField_country_short => 'Land';
+
+  @override
+  String get enum_siteField_region_short => 'Regio';
+
+  @override
+  String get enum_siteField_city_short => 'Stad';
+
+  @override
+  String get enum_siteField_island_short => 'Eiland';
+
+  @override
+  String get enum_siteField_bodyOfWater_short => 'Wateropp.';
+
+  @override
+  String get enum_siteField_diveCount_short => 'Duiken';
+
+  @override
+  String get enum_siteField_maxDepth_short => 'Max D';
+
+  @override
+  String get enum_siteField_minDepth_short => 'Min D';
+
+  @override
+  String get enum_siteField_altitude_short => 'Hoogte';
+
+  @override
+  String get enum_siteField_waterType_short => 'Water';
+
+  @override
+  String get enum_siteField_typicalVisibility_short => 'Zicht';
+
+  @override
+  String get enum_siteField_typicalCurrent_short => 'Stroming';
+
+  @override
+  String get enum_siteField_difficulty_short => 'Moeil.';
+
+  @override
+  String get enum_siteField_entryType_short => 'Instap';
+
+  @override
+  String get enum_siteField_bestSeason_short => 'Seizoen';
+
+  @override
+  String get enum_siteField_mooringNumber_short => 'Boei';
+
+  @override
+  String get enum_siteField_hazards_short => 'Gevaren';
+
+  @override
+  String get enum_siteField_rating_short => 'Beoord.';
+
+  @override
+  String get enum_siteField_notes_short => 'Notities';
+
+  @override
+  String get enum_siteField_latitude_short => 'Breedte';
+
+  @override
+  String get enum_siteField_longitude_short => 'Lengte';
+
+  @override
+  String get enum_buddyField_buddyName => 'Naam';
+
+  @override
+  String get enum_buddyField_email => 'E-mail';
+
+  @override
+  String get enum_buddyField_phone => 'Telefoon';
+
+  @override
+  String get enum_buddyField_certificationLevel => 'Certificeringsniveau';
+
+  @override
+  String get enum_buddyField_certificationAgency => 'Certificeringsorganisatie';
+
+  @override
+  String get enum_buddyField_diveCount => 'Aantal duiken';
+
+  @override
+  String get enum_buddyField_notes => 'Notities';
+
+  @override
+  String get enum_buddyField_buddyName_short => 'Naam';
+
+  @override
+  String get enum_buddyField_email_short => 'E-mail';
+
+  @override
+  String get enum_buddyField_phone_short => 'Tel.';
+
+  @override
+  String get enum_buddyField_certificationLevel_short => 'Niveau';
+
+  @override
+  String get enum_buddyField_certificationAgency_short => 'Org.';
+
+  @override
+  String get enum_buddyField_diveCount_short => 'Duiken';
+
+  @override
+  String get enum_buddyField_notes_short => 'Notities';
+
+  @override
+  String get enum_tripField_tripName => 'Naam';
+
+  @override
+  String get enum_tripField_startDate => 'Startdatum';
+
+  @override
+  String get enum_tripField_endDate => 'Einddatum';
+
+  @override
+  String get enum_tripField_durationDays => 'Duur';
+
+  @override
+  String get enum_tripField_location => 'Locatie';
+
+  @override
+  String get enum_tripField_tripType => 'Reistype';
+
+  @override
+  String get enum_tripField_resortName => 'Resort';
+
+  @override
+  String get enum_tripField_liveaboardName => 'Liveaboard';
+
+  @override
+  String get enum_tripField_diveCount => 'Aantal duiken';
+
+  @override
+  String get enum_tripField_totalRuntime => 'Totale looptijd';
+
+  @override
+  String get enum_tripField_maxDepth => 'Max diepte';
+
+  @override
+  String get enum_tripField_avgDepth => 'Gem. diepte';
+
+  @override
+  String get enum_tripField_notes => 'Notities';
+
+  @override
+  String get enum_tripField_tripName_short => 'Naam';
+
+  @override
+  String get enum_tripField_startDate_short => 'Start';
+
+  @override
+  String get enum_tripField_endDate_short => 'Eind';
+
+  @override
+  String get enum_tripField_durationDays_short => 'Dagen';
+
+  @override
+  String get enum_tripField_location_short => 'Locatie';
+
+  @override
+  String get enum_tripField_tripType_short => 'Type';
+
+  @override
+  String get enum_tripField_resortName_short => 'Resort';
+
+  @override
+  String get enum_tripField_liveaboardName_short => 'Liveaboard';
+
+  @override
+  String get enum_tripField_diveCount_short => 'Duiken';
+
+  @override
+  String get enum_tripField_totalRuntime_short => 'LT totaal';
+
+  @override
+  String get enum_tripField_maxDepth_short => 'Max D';
+
+  @override
+  String get enum_tripField_avgDepth_short => 'Gem D';
+
+  @override
+  String get enum_tripField_notes_short => 'Notities';
+
+  @override
+  String get enum_equipmentField_itemName => 'Naam';
+
+  @override
+  String get enum_equipmentField_fullName => 'Volledige naam';
+
+  @override
+  String get enum_equipmentField_type => 'Type';
+
+  @override
+  String get enum_equipmentField_brand => 'Merk';
+
+  @override
+  String get enum_equipmentField_model => 'Model';
+
+  @override
+  String get enum_equipmentField_serialNumber => 'Serienummer';
+
+  @override
+  String get enum_equipmentField_size => 'Maat';
+
+  @override
+  String get enum_equipmentField_status => 'Status';
+
+  @override
+  String get enum_equipmentField_isActive => 'Actief';
+
+  @override
+  String get enum_equipmentField_purchaseDate => 'Aankoopdatum';
+
+  @override
+  String get enum_equipmentField_purchasePrice => 'Aankoopprijs';
+
+  @override
+  String get enum_equipmentField_lastServiceDate => 'Laatste onderhoud';
+
+  @override
+  String get enum_equipmentField_nextServiceDue => 'Volgende onderhoud';
+
+  @override
+  String get enum_equipmentField_daysUntilService => 'Dagen tot onderhoud';
+
+  @override
+  String get enum_equipmentField_serviceIntervalDays => 'Onderhoudsinterval';
+
+  @override
+  String get enum_equipmentField_notes => 'Notities';
+
+  @override
+  String get enum_equipmentField_itemName_short => 'Naam';
+
+  @override
+  String get enum_equipmentField_fullName_short => 'Voll. naam';
+
+  @override
+  String get enum_equipmentField_type_short => 'Type';
+
+  @override
+  String get enum_equipmentField_brand_short => 'Merk';
+
+  @override
+  String get enum_equipmentField_model_short => 'Model';
+
+  @override
+  String get enum_equipmentField_serialNumber_short => 'Serienr.';
+
+  @override
+  String get enum_equipmentField_size_short => 'Maat';
+
+  @override
+  String get enum_equipmentField_status_short => 'Status';
+
+  @override
+  String get enum_equipmentField_isActive_short => 'Actief';
+
+  @override
+  String get enum_equipmentField_purchaseDate_short => 'Gekocht';
+
+  @override
+  String get enum_equipmentField_purchasePrice_short => 'Prijs';
+
+  @override
+  String get enum_equipmentField_lastServiceDate_short => 'Onderh.';
+
+  @override
+  String get enum_equipmentField_nextServiceDue_short => 'Volgende';
+
+  @override
+  String get enum_equipmentField_daysUntilService_short => 'Resterend';
+
+  @override
+  String get enum_equipmentField_serviceIntervalDays_short => 'Interval';
+
+  @override
+  String get enum_equipmentField_notes_short => 'Notities';
+
+  @override
+  String get enum_diveCenterField_centerName => 'Naam';
+
+  @override
+  String get enum_diveCenterField_city => 'Plaats';
+
+  @override
+  String get enum_diveCenterField_country => 'Land';
+
+  @override
+  String get enum_diveCenterField_stateProvince => 'Staat / Provincie';
+
+  @override
+  String get enum_diveCenterField_street => 'Straat';
+
+  @override
+  String get enum_diveCenterField_postalCode => 'Postcode';
+
+  @override
+  String get enum_diveCenterField_phone => 'Telefoon';
+
+  @override
+  String get enum_diveCenterField_email => 'E-mail';
+
+  @override
+  String get enum_diveCenterField_website => 'Website';
+
+  @override
+  String get enum_diveCenterField_affiliations => 'Aangesloten bij';
+
+  @override
+  String get enum_diveCenterField_rating => 'Beoordeling';
+
+  @override
+  String get enum_diveCenterField_latitude => 'Breedtegraad';
+
+  @override
+  String get enum_diveCenterField_longitude => 'Lengtegraad';
+
+  @override
+  String get enum_diveCenterField_diveCount => 'Aantal duiken';
+
+  @override
+  String get enum_diveCenterField_notes => 'Notities';
+
+  @override
+  String get enum_diveCenterField_centerName_short => 'Naam';
+
+  @override
+  String get enum_diveCenterField_city_short => 'Plaats';
+
+  @override
+  String get enum_diveCenterField_country_short => 'Land';
+
+  @override
+  String get enum_diveCenterField_stateProvince_short => 'Prov.';
+
+  @override
+  String get enum_diveCenterField_street_short => 'Straat';
+
+  @override
+  String get enum_diveCenterField_postalCode_short => 'Postcode';
+
+  @override
+  String get enum_diveCenterField_phone_short => 'Tel.';
+
+  @override
+  String get enum_diveCenterField_email_short => 'E-mail';
+
+  @override
+  String get enum_diveCenterField_website_short => 'Website';
+
+  @override
+  String get enum_diveCenterField_affiliations_short => 'Aangesloten';
+
+  @override
+  String get enum_diveCenterField_rating_short => 'Beoord.';
+
+  @override
+  String get enum_diveCenterField_latitude_short => 'Breedte';
+
+  @override
+  String get enum_diveCenterField_longitude_short => 'Lengte';
+
+  @override
+  String get enum_diveCenterField_diveCount_short => 'Duiken';
+
+  @override
+  String get enum_diveCenterField_notes_short => 'Notities';
+
+  @override
+  String get enum_certificationField_certName => 'Naam';
+
+  @override
+  String get enum_certificationField_agency => 'Organisatie';
+
+  @override
+  String get enum_certificationField_level => 'Certificering';
+
+  @override
+  String get enum_certificationField_cardNumber => 'Kaartnummer';
+
+  @override
+  String get enum_certificationField_issueDate => 'Uitgiftedatum';
+
+  @override
+  String get enum_certificationField_expiryDate => 'Vervaldatum';
+
+  @override
+  String get enum_certificationField_instructorName => 'Naam instructeur';
+
+  @override
+  String get enum_certificationField_instructorNumber => 'Instructeurnummer';
+
+  @override
+  String get enum_certificationField_expiryStatus => 'Vervalstatus';
+
+  @override
+  String get enum_certificationField_notes => 'Notities';
+
+  @override
+  String get enum_certificationField_certName_short => 'Naam';
+
+  @override
+  String get enum_certificationField_agency_short => 'Org.';
+
+  @override
+  String get enum_certificationField_level_short => 'Certificering';
+
+  @override
+  String get enum_certificationField_cardNumber_short => 'Kaartnr.';
+
+  @override
+  String get enum_certificationField_issueDate_short => 'Uitgifte';
+
+  @override
+  String get enum_certificationField_expiryDate_short => 'Verloopt';
+
+  @override
+  String get enum_certificationField_instructorName_short => 'Instructeur';
+
+  @override
+  String get enum_certificationField_instructorNumber_short => 'Instr.nr.';
+
+  @override
+  String get enum_certificationField_expiryStatus_short => 'Status';
+
+  @override
+  String get enum_certificationField_notes_short => 'Notities';
+
+  @override
+  String get enum_courseField_courseName => 'Naam';
+
+  @override
+  String get enum_courseField_agency => 'Organisatie';
+
+  @override
+  String get enum_courseField_startDate => 'Startdatum';
+
+  @override
+  String get enum_courseField_completionDate => 'Voltooiingsdatum';
+
+  @override
+  String get enum_courseField_durationDays => 'Duur';
+
+  @override
+  String get enum_courseField_instructorName => 'Naam instructeur';
+
+  @override
+  String get enum_courseField_instructorNumber => 'Instructeurnummer';
+
+  @override
+  String get enum_courseField_location => 'Locatie';
+
+  @override
+  String get enum_courseField_isCompleted => 'Voltooid';
+
+  @override
+  String get enum_courseField_notes => 'Notities';
+
+  @override
+  String get enum_courseField_courseName_short => 'Naam';
+
+  @override
+  String get enum_courseField_agency_short => 'Org.';
+
+  @override
+  String get enum_courseField_startDate_short => 'Gestart';
+
+  @override
+  String get enum_courseField_completionDate_short => 'Voltooid';
+
+  @override
+  String get enum_courseField_durationDays_short => 'Duur';
+
+  @override
+  String get enum_courseField_instructorName_short => 'Instructeur';
+
+  @override
+  String get enum_courseField_instructorNumber_short => 'Instr.nr.';
+
+  @override
+  String get enum_courseField_location_short => 'Locatie';
+
+  @override
+  String get enum_courseField_isCompleted_short => 'Klaar';
+
+  @override
+  String get enum_courseField_notes_short => 'Notities';
+
+  @override
+  String get enum_fieldCategory_accommodation => 'Accommodatie';
+
+  @override
+  String get enum_fieldCategory_address => 'Adres';
+
+  @override
+  String get enum_fieldCategory_certification => 'Certificering';
+
+  @override
+  String get enum_fieldCategory_conditions => 'Omstandigheden';
+
+  @override
+  String get enum_fieldCategory_contact => 'Contact';
+
+  @override
+  String get enum_fieldCategory_coordinates => 'Coördinaten';
+
+  @override
+  String get enum_fieldCategory_dates => 'Datums';
+
+  @override
+  String get enum_fieldCategory_depth => 'Diepte';
+
+  @override
+  String get enum_fieldCategory_details => 'Details';
+
+  @override
+  String get enum_fieldCategory_instructor => 'Instructeur';
+
+  @override
+  String get enum_fieldCategory_other => 'Overig';
+
+  @override
+  String get enum_fieldCategory_purchase => 'Aankoop';
+
+  @override
+  String get enum_fieldCategory_service => 'Onderhoud';
+
+  @override
+  String get enum_fieldCategory_statistics => 'Statistieken';
+
+  @override
+  String get species_whale_shark_name => 'Walvishaai';
+
+  @override
+  String get species_whale_shark_desc =>
+      'Grootste vis in de oceaan, een vreedzame filtereter met een kenmerkend gestippeld patroon.';
+
+  @override
+  String get species_great_white_shark_name => 'Witte haai';
+
+  @override
+  String get species_great_white_shark_desc =>
+      'Iconische toppredator die duikers in kooien af en toe in gematigde wateren zien.';
+
+  @override
+  String get species_great_hammerhead_shark_name => 'Grote hamerhaai';
+
+  @override
+  String get species_great_hammerhead_shark_desc =>
+      'Grootste hamerhaaisoort met een brede, platte kop en hoge rugvin.';
+
+  @override
+  String get species_scalloped_hammerhead_shark_name => 'Geschulpte hamerhaai';
+
+  @override
+  String get species_scalloped_hammerhead_shark_desc =>
+      'Wordt vaak in grote scholen gezien bij zeebergen en poetsstations.';
+
+  @override
+  String get species_smooth_hammerhead_shark_name => 'Gladde hamerhaai';
+
+  @override
+  String get species_smooth_hammerhead_shark_desc =>
+      'Hamerhaai met een gladde, afgeronde koprand die in gematigde zeeën voorkomt.';
+
+  @override
+  String get species_whitetip_reef_shark_name => 'Witpuntrifhaai';
+
+  @override
+  String get species_whitetip_reef_shark_desc =>
+      'Rustige rifbewoner die overdag vaak in grotten en onder overhangen ligt te rusten.';
+
+  @override
+  String get species_blacktip_reef_shark_name => 'Zwartpuntrifhaai';
+
+  @override
+  String get species_blacktip_reef_shark_desc =>
+      'Veelvoorkomende rifhaai van ondiep water met kenmerkende zwarte vinpunten.';
+
+  @override
+  String get species_grey_reef_shark_name => 'Grijze rifhaai';
+
+  @override
+  String get species_grey_reef_shark_desc =>
+      'Actieve rifpredator die vaak in groepen langs steilwanden en kanalen wordt gezien.';
+
+  @override
+  String get species_caribbean_reef_shark_name => 'Caribische rifhaai';
+
+  @override
+  String get species_caribbean_reef_shark_desc =>
+      'De meest waargenomen rifhaai van het Caribisch gebied, stevig gebouwd en nieuwsgierig.';
+
+  @override
+  String get species_nurse_shark_name => 'Verpleegsterhaai';
+
+  @override
+  String get species_nurse_shark_desc =>
+      'Traag bewegende bodembewoner die vaak onder koraaloverhangen ligt te rusten.';
+
+  @override
+  String get species_tawny_nurse_shark_name => 'Bruine verpleegsterhaai';
+
+  @override
+  String get species_tawny_nurse_shark_desc =>
+      'Indo-Pacifische bodembewoner die rust in rifgrotten en op zandige plekken.';
+
+  @override
+  String get species_bull_shark_name => 'Stierhaai';
+
+  @override
+  String get species_bull_shark_desc =>
+      'Gedrongen, krachtige haai die wereldwijd in kustwateren en zoet water voorkomt.';
+
+  @override
+  String get species_tiger_shark_name => 'Tijgerhaai';
+
+  @override
+  String get species_tiger_shark_desc =>
+      'Grote predator met een kenmerkend streeppatroon, gezien tijdens diepe rifduiken.';
+
+  @override
+  String get species_oceanic_whitetip_shark_name => 'Oceanische witpunthaai';
+
+  @override
+  String get species_oceanic_whitetip_shark_desc =>
+      'Pelagische haai met ronde, witgepunte vinnen, gezien tijdens duiken op open zee.';
+
+  @override
+  String get species_thresher_shark_name => 'Voshaai';
+
+  @override
+  String get species_thresher_shark_desc =>
+      'Herkenbaar aan de extreem lange staartvin, soms te zien bij poetsstations.';
+
+  @override
+  String get species_pelagic_thresher_shark_name => 'Pelagische voshaai';
+
+  @override
+  String get species_pelagic_thresher_shark_desc =>
+      'Kleinste voshaaisoort, beroemd om de waarnemingen bij Monad Shoal in de Filipijnen.';
+
+  @override
+  String get species_shortfin_mako_shark_name => 'Kortvinmakohaai';
+
+  @override
+  String get species_shortfin_mako_shark_desc =>
+      'Snelste haai van de oceaan, een gestroomlijnde openwaterjager met metaalblauwe kleur.';
+
+  @override
+  String get species_blue_shark_name => 'Blauwe haai';
+
+  @override
+  String get species_blue_shark_desc =>
+      'Slanke, diepblauwe pelagische haai die vaak bij blauwwaterduiken wordt gezien.';
+
+  @override
+  String get species_spotted_wobbegong_name => 'Gevlekte wobbegong';
+
+  @override
+  String get species_spotted_wobbegong_desc =>
+      'Platte, gecamoufleerde tapijthaai die roerloos op rotsriffen in Australië ligt.';
+
+  @override
+  String get species_tasselled_wobbegong_name => 'Gefranjerde wobbegong';
+
+  @override
+  String get species_tasselled_wobbegong_desc =>
+      'Sierlijke tapijthaai met franjeachtige lobben rond de kop, te vinden op koraalriffen.';
+
+  @override
+  String get species_epaulette_shark_name => 'Epaulethaai';
+
+  @override
+  String get species_epaulette_shark_desc =>
+      'Kleine haai die met zijn borstvinnen over de rifbodem loopt.';
+
+  @override
+  String get species_horn_shark_name => 'Hoornhaai';
+
+  @override
+  String get species_horn_shark_desc =>
+      'Nachtactieve bodembewoner met richels boven de ogen, te vinden voor de kust van Californië.';
+
+  @override
+  String get species_leopard_shark_name => 'Luipaardhaai';
+
+  @override
+  String get species_leopard_shark_desc =>
+      'Prachtig getekende haai die voorkomt in ondiepe baaien langs de Amerikaanse Pacifische kust.';
+
+  @override
+  String get species_pacific_angel_shark_name => 'Pacifische zee-engel';
+
+  @override
+  String get species_pacific_angel_shark_desc =>
+      'Platte hinderlaagjager die ingegraven in het zand op de zeebodem ligt.';
+
+  @override
+  String get species_sand_tiger_shark_name => 'Zandtijgerhaai';
+
+  @override
+  String get species_sand_tiger_shark_desc =>
+      'Grimmig ogende maar vreedzame haai die vaak zwevend in grotten en wrakken wordt gezien.';
+
+  @override
+  String get species_zebra_shark_name => 'Zebrahaai';
+
+  @override
+  String get species_zebra_shark_desc =>
+      'Gevlekte rifhaai die op zandbodems rust, algemeen in de Indo-Pacific.';
+
+  @override
+  String get species_blacktip_shark_name => 'Zwartpunthaai';
+
+  @override
+  String get species_blacktip_shark_desc =>
+      'Snelle kusthaai die bekendstaat om zijn draaiende sprongen, wereldwijd in warme wateren.';
+
+  @override
+  String get species_silvertip_shark_name => 'Zilverpunthaai';
+
+  @override
+  String get species_silvertip_shark_desc =>
+      'Brutale rifhaai met witomrande vinnen, te vinden bij diepe steilwanden en atollen.';
+
+  @override
+  String get species_silky_shark_name => 'Zijdehaai';
+
+  @override
+  String get species_silky_shark_desc =>
+      'Gestroomlijnde pelagische haai met gladde huid, vaak nabij riffen in open water.';
+
+  @override
+  String get species_lemon_shark_name => 'Citroenhaai';
+
+  @override
+  String get species_lemon_shark_desc =>
+      'Geelbruine haai die vaak wordt gezien in ondiepe mangroven en op zandvlaktes.';
+
+  @override
+  String get species_galapagos_shark_name => 'Galapagoshaai';
+
+  @override
+  String get species_galapagos_shark_desc =>
+      'Grote rifhaai rond oceanische eilanden, nieuwsgierig naar duikers.';
+
+  @override
+  String get species_port_jackson_shark_name => 'Port Jackson-haai';
+
+  @override
+  String get species_port_jackson_shark_desc =>
+      'Nachtactieve bodembewoner met harnasachtige tekening, endemisch in Australië.';
+
+  @override
+  String get species_bamboo_shark_name => 'Bruingebande bamboehaai';
+
+  @override
+  String get species_bamboo_shark_desc =>
+      'Kleine, rustige bodembewonende haai, algemeen op Indo-Pacifische koraalriffen.';
+
+  @override
+  String get species_basking_shark_name => 'Reuzenhaai';
+
+  @override
+  String get species_basking_shark_desc =>
+      'Op een na grootste vis, een filtereter die in gematigde oppervlaktewateren wordt gezien.';
+
+  @override
+  String get species_greenland_shark_name => 'Groenlandse haai';
+
+  @override
+  String get species_greenland_shark_desc =>
+      'Traag bewegende diepwaterhaai, een van de langstlevende gewervelden op aarde.';
+
+  @override
+  String get species_cookiecutter_shark_name => 'Sigaarhaai';
+
+  @override
+  String get species_cookiecutter_shark_desc =>
+      'Kleine diepwaterhaai die ronde happen uit grotere zeedieren neemt.';
+
+  @override
+  String get species_sevengill_shark_name => 'Breedsnuitzevenkieuwshaai';
+
+  @override
+  String get species_sevengill_shark_desc =>
+      'Primitieve haai met zeven kieuwspleten, te ontmoeten bij duiken in gematigde kelpwouden.';
+
+  @override
+  String get species_pyjama_shark_name => 'Pyjamahaai';
+
+  @override
+  String get species_pyjama_shark_desc =>
+      'Gestreepte kathaai endemisch in Zuid-Afrika, te vinden op rotsriffen en in kelpwouden.';
+
+  @override
+  String get species_spiny_dogfish_name => 'Doornhaai';
+
+  @override
+  String get species_spiny_dogfish_desc =>
+      'Kleine, talrijke haai met giftige rugstekels, voorkomend in gematigde wateren.';
+
+  @override
+  String get species_swell_shark_name => 'Zwelhaai';
+
+  @override
+  String get species_swell_shark_desc =>
+      'Nachtactieve kathaai die zijn lichaam opblaast bij gevaar, voor de kust van Californië.';
+
+  @override
+  String get species_giant_oceanic_manta_ray_name => 'Reuzenmanta';
+
+  @override
+  String get species_giant_oceanic_manta_ray_desc =>
+      'Grootste roggensoort, een majestueuze filtereter met een spanwijdte tot 7 meter.';
+
+  @override
+  String get species_reef_manta_ray_name => 'Rifmanta';
+
+  @override
+  String get species_reef_manta_ray_desc =>
+      'Kleinere mantasoort die vaak bij poetsstations op tropische riffen wordt gezien.';
+
+  @override
+  String get species_spotted_eagle_ray_name => 'Gevlekte adelaarsrog';
+
+  @override
+  String get species_spotted_eagle_ray_desc =>
+      'Elegante rog met witte stippen en een lange zweepachtige staart, vaak in het middenwater.';
+
+  @override
+  String get species_common_eagle_ray_name => 'Gewone adelaarsrog';
+
+  @override
+  String get species_common_eagle_ray_desc =>
+      'Ruitvormige rog uit de gematigde oostelijke Atlantische Oceaan en de Middellandse Zee.';
+
+  @override
+  String get species_blue_spotted_ribbontail_ray_name =>
+      'Blauwgevlekte pijlstaartrog';
+
+  @override
+  String get species_blue_spotted_ribbontail_ray_desc =>
+      'Felgekleurde rog met heldere blauwe stippen, algemeen op Indo-Pacifische riffen.';
+
+  @override
+  String get species_blue_spotted_stingray_name => 'Blauwgestippelde maskerrog';
+
+  @override
+  String get species_blue_spotted_stingray_desc =>
+      'Kleine rifrog met verspreide blauwe stippen, vaak ingegraven in zandige plekken.';
+
+  @override
+  String get species_southern_stingray_name => 'Zuidelijke pijlstaartrog';
+
+  @override
+  String get species_southern_stingray_desc =>
+      'Grote pijlstaartrog van Caribische zandvlaktes, beroemd bij Stingray City.';
+
+  @override
+  String get species_round_stingray_name => 'Ronde pijlstaartrog';
+
+  @override
+  String get species_round_stingray_desc =>
+      'Kleine ronde pijlstaartrog, algemeen in ondiepe zandgebieden van de oostelijke Pacific.';
+
+  @override
+  String get species_short_tail_stingray_name => 'Kortstaartpijlstaartrog';
+
+  @override
+  String get species_short_tail_stingray_desc =>
+      'Een van de grootste pijlstaartroggen, voorkomend in gematigde wateren van het zuidelijk halfrond.';
+
+  @override
+  String get species_cowtail_stingray_name => 'Koestaartrog';
+
+  @override
+  String get species_cowtail_stingray_desc =>
+      'Grote donkere pijlstaartrog met een kenmerkende vlagachtige staartplooi, op zandige riffen.';
+
+  @override
+  String get species_atlantic_torpedo_ray_name => 'Atlantische sidderrog';
+
+  @override
+  String get species_atlantic_torpedo_ray_desc =>
+      'Sidderrog die sterke schokken kan afgeven, te vinden op Atlantische zandbodems.';
+
+  @override
+  String get species_marbled_electric_ray_name => 'Gemarmerde sidderrog';
+
+  @override
+  String get species_marbled_electric_ray_desc =>
+      'Mediterrane sidderrog met gemarmerd patroon die een flinke elektrische schok geeft.';
+
+  @override
+  String get species_giant_guitarfish_name => 'Reuzengitaarrog';
+
+  @override
+  String get species_giant_guitarfish_desc =>
+      'Haaivormige rog op Indo-Pacifische zandbodems nabij koraalriffen.';
+
+  @override
+  String get species_shovelnose_guitarfish_name => 'Schopneusgitaarrog';
+
+  @override
+  String get species_shovelnose_guitarfish_desc =>
+      'Afgeplatte vorm tussen rog en haai in, algemeen in zandige ondiepten van de oostelijke Pacific.';
+
+  @override
+  String get species_smalltooth_sawfish_name => 'Kleintandzaagvis';
+
+  @override
+  String get species_smalltooth_sawfish_desc =>
+      'Ernstig bedreigde rog met een getande snuit, voorkomend in tropische kustwateren.';
+
+  @override
+  String get species_green_sawfish_name => 'Groene zaagvis';
+
+  @override
+  String get species_green_sawfish_desc =>
+      'Grote zaagvis met olijfgroen lichaam die in estuaria van de Indo-West-Pacific leeft.';
+
+  @override
+  String get species_devil_ray_name => 'Reuzenduivelsrog';
+
+  @override
+  String get species_devil_ray_desc =>
+      'Grote mobularog met kopvinnen, te zien wanneer groepen uit het water springen.';
+
+  @override
+  String get species_spinetail_devil_ray_name => 'Stekelstaartduivelsrog';
+
+  @override
+  String get species_spinetail_devil_ray_desc =>
+      'Pelagische duivelsrog die vaak in grote groepen vlak onder het oppervlak wordt gezien.';
+
+  @override
+  String get species_lesser_devil_ray_name => 'Dwergduivelsrog';
+
+  @override
+  String get species_lesser_devil_ray_desc =>
+      'Kleinste mobulasoort, vormt grote scholen in de Golf van Californië.';
+
+  @override
+  String get species_bat_ray_name => 'Vleermuisrog';
+
+  @override
+  String get species_bat_ray_desc =>
+      'Ruitvormige rog, algemeen in kelpwouden en zandige baaien van Californië.';
+
+  @override
+  String get species_undulate_ray_name => 'Golfrog';
+
+  @override
+  String get species_undulate_ray_desc =>
+      'Prachtig getekende rog met golvende lijnen, voorkomend in de oostelijke Atlantische Oceaan.';
+
+  @override
+  String get species_thornback_ray_name => 'Stekelrog';
+
+  @override
+  String get species_thornback_ray_desc =>
+      'Algemene Europese rog met doornachtige stekels langs rug en staart.';
+
+  @override
+  String get species_cownose_ray_name => 'Koeneusrog';
+
+  @override
+  String get species_cownose_ray_desc =>
+      'Kenmerkende ingekeepte kop, vaak in grote scholen tijdens seizoenstrek.';
+
+  @override
+  String get species_marble_ray_name => 'Gemarmerde pijlstaartrog';
+
+  @override
+  String get species_marble_ray_desc =>
+      'Grote donkere pijlstaartrog met witte stippen, vaak gezien bij Indo-Pacifische poetsstations.';
+
+  @override
+  String get species_ocellate_river_stingray_name => 'Gevlekte zoetwaterrog';
+
+  @override
+  String get species_ocellate_river_stingray_desc =>
+      'Zoetwaterpijlstaartrog met opvallende oranje omringde vlekken, inheems in Zuid-Amerikaanse rivieren.';
+
+  @override
+  String get species_ocellaris_clownfish_name => 'Valse clownvis';
+
+  @override
+  String get species_ocellaris_clownfish_desc =>
+      'Kleine oranje-wit gestreepte vis die op koraalriffen in symbiose met zeeanemonen leeft.';
+
+  @override
+  String get species_clarkii_clownfish_name => 'Clarks anemoonvis';
+
+  @override
+  String get species_clarkii_clownfish_desc =>
+      'Robuuste anemoonvis met donker lichaam en twee witte banden, in de hele Indo-Pacific in uiteenlopende anemonen.';
+
+  @override
+  String get species_tomato_clownfish_name => 'Tomatenanemoonvis';
+
+  @override
+  String get species_tomato_clownfish_desc =>
+      'Felrood-oranje anemoonvis met één witte kopband, algemeen op Indo-Pacifische riffen.';
+
+  @override
+  String get species_regal_blue_tang_name => 'Blauwe doktersvis';
+
+  @override
+  String get species_regal_blue_tang_desc =>
+      'Felblauwe doktersvis met zwarte palettekening en gele staart, op Indo-Pacifische koraalriffen.';
+
+  @override
+  String get species_yellow_tang_name => 'Gele doktersvis';
+
+  @override
+  String get species_yellow_tang_desc =>
+      'Felgele doktersvis, algemeen op Hawaïaanse en Pacifische riffen, vaak in groepen algen grazend.';
+
+  @override
+  String get species_powder_blue_surgeonfish_name => 'Poederblauwe doktersvis';
+
+  @override
+  String get species_powder_blue_surgeonfish_desc =>
+      'Opvallende lichtblauwe doktersvis met zwart gezicht en gele rugvin, voorkomend in de Indische Oceaan.';
+
+  @override
+  String get species_sohal_surgeonfish_name => 'Sohal-doktersvis';
+
+  @override
+  String get species_sohal_surgeonfish_desc =>
+      'Brutale gestreepte doktersvis met oranje scalpelstekel, endemisch op riffen van de Rode Zee en de Arabische Golf.';
+
+  @override
+  String get species_blue_tang_name => 'Blauwe chirurgijnvis';
+
+  @override
+  String get species_blue_tang_desc =>
+      'Diepblauwe doktersvis, algemeen op Caribische riffen; jongen zijn felgeel.';
+
+  @override
+  String get species_emperor_angelfish_name => 'Keizersengelvis';
+
+  @override
+  String get species_emperor_angelfish_desc =>
+      'Grote engelvis met opvallende blauwe en gele horizontale strepen. Jongen tonen concentrische blauwe en witte ringen.';
+
+  @override
+  String get species_french_angelfish_name => 'Franse engelvis';
+
+  @override
+  String get species_french_angelfish_desc =>
+      'Grote donkere engelvis met goudomrande schubben, meestal in paren op Caribische en West-Atlantische riffen.';
+
+  @override
+  String get species_queen_angelfish_name => 'Koninginne-engelvis';
+
+  @override
+  String get species_queen_angelfish_desc =>
+      'Spectaculaire blauw-gele engelvis met een kenmerkende kroonvlek, te vinden op Caribische koraalriffen.';
+
+  @override
+  String get species_regal_angelfish_name => 'Koninklijke engelvis';
+
+  @override
+  String get species_regal_angelfish_desc =>
+      'Elegante engelvis met afwisselend oranje-witte en blauwe verticale banden, op Indo-Pacifische riffen.';
+
+  @override
+  String get species_rock_beauty_name => 'Rotsengelvis';
+
+  @override
+  String get species_rock_beauty_desc =>
+      'Opvallende Caribische engelvis met gele voorhelft en zwarte achterhelft, bij rotsriffen en overhangen.';
+
+  @override
+  String get species_gray_angelfish_name => 'Grijze engelvis';
+
+  @override
+  String get species_gray_angelfish_desc =>
+      'Grote grijze engelvis met bleek gezicht en gele binnenkant van de borstvin, algemeen op Caribische riffen.';
+
+  @override
+  String get species_copperband_butterflyfish_name => 'Koperbandvlindervis';
+
+  @override
+  String get species_copperband_butterflyfish_desc =>
+      'Kenmerkende vlindervis met oranje verticale banden en langgerekte snuit, op Indo-Pacifische riffen.';
+
+  @override
+  String get species_raccoon_butterflyfish_name => 'Wasbeervlindervis';
+
+  @override
+  String get species_raccoon_butterflyfish_desc =>
+      'Gele vlindervis met een donker wasbeerachtig oogmasker, algemeen op Indo-Pacifische en Hawaïaanse riffen.';
+
+  @override
+  String get species_longnose_butterflyfish_name => 'Langsnuitvlindervis';
+
+  @override
+  String get species_longnose_butterflyfish_desc =>
+      'Felgele vlindervis met een extreem lange snuit om voedsel uit spleten van Indo-Pacifische riffen te pikken.';
+
+  @override
+  String get species_threadfin_butterflyfish_name => 'Draadvinvlindervis';
+
+  @override
+  String get species_threadfin_butterflyfish_desc =>
+      'Witte vlindervis met chevronpatroon en een slepende rugvindraad, wijdverbreid in de Indo-Pacific.';
+
+  @override
+  String get species_foureye_butterflyfish_name => 'Vierogenvlindervis';
+
+  @override
+  String get species_foureye_butterflyfish_desc =>
+      'Bleke vlindervis met een opvallende valse oogvlek bij de staart, algemeen op Caribische riffen.';
+
+  @override
+  String get species_spotfin_butterflyfish_name => 'Vlekvinvlindervis';
+
+  @override
+  String get species_spotfin_butterflyfish_desc =>
+      'Wit-gele vlindervis met een klein donker vlekje op de rugvin, voorkomend in de westelijke Atlantische Oceaan.';
+
+  @override
+  String get species_banner_butterflyfish_name => 'Rodezeewimpelvis';
+
+  @override
+  String get species_banner_butterflyfish_desc =>
+      'Zwart-witte wimpelvis met langgerekte rugvin en gele buik, endemisch in de Rode Zee.';
+
+  @override
+  String get species_moorish_idol_name => 'Moorse afgod';
+
+  @override
+  String get species_moorish_idol_desc =>
+      'Iconische rifvis met markante zwarte, witte en gele banden en een lange slepende rugvindraad.';
+
+  @override
+  String get species_green_moray_eel_name => 'Groene murene';
+
+  @override
+  String get species_green_moray_eel_desc =>
+      'Grote groene murene tot 2,5 m, vaak met open bek in rifspleten in de westelijke Atlantische Oceaan.';
+
+  @override
+  String get species_giant_moray_eel_name => 'Reuzenmurene';
+
+  @override
+  String get species_giant_moray_eel_desc =>
+      'De grootste murenesoort, ruim 3 m lang, met luipaardachtige vlekken. Te vinden op Indo-Pacifische koraalriffen.';
+
+  @override
+  String get species_spotted_moray_eel_name => 'Gevlekte murene';
+
+  @override
+  String get species_spotted_moray_eel_desc =>
+      'Witte murene met donkerbruine vlekken, vaak turend vanuit rifholtes in het Caribisch gebied.';
+
+  @override
+  String get species_ribbon_eel_name => 'Lintmurene';
+
+  @override
+  String get species_ribbon_eel_desc =>
+      'Slanke murene met wijde neusvleugels; mannetjes zijn felblauw, vrouwtjes geel. Te vinden in zandige Indo-Pacifische lagunes.';
+
+  @override
+  String get species_spotted_garden_eel_name => 'Gevlekte tuinaal';
+
+  @override
+  String get species_spotted_garden_eel_desc =>
+      'Dunne witte aal met zwarte stippen die in zandkolonies leeft en meedeint met de stroming om plankton te vangen.';
+
+  @override
+  String get species_splendid_garden_eel_name => 'Prachttuinaal';
+
+  @override
+  String get species_splendid_garden_eel_desc =>
+      'Oranje-wit gebande tuinaal die in grote zandkolonies in de westelijke Pacific leeft.';
+
+  @override
+  String get species_snowflake_moray_name => 'Sneeuwvlokmurene';
+
+  @override
+  String get species_snowflake_moray_desc =>
+      'Kleine murene met wit lichaam en zwarte sneeuwvlokachtige tekening, algemeen in Indo-Pacifisch rifpuin.';
+
+  @override
+  String get species_mandarin_dragonet_name => 'Mandarijnvis';
+
+  @override
+  String get species_mandarin_dragonet_desc =>
+      'Piepkleine, schitterend gekleurde vis met psychedelische blauwe en oranje patronen, in puinzones van de westelijke Pacific.';
+
+  @override
+  String get species_common_lionfish_name => 'Koraalduivel';
+
+  @override
+  String get species_common_lionfish_desc =>
+      'Giftige schorpioenvis met spectaculaire waaiervormige borstvinnen en rood-witte strepen. Invasief in het Caribisch gebied.';
+
+  @override
+  String get species_leaf_scorpionfish_name => 'Bladschorpioenvis';
+
+  @override
+  String get species_leaf_scorpionfish_desc =>
+      'Sterk zijdelings afgeplatte, bladvormige schorpioenvis die met de stroming meedeint om drijfvuil na te bootsen op Indo-Pacifische riffen.';
+
+  @override
+  String get species_stonefish_name => 'Steenvis';
+
+  @override
+  String get species_stonefish_desc =>
+      'Giftigste vis ter wereld, perfect gecamoufleerd als steen op Indo-Pacifische rifbodems. Uiterst gevaarlijk.';
+
+  @override
+  String get species_painted_frogfish_name => 'Geschilderde voelsprietvis';
+
+  @override
+  String get species_painted_frogfish_desc =>
+      'Gedrongen hinderlaagjager met een hengel op de kop, sterk wisselend van kleur. Te vinden op Indo-Pacifische riffen.';
+
+  @override
+  String get species_giant_frogfish_name => 'Reuzenvoelsprietvis';
+
+  @override
+  String get species_giant_frogfish_desc =>
+      'De grootste voelsprietvissoort, tot 40 cm, met uitstekende camouflage tussen sponzen en koraalpuin.';
+
+  @override
+  String get species_hairy_frogfish_name => 'Harige voelsprietvis';
+
+  @override
+  String get species_hairy_frogfish_desc =>
+      'Voelsprietvis bedekt met wormachtige vleesuitsteeksels die algen nabootsen, een geliefde vondst voor onderwaterfotografen.';
+
+  @override
+  String get species_clown_triggerfish_name => 'Clowntrekkervis';
+
+  @override
+  String get species_clown_triggerfish_desc =>
+      'Opvallend getekende trekkervis met grote witte vlekken op een donker lichaam en gele lippen, op Indo-Pacifische riffen.';
+
+  @override
+  String get species_titan_triggerfish_name => 'Titaantrekkervis';
+
+  @override
+  String get species_titan_triggerfish_desc =>
+      'Grote agressieve trekkervis die duikers bij zijn nest kan aanvallen. Algemeen op Indo-Pacifische koraalriffen.';
+
+  @override
+  String get species_queen_triggerfish_name => 'Koninginnetrekkervis';
+
+  @override
+  String get species_queen_triggerfish_desc =>
+      'Kleurrijke Caribische trekkervis met blauwe gezichtstekening en lange staartslierten.';
+
+  @override
+  String get species_picasso_triggerfish_name => 'Picassotrekkervis';
+
+  @override
+  String get species_picasso_triggerfish_desc =>
+      'Trekkervis met een abstract patroon van blauwe, gele en zwarte strepen, algemeen op Indo-Pacifische rifplaten.';
+
+  @override
+  String get species_yellowmargin_triggerfish_name => 'Geelrandtrekkervis';
+
+  @override
+  String get species_yellowmargin_triggerfish_desc =>
+      'Grote lichtbruine trekkervis met geelomrande vinnen, berucht om het agressief bewaken van zijn nest op Indo-Pacifische riffen.';
+
+  @override
+  String get species_porcupinefish_name => 'Egelvis';
+
+  @override
+  String get species_porcupinefish_desc =>
+      'Grote stekelige vis die zich bij gevaar tot een bal opblaast, wereldwijd op tropische riffen.';
+
+  @override
+  String get species_guineafowl_pufferfish_name => 'Parelhoenkogelvis';
+
+  @override
+  String get species_guineafowl_pufferfish_desc =>
+      'Donkere kogelvis bedekt met kleine witte stippen, soms in een goudgele kleurfase op Indo-Pacifische riffen.';
+
+  @override
+  String get species_map_pufferfish_name => 'Landkaartkogelvis';
+
+  @override
+  String get species_map_pufferfish_desc =>
+      'Grote bleke kogelvis met fijne donkere landkaartachtige tekening over het hele lichaam, op Indo-Pacifische riffen.';
+
+  @override
+  String get species_sharpnose_pufferfish_name => 'Spitssnuitkogelvis';
+
+  @override
+  String get species_sharpnose_pufferfish_desc =>
+      'Piepkleine kogelvis met blauwe lijnen op het gezicht en een oranje staart, veel gezien op Caribische riffen.';
+
+  @override
+  String get species_boxfish_name => 'Gele koffervis';
+
+  @override
+  String get species_boxfish_desc =>
+      'Jongen zijn felgele kubusjes met zwarte stippen. Volwassen dieren verkleuren naar blauwgrijs. Voorkomend in de hele Indo-Pacific.';
+
+  @override
+  String get species_cowfish_name => 'Langhoornkoffervis';
+
+  @override
+  String get species_cowfish_desc =>
+      'Hoekige gele vis met kenmerkende hoornachtige uitsteeksels boven elk oog, op Indo-Pacifische riffen.';
+
+  @override
+  String get species_napoleon_wrasse_name => 'Napoleonvis';
+
+  @override
+  String get species_napoleon_wrasse_desc =>
+      'Kolossale lipvis tot 2 m met een prominente kopbult. Bedreigd en beschermd, te vinden op Indo-Pacifische riffen.';
+
+  @override
+  String get species_cleaner_wrasse_name => 'Blauwstreeppoetslipvis';
+
+  @override
+  String get species_cleaner_wrasse_desc =>
+      'Kleine blauwgestreepte lipvis die poetsstations bemant en parasieten van grotere vissen verwijdert op Indo-Pacifische riffen.';
+
+  @override
+  String get species_yellowtail_coris_name => 'Geelstaartlipvis';
+
+  @override
+  String get species_yellowtail_coris_desc =>
+      'Kleurrijke lipvis met gevlekt lichaam en gele staart; jongen zijn feloranjerood met witte tekening.';
+
+  @override
+  String get species_bluehead_wrasse_name => 'Blauwkoplipvis';
+
+  @override
+  String get species_bluehead_wrasse_desc =>
+      'Talrijke Caribische lipvis; mannetjes in de eindfase hebben een felblauwe kop en groen lichaam met zwart-witte banden.';
+
+  @override
+  String get species_spanish_hogfish_name => 'Spaanse varkenslipvis';
+
+  @override
+  String get species_spanish_hogfish_desc =>
+      'Paars-gele lipvis, algemeen op Caribische riffen; jongen gedragen zich als poetsvissen.';
+
+  @override
+  String get species_bumphead_parrotfish_name => 'Bultkoppapegaaivis';
+
+  @override
+  String get species_bumphead_parrotfish_desc =>
+      'Grootste papegaaivissoort tot 1,3 m, met een enorme kopbult. Trekt in scholen over Indo-Pacifische riffen.';
+
+  @override
+  String get species_stoplight_parrotfish_name => 'Stoplichtpapegaaivis';
+
+  @override
+  String get species_stoplight_parrotfish_desc =>
+      'Algemene Caribische papegaaivis met dramatische kleurverschillen tussen begin- en eindfase.';
+
+  @override
+  String get species_queen_parrotfish_name => 'Koninginnepapegaaivis';
+
+  @override
+  String get species_queen_parrotfish_desc =>
+      'Grote blauwgroene papegaaivis op Caribische riffen, vaak te zien terwijl hij koraal afbijt om algen te eten.';
+
+  @override
+  String get species_yellowtail_damselfish_name => 'Geelstaartjuffervis';
+
+  @override
+  String get species_yellowtail_damselfish_desc =>
+      'Donkerblauwe juffervis met een felgele staart, algemeen op Caribische riftoppen en -kammen.';
+
+  @override
+  String get species_sergeant_major_name => 'Sergeant-majoor';
+
+  @override
+  String get species_sergeant_major_desc =>
+      'Zilvergele juffervis met vijf markante zwarte banden, in grote groepen op tropische Atlantische riffen.';
+
+  @override
+  String get species_three_spot_damselfish_name => 'Drievlekjuffervis';
+
+  @override
+  String get species_three_spot_damselfish_desc =>
+      'Donkerbruine territoriale juffervis die zijn algentuin fel verdedigt op Caribische riffen.';
+
+  @override
+  String get species_chromis_viridis_name => 'Blauwgroene chromis';
+
+  @override
+  String get species_chromis_viridis_desc =>
+      'Kleine iriserend groene juffervis die in grote scholen boven vertakte koralen op Indo-Pacifische riffen zweeft.';
+
+  @override
+  String get species_blue_chromis_name => 'Blauwe chromis';
+
+  @override
+  String get species_blue_chromis_desc =>
+      'Schitterend blauwe planktonetende juffervis in grote groepen in het middenwater boven Caribische rifwanden.';
+
+  @override
+  String get species_nassau_grouper_name => 'Nassau-tandbaars';
+
+  @override
+  String get species_nassau_grouper_desc =>
+      'Grote Caribische tandbaars met kenmerkende donkere oogstreep en bandenpatroon, nu bedreigd door overbevissing.';
+
+  @override
+  String get species_giant_grouper_name => 'Reuzentandbaars';
+
+  @override
+  String get species_giant_grouper_desc =>
+      'De grootste beenvis van het rif, tot 2,7 m en 400 kg. Te vinden in grotten en wrakken in de hele Indo-Pacific.';
+
+  @override
+  String get species_coral_grouper_name => 'Koraaltandbaars';
+
+  @override
+  String get species_coral_grouper_desc =>
+      'Felrood-oranje tandbaars bedekt met blauwe stippen, een kenmerkende soort van Indo-Pacifische koraalriffen.';
+
+  @override
+  String get species_goliath_grouper_name => 'Goliathtandbaars';
+
+  @override
+  String get species_goliath_grouper_desc =>
+      'Kolossale Atlantische tandbaars tot 2,5 m, vaak te zien bij wrakken en overhangen in Florida en het Caribisch gebied.';
+
+  @override
+  String get species_potato_grouper_name => 'Aardappeltandbaars';
+
+  @override
+  String get species_potato_grouper_desc =>
+      'Grote, gezellige tandbaars met donkere aardappelvormige vlekken, beroemd bij Cod Hole op het Great Barrier Reef.';
+
+  @override
+  String get species_peacock_grouper_name => 'Pauwtandbaars';
+
+  @override
+  String get species_peacock_grouper_desc =>
+      'Donkerbruine tandbaars met felblauwe stippen en bleke verticale banden achteraan, algemeen op Indo-Pacifische riffen.';
+
+  @override
+  String get species_yellowfin_tuna_name => 'Geelvintonijn';
+
+  @override
+  String get species_yellowfin_tuna_desc =>
+      'Snelle pelagische jager met lange gele rug- en aarsvin, af en toe door duikers gezien op offshore stekken.';
+
+  @override
+  String get species_dogtooth_tuna_name => 'Hondstandtonijn';
+
+  @override
+  String get species_dogtooth_tuna_desc =>
+      'Krachtige rifgebonden tonijn met opvallende tanden, te ontmoeten bij diepe rifsteilwanden in de Indo-Pacific.';
+
+  @override
+  String get species_great_barracuda_name => 'Grote barracuda';
+
+  @override
+  String get species_great_barracuda_desc =>
+      'Gestroomlijnde zilveren jager tot 1,8 m met forse tanden, vaak roerloos zwevend bij tropische riffen.';
+
+  @override
+  String get species_blackfin_barracuda_name => 'Zwartvinbarracuda';
+
+  @override
+  String get species_blackfin_barracuda_desc =>
+      'Indo-Pacifische barracuda die berucht is om de enorme tornado-achtige scholen op stekken als Barracuda Point.';
+
+  @override
+  String get species_mahi_mahi_name => 'Goudmakreel';
+
+  @override
+  String get species_mahi_mahi_desc =>
+      'Oogverblindend blauwgroen-gouden pelagische vis met stomp voorhoofd, soms te zien op offshore duikstekken.';
+
+  @override
+  String get species_giant_trevally_name => 'Reuzenmakreel';
+
+  @override
+  String get species_giant_trevally_desc =>
+      'Krachtige zilveren jager tot 1,7 m, bekend om zijn jachten in rifkanalen en langs steilwanden in de Indo-Pacific.';
+
+  @override
+  String get species_bluefin_trevally_name => 'Blauwvinmakreel';
+
+  @override
+  String get species_bluefin_trevally_desc =>
+      'Gestroomlijnde blauwgestippelde makreel die in kleine jachtgroepen langs Indo-Pacifische rifranden patrouilleert.';
+
+  @override
+  String get species_bigeye_trevally_name => 'Grootoogmakreel';
+
+  @override
+  String get species_bigeye_trevally_desc =>
+      'Zilveren makreel met grote ogen die indrukwekkende wervelende scholen vormt bij rifwanden en poetsstations.';
+
+  @override
+  String get species_bar_jack_name => 'Bandmakreel';
+
+  @override
+  String get species_bar_jack_desc =>
+      'Gestroomlijnde zilveren Caribische makreel met een kenmerkende donkerblauwe streep over de rug tot in de onderste staartlob.';
+
+  @override
+  String get species_horse_eye_jack_name => 'Paardenoogmakreel';
+
+  @override
+  String get species_horse_eye_jack_desc =>
+      'Zilveren makreel met grote ogen die scholen vormt bij riffen en wrakken in het Caribisch gebied en de westelijke Atlantische Oceaan.';
+
+  @override
+  String get species_yellowtail_snapper_name => 'Geelstaartsnapper';
+
+  @override
+  String get species_yellowtail_snapper_desc =>
+      'Gestroomlijnde snapper met een gele zijstreep en staart, vaak in scholen in het middenwater op Caribische riffen.';
+
+  @override
+  String get species_schoolmaster_snapper_name => 'Schoolmeestersnapper';
+
+  @override
+  String get species_schoolmaster_snapper_desc =>
+      'Geel-zilveren snapper met blauwe lijnen onder het oog, in groepen onder overhangen op Caribische riffen.';
+
+  @override
+  String get species_bluestripe_snapper_name => 'Blauwstreepsnapper';
+
+  @override
+  String get species_bluestripe_snapper_desc =>
+      'Felgele snapper met vier blauwe horizontale strepen die dichte scholen vormt op Indo-Pacifische riffen.';
+
+  @override
+  String get species_twinspot_snapper_name => 'Tweevleksnapper';
+
+  @override
+  String get species_twinspot_snapper_desc =>
+      'Grote rode snapper op Indo-Pacifische buitenriffen, soms in scholen langs diepe wanden en kanalen.';
+
+  @override
+  String get species_humphead_snapper_name => 'Middernachtsnapper';
+
+  @override
+  String get species_humphead_snapper_desc =>
+      'Grote donkere snapper in scholen bij steile Indo-Pacifische steilwanden; jongen zijn markant zwart-wit.';
+
+  @override
+  String get species_longfin_bannerfish_name => 'Langvinwimpelvis';
+
+  @override
+  String get species_longfin_bannerfish_desc =>
+      'Zwart-witte vis met een lange slepende rugvin en gele staart, vaak in paren op Indo-Pacifische riffen.';
+
+  @override
+  String get species_batfish_orbicular_name => 'Ronde vleermuisvis';
+
+  @override
+  String get species_batfish_orbicular_desc =>
+      'Zilveren schijfvormige vis met hoge vinnen die nieuwsgierig op duikers afkomt. Algemeen bij Indo-Pacifische wrakken en riffen.';
+
+  @override
+  String get species_batfish_teira_name => 'Langvinvleermuisvis';
+
+  @override
+  String get species_batfish_teira_desc =>
+      'Vleermuisvis met hoge vinnen en een donkere vlek bij de borstvin, vaak te zien bij poetsstations en wrakken.';
+
+  @override
+  String get species_batfish_pinnatus_name => 'Geveerde vleermuisvis';
+
+  @override
+  String get species_batfish_pinnatus_desc =>
+      'Jongen zijn gitzwart met felle oranje randen en lijken op een giftige platworm. Te vinden in de westelijke Pacific.';
+
+  @override
+  String get species_banggai_cardinalfish_name => 'Banggai-kardinaalvis';
+
+  @override
+  String get species_banggai_cardinalfish_desc =>
+      'Opvallende zilver-zwarte kardinaalvis met langgerekte vinnen, endemisch op de Banggai-eilanden van Indonesië.';
+
+  @override
+  String get species_pajama_cardinalfish_name => 'Pyjamakardinaalvis';
+
+  @override
+  String get species_pajama_cardinalfish_desc =>
+      'Bijzondere kardinaalvis met geel gezicht, donkere middenband en gevlekte achterkant, tussen koralen in de Indo-Pacific.';
+
+  @override
+  String get species_longnose_hawkfish_name => 'Langsnuitkoraalwachter';
+
+  @override
+  String get species_longnose_hawkfish_desc =>
+      'Kleine witte vis met rood ruitpatroon en langgerekte snuit, zit vaak op gorgonen en zwarte koralen.';
+
+  @override
+  String get species_arc_eye_hawkfish_name => 'Boogoogkoraalwachter';
+
+  @override
+  String get species_arc_eye_hawkfish_desc =>
+      'Kleine koraalwachter met een kenmerkende oranje boog achter het oog, meestal op koraalkoppen op Indo-Pacifische riffen.';
+
+  @override
+  String get species_flame_hawkfish_name => 'Vlamkoraalwachter';
+
+  @override
+  String get species_flame_hawkfish_desc =>
+      'Schitterend rode koraalwachter met donkere oogtekening, zittend in Pocillopora-koralen in de westelijke Pacific.';
+
+  @override
+  String get species_fire_goby_name => 'Vuurgrondel';
+
+  @override
+  String get species_fire_goby_desc =>
+      'Elegante witte grondel met een hoge eerste rugvin en roodoranje staart, zweeft boven Indo-Pacifisch rifpuin.';
+
+  @override
+  String get species_purple_firefish_name => 'Purperen vuurgrondel';
+
+  @override
+  String get species_purple_firefish_desc =>
+      'Tere grondel met paarse vinnen en een hoge rugvinstekel, zwevend bij holen op Indo-Pacifische buitenriffen.';
+
+  @override
+  String get species_yellownose_goby_name => 'Geelsnuitgrondel';
+
+  @override
+  String get species_yellownose_goby_desc =>
+      'Piepkleine Caribische poetsgrondel met gele snuit en blauwe zijstreep, te vinden op sponzen en koraalkoppen.';
+
+  @override
+  String get species_citron_goby_name => 'Citroengrondel';
+
+  @override
+  String get species_citron_goby_desc =>
+      'Piepkleine felgele grondel die tussen de takken van Acropora-koralen op Indo-Pacifische riffen leeft.';
+
+  @override
+  String get species_shrimp_goby_name => 'Steinitz\' garnaalgrondel';
+
+  @override
+  String get species_shrimp_goby_desc =>
+      'Zandkleurige grondel die op Indo-Pacifische zandvlaktes een hol deelt met alfeïde garnalen in een wederzijds voordelige samenwerking.';
+
+  @override
+  String get species_neon_goby_name => 'Neongrondel';
+
+  @override
+  String get species_neon_goby_desc =>
+      'Piepkleine donkere grondel met een schitterend neonblauwe streep die poetsstations bemant op Caribische koraalkoppen.';
+
+  @override
+  String get species_bluestriped_fangblenny_name =>
+      'Blauwgestreepte sabeltandslijmvis';
+
+  @override
+  String get species_bluestriped_fangblenny_desc =>
+      'Kleine blauwgestreepte slijmvis die poetslipvissen nabootst om schubben van nietsvermoedende vissen te bijten.';
+
+  @override
+  String get species_sailfin_blenny_name => 'Zeilvinslijmvis';
+
+  @override
+  String get species_sailfin_blenny_desc =>
+      'Piepkleine Caribische slijmvis die vanuit zijn kokerwoning een grote zeilvormige rugvin opzet om partners te lokken.';
+
+  @override
+  String get species_bicolor_blenny_name => 'Tweekleurige slijmvis';
+
+  @override
+  String get species_bicolor_blenny_desc =>
+      'Kleine slijmvis met donkerbruine voorhelft en oranje achterhelft, turend vanuit holletjes op Indo-Pacifische riffen.';
+
+  @override
+  String get species_redlip_blenny_name => 'Roodlipslijmvis';
+
+  @override
+  String get species_redlip_blenny_desc =>
+      'Donkere slijmvis met opvallende roodoranje lippen die algenplekken op Caribische rifkammen verdedigt.';
+
+  @override
+  String get species_pygmy_seahorse_name => 'Bargibants dwergzeepaardje';
+
+  @override
+  String get species_pygmy_seahorse_desc =>
+      'Piepklein zeepaardje van minder dan 2 cm dat perfect versmelt met zijn gorgoon, een geliefd onderwerp voor macrofotografie.';
+
+  @override
+  String get species_common_seahorse_name => 'Gewoon zeepaardje';
+
+  @override
+  String get species_common_seahorse_desc =>
+      'Middelgroot zeepaardje in zeegrasvelden en koraalpuin in de hele Indo-Pacific, wisselend van kleur.';
+
+  @override
+  String get species_thorny_seahorse_name => 'Doornig zeepaardje';
+
+  @override
+  String get species_thorny_seahorse_desc =>
+      'Zeepaardje bedekt met lange stekels, te vinden in zeegrasvelden en op zachte bodems in de hele Indo-Pacific.';
+
+  @override
+  String get species_ornate_ghost_pipefish_name => 'Sierlijke spookzeenaald';
+
+  @override
+  String get species_ornate_ghost_pipefish_desc =>
+      'Prachtig gecamoufleerde zeenaald die met de kop omlaag zweeft bij haarsterren en zachte koralen in de Indo-Pacific.';
+
+  @override
+  String get species_robust_ghost_pipefish_name => 'Robuuste spookzeenaald';
+
+  @override
+  String get species_robust_ghost_pipefish_desc =>
+      'Grote spookzeenaald die zeegras of algen nabootst, vaak in paren in Indo-Pacifische kustwateren.';
+
+  @override
+  String get species_trumpetfish_name => 'Trompetvis';
+
+  @override
+  String get species_trumpetfish_desc =>
+      'Lange slanke vis die jaagt door zich achter grotere vissen te verschuilen, in diverse kleuren op Caribische en Atlantische riffen.';
+
+  @override
+  String get species_cornetfish_name => 'Fluitbekvis';
+
+  @override
+  String get species_cornetfish_desc =>
+      'Extreem langgerekte vis tot 1,5 m met een slepende staartdraad, vaak glijdend over rifplaten te zien.';
+
+  @override
+  String get species_yellowhead_jawfish_name => 'Geelkopkaakvis';
+
+  @override
+  String get species_yellowhead_jawfish_desc =>
+      'Kleine blauwe vis met gele kop die boven zijn zandhol zweeft op Caribische riffen. Mannetjes broeden de eieren uit in hun bek.';
+
+  @override
+  String get species_flamefish_name => 'Vlamkardinaalvis';
+
+  @override
+  String get species_flamefish_desc =>
+      'Kleine felrode kardinaalvis met een donkere vlek onder de tweede rugvin, overdag verscholen in Caribische rifspleten.';
+
+  @override
+  String get species_longspine_squirrelfish_name => 'Langstekeleekhoornvis';
+
+  @override
+  String get species_longspine_squirrelfish_desc =>
+      'Rode nachtactieve vis met grote ogen en een lange rugvinstekel, overdag onder overhangen op Caribische riffen.';
+
+  @override
+  String get species_soldierfish_name => 'Grootschubsoldatenvis';
+
+  @override
+  String get species_soldierfish_desc =>
+      'Rode nachtactieve vis met enorme donkere ogen en grote schubben, overdag in groepen in grotten en onder overhangen.';
+
+  @override
+  String get species_flame_angelfish_name => 'Vlamengelvis';
+
+  @override
+  String get species_flame_angelfish_desc =>
+      'Schitterend roodoranje dwergengelvis met zwarte verticale banden en blauwgepunte vinnen, voorkomend in de hele Pacific.';
+
+  @override
+  String get species_royal_gramma_name => 'Koninklijke gramma';
+
+  @override
+  String get species_royal_gramma_desc =>
+      'Klein tweekleurig Caribisch baarsje met een paarse voorhelft en gele achterhelft, te vinden onder overhangen.';
+
+  @override
+  String get species_anthias_lyretail_name => 'Lierstaartanthias';
+
+  @override
+  String get species_anthias_lyretail_desc =>
+      'Talrijke rifvis die grote oranje en roze wolken vormt boven Indo-Pacifische koraalformaties. Mannetjes zijn paars.';
+
+  @override
+  String get species_mediterranean_grouper_name => 'Bruine tandbaars';
+
+  @override
+  String get species_mediterranean_grouper_desc =>
+      'Grote donkerbruine tandbaars met bleke vlekken, de iconische jager van mediterrane rotsriffen.';
+
+  @override
+  String get species_mediterranean_moray_name => 'Europese murene';
+
+  @override
+  String get species_mediterranean_moray_desc =>
+      'Donkerbruine murene met gele vlekken, vaak turend vanuit rotsspleten in de Middellandse Zee.';
+
+  @override
+  String get species_ornate_wrasse_name => 'Pauwlipvis';
+
+  @override
+  String get species_ornate_wrasse_desc =>
+      'Kleurrijke groene lipvis met rode koptekening, een van de meest algemene lipvissen op mediterrane riffen.';
+
+  @override
+  String get species_red_sea_bannerfish_name => 'Gemaskerde vlindervis';
+
+  @override
+  String get species_red_sea_bannerfish_desc =>
+      'Felgele vlindervis met een donkere oogvlek, endemisch in de Rode Zee. Vaak in paren te zien.';
+
+  @override
+  String get species_red_sea_anemonefish_name => 'Rodezee-anemoonvis';
+
+  @override
+  String get species_red_sea_anemonefish_desc =>
+      'Oranjegele anemoonvis met twee witte banden, endemisch in de Rode Zee en de Golf van Aden.';
+
+  @override
+  String get species_arabian_angelfish_name => 'Arabische engelvis';
+
+  @override
+  String get species_arabian_angelfish_desc =>
+      'Grote donkerblauwe engelvis met een markante gele verticale band en gele staart, endemisch in de westelijke Indische Oceaan.';
+
+  @override
+  String get species_king_angelfish_name => 'Koningsengelvis';
+
+  @override
+  String get species_king_angelfish_desc =>
+      'Grote donkerblauwe engelvis met een witte verticale band en gele staart, in de oostelijke Pacific en bij de Galapagos.';
+
+  @override
+  String get species_ocean_sunfish_name => 'Maanvis';
+
+  @override
+  String get species_ocean_sunfish_desc =>
+      'De zwaarste beenvis, tot ruim 2 ton. Af en toe door duikers gezien bij poetsstations op Bali en bij de Galapagos.';
+
+  @override
+  String get species_lingcod_name => 'Lingcod';
+
+  @override
+  String get species_lingcod_desc =>
+      'Grote gevlekte roofzuchtige groenling op rotsriffen van de Amerikaanse noordwestkust, vaak eierpakketten bewakend.';
+
+  @override
+  String get species_wolf_eel_name => 'Wolfaal';
+
+  @override
+  String get species_wolf_eel_desc =>
+      'Grote grijze wolfaal met bolle kop en krachtige kaken, te vinden in rotsholen langs de Amerikaanse noordwestkust.';
+
+  @override
+  String get species_giant_sea_bass_name => 'Reuzenzeebaars';
+
+  @override
+  String get species_giant_sea_bass_desc =>
+      'Kolossale baars van ruim 2 m en 250 kg, te vinden op rotsriffen en in kelpwouden voor de kust van Zuid-Californië.';
+
+  @override
+  String get species_garibaldi_name => 'Garibaldi';
+
+  @override
+  String get species_garibaldi_desc =>
+      'Feloranje juffervis en de officiële zeevis van Californië, territoriaal op riffen in kelpwouden.';
+
+  @override
+  String get species_sheephead_name => 'Californische schaapskoplipvis';
+
+  @override
+  String get species_sheephead_desc =>
+      'Grote lipvis met zwarte kop en staart, rood middendeel en witte kin. Te vinden in Californische kelpwouden.';
+
+  @override
+  String get species_copper_rockfish_name => 'Koperkleurige roodbaars';
+
+  @override
+  String get species_copper_rockfish_desc =>
+      'Koperoranje roodbaars met bleke vlekken, een vertrouwde verschijning op rotsriffen en in kelpwouden van de Amerikaanse noordwestkust.';
+
+  @override
+  String get species_oriental_sweetlips_name => 'Oosterse zoetlipvis';
+
+  @override
+  String get species_oriental_sweetlips_desc =>
+      'Grote Indo-Pacifische rifvis met markante zwart-witte strepen en gele vinnen. Jongen voeren een kronkelende dans uit.';
+
+  @override
+  String get species_harlequin_sweetlips_name => 'Harlekijnzoetlipvis';
+
+  @override
+  String get species_harlequin_sweetlips_desc =>
+      'Volwassen dieren zijn grijs met donkere vlekken; jongen zijn bruin met grote witte vlekken en zwemmen met een golvende beweging.';
+
+  @override
+  String get species_blue_ringed_angelfish_name => 'Blauwring-engelvis';
+
+  @override
+  String get species_blue_ringed_angelfish_desc =>
+      'Grote bruine engelvis met blauwe gebogen lijnen en een kenmerkende blauwe ring boven het kieuwdeksel.';
+
+  @override
+  String get species_yellowbar_angelfish_name => 'Geelband-engelvis';
+
+  @override
+  String get species_yellowbar_angelfish_desc =>
+      'Grote grijsblauwe engelvis met een opvallende gele vlek op het lichaam, voorkomend in de Rode Zee en de westelijke Indische Oceaan.';
+
+  @override
+  String get species_filefish_scrawled_name => 'Gekrabbelde vijlvis';
+
+  @override
+  String get species_filefish_scrawled_desc =>
+      'Grote olijfbruine vijlvis met blauwe krabbelachtige tekening en oranje keelzak, wereldwijd op tropische riffen.';
+
+  @override
+  String get species_clown_filefish_name => 'Oranjegevlekte vijlvis';
+
+  @override
+  String get species_clown_filefish_desc =>
+      'Kleine groene vijlvis met oranje stippen en een lange snuit, eet uitsluitend poliepen van Acropora-koraal.';
+
+  @override
+  String get species_unicornfish_name => 'Blauwstekeleenhoornvis';
+
+  @override
+  String get species_unicornfish_desc =>
+      'Grijze doktersvis met een opvallende hoorn op het voorhoofd en twee blauwe staartstekels, algemeen op Indo-Pacifische rifplaten.';
+
+  @override
+  String get species_surgeonfish_sailfin_name => 'Zeilvindoktersvis';
+
+  @override
+  String get species_surgeonfish_sailfin_desc =>
+      'Markant gebande doktersvis met een sterk vergrote rug- en aarsvin, voorkomend in de hele Indo-Pacific.';
+
+  @override
+  String get species_achilles_tang_name => 'Achilles-doktersvis';
+
+  @override
+  String get species_achilles_tang_desc =>
+      'Donkerbruine doktersvis met een felle oranje traanvorm bij de staart, in brandingszones van de centrale Pacific.';
+
+  @override
+  String get species_doctorfish_name => 'Caribische doktersvis';
+
+  @override
+  String get species_doctorfish_desc =>
+      'Grijsbruine doktersvis met vage donkere banden en een opvallend staartscalpel, algemeen op Caribische riffen.';
+
+  @override
+  String get species_checkerboard_wrasse_name => 'Schaakbordlipvis';
+
+  @override
+  String get species_checkerboard_wrasse_desc =>
+      'Kleurrijke lipvis met een schaakbordpatroon van groene, roze en zwarte vlakken over het lichaam.';
+
+  @override
+  String get species_bird_wrasse_name => 'Vogellipvis';
+
+  @override
+  String get species_bird_wrasse_desc =>
+      'Lipvis met een extreem langgerekte snuit als een vogelsnavel; mannetjes zijn donkergroen, vrouwtjes bruin.';
+
+  @override
+  String get species_sling_jaw_wrasse_name => 'Slingerkaaklipvis';
+
+  @override
+  String get species_sling_jaw_wrasse_desc =>
+      'Lipvis met een uitschuifbare kaak die naar voren schiet om prooi te grijpen, in gele of bruine kleurvormen.';
+
+  @override
+  String get species_peacock_flounder_name => 'Pauwbot';
+
+  @override
+  String get species_peacock_flounder_desc =>
+      'Platte bodembewonende vis met blauwe ringen en stippen die van kleur kan veranderen om bij de zeebodem te passen.';
+
+  @override
+  String get species_hogfish_name => 'Varkenslipvis';
+
+  @override
+  String get species_hogfish_desc =>
+      'Grote West-Atlantische lipvis met een varkensachtige snuit en langgerekte rugvinstekels, bij riffen en wrakken.';
+
+  @override
+  String get species_tarpon_name => 'Atlantische tarpoen';
+
+  @override
+  String get species_tarpon_desc =>
+      'Enorme zilveren vis met grote spiegelende schubben, soms door duikers ontmoet in Caribische grotten en kanalen.';
+
+  @override
+  String get species_permit_name => 'Grote pompano';
+
+  @override
+  String get species_permit_desc =>
+      'Hoog gebouwde zilveren makreel met een donkere gevorkte staart, op Caribische zandvlaktes en nabij riffen.';
+
+  @override
+  String get species_spotted_drum_name => 'Gevlekte trommelvis';
+
+  @override
+  String get species_spotted_drum_desc =>
+      'Opvallende Caribische vis met een hoge langgerekte rugvin en een markant zwart-wit gevlekt patroon.';
+
+  @override
+  String get species_jackknife_fish_name => 'Zakmesvis';
+
+  @override
+  String get species_jackknife_fish_desc =>
+      'Elegante Caribische vis met een hoge zwarte rugvinstreep en diagonale lichaamsband, te vinden onder overhangen.';
+
+  @override
+  String get species_bigeye_name => 'Glasoog';
+
+  @override
+  String get species_bigeye_desc =>
+      'Felrode nachtactieve vis met grote weerspiegelende ogen, verscholen in grotten op Caribische en Atlantische riffen.';
+
+  @override
+  String get species_remora_name => 'Zuigvis';
+
+  @override
+  String get species_remora_desc =>
+      'Slanke vis met een zuignap op de kop die meelift met haaien, roggen, schildpadden en andere grote dieren.';
+
+  @override
+  String get species_tilefish_sand_name => 'Zandtegelvis';
+
+  @override
+  String get species_tilefish_sand_desc =>
+      'Langgerekte lichtblauwe vis die puinheuveltjes bouwt op zandige plekken van Caribische riffen.';
+
+  @override
+  String get species_weedy_seadragon_name => 'Wierzeedraak';
+
+  @override
+  String get species_weedy_seadragon_desc =>
+      'Sierlijke verwant van de zeepaardjes met bladachtige aanhangsels, endemisch in de gematigde wateren van Zuid-Australië.';
+
+  @override
+  String get species_leafy_seadragon_name => 'Bladzeedraak';
+
+  @override
+  String get species_leafy_seadragon_desc =>
+      'Spectaculaire zeedraak bedekt met uitbundige bladvormige uitsteeksels, endemisch in Zuid-Australië. Een waarneming voor op je verlanglijst.';
+
+  @override
+  String get species_sailfin_snapper_name => 'Zeilvinsnapper';
+
+  @override
+  String get species_sailfin_snapper_desc =>
+      'Elegante geel-blauwe snapper met langgerekte rug- en aarsvin, te vinden op Indo-Pacifische rifhellingen.';
+
+  @override
+  String get species_sweetlip_emperor_name => 'Gespikkelde keizersbaars';
+
+  @override
+  String get species_sweetlip_emperor_desc =>
+      'Grote zilverachtige keizersbaars met blauwe lijnen op het gezicht en gele vinranden, algemeen boven zandige Indo-Pacifische rifgebieden.';
+
+  @override
+  String get species_crocodilefish_name => 'Krokodilvis';
+
+  @override
+  String get species_crocodilefish_desc =>
+      'Platkoppige hinderlaagjager met sierlijke oogfranjes die perfect gecamoufleerd op Indo-Pacifische rifbodems ligt.';
+
+  @override
+  String get species_devil_scorpionfish_name => 'Duivelsschorpioenvis';
+
+  @override
+  String get species_devil_scorpionfish_desc =>
+      'Gedrongen gecamoufleerde schorpioenvis die kleurrijke binnenzijden van de borstvinnen toont als waarschuwing aan jagers.';
+
+  @override
+  String get species_spiny_devilfish_name => 'Duivelsteker';
+
+  @override
+  String get species_spiny_devilfish_desc =>
+      'Giftige bodembewoner die op omgevormde vinstralen loopt en felle borstvinnen laat flitsen bij verstoring.';
+
+  @override
+  String get species_waspfish_name => 'Kaketoewespvis';
+
+  @override
+  String get species_waspfish_desc =>
+      'Kleine zijdelings afgeplatte schorpioenvis die als een dood blad meedeint met de stroming boven Indo-Pacifische modderbodems.';
+
+  @override
+  String get species_stargazer_name => 'Witrandsterrenkijker';
+
+  @override
+  String get species_stargazer_desc =>
+      'Hinderlaagjager die zich in het zand ingraaft met alleen de ogen zichtbaar en elektrische schokken kan afgeven. Voorkomend in de Indo-Pacific.';
+
+  @override
+  String get species_striped_catfish_name => 'Gestreepte koraalmeerval';
+
+  @override
+  String get species_striped_catfish_desc =>
+      'Meerval met giftige stekels; jongen vormen dichte bolvormige scholen die over Indo-Pacifische rifbodems rollen.';
+
+  @override
+  String get species_red_emperor_name => 'Rode keizersnapper';
+
+  @override
+  String get species_red_emperor_desc =>
+      'Grote snapper; volwassen dieren zijn roze-rood, jongen hebben markante rode en witte banden. Te vinden op Indo-Pacifische riffen.';
+
+  @override
+  String get species_mangrove_snapper_name => 'Mangrovesnapper';
+
+  @override
+  String get species_mangrove_snapper_desc =>
+      'Grijze snapper in Caribische mangroven, zeegras en riffen, vaak samenscholend bij structuren.';
+
+  @override
+  String get species_dottyback_orchid_name => 'Orchideebaarsje';
+
+  @override
+  String get species_dottyback_orchid_desc =>
+      'Klein felpaars visje endemisch in de Rode Zee, dat in en uit spleten van steile rifwanden schiet.';
+
+  @override
+  String get species_dottyback_royal_name => 'Koningsbaarsje';
+
+  @override
+  String get species_dottyback_royal_desc =>
+      'Klein tweekleurig visje met magenta voorkant en felgele achterkant, te vinden op Indo-Pacifische rifwanden.';
+
+  @override
+  String get species_coral_trout_name => 'Koraalforel';
+
+  @override
+  String get species_coral_trout_desc =>
+      'Gewilde jager van het Great Barrier Reef met een oranjerood lichaam vol blauwe stippen.';
+
+  @override
+  String get species_barramundi_cod_name => 'Barramundi-tandbaars';
+
+  @override
+  String get species_barramundi_cod_desc =>
+      'Kenmerkende tandbaars met een kleine kop, gebocheld lichaam en donkere stippen op een bleke ondergrond.';
+
+  @override
+  String get species_spadefish_atlantic_name => 'Atlantische spadevis';
+
+  @override
+  String get species_spadefish_atlantic_desc =>
+      'Zilveren schijfvormige vis met donkere verticale banden, vaak in grote scholen rond Caribische wrakken.';
+
+  @override
+  String get species_fusilier_yellowback_name => 'Geelrugfuselier';
+
+  @override
+  String get species_fusilier_yellowback_desc =>
+      'Gestroomlijnde blauwe planktoneter met gele rug die enorme scholen vormt boven Indo-Pacifische rifhellingen.';
+
+  @override
+  String get species_fusilier_bluestreak_name => 'Blauwstreepfuselier';
+
+  @override
+  String get species_fusilier_bluestreak_desc =>
+      'Kleine blauwe fuselier met een donkere zijstreep, in snel bewegende scholen langs Indo-Pacifische rifwanden.';
+
+  @override
+  String get species_porkfish_name => 'Varkensgrommer';
+
+  @override
+  String get species_porkfish_desc =>
+      'Kleurrijke Caribische grommer met blauwe en gele strepen en twee zwarte kopbanden, bij riffen en wrakken.';
+
+  @override
+  String get species_blue_striped_grunt_name => 'Blauwgestreepte grommer';
+
+  @override
+  String get species_blue_striped_grunt_desc =>
+      'Gele Caribische grommer met heldere blauwe horizontale strepen, vormt overdag grote rustende scholen onder overhangen.';
+
+  @override
+  String get species_french_grunt_name => 'Franse grommer';
+
+  @override
+  String get species_french_grunt_desc =>
+      'Kleine geelgestreepte grommer die overdag dichte rustende scholen vormt op Caribische riffen.';
+
+  @override
+  String get species_convict_tang_name => 'Zebradoktersvis';
+
+  @override
+  String get species_convict_tang_desc =>
+      'Bleke doktersvis met zes verticale zwarte banden, vaak grazend in grote scholen op Indo-Pacifische rifplaten.';
+
+  @override
+  String get species_great_hammerhead_name => 'Geschulpte hamerhaai';
+
+  @override
+  String get species_great_hammerhead_desc =>
+      'Kenmerkende haai met een geschulpte hamervormige kop, vormt grote scholen bij zeebergen en eilanden in open zee.';
+
+  @override
+  String get species_wobbegong_name => 'Gevlekte wobbegong';
+
+  @override
+  String get species_wobbegong_desc =>
+      'Platte, goed gecamoufleerde tapijthaai met franjeachtige lobben rond de bek, op gematigde Australische riffen.';
+
+  @override
+  String get species_manta_ray_name => 'Rifmanta';
+
+  @override
+  String get species_manta_ray_desc =>
+      'Gracieuze reus met een spanwijdte tot 5 m die poetsstations bezoekt en plankton eet op Indo-Pacifische riffen.';
+
+  @override
+  String get species_oceanic_manta_name => 'Oceanische manta';
+
+  @override
+  String get species_oceanic_manta_desc =>
+      'De grootste roggensoort met een spanwijdte van ruim 7 m, te ontmoeten bij zeebergen in open zee en poetsstations.';
+
+  @override
+  String get species_undulated_moray_name => 'Gegolfde murene';
+
+  @override
+  String get species_undulated_moray_desc =>
+      'Geelgroene murene met donkere golvende tekening, \'s nachts vaak jagend op Indo-Pacifische riffen.';
+
+  @override
+  String get species_whitemouth_moray_name => 'Witmondmurene';
+
+  @override
+  String get species_whitemouth_moray_desc =>
+      'Donkerbruine murene met kleine witte stippen en een kenmerkend wit bekinterieur, voorkomend in de hele Indo-Pacific.';
+
+  @override
+  String get species_dragon_moray_name => 'Draakmurene';
+
+  @override
+  String get species_dragon_moray_desc =>
+      'Opvallende murene met drakenachtige hoorns boven de neusgaten en oranjerode luipaardvlekken, voorkomend in de Indo-Pacific.';
+
+  @override
+  String get species_lyretail_grouper_name => 'Lierstaarttandbaars';
+
+  @override
+  String get species_lyretail_grouper_desc =>
+      'Roodroze tandbaars met blauwe stippen en een kenmerkende sikkelvormige staart, op Indo-Pacifische buitenrifwanden.';
+
+  @override
+  String get species_banded_butterflyfish_name => 'Gebande vlindervis';
+
+  @override
+  String get species_banded_butterflyfish_desc =>
+      'Witte vlindervis met vier markante zwarte verticale banden, een van de meest algemene vlindervissen op Caribische riffen.';
+
+  @override
+  String get species_ringed_pipefish_name => 'Geringde zeenaald';
+
+  @override
+  String get species_ringed_pipefish_desc =>
+      'Slanke zeenaald met afwisselend rode en witte ringen, in grotten en onder overhangen op Indo-Pacifische riffen.';
+
+  @override
+  String get species_razorfish_name => 'Scheermesvis';
+
+  @override
+  String get species_razorfish_desc =>
+      'Piepklein visje dat in groepen verticaal met de kop omlaag zwemt, vaak schuilend tussen zee-egelstekels op Indo-Pacifische riffen.';
+
+  @override
+  String get species_harlequin_tuskfish_name => 'Harlekijnslagtandlipvis';
+
+  @override
+  String get species_harlequin_tuskfish_desc =>
+      'Kleurrijke lipvis met felblauwe slagtanden, roodoranje banden en witte vlakken, op riffen in de westelijke Pacific.';
+
+  @override
+  String get species_blue_groper_name => 'Australische blauwe lipvis';
+
+  @override
+  String get species_blue_groper_desc =>
+      'Grote blauwe lipvis endemisch in oost-Australië, aanhankelijk en vaak duikers benaderend op gematigde riffen.';
+
+  @override
+  String get species_red_lipped_batfish_name => 'Roodlipvleermuisvis';
+
+  @override
+  String get species_red_lipped_batfish_desc =>
+      'Bizarre platte vis met felrode lippen die op omgevormde vinnen over de Galapagos-zeebodem loopt.';
+
+  @override
+  String get species_orangeband_surgeonfish_name => 'Oranjebanddoktersvis';
+
+  @override
+  String get species_orangeband_surgeonfish_desc =>
+      'Grijsbruine doktersvis met een oranje horizontale band achter het oog, op Pacifische rifhellingen.';
+
+  @override
+  String get species_maori_wrasse_name => 'Maori-lipvis';
+
+  @override
+  String get species_maori_wrasse_desc =>
+      'Middelgrote lipvis met een donkere band achter de borstvin, algemeen op riffen in de Pacific en de Indische Oceaan.';
+
+  @override
+  String get species_blue_ringed_octopus_name => 'Blauwgeringde octopus';
+
+  @override
+  String get species_blue_ringed_octopus_desc =>
+      'Kleine maar uiterst giftige octopus met felblauwe ringen die oplichten bij dreiging.';
+
+  @override
+  String get species_common_octopus_name => 'Gewone octopus';
+
+  @override
+  String get species_common_octopus_desc =>
+      'Zeer intelligente octopus, bekend om zijn bliksemsnelle kleurwisselingen en probleemoplossend vermogen.';
+
+  @override
+  String get species_giant_pacific_octopus_name => 'Reuzenoctopus';
+
+  @override
+  String get species_giant_pacific_octopus_desc =>
+      'De grootste octopussoort, met een armspanwijdte van ruim 4 meter in koude Pacifische wateren.';
+
+  @override
+  String get species_mimic_octopus_name => 'Mimic-octopus';
+
+  @override
+  String get species_mimic_octopus_desc =>
+      'Opmerkelijke octopus die het uiterlijk en gedrag van andere zeedieren nabootst.';
+
+  @override
+  String get species_coconut_octopus_name => 'Kokosnootoctopus';
+
+  @override
+  String get species_coconut_octopus_desc =>
+      'Kleine octopus die beroemd is om het meedragen van kokosschelpen als verplaatsbare schuilplaats.';
+
+  @override
+  String get species_day_octopus_name => 'Dagoctopus';
+
+  @override
+  String get species_day_octopus_desc =>
+      'Overdag actieve jager, algemeen op Indo-Pacifische riffen, met indrukwekkende camouflagekunsten.';
+
+  @override
+  String get species_wonderpus_octopus_name => 'Wonderpus-octopus';
+
+  @override
+  String get species_wonderpus_octopus_desc =>
+      'Opvallende octopus met een uniek wit-bruin bandpatroon, te vinden op zandige muckstekken.';
+
+  @override
+  String get species_broadclub_cuttlefish_name => 'Breedarmzeekat';
+
+  @override
+  String get species_broadclub_cuttlefish_desc =>
+      'Grote zeekat met hypnotiserende kleurenspelen, veel gezien op Indo-Pacifische riffen.';
+
+  @override
+  String get species_pharaoh_cuttlefish_name => 'Faraozeekat';
+
+  @override
+  String get species_pharaoh_cuttlefish_desc =>
+      'Grote zeekat uit de Indische Oceaan, bekend om zijn pulserende kleurpatronen.';
+
+  @override
+  String get species_flamboyant_cuttlefish_name => 'Flamboyante zeekat';
+
+  @override
+  String get species_flamboyant_cuttlefish_desc =>
+      'Piepkleine zeekat die over de zeebodem loopt en felle paarse, roze en gele pulsen toont.';
+
+  @override
+  String get species_giant_cuttlefish_name => 'Reuzenzeekat';
+
+  @override
+  String get species_giant_cuttlefish_desc =>
+      'De grootste zeekat ter wereld, beroemd om de massale paaiverzamelingen in Zuid-Australië.';
+
+  @override
+  String get species_bigfin_reef_squid_name => 'Grootvinrifpijlinktvis';
+
+  @override
+  String get species_bigfin_reef_squid_desc =>
+      'Scholende pijlinktvis die vaak bij nachtduiken opduikt, aangetrokken door duiklampen.';
+
+  @override
+  String get species_caribbean_reef_squid_name => 'Caribische rifpijlinktvis';
+
+  @override
+  String get species_caribbean_reef_squid_desc =>
+      'Nieuwsgierige pijlinktvis die vaak in kleine groepjes bij rifranden in het Caribisch gebied zweeft.';
+
+  @override
+  String get species_bobtail_squid_name => 'Dwerginktvis';
+
+  @override
+  String get species_bobtail_squid_desc =>
+      'Piepkleine nachtactieve inktvis die zich overdag ingraaft in het zand, een gewilde muckvondst.';
+
+  @override
+  String get species_chambered_nautilus_name => 'Parelboot';
+
+  @override
+  String get species_chambered_nautilus_desc =>
+      'Oeroud levend fossiel met een opgerolde schelp, zelden door duikers gezien in diep water bij dageraad.';
+
+  @override
+  String get species_spanish_dancer_name => 'Spaanse danseres';
+
+  @override
+  String get species_spanish_dancer_desc =>
+      'Grootste zeenaaktslak, die zwemt met een golvende rode mantel als een flamencodanseres.';
+
+  @override
+  String get species_chromodoris_willani_name => 'Willans chromodoris';
+
+  @override
+  String get species_chromodoris_willani_desc =>
+      'Opvallende blauw-zwarte zeenaaktslak met witte rand, algemeen in de Indo-Pacific.';
+
+  @override
+  String get species_chromodoris_lochi_name => 'Lochs chromodoris';
+
+  @override
+  String get species_chromodoris_lochi_desc =>
+      'Blauwe zeenaaktslak met donkere lijnen en witte rand, voorkomend in de hele tropische Pacific.';
+
+  @override
+  String get species_chromodoris_magnifica_name => 'Prachtige chromodoris';
+
+  @override
+  String get species_chromodoris_magnifica_desc =>
+      'Schitterend blauwe, witte en oranje zeenaaktslak op Indo-Pacifische koraalriffen.';
+
+  @override
+  String get species_chromodoris_annae_name => 'Anna\'s chromodoris';
+
+  @override
+  String get species_chromodoris_annae_desc =>
+      'Diepblauwe zeenaaktslak met zwarte lijnen en oranjegepunte rinoforen en kieuwen.';
+
+  @override
+  String get species_nembrotha_kubaryana_name => 'Variabele neonslak';
+
+  @override
+  String get species_nembrotha_kubaryana_desc =>
+      'Donkergroene zeenaaktslak met felle oranje of rode tekening, die zich voedt met zakpijpen.';
+
+  @override
+  String get species_nembrotha_cristata_name => 'Gekuifde nembrotha';
+
+  @override
+  String get species_nembrotha_cristata_desc =>
+      'Zwarte zeenaaktslak met felgroene puistjes en strepen, te vinden op Indo-Pacifische riffen.';
+
+  @override
+  String get species_phyllidia_varicosa_name => 'Knobbelige phyllidia';
+
+  @override
+  String get species_phyllidia_varicosa_desc =>
+      'Blauwgrijze zeenaaktslak met verhoogde geelgepunte knobbels, giftig voor rovers.';
+
+  @override
+  String get species_phyllidia_ocellata_name => 'Geoogde phyllidia';
+
+  @override
+  String get species_phyllidia_ocellata_desc =>
+      'Witte zeenaaktslak met verhoogde, roze omringde knobbels, te vinden op tropische riffen.';
+
+  @override
+  String get species_pikachu_nudibranch_name => 'Pikachu-zeenaaktslak';
+
+  @override
+  String get species_pikachu_nudibranch_desc =>
+      'Piepkleine geel-zwarte zeeslak die op een tekenfilmfiguur lijkt, voorkomend in de Pacific.';
+
+  @override
+  String get species_anna_rosefieldi_name => 'Roboastra-zeenaaktslak';
+
+  @override
+  String get species_anna_rosefieldi_desc =>
+      'Roofzuchtige zeenaaktslak met donker lichaam en felle lengtestrepen die op andere slakken jaagt.';
+
+  @override
+  String get species_lettuce_sea_slug_name => 'Slazeeslak';
+
+  @override
+  String get species_lettuce_sea_slug_desc =>
+      'Gekrulde groene zeeslak die chloroplasten uit algen bewaart om te fotosynthetiseren.';
+
+  @override
+  String get species_blue_dragon_nudibranch_name => 'Blauwe drakenslak';
+
+  @override
+  String get species_blue_dragon_nudibranch_desc =>
+      'Lange aeolide zeenaaktslak met blauwgepunte cerata die symbiotische zoöxanthellen herbergt.';
+
+  @override
+  String get species_gloomy_nudibranch_name => 'Sombere zeenaaktslak';
+
+  @override
+  String get species_gloomy_nudibranch_desc =>
+      'Donker blauwgroene zeenaaktslak met blauwomrande richels, algemeen op Indo-Pacifische riffen.';
+
+  @override
+  String get species_ocellined_nudibranch_name => 'Oranjegelijnde zeenaaktslak';
+
+  @override
+  String get species_ocellined_nudibranch_desc =>
+      'Witte zeenaaktslak met oranje omlijnde richels die geometrische patronen op de mantel vormen.';
+
+  @override
+  String get species_glossodoris_cincta_name => 'Glossodoris-zeenaaktslak';
+
+  @override
+  String get species_glossodoris_cincta_desc =>
+      'Crèmekleurige zeenaaktslak met donkerbruine rand en oranje zoom op de mantel.';
+
+  @override
+  String get species_jorunna_funebris_name => 'Gestippelde zeenaaktslak';
+
+  @override
+  String get species_jorunna_funebris_desc =>
+      'Witte zeenaaktslak bedekt met zwartgepunte caryophyllidia, lijkt op een pluizig konijntje.';
+
+  @override
+  String get species_ceratosoma_trilobatum_name => 'Drielobbige zeenaaktslak';
+
+  @override
+  String get species_ceratosoma_trilobatum_desc =>
+      'Grote zeenaaktslak met een hoge rughoorn en zijlobben in paarse en gele tinten.';
+
+  @override
+  String get species_hypselodoris_apolegma_name => 'Paarse hypselodoris';
+
+  @override
+  String get species_hypselodoris_apolegma_desc =>
+      'Elegante paarse zeenaaktslak met witte mantelrand, te vinden op Indo-Pacifische riffen.';
+
+  @override
+  String get species_hypselodoris_bullockii_name => 'Bullocks hypselodoris';
+
+  @override
+  String get species_hypselodoris_bullockii_desc =>
+      'Roze en paarse zeenaaktslak met geelgepunte rinoforen op Indo-Pacifische riffen.';
+
+  @override
+  String get species_flabellina_exoptata_name => 'Sierlijke flabellina';
+
+  @override
+  String get species_flabellina_exoptata_desc =>
+      'Doorschijnende aeolide zeenaaktslak met paarsgepunte oranje cerata, voorkomend in tropische wateren.';
+
+  @override
+  String get species_risbecia_tryoni_name => 'Tryons risbecia';
+
+  @override
+  String get species_risbecia_tryoni_desc =>
+      'Grote bruin-blauwe zeenaaktslak die vaak in parende paren op Indo-Pacifische riffen wordt gevonden.';
+
+  @override
+  String get species_goniobranchus_kuniei_name => 'Kunies zeenaaktslak';
+
+  @override
+  String get species_goniobranchus_kuniei_desc =>
+      'Witte zeenaaktslak met oranje stippen en paarse mantelrand, voorkomend in de westelijke Pacific.';
+
+  @override
+  String get species_mexichromis_multituberculata_name =>
+      'Veelknobbelige zeenaaktslak';
+
+  @override
+  String get species_mexichromis_multituberculata_desc =>
+      'Paars-witte zeenaaktslak met verhoogde knobbels en oranjegepunte aanhangsels.';
+
+  @override
+  String get species_chromodoris_dianae_name => 'Diana\'s chromodoris';
+
+  @override
+  String get species_chromodoris_dianae_desc =>
+      'Felblauwe zeenaaktslak met zwarte strepen en oranje kieuwen, voorkomend in de westelijke Pacific.';
+
+  @override
+  String get species_phyllodesmium_poindimiei_name =>
+      'Zonne-aangedreven zeenaaktslak';
+
+  @override
+  String get species_phyllodesmium_poindimiei_desc =>
+      'Doorschijnende aeolide zeenaaktslak met vertakte cerata die zoöxanthellen herbergt.';
+
+  @override
+  String get species_chromodoris_elisabethina_name => 'Elisabeths chromodoris';
+
+  @override
+  String get species_chromodoris_elisabethina_desc =>
+      'Blauwe zeenaaktslak met gele lijnen en een witte mantelrand, algemeen in Zuidoost-Azië.';
+
+  @override
+  String get species_doridella_batava_name => 'Bataafse dorisslak';
+
+  @override
+  String get species_doridella_batava_desc =>
+      'Variabel zwarte tot bruine dorisslak, te vinden onder stenen en puin op Indo-Pacifische riffen.';
+
+  @override
+  String get species_tiger_cowrie_name => 'Tijgerkauri';
+
+  @override
+  String get species_tiger_cowrie_desc =>
+      'Grote gevlekte kaurischelp op tropische riffen, vaak deels bedekt door zijn eigen mantel.';
+
+  @override
+  String get species_tritons_trumpet_name => 'Tritonshoorn';
+
+  @override
+  String get species_tritons_trumpet_desc =>
+      'Grote roofzuchtige zeeslak en natuurlijke vijand van de doornenkroonzeester.';
+
+  @override
+  String get species_queen_conch_name => 'Koninginnekinkhoorn';
+
+  @override
+  String get species_queen_conch_desc =>
+      'Iconische grote kinkhoorn van Caribische zeegrasvelden met een kenmerkende roze binnenlip.';
+
+  @override
+  String get species_banded_coral_shrimp_name => 'Gebande koraalgarnaal';
+
+  @override
+  String get species_banded_coral_shrimp_desc =>
+      'Rood-wit gebande poetsgarnaal met lange witte antennes, te vinden in rifspleten.';
+
+  @override
+  String get species_mantis_shrimp_name => 'Pauwbidsprinkhaankreeft';
+
+  @override
+  String get species_mantis_shrimp_desc =>
+      'Kleurrijke jager met krachtige knotsvormige aanhangsels die schelpen kunnen verbrijzelen.';
+
+  @override
+  String get species_cleaner_shrimp_name => 'Scharlaken poetsgarnaal';
+
+  @override
+  String get species_cleaner_shrimp_desc =>
+      'Felrood-witte garnaal die poetsstations opzet om rifvissen te bedienen.';
+
+  @override
+  String get species_pederson_cleaner_shrimp_name => 'Pedersons poetsgarnaal';
+
+  @override
+  String get species_pederson_cleaner_shrimp_desc =>
+      'Doorschijnende Caribische poetsgarnaal die tussen de tentakels van anemonen leeft.';
+
+  @override
+  String get species_harlequin_shrimp_name => 'Harlekijngarnaal';
+
+  @override
+  String get species_harlequin_shrimp_desc =>
+      'Opvallend getekende garnaal met platte scharen die zich uitsluitend met zeesterren voedt.';
+
+  @override
+  String get species_coleman_shrimp_name => 'Colemangarnaal';
+
+  @override
+  String get species_coleman_shrimp_desc =>
+      'Piepklein garnaalpaar dat op vuurzee-egels leeft, zeer geliefd bij onderwaterfotografen.';
+
+  @override
+  String get species_emperor_shrimp_name => 'Keizersgarnaal';
+
+  @override
+  String get species_emperor_shrimp_desc =>
+      'Kleurrijke commensale garnaal die meelift op zeekomkommers en zeenaaktslakken.';
+
+  @override
+  String get species_sexy_shrimp_name => 'Sexy garnaal';
+
+  @override
+  String get species_sexy_shrimp_desc =>
+      'Piepkleine anemoongarnaal die bekendstaat om zijn wiegende staartdans, populair in de macrofotografie.';
+
+  @override
+  String get species_marble_shrimp_name => 'Marmergarnaal';
+
+  @override
+  String get species_marble_shrimp_desc =>
+      'Nachtactieve gevlekte garnaal met veerachtige poten, overdag verscholen in rifspleten.';
+
+  @override
+  String get species_spiny_lobster_name => 'Caribische langoest';
+
+  @override
+  String get species_spiny_lobster_desc =>
+      'Grote langoest zonder scharen met lange antennes, schuilend onder rifoverhangen.';
+
+  @override
+  String get species_painted_spiny_lobster_name => 'Geschilderde langoest';
+
+  @override
+  String get species_painted_spiny_lobster_desc =>
+      'Felgekleurde langoest met blauw, groen en wit gestreepte poten op Indo-Pacifische riffen.';
+
+  @override
+  String get species_slipper_lobster_name => 'Beerkreeft';
+
+  @override
+  String get species_slipper_lobster_desc =>
+      'Platte nachtactieve kreeft met brede antenneplaten in plaats van lange zwepen.';
+
+  @override
+  String get species_squat_lobster_name => 'Galatheakreeftje';
+
+  @override
+  String get species_squat_lobster_desc =>
+      'Piepklein roze-paars kreeftachtige dat op reuzentonsponzen leeft, een favoriet voor macrofotografie.';
+
+  @override
+  String get species_hermit_crab_name => 'Blauwpotige heremietkreeft';
+
+  @override
+  String get species_hermit_crab_desc =>
+      'Kleine heremietkreeft met felblauwe poten, veel gezien op Caribische riffen.';
+
+  @override
+  String get species_orangutan_crab_name => 'Orang-oetankrab';
+
+  @override
+  String get species_orangutan_crab_desc =>
+      'Piepkleine harige krab die in bellenkoraal leeft, genoemd naar zijn gelijkenis met een orang-oetan.';
+
+  @override
+  String get species_decorator_crab_name => 'Decoratiekrab';
+
+  @override
+  String get species_decorator_crab_desc =>
+      'Meester in vermomming die sponzen, algen en hydroïdpoliepen op zijn rugschild plakt.';
+
+  @override
+  String get species_porcelain_crab_name => 'Porseleinen anemoonkrab';
+
+  @override
+  String get species_porcelain_crab_desc =>
+      'Platte gevlekte krab die in anemonen leeft en met veerachtige monddelen plankton filtert.';
+
+  @override
+  String get species_arrow_crab_name => 'Pijlkrab';
+
+  @override
+  String get species_arrow_crab_desc =>
+      'Spichtige Caribische krab met een lang spits rostrum en gestreepte poten.';
+
+  @override
+  String get species_channel_clinging_crab_name => 'Caribische klimkrab';
+
+  @override
+  String get species_channel_clinging_crab_desc =>
+      'Grote Caribische rifkrab met donker lichaam en roodoranje scharen, te vinden in spleten.';
+
+  @override
+  String get species_coral_crab_name => 'Koraalwachterkrab';
+
+  @override
+  String get species_coral_crab_desc =>
+      'Kleine gevlekte krab die in symbiose in Pocillopora-koralen leeft en zijn gastheer verdedigt.';
+
+  @override
+  String get species_crown_of_thorns_starfish_name => 'Doornenkroonzeester';
+
+  @override
+  String get species_crown_of_thorns_starfish_desc =>
+      'Giftige veelarmige zeester die koraal eet en riffen bij plagen kan verwoesten.';
+
+  @override
+  String get species_blue_linckia_starfish_name => 'Blauwe zeester';
+
+  @override
+  String get species_blue_linckia_starfish_desc =>
+      'Felblauwe zeester die veel wordt gezien op Indo-Pacifische rifplaten en -hellingen.';
+
+  @override
+  String get species_red_knob_starfish_name => 'Roodknobbelzeester';
+
+  @override
+  String get species_red_knob_starfish_desc =>
+      'Grote grijze zeester met opvallende roodgepunte stekels, te vinden op zandige rifgebieden.';
+
+  @override
+  String get species_chocolate_chip_starfish_name => 'Chocoladestipzeester';
+
+  @override
+  String get species_chocolate_chip_starfish_desc =>
+      'Lichtbruine zeester met donkere verhoogde knobbels als chocoladestukjes op zandige bodems.';
+
+  @override
+  String get species_cushion_star_name => 'Kussenzeester';
+
+  @override
+  String get species_cushion_star_desc =>
+      'Gezwollen vijfhoekige zeester met korte armen, te vinden op Indo-Pacifische rifplaten.';
+
+  @override
+  String get species_fromia_starfish_name => 'Elegante zeester';
+
+  @override
+  String get species_fromia_starfish_desc =>
+      'Kleine oranjerode zeester met bleke plaatranden die een tegelachtig patroon vormen.';
+
+  @override
+  String get species_basket_star_name => 'Medusahoofd';
+
+  @override
+  String get species_basket_star_desc =>
+      'Rijk vertakte armen die zich \'s nachts ontvouwen om plankton uit de stroming te filteren.';
+
+  @override
+  String get species_brittle_star_name => 'Gebande slangster';
+
+  @override
+  String get species_brittle_star_desc =>
+      'Gestreepte slangster onder stenen en in spleten, met lenige, slangachtige armen.';
+
+  @override
+  String get species_feather_star_name => 'Veerster';
+
+  @override
+  String get species_feather_star_desc =>
+      'Veelarmige haarster die op uitsteeksels van het rif zit en met veerachtige armen plankton filtert.';
+
+  @override
+  String get species_black_feather_star_name => 'Zwarte veerster';
+
+  @override
+  String get species_black_feather_star_desc =>
+      'Donkere haarster die kort kan zwemmen door zijn vele armen ritmisch te bewegen.';
+
+  @override
+  String get species_long_spined_sea_urchin_name => 'Langstekelige zee-egel';
+
+  @override
+  String get species_long_spined_sea_urchin_desc =>
+      'Zwarte zee-egel met lange giftige stekels, een onmisbare algengrazer op Caribische riffen.';
+
+  @override
+  String get species_fire_urchin_name => 'Vuurzee-egel';
+
+  @override
+  String get species_fire_urchin_desc =>
+      'Zachte zee-egel met giftige stekels die bij aanraking pijnlijke steken veroorzaken.';
+
+  @override
+  String get species_pencil_urchin_name => 'Potloodzee-egel';
+
+  @override
+  String get species_pencil_urchin_desc =>
+      'Stevige zee-egel met dikke stompe stekels, vastgeklemd in rifspleten.';
+
+  @override
+  String get species_collector_urchin_name => 'Verzamelaarszee-egel';
+
+  @override
+  String get species_collector_urchin_desc =>
+      'Zee-egel die zich met puin en algenresten bedekt om zich te camoufleren.';
+
+  @override
+  String get species_sea_apple_name => 'Zeeappel';
+
+  @override
+  String get species_sea_apple_desc =>
+      'Felgekleurde zeekomkommer met mondtentakels waarmee hij voedsel uit het water filtert.';
+
+  @override
+  String get species_pineapple_sea_cucumber_name => 'Ananaszeekomkommer';
+
+  @override
+  String get species_pineapple_sea_cucumber_desc =>
+      'Grote oranjerode zeekomkommer met stervormige papillen, te vinden op rifhellingen.';
+
+  @override
+  String get species_black_sea_cucumber_name => 'Zwarte zeekomkommer';
+
+  @override
+  String get species_black_sea_cucumber_desc =>
+      'Algemene zwarte zeekomkommer op zandige rifplaten in de hele Indo-Pacific.';
+
+  @override
+  String get species_leopard_sea_cucumber_name => 'Luipaardzeekomkommer';
+
+  @override
+  String get species_leopard_sea_cucumber_desc =>
+      'Gevlekte zeekomkommer die bij verstoring kleverige witte cuvierbuisjes uitstoot.';
+
+  @override
+  String get species_sand_dollar_name => 'Zanddollar';
+
+  @override
+  String get species_sand_dollar_desc =>
+      'Platte schijfvormige zee-egel die half ingegraven in zandbodems ligt.';
+
+  @override
+  String get species_moon_jellyfish_name => 'Oorkwal';
+
+  @override
+  String get species_moon_jellyfish_desc =>
+      'Doorschijnende klokvormige kwal met vier hoefijzervormige geslachtsklieren die door het lichaam schemeren.';
+
+  @override
+  String get species_lions_mane_jellyfish_name => 'Haarkwal';
+
+  @override
+  String get species_lions_mane_jellyfish_desc =>
+      'Een van de grootste kwallensoorten, met lange slepende tentakels in koude wateren.';
+
+  @override
+  String get species_box_jellyfish_name => 'Kubuskwal';
+
+  @override
+  String get species_box_jellyfish_desc =>
+      'Uiterst gevaarlijke kwal met krachtig gif, voorkomend in tropische Indo-Pacifische wateren.';
+
+  @override
+  String get species_upside_down_jellyfish_name => 'Omgekeerde kwal';
+
+  @override
+  String get species_upside_down_jellyfish_desc =>
+      'Bijzondere kwal die met de klok omlaag op zandbodems rust zodat zijn algen kunnen fotosynthetiseren.';
+
+  @override
+  String get species_blue_blubber_jellyfish_name => 'Blauwe blubberkwal';
+
+  @override
+  String get species_blue_blubber_jellyfish_desc =>
+      'Blauwwitte kwal met een stevige klok en gekrulde mondarmen, algemeen in Australische wateren.';
+
+  @override
+  String get species_fried_egg_jellyfish_name => 'Spiegeleikwal';
+
+  @override
+  String get species_fried_egg_jellyfish_desc =>
+      'Mediterrane kwal met een gele koepel als een spiegelei en een milde netelbeet.';
+
+  @override
+  String get species_pacific_sea_nettle_name => 'Pacifische zeenetel';
+
+  @override
+  String get species_pacific_sea_nettle_desc =>
+      'Goudbruine kwal met lange slepende tentakels, voorkomend langs de Pacifische kust.';
+
+  @override
+  String get species_compass_jellyfish_name => 'Kompaskwal';
+
+  @override
+  String get species_compass_jellyfish_desc =>
+      'Bruin-witte kwal met V-vormige tekening die uitstraalt als een kompasroos.';
+
+  @override
+  String get species_spotted_jellyfish_name => 'Gevlekte kwal';
+
+  @override
+  String get species_spotted_jellyfish_desc =>
+      'Witgestippelde goudkleurige kwal, beroemd omdat hij het Jellyfish Lake van Palau vult.';
+
+  @override
+  String get species_barrel_jellyfish_name => 'Wortelmondkwal';
+
+  @override
+  String get species_barrel_jellyfish_desc =>
+      'Grote koepelvormige kwal met gekrulde mondarmen en een milde netelbeet, algemeen in de Atlantische Oceaan.';
+
+  @override
+  String get species_persian_carpet_flatworm_name => 'Perzischtapijtplatworm';
+
+  @override
+  String get species_persian_carpet_flatworm_desc =>
+      'Sierlijke zwarte platworm met geeloranje randen, vaak aangezien voor een zeenaaktslak.';
+
+  @override
+  String get species_leopard_flatworm_name => 'Luipaardplatworm';
+
+  @override
+  String get species_leopard_flatworm_desc =>
+      'Doorschijnende platworm met luipaardachtige vlekken die over rifbodems glijdt.';
+
+  @override
+  String get species_divided_flatworm_name => 'Gedeelde platworm';
+
+  @override
+  String get species_divided_flatworm_desc =>
+      'Opvallende zwart-oranje platworm die giftige zeenaaktslakken nabootst als bescherming.';
+
+  @override
+  String get species_blue_pseudoceros_flatworm_name =>
+      'Blauwe pseudoceros-platworm';
+
+  @override
+  String get species_blue_pseudoceros_flatworm_desc =>
+      'Diepblauwe platworm met oranje rand, glijdend over Indo-Pacifische rifoppervlakken.';
+
+  @override
+  String get species_racing_stripe_flatworm_name => 'Racestreepplatworm';
+
+  @override
+  String get species_racing_stripe_flatworm_desc =>
+      'Crèmekleurige platworm met een duidelijke donkere middenstreep en gegolfde rand.';
+
+  @override
+  String get species_christmas_tree_worm_name => 'Kerstboomworm';
+
+  @override
+  String get species_christmas_tree_worm_desc =>
+      'Kleurrijke worm met spiraalvormige kroontjes in koraal, die zich razendsnel terugtrekt als je nadert.';
+
+  @override
+  String get species_feather_duster_worm_name => 'Plumeauworm';
+
+  @override
+  String get species_feather_duster_worm_desc =>
+      'Kokerbewonende worm met een waaiervormige kroon van veerachtige radiolen om voedsel te filteren.';
+
+  @override
+  String get species_fire_worm_name => 'Bebaarde vuurworm';
+
+  @override
+  String get species_fire_worm_desc =>
+      'Borstelworm met witte brandharen die bij aanraking pijnlijke irritatie veroorzaken.';
+
+  @override
+  String get species_bobbit_worm_name => 'Bobbitworm';
+
+  @override
+  String get species_bobbit_worm_desc =>
+      'Hinderlaagjager die verscholen in het zand ligt en met krachtige kaken bliksemsnel toeslaat.';
+
+  @override
+  String get species_social_feather_duster_name => 'Sociale plumeauworm';
+
+  @override
+  String get species_social_feather_duster_desc =>
+      'Koloniale kokerworm die op Caribische riffen groepen tere gebande kroontjes vormt.';
+
+  @override
+  String get species_giant_clam_name => 'Reuzenschelp';
+
+  @override
+  String get species_giant_clam_desc =>
+      'De grootste levende tweekleppige, met iriserend mantelweefsel waarin symbiotische algen leven.';
+
+  @override
+  String get species_boring_clam_name => 'Borende doopvontschelp';
+
+  @override
+  String get species_boring_clam_desc =>
+      'Kleine kleurrijke schelp die zich in koraalrots boort en alleen zijn felle mantel laat zien.';
+
+  @override
+  String get species_maxima_clam_name => 'Maxima-doopvontschelp';
+
+  @override
+  String get species_maxima_clam_desc =>
+      'Schitterend gekleurde schelp die in rifrots is ingebed, met elektrisch blauwe en groene mantels.';
+
+  @override
+  String get species_flame_scallop_name => 'Vuurschelp';
+
+  @override
+  String get species_flame_scallop_desc =>
+      'Rode tweekleppige met flitsend wit licht langs de mantelrand, te vinden in rifspleten.';
+
+  @override
+  String get species_thorny_oyster_name => 'Stekeloester';
+
+  @override
+  String get species_thorny_oyster_desc =>
+      'Tweekleppige met stekelige schelp, vastgehecht aan rifrots en vaak begroeid met sponzen en algen.';
+
+  @override
+  String get species_magnificent_sea_anemone_name => 'Prachtzeeanemoon';
+
+  @override
+  String get species_magnificent_sea_anemone_desc =>
+      'Grote kleurrijke anemoon die clownvissen herbergt, met een opvallende zuil en wuivende tentakels.';
+
+  @override
+  String get species_bubble_tip_anemone_name => 'Bubbelanemoon';
+
+  @override
+  String get species_bubble_tip_anemone_desc =>
+      'Populaire gastheer voor clownvissen, met bolgepunte tentakels in groene, bruine of rozerode tinten.';
+
+  @override
+  String get species_giant_carpet_anemone_name => 'Reuzentapijtanemoon';
+
+  @override
+  String get species_giant_carpet_anemone_desc =>
+      'Kolossale anemoon met korte kleverige tentakels die ruim een meter in doorsnede kan worden.';
+
+  @override
+  String get species_haddon_carpet_anemone_name => 'Haddons tapijtanemoon';
+
+  @override
+  String get species_haddon_carpet_anemone_desc =>
+      'Platte tapijtanemoon op zandbodems die diverse clownvissen en porseleinkrabben herbergt.';
+
+  @override
+  String get species_long_tentacle_anemone_name => 'Langtentakelanemoon';
+
+  @override
+  String get species_long_tentacle_anemone_desc =>
+      'Anemoon van zandbodems met lange wuivende tentakels, vaak met clownvissen erin.';
+
+  @override
+  String get species_tube_anemone_name => 'Kokeranemoon';
+
+  @override
+  String get species_tube_anemone_desc =>
+      'Elegante anemoon die in een perkamentachtige koker in het zand leeft, met twee kransen tentakels.';
+
+  @override
+  String get species_hell_fire_anemone_name => 'Hellevuuranemoon';
+
+  @override
+  String get species_hell_fire_anemone_desc =>
+      'Sterk netelende anemoon met vertakte tentakels die op zacht koraal lijken.';
+
+  @override
+  String get species_beaded_sea_anemone_name => 'Kralenzeeanemoon';
+
+  @override
+  String get species_beaded_sea_anemone_desc =>
+      'Anemoon met gezwollen kraalvormige tentakeltoppen, op zandige Indo-Pacifische rifgebieden.';
+
+  @override
+  String get species_condylactis_anemone_name => 'Caribische reuzenanemoon';
+
+  @override
+  String get species_condylactis_anemone_desc =>
+      'Grote Caribische anemoon met paarsgepunte tentakels, te vinden op rotsachtige rifbodems.';
+
+  @override
+  String get species_sand_anemone_name => 'Zandanemoon';
+
+  @override
+  String get species_sand_anemone_desc =>
+      'Tere anemoon die deels in het zand is ingegraven, met paarsgepunte tentakels.';
+
+  @override
+  String get species_barrel_sponge_name => 'Reuzentonspons';
+
+  @override
+  String get species_barrel_sponge_desc =>
+      'Kolossale tonvormige spons die eeuwenlang kan leven op Caribische rifwanden.';
+
+  @override
+  String get species_azure_vase_sponge_name => 'Azuurblauwe vaasspons';
+
+  @override
+  String get species_azure_vase_sponge_desc =>
+      'Levendig blauwpaarse vaasvormige spons, te vinden op Caribische rifwanden.';
+
+  @override
+  String get species_yellow_tube_sponge_name => 'Gele buisspons';
+
+  @override
+  String get species_yellow_tube_sponge_desc =>
+      'Felgele buisvormige spons die in trossen groeit op Caribische rifwanden.';
+
+  @override
+  String get species_elephant_ear_sponge_name => 'Olifantsoorspons';
+
+  @override
+  String get species_elephant_ear_sponge_desc =>
+      'Grote oranje waaiervormige spons die op wanden en overhangen in het Caribisch gebied groeit.';
+
+  @override
+  String get species_rope_sponge_name => 'Touwspons';
+
+  @override
+  String get species_rope_sponge_desc =>
+      'Rode rechtopstaande vertakte spons die touwachtige vormen aanneemt op Caribische riffen.';
+
+  @override
+  String get species_portuguese_man_o_war_name => 'Portugees oorlogsschip';
+
+  @override
+  String get species_portuguese_man_o_war_desc =>
+      'Koloniale hydropoliep met een gasgevuld drijflichaam en uiterst pijnlijke slepende tentakels.';
+
+  @override
+  String get species_fire_coral_name => 'Vuurkoraal';
+
+  @override
+  String get species_fire_coral_desc =>
+      'Geen echt koraal maar een hydropoliep die duikers bij aanraking pijnlijke netelwonden bezorgt.';
+
+  @override
+  String get species_by_the_wind_sailor_name => 'Zeilkwal';
+
+  @override
+  String get species_by_the_wind_sailor_desc =>
+      'Blauwe drijvende hydropoliepkolonie met een diagonaal zeil dat de wind vangt.';
+
+  @override
+  String get species_blue_button_name => 'Blauwe knoop';
+
+  @override
+  String get species_blue_button_desc =>
+      'Drijvende koloniale hydropoliep met een platte schijf en blauwe tentakelachtige poliepen.';
+
+  @override
+  String get species_giant_sea_hare_name => 'Reuzenzeehaas';
+
+  @override
+  String get species_giant_sea_hare_desc =>
+      'Een van de grootste zeeslakken, donkerbruin tot zwart, te vinden in kelpvelden.';
+
+  @override
+  String get species_sea_hare_name => 'Gevlekte zeehaas';
+
+  @override
+  String get species_sea_hare_desc =>
+      'Grote groengevlekte zeehaas die bij verstoring paarse inkt uitstoot.';
+
+  @override
+  String get species_nudibranch_berghia_name => 'Berghia-zeenaaktslak';
+
+  @override
+  String get species_nudibranch_berghia_desc =>
+      'Doorschijnende aeolide zeenaaktslak met witgepunte cerata die zich met anemonen voedt.';
+
+  @override
+  String get species_sea_pen_name => 'Zeeveer';
+
+  @override
+  String get species_sea_pen_desc =>
+      'Veervormige koloniale octokoraal die in het zand is verankerd en zich bij verstoring terugtrekt.';
+
+  @override
+  String get species_blue_sea_star_name => 'Blauwe zeester';
+
+  @override
+  String get species_blue_sea_star_desc =>
+      'Veelkleurige zeester die uit één losse arm kan regenereren, op Indo-Pacifische riffen.';
+
+  @override
+  String get species_reef_squid_name => 'Rifpijlinktvis';
+
+  @override
+  String get species_reef_squid_desc =>
+      'Zuidelijke rifpijlinktvis die veel wordt gezien in gematigde Australische wateren.';
+
+  @override
+  String get species_tiger_shrimp_name => 'Tijgergarnaal';
+
+  @override
+  String get species_tiger_shrimp_desc =>
+      'Grote gebande garnaal op zandbodems en in zeegrasvelden in de Indo-Pacific.';
+
+  @override
+  String get species_candy_crab_name => 'Snoepkrab';
+
+  @override
+  String get species_candy_crab_desc =>
+      'Piepkleine kleurrijke krab die met roze of gele stekelige uitsteeksels bij zijn zachtkoraalgastheer past.';
+
+  @override
+  String get species_spider_crab_name => 'Spinnendecoratiekrab';
+
+  @override
+  String get species_spider_crab_desc =>
+      'Traag bewegende krab bedekt met vastgeplakte sponzen en algen als camouflage.';
+
+  @override
+  String get species_anemone_shrimp_name => 'Prachtanemoongarnaal';
+
+  @override
+  String get species_anemone_shrimp_desc =>
+      'Doorzichtige garnaal met witte en paarse tekening die tussen anemoontentakels leeft.';
+
+  @override
+  String get species_snapping_shrimp_name => 'Pistoolgarnaal';
+
+  @override
+  String get species_snapping_shrimp_desc =>
+      'Kleine garnaal die met zijn buitenmaatse schaar een luide knal produceert, vaak in duo met grondels.';
+
+  @override
+  String get species_glass_sponge_name => 'Bloemenmandje van Venus';
+
+  @override
+  String get species_glass_sponge_desc =>
+      'Tere glasspons met een fijn silicaatskelet, te vinden in diep water.';
+
+  @override
+  String get species_toxic_sea_urchin_name => 'Bloemzee-egel';
+
+  @override
+  String get species_toxic_sea_urchin_desc =>
+      'Bedrieglijk mooie zee-egel bedekt met bloemachtige pedicellariën met krachtig gif.';
+
+  @override
+  String get species_slate_pencil_urchin_name => 'Griffelzee-egel';
+
+  @override
+  String get species_slate_pencil_urchin_desc =>
+      'Zee-egel met dikke afgeronde stekels, te vinden op Caribische en Atlantische rifbodems.';
+
+  @override
+  String get species_spiny_sea_star_name => 'Gedoornde zeester';
+
+  @override
+  String get species_spiny_sea_star_desc =>
+      'Grote zeester van gematigde streken met opvallende stekels, in Europese en Atlantische wateren.';
+
+  @override
+  String get species_bat_star_name => 'Vleermuiszeester';
+
+  @override
+  String get species_bat_star_desc =>
+      'Pacifische zeester met zwemvliesachtige armen in oranje, rood of paars, te vinden in kelpwouden.';
+
+  @override
+  String get species_sunflower_star_name => 'Zonnebloemzeester';
+
+  @override
+  String get species_sunflower_star_desc =>
+      'Kolossale, snel bewegende zeester met tot 24 armen, te vinden in Pacifische kelpwouden.';
+
+  @override
+  String get species_blood_star_name => 'Bloedzeester';
+
+  @override
+  String get species_blood_star_desc =>
+      'Feloranjerode zeester met slanke armen, voorkomend in gematigde Pacifische wateren.';
+
+  @override
+  String get species_common_cuttlefish_name => 'Gewone zeekat';
+
+  @override
+  String get species_common_cuttlefish_desc =>
+      'Meester in camouflage met W-vormige pupillen, voorkomend in Europese en mediterrane wateren.';
+
+  @override
+  String get species_blue_spotted_crab_name => 'Blauwgevlekte zwemkrab';
+
+  @override
+  String get species_blue_spotted_crab_desc =>
+      'Actieve zwemkrab met blauwe stippen op het rugschild, op zandige Indo-Pacifische bodems.';
+
+  @override
+  String get species_sponge_crab_name => 'Sponskrab';
+
+  @override
+  String get species_sponge_crab_desc =>
+      'Krab die een levende spons uitsnijdt en als camouflage op zijn rug meedraagt.';
+
+  @override
+  String get species_horseshoe_crab_name => 'Degenkrab';
+
+  @override
+  String get species_horseshoe_crab_desc =>
+      'Oeroud geleedpotig dier met een helmvormig schild, te vinden op Atlantische zandbodems.';
+
+  @override
+  String get species_sea_spider_name => 'Zeespin';
+
+  @override
+  String get species_sea_spider_desc =>
+      'Teer langpotig zeegeleedpotige dat over hydroïdpoliepen en mosdiertjes kruipt.';
+
+  @override
+  String get species_sea_lily_name => 'Zeelelie';
+
+  @override
+  String get species_sea_lily_desc =>
+      'Gesteeld levend fossiel uit de haarsterrengroep dat in dieper water met veerachtige armen voedsel filtert.';
+
+  @override
+  String get species_mantis_shrimp_lysiosquilla_name =>
+      'Speerbidsprinkhaankreeft';
+
+  @override
+  String get species_mantis_shrimp_lysiosquilla_desc =>
+      'Grote gravende bidsprinkhaankreeft met speervormige aanhangsels, te vinden op zandbodems.';
+
+  @override
+  String get species_purple_sea_urchin_name => 'Paarse zee-egel';
+
+  @override
+  String get species_purple_sea_urchin_desc =>
+      'Talrijke paarse zee-egel in Pacifische kelpwouden en rotsige getijdenpoelen.';
+
+  @override
+  String get species_crown_jellyfish_name => 'Kroonkwal';
+
+  @override
+  String get species_crown_jellyfish_desc =>
+      'Dieppaarse kwal met een verhoogde kroonvormige klok, voorkomend in de Indo-Pacific.';
+
+  @override
+  String get species_comb_jelly_name => 'Zeedruif';
+
+  @override
+  String get species_comb_jelly_desc =>
+      'Klein bioluminescent ribkwalletje met iriserende kamrijen en twee lange tentakels.';
+
+  @override
+  String get species_warty_sea_slug_name => 'Wrattige zeeslak';
+
+  @override
+  String get species_warty_sea_slug_desc =>
+      'Blauw-zwarte zeenaaktslak met geelgekapte knobbels, veel gezien op Indo-Pacifische riffen.';
+
+  @override
+  String get species_doris_nudibranch_name => 'Zeecitroen';
+
+  @override
+  String get species_doris_nudibranch_desc =>
+      'Geel gevlekte dorisslak uit gematigde Pacifische wateren die zich met sponzen voedt.';
+
+  @override
+  String get species_opalescent_nudibranch_name => 'Opalescerende zeenaaktslak';
+
+  @override
+  String get species_opalescent_nudibranch_desc =>
+      'Doorschijnende aeolide slak met feloranje cerata en blauwe ruglijnen in Pacifische wateren.';
+
+  @override
+  String get species_clown_nudibranch_name => 'Clownzeenaaktslak';
+
+  @override
+  String get species_clown_nudibranch_desc =>
+      'Roze-oranje zeenaaktslak met blauwe en witte stippen, voorkomend in gematigde Australische wateren.';
+
+  @override
+  String get species_bottlenose_dolphin_name => 'Tuimelaar';
+
+  @override
+  String get species_bottlenose_dolphin_desc =>
+      'Nieuwsgierige en speelse dolfijn die duikers vaak ontmoeten in tropische en gematigde wateren.';
+
+  @override
+  String get species_spinner_dolphin_name => 'Langsnuitdolfijn';
+
+  @override
+  String get species_spinner_dolphin_desc =>
+      'Acrobatische dolfijn die bekendstaat om zijn draaisprongen, vaak in grote scholen bij koraalriffen.';
+
+  @override
+  String get species_common_dolphin_name => 'Gewone dolfijn';
+
+  @override
+  String get species_common_dolphin_desc =>
+      'Snelzwemmende dolfijn met een kenmerkend zandlopermotief, in open oceaan en kustwateren.';
+
+  @override
+  String get species_spotted_dolphin_name => 'Atlantische gevlekte dolfijn';
+
+  @override
+  String get species_spotted_dolphin_desc =>
+      'Vriendelijke gevlekte dolfijn die duikers regelmatig benadert op de Bahama\'s en in het Caribisch gebied.';
+
+  @override
+  String get species_rissos_dolphin_name => 'Grijze dolfijn';
+
+  @override
+  String get species_rissos_dolphin_desc =>
+      'Grote dolfijn met een zwaar bekrast grijs lichaam, wereldwijd in diepe wateren ver uit de kust.';
+
+  @override
+  String get species_humpback_whale_name => 'Bultrug';
+
+  @override
+  String get species_humpback_whale_desc =>
+      'Majestueuze walvis die bekendstaat om zijn sprongen en complexe zang, te zien tijdens de seizoenstrek.';
+
+  @override
+  String get species_grey_whale_name => 'Grijze walvis';
+
+  @override
+  String get species_grey_whale_desc =>
+      'Baleinwalvis die op de bodem foerageert en langs de Pacifische kust trekt, vaak bedekt met zeepokken.';
+
+  @override
+  String get species_blue_whale_name => 'Blauwe vinvis';
+
+  @override
+  String get species_blue_whale_desc =>
+      'Het grootste dier dat ooit heeft geleefd, af en toe door duikers ontmoet in diepblauw water.';
+
+  @override
+  String get species_sperm_whale_name => 'Potvis';
+
+  @override
+  String get species_sperm_whale_desc =>
+      'Diepduikende walvis met een enorme kop, soms rustend aan het oppervlak tussen duiken door.';
+
+  @override
+  String get species_orca_name => 'Orka';
+
+  @override
+  String get species_orca_desc =>
+      'Toppredator met kenmerkende zwart-witte tekening, voorkomend in alle oceanen.';
+
+  @override
+  String get species_minke_whale_name => 'Dwergvinvis';
+
+  @override
+  String get species_minke_whale_desc =>
+      'Kleinere baleinwalvis die nieuwsgierig is naar duikers, vooral bij het Great Barrier Reef.';
+
+  @override
+  String get species_beluga_whale_name => 'Beloega';
+
+  @override
+  String get species_beluga_whale_desc =>
+      'Witte arctische walvis die bekendstaat om zijn geluiden en gezellige gedrag in koude wateren.';
+
+  @override
+  String get species_pilot_whale_name => 'Indische griend';
+
+  @override
+  String get species_pilot_whale_desc =>
+      'Sociale diepduikende walvis, vaak in grote groepen in tropische en warm gematigde zeeën.';
+
+  @override
+  String get species_false_killer_whale_name => 'Zwarte zwaardwalvis';
+
+  @override
+  String get species_false_killer_whale_desc =>
+      'Grote oceanische dolfijn die duikers af en toe in open water benadert.';
+
+  @override
+  String get species_dugong_name => 'Doejong';
+
+  @override
+  String get species_dugong_desc =>
+      'Vreedzame planteneter die zeegrasvelden in de Indo-Pacific afgraast, nauw verwant aan de lamantijnen.';
+
+  @override
+  String get species_west_indian_manatee_name => 'Caribische lamantijn';
+
+  @override
+  String get species_west_indian_manatee_desc =>
+      'Traag bewegende planteneter in warme ondiepe wateren, estuaria en bronnen van het Caribisch gebied.';
+
+  @override
+  String get species_sea_otter_name => 'Zeeotter';
+
+  @override
+  String get species_sea_otter_desc =>
+      'Charismatisch zeezoogdier dat in kelpwouden langs de Noord-Pacifische kust leeft.';
+
+  @override
+  String get species_california_sea_lion_name => 'Californische zeeleeuw';
+
+  @override
+  String get species_california_sea_lion_desc =>
+      'Speelse en behendige zeeleeuw die langs de Pacifische kust vaak met duikers speelt.';
+
+  @override
+  String get species_steller_sea_lion_name => 'Stellerzeeleeuw';
+
+  @override
+  String get species_steller_sea_lion_desc =>
+      'Grootste zeeleeuwensoort, te vinden in koude Noord-Pacifische wateren bij rotsachtige kusten.';
+
+  @override
+  String get species_harbor_seal_name => 'Gewone zeehond';
+
+  @override
+  String get species_harbor_seal_desc =>
+      'Nieuwsgierige zeehond in gematigde kustwateren, vaak rustend op rotsen bij duikstekken.';
+
+  @override
+  String get species_grey_seal_name => 'Grijze zeehond';
+
+  @override
+  String get species_grey_seal_desc =>
+      'Grote speelse zeehond uit de Noord-Atlantische Oceaan, bekend omdat hij duikers onder water opzoekt.';
+
+  @override
+  String get species_northern_elephant_seal_name => 'Noordelijke zeeolifant';
+
+  @override
+  String get species_northern_elephant_seal_desc =>
+      'Kolossale diepduikende zeehond; mannetjes hebben een grote slurf. Te vinden langs de oostelijke Pacifische kust.';
+
+  @override
+  String get species_hawaiian_monk_seal_name => 'Hawaïaanse monniksrob';
+
+  @override
+  String get species_hawaiian_monk_seal_desc =>
+      'Ernstig bedreigde zeehond endemisch op Hawaï, af en toe door duikers op riffen gezien.';
+
+  @override
+  String get species_leopard_seal_name => 'Zeeluipaard';
+
+  @override
+  String get species_leopard_seal_desc =>
+      'Krachtige Antarctische jager met gevlekte vacht, te ontmoeten door koudwaterduikers.';
+
+  @override
+  String get species_narwhal_name => 'Narwal';
+
+  @override
+  String get species_narwhal_desc =>
+      'Arctische walvis met een lange spiraalvormige slagtand, zelden gezien maar iconisch onder de zeezoogdieren.';
+
+  @override
+  String get species_green_sea_turtle_name => 'Soepschildpad';
+
+  @override
+  String get species_green_sea_turtle_desc =>
+      'Grote zeeschildpad die vaak grazend op zeegras in tropische wateren wordt gezien.';
+
+  @override
+  String get species_hawksbill_sea_turtle_name => 'Karetschildpad';
+
+  @override
+  String get species_hawksbill_sea_turtle_desc =>
+      'Rifbewonende schildpad met een spitse snavel die zich met sponzen tussen koraalformaties voedt.';
+
+  @override
+  String get species_loggerhead_sea_turtle_name => 'Onechte karetschildpad';
+
+  @override
+  String get species_loggerhead_sea_turtle_desc =>
+      'Schildpad met een grote kop, voorkomend in gematigde en tropische zeeën, vaak bij rotsriffen.';
+
+  @override
+  String get species_leatherback_sea_turtle_name => 'Lederschildpad';
+
+  @override
+  String get species_leatherback_sea_turtle_desc =>
+      'Grootste levende schildpad met een flexibel leerachtig schild, duikt tot extreme diepten.';
+
+  @override
+  String get species_olive_ridley_sea_turtle_name => 'Olijfschildpad';
+
+  @override
+  String get species_olive_ridley_sea_turtle_desc =>
+      'Kleinste zeeschildpadsoort, bekend om de massale gelijktijdige nestafzet die arribada wordt genoemd.';
+
+  @override
+  String get species_kemps_ridley_sea_turtle_name => 'Kemps zeeschildpad';
+
+  @override
+  String get species_kemps_ridley_sea_turtle_desc =>
+      'Ernstig bedreigde zeeschildpad die vooral in de Golf van Mexico voorkomt.';
+
+  @override
+  String get species_flatback_sea_turtle_name =>
+      'Australische platrugschildpad';
+
+  @override
+  String get species_flatback_sea_turtle_desc =>
+      'Endemisch in Australische wateren, herkenbaar aan het platte schild en de kustgebonden leefwijze.';
+
+  @override
+  String get species_brain_coral_name => 'Hersenkoraal';
+
+  @override
+  String get species_brain_coral_desc =>
+      'Massief rifbouwend koraal met een gegroefd oppervlak als een hersenen, algemeen op Caribische riffen.';
+
+  @override
+  String get species_staghorn_coral_name => 'Hertshoornkoraal';
+
+  @override
+  String get species_staghorn_coral_desc =>
+      'Snelgroeiend vertakt koraal dat dichte struiken vormt, een cruciale leefomgeving voor rifvissen.';
+
+  @override
+  String get species_elkhorn_coral_name => 'Elandshoornkoraal';
+
+  @override
+  String get species_elkhorn_coral_desc =>
+      'Groot vertakt koraal met platte handvormige takken, een sleutelbouwer van Caribische riffen.';
+
+  @override
+  String get species_table_coral_name => 'Tafelkoraal';
+
+  @override
+  String get species_table_coral_desc =>
+      'Vlak plaatvormend koraal op Indo-Pacifische riffen dat schuilplaats biedt aan veel vissoorten.';
+
+  @override
+  String get species_mushroom_coral_name => 'Paddenstoelkoraal';
+
+  @override
+  String get species_mushroom_coral_desc =>
+      'Vrijlevend solitair koraal in de vorm van een schijf, op zandige plekken bij Indo-Pacifische riffen.';
+
+  @override
+  String get species_bubble_coral_name => 'Bellenkoraal';
+
+  @override
+  String get species_bubble_coral_desc =>
+      'Kenmerkend koraal met druifachtige blaasjes die zich overdag opblazen om licht te vangen.';
+
+  @override
+  String get species_plate_coral_name => 'Plaatkoraal';
+
+  @override
+  String get species_plate_coral_desc =>
+      'Dun plaatvormend koraal dat spiraalvormige richels vormt, algemeen op Indo-Pacifische rifhellingen.';
+
+  @override
+  String get species_pillar_coral_name => 'Pilaarkoraal';
+
+  @override
+  String get species_pillar_coral_desc =>
+      'Zeldzaam omhoog groeiend koraal dat hoge zuilen vormt, voorkomend in het Caribisch gebied.';
+
+  @override
+  String get species_star_coral_name => 'Sterkoraal';
+
+  @override
+  String get species_star_coral_desc =>
+      'Belangrijke Caribische rifbouwer die grote keivormige kolonies met stervormige poliepen vormt.';
+
+  @override
+  String get species_lettuce_coral_name => 'Slakoraal';
+
+  @override
+  String get species_lettuce_coral_desc =>
+      'Dun plaatvormend koraal met bladachtige plooien, algemeen op Caribische rifwanden en -hellingen.';
+
+  @override
+  String get species_finger_coral_name => 'Vingerkoraal';
+
+  @override
+  String get species_finger_coral_desc =>
+      'Stevig vertakt koraal met dikke vingerachtige uitsteeksels, te vinden op ondiepe riffen.';
+
+  @override
+  String get species_massive_porites_name => 'Massief poriteskoraal';
+
+  @override
+  String get species_massive_porites_desc =>
+      'Groot keikoraal dat eeuwenlang kan doorgroeien, een dominante rifbouwer in de Indo-Pacific.';
+
+  @override
+  String get species_cauliflower_coral_name => 'Bloemkoolkoraal';
+
+  @override
+  String get species_cauliflower_coral_desc =>
+      'Compact vertakt koraal in de vorm van een bloemkool, wijdverbreid in ondiepe tropische riffen.';
+
+  @override
+  String get species_flower_pot_coral_name => 'Bloempotkoraal';
+
+  @override
+  String get species_flower_pot_coral_desc =>
+      'Kolonie van langtentakelige poliepen die zich overdag uitstrekken als een boeket bloemen.';
+
+  @override
+  String get species_cup_coral_name => 'Oranje bekerkoraal';
+
+  @override
+  String get species_cup_coral_desc =>
+      'Feloranje niet-fotosynthetisch koraal op wanden en onder overhangen in tropische wateren.';
+
+  @override
+  String get species_scroll_coral_name => 'Rolkoraal';
+
+  @override
+  String get species_scroll_coral_desc =>
+      'Koraal dat grote opgerolde platen vormt, algemeen op Indo-Pacifische rifhellingen en in lagunes.';
+
+  @override
+  String get species_cabbage_coral_name => 'Koolkoraal';
+
+  @override
+  String get species_cabbage_coral_desc =>
+      'Schijfvormig plaatkoraal dat op koolbladeren lijkt, te vinden in beschutte rifgebieden.';
+
+  @override
+  String get species_hammer_coral_name => 'Hamerkoraal';
+
+  @override
+  String get species_hammer_coral_desc =>
+      'Grootpoliepig koraal met anker- of hamervormige tentakeltoppen, geliefd op Indo-Pacifische riffen.';
+
+  @override
+  String get species_torch_coral_name => 'Fakkelkoraal';
+
+  @override
+  String get species_torch_coral_desc =>
+      'Vertakt koraal met lange wuivende tentakels die eindigen in gloeiende bolletjes.';
+
+  @override
+  String get species_frogspawn_coral_name => 'Kikkerdrilkoraal';
+
+  @override
+  String get species_frogspawn_coral_desc =>
+      'Grootpoliepig koraal met vertakte tentakeltoppen die op kikkerdril lijken.';
+
+  @override
+  String get species_sea_fan_name => 'Gewone zeewaaier';
+
+  @override
+  String get species_sea_fan_desc =>
+      'Platte waaiervormige gorgoon die haaks op de stroming staat, iconisch op Caribische riffen.';
+
+  @override
+  String get species_venus_sea_fan_name => 'Venuszeewaaier';
+
+  @override
+  String get species_venus_sea_fan_desc =>
+      'Tere waaiervormige gorgoon op ondiepe Caribische riffen met matige stroming.';
+
+  @override
+  String get species_deepwater_sea_fan_name => 'Diepwaterzeewaaier';
+
+  @override
+  String get species_deepwater_sea_fan_desc =>
+      'Grote struikachtige gorgoon op diepe rifwanden in het Caribisch gebied.';
+
+  @override
+  String get species_sea_whip_name => 'Zeezweep';
+
+  @override
+  String get species_sea_whip_desc =>
+      'Slanke staafvormige gorgoon die meewuift met de stroming op Atlantische en Caribische riffen.';
+
+  @override
+  String get species_sea_plume_name => 'Zeepluim';
+
+  @override
+  String get species_sea_plume_desc =>
+      'Hoge veerachtige gorgoon die pluimvormige kolonies vormt op Caribische riftoppen.';
+
+  @override
+  String get species_organ_pipe_coral_name => 'Orgelpijpkoraal';
+
+  @override
+  String get species_organ_pipe_coral_desc =>
+      'Felrode skeletbuisjes met tere poliepen, te vinden op beschutte Indo-Pacifische riffen.';
+
+  @override
+  String get species_leather_coral_name => 'Leerkoraal';
+
+  @override
+  String get species_leather_coral_desc =>
+      'Zacht koraal met een glad leerachtig oppervlak dat grote paddenstoelvormige kolonies vormt.';
+
+  @override
+  String get species_toadstool_leather_coral_name => 'Paddenstoelleerkoraal';
+
+  @override
+  String get species_toadstool_leather_coral_desc =>
+      'Zacht koraal met een dikke steel en platte hoed, algemeen op Indo-Pacifische rifplaten.';
+
+  @override
+  String get species_pulsing_xenia_name => 'Pulserende xenia';
+
+  @override
+  String get species_pulsing_xenia_desc =>
+      'Zacht koraal met ritmisch pulserende poliepen, voorkomend in beschutte Indo-Pacifische wateren.';
+
+  @override
+  String get species_tree_coral_name => 'Boomkoraal';
+
+  @override
+  String get species_tree_coral_desc =>
+      'Levendig zacht koraal dat boomachtige groepen vormt op wanden en onder overhangen in de Rode Zee.';
+
+  @override
+  String get species_blue_coral_name => 'Blauw koraal';
+
+  @override
+  String get species_blue_coral_desc =>
+      'Bijzonder octokoraal met een blauw skelet, te vinden op ondiepe Indo-Pacifische rifplaten.';
+
+  @override
+  String get species_black_coral_name => 'Zwart koraal';
+
+  @override
+  String get species_black_coral_desc =>
+      'Diepwaterkoraal met een donker skelet, te vinden op wanden en steilwanden beneden 30 meter.';
+
+  @override
+  String get species_carnation_coral_name => 'Anjerkoraal';
+
+  @override
+  String get species_carnation_coral_desc =>
+      'Felgekleurd zacht koraal onder overhangen en op wanden in de Indo-Pacific.';
+
+  @override
+  String get species_wire_coral_name => 'Draadkoraal';
+
+  @override
+  String get species_wire_coral_desc =>
+      'Lang spiraalvormig zwart koraal dat opgerolde zwepen vormt, gastheer voor grondels en garnalen.';
+
+  @override
+  String get species_dead_mans_fingers_name => 'Dodemansduim';
+
+  @override
+  String get species_dead_mans_fingers_desc =>
+      'Vlezig zacht koraal met vingervormige lobben, algemeen op gematigde Noord-Atlantische riffen.';
+
+  @override
+  String get species_sun_coral_name => 'Zonnekoraal';
+
+  @override
+  String get species_sun_coral_desc =>
+      'Geeloranje niet-fotosynthetisch koraal dat zijn poliepen \'s nachts opent op Indo-Pacifische wanden.';
+
+  @override
+  String get species_lace_coral_name => 'Kantkoraal';
+
+  @override
+  String get species_lace_coral_desc =>
+      'Teer roze hydrokoraal met kantachtige takjes, te vinden in spleten en onder overhangen.';
+
+  @override
+  String get species_kenya_tree_coral_name => 'Kenia-boomkoraal';
+
+  @override
+  String get species_kenya_tree_coral_desc =>
+      'Sterk zacht koraal met boomachtige takken, algemeen in de Indo-Pacific.';
+
+  @override
+  String get species_colt_coral_name => 'Coltkoraal';
+
+  @override
+  String get species_colt_coral_desc =>
+      'Zacht koraal met dikke rubberachtige takken vol kleine poliepen op Indo-Pacifische riffen.';
+
+  @override
+  String get species_turtle_grass_name => 'Schildpadgras';
+
+  @override
+  String get species_turtle_grass_desc =>
+      'Dominant Caribisch zeegras met brede platte bladen, een essentiële voedselbron voor zeeschildpadden.';
+
+  @override
+  String get species_eelgrass_name => 'Groot zeegras';
+
+  @override
+  String get species_eelgrass_desc =>
+      'Zeegras van gematigde streken dat dichte onderwaterweiden vormt en dient als kraamkamer.';
+
+  @override
+  String get species_manatee_grass_name => 'Lamantijngras';
+
+  @override
+  String get species_manatee_grass_desc =>
+      'Zeegras met cilindrische bladen op Caribische zandbodems, vaak vlak bij velden schildpadgras.';
+
+  @override
+  String get species_shoal_grass_name => 'Smalbladig zeegras';
+
+  @override
+  String get species_shoal_grass_desc =>
+      'Pionierzeegras met smalle bladen dat verstoorde zandgebieden in het Caribisch gebied koloniseert.';
+
+  @override
+  String get species_paddle_grass_name => 'Peddelgras';
+
+  @override
+  String get species_paddle_grass_desc =>
+      'Klein teer zeegras met ovale blaadjes, te vinden in dieper water in de hele tropen.';
+
+  @override
+  String get species_neptune_grass_name => 'Neptunusgras';
+
+  @override
+  String get species_neptune_grass_desc =>
+      'Mediterraan zeegras dat uitgestrekte weiden vormt die cruciaal zijn voor kustecosystemen.';
+
+  @override
+  String get species_giant_kelp_name => 'Reuzenkelp';
+
+  @override
+  String get species_giant_kelp_desc =>
+      'Torenhoge onderwaterwoudsoort die tot 60 meter groeit, iconisch voor het duiken in Californië.';
+
+  @override
+  String get species_bull_kelp_name => 'Stierkelp';
+
+  @override
+  String get species_bull_kelp_desc =>
+      'Pacifische kelp met één lange steel en een bolvormig drijflichaam, vormt dichte bladerdakwouden.';
+
+  @override
+  String get species_bladder_wrack_name => 'Blaaswier';
+
+  @override
+  String get species_bladder_wrack_desc =>
+      'Algemeen bruinwier met gepaarde luchtblazen, te vinden in getijdenzones van de Noord-Atlantische Oceaan.';
+
+  @override
+  String get species_sargassum_name => 'Sargassowier';
+
+  @override
+  String get species_sargassum_desc =>
+      'Vrij drijvend bruinwier dat vlotten vormt waarin jonge vissen en ongewervelden schuilen.';
+
+  @override
+  String get species_kelp_forest_ecklonia_name => 'Ecklonia-kelp';
+
+  @override
+  String get species_kelp_forest_ecklonia_desc =>
+      'Dominante kelp in wateren van het zuidelijk halfrond, vormt belangrijke onderwaterwouden.';
+
+  @override
+  String get species_coralline_algae_name => 'Kalkroodwier';
+
+  @override
+  String get species_coralline_algae_desc =>
+      'Hard korstvormend roodwier dat rifstructuren aaneenkit en riffen een roze gloed geeft.';
+
+  @override
+  String get species_irish_moss_name => 'Iers mos';
+
+  @override
+  String get species_irish_moss_desc =>
+      'Waaiervormig roodwier op rotskusten in de getijdenzone van de Noord-Atlantische Oceaan.';
+
+  @override
+  String get species_dulse_name => 'Duls';
+
+  @override
+  String get species_dulse_desc =>
+      'Plat roodpaars wier dat op rotsen en kelpstelen in koude noordelijke wateren groeit.';
+
+  @override
+  String get species_halimeda_name => 'Halimeda';
+
+  @override
+  String get species_halimeda_desc =>
+      'Verkalkt groenwier met schijfvormige segmenten, een belangrijke bron van rifzand.';
+
+  @override
+  String get species_sea_lettuce_name => 'Zeesla';
+
+  @override
+  String get species_sea_lettuce_desc =>
+      'Felgroen bladvormig wier in ondiepe kustwateren wereldwijd.';
+
+  @override
+  String get species_caulerpa_name => 'Groen druivenwier';
+
+  @override
+  String get species_caulerpa_desc =>
+      'Kruipend groenwier met druifachtige loten, te vinden op tropisch rifpuin en zand.';
+
+  @override
+  String get species_mermaid_fan_name => 'Zeemeerminwaaier';
+
+  @override
+  String get species_mermaid_fan_desc =>
+      'Verkalkt groenwier in de vorm van een kleine waaier, algemeen op Caribische zandbodems.';
+
+  @override
+  String get species_shaving_brush_algae_name => 'Scheerkwastwier';
+
+  @override
+  String get species_shaving_brush_algae_desc =>
+      'Verkalkt groenwier met een kwastachtige pluim op een steel, te vinden op Caribische zandbodems.';
+
+  @override
+  String get species_finger_kelp_name => 'Vingerwier';
+
+  @override
+  String get species_finger_kelp_desc =>
+      'Bruinwier met vingervormige bladen dat kelpvelden vormt in Noord-Atlantische kustwateren.';
+
+  @override
+  String get species_banded_sea_krait_name => 'Gebande zeekrait';
+
+  @override
+  String get species_banded_sea_krait_desc =>
+      'Giftige zeeslang met blauwgrijze en zwarte banden, rustig van aard en veel gezien op Indo-Pacifische riffen.';
+
+  @override
+  String get species_olive_sea_snake_name => 'Olijfkleurige zeeslang';
+
+  @override
+  String get species_olive_sea_snake_desc =>
+      'Nieuwsgierige zeeslang op Australische riffen, bekend omdat hij duikers benadert.';
+
+  @override
+  String get species_yellow_bellied_sea_snake_name => 'Geelbuikzeeslang';
+
+  @override
+  String get species_yellow_bellied_sea_snake_desc =>
+      'Pelagische zeeslang met gele onderzijde, de meest wijdverbreide slangensoort op aarde.';
+
+  @override
+  String get species_marine_iguana_name => 'Zeeleguaan';
+
+  @override
+  String get species_marine_iguana_desc =>
+      'Endemisch op de Galapagos, de enige hagedis die onder water op algen foerageert.';
+
+  @override
+  String get species_saltwater_crocodile_name => 'Zoutwaterkrokodil';
+
+  @override
+  String get species_saltwater_crocodile_desc =>
+      'Grootste levende reptiel, voorkomend in kust- en estuariumwateren van de Indo-Pacific.';
+
+  @override
+  String get common_action_done => 'Gereed';
+
+  @override
+  String get common_action_more => 'Meer';
+
+  @override
+  String get common_label_displayName => 'Weergavenaam';
+
+  @override
+  String common_relativeTime_daysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '${count}d geleden',
+      one: '${count}d geleden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_hoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '${count}u geleden',
+      one: '${count}u geleden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_inDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'over ${count}d',
+      one: 'over ${count}d',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_inHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'over ${count}u',
+      one: 'over ${count}u',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_inLessThanMinute => 'over <1m';
+
+  @override
+  String common_relativeTime_inMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'over ${count}m',
+      one: 'over ${count}m',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_justNow => 'zojuist';
+
+  @override
+  String common_relativeTime_minutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '${count}m geleden',
+      one: '${count}m geleden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String common_relativeTime_monthsAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '${count}mnd geleden',
+      one: '${count}mnd geleden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_relativeTime_overdue => 'te laat';
+
+  @override
+  String get media_cache_calculating => 'Cachegrootte berekenen…';
+
+  @override
+  String get media_cache_cardTitle => 'Cachebeheer';
+
+  @override
+  String get media_cache_clearAction => 'Cache wissen';
+
+  @override
+  String get media_cache_clearBody =>
+      'Verwijdert gedownloade miniaturen en netwerkafbeeldingen op volledige grootte. Gekoppelde media blijven behouden; afbeeldingen worden bij de volgende weergave opnieuw gedownload.';
+
+  @override
+  String get media_cache_clearConfirm => 'Wissen';
+
+  @override
+  String media_cache_clearError(String error) {
+    return 'Wissen mislukt: $error';
+  }
+
+  @override
+  String get media_cache_clearTitle => 'Cache met netwerkafbeeldingen wissen?';
+
+  @override
+  String get media_cache_cleared => 'Cache gewist';
+
+  @override
+  String get media_cache_diskCache => 'Schijfcache';
+
+  @override
+  String media_cache_error(String error) {
+    return 'Fout: $error';
+  }
+
+  @override
+  String get media_credentials_actionTest => 'Inloggegevens testen';
+
+  @override
+  String media_credentials_authLabel(String authType) {
+    return 'Auth: $authType';
+  }
+
+  @override
+  String get media_credentials_deleteBody =>
+      'Verwijdert de opgeslagen inloggegevens. Items die via deze host zijn gekoppeld, tonen ‘Log in om te bekijken’ totdat je ze opnieuw toevoegt.';
+
+  @override
+  String media_credentials_deleteError(String error) {
+    return 'Verwijderen mislukt: $error';
+  }
+
+  @override
+  String media_credentials_deleteTitle(String host) {
+    return '$host verwijderen?';
+  }
+
+  @override
+  String media_credentials_deleted(String host) {
+    return '$host verwijderd';
+  }
+
+  @override
+  String media_credentials_editTitle(String host) {
+    return '$host bewerken';
+  }
+
+  @override
+  String get media_credentials_emptySubtitle =>
+      'Inloggegevens per host die tijdens URL- of manifest-imports zijn toegevoegd, verschijnen hier.';
+
+  @override
+  String get media_credentials_emptyTitle => 'Geen opgeslagen inloggegevens';
+
+  @override
+  String media_credentials_lastUsed(String when) {
+    return 'Laatst gebruikt $when';
+  }
+
+  @override
+  String get media_credentials_loadError => 'Kan opgeslagen hosts niet laden';
+
+  @override
+  String get media_credentials_loading => 'Opgeslagen hosts laden...';
+
+  @override
+  String media_credentials_saveError(String error) {
+    return 'Opslaan mislukt: $error';
+  }
+
+  @override
+  String get media_credentials_savedHostsTitle => 'Opgeslagen hosts';
+
+  @override
+  String media_credentials_testError(String error) {
+    return 'Test mislukt: $error';
+  }
+
+  @override
+  String media_credentials_testFailed(String host) {
+    return 'Inloggegevens geweigerd voor $host';
+  }
+
+  @override
+  String media_credentials_testOk(String host) {
+    return 'Inloggegevens in orde voor $host';
+  }
+
+  @override
+  String get media_manifest_actionPollNow => 'Nu ophalen';
+
+  @override
+  String get media_manifest_cardTitle => 'Manifest-abonnementen';
+
+  @override
+  String get media_manifest_deleteBody =>
+      'Verwijdert het abonnement. Al geïmporteerde items blijven behouden (je kunt ze opruimen via de wachtrij met wezen).';
+
+  @override
+  String media_manifest_deleteError(String error) {
+    return 'Verwijderen mislukt: $error';
+  }
+
+  @override
+  String media_manifest_deleteTitle(String name) {
+    return '$name verwijderen?';
+  }
+
+  @override
+  String get media_manifest_editTitle => 'Abonnement bewerken';
+
+  @override
+  String get media_manifest_emptySubtitle =>
+      'Abonneer je op het tabblad URL op een Atom/RSS-, JSON- of CSV-manifest om je bibliotheek gesynchroniseerd te houden.';
+
+  @override
+  String get media_manifest_emptyTitle => 'Geen manifest-abonnementen';
+
+  @override
+  String media_manifest_lastError(String error) {
+    return 'Laatste fout: $error';
+  }
+
+  @override
+  String media_manifest_lastPolled(String when) {
+    return 'Laatst opgehaald $when';
+  }
+
+  @override
+  String get media_manifest_loadError => 'Kan abonnementen niet laden';
+
+  @override
+  String get media_manifest_loading => 'Abonnementen laden...';
+
+  @override
+  String get media_manifest_neverPolled => 'Nooit opgehaald';
+
+  @override
+  String media_manifest_nextPoll(String when) {
+    return 'Volgende $when';
+  }
+
+  @override
+  String get media_manifest_notFound => 'Abonnement niet gevonden';
+
+  @override
+  String media_manifest_pollError(String error) {
+    return 'Ophalen mislukt: $error';
+  }
+
+  @override
+  String media_manifest_polled(String name) {
+    return '$name opgehaald';
+  }
+
+  @override
+  String media_manifest_polling(String name) {
+    return '$name ophalen...';
+  }
+
+  @override
+  String media_manifest_saveError(String error) {
+    return 'Opslaan mislukt: $error';
+  }
+
+  @override
+  String media_manifest_updateError(String error) {
+    return 'Kan niet bijwerken: $error';
+  }
+
+  @override
+  String get media_manifest_urlLabel => 'Manifest-URL';
+
+  @override
+  String media_scan_failed(String error) {
+    return 'Scannen mislukt: $error';
+  }
+
+  @override
+  String media_scan_progressItems(int done, int total) {
+    return '$done / $total items';
+  }
+
+  @override
+  String media_scan_progressReachability(int available, int unreachable) {
+    return '$available bereikbaar  ·  $unreachable onbereikbaar';
+  }
+
+  @override
+  String media_scan_summary(
+    int total,
+    String seconds,
+    int available,
+    int unreachable,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other:
+          '$total items in ${seconds}s gescand: $available bereikbaar, $unreachable onbereikbaar',
+      one:
+          '$total item in ${seconds}s gescand: $available bereikbaar, $unreachable onbereikbaar',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_scan_summarySkipped(String base, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count overgeslagen (geen URL)',
+      one: '$count overgeslagen (geen URL)',
+    );
+    return '$base, $_temp0';
+  }
+
+  @override
+  String get media_scan_title => 'Alle netwerkmedia scannen';
+
+  @override
+  String get settings_mediaSources_androidUriTitle =>
+      'Android-URI-machtigingen';
+
+  @override
+  String settings_mediaSources_androidUriUsage(int used, int limit) {
+    return '$used / $limit permanente URI’s in gebruik';
+  }
+
+  @override
+  String get settings_mediaSources_counting => 'Tellen…';
+
+  @override
+  String settings_mediaSources_error(String error) {
+    return 'Fout: $error';
+  }
+
+  @override
+  String get settings_mediaSources_loading => 'Laden…';
+
+  @override
+  String settings_mediaSources_localFilesCounts(
+    int available,
+    int unavailable,
+  ) {
+    return '$available beschikbaar, $unavailable niet beschikbaar';
+  }
+
+  @override
+  String get settings_mediaSources_photoLibrarySubtitle =>
+      'Apple Photos / Google Photos / iCloud';
+
+  @override
+  String get settings_mediaSources_reverifyAll =>
+      'Alle lokale bestanden opnieuw verifiëren';
+
+  @override
+  String settings_mediaSources_reverifyFailed(String error) {
+    return 'Opnieuw verifiëren mislukt: $error';
+  }
+
+  @override
+  String settings_mediaSources_reverifyResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items bijgewerkt',
+      one: '$count item bijgewerkt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_mediaSources_title => 'Mediabronnen';
+
+  @override
+  String get settings_networkSources_scanDescription =>
+      'Controleert elke via URL of manifest geïmporteerde foto opnieuw bij de bijbehorende host. Onbereikbare items worden gemarkeerd zodat ze als ‘ontbrekend’ in je bibliotheek verschijnen en kunnen worden opgeruimd.';
+
+  @override
+  String statistics_conditions_entryMethod_semanticLabel(String description) {
+    return 'Staafdiagram. Instapmethoden. $description';
+  }
+
+  @override
+  String statistics_conditions_visibility_semanticLabel(String description) {
+    return 'Cirkeldiagram. Zichtverdeling. $description';
+  }
+
+  @override
+  String statistics_conditions_waterType_semanticLabel(String description) {
+    return 'Cirkeldiagram. Verdeling van watertypes. $description';
+  }
+
+  @override
+  String statistics_progression_divesBySuitThickness_semanticLabel(
+    String description,
+  ) {
+    return 'Staafdiagram. Duiken per pakdikte. $description';
+  }
+
+  @override
+  String statistics_progression_divesPerYear_countInYear(
+    int count,
+    String year,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken in $year',
+      one: '1 duik in $year',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String statistics_progression_divesPerYear_semanticLabel(String description) {
+    return 'Staafdiagram. Duiken per jaar. $description';
+  }
+
+  @override
+  String get statistics_records_unavailable => 'Records niet beschikbaar';
+
+  @override
+  String statistics_summary_depthBucket_over(String min, String unit) {
+    return '$min$unit+';
+  }
+
+  @override
+  String statistics_summary_depthBucket_range(
+    String min,
+    String max,
+    String unit,
+  ) {
+    return '$min-$max$unit';
+  }
+
+  @override
+  String get statistics_summary_distributions_title => 'Verdelingen';
+
+  @override
+  String get statistics_summary_diveTypes_error =>
+      'Kan duiktypegegevens niet laden';
+
+  @override
+  String get statistics_summary_diveTypes_unknown => 'Onbekend';
+
+  @override
+  String get statistics_summary_divesPerMonth => 'Duiken / maand';
+
+  @override
+  String get statistics_summary_divesPerYear => 'Duiken / jaar';
+
+  @override
+  String statistics_timePatterns_dayOfWeek_semanticLabel(String description) {
+    return 'Staafdiagram. Duiken per dag van de week. $description';
+  }
+
+  @override
+  String statistics_timePatterns_seasonal_semanticLabel(String description) {
+    return 'Staafdiagram. Duiken per maand. $description';
+  }
+
+  @override
+  String statistics_timePatterns_surfaceInterval_statLabel(
+    String label,
+    String value,
+  ) {
+    return 'Oppervlakte-interval $label: $value';
+  }
+
+  @override
+  String get statistics_timePatterns_timeOfDay_afternoon => 'Middag';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_evening => 'Avond';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_morning => 'Ochtend';
+
+  @override
+  String get statistics_timePatterns_timeOfDay_night => 'Nacht';
+
+  @override
+  String statistics_timePatterns_timeOfDay_semanticLabel(String description) {
+    return 'Cirkeldiagram. Duiken per tijdstip van de dag. $description';
+  }
+
+  @override
+  String get columnConfig_displayOptions => 'Weergaveopties';
+
+  @override
+  String get columnConfig_noExtraFields =>
+      'Geen extra velden ingesteld. Voeg hieronder velden toe.';
+
+  @override
+  String get columnConfig_savePresetTitle => 'Voorinstelling opslaan';
+
+  @override
+  String get columnConfig_section => 'Sectie';
+
+  @override
+  String get columnConfig_showTags => 'Tags tonen';
+
+  @override
+  String get columnConfig_showTags_subtitle =>
+      'Tagchips tonen op gedetailleerde duikkaarten';
+
+  @override
+  String get columnConfig_slot_date => 'Datum / Ondertitel';
+
+  @override
+  String get columnConfig_slot_slot1 => 'Slot 1';
+
+  @override
+  String get columnConfig_slot_slot2 => 'Slot 2';
+
+  @override
+  String get columnConfig_slot_slot3 => 'Slot 3';
+
+  @override
+  String get columnConfig_slot_slot4 => 'Slot 4';
+
+  @override
+  String get columnConfig_slot_stat1 => 'Statistiek 1';
+
+  @override
+  String get columnConfig_slot_stat2 => 'Statistiek 2';
+
+  @override
+  String get columnConfig_slot_subtitle => 'Ondertitel';
+
+  @override
+  String get columnConfig_slot_title => 'Titel';
+
+  @override
+  String get columnConfig_tooltip_columnSettings => 'Kolominstellingen';
+
+  @override
+  String get common_action_add => 'Toevoegen';
+
+  @override
+  String get common_action_pin => 'Vastmaken';
+
+  @override
+  String get common_action_remove => 'Verwijderen';
+
+  @override
+  String get common_action_unpin => 'Losmaken';
+
+  @override
+  String diveLog_filterChip_dateRange(String end, String start) {
+    return '$start - $end';
+  }
+
+  @override
+  String diveLog_filterChip_equipmentCount(int count) {
+    return '$count uitrustingsstukken';
+  }
+
+  @override
+  String get diveLog_filter_allComputers => 'Alle computers';
+
+  @override
+  String get diveLog_filter_noComputersRegistered =>
+      'Geen duikcomputers geregistreerd';
+
+  @override
+  String diveLog_filter_sectionDepthRangeUnit(String unit) {
+    return 'Dieptebereik ($unit)';
+  }
+
+  @override
+  String get diveLog_filter_sectionDiveComputer => 'Duikcomputer';
+
+  @override
+  String diveLog_listPage_semanticsDiveAtSite(int diveNumber, String siteName) {
+    return 'Duik $diveNumber bij $siteName';
+  }
+
+  @override
+  String get enum_listViewMode_compact => 'Compact';
+
+  @override
+  String get enum_listViewMode_dense => 'Dicht';
+
+  @override
+  String get enum_listViewMode_detailed => 'Gedetailleerd';
+
+  @override
+  String get enum_listViewMode_table => 'Tabel';
+
+  @override
+  String get enum_profileMetric_ascentRate => 'Opstijgsnelheid';
+
+  @override
+  String get enum_profileMetric_cns => 'CNS%';
+
+  @override
+  String get enum_profileMetric_otu => 'OTU';
+
+  @override
+  String get enum_sortField_bottomTime => 'Bodemtijd';
+
+  @override
+  String get enum_sortField_serviceDue => 'Service nodig';
+
+  @override
+  String get listViewMode_tooltip => 'Weergavemodus';
+
+  @override
+  String marineLife_speciesManage_errorLoading(Object error) {
+    return 'Fout bij het laden van soorten: $error';
+  }
+
+  @override
+  String get settings_appearance_header_cards => 'Kaarten';
+
+  @override
+  String get settings_appearance_header_listView => 'Lijstweergave';
+
+  @override
+  String get settings_appearance_header_tableMode => 'Tabelmodus';
+
+  @override
+  String get settings_appearance_listFields_buddies =>
+      'Lijstvelden voor buddies';
+
+  @override
+  String get settings_appearance_listFields_certifications =>
+      'Lijstvelden voor certificeringen';
+
+  @override
+  String get settings_appearance_listFields_courses =>
+      'Lijstvelden voor cursussen';
+
+  @override
+  String get settings_appearance_listFields_diveCenters =>
+      'Lijstvelden voor duikcentra';
+
+  @override
+  String get settings_appearance_listFields_dives => 'Lijstvelden voor duiken';
+
+  @override
+  String get settings_appearance_listFields_equipment =>
+      'Lijstvelden voor uitrusting';
+
+  @override
+  String get settings_appearance_listFields_sites =>
+      'Lijstvelden voor duikstekken';
+
+  @override
+  String get settings_appearance_listFields_subtitle =>
+      'Pas de velden aan die in lijstweergaven worden getoond';
+
+  @override
+  String get settings_appearance_listFields_trips => 'Lijstvelden voor reizen';
+
+  @override
+  String get settings_appearance_listView_buddies => 'Lijstweergave buddies';
+
+  @override
+  String get settings_appearance_listView_buddies_subtitle =>
+      'Standaardindeling voor de lijst met buddies';
+
+  @override
+  String get settings_appearance_listView_certifications =>
+      'Lijstweergave certificeringen';
+
+  @override
+  String get settings_appearance_listView_certifications_subtitle =>
+      'Standaardindeling voor de lijst met certificeringen';
+
+  @override
+  String get settings_appearance_listView_courses => 'Lijstweergave cursussen';
+
+  @override
+  String get settings_appearance_listView_courses_subtitle =>
+      'Standaardindeling voor de lijst met cursussen';
+
+  @override
+  String get settings_appearance_listView_diveCenters =>
+      'Lijstweergave duikcentra';
+
+  @override
+  String get settings_appearance_listView_diveCenters_subtitle =>
+      'Standaardindeling voor de lijst met duikcentra';
+
+  @override
+  String get settings_appearance_listView_dives => 'Lijstweergave duiken';
+
+  @override
+  String get settings_appearance_listView_dives_subtitle =>
+      'Standaardindeling voor de lijst met duiken';
+
+  @override
+  String get settings_appearance_listView_equipment =>
+      'Lijstweergave uitrusting';
+
+  @override
+  String get settings_appearance_listView_equipment_subtitle =>
+      'Standaardindeling voor de lijst met uitrusting';
+
+  @override
+  String get settings_appearance_listView_sites => 'Lijstweergave duikstekken';
+
+  @override
+  String get settings_appearance_listView_sites_subtitle =>
+      'Standaardindeling voor de lijst met duikstekken';
+
+  @override
+  String get settings_appearance_listView_trips => 'Lijstweergave reizen';
+
+  @override
+  String get settings_appearance_listView_trips_subtitle =>
+      'Standaardindeling voor de lijst met reizen';
+
+  @override
+  String get settings_appearance_showDataSourceBadges =>
+      'Badges voor gegevensbron tonen';
+
+  @override
+  String get settings_appearance_showDataSourceBadges_subtitle =>
+      'Bronvermelding tonen bij duikgegevens';
+
+  @override
+  String get settings_appearance_title_buddies => 'Uiterlijk van buddies';
+
+  @override
+  String get settings_appearance_title_certifications =>
+      'Uiterlijk van certificeringen';
+
+  @override
+  String get settings_appearance_title_courses => 'Uiterlijk van cursussen';
+
+  @override
+  String get settings_appearance_title_diveCenters =>
+      'Uiterlijk van duikcentra';
+
+  @override
+  String get settings_appearance_title_dives => 'Uiterlijk van duiken';
+
+  @override
+  String get settings_appearance_title_equipment => 'Uiterlijk van uitrusting';
+
+  @override
+  String get settings_appearance_title_sites => 'Uiterlijk van duikstekken';
+
+  @override
+  String get settings_appearance_title_trips => 'Uiterlijk van reizen';
+
+  @override
+  String get settings_cloudSync_troubleshoot_tileSubtitle =>
+      'Een vastgelopen synchronisatie herstellen of cloudruimte vrijmaken';
+
+  @override
+  String get settings_data_header_dataTools => 'Gegevenshulpmiddelen';
+
+  @override
+  String get settings_decompression_ascentGasLabel => 'Opstijging plannen met';
+
+  @override
+  String get settings_decompression_ascentGas_allCarried =>
+      'Alle meegenomen flessen';
+
+  @override
+  String get settings_decompression_ascentGas_decoStage =>
+      'Deco-/stagefles + hoofdgas';
+
+  @override
+  String get settings_decompression_cnsSource => 'CNS-bron';
+
+  @override
+  String get settings_decompression_decoStopSource => 'Bron van decostops';
+
+  @override
+  String get settings_decompression_header_ascent => 'Opstijgplanning';
+
+  @override
+  String get settings_decompression_header_ascent_subtitle =>
+      'Naar welke meegenomen flessen de gesimuleerde opstijging (TTS, plafond en stops) op elke diepte mag overschakelen. Alleen gassen die bij de duik zijn vastgelegd, worden meegenomen.';
+
+  @override
+  String get settings_decompression_header_dataSources =>
+      'Voorkeuren voor gegevensbron';
+
+  @override
+  String get settings_decompression_header_dataSources_subtitle =>
+      'Bij de instelling Duikcomputer gebruikt de app de gegevens die de duikcomputer meldt, als die beschikbaar zijn. Zijn er geen computergegevens, dan gebruikt de app berekende waarden.';
+
+  @override
+  String get settings_decompression_ndlSource => 'NDL-bron';
+
+  @override
+  String get settings_decompression_sourceCalculated => 'Berekend';
+
+  @override
+  String get settings_decompression_sourceComputer => 'Duikcomputer';
+
+  @override
+  String get settings_decompression_ttsSource => 'TTS-bron';
+
+  @override
+  String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'duiken',
+      one: 'duik',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'uur',
+      one: 'uur',
+    );
+    return '$count $_temp0 met $hours $_temp1 bijgewerkt.';
+  }
+
+  @override
+  String settings_fixDiveTimes_apply(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'duiken',
+      one: 'duik',
+    );
+    return 'Toepassen op $count $_temp0';
+  }
+
+  @override
+  String get settings_fixDiveTimes_clearRange => 'Datumbereik wissen';
+
+  @override
+  String get settings_fixDiveTimes_confirmApply => 'Toepassen';
+
+  @override
+  String settings_fixDiveTimes_confirmBody(
+    int count,
+    String hours,
+    int hoursAbs,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'worden',
+      one: 'wordt',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'duiken',
+      one: 'duik',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'uur',
+      one: 'uur',
+    );
+    return 'Hiermee $_temp0 $count $_temp1 met $hours $_temp2 verschoven. Dit kan niet automatisch ongedaan worden gemaakt.';
+  }
+
+  @override
+  String get settings_fixDiveTimes_confirmTitle => 'Tijdverschuiving toepassen';
+
+  @override
+  String get settings_fixDiveTimes_dateRangeFilter => 'Filter op datumbereik';
+
+  @override
+  String get settings_fixDiveTimes_deselectAll => 'Alles deselecteren';
+
+  @override
+  String get settings_fixDiveTimes_diveFallback => 'Duik';
+
+  @override
+  String settings_fixDiveTimes_diveNumber(int number) {
+    return 'Duik nr. $number';
+  }
+
+  @override
+  String get settings_fixDiveTimes_empty => 'Geen duiken gevonden.';
+
+  @override
+  String get settings_fixDiveTimes_emptyFiltered =>
+      'Geen duiken gevonden in dit datumbereik.';
+
+  @override
+  String get settings_fixDiveTimes_enterOffsetHint =>
+      'Voer een verschuiving in uren in';
+
+  @override
+  String get settings_fixDiveTimes_from => 'Van';
+
+  @override
+  String get settings_fixDiveTimes_hourOffset => 'Urenverschuiving';
+
+  @override
+  String get settings_fixDiveTimes_hoursField => 'Uren (bijv. +7, -5)';
+
+  @override
+  String settings_fixDiveTimes_loadError(String error) {
+    return 'Duiken laden mislukt: $error';
+  }
+
+  @override
+  String get settings_fixDiveTimes_noSelection => 'Geen duiken geselecteerd.';
+
+  @override
+  String get settings_fixDiveTimes_offsetHint =>
+      'Voer een positief of negatief geheel getal in om de duiktijden te verschuiven.';
+
+  @override
+  String settings_fixDiveTimes_preview(int count, String hours, int hoursAbs) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'duiken worden',
+      one: 'duik wordt',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      hoursAbs,
+      locale: localeName,
+      other: 'uur',
+      one: 'uur',
+    );
+    return 'Voorbeeld: $count $_temp0 met $hours $_temp1 verschoven.';
+  }
+
+  @override
+  String get settings_fixDiveTimes_selectAll => 'Alles selecteren';
+
+  @override
+  String get settings_fixDiveTimes_selectDivesHint =>
+      'Selecteer de duiken om toe te passen';
+
+  @override
+  String get settings_fixDiveTimes_subtitle =>
+      'Tijden van geïmporteerde duiken aanpassen';
+
+  @override
+  String get settings_fixDiveTimes_title => 'Duiktijden corrigeren';
+
+  @override
+  String get settings_fixDiveTimes_to => 'Tot';
+
+  @override
+  String get settings_fixDiveTimes_zeroOffset =>
+      'De urenverschuiving is 0, er valt niets te wijzigen.';
+
+  @override
+  String get settings_syncDevices_appBar_refreshTooltip => 'Vernieuwen';
+
+  @override
+  String get settings_syncDevices_appBar_title => 'Apparaten op deze provider';
+
+  @override
+  String get settings_syncDevices_empty =>
+      'Geen synchronisatiebestanden op deze provider.';
+
+  @override
+  String settings_syncDevices_readError(String error) {
+    return 'De provider kon niet worden gelezen.\n$error';
+  }
+
+  @override
+  String get settings_syncDevices_removal_noBackend =>
+      'Er is geen cloudprovider ingesteld';
+
+  @override
+  String get settings_syncDevices_removal_unreachable =>
+      'De provider was niet bereikbaar. Er is niets verwijderd.';
+
+  @override
+  String settings_syncDevices_removeDialog_bodyRisky(
+    int count,
+    String name,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Hiermee worden $count bestanden ($size) van $name verwijderd.\n\nDat apparaat maakt nog steeds deel uit van deze synchronisatie. Als het weer online komt, bouwt het zichzelf opnieuw op vanaf de provider in plaats van oude gegevens terug te halen, maar alle wijzigingen die het nog niet heeft gepubliceerd gaan verloren. Je duikgegevens op DIT apparaat worden niet aangetast.',
+      one:
+          'Hiermee wordt 1 bestand ($size) van $name verwijderd.\n\nDat apparaat maakt nog steeds deel uit van deze synchronisatie. Als het weer online komt, bouwt het zichzelf opnieuw op vanaf de provider in plaats van oude gegevens terug te halen, maar alle wijzigingen die het nog niet heeft gepubliceerd gaan verloren. Je duikgegevens op DIT apparaat worden niet aangetast.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_removeDialog_bodySafe(
+    int count,
+    String name,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Hiermee worden $count bestanden ($size) van $name verwijderd. Het zijn restanten van een bibliotheek waarmee geen enkel apparaat nog synchroniseert. Je duikgegevens worden niet aangetast.',
+      one:
+          'Hiermee wordt 1 bestand ($size) van $name verwijderd. Het is een restant van een bibliotheek waarmee geen enkel apparaat nog synchroniseert. Je duikgegevens worden niet aangetast.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_removeDialog_title(String name) {
+    return 'Bestanden van $name verwijderen?';
+  }
+
+  @override
+  String settings_syncDevices_removeProgressTitle(String name) {
+    return 'Bestanden van $name verwijderen';
+  }
+
+  @override
+  String get settings_syncDevices_removeTooltip =>
+      'Bestanden van dit apparaat verwijderen';
+
+  @override
+  String get settings_syncDevices_state_active => 'Synchroniseert normaal';
+
+  @override
+  String get settings_syncDevices_state_retired => 'Uit gebruik';
+
+  @override
+  String get settings_syncDevices_state_staleEpoch =>
+      'Restant van een eerdere bibliotheek, geen enkel apparaat leest dit';
+
+  @override
+  String get settings_syncDevices_state_thisDevice => 'Dit apparaat';
+
+  @override
+  String get settings_syncDevices_state_unreadable =>
+      'Geen leesbaar manifest: een onvoltooide upload, of versleuteld';
+
+  @override
+  String settings_syncDevices_summary(
+    int deviceCount,
+    int fileCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      deviceCount,
+      locale: localeName,
+      other: '$deviceCount apparaten',
+      one: '1 apparaat',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount bestanden',
+      one: '1 bestand',
+    );
+    return '$_temp0, $_temp1, $size';
+  }
+
+  @override
+  String settings_syncDevices_summary_removable(int count, String size) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count restanten van vervangen of buiten gebruik gestelde bibliotheken, goed voor $size.',
+      one:
+          '1 restant van een vervangen of buiten gebruik gestelde bibliotheek, goed voor $size.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncDevices_tile_filesSize(int count, String size) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bestanden',
+      one: '1 bestand',
+    );
+    return '$_temp0, $size';
+  }
+
+  @override
+  String settings_syncDevices_tile_filesSizeSeen(
+    int count,
+    String size,
+    String when,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bestanden',
+      one: '1 bestand',
+    );
+    return '$_temp0, $size, $when';
+  }
+
+  @override
+  String settings_syncDevices_unnamedDevice(String shortId) {
+    return 'Apparaat $shortId';
+  }
+
+  @override
+  String get settings_syncMaintenance_keepAppOpen =>
+      'Houd de app open totdat dit klaar is. Als je hem nu sluit, blijft de provider gedeeltelijk geleegd achter en moet de volgende synchronisatie opnieuw beginnen.';
+
+  @override
+  String get settings_syncMaintenance_phase_clearingOldFiles =>
+      'Oude bestanden wissen';
+
+  @override
+  String get settings_syncMaintenance_phase_deleting => 'Verwijderen';
+
+  @override
+  String get settings_syncMaintenance_phase_publishingLibrary =>
+      'Bibliotheek publiceren';
+
+  @override
+  String get settings_syncMaintenance_phase_working => 'Bezig...';
+
+  @override
+  String settings_syncMaintenance_progress_filesOfTotal(int done, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$done van $total bestanden',
+      one: '$done van 1 bestand',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_removedFiles(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bestanden verwijderd',
+      one: '1 bestand verwijderd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_removedFilesPartial(
+    int count,
+    String trouble,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count bestanden verwijderd, maar $trouble. Probeer het opnieuw als je online bent.',
+      one:
+          '1 bestand verwijderd, maar $trouble. Probeer het opnieuw als je online bent.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_trouble_failed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count konden niet worden verwijderd',
+      one: '1 kon niet worden verwijderd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_syncMaintenance_trouble_listIncomplete =>
+      'sommige bestanden konden niet worden opgesomd';
+
+  @override
+  String settings_syncMaintenance_wipedFiles(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bestanden gewist',
+      one: '1 bestand gewist',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_syncMaintenance_wipedFilesPartial(int count, String trouble) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count bestanden gewist, maar $trouble. Probeer het opnieuw als je online bent.',
+      one:
+          '1 bestand gewist, maar $trouble. Probeer het opnieuw als je online bent.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_troubleshootSync_appBar_title =>
+      'Synchronisatieproblemen oplossen';
+
+  @override
+  String get settings_troubleshootSync_devices_subtitle =>
+      'Bekijk elk apparaat dat hier bestanden bewaart, hoeveel ruimte elk gebruikt, en verwijder restanten van bibliotheken waarmee geen enkel apparaat nog synchroniseert. Je duikgegevens worden niet aangetast.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirm => 'Opnieuw opbouwen';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirmBody =>
+      'Hiermee wordt de bibliotheek van dit apparaat de huidige bibliotheek op de provider en wordt deze opnieuw gepubliceerd, zodat andere apparaten vanaf jou synchroniseren. Gebruik dit wanneer een vervanging vanaf een ander apparaat is vastgelopen. Je duikgegevens worden niet aangetast.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_confirmTitle =>
+      'Provider opnieuw opbouwen vanaf dit apparaat?';
+
+  @override
+  String get settings_troubleshootSync_rebuild_doneSnack =>
+      'Provider opnieuw opgebouwd vanaf dit apparaat';
+
+  @override
+  String get settings_troubleshootSync_rebuild_failedSnack =>
+      'Opnieuw opbouwen mislukt';
+
+  @override
+  String get settings_troubleshootSync_rebuild_progressTitle =>
+      'Provider opnieuw opbouwen';
+
+  @override
+  String get settings_troubleshootSync_rebuild_subtitle =>
+      'Gebruik dit als de synchronisatie vastloopt terwijl er wordt gewacht op een bibliotheek die een ander apparaat heeft vervangen maar nooit volledig heeft geüpload (dat apparaat is mogelijk offline). Publiceert de bibliotheek van dit apparaat als de huidige.';
+
+  @override
+  String get settings_troubleshootSync_rebuild_title =>
+      'Provider opnieuw opbouwen vanaf dit apparaat';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_confirmBody =>
+      'Hiermee worden alleen de synchronisatiebestanden van dit apparaat van de provider verwijderd. Andere apparaten blijven synchroniseren en je duikgegevens worden niet aangetast.';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_confirmTitle =>
+      'Cloudbestanden van dit apparaat verwijderen?';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_progressTitle =>
+      'Cloudbestanden van dit apparaat verwijderen';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_subtitle =>
+      'Maak de ruimte van dit apparaat op de provider vrij. Andere apparaten blijven synchroniseren. Je duikgegevens worden niet aangetast.';
+
+  @override
+  String get settings_troubleshootSync_removeThisDevice_title =>
+      'Cloudbestanden van dit apparaat verwijderen';
+
+  @override
+  String get settings_troubleshootSync_repair_confirm => 'Herstellen';
+
+  @override
+  String get settings_troubleshootSync_repair_confirmBody =>
+      'Hiermee wordt alle lokale synchronisatiestatus gewist en krijgt dit apparaat een nieuwe synchronisatie-identiteit; bij de volgende synchronisatie maakt het opnieuw verbinding. Je duikgegevens zijn veilig en worden niet verwijderd.';
+
+  @override
+  String get settings_troubleshootSync_repair_confirmTitle =>
+      'Synchronisatie herstellen?';
+
+  @override
+  String get settings_troubleshootSync_repair_doneSnack =>
+      'Synchronisatie hersteld';
+
+  @override
+  String get settings_troubleshootSync_repair_subtitle =>
+      'Herstel een vastgelopen synchronisatie. Wist de synchronisatiestatus van dit apparaat en geeft het een nieuwe synchronisatie-identiteit; bij de volgende synchronisatie maakt het opnieuw verbinding. Je duikgegevens worden niet aangetast.';
+
+  @override
+  String get settings_troubleshootSync_repair_title =>
+      'Synchronisatie herstellen';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_confirm => 'Alles wissen';
+
+  @override
+  String settings_troubleshootSync_wipeAll_confirmBody(String word) {
+    return 'Hiermee worden de synchronisatiegegevens van ELK apparaat van deze provider verwijderd, inclusief de bibliotheekmarkeringen. Elk apparaat moet de synchronisatie helemaal opnieuw opzetten. Je duikgegevens worden niet aangetast.\n\nTyp $word om te bevestigen.';
+  }
+
+  @override
+  String get settings_troubleshootSync_wipeAll_confirmTitle =>
+      'Alle synchronisatiegegevens wissen?';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_progressTitle =>
+      'Synchronisatiegegevens wissen';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_subtitle =>
+      'Verwijder de synchronisatiegegevens van elk apparaat van deze provider, inclusief de bibliotheekmarkeringen. Elk apparaat zet de synchronisatie helemaal opnieuw op. Je duikgegevens worden niet aangetast.';
+
+  @override
+  String get settings_troubleshootSync_wipeAll_title =>
+      'Alle synchronisatiegegevens op deze provider wissen';
+
+  @override
+  String get tableMode_tooltip_toggleDetailPane =>
+      'Detailpaneel tonen of verbergen';
+
+  @override
+  String get tableMode_tooltip_toggleProfilePanel =>
+      'Profielpaneel tonen of verbergen';
+
+  @override
+  String get maps_regionDownload_title => 'Regio downloaden';
+
+  @override
+  String get maps_regionDownload_nameRequired =>
+      'Voer een naam in voor deze regio';
+
+  @override
+  String get maps_regionDownload_nameLabel => 'Regionaam';
+
+  @override
+  String get maps_regionDownload_nameHint => 'bijv. Cozumel, Mexico';
+
+  @override
+  String get maps_regionDownload_zoomLevels => 'Zoomniveaus';
+
+  @override
+  String get maps_regionDownload_zoomHint =>
+      'Hogere zoom = meer detail, grotere download';
+
+  @override
+  String maps_regionDownload_minZoom(int zoom) {
+    return 'Min: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_minZoomSemantics(int zoom) {
+    return 'Minimale zoom: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_maxZoom(int zoom) {
+    return 'Max: $zoom';
+  }
+
+  @override
+  String maps_regionDownload_maxZoomSemantics(int zoom) {
+    return 'Maximale zoom: $zoom';
+  }
+
+  @override
+  String get maps_regionDownload_estimatingSemantics =>
+      'Downloadgrootte wordt geschat';
+
+  @override
+  String maps_regionDownload_estimateSemantics(int count, Object size) {
+    return 'Geschatte download: $count tegels, $size';
+  }
+
+  @override
+  String get maps_regionDownload_estimateUnavailableSemantics =>
+      'Kan de downloadgrootte niet schatten';
+
+  @override
+  String get maps_regionDownload_estimating => 'Schatten...';
+
+  @override
+  String maps_regionDownload_tileCount(int count) {
+    return '~$count tegels';
+  }
+
+  @override
+  String get maps_regionDownload_estimateUnavailable => 'Kan niet schatten';
+
+  @override
+  String get maps_regionDownload_largeWarningSemantics =>
+      'Waarschuwing: grote download. Verlaag de zoomniveaus of kies een kleinere regio.';
+
+  @override
+  String get maps_regionDownload_largeWarning =>
+      'Grote download. Verlaag de zoomniveaus of kies een kleinere regio.';
+
+  @override
+  String get maps_regionDownload_downloadButton => 'Downloaden';
+
+  @override
+  String get diveLog_map_title => 'Duikactiviteit';
+
+  @override
+  String diveLog_map_infoCard_minutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String trips_gallery_diveSection_subtitle(
+    Object date,
+    int count,
+    Object photoLabel,
+  ) {
+    return '$date ($count $photoLabel)';
+  }
+
+  @override
+  String get trips_gallery_thumbnail_photo =>
+      'Fotominiatuur. Tik om volledig scherm te bekijken';
+
+  @override
+  String get trips_gallery_thumbnail_video =>
+      'Videominiatuur. Tik om volledig scherm te bekijken';
+
+  @override
+  String get trips_gallery_thumbnail_photoMissing =>
+      'Fotominiatuur, ontbreekt op het apparaat. Tik om volledig scherm te bekijken';
+
+  @override
+  String get trips_gallery_thumbnail_videoMissing =>
+      'Videominiatuur, ontbreekt op het apparaat. Tik om volledig scherm te bekijken';
+
+  @override
+  String get trips_photos_thumbnail_photo =>
+      'Fotominiatuur. Tik om de galerij te openen';
+
+  @override
+  String get trips_photos_thumbnail_video =>
+      'Videominiatuur. Tik om de galerij te openen';
+
+  @override
+  String trips_picker_suggestedSemantics(Object name) {
+    return 'Voorgestelde reis: $name. Tik om te gebruiken';
+  }
+
+  @override
+  String trips_picker_tileSemantics(
+    Object name,
+    Object startDate,
+    Object endDate,
+  ) {
+    return '$name, $startDate tot $endDate';
+  }
+
+  @override
+  String trips_picker_tileSemanticsSelected(
+    Object name,
+    Object startDate,
+    Object endDate,
+  ) {
+    return '$name, $startDate tot $endDate, geselecteerd';
+  }
+
+  @override
+  String get divePlanner_quickPlan_subtitle =>
+      'Maak een eenvoudig rechthoekig duikprofiel';
+
+  @override
+  String get divePlanner_quickPlan_depthLabel => 'Diepte:';
+
+  @override
+  String divePlanner_quickPlan_depthSemantics(Object depth) {
+    return 'Diepte: $depth';
+  }
+
+  @override
+  String get divePlanner_quickPlan_timeLabel => 'Tijd:';
+
+  @override
+  String divePlanner_quickPlan_bottomTimeSemantics(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Bodemtijd: $minutes minuten',
+      one: 'Bodemtijd: 1 minuut',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String divePlanner_quickPlan_minutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String divePlanner_quickPlan_previewSemantics(Object depth, int minutes) {
+    return 'Planvoorbeeld: afdaling naar $depth, bodemtijd $minutes minuten, opstijging met veiligheidsstop';
+  }
+
+  @override
+  String get divePlanner_quickPlan_previewTitle => 'Planvoorbeeld:';
+
+  @override
+  String divePlanner_quickPlan_previewDescent(Object depth) {
+    return 'Afdaling naar $depth';
+  }
+
+  @override
+  String divePlanner_quickPlan_previewBottomTime(int minutes) {
+    return 'Bodemtijd: $minutes min';
+  }
+
+  @override
+  String get divePlanner_quickPlan_previewAscent =>
+      'Opstijging met veiligheidsstop';
+
+  @override
+  String get divePlanner_quickPlan_create => 'Maken';
+
+  @override
+  String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
+    return 'SAC-verbruik: $value $volumeSymbol per minuut';
+  }
+
+  @override
+  String divePlanner_semantics_reservePressure(Object pressureSymbol) {
+    return 'Reservedruk in $pressureSymbol';
+  }
+
+  @override
+  String divePlanner_semantics_altitudeGroup(Object group) {
+    return 'Hoogtegroep: $group';
+  }
+
+  @override
+  String diveSites_import_detail_maxDepth(Object depth) {
+    return 'Max $depth';
+  }
+
+  @override
+  String get autoUpdate_banner_download => 'Downloaden';
+
+  @override
+  String get settings_cloudSync_provider_icloud_subtitle =>
+      'Synchroniseren via Apple iCloud';
+
+  @override
+  String get settings_debugLog_search_hint => 'Logs doorzoeken...';
+
+  @override
+  String get settings_debugLog_appBar_title => 'Debuglogs';
+
+  @override
+  String get settings_debugLog_disableDebugMode => 'Debugmodus uitschakelen';
+
+  @override
+  String get settings_debugLog_clearLogs => 'Logs wissen';
+
+  @override
+  String get settings_debugLog_empty =>
+      'Geen logregels komen overeen met de huidige filters';
+
+  @override
+  String settings_debugLog_loadError(Object error) {
+    return 'Fout bij laden van logs: $error';
+  }
+
+  @override
+  String get settings_debugLog_copiedSnack =>
+      'Gefilterde logs gekopieerd naar klembord';
+
+  @override
+  String settings_debugLog_savedSnack(String path) {
+    return 'Logs opgeslagen in $path';
+  }
+
+  @override
+  String get common_action_copy => 'Kopiëren';
+
+  @override
+  String get settings_appearance_customGradient_title =>
+      'Aangepast kleurverloop';
+
+  @override
+  String get settings_appearance_customGradient_start => 'Begin';
+
+  @override
+  String get settings_appearance_customGradient_end => 'Einde';
+
+  @override
+  String get settings_appearance_customGradient_hue => 'Kleurtoon';
+
+  @override
+  String get settings_appearance_customGradient_saturation => 'Verzadiging';
+
+  @override
+  String get settings_appearance_customGradient_brightness => 'Helderheid';
+
+  @override
+  String get settings_appearance_customGradient_preview => 'Voorbeeld';
+
+  @override
+  String get common_action_apply => 'Toepassen';
+
+  @override
+  String settings_cloudSync_message_loadStateFailed(Object error) {
+    return 'Kan synchronisatiestatus niet laden: $error';
+  }
+
+  @override
+  String get settings_cloudSync_message_noProviderConfigured =>
+      'Geen cloudprovider ingesteld';
+
+  @override
+  String get settings_cloudSync_message_adopting =>
+      'Herstelde bibliotheek wordt overgenomen...';
+
+  @override
+  String get settings_cloudSync_message_adoptFailed =>
+      'Kan de herstelde bibliotheek niet overnemen';
+
+  @override
+  String get settings_cloudSync_message_firstSyncNeedsConfirm =>
+      'De eerste synchronisatie moet worden bevestigd. Tik op ‘Nu synchroniseren’ om te controleren.';
+
+  @override
+  String get settings_cloudSync_message_startingSync =>
+      'Synchronisatie starten...';
+
+  @override
+  String get settings_cloudSync_message_replacePaused =>
+      'Synchronisatie gepauzeerd: de bibliotheek is vervangen vanuit een back-up. Tik op ‘Nu synchroniseren’ om te controleren.';
+
+  @override
+  String get settings_cloudSync_message_encryptedPaused =>
+      'Synchronisatie gepauzeerd: deze bibliotheek is versleuteld. Voer de wachtwoordzin in om door te gaan.';
+
+  @override
+  String get settings_cloudSync_message_completedWithConflicts =>
+      'Synchronisatie voltooid met conflicten';
+
+  @override
+  String get settings_cloudSync_message_completedSuccessfully =>
+      'Synchronisatie succesvol voltooid';
+
+  @override
+  String get settings_cloudSync_message_syncFailed => 'Synchronisatie mislukt';
+
+  @override
+  String get settings_cloudSync_message_phaseDefault => 'synchronisatie';
+
+  @override
+  String settings_cloudSync_message_syncErrorDuring(
+    String phase,
+    Object error,
+  ) {
+    return 'Synchronisatiefout tijdens $phase: $error';
+  }
+
+  @override
+  String get settings_section_debug_title => 'Debug';
+
+  @override
+  String get settings_section_debug_subtitle => 'Logs & diagnostiek';
+
+  @override
+  String get settings_debugLog_minSeverityLabel => 'Min. ernst:';
+
+  @override
+  String get settings_debugLog_shareSubject => 'Submersion-debuglogs';
+
+  @override
+  String get settings_debugLog_saveDialogTitle => 'Debuglogs opslaan';
+
+  @override
+  String get universalImport_preset_saveTitle => 'Opslaan als voorinstelling';
+
+  @override
+  String get universalImport_preset_nameLabel => 'Naam voorinstelling';
+
+  @override
+  String get universalImport_preset_nameHint => 'bijv. Mijn duiklogboek-CSV';
+
+  @override
+  String get universalImport_preset_nameRequired => 'Naam is verplicht';
+
+  @override
+  String get universalImport_preset_sourceAppLabel => 'Bronapplicatie';
+
+  @override
+  String get universalImport_preset_sourceAppNone => 'Geen';
+
+  @override
+  String get universalImport_preset_entityTypesLabel => 'Entiteitstypen';
+
+  @override
+  String get universalImport_preset_matchThresholdLabel =>
+      'Overeenkomstdrempel';
+
+  @override
+  String get universalImport_preset_matchThresholdHelp =>
+      'Hoe nauw CSV-kopteksten moeten overeenkomen voor automatische detectie';
+
+  @override
+  String universalImport_preset_signatureHeaders(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count handtekeningkopteksten uit het huidige bestand',
+      one: '1 handtekeningkoptekst uit het huidige bestand',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_preset_selectTitle => 'Voorinstelling selecteren';
+
+  @override
+  String universalImport_preset_loadFailed(String error) {
+    return 'Kan voorinstellingen niet laden: $error';
+  }
+
+  @override
+  String get universalImport_preset_sectionSaved =>
+      'Opgeslagen voorinstellingen';
+
+  @override
+  String get universalImport_preset_sectionBuiltIn =>
+      'Ingebouwde voorinstellingen';
+
+  @override
+  String get universalImport_preset_deleteTitle => 'Voorinstelling verwijderen';
+
+  @override
+  String universalImport_preset_deleteConfirm(String name) {
+    return '‘$name’ verwijderen? Dit kan niet ongedaan worden gemaakt.';
+  }
+
+  @override
+  String universalImport_preset_headersMatched(
+    int matched,
+    int total,
+    int percent,
+  ) {
+    return '$matched/$total kopteksten komen overeen ($percent%)';
+  }
+
+  @override
+  String get universalImport_preset_noSignatureHeaders =>
+      'Geen handtekeningkopteksten';
+
+  @override
+  String get universalImport_preset_deleteTooltip =>
+      'Voorinstelling verwijderen';
+
+  @override
+  String get universalImport_preset_presetsButton => 'Voorinstellingen';
+
+  @override
+  String universalImport_preset_savedSnackbar(String name) {
+    return 'Voorinstelling ‘$name’ opgeslagen';
+  }
+
+  @override
+  String get universalImport_step_done => 'Gereed';
+
+  @override
+  String get universalImport_cancel_inProgressTitle => 'Bezig met annuleren';
+
+  @override
+  String get universalImport_cancel_inProgressBody =>
+      'De huidige duik wordt afgerond voordat er wordt gestopt. Reeds geïmporteerde duiken blijven behouden.';
+
+  @override
+  String get universalImport_cancel_confirmTitle => 'Import annuleren?';
+
+  @override
+  String get universalImport_cancel_confirmBody =>
+      'Stop nadat de huidige duik is afgerond. Reeds geïmporteerde duiken blijven behouden.';
+
+  @override
+  String get universalImport_cancel_keepImporting => 'Doorgaan met importeren';
+
+  @override
+  String get universalImport_cancel_confirmAction => 'Import annuleren';
+
+  @override
+  String get universalImport_cancel_discardSelections =>
+      'Selecties verwerpen en annuleren?';
+
+  @override
+  String get universalImport_action_importSelected => 'Selectie importeren';
+
+  @override
+  String get universalImport_action_next => 'Volgende';
+
+  @override
+  String get common_action_yes => 'Ja';
+
+  @override
+  String get common_action_no => 'Nee';
+
+  @override
+  String universalImport_counts_new(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count nieuw',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_merging(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count samenvoegen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_replacing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vervangen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_counts_skipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count overgeslagen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_counts_nothingSelected => 'Niets geselecteerd';
+
+  @override
+  String get universalImport_section_potentialDuplicates =>
+      'Potentiële duplicaten';
+
+  @override
+  String get universalImport_section_possibleDuplicates =>
+      'Mogelijke duplicaten';
+
+  @override
+  String universalImport_count_duplicates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duplicaten',
+      one: '1 duplicaat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_entityAction_importBadge => 'IMPORTEREN';
+
+  @override
+  String get universalImport_entityAction_skipBadge => 'OVERSLAAN';
+
+  @override
+  String get universalImport_compare_existing => 'Bestaand';
+
+  @override
+  String get universalImport_compare_incoming => 'Inkomend';
+
+  @override
+  String get universalImport_label_skipped => 'Overgeslagen';
+
+  @override
+  String get universalImport_action_viewDives => 'Duiken bekijken';
+
+  @override
+  String get diveImport_healthkit_accessGranted => 'HealthKit-toegang verleend';
+
+  @override
+  String get diveImport_healthkit_accessGrantedBody =>
+      'Je kunt doorgaan naar de volgende stap.';
+
+  @override
+  String get diveImport_healthkit_requesting => 'Aanvragen...';
+
+  @override
+  String get diveImport_healthkit_grantAccessButton =>
+      'HealthKit-toegang verlenen';
+
+  @override
+  String get diveImport_healthkit_selectDateRange => 'Datumbereik selecteren';
+
+  @override
+  String get diveImport_healthkit_selectDateRangeBody =>
+      'Kies het datumbereik om in Apple Health naar duiken te zoeken.';
+
+  @override
+  String get diveImport_healthkit_fetchingDives =>
+      'Duiken ophalen uit Apple Health...';
+
+  @override
+  String get diveImport_healthkit_fetchFailed => 'Ophalen mislukt';
+
+  @override
+  String diveImport_healthkit_fetchFailedBody(String error) {
+    return 'Kan duiken niet ophalen: $error';
+  }
+
+  @override
+  String diveImport_healthkit_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken gevonden',
+      one: '1 duik gevonden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveImport_healthkit_proceedingToReview =>
+      'Doorgaan naar controleren...';
+
+  @override
+  String get importWizard_dc_knownComputer => 'Bekende computer';
+
+  @override
+  String importWizard_dc_knownComputerBody(String name) {
+    return 'Opgeslagen als ‘$name’. Alleen nieuwe duiken worden gedownload.';
+  }
+
+  @override
+  String get importWizard_dc_noNewDives =>
+      'Geen nieuwe duiken om te downloaden';
+
+  @override
+  String get importWizard_dc_noNewDivesBody =>
+      'Alle duiken van deze computer zijn al geïmporteerd.';
+
+  @override
+  String get universalImport_compare_noDiveData =>
+      'Duikgegevens niet beschikbaar voor vergelijking.';
+
+  @override
+  String get universalImport_entityAction_consolidateBadge => 'CONSOLIDEREN';
+
+  @override
+  String get diveCenters_import_quickSearch_egypt => 'Egypte';
+
+  @override
+  String get diveCenters_import_quickSearch_mexico => 'Mexico';
+
+  @override
+  String get accessibility_shortcut_switchDiver => 'Duiker wisselen';
+
+  @override
+  String get lock_recoveryCode_title => 'Herstelcode gebruiken';
+
+  @override
+  String get lock_recoveryCode_body =>
+      'Voer de herstelcode van 8 woorden in die je hebt opgeslagen toen je het app-wachtwoord instelde.';
+
+  @override
+  String get lock_recoveryCode_error => 'Onjuiste herstelcode.';
+
+  @override
+  String get lock_forcedReset_title => 'Stel een nieuw wachtwoord in';
+
+  @override
+  String get lock_forcedReset_body =>
+      'Je hebt ontgrendeld met je herstelcode, dus je oude wachtwoord wordt niet meer vertrouwd. Kies nu een nieuw wachtwoord.';
+
+  @override
+  String get lock_forcedReset_submit => 'Wachtwoord instellen';
+
+  @override
+  String get lock_forcedReset_error =>
+      'Kan het nieuwe wachtwoord niet instellen. Probeer opnieuw.';
+
+  @override
+  String get lock_sidecarRepair_title => 'Beveiligingssleutelbestand repareren';
+
+  @override
+  String get lock_sidecarRepair_body =>
+      'Je beveiligingssleutelbestand ontbrak en de sleutelhanger van dit apparaat bevat de sleutel nog. Bevestig je wachtwoord om een nieuw sleutelbestand te schrijven. Let op: het wachtwoord dat je hier invoert wordt vanaf nu het app-wachtwoord, en je ontvangt een nieuwe herstelcode.';
+
+  @override
+  String get lock_sidecarRepair_submit => 'Repareren';
+
+  @override
+  String get lock_sidecarRepair_error => 'Reparatie mislukt. Probeer opnieuw.';
+
+  @override
+  String get lock_newRecoveryCode_title => 'Je nieuwe herstelcode';
+
+  @override
+  String get lock_startFresh_title => 'Een andere database openen';
+
+  @override
+  String lock_startFresh_body(Object token) {
+    return 'Je huidige database blijft op de schijf staan, hernoemd met het achtervoegsel .locked; er wordt niets verwijderd. Je kunt hem later terughalen met je wachtwoord of door contact op te nemen met de ondersteuning. Cloudsynchronisatie wordt uitgeschakeld zodat de nieuwe database niet vermengd kan raken met de oude.\n\nDe app start met een nieuwe, lege database. Je kunt een back-up terugzetten in de configuratiewizard.\n\nTyp $token om te bevestigen.';
+  }
+
+  @override
+  String get lock_startFresh_confirm => 'Opzijzetten en opnieuw beginnen';
+
+  @override
+  String get lock_biometric_reason => 'Ontgrendel je duiklogboek';
+
+  @override
+  String startup_migrating_progress(Object currentStep, Object totalSteps) {
+    return 'Database upgraden... stap $currentStep van $totalSteps';
+  }
+
+  @override
+  String get startup_error_title => 'Database-upgrade mislukt';
+
+  @override
+  String get startup_error_body =>
+      'Probeer de app opnieuw te starten. Als dit blijft gebeuren, neem dan contact op met de ondersteuning: je gegevens staan nog op de schijf en opnieuw installeren is niet nodig.';
+
+  @override
+  String get startup_recovering_title => 'Database herstellen...';
+
+  @override
+  String get startup_recovering_body =>
+      'De onderbroken transactie wordt teruggedraaid. Dit duurt meestal een paar seconden.';
+
+  @override
+  String get startup_recoveryFailed_title => 'Herstel is niet voltooid';
+
+  @override
+  String get startup_recoveryFailed_body =>
+      'De database kon niet automatisch worden teruggedraaid. Je gegevens staan nog op de schijf; neem contact op met de ondersteuning voordat je opnieuw installeert, zodat we je kunnen helpen ze terug te halen.';
+
+  @override
+  String get startup_recoveryRequired_title => 'Database moet worden hersteld';
+
+  @override
+  String get startup_recoveryRequired_body =>
+      'Een eerdere sessie is onderbroken tijdens het schrijven naar de database. Je gegevens staan nog op de schijf; we hoeven alleen het terugdraaien van de geannuleerde wijziging af te maken voordat de app kan worden geopend.';
+
+  @override
+  String startup_recovery_sqliteCode(Object code) {
+    return 'SQLite-code $code';
+  }
+
+  @override
+  String get startup_recovery_action => 'Database herstellen';
+
+  @override
+  String get startup_recovery_closeWithoutRecovering =>
+      'Sluiten zonder herstellen';
+
+  @override
+  String get common_action_tryAgain => 'Probeer opnieuw';
+
+  @override
+  String get lock_screen_title => 'Submersion is vergrendeld';
+
+  @override
+  String get lock_screen_forgotPassword => 'Wachtwoord vergeten?';
+
+  @override
+  String get lock_incorrectPassword => 'Onjuist wachtwoord. Probeer opnieuw.';
+
+  @override
+  String get startup_backup_semanticsLabel => 'Back-up maken';
+
+  @override
+  String get startup_backup_title => 'Back-up van je gegevens maken';
+
+  @override
+  String get startup_backup_body =>
+      'We slaan een kopie van je duiklogboek op voordat we je database bijwerken.';
+
+  @override
+  String get startup_backupFailed_title =>
+      'Kan geen back-up van je gegevens maken';
+
+  @override
+  String get startup_backupFailed_body =>
+      'Je duiklogboek is niet gewijzigd: we hebben het niet bijgewerkt. Maak ruimte vrij (of los het probleem op) en probeer opnieuw.';
+
+  @override
+  String get startup_backupFailed_quit => 'Afsluiten';
+
+  @override
+  String get startup_backupFailed_technicalDetails => 'Technische details';
+
+  @override
+  String get common_action_retry => 'Opnieuw proberen';
+
+  @override
+  String get startup_versionMismatch_title => 'Update vereist';
+
+  @override
+  String startup_versionMismatch_body(
+    Object databaseVersion,
+    Object appVersion,
+  ) {
+    return 'Je duikgegevens zijn opgeslagen door een nieuwere versie van Submersion (schema v$databaseVersion). Deze versie ondersteunt schema’s alleen tot v$appVersion.';
+  }
+
+  @override
+  String get startup_versionMismatch_instructions =>
+      'Werk Submersion bij naar de nieuwste versie. Je gegevens zijn veilig en zijn niet gewijzigd. Als er vóór de upgrade een back-up is gemaakt, staat die in je map Backups en kan die na het bijwerken worden teruggezet.';
+
+  @override
+  String get startup_versionMismatch_download => 'Nieuwste versie downloaden';
+
+  @override
+  String get startup_versionMismatch_manualLink =>
+      'Als dat geen browser opent, ga naar:';
+
+  @override
+  String get universalImport_compare_downloaded => 'Gedownload';
+
+  @override
+  String get universalImport_compare_errorLoading =>
+      'Fout bij het laden van duikgegevens';
+
+  @override
+  String get universalImport_compare_diveNotFound =>
+      'Bestaande duik niet gevonden';
+
+  @override
+  String universalImport_compare_sameFields(Object fields) {
+    return 'Gelijk: $fields';
+  }
+
+  @override
+  String get universalImport_compare_differences => 'VERSCHILLEN';
+
+  @override
+  String get universalImport_compare_notRecorded => 'niet vastgelegd';
+
+  @override
+  String universalImport_compare_serial(Object serial) {
+    return 'Serienr.: $serial';
+  }
+
+  @override
+  String get universalImport_compare_skipSubtitle => 'Deze download verwerpen';
+
+  @override
+  String get universalImport_compare_importAsNewSubtitle =>
+      'Opslaan als aparte duik';
+
+  @override
+  String get universalImport_compare_consolidateSubtitle =>
+      'Toevoegen als 2e computermeting';
+
+  @override
+  String get diveLog_tooltip_ndlOverMax => '>60 min';
+
+  @override
+  String diveLog_tooltip_interpolated(String value) {
+    return '$value (geïnterpoleerd)';
+  }
+
+  @override
+  String get enum_profileMetric_ascentRate_short => 'Snelheid';
+
+  @override
+  String get enum_profileMetric_cns_short => 'CNS';
+
+  @override
+  String get enum_profileMetric_otu_short => 'OTU';
+
+  @override
+  String get diveLog_profileEditor_rangeOperations => 'Bereikbewerkingen';
+
+  @override
+  String get diveLog_profileEditor_selectRangeHint =>
+      'Selecteer een bereik op de grafiek om bewerkingen in te schakelen';
+
+  @override
+  String get diveLog_profileEditor_depthPlusOneMeter => 'Diepte +1 m';
+
+  @override
+  String get diveLog_profileEditor_depthMinusOneMeter => 'Diepte -1 m';
+
+  @override
+  String get diveLog_profileEditor_timePlusFiveSeconds => 'Tijd +5 s';
+
+  @override
+  String get diveLog_profileEditor_timeMinusFiveSeconds => 'Tijd -5 s';
+
+  @override
+  String get diveLog_profileEditor_smoothing => 'Afvlakking';
+
+  @override
+  String get diveLog_profileEditor_smoothLight => 'Licht';
+
+  @override
+  String get diveLog_profileEditor_smoothMedium => 'Gemiddeld';
+
+  @override
+  String get diveLog_profileEditor_smoothHeavy => 'Zwaar';
+
+  @override
+  String get diveLog_profileEditor_applyToAll => 'Op alles toepassen';
+
+  @override
+  String get diveLog_profileEditor_applyToSelection => 'Op selectie toepassen';
+
+  @override
+  String get diveLog_profileEditor_outlierDetection => 'Uitschieterdetectie';
+
+  @override
+  String get diveLog_profileEditor_detect => 'Detecteren';
+
+  @override
+  String get diveLog_profileEditor_removeAll => 'Alles verwijderen';
+
+  @override
+  String diveLog_profileEditor_outliersDetected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mogelijke uitschieters gedetecteerd',
+      one: '$count mogelijke uitschieter gedetecteerd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_profileEditor_manualDrawing => 'Handmatig tekenen';
+
+  @override
+  String get diveLog_profileEditor_drawHint =>
+      'Tik op de grafiek om routepunten te plaatsen';
+
+  @override
+  String get diveLog_profileEditor_clearWaypoints => 'Wissen';
+
+  @override
+  String get diveLog_profileEditor_generateProfile => 'Profiel genereren';
+
+  @override
+  String get diveLog_profileEditor_trimMode => 'Bijsnijmodus';
+
+  @override
+  String get diveLog_profileEditor_trimHint =>
+      'Uiteinden van het profiel bijsnijden';
+
+  @override
+  String get diveLog_profileEditor_trimEnd => 'Einde bijsnijden';
+
+  @override
+  String get diveLog_profileEditor_mode_smooth => 'Afvlakken';
+
+  @override
+  String get diveLog_profileEditor_title => 'Profiel bewerken';
+
+  @override
+  String get diveLog_profileEditor_discardBody =>
+      'Je hebt niet-opgeslagen wijzigingen aan dit duikprofiel. Weet je zeker dat je deze wilt verwerpen?';
+
+  @override
+  String get diveLog_profileEditor_saveTitle => 'Profiel opslaan?';
+
+  @override
+  String get diveLog_profileEditor_saveBody =>
+      'Hiermee wordt het bewerkte profiel opgeslagen als het primaire profiel voor deze duik. Het originele profiel blijft bewaard en kan later worden teruggezet.';
+
+  @override
+  String diveLog_profileEditor_saveFailed(String error) {
+    return 'Opslaan van profiel mislukt: $error';
+  }
+
+  @override
+  String diveLog_profileEditor_errorLoadingDive(String error) {
+    return 'Fout bij het laden van de duik: $error';
+  }
+
+  @override
+  String get diveLog_profileEditor_noProfileData =>
+      'Geen profielgegevens beschikbaar';
+
+  @override
+  String get diveLog_profileEditor_undo => 'Ongedaan maken';
+
+  @override
+  String get diveLog_profileEditor_mode_select => 'Selecteren';
+
+  @override
+  String get diveLog_profileEditor_mode_outlier => 'Uitschieter';
+
+  @override
+  String get diveLog_profileEditor_mode_draw => 'Tekenen';
+
+  @override
+  String get diveLog_profileEditor_mode_trim => 'Bijsnijden';
+
+  @override
+  String diveLog_sources_sectionTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Databronnen',
+      one: 'Databron',
+      zero: 'Databron',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_badge_manual => 'Handmatig';
+
+  @override
+  String get diveLog_sources_badge_viewing => 'Wordt bekeken';
+
+  @override
+  String get diveLog_sources_badge_secondary => 'Secundair';
+
+  @override
+  String diveLog_sources_created(String date) {
+    return 'Aangemaakt op $date';
+  }
+
+  @override
+  String get diveLog_sources_detail_serial => 'Serienummer';
+
+  @override
+  String get diveLog_sources_detail_format => 'Formaat';
+
+  @override
+  String get diveLog_sources_detail_imported => 'Geïmporteerd';
+
+  @override
+  String diveLog_detail_semantics_viewDiveComputer(String name) {
+    return 'Duikcomputer $name bekijken';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewTrip(String name) {
+    return 'Reis $name bekijken';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewDiveCenter(String name) {
+    return 'Duikcentrum $name bekijken';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewSpecies(String name) {
+    return 'Soort $name bekijken';
+  }
+
+  @override
+  String diveLog_detail_semantics_viewCourse(String name) {
+    return 'Cursus $name bekijken';
+  }
+
+  @override
+  String diveLog_detail_serialNumber(String serial) {
+    return 'Serienr. $serial';
+  }
+
+  @override
+  String diveLog_detail_errorLoadingSignature(String error) {
+    return 'Fout bij het laden van de handtekening: $error';
+  }
+
+  @override
+  String get diveLog_profilePanel_selectDive =>
+      'Selecteer een duik om het profiel te bekijken';
+
+  @override
+  String get diveLog_profilePanel_noProfileData =>
+      'Geen profielgegevens voor deze duik';
+
+  @override
+  String get settings_export_progress_divesCsv =>
+      'Duiken exporteren naar CSV...';
+
+  @override
+  String get settings_export_progress_sitesCsv =>
+      'Duikstekken exporteren naar CSV...';
+
+  @override
+  String get settings_export_progress_equipmentCsv =>
+      'Uitrusting exporteren naar CSV...';
+
+  @override
+  String get settings_export_progress_pdf => 'PDF-logboek genereren...';
+
+  @override
+  String get settings_export_progress_loadingSignatures =>
+      'Handtekeningen laden...';
+
+  @override
+  String get settings_export_progress_loadingCertifications =>
+      'Certificeringen laden...';
+
+  @override
+  String get settings_export_progress_loadingFonts => 'Lettertypen laden...';
+
+  @override
+  String settings_export_progress_templatePdf(String template) {
+    return '$template-PDF genereren...';
+  }
+
+  @override
+  String get settings_export_progress_uddf => 'UDDF-bestand genereren...';
+
+  @override
+  String get settings_export_progress_collectingData =>
+      'Alle gegevens verzamelen...';
+
+  @override
+  String get settings_export_progress_excel => 'Excel-bestand genereren...';
+
+  @override
+  String get settings_export_progress_buildingExcel =>
+      'Excel-werkmap opbouwen...';
+
+  @override
+  String get settings_export_progress_kml => 'KML-bestand genereren...';
+
+  @override
+  String get settings_export_progress_buildingKml => 'KML-bestand opbouwen...';
+
+  @override
+  String get settings_export_progress_preparingExcel =>
+      'Excel-bestand voorbereiden...';
+
+  @override
+  String get settings_export_progress_preparingKml =>
+      'KML-bestand voorbereiden...';
+
+  @override
+  String get settings_export_progress_chooseLocation =>
+      'Kies een opslaglocatie...';
+
+  @override
+  String get settings_export_progress_preparingDivesCsv =>
+      'Duiken-CSV voorbereiden...';
+
+  @override
+  String get settings_export_progress_preparingSitesCsv =>
+      'Duikstekken-CSV voorbereiden...';
+
+  @override
+  String get settings_export_progress_preparingEquipmentCsv =>
+      'Uitrusting-CSV voorbereiden...';
+
+  @override
+  String get settings_export_progress_preparingUddf =>
+      'UDDF-bestand voorbereiden...';
+
+  @override
+  String get settings_export_progress_preparingPdf => 'PDF voorbereiden...';
+
+  @override
+  String get settings_export_progress_selectingBackup =>
+      'Back-upbestand selecteren...';
+
+  @override
+  String get settings_export_progress_restoringBackup =>
+      'Herstellen vanuit de back-up...';
+
+  @override
+  String get settings_export_empty_dives => 'Geen duiken om te exporteren';
+
+  @override
+  String get settings_export_empty_sites => 'Geen duikstekken om te exporteren';
+
+  @override
+  String get settings_export_empty_equipment =>
+      'Geen uitrusting om te exporteren';
+
+  @override
+  String get settings_export_empty_data => 'Geen gegevens om te exporteren';
+
+  @override
+  String get settings_export_empty_diveSites =>
+      'Geen duikstekken om te exporteren';
+
+  @override
+  String settings_export_saveFailed(String error) {
+    return 'Opslaan mislukt: $error';
+  }
+
+  @override
+  String settings_export_backupFailed(String error) {
+    return 'Back-up mislukt: $error';
+  }
+
+  @override
+  String settings_export_restoreFailed(String error) {
+    return 'Herstellen mislukt: $error';
+  }
+
+  @override
+  String get settings_export_fileUnreadable =>
+      'Kan geen toegang krijgen tot het bestand';
+
+  @override
+  String get settings_export_notADbFile => 'Selecteer een .db-back-upbestand';
+
+  @override
+  String get settings_export_success_dives => 'Duiken succesvol geëxporteerd';
+
+  @override
+  String get settings_export_success_sites =>
+      'Duikstekken succesvol geëxporteerd';
+
+  @override
+  String get settings_export_success_equipment =>
+      'Uitrusting succesvol geëxporteerd';
+
+  @override
+  String get settings_export_success_pdf => 'PDF-logboek succesvol gegenereerd';
+
+  @override
+  String get settings_export_success_uddf =>
+      'UDDF-bestand succesvol gegenereerd';
+
+  @override
+  String get settings_export_success_excel =>
+      'Excel-bestand succesvol geëxporteerd';
+
+  @override
+  String settings_export_success_kml(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'KML-bestand succesvol geëxporteerd ($count duikstekken zonder coördinaten overgeslagen)',
+      one:
+          'KML-bestand succesvol geëxporteerd (1 duikstek zonder coördinaten overgeslagen)',
+      zero: 'KML-bestand succesvol geëxporteerd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_export_saved_excel =>
+      'Excel-bestand succesvol opgeslagen';
+
+  @override
+  String settings_export_saved_kml(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'KML-bestand succesvol opgeslagen ($count duikstekken zonder coördinaten overgeslagen)',
+      one:
+          'KML-bestand succesvol opgeslagen (1 duikstek zonder coördinaten overgeslagen)',
+      zero: 'KML-bestand succesvol opgeslagen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_export_saved_divesCsv =>
+      'Duiken-CSV succesvol opgeslagen';
+
+  @override
+  String get settings_export_saved_sitesCsv =>
+      'Duikstekken-CSV succesvol opgeslagen';
+
+  @override
+  String get settings_export_saved_equipmentCsv =>
+      'Uitrusting-CSV succesvol opgeslagen';
+
+  @override
+  String get settings_export_saved_uddf => 'UDDF-bestand succesvol opgeslagen';
+
+  @override
+  String get settings_export_saved_pdf => 'PDF succesvol opgeslagen';
+
+  @override
+  String get settings_export_saved_backup => 'Back-up succesvol opgeslagen';
+
+  @override
+  String get settings_export_restoreComplete => 'Herstel voltooid';
+
+  @override
+  String get settings_export_cancelled_save => 'Opslaan geannuleerd';
+
+  @override
+  String get settings_export_cancelled_backup => 'Back-up geannuleerd';
+
+  @override
+  String get settings_export_cancelled_restore => 'Herstellen geannuleerd';
+
+  @override
+  String get settings_export_pdfDocumentTitle => 'Duiklogboek';
+
+  @override
+  String get settings_export_saveBackupDialogTitle => 'Back-up opslaan';
+
+  @override
+  String backup_operation_created(String size) {
+    return 'Back-up gemaakt: $size';
+  }
+
+  @override
+  String backup_operation_backupFailed(String error) {
+    return 'Back-up mislukt: $error';
+  }
+
+  @override
+  String get backup_operation_restoring => 'Back-up herstellen...';
+
+  @override
+  String backup_operation_restoreFailed(String error) {
+    return 'Herstellen mislukt: $error';
+  }
+
+  @override
+  String get backup_operation_deleting => 'Back-up verwijderen...';
+
+  @override
+  String get backup_operation_deleted => 'Back-up verwijderd';
+
+  @override
+  String backup_operation_deleteFailed(String error) {
+    return 'Verwijderen mislukt: $error';
+  }
+
+  @override
+  String get backup_operation_exporting => 'Back-up exporteren...';
+
+  @override
+  String backup_operation_exported(String size) {
+    return 'Back-up geëxporteerd: $size';
+  }
+
+  @override
+  String backup_operation_exportFailed(String error) {
+    return 'Export mislukt: $error';
+  }
+
+  @override
+  String get backup_operation_preparingShare =>
+      'Back-up voorbereiden om te delen...';
+
+  @override
+  String get backup_operation_shareReady => 'Back-up klaar om te delen';
+
+  @override
+  String backup_operation_upgrading(int step, int total) {
+    return 'Database bijwerken (stap $step van $total)...';
+  }
+
+  @override
+  String backup_restore_dialog_counts(int diveCount, int siteCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount duiken',
+      one: '1 duik',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount duikstekken',
+      one: '1 duikstek',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get backup_restore_preMigration_title =>
+      'Back-up voor migratie herstellen';
+
+  @override
+  String get backup_restore_preMigration_unknownVersion => 'onbekende versie';
+
+  @override
+  String get backup_restore_preMigration_restoreAnyway => 'Toch herstellen';
+
+  @override
+  String backup_restore_preMigration_incompleteMetadata(
+    String timestamp,
+    String appVersion,
+  ) {
+    return 'Deze back-up is gemaakt op $timestamp door app $appVersion, maar de metagegevens van de databasemigratie zijn onvolledig.\n\nDe app kan niet controleren of het herstellen van deze back-up veilig is, daarom is herstellen uitgeschakeld.';
+  }
+
+  @override
+  String backup_restore_preMigration_newerApp(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+  ) {
+    return 'Deze back-up is nieuwer dan je app. Installeer een nieuwere appversie om hem te herstellen.\n\nBack-up gemaakt op $timestamp door app $appVersion (database v$fromVersion).';
+  }
+
+  @override
+  String backup_restore_preMigration_safe(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+    int toVersion,
+  ) {
+    return 'Deze back-up is gemaakt op $timestamp door app $appVersion, vlak voor het bijwerken van de database van v$fromVersion naar v$toVersion.\n\nHet databaseschema van je app komt overeen met deze back-up, dus herstellen is veilig.';
+  }
+
+  @override
+  String backup_restore_preMigration_warning(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+    int toVersion,
+    int currentVersion,
+  ) {
+    return 'Deze back-up is gemaakt op $timestamp door app $appVersion, vlak voor het bijwerken van de database van v$fromVersion naar v$toVersion.\n\nJe gebruikt een nieuwere app (database v$currentVersion).\n\nNu herstellen voert de database-upgrade van v$fromVersion naar v$toVersion opnieuw uit op je herstelde gegevens, precies dezelfde upgrade die oorspronkelijk zou worden uitgevoerd. Als die upgrade het probleem veroorzaakte, loop je er opnieuw tegenaan.\n\nOm veilig te herstellen: installeer app $appVersion of ouder en herstel deze back-up vanuit die oudere app.';
+  }
+
+  @override
+  String get settings_cloudSync_progress_preparing =>
+      'Synchronisatie voorbereiden...';
+
+  @override
+  String get settings_cloudSync_progress_pulling => 'Wijzigingen ophalen...';
+
+  @override
+  String get settings_cloudSync_progress_publishing =>
+      'Wijzigingen publiceren...';
+
+  @override
+  String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total) {
+    return 'Bibliotheek uploaden ($uploaded van $total)';
+  }
+
+  @override
+  String get settings_cloudSync_result_noProvider =>
+      'Geen cloudprovider ingesteld';
+
+  @override
+  String get settings_cloudSync_result_notAuthenticated =>
+      'Niet geverifieerd bij de cloudprovider';
+
+  @override
+  String get settings_cloudSync_result_timedOut =>
+      'Time-out bij de synchronisatie';
+
+  @override
+  String get settings_cloudSync_result_epochMarkerUnreadable =>
+      'Kan de epochemarkering van de bibliotheek niet lezen';
+
+  @override
+  String get settings_cloudSync_result_epochMarkerEncrypted =>
+      'De epochemarkering van de bibliotheek is versleuteld';
+
+  @override
+  String get settings_cloudSync_result_libraryReplacedRemotely =>
+      'De cloudbibliotheek is vervangen vanaf een back-up';
+
+  @override
+  String get settings_cloudSync_result_noReplacementToRebuild =>
+      'Geen bibliotheekvervanging om vanuit te herbouwen';
+
+  @override
+  String get settings_cloudSync_result_rebuiltFromThisDevice =>
+      'Deze provider is opnieuw opgebouwd vanuit de bibliotheek van dit apparaat';
+
+  @override
+  String settings_cloudSync_result_rebuildFailed(String error) {
+    return 'Herbouwen mislukt: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_libraryReplaced =>
+      'Bibliotheek vervangen';
+
+  @override
+  String settings_cloudSync_result_libraryReplaceFailed(String error) {
+    return 'Vervangen van de bibliotheek mislukt: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_noReplacementMarker =>
+      'Geen markering voor bibliotheekvervanging gevonden';
+
+  @override
+  String get settings_cloudSync_result_adoptedRestoredLibrary =>
+      'Herstelde bibliotheek overgenomen';
+
+  @override
+  String settings_cloudSync_result_adoptFailed(String error) {
+    return 'Kan de herstelde bibliotheek niet overnemen: $error';
+  }
+
+  @override
+  String get settings_cloudSync_result_previousLibraryUnreadable =>
+      'De vorige bibliotheek kon niet worden gelezen; deze provider is opnieuw ingericht vanuit de bibliotheek van dit apparaat.';
+
+  @override
+  String get settings_cloudSync_result_replacementStillUploading =>
+      'De vervangen bibliotheek wordt nog geüpload. Probeer het zo meteen opnieuw.';
+
+  @override
+  String settings_cloudSync_result_recordsFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count records konden niet worden toegepast',
+      one: '1 record kon niet worden toegepast',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_result_adoptedFreshIdentity =>
+      'Een ander apparaat synchroniseerde met de identiteit van dit apparaat. Dit apparaat heeft een nieuwe identiteit overgenomen en de cloudgegevens samengevoegd.';
+
+  @override
+  String settings_cloudSync_launchCheck_unavailable(String provider) {
+    return '$provider is niet beschikbaar op dit apparaat';
+  }
+
+  @override
+  String settings_cloudSync_launchCheck_notSignedIn(String provider) {
+    return 'Niet aangemeld bij $provider';
+  }
+
+  @override
+  String settings_cloudSync_launchCheck_localChanges(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count lokale wijzigingen om te uploaden',
+      one: '1 lokale wijziging om te uploaden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_launchCheck_noRemoteData =>
+      'Geen synchronisatiegegevens gevonden in de cloud';
+
+  @override
+  String get settings_cloudSync_launchCheck_cloudDataAvailable =>
+      'Cloudgegevens beschikbaar';
+
+  @override
+  String get settings_cloudSync_launchCheck_updatesAvailable =>
+      'Updates beschikbaar uit de cloud';
+
+  @override
+  String get settings_cloudSync_launchCheck_upToDate => 'Alles is up-to-date';
+
+  @override
+  String settings_cloudSync_launchCheck_failed(String error) {
+    return 'Synchronisatiecontrole mislukt: $error';
   }
 }

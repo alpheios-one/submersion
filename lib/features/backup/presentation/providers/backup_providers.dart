@@ -20,6 +20,9 @@ import 'package:submersion/features/backup/presentation/providers/post_restore_s
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion_saf/submersion_saf.dart';
 
 // =============================================================================
 // Repository & Service Providers
@@ -238,6 +241,13 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     _startDesktopTimerIfNeeded();
   }
 
+  /// Localizations for the operation messages this notifier publishes.
+  ///
+  /// A provider has no BuildContext, so the persisted locale setting is
+  /// resolved through the same helper SyncNotifier uses. This is the string
+  /// half of what [SafetyReviewSweepProgress] already does structurally.
+  AppLocalizations get _l10n => l10nForLocaleTag(_ref.read(localeProvider));
+
   BackupService get _service => _ref.read(backupServiceProvider);
 
   /// After a restore, realign the active diver from the restored database's
@@ -295,16 +305,16 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
   Future<void> performBackup() async {
     if (state.status == BackupOperationStatus.inProgress) return;
 
-    state = const BackupOperationState(
+    state = BackupOperationState(
       status: BackupOperationStatus.inProgress,
-      message: 'Creating backup...',
+      message: _l10n.backup_backingUp,
     );
 
     try {
       final record = await _service.performBackup();
       state = BackupOperationState(
         status: BackupOperationStatus.success,
-        message: 'Backup created: ${record.formattedSize}',
+        message: _l10n.backup_operation_created(record.formattedSize),
         lastRecord: record,
       );
       _ref.read(backupSettingsProvider.notifier).refresh();
@@ -312,7 +322,7 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     } catch (e) {
       state = BackupOperationState(
         status: BackupOperationStatus.error,
-        message: 'Backup failed: $e',
+        message: _l10n.backup_operation_backupFailed('$e'),
       );
     }
   }
@@ -325,9 +335,9 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
   }) async {
     if (state.status == BackupOperationStatus.inProgress) return;
 
-    state = const BackupOperationState(
+    state = BackupOperationState(
       status: BackupOperationStatus.inProgress,
-      message: 'Restoring backup...',
+      message: _l10n.backup_operation_restoring,
       isRestoring: true,
     );
 
@@ -357,7 +367,7 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     } catch (e) {
       state = BackupOperationState(
         status: BackupOperationStatus.error,
-        message: 'Restore failed: $e',
+        message: _l10n.backup_operation_restoreFailed('$e'),
       );
     }
   }
@@ -366,22 +376,22 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
   Future<void> deleteBackup(BackupRecord record) async {
     if (state.status == BackupOperationStatus.inProgress) return;
 
-    state = const BackupOperationState(
+    state = BackupOperationState(
       status: BackupOperationStatus.inProgress,
-      message: 'Deleting backup...',
+      message: _l10n.backup_operation_deleting,
     );
 
     try {
       await _service.deleteBackup(record);
-      state = const BackupOperationState(
+      state = BackupOperationState(
         status: BackupOperationStatus.success,
-        message: 'Backup deleted',
+        message: _l10n.backup_operation_deleted,
       );
       _ref.invalidate(backupHistoryProvider);
     } catch (e) {
       state = BackupOperationState(
         status: BackupOperationStatus.error,
-        message: 'Delete failed: $e',
+        message: _l10n.backup_operation_deleteFailed('$e'),
       );
     }
   }
@@ -390,16 +400,16 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
   Future<void> exportToPath(String destinationPath) async {
     if (state.status == BackupOperationStatus.inProgress) return;
 
-    state = const BackupOperationState(
+    state = BackupOperationState(
       status: BackupOperationStatus.inProgress,
-      message: 'Exporting backup...',
+      message: _l10n.backup_operation_exporting,
     );
 
     try {
       final record = await _service.exportBackupToPath(destinationPath);
       state = BackupOperationState(
         status: BackupOperationStatus.success,
-        message: 'Backup exported: ${record.formattedSize}',
+        message: _l10n.backup_operation_exported(record.formattedSize),
         lastRecord: record,
       );
       _ref.read(backupSettingsProvider.notifier).refresh();
@@ -407,7 +417,7 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     } catch (e) {
       state = BackupOperationState(
         status: BackupOperationStatus.error,
-        message: 'Export failed: $e',
+        message: _l10n.backup_operation_exportFailed('$e'),
       );
     }
   }
@@ -416,24 +426,76 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
   Future<File?> exportForSharing() async {
     if (state.status == BackupOperationStatus.inProgress) return null;
 
-    state = const BackupOperationState(
+    state = BackupOperationState(
       status: BackupOperationStatus.inProgress,
-      message: 'Preparing backup for sharing...',
+      message: _l10n.backup_operation_preparingShare,
     );
 
     try {
       final file = await _service.exportBackupToTemp();
-      state = const BackupOperationState(
+      state = BackupOperationState(
         status: BackupOperationStatus.success,
-        message: 'Backup ready for sharing',
+        message: _l10n.backup_operation_shareReady,
       );
       return file;
     } catch (e) {
       state = BackupOperationState(
         status: BackupOperationStatus.error,
-        message: 'Export failed: $e',
+        message: _l10n.backup_operation_exportFailed('$e'),
       );
       return null;
+    }
+  }
+
+  /// Export a backup into an Android SAF tree, streaming it in.
+  ///
+  /// The Android counterpart to [exportToPath]. Scoped storage gives no
+  /// writable filesystem path for a user-chosen folder, and file_picker 12's
+  /// `saveFile` requires the whole artifact in memory as bytes, which a large
+  /// dive library cannot afford. So the artifact is built in temp (encrypted
+  /// when backup encryption is on, exactly as every other export path does)
+  /// and then streamed into the tree by the same platform channel the
+  /// scheduled backup uses.
+  Future<void> exportToSafTree({
+    required String treeUri,
+    required String fileName,
+  }) async {
+    if (state.status == BackupOperationStatus.inProgress) return;
+
+    state = const BackupOperationState(
+      status: BackupOperationStatus.inProgress,
+      message: 'Exporting backup...',
+    );
+
+    File? temp;
+    try {
+      temp = await _service.exportBackupToTemp();
+      await SubmersionSaf.writeBackup(
+        treeUri: treeUri,
+        fileName: fileName,
+        sourcePath: temp.path,
+      );
+      state = const BackupOperationState(
+        status: BackupOperationStatus.success,
+        message: 'Backup exported',
+      );
+      _ref.read(backupSettingsProvider.notifier).refresh();
+      _ref.invalidate(backupHistoryProvider);
+    } catch (e) {
+      state = BackupOperationState(
+        status: BackupOperationStatus.error,
+        message: 'Export failed: $e',
+      );
+    } finally {
+      // The temp artifact is a full copy of the library, and when encryption
+      // is off it is plaintext. Never leave it behind.
+      if (temp != null && await temp.exists()) {
+        try {
+          await temp.delete();
+        } catch (_) {
+          // best-effort temp cleanup
+        }
+      }
     }
   }
 
@@ -445,9 +507,9 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
   }) async {
     if (state.status == BackupOperationStatus.inProgress) return;
 
-    state = const BackupOperationState(
+    state = BackupOperationState(
       status: BackupOperationStatus.inProgress,
-      message: 'Validating backup file...',
+      message: _l10n.backup_import_validating,
       isRestoring: true,
     );
 
@@ -457,14 +519,14 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
       if (!validation.isValid) {
         state = BackupOperationState(
           status: BackupOperationStatus.error,
-          message: validation.error ?? 'Invalid backup file',
+          message: validation.error ?? _l10n.backup_import_invalidFile,
         );
         return;
       }
 
-      state = const BackupOperationState(
+      state = BackupOperationState(
         status: BackupOperationStatus.inProgress,
-        message: 'Restoring backup...',
+        message: _l10n.backup_operation_restoring,
         isRestoring: true,
       );
 
@@ -493,7 +555,7 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     } catch (e) {
       state = BackupOperationState(
         status: BackupOperationStatus.error,
-        message: 'Restore failed: $e',
+        message: _l10n.backup_operation_restoreFailed('$e'),
       );
     }
   }
@@ -504,7 +566,7 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
   void _onRestoreMigrationProgress(int currentStep, int totalSteps) {
     state = BackupOperationState(
       status: BackupOperationStatus.inProgress,
-      message: 'Upgrading database (step $currentStep of $totalSteps)...',
+      message: _l10n.backup_operation_upgrading(currentStep, totalSteps),
       isRestoring: true,
     );
   }

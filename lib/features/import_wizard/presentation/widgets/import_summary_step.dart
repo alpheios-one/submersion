@@ -7,6 +7,7 @@ import 'package:submersion/features/dive_sites/presentation/providers/site_match
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_file_outcome.dart';
 import 'package:submersion/features/import_wizard/presentation/providers/import_wizard_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The summary step shown after the import completes.
@@ -158,7 +159,7 @@ class _SuccessView extends StatelessWidget {
               if (entry.value > 0)
                 _CountRow(
                   icon: _iconForType(entry.key),
-                  label: _labelForType(entry.key),
+                  label: _labelForType(l10n, entry.key),
                   count: entry.value,
                 ),
             if (updatedCount > 0)
@@ -192,7 +193,7 @@ class _SuccessView extends StatelessWidget {
             if (skippedCount > 0)
               _CountRow(
                 icon: Icons.skip_next,
-                label: 'Skipped',
+                label: l10n.universalImport_label_skipped,
                 count: skippedCount,
                 key: const Key('import_summary_skipped_row'),
               ),
@@ -237,12 +238,15 @@ class _SuccessView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                OutlinedButton(onPressed: onDone, child: const Text('Done')),
+                OutlinedButton(
+                  onPressed: onDone,
+                  child: Text(l10n.universalImport_action_done),
+                ),
                 if (hasActivity) ...[
                   const SizedBox(width: 16),
                   FilledButton(
                     onPressed: onViewDives,
-                    child: const Text('View Dives'),
+                    child: Text(l10n.universalImport_action_viewDives),
                   ),
                 ],
               ],
@@ -308,30 +312,30 @@ class _SuccessView extends StatelessWidget {
     }
   }
 
-  String _labelForType(ImportEntityType type) {
+  String _labelForType(AppLocalizations l10n, ImportEntityType type) {
     switch (type) {
       case ImportEntityType.dives:
-        return 'Dives';
+        return l10n.diveImport_uddf_dives;
       case ImportEntityType.sites:
-        return 'Sites';
+        return l10n.diveImport_uddf_sites;
       case ImportEntityType.buddies:
-        return 'Buddies';
+        return l10n.diveImport_uddf_buddies;
       case ImportEntityType.equipment:
-        return 'Equipment';
+        return l10n.diveImport_uddf_equipment;
       case ImportEntityType.trips:
-        return 'Trips';
+        return l10n.diveImport_uddf_trips;
       case ImportEntityType.certifications:
-        return 'Certifications';
+        return l10n.diveImport_uddf_certifications;
       case ImportEntityType.diveCenters:
-        return 'Dive Centers';
+        return l10n.diveImport_uddf_diveCenters;
       case ImportEntityType.tags:
-        return 'Tags';
+        return l10n.diveImport_uddf_tags;
       case ImportEntityType.diveTypes:
-        return 'Dive Types';
+        return l10n.diveImport_uddf_diveTypes;
       case ImportEntityType.equipmentSets:
-        return 'Equipment Sets';
+        return l10n.diveImport_uddf_equipmentSets;
       case ImportEntityType.courses:
-        return 'Courses';
+        return l10n.diveImport_uddf_tabCourses;
     }
   }
 }
@@ -367,7 +371,10 @@ class _ErrorView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            OutlinedButton(onPressed: onDone, child: const Text('Done')),
+            OutlinedButton(
+              onPressed: onDone,
+              child: Text(context.l10n.universalImport_action_done),
+            ),
           ],
         ),
       ),

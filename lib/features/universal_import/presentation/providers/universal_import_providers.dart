@@ -40,6 +40,7 @@ import 'package:submersion/features/universal_import/data/services/shearwater_db
 import 'package:submersion/features/universal_import/data/services/import_duplicate_checker.dart';
 import 'package:submersion/features/universal_import/data/services/zip_expansion_service.dart';
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_state.dart';
+import 'package:submersion/core/services/files/picked_file_materializer.dart';
 
 export 'package:submersion/features/universal_import/presentation/providers/universal_import_state.dart';
 
@@ -283,19 +284,19 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     );
 
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.any,
-        allowMultiple: true,
-      );
+      final result = await FilePicker.pickFiles(type: FileType.any);
 
-      if (result == null || result.files.isEmpty) {
+      if (result.isEmpty) {
         state = state.copyWith(isLoading: false);
         return;
       }
 
+      // Copy in any handle without a local path (Android SAF picks) rather
+      // than filtering it out: dropping them silently would shrink the
+      // selection and then report "no importable files" for a pick the user
+      // made correctly.
       final pickedPaths = [
-        for (final f in result.files)
-          if (f.path != null) f.path!,
+        for (final f in await materializePickedFiles(result)) f.path,
       ];
       final expansion = await _zipExpansion.expandAll(pickedPaths);
       _applyExpansionExtras(expansion);
@@ -619,27 +620,16 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.any,
-        allowMultiple: false,
-      );
+      final pickedFile = await FilePicker.pickFile(type: FileType.any);
 
-      if (result == null || result.files.isEmpty) {
+      if (pickedFile == null) {
         state = state.copyWith(isLoading: false);
         return;
       }
 
-      final pickedFile = result.files.first;
-      final filePath = pickedFile.path;
-      if (filePath == null) {
-        state = state.copyWith(
-          isLoading: false,
-          error: 'Could not access file',
-        );
-        return;
-      }
-
-      final bytes = await File(filePath).readAsBytes();
+      // Reads through the handle, so a SAF pick with no local path works
+      // instead of failing with "Could not access file".
+      final bytes = await pickedFile.readAsBytes();
 
       state = state.copyWith(
         isLoading: false,

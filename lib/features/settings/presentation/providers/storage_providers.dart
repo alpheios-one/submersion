@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/domain/entities/storage_config.dart';
+import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_client_config.dart';
 import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/database_migration_service.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -16,7 +17,8 @@ class StoragePlatformCapabilities {
   /// Whether iCloud sync is supported (iOS/macOS only)
   final bool supportsICloud;
 
-  /// Whether Google Drive sync is supported (all platforms)
+  /// Whether Google Drive sync is supported: everywhere except a
+  /// Windows/Linux build with no Desktop-app OAuth client compiled in
   final bool supportsGoogleDrive;
 
   /// Whether this is a desktop platform
@@ -53,7 +55,11 @@ final storagePlatformCapabilitiesProvider =
         //   scoped storage rules out an arbitrary folder for the live DB
         supportsCustomFolder: true,
         supportsICloud: Platform.isIOS || Platform.isMacOS,
-        supportsGoogleDrive: true, // All platforms
+        // Single source of truth shared with
+        // GoogleDriveStorageProvider.isAvailable(), so the two cannot
+        // diverge: compile-time OAuth config on mobile/macOS, and on
+        // Windows/Linux the Desktop-app client being compiled in.
+        supportsGoogleDrive: GoogleDriveClientConfig.isSupportedOnThisPlatform,
         isDesktop: Platform.isMacOS || Platform.isWindows || Platform.isLinux,
         customFolderIsDeviceVolumeOnly: Platform.isAndroid,
       );

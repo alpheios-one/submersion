@@ -18,6 +18,8 @@ import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.d
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
@@ -132,6 +134,21 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
     }
   }
 
+  // Diver-placed annotations, flattened to the site's local frame so the
+  // whole input still crosses compute().
+  final features =
+      ref.watch(siteFeaturesProvider(siteId)).valueOrNull ?? const [];
+  final featureInputs = [
+    for (final f in features)
+      SiteFeatureMarkerInput(
+        id: f.id,
+        typeName: f.typeName,
+        label: f.name,
+        offset: enuOffsetMeters(center, GeoPoint(f.latitude, f.longitude)),
+        depthMeters: f.depthMeters,
+      ),
+  ];
+
   // Terrain appearance and the depth unit shape the geometry (contour
   // levels, ramp colors, wall threshold), so the scene rebuilds when the
   // diver changes either.
@@ -164,6 +181,7 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
     siteMaxDepth: site.maxDepth,
     divePaths: divePaths,
     nearbySites: nearby,
+    features: featureInputs,
     appearance: appearance,
     displayUnitInMeters: depthUnit == DepthUnit.feet ? 0.3048 : 1.0,
     depthSymbol: depthUnit.symbol,

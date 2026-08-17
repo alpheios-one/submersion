@@ -38,6 +38,13 @@ class AppShortcuts {
     if (_registered) return;
     _registered = true;
 
+    // The `label` and `category` strings below are deliberately English
+    // literals, NOT `context.l10n` lookups. Registration happens once from
+    // a static method with no BuildContext, and ShortcutCatalog uses the
+    // category string as a grouping key, a sort key and the argument to
+    // unregisterCategory. They are stable identifiers; the help sheet
+    // resolves them to the UI language at render time through
+    // shortcutEntryLabel / shortcutCategoryLabel in shortcut_display.dart.
     ShortcutCatalog.instance.registerAll([
       // Navigation
       ShortcutEntry(

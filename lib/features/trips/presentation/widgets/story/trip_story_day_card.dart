@@ -8,6 +8,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/dive_type_label_resolver.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_list_item.dart';
+import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -175,13 +176,13 @@ class _DayStatStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final bottom = day.totalBottomTime;
-    final bottomLabel = bottom.inHours > 0
-        ? '${bottom.inHours}h ${bottom.inMinutes % 60}m'
-        : '${bottom.inMinutes}m';
+    final runtime = day.totalRuntime;
+    final runtimeLabel = runtime.inHours > 0
+        ? '${runtime.inHours}h ${runtime.inMinutes % 60}m'
+        : '${runtime.inMinutes}m';
     final stats = <(String, String)>[
       (l10n.trips_detail_stat_totalDives, '${day.diveCount}'),
-      (l10n.trips_detail_stat_totalBottomTime, bottomLabel),
+      (l10n.trips_detail_stat_totalRuntime, runtimeLabel),
       if (day.maxDepth != null)
         (l10n.trips_detail_stat_maxDepth, units.formatDepth(day.maxDepth)),
       // siteCount dedupes by site id (siteNames dedupes by display name), so two
@@ -315,7 +316,11 @@ class _SightingChips extends StatelessWidget {
     for (final sighting in day.sightings) {
       final existing = merged[sighting.speciesId];
       merged[sighting.speciesId] = (
-        name: sighting.speciesName,
+        name: localizedSpeciesName(
+          context.l10n,
+          sighting.speciesId,
+          sighting.speciesName,
+        ),
         count: (existing?.count ?? 0) + sighting.count,
       );
     }

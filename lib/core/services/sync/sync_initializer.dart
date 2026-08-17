@@ -10,6 +10,8 @@ import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/sync_clock.dart';
 import 'package:submersion/core/services/sync/sync_preferences.dart'
     show syncLastProviderPrefsKey;
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The cloud provider the foreground app last selected, as recorded in
 /// [prefs]. Free-standing (not a [SyncInitializer] method) so the headless
@@ -62,11 +64,22 @@ class SyncInitializer {
   final SyncRepository _syncRepository;
   final SharedPreferences _prefs;
 
+  /// Resolves localizations for the [SyncCheckResult] messages. Injected by
+  /// `syncInitializerProvider`; defaults to English so an un-wired caller (a
+  /// unit test, the headless isolate) stays deterministic.
+  final AppLocalizations Function() _localizations;
+
+  static AppLocalizations _englishLocalizations() => l10nForLocaleTag('en');
+
+  AppLocalizations get _l10n => _localizations();
+
   SyncInitializer({
     required SyncRepository syncRepository,
     required SharedPreferences prefs,
+    AppLocalizations Function()? localizations,
   }) : _syncRepository = syncRepository,
-       _prefs = prefs;
+       _prefs = prefs,
+       _localizations = localizations ?? _englishLocalizations;
 
   /// Get the last used cloud provider type
   CloudProviderType? getLastProvider() => lastCloudProviderFromPrefs(_prefs);
@@ -244,9 +257,9 @@ class SyncInitializer {
     CloudStorageProvider? provider,
   ) async {
     if (provider == null) {
-      return const SyncCheckResult(
+      return SyncCheckResult(
         status: SyncCheckStatus.notConfigured,
-        message: 'No cloud provider configured',
+        message: _l10n.settings_cloudSync_result_noProvider,
       );
     }
 
@@ -255,7 +268,9 @@ class SyncInitializer {
       if (!await provider.isAvailable()) {
         return SyncCheckResult(
           status: SyncCheckStatus.unavailable,
-          message: '${provider.providerName} is not available on this device',
+          message: _l10n.settings_cloudSync_launchCheck_unavailable(
+            provider.providerName,
+          ),
         );
       }
 
@@ -263,7 +278,9 @@ class SyncInitializer {
       if (!await provider.isAuthenticated()) {
         return SyncCheckResult(
           status: SyncCheckStatus.notAuthenticated,
-          message: 'Not signed in to ${provider.providerName}',
+          message: _l10n.settings_cloudSync_launchCheck_notSignedIn(
+            provider.providerName,
+          ),
         );
       }
 
@@ -290,15 +307,16 @@ class SyncInitializer {
         if (pendingCount > 0) {
           return SyncCheckResult(
             status: SyncCheckStatus.localChanges,
-            message:
-                '$pendingCount local change${pendingCount == 1 ? '' : 's'} to upload',
+            message: _l10n.settings_cloudSync_launchCheck_localChanges(
+              pendingCount,
+            ),
             localLastSync: localLastSync,
             pendingChanges: pendingCount,
           );
         }
-        return const SyncCheckResult(
+        return SyncCheckResult(
           status: SyncCheckStatus.noRemoteData,
-          message: 'No sync data found in cloud',
+          message: _l10n.settings_cloudSync_launchCheck_noRemoteData,
         );
       }
 
@@ -308,7 +326,7 @@ class SyncInitializer {
       if (localLastSync == null) {
         return SyncCheckResult(
           status: SyncCheckStatus.updatesAvailable,
-          message: 'Cloud data available',
+          message: _l10n.settings_cloudSync_launchCheck_cloudDataAvailable,
           remoteModified: remoteModified,
         );
       }
@@ -316,7 +334,7 @@ class SyncInitializer {
       if (remoteModified.isAfter(localLastSync)) {
         return SyncCheckResult(
           status: SyncCheckStatus.updatesAvailable,
-          message: 'Updates available from cloud',
+          message: _l10n.settings_cloudSync_launchCheck_updatesAvailable,
           localLastSync: localLastSync,
           remoteModified: remoteModified,
         );
@@ -327,8 +345,9 @@ class SyncInitializer {
       if (pendingCount > 0) {
         return SyncCheckResult(
           status: SyncCheckStatus.localChanges,
-          message:
-              '$pendingCount local change${pendingCount == 1 ? '' : 's'} to upload',
+          message: _l10n.settings_cloudSync_launchCheck_localChanges(
+            pendingCount,
+          ),
           localLastSync: localLastSync,
           pendingChanges: pendingCount,
         );
@@ -336,14 +355,14 @@ class SyncInitializer {
 
       return SyncCheckResult(
         status: SyncCheckStatus.upToDate,
-        message: 'Everything is up to date',
+        message: _l10n.settings_cloudSync_launchCheck_upToDate,
         localLastSync: localLastSync,
       );
     } catch (e, stackTrace) {
       _log.error('Sync check failed', error: e, stackTrace: stackTrace);
       return SyncCheckResult(
         status: SyncCheckStatus.error,
-        message: 'Sync check failed: $e',
+        message: _l10n.settings_cloudSync_launchCheck_failed('$e'),
       );
     }
   }

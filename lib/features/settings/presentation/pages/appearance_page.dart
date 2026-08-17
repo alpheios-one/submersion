@@ -78,7 +78,10 @@ class AppearancePage extends ConsumerWidget {
             ),
             title: Text(context.l10n.settings_appearance_appLanguage),
             subtitle: Text(
-              LanguageSettingsPage.getDisplayName(settings.locale),
+              LanguageSettingsPage.getDisplayName(
+                context.l10n,
+                settings.locale,
+              ),
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/settings/language'),

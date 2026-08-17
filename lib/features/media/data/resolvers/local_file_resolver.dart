@@ -91,7 +91,9 @@ class LocalFileResolver implements MediaSourceResolver {
         // on macOS — when the direct read is denied.
         if (await f.exists()) {
           final blocker = await _readBlocker(f);
-          if (blocker == null) return FileData(file: f);
+          if (blocker == null) {
+            return FileData(file: f, servedFrom: ServedFrom.localDisk);
+          }
           _log.debug(
             'localPath exists but cannot be opened (sandbox?), falling '
             'back to bookmark: $localPath [item ${item.id}]',
@@ -143,7 +145,7 @@ class LocalFileResolver implements MediaSourceResolver {
       // bookmark-bytes branch below, which is unit-tested.
       try {
         final bytes = await _platform.readUriBytes(ref);
-        return BytesData(bytes: bytes);
+        return BytesData(bytes: bytes, servedFrom: ServedFrom.localDisk);
       } catch (e, st) {
         _log.warning(
           'readUriBytes failed for item ${item.id}',
@@ -171,7 +173,7 @@ class LocalFileResolver implements MediaSourceResolver {
         // FileData from a resolved bookmark handle) avoids leaking the
         // security scope when callers forget to invoke releaseBookmark.
         final bytes = await _platform.readBookmarkBytes(blob);
-        return BytesData(bytes: bytes);
+        return BytesData(bytes: bytes, servedFrom: ServedFrom.localDisk);
       } catch (e, st) {
         _log.warning(
           'readBookmarkBytes failed for item ${item.id}',
@@ -232,7 +234,13 @@ class LocalFileResolver implements MediaSourceResolver {
         item,
         maxDimension: maxDim,
       );
-      if (poster != null) return BytesData(bytes: poster);
+      if (poster != null) {
+        return BytesData(
+          bytes: poster,
+          servedFrom: ServedFrom.localDisk,
+          servedTier: ServedTier.thumbnail,
+        );
+      }
     }
     return resolve(item);
   }

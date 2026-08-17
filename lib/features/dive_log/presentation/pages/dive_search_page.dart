@@ -19,10 +19,22 @@ import 'package:submersion/shared/widgets/app_date_picker.dart';
 /// Advanced search page with all filter options in collapsible sections.
 ///
 /// This page provides a comprehensive form for searching dives with
-/// all available filter criteria. When the user taps "Search", the
-/// filters are applied and they're navigated to the dive list.
+/// all available filter criteria. It edits whichever filter the surface that
+/// opened it owns: the dive list's [diveFilterProvider] by default, or the
+/// Statistics tab's own filter when that section pushes the page with its
+/// provider as the route `extra` (#1079). Applying the dive-list filter takes
+/// the user to the dive list; applying any other section's filter returns to
+/// that section, which is already showing the filtered results.
 class DiveSearchPage extends ConsumerStatefulWidget {
-  const DiveSearchPage({super.key});
+  /// Filter this page reads its initial values from and writes back to.
+  ///
+  /// Null means the dive list's [diveFilterProvider]. It cannot be the default
+  /// value directly because `diveFilterProvider` is a `final` top-level
+  /// variable rather than a compile-time constant, the same constraint
+  /// `DiveFilterSheet` works around.
+  final StateProvider<DiveFilterState>? filterProvider;
+
+  const DiveSearchPage({super.key, this.filterProvider});
 
   @override
   ConsumerState<DiveSearchPage> createState() => _DiveSearchPageState();
@@ -81,11 +93,20 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     'customFields': false,
   };
 
+  /// Resolved target of this page: the section's own filter, or the dive
+  /// list's filter when the page was opened without one.
+  StateProvider<DiveFilterState> get _filterProvider =>
+      widget.filterProvider ?? diveFilterProvider;
+
+  /// True when this page edits the dive list's filter, which is the only case
+  /// where applying should navigate to the dive list.
+  bool get _targetsDiveList => identical(_filterProvider, diveFilterProvider);
+
   @override
   void initState() {
     super.initState();
     // Initialize from current filter state
-    final filter = ref.read(diveFilterProvider);
+    final filter = ref.read(_filterProvider);
     _startDate = filter.startDate;
     _endDate = filter.endDate;
     _siteId = filter.siteId;
@@ -246,8 +267,16 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
                 flex: 2,
                 child: FilledButton.icon(
                   onPressed: _applyAndSearch,
-                  icon: const Icon(Icons.search),
-                  label: Text(context.l10n.diveLog_search_search),
+                  // Outside the dive list the action filters the section in
+                  // place rather than running a search, so say so.
+                  icon: Icon(
+                    _targetsDiveList ? Icons.search : Icons.filter_alt,
+                  ),
+                  label: Text(
+                    _targetsDiveList
+                        ? context.l10n.diveLog_search_search
+                        : context.l10n.diveLog_filter_apply,
+                  ),
                 ),
               ),
             ],
@@ -655,7 +684,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
                 color: isSelected ? Colors.amber : null,
                 size: 32,
               ),
-              tooltip: '$rating star${rating > 1 ? 's' : ''}',
+              tooltip: context.l10n.diveSites_edit_rating_starTooltip(rating),
               onPressed: () {
                 setState(() {
                   if (_minRating == rating) {
@@ -775,8 +804,8 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
   }
 
   void _applyAndSearch() {
-    // Apply all filters
-    ref.read(diveFilterProvider.notifier).state = DiveFilterState(
+    // Apply all filters to whichever section owns this page
+    ref.read(_filterProvider.notifier).state = DiveFilterState(
       startDate: _startDate,
       endDate: _endDate,
       siteId: _siteId,
@@ -798,8 +827,21 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
       customFieldValue: _customFieldValue,
     );
 
-    // Navigate to dive list
-    context.go('/dives');
+    if (_targetsDiveList) {
+      // Navigate to dive list, the surface that shows these results.
+      context.go('/dives');
+      return;
+    }
+
+    // Another section owns the filter, so hand control back to it instead of
+    // switching the user to the dive list (#1079). The page is always pushed
+    // in that case; the dive list stays the fallback for a hand-built route
+    // that somehow has nothing to pop.
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/dives');
+    }
   }
 
   Widget _buildCustomFieldsContent() {

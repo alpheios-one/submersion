@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:excel_community/excel_community.dart' as xl;
@@ -93,19 +92,13 @@ class PreDiveExcelExportService {
       dialogTitle: 'Save Checklist Export',
       fileName: _fileName(),
       type: FileType.custom,
-      allowedExtensions: const ['xlsx'],
       bytes: Uint8List.fromList(bytes),
+      mimeType:
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     );
 
     if (result == null) return null;
-
-    // Only Android's picker writes the bytes itself; elsewhere saveFile just
-    // returns the chosen path.
-    if (!Platform.isAndroid) {
-      await File(result).writeAsBytes(Uint8List.fromList(bytes));
-    }
-
-    return result;
+    return savedFileLocation(result);
   }
 
   String _fileName() =>

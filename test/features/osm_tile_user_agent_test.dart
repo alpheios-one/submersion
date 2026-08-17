@@ -256,7 +256,7 @@ void main() {
       final tripWithStats = TripWithStats(
         trip: trip,
         diveCount: 1,
-        totalBottomTime: 45 * 60,
+        totalRuntime: 45 * 60,
         maxDepth: 25.0,
       );
 

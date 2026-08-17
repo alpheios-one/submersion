@@ -17,9 +17,13 @@ double attributeDisplayFromMetric(
   AttributeDimension.pressureBar => units.convertPressure(metric),
   AttributeDimension.lengthM ||
   AttributeDimension.depthM => units.convertDepth(metric),
-  // Stored in m/s (see AttributeDimension.speedMps); shares the wind-speed
-  // conversion so two speeds never disagree on units.
-  AttributeDimension.speedMps => units.convertWindSpeed(metric),
+  // Stored in m/s (see AttributeDimension.speedMps), read as distance per
+  // minute: m/s -> m/min is x60, then the depth conversion carries it to
+  // ft/min for an imperial diver. Same shape as the ascent-rate axis, which
+  // is the app's other distance-per-minute readout.
+  AttributeDimension.speedMps => units.convertDepth(metric * 60),
+  // Stored in hours, read in minutes; a minute is a minute in every market.
+  AttributeDimension.durationH => metric * 60,
   AttributeDimension.thicknessMm || AttributeDimension.none => metric,
 };
 
@@ -34,7 +38,8 @@ double attributeMetricFromDisplay(
   AttributeDimension.pressureBar => units.pressureToBar(display),
   AttributeDimension.lengthM ||
   AttributeDimension.depthM => units.depthToMeters(display),
-  AttributeDimension.speedMps => units.windSpeedToMs(display),
+  AttributeDimension.speedMps => units.depthToMeters(display) / 60,
+  AttributeDimension.durationH => display / 60,
   AttributeDimension.thicknessMm || AttributeDimension.none => display,
 };
 
@@ -45,7 +50,8 @@ String attributeUnitSymbol(AttributeDimension d, UnitFormatter units) =>
       AttributeDimension.pressureBar => units.pressureSymbol,
       AttributeDimension.lengthM ||
       AttributeDimension.depthM => units.depthSymbol,
-      AttributeDimension.speedMps => units.speedSymbol,
+      AttributeDimension.speedMps => '${units.depthSymbol}/min',
+      AttributeDimension.durationH => 'min',
       AttributeDimension.thicknessMm => 'mm',
       AttributeDimension.none => '',
     };
@@ -64,10 +70,11 @@ String formatAttributeNumberForEditing(
   double metricValue,
 ) {
   final display = attributeDisplayFromMetric(dimension, units, metricValue);
-  final rounded = display == display.roundToDouble()
-      ? display
-      : (display * 10).roundToDouble() / 10;
-  return formatDecimalForInput(rounded);
+  // Rounds to the one decimal place actually rendered BEFORE deciding whether
+  // the value is whole, then drops a trailing zero. A per-time round trip
+  // (100 min -> 1.666..h -> 100.000...1) is binary noise, not a fraction the
+  // diver typed, and must still read as "100" rather than "100.0".
+  return formatRoundedForInput(display, 1);
 }
 
 /// Display string for a stored attribute value (detail page, CSV).

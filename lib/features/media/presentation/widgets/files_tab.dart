@@ -9,6 +9,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_provide
 import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/features/media/domain/value_objects/extracted_file.dart';
 import 'package:submersion/features/media/domain/value_objects/matched_selection.dart';
+import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 import 'package:submersion/features/media/presentation/providers/files_tab_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/file_review_pane.dart';
@@ -40,18 +41,39 @@ import 'package:submersion/features/media/presentation/widgets/file_review_pane.
 /// then an iOS-imported video matches and stores but shows the viewer's
 /// video-unavailable state rather than playing.
 class FilesTab extends ConsumerWidget {
-  const FilesTab({super.key, this.diveId});
+  const FilesTab({super.key, this.target});
 
-  /// The dive the picker was opened from, when there is one.
+  /// What this picker session attaches its files to, when it has an owner.
   ///
-  /// [FilesTabNotifier.commit] only persists files sitting in
-  /// [MatchedSelection.matched], and the Link button is gated on that map
-  /// being non-empty, so a photo the date matcher rejected had no route into
-  /// the database. When the picker came from a dive, that dive is the obvious
-  /// manual target: it backs the review pane's "add all to this dive" action
-  /// and makes turning auto-match off produce a usable selection instead of
-  /// an inert one. Null when the picker was opened outside a dive context.
-  final String? diveId;
+  /// A [DiveAttachTarget] backs the review pane's "add all to this dive"
+  /// action and makes turning auto-match off produce a usable selection
+  /// instead of an inert one: [FilesTabNotifier.commit] only persists files
+  /// sitting in [MatchedSelection.matched], so without a manual target a
+  /// photo the date matcher rejected had no route into the database.
+  ///
+  /// A [SiteAttachTarget] switches the tab out of dive mode entirely; see
+  /// [_isSiteSession]. Null when the picker was opened with no owning entity
+  /// (the library importer), where the matcher is the only thing that can
+  /// assign one.
+  final MediaAttachTarget? target;
+
+  /// A site session drops every dive affordance: the auto-match checkbox,
+  /// the matcher itself, the dive-grouped review pane, and the per-file
+  /// assign actions.
+  ///
+  /// Dive matching against a site is not merely useless, it is wrong. A site
+  /// has no time window, so the matcher compares the photo against every
+  /// dive in the log and either finds nothing (the issue #1098 symptom: no
+  /// group, therefore no commit button, therefore no way to save) or routes
+  /// the photo to some dive the user never mentioned.
+  bool get _isSiteSession => target is SiteAttachTarget;
+
+  /// The dive files may be manually assigned to, or null when there isn't
+  /// one to offer.
+  String? get _assignableDiveId => switch (target) {
+    DiveAttachTarget(:final diveId) => diveId,
+    SiteAttachTarget() || null => null,
+  };
 
   // coverage:ignore-start
   // FilePicker.pickFiles is a static method on package:file_picker; not
@@ -64,20 +86,17 @@ class FilesTab extends ConsumerWidget {
     // FileType.media admits both images and videos at the OS picker layer.
     // Their capture time is recovered by ExifExtractor (JPEG EXIF or the
     // MP4/MOV mvhd) so both match dives; see class doc.
-    final result = await FilePicker.pickFiles(
-      type: FileType.media,
-      allowMultiple: true,
-    );
-    if (result == null) return;
+    final result = await FilePicker.pickFiles(type: FileType.media);
+    if (result.isEmpty) return;
 
     final notifier = ref.read(filesTabNotifierProvider.notifier);
     final extractor = ref.read(exifExtractorProvider);
 
-    notifier.setExtractionProgress(done: 0, total: result.files.length);
+    notifier.setExtractionProgress(done: 0, total: result.length);
 
     final extracted = <ExtractedFile>[];
-    for (var i = 0; i < result.files.length; i++) {
-      final pf = result.files[i];
+    for (var i = 0; i < result.length; i++) {
+      final pf = result[i];
       final path = pf.path;
       if (path != null) {
         final file = File(path);
@@ -91,7 +110,7 @@ class FilesTab extends ConsumerWidget {
       // Advance progress unconditionally so isExtracting flips false even
       // when files are skipped (null path or null metadata). `done` here
       // means "files processed", not "files successfully extracted".
-      notifier.setExtractionProgress(done: i + 1, total: result.files.length);
+      notifier.setExtractionProgress(done: i + 1, total: result.length);
     }
 
     await _applyMatchAndStash(ref, extracted);
@@ -140,18 +159,26 @@ class FilesTab extends ConsumerWidget {
   ) async {
     final notifier = ref.read(filesTabNotifierProvider.notifier);
     final state = ref.read(filesTabNotifierProvider);
+    if (_isSiteSession) {
+      // The site owns every picked file, so there is nothing to match and
+      // nothing to group. `commit` reads `files` directly for this case; the
+      // empty selection keeps any dive grouping from an earlier session on
+      // this (non-autoDispose) notifier from leaking into the review pane.
+      notifier.setFiles(extracted, match: MatchedSelection.empty());
+      return;
+    }
     if (!state.autoMatchByDate) {
       // Opened from a dive, auto-match declined: the user asked for exactly
       // these files on exactly this dive, so stage them as matched. Parking
       // them in `unmatched` (as this used to) hid the Link button and made
       // the unchecked checkbox a dead end.
-      final target = diveId;
+      final assignable = _assignableDiveId;
       notifier.setFiles(
         extracted,
-        match: target == null
+        match: assignable == null
             ? MatchedSelection(matched: const {}, unmatched: extracted)
             : MatchedSelection(
-                matched: {target: extracted},
+                matched: {assignable: extracted},
                 unmatched: const [],
               ),
       );
@@ -210,19 +237,22 @@ class FilesTab extends ConsumerWidget {
               ),
             ],
           ),
-          Row(
-            children: [
-              Checkbox(
-                value: state.autoMatchByDate,
-                onChanged: (_) => ref
-                    .read(filesTabNotifierProvider.notifier)
-                    .toggleAutoMatch(),
-              ),
-              const Expanded(
-                child: Text('Auto-match photos and videos to dives by date'),
-              ),
-            ],
-          ),
+          // Dives are not this session's business when a site is the target,
+          // so the option is hidden rather than shown-and-ignored.
+          if (!_isSiteSession)
+            Row(
+              children: [
+                Checkbox(
+                  value: state.autoMatchByDate,
+                  onChanged: (_) => ref
+                      .read(filesTabNotifierProvider.notifier)
+                      .toggleAutoMatch(),
+                ),
+                const Expanded(
+                  child: Text('Auto-match photos and videos to dives by date'),
+                ),
+              ],
+            ),
           if (state.isExtracting) ...[
             const SizedBox(height: 16),
             LinearProgressIndicator(
@@ -240,27 +270,51 @@ class FilesTab extends ConsumerWidget {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   )
-                : FileReviewPane(state: state, assignableDiveId: diveId),
+                : FileReviewPane(
+                    state: state,
+                    assignableDiveId: _assignableDiveId,
+                    flat: _isSiteSession,
+                  ),
           ),
-          // TODO(media): l10n, pluralization
-          if (state.match.matched.isNotEmpty)
+          // Rendered for anything staged, disabled when nothing is
+          // committable, rather than hidden. Hiding it (issue #1098) left a
+          // user who had picked files staring at a screen with no way to
+          // accept them and no explanation; the URL tab's always-present
+          // "Add" is the convention being matched here.
+          if (state.files.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 16),
               child: SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  // coverage:ignore-start
-                  onPressed: () => _commit(context, ref),
+                  onPressed: _committableCount(state) == 0
+                      ? null
+                      // coverage:ignore-start
+                      : () => _commit(context, ref),
                   // coverage:ignore-end
-                  child: Text(
-                    'Link ${state.match.totalFiles - state.match.unmatched.length} items',
-                  ),
+                  child: Text(_commitLabel(state)),
                 ),
               ),
             ),
         ],
       ),
     );
+  }
+
+  /// How many staged files [FilesTabNotifier.commit] would actually persist.
+  int _committableCount(FilesTabState state) => _isSiteSession
+      ? state.files.length
+      : state.match.totalFiles - state.match.unmatched.length;
+
+  // TODO(media): l10n, pluralization. The whole tab is still hardcoded
+  // English behind `TODO(media): l10n` markers; localizing these two strings
+  // alone would not make the tab usable in another language.
+  String _commitLabel(FilesTabState state) {
+    final count = _committableCount(state);
+    if (_isSiteSession) {
+      return 'Attach $count item${count == 1 ? '' : 's'} to this site';
+    }
+    return 'Link $count items';
   }
 
   // coverage:ignore-start
@@ -276,15 +330,23 @@ class FilesTab extends ConsumerWidget {
     // on the dive-detail view we return to.
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final created = await notifier.commit();
+    final created = await notifier.commit(target: target);
     if (!context.mounted) return;
-    // Return to the dive-detail view now that the files are linked; the grid
-    // refreshes reactively via mediaForDiveProvider's watchDiveDetailChanges.
+    // Return to the detail view now that the files are linked; the grid
+    // refreshes reactively via mediaForDiveProvider's watchDiveDetailChanges,
+    // and mediaForSiteProvider's invalidateSelfWhen(watchMediaChanges) does
+    // the same for a site.
     navigator.pop();
-    // TODO(media): l10n, pluralization
+    // TODO(media): l10n
     messenger.showSnackBar(
       SnackBar(
-        content: Text('Linked ${created.length} items'),
+        content: Text(
+          _isSiteSession
+              ? 'Attached ${created.length} '
+                    'item${created.length == 1 ? '' : 's'} to this site'
+              // TODO(media): pluralization
+              : 'Linked ${created.length} items',
+        ),
         action: SnackBarAction(
           label: 'Undo',
           onPressed: () => notifier.undoCommit(created),

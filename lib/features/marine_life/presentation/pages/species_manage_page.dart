@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
@@ -128,7 +129,13 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
                 child: speciesAsync.when(
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                  error: (e, st) => Center(child: Text('Error: $e')),
+                  error: (e, st) => Center(
+                    child: Text(
+                      context.l10n.marineLife_speciesManage_errorLoading(
+                        e.toString(),
+                      ),
+                    ),
+                  ),
                   data: (allSpecies) => _buildSpeciesList(allSpecies),
                 ),
               ),
@@ -169,7 +176,7 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
       child: Row(
         children: [
           FilterChip(
-            label: const Text('All'),
+            label: Text(context.l10n.marineLife_speciesManage_allFilter),
             selected: _selectedCategory == null,
             onSelected: (_) => setState(() => _selectedCategory = null),
           ),
@@ -178,7 +185,7 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
             return Padding(
               padding: const EdgeInsetsDirectional.only(end: 8),
               child: FilterChip(
-                label: Text(category.displayName),
+                label: Text(category.localizedName(context.l10n)),
                 selected: _selectedCategory == category,
                 onSelected: (_) => setState(
                   () => _selectedCategory = _selectedCategory == category
@@ -201,9 +208,14 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
     var filtered = allSpecies;
 
     if (_searchQuery.isNotEmpty) {
+      final l10n = context.l10n;
       final query = _searchQuery.toLowerCase();
       filtered = filtered.where((s) {
+        // Built-in rows render their translated name, so the diver's query
+        // has to match that as well as the English column the database
+        // stores -- otherwise searching in your own language finds nothing.
         return s.commonName.toLowerCase().contains(query) ||
+            s.localizedCommonName(l10n).toLowerCase().contains(query) ||
             (s.scientificName?.toLowerCase().contains(query) ?? false) ||
             (s.taxonomyClass?.toLowerCase().contains(query) ?? false);
       }).toList();
@@ -221,7 +233,9 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
     final filtered = _visibleSpecies(allSpecies);
 
     if (filtered.isEmpty) {
-      return const Center(child: Text('No species found'));
+      return Center(
+        child: Text(context.l10n.marineLife_speciesManage_noSpeciesFound),
+      );
     }
 
     final customSpecies = filtered.where((s) => !s.isBuiltIn).toList();
@@ -230,14 +244,22 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
     return ListView(
       children: [
         if (customSpecies.isNotEmpty) ...[
-          _buildSectionHeader('Custom Species (${customSpecies.length})'),
+          _buildSectionHeader(
+            context.l10n.marineLife_speciesManage_customSpeciesHeader(
+              customSpecies.length,
+            ),
+          ),
           ...customSpecies.map(
             (species) => _buildSpeciesTile(species, isCustom: true),
           ),
           if (builtInSpecies.isNotEmpty) const Divider(),
         ],
         if (builtInSpecies.isNotEmpty) ...[
-          _buildSectionHeader('Built-in Species (${builtInSpecies.length})'),
+          _buildSectionHeader(
+            context.l10n.marineLife_speciesManage_builtInSpeciesHeader(
+              builtInSpecies.length,
+            ),
+          ),
           ...builtInSpecies.map(
             (species) => _buildSpeciesTile(species, isCustom: false),
           ),
@@ -272,13 +294,13 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
           color: _getCategoryColor(species.category),
         ),
       ),
-      title: Text(species.commonName),
+      title: Text(species.localizedCommonName(context.l10n)),
       subtitle: species.scientificName != null
           ? Text(
               species.scientificName!,
               style: const TextStyle(fontStyle: FontStyle.italic),
             )
-          : Text(species.category.displayName),
+          : Text(species.category.localizedName(context.l10n)),
       // Per-row actions yield to selection mode. Leaving the trash here would
       // put a one-tap delete beside the checkbox while the bulk delete sits
       // deliberately behind the selection bar's overflow -- two contradictory
@@ -383,7 +405,7 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
         SnackBar(
           content: Text(
             context.l10n.marineLife_species_delete_inUseError(
-              species.commonName,
+              species.localizedCommonName(context.l10n),
             ),
           ),
           backgroundColor: Theme.of(context).colorScheme.error,
@@ -398,20 +420,20 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
         title: Text(context.l10n.marineLife_species_delete_confirmTitle),
         content: Text(
           context.l10n.marineLife_species_delete_confirmBody(
-            species.commonName,
+            species.localizedCommonName(context.l10n),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.marineLife_speciesManage_cancelButton),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
-            child: const Text('Delete'),
+            child: Text(context.l10n.marineLife_speciesManage_deleteButton),
           ),
         ],
       ),
@@ -425,7 +447,7 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
             SnackBar(
               content: Text(
                 context.l10n.marineLife_species_delete_snackbar(
-                  species.commonName,
+                  species.localizedCommonName(context.l10n),
                 ),
               ),
             ),
@@ -450,20 +472,16 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
     final confirmed = await showDialog<bool>(
       context: ctx,
       builder: (dialogCtx) => AlertDialog(
-        title: const Text('Reset to Defaults?'),
-        content: const Text(
-          'This will restore all built-in species to their original values. '
-          'Custom species will not be affected. '
-          'Built-in species with existing sightings will be updated but preserved.',
-        ),
+        title: Text(ctx.l10n.marineLife_speciesManage_resetDialogTitle),
+        content: Text(ctx.l10n.marineLife_speciesManage_resetDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogCtx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(ctx.l10n.marineLife_speciesManage_cancelButton),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogCtx).pop(true),
-            child: const Text('Reset'),
+            child: Text(ctx.l10n.marineLife_speciesManage_resetButton),
           ),
         ],
       ),
@@ -475,8 +493,8 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
         await notifier.resetBuiltInSpecies();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Built-in species restored to defaults'),
+            SnackBar(
+              content: Text(context.l10n.marineLife_speciesManage_resetSuccess),
             ),
           );
         }
@@ -484,7 +502,11 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error resetting species: $e'),
+              content: Text(
+                context.l10n.marineLife_speciesManage_errorResetting(
+                  e.toString(),
+                ),
+              ),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
