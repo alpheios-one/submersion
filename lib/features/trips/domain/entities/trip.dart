@@ -169,22 +169,29 @@ int _calendarDaysBetween(DateTime from, DateTime to) {
 class TripWithStats extends Equatable {
   final Trip trip;
   final int diveCount;
-  final int totalBottomTime; // seconds
+
+  /// Total time in the water across the trip's dives, in seconds.
+  ///
+  /// Runtime (surface to surface), falling back to bottom time for dives that
+  /// only carry one. This is the same `COALESCE(runtime, bottom_time)` total
+  /// the statistics page reports, so a trip's hours agree with the overall
+  /// dive-time figure instead of undercounting every ascent (issue #889).
+  final int totalRuntime; // seconds
   final double? maxDepth;
   final double? avgDepth;
 
   const TripWithStats({
     required this.trip,
     this.diveCount = 0,
-    this.totalBottomTime = 0,
+    this.totalRuntime = 0,
     this.maxDepth,
     this.avgDepth,
   });
 
-  /// Total bottom time formatted as hours:minutes
-  String get formattedBottomTime {
-    final hours = totalBottomTime ~/ 3600;
-    final minutes = (totalBottomTime % 3600) ~/ 60;
+  /// Total runtime formatted as hours:minutes
+  String get formattedRuntime {
+    final hours = totalRuntime ~/ 3600;
+    final minutes = (totalRuntime % 3600) ~/ 60;
     if (hours > 0) {
       return '${hours}h ${minutes}m';
     }
@@ -195,7 +202,7 @@ class TripWithStats extends Equatable {
   List<Object?> get props => [
     trip,
     diveCount,
-    totalBottomTime,
+    totalRuntime,
     maxDepth,
     avgDepth,
   ];

@@ -30511,11 +30511,11 @@ abstract class AppLocalizations {
   /// **'Max Depth'**
   String get trips_detail_stat_maxDepth;
 
-  /// No description provided for @trips_detail_stat_totalBottomTime.
+  /// No description provided for @trips_detail_stat_totalRuntime.
   ///
   /// In en, this message translates to:
-  /// **'Total Bottom Time'**
-  String get trips_detail_stat_totalBottomTime;
+  /// **'Total Runtime'**
+  String get trips_detail_stat_totalRuntime;
 
   /// No description provided for @trips_detail_stat_totalDives.
   ///

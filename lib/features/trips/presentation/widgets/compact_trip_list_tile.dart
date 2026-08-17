@@ -123,7 +123,7 @@ class CompactTripListTile extends StatelessWidget {
                               color: colorScheme.primary,
                             ),
                           ),
-                          if (tripWithStats.totalBottomTime > 0) ...[
+                          if (tripWithStats.totalRuntime > 0) ...[
                             const SizedBox(width: 12),
                             Icon(
                               Icons.timer,
@@ -132,7 +132,7 @@ class CompactTripListTile extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              tripWithStats.formattedBottomTime,
+                              tripWithStats.formattedRuntime,
                               style: textTheme.bodySmall?.copyWith(
                                 color: colorScheme.primary,
                               ),

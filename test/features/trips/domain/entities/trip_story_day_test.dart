@@ -8,6 +8,7 @@ Dive _dive({
   required String id,
   required DateTime dateTime,
   Duration? bottomTime,
+  Duration? runtime,
   double? maxDepth,
   DiveSite? site,
   double? airTemp,
@@ -18,6 +19,7 @@ Dive _dive({
     id: id,
     dateTime: dateTime,
     bottomTime: bottomTime,
+    runtime: runtime,
     maxDepth: maxDepth,
     site: site,
     airTemp: airTemp,
@@ -32,7 +34,7 @@ void main() {
   const siteB = DiveSite(id: 'site-b', name: 'Jetty');
 
   group('TripStoryDay derived getters', () {
-    test('aggregates dive count, bottom time, and max depth', () {
+    test('aggregates dive count, runtime, and max depth', () {
       final day = TripStoryDay(
         date: date,
         dayNumber: 2,
@@ -41,14 +43,16 @@ void main() {
           _dive(
             id: 'd1',
             dateTime: DateTime(2026, 3, 8, 9),
-            bottomTime: const Duration(minutes: 47),
+            bottomTime: const Duration(minutes: 40),
+            runtime: const Duration(minutes: 47),
             maxDepth: 28,
             site: siteA,
           ),
           _dive(
             id: 'd2',
             dateTime: DateTime(2026, 3, 8, 11),
-            bottomTime: const Duration(minutes: 51),
+            bottomTime: const Duration(minutes: 44),
+            runtime: const Duration(minutes: 51),
             maxDepth: 24,
             site: siteA,
           ),
@@ -57,11 +61,37 @@ void main() {
       );
 
       expect(day.diveCount, 3);
-      expect(day.totalBottomTime, const Duration(minutes: 98));
+      expect(day.totalRuntime, const Duration(minutes: 98));
       expect(day.maxDepth, 28);
       expect(day.siteNames, ['Blue Corner', 'Jetty']);
       expect(day.siteCount, 2);
       expect(day.hasContent, isTrue);
+    });
+
+    test('totalRuntime falls back to bottom time when runtime is absent', () {
+      // Hand-logged dives often carry only a bottom time. Dropping them from
+      // the total would under-report the day more badly than the bug this
+      // replaces, so bottom time remains the fallback -- mirroring the
+      // COALESCE(runtime, bottom_time) the SQL aggregates use.
+      final day = TripStoryDay(
+        date: date,
+        dayNumber: 2,
+        kind: TripStoryDayKind.past,
+        dives: [
+          _dive(
+            id: 'd1',
+            dateTime: DateTime(2026, 3, 8, 9),
+            bottomTime: const Duration(minutes: 38),
+          ),
+          _dive(
+            id: 'd2',
+            dateTime: DateTime(2026, 3, 8, 11),
+            runtime: const Duration(minutes: 42),
+          ),
+        ],
+      );
+
+      expect(day.totalRuntime, const Duration(minutes: 80));
     });
 
     test(
@@ -92,7 +122,7 @@ void main() {
         kind: TripStoryDayKind.future,
       );
       expect(day.diveCount, 0);
-      expect(day.totalBottomTime, Duration.zero);
+      expect(day.totalRuntime, Duration.zero);
       expect(day.maxDepth, isNull);
       expect(day.siteNames, isEmpty);
       expect(day.hasContent, isFalse);

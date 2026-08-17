@@ -5561,7 +5561,7 @@
   "trips_detail_stat_seaDays": "Sea days",
   "trips_detail_stat_sitesVisited": "Sites visited",
   "trips_detail_stat_speciesSeen": "Species seen",
-  "trips_detail_stat_totalBottomTime": "Tiempo de fondo total",
+  "trips_detail_stat_totalRuntime": "Tiempo total",
   "trips_detail_stat_totalDives": "Total de inmersiones",
   "trips_detail_tab_dives": "Dives",
   "trips_detail_tab_itinerary": "Itinerary",

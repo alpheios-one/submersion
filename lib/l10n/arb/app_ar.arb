@@ -5561,7 +5561,7 @@
   "trips_detail_stat_seaDays": "Sea days",
   "trips_detail_stat_sitesVisited": "Sites visited",
   "trips_detail_stat_speciesSeen": "Species seen",
-  "trips_detail_stat_totalBottomTime": "إجمالي وقت القاع",
+  "trips_detail_stat_totalRuntime": "إجمالي وقت التشغيل",
   "trips_detail_stat_totalDives": "إجمالي الغوصات",
   "trips_detail_tab_dives": "Dives",
   "trips_detail_tab_itinerary": "Itinerary",

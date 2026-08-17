@@ -17922,7 +17922,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'أقصى عمق';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'إجمالي وقت القاع';
+  String get trips_detail_stat_totalRuntime => 'إجمالي وقت التشغيل';
 
   @override
   String get trips_detail_stat_totalDives => 'إجمالي الغوصات';

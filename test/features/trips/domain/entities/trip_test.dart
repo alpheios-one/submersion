@@ -377,7 +377,7 @@ void main() {
     });
   });
 
-  group('TripWithStats.formattedBottomTime', () {
+  group('TripWithStats.formattedRuntime', () {
     Trip makeTrip() => Trip(
       id: 't1',
       name: 'T',
@@ -388,18 +388,18 @@ void main() {
     );
 
     test('shows "Xm" when under an hour', () {
-      final stats = TripWithStats(trip: makeTrip(), totalBottomTime: 1800);
-      expect(stats.formattedBottomTime, equals('30m'));
+      final stats = TripWithStats(trip: makeTrip(), totalRuntime: 1800);
+      expect(stats.formattedRuntime, equals('30m'));
     });
 
     test('shows "Yh Xm" when an hour or more', () {
-      final stats = TripWithStats(trip: makeTrip(), totalBottomTime: 3665);
-      expect(stats.formattedBottomTime, equals('1h 1m'));
+      final stats = TripWithStats(trip: makeTrip(), totalRuntime: 3665);
+      expect(stats.formattedRuntime, equals('1h 1m'));
     });
 
-    test('handles zero bottom time', () {
-      final stats = TripWithStats(trip: makeTrip(), totalBottomTime: 0);
-      expect(stats.formattedBottomTime, equals('0m'));
+    test('handles zero runtime', () {
+      final stats = TripWithStats(trip: makeTrip(), totalRuntime: 0);
+      expect(stats.formattedRuntime, equals('0m'));
     });
 
     test('props distinguishes different stats', () {

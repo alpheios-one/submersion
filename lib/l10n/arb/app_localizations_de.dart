@@ -18218,7 +18218,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trips_detail_stat_maxDepth => 'Max. Tiefe';
 
   @override
-  String get trips_detail_stat_totalBottomTime => 'Gesamte Grundzeit';
+  String get trips_detail_stat_totalRuntime => 'Gesamte Laufzeit';
 
   @override
   String get trips_detail_stat_totalDives => 'Tauchgänge gesamt';

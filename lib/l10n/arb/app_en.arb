@@ -10863,7 +10863,7 @@
   "trips_detail_snackBar_deleted": "Trip deleted",
   "trips_detail_stat_avgDepth": "Avg Depth",
   "trips_detail_stat_maxDepth": "Max Depth",
-  "trips_detail_stat_totalBottomTime": "Total Bottom Time",
+  "trips_detail_stat_totalRuntime": "Total Runtime",
   "trips_detail_stat_totalDives": "Total Dives",
   "trips_detail_tab_checklist": "Checklist",
   "trips_detail_tooltip_edit": "Edit trip",

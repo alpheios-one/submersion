@@ -265,7 +265,7 @@ class TripStatStrip extends ConsumerWidget {
 
     final entries = <(String, String)>[
       (l10n.trips_detail_stat_totalDives, '${stats.diveCount}'),
-      (l10n.trips_detail_stat_totalBottomTime, stats.formattedBottomTime),
+      (l10n.trips_detail_stat_totalRuntime, stats.formattedRuntime),
       if (stats.maxDepth != null)
         (l10n.trips_detail_stat_maxDepth, units.formatDepth(stats.maxDepth)),
       if (siteCount > 0) (l10n.trips_detail_stat_sitesVisited, '$siteCount'),
