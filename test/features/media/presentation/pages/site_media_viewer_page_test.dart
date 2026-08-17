@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -170,6 +171,177 @@ void main() {
     // The overlay tracks the page the pager settled on.
     expect(find.text('Mooring line'), findsNothing);
     expect(find.text(_metadataLine(second.takenAt)), findsOneWidget);
+  });
+
+  testWidgets('arrow buttons page forward and back', (tester) async {
+    await pumpViewer(tester);
+    expect(find.text('1 / 2'), findsOneWidget);
+    // Nothing to go back to on the first item.
+    expect(find.byTooltip('Previous media'), findsNothing);
+
+    await tester.tap(find.byTooltip('Next media'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('2 / 2'), findsOneWidget);
+    expect(find.text(_metadataLine(second.takenAt)), findsOneWidget);
+    expect(find.byTooltip('Next media'), findsNothing);
+
+    await tester.tap(find.byTooltip('Previous media'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 / 2'), findsOneWidget);
+    expect(find.text('Mooring line'), findsOneWidget);
+  });
+
+  testWidgets('a single item gets no arrows', (tester) async {
+    await pumpViewer(tester, items: [first]);
+
+    expect(find.text('1 / 1'), findsOneWidget);
+    expect(find.byTooltip('Previous media'), findsNothing);
+    expect(find.byTooltip('Next media'), findsNothing);
+  });
+
+  testWidgets('left/right arrow keys page through the gallery', (tester) async {
+    await pumpViewer(tester);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 2'), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pumpAndSettle();
+    expect(find.text('1 / 2'), findsOneWidget);
+  });
+
+  testWidgets('Escape closes the viewer', (tester) async {
+    await tester.pumpWidget(
+      await mediaTestApp(
+        overrides: [
+          mediaForSiteProvider(
+            'site-1',
+          ).overrideWith((ref) async => [first, second]),
+        ],
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SiteMediaViewerPage(
+                  siteId: 'site-1',
+                  initialMediaId: 'm1',
+                  scope: SiteViewerScope.attachments,
+                ),
+              ),
+            ),
+            child: const Text('Open viewer'),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open viewer'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SiteMediaViewerPage), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SiteMediaViewerPage), findsNothing);
+    expect(find.text('Open viewer'), findsOneWidget);
+  });
+
+  /// The viewer over a list the test can shrink underneath it.
+  ///
+  /// Re-pumping with a different override does NOT do this: the FutureProvider
+  /// keeps its cached value, so the pager never sees the shorter list. The
+  /// live path is the provider recomputing, so drive that instead.
+  Future<void Function(List<MediaItem>)> pumpShrinkableViewer(
+    WidgetTester tester,
+    List<MediaItem> initialItems, {
+    required String initialMediaId,
+  }) async {
+    var items = initialItems;
+    await tester.pumpWidget(
+      await mediaTestApp(
+        overrides: [
+          mediaForSiteProvider('site-1').overrideWith((ref) async => items),
+        ],
+        home: SiteMediaViewerPage(
+          siteId: 'site-1',
+          initialMediaId: initialMediaId,
+          scope: SiteViewerScope.attachments,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SiteMediaViewerPage)),
+    );
+    return (next) {
+      items = next;
+      container.invalidate(mediaForSiteProvider('site-1'));
+    };
+  }
+
+  testWidgets('a site list that shrinks under the viewer keeps working', (
+    tester,
+  ) async {
+    final third = testMediaItem(
+      id: 'm3',
+      siteId: 'site-1',
+      originalFilename: 'kelp.png',
+      takenAt: DateTime(2026, 3, 3, 9),
+    );
+    final shrinkTo = await pumpShrinkableViewer(tester, [
+      first,
+      second,
+      third,
+    ], initialMediaId: 'm3');
+    expect(find.text('3 / 3'), findsOneWidget);
+
+    // A delete or a sync pull can shrink the list while the viewer is open.
+    // Indexing it with the stale page would throw a RangeError out of build.
+    shrinkTo([first]);
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('1 / 1'), findsOneWidget);
+  });
+
+  testWidgets('navigation recovers after the site list shrinks', (
+    tester,
+  ) async {
+    final third = testMediaItem(id: 'm3', siteId: 'site-1');
+    final shrinkTo = await pumpShrinkableViewer(tester, [
+      first,
+      second,
+      third,
+    ], initialMediaId: 'm3');
+    expect(find.text('3 / 3'), findsOneWidget);
+
+    shrinkTo([first, second]);
+    await tester.pumpAndSettle();
+    expect(find.text('2 / 2'), findsOneWidget);
+
+    // The nav target is still on the departed third item; stepping from it
+    // unclamped would put every press out of range and freeze navigation.
+    await tester.tap(find.byTooltip('Previous media'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 / 2'), findsOneWidget);
+  });
+
+  testWidgets('arrows hide with the rest of the chrome', (tester) async {
+    await pumpViewer(tester);
+    expect(find.byTooltip('Next media'), findsOneWidget);
+
+    // The tap lands between the arrows: they cover the viewer so they can pin
+    // themselves to its edges, and must not swallow the chrome toggle.
+    await tester.tapAt(tester.getCenter(find.byType(PhotoViewGallery)));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Next media'), findsNothing);
   });
 
   testWidgets('tapping the photo toggles the overlays off and back on', (

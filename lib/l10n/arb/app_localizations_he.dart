@@ -12082,6 +12082,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'המדיה הבאה';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'אין תמונות זמינות';
 
   @override
@@ -12091,6 +12094,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_photoViewer_playPauseVideoLabel => 'הפעל או השהה סרטון';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'המדיה הקודמת';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'דלג למיקום בסרטון';

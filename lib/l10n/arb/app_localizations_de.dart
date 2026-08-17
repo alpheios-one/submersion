@@ -12375,6 +12375,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'Nächstes Medium';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'Keine Fotos verfügbar';
 
   @override
@@ -12385,6 +12388,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get media_photoViewer_playPauseVideoLabel =>
       'Video abspielen oder pausieren';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'Vorheriges Medium';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'Videoposition suchen';
