@@ -1,6 +1,6 @@
 # Media Provenance PR 2a: The Read-Only Info Panel Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Give every media item an info panel that reports its file facts, where it was linked from, whether it is backed up, and where its bytes are actually being served from right now.
 
@@ -70,7 +70,7 @@ Confirmed against the branch tip before this plan was written.
 
 Extracted rather than invented: six near-identical private copies exist. This task creates the shared one and leaves the copies alone. Consolidating them is unrelated refactoring and out of scope.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
@@ -99,12 +99,12 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `flutter test test/shared/utils/byte_format_test.dart`
 Expected: FAIL to compile, "Target of URI doesn't exist".
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```dart
 /// Human-readable byte count, matching the thresholds and precision the app
@@ -128,12 +128,12 @@ String formatBytes(int bytes) {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `flutter test test/shared/utils/byte_format_test.dart`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 dart format .
@@ -203,7 +203,7 @@ class MediaProvenance {
 
 **Note the deliberate omission:** `MediaProvenance` holds origin and backup only. `ServingFacts` is NOT a member. Serving state comes from a `ChangeNotifier` the widget listens to directly (Task 7), and folding it in would force this cheap synchronous object to become reactive to something Riverpod cannot see. See Verified Fact 11.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Cover, at minimum:
 
@@ -236,12 +236,12 @@ test('a failed queue row carries its error text', () { ... });
 test('ServingFacts.from(null) is unobserved', () { ... });
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `flutter test test/features/media/domain/entities/media_provenance_test.dart`
 Expected: FAIL to compile, "Target of URI doesn't exist".
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Key rules to encode:
 
@@ -250,12 +250,12 @@ Key rules to encode:
 - **`eligible`** is `kUploadableSources.contains(sourceType)`.
 - **`tier`** derives from the three stamps: any `remoteUploadedAt` is `full`; else any `remoteCompressedUploadedAt` is `renditionOnly`; else any `remoteThumbUploadedAt` is `thumbOnly`; else `none`. Do not re-implement `isBackedUp`; this is a finer-grained readout that must stay consistent with it, so assert in a test that `tier != BackupTier.none` agrees with `isBackedUp` for non-thumb-only rows.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `flutter test test/features/media/domain/entities/media_provenance_test.dart`
 Expected: PASS.
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 dart format .
@@ -292,7 +292,7 @@ final mediaProvenanceProvider =
 
 **This provider must stay cheap enough for every visible grid tile**, because PR 3's badge consumes it. It may watch `mediaStoreAttachedProvider` and `mediaQueueEntryProvider`. It must NOT watch `mediaStoreRuntimeProvider` or `mediaStoreStatusHintProvider` (Verified Fact 2).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Use a `ProviderContainer` with `mediaStoreAttachedProvider` and `mediaQueueEntryProvider` overridden. Assert:
 
@@ -310,12 +310,12 @@ test('does not build the store runtime', () async {
 
 That last test is the important one. Write it.
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `flutter test test/features/media/presentation/providers/media_provenance_providers_test.dart`
 Expected: FAIL to compile.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `mediaQueueEntryProvider` wraps `MediaTransferQueueRepository.watchLatestForMedia(mediaId)`. Follow the guarding pattern in `mediaBadgeStateProvider` (`media_store_providers.dart:242-257`), including its handling of an uninitialized `LocalCacheDatabaseService`, which throws `StateError` rather than an `Exception`.
 
@@ -323,16 +323,16 @@ Expected: FAIL to compile.
 
 Add the `// no-tick:` comment convention if this repo's provider-tick contract test requires it; read the failure message from that test rather than guessing.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `flutter test test/features/media/presentation/providers/media_provenance_providers_test.dart`
 Expected: PASS.
 
-- [ ] **Step 5: Register with the provider tick contract test if it complains**
+- [x] **Step 5: Register with the provider tick contract test if it complains**
 
 Run: `flutter test test/core/providers/` and the media provider contract tests. If a test enumerates media providers and fails naming the new ones, add them where it says. Read the failure text; it names the missing site precisely.
 
-- [ ] **Step 6: Format and commit**
+- [x] **Step 6: Format and commit**
 
 ```bash
 dart format .
@@ -370,7 +370,7 @@ final mediaStoreIdentityProvider = FutureProvider<MediaStoreIdentity?>(...);
 
 Panel-only. Null when no store is attached.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```dart
 test('is null when no store is attached', () { ... });
@@ -379,11 +379,11 @@ test('reports the active descriptor provider type and hint', () { ... });
 
 Override `mediaStoresRepositoryProvider` (or whatever the repo names it; read `media_store_providers.dart` for the exact symbol) with a fake returning a `MediaStoreDescriptor`.
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Expected: FAIL, `MediaStoreIdentity` undefined.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Read `MediaStoresRepository.getActive()`, which returns
 `({String id, String providerType, String displayHint, DateTime? lastSweepAt})`.
@@ -391,11 +391,11 @@ Return null when it yields null. Do NOT reuse `mediaStoreStatusHintProvider`: it
 
 Document in the doc comment that this provider constructs nothing itself but that its dependency chain may, and that it is therefore panel-only and must never be watched from a tile.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Expected: PASS.
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 dart format .
@@ -422,15 +422,15 @@ contract: never watch it from a grid tile."
 
 **41 new keys.** Add message + `@` metadata to `app_en.arb`; add message only to the other ten. Keys are appended, not sorted. Placeholders are formatted in Dart and passed as `String`, per repo convention (no ARB uses `format:`).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Model it on `test/l10n/site_media_strings_test.dart`. It must assert (a) every new key resolves in every locale, and (b) no non-English locale shipped the English source text verbatim.
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Expected: FAIL, the getters do not exist.
 
-- [ ] **Step 3: Add the keys to `app_en.arb`**
+- [x] **Step 3: Add the keys to `app_en.arb`**
 
 Panel chrome and File block:
 ```
@@ -500,11 +500,11 @@ Metadata shape to copy exactly:
 }
 ```
 
-- [ ] **Step 4: Translate into the other ten catalogs**
+- [x] **Step 4: Translate into the other ten catalogs**
 
 Add the message key only, no `@` metadata, to `app_ar`, `app_de`, `app_es`, `app_fr`, `app_he`, `app_hu`, `app_it`, `app_nl`, `app_pt`, `app_zh`. Every locale must be genuinely translated, not copied English. Preserve `{date}` and `{error}` placeholder names exactly; `arb_parity_test.dart:60` compares ICU argument names per key.
 
-- [ ] **Step 5: Regenerate and verify parity**
+- [x] **Step 5: Regenerate and verify parity**
 
 ```bash
 flutter pub get     # runs gen-l10n implicitly (pubspec.yaml:184 generate: true)
@@ -512,7 +512,7 @@ flutter test test/l10n/
 ```
 Expected: `arb_parity_test.dart` and the new strings test both PASS. The 12 generated `app_localizations*.dart` files change and must be committed.
 
-- [ ] **Step 6: Format and commit**
+- [x] **Step 6: Format and commit**
 
 ```bash
 dart format .
@@ -538,7 +538,7 @@ no ARB in this repo uses an ICU format specifier."
 
 Structure: a `ListView` of titled sections, each section a `Card` containing a title `Text` in `titleMedium`, a `Divider`, then `DiveDetailRow`s. That is the `dive_detail_page.dart:3027-3037` convention. Reuse `DiveDetailRow({label, value})`; do not write a new key-value row.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Use `localizedMaterialApp` from `test/helpers/l10n_test_helpers.dart` and pin `Intl.defaultLocale = 'en_US'` in `setUp` with restore in `tearDown` (the established widget-test pattern). Assert:
 
@@ -553,11 +553,11 @@ testWidgets('a row linked on another device says so', ...);
 
 Dates in expectations must match `UnitFormatter` output, not raw `DateFormat`. `UnitFormatter` uses an explicit `'h:mm a'` pattern and emits an ASCII space, so these assertions do NOT need the U+202F narrow no-break space that `media_repair_history_test.dart:100` requires. If an assertion needs ` `, something is using raw intl and should be fixed to use `UnitFormatter`.
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Expected: FAIL to compile.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```dart
 final units = UnitFormatter(ref.watch(settingsProvider));
@@ -583,11 +583,11 @@ The rule is therefore three-way:
 
 Never render the raw id; it is a UUID and means nothing to a reader.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Expected: PASS.
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 dart format .
@@ -609,7 +609,7 @@ no-break space that raw intl jm formatting forces tests to match."
 - Modify: `lib/features/media/presentation/widgets/media_info_panel.dart`
 - Test: extend `test/features/media/presentation/widgets/media_info_panel_test.dart`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```dart
 testWidgets('an ineligible source says so instead of not backed up', ...);
@@ -628,11 +628,11 @@ testWidgets('the panel refreshes when the recorder records', (tester) async {
 
 That last test is the important one.
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Expected: FAIL.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Backup block reads `ref.watch(mediaProvenanceProvider(item)).backup` plus `ref.watch(mediaStoreIdentityProvider)` for the store name. Precedence for the summary line: not `eligible` yields `notEligible`; not `storeAttached` yields `storeNotConnected`; otherwise the `BackupTier` maps to `backupFull` / `backupThumbOnly` / `backupRenditionOnly` / `backupNone`. Queue state, when present and not `'done'`, renders as its own row below.
 
@@ -652,11 +652,11 @@ Reading the recorder through a `ListenableBuilder` rather than a provider is del
 
 Map `ServedFrom` to its string with an exhaustive `switch` (no `default:` arm, so a future enum value is a compile error rather than a silently wrong label). Append the tier when it is not `original`. When `storeFallbackUsed` is true and bytes were served, append `media_info_servingFallbackNote`.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Expected: PASS.
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 dart format .
@@ -685,16 +685,16 @@ enum value becomes a compile error instead of a silently wrong label."
 **Interfaces:**
 - Produces: `Future<void> showMediaInfoSheet(BuildContext context, MediaItem item)`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```dart
 testWidgets('the viewer info button opens the sheet', ...);
 testWidgets('the sheet renders the panel for the given item', ...);
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Launcher, following `scan_results_dialog.dart:398-410`:
 
@@ -721,14 +721,14 @@ Viewer button: add an `onShowInfo` callback parameter to `_TopOverlay` and rende
 
 `_topChromeHeight = 64` (`:1098`) does not need changing: it is sized for a 48 px `IconButton` plus padding, and another button does not alter the height.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
-- [ ] **Step 5: Run the viewer's existing suites**
+- [x] **Step 5: Run the viewer's existing suites**
 
 Run: `flutter test test/features/media/presentation/`
 Expected: PASS, unchanged counts. Adding a button to the overlay must not break existing viewer tests; if one asserts an exact icon count in the overlay, update it and note that in the commit.
 
-- [ ] **Step 6: Format and commit**
+- [x] **Step 6: Format and commit**
 
 ```bash
 dart format .
@@ -752,23 +752,23 @@ the spec's side-panel-on-wide wording deliberately."
 
 The tile tap is a literal no-op today (`:107`), so a missing item cannot be inspected in the one view built for troubleshooting it. This wires it.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```dart
 testWidgets('tapping a missing tile opens the info panel', ...);
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Expected: FAIL, no sheet appears.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Replace `onTileTap: (entry, index) {}` with `onTileTap: (entry, index) => showMediaInfoSheet(context, entry.item)`. Confirm the entry type's field name for the `MediaItem` by reading `MediaLibraryGrid`'s entry type; do not assume `.item`.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 dart format .
@@ -784,19 +784,19 @@ missing item could not tell you anything about it."
 
 ### Task 10: Full verification
 
-- [ ] **Step 1:** `dart format --set-exit-if-changed .` exits 0.
-- [ ] **Step 2:** `flutter analyze` reports no issues. Analyze the whole project; do not pipe through `tail` or `grep`, which masks the exit code.
-- [ ] **Step 3:** `flutter test` has zero failures. Expect a rise equal to the tests added, and expect some shared-widget consumer tests to need localization hosts added (see below).
-- [ ] **Step 4:** `git diff --stat origin/main...HEAD -- lib/core/database lib/features/sync` is empty.
-- [ ] **Step 5:** no em-dash was added to source. Build the pattern rather than
+- [x] **Step 1:** `dart format --set-exit-if-changed .` exits 0.
+- [x] **Step 2:** `flutter analyze` reports no issues. Analyze the whole project; do not pipe through `tail` or `grep`, which masks the exit code.
+- [x] **Step 3:** `flutter test` has zero failures. Expect a rise equal to the tests added, and expect some shared-widget consumer tests to need localization hosts added (see below).
+- [x] **Step 4:** `git diff --stat origin/main...HEAD -- lib/core/database lib/features/sync` is empty.
+- [x] **Step 5:** no em-dash was added to source. Build the pattern rather than
   typing it, so this file does not contain what it searches for, and scope the
   diff to source because docs legitimately discuss the character by name:
   ```bash
   EMDASH=$(printf '\xe2\x80\x94')
   git diff origin/main...HEAD -- lib test | grep -n "^+.*$EMDASH" || echo "clean"
   ```
-- [ ] **Step 6:** `flutter test test/l10n/` passes, confirming all 11 catalogs are still at parity.
-- [ ] **Step 7:** Push and open the PR against `main`, with no attribution line and no session URL.
+- [x] **Step 6:** `flutter test test/l10n/` passes, confirming all 11 catalogs are still at parity.
+- [x] **Step 7:** Push and open the PR against `main`, with no attribution line and no session URL.
 
 **Expected failure class, not a surprise:** adding localized strings to widgets that other tests render will break every consumer test that does not host localization delegates. Fix by wrapping those tests in `localizedMaterialApp` from `test/helpers/l10n_test_helpers.dart`. Budget for this fanout rather than debugging it.
 
