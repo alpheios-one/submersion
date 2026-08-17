@@ -1,10 +1,17 @@
 # CCR O2 Cell Millivolt Graph — Design
 
 **Date:** 2026-08-15
-**Status:** Approved for planning
+**Status:** Implemented (see "Amendments" below for what shipped beyond this design)
 **Issue:** [#810](https://github.com/submersion-app/submersion/issues/810)
-**Schema:** v150 → v151 (re-verify against `origin/main` before writing the migration)
+**Schema:** v150 → v153. Planned as v151; by the time this branch rebased onto `main`, PRs already in flight had claimed v151 (`diver_settings.seascape_appearance`) and v152 (`site_features`), so the migration renumbered to v153. See "Migration" below.
 **Delivery:** one PR, full vertical slice
+
+## Amendments
+
+What shipped goes beyond this design in two ways not covered by the sections below:
+
+- **Agreement rug.** The per-cell lines alone ask the reader to compare traces to notice disagreement. A status rug pinned to the plot's bottom edge — colored green/yellow/red for tight/drifting/wide spread between cells (thresholds `kO2CellDriftingMv = 5`, `kO2CellWideMv = 12`) — reads the whole dive at a glance instead. It renders together with the per-cell lines behind the single `showO2CellMv` toggle; an agreement/cells mode split was tried and rejected — see "Rendering" below for why. The combined feature's label is "O2 Cell Spread" (`diveLog_o2CellSpread_label`), not the metric name "O2 Cells" used for the legend toggle itself — the two needed to differ once several locales' words for "drifting" turned out to already contain "drift", making an earlier "O2 Cell Drift" label read as a tautology (`O2 Cell Drift: drifting`).
+- **Demo fixture.** `test/dives/102_o2_cell_traffic_light_demo.db.export`: a real Shearwater Cloud DB import (not a synthetic app-schema database) built by patching only the three per-cell millivolt bytes of the existing `petrel3_ccr_o2_cells.bin` native fixture, so the three agreement colors are all visible after one import. No import format was extended to carry millivolts — the Shearwater Cloud DB path already routes through the same FFI parser as a live download and carries them for free (see "Backfill" below).
 
 ## Problem
 
@@ -30,7 +37,8 @@ are the same task: there is no rendering to build until millivolts are persisted
 1. Carry per-cell millivolts from libdivecomputer to the database across all five
    platform paths.
 2. Draw the cells as a selectable right-axis metric on the dive profile chart, one
-   line per cell, so a diverging cell is visible at a glance.
+   line per cell, so a diverging cell is visible at a glance. (Shipped with a
+   traffic-light agreement rug alongside the lines — see "Amendments" above.)
 3. Show millivolts alongside the existing per-cell ppO2 in the profile tooltip.
 4. Change nothing for dives that have no millivolt data.
 
@@ -160,8 +168,12 @@ apart silently.
 
 ## Migration
 
-Version bump 150 → 151. `origin/main` is at 150 and no open PR claims 151 as of
-2026-08-15 (PR #603 claims 138, PR #954 claims 149) — re-verify before writing it.
+Version bump 150 → 151, as designed and first implemented. By the time this
+branch rebased onto a `main` that had moved on, two other features had already
+landed as v151 (`diver_settings.seascape_appearance`) and v152 (`site_features`),
+so the rebase renumbered this migration to v153 — same idempotent-helper
+pattern, same `onUpgrade`/`beforeOpen` dual-call, same tripwire update, just a
+different number and a re-run of the checklist below against the new slot.
 
 All four steps of the schema-bump checklist:
 
@@ -214,18 +226,53 @@ scale honest across dives.
 
 ### Lines
 
-`_buildO2CellMvLines(MetricBand band)` returns `List<LineChartBarData>`, spread into
-the existing list beside the ppO2 line. One line per cell, in graded shades of a
-single hue so they read as one metric with three members.
+`_buildO2CellMvLines(MetricBand band, UnitFormatter units)` returns
+`List<LineChartBarData>`, spread into the existing list beside the ppO2 line. One
+line per cell, colored from `kO2CellColors` (`o2_cell_readout.dart`) — not a single
+hue as originally planned, but an ordered six-entry ramp (Cyan 300, Teal 300, Light
+Green 300, Yellow 300, Orange 300, Red 300) shared with the tooltip bullets and the
+legend swatch, so a cell's line and its tooltip row always agree on color even as
+cell count grows past three.
 
 Unlike `_buildPpO2Line`, these get **no** surface lead-in and no carry-forward across
 gaps. Per-cell curves have genuine dropouts, and a broken line is the honest
 rendering of a cell that stopped reporting.
 
+### Agreement rug
+
+Not in the original design — added once the per-cell lines shipped and reading
+three overlapping traces to spot a diverging cell proved harder than it sounds.
+`_buildO2CellRug(MetricBand band)` draws a status strip pinned to the plot's bottom
+edge, one run per contiguous stretch of samples sharing an agreement level
+(`o2CellAgreementRuns`, `o2_cell_spread.dart`), colored traffic-light style:
+
+- **tight** (spread < `kO2CellDriftingMv` = 5 mV) — green, quiet (55% alpha): a
+  healthy rig sits here essentially the whole dive, so it must read as background,
+  not as a series demanding attention.
+- **drifting** (5–12 mV) — yellow, full opacity.
+- **wide** (≥ `kO2CellWideMv` = 12 mV) — red, full opacity, drawn heavier
+  (`barWidth: 6` vs `3`) so an exception is visible without hunting for a color
+  change.
+
+The rug and the per-cell lines render together, gated on the single `showO2CellMv`
+toggle — there is no mode switch between "verdict" and "detail" views. An
+`O2CellDisplayMode { agreement, cells }` split was implemented and then reverted:
+it forced a choice between the at-a-glance rug and the lines behind it, when
+showing both costs nothing and answers "is something wrong" and "which cell" in
+one glance instead of two. The combined feature is labeled "O2 Cell Spread"
+(`diveLog_o2CellSpread_label`) on the rug's caption and its tooltip row — not "O2
+Cells", which stays the legend toggle's own label for the underlying metric. An
+intermediate label, "O2 Cell Drift", was tried and dropped: paired with the
+"drifting" agreement-level word it read as "O2 Cell Drift: drifting" — a
+tautology, and one that repeated just as badly in German, French, Dutch, and
+Italian, whose words for the drifting level already contain "drift".
+
 ### Toggle
 
 `showO2CellMv` joins `ProfileLegendState`: field, constructor, `copyWith`, `==`,
-`hashCode`, `activeSecondaryCount`, and `toggleO2CellMv()`.
+`hashCode`, `activeSecondaryCount`, and `toggleO2CellMv()`. Controls the per-cell
+lines and the agreement rug together (see "Agreement rug" above) — no separate
+`o2CellMode` field.
 
 Session-only, with no persisted default setting. `showMod` is the precedent
 (`showMod: false, // MOD not in settings yet`). A `defaultShowO2CellMv` would mean a
@@ -236,14 +283,16 @@ legacy-payload sync test). Not worth it for a first cut, and easy to add later.
 ### Tooltip
 
 The existing per-cell rows, and the mirrored fullscreen block, get one combined row
-per cell rather than a second set:
+per cell rather than a second set (`formatO2CellReadout`, `o2_cell_readout.dart`):
 
 - bar and millivolts present → `Sensor 1    0.98 bar (58 mV)`
 - millivolts only, untrusted calibration → `Sensor 1    58 mV`
 - bar only → unchanged
 
 This keeps tooltip height fixed and puts both readings for one physical cell on one
-line.
+line. A separate row states the agreement verdict backed by the spread that drives
+it — `O2 Cell Spread    tight (2 mV)` — rather than leaving the reader to judge a
+bare millivolt gap.
 
 ## Testing
 
@@ -262,7 +311,8 @@ field-count constant are the primary mitigation. `DiveMarshalingTest.kt` lives i
 source set exists and add a decoder test there against a synthetic `DoubleArray`. If
 no JVM source set exists, say so plainly rather than imply the decoder is covered.
 
-**Migration.** A v150→v151 test in `test/core/database/`, modelled on
+**Migration.** A v150→v153 test (`migration_v153_o2_cell_mv_test.dart`, renumbered
+from v151 per "Migration" above) in `test/core/database/`, modelled on
 `migration_v89_o2_cells_test.dart`, including the partial-schema case the PRAGMA
 guard exists for. Plus the tripwire update.
 

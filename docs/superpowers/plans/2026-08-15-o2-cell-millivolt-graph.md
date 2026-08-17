@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Carry per-cell CCR O2 sensor millivolts from libdivecomputer through to the dive profile chart, drawn as a selectable right-axis metric with one line per cell.
+**Goal:** Carry per-cell CCR O2 sensor millivolts from libdivecomputer through to the dive profile chart, drawn as a selectable right-axis metric with one line per cell, plus a traffic-light agreement rug (see "Amendments" below — not part of the original goal).
 
-**Architecture:** Six nullable INTEGER columns `o2_sensor_mv1..6` on `dive_profiles`, exactly parallel to the existing `o2_sensor1..6` (which hold ppO2 in bar). The value originates in `dc_sample_value_t.ppo2.millivolt` (merged in submersion-app/libdivecomputer PR #2), is captured by the C wrapper, marshalled across five hand-written platform paths, persisted via a v151 Drift migration, and rendered by a new `ProfileRightAxisMetric.o2CellMv` that emits a `List<LineChartBarData>` rather than a single line.
+**Architecture:** Six nullable INTEGER columns `o2_sensor_mv1..6` on `dive_profiles`, exactly parallel to the existing `o2_sensor1..6` (which hold ppO2 in bar). The value originates in `dc_sample_value_t.ppo2.millivolt` (merged in submersion-app/libdivecomputer PR #2), is captured by the C wrapper, marshalled across five hand-written platform paths, persisted via a Drift migration (planned as v151, shipped as v153 — see "Amendments"), and rendered by a new `ProfileRightAxisMetric.o2CellMv` that emits a `List<LineChartBarData>` rather than a single line.
 
 **Tech Stack:** C (libdivecomputer wrapper), Pigeon (Dart/Swift/Kotlin/C++/GObject-C codegen), Kotlin + JNI (Android), Swift (Darwin), Drift ORM + SQLite, Flutter, Riverpod, fl_chart.
 
@@ -18,11 +18,48 @@
 - **Do not modify anything under `packages/libdivecomputer_plugin/third_party/libdivecomputer/`.** That submodule is finalized at `08bf592` and provides `ppo2.millivolt` already. If a task seems to need a change there, stop and report.
 - **Absent-value sentinel in C:** `UINT32_MAX`, never `0`. Zero is libdivecomputer's "device does not report millivolts".
 - **Android JNI array:** append only. Millivolts occupy indices 22–27; the array grows 22 → 28. Never insert mid-array.
-- **Schema version 151.** `origin/main` is at 150; PR #603 claims 138 and PR #954 claims 149, so 151 is free as of 2026-08-15. Re-verify in Task 5 Step 1 before writing the migration.
+- **Schema version 151, as planned at the time.** `origin/main` is at 150; PR #603 claims 138 and PR #954 claims 149, so 151 is free as of 2026-08-15. Re-verify in Task 5 Step 1 before writing the migration. (Shipped as v153 after a later rebase — see "Amendments".)
 - **Formatting:** `dart format .` must produce no changes before any commit. `flutter analyze` must be clean.
 - **No emojis** in code, comments, or docs. Keep comments sparse — rationale belongs in commit messages, not in code blocks.
 - **Six cells everywhere.** Even though only three are ever populated today, every array, column set, and accessor list is six wide to stay 1:1 with `o2_sensor1..6`.
 - **Commit after every task.** Never `git add -A` — stage explicit paths only.
+
+---
+
+## Amendments (post-implementation)
+
+What shipped diverges from the tasks below in a few places. Task-by-task notes
+mark each one; this is the summary.
+
+- **Schema version 153, not 151.** By the time this branch rebased onto a moved
+  `main`, two other features had already claimed v151 (`diver_settings.seascape_appearance`)
+  and v152 (`site_features`). Same migration, same checklist, renumbered. See the
+  note on Task 5.
+- **Agreement rug.** Not in this plan at all — added after Task 11/12 shipped,
+  once per-cell lines alone proved to ask more of the reader than a status strip
+  would. Colored traffic-light green/yellow/red for tight/drifting/wide spread
+  between cells, rendered together with the per-cell lines behind the same
+  `showO2CellMv` toggle. An `O2CellDisplayMode { agreement, cells }` mode switch
+  was built and then reverted in favor of always showing both — see the spec's
+  "Agreement rug" section for why. Labeled "O2 Cell Spread"
+  (`diveLog_o2CellSpread_label`), not "O2 Cells" (the legend toggle's own label,
+  which is unchanged) or "O2 Cell Drift" (tried, dropped as a tautology against
+  the "drifting" agreement word — see the spec).
+- **Demo fixture, not a seed script.** `test/dives/102_o2_cell_traffic_light_demo.db.export`:
+  a real, importable Shearwater Cloud DB whose profile blob is the existing
+  `petrel3_ccr_o2_cells.bin` native fixture with only the millivolt bytes patched,
+  reusing the app's normal Import Wizard end to end. An earlier `tool/` script that
+  wrote directly to a fresh app-schema database was replaced by this once it
+  became clear the Shearwater Cloud import path already carries millivolts
+  end-to-end (`ParsedDiveProfileMapper.samples()` already maps `o2SensorMv1..6`
+  from the FFI-parsed sample) — no import-code change was needed, just a fixture
+  that exercises it.
+- **Tooltip helpers extracted.** `_cellReadout`/`_valueAt` as sketched in Task 12
+  shipped as `formatO2CellReadout`/`o2CellCount`/`valueAtSample` in a new
+  `lib/features/dive_log/presentation/widgets/o2_cell_readout.dart`, alongside
+  `kO2CellColors`/`o2CellColor` (see the note on Task 11). Extracted because the
+  rug and both tooltip call sites all need the same cell-count/readout/color
+  logic, not because the original design was wrong.
 
 ---
 
@@ -625,6 +662,14 @@ git commit -m "feat(dive-log): add O2 cell millivolts to DiveProfilePoint (#810)
 
 ## Task 5: Drift schema v151
 
+**Shipped as v153.** Written as v151 first, exactly as this task describes. A
+later rebase onto `main` found v151 and v152 already claimed by unrelated
+in-flight features (`diver_settings.seascape_appearance`, `site_features`), so
+every `151` below — the version constant, the migration block, the backstop, the
+tripwire, and the test file name (`migration_v153_o2_cell_mv_test.dart`) —
+became `153` at that point. Same checklist, same idempotent-helper pattern,
+different number.
+
 **Files:**
 - Modify: `lib/core/database/database.dart:797-802` (columns), `:2965` (version), migration block, `beforeOpen` backstop, `migrationVersions`
 - Create: `test/core/database/migration_v151_o2_cell_mv_test.dart`
@@ -1201,6 +1246,11 @@ git commit -m "feat(profile): add the O2 cell millivolt right-axis metric (#810)
 
 ## Task 10: Legend toggle
 
+**Amendment:** this toggle shipped exactly as described here, then later grew to
+also gate the agreement rug (Task 11's follow-up — see "Amendments" at the top).
+No `o2CellMode` field was added to `ProfileLegendState`: a mode split was tried
+and reverted, so the toggle stayed this single bool.
+
 **Files:**
 - Modify: `lib/features/dive_log/presentation/providers/profile_legend_provider.dart` (field, constructor, `copyWith`, `==`, `hashCode`, `activeSecondaryCount`, toggle method)
 - Modify: the legend UI widget listing gas-analysis toggles (located in Step 1)
@@ -1277,6 +1327,16 @@ git commit -m "feat(profile): add the O2 cell millivolt legend toggle (#810)"
 ---
 
 ## Task 11: Draw one line per cell
+
+**Amendment:** the color palette below (`cellColors`, three shades of cyan) is
+not what shipped. The final palette is `kO2CellColors` in the extracted
+`lib/features/dive_log/presentation/widgets/o2_cell_readout.dart` — an ordered
+six-entry ramp (Cyan 300, Teal 300, Light Green 300, Yellow 300, Orange 300, Red
+300 — all one Material weight, spread further apart on the wheel), shared with
+the tooltip bullets and the agreement rug's colors rather than defined locally
+per call site. This task also grew a sibling: `_buildO2CellRug`, the traffic-light
+agreement strip described in "Amendments" at the top and not part of the
+original plan.
 
 **Files:**
 - Modify: `lib/features/dive_log/presentation/widgets/dive_profile_chart.dart:2713-2719` (line list), plus a new builder near `_buildPpO2Line` at `:4775`
@@ -1420,6 +1480,18 @@ git commit -m "feat(profile): draw one line per O2 cell millivolt curve (#810)"
 
 ## Task 12: Tooltip rows
 
+**Amendment:** `_cellReadout`/`_valueAt` as sketched below shipped as
+`formatO2CellReadout`/`o2CellCount`/`valueAtSample` in the extracted
+`o2_cell_readout.dart` (see Task 11's note), not as private methods on the chart
+state — the agreement rug needs the same cell-count/readout logic the tooltip
+does. The bullet color is `o2CellColor(cell)` per cell, not the fixed
+`0xFF80DEEA` shown below. A later fix also decoupled these rows from the
+`_showPpO2` gate this task leaves in place (see below) — hiding the aggregate
+ppO2 line used to hide every cell reading with it; the cell rows now follow
+`_showPpO2 || _showO2CellMv`. And a further row was added beyond the per-cell
+ones: the agreement verdict, `O2 Cell Spread    tight (2 mV)` — see the spec's
+"Tooltip" section.
+
 **Files:**
 - Modify: `lib/features/dive_log/presentation/widgets/dive_profile_chart.dart:1337-1352` and the mirrored fullscreen block at `:3246`
 - Test: `test/features/dive_log/presentation/widgets/dive_profile_chart_test.dart`
@@ -1503,6 +1575,8 @@ Replace the per-cell loop body at `:1339-1351` and the mirrored block at `:3246`
 ```
 
 Both blocks sit inside `if (_showPpO2 && widget.ppO2Curve != null)`. Leave that gate as it is — changing it is out of scope, and the lines themselves (Task 11) already render independently of it.
+
+**Amendment:** left in place here, then changed in a follow-up fix once it turned out to be a real bug: the cell rows sat inside the ppO2 gate, so hiding the loop ppO2 line took every sensor reading with it. The gate became `if (_showPpO2 || _showO2CellMv)` so the cell rows follow their own toggles.
 
 - [ ] **Step 5: Run to verify they pass**
 
