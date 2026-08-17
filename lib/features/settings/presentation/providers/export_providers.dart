@@ -1050,6 +1050,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
         fileName: fileName,
         type: FileType.any,
         bytes: await File(tempBackupPath).readAsBytes(),
+        mimeType: 'application/vnd.sqlite3',
       );
 
       if (savePath == null) {

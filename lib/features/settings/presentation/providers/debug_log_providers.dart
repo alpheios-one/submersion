@@ -152,8 +152,8 @@ Future<String?> saveLogFile(LogFileService service) async {
     dialogTitle: 'Save Debug Logs',
     fileName: 'submersion-debug-logs.txt',
     type: FileType.custom,
-    allowedExtensions: ['txt', 'log'],
     bytes: bytes,
+    mimeType: 'text/plain',
   );
 
   if (result == null) return null;

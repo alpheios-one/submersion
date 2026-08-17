@@ -117,6 +117,26 @@ void main() {
     return (pushedExtras: pushedExtras);
   }
 
+  testWidgets('desktop pick goes through file_picker', (tester) async {
+    // No pickImageOverride and not the mobile layout, so `_pick` takes the
+    // FilePicker branch -- the one file_picker 12 moved to `pickFile()`.
+    // The picker is stubbed in setUp to return the fixture photo.
+    final result = await pumpScanPage(
+      tester,
+      engine: FakeEngine(padiTrainingMetric()),
+    );
+
+    await tapAndProcess(tester, 'Choose Photo');
+
+    expect(
+      result.pushedExtras,
+      hasLength(1),
+      reason:
+          'the desktop pick must reach OCR and navigate on, exactly as '
+          'the overridden path does',
+    );
+  });
+
   testWidgets('engine unavailable shows install guidance', (tester) async {
     await pumpScanPage(
       tester,
