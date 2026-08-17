@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart' hide Visibility;
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart' show NumberFormat;
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
@@ -112,23 +111,19 @@ const _createNewSiteSentinel = '__create_new__';
 const _createNewDiveCenterSentinel = '__create_new_dive_center__';
 const _createNewTripSentinel = '__create_new_trip__';
 
-/// [value] rounded to [fractionDigits] and rendered with the diver's locale
-/// decimal separator, for seeding an editable field.
+/// [value] rendered with exactly [fractionDigits] decimals in the diver's
+/// locale, for seeding an editable field.
 ///
 /// Every field seeded here is read back with [parseUserDecimal], and the two
 /// halves must share one convention. `toStringAsFixed` always emits a dot, and
 /// under de/es/it that dot is the GROUPING separator, so a diver who opened a
 /// dive and saved it untouched would store ten times the depth (#1091).
 ///
-/// The fraction digits are pinned rather than left to the locale pattern so a
-/// seeded value keeps the precision the field has always shown.
-String _seedDecimal(double value, int fractionDigits) {
-  final format = NumberFormat.decimalPattern()
-    ..turnOffGrouping()
-    ..maximumFractionDigits = fractionDigits
-    ..minimumFractionDigits = fractionDigits;
-  return format.format(value);
-}
+/// This page keeps trailing zeros (a weight seeds as "2.0"), so it uses
+/// [formatFixedForInput] rather than the trailing-zero-dropping
+/// [formatRoundedForInput] the other forms use.
+String _seedDecimal(double value, int fractionDigits) =>
+    formatFixedForInput(value, fractionDigits);
 
 /// [value] rendered for seeding a whole-number field, paired with
 /// [parseUserInt]. Grouping is off, so this is digit-only text.

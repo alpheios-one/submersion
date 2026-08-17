@@ -15,6 +15,31 @@ import 'package:intl/intl.dart';
 /// separator, so "12.5" parses as 125. Always pair [formatDecimalForInput]
 /// with [parseUserDecimal].
 
+/// The active locale's decimal format, rebuilt only when the locale changes.
+///
+/// These helpers run from `onChanged`, so they are on the keystroke path, and
+/// building a NumberFormat means a locale lookup plus a pattern parse every
+/// time. The cache is keyed on the locale because `Intl.defaultLocale` is a
+/// MUTABLE process global: the app sets it when the diver switches language,
+/// and tests reassign it freely, so a cache that ignored it would silently
+/// format and parse against the previous locale.
+///
+/// Callers must treat the returned instance as read-only. `parse` and `symbols`
+/// do not mutate it; anything that needs `turnOffGrouping` or a different digit
+/// count must build its own.
+String? _cachedLocale;
+NumberFormat? _cachedFormat;
+
+NumberFormat _localeFormat() {
+  final locale = Intl.getCurrentLocale();
+  final cached = _cachedFormat;
+  if (cached != null && _cachedLocale == locale) return cached;
+  final format = NumberFormat.decimalPattern(locale);
+  _cachedLocale = locale;
+  _cachedFormat = format;
+  return format;
+}
+
 /// The number [text] represents in the active locale, or null when [text] is
 /// blank or cannot be read as a finite number.
 ///
@@ -26,7 +51,7 @@ double? parseUserDecimal(String text) {
   if (trimmed.isEmpty) return null;
   if (!_groupingIsWellFormed(trimmed)) return null;
   try {
-    final value = NumberFormat.decimalPattern().parse(trimmed);
+    final value = _localeFormat().parse(trimmed);
     // intl parses "NaN" and "Infinity" under some locales; neither survives a
     // round trip through the database as a meaningful quantity.
     return value.isFinite ? value.toDouble() : null;
@@ -44,7 +69,7 @@ double? parseUserDecimal(String text) {
 /// instead of guessed. A diver in a comma-decimal locale using an
 /// English-language device would otherwise log 64 m of visibility for "6,4".
 bool _groupingIsWellFormed(String text) {
-  final symbols = NumberFormat.decimalPattern().symbols;
+  final symbols = _localeFormat().symbols;
   final groupSep = symbols.GROUP_SEP;
   if (groupSep.isEmpty) return true;
 
@@ -105,7 +130,38 @@ String formatDecimalForInput(double value) {
   }
   // "1250.0" reads as a half-finished edit; the field wants "1250".
   if (text.endsWith('.0')) text = text.substring(0, text.length - 2);
-  final symbols = NumberFormat.decimalPattern().symbols;
+  return _localiseSeparators(text);
+}
+
+/// [value] rounded to [fractionDigits] and rendered for seeding, with trailing
+/// zeros dropped (12.0 seeds as "12", not "12.0").
+///
+/// Most converted fields want this: a unit conversion such as kg to lbs leaves
+/// a long fractional tail that would otherwise leak into the field.
+String formatRoundedForInput(double value, int fractionDigits) {
+  if (!value.isFinite) return '';
+  return formatDecimalForInput(
+    double.parse(value.toStringAsFixed(fractionDigits)),
+  );
+}
+
+/// [value] rendered for seeding with exactly [fractionDigits] decimals, keeping
+/// trailing zeros (2 seeds as "2.0" at one digit).
+///
+/// Distinct from [formatRoundedForInput] on purpose. The two differ only in
+/// trailing zeros, which is precisely why they belong side by side: the dive
+/// log seeds at a pinned precision and its displayed "2.0" is load-bearing,
+/// while every other field drops the zero. Keeping both here stops per-widget
+/// copies from drifting apart.
+String formatFixedForInput(double value, int fractionDigits) {
+  if (!value.isFinite) return '';
+  return _localiseSeparators(value.toStringAsFixed(fractionDigits));
+}
+
+/// Swaps the ASCII '.' and '-' produced by Dart's own number formatting for the
+/// active locale's decimal separator and minus sign.
+String _localiseSeparators(String text) {
+  final symbols = _localeFormat().symbols;
   return text
       .replaceFirst('.', symbols.DECIMAL_SEP)
       .replaceFirst('-', symbols.MINUS_SIGN);

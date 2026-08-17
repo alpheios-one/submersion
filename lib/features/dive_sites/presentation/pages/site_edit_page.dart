@@ -31,16 +31,12 @@ import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/forms/edit_form_scaffold.dart';
 import 'package:submersion/shared/widgets/forms/responsive_form_columns.dart';
 
-/// Seeds a depth field at the single decimal place it has always shown, using
-/// the active locale's decimal separator so the save path can read it back
-/// (#1091). The rounding happens before formatting because the shared input
-/// formatter keeps up to three fraction digits.
-String _depthForInput(double value) =>
-    formatDecimalForInput(double.parse(value.toStringAsFixed(1)));
+/// Seeds a depth field at the single decimal place it has always shown, and an
+/// altitude field at the whole units it has always shown, both in the active
+/// locale's decimal separator so the save path can read them back (#1091).
+String _depthForInput(double value) => formatRoundedForInput(value, 1);
 
-/// Seeds an altitude field, which has always shown whole units.
-String _altitudeForInput(double value) =>
-    formatDecimalForInput(value.roundToDouble());
+String _altitudeForInput(double value) => formatRoundedForInput(value, 0);
 
 class SiteEditPage extends ConsumerStatefulWidget {
   final String? siteId;

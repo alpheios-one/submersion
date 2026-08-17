@@ -13,16 +13,6 @@ import 'package:submersion/l10n/l10n_extension.dart';
 
 const _uuid = Uuid();
 
-/// [value] rounded to [decimals] places, rendered in the diver's locale for
-/// seeding a text field.
-///
-/// These fields were seeded with `toStringAsFixed`, which always emits '.', so
-/// a diver in a comma-decimal locale could not read the value back (#1091).
-/// Rounding before formatting keeps the terse display fixed-point seeding gave:
-/// a psi or cuft conversion otherwise arrives with a long fractional tail.
-String _seedFixed(double value, int decimals) =>
-    formatDecimalForInput(double.parse(value.toStringAsFixed(decimals)));
-
 /// Widget for managing tanks in a dive plan.
 class PlanTankList extends ConsumerWidget {
   const PlanTankList({super.key});
@@ -209,13 +199,13 @@ class _TankEditDialogState extends State<_TankEditDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.tank?.name ?? '');
     _volumeController = TextEditingController(
-      text: _seedFixed(
+      text: formatRoundedForInput(
         widget.units.convertVolume(widget.tank?.volume ?? 11.1),
         1,
       ),
     );
     _pressureController = TextEditingController(
-      text: _seedFixed(
+      text: formatRoundedForInput(
         widget.units.convertPressure(widget.tank?.startPressure ?? 200),
         0,
       ),

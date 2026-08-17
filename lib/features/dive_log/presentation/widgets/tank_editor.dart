@@ -17,16 +17,6 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 /// Callback when tank data changes
 typedef TankChangeCallback = void Function(DiveTank tank);
 
-/// [value] rounded to [decimals] places, rendered in the diver's locale for
-/// seeding a text field.
-///
-/// These fields were seeded with `toStringAsFixed`, which always emits '.', so
-/// a diver in a comma-decimal locale could not read the value back (#1091).
-/// Rounding before formatting keeps the terse display fixed-point seeding gave:
-/// a psi conversion otherwise arrives with a long fractional tail.
-String _seedFixed(double value, int decimals) =>
-    formatDecimalForInput(double.parse(value.toStringAsFixed(decimals)));
-
 /// Widget for editing a single tank's configuration
 class TankEditor extends ConsumerStatefulWidget {
   final DiveTank tank;
@@ -96,26 +86,35 @@ class _TankEditorState extends ConsumerState<TankEditor> {
         final cuft =
             match?.ratedCapacityCuft ??
             (widget.tank.volume! * widget.tank.workingPressure!) / 28.3168;
-        volumeText = _seedFixed(cuft, 1);
+        volumeText = formatRoundedForInput(cuft, 1);
       } else {
-        volumeText = _seedFixed(widget.tank.volume!, 1);
+        volumeText = formatRoundedForInput(widget.tank.volume!, 1);
       }
     }
 
     _volumeController = TextEditingController(text: volumeText);
     _workingPressureController = TextEditingController(
       text: widget.tank.workingPressure != null
-          ? _seedFixed(units.convertPressure(widget.tank.workingPressure!), 0)
+          ? formatRoundedForInput(
+              units.convertPressure(widget.tank.workingPressure!),
+              0,
+            )
           : '',
     );
     _startPressureController = TextEditingController(
       text: widget.tank.startPressure != null
-          ? _seedFixed(units.convertPressure(widget.tank.startPressure!), 0)
+          ? formatRoundedForInput(
+              units.convertPressure(widget.tank.startPressure!),
+              0,
+            )
           : '',
     );
     _endPressureController = TextEditingController(
       text: widget.tank.endPressure != null
-          ? _seedFixed(units.convertPressure(widget.tank.endPressure!), 0)
+          ? formatRoundedForInput(
+              units.convertPressure(widget.tank.endPressure!),
+              0,
+            )
           : '',
     );
     _o2Controller = TextEditingController(
@@ -816,11 +815,11 @@ class _TankEditorState extends ConsumerState<TankEditor> {
       // This is because "tank size" in imperial is rated by gas capacity (e.g., AL80 = 80 cuft),
       // while metric uses physical water volume (e.g., 11.1L)
       if (settings.volumeUnit == VolumeUnit.cubicFeet) {
-        _volumeController.text = _seedFixed(preset.volumeCuft, 1);
+        _volumeController.text = formatRoundedForInput(preset.volumeCuft, 1);
       } else {
-        _volumeController.text = _seedFixed(preset.volumeLiters, 1);
+        _volumeController.text = formatRoundedForInput(preset.volumeLiters, 1);
       }
-      _workingPressureController.text = _seedFixed(
+      _workingPressureController.text = formatRoundedForInput(
         units.convertPressure(preset.workingPressureBar),
         0,
       );

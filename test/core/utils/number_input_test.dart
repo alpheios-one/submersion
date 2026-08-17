@@ -158,6 +158,76 @@ void main() {
     });
   });
 
+  group('formatRoundedForInput', () {
+    test('rounds to the requested precision and drops trailing zeros', () {
+      Intl.defaultLocale = 'en_US';
+      expect(formatRoundedForInput(12.44, 1), '12.4');
+      expect(formatRoundedForInput(12.46, 1), '12.5');
+      expect(formatRoundedForInput(12.0, 1), '12');
+      expect(formatRoundedForInput(1250.6, 0), '1251');
+    });
+
+    test('rounds the double, not the decimal literal', () {
+      // 12.45 is really 12.4499999999999993 as a double, so it rounds down.
+      // Asserted rather than avoided: this matches the toStringAsFixed the
+      // per-widget seed helpers already used, so seeds are unchanged.
+      Intl.defaultLocale = 'en_US';
+      expect(formatRoundedForInput(12.45, 1), '12.4');
+    });
+
+    test('uses the locale decimal separator', () {
+      Intl.defaultLocale = 'fr';
+      expect(formatRoundedForInput(12.46, 1), '12,5');
+    });
+  });
+
+  group('formatFixedForInput', () {
+    test('keeps exactly the requested decimals, trailing zeros included', () {
+      // The dive log seeds weight and depth fields at a pinned precision, and
+      // the displayed "2.0" is asserted by existing tests.
+      Intl.defaultLocale = 'en_US';
+      expect(formatFixedForInput(2, 1), '2.0');
+      expect(formatFixedForInput(28.44, 1), '28.4');
+      expect(formatFixedForInput(1250, 0), '1250');
+    });
+
+    test('uses the locale decimal separator', () {
+      Intl.defaultLocale = 'de';
+      expect(formatFixedForInput(2, 1), '2,0');
+    });
+
+    test('round trips back through parseUserDecimal', () {
+      for (final locale in ['en_US', 'fr', 'de', 'es']) {
+        Intl.defaultLocale = locale;
+        expect(
+          parseUserDecimal(formatFixedForInput(12.5, 1)),
+          12.5,
+          reason: 'locale $locale',
+        );
+      }
+    });
+  });
+
+  group('locale cache', () {
+    test('a locale change takes effect immediately', () {
+      // The helpers cache their NumberFormat, and Intl.defaultLocale is a
+      // mutable process global, so a stale cache would silently format and
+      // parse against the previous diver's locale.
+      Intl.defaultLocale = 'en_US';
+      expect(formatDecimalForInput(12.5), '12.5');
+      expect(parseUserDecimal('12.5'), 12.5);
+
+      Intl.defaultLocale = 'fr';
+      expect(formatDecimalForInput(12.5), '12,5');
+      expect(parseUserDecimal('12,5'), 12.5);
+      expect(parseUserDecimal('12.5'), isNull);
+
+      Intl.defaultLocale = 'en_US';
+      expect(formatDecimalForInput(12.5), '12.5');
+      expect(parseUserDecimal('12,5'), isNull);
+    });
+  });
+
   group('round trip', () {
     // The regression guard for the trap that makes this bug dangerous to fix
     // naively: seeding a field with double.toString() ('12.5') and reading it

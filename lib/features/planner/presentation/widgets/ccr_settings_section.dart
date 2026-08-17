@@ -7,12 +7,6 @@ import 'package:submersion/features/dive_planner/presentation/providers/dive_pla
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// [value] rounded to [decimals] places, rendered in the diver's locale for
-/// seeding a text field. Rounding first keeps the terse display fixed-point
-/// seeding gave: a foot conversion otherwise arrives with a fractional tail.
-String _seedFixed(double value, int decimals) =>
-    formatDecimalForInput(double.parse(value.toStringAsFixed(decimals)));
-
 /// Setpoint controls for a CCR plan: low/high setpoints (bar) and the
 /// depth below which the high setpoint is in force (display units).
 class CcrSettingsSection extends ConsumerStatefulWidget {
@@ -35,13 +29,13 @@ class _CcrSettingsSectionState extends ConsumerState<CcrSettingsSection> {
     // A setpoint is decimal by nature (1,2 bar for a comma-decimal diver), so
     // the seed and the parse both go through the locale helpers (#1091).
     _lowController = TextEditingController(
-      text: _seedFixed(state.setpointLow ?? 0.7, 1),
+      text: formatRoundedForInput(state.setpointLow ?? 0.7, 1),
     );
     _highController = TextEditingController(
-      text: _seedFixed(state.setpointHigh ?? 1.3, 1),
+      text: formatRoundedForInput(state.setpointHigh ?? 1.3, 1),
     );
     _switchController = TextEditingController(
-      text: _seedFixed(
+      text: formatRoundedForInput(
         units.convertDepth(state.setpointSwitchDepth ?? 10.0),
         0,
       ),

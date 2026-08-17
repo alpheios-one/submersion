@@ -12,15 +12,6 @@ import 'package:submersion/features/tank_presets/domain/entities/tank_preset_ent
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// [value] rounded to [decimals] places, rendered in the diver's locale for
-/// seeding a text field.
-///
-/// Volume is decimal by nature (an 11,1 L cylinder for a comma-decimal diver),
-/// so seed, validator, and save all go through the locale helpers (#1091).
-/// Rounding first keeps the terse display fixed-point seeding gave.
-String _seedFixed(double value, int decimals) =>
-    formatDecimalForInput(double.parse(value.toStringAsFixed(decimals)));
-
 class TankPresetEditPage extends ConsumerStatefulWidget {
   final String? presetId;
 
@@ -77,13 +68,19 @@ class _TankPresetEditPageState extends ConsumerState<TankPresetEditPage> {
 
           // Convert volume to user's preferred units
           if (settings.volumeUnit == VolumeUnit.cubicFeet) {
-            _volumeController.text = _seedFixed(preset.volumeCuft, 1);
+            _volumeController.text = formatRoundedForInput(
+              preset.volumeCuft,
+              1,
+            );
           } else {
-            _volumeController.text = _seedFixed(preset.volumeLiters, 1);
+            _volumeController.text = formatRoundedForInput(
+              preset.volumeLiters,
+              1,
+            );
           }
 
           // Convert pressure to user's preferred units
-          _workingPressureController.text = _seedFixed(
+          _workingPressureController.text = formatRoundedForInput(
             units.convertPressure(preset.workingPressureBar),
             0,
           );

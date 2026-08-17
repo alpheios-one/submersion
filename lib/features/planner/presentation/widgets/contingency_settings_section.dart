@@ -9,12 +9,6 @@ import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// [value] rounded to [decimals] places, rendered in the diver's locale for
-/// seeding a text field. The seed and the parse must share one convention, or
-/// a comma-decimal diver cannot read back what the field shows (#1091).
-String _seedFixed(double value, int decimals) =>
-    formatDecimalForInput(double.parse(value.toStringAsFixed(decimals)));
-
 /// Contingency configuration: deviation deltas and the turn-pressure rule.
 class ContingencySettingsSection extends ConsumerStatefulWidget {
   const ContingencySettingsSection({super.key});
@@ -36,13 +30,16 @@ class _ContingencySettingsSectionState
     final state = ref.read(divePlanNotifierProvider);
     final units = UnitFormatter(ref.read(settingsProvider));
     _depthController = TextEditingController(
-      text: _seedFixed(units.convertDepth(state.deviationDepthDelta), 0),
+      text: formatRoundedForInput(
+        units.convertDepth(state.deviationDepthDelta),
+        0,
+      ),
     );
     _timeController = TextEditingController(
       text: formatDecimalForInput(state.deviationTimeMinutes.toDouble()),
     );
     _fractionController = TextEditingController(
-      text: _seedFixed(state.turnPressureFraction ?? (1 / 3), 2),
+      text: formatRoundedForInput(state.turnPressureFraction ?? (1 / 3), 2),
     );
   }
 
