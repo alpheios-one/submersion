@@ -330,7 +330,12 @@ MeshData _ribbonMesh(
       tx /= len;
       tz /= len;
     }
-    final px = -tz, pz = tx;
+    // Perpendicular in xz, rotated the way the map frame turns: scene Z
+    // runs SOUTH (see SpatialProjection), so the sense is (tz, -tx). Get
+    // it backwards and the ribbon's two edges swap array slots while the
+    // strip indices below stay put, which splits every quad along the
+    // other diagonal and shifts the triangle sort keys for free.
+    final px = tz, pz = -tx;
     final vi = i * 6;
     positions[vi] = xyz[i * 3] - px * halfWidth;
     positions[vi + 1] = xyz[i * 3 + 1];

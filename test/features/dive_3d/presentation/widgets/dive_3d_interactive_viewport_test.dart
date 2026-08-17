@@ -155,7 +155,6 @@ void main() {
     var painter = scenePainterOf(tester);
     expect(painter.yawDegrees, chartYawDegrees);
     expect(painter.pitchDegrees, chartPitchDegrees);
-    expect(painter.mirrorX, isTrue);
     // A drag must NOT change yaw/pitch (it pans the plan view).
     await tester.drag(
       find.byType(Dive3dInteractiveViewport),

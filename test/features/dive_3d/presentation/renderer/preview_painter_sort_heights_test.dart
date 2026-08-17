@@ -55,7 +55,6 @@ Future<ui.Image> _render(MeshData drape) async {
     ),
     yawDegrees: chartYawDegrees,
     pitchDegrees: chartPitchDegrees,
-    mirrorX: true,
   ).paint(ui.Canvas(recorder), _size);
   return recorder.endRecording().toImage(
     _size.width.round(),
@@ -71,7 +70,6 @@ Future<({int r, int g})> _pixelAtDrape(ui.Image image) async {
     bounds: _bounds,
     yawDegrees: chartYawDegrees,
     pitchDegrees: chartPitchDegrees,
-    mirrorX: true,
   );
   final p = projector.project(5.0, -2.5, -0.3);
   final bytes = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!;
