@@ -18249,6 +18249,12 @@ abstract class AppLocalizations {
   /// **'Purchase Price'**
   String get equipment_edit_purchasePriceLabel;
 
+  /// No description provided for @equipment_edit_purchasePriceValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid amount'**
+  String get equipment_edit_purchasePriceValidation;
+
   /// No description provided for @equipment_edit_remindMeBeforeServiceDue.
   ///
   /// In en, this message translates to:

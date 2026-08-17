@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:submersion/core/database/database.dart'
     hide DiveSite, DiveComputer;
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
@@ -402,7 +403,13 @@ void main() {
     await scrollTo(tester, find.text('Suit thickness (mm)'));
     expect(find.widgetWithText(TextField, '2.5'), findsOneWidget);
 
-    // A comma decimal separator parses to the same value as a dot.
+    // A comma reads as a decimal separator only where the diver's locale says
+    // it is one. Number parsing follows Intl.defaultLocale, the process global
+    // lib/app.dart sets from the app locale.
+    final previousLocale = Intl.defaultLocale;
+    addTearDown(() => Intl.defaultLocale = previousLocale);
+    Intl.defaultLocale = 'fr';
+
     final maxField = find.byWidgetPredicate(
       (w) =>
           w is TextField &&
@@ -416,6 +423,35 @@ void main() {
     final applied = ref.read(filterProvider);
     expect(applied.equipmentAttrMin, 2.5);
     expect(applied.equipmentAttrMax, 7.5);
+  });
+
+  testWidgets('a comma is read as thousands under a dot-decimal locale', (
+    tester,
+  ) async {
+    // The old replaceAll(',', '.') workaround turned an en_US diver's "1,250"
+    // into 1.25. Locale-aware parsing reads the comma in the role that
+    // locale actually gives it (#1091).
+    final previousLocale = Intl.defaultLocale;
+    addTearDown(() => Intl.defaultLocale = previousLocale);
+    Intl.defaultLocale = 'en_US';
+
+    final ref = await openSheet(
+      tester,
+      initial: const DiveFilterState(equipmentAttrKey: 'thickness_mm'),
+    );
+    await scrollTo(tester, find.text('Suit thickness (mm)'));
+
+    final maxField = find.byWidgetPredicate(
+      (w) =>
+          w is TextField &&
+          w.decoration?.labelText == 'Max' &&
+          w.decoration?.suffixText == null,
+    );
+    await tester.enterText(maxField, '1,250');
+    await tester.pumpAndSettle();
+
+    await tapText(tester, 'Apply Filters');
+    expect(ref.read(filterProvider).equipmentAttrMax, 1250);
   });
 
   testWidgets('Clear All resets the filter and closes the sheet', (

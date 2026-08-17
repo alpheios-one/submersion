@@ -10517,6 +10517,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_edit_purchasePriceLabel => 'سعر الشراء';
 
   @override
+  String get equipment_edit_purchasePriceValidation => 'أدخل مبلغاً صالحاً';
+
+  @override
   String get equipment_edit_remindMeBeforeServiceDue =>
       'ذكّرني قبل موعد الصيانة:';
 

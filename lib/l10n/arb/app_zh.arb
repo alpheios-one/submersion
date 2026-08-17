@@ -3555,6 +3555,7 @@
   "equipment_edit_purchaseDateLabel": "购买日期",
   "equipment_edit_purchaseInfoTitle": "购买信息",
   "equipment_edit_purchasePriceLabel": "购买价格",
+  "equipment_edit_purchasePriceValidation": "请输入有效金额",
   "equipment_edit_remindMeBeforeServiceDue": "在维护到期前提醒我：",
   "equipment_edit_reminderDays": "{days} 天",
   "equipment_edit_saveButton_edit": "保存更改",

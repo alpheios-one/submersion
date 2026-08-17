@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/divers/domain/entities/diver_weight_entry.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
@@ -125,17 +126,17 @@ class BodyWeightEditPage extends ConsumerWidget {
     );
 
     if (saved != true) return;
-    final parsedWeight = double.tryParse(weightController.text);
+    final parsedWeight = parseUserDecimal(weightController.text);
     if (parsedWeight == null) return;
     final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
     if (diverId == null) return;
 
     final double? heightCm;
     if (units.heightIsMetric) {
-      heightCm = double.tryParse(heightCmController.text);
+      heightCm = parseUserDecimal(heightCmController.text);
     } else {
-      final feet = double.tryParse(heightFeetController.text);
-      final inches = double.tryParse(heightInchesController.text);
+      final feet = parseUserDecimal(heightFeetController.text);
+      final inches = parseUserDecimal(heightInchesController.text);
       heightCm = (feet == null && inches == null)
           ? null
           : units.feetInchesToCm(feet ?? 0, inches ?? 0);

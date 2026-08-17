@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
 import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
@@ -153,7 +154,12 @@ class _ScheduleOverrideDialogState extends State<_ScheduleOverrideDialog> {
     final s = widget.schedule;
     _days = TextEditingController(text: s.intervalDays?.toString() ?? '');
     _dives = TextEditingController(text: s.intervalDives?.toString() ?? '');
-    _hours = TextEditingController(text: s.intervalHours?.toString() ?? '');
+    // Fractional, so the seed uses the diver's decimal separator to match how
+    // the field is read back (#1091).
+    final hours = s.intervalHours;
+    _hours = TextEditingController(
+      text: hours == null ? '' : formatDecimalForInput(hours),
+    );
     _anchorDate = s.anchorDate;
   }
 
@@ -270,9 +276,9 @@ class _ScheduleOverrideDialogState extends State<_ScheduleOverrideDialog> {
               id: schedule.id,
               equipmentId: schedule.equipmentId,
               serviceKindId: schedule.serviceKindId,
-              intervalDays: int.tryParse(_days.text.trim()),
-              intervalDives: int.tryParse(_dives.text.trim()),
-              intervalHours: double.tryParse(_hours.text.trim()),
+              intervalDays: parseUserInt(_days.text),
+              intervalDives: parseUserInt(_dives.text),
+              intervalHours: parseUserDecimal(_hours.text),
               anchorDate: _anchorDate,
               enabled: schedule.enabled,
               createdAt: schedule.createdAt,

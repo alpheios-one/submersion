@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/data/services/dive_time_migration_service.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -75,7 +76,7 @@ class _FixDiveTimesPageState extends ConsumerState<FixDiveTimesPage> {
   }
 
   void _onOffsetChanged(String value) {
-    final parsed = int.tryParse(value);
+    final parsed = parseUserInt(value);
     setState(() => _offsetHours = parsed ?? 0);
   }
 

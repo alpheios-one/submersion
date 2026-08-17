@@ -3410,6 +3410,7 @@
   "equipment_edit_purchaseDateLabel": "تاريخ الشراء",
   "equipment_edit_purchaseInfoTitle": "معلومات الشراء",
   "equipment_edit_purchasePriceLabel": "سعر الشراء",
+  "equipment_edit_purchasePriceValidation": "أدخل مبلغاً صالحاً",
   "equipment_edit_remindMeBeforeServiceDue": "ذكّرني قبل موعد الصيانة:",
   "equipment_edit_reminderDays": "{days} يوم",
   "equipment_edit_saveButton_edit": "حفظ التغييرات",

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/provider.dart';
 
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
@@ -482,7 +483,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
                   suffixText: 'm',
                 ),
                 keyboardType: TextInputType.number,
-                onChanged: (value) => _minDepth = double.tryParse(value),
+                onChanged: (value) => _minDepth = parseUserDecimal(value),
               ),
             ),
             const SizedBox(width: 16),
@@ -495,7 +496,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
                   suffixText: 'm',
                 ),
                 keyboardType: TextInputType.number,
-                onChanged: (value) => _maxDepth = double.tryParse(value),
+                onChanged: (value) => _maxDepth = parseUserDecimal(value),
               ),
             ),
           ],
@@ -519,7 +520,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
                   suffixText: 'min',
                 ),
                 keyboardType: TextInputType.number,
-                onChanged: (value) => _minDurationMinutes = int.tryParse(value),
+                onChanged: (value) => _minDurationMinutes = parseUserInt(value),
               ),
             ),
             const SizedBox(width: 16),
@@ -532,7 +533,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
                   suffixText: 'min',
                 ),
                 keyboardType: TextInputType.number,
-                onChanged: (value) => _maxDurationMinutes = int.tryParse(value),
+                onChanged: (value) => _maxDurationMinutes = parseUserInt(value),
               ),
             ),
           ],

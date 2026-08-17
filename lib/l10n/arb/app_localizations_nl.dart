@@ -10619,6 +10619,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_edit_purchasePriceLabel => 'Aankoopprijs';
 
   @override
+  String get equipment_edit_purchasePriceValidation =>
+      'Voer een geldig bedrag in';
+
+  @override
   String get equipment_edit_remindMeBeforeServiceDue =>
       'Herinner me voordat service nodig is:';
 

@@ -3338,6 +3338,7 @@
   "equipment_edit_purchaseDateLabel": "Data di acquisto",
   "equipment_edit_purchaseInfoTitle": "Informazioni acquisto",
   "equipment_edit_purchasePriceLabel": "Prezzo di acquisto",
+  "equipment_edit_purchasePriceValidation": "Inserisci un importo valido",
   "equipment_edit_remindMeBeforeServiceDue": "Ricordami prima della scadenza della manutenzione:",
   "equipment_edit_reminderDays": "{days} giorni",
   "equipment_edit_saveButton_edit": "Salva modifiche",

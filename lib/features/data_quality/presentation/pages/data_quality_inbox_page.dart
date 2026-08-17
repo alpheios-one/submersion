@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/data_quality/data/services/quality_repair_executor.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
@@ -576,7 +577,7 @@ Future<({Duration offset, bool importWide})?> showTimeShiftSheet(
   final controller = TextEditingController(
     text: suggestedOffset == Duration.zero
         ? ''
-        : suggestedOffset.inHours.toString(),
+        : formatDecimalForInput(suggestedOffset.inHours.toDouble()),
   );
   var importWide = false;
   return showModalBottomSheet<({Duration offset, bool importWide})>(
@@ -615,7 +616,7 @@ Future<({Duration offset, bool importWide})?> showTimeShiftSheet(
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: () {
-                  final hours = int.tryParse(controller.text.trim()) ?? 0;
+                  final hours = parseUserInt(controller.text) ?? 0;
                   Navigator.of(context).pop((
                     offset: Duration(hours: hours),
                     importWide: importWide,

@@ -3338,6 +3338,7 @@
   "equipment_edit_purchaseDateLabel": "תאריך רכישה",
   "equipment_edit_purchaseInfoTitle": "פרטי רכישה",
   "equipment_edit_purchasePriceLabel": "מחיר רכישה",
+  "equipment_edit_purchasePriceValidation": "הזן סכום חוקי",
   "equipment_edit_remindMeBeforeServiceDue": "הזכר לי לפני מועד הטיפול:",
   "equipment_edit_reminderDays": "{days} ימים",
   "equipment_edit_saveButton_edit": "שמור שינויים",

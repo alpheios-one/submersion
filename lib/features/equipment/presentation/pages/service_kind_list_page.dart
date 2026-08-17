@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
@@ -309,8 +310,12 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
     _dives = TextEditingController(
       text: k?.defaultIntervalDives?.toString() ?? '',
     );
+    // Hours are fractional, so the seed has to use the diver's decimal
+    // separator: toString() would seed "12.5" where '.' groups thousands,
+    // and an untouched re-save would store 125 (#1091).
+    final hours = k?.defaultIntervalHours;
     _hours = TextEditingController(
-      text: k?.defaultIntervalHours?.toString() ?? '',
+      text: hours == null ? '' : formatDecimalForInput(hours),
     );
     _types = {...(k?.applicableTypes ?? const [])};
     _autoAttach = k?.autoAttach ?? false;
@@ -443,9 +448,9 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
           diverId: diverId,
           name: _name.text.trim(),
           applicableTypes: _types.toList(),
-          defaultIntervalDays: int.tryParse(_days.text.trim()),
-          defaultIntervalDives: int.tryParse(_dives.text.trim()),
-          defaultIntervalHours: double.tryParse(_hours.text.trim()),
+          defaultIntervalDays: parseUserInt(_days.text),
+          defaultIntervalDives: parseUserInt(_dives.text),
+          defaultIntervalHours: parseUserDecimal(_hours.text),
           autoAttach: _autoAttach,
           createdAt: now,
           updatedAt: now,
@@ -459,9 +464,9 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
           diverId: existing.diverId,
           name: _name.text.trim(),
           applicableTypes: _types.toList(),
-          defaultIntervalDays: int.tryParse(_days.text.trim()),
-          defaultIntervalDives: int.tryParse(_dives.text.trim()),
-          defaultIntervalHours: double.tryParse(_hours.text.trim()),
+          defaultIntervalDays: parseUserInt(_days.text),
+          defaultIntervalDives: parseUserInt(_dives.text),
+          defaultIntervalHours: parseUserDecimal(_hours.text),
           autoAttach: _autoAttach,
           isBuiltIn: false,
           createdAt: existing.createdAt,

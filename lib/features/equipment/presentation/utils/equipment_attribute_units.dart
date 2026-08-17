@@ -1,3 +1,4 @@
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
@@ -59,20 +60,21 @@ String attributeUnitSymbol(AttributeDimension d, UnitFormatter units) =>
 /// label, with no unit symbol: integers render without decimals, otherwise one
 /// decimal place. Keeps edit fields readable after a unit conversion (e.g.
 /// kg->lbs) instead of leaking full floating-point precision.
+///
+/// Rendered in the diver's locale, matching how the field is read back with
+/// [parseUserDecimal]. Seeding "7.5" where ',' is the decimal separator and '.'
+/// groups thousands would make an untouched re-save store 75 (#1091).
 String formatAttributeNumberForEditing(
   AttributeDimension dimension,
   UnitFormatter units,
   double metricValue,
 ) {
   final display = attributeDisplayFromMetric(dimension, units, metricValue);
-  // Round to the one decimal place actually rendered BEFORE asking whether the
-  // value is whole. A per-time round trip (100 min -> 1.666..h -> 100.000...1)
-  // is binary noise, not a fraction the diver typed, and must still read as
-  // "100" rather than "100.0".
-  final rounded = (display * 10).roundToDouble() / 10;
-  return rounded == rounded.roundToDouble()
-      ? rounded.toStringAsFixed(0)
-      : rounded.toStringAsFixed(1);
+  // Rounds to the one decimal place actually rendered BEFORE deciding whether
+  // the value is whole, then drops a trailing zero. A per-time round trip
+  // (100 min -> 1.666..h -> 100.000...1) is binary noise, not a fraction the
+  // diver typed, and must still read as "100" rather than "100.0".
+  return formatRoundedForInput(display, 1);
 }
 
 /// Display string for a stored attribute value (detail page, CSV).

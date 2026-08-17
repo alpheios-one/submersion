@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
@@ -118,9 +119,11 @@ class EquipmentAttributeFormSection extends StatelessWidget {
               onCleared(def.key);
               return;
             }
-            // Tolerate a comma decimal separator (many locales' numeric
-            // keyboards produce "7,5"), like the suit-thickness filter bounds.
-            final parsed = double.tryParse(trimmed.replaceAll(',', '.'));
+            // Read in the diver's locale, matching how the field is seeded by
+            // formatAttributeNumberForEditing. A blanket replaceAll(',', '.')
+            // would misread the en_US thousands separator, turning "1,250"
+            // into 1.25.
+            final parsed = parseUserDecimal(trimmed);
             if (parsed != null) {
               onChanged(
                 _base(def.key).copyWith(

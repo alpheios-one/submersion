@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -217,9 +218,10 @@ class TerrainAppearanceSheet extends ConsumerWidget {
   }
 }
 
-/// Depth in the diver's unit, trimmed to a whole number when it is one.
-String _formatDisplay(double display) =>
-    display % 1 == 0 ? display.toStringAsFixed(0) : display.toStringAsFixed(1);
+/// Depth in the diver's unit, trimmed to a whole number when it is one and
+/// written with the diver's decimal separator so the field can be read back
+/// (#1091).
+String _formatDisplay(double display) => formatRoundedForInput(display, 1);
 
 /// One custom contour level. Stateful because the depth box owns a controller:
 /// a decimal keypad offers no submit key, so the row commits when the field
@@ -322,7 +324,10 @@ class _LevelRowState extends State<_LevelRow> {
   /// The appearance this row's box would produce, or null when the text is
   /// unusable or already matches what is stored.
   SeascapeAppearance? _pendingAppearance() {
-    final typed = double.tryParse(_controller.text.trim().replaceAll(',', '.'));
+    // Read in the diver's locale, matching _formatDisplay. A blanket
+    // replaceAll(',', '.') would misread the en_US thousands separator,
+    // turning "1,250" into 1.25 (#1091).
+    final typed = parseUserDecimal(_controller.text);
     if (typed == null || !typed.isFinite || typed <= 0) return null;
     final appearance = _appearance;
     if (appearance == null || widget.index >= appearance.customLevels.length) {

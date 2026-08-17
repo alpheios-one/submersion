@@ -394,7 +394,10 @@ void main() {
         tester,
         initial: twoLevels.copyWith(depthUnit: DepthUnit.feet),
       );
-      expect(levelFieldText(tester, 0), '65.6'); // 20 m in feet
+      // Seeded with the diver's own decimal separator, as every other numeric
+      // field now is (#1091). Showing a de diver "65.6" is the mismatch that
+      // made them type a comma the app could not read back.
+      expect(levelFieldText(tester, 0), '65,6'); // 20 m in feet
       Navigator.of(tester.element(find.byType(TerrainAppearanceSheet))).pop();
       await tester.pumpAndSettle();
       expect(levelsOf(container).map((l) => l.depthMeters), [

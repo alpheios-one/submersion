@@ -3410,6 +3410,7 @@
   "equipment_edit_purchaseDateLabel": "Aankoopdatum",
   "equipment_edit_purchaseInfoTitle": "Aankoopinformatie",
   "equipment_edit_purchasePriceLabel": "Aankoopprijs",
+  "equipment_edit_purchasePriceValidation": "Voer een geldig bedrag in",
   "equipment_edit_remindMeBeforeServiceDue": "Herinner me voordat service nodig is:",
   "equipment_edit_reminderDays": "{days} dagen",
   "equipment_edit_saveButton_edit": "Wijzigingen opslaan",
