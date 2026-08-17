@@ -13,6 +13,7 @@ import 'package:submersion/features/media/domain/value_objects/media_source_data
 import 'package:submersion/features/media/domain/value_objects/verify_result.dart';
 import 'package:submersion/features/media/presentation/helpers/media_link_replacer.dart';
 import 'package:submersion/features/media/presentation/providers/media_provenance_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_serving_providers.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -39,7 +40,14 @@ class MediaInfoPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final provenance = ref.watch(mediaProvenanceProvider(item));
+    // Re-read the row rather than rendering the snapshot handed to the sheet.
+    // mediaProvenanceProvider is keyed by the MediaItem VALUE and derives
+    // everything from it, so invalidating that alone would recompute from the
+    // same stale object: Check now would write isOrphaned to the database and
+    // the Status row would never move. The passed item is the seed and the
+    // fallback for the frame before the read lands.
+    final live = ref.watch(mediaByIdProvider(item.id)).value ?? item;
+    final provenance = ref.watch(mediaProvenanceProvider(live));
     final units = UnitFormatter(ref.watch(settingsProvider));
 
     return ListView(
@@ -48,13 +56,13 @@ class MediaInfoPanel extends ConsumerWidget {
       children: [
         Text(l10n.media_info_title, style: _titleStyle(context)),
         const SizedBox(height: 16),
-        _FileSection(item: item, units: units),
+        _FileSection(item: live, units: units),
         const SizedBox(height: 12),
-        _OriginSection(item: item, origin: provenance.origin, units: units),
+        _OriginSection(item: live, origin: provenance.origin, units: units),
         const SizedBox(height: 12),
-        _BackupSection(item: item, backup: provenance.backup, units: units),
+        _BackupSection(item: live, backup: provenance.backup, units: units),
         const SizedBox(height: 12),
-        _ServingSection(item: item),
+        _ServingSection(item: live),
       ],
     );
   }
@@ -421,7 +429,9 @@ class _CheckNowButtonState extends ConsumerState<_CheckNowButton> {
         VerifyResult.volumeOffline => l10n.media_info_checkUnavailable,
       };
       messenger.showSnackBar(SnackBar(content: Text(message)));
-      ref.invalidate(mediaProvenanceProvider);
+      // Invalidate the ROW, not the provenance provider: provenance is keyed
+      // by the item value, so re-reading the row is what actually re-keys it.
+      ref.invalidate(mediaByIdProvider(widget.item.id));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -447,9 +457,9 @@ class _LocateButton extends ConsumerWidget {
       // The picker and confirm dialog can outlive the sheet, and ref after
       // dispose throws, which would turn a plain user-cancel into an error.
       if (!context.mounted) return;
-      // The repair writes the row, so the panel's origin facts have to be
-      // re-read for the status line to stop saying "missing".
-      if (applied) ref.invalidate(mediaProvenanceProvider);
+      // The repair writes the row, so re-read it: that is what re-keys the
+      // provenance provider and lets the status line stop saying "missing".
+      if (applied) ref.invalidate(mediaByIdProvider(item.id));
     },
     child: Text(context.l10n.media_info_actionLocate),
   );
