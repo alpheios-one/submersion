@@ -6208,9 +6208,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get setup_sync_header => 'סנכרון ענן';
 
   @override
-  String get setup_sync_icloudUnavailable => 'iCloud אינו זמין במכשיר זה';
-
-  @override
   String get setup_sync_libraryFound_adopt => 'אימוץ הספרייה הקיימת';
 
   @override

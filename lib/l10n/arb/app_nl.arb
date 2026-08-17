@@ -308,7 +308,6 @@
   "setup_sync_connectedTo": "Verbonden met {provider}",
   "setup_sync_error": "Kon geen verbinding maken: {error}",
   "setup_sync_header": "Cloudsynchronisatie",
-  "setup_sync_icloudUnavailable": "iCloud is niet beschikbaar op dit apparaat",
   "setup_sync_libraryFound_adopt": "Bestaande bibliotheek overnemen",
   "setup_sync_libraryFound_keepFresh": "Opnieuw beginnen",
   "setup_sync_libraryFound_message": "Dit account bevat al een Submersion-bibliotheek. Deze overnemen in plaats van opnieuw te beginnen?",

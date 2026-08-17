@@ -308,7 +308,6 @@
   "setup_sync_connectedTo": "Csatlakoztatva: {provider}",
   "setup_sync_error": "Nem sikerült csatlakozni: {error}",
   "setup_sync_header": "Felhőszinkronizálás",
-  "setup_sync_icloudUnavailable": "Az iCloud nem érhető el ezen az eszközön",
   "setup_sync_libraryFound_adopt": "Meglévő könyvtár átvétele",
   "setup_sync_libraryFound_keepFresh": "Új kezdés",
   "setup_sync_libraryFound_message": "Ez a fiók már tartalmaz Submersion-könyvtárat. Átveszi ahelyett, hogy újat kezdene?",

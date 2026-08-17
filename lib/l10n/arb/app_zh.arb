@@ -346,7 +346,6 @@
   "setup_sync_connectedTo": "已连接到 {provider}",
   "setup_sync_error": "无法连接：{error}",
   "setup_sync_header": "云同步",
-  "setup_sync_icloudUnavailable": "此设备不支持 iCloud",
   "setup_sync_libraryFound_adopt": "采用现有资料库",
   "setup_sync_libraryFound_keepFresh": "重新开始",
   "setup_sync_libraryFound_message": "此账户已包含 Submersion 资料库。要采用它而不是重新开始吗？",

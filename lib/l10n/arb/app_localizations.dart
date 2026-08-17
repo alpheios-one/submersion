@@ -10687,12 +10687,6 @@ abstract class AppLocalizations {
   /// **'Cloud sync'**
   String get setup_sync_header;
 
-  /// No description provided for @setup_sync_icloudUnavailable.
-  ///
-  /// In en, this message translates to:
-  /// **'iCloud is not available on this device'**
-  String get setup_sync_icloudUnavailable;
-
   /// No description provided for @setup_sync_libraryFound_adopt.
   ///
   /// In en, this message translates to:

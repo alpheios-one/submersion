@@ -6352,10 +6352,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get setup_sync_header => 'Felhőszinkronizálás';
 
   @override
-  String get setup_sync_icloudUnavailable =>
-      'Az iCloud nem érhető el ezen az eszközön';
-
-  @override
   String get setup_sync_libraryFound_adopt => 'Meglévő könyvtár átvétele';
 
   @override
