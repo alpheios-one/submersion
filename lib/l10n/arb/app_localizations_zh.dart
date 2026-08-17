@@ -6048,9 +6048,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get setup_sync_header => '云同步';
 
   @override
-  String get setup_sync_icloudUnavailable => '此设备不支持 iCloud';
-
-  @override
   String get setup_sync_libraryFound_adopt => '采用现有资料库';
 
   @override

@@ -308,7 +308,6 @@
   "setup_sync_connectedTo": "Verbunden mit {provider}",
   "setup_sync_error": "Verbindung fehlgeschlagen: {error}",
   "setup_sync_header": "Cloud-Synchronisierung",
-  "setup_sync_icloudUnavailable": "iCloud ist auf diesem Gerät nicht verfügbar",
   "setup_sync_libraryFound_adopt": "Vorhandene Bibliothek übernehmen",
   "setup_sync_libraryFound_keepFresh": "Neu beginnen",
   "setup_sync_libraryFound_message": "Dieses Konto enthält bereits eine Submersion-Bibliothek. Diese übernehmen, statt neu zu beginnen?",

@@ -6252,10 +6252,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setup_sync_header => 'Cloud sync';
 
   @override
-  String get setup_sync_icloudUnavailable =>
-      'iCloud is not available on this device';
-
-  @override
   String get setup_sync_libraryFound_adopt => 'Adopt existing library';
 
   @override

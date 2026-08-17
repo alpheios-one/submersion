@@ -3516,7 +3516,6 @@
     }
   },
   "setup_sync_header": "Cloud sync",
-  "setup_sync_icloudUnavailable": "iCloud is not available on this device",
   "setup_sync_libraryFound_adopt": "Adopt existing library",
   "setup_sync_libraryFound_keepFresh": "Start fresh",
   "setup_sync_libraryFound_message": "This account already contains a Submersion library. Adopt it instead of starting fresh?",

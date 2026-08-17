@@ -308,7 +308,6 @@
   "setup_sync_connectedTo": "מחובר אל {provider}",
   "setup_sync_error": "החיבור נכשל: {error}",
   "setup_sync_header": "סנכרון ענן",
-  "setup_sync_icloudUnavailable": "iCloud אינו זמין במכשיר זה",
   "setup_sync_libraryFound_adopt": "אימוץ הספרייה הקיימת",
   "setup_sync_libraryFound_keepFresh": "התחלה חדשה",
   "setup_sync_libraryFound_message": "חשבון זה כבר מכיל ספריית Submersion. לאמץ אותה במקום להתחיל מחדש?",

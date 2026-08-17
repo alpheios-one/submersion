@@ -308,7 +308,6 @@
   "setup_sync_connectedTo": "Conectado a {provider}",
   "setup_sync_error": "No se pudo conectar: {error}",
   "setup_sync_header": "Sincronización en la nube",
-  "setup_sync_icloudUnavailable": "iCloud no está disponible en este dispositivo",
   "setup_sync_libraryFound_adopt": "Adoptar biblioteca existente",
   "setup_sync_libraryFound_keepFresh": "Empezar de cero",
   "setup_sync_libraryFound_message": "Esta cuenta ya contiene una biblioteca de Submersion. ¿Adoptarla en lugar de empezar de cero?",

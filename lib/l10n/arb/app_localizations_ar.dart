@@ -6239,9 +6239,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get setup_sync_header => 'مزامنة السحابة';
 
   @override
-  String get setup_sync_icloudUnavailable => 'iCloud غير متاح على هذا الجهاز';
-
-  @override
   String get setup_sync_libraryFound_adopt => 'اعتماد المكتبة الحالية';
 
   @override

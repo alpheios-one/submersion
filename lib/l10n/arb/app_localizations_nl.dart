@@ -6321,10 +6321,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get setup_sync_header => 'Cloudsynchronisatie';
 
   @override
-  String get setup_sync_icloudUnavailable =>
-      'iCloud is niet beschikbaar op dit apparaat';
-
-  @override
   String get setup_sync_libraryFound_adopt => 'Bestaande bibliotheek overnemen';
 
   @override
