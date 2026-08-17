@@ -773,6 +773,14 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
 
+      # flutter_secure_storage 11 hardcodes compileSdk 37 in its own module,
+      # so the app compiles against 37 too (android/app/build.gradle.kts).
+      # Installed explicitly rather than left to Gradle's auto-download: the
+      # runner image only preinstalls a few platforms, and a missing one fails
+      # late with an opaque "failed to find target with hash string" error.
+      - name: Install Android SDK platform 37
+        run: sdkmanager --install "platforms;android-37.0"
+
       - name: Disable Swift Package Manager (project uses CocoaPods)
         run: flutter config --no-enable-swift-package-manager
 
