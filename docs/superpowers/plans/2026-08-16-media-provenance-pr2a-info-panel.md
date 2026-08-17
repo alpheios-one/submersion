@@ -16,7 +16,7 @@
 
 ## Global Constraints
 
-- **No em-dashes.** The `—` (U+2014) character must not appear in any code, comment, doc, ARB string, test name, or commit message. En-dashes used as prose punctuation and spaced hyphens are equally forbidden. Use commas, colons, semicolons, parentheses, or two sentences.
+- **No em-dashes.** The em-dash character (U+2014) must not appear in any code, comment, doc, ARB string, test name, or commit message. En-dashes (U+2013) used as prose punctuation and spaced hyphens are equally forbidden. Use commas, colons, semicolons, parentheses, or two sentences. This rule is stated by codepoint rather than by quoting the glyph so that this file does not trip the Task 10 check.
 - **No emojis** in code, comments, or documentation.
 - **No schema change.** No columns, no migration, no version bump, no synced entity touched.
 - **No new repair, verify, or upload logic.** PR 2a is READ-ONLY. It renders state and nothing else. Every action button belongs to PR 2b. If a task seems to need a write, stop: it is out of scope.
@@ -773,7 +773,13 @@ missing item could not tell you anything about it."
 - [ ] **Step 2:** `flutter analyze` reports no issues. Analyze the whole project; do not pipe through `tail` or `grep`, which masks the exit code.
 - [ ] **Step 3:** `flutter test` has zero failures. Expect a rise equal to the tests added, and expect some shared-widget consumer tests to need localization hosts added (see below).
 - [ ] **Step 4:** `git diff --stat origin/main...HEAD -- lib/core/database lib/features/sync` is empty.
-- [ ] **Step 5:** `git diff origin/main...HEAD | grep -n '^+.*—'` finds nothing.
+- [ ] **Step 5:** no em-dash was added to source. Build the pattern rather than
+  typing it, so this file does not contain what it searches for, and scope the
+  diff to source because docs legitimately discuss the character by name:
+  ```bash
+  EMDASH=$(printf '\xe2\x80\x94')
+  git diff origin/main...HEAD -- lib test | grep -n "^+.*$EMDASH" || echo "clean"
+  ```
 - [ ] **Step 6:** `flutter test test/l10n/` passes, confirming all 11 catalogs are still at parity.
 - [ ] **Step 7:** Push and open the PR against `main`, with no attribution line and no session URL.
 
