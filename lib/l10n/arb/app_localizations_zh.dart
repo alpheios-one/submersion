@@ -11824,6 +11824,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => '下一个媒体';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => '无照片可用';
 
   @override
@@ -11833,6 +11836,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_photoViewer_playPauseVideoLabel => '播放或暂停视频';
+
+  @override
+  String get media_photoViewer_previousTooltip => '上一个媒体';
 
   @override
   String get media_photoViewer_seekVideoLabel => '调整视频位置';
@@ -13829,6 +13835,16 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_cloudSync_provider_googleDrive_subtitle =>
       '通过 Google Drive 同步';
+
+  @override
+  String get settings_cloudSync_googleDrive_desktopNotConfigured => '此版本不可用';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_title => '请在浏览器中继续';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_message =>
+      '请在网页浏览器中完成 Google 登录，然后返回 Submersion。';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -21842,7 +21858,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get attrLabel_dpv_style => '款式';
 
   @override
-  String get attrLabel_burn_time_h => '续航时间（小时）';
+  String get attrLabel_burn_time_h => '续航时间';
 
   @override
   String get attrLabel_battery_type => '电池';

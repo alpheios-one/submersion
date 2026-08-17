@@ -12367,6 +12367,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'Elemento siguiente';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'No hay fotos disponibles';
 
   @override
@@ -12377,6 +12380,9 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get media_photoViewer_playPauseVideoLabel =>
       'Reproducir o pausar video';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'Elemento anterior';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'Buscar posicion del video';
@@ -14509,6 +14515,18 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_cloudSync_provider_googleDrive_subtitle =>
       'Sincronizar via Google Drive';
+
+  @override
+  String get settings_cloudSync_googleDrive_desktopNotConfigured =>
+      'No disponible en esta versión';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_title =>
+      'Continúa en tu navegador';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_message =>
+      'Termina de iniciar sesión en Google en tu navegador web y luego vuelve a Submersion.';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -23006,7 +23024,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get attrLabel_dpv_style => 'Estilo';
 
   @override
-  String get attrLabel_burn_time_h => 'Autonomía (h)';
+  String get attrLabel_burn_time_h => 'Autonomía';
 
   @override
   String get attrLabel_battery_type => 'Batería';

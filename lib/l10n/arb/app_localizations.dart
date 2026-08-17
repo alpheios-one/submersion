@@ -20963,6 +20963,12 @@ abstract class AppLocalizations {
   /// **'Failed to write metadata: {error}'**
   String media_photoViewer_failedToWriteMetadataError(Object error);
 
+  /// No description provided for @media_photoViewer_nextTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Next media'**
+  String get media_photoViewer_nextTooltip;
+
   /// No description provided for @media_photoViewer_noPhotosAvailable.
   ///
   /// In en, this message translates to:
@@ -20980,6 +20986,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Play or pause video'**
   String get media_photoViewer_playPauseVideoLabel;
+
+  /// No description provided for @media_photoViewer_previousTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous media'**
+  String get media_photoViewer_previousTooltip;
 
   /// No description provided for @media_photoViewer_seekVideoLabel.
   ///
@@ -24413,6 +24425,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync via Google Drive'**
   String get settings_cloudSync_provider_googleDrive_subtitle;
+
+  /// No description provided for @settings_cloudSync_googleDrive_desktopNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available in this build'**
+  String get settings_cloudSync_googleDrive_desktopNotConfigured;
+
+  /// No description provided for @settings_cloudSync_googleDrive_browserWait_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue in your browser'**
+  String get settings_cloudSync_googleDrive_browserWait_title;
+
+  /// No description provided for @settings_cloudSync_googleDrive_browserWait_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish signing in to Google in your web browser, then return to Submersion.'**
+  String get settings_cloudSync_googleDrive_browserWait_message;
 
   /// No description provided for @settings_cloudSync_provider_icloud.
   ///
@@ -38332,7 +38362,7 @@ abstract class AppLocalizations {
   /// No description provided for @attrLabel_burn_time_h.
   ///
   /// In en, this message translates to:
-  /// **'Burn time (h)'**
+  /// **'Burn time'**
   String get attrLabel_burn_time_h;
 
   /// No description provided for @attrLabel_battery_type.

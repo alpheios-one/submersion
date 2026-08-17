@@ -12346,6 +12346,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'Következő médiaelem';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'Nincsenek elerheto fotok';
 
   @override
@@ -12356,6 +12359,9 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get media_photoViewer_playPauseVideoLabel =>
       'Video lejatszasa vagy szüneteltetese';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'Előző médiaelem';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'Video pozicio keresese';
@@ -14470,6 +14476,18 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_cloudSync_provider_googleDrive_subtitle =>
       'Szinkronizalas Google Drive-on keresztül';
+
+  @override
+  String get settings_cloudSync_googleDrive_desktopNotConfigured =>
+      'Ebben a buildben nem érhető el';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_title =>
+      'Folytassa a böngészőjében';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_message =>
+      'Fejezze be a Google-bejelentkezést a webböngészőjében, majd térjen vissza a Submersionbe.';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -22915,7 +22933,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get attrLabel_dpv_style => 'Fazon';
 
   @override
-  String get attrLabel_burn_time_h => 'Üzemidő (ó)';
+  String get attrLabel_burn_time_h => 'Üzemidő';
 
   @override
   String get attrLabel_battery_type => 'Akkumulátor';

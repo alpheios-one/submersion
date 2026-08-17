@@ -327,7 +327,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'search',
                 name: 'diveSearch',
-                builder: (context, state) => const DiveSearchPage(),
+                // Sections with their own filter (Statistics) push this page
+                // with their filter provider as `extra` so the form edits and
+                // applies to that filter (#1079). Every other entry point,
+                // such as a deep link or the keyboard shortcut, gets the dive
+                // list's filter.
+                builder: (context, state) => DiveSearchPage(
+                  filterProvider: state.extra is StateProvider<DiveFilterState>
+                      ? state.extra as StateProvider<DiveFilterState>
+                      : null,
+                ),
               ),
               GoRoute(
                 path: 'match-sites',

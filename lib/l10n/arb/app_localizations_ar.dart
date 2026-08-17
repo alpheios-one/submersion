@@ -12161,6 +12161,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'الوسائط التالية';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'لا توجد صور متاحة';
 
   @override
@@ -12170,6 +12173,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_photoViewer_playPauseVideoLabel => 'تشغيل أو إيقاف الفيديو';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'الوسائط السابقة';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'تحريك موضع الفيديو';
@@ -14263,6 +14269,18 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_cloudSync_provider_googleDrive_subtitle =>
       'المزامنة عبر Google Drive';
+
+  @override
+  String get settings_cloudSync_googleDrive_desktopNotConfigured =>
+      'غير متوفر في هذا الإصدار';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_title =>
+      'تابع في متصفحك';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_message =>
+      'أكمل تسجيل الدخول إلى Google في متصفح الويب الخاص بك، ثم عد إلى Submersion.';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -22584,7 +22602,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get attrLabel_dpv_style => 'النمط';
 
   @override
-  String get attrLabel_burn_time_h => 'زمن التشغيل (ساعة)';
+  String get attrLabel_burn_time_h => 'زمن التشغيل';
 
   @override
   String get attrLabel_battery_type => 'البطارية';

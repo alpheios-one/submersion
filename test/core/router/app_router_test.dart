@@ -7,12 +7,14 @@ import 'package:submersion/core/constants/feature_flags.dart';
 import 'package:submersion/core/router/app_router.dart';
 import 'package:submersion/features/checklists/presentation/pages/checklist_template_edit_page.dart';
 import 'package:submersion/features/checklists/presentation/pages/checklist_templates_page.dart';
+import 'package:submersion/features/dive_log/presentation/pages/dive_search_page.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incident_edit_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incidents_list_page.dart';
 import 'package:submersion/features/safety/presentation/pages/no_fly_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
+import 'package:submersion/features/statistics/presentation/providers/statistics_filter_provider.dart';
 import 'package:submersion/features/settings/presentation/pages/settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -1059,6 +1061,58 @@ void main() {
             '/settings is a bottom-nav destination; switching tabs must not '
             'animate, matching every other tab root.',
       );
+    });
+  });
+
+  group('diveSearch route carries the calling section filter (#1079)', () {
+    // Statistics keeps its own filter, so the advanced search form has to be
+    // told which filter it is editing. The section pushes its provider as the
+    // route `extra`; anything else (deep link, keyboard shortcut) falls back
+    // to the dive list's filter.
+    late BuildContext context;
+
+    DiveSearchPage buildWith(Object? extra) {
+      final route = _findRouteByName(router.configuration.routes, 'diveSearch');
+      expect(route, isNotNull);
+      final widget = route!.builder!(
+        context,
+        GoRouterState(
+          router.configuration,
+          uri: Uri.parse('/dives/search'),
+          matchedLocation: '/dives/search',
+          fullPath: '/dives/search',
+          pathParameters: const {},
+          pageKey: const ValueKey('/dives/search'),
+          extra: extra,
+        ),
+      );
+      expect(widget, isA<DiveSearchPage>());
+      return widget as DiveSearchPage;
+    }
+
+    testWidgets('a pushed filter provider reaches the page', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+      context = tester.element(find.byType(SizedBox));
+
+      expect(
+        buildWith(statisticsFilterProvider).filterProvider,
+        same(statisticsFilterProvider),
+      );
+    });
+
+    testWidgets('no extra falls back to the dive list filter', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+      context = tester.element(find.byType(SizedBox));
+
+      expect(buildWith(null).filterProvider, isNull);
+    });
+
+    testWidgets('an extra of another type falls back too', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+      context = tester.element(find.byType(SizedBox));
+
+      // A stale deep link or an unrelated caller must not crash the route.
+      expect(buildWith('not a provider').filterProvider, isNull);
     });
   });
 }

@@ -12082,6 +12082,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get media_photoViewer_nextTooltip => 'המדיה הבאה';
+
+  @override
   String get media_photoViewer_noPhotosAvailable => 'אין תמונות זמינות';
 
   @override
@@ -12091,6 +12094,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_photoViewer_playPauseVideoLabel => 'הפעל או השהה סרטון';
+
+  @override
+  String get media_photoViewer_previousTooltip => 'המדיה הקודמת';
 
   @override
   String get media_photoViewer_seekVideoLabel => 'דלג למיקום בסרטון';
@@ -14164,6 +14170,17 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_cloudSync_provider_googleDrive_subtitle =>
       'סנכרון באמצעות Google Drive';
+
+  @override
+  String get settings_cloudSync_googleDrive_desktopNotConfigured =>
+      'לא זמין בגרסה זו';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_title => 'המשך בדפדפן';
+
+  @override
+  String get settings_cloudSync_googleDrive_browserWait_message =>
+      'סיים את ההתחברות לחשבון Google בדפדפן האינטרנט שלך, ולאחר מכן חזור אל Submersion.';
 
   @override
   String get settings_cloudSync_provider_icloud => 'iCloud';
@@ -22423,7 +22440,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attrLabel_dpv_style => 'סגנון';
 
   @override
-  String get attrLabel_burn_time_h => 'זמן פעולה (שעות)';
+  String get attrLabel_burn_time_h => 'זמן פעולה';
 
   @override
   String get attrLabel_battery_type => 'סוללה';

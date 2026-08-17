@@ -252,6 +252,35 @@ final selectedCloudProviderTypeProvider = StateProvider<CloudProviderType?>(
   (ref) => null,
 );
 
+/// Whether Google Drive can be offered on this platform/build. True on
+/// iOS/macOS/Android; on Windows/Linux only when the Desktop-app OAuth
+/// client is compiled in (GoogleDriveClientConfig).
+final googleDriveAvailableProvider = FutureProvider<bool>((ref) {
+  return cloudProviderInstanceFor(CloudProviderType.googledrive).isAvailable();
+});
+
+/// Signed-in Google account email for the provider tile subtitle, or null
+/// when Google Drive is not the selected provider, is not authenticated, or
+/// no account is known.
+///
+/// Selecting `isAuthenticated` serves two purposes, and the value matters as
+/// much as the subscription. As a subscription it re-runs on connect and
+/// sign-out without re-running on every sync progress tick. As a value it
+/// suppresses a STALE subtitle: GoogleSignInAuthenticator.handleAuthFailure()
+/// deliberately keeps `_currentUser` so a transient token refresh cannot blank
+/// a still-valid account, which means getUserEmail() keeps returning an
+/// address after a revoked grant. Without this gate the tile would keep
+/// advertising a connected account that can no longer sync.
+final googleDriveAccountEmailProvider = FutureProvider<String?>((ref) async {
+  final type = ref.watch(selectedCloudProviderTypeProvider);
+  if (type != CloudProviderType.googledrive) return null;
+  final isAuthenticated = ref.watch(
+    syncStateProvider.select((s) => s.isAuthenticated),
+  );
+  if (!isAuthenticated) return null;
+  return cloudProviderInstanceFor(CloudProviderType.googledrive).getUserEmail();
+});
+
 /// The sync account for [type]. The pre-account selection UI picks provider
 /// TYPES; this shim maps a type onto the accounts model so selection state
 /// stays consistent until the Phase 3 UI selects accounts directly.

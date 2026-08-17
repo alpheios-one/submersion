@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_bu
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/terrain_ceiling.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 
@@ -226,6 +227,11 @@ ContourBuildResult buildContourLayers({
       (grid.originLat + grid.cellSizeLatDeg * r - center.latitude) *
       BathymetryTerrainBuilder.metersPerDegLat;
 
+  final ceiling = TerrainCeiling(
+    grid: grid,
+    center: center,
+    projection: projection,
+  );
   final layers = <SceneLayer>[];
   final labels = <ContourLabelSpec>[];
   for (final level in levels) {
@@ -252,7 +258,12 @@ ContourBuildResult buildContourLayers({
       sceneLines.add(xyz);
       layers.add(
         SceneLayer(
-          _ribbonMesh(xyz, isMajor: level.isMajor, colorArgb: level.colorArgb),
+          _ribbonMesh(
+            xyz,
+            isMajor: level.isMajor,
+            colorArgb: level.colorArgb,
+            ceiling: ceiling,
+          ),
           overlay: SceneOverlay.contours,
           drapedOnTerrain: true,
         ),
@@ -282,10 +293,16 @@ ContourBuildResult buildContourLayers({
 
 /// A thin horizontal ribbon along a scene-space polyline (constant y), the
 /// same perpendicular-extrusion pattern as SpatialPathBuilder.buildRibbon.
+///
+/// Every vertex also carries a sort height: the ribbon is DRAWN on the
+/// isobath but SORTED at the ceiling of the terrain cell it crosses, so the
+/// rough cells that used to paint over it now lose the comparison. See
+/// [TerrainCeiling].
 MeshData _ribbonMesh(
   List<double> xyz, {
   required bool isMajor,
   required int? colorArgb,
+  required TerrainCeiling ceiling,
 }) {
   final n = xyz.length ~/ 3;
   if (n < 2) {
@@ -303,6 +320,7 @@ MeshData _ribbonMesh(
 
   final positions = Float32List(n * 6);
   final colors = Float32List(n * 6);
+  final sortHeights = Float32List(n * 2);
   for (var i = 0; i < n; i++) {
     final j = i < n - 1 ? i : i - 1;
     var tx = xyz[(j + 1) * 3] - xyz[j * 3];
@@ -324,6 +342,15 @@ MeshData _ribbonMesh(
       colors[vi + s * 3] = color.r;
       colors[vi + s * 3 + 1] = color.g;
       colors[vi + s * 3 + 2] = color.b;
+      // Each edge of the ribbon can straddle a different cell on rough
+      // ground, so each asks for its own ceiling. The same lift that keeps
+      // the ribbon off the mesh keeps its sort height off the ceiling.
+      final si = vi + s * 3;
+      sortHeights[i * 2 + s] = math.max(
+        positions[si + 1],
+        ceiling.atScene(positions[si], positions[si + 2]) +
+            contourLiftSceneUnits,
+      );
     }
   }
   final indices = Uint32List((n - 1) * 6);
@@ -342,6 +369,7 @@ MeshData _ribbonMesh(
     indices: indices,
     colors: colors,
     opacity: opacity,
+    sortHeights: sortHeights,
   );
 }
 

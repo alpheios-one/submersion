@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
+import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 import 'package:submersion/features/media/presentation/pages/photo_picker_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
@@ -27,6 +28,14 @@ class SiteMediaImportHelper {
 
     // Sites have no dive window: open the picker over all time. buffer is
     // zeroed so showPhotoPicker does not widen the range further.
+    //
+    // The target is what makes the Files and URL tabs usable here. Those
+    // tabs persist rows themselves instead of returning a selection, and
+    // without it they fall back to matching against dives, which for a site
+    // meant no commit button at all (issue #1098). They also do not pop with
+    // a result, so `linkSelectedAssets` below sees null and no-ops for them;
+    // that is correct, they have already written their rows, and
+    // mediaForSiteProvider picks the change up through watchMediaChanges.
     // coverage:ignore-start
     // showPhotoPicker drives a full-screen page tied to photo_manager + the
     // platform photo library; not unit-testable from flutter_test.
@@ -36,6 +45,7 @@ class SiteMediaImportHelper {
       diveEndTime: DateTime.now().add(const Duration(days: 1)),
       buffer: Duration.zero,
       alreadyLinkedIds: alreadyLinkedIds,
+      target: SiteAttachTarget(siteId),
     );
     // coverage:ignore-end
     if (!context.mounted) return false;

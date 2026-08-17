@@ -63,7 +63,7 @@ class PlatformGalleryResolver implements MediaSourceResolver {
     if (bytes == null) {
       return const UnavailableData(kind: UnavailableKind.notFound);
     }
-    return BytesData(bytes: bytes);
+    return BytesData(bytes: bytes, servedFrom: ServedFrom.platformGallery);
     // coverage:ignore-end
   }
 
@@ -87,7 +87,11 @@ class PlatformGalleryResolver implements MediaSourceResolver {
     if (bytes == null) {
       return const UnavailableData(kind: UnavailableKind.notFound);
     }
-    return BytesData(bytes: bytes);
+    return BytesData(
+      bytes: bytes,
+      servedFrom: ServedFrom.platformGallery,
+      servedTier: ServedTier.thumbnail,
+    );
   }
 
   /// Runs only on a cache miss.

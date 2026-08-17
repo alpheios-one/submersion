@@ -26,6 +26,7 @@ import 'package:submersion/features/media/presentation/helpers/media_share_helpe
 import 'package:submersion/features/media/presentation/providers/lightroom_providers.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
+import 'package:submersion/features/media/presentation/widgets/media_nav_arrows.dart';
 import 'package:submersion/features/media/presentation/widgets/perdix_overlay/draggable_perdix_overlay.dart';
 import 'package:submersion/features/media/presentation/widgets/perdix_overlay/perdix_face_resolver.dart';
 import 'package:submersion/features/media/presentation/widgets/write_metadata_dialog.dart';
@@ -79,6 +80,11 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
 
   late PageController _pageController;
   int _currentIndex = 0;
+
+  /// The page the last nav request aimed at, which runs ahead of
+  /// [_currentIndex] while the pager is still animating. See [_stepPage].
+  int _navTargetIndex = 0;
+
   bool _showOverlay = true;
 
   /// Live video controllers hoisted from _VideoItem, keyed by media id, so
@@ -112,6 +118,7 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
       (m) => m.id == widget.initialMediaId,
     );
     _currentIndex = initialIndex == -1 ? 0 : initialIndex;
+    _navTargetIndex = _currentIndex;
     _pageController = PageController(initialPage: _currentIndex);
 
     // Set immersive mode for full-screen experience
@@ -130,6 +137,57 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
       overlays: SystemUiOverlay.values,
     );
     super.dispose();
+  }
+
+  /// Steps [delta] pages from the last page *requested*, not the last one
+  /// settled on.
+  ///
+  /// onPageChanged only fires once the pager crosses the halfway point, so
+  /// [_currentIndex] lags an in-flight animation; stepping from it would drop
+  /// the second of two quick presses instead of advancing two items.
+  void _stepPage(int delta) {
+    if (!_pageController.hasClients) return;
+    final count = _pageableMedia.length;
+    if (count == 0) return;
+    // The gallery is live and can shrink under the viewer, stranding the nav
+    // target past the new end. Clamp to the same bounds the arrows and the
+    // page indicator are drawn from, or every press would fall out of range
+    // and navigation would freeze with the controls still showing.
+    final target = _navTargetIndex.clamp(0, count - 1) + delta;
+    // Out-of-range steps do nothing: the ends of the list do not wrap.
+    if (target < 0 || target >= count) return;
+    _navTargetIndex = target;
+    _pageController.animateToPage(
+      target,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// Keyboard navigation for pointer platforms: arrows page, Escape closes.
+  ///
+  /// This node is an ancestor of the video item's own [Focus], which handles
+  /// only the space bar and returns [KeyEventResult.ignored] for everything
+  /// else, so arrows keep working while a video holds focus. Arrow presses are
+  /// reported handled even at the ends of the list, which keeps them from
+  /// falling through to default directional focus traversal.
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+      _stepPage(-1);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+      _stepPage(1);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      Navigator.of(context).maybePop();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -242,7 +300,7 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
               enrichment!.matchConfidence != MatchConfidence.noProfile &&
               perdixResolver.isAvailable;
 
-          return GestureDetector(
+          final viewer = GestureDetector(
             // Swipe down to close (common pattern for fullscreen viewers)
             onVerticalDragEnd: (details) {
               if (details.primaryVelocity != null &&
@@ -257,7 +315,12 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                   mediaList: mediaList,
                   pageController: _pageController,
                   onPageChanged: (index) {
-                    setState(() => _currentIndex = index);
+                    // Swipes and settles both land here, which is what
+                    // re-syncs the nav target after a gesture.
+                    setState(() {
+                      _currentIndex = index;
+                      _navTargetIndex = index;
+                    });
                   },
                   showOverlay: _showOverlay,
                   onToggleOverlay: () =>
@@ -315,6 +378,15 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                               mode: LaunchMode.externalApplication,
                             ),
                           ),
+                  ),
+
+                  // Previous / next controls. Mounted with the rest of the
+                  // chrome, so the tap-to-hide gesture takes them away too.
+                  MediaNavArrows(
+                    currentIndex: currentIndex,
+                    totalCount: mediaList.length,
+                    onPrevious: () => _stepPage(-1),
+                    onNext: () => _stepPage(1),
                   ),
 
                   // Mini dive profile overlay (lower right)
@@ -396,6 +468,15 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                   ),
               ],
             ),
+          );
+
+          // Keyboard nav has to wrap the whole viewer to see its key events.
+          // Built as a local above rather than nested inline so the tree it
+          // wraps stays where it is.
+          return Focus(
+            autofocus: true,
+            onKeyEvent: _handleKeyEvent,
+            child: viewer,
           );
         },
       ),
