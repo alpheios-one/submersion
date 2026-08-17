@@ -369,11 +369,13 @@ jobs:
       - name: Run Python guard tests with coverage
         run: |
           mkdir -p coverage
-          guards='scripts/check_proguard_serial_keep.py,scripts/check_native_libs_present.py,scripts/check_jni_local_refs.py,scripts/check_dc_process_isolation.py,scripts/fix_macho_symbol_order.py,scripts/release/sanitize_apple_store_notes.py'
+          guards='scripts/check_proguard_serial_keep.py,scripts/check_native_libs_present.py,scripts/check_bundled_native_assets.py,scripts/check_jni_local_refs.py,scripts/check_dc_process_isolation.py,scripts/fix_macho_symbol_order.py,scripts/release/sanitize_apple_store_notes.py'
           python3 -m coverage run --include="$guards" \
             scripts/check_proguard_serial_keep_test.py
           python3 -m coverage run --append --include="$guards" \
             scripts/check_native_libs_present_test.py
+          python3 -m coverage run --append --include="$guards" \
+            scripts/check_bundled_native_assets_test.py
           python3 -m coverage run --append --include="$guards" \
             scripts/check_jni_local_refs_test.py
           python3 -m coverage run --append --include="$guards" \
@@ -922,6 +924,12 @@ jobs:
       - name: Build Linux
         run: flutter build linux --release "${{ env.DART_DEFINES }}" -v
 
+      - name: Check bundled native assets
+        # Same guard as the Windows job. Linux uses the stock Flutter install
+        # rule and has always bundled its libraries, so this doubles as the
+        # positive control that the check is not vacuously passing.
+        run: python3 scripts/check_bundled_native_assets.py build/linux/x64/release/bundle
+
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v7
         if: >
@@ -997,6 +1005,14 @@ jobs:
 
       - name: Build Windows
         run: flutter build windows --release "${{ env.DART_DEFINES }}" -v
+
+      - name: Check bundled native assets
+        # A Windows build that never bundles sqlcipher.dll still compiles,
+        # packages and ships; it only fails when a user launches it (issue
+        # #1129). CI builds but never launches, so this is the step that has to
+        # notice. Windows runners expose the interpreter as `python`, not the
+        # `python3` the Linux guard steps use.
+        run: python scripts/check_bundled_native_assets.py build\windows\x64\runner\Release
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v7

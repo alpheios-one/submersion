@@ -72,6 +72,12 @@ SeascapeAxes buildSeascapeAxes({
   final z0 = p.zOf(minNorth);
   final z1 = p.zOf(maxNorth);
   final yBottom = p.yOf(maxDepthMeters);
+  // Ticks poke OUTWARD, away from the terrain. The map frame runs Z south
+  // (see SpatialProjection), so z0 is the LARGER scene Z; deriving each
+  // sign from the axis itself keeps the ticks outside the grid whichever
+  // way the frame points.
+  final xTick = x0 + (x0 - x1).sign * tickLen;
+  final zTick = z0 + (z0 - z1).sign * tickLen;
 
   final segments = <AxisSegment>[
     AxisSegment(AxisRole.axisX, x0, 0, z0, x1, 0, z0),
@@ -103,7 +109,7 @@ SeascapeAxes buildSeascapeAxes({
     divisions: 5,
     emit: (meters, text) {
       final x = p.xOf(minEast + meters);
-      segments.add(AxisSegment(AxisRole.tickX, x, 0, z0, x, 0, z0 - tickLen));
+      segments.add(AxisSegment(AxisRole.tickX, x, 0, z0, x, 0, zTick));
       labels.add(AxisLabel(AxisLabelKind.tick, x, 0, z0, text));
     },
   );
@@ -112,7 +118,7 @@ SeascapeAxes buildSeascapeAxes({
     divisions: 5,
     emit: (meters, text) {
       final z = p.zOf(minNorth + meters);
-      segments.add(AxisSegment(AxisRole.tickZ, x0, 0, z, x0 - tickLen, 0, z));
+      segments.add(AxisSegment(AxisRole.tickZ, x0, 0, z, xTick, 0, z));
       labels.add(AxisLabel(AxisLabelKind.tick, x0, 0, z, text));
     },
   );
@@ -121,7 +127,7 @@ SeascapeAxes buildSeascapeAxes({
     divisions: 4,
     emit: (meters, text) {
       final y = p.yOf(meters);
-      segments.add(AxisSegment(AxisRole.tickY, x0, y, z0, x0 - tickLen, y, z0));
+      segments.add(AxisSegment(AxisRole.tickY, x0, y, z0, xTick, y, z0));
       labels.add(AxisLabel(AxisLabelKind.tick, x0, y, z0, text));
     },
   );
