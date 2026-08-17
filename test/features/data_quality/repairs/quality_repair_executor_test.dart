@@ -318,6 +318,52 @@ void main() {
       expect((await diveRepo.getDiveById('d1'))!.waterTemp, 78);
     });
 
+    test('refuses a scale that does not land the reading in range', () async {
+      // -50 read as Fahrenheit is -45.6 C: still implausible, so converting
+      // would resolve a finding the next scan reopens.
+      await diveRepo.createDive(
+        domain.Dive(
+          id: 'd1',
+          dateTime: DateTime.utc(2026, 7, 1),
+          waterTemp: -50,
+        ),
+      );
+      final finding = await seedFindingForDive('d1');
+
+      final result = await executor.convertWaterTemp(
+        diveId: 'd1',
+        kelvinScale: false,
+        findingId: finding.id,
+      );
+
+      expect(result.changed, isFalse);
+      expect((await diveRepo.getDiveById('d1'))!.waterTemp, -50);
+      expect(await statusOf('d1'), QualityStatus.open);
+    });
+
+    test('refuses when the dive was corrected between scan and tap', () async {
+      // The finding was raised against a bad value, but the diver fixed it by
+      // hand first. Converting a plausible 25 C would turn it into -3.9 C.
+      await diveRepo.createDive(
+        domain.Dive(
+          id: 'd1',
+          dateTime: DateTime.utc(2026, 7, 1),
+          waterTemp: 25,
+        ),
+      );
+      final finding = await seedFindingForDive('d1');
+
+      final result = await executor.convertWaterTemp(
+        diveId: 'd1',
+        kelvinScale: false,
+        findingId: finding.id,
+      );
+
+      expect(result.changed, isFalse);
+      expect((await diveRepo.getDiveById('d1'))!.waterTemp, 25);
+      expect(await statusOf('d1'), QualityStatus.open);
+    });
+
     test('converts a Fahrenheit-as-Kelvin reading', () async {
       await diveRepo.createDive(
         domain.Dive(

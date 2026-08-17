@@ -166,11 +166,20 @@ class QualityRepairExecutor {
     final dive = await _diveRepo.getDiveById(diveId);
     final prior = dive?.waterTemp;
     if (prior == null) return const RepairResult.noChange();
+    // Re-test convergence against the CURRENT value rather than trusting the
+    // finding's params. The dive may have been corrected by hand since the
+    // scan, and converting an already-plausible reading would corrupt it.
+    // Refusing also subsumes the degenerate -40 case, where Celsius and
+    // Fahrenheit coincide and the conversion could never change anything.
+    if (!RepairPredicates.convertedChannelIsPlausible([
+      prior,
+    ], kelvinScale: kelvinScale)) {
+      return const RepairResult.noChange();
+    }
     final converted = RepairPredicates.convertToCelsius(
       prior,
       kelvinScale: kelvinScale,
     );
-    if (converted == prior) return const RepairResult.noChange();
 
     Future<void> write(double value) async {
       await _db.transaction(
