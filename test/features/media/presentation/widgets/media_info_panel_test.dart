@@ -11,6 +11,7 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_provenance.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_provenance_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_serving_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_info_panel.dart';
@@ -56,14 +57,18 @@ MediaItem _item({
 
 /// Reports a fixed result and records what it was asked to verify.
 class _FakeVerifier implements MediaItemVerifier {
-  _FakeVerifier(this.result);
+  _FakeVerifier(this.result, {this.onVerify});
 
   final VerifyResult result;
+
+  /// Stands in for the row write the real verifier performs.
+  final void Function()? onVerify;
   final List<String> verified = [];
 
   @override
   Future<VerifyResult> verify(MediaItem item) async {
     verified.add(item.id);
+    onVerify?.call();
     return result;
   }
 
@@ -108,6 +113,10 @@ void main() {
     MediaStoreIdentity? identity,
     String thisDevice = 'device-here',
     List<dynamic> extra = const [],
+
+    /// Single-element holder so a test can swap the stored row mid-flight,
+    /// which is what a persisted action really does.
+    List<MediaItem>? liveRow,
   }) async {
     // Four stacked sections overflow a default 800x600 surface, and a
     // ListView does not build what is below the fold, so the Serving block
@@ -131,6 +140,11 @@ void main() {
           // UnitFormatter reads the diver's date and time preferences, and
           // the real notifier wants SharedPreferences.
           settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+          // The panel re-reads the row so persisted actions show up; without
+          // an override this would reach for an uninitialised database.
+          mediaByIdProvider.overrideWith(
+            (ref, id) async => liveRow == null ? item : liveRow.first,
+          ),
           ...extra.cast(),
         ],
         child: localizedMaterialApp(
@@ -380,6 +394,42 @@ void main() {
 
       expect(find.text('Not loaded yet'), findsNothing);
       expect(find.text('Local file on this device'), findsOneWidget);
+    });
+  });
+
+  // A persisted action has to change what the panel shows. The provenance
+  // provider is keyed by the MediaItem VALUE, so invalidating it alone
+  // recomputes from the same stale object and the Status row never moves.
+  group('reflects persisted changes', () {
+    testWidgets('Check now updates the status row from the re-read row', (
+      tester,
+    ) async {
+      // The stored row starts unverified and becomes missing once the
+      // verifier has run, exactly as the real write does.
+      final row = [_item()];
+      final verifier = _FakeVerifier(
+        VerifyResult.notFound,
+        onVerify: () => row[0] = _item(
+          isOrphaned: true,
+          lastVerifiedAt: DateTime(2026, 8, 2),
+        ),
+      );
+
+      await pump(
+        tester,
+        _item(),
+        liveRow: row,
+        extra: [mediaItemVerifierProvider.overrideWithValue(verifier)],
+      );
+
+      // Seeded state, before any action.
+      expect(find.text('Not checked yet'), findsOneWidget);
+
+      await tester.tap(find.text('Check now'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Missing from this device'), findsOneWidget);
+      expect(find.text('Not checked yet'), findsNothing);
     });
   });
 
