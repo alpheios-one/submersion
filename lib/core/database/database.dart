@@ -2832,6 +2832,40 @@ class SiteSpecies extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Diver-placed annotations on a dive site (slice 2 of the seascape
+/// usefulness program): wrecks, moorings, entry/exit points,
+/// swim-throughs, hazards, and typical-current arrows. Points only;
+/// optional bearing (current direction, wreck orientation) and optional
+/// depth (meters). Mutable LWW entity: carries its own hlc.
+class SiteFeatures extends Table {
+  TextColumn get id => text()();
+  TextColumn get siteId =>
+      text().references(DiveSites, #id, onDelete: KeyAction.cascade)();
+
+  /// SiteFeatureType enum name. Plain text so rows from a newer build
+  /// with unknown types survive; the UI renders a generic marker.
+  TextColumn get type => text()();
+  TextColumn get name => text().withDefault(const Constant(''))();
+  RealColumn get latitude => real()();
+  RealColumn get longitude => real()();
+
+  /// 0-359 compass degrees; current direction or wreck orientation.
+  RealColumn get bearingDeg => real().nullable()();
+
+  /// Stored meters; displayed in the diver's unit.
+  RealColumn get depthMeters => real().nullable()();
+  TextColumn get notes => text().withDefault(const Constant(''))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  /// Hybrid Logical Clock for cross-device conflict resolution
+  /// (nullable: rows written before HLC rollout fall back to updatedAt).
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 /// Tracks scheduled notifications to enable smart rescheduling
 class ScheduledNotifications extends Table {
   TextColumn get id => text()();
@@ -2967,6 +3001,7 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     TideRecords,
     // Site-species junction
     SiteSpecies,
+    SiteFeatures,
     // Training courses (v1.5)
     Courses,
     // Course requirement tracker (v121)
@@ -3026,7 +3061,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 151;
+  static const int currentSchemaVersion = 152;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3243,6 +3278,9 @@ class AppDatabase extends _$AppDatabase {
     // terrain appearance knobs as one JSON blob, per-diver so they sync.
     // Nullable so pre-v151 rows can adopt the legacy device-local pref.
     151,
+    // v152: site_features (seascape program slice 2): diver-placed
+    // annotations on a site, synced LWW.
+    152,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -8017,6 +8055,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertSeascapeAppearanceColumn();
         }
         if (from < 151) await reportProgress();
+        // v152: site features annotation table (slice 2).
+        if (from < 152) {
+          await createMigrator().createTable(siteFeatures);
+        }
+        if (from < 152) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8101,6 +8144,10 @@ class AppDatabase extends _$AppDatabase {
         // collision self-heal; createTable is idempotent).
         await createMigrator().createTable(courseRequirements);
         await createMigrator().createTable(courseRequirementDives);
+
+        // v152 backstop: site features table (parallel-branch
+        // version-collision self-heal; createTable is idempotent).
+        await createMigrator().createTable(siteFeatures);
 
         // v122 backstop: re-assert service ledger schema + built-in kinds.
         // The legacy backfill is NOT here (onUpgrade only) -- re-running it

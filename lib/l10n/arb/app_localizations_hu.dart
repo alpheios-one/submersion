@@ -22446,6 +22446,63 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Keverék';
 
   @override
+  String get siteFeature_type_wreck => 'Roncs';
+
+  @override
+  String get siteFeature_type_mooring => 'Kikötőbója';
+
+  @override
+  String get siteFeature_type_entry => 'Beszállási pont';
+
+  @override
+  String get siteFeature_type_exit => 'Kiszállási pont';
+
+  @override
+  String get siteFeature_type_swimThrough => 'Átúszó';
+
+  @override
+  String get siteFeature_type_hazard => 'Veszély';
+
+  @override
+  String get siteFeature_type_current => 'Áramlás';
+
+  @override
+  String get siteFeature_sectionTitle => 'Jellemzők';
+
+  @override
+  String get siteFeature_addAction => 'Jellemző hozzáadása';
+
+  @override
+  String get siteFeature_placeHint =>
+      'Koppintson a térképre a jellemző elhelyezéséhez';
+
+  @override
+  String get siteFeature_addTitle => 'Jellemző hozzáadása';
+
+  @override
+  String get siteFeature_editTitle => 'Jellemző szerkesztése';
+
+  @override
+  String get siteFeature_field_name => 'Név';
+
+  @override
+  String get siteFeature_field_bearing => 'Irány (°)';
+
+  @override
+  String get siteFeature_field_depth => 'Mélység';
+
+  @override
+  String get siteFeature_field_notes => 'Jegyzetek';
+
+  @override
+  String get siteFeature_deleteAction => 'Törlés';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'Törli: $name?';
+  }
+
+  @override
   String get siteScape_mode2d => 'Térkép';
 
   @override

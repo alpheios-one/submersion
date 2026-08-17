@@ -466,6 +466,13 @@ class SiteRepository {
           if (media.siteId != null) media.id: media.siteId!,
       };
 
+      final affectedFeatures = await (_db.select(
+        _db.siteFeatures,
+      )..where((t) => t.siteId.isIn(duplicateIds))).get();
+      final featureOriginalSiteIds = {
+        for (final f in affectedFeatures) f.id: f.siteId,
+      };
+
       // Capture raw timestamps for deleted sites (domain entity lacks these)
       final rawSiteRows = await (_db.select(
         _db.diveSites,
@@ -500,6 +507,7 @@ class SiteRepository {
 
         await _relinkDives(duplicateIds, survivorId, now);
         await _relinkMedia(duplicateIds, survivorId, now);
+        await _relinkSiteFeatures(duplicateIds, survivorId, now);
         await _mergeExpectedSpecies(
           orderedSiteIds: orderedIds,
           survivorId: survivorId,
@@ -543,6 +551,7 @@ class SiteRepository {
         deletedSites: deletedSites,
         diveOriginalSiteIds: diveOriginalSiteIds,
         mediaOriginalSiteIds: mediaOriginalSiteIds,
+        featureOriginalSiteIds: featureOriginalSiteIds,
         deletedSpeciesEntries: deletedSpecies,
         modifiedSpeciesEntries: modifiedSpecies,
         deletedSiteTimestamps: {
@@ -647,6 +656,23 @@ class SiteRepository {
           );
           await _syncRepository.markRecordPending(
             entityType: 'media',
+            recordId: entry.key,
+            localUpdatedAt: now,
+          );
+        }
+
+        // 4b. Re-point site features back to their original sites
+        for (final entry in snapshot.featureOriginalSiteIds.entries) {
+          await (_db.update(
+            _db.siteFeatures,
+          )..where((t) => t.id.equals(entry.key))).write(
+            SiteFeaturesCompanion(
+              siteId: Value(entry.value),
+              updatedAt: Value(now),
+            ),
+          );
+          await _syncRepository.markRecordPending(
+            entityType: 'siteFeatures',
             recordId: entry.key,
             localUpdatedAt: now,
           );
@@ -873,6 +899,37 @@ class SiteRepository {
     }
   }
 
+  /// Diver-placed annotations follow their site: a simple re-point with
+  /// no dedupe key (two moorings at one site are legitimate, and any
+  /// genuine duplicates are visible on the map and hand-fixable).
+  Future<void> _relinkSiteFeatures(
+    List<String> duplicateIds,
+    String survivorId,
+    int now,
+  ) async {
+    if (duplicateIds.isEmpty) return;
+
+    final affected = await (_db.select(
+      _db.siteFeatures,
+    )..where((t) => t.siteId.isIn(duplicateIds))).get();
+
+    if (affected.isEmpty) return;
+
+    await (_db.update(
+      _db.siteFeatures,
+    )..where((t) => t.siteId.isIn(duplicateIds))).write(
+      SiteFeaturesCompanion(siteId: Value(survivorId), updatedAt: Value(now)),
+    );
+
+    for (final feature in affected) {
+      await _syncRepository.markRecordPending(
+        entityType: 'siteFeatures',
+        recordId: feature.id,
+        localUpdatedAt: now,
+      );
+    }
+  }
+
   Future<void> _relinkMedia(
     List<String> duplicateIds,
     String survivorId,
@@ -987,6 +1044,9 @@ class MergeSnapshot {
   final List<domain.DiveSite> deletedSites;
   final Map<String, String> diveOriginalSiteIds;
   final Map<String, String> mediaOriginalSiteIds;
+
+  /// Site feature id -> the site it belonged to before the merge.
+  final Map<String, String> featureOriginalSiteIds;
   final List<SiteSpeciesSnapshot> deletedSpeciesEntries;
   final List<SiteSpeciesSnapshot> modifiedSpeciesEntries;
 
@@ -1003,6 +1063,7 @@ class MergeSnapshot {
     required this.deletedSites,
     required this.diveOriginalSiteIds,
     required this.mediaOriginalSiteIds,
+    this.featureOriginalSiteIds = const {},
     required this.deletedSpeciesEntries,
     required this.modifiedSpeciesEntries,
     this.deletedSiteTimestamps = const {},

@@ -22141,6 +22141,62 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dive3d_seascape_appearance_surfaceBlend => 'Blend';
 
   @override
+  String get siteFeature_type_wreck => 'Wreck';
+
+  @override
+  String get siteFeature_type_mooring => 'Mooring';
+
+  @override
+  String get siteFeature_type_entry => 'Entry point';
+
+  @override
+  String get siteFeature_type_exit => 'Exit point';
+
+  @override
+  String get siteFeature_type_swimThrough => 'Swim-through';
+
+  @override
+  String get siteFeature_type_hazard => 'Hazard';
+
+  @override
+  String get siteFeature_type_current => 'Current';
+
+  @override
+  String get siteFeature_sectionTitle => 'Features';
+
+  @override
+  String get siteFeature_addAction => 'Add feature';
+
+  @override
+  String get siteFeature_placeHint => 'Tap the map to place the feature';
+
+  @override
+  String get siteFeature_addTitle => 'Add feature';
+
+  @override
+  String get siteFeature_editTitle => 'Edit feature';
+
+  @override
+  String get siteFeature_field_name => 'Name';
+
+  @override
+  String get siteFeature_field_bearing => 'Bearing (°)';
+
+  @override
+  String get siteFeature_field_depth => 'Depth';
+
+  @override
+  String get siteFeature_field_notes => 'Notes';
+
+  @override
+  String get siteFeature_deleteAction => 'Delete';
+
+  @override
+  String siteFeature_deleteConfirm(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
   String get siteScape_mode2d => 'Map';
 
   @override

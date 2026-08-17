@@ -2,7 +2,14 @@ import 'package:submersion/features/dive_3d/domain/entities/dive_3d_scene_data.d
 import 'package:submersion/features/dive_3d/domain/profile_lookup.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/scene_bounds.dart';
 
-enum SceneMarkerKind { gasSwitch, bookmark, photo, site, nearbySite }
+enum SceneMarkerKind {
+  gasSwitch,
+  bookmark,
+  photo,
+  site,
+  nearbySite,
+  siteFeature,
+}
 
 /// A tappable scene annotation. x/y/z are scene coordinates; depth-time
 /// scenes leave z at 0 (renderers billboard), spatial scenes position

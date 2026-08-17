@@ -15,6 +15,8 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/pages/site_detail_page.dart';
 import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
+import 'package:submersion/features/dive_sites/domain/entities/site_feature.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/site_scape/presentation/site_scape_view.dart';
@@ -374,6 +376,69 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byTooltip('Site Seascape'), findsNothing);
+    });
+  });
+
+  group('SiteDetailPage feature placement', () {
+    const gpsSite = DiveSite(
+      id: 'gps-site',
+      name: 'Salt Pier',
+      location: GeoPoint(12.151, -68.299),
+    );
+
+    testWidgets('the add action opens the fullscreen scape armed to place', (
+      tester,
+    ) async {
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(gpsSite.id).overrideWith((ref) async => gpsSite),
+            siteDiveCountProvider(gpsSite.id).overrideWith((ref) async => 0),
+            bathymetryGridProvider.overrideWith((ref, cell) async => null),
+            siteFeaturesProvider(
+              gpsSite.id,
+            ).overrideWith((ref) async => <SiteFeature>[]),
+          ],
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SiteDetailPage(siteId: gpsSite.id, embedded: true),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(
+        find.byKey(const ValueKey('siteFeatureAddButton')),
+        findsOneWidget,
+      );
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('siteFeatureAddButton')),
+        100,
+      );
+      await tester.tap(find.byKey(const ValueKey('siteFeatureAddButton')));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      // The fullscreen scape opened with the placement hint showing.
+      expect(
+        find.byKey(const ValueKey('siteFeaturePlaceBanner')),
+        findsOneWidget,
+      );
+      expect(find.text('Tap the map to place the feature'), findsOneWidget);
+
+      // Cancelling disarms placement without writing anything.
+      await tester.tap(find.byKey(const ValueKey('siteFeaturePlaceCancel')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(
+        find.byKey(const ValueKey('siteFeaturePlaceBanner')),
+        findsNothing,
+      );
     });
   });
 
