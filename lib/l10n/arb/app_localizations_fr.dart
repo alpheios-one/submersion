@@ -32281,7 +32281,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_status_cloudOnly => 'Stocké uniquement dans le cloud';
 
   @override
-  String get media_status_notBackedUp => 'Non sauvegarde';
+  String get media_status_notBackedUp => 'Non sauvegardé';
 
   @override
   String get media_tile_infoMenuItem => 'Infos du média';

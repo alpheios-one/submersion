@@ -9478,7 +9478,7 @@
   "media_info_checkUnavailable": "No se pudo comprobar ahora",
   "media_info_backupQueued": "En cola para subir",
   "media_status_broken": "Falta y sin copia",
-  "media_status_transferFailed": "Fallo la subida",
+  "media_status_transferFailed": "Falló la subida",
   "media_status_transferring": "Subiendo",
   "media_status_queued": "Esperando para subir",
   "media_status_cloudOnly": "Solo en la nube",

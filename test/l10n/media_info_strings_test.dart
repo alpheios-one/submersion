@@ -8,7 +8,6 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 /// looking fine in CI and wrong to the user.
 void main() {
   /// The 68 strings this feature introduced, resolved for one locale.
-  /// The 68 strings this feature introduced, resolved for one locale.
   List<String> mediaInfoStrings(AppLocalizations l10n) => <String>[
     l10n.media_info_title,
     l10n.media_info_fileSection,

@@ -46,7 +46,10 @@ void main() {
     Intl.defaultLocale = previousDefaultLocale;
   });
 
-  Future<int> pump(
+  /// Tap counter as a mutable list: a returned int would snapshot the value
+  /// at pump time and could never observe a later tap, which is exactly how
+  /// the propagation assertion below was silently vacuous.
+  Future<List<int>> pump(
     WidgetTester tester,
     MediaItem item, {
     bool attached = true,
@@ -57,7 +60,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    var tileTaps = 0;
+    final tileTaps = [0];
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -75,8 +78,13 @@ void main() {
         child: localizedMaterialApp(
           locale: const Locale('en'),
           home: Scaffold(
+            // opaque so the stand-in tile is tappable across its whole
+            // area, the way a real grid tile is: with the default
+            // deferToChild it would only hit-test where the small badge is,
+            // which made the non-propagation counter unobservable.
             body: GestureDetector(
-              onTap: () => tileTaps++,
+              behavior: HitTestBehavior.opaque,
+              onTap: () => tileTaps[0]++,
               child: Center(child: MediaStatusBadge(item: item)),
             ),
           ),
@@ -138,11 +146,30 @@ void main() {
   testWidgets('tapping the badge opens the info panel and not the tile', (
     tester,
   ) async {
-    await pump(tester, _item(missing: true));
+    final tileTaps = await pump(tester, _item(missing: true));
 
     await tester.tap(find.byKey(const Key('media-status-badge')));
     await tester.pumpAndSettle();
 
     expect(find.byType(MediaInfoPanel), findsOneWidget);
+    // The half this test is actually named for. Without it a regression that
+    // let the tap propagate would still pass, because the panel would open
+    // either way.
+    expect(tileTaps[0], 0, reason: 'the tile tap must not also fire');
+  });
+
+  // Proves the counter above is actually wired. Without this, tileTaps could
+  // be zero because nothing ever increments it, and the non-propagation
+  // assertion would be vacuous no matter what the badge did.
+  testWidgets('the surrounding tile tap counter does increment', (
+    tester,
+  ) async {
+    final tileTaps = await pump(tester, _item(missing: true));
+
+    // Away from the centred badge, so this lands on the tile itself.
+    await tester.tapAt(const Offset(20, 20));
+    await tester.pumpAndSettle();
+
+    expect(tileTaps[0], 1);
   });
 }

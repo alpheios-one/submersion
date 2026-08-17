@@ -39,6 +39,11 @@ Future<bool> replaceMediaLink(
   /// the pumps that dismiss the dialog, which deadlocks.
   Future<({String hash, int sizeBytes})> Function(File)? hashFile,
 }) async {
+  // Read before the first await. The picker and the confirm dialog can both
+  // outlive this widget, and touching ref afterwards throws once it is
+  // disposed. Capturing here also means a repair the user already confirmed
+  // still lands if they dismiss the sheet while it applies.
+  final repairService = ref.read(mediaRepairServiceProvider);
   final picked = pickPath ?? _pickImagePath;
   final newPath = await picked();
   if (newPath == null) return false;
@@ -69,7 +74,7 @@ Future<bool> replaceMediaLink(
     if (confirmed != true) return false;
   }
 
-  await ref.read(mediaRepairServiceProvider).apply([
+  await repairService.apply([
     RepairProposal(
       item: item,
       confidence: sameBytes ? RepairConfidence.exact : RepairConfidence.edited,

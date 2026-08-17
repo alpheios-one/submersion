@@ -53220,67 +53220,67 @@ abstract class AppLocalizations {
   /// **'Signature'**
   String get media_info_typeSignature;
 
-  /// No description provided for @media_info_actionCheckNow.
+  /// Media info panel, Origin block: re-checks whether the item's source still resolves
   ///
   /// In en, this message translates to:
   /// **'Check now'**
   String get media_info_actionCheckNow;
 
-  /// No description provided for @media_info_actionLocate.
+  /// Media info panel, Origin block: picks a replacement file for a missing local file
   ///
   /// In en, this message translates to:
   /// **'Locate file...'**
   String get media_info_actionLocate;
 
-  /// No description provided for @media_info_actionBackUpNow.
+  /// Media info panel, Backup block: queues the item for upload
   ///
   /// In en, this message translates to:
   /// **'Back up now'**
   String get media_info_actionBackUpNow;
 
-  /// No description provided for @media_info_actionRetryUpload.
+  /// Media info panel, Backup block: same action as Back up now, shown when the previous upload failed
   ///
   /// In en, this message translates to:
   /// **'Retry upload'**
   String get media_info_actionRetryUpload;
 
-  /// No description provided for @media_info_actionReveal.
+  /// Media info panel, Origin block: opens the platform file manager at the item's path
   ///
   /// In en, this message translates to:
   /// **'Show in file manager'**
   String get media_info_actionReveal;
 
-  /// No description provided for @media_info_actionCopyPath.
+  /// Media info panel, Origin block: copies the source reference to the clipboard
   ///
   /// In en, this message translates to:
   /// **'Copy reference'**
   String get media_info_actionCopyPath;
 
-  /// No description provided for @media_info_referenceCopied.
+  /// Confirmation shown after copying the source reference
   ///
   /// In en, this message translates to:
   /// **'Reference copied'**
   String get media_info_referenceCopied;
 
-  /// No description provided for @media_info_checkFound.
+  /// Result of Check now when the source still resolves
   ///
   /// In en, this message translates to:
   /// **'Source found'**
   String get media_info_checkFound;
 
-  /// No description provided for @media_info_checkMissing.
+  /// Result of Check now when the source is gone
   ///
   /// In en, this message translates to:
   /// **'Source is missing'**
   String get media_info_checkMissing;
 
-  /// No description provided for @media_info_checkUnavailable.
+  /// Result of Check now when nothing could be determined, for example an unmounted volume
   ///
   /// In en, this message translates to:
   /// **'Could not check right now'**
   String get media_info_checkUnavailable;
 
-  /// No description provided for @media_info_backupQueued.
+  /// Confirmation shown after queueing an upload
   ///
   /// In en, this message translates to:
   /// **'Queued for upload'**

@@ -32226,7 +32226,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_status_broken => 'Falta y sin copia';
 
   @override
-  String get media_status_transferFailed => 'Fallo la subida';
+  String get media_status_transferFailed => 'Falló la subida';
 
   @override
   String get media_status_transferring => 'Subiendo';
