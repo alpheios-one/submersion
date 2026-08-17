@@ -18191,5 +18191,5 @@
   },
   "enum_profileMetric_o2CellMv": "O2 Cells",
   "enum_profileMetric_o2CellMv_short": "Cells",
-  "diveLog_o2CellDrift_label": "O2 Cell Drift"
+  "diveLog_o2CellSpread_label": "O2 Cell Spread"
 }

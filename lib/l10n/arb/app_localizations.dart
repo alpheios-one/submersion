@@ -53322,11 +53322,11 @@ abstract class AppLocalizations {
   /// **'Cells'**
   String get enum_profileMetric_o2CellMv_short;
 
-  /// No description provided for @diveLog_o2CellDrift_label.
+  /// No description provided for @diveLog_o2CellSpread_label.
   ///
   /// In en, this message translates to:
-  /// **'O2 Cell Drift'**
-  String get diveLog_o2CellDrift_label;
+  /// **'O2 Cell Spread'**
+  String get diveLog_o2CellSpread_label;
 }
 
 class _AppLocalizationsDelegate

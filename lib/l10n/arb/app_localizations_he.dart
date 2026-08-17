@@ -31564,5 +31564,5 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_profileMetric_o2CellMv_short => 'תאים';
 
   @override
-  String get diveLog_o2CellDrift_label => 'סטיית תאי O2';
+  String get diveLog_o2CellSpread_label => 'פיזור תאי O2';
 }

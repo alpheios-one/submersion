@@ -9489,5 +9489,5 @@
   "media_info_backupQueued": "已加入上传队列",
   "enum_profileMetric_o2CellMv": "O2 电池",
   "enum_profileMetric_o2CellMv_short": "电池",
-  "diveLog_o2CellDrift_label": "氧电池漂移"
+  "diveLog_o2CellSpread_label": "O2电池离散度"
 }

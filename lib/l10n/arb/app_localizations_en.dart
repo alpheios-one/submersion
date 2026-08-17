@@ -31698,5 +31698,5 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_profileMetric_o2CellMv_short => 'Cells';
 
   @override
-  String get diveLog_o2CellDrift_label => 'O2 Cell Drift';
+  String get diveLog_o2CellSpread_label => 'O2 Cell Spread';
 }

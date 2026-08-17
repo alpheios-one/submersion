@@ -31980,5 +31980,5 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_profileMetric_o2CellMv_short => 'Cellen';
 
   @override
-  String get diveLog_o2CellDrift_label => 'O2-celdrift';
+  String get diveLog_o2CellSpread_label => 'O2-celspreiding';
 }

@@ -9489,5 +9489,5 @@
   "media_info_backupQueued": "En cola para subir",
   "enum_profileMetric_o2CellMv": "Células O2",
   "enum_profileMetric_o2CellMv_short": "Células",
-  "diveLog_o2CellDrift_label": "Desviación de células O2"
+  "diveLog_o2CellSpread_label": "Dispersión de células O2"
 }

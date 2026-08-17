@@ -31901,5 +31901,5 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_profileMetric_o2CellMv_short => 'الخلايا';
 
   @override
-  String get diveLog_o2CellDrift_label => 'انحراف خلايا O2';
+  String get diveLog_o2CellSpread_label => 'تشتت خلايا O2';
 }

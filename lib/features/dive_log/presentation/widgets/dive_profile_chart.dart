@@ -1383,7 +1383,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       if (agreement != null) {
         rows.add(
           TooltipRow(
-            label: _l10nO2CellDriftLabel,
+            label: _l10nO2CellSpreadLabel,
             value: agreement,
             bulletColor: _agreementColor(
               o2CellAgreementFor(_o2CellRangeAt(spot.spotIndex)!),
@@ -3337,7 +3337,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                       final agreement = _o2CellAgreementReadout(spot.spotIndex);
                       if (agreement != null) {
                         addRow(
-                          _l10nO2CellDriftLabel,
+                          _l10nO2CellSpreadLabel,
                           agreement,
                           _agreementColor(
                             o2CellAgreementFor(_o2CellRangeAt(spot.spotIndex)!),
@@ -4940,7 +4940,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   };
 
   /// The rug's caption. Held here so the track and the tooltip cannot diverge.
-  String get _l10nO2CellDriftLabel => context.l10n.diveLog_o2CellDrift_label;
+  String get _l10nO2CellSpreadLabel => context.l10n.diveLog_o2CellSpread_label;
 
   String _agreementWord(O2CellAgreement level) => switch (level) {
     O2CellAgreement.tight => context.l10n.diveLog_tooltip_o2CellsTight,
@@ -4986,7 +4986,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
             fontSize: 9,
             color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
           ),
-          labelResolver: (_) => _l10nO2CellDriftLabel,
+          labelResolver: (_) => _l10nO2CellSpreadLabel,
         ),
       ),
     ];

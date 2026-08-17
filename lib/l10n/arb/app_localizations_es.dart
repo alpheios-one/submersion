@@ -32241,5 +32241,5 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enum_profileMetric_o2CellMv_short => 'Células';
 
   @override
-  String get diveLog_o2CellDrift_label => 'Desviación de células O2';
+  String get diveLog_o2CellSpread_label => 'Dispersión de células O2';
 }

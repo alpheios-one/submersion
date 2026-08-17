@@ -32085,5 +32085,5 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_profileMetric_o2CellMv_short => 'Cellák';
 
   @override
-  String get diveLog_o2CellDrift_label => 'O2 cellák eltérése';
+  String get diveLog_o2CellSpread_label => 'O2-cellák szórása';
 }

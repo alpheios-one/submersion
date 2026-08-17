@@ -30361,5 +30361,5 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_profileMetric_o2CellMv_short => '电池';
 
   @override
-  String get diveLog_o2CellDrift_label => '氧电池漂移';
+  String get diveLog_o2CellSpread_label => 'O2电池离散度';
 }

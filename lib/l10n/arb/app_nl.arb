@@ -9489,5 +9489,5 @@
   "media_info_backupQueued": "In wachtrij voor upload",
   "enum_profileMetric_o2CellMv": "O2-cellen",
   "enum_profileMetric_o2CellMv_short": "Cellen",
-  "diveLog_o2CellDrift_label": "O2-celdrift"
+  "diveLog_o2CellSpread_label": "O2-celspreiding"
 }

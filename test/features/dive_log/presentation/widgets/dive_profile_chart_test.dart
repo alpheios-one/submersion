@@ -2959,7 +2959,7 @@ void main() {
       await tester.pump();
 
       if (receivedRows != null) {
-        final row = receivedRows!.where((r) => r.label == 'O2 Cell Drift');
+        final row = receivedRows!.where((r) => r.label == 'O2 Cell Spread');
         expect(row, hasLength(1));
         // 1 mV apart: a verdict of "tight", with the measurement behind it.
         expect(row.single.value, contains('tight'));
