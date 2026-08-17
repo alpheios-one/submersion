@@ -23936,4 +23936,149 @@ class AppLocalizationsHe extends AppLocalizations {
   String marineLife_species_delete_error(String error) {
     return 'שגיאה במחיקת המין: $error';
   }
+
+  @override
+  String get media_info_title => 'פרטי מדיה';
+
+  @override
+  String get media_info_fileSection => 'קובץ';
+
+  @override
+  String get media_info_filename => 'שם הקובץ';
+
+  @override
+  String get media_info_type => 'סוג';
+
+  @override
+  String get media_info_dimensions => 'ממדים';
+
+  @override
+  String get media_info_size => 'גודל';
+
+  @override
+  String get media_info_taken => 'צולם';
+
+  @override
+  String get media_info_coordinates => 'קואורדינטות';
+
+  @override
+  String get media_info_unknown => 'לא ידוע';
+
+  @override
+  String get media_info_originSection => 'מקור';
+
+  @override
+  String get media_info_source => 'מקור';
+
+  @override
+  String get media_info_reference => 'הפניה';
+
+  @override
+  String get media_info_linkedOn => 'קושר במכשיר';
+
+  @override
+  String get media_info_thisDevice => 'מכשיר זה';
+
+  @override
+  String get media_info_otherDevice => 'מכשיר אחר';
+
+  @override
+  String get media_info_status => 'מצב';
+
+  @override
+  String get media_info_statusFound => 'נמצא במכשיר זה';
+
+  @override
+  String get media_info_statusMissing => 'חסר במכשיר זה';
+
+  @override
+  String get media_info_statusUnchecked => 'טרם נבדק';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'נבדק לאחרונה $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'גיבוי';
+
+  @override
+  String get media_info_store => 'אחסון בענן';
+
+  @override
+  String get media_info_storeNotConnected => 'לא מחובר אחסון בענן';
+
+  @override
+  String get media_info_notEligible => 'מקור זה אינו זכאי לגיבוי';
+
+  @override
+  String get media_info_backupFull => 'המקור הועלה';
+
+  @override
+  String get media_info_backupThumbOnly => 'תמונה ממוזערת בלבד, המקור לא נשלח';
+
+  @override
+  String get media_info_backupRenditionOnly => 'גרסה דחוסה הועלתה';
+
+  @override
+  String get media_info_backupNone => 'לא מגובה';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'הועלה $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'ממתין להעלאה';
+
+  @override
+  String get media_info_queueTransferring => 'מעלה כעת';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'ההעלאה נכשלה: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'מוגש כעת';
+
+  @override
+  String get media_info_servingUnobserved => 'טרם נטען';
+
+  @override
+  String get media_info_servingFailed => 'לא ניתן היה לטעון';
+
+  @override
+  String get media_info_servedLocalDisk => 'קובץ מקומי במכשיר זה';
+
+  @override
+  String get media_info_servedGallery => 'ספריית התמונות';
+
+  @override
+  String get media_info_servedStoreCache => 'מטמון מקומי, מהאחסון בענן';
+
+  @override
+  String get media_info_servedStoreNetwork => 'הורד מהאחסון בענן';
+
+  @override
+  String get media_info_servedNetworkUrl => 'הזרמה מכתובת URL';
+
+  @override
+  String get media_info_servedConnectorCache => 'מטמון מקומי, מהשירות המחובר';
+
+  @override
+  String get media_info_servedConnectorNetwork => 'הורד מהשירות המחובר';
+
+  @override
+  String get media_info_servedEmbedded => 'מאוחסן ביומן זה';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'לא ניתן היה להגיע למקור המקורי, ולכן האחסון בענן סיפק זאת.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'תמונה ממוזערת';
+
+  @override
+  String get media_info_servingTierRendition => 'גרסה דחוסה';
 }

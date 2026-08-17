@@ -24456,4 +24456,154 @@ class AppLocalizationsHu extends AppLocalizations {
   String marineLife_species_delete_error(String error) {
     return 'Hiba a faj törlésekor: $error';
   }
+
+  @override
+  String get media_info_title => 'Media info';
+
+  @override
+  String get media_info_fileSection => 'Fajl';
+
+  @override
+  String get media_info_filename => 'Fajlnev';
+
+  @override
+  String get media_info_type => 'Tipus';
+
+  @override
+  String get media_info_dimensions => 'Meretek';
+
+  @override
+  String get media_info_size => 'Meret';
+
+  @override
+  String get media_info_taken => 'Keszult';
+
+  @override
+  String get media_info_coordinates => 'Koordinatak';
+
+  @override
+  String get media_info_unknown => 'Ismeretlen';
+
+  @override
+  String get media_info_originSection => 'Eredet';
+
+  @override
+  String get media_info_source => 'Forras';
+
+  @override
+  String get media_info_reference => 'Hivatkozas';
+
+  @override
+  String get media_info_linkedOn => 'Osszekapcsolva';
+
+  @override
+  String get media_info_thisDevice => 'Ez az eszkoz';
+
+  @override
+  String get media_info_otherDevice => 'Egy masik eszkoz';
+
+  @override
+  String get media_info_status => 'Allapot';
+
+  @override
+  String get media_info_statusFound => 'Megtalalhato ezen az eszkozon';
+
+  @override
+  String get media_info_statusMissing => 'Hianyzik errol az eszkozrol';
+
+  @override
+  String get media_info_statusUnchecked => 'Meg nincs ellenorizve';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Utoljara ellenorizve $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Biztonsagi mentes';
+
+  @override
+  String get media_info_store => 'Felho tarhely';
+
+  @override
+  String get media_info_storeNotConnected =>
+      'Nincs csatlakoztatott felho tarhely';
+
+  @override
+  String get media_info_notEligible => 'Ez a forras nem menthato';
+
+  @override
+  String get media_info_backupFull => 'Eredeti feltoltve';
+
+  @override
+  String get media_info_backupThumbOnly =>
+      'Csak belyegkep, az eredeti nincs elkuldve';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Tomoritett valtozat feltoltve';
+
+  @override
+  String get media_info_backupNone => 'Nincs mentve';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Feltoltve $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'Feltoltesre var';
+
+  @override
+  String get media_info_queueTransferring => 'Feltoltes folyamatban';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'A feltoltes sikertelen: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'Jelenlegi forras';
+
+  @override
+  String get media_info_servingUnobserved => 'Meg nincs betoltve';
+
+  @override
+  String get media_info_servingFailed => 'Nem sikerult betolteni';
+
+  @override
+  String get media_info_servedLocalDisk => 'Helyi fajl ezen az eszkozon';
+
+  @override
+  String get media_info_servedGallery => 'Fotokonyvtar';
+
+  @override
+  String get media_info_servedStoreCache =>
+      'Helyi gyorsitotar, a felho tarhelyrol';
+
+  @override
+  String get media_info_servedStoreNetwork => 'Letoltve a felho tarhelyrol';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Streameles URL-cimrol';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Helyi gyorsitotar, a csatlakoztatott szolgaltatasbol';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Letoltve a csatlakoztatott szolgaltatasbol';
+
+  @override
+  String get media_info_servedEmbedded => 'Ebben a naploban tarolva';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'Az eredeti forras nem volt elerheto, ezert a felho tarhely szolgalta ki.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Belyegkep';
+
+  @override
+  String get media_info_servingTierRendition => 'Tomoritett valtozat';
 }

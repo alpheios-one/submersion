@@ -23310,4 +23310,148 @@ class AppLocalizationsZh extends AppLocalizations {
   String marineLife_species_delete_error(String error) {
     return '删除物种时出错：$error';
   }
+
+  @override
+  String get media_info_title => '媒体信息';
+
+  @override
+  String get media_info_fileSection => '文件';
+
+  @override
+  String get media_info_filename => '文件名';
+
+  @override
+  String get media_info_type => '类型';
+
+  @override
+  String get media_info_dimensions => '尺寸';
+
+  @override
+  String get media_info_size => '大小';
+
+  @override
+  String get media_info_taken => '拍摄时间';
+
+  @override
+  String get media_info_coordinates => '坐标';
+
+  @override
+  String get media_info_unknown => '未知';
+
+  @override
+  String get media_info_originSection => '来源';
+
+  @override
+  String get media_info_source => '源';
+
+  @override
+  String get media_info_reference => '引用';
+
+  @override
+  String get media_info_linkedOn => '关联于';
+
+  @override
+  String get media_info_thisDevice => '此设备';
+
+  @override
+  String get media_info_otherDevice => '其他设备';
+
+  @override
+  String get media_info_status => '状态';
+
+  @override
+  String get media_info_statusFound => '在此设备上找到';
+
+  @override
+  String get media_info_statusMissing => '此设备上缺失';
+
+  @override
+  String get media_info_statusUnchecked => '尚未检查';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return '上次检查 $date';
+  }
+
+  @override
+  String get media_info_backupSection => '备份';
+
+  @override
+  String get media_info_store => '云存储';
+
+  @override
+  String get media_info_storeNotConnected => '未连接云存储';
+
+  @override
+  String get media_info_notEligible => '此来源不支持备份';
+
+  @override
+  String get media_info_backupFull => '已上传原图';
+
+  @override
+  String get media_info_backupThumbOnly => '仅缩略图，原图未发送';
+
+  @override
+  String get media_info_backupRenditionOnly => '已上传压缩版本';
+
+  @override
+  String get media_info_backupNone => '未备份';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return '上传于 $date';
+  }
+
+  @override
+  String get media_info_queuePending => '等待上传';
+
+  @override
+  String get media_info_queueTransferring => '正在上传';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return '上传失败：$error';
+  }
+
+  @override
+  String get media_info_servingSection => '当前来源';
+
+  @override
+  String get media_info_servingUnobserved => '尚未加载';
+
+  @override
+  String get media_info_servingFailed => '无法加载';
+
+  @override
+  String get media_info_servedLocalDisk => '此设备上的本地文件';
+
+  @override
+  String get media_info_servedGallery => '照片库';
+
+  @override
+  String get media_info_servedStoreCache => '本地缓存，来自云存储';
+
+  @override
+  String get media_info_servedStoreNetwork => '从云存储下载';
+
+  @override
+  String get media_info_servedNetworkUrl => '从网址串流';
+
+  @override
+  String get media_info_servedConnectorCache => '本地缓存，来自已连接的服务';
+
+  @override
+  String get media_info_servedConnectorNetwork => '从已连接的服务下载';
+
+  @override
+  String get media_info_servedEmbedded => '存储在此日志中';
+
+  @override
+  String get media_info_servingFallbackNote => '无法访问原始来源，因此由云存储提供。';
+
+  @override
+  String get media_info_servingTierThumbnail => '缩略图';
+
+  @override
+  String get media_info_servingTierRendition => '压缩版本';
 }

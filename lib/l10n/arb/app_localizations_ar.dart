@@ -24113,4 +24113,151 @@ class AppLocalizationsAr extends AppLocalizations {
   String marineLife_species_delete_error(String error) {
     return 'خطأ في حذف النوع: $error';
   }
+
+  @override
+  String get media_info_title => 'معلومات الوسائط';
+
+  @override
+  String get media_info_fileSection => 'الملف';
+
+  @override
+  String get media_info_filename => 'اسم الملف';
+
+  @override
+  String get media_info_type => 'النوع';
+
+  @override
+  String get media_info_dimensions => 'الأبعاد';
+
+  @override
+  String get media_info_size => 'الحجم';
+
+  @override
+  String get media_info_taken => 'تاريخ الالتقاط';
+
+  @override
+  String get media_info_coordinates => 'الإحداثيات';
+
+  @override
+  String get media_info_unknown => 'غير معروف';
+
+  @override
+  String get media_info_originSection => 'المصدر';
+
+  @override
+  String get media_info_source => 'المصدر';
+
+  @override
+  String get media_info_reference => 'المرجع';
+
+  @override
+  String get media_info_linkedOn => 'تم الربط على';
+
+  @override
+  String get media_info_thisDevice => 'هذا الجهاز';
+
+  @override
+  String get media_info_otherDevice => 'جهاز آخر';
+
+  @override
+  String get media_info_status => 'الحالة';
+
+  @override
+  String get media_info_statusFound => 'موجود على هذا الجهاز';
+
+  @override
+  String get media_info_statusMissing => 'غير موجود على هذا الجهاز';
+
+  @override
+  String get media_info_statusUnchecked => 'لم يتم التحقق بعد';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'آخر فحص $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'النسخ الاحتياطي';
+
+  @override
+  String get media_info_store => 'التخزين السحابي';
+
+  @override
+  String get media_info_storeNotConnected => 'لا يوجد تخزين سحابي متصل';
+
+  @override
+  String get media_info_notEligible => 'هذا المصدر غير مؤهل للنسخ الاحتياطي';
+
+  @override
+  String get media_info_backupFull => 'تم رفع الأصل';
+
+  @override
+  String get media_info_backupThumbOnly => 'صورة مصغرة فقط، لم يتم إرسال الأصل';
+
+  @override
+  String get media_info_backupRenditionOnly => 'تم رفع النسخة المضغوطة';
+
+  @override
+  String get media_info_backupNone => 'لا يوجد نسخ احتياطي';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'تم الرفع $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'في انتظار الرفع';
+
+  @override
+  String get media_info_queueTransferring => 'جارٍ الرفع الآن';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'فشل الرفع: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'المصدر الحالي';
+
+  @override
+  String get media_info_servingUnobserved => 'لم يتم التحميل بعد';
+
+  @override
+  String get media_info_servingFailed => 'تعذر التحميل';
+
+  @override
+  String get media_info_servedLocalDisk => 'ملف محلي على هذا الجهاز';
+
+  @override
+  String get media_info_servedGallery => 'مكتبة الصور';
+
+  @override
+  String get media_info_servedStoreCache =>
+      'ذاكرة تخزين محلية، من التخزين السحابي';
+
+  @override
+  String get media_info_servedStoreNetwork => 'تم تنزيله من التخزين السحابي';
+
+  @override
+  String get media_info_servedNetworkUrl => 'بث من رابط';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'ذاكرة تخزين محلية، من الخدمة المتصلة';
+
+  @override
+  String get media_info_servedConnectorNetwork => 'تم تنزيله من الخدمة المتصلة';
+
+  @override
+  String get media_info_servedEmbedded => 'مخزن داخل هذا السجل';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'تعذر الوصول إلى المصدر الأصلي، لذلك تم التقديم من التخزين السحابي.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'صورة مصغرة';
+
+  @override
+  String get media_info_servingTierRendition => 'نسخة مضغوطة';
 }

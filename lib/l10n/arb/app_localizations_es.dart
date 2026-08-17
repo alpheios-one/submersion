@@ -24552,4 +24552,155 @@ class AppLocalizationsEs extends AppLocalizations {
   String marineLife_species_delete_error(String error) {
     return 'Error al eliminar la especie: $error';
   }
+
+  @override
+  String get media_info_title => 'Informacion del medio';
+
+  @override
+  String get media_info_fileSection => 'Archivo';
+
+  @override
+  String get media_info_filename => 'Nombre del archivo';
+
+  @override
+  String get media_info_type => 'Tipo';
+
+  @override
+  String get media_info_dimensions => 'Dimensiones';
+
+  @override
+  String get media_info_size => 'Tamano';
+
+  @override
+  String get media_info_taken => 'Capturada';
+
+  @override
+  String get media_info_coordinates => 'Coordenadas';
+
+  @override
+  String get media_info_unknown => 'Desconocido';
+
+  @override
+  String get media_info_originSection => 'Origen';
+
+  @override
+  String get media_info_source => 'Fuente';
+
+  @override
+  String get media_info_reference => 'Referencia';
+
+  @override
+  String get media_info_linkedOn => 'Vinculada en';
+
+  @override
+  String get media_info_thisDevice => 'Este dispositivo';
+
+  @override
+  String get media_info_otherDevice => 'Otro dispositivo';
+
+  @override
+  String get media_info_status => 'Estado';
+
+  @override
+  String get media_info_statusFound => 'Encontrada en este dispositivo';
+
+  @override
+  String get media_info_statusMissing => 'No esta en este dispositivo';
+
+  @override
+  String get media_info_statusUnchecked => 'Aun sin comprobar';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Ultima comprobacion $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Copia de seguridad';
+
+  @override
+  String get media_info_store => 'Almacen en la nube';
+
+  @override
+  String get media_info_storeNotConnected => 'Sin almacen en la nube conectado';
+
+  @override
+  String get media_info_notEligible =>
+      'Esta fuente no admite copia de seguridad';
+
+  @override
+  String get media_info_backupFull => 'Original subido';
+
+  @override
+  String get media_info_backupThumbOnly =>
+      'Solo miniatura, el original no se envio';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Version comprimida subida';
+
+  @override
+  String get media_info_backupNone => 'Sin copia de seguridad';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Subida $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'Esperando para subir';
+
+  @override
+  String get media_info_queueTransferring => 'Subiendo ahora';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'Fallo la subida: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'Sirviendo ahora';
+
+  @override
+  String get media_info_servingUnobserved => 'Aun no cargada';
+
+  @override
+  String get media_info_servingFailed => 'No se pudo cargar';
+
+  @override
+  String get media_info_servedLocalDisk => 'Archivo local en este dispositivo';
+
+  @override
+  String get media_info_servedGallery => 'Fototeca';
+
+  @override
+  String get media_info_servedStoreCache =>
+      'Cache local, desde el almacen en la nube';
+
+  @override
+  String get media_info_servedStoreNetwork =>
+      'Descargada del almacen en la nube';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Transmitiendo desde una URL';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Cache local, del servicio conectado';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Descargada del servicio conectado';
+
+  @override
+  String get media_info_servedEmbedded => 'Guardada dentro de este cuaderno';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'No se pudo acceder a la fuente original, asi que el almacen en la nube la sirvio.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Miniatura';
+
+  @override
+  String get media_info_servingTierRendition => 'Version comprimida';
 }

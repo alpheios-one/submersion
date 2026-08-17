@@ -24613,4 +24613,155 @@ class AppLocalizationsFr extends AppLocalizations {
   String marineLife_species_delete_error(String error) {
     return 'Erreur lors de la suppression de l\'espèce : $error';
   }
+
+  @override
+  String get media_info_title => 'Infos du media';
+
+  @override
+  String get media_info_fileSection => 'Fichier';
+
+  @override
+  String get media_info_filename => 'Nom du fichier';
+
+  @override
+  String get media_info_type => 'Type';
+
+  @override
+  String get media_info_dimensions => 'Dimensions';
+
+  @override
+  String get media_info_size => 'Taille';
+
+  @override
+  String get media_info_taken => 'Prise le';
+
+  @override
+  String get media_info_coordinates => 'Coordonnees';
+
+  @override
+  String get media_info_unknown => 'Inconnu';
+
+  @override
+  String get media_info_originSection => 'Origine';
+
+  @override
+  String get media_info_source => 'Source';
+
+  @override
+  String get media_info_reference => 'Reference';
+
+  @override
+  String get media_info_linkedOn => 'Liee sur';
+
+  @override
+  String get media_info_thisDevice => 'Cet appareil';
+
+  @override
+  String get media_info_otherDevice => 'Un autre appareil';
+
+  @override
+  String get media_info_status => 'Etat';
+
+  @override
+  String get media_info_statusFound => 'Trouvee sur cet appareil';
+
+  @override
+  String get media_info_statusMissing => 'Absente de cet appareil';
+
+  @override
+  String get media_info_statusUnchecked => 'Pas encore verifiee';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Derniere verification $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Sauvegarde';
+
+  @override
+  String get media_info_store => 'Stockage cloud';
+
+  @override
+  String get media_info_storeNotConnected => 'Aucun stockage cloud connecte';
+
+  @override
+  String get media_info_notEligible =>
+      'Cette source ne peut pas etre sauvegardee';
+
+  @override
+  String get media_info_backupFull => 'Original televerse';
+
+  @override
+  String get media_info_backupThumbOnly =>
+      'Miniature seulement, original non envoye';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Version compressee televersee';
+
+  @override
+  String get media_info_backupNone => 'Non sauvegardee';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Televersee $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'En attente de televersement';
+
+  @override
+  String get media_info_queueTransferring => 'Televersement en cours';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'Echec du televersement : $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'Source actuelle';
+
+  @override
+  String get media_info_servingUnobserved => 'Pas encore chargee';
+
+  @override
+  String get media_info_servingFailed => 'Impossible a charger';
+
+  @override
+  String get media_info_servedLocalDisk => 'Fichier local sur cet appareil';
+
+  @override
+  String get media_info_servedGallery => 'Photheque';
+
+  @override
+  String get media_info_servedStoreCache =>
+      'Cache local, depuis le stockage cloud';
+
+  @override
+  String get media_info_servedStoreNetwork =>
+      'Telechargee depuis le stockage cloud';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Diffusion depuis une URL';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Cache local, depuis le service connecte';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Telechargee depuis le service connecte';
+
+  @override
+  String get media_info_servedEmbedded => 'Stockee dans ce carnet';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'La source d origine etait inaccessible, le stockage cloud a donc pris le relais.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Miniature';
+
+  @override
+  String get media_info_servingTierRendition => 'Version compressee';
 }
