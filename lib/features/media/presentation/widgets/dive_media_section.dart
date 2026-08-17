@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_reposit
 import 'package:submersion/features/media/presentation/helpers/lightroom_scan_helper.dart';
 import 'package:submersion/features/media/presentation/providers/lightroom_providers.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/shared/utils/file_reveal.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/services/media_repair_types.dart';
 import 'package:submersion/features/media/presentation/pages/photo_viewer_page.dart';
@@ -240,19 +241,6 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
   // `Process.run` / `FilePicker.pickFiles` / `showMenu`, none of which are
   // unit-testable from flutter_test. Exercised by manual desktop smoke tests.
 
-  /// Reveals [path] in the platform's native file manager. Failures of the
-  /// spawned process are intentionally swallowed: surfacing them would require
-  /// UX out of scope for the context menu.
-  Future<void> _showInFinder(String path) async {
-    if (Platform.isMacOS) {
-      await Process.run('open', ['-R', path]);
-    } else if (Platform.isWindows) {
-      await Process.run('explorer', ['/select,', path]);
-    } else if (Platform.isLinux) {
-      await Process.run('xdg-open', [File(path).parent.path]);
-    }
-  }
-
   /// Prompts the user to pick a replacement file for [item] and routes the
   /// re-link through the repair engine (Media section Phase 3): the picked
   /// file is hash-verified against the row's content identity, bookmark
@@ -347,7 +335,7 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
     );
 
     if (selected == 'show' && item.localPath != null) {
-      await _showInFinder(item.localPath!);
+      await revealInFileManager(item.localPath!);
     } else if (selected == 'replace') {
       if (!context.mounted) return;
       await _replaceLink(item);
