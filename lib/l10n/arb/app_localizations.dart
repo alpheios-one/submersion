@@ -41166,6 +41166,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Compressed version'**
   String get media_info_servingTierRendition;
+
+  /// No description provided for @media_info_typePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get media_info_typePhoto;
+
+  /// No description provided for @media_info_typeVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get media_info_typeVideo;
+
+  /// No description provided for @media_info_typeDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get media_info_typeDocument;
+
+  /// No description provided for @media_info_typeSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Signature'**
+  String get media_info_typeSignature;
 }
 
 class _AppLocalizationsDelegate

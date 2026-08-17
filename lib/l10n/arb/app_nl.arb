@@ -7469,5 +7469,9 @@
   "media_info_servedEmbedded": "Opgeslagen in dit logboek",
   "media_info_servingFallbackNote": "De oorspronkelijke bron was niet bereikbaar, dus leverde de cloudopslag dit.",
   "media_info_servingTierThumbnail": "Miniatuur",
-  "media_info_servingTierRendition": "Gecomprimeerde versie"
+  "media_info_servingTierRendition": "Gecomprimeerde versie",
+  "media_info_typePhoto": "Foto",
+  "media_info_typeVideo": "Video",
+  "media_info_typeDocument": "Document",
+  "media_info_typeSignature": "Handtekening"
 }

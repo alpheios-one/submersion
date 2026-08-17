@@ -7469,5 +7469,9 @@
   "media_info_servedEmbedded": "מאוחסן ביומן זה",
   "media_info_servingFallbackNote": "לא ניתן היה להגיע למקור המקורי, ולכן האחסון בענן סיפק זאת.",
   "media_info_servingTierThumbnail": "תמונה ממוזערת",
-  "media_info_servingTierRendition": "גרסה דחוסה"
+  "media_info_servingTierRendition": "גרסה דחוסה",
+  "media_info_typePhoto": "תמונה",
+  "media_info_typeVideo": "וידאו",
+  "media_info_typeDocument": "מסמך",
+  "media_info_typeSignature": "חתימה"
 }

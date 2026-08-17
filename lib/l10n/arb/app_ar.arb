@@ -7469,5 +7469,9 @@
   "media_info_servedEmbedded": "مخزن داخل هذا السجل",
   "media_info_servingFallbackNote": "تعذر الوصول إلى المصدر الأصلي، لذلك تم التقديم من التخزين السحابي.",
   "media_info_servingTierThumbnail": "صورة مصغرة",
-  "media_info_servingTierRendition": "نسخة مضغوطة"
+  "media_info_servingTierRendition": "نسخة مضغوطة",
+  "media_info_typePhoto": "صورة",
+  "media_info_typeVideo": "فيديو",
+  "media_info_typeDocument": "مستند",
+  "media_info_typeSignature": "توقيع"
 }

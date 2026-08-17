@@ -102,7 +102,10 @@ class _FileSection extends StatelessWidget {
           label: l10n.media_info_filename,
           value: item.originalFilename ?? unknown,
         ),
-        DiveDetailRow(label: l10n.media_info_type, value: item.mediaType.name),
+        DiveDetailRow(
+          label: l10n.media_info_type,
+          value: mediaTypeLabel(l10n, item.mediaType),
+        ),
         DiveDetailRow(
           label: l10n.media_info_dimensions,
           // Pixels are unit-system invariant, so this is one of the few
@@ -307,6 +310,19 @@ class _ServingSection extends ConsumerWidget {
     return tier == null ? source : '$source ($tier)';
   }
 }
+
+/// Localized name for a media type.
+///
+/// MediaType.name would render the raw enum identifier, so a signature would
+/// read as "instructorSignature" in every language. MediaType.displayName is
+/// hardcoded English, which is no better in a panel that is localized
+/// everywhere else.
+String mediaTypeLabel(AppLocalizations l10n, MediaType type) => switch (type) {
+  MediaType.photo => l10n.media_info_typePhoto,
+  MediaType.video => l10n.media_info_typeVideo,
+  MediaType.document => l10n.media_info_typeDocument,
+  MediaType.instructorSignature => l10n.media_info_typeSignature,
+};
 
 /// Localized name for a source type.
 ///

@@ -15778,5 +15778,9 @@
   "media_info_servedEmbedded": "Stored inside this logbook",
   "media_info_servingFallbackNote": "The original source could not be reached, so the cloud store served this.",
   "media_info_servingTierThumbnail": "Thumbnail",
-  "media_info_servingTierRendition": "Compressed version"
+  "media_info_servingTierRendition": "Compressed version",
+  "media_info_typePhoto": "Photo",
+  "media_info_typeVideo": "Video",
+  "media_info_typeDocument": "Document",
+  "media_info_typeSignature": "Signature"
 }

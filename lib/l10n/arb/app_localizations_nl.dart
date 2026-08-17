@@ -24505,4 +24505,16 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_info_servingTierRendition => 'Gecomprimeerde versie';
+
+  @override
+  String get media_info_typePhoto => 'Foto';
+
+  @override
+  String get media_info_typeVideo => 'Video';
+
+  @override
+  String get media_info_typeDocument => 'Document';
+
+  @override
+  String get media_info_typeSignature => 'Handtekening';
 }

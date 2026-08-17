@@ -24517,7 +24517,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_info_dimensions => 'Abmessungen';
 
   @override
-  String get media_info_size => 'Grosse';
+  String get media_info_size => 'Größe';
 
   @override
   String get media_info_taken => 'Aufgenommen';
@@ -24538,29 +24538,29 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_info_reference => 'Referenz';
 
   @override
-  String get media_info_linkedOn => 'Verknupft auf';
+  String get media_info_linkedOn => 'Verknüpft auf';
 
   @override
-  String get media_info_thisDevice => 'Dieses Gerat';
+  String get media_info_thisDevice => 'Dieses Gerät';
 
   @override
-  String get media_info_otherDevice => 'Ein anderes Gerat';
+  String get media_info_otherDevice => 'Ein anderes Gerät';
 
   @override
   String get media_info_status => 'Status';
 
   @override
-  String get media_info_statusFound => 'Auf diesem Gerat gefunden';
+  String get media_info_statusFound => 'Auf diesem Gerät gefunden';
 
   @override
-  String get media_info_statusMissing => 'Auf diesem Gerat nicht vorhanden';
+  String get media_info_statusMissing => 'Auf diesem Gerät nicht vorhanden';
 
   @override
-  String get media_info_statusUnchecked => 'Noch nicht gepruft';
+  String get media_info_statusUnchecked => 'Noch nicht geprüft';
 
   @override
   String media_info_lastChecked(String date) {
-    return 'Zuletzt gepruft $date';
+    return 'Zuletzt geprüft $date';
   }
 
   @override
@@ -24616,7 +24616,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_info_servingFailed => 'Konnte nicht geladen werden';
 
   @override
-  String get media_info_servedLocalDisk => 'Lokale Datei auf diesem Gerat';
+  String get media_info_servedLocalDisk => 'Lokale Datei auf diesem Gerät';
 
   @override
   String get media_info_servedGallery => 'Fotomediathek';
@@ -24645,11 +24645,23 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_info_servingFallbackNote =>
-      'Die urspruengliche Quelle war nicht erreichbar, daher kam dies aus dem Cloud-Speicher.';
+      'Die ursprüngliche Quelle war nicht erreichbar, daher kam dies aus dem Cloud-Speicher.';
 
   @override
   String get media_info_servingTierThumbnail => 'Miniaturbild';
 
   @override
   String get media_info_servingTierRendition => 'Komprimierte Version';
+
+  @override
+  String get media_info_typePhoto => 'Foto';
+
+  @override
+  String get media_info_typeVideo => 'Video';
+
+  @override
+  String get media_info_typeDocument => 'Dokument';
+
+  @override
+  String get media_info_typeSignature => 'Unterschrift';
 }

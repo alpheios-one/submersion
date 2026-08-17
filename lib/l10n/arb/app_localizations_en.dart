@@ -24278,4 +24278,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_info_servingTierRendition => 'Compressed version';
+
+  @override
+  String get media_info_typePhoto => 'Photo';
+
+  @override
+  String get media_info_typeVideo => 'Video';
+
+  @override
+  String get media_info_typeDocument => 'Document';
+
+  @override
+  String get media_info_typeSignature => 'Signature';
 }

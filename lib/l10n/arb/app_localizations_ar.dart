@@ -24260,4 +24260,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_info_servingTierRendition => 'نسخة مضغوطة';
+
+  @override
+  String get media_info_typePhoto => 'صورة';
+
+  @override
+  String get media_info_typeVideo => 'فيديو';
+
+  @override
+  String get media_info_typeDocument => 'مستند';
+
+  @override
+  String get media_info_typeSignature => 'توقيع';
 }

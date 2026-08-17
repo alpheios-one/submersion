@@ -24554,7 +24554,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get media_info_title => 'Informacion del medio';
+  String get media_info_title => 'Información del medio';
 
   @override
   String get media_info_fileSection => 'Archivo';
@@ -24569,7 +24569,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_info_dimensions => 'Dimensiones';
 
   @override
-  String get media_info_size => 'Tamano';
+  String get media_info_size => 'Tamaño';
 
   @override
   String get media_info_taken => 'Capturada';
@@ -24612,17 +24612,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String media_info_lastChecked(String date) {
-    return 'Ultima comprobacion $date';
+    return 'Última comprobación $date';
   }
 
   @override
   String get media_info_backupSection => 'Copia de seguridad';
 
   @override
-  String get media_info_store => 'Almacen en la nube';
+  String get media_info_store => 'Almacén en la nube';
 
   @override
-  String get media_info_storeNotConnected => 'Sin almacen en la nube conectado';
+  String get media_info_storeNotConnected => 'Sin almacén en la nube conectado';
 
   @override
   String get media_info_notEligible =>
@@ -24633,10 +24633,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_info_backupThumbOnly =>
-      'Solo miniatura, el original no se envio';
+      'Solo miniatura, el original no se envió';
 
   @override
-  String get media_info_backupRenditionOnly => 'Version comprimida subida';
+  String get media_info_backupRenditionOnly => 'Versión comprimida subida';
 
   @override
   String get media_info_backupNone => 'Sin copia de seguridad';
@@ -24654,14 +24654,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String media_info_queueFailed(Object error) {
-    return 'Fallo la subida: $error';
+    return 'Falló la subida: $error';
   }
 
   @override
   String get media_info_servingSection => 'Sirviendo ahora';
 
   @override
-  String get media_info_servingUnobserved => 'Aun no cargada';
+  String get media_info_servingUnobserved => 'Aún no cargada';
 
   @override
   String get media_info_servingFailed => 'No se pudo cargar';
@@ -24674,18 +24674,18 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_info_servedStoreCache =>
-      'Cache local, desde el almacen en la nube';
+      'Caché local, desde el almacén en la nube';
 
   @override
   String get media_info_servedStoreNetwork =>
-      'Descargada del almacen en la nube';
+      'Descargada del almacén en la nube';
 
   @override
   String get media_info_servedNetworkUrl => 'Transmitiendo desde una URL';
 
   @override
   String get media_info_servedConnectorCache =>
-      'Cache local, del servicio conectado';
+      'Caché local, del servicio conectado';
 
   @override
   String get media_info_servedConnectorNetwork =>
@@ -24696,11 +24696,23 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_info_servingFallbackNote =>
-      'No se pudo acceder a la fuente original, asi que el almacen en la nube la sirvio.';
+      'No se pudo acceder a la fuente original, así que el almacén en la nube la sirvió.';
 
   @override
   String get media_info_servingTierThumbnail => 'Miniatura';
 
   @override
-  String get media_info_servingTierRendition => 'Version comprimida';
+  String get media_info_servingTierRendition => 'Versión comprimida';
+
+  @override
+  String get media_info_typePhoto => 'Foto';
+
+  @override
+  String get media_info_typeVideo => 'Vídeo';
+
+  @override
+  String get media_info_typeDocument => 'Documento';
+
+  @override
+  String get media_info_typeSignature => 'Firma';
 }

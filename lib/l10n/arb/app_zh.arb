@@ -7469,5 +7469,9 @@
   "media_info_servedEmbedded": "存储在此日志中",
   "media_info_servingFallbackNote": "无法访问原始来源，因此由云存储提供。",
   "media_info_servingTierThumbnail": "缩略图",
-  "media_info_servingTierRendition": "压缩版本"
+  "media_info_servingTierRendition": "压缩版本",
+  "media_info_typePhoto": "照片",
+  "media_info_typeVideo": "视频",
+  "media_info_typeDocument": "文档",
+  "media_info_typeSignature": "签名"
 }
