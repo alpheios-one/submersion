@@ -7469,5 +7469,16 @@
   "media_info_servedEmbedded": "Ebben a naploban tarolva",
   "media_info_servingFallbackNote": "Az eredeti forras nem volt elerheto, ezert a felho tarhely szolgalta ki.",
   "media_info_servingTierThumbnail": "Belyegkep",
-  "media_info_servingTierRendition": "Tomoritett valtozat"
+  "media_info_servingTierRendition": "Tomoritett valtozat",
+  "media_info_actionCheckNow": "Ellenorzes most",
+  "media_info_actionLocate": "Fajl keresese...",
+  "media_info_actionBackUpNow": "Mentes most",
+  "media_info_actionRetryUpload": "Feltoltes ujra",
+  "media_info_actionReveal": "Megjelenites a fajlkezeloben",
+  "media_info_actionCopyPath": "Hivatkozas masolasa",
+  "media_info_referenceCopied": "Hivatkozas masolva",
+  "media_info_checkFound": "A forras megtalalhato",
+  "media_info_checkMissing": "A forras hianyzik",
+  "media_info_checkUnavailable": "Most nem ellenorizheto",
+  "media_info_backupQueued": "Feltoltesi sorban"
 }

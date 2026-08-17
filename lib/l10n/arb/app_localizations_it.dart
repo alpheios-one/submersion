@@ -24686,4 +24686,37 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get media_info_servingTierRendition => 'Versione compressa';
+
+  @override
+  String get media_info_actionCheckNow => 'Verifica ora';
+
+  @override
+  String get media_info_actionLocate => 'Trova file...';
+
+  @override
+  String get media_info_actionBackUpNow => 'Esegui backup ora';
+
+  @override
+  String get media_info_actionRetryUpload => 'Riprova caricamento';
+
+  @override
+  String get media_info_actionReveal => 'Mostra nel gestore file';
+
+  @override
+  String get media_info_actionCopyPath => 'Copia riferimento';
+
+  @override
+  String get media_info_referenceCopied => 'Riferimento copiato';
+
+  @override
+  String get media_info_checkFound => 'Sorgente trovata';
+
+  @override
+  String get media_info_checkMissing => 'Sorgente mancante';
+
+  @override
+  String get media_info_checkUnavailable => 'Impossibile verificare ora';
+
+  @override
+  String get media_info_backupQueued => 'In coda per il caricamento';
 }

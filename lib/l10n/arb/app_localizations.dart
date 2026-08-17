@@ -41166,6 +41166,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Compressed version'**
   String get media_info_servingTierRendition;
+
+  /// No description provided for @media_info_actionCheckNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Check now'**
+  String get media_info_actionCheckNow;
+
+  /// No description provided for @media_info_actionLocate.
+  ///
+  /// In en, this message translates to:
+  /// **'Locate file...'**
+  String get media_info_actionLocate;
+
+  /// No description provided for @media_info_actionBackUpNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up now'**
+  String get media_info_actionBackUpNow;
+
+  /// No description provided for @media_info_actionRetryUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry upload'**
+  String get media_info_actionRetryUpload;
+
+  /// No description provided for @media_info_actionReveal.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in file manager'**
+  String get media_info_actionReveal;
+
+  /// No description provided for @media_info_actionCopyPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy reference'**
+  String get media_info_actionCopyPath;
+
+  /// No description provided for @media_info_referenceCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference copied'**
+  String get media_info_referenceCopied;
+
+  /// No description provided for @media_info_checkFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Source found'**
+  String get media_info_checkFound;
+
+  /// No description provided for @media_info_checkMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Source is missing'**
+  String get media_info_checkMissing;
+
+  /// No description provided for @media_info_checkUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check right now'**
+  String get media_info_checkUnavailable;
+
+  /// No description provided for @media_info_backupQueued.
+  ///
+  /// In en, this message translates to:
+  /// **'Queued for upload'**
+  String get media_info_backupQueued;
 }
 
 class _AppLocalizationsDelegate

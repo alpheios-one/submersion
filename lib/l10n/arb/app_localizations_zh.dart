@@ -23454,4 +23454,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_info_servingTierRendition => '压缩版本';
+
+  @override
+  String get media_info_actionCheckNow => '立即检查';
+
+  @override
+  String get media_info_actionLocate => '查找文件...';
+
+  @override
+  String get media_info_actionBackUpNow => '立即备份';
+
+  @override
+  String get media_info_actionRetryUpload => '重试上传';
+
+  @override
+  String get media_info_actionReveal => '在文件管理器中显示';
+
+  @override
+  String get media_info_actionCopyPath => '复制引用';
+
+  @override
+  String get media_info_referenceCopied => '引用已复制';
+
+  @override
+  String get media_info_checkFound => '已找到源';
+
+  @override
+  String get media_info_checkMissing => '源缺失';
+
+  @override
+  String get media_info_checkUnavailable => '目前无法检查';
+
+  @override
+  String get media_info_backupQueued => '已加入上传队列';
 }

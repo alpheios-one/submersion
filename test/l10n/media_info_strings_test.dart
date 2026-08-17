@@ -7,7 +7,7 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 /// to English silently, so a locale that never got the keys would ship
 /// looking fine in CI and wrong to the user.
 void main() {
-  /// The 46 strings this feature introduced, resolved for one locale.
+  /// The 57 strings this feature introduced, resolved for one locale.
   List<String> mediaInfoStrings(AppLocalizations l10n) => <String>[
     l10n.media_info_title,
     l10n.media_info_fileSection,
@@ -55,6 +55,17 @@ void main() {
     l10n.media_info_servingFallbackNote,
     l10n.media_info_servingTierThumbnail,
     l10n.media_info_servingTierRendition,
+    l10n.media_info_actionCheckNow,
+    l10n.media_info_actionLocate,
+    l10n.media_info_actionBackUpNow,
+    l10n.media_info_actionRetryUpload,
+    l10n.media_info_actionReveal,
+    l10n.media_info_actionCopyPath,
+    l10n.media_info_referenceCopied,
+    l10n.media_info_checkFound,
+    l10n.media_info_checkMissing,
+    l10n.media_info_checkUnavailable,
+    l10n.media_info_backupQueued,
   ];
 
   test('every supported locale resolves the media info strings', () {

@@ -15778,5 +15778,16 @@
   "media_info_servedEmbedded": "Stored inside this logbook",
   "media_info_servingFallbackNote": "The original source could not be reached, so the cloud store served this.",
   "media_info_servingTierThumbnail": "Thumbnail",
-  "media_info_servingTierRendition": "Compressed version"
+  "media_info_servingTierRendition": "Compressed version",
+  "media_info_actionCheckNow": "Check now",
+  "media_info_actionLocate": "Locate file...",
+  "media_info_actionBackUpNow": "Back up now",
+  "media_info_actionRetryUpload": "Retry upload",
+  "media_info_actionReveal": "Show in file manager",
+  "media_info_actionCopyPath": "Copy reference",
+  "media_info_referenceCopied": "Reference copied",
+  "media_info_checkFound": "Source found",
+  "media_info_checkMissing": "Source is missing",
+  "media_info_checkUnavailable": "Could not check right now",
+  "media_info_backupQueued": "Queued for upload"
 }

@@ -7469,5 +7469,16 @@
   "media_info_servedEmbedded": "In diesem Logbuch gespeichert",
   "media_info_servingFallbackNote": "Die urspruengliche Quelle war nicht erreichbar, daher kam dies aus dem Cloud-Speicher.",
   "media_info_servingTierThumbnail": "Miniaturbild",
-  "media_info_servingTierRendition": "Komprimierte Version"
+  "media_info_servingTierRendition": "Komprimierte Version",
+  "media_info_actionCheckNow": "Jetzt prufen",
+  "media_info_actionLocate": "Datei suchen...",
+  "media_info_actionBackUpNow": "Jetzt sichern",
+  "media_info_actionRetryUpload": "Upload wiederholen",
+  "media_info_actionReveal": "Im Dateimanager anzeigen",
+  "media_info_actionCopyPath": "Referenz kopieren",
+  "media_info_referenceCopied": "Referenz kopiert",
+  "media_info_checkFound": "Quelle gefunden",
+  "media_info_checkMissing": "Quelle fehlt",
+  "media_info_checkUnavailable": "Prufung derzeit nicht moglich",
+  "media_info_backupQueued": "Zum Upload eingereiht"
 }

@@ -24606,4 +24606,37 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_info_servingTierRendition => 'Tomoritett valtozat';
+
+  @override
+  String get media_info_actionCheckNow => 'Ellenorzes most';
+
+  @override
+  String get media_info_actionLocate => 'Fajl keresese...';
+
+  @override
+  String get media_info_actionBackUpNow => 'Mentes most';
+
+  @override
+  String get media_info_actionRetryUpload => 'Feltoltes ujra';
+
+  @override
+  String get media_info_actionReveal => 'Megjelenites a fajlkezeloben';
+
+  @override
+  String get media_info_actionCopyPath => 'Hivatkozas masolasa';
+
+  @override
+  String get media_info_referenceCopied => 'Hivatkozas masolva';
+
+  @override
+  String get media_info_checkFound => 'A forras megtalalhato';
+
+  @override
+  String get media_info_checkMissing => 'A forras hianyzik';
+
+  @override
+  String get media_info_checkUnavailable => 'Most nem ellenorizheto';
+
+  @override
+  String get media_info_backupQueued => 'Feltoltesi sorban';
 }

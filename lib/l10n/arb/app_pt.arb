@@ -7469,5 +7469,16 @@
   "media_info_servedEmbedded": "Armazenada neste diario",
   "media_info_servingFallbackNote": "A fonte original nao pode ser acessada, entao o armazenamento na nuvem forneceu isto.",
   "media_info_servingTierThumbnail": "Miniatura",
-  "media_info_servingTierRendition": "Versao comprimida"
+  "media_info_servingTierRendition": "Versao comprimida",
+  "media_info_actionCheckNow": "Verificar agora",
+  "media_info_actionLocate": "Localizar arquivo...",
+  "media_info_actionBackUpNow": "Fazer backup agora",
+  "media_info_actionRetryUpload": "Tentar envio novamente",
+  "media_info_actionReveal": "Mostrar no gerenciador de arquivos",
+  "media_info_actionCopyPath": "Copiar referencia",
+  "media_info_referenceCopied": "Referencia copiada",
+  "media_info_checkFound": "Fonte encontrada",
+  "media_info_checkMissing": "Fonte ausente",
+  "media_info_checkUnavailable": "Nao foi possivel verificar agora",
+  "media_info_backupQueued": "Na fila para envio"
 }

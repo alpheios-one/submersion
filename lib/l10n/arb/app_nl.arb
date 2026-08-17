@@ -7469,5 +7469,16 @@
   "media_info_servedEmbedded": "Opgeslagen in dit logboek",
   "media_info_servingFallbackNote": "De oorspronkelijke bron was niet bereikbaar, dus leverde de cloudopslag dit.",
   "media_info_servingTierThumbnail": "Miniatuur",
-  "media_info_servingTierRendition": "Gecomprimeerde versie"
+  "media_info_servingTierRendition": "Gecomprimeerde versie",
+  "media_info_actionCheckNow": "Nu controleren",
+  "media_info_actionLocate": "Bestand zoeken...",
+  "media_info_actionBackUpNow": "Nu back-uppen",
+  "media_info_actionRetryUpload": "Upload opnieuw proberen",
+  "media_info_actionReveal": "Tonen in bestandsbeheer",
+  "media_info_actionCopyPath": "Referentie kopieren",
+  "media_info_referenceCopied": "Referentie gekopieerd",
+  "media_info_checkFound": "Bron gevonden",
+  "media_info_checkMissing": "Bron ontbreekt",
+  "media_info_checkUnavailable": "Kon nu niet controleren",
+  "media_info_backupQueued": "In wachtrij voor upload"
 }

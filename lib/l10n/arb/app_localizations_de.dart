@@ -24652,4 +24652,37 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_info_servingTierRendition => 'Komprimierte Version';
+
+  @override
+  String get media_info_actionCheckNow => 'Jetzt prufen';
+
+  @override
+  String get media_info_actionLocate => 'Datei suchen...';
+
+  @override
+  String get media_info_actionBackUpNow => 'Jetzt sichern';
+
+  @override
+  String get media_info_actionRetryUpload => 'Upload wiederholen';
+
+  @override
+  String get media_info_actionReveal => 'Im Dateimanager anzeigen';
+
+  @override
+  String get media_info_actionCopyPath => 'Referenz kopieren';
+
+  @override
+  String get media_info_referenceCopied => 'Referenz kopiert';
+
+  @override
+  String get media_info_checkFound => 'Quelle gefunden';
+
+  @override
+  String get media_info_checkMissing => 'Quelle fehlt';
+
+  @override
+  String get media_info_checkUnavailable => 'Prufung derzeit nicht moglich';
+
+  @override
+  String get media_info_backupQueued => 'Zum Upload eingereiht';
 }

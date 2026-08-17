@@ -7469,5 +7469,16 @@
   "media_info_servedEmbedded": "Stockee dans ce carnet",
   "media_info_servingFallbackNote": "La source d origine etait inaccessible, le stockage cloud a donc pris le relais.",
   "media_info_servingTierThumbnail": "Miniature",
-  "media_info_servingTierRendition": "Version compressee"
+  "media_info_servingTierRendition": "Version compressee",
+  "media_info_actionCheckNow": "Verifier maintenant",
+  "media_info_actionLocate": "Localiser le fichier...",
+  "media_info_actionBackUpNow": "Sauvegarder maintenant",
+  "media_info_actionRetryUpload": "Reessayer le televersement",
+  "media_info_actionReveal": "Afficher dans le gestionnaire de fichiers",
+  "media_info_actionCopyPath": "Copier la reference",
+  "media_info_referenceCopied": "Reference copiee",
+  "media_info_checkFound": "Source trouvee",
+  "media_info_checkMissing": "Source introuvable",
+  "media_info_checkUnavailable": "Verification impossible pour le moment",
+  "media_info_backupQueued": "Mis en file pour televersement"
 }

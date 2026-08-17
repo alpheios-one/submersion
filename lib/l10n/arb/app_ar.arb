@@ -7469,5 +7469,16 @@
   "media_info_servedEmbedded": "مخزن داخل هذا السجل",
   "media_info_servingFallbackNote": "تعذر الوصول إلى المصدر الأصلي، لذلك تم التقديم من التخزين السحابي.",
   "media_info_servingTierThumbnail": "صورة مصغرة",
-  "media_info_servingTierRendition": "نسخة مضغوطة"
+  "media_info_servingTierRendition": "نسخة مضغوطة",
+  "media_info_actionCheckNow": "تحقق الآن",
+  "media_info_actionLocate": "تحديد موقع الملف...",
+  "media_info_actionBackUpNow": "انسخ احتياطيًا الآن",
+  "media_info_actionRetryUpload": "إعادة محاولة الرفع",
+  "media_info_actionReveal": "إظهار في مدير الملفات",
+  "media_info_actionCopyPath": "نسخ المرجع",
+  "media_info_referenceCopied": "تم نسخ المرجع",
+  "media_info_checkFound": "تم العثور على المصدر",
+  "media_info_checkMissing": "المصدر مفقود",
+  "media_info_checkUnavailable": "تعذر التحقق الآن",
+  "media_info_backupQueued": "في قائمة انتظار الرفع"
 }

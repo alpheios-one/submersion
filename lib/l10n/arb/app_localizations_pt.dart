@@ -24688,4 +24688,37 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_info_servingTierRendition => 'Versao comprimida';
+
+  @override
+  String get media_info_actionCheckNow => 'Verificar agora';
+
+  @override
+  String get media_info_actionLocate => 'Localizar arquivo...';
+
+  @override
+  String get media_info_actionBackUpNow => 'Fazer backup agora';
+
+  @override
+  String get media_info_actionRetryUpload => 'Tentar envio novamente';
+
+  @override
+  String get media_info_actionReveal => 'Mostrar no gerenciador de arquivos';
+
+  @override
+  String get media_info_actionCopyPath => 'Copiar referencia';
+
+  @override
+  String get media_info_referenceCopied => 'Referencia copiada';
+
+  @override
+  String get media_info_checkFound => 'Fonte encontrada';
+
+  @override
+  String get media_info_checkMissing => 'Fonte ausente';
+
+  @override
+  String get media_info_checkUnavailable => 'Nao foi possivel verificar agora';
+
+  @override
+  String get media_info_backupQueued => 'Na fila para envio';
 }

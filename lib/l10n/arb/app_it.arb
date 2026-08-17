@@ -7469,5 +7469,16 @@
   "media_info_servedEmbedded": "Salvata in questo diario",
   "media_info_servingFallbackNote": "La sorgente originale non era raggiungibile, quindi ha risposto l archivio cloud.",
   "media_info_servingTierThumbnail": "Miniatura",
-  "media_info_servingTierRendition": "Versione compressa"
+  "media_info_servingTierRendition": "Versione compressa",
+  "media_info_actionCheckNow": "Verifica ora",
+  "media_info_actionLocate": "Trova file...",
+  "media_info_actionBackUpNow": "Esegui backup ora",
+  "media_info_actionRetryUpload": "Riprova caricamento",
+  "media_info_actionReveal": "Mostra nel gestore file",
+  "media_info_actionCopyPath": "Copia riferimento",
+  "media_info_referenceCopied": "Riferimento copiato",
+  "media_info_checkFound": "Sorgente trovata",
+  "media_info_checkMissing": "Sorgente mancante",
+  "media_info_checkUnavailable": "Impossibile verificare ora",
+  "media_info_backupQueued": "In coda per il caricamento"
 }

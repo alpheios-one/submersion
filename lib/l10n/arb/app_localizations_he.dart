@@ -24081,4 +24081,37 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_info_servingTierRendition => 'גרסה דחוסה';
+
+  @override
+  String get media_info_actionCheckNow => 'בדוק עכשיו';
+
+  @override
+  String get media_info_actionLocate => 'אתר קובץ...';
+
+  @override
+  String get media_info_actionBackUpNow => 'גבה עכשיו';
+
+  @override
+  String get media_info_actionRetryUpload => 'נסה להעלות שוב';
+
+  @override
+  String get media_info_actionReveal => 'הצג במנהל הקבצים';
+
+  @override
+  String get media_info_actionCopyPath => 'העתק הפניה';
+
+  @override
+  String get media_info_referenceCopied => 'ההפניה הועתקה';
+
+  @override
+  String get media_info_checkFound => 'המקור נמצא';
+
+  @override
+  String get media_info_checkMissing => 'המקור חסר';
+
+  @override
+  String get media_info_checkUnavailable => 'לא ניתן לבדוק כעת';
+
+  @override
+  String get media_info_backupQueued => 'בתור להעלאה';
 }
