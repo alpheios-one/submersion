@@ -213,7 +213,6 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
     yawDegrees: _yaw,
     pitchDegrees: _pitch,
     zoom: _zoom,
-    mirrorX: widget.chartMode,
   );
 
   // Cached screen projections of the surface grid, recomputed when the camera,
@@ -341,7 +340,6 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
             pitchDegrees: _pitch,
             zoom: _zoom,
             visibleOverlays: widget.visibleOverlays,
-            mirrorX: widget.chartMode,
             terrainImagery: widget.terrainImagery,
             imageryWhiteTexel: widget.imageryWhiteTexel,
           ),
@@ -364,7 +362,6 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
                   zoom: _zoom,
                   scrubPosition: widget.scrubPosition,
                   style: widget.scrubCursor,
-                  mirrorX: widget.chartMode,
                 ),
           child: const SizedBox.expand(),
         );
@@ -407,7 +404,6 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
                   surfaceGrid: hasHover ? widget.surfaceGrid : null,
                   hoverPick: hasHover ? widget.hoverPick : null,
                   contourLabels: widget.contourLabels,
-                  mirrorX: widget.chartMode,
                   panOffset: _pan,
                 ),
                 child: scenePaint,
@@ -551,7 +547,6 @@ class _ScrubCursorPainter extends CustomPainter {
   final double zoom;
   final ValueListenable<double> scrubPosition;
   final ScrubCursorStyle style;
-  final bool mirrorX;
 
   _ScrubCursorPainter({
     required this.scene,
@@ -560,7 +555,6 @@ class _ScrubCursorPainter extends CustomPainter {
     required this.zoom,
     required this.scrubPosition,
     required this.style,
-    this.mirrorX = false,
   }) : super(repaint: scrubPosition);
 
   @override
@@ -575,7 +569,6 @@ class _ScrubCursorPainter extends CustomPainter {
       yawDegrees: yawDegrees,
       pitchDegrees: pitchDegrees,
       zoom: zoom,
-      mirrorX: mirrorX,
     );
     if (style == ScrubCursorStyle.timePlane) {
       final b = scene.bounds;
@@ -608,6 +601,5 @@ class _ScrubCursorPainter extends CustomPainter {
       oldDelegate.yawDegrees != yawDegrees ||
       oldDelegate.pitchDegrees != pitchDegrees ||
       oldDelegate.zoom != zoom ||
-      oldDelegate.style != style ||
-      oldDelegate.mirrorX != mirrorX;
+      oldDelegate.style != style;
 }
