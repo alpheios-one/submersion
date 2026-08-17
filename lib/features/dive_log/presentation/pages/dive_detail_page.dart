@@ -1361,6 +1361,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 Positioned(
                   right: 8,
                   top: 8,
+                  // Decorative label only: no gesture recognizer of its own.
+                  // It is a DESCENDANT of the card's InkWell, so the hit path
+                  // still reaches that ancestor and the whole card stays one
+                  // tap target. Giving this badge its own onTap would carve a
+                  // competing recognizer out of the card (see the badge tap
+                  // test).
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
