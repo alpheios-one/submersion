@@ -444,6 +444,9 @@ class _LocateButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => TextButton(
     onPressed: () async {
       final applied = await replaceMediaLink(context, ref, item);
+      // The picker and confirm dialog can outlive the sheet, and ref after
+      // dispose throws, which would turn a plain user-cancel into an error.
+      if (!context.mounted) return;
       // The repair writes the row, so the panel's origin facts have to be
       // re-read for the status line to stop saying "missing".
       if (applied) ref.invalidate(mediaProvenanceProvider);
@@ -467,22 +470,31 @@ class _BackUpButton extends ConsumerWidget {
     onPressed: () async {
       final messenger = ScaffoldMessenger.of(context);
       final queued = context.l10n.media_info_backupQueued;
+      // Both providers are read before any await, so nothing touches ref
+      // across an async gap that could outlive the sheet.
+      final queue = ref.read(mediaTransferQueueRepositoryProvider);
+      final runtimeFuture = ref.read(mediaStoreRuntimeProvider.future);
+
       try {
-        await ref
-            .read(mediaTransferQueueRepositoryProvider)
-            .enqueueRepairUpload(mediaId: item.id);
-        // Kick the worker so a queued row starts moving rather than waiting
-        // for the next incidental drain. Unawaited: the drain is
-        // long-running and the queue row is already durable.
-        final runtime = await ref.read(mediaStoreRuntimeProvider.future);
-        unawaited(runtime?.worker?.drain() ?? Future<void>.value());
+        await queue.enqueueRepairUpload(mediaId: item.id);
       } on Object {
-        // Building the store runtime reads the keychain and can fail for
-        // reasons unrelated to this item. This is a convenience affordance,
-        // not a promise, so a failure leaves the queue untouched rather than
-        // throwing out of a button tap.
+        // Nothing was queued, so there is nothing to report.
         return;
       }
+
+      // Kick the worker so a queued row starts moving rather than waiting
+      // for the next incidental drain. Its failure is reported separately
+      // from the enqueue on purpose: building the runtime reads the keychain
+      // and can fail for reasons unrelated to this item, and the row IS
+      // queued at that point. Folding the two together would swallow the
+      // confirmation for work that really did get scheduled.
+      try {
+        final runtime = await runtimeFuture;
+        unawaited(runtime?.worker?.drain() ?? Future<void>.value());
+      } on Object {
+        // The row is durable and the next drain will find it.
+      }
+
       if (!context.mounted) return;
       messenger.showSnackBar(SnackBar(content: Text(queued)));
     },

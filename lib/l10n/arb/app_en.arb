@@ -18034,14 +18034,47 @@
   "media_info_typeDocument": "Document",
   "media_info_typeSignature": "Signature",
   "media_info_actionCheckNow": "Check now",
+  "@media_info_actionCheckNow": {
+    "description": "Media info panel, Origin block: re-checks whether the item's source still resolves"
+  },
   "media_info_actionLocate": "Locate file...",
+  "@media_info_actionLocate": {
+    "description": "Media info panel, Origin block: picks a replacement file for a missing local file"
+  },
   "media_info_actionBackUpNow": "Back up now",
+  "@media_info_actionBackUpNow": {
+    "description": "Media info panel, Backup block: queues the item for upload"
+  },
   "media_info_actionRetryUpload": "Retry upload",
+  "@media_info_actionRetryUpload": {
+    "description": "Media info panel, Backup block: same action as Back up now, shown when the previous upload failed"
+  },
   "media_info_actionReveal": "Show in file manager",
+  "@media_info_actionReveal": {
+    "description": "Media info panel, Origin block: opens the platform file manager at the item's path"
+  },
   "media_info_actionCopyPath": "Copy reference",
+  "@media_info_actionCopyPath": {
+    "description": "Media info panel, Origin block: copies the source reference to the clipboard"
+  },
   "media_info_referenceCopied": "Reference copied",
+  "@media_info_referenceCopied": {
+    "description": "Confirmation shown after copying the source reference"
+  },
   "media_info_checkFound": "Source found",
+  "@media_info_checkFound": {
+    "description": "Result of Check now when the source still resolves"
+  },
   "media_info_checkMissing": "Source is missing",
+  "@media_info_checkMissing": {
+    "description": "Result of Check now when the source is gone"
+  },
   "media_info_checkUnavailable": "Could not check right now",
-  "media_info_backupQueued": "Queued for upload"
+  "@media_info_checkUnavailable": {
+    "description": "Result of Check now when nothing could be determined, for example an unmounted volume"
+  },
+  "media_info_backupQueued": "Queued for upload",
+  "@media_info_backupQueued": {
+    "description": "Confirmation shown after queueing an upload"
+  }
 }
