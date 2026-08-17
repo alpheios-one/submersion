@@ -30,6 +30,8 @@ Future<void> _pumpMap(
   required String? siteId,
   List<SiteFeature> features = const [_feature],
   SiteFeatureRepository? repository,
+  MapController? controller,
+  double initialZoom = 14,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -50,9 +52,10 @@ Future<void> _pumpMap(
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: FlutterMap(
-            options: const MapOptions(
-              initialCenter: LatLng(12.15, -68.3),
-              initialZoom: 14,
+            mapController: controller,
+            options: MapOptions(
+              initialCenter: const LatLng(12.15, -68.3),
+              initialZoom: initialZoom,
             ),
             children: [SiteFeatureMarkerLayer(siteId: siteId)],
           ),
@@ -80,16 +83,73 @@ class _RecordingFeatureRepository implements SiteFeatureRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+/// Tap the marker, then step through the info sheet's edit button to the
+/// editor. Two deliberate steps: a marker tap is "show me", not "change me".
+Future<void> _openEditorFromMarker(WidgetTester tester) async {
+  await tester.tap(find.byKey(const ValueKey('siteFeatureMarker-f-1')));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 400));
+  await tester.tap(find.byKey(const ValueKey('siteFeatureInfoEditButton')));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 400));
+}
+
 void main() {
+  testWidgets('a marker tap zooms in and opens the read-only info sheet', (
+    tester,
+  ) async {
+    final controller = MapController();
+    await _pumpMap(tester, siteId: 'site-1', controller: controller);
+
+    await tester.tap(find.byKey(const ValueKey('siteFeatureMarker-f-1')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(controller.camera.zoom, 17.0);
+    expect(
+      controller.camera.center.latitude,
+      closeTo(_feature.latitude, 1e-9),
+      reason: 'the tap should center the feature it zoomed to',
+    );
+    expect(find.byKey(const ValueKey('siteFeatureInfoSheet')), findsOneWidget);
+    expect(find.text('Ebb runs north'), findsOneWidget);
+    // The editor stays behind the sheet's edit button.
+    expect(find.byKey(const ValueKey('siteFeatureSaveButton')), findsNothing);
+  });
+
+  testWidgets('a marker tap never zooms back OUT', (tester) async {
+    final controller = MapController();
+    await _pumpMap(
+      tester,
+      siteId: 'site-1',
+      controller: controller,
+      initialZoom: 18,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('siteFeatureMarker-f-1')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(controller.camera.zoom, 18.0);
+  });
+
+  testWidgets('the info sheet edit button opens the editor', (tester) async {
+    await _pumpMap(tester, siteId: 'site-1');
+
+    await _openEditorFromMarker(tester);
+
+    expect(find.byKey(const ValueKey('siteFeatureSaveButton')), findsOneWidget);
+    // The info sheet closed on the way, rather than stacking underneath.
+    expect(find.byKey(const ValueKey('siteFeatureInfoSheet')), findsNothing);
+  });
+
   testWidgets('saving from a marker tap writes the edit through', (
     tester,
   ) async {
     final repo = _RecordingFeatureRepository();
     await _pumpMap(tester, siteId: 'site-1', repository: repo);
 
-    await tester.tap(find.byKey(const ValueKey('siteFeatureMarker-f-1')));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await _openEditorFromMarker(tester);
     await tester.enterText(
       find.byKey(const ValueKey('siteFeatureNameField')),
       'Flood tide',
@@ -108,9 +168,7 @@ void main() {
     final repo = _RecordingFeatureRepository();
     await _pumpMap(tester, siteId: 'site-1', repository: repo);
 
-    await tester.tap(find.byKey(const ValueKey('siteFeatureMarker-f-1')));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await _openEditorFromMarker(tester);
     await tester.tap(find.byKey(const ValueKey('siteFeatureDeleteButton')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
@@ -128,9 +186,7 @@ void main() {
     final repo = _RecordingFeatureRepository();
     await _pumpMap(tester, siteId: 'site-1', repository: repo);
 
-    await tester.tap(find.byKey(const ValueKey('siteFeatureMarker-f-1')));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await _openEditorFromMarker(tester);
     Navigator.of(
       tester.element(find.byKey(const ValueKey('siteFeatureSaveButton'))),
     ).pop();
@@ -161,9 +217,7 @@ void main() {
     expect(find.byIcon(Icons.place), findsOneWidget);
   });
 
-  testWidgets('renders one rotated marker per feature and edits on tap', (
-    tester,
-  ) async {
+  testWidgets('renders one rotated marker per feature', (tester) async {
     await _pumpMap(tester, siteId: 'site-1');
 
     final marker = find.byKey(const ValueKey('siteFeatureMarker-f-1'));
@@ -173,12 +227,6 @@ void main() {
       find.descendant(of: marker, matching: find.byType(Transform)).first,
     );
     expect(rotate.transform.storage[0], closeTo(math.cos(math.pi / 2), 1e-9));
-
-    await tester.tap(marker);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    // The shared edit sheet opened for this feature.
-    expect(find.byKey(const ValueKey('siteFeatureSaveButton')), findsOneWidget);
   });
 
   testWidgets('null siteId renders nothing', (tester) async {

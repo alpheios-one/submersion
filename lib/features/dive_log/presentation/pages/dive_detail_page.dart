@@ -1356,68 +1356,48 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               ),
               // Content
               content,
-              // Map / 3D pills: deep links into the unified sites map.
+              // View Site button
               if (site != null)
                 Positioned(
                   right: 8,
                   top: 8,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _sitePill(
-                        context,
-                        icon: Icons.map_outlined,
-                        label: context.l10n.diveLog_detail_viewMap,
-                        onTap: () => context.push('/sites/map?site=${site.id}'),
-                      ),
-                      const SizedBox(width: 6),
-                      _sitePill(
-                        context,
-                        icon: Icons.terrain,
-                        label: context.l10n.diveLog_detail_view3d,
-                        onTap: () =>
-                            context.push('/sites/map?site=${site.id}&scape=3d'),
-                      ),
-                    ],
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.arrow_forward,
+                          size: 14,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          context.l10n.diveLog_detail_viewSite,
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// One compact tappable header pill (Map or 3D), styled like the old
-  /// "View Site" badge but carrying its own deep-link tap.
-  Widget _sitePill(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      color: colorScheme.primaryContainer,
-      borderRadius: BorderRadius.circular(16),
-      elevation: 2,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 14, color: colorScheme.onPrimaryContainer),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ],
           ),
         ),

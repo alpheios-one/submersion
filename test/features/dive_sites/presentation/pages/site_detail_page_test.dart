@@ -442,11 +442,11 @@ void main() {
     });
   });
 
-  group('SiteDetailPage embedded 3D history action', () {
+  group('SiteDetailPage 3D history action', () {
     const bareSite = DiveSite(id: 'history-site', name: 'Mystery');
 
-    testWidgets('embedded header shows the 3D history button even without '
-        'coordinates', (tester) async {
+    testWidgets('3D history rides the dives-at-this-site card, not the page '
+        'chrome, and survives a site without coordinates', (tester) async {
       final overrides = await getBaseOverrides();
       await tester.pumpWidget(
         ProviderScope(
@@ -464,10 +464,26 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+
+      final button = find.byKey(const ValueKey('siteCareerTerrainButton'));
+      expect(button, findsOneWidget);
       expect(find.byTooltip('3D History'), findsOneWidget);
+      // It lives on the card built from those dives, not in the page chrome.
+      expect(
+        find.descendant(
+          of: find
+              .ancestor(
+                of: find.text('Dives at this Site'),
+                matching: find.byType(Card),
+              )
+              .first,
+          matching: button,
+        ),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('embedded 3D history button opens the career terrain page', (
+    testWidgets('the 3D history button opens the career terrain page', (
       tester,
     ) async {
       final overrides = await getBaseOverrides();
@@ -889,6 +905,34 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
       // The fullscreen route also renders a FlutterMap.
       expect(find.byType(FlutterMap), findsWidgets);
+    });
+
+    testWidgets('the inline preview carries no 2D/3D toggle', (tester) async {
+      _setMobileTestSurfaceSize(tester);
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(locatedSite.id).overrideWith((_) async => locatedSite),
+            siteDiveCountProvider(locatedSite.id).overrideWith((_) async => 0),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SiteDetailPage(siteId: locatedSite.id),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      // A 200px strip is too small to read a seascape in, so the preview
+      // stays flat 2D; the fullscreen route is the way into 3D.
+      expect(find.byType(SiteScapeView), findsNothing);
+      expect(find.byKey(const ValueKey('siteScape2dButton')), findsNothing);
+      expect(find.byKey(const ValueKey('siteScape3dButton')), findsNothing);
+      expect(find.byIcon(Icons.fullscreen), findsOneWidget);
     });
   });
 

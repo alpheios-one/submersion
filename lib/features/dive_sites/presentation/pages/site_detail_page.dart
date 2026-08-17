@@ -161,9 +161,6 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
   final MapController _previewController = MapController();
   final MapController _fullController = MapController();
 
-  // Ephemeral morph state for the embedded map card; starts in 2D.
-  SiteScapeMode _previewScapeMode = SiteScapeMode.map2d;
-
   @override
   Widget build(BuildContext context) {
     final site = widget.site;
@@ -305,18 +302,6 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                   _showFullscreenMap(context, ref, site, initialScape3d: true),
             ),
           IconButton(
-            icon: const Icon(Icons.view_in_ar),
-            tooltip: context.l10n.dive3d_career_title,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => CareerTerrainPage(
-                  query: careerSiteQuery(siteId),
-                  title: site.name,
-                ),
-              ),
-            ),
-          ),
-          IconButton(
             icon: const Icon(Icons.edit),
             tooltip: context.l10n.diveSites_detail_editTooltip,
             onPressed: () => context.push('/sites/$siteId/edit'),
@@ -390,20 +375,6 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
               onPressed: () =>
                   _showFullscreenMap(context, ref, site, initialScape3d: true),
             ),
-          // Unconditional, matching the standalone AppBar: career terrain is
-          // built from dive profiles, not from the site's coordinates.
-          IconButton(
-            icon: const Icon(Icons.view_in_ar, size: 20),
-            tooltip: context.l10n.dive3d_career_title,
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => CareerTerrainPage(
-                  query: careerSiteQuery(widget.siteId),
-                  title: site.name,
-                ),
-              ),
-            ),
-          ),
           IconButton(
             icon: const Icon(Icons.edit, size: 20),
             tooltip: context.l10n.diveSites_detail_editTooltipShort,
@@ -524,110 +495,105 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
       site.location!.longitude,
     );
 
+    // Flat 2D preview: the seascape lives behind the header's terrain
+    // button and the fullscreen map, both of which open a pane big enough
+    // to read. A 200px strip is not, so it carries no mode toggle.
     return Card(
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
         height: 200,
-        child: SiteScapeView(
-          mode: _previewScapeMode,
-          onModeChanged: (m) => setState(() => _previewScapeMode = m),
-          selectedSiteId: site.id,
-          selectedSiteLocation: site.location,
-          mapController: _previewController,
-          mapBuilder: (context) => Stack(
-            children: [
-              TrackpadZoomMap(
-                controller: _previewController,
-                child: FlutterMap(
-                  mapController: _previewController,
-                  key: ValueKey(
-                    '${site.location!.latitude}_${site.location!.longitude}',
+        child: Stack(
+          children: [
+            TrackpadZoomMap(
+              controller: _previewController,
+              child: FlutterMap(
+                mapController: _previewController,
+                key: ValueKey(
+                  '${site.location!.latitude}_${site.location!.longitude}',
+                ),
+                options: MapOptions(
+                  initialCenter: siteLocation,
+                  initialZoom: 14.0,
+                  minZoom: 2.0,
+                  maxZoom: 18.0,
+                  interactionOptions: const InteractionOptions(
+                    flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
                   ),
-                  options: MapOptions(
-                    initialCenter: siteLocation,
-                    initialZoom: 14.0,
-                    minZoom: 2.0,
-                    maxZoom: 18.0,
-                    interactionOptions: const InteractionOptions(
-                      flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-                    ),
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate: ref.watch(mapTileUrlProvider),
+                    userAgentPackageName: 'app.submersion',
+                    maxZoom: ref.watch(mapTileMaxZoomProvider),
+                    tileProvider: TileCacheService.instance.isInitialized
+                        ? TileCacheService.instance.getTileProvider()
+                        : null,
                   ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: ref.watch(mapTileUrlProvider),
-                      userAgentPackageName: 'app.submersion',
-                      maxZoom: ref.watch(mapTileMaxZoomProvider),
-                      tileProvider: TileCacheService.instance.isInitialized
-                          ? TileCacheService.instance.getTileProvider()
-                          : null,
-                    ),
-                    BathymetryDepthOverlayLayer(location: site.location),
-                    SiteFeatureMarkerLayer(siteId: site.id),
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          point: siteLocation,
-                          width: 50,
-                          height: 50,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: colorScheme.primary,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: colorScheme.onPrimary,
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                  BathymetryDepthOverlayLayer(location: site.location),
+                  SiteFeatureMarkerLayer(siteId: site.id),
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        point: siteLocation,
+                        width: 50,
+                        height: 50,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: colorScheme.onPrimary,
+                              width: 2,
                             ),
-                            child: Center(
-                              child: Icon(
-                                Icons.scuba_diving,
-                                size: 24,
-                                color: colorScheme.onPrimary,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
                               ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.scuba_diving,
+                              size: 24,
+                              color: colorScheme.onPrimary,
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    const MapAttribution(),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  const MapAttribution(),
+                ],
               ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Material(
-                  color: colorScheme.surface.withValues(alpha: 0.9),
-                  borderRadius: BorderRadius.circular(4),
-                  child: Semantics(
-                    button: true,
-                    label: context
-                        .l10n
-                        .diveSites_detail_semantics_viewFullscreenMap,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(4),
-                      onTap: () => _showFullscreenMap(context, ref, site),
-                      child: Padding(
-                        padding: const EdgeInsets.all(6),
-                        child: Icon(
-                          Icons.fullscreen,
-                          size: 20,
-                          color: colorScheme.primary,
-                        ),
+            ),
+            Positioned(
+              right: 8,
+              top: 8,
+              child: Material(
+                color: colorScheme.surface.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(4),
+                child: Semantics(
+                  button: true,
+                  label:
+                      context.l10n.diveSites_detail_semantics_viewFullscreenMap,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(4),
+                    onTap: () => _showFullscreenMap(context, ref, site),
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Icon(
+                        Icons.fullscreen,
+                        size: 20,
+                        color: colorScheme.primary,
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -758,6 +724,23 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                                 ?.copyWith(color: colorScheme.onSurfaceVariant),
                           ),
                         ],
+                      ),
+                    ),
+                    // Career terrain is built from the dives at this site,
+                    // so it belongs to this card rather than the page
+                    // chrome. Unconditional, as it was in the app bar:
+                    // it draws from dive profiles, not site coordinates.
+                    IconButton(
+                      key: const ValueKey('siteCareerTerrainButton'),
+                      icon: const Icon(Icons.view_in_ar),
+                      tooltip: context.l10n.dive3d_career_title,
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => CareerTerrainPage(
+                            query: careerSiteQuery(site.id),
+                            title: site.name,
+                          ),
+                        ),
                       ),
                     ),
                     if (diveCount > 0)

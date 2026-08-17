@@ -4881,12 +4881,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Volledig scherm bekijken';
 
   @override
-  String get diveLog_detail_viewMap => 'Kaart';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => 'Duikstek bekijken';
 
   @override
