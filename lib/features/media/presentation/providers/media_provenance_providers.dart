@@ -1,6 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:submersion/core/data/repositories/sync_repository.dart';
+// Re-exports flutter_riverpod alongside the invalidateSelfWhen extension, so
+// importing both would be redundant.
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_provenance.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
@@ -90,7 +91,13 @@ class MediaStoreIdentity {
 final mediaStoreIdentityProvider = FutureProvider<MediaStoreIdentity?>((
   ref,
 ) async {
-  final descriptor = await ref.watch(mediaStoresRepositoryProvider).getActive();
+  final storesRepository = ref.watch(mediaStoresRepositoryProvider);
+  // Without this the panel would keep reporting whatever store was attached
+  // when it first resolved: connect or disconnect a store and the Backup
+  // block would serve a stale cache. Same tick mediaStoreStatusHintProvider
+  // subscribes to.
+  ref.invalidateSelfWhen(storesRepository.watchStoresChanges());
+  final descriptor = await storesRepository.getActive();
   if (descriptor == null) return null;
   return MediaStoreIdentity(
     providerType: descriptor.providerType,

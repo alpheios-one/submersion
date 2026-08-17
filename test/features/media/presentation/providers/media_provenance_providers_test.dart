@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
@@ -22,12 +24,39 @@ MediaItem _item({
 );
 
 class _FakeStoresRepository implements MediaStoresRepository {
-  _FakeStoresRepository(this._active);
+  _FakeStoresRepository(this._active, {Stream<void>? changes})
+    : _changes = changes ?? const Stream<void>.empty();
 
   final MediaStoreDescriptor? _active;
+  final Stream<void> _changes;
 
   @override
   Future<MediaStoreDescriptor?> getActive() async => _active;
+
+  /// The identity provider subscribes to this so connecting or disconnecting
+  /// a store refreshes the panel instead of serving a stale descriptor.
+  @override
+  Stream<void> watchStoresChanges() => _changes;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} is not stubbed');
+}
+
+/// Returns whatever the supplied closure yields at call time, so a test can
+/// change the answer between reads.
+class _MutableStoresRepository implements MediaStoresRepository {
+  _MutableStoresRepository(this._active, {required Stream<void> changes})
+    : _changes = changes;
+
+  final MediaStoreDescriptor? Function() _active;
+  final Stream<void> _changes;
+
+  @override
+  Future<MediaStoreDescriptor?> getActive() async => _active();
+
+  @override
+  Stream<void> watchStoresChanges() => _changes;
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>
@@ -142,6 +171,40 @@ void main() {
 
       expect(identity!.providerType, 's3');
       expect(identity.displayHint, 'dive-media @ minio.host');
+    });
+
+    // Without a change-tick subscription this provider would keep serving
+    // whatever store was attached when it first resolved, so connecting a
+    // store would leave the panel reporting "no cloud store connected"
+    // indefinitely. The architecture contract test catches the missing
+    // subscription; this proves the wiring actually re-reads.
+    test('re-reads the descriptor when the stores table changes', () async {
+      final changes = StreamController<void>.broadcast();
+      addTearDown(changes.close);
+      var current = <MediaStoreDescriptor?>[null].first;
+      final repo = _MutableStoresRepository(
+        () => current,
+        changes: changes.stream,
+      );
+      final c = _container(
+        extra: [mediaStoresRepositoryProvider.overrideWithValue(repo)],
+      );
+      final sub = c.listen(mediaStoreIdentityProvider, (_, _) {});
+      addTearDown(sub.close);
+
+      expect(await c.read(mediaStoreIdentityProvider.future), isNull);
+
+      current = (
+        id: 's1',
+        providerType: 'dropbox',
+        displayHint: 'Dropbox',
+        lastSweepAt: null,
+      );
+      changes.add(null);
+      await Future<void>.delayed(Duration.zero);
+
+      final identity = await c.read(mediaStoreIdentityProvider.future);
+      expect(identity?.providerType, 'dropbox');
     });
   });
 
