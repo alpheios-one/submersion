@@ -5,6 +5,8 @@ import 'package:submersion/core/services/sync/sync_device_footprint.dart';
 import 'package:submersion/features/settings/presentation/pages/sync_devices_page.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_device_providers.dart';
 
+import '../../../../helpers/l10n_test_helpers.dart';
+
 /// Issue #1032: the user could see 400+ files on Dropbox but nothing in the app
 /// explained them, so the only tool available was the all-or-nothing wipe.
 void main() {
@@ -34,7 +36,10 @@ void main() {
         overrides: [
           syncDeviceFootprintListProvider.overrideWith((ref) async => devices),
         ],
-        child: const MaterialApp(home: SyncDevicesPage()),
+        child: localizedMaterialApp(
+          locale: const Locale('en'),
+          home: const SyncDevicesPage(),
+        ),
       ),
     );
     await tester.pumpAndSettle();

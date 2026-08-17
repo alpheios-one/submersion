@@ -363,8 +363,8 @@ void main() {
       await tester.pumpWidget(_buildList(group: group, selectedIndices: {0}));
       await tester.pump();
 
-      // Header shows "1 / 2 selected · 1 duplicate"
-      expect(find.text('1 / 2 selected \u00b7 1 duplicate'), findsOneWidget);
+      // Header shows "1 of 2 selected · 1 duplicate"
+      expect(find.text('1 of 2 selected \u00b7 1 duplicate'), findsOneWidget);
     });
 
     testWidgets('shows plural duplicates text when more than one duplicate', (
@@ -385,7 +385,7 @@ void main() {
       await tester.pumpWidget(_buildList(group: group, selectedIndices: {0}));
       await tester.pump();
 
-      expect(find.text('1 / 1 selected \u00b7 2 duplicates'), findsOneWidget);
+      expect(find.text('1 of 1 selected \u00b7 2 duplicates'), findsOneWidget);
     });
 
     testWidgets('shows only selected count when no duplicates', (tester) async {
@@ -400,7 +400,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('2 / 2 selected'), findsOneWidget);
+      expect(find.text('2 of 2 selected'), findsOneWidget);
     });
   });
 

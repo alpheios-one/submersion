@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/presentation/widgets/ocean_background.dart';
 import 'package:submersion/core/presentation/widgets/unlock_form.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Full-screen startup lock: splash chrome around an UnlockForm plus the
 /// escape-hatch links (recovery code / open a different database).
 ///
-/// Rendered inside the pre-l10n splash MaterialApp, so strings are plain
-/// English by the same precedent as the splash and migration UI.
+/// Rendered inside the splash MaterialApp, which carries the localization
+/// delegates (see `StartupWrapper.build`), so `context.l10n` resolves here.
 class LockScreenView extends StatelessWidget {
   final Brightness brightness;
   final Future<bool> Function(String secret) onSubmitSecret;
@@ -44,9 +45,9 @@ class LockScreenView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Submersion is locked',
-                    style: TextStyle(
+                  Text(
+                    context.l10n.lock_screen_title,
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -63,12 +64,14 @@ class LockScreenView extends StatelessWidget {
                         if (onUseRecoveryCode != null)
                           TextButton(
                             onPressed: onUseRecoveryCode,
-                            child: const Text('Forgot password?'),
+                            child: Text(
+                              context.l10n.lock_screen_forgotPassword,
+                            ),
                           ),
                         if (onStartFresh != null)
                           TextButton(
                             onPressed: onStartFresh,
-                            child: const Text('Open a different database'),
+                            child: Text(context.l10n.lock_startFresh_title),
                           ),
                       ],
                     ),

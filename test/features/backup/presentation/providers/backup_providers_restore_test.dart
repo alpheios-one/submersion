@@ -165,6 +165,7 @@ void main() {
   }) {
     final container = ProviderContainer(
       overrides: [
+        localeProvider.overrideWithValue('en'),
         sharedPreferencesProvider.overrideWithValue(prefs),
         cloudStorageProviderProvider.overrideWithValue(null),
         if (overrideService) backupServiceProvider.overrideWithValue(service),

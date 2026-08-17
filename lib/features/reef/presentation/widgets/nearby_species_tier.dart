@@ -5,6 +5,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
+import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_color.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
 import 'package:submersion/features/reef/domain/entities/nearby_species.dart';
@@ -90,7 +91,7 @@ class NearbySpeciesTier extends ConsumerWidget {
                 iconForSpeciesCategory(s.category),
                 color: colorForSpeciesCategory(s.category, theme.brightness),
               ),
-              title: Text(s.commonName),
+              title: Text(s.localizedCommonName(context.l10n)),
               subtitle: s.scientificName == null
                   ? null
                   : Text(s.scientificName!),

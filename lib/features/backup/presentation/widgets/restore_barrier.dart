@@ -73,15 +73,15 @@ class _RestoreOverlay extends StatelessWidget {
     final theme = Theme.of(context);
     final sweep = sweepProgress;
 
-    // The provider supplies an English progress string for the swap phases;
-    // fall back to a plain one if it is ever absent. Once the safety sweep
-    // starts, its own localized label takes over.
+    // The provider supplies a localized progress string for the swap phases;
+    // fall back to the plain restoring line if it is ever absent. Once the
+    // safety sweep starts, its own label takes over.
     final label = sweep != null
         ? context.l10n.backup_restore_safetyReview_progress(
             sweep.done,
             sweep.total,
           )
-        : (message ?? 'Restoring backup...');
+        : (message ?? context.l10n.backup_operation_restoring);
 
     // Announce the busy/restoring state to screen readers as a live region, and
     // exclude the inner widgets' own semantics so the state is announced once

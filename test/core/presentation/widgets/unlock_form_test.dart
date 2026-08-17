@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/presentation/widgets/unlock_form.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 void main() {
   testWidgets('submits secret and shows error on rejection', (tester) async {
@@ -9,6 +10,9 @@ void main() {
     var accept = false;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         home: Scaffold(
           body: UnlockForm(
             autoFireBiometric: false,
@@ -39,6 +43,9 @@ void main() {
     var fired = 0;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         home: Scaffold(
           body: UnlockForm(
             autoFireBiometric: false,
@@ -60,6 +67,9 @@ void main() {
     var fired = 0;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         home: Scaffold(
           body: UnlockForm(
             onBiometric: () async {

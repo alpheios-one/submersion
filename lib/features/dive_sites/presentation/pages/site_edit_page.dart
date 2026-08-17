@@ -9,6 +9,7 @@ import 'package:submersion/core/providers/location_service_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -29,6 +30,13 @@ import 'package:submersion/features/weather/presentation/providers/weather_provi
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/forms/edit_form_scaffold.dart';
 import 'package:submersion/shared/widgets/forms/responsive_form_columns.dart';
+
+/// Seeds a depth field at the single decimal place it has always shown, and an
+/// altitude field at the whole units it has always shown, both in the active
+/// locale's decimal separator so the save path can read them back (#1091).
+String _depthForInput(double value) => formatRoundedForInput(value, 1);
+
+String _altitudeForInput(double value) => formatRoundedForInput(value, 0);
 
 class SiteEditPage extends ConsumerStatefulWidget {
   final String? siteId;
@@ -172,9 +180,9 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
       // that predates this feature would otherwise prompt to discard changes.
       final wasApplying = _isApplyingInitialValues;
       _isApplyingInitialValues = true;
-      _altitudeController.text = units
-          .convertAltitude(meters)
-          .toStringAsFixed(0);
+      _altitudeController.text = _altitudeForInput(
+        units.convertAltitude(meters),
+      );
       _isApplyingInitialValues = wasApplying;
     });
   }
@@ -249,10 +257,10 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     _islandController.text = site.island ?? '';
     _bodyOfWaterController.text = site.bodyOfWater ?? '';
     _minDepthController.text = site.minDepth != null
-        ? units.convertDepth(site.minDepth!).toStringAsFixed(1)
+        ? _depthForInput(units.convertDepth(site.minDepth!))
         : '';
     _maxDepthController.text = site.maxDepth != null
-        ? units.convertDepth(site.maxDepth!).toStringAsFixed(1)
+        ? _depthForInput(units.convertDepth(site.maxDepth!))
         : '';
     _latitudeController.text = site.location?.latitude.toString() ?? '';
     _longitudeController.text = site.location?.longitude.toString() ?? '';
@@ -266,7 +274,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     _waterType = site.waterType;
     _isShared = site.isShared;
     _altitudeController.text = site.altitude != null
-        ? units.convertAltitude(site.altitude!).toStringAsFixed(0)
+        ? _altitudeForInput(units.convertAltitude(site.altitude!))
         : '';
     _isApplyingInitialValues = false;
 
@@ -337,7 +345,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
       controller: _minDepthController,
       sites: data.sites,
       getValue: (site) => site.minDepth != null
-          ? units.convertDepth(site.minDepth!).toStringAsFixed(1)
+          ? _depthForInput(units.convertDepth(site.minDepth!))
           : '',
       isMeaningful: (value) => value.trim().isNotEmpty,
     );
@@ -346,7 +354,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
       controller: _maxDepthController,
       sites: data.sites,
       getValue: (site) => site.maxDepth != null
-          ? units.convertDepth(site.maxDepth!).toStringAsFixed(1)
+          ? _depthForInput(units.convertDepth(site.maxDepth!))
           : '',
       isMeaningful: (value) => value.trim().isNotEmpty,
     );
@@ -390,7 +398,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
       controller: _altitudeController,
       sites: data.sites,
       getValue: (site) => site.altitude != null
-          ? units.convertAltitude(site.altitude!).toStringAsFixed(0)
+          ? _altitudeForInput(units.convertAltitude(site.altitude!))
           : '',
       isMeaningful: (value) => value.trim().isNotEmpty,
     );
@@ -659,7 +667,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
 
   String? _altitudeValidatorFn(String? value) {
     if (value != null && value.isNotEmpty) {
-      final altitude = double.tryParse(value);
+      final altitude = parseUserDecimal(value);
       if (altitude == null || altitude < 0) {
         return context.l10n.diveSites_edit_altitude_validation;
       }
@@ -1341,9 +1349,9 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
         }
       }
 
-      final minDepthInput = double.tryParse(_minDepthController.text);
-      final maxDepthInput = double.tryParse(_maxDepthController.text);
-      final altitudeInput = double.tryParse(_altitudeController.text);
+      final minDepthInput = parseUserDecimal(_minDepthController.text);
+      final maxDepthInput = parseUserDecimal(_maxDepthController.text);
+      final altitudeInput = parseUserDecimal(_altitudeController.text);
       final minDepthMeters = minDepthInput != null
           ? units.depthToMeters(minDepthInput)
           : null;

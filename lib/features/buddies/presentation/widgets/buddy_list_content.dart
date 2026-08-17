@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -802,7 +803,7 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
       currentField: sort.field,
       currentDirection: sort.direction,
       fields: BuddySortField.values,
-      getFieldDisplayName: (field) => field.displayName,
+      getFieldDisplayName: (field) => field.localizedName(context.l10n),
       getFieldIcon: (field) => field.icon,
       onSortChanged: (field, direction) {
         ref.read(buddySortProvider.notifier).state = SortState(
@@ -1124,7 +1125,9 @@ class BuddySearchDelegate extends SearchDelegate<Buddy?> {
         );
       },
       errorBuilder: (context, error) {
-        return Center(child: Text('Error: $error'));
+        return Center(
+          child: Text('${context.l10n.common_label_error}: $error'),
+        );
       },
     );
   }

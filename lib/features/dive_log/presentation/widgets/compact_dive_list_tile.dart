@@ -152,6 +152,7 @@ class CompactDiveListTile extends ConsumerWidget {
 
   /// Builds the icon+value or label:value widget for a stat slot.
   Widget _buildStatSlot(
+    BuildContext context,
     DiveField field,
     String formatted,
     TextStyle style,
@@ -176,7 +177,7 @@ class CompactDiveListTile extends ConsumerWidget {
       );
     }
     return Text(
-      '${field.shortLabel}: $formatted',
+      '${field.localizedShortLabel(context.l10n)}: $formatted',
       style: style,
       overflow: TextOverflow.ellipsis,
       maxLines: 1,
@@ -338,6 +339,7 @@ class CompactDiveListTile extends ConsumerWidget {
                       children: [
                         ExcludeSemantics(
                           child: _buildStatSlot(
+                            context,
                             stat1Field,
                             stat1Text,
                             stat1HasValue ? statStyle! : statStyleDim!,
@@ -347,6 +349,7 @@ class CompactDiveListTile extends ConsumerWidget {
                         const SizedBox(width: 14),
                         ExcludeSemantics(
                           child: _buildStatSlot(
+                            context,
                             stat2Field,
                             stat2Text,
                             stat2HasValue ? statStyle! : statStyleDim!,

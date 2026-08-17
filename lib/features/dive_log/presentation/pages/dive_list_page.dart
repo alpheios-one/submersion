@@ -209,13 +209,13 @@ class _DiveListPageState extends ConsumerState<DiveListPage> {
         onMapViewToggle: _toggleMapView,
         columnSettingsAction: IconButton(
           icon: const Icon(Icons.view_column_outlined),
-          tooltip: 'Column settings',
+          tooltip: context.l10n.columnConfig_tooltip_columnSettings,
           onPressed: () => showTableColumnPicker(context),
         ),
         appBarActions: [
           IconButton(
             icon: const Icon(Icons.search, size: 20),
-            tooltip: 'Search dives',
+            tooltip: context.l10n.diveLog_listPage_tooltip_searchDives,
             onPressed: () {
               showSearch(context: context, delegate: DiveSearchDelegate(ref));
             },
@@ -225,7 +225,7 @@ class _DiveListPageState extends ConsumerState<DiveListPage> {
               isLabelVisible: ref.watch(diveFilterProvider).hasActiveFilters,
               child: const Icon(Icons.filter_list, size: 20),
             ),
-            tooltip: 'Filter dives',
+            tooltip: context.l10n.diveLog_listPage_tooltip_filterDives,
             onPressed: () {
               showModalBottomSheet(
                 context: context,
@@ -1074,7 +1074,7 @@ class DiveListTile extends ConsumerWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    '${field.shortLabel}: ',
+                                    '${field.localizedShortLabel(context.l10n)}: ',
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: secondaryTextColor,
@@ -1121,7 +1121,10 @@ class DiveListTile extends ConsumerWidget {
         clipBehavior: Clip.antiAlias,
         child: Semantics(
           button: true,
-          label: 'Dive $diveNumber at ${siteName ?? 'Unknown Site'}',
+          label: context.l10n.diveLog_listPage_semanticsDiveAtSite(
+            diveNumber,
+            siteName ?? context.l10n.diveLog_listPage_unknownSite,
+          ),
           child: InkWell(
             onTap: onTap,
             onDoubleTap: onDoubleTap,
@@ -1179,7 +1182,10 @@ class DiveListTile extends ConsumerWidget {
         color: cardColor,
         child: Semantics(
           button: true,
-          label: 'Dive $diveNumber at ${siteName ?? 'Unknown Site'}',
+          label: context.l10n.diveLog_listPage_semanticsDiveAtSite(
+            diveNumber,
+            siteName ?? context.l10n.diveLog_listPage_unknownSite,
+          ),
           child: InkWell(
             onTap: onTap,
             onDoubleTap: onDoubleTap,
@@ -1231,7 +1237,10 @@ class DiveListTile extends ConsumerWidget {
         ],
       );
     }
-    return Text('${field.shortLabel}: $formatted', style: style);
+    return Text(
+      '${field.localizedShortLabel(context.l10n)}: $formatted',
+      style: style,
+    );
   }
 
   /// Returns the value from the tile's constructor params for known fields.

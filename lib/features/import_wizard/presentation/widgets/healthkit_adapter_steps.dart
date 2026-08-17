@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_import/domain/entities/imported_dive.dart';
 import 'package:submersion/features/dive_import/domain/services/health_import_service.dart';
@@ -119,13 +120,13 @@ class _HealthKitPermissionsStepState
               ),
               const SizedBox(height: 16),
               Text(
-                'HealthKit Access Granted',
+                context.l10n.diveImport_healthkit_accessGranted,
                 style: theme.textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'You can proceed to the next step.',
+                context.l10n.diveImport_healthkit_accessGrantedBody,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -152,14 +153,13 @@ class _HealthKitPermissionsStepState
             ),
             const SizedBox(height: 16),
             Text(
-              'HealthKit Access Required',
+              context.l10n.diveImport_healthkit_accessRequired,
               style: theme.textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Submersion needs access to your Apple Health data to import '
-              'dives recorded by your Apple Watch.',
+              context.l10n.diveImport_healthkit_accessDescription,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -175,7 +175,9 @@ class _HealthKitPermissionsStepState
                     )
                   : const Icon(Icons.health_and_safety),
               label: Text(
-                _isRequesting ? 'Requesting...' : 'Grant HealthKit Access',
+                _isRequesting
+                    ? context.l10n.diveImport_healthkit_requesting
+                    : context.l10n.diveImport_healthkit_grantAccessButton,
               ),
               onPressed: _isRequesting ? null : _requestPermissions,
             ),
@@ -268,10 +270,13 @@ class _HealthKitDateRangeStepState
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Select Date Range', style: theme.textTheme.titleLarge),
+          Text(
+            context.l10n.diveImport_healthkit_selectDateRange,
+            style: theme.textTheme.titleLarge,
+          ),
           const SizedBox(height: 8),
           Text(
-            'Choose the date range to search for dives in Apple Health.',
+            context.l10n.diveImport_healthkit_selectDateRangeBody,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -281,7 +286,7 @@ class _HealthKitDateRangeStepState
             children: [
               Expanded(
                 child: DatePickerButton(
-                  label: 'From',
+                  label: context.l10n.diveImport_healthkit_dateFrom,
                   date: _startDate,
                   dateText: dateFormat.format(_startDate),
                   onTap: _selectStartDate,
@@ -290,7 +295,7 @@ class _HealthKitDateRangeStepState
               const SizedBox(width: 16),
               Expanded(
                 child: DatePickerButton(
-                  label: 'To',
+                  label: context.l10n.diveImport_healthkit_dateTo,
                   date: _endDate,
                   dateText: dateFormat.format(_endDate),
                   onTap: _selectEndDate,
@@ -426,9 +431,10 @@ class _HealthKitFetchStepState extends ConsumerState<HealthKitFetchStep> {
       }
     } catch (e) {
       if (mounted) {
+        final message = context.l10n.diveImport_healthkit_fetchFailedBody('$e');
         setState(() {
           _isFetching = false;
-          _error = 'Failed to fetch dives: $e';
+          _error = message;
         });
         widget.onDivesFetched([]);
         ref.read(healthKitDivesFetchedProvider.notifier).state = true;
@@ -450,7 +456,7 @@ class _HealthKitFetchStepState extends ConsumerState<HealthKitFetchStep> {
               const CircularProgressIndicator(),
               const SizedBox(height: 16),
               Text(
-                'Fetching dives from Apple Health...',
+                context.l10n.diveImport_healthkit_fetchingDives,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -476,7 +482,10 @@ class _HealthKitFetchStepState extends ConsumerState<HealthKitFetchStep> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text('Fetch Failed', style: theme.textTheme.titleLarge),
+              Text(
+                context.l10n.diveImport_healthkit_fetchFailed,
+                style: theme.textTheme.titleLarge,
+              ),
               const SizedBox(height: 8),
               Text(
                 _error!,
@@ -507,12 +516,12 @@ class _HealthKitFetchStepState extends ConsumerState<HealthKitFetchStep> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Found $_diveCount dive${_diveCount == 1 ? '' : 's'}',
+                context.l10n.diveImport_healthkit_foundDives(_diveCount),
                 style: theme.textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
               Text(
-                'Proceeding to review...',
+                context.l10n.diveImport_healthkit_proceedingToReview,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

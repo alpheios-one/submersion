@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_type_icon.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
@@ -247,7 +249,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                       onPressed: () {
                         showSearch(
                           context: context,
-                          delegate: EquipmentSearchDelegate(),
+                          delegate: EquipmentSearchDelegate(context.l10n),
                         );
                       },
                     ),
@@ -563,7 +565,10 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
             icon: const Icon(Icons.search, size: 20),
             tooltip: context.l10n.equipment_list_searchTooltip,
             onPressed: () {
-              showSearch(context: context, delegate: EquipmentSearchDelegate());
+              showSearch(
+                context: context,
+                delegate: EquipmentSearchDelegate(context.l10n),
+              );
             },
           ),
           IconButton(
@@ -617,7 +622,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
       currentField: sort.field,
       currentDirection: sort.direction,
       fields: EquipmentSortField.values,
-      getFieldDisplayName: (field) => field.displayName,
+      getFieldDisplayName: (field) => field.localizedName(context.l10n),
       getFieldIcon: (field) => field.icon,
       onSortChanged: (field, direction) {
         ref.read(equipmentSortProvider.notifier).state = SortState(
@@ -954,10 +959,12 @@ class EquipmentListTile extends ConsumerWidget {
 
 /// Search delegate for equipment
 class EquipmentSearchDelegate extends SearchDelegate<EquipmentItem?> {
-  EquipmentSearchDelegate();
+  EquipmentSearchDelegate(this._l10n);
+
+  final AppLocalizations _l10n;
 
   @override
-  String get searchFieldLabel => 'Search equipment...';
+  String get searchFieldLabel => _l10n.equipment_search_fieldLabel;
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -965,7 +972,7 @@ class EquipmentSearchDelegate extends SearchDelegate<EquipmentItem?> {
       if (query.isNotEmpty)
         IconButton(
           icon: const Icon(Icons.clear),
-          tooltip: 'Clear Search',
+          tooltip: _l10n.equipment_search_clearTooltip,
           onPressed: () => query = '',
         ),
     ];
@@ -975,7 +982,7 @@ class EquipmentSearchDelegate extends SearchDelegate<EquipmentItem?> {
   Widget buildLeading(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
-      tooltip: 'Back',
+      tooltip: _l10n.equipment_search_backTooltip,
       onPressed: () => close(context, null),
     );
   }
@@ -1001,7 +1008,7 @@ class EquipmentSearchDelegate extends SearchDelegate<EquipmentItem?> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Search by name, brand, model, or serial number',
+              _l10n.equipment_search_hint,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -1046,7 +1053,7 @@ class EquipmentSearchDelegate extends SearchDelegate<EquipmentItem?> {
               ),
               const SizedBox(height: 16),
               Text(
-                'No equipment found for "$query"',
+                _l10n.equipment_search_noResults(query),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -1056,7 +1063,7 @@ class EquipmentSearchDelegate extends SearchDelegate<EquipmentItem?> {
         );
       },
       errorBuilder: (context, error) {
-        return Center(child: Text('Error: $error'));
+        return Center(child: Text(_l10n.equipment_list_errorLoading(error)));
       },
     );
   }

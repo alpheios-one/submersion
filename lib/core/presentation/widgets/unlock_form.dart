@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
-/// Password + optional-biometric unlock form. Hardcoded English strings by
-/// design: at startup this renders inside the pre-l10n splash MaterialApp
-/// (same precedent as the splash/migration strings in startup_page.dart),
-/// and the re-lock overlay reuses it for visual consistency.
+import 'package:submersion/l10n/l10n_extension.dart';
+
+/// Password + optional-biometric unlock form. Hosted both by the startup
+/// lock screen (inside the splash MaterialApp, which carries the
+/// localization delegates) and by the re-lock overlay inside the main app,
+/// so `context.l10n` resolves in both hosts.
 class UnlockForm extends StatefulWidget {
   final Future<bool> Function(String secret) onSubmitSecret;
   final Future<bool> Function()? onBiometric;
@@ -80,30 +82,30 @@ class _UnlockFormState extends State<UnlockForm> {
             autofocus: true,
             enabled: !_busy,
             onSubmitted: (_) => _submit(),
-            decoration: const InputDecoration(
-              labelText: 'Password',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: context.l10n.settings_security_password,
+              border: const OutlineInputBorder(),
             ),
           ),
         ),
         if (_showError) ...[
           const SizedBox(height: 8),
-          const Text(
-            'Incorrect password. Try again.',
-            style: TextStyle(color: Colors.redAccent, fontSize: 13),
+          Text(
+            context.l10n.lock_incorrectPassword,
+            style: const TextStyle(color: Colors.redAccent, fontSize: 13),
           ),
         ],
         const SizedBox(height: 16),
         FilledButton(
           onPressed: _busy ? null : _submit,
-          child: const Text('Unlock'),
+          child: Text(context.l10n.settings_cloudSync_encryption_unlock),
         ),
         if (widget.onBiometric != null) ...[
           const SizedBox(height: 12),
           IconButton(
             icon: const Icon(Icons.fingerprint, size: 36),
             onPressed: _busy ? null : _tryBiometric,
-            tooltip: 'Unlock with biometrics',
+            tooltip: context.l10n.settings_security_biometrics,
           ),
         ],
         if (widget.footer != null) ...[

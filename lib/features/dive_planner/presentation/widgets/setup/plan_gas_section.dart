@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_planner/domain/entities/plan_result.dart';
 import 'package:submersion/features/dive_planner/presentation/providers/dive_planner_providers.dart';
@@ -34,8 +35,10 @@ class PlanGasSection extends ConsumerWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Semantics(
-                label:
-                    'SAC Rate: ${planState.sacRate.toStringAsFixed(0)} ${units.volumeSymbol} per minute',
+                label: context.l10n.divePlanner_semantics_sacRate(
+                  planState.sacRate.toStringAsFixed(0),
+                  units.volumeSymbol,
+                ),
                 child: Slider(
                   value: planState.sacRate,
                   min: 8,
@@ -137,23 +140,23 @@ class _ReservePressureInputState extends State<_ReservePressureInput> {
   String? _messageText;
   bool _isError = false;
 
+  /// The seed and the parse must share one convention, so a whole-pressure
+  /// seed is rendered in the diver's locale rather than with toStringAsFixed
+  /// (#1091).
+  String _seed(double bar) =>
+      formatDecimalForInput(widget.units.convertPressure(bar).roundToDouble());
+
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(
-      text: widget.units
-          .convertPressure(widget.reservePressure)
-          .toStringAsFixed(0),
-    );
+    _controller = TextEditingController(text: _seed(widget.reservePressure));
   }
 
   @override
   void didUpdateWidget(_ReservePressureInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.reservePressure != widget.reservePressure) {
-      final newText = widget.units
-          .convertPressure(widget.reservePressure)
-          .toStringAsFixed(0);
+      final newText = _seed(widget.reservePressure);
       if (_controller.text != newText) {
         _controller.text = newText;
       }
@@ -175,7 +178,7 @@ class _ReservePressureInputState extends State<_ReservePressureInput> {
   }
 
   String? _getError(String value) {
-    final parsed = double.tryParse(value);
+    final parsed = parseUserDecimal(value);
     if (parsed == null) return null;
     final bar = widget.units.pressureToBar(parsed);
     if (bar <= 0) return context.l10n.divePlanner_error_reserveMustBePositive;
@@ -191,9 +194,7 @@ class _ReservePressureInputState extends State<_ReservePressureInput> {
 
   void _validate(String value) {
     if (value.isEmpty) {
-      final defaultDisplay = widget.units
-          .convertPressure(widget.defaultPressureBar)
-          .toStringAsFixed(0);
+      final defaultDisplay = _seed(widget.defaultPressureBar);
       setState(() {
         _messageText = context.l10n.divePlanner_info_reserveDefault(
           widget.units.pressureSymbol,
@@ -210,7 +211,7 @@ class _ReservePressureInputState extends State<_ReservePressureInput> {
       _isError = error != null;
     });
     if (error == null) {
-      final parsed = double.tryParse(value);
+      final parsed = parseUserDecimal(value);
       if (parsed != null) {
         widget.onChanged(widget.units.pressureToBar(parsed));
       }
@@ -222,7 +223,9 @@ class _ReservePressureInputState extends State<_ReservePressureInput> {
     final textField = SizedBox(
       width: 80,
       child: Semantics(
-        label: 'Reserve pressure in ${widget.units.pressureSymbol}',
+        label: context.l10n.divePlanner_semantics_reservePressure(
+          widget.units.pressureSymbol,
+        ),
         child: TextField(
           controller: _controller,
           decoration: InputDecoration(

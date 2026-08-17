@@ -21,6 +21,7 @@ import 'package:submersion/features/import_wizard/domain/models/import_bundle.da
 import 'package:submersion/features/import_wizard/domain/models/import_phase.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/test_app.dart';
 
@@ -1806,7 +1807,7 @@ void main() {
       await tester.pumpWidget(buildPermissionsStep(service));
       await tester.pumpAndSettle();
 
-      expect(find.text('HealthKit Access Required'), findsOneWidget);
+      expect(find.text('Apple HealthKit Access Required'), findsOneWidget);
       expect(find.text('Grant HealthKit Access'), findsOneWidget);
     });
 
@@ -1821,8 +1822,9 @@ void main() {
 
       expect(
         find.text(
-          'Submersion needs access to your Apple Health data to import '
-          'dives recorded by your Apple Watch.',
+          'Submersion uses Apple HealthKit to read underwater diving workout '
+          'data, including depth, duration, water temperature, and heart '
+          'rate, to create detailed dive logs.',
         ),
         findsOneWidget,
       );
@@ -1895,7 +1897,7 @@ void main() {
       await tester.tap(find.text('Grant HealthKit Access'));
       await tester.pumpAndSettle();
 
-      expect(find.text('HealthKit Access Required'), findsOneWidget);
+      expect(find.text('Apple HealthKit Access Required'), findsOneWidget);
       expect(find.text('Grant HealthKit Access'), findsOneWidget);
     });
 
@@ -1935,7 +1937,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Falls through to the request screen
-      expect(find.text('HealthKit Access Required'), findsOneWidget);
+      expect(find.text('Apple HealthKit Access Required'), findsOneWidget);
       expect(find.text('Grant HealthKit Access'), findsOneWidget);
     });
 
@@ -1953,7 +1955,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should recover -- still on request screen, not crashed
-      expect(find.text('HealthKit Access Required'), findsOneWidget);
+      expect(find.text('Apple HealthKit Access Required'), findsOneWidget);
       expect(find.text('Grant HealthKit Access'), findsOneWidget);
     });
 
@@ -1967,6 +1969,9 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: const Locale('en'),
               home: Scaffold(
                 body: Column(
                   children: [
@@ -2099,6 +2104,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
             home: Scaffold(
               body: Column(
                 children: [
@@ -2301,6 +2309,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
             home: Scaffold(
               body: Column(
                 children: [
@@ -2352,6 +2363,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
             home: Scaffold(
               body: Column(
                 children: [
@@ -2422,6 +2436,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
             home: Consumer(
               builder: (context, ref, _) {
                 capturedRef = ref;
@@ -2443,6 +2460,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
             home: Consumer(
               builder: (context, ref, _) {
                 capturedRef = ref;
@@ -2462,6 +2482,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
             home: Consumer(
               builder: (context, ref, _) {
                 capturedRef = ref;

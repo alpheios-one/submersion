@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/settings/presentation/providers/export_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 import '../../../../helpers/mock_file_picker_platform.dart';
 
@@ -24,7 +25,12 @@ void main() {
     originalPicker = FilePickerPlatform.instance;
     picker = MockFilePickerPlatform();
     FilePickerPlatform.instance = picker;
-    container = ProviderContainer();
+    // ExportNotifier localizes its status messages, and localeProvider
+    // watches settingsProvider, which wants SharedPreferences and a
+    // database. Pin the locale so this test stays about the picker.
+    container = ProviderContainer(
+      overrides: [localeProvider.overrideWithValue('en')],
+    );
   });
 
   tearDown(() async {

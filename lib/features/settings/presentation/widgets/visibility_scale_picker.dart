@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -204,8 +205,11 @@ class _CustomVisibilityScaleFormState extends State<CustomVisibilityScaleForm> {
   @override
   void initState() {
     super.initState();
-    String initial(double meters) =>
-        widget.units.convertDepth(meters).toStringAsFixed(0);
+    // Whole units only, but rendered through the locale formatter so the text
+    // shares one convention with [_metersFrom].
+    String initial(double meters) => formatDecimalForInput(
+      widget.units.convertDepth(meters).roundToDouble(),
+    );
     _excellent = TextEditingController(
       text: initial(widget.initial.excellentAtOrAboveM),
     );
@@ -224,7 +228,7 @@ class _CustomVisibilityScaleFormState extends State<CustomVisibilityScaleForm> {
   }
 
   double? _metersFrom(TextEditingController c) {
-    final parsed = double.tryParse(c.text.trim());
+    final parsed = parseUserDecimal(c.text);
     return parsed == null ? null : widget.units.depthToMeters(parsed);
   }
 

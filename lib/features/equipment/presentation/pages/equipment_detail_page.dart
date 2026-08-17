@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/utils/currency.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
@@ -1210,7 +1211,10 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
       _serviceType = record.serviceType;
       _serviceDate = record.serviceDate;
       _providerController.text = record.provider ?? '';
-      _costController.text = record.cost?.toString() ?? '';
+      // Seeded in the diver's locale to match how the field is read back;
+      // see formatDecimalForInput for why the two halves must agree.
+      final cost = record.cost;
+      _costController.text = cost == null ? '' : formatDecimalForInput(cost);
       _initialCurrencyCode = record.currency;
       _notesController.text = record.notes;
       _nextServiceDue = record.nextServiceDue;
@@ -1384,7 +1388,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
                             ),
                             validator: (value) {
                               if (value != null && value.isNotEmpty) {
-                                final parsed = double.tryParse(value);
+                                final parsed = parseUserDecimal(value);
                                 if (parsed == null || parsed < 0) {
                                   return context
                                       .l10n
@@ -1552,9 +1556,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
         provider: _providerController.text.trim().isEmpty
             ? null
             : _providerController.text.trim(),
-        cost: _costController.text.isEmpty
-            ? null
-            : double.tryParse(_costController.text),
+        cost: parseUserDecimal(_costController.text),
         currency: _currencyController.text.trim().isEmpty
             ? _fallbackCurrencyCode()
             : _currencyController.text.trim().toUpperCase(),

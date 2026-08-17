@@ -554,7 +554,7 @@ class _DiveSiteCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       child: Semantics(
         button: true,
-        label: 'View details for ${site.name}',
+        label: context.l10n.diveSites_import_semantics_viewDetails(site.name),
         child: InkWell(
           onTap: () => _showDetails(context),
           borderRadius: BorderRadius.circular(12),
@@ -624,7 +624,7 @@ class _DiveSiteCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'Imported',
+                              context.l10n.diveSites_import_badge_imported,
                               style: theme.textTheme.labelMedium?.copyWith(
                                 color: colorScheme.primary,
                               ),
@@ -635,7 +635,9 @@ class _DiveSiteCard extends StatelessWidget {
                     else
                       FilledButton.tonal(
                         onPressed: onImport,
-                        child: const Text('Import'),
+                        child: Text(
+                          context.l10n.diveSites_import_button_import,
+                        ),
                       ),
                   ],
                 ),
@@ -695,7 +697,7 @@ class _DiveSiteCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'GPS',
+                          context.l10n.diveSites_import_label_gps,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -795,7 +797,9 @@ class _DiveSiteCard extends StatelessWidget {
                         Chip(
                           avatar: const Icon(Icons.arrow_downward, size: 18),
                           label: Text(
-                            'Max ${site.maxDepth!.toStringAsFixed(0)}m',
+                            context.l10n.diveSites_import_detail_maxDepth(
+                              units.formatDepth(site.maxDepth!, decimals: 0),
+                            ),
                           ),
                         ),
                       if (site.hasCoordinates)
@@ -815,7 +819,7 @@ class _DiveSiteCard extends StatelessWidget {
 
                   // Source
                   Text(
-                    'Source: ${site.source}',
+                    context.l10n.diveSites_import_detail_source(site.source),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -832,7 +836,9 @@ class _DiveSiteCard extends StatelessWidget {
                           onImport();
                         },
                         icon: const Icon(Icons.download),
-                        label: const Text('Import to My Sites'),
+                        label: Text(
+                          context.l10n.diveSites_import_detail_importToMySites,
+                        ),
                       ),
                     )
                   else
@@ -845,7 +851,11 @@ class _DiveSiteCard extends StatelessWidget {
                           children: [
                             Icon(Icons.check, color: colorScheme.primary),
                             const SizedBox(width: 8),
-                            const Text('Already Imported'),
+                            Text(
+                              context
+                                  .l10n
+                                  .diveSites_import_detail_alreadyImported,
+                            ),
                           ],
                         ),
                       ),

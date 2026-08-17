@@ -231,7 +231,10 @@ class EquipmentSummaryWidget extends ConsumerWidget {
             children: serviceDue.take(3).map((item) {
               return Semantics(
                 button: true,
-                label: '${item.name}, ${item.type.displayName}, service due',
+                label: context.l10n.equipment_summary_serviceDueSemanticLabel(
+                  item.name,
+                  item.type.displayName,
+                ),
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: Theme.of(context).colorScheme.error,
@@ -291,7 +294,10 @@ class EquipmentSummaryWidget extends ConsumerWidget {
             children: previewItems.map((item) {
               return Semantics(
                 button: true,
-                label: '${item.name}, ${item.type.displayName}',
+                label: context.l10n.equipment_summary_recentSemanticLabel(
+                  item.name,
+                  item.type.displayName,
+                ),
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: Theme.of(

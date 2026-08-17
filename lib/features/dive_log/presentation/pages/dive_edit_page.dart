@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart' hide Visibility;
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
+import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:uuid/uuid.dart';
 
@@ -109,6 +111,24 @@ import 'package:submersion/features/tank_presets/presentation/providers/tank_pre
 const _createNewSiteSentinel = '__create_new__';
 const _createNewDiveCenterSentinel = '__create_new_dive_center__';
 const _createNewTripSentinel = '__create_new_trip__';
+
+/// [value] rendered with exactly [fractionDigits] decimals in the diver's
+/// locale, for seeding an editable field.
+///
+/// Every field seeded here is read back with [parseUserDecimal], and the two
+/// halves must share one convention. `toStringAsFixed` always emits a dot, and
+/// under de/es/it that dot is the GROUPING separator, so a diver who opened a
+/// dive and saved it untouched would store ten times the depth (#1091).
+///
+/// This page keeps trailing zeros (a weight seeds as "2.0"), so it uses
+/// [formatFixedForInput] rather than the trailing-zero-dropping
+/// [formatRoundedForInput] the other forms use.
+String _seedDecimal(double value, int fractionDigits) =>
+    formatFixedForInput(value, fractionDigits);
+
+/// [value] rendered for seeding a whole-number field, paired with
+/// [parseUserInt]. Grouping is off, so this is digit-only text.
+String _seedInt(int value) => _seedDecimal(value.toDouble(), 0);
 
 class DiveEditPage extends ConsumerStatefulWidget {
   final String? diveId;
@@ -317,7 +337,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       _entryTime.hour,
       _entryTime.minute,
     );
-    final runtimeMinutes = int.tryParse(_runtimeController.text);
+    final runtimeMinutes = parseUserInt(_runtimeController.text);
     if (runtimeMinutes == null || runtimeMinutes <= 0) return null;
     return entry.add(Duration(minutes: runtimeMinutes));
   }
@@ -469,7 +489,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     if (p == null) return;
     final units = UnitFormatter(ref.read(settingsProvider));
     if (p.diveNumber != null) {
-      _diveNumberController.text = p.diveNumber.toString();
+      _diveNumberController.text = _seedInt(p.diveNumber!);
     }
     if (p.dateTime != null) {
       _entryDate = p.dateTime!;
@@ -478,22 +498,25 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       }
     }
     if (p.durationMinutes != null) {
-      _durationController.text = p.durationMinutes.toString();
+      _durationController.text = _seedInt(p.durationMinutes!);
     }
     if (p.maxDepthMeters != null) {
-      _maxDepthController.text = units
-          .convertDepth(p.maxDepthMeters!)
-          .toStringAsFixed(1);
+      _maxDepthController.text = _seedDecimal(
+        units.convertDepth(p.maxDepthMeters!),
+        1,
+      );
     }
     if (p.waterTempCelsius != null) {
-      _waterTempController.text = units
-          .convertTemperature(p.waterTempCelsius!)
-          .toStringAsFixed(0);
+      _waterTempController.text = _seedDecimal(
+        units.convertTemperature(p.waterTempCelsius!),
+        0,
+      );
     }
     if (p.airTempCelsius != null) {
-      _airTempController.text = units
-          .convertTemperature(p.airTempCelsius!)
-          .toStringAsFixed(0);
+      _airTempController.text = _seedDecimal(
+        units.convertTemperature(p.airTempCelsius!),
+        0,
+      );
     }
     if (p.notes != null) _notesController.text = p.notes!;
     if (p.rating != null) _rating = p.rating!;
@@ -549,7 +572,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       if (mounted && _diveNumberController.text.isEmpty) {
         _silently(() {
           setState(() {
-            _diveNumberController.text = nextNumber.toString();
+            _diveNumberController.text = _seedInt(nextNumber);
           });
         });
       }
@@ -579,7 +602,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         setState(() {
           _existingDive = dive;
           _diverRoleId = dive.diverRoleId;
-          _diveNumberController.text = dive.diveNumber?.toString() ?? '';
+          _diveNumberController.text = dive.diveNumber != null
+              ? _seedInt(dive.diveNumber!)
+              : '';
           // Use entryTime if available, otherwise fall back to dateTime
           final entryDateTime = dive.entryTime ?? dive.dateTime;
           _entryDate = entryDateTime;
@@ -596,43 +621,44 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           }
           // Bottom time (stored bottomTime, or auto-calculated from profile)
           if (dive.bottomTime != null) {
-            _durationController.text = dive.bottomTime!.inMinutes.toString();
+            _durationController.text = _seedInt(dive.bottomTime!.inMinutes);
           } else if (dive.profile.isNotEmpty) {
             // Auto-calculate from profile if no stored duration
             final calculatedBottomTime = dive.calculateBottomTimeFromProfile();
             if (calculatedBottomTime != null) {
-              _durationController.text = calculatedBottomTime.inMinutes
-                  .toString();
+              _durationController.text = _seedInt(
+                calculatedBottomTime.inMinutes,
+              );
             }
           }
           // Runtime: use stored value, or calculate from entry/exit times
           if (dive.runtime != null) {
-            _runtimeController.text = dive.runtime!.inMinutes.toString();
+            _runtimeController.text = _seedInt(dive.runtime!.inMinutes);
           } else if (dive.entryTime != null && dive.exitTime != null) {
             final calculatedRuntime = dive.exitTime!.difference(
               dive.entryTime!,
             );
-            _runtimeController.text = calculatedRuntime.inMinutes.toString();
+            _runtimeController.text = _seedInt(calculatedRuntime.inMinutes);
           }
           // Convert stored metric values to user's preferred units
           _maxDepthController.text = dive.maxDepth != null
-              ? units.convertDepth(dive.maxDepth!).toStringAsFixed(1)
+              ? _seedDecimal(units.convertDepth(dive.maxDepth!), 1)
               : '';
           _avgDepthController.text = dive.avgDepth != null
-              ? units.convertDepth(dive.avgDepth!).toStringAsFixed(1)
+              ? _seedDecimal(units.convertDepth(dive.avgDepth!), 1)
               : '';
           _waterTempController.text = dive.waterTemp != null
-              ? units.convertTemperature(dive.waterTemp!).toStringAsFixed(0)
+              ? _seedDecimal(units.convertTemperature(dive.waterTemp!), 0)
               : '';
           _airTempController.text = dive.airTemp != null
-              ? units.convertTemperature(dive.airTemp!).toStringAsFixed(0)
+              ? _seedDecimal(units.convertTemperature(dive.airTemp!), 0)
               : '';
           _notesController.text = dive.notes;
           _nameController.text = dive.name ?? '';
           _selectedDiveTypeIds = List.from(dive.diveTypeIds);
           _selectedVisibility = dive.visibility ?? Visibility.unknown;
           _visibilityController.text = dive.visibilityMeters != null
-              ? units.convertDepth(dive.visibilityMeters!).toStringAsFixed(0)
+              ? _seedDecimal(units.convertDepth(dive.visibilityMeters!), 0)
               : '';
           _rating = dive.rating ?? 0;
           _selectedSite = dive.site;
@@ -659,15 +685,14 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               _exitMethod == null || _exitMethod == _entryMethod;
           _waterType = dive.waterType;
           _swellHeightController.text = dive.swellHeight != null
-              ? units.convertDepth(dive.swellHeight!).toStringAsFixed(1)
+              ? _seedDecimal(units.convertDepth(dive.swellHeight!), 1)
               : '';
           _altitudeController.text = dive.altitude != null
-              ? units.convertAltitude(dive.altitude!).toStringAsFixed(0)
+              ? _seedDecimal(units.convertAltitude(dive.altitude!), 0)
               : '';
           _surfacePressureController.text = dive.surfacePressure != null
-              ? (dive.surfacePressure! * 1000).toStringAsFixed(
-                  0,
-                ) // Convert bar to mbar
+              // Convert bar to mbar
+              ? _seedDecimal(dive.surfacePressure! * 1000, 0)
               : '';
 
           // Load weather fields
@@ -677,10 +702,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _weatherSource = dive.weatherSource;
           _weatherFetchedAt = dive.weatherFetchedAt;
           _windSpeedController.text = dive.windSpeed != null
-              ? units.convertWindSpeed(dive.windSpeed!).toStringAsFixed(1)
+              ? _seedDecimal(units.convertWindSpeed(dive.windSpeed!), 1)
               : '';
           _humidityController.text = dive.humidity != null
-              ? dive.humidity!.toStringAsFixed(0)
+              ? _seedDecimal(dive.humidity!, 0)
               : '';
           _weatherDescriptionController.text = dive.weatherDescription ?? '';
 
@@ -704,9 +729,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _weightingFeedback = dive.weightingFeedback;
           _weightingFeedbackAmountController.text =
               dive.weightingFeedbackKg != null
-              ? units
-                    .convertWeight(dive.weightingFeedbackKg!)
-                    .toStringAsFixed(1)
+              ? _seedDecimal(units.convertWeight(dive.weightingFeedbackKg!), 1)
               : '';
 
           // Load tags
@@ -1082,27 +1105,29 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       currentStrength: _currentStrength?.name,
       swellHeight: _swellHeightController.text.isNotEmpty
           ? units.depthToMeters(
-              double.tryParse(_swellHeightController.text) ?? 0,
+              parseUserDecimal(_swellHeightController.text) ?? 0,
             )
           : null,
       entryMethod: _entryMethod?.name,
       exitMethod: _exitMethod?.name,
       altitude: _altitudeController.text.isNotEmpty
           ? units.altitudeToMeters(
-              double.tryParse(_altitudeController.text) ?? 0,
+              parseUserDecimal(_altitudeController.text) ?? 0,
             )
           : null,
       surfacePressure: _surfacePressureController.text.isNotEmpty
-          ? (double.tryParse(_surfacePressureController.text) ?? 0) / 1000
+          ? (parseUserDecimal(_surfacePressureController.text) ?? 0) / 1000
           : null,
       windSpeed: _windSpeedController.text.isNotEmpty
-          ? units.windSpeedToMs(double.tryParse(_windSpeedController.text) ?? 0)
+          ? units.windSpeedToMs(
+              parseUserDecimal(_windSpeedController.text) ?? 0,
+            )
           : null,
       windDirection: _windDirection?.name,
       cloudCover: _cloudCover?.name,
       precipitation: _precipitation?.name,
       humidity: _humidityController.text.isNotEmpty
-          ? (double.tryParse(_humidityController.text) ?? 0)
+          ? (parseUserDecimal(_humidityController.text) ?? 0)
           : null,
       weatherDescription: _weatherDescriptionController.text.isNotEmpty
           ? _weatherDescriptionController.text
@@ -1588,21 +1613,21 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           BulkField.setpointLow,
           FormRow.custom(
             label: context.l10n.diveLog_bulkEdit_fieldSetpointLow,
-            child: _bulkNumberField((v) => _setpointLow = double.tryParse(v)),
+            child: _bulkNumberField((v) => _setpointLow = parseUserDecimal(v)),
           ),
         ),
         _gatedRow(
           BulkField.setpointHigh,
           FormRow.custom(
             label: context.l10n.diveLog_bulkEdit_fieldSetpointHigh,
-            child: _bulkNumberField((v) => _setpointHigh = double.tryParse(v)),
+            child: _bulkNumberField((v) => _setpointHigh = parseUserDecimal(v)),
           ),
         ),
         _gatedRow(
           BulkField.setpointDeco,
           FormRow.custom(
             label: context.l10n.diveLog_bulkEdit_fieldSetpointDeco,
-            child: _bulkNumberField((v) => _setpointDeco = double.tryParse(v)),
+            child: _bulkNumberField((v) => _setpointDeco = parseUserDecimal(v)),
           ),
         ),
         _gatedRow(
@@ -1620,7 +1645,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           FormRow.custom(
             label: context.l10n.diveLog_bulkEdit_fieldScrubberDuration,
             child: _bulkNumberField(
-              (v) => _scrubberDurationMinutes = int.tryParse(v),
+              (v) => _scrubberDurationMinutes = parseUserInt(v),
             ),
           ),
         ),
@@ -1872,7 +1897,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   ) {
     if (meters == null) return null;
     return ProfileSuggestion(
-      value: units.convertDepth(meters).toStringAsFixed(1),
+      value: _seedDecimal(units.convertDepth(meters), 1),
       onUse: onUse,
       tooltip: context.l10n.diveLog_edit_tooltip_calculateFromProfile,
     );
@@ -1884,7 +1909,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   ) {
     if (duration == null) return null;
     return ProfileSuggestion(
-      value: duration.inMinutes.toString(),
+      value: _seedInt(duration.inMinutes),
       onUse: onUse,
       tooltip: context.l10n.diveLog_edit_tooltip_calculateFromProfile,
     );
@@ -2691,7 +2716,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     }
 
     setState(() {
-      _durationController.text = calculatedBottomTime.inMinutes.toString();
+      _durationController.text = _seedInt(calculatedBottomTime.inMinutes);
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -2730,16 +2755,17 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     }
 
     final displayDepth = units.convertDepth(calculatedDepth);
+    final depthText = _seedDecimal(displayDepth, 1);
 
     setState(() {
-      _maxDepthController.text = displayDepth.toStringAsFixed(1);
+      _maxDepthController.text = depthText;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           context.l10n.diveLog_edit_snackbar_maxDepthCalculated(
-            '${displayDepth.toStringAsFixed(1)} ${units.depthSymbol}',
+            '$depthText ${units.depthSymbol}',
           ),
         ),
       ),
@@ -2771,16 +2797,17 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     }
 
     final displayDepth = units.convertDepth(calculatedDepth);
+    final depthText = _seedDecimal(displayDepth, 1);
 
     setState(() {
-      _avgDepthController.text = displayDepth.toStringAsFixed(1);
+      _avgDepthController.text = depthText;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           context.l10n.diveLog_edit_snackbar_avgDepthCalculated(
-            '${displayDepth.toStringAsFixed(1)} ${units.depthSymbol}',
+            '$depthText ${units.depthSymbol}',
           ),
         ),
       ),
@@ -2812,7 +2839,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     }
 
     setState(() {
-      _runtimeController.text = calculatedRuntime.inMinutes.toString();
+      _runtimeController.text = _seedInt(calculatedRuntime.inMinutes);
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -3850,9 +3877,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     final units = UnitFormatter(ref.read(settingsProvider));
     setState(() {
       _silently(() {
-        _altitudeController.text = units
-            .convertAltitude(meters)
-            .toStringAsFixed(0);
+        _altitudeController.text = _seedDecimal(
+          units.convertAltitude(meters),
+          0,
+        );
       });
     });
   }
@@ -3925,9 +3953,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       setState(() {
         // Populate weather fields from fetched data
         if (weather.windSpeed != null) {
-          _windSpeedController.text = units
-              .convertWindSpeed(weather.windSpeed!)
-              .toStringAsFixed(1);
+          _windSpeedController.text = _seedDecimal(
+            units.convertWindSpeed(weather.windSpeed!),
+            1,
+          );
         }
         if (weather.windDirection != null) {
           _windDirection = weather.windDirection;
@@ -3939,22 +3968,25 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _precipitation = weather.precipitation;
         }
         if (weather.humidity != null) {
-          _humidityController.text = weather.humidity!.toStringAsFixed(0);
+          _humidityController.text = _seedDecimal(weather.humidity!, 0);
         }
         if (weather.description != null && weather.description!.isNotEmpty) {
           _weatherDescriptionController.text = weather.description!;
         }
         // Only fill airTemp if the controller is currently empty
         if (weather.airTemp != null && _airTempController.text.isEmpty) {
-          _airTempController.text = units
-              .convertTemperature(weather.airTemp!)
-              .toStringAsFixed(0);
+          _airTempController.text = _seedDecimal(
+            units.convertTemperature(weather.airTemp!),
+            0,
+          );
         }
         // Only fill surfacePressure if the controller is currently empty
         if (weather.surfacePressure != null &&
             _surfacePressureController.text.isEmpty) {
-          _surfacePressureController.text = (weather.surfacePressure! * 1000)
-              .toStringAsFixed(0);
+          _surfacePressureController.text = _seedDecimal(
+            weather.surfacePressure! * 1000,
+            0,
+          );
         }
         _weatherSource = WeatherSource.openMeteo;
         _weatherFetchedAt = DateTime.now();
@@ -4146,7 +4178,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             flex: 1,
             child: TextFormField(
               initialValue: displayAmount > 0
-                  ? displayAmount.toStringAsFixed(1)
+                  ? _seedDecimal(displayAmount, 1)
                   : '',
               decoration: InputDecoration(
                 labelText: units.weightSymbol,
@@ -4156,7 +4188,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                 decimal: true,
               ),
               onChanged: (value) {
-                final displayValue = double.tryParse(value) ?? 0;
+                final displayValue = parseUserDecimal(value) ?? 0;
                 // Convert back to kg for storage
                 final amountKg = units.weightToKg(displayValue);
                 _weights[index] = weight.copyWith(amountKg: amountKg);
@@ -4281,7 +4313,13 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                     size: 20,
                   ),
                 ),
-                title: Text(sighting.speciesName),
+                title: Text(
+                  localizedSpeciesName(
+                    context.l10n,
+                    sighting.speciesId,
+                    sighting.speciesName,
+                  ),
+                ),
                 subtitle: sighting.notes.isNotEmpty
                     ? Text(
                         sighting.notes,
@@ -4534,7 +4572,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         if (runtime.isNegative) runtime = null;
       } else if (_runtimeController.text.isNotEmpty) {
         runtime = Duration(
-          minutes: (int.tryParse(_runtimeController.text) ?? 0),
+          minutes: (parseUserInt(_runtimeController.text) ?? 0),
         );
       }
 
@@ -4542,45 +4580,45 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       Duration? duration;
       if (_durationController.text.isNotEmpty) {
         duration = Duration(
-          minutes: (int.tryParse(_durationController.text) ?? 0),
+          minutes: (parseUserInt(_durationController.text) ?? 0),
         );
       }
 
       // Parse form values and convert to metric for storage
       final maxDepth = _maxDepthController.text.isNotEmpty
           ? units.depthToMeters(
-              (double.tryParse(_maxDepthController.text) ?? 0),
+              (parseUserDecimal(_maxDepthController.text) ?? 0),
             )
           : null;
       final avgDepth = _avgDepthController.text.isNotEmpty
           ? units.depthToMeters(
-              (double.tryParse(_avgDepthController.text) ?? 0),
+              (parseUserDecimal(_avgDepthController.text) ?? 0),
             )
           : null;
       final waterTemp = _waterTempController.text.isNotEmpty
           ? units.temperatureToCelsius(
-              (double.tryParse(_waterTempController.text) ?? 0),
+              (parseUserDecimal(_waterTempController.text) ?? 0),
             )
           : null;
       final airTemp = _airTempController.text.isNotEmpty
           ? units.temperatureToCelsius(
-              (double.tryParse(_airTempController.text) ?? 0),
+              (parseUserDecimal(_airTempController.text) ?? 0),
             )
           : null;
 
       // Parse conditions values (convert to metric)
       final swellHeight = _swellHeightController.text.isNotEmpty
           ? units.depthToMeters(
-              (double.tryParse(_swellHeightController.text) ?? 0),
+              (parseUserDecimal(_swellHeightController.text) ?? 0),
             )
           : null;
       final altitude = _altitudeController.text.isNotEmpty
           ? units.altitudeToMeters(
-              (double.tryParse(_altitudeController.text) ?? 0),
+              (parseUserDecimal(_altitudeController.text) ?? 0),
             )
           : null;
       final surfacePressure = _surfacePressureController.text.isNotEmpty
-          ? (double.tryParse(_surfacePressureController.text) ?? 0) /
+          ? (parseUserDecimal(_surfacePressureController.text) ?? 0) /
                 1000 // Convert mbar to bar
           : null;
 
@@ -4589,7 +4627,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         id: widget.diveId ?? '',
         diverId: _existingDive?.diverId, // Preserve diver assignment
         diveNumber: _diveNumberController.text.isNotEmpty
-            ? (int.tryParse(_diveNumberController.text) ?? 0)
+            ? (parseUserInt(_diveNumberController.text) ?? 0)
             : null,
         name: _nameController.text.trim().isNotEmpty
             ? _nameController.text.trim()
@@ -4611,7 +4649,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             : null,
         visibilityMeters: _visibilityController.text.isNotEmpty
             ? units.depthToMeters(
-                double.tryParse(_visibilityController.text) ?? 0,
+                parseUserDecimal(_visibilityController.text) ?? 0,
               )
             : null,
         diveTypeIds: _selectedDiveTypeIds,
@@ -4637,14 +4675,14 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         // Weather fields
         windSpeed: _windSpeedController.text.isNotEmpty
             ? units.windSpeedToMs(
-                (double.tryParse(_windSpeedController.text) ?? 0),
+                (parseUserDecimal(_windSpeedController.text) ?? 0),
               )
             : null,
         windDirection: _windDirection,
         cloudCover: _cloudCover,
         precipitation: _precipitation,
         humidity: _humidityController.text.isNotEmpty
-            ? (double.tryParse(_humidityController.text) ?? 0)
+            ? (parseUserDecimal(_humidityController.text) ?? 0)
             : null,
         weatherDescription: _weatherDescriptionController.text.isNotEmpty
             ? _weatherDescriptionController.text
@@ -4660,7 +4698,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                     _weightingFeedback == WeightingFeedback.underweighted) &&
                 _weightingFeedbackAmountController.text.isNotEmpty
             ? units.weightToKg(
-                double.tryParse(_weightingFeedbackAmountController.text) ?? 0,
+                parseUserDecimal(_weightingFeedbackAmountController.text) ?? 0,
               )
             : null,
         // Tags
@@ -4899,7 +4937,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   String? _getAltitudeWarning(UnitFormatter units) {
     final altitudeText = _altitudeController.text.trim();
     if (altitudeText.isEmpty) return null;
-    final altitudeInUserUnits = double.tryParse(altitudeText);
+    final altitudeInUserUnits = parseUserDecimal(altitudeText);
     if (altitudeInUserUnits == null) return null;
 
     final altitudeMeters = units.altitudeToMeters(altitudeInUserUnits);
@@ -4913,7 +4951,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   Color? _getAltitudeWarningColor(UnitFormatter units) {
     final altitudeText = _altitudeController.text.trim();
     if (altitudeText.isEmpty) return null;
-    final altitudeInUserUnits = double.tryParse(altitudeText);
+    final altitudeInUserUnits = parseUserDecimal(altitudeText);
     if (altitudeInUserUnits == null) return null;
 
     final altitudeMeters = units.altitudeToMeters(altitudeInUserUnits);

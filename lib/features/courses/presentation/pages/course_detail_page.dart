@@ -188,7 +188,8 @@ class CourseDetailPage extends ConsumerWidget {
                               ),
                             ),
                             title: Text(
-                              dive.site?.name ?? 'Unknown Site',
+                              dive.site?.name ??
+                                  context.l10n.diveLog_listPage_unknownSite,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -632,7 +633,7 @@ class CourseDetailPage extends ConsumerWidget {
         children: [
           Icon(Icons.error_outline, size: 48, color: colorScheme.error),
           const SizedBox(height: 16),
-          Text('Error: $error'),
+          Text('${context.l10n.common_label_error}: $error'),
         ],
       ),
     );

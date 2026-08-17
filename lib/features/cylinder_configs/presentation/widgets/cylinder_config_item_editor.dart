@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config_item.dart';
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
@@ -54,8 +55,10 @@ class _CylinderConfigItemEditorState
     super.dispose();
   }
 
-  static String _trim(double value) =>
-      value == value.roundToDouble() ? value.round().toString() : '$value';
+  /// A gas fraction as the diver's locale writes it: 21 stays "21", 32.5
+  /// becomes "32,5" for a comma-decimal diver. Paired with [parseUserDecimal]
+  /// below, which is the half that reads it back (#1091).
+  static String _trim(double value) => formatDecimalForInput(value);
 
   void _applyPreset(TankPresetEntity preset) {
     widget.onChanged(
@@ -103,12 +106,6 @@ class _CylinderConfigItemEditorState
       ),
     );
     if (chosen != null) _applyPreset(chosen);
-  }
-
-  double? _parse(String text) {
-    final trimmed = text.trim();
-    if (trimmed.isEmpty) return null;
-    return double.tryParse(trimmed);
   }
 
   @override
@@ -164,7 +161,7 @@ class _CylinderConfigItemEditorState
                   // Only a parseable value updates the model: transient states
                   // like a lone "." must not clobber the stored mix.
                   onChanged: (text) {
-                    final parsed = _parse(text);
+                    final parsed = parseUserDecimal(text);
                     if (parsed != null) {
                       widget.onChanged(item.copyWith(o2Percent: parsed));
                     }
@@ -182,7 +179,7 @@ class _CylinderConfigItemEditorState
                     labelText: l10n.gasCalculators_mnd_hePercent,
                   ),
                   onChanged: (text) {
-                    final parsed = _parse(text);
+                    final parsed = parseUserDecimal(text);
                     if (parsed != null) {
                       widget.onChanged(item.copyWith(hePercent: parsed));
                     }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/currency.dart';
@@ -185,6 +186,45 @@ void main() {
       final saved = await repository.getEquipmentById(created.id);
       expect(saved!.buoyancyKg, isNull);
     });
+
+    testWidgets(
+      'a no-op save preserves attributes under a grouping-dot locale',
+      (tester) async {
+        // Under de, '.' is the GROUPING separator, so a field seeded with
+        // double.toString() ("2.5") and read back locale-aware would store 25.
+        // Opening an item and saving it untouched must change nothing (#1091).
+        final previousLocale = Intl.defaultLocale;
+        addTearDown(() => Intl.defaultLocale = previousLocale);
+        Intl.defaultLocale = 'de';
+
+        final created = await repository.createEquipment(
+          EquipmentItem(
+            id: '',
+            name: 'Wetsuit',
+            type: EquipmentType.wetsuit,
+            attributes: [
+              EquipmentAttribute.curated(
+                equipmentId: '',
+                key: 'buoyancy_kg',
+                valueNum: 2.5,
+              ),
+            ],
+          ),
+        );
+        await pumpEditor(tester, created.id);
+
+        await tester.scrollUntilVisible(
+          find.text('Save'),
+          300,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+
+        final saved = await repository.getEquipmentById(created.id);
+        expect(saved!.buoyancyKg, closeTo(2.5, 0.001));
+      },
+    );
 
     testWidgets('shows the stored currency and its symbol on the price field', (
       tester,

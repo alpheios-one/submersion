@@ -451,9 +451,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify labels are present
-      expect(find.text('Max depth'), findsOneWidget);
+      expect(find.text('Max Depth'), findsOneWidget);
       expect(find.text('Duration'), findsOneWidget);
-      expect(find.text('Water temp'), findsOneWidget);
+      expect(find.text('Water Temp'), findsOneWidget);
       expect(find.text('CNS%'), findsOneWidget);
     });
 
@@ -1084,14 +1084,27 @@ void main() {
         final secondaryHeaderStyle = (dataTable.columns[2].label as Text).style;
         expect(secondaryHeaderStyle?.fontWeight, isNot(FontWeight.bold));
 
-        // Row labels use the new l10n keys. "Duration" also appears on each
-        // per-source card's own metrics row, so scope that lookup to the grid.
-        expect(find.text('Max Depth'), findsOneWidget);
+        // Row labels use the new l10n keys. "Max Depth" and "Duration" also
+        // appear on each per-source card's own metrics row, so scope both
+        // lookups to the grid.
+        expect(
+          find.descendant(
+            of: dataTableFinder,
+            matching: find.text('Max Depth'),
+          ),
+          findsOneWidget,
+        );
         expect(
           find.descendant(of: dataTableFinder, matching: find.text('Duration')),
           findsOneWidget,
         );
-        expect(find.text('Water Temp'), findsOneWidget);
+        expect(
+          find.descendant(
+            of: dataTableFinder,
+            matching: find.text('Water Temp'),
+          ),
+          findsOneWidget,
+        );
         expect(find.text('CNS'), findsOneWidget);
         expect(find.text('OTU'), findsOneWidget);
         expect(find.text('Deco Algorithm'), findsOneWidget);
