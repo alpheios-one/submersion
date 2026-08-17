@@ -7,6 +7,7 @@ import 'package:submersion/features/media/domain/entities/media_library_filter.d
 import 'package:submersion/features/media/presentation/pages/media_repair_history_view.dart';
 import 'package:submersion/features/media/presentation/pages/media_repair_wizard_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
+import 'package:submersion/features/media/presentation/widgets/media_info_sheet.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_grid.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -104,7 +105,11 @@ class MediaMissingView extends ConsumerWidget {
                   hasMore: state.hasMore,
                   onLoadMore: () =>
                       ref.read(missingViewProvider.notifier).loadMore(),
-                  onTileTap: (entry, index) {},
+                  // The one view built for troubleshooting a missing item
+                  // could not previously tell you anything about it: this tap
+                  // was a literal no-op.
+                  onTileTap: (entry, index) =>
+                      showMediaInfoSheet(context, entry.item),
                 ),
         ),
       ],
