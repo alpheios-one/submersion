@@ -382,7 +382,10 @@ void main() {
 
       expect(find.text('Unknown Device'), findsOneWidget);
       expect(
-        find.text('This device may not be fully supported.'),
+        find.text(
+          "This device is not in our library. We'll try to connect, "
+          'but download may not work.',
+        ),
         findsOneWidget,
       );
     });

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
+import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/features/trips/domain/constants/trip_field.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
@@ -77,7 +78,7 @@ class TripListPage extends ConsumerWidget {
           },
           columnSettingsAction: IconButton(
             icon: const Icon(Icons.view_column_outlined),
-            tooltip: 'Column settings',
+            tooltip: context.l10n.columnConfig_tooltip_columnSettings,
             onPressed: () => showEntityTableColumnPicker<TripField>(
               context,
               configProvider: tripTableConfigProvider,
@@ -89,7 +90,10 @@ class TripListPage extends ConsumerWidget {
               icon: const Icon(Icons.search, size: 20),
               tooltip: context.l10n.trips_list_tooltip_search,
               onPressed: () {
-                showSearch(context: context, delegate: TripSearchDelegate());
+                showSearch(
+                  context: context,
+                  delegate: TripSearchDelegate(context.l10n),
+                );
               },
             ),
             IconButton(
@@ -103,7 +107,8 @@ class TripListPage extends ConsumerWidget {
                   currentField: sort.field,
                   currentDirection: sort.direction,
                   fields: TripSortField.values,
-                  getFieldDisplayName: (field) => field.displayName,
+                  getFieldDisplayName: (field) =>
+                      field.localizedName(context.l10n),
                   getFieldIcon: (field) => field.icon,
                   onSortChanged: (field, direction) {
                     ref.read(tripSortProvider.notifier).state = SortState(

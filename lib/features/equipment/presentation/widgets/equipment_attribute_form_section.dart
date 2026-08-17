@@ -143,7 +143,10 @@ class EquipmentAttributeFormSection extends StatelessWidget {
           initialValue: current?.valueText,
           decoration: InputDecoration(labelText: label),
           items: [
-            const DropdownMenuItem<String?>(value: null, child: Text('--')),
+            DropdownMenuItem<String?>(
+              value: null,
+              child: Text(context.l10n.common_placeholder_noValue),
+            ),
             for (final option in def.choiceKeys)
               DropdownMenuItem(
                 value: option,

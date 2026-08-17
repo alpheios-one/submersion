@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/constants/entity_field.dart';
 
 /// Wrapper carrying a [Buddy] with its computed dive count.
@@ -41,6 +42,30 @@ enum BuddyField implements EntityField {
     BuddyField.certificationAgency => 'Agency',
     BuddyField.diveCount => 'Dives',
     BuddyField.notes => 'Notes',
+  };
+
+  @override
+  String localizedDisplayName(AppLocalizations l10n) => switch (this) {
+    BuddyField.buddyName => l10n.enum_buddyField_buddyName,
+    BuddyField.email => l10n.enum_buddyField_email,
+    BuddyField.phone => l10n.enum_buddyField_phone,
+    BuddyField.certificationLevel => l10n.enum_buddyField_certificationLevel,
+    BuddyField.certificationAgency => l10n.enum_buddyField_certificationAgency,
+    BuddyField.diveCount => l10n.enum_buddyField_diveCount,
+    BuddyField.notes => l10n.enum_buddyField_notes,
+  };
+
+  @override
+  String localizedShortLabel(AppLocalizations l10n) => switch (this) {
+    BuddyField.buddyName => l10n.enum_buddyField_buddyName_short,
+    BuddyField.email => l10n.enum_buddyField_email_short,
+    BuddyField.phone => l10n.enum_buddyField_phone_short,
+    BuddyField.certificationLevel =>
+      l10n.enum_buddyField_certificationLevel_short,
+    BuddyField.certificationAgency =>
+      l10n.enum_buddyField_certificationAgency_short,
+    BuddyField.diveCount => l10n.enum_buddyField_diveCount_short,
+    BuddyField.notes => l10n.enum_buddyField_notes_short,
   };
 
   @override

@@ -128,7 +128,9 @@ class _AltitudeInputState extends State<_AltitudeInput> {
     final groupChip = showGroup
         ? Flexible(
             child: Semantics(
-              label: 'Altitude group: ${altitudeGroup.displayName}',
+              label: context.l10n.divePlanner_semantics_altitudeGroup(
+                altitudeGroup.displayName,
+              ),
               child: _buildGroupChip(theme, altitudeGroup),
             ),
           )

@@ -6,6 +6,8 @@ import 'package:submersion/core/services/sync/sync_cleanup_outcome.dart';
 import 'package:submersion/core/services/sync/sync_device_footprint.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_device_providers.dart';
 import 'package:submersion/features/settings/presentation/widgets/sync_maintenance_progress_dialog.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Lists every device holding files on the sync backend, so a user can see
 /// where their cloud space went and remove the leftovers.
@@ -19,14 +21,15 @@ class SyncDevicesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final devices = ref.watch(syncDeviceFootprintListProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Devices on this backend'),
+        title: Text(l10n.settings_syncDevices_appBar_title),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
+            tooltip: l10n.settings_syncDevices_appBar_refreshTooltip,
             onPressed: () => ref.invalidate(syncDeviceFootprintListProvider),
           ),
         ],
@@ -35,12 +38,12 @@ class SyncDevicesPage extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => _Message(
           icon: Icons.cloud_off,
-          text: 'Could not read the backend.\n$e',
+          text: l10n.settings_syncDevices_readError('$e'),
         ),
         data: (list) => list.isEmpty
-            ? const _Message(
+            ? _Message(
                 icon: Icons.cloud_queue,
-                text: 'No sync files on this backend.',
+                text: l10n.settings_syncDevices_empty,
               )
             : ListView.separated(
                 itemCount: list.length + 1,
@@ -63,6 +66,7 @@ class _Summary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final theme = Theme.of(context);
     final files = devices.fold<int>(0, (a, d) => a + d.fileCount);
     final bytes = devices.fold<int>(0, (a, d) => a + d.byteCount);
@@ -75,15 +79,20 @@ class _Summary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${devices.length} device${devices.length == 1 ? '' : 's'}, '
-            '$files file${files == 1 ? '' : 's'}, ${_formatBytes(bytes)}',
+            l10n.settings_syncDevices_summary(
+              devices.length,
+              files,
+              _formatBytes(bytes),
+            ),
             style: theme.textTheme.titleMedium,
           ),
           if (removable.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
-              '${removable.length} left over from a replaced or retired '
-              'library, holding ${_formatBytes(removableBytes)}.',
+              l10n.settings_syncDevices_summary_removable(
+                removable.length,
+                _formatBytes(removableBytes),
+              ),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -102,13 +111,16 @@ class _DeviceTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final theme = Theme.of(context);
     final when = device.publishedAt ?? device.lastModified;
+    final size = _formatBytes(device.byteCount);
     return ListTile(
       isThreeLine: true,
       leading: Icon(_icon, color: _color(theme)),
       title: Text(
-        device.deviceName ?? 'Device ${device.shortId}',
+        device.deviceName ??
+            l10n.settings_syncDevices_unnamedDevice(device.shortId),
         style: TextStyle(
           fontWeight: device.isSelf ? FontWeight.bold : FontWeight.normal,
         ),
@@ -116,11 +128,18 @@ class _DeviceTile extends ConsumerWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(_stateLabel),
+          Text(_stateLabel(l10n)),
           Text(
-            '${device.fileCount} file${device.fileCount == 1 ? '' : 's'}, '
-            '${_formatBytes(device.byteCount)}'
-            '${when == null ? '' : ' - ${DateFormat.yMMMd().add_jm().format(when.toLocal())}'}',
+            when == null
+                ? l10n.settings_syncDevices_tile_filesSize(
+                    device.fileCount,
+                    size,
+                  )
+                : l10n.settings_syncDevices_tile_filesSizeSeen(
+                    device.fileCount,
+                    size,
+                    DateFormat.yMMMd().add_jm().format(when.toLocal()),
+                  ),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -131,7 +150,7 @@ class _DeviceTile extends ConsumerWidget {
           ? null
           : IconButton(
               icon: const Icon(Icons.delete_outline),
-              tooltip: 'Remove this device’s files',
+              tooltip: l10n.settings_syncDevices_removeTooltip,
               onPressed: () => _confirmRemove(context, ref),
             ),
     );
@@ -150,40 +169,45 @@ class _DeviceTile extends ConsumerWidget {
     _ => theme.colorScheme.onSurfaceVariant,
   };
 
-  String get _stateLabel => switch (device.state) {
+  String _stateLabel(AppLocalizations l10n) => switch (device.state) {
     SyncDeviceFootprintState.active =>
-      device.isSelf ? 'This device' : 'Syncing normally',
+      device.isSelf
+          ? l10n.settings_syncDevices_state_thisDevice
+          : l10n.settings_syncDevices_state_active,
     SyncDeviceFootprintState.staleEpoch =>
-      'Left over from an earlier library - no device reads this',
-    SyncDeviceFootprintState.retired => 'Retired',
+      l10n.settings_syncDevices_state_staleEpoch,
+    SyncDeviceFootprintState.retired => l10n.settings_syncDevices_state_retired,
     SyncDeviceFootprintState.unreadable =>
-      'No readable manifest - an unfinished upload, or encrypted',
+      l10n.settings_syncDevices_state_unreadable,
   };
 
   Future<void> _confirmRemove(BuildContext context, WidgetRef ref) async {
-    final name = device.deviceName ?? 'device ${device.shortId}';
+    final l10n = context.l10n;
+    final name =
+        device.deviceName ??
+        l10n.settings_cloudSync_peerNeedsAdopt_unnamedDevice(device.shortId);
+    final size = _formatBytes(device.byteCount);
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Remove $name’s files?'),
+        title: Text(l10n.settings_syncDevices_removeDialog_title(name)),
         content: Text(
           device.isSafeToRemove
-              ? 'This deletes ${device.fileCount} files '
-                    '(${_formatBytes(device.byteCount)}) belonging to $name. '
-                    'They are left over from a library no device syncs from '
-                    'any more. Your dive data is not affected.'
-              : 'This deletes ${device.fileCount} files '
-                    '(${_formatBytes(device.byteCount)}) belonging to $name.\n\n'
-                    'That device is still part of this sync. If it comes back '
-                    'online it will rebuild from the backend rather than '
-                    'resurrect old data, but any changes it has not yet '
-                    'published will be lost. Your dive data on THIS device is '
-                    'not affected.',
+              ? l10n.settings_syncDevices_removeDialog_bodySafe(
+                  device.fileCount,
+                  size,
+                  name,
+                )
+              : l10n.settings_syncDevices_removeDialog_bodyRisky(
+                  device.fileCount,
+                  size,
+                  name,
+                ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.common_action_cancel),
           ),
           FilledButton(
             style: device.isSafeToRemove
@@ -192,7 +216,7 @@ class _DeviceTile extends ConsumerWidget {
                     backgroundColor: Theme.of(context).colorScheme.error,
                   ),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Remove'),
+            child: Text(l10n.common_action_remove),
           ),
         ],
       ),
@@ -201,32 +225,39 @@ class _DeviceTile extends ConsumerWidget {
 
     final outcome = await runWithSyncMaintenanceProgress(
       context: context,
-      title: 'Removing $name’s files',
+      title: l10n.settings_syncDevices_removeProgressTitle(name),
       task: (report) => retireSyncPeer(
         ref,
         device.deviceId,
-        onProgress: cleanupPhase(report, 'Deleting'),
+        onProgress: cleanupPhase(
+          report,
+          l10n.settings_syncMaintenance_phase_deleting,
+        ),
       ),
     );
     if (!context.mounted) return;
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(_removalMessage(outcome))));
+    ).showSnackBar(SnackBar(content: Text(_removalMessage(l10n, outcome))));
   }
 
-  static String _removalMessage(SyncCleanupOutcome? outcome) {
-    if (outcome == null) return 'No cloud backend is configured';
+  static String _removalMessage(
+    AppLocalizations l10n,
+    SyncCleanupOutcome? outcome,
+  ) {
+    if (outcome == null) return l10n.settings_syncDevices_removal_noBackend;
     if (outcome.isComplete) {
-      return 'Removed ${outcome.deleted} '
-          'file${outcome.deleted == 1 ? '' : 's'}';
+      return l10n.settings_syncMaintenance_removedFiles(outcome.deleted);
     }
     if (outcome.deleted == 0 && outcome.listIncomplete) {
       // retirePeer refuses to delete without a durable fence marker, so this
       // is the "could not reach the backend" case, not a partial deletion.
-      return 'Could not reach the backend. Nothing was removed.';
+      return l10n.settings_syncDevices_removal_unreachable;
     }
-    return 'Removed ${outcome.deleted} files, but ${outcome.failed} could not '
-        'be deleted. Try again while online.';
+    return l10n.settings_syncMaintenance_removedFilesPartial(
+      outcome.deleted,
+      l10n.settings_syncMaintenance_trouble_failed(outcome.failed),
+    );
   }
 }
 

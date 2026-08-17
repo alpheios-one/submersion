@@ -40896,6 +40896,12023 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error deleting species: {error}'**
   String marineLife_species_delete_error(String error);
+
+  /// No description provided for @enum_diveField_diveNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Number'**
+  String get enum_diveField_diveNumber;
+
+  /// No description provided for @enum_diveField_dateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Date & Time'**
+  String get enum_diveField_dateTime;
+
+  /// No description provided for @enum_diveField_siteName.
+  ///
+  /// In en, this message translates to:
+  /// **'Site Name'**
+  String get enum_diveField_siteName;
+
+  /// No description provided for @enum_diveField_diveName.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Name'**
+  String get enum_diveField_diveName;
+
+  /// No description provided for @enum_diveField_maxDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Max Depth'**
+  String get enum_diveField_maxDepth;
+
+  /// No description provided for @enum_diveField_avgDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Depth'**
+  String get enum_diveField_avgDepth;
+
+  /// No description provided for @enum_diveField_bottomTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Bottom Time'**
+  String get enum_diveField_bottomTime;
+
+  /// No description provided for @enum_diveField_runtime.
+  ///
+  /// In en, this message translates to:
+  /// **'Runtime'**
+  String get enum_diveField_runtime;
+
+  /// No description provided for @enum_diveField_waterTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Temperature'**
+  String get enum_diveField_waterTemp;
+
+  /// No description provided for @enum_diveField_airTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'Air Temperature'**
+  String get enum_diveField_airTemp;
+
+  /// No description provided for @enum_diveField_visibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Visibility'**
+  String get enum_diveField_visibility;
+
+  /// No description provided for @enum_diveField_currentDirection.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Direction'**
+  String get enum_diveField_currentDirection;
+
+  /// No description provided for @enum_diveField_currentStrength.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Strength'**
+  String get enum_diveField_currentStrength;
+
+  /// No description provided for @enum_diveField_swellHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Swell Height'**
+  String get enum_diveField_swellHeight;
+
+  /// No description provided for @enum_diveField_entryMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry Method'**
+  String get enum_diveField_entryMethod;
+
+  /// No description provided for @enum_diveField_exitMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Method'**
+  String get enum_diveField_exitMethod;
+
+  /// No description provided for @enum_diveField_waterType.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Type'**
+  String get enum_diveField_waterType;
+
+  /// No description provided for @enum_diveField_altitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Altitude'**
+  String get enum_diveField_altitude;
+
+  /// No description provided for @enum_diveField_surfacePressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface Pressure'**
+  String get enum_diveField_surfacePressure;
+
+  /// No description provided for @enum_diveField_windSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind Speed'**
+  String get enum_diveField_windSpeed;
+
+  /// No description provided for @enum_diveField_cloudCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Cover'**
+  String get enum_diveField_cloudCover;
+
+  /// No description provided for @enum_diveField_precipitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Precipitation'**
+  String get enum_diveField_precipitation;
+
+  /// No description provided for @enum_diveField_humidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity'**
+  String get enum_diveField_humidity;
+
+  /// No description provided for @enum_diveField_weatherDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get enum_diveField_weatherDescription;
+
+  /// No description provided for @enum_diveField_primaryGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary Gas'**
+  String get enum_diveField_primaryGas;
+
+  /// No description provided for @enum_diveField_diluentGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Diluent Gas'**
+  String get enum_diveField_diluentGas;
+
+  /// No description provided for @enum_diveField_tankCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank Count'**
+  String get enum_diveField_tankCount;
+
+  /// No description provided for @enum_diveField_startPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Pressure'**
+  String get enum_diveField_startPressure;
+
+  /// No description provided for @enum_diveField_endPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'End Pressure'**
+  String get enum_diveField_endPressure;
+
+  /// No description provided for @enum_diveField_sacRate.
+  ///
+  /// In en, this message translates to:
+  /// **'SAC Rate'**
+  String get enum_diveField_sacRate;
+
+  /// No description provided for @enum_diveField_gasConsumed.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas Consumed'**
+  String get enum_diveField_gasConsumed;
+
+  /// No description provided for @enum_diveField_totalWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Weight'**
+  String get enum_diveField_totalWeight;
+
+  /// No description provided for @enum_diveField_diveComputerModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Computer'**
+  String get enum_diveField_diveComputerModel;
+
+  /// No description provided for @enum_diveField_gradientFactorLow.
+  ///
+  /// In en, this message translates to:
+  /// **'GF Low'**
+  String get enum_diveField_gradientFactorLow;
+
+  /// No description provided for @enum_diveField_gradientFactorHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'GF High'**
+  String get enum_diveField_gradientFactorHigh;
+
+  /// No description provided for @enum_diveField_decoAlgorithm.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco Algorithm'**
+  String get enum_diveField_decoAlgorithm;
+
+  /// No description provided for @enum_diveField_decoConservatism.
+  ///
+  /// In en, this message translates to:
+  /// **'Conservatism'**
+  String get enum_diveField_decoConservatism;
+
+  /// No description provided for @enum_diveField_cnsStart.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS Start'**
+  String get enum_diveField_cnsStart;
+
+  /// No description provided for @enum_diveField_cnsEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS End'**
+  String get enum_diveField_cnsEnd;
+
+  /// No description provided for @enum_diveField_otu.
+  ///
+  /// In en, this message translates to:
+  /// **'OTU'**
+  String get enum_diveField_otu;
+
+  /// No description provided for @enum_diveField_diveMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Mode'**
+  String get enum_diveField_diveMode;
+
+  /// No description provided for @enum_diveField_setpointLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Setpoint Low'**
+  String get enum_diveField_setpointLow;
+
+  /// No description provided for @enum_diveField_setpointHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Setpoint High'**
+  String get enum_diveField_setpointHigh;
+
+  /// No description provided for @enum_diveField_setpointDeco.
+  ///
+  /// In en, this message translates to:
+  /// **'Setpoint Deco'**
+  String get enum_diveField_setpointDeco;
+
+  /// No description provided for @enum_diveField_buddy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddy'**
+  String get enum_diveField_buddy;
+
+  /// No description provided for @enum_diveField_diveMaster.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Master'**
+  String get enum_diveField_diveMaster;
+
+  /// No description provided for @enum_diveField_siteLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Site Location'**
+  String get enum_diveField_siteLocation;
+
+  /// No description provided for @enum_diveField_diveCenterName.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Center'**
+  String get enum_diveField_diveCenterName;
+
+  /// No description provided for @enum_diveField_siteLatitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Latitude'**
+  String get enum_diveField_siteLatitude;
+
+  /// No description provided for @enum_diveField_siteLongitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Longitude'**
+  String get enum_diveField_siteLongitude;
+
+  /// No description provided for @enum_diveField_tripName.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get enum_diveField_tripName;
+
+  /// No description provided for @enum_diveField_ratingStars.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get enum_diveField_ratingStars;
+
+  /// No description provided for @enum_diveField_isFavorite.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite'**
+  String get enum_diveField_isFavorite;
+
+  /// No description provided for @enum_diveField_notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_diveField_notes;
+
+  /// No description provided for @enum_diveField_tags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get enum_diveField_tags;
+
+  /// No description provided for @enum_diveField_importSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Source'**
+  String get enum_diveField_importSource;
+
+  /// No description provided for @enum_diveField_diveTypeName.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Type'**
+  String get enum_diveField_diveTypeName;
+
+  /// No description provided for @enum_diveField_surfaceInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface Interval'**
+  String get enum_diveField_surfaceInterval;
+
+  /// No description provided for @enum_diveField_diveNumber_short.
+  ///
+  /// In en, this message translates to:
+  /// **'#'**
+  String get enum_diveField_diveNumber_short;
+
+  /// No description provided for @enum_diveField_dateTime_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get enum_diveField_dateTime_short;
+
+  /// No description provided for @enum_diveField_siteName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Site'**
+  String get enum_diveField_siteName_short;
+
+  /// No description provided for @enum_diveField_diveName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_diveField_diveName_short;
+
+  /// No description provided for @enum_diveField_maxDepth_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Max D'**
+  String get enum_diveField_maxDepth_short;
+
+  /// No description provided for @enum_diveField_avgDepth_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg D'**
+  String get enum_diveField_avgDepth_short;
+
+  /// No description provided for @enum_diveField_bottomTime_short.
+  ///
+  /// In en, this message translates to:
+  /// **'BT'**
+  String get enum_diveField_bottomTime_short;
+
+  /// No description provided for @enum_diveField_runtime_short.
+  ///
+  /// In en, this message translates to:
+  /// **'RT'**
+  String get enum_diveField_runtime_short;
+
+  /// No description provided for @enum_diveField_waterTemp_short.
+  ///
+  /// In en, this message translates to:
+  /// **'W Temp'**
+  String get enum_diveField_waterTemp_short;
+
+  /// No description provided for @enum_diveField_airTemp_short.
+  ///
+  /// In en, this message translates to:
+  /// **'A Temp'**
+  String get enum_diveField_airTemp_short;
+
+  /// No description provided for @enum_diveField_visibility_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Vis'**
+  String get enum_diveField_visibility_short;
+
+  /// No description provided for @enum_diveField_currentDirection_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Curr Dir'**
+  String get enum_diveField_currentDirection_short;
+
+  /// No description provided for @enum_diveField_currentStrength_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Curr'**
+  String get enum_diveField_currentStrength_short;
+
+  /// No description provided for @enum_diveField_swellHeight_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Swell'**
+  String get enum_diveField_swellHeight_short;
+
+  /// No description provided for @enum_diveField_entryMethod_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry'**
+  String get enum_diveField_entryMethod_short;
+
+  /// No description provided for @enum_diveField_exitMethod_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get enum_diveField_exitMethod_short;
+
+  /// No description provided for @enum_diveField_waterType_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Water'**
+  String get enum_diveField_waterType_short;
+
+  /// No description provided for @enum_diveField_altitude_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Alt'**
+  String get enum_diveField_altitude_short;
+
+  /// No description provided for @enum_diveField_surfacePressure_short.
+  ///
+  /// In en, this message translates to:
+  /// **'S Press'**
+  String get enum_diveField_surfacePressure_short;
+
+  /// No description provided for @enum_diveField_windSpeed_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind'**
+  String get enum_diveField_windSpeed_short;
+
+  /// No description provided for @enum_diveField_cloudCover_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud'**
+  String get enum_diveField_cloudCover_short;
+
+  /// No description provided for @enum_diveField_precipitation_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Precip'**
+  String get enum_diveField_precipitation_short;
+
+  /// No description provided for @enum_diveField_humidity_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Humid'**
+  String get enum_diveField_humidity_short;
+
+  /// No description provided for @enum_diveField_weatherDescription_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get enum_diveField_weatherDescription_short;
+
+  /// No description provided for @enum_diveField_primaryGas_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas'**
+  String get enum_diveField_primaryGas_short;
+
+  /// No description provided for @enum_diveField_diluentGas_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Dil'**
+  String get enum_diveField_diluentGas_short;
+
+  /// No description provided for @enum_diveField_tankCount_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Tanks'**
+  String get enum_diveField_tankCount_short;
+
+  /// No description provided for @enum_diveField_startPressure_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Start P'**
+  String get enum_diveField_startPressure_short;
+
+  /// No description provided for @enum_diveField_endPressure_short.
+  ///
+  /// In en, this message translates to:
+  /// **'End P'**
+  String get enum_diveField_endPressure_short;
+
+  /// No description provided for @enum_diveField_sacRate_short.
+  ///
+  /// In en, this message translates to:
+  /// **'SAC'**
+  String get enum_diveField_sacRate_short;
+
+  /// No description provided for @enum_diveField_gasConsumed_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas Used'**
+  String get enum_diveField_gasConsumed_short;
+
+  /// No description provided for @enum_diveField_totalWeight_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Wt'**
+  String get enum_diveField_totalWeight_short;
+
+  /// No description provided for @enum_diveField_diveComputerModel_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Computer'**
+  String get enum_diveField_diveComputerModel_short;
+
+  /// No description provided for @enum_diveField_gradientFactorLow_short.
+  ///
+  /// In en, this message translates to:
+  /// **'GFL'**
+  String get enum_diveField_gradientFactorLow_short;
+
+  /// No description provided for @enum_diveField_gradientFactorHigh_short.
+  ///
+  /// In en, this message translates to:
+  /// **'GFH'**
+  String get enum_diveField_gradientFactorHigh_short;
+
+  /// No description provided for @enum_diveField_decoAlgorithm_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Algo'**
+  String get enum_diveField_decoAlgorithm_short;
+
+  /// No description provided for @enum_diveField_decoConservatism_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Conserv'**
+  String get enum_diveField_decoConservatism_short;
+
+  /// No description provided for @enum_diveField_cnsStart_short.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS Start'**
+  String get enum_diveField_cnsStart_short;
+
+  /// No description provided for @enum_diveField_cnsEnd_short.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS End'**
+  String get enum_diveField_cnsEnd_short;
+
+  /// No description provided for @enum_diveField_otu_short.
+  ///
+  /// In en, this message translates to:
+  /// **'OTU'**
+  String get enum_diveField_otu_short;
+
+  /// No description provided for @enum_diveField_diveMode_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Mode'**
+  String get enum_diveField_diveMode_short;
+
+  /// No description provided for @enum_diveField_setpointLow_short.
+  ///
+  /// In en, this message translates to:
+  /// **'SP Lo'**
+  String get enum_diveField_setpointLow_short;
+
+  /// No description provided for @enum_diveField_setpointHigh_short.
+  ///
+  /// In en, this message translates to:
+  /// **'SP Hi'**
+  String get enum_diveField_setpointHigh_short;
+
+  /// No description provided for @enum_diveField_setpointDeco_short.
+  ///
+  /// In en, this message translates to:
+  /// **'SP Deco'**
+  String get enum_diveField_setpointDeco_short;
+
+  /// No description provided for @enum_diveField_buddy_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddy'**
+  String get enum_diveField_buddy_short;
+
+  /// No description provided for @enum_diveField_diveMaster_short.
+  ///
+  /// In en, this message translates to:
+  /// **'DM'**
+  String get enum_diveField_diveMaster_short;
+
+  /// No description provided for @enum_diveField_siteLocation_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get enum_diveField_siteLocation_short;
+
+  /// No description provided for @enum_diveField_diveCenterName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Ctr'**
+  String get enum_diveField_diveCenterName_short;
+
+  /// No description provided for @enum_diveField_siteLatitude_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Lat'**
+  String get enum_diveField_siteLatitude_short;
+
+  /// No description provided for @enum_diveField_siteLongitude_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Lng'**
+  String get enum_diveField_siteLongitude_short;
+
+  /// No description provided for @enum_diveField_tripName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get enum_diveField_tripName_short;
+
+  /// No description provided for @enum_diveField_ratingStars_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get enum_diveField_ratingStars_short;
+
+  /// No description provided for @enum_diveField_isFavorite_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Fav'**
+  String get enum_diveField_isFavorite_short;
+
+  /// No description provided for @enum_diveField_notes_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_diveField_notes_short;
+
+  /// No description provided for @enum_diveField_tags_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get enum_diveField_tags_short;
+
+  /// No description provided for @enum_diveField_importSource_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get enum_diveField_importSource_short;
+
+  /// No description provided for @enum_diveField_diveTypeName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get enum_diveField_diveTypeName_short;
+
+  /// No description provided for @enum_diveField_surfaceInterval_short.
+  ///
+  /// In en, this message translates to:
+  /// **'SI'**
+  String get enum_diveField_surfaceInterval_short;
+
+  /// No description provided for @enum_siteField_siteName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_siteField_siteName;
+
+  /// No description provided for @enum_siteField_location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get enum_siteField_location;
+
+  /// No description provided for @enum_siteField_country.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get enum_siteField_country;
+
+  /// No description provided for @enum_siteField_region.
+  ///
+  /// In en, this message translates to:
+  /// **'Region'**
+  String get enum_siteField_region;
+
+  /// No description provided for @enum_siteField_city.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get enum_siteField_city;
+
+  /// No description provided for @enum_siteField_island.
+  ///
+  /// In en, this message translates to:
+  /// **'Island'**
+  String get enum_siteField_island;
+
+  /// No description provided for @enum_siteField_bodyOfWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Body of Water'**
+  String get enum_siteField_bodyOfWater;
+
+  /// No description provided for @enum_siteField_diveCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Count'**
+  String get enum_siteField_diveCount;
+
+  /// No description provided for @enum_siteField_maxDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Max Depth'**
+  String get enum_siteField_maxDepth;
+
+  /// No description provided for @enum_siteField_minDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Min Depth'**
+  String get enum_siteField_minDepth;
+
+  /// No description provided for @enum_siteField_altitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Altitude'**
+  String get enum_siteField_altitude;
+
+  /// No description provided for @enum_siteField_waterType.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Type'**
+  String get enum_siteField_waterType;
+
+  /// No description provided for @enum_siteField_typicalVisibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical Visibility'**
+  String get enum_siteField_typicalVisibility;
+
+  /// No description provided for @enum_siteField_typicalCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical Current'**
+  String get enum_siteField_typicalCurrent;
+
+  /// No description provided for @enum_siteField_difficulty.
+  ///
+  /// In en, this message translates to:
+  /// **'Difficulty'**
+  String get enum_siteField_difficulty;
+
+  /// No description provided for @enum_siteField_entryType.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry Type'**
+  String get enum_siteField_entryType;
+
+  /// No description provided for @enum_siteField_bestSeason.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Season'**
+  String get enum_siteField_bestSeason;
+
+  /// No description provided for @enum_siteField_mooringNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Mooring Number'**
+  String get enum_siteField_mooringNumber;
+
+  /// No description provided for @enum_siteField_hazards.
+  ///
+  /// In en, this message translates to:
+  /// **'Hazards'**
+  String get enum_siteField_hazards;
+
+  /// No description provided for @enum_siteField_rating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get enum_siteField_rating;
+
+  /// No description provided for @enum_siteField_notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_siteField_notes;
+
+  /// No description provided for @enum_siteField_latitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Latitude'**
+  String get enum_siteField_latitude;
+
+  /// No description provided for @enum_siteField_longitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Longitude'**
+  String get enum_siteField_longitude;
+
+  /// No description provided for @enum_siteField_siteName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_siteField_siteName_short;
+
+  /// No description provided for @enum_siteField_location_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get enum_siteField_location_short;
+
+  /// No description provided for @enum_siteField_country_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get enum_siteField_country_short;
+
+  /// No description provided for @enum_siteField_region_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Region'**
+  String get enum_siteField_region_short;
+
+  /// No description provided for @enum_siteField_city_short.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get enum_siteField_city_short;
+
+  /// No description provided for @enum_siteField_island_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Island'**
+  String get enum_siteField_island_short;
+
+  /// No description provided for @enum_siteField_bodyOfWater_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Body'**
+  String get enum_siteField_bodyOfWater_short;
+
+  /// No description provided for @enum_siteField_diveCount_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get enum_siteField_diveCount_short;
+
+  /// No description provided for @enum_siteField_maxDepth_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Max D'**
+  String get enum_siteField_maxDepth_short;
+
+  /// No description provided for @enum_siteField_minDepth_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Min D'**
+  String get enum_siteField_minDepth_short;
+
+  /// No description provided for @enum_siteField_altitude_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Alt'**
+  String get enum_siteField_altitude_short;
+
+  /// No description provided for @enum_siteField_waterType_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Water'**
+  String get enum_siteField_waterType_short;
+
+  /// No description provided for @enum_siteField_typicalVisibility_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Vis'**
+  String get enum_siteField_typicalVisibility_short;
+
+  /// No description provided for @enum_siteField_typicalCurrent_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get enum_siteField_typicalCurrent_short;
+
+  /// No description provided for @enum_siteField_difficulty_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Diff'**
+  String get enum_siteField_difficulty_short;
+
+  /// No description provided for @enum_siteField_entryType_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry'**
+  String get enum_siteField_entryType_short;
+
+  /// No description provided for @enum_siteField_bestSeason_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Season'**
+  String get enum_siteField_bestSeason_short;
+
+  /// No description provided for @enum_siteField_mooringNumber_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Mooring'**
+  String get enum_siteField_mooringNumber_short;
+
+  /// No description provided for @enum_siteField_hazards_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Hazards'**
+  String get enum_siteField_hazards_short;
+
+  /// No description provided for @enum_siteField_rating_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get enum_siteField_rating_short;
+
+  /// No description provided for @enum_siteField_notes_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_siteField_notes_short;
+
+  /// No description provided for @enum_siteField_latitude_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Lat'**
+  String get enum_siteField_latitude_short;
+
+  /// No description provided for @enum_siteField_longitude_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Lon'**
+  String get enum_siteField_longitude_short;
+
+  /// No description provided for @enum_buddyField_buddyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_buddyField_buddyName;
+
+  /// No description provided for @enum_buddyField_email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get enum_buddyField_email;
+
+  /// No description provided for @enum_buddyField_phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get enum_buddyField_phone;
+
+  /// No description provided for @enum_buddyField_certificationLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification Level'**
+  String get enum_buddyField_certificationLevel;
+
+  /// No description provided for @enum_buddyField_certificationAgency.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification Agency'**
+  String get enum_buddyField_certificationAgency;
+
+  /// No description provided for @enum_buddyField_diveCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Count'**
+  String get enum_buddyField_diveCount;
+
+  /// No description provided for @enum_buddyField_notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_buddyField_notes;
+
+  /// No description provided for @enum_buddyField_buddyName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_buddyField_buddyName_short;
+
+  /// No description provided for @enum_buddyField_email_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get enum_buddyField_email_short;
+
+  /// No description provided for @enum_buddyField_phone_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get enum_buddyField_phone_short;
+
+  /// No description provided for @enum_buddyField_certificationLevel_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Cert Level'**
+  String get enum_buddyField_certificationLevel_short;
+
+  /// No description provided for @enum_buddyField_certificationAgency_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Agency'**
+  String get enum_buddyField_certificationAgency_short;
+
+  /// No description provided for @enum_buddyField_diveCount_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get enum_buddyField_diveCount_short;
+
+  /// No description provided for @enum_buddyField_notes_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_buddyField_notes_short;
+
+  /// No description provided for @enum_tripField_tripName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_tripField_tripName;
+
+  /// No description provided for @enum_tripField_startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get enum_tripField_startDate;
+
+  /// No description provided for @enum_tripField_endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get enum_tripField_endDate;
+
+  /// No description provided for @enum_tripField_durationDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get enum_tripField_durationDays;
+
+  /// No description provided for @enum_tripField_location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get enum_tripField_location;
+
+  /// No description provided for @enum_tripField_tripType.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Type'**
+  String get enum_tripField_tripType;
+
+  /// No description provided for @enum_tripField_resortName.
+  ///
+  /// In en, this message translates to:
+  /// **'Resort'**
+  String get enum_tripField_resortName;
+
+  /// No description provided for @enum_tripField_liveaboardName.
+  ///
+  /// In en, this message translates to:
+  /// **'Liveaboard'**
+  String get enum_tripField_liveaboardName;
+
+  /// No description provided for @enum_tripField_diveCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Count'**
+  String get enum_tripField_diveCount;
+
+  /// No description provided for @enum_tripField_totalRuntime.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Runtime'**
+  String get enum_tripField_totalRuntime;
+
+  /// No description provided for @enum_tripField_maxDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Max Depth'**
+  String get enum_tripField_maxDepth;
+
+  /// No description provided for @enum_tripField_avgDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg Depth'**
+  String get enum_tripField_avgDepth;
+
+  /// No description provided for @enum_tripField_notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_tripField_notes;
+
+  /// No description provided for @enum_tripField_tripName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_tripField_tripName_short;
+
+  /// No description provided for @enum_tripField_startDate_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get enum_tripField_startDate_short;
+
+  /// No description provided for @enum_tripField_endDate_short.
+  ///
+  /// In en, this message translates to:
+  /// **'End'**
+  String get enum_tripField_endDate_short;
+
+  /// No description provided for @enum_tripField_durationDays_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get enum_tripField_durationDays_short;
+
+  /// No description provided for @enum_tripField_location_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get enum_tripField_location_short;
+
+  /// No description provided for @enum_tripField_tripType_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get enum_tripField_tripType_short;
+
+  /// No description provided for @enum_tripField_resortName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Resort'**
+  String get enum_tripField_resortName_short;
+
+  /// No description provided for @enum_tripField_liveaboardName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Liveaboard'**
+  String get enum_tripField_liveaboardName_short;
+
+  /// No description provided for @enum_tripField_diveCount_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get enum_tripField_diveCount_short;
+
+  /// No description provided for @enum_tripField_totalRuntime_short.
+  ///
+  /// In en, this message translates to:
+  /// **'RT Total'**
+  String get enum_tripField_totalRuntime_short;
+
+  /// No description provided for @enum_tripField_maxDepth_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Max D'**
+  String get enum_tripField_maxDepth_short;
+
+  /// No description provided for @enum_tripField_avgDepth_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg D'**
+  String get enum_tripField_avgDepth_short;
+
+  /// No description provided for @enum_tripField_notes_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_tripField_notes_short;
+
+  /// No description provided for @enum_equipmentField_itemName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_equipmentField_itemName;
+
+  /// No description provided for @enum_equipmentField_fullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get enum_equipmentField_fullName;
+
+  /// No description provided for @enum_equipmentField_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get enum_equipmentField_type;
+
+  /// No description provided for @enum_equipmentField_brand.
+  ///
+  /// In en, this message translates to:
+  /// **'Brand'**
+  String get enum_equipmentField_brand;
+
+  /// No description provided for @enum_equipmentField_model.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get enum_equipmentField_model;
+
+  /// No description provided for @enum_equipmentField_serialNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial Number'**
+  String get enum_equipmentField_serialNumber;
+
+  /// No description provided for @enum_equipmentField_size.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get enum_equipmentField_size;
+
+  /// No description provided for @enum_equipmentField_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get enum_equipmentField_status;
+
+  /// No description provided for @enum_equipmentField_isActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get enum_equipmentField_isActive;
+
+  /// No description provided for @enum_equipmentField_purchaseDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Date'**
+  String get enum_equipmentField_purchaseDate;
+
+  /// No description provided for @enum_equipmentField_purchasePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase Price'**
+  String get enum_equipmentField_purchasePrice;
+
+  /// No description provided for @enum_equipmentField_lastServiceDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Service'**
+  String get enum_equipmentField_lastServiceDate;
+
+  /// No description provided for @enum_equipmentField_nextServiceDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Service Due'**
+  String get enum_equipmentField_nextServiceDue;
+
+  /// No description provided for @enum_equipmentField_daysUntilService.
+  ///
+  /// In en, this message translates to:
+  /// **'Days Until Service'**
+  String get enum_equipmentField_daysUntilService;
+
+  /// No description provided for @enum_equipmentField_serviceIntervalDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Service Interval'**
+  String get enum_equipmentField_serviceIntervalDays;
+
+  /// No description provided for @enum_equipmentField_notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_equipmentField_notes;
+
+  /// No description provided for @enum_equipmentField_itemName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_equipmentField_itemName_short;
+
+  /// No description provided for @enum_equipmentField_fullName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get enum_equipmentField_fullName_short;
+
+  /// No description provided for @enum_equipmentField_type_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get enum_equipmentField_type_short;
+
+  /// No description provided for @enum_equipmentField_brand_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Brand'**
+  String get enum_equipmentField_brand_short;
+
+  /// No description provided for @enum_equipmentField_model_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get enum_equipmentField_model_short;
+
+  /// No description provided for @enum_equipmentField_serialNumber_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial #'**
+  String get enum_equipmentField_serialNumber_short;
+
+  /// No description provided for @enum_equipmentField_size_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get enum_equipmentField_size_short;
+
+  /// No description provided for @enum_equipmentField_status_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get enum_equipmentField_status_short;
+
+  /// No description provided for @enum_equipmentField_isActive_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get enum_equipmentField_isActive_short;
+
+  /// No description provided for @enum_equipmentField_purchaseDate_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchased'**
+  String get enum_equipmentField_purchaseDate_short;
+
+  /// No description provided for @enum_equipmentField_purchasePrice_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get enum_equipmentField_purchasePrice_short;
+
+  /// No description provided for @enum_equipmentField_lastServiceDate_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Serviced'**
+  String get enum_equipmentField_lastServiceDate_short;
+
+  /// No description provided for @enum_equipmentField_nextServiceDue_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Svc'**
+  String get enum_equipmentField_nextServiceDue_short;
+
+  /// No description provided for @enum_equipmentField_daysUntilService_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Days Left'**
+  String get enum_equipmentField_daysUntilService_short;
+
+  /// No description provided for @enum_equipmentField_serviceIntervalDays_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Interval'**
+  String get enum_equipmentField_serviceIntervalDays_short;
+
+  /// No description provided for @enum_equipmentField_notes_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_equipmentField_notes_short;
+
+  /// No description provided for @enum_diveCenterField_centerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_diveCenterField_centerName;
+
+  /// No description provided for @enum_diveCenterField_city.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get enum_diveCenterField_city;
+
+  /// No description provided for @enum_diveCenterField_country.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get enum_diveCenterField_country;
+
+  /// No description provided for @enum_diveCenterField_stateProvince.
+  ///
+  /// In en, this message translates to:
+  /// **'State / Province'**
+  String get enum_diveCenterField_stateProvince;
+
+  /// No description provided for @enum_diveCenterField_street.
+  ///
+  /// In en, this message translates to:
+  /// **'Street'**
+  String get enum_diveCenterField_street;
+
+  /// No description provided for @enum_diveCenterField_postalCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Postal Code'**
+  String get enum_diveCenterField_postalCode;
+
+  /// No description provided for @enum_diveCenterField_phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get enum_diveCenterField_phone;
+
+  /// No description provided for @enum_diveCenterField_email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get enum_diveCenterField_email;
+
+  /// No description provided for @enum_diveCenterField_website.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get enum_diveCenterField_website;
+
+  /// No description provided for @enum_diveCenterField_affiliations.
+  ///
+  /// In en, this message translates to:
+  /// **'Affiliations'**
+  String get enum_diveCenterField_affiliations;
+
+  /// No description provided for @enum_diveCenterField_rating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get enum_diveCenterField_rating;
+
+  /// No description provided for @enum_diveCenterField_latitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Latitude'**
+  String get enum_diveCenterField_latitude;
+
+  /// No description provided for @enum_diveCenterField_longitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Longitude'**
+  String get enum_diveCenterField_longitude;
+
+  /// No description provided for @enum_diveCenterField_diveCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Count'**
+  String get enum_diveCenterField_diveCount;
+
+  /// No description provided for @enum_diveCenterField_notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_diveCenterField_notes;
+
+  /// No description provided for @enum_diveCenterField_centerName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_diveCenterField_centerName_short;
+
+  /// No description provided for @enum_diveCenterField_city_short.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get enum_diveCenterField_city_short;
+
+  /// No description provided for @enum_diveCenterField_country_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get enum_diveCenterField_country_short;
+
+  /// No description provided for @enum_diveCenterField_stateProvince_short.
+  ///
+  /// In en, this message translates to:
+  /// **'State'**
+  String get enum_diveCenterField_stateProvince_short;
+
+  /// No description provided for @enum_diveCenterField_street_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Street'**
+  String get enum_diveCenterField_street_short;
+
+  /// No description provided for @enum_diveCenterField_postalCode_short.
+  ///
+  /// In en, this message translates to:
+  /// **'ZIP'**
+  String get enum_diveCenterField_postalCode_short;
+
+  /// No description provided for @enum_diveCenterField_phone_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get enum_diveCenterField_phone_short;
+
+  /// No description provided for @enum_diveCenterField_email_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get enum_diveCenterField_email_short;
+
+  /// No description provided for @enum_diveCenterField_website_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get enum_diveCenterField_website_short;
+
+  /// No description provided for @enum_diveCenterField_affiliations_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Affiliations'**
+  String get enum_diveCenterField_affiliations_short;
+
+  /// No description provided for @enum_diveCenterField_rating_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get enum_diveCenterField_rating_short;
+
+  /// No description provided for @enum_diveCenterField_latitude_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Lat'**
+  String get enum_diveCenterField_latitude_short;
+
+  /// No description provided for @enum_diveCenterField_longitude_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Lon'**
+  String get enum_diveCenterField_longitude_short;
+
+  /// No description provided for @enum_diveCenterField_diveCount_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get enum_diveCenterField_diveCount_short;
+
+  /// No description provided for @enum_diveCenterField_notes_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_diveCenterField_notes_short;
+
+  /// No description provided for @enum_certificationField_certName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_certificationField_certName;
+
+  /// No description provided for @enum_certificationField_agency.
+  ///
+  /// In en, this message translates to:
+  /// **'Agency'**
+  String get enum_certificationField_agency;
+
+  /// No description provided for @enum_certificationField_level.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification'**
+  String get enum_certificationField_level;
+
+  /// No description provided for @enum_certificationField_cardNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Card Number'**
+  String get enum_certificationField_cardNumber;
+
+  /// No description provided for @enum_certificationField_issueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue Date'**
+  String get enum_certificationField_issueDate;
+
+  /// No description provided for @enum_certificationField_expiryDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry Date'**
+  String get enum_certificationField_expiryDate;
+
+  /// No description provided for @enum_certificationField_instructorName.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor Name'**
+  String get enum_certificationField_instructorName;
+
+  /// No description provided for @enum_certificationField_instructorNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor Number'**
+  String get enum_certificationField_instructorNumber;
+
+  /// No description provided for @enum_certificationField_expiryStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry Status'**
+  String get enum_certificationField_expiryStatus;
+
+  /// No description provided for @enum_certificationField_notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_certificationField_notes;
+
+  /// No description provided for @enum_certificationField_certName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_certificationField_certName_short;
+
+  /// No description provided for @enum_certificationField_agency_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Agency'**
+  String get enum_certificationField_agency_short;
+
+  /// No description provided for @enum_certificationField_level_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification'**
+  String get enum_certificationField_level_short;
+
+  /// No description provided for @enum_certificationField_cardNumber_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Card #'**
+  String get enum_certificationField_cardNumber_short;
+
+  /// No description provided for @enum_certificationField_issueDate_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Issued'**
+  String get enum_certificationField_issueDate_short;
+
+  /// No description provided for @enum_certificationField_expiryDate_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires'**
+  String get enum_certificationField_expiryDate_short;
+
+  /// No description provided for @enum_certificationField_instructorName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor'**
+  String get enum_certificationField_instructorName_short;
+
+  /// No description provided for @enum_certificationField_instructorNumber_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Instr. #'**
+  String get enum_certificationField_instructorNumber_short;
+
+  /// No description provided for @enum_certificationField_expiryStatus_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get enum_certificationField_expiryStatus_short;
+
+  /// No description provided for @enum_certificationField_notes_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_certificationField_notes_short;
+
+  /// No description provided for @enum_courseField_courseName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_courseField_courseName;
+
+  /// No description provided for @enum_courseField_agency.
+  ///
+  /// In en, this message translates to:
+  /// **'Agency'**
+  String get enum_courseField_agency;
+
+  /// No description provided for @enum_courseField_startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get enum_courseField_startDate;
+
+  /// No description provided for @enum_courseField_completionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Completion Date'**
+  String get enum_courseField_completionDate;
+
+  /// No description provided for @enum_courseField_durationDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get enum_courseField_durationDays;
+
+  /// No description provided for @enum_courseField_instructorName.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor Name'**
+  String get enum_courseField_instructorName;
+
+  /// No description provided for @enum_courseField_instructorNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor Number'**
+  String get enum_courseField_instructorNumber;
+
+  /// No description provided for @enum_courseField_location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get enum_courseField_location;
+
+  /// No description provided for @enum_courseField_isCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get enum_courseField_isCompleted;
+
+  /// No description provided for @enum_courseField_notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_courseField_notes;
+
+  /// No description provided for @enum_courseField_courseName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enum_courseField_courseName_short;
+
+  /// No description provided for @enum_courseField_agency_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Agency'**
+  String get enum_courseField_agency_short;
+
+  /// No description provided for @enum_courseField_startDate_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Started'**
+  String get enum_courseField_startDate_short;
+
+  /// No description provided for @enum_courseField_completionDate_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get enum_courseField_completionDate_short;
+
+  /// No description provided for @enum_courseField_durationDays_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get enum_courseField_durationDays_short;
+
+  /// No description provided for @enum_courseField_instructorName_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor'**
+  String get enum_courseField_instructorName_short;
+
+  /// No description provided for @enum_courseField_instructorNumber_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Instr. #'**
+  String get enum_courseField_instructorNumber_short;
+
+  /// No description provided for @enum_courseField_location_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get enum_courseField_location_short;
+
+  /// No description provided for @enum_courseField_isCompleted_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get enum_courseField_isCompleted_short;
+
+  /// No description provided for @enum_courseField_notes_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get enum_courseField_notes_short;
+
+  /// No description provided for @enum_fieldCategory_accommodation.
+  ///
+  /// In en, this message translates to:
+  /// **'Accommodation'**
+  String get enum_fieldCategory_accommodation;
+
+  /// No description provided for @enum_fieldCategory_address.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get enum_fieldCategory_address;
+
+  /// No description provided for @enum_fieldCategory_certification.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification'**
+  String get enum_fieldCategory_certification;
+
+  /// No description provided for @enum_fieldCategory_conditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Conditions'**
+  String get enum_fieldCategory_conditions;
+
+  /// No description provided for @enum_fieldCategory_contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get enum_fieldCategory_contact;
+
+  /// No description provided for @enum_fieldCategory_coordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates'**
+  String get enum_fieldCategory_coordinates;
+
+  /// No description provided for @enum_fieldCategory_dates.
+  ///
+  /// In en, this message translates to:
+  /// **'Dates'**
+  String get enum_fieldCategory_dates;
+
+  /// No description provided for @enum_fieldCategory_depth.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth'**
+  String get enum_fieldCategory_depth;
+
+  /// No description provided for @enum_fieldCategory_details.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get enum_fieldCategory_details;
+
+  /// No description provided for @enum_fieldCategory_instructor.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor'**
+  String get enum_fieldCategory_instructor;
+
+  /// No description provided for @enum_fieldCategory_other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get enum_fieldCategory_other;
+
+  /// No description provided for @enum_fieldCategory_purchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase'**
+  String get enum_fieldCategory_purchase;
+
+  /// No description provided for @enum_fieldCategory_service.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get enum_fieldCategory_service;
+
+  /// No description provided for @enum_fieldCategory_statistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get enum_fieldCategory_statistics;
+
+  /// No description provided for @species_whale_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Whale Shark'**
+  String get species_whale_shark_name;
+
+  /// No description provided for @species_whale_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest fish in the ocean, gentle filter feeder with distinctive spotted pattern.'**
+  String get species_whale_shark_desc;
+
+  /// No description provided for @species_great_white_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Great White Shark'**
+  String get species_great_white_shark_name;
+
+  /// No description provided for @species_great_white_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Iconic apex predator occasionally seen by cage divers in temperate waters.'**
+  String get species_great_white_shark_desc;
+
+  /// No description provided for @species_great_hammerhead_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Great Hammerhead Shark'**
+  String get species_great_hammerhead_shark_name;
+
+  /// No description provided for @species_great_hammerhead_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest hammerhead species with a broad, flat head and tall dorsal fin.'**
+  String get species_great_hammerhead_shark_desc;
+
+  /// No description provided for @species_scalloped_hammerhead_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Scalloped Hammerhead Shark'**
+  String get species_scalloped_hammerhead_shark_name;
+
+  /// No description provided for @species_scalloped_hammerhead_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Often seen in large schools at seamounts and cleaning stations.'**
+  String get species_scalloped_hammerhead_shark_desc;
+
+  /// No description provided for @species_smooth_hammerhead_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth Hammerhead Shark'**
+  String get species_smooth_hammerhead_shark_name;
+
+  /// No description provided for @species_smooth_hammerhead_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hammerhead with a smooth, rounded head margin found in temperate seas.'**
+  String get species_smooth_hammerhead_shark_desc;
+
+  /// No description provided for @species_whitetip_reef_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Whitetip Reef Shark'**
+  String get species_whitetip_reef_shark_name;
+
+  /// No description provided for @species_whitetip_reef_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Docile reef dweller often found resting in caves and under ledges during the day.'**
+  String get species_whitetip_reef_shark_desc;
+
+  /// No description provided for @species_blacktip_reef_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blacktip Reef Shark'**
+  String get species_blacktip_reef_shark_name;
+
+  /// No description provided for @species_blacktip_reef_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Common shallow-water reef shark with distinctive black-tipped fins.'**
+  String get species_blacktip_reef_shark_desc;
+
+  /// No description provided for @species_grey_reef_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey Reef Shark'**
+  String get species_grey_reef_shark_name;
+
+  /// No description provided for @species_grey_reef_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Active reef predator often encountered in groups along drop-offs and channels.'**
+  String get species_grey_reef_shark_desc;
+
+  /// No description provided for @species_caribbean_reef_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Caribbean Reef Shark'**
+  String get species_caribbean_reef_shark_name;
+
+  /// No description provided for @species_caribbean_reef_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Most commonly encountered reef shark in the Caribbean, robust and curious.'**
+  String get species_caribbean_reef_shark_desc;
+
+  /// No description provided for @species_nurse_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Nurse Shark'**
+  String get species_nurse_shark_name;
+
+  /// No description provided for @species_nurse_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow-moving bottom dweller often found resting under coral ledges.'**
+  String get species_nurse_shark_desc;
+
+  /// No description provided for @species_tawny_nurse_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tawny Nurse Shark'**
+  String get species_tawny_nurse_shark_name;
+
+  /// No description provided for @species_tawny_nurse_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Indo-Pacific bottom dweller found resting in reef caves and sandy areas.'**
+  String get species_tawny_nurse_shark_desc;
+
+  /// No description provided for @species_bull_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bull Shark'**
+  String get species_bull_shark_name;
+
+  /// No description provided for @species_bull_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Stocky, powerful shark found in coastal and freshwater environments worldwide.'**
+  String get species_bull_shark_desc;
+
+  /// No description provided for @species_tiger_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiger Shark'**
+  String get species_tiger_shark_name;
+
+  /// No description provided for @species_tiger_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large predator with distinctive striped pattern, encountered on deep reef dives.'**
+  String get species_tiger_shark_desc;
+
+  /// No description provided for @species_oceanic_whitetip_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Oceanic Whitetip Shark'**
+  String get species_oceanic_whitetip_shark_name;
+
+  /// No description provided for @species_oceanic_whitetip_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pelagic shark with rounded white-tipped fins, seen on open ocean dives.'**
+  String get species_oceanic_whitetip_shark_desc;
+
+  /// No description provided for @species_thresher_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Thresher Shark'**
+  String get species_thresher_shark_name;
+
+  /// No description provided for @species_thresher_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Recognizable by its extremely long tail fin, sometimes seen at cleaning stations.'**
+  String get species_thresher_shark_desc;
+
+  /// No description provided for @species_pelagic_thresher_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pelagic Thresher Shark'**
+  String get species_pelagic_thresher_shark_name;
+
+  /// No description provided for @species_pelagic_thresher_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Smallest thresher species, famously seen at Monad Shoal in the Philippines.'**
+  String get species_pelagic_thresher_shark_desc;
+
+  /// No description provided for @species_shortfin_mako_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Shortfin Mako Shark'**
+  String get species_shortfin_mako_shark_name;
+
+  /// No description provided for @species_shortfin_mako_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fastest shark in the ocean, a sleek open-water predator with metallic blue coloring.'**
+  String get species_shortfin_mako_shark_desc;
+
+  /// No description provided for @species_blue_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Shark'**
+  String get species_blue_shark_name;
+
+  /// No description provided for @species_blue_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slender, deep blue pelagic shark often encountered on blue-water dives.'**
+  String get species_blue_shark_desc;
+
+  /// No description provided for @species_spotted_wobbegong_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotted Wobbegong'**
+  String get species_spotted_wobbegong_name;
+
+  /// No description provided for @species_spotted_wobbegong_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat, camouflaged carpet shark that lies motionless on rocky reefs in Australia.'**
+  String get species_spotted_wobbegong_desc;
+
+  /// No description provided for @species_tasselled_wobbegong_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasselled Wobbegong'**
+  String get species_tasselled_wobbegong_name;
+
+  /// No description provided for @species_tasselled_wobbegong_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ornate carpet shark with fringed lobes around its head, found in coral reefs.'**
+  String get species_tasselled_wobbegong_desc;
+
+  /// No description provided for @species_epaulette_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Epaulette Shark'**
+  String get species_epaulette_shark_name;
+
+  /// No description provided for @species_epaulette_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small shark that walks along the reef floor using its pectoral fins.'**
+  String get species_epaulette_shark_desc;
+
+  /// No description provided for @species_horn_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Horn Shark'**
+  String get species_horn_shark_name;
+
+  /// No description provided for @species_horn_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Nocturnal bottom dweller with ridges above its eyes, found off California.'**
+  String get species_horn_shark_desc;
+
+  /// No description provided for @species_leopard_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Leopard Shark'**
+  String get species_leopard_shark_name;
+
+  /// No description provided for @species_leopard_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Beautifully patterned shark found in shallow bays along the US Pacific coast.'**
+  String get species_leopard_shark_desc;
+
+  /// No description provided for @species_pacific_angel_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pacific Angel Shark'**
+  String get species_pacific_angel_shark_name;
+
+  /// No description provided for @species_pacific_angel_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat-bodied ambush predator that lies buried in sand on the seafloor.'**
+  String get species_pacific_angel_shark_desc;
+
+  /// No description provided for @species_sand_tiger_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sand Tiger Shark'**
+  String get species_sand_tiger_shark_name;
+
+  /// No description provided for @species_sand_tiger_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fierce-looking but docile shark often seen hovering in caves and shipwrecks.'**
+  String get species_sand_tiger_shark_desc;
+
+  /// No description provided for @species_zebra_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Zebra Shark'**
+  String get species_zebra_shark_name;
+
+  /// No description provided for @species_zebra_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotted reef shark that rests on sandy bottoms, common in the Indo-Pacific.'**
+  String get species_zebra_shark_desc;
+
+  /// No description provided for @species_blacktip_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blacktip Shark'**
+  String get species_blacktip_shark_name;
+
+  /// No description provided for @species_blacktip_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast coastal shark known for spinning leaps, found in warm waters worldwide.'**
+  String get species_blacktip_shark_desc;
+
+  /// No description provided for @species_silvertip_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Silvertip Shark'**
+  String get species_silvertip_shark_name;
+
+  /// No description provided for @species_silvertip_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bold reef shark with white-edged fins, found near deep drop-offs and atolls.'**
+  String get species_silvertip_shark_desc;
+
+  /// No description provided for @species_silky_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Silky Shark'**
+  String get species_silky_shark_name;
+
+  /// No description provided for @species_silky_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleek pelagic shark with smooth skin, often found near offshore reefs.'**
+  String get species_silky_shark_desc;
+
+  /// No description provided for @species_lemon_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Lemon Shark'**
+  String get species_lemon_shark_name;
+
+  /// No description provided for @species_lemon_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellowish-brown shark commonly seen in shallow mangroves and sandy flats.'**
+  String get species_lemon_shark_desc;
+
+  /// No description provided for @species_galapagos_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Galapagos Shark'**
+  String get species_galapagos_shark_name;
+
+  /// No description provided for @species_galapagos_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large reef shark found around oceanic islands, inquisitive toward divers.'**
+  String get species_galapagos_shark_desc;
+
+  /// No description provided for @species_port_jackson_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Port Jackson Shark'**
+  String get species_port_jackson_shark_name;
+
+  /// No description provided for @species_port_jackson_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Nocturnal bottom dweller with harness-like markings, endemic to Australia.'**
+  String get species_port_jackson_shark_desc;
+
+  /// No description provided for @species_bamboo_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Brownbanded Bamboo Shark'**
+  String get species_bamboo_shark_name;
+
+  /// No description provided for @species_bamboo_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small, docile bottom-dwelling shark common on Indo-Pacific coral reefs.'**
+  String get species_bamboo_shark_desc;
+
+  /// No description provided for @species_basking_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Basking Shark'**
+  String get species_basking_shark_name;
+
+  /// No description provided for @species_basking_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Second-largest fish, a filter feeder seen in temperate surface waters.'**
+  String get species_basking_shark_desc;
+
+  /// No description provided for @species_greenland_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Greenland Shark'**
+  String get species_greenland_shark_name;
+
+  /// No description provided for @species_greenland_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow-moving deep-water shark, one of the longest-lived vertebrates on Earth.'**
+  String get species_greenland_shark_desc;
+
+  /// No description provided for @species_cookiecutter_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Cookiecutter Shark'**
+  String get species_cookiecutter_shark_name;
+
+  /// No description provided for @species_cookiecutter_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small deep-water shark that takes circular bites from larger marine animals.'**
+  String get species_cookiecutter_shark_desc;
+
+  /// No description provided for @species_sevengill_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Broadnose Sevengill Shark'**
+  String get species_sevengill_shark_name;
+
+  /// No description provided for @species_sevengill_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Primitive shark with seven gill slits, encountered on temperate kelp dives.'**
+  String get species_sevengill_shark_desc;
+
+  /// No description provided for @species_pyjama_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pyjama Shark'**
+  String get species_pyjama_shark_name;
+
+  /// No description provided for @species_pyjama_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striped catshark endemic to South Africa, found in rocky reefs and kelp forests.'**
+  String get species_pyjama_shark_desc;
+
+  /// No description provided for @species_spiny_dogfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiny Dogfish'**
+  String get species_spiny_dogfish_name;
+
+  /// No description provided for @species_spiny_dogfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small, abundant shark with venomous dorsal spines, found in temperate waters.'**
+  String get species_spiny_dogfish_desc;
+
+  /// No description provided for @species_swell_shark_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Swell Shark'**
+  String get species_swell_shark_name;
+
+  /// No description provided for @species_swell_shark_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Nocturnal catshark that inflates its body when threatened, found off California.'**
+  String get species_swell_shark_desc;
+
+  /// No description provided for @species_giant_oceanic_manta_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Oceanic Manta Ray'**
+  String get species_giant_oceanic_manta_ray_name;
+
+  /// No description provided for @species_giant_oceanic_manta_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest ray species, majestic filter feeder with wingspans up to 7 meters.'**
+  String get species_giant_oceanic_manta_ray_desc;
+
+  /// No description provided for @species_reef_manta_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef Manta Ray'**
+  String get species_reef_manta_ray_name;
+
+  /// No description provided for @species_reef_manta_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Smaller manta species commonly seen at cleaning stations on tropical reefs.'**
+  String get species_reef_manta_ray_desc;
+
+  /// No description provided for @species_spotted_eagle_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotted Eagle Ray'**
+  String get species_spotted_eagle_ray_name;
+
+  /// No description provided for @species_spotted_eagle_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elegant ray with white spots and a long whip-like tail, often seen mid-water.'**
+  String get species_spotted_eagle_ray_desc;
+
+  /// No description provided for @species_common_eagle_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Eagle Ray'**
+  String get species_common_eagle_ray_name;
+
+  /// No description provided for @species_common_eagle_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Diamond-shaped ray found in temperate eastern Atlantic and Mediterranean waters.'**
+  String get species_common_eagle_ray_desc;
+
+  /// No description provided for @species_blue_spotted_ribbontail_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-spotted Ribbontail Ray'**
+  String get species_blue_spotted_ribbontail_ray_name;
+
+  /// No description provided for @species_blue_spotted_ribbontail_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brightly colored ray with vivid blue spots, common on Indo-Pacific reefs.'**
+  String get species_blue_spotted_ribbontail_ray_desc;
+
+  /// No description provided for @species_blue_spotted_stingray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluespotted Stingray'**
+  String get species_blue_spotted_stingray_name;
+
+  /// No description provided for @species_blue_spotted_stingray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small reef stingray with scattered blue spots, often buried in sandy patches.'**
+  String get species_blue_spotted_stingray_desc;
+
+  /// No description provided for @species_southern_stingray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Southern Stingray'**
+  String get species_southern_stingray_name;
+
+  /// No description provided for @species_southern_stingray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large stingray found on Caribbean sand flats, famous at Stingray City.'**
+  String get species_southern_stingray_desc;
+
+  /// No description provided for @species_round_stingray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Round Stingray'**
+  String get species_round_stingray_name;
+
+  /// No description provided for @species_round_stingray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small circular stingray common in shallow sandy areas of the eastern Pacific.'**
+  String get species_round_stingray_desc;
+
+  /// No description provided for @species_short_tail_stingray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Short-tail Stingray'**
+  String get species_short_tail_stingray_name;
+
+  /// No description provided for @species_short_tail_stingray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'One of the largest stingrays, found in temperate waters of the southern hemisphere.'**
+  String get species_short_tail_stingray_desc;
+
+  /// No description provided for @species_cowtail_stingray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Cowtail Stingray'**
+  String get species_cowtail_stingray_name;
+
+  /// No description provided for @species_cowtail_stingray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large dark stingray with a distinctive flag-like tail fold, found on sandy reefs.'**
+  String get species_cowtail_stingray_desc;
+
+  /// No description provided for @species_atlantic_torpedo_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Atlantic Torpedo Ray'**
+  String get species_atlantic_torpedo_ray_name;
+
+  /// No description provided for @species_atlantic_torpedo_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Electric ray capable of producing strong shocks, found on Atlantic sandy bottoms.'**
+  String get species_atlantic_torpedo_ray_desc;
+
+  /// No description provided for @species_marbled_electric_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Marbled Electric Ray'**
+  String get species_marbled_electric_ray_name;
+
+  /// No description provided for @species_marbled_electric_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Mediterranean electric ray with marbled pattern, delivers a notable electric shock.'**
+  String get species_marbled_electric_ray_desc;
+
+  /// No description provided for @species_giant_guitarfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Guitarfish'**
+  String get species_giant_guitarfish_name;
+
+  /// No description provided for @species_giant_guitarfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Shark-shaped ray found on Indo-Pacific sandy bottoms near coral reefs.'**
+  String get species_giant_guitarfish_desc;
+
+  /// No description provided for @species_shovelnose_guitarfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Shovelnose Guitarfish'**
+  String get species_shovelnose_guitarfish_name;
+
+  /// No description provided for @species_shovelnose_guitarfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flattened ray-shark hybrid shape, common in sandy shallows of the eastern Pacific.'**
+  String get species_shovelnose_guitarfish_desc;
+
+  /// No description provided for @species_smalltooth_sawfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Smalltooth Sawfish'**
+  String get species_smalltooth_sawfish_name;
+
+  /// No description provided for @species_smalltooth_sawfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Critically endangered ray with a toothed rostrum, found in tropical coastal waters.'**
+  String get species_smalltooth_sawfish_desc;
+
+  /// No description provided for @species_green_sawfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Green Sawfish'**
+  String get species_green_sawfish_name;
+
+  /// No description provided for @species_green_sawfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large sawfish with an olive-green body, inhabiting Indo-West Pacific estuaries.'**
+  String get species_green_sawfish_desc;
+
+  /// No description provided for @species_devil_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Devil Ray'**
+  String get species_devil_ray_name;
+
+  /// No description provided for @species_devil_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large mobula ray with cephalic fins, seen leaping from the water in groups.'**
+  String get species_devil_ray_desc;
+
+  /// No description provided for @species_spinetail_devil_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spinetail Devil Ray'**
+  String get species_spinetail_devil_ray_name;
+
+  /// No description provided for @species_spinetail_devil_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pelagic devil ray often seen in large aggregations near the surface.'**
+  String get species_spinetail_devil_ray_desc;
+
+  /// No description provided for @species_lesser_devil_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pygmy Devil Ray'**
+  String get species_lesser_devil_ray_name;
+
+  /// No description provided for @species_lesser_devil_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Smallest mobula species, forms large schools in the Gulf of California.'**
+  String get species_lesser_devil_ray_desc;
+
+  /// No description provided for @species_bat_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bat Ray'**
+  String get species_bat_ray_name;
+
+  /// No description provided for @species_bat_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Diamond-shaped ray common in kelp forests and sandy bays of California.'**
+  String get species_bat_ray_desc;
+
+  /// No description provided for @species_undulate_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Undulate Ray'**
+  String get species_undulate_ray_name;
+
+  /// No description provided for @species_undulate_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Beautifully patterned skate with wavy lines, found in the eastern Atlantic.'**
+  String get species_undulate_ray_desc;
+
+  /// No description provided for @species_thornback_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Thornback Ray'**
+  String get species_thornback_ray_name;
+
+  /// No description provided for @species_thornback_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Common European skate with thorny spines along its back and tail.'**
+  String get species_thornback_ray_desc;
+
+  /// No description provided for @species_cownose_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Cownose Ray'**
+  String get species_cownose_ray_name;
+
+  /// No description provided for @species_cownose_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Distinctive notched head, often seen in large schools during seasonal migrations.'**
+  String get species_cownose_ray_desc;
+
+  /// No description provided for @species_marble_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Marble Ray'**
+  String get species_marble_ray_name;
+
+  /// No description provided for @species_marble_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large dark stingray with white spots, frequently seen at Indo-Pacific cleaning stations.'**
+  String get species_marble_ray_desc;
+
+  /// No description provided for @species_ocellate_river_stingray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocellate River Stingray'**
+  String get species_ocellate_river_stingray_name;
+
+  /// No description provided for @species_ocellate_river_stingray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Freshwater stingray with striking orange-ringed spots, native to South American rivers.'**
+  String get species_ocellate_river_stingray_desc;
+
+  /// No description provided for @species_ocellaris_clownfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocellaris Clownfish'**
+  String get species_ocellaris_clownfish_name;
+
+  /// No description provided for @species_ocellaris_clownfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small orange and white striped fish commonly found living symbiotically in sea anemones on coral reefs.'**
+  String get species_ocellaris_clownfish_desc;
+
+  /// No description provided for @species_clarkii_clownfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Clark\'s Clownfish'**
+  String get species_clarkii_clownfish_name;
+
+  /// No description provided for @species_clarkii_clownfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hardy anemonefish with dark body and two white bars, found across the Indo-Pacific in various anemone species.'**
+  String get species_clarkii_clownfish_desc;
+
+  /// No description provided for @species_tomato_clownfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomato Clownfish'**
+  String get species_tomato_clownfish_name;
+
+  /// No description provided for @species_tomato_clownfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright red-orange anemonefish with a single white head bar, common on Indo-Pacific reefs.'**
+  String get species_tomato_clownfish_desc;
+
+  /// No description provided for @species_regal_blue_tang_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Regal Blue Tang'**
+  String get species_regal_blue_tang_name;
+
+  /// No description provided for @species_regal_blue_tang_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Vivid blue surgeonfish with a black palette marking and yellow tail, found on Indo-Pacific coral reefs.'**
+  String get species_regal_blue_tang_desc;
+
+  /// No description provided for @species_yellow_tang_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow Tang'**
+  String get species_yellow_tang_name;
+
+  /// No description provided for @species_yellow_tang_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright yellow surgeonfish common on Hawaiian and Pacific reefs, often seen grazing algae in groups.'**
+  String get species_yellow_tang_desc;
+
+  /// No description provided for @species_powder_blue_surgeonfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Powder Blue Surgeonfish'**
+  String get species_powder_blue_surgeonfish_name;
+
+  /// No description provided for @species_powder_blue_surgeonfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striking pale blue surgeonfish with black face and yellow dorsal fin, found in the Indian Ocean.'**
+  String get species_powder_blue_surgeonfish_desc;
+
+  /// No description provided for @species_sohal_surgeonfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sohal Surgeonfish'**
+  String get species_sohal_surgeonfish_name;
+
+  /// No description provided for @species_sohal_surgeonfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bold striped surgeonfish with orange scalpel spine, endemic to the Red Sea and Arabian Gulf reefs.'**
+  String get species_sohal_surgeonfish_desc;
+
+  /// No description provided for @species_blue_tang_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Tang'**
+  String get species_blue_tang_name;
+
+  /// No description provided for @species_blue_tang_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep blue surgeonfish common on Caribbean reefs, juveniles are bright yellow.'**
+  String get species_blue_tang_desc;
+
+  /// No description provided for @species_emperor_angelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Emperor Angelfish'**
+  String get species_emperor_angelfish_name;
+
+  /// No description provided for @species_emperor_angelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large angelfish with striking blue and yellow horizontal stripes. Juveniles display concentric blue and white circles.'**
+  String get species_emperor_angelfish_desc;
+
+  /// No description provided for @species_french_angelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'French Angelfish'**
+  String get species_french_angelfish_name;
+
+  /// No description provided for @species_french_angelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large dark angelfish with golden-edged scales, commonly seen in pairs on Caribbean and western Atlantic reefs.'**
+  String get species_french_angelfish_desc;
+
+  /// No description provided for @species_queen_angelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Queen Angelfish'**
+  String get species_queen_angelfish_name;
+
+  /// No description provided for @species_queen_angelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Spectacular blue and yellow angelfish with a distinctive crown spot, found on Caribbean coral reefs.'**
+  String get species_queen_angelfish_desc;
+
+  /// No description provided for @species_regal_angelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Regal Angelfish'**
+  String get species_regal_angelfish_name;
+
+  /// No description provided for @species_regal_angelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elegant angelfish with alternating orange-white and blue vertical bands, found on Indo-Pacific reefs.'**
+  String get species_regal_angelfish_desc;
+
+  /// No description provided for @species_rock_beauty_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Rock Beauty'**
+  String get species_rock_beauty_name;
+
+  /// No description provided for @species_rock_beauty_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striking Caribbean angelfish with a yellow front half and black rear half, found near rocky reefs and ledges.'**
+  String get species_rock_beauty_desc;
+
+  /// No description provided for @species_gray_angelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Gray Angelfish'**
+  String get species_gray_angelfish_name;
+
+  /// No description provided for @species_gray_angelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large gray angelfish with pale face and yellow inner pectoral fin, common on Caribbean reefs.'**
+  String get species_gray_angelfish_desc;
+
+  /// No description provided for @species_copperband_butterflyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Copperband Butterflyfish'**
+  String get species_copperband_butterflyfish_name;
+
+  /// No description provided for @species_copperband_butterflyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Distinctive butterflyfish with orange vertical bands and elongated snout, found on Indo-Pacific reefs.'**
+  String get species_copperband_butterflyfish_desc;
+
+  /// No description provided for @species_raccoon_butterflyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Raccoon Butterflyfish'**
+  String get species_raccoon_butterflyfish_name;
+
+  /// No description provided for @species_raccoon_butterflyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow butterflyfish with a dark raccoon-like eye mask, common on Indo-Pacific and Hawaiian reefs.'**
+  String get species_raccoon_butterflyfish_desc;
+
+  /// No description provided for @species_longnose_butterflyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Longnose Butterflyfish'**
+  String get species_longnose_butterflyfish_name;
+
+  /// No description provided for @species_longnose_butterflyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright yellow butterflyfish with an extremely long snout used to pick food from crevices on Indo-Pacific reefs.'**
+  String get species_longnose_butterflyfish_desc;
+
+  /// No description provided for @species_threadfin_butterflyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Threadfin Butterflyfish'**
+  String get species_threadfin_butterflyfish_name;
+
+  /// No description provided for @species_threadfin_butterflyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'White butterflyfish with chevron pattern and trailing dorsal filament, widespread across the Indo-Pacific.'**
+  String get species_threadfin_butterflyfish_desc;
+
+  /// No description provided for @species_foureye_butterflyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Foureye Butterflyfish'**
+  String get species_foureye_butterflyfish_name;
+
+  /// No description provided for @species_foureye_butterflyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pale butterflyfish with a prominent false eyespot near the tail, common on Caribbean reefs.'**
+  String get species_foureye_butterflyfish_desc;
+
+  /// No description provided for @species_spotfin_butterflyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotfin Butterflyfish'**
+  String get species_spotfin_butterflyfish_name;
+
+  /// No description provided for @species_spotfin_butterflyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'White and yellow butterflyfish with a small dark spot on the dorsal fin, found in the western Atlantic.'**
+  String get species_spotfin_butterflyfish_desc;
+
+  /// No description provided for @species_banner_butterflyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Red Sea Bannerfish'**
+  String get species_banner_butterflyfish_name;
+
+  /// No description provided for @species_banner_butterflyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Black and white bannerfish with an elongated dorsal fin and yellow belly, endemic to the Red Sea.'**
+  String get species_banner_butterflyfish_desc;
+
+  /// No description provided for @species_moorish_idol_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Moorish Idol'**
+  String get species_moorish_idol_name;
+
+  /// No description provided for @species_moorish_idol_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Iconic reef fish with bold black, white, and yellow bands and a long trailing dorsal filament.'**
+  String get species_moorish_idol_desc;
+
+  /// No description provided for @species_green_moray_eel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Green Moray Eel'**
+  String get species_green_moray_eel_name;
+
+  /// No description provided for @species_green_moray_eel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large green moray reaching 2.5m, often seen with mouth agape in reef crevices across the western Atlantic.'**
+  String get species_green_moray_eel_desc;
+
+  /// No description provided for @species_giant_moray_eel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Moray Eel'**
+  String get species_giant_moray_eel_name;
+
+  /// No description provided for @species_giant_moray_eel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest moray species, reaching over 3m, with leopard-like spots. Found on Indo-Pacific coral reefs.'**
+  String get species_giant_moray_eel_desc;
+
+  /// No description provided for @species_spotted_moray_eel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotted Moray Eel'**
+  String get species_spotted_moray_eel_name;
+
+  /// No description provided for @species_spotted_moray_eel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'White moray with dark brown spots, commonly encountered peering from reef holes in the Caribbean.'**
+  String get species_spotted_moray_eel_desc;
+
+  /// No description provided for @species_ribbon_eel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ribbon Eel'**
+  String get species_ribbon_eel_name;
+
+  /// No description provided for @species_ribbon_eel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slender eel with flared nostrils; males are vivid blue, females are yellow. Found in Indo-Pacific sandy lagoons.'**
+  String get species_ribbon_eel_desc;
+
+  /// No description provided for @species_spotted_garden_eel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotted Garden Eel'**
+  String get species_spotted_garden_eel_name;
+
+  /// No description provided for @species_spotted_garden_eel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Thin white eel with black spots that lives in sandy colonies, swaying in the current to catch plankton.'**
+  String get species_spotted_garden_eel_desc;
+
+  /// No description provided for @species_splendid_garden_eel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Splendid Garden Eel'**
+  String get species_splendid_garden_eel_name;
+
+  /// No description provided for @species_splendid_garden_eel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Orange and white banded garden eel found in large sandy colonies in the western Pacific.'**
+  String get species_splendid_garden_eel_desc;
+
+  /// No description provided for @species_snowflake_moray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Snowflake Moray Eel'**
+  String get species_snowflake_moray_name;
+
+  /// No description provided for @species_snowflake_moray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small moray with white body and black snowflake-like markings, common in Indo-Pacific reef rubble.'**
+  String get species_snowflake_moray_desc;
+
+  /// No description provided for @species_mandarin_dragonet_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Mandarin Dragonet'**
+  String get species_mandarin_dragonet_name;
+
+  /// No description provided for @species_mandarin_dragonet_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny, brilliantly colored fish with psychedelic blue and orange patterns, found in western Pacific rubble zones.'**
+  String get species_mandarin_dragonet_desc;
+
+  /// No description provided for @species_common_lionfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Lionfish'**
+  String get species_common_lionfish_name;
+
+  /// No description provided for @species_common_lionfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Venomous scorpionfish with dramatic fan-like pectoral fins and red-white stripes. Invasive in the Caribbean.'**
+  String get species_common_lionfish_desc;
+
+  /// No description provided for @species_leaf_scorpionfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaf Scorpionfish'**
+  String get species_leaf_scorpionfish_name;
+
+  /// No description provided for @species_leaf_scorpionfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Highly compressed, leaf-shaped scorpionfish that sways with the current to mimic debris on Indo-Pacific reefs.'**
+  String get species_leaf_scorpionfish_desc;
+
+  /// No description provided for @species_stonefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef Stonefish'**
+  String get species_stonefish_name;
+
+  /// No description provided for @species_stonefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'World\'s most venomous fish, perfectly camouflaged as a rock on Indo-Pacific reef floors. Extremely dangerous.'**
+  String get species_stonefish_desc;
+
+  /// No description provided for @species_painted_frogfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Painted Frogfish'**
+  String get species_painted_frogfish_name;
+
+  /// No description provided for @species_painted_frogfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Chunky ambush predator with a lure on its head, highly variable in color. Found on Indo-Pacific reefs.'**
+  String get species_painted_frogfish_desc;
+
+  /// No description provided for @species_giant_frogfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Frogfish'**
+  String get species_giant_frogfish_name;
+
+  /// No description provided for @species_giant_frogfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest frogfish species, reaching 40cm, with excellent camouflage in sponges and coral rubble.'**
+  String get species_giant_frogfish_desc;
+
+  /// No description provided for @species_hairy_frogfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Hairy Frogfish'**
+  String get species_hairy_frogfish_name;
+
+  /// No description provided for @species_hairy_frogfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Frogfish covered in worm-like fleshy appendages that mimic algae, a prized find for underwater photographers.'**
+  String get species_hairy_frogfish_desc;
+
+  /// No description provided for @species_clown_triggerfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Clown Triggerfish'**
+  String get species_clown_triggerfish_name;
+
+  /// No description provided for @species_clown_triggerfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Boldly patterned triggerfish with large white spots on a dark body and yellow lips, found on Indo-Pacific reefs.'**
+  String get species_clown_triggerfish_desc;
+
+  /// No description provided for @species_titan_triggerfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Titan Triggerfish'**
+  String get species_titan_triggerfish_name;
+
+  /// No description provided for @species_titan_triggerfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large aggressive triggerfish known to charge divers near its nest. Common on Indo-Pacific coral reefs.'**
+  String get species_titan_triggerfish_desc;
+
+  /// No description provided for @species_queen_triggerfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Queen Triggerfish'**
+  String get species_queen_triggerfish_name;
+
+  /// No description provided for @species_queen_triggerfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colorful Caribbean triggerfish with blue facial markings and long tail streamers.'**
+  String get species_queen_triggerfish_desc;
+
+  /// No description provided for @species_picasso_triggerfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Picasso Triggerfish'**
+  String get species_picasso_triggerfish_name;
+
+  /// No description provided for @species_picasso_triggerfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Triggerfish with an abstract pattern of blue, yellow, and black stripes, common on Indo-Pacific reef flats.'**
+  String get species_picasso_triggerfish_desc;
+
+  /// No description provided for @species_yellowmargin_triggerfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellowmargin Triggerfish'**
+  String get species_yellowmargin_triggerfish_name;
+
+  /// No description provided for @species_yellowmargin_triggerfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large tan triggerfish with yellow-edged fins, known for aggressive nest guarding on Indo-Pacific reefs.'**
+  String get species_yellowmargin_triggerfish_desc;
+
+  /// No description provided for @species_porcupinefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Porcupinefish'**
+  String get species_porcupinefish_name;
+
+  /// No description provided for @species_porcupinefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large spiny fish that inflates into a ball when threatened, found on tropical reefs worldwide.'**
+  String get species_porcupinefish_desc;
+
+  /// No description provided for @species_guineafowl_pufferfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Guineafowl Pufferfish'**
+  String get species_guineafowl_pufferfish_name;
+
+  /// No description provided for @species_guineafowl_pufferfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark pufferfish covered in small white spots, sometimes found in a golden-yellow color phase on Indo-Pacific reefs.'**
+  String get species_guineafowl_pufferfish_desc;
+
+  /// No description provided for @species_map_pufferfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Map Pufferfish'**
+  String get species_map_pufferfish_name;
+
+  /// No description provided for @species_map_pufferfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large pale pufferfish with intricate dark map-like markings across its body, found on Indo-Pacific reefs.'**
+  String get species_map_pufferfish_desc;
+
+  /// No description provided for @species_sharpnose_pufferfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharpnose Pufferfish'**
+  String get species_sharpnose_pufferfish_name;
+
+  /// No description provided for @species_sharpnose_pufferfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny pufferfish with blue lines on the face and orange tail, commonly seen on Caribbean reefs.'**
+  String get species_sharpnose_pufferfish_desc;
+
+  /// No description provided for @species_boxfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow Boxfish'**
+  String get species_boxfish_name;
+
+  /// No description provided for @species_boxfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Juveniles are bright yellow cubes with black spots. Adults darken to blue-gray. Found across the Indo-Pacific.'**
+  String get species_boxfish_desc;
+
+  /// No description provided for @species_cowfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Longhorn Cowfish'**
+  String get species_cowfish_name;
+
+  /// No description provided for @species_cowfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Boxy yellow fish with distinctive horn-like projections above each eye, found on Indo-Pacific reefs.'**
+  String get species_cowfish_desc;
+
+  /// No description provided for @species_napoleon_wrasse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Napoleon Wrasse'**
+  String get species_napoleon_wrasse_name;
+
+  /// No description provided for @species_napoleon_wrasse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive wrasse reaching 2m with a prominent forehead bump. Endangered and protected, found on Indo-Pacific reefs.'**
+  String get species_napoleon_wrasse_desc;
+
+  /// No description provided for @species_cleaner_wrasse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluestreak Cleaner Wrasse'**
+  String get species_cleaner_wrasse_name;
+
+  /// No description provided for @species_cleaner_wrasse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small blue-striped wrasse that operates cleaning stations, removing parasites from larger fish on Indo-Pacific reefs.'**
+  String get species_cleaner_wrasse_desc;
+
+  /// No description provided for @species_yellowtail_coris_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellowtail Coris'**
+  String get species_yellowtail_coris_name;
+
+  /// No description provided for @species_yellowtail_coris_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colorful wrasse with spotted body and yellow tail, juveniles are bright orange-red with white markings.'**
+  String get species_yellowtail_coris_desc;
+
+  /// No description provided for @species_bluehead_wrasse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluehead Wrasse'**
+  String get species_bluehead_wrasse_name;
+
+  /// No description provided for @species_bluehead_wrasse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Abundant Caribbean wrasse; terminal males have a vivid blue head and green body with black-white bars.'**
+  String get species_bluehead_wrasse_desc;
+
+  /// No description provided for @species_spanish_hogfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish Hogfish'**
+  String get species_spanish_hogfish_name;
+
+  /// No description provided for @species_spanish_hogfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple and yellow wrasse common on Caribbean reefs; juveniles act as cleaner fish.'**
+  String get species_spanish_hogfish_desc;
+
+  /// No description provided for @species_bumphead_parrotfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bumphead Parrotfish'**
+  String get species_bumphead_parrotfish_name;
+
+  /// No description provided for @species_bumphead_parrotfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest parrotfish species reaching 1.3m, with a massive forehead bump. Travels in schools on Indo-Pacific reefs.'**
+  String get species_bumphead_parrotfish_desc;
+
+  /// No description provided for @species_stoplight_parrotfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Stoplight Parrotfish'**
+  String get species_stoplight_parrotfish_name;
+
+  /// No description provided for @species_stoplight_parrotfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Caribbean parrotfish with dramatic color changes between initial and terminal phases.'**
+  String get species_stoplight_parrotfish_desc;
+
+  /// No description provided for @species_queen_parrotfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Queen Parrotfish'**
+  String get species_queen_parrotfish_name;
+
+  /// No description provided for @species_queen_parrotfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large blue-green parrotfish found on Caribbean reefs, often seen biting coral to feed on algae.'**
+  String get species_queen_parrotfish_desc;
+
+  /// No description provided for @species_yellowtail_damselfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellowtail Damselfish'**
+  String get species_yellowtail_damselfish_name;
+
+  /// No description provided for @species_yellowtail_damselfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark blue damselfish with a bright yellow tail, common on Caribbean reef tops and crests.'**
+  String get species_yellowtail_damselfish_desc;
+
+  /// No description provided for @species_sergeant_major_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sergeant Major'**
+  String get species_sergeant_major_name;
+
+  /// No description provided for @species_sergeant_major_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver-yellow damselfish with five bold black bars, found in large aggregations on tropical Atlantic reefs.'**
+  String get species_sergeant_major_desc;
+
+  /// No description provided for @species_three_spot_damselfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Threespot Damselfish'**
+  String get species_three_spot_damselfish_name;
+
+  /// No description provided for @species_three_spot_damselfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark brown territorial damselfish that aggressively defends its algae garden on Caribbean reefs.'**
+  String get species_three_spot_damselfish_desc;
+
+  /// No description provided for @species_chromis_viridis_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-Green Chromis'**
+  String get species_chromis_viridis_name;
+
+  /// No description provided for @species_chromis_viridis_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small iridescent green damselfish seen in large schools hovering above branching corals on Indo-Pacific reefs.'**
+  String get species_chromis_viridis_desc;
+
+  /// No description provided for @species_blue_chromis_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Chromis'**
+  String get species_blue_chromis_name;
+
+  /// No description provided for @species_blue_chromis_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brilliant blue planktivorous damselfish found in large midwater aggregations above Caribbean reef walls.'**
+  String get species_blue_chromis_desc;
+
+  /// No description provided for @species_nassau_grouper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Nassau Grouper'**
+  String get species_nassau_grouper_name;
+
+  /// No description provided for @species_nassau_grouper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large Caribbean grouper with distinctive dark eye stripe and banded pattern, now endangered due to overfishing.'**
+  String get species_nassau_grouper_desc;
+
+  /// No description provided for @species_giant_grouper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Grouper'**
+  String get species_giant_grouper_name;
+
+  /// No description provided for @species_giant_grouper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest bony reef fish, reaching 2.7m and 400kg. Found in caves and wrecks across the Indo-Pacific.'**
+  String get species_giant_grouper_desc;
+
+  /// No description provided for @species_coral_grouper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Coral Grouper'**
+  String get species_coral_grouper_name;
+
+  /// No description provided for @species_coral_grouper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright red-orange grouper covered in blue spots, a signature species of Indo-Pacific coral reefs.'**
+  String get species_coral_grouper_desc;
+
+  /// No description provided for @species_goliath_grouper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Goliath Grouper'**
+  String get species_goliath_grouper_name;
+
+  /// No description provided for @species_goliath_grouper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive Atlantic grouper reaching 2.5m, often encountered near wrecks and ledges in Florida and the Caribbean.'**
+  String get species_goliath_grouper_desc;
+
+  /// No description provided for @species_potato_grouper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Potato Grouper'**
+  String get species_potato_grouper_name;
+
+  /// No description provided for @species_potato_grouper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large friendly grouper with dark potato-shaped blotches, famous at the Great Barrier Reef\'s Cod Hole.'**
+  String get species_potato_grouper_desc;
+
+  /// No description provided for @species_peacock_grouper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Peacock Grouper'**
+  String get species_peacock_grouper_name;
+
+  /// No description provided for @species_peacock_grouper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark brown grouper with bright blue spots and pale vertical bars at the rear, common on Indo-Pacific reefs.'**
+  String get species_peacock_grouper_desc;
+
+  /// No description provided for @species_yellowfin_tuna_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellowfin Tuna'**
+  String get species_yellowfin_tuna_name;
+
+  /// No description provided for @species_yellowfin_tuna_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast pelagic predator with long yellow dorsal and anal fins, occasionally seen by divers at offshore sites.'**
+  String get species_yellowfin_tuna_desc;
+
+  /// No description provided for @species_dogtooth_tuna_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Dogtooth Tuna'**
+  String get species_dogtooth_tuna_name;
+
+  /// No description provided for @species_dogtooth_tuna_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Powerful reef-associated tuna with prominent teeth, encountered at deep reef drop-offs in the Indo-Pacific.'**
+  String get species_dogtooth_tuna_desc;
+
+  /// No description provided for @species_great_barracuda_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Great Barracuda'**
+  String get species_great_barracuda_name;
+
+  /// No description provided for @species_great_barracuda_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleek silver predator up to 1.8m with prominent teeth, often seen hovering motionless near tropical reefs.'**
+  String get species_great_barracuda_desc;
+
+  /// No description provided for @species_blackfin_barracuda_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blackfin Barracuda'**
+  String get species_blackfin_barracuda_name;
+
+  /// No description provided for @species_blackfin_barracuda_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Indo-Pacific barracuda known for forming massive tornado-like schools at dive sites like Barracuda Point.'**
+  String get species_blackfin_barracuda_desc;
+
+  /// No description provided for @species_mahi_mahi_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Mahi-Mahi'**
+  String get species_mahi_mahi_name;
+
+  /// No description provided for @species_mahi_mahi_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dazzling blue-green and gold pelagic fish with a blunt forehead, occasionally seen at offshore dive sites.'**
+  String get species_mahi_mahi_desc;
+
+  /// No description provided for @species_giant_trevally_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Trevally'**
+  String get species_giant_trevally_name;
+
+  /// No description provided for @species_giant_trevally_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Powerful silver predator up to 1.7m, known for hunting on reef channels and drop-offs across the Indo-Pacific.'**
+  String get species_giant_trevally_desc;
+
+  /// No description provided for @species_bluefin_trevally_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluefin Trevally'**
+  String get species_bluefin_trevally_name;
+
+  /// No description provided for @species_bluefin_trevally_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleek blue-spotted jack commonly seen patrolling Indo-Pacific reef edges in small hunting groups.'**
+  String get species_bluefin_trevally_desc;
+
+  /// No description provided for @species_bigeye_trevally_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bigeye Trevally'**
+  String get species_bigeye_trevally_name;
+
+  /// No description provided for @species_bigeye_trevally_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver jack with large eyes that forms impressive swirling schools near reef walls and cleaning stations.'**
+  String get species_bigeye_trevally_desc;
+
+  /// No description provided for @species_bar_jack_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bar Jack'**
+  String get species_bar_jack_name;
+
+  /// No description provided for @species_bar_jack_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleek silver Caribbean jack with a distinctive dark blue stripe along the back and onto the lower tail.'**
+  String get species_bar_jack_desc;
+
+  /// No description provided for @species_horse_eye_jack_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Horse-Eye Jack'**
+  String get species_horse_eye_jack_name;
+
+  /// No description provided for @species_horse_eye_jack_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large-eyed silver jack that forms schools near reefs and wrecks in the Caribbean and western Atlantic.'**
+  String get species_horse_eye_jack_desc;
+
+  /// No description provided for @species_yellowtail_snapper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellowtail Snapper'**
+  String get species_yellowtail_snapper_name;
+
+  /// No description provided for @species_yellowtail_snapper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleek snapper with a yellow lateral stripe and tail, often seen in midwater schools on Caribbean reefs.'**
+  String get species_yellowtail_snapper_desc;
+
+  /// No description provided for @species_schoolmaster_snapper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Schoolmaster Snapper'**
+  String get species_schoolmaster_snapper_name;
+
+  /// No description provided for @species_schoolmaster_snapper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow-silver snapper with blue lines under the eye, found in groups under ledges on Caribbean reefs.'**
+  String get species_schoolmaster_snapper_desc;
+
+  /// No description provided for @species_bluestripe_snapper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluestripe Snapper'**
+  String get species_bluestripe_snapper_name;
+
+  /// No description provided for @species_bluestripe_snapper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright yellow snapper with four blue horizontal stripes, forming dense schools on Indo-Pacific reefs.'**
+  String get species_bluestripe_snapper_desc;
+
+  /// No description provided for @species_twinspot_snapper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Twinspot Snapper'**
+  String get species_twinspot_snapper_name;
+
+  /// No description provided for @species_twinspot_snapper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large red snapper found on Indo-Pacific outer reefs, sometimes forming schools on deep walls and channels.'**
+  String get species_twinspot_snapper_desc;
+
+  /// No description provided for @species_humphead_snapper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Midnight Snapper'**
+  String get species_humphead_snapper_name;
+
+  /// No description provided for @species_humphead_snapper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large dark snapper found in schools near steep Indo-Pacific drop-offs, juveniles are boldly black and white.'**
+  String get species_humphead_snapper_desc;
+
+  /// No description provided for @species_longfin_bannerfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Longfin Bannerfish'**
+  String get species_longfin_bannerfish_name;
+
+  /// No description provided for @species_longfin_bannerfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Black and white fish with a long trailing dorsal fin and yellow tail, often seen in pairs on Indo-Pacific reefs.'**
+  String get species_longfin_bannerfish_desc;
+
+  /// No description provided for @species_batfish_orbicular_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Orbicular Batfish'**
+  String get species_batfish_orbicular_name;
+
+  /// No description provided for @species_batfish_orbicular_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver disc-shaped fish with tall fins that approaches divers curiously. Common on Indo-Pacific wrecks and reefs.'**
+  String get species_batfish_orbicular_desc;
+
+  /// No description provided for @species_batfish_teira_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Longfin Batfish'**
+  String get species_batfish_teira_name;
+
+  /// No description provided for @species_batfish_teira_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tall-finned batfish with a dark blotch near the pectoral fin, often seen at cleaning stations and wrecks.'**
+  String get species_batfish_teira_desc;
+
+  /// No description provided for @species_batfish_pinnatus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinnate Batfish'**
+  String get species_batfish_pinnatus_name;
+
+  /// No description provided for @species_batfish_pinnatus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Juveniles are jet black with vivid orange borders resembling a toxic flatworm. Found in the western Pacific.'**
+  String get species_batfish_pinnatus_desc;
+
+  /// No description provided for @species_banggai_cardinalfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Banggai Cardinalfish'**
+  String get species_banggai_cardinalfish_name;
+
+  /// No description provided for @species_banggai_cardinalfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striking silver and black cardinalfish with elongated fins, endemic to the Banggai Islands of Indonesia.'**
+  String get species_banggai_cardinalfish_desc;
+
+  /// No description provided for @species_pajama_cardinalfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pajama Cardinalfish'**
+  String get species_pajama_cardinalfish_name;
+
+  /// No description provided for @species_pajama_cardinalfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Unusual cardinalfish with yellow face, dark waist band, and spotted rear, found among corals in the Indo-Pacific.'**
+  String get species_pajama_cardinalfish_desc;
+
+  /// No description provided for @species_longnose_hawkfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Longnose Hawkfish'**
+  String get species_longnose_hawkfish_name;
+
+  /// No description provided for @species_longnose_hawkfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small white fish with red crosshatch pattern and elongated snout, perches on gorgonians and black corals.'**
+  String get species_longnose_hawkfish_desc;
+
+  /// No description provided for @species_arc_eye_hawkfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Arc-Eye Hawkfish'**
+  String get species_arc_eye_hawkfish_name;
+
+  /// No description provided for @species_arc_eye_hawkfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small hawkfish with distinctive orange arc behind the eye, commonly perched on coral heads on Indo-Pacific reefs.'**
+  String get species_arc_eye_hawkfish_desc;
+
+  /// No description provided for @species_flame_hawkfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Flame Hawkfish'**
+  String get species_flame_hawkfish_name;
+
+  /// No description provided for @species_flame_hawkfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brilliant red hawkfish with dark eye markings, found perching in Pocillopora corals across the western Pacific.'**
+  String get species_flame_hawkfish_desc;
+
+  /// No description provided for @species_fire_goby_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Fire Goby'**
+  String get species_fire_goby_name;
+
+  /// No description provided for @species_fire_goby_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elegant white goby with a tall first dorsal fin and red-orange tail, hovers above Indo-Pacific reef rubble.'**
+  String get species_fire_goby_desc;
+
+  /// No description provided for @species_purple_firefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple Firefish'**
+  String get species_purple_firefish_name;
+
+  /// No description provided for @species_purple_firefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Delicate goby with purple fins and a tall dorsal spike, found hovering near burrows on Indo-Pacific outer reefs.'**
+  String get species_purple_firefish_desc;
+
+  /// No description provided for @species_yellownose_goby_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellownose Goby'**
+  String get species_yellownose_goby_name;
+
+  /// No description provided for @species_yellownose_goby_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny Caribbean cleaner goby with a yellow snout and blue lateral stripe, found on sponges and coral heads.'**
+  String get species_yellownose_goby_desc;
+
+  /// No description provided for @species_citron_goby_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Citron Goby'**
+  String get species_citron_goby_name;
+
+  /// No description provided for @species_citron_goby_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny bright yellow goby that lives among the branches of Acropora corals on Indo-Pacific reefs.'**
+  String get species_citron_goby_desc;
+
+  /// No description provided for @species_shrimp_goby_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Steinitz\'s Shrimp Goby'**
+  String get species_shrimp_goby_name;
+
+  /// No description provided for @species_shrimp_goby_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sandy-colored goby that shares a burrow with alpheid shrimp in a mutualistic relationship on Indo-Pacific sand flats.'**
+  String get species_shrimp_goby_desc;
+
+  /// No description provided for @species_neon_goby_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Neon Goby'**
+  String get species_neon_goby_name;
+
+  /// No description provided for @species_neon_goby_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny dark goby with a brilliant neon blue stripe, operates cleaning stations on Caribbean coral heads.'**
+  String get species_neon_goby_desc;
+
+  /// No description provided for @species_bluestriped_fangblenny_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluestriped Fangblenny'**
+  String get species_bluestriped_fangblenny_name;
+
+  /// No description provided for @species_bluestriped_fangblenny_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small blue-striped blenny that mimics cleaner wrasses to bite scales from unsuspecting fish.'**
+  String get species_bluestriped_fangblenny_desc;
+
+  /// No description provided for @species_sailfin_blenny_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sailfin Blenny'**
+  String get species_sailfin_blenny_name;
+
+  /// No description provided for @species_sailfin_blenny_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny Caribbean blenny that raises a large sail-like dorsal fin from its tube home to attract mates.'**
+  String get species_sailfin_blenny_desc;
+
+  /// No description provided for @species_bicolor_blenny_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bicolor Blenny'**
+  String get species_bicolor_blenny_name;
+
+  /// No description provided for @species_bicolor_blenny_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small blenny with dark brown front half and orange rear half, peers from holes on Indo-Pacific reefs.'**
+  String get species_bicolor_blenny_desc;
+
+  /// No description provided for @species_redlip_blenny_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Redlip Blenny'**
+  String get species_redlip_blenny_name;
+
+  /// No description provided for @species_redlip_blenny_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark blenny with prominent red-orange lips that defends algae patches on Caribbean reef crests.'**
+  String get species_redlip_blenny_desc;
+
+  /// No description provided for @species_pygmy_seahorse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bargibant\'s Pygmy Seahorse'**
+  String get species_pygmy_seahorse_name;
+
+  /// No description provided for @species_pygmy_seahorse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny seahorse under 2cm that perfectly matches its host gorgonian coral, a prized macro photography subject.'**
+  String get species_pygmy_seahorse_desc;
+
+  /// No description provided for @species_common_seahorse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Seahorse'**
+  String get species_common_seahorse_name;
+
+  /// No description provided for @species_common_seahorse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium-sized seahorse found in seagrass beds and coral rubble across the Indo-Pacific, variable in color.'**
+  String get species_common_seahorse_desc;
+
+  /// No description provided for @species_thorny_seahorse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Thorny Seahorse'**
+  String get species_thorny_seahorse_name;
+
+  /// No description provided for @species_thorny_seahorse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Seahorse covered in long spines found in seagrass beds and soft bottom habitats across the Indo-Pacific.'**
+  String get species_thorny_seahorse_desc;
+
+  /// No description provided for @species_ornate_ghost_pipefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ornate Ghost Pipefish'**
+  String get species_ornate_ghost_pipefish_name;
+
+  /// No description provided for @species_ornate_ghost_pipefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elaborately camouflaged pipefish that hovers head-down near crinoids and soft corals in the Indo-Pacific.'**
+  String get species_ornate_ghost_pipefish_desc;
+
+  /// No description provided for @species_robust_ghost_pipefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Robust Ghost Pipefish'**
+  String get species_robust_ghost_pipefish_name;
+
+  /// No description provided for @species_robust_ghost_pipefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large ghost pipefish that mimics seagrass or algae, often found in pairs in Indo-Pacific coastal waters.'**
+  String get species_robust_ghost_pipefish_desc;
+
+  /// No description provided for @species_trumpetfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Trumpetfish'**
+  String get species_trumpetfish_name;
+
+  /// No description provided for @species_trumpetfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Long slender fish that hunts by shadowing larger fish, found on Caribbean and Atlantic reefs in various colors.'**
+  String get species_trumpetfish_desc;
+
+  /// No description provided for @species_cornetfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Cornetfish'**
+  String get species_cornetfish_name;
+
+  /// No description provided for @species_cornetfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Extremely elongated fish up to 1.5m with a trailing tail filament, often seen gliding over reef flats.'**
+  String get species_cornetfish_desc;
+
+  /// No description provided for @species_yellowhead_jawfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellowhead Jawfish'**
+  String get species_yellowhead_jawfish_name;
+
+  /// No description provided for @species_yellowhead_jawfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small blue-bodied fish with a yellow head that hovers above its sand burrow on Caribbean reefs. Males brood eggs in their mouth.'**
+  String get species_yellowhead_jawfish_desc;
+
+  /// No description provided for @species_flamefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Flamefish'**
+  String get species_flamefish_name;
+
+  /// No description provided for @species_flamefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small bright red cardinalfish with a dark spot below the second dorsal fin, hides in Caribbean reef crevices by day.'**
+  String get species_flamefish_desc;
+
+  /// No description provided for @species_longspine_squirrelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Longspine Squirrelfish'**
+  String get species_longspine_squirrelfish_name;
+
+  /// No description provided for @species_longspine_squirrelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Red nocturnal fish with large eyes and a long dorsal spine, found under ledges on Caribbean reefs by day.'**
+  String get species_longspine_squirrelfish_desc;
+
+  /// No description provided for @species_soldierfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bigscale Soldierfish'**
+  String get species_soldierfish_name;
+
+  /// No description provided for @species_soldierfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Red nocturnal fish with enormous dark eyes and large scales, forms groups in caves and overhangs by day.'**
+  String get species_soldierfish_desc;
+
+  /// No description provided for @species_flame_angelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Flame Angelfish'**
+  String get species_flame_angelfish_name;
+
+  /// No description provided for @species_flame_angelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brilliant red-orange dwarf angelfish with black vertical bars and blue-tipped fins, found across the Pacific.'**
+  String get species_flame_angelfish_desc;
+
+  /// No description provided for @species_royal_gramma_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Royal Gramma'**
+  String get species_royal_gramma_name;
+
+  /// No description provided for @species_royal_gramma_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small bicolored Caribbean basslet with a purple front half and yellow rear half, found under ledges.'**
+  String get species_royal_gramma_desc;
+
+  /// No description provided for @species_anthias_lyretail_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Lyretail Anthias'**
+  String get species_anthias_lyretail_name;
+
+  /// No description provided for @species_anthias_lyretail_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Abundant reef fish forming large orange and pink clouds above Indo-Pacific coral formations. Males are purple.'**
+  String get species_anthias_lyretail_desc;
+
+  /// No description provided for @species_mediterranean_grouper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Dusky Grouper'**
+  String get species_mediterranean_grouper_name;
+
+  /// No description provided for @species_mediterranean_grouper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large dark brown grouper with pale mottling, the iconic predator of Mediterranean rocky reefs.'**
+  String get species_mediterranean_grouper_desc;
+
+  /// No description provided for @species_mediterranean_moray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Mediterranean Moray'**
+  String get species_mediterranean_moray_name;
+
+  /// No description provided for @species_mediterranean_moray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark brown moray eel with yellow mottling, commonly seen peering from rocky crevices in the Mediterranean.'**
+  String get species_mediterranean_moray_desc;
+
+  /// No description provided for @species_ornate_wrasse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ornate Wrasse'**
+  String get species_ornate_wrasse_name;
+
+  /// No description provided for @species_ornate_wrasse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colorful green wrasse with red head markings, one of the most common wrasses on Mediterranean reefs.'**
+  String get species_ornate_wrasse_desc;
+
+  /// No description provided for @species_red_sea_bannerfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Masked Butterflyfish'**
+  String get species_red_sea_bannerfish_name;
+
+  /// No description provided for @species_red_sea_bannerfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright yellow butterflyfish with a dark eye patch, endemic to the Red Sea. Often seen in pairs.'**
+  String get species_red_sea_bannerfish_desc;
+
+  /// No description provided for @species_red_sea_anemonefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Red Sea Anemonefish'**
+  String get species_red_sea_anemonefish_name;
+
+  /// No description provided for @species_red_sea_anemonefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Orange-yellow anemonefish with two white bars, endemic to the Red Sea and Gulf of Aden.'**
+  String get species_red_sea_anemonefish_desc;
+
+  /// No description provided for @species_arabian_angelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabian Angelfish'**
+  String get species_arabian_angelfish_name;
+
+  /// No description provided for @species_arabian_angelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large dark blue angelfish with a bold yellow vertical bar and tail, endemic to the western Indian Ocean.'**
+  String get species_arabian_angelfish_desc;
+
+  /// No description provided for @species_king_angelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'King Angelfish'**
+  String get species_king_angelfish_name;
+
+  /// No description provided for @species_king_angelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large dark blue angelfish with a white vertical bar and yellow tail, found in the eastern Pacific and Galapagos.'**
+  String get species_king_angelfish_desc;
+
+  /// No description provided for @species_ocean_sunfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocean Sunfish'**
+  String get species_ocean_sunfish_name;
+
+  /// No description provided for @species_ocean_sunfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The heaviest bony fish, reaching over 2 tons. Occasionally seen by divers at cleaning stations in Bali and the Galapagos.'**
+  String get species_ocean_sunfish_desc;
+
+  /// No description provided for @species_lingcod_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Lingcod'**
+  String get species_lingcod_name;
+
+  /// No description provided for @species_lingcod_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large mottled predatory greenling found on rocky reefs of the Pacific Northwest, often guarding egg masses.'**
+  String get species_lingcod_desc;
+
+  /// No description provided for @species_wolf_eel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Wolf-Eel'**
+  String get species_wolf_eel_name;
+
+  /// No description provided for @species_wolf_eel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large gray wolf-eel with a bulbous head and powerful jaws, found in rocky dens in the Pacific Northwest.'**
+  String get species_wolf_eel_desc;
+
+  /// No description provided for @species_giant_sea_bass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Sea Bass'**
+  String get species_giant_sea_bass_name;
+
+  /// No description provided for @species_giant_sea_bass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive bass reaching over 2m and 250kg, found on rocky reefs and kelp forests off southern California.'**
+  String get species_giant_sea_bass_desc;
+
+  /// No description provided for @species_garibaldi_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Garibaldi'**
+  String get species_garibaldi_name;
+
+  /// No description provided for @species_garibaldi_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright orange damselfish and California\'s state marine fish, territorial on kelp forest reefs.'**
+  String get species_garibaldi_desc;
+
+  /// No description provided for @species_sheephead_name.
+  ///
+  /// In en, this message translates to:
+  /// **'California Sheephead'**
+  String get species_sheephead_name;
+
+  /// No description provided for @species_sheephead_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large wrasse with black head and tail, red midsection, and white chin. Found in California kelp forests.'**
+  String get species_sheephead_desc;
+
+  /// No description provided for @species_copper_rockfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Copper Rockfish'**
+  String get species_copper_rockfish_name;
+
+  /// No description provided for @species_copper_rockfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Coppery-orange rockfish with pale patches, a common sight on Pacific Northwest rocky reefs and kelp forests.'**
+  String get species_copper_rockfish_desc;
+
+  /// No description provided for @species_oriental_sweetlips_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Oriental Sweetlips'**
+  String get species_oriental_sweetlips_name;
+
+  /// No description provided for @species_oriental_sweetlips_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large Indo-Pacific reef fish with bold black and white stripes and yellow fins. Juveniles perform a wriggling dance.'**
+  String get species_oriental_sweetlips_desc;
+
+  /// No description provided for @species_harlequin_sweetlips_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Harlequin Sweetlips'**
+  String get species_harlequin_sweetlips_name;
+
+  /// No description provided for @species_harlequin_sweetlips_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Adults are gray with dark spots; juveniles are brown with large white spots and swim with an undulating motion.'**
+  String get species_harlequin_sweetlips_desc;
+
+  /// No description provided for @species_blue_ringed_angelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-Ringed Angelfish'**
+  String get species_blue_ringed_angelfish_name;
+
+  /// No description provided for @species_blue_ringed_angelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large brown angelfish with blue curved lines and a distinctive blue ring above the gill cover.'**
+  String get species_blue_ringed_angelfish_desc;
+
+  /// No description provided for @species_yellowbar_angelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellowbar Angelfish'**
+  String get species_yellowbar_angelfish_name;
+
+  /// No description provided for @species_yellowbar_angelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large gray-blue angelfish with a prominent yellow body patch, found in the Red Sea and western Indian Ocean.'**
+  String get species_yellowbar_angelfish_desc;
+
+  /// No description provided for @species_filefish_scrawled_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrawled Filefish'**
+  String get species_filefish_scrawled_name;
+
+  /// No description provided for @species_filefish_scrawled_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large olive-brown filefish with blue scribble-like markings and orange dewlap, found on tropical reefs worldwide.'**
+  String get species_filefish_scrawled_desc;
+
+  /// No description provided for @species_clown_filefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Orangespotted Filefish'**
+  String get species_clown_filefish_name;
+
+  /// No description provided for @species_clown_filefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small green filefish with orange spots and a long snout, feeds exclusively on Acropora coral polyps.'**
+  String get species_clown_filefish_desc;
+
+  /// No description provided for @species_unicornfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluespine Unicornfish'**
+  String get species_unicornfish_name;
+
+  /// No description provided for @species_unicornfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gray surgeonfish with a prominent forehead horn and two blue tail spines, common on Indo-Pacific reef flats.'**
+  String get species_unicornfish_desc;
+
+  /// No description provided for @species_surgeonfish_sailfin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sailfin Tang'**
+  String get species_surgeonfish_sailfin_name;
+
+  /// No description provided for @species_surgeonfish_sailfin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Boldly banded surgeonfish with a greatly expanded dorsal and anal fin, found across the Indo-Pacific.'**
+  String get species_surgeonfish_sailfin_desc;
+
+  /// No description provided for @species_achilles_tang_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Achilles Tang'**
+  String get species_achilles_tang_name;
+
+  /// No description provided for @species_achilles_tang_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark brown surgeonfish with a bold orange teardrop near the tail, found in surge zones of the central Pacific.'**
+  String get species_achilles_tang_desc;
+
+  /// No description provided for @species_doctorfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Doctorfish'**
+  String get species_doctorfish_name;
+
+  /// No description provided for @species_doctorfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Grayish-brown surgeonfish with faint dark bars and a prominent tail scalpel, common on Caribbean reefs.'**
+  String get species_doctorfish_desc;
+
+  /// No description provided for @species_checkerboard_wrasse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkerboard Wrasse'**
+  String get species_checkerboard_wrasse_name;
+
+  /// No description provided for @species_checkerboard_wrasse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colorful wrasse with a checkerboard pattern of green, pink, and black squares across the body.'**
+  String get species_checkerboard_wrasse_desc;
+
+  /// No description provided for @species_bird_wrasse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bird Wrasse'**
+  String get species_bird_wrasse_name;
+
+  /// No description provided for @species_bird_wrasse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrasse with an extremely elongated snout resembling a bird\'s beak, males are dark green, females are brown.'**
+  String get species_bird_wrasse_desc;
+
+  /// No description provided for @species_sling_jaw_wrasse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sling-Jaw Wrasse'**
+  String get species_sling_jaw_wrasse_name;
+
+  /// No description provided for @species_sling_jaw_wrasse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrasse with an extendable jaw that shoots forward to capture prey, found in yellow or brown color morphs.'**
+  String get species_sling_jaw_wrasse_desc;
+
+  /// No description provided for @species_peacock_flounder_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Peacock Flounder'**
+  String get species_peacock_flounder_name;
+
+  /// No description provided for @species_peacock_flounder_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat bottom-dwelling fish with blue rings and spots that can change color to match the seafloor.'**
+  String get species_peacock_flounder_desc;
+
+  /// No description provided for @species_hogfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Hogfish'**
+  String get species_hogfish_name;
+
+  /// No description provided for @species_hogfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large western Atlantic wrasse with a pig-like snout and elongated dorsal spines, found near reefs and wrecks.'**
+  String get species_hogfish_desc;
+
+  /// No description provided for @species_tarpon_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Atlantic Tarpon'**
+  String get species_tarpon_name;
+
+  /// No description provided for @species_tarpon_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Huge silver fish with large mirror-like scales, sometimes encountered by divers in Caribbean caves and channels.'**
+  String get species_tarpon_desc;
+
+  /// No description provided for @species_permit_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Permit'**
+  String get species_permit_name;
+
+  /// No description provided for @species_permit_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep-bodied silver jack with a dark forked tail, found on Caribbean sand flats and near reefs.'**
+  String get species_permit_desc;
+
+  /// No description provided for @species_spotted_drum_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotted Drum'**
+  String get species_spotted_drum_name;
+
+  /// No description provided for @species_spotted_drum_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striking Caribbean fish with a tall elongated dorsal fin and bold black and white spotted pattern.'**
+  String get species_spotted_drum_desc;
+
+  /// No description provided for @species_jackknife_fish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Jackknife Fish'**
+  String get species_jackknife_fish_name;
+
+  /// No description provided for @species_jackknife_fish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elegant Caribbean fish with a tall black dorsal fin stripe and diagonal body band, found under ledges.'**
+  String get species_jackknife_fish_desc;
+
+  /// No description provided for @species_bigeye_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Glasseye'**
+  String get species_bigeye_name;
+
+  /// No description provided for @species_bigeye_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright red nocturnal fish with large reflective eyes, found hiding in caves on Caribbean and Atlantic reefs.'**
+  String get species_bigeye_desc;
+
+  /// No description provided for @species_remora_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Remora'**
+  String get species_remora_name;
+
+  /// No description provided for @species_remora_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slender fish with a suction disc on its head that hitchhikes on sharks, rays, turtles, and other large animals.'**
+  String get species_remora_desc;
+
+  /// No description provided for @species_tilefish_sand_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sand Tilefish'**
+  String get species_tilefish_sand_name;
+
+  /// No description provided for @species_tilefish_sand_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elongated pale blue fish that builds rubble mounds over sandy areas on Caribbean reefs.'**
+  String get species_tilefish_sand_desc;
+
+  /// No description provided for @species_weedy_seadragon_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Weedy Seadragon'**
+  String get species_weedy_seadragon_name;
+
+  /// No description provided for @species_weedy_seadragon_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ornate relative of seahorses with leaf-like appendages, endemic to temperate southern Australian waters.'**
+  String get species_weedy_seadragon_desc;
+
+  /// No description provided for @species_leafy_seadragon_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Leafy Seadragon'**
+  String get species_leafy_seadragon_name;
+
+  /// No description provided for @species_leafy_seadragon_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Spectacular seadragon covered in elaborate leaf-like projections, endemic to southern Australia. A bucket-list dive sighting.'**
+  String get species_leafy_seadragon_desc;
+
+  /// No description provided for @species_sailfin_snapper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sailfin Snapper'**
+  String get species_sailfin_snapper_name;
+
+  /// No description provided for @species_sailfin_snapper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elegant yellow and blue snapper with elongated dorsal and anal fins, found on Indo-Pacific reef slopes.'**
+  String get species_sailfin_snapper_desc;
+
+  /// No description provided for @species_sweetlip_emperor_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spangled Emperor'**
+  String get species_sweetlip_emperor_name;
+
+  /// No description provided for @species_sweetlip_emperor_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large silvery emperor with blue lines on the face and yellow fin edges, common over Indo-Pacific sandy reef areas.'**
+  String get species_sweetlip_emperor_desc;
+
+  /// No description provided for @species_crocodilefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Crocodilefish'**
+  String get species_crocodilefish_name;
+
+  /// No description provided for @species_crocodilefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat-headed ambush predator with elaborate eye fringes, lies perfectly camouflaged on Indo-Pacific reef floors.'**
+  String get species_crocodilefish_desc;
+
+  /// No description provided for @species_devil_scorpionfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Devil Scorpionfish'**
+  String get species_devil_scorpionfish_name;
+
+  /// No description provided for @species_devil_scorpionfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Stout camouflaged scorpionfish with colorful inner pectoral fins flashed as a warning to predators.'**
+  String get species_devil_scorpionfish_desc;
+
+  /// No description provided for @species_spiny_devilfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Demon Stinger'**
+  String get species_spiny_devilfish_name;
+
+  /// No description provided for @species_spiny_devilfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Venomous bottom-dweller that walks on modified fin rays and flashes bright pectoral fins when disturbed.'**
+  String get species_spiny_devilfish_desc;
+
+  /// No description provided for @species_waspfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Cockatoo Waspfish'**
+  String get species_waspfish_name;
+
+  /// No description provided for @species_waspfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small compressed scorpionfish that sways like a dead leaf in the current on Indo-Pacific muddy bottoms.'**
+  String get species_waspfish_desc;
+
+  /// No description provided for @species_stargazer_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Whitemargin Stargazer'**
+  String get species_stargazer_name;
+
+  /// No description provided for @species_stargazer_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ambush predator that buries in sand with only eyes exposed, can deliver electric shocks. Found in the Indo-Pacific.'**
+  String get species_stargazer_desc;
+
+  /// No description provided for @species_striped_catfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Striped Catfish'**
+  String get species_striped_catfish_name;
+
+  /// No description provided for @species_striped_catfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Venomous-spined catfish; juveniles form dense ball-shaped schools that roll across Indo-Pacific reef floors.'**
+  String get species_striped_catfish_desc;
+
+  /// No description provided for @species_red_emperor_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Red Emperor'**
+  String get species_red_emperor_name;
+
+  /// No description provided for @species_red_emperor_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large snapper; adults are pinkish-red, juveniles have bold red and white bands. Found on Indo-Pacific reefs.'**
+  String get species_red_emperor_desc;
+
+  /// No description provided for @species_mangrove_snapper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Mangrove Snapper'**
+  String get species_mangrove_snapper_name;
+
+  /// No description provided for @species_mangrove_snapper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gray snapper found in Caribbean mangroves, seagrass, and reefs, often aggregating near structure.'**
+  String get species_mangrove_snapper_desc;
+
+  /// No description provided for @species_dottyback_orchid_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Orchid Dottyback'**
+  String get species_dottyback_orchid_name;
+
+  /// No description provided for @species_dottyback_orchid_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small vivid purple fish endemic to the Red Sea, darting in and out of crevices on steep reef walls.'**
+  String get species_dottyback_orchid_desc;
+
+  /// No description provided for @species_dottyback_royal_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Royal Dottyback'**
+  String get species_dottyback_royal_name;
+
+  /// No description provided for @species_dottyback_royal_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small bicolored fish with a magenta front and bright yellow rear, found on Indo-Pacific reef walls.'**
+  String get species_dottyback_royal_desc;
+
+  /// No description provided for @species_coral_trout_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Coral Trout'**
+  String get species_coral_trout_name;
+
+  /// No description provided for @species_coral_trout_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Prized Great Barrier Reef predator with an orange-red body covered in blue spots.'**
+  String get species_coral_trout_desc;
+
+  /// No description provided for @species_barramundi_cod_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Barramundi Cod'**
+  String get species_barramundi_cod_name;
+
+  /// No description provided for @species_barramundi_cod_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Distinctive grouper with a small head, humped body, and dark polka dots on a pale background.'**
+  String get species_barramundi_cod_desc;
+
+  /// No description provided for @species_spadefish_atlantic_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Atlantic Spadefish'**
+  String get species_spadefish_atlantic_name;
+
+  /// No description provided for @species_spadefish_atlantic_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver disc-shaped fish with dark vertical bars, often seen in large schools around Caribbean wrecks.'**
+  String get species_spadefish_atlantic_desc;
+
+  /// No description provided for @species_fusilier_yellowback_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellowback Fusilier'**
+  String get species_fusilier_yellowback_name;
+
+  /// No description provided for @species_fusilier_yellowback_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleek blue planktivorous fish with a yellow back, forming massive schools above Indo-Pacific reef slopes.'**
+  String get species_fusilier_yellowback_desc;
+
+  /// No description provided for @species_fusilier_bluestreak_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluestreak Fusilier'**
+  String get species_fusilier_bluestreak_name;
+
+  /// No description provided for @species_fusilier_bluestreak_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small blue fusilier with a dark lateral stripe, seen in fast-moving schools along Indo-Pacific reef walls.'**
+  String get species_fusilier_bluestreak_desc;
+
+  /// No description provided for @species_porkfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Porkfish'**
+  String get species_porkfish_name;
+
+  /// No description provided for @species_porkfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colorful Caribbean grunt with blue and yellow stripes and two black head bars, found near reefs and wrecks.'**
+  String get species_porkfish_desc;
+
+  /// No description provided for @species_blue_striped_grunt_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-Striped Grunt'**
+  String get species_blue_striped_grunt_name;
+
+  /// No description provided for @species_blue_striped_grunt_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow Caribbean grunt with vivid blue horizontal stripes, forms large resting schools under ledges by day.'**
+  String get species_blue_striped_grunt_desc;
+
+  /// No description provided for @species_french_grunt_name.
+  ///
+  /// In en, this message translates to:
+  /// **'French Grunt'**
+  String get species_french_grunt_name;
+
+  /// No description provided for @species_french_grunt_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small yellow-striped grunt that forms dense resting schools on Caribbean reefs during daylight hours.'**
+  String get species_french_grunt_desc;
+
+  /// No description provided for @species_convict_tang_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Convict Tang'**
+  String get species_convict_tang_name;
+
+  /// No description provided for @species_convict_tang_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pale surgeonfish with six vertical black bars, often seen grazing in large schools on Indo-Pacific reef flats.'**
+  String get species_convict_tang_desc;
+
+  /// No description provided for @species_great_hammerhead_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Scalloped Hammerhead'**
+  String get species_great_hammerhead_name;
+
+  /// No description provided for @species_great_hammerhead_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Distinctive shark with a scalloped hammer-shaped head, forms large schools at seamounts and offshore islands.'**
+  String get species_great_hammerhead_desc;
+
+  /// No description provided for @species_wobbegong_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotted Wobbegong'**
+  String get species_wobbegong_name;
+
+  /// No description provided for @species_wobbegong_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat, well-camouflaged carpet shark with fringed lobes around the mouth, found on Australian temperate reefs.'**
+  String get species_wobbegong_desc;
+
+  /// No description provided for @species_manta_ray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef Manta Ray'**
+  String get species_manta_ray_name;
+
+  /// No description provided for @species_manta_ray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Graceful giant reaching 5m wingspan that visits cleaning stations and feeds on plankton at Indo-Pacific reefs.'**
+  String get species_manta_ray_desc;
+
+  /// No description provided for @species_oceanic_manta_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Oceanic Manta Ray'**
+  String get species_oceanic_manta_name;
+
+  /// No description provided for @species_oceanic_manta_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest ray species with wingspans exceeding 7m, encountered at offshore seamounts and cleaning stations.'**
+  String get species_oceanic_manta_desc;
+
+  /// No description provided for @species_undulated_moray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Undulated Moray Eel'**
+  String get species_undulated_moray_name;
+
+  /// No description provided for @species_undulated_moray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellowish-green moray with dark wavy markings, commonly seen hunting on Indo-Pacific reefs at night.'**
+  String get species_undulated_moray_desc;
+
+  /// No description provided for @species_whitemouth_moray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Whitemouth Moray Eel'**
+  String get species_whitemouth_moray_name;
+
+  /// No description provided for @species_whitemouth_moray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark brown moray with small white spots and a distinctive white mouth interior, found across the Indo-Pacific.'**
+  String get species_whitemouth_moray_desc;
+
+  /// No description provided for @species_dragon_moray_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Dragon Moray Eel'**
+  String get species_dragon_moray_name;
+
+  /// No description provided for @species_dragon_moray_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striking moray with dragon-like horns above its nostrils and orange-red leopard spots, found in the Indo-Pacific.'**
+  String get species_dragon_moray_desc;
+
+  /// No description provided for @species_lyretail_grouper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Lyretail Grouper'**
+  String get species_lyretail_grouper_name;
+
+  /// No description provided for @species_lyretail_grouper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Red-pink grouper with blue spots and a distinctive crescent-shaped tail, found on Indo-Pacific outer reef walls.'**
+  String get species_lyretail_grouper_desc;
+
+  /// No description provided for @species_banded_butterflyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Banded Butterflyfish'**
+  String get species_banded_butterflyfish_name;
+
+  /// No description provided for @species_banded_butterflyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'White butterflyfish with four bold black vertical bands, one of the most common butterflies on Caribbean reefs.'**
+  String get species_banded_butterflyfish_desc;
+
+  /// No description provided for @species_ringed_pipefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ringed Pipefish'**
+  String get species_ringed_pipefish_name;
+
+  /// No description provided for @species_ringed_pipefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slender pipefish with alternating red and white rings, found in caves and under ledges on Indo-Pacific reefs.'**
+  String get species_ringed_pipefish_desc;
+
+  /// No description provided for @species_razorfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Razorfish'**
+  String get species_razorfish_name;
+
+  /// No description provided for @species_razorfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny fish that swims vertically head-down in groups, often hiding among sea urchin spines on Indo-Pacific reefs.'**
+  String get species_razorfish_desc;
+
+  /// No description provided for @species_harlequin_tuskfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Harlequin Tuskfish'**
+  String get species_harlequin_tuskfish_name;
+
+  /// No description provided for @species_harlequin_tuskfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colorful wrasse with bright blue tusks, red-orange bars, and white patches, found on western Pacific reefs.'**
+  String get species_harlequin_tuskfish_desc;
+
+  /// No description provided for @species_blue_groper_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Groper'**
+  String get species_blue_groper_name;
+
+  /// No description provided for @species_blue_groper_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large blue wrasse endemic to eastern Australia, friendly and often approaches divers on temperate reefs.'**
+  String get species_blue_groper_desc;
+
+  /// No description provided for @species_red_lipped_batfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Red-Lipped Batfish'**
+  String get species_red_lipped_batfish_name;
+
+  /// No description provided for @species_red_lipped_batfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bizarre flat-bodied fish with bright red lips that walks on modified fins on the Galapagos seafloor.'**
+  String get species_red_lipped_batfish_desc;
+
+  /// No description provided for @species_orangeband_surgeonfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Orangeband Surgeonfish'**
+  String get species_orangeband_surgeonfish_name;
+
+  /// No description provided for @species_orangeband_surgeonfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gray-brown surgeonfish with an orange horizontal band behind the eye, found on Pacific reef slopes.'**
+  String get species_orangeband_surgeonfish_desc;
+
+  /// No description provided for @species_maori_wrasse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Maori Wrasse'**
+  String get species_maori_wrasse_name;
+
+  /// No description provided for @species_maori_wrasse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium-sized wrasse with a dark band behind the pectoral fin, common on Pacific and Indian Ocean reefs.'**
+  String get species_maori_wrasse_desc;
+
+  /// No description provided for @species_blue_ringed_octopus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-ringed Octopus'**
+  String get species_blue_ringed_octopus_name;
+
+  /// No description provided for @species_blue_ringed_octopus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small but extremely venomous octopus with bright blue rings that flash when threatened.'**
+  String get species_blue_ringed_octopus_desc;
+
+  /// No description provided for @species_common_octopus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Octopus'**
+  String get species_common_octopus_name;
+
+  /// No description provided for @species_common_octopus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Highly intelligent octopus known for rapid color changes and problem-solving abilities.'**
+  String get species_common_octopus_desc;
+
+  /// No description provided for @species_giant_pacific_octopus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Pacific Octopus'**
+  String get species_giant_pacific_octopus_name;
+
+  /// No description provided for @species_giant_pacific_octopus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest octopus species, with arm spans reaching over 4 meters in cold Pacific waters.'**
+  String get species_giant_pacific_octopus_desc;
+
+  /// No description provided for @species_mimic_octopus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Mimic Octopus'**
+  String get species_mimic_octopus_name;
+
+  /// No description provided for @species_mimic_octopus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Remarkable octopus that imitates the appearance and behavior of other marine species.'**
+  String get species_mimic_octopus_desc;
+
+  /// No description provided for @species_coconut_octopus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Coconut Octopus'**
+  String get species_coconut_octopus_name;
+
+  /// No description provided for @species_coconut_octopus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small octopus famous for carrying coconut shells and using them as portable shelters.'**
+  String get species_coconut_octopus_desc;
+
+  /// No description provided for @species_day_octopus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Day Octopus'**
+  String get species_day_octopus_name;
+
+  /// No description provided for @species_day_octopus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Active daytime hunter common on Indo-Pacific reefs with impressive camouflage abilities.'**
+  String get species_day_octopus_desc;
+
+  /// No description provided for @species_wonderpus_octopus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Wonderpus Octopus'**
+  String get species_wonderpus_octopus_name;
+
+  /// No description provided for @species_wonderpus_octopus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striking octopus with unique white and brown banding found on sandy muck dive sites.'**
+  String get species_wonderpus_octopus_desc;
+
+  /// No description provided for @species_broadclub_cuttlefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Broadclub Cuttlefish'**
+  String get species_broadclub_cuttlefish_name;
+
+  /// No description provided for @species_broadclub_cuttlefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large cuttlefish with mesmerizing color displays, commonly seen on Indo-Pacific reefs.'**
+  String get species_broadclub_cuttlefish_desc;
+
+  /// No description provided for @species_pharaoh_cuttlefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pharaoh Cuttlefish'**
+  String get species_pharaoh_cuttlefish_name;
+
+  /// No description provided for @species_pharaoh_cuttlefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large cuttlefish found across the Indian Ocean, known for pulsating color patterns.'**
+  String get species_pharaoh_cuttlefish_desc;
+
+  /// No description provided for @species_flamboyant_cuttlefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Flamboyant Cuttlefish'**
+  String get species_flamboyant_cuttlefish_name;
+
+  /// No description provided for @species_flamboyant_cuttlefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny cuttlefish that walks on the seafloor displaying vivid purple, pink, and yellow pulses.'**
+  String get species_flamboyant_cuttlefish_desc;
+
+  /// No description provided for @species_giant_cuttlefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Cuttlefish'**
+  String get species_giant_cuttlefish_name;
+
+  /// No description provided for @species_giant_cuttlefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The world\'s largest cuttlefish, famous for mass spawning aggregations in South Australia.'**
+  String get species_giant_cuttlefish_desc;
+
+  /// No description provided for @species_bigfin_reef_squid_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bigfin Reef Squid'**
+  String get species_bigfin_reef_squid_name;
+
+  /// No description provided for @species_bigfin_reef_squid_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Schooling squid frequently encountered on night dives, attracted to dive lights.'**
+  String get species_bigfin_reef_squid_desc;
+
+  /// No description provided for @species_caribbean_reef_squid_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Caribbean Reef Squid'**
+  String get species_caribbean_reef_squid_name;
+
+  /// No description provided for @species_caribbean_reef_squid_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Curious squid often hovering in small groups near reef edges in the Caribbean.'**
+  String get species_caribbean_reef_squid_desc;
+
+  /// No description provided for @species_bobtail_squid_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bobtail Squid'**
+  String get species_bobtail_squid_name;
+
+  /// No description provided for @species_bobtail_squid_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny nocturnal squid that buries in sand by day, a prized muck diving find.'**
+  String get species_bobtail_squid_desc;
+
+  /// No description provided for @species_chambered_nautilus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Chambered Nautilus'**
+  String get species_chambered_nautilus_name;
+
+  /// No description provided for @species_chambered_nautilus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ancient living fossil with a coiled shell, rarely seen by divers in deep water at dawn.'**
+  String get species_chambered_nautilus_desc;
+
+  /// No description provided for @species_spanish_dancer_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish Dancer'**
+  String get species_spanish_dancer_name;
+
+  /// No description provided for @species_spanish_dancer_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest nudibranch species that swims with undulating red mantle resembling a flamenco dancer.'**
+  String get species_spanish_dancer_desc;
+
+  /// No description provided for @species_chromodoris_willani_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Willan\'s Chromodoris'**
+  String get species_chromodoris_willani_name;
+
+  /// No description provided for @species_chromodoris_willani_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striking blue and black nudibranch with white margin, common in the Indo-Pacific.'**
+  String get species_chromodoris_willani_desc;
+
+  /// No description provided for @species_chromodoris_lochi_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Loch\'s Chromodoris'**
+  String get species_chromodoris_lochi_name;
+
+  /// No description provided for @species_chromodoris_lochi_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue nudibranch with dark lines and white border found throughout the tropical Pacific.'**
+  String get species_chromodoris_lochi_desc;
+
+  /// No description provided for @species_chromodoris_magnifica_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Magnificent Chromodoris'**
+  String get species_chromodoris_magnifica_name;
+
+  /// No description provided for @species_chromodoris_magnifica_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brilliant blue, white, and orange nudibranch found on Indo-Pacific coral reefs.'**
+  String get species_chromodoris_magnifica_desc;
+
+  /// No description provided for @species_chromodoris_annae_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Anna\'s Chromodoris'**
+  String get species_chromodoris_annae_name;
+
+  /// No description provided for @species_chromodoris_annae_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep blue nudibranch with black lines and orange-tipped rhinophores and gills.'**
+  String get species_chromodoris_annae_desc;
+
+  /// No description provided for @species_nembrotha_kubaryana_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Variable Neon Slug'**
+  String get species_nembrotha_kubaryana_name;
+
+  /// No description provided for @species_nembrotha_kubaryana_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark green nudibranch with vivid orange or red markings, feeds on tunicates.'**
+  String get species_nembrotha_kubaryana_desc;
+
+  /// No description provided for @species_nembrotha_cristata_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Crested Nembrotha'**
+  String get species_nembrotha_cristata_name;
+
+  /// No description provided for @species_nembrotha_cristata_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Black nudibranch with bright green pustules and striping found on Indo-Pacific reefs.'**
+  String get species_nembrotha_cristata_desc;
+
+  /// No description provided for @species_phyllidia_varicosa_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Varicose Phyllidia'**
+  String get species_phyllidia_varicosa_name;
+
+  /// No description provided for @species_phyllidia_varicosa_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-grey nudibranch with raised yellow-tipped tubercles, toxic to predators.'**
+  String get species_phyllidia_varicosa_desc;
+
+  /// No description provided for @species_phyllidia_ocellata_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocellated Phyllidia'**
+  String get species_phyllidia_ocellata_name;
+
+  /// No description provided for @species_phyllidia_ocellata_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'White nudibranch with raised pink-ringed tubercles found on tropical reefs.'**
+  String get species_phyllidia_ocellata_desc;
+
+  /// No description provided for @species_pikachu_nudibranch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pikachu Nudibranch'**
+  String get species_pikachu_nudibranch_name;
+
+  /// No description provided for @species_pikachu_nudibranch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny yellow and black sea slug resembling a cartoon character, found in the Pacific.'**
+  String get species_pikachu_nudibranch_desc;
+
+  /// No description provided for @species_anna_rosefieldi_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Roboastra Nudibranch'**
+  String get species_anna_rosefieldi_name;
+
+  /// No description provided for @species_anna_rosefieldi_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Predatory nudibranch with dark body and bright longitudinal stripes that hunts other slugs.'**
+  String get species_anna_rosefieldi_desc;
+
+  /// No description provided for @species_lettuce_sea_slug_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Lettuce Sea Slug'**
+  String get species_lettuce_sea_slug_name;
+
+  /// No description provided for @species_lettuce_sea_slug_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruffled green sea slug that retains chloroplasts from algae for photosynthesis.'**
+  String get species_lettuce_sea_slug_desc;
+
+  /// No description provided for @species_blue_dragon_nudibranch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Dragon Nudibranch'**
+  String get species_blue_dragon_nudibranch_name;
+
+  /// No description provided for @species_blue_dragon_nudibranch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Long aeolid nudibranch with blue-tipped cerata that harbors symbiotic zooxanthellae.'**
+  String get species_blue_dragon_nudibranch_desc;
+
+  /// No description provided for @species_gloomy_nudibranch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Gloomy Nudibranch'**
+  String get species_gloomy_nudibranch_name;
+
+  /// No description provided for @species_gloomy_nudibranch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark blue-green nudibranch with blue-edged ridges common on Indo-Pacific reefs.'**
+  String get species_gloomy_nudibranch_desc;
+
+  /// No description provided for @species_ocellined_nudibranch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocellined Nudibranch'**
+  String get species_ocellined_nudibranch_name;
+
+  /// No description provided for @species_ocellined_nudibranch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'White nudibranch with orange-lined ridges forming geometric patterns on its mantle.'**
+  String get species_ocellined_nudibranch_desc;
+
+  /// No description provided for @species_glossodoris_cincta_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Glossodoris Nudibranch'**
+  String get species_glossodoris_cincta_name;
+
+  /// No description provided for @species_glossodoris_cincta_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Cream-colored nudibranch with dark brown border and orange margin on the mantle.'**
+  String get species_glossodoris_cincta_desc;
+
+  /// No description provided for @species_jorunna_funebris_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Dotted Nudibranch'**
+  String get species_jorunna_funebris_name;
+
+  /// No description provided for @species_jorunna_funebris_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'White nudibranch covered in black-tipped caryophyllidia, resembling a fuzzy bunny.'**
+  String get species_jorunna_funebris_desc;
+
+  /// No description provided for @species_ceratosoma_trilobatum_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Trilobate Nudibranch'**
+  String get species_ceratosoma_trilobatum_name;
+
+  /// No description provided for @species_ceratosoma_trilobatum_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large nudibranch with tall dorsal horn and lateral lobes in purple and yellow hues.'**
+  String get species_ceratosoma_trilobatum_desc;
+
+  /// No description provided for @species_hypselodoris_apolegma_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple Hypselodoris'**
+  String get species_hypselodoris_apolegma_name;
+
+  /// No description provided for @species_hypselodoris_apolegma_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elegant purple nudibranch with white mantle border found on Indo-Pacific reefs.'**
+  String get species_hypselodoris_apolegma_desc;
+
+  /// No description provided for @species_hypselodoris_bullockii_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bullock\'s Hypselodoris'**
+  String get species_hypselodoris_bullockii_name;
+
+  /// No description provided for @species_hypselodoris_bullockii_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink and purple nudibranch with yellow-tipped rhinophores on Indo-Pacific reefs.'**
+  String get species_hypselodoris_bullockii_desc;
+
+  /// No description provided for @species_flabellina_exoptata_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Desirable Flabellina'**
+  String get species_flabellina_exoptata_name;
+
+  /// No description provided for @species_flabellina_exoptata_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Translucent aeolid nudibranch with purple-tipped orange cerata found in tropical waters.'**
+  String get species_flabellina_exoptata_desc;
+
+  /// No description provided for @species_risbecia_tryoni_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tryon\'s Risbecia'**
+  String get species_risbecia_tryoni_name;
+
+  /// No description provided for @species_risbecia_tryoni_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large brown and blue nudibranch often found in mating pairs on Indo-Pacific reefs.'**
+  String get species_risbecia_tryoni_desc;
+
+  /// No description provided for @species_goniobranchus_kuniei_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Kunie\'s Nudibranch'**
+  String get species_goniobranchus_kuniei_name;
+
+  /// No description provided for @species_goniobranchus_kuniei_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Orange-spotted white nudibranch with purple mantle margin found in the western Pacific.'**
+  String get species_goniobranchus_kuniei_desc;
+
+  /// No description provided for @species_mexichromis_multituberculata_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-tuberculated Nudibranch'**
+  String get species_mexichromis_multituberculata_name;
+
+  /// No description provided for @species_mexichromis_multituberculata_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple and white nudibranch with raised tubercles and orange-tipped appendages.'**
+  String get species_mexichromis_multituberculata_desc;
+
+  /// No description provided for @species_chromodoris_dianae_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Diana\'s Chromodoris'**
+  String get species_chromodoris_dianae_name;
+
+  /// No description provided for @species_chromodoris_dianae_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright blue nudibranch with black stripes and orange gills found in the western Pacific.'**
+  String get species_chromodoris_dianae_desc;
+
+  /// No description provided for @species_phyllodesmium_poindimiei_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Solar-powered Nudibranch'**
+  String get species_phyllodesmium_poindimiei_name;
+
+  /// No description provided for @species_phyllodesmium_poindimiei_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Translucent aeolid nudibranch with branching cerata that harbors zooxanthellae.'**
+  String get species_phyllodesmium_poindimiei_desc;
+
+  /// No description provided for @species_chromodoris_elisabethina_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Elizabeth\'s Chromodoris'**
+  String get species_chromodoris_elisabethina_name;
+
+  /// No description provided for @species_chromodoris_elisabethina_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue and yellow-lined nudibranch with a white mantle border, common in Southeast Asia.'**
+  String get species_chromodoris_elisabethina_desc;
+
+  /// No description provided for @species_doridella_batava_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Batavian Dorid'**
+  String get species_doridella_batava_name;
+
+  /// No description provided for @species_doridella_batava_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Variable black to brown dorid nudibranch found under rocks and rubble on Indo-Pacific reefs.'**
+  String get species_doridella_batava_desc;
+
+  /// No description provided for @species_tiger_cowrie_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiger Cowrie'**
+  String get species_tiger_cowrie_name;
+
+  /// No description provided for @species_tiger_cowrie_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large spotted cowrie shell found on tropical reefs, often partially covered by its mantle.'**
+  String get species_tiger_cowrie_desc;
+
+  /// No description provided for @species_tritons_trumpet_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Triton\'s Trumpet'**
+  String get species_tritons_trumpet_name;
+
+  /// No description provided for @species_tritons_trumpet_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large predatory snail and natural enemy of the crown-of-thorns starfish.'**
+  String get species_tritons_trumpet_desc;
+
+  /// No description provided for @species_queen_conch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Queen Conch'**
+  String get species_queen_conch_name;
+
+  /// No description provided for @species_queen_conch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Iconic large conch of Caribbean seagrass beds with a distinctive pink inner lip.'**
+  String get species_queen_conch_desc;
+
+  /// No description provided for @species_banded_coral_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Banded Coral Shrimp'**
+  String get species_banded_coral_shrimp_name;
+
+  /// No description provided for @species_banded_coral_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Red and white banded cleaner shrimp with long white antennae found in reef crevices.'**
+  String get species_banded_coral_shrimp_desc;
+
+  /// No description provided for @species_mantis_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Peacock Mantis Shrimp'**
+  String get species_mantis_shrimp_name;
+
+  /// No description provided for @species_mantis_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colorful predator with powerful club-like appendages that can smash through shells.'**
+  String get species_mantis_shrimp_desc;
+
+  /// No description provided for @species_cleaner_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Scarlet Cleaner Shrimp'**
+  String get species_cleaner_shrimp_name;
+
+  /// No description provided for @species_cleaner_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright red and white shrimp that sets up cleaning stations to service reef fish.'**
+  String get species_cleaner_shrimp_desc;
+
+  /// No description provided for @species_pederson_cleaner_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pederson Cleaner Shrimp'**
+  String get species_pederson_cleaner_shrimp_name;
+
+  /// No description provided for @species_pederson_cleaner_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Translucent Caribbean cleaner shrimp living among anemone tentacles.'**
+  String get species_pederson_cleaner_shrimp_desc;
+
+  /// No description provided for @species_harlequin_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Harlequin Shrimp'**
+  String get species_harlequin_shrimp_name;
+
+  /// No description provided for @species_harlequin_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Strikingly patterned shrimp with flat claws that feeds exclusively on sea stars.'**
+  String get species_harlequin_shrimp_desc;
+
+  /// No description provided for @species_coleman_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Coleman Shrimp'**
+  String get species_coleman_shrimp_name;
+
+  /// No description provided for @species_coleman_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny paired shrimp living on fire urchins, highly prized by underwater photographers.'**
+  String get species_coleman_shrimp_desc;
+
+  /// No description provided for @species_emperor_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Emperor Shrimp'**
+  String get species_emperor_shrimp_name;
+
+  /// No description provided for @species_emperor_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colorful commensal shrimp that rides on sea cucumbers and nudibranchs.'**
+  String get species_emperor_shrimp_desc;
+
+  /// No description provided for @species_sexy_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sexy Shrimp'**
+  String get species_sexy_shrimp_name;
+
+  /// No description provided for @species_sexy_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny anemone shrimp known for its tail-waving dance, popular in macro photography.'**
+  String get species_sexy_shrimp_desc;
+
+  /// No description provided for @species_marble_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Marble Shrimp'**
+  String get species_marble_shrimp_name;
+
+  /// No description provided for @species_marble_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Nocturnal mottled shrimp with feathery legs found hiding in reef crevices by day.'**
+  String get species_marble_shrimp_desc;
+
+  /// No description provided for @species_spiny_lobster_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Caribbean Spiny Lobster'**
+  String get species_spiny_lobster_name;
+
+  /// No description provided for @species_spiny_lobster_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large clawless lobster with long antennae found sheltering under reef ledges.'**
+  String get species_spiny_lobster_desc;
+
+  /// No description provided for @species_painted_spiny_lobster_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Painted Spiny Lobster'**
+  String get species_painted_spiny_lobster_name;
+
+  /// No description provided for @species_painted_spiny_lobster_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibrantly colored lobster with blue, green, and white striped legs on Indo-Pacific reefs.'**
+  String get species_painted_spiny_lobster_desc;
+
+  /// No description provided for @species_slipper_lobster_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Slipper Lobster'**
+  String get species_slipper_lobster_name;
+
+  /// No description provided for @species_slipper_lobster_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat-bodied nocturnal lobster with wide antennae plates instead of long whips.'**
+  String get species_slipper_lobster_desc;
+
+  /// No description provided for @species_squat_lobster_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Squat Lobster'**
+  String get species_squat_lobster_name;
+
+  /// No description provided for @species_squat_lobster_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny pink-purple crustacean living on giant barrel sponges, a macro photography favorite.'**
+  String get species_squat_lobster_desc;
+
+  /// No description provided for @species_hermit_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-legged Hermit Crab'**
+  String get species_hermit_crab_name;
+
+  /// No description provided for @species_hermit_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small hermit crab with bright blue legs commonly seen on Caribbean reefs.'**
+  String get species_hermit_crab_desc;
+
+  /// No description provided for @species_orangutan_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Orangutan Crab'**
+  String get species_orangutan_crab_name;
+
+  /// No description provided for @species_orangutan_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny hairy crab living in bubble coral, named for its resemblance to an orangutan.'**
+  String get species_orangutan_crab_desc;
+
+  /// No description provided for @species_decorator_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Decorator Crab'**
+  String get species_decorator_crab_name;
+
+  /// No description provided for @species_decorator_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Master of disguise that attaches sponges, algae, and hydroids to its carapace.'**
+  String get species_decorator_crab_desc;
+
+  /// No description provided for @species_porcelain_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Porcelain Anemone Crab'**
+  String get species_porcelain_crab_name;
+
+  /// No description provided for @species_porcelain_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat spotted crab living in anemones, filter-feeding with feathery mouthparts.'**
+  String get species_porcelain_crab_desc;
+
+  /// No description provided for @species_arrow_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrow Crab'**
+  String get species_arrow_crab_name;
+
+  /// No description provided for @species_arrow_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Spindly Caribbean crab with long pointed rostrum and striped legs.'**
+  String get species_arrow_crab_desc;
+
+  /// No description provided for @species_channel_clinging_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel Clinging Crab'**
+  String get species_channel_clinging_crab_name;
+
+  /// No description provided for @species_channel_clinging_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large Caribbean reef crab with dark body and red-orange claws found in crevices.'**
+  String get species_channel_clinging_crab_desc;
+
+  /// No description provided for @species_coral_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Coral Guard Crab'**
+  String get species_coral_crab_name;
+
+  /// No description provided for @species_coral_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small spotted crab living symbiotically in Pocillopora corals, defending its host.'**
+  String get species_coral_crab_desc;
+
+  /// No description provided for @species_crown_of_thorns_starfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Crown-of-thorns Starfish'**
+  String get species_crown_of_thorns_starfish_name;
+
+  /// No description provided for @species_crown_of_thorns_starfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Venomous multi-armed starfish that feeds on coral and can devastate reefs in outbreaks.'**
+  String get species_crown_of_thorns_starfish_desc;
+
+  /// No description provided for @species_blue_linckia_starfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Linckia Starfish'**
+  String get species_blue_linckia_starfish_name;
+
+  /// No description provided for @species_blue_linckia_starfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Vivid blue sea star commonly seen on Indo-Pacific reef flats and slopes.'**
+  String get species_blue_linckia_starfish_desc;
+
+  /// No description provided for @species_red_knob_starfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Red Knob Starfish'**
+  String get species_red_knob_starfish_name;
+
+  /// No description provided for @species_red_knob_starfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large grey starfish with prominent red-tipped spines found on sandy reef areas.'**
+  String get species_red_knob_starfish_desc;
+
+  /// No description provided for @species_chocolate_chip_starfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Chocolate Chip Starfish'**
+  String get species_chocolate_chip_starfish_name;
+
+  /// No description provided for @species_chocolate_chip_starfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tan starfish with dark raised nodules resembling chocolate chips on sandy substrates.'**
+  String get species_chocolate_chip_starfish_desc;
+
+  /// No description provided for @species_cushion_star_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Cushion Star'**
+  String get species_cushion_star_name;
+
+  /// No description provided for @species_cushion_star_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Puffy pentagonal starfish with reduced arms found on Indo-Pacific reef flats.'**
+  String get species_cushion_star_desc;
+
+  /// No description provided for @species_fromia_starfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Elegant Starfish'**
+  String get species_fromia_starfish_name;
+
+  /// No description provided for @species_fromia_starfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small orange-red starfish with pale plate margins creating a tiled pattern.'**
+  String get species_fromia_starfish_desc;
+
+  /// No description provided for @species_basket_star_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Basket Star'**
+  String get species_basket_star_name;
+
+  /// No description provided for @species_basket_star_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elaborately branched arms unfurl at night to filter-feed in the current.'**
+  String get species_basket_star_desc;
+
+  /// No description provided for @species_brittle_star_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Banded Brittle Star'**
+  String get species_brittle_star_name;
+
+  /// No description provided for @species_brittle_star_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striped brittle star found under rocks and in crevices with agile, snake-like arms.'**
+  String get species_brittle_star_desc;
+
+  /// No description provided for @species_feather_star_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Feather Star'**
+  String get species_feather_star_name;
+
+  /// No description provided for @species_feather_star_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-armed crinoid perched on reef prominences, filter-feeding with feathery arms.'**
+  String get species_feather_star_desc;
+
+  /// No description provided for @species_black_feather_star_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Black Feather Star'**
+  String get species_black_feather_star_name;
+
+  /// No description provided for @species_black_feather_star_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark crinoid that can swim briefly by rhythmically waving its many arms.'**
+  String get species_black_feather_star_desc;
+
+  /// No description provided for @species_long_spined_sea_urchin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-spined Sea Urchin'**
+  String get species_long_spined_sea_urchin_name;
+
+  /// No description provided for @species_long_spined_sea_urchin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Black urchin with long venomous spines, a critical reef grazer in the Caribbean.'**
+  String get species_long_spined_sea_urchin_desc;
+
+  /// No description provided for @species_fire_urchin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Fire Urchin'**
+  String get species_fire_urchin_name;
+
+  /// No description provided for @species_fire_urchin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft-bodied urchin with venomous spines that cause painful stings on contact.'**
+  String get species_fire_urchin_desc;
+
+  /// No description provided for @species_pencil_urchin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pencil Urchin'**
+  String get species_pencil_urchin_name;
+
+  /// No description provided for @species_pencil_urchin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Robust urchin with thick blunt spines found wedged into reef crevices.'**
+  String get species_pencil_urchin_desc;
+
+  /// No description provided for @species_collector_urchin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Collector Urchin'**
+  String get species_collector_urchin_name;
+
+  /// No description provided for @species_collector_urchin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Urchin that covers itself with debris and algae fragments for camouflage.'**
+  String get species_collector_urchin_desc;
+
+  /// No description provided for @species_sea_apple_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Apple'**
+  String get species_sea_apple_name;
+
+  /// No description provided for @species_sea_apple_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brightly colored sea cucumber with oral tentacles used for filter feeding.'**
+  String get species_sea_apple_desc;
+
+  /// No description provided for @species_pineapple_sea_cucumber_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pineapple Sea Cucumber'**
+  String get species_pineapple_sea_cucumber_name;
+
+  /// No description provided for @species_pineapple_sea_cucumber_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large orange-red sea cucumber with star-shaped papillae found on reef slopes.'**
+  String get species_pineapple_sea_cucumber_desc;
+
+  /// No description provided for @species_black_sea_cucumber_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Black Sea Cucumber'**
+  String get species_black_sea_cucumber_name;
+
+  /// No description provided for @species_black_sea_cucumber_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Common black sea cucumber found on sandy reef flats throughout the Indo-Pacific.'**
+  String get species_black_sea_cucumber_desc;
+
+  /// No description provided for @species_leopard_sea_cucumber_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Leopard Sea Cucumber'**
+  String get species_leopard_sea_cucumber_name;
+
+  /// No description provided for @species_leopard_sea_cucumber_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotted sea cucumber that ejects sticky white Cuvierian tubules when disturbed.'**
+  String get species_leopard_sea_cucumber_desc;
+
+  /// No description provided for @species_sand_dollar_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sand Dollar'**
+  String get species_sand_dollar_name;
+
+  /// No description provided for @species_sand_dollar_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat disc-shaped urchin found partially buried in sandy substrates.'**
+  String get species_sand_dollar_desc;
+
+  /// No description provided for @species_moon_jellyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon Jellyfish'**
+  String get species_moon_jellyfish_name;
+
+  /// No description provided for @species_moon_jellyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Translucent bell-shaped jellyfish with four horseshoe-shaped gonads visible through its body.'**
+  String get species_moon_jellyfish_desc;
+
+  /// No description provided for @species_lions_mane_jellyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Lion\'s Mane Jellyfish'**
+  String get species_lions_mane_jellyfish_name;
+
+  /// No description provided for @species_lions_mane_jellyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'One of the largest jellyfish species with long trailing tentacles in cold waters.'**
+  String get species_lions_mane_jellyfish_desc;
+
+  /// No description provided for @species_box_jellyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Box Jellyfish'**
+  String get species_box_jellyfish_name;
+
+  /// No description provided for @species_box_jellyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Extremely dangerous jellyfish with potent venom found in Indo-Pacific tropical waters.'**
+  String get species_box_jellyfish_desc;
+
+  /// No description provided for @species_upside_down_jellyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Upside-down Jellyfish'**
+  String get species_upside_down_jellyfish_name;
+
+  /// No description provided for @species_upside_down_jellyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Unusual jellyfish that rests bell-down on sandy bottoms to photosynthesize algae.'**
+  String get species_upside_down_jellyfish_desc;
+
+  /// No description provided for @species_blue_blubber_jellyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Blubber Jellyfish'**
+  String get species_blue_blubber_jellyfish_name;
+
+  /// No description provided for @species_blue_blubber_jellyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-white jellyfish with a firm bell and frilly oral arms common in Australian waters.'**
+  String get species_blue_blubber_jellyfish_desc;
+
+  /// No description provided for @species_fried_egg_jellyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Fried Egg Jellyfish'**
+  String get species_fried_egg_jellyfish_name;
+
+  /// No description provided for @species_fried_egg_jellyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Mediterranean jellyfish with a yellow dome resembling a fried egg and mild sting.'**
+  String get species_fried_egg_jellyfish_desc;
+
+  /// No description provided for @species_pacific_sea_nettle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pacific Sea Nettle'**
+  String get species_pacific_sea_nettle_name;
+
+  /// No description provided for @species_pacific_sea_nettle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden-brown jellyfish with long trailing tentacles found along the Pacific coast.'**
+  String get species_pacific_sea_nettle_desc;
+
+  /// No description provided for @species_compass_jellyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Compass Jellyfish'**
+  String get species_compass_jellyfish_name;
+
+  /// No description provided for @species_compass_jellyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown and white jellyfish with V-shaped markings radiating like a compass rose.'**
+  String get species_compass_jellyfish_desc;
+
+  /// No description provided for @species_spotted_jellyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotted Jellyfish'**
+  String get species_spotted_jellyfish_name;
+
+  /// No description provided for @species_spotted_jellyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'White-spotted golden jellyfish famous for filling Palau\'s Jellyfish Lake.'**
+  String get species_spotted_jellyfish_desc;
+
+  /// No description provided for @species_barrel_jellyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Barrel Jellyfish'**
+  String get species_barrel_jellyfish_name;
+
+  /// No description provided for @species_barrel_jellyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large dome-shaped jellyfish with frilly oral arms and a mild sting, common in the Atlantic.'**
+  String get species_barrel_jellyfish_desc;
+
+  /// No description provided for @species_persian_carpet_flatworm_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Persian Carpet Flatworm'**
+  String get species_persian_carpet_flatworm_name;
+
+  /// No description provided for @species_persian_carpet_flatworm_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ornate black flatworm with yellow-orange margins often mistaken for a nudibranch.'**
+  String get species_persian_carpet_flatworm_desc;
+
+  /// No description provided for @species_leopard_flatworm_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Leopard Flatworm'**
+  String get species_leopard_flatworm_name;
+
+  /// No description provided for @species_leopard_flatworm_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Translucent flatworm with leopard-like spots gliding across reef substrates.'**
+  String get species_leopard_flatworm_desc;
+
+  /// No description provided for @species_divided_flatworm_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Divided Flatworm'**
+  String get species_divided_flatworm_name;
+
+  /// No description provided for @species_divided_flatworm_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striking black and orange flatworm that mimics toxic nudibranchs for protection.'**
+  String get species_divided_flatworm_desc;
+
+  /// No description provided for @species_blue_pseudoceros_flatworm_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Pseudoceros Flatworm'**
+  String get species_blue_pseudoceros_flatworm_name;
+
+  /// No description provided for @species_blue_pseudoceros_flatworm_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep blue flatworm with orange margin found gliding over Indo-Pacific reef surfaces.'**
+  String get species_blue_pseudoceros_flatworm_desc;
+
+  /// No description provided for @species_racing_stripe_flatworm_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Racing Stripe Flatworm'**
+  String get species_racing_stripe_flatworm_name;
+
+  /// No description provided for @species_racing_stripe_flatworm_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Cream-colored flatworm with a distinct dark central stripe and ruffled margin.'**
+  String get species_racing_stripe_flatworm_desc;
+
+  /// No description provided for @species_christmas_tree_worm_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Christmas Tree Worm'**
+  String get species_christmas_tree_worm_name;
+
+  /// No description provided for @species_christmas_tree_worm_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colorful spiral-crowned worm embedded in coral that retracts instantly when approached.'**
+  String get species_christmas_tree_worm_desc;
+
+  /// No description provided for @species_feather_duster_worm_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Feather Duster Worm'**
+  String get species_feather_duster_worm_name;
+
+  /// No description provided for @species_feather_duster_worm_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tube-dwelling worm with a fan-shaped crown of feathery radioles for filter feeding.'**
+  String get species_feather_duster_worm_desc;
+
+  /// No description provided for @species_fire_worm_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bearded Fire Worm'**
+  String get species_fire_worm_name;
+
+  /// No description provided for @species_fire_worm_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bristle worm with white stinging chaetae that cause painful irritation on contact.'**
+  String get species_fire_worm_desc;
+
+  /// No description provided for @species_bobbit_worm_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bobbit Worm'**
+  String get species_bobbit_worm_name;
+
+  /// No description provided for @species_bobbit_worm_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ambush predator hiding in sand with powerful jaws that strike at lightning speed.'**
+  String get species_bobbit_worm_desc;
+
+  /// No description provided for @species_social_feather_duster_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Social Feather Duster'**
+  String get species_social_feather_duster_name;
+
+  /// No description provided for @species_social_feather_duster_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colonial tube worm forming clusters of delicate banded crowns on Caribbean reefs.'**
+  String get species_social_feather_duster_desc;
+
+  /// No description provided for @species_giant_clam_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Clam'**
+  String get species_giant_clam_name;
+
+  /// No description provided for @species_giant_clam_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest living bivalve, with iridescent mantle tissue harboring symbiotic algae.'**
+  String get species_giant_clam_desc;
+
+  /// No description provided for @species_boring_clam_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Boring Clam'**
+  String get species_boring_clam_name;
+
+  /// No description provided for @species_boring_clam_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small colorful clam that bores into coral rock showing only its vivid mantle.'**
+  String get species_boring_clam_desc;
+
+  /// No description provided for @species_maxima_clam_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Maxima Clam'**
+  String get species_maxima_clam_name;
+
+  /// No description provided for @species_maxima_clam_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brilliantly colored clam embedded in reef rock with electric blue and green mantles.'**
+  String get species_maxima_clam_desc;
+
+  /// No description provided for @species_flame_scallop_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Flame Scallop'**
+  String get species_flame_scallop_name;
+
+  /// No description provided for @species_flame_scallop_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Red bivalve with flashing white light along its mantle edge found in reef crevices.'**
+  String get species_flame_scallop_desc;
+
+  /// No description provided for @species_thorny_oyster_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Thorny Oyster'**
+  String get species_thorny_oyster_name;
+
+  /// No description provided for @species_thorny_oyster_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiny-shelled bivalve cemented to reef rock, often encrusted with sponges and algae.'**
+  String get species_thorny_oyster_desc;
+
+  /// No description provided for @species_magnificent_sea_anemone_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Magnificent Sea Anemone'**
+  String get species_magnificent_sea_anemone_name;
+
+  /// No description provided for @species_magnificent_sea_anemone_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large colorful anemone hosting clownfish, with a prominent column and flowing tentacles.'**
+  String get species_magnificent_sea_anemone_desc;
+
+  /// No description provided for @species_bubble_tip_anemone_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bubble Tip Anemone'**
+  String get species_bubble_tip_anemone_name;
+
+  /// No description provided for @species_bubble_tip_anemone_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular clownfish host with bulbous-tipped tentacles in green, brown, or rose colors.'**
+  String get species_bubble_tip_anemone_desc;
+
+  /// No description provided for @species_giant_carpet_anemone_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Carpet Anemone'**
+  String get species_giant_carpet_anemone_name;
+
+  /// No description provided for @species_giant_carpet_anemone_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive anemone with short sticky tentacles that can reach over one meter across.'**
+  String get species_giant_carpet_anemone_desc;
+
+  /// No description provided for @species_haddon_carpet_anemone_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Haddon\'s Carpet Anemone'**
+  String get species_haddon_carpet_anemone_name;
+
+  /// No description provided for @species_haddon_carpet_anemone_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat carpet anemone on sandy substrates hosting various clownfish and porcelain crabs.'**
+  String get species_haddon_carpet_anemone_desc;
+
+  /// No description provided for @species_long_tentacle_anemone_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Long Tentacle Anemone'**
+  String get species_long_tentacle_anemone_name;
+
+  /// No description provided for @species_long_tentacle_anemone_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sandy-bottom anemone with long flowing tentacles, often hosting clownfish.'**
+  String get species_long_tentacle_anemone_desc;
+
+  /// No description provided for @species_tube_anemone_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tube Anemone'**
+  String get species_tube_anemone_name;
+
+  /// No description provided for @species_tube_anemone_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elegant anemone dwelling in a parchment tube in sand with two rings of tentacles.'**
+  String get species_tube_anemone_desc;
+
+  /// No description provided for @species_hell_fire_anemone_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Hell\'s Fire Anemone'**
+  String get species_hell_fire_anemone_name;
+
+  /// No description provided for @species_hell_fire_anemone_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Highly stinging anemone with branched tentacles resembling soft coral.'**
+  String get species_hell_fire_anemone_desc;
+
+  /// No description provided for @species_beaded_sea_anemone_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Beaded Sea Anemone'**
+  String get species_beaded_sea_anemone_name;
+
+  /// No description provided for @species_beaded_sea_anemone_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Anemone with swollen bead-like tentacle tips found on sandy Indo-Pacific reef areas.'**
+  String get species_beaded_sea_anemone_desc;
+
+  /// No description provided for @species_condylactis_anemone_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Caribbean Anemone'**
+  String get species_condylactis_anemone_name;
+
+  /// No description provided for @species_condylactis_anemone_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large Caribbean anemone with purple-tipped tentacles found on rocky reef substrates.'**
+  String get species_condylactis_anemone_desc;
+
+  /// No description provided for @species_sand_anemone_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sand Anemone'**
+  String get species_sand_anemone_name;
+
+  /// No description provided for @species_sand_anemone_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Delicate anemone partially buried in sand with purple-tipped tentacles.'**
+  String get species_sand_anemone_desc;
+
+  /// No description provided for @species_barrel_sponge_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Barrel Sponge'**
+  String get species_barrel_sponge_name;
+
+  /// No description provided for @species_barrel_sponge_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive barrel-shaped sponge that can live for centuries on Caribbean reef walls.'**
+  String get species_barrel_sponge_desc;
+
+  /// No description provided for @species_azure_vase_sponge_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Azure Vase Sponge'**
+  String get species_azure_vase_sponge_name;
+
+  /// No description provided for @species_azure_vase_sponge_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibrant blue-purple vase-shaped sponge found on Caribbean reef walls.'**
+  String get species_azure_vase_sponge_desc;
+
+  /// No description provided for @species_yellow_tube_sponge_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow Tube Sponge'**
+  String get species_yellow_tube_sponge_name;
+
+  /// No description provided for @species_yellow_tube_sponge_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright yellow tubular sponge growing in clusters on Caribbean reef walls.'**
+  String get species_yellow_tube_sponge_desc;
+
+  /// No description provided for @species_elephant_ear_sponge_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Elephant Ear Sponge'**
+  String get species_elephant_ear_sponge_name;
+
+  /// No description provided for @species_elephant_ear_sponge_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large orange fan-shaped sponge growing on walls and overhangs in the Caribbean.'**
+  String get species_elephant_ear_sponge_desc;
+
+  /// No description provided for @species_rope_sponge_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Rope Sponge'**
+  String get species_rope_sponge_name;
+
+  /// No description provided for @species_rope_sponge_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Red erect branching sponge growing in rope-like formations on Caribbean reefs.'**
+  String get species_rope_sponge_desc;
+
+  /// No description provided for @species_portuguese_man_o_war_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Portuguese Man o\' War'**
+  String get species_portuguese_man_o_war_name;
+
+  /// No description provided for @species_portuguese_man_o_war_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colonial hydrozoan with a gas-filled float and extremely painful trailing tentacles.'**
+  String get species_portuguese_man_o_war_desc;
+
+  /// No description provided for @species_fire_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Fire Coral'**
+  String get species_fire_coral_name;
+
+  /// No description provided for @species_fire_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Not a true coral but a hydrozoan that delivers painful stings to divers on contact.'**
+  String get species_fire_coral_desc;
+
+  /// No description provided for @species_by_the_wind_sailor_name.
+  ///
+  /// In en, this message translates to:
+  /// **'By-the-wind Sailor'**
+  String get species_by_the_wind_sailor_name;
+
+  /// No description provided for @species_by_the_wind_sailor_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue floating hydrozoan colony with a diagonal sail that catches the wind.'**
+  String get species_by_the_wind_sailor_desc;
+
+  /// No description provided for @species_blue_button_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Button'**
+  String get species_blue_button_name;
+
+  /// No description provided for @species_blue_button_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Floating colonial hydrozoan with a flat disc and blue tentacle-like hydroids.'**
+  String get species_blue_button_desc;
+
+  /// No description provided for @species_giant_sea_hare_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Sea Hare'**
+  String get species_giant_sea_hare_name;
+
+  /// No description provided for @species_giant_sea_hare_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'One of the largest sea slugs, dark brown to black, found in kelp beds.'**
+  String get species_giant_sea_hare_desc;
+
+  /// No description provided for @species_sea_hare_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotted Sea Hare'**
+  String get species_sea_hare_name;
+
+  /// No description provided for @species_sea_hare_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large green-spotted sea hare that releases purple ink when disturbed.'**
+  String get species_sea_hare_desc;
+
+  /// No description provided for @species_nudibranch_berghia_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Berghia Nudibranch'**
+  String get species_nudibranch_berghia_name;
+
+  /// No description provided for @species_nudibranch_berghia_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Translucent aeolid nudibranch with white-tipped cerata that feeds on anemones.'**
+  String get species_nudibranch_berghia_desc;
+
+  /// No description provided for @species_sea_pen_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Pen'**
+  String get species_sea_pen_name;
+
+  /// No description provided for @species_sea_pen_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Feather-shaped colonial octocoral anchored in sand that retracts when disturbed.'**
+  String get species_sea_pen_desc;
+
+  /// No description provided for @species_blue_sea_star_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Sea Star'**
+  String get species_blue_sea_star_name;
+
+  /// No description provided for @species_blue_sea_star_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-colored sea star that regenerates from single arm fragments on Indo-Pacific reefs.'**
+  String get species_blue_sea_star_desc;
+
+  /// No description provided for @species_reef_squid_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef Squid'**
+  String get species_reef_squid_name;
+
+  /// No description provided for @species_reef_squid_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Southern reef squid commonly encountered in temperate Australian waters.'**
+  String get species_reef_squid_desc;
+
+  /// No description provided for @species_tiger_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiger Shrimp'**
+  String get species_tiger_shrimp_name;
+
+  /// No description provided for @species_tiger_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large banded shrimp found on sandy bottoms and seagrass beds in the Indo-Pacific.'**
+  String get species_tiger_shrimp_desc;
+
+  /// No description provided for @species_candy_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Candy Crab'**
+  String get species_candy_crab_name;
+
+  /// No description provided for @species_candy_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny colorful crab matching its soft coral host with pink or yellow spiny projections.'**
+  String get species_candy_crab_desc;
+
+  /// No description provided for @species_spider_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spider Decorator Crab'**
+  String get species_spider_crab_name;
+
+  /// No description provided for @species_spider_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow-moving crab covered in attached sponges and algae for camouflage.'**
+  String get species_spider_crab_desc;
+
+  /// No description provided for @species_anemone_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Magnificent Anemone Shrimp'**
+  String get species_anemone_shrimp_name;
+
+  /// No description provided for @species_anemone_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Transparent shrimp with white and purple markings living among anemone tentacles.'**
+  String get species_anemone_shrimp_desc;
+
+  /// No description provided for @species_snapping_shrimp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapping Shrimp'**
+  String get species_snapping_shrimp_name;
+
+  /// No description provided for @species_snapping_shrimp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small shrimp producing a loud snap with its oversized claw, often paired with gobies.'**
+  String get species_snapping_shrimp_desc;
+
+  /// No description provided for @species_glass_sponge_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Venus Flower Basket'**
+  String get species_glass_sponge_name;
+
+  /// No description provided for @species_glass_sponge_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Delicate glass sponge with an intricate silica skeleton found in deep water.'**
+  String get species_glass_sponge_desc;
+
+  /// No description provided for @species_toxic_sea_urchin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Flower Urchin'**
+  String get species_toxic_sea_urchin_name;
+
+  /// No description provided for @species_toxic_sea_urchin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deceptively attractive urchin covered in flower-like pedicellariae with potent venom.'**
+  String get species_toxic_sea_urchin_desc;
+
+  /// No description provided for @species_slate_pencil_urchin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Slate Pencil Urchin'**
+  String get species_slate_pencil_urchin_name;
+
+  /// No description provided for @species_slate_pencil_urchin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Urchin with thick rounded spines found on Caribbean and Atlantic reef substrates.'**
+  String get species_slate_pencil_urchin_desc;
+
+  /// No description provided for @species_spiny_sea_star_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiny Sea Star'**
+  String get species_spiny_sea_star_name;
+
+  /// No description provided for @species_spiny_sea_star_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large temperate sea star with prominent spines found in European and Atlantic waters.'**
+  String get species_spiny_sea_star_desc;
+
+  /// No description provided for @species_bat_star_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bat Star'**
+  String get species_bat_star_name;
+
+  /// No description provided for @species_bat_star_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Webbed-armed Pacific sea star in orange, red, or purple found in kelp forests.'**
+  String get species_bat_star_desc;
+
+  /// No description provided for @species_sunflower_star_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunflower Star'**
+  String get species_sunflower_star_name;
+
+  /// No description provided for @species_sunflower_star_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive fast-moving sea star with up to 24 arms found in Pacific kelp forests.'**
+  String get species_sunflower_star_desc;
+
+  /// No description provided for @species_blood_star_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood Star'**
+  String get species_blood_star_name;
+
+  /// No description provided for @species_blood_star_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright red-orange slender-armed sea star found in Pacific temperate waters.'**
+  String get species_blood_star_desc;
+
+  /// No description provided for @species_common_cuttlefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Cuttlefish'**
+  String get species_common_cuttlefish_name;
+
+  /// No description provided for @species_common_cuttlefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Master of camouflage found in European and Mediterranean waters with W-shaped pupils.'**
+  String get species_common_cuttlefish_desc;
+
+  /// No description provided for @species_blue_spotted_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-spotted Swimming Crab'**
+  String get species_blue_spotted_crab_name;
+
+  /// No description provided for @species_blue_spotted_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Active swimming crab with blue spots on carapace found on sandy Indo-Pacific substrates.'**
+  String get species_blue_spotted_crab_desc;
+
+  /// No description provided for @species_sponge_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponge Crab'**
+  String get species_sponge_crab_name;
+
+  /// No description provided for @species_sponge_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Crab that carves and carries a living sponge on its back for camouflage.'**
+  String get species_sponge_crab_desc;
+
+  /// No description provided for @species_horseshoe_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Horseshoe Crab'**
+  String get species_horseshoe_crab_name;
+
+  /// No description provided for @species_horseshoe_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ancient chelicerate arthropod with a helmet-shaped shell found on Atlantic sandy bottoms.'**
+  String get species_horseshoe_crab_desc;
+
+  /// No description provided for @species_sea_spider_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Spider'**
+  String get species_sea_spider_name;
+
+  /// No description provided for @species_sea_spider_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Delicate long-legged marine arthropod found crawling on hydroids and bryozoans.'**
+  String get species_sea_spider_desc;
+
+  /// No description provided for @species_sea_lily_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Lily'**
+  String get species_sea_lily_name;
+
+  /// No description provided for @species_sea_lily_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Stalked crinoid living fossil found in deeper waters, filter feeding with feathery arms.'**
+  String get species_sea_lily_desc;
+
+  /// No description provided for @species_mantis_shrimp_lysiosquilla_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spearer Mantis Shrimp'**
+  String get species_mantis_shrimp_lysiosquilla_name;
+
+  /// No description provided for @species_mantis_shrimp_lysiosquilla_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large burrowing mantis shrimp with spearing appendages found on sandy substrates.'**
+  String get species_mantis_shrimp_lysiosquilla_desc;
+
+  /// No description provided for @species_purple_sea_urchin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple Sea Urchin'**
+  String get species_purple_sea_urchin_name;
+
+  /// No description provided for @species_purple_sea_urchin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Abundant purple urchin found in Pacific kelp forests and rocky tidepools.'**
+  String get species_purple_sea_urchin_desc;
+
+  /// No description provided for @species_crown_jellyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Crown Jellyfish'**
+  String get species_crown_jellyfish_name;
+
+  /// No description provided for @species_crown_jellyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep purple jellyfish with a raised crown-like bell found in the Indo-Pacific.'**
+  String get species_crown_jellyfish_desc;
+
+  /// No description provided for @species_comb_jelly_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Gooseberry'**
+  String get species_comb_jelly_name;
+
+  /// No description provided for @species_comb_jelly_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small bioluminescent ctenophore with iridescent comb rows and two long tentacles.'**
+  String get species_comb_jelly_desc;
+
+  /// No description provided for @species_warty_sea_slug_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Warty Sea Slug'**
+  String get species_warty_sea_slug_name;
+
+  /// No description provided for @species_warty_sea_slug_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue and black nudibranch with yellow-capped tubercles commonly seen on Indo-Pacific reefs.'**
+  String get species_warty_sea_slug_desc;
+
+  /// No description provided for @species_doris_nudibranch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Lemon'**
+  String get species_doris_nudibranch_name;
+
+  /// No description provided for @species_doris_nudibranch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow spotted dorid nudibranch found in temperate Pacific waters feeding on sponges.'**
+  String get species_doris_nudibranch_desc;
+
+  /// No description provided for @species_opalescent_nudibranch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Opalescent Nudibranch'**
+  String get species_opalescent_nudibranch_name;
+
+  /// No description provided for @species_opalescent_nudibranch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Translucent aeolid with bright orange cerata and blue dorsal lines in Pacific waters.'**
+  String get species_opalescent_nudibranch_desc;
+
+  /// No description provided for @species_clown_nudibranch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Clown Nudibranch'**
+  String get species_clown_nudibranch_name;
+
+  /// No description provided for @species_clown_nudibranch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink-orange nudibranch with blue and white spots found in temperate Australian waters.'**
+  String get species_clown_nudibranch_desc;
+
+  /// No description provided for @species_bottlenose_dolphin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bottlenose Dolphin'**
+  String get species_bottlenose_dolphin_name;
+
+  /// No description provided for @species_bottlenose_dolphin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Curious and playful dolphin frequently encountered by divers in tropical and temperate waters.'**
+  String get species_bottlenose_dolphin_desc;
+
+  /// No description provided for @species_spinner_dolphin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spinner Dolphin'**
+  String get species_spinner_dolphin_name;
+
+  /// No description provided for @species_spinner_dolphin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Acrobatic dolphin known for aerial spins, often seen in large pods near coral reefs.'**
+  String get species_spinner_dolphin_desc;
+
+  /// No description provided for @species_common_dolphin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Dolphin'**
+  String get species_common_dolphin_name;
+
+  /// No description provided for @species_common_dolphin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast-swimming dolphin with distinctive hourglass pattern, found in open ocean and coastal waters.'**
+  String get species_common_dolphin_desc;
+
+  /// No description provided for @species_spotted_dolphin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Atlantic Spotted Dolphin'**
+  String get species_spotted_dolphin_name;
+
+  /// No description provided for @species_spotted_dolphin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Friendly spotted dolphin that frequently approaches divers in the Bahamas and Caribbean.'**
+  String get species_spotted_dolphin_desc;
+
+  /// No description provided for @species_rissos_dolphin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Risso\'s Dolphin'**
+  String get species_rissos_dolphin_name;
+
+  /// No description provided for @species_rissos_dolphin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large dolphin with heavily scarred grey body, found in deep offshore waters worldwide.'**
+  String get species_rissos_dolphin_desc;
+
+  /// No description provided for @species_humpback_whale_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Humpback Whale'**
+  String get species_humpback_whale_name;
+
+  /// No description provided for @species_humpback_whale_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Majestic whale known for breaching and complex songs, seen on seasonal migrations.'**
+  String get species_humpback_whale_desc;
+
+  /// No description provided for @species_grey_whale_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey Whale'**
+  String get species_grey_whale_name;
+
+  /// No description provided for @species_grey_whale_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bottom-feeding baleen whale that migrates along the Pacific coast, often barnacle-covered.'**
+  String get species_grey_whale_desc;
+
+  /// No description provided for @species_blue_whale_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Whale'**
+  String get species_blue_whale_name;
+
+  /// No description provided for @species_blue_whale_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest animal ever to live, occasionally encountered by divers in deep blue water.'**
+  String get species_blue_whale_desc;
+
+  /// No description provided for @species_sperm_whale_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sperm Whale'**
+  String get species_sperm_whale_name;
+
+  /// No description provided for @species_sperm_whale_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep-diving whale with massive head, sometimes seen resting at the surface between dives.'**
+  String get species_sperm_whale_desc;
+
+  /// No description provided for @species_orca_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Orca'**
+  String get species_orca_name;
+
+  /// No description provided for @species_orca_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Apex predator with distinctive black and white markings, found in all ocean basins.'**
+  String get species_orca_desc;
+
+  /// No description provided for @species_minke_whale_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Minke Whale'**
+  String get species_minke_whale_name;
+
+  /// No description provided for @species_minke_whale_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Smaller baleen whale that is curious around divers, especially in the Great Barrier Reef.'**
+  String get species_minke_whale_desc;
+
+  /// No description provided for @species_beluga_whale_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Beluga Whale'**
+  String get species_beluga_whale_name;
+
+  /// No description provided for @species_beluga_whale_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'White arctic whale known for its vocalizations and sociable behavior in cold waters.'**
+  String get species_beluga_whale_desc;
+
+  /// No description provided for @species_pilot_whale_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Short-finned Pilot Whale'**
+  String get species_pilot_whale_name;
+
+  /// No description provided for @species_pilot_whale_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Social deep-diving whale often seen in large pods in tropical and warm temperate seas.'**
+  String get species_pilot_whale_desc;
+
+  /// No description provided for @species_false_killer_whale_name.
+  ///
+  /// In en, this message translates to:
+  /// **'False Killer Whale'**
+  String get species_false_killer_whale_name;
+
+  /// No description provided for @species_false_killer_whale_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large oceanic dolphin that occasionally approaches divers in open water.'**
+  String get species_false_killer_whale_desc;
+
+  /// No description provided for @species_dugong_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Dugong'**
+  String get species_dugong_name;
+
+  /// No description provided for @species_dugong_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle herbivore that grazes on seagrass beds in the Indo-Pacific, closely related to manatees.'**
+  String get species_dugong_desc;
+
+  /// No description provided for @species_west_indian_manatee_name.
+  ///
+  /// In en, this message translates to:
+  /// **'West Indian Manatee'**
+  String get species_west_indian_manatee_name;
+
+  /// No description provided for @species_west_indian_manatee_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow-moving herbivore found in warm shallow waters, estuaries, and springs of the Caribbean.'**
+  String get species_west_indian_manatee_desc;
+
+  /// No description provided for @species_sea_otter_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Otter'**
+  String get species_sea_otter_name;
+
+  /// No description provided for @species_sea_otter_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Charismatic marine mammal found in kelp forests along the North Pacific coast.'**
+  String get species_sea_otter_desc;
+
+  /// No description provided for @species_california_sea_lion_name.
+  ///
+  /// In en, this message translates to:
+  /// **'California Sea Lion'**
+  String get species_california_sea_lion_name;
+
+  /// No description provided for @species_california_sea_lion_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Playful and agile pinniped that often interacts with divers along the Pacific coast.'**
+  String get species_california_sea_lion_desc;
+
+  /// No description provided for @species_steller_sea_lion_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Steller Sea Lion'**
+  String get species_steller_sea_lion_name;
+
+  /// No description provided for @species_steller_sea_lion_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest sea lion species, found in cold North Pacific waters near rocky coastlines.'**
+  String get species_steller_sea_lion_desc;
+
+  /// No description provided for @species_harbor_seal_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Harbor Seal'**
+  String get species_harbor_seal_name;
+
+  /// No description provided for @species_harbor_seal_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Curious seal commonly seen in temperate coastal waters, often resting on rocks near dive sites.'**
+  String get species_harbor_seal_desc;
+
+  /// No description provided for @species_grey_seal_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey Seal'**
+  String get species_grey_seal_name;
+
+  /// No description provided for @species_grey_seal_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large playful seal found in the North Atlantic, known for approaching divers underwater.'**
+  String get species_grey_seal_desc;
+
+  /// No description provided for @species_northern_elephant_seal_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Northern Elephant Seal'**
+  String get species_northern_elephant_seal_name;
+
+  /// No description provided for @species_northern_elephant_seal_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive deep-diving seal, males have a large proboscis. Found along the eastern Pacific coast.'**
+  String get species_northern_elephant_seal_desc;
+
+  /// No description provided for @species_hawaiian_monk_seal_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Hawaiian Monk Seal'**
+  String get species_hawaiian_monk_seal_name;
+
+  /// No description provided for @species_hawaiian_monk_seal_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Critically endangered seal endemic to Hawaii, occasionally seen by divers on reefs.'**
+  String get species_hawaiian_monk_seal_desc;
+
+  /// No description provided for @species_leopard_seal_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Leopard Seal'**
+  String get species_leopard_seal_name;
+
+  /// No description provided for @species_leopard_seal_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Powerful Antarctic predator with spotted coat, encountered by cold-water divers.'**
+  String get species_leopard_seal_desc;
+
+  /// No description provided for @species_narwhal_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Narwhal'**
+  String get species_narwhal_name;
+
+  /// No description provided for @species_narwhal_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Arctic whale with a long spiral tusk, rarely seen but iconic among marine mammals.'**
+  String get species_narwhal_desc;
+
+  /// No description provided for @species_green_sea_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Green Sea Turtle'**
+  String get species_green_sea_turtle_name;
+
+  /// No description provided for @species_green_sea_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large sea turtle commonly seen grazing on seagrass in tropical waters.'**
+  String get species_green_sea_turtle_desc;
+
+  /// No description provided for @species_hawksbill_sea_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Hawksbill Sea Turtle'**
+  String get species_hawksbill_sea_turtle_name;
+
+  /// No description provided for @species_hawksbill_sea_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef-dwelling turtle with a pointed beak, feeds on sponges among coral formations.'**
+  String get species_hawksbill_sea_turtle_desc;
+
+  /// No description provided for @species_loggerhead_sea_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Loggerhead Sea Turtle'**
+  String get species_loggerhead_sea_turtle_name;
+
+  /// No description provided for @species_loggerhead_sea_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large-headed turtle found in temperate and tropical seas, often near rocky reefs.'**
+  String get species_loggerhead_sea_turtle_desc;
+
+  /// No description provided for @species_leatherback_sea_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Leatherback Sea Turtle'**
+  String get species_leatherback_sea_turtle_name;
+
+  /// No description provided for @species_leatherback_sea_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest living turtle with a flexible leathery shell, dives to extreme depths.'**
+  String get species_leatherback_sea_turtle_desc;
+
+  /// No description provided for @species_olive_ridley_sea_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Olive Ridley Sea Turtle'**
+  String get species_olive_ridley_sea_turtle_name;
+
+  /// No description provided for @species_olive_ridley_sea_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Smallest sea turtle species known for synchronized mass nesting events called arribadas.'**
+  String get species_olive_ridley_sea_turtle_desc;
+
+  /// No description provided for @species_kemps_ridley_sea_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Kemp\'s Ridley Sea Turtle'**
+  String get species_kemps_ridley_sea_turtle_name;
+
+  /// No description provided for @species_kemps_ridley_sea_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Critically endangered sea turtle found primarily in the Gulf of Mexico.'**
+  String get species_kemps_ridley_sea_turtle_desc;
+
+  /// No description provided for @species_flatback_sea_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Flatback Sea Turtle'**
+  String get species_flatback_sea_turtle_name;
+
+  /// No description provided for @species_flatback_sea_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Endemic to Australian waters, distinguished by its flat carapace and coastal habitat.'**
+  String get species_flatback_sea_turtle_desc;
+
+  /// No description provided for @species_brain_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Brain Coral'**
+  String get species_brain_coral_name;
+
+  /// No description provided for @species_brain_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive reef-building coral with grooved surface resembling a brain, common on Caribbean reefs.'**
+  String get species_brain_coral_desc;
+
+  /// No description provided for @species_staghorn_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Staghorn Coral'**
+  String get species_staghorn_coral_name;
+
+  /// No description provided for @species_staghorn_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast-growing branching coral that forms dense thickets, critical habitat for reef fish.'**
+  String get species_staghorn_coral_desc;
+
+  /// No description provided for @species_elkhorn_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Elkhorn Coral'**
+  String get species_elkhorn_coral_name;
+
+  /// No description provided for @species_elkhorn_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large branching coral with flat palmate branches, a key reef builder in the Caribbean.'**
+  String get species_elkhorn_coral_desc;
+
+  /// No description provided for @species_table_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Table Coral'**
+  String get species_table_coral_name;
+
+  /// No description provided for @species_table_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat plate-forming coral found on Indo-Pacific reefs, provides shelter for many fish species.'**
+  String get species_table_coral_desc;
+
+  /// No description provided for @species_mushroom_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Mushroom Coral'**
+  String get species_mushroom_coral_name;
+
+  /// No description provided for @species_mushroom_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Free-living solitary coral shaped like a disc, found on sandy areas near Indo-Pacific reefs.'**
+  String get species_mushroom_coral_desc;
+
+  /// No description provided for @species_bubble_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bubble Coral'**
+  String get species_bubble_coral_name;
+
+  /// No description provided for @species_bubble_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Distinctive coral with grape-like vesicles that inflate during the day to capture light.'**
+  String get species_bubble_coral_desc;
+
+  /// No description provided for @species_plate_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Plate Coral'**
+  String get species_plate_coral_name;
+
+  /// No description provided for @species_plate_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Thin plating coral forming whorled shelves, common on Indo-Pacific reef slopes.'**
+  String get species_plate_coral_desc;
+
+  /// No description provided for @species_pillar_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pillar Coral'**
+  String get species_pillar_coral_name;
+
+  /// No description provided for @species_pillar_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Rare upward-growing coral forming tall columns, found in the Caribbean.'**
+  String get species_pillar_coral_desc;
+
+  /// No description provided for @species_star_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Star Coral'**
+  String get species_star_coral_name;
+
+  /// No description provided for @species_star_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Major Caribbean reef builder forming large boulder-shaped colonies with star-shaped polyps.'**
+  String get species_star_coral_desc;
+
+  /// No description provided for @species_lettuce_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Lettuce Coral'**
+  String get species_lettuce_coral_name;
+
+  /// No description provided for @species_lettuce_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Thin plating coral with leaf-like folds, common on Caribbean reef walls and slopes.'**
+  String get species_lettuce_coral_desc;
+
+  /// No description provided for @species_finger_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Finger Coral'**
+  String get species_finger_coral_name;
+
+  /// No description provided for @species_finger_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sturdy branching coral with thick finger-like projections found on shallow reefs.'**
+  String get species_finger_coral_desc;
+
+  /// No description provided for @species_massive_porites_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive Porites Coral'**
+  String get species_massive_porites_name;
+
+  /// No description provided for @species_massive_porites_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large boulder coral that can grow for centuries, a dominant reef builder in the Indo-Pacific.'**
+  String get species_massive_porites_desc;
+
+  /// No description provided for @species_cauliflower_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Cauliflower Coral'**
+  String get species_cauliflower_coral_name;
+
+  /// No description provided for @species_cauliflower_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact branching coral with a cauliflower shape, widespread in tropical reef shallows.'**
+  String get species_cauliflower_coral_desc;
+
+  /// No description provided for @species_flower_pot_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Flowerpot Coral'**
+  String get species_flower_pot_coral_name;
+
+  /// No description provided for @species_flower_pot_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Colony of long-tentacled polyps that extend during the day, resembling a bouquet of flowers.'**
+  String get species_flower_pot_coral_desc;
+
+  /// No description provided for @species_cup_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Orange Cup Coral'**
+  String get species_cup_coral_name;
+
+  /// No description provided for @species_cup_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright orange non-photosynthetic coral found on walls and overhangs in tropical waters.'**
+  String get species_cup_coral_desc;
+
+  /// No description provided for @species_scroll_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll Coral'**
+  String get species_scroll_coral_name;
+
+  /// No description provided for @species_scroll_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Coral forming large scrolling plates, common on Indo-Pacific reef slopes and lagoons.'**
+  String get species_scroll_coral_desc;
+
+  /// No description provided for @species_cabbage_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Cabbage Coral'**
+  String get species_cabbage_coral_name;
+
+  /// No description provided for @species_cabbage_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Disc-shaped plating coral resembling cabbage leaves, found in sheltered reef areas.'**
+  String get species_cabbage_coral_desc;
+
+  /// No description provided for @species_hammer_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Hammer Coral'**
+  String get species_hammer_coral_name;
+
+  /// No description provided for @species_hammer_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large-polyped coral with anchor or hammer-shaped tentacle tips, popular on Indo-Pacific reefs.'**
+  String get species_hammer_coral_desc;
+
+  /// No description provided for @species_torch_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Torch Coral'**
+  String get species_torch_coral_name;
+
+  /// No description provided for @species_torch_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Branching coral with long flowing tentacles tipped with glowing bulbs.'**
+  String get species_torch_coral_desc;
+
+  /// No description provided for @species_frogspawn_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Frogspawn Coral'**
+  String get species_frogspawn_coral_name;
+
+  /// No description provided for @species_frogspawn_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large-polyped coral with branching tentacle tips resembling frog eggs.'**
+  String get species_frogspawn_coral_desc;
+
+  /// No description provided for @species_sea_fan_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Sea Fan'**
+  String get species_sea_fan_name;
+
+  /// No description provided for @species_sea_fan_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat fan-shaped gorgonian oriented perpendicular to currents, iconic on Caribbean reefs.'**
+  String get species_sea_fan_desc;
+
+  /// No description provided for @species_venus_sea_fan_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Venus Sea Fan'**
+  String get species_venus_sea_fan_name;
+
+  /// No description provided for @species_venus_sea_fan_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Delicate fan-shaped gorgonian found on shallow Caribbean reefs in moderate current areas.'**
+  String get species_venus_sea_fan_desc;
+
+  /// No description provided for @species_deepwater_sea_fan_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Deepwater Sea Fan'**
+  String get species_deepwater_sea_fan_name;
+
+  /// No description provided for @species_deepwater_sea_fan_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large bushy gorgonian found on deep reef walls in the Caribbean.'**
+  String get species_deepwater_sea_fan_desc;
+
+  /// No description provided for @species_sea_whip_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Whip'**
+  String get species_sea_whip_name;
+
+  /// No description provided for @species_sea_whip_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slender rod-shaped gorgonian found swaying in currents on Atlantic and Caribbean reefs.'**
+  String get species_sea_whip_desc;
+
+  /// No description provided for @species_sea_plume_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Plume'**
+  String get species_sea_plume_name;
+
+  /// No description provided for @species_sea_plume_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tall feathery gorgonian forming plume-like colonies on Caribbean reef tops.'**
+  String get species_sea_plume_desc;
+
+  /// No description provided for @species_organ_pipe_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Organ Pipe Coral'**
+  String get species_organ_pipe_coral_name;
+
+  /// No description provided for @species_organ_pipe_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright red skeletal tubes with delicate polyps, found on sheltered Indo-Pacific reefs.'**
+  String get species_organ_pipe_coral_desc;
+
+  /// No description provided for @species_leather_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Leather Coral'**
+  String get species_leather_coral_name;
+
+  /// No description provided for @species_leather_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft coral with a smooth leathery surface that forms large mushroom-shaped colonies.'**
+  String get species_leather_coral_desc;
+
+  /// No description provided for @species_toadstool_leather_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Toadstool Leather Coral'**
+  String get species_toadstool_leather_coral_name;
+
+  /// No description provided for @species_toadstool_leather_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft coral with a thick stalk and flat cap, common on Indo-Pacific reef flats.'**
+  String get species_toadstool_leather_coral_desc;
+
+  /// No description provided for @species_pulsing_xenia_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulsing Xenia'**
+  String get species_pulsing_xenia_name;
+
+  /// No description provided for @species_pulsing_xenia_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft coral with rhythmically pulsing polyps, found in sheltered Indo-Pacific waters.'**
+  String get species_pulsing_xenia_desc;
+
+  /// No description provided for @species_tree_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tree Coral'**
+  String get species_tree_coral_name;
+
+  /// No description provided for @species_tree_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibrant soft coral forming tree-like clusters on walls and overhangs in the Red Sea.'**
+  String get species_tree_coral_desc;
+
+  /// No description provided for @species_blue_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Coral'**
+  String get species_blue_coral_name;
+
+  /// No description provided for @species_blue_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Unique octocoral with a blue skeleton, found on shallow Indo-Pacific reef flats.'**
+  String get species_blue_coral_desc;
+
+  /// No description provided for @species_black_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Black Coral'**
+  String get species_black_coral_name;
+
+  /// No description provided for @species_black_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep-water coral with a dark skeleton, found on walls and drop-offs below 30 meters.'**
+  String get species_black_coral_desc;
+
+  /// No description provided for @species_carnation_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Carnation Coral'**
+  String get species_carnation_coral_name;
+
+  /// No description provided for @species_carnation_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brightly colored soft coral found under ledges and on walls in the Indo-Pacific.'**
+  String get species_carnation_coral_desc;
+
+  /// No description provided for @species_wire_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Wire Coral'**
+  String get species_wire_coral_name;
+
+  /// No description provided for @species_wire_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Long spiral black coral forming coiled whips, host to gobies and shrimp.'**
+  String get species_wire_coral_desc;
+
+  /// No description provided for @species_dead_mans_fingers_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Dead Man\'s Fingers'**
+  String get species_dead_mans_fingers_name;
+
+  /// No description provided for @species_dead_mans_fingers_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fleshy soft coral with finger-like lobes, common on temperate North Atlantic reefs.'**
+  String get species_dead_mans_fingers_desc;
+
+  /// No description provided for @species_sun_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun Coral'**
+  String get species_sun_coral_name;
+
+  /// No description provided for @species_sun_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow-orange non-photosynthetic coral that opens its polyps at night on Indo-Pacific walls.'**
+  String get species_sun_coral_desc;
+
+  /// No description provided for @species_lace_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Lace Coral'**
+  String get species_lace_coral_name;
+
+  /// No description provided for @species_lace_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Delicate pink hydrocoral with lace-like branches found in crevices and under ledges.'**
+  String get species_lace_coral_desc;
+
+  /// No description provided for @species_kenya_tree_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Kenya Tree Coral'**
+  String get species_kenya_tree_coral_name;
+
+  /// No description provided for @species_kenya_tree_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hardy soft coral with tree-like branches, common in the Indo-Pacific.'**
+  String get species_kenya_tree_coral_desc;
+
+  /// No description provided for @species_colt_coral_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Colt Coral'**
+  String get species_colt_coral_name;
+
+  /// No description provided for @species_colt_coral_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft coral with thick rubbery branches covered in small polyps on Indo-Pacific reefs.'**
+  String get species_colt_coral_desc;
+
+  /// No description provided for @species_turtle_grass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Turtle Grass'**
+  String get species_turtle_grass_name;
+
+  /// No description provided for @species_turtle_grass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dominant Caribbean seagrass with wide flat blades, vital food source for sea turtles.'**
+  String get species_turtle_grass_desc;
+
+  /// No description provided for @species_eelgrass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Eelgrass'**
+  String get species_eelgrass_name;
+
+  /// No description provided for @species_eelgrass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperate seagrass forming dense underwater meadows that serve as nursery habitat.'**
+  String get species_eelgrass_desc;
+
+  /// No description provided for @species_manatee_grass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Manatee Grass'**
+  String get species_manatee_grass_name;
+
+  /// No description provided for @species_manatee_grass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Cylindrical-bladed seagrass found in Caribbean sandy areas, often near turtle grass beds.'**
+  String get species_manatee_grass_desc;
+
+  /// No description provided for @species_shoal_grass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Shoal Grass'**
+  String get species_shoal_grass_name;
+
+  /// No description provided for @species_shoal_grass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pioneer seagrass with narrow blades, colonizes disturbed sandy areas in the Caribbean.'**
+  String get species_shoal_grass_desc;
+
+  /// No description provided for @species_paddle_grass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Paddle Grass'**
+  String get species_paddle_grass_name;
+
+  /// No description provided for @species_paddle_grass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small delicate seagrass with oval leaves, found in deeper waters across the tropics.'**
+  String get species_paddle_grass_desc;
+
+  /// No description provided for @species_neptune_grass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Neptune Grass'**
+  String get species_neptune_grass_name;
+
+  /// No description provided for @species_neptune_grass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Mediterranean seagrass forming vast meadows critical for coastal marine ecosystems.'**
+  String get species_neptune_grass_desc;
+
+  /// No description provided for @species_giant_kelp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Kelp'**
+  String get species_giant_kelp_name;
+
+  /// No description provided for @species_giant_kelp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Towering underwater forest species growing up to 60 meters, iconic for California diving.'**
+  String get species_giant_kelp_desc;
+
+  /// No description provided for @species_bull_kelp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bull Kelp'**
+  String get species_bull_kelp_name;
+
+  /// No description provided for @species_bull_kelp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pacific kelp with a single long stipe and bulbous float, forms dense canopy forests.'**
+  String get species_bull_kelp_desc;
+
+  /// No description provided for @species_bladder_wrack_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bladder Wrack'**
+  String get species_bladder_wrack_name;
+
+  /// No description provided for @species_bladder_wrack_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Common brown alga with paired air bladders, found in intertidal zones of the North Atlantic.'**
+  String get species_bladder_wrack_desc;
+
+  /// No description provided for @species_sargassum_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sargassum'**
+  String get species_sargassum_name;
+
+  /// No description provided for @species_sargassum_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Free-floating brown alga forming rafts that shelter juvenile fish and invertebrates.'**
+  String get species_sargassum_desc;
+
+  /// No description provided for @species_kelp_forest_ecklonia_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ecklonia Kelp'**
+  String get species_kelp_forest_ecklonia_name;
+
+  /// No description provided for @species_kelp_forest_ecklonia_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dominant kelp in southern hemisphere waters, forming important underwater forests.'**
+  String get species_kelp_forest_ecklonia_desc;
+
+  /// No description provided for @species_coralline_algae_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Coralline Algae'**
+  String get species_coralline_algae_name;
+
+  /// No description provided for @species_coralline_algae_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard encrusting red alga that cements reef structures and gives reefs a pink hue.'**
+  String get species_coralline_algae_desc;
+
+  /// No description provided for @species_irish_moss_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Irish Moss'**
+  String get species_irish_moss_name;
+
+  /// No description provided for @species_irish_moss_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fan-shaped red alga found on rocky shores of the North Atlantic intertidal zone.'**
+  String get species_irish_moss_desc;
+
+  /// No description provided for @species_dulse_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Dulse'**
+  String get species_dulse_name;
+
+  /// No description provided for @species_dulse_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat reddish-purple alga growing on rocks and kelp stipes in cold northern waters.'**
+  String get species_dulse_desc;
+
+  /// No description provided for @species_halimeda_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Halimeda'**
+  String get species_halimeda_name;
+
+  /// No description provided for @species_halimeda_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calcified green alga with disc-shaped segments, major contributor to reef sand.'**
+  String get species_halimeda_desc;
+
+  /// No description provided for @species_sea_lettuce_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Lettuce'**
+  String get species_sea_lettuce_name;
+
+  /// No description provided for @species_sea_lettuce_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright green sheet-like alga found in shallow coastal waters worldwide.'**
+  String get species_sea_lettuce_desc;
+
+  /// No description provided for @species_caulerpa_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Green Grape Algae'**
+  String get species_caulerpa_name;
+
+  /// No description provided for @species_caulerpa_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Creeping green alga with grape-like fronds, found on tropical reef rubble and sand.'**
+  String get species_caulerpa_desc;
+
+  /// No description provided for @species_mermaid_fan_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Mermaid\'s Fan'**
+  String get species_mermaid_fan_name;
+
+  /// No description provided for @species_mermaid_fan_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calcified green alga shaped like a small fan, common on Caribbean sandy bottoms.'**
+  String get species_mermaid_fan_desc;
+
+  /// No description provided for @species_shaving_brush_algae_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Shaving Brush Algae'**
+  String get species_shaving_brush_algae_name;
+
+  /// No description provided for @species_shaving_brush_algae_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calcified green alga with a brush-like tuft on a stalk, found on Caribbean sandy bottoms.'**
+  String get species_shaving_brush_algae_desc;
+
+  /// No description provided for @species_finger_kelp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Oarweed'**
+  String get species_finger_kelp_name;
+
+  /// No description provided for @species_finger_kelp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown alga with finger-like fronds forming kelp beds in North Atlantic coastal waters.'**
+  String get species_finger_kelp_desc;
+
+  /// No description provided for @species_banded_sea_krait_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Banded Sea Krait'**
+  String get species_banded_sea_krait_name;
+
+  /// No description provided for @species_banded_sea_krait_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Venomous sea snake with blue-grey and black bands, docile and commonly seen on Indo-Pacific reefs.'**
+  String get species_banded_sea_krait_desc;
+
+  /// No description provided for @species_olive_sea_snake_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Olive Sea Snake'**
+  String get species_olive_sea_snake_name;
+
+  /// No description provided for @species_olive_sea_snake_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Curious sea snake found on Australian reefs, known for approaching divers.'**
+  String get species_olive_sea_snake_desc;
+
+  /// No description provided for @species_yellow_bellied_sea_snake_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow-bellied Sea Snake'**
+  String get species_yellow_bellied_sea_snake_name;
+
+  /// No description provided for @species_yellow_bellied_sea_snake_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pelagic sea snake with yellow underside, the most widespread snake species on Earth.'**
+  String get species_yellow_bellied_sea_snake_desc;
+
+  /// No description provided for @species_marine_iguana_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Marine Iguana'**
+  String get species_marine_iguana_name;
+
+  /// No description provided for @species_marine_iguana_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Endemic to the Galapagos, the only lizard that forages underwater on algae.'**
+  String get species_marine_iguana_desc;
+
+  /// No description provided for @species_saltwater_crocodile_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Saltwater Crocodile'**
+  String get species_saltwater_crocodile_name;
+
+  /// No description provided for @species_saltwater_crocodile_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest living reptile, found in coastal and estuarine waters of the Indo-Pacific.'**
+  String get species_saltwater_crocodile_desc;
+
+  /// Dismiss a finished operation
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get common_action_done;
+
+  /// Overflow menu tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get common_action_more;
+
+  /// Text field label for a user-chosen display name
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get common_label_displayName;
+
+  /// Relative past time in whole days (abbreviated)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count}d ago} other{{count}d ago}}'**
+  String common_relativeTime_daysAgo(int count);
+
+  /// Relative past time in whole hours (abbreviated)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count}h ago} other{{count}h ago}}'**
+  String common_relativeTime_hoursAgo(int count);
+
+  /// Relative future time in whole days (abbreviated)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{in {count}d} other{in {count}d}}'**
+  String common_relativeTime_inDays(int count);
+
+  /// Relative future time in whole hours (abbreviated)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{in {count}h} other{in {count}h}}'**
+  String common_relativeTime_inHours(int count);
+
+  /// Relative future time, under one minute
+  ///
+  /// In en, this message translates to:
+  /// **'in <1m'**
+  String get common_relativeTime_inLessThanMinute;
+
+  /// Relative future time in whole minutes (abbreviated)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{in {count}m} other{in {count}m}}'**
+  String common_relativeTime_inMinutes(int count);
+
+  /// Relative past time, under one minute
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get common_relativeTime_justNow;
+
+  /// Relative past time in whole minutes (abbreviated)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count}m ago} other{{count}m ago}}'**
+  String common_relativeTime_minutesAgo(int count);
+
+  /// Relative past time in whole months (abbreviated)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count}mo ago} other{{count}mo ago}}'**
+  String common_relativeTime_monthsAgo(int count);
+
+  /// Relative future time that is already in the past
+  ///
+  /// In en, this message translates to:
+  /// **'overdue'**
+  String get common_relativeTime_overdue;
+
+  /// Network Sources: cache size is still being measured
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating cache size…'**
+  String get media_cache_calculating;
+
+  /// Network Sources: cache card header
+  ///
+  /// In en, this message translates to:
+  /// **'Cache management'**
+  String get media_cache_cardTitle;
+
+  /// Network Sources: clear the network image cache action
+  ///
+  /// In en, this message translates to:
+  /// **'Clear cache'**
+  String get media_cache_clearAction;
+
+  /// Network Sources: clear cache confirmation body
+  ///
+  /// In en, this message translates to:
+  /// **'Removes downloaded thumbnails and full-size network images. Linked media rows are kept; images will re-download on next view.'**
+  String get media_cache_clearBody;
+
+  /// Network Sources: confirm button on the clear cache dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get media_cache_clearConfirm;
+
+  /// Network Sources: clearing the cache threw
+  ///
+  /// In en, this message translates to:
+  /// **'Clear failed: {error}'**
+  String media_cache_clearError(String error);
+
+  /// Network Sources: clear cache confirmation title
+  ///
+  /// In en, this message translates to:
+  /// **'Clear network image cache?'**
+  String get media_cache_clearTitle;
+
+  /// Network Sources: cache cleared confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Cache cleared'**
+  String get media_cache_cleared;
+
+  /// Network Sources: on-disk network image cache row
+  ///
+  /// In en, this message translates to:
+  /// **'Disk cache'**
+  String get media_cache_diskCache;
+
+  /// Network Sources: measuring the cache size threw
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String media_cache_error(String error);
+
+  /// Network Sources: probe a saved host with its credentials
+  ///
+  /// In en, this message translates to:
+  /// **'Test credentials'**
+  String get media_credentials_actionTest;
+
+  /// Network Sources: saved host auth scheme (basic, bearer, ...)
+  ///
+  /// In en, this message translates to:
+  /// **'Auth: {authType}'**
+  String media_credentials_authLabel(String authType);
+
+  /// Network Sources: delete saved host confirmation body
+  ///
+  /// In en, this message translates to:
+  /// **'Removes the saved credentials. Items linked through this host will start showing \"Sign in required\" until you re-add them.'**
+  String get media_credentials_deleteBody;
+
+  /// Network Sources: removing a saved host threw
+  ///
+  /// In en, this message translates to:
+  /// **'Delete failed: {error}'**
+  String media_credentials_deleteError(String error);
+
+  /// Network Sources: delete saved host confirmation title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {host}?'**
+  String media_credentials_deleteTitle(String host);
+
+  /// Network Sources: saved host removed confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {host}'**
+  String media_credentials_deleted(String host);
+
+  /// Network Sources: rename saved host dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {host}'**
+  String media_credentials_editTitle(String host);
+
+  /// Network Sources: saved-hosts empty-state explanation
+  ///
+  /// In en, this message translates to:
+  /// **'Per-host credentials added during URL or manifest imports show up here.'**
+  String get media_credentials_emptySubtitle;
+
+  /// Network Sources: no per-host credentials stored
+  ///
+  /// In en, this message translates to:
+  /// **'No saved credentials'**
+  String get media_credentials_emptyTitle;
+
+  /// Network Sources: relative time a saved host was last used
+  ///
+  /// In en, this message translates to:
+  /// **'Last used {when}'**
+  String media_credentials_lastUsed(String when);
+
+  /// Network Sources: saved-hosts query failed
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load saved hosts'**
+  String get media_credentials_loadError;
+
+  /// Network Sources: saved-hosts list is loading
+  ///
+  /// In en, this message translates to:
+  /// **'Loading saved hosts...'**
+  String get media_credentials_loading;
+
+  /// Network Sources: saving a host display name threw
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed: {error}'**
+  String media_credentials_saveError(String error);
+
+  /// Network Sources: saved-hosts card header
+  ///
+  /// In en, this message translates to:
+  /// **'Saved hosts'**
+  String get media_credentials_savedHostsTitle;
+
+  /// Network Sources: credential probe threw
+  ///
+  /// In en, this message translates to:
+  /// **'Test failed: {error}'**
+  String media_credentials_testError(String error);
+
+  /// Network Sources: credential probe was rejected
+  ///
+  /// In en, this message translates to:
+  /// **'Credentials failed for {host}'**
+  String media_credentials_testFailed(String host);
+
+  /// Network Sources: credential probe succeeded
+  ///
+  /// In en, this message translates to:
+  /// **'Credentials OK for {host}'**
+  String media_credentials_testOk(String host);
+
+  /// Network Sources: fetch a subscription immediately
+  ///
+  /// In en, this message translates to:
+  /// **'Poll now'**
+  String get media_manifest_actionPollNow;
+
+  /// Network Sources: manifest subscriptions card header
+  ///
+  /// In en, this message translates to:
+  /// **'Manifest subscriptions'**
+  String get media_manifest_cardTitle;
+
+  /// Network Sources: delete subscription confirmation body
+  ///
+  /// In en, this message translates to:
+  /// **'Removes the subscription. Already-imported entries will remain (you can clean them up via the orphan queue).'**
+  String get media_manifest_deleteBody;
+
+  /// Network Sources: deleting a subscription threw
+  ///
+  /// In en, this message translates to:
+  /// **'Delete failed: {error}'**
+  String media_manifest_deleteError(String error);
+
+  /// Network Sources: delete subscription confirmation title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}?'**
+  String media_manifest_deleteTitle(String name);
+
+  /// Network Sources: edit subscription dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit subscription'**
+  String get media_manifest_editTitle;
+
+  /// Network Sources: subscriptions empty-state explanation
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe to an Atom/RSS, JSON, or CSV manifest from the URL tab to keep your library in sync.'**
+  String get media_manifest_emptySubtitle;
+
+  /// Network Sources: no subscriptions configured
+  ///
+  /// In en, this message translates to:
+  /// **'No manifest subscriptions'**
+  String get media_manifest_emptyTitle;
+
+  /// Network Sources: the last poll of this subscription failed
+  ///
+  /// In en, this message translates to:
+  /// **'Last error: {error}'**
+  String media_manifest_lastError(String error);
+
+  /// Network Sources: relative time of the last successful poll
+  ///
+  /// In en, this message translates to:
+  /// **'Last polled {when}'**
+  String media_manifest_lastPolled(String when);
+
+  /// Network Sources: subscriptions query failed
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load subscriptions'**
+  String get media_manifest_loadError;
+
+  /// Network Sources: subscriptions list is loading
+  ///
+  /// In en, this message translates to:
+  /// **'Loading subscriptions...'**
+  String get media_manifest_loading;
+
+  /// Network Sources: subscription has never been fetched
+  ///
+  /// In en, this message translates to:
+  /// **'Never polled'**
+  String get media_manifest_neverPolled;
+
+  /// Network Sources: relative time of the next scheduled poll
+  ///
+  /// In en, this message translates to:
+  /// **'Next {when}'**
+  String media_manifest_nextPoll(String when);
+
+  /// Network Sources: the polled subscription row no longer exists
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription not found'**
+  String get media_manifest_notFound;
+
+  /// Network Sources: a manual poll threw
+  ///
+  /// In en, this message translates to:
+  /// **'Poll failed: {error}'**
+  String media_manifest_pollError(String error);
+
+  /// Network Sources: a manual poll finished
+  ///
+  /// In en, this message translates to:
+  /// **'Polled {name}'**
+  String media_manifest_polled(String name);
+
+  /// Network Sources: a manual poll has started
+  ///
+  /// In en, this message translates to:
+  /// **'Polling {name}...'**
+  String media_manifest_polling(String name);
+
+  /// Network Sources: saving subscription edits threw
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed: {error}'**
+  String media_manifest_saveError(String error);
+
+  /// Network Sources: toggling a subscription active flag threw
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update: {error}'**
+  String media_manifest_updateError(String error);
+
+  /// Network Sources: manifest URL text field label
+  ///
+  /// In en, this message translates to:
+  /// **'Manifest URL'**
+  String get media_manifest_urlLabel;
+
+  /// Network scan dialog: the scan stream emitted an error
+  ///
+  /// In en, this message translates to:
+  /// **'Scan failed: {error}'**
+  String media_scan_failed(String error);
+
+  /// Network scan dialog: running item counter
+  ///
+  /// In en, this message translates to:
+  /// **'{done} / {total} items'**
+  String media_scan_progressItems(int done, int total);
+
+  /// Network scan dialog: running reachable/unreachable counters
+  ///
+  /// In en, this message translates to:
+  /// **'{available} reachable  ·  {unreachable} unreachable'**
+  String media_scan_progressReachability(int available, int unreachable);
+
+  /// Network scan dialog: final summary line
+  ///
+  /// In en, this message translates to:
+  /// **'{total, plural, one{Scanned {total} item in {seconds}s: {available} reachable, {unreachable} unreachable} other{Scanned {total} items in {seconds}s: {available} reachable, {unreachable} unreachable}}'**
+  String media_scan_summary(
+    int total,
+    String seconds,
+    int available,
+    int unreachable,
+  );
+
+  /// Network scan dialog: summary line extended with the skipped-rows tail
+  ///
+  /// In en, this message translates to:
+  /// **'{base}, {count, plural, one{{count} skipped (no URL)} other{{count} skipped (no URL)}}'**
+  String media_scan_summarySkipped(String base, int count);
+
+  /// Network Sources: scan-all action label and scan dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Scan all network media'**
+  String get media_scan_title;
+
+  /// Media Sources: Android persistable URI gauge title
+  ///
+  /// In en, this message translates to:
+  /// **'Android URI permissions'**
+  String get settings_mediaSources_androidUriTitle;
+
+  /// Media Sources: Android persistable URI gauge value
+  ///
+  /// In en, this message translates to:
+  /// **'{used} / {limit} persistable URIs in use'**
+  String settings_mediaSources_androidUriUsage(int used, int limit);
+
+  /// Media Sources: local-file diagnostics still counting
+  ///
+  /// In en, this message translates to:
+  /// **'Counting…'**
+  String get settings_mediaSources_counting;
+
+  /// Media Sources: a diagnostics provider failed
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String settings_mediaSources_error(String error);
+
+  /// Media Sources: a diagnostics provider is still loading
+  ///
+  /// In en, this message translates to:
+  /// **'Loading…'**
+  String get settings_mediaSources_loading;
+
+  /// Media Sources: local-file diagnostics counts
+  ///
+  /// In en, this message translates to:
+  /// **'{available} available, {unavailable} unavailable'**
+  String settings_mediaSources_localFilesCounts(int available, int unavailable);
+
+  /// Media Sources: platform photo library row subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Photos / Google Photos / iCloud'**
+  String get settings_mediaSources_photoLibrarySubtitle;
+
+  /// Media Sources: re-verify every local file action
+  ///
+  /// In en, this message translates to:
+  /// **'Re-verify all local files'**
+  String get settings_mediaSources_reverifyAll;
+
+  /// Media Sources: the re-verify pass threw
+  ///
+  /// In en, this message translates to:
+  /// **'Re-verify failed: {error}'**
+  String settings_mediaSources_reverifyFailed(String error);
+
+  /// Media Sources: how many rows the re-verify pass updated
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} item updated} other{{count} items updated}}'**
+  String settings_mediaSources_reverifyResult(int count);
+
+  /// Media Sources settings page app bar title
+  ///
+  /// In en, this message translates to:
+  /// **'Media Sources'**
+  String get settings_mediaSources_title;
+
+  /// Network Sources: explanation under the scan-all button
+  ///
+  /// In en, this message translates to:
+  /// **'Re-checks every URL- or manifest-imported photo against its host. Marks unreachable items so they show \"missing\" in your library and can be cleaned up.'**
+  String get settings_networkSources_scanDescription;
+
+  /// Screen-reader summary of the entry method bar chart
+  ///
+  /// In en, this message translates to:
+  /// **'Bar chart. Entry methods. {description}'**
+  String statistics_conditions_entryMethod_semanticLabel(String description);
+
+  /// Screen-reader summary of the visibility distribution pie chart
+  ///
+  /// In en, this message translates to:
+  /// **'Pie chart. Visibility distribution. {description}'**
+  String statistics_conditions_visibility_semanticLabel(String description);
+
+  /// Screen-reader summary of the water type distribution pie chart
+  ///
+  /// In en, this message translates to:
+  /// **'Pie chart. Water type distribution. {description}'**
+  String statistics_conditions_waterType_semanticLabel(String description);
+
+  /// Screen-reader summary of the dives-by-suit-thickness bar chart
+  ///
+  /// In en, this message translates to:
+  /// **'Bar chart. Dives by suit thickness. {description}'**
+  String statistics_progression_divesBySuitThickness_semanticLabel(
+    String description,
+  );
+
+  /// One entry of the dives-per-year screen-reader summary
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive in {year}} other{{count} dives in {year}}}'**
+  String statistics_progression_divesPerYear_countInYear(
+    int count,
+    String year,
+  );
+
+  /// Screen-reader summary of the dives-per-year bar chart
+  ///
+  /// In en, this message translates to:
+  /// **'Bar chart. Dives per year. {description}'**
+  String statistics_progression_divesPerYear_semanticLabel(String description);
+
+  /// No description provided for @statistics_records_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Records unavailable'**
+  String get statistics_records_unavailable;
+
+  /// Depth-distribution legend for the open-ended deepest bucket; unit is the diver's depth symbol
+  ///
+  /// In en, this message translates to:
+  /// **'{min}{unit}+'**
+  String statistics_summary_depthBucket_over(String min, String unit);
+
+  /// Depth-distribution legend for a closed depth bucket; unit is the diver's depth symbol
+  ///
+  /// In en, this message translates to:
+  /// **'{min}-{max}{unit}'**
+  String statistics_summary_depthBucket_range(
+    String min,
+    String max,
+    String unit,
+  );
+
+  /// No description provided for @statistics_summary_distributions_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Distributions'**
+  String get statistics_summary_distributions_title;
+
+  /// No description provided for @statistics_summary_diveTypes_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load dive type data'**
+  String get statistics_summary_diveTypes_error;
+
+  /// No description provided for @statistics_summary_diveTypes_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get statistics_summary_diveTypes_unknown;
+
+  /// No description provided for @statistics_summary_divesPerMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives / Month'**
+  String get statistics_summary_divesPerMonth;
+
+  /// No description provided for @statistics_summary_divesPerYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives / Year'**
+  String get statistics_summary_divesPerYear;
+
+  /// Screen-reader summary of the dives-by-day-of-week bar chart
+  ///
+  /// In en, this message translates to:
+  /// **'Bar chart. Dives by day of week. {description}'**
+  String statistics_timePatterns_dayOfWeek_semanticLabel(String description);
+
+  /// Screen-reader summary of the dives-by-month bar chart
+  ///
+  /// In en, this message translates to:
+  /// **'Bar chart. Dives by month. {description}'**
+  String statistics_timePatterns_seasonal_semanticLabel(String description);
+
+  /// Screen-reader label for one surface-interval statistic tile
+  ///
+  /// In en, this message translates to:
+  /// **'{label} surface interval: {value}'**
+  String statistics_timePatterns_surfaceInterval_statLabel(
+    String label,
+    String value,
+  );
+
+  /// No description provided for @statistics_timePatterns_timeOfDay_afternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get statistics_timePatterns_timeOfDay_afternoon;
+
+  /// No description provided for @statistics_timePatterns_timeOfDay_evening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get statistics_timePatterns_timeOfDay_evening;
+
+  /// No description provided for @statistics_timePatterns_timeOfDay_morning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get statistics_timePatterns_timeOfDay_morning;
+
+  /// No description provided for @statistics_timePatterns_timeOfDay_night.
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get statistics_timePatterns_timeOfDay_night;
+
+  /// Screen-reader summary of the dives-by-time-of-day pie chart
+  ///
+  /// In en, this message translates to:
+  /// **'Pie chart. Dives by time of day. {description}'**
+  String statistics_timePatterns_timeOfDay_semanticLabel(String description);
+
+  /// No description provided for @columnConfig_displayOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Display Options'**
+  String get columnConfig_displayOptions;
+
+  /// No description provided for @columnConfig_noExtraFields.
+  ///
+  /// In en, this message translates to:
+  /// **'No extra fields configured. Add fields below.'**
+  String get columnConfig_noExtraFields;
+
+  /// No description provided for @columnConfig_savePresetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Preset'**
+  String get columnConfig_savePresetTitle;
+
+  /// No description provided for @columnConfig_section.
+  ///
+  /// In en, this message translates to:
+  /// **'Section'**
+  String get columnConfig_section;
+
+  /// No description provided for @columnConfig_showTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Show tags'**
+  String get columnConfig_showTags;
+
+  /// No description provided for @columnConfig_showTags_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Display tag chips on detailed dive cards'**
+  String get columnConfig_showTags_subtitle;
+
+  /// No description provided for @columnConfig_slot_date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date / Subtitle'**
+  String get columnConfig_slot_date;
+
+  /// No description provided for @columnConfig_slot_slot1.
+  ///
+  /// In en, this message translates to:
+  /// **'Slot 1'**
+  String get columnConfig_slot_slot1;
+
+  /// No description provided for @columnConfig_slot_slot2.
+  ///
+  /// In en, this message translates to:
+  /// **'Slot 2'**
+  String get columnConfig_slot_slot2;
+
+  /// No description provided for @columnConfig_slot_slot3.
+  ///
+  /// In en, this message translates to:
+  /// **'Slot 3'**
+  String get columnConfig_slot_slot3;
+
+  /// No description provided for @columnConfig_slot_slot4.
+  ///
+  /// In en, this message translates to:
+  /// **'Slot 4'**
+  String get columnConfig_slot_slot4;
+
+  /// No description provided for @columnConfig_slot_stat1.
+  ///
+  /// In en, this message translates to:
+  /// **'Stat 1'**
+  String get columnConfig_slot_stat1;
+
+  /// No description provided for @columnConfig_slot_stat2.
+  ///
+  /// In en, this message translates to:
+  /// **'Stat 2'**
+  String get columnConfig_slot_stat2;
+
+  /// No description provided for @columnConfig_slot_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtitle'**
+  String get columnConfig_slot_subtitle;
+
+  /// No description provided for @columnConfig_slot_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get columnConfig_slot_title;
+
+  /// No description provided for @columnConfig_tooltip_columnSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Column settings'**
+  String get columnConfig_tooltip_columnSettings;
+
+  /// No description provided for @common_action_add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get common_action_add;
+
+  /// No description provided for @common_action_pin.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin'**
+  String get common_action_pin;
+
+  /// No description provided for @common_action_remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get common_action_remove;
+
+  /// No description provided for @common_action_unpin.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin'**
+  String get common_action_unpin;
+
+  /// Active-filter chip showing a closed date range.
+  ///
+  /// In en, this message translates to:
+  /// **'{start} - {end}'**
+  String diveLog_filterChip_dateRange(String end, String start);
+
+  /// Active-filter chip when more than one equipment item is selected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Equipment'**
+  String diveLog_filterChip_equipmentCount(int count);
+
+  /// No description provided for @diveLog_filter_allComputers.
+  ///
+  /// In en, this message translates to:
+  /// **'All computers'**
+  String get diveLog_filter_allComputers;
+
+  /// No description provided for @diveLog_filter_noComputersRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'No dive computers registered'**
+  String get diveLog_filter_noComputersRegistered;
+
+  /// Depth-range filter section header; {unit} is the diver's depth unit symbol (m or ft).
+  ///
+  /// In en, this message translates to:
+  /// **'Depth Range ({unit})'**
+  String diveLog_filter_sectionDepthRangeUnit(String unit);
+
+  /// No description provided for @diveLog_filter_sectionDiveComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Computer'**
+  String get diveLog_filter_sectionDiveComputer;
+
+  /// Screen-reader label for a dive row in the dive list.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive {diveNumber} at {siteName}'**
+  String diveLog_listPage_semanticsDiveAtSite(int diveNumber, String siteName);
+
+  /// No description provided for @enum_listViewMode_compact.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact'**
+  String get enum_listViewMode_compact;
+
+  /// No description provided for @enum_listViewMode_dense.
+  ///
+  /// In en, this message translates to:
+  /// **'Dense'**
+  String get enum_listViewMode_dense;
+
+  /// No description provided for @enum_listViewMode_detailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed'**
+  String get enum_listViewMode_detailed;
+
+  /// No description provided for @enum_listViewMode_table.
+  ///
+  /// In en, this message translates to:
+  /// **'Table'**
+  String get enum_listViewMode_table;
+
+  /// No description provided for @enum_profileMetric_ascentRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Ascent Rate'**
+  String get enum_profileMetric_ascentRate;
+
+  /// No description provided for @enum_profileMetric_cns.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS%'**
+  String get enum_profileMetric_cns;
+
+  /// No description provided for @enum_profileMetric_otu.
+  ///
+  /// In en, this message translates to:
+  /// **'OTU'**
+  String get enum_profileMetric_otu;
+
+  /// No description provided for @enum_sortField_bottomTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Bottom Time'**
+  String get enum_sortField_bottomTime;
+
+  /// No description provided for @enum_sortField_serviceDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Service Due'**
+  String get enum_sortField_serviceDue;
+
+  /// No description provided for @listViewMode_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'View mode'**
+  String get listViewMode_tooltip;
+
+  /// No description provided for @marineLife_speciesManage_errorLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading species: {error}'**
+  String marineLife_speciesManage_errorLoading(Object error);
+
+  /// No description provided for @settings_appearance_header_cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards'**
+  String get settings_appearance_header_cards;
+
+  /// No description provided for @settings_appearance_header_listView.
+  ///
+  /// In en, this message translates to:
+  /// **'List View'**
+  String get settings_appearance_header_listView;
+
+  /// No description provided for @settings_appearance_header_tableMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Table Mode'**
+  String get settings_appearance_header_tableMode;
+
+  /// No description provided for @settings_appearance_listFields_buddies.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddy List Fields'**
+  String get settings_appearance_listFields_buddies;
+
+  /// No description provided for @settings_appearance_listFields_certifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification List Fields'**
+  String get settings_appearance_listFields_certifications;
+
+  /// No description provided for @settings_appearance_listFields_courses.
+  ///
+  /// In en, this message translates to:
+  /// **'Course List Fields'**
+  String get settings_appearance_listFields_courses;
+
+  /// No description provided for @settings_appearance_listFields_diveCenters.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Center List Fields'**
+  String get settings_appearance_listFields_diveCenters;
+
+  /// No description provided for @settings_appearance_listFields_dives.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive List Fields'**
+  String get settings_appearance_listFields_dives;
+
+  /// No description provided for @settings_appearance_listFields_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment List Fields'**
+  String get settings_appearance_listFields_equipment;
+
+  /// No description provided for @settings_appearance_listFields_sites.
+  ///
+  /// In en, this message translates to:
+  /// **'Site List Fields'**
+  String get settings_appearance_listFields_sites;
+
+  /// No description provided for @settings_appearance_listFields_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize fields shown in list views'**
+  String get settings_appearance_listFields_subtitle;
+
+  /// No description provided for @settings_appearance_listFields_trips.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip List Fields'**
+  String get settings_appearance_listFields_trips;
+
+  /// No description provided for @settings_appearance_listView_buddies.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddies List View'**
+  String get settings_appearance_listView_buddies;
+
+  /// No description provided for @settings_appearance_listView_buddies_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Default layout for the buddies list'**
+  String get settings_appearance_listView_buddies_subtitle;
+
+  /// No description provided for @settings_appearance_listView_certifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Certifications List View'**
+  String get settings_appearance_listView_certifications;
+
+  /// No description provided for @settings_appearance_listView_certifications_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Default layout for the certifications list'**
+  String get settings_appearance_listView_certifications_subtitle;
+
+  /// No description provided for @settings_appearance_listView_courses.
+  ///
+  /// In en, this message translates to:
+  /// **'Courses List View'**
+  String get settings_appearance_listView_courses;
+
+  /// No description provided for @settings_appearance_listView_courses_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Default layout for the courses list'**
+  String get settings_appearance_listView_courses_subtitle;
+
+  /// No description provided for @settings_appearance_listView_diveCenters.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Centers List View'**
+  String get settings_appearance_listView_diveCenters;
+
+  /// No description provided for @settings_appearance_listView_diveCenters_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Default layout for the dive centers list'**
+  String get settings_appearance_listView_diveCenters_subtitle;
+
+  /// No description provided for @settings_appearance_listView_dives.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives List View'**
+  String get settings_appearance_listView_dives;
+
+  /// No description provided for @settings_appearance_listView_dives_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Default layout for the dives list'**
+  String get settings_appearance_listView_dives_subtitle;
+
+  /// No description provided for @settings_appearance_listView_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment List View'**
+  String get settings_appearance_listView_equipment;
+
+  /// No description provided for @settings_appearance_listView_equipment_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Default layout for the equipment list'**
+  String get settings_appearance_listView_equipment_subtitle;
+
+  /// No description provided for @settings_appearance_listView_sites.
+  ///
+  /// In en, this message translates to:
+  /// **'Sites List View'**
+  String get settings_appearance_listView_sites;
+
+  /// No description provided for @settings_appearance_listView_sites_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Default layout for the sites list'**
+  String get settings_appearance_listView_sites_subtitle;
+
+  /// No description provided for @settings_appearance_listView_trips.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips List View'**
+  String get settings_appearance_listView_trips;
+
+  /// No description provided for @settings_appearance_listView_trips_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Default layout for the trips list'**
+  String get settings_appearance_listView_trips_subtitle;
+
+  /// No description provided for @settings_appearance_showDataSourceBadges.
+  ///
+  /// In en, this message translates to:
+  /// **'Show data source badges'**
+  String get settings_appearance_showDataSourceBadges;
+
+  /// No description provided for @settings_appearance_showDataSourceBadges_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Display source attribution on dive metrics'**
+  String get settings_appearance_showDataSourceBadges_subtitle;
+
+  /// No description provided for @settings_appearance_title_buddies.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddies Appearance'**
+  String get settings_appearance_title_buddies;
+
+  /// No description provided for @settings_appearance_title_certifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Certifications Appearance'**
+  String get settings_appearance_title_certifications;
+
+  /// No description provided for @settings_appearance_title_courses.
+  ///
+  /// In en, this message translates to:
+  /// **'Courses Appearance'**
+  String get settings_appearance_title_courses;
+
+  /// No description provided for @settings_appearance_title_diveCenters.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Centers Appearance'**
+  String get settings_appearance_title_diveCenters;
+
+  /// No description provided for @settings_appearance_title_dives.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives Appearance'**
+  String get settings_appearance_title_dives;
+
+  /// No description provided for @settings_appearance_title_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment Appearance'**
+  String get settings_appearance_title_equipment;
+
+  /// No description provided for @settings_appearance_title_sites.
+  ///
+  /// In en, this message translates to:
+  /// **'Sites Appearance'**
+  String get settings_appearance_title_sites;
+
+  /// No description provided for @settings_appearance_title_trips.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips Appearance'**
+  String get settings_appearance_title_trips;
+
+  /// No description provided for @settings_cloudSync_troubleshoot_tileSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fix a stuck sync or free cloud space'**
+  String get settings_cloudSync_troubleshoot_tileSubtitle;
+
+  /// No description provided for @settings_data_header_dataTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Tools'**
+  String get settings_data_header_dataTools;
+
+  /// No description provided for @settings_decompression_ascentGasLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan ascent with'**
+  String get settings_decompression_ascentGasLabel;
+
+  /// No description provided for @settings_decompression_ascentGas_allCarried.
+  ///
+  /// In en, this message translates to:
+  /// **'All carried cylinders'**
+  String get settings_decompression_ascentGas_allCarried;
+
+  /// No description provided for @settings_decompression_ascentGas_decoStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco/stage + back gas'**
+  String get settings_decompression_ascentGas_decoStage;
+
+  /// No description provided for @settings_decompression_cnsSource.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS Source'**
+  String get settings_decompression_cnsSource;
+
+  /// No description provided for @settings_decompression_decoStopSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco Stop Source'**
+  String get settings_decompression_decoStopSource;
+
+  /// No description provided for @settings_decompression_header_ascent.
+  ///
+  /// In en, this message translates to:
+  /// **'Ascent planning'**
+  String get settings_decompression_header_ascent;
+
+  /// No description provided for @settings_decompression_header_ascent_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which carried cylinders the simulated ascent (TTS, ceiling and stops) may switch to at each depth. Only gases recorded on the dive are considered.'**
+  String get settings_decompression_header_ascent_subtitle;
+
+  /// No description provided for @settings_decompression_header_dataSources.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Source Preferences'**
+  String get settings_decompression_header_dataSources;
+
+  /// No description provided for @settings_decompression_header_dataSources_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When set to Dive Computer, the app uses data reported by the dive computer when available. Falls back to calculated values when computer data is not present.'**
+  String get settings_decompression_header_dataSources_subtitle;
+
+  /// No description provided for @settings_decompression_ndlSource.
+  ///
+  /// In en, this message translates to:
+  /// **'NDL Source'**
+  String get settings_decompression_ndlSource;
+
+  /// No description provided for @settings_decompression_sourceCalculated.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculated'**
+  String get settings_decompression_sourceCalculated;
+
+  /// No description provided for @settings_decompression_sourceComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Computer'**
+  String get settings_decompression_sourceComputer;
+
+  /// No description provided for @settings_decompression_ttsSource.
+  ///
+  /// In en, this message translates to:
+  /// **'TTS Source'**
+  String get settings_decompression_ttsSource;
+
+  /// Snackbar after the offset is applied. hours is the signed offset as text; hoursAbs drives the hour/hours plural.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {count} {count, plural, =1{dive} other{dives}} by {hours} {hoursAbs, plural, =1{hour} other{hours}}.'**
+  String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs);
+
+  /// Apply bar button label
+  ///
+  /// In en, this message translates to:
+  /// **'Apply to {count} {count, plural, =1{dive} other{dives}}'**
+  String settings_fixDiveTimes_apply(int count);
+
+  /// No description provided for @settings_fixDiveTimes_clearRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear date range'**
+  String get settings_fixDiveTimes_clearRange;
+
+  /// No description provided for @settings_fixDiveTimes_confirmApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get settings_fixDiveTimes_confirmApply;
+
+  /// Confirmation body. hours is the signed offset as text; hoursAbs drives the hour/hours plural.
+  ///
+  /// In en, this message translates to:
+  /// **'This will shift {count} {count, plural, =1{dive} other{dives}} by {hours} {hoursAbs, plural, =1{hour} other{hours}}. This cannot be undone automatically.'**
+  String settings_fixDiveTimes_confirmBody(
+    int count,
+    String hours,
+    int hoursAbs,
+  );
+
+  /// No description provided for @settings_fixDiveTimes_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Time Offset'**
+  String get settings_fixDiveTimes_confirmTitle;
+
+  /// No description provided for @settings_fixDiveTimes_dateRangeFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Range Filter'**
+  String get settings_fixDiveTimes_dateRangeFilter;
+
+  /// No description provided for @settings_fixDiveTimes_deselectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect All'**
+  String get settings_fixDiveTimes_deselectAll;
+
+  /// No description provided for @settings_fixDiveTimes_diveFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive'**
+  String get settings_fixDiveTimes_diveFallback;
+
+  /// List row title for a numbered dive
+  ///
+  /// In en, this message translates to:
+  /// **'Dive #{number}'**
+  String settings_fixDiveTimes_diveNumber(int number);
+
+  /// No description provided for @settings_fixDiveTimes_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No dives found.'**
+  String get settings_fixDiveTimes_empty;
+
+  /// No description provided for @settings_fixDiveTimes_emptyFiltered.
+  ///
+  /// In en, this message translates to:
+  /// **'No dives found in this date range.'**
+  String get settings_fixDiveTimes_emptyFiltered;
+
+  /// No description provided for @settings_fixDiveTimes_enterOffsetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an hour offset'**
+  String get settings_fixDiveTimes_enterOffsetHint;
+
+  /// No description provided for @settings_fixDiveTimes_from.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get settings_fixDiveTimes_from;
+
+  /// No description provided for @settings_fixDiveTimes_hourOffset.
+  ///
+  /// In en, this message translates to:
+  /// **'Hour Offset'**
+  String get settings_fixDiveTimes_hourOffset;
+
+  /// No description provided for @settings_fixDiveTimes_hoursField.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours (e.g. +7, -5)'**
+  String get settings_fixDiveTimes_hoursField;
+
+  /// Snackbar shown when the dive list fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load dives: {error}'**
+  String settings_fixDiveTimes_loadError(String error);
+
+  /// No description provided for @settings_fixDiveTimes_noSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'No dives selected.'**
+  String get settings_fixDiveTimes_noSelection;
+
+  /// No description provided for @settings_fixDiveTimes_offsetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a positive or negative integer to shift dive times.'**
+  String get settings_fixDiveTimes_offsetHint;
+
+  /// Preview banner. hours is the signed offset as text (e.g. +7); hoursAbs drives the hour/hours plural.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview: {count} {count, plural, =1{dive} other{dives}} will shift by {hours} {hoursAbs, plural, =1{hour} other{hours}}.'**
+  String settings_fixDiveTimes_preview(int count, String hours, int hoursAbs);
+
+  /// No description provided for @settings_fixDiveTimes_selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select All'**
+  String get settings_fixDiveTimes_selectAll;
+
+  /// No description provided for @settings_fixDiveTimes_selectDivesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select dives to apply'**
+  String get settings_fixDiveTimes_selectDivesHint;
+
+  /// No description provided for @settings_fixDiveTimes_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust times for imported dives'**
+  String get settings_fixDiveTimes_subtitle;
+
+  /// No description provided for @settings_fixDiveTimes_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Fix Dive Times'**
+  String get settings_fixDiveTimes_title;
+
+  /// No description provided for @settings_fixDiveTimes_to.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get settings_fixDiveTimes_to;
+
+  /// No description provided for @settings_fixDiveTimes_zeroOffset.
+  ///
+  /// In en, this message translates to:
+  /// **'Hour offset is 0, nothing to change.'**
+  String get settings_fixDiveTimes_zeroOffset;
+
+  /// No description provided for @settings_syncDevices_appBar_refreshTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get settings_syncDevices_appBar_refreshTooltip;
+
+  /// No description provided for @settings_syncDevices_appBar_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Devices on this backend'**
+  String get settings_syncDevices_appBar_title;
+
+  /// No description provided for @settings_syncDevices_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No sync files on this backend.'**
+  String get settings_syncDevices_empty;
+
+  /// Shown when the sync backend listing could not be read.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read the backend.\n{error}'**
+  String settings_syncDevices_readError(String error);
+
+  /// No description provided for @settings_syncDevices_removal_noBackend.
+  ///
+  /// In en, this message translates to:
+  /// **'No cloud backend is configured'**
+  String get settings_syncDevices_removal_noBackend;
+
+  /// No description provided for @settings_syncDevices_removal_unreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach the backend. Nothing was removed.'**
+  String get settings_syncDevices_removal_unreachable;
+
+  /// Confirmation body when the peer is still an active syncer.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{This deletes 1 file ({size}) belonging to {name}.\n\nThat device is still part of this sync. If it comes back online it will rebuild from the backend rather than resurrect old data, but any changes it has not yet published will be lost. Your dive data on THIS device is not affected.} other{This deletes {count} files ({size}) belonging to {name}.\n\nThat device is still part of this sync. If it comes back online it will rebuild from the backend rather than resurrect old data, but any changes it has not yet published will be lost. Your dive data on THIS device is not affected.}}'**
+  String settings_syncDevices_removeDialog_bodyRisky(
+    int count,
+    String name,
+    String size,
+  );
+
+  /// Confirmation body when the peer is safe to remove.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{This deletes 1 file ({size}) belonging to {name}. It is left over from a library no device syncs from any more. Your dive data is not affected.} other{This deletes {count} files ({size}) belonging to {name}. They are left over from a library no device syncs from any more. Your dive data is not affected.}}'**
+  String settings_syncDevices_removeDialog_bodySafe(
+    int count,
+    String name,
+    String size,
+  );
+
+  /// No description provided for @settings_syncDevices_removeDialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name}’s files?'**
+  String settings_syncDevices_removeDialog_title(String name);
+
+  /// No description provided for @settings_syncDevices_removeProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Removing {name}’s files'**
+  String settings_syncDevices_removeProgressTitle(String name);
+
+  /// No description provided for @settings_syncDevices_removeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this device’s files'**
+  String get settings_syncDevices_removeTooltip;
+
+  /// No description provided for @settings_syncDevices_state_active.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing normally'**
+  String get settings_syncDevices_state_active;
+
+  /// No description provided for @settings_syncDevices_state_retired.
+  ///
+  /// In en, this message translates to:
+  /// **'Retired'**
+  String get settings_syncDevices_state_retired;
+
+  /// No description provided for @settings_syncDevices_state_staleEpoch.
+  ///
+  /// In en, this message translates to:
+  /// **'Left over from an earlier library - no device reads this'**
+  String get settings_syncDevices_state_staleEpoch;
+
+  /// No description provided for @settings_syncDevices_state_thisDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'This device'**
+  String get settings_syncDevices_state_thisDevice;
+
+  /// No description provided for @settings_syncDevices_state_unreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'No readable manifest - an unfinished upload, or encrypted'**
+  String get settings_syncDevices_state_unreadable;
+
+  /// Totals header: how many devices, how many files, and their combined size. {size} is a preformatted size such as "1.4 MB".
+  ///
+  /// In en, this message translates to:
+  /// **'{deviceCount, plural, =1{1 device} other{{deviceCount} devices}}, {fileCount, plural, =1{1 file} other{{fileCount} files}}, {size}'**
+  String settings_syncDevices_summary(
+    int deviceCount,
+    int fileCount,
+    String size,
+  );
+
+  /// How many of the listed devices are safe to remove, and how much space they hold.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 left over from a replaced or retired library, holding {size}.} other{{count} left over from a replaced or retired library, holding {size}.}}'**
+  String settings_syncDevices_summary_removable(int count, String size);
+
+  /// Device row subtitle when no timestamp is known.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 file} other{{count} files}}, {size}'**
+  String settings_syncDevices_tile_filesSize(int count, String size);
+
+  /// Device row subtitle including the publish/modify timestamp.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 file} other{{count} files}}, {size} - {when}'**
+  String settings_syncDevices_tile_filesSizeSeen(
+    int count,
+    String size,
+    String when,
+  );
+
+  /// Title-case fallback name for a device that published no name. The mid-sentence lowercase form is settings_cloudSync_peerNeedsAdopt_unnamedDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Device {shortId}'**
+  String settings_syncDevices_unnamedDevice(String shortId);
+
+  /// No description provided for @settings_syncMaintenance_keepAppOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the app open until this finishes. Closing it now leaves the backend partly cleared, and the next sync has to start over.'**
+  String get settings_syncMaintenance_keepAppOpen;
+
+  /// No description provided for @settings_syncMaintenance_phase_clearingOldFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing old files'**
+  String get settings_syncMaintenance_phase_clearingOldFiles;
+
+  /// No description provided for @settings_syncMaintenance_phase_deleting.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting'**
+  String get settings_syncMaintenance_phase_deleting;
+
+  /// No description provided for @settings_syncMaintenance_phase_publishingLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Publishing library'**
+  String get settings_syncMaintenance_phase_publishingLibrary;
+
+  /// No description provided for @settings_syncMaintenance_phase_working.
+  ///
+  /// In en, this message translates to:
+  /// **'Working...'**
+  String get settings_syncMaintenance_phase_working;
+
+  /// Progress counter inside the sync maintenance dialog, e.g. "12 of 400 files".
+  ///
+  /// In en, this message translates to:
+  /// **'{total, plural, =1{{done} of 1 file} other{{done} of {total} files}}'**
+  String settings_syncMaintenance_progress_filesOfTotal(int done, int total);
+
+  /// Snackbar after a fully successful cloud file removal.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Removed 1 file} other{Removed {count} files}}'**
+  String settings_syncMaintenance_removedFiles(int count);
+
+  /// Snackbar after a partially successful removal. {trouble} is an already localized clause built from the trouble_* keys.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Removed 1 file, but {trouble}. Try again while online.} other{Removed {count} files, but {trouble}. Try again while online.}}'**
+  String settings_syncMaintenance_removedFilesPartial(
+    int count,
+    String trouble,
+  );
+
+  /// Clause spliced into the *Partial messages when some files could not be deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 could not be deleted} other{{count} could not be deleted}}'**
+  String settings_syncMaintenance_trouble_failed(int count);
+
+  /// No description provided for @settings_syncMaintenance_trouble_listIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'some files could not be listed'**
+  String get settings_syncMaintenance_trouble_listIncomplete;
+
+  /// Snackbar after a fully successful full-backend wipe.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Wiped 1 file} other{Wiped {count} files}}'**
+  String settings_syncMaintenance_wipedFiles(int count);
+
+  /// Snackbar after a partially successful wipe. {trouble} is an already localized clause built from the trouble_* keys.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Wiped 1 file, but {trouble}. Try again while online.} other{Wiped {count} files, but {trouble}. Try again while online.}}'**
+  String settings_syncMaintenance_wipedFilesPartial(int count, String trouble);
+
+  /// No description provided for @settings_troubleshootSync_appBar_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Troubleshoot Sync'**
+  String get settings_troubleshootSync_appBar_title;
+
+  /// No description provided for @settings_troubleshootSync_devices_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'See every device holding files here, how much space each uses, and remove leftovers from libraries no device syncs from any more. Your dive data is not affected.'**
+  String get settings_troubleshootSync_devices_subtitle;
+
+  /// No description provided for @settings_troubleshootSync_rebuild_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebuild'**
+  String get settings_troubleshootSync_rebuild_confirm;
+
+  /// No description provided for @settings_troubleshootSync_rebuild_confirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This makes this device’s library the current one on the backend and republishes it, so other devices sync from you. Use it when a replacement from another device is stuck. Your dive data is not affected.'**
+  String get settings_troubleshootSync_rebuild_confirmBody;
+
+  /// No description provided for @settings_troubleshootSync_rebuild_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebuild backend from this device?'**
+  String get settings_troubleshootSync_rebuild_confirmTitle;
+
+  /// No description provided for @settings_troubleshootSync_rebuild_doneSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebuilt backend from this device'**
+  String get settings_troubleshootSync_rebuild_doneSnack;
+
+  /// No description provided for @settings_troubleshootSync_rebuild_failedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebuild failed'**
+  String get settings_troubleshootSync_rebuild_failedSnack;
+
+  /// No description provided for @settings_troubleshootSync_rebuild_progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebuilding backend'**
+  String get settings_troubleshootSync_rebuild_progressTitle;
+
+  /// No description provided for @settings_troubleshootSync_rebuild_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use if sync is stuck waiting on a library that another device replaced but never finished uploading (that device may be offline). Publishes this device’s library as the current one.'**
+  String get settings_troubleshootSync_rebuild_subtitle;
+
+  /// No description provided for @settings_troubleshootSync_rebuild_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebuild backend from this device'**
+  String get settings_troubleshootSync_rebuild_title;
+
+  /// No description provided for @settings_troubleshootSync_removeThisDevice_confirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes only this device’s sync files from the backend. Other devices keep syncing, and your dive data is not affected.'**
+  String get settings_troubleshootSync_removeThisDevice_confirmBody;
+
+  /// No description provided for @settings_troubleshootSync_removeThisDevice_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this device’s cloud files?'**
+  String get settings_troubleshootSync_removeThisDevice_confirmTitle;
+
+  /// No description provided for @settings_troubleshootSync_removeThisDevice_progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Removing this device’s cloud files'**
+  String get settings_troubleshootSync_removeThisDevice_progressTitle;
+
+  /// No description provided for @settings_troubleshootSync_removeThisDevice_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Free this device’s space on the backend. Other devices keep syncing. Your dive data is not affected.'**
+  String get settings_troubleshootSync_removeThisDevice_subtitle;
+
+  /// No description provided for @settings_troubleshootSync_removeThisDevice_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this device’s cloud files'**
+  String get settings_troubleshootSync_removeThisDevice_title;
+
+  /// No description provided for @settings_troubleshootSync_repair_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair'**
+  String get settings_troubleshootSync_repair_confirm;
+
+  /// No description provided for @settings_troubleshootSync_repair_confirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This clears all local sync state and gives this device a new sync identity, then reconnects fresh on the next sync. Your dive data is safe and is not deleted.'**
+  String get settings_troubleshootSync_repair_confirmBody;
+
+  /// No description provided for @settings_troubleshootSync_repair_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair Sync?'**
+  String get settings_troubleshootSync_repair_confirmTitle;
+
+  /// No description provided for @settings_troubleshootSync_repair_doneSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync repaired'**
+  String get settings_troubleshootSync_repair_doneSnack;
+
+  /// No description provided for @settings_troubleshootSync_repair_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fix a stuck sync. Clears this device’s sync state and gives it a fresh sync identity, then reconnects on the next sync. Your dive data is not affected.'**
+  String get settings_troubleshootSync_repair_subtitle;
+
+  /// No description provided for @settings_troubleshootSync_repair_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair Sync'**
+  String get settings_troubleshootSync_repair_title;
+
+  /// No description provided for @settings_troubleshootSync_wipeAll_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Wipe everything'**
+  String get settings_troubleshootSync_wipeAll_confirm;
+
+  /// Body of the typed-confirmation wipe dialog. {word} is the literal, never-translated sentinel the user must type (WIPE); it must match the hint and the button comparison exactly.
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes EVERY device’s sync data from this backend, including the library markers. Every device must re-establish sync from scratch. Your dive data is not affected.\n\nType {word} to confirm.'**
+  String settings_troubleshootSync_wipeAll_confirmBody(String word);
+
+  /// No description provided for @settings_troubleshootSync_wipeAll_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wipe all sync data?'**
+  String get settings_troubleshootSync_wipeAll_confirmTitle;
+
+  /// No description provided for @settings_troubleshootSync_wipeAll_progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wiping sync data'**
+  String get settings_troubleshootSync_wipeAll_progressTitle;
+
+  /// No description provided for @settings_troubleshootSync_wipeAll_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete every device’s sync data from this backend, including the library markers. Every device re-establishes from scratch. Your dive data is not affected.'**
+  String get settings_troubleshootSync_wipeAll_subtitle;
+
+  /// No description provided for @settings_troubleshootSync_wipeAll_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Wipe all sync data on this backend'**
+  String get settings_troubleshootSync_wipeAll_title;
+
+  /// No description provided for @tableMode_tooltip_toggleDetailPane.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle detail pane'**
+  String get tableMode_tooltip_toggleDetailPane;
+
+  /// No description provided for @tableMode_tooltip_toggleProfilePanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle profile panel'**
+  String get tableMode_tooltip_toggleProfilePanel;
+
+  /// No description provided for @maps_regionDownload_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Region'**
+  String get maps_regionDownload_title;
+
+  /// No description provided for @maps_regionDownload_nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a name for this region'**
+  String get maps_regionDownload_nameRequired;
+
+  /// No description provided for @maps_regionDownload_nameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Region Name'**
+  String get maps_regionDownload_nameLabel;
+
+  /// No description provided for @maps_regionDownload_nameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Cozumel, Mexico'**
+  String get maps_regionDownload_nameHint;
+
+  /// No description provided for @maps_regionDownload_zoomLevels.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom Levels'**
+  String get maps_regionDownload_zoomLevels;
+
+  /// No description provided for @maps_regionDownload_zoomHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Higher zoom = more detail, larger download'**
+  String get maps_regionDownload_zoomHint;
+
+  /// No description provided for @maps_regionDownload_minZoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Min: {zoom}'**
+  String maps_regionDownload_minZoom(int zoom);
+
+  /// No description provided for @maps_regionDownload_minZoomSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum zoom: {zoom}'**
+  String maps_regionDownload_minZoomSemantics(int zoom);
+
+  /// No description provided for @maps_regionDownload_maxZoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Max: {zoom}'**
+  String maps_regionDownload_maxZoom(int zoom);
+
+  /// No description provided for @maps_regionDownload_maxZoomSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum zoom: {zoom}'**
+  String maps_regionDownload_maxZoomSemantics(int zoom);
+
+  /// No description provided for @maps_regionDownload_estimatingSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimating download size'**
+  String get maps_regionDownload_estimatingSemantics;
+
+  /// No description provided for @maps_regionDownload_estimateSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated download: {count} tiles, {size}'**
+  String maps_regionDownload_estimateSemantics(int count, Object size);
+
+  /// No description provided for @maps_regionDownload_estimateUnavailableSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to estimate download size'**
+  String get maps_regionDownload_estimateUnavailableSemantics;
+
+  /// No description provided for @maps_regionDownload_estimating.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimating...'**
+  String get maps_regionDownload_estimating;
+
+  /// No description provided for @maps_regionDownload_tileCount.
+  ///
+  /// In en, this message translates to:
+  /// **'~{count} tiles'**
+  String maps_regionDownload_tileCount(int count);
+
+  /// No description provided for @maps_regionDownload_estimateUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to estimate'**
+  String get maps_regionDownload_estimateUnavailable;
+
+  /// No description provided for @maps_regionDownload_largeWarningSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning: Large download. Consider reducing zoom levels or selecting a smaller region.'**
+  String get maps_regionDownload_largeWarningSemantics;
+
+  /// No description provided for @maps_regionDownload_largeWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Large download. Consider reducing zoom levels or selecting a smaller region.'**
+  String get maps_regionDownload_largeWarning;
+
+  /// No description provided for @maps_regionDownload_downloadButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get maps_regionDownload_downloadButton;
+
+  /// No description provided for @diveLog_map_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Activity'**
+  String get diveLog_map_title;
+
+  /// No description provided for @diveLog_map_infoCard_minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String diveLog_map_infoCard_minutes(int minutes);
+
+  /// No description provided for @trips_gallery_diveSection_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{date} ({count} {photoLabel})'**
+  String trips_gallery_diveSection_subtitle(
+    Object date,
+    int count,
+    Object photoLabel,
+  );
+
+  /// No description provided for @trips_gallery_thumbnail_photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo thumbnail. Tap to view full screen'**
+  String get trips_gallery_thumbnail_photo;
+
+  /// No description provided for @trips_gallery_thumbnail_video.
+  ///
+  /// In en, this message translates to:
+  /// **'Video thumbnail. Tap to view full screen'**
+  String get trips_gallery_thumbnail_video;
+
+  /// No description provided for @trips_gallery_thumbnail_photoMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo thumbnail, missing from device. Tap to view full screen'**
+  String get trips_gallery_thumbnail_photoMissing;
+
+  /// No description provided for @trips_gallery_thumbnail_videoMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Video thumbnail, missing from device. Tap to view full screen'**
+  String get trips_gallery_thumbnail_videoMissing;
+
+  /// No description provided for @trips_photos_thumbnail_photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo thumbnail. Tap to open gallery'**
+  String get trips_photos_thumbnail_photo;
+
+  /// No description provided for @trips_photos_thumbnail_video.
+  ///
+  /// In en, this message translates to:
+  /// **'Video thumbnail. Tap to open gallery'**
+  String get trips_photos_thumbnail_video;
+
+  /// No description provided for @trips_picker_suggestedSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested trip: {name}. Tap to use'**
+  String trips_picker_suggestedSemantics(Object name);
+
+  /// No description provided for @trips_picker_tileSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, {startDate} to {endDate}'**
+  String trips_picker_tileSemantics(
+    Object name,
+    Object startDate,
+    Object endDate,
+  );
+
+  /// No description provided for @trips_picker_tileSemanticsSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, {startDate} to {endDate}, selected'**
+  String trips_picker_tileSemanticsSelected(
+    Object name,
+    Object startDate,
+    Object endDate,
+  );
+
+  /// No description provided for @divePlanner_quickPlan_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a simple rectangular dive profile'**
+  String get divePlanner_quickPlan_subtitle;
+
+  /// No description provided for @divePlanner_quickPlan_depthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth:'**
+  String get divePlanner_quickPlan_depthLabel;
+
+  /// No description provided for @divePlanner_quickPlan_depthSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth: {depth}'**
+  String divePlanner_quickPlan_depthSemantics(Object depth);
+
+  /// No description provided for @divePlanner_quickPlan_timeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time:'**
+  String get divePlanner_quickPlan_timeLabel;
+
+  /// No description provided for @divePlanner_quickPlan_bottomTimeSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, =1{Bottom time: 1 minute} other{Bottom time: {minutes} minutes}}'**
+  String divePlanner_quickPlan_bottomTimeSemantics(int minutes);
+
+  /// No description provided for @divePlanner_quickPlan_minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String divePlanner_quickPlan_minutes(int minutes);
+
+  /// No description provided for @divePlanner_quickPlan_previewSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan preview: Descent to {depth}, bottom time {minutes} minutes, ascent with safety stop'**
+  String divePlanner_quickPlan_previewSemantics(Object depth, int minutes);
+
+  /// No description provided for @divePlanner_quickPlan_previewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan Preview:'**
+  String get divePlanner_quickPlan_previewTitle;
+
+  /// No description provided for @divePlanner_quickPlan_previewDescent.
+  ///
+  /// In en, this message translates to:
+  /// **'Descent to {depth}'**
+  String divePlanner_quickPlan_previewDescent(Object depth);
+
+  /// No description provided for @divePlanner_quickPlan_previewBottomTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Bottom time: {minutes} min'**
+  String divePlanner_quickPlan_previewBottomTime(int minutes);
+
+  /// No description provided for @divePlanner_quickPlan_previewAscent.
+  ///
+  /// In en, this message translates to:
+  /// **'Ascent with safety stop'**
+  String get divePlanner_quickPlan_previewAscent;
+
+  /// No description provided for @divePlanner_quickPlan_create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get divePlanner_quickPlan_create;
+
+  /// No description provided for @divePlanner_semantics_sacRate.
+  ///
+  /// In en, this message translates to:
+  /// **'SAC Rate: {value} {volumeSymbol} per minute'**
+  String divePlanner_semantics_sacRate(Object value, Object volumeSymbol);
+
+  /// No description provided for @divePlanner_semantics_reservePressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserve pressure in {pressureSymbol}'**
+  String divePlanner_semantics_reservePressure(Object pressureSymbol);
+
+  /// No description provided for @divePlanner_semantics_altitudeGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Altitude group: {group}'**
+  String divePlanner_semantics_altitudeGroup(Object group);
+
+  /// No description provided for @diveSites_import_detail_maxDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Max {depth}'**
+  String diveSites_import_detail_maxDepth(Object depth);
+
+  /// No description provided for @autoUpdate_banner_download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get autoUpdate_banner_download;
+
+  /// Subtitle of the iCloud provider tile on the Cloud Sync page.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync via Apple iCloud'**
+  String get settings_cloudSync_provider_icloud_subtitle;
+
+  /// Hint text of the search field in the debug log viewer app bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Search logs...'**
+  String get settings_debugLog_search_hint;
+
+  /// App bar title of the debug log viewer page.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug Logs'**
+  String get settings_debugLog_appBar_title;
+
+  /// Overflow menu item that turns debug mode off.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable Debug Mode'**
+  String get settings_debugLog_disableDebugMode;
+
+  /// Overflow menu item that erases the log file.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Logs'**
+  String get settings_debugLog_clearLogs;
+
+  /// Shown when every log entry is filtered out.
+  ///
+  /// In en, this message translates to:
+  /// **'No log entries match the current filters'**
+  String get settings_debugLog_empty;
+
+  /// Shown when the log file cannot be read.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading logs: {error}'**
+  String settings_debugLog_loadError(Object error);
+
+  /// Snack bar confirming the visible log entries were copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Filtered logs copied to clipboard'**
+  String get settings_debugLog_copiedSnack;
+
+  /// Snack bar confirming where the log file was written.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs saved to {path}'**
+  String settings_debugLog_savedSnack(String path);
+
+  /// Generic Copy button label, sibling of common_action_share/save.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get common_action_copy;
+
+  /// Title of the dialog for picking a two-colour card gradient.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Gradient'**
+  String get settings_appearance_customGradient_title;
+
+  /// Label of the gradient's first (start) colour well.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get settings_appearance_customGradient_start;
+
+  /// Label of the gradient's second (end) colour well.
+  ///
+  /// In en, this message translates to:
+  /// **'End'**
+  String get settings_appearance_customGradient_end;
+
+  /// Label of the HSV hue slider.
+  ///
+  /// In en, this message translates to:
+  /// **'Hue'**
+  String get settings_appearance_customGradient_hue;
+
+  /// Label of the HSV saturation slider.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturation'**
+  String get settings_appearance_customGradient_saturation;
+
+  /// Label of the HSV brightness (value) slider.
+  ///
+  /// In en, this message translates to:
+  /// **'Brightness'**
+  String get settings_appearance_customGradient_brightness;
+
+  /// Caption under the gradient preview bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get settings_appearance_customGradient_preview;
+
+  /// Generic Apply button label, sibling of common_action_save/cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get common_action_apply;
+
+  /// Sync status detail when the stored sync state cannot be read.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load sync state: {error}'**
+  String settings_cloudSync_message_loadStateFailed(Object error);
+
+  /// Sync status detail when no cloud backend has been chosen.
+  ///
+  /// In en, this message translates to:
+  /// **'No cloud provider configured'**
+  String get settings_cloudSync_message_noProviderConfigured;
+
+  /// Sync status detail while the replaced cloud library is being adopted.
+  ///
+  /// In en, this message translates to:
+  /// **'Adopting the restored library...'**
+  String get settings_cloudSync_message_adopting;
+
+  /// Sync status detail when adopting the replaced cloud library failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to adopt the restored library'**
+  String get settings_cloudSync_message_adoptFailed;
+
+  /// Sync status detail when an automatic sync deferred the first library merge.
+  ///
+  /// In en, this message translates to:
+  /// **'First sync needs confirmation. Tap Sync Now to review.'**
+  String get settings_cloudSync_message_firstSyncNeedsConfirm;
+
+  /// Sync status detail at the start of a sync run.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting sync...'**
+  String get settings_cloudSync_message_startingSync;
+
+  /// Sync status detail when another device replaced the cloud library.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync paused: the library was replaced from a backup. Tap Sync Now to review.'**
+  String get settings_cloudSync_message_replacePaused;
+
+  /// Sync status detail when the cloud library needs the encryption passphrase.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync paused: this library is encrypted. Enter the passphrase to continue.'**
+  String get settings_cloudSync_message_encryptedPaused;
+
+  /// Sync status detail after a sync that produced conflicts.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync completed with conflicts'**
+  String get settings_cloudSync_message_completedWithConflicts;
+
+  /// Sync status detail after a clean sync.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync completed successfully'**
+  String get settings_cloudSync_message_completedSuccessfully;
+
+  /// Sync status detail when the sync service reported a failure with no message.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed'**
+  String get settings_cloudSync_message_syncFailed;
+
+  /// Fallback name for the sync phase named inside settings_cloudSync_message_syncErrorDuring.
+  ///
+  /// In en, this message translates to:
+  /// **'sync'**
+  String get settings_cloudSync_message_phaseDefault;
+
+  /// Sync status detail when a sync threw. {phase} is the previous, already localized status message.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync error during {phase}: {error}'**
+  String settings_cloudSync_message_syncErrorDuring(String phase, Object error);
+
+  /// Settings list row for the debug/diagnostics section.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug'**
+  String get settings_section_debug_title;
+
+  /// Subtitle of the debug settings row.
+  ///
+  /// In en, this message translates to:
+  /// **'Logs & diagnostics'**
+  String get settings_section_debug_subtitle;
+
+  /// Label before the minimum-severity dropdown in the debug log filter bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Min severity:'**
+  String get settings_debugLog_minSeverityLabel;
+
+  /// Subject line used when sharing the debug log file.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion Debug Logs'**
+  String get settings_debugLog_shareSubject;
+
+  /// Title of the system save dialog for the debug log file.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Debug Logs'**
+  String get settings_debugLog_saveDialogTitle;
+
+  /// No description provided for @universalImport_preset_saveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as Preset'**
+  String get universalImport_preset_saveTitle;
+
+  /// No description provided for @universalImport_preset_nameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset Name'**
+  String get universalImport_preset_nameLabel;
+
+  /// No description provided for @universalImport_preset_nameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., My Dive Log CSV'**
+  String get universalImport_preset_nameHint;
+
+  /// No description provided for @universalImport_preset_nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get universalImport_preset_nameRequired;
+
+  /// No description provided for @universalImport_preset_sourceAppLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Source Application'**
+  String get universalImport_preset_sourceAppLabel;
+
+  /// No description provided for @universalImport_preset_sourceAppNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get universalImport_preset_sourceAppNone;
+
+  /// No description provided for @universalImport_preset_entityTypesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Entity Types'**
+  String get universalImport_preset_entityTypesLabel;
+
+  /// No description provided for @universalImport_preset_matchThresholdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Match Threshold'**
+  String get universalImport_preset_matchThresholdLabel;
+
+  /// No description provided for @universalImport_preset_matchThresholdHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'How closely CSV headers must match for auto-detection'**
+  String get universalImport_preset_matchThresholdHelp;
+
+  /// Count of CSV headers stored as the preset match signature.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 signature header from current file} other{{count} signature headers from current file}}'**
+  String universalImport_preset_signatureHeaders(int count);
+
+  /// No description provided for @universalImport_preset_selectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Preset'**
+  String get universalImport_preset_selectTitle;
+
+  /// Error shown when the saved CSV preset list cannot be read.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load presets: {error}'**
+  String universalImport_preset_loadFailed(String error);
+
+  /// No description provided for @universalImport_preset_sectionSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Presets'**
+  String get universalImport_preset_sectionSaved;
+
+  /// No description provided for @universalImport_preset_sectionBuiltIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in Presets'**
+  String get universalImport_preset_sectionBuiltIn;
+
+  /// No description provided for @universalImport_preset_deleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Preset'**
+  String get universalImport_preset_deleteTitle;
+
+  /// Confirmation body for deleting a user-saved CSV preset.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"? This cannot be undone.'**
+  String universalImport_preset_deleteConfirm(String name);
+
+  /// How well the current CSV headers match a preset signature.
+  ///
+  /// In en, this message translates to:
+  /// **'{matched}/{total} headers matched ({percent}%)'**
+  String universalImport_preset_headersMatched(
+    int matched,
+    int total,
+    int percent,
+  );
+
+  /// No description provided for @universalImport_preset_noSignatureHeaders.
+  ///
+  /// In en, this message translates to:
+  /// **'No signature headers'**
+  String get universalImport_preset_noSignatureHeaders;
+
+  /// No description provided for @universalImport_preset_deleteTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete preset'**
+  String get universalImport_preset_deleteTooltip;
+
+  /// No description provided for @universalImport_preset_presetsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Presets'**
+  String get universalImport_preset_presetsButton;
+
+  /// Snackbar confirming a CSV column-mapping preset was saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset \"{name}\" saved'**
+  String universalImport_preset_savedSnackbar(String name);
+
+  /// No description provided for @universalImport_step_done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get universalImport_step_done;
+
+  /// No description provided for @universalImport_cancel_inProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelling'**
+  String get universalImport_cancel_inProgressTitle;
+
+  /// No description provided for @universalImport_cancel_inProgressBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Finishing the current dive before stopping. Already-imported dives are kept.'**
+  String get universalImport_cancel_inProgressBody;
+
+  /// No description provided for @universalImport_cancel_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel import?'**
+  String get universalImport_cancel_confirmTitle;
+
+  /// No description provided for @universalImport_cancel_confirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop after the current dive finishes. Already-imported dives will be kept.'**
+  String get universalImport_cancel_confirmBody;
+
+  /// No description provided for @universalImport_cancel_keepImporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep importing'**
+  String get universalImport_cancel_keepImporting;
+
+  /// No description provided for @universalImport_cancel_confirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel import'**
+  String get universalImport_cancel_confirmAction;
+
+  /// No description provided for @universalImport_cancel_discardSelections.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard selections and cancel?'**
+  String get universalImport_cancel_discardSelections;
+
+  /// No description provided for @universalImport_action_importSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Selected'**
+  String get universalImport_action_importSelected;
+
+  /// No description provided for @universalImport_action_next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get universalImport_action_next;
+
+  /// No description provided for @common_action_yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get common_action_yes;
+
+  /// No description provided for @common_action_no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get common_action_no;
+
+  /// Review bar fragment: how many items will be imported as new.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, other{{count} new}}'**
+  String universalImport_counts_new(int count);
+
+  /// Review bar fragment: how many items will be consolidated into existing records.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, other{{count} merging}}'**
+  String universalImport_counts_merging(int count);
+
+  /// Review bar fragment: how many items will replace existing source data.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, other{{count} replacing}}'**
+  String universalImport_counts_replacing(int count);
+
+  /// Review bar fragment: how many items will be skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, other{{count} skipped}}'**
+  String universalImport_counts_skipped(int count);
+
+  /// No description provided for @universalImport_counts_nothingSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing selected'**
+  String get universalImport_counts_nothingSelected;
+
+  /// No description provided for @universalImport_section_potentialDuplicates.
+  ///
+  /// In en, this message translates to:
+  /// **'Potential Duplicates'**
+  String get universalImport_section_potentialDuplicates;
+
+  /// No description provided for @universalImport_section_possibleDuplicates.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible Duplicates'**
+  String get universalImport_section_possibleDuplicates;
+
+  /// Header count of duplicate rows in an import review tab.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 duplicate} other{{count} duplicates}}'**
+  String universalImport_count_duplicates(int count);
+
+  /// No description provided for @universalImport_entityAction_importBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'IMPORT'**
+  String get universalImport_entityAction_importBadge;
+
+  /// No description provided for @universalImport_entityAction_skipBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'SKIP'**
+  String get universalImport_entityAction_skipBadge;
+
+  /// No description provided for @universalImport_compare_existing.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing'**
+  String get universalImport_compare_existing;
+
+  /// No description provided for @universalImport_compare_incoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Incoming'**
+  String get universalImport_compare_incoming;
+
+  /// No description provided for @universalImport_label_skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get universalImport_label_skipped;
+
+  /// No description provided for @universalImport_action_viewDives.
+  ///
+  /// In en, this message translates to:
+  /// **'View Dives'**
+  String get universalImport_action_viewDives;
+
+  /// No description provided for @diveImport_healthkit_accessGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'HealthKit Access Granted'**
+  String get diveImport_healthkit_accessGranted;
+
+  /// No description provided for @diveImport_healthkit_accessGrantedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You can proceed to the next step.'**
+  String get diveImport_healthkit_accessGrantedBody;
+
+  /// No description provided for @diveImport_healthkit_requesting.
+  ///
+  /// In en, this message translates to:
+  /// **'Requesting...'**
+  String get diveImport_healthkit_requesting;
+
+  /// No description provided for @diveImport_healthkit_grantAccessButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant HealthKit Access'**
+  String get diveImport_healthkit_grantAccessButton;
+
+  /// No description provided for @diveImport_healthkit_selectDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date Range'**
+  String get diveImport_healthkit_selectDateRange;
+
+  /// No description provided for @diveImport_healthkit_selectDateRangeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the date range to search for dives in Apple Health.'**
+  String get diveImport_healthkit_selectDateRangeBody;
+
+  /// No description provided for @diveImport_healthkit_fetchingDives.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching dives from Apple Health...'**
+  String get diveImport_healthkit_fetchingDives;
+
+  /// No description provided for @diveImport_healthkit_fetchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch Failed'**
+  String get diveImport_healthkit_fetchFailed;
+
+  /// Body text shown when reading dives from Apple Health throws.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to fetch dives: {error}'**
+  String diveImport_healthkit_fetchFailedBody(String error);
+
+  /// Result headline after fetching dives from Apple Health.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Found 1 dive} other{Found {count} dives}}'**
+  String diveImport_healthkit_foundDives(int count);
+
+  /// No description provided for @diveImport_healthkit_proceedingToReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Proceeding to review...'**
+  String get diveImport_healthkit_proceedingToReview;
+
+  /// No description provided for @importWizard_dc_knownComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'Known Computer'**
+  String get importWizard_dc_knownComputer;
+
+  /// Badge body shown when the connected dive computer is already saved in the library.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved as \"{name}\". Only new dives will be downloaded.'**
+  String importWizard_dc_knownComputerBody(String name);
+
+  /// No description provided for @importWizard_dc_noNewDives.
+  ///
+  /// In en, this message translates to:
+  /// **'No new dives to download'**
+  String get importWizard_dc_noNewDives;
+
+  /// No description provided for @importWizard_dc_noNewDivesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'All dives from this computer have already been imported.'**
+  String get importWizard_dc_noNewDivesBody;
+
+  /// No description provided for @universalImport_compare_noDiveData.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive data not available for comparison.'**
+  String get universalImport_compare_noDiveData;
+
+  /// No description provided for @universalImport_entityAction_consolidateBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'CONSOLIDATE'**
+  String get universalImport_entityAction_consolidateBadge;
+
+  /// No description provided for @diveCenters_import_quickSearch_egypt.
+  ///
+  /// In en, this message translates to:
+  /// **'Egypt'**
+  String get diveCenters_import_quickSearch_egypt;
+
+  /// No description provided for @diveCenters_import_quickSearch_mexico.
+  ///
+  /// In en, this message translates to:
+  /// **'Mexico'**
+  String get diveCenters_import_quickSearch_mexico;
+
+  /// No description provided for @accessibility_shortcut_switchDiver.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch diver'**
+  String get accessibility_shortcut_switchDiver;
+
+  /// No description provided for @lock_recoveryCode_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Use recovery code'**
+  String get lock_recoveryCode_title;
+
+  /// No description provided for @lock_recoveryCode_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 8-word recovery code you saved when you set up the app password.'**
+  String get lock_recoveryCode_body;
+
+  /// No description provided for @lock_recoveryCode_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect recovery code.'**
+  String get lock_recoveryCode_error;
+
+  /// No description provided for @lock_forcedReset_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a new password'**
+  String get lock_forcedReset_title;
+
+  /// No description provided for @lock_forcedReset_body.
+  ///
+  /// In en, this message translates to:
+  /// **'You unlocked with your recovery code, so your old password is no longer trusted. Choose a new one now.'**
+  String get lock_forcedReset_body;
+
+  /// No description provided for @lock_forcedReset_submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Set password'**
+  String get lock_forcedReset_submit;
+
+  /// No description provided for @lock_forcedReset_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not set the new password. Try again.'**
+  String get lock_forcedReset_error;
+
+  /// No description provided for @lock_sidecarRepair_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair security key file'**
+  String get lock_sidecarRepair_title;
+
+  /// No description provided for @lock_sidecarRepair_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Your security key file was missing and this device\'s keychain still holds the key. Confirm your password to write a new key file. Note: the password you enter here becomes the app password going forward, and you will receive a new recovery code.'**
+  String get lock_sidecarRepair_body;
+
+  /// No description provided for @lock_sidecarRepair_submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair'**
+  String get lock_sidecarRepair_submit;
+
+  /// No description provided for @lock_sidecarRepair_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair failed. Try again.'**
+  String get lock_sidecarRepair_error;
+
+  /// No description provided for @lock_newRecoveryCode_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Your new recovery code'**
+  String get lock_newRecoveryCode_title;
+
+  /// No description provided for @lock_startFresh_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a different database'**
+  String get lock_startFresh_title;
+
+  /// Body of the start-fresh confirmation dialog. {token} is the untranslated ASCII confirmation word the diver must type.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current database stays on disk, renamed with a .locked suffix; nothing is deleted. You can recover it later with your password or by contacting support. Cloud sync will be turned off so the new database cannot mix with the old one.\n\nThe app will start with a fresh, empty database. You can restore from a backup in the setup wizard.\n\nType {token} to confirm.'**
+  String lock_startFresh_body(Object token);
+
+  /// No description provided for @lock_startFresh_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Set aside and start fresh'**
+  String get lock_startFresh_confirm;
+
+  /// No description provided for @lock_biometric_reason.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock your dive log'**
+  String get lock_biometric_reason;
+
+  /// Splash progress line during a schema migration
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrading database... step {currentStep} of {totalSteps}'**
+  String startup_migrating_progress(Object currentStep, Object totalSteps);
+
+  /// No description provided for @startup_error_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Database upgrade failed'**
+  String get startup_error_title;
+
+  /// No description provided for @startup_error_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Try restarting the app. If this persists, contact support. Your data is still on disk and does not require a reinstall.'**
+  String get startup_error_body;
+
+  /// No description provided for @startup_recovering_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovering database...'**
+  String get startup_recovering_title;
+
+  /// No description provided for @startup_recovering_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Rolling back the interrupted transaction. This usually takes a few seconds.'**
+  String get startup_recovering_body;
+
+  /// No description provided for @startup_recoveryFailed_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery did not complete'**
+  String get startup_recoveryFailed_title;
+
+  /// No description provided for @startup_recoveryFailed_body.
+  ///
+  /// In en, this message translates to:
+  /// **'The database could not be rolled back automatically. Your data is still on disk; contact support before reinstalling so we can help you recover it.'**
+  String get startup_recoveryFailed_body;
+
+  /// No description provided for @startup_recoveryRequired_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Database needs recovery'**
+  String get startup_recoveryRequired_title;
+
+  /// No description provided for @startup_recoveryRequired_body.
+  ///
+  /// In en, this message translates to:
+  /// **'A previous session was interrupted while writing to the database. Your data is still on disk; we just need to finish rolling back the cancelled change before the app can open.'**
+  String get startup_recoveryRequired_body;
+
+  /// Diagnostic line under the recovery screen. Object, not int, so the raw SQLite extended result code is never group-separated.
+  ///
+  /// In en, this message translates to:
+  /// **'SQLite code {code}'**
+  String startup_recovery_sqliteCode(Object code);
+
+  /// No description provided for @startup_recovery_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover database'**
+  String get startup_recovery_action;
+
+  /// No description provided for @startup_recovery_closeWithoutRecovering.
+  ///
+  /// In en, this message translates to:
+  /// **'Close without recovering'**
+  String get startup_recovery_closeWithoutRecovering;
+
+  /// No description provided for @common_action_tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get common_action_tryAgain;
+
+  /// No description provided for @lock_screen_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion is locked'**
+  String get lock_screen_title;
+
+  /// No description provided for @lock_screen_forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get lock_screen_forgotPassword;
+
+  /// No description provided for @lock_incorrectPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password. Try again.'**
+  String get lock_incorrectPassword;
+
+  /// No description provided for @startup_backup_semanticsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Backing up'**
+  String get startup_backup_semanticsLabel;
+
+  /// No description provided for @startup_backup_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Backing up your data'**
+  String get startup_backup_title;
+
+  /// No description provided for @startup_backup_body.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re saving a copy of your dive log before updating your database.'**
+  String get startup_backup_body;
+
+  /// No description provided for @startup_backupFailed_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t back up your data'**
+  String get startup_backupFailed_title;
+
+  /// No description provided for @startup_backupFailed_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Your dive log hasn\'t changed, so we didn\'t update it. Free up space (or fix the issue) and try again.'**
+  String get startup_backupFailed_body;
+
+  /// No description provided for @startup_backupFailed_quit.
+  ///
+  /// In en, this message translates to:
+  /// **'Quit'**
+  String get startup_backupFailed_quit;
+
+  /// No description provided for @startup_backupFailed_technicalDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical details'**
+  String get startup_backupFailed_technicalDetails;
+
+  /// No description provided for @common_action_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get common_action_retry;
+
+  /// No description provided for @startup_versionMismatch_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Required'**
+  String get startup_versionMismatch_title;
+
+  /// Explains a database written by a newer app build. Object, not int, so schema numbers are never group-separated.
+  ///
+  /// In en, this message translates to:
+  /// **'Your dive data was saved by a newer version of Submersion (schema v{databaseVersion}). This version only supports up to schema v{appVersion}.'**
+  String startup_versionMismatch_body(
+    Object databaseVersion,
+    Object appVersion,
+  );
+
+  /// No description provided for @startup_versionMismatch_instructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Please update Submersion to the latest version. Your data is safe and has not been modified. If a backup was taken before the upgrade, it is in your Backups folder and can be restored after updating.'**
+  String get startup_versionMismatch_instructions;
+
+  /// No description provided for @startup_versionMismatch_download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Latest Version'**
+  String get startup_versionMismatch_download;
+
+  /// No description provided for @startup_versionMismatch_manualLink.
+  ///
+  /// In en, this message translates to:
+  /// **'If that does not open a browser, visit:'**
+  String get startup_versionMismatch_manualLink;
+
+  /// No description provided for @universalImport_compare_downloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded'**
+  String get universalImport_compare_downloaded;
+
+  /// No description provided for @universalImport_compare_errorLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading dive data'**
+  String get universalImport_compare_errorLoading;
+
+  /// No description provided for @universalImport_compare_diveNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing dive not found'**
+  String get universalImport_compare_diveNotFound;
+
+  /// Summary line listing the fields that match between the existing and incoming dive.
+  ///
+  /// In en, this message translates to:
+  /// **'Same: {fields}'**
+  String universalImport_compare_sameFields(Object fields);
+
+  /// No description provided for @universalImport_compare_differences.
+  ///
+  /// In en, this message translates to:
+  /// **'DIFFERENCES'**
+  String get universalImport_compare_differences;
+
+  /// No description provided for @universalImport_compare_notRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'not recorded'**
+  String get universalImport_compare_notRecorded;
+
+  /// Dive computer serial number in a compact label
+  ///
+  /// In en, this message translates to:
+  /// **'S/N: {serial}'**
+  String universalImport_compare_serial(Object serial);
+
+  /// No description provided for @universalImport_compare_skipSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this download'**
+  String get universalImport_compare_skipSubtitle;
+
+  /// No description provided for @universalImport_compare_importAsNewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as separate dive'**
+  String get universalImport_compare_importAsNewSubtitle;
+
+  /// No description provided for @universalImport_compare_consolidateSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add as 2nd computer reading'**
+  String get universalImport_compare_consolidateSubtitle;
+
+  /// Profile readout NDL value when the no-decompression limit is longer than the chart tracks (over one hour). NDL is a diving acronym and is not translated.
+  ///
+  /// In en, this message translates to:
+  /// **'>60 min'**
+  String get diveLog_tooltip_ndlOverMax;
+
+  /// Profile readout value carried over from the first sample rather than measured at the surface lead-in.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} (interpolated)'**
+  String diveLog_tooltip_interpolated(String value);
+
+  /// Short form of the ascent-rate metric, shown on the chart axis.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate'**
+  String get enum_profileMetric_ascentRate_short;
+
+  /// Short form of the CNS metric, shown on the chart axis. Not translated.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS'**
+  String get enum_profileMetric_cns_short;
+
+  /// Short form of the OTU metric, shown on the chart axis. Not translated.
+  ///
+  /// In en, this message translates to:
+  /// **'OTU'**
+  String get enum_profileMetric_otu_short;
+
+  /// No description provided for @diveLog_profileEditor_rangeOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Range Operations'**
+  String get diveLog_profileEditor_rangeOperations;
+
+  /// No description provided for @diveLog_profileEditor_selectRangeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a range on the chart to enable operations'**
+  String get diveLog_profileEditor_selectRangeHint;
+
+  /// Profile editor button: shift the selected segment 1 metre shallower. The shift is always exactly one metre because dive profiles are stored in metres, so keep the metric unit in the translation.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth +1m'**
+  String get diveLog_profileEditor_depthPlusOneMeter;
+
+  /// Profile editor button: shift the selected segment 1 metre deeper. The shift is always exactly one metre, so keep the metric unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth -1m'**
+  String get diveLog_profileEditor_depthMinusOneMeter;
+
+  /// No description provided for @diveLog_profileEditor_timePlusFiveSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Time +5s'**
+  String get diveLog_profileEditor_timePlusFiveSeconds;
+
+  /// No description provided for @diveLog_profileEditor_timeMinusFiveSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Time -5s'**
+  String get diveLog_profileEditor_timeMinusFiveSeconds;
+
+  /// No description provided for @diveLog_profileEditor_smoothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Smoothing'**
+  String get diveLog_profileEditor_smoothing;
+
+  /// Profile editor smoothing strength: the weakest setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get diveLog_profileEditor_smoothLight;
+
+  /// Profile editor smoothing strength: the middle setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get diveLog_profileEditor_smoothMedium;
+
+  /// Profile editor smoothing strength: the strongest setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy'**
+  String get diveLog_profileEditor_smoothHeavy;
+
+  /// No description provided for @diveLog_profileEditor_applyToAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply to All'**
+  String get diveLog_profileEditor_applyToAll;
+
+  /// No description provided for @diveLog_profileEditor_applyToSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply to Selection'**
+  String get diveLog_profileEditor_applyToSelection;
+
+  /// No description provided for @diveLog_profileEditor_outlierDetection.
+  ///
+  /// In en, this message translates to:
+  /// **'Outlier Detection'**
+  String get diveLog_profileEditor_outlierDetection;
+
+  /// No description provided for @diveLog_profileEditor_detect.
+  ///
+  /// In en, this message translates to:
+  /// **'Detect'**
+  String get diveLog_profileEditor_detect;
+
+  /// No description provided for @diveLog_profileEditor_removeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove All'**
+  String get diveLog_profileEditor_removeAll;
+
+  /// Number of suspect depth samples the profile editor found.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 potential outlier detected} other{{count} potential outliers detected}}'**
+  String diveLog_profileEditor_outliersDetected(int count);
+
+  /// No description provided for @diveLog_profileEditor_manualDrawing.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Drawing'**
+  String get diveLog_profileEditor_manualDrawing;
+
+  /// No description provided for @diveLog_profileEditor_drawHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap on the chart to place waypoints'**
+  String get diveLog_profileEditor_drawHint;
+
+  /// Profile editor button: remove every drawn waypoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get diveLog_profileEditor_clearWaypoints;
+
+  /// No description provided for @diveLog_profileEditor_generateProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Profile'**
+  String get diveLog_profileEditor_generateProfile;
+
+  /// No description provided for @diveLog_profileEditor_trimMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Trim Mode'**
+  String get diveLog_profileEditor_trimMode;
+
+  /// No description provided for @diveLog_profileEditor_trimHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Trim profile endpoints'**
+  String get diveLog_profileEditor_trimHint;
+
+  /// No description provided for @diveLog_profileEditor_trimEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Trim End'**
+  String get diveLog_profileEditor_trimEnd;
+
+  /// Profile editor mode and range action: smooth the depth curve.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth'**
+  String get diveLog_profileEditor_mode_smooth;
+
+  /// No description provided for @diveLog_profileEditor_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get diveLog_profileEditor_title;
+
+  /// No description provided for @diveLog_profileEditor_discardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You have unsaved changes to this dive profile. Are you sure you want to discard them?'**
+  String get diveLog_profileEditor_discardBody;
+
+  /// No description provided for @diveLog_profileEditor_saveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save profile?'**
+  String get diveLog_profileEditor_saveTitle;
+
+  /// No description provided for @diveLog_profileEditor_saveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will save the edited profile as the primary profile for this dive. The original profile will be preserved and can be restored later.'**
+  String get diveLog_profileEditor_saveBody;
+
+  /// Snackbar shown when saving an edited dive profile fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save profile: {error}'**
+  String diveLog_profileEditor_saveFailed(String error);
+
+  /// Shown when the dive being edited cannot be loaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading dive: {error}'**
+  String diveLog_profileEditor_errorLoadingDive(String error);
+
+  /// No description provided for @diveLog_profileEditor_noProfileData.
+  ///
+  /// In en, this message translates to:
+  /// **'No profile data available'**
+  String get diveLog_profileEditor_noProfileData;
+
+  /// Tooltip for the profile editor's undo button.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get diveLog_profileEditor_undo;
+
+  /// Profile editor mode: select a range of the depth curve.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get diveLog_profileEditor_mode_select;
+
+  /// Profile editor mode: find and remove suspect depth samples.
+  ///
+  /// In en, this message translates to:
+  /// **'Outlier'**
+  String get diveLog_profileEditor_mode_outlier;
+
+  /// Profile editor mode: draw the depth curve by placing waypoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw'**
+  String get diveLog_profileEditor_mode_draw;
+
+  /// Profile editor mode: trim samples off the ends of the profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Trim'**
+  String get diveLog_profileEditor_mode_trim;
+
+  /// Header of the dive-detail section listing where a dive's data came from (dive computers, imported files, manual entry).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Data Source} =1{Data Source} other{Data Sources}}'**
+  String diveLog_sources_sectionTitle(int count);
+
+  /// Badge on a dive whose data was typed in rather than downloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get diveLog_sources_badge_manual;
+
+  /// Badge on the data source currently being previewed on the chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewing'**
+  String get diveLog_sources_badge_viewing;
+
+  /// Badge on a data source that is not the dive's primary source.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary'**
+  String get diveLog_sources_badge_secondary;
+
+  /// When a manually entered dive record was created.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {date}'**
+  String diveLog_sources_created(String date);
+
+  /// Serial number of the dive computer a dive was downloaded from.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial'**
+  String get diveLog_sources_detail_serial;
+
+  /// File format a dive was imported from, e.g. UDDF or DL7.
+  ///
+  /// In en, this message translates to:
+  /// **'Format'**
+  String get diveLog_sources_detail_format;
+
+  /// Date a dive's data was imported into the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported'**
+  String get diveLog_sources_detail_imported;
+
+  /// Screen-reader label for the row that opens a linked dive computer.
+  ///
+  /// In en, this message translates to:
+  /// **'View dive computer {name}'**
+  String diveLog_detail_semantics_viewDiveComputer(String name);
+
+  /// Screen-reader label for the row that opens the dive's trip.
+  ///
+  /// In en, this message translates to:
+  /// **'View trip {name}'**
+  String diveLog_detail_semantics_viewTrip(String name);
+
+  /// Screen-reader label for the row that opens the dive's dive center.
+  ///
+  /// In en, this message translates to:
+  /// **'View dive center {name}'**
+  String diveLog_detail_semantics_viewDiveCenter(String name);
+
+  /// Screen-reader label for a marine life sighting that opens the species page. Uses the same localized species name shown on screen.
+  ///
+  /// In en, this message translates to:
+  /// **'View species {name}'**
+  String diveLog_detail_semantics_viewSpecies(String name);
+
+  /// Screen-reader label for the chip that opens the dive's course.
+  ///
+  /// In en, this message translates to:
+  /// **'View course {name}'**
+  String diveLog_detail_semantics_viewCourse(String name);
+
+  /// Serial number of the dive computer, shown under its name.
+  ///
+  /// In en, this message translates to:
+  /// **'S/N {serial}'**
+  String diveLog_detail_serialNumber(String serial);
+
+  /// Shown when the instructor signature attached to a dive fails to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading signature: {error}'**
+  String diveLog_detail_errorLoadingSignature(String error);
+
+  /// Placeholder in the profile panel when no dive is highlighted.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a dive to view its profile'**
+  String get diveLog_profilePanel_selectDive;
+
+  /// Placeholder in the profile panel when the highlighted dive has no depth samples.
+  ///
+  /// In en, this message translates to:
+  /// **'No profile data for this dive'**
+  String get diveLog_profilePanel_noProfileData;
+
+  /// No description provided for @settings_export_progress_divesCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting dives to CSV...'**
+  String get settings_export_progress_divesCsv;
+
+  /// No description provided for @settings_export_progress_sitesCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting sites to CSV...'**
+  String get settings_export_progress_sitesCsv;
+
+  /// No description provided for @settings_export_progress_equipmentCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting equipment to CSV...'**
+  String get settings_export_progress_equipmentCsv;
+
+  /// No description provided for @settings_export_progress_pdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating PDF logbook...'**
+  String get settings_export_progress_pdf;
+
+  /// No description provided for @settings_export_progress_loadingSignatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading signatures...'**
+  String get settings_export_progress_loadingSignatures;
+
+  /// No description provided for @settings_export_progress_loadingCertifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading certifications...'**
+  String get settings_export_progress_loadingCertifications;
+
+  /// No description provided for @settings_export_progress_loadingFonts.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading fonts...'**
+  String get settings_export_progress_loadingFonts;
+
+  /// No description provided for @settings_export_progress_templatePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating {template} PDF...'**
+  String settings_export_progress_templatePdf(String template);
+
+  /// No description provided for @settings_export_progress_uddf.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating UDDF file...'**
+  String get settings_export_progress_uddf;
+
+  /// No description provided for @settings_export_progress_collectingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Collecting all data...'**
+  String get settings_export_progress_collectingData;
+
+  /// No description provided for @settings_export_progress_excel.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating Excel file...'**
+  String get settings_export_progress_excel;
+
+  /// No description provided for @settings_export_progress_buildingExcel.
+  ///
+  /// In en, this message translates to:
+  /// **'Building Excel workbook...'**
+  String get settings_export_progress_buildingExcel;
+
+  /// No description provided for @settings_export_progress_kml.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating KML file...'**
+  String get settings_export_progress_kml;
+
+  /// No description provided for @settings_export_progress_buildingKml.
+  ///
+  /// In en, this message translates to:
+  /// **'Building KML file...'**
+  String get settings_export_progress_buildingKml;
+
+  /// No description provided for @settings_export_progress_preparingExcel.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing Excel file...'**
+  String get settings_export_progress_preparingExcel;
+
+  /// No description provided for @settings_export_progress_preparingKml.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing KML file...'**
+  String get settings_export_progress_preparingKml;
+
+  /// No description provided for @settings_export_progress_chooseLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose save location...'**
+  String get settings_export_progress_chooseLocation;
+
+  /// No description provided for @settings_export_progress_preparingDivesCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing dives CSV...'**
+  String get settings_export_progress_preparingDivesCsv;
+
+  /// No description provided for @settings_export_progress_preparingSitesCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing sites CSV...'**
+  String get settings_export_progress_preparingSitesCsv;
+
+  /// No description provided for @settings_export_progress_preparingEquipmentCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing equipment CSV...'**
+  String get settings_export_progress_preparingEquipmentCsv;
+
+  /// No description provided for @settings_export_progress_preparingUddf.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing UDDF file...'**
+  String get settings_export_progress_preparingUddf;
+
+  /// No description provided for @settings_export_progress_preparingPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing PDF...'**
+  String get settings_export_progress_preparingPdf;
+
+  /// No description provided for @settings_export_progress_selectingBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Selecting backup file...'**
+  String get settings_export_progress_selectingBackup;
+
+  /// No description provided for @settings_export_progress_restoringBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring from backup...'**
+  String get settings_export_progress_restoringBackup;
+
+  /// No description provided for @settings_export_empty_dives.
+  ///
+  /// In en, this message translates to:
+  /// **'No dives to export'**
+  String get settings_export_empty_dives;
+
+  /// No description provided for @settings_export_empty_sites.
+  ///
+  /// In en, this message translates to:
+  /// **'No sites to export'**
+  String get settings_export_empty_sites;
+
+  /// No description provided for @settings_export_empty_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'No equipment to export'**
+  String get settings_export_empty_equipment;
+
+  /// No description provided for @settings_export_empty_data.
+  ///
+  /// In en, this message translates to:
+  /// **'No data to export'**
+  String get settings_export_empty_data;
+
+  /// No description provided for @settings_export_empty_diveSites.
+  ///
+  /// In en, this message translates to:
+  /// **'No dive sites to export'**
+  String get settings_export_empty_diveSites;
+
+  /// No description provided for @settings_export_saveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed: {error}'**
+  String settings_export_saveFailed(String error);
+
+  /// No description provided for @settings_export_backupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup failed: {error}'**
+  String settings_export_backupFailed(String error);
+
+  /// No description provided for @settings_export_restoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed: {error}'**
+  String settings_export_restoreFailed(String error);
+
+  /// No description provided for @settings_export_fileUnreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not access file'**
+  String get settings_export_fileUnreadable;
+
+  /// No description provided for @settings_export_notADbFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a .db backup file'**
+  String get settings_export_notADbFile;
+
+  /// No description provided for @settings_export_success_dives.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives exported successfully'**
+  String get settings_export_success_dives;
+
+  /// No description provided for @settings_export_success_sites.
+  ///
+  /// In en, this message translates to:
+  /// **'Sites exported successfully'**
+  String get settings_export_success_sites;
+
+  /// No description provided for @settings_export_success_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment exported successfully'**
+  String get settings_export_success_equipment;
+
+  /// No description provided for @settings_export_success_pdf.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF logbook generated successfully'**
+  String get settings_export_success_pdf;
+
+  /// No description provided for @settings_export_success_uddf.
+  ///
+  /// In en, this message translates to:
+  /// **'UDDF file generated successfully'**
+  String get settings_export_success_uddf;
+
+  /// No description provided for @settings_export_success_excel.
+  ///
+  /// In en, this message translates to:
+  /// **'Excel file exported successfully'**
+  String get settings_export_success_excel;
+
+  /// No description provided for @settings_export_success_kml.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{KML file exported successfully} =1{KML file exported successfully (1 site without coordinates skipped)} other{KML file exported successfully ({count} sites without coordinates skipped)}}'**
+  String settings_export_success_kml(int count);
+
+  /// No description provided for @settings_export_saved_excel.
+  ///
+  /// In en, this message translates to:
+  /// **'Excel file saved successfully'**
+  String get settings_export_saved_excel;
+
+  /// No description provided for @settings_export_saved_kml.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{KML file saved successfully} =1{KML file saved successfully (1 site without coordinates skipped)} other{KML file saved successfully ({count} sites without coordinates skipped)}}'**
+  String settings_export_saved_kml(int count);
+
+  /// No description provided for @settings_export_saved_divesCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives CSV saved successfully'**
+  String get settings_export_saved_divesCsv;
+
+  /// No description provided for @settings_export_saved_sitesCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Sites CSV saved successfully'**
+  String get settings_export_saved_sitesCsv;
+
+  /// No description provided for @settings_export_saved_equipmentCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment CSV saved successfully'**
+  String get settings_export_saved_equipmentCsv;
+
+  /// No description provided for @settings_export_saved_uddf.
+  ///
+  /// In en, this message translates to:
+  /// **'UDDF file saved successfully'**
+  String get settings_export_saved_uddf;
+
+  /// No description provided for @settings_export_saved_pdf.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF saved successfully'**
+  String get settings_export_saved_pdf;
+
+  /// No description provided for @settings_export_saved_backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup saved successfully'**
+  String get settings_export_saved_backup;
+
+  /// No description provided for @settings_export_restoreComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore complete'**
+  String get settings_export_restoreComplete;
+
+  /// No description provided for @settings_export_cancelled_save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save cancelled'**
+  String get settings_export_cancelled_save;
+
+  /// No description provided for @settings_export_cancelled_backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup cancelled'**
+  String get settings_export_cancelled_backup;
+
+  /// No description provided for @settings_export_cancelled_restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore cancelled'**
+  String get settings_export_cancelled_restore;
+
+  /// No description provided for @settings_export_pdfDocumentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Logbook'**
+  String get settings_export_pdfDocumentTitle;
+
+  /// No description provided for @settings_export_saveBackupDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Backup'**
+  String get settings_export_saveBackupDialogTitle;
+
+  /// No description provided for @backup_operation_created.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup created: {size}'**
+  String backup_operation_created(String size);
+
+  /// No description provided for @backup_operation_backupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup failed: {error}'**
+  String backup_operation_backupFailed(String error);
+
+  /// No description provided for @backup_operation_restoring.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring backup...'**
+  String get backup_operation_restoring;
+
+  /// No description provided for @backup_operation_restoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed: {error}'**
+  String backup_operation_restoreFailed(String error);
+
+  /// No description provided for @backup_operation_deleting.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting backup...'**
+  String get backup_operation_deleting;
+
+  /// No description provided for @backup_operation_deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup deleted'**
+  String get backup_operation_deleted;
+
+  /// No description provided for @backup_operation_deleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete failed: {error}'**
+  String backup_operation_deleteFailed(String error);
+
+  /// No description provided for @backup_operation_exporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting backup...'**
+  String get backup_operation_exporting;
+
+  /// No description provided for @backup_operation_exported.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup exported: {size}'**
+  String backup_operation_exported(String size);
+
+  /// No description provided for @backup_operation_exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String backup_operation_exportFailed(String error);
+
+  /// No description provided for @backup_operation_preparingShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing backup for sharing...'**
+  String get backup_operation_preparingShare;
+
+  /// No description provided for @backup_operation_shareReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup ready for sharing'**
+  String get backup_operation_shareReady;
+
+  /// No description provided for @backup_operation_upgrading.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrading database (step {step} of {total})...'**
+  String backup_operation_upgrading(int step, int total);
+
+  /// No description provided for @backup_restore_dialog_counts.
+  ///
+  /// In en, this message translates to:
+  /// **'{diveCount, plural, =1{1 dive} other{{diveCount} dives}}, {siteCount, plural, =1{1 site} other{{siteCount} sites}}'**
+  String backup_restore_dialog_counts(int diveCount, int siteCount);
+
+  /// No description provided for @backup_restore_preMigration_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore pre-migration backup'**
+  String get backup_restore_preMigration_title;
+
+  /// No description provided for @backup_restore_preMigration_unknownVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'unknown version'**
+  String get backup_restore_preMigration_unknownVersion;
+
+  /// No description provided for @backup_restore_preMigration_restoreAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore anyway'**
+  String get backup_restore_preMigration_restoreAnyway;
+
+  /// No description provided for @backup_restore_preMigration_incompleteMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup was made on {timestamp} by app {appVersion}, but its database migration metadata is incomplete.\n\nThe app cannot verify whether restoring this backup is safe, so restore is disabled.'**
+  String backup_restore_preMigration_incompleteMetadata(
+    String timestamp,
+    String appVersion,
+  );
+
+  /// No description provided for @backup_restore_preMigration_newerApp.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup is newer than your app. Install a newer app version to restore it.\n\nBackup made on {timestamp} by app {appVersion} (database v{fromVersion}).'**
+  String backup_restore_preMigration_newerApp(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+  );
+
+  /// No description provided for @backup_restore_preMigration_safe.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup was made on {timestamp} by app {appVersion}, just before upgrading the database from v{fromVersion} to v{toVersion}.\n\nYour app\'s database schema matches this backup, so restore is safe.'**
+  String backup_restore_preMigration_safe(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+    int toVersion,
+  );
+
+  /// No description provided for @backup_restore_preMigration_warning.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup was made on {timestamp} by app {appVersion}, just before upgrading the database from v{fromVersion} to v{toVersion}.\n\nYou are running a newer app (database v{currentVersion}).\n\nRestoring now will re-run the v{fromVersion} to v{toVersion} database upgrade on your restored data, the same upgrade that was about to run originally. If that upgrade caused the problem, you will hit the same issue again.\n\nTo restore safely: install app {appVersion} or earlier, then restore this backup from that older app.'**
+  String backup_restore_preMigration_warning(
+    String timestamp,
+    String appVersion,
+    int fromVersion,
+    int toVersion,
+    int currentVersion,
+  );
+
+  /// No description provided for @settings_cloudSync_progress_preparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing sync...'**
+  String get settings_cloudSync_progress_preparing;
+
+  /// No description provided for @settings_cloudSync_progress_pulling.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulling changes...'**
+  String get settings_cloudSync_progress_pulling;
+
+  /// No description provided for @settings_cloudSync_progress_publishing.
+  ///
+  /// In en, this message translates to:
+  /// **'Publishing changes...'**
+  String get settings_cloudSync_progress_publishing;
+
+  /// No description provided for @settings_cloudSync_progress_uploadingLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading library ({uploaded} of {total})'**
+  String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total);
+
+  /// No description provided for @settings_cloudSync_result_noProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'No cloud provider configured'**
+  String get settings_cloudSync_result_noProvider;
+
+  /// No description provided for @settings_cloudSync_result_notAuthenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'Not authenticated with cloud provider'**
+  String get settings_cloudSync_result_notAuthenticated;
+
+  /// No description provided for @settings_cloudSync_result_timedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync timed out'**
+  String get settings_cloudSync_result_timedOut;
+
+  /// No description provided for @settings_cloudSync_result_epochMarkerUnreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read the library epoch marker'**
+  String get settings_cloudSync_result_epochMarkerUnreadable;
+
+  /// No description provided for @settings_cloudSync_result_epochMarkerEncrypted.
+  ///
+  /// In en, this message translates to:
+  /// **'The library epoch marker is encrypted'**
+  String get settings_cloudSync_result_epochMarkerEncrypted;
+
+  /// No description provided for @settings_cloudSync_result_libraryReplacedRemotely.
+  ///
+  /// In en, this message translates to:
+  /// **'The cloud library was replaced from a backup'**
+  String get settings_cloudSync_result_libraryReplacedRemotely;
+
+  /// No description provided for @settings_cloudSync_result_noReplacementToRebuild.
+  ///
+  /// In en, this message translates to:
+  /// **'No library replacement to rebuild from'**
+  String get settings_cloudSync_result_noReplacementToRebuild;
+
+  /// No description provided for @settings_cloudSync_result_rebuiltFromThisDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebuilt this backend from this device’s library'**
+  String get settings_cloudSync_result_rebuiltFromThisDevice;
+
+  /// No description provided for @settings_cloudSync_result_rebuildFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebuild failed: {error}'**
+  String settings_cloudSync_result_rebuildFailed(String error);
+
+  /// No description provided for @settings_cloudSync_result_libraryReplaced.
+  ///
+  /// In en, this message translates to:
+  /// **'Library replaced'**
+  String get settings_cloudSync_result_libraryReplaced;
+
+  /// No description provided for @settings_cloudSync_result_libraryReplaceFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Library replace failed: {error}'**
+  String settings_cloudSync_result_libraryReplaceFailed(String error);
+
+  /// No description provided for @settings_cloudSync_result_noReplacementMarker.
+  ///
+  /// In en, this message translates to:
+  /// **'No library replacement marker found'**
+  String get settings_cloudSync_result_noReplacementMarker;
+
+  /// No description provided for @settings_cloudSync_result_adoptedRestoredLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Adopted the restored library'**
+  String get settings_cloudSync_result_adoptedRestoredLibrary;
+
+  /// No description provided for @settings_cloudSync_result_adoptFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to adopt the restored library: {error}'**
+  String settings_cloudSync_result_adoptFailed(String error);
+
+  /// No description provided for @settings_cloudSync_result_previousLibraryUnreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'The previous library could not be read; re-established this backend from this device\'s library.'**
+  String get settings_cloudSync_result_previousLibraryUnreadable;
+
+  /// No description provided for @settings_cloudSync_result_replacementStillUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'The replaced library is still uploading. Try again shortly.'**
+  String get settings_cloudSync_result_replacementStillUploading;
+
+  /// No description provided for @settings_cloudSync_result_recordsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 record failed to apply} other{{count} records failed to apply}}'**
+  String settings_cloudSync_result_recordsFailed(int count);
+
+  /// No description provided for @settings_cloudSync_result_adoptedFreshIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Another device was syncing with this device\'s identity. This device adopted a new identity and merged the cloud data.'**
+  String get settings_cloudSync_result_adoptedFreshIdentity;
+
+  /// No description provided for @settings_cloudSync_launchCheck_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'{provider} is not available on this device'**
+  String settings_cloudSync_launchCheck_unavailable(String provider);
+
+  /// No description provided for @settings_cloudSync_launchCheck_notSignedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Not signed in to {provider}'**
+  String settings_cloudSync_launchCheck_notSignedIn(String provider);
+
+  /// No description provided for @settings_cloudSync_launchCheck_localChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 local change to upload} other{{count} local changes to upload}}'**
+  String settings_cloudSync_launchCheck_localChanges(int count);
+
+  /// No description provided for @settings_cloudSync_launchCheck_noRemoteData.
+  ///
+  /// In en, this message translates to:
+  /// **'No sync data found in cloud'**
+  String get settings_cloudSync_launchCheck_noRemoteData;
+
+  /// No description provided for @settings_cloudSync_launchCheck_cloudDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud data available'**
+  String get settings_cloudSync_launchCheck_cloudDataAvailable;
+
+  /// No description provided for @settings_cloudSync_launchCheck_updatesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates available from cloud'**
+  String get settings_cloudSync_launchCheck_updatesAvailable;
+
+  /// No description provided for @settings_cloudSync_launchCheck_upToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is up to date'**
+  String get settings_cloudSync_launchCheck_upToDate;
+
+  /// No description provided for @settings_cloudSync_launchCheck_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync check failed: {error}'**
+  String settings_cloudSync_launchCheck_failed(String error);
 }
 
 class _AppLocalizationsDelegate

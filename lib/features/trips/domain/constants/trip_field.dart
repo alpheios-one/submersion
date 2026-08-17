@@ -4,6 +4,7 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/constants/entity_field.dart';
 
 /// Enumeration of every displayable field for the trip table view.
@@ -57,6 +58,40 @@ enum TripField implements EntityField {
     TripField.maxDepth => 'Max D',
     TripField.avgDepth => 'Avg D',
     TripField.notes => 'Notes',
+  };
+
+  @override
+  String localizedDisplayName(AppLocalizations l10n) => switch (this) {
+    TripField.tripName => l10n.enum_tripField_tripName,
+    TripField.startDate => l10n.enum_tripField_startDate,
+    TripField.endDate => l10n.enum_tripField_endDate,
+    TripField.durationDays => l10n.enum_tripField_durationDays,
+    TripField.location => l10n.enum_tripField_location,
+    TripField.tripType => l10n.enum_tripField_tripType,
+    TripField.resortName => l10n.enum_tripField_resortName,
+    TripField.liveaboardName => l10n.enum_tripField_liveaboardName,
+    TripField.diveCount => l10n.enum_tripField_diveCount,
+    TripField.totalRuntime => l10n.enum_tripField_totalRuntime,
+    TripField.maxDepth => l10n.enum_tripField_maxDepth,
+    TripField.avgDepth => l10n.enum_tripField_avgDepth,
+    TripField.notes => l10n.enum_tripField_notes,
+  };
+
+  @override
+  String localizedShortLabel(AppLocalizations l10n) => switch (this) {
+    TripField.tripName => l10n.enum_tripField_tripName_short,
+    TripField.startDate => l10n.enum_tripField_startDate_short,
+    TripField.endDate => l10n.enum_tripField_endDate_short,
+    TripField.durationDays => l10n.enum_tripField_durationDays_short,
+    TripField.location => l10n.enum_tripField_location_short,
+    TripField.tripType => l10n.enum_tripField_tripType_short,
+    TripField.resortName => l10n.enum_tripField_resortName_short,
+    TripField.liveaboardName => l10n.enum_tripField_liveaboardName_short,
+    TripField.diveCount => l10n.enum_tripField_diveCount_short,
+    TripField.totalRuntime => l10n.enum_tripField_totalRuntime_short,
+    TripField.maxDepth => l10n.enum_tripField_maxDepth_short,
+    TripField.avgDepth => l10n.enum_tripField_avgDepth_short,
+    TripField.notes => l10n.enum_tripField_notes_short,
   };
 
   @override

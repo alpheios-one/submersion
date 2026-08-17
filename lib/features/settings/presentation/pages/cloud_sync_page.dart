@@ -183,7 +183,7 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
           OutlinedButton.icon(
             onPressed: () => context.push('/settings/storage'),
             icon: const Icon(Icons.settings),
-            label: const Text('Storage Settings'),
+            label: Text(context.l10n.settings_cloudSync_storageSettings),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.orange.shade800,
               side: BorderSide(color: Colors.orange.shade800),
@@ -421,8 +421,9 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
                     syncState.progress != null) ...[
                   const SizedBox(height: 16),
                   Semantics(
-                    label:
-                        'Sync progress: ${(syncState.progress! * 100).toStringAsFixed(0)} percent',
+                    label: l10n.settings_cloudSync_syncProgressPercent(
+                      (syncState.progress! * 100).toStringAsFixed(0),
+                    ),
                     child: LinearProgressIndicator(value: syncState.progress),
                   ),
                 ],
@@ -511,7 +512,7 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
-            'Cloud Provider',
+            l10n.settings_cloudSync_header_cloudProvider,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: Theme.of(context).colorScheme.primary,
             ),
@@ -521,8 +522,8 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
           context,
           ref,
           provider: CloudProviderType.icloud,
-          title: 'iCloud',
-          subtitle: 'Sync via Apple iCloud',
+          title: l10n.settings_cloudSync_provider_icloud,
+          subtitle: l10n.settings_cloudSync_provider_icloud_subtitle,
           icon: Icons.cloud,
           isSelected: selectedProvider == CloudProviderType.icloud,
           isAvailable: isApple && !iCloudUnsupported,
@@ -563,10 +564,10 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
                     l10n.settings_cloudSync_provider_notAvailable),
         ),
         trailing: isSelected
-            ? const Icon(
+            ? Icon(
                 Icons.check_circle,
                 color: Colors.green,
-                semanticLabel: 'Connected',
+                semanticLabel: l10n.settings_cloudSync_provider_connected,
               )
             : null,
         enabled: isAvailable,
@@ -640,10 +641,10 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isSelected)
-              const Icon(
+              Icon(
                 Icons.check_circle,
                 color: Colors.green,
-                semanticLabel: 'Connected',
+                semanticLabel: l10n.settings_cloudSync_provider_connected,
               ),
             IconButton(
               icon: const Icon(Icons.settings_outlined),
@@ -687,10 +688,10 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isSelected)
-              const Icon(
+              Icon(
                 Icons.check_circle,
                 color: Colors.green,
-                semanticLabel: 'Connected',
+                semanticLabel: l10n.settings_cloudSync_provider_connected,
               ),
             if (isConnected)
               IconButton(
@@ -842,7 +843,9 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
     if (cloudProvider == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to initialize ${provider.name} provider'),
+          content: Text(
+            context.l10n.settings_cloudSync_provider_initFailed(provider.name),
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -856,7 +859,11 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Connected to ${cloudProvider.providerName}'),
+            content: Text(
+              context.l10n.settings_cloudSync_provider_connectedTo(
+                cloudProvider.providerName,
+              ),
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -1210,13 +1217,17 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
                     ),
                   )
                 : const Icon(Icons.sync),
-            label: Text(isSyncing ? 'Syncing...' : 'Sync Now'),
+            label: Text(
+              isSyncing
+                  ? context.l10n.settings_cloudSync_status_syncing
+                  : context.l10n.settings_cloudSync_syncNow,
+            ),
           ),
           if (!hasProvider)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text(
-                'Select a cloud provider to enable sync',
+                context.l10n.settings_cloudSync_selectProviderHint,
                 style: Theme.of(context).textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
@@ -1345,15 +1356,15 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
-            'Sync Behavior',
+            context.l10n.settings_cloudSync_header_syncBehavior,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
         SwitchListTile(
-          title: const Text('Auto Sync'),
-          subtitle: const Text('Sync automatically after changes'),
+          title: Text(context.l10n.settings_cloudSync_autoSync),
+          subtitle: Text(context.l10n.settings_cloudSync_autoSync_subtitle),
           value: settings.autoSyncEnabled,
           onChanged: disabled
               ? null
@@ -1362,8 +1373,8 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
                     .setAutoSyncEnabled(value),
         ),
         SwitchListTile(
-          title: const Text('Sync on Launch'),
-          subtitle: const Text('Check for updates at startup'),
+          title: Text(context.l10n.settings_cloudSync_syncOnLaunch),
+          subtitle: Text(context.l10n.settings_cloudSync_syncOnLaunch_subtitle),
           value: settings.syncOnLaunch,
           onChanged: disabled
               ? null
@@ -1372,8 +1383,8 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
                     .setSyncOnLaunch(value),
         ),
         SwitchListTile(
-          title: const Text('Sync on Resume'),
-          subtitle: const Text('Check for updates when app becomes active'),
+          title: Text(context.l10n.settings_cloudSync_syncOnResume),
+          subtitle: Text(context.l10n.settings_cloudSync_syncOnResume_subtitle),
           value: settings.syncOnResume,
           onChanged: disabled
               ? null
@@ -1400,7 +1411,9 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
               const Icon(Icons.warning, color: Colors.orange, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Conflicts (${syncState.conflicts})',
+                context.l10n.settings_cloudSync_header_conflicts(
+                  syncState.conflicts,
+                ),
                 style: Theme.of(
                   context,
                 ).textTheme.titleSmall?.copyWith(color: Colors.orange),
@@ -1410,9 +1423,9 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
         ),
         ListTile(
           leading: const Icon(Icons.merge_type),
-          title: const Text('Resolve Conflicts'),
+          title: Text(context.l10n.settings_cloudSync_resolveConflicts),
           subtitle: Text(
-            '${syncState.conflicts} item${syncState.conflicts == 1 ? '' : 's'} need${syncState.conflicts == 1 ? 's' : ''} attention',
+            context.l10n.settings_cloudSync_conflictItems(syncState.conflicts),
           ),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => _showConflictResolution(context, ref),
@@ -1449,7 +1462,7 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
-            'Advanced',
+            context.l10n.settings_cloudSync_header_advanced,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: Theme.of(context).colorScheme.primary,
             ),
@@ -1457,8 +1470,10 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
         ),
         ListTile(
           leading: const Icon(Icons.build),
-          title: const Text('Troubleshoot Sync'),
-          subtitle: const Text('Fix a stuck sync or free cloud space'),
+          title: Text(context.l10n.settings_troubleshootSync_appBar_title),
+          subtitle: Text(
+            context.l10n.settings_cloudSync_troubleshoot_tileSubtitle,
+          ),
           enabled: !isSyncing,
           onTap: isSyncing
               ? null
@@ -1470,8 +1485,8 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
         ),
         ListTile(
           leading: const Icon(Icons.logout),
-          title: const Text('Sign Out'),
-          subtitle: const Text('Disconnect from cloud provider'),
+          title: Text(context.l10n.settings_cloudSync_signOut),
+          subtitle: Text(context.l10n.settings_cloudSync_signOut_subtitle),
           onTap: () => _confirmSignOut(context, ref),
         ),
         // Replacing the cloud library is only meaningful once a backend is
@@ -1555,7 +1570,9 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
       await ref.read(backupSettingsProvider.notifier).disableCloudBackup();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Signed out from cloud provider')),
+          SnackBar(
+            content: Text(context.l10n.settings_cloudSync_signOutSuccess),
+          ),
         );
       }
     }

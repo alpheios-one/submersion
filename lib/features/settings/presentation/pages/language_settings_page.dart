@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 class LanguageSettingsPage extends ConsumerWidget {
@@ -86,12 +87,12 @@ class LanguageSettingsPage extends ConsumerWidget {
     );
   }
 
-  static String getDisplayName(String localeCode) {
+  static String getDisplayName(AppLocalizations l10n, String localeCode) {
     final option = supportedLocales.firstWhere(
       (o) => o.code == localeCode,
       orElse: () => supportedLocales.first,
     );
-    if (option.code == 'system') return 'System Default';
+    if (option.code == 'system') return l10n.settings_language_systemDefault;
     return option.nativeName;
   }
 }

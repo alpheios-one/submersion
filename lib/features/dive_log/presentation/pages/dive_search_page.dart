@@ -683,7 +683,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
                 color: isSelected ? Colors.amber : null,
                 size: 32,
               ),
-              tooltip: '$rating star${rating > 1 ? 's' : ''}',
+              tooltip: context.l10n.diveSites_edit_rating_starTooltip(rating),
               onPressed: () {
                 setState(() {
                   if (_minRating == rating) {

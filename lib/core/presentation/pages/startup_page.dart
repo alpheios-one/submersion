@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:submersion/app.dart' show resolveAppLocale;
+import 'package:submersion/app.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/domain/entities/migration_progress.dart';
@@ -41,6 +43,8 @@ import 'package:submersion/features/media/data/repositories/media_repository.dar
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
 import 'package:submersion/features/media_store/data/media_orphan_backlog_sweep.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/main.dart' show SubmersionRestart;
 
 /// Callback signature for the service initializer used by [StartupWrapper].
@@ -473,8 +477,14 @@ class _StartupWrapperState extends State<StartupWrapper>
   }
 
   Future<bool> _unlockWithBiometric() async {
+    // The lock screen lives inside the splash MaterialApp, so the splash
+    // navigator's context is the one carrying Localizations here; this
+    // State's own context sits above that MaterialApp and has none.
+    final promptCtx = _splashNavigatorKey.currentContext;
     final ok = await BiometricService().authenticate(
-      reason: 'Unlock your dive log',
+      reason: promptCtx == null
+          ? 'Unlock your dive log'
+          : AppLocalizations.of(promptCtx).lock_biometric_reason,
     );
     if (ok) _unlockCompleter?.complete();
     return ok;
@@ -801,6 +811,17 @@ class _StartupWrapperState extends State<StartupWrapper>
               child: MaterialApp(
                 debugShowCheckedModeBanner: false,
                 navigatorKey: _splashNavigatorKey,
+                // The splash runs before the database (and therefore the
+                // diver's saved locale preference) is readable, so it can
+                // only resolve the system locale. Without these delegates
+                // the lock, migration and recovery screens would stay the
+                // last English-only surfaces in the app, and they are
+                // exactly the screens a diver meets when something is
+                // already wrong.
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                localeListResolutionCallback: (preferred, supported) =>
+                    resolveAppLocale(preferred, supported),
                 home:
                     (_state == _StartupState.error ||
                         _state == _StartupState.backupFailed ||
@@ -812,7 +833,13 @@ class _StartupWrapperState extends State<StartupWrapper>
                         backgroundColor: backgroundColor,
                         body: SafeArea(
                           child: Center(
-                            child: _buildErrorContent(textColor, subtitleColor),
+                            child: Builder(
+                              builder: (context) => _buildErrorContent(
+                                context,
+                                textColor,
+                                subtitleColor,
+                              ),
+                            ),
                           ),
                         ),
                       )
@@ -836,7 +863,12 @@ class _StartupWrapperState extends State<StartupWrapper>
                         body: OceanBackground(
                           brightness: brightness,
                           child: SafeArea(
-                            child: Center(child: _buildSplashContent(isDark)),
+                            child: Center(
+                              child: Builder(
+                                builder: (context) =>
+                                    _buildSplashContent(context, isDark),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -857,7 +889,7 @@ class _StartupWrapperState extends State<StartupWrapper>
     );
   }
 
-  Widget _buildSplashContent(bool isDark) {
+  Widget _buildSplashContent(BuildContext context, bool isDark) {
     if (_state == _StartupState.backingUp) {
       return const BackingUpView();
     }
@@ -898,8 +930,10 @@ class _StartupWrapperState extends State<StartupWrapper>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Upgrading database... '
-                          'step ${_progress.currentStep} of ${_progress.totalSteps}',
+                          context.l10n.startup_migrating_progress(
+                            _progress.currentStep,
+                            _progress.totalSteps,
+                          ),
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.white.withValues(alpha: 0.8),
@@ -916,7 +950,11 @@ class _StartupWrapperState extends State<StartupWrapper>
     );
   }
 
-  Widget _buildErrorContent(Color textColor, Color subtitleColor) {
+  Widget _buildErrorContent(
+    BuildContext context,
+    Color textColor,
+    Color subtitleColor,
+  ) {
     if (_state == _StartupState.backupFailed && _backupError != null) {
       return BackupFailedView(
         error: _backupError!,
@@ -928,7 +966,7 @@ class _StartupWrapperState extends State<StartupWrapper>
     if (_state == _StartupState.recoveryRequired ||
         _state == _StartupState.recovering ||
         _state == _StartupState.recoveryFailed) {
-      return _buildRecoveryContent(textColor, subtitleColor);
+      return _buildRecoveryContent(context, textColor, subtitleColor);
     }
 
     if (_isVersionMismatch) {
@@ -950,7 +988,7 @@ class _StartupWrapperState extends State<StartupWrapper>
           const Icon(Icons.error_outline, size: 64, color: Colors.red),
           const SizedBox(height: 24),
           Text(
-            'Database upgrade failed',
+            context.l10n.startup_error_title,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -966,20 +1004,25 @@ class _StartupWrapperState extends State<StartupWrapper>
           ),
           const SizedBox(height: 16),
           Text(
-            'Try restarting the app. If this persists, '
-            'contact support — your data is still on disk and does not '
-            'require a reinstall.',
+            context.l10n.startup_error_body,
             style: TextStyle(fontSize: 14, color: subtitleColor),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          FilledButton(onPressed: _closeApp, child: const Text('Close')),
+          FilledButton(
+            onPressed: _closeApp,
+            child: Text(context.l10n.common_action_close),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildRecoveryContent(Color textColor, Color subtitleColor) {
+  Widget _buildRecoveryContent(
+    BuildContext context,
+    Color textColor,
+    Color subtitleColor,
+  ) {
     if (_state == _StartupState.recovering) {
       return Padding(
         padding: const EdgeInsets.all(24),
@@ -993,7 +1036,7 @@ class _StartupWrapperState extends State<StartupWrapper>
             ),
             const SizedBox(height: 24),
             Text(
-              'Recovering database...',
+              context.l10n.startup_recovering_title,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -1003,8 +1046,7 @@ class _StartupWrapperState extends State<StartupWrapper>
             ),
             const SizedBox(height: 16),
             Text(
-              'Rolling back the interrupted transaction. This usually '
-              'takes a few seconds.',
+              context.l10n.startup_recovering_body,
               style: TextStyle(fontSize: 14, color: subtitleColor),
               textAlign: TextAlign.center,
             ),
@@ -1025,7 +1067,7 @@ class _StartupWrapperState extends State<StartupWrapper>
             const Icon(Icons.error_outline, size: 64, color: Colors.orange),
             const SizedBox(height: 24),
             Text(
-              'Recovery did not complete',
+              context.l10n.startup_recoveryFailed_title,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -1035,9 +1077,7 @@ class _StartupWrapperState extends State<StartupWrapper>
             ),
             const SizedBox(height: 16),
             Text(
-              'The database could not be rolled back automatically. Your '
-              'data is still on disk; contact support before reinstalling '
-              'so we can help you recover it.',
+              context.l10n.startup_recoveryFailed_body,
               style: TextStyle(fontSize: 14, color: subtitleColor),
               textAlign: TextAlign.center,
             ),
@@ -1059,9 +1099,12 @@ class _StartupWrapperState extends State<StartupWrapper>
               children: [
                 OutlinedButton(
                   onPressed: _runRecovery,
-                  child: const Text('Try again'),
+                  child: Text(context.l10n.common_action_tryAgain),
                 ),
-                FilledButton(onPressed: _closeApp, child: const Text('Close')),
+                FilledButton(
+                  onPressed: _closeApp,
+                  child: Text(context.l10n.common_action_close),
+                ),
               ],
             ),
           ],
@@ -1079,7 +1122,7 @@ class _StartupWrapperState extends State<StartupWrapper>
           const Icon(Icons.build_circle_outlined, size: 64, color: Colors.blue),
           const SizedBox(height: 24),
           Text(
-            'Database needs recovery',
+            context.l10n.startup_recoveryRequired_title,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -1089,16 +1132,14 @@ class _StartupWrapperState extends State<StartupWrapper>
           ),
           const SizedBox(height: 16),
           Text(
-            'A previous session was interrupted while writing to the '
-            'database. Your data is still on disk; we just need to finish '
-            'rolling back the cancelled change before the app can open.',
+            context.l10n.startup_recoveryRequired_body,
             style: TextStyle(fontSize: 14, color: subtitleColor),
             textAlign: TextAlign.center,
           ),
           if (code != null) ...[
             const SizedBox(height: 12),
             Text(
-              'SQLite code $code',
+              context.l10n.startup_recovery_sqliteCode(code),
               style: TextStyle(
                 fontSize: 12,
                 color: subtitleColor,
@@ -1110,12 +1151,12 @@ class _StartupWrapperState extends State<StartupWrapper>
           const SizedBox(height: 24),
           FilledButton(
             onPressed: _runRecovery,
-            child: const Text('Recover database'),
+            child: Text(context.l10n.startup_recovery_action),
           ),
           const SizedBox(height: 8),
           TextButton(
             onPressed: _closeApp,
-            child: const Text('Close without recovering'),
+            child: Text(context.l10n.startup_recovery_closeWithoutRecovering),
           ),
         ],
       ),

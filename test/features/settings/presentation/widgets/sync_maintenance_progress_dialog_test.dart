@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/settings/presentation/widgets/sync_maintenance_progress_dialog.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 /// Issue #1032: the destructive Troubleshoot Sync actions ran for minutes in
 /// silence, so the user assumed a hang and killed the app mid-wipe. These tests
@@ -17,6 +18,9 @@ void main() {
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         home: Scaffold(
           body: Builder(
             builder: (context) => ElevatedButton(
@@ -121,6 +125,9 @@ void main() {
     var returned = false;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         home: Scaffold(
           body: Builder(
             builder: (context) => ElevatedButton(
