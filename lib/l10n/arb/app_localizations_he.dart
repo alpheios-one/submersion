@@ -23337,6 +23337,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dataQuality_repair_noChange => 'אין כאן מה לתקן';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'אין תיקון אוטומטי. פתח את הצלילה כדי לתקן זאת.';
+
+  @override
   String get dataQuality_repair_failed => 'התיקון נכשל';
 
   @override

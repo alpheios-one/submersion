@@ -22730,6 +22730,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dataQuality_repair_noChange => '这里没有需要修正的内容';
 
   @override
+  String get dataQuality_repair_needsReview => '无法自动修复。打开该次潜水进行更正。';
+
+  @override
   String get dataQuality_repair_failed => '修复失败';
 
   @override

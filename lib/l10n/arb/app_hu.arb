@@ -7218,6 +7218,7 @@
   "dataQuality_action_undo": "Visszavonás",
   "dataQuality_repair_applied": "Javítás alkalmazva",
   "dataQuality_repair_noChange": "Itt nincs mit javítani",
+  "dataQuality_repair_needsReview": "Nincs automatikus javítás. Nyisd meg a merülést a javításhoz.",
   "dataQuality_repair_failed": "A javítás sikertelen",
   "dataQuality_chip_all": "Mind",
   "dataQuality_chip_time": "Idő",

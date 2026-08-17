@@ -7218,6 +7218,7 @@
   "dataQuality_action_undo": "撤消",
   "dataQuality_repair_applied": "已应用修复",
   "dataQuality_repair_noChange": "这里没有需要修正的内容",
+  "dataQuality_repair_needsReview": "无法自动修复。打开该次潜水进行更正。",
   "dataQuality_repair_failed": "修复失败",
   "dataQuality_chip_all": "全部",
   "dataQuality_chip_time": "时间",

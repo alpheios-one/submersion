@@ -15253,6 +15253,7 @@
   "dataQuality_action_undo": "Undo",
   "dataQuality_repair_applied": "Repair applied",
   "dataQuality_repair_noChange": "Nothing to repair here",
+  "dataQuality_repair_needsReview": "No automatic fix. Open the dive to correct this.",
   "dataQuality_repair_failed": "Repair failed",
   "dataQuality_chip_all": "All",
   "dataQuality_chip_time": "Time",

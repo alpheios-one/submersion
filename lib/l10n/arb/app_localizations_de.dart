@@ -23884,6 +23884,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Hier gibt es nichts zu korrigieren';
 
   @override
+  String get dataQuality_repair_needsReview =>
+      'Keine automatische Korrektur. Öffne den Tauchgang, um das zu beheben.';
+
+  @override
   String get dataQuality_repair_failed => 'Korrektur fehlgeschlagen';
 
   @override
