@@ -2533,8 +2533,6 @@
   "diveLog_tooltip_sac": "SAC",
   "diveLog_tooltip_sensor": "传感器",
   "diveLog_legend_label_o2Cells": "氧电池",
-  "diveLog_legend_o2Cells_agreement": "一致性",
-  "diveLog_legend_o2Cells_cells": "电池",
   "diveLog_tooltip_o2CellsTight": "接近",
   "diveLog_tooltip_o2CellsDrifting": "偏移",
   "diveLog_tooltip_o2CellsWide": "偏差大",
@@ -9490,5 +9488,6 @@
   "media_info_checkUnavailable": "目前无法检查",
   "media_info_backupQueued": "已加入上传队列",
   "enum_profileMetric_o2CellMv": "O2 电池",
-  "enum_profileMetric_o2CellMv_short": "电池"
+  "enum_profileMetric_o2CellMv_short": "电池",
+  "diveLog_o2CellDrift_label": "氧电池漂移"
 }

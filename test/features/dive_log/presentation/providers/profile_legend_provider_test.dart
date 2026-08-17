@@ -488,38 +488,6 @@ void main() {
       expect(on.hashCode, isNot(equals(off.hashCode)));
     });
 
-    test('display mode defaults to agreement and switches to cells', () {
-      const state = ProfileLegendState();
-      expect(state.o2CellMode, O2CellDisplayMode.agreement);
-      expect(
-        state.copyWith(o2CellMode: O2CellDisplayMode.cells).o2CellMode,
-        O2CellDisplayMode.cells,
-      );
-    });
-
-    test('the display mode participates in equality', () {
-      const absolute = ProfileLegendState();
-      final spread = absolute.copyWith(o2CellMode: O2CellDisplayMode.cells);
-      expect(spread, isNot(equals(absolute)));
-    });
-
-    test('setO2CellMode is independent of the visibility toggle', () {
-      final container = ProviderContainer(
-        overrides: [
-          settingsProvider.overrideWith(
-            (ref) => _StubSettingsNotifier(const AppSettings()),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
-      final notifier = container.read(profileLegendProvider.notifier);
-      notifier.setO2CellMode(O2CellDisplayMode.cells);
-      final state = container.read(profileLegendProvider);
-      expect(state.o2CellMode, O2CellDisplayMode.cells);
-      // Changing the mode must not switch the lines on by itself.
-      expect(state.showO2CellMv, isFalse);
-    });
-
     test('toggleO2CellMv flips the state, session-only', () {
       final container = ProviderContainer(
         overrides: [

@@ -279,12 +279,13 @@ Widget _buildChartAllMetrics({
 // Tests
 // ---------------------------------------------------------------------------
 
-/// Rug segments are flat two-point bars in one of the agreement colours.
+/// Rug segments are flat two-point bars in one of the traffic-light
+/// agreement colours (green/yellow/red for tight/drifting/wide).
 bool _isRugSegment(LineChartBarData bar) =>
     bar.spots.length == 2 &&
     bar.spots.first.y == bar.spots.last.y &&
-    (bar.color == kO2CellColors.first.withValues(alpha: 0.55) ||
-        bar.color == const Color(0xFFFFB74D) ||
+    (bar.color == const Color(0xFF66BB6A).withValues(alpha: 0.55) ||
+        bar.color == const Color(0xFFFFCA28) ||
         bar.color == const Color(0xFFE57373));
 
 void main() {
@@ -1465,42 +1466,7 @@ void main() {
       expect(chart.o2CellMvCurves, mv);
     });
 
-    testWidgets('draws one line per O2 cell once the toggle is on', (
-      tester,
-    ) async {
-      final profile = makeRichProfile();
-      final mv = <List<int?>>[
-        List.generate(10, (i) => 58 + i % 3),
-        List.generate(10, (i) => 61 - i % 3),
-        List.generate(10, (i) => 43),
-      ];
-
-      await tester.pumpWidget(
-        _buildChart(profile: profile, o2CellMvCurves: mv),
-      );
-      await tester.pumpAndSettle();
-
-      int barCount() => tester
-          .widget<LineChart>(find.byType(LineChart).first)
-          .data
-          .lineBarsData
-          .length;
-
-      final before = barCount();
-
-      final container = ProviderScope.containerOf(
-        tester.element(find.byType(DiveProfileChart)),
-      );
-      final notifier = container.read(profileLegendProvider.notifier);
-      notifier.toggleO2CellMv();
-      notifier.setO2CellMode(O2CellDisplayMode.cells);
-      await tester.pumpAndSettle();
-
-      // One new line per cell, and nothing else appears or disappears.
-      expect(barCount(), before + 3);
-    });
-
-    testWidgets('agreement mode draws a rug pinned to the bottom edge', (
+    testWidgets('the rug pins to the bottom edge once the toggle is on', (
       tester,
     ) async {
       final profile = makeRichProfile();
@@ -1571,7 +1537,7 @@ void main() {
       expect(rug.any((b) => b.barWidth > 3), isTrue);
     });
 
-    testWidgets('cells mode draws one line per cell', (tester) async {
+    testWidgets('draws one line per cell alongside the rug', (tester) async {
       final profile = makeRichProfile();
       final mv = <List<int?>>[
         List.generate(10, (i) => 63),
@@ -1589,7 +1555,6 @@ void main() {
       );
       final notifier = container.read(profileLegendProvider.notifier);
       notifier.toggleO2CellMv();
-      notifier.setO2CellMode(O2CellDisplayMode.cells);
       await tester.pumpAndSettle();
 
       final cellLines = tester
@@ -1648,7 +1613,6 @@ void main() {
       );
       final notifier = container.read(profileLegendProvider.notifier);
       notifier.toggleO2CellMv();
-      notifier.setO2CellMode(O2CellDisplayMode.cells);
       await tester.pumpAndSettle();
 
       final bars = tester
@@ -2995,7 +2959,7 @@ void main() {
       await tester.pump();
 
       if (receivedRows != null) {
-        final row = receivedRows!.where((r) => r.label == 'O2 cells');
+        final row = receivedRows!.where((r) => r.label == 'O2 Cell Drift');
         expect(row, hasLength(1));
         // 1 mV apart: a verdict of "tight", with the measurement behind it.
         expect(row.single.value, contains('tight'));

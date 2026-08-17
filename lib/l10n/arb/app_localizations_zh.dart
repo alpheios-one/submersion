@@ -7017,12 +7017,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_legend_label_o2Cells => '氧电池';
 
   @override
-  String get diveLog_legend_o2Cells_agreement => '一致性';
-
-  @override
-  String get diveLog_legend_o2Cells_cells => '电池';
-
-  @override
   String get diveLog_tooltip_o2CellsTight => '接近';
 
   @override
@@ -30365,4 +30359,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_profileMetric_o2CellMv_short => '电池';
+
+  @override
+  String get diveLog_o2CellDrift_label => '氧电池漂移';
 }

@@ -7354,12 +7354,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_legend_label_o2Cells => 'O2 cellák';
 
   @override
-  String get diveLog_legend_o2Cells_agreement => 'Egyezés';
-
-  @override
-  String get diveLog_legend_o2Cells_cells => 'Cellák';
-
-  @override
   String get diveLog_tooltip_o2CellsTight => 'szoros';
 
   @override
@@ -32089,4 +32083,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_profileMetric_o2CellMv_short => 'Cellák';
+
+  @override
+  String get diveLog_o2CellDrift_label => 'O2 cellák eltérése';
 }

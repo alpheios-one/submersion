@@ -3884,8 +3884,6 @@
   "diveLog_tooltip_sac": "SAC",
   "diveLog_tooltip_sensor": "Sensor",
   "diveLog_legend_label_o2Cells": "O2 cells",
-  "diveLog_legend_o2Cells_agreement": "Agreement",
-  "diveLog_legend_o2Cells_cells": "Cells",
   "diveLog_tooltip_o2CellsTight": "tight",
   "diveLog_tooltip_o2CellsDrifting": "drifting",
   "diveLog_tooltip_o2CellsWide": "wide",
@@ -18192,5 +18190,6 @@
     "description": "Confirmation shown after queueing an upload"
   },
   "enum_profileMetric_o2CellMv": "O2 Cells",
-  "enum_profileMetric_o2CellMv_short": "Cells"
+  "enum_profileMetric_o2CellMv_short": "Cells",
+  "diveLog_o2CellDrift_label": "O2 Cell Drift"
 }

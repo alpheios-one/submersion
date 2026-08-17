@@ -2400,8 +2400,6 @@
   "diveLog_tooltip_sac": "SAC",
   "diveLog_tooltip_sensor": "Sensor",
   "diveLog_legend_label_o2Cells": "Células O2",
-  "diveLog_legend_o2Cells_agreement": "Concordância",
-  "diveLog_legend_o2Cells_cells": "Células",
   "diveLog_tooltip_o2CellsTight": "estreita",
   "diveLog_tooltip_o2CellsDrifting": "em deriva",
   "diveLog_tooltip_o2CellsWide": "ampla",
@@ -9490,5 +9488,6 @@
   "media_info_checkUnavailable": "Não foi possível verificar agora",
   "media_info_backupQueued": "Na fila para envio",
   "enum_profileMetric_o2CellMv": "Células O2",
-  "enum_profileMetric_o2CellMv_short": "Células"
+  "enum_profileMetric_o2CellMv_short": "Células",
+  "diveLog_o2CellDrift_label": "Desvio das células O2"
 }

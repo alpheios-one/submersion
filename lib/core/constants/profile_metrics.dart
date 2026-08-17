@@ -179,15 +179,6 @@ extension ProfileMetricCategoryExtension on ProfileMetricCategory {
   }
 }
 
-/// How the O2 cells are drawn (issue #810).
-///
-/// [agreement] is the default: a status strip on the bottom edge of the plot,
-/// coloured by how far apart the cells are, so the whole dive reads left to
-/// right without decoding a curve. [cells] plots each cell's raw millivolts for
-/// detail -- on an absolute scale the ppO2 swing dominates and the disagreement
-/// is invisible, which is why it is not the default.
-enum O2CellDisplayMode { agreement, cells }
-
 /// Data source preference for metrics that can come from a dive computer
 /// or app calculation.
 enum MetricDataSource {

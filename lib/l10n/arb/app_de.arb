@@ -2400,8 +2400,6 @@
   "diveLog_tooltip_sac": "AMV",
   "diveLog_tooltip_sensor": "Sensor",
   "diveLog_legend_label_o2Cells": "O2-Zellen",
-  "diveLog_legend_o2Cells_agreement": "Übereinstimmung",
-  "diveLog_legend_o2Cells_cells": "Zellen",
   "diveLog_tooltip_o2CellsTight": "eng",
   "diveLog_tooltip_o2CellsDrifting": "driftet",
   "diveLog_tooltip_o2CellsWide": "weit",
@@ -9490,5 +9488,6 @@
   "media_info_checkUnavailable": "Prüfung derzeit nicht möglich",
   "media_info_backupQueued": "Zum Upload eingereiht",
   "enum_profileMetric_o2CellMv": "O2-Zellen",
-  "enum_profileMetric_o2CellMv_short": "Zellen"
+  "enum_profileMetric_o2CellMv_short": "Zellen",
+  "diveLog_o2CellDrift_label": "O2-Zellendrift"
 }

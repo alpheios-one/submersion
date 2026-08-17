@@ -7403,12 +7403,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_legend_label_o2Cells => 'Cellules O2';
 
   @override
-  String get diveLog_legend_o2Cells_agreement => 'Concordance';
-
-  @override
-  String get diveLog_legend_o2Cells_cells => 'Cellules';
-
-  @override
   String get diveLog_tooltip_o2CellsTight => 'serrée';
 
   @override
@@ -32288,4 +32282,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get enum_profileMetric_o2CellMv_short => 'Cellules';
+
+  @override
+  String get diveLog_o2CellDrift_label => 'Dérive des cellules O2';
 }

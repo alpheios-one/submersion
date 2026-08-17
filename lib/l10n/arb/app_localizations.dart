@@ -12457,18 +12457,6 @@ abstract class AppLocalizations {
   /// **'O2 cells'**
   String get diveLog_legend_label_o2Cells;
 
-  /// No description provided for @diveLog_legend_o2Cells_agreement.
-  ///
-  /// In en, this message translates to:
-  /// **'Agreement'**
-  String get diveLog_legend_o2Cells_agreement;
-
-  /// No description provided for @diveLog_legend_o2Cells_cells.
-  ///
-  /// In en, this message translates to:
-  /// **'Cells'**
-  String get diveLog_legend_o2Cells_cells;
-
   /// No description provided for @diveLog_tooltip_o2CellsTight.
   ///
   /// In en, this message translates to:
@@ -53333,6 +53321,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cells'**
   String get enum_profileMetric_o2CellMv_short;
+
+  /// No description provided for @diveLog_o2CellDrift_label.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 Cell Drift'**
+  String get diveLog_o2CellDrift_label;
 }
 
 class _AppLocalizationsDelegate

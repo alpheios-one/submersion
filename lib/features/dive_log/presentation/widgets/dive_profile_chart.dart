@@ -610,7 +610,6 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   bool _showPpN2 = false;
   bool _showPpHe = false;
   bool _showO2CellMv = false;
-  O2CellDisplayMode _o2CellMode = O2CellDisplayMode.agreement;
   bool _showMod = false;
   bool _showDensity = false;
   bool _showGf = false;
@@ -1384,7 +1383,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       if (agreement != null) {
         rows.add(
           TooltipRow(
-            label: _l10nO2CellsLabel,
+            label: _l10nO2CellDriftLabel,
             value: agreement,
             bulletColor: _agreementColor(
               o2CellAgreementFor(_o2CellRangeAt(spot.spotIndex)!),
@@ -1738,7 +1737,6 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     _showPpN2 = legendState.showPpN2;
     _showPpHe = legendState.showPpHe;
     _showO2CellMv = legendState.showO2CellMv;
-    _o2CellMode = legendState.o2CellMode;
     _showMod = legendState.showMod;
     _showDensity = legendState.showDensity;
     _showGf = legendState.showGf;
@@ -2776,9 +2774,11 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                         widget.ppHeCurve!.any((v) => v > 0.001))
                       _buildPpHeLine(metricBand),
 
-                    // O2 cell millivolt lines, one per reporting cell
-                    if (_showO2CellMv && widget.o2CellMvCurves != null)
+                    // O2 cell agreement rug plus one millivolt line per cell
+                    if (_showO2CellMv && widget.o2CellMvCurves != null) ...[
+                      ..._buildO2CellRug(metricBand),
                       ..._buildO2CellMvLines(metricBand, units),
+                    ],
 
                     // MOD line (if showing)
                     if (_showMod && widget.modCurve != null)
@@ -3337,7 +3337,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                       final agreement = _o2CellAgreementReadout(spot.spotIndex);
                       if (agreement != null) {
                         addRow(
-                          _l10nO2CellsLabel,
+                          _l10nO2CellDriftLabel,
                           agreement,
                           _agreementColor(
                             o2CellAgreementFor(_o2CellRangeAt(spot.spotIndex)!),
@@ -4929,17 +4929,18 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     return spread[sampleIndex];
   }
 
-  /// Colour for one agreement level. Tight is deliberately quiet: a healthy
-  /// rig is in that state for essentially the whole dive, so it must read as
-  /// background, not as a series demanding attention.
+  /// Colour for one agreement level, traffic-light coded so the verdict reads
+  /// without decoding a legend. Tight is deliberately quiet despite being
+  /// green: a healthy rig is in that state for essentially the whole dive, so
+  /// it must read as background, not as a series demanding attention.
   Color _agreementColor(O2CellAgreement level) => switch (level) {
-    O2CellAgreement.tight => o2CellColor(0).withValues(alpha: 0.55),
-    O2CellAgreement.drifting => const Color(0xFFFFB74D),
+    O2CellAgreement.tight => const Color(0xFF66BB6A).withValues(alpha: 0.55),
+    O2CellAgreement.drifting => const Color(0xFFFFCA28),
     O2CellAgreement.wide => const Color(0xFFE57373),
   };
 
-  /// The rug's caption. Held here so the track and the tooltip cannot drift.
-  String get _l10nO2CellsLabel => context.l10n.diveLog_legend_label_o2Cells;
+  /// The rug's caption. Held here so the track and the tooltip cannot diverge.
+  String get _l10nO2CellDriftLabel => context.l10n.diveLog_o2CellDrift_label;
 
   String _agreementWord(O2CellAgreement level) => switch (level) {
     O2CellAgreement.tight => context.l10n.diveLog_tooltip_o2CellsTight,
@@ -4970,7 +4971,6 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     ColorScheme colorScheme,
   ) {
     if (!_showO2CellMv) return const [];
-    if (_o2CellMode != O2CellDisplayMode.agreement) return const [];
     if (widget.o2CellMvCurves == null) return const [];
 
     return [
@@ -4986,7 +4986,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
             fontSize: 9,
             color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
           ),
-          labelResolver: (_) => _l10nO2CellsLabel,
+          labelResolver: (_) => _l10nO2CellDriftLabel,
         ),
       ),
     ];
@@ -5036,17 +5036,14 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     return bars;
   }
 
-  /// Per-cell millivolt lines, for when the rug says something needs a closer
-  /// look. On an absolute scale the ppO2 swing dominates and the disagreement
-  /// is invisible, which is why this is not the default.
+  /// Per-cell millivolt lines, drawn alongside the agreement rug: the rug
+  /// reads the whole dive at a glance, the lines give the detail behind it.
+  /// On an absolute scale the ppO2 swing dominates and the disagreement
+  /// between cells is invisible, which is why the rug exists at all.
   List<LineChartBarData> _buildO2CellMvLines(
     MetricBand band,
     UnitFormatter units,
   ) {
-    if (_o2CellMode == O2CellDisplayMode.agreement) {
-      return _buildO2CellRug(band);
-    }
-
     final mvCurves = widget.o2CellMvCurves;
     if (mvCurves == null) return const [];
     final range = _getMetricRange(ProfileRightAxisMetric.o2CellMv, units);

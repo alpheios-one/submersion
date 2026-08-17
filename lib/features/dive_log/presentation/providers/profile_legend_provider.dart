@@ -58,9 +58,6 @@ class ProfileLegendState {
   /// default backs it, following the showMod precedent.
   final bool showO2CellMv;
 
-  /// Absolute millivolts or deviation-from-median for the O2 cell lines.
-  final O2CellDisplayMode o2CellMode;
-
   // Per-metric data source preferences (session overrides).
   // The ceiling line has no source toggle: every import path stores only the
   // computer's stepped stop depth in `ceiling`, so a "computer" ceiling line
@@ -116,7 +113,6 @@ class ProfileLegendState {
     this.showCns = false,
     this.showOtu = false,
     this.showO2CellMv = false,
-    this.o2CellMode = O2CellDisplayMode.agreement,
     this.ndlSource = MetricDataSource.calculated,
     this.ttsSource = MetricDataSource.calculated,
     this.cnsSource = MetricDataSource.calculated,
@@ -199,7 +195,6 @@ class ProfileLegendState {
     bool? showCns,
     bool? showOtu,
     bool? showO2CellMv,
-    O2CellDisplayMode? o2CellMode,
     MetricDataSource? ndlSource,
     MetricDataSource? ttsSource,
     MetricDataSource? cnsSource,
@@ -240,7 +235,6 @@ class ProfileLegendState {
       showCns: showCns ?? this.showCns,
       showOtu: showOtu ?? this.showOtu,
       showO2CellMv: showO2CellMv ?? this.showO2CellMv,
-      o2CellMode: o2CellMode ?? this.o2CellMode,
       ndlSource: ndlSource ?? this.ndlSource,
       ttsSource: ttsSource ?? this.ttsSource,
       cnsSource: cnsSource ?? this.cnsSource,
@@ -286,7 +280,6 @@ class ProfileLegendState {
           showCns == other.showCns &&
           showOtu == other.showOtu &&
           showO2CellMv == other.showO2CellMv &&
-          o2CellMode == other.o2CellMode &&
           ndlSource == other.ndlSource &&
           ttsSource == other.ttsSource &&
           cnsSource == other.cnsSource &&
@@ -326,7 +319,6 @@ class ProfileLegendState {
     showCns,
     showOtu,
     showO2CellMv,
-    o2CellMode,
     ndlSource,
     ttsSource,
     cnsSource,
@@ -560,10 +552,6 @@ class ProfileLegend extends _$ProfileLegend {
 
   void toggleO2CellMv() {
     state = state.copyWith(showO2CellMv: !state.showO2CellMv);
-  }
-
-  void setO2CellMode(O2CellDisplayMode mode) {
-    state = state.copyWith(o2CellMode: mode);
   }
 
   // Data source set methods (for SegmentedButton)

@@ -400,25 +400,13 @@ class ChartOptionsDialog extends StatelessWidget {
           onTap: legendNotifier.togglePpHe,
         ),
       if (config.hasO2CellMvData)
-        _buildToggleWithSource(
+        _buildToggleItem(
           context,
           label: context.l10n.diveLog_legend_label_o2Cells,
           // Cell 1's colour, so the swatch belongs to the same set as the lines.
           color: o2CellColor(0),
           isEnabled: legendState.showO2CellMv,
           onTap: legendNotifier.toggleO2CellMv,
-          currentSource: legendState.o2CellMode,
-          onSourceChanged: legendNotifier.setO2CellMode,
-          segments: [
-            (
-              O2CellDisplayMode.agreement,
-              context.l10n.diveLog_legend_o2Cells_agreement,
-            ),
-            (
-              O2CellDisplayMode.cells,
-              context.l10n.diveLog_legend_o2Cells_cells,
-            ),
-          ],
         ),
       if (config.hasModData)
         _buildToggleItem(

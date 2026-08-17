@@ -7226,12 +7226,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_legend_label_o2Cells => 'خلايا O2';
 
   @override
-  String get diveLog_legend_o2Cells_agreement => 'التوافق';
-
-  @override
-  String get diveLog_legend_o2Cells_cells => 'الخلايا';
-
-  @override
   String get diveLog_tooltip_o2CellsTight => 'متقارب';
 
   @override
@@ -31905,4 +31899,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_profileMetric_o2CellMv_short => 'الخلايا';
+
+  @override
+  String get diveLog_o2CellDrift_label => 'انحراف خلايا O2';
 }

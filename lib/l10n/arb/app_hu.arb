@@ -2328,8 +2328,6 @@
   "diveLog_tooltip_sac": "SAC",
   "diveLog_tooltip_sensor": "Érzékelő",
   "diveLog_legend_label_o2Cells": "O2 cellák",
-  "diveLog_legend_o2Cells_agreement": "Egyezés",
-  "diveLog_legend_o2Cells_cells": "Cellák",
   "diveLog_tooltip_o2CellsTight": "szoros",
   "diveLog_tooltip_o2CellsDrifting": "elsodródó",
   "diveLog_tooltip_o2CellsWide": "széles",
@@ -9490,5 +9488,6 @@
   "media_info_checkUnavailable": "Most nem ellenőrizhető",
   "media_info_backupQueued": "Feltöltési sorban",
   "enum_profileMetric_o2CellMv": "O2-cellák",
-  "enum_profileMetric_o2CellMv_short": "Cellák"
+  "enum_profileMetric_o2CellMv_short": "Cellák",
+  "diveLog_o2CellDrift_label": "O2 cellák eltérése"
 }
