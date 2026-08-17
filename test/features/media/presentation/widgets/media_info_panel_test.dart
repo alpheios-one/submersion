@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:submersion/features/media/data/services/media_item_verifier.dart';
+import 'package:submersion/features/media/domain/value_objects/verify_result.dart';
+import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +11,7 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_provenance.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_provenance_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_serving_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_info_panel.dart';
@@ -50,6 +55,42 @@ MediaItem _item({
   updatedAt: DateTime(2026, 3, 12),
 );
 
+/// Reports a fixed result and records what it was asked to verify.
+class _FakeVerifier implements MediaItemVerifier {
+  _FakeVerifier(this.result, {this.onVerify});
+
+  final VerifyResult result;
+
+  /// Stands in for the row write the real verifier performs.
+  final void Function()? onVerify;
+  final List<String> verified = [];
+
+  @override
+  Future<VerifyResult> verify(MediaItem item) async {
+    verified.add(item.id);
+    onVerify?.call();
+    return result;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} is not stubbed');
+}
+
+class _CapturingQueue implements MediaTransferQueueRepository {
+  final List<String> repairEnqueued = [];
+
+  @override
+  Future<int> enqueueRepairUpload({required String mediaId}) async {
+    repairEnqueued.add(mediaId);
+    return 1;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} is not stubbed');
+}
+
 void main() {
   late String? previousDefaultLocale;
   late MediaServingRecorder recorder;
@@ -71,6 +112,11 @@ void main() {
     QueueFacts? queue,
     MediaStoreIdentity? identity,
     String thisDevice = 'device-here',
+    List<dynamic> extra = const [],
+
+    /// Single-element holder so a test can swap the stored row mid-flight,
+    /// which is what a persisted action really does.
+    List<MediaItem>? liveRow,
   }) async {
     // Four stacked sections overflow a default 800x600 surface, and a
     // ListView does not build what is below the fold, so the Serving block
@@ -94,6 +140,12 @@ void main() {
           // UnitFormatter reads the diver's date and time preferences, and
           // the real notifier wants SharedPreferences.
           settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+          // The panel re-reads the row so persisted actions show up; without
+          // an override this would reach for an uninitialised database.
+          mediaByIdProvider.overrideWith(
+            (ref, id) async => liveRow == null ? item : liveRow.first,
+          ),
+          ...extra.cast(),
         ],
         child: localizedMaterialApp(
           locale: const Locale('en'),
@@ -342,6 +394,226 @@ void main() {
 
       expect(find.text('Not loaded yet'), findsNothing);
       expect(find.text('Local file on this device'), findsOneWidget);
+    });
+  });
+
+  // A persisted action has to change what the panel shows. The provenance
+  // provider is keyed by the MediaItem VALUE, so invalidating it alone
+  // recomputes from the same stale object and the Status row never moves.
+  group('reflects persisted changes', () {
+    testWidgets('Check now updates the status row from the re-read row', (
+      tester,
+    ) async {
+      // The stored row starts unverified and becomes missing once the
+      // verifier has run, exactly as the real write does.
+      final row = [_item()];
+      final verifier = _FakeVerifier(
+        VerifyResult.notFound,
+        onVerify: () => row[0] = _item(
+          isOrphaned: true,
+          lastVerifiedAt: DateTime(2026, 8, 2),
+        ),
+      );
+
+      await pump(
+        tester,
+        _item(),
+        liveRow: row,
+        extra: [mediaItemVerifierProvider.overrideWithValue(verifier)],
+      );
+
+      // Seeded state, before any action.
+      expect(find.text('Not checked yet'), findsOneWidget);
+
+      await tester.tap(find.text('Check now'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Missing from this device'), findsOneWidget);
+      expect(find.text('Not checked yet'), findsNothing);
+    });
+  });
+
+  group('Actions', () {
+    testWidgets('Check now is always offered', (tester) async {
+      await pump(tester, _item());
+
+      expect(find.text('Check now'), findsOneWidget);
+    });
+
+    testWidgets('Check now verifies and reports the result', (tester) async {
+      final verifier = _FakeVerifier(VerifyResult.notFound);
+      await pump(
+        tester,
+        _item(),
+        extra: [mediaItemVerifierProvider.overrideWithValue(verifier)],
+      );
+
+      await tester.tap(find.text('Check now'));
+      await tester.pumpAndSettle();
+
+      expect(verifier.verified, ['m1']);
+      expect(find.text('Source is missing'), findsOneWidget);
+    });
+
+    testWidgets('a recoverable check result reads as could not check', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        _item(),
+        extra: [
+          mediaItemVerifierProvider.overrideWithValue(
+            _FakeVerifier(VerifyResult.volumeOffline),
+          ),
+        ],
+      );
+
+      await tester.tap(find.text('Check now'));
+      await tester.pumpAndSettle();
+
+      // An unmounted volume is not a missing file, and saying so would push
+      // the reader toward relinking something that is merely offline.
+      expect(find.text('Could not check right now'), findsOneWidget);
+      expect(find.text('Source is missing'), findsNothing);
+    });
+
+    testWidgets('Locate appears only for a missing local file', (tester) async {
+      await pump(
+        tester,
+        _item(
+          sourceType: MediaSourceType.localFile,
+          platformAssetId: null,
+          localPath: '/gone/reef.jpg',
+          isOrphaned: true,
+        ),
+      );
+
+      expect(find.text('Locate file...'), findsOneWidget);
+    });
+
+    // Picking a file for a gallery row would relink it to the wrong source
+    // type, so the repair engine's file candidate is not offered there.
+    testWidgets('Locate is absent for a missing gallery row', (tester) async {
+      await pump(tester, _item(isOrphaned: true));
+
+      expect(find.text('Locate file...'), findsNothing);
+    });
+
+    testWidgets('Locate is absent for a healthy local file', (tester) async {
+      await pump(
+        tester,
+        _item(
+          sourceType: MediaSourceType.localFile,
+          platformAssetId: null,
+          localPath: '/here/reef.jpg',
+          lastVerifiedAt: DateTime(2026, 8, 1),
+        ),
+      );
+
+      expect(find.text('Locate file...'), findsNothing);
+    });
+
+    testWidgets('Copy reference puts the pointer on the clipboard', (
+      tester,
+    ) async {
+      final copied = <String>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method == 'Clipboard.setData') {
+            copied.add((call.arguments as Map)['text'] as String);
+          }
+          return null;
+        },
+      );
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        ),
+      );
+
+      await pump(tester, _item());
+      await tester.tap(find.text('Copy reference'));
+      await tester.pumpAndSettle();
+
+      expect(copied, ['asset-1']);
+      expect(find.text('Reference copied'), findsOneWidget);
+    });
+
+    testWidgets('Back up now is hidden when already fully backed up', (
+      tester,
+    ) async {
+      await pump(tester, _item(remoteUploadedAt: DateTime(2026, 7)));
+
+      expect(find.text('Back up now'), findsNothing);
+    });
+
+    testWidgets('Back up now is hidden when no store is attached', (
+      tester,
+    ) async {
+      await pump(tester, _item(), attached: false);
+
+      expect(find.text('Back up now'), findsNothing);
+    });
+
+    testWidgets('Back up now is hidden for an ineligible source', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        _item(sourceType: MediaSourceType.networkUrl, platformAssetId: null),
+      );
+
+      expect(find.text('Back up now'), findsNothing);
+    });
+
+    testWidgets('Back up now enqueues a repair upload', (tester) async {
+      final queue = _CapturingQueue();
+      await pump(
+        tester,
+        _item(),
+        extra: [
+          mediaTransferQueueRepositoryProvider.overrideWithValue(queue),
+          mediaStoreRuntimeProvider.overrideWith((ref) async => null),
+        ],
+      );
+
+      await tester.tap(find.text('Back up now'));
+      await tester.pumpAndSettle();
+
+      expect(queue.repairEnqueued, ['m1']);
+      expect(find.text('Queued for upload'), findsOneWidget);
+    });
+
+    // enqueueRepairUpload is what re-arms a terminally failed row, so the
+    // only difference here is the label.
+    testWidgets('the label reads Retry upload when the queue row failed', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        _item(),
+        queue: const QueueFacts(state: 'failed', error: 'network down'),
+      );
+
+      expect(find.text('Retry upload'), findsOneWidget);
+      expect(find.text('Back up now'), findsNothing);
+    });
+
+    // The answer to "is it uploading" is already on screen, and a second
+    // nudge would only re-enqueue what is already queued.
+    testWidgets('no upload action while a transfer is in flight', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        _item(),
+        queue: const QueueFacts(state: 'transferring'),
+      );
+
+      expect(find.text('Back up now'), findsNothing);
+      expect(find.text('Retry upload'), findsNothing);
     });
   });
 }

@@ -9465,5 +9465,16 @@
   "media_info_typePhoto": "Foto",
   "media_info_typeVideo": "Video",
   "media_info_typeDocument": "Dokument",
-  "media_info_typeSignature": "Unterschrift"
+  "media_info_typeSignature": "Unterschrift",
+  "media_info_actionCheckNow": "Jetzt prüfen",
+  "media_info_actionLocate": "Datei suchen...",
+  "media_info_actionBackUpNow": "Jetzt sichern",
+  "media_info_actionRetryUpload": "Upload wiederholen",
+  "media_info_actionReveal": "Im Dateimanager anzeigen",
+  "media_info_actionCopyPath": "Referenz kopieren",
+  "media_info_referenceCopied": "Referenz kopiert",
+  "media_info_checkFound": "Quelle gefunden",
+  "media_info_checkMissing": "Quelle fehlt",
+  "media_info_checkUnavailable": "Prüfung derzeit nicht möglich",
+  "media_info_backupQueued": "Zum Upload eingereiht"
 }

@@ -9465,5 +9465,16 @@
   "media_info_typePhoto": "Fénykép",
   "media_info_typeVideo": "Videó",
   "media_info_typeDocument": "Dokumentum",
-  "media_info_typeSignature": "Aláírás"
+  "media_info_typeSignature": "Aláírás",
+  "media_info_actionCheckNow": "Ellenőrzés most",
+  "media_info_actionLocate": "Fájl keresése...",
+  "media_info_actionBackUpNow": "Mentés most",
+  "media_info_actionRetryUpload": "Feltöltés újra",
+  "media_info_actionReveal": "Megjelenítés a fájlkezelőben",
+  "media_info_actionCopyPath": "Hivatkozás másolása",
+  "media_info_referenceCopied": "Hivatkozás másolva",
+  "media_info_checkFound": "A forrás megtalálható",
+  "media_info_checkMissing": "A forrás hiányzik",
+  "media_info_checkUnavailable": "Most nem ellenőrizhető",
+  "media_info_backupQueued": "Feltöltési sorban"
 }

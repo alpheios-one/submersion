@@ -32188,4 +32188,37 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_info_typeSignature => 'Firma';
+
+  @override
+  String get media_info_actionCheckNow => 'Comprobar ahora';
+
+  @override
+  String get media_info_actionLocate => 'Buscar archivo...';
+
+  @override
+  String get media_info_actionBackUpNow => 'Copiar ahora';
+
+  @override
+  String get media_info_actionRetryUpload => 'Reintentar subida';
+
+  @override
+  String get media_info_actionReveal => 'Mostrar en el gestor de archivos';
+
+  @override
+  String get media_info_actionCopyPath => 'Copiar referencia';
+
+  @override
+  String get media_info_referenceCopied => 'Referencia copiada';
+
+  @override
+  String get media_info_checkFound => 'Fuente encontrada';
+
+  @override
+  String get media_info_checkMissing => 'Falta la fuente';
+
+  @override
+  String get media_info_checkUnavailable => 'No se pudo comprobar ahora';
+
+  @override
+  String get media_info_backupQueued => 'En cola para subir';
 }

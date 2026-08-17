@@ -53219,6 +53219,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Signature'**
   String get media_info_typeSignature;
+
+  /// Media info panel, Origin block: re-checks whether the item's source still resolves
+  ///
+  /// In en, this message translates to:
+  /// **'Check now'**
+  String get media_info_actionCheckNow;
+
+  /// Media info panel, Origin block: picks a replacement file for a missing local file
+  ///
+  /// In en, this message translates to:
+  /// **'Locate file...'**
+  String get media_info_actionLocate;
+
+  /// Media info panel, Backup block: queues the item for upload
+  ///
+  /// In en, this message translates to:
+  /// **'Back up now'**
+  String get media_info_actionBackUpNow;
+
+  /// Media info panel, Backup block: same action as Back up now, shown when the previous upload failed
+  ///
+  /// In en, this message translates to:
+  /// **'Retry upload'**
+  String get media_info_actionRetryUpload;
+
+  /// Media info panel, Origin block: opens the platform file manager at the item's path
+  ///
+  /// In en, this message translates to:
+  /// **'Show in file manager'**
+  String get media_info_actionReveal;
+
+  /// Media info panel, Origin block: copies the source reference to the clipboard
+  ///
+  /// In en, this message translates to:
+  /// **'Copy reference'**
+  String get media_info_actionCopyPath;
+
+  /// Confirmation shown after copying the source reference
+  ///
+  /// In en, this message translates to:
+  /// **'Reference copied'**
+  String get media_info_referenceCopied;
+
+  /// Result of Check now when the source still resolves
+  ///
+  /// In en, this message translates to:
+  /// **'Source found'**
+  String get media_info_checkFound;
+
+  /// Result of Check now when the source is gone
+  ///
+  /// In en, this message translates to:
+  /// **'Source is missing'**
+  String get media_info_checkMissing;
+
+  /// Result of Check now when nothing could be determined, for example an unmounted volume
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check right now'**
+  String get media_info_checkUnavailable;
+
+  /// Confirmation shown after queueing an upload
+  ///
+  /// In en, this message translates to:
+  /// **'Queued for upload'**
+  String get media_info_backupQueued;
 }
 
 class _AppLocalizationsDelegate

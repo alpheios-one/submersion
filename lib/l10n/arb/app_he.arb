@@ -9465,5 +9465,16 @@
   "media_info_typePhoto": "תמונה",
   "media_info_typeVideo": "וידאו",
   "media_info_typeDocument": "מסמך",
-  "media_info_typeSignature": "חתימה"
+  "media_info_typeSignature": "חתימה",
+  "media_info_actionCheckNow": "בדוק עכשיו",
+  "media_info_actionLocate": "אתר קובץ...",
+  "media_info_actionBackUpNow": "גבה עכשיו",
+  "media_info_actionRetryUpload": "נסה להעלות שוב",
+  "media_info_actionReveal": "הצג במנהל הקבצים",
+  "media_info_actionCopyPath": "העתק הפניה",
+  "media_info_referenceCopied": "ההפניה הועתקה",
+  "media_info_checkFound": "המקור נמצא",
+  "media_info_checkMissing": "המקור חסר",
+  "media_info_checkUnavailable": "לא ניתן לבדוק כעת",
+  "media_info_backupQueued": "בתור להעלאה"
 }

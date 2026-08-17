@@ -31927,4 +31927,37 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_info_typeSignature => 'Handtekening';
+
+  @override
+  String get media_info_actionCheckNow => 'Nu controleren';
+
+  @override
+  String get media_info_actionLocate => 'Bestand zoeken...';
+
+  @override
+  String get media_info_actionBackUpNow => 'Nu back-uppen';
+
+  @override
+  String get media_info_actionRetryUpload => 'Upload opnieuw proberen';
+
+  @override
+  String get media_info_actionReveal => 'Tonen in bestandsbeheer';
+
+  @override
+  String get media_info_actionCopyPath => 'Referentie kopiëren';
+
+  @override
+  String get media_info_referenceCopied => 'Referentie gekopieerd';
+
+  @override
+  String get media_info_checkFound => 'Bron gevonden';
+
+  @override
+  String get media_info_checkMissing => 'Bron ontbreekt';
+
+  @override
+  String get media_info_checkUnavailable => 'Kon nu niet controleren';
+
+  @override
+  String get media_info_backupQueued => 'In wachtrij voor upload';
 }

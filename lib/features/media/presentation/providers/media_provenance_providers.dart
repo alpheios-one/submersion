@@ -2,6 +2,9 @@ import 'package:submersion/core/data/repositories/sync_repository.dart';
 // Re-exports flutter_riverpod alongside the invalidateSelfWhen extension, so
 // importing both would be redundant.
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/media/data/services/media_item_verifier.dart';
+import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_provenance.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
@@ -55,6 +58,17 @@ final mediaProvenanceProvider = Provider.family<MediaProvenance, MediaItem>((
   final queue = ref.watch(mediaQueueFactsProvider(item.id)).value;
   return MediaProvenance.from(item, storeAttached: attached, queue: queue);
 });
+
+/// Checks one item's source and persists the outcome.
+///
+/// no-tick: a service rather than data, so there is no cached query that
+/// could go stale.
+final mediaItemVerifierProvider = Provider<MediaItemVerifier>(
+  (ref) => MediaItemVerifier(
+    registry: ref.watch(mediaSourceResolverRegistryProvider),
+    repository: ref.watch(mediaRepositoryProvider),
+  ),
+);
 
 /// This device's sync id, for deciding whether a row was linked here.
 ///

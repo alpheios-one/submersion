@@ -31848,4 +31848,37 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_info_typeSignature => 'توقيع';
+
+  @override
+  String get media_info_actionCheckNow => 'تحقق الآن';
+
+  @override
+  String get media_info_actionLocate => 'تحديد موقع الملف...';
+
+  @override
+  String get media_info_actionBackUpNow => 'انسخ احتياطيًا الآن';
+
+  @override
+  String get media_info_actionRetryUpload => 'إعادة محاولة الرفع';
+
+  @override
+  String get media_info_actionReveal => 'إظهار في مدير الملفات';
+
+  @override
+  String get media_info_actionCopyPath => 'نسخ المرجع';
+
+  @override
+  String get media_info_referenceCopied => 'تم نسخ المرجع';
+
+  @override
+  String get media_info_checkFound => 'تم العثور على المصدر';
+
+  @override
+  String get media_info_checkMissing => 'المصدر مفقود';
+
+  @override
+  String get media_info_checkUnavailable => 'تعذر التحقق الآن';
+
+  @override
+  String get media_info_backupQueued => 'في قائمة انتظار الرفع';
 }

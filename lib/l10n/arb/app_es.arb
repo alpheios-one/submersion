@@ -9465,5 +9465,16 @@
   "media_info_typePhoto": "Foto",
   "media_info_typeVideo": "Vídeo",
   "media_info_typeDocument": "Documento",
-  "media_info_typeSignature": "Firma"
+  "media_info_typeSignature": "Firma",
+  "media_info_actionCheckNow": "Comprobar ahora",
+  "media_info_actionLocate": "Buscar archivo...",
+  "media_info_actionBackUpNow": "Copiar ahora",
+  "media_info_actionRetryUpload": "Reintentar subida",
+  "media_info_actionReveal": "Mostrar en el gestor de archivos",
+  "media_info_actionCopyPath": "Copiar referencia",
+  "media_info_referenceCopied": "Referencia copiada",
+  "media_info_checkFound": "Fuente encontrada",
+  "media_info_checkMissing": "Falta la fuente",
+  "media_info_checkUnavailable": "No se pudo comprobar ahora",
+  "media_info_backupQueued": "En cola para subir"
 }

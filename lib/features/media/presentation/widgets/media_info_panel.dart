@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -7,18 +10,25 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_provenance.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
+import 'package:submersion/features/media/domain/value_objects/verify_result.dart';
+import 'package:submersion/features/media/presentation/helpers/media_link_replacer.dart';
 import 'package:submersion/features/media/presentation/providers/media_provenance_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_serving_providers.dart';
+import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/utils/byte_format.dart';
+import 'package:submersion/shared/utils/file_reveal.dart';
 
 /// Everything the app knows about where one media item came from, whether it
 /// is backed up, and where its bytes are being served from right now.
 ///
-/// Read-only. Every fix this panel might offer belongs to a later change; the
-/// point here is that none of these facts were visible anywhere before.
+/// Each block also offers the fixes relevant to what it reports, so a problem
+/// surfaced here can be acted on here. Those actions are entry points into
+/// machinery that already exists; the only capability added for the panel is
+/// checking a single item's source.
 class MediaInfoPanel extends ConsumerWidget {
   const MediaInfoPanel({super.key, required this.item, this.scrollController});
 
@@ -30,7 +40,14 @@ class MediaInfoPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final provenance = ref.watch(mediaProvenanceProvider(item));
+    // Re-read the row rather than rendering the snapshot handed to the sheet.
+    // mediaProvenanceProvider is keyed by the MediaItem VALUE and derives
+    // everything from it, so invalidating that alone would recompute from the
+    // same stale object: Check now would write isOrphaned to the database and
+    // the Status row would never move. The passed item is the seed and the
+    // fallback for the frame before the read lands.
+    final live = ref.watch(mediaByIdProvider(item.id)).value ?? item;
+    final provenance = ref.watch(mediaProvenanceProvider(live));
     final units = UnitFormatter(ref.watch(settingsProvider));
 
     return ListView(
@@ -39,13 +56,13 @@ class MediaInfoPanel extends ConsumerWidget {
       children: [
         Text(l10n.media_info_title, style: _titleStyle(context)),
         const SizedBox(height: 16),
-        _FileSection(item: item, units: units),
+        _FileSection(item: live, units: units),
         const SizedBox(height: 12),
-        _OriginSection(origin: provenance.origin, units: units),
+        _OriginSection(item: live, origin: provenance.origin, units: units),
         const SizedBox(height: 12),
-        _BackupSection(backup: provenance.backup, units: units),
+        _BackupSection(item: live, backup: provenance.backup, units: units),
         const SizedBox(height: 12),
-        _ServingSection(item: item),
+        _ServingSection(item: live),
       ],
     );
   }
@@ -55,11 +72,19 @@ class MediaInfoPanel extends ConsumerWidget {
 }
 
 /// A titled card of label/value rows, matching the dive detail convention.
+///
+/// [actions] render as a trailing wrap so a block that surfaces a problem
+/// also offers the fix, rather than sending the reader somewhere else.
 class _Section extends StatelessWidget {
-  const _Section({required this.title, required this.children});
+  const _Section({
+    required this.title,
+    required this.children,
+    this.actions = const [],
+  });
 
   final String title;
   final List<Widget> children;
+  final List<Widget> actions;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +97,13 @@ class _Section extends StatelessWidget {
             Text(title, style: Theme.of(context).textTheme.titleMedium),
             const Divider(),
             ...children,
+            if (actions.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Wrap(spacing: 8, children: actions),
+              ),
+            ],
           ],
         ),
       ),
@@ -134,8 +166,13 @@ class _FileSection extends StatelessWidget {
 }
 
 class _OriginSection extends ConsumerWidget {
-  const _OriginSection({required this.origin, required this.units});
+  const _OriginSection({
+    required this.item,
+    required this.origin,
+    required this.units,
+  });
 
+  final MediaItem item;
   final OriginFacts origin;
   final UnitFormatter units;
 
@@ -144,9 +181,29 @@ class _OriginSection extends ConsumerWidget {
     final l10n = context.l10n;
     final deviceId = origin.originDeviceId;
     final thisDevice = ref.watch(currentDeviceIdProvider).value;
+    final pointer = origin.pointer;
+    final isLocalFile = origin.sourceType == MediaSourceType.localFile;
 
     return _Section(
       title: l10n.media_info_originSection,
+      actions: [
+        _CheckNowButton(item: item),
+        // The repair engine's file candidate only makes sense for a row that
+        // points at a path, so this is not offered for a missing gallery
+        // asset, where picking a file would relink it to the wrong source
+        // type.
+        if (origin.health == OriginHealth.missing && isLocalFile)
+          _LocateButton(item: item),
+        if (pointer != null && isLocalFile && canRevealInFileManager)
+          TextButton(
+            // Explicitly unawaited: revealInFileManager swallows its own
+            // failures, so there is nothing to surface and nothing to wait
+            // for before the sheet stays put.
+            onPressed: () => unawaited(revealInFileManager(pointer)),
+            child: Text(l10n.media_info_actionReveal),
+          ),
+        if (pointer != null) _CopyReferenceButton(pointer: pointer),
+      ],
       children: [
         DiveDetailRow(
           label: l10n.media_info_source,
@@ -192,10 +249,27 @@ class _OriginSection extends ConsumerWidget {
 }
 
 class _BackupSection extends ConsumerWidget {
-  const _BackupSection({required this.backup, required this.units});
+  const _BackupSection({
+    required this.item,
+    required this.backup,
+    required this.units,
+  });
 
+  final MediaItem item;
   final BackupFacts backup;
   final UnitFormatter units;
+
+  /// Whether to offer an upload at all.
+  ///
+  /// Hidden while pending or transferring: the answer to "is it uploading"
+  /// is already on screen, and a second nudge would only re-enqueue what is
+  /// already queued.
+  bool get _offerUpload =>
+      backup.eligible &&
+      backup.storeAttached &&
+      backup.tier != BackupTier.full &&
+      backup.queueState != 'pending' &&
+      backup.queueState != 'transferring';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -204,6 +278,10 @@ class _BackupSection extends ConsumerWidget {
 
     return _Section(
       title: l10n.media_info_backupSection,
+      actions: [
+        if (_offerUpload)
+          _BackUpButton(item: item, isRetry: backup.queueState == 'failed'),
+      ],
       children: [
         DiveDetailRow(
           label: l10n.media_info_store,
@@ -309,6 +387,153 @@ class _ServingSection extends ConsumerWidget {
     };
     return tier == null ? source : '$source ($tier)';
   }
+}
+
+/// Checks the item's source and reports what it found.
+///
+/// The verifier writes `isOrphaned` and `lastVerifiedAt`, and the panel reads
+/// its origin facts off the row, so the result reaches the display through
+/// the repository rather than through local state.
+class _CheckNowButton extends ConsumerStatefulWidget {
+  const _CheckNowButton({required this.item});
+
+  final MediaItem item;
+
+  @override
+  ConsumerState<_CheckNowButton> createState() => _CheckNowButtonState();
+}
+
+class _CheckNowButtonState extends ConsumerState<_CheckNowButton> {
+  bool _busy = false;
+
+  Future<void> _run() async {
+    // Captured before the await: the messenger and the strings cannot be
+    // read from a context that may have been unmounted by the time the
+    // check returns.
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    setState(() => _busy = true);
+    try {
+      final result = await ref
+          .read(mediaItemVerifierProvider)
+          .verify(widget.item);
+      // The sheet can be dismissed while the check runs. ref after dispose
+      // throws, and there is no one left to show a snack bar to.
+      if (!mounted) return;
+      final message = switch (result) {
+        VerifyResult.available => l10n.media_info_checkFound,
+        VerifyResult.notFound ||
+        VerifyResult.unauthenticated ||
+        VerifyResult.fromOtherDevice => l10n.media_info_checkMissing,
+        VerifyResult.transientError ||
+        VerifyResult.volumeOffline => l10n.media_info_checkUnavailable,
+      };
+      messenger.showSnackBar(SnackBar(content: Text(message)));
+      // Invalidate the ROW, not the provenance provider: provenance is keyed
+      // by the item value, so re-reading the row is what actually re-keys it.
+      ref.invalidate(mediaByIdProvider(widget.item.id));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => TextButton(
+    onPressed: _busy ? null : _run,
+    child: Text(context.l10n.media_info_actionCheckNow),
+  );
+}
+
+/// Picks a replacement file and re-links through the repair engine.
+class _LocateButton extends ConsumerWidget {
+  const _LocateButton({required this.item});
+
+  final MediaItem item;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => TextButton(
+    onPressed: () async {
+      final applied = await replaceMediaLink(context, ref, item);
+      // The picker and confirm dialog can outlive the sheet, and ref after
+      // dispose throws, which would turn a plain user-cancel into an error.
+      if (!context.mounted) return;
+      // The repair writes the row, so re-read it: that is what re-keys the
+      // provenance provider and lets the status line stop saying "missing".
+      if (applied) ref.invalidate(mediaByIdProvider(item.id));
+    },
+    child: Text(context.l10n.media_info_actionLocate),
+  );
+}
+
+/// Queues the item for upload, or re-arms a terminally failed row.
+class _BackUpButton extends ConsumerWidget {
+  const _BackUpButton({required this.item, required this.isRetry});
+
+  final MediaItem item;
+
+  /// Only the label differs. `enqueueRepairUpload` is idempotent and already
+  /// re-arms a failed row via retry, so both cases are the same call.
+  final bool isRetry;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => TextButton(
+    onPressed: () async {
+      final messenger = ScaffoldMessenger.of(context);
+      final queued = context.l10n.media_info_backupQueued;
+      // Both providers are read before any await, so nothing touches ref
+      // across an async gap that could outlive the sheet.
+      final queue = ref.read(mediaTransferQueueRepositoryProvider);
+      final runtimeFuture = ref.read(mediaStoreRuntimeProvider.future);
+
+      try {
+        await queue.enqueueRepairUpload(mediaId: item.id);
+      } on Object {
+        // Nothing was queued, so there is nothing to report.
+        return;
+      }
+
+      // Kick the worker so a queued row starts moving rather than waiting
+      // for the next incidental drain. Its failure is reported separately
+      // from the enqueue on purpose: building the runtime reads the keychain
+      // and can fail for reasons unrelated to this item, and the row IS
+      // queued at that point. Folding the two together would swallow the
+      // confirmation for work that really did get scheduled.
+      try {
+        final runtime = await runtimeFuture;
+        unawaited(runtime?.worker?.drain() ?? Future<void>.value());
+      } on Object {
+        // The row is durable and the next drain will find it.
+      }
+
+      if (!context.mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text(queued)));
+    },
+    child: Text(
+      isRetry
+          ? context.l10n.media_info_actionRetryUpload
+          : context.l10n.media_info_actionBackUpNow,
+    ),
+  );
+}
+
+/// Copies the source pointer, which is often a path a reader wants to paste
+/// into a terminal or a file dialog.
+class _CopyReferenceButton extends StatelessWidget {
+  const _CopyReferenceButton({required this.pointer});
+
+  final String pointer;
+
+  @override
+  Widget build(BuildContext context) => TextButton(
+    onPressed: () async {
+      final messenger = ScaffoldMessenger.of(context);
+      final copied = context.l10n.media_info_referenceCopied;
+      await Clipboard.setData(ClipboardData(text: pointer));
+      if (!context.mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text(copied)));
+    },
+    child: Text(context.l10n.media_info_actionCopyPath),
+  );
 }
 
 /// Localized name for a media type.

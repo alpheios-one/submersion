@@ -32032,4 +32032,37 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_info_typeSignature => 'Aláírás';
+
+  @override
+  String get media_info_actionCheckNow => 'Ellenőrzés most';
+
+  @override
+  String get media_info_actionLocate => 'Fájl keresése...';
+
+  @override
+  String get media_info_actionBackUpNow => 'Mentés most';
+
+  @override
+  String get media_info_actionRetryUpload => 'Feltöltés újra';
+
+  @override
+  String get media_info_actionReveal => 'Megjelenítés a fájlkezelőben';
+
+  @override
+  String get media_info_actionCopyPath => 'Hivatkozás másolása';
+
+  @override
+  String get media_info_referenceCopied => 'Hivatkozás másolva';
+
+  @override
+  String get media_info_checkFound => 'A forrás megtalálható';
+
+  @override
+  String get media_info_checkMissing => 'A forrás hiányzik';
+
+  @override
+  String get media_info_checkUnavailable => 'Most nem ellenőrizhető';
+
+  @override
+  String get media_info_backupQueued => 'Feltöltési sorban';
 }

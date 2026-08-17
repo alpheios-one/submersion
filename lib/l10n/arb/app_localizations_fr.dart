@@ -32229,4 +32229,39 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_info_typeSignature => 'Signature';
+
+  @override
+  String get media_info_actionCheckNow => 'Vérifier maintenant';
+
+  @override
+  String get media_info_actionLocate => 'Localiser le fichier...';
+
+  @override
+  String get media_info_actionBackUpNow => 'Sauvegarder maintenant';
+
+  @override
+  String get media_info_actionRetryUpload => 'Réessayer le téléversement';
+
+  @override
+  String get media_info_actionReveal =>
+      'Afficher dans le gestionnaire de fichiers';
+
+  @override
+  String get media_info_actionCopyPath => 'Copier la référence';
+
+  @override
+  String get media_info_referenceCopied => 'Référence copiée';
+
+  @override
+  String get media_info_checkFound => 'Source trouvée';
+
+  @override
+  String get media_info_checkMissing => 'Source introuvable';
+
+  @override
+  String get media_info_checkUnavailable =>
+      'Vérification impossible pour le moment';
+
+  @override
+  String get media_info_backupQueued => 'Mis en file pour téléversement';
 }
