@@ -4881,12 +4881,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Volledig scherm bekijken';
 
   @override
-  String get diveLog_detail_viewMap => 'Kaart';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => 'Duikstek bekijken';
 
   @override
@@ -6319,10 +6313,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get setup_sync_header => 'Cloudsynchronisatie';
-
-  @override
-  String get setup_sync_icloudUnavailable =>
-      'iCloud is niet beschikbaar op dit apparaat';
 
   @override
   String get setup_sync_libraryFound_adopt => 'Bestaande bibliotheek overnemen';

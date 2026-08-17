@@ -4920,12 +4920,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'Vollbild anzeigen';
 
   @override
-  String get diveLog_detail_viewMap => 'Karte';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => 'Tauchplatz anzeigen';
 
   @override
@@ -6366,10 +6360,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get setup_sync_header => 'Cloud-Synchronisierung';
-
-  @override
-  String get setup_sync_icloudUnavailable =>
-      'iCloud ist auf diesem Gerät nicht verfügbar';
 
   @override
   String get setup_sync_libraryFound_adopt =>

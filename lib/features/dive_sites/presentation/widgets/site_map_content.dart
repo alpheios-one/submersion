@@ -186,7 +186,9 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
       mapBuilder: (context) => Stack(
         children: [
           _buildMap(context, sitesWithCounts, heatMapAsync, heatMapSettings),
-          // Heat map toggle and fit all sites controls
+          // Pane mode, heat map toggle and fit all sites controls. The 2D/3D
+          // pair leads this cluster rather than floating in its own card, so
+          // the pane controls read as one group in both modes.
           Positioned(
             top: 8,
             right: 8,
@@ -196,6 +198,12 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    SiteScapeModeToggle(
+                      mode: _scapeMode,
+                      onModeChanged: (m) => setState(() => _scapeMode = m),
+                      selectedSiteId: selectedSite?.id,
+                      selectedSiteLocation: selectedSite?.location,
+                    ),
                     const BuiltInSitesToggleButton(),
                     const HeatMapToggleButton(),
                     IconButton(

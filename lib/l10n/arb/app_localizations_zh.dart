@@ -4673,12 +4673,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => '查看全屏';
 
   @override
-  String get diveLog_detail_viewMap => '地图';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => '查看潜水点';
 
   @override
@@ -6046,9 +6040,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get setup_sync_header => '云同步';
-
-  @override
-  String get setup_sync_icloudUnavailable => '此设备不支持 iCloud';
 
   @override
   String get setup_sync_libraryFound_adopt => '采用现有资料库';

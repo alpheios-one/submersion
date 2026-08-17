@@ -4918,12 +4918,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'Ver em tela cheia';
 
   @override
-  String get diveLog_detail_viewMap => 'Mapa';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => 'Ver Ponto de Mergulho';
 
   @override
@@ -6373,10 +6367,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get setup_sync_header => 'Sincronização na nuvem';
-
-  @override
-  String get setup_sync_icloudUnavailable =>
-      'O iCloud não está disponível neste dispositivo';
 
   @override
   String get setup_sync_libraryFound_adopt => 'Adotar biblioteca existente';

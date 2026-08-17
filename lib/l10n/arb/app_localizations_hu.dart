@@ -4900,12 +4900,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'Teljes kepernyo';
 
   @override
-  String get diveLog_detail_viewMap => 'Térkép';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => 'Merulohely megtekintese';
 
   @override
@@ -6350,10 +6344,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get setup_sync_header => 'Felhőszinkronizálás';
-
-  @override
-  String get setup_sync_icloudUnavailable =>
-      'Az iCloud nem érhető el ezen az eszközön';
 
   @override
   String get setup_sync_libraryFound_adopt => 'Meglévő könyvtár átvétele';

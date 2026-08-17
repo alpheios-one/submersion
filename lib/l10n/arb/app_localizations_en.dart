@@ -4826,12 +4826,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'View fullscreen';
 
   @override
-  String get diveLog_detail_viewMap => 'Map';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => 'View Site';
 
   @override
@@ -6250,10 +6244,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setup_sync_header => 'Cloud sync';
-
-  @override
-  String get setup_sync_icloudUnavailable =>
-      'iCloud is not available on this device';
 
   @override
   String get setup_sync_libraryFound_adopt => 'Adopt existing library';
