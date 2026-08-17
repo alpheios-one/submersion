@@ -7480,5 +7480,12 @@
   "media_info_checkFound": "המקור נמצא",
   "media_info_checkMissing": "המקור חסר",
   "media_info_checkUnavailable": "לא ניתן לבדוק כעת",
-  "media_info_backupQueued": "בתור להעלאה"
+  "media_info_backupQueued": "בתור להעלאה",
+  "media_status_broken": "חסר ולא מגובה",
+  "media_status_transferFailed": "ההעלאה נכשלה",
+  "media_status_transferring": "מעלה",
+  "media_status_queued": "ממתין להעלאה",
+  "media_status_cloudOnly": "מאוחסן בענן בלבד",
+  "media_status_notBackedUp": "לא מגובה",
+  "media_tile_infoMenuItem": "פרטי מדיה"
 }

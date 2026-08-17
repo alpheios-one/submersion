@@ -7480,5 +7480,12 @@
   "media_info_checkFound": "A forras megtalalhato",
   "media_info_checkMissing": "A forras hianyzik",
   "media_info_checkUnavailable": "Most nem ellenorizheto",
-  "media_info_backupQueued": "Feltoltesi sorban"
+  "media_info_backupQueued": "Feltoltesi sorban",
+  "media_status_broken": "Hianyzik es nincs mentve",
+  "media_status_transferFailed": "A feltoltes sikertelen",
+  "media_status_transferring": "Feltoltes folyamatban",
+  "media_status_queued": "Feltoltesre var",
+  "media_status_cloudOnly": "Csak a felhoben tarolva",
+  "media_status_notBackedUp": "Nincs mentve",
+  "media_tile_infoMenuItem": "Media info"
 }

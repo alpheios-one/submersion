@@ -7480,5 +7480,12 @@
   "media_info_checkFound": "Bron gevonden",
   "media_info_checkMissing": "Bron ontbreekt",
   "media_info_checkUnavailable": "Kon nu niet controleren",
-  "media_info_backupQueued": "In wachtrij voor upload"
+  "media_info_backupQueued": "In wachtrij voor upload",
+  "media_status_broken": "Ontbreekt en geen back-up",
+  "media_status_transferFailed": "Uploaden mislukt",
+  "media_status_transferring": "Uploaden",
+  "media_status_queued": "Wacht op uploaden",
+  "media_status_cloudOnly": "Alleen in de cloud opgeslagen",
+  "media_status_notBackedUp": "Geen back-up",
+  "media_tile_infoMenuItem": "Media-info"
 }

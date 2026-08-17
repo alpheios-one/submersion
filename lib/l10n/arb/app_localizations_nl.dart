@@ -24538,4 +24538,25 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'In wachtrij voor upload';
+
+  @override
+  String get media_status_broken => 'Ontbreekt en geen back-up';
+
+  @override
+  String get media_status_transferFailed => 'Uploaden mislukt';
+
+  @override
+  String get media_status_transferring => 'Uploaden';
+
+  @override
+  String get media_status_queued => 'Wacht op uploaden';
+
+  @override
+  String get media_status_cloudOnly => 'Alleen in de cloud opgeslagen';
+
+  @override
+  String get media_status_notBackedUp => 'Geen back-up';
+
+  @override
+  String get media_tile_infoMenuItem => 'Media-info';
 }

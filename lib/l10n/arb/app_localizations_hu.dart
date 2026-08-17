@@ -24639,4 +24639,25 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Feltoltesi sorban';
+
+  @override
+  String get media_status_broken => 'Hianyzik es nincs mentve';
+
+  @override
+  String get media_status_transferFailed => 'A feltoltes sikertelen';
+
+  @override
+  String get media_status_transferring => 'Feltoltes folyamatban';
+
+  @override
+  String get media_status_queued => 'Feltoltesre var';
+
+  @override
+  String get media_status_cloudOnly => 'Csak a felhoben tarolva';
+
+  @override
+  String get media_status_notBackedUp => 'Nincs mentve';
+
+  @override
+  String get media_tile_infoMenuItem => 'Media info';
 }

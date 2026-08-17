@@ -7480,5 +7480,12 @@
   "media_info_checkFound": "Quelle gefunden",
   "media_info_checkMissing": "Quelle fehlt",
   "media_info_checkUnavailable": "Prufung derzeit nicht moglich",
-  "media_info_backupQueued": "Zum Upload eingereiht"
+  "media_info_backupQueued": "Zum Upload eingereiht",
+  "media_status_broken": "Fehlt und nicht gesichert",
+  "media_status_transferFailed": "Upload fehlgeschlagen",
+  "media_status_transferring": "Wird hochgeladen",
+  "media_status_queued": "Warten auf Upload",
+  "media_status_cloudOnly": "Nur in der Cloud gespeichert",
+  "media_status_notBackedUp": "Nicht gesichert",
+  "media_tile_infoMenuItem": "Medieninfo"
 }

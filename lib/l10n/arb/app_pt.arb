@@ -7480,5 +7480,12 @@
   "media_info_checkFound": "Fonte encontrada",
   "media_info_checkMissing": "Fonte ausente",
   "media_info_checkUnavailable": "Nao foi possivel verificar agora",
-  "media_info_backupQueued": "Na fila para envio"
+  "media_info_backupQueued": "Na fila para envio",
+  "media_status_broken": "Ausente e sem backup",
+  "media_status_transferFailed": "Falha no envio",
+  "media_status_transferring": "Enviando",
+  "media_status_queued": "Aguardando envio",
+  "media_status_cloudOnly": "Armazenado apenas na nuvem",
+  "media_status_notBackedUp": "Sem backup",
+  "media_tile_infoMenuItem": "Informacoes da midia"
 }
