@@ -382,8 +382,51 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'استبدال';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'تحديث';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'الغطسات التي لا تحتوي على أسطوانة فقط';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'اختر السمات التي سيتم استبدالها في الأسطوانات الموجودة بالفعل في هذه الغطسات. لا يتغير ضغط البداية والنهاية أبدًا.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'اختر سمة واحدة على الأقل للأسطوانة لتحديثها.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'إعداد مسبق';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'الدور';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'الحجم';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'ضغط التشغيل';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'المادة';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'خليط الغاز';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'الاسم';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غطسات محددة لا تحتوي على أسطوانات وسيتم تخطيها.',
+      one: 'غطسة واحدة محددة لا تحتوي على أسطوانات وسيتم تخطيها.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'تطبيق التغييرات؟';

@@ -385,8 +385,53 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Sostituisci';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Aggiorna';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Solo immersioni senza bombola esistente';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Scegli quali attributi sovrascrivere sulle bombole che queste immersioni hanno già. Le pressioni iniziale e finale non vengono mai modificate.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Scegli almeno un attributo della bombola da aggiornare.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Preimpostazione';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Ruolo';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volume';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure =>
+      'Pressione di esercizio';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Materiale';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Miscela';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Nome';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count immersioni selezionate non hanno bombole e verranno saltate.',
+      one: '1 immersione selezionata non ha bombole e verrà saltata.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Applicare le modifiche?';

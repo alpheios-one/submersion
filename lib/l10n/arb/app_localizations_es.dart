@@ -385,8 +385,52 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Reemplazar';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Actualizar';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Solo inmersiones que aún no tienen botella';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Elige qué atributos sobrescribir en las botellas que estas inmersiones ya tienen. Las presiones inicial y final nunca se modifican.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Elige al menos un atributo de botella para actualizar.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Preajuste';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Función';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volumen';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Presión de trabajo';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Material';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Mezcla de gas';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Nombre';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count inmersiones seleccionadas no tienen botellas y se omitirán.',
+      one: '1 inmersión seleccionada no tiene botellas y se omitirá.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => '¿Aplicar cambios?';

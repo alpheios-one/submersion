@@ -384,8 +384,52 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Substituir';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Atualizar';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Apenas mergulhos sem cilindro existente';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Escolhe quais atributos sobrescrever nos cilindros que estes mergulhos já têm. As pressões inicial e final nunca são alteradas.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Escolhe pelo menos um atributo de cilindro para atualizar.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Predefinição';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Função';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volume';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Pressão de trabalho';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Material';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Mistura de gás';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Nome';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count mergulhos selecionados não têm cilindros e serão ignorados.',
+      one: '1 mergulho selecionado não tem cilindros e será ignorado.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Aplicar alterações?';

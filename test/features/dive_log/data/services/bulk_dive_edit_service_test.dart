@@ -295,6 +295,80 @@ void main() {
     },
   );
 
+  group('TankSpecsOp', () {
+    // The #797 shape: an imported tank carrying pressures but no cylinder
+    // identity.
+    Future<void> seedImportedTank(String diveId) => diveRepo.bulkAddTank([
+      diveId,
+    ], const domain.DiveTank(id: '', startPressure: 200, endPressure: 50));
+
+    Future<DiveTank> tankRow(String diveId) => (db.select(
+      db.diveTanks,
+    )..where((t) => t.diveId.equals(diveId))).getSingle();
+
+    test('apply overwrites specs in place and keeps the pressures', () async {
+      await seed('d1');
+      await seedImportedTank('d1');
+      final priorId = (await tankRow('d1')).id;
+
+      await service.apply(
+        const BulkEditRequest(
+          diveIds: ['d1'],
+          ops: [
+            TankSpecsOp(
+              specs: domain.DiveTank(
+                id: '',
+                volume: 11.1,
+                workingPressure: 207,
+                material: TankMaterial.aluminum,
+                presetName: 'al80',
+              ),
+              fields: {
+                TankSpecField.volume,
+                TankSpecField.workingPressure,
+                TankSpecField.material,
+                TankSpecField.preset,
+              },
+            ),
+          ],
+        ),
+      );
+
+      final row = await tankRow('d1');
+      expect(row.id, priorId); // same row, no delete/reinsert
+      expect(row.volume, 11.1);
+      expect(row.presetName, 'al80');
+      expect(row.startPressure, 200);
+      expect(row.endPressure, 50);
+    });
+
+    test('undo restores the prior specs on the same row id', () async {
+      await seed('d1');
+      await seedImportedTank('d1');
+      final priorId = (await tankRow('d1')).id;
+
+      final snap = await service.apply(
+        const BulkEditRequest(
+          diveIds: ['d1'],
+          ops: [
+            TankSpecsOp(
+              specs: domain.DiveTank(id: '', volume: 11.1),
+              fields: {TankSpecField.volume},
+            ),
+          ],
+        ),
+      );
+      expect((await tankRow('d1')).volume, 11.1);
+
+      await service.undo(snap);
+
+      final row = await tankRow('d1');
+      expect(row.volume, isNull); // prior NULL restored
+      expect(row.id, priorId); // undo did not re-insert under a new id
+      expect(row.startPressure, 200);
+    });
+  });
+
   test(
     'apply with no dives returns an empty snapshot; undo is a no-op',
     () async {

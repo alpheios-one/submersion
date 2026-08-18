@@ -386,8 +386,52 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Remplacer';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Mettre à jour';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Seulement les plongées sans bloc existant';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Choisis les attributs à écraser sur les blocs que ces plongées possèdent déjà. Les pressions de début et de fin ne sont jamais modifiées.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Choisis au moins un attribut de bloc à mettre à jour.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Préréglage';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Rôle';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volume';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Pression de service';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Matériau';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Mélange gazeux';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Nom';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count plongées sélectionnées n\'ont pas de bloc et seront ignorées.',
+      one: '1 plongée sélectionnée n\'a pas de bloc et sera ignorée.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Appliquer les modifications ?';

@@ -382,8 +382,52 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Vervangen';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Bijwerken';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Alleen duiken zonder bestaande fles';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Kies welke eigenschappen worden overschreven op de flessen die deze duiken al hebben. Begin- en einddruk worden nooit gewijzigd.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Kies minstens één fleseigenschap om bij te werken.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Voorinstelling';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Rol';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volume';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Werkdruk';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Materiaal';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Gasmengsel';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Naam';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count geselecteerde duiken hebben geen flessen en worden overgeslagen.',
+      one: '1 geselecteerde duik heeft geen flessen en wordt overgeslagen.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Wijzigingen toepassen?';

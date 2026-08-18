@@ -697,11 +697,77 @@ abstract class AppLocalizations {
   /// **'Replace'**
   String get diveLog_bulkEdit_modeReplace;
 
+  /// No description provided for @diveLog_bulkEdit_modeUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get diveLog_bulkEdit_modeUpdate;
+
   /// No description provided for @diveLog_bulkEdit_tankOnlyIfEmpty.
   ///
   /// In en, this message translates to:
   /// **'Only dives that don\'t already have a tank'**
   String get diveLog_bulkEdit_tankOnlyIfEmpty;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which attributes to overwrite on the tanks these dives already have. Start and end pressures are never changed.'**
+  String get diveLog_bulkEdit_tankSpecsHint;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsNoFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at least one tank attribute to update.'**
+  String get diveLog_bulkEdit_tankSpecsNoFields;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset'**
+  String get diveLog_bulkEdit_tankFieldPreset;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get diveLog_bulkEdit_tankFieldRole;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get diveLog_bulkEdit_tankFieldVolume;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldWorkingPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Working pressure'**
+  String get diveLog_bulkEdit_tankFieldWorkingPressure;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldMaterial.
+  ///
+  /// In en, this message translates to:
+  /// **'Material'**
+  String get diveLog_bulkEdit_tankFieldMaterial;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldGasMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas mix'**
+  String get diveLog_bulkEdit_tankFieldGasMix;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get diveLog_bulkEdit_tankFieldName;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 selected dive has no tanks and will be skipped.} other{{count} selected dives have no tanks and will be skipped.}}'**
+  String diveLog_bulkEdit_tankSpecsSkipped(int count);
 
   /// No description provided for @diveLog_bulkEdit_confirmTitle.
   ///
