@@ -2532,6 +2532,10 @@
   "diveLog_tooltip_rate": "速率",
   "diveLog_tooltip_sac": "SAC",
   "diveLog_tooltip_sensor": "传感器",
+  "diveLog_legend_label_o2Cells": "氧电池",
+  "diveLog_tooltip_o2CellsTight": "接近",
+  "diveLog_tooltip_o2CellsDrifting": "偏移",
+  "diveLog_tooltip_o2CellsWide": "偏差大",
   "diveLog_tooltip_srfGf": "水面GF",
   "diveLog_tooltip_temp": "温度",
   "diveLog_tooltip_time": "时间",
@@ -5903,6 +5907,7 @@
   "units_profileMetric_gPerL": "g/L",
   "units_profileMetric_min": "分",
   "units_profileMetric_percent": "%",
+  "units_profileMetric_millivolts": "mV",
   "units_sac_litersPerMin": "L/分钟",
   "units_sac_pressurePerMin": "压力/分",
   "units_temperature_celsius": "C",
@@ -7311,7 +7316,13 @@
   "water_conditions_noData": "此位置没有卫星水文数据",
   "water_conditions_freshwater": "卫星水温仅覆盖海洋",
   "water_conditions_anomaly": "距平 {value}",
-  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
+  "@water_conditions_anomaly": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "reef_health_degreeHeatingWeeks": "热度周 {value} 摄氏度周",
   "reef_health_seaSurface": "海表温度 {value}",
   "reef_health_asOf": "数据日期 {date}",
@@ -9477,6 +9488,9 @@
   "media_info_checkMissing": "源缺失",
   "media_info_checkUnavailable": "目前无法检查",
   "media_info_backupQueued": "已加入上传队列",
+  "enum_profileMetric_o2CellMv": "O2 电池",
+  "enum_profileMetric_o2CellMv_short": "电池",
+  "diveLog_o2CellSpread_label": "O2电池离散度",
   "media_status_broken": "缺失且未备份",
   "media_status_transferFailed": "上传失败",
   "media_status_transferring": "正在上传",

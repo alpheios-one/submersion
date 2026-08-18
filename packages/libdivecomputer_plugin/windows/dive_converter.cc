@@ -100,6 +100,16 @@ ParsedDive ConvertParsedDive(const libdc_parsed_dive_t& dive) {
                                    : std::optional<double>(s.o2_sensor[c]);
             }
 
+            // Per-cell raw O2 output: UINT32_MAX -> nullptr.
+            std::optional<int64_t> o2_sensor_mv[6];
+            for (int c = 0; c < 6; c++) {
+                o2_sensor_mv[c] =
+                    (s.o2_sensor_mv[c] == UINT32_MAX)
+                        ? std::nullopt
+                        : std::optional<int64_t>(
+                              static_cast<int64_t>(s.o2_sensor_mv[c]));
+            }
+
             // Nullable ints: UINT32_MAX -> nullptr.
             std::optional<int64_t> tank_index =
                 (s.tank == UINT32_MAX)
@@ -162,6 +172,12 @@ ParsedDive ConvertParsedDive(const libdc_parsed_dive_t& dive) {
                     o2_sensor[3] ? &*o2_sensor[3] : nullptr,
                     o2_sensor[4] ? &*o2_sensor[4] : nullptr,
                     o2_sensor[5] ? &*o2_sensor[5] : nullptr,
+                    o2_sensor_mv[0] ? &*o2_sensor_mv[0] : nullptr,
+                    o2_sensor_mv[1] ? &*o2_sensor_mv[1] : nullptr,
+                    o2_sensor_mv[2] ? &*o2_sensor_mv[2] : nullptr,
+                    o2_sensor_mv[3] ? &*o2_sensor_mv[3] : nullptr,
+                    o2_sensor_mv[4] ? &*o2_sensor_mv[4] : nullptr,
+                    o2_sensor_mv[5] ? &*o2_sensor_mv[5] : nullptr,
                     gas_mix_index ? &*gas_mix_index : nullptr)));
         }
     }

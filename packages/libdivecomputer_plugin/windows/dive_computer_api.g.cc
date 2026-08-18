@@ -237,6 +237,12 @@ ProfileSample::ProfileSample(
   const double* o2_sensor4,
   const double* o2_sensor5,
   const double* o2_sensor6,
+  const int64_t* o2_sensor_mv1,
+  const int64_t* o2_sensor_mv2,
+  const int64_t* o2_sensor_mv3,
+  const int64_t* o2_sensor_mv4,
+  const int64_t* o2_sensor_mv5,
+  const int64_t* o2_sensor_mv6,
   const int64_t* gas_mix_index)
  : time_seconds_(time_seconds),
     depth_meters_(depth_meters),
@@ -259,6 +265,12 @@ ProfileSample::ProfileSample(
     o2_sensor4_(o2_sensor4 ? std::optional<double>(*o2_sensor4) : std::nullopt),
     o2_sensor5_(o2_sensor5 ? std::optional<double>(*o2_sensor5) : std::nullopt),
     o2_sensor6_(o2_sensor6 ? std::optional<double>(*o2_sensor6) : std::nullopt),
+    o2_sensor_mv1_(o2_sensor_mv1 ? std::optional<int64_t>(*o2_sensor_mv1) : std::nullopt),
+    o2_sensor_mv2_(o2_sensor_mv2 ? std::optional<int64_t>(*o2_sensor_mv2) : std::nullopt),
+    o2_sensor_mv3_(o2_sensor_mv3 ? std::optional<int64_t>(*o2_sensor_mv3) : std::nullopt),
+    o2_sensor_mv4_(o2_sensor_mv4 ? std::optional<int64_t>(*o2_sensor_mv4) : std::nullopt),
+    o2_sensor_mv5_(o2_sensor_mv5 ? std::optional<int64_t>(*o2_sensor_mv5) : std::nullopt),
+    o2_sensor_mv6_(o2_sensor_mv6 ? std::optional<int64_t>(*o2_sensor_mv6) : std::nullopt),
     gas_mix_index_(gas_mix_index ? std::optional<int64_t>(*gas_mix_index) : std::nullopt) {}
 
 int64_t ProfileSample::time_seconds() const {
@@ -526,6 +538,84 @@ void ProfileSample::set_o2_sensor6(double value_arg) {
 }
 
 
+const int64_t* ProfileSample::o2_sensor_mv1() const {
+  return o2_sensor_mv1_ ? &(*o2_sensor_mv1_) : nullptr;
+}
+
+void ProfileSample::set_o2_sensor_mv1(const int64_t* value_arg) {
+  o2_sensor_mv1_ = value_arg ? std::optional<int64_t>(*value_arg) : std::nullopt;
+}
+
+void ProfileSample::set_o2_sensor_mv1(int64_t value_arg) {
+  o2_sensor_mv1_ = value_arg;
+}
+
+
+const int64_t* ProfileSample::o2_sensor_mv2() const {
+  return o2_sensor_mv2_ ? &(*o2_sensor_mv2_) : nullptr;
+}
+
+void ProfileSample::set_o2_sensor_mv2(const int64_t* value_arg) {
+  o2_sensor_mv2_ = value_arg ? std::optional<int64_t>(*value_arg) : std::nullopt;
+}
+
+void ProfileSample::set_o2_sensor_mv2(int64_t value_arg) {
+  o2_sensor_mv2_ = value_arg;
+}
+
+
+const int64_t* ProfileSample::o2_sensor_mv3() const {
+  return o2_sensor_mv3_ ? &(*o2_sensor_mv3_) : nullptr;
+}
+
+void ProfileSample::set_o2_sensor_mv3(const int64_t* value_arg) {
+  o2_sensor_mv3_ = value_arg ? std::optional<int64_t>(*value_arg) : std::nullopt;
+}
+
+void ProfileSample::set_o2_sensor_mv3(int64_t value_arg) {
+  o2_sensor_mv3_ = value_arg;
+}
+
+
+const int64_t* ProfileSample::o2_sensor_mv4() const {
+  return o2_sensor_mv4_ ? &(*o2_sensor_mv4_) : nullptr;
+}
+
+void ProfileSample::set_o2_sensor_mv4(const int64_t* value_arg) {
+  o2_sensor_mv4_ = value_arg ? std::optional<int64_t>(*value_arg) : std::nullopt;
+}
+
+void ProfileSample::set_o2_sensor_mv4(int64_t value_arg) {
+  o2_sensor_mv4_ = value_arg;
+}
+
+
+const int64_t* ProfileSample::o2_sensor_mv5() const {
+  return o2_sensor_mv5_ ? &(*o2_sensor_mv5_) : nullptr;
+}
+
+void ProfileSample::set_o2_sensor_mv5(const int64_t* value_arg) {
+  o2_sensor_mv5_ = value_arg ? std::optional<int64_t>(*value_arg) : std::nullopt;
+}
+
+void ProfileSample::set_o2_sensor_mv5(int64_t value_arg) {
+  o2_sensor_mv5_ = value_arg;
+}
+
+
+const int64_t* ProfileSample::o2_sensor_mv6() const {
+  return o2_sensor_mv6_ ? &(*o2_sensor_mv6_) : nullptr;
+}
+
+void ProfileSample::set_o2_sensor_mv6(const int64_t* value_arg) {
+  o2_sensor_mv6_ = value_arg ? std::optional<int64_t>(*value_arg) : std::nullopt;
+}
+
+void ProfileSample::set_o2_sensor_mv6(int64_t value_arg) {
+  o2_sensor_mv6_ = value_arg;
+}
+
+
 const int64_t* ProfileSample::gas_mix_index() const {
   return gas_mix_index_ ? &(*gas_mix_index_) : nullptr;
 }
@@ -541,7 +631,7 @@ void ProfileSample::set_gas_mix_index(int64_t value_arg) {
 
 EncodableList ProfileSample::ToEncodableList() const {
   EncodableList list;
-  list.reserve(22);
+  list.reserve(28);
   list.push_back(EncodableValue(time_seconds_));
   list.push_back(EncodableValue(depth_meters_));
   list.push_back(temperature_celsius_ ? EncodableValue(*temperature_celsius_) : EncodableValue());
@@ -563,6 +653,12 @@ EncodableList ProfileSample::ToEncodableList() const {
   list.push_back(o2_sensor4_ ? EncodableValue(*o2_sensor4_) : EncodableValue());
   list.push_back(o2_sensor5_ ? EncodableValue(*o2_sensor5_) : EncodableValue());
   list.push_back(o2_sensor6_ ? EncodableValue(*o2_sensor6_) : EncodableValue());
+  list.push_back(o2_sensor_mv1_ ? EncodableValue(*o2_sensor_mv1_) : EncodableValue());
+  list.push_back(o2_sensor_mv2_ ? EncodableValue(*o2_sensor_mv2_) : EncodableValue());
+  list.push_back(o2_sensor_mv3_ ? EncodableValue(*o2_sensor_mv3_) : EncodableValue());
+  list.push_back(o2_sensor_mv4_ ? EncodableValue(*o2_sensor_mv4_) : EncodableValue());
+  list.push_back(o2_sensor_mv5_ ? EncodableValue(*o2_sensor_mv5_) : EncodableValue());
+  list.push_back(o2_sensor_mv6_ ? EncodableValue(*o2_sensor_mv6_) : EncodableValue());
   list.push_back(gas_mix_index_ ? EncodableValue(*gas_mix_index_) : EncodableValue());
   return list;
 }
@@ -647,7 +743,31 @@ ProfileSample ProfileSample::FromEncodableList(const EncodableList& list) {
   if (!encodable_o2_sensor6.IsNull()) {
     decoded.set_o2_sensor6(std::get<double>(encodable_o2_sensor6));
   }
-  auto& encodable_gas_mix_index = list[21];
+  auto& encodable_o2_sensor_mv1 = list[21];
+  if (!encodable_o2_sensor_mv1.IsNull()) {
+    decoded.set_o2_sensor_mv1(std::get<int64_t>(encodable_o2_sensor_mv1));
+  }
+  auto& encodable_o2_sensor_mv2 = list[22];
+  if (!encodable_o2_sensor_mv2.IsNull()) {
+    decoded.set_o2_sensor_mv2(std::get<int64_t>(encodable_o2_sensor_mv2));
+  }
+  auto& encodable_o2_sensor_mv3 = list[23];
+  if (!encodable_o2_sensor_mv3.IsNull()) {
+    decoded.set_o2_sensor_mv3(std::get<int64_t>(encodable_o2_sensor_mv3));
+  }
+  auto& encodable_o2_sensor_mv4 = list[24];
+  if (!encodable_o2_sensor_mv4.IsNull()) {
+    decoded.set_o2_sensor_mv4(std::get<int64_t>(encodable_o2_sensor_mv4));
+  }
+  auto& encodable_o2_sensor_mv5 = list[25];
+  if (!encodable_o2_sensor_mv5.IsNull()) {
+    decoded.set_o2_sensor_mv5(std::get<int64_t>(encodable_o2_sensor_mv5));
+  }
+  auto& encodable_o2_sensor_mv6 = list[26];
+  if (!encodable_o2_sensor_mv6.IsNull()) {
+    decoded.set_o2_sensor_mv6(std::get<int64_t>(encodable_o2_sensor_mv6));
+  }
+  auto& encodable_gas_mix_index = list[27];
   if (!encodable_gas_mix_index.IsNull()) {
     decoded.set_gas_mix_index(std::get<int64_t>(encodable_gas_mix_index));
   }

@@ -454,6 +454,12 @@ class ReparseService {
             o2Sensor4: Value(s.o2Sensor4),
             o2Sensor5: Value(s.o2Sensor5),
             o2Sensor6: Value(s.o2Sensor6),
+            o2SensorMv1: Value(s.o2SensorMv1),
+            o2SensorMv2: Value(s.o2SensorMv2),
+            o2SensorMv3: Value(s.o2SensorMv3),
+            o2SensorMv4: Value(s.o2SensorMv4),
+            o2SensorMv5: Value(s.o2SensorMv5),
+            o2SensorMv6: Value(s.o2SensorMv6),
           ),
         );
       }

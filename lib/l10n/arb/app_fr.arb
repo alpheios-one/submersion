@@ -2327,6 +2327,10 @@
   "diveLog_tooltip_rate": "Vitesse",
   "diveLog_tooltip_sac": "CAS",
   "diveLog_tooltip_sensor": "Capteur",
+  "diveLog_legend_label_o2Cells": "Cellules O2",
+  "diveLog_tooltip_o2CellsTight": "serrée",
+  "diveLog_tooltip_o2CellsDrifting": "en dérive",
+  "diveLog_tooltip_o2CellsWide": "large",
   "diveLog_tooltip_srfGf": "SrfGF",
   "diveLog_tooltip_temp": "Temp",
   "diveLog_tooltip_time": "Temps",
@@ -5647,6 +5651,7 @@
   "units_profileMetric_gPerL": "g/L",
   "units_profileMetric_min": "min",
   "units_profileMetric_percent": "%",
+  "units_profileMetric_millivolts": "mV",
   "units_sac_litersPerMin": "L/min",
   "units_sac_pressurePerMin": "pression/min",
   "units_temperature_celsius": "C",
@@ -7311,7 +7316,13 @@
   "water_conditions_noData": "Aucune donnée satellite sur l'eau pour cet emplacement",
   "water_conditions_freshwater": "La température de l'eau par satellite ne couvre que les océans",
   "water_conditions_anomaly": "Anomalie {value}",
-  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
+  "@water_conditions_anomaly": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "reef_health_degreeHeatingWeeks": "Degrés-semaines de chaleur {value} C-semaines",
   "reef_health_seaSurface": "Surface de la mer {value}",
   "reef_health_asOf": "Au {date}",
@@ -9477,6 +9488,9 @@
   "media_info_checkMissing": "Source introuvable",
   "media_info_checkUnavailable": "Vérification impossible pour le moment",
   "media_info_backupQueued": "Mis en file pour téléversement",
+  "enum_profileMetric_o2CellMv": "Cellules O2",
+  "enum_profileMetric_o2CellMv_short": "Cellules",
+  "diveLog_o2CellSpread_label": "Écart des cellules O2",
   "media_status_broken": "Absent et non sauvegardé",
   "media_status_transferFailed": "Échec du téléversement",
   "media_status_transferring": "Téléversement en cours",

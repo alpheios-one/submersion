@@ -651,6 +651,13 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
                     o2Sensor4: s.o2_sensor.3.isNaN ? nil : s.o2_sensor.3,
                     o2Sensor5: s.o2_sensor.4.isNaN ? nil : s.o2_sensor.4,
                     o2Sensor6: s.o2_sensor.5.isNaN ? nil : s.o2_sensor.5,
+                    // C `unsigned int o2_sensor_mv[6]` imports as a 6-tuple.
+                    o2SensorMv1: s.o2_sensor_mv.0 == UInt32.max ? nil : Int64(s.o2_sensor_mv.0),
+                    o2SensorMv2: s.o2_sensor_mv.1 == UInt32.max ? nil : Int64(s.o2_sensor_mv.1),
+                    o2SensorMv3: s.o2_sensor_mv.2 == UInt32.max ? nil : Int64(s.o2_sensor_mv.2),
+                    o2SensorMv4: s.o2_sensor_mv.3 == UInt32.max ? nil : Int64(s.o2_sensor_mv.3),
+                    o2SensorMv5: s.o2_sensor_mv.4 == UInt32.max ? nil : Int64(s.o2_sensor_mv.4),
+                    o2SensorMv6: s.o2_sensor_mv.5 == UInt32.max ? nil : Int64(s.o2_sensor_mv.5),
                     gasMixIndex: s.gasmix == UInt32.max ? nil : Int64(s.gasmix)
                 ))
             }

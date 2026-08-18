@@ -7351,6 +7351,18 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_tooltip_sensor => 'Érzékelő';
 
   @override
+  String get diveLog_legend_label_o2Cells => 'O2 cellák';
+
+  @override
+  String get diveLog_tooltip_o2CellsTight => 'szoros';
+
+  @override
+  String get diveLog_tooltip_o2CellsDrifting => 'elsodródó';
+
+  @override
+  String get diveLog_tooltip_o2CellsWide => 'széles';
+
+  @override
   String get diveLog_tooltip_srfGf => 'SrfGF';
 
   @override
@@ -18865,6 +18877,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get units_profileMetric_percent => '%';
+
+  @override
+  String get units_profileMetric_millivolts => 'mV';
 
   @override
   String get units_sac_litersPerMin => 'L/min';
@@ -32065,6 +32080,15 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Feltöltési sorban';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'O2-cellák';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Cellák';
+
+  @override
+  String get diveLog_o2CellSpread_label => 'O2-cellák szórása';
 
   @override
   String get media_status_broken => 'Hiányzik és nincs mentve';

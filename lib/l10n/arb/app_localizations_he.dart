@@ -7185,6 +7185,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_tooltip_sensor => 'חיישן';
 
   @override
+  String get diveLog_legend_label_o2Cells => 'תאי O2';
+
+  @override
+  String get diveLog_tooltip_o2CellsTight => 'צמוד';
+
+  @override
+  String get diveLog_tooltip_o2CellsDrifting => 'סטייה';
+
+  @override
+  String get diveLog_tooltip_o2CellsWide => 'רחב';
+
+  @override
   String get diveLog_tooltip_srfGf => 'SrfGF';
 
   @override
@@ -18449,6 +18461,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get units_profileMetric_percent => '%';
+
+  @override
+  String get units_profileMetric_millivolts => 'mV';
 
   @override
   String get units_sac_litersPerMin => 'L/min';
@@ -31544,6 +31559,15 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'בתור להעלאה';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'תאי O2';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'תאים';
+
+  @override
+  String get diveLog_o2CellSpread_label => 'פיזור תאי O2';
 
   @override
   String get media_status_broken => 'חסר ולא מגובה';

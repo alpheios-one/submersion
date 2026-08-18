@@ -2399,6 +2399,10 @@
   "diveLog_tooltip_rate": "المعدل",
   "diveLog_tooltip_sac": "SAC",
   "diveLog_tooltip_sensor": "المستشعر",
+  "diveLog_legend_label_o2Cells": "خلايا O2",
+  "diveLog_tooltip_o2CellsTight": "متقارب",
+  "diveLog_tooltip_o2CellsDrifting": "منحرف",
+  "diveLog_tooltip_o2CellsWide": "متباعد",
   "diveLog_tooltip_srfGf": "SrfGF",
   "diveLog_tooltip_temp": "الحرارة",
   "diveLog_tooltip_time": "الوقت",
@@ -5719,6 +5723,7 @@
   "units_profileMetric_gPerL": "g/L",
   "units_profileMetric_min": "min",
   "units_profileMetric_percent": "%",
+  "units_profileMetric_millivolts": "mV",
   "units_sac_litersPerMin": "L/min",
   "units_sac_pressurePerMin": "ضغط/min",
   "units_temperature_celsius": "C",
@@ -7311,7 +7316,13 @@
   "water_conditions_noData": "لا توجد بيانات مياه من الأقمار الصناعية لهذا الموقع",
   "water_conditions_freshwater": "درجة حرارة المياه عبر الأقمار الصناعية تغطي المحيطات فقط",
   "water_conditions_anomaly": "شذوذ {value}",
-  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
+  "@water_conditions_anomaly": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "reef_health_degreeHeatingWeeks": "أسابيع الحرارة المتراكمة {value} درجة-أسبوع",
   "reef_health_seaSurface": "سطح البحر {value}",
   "reef_health_asOf": "حتى {date}",
@@ -9477,6 +9488,9 @@
   "media_info_checkMissing": "المصدر مفقود",
   "media_info_checkUnavailable": "تعذر التحقق الآن",
   "media_info_backupQueued": "في قائمة انتظار الرفع",
+  "enum_profileMetric_o2CellMv": "خلايا الأكسجين",
+  "enum_profileMetric_o2CellMv_short": "الخلايا",
+  "diveLog_o2CellSpread_label": "تشتت خلايا O2",
   "media_status_broken": "مفقود وغير منسوخ احتياطيًا",
   "media_status_transferFailed": "فشل الرفع",
   "media_status_transferring": "جارٍ الرفع",

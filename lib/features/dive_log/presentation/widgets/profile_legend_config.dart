@@ -37,6 +37,9 @@ class ProfileLegendConfig {
   final bool hasTtsData;
   final bool hasCnsData;
   final bool hasOtuData;
+
+  /// Whether any O2 cell reported a raw millivolt reading (issue #810).
+  final bool hasO2CellMvData;
   const ProfileLegendConfig({
     this.hasTemperatureData = false,
     this.hasPressureData = false,
@@ -67,6 +70,7 @@ class ProfileLegendConfig {
     this.hasTtsData = false,
     this.hasCnsData = false,
     this.hasOtuData = false,
+    this.hasO2CellMvData = false,
   });
 
   bool get hasTankListSection =>
@@ -97,5 +101,6 @@ class ProfileLegendConfig {
       hasMeanDepthData ||
       hasTtsData ||
       hasCnsData ||
-      hasOtuData;
+      hasOtuData ||
+      hasO2CellMvData;
 }

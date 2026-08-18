@@ -7400,6 +7400,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_tooltip_sensor => 'Capteur';
 
   @override
+  String get diveLog_legend_label_o2Cells => 'Cellules O2';
+
+  @override
+  String get diveLog_tooltip_o2CellsTight => 'serrée';
+
+  @override
+  String get diveLog_tooltip_o2CellsDrifting => 'en dérive';
+
+  @override
+  String get diveLog_tooltip_o2CellsWide => 'large';
+
+  @override
   String get diveLog_tooltip_srfGf => 'SrfGF';
 
   @override
@@ -18989,6 +19001,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get units_profileMetric_percent => '%';
+
+  @override
+  String get units_profileMetric_millivolts => 'mV';
 
   @override
   String get units_sac_litersPerMin => 'L/min';
@@ -32264,6 +32279,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Mis en file pour téléversement';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'Cellules O2';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Cellules';
+
+  @override
+  String get diveLog_o2CellSpread_label => 'Écart des cellules O2';
 
   @override
   String get media_status_broken => 'Absent et non sauvegardé';

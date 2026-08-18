@@ -12451,6 +12451,30 @@ abstract class AppLocalizations {
   /// **'Sensor'**
   String get diveLog_tooltip_sensor;
 
+  /// No description provided for @diveLog_legend_label_o2Cells.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 cells'**
+  String get diveLog_legend_label_o2Cells;
+
+  /// No description provided for @diveLog_tooltip_o2CellsTight.
+  ///
+  /// In en, this message translates to:
+  /// **'tight'**
+  String get diveLog_tooltip_o2CellsTight;
+
+  /// No description provided for @diveLog_tooltip_o2CellsDrifting.
+  ///
+  /// In en, this message translates to:
+  /// **'drifting'**
+  String get diveLog_tooltip_o2CellsDrifting;
+
+  /// No description provided for @diveLog_tooltip_o2CellsWide.
+  ///
+  /// In en, this message translates to:
+  /// **'wide'**
+  String get diveLog_tooltip_o2CellsWide;
+
   /// No description provided for @diveLog_tooltip_srfGf.
   ///
   /// In en, this message translates to:
@@ -31674,6 +31698,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'%'**
   String get units_profileMetric_percent;
+
+  /// No description provided for @units_profileMetric_millivolts.
+  ///
+  /// In en, this message translates to:
+  /// **'mV'**
+  String get units_profileMetric_millivolts;
 
   /// Symbol for SAC rate in liters per minute
   ///
@@ -53285,6 +53315,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Queued for upload'**
   String get media_info_backupQueued;
+
+  /// No description provided for @enum_profileMetric_o2CellMv.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 Cells'**
+  String get enum_profileMetric_o2CellMv;
+
+  /// No description provided for @enum_profileMetric_o2CellMv_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Cells'**
+  String get enum_profileMetric_o2CellMv_short;
+
+  /// No description provided for @diveLog_o2CellSpread_label.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 Cell Spread'**
+  String get diveLog_o2CellSpread_label;
 
   /// No description provided for @media_status_broken.
   ///

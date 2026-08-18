@@ -7014,6 +7014,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_tooltip_sensor => '传感器';
 
   @override
+  String get diveLog_legend_label_o2Cells => '氧电池';
+
+  @override
+  String get diveLog_tooltip_o2CellsTight => '接近';
+
+  @override
+  String get diveLog_tooltip_o2CellsDrifting => '偏移';
+
+  @override
+  String get diveLog_tooltip_o2CellsWide => '偏差大';
+
+  @override
   String get diveLog_tooltip_srfGf => '水面GF';
 
   @override
@@ -17978,6 +17990,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get units_profileMetric_percent => '%';
+
+  @override
+  String get units_profileMetric_millivolts => 'mV';
 
   @override
   String get units_sac_litersPerMin => 'L/分钟';
@@ -30341,6 +30356,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => '已加入上传队列';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'O2 电池';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => '电池';
+
+  @override
+  String get diveLog_o2CellSpread_label => 'O2电池离散度';
 
   @override
   String get media_status_broken => '缺失且未备份';
