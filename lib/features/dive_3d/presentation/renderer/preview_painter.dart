@@ -24,7 +24,6 @@ class Dive3dScenePainter extends CustomPainter {
   final double pitchDegrees;
   final double zoom;
   final Set<SceneOverlay>? visibleOverlays;
-  final bool mirrorX;
 
   /// Stitched map-tile mosaic draped over the terrain-merged group; null
   /// paints vertex colors only.
@@ -41,7 +40,6 @@ class Dive3dScenePainter extends CustomPainter {
     this.pitchDegrees = 22,
     this.zoom = 1.0,
     this.visibleOverlays,
-    this.mirrorX = false,
     this.terrainImagery,
     this.imageryWhiteTexel,
   });
@@ -104,7 +102,6 @@ class Dive3dScenePainter extends CustomPainter {
       yawDegrees: yawDegrees,
       pitchDegrees: pitchDegrees,
       zoom: zoom,
-      mirrorX: mirrorX,
     );
     final parts = partitionLayers(scene, visibleOverlays);
     // Only the terrain-merged group textures; rest layers (paths, pins,
@@ -366,7 +363,6 @@ class Dive3dScenePainter extends CustomPainter {
       oldDelegate.pitchDegrees != pitchDegrees ||
       oldDelegate.zoom != zoom ||
       oldDelegate.visibleOverlays != visibleOverlays ||
-      oldDelegate.mirrorX != mirrorX ||
       !identical(oldDelegate.terrainImagery, terrainImagery) ||
       oldDelegate.imageryWhiteTexel != imageryWhiteTexel;
 }

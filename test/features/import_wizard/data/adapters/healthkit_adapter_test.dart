@@ -1773,22 +1773,24 @@ void main() {
       tester,
     ) async {
       final service = MockHealthImportService();
-      final completer = Completer<bool>();
-      when(service.hasPermissions()).thenAnswer((_) => completer.future);
+      final completer = Completer<HealthPermissionStatus>();
+      when(service.permissionStatus()).thenAnswer((_) => completer.future);
 
       await tester.pumpWidget(buildPermissionsStep(service));
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      completer.complete(false);
+      completer.complete(HealthPermissionStatus.granted);
       await tester.pumpAndSettle();
     });
 
-    testWidgets('shows granted state when permissions already granted', (
+    testWidgets('shows granted state when the platform confirms access', (
       tester,
     ) async {
       final service = MockHealthImportService();
-      when(service.hasPermissions()).thenAnswer((_) async => true);
+      when(
+        service.permissionStatus(),
+      ).thenAnswer((_) async => HealthPermissionStatus.granted);
 
       await tester.pumpWidget(buildPermissionsStep(service));
       await tester.pumpAndSettle();
@@ -1796,30 +1798,76 @@ void main() {
       expect(find.text('HealthKit Access Granted'), findsOneWidget);
       expect(find.text('You can proceed to the next step.'), findsOneWidget);
       expect(find.byIcon(Icons.check_circle), findsOneWidget);
+      // Nothing to request: the platform already said yes.
+      verifyNever(service.requestPermissions());
     });
 
-    testWidgets('shows request button when permissions not yet granted', (
+    testWidgets('requests access when the platform will not disclose it', (
+      tester,
+    ) async {
+      // Regression for #1128: iOS never reports read access, so the step used
+      // to sit on "Access Required" and demand a button tap on every visit.
+      final service = MockHealthImportService();
+      when(
+        service.permissionStatus(),
+      ).thenAnswer((_) async => HealthPermissionStatus.undetermined);
+      when(service.requestPermissions()).thenAnswer((_) async => true);
+
+      await tester.pumpWidget(buildPermissionsStep(service));
+      await tester.pumpAndSettle();
+
+      verify(service.requestPermissions()).called(1);
+      expect(find.text('HealthKit Access Granted'), findsOneWidget);
+      expect(find.text('Grant HealthKit Access'), findsNothing);
+    });
+
+    testWidgets('explains where to fix access once it is requested', (
       tester,
     ) async {
       final service = MockHealthImportService();
-      when(service.hasPermissions()).thenAnswer((_) async => false);
+      when(
+        service.permissionStatus(),
+      ).thenAnswer((_) async => HealthPermissionStatus.undetermined);
+      when(service.requestPermissions()).thenAnswer((_) async => true);
+
+      await tester.pumpWidget(buildPermissionsStep(service));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('never tells apps whether read access'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('shows the unavailable state off Apple platforms', (
+      tester,
+    ) async {
+      final service = MockHealthImportService();
+      when(
+        service.permissionStatus(),
+      ).thenAnswer((_) async => HealthPermissionStatus.unsupported);
+
+      await tester.pumpWidget(buildPermissionsStep(service));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Not Available'), findsOneWidget);
+      verifyNever(service.requestPermissions());
+    });
+
+    testWidgets('offers a retry button when the platform refuses access', (
+      tester,
+    ) async {
+      final service = MockHealthImportService();
+      when(
+        service.permissionStatus(),
+      ).thenAnswer((_) async => HealthPermissionStatus.denied);
 
       await tester.pumpWidget(buildPermissionsStep(service));
       await tester.pumpAndSettle();
 
       expect(find.text('Apple HealthKit Access Required'), findsOneWidget);
       expect(find.text('Grant HealthKit Access'), findsOneWidget);
-    });
-
-    testWidgets('shows description text when permissions not granted', (
-      tester,
-    ) async {
-      final service = MockHealthImportService();
-      when(service.hasPermissions()).thenAnswer((_) async => false);
-
-      await tester.pumpWidget(buildPermissionsStep(service));
-      await tester.pumpAndSettle();
-
+      expect(find.byIcon(Icons.health_and_safety), findsAtLeast(1));
       expect(
         find.text(
           'Submersion uses Apple HealthKit to read underwater diving workout '
@@ -1828,25 +1876,16 @@ void main() {
         ),
         findsOneWidget,
       );
+      verifyNever(service.requestPermissions());
     });
 
-    testWidgets('shows health_and_safety icon when permissions not granted', (
+    testWidgets('tapping the retry button requests access again', (
       tester,
     ) async {
       final service = MockHealthImportService();
-      when(service.hasPermissions()).thenAnswer((_) async => false);
-
-      await tester.pumpWidget(buildPermissionsStep(service));
-      await tester.pumpAndSettle();
-
-      expect(find.byIcon(Icons.health_and_safety), findsAtLeast(1));
-    });
-
-    testWidgets('tapping request button calls requestPermissions', (
-      tester,
-    ) async {
-      final service = MockHealthImportService();
-      when(service.hasPermissions()).thenAnswer((_) async => false);
+      when(
+        service.permissionStatus(),
+      ).thenAnswer((_) async => HealthPermissionStatus.denied);
       final requestCompleter = Completer<bool>();
       when(
         service.requestPermissions(),
@@ -1859,99 +1898,58 @@ void main() {
       await tester.pump();
 
       verify(service.requestPermissions()).called(1);
-
-      // Shows requesting state
       expect(find.text('Requesting...'), findsOneWidget);
+
+      // The button disables itself while the request is in flight.
+      await tester.tap(find.byType(FilledButton));
+      await tester.pump();
+      verifyNever(service.requestPermissions());
 
       requestCompleter.complete(true);
       await tester.pumpAndSettle();
-    });
-
-    testWidgets('shows granted state after permissions granted via button', (
-      tester,
-    ) async {
-      final service = MockHealthImportService();
-      when(service.hasPermissions()).thenAnswer((_) async => false);
-      when(service.requestPermissions()).thenAnswer((_) async => true);
-
-      await tester.pumpWidget(buildPermissionsStep(service));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Grant HealthKit Access'));
-      await tester.pumpAndSettle();
 
       expect(find.text('HealthKit Access Granted'), findsOneWidget);
-      expect(find.byIcon(Icons.check_circle), findsOneWidget);
     });
 
-    testWidgets('stays on request screen when permissions denied via button', (
+    testWidgets('stays on the request screen when the request fails', (
       tester,
     ) async {
       final service = MockHealthImportService();
-      when(service.hasPermissions()).thenAnswer((_) async => false);
+      when(
+        service.permissionStatus(),
+      ).thenAnswer((_) async => HealthPermissionStatus.undetermined);
       when(service.requestPermissions()).thenAnswer((_) async => false);
 
       await tester.pumpWidget(buildPermissionsStep(service));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Grant HealthKit Access'));
-      await tester.pumpAndSettle();
-
       expect(find.text('Apple HealthKit Access Required'), findsOneWidget);
       expect(find.text('Grant HealthKit Access'), findsOneWidget);
     });
 
-    testWidgets('button is disabled while requesting permissions', (
-      tester,
-    ) async {
+    testWidgets('requests access when the status check throws', (tester) async {
       final service = MockHealthImportService();
-      when(service.hasPermissions()).thenAnswer((_) async => false);
-      final requestCompleter = Completer<bool>();
-      when(
-        service.requestPermissions(),
-      ).thenAnswer((_) => requestCompleter.future);
+      when(service.permissionStatus()).thenThrow(Exception('platform error'));
+      when(service.requestPermissions()).thenAnswer((_) async => true);
 
       await tester.pumpWidget(buildPermissionsStep(service));
       await tester.pumpAndSettle();
 
-      // Tap the button to start the request.
-      await tester.tap(find.text('Grant HealthKit Access'));
-      await tester.pump();
-
-      // While the request is in flight, tapping again should be a no-op
-      // because the button disables itself (onPressed = null).
-      // Verify by checking that requestPermissions was called exactly once.
+      // A failed check is not a denial, so it must not block the import.
       verify(service.requestPermissions()).called(1);
-
-      requestCompleter.complete(false);
-      await tester.pumpAndSettle();
-    });
-
-    testWidgets('handles exception during hasPermissions check gracefully', (
-      tester,
-    ) async {
-      final service = MockHealthImportService();
-      when(service.hasPermissions()).thenThrow(Exception('platform error'));
-
-      await tester.pumpWidget(buildPermissionsStep(service));
-      await tester.pumpAndSettle();
-
-      // Falls through to the request screen
-      expect(find.text('Apple HealthKit Access Required'), findsOneWidget);
-      expect(find.text('Grant HealthKit Access'), findsOneWidget);
+      expect(find.text('HealthKit Access Granted'), findsOneWidget);
     });
 
     testWidgets('handles exception during requestPermissions gracefully', (
       tester,
     ) async {
       final service = MockHealthImportService();
-      when(service.hasPermissions()).thenAnswer((_) async => false);
+      when(
+        service.permissionStatus(),
+      ).thenAnswer((_) async => HealthPermissionStatus.undetermined);
       when(service.requestPermissions()).thenThrow(Exception('platform error'));
 
       await tester.pumpWidget(buildPermissionsStep(service));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Grant HealthKit Access'));
       await tester.pumpAndSettle();
 
       // Should recover -- still on request screen, not crashed
@@ -1960,10 +1958,12 @@ void main() {
     });
 
     testWidgets(
-      'sets healthKitPermissionsGrantedProvider when permissions granted on check',
+      'sets healthKitPermissionsGrantedProvider once access is ready',
       (tester) async {
         final service = MockHealthImportService();
-        when(service.hasPermissions()).thenAnswer((_) async => true);
+        when(
+          service.permissionStatus(),
+        ).thenAnswer((_) async => HealthPermissionStatus.granted);
 
         late WidgetRef capturedRef;
         await tester.pumpWidget(
@@ -2008,6 +2008,57 @@ void main() {
         expect(capturedRef.read(healthKitPermissionsGrantedProvider), isTrue);
       },
     );
+
+    testWidgets('clears healthKitPermissionsGrantedProvider when refused', (
+      tester,
+    ) async {
+      final service = MockHealthImportService();
+      when(
+        service.permissionStatus(),
+      ).thenAnswer((_) async => HealthPermissionStatus.denied);
+
+      late WidgetRef capturedRef;
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
+            home: Scaffold(
+              body: Column(
+                children: [
+                  Consumer(
+                    builder: (context, ref, _) {
+                      capturedRef = ref;
+                      return const SizedBox();
+                    },
+                  ),
+                  Expanded(
+                    child: Builder(
+                      builder: (context) {
+                        final widgetAdapter = HealthKitAdapter(
+                          healthService: service,
+                          diveMatcher: MockDiveMatcher(),
+                          converter: MockImportedDiveConverter(),
+                          diveRepository: MockDiveRepository(),
+                          diverId: 'diver-1',
+                        );
+                        return widgetAdapter.acquisitionSteps[0].builder(
+                          context,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(capturedRef.read(healthKitPermissionsGrantedProvider), isFalse);
+    });
   });
 
   // -------------------------------------------------------------------------
@@ -2143,6 +2194,60 @@ void main() {
       expect(capturedRef.read(healthKitDateRangeSelectedProvider), isTrue);
     });
 
+    testWidgets('publishes a range covering both days end to end', (
+      tester,
+    ) async {
+      // Regression for #1128: the pickers hand back midnight and HealthKit
+      // matches on a strict start date, so a range ending at midnight drops
+      // every dive on its own end day.
+      late WidgetRef capturedRef;
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
+            home: Scaffold(
+              body: Column(
+                children: [
+                  Consumer(
+                    builder: (context, ref, _) {
+                      capturedRef = ref;
+                      return const SizedBox();
+                    },
+                  ),
+                  Expanded(
+                    child: Builder(
+                      builder: (context) {
+                        final widgetAdapter = HealthKitAdapter(
+                          healthService: MockHealthImportService(),
+                          diveMatcher: MockDiveMatcher(),
+                          converter: MockImportedDiveConverter(),
+                          diveRepository: MockDiveRepository(),
+                          diverId: 'diver-1',
+                        );
+                        return widgetAdapter.acquisitionSteps[1].builder(
+                          context,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final range = capturedRef.read(healthKitDateRangeProvider);
+      expect(range.start.hour, equals(0));
+      expect(range.start.minute, equals(0));
+      expect(range.end.hour, equals(23));
+      expect(range.end.minute, equals(59));
+      expect(range.end.second, equals(59));
+    });
+
     testWidgets('both date picker buttons are tappable InkWells', (
       tester,
     ) async {
@@ -2259,7 +2364,12 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Found 0 dives'), findsOneWidget);
-      expect(find.text('Proceeding to review...'), findsOneWidget);
+      // A zero-dive result points at the two things that actually cause it.
+      expect(find.text('Proceeding to review...'), findsNothing);
+      expect(
+        find.textContaining('Check that the dates cover the dive'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows error state when fetch fails', (tester) async {
@@ -2497,6 +2607,63 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(capturedRef.read(healthKitDivesFetchedProvider), isFalse);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // healthKitWholeDayRange
+  // -------------------------------------------------------------------------
+
+  group('healthKitWholeDayRange', () {
+    test('starts the range at midnight on the start day', () {
+      final range = healthKitWholeDayRange(
+        DateTime(2024, 1, 15, 14, 30),
+        DateTime(2024, 1, 20, 8, 0),
+      );
+
+      expect(range.start, equals(DateTime(2024, 1, 15)));
+    });
+
+    test('runs the range to the last instant of the end day', () {
+      // A dive at 09:00 on the end day must fall inside the range.
+      final range = healthKitWholeDayRange(
+        DateTime(2024, 1, 15),
+        DateTime(2024, 1, 20),
+      );
+
+      expect(range.end, equals(DateTime(2024, 1, 20, 23, 59, 59, 999)));
+      expect(range.end.isAfter(DateTime(2024, 1, 20, 9, 0)), isTrue);
+    });
+
+    test('ends on the last instant the method channel can carry', () {
+      // The health plugin sends both bounds as millisecondsSinceEpoch, so
+      // 23:59:59.999999 would truncate to the same integer. Spelling the end
+      // with microseconds buys nothing; this pins that they are equivalent so
+      // the extra precision is not reintroduced as a "fix".
+      final range = healthKitWholeDayRange(
+        DateTime(2024, 1, 15),
+        DateTime(2024, 1, 20),
+      );
+      final lastMicrosecond = DateTime(
+        2024,
+        1,
+        21,
+      ).subtract(const Duration(microseconds: 1));
+
+      expect(
+        range.end.millisecondsSinceEpoch,
+        equals(lastMicrosecond.millisecondsSinceEpoch),
+      );
+    });
+
+    test('covers a single day picked for both ends', () {
+      final range = healthKitWholeDayRange(
+        DateTime(2024, 1, 15),
+        DateTime(2024, 1, 15),
+      );
+
+      expect(range.start.isBefore(DateTime(2024, 1, 15, 9, 0)), isTrue);
+      expect(range.end.isAfter(DateTime(2024, 1, 15, 9, 0)), isTrue);
     });
   });
 }

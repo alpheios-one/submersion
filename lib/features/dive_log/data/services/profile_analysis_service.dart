@@ -23,6 +23,15 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
 import 'package:submersion/features/dive_log/domain/entities/profile_event.dart';
 import 'package:submersion/features/dive_log/domain/services/deco_stop_curve.dart';
 
+/// Version of the deco computation behind [ProfileAnalysis].
+///
+/// Bump this whenever a change could flip [ProfileAnalysis.hadDecoObligation]
+/// for an unchanged profile: a different algorithm, altered coefficients, or a
+/// changed ceiling convention. Consumers that memoize an analysis-derived
+/// answer fold it into their cache key, so a bump invalidates their stored
+/// results. Currently used by the statistics deco-classification cache (#623).
+const int analysisEngineVersion = 1;
+
 /// Represents SAC calculated over a segment of the dive.
 class SacSegment extends Equatable {
   /// Start timestamp of this segment (seconds from dive start)
@@ -236,6 +245,12 @@ class ProfileAnalysis {
   /// with null where that cell had no reading. Null when the dive has no cells.
   final List<List<double?>>? o2SensorCurves;
 
+  /// Raw O2 cell output at each profile point (mV), shaped like
+  /// [o2SensorCurves]. Derived independently of the ppO2 resolution: a computer
+  /// with an untrusted calibration reports these and no bar value at all
+  /// (issue #810). Null when no cell reports millivolts.
+  final List<List<int?>>? o2CellMvCurves;
+
   /// True when [ppO2Curve] values are derived from averaging O2 cells (no
   /// computer-supplied ppO2 was available). Used to label the chart tooltip.
   final bool ppO2FromSensorAverage;
@@ -303,6 +318,7 @@ class ProfileAnalysis {
     required this.o2Exposure,
     required this.ppO2Curve,
     this.o2SensorCurves,
+    this.o2CellMvCurves,
     this.ppO2FromSensorAverage = false,
     this.sacCurve,
     this.smoothedSacCurve,
@@ -393,6 +409,7 @@ class ProfileAnalysis {
     O2Exposure? o2Exposure,
     List<double>? ppO2Curve,
     List<List<double?>>? o2SensorCurves,
+    List<List<int?>>? o2CellMvCurves,
     bool? ppO2FromSensorAverage,
     List<double>? sacCurve,
     List<double>? smoothedSacCurve,
@@ -424,6 +441,7 @@ class ProfileAnalysis {
       o2Exposure: o2Exposure ?? this.o2Exposure,
       ppO2Curve: ppO2Curve ?? this.ppO2Curve,
       o2SensorCurves: o2SensorCurves ?? this.o2SensorCurves,
+      o2CellMvCurves: o2CellMvCurves ?? this.o2CellMvCurves,
       ppO2FromSensorAverage:
           ppO2FromSensorAverage ?? this.ppO2FromSensorAverage,
       sacCurve: sacCurve ?? this.sacCurve,

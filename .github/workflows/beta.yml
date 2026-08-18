@@ -20,10 +20,18 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: beta-pipeline
-  cancel-in-progress: true
-
+# Concurrency is declared per job, not for the whole workflow, because the two
+# phases of this pipeline want opposite policies. Workflow-level concurrency is
+# evaluated when the run is created, long before any job has been scheduled, so
+# it cannot tell a run that is two minutes into compiling from one that is
+# mid-upload to App Store Connect; a newer run cancelled either. That is how a
+# beta lost all three store uploads at 22:56 on 2026-08-17 after a 26 minute
+# build, to a run that then skipped every job because its upstream CI had been
+# cancelled rather than succeeding.
+#
+# Build phase: still preemptible. Finishing a superseded build helps nobody.
+# Publish phase: never cancelled. Once a lane starts talking to a store, a
+# newer run's matching lane queues behind it instead of killing it.
 jobs:
   precheck:
     name: Compute version and gate
@@ -157,6 +165,11 @@ jobs:
     name: Build
     needs: precheck
     if: needs.precheck.outputs.proceed == 'true'
+    # The group name must stay distinct from anything build-all.yml declares
+    # (it declares none), or the caller would cancel itself.
+    concurrency:
+      group: beta-build
+      cancel-in-progress: true
     uses: ./.github/workflows/build-all.yml
     with:
       version-tag: ${{ needs.precheck.outputs.tag }}
@@ -168,6 +181,12 @@ jobs:
     name: Publish to beta-builds
     needs: [precheck, build]
     if: needs.precheck.outputs.proceed == 'true' && inputs.skip-publish != true
+    # One group per lane rather than one shared publish group: a shared group
+    # would serialize this run's own four lanes against each other and stretch
+    # about 90 seconds of parallel uploads into three and a half minutes.
+    concurrency:
+      group: beta-publish-release
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -278,6 +297,9 @@ jobs:
     runs-on: macos-15
     needs: [precheck, build]
     if: needs.precheck.outputs.proceed == 'true' && inputs.skip-publish != true
+    concurrency:
+      group: beta-publish-ios
+      cancel-in-progress: false
     timeout-minutes: 45
     steps:
       - name: Checkout repository
@@ -379,6 +401,9 @@ jobs:
     runs-on: macos-15
     needs: [precheck, build]
     if: needs.precheck.outputs.proceed == 'true' && inputs.skip-publish != true
+    concurrency:
+      group: beta-publish-macos
+      cancel-in-progress: false
     timeout-minutes: 45
     steps:
       - name: Checkout repository
@@ -474,6 +499,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [precheck, build]
     if: needs.precheck.outputs.proceed == 'true' && inputs.skip-publish != true
+    concurrency:
+      group: beta-publish-play
+      cancel-in-progress: false
     timeout-minutes: 15
     steps:
       - name: Checkout repository

@@ -697,11 +697,77 @@ abstract class AppLocalizations {
   /// **'Replace'**
   String get diveLog_bulkEdit_modeReplace;
 
+  /// No description provided for @diveLog_bulkEdit_modeUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get diveLog_bulkEdit_modeUpdate;
+
   /// No description provided for @diveLog_bulkEdit_tankOnlyIfEmpty.
   ///
   /// In en, this message translates to:
   /// **'Only dives that don\'t already have a tank'**
   String get diveLog_bulkEdit_tankOnlyIfEmpty;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which attributes to overwrite on the tanks these dives already have. Start and end pressures are never changed.'**
+  String get diveLog_bulkEdit_tankSpecsHint;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsNoFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at least one tank attribute to update.'**
+  String get diveLog_bulkEdit_tankSpecsNoFields;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset'**
+  String get diveLog_bulkEdit_tankFieldPreset;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get diveLog_bulkEdit_tankFieldRole;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get diveLog_bulkEdit_tankFieldVolume;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldWorkingPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Working pressure'**
+  String get diveLog_bulkEdit_tankFieldWorkingPressure;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldMaterial.
+  ///
+  /// In en, this message translates to:
+  /// **'Material'**
+  String get diveLog_bulkEdit_tankFieldMaterial;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldGasMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas mix'**
+  String get diveLog_bulkEdit_tankFieldGasMix;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get diveLog_bulkEdit_tankFieldName;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 selected dive has no tanks and will be skipped.} other{{count} selected dives have no tanks and will be skipped.}}'**
+  String diveLog_bulkEdit_tankSpecsSkipped(int count);
 
   /// No description provided for @diveLog_bulkEdit_confirmTitle.
   ///
@@ -8203,18 +8269,6 @@ abstract class AppLocalizations {
   /// **'View fullscreen'**
   String get diveLog_detail_tooltip_viewFullscreen;
 
-  /// No description provided for @diveLog_detail_viewMap.
-  ///
-  /// In en, this message translates to:
-  /// **'Map'**
-  String get diveLog_detail_viewMap;
-
-  /// No description provided for @diveLog_detail_view3d.
-  ///
-  /// In en, this message translates to:
-  /// **'3D'**
-  String get diveLog_detail_view3d;
-
   /// No description provided for @diveLog_detail_viewSite.
   ///
   /// In en, this message translates to:
@@ -9649,6 +9703,12 @@ abstract class AppLocalizations {
   /// **'Filter Dives'**
   String get diveLog_filter_title;
 
+  /// No description provided for @diveLog_filter_resizeGrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Resize filter panel'**
+  String get diveLog_filter_resizeGrip;
+
   /// No description provided for @diveLog_filter_tooltip_close.
   ///
   /// In en, this message translates to:
@@ -10686,12 +10746,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cloud sync'**
   String get setup_sync_header;
-
-  /// No description provided for @setup_sync_icloudUnavailable.
-  ///
-  /// In en, this message translates to:
-  /// **'iCloud is not available on this device'**
-  String get setup_sync_icloudUnavailable;
 
   /// No description provided for @setup_sync_libraryFound_adopt.
   ///
@@ -12469,6 +12523,30 @@ abstract class AppLocalizations {
   /// **'Sensor'**
   String get diveLog_tooltip_sensor;
 
+  /// No description provided for @diveLog_legend_label_o2Cells.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 cells'**
+  String get diveLog_legend_label_o2Cells;
+
+  /// No description provided for @diveLog_tooltip_o2CellsTight.
+  ///
+  /// In en, this message translates to:
+  /// **'tight'**
+  String get diveLog_tooltip_o2CellsTight;
+
+  /// No description provided for @diveLog_tooltip_o2CellsDrifting.
+  ///
+  /// In en, this message translates to:
+  /// **'drifting'**
+  String get diveLog_tooltip_o2CellsDrifting;
+
+  /// No description provided for @diveLog_tooltip_o2CellsWide.
+  ///
+  /// In en, this message translates to:
+  /// **'wide'**
+  String get diveLog_tooltip_o2CellsWide;
+
   /// No description provided for @diveLog_tooltip_srfGf.
   ///
   /// In en, this message translates to:
@@ -13513,6 +13591,49 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Parking Information'**
   String get diveSites_edit_access_parkingInfo_label;
+
+  /// Site form row: the typical way into the water at this site
+  ///
+  /// In en, this message translates to:
+  /// **'Entry Method'**
+  String get diveSites_edit_access_entryMethod_label;
+
+  /// Site form row: the typical way out of the water at this site
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Method'**
+  String get diveSites_edit_access_exitMethod_label;
+
+  /// Chip offering to fill a site's entry and exit method from the dives already logged there
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Your dive here: {entry} in, {exit} out} other{Your {count} dives here: {entry} in, {exit} out}}'**
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  );
+
+  /// Chip offering to fill a site's entry method when the logged dives record no exit method
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Your dive here: {entry}} other{Your {count} dives here: {entry}}}'**
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  );
+
+  /// Site detail access card: entry method row label
+  ///
+  /// In en, this message translates to:
+  /// **'Entry'**
+  String get diveSites_detail_access_entryMethod;
+
+  /// Site detail access card: exit method row label
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get diveSites_detail_access_exitMethod;
 
   /// No description provided for @diveSites_edit_altitude_helperText.
   ///
@@ -24321,11 +24442,31 @@ abstract class AppLocalizations {
   /// **' and '**
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator;
 
-  /// No description provided for @settings_cloudSync_peerRequiresUpdate_banner.
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamed.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}'**
-  String settings_cloudSync_peerRequiresUpdate_banner(num count);
+  /// **'{deviceList} syncs from a newer version of Submersion, so its latest changes are held for now.'**
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamedPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'{deviceList} sync from a newer version of Submersion, so their latest changes are held for now.'**
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  );
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_updateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Update this device to receive them.'**
+  String get settings_cloudSync_peerRequiresUpdate_updateAction;
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_storeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'They will apply automatically once this device\'s app store update arrives; the update may still be in review.'**
+  String get settings_cloudSync_peerRequiresUpdate_storeAction;
 
   /// No description provided for @settings_cloudSync_provider_connected.
   ///
@@ -28012,6 +28153,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Deco'**
   String get statistics_profile_deco_noDeco;
+
+  /// No description provided for @statistics_profile_deco_notRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Recorded'**
+  String get statistics_profile_deco_notRecorded;
+
+  /// No description provided for @statistics_profile_deco_notRecordedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} dives have no recorded or computable deco data and are excluded from the rate'**
+  String statistics_profile_deco_notRecordedHint(int count);
 
   /// No description provided for @statistics_profile_deco_semanticLabel.
   ///
@@ -31705,6 +31858,12 @@ abstract class AppLocalizations {
   /// **'%'**
   String get units_profileMetric_percent;
 
+  /// No description provided for @units_profileMetric_millivolts.
+  ///
+  /// In en, this message translates to:
+  /// **'mV'**
+  String get units_profileMetric_millivolts;
+
   /// Symbol for SAC rate in liters per minute
   ///
   /// In en, this message translates to:
@@ -33807,7 +33966,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveImport_healthkit_notAvailableDescription.
   ///
   /// In en, this message translates to:
-  /// **'Apple Watch import is only available on iOS and macOS devices.'**
+  /// **'Apple Watch import needs an iPhone with the Health app.'**
   String get diveImport_healthkit_notAvailableDescription;
 
   /// No description provided for @diveImport_healthkit_permissionCheckFailed.
@@ -41844,6 +42003,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Entry'**
   String get enum_siteField_entryType_short;
+
+  /// Site table column: exit method
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Method'**
+  String get enum_siteField_exitMethod;
+
+  /// Site table column (short): exit method
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get enum_siteField_exitMethod_short;
 
   /// No description provided for @enum_siteField_bestSeason_short.
   ///
@@ -51699,17 +51870,134 @@ abstract class AppLocalizations {
   /// **'Upgrading database... step {currentStep} of {totalSteps}'**
   String startup_migrating_progress(Object currentStep, Object totalSteps);
 
-  /// No description provided for @startup_error_title.
+  /// Terminal startup screen title when the failure could not be classified. Deliberately neutral: it must NOT claim the database upgrade failed, since most failures reach this screen without a migration having been attempted.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion could not start'**
+  String get startup_error_title;
+
+  /// Body for an unclassified terminal startup failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong before your dive log finished opening. Your data is still on disk and does not require a reinstall. Try restarting the app; if this persists, contact support.'**
+  String get startup_error_body;
+
+  /// Terminal startup screen title when the app's native database engine is missing or is not a SQLCipher build. The diver's database was never opened.
+  ///
+  /// In en, this message translates to:
+  /// **'This build can\'t open a database'**
+  String get startup_engineUnavailable_title;
+
+  /// Explains that an engine failure happens before the database is opened, so no dive data is at risk.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion\'s database engine is missing from this build, so your dive log was never opened. Nothing on disk has changed and no data is at risk.'**
+  String get startup_engineUnavailable_body;
+
+  /// Tells the diver that reinstalling or restoring cannot fix a broken app package, and asks them to report it.
+  ///
+  /// In en, this message translates to:
+  /// **'Reinstalling or restoring a backup will not help. Install a working build of Submersion, and please report this: it is a fault in the app package, not in your data.'**
+  String get startup_engineUnavailable_guidance;
+
+  /// Terminal startup screen title when the schema upgrade ladder genuinely failed. This is the ONLY class that may say the upgrade failed.
   ///
   /// In en, this message translates to:
   /// **'Database upgrade failed'**
-  String get startup_error_title;
+  String get startup_migrationFailed_title;
 
-  /// No description provided for @startup_error_body.
+  /// Explains a failed schema upgrade and points at the pre-migration safety copy.
   ///
   /// In en, this message translates to:
-  /// **'Try restarting the app. If this persists, contact support. Your data is still on disk and does not require a reinstall.'**
-  String get startup_error_body;
+  /// **'Your dive log could not be upgraded to the format this version needs. A safety copy was taken before the upgrade started, so nothing is lost.'**
+  String get startup_migrationFailed_body;
+
+  /// Terminal startup screen title when the database file was reached but is corrupt or unreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'Your dive log could not be read'**
+  String get startup_dataUnreadable_title;
+
+  /// Explains a damaged database file and points at restoring a backup.
+  ///
+  /// In en, this message translates to:
+  /// **'The database file is there, but Submersion cannot read it. This usually means the file is damaged. Restoring a backup is the fastest way back.'**
+  String get startup_dataUnreadable_body;
+
+  /// Label above the raw error text on the terminal startup failure screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical details'**
+  String get startup_failure_technicalDetails;
+
+  /// Heading of the recovery card offering a backup found on disk during a failed startup.
+  ///
+  /// In en, this message translates to:
+  /// **'A backup is available'**
+  String get startup_failure_backupAvailable_title;
+
+  /// When the offered backup was taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken {timestamp}'**
+  String startup_failure_backupAvailable_taken(Object timestamp);
+
+  /// Extra line shown when the offered backup is the automatic pre-migration safety copy. Object, not int, so schema numbers are never group-separated.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety copy taken before the upgrade from schema v{fromVersion} to v{toVersion}.'**
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  );
+
+  /// Button that swaps the offered backup in for the live database and restarts startup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore this backup'**
+  String get startup_failure_restoreAction;
+
+  /// Progress label while the offered backup is being restored.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring your dive log...'**
+  String get startup_failure_restoring;
+
+  /// Shown when the restore failed. Reassures the diver that the live database was rolled back untouched.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup could not be restored. Your dive log has been left exactly as it was.'**
+  String get startup_failure_restoreFailed;
+
+  /// Label before the filesystem path where backups are kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Your backups are in:'**
+  String get startup_failure_backupsFolder;
+
+  /// Desktop-only button that opens the backups folder in the system file manager.
+  ///
+  /// In en, this message translates to:
+  /// **'Show backup folder'**
+  String get startup_failure_showBackupsFolder;
+
+  /// Heading of the guided-downgrade section on a failed schema upgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Going back to the previous version'**
+  String get startup_failure_downgrade_title;
+
+  /// Explains how to go back to the previous app version, and why Submersion never downgrades itself.
+  ///
+  /// In en, this message translates to:
+  /// **'If the upgrade keeps failing, install the version of Submersion you were running before, then restore the safety copy from inside that version. Restoring it here would only run the same upgrade again. Submersion does not downgrade itself: moving you onto older builds automatically would quietly keep you on versions with known problems.'**
+  String get startup_failure_downgrade_body;
+
+  /// Button opening the app's releases page so the diver can pick the previous version.
+  ///
+  /// In en, this message translates to:
+  /// **'View previous releases'**
+  String get startup_failure_downgrade_action;
 
   /// No description provided for @startup_recovering_title.
   ///
@@ -51857,6 +52145,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please update Submersion to the latest version. Your data is safe and has not been modified. If a backup was taken before the upgrade, it is in your Backups folder and can be restored after updating.'**
   String get startup_versionMismatch_instructions;
+
+  /// No description provided for @startup_versionMismatch_storeInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'This app was installed from an app store and is older than the version that created your data. Your data is safe and has not been modified. Update Submersion when the new version appears in the store, then reopen it.'**
+  String get startup_versionMismatch_storeInstructions;
 
   /// No description provided for @startup_versionMismatch_download.
   ///
@@ -52931,6 +53225,486 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync check failed: {error}'**
   String settings_cloudSync_launchCheck_failed(String error);
+
+  /// No description provided for @diveLog_detail_viewMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get diveLog_detail_viewMap;
+
+  /// No description provided for @diveLog_detail_view3d.
+  ///
+  /// In en, this message translates to:
+  /// **'3D'**
+  String get diveLog_detail_view3d;
+
+  /// No description provided for @setup_sync_icloudUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'iCloud is not available on this device'**
+  String get setup_sync_icloudUnavailable;
+
+  /// No description provided for @media_info_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Media info'**
+  String get media_info_title;
+
+  /// No description provided for @media_info_fileSection.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get media_info_fileSection;
+
+  /// No description provided for @media_info_filename.
+  ///
+  /// In en, this message translates to:
+  /// **'Filename'**
+  String get media_info_filename;
+
+  /// No description provided for @media_info_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get media_info_type;
+
+  /// No description provided for @media_info_dimensions.
+  ///
+  /// In en, this message translates to:
+  /// **'Dimensions'**
+  String get media_info_dimensions;
+
+  /// No description provided for @media_info_size.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get media_info_size;
+
+  /// No description provided for @media_info_taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken'**
+  String get media_info_taken;
+
+  /// No description provided for @media_info_coordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates'**
+  String get media_info_coordinates;
+
+  /// No description provided for @media_info_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get media_info_unknown;
+
+  /// No description provided for @media_info_originSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Origin'**
+  String get media_info_originSection;
+
+  /// No description provided for @media_info_source.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get media_info_source;
+
+  /// No description provided for @media_info_reference.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference'**
+  String get media_info_reference;
+
+  /// No description provided for @media_info_linkedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked on'**
+  String get media_info_linkedOn;
+
+  /// No description provided for @media_info_thisDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'This device'**
+  String get media_info_thisDevice;
+
+  /// No description provided for @media_info_otherDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Another device'**
+  String get media_info_otherDevice;
+
+  /// No description provided for @media_info_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get media_info_status;
+
+  /// No description provided for @media_info_statusFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Found on this device'**
+  String get media_info_statusFound;
+
+  /// No description provided for @media_info_statusMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing from this device'**
+  String get media_info_statusMissing;
+
+  /// No description provided for @media_info_statusUnchecked.
+  ///
+  /// In en, this message translates to:
+  /// **'Not checked yet'**
+  String get media_info_statusUnchecked;
+
+  /// Origin block: when the media source was last verified
+  ///
+  /// In en, this message translates to:
+  /// **'Last checked {date}'**
+  String media_info_lastChecked(String date);
+
+  /// No description provided for @media_info_backupSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get media_info_backupSection;
+
+  /// No description provided for @media_info_store.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud store'**
+  String get media_info_store;
+
+  /// No description provided for @media_info_storeNotConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'No cloud store connected'**
+  String get media_info_storeNotConnected;
+
+  /// No description provided for @media_info_notEligible.
+  ///
+  /// In en, this message translates to:
+  /// **'This source is not eligible for backup'**
+  String get media_info_notEligible;
+
+  /// No description provided for @media_info_backupFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Original uploaded'**
+  String get media_info_backupFull;
+
+  /// No description provided for @media_info_backupThumbOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail only, original not sent'**
+  String get media_info_backupThumbOnly;
+
+  /// No description provided for @media_info_backupRenditionOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Compressed version uploaded'**
+  String get media_info_backupRenditionOnly;
+
+  /// No description provided for @media_info_backupNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not backed up'**
+  String get media_info_backupNone;
+
+  /// Backup block: when the item reached the cloud store
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded {date}'**
+  String media_info_uploadedOn(String date);
+
+  /// No description provided for @media_info_queuePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting to upload'**
+  String get media_info_queuePending;
+
+  /// No description provided for @media_info_queueTransferring.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading now'**
+  String get media_info_queueTransferring;
+
+  /// Backup block: the transfer queue's failure message
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed: {error}'**
+  String media_info_queueFailed(Object error);
+
+  /// No description provided for @media_info_servingSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Serving now'**
+  String get media_info_servingSection;
+
+  /// No description provided for @media_info_servingUnobserved.
+  ///
+  /// In en, this message translates to:
+  /// **'Not loaded yet'**
+  String get media_info_servingUnobserved;
+
+  /// No description provided for @media_info_servingFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not be loaded'**
+  String get media_info_servingFailed;
+
+  /// No description provided for @media_info_servedLocalDisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Local file on this device'**
+  String get media_info_servedLocalDisk;
+
+  /// No description provided for @media_info_servedGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo library'**
+  String get media_info_servedGallery;
+
+  /// No description provided for @media_info_servedStoreCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Local cache, from the cloud store'**
+  String get media_info_servedStoreCache;
+
+  /// No description provided for @media_info_servedStoreNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded from the cloud store'**
+  String get media_info_servedStoreNetwork;
+
+  /// No description provided for @media_info_servedNetworkUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Streaming from a URL'**
+  String get media_info_servedNetworkUrl;
+
+  /// No description provided for @media_info_servedConnectorCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Local cache, from the connected service'**
+  String get media_info_servedConnectorCache;
+
+  /// No description provided for @media_info_servedConnectorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded from the connected service'**
+  String get media_info_servedConnectorNetwork;
+
+  /// No description provided for @media_info_servedEmbedded.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored inside this logbook'**
+  String get media_info_servedEmbedded;
+
+  /// No description provided for @media_info_servingFallbackNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The original source could not be reached, so the cloud store served this.'**
+  String get media_info_servingFallbackNote;
+
+  /// No description provided for @media_info_servingTierThumbnail.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail'**
+  String get media_info_servingTierThumbnail;
+
+  /// No description provided for @media_info_servingTierRendition.
+  ///
+  /// In en, this message translates to:
+  /// **'Compressed version'**
+  String get media_info_servingTierRendition;
+
+  /// No description provided for @media_info_typePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get media_info_typePhoto;
+
+  /// No description provided for @media_info_typeVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get media_info_typeVideo;
+
+  /// No description provided for @media_info_typeDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get media_info_typeDocument;
+
+  /// No description provided for @media_info_typeSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Signature'**
+  String get media_info_typeSignature;
+
+  /// Media info panel, Origin block: re-checks whether the item's source still resolves
+  ///
+  /// In en, this message translates to:
+  /// **'Check now'**
+  String get media_info_actionCheckNow;
+
+  /// Media info panel, Origin block: picks a replacement file for a missing local file
+  ///
+  /// In en, this message translates to:
+  /// **'Locate file...'**
+  String get media_info_actionLocate;
+
+  /// Media info panel, Backup block: queues the item for upload
+  ///
+  /// In en, this message translates to:
+  /// **'Back up now'**
+  String get media_info_actionBackUpNow;
+
+  /// Media info panel, Backup block: same action as Back up now, shown when the previous upload failed
+  ///
+  /// In en, this message translates to:
+  /// **'Retry upload'**
+  String get media_info_actionRetryUpload;
+
+  /// Media info panel, Origin block: opens the platform file manager at the item's path
+  ///
+  /// In en, this message translates to:
+  /// **'Show in file manager'**
+  String get media_info_actionReveal;
+
+  /// Media info panel, Origin block: copies the source reference to the clipboard
+  ///
+  /// In en, this message translates to:
+  /// **'Copy reference'**
+  String get media_info_actionCopyPath;
+
+  /// Confirmation shown after copying the source reference
+  ///
+  /// In en, this message translates to:
+  /// **'Reference copied'**
+  String get media_info_referenceCopied;
+
+  /// Result of Check now when the source still resolves
+  ///
+  /// In en, this message translates to:
+  /// **'Source found'**
+  String get media_info_checkFound;
+
+  /// Result of Check now when the source is gone
+  ///
+  /// In en, this message translates to:
+  /// **'Source is missing'**
+  String get media_info_checkMissing;
+
+  /// Result of Check now when nothing could be determined, for example an unmounted volume
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check right now'**
+  String get media_info_checkUnavailable;
+
+  /// Confirmation shown after queueing an upload
+  ///
+  /// In en, this message translates to:
+  /// **'Queued for upload'**
+  String get media_info_backupQueued;
+
+  /// No description provided for @enum_profileMetric_o2CellMv.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 Cells'**
+  String get enum_profileMetric_o2CellMv;
+
+  /// No description provided for @enum_profileMetric_o2CellMv_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Cells'**
+  String get enum_profileMetric_o2CellMv_short;
+
+  /// No description provided for @diveLog_o2CellSpread_label.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 Cell Spread'**
+  String get diveLog_o2CellSpread_label;
+
+  /// No description provided for @media_status_broken.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing and not backed up'**
+  String get media_status_broken;
+
+  /// No description provided for @media_status_transferFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed'**
+  String get media_status_transferFailed;
+
+  /// No description provided for @media_status_transferring.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading'**
+  String get media_status_transferring;
+
+  /// No description provided for @media_status_queued.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting to upload'**
+  String get media_status_queued;
+
+  /// No description provided for @media_status_cloudOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored in the cloud only'**
+  String get media_status_cloudOnly;
+
+  /// No description provided for @media_status_notBackedUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Not backed up'**
+  String get media_status_notBackedUp;
+
+  /// No description provided for @media_tile_infoMenuItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Media info'**
+  String get media_tile_infoMenuItem;
+
+  /// Hint under the HealthKit access headline explaining that iOS will not confirm read access.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Health never tells apps whether read access was granted. If no dives turn up, open Health, then Sharing, Apps, Submersion, and turn on Workouts, Underwater Depth, Water Temperature, and Heart Rate.'**
+  String get diveImport_healthkit_accessGrantedHint;
+
+  /// Hint shown when a HealthKit fetch returned zero dives.
+  ///
+  /// In en, this message translates to:
+  /// **'No underwater diving workouts in this range. Check that the dates cover the dive, and that Health, Sharing, Apps, Submersion has Workouts and Underwater Depth turned on.'**
+  String get diveImport_healthkit_foundNoDivesHint;
+
+  /// HealthKit data type disclosure: underwater depth.
+  ///
+  /// In en, this message translates to:
+  /// **'Underwater Depth - depth samples recorded during dives'**
+  String get settings_dataSources_appleHealth_dataTypeDepth;
+
+  /// HealthKit data type disclosure: water temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Temperature - water temperature samples recorded during dives'**
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp;
+
+  /// Permission row shown when the platform will not disclose read access.
+  ///
+  /// In en, this message translates to:
+  /// **'HealthKit access is managed in the Health app'**
+  String get settings_dataSources_appleHealth_permissionManagedInHealth;
+
+  /// Permission row shown when HealthKit is unavailable on this device.
+  ///
+  /// In en, this message translates to:
+  /// **'HealthKit is not available on this device'**
+  String get settings_dataSources_appleHealth_permissionUnsupported;
 }
 
 class _AppLocalizationsDelegate

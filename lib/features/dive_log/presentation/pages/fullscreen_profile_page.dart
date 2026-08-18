@@ -421,6 +421,7 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                           sacCurve: analysis?.smoothedSacCurve,
                           ppO2Curve: analysis?.ppO2Curve,
                           o2SensorCurves: analysis?.o2SensorCurves,
+                          o2CellMvCurves: analysis?.o2CellMvCurves,
                           ppO2FromSensorAverage:
                               analysis?.ppO2FromSensorAverage ?? false,
                           ppN2Curve: analysis?.ppN2Curve,

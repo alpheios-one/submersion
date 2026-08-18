@@ -124,6 +124,12 @@ class ProfileSample {
     this.o2Sensor4,
     this.o2Sensor5,
     this.o2Sensor6,
+    this.o2SensorMv1,
+    this.o2SensorMv2,
+    this.o2SensorMv3,
+    this.o2SensorMv4,
+    this.o2SensorMv5,
+    this.o2SensorMv6,
     this.gasMixIndex,
   });
 
@@ -174,6 +180,21 @@ class ProfileSample {
 
   double? o2Sensor6;
 
+  /// Raw O2 cell output in millivolts (sensor 1..6), null when that cell
+  /// reports none. Present even when the cell's ppO2 is unavailable because the
+  /// logged calibration could not be trusted (issue #810).
+  int? o2SensorMv1;
+
+  int? o2SensorMv2;
+
+  int? o2SensorMv3;
+
+  int? o2SensorMv4;
+
+  int? o2SensorMv5;
+
+  int? o2SensorMv6;
+
   /// Active gas mix index at this sample (from DC_SAMPLE_GASMIX), carried forward
   /// from the most recent gas switch; null if the computer reported no gas.
   int? gasMixIndex;
@@ -201,6 +222,12 @@ class ProfileSample {
       o2Sensor4,
       o2Sensor5,
       o2Sensor6,
+      o2SensorMv1,
+      o2SensorMv2,
+      o2SensorMv3,
+      o2SensorMv4,
+      o2SensorMv5,
+      o2SensorMv6,
       gasMixIndex,
     ];
   }
@@ -229,7 +256,13 @@ class ProfileSample {
       o2Sensor4: result[18] as double?,
       o2Sensor5: result[19] as double?,
       o2Sensor6: result[20] as double?,
-      gasMixIndex: result[21] as int?,
+      o2SensorMv1: result[21] as int?,
+      o2SensorMv2: result[22] as int?,
+      o2SensorMv3: result[23] as int?,
+      o2SensorMv4: result[24] as int?,
+      o2SensorMv5: result[25] as int?,
+      o2SensorMv6: result[26] as int?,
+      gasMixIndex: result[27] as int?,
     );
   }
 }

@@ -10,6 +10,8 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.dart'
+    as domain;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
@@ -548,6 +550,12 @@ class DiveRepository {
                 o2Sensor4: p.o2Sensor4,
                 o2Sensor5: p.o2Sensor5,
                 o2Sensor6: p.o2Sensor6,
+                o2SensorMv1: p.o2SensorMv1,
+                o2SensorMv2: p.o2SensorMv2,
+                o2SensorMv3: p.o2SensorMv3,
+                o2SensorMv4: p.o2SensorMv4,
+                o2SensorMv5: p.o2SensorMv5,
+                o2SensorMv6: p.o2SensorMv6,
                 cns: p.cns,
                 ndl: p.ndl,
                 ceiling: p.ceiling,
@@ -611,6 +619,12 @@ class DiveRepository {
                 o2Sensor4: Value(point.o2Sensor4),
                 o2Sensor5: Value(point.o2Sensor5),
                 o2Sensor6: Value(point.o2Sensor6),
+                o2SensorMv1: Value(point.o2SensorMv1),
+                o2SensorMv2: Value(point.o2SensorMv2),
+                o2SensorMv3: Value(point.o2SensorMv3),
+                o2SensorMv4: Value(point.o2SensorMv4),
+                o2SensorMv5: Value(point.o2SensorMv5),
+                o2SensorMv6: Value(point.o2SensorMv6),
                 cns: Value(point.cns),
                 ndl: Value(point.ndl),
                 ceiling: Value(point.ceiling),
@@ -685,6 +699,12 @@ class DiveRepository {
       o2Sensor4: row.o2Sensor4,
       o2Sensor5: row.o2Sensor5,
       o2Sensor6: row.o2Sensor6,
+      o2SensorMv1: row.o2SensorMv1,
+      o2SensorMv2: row.o2SensorMv2,
+      o2SensorMv3: row.o2SensorMv3,
+      o2SensorMv4: row.o2SensorMv4,
+      o2SensorMv5: row.o2SensorMv5,
+      o2SensorMv6: row.o2SensorMv6,
       cns: row.cns,
       ndl: row.ndl,
       ceiling: row.ceiling,
@@ -1190,6 +1210,12 @@ class DiveRepository {
               o2Sensor4: Value(point.o2Sensor4),
               o2Sensor5: Value(point.o2Sensor5),
               o2Sensor6: Value(point.o2Sensor6),
+              o2SensorMv1: Value(point.o2SensorMv1),
+              o2SensorMv2: Value(point.o2SensorMv2),
+              o2SensorMv3: Value(point.o2SensorMv3),
+              o2SensorMv4: Value(point.o2SensorMv4),
+              o2SensorMv5: Value(point.o2SensorMv5),
+              o2SensorMv6: Value(point.o2SensorMv6),
               cns: Value(point.cns),
               ndl: Value(point.ndl),
               ceiling: Value(point.ceiling),
@@ -5228,6 +5254,114 @@ class DiveRepository {
     domain.DiveTank tank, {
     bool onlyIfEmpty = false,
   }) => bulkAddTanks(diveIds, [tank], onlyIfEmpty: onlyIfEmpty);
+
+  /// A companion carrying only the columns named in [fields]. Every other
+  /// column stays absent, so the generated UPDATE never mentions it and the
+  /// stored value survives untouched. This is what separates an in-place spec
+  /// edit from [_tankCompanion], which always writes the whole row.
+  DiveTanksCompanion _tankSpecsCompanion(
+    domain.DiveTank specs,
+    Set<domain.TankSpecField> fields,
+  ) => DiveTanksCompanion(
+    presetName: fields.contains(domain.TankSpecField.preset)
+        ? Value(specs.presetName)
+        : const Value.absent(),
+    tankRole: fields.contains(domain.TankSpecField.role)
+        ? Value(specs.role.name)
+        : const Value.absent(),
+    volume: fields.contains(domain.TankSpecField.volume)
+        ? Value(specs.volume)
+        : const Value.absent(),
+    workingPressure: fields.contains(domain.TankSpecField.workingPressure)
+        ? Value(specs.workingPressure)
+        : const Value.absent(),
+    tankMaterial: fields.contains(domain.TankSpecField.material)
+        ? Value(specs.material?.name)
+        : const Value.absent(),
+    o2Percent: fields.contains(domain.TankSpecField.gasMix)
+        ? Value(specs.gasMix.o2)
+        : const Value.absent(),
+    hePercent: fields.contains(domain.TankSpecField.gasMix)
+        ? Value(specs.gasMix.he)
+        : const Value.absent(),
+    tankName: fields.contains(domain.TankSpecField.name)
+        ? Value(specs.name)
+        : const Value.absent(),
+  );
+
+  /// Overwrite the [fields] of every tank each dive already has with the values
+  /// from [specs]. Dives with no tanks are skipped rather than given one.
+  ///
+  /// Start/end pressure, row id, tank order, and computer attribution are never
+  /// written, so pressure profiles and gas switches keep pointing at live rows
+  /// (#797). Returns the number of dives actually touched. No notify/txn.
+  Future<int> bulkUpdateTankSpecs(
+    List<String> diveIds,
+    domain.DiveTank specs,
+    Set<domain.TankSpecField> fields,
+  ) async {
+    if (diveIds.isEmpty || fields.isEmpty) return 0;
+    final companion = _tankSpecsCompanion(specs, fields);
+    final now = DateTime.now().millisecondsSinceEpoch;
+    // One SELECT for every dive rather than one per dive: a 248-dive import
+    // would otherwise cost 248 round-trips before the first write.
+    final existing = await (_db.select(
+      _db.diveTanks,
+    )..where((t) => t.diveId.isIn(diveIds))).get();
+    if (existing.isEmpty) return 0;
+    final changed = <String>{};
+    for (final row in existing) {
+      await (_db.update(
+        _db.diveTanks,
+      )..where((t) => t.id.equals(row.id))).write(companion);
+      await _syncRepository.markRecordPending(
+        entityType: 'diveTanks',
+        recordId: row.id,
+        localUpdatedAt: now,
+      );
+      changed.add(row.diveId);
+    }
+    await _bumpDives(changed.toList(), now);
+    return changed.length;
+  }
+
+  /// Write [rows] back over the tanks with the same ids, restoring prior NULLs.
+  ///
+  /// The undo counterpart of [bulkUpdateTankSpecs]. It updates in place instead
+  /// of reusing [bulkReplaceTanks], which would re-insert under fresh ids and
+  /// so destroy the very pressure profiles the update preserved. No notify/txn.
+  Future<void> bulkRestoreTankRows(List<DiveTank> rows) async {
+    if (rows.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    for (final row in rows) {
+      await (_db.update(
+        _db.diveTanks,
+      )..where((t) => t.id.equals(row.id))).write(row.toCompanion(false));
+      await _syncRepository.markRecordPending(
+        entityType: 'diveTanks',
+        recordId: row.id,
+        localUpdatedAt: now,
+      );
+    }
+    await _bumpDives(rows.map((r) => r.diveId).toSet().toList(), now);
+  }
+
+  /// How many of [diveIds] have no tank rows at all. Used to warn before an
+  /// in-place tank spec update, which skips them.
+  Future<int> divesWithoutTanksCount(List<String> diveIds) async {
+    if (diveIds.isEmpty) return 0;
+    final rows =
+        await (_db.selectOnly(_db.diveTanks)
+              ..addColumns([_db.diveTanks.diveId])
+              ..where(_db.diveTanks.diveId.isIn(diveIds))
+              ..groupBy([_db.diveTanks.diveId]))
+            .get();
+    final withTanks = rows
+        .map((r) => r.read(_db.diveTanks.diveId))
+        .whereType<String>()
+        .toSet();
+    return diveIds.toSet().difference(withTanks).length;
+  }
 
   /// Replace each dive's tank list with [tanks] (fresh ids, sequential order).
   /// No notify/txn. Cascades to delete tank_pressure_profiles/gas_switches.

@@ -383,8 +383,51 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Csere';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Frissítés';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Csak a meglévő palack nélküli merülések';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Válaszd ki, mely tulajdonságok íródjanak felül a merülésekhez már tartozó palackokon. A kezdő és a záró nyomás soha nem változik.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Válassz legalább egy palacktulajdonságot a frissítéshez.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Előbeállítás';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Szerep';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Térfogat';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Üzemi nyomás';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Anyag';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Gázkeverék';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Név';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kiválasztott merüléshez nincs palack, ezért kimaradnak.',
+      one: '1 kiválasztott merüléshez nincs palack, ezért kimarad.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Alkalmazza a módosításokat?';
@@ -4900,12 +4943,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'Teljes kepernyo';
 
   @override
-  String get diveLog_detail_viewMap => 'Térkép';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => 'Merulohely megtekintese';
 
   @override
@@ -5770,6 +5807,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_title => 'Merulesek szurese';
 
   @override
+  String get diveLog_filter_resizeGrip => 'Szűrőpanel átméretezése';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Szuro bezarasa';
 
   @override
@@ -6350,10 +6390,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get setup_sync_header => 'Felhőszinkronizálás';
-
-  @override
-  String get setup_sync_icloudUnavailable =>
-      'Az iCloud nem érhető el ezen az eszközön';
 
   @override
   String get setup_sync_libraryFound_adopt => 'Meglévő könyvtár átvétele';
@@ -7361,6 +7397,18 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_tooltip_sensor => 'Érzékelő';
 
   @override
+  String get diveLog_legend_label_o2Cells => 'O2 cellák';
+
+  @override
+  String get diveLog_tooltip_o2CellsTight => 'szoros';
+
+  @override
+  String get diveLog_tooltip_o2CellsDrifting => 'elsodródó';
+
+  @override
+  String get diveLog_tooltip_o2CellsWide => 'széles';
+
+  @override
   String get diveLog_tooltip_srfGf => 'SrfGF';
 
   @override
@@ -7964,6 +8012,47 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveSites_edit_access_parkingInfo_label => 'Parkolasi informaciok';
+
+  @override
+  String get diveSites_edit_access_entryMethod_label => 'Belépés módja';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Kilépés módja';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Az itteni $count merülésed: belépés $entry, kilépés $exit',
+      one: 'Az itteni merülésed: belépés $entry, kilépés $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Az itteni $count merülésed: belépés $entry',
+      one: 'Az itteni merülésed: belépés $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Belépés';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Kilépés';
 
   @override
   String get diveSites_edit_altitude_helperText =>
@@ -14400,17 +14489,24 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' és ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count eszköz a Submersion újabb verziójából szinkronizál. Frissítsd ezt az eszközt, hogy megkapd a legújabb változtatásaikat.',
-      one:
-          '1 eszköz a Submersion újabb verziójából szinkronizál. Frissítsd ezt az eszközt, hogy megkapd a legújabb változtatásait.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList a Submersion újabb verziójából szinkronizál, ezért a legújabb változtatásai egyelőre visszatartva maradnak.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList a Submersion újabb verziójából szinkronizálnak, ezért a legújabb változtatásaik egyelőre visszatartva maradnak.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Frissítsd ezt az eszközt, hogy megkapd őket.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'Automatikusan érvénybe lépnek, amint megérkezik az eszköz alkalmazásbolti frissítése; a frissítés még ellenőrzés alatt állhat.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Csatlakoztatva';
@@ -16627,6 +16723,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_profile_deco_noDeco => 'Nincs deko';
+
+  @override
+  String get statistics_profile_deco_notRecorded => 'Nincs rögzítve';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count merülés nem tartalmaz rögzített vagy számítható dekompressziós adatot, ezért kimarad az arányból';
+  }
 
   @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
@@ -18885,6 +18989,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get units_profileMetric_percent => '%';
 
   @override
+  String get units_profileMetric_millivolts => 'mV';
+
+  @override
   String get units_sac_litersPerMin => 'L/min';
 
   @override
@@ -20220,7 +20327,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'Az Apple Watch importalas csak iOS es macOS eszkozokon erheto el.';
+      'Az Apple Watch importáláshoz iPhone szükséges a Health alkalmazással.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -24937,6 +25044,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'Besz.';
+
+  @override
+  String get enum_siteField_exitMethod => 'Kilépés módja';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Kilépés';
 
   @override
   String get enum_siteField_bestSeason_short => 'Évszak';
@@ -31032,11 +31145,88 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'Az adatbázis frissítése sikertelen';
+  String get startup_error_title => 'A Submersion nem tudott elindulni';
 
   @override
   String get startup_error_body =>
-      'Próbálja meg újraindítani az alkalmazást. Ha a hiba továbbra is fennáll, forduljon az ügyfélszolgálathoz: az adatai továbbra is a lemezen vannak, és nincs szükség újratelepítésre.';
+      'Valami hiba történt, mielőtt a merülési naplód teljesen megnyílt volna. Az adataid továbbra is a lemezen vannak, és nincs szükség újratelepítésre. Próbáld újraindítani az alkalmazást; ha a probléma nem szűnik meg, fordulj az ügyfélszolgálathoz.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'Ez a build nem tud adatbázist megnyitni';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'Ebből a buildből hiányzik a Submersion adatbázismotorja, ezért a merülési naplód meg sem nyílt. A lemezen semmi nem változott, és egyetlen adat sincs veszélyben.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'Az újratelepítés vagy egy biztonsági másolat visszaállítása itt nem segít. Telepítsd a Submersion egy működő buildjét, és kérjük, jelentsd ezt: az alkalmazáscsomag hibája, nem az adataidé.';
+
+  @override
+  String get startup_migrationFailed_title =>
+      'Az adatbázis frissítése nem sikerült';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'A merülési naplódat nem sikerült az ehhez a verzióhoz szükséges formátumra frissíteni. A frissítés megkezdése előtt biztonsági másolat készült, így semmi nem veszett el.';
+
+  @override
+  String get startup_dataUnreadable_title =>
+      'A merülési naplódat nem sikerült beolvasni';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'Az adatbázisfájl megvan, de a Submersion nem tudja elolvasni. Ez általában azt jelenti, hogy a fájl sérült. Egy biztonsági másolat visszaállítása a leggyorsabb út vissza.';
+
+  @override
+  String get startup_failure_technicalDetails => 'Technikai részletek';
+
+  @override
+  String get startup_failure_backupAvailable_title =>
+      'Elérhető egy biztonsági másolat';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'Készült: $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'Biztonsági másolat a v$fromVersion sémáról v$toVersion sémára történő frissítés előtt.';
+  }
+
+  @override
+  String get startup_failure_restoreAction =>
+      'Ennek a másolatnak a visszaállítása';
+
+  @override
+  String get startup_failure_restoring => 'Merülési napló visszaállítása...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'A biztonsági másolatot nem sikerült visszaállítani. A merülési naplód pontosan úgy maradt, ahogy volt.';
+
+  @override
+  String get startup_failure_backupsFolder =>
+      'A biztonsági másolataid itt vannak:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'Biztonsági mentések mappája';
+
+  @override
+  String get startup_failure_downgrade_title => 'Visszatérés az előző verzióra';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'Ha a frissítés továbbra sem sikerül, telepítsd a Submersion korábban használt verzióját, majd abból a verzióból állítsd vissza a biztonsági másolatot. Itt visszaállítani csak ugyanazt a frissítést futtatná le újra. A Submersion soha nem vált magától régebbi verzióra: az automatikus visszaléptetés csendben ismert hibás verziókon tartana.';
+
+  @override
+  String get startup_failure_downgrade_action =>
+      'Korábbi kiadások megtekintése';
 
   @override
   String get startup_recovering_title => 'Adatbázis helyreállítása...';
@@ -31126,6 +31316,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'Kérjük, frissítse a Submersiont a legújabb verzióra. Az adatai biztonságban vannak, és nem módosultak. Ha a frissítés előtt készült biztonsági mentés, az a Backups mappában található, és a frissítés után visszaállítható.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'Ezt az alkalmazást alkalmazásboltból telepítetted, és régebbi, mint az adataidat létrehozó verzió. Az adataid biztonságban vannak, nem módosultak. Frissítsd a Submersiont, amint az új verzió megjelenik a boltban, majd nyisd meg újra.';
 
   @override
   String get startup_versionMismatch_download => 'Legújabb verzió letöltése';
@@ -31878,4 +32072,263 @@ class AppLocalizationsHu extends AppLocalizations {
   String settings_cloudSync_launchCheck_failed(String error) {
     return 'A szinkronizálás ellenőrzése nem sikerült: $error';
   }
+
+  @override
+  String get diveLog_detail_viewMap => 'Térkép';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
+  String get setup_sync_icloudUnavailable =>
+      'Az iCloud nem érhető el ezen az eszközön';
+
+  @override
+  String get media_info_title => 'Média infó';
+
+  @override
+  String get media_info_fileSection => 'Fájl';
+
+  @override
+  String get media_info_filename => 'Fájlnév';
+
+  @override
+  String get media_info_type => 'Típus';
+
+  @override
+  String get media_info_dimensions => 'Méretek';
+
+  @override
+  String get media_info_size => 'Méret';
+
+  @override
+  String get media_info_taken => 'Készült';
+
+  @override
+  String get media_info_coordinates => 'Koordináták';
+
+  @override
+  String get media_info_unknown => 'Ismeretlen';
+
+  @override
+  String get media_info_originSection => 'Eredet';
+
+  @override
+  String get media_info_source => 'Forrás';
+
+  @override
+  String get media_info_reference => 'Hivatkozás';
+
+  @override
+  String get media_info_linkedOn => 'Összekapcsolva';
+
+  @override
+  String get media_info_thisDevice => 'Ez az eszköz';
+
+  @override
+  String get media_info_otherDevice => 'Egy másik eszköz';
+
+  @override
+  String get media_info_status => 'Állapot';
+
+  @override
+  String get media_info_statusFound => 'Megtalálható ezen az eszközön';
+
+  @override
+  String get media_info_statusMissing => 'Hiányzik erről az eszközről';
+
+  @override
+  String get media_info_statusUnchecked => 'Még nincs ellenőrizve';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Utoljára ellenőrizve $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Biztonsági mentés';
+
+  @override
+  String get media_info_store => 'Felhő tárhely';
+
+  @override
+  String get media_info_storeNotConnected =>
+      'Nincs csatlakoztatott felhő tárhely';
+
+  @override
+  String get media_info_notEligible => 'Ez a forrás nem menthető';
+
+  @override
+  String get media_info_backupFull => 'Eredeti feltoltve';
+
+  @override
+  String get media_info_backupThumbOnly =>
+      'Csak bélyegkép, az eredeti nincs elküldve';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Tömörített változat feltöltve';
+
+  @override
+  String get media_info_backupNone => 'Nincs mentve';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Feltoltve $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'Feltoltesre var';
+
+  @override
+  String get media_info_queueTransferring => 'Feltoltes folyamatban';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'A feltöltés sikertelen: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'Jelenlegi forrás';
+
+  @override
+  String get media_info_servingUnobserved => 'Még nincs betöltve';
+
+  @override
+  String get media_info_servingFailed => 'Nem sikerült betölteni';
+
+  @override
+  String get media_info_servedLocalDisk => 'Helyi fájl ezen az eszközön';
+
+  @override
+  String get media_info_servedGallery => 'Fotókönyvtár';
+
+  @override
+  String get media_info_servedStoreCache =>
+      'Helyi gyorsítótár, a felhő tárhelyről';
+
+  @override
+  String get media_info_servedStoreNetwork => 'Letöltve a felhő tárhelyről';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Streamelés URL-címről';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Helyi gyorsítótár, a csatlakoztatott szolgáltatásból';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Letöltve a csatlakoztatott szolgáltatásból';
+
+  @override
+  String get media_info_servedEmbedded => 'Ebben a naplóban tárolva';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'Az eredeti forrás nem volt elérhető, ezért a felhő tárhely szolgálta ki.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Bélyegkép';
+
+  @override
+  String get media_info_servingTierRendition => 'Tömörített változat';
+
+  @override
+  String get media_info_typePhoto => 'Fénykép';
+
+  @override
+  String get media_info_typeVideo => 'Videó';
+
+  @override
+  String get media_info_typeDocument => 'Dokumentum';
+
+  @override
+  String get media_info_typeSignature => 'Aláírás';
+
+  @override
+  String get media_info_actionCheckNow => 'Ellenőrzés most';
+
+  @override
+  String get media_info_actionLocate => 'Fájl keresése...';
+
+  @override
+  String get media_info_actionBackUpNow => 'Mentés most';
+
+  @override
+  String get media_info_actionRetryUpload => 'Feltöltés újra';
+
+  @override
+  String get media_info_actionReveal => 'Megjelenítés a fájlkezelőben';
+
+  @override
+  String get media_info_actionCopyPath => 'Hivatkozás másolása';
+
+  @override
+  String get media_info_referenceCopied => 'Hivatkozás másolva';
+
+  @override
+  String get media_info_checkFound => 'A forrás megtalálható';
+
+  @override
+  String get media_info_checkMissing => 'A forrás hiányzik';
+
+  @override
+  String get media_info_checkUnavailable => 'Most nem ellenőrizhető';
+
+  @override
+  String get media_info_backupQueued => 'Feltöltési sorban';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'O2-cellák';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Cellák';
+
+  @override
+  String get diveLog_o2CellSpread_label => 'O2-cellák szórása';
+
+  @override
+  String get media_status_broken => 'Hiányzik és nincs mentve';
+
+  @override
+  String get media_status_transferFailed => 'A feltöltés sikertelen';
+
+  @override
+  String get media_status_transferring => 'Feltöltés folyamatban';
+
+  @override
+  String get media_status_queued => 'Feltöltésre vár';
+
+  @override
+  String get media_status_cloudOnly => 'Csak a felhőben tárolva';
+
+  @override
+  String get media_status_notBackedUp => 'Nincs mentve';
+
+  @override
+  String get media_tile_infoMenuItem => 'Média infó';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Az Apple Health soha nem árulja el az alkalmazásoknak, hogy megkapta-e az olvasási hozzáférést. Ha nem jelenik meg merülés, nyisd meg a Health appot, majd a Megosztás, Appok, Submersion menüpontot, és kapcsold be az Edzések, Vízmélység, Vízhőmérséklet és Pulzus tételt.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'Nincs merülés edzés ebben az időszakban. Ellenőrizd, hogy a dátumok lefedik-e a merülést, és hogy a Health, Megosztás, Appok, Submersion menüben be van-e kapcsolva az Edzések és a Vízmélység.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Vízmélység - a merülések során rögzített mélységadatok';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Vízhőmérséklet - a merülések során rögzített hőmérsékleti adatok';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'A HealthKit hozzáférést a Health alkalmazásban kezelheted';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'A HealthKit nem érhető el ezen az eszközön';
 }

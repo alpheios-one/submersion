@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
+import 'package:submersion/features/media/presentation/widgets/media_info_sheet.dart';
+import 'package:submersion/features/media/presentation/widgets/media_status_badge.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// One library thumbnail with the shared selection overlay. Used by both the
 /// flat grid and the grouped list so the two modes cannot diverge.
@@ -19,11 +22,47 @@ class MediaLibraryTile extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
 
+  /// Opens the context menu at the pointer.
+  ///
+  /// Desktop-only in practice: `onSecondaryTapDown` does not fire on a
+  /// touchscreen, so mobile reaches the panel through the viewer's info
+  /// button instead. Long-press is not available here, being already claimed
+  /// by selection toggling.
+  // coverage:ignore-start
+  // showMenu at a pointer position is not drivable from flutter_test without
+  // a real mouse; the menu's single action is a direct call to the same
+  // launcher the badge tap uses, which IS tested.
+  Future<void> _showContextMenu(
+    BuildContext context,
+    TapDownDetails details,
+  ) async {
+    final overlay =
+        Overlay.of(context).context.findRenderObject()! as RenderBox;
+    final selection = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromRect(
+        details.globalPosition & Size.zero,
+        Offset.zero & overlay.size,
+      ),
+      items: [
+        PopupMenuItem(
+          value: 'info',
+          child: Text(context.l10n.media_tile_infoMenuItem),
+        ),
+      ],
+    );
+    if (selection == 'info' && context.mounted) {
+      await showMediaInfoSheet(context, entry.item);
+    }
+  }
+  // coverage:ignore-end
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
+      onSecondaryTapDown: (details) => _showContextMenu(context, details),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -32,6 +71,12 @@ class MediaLibraryTile extends StatelessWidget {
             thumbnail: true,
             targetSize: const Size(200, 200),
             fit: BoxFit.cover,
+          ),
+          // Top-left: the top-right corner belongs to the selection check.
+          Positioned(
+            top: 4,
+            left: 4,
+            child: MediaStatusBadge(item: entry.item),
           ),
           if (selected) ...[
             Container(

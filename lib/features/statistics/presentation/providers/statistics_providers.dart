@@ -8,6 +8,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_provide
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/statistics/data/repositories/statistics_repository.dart';
+import 'package:submersion/features/statistics/data/services/deco_classification_service.dart';
 import 'package:submersion/features/statistics/domain/entities/species_statistics.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_filter_provider.dart';
 
@@ -495,14 +496,45 @@ final timeAtDepthRangesProvider =
       );
     });
 
+/// Deco obligation counts: recorded signals first, the app's own analysis as
+/// the fallback (#623).
+///
+/// A dive whose source recorded no deco columns is classified by the same
+/// analysis that draws the DECO badge on its detail page, so the card and the
+/// dive can no longer disagree. Dives with no profile at all stay unknown and
+/// are excluded from the rate rather than counted as no-deco.
 final decoObligationStatsProvider =
-    FutureProvider<({int decoCount, int totalCount})>((ref) async {
+    FutureProvider<({int decoCount, int noDecoCount, int unknownCount})>((
+      ref,
+    ) async {
       _keepAliveWithExpiry(ref);
       final repository = ref.watch(statisticsRepositoryProvider);
       final currentDiverId = ref.watch(currentDiverIdProvider);
       final filter = ref.watch(statisticsFilterProvider);
-      return repository.getDecoObligationStats(
+
+      final scan = await repository.scanRecordedDecoSignals(
         diverId: currentDiverId,
         filter: filter,
       );
+
+      var deco = scan.recordedDeco.length;
+      var noDeco = scan.recordedNoDeco.length;
+      var unknown = scan.noProfile.length;
+
+      final computed = await const DecoClassificationService().classify(
+        ref,
+        scan.needsCompute,
+      );
+      for (final diveId in scan.needsCompute.keys) {
+        final hadDeco = computed[diveId];
+        if (hadDeco == null) {
+          unknown++;
+        } else if (hadDeco) {
+          deco++;
+        } else {
+          noDeco++;
+        }
+      }
+
+      return (decoCount: deco, noDecoCount: noDeco, unknownCount: unknown);
     });

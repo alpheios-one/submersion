@@ -1,20 +1,18 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/feature_flags.dart';
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/core/services/media_store/store_keys.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/media/presentation/helpers/lightroom_scan_helper.dart';
+import 'package:submersion/features/media/presentation/helpers/media_link_replacer.dart';
 import 'package:submersion/features/media/presentation/providers/lightroom_providers.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/shared/utils/file_reveal.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
-import 'package:submersion/features/media/domain/services/media_repair_types.dart';
 import 'package:submersion/features/media/presentation/pages/photo_viewer_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
-import 'package:submersion/features/media/presentation/providers/media_repair_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/lightroom_suggestions_row.dart';
 import 'package:submersion/features/media/presentation/widgets/media_grid.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -240,19 +238,6 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
   // `Process.run` / `FilePicker.pickFiles` / `showMenu`, none of which are
   // unit-testable from flutter_test. Exercised by manual desktop smoke tests.
 
-  /// Reveals [path] in the platform's native file manager. Failures of the
-  /// spawned process are intentionally swallowed: surfacing them would require
-  /// UX out of scope for the context menu.
-  Future<void> _showInFinder(String path) async {
-    if (Platform.isMacOS) {
-      await Process.run('open', ['-R', path]);
-    } else if (Platform.isWindows) {
-      await Process.run('explorer', ['/select,', path]);
-    } else if (Platform.isLinux) {
-      await Process.run('xdg-open', [File(path).parent.path]);
-    }
-  }
-
   /// Prompts the user to pick a replacement file for [item] and routes the
   /// re-link through the repair engine (Media section Phase 3): the picked
   /// file is hash-verified against the row's content identity, bookmark
@@ -263,50 +248,10 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
   /// Phase 2 photo-only constraint: picker is restricted to `FileType.image`
   /// (videos aren't supported as local-file media yet, see [FilesTab]).
   Future<void> _replaceLink(MediaItem item) async {
-    final result = await FilePicker.pickFile(type: FileType.image);
-    if (result == null) return;
-    final newPath = result.path;
-    if (newPath == null) return;
-
-    final digest = await sha256OfFile(File(newPath));
-    final rowHash = item.contentHash;
-    final sameBytes = rowHash == null || digest.hash == rowHash;
-
-    if (!sameBytes) {
-      if (!mounted) return;
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(ctx.l10n.media_diveMediaSection_replaceEditedTitle),
-          content: Text(ctx.l10n.media_diveMediaSection_replaceEditedContent),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: Text(ctx.l10n.media_diveMediaSection_cancelButton),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: Text(ctx.l10n.media_diveMediaSection_replaceButton),
-            ),
-          ],
-        ),
-      );
-      if (confirmed != true) return;
-    }
-
-    await ref.read(mediaRepairServiceProvider).apply([
-      RepairProposal(
-        item: item,
-        confidence: sameBytes
-            ? RepairConfidence.exact
-            : RepairConfidence.edited,
-        candidate: RepairCandidate.file(
-          path: newPath,
-          sizeBytes: digest.sizeBytes,
-          hash: digest.hash,
-        ),
-      ),
-    ]);
+    final applied = await replaceMediaLink(context, ref, item);
+    // The refresh stays here rather than in the helper: it is dive-scoped,
+    // and the info panel calls the same flow without a dive list to refresh.
+    if (!applied || !mounted) return;
     await ref.read(mediaListNotifierProvider(widget.diveId).notifier).refresh();
   }
 
@@ -347,7 +292,7 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
     );
 
     if (selected == 'show' && item.localPath != null) {
-      await _showInFinder(item.localPath!);
+      await revealInFileManager(item.localPath!);
     } else if (selected == 'replace') {
       if (!context.mounted) return;
       await _replaceLink(item);

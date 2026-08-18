@@ -42,10 +42,102 @@ class TestDetection(unittest.TestCase):
         self.assertEqual(matched("Run Submersion.exe now."), [".exe"])
         self.assertEqual(matched("Ships as an MSI package."), ["MSI"])
 
+    def test_linux_distribution_names(self):
+        for line, expected in [
+            ("Built on Fedora.", "Fedora"),
+            ("Built on Red Hat.", "Red Hat"),
+            ("Built on RedHat.", "RedHat"),
+            ("Built on RHEL.", "RHEL"),
+            ("Built on CentOS.", "CentOS"),
+            ("Built on AlmaLinux.", "AlmaLinux"),
+            ("Built on openSUSE.", "openSUSE"),
+            ("Built on SUSE.", "SUSE"),
+            ("Built on Manjaro.", "Manjaro"),
+            ("Built on Gentoo.", "Gentoo"),
+            ("Built on Slackware.", "Slackware"),
+            ("Built on NixOS.", "NixOS"),
+            ("Built on SteamOS.", "SteamOS"),
+            ("Built on Deepin.", "Deepin"),
+            ("Built on Solus.", "Solus"),
+            ("Built on EndeavourOS.", "EndeavourOS"),
+            ("Built on Raspbian.", "Raspbian"),
+            ("Built on Pop!_OS.", "Pop!_OS"),
+            ("Built on elementary OS.", "elementary OS"),
+            ("Built on Zorin OS.", "Zorin OS"),
+            ("Built on Raspberry Pi OS.", "Raspberry Pi OS"),
+        ]:
+            with self.subTest(line=line):
+                self.assertIn(expected, matched(line))
+
+    def test_distro_names_containing_linux_are_consumed_whole(self):
+        # These must be declared above the bare "\bLinux\b" entry. Declared
+        # below it, the bare entry consumes the Linux half first and the rest
+        # of the name is stranded in the output ("Arch other platforms") with
+        # nothing to report it, because the stranded half is not itself a term.
+        #
+        # Asserted through replace_terms rather than find_matches: the
+        # longest-spelling-wins rule is a property of the rewriting order, and
+        # find_matches deliberately reports every overlapping hit.
+        for line, expected in [
+            ("Built on Arch Linux.", "Built on other platforms."),
+            ("Built on Linux Mint.", "Built on other platforms."),
+            ("Built on Rocky Linux.", "Built on other platforms."),
+            ("Built on Alpine Linux.", "Built on other platforms."),
+            ("Built on Kali Linux.", "Built on other platforms."),
+            ("Built on Void Linux.", "Built on other platforms."),
+            ("Built on MX Linux.", "Built on other platforms."),
+            ("Built on Red Hat Enterprise Linux.",
+             "Built on other platforms."),
+        ]:
+            with self.subTest(line=line):
+                self.assertEqual(san.replace_terms(line, TERMS), expected)
+
+    def test_declaration_order_puts_linux_compounds_before_bare_linux(self):
+        # The structural form of the test above, so a term added in the wrong
+        # place fails here even if nobody adds a sentence for it.
+        patterns = [pattern.pattern for pattern, _cls in TERMS]
+        bare = patterns.index(r"\bLinux\b")
+        for position, pattern in enumerate(patterns):
+            if pattern == r"\bLinux\b" or r"[ \t]+Linux\b" not in pattern:
+                continue
+            with self.subTest(pattern=pattern):
+                self.assertLess(position, bare,
+                                "declare this above the bare Linux term")
+
+    def test_short_distro_names_are_case_sensitive(self):
+        # Lowercase "arch" is the usual abbreviation for a CPU architecture and
+        # "mint" is ordinary prose, so only the capitalised distro is a term.
+        self.assertEqual(matched("Ships an Arch package."), ["Arch"])
+        self.assertEqual(matched("Ships a Mint package."), ["Mint"])
+        self.assertEqual(matched("covers both arch slices"), [])
+        self.assertEqual(matched("a mint-condition regulator"), [])
+
+    def test_ambiguous_short_names_need_their_linux_suffix(self):
+        # Rocky, Alpine, Kali, Void and MX are plausible dive-site names and
+        # ordinary prose, so they are only terms in their "<name> Linux" form.
+        for line in [
+            "Rocky Point is a new dive site.",
+            "an alpine lake at altitude",
+            "returns void when the handle is stale",
+            "the MX series regulator",
+        ]:
+            with self.subTest(line=line):
+                self.assertEqual(matched(line), [])
+
     def test_apt_only_matches_command_context(self):
         self.assertEqual(matched("Run sudo apt install tesseract-ocr"),
                          ["sudo apt install"])
         self.assertEqual(matched("That is an apt description."), [])
+
+    def test_other_package_managers_and_formats(self):
+        self.assertEqual(matched("Run sudo dnf install submersion"),
+                         ["sudo dnf install"])
+        self.assertEqual(matched("Run zypper install submersion"),
+                         ["zypper install"])
+        self.assertEqual(matched("Yum, that tastes good."), [])
+        self.assertEqual(matched("Install with pacman."), ["pacman"])
+        self.assertEqual(matched("Grab submersion.rpm now."), [".rpm"])
+        self.assertEqual(matched("Grab submersion.deb now."), [".deb"])
 
     def test_microsoft_and_pc(self):
         self.assertEqual(matched("Your Mac or PC can browse them."), ["PC"])
@@ -144,6 +236,46 @@ class TestListRepair(unittest.TestCase):
         self.assertEqual(
             self.repair("a fix for Windows or Linux"),
             "a fix for other platforms",
+        )
+
+    def test_multi_word_terms_are_whole_list_members(self):
+        # A member is one word or one whole banned term. Without the second
+        # half, this list fails to match at "Rocky", matches from "Linux"
+        # instead, and leaves "Rocky other platforms" behind - a stranded
+        # distro name that the survivor check cannot see, because bare "Rocky"
+        # is not itself a banned term.
+        self.assertEqual(
+            self.repair("Rocky Linux, AlmaLinux, and CentOS all work"),
+            "other platforms all work",
+        )
+        self.assertEqual(
+            self.repair("packages for Fedora, Red Hat, and Ubuntu today"),
+            "packages for other platforms today",
+        )
+        self.assertEqual(
+            self.repair("built on macOS, Arch Linux, and Windows"),
+            "built on macOS",
+        )
+
+    def test_optional_suffix_is_taken_with_the_member(self):
+        # "Zorin OS" must leave as one member. Dropping only "Zorin" would
+        # strand its "OS" in the sentence.
+        self.assertEqual(
+            self.repair("openSUSE and Zorin OS packaging landed"),
+            "other platforms packaging landed",
+        )
+
+    def test_multi_word_members_do_not_absorb_leading_prose(self):
+        # The property the single-word rule existed to protect. A multi-word
+        # branch can only match a banned term, so it can never start earlier
+        # than one does.
+        self.assertEqual(
+            self.repair("also broken on Red Hat, Fedora, and Windows today"),
+            "also broken on other platforms today",
+        )
+        self.assertEqual(
+            self.repair("tested with Arch Linux and macOS"),
+            "tested with macOS",
         )
 
 

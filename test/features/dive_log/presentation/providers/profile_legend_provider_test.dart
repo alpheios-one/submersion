@@ -467,4 +467,40 @@ void main() {
       expect(container.read(profileLegendProvider).showPhotoMarkers, isFalse);
     });
   });
+
+  group('O2 cell millivolts (issue #810)', () {
+    test('default to hidden and copyWith flips them', () {
+      const state = ProfileLegendState();
+      expect(state.showO2CellMv, isFalse);
+      expect(state.copyWith(showO2CellMv: true).showO2CellMv, isTrue);
+    });
+
+    test('showing them counts as an active secondary toggle', () {
+      const off = ProfileLegendState();
+      final on = off.copyWith(showO2CellMv: true);
+      expect(on.activeSecondaryCount, off.activeSecondaryCount + 1);
+    });
+
+    test('participate in equality and hashCode', () {
+      const off = ProfileLegendState();
+      final on = off.copyWith(showO2CellMv: true);
+      expect(on, isNot(equals(off)));
+      expect(on.hashCode, isNot(equals(off.hashCode)));
+    });
+
+    test('toggleO2CellMv flips the state, session-only', () {
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith(
+            (ref) => _StubSettingsNotifier(const AppSettings()),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      // No persisted default setting backs this one, so it always starts off.
+      expect(container.read(profileLegendProvider).showO2CellMv, isFalse);
+      container.read(profileLegendProvider.notifier).toggleO2CellMv();
+      expect(container.read(profileLegendProvider).showO2CellMv, isTrue);
+    });
+  });
 }

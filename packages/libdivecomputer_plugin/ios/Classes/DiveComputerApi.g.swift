@@ -175,6 +175,15 @@ struct ProfileSample {
   var o2Sensor4: Double? = nil
   var o2Sensor5: Double? = nil
   var o2Sensor6: Double? = nil
+  /// Raw O2 cell output in millivolts (sensor 1..6), null when that cell
+  /// reports none. Present even when the cell's ppO2 is unavailable because the
+  /// logged calibration could not be trusted (issue #810).
+  var o2SensorMv1: Int64? = nil
+  var o2SensorMv2: Int64? = nil
+  var o2SensorMv3: Int64? = nil
+  var o2SensorMv4: Int64? = nil
+  var o2SensorMv5: Int64? = nil
+  var o2SensorMv6: Int64? = nil
   /// Active gas mix index at this sample (from DC_SAMPLE_GASMIX), carried forward
   /// from the most recent gas switch; null if the computer reported no gas.
   var gasMixIndex: Int64? = nil
@@ -203,7 +212,13 @@ struct ProfileSample {
     let o2Sensor4: Double? = nilOrValue(pigeonVar_list[18])
     let o2Sensor5: Double? = nilOrValue(pigeonVar_list[19])
     let o2Sensor6: Double? = nilOrValue(pigeonVar_list[20])
-    let gasMixIndex: Int64? = nilOrValue(pigeonVar_list[21])
+    let o2SensorMv1: Int64? = nilOrValue(pigeonVar_list[21])
+    let o2SensorMv2: Int64? = nilOrValue(pigeonVar_list[22])
+    let o2SensorMv3: Int64? = nilOrValue(pigeonVar_list[23])
+    let o2SensorMv4: Int64? = nilOrValue(pigeonVar_list[24])
+    let o2SensorMv5: Int64? = nilOrValue(pigeonVar_list[25])
+    let o2SensorMv6: Int64? = nilOrValue(pigeonVar_list[26])
+    let gasMixIndex: Int64? = nilOrValue(pigeonVar_list[27])
 
     return ProfileSample(
       timeSeconds: timeSeconds,
@@ -227,6 +242,12 @@ struct ProfileSample {
       o2Sensor4: o2Sensor4,
       o2Sensor5: o2Sensor5,
       o2Sensor6: o2Sensor6,
+      o2SensorMv1: o2SensorMv1,
+      o2SensorMv2: o2SensorMv2,
+      o2SensorMv3: o2SensorMv3,
+      o2SensorMv4: o2SensorMv4,
+      o2SensorMv5: o2SensorMv5,
+      o2SensorMv6: o2SensorMv6,
       gasMixIndex: gasMixIndex
     )
   }
@@ -253,6 +274,12 @@ struct ProfileSample {
       o2Sensor4,
       o2Sensor5,
       o2Sensor6,
+      o2SensorMv1,
+      o2SensorMv2,
+      o2SensorMv3,
+      o2SensorMv4,
+      o2SensorMv5,
+      o2SensorMv6,
       gasMixIndex,
     ]
   }

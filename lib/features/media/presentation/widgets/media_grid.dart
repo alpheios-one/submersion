@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
-import 'package:submersion/features/media_store/presentation/widgets/media_store_badge.dart';
+import 'package:submersion/features/media/presentation/widgets/media_status_badge.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 /// Shared building blocks for media grids (dive and site sections).
@@ -135,7 +135,7 @@ class MediaThumbnailTile extends StatelessWidget {
 
             // Media store transfer badge (queued/uploading/failed only;
             // top-left so it never collides with the selection checkmark).
-            Positioned(top: 4, left: 4, child: MediaStoreBadge(item: item)),
+            Positioned(top: 4, left: 4, child: MediaStatusBadge(item: item)),
 
             // Video icon (top-right when no checkmark, hidden when checkmark)
             if (item.isVideo && !isSelected)

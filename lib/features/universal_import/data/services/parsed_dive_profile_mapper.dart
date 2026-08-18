@@ -53,6 +53,22 @@ class ParsedDiveProfileMapper {
           sampleMap['o2Sensor${cell + 1}'] = cells[cell];
         }
       }
+      // Raw cell output, carried independently of the bar values above: a
+      // computer with an untrusted calibration reports these and nothing else
+      // (issue #810).
+      final cellMv = <int?>[
+        s.o2SensorMv1,
+        s.o2SensorMv2,
+        s.o2SensorMv3,
+        s.o2SensorMv4,
+        s.o2SensorMv5,
+        s.o2SensorMv6,
+      ];
+      for (var cell = 0; cell < cellMv.length; cell++) {
+        if (cellMv[cell] != null) {
+          sampleMap['o2SensorMv${cell + 1}'] = cellMv[cell];
+        }
+      }
       if (s.heartRate != null) {
         sampleMap['heartRate'] = s.heartRate;
       }

@@ -224,23 +224,20 @@ class KmlExportService {
       );
     }
 
-    if (site.conditions != null) {
-      final conditions = site.conditions!;
-      if (conditions.waterType != null) {
-        buffer.writeln(
-          '<p><b>Water Type:</b> ${_escapeHtml(conditions.waterType!)}</p>',
-        );
-      }
-      if (conditions.typicalCurrent != null) {
-        buffer.writeln(
-          '<p><b>Typical Current:</b> ${_escapeHtml(conditions.typicalCurrent!)}</p>',
-        );
-      }
-      if (conditions.entryType != null) {
-        buffer.writeln(
-          '<p><b>Entry:</b> ${_escapeHtml(conditions.entryType!)}</p>',
-        );
-      }
+    if (site.waterType != null) {
+      buffer.writeln(
+        '<p><b>Water Type:</b> ${_escapeHtml(site.waterType!.displayName)}</p>',
+      );
+    }
+    if (site.entryMethod != null) {
+      buffer.writeln(
+        '<p><b>Entry:</b> ${_escapeHtml(site.entryMethod!.displayName)}</p>',
+      );
+    }
+    if (site.exitMethod != null && site.exitMethod != site.entryMethod) {
+      buffer.writeln(
+        '<p><b>Exit:</b> ${_escapeHtml(site.exitMethod!.displayName)}</p>',
+      );
     }
 
     if (site.hazards != null && site.hazards!.isNotEmpty) {

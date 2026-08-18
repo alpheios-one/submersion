@@ -37,6 +37,9 @@ class _FileWritingAdapter implements BackupDatabaseAdapter {
 
   @override
   AppDatabase get database => throw UnimplementedError();
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 class _FakeSafPort implements BackupSafPort {

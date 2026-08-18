@@ -155,6 +155,17 @@ data class ProfileSample (
   val o2Sensor5: Double? = null,
   val o2Sensor6: Double? = null,
   /**
+   * Raw O2 cell output in millivolts (sensor 1..6), null when that cell
+   * reports none. Present even when the cell's ppO2 is unavailable because the
+   * logged calibration could not be trusted (issue #810).
+   */
+  val o2SensorMv1: Long? = null,
+  val o2SensorMv2: Long? = null,
+  val o2SensorMv3: Long? = null,
+  val o2SensorMv4: Long? = null,
+  val o2SensorMv5: Long? = null,
+  val o2SensorMv6: Long? = null,
+  /**
    * Active gas mix index at this sample (from DC_SAMPLE_GASMIX), carried forward
    * from the most recent gas switch; null if the computer reported no gas.
    */
@@ -184,8 +195,14 @@ data class ProfileSample (
       val o2Sensor4 = pigeonVar_list[18] as Double?
       val o2Sensor5 = pigeonVar_list[19] as Double?
       val o2Sensor6 = pigeonVar_list[20] as Double?
-      val gasMixIndex = pigeonVar_list[21] as Long?
-      return ProfileSample(timeSeconds, depthMeters, temperatureCelsius, pressureBar, tankIndex, heartRate, heading, setpoint, ppo2, cns, rbt, decoType, decoTime, decoDepth, tts, o2Sensor1, o2Sensor2, o2Sensor3, o2Sensor4, o2Sensor5, o2Sensor6, gasMixIndex)
+      val o2SensorMv1 = pigeonVar_list[21] as Long?
+      val o2SensorMv2 = pigeonVar_list[22] as Long?
+      val o2SensorMv3 = pigeonVar_list[23] as Long?
+      val o2SensorMv4 = pigeonVar_list[24] as Long?
+      val o2SensorMv5 = pigeonVar_list[25] as Long?
+      val o2SensorMv6 = pigeonVar_list[26] as Long?
+      val gasMixIndex = pigeonVar_list[27] as Long?
+      return ProfileSample(timeSeconds, depthMeters, temperatureCelsius, pressureBar, tankIndex, heartRate, heading, setpoint, ppo2, cns, rbt, decoType, decoTime, decoDepth, tts, o2Sensor1, o2Sensor2, o2Sensor3, o2Sensor4, o2Sensor5, o2Sensor6, o2SensorMv1, o2SensorMv2, o2SensorMv3, o2SensorMv4, o2SensorMv5, o2SensorMv6, gasMixIndex)
     }
   }
   fun toList(): List<Any?> {
@@ -211,6 +228,12 @@ data class ProfileSample (
       o2Sensor4,
       o2Sensor5,
       o2Sensor6,
+      o2SensorMv1,
+      o2SensorMv2,
+      o2SensorMv3,
+      o2SensorMv4,
+      o2SensorMv5,
+      o2SensorMv6,
       gasMixIndex,
     )
   }

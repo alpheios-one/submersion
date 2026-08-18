@@ -379,7 +379,50 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'החלף';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'עדכון';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty => 'רק צלילות ללא מכל קיים';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'בחר אילו מאפיינים לדרוס במיכלים שכבר קיימים בצלילות אלה. לחצי ההתחלה והסיום לעולם אינם משתנים.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'בחר לפחות מאפיין אחד של מיכל לעדכון.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'הגדרה מראש';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'תפקיד';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'נפח';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'לחץ עבודה';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'חומר';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'תערובת גז';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'שם';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות שנבחרו ללא מיכלים וידולגו.',
+      one: 'צלילה אחת שנבחרה ללא מיכלים ותידולג.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'להחיל שינויים?';
@@ -4791,12 +4834,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'הצגה במסך מלא';
 
   @override
-  String get diveLog_detail_viewMap => 'מפה';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => 'הצגת אתר';
 
   @override
@@ -5637,6 +5674,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_filter_title => 'סינון צלילות';
 
   @override
+  String get diveLog_filter_resizeGrip => 'שינוי גודל חלונית הסינון';
+
+  @override
   String get diveLog_filter_tooltip_close => 'סגירת מסנן';
 
   @override
@@ -6206,9 +6246,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get setup_sync_header => 'סנכרון ענן';
-
-  @override
-  String get setup_sync_icloudUnavailable => 'iCloud אינו זמין במכשיר זה';
 
   @override
   String get setup_sync_libraryFound_adopt => 'אימוץ הספרייה הקיימת';
@@ -7194,6 +7231,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_tooltip_sensor => 'חיישן';
 
   @override
+  String get diveLog_legend_label_o2Cells => 'תאי O2';
+
+  @override
+  String get diveLog_tooltip_o2CellsTight => 'צמוד';
+
+  @override
+  String get diveLog_tooltip_o2CellsDrifting => 'סטייה';
+
+  @override
+  String get diveLog_tooltip_o2CellsWide => 'רחב';
+
+  @override
   String get diveLog_tooltip_srfGf => 'SrfGF';
 
   @override
@@ -7782,6 +7831,47 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveSites_edit_access_parkingInfo_label => 'מידע על חניה';
+
+  @override
+  String get diveSites_edit_access_entryMethod_label => 'שיטת כניסה';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'שיטת יציאה';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count הצלילות שלך כאן: כניסה $entry, יציאה $exit',
+      one: 'הצלילה שלך כאן: כניסה $entry, יציאה $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count הצלילות שלך כאן: כניסה $entry',
+      one: 'הצלילה שלך כאן: כניסה $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'כניסה';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'יציאה';
 
   @override
   String get diveSites_edit_altitude_helperText =>
@@ -14096,17 +14186,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' ו-';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count מכשירים מסתנכרנים מגרסה חדשה יותר של Submersion. עדכן מכשיר זה כדי לקבל את השינויים האחרונים שלהם.',
-      one:
-          'מכשיר אחד מסתנכרן מגרסה חדשה יותר של Submersion. עדכן מכשיר זה כדי לקבל את השינויים האחרונים שלו.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList מסתנכרן מגרסה חדשה יותר של Submersion, ולכן השינויים האחרונים שלו מוחזקים בינתיים.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList מסתנכרנים מגרסה חדשה יותר של Submersion, ולכן השינויים האחרונים שלהם מוחזקים בינתיים.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'עדכן מכשיר זה כדי לקבל אותם.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'הם יוחלו אוטומטית ברגע שעדכון חנות האפליקציות של מכשיר זה יגיע; ייתכן שהעדכון עדיין בבדיקה.';
 
   @override
   String get settings_cloudSync_provider_connected => 'מחובר';
@@ -16251,6 +16348,14 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get statistics_profile_deco_noDeco => 'ללא דקו';
+
+  @override
+  String get statistics_profile_deco_notRecorded => 'לא נרשם';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return 'ל-$count צלילות אין נתוני דקומפרסיה שנרשמו או שניתן לחשב, והן אינן נכללות בשיעור';
+  }
 
   @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
@@ -18468,6 +18573,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get units_profileMetric_percent => '%';
 
   @override
+  String get units_profileMetric_millivolts => 'mV';
+
+  @override
   String get units_sac_litersPerMin => 'L/min';
 
   @override
@@ -19774,7 +19882,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'ייבוא מ-Apple Watch זמין רק במכשירי iOS ו-macOS.';
+      'ייבוא מ-Apple Watch מחייב אייפון עם אפליקציית הבריאות.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed => 'בדיקת הרשאות נכשלה';
@@ -24416,6 +24524,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'כניסה';
+
+  @override
+  String get enum_siteField_exitMethod => 'שיטת יציאה';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'יציאה';
 
   @override
   String get enum_siteField_bestSeason_short => 'עונה';
@@ -30546,11 +30660,83 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'שדרוג מסד הנתונים נכשל';
+  String get startup_error_title => 'Submersion לא הצליחה להיפתח';
 
   @override
   String get startup_error_body =>
-      'נסו להפעיל מחדש את האפליקציה. אם הבעיה נמשכת, פנו לתמיכה: הנתונים שלכם עדיין בדיסק ואין צורך בהתקנה מחדש.';
+      'משהו השתבש לפני שיומן הצלילה שלך נפתח במלואו. הנתונים שלך עדיין על הדיסק ואין צורך בהתקנה מחדש. נסה להפעיל מחדש את האפליקציה; אם התקלה נמשכת, פנה לתמיכה.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'גרסה זו אינה יכולה לפתוח מסד נתונים';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'מנוע מסד הנתונים של Submersion חסר בגרסה הזו, ולכן יומן הצלילה שלך מעולם לא נפתח. שום דבר על הדיסק לא השתנה ואין נתונים בסיכון.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'התקנה מחדש או שחזור גיבוי לא יעזרו כאן. התקן גרסה תקינה של Submersion, ונשמח אם תדווח על כך: זו תקלה בחבילת האפליקציה, לא בנתונים שלך.';
+
+  @override
+  String get startup_migrationFailed_title => 'שדרוג מסד הנתונים נכשל';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'לא ניתן היה לשדרג את יומן הצלילה שלך לתבנית שגרסה זו דורשת. עותק בטיחות נוצר לפני תחילת השדרוג, כך ששום דבר לא אבד.';
+
+  @override
+  String get startup_dataUnreadable_title =>
+      'לא ניתן היה לקרוא את יומן הצלילה שלך';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'קובץ מסד הנתונים קיים, אבל Submersion לא מצליחה לקרוא אותו. בדרך כלל המשמעות היא שהקובץ פגום. שחזור גיבוי הוא הדרך המהירה ביותר לחזור.';
+
+  @override
+  String get startup_failure_technicalDetails => 'פרטים טכניים';
+
+  @override
+  String get startup_failure_backupAvailable_title => 'יש גיבוי זמין';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'נוצר ב-$timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'עותק בטיחות שנוצר לפני השדרוג מסכימה v$fromVersion ל-v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction => 'שחזר גיבוי זה';
+
+  @override
+  String get startup_failure_restoring => 'משחזר את יומן הצלילה...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'לא ניתן היה לשחזר את הגיבוי. יומן הצלילה שלך נשאר בדיוק כפי שהיה.';
+
+  @override
+  String get startup_failure_backupsFolder => 'הגיבויים שלך נמצאים ב:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'הצג את תיקיית הגיבויים';
+
+  @override
+  String get startup_failure_downgrade_title => 'חזרה לגרסה הקודמת';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'אם השדרוג ממשיך להיכשל, התקן את גרסת Submersion שהשתמשת בה קודם, ואז שחזר את עותק הבטיחות מתוך אותה גרסה. שחזור כאן רק יריץ שוב את אותו שדרוג. Submersion לעולם אינה חוזרת לגרסה ישנה מעצמה: העברה אוטומטית לגרסאות ישנות הייתה משאירה אותך בשקט על גרסאות עם בעיות ידועות.';
+
+  @override
+  String get startup_failure_downgrade_action => 'הצג גרסאות קודמות';
 
   @override
   String get startup_recovering_title => 'משחזר את מסד הנתונים...';
@@ -30636,6 +30822,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'עדכנו את Submersion לגרסה האחרונה. הנתונים שלכם בטוחים ולא שונו. אם נוצר גיבוי לפני השדרוג, הוא נמצא בתיקיית Backups וניתן לשחזר אותו לאחר העדכון.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'אפליקציה זו הותקנה מחנות אפליקציות והיא ישנה יותר מהגרסה שיצרה את הנתונים שלך. הנתונים שלך בטוחים ולא שונו. עדכן את Submersion כשהגרסה החדשה תופיע בחנות, ואז פתח את האפליקציה מחדש.';
 
   @override
   String get startup_versionMismatch_download => 'הורדת הגרסה האחרונה';
@@ -31362,4 +31552,257 @@ class AppLocalizationsHe extends AppLocalizations {
   String settings_cloudSync_launchCheck_failed(String error) {
     return 'בדיקת הסנכרון נכשלה: $error';
   }
+
+  @override
+  String get diveLog_detail_viewMap => 'מפה';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
+  String get setup_sync_icloudUnavailable => 'iCloud אינו זמין במכשיר זה';
+
+  @override
+  String get media_info_title => 'פרטי מדיה';
+
+  @override
+  String get media_info_fileSection => 'קובץ';
+
+  @override
+  String get media_info_filename => 'שם הקובץ';
+
+  @override
+  String get media_info_type => 'סוג';
+
+  @override
+  String get media_info_dimensions => 'ממדים';
+
+  @override
+  String get media_info_size => 'גודל';
+
+  @override
+  String get media_info_taken => 'צולם';
+
+  @override
+  String get media_info_coordinates => 'קואורדינטות';
+
+  @override
+  String get media_info_unknown => 'לא ידוע';
+
+  @override
+  String get media_info_originSection => 'מקור';
+
+  @override
+  String get media_info_source => 'מקור';
+
+  @override
+  String get media_info_reference => 'הפניה';
+
+  @override
+  String get media_info_linkedOn => 'קושר במכשיר';
+
+  @override
+  String get media_info_thisDevice => 'מכשיר זה';
+
+  @override
+  String get media_info_otherDevice => 'מכשיר אחר';
+
+  @override
+  String get media_info_status => 'מצב';
+
+  @override
+  String get media_info_statusFound => 'נמצא במכשיר זה';
+
+  @override
+  String get media_info_statusMissing => 'חסר במכשיר זה';
+
+  @override
+  String get media_info_statusUnchecked => 'טרם נבדק';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'נבדק לאחרונה $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'גיבוי';
+
+  @override
+  String get media_info_store => 'אחסון בענן';
+
+  @override
+  String get media_info_storeNotConnected => 'לא מחובר אחסון בענן';
+
+  @override
+  String get media_info_notEligible => 'מקור זה אינו זכאי לגיבוי';
+
+  @override
+  String get media_info_backupFull => 'המקור הועלה';
+
+  @override
+  String get media_info_backupThumbOnly => 'תמונה ממוזערת בלבד, המקור לא נשלח';
+
+  @override
+  String get media_info_backupRenditionOnly => 'גרסה דחוסה הועלתה';
+
+  @override
+  String get media_info_backupNone => 'לא מגובה';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'הועלה $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'ממתין להעלאה';
+
+  @override
+  String get media_info_queueTransferring => 'מעלה כעת';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'ההעלאה נכשלה: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'מוגש כעת';
+
+  @override
+  String get media_info_servingUnobserved => 'טרם נטען';
+
+  @override
+  String get media_info_servingFailed => 'לא ניתן היה לטעון';
+
+  @override
+  String get media_info_servedLocalDisk => 'קובץ מקומי במכשיר זה';
+
+  @override
+  String get media_info_servedGallery => 'ספריית התמונות';
+
+  @override
+  String get media_info_servedStoreCache => 'מטמון מקומי, מהאחסון בענן';
+
+  @override
+  String get media_info_servedStoreNetwork => 'הורד מהאחסון בענן';
+
+  @override
+  String get media_info_servedNetworkUrl => 'הזרמה מכתובת URL';
+
+  @override
+  String get media_info_servedConnectorCache => 'מטמון מקומי, מהשירות המחובר';
+
+  @override
+  String get media_info_servedConnectorNetwork => 'הורד מהשירות המחובר';
+
+  @override
+  String get media_info_servedEmbedded => 'מאוחסן ביומן זה';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'לא ניתן היה להגיע למקור המקורי, ולכן האחסון בענן סיפק זאת.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'תמונה ממוזערת';
+
+  @override
+  String get media_info_servingTierRendition => 'גרסה דחוסה';
+
+  @override
+  String get media_info_typePhoto => 'תמונה';
+
+  @override
+  String get media_info_typeVideo => 'וידאו';
+
+  @override
+  String get media_info_typeDocument => 'מסמך';
+
+  @override
+  String get media_info_typeSignature => 'חתימה';
+
+  @override
+  String get media_info_actionCheckNow => 'בדוק עכשיו';
+
+  @override
+  String get media_info_actionLocate => 'אתר קובץ...';
+
+  @override
+  String get media_info_actionBackUpNow => 'גבה עכשיו';
+
+  @override
+  String get media_info_actionRetryUpload => 'נסה להעלות שוב';
+
+  @override
+  String get media_info_actionReveal => 'הצג במנהל הקבצים';
+
+  @override
+  String get media_info_actionCopyPath => 'העתק הפניה';
+
+  @override
+  String get media_info_referenceCopied => 'ההפניה הועתקה';
+
+  @override
+  String get media_info_checkFound => 'המקור נמצא';
+
+  @override
+  String get media_info_checkMissing => 'המקור חסר';
+
+  @override
+  String get media_info_checkUnavailable => 'לא ניתן לבדוק כעת';
+
+  @override
+  String get media_info_backupQueued => 'בתור להעלאה';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'תאי O2';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'תאים';
+
+  @override
+  String get diveLog_o2CellSpread_label => 'פיזור תאי O2';
+
+  @override
+  String get media_status_broken => 'חסר ולא מגובה';
+
+  @override
+  String get media_status_transferFailed => 'ההעלאה נכשלה';
+
+  @override
+  String get media_status_transferring => 'מעלה';
+
+  @override
+  String get media_status_queued => 'ממתין להעלאה';
+
+  @override
+  String get media_status_cloudOnly => 'מאוחסן בענן בלבד';
+
+  @override
+  String get media_status_notBackedUp => 'לא מגובה';
+
+  @override
+  String get media_tile_infoMenuItem => 'פרטי מדיה';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'אפליקציית הבריאות של Apple לעולם אינה מגלה ליישומים אם ניתנה הרשאת קריאה. אם לא מופיעות צלילות, פתחו את אפליקציית הבריאות, ואז שיתוף, יישומים, Submersion, והפעילו אימונים, עומק מתחת למים, טמפרטורת מים ודופק.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'אין אימוני צלילה בטווח הזה. ודאו שהתאריכים כוללים את הצלילה ושבאפליקציית הבריאות, בשיתוף, יישומים, Submersion, מופעלים אימונים ועומק מתחת למים.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'עומק מתחת למים - דגימות עומק שנרשמו במהלך צלילות';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'טמפרטורת מים - דגימות טמפרטורה שנרשמו במהלך צלילות';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'הגישה ל-HealthKit מנוהלת באפליקציית הבריאות';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit אינו זמין במכשיר הזה';
 }

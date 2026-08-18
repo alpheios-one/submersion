@@ -27,13 +27,8 @@ void main() {
     notes: 'Great site',
     hazards: 'Strong current',
     mooringNumber: '7',
-    conditions: SiteConditions(
-      waterType: 'salt',
-      typicalVisibility: '20m',
-      typicalCurrent: 'moderate',
-      bestSeason: 'summer',
-      entryType: 'shore',
-    ),
+    entryMethod: EntryMethod.shore,
+    exitMethod: EntryMethod.ladder,
   );
 
   const testEntity = (site: testSite, diveCount: 12);
@@ -631,31 +626,32 @@ void main() {
       );
     });
 
-    test('returns typicalVisibility from conditions', () {
+    test('returns null for the fields with no backing column', () {
+      // typicalVisibility, typicalCurrent and bestSeason have never had a
+      // column behind them. The enum members stay for saved-layout
+      // compatibility, so the honest value is null.
       expect(
         adapter.extractValue(SiteField.typicalVisibility, testEntity),
-        equals('20m'),
+        isNull,
       );
-    });
-
-    test('returns typicalCurrent from conditions', () {
       expect(
         adapter.extractValue(SiteField.typicalCurrent, testEntity),
-        equals('moderate'),
+        isNull,
       );
+      expect(adapter.extractValue(SiteField.bestSeason, testEntity), isNull);
     });
 
-    test('returns entryType from conditions', () {
+    test('returns entryType from the real entry method column', () {
       expect(
         adapter.extractValue(SiteField.entryType, testEntity),
-        equals('shore'),
+        equals(EntryMethod.shore.displayName),
       );
     });
 
-    test('returns bestSeason from conditions', () {
+    test('returns exitMethod from the real exit method column', () {
       expect(
-        adapter.extractValue(SiteField.bestSeason, testEntity),
-        equals('summer'),
+        adapter.extractValue(SiteField.exitMethod, testEntity),
+        equals(EntryMethod.ladder.displayName),
       );
     });
 
@@ -681,13 +677,14 @@ void main() {
       );
     });
 
-    test('returns null for conditions fields when conditions is null', () {
-      const noCondSite = DiveSite(id: 'no-cond', name: 'No Conditions');
-      const entity = (site: noCondSite, diveCount: 0);
+    test('returns null for condition fields on a bare site', () {
+      const bareSite = DiveSite(id: 'bare', name: 'Bare Site');
+      const entity = (site: bareSite, diveCount: 0);
       expect(adapter.extractValue(SiteField.waterType, entity), isNull);
       expect(adapter.extractValue(SiteField.typicalVisibility, entity), isNull);
       expect(adapter.extractValue(SiteField.typicalCurrent, entity), isNull);
       expect(adapter.extractValue(SiteField.entryType, entity), isNull);
+      expect(adapter.extractValue(SiteField.exitMethod, entity), isNull);
       expect(adapter.extractValue(SiteField.bestSeason, entity), isNull);
     });
 

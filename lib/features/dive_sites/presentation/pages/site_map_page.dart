@@ -284,6 +284,10 @@ class _SiteMapPageState extends ConsumerState<SiteMapPage>
     List<SiteWithDiveCount> sitesWithCounts,
   ) {
     final selectionState = ref.watch(mapListSelectionProvider('sites'));
+    final selectedSite = sitesWithCounts
+        .where((s) => s.site.id == selectionState.selectedId)
+        .firstOrNull
+        ?.site;
 
     // Filter sites with valid coordinates (lat: -90 to 90, lng: -180 to 180)
     final sitesWithLocation = sitesWithCounts.where((s) {
@@ -347,13 +351,7 @@ class _SiteMapPageState extends ConsumerState<SiteMapPage>
               // Depth overlay for the selected site: same layer the
               // master-detail map and site detail render, so the app-bar
               // toggle actually shows something on this page too.
-              BathymetryDepthOverlayLayer(
-                location: sitesWithCounts
-                    .where((s) => s.site.id == selectionState.selectedId)
-                    .firstOrNull
-                    ?.site
-                    .location,
-              ),
+              BathymetryDepthOverlayLayer(location: selectedSite?.location),
               SiteFeatureMarkerLayer(siteId: selectionState.selectedId),
               // Built-in (bundled) sites layer - below the user markers so the
               // user's own sites always draw on top. Shown only when toggled.
@@ -442,10 +440,30 @@ class _SiteMapPageState extends ConsumerState<SiteMapPage>
           ),
         ),
 
-        // Reset-to-north compass (hidden until the map is rotated)
+        // Pane mode controls. Docked top-right so the 2D/3D pair sits where
+        // the terrain pane's own actions sit in 3D, rather than jumping
+        // corners with the mode.
         Positioned(
-          top: 16,
-          right: 16,
+          top: 8,
+          right: 8,
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              child: SiteScapeModeToggle(
+                mode: _scapeMode,
+                onModeChanged: (m) => setState(() => _scapeMode = m),
+                selectedSiteId: selectedSite?.id,
+                selectedSiteLocation: selectedSite?.location,
+              ),
+            ),
+          ),
+        ),
+
+        // Reset-to-north compass (hidden until the map is rotated), tucked
+        // under the controls card as on the master-detail map.
+        Positioned(
+          top: 64,
+          right: 8,
           child: MapCompassButton(controller: _mapController),
         ),
 

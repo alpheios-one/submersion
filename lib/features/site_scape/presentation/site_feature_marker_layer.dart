@@ -8,6 +8,8 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/site_feature.dart'
     as domain;
 import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
+import 'package:submersion/features/site_scape/presentation/site_feature_glyph.dart';
+import 'package:submersion/features/site_scape/presentation/site_feature_info_sheet.dart';
 import 'package:submersion/features/site_scape/presentation/site_feature_sheet.dart';
 
 /// Opens the edit sheet for [feature] and persists whatever comes back.
@@ -46,6 +48,11 @@ Future<void> editSiteFeature(
   }
 }
 
+/// Zoom a marker tap settles on: close enough to read the feature and its
+/// neighbours, but never a zoom OUT, so tapping while already zoomed in
+/// keeps the detail the diver had.
+const double _featureTapZoom = 17.0;
+
 /// Diver-placed features for the selected site, as flutter_map markers.
 /// Renders nothing without a selection (features are a selected-site
 /// concern, matching the depth overlay's scoping).
@@ -67,66 +74,42 @@ class SiteFeatureMarkerLayer extends ConsumerWidget {
             point: LatLng(f.latitude, f.longitude),
             width: 36,
             height: 36,
-            child: GestureDetector(
-              key: ValueKey('siteFeatureMarker-${f.id}'),
-              onTap: () => editSiteFeature(context, ref, f),
-              child: Transform.rotate(
-                angle: (f.bearingDeg ?? 0) * math.pi / 180.0,
-                child: SiteFeatureGlyph(typeName: f.typeName),
+            child: Builder(
+              // Builder, not the layer's own context: MapController.of
+              // needs a context BELOW the FlutterMap that hosts this layer.
+              builder: (markerContext) => GestureDetector(
+                key: ValueKey('siteFeatureMarker-${f.id}'),
+                onTap: () => _onFeatureTap(markerContext, ref, f),
+                child: Transform.rotate(
+                  angle: (f.bearingDeg ?? 0) * math.pi / 180.0,
+                  child: SiteFeatureGlyph(typeName: f.typeName),
+                ),
               ),
             ),
           ),
       ],
     );
   }
-}
 
-/// One circular glyph per feature type; an unknown type (from a newer app
-/// version) renders a generic pin rather than disappearing.
-class SiteFeatureGlyph extends StatelessWidget {
-  final String typeName;
-  final double size;
-
-  const SiteFeatureGlyph({super.key, required this.typeName, this.size = 20});
-
-  static (IconData, Color) styleFor(String typeName) {
-    return switch (domain.SiteFeatureType.values.asNameMap()[typeName]) {
-      domain.SiteFeatureType.wreck => (
-        Icons.directions_boat,
-        const Color(0xFF8B5CF6),
-      ),
-      domain.SiteFeatureType.mooring => (Icons.anchor, const Color(0xFF0EA5E9)),
-      domain.SiteFeatureType.entry => (Icons.login, const Color(0xFF22C55E)),
-      domain.SiteFeatureType.exit => (Icons.logout, const Color(0xFFF97316)),
-      domain.SiteFeatureType.swimThrough => (
-        Icons.u_turn_right,
-        const Color(0xFF14B8A6),
-      ),
-      domain.SiteFeatureType.hazard => (
-        Icons.warning_amber,
-        const Color(0xFFEF4444),
-      ),
-      domain.SiteFeatureType.current => (
-        Icons.navigation,
-        const Color(0xFF3B82F6),
-      ),
-      null => (Icons.place, const Color(0xFFEF4444)),
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final (icon, color) = styleFor(typeName);
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
-        boxShadow: const [
-          BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
-        ],
-      ),
-      child: Icon(icon, size: size, color: Colors.white),
+  /// Zoom to the feature, then show what the diver recorded. Editing is one
+  /// deliberate step further in, behind the sheet's edit button, so a tap
+  /// meant as "look closer" can no longer open an editor by accident.
+  void _onFeatureTap(
+    BuildContext context,
+    WidgetRef ref,
+    domain.SiteFeature feature,
+  ) {
+    final target = LatLng(feature.latitude, feature.longitude);
+    final controller = MapController.of(context);
+    controller.move(
+      target,
+      math.max(MapCamera.of(context).zoom, _featureTapZoom),
+    );
+    showSiteFeatureInfoSheet(
+      context,
+      ref,
+      feature,
+      onEdit: () => editSiteFeature(context, ref, feature),
     );
   }
 }

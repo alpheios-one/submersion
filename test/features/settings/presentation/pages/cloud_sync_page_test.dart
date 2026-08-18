@@ -121,6 +121,9 @@ class _NoopBackupAdapter implements BackupDatabaseAdapter {
 
   @override
   AppDatabase get database => throw UnimplementedError();
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 /// Fake [BackupService] recording safety-backup calls from the adopt flow.
@@ -1234,7 +1237,12 @@ void main() {
       await pumpPage(
         tester,
         selectedProvider: CloudProviderType.icloud,
-        syncState: const SyncState(newerSchemaPeerCount: 2),
+        syncState: const SyncState(
+          newerSchemaPeerLabels: [
+            (name: 'Living Room Mac', shortId: 'aaa11111'),
+            (name: 'Dive iPad', shortId: 'bbb22222'),
+          ],
+        ),
       );
 
       expect(
@@ -1249,7 +1257,12 @@ void main() {
       await pumpPage(
         tester,
         selectedProvider: CloudProviderType.icloud,
-        syncState: const SyncState(newerSchemaPeerCount: 2),
+        syncState: const SyncState(
+          newerSchemaPeerLabels: [
+            (name: 'Living Room Mac', shortId: 'aaa11111'),
+            (name: 'Dive iPad', shortId: 'bbb22222'),
+          ],
+        ),
       );
 
       // Material does not re-derive text colour from the Card background, so

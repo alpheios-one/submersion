@@ -385,8 +385,53 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Sostituisci';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Aggiorna';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Solo immersioni senza bombola esistente';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Scegli quali attributi sovrascrivere sulle bombole che queste immersioni hanno già. Le pressioni iniziale e finale non vengono mai modificate.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Scegli almeno un attributo della bombola da aggiornare.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Preimpostazione';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Ruolo';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volume';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure =>
+      'Pressione di esercizio';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Materiale';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Miscela';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Nome';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count immersioni selezionate non hanno bombole e verranno saltate.',
+      one: '1 immersione selezionata non ha bombole e verrà saltata.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Applicare le modifiche?';
@@ -4915,12 +4960,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Visualizza a schermo intero';
 
   @override
-  String get diveLog_detail_viewMap => 'Mappa';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => 'Visualizza sito';
 
   @override
@@ -5788,6 +5827,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_filter_title => 'Filtra immersioni';
 
   @override
+  String get diveLog_filter_resizeGrip => 'Ridimensiona il pannello dei filtri';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Chiudi filtro';
 
   @override
@@ -6369,10 +6411,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get setup_sync_header => 'Sincronizzazione cloud';
-
-  @override
-  String get setup_sync_icloudUnavailable =>
-      'iCloud non è disponibile su questo dispositivo';
 
   @override
   String get setup_sync_libraryFound_adopt => 'Adotta la libreria esistente';
@@ -7380,6 +7418,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_tooltip_sensor => 'Sensore';
 
   @override
+  String get diveLog_legend_label_o2Cells => 'Celle O2';
+
+  @override
+  String get diveLog_tooltip_o2CellsTight => 'stretta';
+
+  @override
+  String get diveLog_tooltip_o2CellsDrifting => 'in deriva';
+
+  @override
+  String get diveLog_tooltip_o2CellsWide => 'ampia';
+
+  @override
   String get diveLog_tooltip_srfGf => 'SrfGF';
 
   @override
@@ -7981,6 +8031,47 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get diveSites_edit_access_parkingInfo_label =>
       'Informazioni parcheggio';
+
+  @override
+  String get diveSites_edit_access_entryMethod_label => 'Metodo di entrata';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Metodo di uscita';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Le tue $count immersioni qui: entrata $entry, uscita $exit',
+      one: 'La tua immersione qui: entrata $entry, uscita $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Le tue $count immersioni qui: entrata $entry',
+      one: 'La tua immersione qui: entrata $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Entrata';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Uscita';
 
   @override
   String get diveSites_edit_altitude_helperText =>
@@ -14443,17 +14534,24 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' e ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count dispositivi si sincronizzano da una versione più recente di Submersion. Aggiorna questo dispositivo per ricevere le loro ultime modifiche.',
-      one:
-          '1 dispositivo si sincronizza da una versione più recente di Submersion. Aggiorna questo dispositivo per ricevere le sue ultime modifiche.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList si sincronizza da una versione più recente di Submersion, quindi le sue ultime modifiche sono per ora trattenute.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList si sincronizzano da una versione più recente di Submersion, quindi le loro ultime modifiche sono per ora trattenute.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Aggiorna questo dispositivo per riceverle.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'Verranno applicate automaticamente quando arriverà l\'aggiornamento dell\'app store per questo dispositivo; l\'aggiornamento potrebbe essere ancora in revisione.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Connesso';
@@ -16670,6 +16768,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get statistics_profile_deco_noDeco => 'No deco';
+
+  @override
+  String get statistics_profile_deco_notRecorded => 'Non registrato';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count immersioni non hanno dati di decompressione registrati o calcolabili e sono escluse dal tasso';
+  }
 
   @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
@@ -18938,6 +19044,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get units_profileMetric_percent => '%';
 
   @override
+  String get units_profileMetric_millivolts => 'mV';
+
+  @override
   String get units_sac_litersPerMin => 'L/min';
 
   @override
@@ -20275,7 +20384,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'L\'importazione da Apple Watch è disponibile solo su dispositivi iOS e macOS.';
+      'L\'importazione da Apple Watch richiede un iPhone con l\'app Salute.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -25018,6 +25127,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'Ingr.';
+
+  @override
+  String get enum_siteField_exitMethod => 'Metodo di uscita';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Uscita';
 
   @override
   String get enum_siteField_bestSeason_short => 'Stagione';
@@ -31150,11 +31265,86 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'Aggiornamento del database non riuscito';
+  String get startup_error_title => 'Submersion non è riuscito ad avviarsi';
 
   @override
   String get startup_error_body =>
-      'Prova a riavviare l’app. Se il problema persiste, contatta l’assistenza: i tuoi dati sono ancora sul disco e non è necessaria una reinstallazione.';
+      'Qualcosa è andato storto prima che il tuo diario di immersione fosse aperto del tutto. I tuoi dati sono ancora sul disco e non richiedono una reinstallazione. Prova a riavviare l\'app; se il problema persiste, contatta l\'assistenza.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'Questa build non può aprire un database';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'In questa build manca il motore di database di Submersion, quindi il tuo diario di immersione non è mai stato aperto. Sul disco non è cambiato nulla e nessun dato è a rischio.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'Reinstallare o ripristinare un backup non servirà. Installa una build funzionante di Submersion e segnalaci il problema: è un difetto del pacchetto dell\'app, non dei tuoi dati.';
+
+  @override
+  String get startup_migrationFailed_title =>
+      'Aggiornamento del database non riuscito';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'Non è stato possibile aggiornare il tuo diario di immersione al formato richiesto da questa versione. Prima dell\'aggiornamento è stata creata una copia di sicurezza, quindi non è andato perso nulla.';
+
+  @override
+  String get startup_dataUnreadable_title =>
+      'Non è stato possibile leggere il tuo diario di immersione';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'Il file del database c\'è, ma Submersion non riesce a leggerlo. Di solito significa che il file è danneggiato. Ripristinare un backup è il modo più rapido per ripartire.';
+
+  @override
+  String get startup_failure_technicalDetails => 'Dettagli tecnici';
+
+  @override
+  String get startup_failure_backupAvailable_title => 'È disponibile un backup';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'Creato il $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'Copia di sicurezza creata prima dell\'aggiornamento dallo schema v$fromVersion a v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction => 'Ripristina questo backup';
+
+  @override
+  String get startup_failure_restoring =>
+      'Ripristino del diario di immersione...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'Non è stato possibile ripristinare il backup. Il tuo diario di immersione è stato lasciato esattamente com\'era.';
+
+  @override
+  String get startup_failure_backupsFolder => 'I tuoi backup si trovano in:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'Mostra cartella dei backup';
+
+  @override
+  String get startup_failure_downgrade_title =>
+      'Tornare alla versione precedente';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'Se l\'aggiornamento continua a fallire, installa la versione di Submersion che usavi prima e ripristina la copia di sicurezza da quella versione. Ripristinarla qui rieseguirebbe soltanto lo stesso aggiornamento. Submersion non torna da solo a versioni precedenti: spostarti automaticamente su build più vecchie ti terrebbe in silenzio su versioni con problemi noti.';
+
+  @override
+  String get startup_failure_downgrade_action => 'Vedi le versioni precedenti';
 
   @override
   String get startup_recovering_title => 'Recupero del database...';
@@ -31244,6 +31434,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'Aggiorna Submersion all’ultima versione. I tuoi dati sono al sicuro e non sono stati modificati. Se prima dell’aggiornamento è stato eseguito un backup, si trova nella cartella Backups e può essere ripristinato dopo l’aggiornamento.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'Questa app è stata installata da un app store ed è più vecchia della versione che ha creato i tuoi dati. I tuoi dati sono al sicuro e non sono stati modificati. Aggiorna Submersion quando la nuova versione appare nello store, poi riaprila.';
 
   @override
   String get startup_versionMismatch_download => 'Scarica l’ultima versione';
@@ -31989,4 +32183,263 @@ class AppLocalizationsIt extends AppLocalizations {
   String settings_cloudSync_launchCheck_failed(String error) {
     return 'Controllo della sincronizzazione non riuscito: $error';
   }
+
+  @override
+  String get diveLog_detail_viewMap => 'Mappa';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
+  String get setup_sync_icloudUnavailable =>
+      'iCloud non è disponibile su questo dispositivo';
+
+  @override
+  String get media_info_title => 'Info media';
+
+  @override
+  String get media_info_fileSection => 'File';
+
+  @override
+  String get media_info_filename => 'Nome file';
+
+  @override
+  String get media_info_type => 'Tipo';
+
+  @override
+  String get media_info_dimensions => 'Dimensioni';
+
+  @override
+  String get media_info_size => 'Dimensione';
+
+  @override
+  String get media_info_taken => 'Scattata';
+
+  @override
+  String get media_info_coordinates => 'Coordinate';
+
+  @override
+  String get media_info_unknown => 'Sconosciuto';
+
+  @override
+  String get media_info_originSection => 'Origine';
+
+  @override
+  String get media_info_source => 'Sorgente';
+
+  @override
+  String get media_info_reference => 'Riferimento';
+
+  @override
+  String get media_info_linkedOn => 'Collegata su';
+
+  @override
+  String get media_info_thisDevice => 'Questo dispositivo';
+
+  @override
+  String get media_info_otherDevice => 'Un altro dispositivo';
+
+  @override
+  String get media_info_status => 'Stato';
+
+  @override
+  String get media_info_statusFound => 'Trovata su questo dispositivo';
+
+  @override
+  String get media_info_statusMissing => 'Assente da questo dispositivo';
+
+  @override
+  String get media_info_statusUnchecked => 'Non ancora verificata';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Ultimo controllo $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Backup';
+
+  @override
+  String get media_info_store => 'Archivio cloud';
+
+  @override
+  String get media_info_storeNotConnected => 'Nessun archivio cloud collegato';
+
+  @override
+  String get media_info_notEligible =>
+      'Questa sorgente non può essere sottoposta a backup';
+
+  @override
+  String get media_info_backupFull => 'Originale caricato';
+
+  @override
+  String get media_info_backupThumbOnly =>
+      'Solo miniatura, originale non inviato';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Versione compressa caricata';
+
+  @override
+  String get media_info_backupNone => 'Nessun backup';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Caricata $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'In attesa di caricamento';
+
+  @override
+  String get media_info_queueTransferring => 'Caricamento in corso';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'Caricamento non riuscito: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'In uso ora';
+
+  @override
+  String get media_info_servingUnobserved => 'Non ancora caricata';
+
+  @override
+  String get media_info_servingFailed => 'Impossibile caricare';
+
+  @override
+  String get media_info_servedLocalDisk => 'File locale su questo dispositivo';
+
+  @override
+  String get media_info_servedGallery => 'Libreria foto';
+
+  @override
+  String get media_info_servedStoreCache =>
+      'Cache locale, dall\'archivio cloud';
+
+  @override
+  String get media_info_servedStoreNetwork => 'Scaricata dall\'archivio cloud';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Streaming da un URL';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Cache locale, dal servizio collegato';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Scaricata dal servizio collegato';
+
+  @override
+  String get media_info_servedEmbedded => 'Salvata in questo diario';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'La sorgente originale non era raggiungibile, quindi ha risposto l\'archivio cloud.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Miniatura';
+
+  @override
+  String get media_info_servingTierRendition => 'Versione compressa';
+
+  @override
+  String get media_info_typePhoto => 'Foto';
+
+  @override
+  String get media_info_typeVideo => 'Video';
+
+  @override
+  String get media_info_typeDocument => 'Documento';
+
+  @override
+  String get media_info_typeSignature => 'Firma';
+
+  @override
+  String get media_info_actionCheckNow => 'Verifica ora';
+
+  @override
+  String get media_info_actionLocate => 'Trova file...';
+
+  @override
+  String get media_info_actionBackUpNow => 'Esegui backup ora';
+
+  @override
+  String get media_info_actionRetryUpload => 'Riprova caricamento';
+
+  @override
+  String get media_info_actionReveal => 'Mostra nel gestore file';
+
+  @override
+  String get media_info_actionCopyPath => 'Copia riferimento';
+
+  @override
+  String get media_info_referenceCopied => 'Riferimento copiato';
+
+  @override
+  String get media_info_checkFound => 'Sorgente trovata';
+
+  @override
+  String get media_info_checkMissing => 'Sorgente mancante';
+
+  @override
+  String get media_info_checkUnavailable => 'Impossibile verificare ora';
+
+  @override
+  String get media_info_backupQueued => 'In coda per il caricamento';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'Celle O2';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Celle';
+
+  @override
+  String get diveLog_o2CellSpread_label => 'Dispersione delle celle O2';
+
+  @override
+  String get media_status_broken => 'Mancante e senza backup';
+
+  @override
+  String get media_status_transferFailed => 'Caricamento non riuscito';
+
+  @override
+  String get media_status_transferring => 'Caricamento in corso';
+
+  @override
+  String get media_status_queued => 'In attesa di caricamento';
+
+  @override
+  String get media_status_cloudOnly => 'Salvato solo nel cloud';
+
+  @override
+  String get media_status_notBackedUp => 'Nessun backup';
+
+  @override
+  String get media_tile_infoMenuItem => 'Info media';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple Salute non comunica mai alle app se l\'accesso in lettura è stato concesso. Se non compare nessuna immersione, apri Salute, poi Condivisione, App, Submersion, e attiva Allenamenti, Profondità subacquea, Temperatura dell\'acqua e Frequenza cardiaca.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'Nessun allenamento di immersione in questo intervallo. Verifica che le date coprano l\'immersione e che in Salute, Condivisione, App, Submersion siano attivi Allenamenti e Profondità subacquea.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Profondità subacquea - campioni di profondità registrati durante le immersioni';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Temperatura dell\'acqua - campioni di temperatura registrati durante le immersioni';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'L\'accesso a HealthKit si gestisce nell\'app Salute';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit non è disponibile su questo dispositivo';
 }

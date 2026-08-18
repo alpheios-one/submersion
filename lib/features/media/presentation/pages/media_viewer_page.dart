@@ -31,6 +31,7 @@ import 'package:submersion/features/media/presentation/widgets/perdix_overlay/dr
 import 'package:submersion/features/media/presentation/widgets/perdix_overlay/perdix_face_resolver.dart';
 import 'package:submersion/features/media/presentation/widgets/write_metadata_dialog.dart';
 import 'package:submersion/features/media/presentation/widgets/mini_dive_profile_overlay.dart';
+import 'package:submersion/features/media/presentation/widgets/media_info_sheet.dart';
 import 'package:submersion/features/media_store/presentation/widgets/media_reupload_button.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -1291,6 +1292,11 @@ class _TopOverlay extends StatelessWidget {
                     tooltip: context.l10n.media_lightroom_openInLightroom,
                     onPressed: onOpenInLightroom,
                   ),
+                IconButton(
+                  icon: const Icon(Icons.info_outline, color: Colors.white),
+                  tooltip: context.l10n.media_info_title,
+                  onPressed: () => showMediaInfoSheet(context, item),
+                ),
                 IconButton(
                   icon: const Icon(Icons.share, color: Colors.white),
                   tooltip: context.l10n.media_photoViewer_shareTooltip,

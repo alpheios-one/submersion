@@ -44,8 +44,21 @@ class _HostState extends State<_Host> {
       selectedSiteId: widget.selectedSiteId,
       selectedSiteLocation: widget.selectedSiteLocation,
       mapController: null,
-      mapBuilder: (_) =>
+      // Real hosts seat the toggle inside their own 2D stack, so it goes
+      // offstage with the map in 3D and the terrain pane's injected copy
+      // is the only one on screen. Mirror that, or the two would collide
+      // on the same widget keys.
+      mapBuilder: (_) => Stack(
+        children: [
           const ColoredBox(color: Colors.green, child: Text('MAP_STACK')),
+          SiteScapeModeToggle(
+            mode: mode,
+            onModeChanged: (m) => setState(() => mode = m),
+            selectedSiteId: widget.selectedSiteId,
+            selectedSiteLocation: widget.selectedSiteLocation,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -137,6 +150,47 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('siteScape2dButton')));
     await tester.pump();
     expect(find.byType(SiteTerrainPane), findsNothing);
+  });
+
+  testWidgets('in 3D the toggle is docked inside the terrain pane, so it '
+      'shares a card with the pane actions instead of floating alone', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(
+        const _Host(selectedSiteId: 'site-1', selectedSiteLocation: _loc),
+        overrides: [
+          bathymetryGridProvider.overrideWith(
+            (ref, key) => Completer<BathymetryGrid?>().future,
+          ),
+        ],
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('siteScape3dButton')));
+    await tester.pump();
+    await tester.pump();
+
+    // The host's own copy went offstage with the 2D stack, so the only
+    // toggle on screen is the one the pane docked.
+    expect(
+      find.descendant(
+        of: find.byType(SiteTerrainPane),
+        matching: find.byKey(const ValueKey('siteScape2dButton')),
+      ),
+      findsOneWidget,
+    );
+    // Even on a site whose seascape came back empty, the way back to 2D is
+    // still docked: entering 3D must never be a dead end.
+    expect(
+      find.text('No bathymetry available for this location'),
+      findsOneWidget,
+    );
+    final back = tester.widget<IconButton>(
+      find.byKey(const ValueKey('siteScape2dButton')),
+    );
+    expect(back.onPressed, isNotNull);
   });
 
   testWidgets('no selection disables 3D', (tester) async {

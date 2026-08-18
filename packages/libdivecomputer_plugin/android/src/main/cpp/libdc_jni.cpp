@@ -998,6 +998,9 @@ Java_com_submersion_libdivecomputer_LibdcWrapper_nativeGetDiveSampleCount(
     return static_cast<jint>(dive->sample_count);
 }
 
+// Must match SAMPLE_FIELD_COUNT in SampleDecoder.kt.
+#define LIBDC_SAMPLE_FIELD_COUNT 28
+
 extern "C" JNIEXPORT jdoubleArray JNICALL
 Java_com_submersion_libdivecomputer_LibdcWrapper_nativeGetDiveSample(
     JNIEnv *env, jclass, jlong divePtr, jint index) {
@@ -1005,10 +1008,11 @@ Java_com_submersion_libdivecomputer_LibdcWrapper_nativeGetDiveSample(
     if (index < 0 || static_cast<unsigned int>(index) >= dive->sample_count) return nullptr;
 
     const libdc_sample_t *s = &dive->samples[index];
-    // All 22 fields (14 base + 6 O2 cells + gas mix + heading). Integer sentinels
-    // (UINT32_MAX) are cast to double; NAN doubles pass through and become null
-    // on the Kotlin side.
-    jdouble values[22] = {
+    // All 28 fields (14 base + 6 O2 cells + gas mix + heading + 6 cell mV).
+    // Integer sentinels (UINT32_MAX) are cast to double; NAN doubles pass
+    // through and become null on the Kotlin side. Kotlin indexes this array
+    // positionally (see SampleDecoder.kt): append only, never insert.
+    jdouble values[LIBDC_SAMPLE_FIELD_COUNT] = {
         static_cast<jdouble>(s->time_ms),
         s->depth,
         s->temperature,
@@ -1030,10 +1034,16 @@ Java_com_submersion_libdivecomputer_LibdcWrapper_nativeGetDiveSample(
         s->o2_sensor[4],
         s->o2_sensor[5],
         static_cast<jdouble>(s->gasmix),
-        static_cast<jdouble>(s->heading)
+        static_cast<jdouble>(s->heading),
+        static_cast<jdouble>(s->o2_sensor_mv[0]),
+        static_cast<jdouble>(s->o2_sensor_mv[1]),
+        static_cast<jdouble>(s->o2_sensor_mv[2]),
+        static_cast<jdouble>(s->o2_sensor_mv[3]),
+        static_cast<jdouble>(s->o2_sensor_mv[4]),
+        static_cast<jdouble>(s->o2_sensor_mv[5])
     };
-    jdoubleArray result = env->NewDoubleArray(22);
-    env->SetDoubleArrayRegion(result, 0, 22, values);
+    jdoubleArray result = env->NewDoubleArray(LIBDC_SAMPLE_FIELD_COUNT);
+    env->SetDoubleArrayRegion(result, 0, LIBDC_SAMPLE_FIELD_COUNT, values);
     return result;
 }
 

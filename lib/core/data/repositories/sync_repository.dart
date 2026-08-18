@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/database/database.dart';
@@ -28,7 +29,14 @@ class SyncRepository {
   /// a fresh Hybrid Logical Clock onto these rows so cross-device merges can
   /// order edits correctly under wall-clock skew. Entities not listed here
   /// (append-only tables) fall back to updatedAt ordering.
-  static const Map<String, ({String table, String pk})> _hlcTargets = {
+  ///
+  /// MUST cover every table declaring an `hlc` column: an omission is silent
+  /// (`_stampHlc` no-ops on an unknown entity type), leaves the column NULL,
+  /// and the incremental export's `hlc > watermark` filter then excludes the
+  /// row from every changeset forever. `sync_hlc_target_registration_test`
+  /// asserts this against the live schema.
+  @visibleForTesting
+  static const Map<String, ({String table, String pk})> hlcTargets = {
     'divers': (table: 'divers', pk: 'id'),
     'diverSettings': (table: 'diver_settings', pk: 'id'),
     'buddies': (table: 'buddies', pk: 'id'),
@@ -59,7 +67,14 @@ class SyncRepository {
     'divePlanSegments': (table: 'dive_plan_segments', pk: 'id'),
     'equipment': (table: 'equipment', pk: 'id'),
     'equipmentSets': (table: 'equipment_sets', pk: 'id'),
+    // The equipmentSetItems junction is deliberately absent: it has no hlc
+    // column and rides the parent set's clock (see _exportEquipmentSetItems).
+    // Geofences are first-class rows with their own id and hlc, so they carry
+    // their own clock.
+    'equipmentSetGeofences': (table: 'equipment_set_geofences', pk: 'id'),
     'equipmentAttributes': (table: 'equipment_attributes', pk: 'id'),
+    'cylinderConfigs': (table: 'cylinder_configs', pk: 'id'),
+    'cylinderConfigItems': (table: 'cylinder_config_items', pk: 'id'),
     'diveTypes': (table: 'dive_types', pk: 'id'),
     'diveRoles': (table: 'dive_roles', pk: 'id'),
     'diverWeightEntries': (table: 'diver_weight_entries', pk: 'id'),
@@ -74,6 +89,11 @@ class SyncRepository {
     'diveSites': (table: 'dive_sites', pk: 'id'),
     'certifications': (table: 'certifications', pk: 'id'),
     'serviceRecords': (table: 'service_records', pk: 'id'),
+    'serviceKinds': (table: 'service_kinds', pk: 'id'),
+    // Editing a schedule never touches the parent equipment row, so a
+    // clockless child riding the parent's hlc would never replicate; the
+    // schedule needs its own clock.
+    'serviceSchedules': (table: 'service_schedules', pk: 'id'),
     'settings': (table: 'settings', pk: 'key'),
     'csvPresets': (table: 'csv_presets', pk: 'id'),
     'viewConfigs': (table: 'view_configs', pk: 'id'),
@@ -474,35 +494,95 @@ class SyncRepository {
     }
   }
 
-  /// One-time self-heal for enrichment rows written before schema v130, when
-  /// media_enrichment had no `hlc` column and never synced. Such rows carry
-  /// `hlc IS NULL` and are invisible to the incremental export (which filters
-  /// `hlc > watermark`; SQL `NULL > x` is false). markRecordPending stamps a
-  /// fresh HLC (above every peer watermark) so they replicate on the next sync
-  /// and heal peers that lost the depth/time association.
+  /// Tables that can still hold rows written while their entity type did not
+  /// stamp an HLC.
   ///
-  /// Self-limiting: rows written by saveEnrichment always get an HLC, so once
-  /// every legacy row is stamped this finds nothing.
-  Future<void> backfillMediaEnrichmentHlc() async {
-    final rows = await _db
-        .customSelect(
-          'SELECT id, created_at FROM media_enrichment WHERE hlc IS NULL',
-        )
-        .get();
-    if (rows.isEmpty) return;
-    // One transaction for the whole backfill: markRecordPending's own
-    // per-row transaction nests as a savepoint, so a library with many
-    // linked photos commits once instead of once per row (the per-row fsync
-    // was the sync-start cost flagged in review).
-    await _db.transaction(() async {
-      for (final row in rows) {
-        await markRecordPending(
-          entityType: 'mediaEnrichment',
-          recordId: row.read<String>('id'),
-          localUpdatedAt: row.read<int>('created_at'),
-        );
-      }
-    });
+  /// Each entry names three things: the SQL table to scan, the `timestamp`
+  /// column [backfillMissingHlc] reads as the row's local update time, and an
+  /// optional `filter` restricting which rows are eligible.
+  ///
+  /// Two ways a table lands here: it gained the `hlc` column late
+  /// (media_enrichment, schema v130), or it declared the column from the start
+  /// but its entity type was missing from [hlcTargets], so `_stampHlc` silently
+  /// no-opped on every write (issue #1144).
+  static const List<
+    ({String entityType, String table, String timestamp, String? filter})
+  >
+  _hlcBackfillTargets = [
+    (
+      entityType: 'mediaEnrichment',
+      table: 'media_enrichment',
+      timestamp: 'created_at',
+      filter: null,
+    ),
+    (
+      entityType: 'serviceKinds',
+      table: 'service_kinds',
+      timestamp: 'updated_at',
+      // Built-ins are reference data seeded on every device and skipped by the
+      // export, so stamping one only queues a sync record that publishes
+      // nothing.
+      filter: 'is_built_in = 0',
+    ),
+    (
+      entityType: 'serviceSchedules',
+      table: 'service_schedules',
+      timestamp: 'updated_at',
+      filter: null,
+    ),
+    (
+      entityType: 'cylinderConfigs',
+      table: 'cylinder_configs',
+      timestamp: 'updated_at',
+      filter: null,
+    ),
+    (
+      entityType: 'cylinderConfigItems',
+      table: 'cylinder_config_items',
+      timestamp: 'updated_at',
+      filter: null,
+    ),
+    (
+      entityType: 'equipmentSetGeofences',
+      table: 'equipment_set_geofences',
+      timestamp: 'updated_at',
+      filter: null,
+    ),
+  ];
+
+  /// One-time self-heal for rows that carry `hlc IS NULL`. Such rows are
+  /// invisible to the incremental export (which filters `hlc > watermark`;
+  /// SQL `NULL > x` is false), so a local edit reaches peers only on a full
+  /// base republish. markRecordPending stamps a fresh HLC (above every peer
+  /// watermark) so they replicate on the next sync and heal peers that never
+  /// received them.
+  ///
+  /// Self-limiting: every write path for these tables now stamps an HLC, so
+  /// once the legacy rows are done this finds nothing.
+  Future<void> backfillMissingHlc() async {
+    for (final target in _hlcBackfillTargets) {
+      final filter = target.filter == null ? '' : ' AND ${target.filter}';
+      final rows = await _db
+          .customSelect(
+            'SELECT id, "${target.timestamp}" AS ts FROM "${target.table}" '
+            'WHERE hlc IS NULL$filter',
+          )
+          .get();
+      if (rows.isEmpty) continue;
+      // One transaction per table: markRecordPending's own per-row transaction
+      // nests as a savepoint, so a library with many affected rows commits once
+      // instead of once per row (the per-row fsync was the sync-start cost
+      // flagged in review).
+      await _db.transaction(() async {
+        for (final row in rows) {
+          await markRecordPending(
+            entityType: target.entityType,
+            recordId: row.read<String>('id'),
+            localUpdatedAt: row.read<int>('ts'),
+          );
+        }
+      });
+    }
   }
 
   /// Stamp a fresh Hybrid Logical Clock onto the just-written entity row, if
@@ -511,7 +591,7 @@ class SyncRepository {
   /// The row is expected to already exist (repositories mark pending after the
   /// insert/update); if it does not, the UPDATE is a harmless no-op.
   Future<void> _stampHlc(String entityType, String recordId) async {
-    final target = _hlcTargets[entityType];
+    final target = hlcTargets[entityType];
     if (target == null) return;
     await ensureSyncClockConfigured();
     final hlc = SyncClock.instance.issue();
@@ -547,7 +627,7 @@ class SyncRepository {
   /// none has one yet. Lexically comparable because the packed format zero-pads
   /// physical time and counter.
   Future<String?> _maxRowHlc() async {
-    final union = _hlcTargets.values
+    final union = hlcTargets.values
         .map((t) => 'SELECT MAX(hlc) AS h FROM "${t.table}"')
         .join(' UNION ALL ');
     final row = await _db
@@ -908,7 +988,7 @@ class SyncRepository {
       // Stamp a monotonic HLC so the changeset writer can publish only NEW
       // tombstones (filtered by hlc > publishedHlcHigh) instead of re-sending
       // the whole deletion log every sync. Deliberately NOT gated on
-      // _hlcTargets: write-once child deletions (diveTanks, diveProfileEvents,
+      // hlcTargets: write-once child deletions (diveTanks, diveProfileEvents,
       // ...) have no row hlc but their tombstones still need one. Configure the
       // clock first -- deletes routinely fire outside a sync. A null hlc (clock
       // unconfigurable) still rides every full base, so no tombstone is lost.

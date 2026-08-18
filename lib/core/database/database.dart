@@ -530,7 +530,7 @@ class DivePlanTanks extends Table {
   RealColumn get decoSwitchDepth => real().nullable()();
 
   /// Whether this cylinder also doubles as travel gas, breathed on the
-  /// descent before switching to its primary role's gas (v153).
+  /// descent before switching to its primary role's gas (v155).
   BoolColumn get isTravelGas => boolean().withDefault(const Constant(false))();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   IntColumn get createdAt => integer()();
@@ -804,6 +804,14 @@ class DiveProfiles extends Table {
   RealColumn get o2Sensor4 => real().nullable()();
   RealColumn get o2Sensor5 => real().nullable()();
   RealColumn get o2Sensor6 => real().nullable()();
+  // Raw O2 cell output in millivolts (issue #810). Reported even when the
+  // matching o2SensorN is null because the logged calibration was untrusted.
+  IntColumn get o2SensorMv1 => integer().nullable()();
+  IntColumn get o2SensorMv2 => integer().nullable()();
+  IntColumn get o2SensorMv3 => integer().nullable()();
+  IntColumn get o2SensorMv4 => integer().nullable()();
+  IntColumn get o2SensorMv5 => integer().nullable()();
+  IntColumn get o2SensorMv6 => integer().nullable()();
 
   // Per-sample decompression data (v1.5)
   RealColumn get cns => real().nullable()(); // CNS percentage 0-100
@@ -853,6 +861,10 @@ class DiveSites extends Table {
       text().nullable()(); // Parking availability and tips
   RealColumn get altitude => real()
       .nullable()(); // Altitude above sea level in meters (for altitude diving)
+  /// Typical entry and exit method at this site, stored as EntryMethod.name
+  /// (issue #1104). Snapped onto a dive when the site is assigned.
+  TextColumn get entryMethod => text().nullable()();
+  TextColumn get exitMethod => text().nullable()();
   BoolColumn get isShared => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -3065,7 +3077,28 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 153;
+  static const int currentSchemaVersion = 155;
+
+  /// The oldest schema whose reader can apply this build's sync payloads
+  /// without loss or misinterpretation (the compatibility floor).
+  ///
+  /// Stamped into every published manifest's `schemaVersion` field, which
+  /// shipped readers compare against their own schema to decide whether to
+  /// hold a peer (changeset_reader.dart). Keeping the floor low lets older
+  /// builds keep syncing across additive schema changes; the receiving-side
+  /// overlay merge (issue #474) preserves columns an older peer omits, and
+  /// test/core/services/sync/cross_version_roundtrip_test.dart locks that in.
+  ///
+  /// Raise this to the NEW schema version ONLY when a migration:
+  ///  - drops, renames, or retypes an existing synced column,
+  ///  - changes the meaning or units of an existing column's values,
+  ///  - removes or folds a synced entity (the v147 buddyRoles case),
+  ///  - tightens a constraint an old writer's payloads would violate.
+  /// Do NOT raise it for new tables or synced entities, new nullable or
+  /// defaulted columns, new indexes, dedupe passes, or data repairs that
+  /// preserve meaning. When raising it, extend the round-trip test's
+  /// projection so the new boundary stays covered.
+  static const int minimumCompatibleSchemaVersion = 137;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3285,10 +3318,16 @@ class AppDatabase extends _$AppDatabase {
     // v152: site_features (seascape program slice 2): diver-placed
     // annotations on a site, synced LWW.
     152,
-    // v153: dive_plan_tanks.is_travel_gas: flags a cylinder as also breathed
-    // on the descent, independent of its role, so the lost-gas contingency
-    // can cover stage/deco/diluent/pony/etc. cylinders used that way.
+    // v153 (issue #810): raw O2 cell output in millivolts on dive_profiles.
     153,
+    // v154 (issue #1104): dive_sites.entry_method / exit_method, the site's
+    // typical way in and out of the water.
+    154,
+    // v155: dive_plan_tanks.is_travel_gas: flags a cylinder as also
+    // breathed on the descent, independent of its role, so the lost-gas
+    // contingency can cover stage/deco/diluent/pony/etc. cylinders used
+    // that way.
+    155,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4711,7 +4750,41 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  /// Idempotent DDL for the v153 dive_plan_tanks travel-gas flag. Same
+  /// Raw O2 cell output columns on dive_profiles (issue #810). PRAGMA-guarded
+  /// so a healthy database no-ops and a partial schema does not throw.
+  Future<void> _assertO2CellMillivoltColumns() async {
+    final cols = await customSelect("PRAGMA table_info('dive_profiles')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    for (var n = 1; n <= 6; n++) {
+      if (!names.contains('o2_sensor_mv$n')) {
+        await customStatement(
+          'ALTER TABLE dive_profiles ADD COLUMN o2_sensor_mv$n INTEGER',
+        );
+      }
+    }
+  }
+
+  /// Site-level entry/exit method columns on dive_sites (issue #1104).
+  /// PRAGMA-guarded so a healthy database no-ops and a partial schema does
+  /// not throw.
+  Future<void> _assertSiteEntryExitMethodColumns() async {
+    final cols = await customSelect("PRAGMA table_info('dive_sites')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('entry_method')) {
+      await customStatement(
+        'ALTER TABLE dive_sites ADD COLUMN entry_method TEXT',
+      );
+    }
+    if (!names.contains('exit_method')) {
+      await customStatement(
+        'ALTER TABLE dive_sites ADD COLUMN exit_method TEXT',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v155 dive_plan_tanks travel-gas flag. Same
   /// dual-call contract (onUpgrade + beforeOpen backstop) as the other
   /// column-assert helpers.
   Future<void> _assertTravelGasColumn() async {
@@ -8085,12 +8158,22 @@ class AppDatabase extends _$AppDatabase {
           await createMigrator().createTable(siteFeatures);
         }
         if (from < 152) await reportProgress();
-        // v153: dive_plan_tanks travel-gas flag (lost-gas contingency
-        // planning for stage/deco/diluent cylinders also used on descent).
+        // v153: raw O2 cell output in millivolts (issue #810).
         if (from < 153) {
-          await _assertTravelGasColumn();
+          await _assertO2CellMillivoltColumns();
         }
         if (from < 153) await reportProgress();
+        // v154: site-level entry/exit method (issue #1104).
+        if (from < 154) {
+          await _assertSiteEntryExitMethodColumns();
+        }
+        if (from < 154) await reportProgress();
+        // v155: dive_plan_tanks travel-gas flag (lost-gas contingency
+        // planning for stage/deco/diluent cylinders also used on descent).
+        if (from < 155) {
+          await _assertTravelGasColumn();
+        }
+        if (from < 155) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8238,7 +8321,16 @@ class AppDatabase extends _$AppDatabase {
         // version number from a parallel branch skips onUpgrade).
         await _assertSeascapeAppearanceColumn();
 
-        // v153 backstop: re-assert the dive_plan_tanks travel-gas column.
+        // v153 backstop: re-assert the O2 cell millivolt columns (issue
+        // #810; same parallel-branch version-collision self-heal).
+        await _assertO2CellMillivoltColumns();
+
+        // v154 backstop: re-assert the site entry/exit method columns (issue
+        // #1104; same parallel-branch version-collision self-heal).
+        await _assertSiteEntryExitMethodColumns();
+
+        // v155 backstop: re-assert the dive_plan_tanks travel-gas column
+        // (same parallel-branch version-collision self-heal).
         await _assertTravelGasColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.

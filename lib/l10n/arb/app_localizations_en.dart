@@ -381,8 +381,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Replace';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Update';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Only dives that don\'t already have a tank';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Choose which attributes to overwrite on the tanks these dives already have. Start and end pressures are never changed.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Choose at least one tank attribute to update.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Preset';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Role';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volume';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Working pressure';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Material';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Gas mix';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Name';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected dives have no tanks and will be skipped.',
+      one: '1 selected dive has no tanks and will be skipped.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Apply changes?';
@@ -4826,12 +4869,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_detail_tooltip_viewFullscreen => 'View fullscreen';
 
   @override
-  String get diveLog_detail_viewMap => 'Map';
-
-  @override
-  String get diveLog_detail_view3d => '3D';
-
-  @override
   String get diveLog_detail_viewSite => 'View Site';
 
   @override
@@ -5680,6 +5717,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_filter_title => 'Filter Dives';
 
   @override
+  String get diveLog_filter_resizeGrip => 'Resize filter panel';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Close filter';
 
   @override
@@ -6250,10 +6290,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setup_sync_header => 'Cloud sync';
-
-  @override
-  String get setup_sync_icloudUnavailable =>
-      'iCloud is not available on this device';
 
   @override
   String get setup_sync_libraryFound_adopt => 'Adopt existing library';
@@ -7246,6 +7282,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_tooltip_sensor => 'Sensor';
 
   @override
+  String get diveLog_legend_label_o2Cells => 'O2 cells';
+
+  @override
+  String get diveLog_tooltip_o2CellsTight => 'tight';
+
+  @override
+  String get diveLog_tooltip_o2CellsDrifting => 'drifting';
+
+  @override
+  String get diveLog_tooltip_o2CellsWide => 'wide';
+
+  @override
   String get diveLog_tooltip_srfGf => 'SrfGF';
 
   @override
@@ -7841,6 +7889,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveSites_edit_access_parkingInfo_label => 'Parking Information';
+
+  @override
+  String get diveSites_edit_access_entryMethod_label => 'Entry Method';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Exit Method';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Your $count dives here: $entry in, $exit out',
+      one: 'Your dive here: $entry in, $exit out',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Your $count dives here: $entry',
+      one: 'Your dive here: $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Entry';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Exit';
 
   @override
   String get diveSites_edit_altitude_helperText =>
@@ -14208,17 +14297,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' and ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count devices sync from a newer version of Submersion. Update this device to receive their latest changes.',
-      one:
-          '1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList syncs from a newer version of Submersion, so its latest changes are held for now.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList sync from a newer version of Submersion, so their latest changes are held for now.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Update this device to receive them.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'They will apply automatically once this device\'s app store update arrives; the update may still be in review.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Connected';
@@ -16388,6 +16484,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statistics_profile_deco_noDeco => 'No Deco';
+
+  @override
+  String get statistics_profile_deco_notRecorded => 'Not Recorded';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count dives have no recorded or computable deco data and are excluded from the rate';
+  }
 
   @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
@@ -18618,6 +18722,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get units_profileMetric_percent => '%';
 
   @override
+  String get units_profileMetric_millivolts => 'mV';
+
+  @override
   String get units_sac_litersPerMin => 'L/min';
 
   @override
@@ -19934,7 +20041,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'Apple Watch import is only available on iOS and macOS devices.';
+      'Apple Watch import needs an iPhone with the Health app.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -24611,6 +24718,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'Entry';
+
+  @override
+  String get enum_siteField_exitMethod => 'Exit Method';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Exit';
 
   @override
   String get enum_siteField_bestSeason_short => 'Season';
@@ -30676,11 +30789,83 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'Database upgrade failed';
+  String get startup_error_title => 'Submersion could not start';
 
   @override
   String get startup_error_body =>
-      'Try restarting the app. If this persists, contact support. Your data is still on disk and does not require a reinstall.';
+      'Something went wrong before your dive log finished opening. Your data is still on disk and does not require a reinstall. Try restarting the app; if this persists, contact support.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'This build can\'t open a database';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'Submersion\'s database engine is missing from this build, so your dive log was never opened. Nothing on disk has changed and no data is at risk.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'Reinstalling or restoring a backup will not help. Install a working build of Submersion, and please report this: it is a fault in the app package, not in your data.';
+
+  @override
+  String get startup_migrationFailed_title => 'Database upgrade failed';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'Your dive log could not be upgraded to the format this version needs. A safety copy was taken before the upgrade started, so nothing is lost.';
+
+  @override
+  String get startup_dataUnreadable_title => 'Your dive log could not be read';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'The database file is there, but Submersion cannot read it. This usually means the file is damaged. Restoring a backup is the fastest way back.';
+
+  @override
+  String get startup_failure_technicalDetails => 'Technical details';
+
+  @override
+  String get startup_failure_backupAvailable_title => 'A backup is available';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'Taken $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'Safety copy taken before the upgrade from schema v$fromVersion to v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction => 'Restore this backup';
+
+  @override
+  String get startup_failure_restoring => 'Restoring your dive log...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'The backup could not be restored. Your dive log has been left exactly as it was.';
+
+  @override
+  String get startup_failure_backupsFolder => 'Your backups are in:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'Show backup folder';
+
+  @override
+  String get startup_failure_downgrade_title =>
+      'Going back to the previous version';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'If the upgrade keeps failing, install the version of Submersion you were running before, then restore the safety copy from inside that version. Restoring it here would only run the same upgrade again. Submersion does not downgrade itself: moving you onto older builds automatically would quietly keep you on versions with known problems.';
+
+  @override
+  String get startup_failure_downgrade_action => 'View previous releases';
 
   @override
   String get startup_recovering_title => 'Recovering database...';
@@ -30767,6 +30952,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'Please update Submersion to the latest version. Your data is safe and has not been modified. If a backup was taken before the upgrade, it is in your Backups folder and can be restored after updating.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'This app was installed from an app store and is older than the version that created your data. Your data is safe and has not been modified. Update Submersion when the new version appears in the store, then reopen it.';
 
   @override
   String get startup_versionMismatch_download => 'Download Latest Version';
@@ -31494,4 +31683,260 @@ class AppLocalizationsEn extends AppLocalizations {
   String settings_cloudSync_launchCheck_failed(String error) {
     return 'Sync check failed: $error';
   }
+
+  @override
+  String get diveLog_detail_viewMap => 'Map';
+
+  @override
+  String get diveLog_detail_view3d => '3D';
+
+  @override
+  String get setup_sync_icloudUnavailable =>
+      'iCloud is not available on this device';
+
+  @override
+  String get media_info_title => 'Media info';
+
+  @override
+  String get media_info_fileSection => 'File';
+
+  @override
+  String get media_info_filename => 'Filename';
+
+  @override
+  String get media_info_type => 'Type';
+
+  @override
+  String get media_info_dimensions => 'Dimensions';
+
+  @override
+  String get media_info_size => 'Size';
+
+  @override
+  String get media_info_taken => 'Taken';
+
+  @override
+  String get media_info_coordinates => 'Coordinates';
+
+  @override
+  String get media_info_unknown => 'Unknown';
+
+  @override
+  String get media_info_originSection => 'Origin';
+
+  @override
+  String get media_info_source => 'Source';
+
+  @override
+  String get media_info_reference => 'Reference';
+
+  @override
+  String get media_info_linkedOn => 'Linked on';
+
+  @override
+  String get media_info_thisDevice => 'This device';
+
+  @override
+  String get media_info_otherDevice => 'Another device';
+
+  @override
+  String get media_info_status => 'Status';
+
+  @override
+  String get media_info_statusFound => 'Found on this device';
+
+  @override
+  String get media_info_statusMissing => 'Missing from this device';
+
+  @override
+  String get media_info_statusUnchecked => 'Not checked yet';
+
+  @override
+  String media_info_lastChecked(String date) {
+    return 'Last checked $date';
+  }
+
+  @override
+  String get media_info_backupSection => 'Backup';
+
+  @override
+  String get media_info_store => 'Cloud store';
+
+  @override
+  String get media_info_storeNotConnected => 'No cloud store connected';
+
+  @override
+  String get media_info_notEligible => 'This source is not eligible for backup';
+
+  @override
+  String get media_info_backupFull => 'Original uploaded';
+
+  @override
+  String get media_info_backupThumbOnly => 'Thumbnail only, original not sent';
+
+  @override
+  String get media_info_backupRenditionOnly => 'Compressed version uploaded';
+
+  @override
+  String get media_info_backupNone => 'Not backed up';
+
+  @override
+  String media_info_uploadedOn(String date) {
+    return 'Uploaded $date';
+  }
+
+  @override
+  String get media_info_queuePending => 'Waiting to upload';
+
+  @override
+  String get media_info_queueTransferring => 'Uploading now';
+
+  @override
+  String media_info_queueFailed(Object error) {
+    return 'Upload failed: $error';
+  }
+
+  @override
+  String get media_info_servingSection => 'Serving now';
+
+  @override
+  String get media_info_servingUnobserved => 'Not loaded yet';
+
+  @override
+  String get media_info_servingFailed => 'Could not be loaded';
+
+  @override
+  String get media_info_servedLocalDisk => 'Local file on this device';
+
+  @override
+  String get media_info_servedGallery => 'Photo library';
+
+  @override
+  String get media_info_servedStoreCache => 'Local cache, from the cloud store';
+
+  @override
+  String get media_info_servedStoreNetwork => 'Downloaded from the cloud store';
+
+  @override
+  String get media_info_servedNetworkUrl => 'Streaming from a URL';
+
+  @override
+  String get media_info_servedConnectorCache =>
+      'Local cache, from the connected service';
+
+  @override
+  String get media_info_servedConnectorNetwork =>
+      'Downloaded from the connected service';
+
+  @override
+  String get media_info_servedEmbedded => 'Stored inside this logbook';
+
+  @override
+  String get media_info_servingFallbackNote =>
+      'The original source could not be reached, so the cloud store served this.';
+
+  @override
+  String get media_info_servingTierThumbnail => 'Thumbnail';
+
+  @override
+  String get media_info_servingTierRendition => 'Compressed version';
+
+  @override
+  String get media_info_typePhoto => 'Photo';
+
+  @override
+  String get media_info_typeVideo => 'Video';
+
+  @override
+  String get media_info_typeDocument => 'Document';
+
+  @override
+  String get media_info_typeSignature => 'Signature';
+
+  @override
+  String get media_info_actionCheckNow => 'Check now';
+
+  @override
+  String get media_info_actionLocate => 'Locate file...';
+
+  @override
+  String get media_info_actionBackUpNow => 'Back up now';
+
+  @override
+  String get media_info_actionRetryUpload => 'Retry upload';
+
+  @override
+  String get media_info_actionReveal => 'Show in file manager';
+
+  @override
+  String get media_info_actionCopyPath => 'Copy reference';
+
+  @override
+  String get media_info_referenceCopied => 'Reference copied';
+
+  @override
+  String get media_info_checkFound => 'Source found';
+
+  @override
+  String get media_info_checkMissing => 'Source is missing';
+
+  @override
+  String get media_info_checkUnavailable => 'Could not check right now';
+
+  @override
+  String get media_info_backupQueued => 'Queued for upload';
+
+  @override
+  String get enum_profileMetric_o2CellMv => 'O2 Cells';
+
+  @override
+  String get enum_profileMetric_o2CellMv_short => 'Cells';
+
+  @override
+  String get diveLog_o2CellSpread_label => 'O2 Cell Spread';
+
+  @override
+  String get media_status_broken => 'Missing and not backed up';
+
+  @override
+  String get media_status_transferFailed => 'Upload failed';
+
+  @override
+  String get media_status_transferring => 'Uploading';
+
+  @override
+  String get media_status_queued => 'Waiting to upload';
+
+  @override
+  String get media_status_cloudOnly => 'Stored in the cloud only';
+
+  @override
+  String get media_status_notBackedUp => 'Not backed up';
+
+  @override
+  String get media_tile_infoMenuItem => 'Media info';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple Health never tells apps whether read access was granted. If no dives turn up, open Health, then Sharing, Apps, Submersion, and turn on Workouts, Underwater Depth, Water Temperature, and Heart Rate.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'No underwater diving workouts in this range. Check that the dates cover the dive, and that Health, Sharing, Apps, Submersion has Workouts and Underwater Depth turned on.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Underwater Depth - depth samples recorded during dives';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Water Temperature - water temperature samples recorded during dives';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'HealthKit access is managed in the Health app';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit is not available on this device';
 }

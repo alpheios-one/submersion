@@ -36,6 +36,9 @@ class _FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
   @override
   AppDatabase get database =>
       throw UnimplementedError('Fake database does not support queries');
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 /// An adapter whose backup always fails, modelling a full disk or an

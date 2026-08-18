@@ -36,6 +36,9 @@ class _FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
   @override
   AppDatabase get database =>
       throw UnimplementedError('Fake database does not support direct queries');
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 /// Spy repository with a live epoch, isolating restore wiring from the DB.

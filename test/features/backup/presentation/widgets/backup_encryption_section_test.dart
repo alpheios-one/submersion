@@ -67,6 +67,9 @@ class _FakeDbAdapter implements BackupDatabaseAdapter {
   Future<String> get databasePath async => '/fake/db';
   @override
   AppDatabase get database => throw UnimplementedError();
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 /// A [BackupService] whose only overridden method is the re-encrypt migration,

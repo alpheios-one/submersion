@@ -118,6 +118,22 @@ void main() {
     expect(find.text('Blue Hole'), findsOneWidget);
   });
 
+  testWidgets('the 2D/3D toggle is docked on the right of the map pane', (
+    tester,
+  ) async {
+    await _pumpPage(tester, const SiteMapPage(initialSiteId: 'site-1'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    final toggle = find.byKey(const ValueKey('siteScape2dButton'));
+    expect(toggle, findsOneWidget);
+    // Right of centre: the pane's controls all cluster on one side, so the
+    // mode buttons no longer sit alone in the opposite corner.
+    final pane = tester.getRect(find.byType(FlutterMap).first);
+    expect(tester.getCenter(toggle).dx, greaterThan(pane.center.dx));
+    expect(tester.getCenter(toggle).dy, lessThan(pane.center.dy));
+  });
+
   testWidgets('unknown deep-link site resolves the seed without zoom or 3D', (
     tester,
   ) async {

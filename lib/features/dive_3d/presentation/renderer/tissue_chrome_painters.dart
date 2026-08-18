@@ -168,13 +168,14 @@ void paintAxisLabels(
 }
 
 /// Screen angle (radians, canvas convention: y grows downward) of the
-/// scene's +Z axis — geographic NORTH in the seascape's east-north-up
-/// frame — under the projector's current camera. Position-independent
-/// under the orthographic projection, so any base point works. Returns
-/// null when the view runs straight along north and the projected
-/// direction collapses (the compass should hide, not point a lie).
+/// scene's -Z axis — geographic NORTH, since the map frame runs Z south
+/// to stay right-handed (see SpatialProjection) — under the projector's
+/// current camera. Position-independent under the orthographic
+/// projection, so any base point works. Returns null when the view runs
+/// straight along north and the projected direction collapses (the
+/// compass should hide, not point a lie).
 double? compassNeedleAngle(SceneProjector p) {
-  final delta = p.project(0, 0, 1) - p.project(0, 0, 0);
+  final delta = p.project(0, 0, -1) - p.project(0, 0, 0);
   if (delta.distance < 1e-3) return null;
   return math.atan2(delta.dy, delta.dx);
 }
@@ -215,7 +216,6 @@ class AxisChromePainter extends CustomPainter {
   final TissueSurfaceGrid? surfaceGrid;
   final ValueListenable<TissuePick?>? hoverPick;
   final List<ContourLabelSpec>? contourLabels;
-  final bool mirrorX;
 
   /// The viewport's screen-space pan translation. World-anchored chrome
   /// (axes, labels, hover ring) should ride the pan, but fixed chrome (the
@@ -234,7 +234,6 @@ class AxisChromePainter extends CustomPainter {
     this.surfaceGrid,
     this.hoverPick,
     this.contourLabels,
-    this.mirrorX = false,
     this.panOffset = Offset.zero,
   }) : super(repaint: hoverPick);
 
@@ -255,7 +254,6 @@ class AxisChromePainter extends CustomPainter {
       yawDegrees: yawDegrees,
       pitchDegrees: pitchDegrees,
       zoom: zoom,
-      mirrorX: mirrorX,
     );
     paintAxisSegments(canvas, p, frame, style);
     paintAxisLabels(canvas, p, labels, style, textDirection);
@@ -392,7 +390,6 @@ class AxisChromePainter extends CustomPainter {
       !identical(old.bounds, bounds) ||
       !identical(old.surfaceGrid, surfaceGrid) ||
       !identical(old.contourLabels, contourLabels) ||
-      old.mirrorX != mirrorX ||
       old.panOffset != panOffset ||
       old.style != style ||
       old.textDirection != textDirection;

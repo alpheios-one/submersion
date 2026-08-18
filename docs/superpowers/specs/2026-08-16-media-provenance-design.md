@@ -260,16 +260,54 @@ says "not loaded yet" rather than guessing.
 
 `mediaProvenanceProvider = Provider.family<MediaProvenance, MediaItem>`.
 
-Synchronous and cheap: every input is either a row field or an
-already-watched provider. This matters because the badge derives from the same
-object on every tile.
+**AMENDED 2026-08-16, during PR 2a planning.** The original claim here was that
+this provider is "synchronous and cheap: every input is either a row field or
+an already-watched provider". That is wrong, and it matters, because the
+section 8 badge was to derive from the same object on every grid tile.
+
+`mediaStoreStatusHintProvider` awaits `mediaStoreRuntimeProvider`, and building
+that runtime does a keychain read, constructs the object store, kicks a
+transfer-queue drain and can trigger an auto verify sweep.
+`mediaStoreAttachedProvider` exists precisely so per-tile widgets never reach
+it. Deriving the badge from a model that resolves store identity would have put
+a runtime construction behind every visible tile.
+
+The model is therefore split along the cost boundary rather than the conceptual
+one:
+
+- `mediaProvenanceProvider = Provider.family<MediaProvenance, MediaItem>` holds
+  origin and backup facts, watching only row fields, the per-item transfer-queue
+  row, and `mediaStoreAttachedProvider`. Cheap enough for every tile, and PR 3's
+  badge consumes it.
+- `mediaStoreIdentityProvider = FutureProvider<MediaStoreIdentity?>` resolves
+  the store's provider type and display hint. Panel-only by contract; never
+  watched from a tile.
+
+Same facts, two access costs. PR 2a's provider test pins this by overriding the
+runtime provider with a throwing builder and asserting `mediaProvenanceProvider`
+still resolves, so the expensive dependency cannot be reintroduced silently.
+
+`ServingFacts` is likewise not a member of `MediaProvenance`. It comes from
+`MediaServingRecorder`, a `ChangeNotifier`, which the panel reads through a
+`ListenableBuilder`. Wrapping it in a provider would collide with Riverpod 3
+auto-pause, which trips an assertion on providers that self-invalidate from a
+listener the framework cannot see; the repo's fix for that
+(`Ref.invalidateSelfWhen`) takes a `Stream<void>`, which a `ChangeNotifier` is
+not.
 
 ## 7. The info panel
 
 New widget `lib/features/media/presentation/widgets/media_info_panel.dart`,
-plus a `showMediaInfo(context, item)` launcher. Adaptive presentation: a
-draggable bottom sheet on compact widths, a right-hand panel inside the viewer
-on wide ones.
+plus a `showMediaInfoSheet(context, item)` launcher.
+
+**AMENDED 2026-08-16.** The original wording called for "a draggable bottom
+sheet on compact widths, a right-hand panel inside the viewer on wide ones".
+The repo has `ResponsiveBreakpoints` and a `MasterDetailScaffold`, but **no
+transient panel in this app branches on them**: every one is
+`showModalBottomSheet(isScrollControlled: true)` at all widths, including all
+four existing media-feature sheets. The tall-content template is
+`scan_results_dialog.dart:398-410`, a `DraggableScrollableSheet` inside the
+modal sheet. Following the repo beats following this spec.
 
 ### 7.1 Blocks
 
@@ -300,10 +338,25 @@ All reuse existing machinery. No new repair logic.
 | Back up now, Retry | existing transfer-queue enqueue and retry |
 | Re-upload | existing `MediaReuploadButton` (`media_reupload_button.dart:12-50`) |
 
-**Open question resolved at plan time, not now:** whether
-`MediaRepairWizardPage` accepts a single-item scope or only runs library-wide.
-If it does not, **Locate** opens the wizard pre-filtered rather than growing
-new repair code. Under no circumstance does this feature add repair logic.
+**RESOLVED 2026-08-16.** `MediaRepairWizardPage`'s constructor is
+`const MediaRepairWizardPage({super.key})` and its notifier is hardcoded to
+page the entire library, so it has **no single-item scope**. It does not need
+one: `MediaRepairService.apply(List<RepairProposal>)` accepts a one-element
+list and is already a usable single-item entry point, and the single-item
+repair flow **already exists** as the private `_replaceLink(MediaItem)` at
+`dive_media_section.dart:265` (file picker, hash verify, `apply` with one
+proposal). **Locate** therefore extracts that existing private flow into a
+shared helper. No repair logic is added.
+
+**Also resolved, and this one does need new code.** "Check now" was specced as
+calling the resolver contract's existing `verify(item)`. That contract exists,
+but the only caller that PERSISTS a result is
+`LocalFilesDiagnosticsService.reverifyAll()`, which is a bulk sweep AND is
+hardcoded to `LocalFileResolver` rather than dispatching through
+`MediaSourceResolverRegistry`. A per-item, any-source-type verify is genuinely
+new, roughly 15 lines. `MediaRepository.markAsVerified(id)` already exists,
+sets `isOrphaned` and `lastVerifiedAt` in one write, and is currently called
+from nowhere. Both belong to PR 2b.
 
 ### 7.3 Entry points
 
@@ -311,7 +364,19 @@ new repair code. Under no circumstance does this feature add repair logic.
   (`lib/features/media/presentation/pages/media_viewer_page.dart:1101-1226`),
   which today has close, page indicator, go-to-dive, write-metadata, Perdix
   toggle, Lightroom, share, and re-upload, but no info affordance.
-- Tile long-press or context menu in both grids.
+- Tile **right-click** (`onSecondaryTapDown` plus `showMenu`) in both grids,
+  matching `dive_media_section.dart:595-600`. **AMENDED 2026-08-16:** the
+  original said long-press, which the gesture system does not allow.
+  `MediaThumbnailTile` has no gesture callbacks at all, and its enclosing
+  `DragSelectGridView` deliberately registers no long-press recognizer so that
+  a hold falls through to the tap recognizer (commit `899d7f58baa`, "remove
+  long-press as a way into multi-select"); adding one would both break that
+  intent and win the gesture arena against the grid's own drag-anchor
+  recognizer during selection. `MediaLibraryTile.onLongPress` is already
+  claimed by selection toggling. Consequence, accepted: right-click is
+  desktop-only, so on a phone the grid has no tile-level route to the panel and
+  the viewer's info button is the way in. This entry point ships with PR 3,
+  alongside the badge that shares it.
 - `MediaMissingView` tiles, whose `onTileTap` is currently a literal no-op
   (`lib/features/media/presentation/pages/media_missing_view.dart:107`).
   Wiring it to the panel makes the Missing view answer why an item is missing,
@@ -430,7 +495,8 @@ Three stacked PRs, each in its own worktree per `CLAUDE.md`.
 | PR | Contents | Why separable |
 | --- | --- | --- |
 | 1 | `ServedFrom`, `ServedTier`, the stamping sites, `MediaServingRecorder`, recorder writes in both fallback paths | Pure plumbing, no UI, fully unit-testable, zero user-visible change |
-| 2 | `MediaProvenance` and its provider, the info panel, three entry points, actions, ARB keys x11 | The feature proper |
+| 2a | `MediaProvenance` and its two providers, the READ-ONLY info panel, viewer and Missing-view entry points, ARB keys x11 | The feature proper |
+| 2b | The actions layer: Check now, Locate, Back up now / Retry, Reveal, Copy path | Separable, different risk profile |
 | 3 | Badge ladder, `MediaLibraryTile` slot, badge-to-panel tap, Missing-view tap | Depends on PR 2 for its tap target |
 
 ## 11. Risks

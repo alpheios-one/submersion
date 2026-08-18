@@ -131,12 +131,24 @@ LibdivecomputerPluginParsedDive* convert_parsed_dive(
                 o2_sensor[c] = isnan(cell_vals[c]) ? NULL : &cell_vals[c];
             }
 
+            // Per-cell raw O2 output: UINT32_MAX -> NULL. mv_vals must outlive
+            // the constructor call for the same reason as cell_vals.
+            int64_t mv_vals[6];
+            int64_t* o2_sensor_mv[6];
+            for (int c = 0; c < 6; c++) {
+                mv_vals[c] = (int64_t)s->o2_sensor_mv[c];
+                o2_sensor_mv[c] =
+                    (s->o2_sensor_mv[c] == UINT32_MAX) ? NULL : &mv_vals[c];
+            }
+
             LibdivecomputerPluginProfileSample* sample =
                 libdivecomputer_plugin_profile_sample_new(
                     time_seconds, s->depth, temp_c, pressure, tank_index,
                     heart_rate, heading, setpoint, ppo2, cns, rbt, deco_type,
                     deco_time, deco_depth, tts, o2_sensor[0], o2_sensor[1],
                     o2_sensor[2], o2_sensor[3], o2_sensor[4], o2_sensor[5],
+                    o2_sensor_mv[0], o2_sensor_mv[1], o2_sensor_mv[2],
+                    o2_sensor_mv[3], o2_sensor_mv[4], o2_sensor_mv[5],
                     gas_mix_index);
 
             fl_value_append_take(

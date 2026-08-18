@@ -231,6 +231,7 @@ static void sample_callback(dc_sample_type_t type,
         state->current_sample.ppo2 = NAN;
         for (int cell = 0; cell < 6; cell++) {
             state->current_sample.o2_sensor[cell] = NAN;
+            state->current_sample.o2_sensor_mv[cell] = UINT32_MAX;
         }
         state->current_sample.cns = NAN;
         state->current_sample.rbt = UINT32_MAX;
@@ -279,6 +280,12 @@ static void sample_callback(dc_sample_type_t type,
         } else if (value->ppo2.sensor < 6) {
             state->current_sample.o2_sensor[value->ppo2.sensor] =
                 value->ppo2.value;
+            // Zero means the device reports no millivolts; keep the sentinel so
+            // it does not reach the chart as a flat 0 mV line.
+            if (value->ppo2.millivolt) {
+                state->current_sample.o2_sensor_mv[value->ppo2.sensor] =
+                    value->ppo2.millivolt;
+            }
         }
         break;
     case DC_SAMPLE_CNS:

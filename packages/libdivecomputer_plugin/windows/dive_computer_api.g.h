@@ -189,6 +189,12 @@ class ProfileSample {
     const double* o2_sensor4,
     const double* o2_sensor5,
     const double* o2_sensor6,
+    const int64_t* o2_sensor_mv1,
+    const int64_t* o2_sensor_mv2,
+    const int64_t* o2_sensor_mv3,
+    const int64_t* o2_sensor_mv4,
+    const int64_t* o2_sensor_mv5,
+    const int64_t* o2_sensor_mv6,
     const int64_t* gas_mix_index);
 
   int64_t time_seconds() const;
@@ -278,6 +284,33 @@ class ProfileSample {
   void set_o2_sensor6(const double* value_arg);
   void set_o2_sensor6(double value_arg);
 
+  // Raw O2 cell output in millivolts (sensor 1..6), null when that cell
+  // reports none. Present even when the cell's ppO2 is unavailable because the
+  // logged calibration could not be trusted (issue #810).
+  const int64_t* o2_sensor_mv1() const;
+  void set_o2_sensor_mv1(const int64_t* value_arg);
+  void set_o2_sensor_mv1(int64_t value_arg);
+
+  const int64_t* o2_sensor_mv2() const;
+  void set_o2_sensor_mv2(const int64_t* value_arg);
+  void set_o2_sensor_mv2(int64_t value_arg);
+
+  const int64_t* o2_sensor_mv3() const;
+  void set_o2_sensor_mv3(const int64_t* value_arg);
+  void set_o2_sensor_mv3(int64_t value_arg);
+
+  const int64_t* o2_sensor_mv4() const;
+  void set_o2_sensor_mv4(const int64_t* value_arg);
+  void set_o2_sensor_mv4(int64_t value_arg);
+
+  const int64_t* o2_sensor_mv5() const;
+  void set_o2_sensor_mv5(const int64_t* value_arg);
+  void set_o2_sensor_mv5(int64_t value_arg);
+
+  const int64_t* o2_sensor_mv6() const;
+  void set_o2_sensor_mv6(const int64_t* value_arg);
+  void set_o2_sensor_mv6(int64_t value_arg);
+
   // Active gas mix index at this sample (from DC_SAMPLE_GASMIX), carried forward
   // from the most recent gas switch; null if the computer reported no gas.
   const int64_t* gas_mix_index() const;
@@ -312,6 +345,12 @@ class ProfileSample {
   std::optional<double> o2_sensor4_;
   std::optional<double> o2_sensor5_;
   std::optional<double> o2_sensor6_;
+  std::optional<int64_t> o2_sensor_mv1_;
+  std::optional<int64_t> o2_sensor_mv2_;
+  std::optional<int64_t> o2_sensor_mv3_;
+  std::optional<int64_t> o2_sensor_mv4_;
+  std::optional<int64_t> o2_sensor_mv5_;
+  std::optional<int64_t> o2_sensor_mv6_;
   std::optional<int64_t> gas_mix_index_;
 
 };

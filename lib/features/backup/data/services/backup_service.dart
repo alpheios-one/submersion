@@ -9,9 +9,12 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
+import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/backup_bookmark_service.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/security/database_security_sidecar.dart'
+    show isEncryptedDatabaseFile;
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/sync/crypto/encryption_key_store.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
@@ -554,7 +557,19 @@ class BackupService {
   ///
   /// Checks: file exists, has correct extension, is a valid SQLite database,
   /// and contains expected Submersion tables.
-  Future<BackupValidationResult> validateBackupFile(String filePath) async {
+  ///
+  /// [allowLiveDatabaseEncryption] opts into the one artifact kind that may
+  /// legitimately be SQLCipher ciphertext: a [BackupType.preMigration] copy,
+  /// which is a raw byte copy of the live database and so carries the live
+  /// database's encryption. Such a file is deep-checked with the live key
+  /// instead of being rejected. Portable backups keep the strict plaintext
+  /// rule: they are decrypted on export precisely so they restore on a
+  /// device where the database password is unknown, and an encrypted-looking
+  /// one is a real problem that must fail loudly.
+  Future<BackupValidationResult> validateBackupFile(
+    String filePath, {
+    bool allowLiveDatabaseEncryption = false,
+  }) async {
     final file = File(filePath);
 
     // Check file exists
@@ -589,15 +604,44 @@ class BackupService {
       return const BackupValidationResult.invalid('File is empty');
     }
 
+    // A pre-migration copy of a protected database is SQLCipher ciphertext,
+    // so the deep check below needs the live key. With one, a keyed open
+    // settles the question: it succeeds on a real encrypted copy and fails
+    // on anything else, which lands in the generic invalid-database result.
+    //
+    // Without one there is nothing to open the file with, and nothing a
+    // restore could do with it either, since the key is the only way back to
+    // the data. The report must stay honest about WHY, though: a corrupt
+    // plaintext database and an encrypted one are indistinguishable at the
+    // header, so isEncryptedDatabaseFile alone must never conclude
+    // "encrypted" (see DatabaseSecuritySidecar.existsFor, which is the
+    // corroborating signal the startup gate and schema probe use). That
+    // signal is unavailable here: the sidecar lives next to the live
+    // database and is never copied into the backups directory. So name both
+    // possibilities rather than asserting one the file cannot prove.
+    String? deepCheckKeyHex;
+    if (allowLiveDatabaseEncryption && isEncryptedDatabaseFile(filePath)) {
+      deepCheckKeyHex = _dbAdapter.databaseKeyHex;
+      if (deepCheckKeyHex == null) {
+        return const BackupValidationResult.invalid(
+          'This safety copy cannot be opened. It was either taken from a '
+          'protected database whose key this install no longer has, or the '
+          'file is corrupt.',
+        );
+      }
+    }
+
     // Use sqlite3 directly in read-only mode to avoid Drift's migration
     // system triggering ALTER TABLE on older-schema backups. The backup file
     // may also be in a read-only sandboxed directory (iOS/macOS file picker).
-    // Deliberately keyless: backup artifacts are portable plaintext by
-    // design, and an encrypted-looking file should fail validation loudly.
+    // Keyless unless the caller opted in above: backup artifacts are portable
+    // plaintext by design, and an encrypted-looking file should fail
+    // validation loudly.
     try {
       final testDb = DatabaseService.openRaw(
         filePath,
         mode: sqlite3.OpenMode.readOnly,
+        keyHex: deepCheckKeyHex,
       );
       try {
         // Verify it's a valid SQLite database
@@ -611,6 +655,27 @@ class BackupService {
         if (tables.isEmpty) {
           return const BackupValidationResult.invalid(
             'File does not appear to be a Submersion backup (missing expected tables)',
+          );
+        }
+
+        // Reject a backup written by a NEWER schema before restore can swap
+        // it in; the post-swap open guard would otherwise fire with the file
+        // already live (issue #1089). Read from this already-open read-only
+        // handle rather than reopening: DatabaseService.getStoredSchemaVersion
+        // opens read-write, which fails on the sandboxed read-only backup
+        // directories this method is documented to accept. An older schema is
+        // fine and stays valid; the reopen runs the migration ladder.
+        final storedSchema = testDb.select('PRAGMA user_version');
+        final backupSchema = storedSchema.isEmpty
+            ? null
+            : storedSchema.first.values.first as int?;
+        if (backupSchema != null &&
+            backupSchema > AppDatabase.currentSchemaVersion) {
+          return BackupValidationResult.invalid(
+            'This backup was created by a newer version of Submersion '
+            '(database v$backupSchema; this app supports up to '
+            'v${AppDatabase.currentSchemaVersion}). Update Submersion, then '
+            'restore.',
           );
         }
 
@@ -676,7 +741,17 @@ class BackupService {
     try {
       // Parity with the file-picker path: the file on disk (or the fresh
       // download) may have been corrupted since the record was written.
-      final validation = await validateBackupFile(materialized.path);
+      //
+      // A pre-migration copy is the one kind that may legitimately be
+      // SQLCipher ciphertext (it is a raw copy of the live file, taken before
+      // the migration with the database closed), so it is deep-checked with
+      // the live key rather than rejected. DatabaseService.restore already
+      // handles such a source: it detects the encrypted header and skips the
+      // re-encryption it would otherwise apply.
+      final validation = await validateBackupFile(
+        materialized.path,
+        allowLiveDatabaseEncryption: record.type == BackupType.preMigration,
+      );
       if (!validation.isValid) {
         throw BackupException(
           validation.error ?? 'Backup file failed validation',
@@ -738,6 +813,35 @@ class BackupService {
       encryptionSecret: encryptionSecret,
     );
     try {
+      // Refuse a newer-schema backup here, before performBackup and before
+      // any swap, so the refusal has zero side effects. This runs on the
+      // MATERIALIZED plaintext, which is the only place an encrypted
+      // artifact's schema is readable at all (issue #1089). The copy is
+      // always plaintext, so no key is needed.
+      //
+      // The read is best-effort BY DESIGN. getStoredSchemaVersion rethrows on
+      // a corrupt or unreadable file so its startup callers can route to
+      // corruption recovery or the unlock screen; neither concerns this
+      // guard, whose only job is to refuse a schema it can positively read as
+      // newer. Anything unreadable falls through to the existing restore
+      // path, which surfaces the real failure exactly as it did before this
+      // guard existed.
+      int? restoredSchema;
+      try {
+        restoredSchema = DatabaseService.getStoredSchemaVersion(
+          materialized.path,
+        );
+      } catch (_) {
+        restoredSchema = null;
+      }
+      if (restoredSchema != null &&
+          restoredSchema > AppDatabase.currentSchemaVersion) {
+        throw BackupNewerSchemaException(
+          backupSchemaVersion: restoredSchema,
+          supportedSchemaVersion: AppDatabase.currentSchemaVersion,
+        );
+      }
+
       // Create a proper backup before restoring so the user can find it
       // in their configured backup location and in the history list.
       await performBackup();
@@ -1401,6 +1505,23 @@ class BackupException implements Exception {
 
   @override
   String toString() => 'BackupException: $message';
+}
+
+/// A backup written by a NEWER schema than this build supports. Restoring it
+/// would swap in a database the running app cannot open, and the version
+/// guard only fires once the file is already live (issue #1089).
+class BackupNewerSchemaException extends BackupException {
+  final int backupSchemaVersion;
+  final int supportedSchemaVersion;
+
+  BackupNewerSchemaException({
+    required this.backupSchemaVersion,
+    required this.supportedSchemaVersion,
+  }) : super(
+         'This backup was created by a newer version of Submersion '
+         '(database v$backupSchemaVersion; this app supports up to '
+         'v$supportedSchemaVersion). Update Submersion, then restore.',
+       );
 }
 
 /// Result of validating a backup file
