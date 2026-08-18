@@ -561,10 +561,11 @@ const _cellMvAccessors = <int? Function(DiveProfilePoint)>[
 
 /// Builds one curve per cell, indexed by physical cell position (curve index
 /// i == cell i+1), up to the highest-numbered cell that has any reading. A
-/// lower cell with no readings at all is omitted rather than padded with an
-/// all-null curve, which keeps physical cell numbering correct even when
-/// cells are absent or non-contiguous (e.g. a failed/unreported cell). Null
-/// when no cell reports anything.
+/// lower cell that reports nothing still gets an all-null curve rather than
+/// being dropped, so physical cell numbering stays correct even when cells are
+/// absent or non-contiguous (e.g. a dead cell 2 on a three-cell head keeps
+/// cell 3 at index 2). Cells above the highest reporting one are not emitted
+/// at all. Null when no cell reports anything.
 List<List<T?>>? _resolveCellCurves<T>(
   List<DiveProfilePoint> profile,
   List<T? Function(DiveProfilePoint)> accessors,

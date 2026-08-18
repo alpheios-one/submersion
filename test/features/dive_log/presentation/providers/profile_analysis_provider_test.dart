@@ -920,6 +920,25 @@ void main() {
       expect(result.o2CellMvCurves![2].first, 43);
     });
 
+    test(
+      'a silent lower cell keeps its slot so higher cells stay numbered',
+      () {
+        // Cell 2 reports nothing for the whole dive. Dropping it would shift
+        // cell 3 down to index 1 and mislabel it in the tooltip and legend, so
+        // it is padded with an all-null curve instead.
+        final profile = baseProfile
+            .map((p) => p.copyWith(o2SensorMv1: 58, o2SensorMv3: 43))
+            .toList();
+
+        final (result, _) = overlayComputerDecoData(baseAnalysis, profile);
+
+        expect(result.o2CellMvCurves!.length, 3);
+        expect(result.o2CellMvCurves![0].first, 58);
+        expect(result.o2CellMvCurves![1], everyElement(isNull));
+        expect(result.o2CellMvCurves![2].first, 43);
+      },
+    );
+
     test('millivolt curves survive with no ppO2, cells or setpoint', () {
       // Issue #810 in full: an untrusted calibration means no per-cell bar
       // value, so resolveRebreatherPpO2 bails and the overlay early-returns.
