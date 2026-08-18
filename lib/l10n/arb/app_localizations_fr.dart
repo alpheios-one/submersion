@@ -11114,6 +11114,29 @@ class AppLocalizationsFr extends AppLocalizations {
   String get equipment_serviceKinds_defaultCurrencyLabel => 'Devise';
 
   @override
+  String get equipment_service_exportMenuItem =>
+      'Exporter le journal d\'entretien';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'Journal d\'entretien';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'Historique d\'entretien de tout l\'équipement en tableur';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'Exportation du journal d\'entretien...';
+
+  @override
+  String get settings_export_success_maintenance =>
+      'Journal d\'entretien exporté';
+
+  @override
+  String get settings_export_saved_maintenance =>
+      'Journal d\'entretien enregistré';
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Enregistrement de revision supprime';
 

@@ -11084,6 +11084,29 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipment_serviceKinds_defaultCurrencyLabel => 'Valuta';
 
   @override
+  String get equipment_service_exportMenuItem =>
+      'Esporta registro di manutenzione';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'Registro di manutenzione';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'Cronologia di manutenzione di tutta l\'attrezzatura come foglio di calcolo';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'Esportazione del registro di manutenzione...';
+
+  @override
+  String get settings_export_success_maintenance =>
+      'Registro di manutenzione esportato';
+
+  @override
+  String get settings_export_saved_maintenance =>
+      'Registro di manutenzione salvato';
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Registro manutenzione eliminato';
 

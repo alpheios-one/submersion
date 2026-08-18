@@ -11057,6 +11057,28 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_serviceKinds_defaultCurrencyLabel => 'Pénznem';
 
   @override
+  String get equipment_service_exportMenuItem =>
+      'Karbantartási napló exportálása';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'Karbantartási napló';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'A teljes felszerelés szerviztörténete táblázatként';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'Karbantartási napló exportálása...';
+
+  @override
+  String get settings_export_success_maintenance =>
+      'Karbantartási napló exportálva';
+
+  @override
+  String get settings_export_saved_maintenance => 'Karbantartási napló mentve';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Szervizrekord torolve';
 
   @override

@@ -11003,6 +11003,28 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_serviceKinds_defaultCurrencyLabel => 'Valuta';
 
   @override
+  String get equipment_service_exportMenuItem => 'Onderhoudslogboek exporteren';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'Onderhoudslogboek';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'Servicegeschiedenis van alle uitrusting als spreadsheet';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'Onderhoudslogboek exporteren...';
+
+  @override
+  String get settings_export_success_maintenance =>
+      'Onderhoudslogboek geëxporteerd';
+
+  @override
+  String get settings_export_saved_maintenance =>
+      'Onderhoudslogboek opgeslagen';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Servicerecord verwijderd';
 
   @override

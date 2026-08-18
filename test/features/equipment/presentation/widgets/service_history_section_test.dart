@@ -214,6 +214,24 @@ void main() {
 
     expect(find.text('All tasks'), findsNothing);
   });
+
+  testWidgets('the item-level export offers share and save', (tester) async {
+    await pumpSection(
+      tester,
+      records: [record(id: 'r1', kindId: 'disinfect')],
+      kinds: [kind('disinfect', 'Disinfect')],
+    );
+
+    await tester.tap(find.byKey(const Key('service-history-overflow')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Export maintenance log'));
+    await tester.pumpAndSettle();
+
+    // Both delivery paths are offered; they are a deliberate pair, not a
+    // fallback chain.
+    expect(find.text('Save to File'), findsOneWidget);
+    expect(find.text('Share'), findsOneWidget);
+  });
 }
 
 class _MockServiceRecordNotifier

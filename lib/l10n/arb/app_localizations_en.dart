@@ -10906,6 +10906,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_serviceKinds_defaultCurrencyLabel => 'Currency';
 
   @override
+  String get equipment_service_exportMenuItem => 'Export maintenance log';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'Maintenance Log';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'Service history for all equipment as a spreadsheet';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'Exporting maintenance log...';
+
+  @override
+  String get settings_export_success_maintenance => 'Maintenance log exported';
+
+  @override
+  String get settings_export_saved_maintenance => 'Maintenance log saved';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Service record deleted';
 
   @override

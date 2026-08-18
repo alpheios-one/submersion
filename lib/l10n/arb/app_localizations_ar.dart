@@ -10891,6 +10891,26 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_serviceKinds_defaultCurrencyLabel => 'العملة';
 
   @override
+  String get equipment_service_exportMenuItem => 'تصدير سجل الصيانة';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'سجل الصيانة';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'سجل صيانة جميع المعدات كجدول بيانات';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'جارٍ تصدير سجل الصيانة...';
+
+  @override
+  String get settings_export_success_maintenance => 'تم تصدير سجل الصيانة';
+
+  @override
+  String get settings_export_saved_maintenance => 'تم حفظ سجل الصيانة';
+
+  @override
   String get equipment_service_snackbar_deleted => 'تم حذف سجل الصيانة';
 
   @override

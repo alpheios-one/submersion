@@ -10826,6 +10826,25 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_serviceKinds_defaultCurrencyLabel => 'מטבע';
 
   @override
+  String get equipment_service_exportMenuItem => 'ייצוא יומן התחזוקה';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'יומן תחזוקה';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'היסטוריית הטיפולים של כל הציוד כגיליון אלקטרוני';
+
+  @override
+  String get settings_export_progress_maintenance => 'מייצא את יומן התחזוקה...';
+
+  @override
+  String get settings_export_success_maintenance => 'יומן התחזוקה יוצא';
+
+  @override
+  String get settings_export_saved_maintenance => 'יומן התחזוקה נשמר';
+
+  @override
   String get equipment_service_snackbar_deleted => 'רשומת טיפול נמחקה';
 
   @override

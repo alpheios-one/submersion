@@ -18909,6 +18909,42 @@ abstract class AppLocalizations {
   /// **'Currency'**
   String get equipment_serviceKinds_defaultCurrencyLabel;
 
+  /// No description provided for @equipment_service_exportMenuItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Export maintenance log'**
+  String get equipment_service_exportMenuItem;
+
+  /// No description provided for @transfer_export_maintenanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance Log'**
+  String get transfer_export_maintenanceTitle;
+
+  /// No description provided for @transfer_export_maintenanceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Service history for all equipment as a spreadsheet'**
+  String get transfer_export_maintenanceSubtitle;
+
+  /// No description provided for @settings_export_progress_maintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting maintenance log...'**
+  String get settings_export_progress_maintenance;
+
+  /// No description provided for @settings_export_success_maintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance log exported'**
+  String get settings_export_success_maintenance;
+
+  /// No description provided for @settings_export_saved_maintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance log saved'**
+  String get settings_export_saved_maintenance;
+
   /// No description provided for @equipment_service_snackbar_deleted.
   ///
   /// In en, this message translates to:

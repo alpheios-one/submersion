@@ -11077,6 +11077,29 @@ class AppLocalizationsDe extends AppLocalizations {
   String get equipment_serviceKinds_defaultCurrencyLabel => 'Währung';
 
   @override
+  String get equipment_service_exportMenuItem =>
+      'Wartungsprotokoll exportieren';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'Wartungsprotokoll';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'Serviceverlauf der gesamten Ausrüstung als Tabelle';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'Wartungsprotokoll wird exportiert...';
+
+  @override
+  String get settings_export_success_maintenance =>
+      'Wartungsprotokoll exportiert';
+
+  @override
+  String get settings_export_saved_maintenance =>
+      'Wartungsprotokoll gespeichert';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Wartungseintrag gelöscht';
 
   @override

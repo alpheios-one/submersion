@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/export/excel/maintenance_excel_export_service.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/domain/entities/service_record.dart';
@@ -12,6 +13,7 @@ import 'package:submersion/features/equipment/presentation/utils/service_type_la
 import 'package:submersion/features/equipment/presentation/widgets/service_record_dialog.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/export_destination_sheet.dart';
 
 /// Service History Section Widget
 class ServiceHistorySection extends ConsumerStatefulWidget {
@@ -84,6 +86,22 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
                   onPressed: () => _showAddServiceDialog(context, ref),
                   icon: const Icon(Icons.add, size: 18),
                   label: Text(context.l10n.equipment_service_addButton),
+                ),
+                PopupMenuButton<String>(
+                  key: const Key('service-history-overflow'),
+                  onSelected: (value) {
+                    if (value == 'export') {
+                      _exportHistory(context, recordsAsync.valueOrNull ?? []);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'export',
+                      child: Text(
+                        context.l10n.equipment_service_exportMenuItem,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -228,6 +246,45 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
         ),
       ),
     );
+  }
+
+  /// Exports the rows currently on screen, so a filtered view exports what
+  /// the diver is actually looking at rather than the whole history.
+  Future<void> _exportHistory(
+    BuildContext context,
+    List<ServiceRecord> records,
+  ) async {
+    final destination = await showExportDestinationSheet(
+      context,
+      title: context.l10n.equipment_service_exportMenuItem,
+    );
+    if (destination == null || !context.mounted) return;
+
+    final item = ref.read(equipmentItemProvider(equipmentId)).valueOrNull;
+    final kinds =
+        ref.read(serviceKindsProvider).valueOrNull ?? const <ServiceKind>[];
+    final kindsById = {for (final k in kinds) k.id: k};
+    final dateFormat = ref.read(settingsProvider).dateFormat;
+
+    final rows = <MaintenanceLogRow>[
+      for (final record in records.where(_filter.matches))
+        (
+          equipmentName: item?.name ?? '',
+          equipmentType: item?.type.displayName ?? '',
+          taskName: kindsById[record.serviceKindId]?.name ?? '',
+          serviceType: record.serviceType,
+          record: record,
+        ),
+    ];
+
+    final service = MaintenanceExcelExportService();
+    // No progress dialog around the save path: the native save panel must not
+    // open while a modal route is up.
+    if (destination == ExportDestination.share) {
+      await service.exportToExcel(rows: rows, dateFormat: dateFormat);
+    } else {
+      await service.saveToFile(rows: rows, dateFormat: dateFormat);
+    }
   }
 
   /// Options come from the records themselves, so a diver never sees a task

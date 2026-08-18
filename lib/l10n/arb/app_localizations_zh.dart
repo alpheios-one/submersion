@@ -10584,6 +10584,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceKinds_defaultCurrencyLabel => '货币';
 
   @override
+  String get equipment_service_exportMenuItem => '导出保养记录';
+
+  @override
+  String get transfer_export_maintenanceTitle => '保养记录';
+
+  @override
+  String get transfer_export_maintenanceSubtitle => '以电子表格导出所有装备的保养历史';
+
+  @override
+  String get settings_export_progress_maintenance => '正在导出保养记录...';
+
+  @override
+  String get settings_export_success_maintenance => '保养记录已导出';
+
+  @override
+  String get settings_export_saved_maintenance => '保养记录已保存';
+
+  @override
   String get equipment_service_snackbar_deleted => '维护记录已删除';
 
   @override
