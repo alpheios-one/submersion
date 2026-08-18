@@ -12,7 +12,16 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
     private var downloadSession: OpaquePointer?  // libdc_download_session_t*
     private var activeBleStream: BleIoStream?
     private var serialScanner: SerialScanner?
-    private var activeSerialStream: SerialIoStream?
+    // Holds the open byte pipe for the duration of a serial-transport download.
+    // Typed as AnyObject because it is either a SerialIoStream or, for a cable
+    // the operating system never exposed as a serial port, an FtdiUsbIoStream
+    // (issue #732). Nothing calls methods on it: its only job is to keep the
+    // stream alive, because the callback table's userdata pointer is unretained.
+    private var activeSerialStream: AnyObject?
+
+    /// Why the most recent candidate could not be opened, for the error the
+    /// user sees when nothing opens at all.
+    private var lastCandidateFailure = ""
 
     // Dive buffering for the multi-port serial probe. When more than one serial
     // port is a candidate (manual model selection with no exact path), each port
@@ -381,19 +390,98 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         reportDownloadResult(result)
     }
 
-    /// Serial-over-USB download with auto-probe, mirroring the Linux/Windows
-    /// backends. A single candidate (an explicit /dev path, or the sole USB
-    /// serial port) is opened and run directly. Multiple candidates (manual
-    /// model selection with several adapters attached) are each tried with a
-    /// full download, buffering dives so a wrong port cannot leak phantom dives.
+    /// One thing worth trying as the byte pipe for a serial-transport download.
+    ///
+    /// Serial ports come first because they are what works today. Raw-USB
+    /// cables are the fallback for hardware the operating system never
+    /// published as a serial port at all: the Aeris/Oceanic cable is an FTDI
+    /// chip with a custom product ID that Apple's driver does not claim, so no
+    /// /dev/cu.* node exists for it (issue #732).
+    private enum DownloadCandidate {
+        case serialPort(String)
+        case ftdiUsb(UsbFtdiDevice)
+
+        /// Label for logs and the probe report shown to the user.
+        var label: String {
+            switch self {
+            case .serialPort(let path): return path
+            case .ftdiUsb(let device): return "\(device.displayName) (USB)"
+            }
+        }
+    }
+
+    /// Opens a candidate. Returns the stream plus its callbacks on success, or
+    /// nil with `lastCandidateFailure` set to the reason it could not be opened.
+    ///
+    /// The stream is returned as AnyObject only so the caller can keep it
+    /// alive for the duration of the run; the callback userdata pointer is
+    /// unretained.
+    private func openCandidate(
+        _ candidate: DownloadCandidate
+    ) -> (stream: AnyObject, callbacks: libdc_io_callbacks_t, close: () -> Void)? {
+        switch candidate {
+        case .serialPort(let path):
+            let stream = SerialIoStream()
+            if let failure = stream.open(path: path) {
+                NativeLogger.e(
+                    "DiveComputerHost", category: "SER",
+                    "Failed to open \(path) (errno=\(failure.errnoValue)): \(failure.reason)")
+                lastCandidateFailure = failure.reason
+                return nil
+            }
+            NativeLogger.i("DiveComputerHost", category: "SER", "Opened serial port: \(path)")
+            return (stream, stream.makeCallbacks(), stream.close)
+        case .ftdiUsb(let device):
+            let stream = FtdiUsbIoStream()
+            if let reason = stream.open(device: device) {
+                NativeLogger.e(
+                    "DiveComputerHost", category: "USB",
+                    "Failed to open \(device.displayName): \(reason)")
+                lastCandidateFailure = reason
+                return nil
+            }
+            return (stream, stream.makeCallbacks(), stream.close)
+        }
+    }
+
+    /// Serial-transport download with auto-probe, mirroring the Linux/Windows
+    /// backends.
+    ///
+    /// Candidates are the USB serial ports the operating system published,
+    /// followed by any dive-computer USB cable it left unclaimed (issue #732:
+    /// the Aeris/Oceanic cable is an FTDI chip with a custom product ID that
+    /// Apple's driver does not match, so it never becomes a /dev/cu.* node).
+    /// Serial ports come first, so a cable that already works keeps working.
+    ///
+    /// A single candidate is opened and run directly so the real failure is
+    /// reported. Multiple candidates are each tried with a full download,
+    /// buffering dives so a wrong candidate cannot leak phantom dives.
     private func performSerialDownload(
         device: DiscoveredDevice, session: OpaquePointer,
         downloadCallbacks: libdc_download_callbacks_t, fingerprint: [UInt8]?
     ) {
         let transportValue = UInt32(LIBDC_TRANSPORT_SERIAL)
         let available = SerialPortEnumerator.enumerateUsbSerialPaths()
-        let candidates = SerialPortEnumerator.candidatePorts(
+        var candidates = SerialPortEnumerator.candidatePorts(
             address: device.address, available: available)
+            .map { DownloadCandidate.serialPort($0) }
+
+        // Cables the operating system never published as a serial port. Tried
+        // after the serial ports so nothing that works today changes: a real
+        // /dev node is always the better path when one exists. An explicit
+        // /dev address means the user picked a specific port, so raw USB is
+        // not second-guessed into the list.
+        if !device.address.hasPrefix("/dev/") {
+            // The log closure is how the enumerator reports what it saw; it
+            // takes one rather than calling NativeLogger itself so the file
+            // stays compilable outside the CocoaPods build. Every USB device is
+            // reported, matched or not, so a user's debug log distinguishes a
+            // cable that is not enumerating from one the allowlist rejected.
+            let found = UsbFtdiDeviceEnumerator.enumerateDiveCables { message in
+                NativeLogger.i("DiveComputerHost", category: "USB", message)
+            }
+            candidates.append(contentsOf: found.map { DownloadCandidate.ftdiUsb($0) })
+        }
 
         if candidates.isEmpty {
             reportError(
@@ -405,23 +493,19 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         // Single candidate: open directly and report the real outcome (an open
         // failure is a clear connect error; a comms failure is download_error).
         if candidates.count == 1 {
-            let port = candidates[0]
-            let stream = SerialIoStream()
-            if let failure = stream.open(path: port) {
-                NativeLogger.e("DiveComputerHost", category: "SER",
-                    "Failed to open \(port) (errno=\(failure.errnoValue)): \(failure.reason)")
+            let candidate = candidates[0]
+            guard let opened = openCandidate(candidate) else {
                 reportError(
                     code: "connect_failed",
-                    message: "Failed to open serial port \(port): \(failure.reason)")
+                    message: "Failed to open \(candidate.label): \(lastCandidateFailure)")
                 return
             }
-            NativeLogger.i("DiveComputerHost", category: "SER", "Opened serial port: \(port)")
-            self.activeSerialStream = stream
+            self.activeSerialStream = opened.stream
             let result = runOnce(
                 session: session, device: device, transportValue: transportValue,
-                ioCallbacks: stream.makeCallbacks(), fingerprint: fingerprint,
+                ioCallbacks: opened.callbacks, fingerprint: fingerprint,
                 downloadCallbacks: downloadCallbacks)
-            stream.close()
+            opened.close()
             self.activeSerialStream = nil
             reportDownloadResult(result)
             return
@@ -438,34 +522,34 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         var lastResult = RunResult(
             rc: Int32(LIBDC_STATUS_IO), serial: 0, firmware: 0, errorMessage: "")
 
-        for port in candidates {
+        for candidate in candidates {
             diveBufferLock.lock()
             bufferedDives.removeAll()
             diveBufferLock.unlock()
 
-            let stream = SerialIoStream()
-            if let failure = stream.open(path: port) {
-                NativeLogger.e("DiveComputerHost", category: "SER",
-                    "Failed to open \(port) (errno=\(failure.errnoValue)): \(failure.reason)")
-                probeLog += "  \(port): \(failure.reason)\n"
+            guard let opened = openCandidate(candidate) else {
+                probeLog += "  \(candidate.label): \(lastCandidateFailure)\n"
                 continue
             }
             anyOpened = true
-            NativeLogger.i("DiveComputerHost", category: "SER", "Probing serial port: \(port)")
-            self.activeSerialStream = stream
+            NativeLogger.i(
+                "DiveComputerHost", category: "SER", "Probing \(candidate.label)")
+            self.activeSerialStream = opened.stream
             let result = runOnce(
                 session: session, device: device, transportValue: transportValue,
-                ioCallbacks: stream.makeCallbacks(), fingerprint: fingerprint,
+                ioCallbacks: opened.callbacks, fingerprint: fingerprint,
                 downloadCallbacks: downloadCallbacks)
             lastResult = result
-            stream.close()
+            opened.close()
             self.activeSerialStream = nil
 
             if result.rc == 0 || result.rc == Int32(LIBDC_STATUS_CANCELLED) {
                 break
             }
-            probeLog += "  \(port): download failed (rc=\(result.rc))\n"
-            NativeLogger.w("DiveComputerHost", category: "SER", "Probe failed on \(port) rc=\(result.rc)")
+            probeLog += "  \(candidate.label): download failed (rc=\(result.rc))\n"
+            NativeLogger.w(
+                "DiveComputerHost", category: "SER",
+                "Probe failed on \(candidate.label) rc=\(result.rc)")
         }
 
         // Flush buffered dives on success OR cancellation (a cancel still sends
