@@ -11063,6 +11063,20 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Standardpreis';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Leer lassen für keinen Standardwert';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Standardpreis für dieses Teil';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Währung';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Wartungseintrag gelöscht';
 
   @override

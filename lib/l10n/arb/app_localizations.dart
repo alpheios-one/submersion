@@ -18885,6 +18885,30 @@ abstract class AppLocalizations {
   /// **'{count} of {total} shown'**
   String equipment_service_filterMatchCount(int count, int total);
 
+  /// No description provided for @equipment_serviceKinds_defaultCostLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Default price'**
+  String get equipment_serviceKinds_defaultCostLabel;
+
+  /// No description provided for @equipment_serviceKinds_defaultCostHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave blank for no default'**
+  String get equipment_serviceKinds_defaultCostHint;
+
+  /// No description provided for @equipment_scheduleDialog_defaultCostLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Default price for this item'**
+  String get equipment_scheduleDialog_defaultCostLabel;
+
+  /// No description provided for @equipment_serviceKinds_defaultCurrencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get equipment_serviceKinds_defaultCurrencyLabel;
+
   /// No description provided for @equipment_service_snackbar_deleted.
   ///
   /// In en, this message translates to:

@@ -11100,6 +11100,20 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Prix par défaut';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Laisser vide pour aucune valeur par défaut';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Prix par défaut pour cet équipement';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Devise';
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Enregistrement de revision supprime';
 

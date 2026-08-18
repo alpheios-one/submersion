@@ -11066,6 +11066,20 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Preço padrão';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Deixe em branco para nenhum valor padrão';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Preço padrão para este equipamento';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Moeda';
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Registro de manutencao excluido';
 

@@ -307,6 +307,35 @@ void main() {
       expect(custom.autoAttach, isTrue);
     });
 
+    testWidgets('a default price round-trips through the editor', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildDbPage());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Name'),
+        'Disinfect',
+      );
+      await tester.ensureVisible(
+        find.byKey(const Key('service-kind-default-cost')),
+      );
+      await tester.enterText(
+        find.byKey(const Key('service-kind-default-cost')),
+        '12.5',
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      final kinds = await tester.runAsync(() => kindRepo.getAllKinds());
+      final custom = kinds!.firstWhere((k) => k.name == 'Disinfect');
+      expect(custom.defaultCost, 12.5);
+    });
+
     testWidgets('editing a custom kind persists changes', (tester) async {
       await tester.runAsync(
         () => kindRepo.createKind(

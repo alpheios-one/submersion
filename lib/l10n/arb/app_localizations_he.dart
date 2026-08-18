@@ -10812,6 +10812,20 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCostLabel => 'מחיר ברירת מחדל';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'השאירו ריק ללא ברירת מחדל';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'מחיר ברירת מחדל לפריט זה';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'מטבע';
+
+  @override
   String get equipment_service_snackbar_deleted => 'רשומת טיפול נמחקה';
 
   @override

@@ -146,6 +146,7 @@ class _ScheduleOverrideDialogState extends State<_ScheduleOverrideDialog> {
   late final TextEditingController _days;
   late final TextEditingController _dives;
   late final TextEditingController _hours;
+  late final TextEditingController _defaultCost;
   DateTime? _anchorDate;
 
   @override
@@ -160,6 +161,11 @@ class _ScheduleOverrideDialogState extends State<_ScheduleOverrideDialog> {
     _hours = TextEditingController(
       text: hours == null ? '' : formatDecimalForInput(hours),
     );
+    // Same decimal-separator pairing as the hours field above (#1091).
+    final cost = s.defaultCost;
+    _defaultCost = TextEditingController(
+      text: cost == null ? '' : formatDecimalForInput(cost),
+    );
     _anchorDate = s.anchorDate;
   }
 
@@ -168,6 +174,7 @@ class _ScheduleOverrideDialogState extends State<_ScheduleOverrideDialog> {
     _days.dispose();
     _dives.dispose();
     _hours.dispose();
+    _defaultCost.dispose();
     super.dispose();
   }
 
@@ -220,6 +227,24 @@ class _ScheduleOverrideDialogState extends State<_ScheduleOverrideDialog> {
                     ? null
                     : l10n.equipment_scheduleDialog_inheritHint(
                         _hint(kind.defaultIntervalHours),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Per-item price override. Blank inherits the kind's value, shown
+            // as the hint, exactly like the interval fields above (#829).
+            TextFormField(
+              key: const Key('service-schedule-default-cost'),
+              controller: _defaultCost,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: InputDecoration(
+                labelText: l10n.equipment_scheduleDialog_defaultCostLabel,
+                hintText: kind.defaultCost == null
+                    ? l10n.equipment_serviceKinds_defaultCostHint
+                    : l10n.equipment_scheduleDialog_inheritHint(
+                        formatDecimalForInput(kind.defaultCost!),
                       ),
               ),
             ),
@@ -279,6 +304,8 @@ class _ScheduleOverrideDialogState extends State<_ScheduleOverrideDialog> {
               intervalDays: parseUserInt(_days.text),
               intervalDives: parseUserInt(_dives.text),
               intervalHours: parseUserDecimal(_hours.text),
+              defaultCost: parseUserDecimal(_defaultCost.text),
+              defaultCurrency: widget.schedule.defaultCurrency,
               anchorDate: _anchorDate,
               enabled: schedule.enabled,
               createdAt: schedule.createdAt,

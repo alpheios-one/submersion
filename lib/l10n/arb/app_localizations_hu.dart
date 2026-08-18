@@ -11043,6 +11043,20 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Alapértelmezett ár';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Hagyja üresen, ha nincs alapértelmezés';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Alapértelmezett ár ehhez a felszereléshez';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Pénznem';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Szervizrekord torolve';
 
   @override

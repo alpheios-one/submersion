@@ -11061,6 +11061,20 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Precio predeterminado';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Dejar en blanco para no usar valor predeterminado';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Precio predeterminado para este equipo';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Moneda';
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Registro de servicio eliminado';
 

@@ -10572,6 +10572,18 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCostLabel => '默认价格';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint => '留空表示无默认值';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel => '此装备的默认价格';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => '货币';
+
+  @override
   String get equipment_service_snackbar_deleted => '维护记录已删除';
 
   @override

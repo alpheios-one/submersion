@@ -5,7 +5,10 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
 import 'package:submersion/features/equipment/domain/entities/service_record.dart';
+import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
+import 'package:submersion/features/equipment/domain/services/default_service_cost_resolver.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/utils/service_type_label.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -45,6 +48,11 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   DateTime? _nextServiceDue;
   String? _serviceKindId;
   bool _isSaving = false;
+
+  /// Set as soon as the diver types in the cost field. Once set, the default
+  /// price never writes over it again, including when the clock selection
+  /// changes and re-resolves.
+  bool _costTouched = false;
 
   /// The code this dialog opened with: the record's stored currency when
   /// editing, the diver's default for a new record. Currency is free text, so
@@ -94,10 +102,47 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
     super.dispose();
   }
 
+  /// Fills the cost field from the schedule-then-kind default.
+  ///
+  /// A convenience, not a binding value: it only ever fills an untouched
+  /// field on a NEW record. Editing must never re-prefill, or a cost the
+  /// diver deliberately cleared would silently come back.
+  ///
+  /// This cannot live in initState, because the kinds and schedules arrive
+  /// from FutureProviders that have not resolved when the dialog is built.
+  void _maybePrefillCost(
+    List<ServiceKind> kinds,
+    List<ServiceSchedule> schedules,
+  ) {
+    if (isEditing || _costTouched) return;
+    final resolved = resolveDefaultServiceCost(
+      serviceKindId: _serviceKindId,
+      schedules: schedules,
+      kinds: kinds,
+    );
+    final text = resolved.cost == null
+        ? ''
+        : formatDecimalForInput(resolved.cost!);
+    if (_costController.text != text) _costController.text = text;
+    if (resolved.currency != null) {
+      _currencyController.text = resolved.currency!;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
+
+    // Resolved every build while the field is untouched, so switching the
+    // clock re-prices the record.
+    _maybePrefillCost(
+      ref.watch(serviceKindsProvider).valueOrNull ?? const <ServiceKind>[],
+      ref
+              .watch(serviceSchedulesForEquipmentProvider(widget.equipmentId))
+              .valueOrNull ??
+          const <ServiceSchedule>[],
+    );
 
     return AlertDialog(
       title: Text(
@@ -224,7 +269,9 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
                         builder: (context, value, _) {
                           final symbol = currencySymbol(value.text);
                           return TextFormField(
+                            key: const Key('service-record-cost'),
                             controller: _costController,
+                            onChanged: (_) => _costTouched = true,
                             decoration: InputDecoration(
                               labelText: context
                                   .l10n

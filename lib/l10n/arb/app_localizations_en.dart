@@ -10892,6 +10892,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Default price';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Leave blank for no default';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Default price for this item';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Currency';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Service record deleted';
 
   @override

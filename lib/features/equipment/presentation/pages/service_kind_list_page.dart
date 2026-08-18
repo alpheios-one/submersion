@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
@@ -296,6 +297,8 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
   late final TextEditingController _days;
   late final TextEditingController _dives;
   late final TextEditingController _hours;
+  late final TextEditingController _defaultCost;
+  late final TextEditingController _defaultCurrency;
   late Set<EquipmentType> _types;
   late bool _autoAttach;
 
@@ -317,6 +320,12 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
     _hours = TextEditingController(
       text: hours == null ? '' : formatDecimalForInput(hours),
     );
+    // Same decimal-separator pairing as the hours field above (#1091).
+    final cost = k?.defaultCost;
+    _defaultCost = TextEditingController(
+      text: cost == null ? '' : formatDecimalForInput(cost),
+    );
+    _defaultCurrency = TextEditingController(text: k?.defaultCurrency ?? '');
     _types = {...(k?.applicableTypes ?? const [])};
     _autoAttach = k?.autoAttach ?? false;
   }
@@ -327,6 +336,8 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
     _days.dispose();
     _dives.dispose();
     _hours.dispose();
+    _defaultCost.dispose();
+    _defaultCurrency.dispose();
     super.dispose();
   }
 
@@ -382,6 +393,59 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
                   decoration: InputDecoration(
                     labelText: l10n.equipment_scheduleDialog_intervalHours,
                   ),
+                ),
+                const SizedBox(height: 12),
+                // Default price for this maintenance, prefilled when a record
+                // is logged. A per-item schedule can override it (#829).
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: TextFormField(
+                        key: const Key('service-kind-default-cost'),
+                        controller: _defaultCost,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: InputDecoration(
+                          labelText:
+                              l10n.equipment_serviceKinds_defaultCostLabel,
+                          hintText: l10n.equipment_serviceKinds_defaultCostHint,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return null;
+                          final parsed = parseUserDecimal(value);
+                          if (parsed == null || parsed < 0) {
+                            return l10n.equipment_serviceDialog_costValidation;
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        initialValue: _defaultCurrency.text.isEmpty
+                            ? null
+                            : _defaultCurrency.text,
+                        decoration: InputDecoration(
+                          labelText:
+                              l10n.equipment_serviceKinds_defaultCurrencyLabel,
+                        ),
+                        items: [
+                          for (final code in currencyCodesWith(
+                            _defaultCurrency.text.isEmpty
+                                ? null
+                                : _defaultCurrency.text,
+                          ))
+                            DropdownMenuItem(value: code, child: Text(code)),
+                        ],
+                        onChanged: (value) =>
+                            setState(() => _defaultCurrency.text = value ?? ''),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -451,6 +515,10 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
           defaultIntervalDays: parseUserInt(_days.text),
           defaultIntervalDives: parseUserInt(_dives.text),
           defaultIntervalHours: parseUserDecimal(_hours.text),
+          defaultCost: parseUserDecimal(_defaultCost.text),
+          defaultCurrency: _defaultCurrency.text.trim().isEmpty
+              ? null
+              : _defaultCurrency.text.trim().toUpperCase(),
           autoAttach: _autoAttach,
           createdAt: now,
           updatedAt: now,
@@ -467,6 +535,10 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
           defaultIntervalDays: parseUserInt(_days.text),
           defaultIntervalDives: parseUserInt(_dives.text),
           defaultIntervalHours: parseUserDecimal(_hours.text),
+          defaultCost: parseUserDecimal(_defaultCost.text),
+          defaultCurrency: _defaultCurrency.text.trim().isEmpty
+              ? null
+              : _defaultCurrency.text.trim().toUpperCase(),
           autoAttach: _autoAttach,
           isBuiltIn: false,
           createdAt: existing.createdAt,

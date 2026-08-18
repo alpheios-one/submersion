@@ -6138,6 +6138,10 @@
       }
     }
   },
+  "equipment_serviceKinds_defaultCostLabel": "Default price",
+  "equipment_serviceKinds_defaultCostHint": "Leave blank for no default",
+  "equipment_scheduleDialog_defaultCostLabel": "Default price for this item",
+  "equipment_serviceKinds_defaultCurrencyLabel": "Currency",
   "equipment_service_snackbar_deleted": "Service record deleted",
   "equipment_service_totalCostLabel": "Total Service Cost",
   "equipment_setDetail_addEquipmentButton": "Add Equipment",

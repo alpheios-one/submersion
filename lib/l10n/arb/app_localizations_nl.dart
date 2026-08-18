@@ -10989,6 +10989,20 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Standaardprijs';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Laat leeg voor geen standaardwaarde';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Standaardprijs voor dit item';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Valuta';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Servicerecord verwijderd';
 
   @override

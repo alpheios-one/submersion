@@ -11070,6 +11070,20 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Prezzo predefinito';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Lascia vuoto per nessun valore predefinito';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Prezzo predefinito per questa attrezzatura';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Valuta';
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Registro manutenzione eliminato';
 

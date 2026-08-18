@@ -10877,6 +10877,20 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCostLabel => 'السعر الافتراضي';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'اتركه فارغًا لعدم وجود قيمة افتراضية';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'السعر الافتراضي لهذه المعدة';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'العملة';
+
+  @override
   String get equipment_service_snackbar_deleted => 'تم حذف سجل الصيانة';
 
   @override
