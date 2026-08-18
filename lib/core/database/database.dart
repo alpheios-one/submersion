@@ -1145,6 +1145,12 @@ class ServiceKinds extends Table {
   IntColumn get defaultIntervalDives => integer().nullable()();
   RealColumn get defaultIntervalHours => real().nullable()();
 
+  /// v154: default price for this maintenance, prefilled into a new service
+  /// record. Nullable currency means "no opinion, use the diver's default
+  /// currency"; a NOT NULL default would make every task silently claim USD.
+  RealColumn get defaultCost => real().nullable()();
+  TextColumn get defaultCurrency => text().nullable()();
+
   /// Auto-create a schedule when matching equipment is created.
   BoolColumn get autoAttach => boolean().withDefault(const Constant(false))();
   BoolColumn get isBuiltIn => boolean().withDefault(const Constant(false))();
@@ -1173,6 +1179,12 @@ class ServiceSchedules extends Table {
   IntColumn get intervalDays => integer().nullable()();
   IntColumn get intervalDives => integer().nullable()();
   RealColumn get intervalHours => real().nullable()();
+
+  /// v154: per-item default price, overriding the kind's. Most specific wins,
+  /// so two rebreathers serviced at different shops each keep their own
+  /// figure. Null inherits the kind's value.
+  RealColumn get defaultCost => real().nullable()();
+  TextColumn get defaultCurrency => text().nullable()();
 
   /// Baseline when no ServiceRecord of this kind exists yet (e.g. last hydro
   /// before app adoption). Fallback chain: purchaseDate, then createdAt.
@@ -3069,7 +3081,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 153;
+  static const int currentSchemaVersion = 154;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3291,6 +3303,9 @@ class AppDatabase extends _$AppDatabase {
     152,
     // v153 (issue #810): raw O2 cell output in millivolts on dive_profiles.
     153,
+    // v154 (issue #829): default service price on service_kinds and
+    // service_schedules, prefilled when a maintenance record is logged.
+    154,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4723,6 +4738,28 @@ class AppDatabase extends _$AppDatabase {
       if (!names.contains('o2_sensor_mv$n')) {
         await customStatement(
           'ALTER TABLE dive_profiles ADD COLUMN o2_sensor_mv$n INTEGER',
+        );
+      }
+    }
+  }
+
+  /// Default service price columns on service_kinds and service_schedules
+  /// (issue #829). PRAGMA-guarded so a healthy database no-ops. The
+  /// cols.isEmpty guard matters: minimal migration fixtures build databases
+  /// without these tables and would otherwise crash the whole migration.
+  Future<void> _assertServiceCostColumns() async {
+    for (final table in const ['service_kinds', 'service_schedules']) {
+      final cols = await customSelect("PRAGMA table_info('$table')").get();
+      if (cols.isEmpty) continue;
+      final names = cols.map((c) => c.read<String>('name')).toSet();
+      if (!names.contains('default_cost')) {
+        await customStatement(
+          'ALTER TABLE $table ADD COLUMN default_cost REAL',
+        );
+      }
+      if (!names.contains('default_currency')) {
+        await customStatement(
+          'ALTER TABLE $table ADD COLUMN default_currency TEXT',
         );
       }
     }
@@ -8090,6 +8127,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertO2CellMillivoltColumns();
         }
         if (from < 153) await reportProgress();
+        // v154: default service price on kinds and schedules (issue #829).
+        if (from < 154) {
+          await _assertServiceCostColumns();
+        }
+        if (from < 154) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8240,6 +8282,10 @@ class AppDatabase extends _$AppDatabase {
         // v153 backstop: re-assert the O2 cell millivolt columns (issue
         // #810; same parallel-branch version-collision self-heal).
         await _assertO2CellMillivoltColumns();
+
+        // v154 backstop: re-assert the default service price columns (issue
+        // #829; same parallel-branch version-collision self-heal).
+        await _assertServiceCostColumns();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
