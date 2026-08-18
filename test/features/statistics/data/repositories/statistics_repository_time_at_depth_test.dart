@@ -264,6 +264,27 @@ void main() {
     );
   });
 
+  test('neither loses nor invents time when timestamps tie', () async {
+    await dive('a');
+    // Two samples share t=300 s at depths that fall in different buckets. The
+    // window orders by (timestamp, id), so the tie is broken by row id: the
+    // 11 m row sorts last and carries the interval that leaves the tie.
+    await profile('a', [
+      (0, 5.0),
+      (300, 9.0),
+      (300, 11.0),
+      (600, 5.0),
+      (900, 5.0),
+    ]);
+
+    final ranges = await repo.getTimeAtDepthRanges();
+
+    // 900 s elapsed from the first sample to the last, split 600/300.
+    expect(ranges.fold<int>(0, (sum, r) => sum + r.minutes), 15);
+    expect(minutesAt(ranges, 0), 10);
+    expect(minutesAt(ranges, 10), 5);
+  });
+
   test('returns nothing for a single-sample profile', () async {
     await dive('a');
     await profile('a', [(0, 12.0)]);

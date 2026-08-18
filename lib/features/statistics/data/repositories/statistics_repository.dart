@@ -2171,8 +2171,17 @@ class StatisticsRepository {
   ///
   /// Each dive's intervals are capped at [_maxSampleGapFactor] times that
   /// profile's own mean interval so a recording pause is not banked as bottom
-  /// time. The last sample of a profile closes no interval and so contributes
-  /// nothing, which costs one sample interval per dive.
+  /// time. A profile's total therefore spans its first sample to its last: the
+  /// last sample opens no interval, and whatever time the diver spent after it
+  /// was never recorded and cannot be recovered here.
+  ///
+  /// Samples are ordered by `(timestamp, id)` rather than timestamp alone.
+  /// Ties cannot lose time whichever way they fall -- every row but the last
+  /// of a tied group yields a zero-length interval, and the last carries the
+  /// whole step to the next timestamp -- but if tied rows sit in different
+  /// buckets, the tie order decides which bucket that step lands in. Ordering
+  /// by row id makes that choice reproducible instead of leaving it to
+  /// SQLite.
   ///
   /// Only primary profile rows are counted, matching [getAscentDescentRates]:
   /// a dive logged by two computers, or one whose original profile was demoted
@@ -2195,6 +2204,7 @@ class StatisticsRepository {
           SELECT
             p.dive_id AS dive_id,
             p.computer_id AS computer_id,
+            p.id AS sample_id,
             p.timestamp AS at,
             p.depth AS depth
           FROM dive_profiles p
@@ -2218,7 +2228,9 @@ class StatisticsRepository {
             depth,
             LEAD(at) OVER w - at AS seconds
           FROM samples
-          WINDOW w AS (PARTITION BY dive_id, computer_id ORDER BY at)
+          WINDOW w AS (
+            PARTITION BY dive_id, computer_id ORDER BY at, sample_id
+          )
         )
         SELECT
           CASE
