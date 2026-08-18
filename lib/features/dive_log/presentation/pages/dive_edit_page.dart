@@ -1720,24 +1720,27 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       scalarFields,
       _collectScalarInputs(units),
     );
-    // Tanks in Update mode with no attribute chosen: say so, rather than
-    // falling through to the generic "nothing selected" message.
-    if (_collectionModes[BulkCollectionType.tanks] ==
-            BulkCollectionMode.update &&
-        _bulkTankSpecFields.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.diveLog_bulkEdit_tankSpecsNoFields)),
-      );
-      return;
-    }
-
     final ops = _collectCollectionOps();
     final hasScalar = scalars.toColumns(false).isNotEmpty;
     if (!hasScalar &&
         (notesAppend == null || notesAppend.isEmpty) &&
         ops.isEmpty) {
+      // An incomplete tank intent only blocks the save when it is the whole
+      // request; alongside other changes it no-ops, as every other collection
+      // does with an empty payload. Name the tank case so the hint is
+      // actionable rather than the generic "nothing selected".
+      final tanksUpdateEmpty =
+          _collectionModes[BulkCollectionType.tanks] ==
+              BulkCollectionMode.update &&
+          _bulkTankSpecFields.isEmpty;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.diveLog_bulkEdit_nothingSelected)),
+        SnackBar(
+          content: Text(
+            tanksUpdateEmpty
+                ? l10n.diveLog_bulkEdit_tankSpecsNoFields
+                : l10n.diveLog_bulkEdit_nothingSelected,
+          ),
+        ),
       );
       return;
     }

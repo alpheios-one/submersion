@@ -52,6 +52,10 @@ void main() {
         ProviderScope(
           overrides: buildOverrides(overrides).cast(),
           child: const MaterialApp(
+            // Pinned: an unpinned MaterialApp resolves against the HOST
+            // machine's locales, so English string assertions fail on a
+            // non-English dev machine.
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
@@ -470,6 +474,7 @@ void main() {
         ProviderScope(
           overrides: buildOverrides(overrides).cast(),
           child: MaterialApp(
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
@@ -533,6 +538,7 @@ void main() {
         ProviderScope(
           overrides: buildOverrides(overrides).cast(),
           child: MaterialApp(
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
@@ -566,6 +572,59 @@ void main() {
       final tanks = (await repository.getDiveById(dive.id))!.tanks;
       expect(tanks.single.name, 'Primary');
       expect(tanks.single.startPressure, 200);
+    });
+
+    testWidgets('tank Update with an empty mask still saves other changes', (
+      tester,
+    ) async {
+      // An incomplete tank intent must not hold the rest of the edit hostage;
+      // every other collection silently no-ops an empty payload.
+      final dive = await repository.createDive(
+        createTestDiveWithBottomTime().copyWith(id: 'tank-empty-1'),
+      );
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: buildOverrides(overrides).cast(),
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: DiveEditPage(bulkDiveIds: [dive.id], embedded: true),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tanks set to Update, but no attribute ticked.
+      await tester.ensureVisible(find.text('Update').first);
+      await tester.tap(find.text('Update').first);
+      await tester.pumpAndSettle();
+
+      // An unrelated scalar change that must still apply.
+      final favoriteGate = find.ancestor(
+        of: find.text('Favorite'),
+        matching: find.byType(BulkFieldGate),
+      );
+      await tester.ensureVisible(favoriteGate);
+      await tester.tap(
+        find.descendant(of: favoriteGate, matching: find.byType(Checkbox)),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.descendant(of: favoriteGate, matching: find.byType(Switch)),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Apply'));
+      await tester.pumpAndSettle();
+
+      expect((await repository.getDiveById(dive.id))!.isFavorite, isTrue);
     });
 
     testWidgets('tank Update with no attribute chosen explains why', (

@@ -5303,25 +5303,25 @@ class DiveRepository {
     if (diveIds.isEmpty || fields.isEmpty) return 0;
     final companion = _tankSpecsCompanion(specs, fields);
     final now = DateTime.now().millisecondsSinceEpoch;
-    final changed = <String>[];
-    for (final diveId in diveIds) {
-      final existing = await (_db.select(
+    // One SELECT for every dive rather than one per dive: a 248-dive import
+    // would otherwise cost 248 round-trips before the first write.
+    final existing = await (_db.select(
+      _db.diveTanks,
+    )..where((t) => t.diveId.isIn(diveIds))).get();
+    if (existing.isEmpty) return 0;
+    final changed = <String>{};
+    for (final row in existing) {
+      await (_db.update(
         _db.diveTanks,
-      )..where((t) => t.diveId.equals(diveId))).get();
-      if (existing.isEmpty) continue;
-      for (final row in existing) {
-        await (_db.update(
-          _db.diveTanks,
-        )..where((t) => t.id.equals(row.id))).write(companion);
-        await _syncRepository.markRecordPending(
-          entityType: 'diveTanks',
-          recordId: row.id,
-          localUpdatedAt: now,
-        );
-      }
-      changed.add(diveId);
+      )..where((t) => t.id.equals(row.id))).write(companion);
+      await _syncRepository.markRecordPending(
+        entityType: 'diveTanks',
+        recordId: row.id,
+        localUpdatedAt: now,
+      );
+      changed.add(row.diveId);
     }
-    if (changed.isNotEmpty) await _bumpDives(changed, now);
+    await _bumpDives(changed.toList(), now);
     return changed.length;
   }
 
