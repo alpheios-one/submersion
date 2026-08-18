@@ -88,22 +88,32 @@ void main() {
     currentEpochId: currentEpochId,
   );
 
-  test('published manifests are stamped with the schema version', () async {
-    await DiveRepository().createDive(
-      createTestDiveWithBottomTime(id: 'd1', diveNumber: 1),
-    );
-    await publishPeer('peer-1', epochId: 'epoch-A');
+  test(
+    'published manifests are stamped with the floor and writer schema',
+    () async {
+      await DiveRepository().createDive(
+        createTestDiveWithBottomTime(id: 'd1', diveNumber: 1),
+      );
+      await publishPeer('peer-1', epochId: 'epoch-A');
 
-    final manifestFile = (await provider.listFiles(
-      folderId: folder,
-      namePattern: ChangesetLogLayout.manifestName('peer-1'),
-    )).single;
-    final manifest = SyncManifest.fromBytes(
-      await provider.downloadFile(manifestFile.id),
-    );
+      final manifestFile = (await provider.listFiles(
+        folderId: folder,
+        namePattern: ChangesetLogLayout.manifestName('peer-1'),
+      )).single;
+      final manifest = SyncManifest.fromBytes(
+        await provider.downloadFile(manifestFile.id),
+      );
 
-    expect(manifest.schemaVersion, AppDatabase.currentSchemaVersion);
-  });
+      expect(
+        manifest.schemaVersion,
+        AppDatabase.minimumCompatibleSchemaVersion,
+        reason:
+            'the gate field carries the floor so shipped readers '
+            'only hold peers across declared breaking changes',
+      );
+      expect(manifest.writerSchemaVersion, AppDatabase.currentSchemaVersion);
+    },
+  );
 
   test('holds a peer publishing from a newer schema', () async {
     await DiveRepository().createDive(
