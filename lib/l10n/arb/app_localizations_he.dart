@@ -30568,11 +30568,83 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'שדרוג מסד הנתונים נכשל';
+  String get startup_error_title => 'Submersion לא הצליחה להיפתח';
 
   @override
   String get startup_error_body =>
-      'נסו להפעיל מחדש את האפליקציה. אם הבעיה נמשכת, פנו לתמיכה: הנתונים שלכם עדיין בדיסק ואין צורך בהתקנה מחדש.';
+      'משהו השתבש לפני שיומן הצלילה שלך נפתח במלואו. הנתונים שלך עדיין על הדיסק ואין צורך בהתקנה מחדש. נסה להפעיל מחדש את האפליקציה; אם התקלה נמשכת, פנה לתמיכה.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'גרסה זו אינה יכולה לפתוח מסד נתונים';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'מנוע מסד הנתונים של Submersion חסר בגרסה הזו, ולכן יומן הצלילה שלך מעולם לא נפתח. שום דבר על הדיסק לא השתנה ואין נתונים בסיכון.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'התקנה מחדש או שחזור גיבוי לא יעזרו כאן. התקן גרסה תקינה של Submersion, ונשמח אם תדווח על כך: זו תקלה בחבילת האפליקציה, לא בנתונים שלך.';
+
+  @override
+  String get startup_migrationFailed_title => 'שדרוג מסד הנתונים נכשל';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'לא ניתן היה לשדרג את יומן הצלילה שלך לתבנית שגרסה זו דורשת. עותק בטיחות נוצר לפני תחילת השדרוג, כך ששום דבר לא אבד.';
+
+  @override
+  String get startup_dataUnreadable_title =>
+      'לא ניתן היה לקרוא את יומן הצלילה שלך';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'קובץ מסד הנתונים קיים, אבל Submersion לא מצליחה לקרוא אותו. בדרך כלל המשמעות היא שהקובץ פגום. שחזור גיבוי הוא הדרך המהירה ביותר לחזור.';
+
+  @override
+  String get startup_failure_technicalDetails => 'פרטים טכניים';
+
+  @override
+  String get startup_failure_backupAvailable_title => 'יש גיבוי זמין';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'נוצר ב-$timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'עותק בטיחות שנוצר לפני השדרוג מסכימה v$fromVersion ל-v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction => 'שחזר גיבוי זה';
+
+  @override
+  String get startup_failure_restoring => 'משחזר את יומן הצלילה...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'לא ניתן היה לשחזר את הגיבוי. יומן הצלילה שלך נשאר בדיוק כפי שהיה.';
+
+  @override
+  String get startup_failure_backupsFolder => 'הגיבויים שלך נמצאים ב:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'הצג את תיקיית הגיבויים';
+
+  @override
+  String get startup_failure_downgrade_title => 'חזרה לגרסה הקודמת';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'אם השדרוג ממשיך להיכשל, התקן את גרסת Submersion שהשתמשת בה קודם, ואז שחזר את עותק הבטיחות מתוך אותה גרסה. שחזור כאן רק יריץ שוב את אותו שדרוג. Submersion לעולם אינה חוזרת לגרסה ישנה מעצמה: העברה אוטומטית לגרסאות ישנות הייתה משאירה אותך בשקט על גרסאות עם בעיות ידועות.';
+
+  @override
+  String get startup_failure_downgrade_action => 'הצג גרסאות קודמות';
 
   @override
   String get startup_recovering_title => 'משחזר את מסד הנתונים...';

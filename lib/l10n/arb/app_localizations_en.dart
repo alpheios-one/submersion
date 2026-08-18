@@ -30697,11 +30697,83 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'Database upgrade failed';
+  String get startup_error_title => 'Submersion could not start';
 
   @override
   String get startup_error_body =>
-      'Try restarting the app. If this persists, contact support. Your data is still on disk and does not require a reinstall.';
+      'Something went wrong before your dive log finished opening. Your data is still on disk and does not require a reinstall. Try restarting the app; if this persists, contact support.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'This build can\'t open a database';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'Submersion\'s database engine is missing from this build, so your dive log was never opened. Nothing on disk has changed and no data is at risk.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'Reinstalling or restoring a backup will not help. Install a working build of Submersion, and please report this: it is a fault in the app package, not in your data.';
+
+  @override
+  String get startup_migrationFailed_title => 'Database upgrade failed';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'Your dive log could not be upgraded to the format this version needs. A safety copy was taken before the upgrade started, so nothing is lost.';
+
+  @override
+  String get startup_dataUnreadable_title => 'Your dive log could not be read';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'The database file is there, but Submersion cannot read it. This usually means the file is damaged. Restoring a backup is the fastest way back.';
+
+  @override
+  String get startup_failure_technicalDetails => 'Technical details';
+
+  @override
+  String get startup_failure_backupAvailable_title => 'A backup is available';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'Taken $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'Safety copy taken before the upgrade from schema v$fromVersion to v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction => 'Restore this backup';
+
+  @override
+  String get startup_failure_restoring => 'Restoring your dive log...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'The backup could not be restored. Your dive log has been left exactly as it was.';
+
+  @override
+  String get startup_failure_backupsFolder => 'Your backups are in:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'Show backup folder';
+
+  @override
+  String get startup_failure_downgrade_title =>
+      'Going back to the previous version';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'If the upgrade keeps failing, install the version of Submersion you were running before, then restore the safety copy from inside that version. Restoring it here would only run the same upgrade again. Submersion does not downgrade itself: moving you onto older builds automatically would quietly keep you on versions with known problems.';
+
+  @override
+  String get startup_failure_downgrade_action => 'View previous releases';
 
   @override
   String get startup_recovering_title => 'Recovering database...';
