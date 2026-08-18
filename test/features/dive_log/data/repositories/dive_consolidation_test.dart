@@ -119,6 +119,7 @@ void main() {
   Future<String> insertTestProfile({
     required String diveId,
     String? sourceTag,
+    String? sourceId,
     bool isPrimary = true,
     int timestamp = 0,
     double depth = 5.0,
@@ -132,6 +133,7 @@ void main() {
             id: Value(id),
             diveId: Value(diveId),
             // computerId left null to avoid FK constraints
+            sourceId: Value(sourceId),
             isPrimary: Value(isPrimary),
             timestamp: Value(timestamp),
             depth: Value(depth),
@@ -996,16 +998,16 @@ void main() {
     );
 
     test(
-      'swaps isPrimary flags on dive_profiles when computerId is available',
+      'keeps unattributed null-computerId profiles primary across a swap',
       () async {
-        // This test uses null computerId since FK refs are unavailable in tests.
-        // Profile swapping by computerId is exercised in the implementation;
-        // here we verify the demotion step (all profiles demoted to non-primary)
-        // and that profiles associated with a non-null computerId get promoted.
+        // Rows carrying neither a computerId nor a sourceId are the pre-v154
+        // shape: file imports and manual entries. The promoted source has no
+        // computerId either, so the legacy convention applies -- those rows
+        // are the ones it owns, and they stay primary.
         //
-        // Since we cannot insert real DiveComputer rows, we verify the
-        // demotion side: after swapping, profiles that were primary become
-        // non-primary (computerId-less profiles remain demoted).
+        // This asserted the opposite until issue #1149: the old code demoted
+        // every row and then skipped the promote entirely, so it codified
+        // the stranding as expected behavior.
         final diveId = await insertTestDive(
           id: 'dive-profile-swap',
           diveComputerModel: 'Computer A',
@@ -1049,8 +1051,6 @@ void main() {
           computerReadingId: 'reading-b',
         );
 
-        // All profiles (null computerId) should be demoted to non-primary
-        // since reading-b has no computerId to match for promotion.
         final profiles = await (db.select(
           db.diveProfiles,
         )..where((t) => t.diveId.equals(diveId))).get();
@@ -1058,10 +1058,10 @@ void main() {
         for (final p in profiles) {
           expect(
             p.isPrimary,
-            isFalse,
+            isTrue,
             reason:
-                'All profiles should be demoted when new primary has no '
-                'matching computerId',
+                'A null-computerId source owns the dive\'s unattributed '
+                'null-computerId rows, so promoting it must keep them primary',
           );
         }
 
@@ -1071,6 +1071,212 @@ void main() {
         final readingB = readings.firstWhere((r) => r.id == 'reading-b');
         expect(readingA.isPrimary, isFalse);
         expect(readingB.isPrimary, isTrue);
+      },
+    );
+
+    // Issue #1149: promoting a source that owns no profile rows used to
+    // demote every row for the dive and then promote nothing, leaving zero
+    // `is_primary = 1` rows. The dive kept rendering (the display paths are
+    // unfiltered) while every is_primary consumer silently skipped it.
+    test(
+      'leaves a primary profile row when the new primary source owns none',
+      () async {
+        final diveId = await insertTestDive(
+          id: 'dive-no-owned-profiles',
+          diveComputerModel: 'Computer A',
+        );
+
+        await repository.saveComputerReading(
+          buildReading(
+            id: 'reading-a',
+            diveId: diveId,
+            isPrimary: true,
+            computerModel: 'Computer A',
+          ),
+        );
+        // A file-imported source: null computerId, and no profile rows of
+        // its own (metadata only).
+        await repository.saveComputerReading(
+          buildReading(
+            id: 'reading-b',
+            diveId: diveId,
+            isPrimary: false,
+            computerModel: 'Imported file',
+          ),
+        );
+
+        await insertTestProfile(
+          diveId: diveId,
+          sourceTag: 'a1',
+          isPrimary: true,
+          timestamp: 0,
+          depth: 5.0,
+        );
+        await insertTestProfile(
+          diveId: diveId,
+          sourceTag: 'a2',
+          isPrimary: true,
+          timestamp: 60,
+          depth: 10.0,
+        );
+
+        await repository.setPrimaryDataSource(
+          diveId: diveId,
+          computerReadingId: 'reading-b',
+        );
+
+        final profiles = await (db.select(
+          db.diveProfiles,
+        )..where((t) => t.diveId.equals(diveId))).get();
+
+        expect(
+          profiles.where((p) => p.isPrimary),
+          isNotEmpty,
+          reason:
+              'A dive that has profile rows must never be left with zero '
+              'is_primary rows: getDiveProfile and getAscentDescentRates '
+              'would silently skip it (issue #1149)',
+        );
+      },
+    );
+
+    // The case the sourceId FK exists for: two file-imported sources on one
+    // dive. Both carry a null computerId, so nothing about the computer can
+    // tell their samples apart -- only the owning-source row can.
+    test('promotes exactly the new primary source\'s own samples', () async {
+      final diveId = await insertTestDive(
+        id: 'dive-two-file-imports',
+        diveComputerModel: 'Imported file A',
+      );
+
+      await repository.saveComputerReading(
+        buildReading(
+          id: 'reading-a',
+          diveId: diveId,
+          isPrimary: true,
+          computerModel: 'Imported file A',
+        ),
+      );
+      await repository.saveComputerReading(
+        buildReading(
+          id: 'reading-b',
+          diveId: diveId,
+          isPrimary: false,
+          computerModel: 'Imported file B',
+        ),
+      );
+
+      await insertTestProfile(
+        diveId: diveId,
+        sourceTag: 'a1',
+        sourceId: 'reading-a',
+        isPrimary: true,
+        timestamp: 0,
+        depth: 5.0,
+      );
+      await insertTestProfile(
+        diveId: diveId,
+        sourceTag: 'b1',
+        sourceId: 'reading-b',
+        isPrimary: false,
+        timestamp: 0,
+        depth: 6.0,
+      );
+
+      await repository.setPrimaryDataSource(
+        diveId: diveId,
+        computerReadingId: 'reading-b',
+      );
+
+      final profiles = await (db.select(
+        db.diveProfiles,
+      )..where((t) => t.diveId.equals(diveId))).get();
+      final primary = profiles.where((p) => p.isPrimary).toList();
+
+      expect(primary, hasLength(1));
+      expect(
+        primary.single.sourceId,
+        equals('reading-b'),
+        reason:
+            'Promotion follows the owning-source FK, not the computerId, '
+            'which is null on both sides here (issue #1149)',
+      );
+    });
+
+    test(
+      'promotes an edited profile without resurrecting the originals',
+      () async {
+        final diveId = await insertTestDive(
+          id: 'dive-edited-swap',
+          diveComputerModel: 'Imported file',
+        );
+
+        await repository.saveComputerReading(
+          buildReading(
+            id: 'reading-a',
+            diveId: diveId,
+            isPrimary: true,
+            computerModel: 'Imported file',
+          ),
+        );
+        await repository.saveComputerReading(
+          buildReading(
+            id: 'reading-b',
+            diveId: diveId,
+            isPrimary: false,
+            computerModel: 'Other file',
+          ),
+        );
+
+        // saveEditedProfile's shape: the superseded original demoted, the edit
+        // inserted alongside it at the same timestamp, both owned by source A.
+        await insertTestProfile(
+          diveId: diveId,
+          sourceTag: 'original',
+          sourceId: 'reading-a',
+          isPrimary: false,
+          timestamp: 0,
+          depth: 5.0,
+        );
+        await insertTestProfile(
+          diveId: diveId,
+          sourceTag: 'edited',
+          sourceId: 'reading-a',
+          isPrimary: true,
+          timestamp: 0,
+          depth: 7.0,
+        );
+        await insertTestProfile(
+          diveId: diveId,
+          sourceTag: 'b1',
+          sourceId: 'reading-b',
+          isPrimary: false,
+          timestamp: 0,
+          depth: 9.0,
+        );
+
+        // Swap away to B, then back to A.
+        await repository.setPrimaryDataSource(
+          diveId: diveId,
+          computerReadingId: 'reading-b',
+        );
+        await repository.setPrimaryDataSource(
+          diveId: diveId,
+          computerReadingId: 'reading-a',
+        );
+
+        final profiles = await (db.select(
+          db.diveProfiles,
+        )..where((t) => t.diveId.equals(diveId))).get();
+        final primary = profiles.where((p) => p.isPrimary).toList();
+
+        expect(
+          primary,
+          hasLength(1),
+          reason:
+              'Both of source A\'s generations sit at timestamp 0; promoting '
+              'the whole owned set would render the series twice',
+        );
       },
     );
   });

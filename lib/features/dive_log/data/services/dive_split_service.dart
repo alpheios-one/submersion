@@ -127,13 +127,14 @@ class DiveSplitService {
       );
 
       // 2. The source row becomes the new dive's primary source.
+      final newSourceId = _uuid.v4();
       await _db
           .into(_db.diveDataSources)
           .insert(
             source
                 .toCompanion(false)
                 .copyWith(
-                  id: Value(_uuid.v4()),
+                  id: Value(newSourceId),
                   diveId: Value(newDiveId),
                   isPrimary: const Value(true),
                 ),
@@ -270,6 +271,10 @@ class DiveSplitService {
                 .copyWith(
                   id: Value(_uuid.v4()),
                   diveId: Value(newDiveId),
+                  // Follow the source to its row on the new dive (issue
+                  // #1149); the original row is deleted at step 8, and
+                  // ON DELETE SET NULL would otherwise strip attribution.
+                  sourceId: Value(newSourceId),
                   isPrimary: source.isPrimary
                       ? Value(row.isPrimary)
                       : const Value(true),
@@ -387,11 +392,21 @@ class DiveSplitService {
                   )
                   ..limit(1))
                 .get();
-        if (remainingPrimary.isEmpty && promoted.computerId != null) {
+        if (remainingPrimary.isEmpty) {
+          // Match on the owning-source FK first, and only fall back to the
+          // pre-v154 computerId convention for rows that carry none. The
+          // old code gated the whole promote on `promoted.computerId !=
+          // null`, so a file-imported source promoted nothing and left the
+          // remaining dive with zero is_primary rows -- the same stranding
+          // as issue #1149.
           await (_db.update(_db.diveProfiles)..where(
                 (t) =>
                     t.diveId.equals(diveId) &
-                    t.computerId.equals(promoted.computerId!),
+                    (t.sourceId.equals(promoted.id) |
+                        (t.sourceId.isNull() &
+                            (promoted.computerId != null
+                                ? t.computerId.equals(promoted.computerId!)
+                                : t.computerId.isNull()))),
               ))
               .write(const DiveProfilesCompanion(isPrimary: Value(true)));
         }
