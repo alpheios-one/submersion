@@ -44,7 +44,15 @@ FoldedSites foldSubsurfaceSites(List<Map<String, dynamic>> raw) {
     if (name == null) continue;
     final host = _findSameName(survivors, name, raw[i]);
     if (host == null) {
-      survivors.add(_Survivor(order: i, site: raw[i], normalizedName: name));
+      // Copy: _absorb writes into the survivor, and the caller's maps must
+      // come back out of here exactly as they went in.
+      survivors.add(
+        _Survivor(
+          order: i,
+          site: Map<String, dynamic>.from(raw[i]),
+          normalizedName: name,
+        ),
+      );
     } else {
       _absorb(host, raw[i], aliases);
     }

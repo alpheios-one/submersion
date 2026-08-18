@@ -1151,6 +1151,45 @@ $dives
       expect(sites[0].containsKey('longitude'), isFalse);
     });
 
+    test('drops non-finite coordinates', () async {
+      // double.tryParse('NaN') succeeds, and every comparison against NaN is
+      // false, so a range check alone lets it through.
+      final result = await parser.parse(
+        xmlBytes(
+          divelog(
+            "<site uuid='aaa' name='Blue Hole' gps='NaN NaN'/>",
+            dive('aaa'),
+          ),
+        ),
+      );
+
+      final sites = result.entitiesOf(ImportEntityType.sites);
+      expect(sites.length, 1);
+      expect(sites[0].containsKey('latitude'), isFalse);
+      expect(sites[0].containsKey('longitude'), isFalse);
+    });
+
+    test('trims whitespace off the stored site name', () async {
+      final result = await parser.parse(
+        xmlBytes(
+          divelog("<site uuid='aaa' name='  Blue Hole  '/>", dive('aaa')),
+        ),
+      );
+
+      final sites = result.entitiesOf(ImportEntityType.sites);
+      expect(sites[0]['name'], 'Blue Hole');
+    });
+
+    test('stores no uddfId when the uuid attribute is blank', () async {
+      final result = await parser.parse(
+        xmlBytes(divelog("<site uuid='  ' name='Blue Hole'/>", dive('aaa'))),
+      );
+
+      final sites = result.entitiesOf(ImportEntityType.sites);
+      expect(sites.length, 1);
+      expect(sites[0].containsKey('uddfId'), isFalse);
+    });
+
     test('skips a site with neither a name nor coordinates', () async {
       final result = await parser.parse(
         xmlBytes(divelog("<site uuid='aaa'/>", dive('aaa'))),

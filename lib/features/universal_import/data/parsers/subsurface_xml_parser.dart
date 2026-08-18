@@ -339,10 +339,10 @@ class SubsurfaceXmlParser implements ImportParser {
     final sites = <Map<String, dynamic>>[];
     for (final site in divesites.findElements('site')) {
       final siteData = <String, dynamic>{};
-      final name = site.getAttribute('name');
-      if (name != null && name.trim().isNotEmpty) siteData['name'] = name;
+      final name = site.getAttribute('name')?.trim();
+      if (name != null && name.isNotEmpty) siteData['name'] = name;
       final uuid = site.getAttribute('uuid')?.trim();
-      if (uuid != null) siteData['uddfId'] = uuid;
+      if (uuid != null && uuid.isNotEmpty) siteData['uddfId'] = uuid;
       final coordinates = _parseGps(site.getAttribute('gps'));
       if (coordinates != null) {
         siteData['latitude'] = coordinates.$1;
@@ -374,6 +374,10 @@ class SubsurfaceXmlParser implements ImportParser {
   ///
   /// A pair that is short, unparseable, or off the globe yields null rather
   /// than a half-set or nonsensical coordinate.
+  ///
+  /// The `isFinite` check is not redundant with the range check: `double`
+  /// parses 'NaN', and every comparison against NaN is false, so a range
+  /// check on its own would wave it straight through.
   (double, double)? _parseGps(String? raw) {
     if (raw == null) return null;
     final parts = raw.trim().split(RegExp(r'[\s,]+'));
@@ -381,6 +385,7 @@ class SubsurfaceXmlParser implements ImportParser {
     final lat = double.tryParse(parts[0]);
     final lon = double.tryParse(parts[1]);
     if (lat == null || lon == null) return null;
+    if (!lat.isFinite || !lon.isFinite) return null;
     if (lat.abs() > 90 || lon.abs() > 180) return null;
     return (lat, lon);
   }
