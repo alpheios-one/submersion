@@ -11037,6 +11037,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_service_historyTitle => 'Historico de Manutencao';
 
   @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'Próximo vencimento $date';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Registro de manutencao excluido';
 

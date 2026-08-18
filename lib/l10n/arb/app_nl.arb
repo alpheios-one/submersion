@@ -3506,6 +3506,7 @@
   "equipment_service_editMenuItem": "Bewerken",
   "equipment_service_emptyState": "Nog geen servicerecords",
   "equipment_service_historyTitle": "Servicegeschiedenis",
+  "equipment_service_nextDueLabel": "Volgende vervaldatum {date}",
   "equipment_service_snackbar_deleted": "Servicerecord verwijderd",
   "equipment_service_totalCostLabel": "Totale servicekosten",
   "equipment_setDetail_addEquipmentButton": "Uitrusting toevoegen",

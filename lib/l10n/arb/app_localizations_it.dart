@@ -11040,6 +11040,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipment_service_historyTitle => 'Storico manutenzioni';
 
   @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'Prossima scadenza $date';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Registro manutenzione eliminato';
 

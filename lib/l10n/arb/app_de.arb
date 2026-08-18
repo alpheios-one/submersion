@@ -3506,6 +3506,7 @@
   "equipment_service_editMenuItem": "Bearbeiten",
   "equipment_service_emptyState": "Noch keine Wartungseinträge",
   "equipment_service_historyTitle": "Wartungsverlauf",
+  "equipment_service_nextDueLabel": "Nächste Fälligkeit {date}",
   "equipment_service_snackbar_deleted": "Wartungseintrag gelöscht",
   "equipment_service_totalCostLabel": "Gesamte Wartungskosten",
   "equipment_setDetail_addEquipmentButton": "Ausrüstung hinzufügen",

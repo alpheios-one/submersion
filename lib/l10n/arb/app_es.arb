@@ -3506,6 +3506,7 @@
   "equipment_service_editMenuItem": "Editar",
   "equipment_service_emptyState": "Aun no hay registros de servicio",
   "equipment_service_historyTitle": "Historial de servicio",
+  "equipment_service_nextDueLabel": "Próximo vencimiento {date}",
   "equipment_service_snackbar_deleted": "Registro de servicio eliminado",
   "equipment_service_totalCostLabel": "Costo total de servicio",
   "equipment_setDetail_addEquipmentButton": "Agregar equipo",

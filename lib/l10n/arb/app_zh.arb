@@ -3651,6 +3651,7 @@
   "equipment_service_editMenuItem": "编辑",
   "equipment_service_emptyState": "尚无维护记录",
   "equipment_service_historyTitle": "维护历史",
+  "equipment_service_nextDueLabel": "下次到期 {date}",
   "equipment_service_snackbar_deleted": "维护记录已删除",
   "equipment_service_totalCostLabel": "维护总费用",
   "equipment_setDetail_addEquipmentButton": "添加装备",

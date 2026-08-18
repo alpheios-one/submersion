@@ -11034,6 +11034,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get equipment_service_historyTitle => 'Wartungsverlauf';
 
   @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'Nächste Fälligkeit $date';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => 'Wartungseintrag gelöscht';
 
   @override

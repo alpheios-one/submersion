@@ -3434,6 +3434,7 @@
   "equipment_service_editMenuItem": "Modifica",
   "equipment_service_emptyState": "Nessun registro manutenzione",
   "equipment_service_historyTitle": "Storico manutenzioni",
+  "equipment_service_nextDueLabel": "Prossima scadenza {date}",
   "equipment_service_snackbar_deleted": "Registro manutenzione eliminato",
   "equipment_service_totalCostLabel": "Costo totale manutenzione",
   "equipment_setDetail_addEquipmentButton": "Aggiungi attrezzatura",

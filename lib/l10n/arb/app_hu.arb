@@ -3434,6 +3434,7 @@
   "equipment_service_editMenuItem": "Szerkesztes",
   "equipment_service_emptyState": "Meg nincsenek szervizrekordok",
   "equipment_service_historyTitle": "Szerviz elozmeny",
+  "equipment_service_nextDueLabel": "Következő esedékesség {date}",
   "equipment_service_snackbar_deleted": "Szervizrekord torolve",
   "equipment_service_totalCostLabel": "Osszes szerviz koltseg",
   "equipment_setDetail_addEquipmentButton": "Felszereles hozzaadasa",

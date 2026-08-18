@@ -6113,6 +6113,14 @@
   "equipment_service_editMenuItem": "Edit",
   "equipment_service_emptyState": "No service records yet",
   "equipment_service_historyTitle": "Service History",
+  "equipment_service_nextDueLabel": "Next due {date}",
+  "@equipment_service_nextDueLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "equipment_service_snackbar_deleted": "Service record deleted",
   "equipment_service_totalCostLabel": "Total Service Cost",
   "equipment_setDetail_addEquipmentButton": "Add Equipment",

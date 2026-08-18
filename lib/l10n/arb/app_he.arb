@@ -3434,6 +3434,7 @@
   "equipment_service_editMenuItem": "ערוך",
   "equipment_service_emptyState": "אין עדיין רשומות טיפול",
   "equipment_service_historyTitle": "היסטוריית טיפול",
+  "equipment_service_nextDueLabel": "מועד הבא {date}",
   "equipment_service_snackbar_deleted": "רשומת טיפול נמחקה",
   "equipment_service_totalCostLabel": "סה\"כ עלות טיפול",
   "equipment_setDetail_addEquipmentButton": "הוסף ציוד",

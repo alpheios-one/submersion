@@ -10544,6 +10544,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_service_historyTitle => '维护历史';
 
   @override
+  String equipment_service_nextDueLabel(String date) {
+    return '下次到期 $date';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => '维护记录已删除';
 
   @override

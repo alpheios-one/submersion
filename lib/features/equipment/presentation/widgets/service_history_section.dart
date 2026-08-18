@@ -5,7 +5,9 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/domain/entities/service_record.dart';
+import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/equipment/presentation/utils/service_type_label.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_record_dialog.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -22,6 +24,16 @@ class ServiceHistorySection extends ConsumerWidget {
     final totalCostAsync = ref.watch(
       serviceRecordTotalCostProvider(equipmentId),
     );
+    // Indexed once here rather than per row. While the kinds are still
+    // loading the map is empty and rows fall back to the service type, which
+    // is the right transient state: the history is already useful without the
+    // task names, so blocking it behind a spinner would be worse.
+    final kindsById = {
+      for (final kind
+          in ref.watch(serviceKindsProvider).valueOrNull ??
+              const <ServiceKind>[])
+        kind.id: kind,
+    };
 
     return Card(
       child: Padding(
@@ -32,18 +44,28 @@ class ServiceHistorySection extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.history,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      context.l10n.equipment_service_historyTitle,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+                // Expanded + ellipsis so a long translation of the title
+                // ("Serviceverlauf") cannot overflow the header on a narrow
+                // phone. The Add button keeps its natural width and wins the
+                // space it needs.
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.history,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          context.l10n.equipment_service_historyTitle,
+                          style: Theme.of(context).textTheme.titleMedium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 FilledButton.tonalIcon(
                   onPressed: () => _showAddServiceDialog(context, ref),
@@ -144,6 +166,7 @@ class ServiceHistorySection extends ConsumerWidget {
                     ...records.map(
                       (record) => _ServiceRecordTile(
                         record: record,
+                        kindsById: kindsById,
                         onTap: () =>
                             _showEditServiceDialog(context, ref, record),
                         onDelete: () =>
@@ -215,7 +238,7 @@ class ServiceHistorySection extends ConsumerWidget {
         title: Text(context.l10n.equipment_service_deleteDialog_title),
         content: Text(
           context.l10n.equipment_service_deleteDialog_content(
-            record.serviceType.displayName,
+            record.serviceType.label(context.l10n),
           ),
         ),
         actions: [
@@ -252,11 +275,17 @@ class ServiceHistorySection extends ConsumerWidget {
 /// Service Record Tile Widget
 class _ServiceRecordTile extends ConsumerWidget {
   final ServiceRecord record;
+
+  /// Resolves [ServiceRecord.serviceKindId] to the maintenance task's name.
+  /// Built once by the section rather than per row.
+  final Map<String, ServiceKind> kindsById;
+
   final VoidCallback onTap;
   final VoidCallback onDelete;
 
   const _ServiceRecordTile({
     required this.record,
+    required this.kindsById,
     required this.onTap,
     required this.onDelete,
   });
@@ -265,60 +294,90 @@ class _ServiceRecordTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+
+    // The task answers "which of my jobs was done"; the type answers "what
+    // category of work". Issue #829 asks for both, and the task is the one
+    // that identifies the row, so it takes the title.
+    final kindName = kindsById[record.serviceKindId]?.name;
+    final typeLabel = record.serviceType.label(l10n);
+
+    final providerAndCost = [
+      if (record.provider != null && record.provider!.isNotEmpty)
+        record.provider!,
+      if (record.cost != null) formatMoney(record.cost!, record.currency),
+    ].join(' · ');
 
     return ListTile(
       contentPadding: EdgeInsets.zero,
+      isThreeLine: true,
       leading: CircleAvatar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        backgroundColor: theme.colorScheme.primaryContainer,
         child: Icon(
           _getServiceTypeIcon(record.serviceType),
-          color: Theme.of(context).colorScheme.onPrimaryContainer,
+          color: theme.colorScheme.onPrimaryContainer,
           size: 20,
         ),
       ),
-      title: Text(record.serviceType.displayName),
+      // maxLines + ellipsis is a backstop: if a future change puts a
+      // text-bearing widget back into trailing, the title ellipsizes instead
+      // of rendering one glyph per line (issue #935).
+      title: Text(
+        kindName ?? typeLabel,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(units.formatDate(record.serviceDate)),
-          if (record.provider != null)
+          Text(
+            kindName == null
+                ? units.formatDate(record.serviceDate)
+                : '$typeLabel · ${units.formatDate(record.serviceDate)}',
+            style: theme.textTheme.bodySmall,
+          ),
+          if (providerAndCost.isNotEmpty)
+            Text(providerAndCost, style: theme.textTheme.bodySmall),
+          if (record.nextServiceDue != null)
             Text(
-              record.provider!,
-              style: Theme.of(context).textTheme.bodySmall,
+              l10n.equipment_service_nextDueLabel(
+                units.formatDate(record.nextServiceDue!),
+              ),
+              style: theme.textTheme.bodySmall,
+            ),
+          if (record.notes.isNotEmpty)
+            Text(
+              record.notes,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall,
             ),
         ],
       ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (record.cost != null)
-            Text(
-              formatMoney(record.cost!, record.currency),
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+      // Only fixed-width widgets belong in trailing. _RenderListTile lays
+      // trailing out against the full tile width and gives the title whatever
+      // is left, clamped at zero, so a Text here starves the title (#935).
+      // The cost lives in the subtitle column for that reason.
+      trailing: PopupMenuButton<String>(
+        onSelected: (value) {
+          if (value == 'edit') {
+            onTap();
+          } else if (value == 'delete') {
+            onDelete();
+          }
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem(
+            value: 'edit',
+            child: Text(l10n.equipment_service_editMenuItem),
+          ),
+          PopupMenuItem(
+            value: 'delete',
+            child: Text(
+              l10n.equipment_service_deleteMenuItem,
+              style: const TextStyle(color: Colors.red),
             ),
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'edit') {
-                onTap();
-              } else if (value == 'delete') {
-                onDelete();
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'edit',
-                child: Text(context.l10n.equipment_service_editMenuItem),
-              ),
-              PopupMenuItem(
-                value: 'delete',
-                child: Text(
-                  context.l10n.equipment_service_deleteMenuItem,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
-            ],
           ),
         ],
       ),

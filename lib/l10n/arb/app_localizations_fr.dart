@@ -11071,6 +11071,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get equipment_service_historyTitle => 'Historique de revision';
 
   @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'Prochaine échéance $date';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Enregistrement de revision supprime';
 

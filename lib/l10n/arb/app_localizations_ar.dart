@@ -10848,6 +10848,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_service_historyTitle => 'سجل الصيانة';
 
   @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'الاستحقاق التالي $date';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => 'تم حذف سجل الصيانة';
 
   @override

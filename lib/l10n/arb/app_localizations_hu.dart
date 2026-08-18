@@ -11014,6 +11014,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_service_historyTitle => 'Szerviz elozmeny';
 
   @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'Következő esedékesség $date';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => 'Szervizrekord torolve';
 
   @override

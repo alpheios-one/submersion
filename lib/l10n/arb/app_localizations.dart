@@ -18837,6 +18837,12 @@ abstract class AppLocalizations {
   /// **'Service History'**
   String get equipment_service_historyTitle;
 
+  /// No description provided for @equipment_service_nextDueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Next due {date}'**
+  String equipment_service_nextDueLabel(String date);
+
   /// No description provided for @equipment_service_snackbar_deleted.
   ///
   /// In en, this message translates to:

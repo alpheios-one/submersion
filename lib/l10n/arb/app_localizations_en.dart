@@ -10863,6 +10863,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_service_historyTitle => 'Service History';
 
   @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'Next due $date';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => 'Service record deleted';
 
   @override

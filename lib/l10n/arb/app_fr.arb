@@ -3434,6 +3434,7 @@
   "equipment_service_editMenuItem": "Modifier",
   "equipment_service_emptyState": "Aucun enregistrement de revision",
   "equipment_service_historyTitle": "Historique de revision",
+  "equipment_service_nextDueLabel": "Prochaine échéance {date}",
   "equipment_service_snackbar_deleted": "Enregistrement de revision supprime",
   "equipment_service_totalCostLabel": "Cout total de revision",
   "equipment_setDetail_addEquipmentButton": "Ajouter un equipement",

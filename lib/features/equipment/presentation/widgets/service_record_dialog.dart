@@ -7,6 +7,7 @@ import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/domain/entities/service_record.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/equipment/presentation/utils/service_type_label.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
@@ -123,7 +124,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
                   items: ServiceType.values.map((type) {
                     return DropdownMenuItem(
                       value: type,
-                      child: Text(type.displayName),
+                      child: Text(type.label(context.l10n)),
                     );
                   }).toList(),
                   onChanged: (value) {

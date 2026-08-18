@@ -3506,6 +3506,7 @@
   "equipment_service_editMenuItem": "تعديل",
   "equipment_service_emptyState": "لا توجد سجلات صيانة بعد",
   "equipment_service_historyTitle": "سجل الصيانة",
+  "equipment_service_nextDueLabel": "الاستحقاق التالي {date}",
   "equipment_service_snackbar_deleted": "تم حذف سجل الصيانة",
   "equipment_service_totalCostLabel": "إجمالي تكلفة الصيانة",
   "equipment_setDetail_addEquipmentButton": "إضافة معدات",

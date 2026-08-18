@@ -10784,6 +10784,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_service_historyTitle => 'היסטוריית טיפול';
 
   @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'מועד הבא $date';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => 'רשומת טיפול נמחקה';
 
   @override
