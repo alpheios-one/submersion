@@ -90,3 +90,12 @@ swiftc -o "$BUILD_DIR/ftdi_read_accumulator_tests" \
     Tests/FtdiReadAccumulatorTests/main.swift
 
 "$BUILD_DIR/ftdi_read_accumulator_tests"
+
+# Dive-cable USB allowlist (issue #732). -framework IOKit satisfies the IOKit
+# references in enumerateDiveCables(); the test itself calls only the pure
+# classification functions.
+swiftc -framework IOKit -o "$BUILD_DIR/usb_ftdi_device_enumerator_tests" \
+    Sources/LibDCDarwin/UsbFtdiDeviceEnumerator.swift \
+    Tests/UsbFtdiDeviceEnumeratorTests/main.swift
+
+"$BUILD_DIR/usb_ftdi_device_enumerator_tests"
