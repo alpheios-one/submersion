@@ -21,6 +21,16 @@ abstract class BackupDatabaseAdapter {
   });
   Future<String> get databasePath;
   AppDatabase get database;
+
+  /// The live database's SQLCipher key, or null when database password
+  /// protection is off (the overwhelmingly common case).
+  ///
+  /// Needed only to deep-check a `BackupType.preMigration` artifact, which is
+  /// a raw byte copy of the live file and is therefore SQLCipher ciphertext
+  /// exactly when the live database is. Every other backup kind is a portable
+  /// plaintext export and must keep failing validation loudly if it looks
+  /// encrypted.
+  String? get databaseKeyHex;
 }
 
 /// Default adapter that delegates to [DatabaseService.instance].
@@ -50,6 +60,9 @@ class DefaultBackupDatabaseAdapter implements BackupDatabaseAdapter {
 
   @override
   AppDatabase get database => _dbAdapter.database;
+
+  @override
+  String? get databaseKeyHex => _dbAdapter.databaseKeyHex;
 }
 
 // coverage:ignore-end

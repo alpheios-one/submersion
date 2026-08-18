@@ -670,6 +670,10 @@ class _StartupWrapperState extends State<StartupWrapper>
         fallbackBackupsDirProvider:
             BackupService.resolveDefaultBackupsDirectory,
         preferences: prefs,
+        // The security gate has already run, so this is the live key when
+        // protection is on. Needed only to open the database for the
+        // pre-copy WAL checkpoint.
+        databaseKeyHexProvider: () => DatabaseService.instance.databaseKeyHex,
       );
     }
 

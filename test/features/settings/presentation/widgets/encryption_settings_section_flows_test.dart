@@ -152,6 +152,9 @@ class _NoopBackupAdapter implements BackupDatabaseAdapter {
   Future<String> get databasePath async => '/noop';
   @override
   AppDatabase get database => throw UnimplementedError();
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 class _RecordingBackupService extends BackupService {

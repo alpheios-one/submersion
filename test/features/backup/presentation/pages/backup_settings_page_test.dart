@@ -672,6 +672,9 @@ class _FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
   @override
   AppDatabase get database =>
       throw UnimplementedError('Fake does not support direct queries');
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 /// BackupService override recording restore calls so page-level wiring can be
@@ -686,8 +689,10 @@ class _RecordingRestoreService extends BackupService {
   });
 
   @override
-  Future<BackupValidationResult> validateBackupFile(String filePath) async =>
-      const BackupValidationResult.valid(sizeBytes: 1);
+  Future<BackupValidationResult> validateBackupFile(
+    String filePath, {
+    bool allowLiveDatabaseEncryption = false,
+  }) async => const BackupValidationResult.valid(sizeBytes: 1);
 
   @override
   Future<void> restoreFromBackup(

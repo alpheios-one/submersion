@@ -31,6 +31,9 @@ class _NoopAdapter implements BackupDatabaseAdapter {
 
   @override
   AppDatabase get database => throw UnimplementedError();
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 /// Hands back a real temp artifact so the test can prove it is streamed and
