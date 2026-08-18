@@ -7225,6 +7225,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_travelGas => '也用作过渡气';
+
+  @override
   String divePlanner_field_volume(Object volumeSymbol) {
     return '容积 ($volumeSymbol)';
   }
@@ -12617,6 +12620,11 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String plannerCanvas_contingency_lostGas(String gas) {
     return '失去 $gas';
+  }
+
+  @override
+  String plannerCanvas_contingency_previewing(String label) {
+    return '预览：$label';
   }
 
   @override
@@ -23382,6 +23390,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => '添加到预期物种';
+
+  @override
+  String reef_species_showAll(int count) {
+    return '显示全部 $count 项';
+  }
+
+  @override
+  String get reef_species_showFewer => '显示较少';
 
   @override
   String get reef_attribution_title => '珊瑚礁数据来源';

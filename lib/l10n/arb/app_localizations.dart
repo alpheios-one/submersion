@@ -12829,6 +12829,12 @@ abstract class AppLocalizations {
   /// **'Start ({pressureSymbol})'**
   String divePlanner_field_startPressure(Object pressureSymbol);
 
+  /// No description provided for @divePlanner_field_travelGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Also used as travel gas'**
+  String get divePlanner_field_travelGas;
+
   /// No description provided for @divePlanner_field_volume.
   ///
   /// In en, this message translates to:
@@ -22361,6 +22367,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lost {gas}'**
   String plannerCanvas_contingency_lostGas(String gas);
+
+  /// No description provided for @plannerCanvas_contingency_previewing.
+  ///
+  /// In en, this message translates to:
+  /// **'Previewing: {label}'**
+  String plannerCanvas_contingency_previewing(String label);
 
   /// No description provided for @plannerCanvas_contingency_timeDelta.
   ///
@@ -41025,6 +41037,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add to expected species'**
   String get reef_species_addToExpected;
+
+  /// Expands the capped nearby-species chip list to its full length
+  ///
+  /// In en, this message translates to:
+  /// **'Show all {count}'**
+  String reef_species_showAll(int count);
+
+  /// Collapses the nearby-species chip list back to its capped length
+  ///
+  /// In en, this message translates to:
+  /// **'Show fewer'**
+  String get reef_species_showFewer;
 
   /// No description provided for @reef_attribution_title.
   ///

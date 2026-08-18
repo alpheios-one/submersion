@@ -18,7 +18,7 @@ import 'package:submersion/features/reef/domain/services/species_catalog_matcher
 SpeciesCatalogMatcher _matcher() => SpeciesCatalogMatcher.fromJsonString(
   jsonEncode({
     'speciesKeys': <String, String>{},
-    'orderKeys': [587],
+    'taxonKeys': [587],
   }),
 );
 

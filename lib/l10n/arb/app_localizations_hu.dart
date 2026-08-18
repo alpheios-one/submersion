@@ -7567,6 +7567,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_travelGas => 'Utazógázként is használva';
+
+  @override
   String divePlanner_field_volume(Object volumeSymbol) {
     return 'Térfogat ($volumeSymbol)';
   }
@@ -13171,6 +13174,11 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String plannerCanvas_contingency_lostGas(String gas) {
     return '$gas elveszett';
+  }
+
+  @override
+  String plannerCanvas_contingency_previewing(String label) {
+    return 'Előnézet: $label';
   }
 
   @override
@@ -24526,6 +24534,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'Hozzáadás a várható fajokhoz';
+
+  @override
+  String reef_species_showAll(int count) {
+    return 'Mind a(z) $count megjelenítése';
+  }
+
+  @override
+  String get reef_species_showFewer => 'Kevesebb megjelenítése';
 
   @override
   String get reef_attribution_title => 'Zátony adatforrásai';

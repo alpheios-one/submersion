@@ -7450,6 +7450,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_travelGas => 'Also used as travel gas';
+
+  @override
   String divePlanner_field_volume(Object volumeSymbol) {
     return 'Volume ($volumeSymbol)';
   }
@@ -12996,6 +12999,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String plannerCanvas_contingency_lostGas(String gas) {
     return 'Lost $gas';
+  }
+
+  @override
+  String plannerCanvas_contingency_previewing(String label) {
+    return 'Previewing: $label';
   }
 
   @override
@@ -24197,6 +24205,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'Add to expected species';
+
+  @override
+  String reef_species_showAll(int count) {
+    return 'Show all $count';
+  }
+
+  @override
+  String get reef_species_showFewer => 'Show fewer';
 
   @override
   String get reef_attribution_title => 'Reef data sources';

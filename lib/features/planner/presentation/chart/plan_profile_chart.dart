@@ -213,7 +213,7 @@ class _PlanProfileChartState extends ConsumerState<PlanProfileChart> {
   @override
   Widget build(BuildContext context) {
     final series = ref.watch(planCanvasSeriesProvider);
-    final ghost = ref.watch(deviationGhostSeriesProvider);
+    final ghost = ref.watch(contingencyGhostSeriesProvider);
     final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);

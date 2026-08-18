@@ -224,21 +224,29 @@ never reach an existing installation. Prices are also personal and regional.
 Leaving the seed alone keeps its positional column list and the
 characterization test in `service_ledger_schema_test.dart` intact.
 
-**Migration v156.** A PRAGMA guarded `_assertServiceCostColumns()` helper
+**Migration v157.** A PRAGMA guarded `_assertServiceCostColumns()` helper
 modeled on `_assertO2CellMillivoltColumns` (`database.dart:4718`), with the
 early return on `cols.isEmpty` that minimal test fixtures require. Registered
 in three places, per house convention:
 
-1. `currentSchemaVersion = 156` (`database.dart:3072`)
-2. `156,` appended to `migrationVersions` with a comment (`:3283-3293`)
-3. the `if (from < 156) { ... }` plus `if (from < 156) await reportProgress();`
+1. `currentSchemaVersion = 157` (`database.dart:3072`)
+2. `157,` appended to `migrationVersions` with a comment (`:3283-3293`)
+3. the `if (from < 157) { ... }` plus `if (from < 157) await reportProgress();`
    pair in `onUpgrade` (`:8074-8093`), and the `beforeOpen` backstop (`:8241`)
 
 Main was at 153 when this was written. It has since taken 154 (#1104 site
-entry/exit method) and 155 (#828 gas model), so this migration renumbered to
-**156** on merging main. The floor
-(`minimumCompatibleSchemaVersion`) stays at 137: these are new nullable
-columns, which that constant's docstring explicitly excludes from raising it.
+entry/exit method), 155 (#828 gas model) and 156 (#1127 travel gas), so this
+migration renumbered twice and landed on **157**.
+
+The second collision was the dangerous kind. Both sides had independently
+written `currentSchemaVersion = 156`, so git auto-merged that line with **no
+conflict marker** while the two 156s meant different migrations; only the
+comment blocks around the ladder entries conflicted. Re-grep the scalar after
+every schema merge rather than trusting the absence of markers.
+
+The floor (`minimumCompatibleSchemaVersion`) stays at 137: these are new
+nullable columns, which that constant's docstring explicitly excludes from
+raising it.
 
 **Sync requires no serializer changes.** `sync_data_serializer.dart` routes
 these tables through Drift's generated `toJson()`/`fromJson()`, so
@@ -321,7 +329,7 @@ New keys, all eleven locales in `lib/l10n/arb/`:
 
 | Area | Test |
 | --- | --- |
-| Migration | `test/core/database/migration_v156_service_cost_test.dart`, on the four-test `migration_v153_o2_cell_mv_test.dart` template: columns added preserving rows, ladder membership, idempotency when a column already exists, no-op when the table is absent |
+| Migration | `test/core/database/migration_v157_service_cost_test.dart`, on the four-test `migration_v153_o2_cell_mv_test.dart` template: columns added preserving rows, ladder membership, idempotency when a column already exists, no-op when the table is absent |
 | Entities | `copyWith` clears `defaultCost`/`defaultCurrency` to null via the `_undefined` sentinel |
 | Sync | new keys round-trip in `test/core/services/sync/service_ledger_sync_test.dart` |
 | Seed | `service_ledger_schema_test.dart` gains an assertion that built-in kinds have null `defaultCost` |
@@ -352,7 +360,7 @@ One PR, four ordered commits:
    `ServiceType`; retitle the row with the kind name; move cost out of
    `trailing`; render notes and next due.
 2. Add the filter.
-3. Add `defaultCost`/`defaultCurrency`, migration v156, entity and repository
+3. Add `defaultCost`/`defaultCurrency`, migration v157, entity and repository
    plumbing, editor fields, and the prefill chain.
 4. Add the Excel maintenance log and its entry points.
 

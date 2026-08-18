@@ -6,10 +6,10 @@ import 'package:submersion/core/database/database.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('v156 adds default cost columns, preserving rows', () async {
+  test('v157 adds default cost columns, preserving rows', () async {
     final native = NativeDatabase.memory(
       setup: (db) {
-        db.execute('PRAGMA user_version = 155');
+        db.execute('PRAGMA user_version = 156');
         db.execute('''
           CREATE TABLE service_kinds (
             id TEXT NOT NULL PRIMARY KEY,
@@ -55,15 +55,15 @@ void main() {
     expect(row.read<double?>('default_cost'), isNull);
   });
 
-  test('migration list includes v156 and schema is at least 156', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(156));
-    expect(AppDatabase.migrationVersions, contains(156));
+  test('migration list includes v157 and schema is at least 157', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(157));
+    expect(AppDatabase.migrationVersions, contains(157));
   });
 
-  test('v156 is idempotent when a column already exists', () async {
+  test('v157 is idempotent when a column already exists', () async {
     final native = NativeDatabase.memory(
       setup: (db) {
-        db.execute('PRAGMA user_version = 155');
+        db.execute('PRAGMA user_version = 156');
         db.execute('''
           CREATE TABLE service_schedules (
             id TEXT NOT NULL PRIMARY KEY,
@@ -96,7 +96,7 @@ void main() {
 
   test('the helper no-ops when the tables are absent', () async {
     final native = NativeDatabase.memory(
-      setup: (db) => db.execute('PRAGMA user_version = 155'),
+      setup: (db) => db.execute('PRAGMA user_version = 156'),
     );
     final db = AppDatabase(native);
     addTearDown(db.close);

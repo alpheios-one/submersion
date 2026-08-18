@@ -11,7 +11,7 @@ import 'package:submersion/features/reef/domain/services/species_catalog_matcher
 SpeciesCatalogMatcher _matcher() => SpeciesCatalogMatcher.fromJsonString(
   jsonEncode({
     'speciesKeys': {'2384460': 'sp_sixbar_wrasse', '5231676': 'sp_star_coral'},
-    'orderKeys': [587, 1362],
+    'taxonKeys': [587, 1362],
   }),
 );
 
@@ -200,6 +200,63 @@ void main() {
         matcher: _matcher(),
       ).fetch(const GeoPoint(1, 2));
       expect(result.status, ReefDataStatus.unavailable);
+    });
+
+    // Issue #1036: a land plant led the list at a German quarry. Araceae sits
+    // under Alismatales beside the seagrasses, so the taxon whitelist cannot
+    // exclude it and the resolved family has to.
+    test('drops terrestrial families that share an aquatic order', () async {
+      const families = {'901': 'Araceae', '902': 'Potamogetonaceae'};
+      const names = {'901': 'Arum maculatum', '902': 'Zannichellia palustris'};
+
+      final client = MockClient((request) async {
+        final key = request.url.pathSegments.last;
+        if (request.url.path.startsWith('/v1/species/')) {
+          return http.Response(
+            jsonEncode({'scientificName': names[key], 'family': families[key]}),
+            200,
+          );
+        }
+        return http.Response(
+          _facetBody([
+            ['901', 15],
+            ['902', 4],
+          ]),
+          200,
+        );
+      });
+
+      final result = await NearbySpeciesService(
+        client: client,
+        matcher: _matcher(),
+      ).fetch(const GeoPoint(51.640, 6.430));
+
+      expect(result.status, ReefDataStatus.ok);
+      expect(result.value!.unmatchedNames, ['Zannichellia palustris']);
+    });
+
+    test('keeps records whose family GBIF does not report', () async {
+      final client = MockClient((request) async {
+        if (request.url.path.startsWith('/v1/species/')) {
+          return http.Response(
+            jsonEncode({'scientificName': 'Aplysina archeri'}),
+            200,
+          );
+        }
+        return http.Response(
+          _facetBody([
+            ['901', 15],
+          ]),
+          200,
+        );
+      });
+
+      final result = await NearbySpeciesService(
+        client: client,
+        matcher: _matcher(),
+      ).fetch(const GeoPoint(1, 2));
+
+      expect(result.value!.unmatchedNames, ['Aplysina archeri']);
     });
   });
 }

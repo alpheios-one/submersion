@@ -3207,11 +3207,17 @@ class DiveRepository {
       tankPressuresByTankId.putIfAbsent(p.tankId, () => []).add(p);
     }
 
-    // Get profile for this dive
+    // Get profile for this dive. Every source is kept; only the originals a
+    // saved profile edit superseded are dropped (see
+    // [_dropSupersededOriginals]). [getMergedProfile] mirrors this query and
+    // the two must stay in step.
     final profileQuery = _db.select(_db.diveProfiles)
       ..where((t) => t.diveId.equals(row.id))
       ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]);
-    final profileRows = await profileQuery.get();
+    final profileRows = await _dropSupersededOriginals(
+      row.id,
+      await profileQuery.get(),
+    );
 
     // Get equipment for this dive
     final equipmentQuery = _db.select(_db.diveEquipment).join([
@@ -4430,24 +4436,102 @@ class DiveRepository {
   }
 
   /// All profile samples for [diveId] across every source, ordered by
-  /// timestamp (one SQL statement). Matches the shape of `Dive.profile`.
+  /// timestamp (one SQL statement, two for an edited dive). Matches the shape
+  /// of `Dive.profile`.
   ///
-  /// Deliberately unfiltered, mirroring the `profileRows` query in
-  /// [getDiveById]: [getDiveForAnalysis] must feed the analysis pipeline the
-  /// exact same samples the pre-WS2 `diveProvider` -> `getDiveById` path did,
-  /// which the parity test locks in. This is intentionally NOT the
-  /// `isPrimary`-filtered view used by [getDiveProfile] /
-  /// [getProfilesByDataSource]: for an edited dive it still returns the demoted
-  /// originals alongside the edited rows, exactly as [getDiveById] does. Any
-  /// change to that merge semantics (e.g. dropping demoted originals) must be
-  /// made in both places together, and measured, rather than diverging here.
+  /// Every source is kept -- this is NOT the `isPrimary`-filtered view used by
+  /// [getDiveProfile] -- except for the originals a profile edit superseded,
+  /// which [_dropSupersededOriginals] removes. It mirrors the `profileRows`
+  /// query in [getDiveById] exactly: [getDiveForAnalysis] must feed the
+  /// analysis pipeline the same samples the `diveProvider` -> [getDiveById]
+  /// path shows, which the parity test locks in. Any change to that merge
+  /// semantics must be made in both places together rather than diverging
+  /// here.
   Future<List<domain.DiveProfilePoint>> getMergedProfile(String diveId) async {
-    final rows =
-        await (_db.select(_db.diveProfiles)
-              ..where((t) => t.diveId.equals(diveId))
-              ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
-            .get();
+    final rows = await _dropSupersededOriginals(
+      diveId,
+      await (_db.select(_db.diveProfiles)
+            ..where((t) => t.diveId.equals(diveId))
+            ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+          .get(),
+    );
     return _dropDuplicateSamples(rows).map(_profilePointFromRow).toList();
+  }
+
+  /// Drops the originals that a saved profile edit superseded.
+  ///
+  /// [saveEditedProfile] does not delete the rows it replaces: it demotes them
+  /// to `isPrimary = false` and inserts the edited samples as the new primary,
+  /// so [restoreOriginalProfile] can put them back. A read that returns both
+  /// sets shows the union of the two profiles, which makes a deletion-shaped
+  /// edit look like it never saved -- the reported symptom of the "Trim End"
+  /// bug (#1161), where the trimmed tail reappeared from the demoted rows.
+  ///
+  /// Only the primary source's family is affected. A row belongs to it when
+  /// its computerId is null (the schema convention for primary/manual/edited
+  /// rows) or matches the primary data source's computer; a secondary
+  /// computer's rows are ALWAYS demoted and must never be mistaken for
+  /// superseded originals. This is the same rule
+  /// [getProfilesByDataSource] applies to the grouped view.
+  ///
+  /// The `dive_data_sources` lookup only runs when a demoted row actually
+  /// carries a computerId, so the common shapes -- an unedited single-source
+  /// dive (every row primary) and an edited file import (demoted rows all
+  /// null-computerId) -- add no query at all.
+  Future<List<DiveProfile>> _dropSupersededOriginals(
+    String diveId,
+    List<DiveProfile> rows,
+  ) async {
+    // An edit leaves both demoted and promoted rows behind. Either one missing
+    // means there is nothing to supersede: an untouched dive, or one
+    // setPrimaryDataSource stranded with no primary rows at all.
+    if (!rows.any((r) => !r.isPrimary) || !rows.any((r) => r.isPrimary)) {
+      return rows;
+    }
+
+    String? primaryComputerId;
+    var everyRowIsFamily = false;
+    if (rows.any((r) => !r.isPrimary && r.computerId != null)) {
+      final primary = await _primarySourceComputer(diveId);
+      primaryComputerId = primary.computerId;
+      // With no dive_data_sources row there is a single conceptual source, so
+      // any demoted row can only be an edit leftover -- the same reading
+      // getProfilesByDataSource's no-source fallback takes.
+      everyRowIsFamily = !primary.hasSources;
+    }
+
+    bool isPrimaryFamily(DiveProfile r) =>
+        everyRowIsFamily ||
+        r.computerId == null ||
+        r.computerId == primaryComputerId;
+
+    final family = rows.where(isPrimaryFamily);
+    final hasEditedProfile =
+        family.any((r) => r.isPrimary) && family.any((r) => !r.isPrimary);
+    if (!hasEditedProfile) return rows;
+
+    return [
+      for (final row in rows)
+        if (row.isPrimary || !isPrimaryFamily(row)) row,
+    ];
+  }
+
+  /// The computer owning [diveId]'s primary data source, and whether the dive
+  /// has any `dive_data_sources` rows to read that from.
+  Future<({bool hasSources, String? computerId})> _primarySourceComputer(
+    String diveId,
+  ) async {
+    final sourceRows = _canonicalDataSourceRows(
+      await (_db.select(_db.diveDataSources)
+            ..where((t) => t.diveId.equals(diveId))
+            ..orderBy([
+              (t) => OrderingTerm.desc(t.isPrimary),
+              (t) => OrderingTerm.asc(t.createdAt),
+            ]))
+          .get(),
+    );
+    if (sourceRows.isEmpty) return (hasSources: false, computerId: null);
+    return (hasSources: true, computerId: sourceRows.first.computerId);
   }
 
   /// Drops rows that repeat a sample already seen, comparing every column

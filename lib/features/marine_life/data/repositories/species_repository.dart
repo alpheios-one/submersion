@@ -37,6 +37,13 @@ class SpeciesRepository {
   Stream<void> watchSightingChanges() =>
       _db.tableUpdates(TableUpdateQuery.onTable(_db.sightings));
 
+  /// Emits whenever the `site_species` table changes, which is where a site's
+  /// expected species live. Curating that list never touches `species`, so
+  /// [watchSpeciesChanges] alone leaves the expected list stale after an add
+  /// or a remove.
+  Stream<void> watchSiteSpeciesChanges() =>
+      _db.tableUpdates(TableUpdateQuery.onTable(_db.siteSpecies));
+
   /// Get species by category
   Future<List<domain.Species>> getSpeciesByCategory(
     SpeciesCategory category,

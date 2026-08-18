@@ -7398,6 +7398,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_travelGas => 'משמש גם כגז מעבר';
+
+  @override
   String divePlanner_field_volume(Object volumeSymbol) {
     return 'נפח ($volumeSymbol)';
   }
@@ -12891,6 +12894,11 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String plannerCanvas_contingency_lostGas(String gas) {
     return 'אבדן $gas';
+  }
+
+  @override
+  String plannerCanvas_contingency_previewing(String label) {
+    return 'תצוגה מקדימה: $label';
   }
 
   @override
@@ -23999,6 +24007,14 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'הוספה למינים צפויים';
+
+  @override
+  String reef_species_showAll(int count) {
+    return 'הצג הכול ($count)';
+  }
+
+  @override
+  String get reef_species_showFewer => 'הצג פחות';
 
   @override
   String get reef_attribution_title => 'מקורות נתוני השונית';

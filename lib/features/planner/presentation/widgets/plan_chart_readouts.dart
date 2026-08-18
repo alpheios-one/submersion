@@ -22,7 +22,7 @@ class PlanChartReadouts extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final outcome = ref.watch(planOutcomeProvider);
+    final outcome = ref.watch(activePlanOutcomeProvider);
     final cnsThreshold = ref.watch(cnsWarningThresholdProvider);
     final theme = Theme.of(context);
 
