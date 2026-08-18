@@ -535,4 +535,85 @@ void main() {
       expect(pressures.map((p) => p.id).toSet(), {'tp-a', 'tp-b'});
     });
   });
+
+  group('same-computer provenance (#1045)', () {
+    /// Stamps [diveId]'s seeded data source row with a shared [computerId]
+    /// and payloads unique to that download, mirroring what a real
+    /// dive-computer download writes for each half of a split pair.
+    Future<void> stampSource(
+      String diveId, {
+      required String computerId,
+      required String sourceUuid,
+      required int fingerprintByte,
+    }) async {
+      await (db.update(
+        db.diveDataSources,
+      )..where((t) => t.diveId.equals(diveId))).write(
+        DiveDataSourcesCompanion(
+          computerId: Value(computerId),
+          sourceUuid: Value(sourceUuid),
+          rawFingerprint: Value(Uint8List.fromList([fingerprintByte])),
+          rawData: Value(Uint8List.fromList([fingerprintByte, 0xFF])),
+        ),
+      );
+    }
+
+    test(
+      'both source rows survive the merge with their own raw payloads, while '
+      'the read side collapses them to one canonical source',
+      () async {
+        await seedDive(
+          'a',
+          entry: DateTime.utc(2026, 7, 1, 9),
+          computerId: 'comp-1',
+        );
+        await seedDive(
+          'b',
+          entry: DateTime.utc(2026, 7, 1, 10),
+          computerId: 'comp-1',
+        );
+        await stampSource(
+          'a',
+          computerId: 'comp-1',
+          sourceUuid: 'uuid-a',
+          fingerprintByte: 0xA1,
+        );
+        await stampSource(
+          'b',
+          computerId: 'comp-1',
+          sourceUuid: 'uuid-b',
+          fingerprintByte: 0xB2,
+        );
+
+        final outcome = await service.apply(['a', 'b']);
+        final mergedId = outcome.mergedDive.id;
+
+        // Both rows are carried. They share a computerId but are NOT
+        // duplicates: each is the only surviving copy of one download's
+        // rawData / rawFingerprint / sourceUuid, since step 13 deletes the
+        // originals. Collapsing them here would destroy that half's bytes.
+        final rows = await (db.select(
+          db.diveDataSources,
+        )..where((t) => t.diveId.equals(mergedId))).get();
+        expect(rows, hasLength(2));
+        expect(rows.every((r) => r.computerId == 'comp-1'), isTrue);
+        expect(rows.map((r) => r.sourceUuid).toSet(), {'uuid-a', 'uuid-b'});
+        expect(rows.map((r) => r.rawFingerprint?.first).toSet(), {0xA1, 0xB2});
+        // ReparseService.getSourcesForDiveReparse selects on rawData, so
+        // both halves stay re-parseable after a libdivecomputer upgrade.
+        expect(rows.where((r) => r.rawData != null), hasLength(2));
+
+        // The import duplicate checker unions keys across ALL rows: a
+        // re-download of EITHER half must still resolve as a duplicate of
+        // the merged dive rather than landing as a new dive.
+        final keys = await diveRepo.getSourceKeysByDiveId();
+        expect(keys[mergedId], containsAll(<String>{'uuid-a', 'uuid-b'}));
+
+        // Read side: one computer, one chip. The duplicate is a display
+        // concern, canonicalized on read (#1005), not a storage defect.
+        final canonical = await diveRepo.getDataSources(mergedId);
+        expect(canonical, hasLength(1));
+      },
+    );
+  });
 }
