@@ -62,7 +62,6 @@ class DiveSite extends Equatable {
 
   /// Typical way out of the water at this site. Null means "same as entry".
   final EntryMethod? exitMethod;
-  final SiteConditions? conditions;
   final bool isShared;
 
   const DiveSite({
@@ -90,7 +89,6 @@ class DiveSite extends Equatable {
     this.altitude,
     this.entryMethod,
     this.exitMethod,
-    this.conditions,
     this.isShared = false,
   });
 
@@ -156,7 +154,6 @@ class DiveSite extends Equatable {
     double? altitude,
     EntryMethod? entryMethod,
     EntryMethod? exitMethod,
-    SiteConditions? conditions,
     bool? isShared,
   }) {
     return DiveSite(
@@ -184,7 +181,6 @@ class DiveSite extends Equatable {
       altitude: altitude ?? this.altitude,
       entryMethod: entryMethod ?? this.entryMethod,
       exitMethod: exitMethod ?? this.exitMethod,
-      conditions: conditions ?? this.conditions,
       isShared: isShared ?? this.isShared,
     );
   }
@@ -215,7 +211,6 @@ class DiveSite extends Equatable {
     altitude,
     entryMethod,
     exitMethod,
-    conditions,
     isShared,
   ];
 }
@@ -233,36 +228,4 @@ class GeoPoint extends Equatable {
   @override
   String toString() =>
       '${latitude.toStringAsFixed(6)}, ${longitude.toStringAsFixed(6)}';
-}
-
-/// Typical conditions at a dive site
-class SiteConditions extends Equatable {
-  final String? waterType; // salt, fresh, brackish
-  final String? typicalVisibility;
-  final String? typicalCurrent;
-  final String? bestSeason;
-  final double? minTemp; // celsius
-  final double? maxTemp; // celsius
-  final String? entryType; // shore, boat
-
-  const SiteConditions({
-    this.waterType,
-    this.typicalVisibility,
-    this.typicalCurrent,
-    this.bestSeason,
-    this.minTemp,
-    this.maxTemp,
-    this.entryType,
-  });
-
-  @override
-  List<Object?> get props => [
-    waterType,
-    typicalVisibility,
-    typicalCurrent,
-    bestSeason,
-    minTemp,
-    maxTemp,
-    entryType,
-  ];
 }

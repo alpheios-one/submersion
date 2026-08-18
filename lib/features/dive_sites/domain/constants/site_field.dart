@@ -533,9 +533,11 @@ class SiteFieldAdapter extends EntityFieldAdapter<SiteWithCount, SiteField> {
       case SiteField.waterType:
         return site.waterType?.displayName;
       case SiteField.typicalVisibility:
-        return site.conditions?.typicalVisibility;
       case SiteField.typicalCurrent:
-        return site.conditions?.typicalCurrent;
+        // No backing column. These members are retained because saved table
+        // layouts reference them by name, so removing them would throw on
+        // load. They render blank until a real column exists.
+        return null;
       case SiteField.difficulty:
         return site.difficulty;
       case SiteField.entryType:
@@ -543,7 +545,8 @@ class SiteFieldAdapter extends EntityFieldAdapter<SiteWithCount, SiteField> {
       case SiteField.exitMethod:
         return site.exitMethod?.displayName;
       case SiteField.bestSeason:
-        return site.conditions?.bestSeason;
+        // No backing column; retained for saved-layout compatibility.
+        return null;
       case SiteField.mooringNumber:
         return site.mooringNumber;
       case SiteField.hazards:
