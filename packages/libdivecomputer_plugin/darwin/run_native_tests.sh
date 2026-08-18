@@ -79,3 +79,14 @@ swiftc -o "$BUILD_DIR/ftdi_protocol_tests" \
     Tests/FtdiProtocolTests/main.swift
 
 "$BUILD_DIR/ftdi_protocol_tests"
+
+# FTDI bulk-IN read accumulation (issue #732). libdivecomputer's contract is
+# "exactly N bytes or timeout"; FTDI packets add a two-byte status header on
+# top of the USB chunking that broke issue #334. A scripted packet source
+# stands in for the USB pipe.
+swiftc -o "$BUILD_DIR/ftdi_read_accumulator_tests" \
+    Sources/LibDCDarwin/FtdiProtocol.swift \
+    Sources/LibDCDarwin/FtdiReadAccumulator.swift \
+    Tests/FtdiReadAccumulatorTests/main.swift
+
+"$BUILD_DIR/ftdi_read_accumulator_tests"
