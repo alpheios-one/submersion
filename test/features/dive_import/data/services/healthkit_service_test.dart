@@ -4,6 +4,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:submersion/features/dive_import/data/services/healthkit_service.dart';
 import 'package:submersion/features/dive_import/domain/entities/imported_dive.dart';
+import 'package:submersion/features/dive_import/domain/services/health_import_service.dart';
 
 @GenerateMocks([Health])
 import 'healthkit_service_test.mocks.dart';
@@ -25,30 +26,97 @@ void main() {
     });
 
     group('isAvailable', () {
-      test('returns false when hasPermissions throws', () async {
+      test('reports platform capability, not permission state', () async {
+        expect(await service.isAvailable(), isTrue);
+        expect(
+          await HealthKitService(
+            health: mockHealth,
+            isPlatformSupported: false,
+          ).isAvailable(),
+          isFalse,
+        );
+        verifyNever(mockHealth.hasPermissions(any));
+      });
+    });
+
+    group('permissionStatus', () {
+      test('is undetermined when the platform will not say', () async {
+        // iOS never discloses read access; the plugin returns null.
         when(
-          mockHealth.hasPermissions(any),
-        ).thenThrow(Exception('Not available'));
+          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
+        ).thenAnswer((_) async => null);
 
-        final result = await service.isAvailable();
-
-        expect(result, isFalse);
+        expect(
+          await service.permissionStatus(),
+          equals(HealthPermissionStatus.undetermined),
+        );
       });
 
-      test('returns false when hasPermissions returns null', () async {
-        when(mockHealth.hasPermissions(any)).thenAnswer((_) async => null);
+      test('is undetermined when the probe throws', () async {
+        when(
+          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
+        ).thenThrow(Exception('Error'));
 
-        final result = await service.isAvailable();
-
-        expect(result, isFalse);
+        expect(
+          await service.permissionStatus(),
+          equals(HealthPermissionStatus.undetermined),
+        );
       });
 
-      test('returns true when hasPermissions returns true', () async {
-        when(mockHealth.hasPermissions(any)).thenAnswer((_) async => true);
+      test('is granted when the platform confirms access', () async {
+        when(
+          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
+        ).thenAnswer((_) async => true);
 
-        final result = await service.isAvailable();
+        expect(
+          await service.permissionStatus(),
+          equals(HealthPermissionStatus.granted),
+        );
+      });
 
-        expect(result, isTrue);
+      test('is denied when the platform refuses access', () async {
+        when(
+          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
+        ).thenAnswer((_) async => false);
+
+        expect(
+          await service.permissionStatus(),
+          equals(HealthPermissionStatus.denied),
+        );
+      });
+
+      test('is unsupported off Apple platforms', () async {
+        final offPlatform = HealthKitService(
+          health: mockHealth,
+          isPlatformSupported: false,
+        );
+
+        expect(
+          await offPlatform.permissionStatus(),
+          equals(HealthPermissionStatus.unsupported),
+        );
+      });
+
+      test('probes only types available on every supported iOS', () async {
+        when(
+          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
+        ).thenAnswer((_) async => null);
+
+        await service.permissionStatus();
+
+        // UNDERWATER_DEPTH is iOS 16+, and the plugin reports an unknown type
+        // as an outright denial, so probing with it would make every older
+        // device look permanently denied.
+        final probed =
+            verify(
+                  mockHealth.hasPermissions(
+                    captureAny,
+                    permissions: anyNamed('permissions'),
+                  ),
+                ).captured.single
+                as List<HealthDataType>;
+        expect(probed, isNot(contains(HealthDataType.UNDERWATER_DEPTH)));
+        expect(probed, isNot(contains(HealthDataType.WATER_TEMPERATURE)));
       });
     });
 
@@ -106,6 +174,36 @@ void main() {
         ).called(1);
       });
 
+      test('asks for the dive-specific data types', () async {
+        when(mockHealth.configure()).thenAnswer((_) async {});
+        when(
+          mockHealth.requestAuthorization(
+            any,
+            permissions: anyNamed('permissions'),
+          ),
+        ).thenAnswer((_) async => true);
+
+        await service.requestPermissions();
+
+        final requested =
+            verify(
+                  mockHealth.requestAuthorization(
+                    captureAny,
+                    permissions: anyNamed('permissions'),
+                  ),
+                ).captured.single
+                as List<HealthDataType>;
+        expect(
+          requested,
+          containsAll([
+            HealthDataType.WORKOUT,
+            HealthDataType.HEART_RATE,
+            HealthDataType.UNDERWATER_DEPTH,
+            HealthDataType.WATER_TEMPERATURE,
+          ]),
+        );
+      });
+
       test('returns false when configure throws', () async {
         when(mockHealth.configure()).thenThrow(Exception('Error'));
 
@@ -130,10 +228,73 @@ void main() {
     });
 
     group('fetchDives', () {
-      test('returns empty list when no permissions', () async {
+      /// Stub every per-type query the service issues.
+      void stubReads({
+        List<HealthDataPoint> workouts = const [],
+        List<HealthDataPoint> depth = const [],
+        List<HealthDataPoint> temperature = const [],
+        List<HealthDataPoint> heartRate = const [],
+      }) {
+        final byType = {
+          HealthDataType.WORKOUT: workouts,
+          HealthDataType.UNDERWATER_DEPTH: depth,
+          HealthDataType.WATER_TEMPERATURE: temperature,
+          HealthDataType.HEART_RATE: heartRate,
+        };
+        for (final entry in byType.entries) {
+          when(
+            mockHealth.getHealthDataFromTypes(
+              types: [entry.key],
+              startTime: anyNamed('startTime'),
+              endTime: anyNamed('endTime'),
+            ),
+          ).thenAnswer((_) async => entry.value);
+        }
+      }
+
+      void stubStatus(bool? probeResult) {
         when(
           mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
-        ).thenAnswer((_) async => false);
+        ).thenAnswer((_) async => probeResult);
+      }
+
+      test('fetches dives when the platform will not disclose access', () async {
+        // Regression for #1128: iOS never confirms read access, and gating the
+        // fetch on that non-answer made Apple Watch import always come back
+        // empty.
+        stubStatus(null);
+        stubReads(
+          workouts: [
+            _workoutPoint(
+              uuid: 'dive-uuid-123',
+              startTime: DateTime(2024, 1, 15, 9, 0),
+              endTime: DateTime(2024, 1, 15, 10, 0),
+              activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+            ),
+          ],
+        );
+
+        final result = await service.fetchDives(
+          startDate: DateTime(2024, 1, 1),
+          endDate: DateTime(2024, 1, 31),
+        );
+
+        expect(result, hasLength(1));
+        expect(result.first.sourceId, equals('dive-uuid-123'));
+      });
+
+      test('returns empty list when the platform refuses access', () async {
+        stubStatus(false);
+        stubReads(
+          workouts: [
+            _workoutPoint(
+              uuid: 'dive-uuid-123',
+              startTime: DateTime(2024, 1, 15, 9, 0),
+              endTime: DateTime(2024, 1, 15, 10, 0),
+              activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+            ),
+          ],
+        );
 
         final result = await service.fetchDives(
           startDate: DateTime(2024, 1, 1),
@@ -141,15 +302,35 @@ void main() {
         );
 
         expect(result, isEmpty);
-      });
-
-      test('returns empty list when getHealthDataFromTypes throws', () async {
-        when(
-          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
-        ).thenAnswer((_) async => true);
-        when(
+        verifyNever(
           mockHealth.getHealthDataFromTypes(
             types: anyNamed('types'),
+            startTime: anyNamed('startTime'),
+            endTime: anyNamed('endTime'),
+          ),
+        );
+      });
+
+      test('returns empty list off Apple platforms', () async {
+        final offPlatform = HealthKitService(
+          health: mockHealth,
+          isPlatformSupported: false,
+        );
+
+        final result = await offPlatform.fetchDives(
+          startDate: DateTime(2024, 1, 1),
+          endDate: DateTime(2024, 1, 31),
+        );
+
+        expect(result, isEmpty);
+      });
+
+      test('returns empty list when the workout query throws', () async {
+        stubStatus(true);
+        stubReads();
+        when(
+          mockHealth.getHealthDataFromTypes(
+            types: [HealthDataType.WORKOUT],
             startTime: anyNamed('startTime'),
             endTime: anyNamed('endTime'),
           ),
@@ -164,16 +345,8 @@ void main() {
       });
 
       test('returns empty list when no diving workouts found', () async {
-        when(
-          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
-        ).thenAnswer((_) async => true);
-        when(
-          mockHealth.getHealthDataFromTypes(
-            types: anyNamed('types'),
-            startTime: anyNamed('startTime'),
-            endTime: anyNamed('endTime'),
-          ),
-        ).thenAnswer((_) async => []);
+        stubStatus(true);
+        stubReads();
 
         final result = await service.fetchDives(
           startDate: DateTime(2024, 1, 1),
@@ -184,23 +357,17 @@ void main() {
       });
 
       test('filters out non-diving workouts', () async {
-        final runningWorkout = _createMockWorkoutDataPoint(
-          uuid: 'running-uuid',
-          startTime: DateTime(2024, 1, 15, 10, 0),
-          endTime: DateTime(2024, 1, 15, 11, 0),
-          activityType: HealthWorkoutActivityType.RUNNING,
+        stubStatus(true);
+        stubReads(
+          workouts: [
+            _workoutPoint(
+              uuid: 'running-uuid',
+              startTime: DateTime(2024, 1, 15, 10, 0),
+              endTime: DateTime(2024, 1, 15, 11, 0),
+              activityType: HealthWorkoutActivityType.RUNNING,
+            ),
+          ],
         );
-
-        when(
-          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
-        ).thenAnswer((_) async => true);
-        when(
-          mockHealth.getHealthDataFromTypes(
-            types: anyNamed('types'),
-            startTime: anyNamed('startTime'),
-            endTime: anyNamed('endTime'),
-          ),
-        ).thenAnswer((_) async => [runningWorkout]);
 
         final result = await service.fetchDives(
           startDate: DateTime(2024, 1, 1),
@@ -211,34 +378,17 @@ void main() {
       });
 
       test('converts diving workouts to ImportedDive entities', () async {
-        final divingWorkout = _createMockWorkoutDataPoint(
-          uuid: 'dive-uuid-123',
-          startTime: DateTime(2024, 1, 15, 9, 0),
-          endTime: DateTime(2024, 1, 15, 10, 0),
-          activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+        stubStatus(true);
+        stubReads(
+          workouts: [
+            _workoutPoint(
+              uuid: 'dive-uuid-123',
+              startTime: DateTime(2024, 1, 15, 9, 0),
+              endTime: DateTime(2024, 1, 15, 10, 0),
+              activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+            ),
+          ],
         );
-
-        when(
-          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
-        ).thenAnswer((_) async => true);
-
-        // First call for workouts
-        when(
-          mockHealth.getHealthDataFromTypes(
-            types: [HealthDataType.WORKOUT],
-            startTime: anyNamed('startTime'),
-            endTime: anyNamed('endTime'),
-          ),
-        ).thenAnswer((_) async => [divingWorkout]);
-
-        // Second call for heart rate samples
-        when(
-          mockHealth.getHealthDataFromTypes(
-            types: [HealthDataType.HEART_RATE],
-            startTime: anyNamed('startTime'),
-            endTime: anyNamed('endTime'),
-          ),
-        ).thenAnswer((_) async => []);
 
         final result = await service.fetchDives(
           startDate: DateTime(2024, 1, 1),
@@ -250,43 +400,233 @@ void main() {
         expect(result.first.source, equals(ImportSource.appleWatch));
         expect(result.first.startTime, equals(DateTime(2024, 1, 15, 9, 0)));
         expect(result.first.endTime, equals(DateTime(2024, 1, 15, 10, 0)));
+        expect(result.first.sourceFileFormat, equals('healthkit'));
+      });
+
+      test('builds the profile from the underwater depth series', () async {
+        final start = DateTime(2024, 1, 15, 9, 0);
+        stubStatus(true);
+        stubReads(
+          workouts: [
+            _workoutPoint(
+              uuid: 'dive-uuid-123',
+              startTime: start,
+              endTime: start.add(const Duration(minutes: 40)),
+              activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+            ),
+          ],
+          depth: [
+            _numericPoint(start, 0.0, HealthDataType.UNDERWATER_DEPTH),
+            _numericPoint(
+              start.add(const Duration(seconds: 30)),
+              18.4,
+              HealthDataType.UNDERWATER_DEPTH,
+            ),
+            _numericPoint(
+              start.add(const Duration(seconds: 60)),
+              9.2,
+              HealthDataType.UNDERWATER_DEPTH,
+            ),
+          ],
+        );
+
+        final dive = (await service.fetchDives(
+          startDate: DateTime(2024, 1, 1),
+          endDate: DateTime(2024, 1, 31),
+        )).single;
+
+        expect(
+          dive.profile.map((s) => s.timeSeconds).toList(),
+          equals([0, 30, 60]),
+        );
+        expect(
+          dive.profile.map((s) => s.depth).toList(),
+          equals([0.0, 18.4, 9.2]),
+        );
+        expect(dive.maxDepth, equals(18.4));
+        expect(dive.avgDepth, closeTo(9.2, 0.001));
+      });
+
+      test('merges temperature and heart rate onto depth samples', () async {
+        final start = DateTime(2024, 1, 15, 9, 0);
+        stubStatus(true);
+        stubReads(
+          workouts: [
+            _workoutPoint(
+              uuid: 'dive-uuid-123',
+              startTime: start,
+              endTime: start.add(const Duration(minutes: 40)),
+              activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+            ),
+          ],
+          depth: [
+            _numericPoint(
+              start.add(const Duration(seconds: 10)),
+              12.0,
+              HealthDataType.UNDERWATER_DEPTH,
+            ),
+            _numericPoint(
+              start.add(const Duration(seconds: 600)),
+              20.0,
+              HealthDataType.UNDERWATER_DEPTH,
+            ),
+          ],
+          temperature: [
+            _numericPoint(
+              start.add(const Duration(seconds: 12)),
+              21.5,
+              HealthDataType.WATER_TEMPERATURE,
+            ),
+          ],
+          heartRate: [
+            _numericPoint(
+              start.add(const Duration(seconds: 8)),
+              78.4,
+              HealthDataType.HEART_RATE,
+            ),
+          ],
+        );
+
+        final dive = (await service.fetchDives(
+          startDate: DateTime(2024, 1, 1),
+          endDate: DateTime(2024, 1, 31),
+        )).single;
+
+        expect(dive.profile.first.temperature, equals(21.5));
+        expect(dive.profile.first.heartRate, equals(78));
+        // The second sample sits ten minutes from either reading, well past
+        // the match window, so it must not inherit them.
+        expect(dive.profile.last.temperature, isNull);
+        expect(dive.profile.last.heartRate, isNull);
+        expect(dive.minTemperature, equals(21.5));
+        expect(dive.maxTemperature, equals(21.5));
+        expect(dive.avgHeartRate, equals(78));
+      });
+
+      test('keeps the deepest reading when a second repeats', () async {
+        final start = DateTime(2024, 1, 15, 9, 0);
+        stubStatus(true);
+        stubReads(
+          workouts: [
+            _workoutPoint(
+              uuid: 'dive-uuid-123',
+              startTime: start,
+              endTime: start.add(const Duration(minutes: 40)),
+              activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+            ),
+          ],
+          depth: [
+            _numericPoint(
+              start.add(const Duration(seconds: 30)),
+              11.0,
+              HealthDataType.UNDERWATER_DEPTH,
+            ),
+            _numericPoint(
+              start.add(const Duration(seconds: 30, milliseconds: 400)),
+              14.0,
+              HealthDataType.UNDERWATER_DEPTH,
+            ),
+          ],
+        );
+
+        final dive = (await service.fetchDives(
+          startDate: DateTime(2024, 1, 1),
+          endDate: DateTime(2024, 1, 31),
+        )).single;
+
+        expect(dive.profile, hasLength(1));
+        expect(dive.profile.single.depth, equals(14.0));
+      });
+
+      test('falls back to heart rate alone when no depth series', () async {
+        final start = DateTime(2024, 1, 15, 9, 0);
+        stubStatus(true);
+        stubReads(
+          workouts: [
+            _workoutPoint(
+              uuid: 'dive-uuid-123',
+              startTime: start,
+              endTime: start.add(const Duration(minutes: 40)),
+              activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+            ),
+          ],
+          heartRate: [
+            _numericPoint(
+              start.add(const Duration(seconds: 15)),
+              82.0,
+              HealthDataType.HEART_RATE,
+            ),
+          ],
+        );
+
+        final dive = (await service.fetchDives(
+          startDate: DateTime(2024, 1, 1),
+          endDate: DateTime(2024, 1, 31),
+        )).single;
+
+        expect(dive.profile, hasLength(1));
+        expect(dive.profile.single.depth, equals(0.0));
+        expect(dive.profile.single.heartRate, equals(82));
+        expect(dive.maxDepth, equals(0.0));
+      });
+
+      test('one failing series does not discard the others', () async {
+        // The plugin queries types in a loop and rethrows, so an unsupported
+        // type (the dive series below iOS 16) must not take the rest with it.
+        final start = DateTime(2024, 1, 15, 9, 0);
+        stubStatus(true);
+        stubReads(
+          workouts: [
+            _workoutPoint(
+              uuid: 'dive-uuid-123',
+              startTime: start,
+              endTime: start.add(const Duration(minutes: 40)),
+              activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+            ),
+          ],
+          depth: [
+            _numericPoint(
+              start.add(const Duration(seconds: 30)),
+              18.0,
+              HealthDataType.UNDERWATER_DEPTH,
+            ),
+          ],
+        );
+        when(
+          mockHealth.getHealthDataFromTypes(
+            types: [HealthDataType.WATER_TEMPERATURE],
+            startTime: anyNamed('startTime'),
+            endTime: anyNamed('endTime'),
+          ),
+        ).thenThrow(Exception('INVALID_TYPE'));
+
+        final dive = (await service.fetchDives(
+          startDate: DateTime(2024, 1, 1),
+          endDate: DateTime(2024, 1, 31),
+        )).single;
+
+        expect(dive.maxDepth, equals(18.0));
+        expect(dive.minTemperature, isNull);
       });
 
       test('sorts dives by start time descending', () async {
-        final olderDive = _createMockWorkoutDataPoint(
-          uuid: 'older-dive',
-          startTime: DateTime(2024, 1, 10, 9, 0),
-          endTime: DateTime(2024, 1, 10, 10, 0),
-          activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+        stubStatus(true);
+        stubReads(
+          workouts: [
+            _workoutPoint(
+              uuid: 'older-dive',
+              startTime: DateTime(2024, 1, 10, 9, 0),
+              endTime: DateTime(2024, 1, 10, 10, 0),
+              activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+            ),
+            _workoutPoint(
+              uuid: 'newer-dive',
+              startTime: DateTime(2024, 1, 20, 9, 0),
+              endTime: DateTime(2024, 1, 20, 10, 0),
+              activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
+            ),
+          ],
         );
-
-        final newerDive = _createMockWorkoutDataPoint(
-          uuid: 'newer-dive',
-          startTime: DateTime(2024, 1, 20, 9, 0),
-          endTime: DateTime(2024, 1, 20, 10, 0),
-          activityType: HealthWorkoutActivityType.UNDERWATER_DIVING,
-        );
-
-        when(
-          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
-        ).thenAnswer((_) async => true);
-
-        // Return older dive first
-        when(
-          mockHealth.getHealthDataFromTypes(
-            types: [HealthDataType.WORKOUT],
-            startTime: anyNamed('startTime'),
-            endTime: anyNamed('endTime'),
-          ),
-        ).thenAnswer((_) async => [olderDive, newerDive]);
-
-        when(
-          mockHealth.getHealthDataFromTypes(
-            types: [HealthDataType.HEART_RATE],
-            startTime: anyNamed('startTime'),
-            endTime: anyNamed('endTime'),
-          ),
-        ).thenAnswer((_) async => []);
 
         final result = await service.fetchDives(
           startDate: DateTime(2024, 1, 1),
@@ -294,7 +634,6 @@ void main() {
         );
 
         expect(result, hasLength(2));
-        // Newer dive should be first
         expect(result[0].sourceId, equals('newer-dive'));
         expect(result[1].sourceId, equals('older-dive'));
       });
@@ -309,8 +648,8 @@ void main() {
   });
 }
 
-/// Helper to create a mock workout data point for testing.
-HealthDataPoint _createMockWorkoutDataPoint({
+/// Helper to create a workout data point for testing.
+HealthDataPoint _workoutPoint({
   required String uuid,
   required DateTime startTime,
   required DateTime endTime,
@@ -329,6 +668,22 @@ HealthDataPoint _createMockWorkoutDataPoint({
     unit: HealthDataUnit.NO_UNIT,
     dateFrom: startTime,
     dateTo: endTime,
+    sourcePlatform: HealthPlatformType.appleHealth,
+    sourceDeviceId: 'apple-watch',
+    sourceId: 'com.apple.health',
+    sourceName: 'Apple Watch',
+  );
+}
+
+/// Helper to create a numeric sample (depth, temperature, or heart rate).
+HealthDataPoint _numericPoint(DateTime at, double value, HealthDataType type) {
+  return HealthDataPoint(
+    uuid: '${type.name}-${at.microsecondsSinceEpoch}',
+    value: NumericHealthValue(numericValue: value),
+    type: type,
+    unit: dataTypeToUnit[type] ?? HealthDataUnit.NO_UNIT,
+    dateFrom: at,
+    dateTo: at,
     sourcePlatform: HealthPlatformType.appleHealth,
     sourceDeviceId: 'apple-watch',
     sourceId: 'com.apple.health',

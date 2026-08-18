@@ -9497,5 +9497,11 @@
   "media_status_queued": "ממתין להעלאה",
   "media_status_cloudOnly": "מאוחסן בענן בלבד",
   "media_status_notBackedUp": "לא מגובה",
-  "media_tile_infoMenuItem": "פרטי מדיה"
+  "media_tile_infoMenuItem": "פרטי מדיה",
+  "diveImport_healthkit_accessGrantedHint": "אפליקציית הבריאות של Apple לעולם אינה מגלה ליישומים אם ניתנה הרשאת קריאה. אם לא מופיעות צלילות, פתחו את אפליקציית הבריאות, ואז שיתוף, יישומים, Submersion, והפעילו אימונים, עומק מתחת למים, טמפרטורת מים ודופק.",
+  "diveImport_healthkit_foundNoDivesHint": "אין אימוני צלילה בטווח הזה. ודאו שהתאריכים כוללים את הצלילה ושבאפליקציית הבריאות, בשיתוף, יישומים, Submersion, מופעלים אימונים ועומק מתחת למים.",
+  "settings_dataSources_appleHealth_dataTypeDepth": "עומק מתחת למים - דגימות עומק שנרשמו במהלך צלילות",
+  "settings_dataSources_appleHealth_dataTypeWaterTemp": "טמפרטורת מים - דגימות טמפרטורה שנרשמו במהלך צלילות",
+  "settings_dataSources_appleHealth_permissionManagedInHealth": "הגישה ל-HealthKit מנוהלת באפליקציית הבריאות",
+  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit אינו זמין במכשיר הזה"
 }

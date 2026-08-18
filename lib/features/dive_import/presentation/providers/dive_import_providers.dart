@@ -54,12 +54,16 @@ final healthImportAvailableProvider = FutureProvider<bool>((ref) async {
   return service.isAvailable();
 });
 
-/// Whether we have HealthKit permissions.
-final healthImportHasPermissionsProvider = FutureProvider<bool>((ref) async {
-  final service = ref.watch(healthImportServiceProvider);
-  if (service == null) return false;
-  return service.hasPermissions();
-});
+/// What the platform will tell us about HealthKit read access.
+///
+/// On iOS this is normally [HealthPermissionStatus.undetermined]: Apple does
+/// not disclose read access. Callers must not read that as a refusal.
+final healthImportPermissionStatusProvider =
+    FutureProvider<HealthPermissionStatus>((ref) async {
+      final service = ref.watch(healthImportServiceProvider);
+      if (service == null) return HealthPermissionStatus.unsupported;
+      return service.permissionStatus();
+    });
 
 // ============================================================================
 // Import State Providers

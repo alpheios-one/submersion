@@ -53375,6 +53375,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Media info'**
   String get media_tile_infoMenuItem;
+
+  /// Hint under the HealthKit access headline explaining that iOS will not confirm read access.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Health never tells apps whether read access was granted. If no dives turn up, open Health, then Sharing, Apps, Submersion, and turn on Workouts, Underwater Depth, Water Temperature, and Heart Rate.'**
+  String get diveImport_healthkit_accessGrantedHint;
+
+  /// Hint shown when a HealthKit fetch returned zero dives.
+  ///
+  /// In en, this message translates to:
+  /// **'No underwater diving workouts in this range. Check that the dates cover the dive, and that Health, Sharing, Apps, Submersion has Workouts and Underwater Depth turned on.'**
+  String get diveImport_healthkit_foundNoDivesHint;
+
+  /// HealthKit data type disclosure: underwater depth.
+  ///
+  /// In en, this message translates to:
+  /// **'Underwater Depth - depth samples recorded during dives'**
+  String get settings_dataSources_appleHealth_dataTypeDepth;
+
+  /// HealthKit data type disclosure: water temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Temperature - water temperature samples recorded during dives'**
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp;
+
+  /// Permission row shown when the platform will not disclose read access.
+  ///
+  /// In en, this message translates to:
+  /// **'HealthKit access is managed in the Health app'**
+  String get settings_dataSources_appleHealth_permissionManagedInHealth;
+
+  /// Permission row shown when HealthKit is unavailable on this device.
+  ///
+  /// In en, this message translates to:
+  /// **'HealthKit is not available on this device'**
+  String get settings_dataSources_appleHealth_permissionUnsupported;
 }
 
 class _AppLocalizationsDelegate

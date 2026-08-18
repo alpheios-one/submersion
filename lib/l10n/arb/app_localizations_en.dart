@@ -31723,4 +31723,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'Media info';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple Health never tells apps whether read access was granted. If no dives turn up, open Health, then Sharing, Apps, Submersion, and turn on Workouts, Underwater Depth, Water Temperature, and Heart Rate.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'No underwater diving workouts in this range. Check that the dates cover the dive, and that Health, Sharing, Apps, Submersion has Workouts and Underwater Depth turned on.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Underwater Depth - depth samples recorded during dives';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Water Temperature - water temperature samples recorded during dives';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'HealthKit access is managed in the Health app';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit is not available on this device';
 }

@@ -18199,5 +18199,17 @@
   "media_status_queued": "Waiting to upload",
   "media_status_cloudOnly": "Stored in the cloud only",
   "media_status_notBackedUp": "Not backed up",
-  "media_tile_infoMenuItem": "Media info"
+  "media_tile_infoMenuItem": "Media info",
+  "diveImport_healthkit_accessGrantedHint": "Apple Health never tells apps whether read access was granted. If no dives turn up, open Health, then Sharing, Apps, Submersion, and turn on Workouts, Underwater Depth, Water Temperature, and Heart Rate.",
+  "diveImport_healthkit_foundNoDivesHint": "No underwater diving workouts in this range. Check that the dates cover the dive, and that Health, Sharing, Apps, Submersion has Workouts and Underwater Depth turned on.",
+  "settings_dataSources_appleHealth_dataTypeDepth": "Underwater Depth - depth samples recorded during dives",
+  "settings_dataSources_appleHealth_dataTypeWaterTemp": "Water Temperature - water temperature samples recorded during dives",
+  "settings_dataSources_appleHealth_permissionManagedInHealth": "HealthKit access is managed in the Health app",
+  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit is not available on this device",
+  "@diveImport_healthkit_accessGrantedHint": {"description": "Hint under the HealthKit access headline explaining that iOS will not confirm read access."},
+  "@diveImport_healthkit_foundNoDivesHint": {"description": "Hint shown when a HealthKit fetch returned zero dives."},
+  "@settings_dataSources_appleHealth_dataTypeDepth": {"description": "HealthKit data type disclosure: underwater depth."},
+  "@settings_dataSources_appleHealth_dataTypeWaterTemp": {"description": "HealthKit data type disclosure: water temperature."},
+  "@settings_dataSources_appleHealth_permissionManagedInHealth": {"description": "Permission row shown when the platform will not disclose read access."},
+  "@settings_dataSources_appleHealth_permissionUnsupported": {"description": "Permission row shown when HealthKit is unavailable on this device."}
 }

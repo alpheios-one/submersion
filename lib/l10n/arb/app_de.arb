@@ -9497,5 +9497,11 @@
   "media_status_queued": "Warten auf Upload",
   "media_status_cloudOnly": "Nur in der Cloud gespeichert",
   "media_status_notBackedUp": "Nicht gesichert",
-  "media_tile_infoMenuItem": "Medieninfo"
+  "media_tile_infoMenuItem": "Medieninfo",
+  "diveImport_healthkit_accessGrantedHint": "Apple Health teilt Apps nie mit, ob Lesezugriff gewährt wurde. Falls keine Tauchgänge erscheinen, öffne Health, dann Teilen, Apps, Submersion, und aktiviere Workouts, Unterwassertiefe, Wassertemperatur und Herzfrequenz.",
+  "diveImport_healthkit_foundNoDivesHint": "Keine Tauch-Workouts in diesem Zeitraum. Prüfe, ob die Daten den Tauchgang abdecken und ob unter Health, Teilen, Apps, Submersion die Optionen Workouts und Unterwassertiefe aktiviert sind.",
+  "settings_dataSources_appleHealth_dataTypeDepth": "Unterwassertiefe - während Tauchgängen aufgezeichnete Tiefenwerte",
+  "settings_dataSources_appleHealth_dataTypeWaterTemp": "Wassertemperatur - während Tauchgängen aufgezeichnete Temperaturwerte",
+  "settings_dataSources_appleHealth_permissionManagedInHealth": "Der HealthKit-Zugriff wird in der Health-App verwaltet",
+  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit ist auf diesem Gerät nicht verfügbar"
 }

@@ -30386,4 +30386,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => '媒体信息';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple 健康从不告知 App 是否已获得读取权限。如果没有出现潜水记录，请打开“健康”，依次进入“共享”“App”“Submersion”，并开启“体能训练”“水下深度”“水温”和“心率”。';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      '此时间范围内没有潜水体能训练。请确认日期涵盖该次潜水，并在“健康”“共享”“App”“Submersion”中开启“体能训练”和“水下深度”。';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      '水下深度 - 潜水过程中记录的深度采样';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      '水温 - 潜水过程中记录的水温采样';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'HealthKit 访问权限在“健康”App 中管理';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      '此设备不支持 HealthKit';
 }

@@ -32005,4 +32005,28 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'Media-info';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple Gezondheid vertelt apps nooit of leestoegang is verleend. Verschijnen er geen duiken, open dan Gezondheid, vervolgens Delen, Apps, Submersion, en zet Workouts, Waterdiepte, Watertemperatuur en Hartslag aan.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'Geen duikworkouts in dit bereik. Controleer of de datums de duik omvatten en of bij Gezondheid, Delen, Apps, Submersion de opties Workouts en Waterdiepte aanstaan.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Waterdiepte - dieptemetingen die tijdens duiken zijn vastgelegd';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Watertemperatuur - temperatuurmetingen die tijdens duiken zijn vastgelegd';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'HealthKit-toegang beheer je in de app Gezondheid';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit is niet beschikbaar op dit apparaat';
 }

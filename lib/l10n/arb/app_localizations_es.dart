@@ -32266,4 +32266,28 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'Información del medio';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple Salud nunca indica a las apps si se concedió el acceso de lectura. Si no aparece ninguna inmersión, abre Salud, luego Compartir, Apps, Submersion, y activa Entrenamientos, Profundidad bajo el agua, Temperatura del agua y Frecuencia cardíaca.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'No hay entrenamientos de buceo en este intervalo. Comprueba que las fechas incluyan la inmersión y que en Salud, Compartir, Apps, Submersion estén activados Entrenamientos y Profundidad bajo el agua.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Profundidad bajo el agua - muestras de profundidad registradas durante las inmersiones';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Temperatura del agua - muestras de temperatura registradas durante las inmersiones';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'El acceso a HealthKit se gestiona en la app Salud';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit no está disponible en este dispositivo';
 }
