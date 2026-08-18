@@ -8,6 +8,7 @@ import 'package:submersion/core/data/repositories/sync_repository.dart'
 import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/headless_cloud_provider.dart';
+import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/security/database_security_service.dart';
@@ -25,6 +26,82 @@ import 'package:submersion/features/settings/data/repositories/diver_settings_re
 
 const String kNotificationRefreshTask = 'com.submersion.notificationRefresh';
 const String kBackupTask = 'com.submersion.backup';
+
+const _log = LoggerService('HeadlessDatabase');
+
+/// Points the headless [DatabaseService] at the diver's ACTUAL database.
+///
+/// [DatabaseService] is a per-isolate singleton, so the Workmanager isolate
+/// starts with no location service and `_resolveDatabasePath` falls back to
+/// `<appDocuments>/Submersion/submersion.db`. For a diver who moved their
+/// database, that fallback is not merely a wrong read: drift creates the file
+/// on first statement, so a background run MANUFACTURES an empty database at
+/// the default path, then backs it up and registers the artifact as a healthy
+/// automatic backup (#1168).
+///
+/// The location is reconstructible here for the same reason
+/// [resolveHeadlessCloudProvider] is: [DatabaseLocationService] is entirely
+/// SharedPreferences-backed, and SharedPreferences crosses the isolate
+/// boundary.
+///
+/// Returns false when the task must SKIP. A headless run never creates a
+/// database and never falls back to the default path; falling back is what
+/// produces the phantom. Two things make it skip:
+///   * nothing at the resolved path (the diver has not launched the app at
+///     this location yet), and
+///   * a resolved path that cannot be opened for reading, above all a custom
+///     folder behind a security-scoped bookmark (iOS/macOS) that a headless
+///     isolate cannot re-acquire.
+///
+/// Note what it deliberately does NOT do: reset an unreachable custom location
+/// to the default, which is the foreground's answer in
+/// [DatabaseLocationService.validateCustomLocationAtStartup]. A background task
+/// must not silently rewrite the diver's storage setting.
+Future<bool> prepareHeadlessDatabaseLocation({
+  required SharedPreferences prefs,
+}) async {
+  final location = DatabaseLocationService(prefs);
+  final config = await location.getStorageConfig();
+
+  // On iOS/macOS the custom folder is only reachable through the stored
+  // bookmark. It may well fail to resolve headlessly; the readability probe
+  // below is what decides, so a failure here is not fatal on its own.
+  if (config.isCustomLocation) {
+    await location.resolveStoredBookmark();
+  }
+
+  final dbPath = await location.getDatabasePath();
+  if (!await _isReadableDatabase(dbPath)) {
+    _log.info(
+      'Headless run skipped: no readable database at $dbPath '
+      '(custom location: ${config.isCustomLocation}). Not creating one.',
+    );
+    return false;
+  }
+
+  DatabaseService.instance.adoptLocationService(location);
+  return true;
+}
+
+/// Whether [dbPath] holds a file this isolate can actually read.
+///
+/// Existence alone is not enough: a security-scoped folder can be listed and
+/// still refuse the open. This is the same probe
+/// [DatabaseLocationService.validateCustomLocationAtStartup] uses.
+Future<bool> _isReadableDatabase(String dbPath) async {
+  RandomAccessFile? handle;
+  try {
+    handle = await File(dbPath).open(mode: FileMode.read);
+    await handle.read(16);
+    return true;
+  } catch (_) {
+    return false;
+  } finally {
+    // Close even when the read throws, or the handle leaks on every
+    // background run that hits a revoked-permission folder.
+    await handle?.close();
+  }
+}
 
 /// Headless isolates have no unlock UI. Load the cached key (keychain) and
 /// hand it to DatabaseService; when the database is encrypted and no cached
@@ -76,6 +153,20 @@ void callbackDispatcher() {
 
     try {
       final prefs = await SharedPreferences.getInstance();
+
+      // Resolve WHICH database before unlocking one: a diver with a custom
+      // location has no database at the default path, and opening there would
+      // create one (#1168).
+      final located = await prepareHeadlessDatabaseLocation(prefs: prefs);
+      if (!located) {
+        log.info(
+          'Background task skipped: the configured database is not readable '
+          'from this headless context.',
+        );
+        // "succeeded": a missing database is not a retryable error.
+        return true;
+      }
+
       final ready = await prepareHeadlessDatabaseKey(prefs: prefs);
       if (!ready) {
         log.info(
@@ -85,7 +176,9 @@ void callbackDispatcher() {
         return true; // "succeeded" — do not retry-loop a locked database
       }
 
-      // Initialize database
+      // Opens the location adopted above, NOT the default path. The schema
+      // version this reads has to come from the diver's own file, which is why
+      // the location gate runs first.
       if (!await openHeadlessDatabase(log: log)) {
         return true; // "succeeded" — do not retry-loop a pending upgrade
       }
