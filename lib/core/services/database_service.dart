@@ -141,10 +141,12 @@ class DatabaseService {
 
   /// Initialize the database with optional location service for custom paths.
   ///
-  /// [allowSchemaUpgrade] false makes a pending upgrade a hard stop: the file
-  /// is not opened and [SchemaUpgradePendingException] is thrown. Headless
-  /// callers pass false -- see [SchemaUpgradePendingException] for why the
-  /// background isolate must never run the ladder.
+  /// [allowSchemaUpgrade] false makes a pending upgrade a hard stop: no drift
+  /// connection is created and [SchemaUpgradePendingException] is thrown
+  /// instead. The version probe still opens and closes the file to read
+  /// `PRAGMA user_version`, but nothing writes to it. Headless callers pass
+  /// false -- see [SchemaUpgradePendingException] for why the background
+  /// isolate must never run the ladder.
   Future<void> initialize({
     DatabaseLocationService? locationService,
     void Function(int currentStep, int totalSteps)? onMigrationProgress,
@@ -249,10 +251,19 @@ class DatabaseService {
         stored > 0 &&
         stored < AppDatabase.currentSchemaVersion;
 
-    // Refused BEFORE the file is opened at all: drift runs the ladder on the
-    // first statement, so a caller barred from upgrading must not get a
-    // connection in the first place. A missing file is not a pending upgrade
-    // -- creation is onCreate, which a headless first run may do.
+    // Refused before any drift connection exists: drift runs the ladder on
+    // the first statement, so a caller barred from upgrading must never be
+    // handed a connection at all.
+    //
+    // The FILE has been opened by this point -- [getStoredSchemaVersion] a
+    // few lines up opens it read-write and closes it again, which is also
+    // what rolls back a hot journal (see StartupPhase.preflight, which
+    // documents the same distinction). What the guard promises is narrower
+    // and is what the tests assert: nothing wrote to it, so the stored
+    // version is exactly as the foreground will find it.
+    //
+    // A missing file is not a pending upgrade -- creation is onCreate, which
+    // a headless first run may legitimately do.
     if (migrationPending && !allowSchemaUpgrade) {
       throw SchemaUpgradePendingException(
         storedSchemaVersion: stored,

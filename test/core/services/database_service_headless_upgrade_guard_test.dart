@@ -80,8 +80,10 @@ void main() {
       throwsA(isA<SchemaUpgradePendingException>()),
     );
 
-    // Nothing was opened, so nothing has to be closed, and above all the
-    // stored version is untouched: the foreground still owns the upgrade.
+    // No drift connection was handed out, and -- the part that matters --
+    // the stored version is untouched, so the foreground still owns the
+    // upgrade. (The version probe does open and close the file to read
+    // PRAGMA user_version; the guarantee is that nothing WROTE to it.)
     expect(DatabaseService.instance.databaseOrNull, isNull);
     final probe = DatabaseService.openRaw(dbPath);
     addTearDown(probe.close);
