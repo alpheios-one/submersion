@@ -7828,6 +7828,47 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_edit_access_parkingInfo_label => 'معلومات موقف السيارات';
 
   @override
+  String get diveSites_edit_access_entryMethod_label => 'طريقة الدخول';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'طريقة الخروج';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'غطساتك الـ$count هنا: دخول $entry، خروج $exit',
+      one: 'غطستك هنا: دخول $entry، خروج $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'غطساتك الـ$count هنا: دخول $entry',
+      one: 'غطستك هنا: دخول $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'الدخول';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'الخروج';
+
+  @override
   String get diveSites_edit_altitude_helperText =>
       'ارتفاع الموقع فوق مستوى سطح البحر (للغوص على ارتفاعات)';
 

@@ -7983,6 +7983,47 @@ class AppLocalizationsEs extends AppLocalizations {
       'Informacion de estacionamiento';
 
   @override
+  String get diveSites_edit_access_entryMethod_label => 'Método de entrada';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Método de salida';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tus $count inmersiones aquí: entrada $entry, salida $exit',
+      one: 'Tu inmersión aquí: entrada $entry, salida $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tus $count inmersiones aquí: entrada $entry',
+      one: 'Tu inmersión aquí: entrada $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Entrada';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Salida';
+
+  @override
   String get diveSites_edit_altitude_helperText =>
       'Elevacion del sitio sobre el nivel del mar (para buceo en altitud)';
 

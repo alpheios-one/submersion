@@ -4620,6 +4620,49 @@
   "diveSites_edit_access_mooringNumber_label": "Mooring Number",
   "diveSites_edit_access_parkingInfo_hint": "Parking availability, fees, tips",
   "diveSites_edit_access_parkingInfo_label": "Parking Information",
+  "diveSites_edit_access_entryMethod_label": "Entry Method",
+  "@diveSites_edit_access_entryMethod_label": {
+    "description": "Site form row: the typical way into the water at this site"
+  },
+  "diveSites_edit_access_exitMethod_label": "Exit Method",
+  "@diveSites_edit_access_exitMethod_label": {
+    "description": "Site form row: the typical way out of the water at this site"
+  },
+  "diveSites_edit_access_entrySuggestionPair": "{count, plural, =1{Your dive here: {entry} in, {exit} out} other{Your {count} dives here: {entry} in, {exit} out}}",
+  "@diveSites_edit_access_entrySuggestionPair": {
+    "description": "Chip offering to fill a site's entry and exit method from the dives already logged there",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "entry": {
+        "type": "String"
+      },
+      "exit": {
+        "type": "String"
+      }
+    }
+  },
+  "diveSites_edit_access_entrySuggestionEntryOnly": "{count, plural, =1{Your dive here: {entry}} other{Your {count} dives here: {entry}}}",
+  "@diveSites_edit_access_entrySuggestionEntryOnly": {
+    "description": "Chip offering to fill a site's entry method when the logged dives record no exit method",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "entry": {
+        "type": "String"
+      }
+    }
+  },
+  "diveSites_detail_access_entryMethod": "Entry",
+  "@diveSites_detail_access_entryMethod": {
+    "description": "Site detail access card: entry method row label"
+  },
+  "diveSites_detail_access_exitMethod": "Exit",
+  "@diveSites_detail_access_exitMethod": {
+    "description": "Site detail access card: exit method row label"
+  },
   "diveSites_edit_altitude_helperText": "Site elevation above sea level (for altitude diving)",
   "diveSites_edit_altitude_hint": "e.g., 2000",
   "diveSites_edit_altitude_label": "Altitude ({symbol})",

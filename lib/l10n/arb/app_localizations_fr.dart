@@ -8010,6 +8010,47 @@ class AppLocalizationsFr extends AppLocalizations {
       'Informations de stationnement';
 
   @override
+  String get diveSites_edit_access_entryMethod_label => 'Méthode d\'entrée';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Méthode de sortie';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Vos $count plongées ici : entrée $entry, sortie $exit',
+      one: 'Votre plongée ici : entrée $entry, sortie $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Vos $count plongées ici : entrée $entry',
+      one: 'Votre plongée ici : entrée $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Entrée';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Sortie';
+
+  @override
   String get diveSites_edit_altitude_helperText =>
       'Altitude du site au-dessus du niveau de la mer (pour la plongee en altitude)';
 

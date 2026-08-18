@@ -7603,6 +7603,47 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_edit_access_parkingInfo_label => '停车信息';
 
   @override
+  String get diveSites_edit_access_entryMethod_label => '入水方式';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => '出水方式';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '你在此的 $count 次潜水：入水 $entry，出水 $exit',
+      one: '你在此的潜水：入水 $entry，出水 $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '你在此的 $count 次潜水：入水 $entry',
+      one: '你在此的潜水：入水 $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => '入水';
+
+  @override
+  String get diveSites_detail_access_exitMethod => '出水';
+
+  @override
   String get diveSites_edit_altitude_helperText => '潜水点海拔高度（用于高海拔潜水）';
 
   @override

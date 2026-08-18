@@ -7974,6 +7974,47 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveSites_edit_access_parkingInfo_label => 'Parkinformationen';
 
   @override
+  String get diveSites_edit_access_entryMethod_label => 'Einstiegsart';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Ausstiegsart';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Deine $count Tauchgänge hier: Einstieg $entry, Ausstieg $exit',
+      one: 'Dein Tauchgang hier: Einstieg $entry, Ausstieg $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Deine $count Tauchgänge hier: Einstieg $entry',
+      one: 'Dein Tauchgang hier: Einstieg $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Einstieg';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Ausstieg';
+
+  @override
   String get diveSites_edit_altitude_helperText =>
       'Höhe des Tauchplatzes über dem Meeresspiegel (für Bergseetauchen)';
 
