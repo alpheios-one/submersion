@@ -92,6 +92,60 @@ void main() {
         );
       });
 
+      test('asks the platform once and reuses the answer', () async {
+        // Whether the hardware has HealthKit cannot change while the app
+        // runs, and every entry point needs the answer.
+        var probes = 0;
+        final counted = HealthKitService(
+          health: mockHealth,
+          isPlatformSupported: true,
+          healthDataAvailable: () async {
+            probes++;
+            return true;
+          },
+        );
+        when(
+          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
+        ).thenAnswer((_) async => null);
+        when(
+          mockHealth.getHealthDataFromTypes(
+            types: anyNamed('types'),
+            startTime: anyNamed('startTime'),
+            endTime: anyNamed('endTime'),
+          ),
+        ).thenAnswer((_) async => []);
+
+        await counted.isAvailable();
+        await counted.permissionStatus();
+        await counted.fetchDives(
+          startDate: DateTime(2024, 1, 1),
+          endDate: DateTime(2024, 1, 31),
+        );
+
+        expect(probes, equals(1));
+      });
+
+      test('shares one probe across concurrent callers', () async {
+        var probes = 0;
+        final counted = HealthKitService(
+          health: mockHealth,
+          isPlatformSupported: true,
+          healthDataAvailable: () async {
+            probes++;
+            await Future<void>.delayed(Duration.zero);
+            return true;
+          },
+        );
+
+        await Future.wait([
+          counted.isAvailable(),
+          counted.isAvailable(),
+          counted.isAvailable(),
+        ]);
+
+        expect(probes, equals(1));
+      });
+
       test('an unknown probe never blocks the read', () async {
         final unknown = _serviceWithProbe(mockHealth, null);
         when(

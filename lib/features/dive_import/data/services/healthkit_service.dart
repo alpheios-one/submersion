@@ -50,7 +50,17 @@ class HealthKitService implements HealthImportService {
   }
 
   /// True unless the platform states outright that HealthKit is unavailable.
-  Future<bool> get _healthKitExists async {
+  ///
+  /// Asked once per service. Whether the hardware has HealthKit cannot change
+  /// while the app runs, and every entry point below needs the answer, so the
+  /// in-flight future is shared rather than re-queried four times a wizard.
+  Future<bool> get _healthKitExists =>
+      _healthKitExistsCache ??= _resolveHealthKitExists();
+
+  Future<bool>? _healthKitExistsCache;
+
+  /// Never throws, so the memoised future can never be a poisoned one.
+  Future<bool> _resolveHealthKitExists() async {
     try {
       return await _healthDataAvailableProbe() ?? true;
     } catch (_) {
