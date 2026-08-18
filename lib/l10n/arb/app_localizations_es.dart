@@ -11098,6 +11098,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Registro de mantenimiento guardado';
 
   @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Usar la moneda predeterminada';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Moneda para este equipo';
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Registro de servicio eliminado';
 

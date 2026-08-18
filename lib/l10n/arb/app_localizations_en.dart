@@ -10926,6 +10926,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_export_saved_maintenance => 'Maintenance log saved';
 
   @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Use default currency';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Currency for this item';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Service record deleted';
 
   @override

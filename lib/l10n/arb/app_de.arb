@@ -3524,6 +3524,8 @@
   "settings_export_progress_maintenance": "Wartungsprotokoll wird exportiert...",
   "settings_export_success_maintenance": "Wartungsprotokoll exportiert",
   "settings_export_saved_maintenance": "Wartungsprotokoll gespeichert",
+  "equipment_serviceKinds_defaultCurrencyInherit": "Standardwährung verwenden",
+  "equipment_scheduleDialog_defaultCurrencyLabel": "Währung für dieses Teil",
   "equipment_service_snackbar_deleted": "Wartungseintrag gelöscht",
   "equipment_service_totalCostLabel": "Gesamte Wartungskosten",
   "equipment_setDetail_addEquipmentButton": "Ausrüstung hinzufügen",

@@ -11025,6 +11025,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Onderhoudslogboek opgeslagen';
 
   @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Standaardvaluta gebruiken';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Valuta voor dit item';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Servicerecord verwijderd';
 
   @override

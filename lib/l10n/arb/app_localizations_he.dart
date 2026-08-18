@@ -10845,6 +10845,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_export_saved_maintenance => 'יומן התחזוקה נשמר';
 
   @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'שימוש במטבע ברירת המחדל';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel => 'מטבע לפריט זה';
+
+  @override
   String get equipment_service_snackbar_deleted => 'רשומת טיפול נמחקה';
 
   @override

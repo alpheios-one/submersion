@@ -18945,6 +18945,18 @@ abstract class AppLocalizations {
   /// **'Maintenance log saved'**
   String get settings_export_saved_maintenance;
 
+  /// No description provided for @equipment_serviceKinds_defaultCurrencyInherit.
+  ///
+  /// In en, this message translates to:
+  /// **'Use default currency'**
+  String get equipment_serviceKinds_defaultCurrencyInherit;
+
+  /// No description provided for @equipment_scheduleDialog_defaultCurrencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency for this item'**
+  String get equipment_scheduleDialog_defaultCurrencyLabel;
+
   /// No description provided for @equipment_service_snackbar_deleted.
   ///
   /// In en, this message translates to:

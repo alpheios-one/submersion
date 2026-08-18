@@ -10911,6 +10911,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_export_saved_maintenance => 'تم حفظ سجل الصيانة';
 
   @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'استخدام العملة الافتراضية';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel => 'عملة هذه المعدة';
+
+  @override
   String get equipment_service_snackbar_deleted => 'تم حذف سجل الصيانة';
 
   @override

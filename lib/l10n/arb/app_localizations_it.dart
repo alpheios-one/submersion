@@ -11107,6 +11107,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Registro di manutenzione salvato';
 
   @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Usa la valuta predefinita';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Valuta per questa attrezzatura';
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Registro manutenzione eliminato';
 

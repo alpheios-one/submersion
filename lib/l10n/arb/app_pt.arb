@@ -3524,6 +3524,8 @@
   "settings_export_progress_maintenance": "A exportar o registo de manutenção...",
   "settings_export_success_maintenance": "Registo de manutenção exportado",
   "settings_export_saved_maintenance": "Registo de manutenção guardado",
+  "equipment_serviceKinds_defaultCurrencyInherit": "Usar a moeda padrão",
+  "equipment_scheduleDialog_defaultCurrencyLabel": "Moeda para este equipamento",
   "equipment_service_snackbar_deleted": "Registro de manutencao excluido",
   "equipment_service_totalCostLabel": "Custo Total de Manutencao",
   "equipment_setDetail_addEquipmentButton": "Adicionar Equipamento",

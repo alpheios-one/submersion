@@ -3524,6 +3524,8 @@
   "settings_export_progress_maintenance": "Onderhoudslogboek exporteren...",
   "settings_export_success_maintenance": "Onderhoudslogboek geëxporteerd",
   "settings_export_saved_maintenance": "Onderhoudslogboek opgeslagen",
+  "equipment_serviceKinds_defaultCurrencyInherit": "Standaardvaluta gebruiken",
+  "equipment_scheduleDialog_defaultCurrencyLabel": "Valuta voor dit item",
   "equipment_service_snackbar_deleted": "Servicerecord verwijderd",
   "equipment_service_totalCostLabel": "Totale servicekosten",
   "equipment_setDetail_addEquipmentButton": "Uitrusting toevoegen",

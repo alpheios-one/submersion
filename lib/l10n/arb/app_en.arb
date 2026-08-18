@@ -6148,6 +6148,8 @@
   "settings_export_progress_maintenance": "Exporting maintenance log...",
   "settings_export_success_maintenance": "Maintenance log exported",
   "settings_export_saved_maintenance": "Maintenance log saved",
+  "equipment_serviceKinds_defaultCurrencyInherit": "Use default currency",
+  "equipment_scheduleDialog_defaultCurrencyLabel": "Currency for this item",
   "equipment_service_snackbar_deleted": "Service record deleted",
   "equipment_service_totalCostLabel": "Total Service Cost",
   "equipment_setDetail_addEquipmentButton": "Add Equipment",

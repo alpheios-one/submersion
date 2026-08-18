@@ -3524,6 +3524,8 @@
   "settings_export_progress_maintenance": "جارٍ تصدير سجل الصيانة...",
   "settings_export_success_maintenance": "تم تصدير سجل الصيانة",
   "settings_export_saved_maintenance": "تم حفظ سجل الصيانة",
+  "equipment_serviceKinds_defaultCurrencyInherit": "استخدام العملة الافتراضية",
+  "equipment_scheduleDialog_defaultCurrencyLabel": "عملة هذه المعدة",
   "equipment_service_snackbar_deleted": "تم حذف سجل الصيانة",
   "equipment_service_totalCostLabel": "إجمالي تكلفة الصيانة",
   "equipment_setDetail_addEquipmentButton": "إضافة معدات",

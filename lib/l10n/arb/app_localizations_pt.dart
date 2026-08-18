@@ -11103,6 +11103,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Registo de manutenção guardado';
 
   @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Usar a moeda padrão';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Moeda para este equipamento';
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Registro de manutencao excluido';
 

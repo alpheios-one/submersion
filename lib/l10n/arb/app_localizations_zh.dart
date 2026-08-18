@@ -10602,6 +10602,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_export_saved_maintenance => '保养记录已保存';
 
   @override
+  String get equipment_serviceKinds_defaultCurrencyInherit => '使用默认货币';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel => '此装备的货币';
+
+  @override
   String get equipment_service_snackbar_deleted => '维护记录已删除';
 
   @override

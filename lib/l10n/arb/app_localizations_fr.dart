@@ -11137,6 +11137,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Journal d\'entretien enregistré';
 
   @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Utiliser la devise par défaut';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Devise pour cet équipement';
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Enregistrement de revision supprime';
 

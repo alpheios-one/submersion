@@ -3669,6 +3669,8 @@
   "settings_export_progress_maintenance": "正在导出保养记录...",
   "settings_export_success_maintenance": "保养记录已导出",
   "settings_export_saved_maintenance": "保养记录已保存",
+  "equipment_serviceKinds_defaultCurrencyInherit": "使用默认货币",
+  "equipment_scheduleDialog_defaultCurrencyLabel": "此装备的货币",
   "equipment_service_snackbar_deleted": "维护记录已删除",
   "equipment_service_totalCostLabel": "维护总费用",
   "equipment_setDetail_addEquipmentButton": "添加装备",

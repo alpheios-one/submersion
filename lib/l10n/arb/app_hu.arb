@@ -3452,6 +3452,8 @@
   "settings_export_progress_maintenance": "Karbantartási napló exportálása...",
   "settings_export_success_maintenance": "Karbantartási napló exportálva",
   "settings_export_saved_maintenance": "Karbantartási napló mentve",
+  "equipment_serviceKinds_defaultCurrencyInherit": "Alapértelmezett pénznem használata",
+  "equipment_scheduleDialog_defaultCurrencyLabel": "Pénznem ehhez a felszereléshez",
   "equipment_service_snackbar_deleted": "Szervizrekord torolve",
   "equipment_service_totalCostLabel": "Osszes szerviz koltseg",
   "equipment_setDetail_addEquipmentButton": "Felszereles hozzaadasa",

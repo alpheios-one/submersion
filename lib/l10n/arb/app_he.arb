@@ -3452,6 +3452,8 @@
   "settings_export_progress_maintenance": "מייצא את יומן התחזוקה...",
   "settings_export_success_maintenance": "יומן התחזוקה יוצא",
   "settings_export_saved_maintenance": "יומן התחזוקה נשמר",
+  "equipment_serviceKinds_defaultCurrencyInherit": "שימוש במטבע ברירת המחדל",
+  "equipment_scheduleDialog_defaultCurrencyLabel": "מטבע לפריט זה",
   "equipment_service_snackbar_deleted": "רשומת טיפול נמחקה",
   "equipment_service_totalCostLabel": "סה\"כ עלות טיפול",
   "equipment_setDetail_addEquipmentButton": "הוסף ציוד",

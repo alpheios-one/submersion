@@ -336,6 +336,59 @@ void main() {
       expect(custom.defaultCost, 12.5);
     });
 
+    testWidgets('a default currency can be cleared back to inherit', (
+      tester,
+    ) async {
+      // Review of #829: without a null entry in the dropdown there was no way
+      // back to "use the diver's default" once a currency had been picked.
+      await tester.runAsync(
+        () => kindRepo.createKind(
+          ServiceKind(
+            id: '',
+            diverId: diverId,
+            name: 'Priced kind',
+            defaultCost: 12.5,
+            defaultCurrency: 'EUR',
+            createdAt: DateTime(2026),
+            updatedAt: DateTime(2026),
+          ),
+        ),
+      );
+
+      // The edit dialog is taller than the default 800x600 test surface, and a
+      // clipped DropdownButton never opens on tap.
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(800, 2400);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(buildDbPage());
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Priced kind'), 200);
+      await tester.tap(find.text('Priced kind'));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(
+        find.byKey(const Key('service-kind-default-currency')),
+      );
+      // Tap the rendered value rather than the form field: the field's centre
+      // lands on the decoration, not the dropdown button.
+      await tester.tap(find.text('EUR').last, warnIfMissed: false);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Use default currency').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      final kinds = await tester.runAsync(() => kindRepo.getAllKinds());
+      final updated = kinds!.firstWhere((k) => k.name == 'Priced kind');
+      expect(updated.defaultCurrency, isNull);
+      // Clearing the currency must not disturb the price.
+      expect(updated.defaultCost, 12.5);
+    });
+
     testWidgets('editing a custom kind persists changes', (tester) async {
       await tester.runAsync(
         () => kindRepo.createKind(

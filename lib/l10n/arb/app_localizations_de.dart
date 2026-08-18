@@ -11100,6 +11100,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wartungsprotokoll gespeichert';
 
   @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Standardwährung verwenden';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Währung für dieses Teil';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Wartungseintrag gelöscht';
 
   @override

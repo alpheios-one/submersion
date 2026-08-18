@@ -11079,6 +11079,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_export_saved_maintenance => 'Karbantartási napló mentve';
 
   @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Alapértelmezett pénznem használata';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Pénznem ehhez a felszereléshez';
+
+  @override
   String get equipment_service_snackbar_deleted => 'Szervizrekord torolve';
 
   @override
