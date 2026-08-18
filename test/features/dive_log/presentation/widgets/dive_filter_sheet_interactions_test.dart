@@ -101,6 +101,8 @@ void main() {
           allDiveComputersProvider.overrideWith((ref) async => computers),
         ].cast(),
         child: MaterialApp(
+          // Pinned: this suite drives the sheet by English label.
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(

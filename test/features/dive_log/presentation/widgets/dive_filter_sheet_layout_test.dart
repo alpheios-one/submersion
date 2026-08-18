@@ -36,6 +36,12 @@ void main() {
       ProviderScope(
         overrides: overrides.cast(),
         child: MaterialApp(
+          // Pinned: the assertions below match English strings. flutter_test
+          // forwards the HOST machine's locale list rather than a fixed en_US,
+          // and the app ships 11 locales, so an unpinned MaterialApp renders a
+          // translated sheet on a non-English dev machine and every
+          // find.text() here misses.
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
