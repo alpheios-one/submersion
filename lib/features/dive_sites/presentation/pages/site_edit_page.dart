@@ -761,6 +761,60 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     );
   }
 
+  /// The one-tap fill offered when this site has no entry or exit method yet
+  /// but the diver has already logged dives here.
+  ///
+  /// Gated on both fields being empty. Once a site carries a value, dives that
+  /// inherited it would otherwise become evidence "confirming" the value the
+  /// site itself produced.
+  Widget? _entrySuggestionChip() {
+    if (!widget.isEditing || widget.siteId == null) return null;
+    if (widget.isMerging) return null;
+    if (_entryMethod != null || _exitMethod != null) return null;
+
+    return Consumer(
+      builder: (context, ref, _) {
+        final l10n = context.l10n;
+        final async = ref.watch(
+          siteEntryExitSuggestionProvider(widget.siteId!),
+        );
+        return async.when(
+          loading: () => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
+          data: (suggestion) {
+            if (suggestion == null) return const SizedBox.shrink();
+            final entryLabel = suggestion.entry.localizedName(l10n);
+            final label = suggestion.exit == null
+                ? l10n.diveSites_edit_access_entrySuggestionEntryOnly(
+                    suggestion.count,
+                    entryLabel,
+                  )
+                : l10n.diveSites_edit_access_entrySuggestionPair(
+                    suggestion.count,
+                    entryLabel,
+                    suggestion.exit!.localizedName(l10n),
+                  );
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ActionChip(
+                  avatar: const Icon(Icons.history, size: 18),
+                  label: Text(label),
+                  onPressed: () => setState(() {
+                    _entryMethod = suggestion.entry;
+                    _exitMethod = suggestion.exit;
+                    _hasChanges = true;
+                  }),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   MergeFieldExtras? _entryMethodExtras() {
     if (!widget.isMerging || _entryMethodCandidates.length < 2) return null;
     final index = _mergeFieldIndices['entryMethod'] ?? 0;
@@ -972,6 +1026,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
             }),
             entryMethodExtras: _entryMethodExtras(),
             exitMethodExtras: _exitMethodExtras(),
+            entrySuggestion: _entrySuggestionChip(),
           ),
           LifeNotesSection(
             expanded: _siteSectionExpanded('life'),
