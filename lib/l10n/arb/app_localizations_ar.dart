@@ -5660,6 +5660,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filter_title => 'تصفية الغوصات';
 
   @override
+  String get diveLog_filter_resizeGrip => 'تغيير حجم لوحة التصفية';
+
+  @override
   String get diveLog_filter_tooltip_close => 'إغلاق التصفية';
 
   @override

@@ -5490,6 +5490,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_filter_title => '筛选潜水';
 
   @override
+  String get diveLog_filter_resizeGrip => '调整筛选面板大小';
+
+  @override
   String get diveLog_filter_tooltip_close => '关闭筛选';
 
   @override

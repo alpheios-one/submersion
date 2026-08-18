@@ -3201,6 +3201,7 @@
   "diveLog_filter_showOnlyFavorites": "Show only favorite dives",
   "diveLog_filter_startDate": "Start Date",
   "diveLog_filter_title": "Filter Dives",
+  "diveLog_filter_resizeGrip": "Resize filter panel",
   "diveLog_filter_tooltip_close": "Close filter",
   "diveLog_fullscreenProfile_close": "Close fullscreen",
   "diveLog_fullscreenProfile_readoutHint": "Hover or scrub the profile",

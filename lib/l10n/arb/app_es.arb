@@ -2003,6 +2003,7 @@
   "diveLog_filter_showOnlyFavorites": "Mostrar solo inmersiones favoritas",
   "diveLog_filter_startDate": "Fecha de inicio",
   "diveLog_filter_title": "Filtrar inmersiones",
+  "diveLog_filter_resizeGrip": "Cambiar el tamaño del panel de filtros",
   "diveLog_filter_tooltip_close": "Cerrar filtro",
   "diveLog_fullscreenProfile_close": "Cerrar pantalla completa",
   "diveLog_fullscreenProfile_readoutHint": "Pasa el cursor o desliza sobre el perfil",

@@ -1931,6 +1931,7 @@
   "diveLog_filter_showOnlyFavorites": "Csak kedvenc merulesek mutatasa",
   "diveLog_filter_startDate": "Kezdes datuma",
   "diveLog_filter_title": "Merulesek szurese",
+  "diveLog_filter_resizeGrip": "Szűrőpanel átméretezése",
   "diveLog_filter_tooltip_close": "Szuro bezarasa",
   "diveLog_fullscreenProfile_close": "Teljes kepernyo bezarasa",
   "diveLog_fullscreenProfile_readoutHint": "Vigye az egermutatot a profil fole, vagy huzza rajta az ujjat",

@@ -5805,6 +5805,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_filter_title => 'Filtrer les plongees';
 
   @override
+  String get diveLog_filter_resizeGrip =>
+      'Redimensionner le panneau de filtres';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Fermer le filtre';
 
   @override

@@ -5631,6 +5631,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_filter_title => 'סינון צלילות';
 
   @override
+  String get diveLog_filter_resizeGrip => 'שינוי גודל חלונית הסינון';
+
+  @override
   String get diveLog_filter_tooltip_close => 'סגירת מסנן';
 
   @override

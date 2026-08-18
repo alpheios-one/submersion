@@ -5787,6 +5787,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_filter_title => 'Filtrar Mergulhos';
 
   @override
+  String get diveLog_filter_resizeGrip => 'Redimensionar o painel de filtros';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Fechar filtro';
 
   @override

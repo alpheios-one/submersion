@@ -2134,6 +2134,7 @@
   "diveLog_filter_showOnlyFavorites": "仅显示收藏的潜水",
   "diveLog_filter_startDate": "开始日期",
   "diveLog_filter_title": "筛选潜水",
+  "diveLog_filter_resizeGrip": "调整筛选面板大小",
   "diveLog_filter_tooltip_close": "关闭筛选",
   "diveLog_fullscreenProfile_close": "关闭全屏",
   "diveLog_fullscreenProfile_readoutHint": "悬停或滑动查看轮廓",
