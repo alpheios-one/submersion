@@ -9,6 +9,8 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_provide
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_collection_mode_selector.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_field_gate.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_membership_editor.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/bulk_tank_specs_editor.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/tank_editor.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
@@ -449,6 +451,142 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(SnackBar), findsOneWidget);
+    });
+
+    testWidgets('tank Update mode edits specs and keeps pressures', (
+      tester,
+    ) async {
+      // The #797 shape: an imported dive whose tank has pressures but no
+      // cylinder identity.
+      final dive = await repository.createDive(
+        createTestDiveWithBottomTime().copyWith(id: 'tank-upd-1'),
+      );
+      await repository.bulkAddTank([
+        dive.id,
+      ], const DiveTank(id: '', startPressure: 200, endPressure: 50));
+
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: buildOverrides(overrides).cast(),
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: DiveEditPage(bulkDiveIds: [dive.id], embedded: true),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Update').first);
+      await tester.tap(find.text('Update').first);
+      await tester.pumpAndSettle();
+
+      // The spec editor replaces the add/replace tank list.
+      expect(find.byType(BulkTankSpecsEditor), findsOneWidget);
+
+      // Gate the Volume field on, then type the new cylinder size.
+      final volumeChip = find.widgetWithText(FilterChip, 'Volume');
+      await tester.ensureVisible(volumeChip);
+      await tester.tap(volumeChip);
+      await tester.pumpAndSettle();
+
+      // Scope to the TankEditor: the gate chip carries the same label.
+      final volumeField = find.descendant(
+        of: find.byType(TankEditor),
+        matching: find.ancestor(
+          of: find.text('Volume'),
+          matching: find.byType(TextFormField),
+        ),
+      );
+      await tester.ensureVisible(volumeField);
+      await tester.enterText(volumeField, '11.1');
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Apply'));
+      await tester.pumpAndSettle();
+
+      final tanks = (await repository.getDiveById(dive.id))!.tanks;
+      expect(tanks.length, 1); // no second tank appended
+      expect(tanks.single.volume, 11.1);
+      expect(tanks.single.startPressure, 200); // pressures survive
+      expect(tanks.single.endPressure, 50);
+    });
+
+    testWidgets('tank Update Name gate writes the typed name', (tester) async {
+      // TankEditor has no name input, so the spec editor must supply one;
+      // without it the Name gate could only ever write null.
+      final dive = await repository.createDive(
+        createTestDiveWithBottomTime().copyWith(id: 'tank-name-1'),
+      );
+      await repository.bulkAddTank([
+        dive.id,
+      ], const DiveTank(id: '', name: 'Old', startPressure: 200));
+
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: buildOverrides(overrides).cast(),
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: DiveEditPage(bulkDiveIds: [dive.id], embedded: true),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Update').first);
+      await tester.tap(find.text('Update').first);
+      await tester.pumpAndSettle();
+
+      final nameChip = find.widgetWithText(FilterChip, 'Name');
+      await tester.ensureVisible(nameChip);
+      await tester.tap(nameChip);
+      await tester.pumpAndSettle();
+
+      final nameField = find.byKey(const ValueKey('bulk-tank-spec-name'));
+      await tester.ensureVisible(nameField);
+      await tester.enterText(nameField, 'Primary');
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Apply'));
+      await tester.pumpAndSettle();
+
+      final tanks = (await repository.getDiveById(dive.id))!.tanks;
+      expect(tanks.single.name, 'Primary');
+      expect(tanks.single.startPressure, 200);
+    });
+
+    testWidgets('tank Update with no attribute chosen explains why', (
+      tester,
+    ) async {
+      await pumpBulk(tester);
+
+      await tester.ensureVisible(find.text('Update').first);
+      await tester.tap(find.text('Update').first);
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      // The tank-specific hint, not the generic "turn on a field" one.
+      expect(
+        find.text('Choose at least one tank attribute to update.'),
+        findsOneWidget,
+      );
+      expect(find.text('Apply'), findsNothing); // no confirm dialog
     });
 
     testWidgets('notes Append mode applies an appended note', (tester) async {

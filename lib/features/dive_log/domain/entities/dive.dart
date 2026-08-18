@@ -1026,6 +1026,7 @@ class DiveTank extends Equatable {
   DiveTank copyWith({
     String? id,
     String? name,
+    bool clearName = false,
     double? volume,
     double? workingPressure,
     double? startPressure,
@@ -1042,7 +1043,7 @@ class DiveTank extends Equatable {
   }) {
     return DiveTank(
       id: id ?? this.id,
-      name: name ?? this.name,
+      name: clearName ? null : (name ?? this.name),
       volume: volume ?? this.volume,
       workingPressure: workingPressure ?? this.workingPressure,
       startPressure: startPressure ?? this.startPressure,

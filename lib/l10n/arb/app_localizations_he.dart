@@ -379,7 +379,50 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'החלף';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'עדכון';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty => 'רק צלילות ללא מכל קיים';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'בחר אילו מאפיינים לדרוס במיכלים שכבר קיימים בצלילות אלה. לחצי ההתחלה והסיום לעולם אינם משתנים.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'בחר לפחות מאפיין אחד של מיכל לעדכון.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'הגדרה מראש';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'תפקיד';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'נפח';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'לחץ עבודה';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'חומר';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'תערובת גז';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'שם';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות שנבחרו ללא מיכלים וידולגו.',
+      one: 'צלילה אחת שנבחרה ללא מיכלים ותידולג.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'להחיל שינויים?';

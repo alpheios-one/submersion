@@ -381,8 +381,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Replace';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Update';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Only dives that don\'t already have a tank';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Choose which attributes to overwrite on the tanks these dives already have. Start and end pressures are never changed.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Choose at least one tank attribute to update.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Preset';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Role';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volume';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Working pressure';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Material';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Gas mix';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Name';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected dives have no tanks and will be skipped.',
+      one: '1 selected dive has no tanks and will be skipped.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Apply changes?';

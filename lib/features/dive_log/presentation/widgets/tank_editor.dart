@@ -25,6 +25,11 @@ class TankEditor extends ConsumerStatefulWidget {
   final VoidCallback? onRemove;
   final bool canRemove;
 
+  /// Hide the start/end pressure inputs. Used where the editor describes a
+  /// cylinder rather than one dive's use of it, such as the bulk spec update
+  /// (#797), which never writes pressures.
+  final bool showPressures;
+
   const TankEditor({
     super.key,
     required this.tank,
@@ -32,6 +37,7 @@ class TankEditor extends ConsumerStatefulWidget {
     required this.onChanged,
     this.onRemove,
     this.canRemove = true,
+    this.showPressures = true,
   });
 
   @override
@@ -350,10 +356,12 @@ class _TankEditorState extends ConsumerState<TankEditor> {
               _buildMndInput(gasMix, units, settings),
             ],
 
-            const SizedBox(height: 16),
+            if (widget.showPressures) ...[
+              const SizedBox(height: 16),
 
-            // Start/end pressure
-            _buildPressureRow(units),
+              // Start/end pressure
+              _buildPressureRow(units),
+            ],
 
             // MOD display
             _buildModInfo(gasMix, units, settings),
@@ -432,6 +440,10 @@ class _TankEditorState extends ConsumerState<TankEditor> {
               return DropdownButtonFormField<TankPresetEntity?>(
                 key: ValueKey(matchingPreset?.id ?? 'no-preset'),
                 initialValue: matchingPreset,
+                // Each dropdown here is one Expanded of a shared Row, so it is
+                // narrow. Without this a long label (a custom preset name,
+                // "Carbon Fiber") overflows instead of ellipsizing.
+                isExpanded: true,
                 decoration: InputDecoration(
                   labelText: context.l10n.diveLog_tank_label_tankPreset,
                   isDense: true,
@@ -481,6 +493,7 @@ class _TankEditorState extends ConsumerState<TankEditor> {
         Expanded(
           child: DropdownButtonFormField<TankRole>(
             initialValue: _role,
+            isExpanded: true,
             decoration: InputDecoration(
               labelText: context.l10n.diveLog_tank_label_role,
               isDense: true,
@@ -530,6 +543,7 @@ class _TankEditorState extends ConsumerState<TankEditor> {
           child: DropdownButtonFormField<TankMaterial?>(
             key: ValueKey(_material?.name),
             initialValue: _material,
+            isExpanded: true,
             decoration: InputDecoration(
               labelText: context.l10n.diveLog_tank_label_material,
               isDense: true,

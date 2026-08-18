@@ -381,8 +381,52 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Ersetzen';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Aktualisieren';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Nur Tauchgänge ohne vorhandene Flasche';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Wähle aus, welche Eigenschaften der bereits vorhandenen Flaschen überschrieben werden. Anfangs- und Enddruck werden nie geändert.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Wähle mindestens eine Flascheneigenschaft zum Aktualisieren.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Vorlage';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Rolle';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volumen';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Arbeitsdruck';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Material';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Gasgemisch';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Name';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count ausgewählte Tauchgänge haben keine Flaschen und werden übersprungen.',
+      one: '1 ausgewählter Tauchgang hat keine Flaschen und wird übersprungen.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Änderungen anwenden?';

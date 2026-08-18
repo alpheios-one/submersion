@@ -322,7 +322,25 @@
   "diveLog_bulkEdit_modeAdd": "Add",
   "diveLog_bulkEdit_modeRemove": "Remove",
   "diveLog_bulkEdit_modeReplace": "Replace",
+  "diveLog_bulkEdit_modeUpdate": "Update",
   "diveLog_bulkEdit_tankOnlyIfEmpty": "Only dives that don't already have a tank",
+  "diveLog_bulkEdit_tankSpecsHint": "Choose which attributes to overwrite on the tanks these dives already have. Start and end pressures are never changed.",
+  "diveLog_bulkEdit_tankSpecsNoFields": "Choose at least one tank attribute to update.",
+  "diveLog_bulkEdit_tankFieldPreset": "Preset",
+  "diveLog_bulkEdit_tankFieldRole": "Role",
+  "diveLog_bulkEdit_tankFieldVolume": "Volume",
+  "diveLog_bulkEdit_tankFieldWorkingPressure": "Working pressure",
+  "diveLog_bulkEdit_tankFieldMaterial": "Material",
+  "diveLog_bulkEdit_tankFieldGasMix": "Gas mix",
+  "diveLog_bulkEdit_tankFieldName": "Name",
+  "diveLog_bulkEdit_tankSpecsSkipped": "{count, plural, =1{1 selected dive has no tanks and will be skipped.} other{{count} selected dives have no tanks and will be skipped.}}",
+  "@diveLog_bulkEdit_tankSpecsSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "diveLog_bulkEdit_confirmTitle": "Apply changes?",
   "diveLog_bulkEdit_confirmApply": "Apply",
   "diveLog_bulkEdit_nothingSelected": "Turn on at least one field to apply changes.",

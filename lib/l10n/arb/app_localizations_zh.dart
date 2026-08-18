@@ -371,7 +371,49 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => '替换';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => '更新';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty => '仅没有气瓶的潜水';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      '选择要覆盖这些潜水已有气瓶的哪些属性。起始和结束压力不会被更改。';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields => '请至少选择一个要更新的气瓶属性。';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => '预设';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => '用途';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => '容积';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => '工作压力';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => '材质';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => '混合气';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => '名称';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次所选潜水没有气瓶，将被跳过。',
+      one: '1 次所选潜水没有气瓶，将被跳过。',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => '应用更改？';

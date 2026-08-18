@@ -383,8 +383,51 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Csere';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Frissítés';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Csak a meglévő palack nélküli merülések';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Válaszd ki, mely tulajdonságok íródjanak felül a merülésekhez már tartozó palackokon. A kezdő és a záró nyomás soha nem változik.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Válassz legalább egy palacktulajdonságot a frissítéshez.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Előbeállítás';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Szerep';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Térfogat';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Üzemi nyomás';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Anyag';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Gázkeverék';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Név';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kiválasztott merüléshez nincs palack, ezért kimaradnak.',
+      one: '1 kiválasztott merüléshez nincs palack, ezért kimarad.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Alkalmazza a módosításokat?';
