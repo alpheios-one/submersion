@@ -1503,7 +1503,7 @@
   "diveImport_healthkit_noDivesFound": "لم يتم العثور على غطسات",
   "diveImport_healthkit_noDivesFoundDescription": "لم يتم العثور على أنشطة غوص في النطاق الزمني المحدد.",
   "diveImport_healthkit_notAvailable": "غير متاح",
-  "diveImport_healthkit_notAvailableDescription": "استيراد Apple Watch متاح فقط على أجهزة iOS وmacOS.",
+  "diveImport_healthkit_notAvailableDescription": "يتطلب الاستيراد من Apple Watch جهاز iPhone مزوّدًا بتطبيق صحة.",
   "diveImport_healthkit_permissionCheckFailed": "فشل التحقق من الأذونات",
   "diveImport_healthkit_title": "استيراد من Apple Watch",
   "diveImport_healthkit_watchTitle": "استيراد من الساعة",

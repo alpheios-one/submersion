@@ -19772,7 +19772,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'ייבוא מ-Apple Watch זמין רק במכשירי iOS ו-macOS.';
+      'ייבוא מ-Apple Watch מחייב אייפון עם אפליקציית הבריאות.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed => 'בדיקת הרשאות נכשלה';

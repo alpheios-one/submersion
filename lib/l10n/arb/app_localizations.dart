@@ -33807,7 +33807,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveImport_healthkit_notAvailableDescription.
   ///
   /// In en, this message translates to:
-  /// **'Apple Watch import is only available on iOS and macOS devices.'**
+  /// **'Apple Watch import needs an iPhone with the Health app.'**
   String get diveImport_healthkit_notAvailableDescription;
 
   /// No description provided for @diveImport_healthkit_permissionCheckFailed.

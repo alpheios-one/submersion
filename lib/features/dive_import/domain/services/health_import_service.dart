@@ -36,7 +36,9 @@ extension HealthPermissionStatusX on HealthPermissionStatus {
 /// Abstract interface for importing dives from platform health APIs.
 ///
 /// Implementations handle platform-specific APIs:
-/// - [HealthKitService] for Apple Watch (iOS/macOS)
+/// - `HealthKitService` for Apple Watch, iOS only. The `health` package
+///   declares android and ios platforms and nothing else, so there is no
+///   macOS path to support however capable the Mac is.
 /// - Future: GarminService, SuuntoService
 abstract class HealthImportService {
   /// Check if this health import service is available on the current platform.

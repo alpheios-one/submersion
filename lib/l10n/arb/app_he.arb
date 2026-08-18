@@ -1431,7 +1431,7 @@
   "diveImport_healthkit_noDivesFound": "לא נמצאו צלילות",
   "diveImport_healthkit_noDivesFoundDescription": "לא נמצאו פעילויות צלילה תת-ימיות בטווח התאריכים שנבחר.",
   "diveImport_healthkit_notAvailable": "לא זמין",
-  "diveImport_healthkit_notAvailableDescription": "ייבוא מ-Apple Watch זמין רק במכשירי iOS ו-macOS.",
+  "diveImport_healthkit_notAvailableDescription": "ייבוא מ-Apple Watch מחייב אייפון עם אפליקציית הבריאות.",
   "diveImport_healthkit_permissionCheckFailed": "בדיקת הרשאות נכשלה",
   "diveImport_healthkit_title": "ייבוא מ-Apple Watch",
   "diveImport_healthkit_watchTitle": "ייבוא מהשעון",

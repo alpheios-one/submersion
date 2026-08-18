@@ -20272,7 +20272,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'L\'importazione da Apple Watch è disponibile solo su dispositivi iOS e macOS.';
+      'L\'importazione da Apple Watch richiede un iPhone con l\'app Salute.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>

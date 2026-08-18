@@ -20217,7 +20217,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'Az Apple Watch importalas csak iOS es macOS eszkozokon erheto el.';
+      'Az Apple Watch importáláshoz iPhone szükséges a Health alkalmazással.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>

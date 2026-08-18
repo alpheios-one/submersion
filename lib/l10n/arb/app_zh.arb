@@ -1597,7 +1597,7 @@
   "diveImport_healthkit_noDivesFound": "未找到潜水记录",
   "diveImport_healthkit_noDivesFoundDescription": "在所选日期范围内未找到水下潜水活动。",
   "diveImport_healthkit_notAvailable": "不可用",
-  "diveImport_healthkit_notAvailableDescription": "Apple Watch 导入仅在 iOS 和 macOS 设备上可用。",
+  "diveImport_healthkit_notAvailableDescription": "从 Apple Watch 导入需要装有“健康”App 的 iPhone。",
   "diveImport_healthkit_permissionCheckFailed": "权限检查失败",
   "diveImport_healthkit_title": "从 Apple Watch 导入",
   "diveImport_healthkit_watchTitle": "从手表导入",

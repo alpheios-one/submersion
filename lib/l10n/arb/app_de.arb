@@ -1503,7 +1503,7 @@
   "diveImport_healthkit_noDivesFound": "Keine Tauchgänge gefunden",
   "diveImport_healthkit_noDivesFoundDescription": "Im ausgewählten Zeitraum wurden keine Tauchaktivitäten gefunden.",
   "diveImport_healthkit_notAvailable": "Nicht verfügbar",
-  "diveImport_healthkit_notAvailableDescription": "Apple Watch-Import ist nur auf iOS- und macOS-Geräten verfügbar.",
+  "diveImport_healthkit_notAvailableDescription": "Der Apple-Watch-Import benötigt ein iPhone mit der Health-App.",
   "diveImport_healthkit_permissionCheckFailed": "Berechtigungsprüfung fehlgeschlagen",
   "diveImport_healthkit_title": "Von Apple Watch importieren",
   "diveImport_healthkit_watchTitle": "Von Watch importieren",

@@ -19251,7 +19251,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'Apple Watch 导入仅在 iOS 和 macOS 设备上可用。';
+      '从 Apple Watch 导入需要装有“健康”App 的 iPhone。';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed => '权限检查失败';

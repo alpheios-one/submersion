@@ -17,9 +17,13 @@ import 'package:submersion/features/dive_import/presentation/widgets/imported_di
 // Service Providers
 // ============================================================================
 
-/// Provider for the HealthKit service (Apple platforms only).
+/// Provider for the HealthKit service (iOS only).
+///
+/// Not macOS: the `health` package registers android and ios platforms and
+/// nothing else, so a service built on a Mac could only ever report itself
+/// unsupported.
 final healthKitServiceProvider = Provider<HealthKitService?>((ref) {
-  if (!Platform.isIOS && !Platform.isMacOS) {
+  if (!Platform.isIOS) {
     return null;
   }
   return HealthKitService();
@@ -27,7 +31,7 @@ final healthKitServiceProvider = Provider<HealthKitService?>((ref) {
 
 /// Provider for the active health import service.
 ///
-/// Currently returns HealthKitService on Apple platforms, null elsewhere.
+/// Currently returns HealthKitService on iOS, null elsewhere.
 /// Future: Could include Garmin, Suunto services based on platform/settings.
 final healthImportServiceProvider = Provider<HealthImportService?>((ref) {
   return ref.watch(healthKitServiceProvider);

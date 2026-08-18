@@ -1503,7 +1503,7 @@
   "diveImport_healthkit_noDivesFound": "Nenhum Mergulho Encontrado",
   "diveImport_healthkit_noDivesFoundDescription": "Nenhuma atividade de mergulho subaquatico encontrada no periodo selecionado.",
   "diveImport_healthkit_notAvailable": "Nao Disponivel",
-  "diveImport_healthkit_notAvailableDescription": "A importacao do Apple Watch esta disponivel apenas em dispositivos iOS e macOS.",
+  "diveImport_healthkit_notAvailableDescription": "A importação do Apple Watch precisa de um iPhone com a app Saúde.",
   "diveImport_healthkit_permissionCheckFailed": "Falha ao verificar permissoes",
   "diveImport_healthkit_title": "Importar do Apple Watch",
   "diveImport_healthkit_watchTitle": "Importar do Relogio",

@@ -1431,7 +1431,7 @@
   "diveImport_healthkit_noDivesFound": "Nem talalhato merules",
   "diveImport_healthkit_noDivesFoundDescription": "A kivalasztott idoszakban nem talalhato vizalatti merulesi tevekenyse.",
   "diveImport_healthkit_notAvailable": "Nem elerheto",
-  "diveImport_healthkit_notAvailableDescription": "Az Apple Watch importalas csak iOS es macOS eszkozokon erheto el.",
+  "diveImport_healthkit_notAvailableDescription": "Az Apple Watch importáláshoz iPhone szükséges a Health alkalmazással.",
   "diveImport_healthkit_permissionCheckFailed": "Nem sikerult az engedelyek ellenorzese",
   "diveImport_healthkit_title": "Importalas Apple Watch-rol",
   "diveImport_healthkit_watchTitle": "Importalas orarol",

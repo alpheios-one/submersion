@@ -1503,7 +1503,7 @@
   "diveImport_healthkit_noDivesFound": "Geen duiken gevonden",
   "diveImport_healthkit_noDivesFoundDescription": "Geen onderwaterduikactiviteiten gevonden in het geselecteerde datumbereik.",
   "diveImport_healthkit_notAvailable": "Niet beschikbaar",
-  "diveImport_healthkit_notAvailableDescription": "Apple Watch-import is alleen beschikbaar op iOS- en macOS-apparaten.",
+  "diveImport_healthkit_notAvailableDescription": "Voor importeren vanaf de Apple Watch is een iPhone met de app Gezondheid nodig.",
   "diveImport_healthkit_permissionCheckFailed": "Controle van machtigingen mislukt",
   "diveImport_healthkit_title": "Importeren vanuit Apple Watch",
   "diveImport_healthkit_watchTitle": "Importeren vanuit Watch",

@@ -12952,7 +12952,7 @@
   "diveImport_healthkit_noDivesFound": "No Dives Found",
   "diveImport_healthkit_noDivesFoundDescription": "No underwater diving activities found in the selected date range.",
   "diveImport_healthkit_notAvailable": "Not Available",
-  "diveImport_healthkit_notAvailableDescription": "Apple Watch import is only available on iOS and macOS devices.",
+  "diveImport_healthkit_notAvailableDescription": "Apple Watch import needs an iPhone with the Health app.",
   "diveImport_healthkit_permissionCheckFailed": "Failed to check permissions",
   "diveImport_healthkit_title": "Import from Apple Watch",
   "diveImport_healthkit_watchTitle": "Import from Watch",

@@ -19913,7 +19913,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'استيراد Apple Watch متاح فقط على أجهزة iOS وmacOS.';
+      'يتطلب الاستيراد من Apple Watch جهاز iPhone مزوّدًا بتطبيق صحة.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>

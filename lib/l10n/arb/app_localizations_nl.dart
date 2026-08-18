@@ -20117,7 +20117,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'Apple Watch-import is alleen beschikbaar op iOS- en macOS-apparaten.';
+      'Voor importeren vanaf de Apple Watch is een iPhone met de app Gezondheid nodig.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
