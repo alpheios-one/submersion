@@ -1518,45 +1518,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // Get range selection state
     final rangeState = ref.watch(rangeSelectionProvider(dive.id));
 
-    // Initialize providers with dive duration if needed
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (dive.profile.isNotEmpty) {
-        final maxTimestamp = dive.profile.last.timestamp;
-        final currentPlaybackMax = ref
-            .read(playbackProvider(dive.id))
-            .maxTimestamp;
-        if (currentPlaybackMax == 0) {
-          ref.read(playbackProvider(dive.id).notifier).initialize(maxTimestamp);
-        }
-        final currentRangeMax = ref
-            .read(rangeSelectionProvider(dive.id))
-            .maxTimestamp;
-        if (currentRangeMax == 0) {
-          ref
-              .read(rangeSelectionProvider(dive.id).notifier)
-              .initialize(maxTimestamp);
-        }
-      }
-    });
-
-    // Calculate profile markers (with tank pressure data for accurate thresholds)
-    final markers = _calculateProfileMarkers(
-      dive: dive,
-      analysis: analysis,
-      showMaxDepth: showMaxDepthMarker,
-      showPressureThresholds: showPressureThresholdMarkers,
-      tankPressures: tankPressures,
-    );
-
-    final photoMedia =
-        ref.watch(mediaForDiveProvider(dive.id)).valueOrNull ?? const [];
-    final photoMarkers = dive.profile.isEmpty
-        ? const <PhotoChartMarker>[]
-        : photoMarkersFromMedia(
-            photoMedia,
-            maxProfileSeconds: dive.profile.last.timestamp,
-          );
-
     // Profiles grouped by owning data source, plus the active-source and
     // overlay view state driving the whole page.
     final sourceProfiles =
@@ -1593,9 +1554,56 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // A metadata-only active source has an entry with no points; the chart
     // then renders its empty-profile placeholder instead of silently
     // falling back to the primary's profile (mixed attribution).
+    //
+    // Everything overlaid on the chart is derived from THIS series, never
+    // from dive.profile: the merged series spans every source, so markers
+    // computed against it can report a depth the drawn curve never reaches
+    // and a range extent that runs past its end (#1167).
     final chartProfile = (isMultiSource && activeProfile != null)
         ? activeProfile.points
         : dive.profile;
+
+    // Keep the playback and range extents on the drawn series.
+    //
+    // Deliberately not a one-shot "initialize if still zero": the data
+    // sources load asynchronously, so the first build falls back to
+    // dive.profile and a zero-guard would freeze the merged series' extent
+    // in place forever. The active source can also change at any time. Both
+    // cases leave the range slider running past the end of the visible curve
+    // (#1167). Re-initializing resets playback position and range selection,
+    // which is the wanted behavior when the series underneath them changed.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (chartProfile.isEmpty) return;
+      final maxTimestamp = chartProfile.last.timestamp;
+      if (ref.read(playbackProvider(dive.id)).maxTimestamp != maxTimestamp) {
+        ref.read(playbackProvider(dive.id).notifier).initialize(maxTimestamp);
+      }
+      if (ref.read(rangeSelectionProvider(dive.id)).maxTimestamp !=
+          maxTimestamp) {
+        ref
+            .read(rangeSelectionProvider(dive.id).notifier)
+            .initialize(maxTimestamp);
+      }
+    });
+
+    // Calculate profile markers (with tank pressure data for accurate thresholds)
+    final markers = _calculateProfileMarkers(
+      profile: chartProfile,
+      tanks: dive.tanks,
+      analysis: analysis,
+      showMaxDepth: showMaxDepthMarker,
+      showPressureThresholds: showPressureThresholdMarkers,
+      tankPressures: tankPressures,
+    );
+
+    final photoMedia =
+        ref.watch(mediaForDiveProvider(dive.id)).valueOrNull ?? const [];
+    final photoMarkers = chartProfile.isEmpty
+        ? const <PhotoChartMarker>[]
+        : photoMarkersFromMedia(
+            photoMedia,
+            maxProfileSeconds: chartProfile.last.timestamp,
+          );
 
     // Overlay ids are session state and can briefly outlive their source
     // rows (e.g. right after a split); skip any stale entries instead of
@@ -3159,8 +3167,16 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   );
 
   /// Calculate profile markers for max depth and pressure thresholds
+  /// Markers to overlay on the profile chart.
+  ///
+  /// [profile] must be the series the chart is actually drawing (the active
+  /// source's points), not `dive.profile`. The analysis these markers are
+  /// positioned from is the active source's, so indexing it into the merged
+  /// series would place the max-depth flag at another computer's reading
+  /// (#1167).
   List<ProfileMarker> _calculateProfileMarkers({
-    required Dive dive,
+    required List<DiveProfilePoint> profile,
+    required List<DiveTank> tanks,
     required ProfileAnalysis? analysis,
     required bool showMaxDepth,
     required bool showPressureThresholds,
@@ -3168,12 +3184,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   }) {
     final markers = <ProfileMarker>[];
 
-    if (dive.profile.isEmpty) return markers;
+    if (profile.isEmpty) return markers;
 
     // Add max depth marker
     if (showMaxDepth && analysis != null) {
       final maxDepthMarker = ProfileMarkersService.getMaxDepthMarker(
-        profile: dive.profile,
+        profile: profile,
         maxDepthTimestamp: analysis.maxDepthTimestamp,
         maxDepth: analysis.maxDepth,
       );
@@ -3183,11 +3199,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     }
 
     // Add pressure threshold markers (using per-tank data when available)
-    if (showPressureThresholds && dive.tanks.isNotEmpty) {
+    if (showPressureThresholds && tanks.isNotEmpty) {
       markers.addAll(
         ProfileMarkersService.getPressureThresholdMarkers(
-          profile: dive.profile,
-          tanks: dive.tanks,
+          profile: profile,
+          tanks: tanks,
           tankPressures: tankPressures,
         ),
       );
