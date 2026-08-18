@@ -32176,4 +32176,25 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'In coda per il caricamento';
+
+  @override
+  String get media_status_broken => 'Mancante e senza backup';
+
+  @override
+  String get media_status_transferFailed => 'Caricamento non riuscito';
+
+  @override
+  String get media_status_transferring => 'Caricamento in corso';
+
+  @override
+  String get media_status_queued => 'In attesa di caricamento';
+
+  @override
+  String get media_status_cloudOnly => 'Salvato solo nel cloud';
+
+  @override
+  String get media_status_notBackedUp => 'Nessun backup';
+
+  @override
+  String get media_tile_infoMenuItem => 'Info media';
 }

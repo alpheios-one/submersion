@@ -32194,4 +32194,25 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Na fila para envio';
+
+  @override
+  String get media_status_broken => 'Ausente e sem backup';
+
+  @override
+  String get media_status_transferFailed => 'Falha no envio';
+
+  @override
+  String get media_status_transferring => 'Enviando';
+
+  @override
+  String get media_status_queued => 'Aguardando envio';
+
+  @override
+  String get media_status_cloudOnly => 'Armazenado apenas na nuvem';
+
+  @override
+  String get media_status_notBackedUp => 'Sem backup';
+
+  @override
+  String get media_tile_infoMenuItem => 'Informações da mídia';
 }

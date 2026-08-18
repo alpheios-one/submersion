@@ -31881,4 +31881,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'في قائمة انتظار الرفع';
+
+  @override
+  String get media_status_broken => 'مفقود وغير منسوخ احتياطيًا';
+
+  @override
+  String get media_status_transferFailed => 'فشل الرفع';
+
+  @override
+  String get media_status_transferring => 'جارٍ الرفع';
+
+  @override
+  String get media_status_queued => 'في انتظار الرفع';
+
+  @override
+  String get media_status_cloudOnly => 'مخزن في السحابة فقط';
+
+  @override
+  String get media_status_notBackedUp => 'لا يوجد نسخ احتياطي';
+
+  @override
+  String get media_tile_infoMenuItem => 'معلومات الوسائط';
 }

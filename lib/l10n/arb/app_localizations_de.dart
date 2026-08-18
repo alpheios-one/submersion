@@ -32119,4 +32119,25 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Zum Upload eingereiht';
+
+  @override
+  String get media_status_broken => 'Fehlt und nicht gesichert';
+
+  @override
+  String get media_status_transferFailed => 'Upload fehlgeschlagen';
+
+  @override
+  String get media_status_transferring => 'Wird hochgeladen';
+
+  @override
+  String get media_status_queued => 'Warten auf Upload';
+
+  @override
+  String get media_status_cloudOnly => 'Nur in der Cloud gespeichert';
+
+  @override
+  String get media_status_notBackedUp => 'Nicht gesichert';
+
+  @override
+  String get media_tile_infoMenuItem => 'Medieninfo';
 }

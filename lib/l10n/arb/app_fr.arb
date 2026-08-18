@@ -9476,5 +9476,12 @@
   "media_info_checkFound": "Source trouvée",
   "media_info_checkMissing": "Source introuvable",
   "media_info_checkUnavailable": "Vérification impossible pour le moment",
-  "media_info_backupQueued": "Mis en file pour téléversement"
+  "media_info_backupQueued": "Mis en file pour téléversement",
+  "media_status_broken": "Absent et non sauvegardé",
+  "media_status_transferFailed": "Échec du téléversement",
+  "media_status_transferring": "Téléversement en cours",
+  "media_status_queued": "En attente de téléversement",
+  "media_status_cloudOnly": "Stocké uniquement dans le cloud",
+  "media_status_notBackedUp": "Non sauvegardé",
+  "media_tile_infoMenuItem": "Infos du média"
 }

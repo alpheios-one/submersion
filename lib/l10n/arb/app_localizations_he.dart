@@ -31544,4 +31544,25 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'בתור להעלאה';
+
+  @override
+  String get media_status_broken => 'חסר ולא מגובה';
+
+  @override
+  String get media_status_transferFailed => 'ההעלאה נכשלה';
+
+  @override
+  String get media_status_transferring => 'מעלה';
+
+  @override
+  String get media_status_queued => 'ממתין להעלאה';
+
+  @override
+  String get media_status_cloudOnly => 'מאוחסן בענן בלבד';
+
+  @override
+  String get media_status_notBackedUp => 'לא מגובה';
+
+  @override
+  String get media_tile_infoMenuItem => 'פרטי מדיה';
 }

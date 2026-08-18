@@ -32264,4 +32264,25 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Mis en file pour téléversement';
+
+  @override
+  String get media_status_broken => 'Absent et non sauvegardé';
+
+  @override
+  String get media_status_transferFailed => 'Échec du téléversement';
+
+  @override
+  String get media_status_transferring => 'Téléversement en cours';
+
+  @override
+  String get media_status_queued => 'En attente de téléversement';
+
+  @override
+  String get media_status_cloudOnly => 'Stocké uniquement dans le cloud';
+
+  @override
+  String get media_status_notBackedUp => 'Non sauvegardé';
+
+  @override
+  String get media_tile_infoMenuItem => 'Infos du média';
 }

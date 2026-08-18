@@ -9476,5 +9476,12 @@
   "media_info_checkFound": "تم العثور على المصدر",
   "media_info_checkMissing": "المصدر مفقود",
   "media_info_checkUnavailable": "تعذر التحقق الآن",
-  "media_info_backupQueued": "في قائمة انتظار الرفع"
+  "media_info_backupQueued": "في قائمة انتظار الرفع",
+  "media_status_broken": "مفقود وغير منسوخ احتياطيًا",
+  "media_status_transferFailed": "فشل الرفع",
+  "media_status_transferring": "جارٍ الرفع",
+  "media_status_queued": "في انتظار الرفع",
+  "media_status_cloudOnly": "مخزن في السحابة فقط",
+  "media_status_notBackedUp": "لا يوجد نسخ احتياطي",
+  "media_tile_infoMenuItem": "معلومات الوسائط"
 }

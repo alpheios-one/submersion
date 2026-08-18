@@ -32065,4 +32065,25 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_info_backupQueued => 'Feltöltési sorban';
+
+  @override
+  String get media_status_broken => 'Hiányzik és nincs mentve';
+
+  @override
+  String get media_status_transferFailed => 'A feltöltés sikertelen';
+
+  @override
+  String get media_status_transferring => 'Feltöltés folyamatban';
+
+  @override
+  String get media_status_queued => 'Feltöltésre vár';
+
+  @override
+  String get media_status_cloudOnly => 'Csak a felhőben tárolva';
+
+  @override
+  String get media_status_notBackedUp => 'Nincs mentve';
+
+  @override
+  String get media_tile_infoMenuItem => 'Média infó';
 }

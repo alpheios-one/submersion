@@ -18076,5 +18076,12 @@
   "media_info_backupQueued": "Queued for upload",
   "@media_info_backupQueued": {
     "description": "Confirmation shown after queueing an upload"
-  }
+  },
+  "media_status_broken": "Missing and not backed up",
+  "media_status_transferFailed": "Upload failed",
+  "media_status_transferring": "Uploading",
+  "media_status_queued": "Waiting to upload",
+  "media_status_cloudOnly": "Stored in the cloud only",
+  "media_status_notBackedUp": "Not backed up",
+  "media_tile_infoMenuItem": "Media info"
 }
