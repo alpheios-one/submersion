@@ -408,6 +408,19 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             case .ftdiUsb(let device): return "\(device.displayName) (USB)"
             }
         }
+
+        /// Log category for lines about this candidate.
+        ///
+        /// Tagging a raw-USB probe as SER would make a debug log read as though
+        /// a serial port were involved, which is exactly the distinction
+        /// someone diagnosing issue #732 needs to draw: whether the cable was
+        /// reached through a device node or directly over USB.
+        var logCategory: String {
+            switch self {
+            case .serialPort: return "SER"
+            case .ftdiUsb: return "USB"
+            }
+        }
     }
 
     /// Opens a candidate. Returns the stream plus its callbacks on success, or
@@ -424,18 +437,20 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             let stream = SerialIoStream()
             if let failure = stream.open(path: path) {
                 NativeLogger.e(
-                    "DiveComputerHost", category: "SER",
+                    "DiveComputerHost", category: candidate.logCategory,
                     "Failed to open \(path) (errno=\(failure.errnoValue)): \(failure.reason)")
                 lastCandidateFailure = failure.reason
                 return nil
             }
-            NativeLogger.i("DiveComputerHost", category: "SER", "Opened serial port: \(path)")
+            NativeLogger.i(
+                "DiveComputerHost", category: candidate.logCategory,
+                "Opened serial port: \(path)")
             return (stream, stream.makeCallbacks(), stream.close)
         case .ftdiUsb(let device):
             let stream = FtdiUsbIoStream()
             if let reason = stream.open(device: device) {
                 NativeLogger.e(
-                    "DiveComputerHost", category: "USB",
+                    "DiveComputerHost", category: candidate.logCategory,
                     "Failed to open \(device.displayName): \(reason)")
                 lastCandidateFailure = reason
                 return nil
@@ -533,7 +548,8 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             }
             anyOpened = true
             NativeLogger.i(
-                "DiveComputerHost", category: "SER", "Probing \(candidate.label)")
+                "DiveComputerHost", category: candidate.logCategory,
+                "Probing \(candidate.label)")
             self.activeSerialStream = opened.stream
             let result = runOnce(
                 session: session, device: device, transportValue: transportValue,
@@ -548,7 +564,7 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             }
             probeLog += "  \(candidate.label): download failed (rc=\(result.rc))\n"
             NativeLogger.w(
-                "DiveComputerHost", category: "SER",
+                "DiveComputerHost", category: candidate.logCategory,
                 "Probe failed on \(candidate.label) rc=\(result.rc)")
         }
 
