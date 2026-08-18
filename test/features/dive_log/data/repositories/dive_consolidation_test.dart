@@ -246,6 +246,71 @@ void main() {
   // ---------------------------------------------------------------------------
 
   group('split into separate dive', () {
+    // Two file-imported sources both carry a null computerId, so the legacy
+    // "null belongs to the primary family" rule cannot tell their samples
+    // apart. Splitting one used to sweep up the other's demoted rows and
+    // reattribute them to the new dive, which is the same identify-by-
+    // computerId mistake as issue #1149 in a different method.
+    test('does not move another source\'s samples off the dive', () async {
+      final diveId = await insertTestDive(
+        id: 'dive-two-imports',
+        diveComputerModel: 'Imported file A',
+      );
+
+      await repository.saveComputerReading(
+        buildReading(
+          id: 'source-a',
+          diveId: diveId,
+          isPrimary: true,
+          computerModel: 'Imported file A',
+        ),
+      );
+      await repository.saveComputerReading(
+        buildReading(
+          id: 'source-b',
+          diveId: diveId,
+          isPrimary: false,
+          computerModel: 'Imported file B',
+        ),
+      );
+
+      // Source A's own samples, demoted the way a profile edit leaves the
+      // superseded originals: null computerId, isPrimary false, owned by A.
+      await insertTestProfile(
+        diveId: diveId,
+        sourceTag: 'a-original',
+        sourceId: 'source-a',
+        isPrimary: false,
+        timestamp: 0,
+        depth: 5.0,
+      );
+      // Source B's samples: identical shape apart from the owning source.
+      await insertTestProfile(
+        diveId: diveId,
+        sourceTag: 'b1',
+        sourceId: 'source-b',
+        isPrimary: false,
+        timestamp: 0,
+        depth: 9.0,
+      );
+
+      await DiveSplitService(
+        repository,
+      ).split(diveId: diveId, sourceId: 'source-b');
+
+      final remaining = await (db.select(
+        db.diveProfiles,
+      )..where((t) => t.diveId.equals(diveId))).get();
+
+      expect(
+        remaining.map((r) => r.sourceId),
+        contains('source-a'),
+        reason:
+            "source A's samples belong to the dive being split FROM and must "
+            'not follow source B onto the new dive',
+      );
+    });
+
     test('creates a new standalone dive from detached data', () async {
       final diveId = await insertTestDive(
         id: 'dive-multi',

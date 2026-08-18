@@ -250,17 +250,27 @@ class DiveSplitService {
       // sources take their computer's rows, promoted to primary on the new
       // dive. A computer-less source moves only non-primary null rows
       // (user-edited primary rows stay with the original dive).
+      // Every branch below is additionally gated on the row not being spoken
+      // for by a DIFFERENT source (issue #1149). The computerId rules cannot
+      // separate two file-imported sources -- both sides are null -- so on a
+      // dive carrying two of them the null-family branch swept up the other
+      // source's samples and carried them onto the new dive, taking them off
+      // the dive being split from entirely. A row whose sourceId names
+      // another source is never this source's to move; rows with no sourceId
+      // still fall through to the legacy rules below.
       final profileRows =
-          await (_db.select(_db.diveProfiles)..where(
-                (t) => source.computerId == null
-                    ? t.diveId.equals(diveId) &
-                          t.computerId.isNull() &
-                          t.isPrimary.equals(false)
+          await (_db.select(_db.diveProfiles)..where((t) {
+                final notOwnedByAnotherSource =
+                    t.sourceId.isNull() | t.sourceId.equals(source.id);
+                final byLegacyRule = source.computerId == null
+                    ? t.computerId.isNull() & t.isPrimary.equals(false)
                     : source.isPrimary
-                    ? t.diveId.equals(diveId) &
-                          (ownedBySource(t.computerId) | t.computerId.isNull())
-                    : t.diveId.equals(diveId) & ownedBySource(t.computerId),
-              ))
+                    ? ownedBySource(t.computerId) | t.computerId.isNull()
+                    : ownedBySource(t.computerId);
+                return t.diveId.equals(diveId) &
+                    notOwnedByAnotherSource &
+                    byLegacyRule;
+              }))
               .get();
       await _db.batch((batch) {
         for (final row in profileRows) {
