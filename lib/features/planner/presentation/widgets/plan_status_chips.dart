@@ -165,35 +165,38 @@ class PlanStatusChips extends ConsumerWidget {
 /// losing a deco/stage/travel gas changes the whole deco schedule, not just
 /// the chart ghost -- so this makes clear the numbers are a "what if", not
 /// the live plan.
+///
+/// Gated on [selectedContingencyProvider], not on the raw selection ids: a
+/// selection can go stale (the tank was removed, or stopped being losable)
+/// while its id lingers, and the stats fall back to the live plan in that
+/// case. Reading the same provider the stats read keeps the chip from
+/// claiming a preview that is not in effect.
 class ContingencyPreviewChip extends ConsumerWidget {
   const ContingencyPreviewChip({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final deviationKey = ref.watch(selectedDeviationProvider);
-    final lostGasTankId = ref.watch(selectedLostGasTankIdProvider);
-    if (deviationKey == null && lostGasTankId == null) {
-      return const SizedBox.shrink();
-    }
+    final preview = ref.watch(selectedContingencyProvider);
+    if (preview == null) return const SizedBox.shrink();
 
     final state = ref.watch(divePlanNotifierProvider);
     final units = UnitFormatter(ref.watch(settingsProvider));
 
+    final lostTank = preview.lostTank;
     final String label;
-    if (deviationKey != null) {
+    if (lostTank != null) {
+      label = context.l10n.plannerCanvas_contingency_lostGas(
+        lostTank.gasMix.name,
+      );
+    } else {
       final depth =
           '+${units.formatDepth(state.deviationDepthDelta, decimals: 0)}';
       final time = '+${state.deviationTimeMinutes}′';
-      label = switch (deviationKey) {
+      label = switch (ref.watch(selectedDeviationProvider)) {
         'deeper' => depth,
         'longer' => time,
         _ => '$depth $time',
       };
-    } else {
-      final tank = state.tanks.where((t) => t.id == lostGasTankId).firstOrNull;
-      label = context.l10n.plannerCanvas_contingency_lostGas(
-        tank?.gasMix.name ?? '--',
-      );
     }
 
     return PlanChip(

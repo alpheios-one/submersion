@@ -223,20 +223,26 @@ class PlanResultsSheet extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 4),
+            // The chevron carries its own vertical slack (see below), so the
+            // row only needs padding under it.
+            padding: const EdgeInsets.only(bottom: 4),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () => toggleCollapsed(key),
-                  child: Icon(
+                // An IconButton rather than a bare InkWell so the 20px glyph
+                // gets an accessible box around it: tapTargetSize is left at
+                // the theme default (padded, kMinInteractiveDimension = 48)
+                // and compact density trims it to 40x40, the same treatment
+                // the rest of the app's small icon controls use.
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  iconSize: 20,
+                  color: theme.colorScheme.outline,
+                  onPressed: () => toggleCollapsed(key),
+                  icon: Icon(
                     collapsed ? Icons.chevron_right : Icons.expand_more,
-                    size: 20,
-                    color: theme.colorScheme.outline,
                   ),
                 ),
-                const SizedBox(width: 2),
                 PlanChip(label: label, emphasized: selected, onTap: onSelect),
               ],
             ),

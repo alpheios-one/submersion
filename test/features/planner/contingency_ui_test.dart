@@ -301,7 +301,16 @@ void main() {
       expect(container.read(selectedLostGasTankIdProvider), isNull);
       expect(seriesPainter().ghost, isNull);
 
-      // Collapsing the row hides its runtime table but keeps the chip.
+      // Collapsing the row hides its runtime table but keeps the chip. The
+      // chevron is a 20px glyph, so it needs a box around it to stay
+      // tappable: the theme's padded tap target (48) trimmed by compact
+      // density (-8).
+      final chevron = find.ancestor(
+        of: find.byIcon(Icons.expand_more).last,
+        matching: find.byType(IconButton),
+      );
+      expect(tester.getSize(chevron).height, greaterThanOrEqualTo(40));
+      expect(tester.getSize(chevron).width, greaterThanOrEqualTo(40));
       await tester.tap(find.byIcon(Icons.expand_more).last);
       await tester.pumpAndSettle();
       expect(

@@ -143,4 +143,29 @@ void main() {
     expect(container.read(selectedDeviationProvider), isNull);
     expect(find.textContaining('Previewing'), findsNothing);
   });
+
+  testWidgets('ContingencyPreviewChip hides when the selected tank is gone', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_harness(PlanStatusChips(onIssuesTap: () {})));
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(PlanStatusChips)),
+    );
+    await _seedDecoPlan(tester, find.byType(PlanStatusChips));
+
+    // A selection whose tank the plan never carried stands in for one that
+    // went stale (tank removed, role changed, travel-gas flag cleared): the
+    // id lingers but no contingency is computed, so the headline stats fall
+    // back to the live plan. The chip must not claim a preview that is not
+    // in effect.
+    container.read(selectedLostGasTankIdProvider.notifier).state = 'removed';
+    await tester.pumpAndSettle();
+
+    expect(container.read(selectedContingencyProvider), isNull);
+    expect(find.textContaining('Previewing'), findsNothing);
+    expect(
+      container.read(activePlanOutcomeProvider),
+      same(container.read(planOutcomeProvider)),
+    );
+  });
 }

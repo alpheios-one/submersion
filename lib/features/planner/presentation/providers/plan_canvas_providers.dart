@@ -297,8 +297,18 @@ final selectedLostGasTankIdProvider = StateProvider<String?>((_) => null);
 /// the chart ghost -- so this is the single source both the ghost series and
 /// the headline stats read from, keeping them in sync and to a single engine
 /// run per selection.
+///
+/// It is also null when a selection has gone stale -- the tank was removed,
+/// stopped being losable (its role changed, or its travel-gas flag was
+/// cleared), or the deviation cannot be applied -- so consumers must gate on
+/// this rather than on the raw selection providers, which still hold the id.
+/// [lostTank] is the cylinder being dropped, non-null only for a lost-gas
+/// selection, so a label can name it without re-deriving whether the
+/// selection is still valid.
 final selectedContingencyProvider =
-    Provider<({domain.DivePlan plan, PlanOutcome outcome})?>((ref) {
+    Provider<
+      ({domain.DivePlan plan, PlanOutcome outcome, DiveTank? lostTank})?
+    >((ref) {
       final deviationKey = ref.watch(selectedDeviationProvider);
       final lostGasTankId = ref.watch(selectedLostGasTankIdProvider);
       if (deviationKey == null && lostGasTankId == null) return null;
@@ -312,11 +322,15 @@ final selectedContingencyProvider =
       if (deviationKey != null) {
         final deviation = service.deviationFor(plan, deviationKey);
         if (deviation == null) return null;
-        return (plan: deviation.plan, outcome: deviation.outcome);
+        return (
+          plan: deviation.plan,
+          outcome: deviation.outcome,
+          lostTank: null,
+        );
       }
       final lost = service.lostGasFor(plan, lostGasTankId!);
       if (lost == null) return null;
-      return (plan: lost.plan, outcome: lost.outcome);
+      return (plan: lost.plan, outcome: lost.outcome, lostTank: lost.tank);
     });
 
 /// Chart series for the selected contingency, drawn as a ghost overlay.
