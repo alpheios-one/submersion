@@ -5778,6 +5778,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_filter_title => 'Tauchgänge filtern';
 
   @override
+  String get diveLog_filter_resizeGrip => 'Filterbereich skalieren';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Filter schließen';
 
   @override

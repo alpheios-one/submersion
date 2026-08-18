@@ -5764,6 +5764,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_title => 'Merulesek szurese';
 
   @override
+  String get diveLog_filter_resizeGrip => 'Szűrőpanel átméretezése';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Szuro bezarasa';
 
   @override

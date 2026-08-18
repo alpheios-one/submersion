@@ -1931,6 +1931,7 @@
   "diveLog_filter_showOnlyFavorites": "Mostra solo le immersioni preferite",
   "diveLog_filter_startDate": "Data di inizio",
   "diveLog_filter_title": "Filtra immersioni",
+  "diveLog_filter_resizeGrip": "Ridimensiona il pannello dei filtri",
   "diveLog_filter_tooltip_close": "Chiudi filtro",
   "diveLog_fullscreenProfile_close": "Chiudi schermo intero",
   "diveLog_fullscreenProfile_readoutHint": "Passa il cursore o scorri sul profilo",

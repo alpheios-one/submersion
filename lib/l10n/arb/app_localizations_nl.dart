@@ -5737,6 +5737,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_filter_title => 'Duiken filteren';
 
   @override
+  String get diveLog_filter_resizeGrip => 'Formaat van filterpaneel wijzigen';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Filter sluiten';
 
   @override

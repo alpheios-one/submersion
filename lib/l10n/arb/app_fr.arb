@@ -1931,6 +1931,7 @@
   "diveLog_filter_showOnlyFavorites": "Afficher uniquement les plongees favorites",
   "diveLog_filter_startDate": "Date de debut",
   "diveLog_filter_title": "Filtrer les plongees",
+  "diveLog_filter_resizeGrip": "Redimensionner le panneau de filtres",
   "diveLog_filter_tooltip_close": "Fermer le filtre",
   "diveLog_fullscreenProfile_close": "Fermer le plein ecran",
   "diveLog_fullscreenProfile_readoutHint": "Survolez ou faites glisser sur le profil",

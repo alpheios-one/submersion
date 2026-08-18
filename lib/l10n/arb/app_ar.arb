@@ -2003,6 +2003,7 @@
   "diveLog_filter_showOnlyFavorites": "عرض الغوصات المفضلة فقط",
   "diveLog_filter_startDate": "تاريخ البدء",
   "diveLog_filter_title": "تصفية الغوصات",
+  "diveLog_filter_resizeGrip": "تغيير حجم لوحة التصفية",
   "diveLog_filter_tooltip_close": "إغلاق التصفية",
   "diveLog_fullscreenProfile_close": "إغلاق ملء الشاشة",
   "diveLog_fullscreenProfile_readoutHint": "مرر المؤشر أو اسحب فوق ملف الغوصة",

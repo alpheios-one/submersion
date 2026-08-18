@@ -5674,6 +5674,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_filter_title => 'Filter Dives';
 
   @override
+  String get diveLog_filter_resizeGrip => 'Resize filter panel';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Close filter';
 
   @override

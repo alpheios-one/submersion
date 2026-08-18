@@ -9637,6 +9637,12 @@ abstract class AppLocalizations {
   /// **'Filter Dives'**
   String get diveLog_filter_title;
 
+  /// No description provided for @diveLog_filter_resizeGrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Resize filter panel'**
+  String get diveLog_filter_resizeGrip;
+
   /// No description provided for @diveLog_filter_tooltip_close.
   ///
   /// In en, this message translates to:

@@ -2003,6 +2003,7 @@
   "diveLog_filter_showOnlyFavorites": "Nur Favoriten anzeigen",
   "diveLog_filter_startDate": "Startdatum",
   "diveLog_filter_title": "Tauchgänge filtern",
+  "diveLog_filter_resizeGrip": "Filterbereich skalieren",
   "diveLog_filter_tooltip_close": "Filter schließen",
   "diveLog_fullscreenProfile_close": "Vollbild schließen",
   "diveLog_fullscreenProfile_readoutHint": "Zeiger über das Profil bewegen oder scrubben",
