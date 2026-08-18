@@ -9272,6 +9272,8 @@
   "startup_migrationFailed_body": "Tu cuaderno de buceo no pudo actualizarse al formato que necesita esta versión. Se hizo una copia de seguridad antes de empezar la actualización, así que no se ha perdido nada.",
   "startup_dataUnreadable_title": "No se pudo leer tu cuaderno de buceo",
   "startup_dataUnreadable_body": "El archivo de la base de datos está ahí, pero Submersion no puede leerlo. Normalmente esto significa que el archivo está dañado. Restaurar una copia de seguridad es la forma más rápida de volver.",
+  "startup_databaseBusy_title": "Tu cuaderno de buceo estaba ocupado",
+  "startup_databaseBusy_body": "Algo más seguía usando el archivo de la base de datos, así que Submersion se detuvo en lugar de escribir en él. No se cambió nada y nada está dañado. Cierra Submersion por completo y vuelve a abrirlo.",
   "startup_failure_technicalDetails": "Detalles técnicos",
   "startup_failure_backupAvailable_title": "Hay una copia de seguridad disponible",
   "startup_failure_backupAvailable_taken": "Creada el {timestamp}",

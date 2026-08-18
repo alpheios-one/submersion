@@ -31324,6 +31324,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Il file del database c\'è, ma Submersion non riesce a leggerlo. Di solito significa che il file è danneggiato. Ripristinare un backup è il modo più rapido per ripartire.';
 
   @override
+  String get startup_databaseBusy_title =>
+      'Il tuo diario di immersione era occupato';
+
+  @override
+  String get startup_databaseBusy_body =>
+      'Qualcos’altro stava ancora usando il file del database, quindi Submersion si è fermato invece di scriverci. Non è stato modificato nulla e nulla è danneggiato. Chiudi completamente Submersion, poi riaprilo.';
+
+  @override
   String get startup_failure_technicalDetails => 'Dettagli tecnici';
 
   @override

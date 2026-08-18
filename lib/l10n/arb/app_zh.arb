@@ -9272,6 +9272,8 @@
   "startup_migrationFailed_body": "无法将您的潜水日志升级到此版本所需的格式。升级开始前已创建安全副本，因此没有丢失任何内容。",
   "startup_dataUnreadable_title": "无法读取您的潜水日志",
   "startup_dataUnreadable_body": "数据库文件存在，但 Submersion 无法读取它。这通常意味着文件已损坏。恢复备份是最快的解决办法。",
+  "startup_databaseBusy_title": "您的潜水日志正忙",
+  "startup_databaseBusy_body": "有其他程序仍在使用数据库文件，因此 Submersion 停止了操作，没有写入。没有任何内容被更改或损坏。请完全关闭 Submersion，然后重新打开。",
   "startup_failure_technicalDetails": "技术详情",
   "startup_failure_backupAvailable_title": "有可用的备份",
   "startup_failure_backupAvailable_taken": "创建于 {timestamp}",

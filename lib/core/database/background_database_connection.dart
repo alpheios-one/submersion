@@ -7,7 +7,7 @@ import 'package:drift/isolate.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 
-import 'package:submersion/core/database/sqlcipher_setup.dart';
+import 'package:submersion/core/database/database_connection_setup.dart';
 
 /// Builds the worker's database opener in its own scope.
 ///
@@ -21,9 +21,7 @@ DatabaseConnection Function() _openerFor(String path, String? keyHex) {
     return DatabaseConnection(
       NativeDatabase(
         File(path),
-        setup: keyHex == null
-            ? null
-            : (db) => db.execute(cipherKeyPragma(keyHex)),
+        setup: (db) => applyMainDatabaseSetup(db, keyHex: keyHex),
       ),
     );
   };

@@ -9272,6 +9272,8 @@
   "startup_migrationFailed_body": "Não foi possível atualizar o seu diário de mergulho para o formato de que esta versão precisa. Foi criada uma cópia de segurança antes de a atualização começar, por isso nada se perdeu.",
   "startup_dataUnreadable_title": "Não foi possível ler o seu diário de mergulho",
   "startup_dataUnreadable_body": "O ficheiro da base de dados está lá, mas o Submersion não consegue lê-lo. Normalmente isto significa que o ficheiro está danificado. Restaurar uma cópia de segurança é a forma mais rápida de recomeçar.",
+  "startup_databaseBusy_title": "O seu diário de mergulho estava ocupado",
+  "startup_databaseBusy_body": "Algo ainda estava a usar o ficheiro da base de dados, por isso o Submersion parou em vez de escrever nele. Nada foi alterado e nada está danificado. Feche o Submersion por completo e volte a abri-lo.",
   "startup_failure_technicalDetails": "Detalhes técnicos",
   "startup_failure_backupAvailable_title": "Está disponível uma cópia de segurança",
   "startup_failure_backupAvailable_taken": "Criada a {timestamp}",

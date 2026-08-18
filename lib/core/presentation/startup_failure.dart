@@ -46,6 +46,12 @@ enum StartupFailureKind {
   /// not a database at all. Restoring a backup is the fastest way back.
   dataUnreadable,
 
+  /// Another connection held a lock the whole time SQLite was willing to wait
+  /// for it. Nothing is damaged and nothing was changed -- SQLITE_BUSY is a
+  /// refusal to START the statement, so the transaction rolled back intact.
+  /// Closing Submersion fully and reopening is the whole fix.
+  databaseBusy,
+
   /// Nothing more specific could be established. Treated conservatively: the
   /// failure is assumed to have reached the database, so the recovery routes
   /// stay on offer, but the app does not claim an upgrade failed.
@@ -54,12 +60,22 @@ enum StartupFailureKind {
   /// Whether the diver's database could plausibly have been touched.
   ///
   /// Drives both the reassurance wording and whether restore is offered.
-  /// [engineUnavailable] is the only class that can promise it was not.
-  bool get dataIsAtRisk => this != StartupFailureKind.engineUnavailable;
+  /// [engineUnavailable] promises the file was never opened; [databaseBusy]
+  /// promises it was opened but never written. Offering a restore for a lock
+  /// would invite a diver to overwrite a perfectly intact database.
+  bool get dataIsAtRisk =>
+      this != StartupFailureKind.engineUnavailable &&
+      this != StartupFailureKind.databaseBusy;
 }
 
 /// SQLite primary result code 11, SQLITE_CORRUPT.
 const int _sqliteCorrupt = 11;
+
+/// SQLite primary result code 5, SQLITE_BUSY: another CONNECTION holds the
+/// lock. Result code 6, SQLITE_LOCKED, is the same story within one
+/// connection; both mean the statement never ran.
+const int _sqliteBusy = 5;
+const int _sqliteLocked = 6;
 
 /// SQLite primary result code 26, SQLITE_NOTADB. Also what SQLCipher answers
 /// when reading an encrypted file with a missing or wrong key. The startup
@@ -90,6 +106,14 @@ const List<String> _unreadableDataMarkers = [
   'file is not a database',
 ];
 
+/// Substrings that identify a lock where the SQLite result code is not
+/// reachable, for the same wrapping reason as [_unreadableDataMarkers].
+const List<String> _busyMarkers = [
+  'database is locked',
+  'database table is locked',
+  'database schema is locked',
+];
+
 /// Classifies a terminal startup failure into the class whose title and body
 /// tell the diver the truth about their data.
 ///
@@ -116,6 +140,19 @@ StartupFailureKind classifyStartupFailure(Object error, StartupPhase phase) {
 
   if (_unreadableDataMarkers.any(message.contains)) {
     return StartupFailureKind.dataUnreadable;
+  }
+
+  // Before the phase check: a lock met while the ladder ran is NOT a failed
+  // upgrade. SQLite refused to start the write, so the ladder changed
+  // nothing, and reporting it as a failed migration told the diver their data
+  // was at risk and offered to restore an older backup over an intact file.
+  if (error is sqlite3.SqliteException &&
+      (error.resultCode == _sqliteBusy || error.resultCode == _sqliteLocked)) {
+    return StartupFailureKind.databaseBusy;
+  }
+
+  if (_busyMarkers.any(message.contains)) {
+    return StartupFailureKind.databaseBusy;
   }
 
   if (phase == StartupPhase.upgrading) {

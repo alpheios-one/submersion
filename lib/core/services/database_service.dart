@@ -9,6 +9,7 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import 'package:submersion/core/database/background_database_connection.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/database_connection_setup.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/database/sqlcipher_setup.dart'
     as sqlcipher_setup;
@@ -27,11 +28,11 @@ enum DatabaseOpenMode {
   migrationThenBackground,
 }
 
-/// drift setup callback that keys a SQLCipher connection before any other
-/// statement. Null when no key — plaintext open, zero overhead.
-void Function(sqlite3.Database)? _cipherSetup(String? keyHex) {
-  if (keyHex == null) return null;
-  return (db) => db.execute(DatabaseService.cipherKeyPragma(keyHex));
+/// drift setup callback for a main-database connection: keys SQLCipher before
+/// any other statement, then applies the busy timeout. Never null -- the busy
+/// timeout is needed on plaintext databases too.
+void Function(sqlite3.Database) _connectionSetup(String? keyHex) {
+  return (db) => applyMainDatabaseSetup(db, keyHex: keyHex);
 }
 
 class DatabaseService {
@@ -138,10 +139,16 @@ class DatabaseService {
     _locationService ??= locationService;
   }
 
-  /// Initialize the database with optional location service for custom paths
+  /// Initialize the database with optional location service for custom paths.
+  ///
+  /// [allowSchemaUpgrade] false makes a pending upgrade a hard stop: the file
+  /// is not opened and [SchemaUpgradePendingException] is thrown. Headless
+  /// callers pass false -- see [SchemaUpgradePendingException] for why the
+  /// background isolate must never run the ladder.
   Future<void> initialize({
     DatabaseLocationService? locationService,
     void Function(int currentStep, int totalSteps)? onMigrationProgress,
+    bool allowSchemaUpgrade = true,
   }) async {
     if (_database != null) return;
 
@@ -162,6 +169,7 @@ class DatabaseService {
     _database = await _openDatabase(
       dbPath,
       onMigrationProgress: onMigrationProgress,
+      allowSchemaUpgrade: allowSchemaUpgrade,
     );
 
     await _assertCipherAvailable(_database!);
@@ -222,6 +230,7 @@ class DatabaseService {
   Future<AppDatabase> _openDatabase(
     String dbPath, {
     void Function(int currentStep, int totalSteps)? onMigrationProgress,
+    bool allowSchemaUpgrade = true,
   }) async {
     final file = File(dbPath);
     final keyHex = databaseKeyHex;
@@ -240,9 +249,20 @@ class DatabaseService {
         stored > 0 &&
         stored < AppDatabase.currentSchemaVersion;
 
+    // Refused BEFORE the file is opened at all: drift runs the ladder on the
+    // first statement, so a caller barred from upgrading must not get a
+    // connection in the first place. A missing file is not a pending upgrade
+    // -- creation is onCreate, which a headless first run may do.
+    if (migrationPending && !allowSchemaUpgrade) {
+      throw SchemaUpgradePendingException(
+        storedSchemaVersion: stored,
+        supportedSchemaVersion: AppDatabase.currentSchemaVersion,
+      );
+    }
+
     if (migrationPending) {
       final migrator = AppDatabase(
-        NativeDatabase(file, setup: _cipherSetup(keyHex)),
+        NativeDatabase(file, setup: _connectionSetup(keyHex)),
         onMigrationProgress: onMigrationProgress,
       );
       try {
@@ -451,20 +471,23 @@ class DatabaseService {
       sqlcipher_setup.cipherKeyPragma(keyHex);
 
   /// Single choke point for raw (non-drift) opens of the main database.
-  /// Applies the cipher key when given, and disposes the handle on failure.
+  /// Applies the cipher key and busy timeout, and disposes the handle on
+  /// failure.
+  ///
+  /// The busy timeout matters as much here as on the drift connections: the
+  /// version probe and the pre-migration WAL checkpoint both run at startup,
+  /// the very moment a headless isolate is most likely to be holding a lock.
   static sqlite3.Database openRaw(
     String path, {
     sqlite3.OpenMode mode = sqlite3.OpenMode.readWrite,
     String? keyHex,
   }) {
     final db = sqlite3.sqlite3.open(path, mode: mode);
-    if (keyHex != null) {
-      try {
-        db.execute(cipherKeyPragma(keyHex));
-      } catch (_) {
-        db.close();
-        rethrow;
-      }
+    try {
+      applyMainDatabaseSetup(db, keyHex: keyHex);
+    } catch (_) {
+      db.close();
+      rethrow;
     }
     return db;
   }

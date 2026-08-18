@@ -9272,6 +9272,8 @@
   "startup_migrationFailed_body": "Votre carnet de plongée n’a pas pu être mis à niveau vers le format requis par cette version. Une copie de sécurité a été créée avant le début de la mise à niveau : rien n’est perdu.",
   "startup_dataUnreadable_title": "Votre carnet de plongée n’a pas pu être lu",
   "startup_dataUnreadable_body": "Le fichier de base de données est bien là, mais Submersion ne parvient pas à le lire. Cela signifie généralement qu’il est endommagé. Restaurer une sauvegarde est le moyen le plus rapide de repartir.",
+  "startup_databaseBusy_title": "Votre carnet de plongée était occupé",
+  "startup_databaseBusy_body": "Quelque chose utilisait encore le fichier de base de données ; Submersion s’est donc arrêté au lieu d’y écrire. Rien n’a été modifié ni endommagé. Fermez complètement Submersion, puis rouvrez-le.",
   "startup_failure_technicalDetails": "Détails techniques",
   "startup_failure_backupAvailable_title": "Une sauvegarde est disponible",
   "startup_failure_backupAvailable_taken": "Créée le {timestamp}",

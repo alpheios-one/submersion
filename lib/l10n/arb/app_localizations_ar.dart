@@ -31021,6 +31021,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'ملف قاعدة البيانات موجود، لكن Submersion لا يستطيع قراءته. يعني هذا عادةً أن الملف تالف. استرداد نسخة احتياطية هو أسرع طريق للعودة.';
 
   @override
+  String get startup_databaseBusy_title => 'كان سجل الغوص الخاص بك مشغولاً';
+
+  @override
+  String get startup_databaseBusy_body =>
+      'كان هناك شيء آخر لا يزال يستخدم ملف قاعدة البيانات، لذلك توقف Submersion بدلاً من الكتابة فيه. لم يتغيّر أي شيء ولم يتضرر أي شيء. أغلق Submersion تمامًا ثم افتحه مرة أخرى.';
+
+  @override
   String get startup_failure_technicalDetails => 'تفاصيل تقنية';
 
   @override

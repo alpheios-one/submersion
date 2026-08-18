@@ -51966,6 +51966,18 @@ abstract class AppLocalizations {
   /// **'The database file is there, but Submersion cannot read it. This usually means the file is damaged. Restoring a backup is the fastest way back.'**
   String get startup_dataUnreadable_body;
 
+  /// Terminal startup screen title when another connection held the database lock. Must NOT imply damage: the write never started.
+  ///
+  /// In en, this message translates to:
+  /// **'Your dive log was busy'**
+  String get startup_databaseBusy_title;
+
+  /// Explains a lock, reassures that nothing was written, and gives the one action that fixes it: fully close and reopen the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Something else was still using the database file, so Submersion stopped rather than write to it. Nothing was changed and nothing is damaged. Close Submersion completely, then open it again.'**
+  String get startup_databaseBusy_body;
+
   /// Label above the raw error text on the terminal startup failure screen.
   ///
   /// In en, this message translates to:

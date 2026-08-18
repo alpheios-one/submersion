@@ -1420,34 +1420,37 @@ void main() {
       },
     );
 
-    testWidgets(
-      'non-readonly SqliteException (e.g. SQLITE_BUSY) still shows generic error',
-      (tester) async {
-        await tester.pumpWidget(
-          _buildStartupWrapper(
-            prefs: prefs,
-            logFileService: logFileService,
-            locationService: locationService,
-            schemaVersionProbeOverride: (_) =>
-                (needsMigration: false, totalSteps: 0),
-            initializerOverride: (_) async {
-              // SQLITE_BUSY — primary code 5; not in the READONLY family.
-              throw sqlite3.SqliteException(
-                extendedResultCode: 5,
-                message: 'database is locked',
-              );
-            },
-          ),
-        );
+    testWidgets('SQLITE_BUSY shows the lock screen, not the recovery flow', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildStartupWrapper(
+          prefs: prefs,
+          logFileService: logFileService,
+          locationService: locationService,
+          schemaVersionProbeOverride: (_) =>
+              (needsMigration: false, totalSteps: 0),
+          initializerOverride: (_) async {
+            // SQLITE_BUSY — primary code 5; not in the READONLY family.
+            throw sqlite3.SqliteException(
+              extendedResultCode: 5,
+              message: 'database is locked',
+            );
+          },
+        ),
+      );
 
-        await tester.pump(const Duration(seconds: 2));
-        await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
-        expect(find.text('Submersion could not start'), findsOneWidget);
-        expect(find.byIcon(Icons.error_outline), findsOneWidget);
-        expect(find.text('Database needs recovery'), findsNothing);
-      },
-    );
+      // A lock is not corruption: it must not offer recovery, and it must
+      // not be reported as the generic unclassified failure either -- the
+      // database was never written to, so the diver can be told so.
+      expect(find.textContaining('was busy'), findsOneWidget);
+      expect(find.byIcon(Icons.lock_clock), findsOneWidget);
+      expect(find.text('Submersion could not start'), findsNothing);
+      expect(find.text('Database needs recovery'), findsNothing);
+    });
 
     testWidgets(
       'Close without recovering invokes closeAppOverride exactly once',

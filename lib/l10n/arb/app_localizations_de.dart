@@ -31253,6 +31253,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Datenbankdatei ist vorhanden, aber Submersion kann sie nicht lesen. Das bedeutet meist, dass die Datei beschädigt ist. Das Wiederherstellen einer Sicherung ist der schnellste Weg zurück.';
 
   @override
+  String get startup_databaseBusy_title => 'Ihr Tauchlogbuch war belegt';
+
+  @override
+  String get startup_databaseBusy_body =>
+      'Etwas anderes hat die Datenbankdatei noch verwendet, deshalb hat Submersion angehalten, statt hineinzuschreiben. Es wurde nichts geändert und nichts beschädigt. Schließen Sie Submersion vollständig und öffnen Sie es erneut.';
+
+  @override
   String get startup_failure_technicalDetails => 'Technische Details';
 
   @override

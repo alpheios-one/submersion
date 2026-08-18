@@ -9272,6 +9272,8 @@
   "startup_migrationFailed_body": "A merülési naplódat nem sikerült az ehhez a verzióhoz szükséges formátumra frissíteni. A frissítés megkezdése előtt biztonsági másolat készült, így semmi nem veszett el.",
   "startup_dataUnreadable_title": "A merülési naplódat nem sikerült beolvasni",
   "startup_dataUnreadable_body": "Az adatbázisfájl megvan, de a Submersion nem tudja elolvasni. Ez általában azt jelenti, hogy a fájl sérült. Egy biztonsági másolat visszaállítása a leggyorsabb út vissza.",
+  "startup_databaseBusy_title": "A merülési naplód foglalt volt",
+  "startup_databaseBusy_body": "Valami más még használta az adatbázisfájlt, ezért a Submersion megállt ahelyett, hogy írt volna bele. Semmi nem változott és semmi nem sérült meg. Zárd be teljesen a Submersiont, majd nyisd meg újra.",
   "startup_failure_technicalDetails": "Technikai részletek",
   "startup_failure_backupAvailable_title": "Elérhető egy biztonsági másolat",
   "startup_failure_backupAvailable_taken": "Készült: {timestamp}",

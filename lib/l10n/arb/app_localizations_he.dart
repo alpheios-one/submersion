@@ -30718,6 +30718,13 @@ class AppLocalizationsHe extends AppLocalizations {
       'קובץ מסד הנתונים קיים, אבל Submersion לא מצליחה לקרוא אותו. בדרך כלל המשמעות היא שהקובץ פגום. שחזור גיבוי הוא הדרך המהירה ביותר לחזור.';
 
   @override
+  String get startup_databaseBusy_title => 'יומן הצלילה שלך היה תפוס';
+
+  @override
+  String get startup_databaseBusy_body =>
+      'משהו אחר עדיין השתמש בקובץ מסד הנתונים, ולכן Submersion עצר במקום לכתוב אליו. שום דבר לא השתנה ושום דבר לא ניזוק. סגור את Submersion לגמרי ופתח אותו שוב.';
+
+  @override
   String get startup_failure_technicalDetails => 'פרטים טכניים';
 
   @override

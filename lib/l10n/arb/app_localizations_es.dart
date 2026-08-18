@@ -31356,6 +31356,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'El archivo de la base de datos está ahí, pero Submersion no puede leerlo. Normalmente esto significa que el archivo está dañado. Restaurar una copia de seguridad es la forma más rápida de volver.';
 
   @override
+  String get startup_databaseBusy_title =>
+      'Tu cuaderno de buceo estaba ocupado';
+
+  @override
+  String get startup_databaseBusy_body =>
+      'Algo más seguía usando el archivo de la base de datos, así que Submersion se detuvo en lugar de escribir en él. No se cambió nada y nada está dañado. Cierra Submersion por completo y vuelve a abrirlo.';
+
+  @override
   String get startup_failure_technicalDetails => 'Detalles técnicos';
 
   @override

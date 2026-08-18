@@ -31340,6 +31340,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'O ficheiro da base de dados está lá, mas o Submersion não consegue lê-lo. Normalmente isto significa que o ficheiro está danificado. Restaurar uma cópia de segurança é a forma mais rápida de recomeçar.';
 
   @override
+  String get startup_databaseBusy_title =>
+      'O seu diário de mergulho estava ocupado';
+
+  @override
+  String get startup_databaseBusy_body =>
+      'Algo ainda estava a usar o ficheiro da base de dados, por isso o Submersion parou em vez de escrever nele. Nada foi alterado e nada está danificado. Feche o Submersion por completo e volte a abri-lo.';
+
+  @override
   String get startup_failure_technicalDetails => 'Detalhes técnicos';
 
   @override

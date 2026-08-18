@@ -5,6 +5,7 @@ import 'package:workmanager/workmanager.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart'
     show CloudProviderType;
+import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/headless_cloud_provider.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -41,6 +42,31 @@ Future<bool> prepareHeadlessDatabaseKey({
   return true;
 }
 
+/// Opens the database for a headless task, or reports that the task must skip.
+///
+/// The headless isolate is barred from running the schema upgrade ladder. It
+/// has no progress UI, writes no pre-migration safety copy, and cannot report
+/// a failure to the diver -- and worse, it would be running that ladder
+/// against the same file as the foreground launch that is very probably
+/// running it too, since Android reschedules overdue periodic work exactly
+/// when the app is updated and reopened. Two isolates upgrading one file is
+/// how a launch ends on "database is locked".
+///
+/// Skipping costs nothing: the task runs on its next turn, after a foreground
+/// launch has done the upgrade properly.
+Future<bool> openHeadlessDatabase({LoggerService? log}) async {
+  try {
+    await DatabaseService.instance.initialize(allowSchemaUpgrade: false);
+    return true;
+  } on SchemaUpgradePendingException catch (e) {
+    (log ?? const LoggerService('BackgroundService')).info(
+      'Background task skipped: the database needs a schema upgrade, which '
+      'only a foreground launch may run ($e).',
+    );
+    return false;
+  }
+}
+
 /// Callback for Workmanager background tasks
 @pragma('vm:entry-point')
 void callbackDispatcher() {
@@ -60,7 +86,9 @@ void callbackDispatcher() {
       }
 
       // Initialize database
-      await DatabaseService.instance.initialize();
+      if (!await openHeadlessDatabase(log: log)) {
+        return true; // "succeeded" — do not retry-loop a pending upgrade
+      }
 
       // Initialize notification service
       await NotificationService.instance.initialize();
