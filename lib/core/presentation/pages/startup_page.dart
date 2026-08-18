@@ -915,11 +915,17 @@ class _StartupWrapperState extends State<StartupWrapper>
   Future<void> _showBackupsFolder() async {
     final dir = _backupsDirectory;
     if (dir == null) return;
+    // launchUrl signals a refused hand-off by RETURNING false as often as by
+    // throwing (no registered handler for a file:// directory is the common
+    // case here), so both have to be logged or the button is a silent no-op.
+    // Either way the path is on screen as selectable text, so the diver still
+    // has something to paste into a file manager.
     try {
-      await launchUrl(Uri.directory(dir));
+      final launched = await launchUrl(Uri.directory(dir));
+      if (!launched) {
+        debugPrint('Could not open backups folder: launchUrl returned false');
+      }
     } catch (e) {
-      // The path is rendered on screen as selectable text, so a failed hand-off
-      // still leaves the diver something they can copy into a file manager.
       debugPrint('Could not open backups folder: $e');
     }
   }
@@ -929,14 +935,21 @@ class _StartupWrapperState extends State<StartupWrapper>
   );
 
   Future<void> _openPreviousReleases() async {
+    // Same reasoning as _showBackupsFolder: a refused hand-off shows up as a
+    // false return at least as often as an exception, and an unlogged one
+    // makes the button look broken. The address is rendered beneath the
+    // button either way, so the diver keeps a usable route.
     try {
-      await launchUrl(
+      final launched = await launchUrl(
         _previousReleasesUri,
         mode: LaunchMode.externalApplication,
       );
+      if (!launched) {
+        debugPrint(
+          'Could not open the releases page: launchUrl returned false',
+        );
+      }
     } catch (e) {
-      // Same reasoning as _openLatestRelease: the address is rendered beneath
-      // the button, so a launch failure still leaves a usable route.
       debugPrint('Could not open the releases page: $e');
     }
   }
