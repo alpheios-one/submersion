@@ -2288,7 +2288,13 @@ class StatisticsRepository {
           case 'no_deco':
             recordedNoDeco.add(id);
           case 'compute':
-            needsCompute[id] = row.read<int?>('updated_at') ?? 0;
+            // Non-null read on purpose. `dives.updated_at` is a non-nullable
+            // column and the query inner-joins dives, so a null here means the
+            // schema or the query drifted. Defaulting to 0 would silently
+            // collapse every dive onto one fingerprint component and stop
+            // edits invalidating the computed classification cache, so fail
+            // loudly instead.
+            needsCompute[id] = row.read<int>('updated_at');
           default:
             noProfile.add(id);
         }

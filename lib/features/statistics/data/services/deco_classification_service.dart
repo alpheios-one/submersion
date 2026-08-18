@@ -8,10 +8,22 @@ import 'package:submersion/features/statistics/data/repositories/deco_classifica
 
 /// Fingerprint of every input that can change a computed classification.
 ///
-/// Deliberately coarse: the dive's `updated_at` moves whenever the dive row or
-/// its profile is written, so it stands in for a profile revision without
-/// hashing the samples themselves. The separators matter, so that a shifted
-/// digit in one field cannot impersonate its neighbour.
+/// [gfLow] and [gfHigh] are the diver's *settings* gradient factors, not the
+/// dive's own. Per-dive inputs (the dive's stored GF, altitude, water type,
+/// and the profile samples themselves) are all covered by [diveUpdatedAt],
+/// which moves whenever the dive row or its profile is written. So the only
+/// inputs left to name explicitly are the ones that live outside the dive: the
+/// engine version and the diver's global GF setting, which applies to any dive
+/// that does not carry both of its own.
+///
+/// That makes the fingerprint computable from the statistics scan alone, with
+/// no dive hydration, which is what lets a warm library skip loading profiles
+/// entirely. A dive that does carry its own GF is invalidated needlessly when
+/// the global setting changes; that costs one recompute and never a wrong
+/// answer, which is the right direction to err.
+///
+/// The separators matter, so a shifted digit in one field cannot impersonate
+/// its neighbour.
 String decoInputsHash({
   required int engineVersion,
   required int gfLow,
@@ -38,11 +50,12 @@ class DecoClassificationService {
   /// Dives whose analysis yields nothing (no usable profile) are absent from
   /// the result and stay unclassified rather than defaulting to no-deco.
   ///
-  /// Cached answers are consulted per dive before any analysis runs, so a warm
-  /// library does no compute at all. Uncached dives are processed in chunks
-  /// with their analysis invalidated afterwards: [profileAnalysisProvider] and
-  /// [analysisDiveProvider] are keepAlive families, so a library-wide pass
-  /// would otherwise retain every profile's curves for the whole session.
+  /// The whole cache is read in one query up front, so a warm library performs
+  /// a single SELECT and hydrates no profiles at all. Only genuine misses are
+  /// analyzed, in chunks, with their analysis invalidated afterwards:
+  /// [profileAnalysisProvider] and [analysisDiveProvider] are keepAlive
+  /// families, so a library-wide pass would otherwise retain every profile's
+  /// curves for the whole session.
   Future<Map<String, bool>> classify(
     Ref ref,
     Map<String, int> revisions, {
@@ -50,40 +63,52 @@ class DecoClassificationService {
   }) async {
     if (revisions.isEmpty) return const {};
 
-    // The analysis uses the dive's own gradient factors when it has both, and
-    // the diver's settings otherwise, so both feed the fingerprint.
     final settingsGfLow = ref.read(gfLowProvider);
     final settingsGfHigh = ref.read(gfHighProvider);
 
+    final hashes = <String, String>{
+      for (final entry in revisions.entries)
+        entry.key: decoInputsHash(
+          engineVersion: analysisEngineVersion,
+          gfLow: settingsGfLow,
+          gfHigh: settingsGfHigh,
+          diveUpdatedAt: entry.value,
+        ),
+    };
+
     final cache = DecoClassificationCacheRepository();
     final results = <String, bool>{};
-    final pending = revisions.keys.toList(growable: false);
+    final misses = <String>[];
 
-    for (var start = 0; start < pending.length; start += chunkSize) {
-      final end = start + chunkSize < pending.length
+    try {
+      final stored = await cache.getEntries(revisions.keys.toSet());
+      for (final diveId in revisions.keys) {
+        final entry = stored[diveId];
+        if (entry != null && entry.inputsHash == hashes[diveId]) {
+          results[diveId] = entry.hadDeco;
+        } else {
+          misses.add(diveId);
+        }
+      }
+    } catch (e, stackTrace) {
+      // A cache failure must not lose the statistic: fall back to computing
+      // everything rather than reporting the whole library as unclassified.
+      _log.error(
+        'Failed to read the deco classification cache',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      misses
+        ..clear()
+        ..addAll(revisions.keys);
+    }
+
+    for (var start = 0; start < misses.length; start += chunkSize) {
+      final end = start + chunkSize < misses.length
           ? start + chunkSize
-          : pending.length;
-      for (final diveId in pending.sublist(start, end)) {
-        var analysisRead = false;
+          : misses.length;
+      for (final diveId in misses.sublist(start, end)) {
         try {
-          final dive = await ref.read(analysisDiveProvider(diveId).future);
-          if (dive == null) continue;
-
-          final hash = decoInputsHash(
-            engineVersion: analysisEngineVersion,
-            gfLow: dive.gradientFactorLow ?? settingsGfLow,
-            gfHigh: dive.gradientFactorHigh ?? settingsGfHigh,
-            diveUpdatedAt: revisions[diveId]!,
-          );
-
-          final cached = await cache.getValid({diveId}, hash);
-          final hit = cached[diveId];
-          if (hit != null) {
-            results[diveId] = hit;
-            continue;
-          }
-
-          analysisRead = true;
           final analysis = await ref.read(
             profileAnalysisProvider(diveId).future,
           );
@@ -91,7 +116,11 @@ class DecoClassificationService {
 
           final hadDeco = analysis.hadDecoObligation;
           results[diveId] = hadDeco;
-          await cache.put(diveId, hadDeco: hadDeco, inputsHash: hash);
+          await cache.put(
+            diveId,
+            hadDeco: hadDeco,
+            inputsHash: hashes[diveId]!,
+          );
         } catch (e, stackTrace) {
           _log.error(
             'Failed to classify deco obligation for dive $diveId',
@@ -99,7 +128,7 @@ class DecoClassificationService {
             stackTrace: stackTrace,
           );
         } finally {
-          if (analysisRead) ref.invalidate(profileAnalysisProvider(diveId));
+          ref.invalidate(profileAnalysisProvider(diveId));
           ref.invalidate(analysisDiveProvider(diveId));
         }
       }

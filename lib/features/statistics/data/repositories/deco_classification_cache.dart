@@ -17,20 +17,24 @@ class DecoClassificationCacheRepository {
   LocalCacheDatabase get _db =>
       _database ?? LocalCacheDatabaseService.instance.database;
 
-  /// The cached classifications for [diveIds] that were computed under
-  /// [inputsHash]. Dives that are absent or stale are simply missing from the
-  /// result, which is what marks them as needing recomputation.
-  Future<Map<String, bool>> getValid(
+  /// Every stored entry for [diveIds], keyed by dive id, in a single query.
+  ///
+  /// Deliberately returns the stored `inputsHash` rather than filtering on it
+  /// in SQL: each dive has its own fingerprint (their `updated_at` differ), so
+  /// a hash-filtered query would need one round trip per dive. The caller
+  /// compares hashes in Dart, which keeps this to one round trip for the whole
+  /// batch and leaves the staleness policy in one place.
+  Future<Map<String, ({bool hadDeco, String inputsHash})>> getEntries(
     Set<String> diveIds,
-    String inputsHash,
   ) async {
     if (diveIds.isEmpty) return const {};
-    final rows =
-        await (_db.select(_db.decoClassificationCache)..where(
-              (t) => t.diveId.isIn(diveIds) & t.inputsHash.equals(inputsHash),
-            ))
-            .get();
-    return {for (final row in rows) row.diveId: row.hadDeco};
+    final rows = await (_db.select(
+      _db.decoClassificationCache,
+    )..where((t) => t.diveId.isIn(diveIds))).get();
+    return {
+      for (final row in rows)
+        row.diveId: (hadDeco: row.hadDeco, inputsHash: row.inputsHash),
+    };
   }
 
   Future<void> put(

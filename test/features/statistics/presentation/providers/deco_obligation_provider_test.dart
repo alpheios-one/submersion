@@ -6,6 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
+import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
+import 'package:submersion/features/statistics/data/repositories/deco_classification_cache.dart';
+import 'package:submersion/features/statistics/data/services/deco_classification_service.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -204,5 +207,59 @@ void main() {
       decoObligationStatsProvider.future,
     );
     expect(second.decoCount, 1);
+  });
+
+  test('a cache hit short-circuits the analysis entirely', () async {
+    await insertDive('deep');
+    await insertBareProfile('deep', 40, 25);
+
+    // Seed an entry that contradicts what the analysis would compute. If the
+    // provider reports no-deco, the cached value was used and the profile was
+    // never hydrated, which is the whole point of the fingerprint being
+    // derivable from the scan alone.
+    await DecoClassificationCacheRepository().put(
+      'deep',
+      hadDeco: false,
+      inputsHash: decoInputsHash(
+        engineVersion: analysisEngineVersion,
+        gfLow: 50,
+        gfHigh: 85,
+        diveUpdatedAt: now,
+      ),
+    );
+
+    final stats = await (await makeContainer()).read(
+      decoObligationStatsProvider.future,
+    );
+
+    expect(stats.decoCount, 0);
+    expect(stats.noDecoCount, 1);
+  });
+
+  test('editing a dive invalidates its cached classification', () async {
+    await insertDive('deep');
+    await insertBareProfile('deep', 40, 25);
+
+    final first = await (await makeContainer()).read(
+      decoObligationStatsProvider.future,
+    );
+    expect(first.decoCount, 1);
+
+    // Replace the profile with one well inside the NDL and bump updated_at,
+    // exactly as an edit would. The stale entry must not be served.
+    await (db.delete(
+      db.diveProfiles,
+    )..where((t) => t.diveId.equals('deep'))).go();
+    await insertBareProfile('deep', 18, 30);
+    await (db.update(db.dives)..where((t) => t.id.equals('deep'))).write(
+      DivesCompanion(updatedAt: Value(now + 1000)),
+    );
+
+    final second = await (await makeContainer()).read(
+      decoObligationStatsProvider.future,
+    );
+
+    expect(second.decoCount, 0);
+    expect(second.noDecoCount, 1);
   });
 }
