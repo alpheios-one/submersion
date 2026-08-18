@@ -604,16 +604,28 @@ class BackupService {
     }
 
     // A pre-migration copy of a protected database is SQLCipher ciphertext,
-    // so the deep check below needs the live key. Without one there is
-    // nothing to open the file with, and nothing a restore could do with it
-    // either, since the key is the only way back to the data.
+    // so the deep check below needs the live key. With one, a keyed open
+    // settles the question: it succeeds on a real encrypted copy and fails
+    // on anything else, which lands in the generic invalid-database result.
+    //
+    // Without one there is nothing to open the file with, and nothing a
+    // restore could do with it either, since the key is the only way back to
+    // the data. The report must stay honest about WHY, though: a corrupt
+    // plaintext database and an encrypted one are indistinguishable at the
+    // header, so isEncryptedDatabaseFile alone must never conclude
+    // "encrypted" (see DatabaseSecuritySidecar.existsFor, which is the
+    // corroborating signal the startup gate and schema probe use). That
+    // signal is unavailable here: the sidecar lives next to the live
+    // database and is never copied into the backups directory. So name both
+    // possibilities rather than asserting one the file cannot prove.
     String? deepCheckKeyHex;
     if (allowLiveDatabaseEncryption && isEncryptedDatabaseFile(filePath)) {
       deepCheckKeyHex = _dbAdapter.databaseKeyHex;
       if (deepCheckKeyHex == null) {
         return const BackupValidationResult.invalid(
-          'This safety copy was taken from a protected database, but this '
-          'install has no database key to open it with',
+          'This safety copy cannot be opened. It was either taken from a '
+          'protected database whose key this install no longer has, or the '
+          'file is corrupt.',
         );
       }
     }

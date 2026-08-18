@@ -175,6 +175,29 @@ void main() {
       },
     );
 
+    test('names corruption as well as encryption when there is no key to tell '
+        'them apart', () async {
+      // A corrupt plaintext copy and a SQLCipher one are identical at the
+      // header, and the keyslot sidecar that would corroborate "encrypted"
+      // lives next to the LIVE database, never in the backups directory.
+      // With no key to settle it, the report must not assert either story.
+      final path = '${tempDir.path}/corrupt.db';
+      await File(path).writeAsString('this is not a sqlite database');
+      final service = BackupService(
+        dbAdapter: _FakeBackupDatabaseAdapter(),
+        preferences: preferences,
+      );
+
+      final result = await service.validateBackupFile(
+        path,
+        allowLiveDatabaseEncryption: true,
+      );
+
+      expect(result.isValid, isFalse);
+      expect(result.error, contains('corrupt'));
+      expect(result.error, contains('protected'));
+    });
+
     test(
       'rejects an encrypted copy when the live key is the wrong one',
       () async {
