@@ -94,7 +94,7 @@ void main() {
     await tester.pumpWidget(_harness(location, snapshot));
     await tester.pumpAndSettle();
 
-    expect(find.byType(Chip), findsNWidgets(2));
+    expect(find.byType(RawChip), findsNWidgets(2));
     expect(find.byType(ListTile), findsNothing);
   });
 
@@ -121,19 +121,19 @@ void main() {
 
     // The total is surfaced so the count is knowable without expanding.
     expect(find.text('31'), findsOneWidget);
-    expect(find.byType(Chip), findsNWidgets(12));
+    expect(find.byType(RawChip), findsNWidgets(12));
     expect(find.text('Genus species29'), findsNothing);
 
     await tester.tap(find.text('Show all 31'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(Chip), findsNWidgets(31));
+    expect(find.byType(RawChip), findsNWidgets(31));
     expect(find.text('Genus species29'), findsOneWidget);
 
     await tester.tap(find.text('Show fewer'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(Chip), findsNWidgets(12));
+    expect(find.byType(RawChip), findsNWidgets(12));
   });
 
   testWidgets('does not offer a toggle when nothing is hidden', (tester) async {
@@ -173,6 +173,45 @@ void main() {
     expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
   });
 
+  // Review catch on #1156: routing the add through Chip's delete slot built a
+  // separate semantics node holding the tooltip alone, so a screen reader
+  // announced "add to expected species" with no way to tell which species.
+  // One node must carry the name and the action together.
+  testWidgets('the add action and the species name share one semantics node', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    const location = GeoPoint(12.16, -68.28);
+    final snapshot = _snapshot(
+      const ReefPart.ok(
+        NearbySpecies(
+          matched: [
+            MatchedNearbySpecies(
+              speciesId: 'sp_whale_shark',
+              occurrenceCount: 42,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(_harness(location, snapshot));
+    await tester.pumpAndSettle();
+
+    final node = tester.getSemantics(find.byType(ActionChip).first);
+    expect(node.label, contains('Whale Shark'));
+    expect(
+      node,
+      isSemantics(
+        tooltip: 'Add to expected species',
+        isButton: true,
+        hasTapAction: true,
+      ),
+    );
+
+    handle.dispose();
+  });
+
   testWidgets('renders nothing when no species were recorded nearby', (
     tester,
   ) async {
@@ -182,7 +221,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byType(Chip), findsNothing);
+    expect(find.byType(RawChip), findsNothing);
     expect(find.textContaining('Recorded nearby'), findsNothing);
   });
 

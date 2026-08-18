@@ -137,32 +137,44 @@ class _NearbySpeciesTierState extends ConsumerState<NearbySpeciesTier> {
     );
   }
 
+  /// The whole chip is the add button.
+  ///
+  /// Chip's delete slot would also give a trailing tap target, but it builds
+  /// its own semantics node holding the tooltip alone: a screen reader then
+  /// announces "add to expected species" with no way to tell which species it
+  /// applies to. ActionChip yields one node carrying both the name and the
+  /// action, and the handler is named for what it does.
   Widget _matchedChip(BuildContext context, Species species) {
     final theme = Theme.of(context);
     final name = species.localizedCommonName(context.l10n);
 
-    // Chip's delete slot is the only trailing action it offers, and it gives
-    // the add affordance the same tap target the ListTile button had.
-    return Semantics(
-      label: name,
-      child: Chip(
-        avatar: ExcludeSemantics(
-          child: Icon(
-            iconForSpeciesCategory(species.category),
-            size: 16,
-            color: colorForSpeciesCategory(species.category, theme.brightness),
-          ),
+    return ActionChip(
+      avatar: ExcludeSemantics(
+        child: Icon(
+          iconForSpeciesCategory(species.category),
+          size: 16,
+          color: colorForSpeciesCategory(species.category, theme.brightness),
         ),
-        label: Text(name, style: theme.textTheme.bodySmall),
-        deleteIcon: const Icon(Icons.add_circle_outline, size: 16),
-        deleteButtonTooltipMessage: context.l10n.reef_species_addToExpected,
-        onDeleted: () => ref
-            .read(siteExpectedSpeciesNotifierProvider(widget.siteId).notifier)
-            .addSpecies(species.id),
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
-        padding: const EdgeInsets.symmetric(horizontal: 4),
       ),
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(name, style: theme.textTheme.bodySmall),
+          const SizedBox(width: 4),
+          // Decorative: the tooltip already names the action for assistive
+          // tech, and a second node would say it twice.
+          const ExcludeSemantics(
+            child: Icon(Icons.add_circle_outline, size: 14),
+          ),
+        ],
+      ),
+      tooltip: context.l10n.reef_species_addToExpected,
+      onPressed: () => ref
+          .read(siteExpectedSpeciesNotifierProvider(widget.siteId).notifier)
+          .addSpecies(species.id),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
 
