@@ -2390,6 +2390,7 @@
   "divePlanner_field_planName": "שם התכנית",
   "divePlanner_field_role": "תפקיד",
   "divePlanner_field_startPressure": "לחץ התחלתי ({pressureSymbol})",
+  "divePlanner_field_travelGas": "משמש גם כגז מעבר",
   "divePlanner_field_volume": "נפח ({volumeSymbol})",
   "divePlanner_hint_tankName": "הזן שם מיכל",
   "divePlanner_label_altitude": "גובה:",
@@ -4096,6 +4097,7 @@
   "plannerCanvas_contingency_base": "בסיס",
   "plannerCanvas_contingency_depthDelta": "עומק נוסף",
   "plannerCanvas_contingency_lostGas": "אבדן {gas}",
+  "plannerCanvas_contingency_previewing": "תצוגה מקדימה: {label}",
   "plannerCanvas_contingency_timeDelta": "דקות נוספות",
   "plannerCanvas_chart_meanDepth": "ממוצע {depth}",
   "@plannerCanvas_chart_meanDepth": {

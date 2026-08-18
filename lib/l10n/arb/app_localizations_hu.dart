@@ -7567,6 +7567,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_travelGas => 'Utazógázként is használva';
+
+  @override
   String divePlanner_field_volume(Object volumeSymbol) {
     return 'Térfogat ($volumeSymbol)';
   }
@@ -13068,6 +13071,11 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String plannerCanvas_contingency_lostGas(String gas) {
     return '$gas elveszett';
+  }
+
+  @override
+  String plannerCanvas_contingency_previewing(String label) {
+    return 'Előnézet: $label';
   }
 
   @override

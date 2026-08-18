@@ -2390,6 +2390,7 @@
   "divePlanner_field_planName": "Terv neve",
   "divePlanner_field_role": "Szerep",
   "divePlanner_field_startPressure": "Kezdő ({pressureSymbol})",
+  "divePlanner_field_travelGas": "Utazógázként is használva",
   "divePlanner_field_volume": "Térfogat ({volumeSymbol})",
   "divePlanner_hint_tankName": "Add meg a palack nevét",
   "divePlanner_label_altitude": "Magasság:",
@@ -4096,6 +4097,7 @@
   "plannerCanvas_contingency_base": "Alap",
   "plannerCanvas_contingency_depthDelta": "Extra mélység",
   "plannerCanvas_contingency_lostGas": "{gas} elveszett",
+  "plannerCanvas_contingency_previewing": "Előnézet: {label}",
   "plannerCanvas_contingency_timeDelta": "Extra percek",
   "plannerCanvas_chart_meanDepth": "átlag {depth}",
   "@plannerCanvas_chart_meanDepth": {

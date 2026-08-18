@@ -2462,6 +2462,7 @@
   "divePlanner_field_planName": "اسم الخطة",
   "divePlanner_field_role": "الدور",
   "divePlanner_field_startPressure": "البدء ({pressureSymbol})",
+  "divePlanner_field_travelGas": "يُستخدم أيضًا كغاز سفر",
   "divePlanner_field_volume": "الحجم ({volumeSymbol})",
   "divePlanner_hint_tankName": "أدخل اسم الأسطوانة",
   "divePlanner_label_altitude": "الارتفاع:",
@@ -4168,6 +4169,7 @@
   "plannerCanvas_contingency_base": "أساسي",
   "plannerCanvas_contingency_depthDelta": "عمق إضافي",
   "plannerCanvas_contingency_lostGas": "فقدان {gas}",
+  "plannerCanvas_contingency_previewing": "معاينة: {label}",
   "plannerCanvas_contingency_timeDelta": "دقائق إضافية",
   "plannerCanvas_chart_meanDepth": "المتوسط {depth}",
   "@plannerCanvas_chart_meanDepth": {

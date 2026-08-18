@@ -7618,6 +7618,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_travelGas =>
+      'Également utilisé comme gaz de voyage';
+
+  @override
   String divePlanner_field_volume(Object volumeSymbol) {
     return 'Volume ($volumeSymbol)';
   }
@@ -13146,6 +13150,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String plannerCanvas_contingency_lostGas(String gas) {
     return '$gas perdu';
+  }
+
+  @override
+  String plannerCanvas_contingency_previewing(String label) {
+    return 'Aperçu : $label';
   }
 
   @override
