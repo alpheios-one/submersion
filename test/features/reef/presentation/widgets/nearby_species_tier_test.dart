@@ -7,6 +7,7 @@ import 'package:submersion/features/reef/domain/entities/reef_data_status.dart';
 import 'package:submersion/features/reef/domain/entities/reef_snapshot.dart';
 import 'package:submersion/features/reef/presentation/providers/reef_providers.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/reef/presentation/widgets/nearby_species_tier.dart';
@@ -28,16 +29,46 @@ const _catalogSpecies = Species(
   isBuiltIn: true,
 );
 
+/// Records the ids the tier asks to add, so a tap can be asserted end to end.
+class _RecordingSpeciesRepository extends Fake implements SpeciesRepository {
+  final List<String> added = [];
+
+  @override
+  Future<List<SiteSpeciesEntry>> getExpectedSpeciesForSite(
+    String siteId,
+  ) async => const [];
+
+  @override
+  Future<SiteSpeciesEntry> addExpectedSpecies({
+    required String siteId,
+    required String speciesId,
+    String notes = '',
+  }) async {
+    added.add(speciesId);
+    return SiteSpeciesEntry(
+      id: 'entry-1',
+      siteId: siteId,
+      speciesId: speciesId,
+      speciesName: 'Whale Shark',
+      category: SpeciesCategory.shark,
+      createdAt: DateTime(2026),
+    );
+  }
+}
+
 Widget _harness(
   GeoPoint location,
   ReefSnapshot snapshot, {
   List<Species> catalog = const [_catalogSpecies],
+  SpeciesRepository? repository,
 }) => ProviderScope(
   overrides: [
     reefSnapshotProvider(
       ReefSnapshotRequest(location: location),
     ).overrideWith((ref) async => snapshot),
     allSpeciesProvider.overrideWith((ref) async => catalog),
+    if (repository != null)
+      speciesRepositoryProvider.overrideWithValue(repository),
   ],
   child: localizedMaterialApp(
     locale: const Locale('en'),
@@ -171,6 +202,36 @@ void main() {
     // Only the catalog match is actionable; the long tail has no local id to
     // add, so it must not sprout a dead button.
     expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
+  });
+
+  testWidgets('tapping a matched chip adds that species to expected', (
+    tester,
+  ) async {
+    const location = GeoPoint(12.16, -68.28);
+    final repository = _RecordingSpeciesRepository();
+    final snapshot = _snapshot(
+      const ReefPart.ok(
+        NearbySpecies(
+          matched: [
+            MatchedNearbySpecies(
+              speciesId: 'sp_whale_shark',
+              occurrenceCount: 42,
+            ),
+          ],
+          unmatchedNames: ['Aplysina archeri'],
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(
+      _harness(location, snapshot, repository: repository),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(ActionChip));
+    await tester.pumpAndSettle();
+
+    expect(repository.added, ['sp_whale_shark']);
   });
 
   // Review catch on #1156: routing the add through Chip's delete slot built a
