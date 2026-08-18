@@ -31702,4 +31702,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_o2CellSpread_label => 'O2 Cell Spread';
+
+  @override
+  String get media_status_broken => 'Missing and not backed up';
+
+  @override
+  String get media_status_transferFailed => 'Upload failed';
+
+  @override
+  String get media_status_transferring => 'Uploading';
+
+  @override
+  String get media_status_queued => 'Waiting to upload';
+
+  @override
+  String get media_status_cloudOnly => 'Stored in the cloud only';
+
+  @override
+  String get media_status_notBackedUp => 'Not backed up';
+
+  @override
+  String get media_tile_infoMenuItem => 'Media info';
 }

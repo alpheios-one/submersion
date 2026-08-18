@@ -9490,5 +9490,12 @@
   "media_info_backupQueued": "Feltöltési sorban",
   "enum_profileMetric_o2CellMv": "O2-cellák",
   "enum_profileMetric_o2CellMv_short": "Cellák",
-  "diveLog_o2CellSpread_label": "O2-cellák szórása"
+  "diveLog_o2CellSpread_label": "O2-cellák szórása",
+  "media_status_broken": "Hiányzik és nincs mentve",
+  "media_status_transferFailed": "A feltöltés sikertelen",
+  "media_status_transferring": "Feltöltés folyamatban",
+  "media_status_queued": "Feltöltésre vár",
+  "media_status_cloudOnly": "Csak a felhőben tárolva",
+  "media_status_notBackedUp": "Nincs mentve",
+  "media_tile_infoMenuItem": "Média infó"
 }

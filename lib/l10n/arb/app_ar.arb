@@ -9490,5 +9490,12 @@
   "media_info_backupQueued": "في قائمة انتظار الرفع",
   "enum_profileMetric_o2CellMv": "خلايا الأكسجين",
   "enum_profileMetric_o2CellMv_short": "الخلايا",
-  "diveLog_o2CellSpread_label": "تشتت خلايا O2"
+  "diveLog_o2CellSpread_label": "تشتت خلايا O2",
+  "media_status_broken": "مفقود وغير منسوخ احتياطيًا",
+  "media_status_transferFailed": "فشل الرفع",
+  "media_status_transferring": "جارٍ الرفع",
+  "media_status_queued": "في انتظار الرفع",
+  "media_status_cloudOnly": "مخزن في السحابة فقط",
+  "media_status_notBackedUp": "لا يوجد نسخ احتياطي",
+  "media_tile_infoMenuItem": "معلومات الوسائط"
 }

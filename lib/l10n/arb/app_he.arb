@@ -9490,5 +9490,12 @@
   "media_info_backupQueued": "בתור להעלאה",
   "enum_profileMetric_o2CellMv": "תאי O2",
   "enum_profileMetric_o2CellMv_short": "תאים",
-  "diveLog_o2CellSpread_label": "פיזור תאי O2"
+  "diveLog_o2CellSpread_label": "פיזור תאי O2",
+  "media_status_broken": "חסר ולא מגובה",
+  "media_status_transferFailed": "ההעלאה נכשלה",
+  "media_status_transferring": "מעלה",
+  "media_status_queued": "ממתין להעלאה",
+  "media_status_cloudOnly": "מאוחסן בענן בלבד",
+  "media_status_notBackedUp": "לא מגובה",
+  "media_tile_infoMenuItem": "פרטי מדיה"
 }

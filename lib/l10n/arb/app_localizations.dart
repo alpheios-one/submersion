@@ -53333,6 +53333,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'O2 Cell Spread'**
   String get diveLog_o2CellSpread_label;
+
+  /// No description provided for @media_status_broken.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing and not backed up'**
+  String get media_status_broken;
+
+  /// No description provided for @media_status_transferFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed'**
+  String get media_status_transferFailed;
+
+  /// No description provided for @media_status_transferring.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading'**
+  String get media_status_transferring;
+
+  /// No description provided for @media_status_queued.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting to upload'**
+  String get media_status_queued;
+
+  /// No description provided for @media_status_cloudOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored in the cloud only'**
+  String get media_status_cloudOnly;
+
+  /// No description provided for @media_status_notBackedUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Not backed up'**
+  String get media_status_notBackedUp;
+
+  /// No description provided for @media_tile_infoMenuItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Media info'**
+  String get media_tile_infoMenuItem;
 }
 
 class _AppLocalizationsDelegate

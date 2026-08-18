@@ -9490,5 +9490,12 @@
   "media_info_backupQueued": "In wachtrij voor upload",
   "enum_profileMetric_o2CellMv": "O2-cellen",
   "enum_profileMetric_o2CellMv_short": "Cellen",
-  "diveLog_o2CellSpread_label": "O2-celspreiding"
+  "diveLog_o2CellSpread_label": "O2-celspreiding",
+  "media_status_broken": "Ontbreekt en geen back-up",
+  "media_status_transferFailed": "Uploaden mislukt",
+  "media_status_transferring": "Uploaden",
+  "media_status_queued": "Wacht op uploaden",
+  "media_status_cloudOnly": "Alleen in de cloud opgeslagen",
+  "media_status_notBackedUp": "Geen back-up",
+  "media_tile_infoMenuItem": "Media-info"
 }

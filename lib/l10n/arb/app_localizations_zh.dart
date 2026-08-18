@@ -30365,4 +30365,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_o2CellSpread_label => 'O2电池离散度';
+
+  @override
+  String get media_status_broken => '缺失且未备份';
+
+  @override
+  String get media_status_transferFailed => '上传失败';
+
+  @override
+  String get media_status_transferring => '正在上传';
+
+  @override
+  String get media_status_queued => '等待上传';
+
+  @override
+  String get media_status_cloudOnly => '仅存储在云端';
+
+  @override
+  String get media_status_notBackedUp => '未备份';
+
+  @override
+  String get media_tile_infoMenuItem => '媒体信息';
 }

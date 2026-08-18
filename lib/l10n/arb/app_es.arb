@@ -9490,5 +9490,12 @@
   "media_info_backupQueued": "En cola para subir",
   "enum_profileMetric_o2CellMv": "Células O2",
   "enum_profileMetric_o2CellMv_short": "Células",
-  "diveLog_o2CellSpread_label": "Dispersión de células O2"
+  "diveLog_o2CellSpread_label": "Dispersión de células O2",
+  "media_status_broken": "Falta y sin copia",
+  "media_status_transferFailed": "Falló la subida",
+  "media_status_transferring": "Subiendo",
+  "media_status_queued": "Esperando para subir",
+  "media_status_cloudOnly": "Solo en la nube",
+  "media_status_notBackedUp": "Sin copia de seguridad",
+  "media_tile_infoMenuItem": "Información del medio"
 }

@@ -32245,4 +32245,25 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveLog_o2CellSpread_label => 'Dispersión de células O2';
+
+  @override
+  String get media_status_broken => 'Falta y sin copia';
+
+  @override
+  String get media_status_transferFailed => 'Falló la subida';
+
+  @override
+  String get media_status_transferring => 'Subiendo';
+
+  @override
+  String get media_status_queued => 'Esperando para subir';
+
+  @override
+  String get media_status_cloudOnly => 'Solo en la nube';
+
+  @override
+  String get media_status_notBackedUp => 'Sin copia de seguridad';
+
+  @override
+  String get media_tile_infoMenuItem => 'Información del medio';
 }

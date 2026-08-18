@@ -9490,5 +9490,12 @@
   "media_info_backupQueued": "Na fila para envio",
   "enum_profileMetric_o2CellMv": "Células O2",
   "enum_profileMetric_o2CellMv_short": "Células",
-  "diveLog_o2CellSpread_label": "Dispersão das células O2"
+  "diveLog_o2CellSpread_label": "Dispersão das células O2",
+  "media_status_broken": "Ausente e sem backup",
+  "media_status_transferFailed": "Falha no envio",
+  "media_status_transferring": "Enviando",
+  "media_status_queued": "Aguardando envio",
+  "media_status_cloudOnly": "Armazenado apenas na nuvem",
+  "media_status_notBackedUp": "Sem backup",
+  "media_tile_infoMenuItem": "Informações da mídia"
 }

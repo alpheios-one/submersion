@@ -18192,5 +18192,12 @@
   },
   "enum_profileMetric_o2CellMv": "O2 Cells",
   "enum_profileMetric_o2CellMv_short": "Cells",
-  "diveLog_o2CellSpread_label": "O2 Cell Spread"
+  "diveLog_o2CellSpread_label": "O2 Cell Spread",
+  "media_status_broken": "Missing and not backed up",
+  "media_status_transferFailed": "Upload failed",
+  "media_status_transferring": "Uploading",
+  "media_status_queued": "Waiting to upload",
+  "media_status_cloudOnly": "Stored in the cloud only",
+  "media_status_notBackedUp": "Not backed up",
+  "media_tile_infoMenuItem": "Media info"
 }
