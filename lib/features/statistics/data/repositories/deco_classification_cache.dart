@@ -24,17 +24,43 @@ class DecoClassificationCacheRepository {
   /// a hash-filtered query would need one round trip per dive. The caller
   /// compares hashes in Dart, which keeps this to one round trip for the whole
   /// batch and leaves the staleness policy in one place.
+  /// Ids are queried in chunks so the bound-variable count never exceeds
+  /// SQLite's limit, matching `SpeciesRepository.getSightingsForDives`.
+  ///
+  /// Measured against the engine this app actually bundles, the ceiling is
+  /// 32766 (the SQLite 3.32+ default), not the 999 that older references and
+  /// the sibling repository's comment cite: an unchunked query survives 2500
+  /// ids and throws "too many SQL variables" at 33000. The chunk size stays at
+  /// 900 for consistency with that sibling rather than for necessity.
+  ///
+  /// Overrunning the limit would not surface as a visible failure here: the
+  /// caller catches a cache read error and falls back to recomputing every
+  /// dive, so the cache would quietly stop working for exactly the libraries
+  /// that need it most.
   Future<Map<String, ({bool hadDeco, String inputsHash})>> getEntries(
     Set<String> diveIds,
   ) async {
     if (diveIds.isEmpty) return const {};
-    final rows = await (_db.select(
-      _db.decoClassificationCache,
-    )..where((t) => t.diveId.isIn(diveIds))).get();
-    return {
-      for (final row in rows)
-        row.diveId: (hadDeco: row.hadDeco, inputsHash: row.inputsHash),
-    };
+
+    const chunkSize = 900; // safely under SQLite's 999 bound-variable limit
+    final ids = diveIds.toList(growable: false);
+    final entries = <String, ({bool hadDeco, String inputsHash})>{};
+
+    for (var start = 0; start < ids.length; start += chunkSize) {
+      final end = start + chunkSize < ids.length
+          ? start + chunkSize
+          : ids.length;
+      final rows = await (_db.select(
+        _db.decoClassificationCache,
+      )..where((t) => t.diveId.isIn(ids.sublist(start, end)))).get();
+      for (final row in rows) {
+        entries[row.diveId] = (
+          hadDeco: row.hadDeco,
+          inputsHash: row.inputsHash,
+        );
+      }
+    }
+    return entries;
   }
 
   Future<void> put(

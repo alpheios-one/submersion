@@ -72,4 +72,26 @@ void main() {
 
     expect(await repo.getEntries({'a'}), isEmpty);
   });
+
+  test('reads more ids than SQLite allows bound variables', () async {
+    // Sized against the measured ceiling of the bundled engine, not the 999
+    // that older references cite: an unchunked query survives 2500 ids and
+    // only throws "too many SQL variables" past 32766. Verified this test
+    // fails without the chunking in getEntries, so do not lower the count.
+    // The caller would swallow that throw into a full recompute rather than
+    // surfacing it, which is why this is covered.
+    const count = 33000;
+    for (var i = 0; i < count; i++) {
+      await repo.put('d$i', hadDeco: i.isEven, inputsHash: 'hash-1');
+    }
+
+    final entries = await repo.getEntries({
+      for (var i = 0; i < count; i++) 'd$i',
+    });
+
+    expect(entries, hasLength(count));
+    expect(entries['d0']?.hadDeco, isTrue);
+    expect(entries['d1']?.hadDeco, isFalse);
+    expect(entries['d2499']?.hadDeco, isFalse);
+  });
 }
