@@ -7401,6 +7401,8 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "In de buurt geregistreerd",
   "reef_species_addToExpected": "Toevoegen aan verwachte soorten",
+  "reef_species_showAll": "Alle {count} tonen",
+  "reef_species_showFewer": "Minder tonen",
   "reef_attribution_title": "Rifgegevensbronnen",
   "reef_attribution_wri": "Rifaanwezigheid en dreigingsniveau. CC BY 3.0.",
   "reef_attribution_noaa": "Zeeoppervlaktetemperatuur en hittestress. Publiek domein.",

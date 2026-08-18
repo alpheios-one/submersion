@@ -28,6 +28,11 @@ class ReefRepository {
 
   final Map<String, Future<void>> _inFlight = {};
 
+  /// Cache generation for nearby species. Bump this whenever the taxon
+  /// whitelist changes so previously cached results are refetched rather
+  /// than served for the rest of their 30-day lifetime.
+  static const String _speciesWhitelistVariant = 'v2';
+
   ReefRepository({
     required ReefCacheDao cache,
     required ReefHabitatService habitat,
@@ -86,6 +91,10 @@ class ReefRepository {
       _resolve<NearbySpecies>(
         provider: ReefProviderId.species,
         coordKey: key,
+        // Bumped when the taxon whitelist narrowed (issue #1036). Entries
+        // cached under the old whitelist hold terrestrial mammals and would
+        // otherwise survive their 30-day lifetime after the update.
+        variant: _speciesWhitelistVariant,
         fetch: () => _species.fetch(quantized),
         encode: (v) => jsonEncode(v.toJson()),
         decode: (j) => NearbySpecies.fromJson(j as Map<String, dynamic>),

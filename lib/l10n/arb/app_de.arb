@@ -7401,6 +7401,8 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "In der Nähe erfasst",
   "reef_species_addToExpected": "Zu erwarteten Arten hinzufügen",
+  "reef_species_showAll": "Alle {count} anzeigen",
+  "reef_species_showFewer": "Weniger anzeigen",
   "reef_attribution_title": "Riff-Datenquellen",
   "reef_attribution_wri": "Riffvorkommen und Gefährdungsstufe. CC BY 3.0.",
   "reef_attribution_noaa": "Wasseroberflächentemperatur und Bleiche-Hitzestress. Gemeinfrei.",

@@ -41026,6 +41026,18 @@ abstract class AppLocalizations {
   /// **'Add to expected species'**
   String get reef_species_addToExpected;
 
+  /// Expands the capped nearby-species chip list to its full length
+  ///
+  /// In en, this message translates to:
+  /// **'Show all {count}'**
+  String reef_species_showAll(int count);
+
+  /// Collapses the nearby-species chip list back to its capped length
+  ///
+  /// In en, this message translates to:
+  /// **'Show fewer'**
+  String get reef_species_showFewer;
+
   /// No description provided for @reef_attribution_title.
   ///
   /// In en, this message translates to:

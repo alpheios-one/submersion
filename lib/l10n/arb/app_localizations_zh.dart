@@ -23384,6 +23384,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reef_species_addToExpected => '添加到预期物种';
 
   @override
+  String reef_species_showAll(int count) {
+    return '显示全部 $count 项';
+  }
+
+  @override
+  String get reef_species_showFewer => '显示较少';
+
+  @override
   String get reef_attribution_title => '珊瑚礁数据来源';
 
   @override

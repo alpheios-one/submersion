@@ -7401,6 +7401,8 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "Registrado cerca",
   "reef_species_addToExpected": "Añadir a especies esperadas",
+  "reef_species_showAll": "Mostrar las {count}",
+  "reef_species_showFewer": "Mostrar menos",
   "reef_attribution_title": "Fuentes de datos del arrecife",
   "reef_attribution_wri": "Presencia de arrecife y nivel de amenaza. CC BY 3.0.",
   "reef_attribution_noaa": "Temperatura superficial del mar y estrés térmico. Dominio público.",

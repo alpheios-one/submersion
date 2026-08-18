@@ -12,7 +12,7 @@ import 'package:submersion/features/reef/domain/services/species_catalog_matcher
 ///
 /// The licence filter is mandatory: roughly a quarter of occurrence records
 /// near a typical reef are CC BY-NC, and omitting the filter would ship a
-/// licensing violation. The order whitelist is mandatory too: without it a
+/// licensing violation. The taxon whitelist is mandatory too: without it a
 /// 5 km radius around a coastal site is dominated by birds, which would eat
 /// every facet slot.
 class NearbySpeciesService {
@@ -33,6 +33,16 @@ class NearbySpeciesService {
   /// Live name lookups are capped so a cold cache cannot stall the UI.
   static const int maxUnmatched = 25;
 
+  /// Terrestrial families that sit inside an otherwise aquatic whitelisted
+  /// order, so no choice of rank in the generator can exclude them: Araceae
+  /// is a sibling of the seagrasses under Alismatales, and led the nearby
+  /// list at a German quarry with the woodland plant Arum maculatum
+  /// (issue #1036). Auditing twelve sites worldwide turned up no others.
+  ///
+  /// Duckweed is collateral, having been folded into Araceae, but it floats
+  /// on the surface and is not something a diver logs.
+  static const Set<String> _terrestrialFamilies = {'Araceae'};
+
   NearbySpeciesService({http.Client? client, SpeciesCatalogMatcher? matcher})
     : _client = client ?? http.Client(),
       _matcher = matcher;
@@ -48,7 +58,7 @@ class NearbySpeciesService {
         'license': ['CC0_1_0', 'CC_BY_4_0'],
         'occurrenceStatus': 'PRESENT',
         'hasGeospatialIssue': 'false',
-        'taxonKey': matcher.orderKeys.map((k) => k.toString()).toList(),
+        'taxonKey': matcher.taxonKeys.map((k) => k.toString()).toList(),
         'facet': 'speciesKey',
         'facetLimit': _facetLimit,
         'limit': '0',
@@ -127,6 +137,8 @@ class NearbySpeciesService {
         .toList(growable: false);
   }
 
+  /// Resolves a taxon key to its scientific name, or null when the record is
+  /// unusable or belongs to a [_terrestrialFamilies] family.
   Future<String?> _scientificName(int key) async {
     try {
       final response = await _client.get(
@@ -136,6 +148,9 @@ class NearbySpeciesService {
       if (response.statusCode != 200) return null;
       final decoded = jsonDecode(response.body);
       if (decoded is! Map<String, dynamic>) return null;
+      // An absent family is kept: GBIF omits it for higher-rank records, and
+      // dropping those would lose aquatic life to a missing field.
+      if (_terrestrialFamilies.contains(decoded['family'])) return null;
       final name = decoded['scientificName'];
       return name is String && name.isNotEmpty ? name : null;
     } catch (_) {
