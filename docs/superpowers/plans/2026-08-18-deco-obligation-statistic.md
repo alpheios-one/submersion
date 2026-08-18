@@ -1136,9 +1136,9 @@ Refs #623"
 
 ---
 
-## Follow-up issues to file
+## Follow-up issues
 
-Both were found during the #623 investigation, are real, and are deliberately out of scope here:
+Both were found during the #623 investigation, are real, and were deliberately out of scope here. Filed 2026-08-18:
 
-1. `getTimeAtDepthRanges` counts profile rows and divides by 60, assuming 1 Hz sampling. At a 4-5 s sample interval the card understates time at depth by that factor. It also omits the `is_primary` filter, so a dive logged by two computers is double-counted.
-2. `setPrimaryDataSource` (`dive_repository_impl.dart:5877-5891`) demotes every `dive_profiles` row for a dive, then re-promotes only rows whose `computer_id` matches `newPrimary.computerId`, and only when that id is non-null. File-imported dives have a null `computerId` on both the data source row and the profile rows, so nothing is re-promoted and the dive ends up with no primary profile. Any query gated on `is_primary = 1`, including the ascent/descent rates card, then silently skips that dive.
+1. **#1148**: `getTimeAtDepthRanges` counts profile rows and divides by 60, assuming 1 Hz sampling. At a 4-5 s sample interval the card understates time at depth by that factor. It also omits the `is_primary` filter, so a dive logged by two computers is double-counted.
+2. **#1149**: `setPrimaryDataSource` (`dive_repository_impl.dart:5877-5891`) demotes every `dive_profiles` row for a dive, then re-promotes only rows whose `computer_id` matches `newPrimary.computerId`, and only when that id is non-null. File-imported dives have a null `computerId` on both the data source row and the profile rows, so nothing is re-promoted and the dive ends up with no primary profile. Any query gated on `is_primary = 1`, including the ascent/descent rates card, then silently skips that dive.

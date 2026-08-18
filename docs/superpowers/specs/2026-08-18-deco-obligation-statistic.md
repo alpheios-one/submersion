@@ -139,15 +139,18 @@ analysis after classifying it to bound memory.
 ## Out of scope
 
 Two adjacent defects were found during the investigation and are **not**
-addressed here. They are filed separately so this change stays reviewable:
+addressed here. Both are filed separately so this change stays reviewable:
 
-- `getTimeAtDepthRanges` counts sample rows and divides by 60, assuming 1 Hz
-  sampling. At the reporter's roughly 4-5 s sample interval the card understates
-  time at depth by that factor. It also omits the `is_primary` filter, so a
-  dive logged by two computers is double-counted.
-- `setPrimaryDataSource` (`dive_repository_impl.dart:5877-5891`) demotes every
-  `dive_profiles` row for a dive, then re-promotes only rows matching
-  `newPrimary.computerId`, and only when that id is non-null. File-imported
-  dives have a null `computerId` on both the data source and the profile rows,
-  so nothing is re-promoted and the dive is left with no primary profile. That
-  silently empties the ascent/descent card, among others.
+- **#1148**: `getTimeAtDepthRanges` counts sample rows and divides by 60,
+  assuming 1 Hz sampling. At the reporter's roughly 4-5 s sample interval the
+  card overstates time at depth by that factor. It also omits the `is_primary`
+  filter, so a dive logged by two computers is double-counted.
+- **#1149**: `setPrimaryDataSource` (`dive_repository_impl.dart:5877-5891`)
+  demotes every `dive_profiles` row for a dive, then re-promotes only rows
+  matching `newPrimary.computerId`, and only when that id is non-null.
+  File-imported dives have a null `computerId` on both the data source row
+  (`uddf_entity_importer.dart` sets `computerModel` and `computerSerial` but
+  never `computerId`) and the profile rows, and the "Set Primary" menu item in
+  `data_sources_section.dart` carries no `computerId` guard. So the dive is
+  left with no primary profile at all. That silently empties the
+  ascent/descent card, among others. Confirmed reachable, not latent.
