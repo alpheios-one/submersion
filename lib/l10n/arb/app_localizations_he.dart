@@ -10725,6 +10725,36 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'עדכן';
 
   @override
+  String get equipment_serviceType_annual => 'טיפול שנתי';
+
+  @override
+  String get equipment_serviceType_repair => 'תיקון';
+
+  @override
+  String get equipment_serviceType_inspection => 'בדיקה';
+
+  @override
+  String get equipment_serviceType_overhaul => 'שיפוץ כללי';
+
+  @override
+  String get equipment_serviceType_replacement => 'החלפת חלקים';
+
+  @override
+  String get equipment_serviceType_cleaning => 'ניקוי';
+
+  @override
+  String get equipment_serviceType_calibration => 'כיול';
+
+  @override
+  String get equipment_serviceType_warranty => 'שירות אחריות';
+
+  @override
+  String get equipment_serviceType_recall => 'ריקול/בטיחות';
+
+  @override
+  String get equipment_serviceType_other => 'אחר';
+
+  @override
   String get equipment_service_addButton => 'הוסף';
 
   @override

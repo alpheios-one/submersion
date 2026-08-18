@@ -18723,6 +18723,66 @@ abstract class AppLocalizations {
   /// **'Update'**
   String get equipment_serviceDialog_updateButton;
 
+  /// No description provided for @equipment_serviceType_annual.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual Service'**
+  String get equipment_serviceType_annual;
+
+  /// No description provided for @equipment_serviceType_repair.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair'**
+  String get equipment_serviceType_repair;
+
+  /// No description provided for @equipment_serviceType_inspection.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspection'**
+  String get equipment_serviceType_inspection;
+
+  /// No description provided for @equipment_serviceType_overhaul.
+  ///
+  /// In en, this message translates to:
+  /// **'Overhaul'**
+  String get equipment_serviceType_overhaul;
+
+  /// No description provided for @equipment_serviceType_replacement.
+  ///
+  /// In en, this message translates to:
+  /// **'Part Replacement'**
+  String get equipment_serviceType_replacement;
+
+  /// No description provided for @equipment_serviceType_cleaning.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleaning'**
+  String get equipment_serviceType_cleaning;
+
+  /// No description provided for @equipment_serviceType_calibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Calibration'**
+  String get equipment_serviceType_calibration;
+
+  /// No description provided for @equipment_serviceType_warranty.
+  ///
+  /// In en, this message translates to:
+  /// **'Warranty Service'**
+  String get equipment_serviceType_warranty;
+
+  /// No description provided for @equipment_serviceType_recall.
+  ///
+  /// In en, this message translates to:
+  /// **'Recall/Safety'**
+  String get equipment_serviceType_recall;
+
+  /// No description provided for @equipment_serviceType_other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get equipment_serviceType_other;
+
   /// No description provided for @equipment_service_addButton.
   ///
   /// In en, this message translates to:

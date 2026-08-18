@@ -10485,6 +10485,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => '更新';
 
   @override
+  String get equipment_serviceType_annual => '年度保养';
+
+  @override
+  String get equipment_serviceType_repair => '维修';
+
+  @override
+  String get equipment_serviceType_inspection => '检查';
+
+  @override
+  String get equipment_serviceType_overhaul => '大修';
+
+  @override
+  String get equipment_serviceType_replacement => '部件更换';
+
+  @override
+  String get equipment_serviceType_cleaning => '清洁';
+
+  @override
+  String get equipment_serviceType_calibration => '校准';
+
+  @override
+  String get equipment_serviceType_warranty => '保修服务';
+
+  @override
+  String get equipment_serviceType_recall => '召回/安全';
+
+  @override
+  String get equipment_serviceType_other => '其他';
+
+  @override
   String get equipment_service_addButton => '添加';
 
   @override

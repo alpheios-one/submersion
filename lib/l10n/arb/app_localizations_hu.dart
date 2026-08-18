@@ -10955,6 +10955,36 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Frissites';
 
   @override
+  String get equipment_serviceType_annual => 'Éves szerviz';
+
+  @override
+  String get equipment_serviceType_repair => 'Javítás';
+
+  @override
+  String get equipment_serviceType_inspection => 'Ellenőrzés';
+
+  @override
+  String get equipment_serviceType_overhaul => 'Nagyjavítás';
+
+  @override
+  String get equipment_serviceType_replacement => 'Alkatrészcsere';
+
+  @override
+  String get equipment_serviceType_cleaning => 'Tisztítás';
+
+  @override
+  String get equipment_serviceType_calibration => 'Kalibrálás';
+
+  @override
+  String get equipment_serviceType_warranty => 'Garanciális szerviz';
+
+  @override
+  String get equipment_serviceType_recall => 'Visszahívás/Biztonság';
+
+  @override
+  String get equipment_serviceType_other => 'Egyéb';
+
+  @override
   String get equipment_service_addButton => 'Hozzaadas';
 
   @override

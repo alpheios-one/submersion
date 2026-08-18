@@ -10899,6 +10899,36 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Bijwerken';
 
   @override
+  String get equipment_serviceType_annual => 'Jaarlijkse service';
+
+  @override
+  String get equipment_serviceType_repair => 'Reparatie';
+
+  @override
+  String get equipment_serviceType_inspection => 'Inspectie';
+
+  @override
+  String get equipment_serviceType_overhaul => 'Revisie';
+
+  @override
+  String get equipment_serviceType_replacement => 'Onderdeelvervanging';
+
+  @override
+  String get equipment_serviceType_cleaning => 'Reiniging';
+
+  @override
+  String get equipment_serviceType_calibration => 'Kalibratie';
+
+  @override
+  String get equipment_serviceType_warranty => 'Garantieservice';
+
+  @override
+  String get equipment_serviceType_recall => 'Terugroepactie/Veiligheid';
+
+  @override
+  String get equipment_serviceType_other => 'Overig';
+
+  @override
   String get equipment_service_addButton => 'Toevoegen';
 
   @override

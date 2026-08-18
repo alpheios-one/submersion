@@ -10980,6 +10980,36 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Aggiorna';
 
   @override
+  String get equipment_serviceType_annual => 'Manutenzione annuale';
+
+  @override
+  String get equipment_serviceType_repair => 'Riparazione';
+
+  @override
+  String get equipment_serviceType_inspection => 'Ispezione';
+
+  @override
+  String get equipment_serviceType_overhaul => 'Revisione generale';
+
+  @override
+  String get equipment_serviceType_replacement => 'Sostituzione ricambi';
+
+  @override
+  String get equipment_serviceType_cleaning => 'Pulizia';
+
+  @override
+  String get equipment_serviceType_calibration => 'Calibrazione';
+
+  @override
+  String get equipment_serviceType_warranty => 'Assistenza in garanzia';
+
+  @override
+  String get equipment_serviceType_recall => 'Richiamo/Sicurezza';
+
+  @override
+  String get equipment_serviceType_other => 'Altro';
+
+  @override
   String get equipment_service_addButton => 'Aggiungi';
 
   @override

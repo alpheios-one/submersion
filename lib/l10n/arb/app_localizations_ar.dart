@@ -10789,6 +10789,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'تحديث';
 
   @override
+  String get equipment_serviceType_annual => 'الصيانة السنوية';
+
+  @override
+  String get equipment_serviceType_repair => 'إصلاح';
+
+  @override
+  String get equipment_serviceType_inspection => 'فحص';
+
+  @override
+  String get equipment_serviceType_overhaul => 'عمرة شاملة';
+
+  @override
+  String get equipment_serviceType_replacement => 'استبدال قطع';
+
+  @override
+  String get equipment_serviceType_cleaning => 'تنظيف';
+
+  @override
+  String get equipment_serviceType_calibration => 'معايرة';
+
+  @override
+  String get equipment_serviceType_warranty => 'خدمة الضمان';
+
+  @override
+  String get equipment_serviceType_recall => 'استدعاء/سلامة';
+
+  @override
+  String get equipment_serviceType_other => 'أخرى';
+
+  @override
   String get equipment_service_addButton => 'إضافة';
 
   @override
