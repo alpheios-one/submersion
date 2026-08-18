@@ -31014,11 +31014,88 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'Az adatbázis frissítése sikertelen';
+  String get startup_error_title => 'A Submersion nem tudott elindulni';
 
   @override
   String get startup_error_body =>
-      'Próbálja meg újraindítani az alkalmazást. Ha a hiba továbbra is fennáll, forduljon az ügyfélszolgálathoz: az adatai továbbra is a lemezen vannak, és nincs szükség újratelepítésre.';
+      'Valami hiba történt, mielőtt a merülési naplód teljesen megnyílt volna. Az adataid továbbra is a lemezen vannak, és nincs szükség újratelepítésre. Próbáld újraindítani az alkalmazást; ha a probléma nem szűnik meg, fordulj az ügyfélszolgálathoz.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'Ez a build nem tud adatbázist megnyitni';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'Ebből a buildből hiányzik a Submersion adatbázismotorja, ezért a merülési naplód meg sem nyílt. A lemezen semmi nem változott, és egyetlen adat sincs veszélyben.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'Az újratelepítés vagy egy biztonsági másolat visszaállítása itt nem segít. Telepítsd a Submersion egy működő buildjét, és kérjük, jelentsd ezt: az alkalmazáscsomag hibája, nem az adataidé.';
+
+  @override
+  String get startup_migrationFailed_title =>
+      'Az adatbázis frissítése nem sikerült';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'A merülési naplódat nem sikerült az ehhez a verzióhoz szükséges formátumra frissíteni. A frissítés megkezdése előtt biztonsági másolat készült, így semmi nem veszett el.';
+
+  @override
+  String get startup_dataUnreadable_title =>
+      'A merülési naplódat nem sikerült beolvasni';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'Az adatbázisfájl megvan, de a Submersion nem tudja elolvasni. Ez általában azt jelenti, hogy a fájl sérült. Egy biztonsági másolat visszaállítása a leggyorsabb út vissza.';
+
+  @override
+  String get startup_failure_technicalDetails => 'Technikai részletek';
+
+  @override
+  String get startup_failure_backupAvailable_title =>
+      'Elérhető egy biztonsági másolat';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'Készült: $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'Biztonsági másolat a v$fromVersion sémáról v$toVersion sémára történő frissítés előtt.';
+  }
+
+  @override
+  String get startup_failure_restoreAction =>
+      'Ennek a másolatnak a visszaállítása';
+
+  @override
+  String get startup_failure_restoring => 'Merülési napló visszaállítása...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'A biztonsági másolatot nem sikerült visszaállítani. A merülési naplód pontosan úgy maradt, ahogy volt.';
+
+  @override
+  String get startup_failure_backupsFolder =>
+      'A biztonsági másolataid itt vannak:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'Biztonsági mentések mappája';
+
+  @override
+  String get startup_failure_downgrade_title => 'Visszatérés az előző verzióra';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'Ha a frissítés továbbra sem sikerül, telepítsd a Submersion korábban használt verzióját, majd abból a verzióból állítsd vissza a biztonsági másolatot. Itt visszaállítani csak ugyanazt a frissítést futtatná le újra. A Submersion soha nem vált magától régebbi verzióra: az automatikus visszaléptetés csendben ismert hibás verziókon tartana.';
+
+  @override
+  String get startup_failure_downgrade_action =>
+      'Korábbi kiadások megtekintése';
 
   @override
   String get startup_recovering_title => 'Adatbázis helyreállítása...';

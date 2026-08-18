@@ -31207,12 +31207,90 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title =>
-      'Échec de la mise à niveau de la base de données';
+  String get startup_error_title => 'Submersion n’a pas pu démarrer';
 
   @override
   String get startup_error_body =>
-      'Essayez de redémarrer l’application. Si le problème persiste, contactez l’assistance : vos données sont toujours sur le disque et une réinstallation n’est pas nécessaire.';
+      'Un problème est survenu avant l’ouverture complète de votre carnet de plongée. Vos données sont toujours sur le disque et une réinstallation n’est pas nécessaire. Essayez de redémarrer l’application ; si le problème persiste, contactez l’assistance.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'Cette version ne peut ouvrir aucune base de données';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'Le moteur de base de données de Submersion est absent de cette version, votre carnet de plongée n’a donc jamais été ouvert. Rien n’a changé sur le disque et aucune donnée n’est en danger.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'Réinstaller ou restaurer une sauvegarde n’y changera rien. Installez une version fonctionnelle de Submersion et signalez-nous ce problème : il vient du paquet de l’application, pas de vos données.';
+
+  @override
+  String get startup_migrationFailed_title =>
+      'Échec de la mise à niveau de la base de données';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'Votre carnet de plongée n’a pas pu être mis à niveau vers le format requis par cette version. Une copie de sécurité a été créée avant le début de la mise à niveau : rien n’est perdu.';
+
+  @override
+  String get startup_dataUnreadable_title =>
+      'Votre carnet de plongée n’a pas pu être lu';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'Le fichier de base de données est bien là, mais Submersion ne parvient pas à le lire. Cela signifie généralement qu’il est endommagé. Restaurer une sauvegarde est le moyen le plus rapide de repartir.';
+
+  @override
+  String get startup_failure_technicalDetails => 'Détails techniques';
+
+  @override
+  String get startup_failure_backupAvailable_title =>
+      'Une sauvegarde est disponible';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'Créée le $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'Copie de sécurité créée avant la mise à niveau du schéma v$fromVersion vers v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction => 'Restaurer cette sauvegarde';
+
+  @override
+  String get startup_failure_restoring =>
+      'Restauration de votre carnet de plongée...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'La sauvegarde n’a pas pu être restaurée. Votre carnet de plongée a été laissé exactement en l’état.';
+
+  @override
+  String get startup_failure_backupsFolder =>
+      'Vos sauvegardes se trouvent dans :';
+
+  @override
+  String get startup_failure_showBackupsFolder =>
+      'Afficher le dossier des sauvegardes';
+
+  @override
+  String get startup_failure_downgrade_title =>
+      'Revenir à la version précédente';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'Si la mise à niveau échoue systématiquement, installez la version de Submersion que vous utilisiez auparavant, puis restaurez la copie de sécurité depuis cette version. La restaurer ici ne ferait que relancer la même mise à niveau. Submersion ne revient jamais tout seul à une version antérieure : vous basculer automatiquement sur d’anciennes versions vous maintiendrait discrètement sur des versions présentant des problèmes connus.';
+
+  @override
+  String get startup_failure_downgrade_action =>
+      'Voir les versions précédentes';
 
   @override
   String get startup_recovering_title =>

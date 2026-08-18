@@ -31062,11 +31062,87 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'Datenbank-Upgrade fehlgeschlagen';
+  String get startup_error_title => 'Submersion konnte nicht starten';
 
   @override
   String get startup_error_body =>
-      'Starten Sie die App neu. Falls das Problem weiterhin besteht, kontaktieren Sie den Support: Ihre Daten befinden sich weiterhin auf dem Datenträger und eine Neuinstallation ist nicht erforderlich.';
+      'Etwas ist schiefgelaufen, bevor Ihr Tauchlogbuch vollständig geöffnet war. Ihre Daten befinden sich weiterhin auf dem Datenträger und eine Neuinstallation ist nicht erforderlich. Starten Sie die App neu; falls das Problem weiterhin besteht, kontaktieren Sie den Support.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'Dieser Build kann keine Datenbank öffnen';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'In diesem Build fehlt die Datenbank-Engine von Submersion, daher wurde Ihr Tauchlogbuch nie geöffnet. Auf dem Datenträger hat sich nichts geändert und es sind keine Daten gefährdet.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'Eine Neuinstallation oder das Wiederherstellen einer Sicherung hilft hier nicht. Installieren Sie einen funktionierenden Build von Submersion und melden Sie dies bitte: Es ist ein Fehler im App-Paket, nicht in Ihren Daten.';
+
+  @override
+  String get startup_migrationFailed_title =>
+      'Datenbank-Upgrade fehlgeschlagen';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'Ihr Tauchlogbuch konnte nicht auf das Format aktualisiert werden, das diese Version benötigt. Vor Beginn des Upgrades wurde eine Sicherungskopie erstellt, es geht also nichts verloren.';
+
+  @override
+  String get startup_dataUnreadable_title =>
+      'Ihr Tauchlogbuch konnte nicht gelesen werden';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'Die Datenbankdatei ist vorhanden, aber Submersion kann sie nicht lesen. Das bedeutet meist, dass die Datei beschädigt ist. Das Wiederherstellen einer Sicherung ist der schnellste Weg zurück.';
+
+  @override
+  String get startup_failure_technicalDetails => 'Technische Details';
+
+  @override
+  String get startup_failure_backupAvailable_title =>
+      'Eine Sicherung ist verfügbar';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'Erstellt am $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'Sicherungskopie erstellt vor dem Upgrade von Schema v$fromVersion auf v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction =>
+      'Diese Sicherung wiederherstellen';
+
+  @override
+  String get startup_failure_restoring =>
+      'Tauchlogbuch wird wiederhergestellt ...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'Die Sicherung konnte nicht wiederhergestellt werden. Ihr Tauchlogbuch wurde unverändert gelassen.';
+
+  @override
+  String get startup_failure_backupsFolder => 'Ihre Sicherungen liegen in:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'Sicherungsordner anzeigen';
+
+  @override
+  String get startup_failure_downgrade_title => 'Zurück zur vorherigen Version';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'Wenn das Upgrade weiterhin fehlschlägt, installieren Sie die zuvor verwendete Version von Submersion und stellen Sie die Sicherungskopie aus dieser Version heraus wieder her. Eine Wiederherstellung hier würde nur dasselbe Upgrade erneut ausführen. Submersion führt kein automatisches Downgrade durch: Sie automatisch auf ältere Builds zurückzusetzen würde Sie stillschweigend auf Versionen mit bekannten Problemen halten.';
+
+  @override
+  String get startup_failure_downgrade_action => 'Frühere Versionen ansehen';
 
   @override
   String get startup_recovering_title => 'Datenbank wird wiederhergestellt...';

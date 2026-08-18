@@ -29376,10 +29376,80 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => '数据库升级失败';
+  String get startup_error_title => 'Submersion 无法启动';
 
   @override
-  String get startup_error_body => '请尝试重启应用。如果问题持续存在，请联系支持人员：您的数据仍在磁盘上，无需重新安装。';
+  String get startup_error_body =>
+      '在潜水日志完全打开之前出现了问题。您的数据仍在磁盘上，无需重新安装。请尝试重启应用；如果问题持续存在，请联系支持人员。';
+
+  @override
+  String get startup_engineUnavailable_title => '此版本无法打开数据库';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      '此版本缺少 Submersion 的数据库引擎，因此您的潜水日志从未被打开。磁盘上没有任何变化，也没有数据面临风险。';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      '重新安装或恢复备份都无济于事。请安装可正常工作的 Submersion 版本，并请报告此问题：这是应用安装包的缺陷，而非您的数据问题。';
+
+  @override
+  String get startup_migrationFailed_title => '数据库升级失败';
+
+  @override
+  String get startup_migrationFailed_body =>
+      '无法将您的潜水日志升级到此版本所需的格式。升级开始前已创建安全副本，因此没有丢失任何内容。';
+
+  @override
+  String get startup_dataUnreadable_title => '无法读取您的潜水日志';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      '数据库文件存在，但 Submersion 无法读取它。这通常意味着文件已损坏。恢复备份是最快的解决办法。';
+
+  @override
+  String get startup_failure_technicalDetails => '技术详情';
+
+  @override
+  String get startup_failure_backupAvailable_title => '有可用的备份';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return '创建于 $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return '在从架构 v$fromVersion 升级到 v$toVersion 之前创建的安全副本。';
+  }
+
+  @override
+  String get startup_failure_restoreAction => '恢复此备份';
+
+  @override
+  String get startup_failure_restoring => '正在恢复您的潜水日志...';
+
+  @override
+  String get startup_failure_restoreFailed => '无法恢复该备份。您的潜水日志已保持原样。';
+
+  @override
+  String get startup_failure_backupsFolder => '您的备份位于：';
+
+  @override
+  String get startup_failure_showBackupsFolder => '显示备份文件夹';
+
+  @override
+  String get startup_failure_downgrade_title => '回到上一个版本';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      '如果升级持续失败，请安装您之前使用的 Submersion 版本，然后在该版本中恢复安全副本。在这里恢复只会再次运行同一次升级。Submersion 不会自动降级：自动把您切换到旧版本会在您不知情的情况下让您停留在存在已知问题的版本上。';
+
+  @override
+  String get startup_failure_downgrade_action => '查看以往版本';
 
   @override
   String get startup_recovering_title => '正在恢复数据库...';

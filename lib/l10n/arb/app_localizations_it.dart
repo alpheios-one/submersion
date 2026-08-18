@@ -31132,11 +31132,86 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'Aggiornamento del database non riuscito';
+  String get startup_error_title => 'Submersion non è riuscito ad avviarsi';
 
   @override
   String get startup_error_body =>
-      'Prova a riavviare l’app. Se il problema persiste, contatta l’assistenza: i tuoi dati sono ancora sul disco e non è necessaria una reinstallazione.';
+      'Qualcosa è andato storto prima che il tuo diario di immersione fosse aperto del tutto. I tuoi dati sono ancora sul disco e non richiedono una reinstallazione. Prova a riavviare l\'app; se il problema persiste, contatta l\'assistenza.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'Questa build non può aprire un database';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'In questa build manca il motore di database di Submersion, quindi il tuo diario di immersione non è mai stato aperto. Sul disco non è cambiato nulla e nessun dato è a rischio.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'Reinstallare o ripristinare un backup non servirà. Installa una build funzionante di Submersion e segnalaci il problema: è un difetto del pacchetto dell\'app, non dei tuoi dati.';
+
+  @override
+  String get startup_migrationFailed_title =>
+      'Aggiornamento del database non riuscito';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'Non è stato possibile aggiornare il tuo diario di immersione al formato richiesto da questa versione. Prima dell\'aggiornamento è stata creata una copia di sicurezza, quindi non è andato perso nulla.';
+
+  @override
+  String get startup_dataUnreadable_title =>
+      'Non è stato possibile leggere il tuo diario di immersione';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'Il file del database c\'è, ma Submersion non riesce a leggerlo. Di solito significa che il file è danneggiato. Ripristinare un backup è il modo più rapido per ripartire.';
+
+  @override
+  String get startup_failure_technicalDetails => 'Dettagli tecnici';
+
+  @override
+  String get startup_failure_backupAvailable_title => 'È disponibile un backup';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'Creato il $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'Copia di sicurezza creata prima dell\'aggiornamento dallo schema v$fromVersion a v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction => 'Ripristina questo backup';
+
+  @override
+  String get startup_failure_restoring =>
+      'Ripristino del diario di immersione...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'Non è stato possibile ripristinare il backup. Il tuo diario di immersione è stato lasciato esattamente com\'era.';
+
+  @override
+  String get startup_failure_backupsFolder => 'I tuoi backup si trovano in:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'Mostra cartella dei backup';
+
+  @override
+  String get startup_failure_downgrade_title =>
+      'Tornare alla versione precedente';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'Se l\'aggiornamento continua a fallire, installa la versione di Submersion che usavi prima e ripristina la copia di sicurezza da quella versione. Ripristinarla qui rieseguirebbe soltanto lo stesso aggiornamento. Submersion non torna da solo a versioni precedenti: spostarti automaticamente su build più vecchie ti terrebbe in silenzio su versioni con problemi noti.';
+
+  @override
+  String get startup_failure_downgrade_action => 'Vedi le versioni precedenti';
 
   @override
   String get startup_recovering_title => 'Recupero del database...';

@@ -30833,11 +30833,82 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'فشلت ترقية قاعدة البيانات';
+  String get startup_error_title => 'تعذّر بدء تشغيل Submersion';
 
   @override
   String get startup_error_body =>
-      'حاول إعادة تشغيل التطبيق. إذا استمرت المشكلة، تواصل مع الدعم: بياناتك ما زالت على القرص ولا تتطلب إعادة تثبيت.';
+      'حدث خطأ ما قبل أن يكتمل فتح سجل الغوص الخاص بك. بياناتك ما زالت على القرص ولا تتطلب إعادة تثبيت. حاول إعادة تشغيل التطبيق، وإذا استمرت المشكلة تواصل مع الدعم.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'هذه النسخة لا تستطيع فتح قاعدة بيانات';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'محرك قواعد البيانات الخاص بـ Submersion غير موجود في هذه النسخة، لذلك لم يُفتح سجل الغوص الخاص بك على الإطلاق. لم يتغيّر شيء على القرص ولا توجد بيانات معرّضة للخطر.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'إعادة التثبيت أو استرداد نسخة احتياطية لن تفيد هنا. ثبّت نسخة سليمة من Submersion، ويُرجى الإبلاغ عن هذه المشكلة: فهي خلل في حزمة التطبيق وليس في بياناتك.';
+
+  @override
+  String get startup_migrationFailed_title => 'فشلت ترقية قاعدة البيانات';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'تعذّرت ترقية سجل الغوص الخاص بك إلى التنسيق الذي تحتاجه هذه النسخة. أُخذت نسخة احتياطية قبل بدء الترقية، فلم يُفقد شيء.';
+
+  @override
+  String get startup_dataUnreadable_title => 'تعذّرت قراءة سجل الغوص الخاص بك';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'ملف قاعدة البيانات موجود، لكن Submersion لا يستطيع قراءته. يعني هذا عادةً أن الملف تالف. استرداد نسخة احتياطية هو أسرع طريق للعودة.';
+
+  @override
+  String get startup_failure_technicalDetails => 'تفاصيل تقنية';
+
+  @override
+  String get startup_failure_backupAvailable_title => 'تتوفر نسخة احتياطية';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'أُخذت في $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'نسخة احتياطية أُخذت قبل الترقية من المخطط v$fromVersion إلى v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction => 'استرداد هذه النسخة الاحتياطية';
+
+  @override
+  String get startup_failure_restoring => 'جارٍ استرداد سجل الغوص...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'تعذّر استرداد النسخة الاحتياطية. تُرك سجل الغوص الخاص بك كما كان تمامًا.';
+
+  @override
+  String get startup_failure_backupsFolder => 'نسخك الاحتياطية موجودة في:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'إظهار مجلد النسخ الاحتياطية';
+
+  @override
+  String get startup_failure_downgrade_title => 'العودة إلى الإصدار السابق';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'إذا استمرت الترقية في الفشل، ثبّت إصدار Submersion الذي كنت تستخدمه سابقًا، ثم استرد النسخة الاحتياطية من داخل ذلك الإصدار. الاسترداد هنا سيعيد تشغيل الترقية نفسها فحسب. لا يخفّض Submersion إصداره تلقائيًا: نقلك تلقائيًا إلى نسخ أقدم سيبقيك بصمت على إصدارات ذات مشكلات معروفة.';
+
+  @override
+  String get startup_failure_downgrade_action => 'عرض الإصدارات السابقة';
 
   @override
   String get startup_recovering_title => 'جارٍ استرداد قاعدة البيانات...';
