@@ -16645,6 +16645,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get statistics_profile_deco_noDeco => 'Kein Deko';
 
   @override
+  String get statistics_profile_deco_notRecorded => 'Nicht erfasst';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count Tauchgänge haben keine erfassten oder berechenbaren Deko-Daten und sind von der Rate ausgenommen';
+  }
+
+  @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
     return 'Dekompressionsrate: $percentage% der Tauchgänge erforderten Deko-Stopps';
   }

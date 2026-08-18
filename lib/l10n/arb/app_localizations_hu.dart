@@ -16623,6 +16623,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get statistics_profile_deco_noDeco => 'Nincs deko';
 
   @override
+  String get statistics_profile_deco_notRecorded => 'Nincs rögzítve';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count merülés nem tartalmaz rögzített vagy számítható dekompressziós adatot, ezért kimarad az arányból';
+  }
+
+  @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
     return 'Dekompresszios arany: $percentage% a meruleseknek deko megalloast igenyelt';
   }

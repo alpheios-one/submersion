@@ -5045,6 +5045,8 @@
   "statistics_profile_deco_empty": "No hay datos de deco disponibles",
   "statistics_profile_deco_error": "Error al cargar los datos de deco",
   "statistics_profile_deco_noDeco": "Sin deco",
+  "statistics_profile_deco_notRecorded": "Sin registrar",
+  "statistics_profile_deco_notRecordedHint": "{count} inmersiones no tienen datos de descompresión registrados ni calculables y se excluyen de la tasa",
   "statistics_profile_deco_semanticLabel": "Tasa de descompresion: {percentage}% de las inmersiones requirieron paradas de deco",
   "statistics_profile_deco_subtitle": "Inmersiones que incurrieron en paradas de deco",
   "statistics_profile_deco_title": "Obligacion de descompresion",

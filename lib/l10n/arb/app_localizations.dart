@@ -28007,6 +28007,18 @@ abstract class AppLocalizations {
   /// **'No Deco'**
   String get statistics_profile_deco_noDeco;
 
+  /// No description provided for @statistics_profile_deco_notRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Recorded'**
+  String get statistics_profile_deco_notRecorded;
+
+  /// No description provided for @statistics_profile_deco_notRecordedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} dives have no recorded or computable deco data and are excluded from the rate'**
+  String statistics_profile_deco_notRecordedHint(int count);
+
   /// No description provided for @statistics_profile_deco_semanticLabel.
   ///
   /// In en, this message translates to:

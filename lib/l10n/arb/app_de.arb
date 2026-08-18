@@ -5045,6 +5045,8 @@
   "statistics_profile_deco_empty": "Keine Deko-Daten verfügbar",
   "statistics_profile_deco_error": "Deko-Daten konnten nicht geladen werden",
   "statistics_profile_deco_noDeco": "Kein Deko",
+  "statistics_profile_deco_notRecorded": "Nicht erfasst",
+  "statistics_profile_deco_notRecordedHint": "{count} Tauchgänge haben keine erfassten oder berechenbaren Deko-Daten und sind von der Rate ausgenommen",
   "statistics_profile_deco_semanticLabel": "Dekompressionsrate: {percentage}% der Tauchgänge erforderten Deko-Stopps",
   "statistics_profile_deco_subtitle": "Tauchgänge mit Deko-Stopps",
   "statistics_profile_deco_title": "Dekompressionspflicht",

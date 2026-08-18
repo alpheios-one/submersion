@@ -16679,6 +16679,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_profile_deco_noDeco => 'Sem Deco';
 
   @override
+  String get statistics_profile_deco_notRecorded => 'Não registado';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count mergulhos não têm dados de descompressão registados ou calculáveis e são excluídos da taxa';
+  }
+
+  @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
     return 'Taxa de descompressao: $percentage% dos mergulhos exigiram paradas de deco';
   }

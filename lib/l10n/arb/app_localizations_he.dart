@@ -16248,6 +16248,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get statistics_profile_deco_noDeco => 'ללא דקו';
 
   @override
+  String get statistics_profile_deco_notRecorded => 'לא נרשם';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return 'ל-$count צלילות אין נתוני דקומפרסיה שנרשמו או שניתן לחשב, והן אינן נכללות בשיעור';
+  }
+
+  @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
     return 'שיעור דקומפרסיה: $percentage% מהצלילות דרשו עצירות דקו';
   }

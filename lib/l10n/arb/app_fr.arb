@@ -4973,6 +4973,8 @@
   "statistics_profile_deco_empty": "Aucune donnee deco disponible",
   "statistics_profile_deco_error": "Echec du chargement des donnees deco",
   "statistics_profile_deco_noDeco": "Sans deco",
+  "statistics_profile_deco_notRecorded": "Non enregistré",
+  "statistics_profile_deco_notRecordedHint": "{count} plongées n'ont aucune donnée de décompression enregistrée ou calculable et sont exclues du taux",
   "statistics_profile_deco_semanticLabel": "Taux de decompression : {percentage}% des plongees ont necessite des paliers de decompression",
   "statistics_profile_deco_subtitle": "Plongees ayant necessite des paliers de decompression",
   "statistics_profile_deco_title": "Obligation de decompression",

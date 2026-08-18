@@ -9755,6 +9755,8 @@
   "statistics_profile_deco_empty": "No deco data available",
   "statistics_profile_deco_error": "Failed to load deco data",
   "statistics_profile_deco_noDeco": "No Deco",
+  "statistics_profile_deco_notRecorded": "Not Recorded",
+  "statistics_profile_deco_notRecordedHint": "{count} dives have no recorded or computable deco data and are excluded from the rate",
   "statistics_profile_deco_semanticLabel": "Decompression rate: {percentage}% of dives required deco stops",
   "statistics_profile_deco_subtitle": "Dives that incurred deco stops",
   "statistics_profile_deco_title": "Decompression Obligation",
@@ -10004,6 +10006,13 @@
       },
       "topCount": {
         "type": "Object"
+      }
+    }
+  },
+  "@statistics_profile_deco_notRecordedHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   },

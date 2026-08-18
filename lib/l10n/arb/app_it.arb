@@ -4969,6 +4969,8 @@
   "statistics_profile_deco_empty": "Nessun dato deco disponibile",
   "statistics_profile_deco_error": "Impossibile caricare i dati deco",
   "statistics_profile_deco_noDeco": "No deco",
+  "statistics_profile_deco_notRecorded": "Non registrato",
+  "statistics_profile_deco_notRecordedHint": "{count} immersioni non hanno dati di decompressione registrati o calcolabili e sono escluse dal tasso",
   "statistics_profile_deco_semanticLabel": "Percentuale decompressione: {percentage}% delle immersioni ha richiesto soste deco",
   "statistics_profile_deco_subtitle": "Immersioni con obbligo di decompressione",
   "statistics_profile_deco_title": "Obbligo di decompressione",

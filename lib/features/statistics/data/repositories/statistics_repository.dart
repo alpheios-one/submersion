@@ -12,6 +12,21 @@ import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dar
 import 'package:submersion/features/statistics/data/dive_filter_sql.dart';
 import 'package:submersion/features/statistics/domain/entities/species_statistics.dart';
 
+/// Per-dive outcome of the recorded (non-computed) deco classification.
+///
+/// The four groups partition the filtered dive library. [needsCompute] maps
+/// dive id to that dive's `dives.updated_at`, which the computed fallback
+/// uses as the profile revision in its cache fingerprint; the lean `Dive`
+/// hydration used by the analysis pipeline carries no `updatedAt`, so this
+/// scan is the only place that value is cheaply available. [noProfile] holds
+/// dives that can never be classified from stored data.
+typedef DecoSignalScan = ({
+  Set<String> recordedDeco,
+  Set<String> recordedNoDeco,
+  Map<String, int> needsCompute,
+  Set<String> noProfile,
+});
+
 /// Data point for line chart trends
 class TrendDataPoint {
   final DateTime date;
@@ -2192,8 +2207,28 @@ class StatisticsRepository {
     }
   }
 
-  /// Get percentage of dives with decompression obligation
-  Future<({int decoCount, int totalCount})> getDecoObligationStats({
+  /// Classifies each filtered dive's decompression obligation from recorded
+  /// profile data alone.
+  ///
+  /// Resolution order, highest confidence first:
+  ///
+  /// 1. `deco_type = 2` (DC_DECO_DECOSTOP per libdc_wrapper.h) or a
+  ///    `decoStopStart` profile event means deco. Types 1 and 3 are safety
+  ///    and deep stops, which are not decompression obligations; the old
+  ///    `ceiling > 0` test counted both, because both profile mappers write
+  ///    `ceiling = decoDepth` for any non-zero deco type.
+  /// 2. A profile that carries `deco_type` values, none of which is 2, means
+  ///    no deco. The computer was recording obligations and reported none.
+  /// 3. `ceiling > 0` on a profile with no `deco_type` at all means deco.
+  ///    Subsurface XML, DAN DL7 and FIT write a stop depth without a type,
+  ///    so this clause keeps them working without re-admitting safety stops.
+  /// 4. Anything else with a profile needs the computed fallback: many
+  ///    sources (MacDive, Shearwater Cloud, generic UDDF, CSV, OCR) record no
+  ///    deco columns at all, and for those the app's own analysis is the only
+  ///    evidence there is. It is also what the dive detail page displays.
+  /// 5. A dive with no profile is unclassifiable and must not be counted as
+  ///    no-deco.
+  Future<DecoSignalScan> scanRecordedDecoSignals({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
   }) async {
@@ -2203,27 +2238,102 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
+        WITH scoped AS (
+          SELECT d.id AS dive_id
+          FROM dives d
+          WHERE 1=1 $diverFilter ${df.clause}
+        ),
+        signals AS (
+          SELECT
+            s.dive_id AS dive_id,
+            MAX(CASE WHEN p.id IS NOT NULL THEN 1 ELSE 0 END) AS has_profile,
+            MAX(CASE WHEN p.deco_type IS NOT NULL THEN 1 ELSE 0 END)
+              AS has_deco_type,
+            MAX(CASE WHEN p.deco_type = 2 THEN 1 ELSE 0 END) AS deco_stop,
+            MAX(CASE WHEN p.ceiling > 0 THEN 1 ELSE 0 END) AS positive_ceiling
+          FROM scoped s
+          LEFT JOIN dive_profiles p ON p.dive_id = s.dive_id
+          GROUP BY s.dive_id
+        ),
+        stop_events AS (
+          SELECT DISTINCT e.dive_id AS dive_id
+          FROM dive_profile_events e
+          JOIN scoped s ON s.dive_id = e.dive_id
+          WHERE e.event_type = 'decoStopStart'
+        )
         SELECT
-          COUNT(DISTINCT CASE WHEN p.ceiling > 0 THEN d.id END) AS deco_count,
-          COUNT(DISTINCT d.id) AS total_count
-        FROM dives d
-        LEFT JOIN dive_profiles p ON p.dive_id = d.id
-        WHERE 1=1 $diverFilter ${df.clause}
+          sig.dive_id AS dive_id,
+          d.updated_at AS updated_at,
+          CASE
+            WHEN sig.deco_stop = 1 OR ev.dive_id IS NOT NULL THEN 'deco'
+            WHEN sig.has_deco_type = 1 THEN 'no_deco'
+            WHEN sig.positive_ceiling = 1 THEN 'deco'
+            WHEN sig.has_profile = 1 THEN 'compute'
+            ELSE 'no_profile'
+          END AS classification
+        FROM signals sig
+        JOIN dives d ON d.id = sig.dive_id
+        LEFT JOIN stop_events ev ON ev.dive_id = sig.dive_id
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
-      if (results.isEmpty) return (decoCount: 0, totalCount: 0);
+      final recordedDeco = <String>{};
+      final recordedNoDeco = <String>{};
+      final needsCompute = <String, int>{};
+      final noProfile = <String>{};
+      for (final row in results) {
+        final id = row.read<String>('dive_id');
+        switch (row.read<String>('classification')) {
+          case 'deco':
+            recordedDeco.add(id);
+          case 'no_deco':
+            recordedNoDeco.add(id);
+          case 'compute':
+            needsCompute[id] = row.read<int?>('updated_at') ?? 0;
+          default:
+            noProfile.add(id);
+        }
+      }
       return (
-        decoCount: results.first.read<int?>('deco_count') ?? 0,
-        totalCount: results.first.read<int?>('total_count') ?? 0,
+        recordedDeco: recordedDeco,
+        recordedNoDeco: recordedNoDeco,
+        needsCompute: needsCompute,
+        noProfile: noProfile,
       );
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to get deco obligation stats',
+        'Failed to scan recorded deco signals',
         error: e,
         stackTrace: stackTrace,
       );
-      return (decoCount: 0, totalCount: 0);
+      return (
+        recordedDeco: const <String>{},
+        recordedNoDeco: const <String>{},
+        needsCompute: const <String, int>{},
+        noProfile: const <String>{},
+      );
     }
+  }
+
+  /// Deco obligation counts from recorded data alone.
+  ///
+  /// Dives needing the computed fallback are reported as unknown here. The
+  /// statistics provider composes this with the computed classification
+  /// cache; this method is the recorded-only view, used by tests and by any
+  /// caller that must not trigger analysis work.
+  Future<({int decoCount, int noDecoCount, int unknownCount})>
+  getDecoObligationStats({
+    String? diverId,
+    DiveFilterState filter = const DiveFilterState(),
+  }) async {
+    final scan = await scanRecordedDecoSignals(
+      diverId: diverId,
+      filter: filter,
+    );
+    return (
+      decoCount: scan.recordedDeco.length,
+      noDecoCount: scan.recordedNoDeco.length,
+      unknownCount: scan.needsCompute.length + scan.noProfile.length,
+    );
   }
 
   /// Aggregates of one diver's history at a site, matched by exact

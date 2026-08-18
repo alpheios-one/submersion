@@ -496,7 +496,9 @@ final timeAtDepthRangesProvider =
     });
 
 final decoObligationStatsProvider =
-    FutureProvider<({int decoCount, int totalCount})>((ref) async {
+    FutureProvider<({int decoCount, int noDecoCount, int unknownCount})>((
+      ref,
+    ) async {
       _keepAliveWithExpiry(ref);
       final repository = ref.watch(statisticsRepositoryProvider);
       final currentDiverId = ref.watch(currentDiverIdProvider);

@@ -4973,6 +4973,8 @@
   "statistics_profile_deco_empty": "Nincsenek deko adatok",
   "statistics_profile_deco_error": "Nem sikerult a deko adatok betoltese",
   "statistics_profile_deco_noDeco": "Nincs deko",
+  "statistics_profile_deco_notRecorded": "Nincs rögzítve",
+  "statistics_profile_deco_notRecordedHint": "{count} merülés nem tartalmaz rögzített vagy számítható dekompressziós adatot, ezért kimarad az arányból",
   "statistics_profile_deco_semanticLabel": "Dekompresszios arany: {percentage}% a meruleseknek deko megalloast igenyelt",
   "statistics_profile_deco_subtitle": "Merulesek amelyek deko megalloast igenyeltek",
   "statistics_profile_deco_title": "Dekompresszios kotelezetseg",
