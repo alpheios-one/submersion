@@ -44,7 +44,7 @@ class HealthKitService implements HealthImportService {
       return await _pluginChannel.invokeMethod<bool>(
         'checkIfHealthDataAvailable',
       );
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
@@ -53,7 +53,7 @@ class HealthKitService implements HealthImportService {
   Future<bool> get _healthKitExists async {
     try {
       return await _healthDataAvailableProbe() ?? true;
-    } catch (e) {
+    } catch (_) {
       return true;
     }
   }
@@ -109,7 +109,7 @@ class HealthKitService implements HealthImportService {
       return granted
           ? HealthPermissionStatus.granted
           : HealthPermissionStatus.denied;
-    } catch (e) {
+    } catch (_) {
       // A failed probe is not a denial. Reporting "unsupported" here would
       // block the read, which is the exact mistake that broke this import.
       return HealthPermissionStatus.undetermined;
@@ -137,7 +137,7 @@ class HealthKitService implements HealthImportService {
       );
 
       return authorized;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   }
@@ -208,7 +208,7 @@ class HealthKitService implements HealthImportService {
         startTime: startTime,
         endTime: endTime,
       );
-    } catch (e) {
+    } catch (_) {
       return [];
     }
   }
