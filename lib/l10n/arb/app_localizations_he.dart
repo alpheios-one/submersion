@@ -15513,6 +15513,30 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => 'יחידת קצב SAC';
 
   @override
+  String get settings_units_gasModel => 'חישובי גז';
+
+  @override
+  String get settings_units_gasModel_real => 'גז ממשי';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      'מתחשב בדחיסות. מיכל 12 ליטר ב-200 בר מכיל כ-2317 ליטר.';
+
+  @override
+  String get settings_units_gasModel_ideal => 'גז אידיאלי';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      'תואם לחישוב ידני ולטבלאות צלילה. מיכל 12 ליטר ב-200 בר מכיל 2400 ליטר.';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      'כיצד לחץ המיכל מומר לנפח גז. משפיע על קצב צריכת האוויר, סטטיסטיקות הגז, המתכנן ומחשבוני הגז. גז אידיאלי תואם לחישוב שמלמדים ארגוני ההסמכה; גז ממשי מדויק פיזיקלית ומציג קצב צריכה נמוך בכ-5%.';
+
+  @override
+  String get settings_units_dialog_gasModel => 'חישובי גז';
+
+  @override
   String get settings_units_dialog_temperatureUnit => 'יחידת טמפרטורה';
 
   @override

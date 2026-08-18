@@ -15914,6 +15914,30 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => 'Unidade de Taxa SAC';
 
   @override
+  String get settings_units_gasModel => 'Cálculos de gás';
+
+  @override
+  String get settings_units_gasModel_real => 'Gás real';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      'Considera a compressibilidade. Um cilindro de 12 L a 200 bar contém cerca de 2317 L.';
+
+  @override
+  String get settings_units_gasModel_ideal => 'Gás ideal';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      'Corresponde ao cálculo manual e às tabelas. Um cilindro de 12 L a 200 bar contém 2400 L.';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      'Como a pressão do cilindro é convertida em volume de gás. Afeta o SAC, as estatísticas de gás, o planeador e as calculadoras. O gás ideal corresponde ao cálculo ensinado pelas agências; o gás real é fisicamente exato e apresenta um SAC cerca de 5% mais baixo.';
+
+  @override
+  String get settings_units_dialog_gasModel => 'Cálculos de gás';
+
+  @override
   String get settings_units_dialog_temperatureUnit => 'Unidade de Temperatura';
 
   @override

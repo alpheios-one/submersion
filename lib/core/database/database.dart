@@ -1560,6 +1560,13 @@ class DiverSettings extends Table {
   TextColumn get altitudeUnit => text().withDefault(const Constant('meters'))();
   TextColumn get sacUnit =>
       text().withDefault(const Constant('litersPerMin'))();
+
+  /// v154: which equation of state converts cylinder pressure to gas volume.
+  ///
+  /// 'real' reproduces the compressibility-corrected math the app used
+  /// unconditionally before the preference existed, so upgrading changes
+  /// nobody's numbers; 'ideal' matches hand calculation (issue #828).
+  TextColumn get gasModel => text().withDefault(const Constant('real'))();
   TextColumn get defaultCurrency => text().withDefault(const Constant('USD'))();
 
   /// v144: per-diver calibration deciding which measured distances count as
@@ -3069,7 +3076,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 153;
+  static const int currentSchemaVersion = 154;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3291,6 +3298,9 @@ class AppDatabase extends _$AppDatabase {
     152,
     // v153 (issue #810): raw O2 cell output in millivolts on dive_profiles.
     153,
+    // v154 (issue #828): gas model preference on diver_settings, selecting
+    // ideal or real gas for every pressure-to-volume conversion.
+    154,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4715,6 +4725,21 @@ class AppDatabase extends _$AppDatabase {
 
   /// Raw O2 cell output columns on dive_profiles (issue #810). PRAGMA-guarded
   /// so a healthy database no-ops and a partial schema does not throw.
+  /// Add `diver_settings.gas_model` if it is missing (v154, issue #828).
+  Future<void> _assertGasModelColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('gas_model')) {
+      await customStatement(
+        "ALTER TABLE diver_settings ADD COLUMN gas_model TEXT NOT NULL "
+        "DEFAULT 'real'",
+      );
+    }
+  }
+
   Future<void> _assertO2CellMillivoltColumns() async {
     final cols = await customSelect("PRAGMA table_info('dive_profiles')").get();
     if (cols.isEmpty) return;
@@ -8090,6 +8115,12 @@ class AppDatabase extends _$AppDatabase {
           await _assertO2CellMillivoltColumns();
         }
         if (from < 153) await reportProgress();
+        // v154: selectable gas model for every pressure-to-volume
+        // conversion (issue #828).
+        if (from < 154) {
+          await _assertGasModelColumn();
+        }
+        if (from < 154) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8240,6 +8271,11 @@ class AppDatabase extends _$AppDatabase {
         // v153 backstop: re-assert the O2 cell millivolt columns (issue
         // #810; same parallel-branch version-collision self-heal).
         await _assertO2CellMillivoltColumns();
+
+        // v154 backstop: re-assert the gas model column (issue #828). A
+        // database that arrives by restore or sync-adopt never runs
+        // onUpgrade, and reading settings without this column throws.
+        await _assertGasModelColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

@@ -24,6 +24,7 @@ class GasConsumptionCalculator extends ConsumerWidget {
     final depth = ref.watch(consumptionDepthProvider); // meters
     final time = ref.watch(consumptionTimeProvider);
     final sac = ref.watch(consumptionSacProvider); // L/min
+    final gasModel = ref.watch(gasModelProvider);
     final tank = ref.watch(consumptionTankProvider);
     final result = ref.watch(consumptionResultProvider);
     final settings = ref.watch(settingsProvider);
@@ -295,7 +296,7 @@ class GasConsumptionCalculator extends ConsumerWidget {
                           tankFillPressure.toStringAsFixed(0),
                           pressureSymbol,
                         ),
-                        '${units.convertVolume(tank.freeGasLiters).toStringAsFixed(0)} $volumeSymbol',
+                        '${units.convertVolume(tank.freeGasLitersFor(gasModel)).toStringAsFixed(0)} $volumeSymbol',
                       ),
                       const Divider(height: 24),
                       _buildBreakdownRow(

@@ -136,8 +136,16 @@ class _DiveTableViewState extends ConsumerState<DiveTableView> {
 
     final sorted = List<Dive>.from(widget.dives);
     sorted.sort((a, b) {
-      final va = field.extractFromDive(a, sacUnit: units.sacUnit);
-      final vb = field.extractFromDive(b, sacUnit: units.sacUnit);
+      final va = field.extractFromDive(
+        a,
+        sacUnit: units.sacUnit,
+        gasModel: units.settings.gasModel,
+      );
+      final vb = field.extractFromDive(
+        b,
+        sacUnit: units.sacUnit,
+        gasModel: units.settings.gasModel,
+      );
 
       // Nulls always sort to the end
       if (va == null && vb == null) return 0;
@@ -236,7 +244,11 @@ class _DiveTableViewState extends ConsumerState<DiveTableView> {
     required bool isSelected,
     bool isLastPinned = false,
   }) {
-    final value = column.field.extractFromDive(dive, sacUnit: units.sacUnit);
+    final value = column.field.extractFromDive(
+      dive,
+      sacUnit: units.sacUnit,
+      gasModel: units.settings.gasModel,
+    );
     final text = column.field.formatValue(value, units);
     final rightAligned = _isRightAligned(column.field);
 

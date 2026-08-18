@@ -86,6 +86,7 @@ final consumptionResultProvider = Provider<ConsumptionResult>((ref) {
       minutes: ref.watch(consumptionTimeProvider),
       sacLitersPerMin: ref.watch(consumptionSacProvider),
       tank: ref.watch(consumptionTankProvider),
+      gasModel: ref.watch(gasModelProvider),
     ),
   );
 });
@@ -130,6 +131,7 @@ final rockBottomResultProvider = Provider<RockBottomResult>((ref) {
       solveMinutes: ref.watch(rockBottomSolveMinutesProvider),
       includeSafetyStop: ref.watch(rockBottomSafetyStopProvider),
       tank: ref.watch(rockBottomTankProvider),
+      gasModel: ref.watch(gasModelProvider),
     ),
   );
 });

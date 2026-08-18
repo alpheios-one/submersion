@@ -15961,6 +15961,30 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => 'Unite de SAC Rate';
 
   @override
+  String get settings_units_gasModel => 'Calculs de gaz';
+
+  @override
+  String get settings_units_gasModel_real => 'Gaz réel';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      'Tient compte de la compressibilité. Un bloc de 12 L à 200 bar contient environ 2317 L.';
+
+  @override
+  String get settings_units_gasModel_ideal => 'Gaz parfait';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      'Correspond au calcul manuel et aux tables. Un bloc de 12 L à 200 bar contient 2400 L.';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      'Comment la pression du bloc est convertie en volume de gaz. Cela concerne la consommation (SAC), les statistiques de gaz, le planificateur et les calculatrices. Le gaz parfait correspond au calcul enseigné par les fédérations ; le gaz réel est physiquement exact et donne un SAC environ 5 % plus bas.';
+
+  @override
+  String get settings_units_dialog_gasModel => 'Calculs de gaz';
+
+  @override
   String get settings_units_dialog_temperatureUnit => 'Unite de temperature';
 
   @override

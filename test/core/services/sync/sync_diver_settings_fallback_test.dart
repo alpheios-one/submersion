@@ -218,4 +218,63 @@ void main() {
     expect(exported['accentSectionHeaders'], isFalse);
     expect(exported['accentListIcons'], isTrue);
   });
+
+  test(
+    'applies a pre-v154 diver_settings payload missing the gas model key',
+    () async {
+      await db.customStatement('PRAGMA foreign_keys = OFF');
+
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await db
+          .into(db.diverSettings)
+          .insert(
+            DiverSettingsCompanion.insert(
+              id: 'ds6',
+              diverId: 'diver-6',
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      final exported = await serializer.fetchRecord('diverSettings', 'ds6');
+      expect(exported, isNotNull);
+
+      // A peer still on v153 exports no gasModel. The column is NOT NULL, so
+      // an unseeded import would throw in DiverSetting.fromJson (issue #828).
+      final legacy = Map<String, dynamic>.from(exported!)..remove('gasModel');
+
+      await (db.delete(
+        db.diverSettings,
+      )..where((t) => t.id.equals('ds6'))).go();
+
+      await serializer.upsertRecord('diverSettings', legacy);
+
+      final row = await (db.select(
+        db.diverSettings,
+      )..where((t) => t.id.equals('ds6'))).getSingle();
+      // Hydrates to the app default, so a pre-v154 peer never silently
+      // switches this device's gas math.
+      expect(row.gasModel, 'real');
+    },
+  );
+
+  test('exports the gas model so it reaches other devices', () async {
+    await db.customStatement('PRAGMA foreign_keys = OFF');
+
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db
+        .into(db.diverSettings)
+        .insert(
+          DiverSettingsCompanion.insert(
+            id: 'ds7',
+            diverId: 'diver-7',
+            createdAt: now,
+            updatedAt: now,
+            gasModel: const Value('ideal'),
+          ),
+        );
+
+    final exported = await serializer.fetchRecord('diverSettings', 'ds7');
+    expect(exported, isNotNull);
+    expect(exported!['gasModel'], 'ideal');
+  });
 }

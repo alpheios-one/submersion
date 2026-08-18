@@ -26730,6 +26730,48 @@ abstract class AppLocalizations {
   /// **'SAC Rate Unit'**
   String get settings_units_dialog_sacRateUnit;
 
+  /// Gas model preference (issue #828)
+  ///
+  /// In en, this message translates to:
+  /// **'Gas calculations'**
+  String get settings_units_gasModel;
+
+  /// Gas model preference (issue #828)
+  ///
+  /// In en, this message translates to:
+  /// **'Real gas'**
+  String get settings_units_gasModel_real;
+
+  /// Gas model preference (issue #828)
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts for compressibility. A 12 L cylinder at 200 bar holds about 2317 L.'**
+  String get settings_units_gasModel_real_subtitle;
+
+  /// Gas model preference (issue #828)
+  ///
+  /// In en, this message translates to:
+  /// **'Ideal gas'**
+  String get settings_units_gasModel_ideal;
+
+  /// Gas model preference (issue #828)
+  ///
+  /// In en, this message translates to:
+  /// **'Matches hand calculation and dive tables. A 12 L cylinder at 200 bar holds 2400 L.'**
+  String get settings_units_gasModel_ideal_subtitle;
+
+  /// Gas model preference (issue #828)
+  ///
+  /// In en, this message translates to:
+  /// **'How cylinder pressure is converted to gas volume. This affects SAC rate, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for SAC.'**
+  String get settings_units_gasModel_explanation;
+
+  /// Gas model preference (issue #828)
+  ///
+  /// In en, this message translates to:
+  /// **'Gas calculations'**
+  String get settings_units_dialog_gasModel;
+
   /// No description provided for @settings_units_dialog_temperatureUnit.
   ///
   /// In en, this message translates to:

@@ -41,6 +41,7 @@ final planCalculatorServiceProvider = Provider<PlanCalculatorService>((ref) {
     ppO2Critical: ppO2MaxDeco,
     cnsWarningThreshold: cnsWarningThreshold,
     cnsMethod: ref.watch(cnsCalculationMethodProvider),
+    gasModel: ref.watch(gasModelProvider),
   );
 });
 

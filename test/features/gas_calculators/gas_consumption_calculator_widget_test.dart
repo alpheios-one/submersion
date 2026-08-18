@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/gas_consumption_calculator.dart';
@@ -53,11 +54,24 @@ void main() {
   testWidgets('metric tank capacity reflects the cylinder working pressure', (
     tester,
   ) async {
-    await tester.pumpWidget(_host(settings: const AppSettings()));
+    await tester.pumpWidget(
+      _host(settings: const AppSettings(gasModel: GasModel.ideal)),
+    );
     await tester.pumpAndSettle();
     // Default steel 12 L at 200 bar = 2400 L of free gas, not 12 x 200 from a
     // hardcoded constant applied to a mis-stored capacity.
     expect(find.textContaining('2400'), findsWidgets);
+  });
+
+  testWidgets('tank capacity honors the gas model preference', (tester) async {
+    // The same cylinder reads lower once compressibility is applied, which is
+    // the whole point of the preference (issue #828).
+    await tester.pumpWidget(
+      _host(settings: const AppSettings(gasModel: GasModel.real)),
+    );
+    await tester.pumpAndSettle();
+    expect(find.textContaining('2317'), findsWidgets);
+    expect(find.textContaining('2400'), findsNothing);
   });
 
   testWidgets('renders a metric consumption result in bar', (tester) async {

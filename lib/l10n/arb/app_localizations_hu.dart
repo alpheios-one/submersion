@@ -15861,6 +15861,30 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => 'SAC ertek egyseg';
 
   @override
+  String get settings_units_gasModel => 'Gázszámítások';
+
+  @override
+  String get settings_units_gasModel_real => 'Valós gáz';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      'Figyelembe veszi az összenyomhatóságot. Egy 12 literes palack 200 baron kb. 2317 litert tartalmaz.';
+
+  @override
+  String get settings_units_gasModel_ideal => 'Ideális gáz';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      'Megegyezik a kézi számítással és a merüléstáblákkal. Egy 12 literes palack 200 baron 2400 litert tartalmaz.';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      'Hogyan váltja át az alkalmazás a palacknyomást gáztérfogattá. Ez érinti a SAC-értéket, a gázstatisztikákat, a tervezőt és a gázkalkulátorokat. Az ideális gáz a képzőszervezetek által tanított számítást követi; a valós gáz fizikailag pontos, és a SAC nála kb. 5%-kal alacsonyabb.';
+
+  @override
+  String get settings_units_dialog_gasModel => 'Gázszámítások';
+
+  @override
   String get settings_units_dialog_temperatureUnit => 'Homerseklet egyseg';
 
   @override
