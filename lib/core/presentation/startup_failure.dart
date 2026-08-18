@@ -10,16 +10,23 @@ import 'package:submersion/core/database/database_engine_preflight.dart';
 /// Issue #1134 is exactly that conflation: every terminal failure was
 /// reported under the fixed title "Database upgrade failed".
 enum StartupPhase {
-  /// Nothing has opened the diver's database file yet: the engine preflight,
-  /// the security gate and the schema-version probe all run here.
+  /// Before any migration could have begun: the engine preflight, the
+  /// security gate and the schema-version probe all run here.
+  ///
+  /// Note this does NOT mean the database file is untouched. The security
+  /// gate reads its header and the schema probe opens it read-write to read
+  /// `PRAGMA user_version`. Only the engine preflight, which runs first
+  /// against an in-memory database, can guarantee the file was never reached.
   preflight,
 
-  /// The database is being opened with no schema upgrade pending, and the
-  /// remaining services are starting.
+  /// No schema upgrade was pending, or the ladder has already finished. The
+  /// database is opening and the remaining services are starting.
   opening,
 
-  /// The schema-upgrade ladder is running. A pre-migration safety copy has
-  /// already been taken by this point.
+  /// The schema-upgrade ladder is in flight. A pre-migration safety copy has
+  /// already been taken by this point, and the phase returns to [opening] as
+  /// soon as the ladder finishes, so ordinary service failures after a
+  /// SUCCESSFUL upgrade are not reported as upgrade failures.
   upgrading,
 }
 

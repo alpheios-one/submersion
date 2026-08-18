@@ -591,8 +591,26 @@ class _StartupWrapperState extends State<StartupWrapper>
     }
   }
 
+  /// Leaves [StartupPhase.upgrading] now that the schema ladder is no longer
+  /// in flight.
+  ///
+  /// Everything after the ladder is ordinary service startup, so a failure
+  /// there must not be reported as a failed database upgrade. Observed at two
+  /// points because neither alone is sufficient: the ladder's final progress
+  /// report is the precise instant it finishes and is the one a test can
+  /// drive, while the return of `initialize()` is the backstop that still
+  /// holds if the reported step count ever drifts from the ladder's real one.
+  void _markUpgradeFinished() {
+    _phase = StartupPhase.opening;
+  }
+
   Future<void> _initializeServices() async {
     void onProgress(int currentStep, int totalSteps) {
+      // reportProgress() in the migration ladder increments BEFORE it calls
+      // back, so the final report means the last step already completed.
+      if (totalSteps > 0 && currentStep >= totalSteps) {
+        _markUpgradeFinished();
+      }
       if (mounted) {
         setState(() {
           _progress = MigrationProgress(
@@ -620,6 +638,10 @@ class _StartupWrapperState extends State<StartupWrapper>
         onMigrationProgress: onProgress,
       ),
     );
+
+    // Backstop for the same rule the final progress report already applies:
+    // whatever the ladder reported, it is finished once initialize() returns.
+    _markUpgradeFinished();
 
     await timeStartupStep(
       'localCache',
@@ -822,10 +844,11 @@ class _StartupWrapperState extends State<StartupWrapper>
         // A SAF (content://) or cloud-only record cannot be swapped in by the
         // plain file copy DatabaseService.restore performs.
         if (path == null || isSafRef(path)) continue;
-        // Synchronous stat on purpose: a handful of registry entries, once,
-        // on a screen that is already terminal. The async form would also
-        // make this unreachable from widget tests, whose fake clock never
-        // completes a real dart:io future.
+        // Synchronous stat on purpose. The set is bounded (a handful of
+        // registry entries, read once, on a screen that is already terminal),
+        // so async buys nothing here; and empirically the async form left the
+        // widget tests covering this screen pumping until their timeout
+        // instead of settling.
         if (!File(path).existsSync()) continue;
         if (!mounted) return;
         setState(() {

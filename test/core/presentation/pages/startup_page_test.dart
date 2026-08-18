@@ -1830,6 +1830,61 @@ void main() {
       expect(find.text('View previous releases'), findsOneWidget);
     });
 
+    testWidgets('a service failure AFTER a successful upgrade is not '
+        'reported as a failed upgrade', (tester) async {
+      // The ladder reports after each completed step, so onProgress(3, 3)
+      // means the upgrade finished. Everything thrown past that point is
+      // ordinary service startup (notifications, tile cache, ...) and must
+      // not inherit the migration title, or #1134 is only half fixed.
+      await tester.pumpWidget(
+        _buildStartupWrapper(
+          prefs: prefs,
+          logFileService: logFileService,
+          locationService: locationService,
+          schemaVersionProbeOverride: (_) =>
+              (needsMigration: true, totalSteps: 3),
+          preMigrationBackupFactory: _noOpBackupFactory,
+          initializerOverride: (onProgress) async {
+            onProgress(1, 3);
+            onProgress(2, 3);
+            onProgress(3, 3);
+            throw Exception('notifications blew up');
+          },
+        ),
+      );
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Database upgrade failed'), findsNothing);
+      expect(find.text('Submersion could not start'), findsOneWidget);
+      expect(find.textContaining('notifications blew up'), findsOneWidget);
+      // The guided-downgrade route belongs to a failed upgrade only.
+      expect(find.text('View previous releases'), findsNothing);
+    });
+
+    testWidgets('a failure part way through the ladder still counts as a '
+        'failed upgrade', (tester) async {
+      await tester.pumpWidget(
+        _buildStartupWrapper(
+          prefs: prefs,
+          logFileService: logFileService,
+          locationService: locationService,
+          schemaVersionProbeOverride: (_) =>
+              (needsMigration: true, totalSteps: 3),
+          preMigrationBackupFactory: _noOpBackupFactory,
+          initializerOverride: (onProgress) async {
+            onProgress(1, 3);
+            onProgress(2, 3);
+            throw Exception('migration step 3 blew up');
+          },
+        ),
+      );
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Database upgrade failed'), findsOneWidget);
+    });
+
     testWidgets('a pre-migration backup on disk is surfaced with a restore '
         'route, and restoring resumes startup', (tester) async {
       final dir = Directory.systemTemp.createTempSync('startup-restore-');
