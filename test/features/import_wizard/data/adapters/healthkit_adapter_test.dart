@@ -2635,6 +2635,27 @@ void main() {
       expect(range.end.isAfter(DateTime(2024, 1, 20, 9, 0)), isTrue);
     });
 
+    test('ends on the last instant the method channel can carry', () {
+      // The health plugin sends both bounds as millisecondsSinceEpoch, so
+      // 23:59:59.999999 would truncate to the same integer. Spelling the end
+      // with microseconds buys nothing; this pins that they are equivalent so
+      // the extra precision is not reintroduced as a "fix".
+      final range = healthKitWholeDayRange(
+        DateTime(2024, 1, 15),
+        DateTime(2024, 1, 20),
+      );
+      final lastMicrosecond = DateTime(
+        2024,
+        1,
+        21,
+      ).subtract(const Duration(microseconds: 1));
+
+      expect(
+        range.end.millisecondsSinceEpoch,
+        equals(lastMicrosecond.millisecondsSinceEpoch),
+      );
+    });
+
     test('covers a single day picked for both ends', () {
       final range = healthKitWholeDayRange(
         DateTime(2024, 1, 15),

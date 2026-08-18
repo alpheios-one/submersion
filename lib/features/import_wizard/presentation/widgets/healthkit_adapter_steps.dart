@@ -33,6 +33,12 @@ final healthKitDateRangeProvider = StateProvider<DateTimeRange>(
 /// The date pickers hand back midnight, and HealthKit matches samples with a
 /// strict start-date predicate. Without this, picking the day of a dive as the
 /// end date puts every dive that day *after* the range and finds nothing.
+///
+/// The end is the last instant of the day this API can express, not the last
+/// instant of the day: the health plugin puts both bounds on the method
+/// channel as `millisecondsSinceEpoch`, so anything finer than a millisecond
+/// is truncated before HealthKit ever sees it. Spelling the end as
+/// `23:59:59.999999` would send the very same integer.
 DateTimeRange healthKitWholeDayRange(DateTime start, DateTime end) {
   return DateTimeRange(
     start: DateTime(start.year, start.month, start.day),
