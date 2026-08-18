@@ -206,8 +206,8 @@ class DatabaseService {
     // Guard: reject databases created by a newer version of the app.
     if (stored != null && stored > AppDatabase.currentSchemaVersion) {
       throw DatabaseVersionMismatchException(
-        databaseVersion: stored,
-        appVersion: AppDatabase.currentSchemaVersion,
+        storedSchemaVersion: stored,
+        supportedSchemaVersion: AppDatabase.currentSchemaVersion,
       );
     }
 
@@ -657,7 +657,28 @@ class DatabaseService {
     // Reopen on the swapped-in file BEFORE dropping the pre-restore copy, so a
     // cleanup hiccup can never prevent the reopen. An older-schema backup runs
     // its migration ladder here; surface its progress to the caller.
-    await initialize(onMigrationProgress: onMigrationProgress);
+    try {
+      await initialize(onMigrationProgress: onMigrationProgress);
+    } on DatabaseVersionMismatchException {
+      // The restored file needs a newer app than this one. The backup layer
+      // pre-checks make this near-unreachable, but a raced or hand-placed
+      // file can still reach here, and by now the newer file is already live.
+      // Put the pre-restore database back and reopen so the app keeps a
+      // working library, then surface the error (issue #1089).
+      //
+      // Scoped to this one exception on purpose: every other reopen failure
+      // (corruption, a locked file) is the restored file's own problem and
+      // keeps its existing handling, which may legitimately want the
+      // swapped-in file left in place for recovery.
+      await _deleteIfExists(destinationPath);
+      await _deleteIfExists('$destinationPath-wal');
+      await _deleteIfExists('$destinationPath-shm');
+      if (hadDest && await File(asidePath).exists()) {
+        await File(asidePath).rename(destinationPath);
+      }
+      await initialize();
+      rethrow;
+    }
 
     // The database is open again on the restored file; the pre-restore copy is
     // no longer needed. Its deletion is best-effort — a transient failure (e.g.
