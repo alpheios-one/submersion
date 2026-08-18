@@ -495,8 +495,11 @@ class SyncRepository {
   }
 
   /// Tables that can still hold rows written while their entity type did not
-  /// stamp an HLC, with the column [backfillMissingHlc] reads as the row's
-  /// local timestamp and an optional extra filter.
+  /// stamp an HLC.
+  ///
+  /// Each entry names three things: the SQL table to scan, the `timestamp`
+  /// column [backfillMissingHlc] reads as the row's local update time, and an
+  /// optional `filter` restricting which rows are eligible.
   ///
   /// Two ways a table lands here: it gained the `hlc` column late
   /// (media_enrichment, schema v130), or it declared the column from the start
