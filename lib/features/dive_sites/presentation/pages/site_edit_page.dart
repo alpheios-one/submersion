@@ -111,6 +111,8 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
   final Map<String, int> _mergeFieldIndices = {};
   List<_MergeFieldCandidate<SiteDifficulty?>> _difficultyCandidates = [];
   List<_MergeFieldCandidate<WaterType?>> _waterTypeCandidates = [];
+  List<_MergeFieldCandidate<EntryMethod?>> _entryMethodCandidates = [];
+  List<_MergeFieldCandidate<EntryMethod?>> _exitMethodCandidates = [];
   List<_MergeFieldCandidate<double>> _ratingCandidates = [];
   List<_MergeFieldCandidate<_CoordinateCandidate>> _coordinateCandidates = [];
 
@@ -432,6 +434,30 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     _waterType =
         _waterTypeCandidates[_mergeFieldIndices['waterType'] ?? 0].value;
 
+    _entryMethodCandidates = _buildDistinctCandidates<EntryMethod?>(
+      data.sites,
+      (site) => site.entryMethod,
+      equals: (a, b) => a == b,
+    );
+    _mergeFieldIndices['entryMethod'] = _firstMeaningfulIndex(
+      _entryMethodCandidates,
+      (value) => value != null,
+    );
+    _entryMethod =
+        _entryMethodCandidates[_mergeFieldIndices['entryMethod'] ?? 0].value;
+
+    _exitMethodCandidates = _buildDistinctCandidates<EntryMethod?>(
+      data.sites,
+      (site) => site.exitMethod,
+      equals: (a, b) => a == b,
+    );
+    _mergeFieldIndices['exitMethod'] = _firstMeaningfulIndex(
+      _exitMethodCandidates,
+      (value) => value != null,
+    );
+    _exitMethod =
+        _exitMethodCandidates[_mergeFieldIndices['exitMethod'] ?? 0].value;
+
     _ratingCandidates = _buildDistinctCandidates<double>(
       data.sites,
       (site) => site.rating ?? 0,
@@ -735,6 +761,32 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     );
   }
 
+  MergeFieldExtras? _entryMethodExtras() {
+    if (!widget.isMerging || _entryMethodCandidates.length < 2) return null;
+    final index = _mergeFieldIndices['entryMethod'] ?? 0;
+    return MergeFieldExtras(
+      sourceLabel: context.l10n.diveSites_edit_merge_fieldSourceLabel(
+        _entryMethodCandidates[index].siteName,
+        index + 1,
+        _entryMethodCandidates.length,
+      ),
+      onCycle: _cycleEntryMethod,
+    );
+  }
+
+  MergeFieldExtras? _exitMethodExtras() {
+    if (!widget.isMerging || _exitMethodCandidates.length < 2) return null;
+    final index = _mergeFieldIndices['exitMethod'] ?? 0;
+    return MergeFieldExtras(
+      sourceLabel: context.l10n.diveSites_edit_merge_fieldSourceLabel(
+        _exitMethodCandidates[index].siteName,
+        index + 1,
+        _exitMethodCandidates.length,
+      ),
+      onCycle: _cycleExitMethod,
+    );
+  }
+
   MergeFieldExtras? _ratingExtras() {
     if (!widget.isMerging || _ratingCandidates.length < 2) return null;
     final index = _mergeFieldIndices['rating'] ?? 0;
@@ -918,6 +970,8 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
               _exitMethod = value;
               _hasChanges = true;
             }),
+            entryMethodExtras: _entryMethodExtras(),
+            exitMethodExtras: _exitMethodExtras(),
           ),
           LifeNotesSection(
             expanded: _siteSectionExpanded('life'),
@@ -1087,6 +1141,10 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     final candidates = _mergeTextCandidates[key];
     if (candidates == null || index < 0 || index >= candidates.length) return;
 
+    // Text rows only. Enum-valued merge fields (difficulty, waterType,
+    // entryMethod, exitMethod) and rating are cycled by their own _cycleX
+    // methods against their own candidate lists, so their absence from this
+    // switch is deliberate rather than a missing case.
     final controller = switch (key) {
       'name' => _nameController,
       'description' => _descriptionController,
@@ -1143,6 +1201,30 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
           _waterTypeCandidates.length;
       _mergeFieldIndices['waterType'] = nextIndex;
       _waterType = _waterTypeCandidates[nextIndex].value;
+      _hasChanges = true;
+    });
+  }
+
+  void _cycleEntryMethod() {
+    if (_entryMethodCandidates.length < 2) return;
+    setState(() {
+      final nextIndex =
+          ((_mergeFieldIndices['entryMethod'] ?? 0) + 1) %
+          _entryMethodCandidates.length;
+      _mergeFieldIndices['entryMethod'] = nextIndex;
+      _entryMethod = _entryMethodCandidates[nextIndex].value;
+      _hasChanges = true;
+    });
+  }
+
+  void _cycleExitMethod() {
+    if (_exitMethodCandidates.length < 2) return;
+    setState(() {
+      final nextIndex =
+          ((_mergeFieldIndices['exitMethod'] ?? 0) + 1) %
+          _exitMethodCandidates.length;
+      _mergeFieldIndices['exitMethod'] = nextIndex;
+      _exitMethod = _exitMethodCandidates[nextIndex].value;
       _hasChanges = true;
     });
   }
