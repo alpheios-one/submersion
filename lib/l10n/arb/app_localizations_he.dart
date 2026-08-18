@@ -19779,7 +19779,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'ייבוא מ-Apple Watch זמין רק במכשירי iOS ו-macOS.';
+      'ייבוא מ-Apple Watch מחייב אייפון עם אפליקציית הבריאות.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed => 'בדיקת הרשאות נכשלה';
@@ -31672,4 +31672,28 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'פרטי מדיה';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'אפליקציית הבריאות של Apple לעולם אינה מגלה ליישומים אם ניתנה הרשאת קריאה. אם לא מופיעות צלילות, פתחו את אפליקציית הבריאות, ואז שיתוף, יישומים, Submersion, והפעילו אימונים, עומק מתחת למים, טמפרטורת מים ודופק.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'אין אימוני צלילה בטווח הזה. ודאו שהתאריכים כוללים את הצלילה ושבאפליקציית הבריאות, בשיתוף, יישומים, Submersion, מופעלים אימונים ועומק מתחת למים.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'עומק מתחת למים - דגימות עומק שנרשמו במהלך צלילות';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'טמפרטורת מים - דגימות טמפרטורה שנרשמו במהלך צלילות';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'הגישה ל-HealthKit מנוהלת באפליקציית הבריאות';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit אינו זמין במכשיר הזה';
 }

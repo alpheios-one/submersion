@@ -1503,7 +1503,7 @@
   "diveImport_healthkit_noDivesFound": "لم يتم العثور على غطسات",
   "diveImport_healthkit_noDivesFoundDescription": "لم يتم العثور على أنشطة غوص في النطاق الزمني المحدد.",
   "diveImport_healthkit_notAvailable": "غير متاح",
-  "diveImport_healthkit_notAvailableDescription": "استيراد Apple Watch متاح فقط على أجهزة iOS وmacOS.",
+  "diveImport_healthkit_notAvailableDescription": "يتطلب الاستيراد من Apple Watch جهاز iPhone مزوّدًا بتطبيق صحة.",
   "diveImport_healthkit_permissionCheckFailed": "فشل التحقق من الأذونات",
   "diveImport_healthkit_title": "استيراد من Apple Watch",
   "diveImport_healthkit_watchTitle": "استيراد من الساعة",
@@ -9520,5 +9520,11 @@
   "media_status_queued": "في انتظار الرفع",
   "media_status_cloudOnly": "مخزن في السحابة فقط",
   "media_status_notBackedUp": "لا يوجد نسخ احتياطي",
-  "media_tile_infoMenuItem": "معلومات الوسائط"
+  "media_tile_infoMenuItem": "معلومات الوسائط",
+  "diveImport_healthkit_accessGrantedHint": "لا يخبر تطبيق صحة Apple التطبيقات أبدًا بما إذا كان قد تم منح إذن القراءة. إذا لم تظهر أي غطسات، افتح تطبيق صحة ثم المشاركة ثم التطبيقات ثم Submersion، وفعّل التمارين وعمق الغوص ودرجة حرارة الماء ومعدل ضربات القلب.",
+  "diveImport_healthkit_foundNoDivesHint": "لا توجد تمارين غوص في هذا النطاق. تأكد من أن التواريخ تغطي الغطسة، ومن تفعيل التمارين وعمق الغوص في تطبيق صحة ضمن المشاركة ثم التطبيقات ثم Submersion.",
+  "settings_dataSources_appleHealth_dataTypeDepth": "عمق الغوص - عينات العمق المسجلة أثناء الغطسات",
+  "settings_dataSources_appleHealth_dataTypeWaterTemp": "درجة حرارة الماء - عينات درجة الحرارة المسجلة أثناء الغطسات",
+  "settings_dataSources_appleHealth_permissionManagedInHealth": "تتم إدارة وصول HealthKit من تطبيق صحة",
+  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit غير متوفر على هذا الجهاز"
 }

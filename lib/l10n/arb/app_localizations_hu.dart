@@ -20224,7 +20224,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'Az Apple Watch importalas csak iOS es macOS eszkozokon erheto el.';
+      'Az Apple Watch importáláshoz iPhone szükséges a Health alkalmazással.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -32198,4 +32198,28 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'Média infó';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Az Apple Health soha nem árulja el az alkalmazásoknak, hogy megkapta-e az olvasási hozzáférést. Ha nem jelenik meg merülés, nyisd meg a Health appot, majd a Megosztás, Appok, Submersion menüpontot, és kapcsold be az Edzések, Vízmélység, Vízhőmérséklet és Pulzus tételt.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'Nincs merülés edzés ebben az időszakban. Ellenőrizd, hogy a dátumok lefedik-e a merülést, és hogy a Health, Megosztás, Appok, Submersion menüben be van-e kapcsolva az Edzések és a Vízmélység.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Vízmélység - a merülések során rögzített mélységadatok';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Vízhőmérséklet - a merülések során rögzített hőmérsékleti adatok';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'A HealthKit hozzáférést a Health alkalmazásban kezelheted';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'A HealthKit nem érhető el ezen az eszközön';
 }

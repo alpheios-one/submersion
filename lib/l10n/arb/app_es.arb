@@ -1503,7 +1503,7 @@
   "diveImport_healthkit_noDivesFound": "Sin inmersiones encontradas",
   "diveImport_healthkit_noDivesFoundDescription": "No se encontraron actividades de buceo en el rango de fechas seleccionado.",
   "diveImport_healthkit_notAvailable": "No disponible",
-  "diveImport_healthkit_notAvailableDescription": "La importacion de Apple Watch solo esta disponible en dispositivos iOS y macOS.",
+  "diveImport_healthkit_notAvailableDescription": "La importación desde el Apple Watch necesita un iPhone con la app Salud.",
   "diveImport_healthkit_permissionCheckFailed": "Error al verificar permisos",
   "diveImport_healthkit_title": "Importar desde Apple Watch",
   "diveImport_healthkit_watchTitle": "Importar desde Watch",
@@ -9520,5 +9520,11 @@
   "media_status_queued": "Esperando para subir",
   "media_status_cloudOnly": "Solo en la nube",
   "media_status_notBackedUp": "Sin copia de seguridad",
-  "media_tile_infoMenuItem": "Información del medio"
+  "media_tile_infoMenuItem": "Información del medio",
+  "diveImport_healthkit_accessGrantedHint": "Apple Salud nunca indica a las apps si se concedió el acceso de lectura. Si no aparece ninguna inmersión, abre Salud, luego Compartir, Apps, Submersion, y activa Entrenamientos, Profundidad bajo el agua, Temperatura del agua y Frecuencia cardíaca.",
+  "diveImport_healthkit_foundNoDivesHint": "No hay entrenamientos de buceo en este intervalo. Comprueba que las fechas incluyan la inmersión y que en Salud, Compartir, Apps, Submersion estén activados Entrenamientos y Profundidad bajo el agua.",
+  "settings_dataSources_appleHealth_dataTypeDepth": "Profundidad bajo el agua - muestras de profundidad registradas durante las inmersiones",
+  "settings_dataSources_appleHealth_dataTypeWaterTemp": "Temperatura del agua - muestras de temperatura registradas durante las inmersiones",
+  "settings_dataSources_appleHealth_permissionManagedInHealth": "El acceso a HealthKit se gestiona en la app Salud",
+  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit no está disponible en este dispositivo"
 }

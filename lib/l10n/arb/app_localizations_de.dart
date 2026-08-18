@@ -20253,7 +20253,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'Apple Watch-Import ist nur auf iOS- und macOS-Geräten verfügbar.';
+      'Der Apple-Watch-Import benötigt ein iPhone mit der Health-App.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -32251,4 +32251,28 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'Medieninfo';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple Health teilt Apps nie mit, ob Lesezugriff gewährt wurde. Falls keine Tauchgänge erscheinen, öffne Health, dann Teilen, Apps, Submersion, und aktiviere Workouts, Unterwassertiefe, Wassertemperatur und Herzfrequenz.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'Keine Tauch-Workouts in diesem Zeitraum. Prüfe, ob die Daten den Tauchgang abdecken und ob unter Health, Teilen, Apps, Submersion die Optionen Workouts und Unterwassertiefe aktiviert sind.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Unterwassertiefe - während Tauchgängen aufgezeichnete Tiefenwerte';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Wassertemperatur - während Tauchgängen aufgezeichnete Temperaturwerte';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'Der HealthKit-Zugriff wird in der Health-App verwaltet';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit ist auf diesem Gerät nicht verfügbar';
 }

@@ -1503,7 +1503,7 @@
   "diveImport_healthkit_noDivesFound": "Geen duiken gevonden",
   "diveImport_healthkit_noDivesFoundDescription": "Geen onderwaterduikactiviteiten gevonden in het geselecteerde datumbereik.",
   "diveImport_healthkit_notAvailable": "Niet beschikbaar",
-  "diveImport_healthkit_notAvailableDescription": "Apple Watch-import is alleen beschikbaar op iOS- en macOS-apparaten.",
+  "diveImport_healthkit_notAvailableDescription": "Voor importeren vanaf de Apple Watch is een iPhone met de app Gezondheid nodig.",
   "diveImport_healthkit_permissionCheckFailed": "Controle van machtigingen mislukt",
   "diveImport_healthkit_title": "Importeren vanuit Apple Watch",
   "diveImport_healthkit_watchTitle": "Importeren vanuit Watch",
@@ -9520,5 +9520,11 @@
   "media_status_queued": "Wacht op uploaden",
   "media_status_cloudOnly": "Alleen in de cloud opgeslagen",
   "media_status_notBackedUp": "Geen back-up",
-  "media_tile_infoMenuItem": "Media-info"
+  "media_tile_infoMenuItem": "Media-info",
+  "diveImport_healthkit_accessGrantedHint": "Apple Gezondheid vertelt apps nooit of leestoegang is verleend. Verschijnen er geen duiken, open dan Gezondheid, vervolgens Delen, Apps, Submersion, en zet Workouts, Waterdiepte, Watertemperatuur en Hartslag aan.",
+  "diveImport_healthkit_foundNoDivesHint": "Geen duikworkouts in dit bereik. Controleer of de datums de duik omvatten en of bij Gezondheid, Delen, Apps, Submersion de opties Workouts en Waterdiepte aanstaan.",
+  "settings_dataSources_appleHealth_dataTypeDepth": "Waterdiepte - dieptemetingen die tijdens duiken zijn vastgelegd",
+  "settings_dataSources_appleHealth_dataTypeWaterTemp": "Watertemperatuur - temperatuurmetingen die tijdens duiken zijn vastgelegd",
+  "settings_dataSources_appleHealth_permissionManagedInHealth": "HealthKit-toegang beheer je in de app Gezondheid",
+  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit is niet beschikbaar op dit apparaat"
 }

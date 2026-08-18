@@ -19920,7 +19920,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'استيراد Apple Watch متاح فقط على أجهزة iOS وmacOS.';
+      'يتطلب الاستيراد من Apple Watch جهاز iPhone مزوّدًا بتطبيق صحة.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -32008,4 +32008,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'معلومات الوسائط';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'لا يخبر تطبيق صحة Apple التطبيقات أبدًا بما إذا كان قد تم منح إذن القراءة. إذا لم تظهر أي غطسات، افتح تطبيق صحة ثم المشاركة ثم التطبيقات ثم Submersion، وفعّل التمارين وعمق الغوص ودرجة حرارة الماء ومعدل ضربات القلب.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'لا توجد تمارين غوص في هذا النطاق. تأكد من أن التواريخ تغطي الغطسة، ومن تفعيل التمارين وعمق الغوص في تطبيق صحة ضمن المشاركة ثم التطبيقات ثم Submersion.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'عمق الغوص - عينات العمق المسجلة أثناء الغطسات';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'درجة حرارة الماء - عينات درجة الحرارة المسجلة أثناء الغطسات';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'تتم إدارة وصول HealthKit من تطبيق صحة';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit غير متوفر على هذا الجهاز';
 }

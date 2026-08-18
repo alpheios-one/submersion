@@ -1503,7 +1503,7 @@
   "diveImport_healthkit_noDivesFound": "Keine Tauchgänge gefunden",
   "diveImport_healthkit_noDivesFoundDescription": "Im ausgewählten Zeitraum wurden keine Tauchaktivitäten gefunden.",
   "diveImport_healthkit_notAvailable": "Nicht verfügbar",
-  "diveImport_healthkit_notAvailableDescription": "Apple Watch-Import ist nur auf iOS- und macOS-Geräten verfügbar.",
+  "diveImport_healthkit_notAvailableDescription": "Der Apple-Watch-Import benötigt ein iPhone mit der Health-App.",
   "diveImport_healthkit_permissionCheckFailed": "Berechtigungsprüfung fehlgeschlagen",
   "diveImport_healthkit_title": "Von Apple Watch importieren",
   "diveImport_healthkit_watchTitle": "Von Watch importieren",
@@ -9520,5 +9520,11 @@
   "media_status_queued": "Warten auf Upload",
   "media_status_cloudOnly": "Nur in der Cloud gespeichert",
   "media_status_notBackedUp": "Nicht gesichert",
-  "media_tile_infoMenuItem": "Medieninfo"
+  "media_tile_infoMenuItem": "Medieninfo",
+  "diveImport_healthkit_accessGrantedHint": "Apple Health teilt Apps nie mit, ob Lesezugriff gewährt wurde. Falls keine Tauchgänge erscheinen, öffne Health, dann Teilen, Apps, Submersion, und aktiviere Workouts, Unterwassertiefe, Wassertemperatur und Herzfrequenz.",
+  "diveImport_healthkit_foundNoDivesHint": "Keine Tauch-Workouts in diesem Zeitraum. Prüfe, ob die Daten den Tauchgang abdecken und ob unter Health, Teilen, Apps, Submersion die Optionen Workouts und Unterwassertiefe aktiviert sind.",
+  "settings_dataSources_appleHealth_dataTypeDepth": "Unterwassertiefe - während Tauchgängen aufgezeichnete Tiefenwerte",
+  "settings_dataSources_appleHealth_dataTypeWaterTemp": "Wassertemperatur - während Tauchgängen aufgezeichnete Temperaturwerte",
+  "settings_dataSources_appleHealth_permissionManagedInHealth": "Der HealthKit-Zugriff wird in der Health-App verwaltet",
+  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit ist auf diesem Gerät nicht verfügbar"
 }

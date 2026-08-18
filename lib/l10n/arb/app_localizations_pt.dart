@@ -20287,7 +20287,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'A importacao do Apple Watch esta disponivel apenas em dispositivos iOS e macOS.';
+      'A importação do Apple Watch precisa de um iPhone com a app Saúde.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -32327,4 +32327,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'Informações da mídia';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'O Apple Saúde nunca informa às apps se o acesso de leitura foi concedido. Se nenhum mergulho aparecer, abra Saúde, depois Partilha, Apps, Submersion, e ative Treinos, Profundidade subaquática, Temperatura da água e Frequência cardíaca.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'Sem treinos de mergulho neste intervalo. Confirme que as datas cobrem o mergulho e que em Saúde, Partilha, Apps, Submersion estão ativos Treinos e Profundidade subaquática.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Profundidade subaquática - amostras de profundidade registadas durante os mergulhos';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Temperatura da água - amostras de temperatura registadas durante os mergulhos';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'O acesso ao HealthKit é gerido na app Saúde';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'O HealthKit não está disponível neste dispositivo';
 }

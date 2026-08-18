@@ -20353,7 +20353,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'L\'import depuis l\'Apple Watch est disponible uniquement sur les appareils iOS et macOS.';
+      'L\'importation depuis l\'Apple Watch nécessite un iPhone avec l\'app Santé.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -32398,4 +32398,28 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'Infos du média';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple Santé n\'indique jamais aux apps si l\'accès en lecture a été accordé. Si aucune plongée n\'apparaît, ouvrez Santé, puis Partage, Apps, Submersion, et activez Entraînements, Profondeur sous l\'eau, Température de l\'eau et Fréquence cardiaque.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'Aucun entraînement de plongée sur cette période. Vérifiez que les dates couvrent la plongée et que Santé, Partage, Apps, Submersion autorise Entraînements et Profondeur sous l\'eau.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Profondeur sous l\'eau - mesures de profondeur enregistrées pendant les plongées';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Température de l\'eau - mesures de température enregistrées pendant les plongées';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'L\'accès à HealthKit se gère dans l\'app Santé';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit n\'est pas disponible sur cet appareil';
 }
