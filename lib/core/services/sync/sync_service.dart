@@ -462,9 +462,11 @@ class SyncService {
       );
       await _syncRepository.ensureSyncClockConfigured();
 
-      // Self-heal: stamp an HLC on pre-v130 enrichment rows so the depth/time
-      // association replicates and repairs peers that lost it (schema v130).
-      await _syncRepository.backfillMediaEnrichmentHlc();
+      // Self-heal: stamp an HLC on rows written while their table was not
+      // HLC-capable (pre-v130 enrichment rows, and the tables whose entity
+      // types were missing from hlcTargets until #1144), so they replicate
+      // instead of waiting for a full base republish.
+      await _syncRepository.backfillMissingHlc();
 
       // ---- Library epoch gate (restore Replace mode) ----
       // A pending replace runs INSTEAD of a merge, and a marker from an
