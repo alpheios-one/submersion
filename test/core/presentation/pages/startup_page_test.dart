@@ -758,8 +758,8 @@ void main() {
               (needsMigration: false, totalSteps: 0),
           initializerOverride: (_) async {
             throw const DatabaseVersionMismatchException(
-              databaseVersion: 99,
-              appVersion: 63,
+              storedSchemaVersion: 99,
+              supportedSchemaVersion: 63,
             );
           },
         ),
@@ -849,8 +849,8 @@ void main() {
                 (needsMigration: false, totalSteps: 0),
             initializerOverride: (_) async {
               throw const DatabaseVersionMismatchException(
-                databaseVersion: 70,
-                appVersion: 63,
+                storedSchemaVersion: 70,
+                supportedSchemaVersion: 63,
               );
             },
             closeAppOverride: () => closeCalled = true,
@@ -1038,8 +1038,8 @@ void main() {
               (needsMigration: false, totalSteps: 0),
           initializerOverride: (_) async {
             throw const DatabaseVersionMismatchException(
-              databaseVersion: 100,
-              appVersion: 50,
+              storedSchemaVersion: 100,
+              supportedSchemaVersion: 50,
             );
           },
         ),

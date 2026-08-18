@@ -371,7 +371,49 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => '替换';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => '更新';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty => '仅没有气瓶的潜水';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      '选择要覆盖这些潜水已有气瓶的哪些属性。起始和结束压力不会被更改。';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields => '请至少选择一个要更新的气瓶属性。';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => '预设';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => '用途';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => '容积';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => '工作压力';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => '材质';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => '混合气';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => '名称';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次所选潜水没有气瓶，将被跳过。',
+      one: '1 次所选潜水没有气瓶，将被跳过。',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => '应用更改？';
@@ -5490,6 +5532,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_filter_title => '筛选潜水';
 
   @override
+  String get diveLog_filter_resizeGrip => '调整筛选面板大小';
+
+  @override
   String get diveLog_filter_tooltip_close => '关闭筛选';
 
   @override
@@ -7601,6 +7646,47 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveSites_edit_access_parkingInfo_label => '停车信息';
+
+  @override
+  String get diveSites_edit_access_entryMethod_label => '入水方式';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => '出水方式';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '你在此的 $count 次潜水：入水 $entry，出水 $exit',
+      one: '你在此的潜水：入水 $entry，出水 $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '你在此的 $count 次潜水：入水 $entry',
+      one: '你在此的潜水：入水 $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => '入水';
+
+  @override
+  String get diveSites_detail_access_exitMethod => '出水';
 
   @override
   String get diveSites_edit_altitude_helperText => '潜水点海拔高度（用于高海拔潜水）';
@@ -13760,15 +13846,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => '和';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收它们的最新更改。',
-      one: '1 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收其最新更改。',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList 正在从更新版本的 Submersion 同步，因此其最新更改暂时被保留。';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList 正在从更新版本的 Submersion 同步，因此它们的最新更改暂时被保留。';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      '更新此设备即可接收这些更改。';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      '此设备的应用商店更新到达后，这些更改将自动应用；该更新可能仍在审核中。';
 
   @override
   String get settings_cloudSync_provider_connected => '已连接';
@@ -15861,6 +15956,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get statistics_profile_deco_noDeco => '无减压';
+
+  @override
+  String get statistics_profile_deco_notRecorded => '未记录';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count 次潜水没有已记录或可计算的减压数据，未计入比例';
+  }
 
   @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
@@ -19275,7 +19378,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'Apple Watch 导入仅在 iOS 和 macOS 设备上可用。';
+      '从 Apple Watch 导入需要装有“健康”App 的 iPhone。';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed => '权限检查失败';
@@ -23811,6 +23914,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => '入水';
+
+  @override
+  String get enum_siteField_exitMethod => '出水方式';
+
+  @override
+  String get enum_siteField_exitMethod_short => '出水';
 
   @override
   String get enum_siteField_bestSeason_short => '季节';
@@ -29574,6 +29683,10 @@ class AppLocalizationsZh extends AppLocalizations {
       '请将 Submersion 更新到最新版本。您的数据是安全的，未被修改。如果升级前已创建备份，它位于您的 Backups 文件夹中，更新后可以恢复。';
 
   @override
+  String get startup_versionMismatch_storeInstructions =>
+      '此应用安装自应用商店，版本低于创建您数据的版本。您的数据是安全的，未被修改。当新版本在商店上架后，请更新 Submersion 并重新打开。';
+
+  @override
   String get startup_versionMismatch_download => '下载最新版本';
 
   @override
@@ -30480,4 +30593,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => '媒体信息';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple 健康从不告知 App 是否已获得读取权限。如果没有出现潜水记录，请打开“健康”，依次进入“共享”“App”“Submersion”，并开启“体能训练”“水下深度”“水温”和“心率”。';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      '此时间范围内没有潜水体能训练。请确认日期涵盖该次潜水，并在“健康”“共享”“App”“Submersion”中开启“体能训练”和“水下深度”。';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      '水下深度 - 潜水过程中记录的深度采样';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      '水温 - 潜水过程中记录的水温采样';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'HealthKit 访问权限在“健康”App 中管理';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      '此设备不支持 HealthKit';
 }

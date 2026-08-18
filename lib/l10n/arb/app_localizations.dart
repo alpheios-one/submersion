@@ -697,11 +697,77 @@ abstract class AppLocalizations {
   /// **'Replace'**
   String get diveLog_bulkEdit_modeReplace;
 
+  /// No description provided for @diveLog_bulkEdit_modeUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get diveLog_bulkEdit_modeUpdate;
+
   /// No description provided for @diveLog_bulkEdit_tankOnlyIfEmpty.
   ///
   /// In en, this message translates to:
   /// **'Only dives that don\'t already have a tank'**
   String get diveLog_bulkEdit_tankOnlyIfEmpty;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which attributes to overwrite on the tanks these dives already have. Start and end pressures are never changed.'**
+  String get diveLog_bulkEdit_tankSpecsHint;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsNoFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at least one tank attribute to update.'**
+  String get diveLog_bulkEdit_tankSpecsNoFields;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset'**
+  String get diveLog_bulkEdit_tankFieldPreset;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get diveLog_bulkEdit_tankFieldRole;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get diveLog_bulkEdit_tankFieldVolume;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldWorkingPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Working pressure'**
+  String get diveLog_bulkEdit_tankFieldWorkingPressure;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldMaterial.
+  ///
+  /// In en, this message translates to:
+  /// **'Material'**
+  String get diveLog_bulkEdit_tankFieldMaterial;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldGasMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas mix'**
+  String get diveLog_bulkEdit_tankFieldGasMix;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get diveLog_bulkEdit_tankFieldName;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 selected dive has no tanks and will be skipped.} other{{count} selected dives have no tanks and will be skipped.}}'**
+  String diveLog_bulkEdit_tankSpecsSkipped(int count);
 
   /// No description provided for @diveLog_bulkEdit_confirmTitle.
   ///
@@ -9637,6 +9703,12 @@ abstract class AppLocalizations {
   /// **'Filter Dives'**
   String get diveLog_filter_title;
 
+  /// No description provided for @diveLog_filter_resizeGrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Resize filter panel'**
+  String get diveLog_filter_resizeGrip;
+
   /// No description provided for @diveLog_filter_tooltip_close.
   ///
   /// In en, this message translates to:
@@ -13513,6 +13585,49 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Parking Information'**
   String get diveSites_edit_access_parkingInfo_label;
+
+  /// Site form row: the typical way into the water at this site
+  ///
+  /// In en, this message translates to:
+  /// **'Entry Method'**
+  String get diveSites_edit_access_entryMethod_label;
+
+  /// Site form row: the typical way out of the water at this site
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Method'**
+  String get diveSites_edit_access_exitMethod_label;
+
+  /// Chip offering to fill a site's entry and exit method from the dives already logged there
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Your dive here: {entry} in, {exit} out} other{Your {count} dives here: {entry} in, {exit} out}}'**
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  );
+
+  /// Chip offering to fill a site's entry method when the logged dives record no exit method
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Your dive here: {entry}} other{Your {count} dives here: {entry}}}'**
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  );
+
+  /// Site detail access card: entry method row label
+  ///
+  /// In en, this message translates to:
+  /// **'Entry'**
+  String get diveSites_detail_access_entryMethod;
+
+  /// Site detail access card: exit method row label
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get diveSites_detail_access_exitMethod;
 
   /// No description provided for @diveSites_edit_altitude_helperText.
   ///
@@ -24315,11 +24430,31 @@ abstract class AppLocalizations {
   /// **' and '**
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator;
 
-  /// No description provided for @settings_cloudSync_peerRequiresUpdate_banner.
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamed.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}'**
-  String settings_cloudSync_peerRequiresUpdate_banner(num count);
+  /// **'{deviceList} syncs from a newer version of Submersion, so its latest changes are held for now.'**
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamedPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'{deviceList} sync from a newer version of Submersion, so their latest changes are held for now.'**
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  );
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_updateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Update this device to receive them.'**
+  String get settings_cloudSync_peerRequiresUpdate_updateAction;
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_storeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'They will apply automatically once this device\'s app store update arrives; the update may still be in review.'**
+  String get settings_cloudSync_peerRequiresUpdate_storeAction;
 
   /// No description provided for @settings_cloudSync_provider_connected.
   ///
@@ -28048,6 +28183,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Deco'**
   String get statistics_profile_deco_noDeco;
+
+  /// No description provided for @statistics_profile_deco_notRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Recorded'**
+  String get statistics_profile_deco_notRecorded;
+
+  /// No description provided for @statistics_profile_deco_notRecordedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} dives have no recorded or computable deco data and are excluded from the rate'**
+  String statistics_profile_deco_notRecordedHint(int count);
 
   /// No description provided for @statistics_profile_deco_semanticLabel.
   ///
@@ -33849,7 +33996,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveImport_healthkit_notAvailableDescription.
   ///
   /// In en, this message translates to:
-  /// **'Apple Watch import is only available on iOS and macOS devices.'**
+  /// **'Apple Watch import needs an iPhone with the Health app.'**
   String get diveImport_healthkit_notAvailableDescription;
 
   /// No description provided for @diveImport_healthkit_permissionCheckFailed.
@@ -41886,6 +42033,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Entry'**
   String get enum_siteField_entryType_short;
+
+  /// Site table column: exit method
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Method'**
+  String get enum_siteField_exitMethod;
+
+  /// Site table column (short): exit method
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get enum_siteField_exitMethod_short;
 
   /// No description provided for @enum_siteField_bestSeason_short.
   ///
@@ -52017,6 +52176,12 @@ abstract class AppLocalizations {
   /// **'Please update Submersion to the latest version. Your data is safe and has not been modified. If a backup was taken before the upgrade, it is in your Backups folder and can be restored after updating.'**
   String get startup_versionMismatch_instructions;
 
+  /// No description provided for @startup_versionMismatch_storeInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'This app was installed from an app store and is older than the version that created your data. Your data is safe and has not been modified. Update Submersion when the new version appears in the store, then reopen it.'**
+  String get startup_versionMismatch_storeInstructions;
+
   /// No description provided for @startup_versionMismatch_download.
   ///
   /// In en, this message translates to:
@@ -53534,6 +53699,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Media info'**
   String get media_tile_infoMenuItem;
+
+  /// Hint under the HealthKit access headline explaining that iOS will not confirm read access.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Health never tells apps whether read access was granted. If no dives turn up, open Health, then Sharing, Apps, Submersion, and turn on Workouts, Underwater Depth, Water Temperature, and Heart Rate.'**
+  String get diveImport_healthkit_accessGrantedHint;
+
+  /// Hint shown when a HealthKit fetch returned zero dives.
+  ///
+  /// In en, this message translates to:
+  /// **'No underwater diving workouts in this range. Check that the dates cover the dive, and that Health, Sharing, Apps, Submersion has Workouts and Underwater Depth turned on.'**
+  String get diveImport_healthkit_foundNoDivesHint;
+
+  /// HealthKit data type disclosure: underwater depth.
+  ///
+  /// In en, this message translates to:
+  /// **'Underwater Depth - depth samples recorded during dives'**
+  String get settings_dataSources_appleHealth_dataTypeDepth;
+
+  /// HealthKit data type disclosure: water temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Temperature - water temperature samples recorded during dives'**
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp;
+
+  /// Permission row shown when the platform will not disclose read access.
+  ///
+  /// In en, this message translates to:
+  /// **'HealthKit access is managed in the Health app'**
+  String get settings_dataSources_appleHealth_permissionManagedInHealth;
+
+  /// Permission row shown when HealthKit is unavailable on this device.
+  ///
+  /// In en, this message translates to:
+  /// **'HealthKit is not available on this device'**
+  String get settings_dataSources_appleHealth_permissionUnsupported;
 }
 
 class _AppLocalizationsDelegate

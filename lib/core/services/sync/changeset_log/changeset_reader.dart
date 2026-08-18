@@ -26,6 +26,7 @@ class ChangesetReadResult {
     this.skippedPeerDeviceIds = const {},
     this.skippedPeerNames = const {},
     this.newerSchemaPeerDeviceIds = const {},
+    this.newerSchemaPeerNames = const {},
     this.retiredPeerIds = const {},
     this.retiredPeerHasFiles = false,
   });
@@ -47,12 +48,16 @@ class ChangesetReadResult {
   /// the UI falls back to a short id label for those.
   final Map<String, String> skippedPeerNames;
 
-  /// Peers held because their manifests were published from a newer database
-  /// schema than this build understands. Merging them would silently drop the
-  /// fields this build does not know and republish the rows without them.
-  /// Their cursors are not advanced; the data applies after this device
-  /// updates.
+  /// Peers held because their manifests declare a compatibility floor above
+  /// this build's schema, i.e. they published across a breaking schema change
+  /// this build predates. Their cursors are not advanced; the data applies
+  /// after this device updates.
   final Set<String> newerSchemaPeerDeviceIds;
+
+  /// Display names for the entries in [newerSchemaPeerDeviceIds] that
+  /// published one, keyed by device id. Same fallback contract as
+  /// [skippedPeerNames]: absent means the UI shows a short id label.
+  final Map<String, String> newerSchemaPeerNames;
   final Set<String> retiredPeerIds;
 
   /// True when a retired peer still has non-marker files in the bucket (a
@@ -116,6 +121,7 @@ class ChangesetReader {
     final skippedPeerDeviceIds = <String>{};
     final skippedPeerNames = <String, String>{};
     final newerSchemaPeerDeviceIds = <String>{};
+    final newerSchemaPeerNames = <String, String>{};
 
     var peersProcessed = 0;
     var payloadsApplied = 0;
@@ -146,13 +152,19 @@ class ChangesetReader {
           continue;
         }
 
-        // Newer-schema filter: hold peers publishing from a newer database
-        // schema. Applying them would silently drop the columns and tables
-        // this build does not know, then republish those rows without them.
-        // The cursor stays put, so the data applies once this device updates.
+        // Compatibility-floor filter: hold peers whose declared floor exceeds
+        // this build's schema, i.e. they publish across a breaking schema
+        // change this build predates. Additive changes do not raise the floor,
+        // because the merge overlay preserves columns an older reader omits
+        // (see AppDatabase.minimumCompatibleSchemaVersion). The cursor stays
+        // put, so the data applies once this device updates.
         final peerSchema = manifest.schemaVersion;
         if (peerSchema != null && peerSchema > localSchemaVersion) {
           newerSchemaPeerDeviceIds.add(peerId);
+          final name = manifest.deviceName;
+          if (name != null && name.isNotEmpty) {
+            newerSchemaPeerNames[peerId] = name;
+          }
           continue;
         }
         peersProcessed++;
@@ -234,6 +246,7 @@ class ChangesetReader {
       skippedPeerDeviceIds: skippedPeerDeviceIds,
       skippedPeerNames: skippedPeerNames,
       newerSchemaPeerDeviceIds: newerSchemaPeerDeviceIds,
+      newerSchemaPeerNames: newerSchemaPeerNames,
       retiredPeerIds: retiredPeerIds,
       retiredPeerHasFiles: retiredPeerHasFiles,
     );

@@ -8,7 +8,6 @@ import android.hardware.usb.UsbManager
 import android.os.Handler
 import android.os.Looper
 import com.hoho.android.usbserial.driver.UsbSerialDriver
-import com.hoho.android.usbserial.driver.UsbSerialProber
 import io.flutter.plugin.common.BinaryMessenger
 import java.util.concurrent.Executors
 
@@ -504,7 +503,10 @@ class DiveComputerHostApiImpl(
     ) {
         val usbManager = context.getSystemService(Context.USB_SERVICE) as? UsbManager
         val drivers: List<UsbSerialDriver> = usbManager?.let {
-            UsbSerialProber.getDefaultProber().findAllDrivers(it)
+            // Not getDefaultProber(): its table lists only stock bridge-chip
+            // identifiers, so a dive cable with a reprogrammed product ID is
+            // invisible (issue #732).
+            DiveCableIds.prober().findAllDrivers(it)
         } ?: emptyList()
 
         if (drivers.isEmpty()) {

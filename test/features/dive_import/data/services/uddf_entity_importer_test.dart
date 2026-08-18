@@ -699,6 +699,133 @@ void main() {
     });
   });
 
+  group('Site linking fallback for a GPS-matched duplicate', () {
+    // The duplicate checker flags an incoming site as a duplicate on name OR
+    // on 100 m proximity, and the wizard then leaves it out of the selection.
+    // A site caught by the proximity arm carries a different name, so binding
+    // its uddfId by name alone strands every dive that referenced it.
+    const existingSite = DiveSite(
+      id: 'existing-maclearie',
+      diverId: diverId,
+      name: 'Maclearie Park',
+      location: GeoPoint(40.179561, -74.037475),
+    );
+
+    setUp(() {
+      when(
+        mockSiteRepo.getAllSites(diverId: anyNamed('diverId')),
+      ).thenAnswer((_) async => [existingSite]);
+      when(mockDiveRepo.createDive(any)).thenAnswer(
+        (invocation) async => invocation.positionalArguments[0] as Dive,
+      );
+    });
+
+    test('links the dive to the existing site the duplicate sits on', () async {
+      final data = UddfImportResult(
+        sites: [
+          {
+            // Spelled differently, so the name lookup cannot rescue this.
+            'name': 'Maclearie Pk',
+            'uddfId': 'site-1',
+            'latitude': 40.179575,
+            'longitude': -74.037466,
+          },
+        ],
+        dives: [
+          {
+            'dateTime': now,
+            'maxDepth': 20.0,
+            'site': {'uddfId': 'site-1'},
+          },
+        ],
+      );
+
+      await importer.import(
+        data: data,
+        selections: const UddfImportSelections(sites: {}, dives: {0}),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      final captured = verify(mockDiveRepo.createDive(captureAny)).captured;
+      final dive = captured[0] as Dive;
+      expect(dive.site, isNotNull);
+      expect(dive.site!.id, 'existing-maclearie');
+    });
+
+    test('leaves the dive unlinked when no existing site is near', () async {
+      final data = UddfImportResult(
+        sites: [
+          {
+            'name': 'Somewhere Else',
+            'uddfId': 'site-1',
+            'latitude': 18.465562,
+            'longitude': -66.084902,
+          },
+        ],
+        dives: [
+          {
+            'dateTime': now,
+            'maxDepth': 20.0,
+            'site': {'uddfId': 'site-1'},
+          },
+        ],
+      );
+
+      await importer.import(
+        data: data,
+        selections: const UddfImportSelections(sites: {}, dives: {0}),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      final captured = verify(mockDiveRepo.createDive(captureAny)).captured;
+      final dive = captured[0] as Dive;
+      expect(dive.site, isNull);
+    });
+
+    test('prefers a name match over a nearer site with another name', () async {
+      const sameNameFarther = DiveSite(
+        id: 'existing-by-name',
+        diverId: diverId,
+        name: 'Maclearie Pk',
+        location: GeoPoint(40.180561, -74.037475),
+      );
+      when(
+        mockSiteRepo.getAllSites(diverId: anyNamed('diverId')),
+      ).thenAnswer((_) async => [existingSite, sameNameFarther]);
+
+      final data = UddfImportResult(
+        sites: [
+          {
+            'name': 'Maclearie Pk',
+            'uddfId': 'site-1',
+            'latitude': 40.179575,
+            'longitude': -74.037466,
+          },
+        ],
+        dives: [
+          {
+            'dateTime': now,
+            'maxDepth': 20.0,
+            'site': {'uddfId': 'site-1'},
+          },
+        ],
+      );
+
+      await importer.import(
+        data: data,
+        selections: const UddfImportSelections(sites: {}, dives: {0}),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      final captured = verify(mockDiveRepo.createDive(captureAny)).captured;
+      final dive = captured[0] as Dive;
+      expect(dive.site!.id, 'existing-by-name');
+    });
+  });
+
   group('Import sites (siteOverrides / replaceSource)', () {
     // A pre-existing site carrying values the import payload will NOT supply,
     // so tests can assert those survive the overwrite.

@@ -385,8 +385,52 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Reemplazar';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Actualizar';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Solo inmersiones que aún no tienen botella';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Elige qué atributos sobrescribir en las botellas que estas inmersiones ya tienen. Las presiones inicial y final nunca se modifican.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Elige al menos un atributo de botella para actualizar.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Preajuste';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Función';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volumen';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Presión de trabajo';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Material';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Mezcla de gas';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Nombre';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count inmersiones seleccionadas no tienen botellas y se omitirán.',
+      one: '1 inmersión seleccionada no tiene botellas y se omitirá.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => '¿Aplicar cambios?';
@@ -5785,6 +5829,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_filter_title => 'Filtrar inmersiones';
 
   @override
+  String get diveLog_filter_resizeGrip =>
+      'Cambiar el tamaño del panel de filtros';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Cerrar filtro';
 
   @override
@@ -7981,6 +8029,47 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get diveSites_edit_access_parkingInfo_label =>
       'Informacion de estacionamiento';
+
+  @override
+  String get diveSites_edit_access_entryMethod_label => 'Método de entrada';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Método de salida';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tus $count inmersiones aquí: entrada $entry, salida $exit',
+      one: 'Tu inmersión aquí: entrada $entry, salida $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tus $count inmersiones aquí: entrada $entry',
+      one: 'Tu inmersión aquí: entrada $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Entrada';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Salida';
 
   @override
   String get diveSites_edit_altitude_helperText =>
@@ -14435,17 +14524,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' y ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count dispositivos sincronizan desde una versión más reciente de Submersion. Actualiza este dispositivo para recibir sus últimos cambios.',
-      one:
-          '1 dispositivo sincroniza desde una versión más reciente de Submersion. Actualiza este dispositivo para recibir sus últimos cambios.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList sincroniza desde una versión más reciente de Submersion, por lo que sus últimos cambios quedan retenidos por ahora.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList sincronizan desde una versión más reciente de Submersion, por lo que sus últimos cambios quedan retenidos por ahora.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Actualiza este dispositivo para recibirlos.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'Se aplicarán automáticamente cuando llegue la actualización de la tienda de aplicaciones de este dispositivo; puede que aún esté en revisión.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Conectado';
@@ -16694,6 +16790,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get statistics_profile_deco_noDeco => 'Sin deco';
+
+  @override
+  String get statistics_profile_deco_notRecorded => 'Sin registrar';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count inmersiones no tienen datos de descompresión registrados ni calculables y se excluyen de la tasa';
+  }
 
   @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
@@ -20314,7 +20418,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'La importacion de Apple Watch solo esta disponible en dispositivos iOS y macOS.';
+      'La importación desde el Apple Watch necesita un iPhone con la app Salud.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -25054,6 +25158,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'Entrada';
+
+  @override
+  String get enum_siteField_exitMethod => 'Método de salida';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Salida';
 
   @override
   String get enum_siteField_bestSeason_short => 'Época';
@@ -31375,6 +31485,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Actualiza Submersion a la última versión. Tus datos están a salvo y no se han modificado. Si se hizo una copia de seguridad antes de la actualización, está en tu carpeta Backups y se puede restaurar después de actualizar.';
 
   @override
+  String get startup_versionMismatch_storeInstructions =>
+      'Esta app se instaló desde una tienda de aplicaciones y es más antigua que la versión que creó tus datos. Tus datos están a salvo y no se han modificado. Actualiza Submersion cuando la nueva versión aparezca en la tienda y vuelve a abrirla.';
+
+  @override
   String get startup_versionMismatch_download => 'Descargar la última versión';
 
   @override
@@ -32365,4 +32479,28 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'Información del medio';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple Salud nunca indica a las apps si se concedió el acceso de lectura. Si no aparece ninguna inmersión, abre Salud, luego Compartir, Apps, Submersion, y activa Entrenamientos, Profundidad bajo el agua, Temperatura del agua y Frecuencia cardíaca.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'No hay entrenamientos de buceo en este intervalo. Comprueba que las fechas incluyan la inmersión y que en Salud, Compartir, Apps, Submersion estén activados Entrenamientos y Profundidad bajo el agua.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Profundidad bajo el agua - muestras de profundidad registradas durante las inmersiones';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Temperatura del agua - muestras de temperatura registradas durante las inmersiones';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'El acceso a HealthKit se gestiona en la app Salud';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit no está disponible en este dispositivo';
 }

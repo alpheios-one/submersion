@@ -21,6 +21,7 @@ import 'package:submersion/features/site_scape/presentation/site_feature_sheet.d
 import 'package:submersion/features/site_scape/presentation/site_features_section.dart';
 import 'package:submersion/features/site_scape/presentation/site_scape_view.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/environment_enum_display.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
@@ -983,7 +984,9 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
   bool _hasAccessInfo(DiveSite site) {
     return (site.accessNotes != null && site.accessNotes!.isNotEmpty) ||
         (site.mooringNumber != null && site.mooringNumber!.isNotEmpty) ||
-        (site.parkingInfo != null && site.parkingInfo!.isNotEmpty);
+        (site.parkingInfo != null && site.parkingInfo!.isNotEmpty) ||
+        site.entryMethod != null ||
+        site.exitMethod != null;
   }
 
   Widget _buildDepthSection(
@@ -1445,6 +1448,24 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                 Icons.info_outline,
                 context.l10n.diveSites_detail_access_accessNotes,
                 site.accessNotes!,
+              ),
+            ],
+            if (site.entryMethod != null) ...[
+              _buildDetailRow(
+                context,
+                Icons.login,
+                context.l10n.diveSites_detail_access_entryMethod,
+                site.entryMethod!.localizedName(context.l10n),
+              ),
+            ],
+            // Only when it differs: a mirrored exit repeats the entry row.
+            if (site.exitMethod != null &&
+                site.exitMethod != site.entryMethod) ...[
+              _buildDetailRow(
+                context,
+                Icons.logout,
+                context.l10n.diveSites_detail_access_exitMethod,
+                site.exitMethod!.localizedName(context.l10n),
               ),
             ],
             if (site.mooringNumber != null &&

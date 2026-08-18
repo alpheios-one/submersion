@@ -3,12 +3,16 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/database/database.dart';
 
-/// Minimal pre-v154 diver_settings stamped at v153, so opening it runs the
-/// 153 -> 154 rung of the ladder rather than only the beforeOpen backstop.
-NativeDatabase _dbAt153() {
+/// Minimal pre-v155 diver_settings stamped at v154, so opening it runs the
+/// 154 -> 155 rung of the ladder rather than only the beforeOpen backstop.
+///
+/// 154 rather than 153 because #1104 claimed 154 on main while this branch
+/// was open; stamping at 154 keeps the fixture scoped to this migration
+/// instead of also triggering that one.
+NativeDatabase _dbAt154() {
   return NativeDatabase.memory(
     setup: (rawDb) {
-      rawDb.execute('PRAGMA user_version = 153');
+      rawDb.execute('PRAGMA user_version = 154');
       rawDb.execute('''
         CREATE TABLE diver_settings (
           id TEXT NOT NULL PRIMARY KEY,
@@ -24,11 +28,11 @@ NativeDatabase _dbAt153() {
   );
 }
 
-/// v154 adds the gas model preference to diver_settings (issue #828).
+/// v155 adds the gas model preference to diver_settings (issue #828).
 void main() {
-  test('v154 is in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(154));
-    expect(AppDatabase.migrationVersions, contains(154));
+  test('v155 is in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(155));
+    expect(AppDatabase.migrationVersions, contains(155));
   });
 
   test('a fresh database has diver_settings.gas_model', () async {
@@ -59,7 +63,7 @@ void main() {
   });
 
   test(
-    'a database stranded before v154 gains the column via beforeOpen',
+    'a database stranded before v155 gains the column via beforeOpen',
     () async {
       final nativeDb = NativeDatabase.memory(
         setup: (rawDb) {
@@ -95,8 +99,8 @@ void main() {
     await db.customSelect('SELECT 1').get();
   });
 
-  test('the 153 -> 154 upgrade adds the column to an existing row', () async {
-    final db = AppDatabase(_dbAt153());
+  test('the 154 -> 155 upgrade adds the column to an existing row', () async {
+    final db = AppDatabase(_dbAt154());
     addTearDown(db.close);
 
     final cols = await db

@@ -5527,7 +5527,7 @@ class SyncDataSerializer {
       'weightUnit': 'kilograms',
       'altitudeUnit': 'meters',
       'sacUnit': 'litersPerMin',
-      // Issue #828. Added in v154; seed it so a payload from a pre-v154 peer
+      // Issue #828. Added in v155; seed it so a payload from a pre-v155 peer
       // hydrates to the documented default rather than null.
       'gasModel': 'real',
       // Issue #1041. v144's visibility columns were never given defaults

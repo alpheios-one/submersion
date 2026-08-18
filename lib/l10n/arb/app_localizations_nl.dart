@@ -382,8 +382,52 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Vervangen';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Bijwerken';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Alleen duiken zonder bestaande fles';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Kies welke eigenschappen worden overschreven op de flessen die deze duiken al hebben. Begin- en einddruk worden nooit gewijzigd.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Kies minstens één fleseigenschap om bij te werken.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Voorinstelling';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Rol';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volume';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Werkdruk';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Materiaal';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Gasmengsel';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Naam';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count geselecteerde duiken hebben geen flessen en worden overgeslagen.',
+      one: '1 geselecteerde duik heeft geen flessen en wordt overgeslagen.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Wijzigingen toepassen?';
@@ -5737,6 +5781,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_filter_title => 'Duiken filteren';
 
   @override
+  String get diveLog_filter_resizeGrip => 'Formaat van filterpaneel wijzigen';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Filter sluiten';
 
   @override
@@ -7916,6 +7963,47 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_edit_access_parkingInfo_label => 'Parkeerinformatie';
+
+  @override
+  String get diveSites_edit_access_entryMethod_label => 'Instapmethode';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Uitstapmethode';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Jouw $count duiken hier: instap $entry, uitstap $exit',
+      one: 'Jouw duik hier: instap $entry, uitstap $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Jouw $count duiken hier: instap $entry',
+      one: 'Jouw duik hier: instap $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Instap';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Uitstap';
 
   @override
   String get diveSites_edit_altitude_helperText =>
@@ -14331,17 +14419,24 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' en ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count apparaten synchroniseren vanaf een nieuwere versie van Submersion. Werk dit apparaat bij om hun nieuwste wijzigingen te ontvangen.',
-      one:
-          '1 apparaat synchroniseert vanaf een nieuwere versie van Submersion. Werk dit apparaat bij om de nieuwste wijzigingen ervan te ontvangen.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList synchroniseert vanaf een nieuwere versie van Submersion, dus de nieuwste wijzigingen worden voorlopig vastgehouden.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList synchroniseren vanaf een nieuwere versie van Submersion, dus hun nieuwste wijzigingen worden voorlopig vastgehouden.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Werk dit apparaat bij om ze te ontvangen.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'Ze worden automatisch toegepast zodra de appstore-update voor dit apparaat beschikbaar is; de update is mogelijk nog in beoordeling.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Verbonden';
@@ -16554,6 +16649,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get statistics_profile_deco_noDeco => 'Geen deco';
+
+  @override
+  String get statistics_profile_deco_notRecorded => 'Niet vastgelegd';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count duiken hebben geen vastgelegde of berekenbare decogegevens en tellen niet mee voor het percentage';
+  }
 
   @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
@@ -20141,7 +20244,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'Apple Watch-import is alleen beschikbaar op iOS- en macOS-apparaten.';
+      'Voor importeren vanaf de Apple Watch is een iPhone met de app Gezondheid nodig.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -24858,6 +24961,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'Instap';
+
+  @override
+  String get enum_siteField_exitMethod => 'Uitstapmethode';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Uitstap';
 
   @override
   String get enum_siteField_bestSeason_short => 'Seizoen';
@@ -31124,6 +31233,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Werk Submersion bij naar de nieuwste versie. Je gegevens zijn veilig en zijn niet gewijzigd. Als er vóór de upgrade een back-up is gemaakt, staat die in je map Backups en kan die na het bijwerken worden teruggezet.';
 
   @override
+  String get startup_versionMismatch_storeInstructions =>
+      'Deze app is geïnstalleerd vanuit een appstore en is ouder dan de versie die uw gegevens heeft gemaakt. Uw gegevens zijn veilig en niet gewijzigd. Werk Submersion bij zodra de nieuwe versie in de store verschijnt en open de app daarna opnieuw.';
+
+  @override
   String get startup_versionMismatch_download => 'Nieuwste versie downloaden';
 
   @override
@@ -32102,4 +32215,28 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'Media-info';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple Gezondheid vertelt apps nooit of leestoegang is verleend. Verschijnen er geen duiken, open dan Gezondheid, vervolgens Delen, Apps, Submersion, en zet Workouts, Waterdiepte, Watertemperatuur en Hartslag aan.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'Geen duikworkouts in dit bereik. Controleer of de datums de duik omvatten en of bij Gezondheid, Delen, Apps, Submersion de opties Workouts en Waterdiepte aanstaan.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Waterdiepte - dieptemetingen die tijdens duiken zijn vastgelegd';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Watertemperatuur - temperatuurmetingen die tijdens duiken zijn vastgelegd';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'HealthKit-toegang beheer je in de app Gezondheid';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit is niet beschikbaar op dit apparaat';
 }

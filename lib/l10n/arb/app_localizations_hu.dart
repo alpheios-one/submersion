@@ -383,8 +383,51 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Csere';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Frissítés';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Csak a meglévő palack nélküli merülések';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Válaszd ki, mely tulajdonságok íródjanak felül a merülésekhez már tartozó palackokon. A kezdő és a záró nyomás soha nem változik.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Válassz legalább egy palacktulajdonságot a frissítéshez.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Előbeállítás';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Szerep';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Térfogat';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Üzemi nyomás';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Anyag';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Gázkeverék';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Név';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kiválasztott merüléshez nincs palack, ezért kimaradnak.',
+      one: '1 kiválasztott merüléshez nincs palack, ezért kimarad.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'Alkalmazza a módosításokat?';
@@ -5764,6 +5807,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_title => 'Merulesek szurese';
 
   @override
+  String get diveLog_filter_resizeGrip => 'Szűrőpanel átméretezése';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Szuro bezarasa';
 
   @override
@@ -7963,6 +8009,47 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveSites_edit_access_parkingInfo_label => 'Parkolasi informaciok';
+
+  @override
+  String get diveSites_edit_access_entryMethod_label => 'Belépés módja';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Kilépés módja';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Az itteni $count merülésed: belépés $entry, kilépés $exit',
+      one: 'Az itteni merülésed: belépés $entry, kilépés $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Az itteni $count merülésed: belépés $entry',
+      one: 'Az itteni merülésed: belépés $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Belépés';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Kilépés';
 
   @override
   String get diveSites_edit_altitude_helperText =>
@@ -14394,17 +14481,24 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' és ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count eszköz a Submersion újabb verziójából szinkronizál. Frissítsd ezt az eszközt, hogy megkapd a legújabb változtatásaikat.',
-      one:
-          '1 eszköz a Submersion újabb verziójából szinkronizál. Frissítsd ezt az eszközt, hogy megkapd a legújabb változtatásait.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList a Submersion újabb verziójából szinkronizál, ezért a legújabb változtatásai egyelőre visszatartva maradnak.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList a Submersion újabb verziójából szinkronizálnak, ezért a legújabb változtatásaik egyelőre visszatartva maradnak.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Frissítsd ezt az eszközt, hogy megkapd őket.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'Automatikusan érvénybe lépnek, amint megérkezik az eszköz alkalmazásbolti frissítése; a frissítés még ellenőrzés alatt állhat.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Csatlakoztatva';
@@ -16645,6 +16739,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_profile_deco_noDeco => 'Nincs deko';
+
+  @override
+  String get statistics_profile_deco_notRecorded => 'Nincs rögzítve';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count merülés nem tartalmaz rögzített vagy számítható dekompressziós adatot, ezért kimarad az arányból';
+  }
 
   @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
@@ -20241,7 +20343,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'Az Apple Watch importalas csak iOS es macOS eszkozokon erheto el.';
+      'Az Apple Watch importáláshoz iPhone szükséges a Health alkalmazással.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -24958,6 +25060,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'Besz.';
+
+  @override
+  String get enum_siteField_exitMethod => 'Kilépés módja';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Kilépés';
 
   @override
   String get enum_siteField_bestSeason_short => 'Évszak';
@@ -31226,6 +31334,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Kérjük, frissítse a Submersiont a legújabb verzióra. Az adatai biztonságban vannak, és nem módosultak. Ha a frissítés előtt készült biztonsági mentés, az a Backups mappában található, és a frissítés után visszaállítható.';
 
   @override
+  String get startup_versionMismatch_storeInstructions =>
+      'Ezt az alkalmazást alkalmazásboltból telepítetted, és régebbi, mint az adataidat létrehozó verzió. Az adataid biztonságban vannak, nem módosultak. Frissítsd a Submersiont, amint az új verzió megjelenik a boltban, majd nyisd meg újra.';
+
+  @override
   String get startup_versionMismatch_download => 'Legújabb verzió letöltése';
 
   @override
@@ -32211,4 +32323,28 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'Média infó';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Az Apple Health soha nem árulja el az alkalmazásoknak, hogy megkapta-e az olvasási hozzáférést. Ha nem jelenik meg merülés, nyisd meg a Health appot, majd a Megosztás, Appok, Submersion menüpontot, és kapcsold be az Edzések, Vízmélység, Vízhőmérséklet és Pulzus tételt.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'Nincs merülés edzés ebben az időszakban. Ellenőrizd, hogy a dátumok lefedik-e a merülést, és hogy a Health, Megosztás, Appok, Submersion menüben be van-e kapcsolva az Edzések és a Vízmélység.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Vízmélység - a merülések során rögzített mélységadatok';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Vízhőmérséklet - a merülések során rögzített hőmérsékleti adatok';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'A HealthKit hozzáférést a Health alkalmazásban kezelheted';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'A HealthKit nem érhető el ezen az eszközön';
 }

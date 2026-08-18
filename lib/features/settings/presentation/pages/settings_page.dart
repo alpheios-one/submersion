@@ -40,6 +40,7 @@ import 'package:submersion/features/settings/presentation/widgets/settings_list_
 import 'package:submersion/features/settings/presentation/widgets/settings_summary_widget.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/features/dive_import/domain/services/health_import_service.dart';
 import 'package:submersion/features/dive_import/presentation/providers/dive_import_providers.dart';
 import 'package:submersion/features/auto_update/domain/beta_program_links.dart';
 import 'package:submersion/features/auto_update/domain/entities/release_channel.dart';
@@ -2718,7 +2719,7 @@ class _DataSourcesSectionContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final permissionsAsync = ref.watch(healthImportHasPermissionsProvider);
+    final permissionsAsync = ref.watch(healthImportPermissionStatusProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -2781,12 +2782,13 @@ class _DataSourcesSectionContent extends ConsumerWidget {
                   const SizedBox(height: 12),
                   // Permission status
                   permissionsAsync.when(
-                    data: (hasPerms) =>
-                        _buildPermissionStatus(context, hasPerms: hasPerms),
-                    loading: () =>
-                        _buildPermissionStatus(context, isLoading: true),
-                    error: (_, _) =>
-                        _buildPermissionStatus(context, hasPerms: false),
+                    data: (status) =>
+                        _buildPermissionStatus(context, status: status),
+                    loading: () => _buildPermissionStatus(context),
+                    error: (_, _) => _buildPermissionStatus(
+                      context,
+                      status: HealthPermissionStatus.undetermined,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -2815,6 +2817,22 @@ class _DataSourcesSectionContent extends ConsumerWidget {
                     context
                         .l10n
                         .settings_dataSources_appleHealth_dataTypeWorkouts,
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.vertical_align_bottom),
+                  title: Text(
+                    context.l10n.settings_dataSources_appleHealth_dataTypeDepth,
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.thermostat),
+                  title: Text(
+                    context
+                        .l10n
+                        .settings_dataSources_appleHealth_dataTypeWaterTemp,
                   ),
                 ),
                 const Divider(height: 1),
@@ -2895,15 +2913,19 @@ class _DataSourcesSectionContent extends ConsumerWidget {
     );
   }
 
+  /// Permission row for the Apple Health card.
+  ///
+  /// A null [status] means the check is still running. Apple never discloses
+  /// read access, so [HealthPermissionStatus.undetermined] is the normal
+  /// steady state on iOS and must not be painted as a refusal.
   Widget _buildPermissionStatus(
     BuildContext context, {
-    bool hasPerms = false,
-    bool isLoading = false,
+    HealthPermissionStatus? status,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    if (isLoading) {
+    if (status == null) {
       return Row(
         children: [
           SizedBox(
@@ -2925,23 +2947,40 @@ class _DataSourcesSectionContent extends ConsumerWidget {
       );
     }
 
+    final (icon, color, label) = switch (status) {
+      HealthPermissionStatus.granted => (
+        Icons.check_circle,
+        Colors.green,
+        context.l10n.settings_dataSources_appleHealth_permissionGranted,
+      ),
+      HealthPermissionStatus.denied => (
+        Icons.cancel,
+        colorScheme.error,
+        context.l10n.settings_dataSources_appleHealth_permissionNotGranted,
+      ),
+      HealthPermissionStatus.unsupported => (
+        Icons.info_outline,
+        colorScheme.onSurfaceVariant,
+        context.l10n.settings_dataSources_appleHealth_permissionUnsupported,
+      ),
+      HealthPermissionStatus.undetermined => (
+        Icons.health_and_safety,
+        colorScheme.onSurfaceVariant,
+        context.l10n.settings_dataSources_appleHealth_permissionManagedInHealth,
+      ),
+    };
+
     return Row(
       children: [
-        Icon(
-          hasPerms ? Icons.check_circle : Icons.cancel,
-          size: 16,
-          color: hasPerms ? Colors.green : colorScheme.error,
-        ),
+        Icon(icon, size: 16, color: color),
         const SizedBox(width: 8),
-        Text(
-          hasPerms
-              ? context.l10n.settings_dataSources_appleHealth_permissionGranted
-              : context
-                    .l10n
-                    .settings_dataSources_appleHealth_permissionNotGranted,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: hasPerms ? Colors.green : colorScheme.error,
-            fontWeight: FontWeight.w500,
+        Expanded(
+          child: Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],

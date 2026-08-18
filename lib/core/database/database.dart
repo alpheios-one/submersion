@@ -857,6 +857,10 @@ class DiveSites extends Table {
       text().nullable()(); // Parking availability and tips
   RealColumn get altitude => real()
       .nullable()(); // Altitude above sea level in meters (for altitude diving)
+  /// Typical entry and exit method at this site, stored as EntryMethod.name
+  /// (issue #1104). Snapped onto a dive when the site is assigned.
+  TextColumn get entryMethod => text().nullable()();
+  TextColumn get exitMethod => text().nullable()();
   BoolColumn get isShared => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -1561,7 +1565,7 @@ class DiverSettings extends Table {
   TextColumn get sacUnit =>
       text().withDefault(const Constant('litersPerMin'))();
 
-  /// v154: which equation of state converts cylinder pressure to gas volume.
+  /// v155: which equation of state converts cylinder pressure to gas volume.
   ///
   /// 'real' reproduces the compressibility-corrected math the app used
   /// unconditionally before the preference existed, so upgrading changes
@@ -3076,7 +3080,28 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 154;
+  static const int currentSchemaVersion = 155;
+
+  /// The oldest schema whose reader can apply this build's sync payloads
+  /// without loss or misinterpretation (the compatibility floor).
+  ///
+  /// Stamped into every published manifest's `schemaVersion` field, which
+  /// shipped readers compare against their own schema to decide whether to
+  /// hold a peer (changeset_reader.dart). Keeping the floor low lets older
+  /// builds keep syncing across additive schema changes; the receiving-side
+  /// overlay merge (issue #474) preserves columns an older peer omits, and
+  /// test/core/services/sync/cross_version_roundtrip_test.dart locks that in.
+  ///
+  /// Raise this to the NEW schema version ONLY when a migration:
+  ///  - drops, renames, or retypes an existing synced column,
+  ///  - changes the meaning or units of an existing column's values,
+  ///  - removes or folds a synced entity (the v147 buddyRoles case),
+  ///  - tightens a constraint an old writer's payloads would violate.
+  /// Do NOT raise it for new tables or synced entities, new nullable or
+  /// defaulted columns, new indexes, dedupe passes, or data repairs that
+  /// preserve meaning. When raising it, extend the round-trip test's
+  /// projection so the new boundary stays covered.
+  static const int minimumCompatibleSchemaVersion = 137;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3298,9 +3323,13 @@ class AppDatabase extends _$AppDatabase {
     152,
     // v153 (issue #810): raw O2 cell output in millivolts on dive_profiles.
     153,
-    // v154 (issue #828): gas model preference on diver_settings, selecting
-    // ideal or real gas for every pressure-to-volume conversion.
+    // v154 (issue #1104): dive_sites.entry_method / exit_method, the site's
+    // typical way in and out of the water.
     154,
+    // v155 (issue #828): gas model preference on diver_settings, selecting
+    // ideal or real gas for every pressure-to-volume conversion. Renumbered
+    // from 154, which #1104 claimed first on main.
+    155,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4725,7 +4754,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Raw O2 cell output columns on dive_profiles (issue #810). PRAGMA-guarded
   /// so a healthy database no-ops and a partial schema does not throw.
-  /// Add `diver_settings.gas_model` if it is missing (v154, issue #828).
+  /// Add `diver_settings.gas_model` if it is missing (v155, issue #828).
   Future<void> _assertGasModelColumn() async {
     final cols = await customSelect(
       "PRAGMA table_info('diver_settings')",
@@ -4750,6 +4779,25 @@ class AppDatabase extends _$AppDatabase {
           'ALTER TABLE dive_profiles ADD COLUMN o2_sensor_mv$n INTEGER',
         );
       }
+    }
+  }
+
+  /// Site-level entry/exit method columns on dive_sites (issue #1104).
+  /// PRAGMA-guarded so a healthy database no-ops and a partial schema does
+  /// not throw.
+  Future<void> _assertSiteEntryExitMethodColumns() async {
+    final cols = await customSelect("PRAGMA table_info('dive_sites')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('entry_method')) {
+      await customStatement(
+        'ALTER TABLE dive_sites ADD COLUMN entry_method TEXT',
+      );
+    }
+    if (!names.contains('exit_method')) {
+      await customStatement(
+        'ALTER TABLE dive_sites ADD COLUMN exit_method TEXT',
+      );
     }
   }
 
@@ -8115,12 +8163,17 @@ class AppDatabase extends _$AppDatabase {
           await _assertO2CellMillivoltColumns();
         }
         if (from < 153) await reportProgress();
-        // v154: selectable gas model for every pressure-to-volume
-        // conversion (issue #828).
+        // v154: site-level entry/exit method (issue #1104).
         if (from < 154) {
-          await _assertGasModelColumn();
+          await _assertSiteEntryExitMethodColumns();
         }
         if (from < 154) await reportProgress();
+        // v155: selectable gas model for every pressure-to-volume
+        // conversion (issue #828).
+        if (from < 155) {
+          await _assertGasModelColumn();
+        }
+        if (from < 155) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8272,9 +8325,14 @@ class AppDatabase extends _$AppDatabase {
         // #810; same parallel-branch version-collision self-heal).
         await _assertO2CellMillivoltColumns();
 
-        // v154 backstop: re-assert the gas model column (issue #828). A
+        // v154 backstop: re-assert the site entry/exit method columns (issue
+        // #1104; same parallel-branch version-collision self-heal).
+        await _assertSiteEntryExitMethodColumns();
+
+        // v155 backstop: re-assert the gas model column (issue #828). A
         // database that arrives by restore or sync-adopt never runs
-        // onUpgrade, and reading settings without this column throws.
+        // onUpgrade, and reading settings without this column throws. This
+        // also covers a database stranded at 154 by the #1104 collision.
         await _assertGasModelColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.

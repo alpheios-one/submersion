@@ -34,6 +34,8 @@ void main() {
         ProviderScope(
           overrides: overrides.cast(),
           child: MaterialApp(
+            // Pinned: the assertions match English strings.
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
@@ -101,6 +103,8 @@ void main() {
         ProviderScope(
           overrides: overrides.cast(),
           child: MaterialApp(
+            // Pinned: the assertions match English strings.
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(

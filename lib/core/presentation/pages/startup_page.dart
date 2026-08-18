@@ -333,8 +333,8 @@ class _StartupWrapperState extends State<StartupWrapper>
         setState(() {
           _state = _StartupState.error;
           _isVersionMismatch = true;
-          _dbVersion = e.databaseVersion;
-          _appVersion = e.appVersion;
+          _dbVersion = e.storedSchemaVersion;
+          _appVersion = e.supportedSchemaVersion;
         });
       }
     } on DatabaseLockedException {

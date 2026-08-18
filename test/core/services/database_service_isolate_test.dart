@@ -325,6 +325,53 @@ void main() {
     },
   );
 
+  test('a newer-schema file rejected at the post-swap reopen rolls back '
+      '(no data loss)', () async {
+    // The sibling test above covers a failed SWAP, which the rename's own
+    // catch already handled. This covers the REOPEN: the version guard
+    // fires after the new file is live, which left the app with no working
+    // database until issue #1089.
+    final defaultPath = p.join(tempDir.path, 'Submersion', 'submersion.db');
+    await DatabaseService.instance.initialize(
+      locationService: _FakeLocation(defaultPath),
+    );
+    final backupPath = p.join(tempDir.path, 'backup.db');
+    await DatabaseService.instance.backup(backupPath);
+
+    // Written AFTER the backup, so this row proves the ORIGINAL database
+    // came back rather than the restored copy.
+    final now = DateTime.now();
+    await DiverRepository().createDiver(
+      domain.Diver(id: '', name: 'Keep Me', createdAt: now, updatedAt: now),
+    );
+
+    // Stamp the backup with a schema this build cannot open. The file is a
+    // genuine Submersion database in every other respect, so it swaps in
+    // cleanly and only fails at the reopen.
+    final raw = sqlite3.sqlite3.open(backupPath);
+    raw.execute(
+      'PRAGMA user_version = ${AppDatabase.currentSchemaVersion + 1}',
+    );
+    raw.close();
+
+    await expectLater(
+      DatabaseService.instance.restore(backupPath),
+      throwsA(isA<DatabaseVersionMismatchException>()),
+    );
+
+    // THE FIX: the pre-restore database is back, open, and intact.
+    final divers = await DiverRepository().getAllDivers();
+    expect(
+      divers.map((d) => d.name),
+      contains('Keep Me'),
+      reason:
+          'the guard fired after the swap; without rollback the app is '
+          'left with the unopenable file live and no database',
+    );
+    expect(File('$defaultPath.restore-staging').existsSync(), isFalse);
+    expect(File('$defaultPath.pre-restore').existsSync(), isFalse);
+  });
+
   test(
     'the restore window seam is one-shot and does not leak across restores',
     () async {

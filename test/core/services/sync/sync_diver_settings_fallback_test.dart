@@ -220,7 +220,7 @@ void main() {
   });
 
   test(
-    'applies a pre-v154 diver_settings payload missing the gas model key',
+    'applies a pre-v155 diver_settings payload missing the gas model key',
     () async {
       await db.customStatement('PRAGMA foreign_keys = OFF');
 
@@ -238,7 +238,7 @@ void main() {
       final exported = await serializer.fetchRecord('diverSettings', 'ds6');
       expect(exported, isNotNull);
 
-      // A peer still on v153 exports no gasModel. The column is NOT NULL, so
+      // A peer still on v154 exports no gasModel. The column is NOT NULL, so
       // an unseeded import would throw in DiverSetting.fromJson (issue #828).
       final legacy = Map<String, dynamic>.from(exported!)..remove('gasModel');
 
@@ -251,7 +251,7 @@ void main() {
       final row = await (db.select(
         db.diverSettings,
       )..where((t) => t.id.equals('ds6'))).getSingle();
-      // Hydrates to the app default, so a pre-v154 peer never silently
+      // Hydrates to the app default, so a pre-v155 peer never silently
       // switches this device's gas math.
       expect(row.gasModel, 'real');
     },
