@@ -7341,6 +7341,8 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "Közelben rögzítve",
   "reef_species_addToExpected": "Hozzáadás a várható fajokhoz",
+  "reef_species_showAll": "Mind a(z) {count} megjelenítése",
+  "reef_species_showFewer": "Kevesebb megjelenítése",
   "reef_attribution_title": "Zátony adatforrásai",
   "reef_attribution_wri": "Zátony jelenléte és veszélyeztetettsége. CC BY 3.0.",
   "reef_attribution_noaa": "Tengerfelszíni hőmérséklet és hőstressz. Közkincs.",

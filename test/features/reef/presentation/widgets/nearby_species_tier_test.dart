@@ -75,6 +75,104 @@ void main() {
     expect(find.textContaining('Aplysina archeri'), findsOneWidget);
   });
 
+  testWidgets('renders as chips rather than full-width rows', (tester) async {
+    const location = GeoPoint(12.16, -68.28);
+    final snapshot = _snapshot(
+      const ReefPart.ok(
+        NearbySpecies(
+          matched: [
+            MatchedNearbySpecies(
+              speciesId: 'sp_whale_shark',
+              occurrenceCount: 42,
+            ),
+          ],
+          unmatchedNames: ['Aplysina archeri'],
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(_harness(location, snapshot));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Chip), findsNWidgets(2));
+    expect(find.byType(ListTile), findsNothing);
+  });
+
+  // Issue #1036: a rich reef site returns dozens of records, and rendering
+  // them all pushed every section below this one off the page.
+  testWidgets('caps the list and reveals the rest on demand', (tester) async {
+    const location = GeoPoint(12.16, -68.28);
+    final snapshot = _snapshot(
+      ReefPart.ok(
+        NearbySpecies(
+          matched: const [
+            MatchedNearbySpecies(
+              speciesId: 'sp_whale_shark',
+              occurrenceCount: 99,
+            ),
+          ],
+          unmatchedNames: [for (var i = 0; i < 30; i++) 'Genus species$i'],
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(_harness(location, snapshot));
+    await tester.pumpAndSettle();
+
+    // The total is surfaced so the count is knowable without expanding.
+    expect(find.text('31'), findsOneWidget);
+    expect(find.byType(Chip), findsNWidgets(12));
+    expect(find.text('Genus species29'), findsNothing);
+
+    await tester.tap(find.text('Show all 31'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Chip), findsNWidgets(31));
+    expect(find.text('Genus species29'), findsOneWidget);
+
+    await tester.tap(find.text('Show fewer'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Chip), findsNWidgets(12));
+  });
+
+  testWidgets('does not offer a toggle when nothing is hidden', (tester) async {
+    const location = GeoPoint(12.16, -68.28);
+    final snapshot = _snapshot(
+      const ReefPart.ok(NearbySpecies(unmatchedNames: ['Aplysina archeri'])),
+    );
+
+    await tester.pumpWidget(_harness(location, snapshot));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Show all'), findsNothing);
+    expect(find.text('Show fewer'), findsNothing);
+  });
+
+  testWidgets('matched chips carry the add-to-expected action', (tester) async {
+    const location = GeoPoint(12.16, -68.28);
+    final snapshot = _snapshot(
+      const ReefPart.ok(
+        NearbySpecies(
+          matched: [
+            MatchedNearbySpecies(
+              speciesId: 'sp_whale_shark',
+              occurrenceCount: 42,
+            ),
+          ],
+          unmatchedNames: ['Aplysina archeri'],
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(_harness(location, snapshot));
+    await tester.pumpAndSettle();
+
+    // Only the catalog match is actionable; the long tail has no local id to
+    // add, so it must not sprout a dead button.
+    expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
+  });
+
   testWidgets('renders nothing when no species were recorded nearby', (
     tester,
   ) async {
@@ -84,7 +182,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byType(ListTile), findsNothing);
+    expect(find.byType(Chip), findsNothing);
     expect(find.textContaining('Recorded nearby'), findsNothing);
   });
 

@@ -7341,6 +7341,8 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "附近记录",
   "reef_species_addToExpected": "添加到预期物种",
+  "reef_species_showAll": "显示全部 {count} 项",
+  "reef_species_showFewer": "显示较少",
   "reef_attribution_title": "珊瑚礁数据来源",
   "reef_attribution_wri": "珊瑚礁分布与威胁等级。CC BY 3.0。",
   "reef_attribution_noaa": "海表温度与白化热压力。公共领域。",

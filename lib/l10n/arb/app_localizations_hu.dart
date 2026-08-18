@@ -24299,6 +24299,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get reef_species_addToExpected => 'Hozzáadás a várható fajokhoz';
 
   @override
+  String reef_species_showAll(int count) {
+    return 'Mind a(z) $count megjelenítése';
+  }
+
+  @override
+  String get reef_species_showFewer => 'Kevesebb megjelenítése';
+
+  @override
   String get reef_attribution_title => 'Zátony adatforrásai';
 
   @override
