@@ -729,7 +729,6 @@ class SyncService {
         recordsFailed: recordsFailed,
         skippedPeerDeviceIds: pullResult.skippedPeerDeviceIds,
         newerSchemaPeerDeviceIds: pullResult.newerSchemaPeerDeviceIds,
-        newerSchemaPeerNames: pullResult.newerSchemaPeerNames,
         adoptedFreshIdentity: adoptedFreshIdentity,
       );
       final resultMessage = resultMessages.isEmpty
