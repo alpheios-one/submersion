@@ -159,9 +159,14 @@ worth it. Recorded here so it is not rediscovered as a bug.
 ## Site editor
 
 Both fields render as `EnumPickerRow<EntryMethod>` in
-`lib/features/dive_sites/presentation/widgets/edit_sections/access_safety_section.dart`,
-using that section's existing generic `mergeExtras: (String key)` callback
-rather than adding per-field parameters.
+`lib/features/dive_sites/presentation/widgets/edit_sections/access_safety_section.dart`.
+
+They take **dedicated** `entryMethodExtras` / `exitMethodExtras` parameters,
+mirroring `DiveInfoSection.waterTypeExtras`. They must not reuse the section's
+generic `mergeExtras: (String key)` callback: that callback resolves through
+`_mergeTextCandidates[key]` and cycles via `_cycleTextField(key)`
+(`site_edit_page.dart:678-691`), both of which are backed by
+`TextEditingController`s and would return null for an enum field.
 
 `_accessSummary()` (`site_edit_page.dart:779-789`) and its `isEmpty` gate at
 `:900` must include the new values, or the section collapses as empty when
@@ -265,9 +270,25 @@ produced. A site whose entry method is already set is never second-guessed.
 - UDDF site import gains an `entrytype` mapping into the new column, joining
   the existing `watertype` / `bodyofwater` / `difficulty` map in
   `uddf_full_import_service.dart`.
-- Once its readers are repointed, `SiteConditions`
-  (`dive_site.dart:225-254`) is deleted. It is never constructed anywhere in
-  `lib`.
+- Retiring `SiteConditions` (`dive_site.dart:225-254`) is a **separate,
+  independently rejectable final task**, because the class has three more dead
+  readers beyond `entryType`: `SiteField.typicalVisibility`,
+  `SiteField.typicalCurrent`, and `SiteField.bestSeason`
+  (`site_field.dart:517-525`). Those three enum members must be **kept** (saved
+  layouts reference them by name) with their extractors returning `null` and a
+  comment, before `DiveSite.conditions` and the class can be removed. The
+  feature does not depend on this task.
+
+### Bonus defect found while tracing
+
+The CSV and Excel site exporters read `site.conditions?.waterType` and
+`site.conditions?.typicalCurrent` (`csv_export_service.dart:230-231`,
+`excel_export_service.dart:315-316`), and the KML exporter does the same behind
+a null check (`kml_export_service.dart:227-243`). So the **Water Type** column
+in the CSV and Excel site exports is blank today as well: #624 repointed
+`site_field.dart` but not the exporters. `site.waterType` is real and populated.
+Repointing water type and typical current alongside entry method is a one-line
+change per exporter and is in scope.
 
 ## Localization
 
