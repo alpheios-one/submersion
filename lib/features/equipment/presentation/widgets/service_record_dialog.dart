@@ -246,6 +246,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
 
                 // Provider field
                 TextFormField(
+                  key: const Key('service-record-provider'),
                   controller: _providerController,
                   decoration: InputDecoration(
                     labelText:

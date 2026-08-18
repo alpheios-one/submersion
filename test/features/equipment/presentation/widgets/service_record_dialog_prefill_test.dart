@@ -42,6 +42,7 @@ void main() {
     double? scheduleCost,
     String? serviceKindId = 'scrubber-repack',
     ServiceRecord? existingRecord,
+    Future<void> Function(ServiceRecord)? onSave,
   }) async {
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
@@ -64,7 +65,7 @@ void main() {
               equipmentId: 'e1',
               serviceKindId: serviceKindId,
               existingRecord: existingRecord,
-              onSave: (record) async {},
+              onSave: onSave ?? (record) async {},
             ),
           ),
         ),
@@ -121,5 +122,97 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(costText(tester), '99');
+  });
+
+  group('save path', () {
+    testWidgets('builds a record with trimmed provider and resolved currency', (
+      tester,
+    ) async {
+      ServiceRecord? saved;
+      await pumpDialog(tester, kindCost: 60, onSave: (r) async => saved = r);
+
+      await tester.enterText(
+        find.byKey(const Key('service-record-provider')),
+        '  DiveShop Bonn  ',
+      );
+      await tester.enterText(find.byKey(costFieldKey), '75');
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      expect(saved, isNotNull);
+      expect(saved!.provider, 'DiveShop Bonn');
+      expect(saved!.cost, 75);
+      expect(saved!.serviceKindId, 'scrubber-repack');
+      // Currency came from the kind, upper-cased and never left blank: the
+      // column is NOT NULL.
+      expect(saved!.currency, 'EUR');
+    });
+
+    testWidgets('an empty provider is stored as null, not an empty string', (
+      tester,
+    ) async {
+      ServiceRecord? saved;
+      await pumpDialog(tester, onSave: (r) async => saved = r);
+
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      expect(saved!.provider, isNull);
+    });
+
+    testWidgets('a failing save surfaces the error and re-enables the form', (
+      tester,
+    ) async {
+      await pumpDialog(
+        tester,
+        onSave: (_) async => throw Exception('write failed'),
+      );
+
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('write failed'), findsOneWidget);
+      // Still open, so the diver can retry rather than losing the entry.
+      expect(find.text('Add Service Record'), findsOneWidget);
+    });
+
+    testWidgets('a negative cost fails validation and blocks the save', (
+      tester,
+    ) async {
+      ServiceRecord? saved;
+      await pumpDialog(tester, onSave: (r) async => saved = r);
+
+      await tester.enterText(find.byKey(costFieldKey), '-1');
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      expect(saved, isNull);
+    });
+
+    testWidgets('the next service due date can be cleared', (tester) async {
+      ServiceRecord? saved;
+      final existing = ServiceRecord(
+        id: 'r1',
+        equipmentId: 'e1',
+        serviceType: ServiceType.cleaning,
+        serviceKindId: 'scrubber-repack',
+        serviceDate: t0,
+        nextServiceDue: DateTime(2026, 6, 14),
+        createdAt: t0,
+        updatedAt: t0,
+      );
+      await pumpDialog(
+        tester,
+        existingRecord: existing,
+        onSave: (r) async => saved = r,
+      );
+
+      await tester.tap(find.byIcon(Icons.clear).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Update'));
+      await tester.pumpAndSettle();
+
+      expect(saved!.nextServiceDue, isNull);
+    });
   });
 }

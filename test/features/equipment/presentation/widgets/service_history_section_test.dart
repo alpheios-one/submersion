@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/services/export/excel/maintenance_excel_export_service.dart';
+import 'package:submersion/core/services/export/export_service.dart'
+    hide ServiceRecord;
+import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/settings/presentation/providers/export_providers.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
 import 'package:submersion/features/equipment/domain/entities/service_record.dart';
@@ -51,6 +57,11 @@ void main() {
     required List<ServiceKind> kinds,
     Locale locale = const Locale('en'),
     Size surface = const Size(600, 1200),
+    Map<String, double> totals = const {},
+    AsyncValue<List<ServiceRecord>>? recordsState,
+    _MockServiceRecordNotifier? notifier,
+    _FakeExportService? exportService,
+    bool settle = true,
   }) async {
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = surface;
@@ -65,12 +76,24 @@ void main() {
         overrides: [
           ...overrides,
           serviceKindsProvider.overrideWith((ref) async => kinds),
-          serviceRecordNotifierProvider(
-            equipmentId,
-          ).overrideWith((ref) => _MockServiceRecordNotifier(records)),
+          serviceRecordNotifierProvider(equipmentId).overrideWith(
+            (ref) =>
+                notifier ??
+                _MockServiceRecordNotifier(records, state: recordsState),
+          ),
           serviceRecordTotalCostProvider(
             equipmentId,
-          ).overrideWith((ref) async => <String, double>{}),
+          ).overrideWith((ref) async => totals),
+          equipmentItemProvider(equipmentId).overrideWith(
+            (ref) async => const EquipmentItem(
+              id: equipmentId,
+              name: 'JJ-CCR',
+              type: EquipmentType.rebreather,
+            ),
+          ),
+          exportServiceProvider.overrideWithValue(
+            exportService ?? _FakeExportService(),
+          ),
         ].cast(),
         child: MaterialApp(
           locale: locale,
@@ -84,7 +107,7 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    if (settle) await tester.pumpAndSettle();
   }
 
   testWidgets('row titles with the maintenance task name', (tester) async {
@@ -232,13 +255,350 @@ void main() {
     expect(find.text('Save to File'), findsOneWidget);
     expect(find.text('Share'), findsOneWidget);
   });
+
+  group('totals, states and icons', () {
+    testWidgets('renders one total row per currency', (tester) async {
+      await pumpSection(
+        tester,
+        records: [record(id: 'r1', kindId: 'disinfect', cost: 45)],
+        kinds: [kind('disinfect', 'Disinfect')],
+        totals: const {'EUR': 45.0, 'USD': 12.0},
+      );
+
+      // Mixed currencies never sum into one figure.
+      expect(find.textContaining('45'), findsWidgets);
+      expect(find.textContaining('12'), findsWidgets);
+      expect(find.text('Total Service Cost'), findsNWidgets(2));
+    });
+
+    testWidgets('a zero total is not shown at all', (tester) async {
+      await pumpSection(
+        tester,
+        records: [record(id: 'r1', kindId: 'disinfect')],
+        kinds: [kind('disinfect', 'Disinfect')],
+        totals: const {'EUR': 0.0},
+      );
+
+      expect(find.text('Total Service Cost'), findsNothing);
+    });
+
+    testWidgets('shows a spinner while records load', (tester) async {
+      await pumpSection(
+        tester,
+        records: const [],
+        kinds: const [],
+        recordsState: const AsyncValue.loading(),
+        settle: false,
+      );
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    });
+
+    testWidgets('shows the error message when records fail to load', (
+      tester,
+    ) async {
+      await pumpSection(
+        tester,
+        records: const [],
+        kinds: const [],
+        recordsState: const AsyncValue.error('boom', StackTrace.empty),
+      );
+
+      expect(find.textContaining('boom'), findsOneWidget);
+    });
+
+    testWidgets('every service type renders its own avatar icon', (
+      tester,
+    ) async {
+      await pumpSection(
+        tester,
+        records: [
+          for (var i = 0; i < ServiceType.values.length; i++)
+            record(
+              id: 'r$i',
+              type: ServiceType.values[i],
+              date: DateTime(2026, 1, i + 1),
+            ),
+        ],
+        kinds: const [],
+      );
+
+      // One avatar per record, and the switch covers every enum value without
+      // falling through to a shared default.
+      expect(
+        find.byType(CircleAvatar),
+        findsNWidgets(ServiceType.values.length),
+      );
+    });
+  });
+
+  group('record actions', () {
+    testWidgets('Add opens the record dialog', (tester) async {
+      await pumpSection(
+        tester,
+        records: [record(id: 'r1', kindId: 'disinfect')],
+        kinds: [kind('disinfect', 'Disinfect')],
+      );
+
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Add Service Record'), findsOneWidget);
+    });
+
+    testWidgets('tapping a row opens the dialog in edit mode', (tester) async {
+      await pumpSection(
+        tester,
+        records: [record(id: 'r1', kindId: 'disinfect')],
+        kinds: [kind('disinfect', 'Disinfect')],
+      );
+
+      await tester.tap(find.text('Disinfect'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Edit Service Record'), findsOneWidget);
+    });
+
+    testWidgets('the row menu offers edit and delete', (tester) async {
+      await pumpSection(
+        tester,
+        records: [record(id: 'r1', kindId: 'disinfect')],
+        kinds: [kind('disinfect', 'Disinfect')],
+      );
+
+      await tester.tap(find.byIcon(Icons.more_vert).last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Edit'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Edit Service Record'), findsOneWidget);
+    });
+
+    testWidgets('deleting asks for confirmation and can be cancelled', (
+      tester,
+    ) async {
+      final notifier = _MockServiceRecordNotifier([
+        record(id: 'r1', kindId: 'disinfect'),
+      ]);
+      await pumpSection(
+        tester,
+        records: const [],
+        kinds: [kind('disinfect', 'Disinfect')],
+        notifier: notifier,
+      );
+
+      await tester.tap(find.byIcon(Icons.more_vert).last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Delete Service Record?'), findsOneWidget);
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(notifier.deletedIds, isEmpty);
+    });
+
+    testWidgets('confirming a delete removes the record', (tester) async {
+      final notifier = _MockServiceRecordNotifier([
+        record(id: 'r1', kindId: 'disinfect'),
+      ]);
+      await pumpSection(
+        tester,
+        records: const [],
+        kinds: [kind('disinfect', 'Disinfect')],
+        notifier: notifier,
+      );
+
+      await tester.tap(find.byIcon(Icons.more_vert).last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await tester.pumpAndSettle();
+
+      expect(notifier.deletedIds, ['r1']);
+      expect(find.text('Service record deleted'), findsOneWidget);
+    });
+  });
+
+  group('filter summary', () {
+    testWidgets('an active filter reports the count and can be cleared', (
+      tester,
+    ) async {
+      await pumpSection(
+        tester,
+        records: [
+          record(id: 'r1', kindId: 'disinfect'),
+          record(id: 'r2', kindId: 'scrubber-repack'),
+        ],
+        kinds: [
+          kind('disinfect', 'Disinfect'),
+          kind('scrubber-repack', 'Scrubber repack'),
+        ],
+      );
+
+      await tester.tap(find.text('All tasks'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Disinfect').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('1 of 2 shown'), findsOneWidget);
+
+      await tester.tap(find.text('Clear filter'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Scrubber repack'), findsOneWidget);
+      expect(find.text('1 of 2 shown'), findsNothing);
+    });
+
+    testWidgets('untagged records get their own bucket', (tester) async {
+      await pumpSection(
+        tester,
+        records: [
+          record(id: 'r1', kindId: 'disinfect'),
+          record(id: 'r2'),
+          record(id: 'r3', kindId: 'scrubber-repack'),
+        ],
+        kinds: [
+          kind('disinfect', 'Disinfect'),
+          kind('scrubber-repack', 'Scrubber repack'),
+        ],
+      );
+
+      await tester.tap(find.text('All tasks'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Not tied to a clock').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('1 of 3 shown'), findsOneWidget);
+      expect(find.text('Disinfect'), findsNothing);
+    });
+  });
+
+  group('item-level export', () {
+    testWidgets('sharing exports the filtered rows with resolved names', (
+      tester,
+    ) async {
+      final fake = _FakeExportService();
+      await pumpSection(
+        tester,
+        records: [
+          record(id: 'r1', kindId: 'disinfect'),
+          record(id: 'r2', kindId: 'scrubber-repack'),
+        ],
+        kinds: [
+          kind('disinfect', 'Disinfect'),
+          kind('scrubber-repack', 'Scrubber repack'),
+        ],
+        exportService: fake,
+      );
+
+      // Narrow first: the export must follow what is on screen.
+      await tester.tap(find.text('All tasks'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Disinfect').last);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('service-history-overflow')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Export maintenance log'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Share'));
+      await tester.pumpAndSettle();
+
+      expect(fake.sharedRows, hasLength(1));
+      expect(fake.sharedRows.single.taskName, 'Disinfect');
+      expect(fake.sharedRows.single.equipmentName, 'JJ-CCR');
+      expect(fake.savedRows, isEmpty);
+    });
+
+    testWidgets('choosing Save to File takes the save path', (tester) async {
+      final fake = _FakeExportService();
+      await pumpSection(
+        tester,
+        records: [record(id: 'r1', kindId: 'disinfect')],
+        kinds: [kind('disinfect', 'Disinfect')],
+        exportService: fake,
+      );
+
+      await tester.tap(find.byKey(const Key('service-history-overflow')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Export maintenance log'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Save to File'));
+      await tester.pumpAndSettle();
+
+      expect(fake.savedRows, hasLength(1));
+      expect(fake.sharedRows, isEmpty);
+    });
+
+    testWidgets('dismissing the destination sheet exports nothing', (
+      tester,
+    ) async {
+      final fake = _FakeExportService();
+      await pumpSection(
+        tester,
+        records: [record(id: 'r1', kindId: 'disinfect')],
+        kinds: [kind('disinfect', 'Disinfect')],
+        exportService: fake,
+      );
+
+      await tester.tap(find.byKey(const Key('service-history-overflow')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Export maintenance log'));
+      await tester.pumpAndSettle();
+      // Tap the barrier to dismiss without choosing.
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+
+      expect(fake.sharedRows, isEmpty);
+      expect(fake.savedRows, isEmpty);
+    });
+  });
 }
 
 class _MockServiceRecordNotifier
     extends StateNotifier<AsyncValue<List<ServiceRecord>>>
     implements ServiceRecordNotifier {
-  _MockServiceRecordNotifier(List<ServiceRecord> records)
-    : super(AsyncValue.data(records));
+  final List<String> deletedIds = [];
+
+  _MockServiceRecordNotifier(
+    List<ServiceRecord> records, {
+    AsyncValue<List<ServiceRecord>>? state,
+  }) : super(state ?? AsyncValue.data(records));
+
+  @override
+  Future<void> deleteRecord(String id) async => deletedIds.add(id);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
+}
+
+/// Captures the rows handed to the export facade, so the item-level export can
+/// be asserted without touching the filesystem or a share sheet.
+class _FakeExportService implements ExportService {
+  List<MaintenanceLogRow> sharedRows = const [];
+  List<MaintenanceLogRow> savedRows = const [];
+
+  @override
+  Future<String> exportMaintenanceLog({
+    required List<MaintenanceLogRow> rows,
+    required DateFormatPreference dateFormat,
+  }) async {
+    sharedRows = rows;
+    return '/tmp/shared.xlsx';
+  }
+
+  @override
+  Future<String?> saveMaintenanceLogToFile({
+    required List<MaintenanceLogRow> rows,
+    required DateFormatPreference dateFormat,
+  }) async {
+    savedRows = rows;
+    return '/tmp/saved.xlsx';
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;

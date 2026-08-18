@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/export/excel/maintenance_excel_export_service.dart';
+import 'package:submersion/features/settings/presentation/providers/export_providers.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/domain/entities/service_record.dart';
@@ -260,9 +261,11 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
     );
     if (destination == null || !context.mounted) return;
 
-    final item = ref.read(equipmentItemProvider(equipmentId)).valueOrNull;
-    final kinds =
-        ref.read(serviceKindsProvider).valueOrNull ?? const <ServiceKind>[];
+    // Awaited rather than read as a snapshot: this section does not watch
+    // either provider, so a plain read returns AsyncLoading and the workbook
+    // would carry a blank equipment name and task column.
+    final item = await ref.read(equipmentItemProvider(equipmentId).future);
+    final kinds = await ref.read(serviceKindsProvider.future);
     final kindsById = {for (final k in kinds) k.id: k};
     final dateFormat = ref.read(settingsProvider).dateFormat;
 
@@ -277,13 +280,18 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
         ),
     ];
 
-    final service = MaintenanceExcelExportService();
+    // Through the injectable facade rather than a bare constructor, so this
+    // path is overridable in tests like every other export surface.
+    final service = ref.read(exportServiceProvider);
     // No progress dialog around the save path: the native save panel must not
     // open while a modal route is up.
     if (destination == ExportDestination.share) {
-      await service.exportToExcel(rows: rows, dateFormat: dateFormat);
+      await service.exportMaintenanceLog(rows: rows, dateFormat: dateFormat);
     } else {
-      await service.saveToFile(rows: rows, dateFormat: dateFormat);
+      await service.saveMaintenanceLogToFile(
+        rows: rows,
+        dateFormat: dateFormat,
+      );
     }
   }
 

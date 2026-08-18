@@ -715,7 +715,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
         return;
       }
       final settings = _ref.read(settingsProvider);
-      final path = await MaintenanceExcelExportService().exportToExcel(
+      final path = await _exportService.exportMaintenanceLog(
         rows: rows,
         dateFormat: settings.dateFormat,
       );
@@ -751,7 +751,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
       state = state.copyWith(
         message: _l10n.settings_export_progress_chooseLocation,
       );
-      final path = await MaintenanceExcelExportService().saveToFile(
+      final path = await _exportService.saveMaintenanceLogToFile(
         rows: rows,
         dateFormat: settings.dateFormat,
       );

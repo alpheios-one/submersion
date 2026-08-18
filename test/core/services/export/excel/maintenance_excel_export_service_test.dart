@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:excel_community/excel_community.dart' as xl;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -5,6 +7,8 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/services/export/excel/maintenance_excel_export_service.dart';
 import 'package:submersion/features/equipment/domain/entities/service_record.dart';
+
+import '../../../../helpers/mock_file_picker_platform.dart';
 
 void main() {
   late MaintenanceExcelExportService service;
@@ -129,5 +133,57 @@ void main() {
       contains(MaintenanceExcelExportService.maintenanceSheet),
     );
     expect(decoded.tables.keys, isNot(contains('Sheet1')));
+  });
+
+  group('delivery paths', () {
+    late MockFilePickerPlatform picker;
+    late Directory tmp;
+
+    setUp(() {
+      picker = MockFilePickerPlatform();
+      FilePickerPlatform.instance = picker;
+      tmp = Directory.systemTemp.createTempSync('maintenance_export');
+    });
+
+    tearDown(() {
+      if (tmp.existsSync()) tmp.deleteSync(recursive: true);
+    });
+
+    test(
+      'saveToFile writes a dated workbook and returns its location',
+      () async {
+        final target = File('${tmp.path}/log.xlsx');
+        picker.saveFileResult = Uri.file(target.path);
+
+        final path = await service.saveToFile(
+          rows: [row()],
+          dateFormat: DateFormatPreference.yyyymmdd,
+        );
+
+        expect(path, isNotNull);
+        expect(target.existsSync(), isTrue);
+        expect(picker.lastSavedFileName, startsWith('submersion_maintenance_'));
+        expect(picker.lastSavedFileName, endsWith('.xlsx'));
+        // The bytes the picker was handed are the workbook, not an empty stub.
+        final decoded = xl.Excel.decodeBytes(picker.lastSavedBytes!);
+        expect(
+          decoded.tables.keys,
+          contains(MaintenanceExcelExportService.maintenanceSheet),
+        );
+      },
+    );
+
+    test('saveToFile returns null when the diver cancels', () async {
+      // The real plugin returns null on dismiss; callers must treat that as a
+      // no-op rather than as a successful export.
+      picker.saveFileResult = null;
+
+      final path = await service.saveToFile(
+        rows: [row()],
+        dateFormat: DateFormatPreference.yyyymmdd,
+      );
+
+      expect(path, isNull);
+    });
   });
 }

@@ -64,4 +64,44 @@ void main() {
     expect(filter.copyWith(serviceKindId: null).serviceKindId, isNull);
     expect(filter.copyWith(serviceKindId: null).isActive, isFalse);
   });
+
+  test('equality covers every dimension', () {
+    // The section rebuilds on filter changes, so two filters differing in any
+    // one dimension must not compare equal.
+    const base = MaintenanceHistoryFilter(
+      serviceKindId: 'disinfect',
+      serviceType: ServiceType.cleaning,
+      year: 2026,
+    );
+
+    expect(
+      base,
+      const MaintenanceHistoryFilter(
+        serviceKindId: 'disinfect',
+        serviceType: ServiceType.cleaning,
+        year: 2026,
+      ),
+    );
+    expect(base, isNot(base.copyWith()));
+    expect(
+      base,
+      isNot(
+        const MaintenanceHistoryFilter(
+          serviceKindId: 'disinfect',
+          serviceType: ServiceType.repair,
+          year: 2026,
+        ),
+      ),
+    );
+    expect(
+      base,
+      isNot(
+        const MaintenanceHistoryFilter(
+          serviceKindId: 'disinfect',
+          serviceType: ServiceType.cleaning,
+          year: 2025,
+        ),
+      ),
+    );
+  });
 }
