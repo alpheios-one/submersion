@@ -389,10 +389,33 @@ class DiveMergeService {
 
       // 10. Data sources carried as provenance; NEVER primary (a merged
       //     profile is user-authored -- reparse must not rewrite it).
+      //     CAVEAT (#1164): isPrimary false only stops reparse from
+      //     rewriting the dives row and tanks. ReparseService step 4 calls
+      //     _replaceDiveProfiles unconditionally, so re-parsing a merged
+      //     dive today still wipes the merged profile. Tracked separately.
       // saveComputerReading (dive_repository_impl.dart:4437) does not call
       // markRecordPending for diveDataSources rows either -- it relies on
       // the parent dive's pending record (step 1) to carry the change, so
       // no per-row markRecordPending here mirrors that.
+      //
+      // EVERY row is carried, including several sharing one computerId --
+      // the shape a same-computer split-pair merge produces. Do NOT collapse
+      // them here (#1045): rows that share a computerId are not duplicates.
+      // Each is the sole surviving copy of one download's rawData,
+      // rawFingerprint and sourceUuid once step 13 deletes the originals, and
+      // all three are load-bearing:
+      //   - getSourceKeysByDiveId unions source_uuid/raw_fingerprint across
+      //     ALL of a dive's rows so a re-download of EITHER half resolves as
+      //     a duplicate; dropping a row makes that half import as a new dive.
+      //   - ReparseService.getSourcesForDiveReparse selects on rawData, so a
+      //     dropped row's bytes can never be re-parsed by a later
+      //     libdivecomputer.
+      // The duplicate is a display-side concern only, and is canonicalized on
+      // read by _canonicalDataSourceRows (#1005). The underlying gap is that
+      // dive_profiles attributes samples by computerId alone, so computerId
+      // gets treated as a per-dive unique source key the schema never
+      // guaranteed -- fixing that needs a dive_profiles.data_source_id FK,
+      // not a lossy write here.
       for (final row in snapshot.dataSourceRows) {
         await _db
             .into(_db.diveDataSources)

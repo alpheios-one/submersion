@@ -730,6 +730,12 @@ class DiveRepository {
   /// and silently misroutes every profile point to whichever row is
   /// iterated last, and getDataSources shows a second, empty, selectable
   /// chip for the row that lost the collision.
+  ///
+  /// Canonicalizing on READ is deliberate, not a stopgap for a bad write
+  /// (#1045): the row that loses here still owns the only copy of its half's
+  /// rawData/rawFingerprint/sourceUuid, which reparse and the import
+  /// duplicate checker (getSourceKeysByDiveId) both read directly. It must
+  /// stay in the table -- only the display collapses it.
   List<DiveDataSourcesData> _canonicalDataSourceRows(
     List<DiveDataSourcesData> rows,
   ) {
