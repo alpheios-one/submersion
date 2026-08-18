@@ -3,7 +3,6 @@ package com.submersion.libdivecomputer
 import android.content.Context
 import android.hardware.usb.UsbManager
 import com.hoho.android.usbserial.driver.UsbSerialDriver
-import com.hoho.android.usbserial.driver.UsbSerialProber
 
 private const val RUNNER_LIBDC_TRANSPORT_SERIAL = 1 shl 0
 private const val RUNNER_LIBDC_STATUS_CANCELLED = -10
@@ -60,7 +59,10 @@ class SerialDownloadRunner(private val context: Context) {
     private fun runProbe(request: SerialDownloadRequest, session: Long, cb: IDiveDownloadCallback) {
         val usbManager = context.getSystemService(Context.USB_SERVICE) as? UsbManager
         val drivers: List<UsbSerialDriver> = usbManager?.let {
-            UsbSerialProber.getDefaultProber().findAllDrivers(it)
+            // Not getDefaultProber(): its table lists only stock bridge-chip
+            // identifiers, so a dive cable with a reprogrammed product ID is
+            // invisible (issue #732).
+            DiveCableIds.prober().findAllDrivers(it)
         } ?: emptyList()
 
         if (drivers.isEmpty()) {
