@@ -12,6 +12,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/environment_enum_display.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -93,6 +94,8 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
   double _rating = 0;
   SiteDifficulty? _difficulty;
   WaterType? _waterType;
+  EntryMethod? _entryMethod;
+  EntryMethod? _exitMethod;
   bool _isLoading = false;
   bool _isInitialized = false;
   bool _hasChanges = false;
@@ -272,6 +275,8 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     _rating = site.rating ?? 0;
     _difficulty = site.difficulty;
     _waterType = site.waterType;
+    _entryMethod = site.entryMethod;
+    _exitMethod = site.exitMethod;
     _isShared = site.isShared;
     _altitudeController.text = site.altitude != null
         ? _altitudeForInput(units.convertAltitude(site.altitude!))
@@ -779,6 +784,11 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
   String _accessSummary() => [
     if (_accessNotesController.text.trim().isNotEmpty)
       context.l10n.diveSites_edit_access_accessNotes_label,
+    if (_entryMethod != null) _entryMethod!.localizedName(context.l10n),
+    // Only when it differs, so the common mirrored case does not read
+    // "Boat Entry · Boat Entry".
+    if (_exitMethod != null && _exitMethod != _entryMethod)
+      _exitMethod!.localizedName(context.l10n),
     if (_mooringNumberController.text.trim().isNotEmpty)
       context.l10n.diveSites_edit_access_mooringNumber_label,
     if (_parkingInfoController.text.trim().isNotEmpty)
@@ -898,6 +908,16 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
             parkingInfoController: _parkingInfoController,
             hazardsController: _hazardsController,
             mergeExtras: widget.isMerging ? _mergeExtras : null,
+            entryMethod: _entryMethod,
+            exitMethod: _exitMethod,
+            onEntryMethodChanged: (value) => setState(() {
+              _entryMethod = value;
+              _hasChanges = true;
+            }),
+            onExitMethodChanged: (value) => setState(() {
+              _exitMethod = value;
+              _hasChanges = true;
+            }),
           ),
           LifeNotesSection(
             expanded: _siteSectionExpanded('life'),
@@ -1418,6 +1438,8 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
             : _parkingInfoController.text.trim(),
         altitude: altitudeMeters,
         waterType: _waterType,
+        entryMethod: _entryMethod,
+        exitMethod: _exitMethod,
         isShared: _isShared,
       );
 
