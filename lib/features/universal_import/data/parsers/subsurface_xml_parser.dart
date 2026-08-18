@@ -10,6 +10,7 @@ import 'package:submersion/features/universal_import/data/models/import_options.
 import 'package:submersion/features/universal_import/data/models/import_payload.dart';
 import 'package:submersion/features/universal_import/data/models/import_warning.dart';
 import 'package:submersion/features/universal_import/data/parsers/import_parser.dart';
+import 'package:submersion/features/universal_import/data/parsers/subsurface/subsurface_site_folder.dart';
 
 /// Parser for Subsurface XML (.ssrf) dive log files.
 ///
@@ -71,16 +72,17 @@ class SubsurfaceXmlParser implements ImportParser {
       );
     }
 
-    // Parse sites and build lookup map
-    final siteMap = <String, Map<String, dynamic>>{};
+    // Parse sites, folding the duplicates a Subsurface logbook accumulates.
+    // The aliases the fold produces redirect each dive's divesiteid to the
+    // surviving site.
+    var siteAliases = const <String, String>{};
     final divesitesElement = root.findElements('divesites').firstOrNull;
     if (divesitesElement != null) {
-      final sites = _parseSites(divesitesElement);
-      for (final site in sites) {
-        final id = site['uddfId'] as String?;
-        if (id != null) siteMap[id] = site;
+      final folded = foldSubsurfaceSites(_parseSites(divesitesElement));
+      siteAliases = folded.aliases;
+      if (folded.sites.isNotEmpty) {
+        entities[ImportEntityType.sites] = folded.sites;
       }
-      if (sites.isNotEmpty) entities[ImportEntityType.sites] = sites;
     }
 
     // Parse dives (with trip support)
@@ -100,7 +102,7 @@ class SubsurfaceXmlParser implements ImportParser {
         final tripDives = <Map<String, dynamic>>[];
         for (final diveElement in tripElement.findElements('dive')) {
           try {
-            final diveData = _parseDive(diveElement, siteMap: siteMap);
+            final diveData = _parseDive(diveElement, siteAliases: siteAliases);
             if (diveData != null) {
               diveData['tripRef'] = tripId;
               _collectTags(diveElement, diveData, allTags);
@@ -134,7 +136,7 @@ class SubsurfaceXmlParser implements ImportParser {
       // Process standalone dives (not inside a trip)
       for (final diveElement in divesElement.findElements('dive')) {
         try {
-          final diveData = _parseDive(diveElement, siteMap: siteMap);
+          final diveData = _parseDive(diveElement, siteAliases: siteAliases);
           if (diveData != null) {
             _collectTags(diveElement, diveData, allTags);
             _collectBuddies(diveElement, diveData, allBuddies);
@@ -170,7 +172,7 @@ class SubsurfaceXmlParser implements ImportParser {
 
   Map<String, dynamic>? _parseDive(
     XmlElement dive, {
-    Map<String, Map<String, dynamic>> siteMap = const {},
+    Map<String, String> siteAliases = const {},
   }) {
     final dateStr = dive.getAttribute('date');
     final timeStr = dive.getAttribute('time');
@@ -287,10 +289,11 @@ class SubsurfaceXmlParser implements ImportParser {
     }
     if (notesParts.isNotEmpty) result['notes'] = notesParts.join('\n');
 
-    // Site linking via divesiteid attribute
+    // Site linking via divesiteid attribute, redirected to the surviving site
+    // when the referenced entry folded into a duplicate.
     final siteId = dive.getAttribute('divesiteid')?.trim();
     if (siteId != null && siteId.isNotEmpty) {
-      result['site'] = {'uddfId': siteId};
+      result['site'] = {'uddfId': siteAliases[siteId] ?? siteId};
     }
 
     // Profile samples — parsed before cylinders for pressure fallback
@@ -328,23 +331,26 @@ class SubsurfaceXmlParser implements ImportParser {
     return result;
   }
 
+  /// Reads every `<site>` verbatim, including the ones Subsurface left
+  /// unnamed. Deciding which of these are the same place is the folder's job:
+  /// dropping an unnamed site here would strand its dives with no coordinates
+  /// at all, which is how imported dives used to lose their location.
   List<Map<String, dynamic>> _parseSites(XmlElement divesites) {
     final sites = <Map<String, dynamic>>[];
     for (final site in divesites.findElements('site')) {
+      final siteData = <String, dynamic>{};
       final name = site.getAttribute('name');
-      if (name == null || name.isEmpty) continue;
-      final siteData = <String, dynamic>{'name': name};
+      if (name != null && name.trim().isNotEmpty) siteData['name'] = name;
       final uuid = site.getAttribute('uuid')?.trim();
       if (uuid != null) siteData['uddfId'] = uuid;
-      final gps = site.getAttribute('gps');
-      if (gps != null) {
-        final parts = gps.trim().split(RegExp(r'\s+'));
-        if (parts.length == 2) {
-          final lat = double.tryParse(parts[0].trim());
-          final lon = double.tryParse(parts[1].trim());
-          if (lat != null) siteData['latitude'] = lat;
-          if (lon != null) siteData['longitude'] = lon;
-        }
+      final coordinates = _parseGps(site.getAttribute('gps'));
+      if (coordinates != null) {
+        siteData['latitude'] = coordinates.$1;
+        siteData['longitude'] = coordinates.$2;
+      }
+      final description = site.getAttribute('description');
+      if (description != null && description.trim().isNotEmpty) {
+        siteData['description'] = description.trim();
       }
       for (final geo in site.findElements('geo')) {
         final cat = geo.getAttribute('cat');
@@ -360,6 +366,23 @@ class SubsurfaceXmlParser implements ImportParser {
       sites.add(siteData);
     }
     return sites;
+  }
+
+  /// Parses a Subsurface `gps` attribute: two decimal degrees separated by
+  /// whitespace or a comma, the same pair of separators Subsurface's own
+  /// `parse_location()` accepts.
+  ///
+  /// A pair that is short, unparseable, or off the globe yields null rather
+  /// than a half-set or nonsensical coordinate.
+  (double, double)? _parseGps(String? raw) {
+    if (raw == null) return null;
+    final parts = raw.trim().split(RegExp(r'[\s,]+'));
+    if (parts.length != 2) return null;
+    final lat = double.tryParse(parts[0]);
+    final lon = double.tryParse(parts[1]);
+    if (lat == null || lon == null) return null;
+    if (lat.abs() > 90 || lon.abs() > 180) return null;
+    return (lat, lon);
   }
 
   Map<String, dynamic> _parseTrip(XmlElement trip) {
