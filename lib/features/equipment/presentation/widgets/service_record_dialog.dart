@@ -54,6 +54,11 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   /// changes and re-resolves.
   bool _costTouched = false;
 
+  /// The same guard for the currency, tracked separately: the two fields are
+  /// edited independently, so typing a price must not forfeit a currency the
+  /// diver picked, and vice versa.
+  bool _currencyTouched = false;
+
   /// The code this dialog opened with: the record's stored currency when
   /// editing, the diver's default for a new record. Currency is free text, so
   /// this can be outside the presets; keeping it lets the dropdown offer it.
@@ -114,19 +119,39 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
     List<ServiceKind> kinds,
     List<ServiceSchedule> schedules,
   ) {
-    if (isEditing || _costTouched) return;
+    if (isEditing) return;
     final resolved = resolveDefaultServiceCost(
       serviceKindId: _serviceKindId,
       schedules: schedules,
       kinds: kinds,
     );
-    final text = resolved.cost == null
-        ? ''
-        : formatDecimalForInput(resolved.cost!);
-    if (_costController.text != text) _costController.text = text;
-    if (resolved.currency != null) {
-      _currencyController.text = resolved.currency!;
+    if (!_costTouched) {
+      final text = resolved.cost == null
+          ? ''
+          : formatDecimalForInput(resolved.cost!);
+      if (_costController.text != text) _costController.text = text;
     }
+    // Guarded on its own flag: this runs on every build, so without it any
+    // later setState (changing the type, date or clock) would silently revert
+    // a currency the diver had already chosen.
+    if (!_currencyTouched && resolved.currency != null) {
+      if (_currencyController.text != resolved.currency) {
+        _currencyController.text = resolved.currency!;
+      }
+    }
+  }
+
+  /// Codes the currency dropdown offers.
+  ///
+  /// [currencyCodesWith] leads with one code outside the presets; the live
+  /// value is added too, because a default resolved from a kind or schedule
+  /// can be an ISO code the presets do not carry, and it must remain visible
+  /// and re-selectable rather than silently missing from the list.
+  List<String> _currencyOptions() {
+    final codes = currencyCodesWith(_initialCurrencyCode);
+    final live = _currencyController.text.trim().toUpperCase();
+    if (live.isEmpty || codes.contains(live)) return codes;
+    return [live, ...codes];
   }
 
   @override
@@ -312,10 +337,9 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
                         label: Text(
                           context.l10n.equipment_serviceDialog_currencyLabel,
                         ),
+                        onSelected: (_) => _currencyTouched = true,
                         dropdownMenuEntries: [
-                          for (final code in currencyCodesWith(
-                            _initialCurrencyCode,
-                          ))
+                          for (final code in _currencyOptions())
                             DropdownMenuEntry(
                               value: code,
                               label: code,
@@ -426,11 +450,17 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   }
 
   Future<void> _pickNextServiceDate() async {
+    // firstDate deliberately reaches into the past, matching the service-date
+    // picker. A next-due date that has already passed is normal data rather
+    // than a corrupt state -- ServiceRecord.isOverdue exists for exactly that,
+    // and a diver back-filling an old service enters one directly. Pinning
+    // firstDate to today made an overdue record's initialDate precede it,
+    // which trips showDatePicker's assert and crashes the picker.
     final picked = await showAppDatePicker(
       context: context,
       initialDate:
           _nextServiceDue ?? DateTime.now().add(const Duration(days: 365)),
-      firstDate: DateTime.now(),
+      firstDate: DateTime(1950),
       lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
     );
     if (picked != null) {

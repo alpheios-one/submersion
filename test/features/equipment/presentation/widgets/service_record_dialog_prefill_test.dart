@@ -17,6 +17,11 @@ const costFieldKey = Key('service-record-cost');
 void main() {
   final t0 = DateTime(2026, 1, 1);
 
+  String currencyText(WidgetTester tester) => tester
+      .widget<DropdownMenu<String>>(find.byType(DropdownMenu<String>))
+      .controller!
+      .text;
+
   ServiceKind kind({double? cost, String? currency}) => ServiceKind(
     id: 'scrubber-repack',
     name: 'Scrubber repack',
@@ -39,6 +44,7 @@ void main() {
   Future<void> pumpDialog(
     WidgetTester tester, {
     double? kindCost,
+    String kindCurrency = 'EUR',
     double? scheduleCost,
     String? serviceKindId = 'scrubber-repack',
     ServiceRecord? existingRecord,
@@ -50,7 +56,7 @@ void main() {
         overrides: [
           ...overrides,
           serviceKindsProvider.overrideWith(
-            (ref) async => [kind(cost: kindCost, currency: 'EUR')],
+            (ref) async => [kind(cost: kindCost, currency: kindCurrency)],
           ),
           serviceSchedulesForEquipmentProvider(
             'e1',
@@ -213,6 +219,98 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(saved!.nextServiceDue, isNull);
+    });
+  });
+
+  group('next service due picker', () {
+    testWidgets('opens for a record whose next due date has already passed', (
+      tester,
+    ) async {
+      // A next-due date in the past is normal data, not a corrupt state:
+      // ServiceRecord.isOverdue exists precisely for it. The picker must open
+      // for such a record rather than assert that initialDate < firstDate.
+      final overdue = ServiceRecord(
+        id: 'r1',
+        equipmentId: 'e1',
+        serviceType: ServiceType.cleaning,
+        serviceKindId: 'scrubber-repack',
+        serviceDate: DateTime(2024, 1, 10),
+        nextServiceDue: DateTime(2024, 7, 10),
+        createdAt: t0,
+        updatedAt: t0,
+      );
+      await pumpDialog(tester, existingRecord: overdue);
+
+      await tester.tap(find.byIcon(Icons.event));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(DatePickerDialog), findsOneWidget);
+    });
+
+    testWidgets('a past due date can be edited and saved', (tester) async {
+      ServiceRecord? saved;
+      final overdue = ServiceRecord(
+        id: 'r1',
+        equipmentId: 'e1',
+        serviceType: ServiceType.cleaning,
+        serviceKindId: 'scrubber-repack',
+        serviceDate: DateTime(2024, 1, 10),
+        nextServiceDue: DateTime(2024, 7, 10),
+        createdAt: t0,
+        updatedAt: t0,
+      );
+      await pumpDialog(
+        tester,
+        existingRecord: overdue,
+        onSave: (r) async => saved = r,
+      );
+
+      await tester.tap(find.byIcon(Icons.event));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Update'));
+      await tester.pumpAndSettle();
+
+      expect(saved!.nextServiceDue, DateTime(2024, 7, 10));
+    });
+  });
+
+  group('currency prefill', () {
+    testWidgets('a chosen currency survives a later rebuild', (tester) async {
+      // _maybePrefillCost runs on every build. Without its own touched flag it
+      // reverted the currency to the resolved default on any setState.
+      await pumpDialog(tester, kindCost: 60, kindCurrency: 'EUR');
+
+      await tester.tap(find.byType(DropdownMenu<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('GBP').last);
+      await tester.pumpAndSettle();
+
+      // Force a real rebuild: the service-type dropdown calls setState, which
+      // typing into a TextFormField does not.
+      await tester.tap(find.byType(DropdownButtonFormField<ServiceType>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Repair').last);
+      await tester.pumpAndSettle();
+
+      expect(currencyText(tester), 'GBP');
+    });
+
+    testWidgets('a resolved code outside the presets stays selectable', (
+      tester,
+    ) async {
+      // currencyCodesWith only leads with the STORED code, so a default
+      // resolved from a kind could otherwise be missing from the menu.
+      await pumpDialog(tester, kindCost: 60, kindCurrency: 'ISK');
+
+      expect(currencyText(tester), 'ISK');
+
+      await tester.tap(find.byType(DropdownMenu<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('ISK'), findsWidgets);
     });
   });
 }

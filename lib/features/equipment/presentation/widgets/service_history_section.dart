@@ -143,7 +143,7 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
 
                 return Column(
                   children: [
-                    if (_showFilterBar(records))
+                    if (_showFilterBar(records, kindsById))
                       _buildFilterBar(context, records, kindsById),
                     // Total cost summary, one row per currency: a history
                     // priced in more than one currency has no single total.
@@ -298,9 +298,20 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
   /// Options come from the records themselves, so a diver never sees a task
   /// they have never logged and every option yields at least one row.
   /// The leading null is the "All" entry.
-  List<String?> _taskOptions(List<ServiceRecord> records) {
+  /// Sorted by the NAME shown, not the id: custom kind ids are uuids, so
+  /// sorting by id puts the dropdown in an order that looks random to the
+  /// diver even though the labels are task names.
+  List<String?> _taskOptions(
+    List<ServiceRecord> records,
+    Map<String, ServiceKind> kindsById,
+  ) {
     final ids = <String?>{for (final r in records) r.serviceKindId};
-    final tagged = ids.whereType<String>().toList()..sort();
+    final tagged = ids.whereType<String>().toList()
+      ..sort((a, b) {
+        final an = kindsById[a]?.name ?? a;
+        final bn = kindsById[b]?.name ?? b;
+        return an.toLowerCase().compareTo(bn.toLowerCase());
+      });
     return [
       null,
       ...tagged,
@@ -322,8 +333,11 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
 
   /// Three controls above a short list is noise. The bar appears only once
   /// some dimension actually has a choice to make (more than "All" plus one).
-  bool _showFilterBar(List<ServiceRecord> records) =>
-      _taskOptions(records).length > 2 ||
+  bool _showFilterBar(
+    List<ServiceRecord> records,
+    Map<String, ServiceKind> kindsById,
+  ) =>
+      _taskOptions(records, kindsById).length > 2 ||
       _typeOptions(records).length > 2 ||
       _yearOptions(records).length > 2;
 
@@ -356,7 +370,7 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
             children: [
               _FilterDropdown<String?>(
                 value: _filter.serviceKindId,
-                options: _taskOptions(records),
+                options: _taskOptions(records, kindsById),
                 labelOf: taskLabel,
                 onChanged: (value) => setState(
                   () => _filter = _filter.copyWith(

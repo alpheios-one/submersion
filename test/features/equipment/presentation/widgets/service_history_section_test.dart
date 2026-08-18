@@ -453,6 +453,44 @@ void main() {
       expect(find.text('1 of 2 shown'), findsNothing);
     });
 
+    testWidgets('task options are ordered by name, not by id', (tester) async {
+      // Custom kind ids are uuids, so sorting by id puts the dropdown in an
+      // order that looks random next to the task names it displays.
+      await pumpSection(
+        tester,
+        records: [
+          record(id: 'r1', kindId: 'f4c2-zzz'),
+          record(id: 'r2', kindId: '0a11-aaa'),
+          record(id: 'r3', kindId: '7b93-mmm'),
+        ],
+        kinds: [
+          kind('f4c2-zzz', 'Anode check'),
+          kind('0a11-aaa', 'Scrubber repack'),
+          kind('7b93-mmm', 'Disinfect'),
+        ],
+      );
+
+      await tester.tap(find.text('All tasks'));
+      await tester.pumpAndSettle();
+
+      final items = tester
+          .widgetList<Text>(
+            find.descendant(
+              of: find.byType(Material).last,
+              matching: find.byType(Text),
+            ),
+          )
+          .map((t) => t.data)
+          .whereType<String>()
+          .where((t) => t != 'All tasks')
+          .toList();
+
+      expect(
+        items,
+        containsAllInOrder(['Anode check', 'Disinfect', 'Scrubber repack']),
+      );
+    });
+
     testWidgets('untagged records get their own bucket', (tester) async {
       await pumpSection(
         tester,
