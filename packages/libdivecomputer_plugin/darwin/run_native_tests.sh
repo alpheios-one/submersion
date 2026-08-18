@@ -69,3 +69,13 @@ swiftc -o "$BUILD_DIR/serial_port_opener_tests" \
     Tests/SerialPortOpenerTests/main.swift
 
 "$BUILD_DIR/serial_port_opener_tests"
+
+# FTDI wire-protocol encoding (issue #732). The Aeris/Oceanic cable is an FTDI
+# chip with a custom product ID that macOS does not claim, so there is no
+# /dev/cu.* node and the chip is driven directly over USB. Divisor vectors come
+# from FTDI application note AN232B-05, not from our implementation.
+swiftc -o "$BUILD_DIR/ftdi_protocol_tests" \
+    Sources/LibDCDarwin/FtdiProtocol.swift \
+    Tests/FtdiProtocolTests/main.swift
+
+"$BUILD_DIR/ftdi_protocol_tests"
