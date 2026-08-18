@@ -5,6 +5,10 @@ import 'package:submersion/features/settings/presentation/widgets/newer_schema_p
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 Widget host(Widget child) => MaterialApp(
+  // Pinned: flutter_test forwards the HOST machine's locale list, so an
+  // unpinned MaterialApp resolves to a translated UI on a non-English dev
+  // machine and every English assertion below finds nothing.
+  locale: const Locale('en'),
   localizationsDelegates: AppLocalizations.localizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   home: Scaffold(body: child),
