@@ -1203,6 +1203,64 @@ void main() {
       );
     });
 
+    // A long dive holds one row per sample, and the promote used to bind one
+    // SQL variable per id. SQLite caps bound variables per statement (999 on
+    // builds before 3.32, 32766 after), so a long enough dive failed outright
+    // with "too many SQL variables". The promote must not scale its variable
+    // count with the sample count.
+    test('promotes a dive with more samples than SQLite can bind', () async {
+      final diveId = await insertTestDive(
+        id: 'dive-many-samples',
+        diveComputerModel: 'Imported file',
+      );
+
+      await repository.saveComputerReading(
+        buildReading(
+          id: 'reading-a',
+          diveId: diveId,
+          isPrimary: true,
+          computerModel: 'Imported file',
+        ),
+      );
+      await repository.saveComputerReading(
+        buildReading(
+          id: 'reading-b',
+          diveId: diveId,
+          isPrimary: false,
+          computerModel: 'Other file',
+        ),
+      );
+
+      // One past the 32766 cap of the bundled SQLite, which is also well past
+      // the 999 cap older builds enforce. Generated with a recursive CTE
+      // rather than 32767 companion inserts, which took ~45s on its own and
+      // would have made this the slowest test in the suite by far.
+      const sampleCount = 32767;
+      await db.customStatement(
+        'INSERT INTO dive_profiles '
+        '(id, dive_id, source_id, is_primary, timestamp, depth) '
+        'WITH RECURSIVE seq(n) AS ('
+        'SELECT 0 UNION ALL SELECT n + 1 FROM seq WHERE n < ?2 - 1) '
+        "SELECT 'p-b-' || n, ?1, 'reading-b', 0, n, 10.0 FROM seq",
+        [diveId, sampleCount],
+      );
+
+      await repository.setPrimaryDataSource(
+        diveId: diveId,
+        computerReadingId: 'reading-b',
+      );
+
+      final promoted =
+          await (db.selectOnly(db.diveProfiles)
+                ..addColumns([db.diveProfiles.id.count()])
+                ..where(
+                  db.diveProfiles.diveId.equals(diveId) &
+                      db.diveProfiles.isPrimary.equals(true),
+                ))
+              .getSingle();
+      expect(promoted.read(db.diveProfiles.id.count()), sampleCount);
+    });
+
     test(
       'promotes an edited profile without resurrecting the originals',
       () async {

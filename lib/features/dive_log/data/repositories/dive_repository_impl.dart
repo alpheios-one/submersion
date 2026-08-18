@@ -6142,13 +6142,11 @@ class DiveRepository {
         // dive kept rendering, because getDiveById and getMergedProfile do
         // not filter on the flag, while getDiveProfile, getAscentDescentRates
         // and the data-quality prefilters silently skipped it.
-        final promote = await _profileIdsOwnedBySource(diveId, newPrimary);
-        if (promote.isNotEmpty) {
+        if (await _sourceOwnsProfiles(diveId, newPrimary)) {
           await (_db.update(_db.diveProfiles)
                 ..where((t) => t.diveId.equals(diveId)))
               .write(const DiveProfilesCompanion(isPrimary: Value(false)));
-          await (_db.update(_db.diveProfiles)..where((t) => t.id.isIn(promote)))
-              .write(const DiveProfilesCompanion(isPrimary: Value(true)));
+          await _promoteProfilesOwnedBySource(diveId, newPrimary);
         }
       });
       SyncEventBus.notifyLocalChange();
@@ -6162,8 +6160,7 @@ class DiveRepository {
     }
   }
 
-  /// Ids of the [DiveProfiles] rows on [diveId] that [source] owns, reduced
-  /// to a single generation.
+  /// Matches the [DiveProfiles] rows on a dive that [source] owns.
   ///
   /// Ownership prefers the v154 `sourceId` FK and falls back to the pre-v154
   /// convention for rows that carry none -- rows written before the migration
@@ -6172,63 +6169,90 @@ class DiveRepository {
   /// a row belongs to [source] when their `computerId`s match, and a
   /// null-`computerId` row belongs to whichever source is primary.
   ///
-  /// The two are unioned rather than tried in order, because a database can
-  /// legitimately hold both shapes at once after syncing with an older peer.
+  /// `computer_id IS ?` rather than `=` is load-bearing. `=` never matches
+  /// NULL, which is exactly how issue #1149 began: the old promote could not
+  /// address a file-imported source's rows at all. `IS` compares null-safely,
+  /// so one predicate covers both a real computer id and the null every file
+  /// import and manual entry carries.
   ///
-  /// The dedupe by timestamp is what keeps an edited profile from rendering
-  /// twice. [saveEditedProfile] does not replace the rows it supersedes: it
-  /// demotes them and inserts a second, null-`computerId` generation
-  /// alongside. Both generations belong to the same source, so promoting the
-  /// owned set wholesale would resurrect the originals next to the edit.
-  /// Null-`computerId` rows win the tie, which is the same "the edit is the
-  /// live one" rule [restoreOriginalProfile] encodes.
-  Future<List<String>> _profileIdsOwnedBySource(
+  /// `source.isPrimary` is deliberately not consulted: callers load the row
+  /// before swapping the source flags, so it still reads false for the very
+  /// source being promoted. The convention is applied prospectively -- this
+  /// source is about to be primary, so the dive's unattributed
+  /// null-computerId rows are the ones it will own.
+  static const String _ownedBySourceSql =
+      '(p.source_id = ?2 OR (p.source_id IS NULL AND p.computer_id IS ?3))';
+
+  List<Variable<Object>> _ownershipVars(
+    String diveId,
+    DiveDataSourcesData source,
+  ) => [
+    Variable<String>(diveId),
+    Variable<String>(source.id),
+    Variable<String>(source.computerId),
+  ];
+
+  /// Whether [source] owns any of the dive's profile rows.
+  ///
+  /// Read before the demote so a source that owns nothing leaves the existing
+  /// primary set alone rather than stranding the dive (issue #1149).
+  Future<bool> _sourceOwnsProfiles(
     String diveId,
     DiveDataSourcesData source,
   ) async {
-    final rows =
-        await (_db.select(_db.diveProfiles)
-              ..where((t) => t.diveId.equals(diveId))
-              ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
-            .get();
-    if (rows.isEmpty) return const [];
+    final row = await _db
+        .customSelect(
+          'SELECT EXISTS(SELECT 1 FROM dive_profiles p '
+          'WHERE p.dive_id = ?1 AND $_ownedBySourceSql) AS owns',
+          variables: _ownershipVars(diveId, source),
+          readsFrom: {_db.diveProfiles},
+        )
+        .getSingle();
+    return row.read<int>('owns') == 1;
+  }
 
-    // `source.isPrimary` is deliberately not consulted: callers load the row
-    // before swapping the source flags, so it still reads false for the very
-    // source being promoted. The convention is applied prospectively -- this
-    // source is about to be primary, so the dive's unattributed
-    // null-computerId rows are the ones it will own.
-    bool ownedByLegacyConvention(DiveProfile row) {
-      if (row.sourceId != null) return false;
-      return source.computerId != null
-          ? row.computerId == source.computerId
-          : row.computerId == null;
-    }
-
-    final owned = rows
-        .where((r) => r.sourceId == source.id || ownedByLegacyConvention(r))
-        .toList();
-
-    // Deterministic on purpose. A null computerId marks the edit, so it wins
-    // the tie; where that cannot separate them (two generations of the same
-    // file-imported source) the greater id does. Ids are shared across
-    // devices, so every peer resolves the same winner and the flag does not
-    // ping-pong through sync.
-    bool supersedes(DiveProfile candidate, DiveProfile held) {
-      if ((candidate.computerId == null) != (held.computerId == null)) {
-        return candidate.computerId == null;
-      }
-      return candidate.id.compareTo(held.id) > 0;
-    }
-
-    final liveByTimestamp = <int, DiveProfile>{};
-    for (final row in owned) {
-      final held = liveByTimestamp[row.timestamp];
-      if (held == null || supersedes(row, held)) {
-        liveByTimestamp[row.timestamp] = row;
-      }
-    }
-    return [for (final row in liveByTimestamp.values) row.id];
+  /// Promotes the rows [source] owns, one per timestamp.
+  ///
+  /// Expressed as a predicate rather than a list of ids on purpose. Binding
+  /// one variable per sample capped the method at SQLite's bound-variable
+  /// limit -- 999 on builds before 3.32, 32766 after -- so a long enough dive
+  /// failed with "too many SQL variables". The limit varies by platform build
+  /// (system SQLite on Android, the bundled SQLCipher elsewhere), so this
+  /// binds a fixed three variables at any dive length instead of chunking to
+  /// whichever ceiling the current build happens to have.
+  ///
+  /// The ranking is what keeps an edited profile from rendering twice.
+  /// [saveEditedProfile] does not replace the rows it supersedes: it demotes
+  /// them and inserts a second, null-computerId generation alongside. Both
+  /// generations belong to the same source and share timestamps, so promoting
+  /// the whole owned set would resurrect the originals next to the edit. Only
+  /// the winner at each timestamp is promoted: the null-computerId row first,
+  /// which is the same "the edit is the live one" rule
+  /// [restoreOriginalProfile] encodes, then the greatest id. Both halves are
+  /// deterministic and derived from synced values, so every device resolves
+  /// the same winner and the flag does not ping-pong through sync.
+  ///
+  /// ROW_NUMBER, not a correlated subquery matching on timestamp. There is no
+  /// index on dive_profiles(timestamp) -- only dive_id -- so a correlated form
+  /// rescans the dive once per row, which measured 45 seconds on a
+  /// 32767-sample dive. The window function sorts the dive's rows once
+  /// instead. The same pattern already appears in the dedupe migrations in
+  /// database.dart.
+  Future<void> _promoteProfilesOwnedBySource(
+    String diveId,
+    DiveDataSourcesData source,
+  ) async {
+    await _db.customStatement(
+      'UPDATE dive_profiles SET is_primary = 1 WHERE id IN ('
+      'SELECT id FROM ('
+      'SELECT p.id AS id, ROW_NUMBER() OVER ('
+      'PARTITION BY p.timestamp '
+      'ORDER BY (p.computer_id IS NULL) DESC, p.id DESC) AS rn '
+      'FROM dive_profiles p '
+      'WHERE p.dive_id = ?1 AND $_ownedBySourceSql'
+      ') WHERE rn = 1)',
+      _ownershipVars(diveId, source).map((v) => v.value).toList(),
+    );
   }
 
   /// Resolves a `{ computerId -> friendly name }` map for the given source
