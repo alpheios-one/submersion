@@ -56,6 +56,12 @@ class DiveSite extends Equatable {
   final String? parkingInfo; // Parking availability and tips
   final double?
   altitude; // Altitude above sea level in meters (for altitude diving)
+  /// Typical way into the water at this site (issue #1104). Snapped onto a
+  /// dive when the site is assigned; the diver can always override it.
+  final EntryMethod? entryMethod;
+
+  /// Typical way out of the water at this site. Null means "same as entry".
+  final EntryMethod? exitMethod;
   final SiteConditions? conditions;
   final bool isShared;
 
@@ -82,6 +88,8 @@ class DiveSite extends Equatable {
     this.mooringNumber,
     this.parkingInfo,
     this.altitude,
+    this.entryMethod,
+    this.exitMethod,
     this.conditions,
     this.isShared = false,
   });
@@ -146,6 +154,8 @@ class DiveSite extends Equatable {
     String? mooringNumber,
     String? parkingInfo,
     double? altitude,
+    EntryMethod? entryMethod,
+    EntryMethod? exitMethod,
     SiteConditions? conditions,
     bool? isShared,
   }) {
@@ -172,6 +182,8 @@ class DiveSite extends Equatable {
       mooringNumber: mooringNumber ?? this.mooringNumber,
       parkingInfo: parkingInfo ?? this.parkingInfo,
       altitude: altitude ?? this.altitude,
+      entryMethod: entryMethod ?? this.entryMethod,
+      exitMethod: exitMethod ?? this.exitMethod,
       conditions: conditions ?? this.conditions,
       isShared: isShared ?? this.isShared,
     );
@@ -201,6 +213,8 @@ class DiveSite extends Equatable {
     mooringNumber,
     parkingInfo,
     altitude,
+    entryMethod,
+    exitMethod,
     conditions,
     isShared,
   ];
