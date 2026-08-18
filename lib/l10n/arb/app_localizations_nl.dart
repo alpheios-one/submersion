@@ -24325,6 +24325,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get reef_species_addToExpected => 'Toevoegen aan verwachte soorten';
 
   @override
+  String reef_species_showAll(int count) {
+    return 'Alle $count tonen';
+  }
+
+  @override
+  String get reef_species_showFewer => 'Minder tonen';
+
+  @override
   String get reef_attribution_title => 'Rifgegevensbronnen';
 
   @override

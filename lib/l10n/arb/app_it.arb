@@ -7371,6 +7371,8 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "Registrato nelle vicinanze",
   "reef_species_addToExpected": "Aggiungi alle specie attese",
+  "reef_species_showAll": "Mostra tutte ({count})",
+  "reef_species_showFewer": "Mostra meno",
   "reef_attribution_title": "Fonti dei dati sulla barriera",
   "reef_attribution_wri": "Presenza della barriera e livello di minaccia. CC BY 3.0.",
   "reef_attribution_noaa": "Temperatura superficiale del mare e stress termico. Dominio pubblico.",

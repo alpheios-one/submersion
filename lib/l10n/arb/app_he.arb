@@ -7371,6 +7371,8 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "תועד בסביבה",
   "reef_species_addToExpected": "הוספה למינים צפויים",
+  "reef_species_showAll": "הצג הכול ({count})",
+  "reef_species_showFewer": "הצג פחות",
   "reef_attribution_title": "מקורות נתוני השונית",
   "reef_attribution_wri": "נוכחות שונית ורמת איום. CC BY 3.0.",
   "reef_attribution_noaa": "טמפרטורת פני הים ועקת חום. נחלת הכלל.",

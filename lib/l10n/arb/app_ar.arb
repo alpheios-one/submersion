@@ -7371,6 +7371,8 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "مسجل في الجوار",
   "reef_species_addToExpected": "إضافة إلى الأنواع المتوقعة",
+  "reef_species_showAll": "عرض الكل ({count})",
+  "reef_species_showFewer": "عرض أقل",
   "reef_attribution_title": "مصادر بيانات الشعاب",
   "reef_attribution_wri": "وجود الشعاب ومستوى التهديد. CC BY 3.0.",
   "reef_attribution_noaa": "درجة حرارة سطح البحر والإجهاد الحراري. ملكية عامة.",

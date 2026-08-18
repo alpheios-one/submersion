@@ -15768,6 +15768,17 @@
   },
   "reef_species_recordedNearby": "Recorded nearby",
   "reef_species_addToExpected": "Add to expected species",
+  "reef_species_showAll": "Show all {count}",
+  "@reef_species_showAll": {
+    "description": "Expands the capped nearby-species chip list to its full length",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "reef_species_showFewer": "Show fewer",
+  "@reef_species_showFewer": {
+    "description": "Collapses the nearby-species chip list back to its capped length"
+  },
   "reef_attribution_title": "Reef data sources",
   "reef_attribution_wri": "Reef presence and threat level. CC BY 3.0.",
   "reef_attribution_noaa": "Sea surface temperature and bleaching heat stress. Public domain.",

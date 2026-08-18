@@ -24075,6 +24075,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reef_species_addToExpected => 'إضافة إلى الأنواع المتوقعة';
 
   @override
+  String reef_species_showAll(int count) {
+    return 'عرض الكل ($count)';
+  }
+
+  @override
+  String get reef_species_showFewer => 'عرض أقل';
+
+  @override
   String get reef_attribution_title => 'مصادر بيانات الشعاب';
 
   @override

@@ -24582,6 +24582,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reef_species_addToExpected => 'Ajouter aux espèces attendues';
 
   @override
+  String reef_species_showAll(int count) {
+    return 'Afficher les $count';
+  }
+
+  @override
+  String get reef_species_showFewer => 'Afficher moins';
+
+  @override
   String get reef_attribution_title => 'Sources de données du récif';
 
   @override
