@@ -125,6 +125,19 @@ class DatabaseService {
     debugOnRestoreWindowOpen = null;
   }
 
+  /// Registers [locationService] without opening anything.
+  ///
+  /// [restore] resolves its destination through the location service, but the
+  /// startup failure screen can offer a restore on a launch where [initialize]
+  /// never got far enough to register one. Without this, a restore attempted
+  /// from that screen would target the DEFAULT database path and quietly write
+  /// past a diver's custom database location.
+  ///
+  /// Does not overwrite a service already registered by [initialize].
+  void adoptLocationService(DatabaseLocationService locationService) {
+    _locationService ??= locationService;
+  }
+
   /// Initialize the database with optional location service for custom paths
   Future<void> initialize({
     DatabaseLocationService? locationService,
@@ -132,7 +145,11 @@ class DatabaseService {
   }) async {
     if (_database != null) return;
 
-    _locationService = locationService;
+    // Keep an already-registered service when called without one. [restore]
+    // reopens via a bare `initialize()`, and clearing the location service
+    // there would make the reopen resolve the DEFAULT path, silently
+    // abandoning a custom database location on every restore.
+    _locationService = locationService ?? _locationService;
     final dbPath = await _resolveDatabasePath();
     _currentDatabasePath = dbPath;
 
@@ -150,13 +167,20 @@ class DatabaseService {
     await _assertCipherAvailable(_database!);
   }
 
-  /// Fails loudly at startup if the native library is NOT SQLCipher — e.g.
-  /// the dynamic linker resolved sqlite3 symbols to a system/plugin copy on
-  /// iOS/macOS. Encrypted databases would be unopenable and enabling
-  /// encryption would corrupt silently, so this must be caught on day one.
+  /// Fails loudly if the native library behind the OPEN connection is not
+  /// SQLCipher (e.g. the dynamic linker resolved sqlite3 symbols to a
+  /// system/plugin copy on iOS/macOS). Encrypted databases would be unopenable
+  /// and enabling encryption would corrupt silently, so this must be caught on
+  /// day one.
   ///
-  /// Skipped under `flutter test`: the host test runner loads the system
-  /// SQLite, which legitimately has no cipher.
+  /// The first line of defence is now `assertDatabaseEngineAvailable`, which
+  /// checks the same invariant on an in-memory handle BEFORE any user file is
+  /// touched. This stays as the check on the real connection.
+  ///
+  /// Skipped under `flutter test`, where a suite may legitimately be running
+  /// against an injected in-memory database. (The host runner itself does link
+  /// SQLCipher through the sqlite3 build hook; see sqlcipher_setup_test.dart,
+  /// which asserts exactly that.)
   Future<void> _assertCipherAvailable(AppDatabase db) async {
     if (Platform.environment.containsKey('FLUTTER_TEST')) return;
     final rows = await db.customSelect('PRAGMA cipher_version').get();
@@ -206,8 +230,8 @@ class DatabaseService {
     // Guard: reject databases created by a newer version of the app.
     if (stored != null && stored > AppDatabase.currentSchemaVersion) {
       throw DatabaseVersionMismatchException(
-        databaseVersion: stored,
-        appVersion: AppDatabase.currentSchemaVersion,
+        storedSchemaVersion: stored,
+        supportedSchemaVersion: AppDatabase.currentSchemaVersion,
       );
     }
 
@@ -657,7 +681,28 @@ class DatabaseService {
     // Reopen on the swapped-in file BEFORE dropping the pre-restore copy, so a
     // cleanup hiccup can never prevent the reopen. An older-schema backup runs
     // its migration ladder here; surface its progress to the caller.
-    await initialize(onMigrationProgress: onMigrationProgress);
+    try {
+      await initialize(onMigrationProgress: onMigrationProgress);
+    } on DatabaseVersionMismatchException {
+      // The restored file needs a newer app than this one. The backup layer
+      // pre-checks make this near-unreachable, but a raced or hand-placed
+      // file can still reach here, and by now the newer file is already live.
+      // Put the pre-restore database back and reopen so the app keeps a
+      // working library, then surface the error (issue #1089).
+      //
+      // Scoped to this one exception on purpose: every other reopen failure
+      // (corruption, a locked file) is the restored file's own problem and
+      // keeps its existing handling, which may legitimately want the
+      // swapped-in file left in place for recovery.
+      await _deleteIfExists(destinationPath);
+      await _deleteIfExists('$destinationPath-wal');
+      await _deleteIfExists('$destinationPath-shm');
+      if (hadDest && await File(asidePath).exists()) {
+        await File(asidePath).rename(destinationPath);
+      }
+      await initialize();
+      rethrow;
+    }
 
     // The database is open again on the restored file; the pre-restore copy is
     // no longer needed. Its deletion is best-effort — a transient failure (e.g.

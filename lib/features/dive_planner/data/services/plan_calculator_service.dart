@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 
+import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/deco/ascent/ascent_gas_plan.dart';
 import 'package:submersion/core/deco/buhlmann_algorithm.dart';
 import 'package:submersion/core/deco/constants/buhlmann_coefficients.dart';
@@ -45,6 +46,10 @@ class PlanCalculatorService {
   /// Algorithm used to convert ppO2 exposure into CNS %/min.
   final CnsCalculationMethod cnsMethod;
 
+  /// Equation of state used to convert cylinder pressure to gas volume,
+  /// sourced from `gasModelProvider` (issue #828).
+  final GasModel gasModel;
+
   final _uuid = const Uuid();
 
   PlanCalculatorService({
@@ -56,6 +61,7 @@ class PlanCalculatorService {
     this.defaultAscentRate = 9.0,
     this.defaultDescentRate = 18.0,
     this.cnsMethod = CnsCalculationMethod.shearwater,
+    this.gasModel = GasModel.real,
   });
 
   /// A copy that decompresses on the given gradient factors, leaving every
@@ -74,6 +80,7 @@ class PlanCalculatorService {
       defaultAscentRate: defaultAscentRate,
       defaultDescentRate: defaultDescentRate,
       cnsMethod: cnsMethod,
+      gasModel: gasModel,
     );
   }
 
@@ -130,6 +137,7 @@ class PlanCalculatorService {
         volume: tank.volume ?? 11.0, // Default AL80 if not specified
         o2Percent: tank.gasMix.o2,
         hePercent: tank.gasMix.he,
+        gasModel: gasModel,
       );
     }
 
@@ -639,6 +647,7 @@ class _GasUsageTracker {
   final double volume;
   final double o2Percent;
   final double hePercent;
+  final GasModel gasModel;
   double gasUsedLiters = 0;
 
   // Memoized remaining pressure. The bisection solver is read up to three times
@@ -653,6 +662,7 @@ class _GasUsageTracker {
     required this.volume,
     this.o2Percent = 21.0,
     this.hePercent = 0.0,
+    required this.gasModel,
   });
 
   void addGasUsed(double liters) {
@@ -671,6 +681,7 @@ class _GasUsageTracker {
         litersConsumed: gasUsedLiters,
         o2Percent: o2Percent,
         hePercent: hePercent,
+        model: gasModel,
       );
       _cachedForLiters = gasUsedLiters;
     }

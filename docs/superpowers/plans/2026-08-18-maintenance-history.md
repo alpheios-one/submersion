@@ -4,7 +4,7 @@
 
 **Goal:** Make the equipment service history say which maintenance task was completed, let it be filtered, let a default price be carried on the task and interval, and let the whole log be exported to Excel.
 
-**Architecture:** Four phases against the existing service ledger. Phase 1 fixes the display by resolving `ServiceRecord.serviceKindId` to a `ServiceKind` name and localizing the `ServiceType` enum, while extracting the history region out of a 1596 line page. Phase 2 adds a presentation-layer filter. Phase 3 adds two nullable columns to `service_kinds` and `service_schedules` behind migration v154, with a pure resolver deciding the prefill. Phase 4 adds an Excel sheet builder used by three surfaces.
+**Architecture:** Four phases against the existing service ledger. Phase 1 fixes the display by resolving `ServiceRecord.serviceKindId` to a `ServiceKind` name and localizing the `ServiceType` enum, while extracting the history region out of a 1596 line page. Phase 2 adds a presentation-layer filter. Phase 3 adds two nullable columns to `service_kinds` and `service_schedules` behind migration v156, with a pure resolver deciding the prefill. Phase 4 adds an Excel sheet builder used by three surfaces.
 
 **Tech Stack:** Flutter, Drift ORM (SQLite), Riverpod, `excel_community`, `intl`, `flutter_test`.
 
@@ -20,7 +20,7 @@
 - **File size:** 200-400 lines typical, 800 maximum.
 - **TDD:** write the failing test first, watch it fail, then implement.
 - **Locale-aware numerics:** any numeric text field must pair `formatDecimalForInput` (seed) with `parseUserDecimal` (read back). `toString()` seeds `"12.5"` in a locale where `.` is a thousands separator.
-- **Schema version:** this plan assumes **v154**. Before Task 6, re-check `currentSchemaVersion` on current `origin/main` and open PR claims (PR #1127 currently writes 153 and will renumber to 154 on rebase). If 154 is taken, use the next free number consistently everywhere.
+- **Schema version:** this plan assumes **v156**. It was written against v154; main then took 156 (#1104) and 155 (#828), so the migration renumbered to 156 at merge time. Always re-check `currentSchemaVersion` on current `origin/main` plus open PR claims before writing a migration.
 - **Test commands:** `flutter test <path>` for one file, `flutter analyze` for lints. Do not overlap local test runs; a second concurrent run produces phantom failures.
 
 ## Phase to commit mapping
@@ -803,11 +803,11 @@ git commit -m "feat(equipment): filter maintenance history by task, type and yea
 
 ---
 
-## Task 6: Schema v154, the two column pairs
+## Task 6: Schema v156, the two column pairs
 
 **Files:**
 - Modify: `lib/core/database/database.dart:1137-1159`, `:1165-1189`, `:3072`, `:3283-3293`, `:8074-8093`, `:8241`, plus a new helper near `:4718`
-- Create: `test/core/database/migration_v154_service_cost_test.dart`
+- Create: `test/core/database/migration_v156_service_cost_test.dart`
 
 **Interfaces:**
 - Consumes: nothing.
@@ -816,7 +816,7 @@ git commit -m "feat(equipment): filter maintenance history by task, type and yea
 - [ ] **Step 1: Re-check the schema version**
 
 Run: `git fetch origin && git show origin/main:lib/core/database/database.dart | grep -n "currentSchemaVersion = "`
-Expected: `153`. If it has moved, use the next free number instead of 154 everywhere below, consistently.
+Expected: `155` (main took 154 for #1104 and 155 for #828). Use the next free number consistently everywhere below; this plan was executed at **156**.
 
 - [ ] **Step 2: Add the columns to both tables**
 
@@ -835,7 +835,7 @@ In `ServiceKinds` (after `defaultIntervalHours`, `database.dart:1146`) and in `S
 `database.dart:3072`:
 
 ```dart
-  static const int currentSchemaVersion = 154;
+  static const int currentSchemaVersion = 156;
 ```
 
 - [ ] **Step 4: Append to `migrationVersions`**
@@ -843,9 +843,9 @@ In `ServiceKinds` (after `defaultIntervalHours`, `database.dart:1146`) and in `S
 At the tail of the list (`database.dart:3291`), after `153,`:
 
 ```dart
-    // v154 (issue #829): default service price on service_kinds and
+    // v156 (issue #829): default service price on service_kinds and
     // service_schedules, prefilled when a maintenance record is logged.
-    154,
+    156,
 ```
 
 - [ ] **Step 5: Write the migration helper**
@@ -882,11 +882,11 @@ Next to `_assertO2CellMillivoltColumns` (`database.dart:4718`):
 At the tail of `onUpgrade` (`database.dart:8093`), after the v153 pair:
 
 ```dart
-        // v154: default service price on kinds and schedules (issue #829).
-        if (from < 154) {
+        // v156: default service price on kinds and schedules (issue #829).
+        if (from < 156) {
           await _assertServiceCostColumns();
         }
-        if (from < 154) await reportProgress();
+        if (from < 156) await reportProgress();
 ```
 
 The pair is mandatory: the progress step count is derived from `migrationVersions.length`, so a missing `reportProgress()` desynchronizes the migration progress bar.
@@ -894,7 +894,7 @@ The pair is mandatory: the progress step count is derived from `migrationVersion
 At the tail of the `beforeOpen` backstops (`database.dart:8243`):
 
 ```dart
-        // v154 backstop: re-assert the default service price columns
+        // v156 backstop: re-assert the default service price columns
         // (issue #829; parallel-branch version-collision self-heal).
         await _assertServiceCostColumns();
 ```
@@ -906,7 +906,7 @@ Expected: exit 0. This regenerates `toJson`/`fromJson`, which is what puts the n
 
 - [ ] **Step 8: Write the migration test**
 
-Create `test/core/database/migration_v154_service_cost_test.dart`, modeled on `migration_v153_o2_cell_mv_test.dart`:
+Create `test/core/database/migration_v156_service_cost_test.dart`, modeled on `migration_v153_o2_cell_mv_test.dart`:
 
 ```dart
 import 'package:drift/drift.dart';
@@ -918,10 +918,10 @@ import 'package:submersion/core/database/database.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('v154 adds default cost columns, preserving rows', () async {
+  test('v156 adds default cost columns, preserving rows', () async {
     final native = NativeDatabase.memory(
       setup: (db) {
-        db.execute('PRAGMA user_version = 153');
+        db.execute('PRAGMA user_version = 155');
         db.execute('''
           CREATE TABLE service_kinds (
             id TEXT NOT NULL PRIMARY KEY,
@@ -967,15 +967,15 @@ void main() {
     expect(row.read<double?>('default_cost'), isNull);
   });
 
-  test('migration list includes v154 and schema is at least 154', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(154));
-    expect(AppDatabase.migrationVersions, contains(154));
+  test('migration list includes v156 and schema is at least 156', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(156));
+    expect(AppDatabase.migrationVersions, contains(156));
   });
 
-  test('v154 is idempotent when a column already exists', () async {
+  test('v156 is idempotent when a column already exists', () async {
     final native = NativeDatabase.memory(
       setup: (db) {
-        db.execute('PRAGMA user_version = 153');
+        db.execute('PRAGMA user_version = 155');
         db.execute('''
           CREATE TABLE service_schedules (
             id TEXT NOT NULL PRIMARY KEY,
@@ -1008,7 +1008,7 @@ void main() {
 
   test('the helper no-ops when the tables are absent', () async {
     final native = NativeDatabase.memory(
-      setup: (db) => db.execute('PRAGMA user_version = 153'),
+      setup: (db) => db.execute('PRAGMA user_version = 155'),
     );
     final db = AppDatabase(native);
     addTearDown(db.close);
@@ -1020,7 +1020,7 @@ void main() {
 
 - [ ] **Step 9: Run the migration test**
 
-Run: `flutter test test/core/database/migration_v154_service_cost_test.dart`
+Run: `flutter test test/core/database/migration_v156_service_cost_test.dart`
 Expected: PASS, 4 tests.
 
 - [ ] **Step 10: Guard the built-in seed**
@@ -1056,7 +1056,7 @@ Expected: PASS. Sync needs no serializer edits, because `sync_data_serializer.da
 dart format .
 flutter analyze
 git add lib/core/database/ test/core/database/
-git commit -m "feat(db): default service cost columns, schema v154 (#829)"
+git commit -m "feat(db): default service cost columns, schema v156 (#829)"
 ```
 
 ---
@@ -2136,7 +2136,7 @@ The PR body must state the multi-device caveat: a default price set on a task or
 | `ServiceType` localization | 1, 3 |
 | Notes and next due rendered | 3 |
 | Filter | 4, 5 |
-| Default price columns, migration v154 | 6 |
+| Default price columns, migration v156 | 6 |
 | Entity and repository plumbing | 7 |
 | Resolution order | 8 |
 | Editors and prefill | 9 |

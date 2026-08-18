@@ -1237,7 +1237,12 @@ void main() {
       await pumpPage(
         tester,
         selectedProvider: CloudProviderType.icloud,
-        syncState: const SyncState(newerSchemaPeerCount: 2),
+        syncState: const SyncState(
+          newerSchemaPeerLabels: [
+            (name: 'Living Room Mac', shortId: 'aaa11111'),
+            (name: 'Dive iPad', shortId: 'bbb22222'),
+          ],
+        ),
       );
 
       expect(
@@ -1252,7 +1257,12 @@ void main() {
       await pumpPage(
         tester,
         selectedProvider: CloudProviderType.icloud,
-        syncState: const SyncState(newerSchemaPeerCount: 2),
+        syncState: const SyncState(
+          newerSchemaPeerLabels: [
+            (name: 'Living Room Mac', shortId: 'aaa11111'),
+            (name: 'Dive iPad', shortId: 'bbb22222'),
+          ],
+        ),
       );
 
       // Material does not re-derive text colour from the Card background, so

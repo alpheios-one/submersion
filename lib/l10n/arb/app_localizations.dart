@@ -697,11 +697,77 @@ abstract class AppLocalizations {
   /// **'Replace'**
   String get diveLog_bulkEdit_modeReplace;
 
+  /// No description provided for @diveLog_bulkEdit_modeUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get diveLog_bulkEdit_modeUpdate;
+
   /// No description provided for @diveLog_bulkEdit_tankOnlyIfEmpty.
   ///
   /// In en, this message translates to:
   /// **'Only dives that don\'t already have a tank'**
   String get diveLog_bulkEdit_tankOnlyIfEmpty;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which attributes to overwrite on the tanks these dives already have. Start and end pressures are never changed.'**
+  String get diveLog_bulkEdit_tankSpecsHint;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsNoFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at least one tank attribute to update.'**
+  String get diveLog_bulkEdit_tankSpecsNoFields;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset'**
+  String get diveLog_bulkEdit_tankFieldPreset;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get diveLog_bulkEdit_tankFieldRole;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get diveLog_bulkEdit_tankFieldVolume;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldWorkingPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Working pressure'**
+  String get diveLog_bulkEdit_tankFieldWorkingPressure;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldMaterial.
+  ///
+  /// In en, this message translates to:
+  /// **'Material'**
+  String get diveLog_bulkEdit_tankFieldMaterial;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldGasMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas mix'**
+  String get diveLog_bulkEdit_tankFieldGasMix;
+
+  /// No description provided for @diveLog_bulkEdit_tankFieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get diveLog_bulkEdit_tankFieldName;
+
+  /// No description provided for @diveLog_bulkEdit_tankSpecsSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 selected dive has no tanks and will be skipped.} other{{count} selected dives have no tanks and will be skipped.}}'**
+  String diveLog_bulkEdit_tankSpecsSkipped(int count);
 
   /// No description provided for @diveLog_bulkEdit_confirmTitle.
   ///
@@ -9637,6 +9703,12 @@ abstract class AppLocalizations {
   /// **'Filter Dives'**
   String get diveLog_filter_title;
 
+  /// No description provided for @diveLog_filter_resizeGrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Resize filter panel'**
+  String get diveLog_filter_resizeGrip;
+
   /// No description provided for @diveLog_filter_tooltip_close.
   ///
   /// In en, this message translates to:
@@ -13513,6 +13585,49 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Parking Information'**
   String get diveSites_edit_access_parkingInfo_label;
+
+  /// Site form row: the typical way into the water at this site
+  ///
+  /// In en, this message translates to:
+  /// **'Entry Method'**
+  String get diveSites_edit_access_entryMethod_label;
+
+  /// Site form row: the typical way out of the water at this site
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Method'**
+  String get diveSites_edit_access_exitMethod_label;
+
+  /// Chip offering to fill a site's entry and exit method from the dives already logged there
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Your dive here: {entry} in, {exit} out} other{Your {count} dives here: {entry} in, {exit} out}}'**
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  );
+
+  /// Chip offering to fill a site's entry method when the logged dives record no exit method
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Your dive here: {entry}} other{Your {count} dives here: {entry}}}'**
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  );
+
+  /// Site detail access card: entry method row label
+  ///
+  /// In en, this message translates to:
+  /// **'Entry'**
+  String get diveSites_detail_access_entryMethod;
+
+  /// Site detail access card: exit method row label
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get diveSites_detail_access_exitMethod;
 
   /// No description provided for @diveSites_edit_altitude_helperText.
   ///
@@ -24495,11 +24610,31 @@ abstract class AppLocalizations {
   /// **' and '**
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator;
 
-  /// No description provided for @settings_cloudSync_peerRequiresUpdate_banner.
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamed.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}'**
-  String settings_cloudSync_peerRequiresUpdate_banner(num count);
+  /// **'{deviceList} syncs from a newer version of Submersion, so its latest changes are held for now.'**
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamedPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'{deviceList} sync from a newer version of Submersion, so their latest changes are held for now.'**
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  );
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_updateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Update this device to receive them.'**
+  String get settings_cloudSync_peerRequiresUpdate_updateAction;
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_storeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'They will apply automatically once this device\'s app store update arrives; the update may still be in review.'**
+  String get settings_cloudSync_peerRequiresUpdate_storeAction;
 
   /// No description provided for @settings_cloudSync_provider_connected.
   ///
@@ -26910,6 +27045,48 @@ abstract class AppLocalizations {
   /// **'SAC Rate Unit'**
   String get settings_units_dialog_sacRateUnit;
 
+  /// No description provided for @settings_units_gasModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas calculations'**
+  String get settings_units_gasModel;
+
+  /// No description provided for @settings_units_gasModel_real.
+  ///
+  /// In en, this message translates to:
+  /// **'Real gas'**
+  String get settings_units_gasModel_real;
+
+  /// No description provided for @settings_units_gasModel_real_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts for compressibility. A 12 L cylinder at 200 bar holds about 2317 L.'**
+  String get settings_units_gasModel_real_subtitle;
+
+  /// No description provided for @settings_units_gasModel_ideal.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideal gas'**
+  String get settings_units_gasModel_ideal;
+
+  /// No description provided for @settings_units_gasModel_ideal_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Matches hand calculation and dive tables. A 12 L cylinder at 200 bar holds 2400 L.'**
+  String get settings_units_gasModel_ideal_subtitle;
+
+  /// No description provided for @settings_units_gasModel_explanation.
+  ///
+  /// In en, this message translates to:
+  /// **'How cylinder pressure is converted to gas volume. This affects SAC rate, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for SAC.'**
+  String get settings_units_gasModel_explanation;
+
+  /// No description provided for @settings_units_dialog_gasModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas calculations'**
+  String get settings_units_dialog_gasModel;
+
   /// No description provided for @settings_units_dialog_temperatureUnit.
   ///
   /// In en, this message translates to:
@@ -28186,6 +28363,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Deco'**
   String get statistics_profile_deco_noDeco;
+
+  /// No description provided for @statistics_profile_deco_notRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Recorded'**
+  String get statistics_profile_deco_notRecorded;
+
+  /// No description provided for @statistics_profile_deco_notRecordedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} dives have no recorded or computable deco data and are excluded from the rate'**
+  String statistics_profile_deco_notRecordedHint(int count);
 
   /// No description provided for @statistics_profile_deco_semanticLabel.
   ///
@@ -33987,7 +34176,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveImport_healthkit_notAvailableDescription.
   ///
   /// In en, this message translates to:
-  /// **'Apple Watch import is only available on iOS and macOS devices.'**
+  /// **'Apple Watch import needs an iPhone with the Health app.'**
   String get diveImport_healthkit_notAvailableDescription;
 
   /// No description provided for @diveImport_healthkit_permissionCheckFailed.
@@ -42024,6 +42213,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Entry'**
   String get enum_siteField_entryType_short;
+
+  /// Site table column: exit method
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Method'**
+  String get enum_siteField_exitMethod;
+
+  /// Site table column (short): exit method
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get enum_siteField_exitMethod_short;
 
   /// No description provided for @enum_siteField_bestSeason_short.
   ///
@@ -51879,17 +52080,134 @@ abstract class AppLocalizations {
   /// **'Upgrading database... step {currentStep} of {totalSteps}'**
   String startup_migrating_progress(Object currentStep, Object totalSteps);
 
-  /// No description provided for @startup_error_title.
+  /// Terminal startup screen title when the failure could not be classified. Deliberately neutral: it must NOT claim the database upgrade failed, since most failures reach this screen without a migration having been attempted.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion could not start'**
+  String get startup_error_title;
+
+  /// Body for an unclassified terminal startup failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong before your dive log finished opening. Your data is still on disk and does not require a reinstall. Try restarting the app; if this persists, contact support.'**
+  String get startup_error_body;
+
+  /// Terminal startup screen title when the app's native database engine is missing or is not a SQLCipher build. The diver's database was never opened.
+  ///
+  /// In en, this message translates to:
+  /// **'This build can\'t open a database'**
+  String get startup_engineUnavailable_title;
+
+  /// Explains that an engine failure happens before the database is opened, so no dive data is at risk.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion\'s database engine is missing from this build, so your dive log was never opened. Nothing on disk has changed and no data is at risk.'**
+  String get startup_engineUnavailable_body;
+
+  /// Tells the diver that reinstalling or restoring cannot fix a broken app package, and asks them to report it.
+  ///
+  /// In en, this message translates to:
+  /// **'Reinstalling or restoring a backup will not help. Install a working build of Submersion, and please report this: it is a fault in the app package, not in your data.'**
+  String get startup_engineUnavailable_guidance;
+
+  /// Terminal startup screen title when the schema upgrade ladder genuinely failed. This is the ONLY class that may say the upgrade failed.
   ///
   /// In en, this message translates to:
   /// **'Database upgrade failed'**
-  String get startup_error_title;
+  String get startup_migrationFailed_title;
 
-  /// No description provided for @startup_error_body.
+  /// Explains a failed schema upgrade and points at the pre-migration safety copy.
   ///
   /// In en, this message translates to:
-  /// **'Try restarting the app. If this persists, contact support. Your data is still on disk and does not require a reinstall.'**
-  String get startup_error_body;
+  /// **'Your dive log could not be upgraded to the format this version needs. A safety copy was taken before the upgrade started, so nothing is lost.'**
+  String get startup_migrationFailed_body;
+
+  /// Terminal startup screen title when the database file was reached but is corrupt or unreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'Your dive log could not be read'**
+  String get startup_dataUnreadable_title;
+
+  /// Explains a damaged database file and points at restoring a backup.
+  ///
+  /// In en, this message translates to:
+  /// **'The database file is there, but Submersion cannot read it. This usually means the file is damaged. Restoring a backup is the fastest way back.'**
+  String get startup_dataUnreadable_body;
+
+  /// Label above the raw error text on the terminal startup failure screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical details'**
+  String get startup_failure_technicalDetails;
+
+  /// Heading of the recovery card offering a backup found on disk during a failed startup.
+  ///
+  /// In en, this message translates to:
+  /// **'A backup is available'**
+  String get startup_failure_backupAvailable_title;
+
+  /// When the offered backup was taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken {timestamp}'**
+  String startup_failure_backupAvailable_taken(Object timestamp);
+
+  /// Extra line shown when the offered backup is the automatic pre-migration safety copy. Object, not int, so schema numbers are never group-separated.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety copy taken before the upgrade from schema v{fromVersion} to v{toVersion}.'**
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  );
+
+  /// Button that swaps the offered backup in for the live database and restarts startup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore this backup'**
+  String get startup_failure_restoreAction;
+
+  /// Progress label while the offered backup is being restored.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring your dive log...'**
+  String get startup_failure_restoring;
+
+  /// Shown when the restore failed. Reassures the diver that the live database was rolled back untouched.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup could not be restored. Your dive log has been left exactly as it was.'**
+  String get startup_failure_restoreFailed;
+
+  /// Label before the filesystem path where backups are kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Your backups are in:'**
+  String get startup_failure_backupsFolder;
+
+  /// Desktop-only button that opens the backups folder in the system file manager.
+  ///
+  /// In en, this message translates to:
+  /// **'Show backup folder'**
+  String get startup_failure_showBackupsFolder;
+
+  /// Heading of the guided-downgrade section on a failed schema upgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Going back to the previous version'**
+  String get startup_failure_downgrade_title;
+
+  /// Explains how to go back to the previous app version, and why Submersion never downgrades itself.
+  ///
+  /// In en, this message translates to:
+  /// **'If the upgrade keeps failing, install the version of Submersion you were running before, then restore the safety copy from inside that version. Restoring it here would only run the same upgrade again. Submersion does not downgrade itself: moving you onto older builds automatically would quietly keep you on versions with known problems.'**
+  String get startup_failure_downgrade_body;
+
+  /// Button opening the app's releases page so the diver can pick the previous version.
+  ///
+  /// In en, this message translates to:
+  /// **'View previous releases'**
+  String get startup_failure_downgrade_action;
 
   /// No description provided for @startup_recovering_title.
   ///
@@ -52037,6 +52355,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please update Submersion to the latest version. Your data is safe and has not been modified. If a backup was taken before the upgrade, it is in your Backups folder and can be restored after updating.'**
   String get startup_versionMismatch_instructions;
+
+  /// No description provided for @startup_versionMismatch_storeInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'This app was installed from an app store and is older than the version that created your data. Your data is safe and has not been modified. Update Submersion when the new version appears in the store, then reopen it.'**
+  String get startup_versionMismatch_storeInstructions;
 
   /// No description provided for @startup_versionMismatch_download.
   ///
@@ -53555,6 +53879,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Media info'**
   String get media_tile_infoMenuItem;
+
+  /// Hint under the HealthKit access headline explaining that iOS will not confirm read access.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Health never tells apps whether read access was granted. If no dives turn up, open Health, then Sharing, Apps, Submersion, and turn on Workouts, Underwater Depth, Water Temperature, and Heart Rate.'**
+  String get diveImport_healthkit_accessGrantedHint;
+
+  /// Hint shown when a HealthKit fetch returned zero dives.
+  ///
+  /// In en, this message translates to:
+  /// **'No underwater diving workouts in this range. Check that the dates cover the dive, and that Health, Sharing, Apps, Submersion has Workouts and Underwater Depth turned on.'**
+  String get diveImport_healthkit_foundNoDivesHint;
+
+  /// HealthKit data type disclosure: underwater depth.
+  ///
+  /// In en, this message translates to:
+  /// **'Underwater Depth - depth samples recorded during dives'**
+  String get settings_dataSources_appleHealth_dataTypeDepth;
+
+  /// HealthKit data type disclosure: water temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Temperature - water temperature samples recorded during dives'**
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp;
+
+  /// Permission row shown when the platform will not disclose read access.
+  ///
+  /// In en, this message translates to:
+  /// **'HealthKit access is managed in the Health app'**
+  String get settings_dataSources_appleHealth_permissionManagedInHealth;
+
+  /// Permission row shown when HealthKit is unavailable on this device.
+  ///
+  /// In en, this message translates to:
+  /// **'HealthKit is not available on this device'**
+  String get settings_dataSources_appleHealth_permissionUnsupported;
 }
 
 class _AppLocalizationsDelegate

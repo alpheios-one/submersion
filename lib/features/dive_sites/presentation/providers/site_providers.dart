@@ -1,3 +1,4 @@
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/performance/perf_timer.dart';
@@ -12,6 +13,8 @@ import 'package:submersion/features/dive_sites/data/services/dive_site_api_servi
 import 'package:submersion/features/dive_sites/domain/constants/site_field.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
+import 'package:submersion/features/dive_sites/domain/models/entry_exit_suggestion.dart';
+import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/shared/models/entity_card_view_config.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
@@ -305,6 +308,40 @@ final siteDiveCountProvider = FutureProvider.family<int, String>((
       .firstOrNull;
   return siteWithCount?.diveCount ?? 0;
 });
+
+/// The entry/exit pairing most often logged at [siteId], or null when the
+/// site has no dives that record an entry method (issue #1104).
+///
+/// Takes the dives tick because site merges, bulk edits, and sync pulls all
+/// change which dives belong to a site without touching the site row, the
+/// same reason [mediaFromDivesAtSiteProvider] subscribes to it.
+final siteEntryExitSuggestionProvider =
+    FutureProvider.family<EntryExitSuggestion?, String>((ref, siteId) async {
+      final diveRepository = ref.watch(diveRepositoryProvider);
+      ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+
+      final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
+      if (diverId == null) return null;
+
+      final stats = ref.watch(statisticsRepositoryProvider);
+      final pairs = await stats.getEntryExitMethodPairsForSite(
+        siteId: siteId,
+        diverId: diverId,
+      );
+      if (pairs.isEmpty) return null;
+
+      final top = pairs.first;
+      final entry = EntryMethod.values.asNameMap()[top.entryMethod];
+      if (entry == null) return null;
+
+      return EntryExitSuggestion(
+        entry: entry,
+        exit: top.exitMethod == null
+            ? null
+            : EntryMethod.values.asNameMap()[top.exitMethod],
+        count: top.count,
+      );
+    });
 
 /// Site list notifier for mutations
 class SiteListNotifier

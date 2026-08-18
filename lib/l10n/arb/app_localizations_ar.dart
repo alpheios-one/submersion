@@ -382,8 +382,51 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'استبدال';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'تحديث';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'الغطسات التي لا تحتوي على أسطوانة فقط';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'اختر السمات التي سيتم استبدالها في الأسطوانات الموجودة بالفعل في هذه الغطسات. لا يتغير ضغط البداية والنهاية أبدًا.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'اختر سمة واحدة على الأقل للأسطوانة لتحديثها.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'إعداد مسبق';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'الدور';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'الحجم';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'ضغط التشغيل';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'المادة';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'خليط الغاز';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'الاسم';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غطسات محددة لا تحتوي على أسطوانات وسيتم تخطيها.',
+      one: 'غطسة واحدة محددة لا تحتوي على أسطوانات وسيتم تخطيها.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => 'تطبيق التغييرات؟';
@@ -5660,6 +5703,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filter_title => 'تصفية الغوصات';
 
   @override
+  String get diveLog_filter_resizeGrip => 'تغيير حجم لوحة التصفية';
+
+  @override
   String get diveLog_filter_tooltip_close => 'إغلاق التصفية';
 
   @override
@@ -7826,6 +7872,47 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveSites_edit_access_parkingInfo_label => 'معلومات موقف السيارات';
+
+  @override
+  String get diveSites_edit_access_entryMethod_label => 'طريقة الدخول';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'طريقة الخروج';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'غطساتك الـ$count هنا: دخول $entry، خروج $exit',
+      one: 'غطستك هنا: دخول $entry، خروج $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'غطساتك الـ$count هنا: دخول $entry',
+      one: 'غطستك هنا: دخول $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'الدخول';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'الخروج';
 
   @override
   String get diveSites_edit_altitude_helperText =>
@@ -14290,17 +14377,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' و';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count أجهزة تتزامن من إصدار أحدث من Submersion. حدّث هذا الجهاز لتلقي أحدث تغييراتها.',
-      one:
-          'جهاز واحد يتزامن من إصدار أحدث من Submersion. حدّث هذا الجهاز لتلقي أحدث تغييراته.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList يزامن من إصدار أحدث من Submersion، لذا يتم تعليق أحدث تغييراته مؤقتًا.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList تزامن من إصدار أحدث من Submersion، لذا يتم تعليق أحدث تغييراتها مؤقتًا.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'حدّث هذا الجهاز لاستلامها.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'سيتم تطبيقها تلقائيًا فور وصول تحديث متجر التطبيقات لهذا الجهاز؛ وقد يكون التحديث لا يزال قيد المراجعة.';
 
   @override
   String get settings_cloudSync_provider_connected => 'متصل';
@@ -15727,6 +15821,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => 'وحدة معدل SAC';
 
   @override
+  String get settings_units_gasModel => 'حسابات الغاز';
+
+  @override
+  String get settings_units_gasModel_real => 'الغاز الحقيقي';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      'يأخذ الانضغاطية في الحسبان. أسطوانة سعة 12 لترًا عند 200 بار تحتوي نحو 2317 لترًا.';
+
+  @override
+  String get settings_units_gasModel_ideal => 'الغاز المثالي';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      'يطابق الحساب اليدوي وجداول الغوص. أسطوانة سعة 12 لترًا عند 200 بار تحتوي 2400 لتر.';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      'كيفية تحويل ضغط الأسطوانة إلى حجم غاز. يؤثر ذلك على معدل استهلاك الهواء والإحصاءات ومخطط الغوص وحاسبات الغاز. الغاز المثالي يطابق الحساب الذي تُعلّمه هيئات التدريب، أما الغاز الحقيقي فدقيق فيزيائيًا ويعطي معدل استهلاك أقل بنحو 5%.';
+
+  @override
+  String get settings_units_dialog_gasModel => 'حسابات الغاز';
+
+  @override
   String get settings_units_dialog_temperatureUnit => 'وحدة درجة الحرارة';
 
   @override
@@ -16466,6 +16584,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get statistics_profile_deco_noDeco => 'بدون تخفيف ضغط';
+
+  @override
+  String get statistics_profile_deco_notRecorded => 'غير مسجل';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count غطسة ليس لها بيانات انضغاط مسجلة أو قابلة للحساب، وهي مستبعدة من النسبة';
+  }
 
   @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
@@ -20013,7 +20139,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'استيراد Apple Watch متاح فقط على أجهزة iOS وmacOS.';
+      'يتطلب الاستيراد من Apple Watch جهاز iPhone مزوّدًا بتطبيق صحة.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -24691,6 +24817,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'الدخول';
+
+  @override
+  String get enum_siteField_exitMethod => 'طريقة الخروج';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'خروج';
 
   @override
   String get enum_siteField_bestSeason_short => 'الموسم';
@@ -30948,11 +31080,82 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'فشلت ترقية قاعدة البيانات';
+  String get startup_error_title => 'تعذّر بدء تشغيل Submersion';
 
   @override
   String get startup_error_body =>
-      'حاول إعادة تشغيل التطبيق. إذا استمرت المشكلة، تواصل مع الدعم: بياناتك ما زالت على القرص ولا تتطلب إعادة تثبيت.';
+      'حدث خطأ ما قبل أن يكتمل فتح سجل الغوص الخاص بك. بياناتك ما زالت على القرص ولا تتطلب إعادة تثبيت. حاول إعادة تشغيل التطبيق، وإذا استمرت المشكلة تواصل مع الدعم.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'هذه النسخة لا تستطيع فتح قاعدة بيانات';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'محرك قواعد البيانات الخاص بـ Submersion غير موجود في هذه النسخة، لذلك لم يُفتح سجل الغوص الخاص بك على الإطلاق. لم يتغيّر شيء على القرص ولا توجد بيانات معرّضة للخطر.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'إعادة التثبيت أو استرداد نسخة احتياطية لن تفيد هنا. ثبّت نسخة سليمة من Submersion، ويُرجى الإبلاغ عن هذه المشكلة: فهي خلل في حزمة التطبيق وليس في بياناتك.';
+
+  @override
+  String get startup_migrationFailed_title => 'فشلت ترقية قاعدة البيانات';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'تعذّرت ترقية سجل الغوص الخاص بك إلى التنسيق الذي تحتاجه هذه النسخة. أُخذت نسخة احتياطية قبل بدء الترقية، فلم يُفقد شيء.';
+
+  @override
+  String get startup_dataUnreadable_title => 'تعذّرت قراءة سجل الغوص الخاص بك';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'ملف قاعدة البيانات موجود، لكن Submersion لا يستطيع قراءته. يعني هذا عادةً أن الملف تالف. استرداد نسخة احتياطية هو أسرع طريق للعودة.';
+
+  @override
+  String get startup_failure_technicalDetails => 'تفاصيل تقنية';
+
+  @override
+  String get startup_failure_backupAvailable_title => 'تتوفر نسخة احتياطية';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'أُخذت في $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'نسخة احتياطية أُخذت قبل الترقية من المخطط v$fromVersion إلى v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction => 'استرداد هذه النسخة الاحتياطية';
+
+  @override
+  String get startup_failure_restoring => 'جارٍ استرداد سجل الغوص...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'تعذّر استرداد النسخة الاحتياطية. تُرك سجل الغوص الخاص بك كما كان تمامًا.';
+
+  @override
+  String get startup_failure_backupsFolder => 'نسخك الاحتياطية موجودة في:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'إظهار مجلد النسخ الاحتياطية';
+
+  @override
+  String get startup_failure_downgrade_title => 'العودة إلى الإصدار السابق';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'إذا استمرت الترقية في الفشل، ثبّت إصدار Submersion الذي كنت تستخدمه سابقًا، ثم استرد النسخة الاحتياطية من داخل ذلك الإصدار. الاسترداد هنا سيعيد تشغيل الترقية نفسها فحسب. لا يخفّض Submersion إصداره تلقائيًا: نقلك تلقائيًا إلى نسخ أقدم سيبقيك بصمت على إصدارات ذات مشكلات معروفة.';
+
+  @override
+  String get startup_failure_downgrade_action => 'عرض الإصدارات السابقة';
 
   @override
   String get startup_recovering_title => 'جارٍ استرداد قاعدة البيانات...';
@@ -31040,6 +31243,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'يرجى تحديث Submersion إلى أحدث إصدار. بياناتك آمنة ولم تُعدَّل. إذا أُخذت نسخة احتياطية قبل الترقية، فهي موجودة في مجلد Backups ويمكن استعادتها بعد التحديث.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'تم تثبيت هذا التطبيق من متجر تطبيقات وهو أقدم من الإصدار الذي أنشأ بياناتك. بياناتك آمنة ولم يتم تعديلها. حدّث Submersion عندما يظهر الإصدار الجديد في المتجر، ثم أعد فتحه.';
 
   @override
   String get startup_versionMismatch_download => 'تنزيل أحدث إصدار';
@@ -32026,4 +32233,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'معلومات الوسائط';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'لا يخبر تطبيق صحة Apple التطبيقات أبدًا بما إذا كان قد تم منح إذن القراءة. إذا لم تظهر أي غطسات، افتح تطبيق صحة ثم المشاركة ثم التطبيقات ثم Submersion، وفعّل التمارين وعمق الغوص ودرجة حرارة الماء ومعدل ضربات القلب.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'لا توجد تمارين غوص في هذا النطاق. تأكد من أن التواريخ تغطي الغطسة، ومن تفعيل التمارين وعمق الغوص في تطبيق صحة ضمن المشاركة ثم التطبيقات ثم Submersion.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'عمق الغوص - عينات العمق المسجلة أثناء الغطسات';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'درجة حرارة الماء - عينات درجة الحرارة المسجلة أثناء الغطسات';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'تتم إدارة وصول HealthKit من تطبيق صحة';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit غير متوفر على هذا الجهاز';
 }

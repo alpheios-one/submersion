@@ -1058,6 +1058,7 @@ class DiveListTile extends ConsumerWidget {
                                 ? field.extractFromDive(
                                     fullDive!,
                                     sacUnit: units.sacUnit,
+                                    gasModel: units.settings.gasModel,
                                     diveTypeLabel: diveTypeLabelResolver,
                                   )
                                 : (field.extractFromSummary(
@@ -1210,6 +1211,7 @@ class DiveListTile extends ConsumerWidget {
         ? field.extractFromDive(
             fullDive!,
             sacUnit: units.sacUnit,
+            gasModel: units.settings.gasModel,
             diveTypeLabel: diveTypeLabelResolver,
           )
         : summary != null

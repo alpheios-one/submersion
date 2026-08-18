@@ -101,6 +101,8 @@ void main() {
           allDiveComputersProvider.overrideWith((ref) async => computers),
         ].cast(),
         child: MaterialApp(
+          // Pinned: this suite drives the sheet by English label.
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
@@ -138,6 +140,11 @@ void main() {
     // The sheet's ListView builds children lazily, so a deep target may not be
     // in the tree yet; scroll it in. Targets already present (e.g. the preset
     // chips near the top) are skipped to avoid a needless scroll.
+    //
+    // Pass a PLAIN finder: `evaluate()` on an index-qualified one (`.first`,
+    // `.at(n)`) throws "Bad state: No element" when nothing has been built
+    // yet, both here and inside dragUntilVisible. Disambiguation happens below
+    // instead, once the target exists.
     if (finder.evaluate().isEmpty) {
       await tester.scrollUntilVisible(finder, 60.0, scrollable: scrollable());
     }
@@ -210,7 +217,7 @@ void main() {
     );
 
     Future<void> selectFrom(String hint, String option) async {
-      await scrollTo(tester, find.text(hint).first);
+      await scrollTo(tester, find.text(hint));
       await tester.tap(find.text(hint).first);
       await tester.pumpAndSettle();
       await tester.tap(find.text(option).last);

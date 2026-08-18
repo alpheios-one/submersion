@@ -186,6 +186,31 @@ class NoaaTideStations extends Table {
   Set<Column> get primaryKey => {stationId};
 }
 
+/// Memoized result of the computed decompression-obligation classification
+/// for one dive (#623).
+///
+/// Local-only by construction: every device can re-derive this from the dive
+/// profile it already holds, so it carries no HLC, is never synced, and is
+/// never backed up. A restored database recomputes rather than inheriting
+/// another device's answer, which may have been produced under different
+/// gradient factors.
+class DecoClassificationCache extends Table {
+  TextColumn get diveId => text()();
+
+  /// Whether the app's own analysis put the diver into decompression.
+  BoolColumn get hadDeco => boolean()();
+
+  /// Fingerprint of every input that can change the answer: engine version,
+  /// the gradient factors actually used, and the dive's profile revision.
+  /// A mismatch means recompute.
+  TextColumn get inputsHash => text()();
+
+  IntColumn get computedAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {diveId};
+}
+
 @DriftDatabase(
   tables: [
     LocalAssetCache,
@@ -197,13 +222,14 @@ class NoaaTideStations extends Table {
     GpsTrackGeometryCache,
     WatchedRoots,
     WatchedFolderIndex,
+    DecoClassificationCache,
   ],
 )
 class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -286,6 +312,10 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           "DELETE FROM local_asset_cache WHERE resolution_method = 'unresolved'",
         );
       }
+      // v13: computed deco-obligation classifications (#623).
+      if (from < 13) {
+        await m.createTable(decoClassificationCache);
+      }
     },
     beforeOpen: (details) async {
       // Ladder-collision self-heal: a parallel branch that also claimed v7
@@ -356,6 +386,15 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           mtime_millis INTEGER NOT NULL,
           content_hash TEXT,
           PRIMARY KEY (root_path, relative_path)
+        )
+      ''');
+      await customStatement('''
+        CREATE TABLE IF NOT EXISTS deco_classification_cache (
+          dive_id TEXT NOT NULL,
+          had_deco INTEGER NOT NULL,
+          inputs_hash TEXT NOT NULL,
+          computed_at INTEGER NOT NULL,
+          PRIMARY KEY (dive_id)
         )
       ''');
     },

@@ -9,6 +9,7 @@ import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
+import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
@@ -82,6 +83,7 @@ class DiverSettingsRepository {
               weightUnit: Value(s.weightUnit.name),
               altitudeUnit: Value(s.altitudeUnit.name),
               sacUnit: Value(s.sacUnit.name),
+              gasModel: Value(s.gasModel.name),
               defaultCurrency: Value(s.defaultCurrency),
               visibilityScalePreset: Value(s.visibilityScalePreset.name),
               visibilityScaleExcellentM: Value(s.visibilityScaleExcellentM),
@@ -240,6 +242,7 @@ class DiverSettingsRepository {
           weightUnit: Value(settings.weightUnit.name),
           altitudeUnit: Value(settings.altitudeUnit.name),
           sacUnit: Value(settings.sacUnit.name),
+          gasModel: Value(settings.gasModel.name),
           defaultCurrency: Value(settings.defaultCurrency),
           visibilityScalePreset: Value(settings.visibilityScalePreset.name),
           visibilityScaleExcellentM: Value(settings.visibilityScaleExcellentM),
@@ -440,6 +443,7 @@ class DiverSettingsRepository {
       weightUnit: _parseWeightUnit(row.weightUnit),
       altitudeUnit: _parseAltitudeUnit(row.altitudeUnit),
       sacUnit: _parseSacUnit(row.sacUnit),
+      gasModel: GasModel.fromName(row.gasModel),
       defaultCurrency: row.defaultCurrency,
       visibilityScalePreset: _parseVisibilityScalePreset(
         row.visibilityScalePreset,

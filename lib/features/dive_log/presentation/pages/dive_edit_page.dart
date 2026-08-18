@@ -70,6 +70,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/pickers/edit_s
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_membership_editor.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/equipment_picker_sheet.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/equipment_set_picker_sheet.dart';
+import 'package:submersion/features/dive_log/presentation/utils/entry_exit_autofill.dart';
 import 'package:submersion/features/dive_log/presentation/utils/water_type_autofill.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/site_picker_sheet.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/species_picker_sheet.dart';
@@ -101,6 +102,7 @@ import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.d
 import 'package:submersion/features/dive_log/presentation/pages/bulk_edit_field_set.dart';
 import 'package:submersion/features/dive_log/presentation/providers/bulk_dive_edit_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_collection_mode_selector.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/bulk_tank_specs_editor.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/flight_window_warning_banner.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_field_gate.dart';
 import 'package:submersion/core/constants/tank_presets.dart';
@@ -951,6 +953,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   final Map<BulkCollectionType, BulkCollectionMode> _collectionModes = {};
   bool _bulkTankOnlyIfEmpty = false;
 
+  // Tanks "Update" mode (#797): a template cylinder plus the mask of which of
+  // its attributes to write onto the tanks each dive already has.
+  DiveTank _bulkTankSpecs = const DiveTank(id: 'bulk-tank-specs');
+  Set<TankSpecField> _bulkTankSpecFields = {};
+
   // Bulk tri-state membership state for each reference collection: the members
   // shown across the selected dives (existing + picker-added), their per-item
   // dive counts, and the resulting add/remove delta.
@@ -1182,6 +1189,23 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   }
 
   Widget _bulkTanksEditor(UnitFormatter units) {
+    // Update edits the tanks each dive already has, so it takes a template plus
+    // a field mask instead of a tank list (#797).
+    if (_collectionModes[BulkCollectionType.tanks] ==
+        BulkCollectionMode.update) {
+      return BulkTankSpecsEditor(
+        specs: _bulkTankSpecs,
+        fields: _bulkTankSpecFields,
+        onSpecsChanged: (t) => setState(() {
+          _markDirty();
+          _bulkTankSpecs = t;
+        }),
+        onFieldsChanged: (f) => setState(() {
+          _markDirty();
+          _bulkTankSpecFields = f;
+        }),
+      );
+    }
     return Column(
       children: [
         for (var i = 0; i < _tanks.length; i++)
@@ -1268,7 +1292,12 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         _collectionEntry(
           type: BulkCollectionType.tanks,
           label: context.l10n.diveLog_bulkEdit_collectionTanks,
-          allowed: ownedModes,
+          // Tanks alone can be edited in place, keeping their pressures (#797).
+          allowed: const [
+            BulkCollectionMode.add,
+            BulkCollectionMode.update,
+            BulkCollectionMode.replace,
+          ],
           editor: _bulkTanksEditor(units),
         ),
         _collectionEntry(
@@ -1364,7 +1393,15 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       );
     }
     final tanksMode = _collectionModes[BulkCollectionType.tanks];
-    if (tanksMode != null) {
+    if (tanksMode == BulkCollectionMode.update) {
+      // An empty mask would touch nothing; _saveBulk reports that separately
+      // rather than sending a no-op op through the engine.
+      if (_bulkTankSpecFields.isNotEmpty) {
+        ops.add(
+          TankSpecsOp(specs: _bulkTankSpecs, fields: _bulkTankSpecFields),
+        );
+      }
+    } else if (tanksMode != null) {
       ops.add(
         TanksOp(
           mode: tanksMode,
@@ -1689,16 +1726,39 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     if (!hasScalar &&
         (notesAppend == null || notesAppend.isEmpty) &&
         ops.isEmpty) {
+      // An incomplete tank intent only blocks the save when it is the whole
+      // request; alongside other changes it no-ops, as every other collection
+      // does with an empty payload. Name the tank case so the hint is
+      // actionable rather than the generic "nothing selected".
+      final tanksUpdateEmpty =
+          _collectionModes[BulkCollectionType.tanks] ==
+              BulkCollectionMode.update &&
+          _bulkTankSpecFields.isEmpty;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.diveLog_bulkEdit_nothingSelected)),
+        SnackBar(
+          content: Text(
+            tanksUpdateEmpty
+                ? l10n.diveLog_bulkEdit_tankSpecsNoFields
+                : l10n.diveLog_bulkEdit_nothingSelected,
+          ),
+        ),
       );
       return;
     }
+
+    // An in-place tank update skips dives with no tanks; warn before applying.
+    final skipped = ops.any((o) => o is TankSpecsOp)
+        ? await ref.read(diveRepositoryProvider).divesWithoutTanksCount(ids)
+        : 0;
+    if (!mounted) return;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.diveLog_bulkEdit_confirmTitle),
+        content: skipped > 0
+            ? Text(l10n.diveLog_bulkEdit_tankSpecsSkipped(skipped))
+            : null,
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -2093,13 +2153,23 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     }
   }
 
-  /// Assigns [site] to the dive and snaps the water type from it (manual
-  /// overrides survive when the site has none). Use for user-initiated
-  /// assignments and new-dive prefill — NOT the load path, which restores the
-  /// dive's own saved water type.
+  /// Assigns [site] to the dive and snaps the water type and the entry/exit
+  /// methods from it (manual overrides survive; see the rules on
+  /// [entryExitAfterSiteAssign]). Use for user-initiated assignments and
+  /// new-dive prefill — NOT the load path, which restores the dive's own
+  /// saved values.
   void _assignSite(DiveSite? site) {
     _selectedSite = site;
     _waterType = waterTypeAfterSiteAssign(_waterType, site);
+    final entryExit = entryExitAfterSiteAssign(
+      currentEntry: _entryMethod,
+      currentExit: _exitMethod,
+      currentLinked: _exitMethodLinked,
+      site: site,
+    );
+    _entryMethod = entryExit.entry;
+    _exitMethod = entryExit.exit;
+    _exitMethodLinked = entryExit.linked;
     unawaited(_maybeAutoFillAltitude());
   }
 

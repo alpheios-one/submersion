@@ -62,7 +62,8 @@ of work". Kinds are user extensible (managed at `/gear/service-types` via
   can always overwrite or clear it.
 - Currency conversion. Totals stay grouped per currency, as `sumByCurrency`
   already does.
-- Fixing the incremental sync HLC gap. See "Deferred work".
+- Fixing the incremental sync HLC gap (issue #1144). See "Deferred work";
+  main resolved it independently before this branch merged.
 
 ## Current state
 
@@ -223,18 +224,21 @@ never reach an existing installation. Prices are also personal and regional.
 Leaving the seed alone keeps its positional column list and the
 characterization test in `service_ledger_schema_test.dart` intact.
 
-**Migration v154.** A PRAGMA guarded `_assertServiceCostColumns()` helper
+**Migration v156.** A PRAGMA guarded `_assertServiceCostColumns()` helper
 modeled on `_assertO2CellMillivoltColumns` (`database.dart:4718`), with the
 early return on `cols.isEmpty` that minimal test fixtures require. Registered
 in three places, per house convention:
 
-1. `currentSchemaVersion = 154` (`database.dart:3072`)
-2. `154,` appended to `migrationVersions` with a comment (`:3283-3293`)
-3. the `if (from < 154) { ... }` plus `if (from < 154) await reportProgress();`
+1. `currentSchemaVersion = 156` (`database.dart:3072`)
+2. `156,` appended to `migrationVersions` with a comment (`:3283-3293`)
+3. the `if (from < 156) { ... }` plus `if (from < 156) await reportProgress();`
    pair in `onUpgrade` (`:8074-8093`), and the `beforeOpen` backstop (`:8241`)
 
-Main is at 153 and open PR #1127 also writes 153, so it renumbers to 154 when
-it rebases. If it lands first, this work renumbers to 155.
+Main was at 153 when this was written. It has since taken 154 (#1104 site
+entry/exit method) and 155 (#828 gas model), so this migration renumbered to
+**156** on merging main. The floor
+(`minimumCompatibleSchemaVersion`) stays at 137: these are new nullable
+columns, which that constant's docstring explicitly excludes from raising it.
 
 **Sync requires no serializer changes.** `sync_data_serializer.dart` routes
 these tables through Drift's generated `toJson()`/`fromJson()`, so
@@ -317,7 +321,7 @@ New keys, all eleven locales in `lib/l10n/arb/`:
 
 | Area | Test |
 | --- | --- |
-| Migration | `test/core/database/migration_v154_service_cost_test.dart`, on the four-test `migration_v153_o2_cell_mv_test.dart` template: columns added preserving rows, ladder membership, idempotency when a column already exists, no-op when the table is absent |
+| Migration | `test/core/database/migration_v156_service_cost_test.dart`, on the four-test `migration_v153_o2_cell_mv_test.dart` template: columns added preserving rows, ladder membership, idempotency when a column already exists, no-op when the table is absent |
 | Entities | `copyWith` clears `defaultCost`/`defaultCurrency` to null via the `_undefined` sentinel |
 | Sync | new keys round-trip in `test/core/services/sync/service_ledger_sync_test.dart` |
 | Seed | `service_ledger_schema_test.dart` gains an assertion that built-in kinds have null `defaultCost` |
@@ -348,7 +352,7 @@ One PR, four ordered commits:
    `ServiceType`; retitle the row with the kind name; move cost out of
    `trailing`; render notes and next due.
 2. Add the filter.
-3. Add `defaultCost`/`defaultCurrency`, migration v154, entity and repository
+3. Add `defaultCost`/`defaultCurrency`, migration v156, entity and repository
    plumbing, editor fields, and the prefill chain.
 4. Add the Excel maintenance log and its entry points.
 
@@ -356,6 +360,15 @@ Commit 1 alone closes the literal complaint in the issue title, so it is
 worth keeping self-contained and reviewable on its own.
 
 ## Deferred work
+
+**RESOLVED UPSTREAM (2026-08-18).** Issue #1144 was fixed on main before this
+branch merged: `sync_repository.dart` now registers `serviceKinds` and
+`serviceSchedules` in `_hlcTargets`, and `_hlcBackfillTargets` stamps the
+existing NULL-hlc rows (custom kinds filtered on `is_built_in = 0`, since
+built-ins are reference data the export skips anyway). A default price set on
+a task or interval therefore reaches a second device on the next incremental
+sync, and the caveat below no longer applies to this work. The original
+analysis is kept for the record.
 
 **Incremental sync does not carry custom kinds or schedules.** Neither
 `serviceKinds` nor `serviceSchedules` appears in

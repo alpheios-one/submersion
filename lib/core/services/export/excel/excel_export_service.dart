@@ -328,9 +328,11 @@ class ExcelExportService {
         site.location?.longitude.toStringAsFixed(6) ?? '',
         convertDepth(site.minDepth, depthUnit),
         convertDepth(site.maxDepth, depthUnit),
-        site.conditions?.waterType ?? '',
-        site.conditions?.typicalCurrent ?? '',
-        site.conditions?.entryType ?? '',
+        site.waterType?.displayName ?? '',
+        // Typical current has no backing column; the header position is kept
+        // so existing consumers of this sheet keep their column offsets.
+        '',
+        site.entryMethod?.displayName ?? '',
         site.difficulty?.displayName ?? '',
         site.rating?.toStringAsFixed(1) ?? '',
         site.description.replaceAll('\n', ' '),

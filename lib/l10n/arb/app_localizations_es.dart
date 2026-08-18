@@ -385,8 +385,52 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => 'Reemplazar';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => 'Actualizar';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty =>
       'Solo inmersiones que aún no tienen botella';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      'Elige qué atributos sobrescribir en las botellas que estas inmersiones ya tienen. Las presiones inicial y final nunca se modifican.';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields =>
+      'Elige al menos un atributo de botella para actualizar.';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => 'Preajuste';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => 'Función';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => 'Volumen';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => 'Presión de trabajo';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => 'Material';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => 'Mezcla de gas';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => 'Nombre';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count inmersiones seleccionadas no tienen botellas y se omitirán.',
+      one: '1 inmersión seleccionada no tiene botellas y se omitirá.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => '¿Aplicar cambios?';
@@ -5785,6 +5829,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_filter_title => 'Filtrar inmersiones';
 
   @override
+  String get diveLog_filter_resizeGrip =>
+      'Cambiar el tamaño del panel de filtros';
+
+  @override
   String get diveLog_filter_tooltip_close => 'Cerrar filtro';
 
   @override
@@ -7981,6 +8029,47 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get diveSites_edit_access_parkingInfo_label =>
       'Informacion de estacionamiento';
+
+  @override
+  String get diveSites_edit_access_entryMethod_label => 'Método de entrada';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Método de salida';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tus $count inmersiones aquí: entrada $entry, salida $exit',
+      one: 'Tu inmersión aquí: entrada $entry, salida $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tus $count inmersiones aquí: entrada $entry',
+      one: 'Tu inmersión aquí: entrada $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Entrada';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Salida';
 
   @override
   String get diveSites_edit_altitude_helperText =>
@@ -14539,17 +14628,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' y ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count dispositivos sincronizan desde una versión más reciente de Submersion. Actualiza este dispositivo para recibir sus últimos cambios.',
-      one:
-          '1 dispositivo sincroniza desde una versión más reciente de Submersion. Actualiza este dispositivo para recibir sus últimos cambios.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList sincroniza desde una versión más reciente de Submersion, por lo que sus últimos cambios quedan retenidos por ahora.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList sincronizan desde una versión más reciente de Submersion, por lo que sus últimos cambios quedan retenidos por ahora.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Actualiza este dispositivo para recibirlos.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'Se aplicarán automáticamente cuando llegue la actualización de la tienda de aplicaciones de este dispositivo; puede que aún esté en revisión.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Conectado';
@@ -16011,6 +16107,30 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => 'Unidad de SAC Rate';
 
   @override
+  String get settings_units_gasModel => 'Cálculos de gas';
+
+  @override
+  String get settings_units_gasModel_real => 'Gas real';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      'Tiene en cuenta la compresibilidad. Una botella de 12 L a 200 bar contiene unos 2317 L.';
+
+  @override
+  String get settings_units_gasModel_ideal => 'Gas ideal';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      'Coincide con el cálculo manual y las tablas. Una botella de 12 L a 200 bar contiene 2400 L.';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      'Cómo se convierte la presión de la botella en volumen de gas. Afecta al SAC, las estadísticas de gas, el planificador y las calculadoras. El gas ideal coincide con el cálculo que enseñan las agencias; el gas real es físicamente exacto y da un SAC un 5 % menor aproximadamente.';
+
+  @override
+  String get settings_units_dialog_gasModel => 'Cálculos de gas';
+
+  @override
   String get settings_units_dialog_temperatureUnit => 'Unidad de temperatura';
 
   @override
@@ -16774,6 +16894,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get statistics_profile_deco_noDeco => 'Sin deco';
+
+  @override
+  String get statistics_profile_deco_notRecorded => 'Sin registrar';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count inmersiones no tienen datos de descompresión registrados ni calculables y se excluyen de la tasa';
+  }
 
   @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
@@ -20394,7 +20522,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'La importacion de Apple Watch solo esta disponible en dispositivos iOS y macOS.';
+      'La importación desde el Apple Watch necesita un iPhone con la app Salud.';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed =>
@@ -25134,6 +25262,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'Entrada';
+
+  @override
+  String get enum_siteField_exitMethod => 'Método de salida';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Salida';
 
   @override
   String get enum_siteField_bestSeason_short => 'Época';
@@ -31283,12 +31417,87 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title =>
-      'Falló la actualización de la base de datos';
+  String get startup_error_title => 'Submersion no pudo iniciarse';
 
   @override
   String get startup_error_body =>
-      'Prueba a reiniciar la app. Si el problema persiste, contacta con el soporte: tus datos siguen en el disco y no hace falta reinstalar.';
+      'Algo salió mal antes de que tu cuaderno de buceo terminara de abrirse. Tus datos siguen en el disco y no requieren una reinstalación. Prueba a reiniciar la aplicación; si el problema persiste, contacta con el soporte.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'Esta compilación no puede abrir una base de datos';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'A esta compilación le falta el motor de base de datos de Submersion, por lo que tu cuaderno de buceo nunca llegó a abrirse. Nada ha cambiado en el disco y ningún dato está en riesgo.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'Reinstalar o restaurar una copia de seguridad no servirá de nada. Instala una compilación funcional de Submersion e infórmanos de esto: es un fallo del paquete de la aplicación, no de tus datos.';
+
+  @override
+  String get startup_migrationFailed_title =>
+      'Error al actualizar la base de datos';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'Tu cuaderno de buceo no pudo actualizarse al formato que necesita esta versión. Se hizo una copia de seguridad antes de empezar la actualización, así que no se ha perdido nada.';
+
+  @override
+  String get startup_dataUnreadable_title =>
+      'No se pudo leer tu cuaderno de buceo';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'El archivo de la base de datos está ahí, pero Submersion no puede leerlo. Normalmente esto significa que el archivo está dañado. Restaurar una copia de seguridad es la forma más rápida de volver.';
+
+  @override
+  String get startup_failure_technicalDetails => 'Detalles técnicos';
+
+  @override
+  String get startup_failure_backupAvailable_title =>
+      'Hay una copia de seguridad disponible';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'Creada el $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'Copia de seguridad creada antes de la actualización del esquema v$fromVersion a v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction =>
+      'Restaurar esta copia de seguridad';
+
+  @override
+  String get startup_failure_restoring => 'Restaurando tu cuaderno de buceo...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'No se pudo restaurar la copia de seguridad. Tu cuaderno de buceo se ha dejado exactamente como estaba.';
+
+  @override
+  String get startup_failure_backupsFolder =>
+      'Tus copias de seguridad están en:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'Mostrar carpeta de copias';
+
+  @override
+  String get startup_failure_downgrade_title => 'Volver a la versión anterior';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'Si la actualización sigue fallando, instala la versión de Submersion que usabas antes y restaura la copia de seguridad desde esa versión. Restaurarla aquí solo volvería a ejecutar la misma actualización. Submersion no se degrada por sí solo: pasarte automáticamente a compilaciones antiguas te mantendría en silencio en versiones con problemas conocidos.';
+
+  @override
+  String get startup_failure_downgrade_action => 'Ver versiones anteriores';
 
   @override
   String get startup_recovering_title => 'Recuperando la base de datos...';
@@ -31378,6 +31587,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'Actualiza Submersion a la última versión. Tus datos están a salvo y no se han modificado. Si se hizo una copia de seguridad antes de la actualización, está en tu carpeta Backups y se puede restaurar después de actualizar.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'Esta app se instaló desde una tienda de aplicaciones y es más antigua que la versión que creó tus datos. Tus datos están a salvo y no se han modificado. Actualiza Submersion cuando la nueva versión aparezca en la tienda y vuelve a abrirla.';
 
   @override
   String get startup_versionMismatch_download => 'Descargar la última versión';
@@ -32370,4 +32583,28 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => 'Información del medio';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple Salud nunca indica a las apps si se concedió el acceso de lectura. Si no aparece ninguna inmersión, abre Salud, luego Compartir, Apps, Submersion, y activa Entrenamientos, Profundidad bajo el agua, Temperatura del agua y Frecuencia cardíaca.';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      'No hay entrenamientos de buceo en este intervalo. Comprueba que las fechas incluyan la inmersión y que en Salud, Compartir, Apps, Submersion estén activados Entrenamientos y Profundidad bajo el agua.';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      'Profundidad bajo el agua - muestras de profundidad registradas durante las inmersiones';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      'Temperatura del agua - muestras de temperatura registradas durante las inmersiones';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'El acceso a HealthKit se gestiona en la app Salud';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      'HealthKit no está disponible en este dispositivo';
 }
