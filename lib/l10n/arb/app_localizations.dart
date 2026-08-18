@@ -51699,17 +51699,134 @@ abstract class AppLocalizations {
   /// **'Upgrading database... step {currentStep} of {totalSteps}'**
   String startup_migrating_progress(Object currentStep, Object totalSteps);
 
-  /// No description provided for @startup_error_title.
+  /// Terminal startup screen title when the failure could not be classified. Deliberately neutral: it must NOT claim the database upgrade failed, since most failures reach this screen without a migration having been attempted.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion could not start'**
+  String get startup_error_title;
+
+  /// Body for an unclassified terminal startup failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong before your dive log finished opening. Your data is still on disk and does not require a reinstall. Try restarting the app; if this persists, contact support.'**
+  String get startup_error_body;
+
+  /// Terminal startup screen title when the app's native database engine is missing or is not a SQLCipher build. The diver's database was never opened.
+  ///
+  /// In en, this message translates to:
+  /// **'This build can\'t open a database'**
+  String get startup_engineUnavailable_title;
+
+  /// Explains that an engine failure happens before the database is opened, so no dive data is at risk.
+  ///
+  /// In en, this message translates to:
+  /// **'Submersion\'s database engine is missing from this build, so your dive log was never opened. Nothing on disk has changed and no data is at risk.'**
+  String get startup_engineUnavailable_body;
+
+  /// Tells the diver that reinstalling or restoring cannot fix a broken app package, and asks them to report it.
+  ///
+  /// In en, this message translates to:
+  /// **'Reinstalling or restoring a backup will not help. Install a working build of Submersion, and please report this: it is a fault in the app package, not in your data.'**
+  String get startup_engineUnavailable_guidance;
+
+  /// Terminal startup screen title when the schema upgrade ladder genuinely failed. This is the ONLY class that may say the upgrade failed.
   ///
   /// In en, this message translates to:
   /// **'Database upgrade failed'**
-  String get startup_error_title;
+  String get startup_migrationFailed_title;
 
-  /// No description provided for @startup_error_body.
+  /// Explains a failed schema upgrade and points at the pre-migration safety copy.
   ///
   /// In en, this message translates to:
-  /// **'Try restarting the app. If this persists, contact support. Your data is still on disk and does not require a reinstall.'**
-  String get startup_error_body;
+  /// **'Your dive log could not be upgraded to the format this version needs. A safety copy was taken before the upgrade started, so nothing is lost.'**
+  String get startup_migrationFailed_body;
+
+  /// Terminal startup screen title when the database file was reached but is corrupt or unreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'Your dive log could not be read'**
+  String get startup_dataUnreadable_title;
+
+  /// Explains a damaged database file and points at restoring a backup.
+  ///
+  /// In en, this message translates to:
+  /// **'The database file is there, but Submersion cannot read it. This usually means the file is damaged. Restoring a backup is the fastest way back.'**
+  String get startup_dataUnreadable_body;
+
+  /// Label above the raw error text on the terminal startup failure screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical details'**
+  String get startup_failure_technicalDetails;
+
+  /// Heading of the recovery card offering a backup found on disk during a failed startup.
+  ///
+  /// In en, this message translates to:
+  /// **'A backup is available'**
+  String get startup_failure_backupAvailable_title;
+
+  /// When the offered backup was taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken {timestamp}'**
+  String startup_failure_backupAvailable_taken(Object timestamp);
+
+  /// Extra line shown when the offered backup is the automatic pre-migration safety copy. Object, not int, so schema numbers are never group-separated.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety copy taken before the upgrade from schema v{fromVersion} to v{toVersion}.'**
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  );
+
+  /// Button that swaps the offered backup in for the live database and restarts startup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore this backup'**
+  String get startup_failure_restoreAction;
+
+  /// Progress label while the offered backup is being restored.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring your dive log...'**
+  String get startup_failure_restoring;
+
+  /// Shown when the restore failed. Reassures the diver that the live database was rolled back untouched.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup could not be restored. Your dive log has been left exactly as it was.'**
+  String get startup_failure_restoreFailed;
+
+  /// Label before the filesystem path where backups are kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Your backups are in:'**
+  String get startup_failure_backupsFolder;
+
+  /// Desktop-only button that opens the backups folder in the system file manager.
+  ///
+  /// In en, this message translates to:
+  /// **'Show backup folder'**
+  String get startup_failure_showBackupsFolder;
+
+  /// Heading of the guided-downgrade section on a failed schema upgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Going back to the previous version'**
+  String get startup_failure_downgrade_title;
+
+  /// Explains how to go back to the previous app version, and why Submersion never downgrades itself.
+  ///
+  /// In en, this message translates to:
+  /// **'If the upgrade keeps failing, install the version of Submersion you were running before, then restore the safety copy from inside that version. Restoring it here would only run the same upgrade again. Submersion does not downgrade itself: moving you onto older builds automatically would quietly keep you on versions with known problems.'**
+  String get startup_failure_downgrade_body;
+
+  /// Button opening the app's releases page so the diver can pick the previous version.
+  ///
+  /// In en, this message translates to:
+  /// **'View previous releases'**
+  String get startup_failure_downgrade_action;
 
   /// No description provided for @startup_recovering_title.
   ///

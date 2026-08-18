@@ -31164,11 +31164,88 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => 'Falha na atualização do banco de dados';
+  String get startup_error_title => 'O Submersion não conseguiu iniciar';
 
   @override
   String get startup_error_body =>
-      'Tente reiniciar o app. Se o problema persistir, entre em contato com o suporte: seus dados continuam no disco e não é necessário reinstalar.';
+      'Algo correu mal antes de o seu diário de mergulho acabar de abrir. Os seus dados continuam no disco e não é necessária uma reinstalação. Tente reiniciar a aplicação; se o problema persistir, contacte o suporte.';
+
+  @override
+  String get startup_engineUnavailable_title =>
+      'Esta compilação não consegue abrir uma base de dados';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      'Falta o motor de base de dados do Submersion nesta compilação, por isso o seu diário de mergulho nunca chegou a ser aberto. Nada mudou no disco e nenhum dado está em risco.';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      'Reinstalar ou restaurar uma cópia de segurança não vai ajudar. Instale uma compilação funcional do Submersion e comunique-nos isto: é uma falha no pacote da aplicação, não nos seus dados.';
+
+  @override
+  String get startup_migrationFailed_title =>
+      'Falha na atualização da base de dados';
+
+  @override
+  String get startup_migrationFailed_body =>
+      'Não foi possível atualizar o seu diário de mergulho para o formato de que esta versão precisa. Foi criada uma cópia de segurança antes de a atualização começar, por isso nada se perdeu.';
+
+  @override
+  String get startup_dataUnreadable_title =>
+      'Não foi possível ler o seu diário de mergulho';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      'O ficheiro da base de dados está lá, mas o Submersion não consegue lê-lo. Normalmente isto significa que o ficheiro está danificado. Restaurar uma cópia de segurança é a forma mais rápida de recomeçar.';
+
+  @override
+  String get startup_failure_technicalDetails => 'Detalhes técnicos';
+
+  @override
+  String get startup_failure_backupAvailable_title =>
+      'Está disponível uma cópia de segurança';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return 'Criada a $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return 'Cópia de segurança criada antes da atualização do esquema v$fromVersion para v$toVersion.';
+  }
+
+  @override
+  String get startup_failure_restoreAction =>
+      'Restaurar esta cópia de segurança';
+
+  @override
+  String get startup_failure_restoring =>
+      'A restaurar o seu diário de mergulho...';
+
+  @override
+  String get startup_failure_restoreFailed =>
+      'Não foi possível restaurar a cópia de segurança. O seu diário de mergulho ficou exatamente como estava.';
+
+  @override
+  String get startup_failure_backupsFolder =>
+      'As suas cópias de segurança estão em:';
+
+  @override
+  String get startup_failure_showBackupsFolder => 'Mostrar pasta das cópias';
+
+  @override
+  String get startup_failure_downgrade_title => 'Voltar à versão anterior';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      'Se a atualização continuar a falhar, instale a versão do Submersion que usava antes e restaure a cópia de segurança a partir dessa versão. Restaurá-la aqui apenas voltaria a executar a mesma atualização. O Submersion nunca regride sozinho: passá-lo automaticamente para compilações antigas mantê-lo-ia em silêncio em versões com problemas conhecidos.';
+
+  @override
+  String get startup_failure_downgrade_action => 'Ver versões anteriores';
 
   @override
   String get startup_recovering_title => 'Recuperando o banco de dados...';

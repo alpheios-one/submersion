@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:url_launcher/url_launcher.dart';
@@ -12,13 +13,16 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:submersion/app.dart' show resolveAppLocale;
 import 'package:submersion/app.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/database_engine_preflight.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/domain/entities/migration_progress.dart';
 import 'package:submersion/core/presentation/pages/lock_escape_dialogs.dart';
 import 'package:submersion/core/presentation/pages/lock_screen_view.dart';
 import 'package:submersion/core/presentation/startup_brightness.dart';
+import 'package:submersion/core/presentation/startup_failure.dart';
 import 'package:submersion/core/presentation/widgets/backup_status_views.dart';
 import 'package:submersion/core/presentation/widgets/ocean_background.dart';
+import 'package:submersion/core/presentation/widgets/startup_failure_view.dart';
 import 'package:submersion/core/presentation/widgets/version_mismatch_view.dart';
 import 'package:submersion/core/services/accounts/account_deduplicator.dart';
 import 'package:submersion/core/services/accounts/account_startup_migration.dart';
@@ -35,7 +39,10 @@ import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/notification_service.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/backup/data/services/backup_service.dart';
+import 'package:submersion/features/backup/data/services/backup_target.dart';
 import 'package:submersion/features/backup/data/services/pre_migration_backup_service.dart';
+import 'package:submersion/features/backup/domain/entities/backup_record.dart';
+import 'package:submersion/features/backup/domain/entities/backup_type.dart';
 import 'package:submersion/features/backup/domain/exceptions/backup_failed_exception.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
@@ -120,6 +127,20 @@ class StartupWrapper extends StatefulWidget {
   })?
   preMigrationBackupFactory;
 
+  /// Optional override for the database engine preflight (used in tests to
+  /// simulate a build whose native library does not resolve).
+  @visibleForTesting
+  final void Function()? enginePreflightOverride;
+
+  /// Optional override for the in-place restore offered by the failure screen
+  /// (used in tests, which must not swap real database files).
+  @visibleForTesting
+  final Future<void> Function(
+    String backupPath,
+    void Function(int currentStep, int totalSteps) onMigrationProgress,
+  )?
+  restoreOverride;
+
   const StartupWrapper({
     super.key,
     required this.prefs,
@@ -129,6 +150,8 @@ class StartupWrapper extends StatefulWidget {
     this.schemaVersionProbeOverride,
     this.closeAppOverride,
     this.preMigrationBackupFactory,
+    this.enginePreflightOverride,
+    this.restoreOverride,
   });
 
   @override
@@ -148,6 +171,26 @@ class _StartupWrapperState extends State<StartupWrapper>
   int _appVersion = 0;
   BackupFailedException? _backupError;
   sqlite3.SqliteException? _readonlyError;
+
+  /// How far startup had got. Drives [classifyStartupFailure]: the same
+  /// exception means different things depending on what was running.
+  StartupPhase _phase = StartupPhase.preflight;
+
+  /// Which class of failure the terminal error screen is reporting.
+  StartupFailureKind _failureKind = StartupFailureKind.unknown;
+
+  /// A backup the diver could swap in, discovered after the failure. Null
+  /// until [_loadRecoveryOptions] finds one (and never loaded at all for an
+  /// engine failure, where no restore can help).
+  BackupRecord? _recoveryBackup;
+
+  /// Directory holding [_recoveryBackup], shown so the diver can reach their
+  /// backups by hand. Backup *settings* are unreachable from the splash: it
+  /// runs before the router and the database exist.
+  String? _backupsDirectory;
+
+  StartupRestoreStatus _restoreStatus = StartupRestoreStatus.idle;
+  String? _restoreError;
 
   /// Completed by the unlock handlers to resume [_runInitialization] past
   /// the lock gate.
@@ -194,6 +237,15 @@ class _StartupWrapperState extends State<StartupWrapper>
 
   Future<void> _runInitialization() async {
     try {
+      _phase = StartupPhase.preflight;
+
+      // Prove the database engine works before ANY user file is touched.
+      // In-memory only, so a failure here provably left the diver's data
+      // alone and can say so, instead of being misattributed to whichever
+      // step happened to be running (issue #1129: a Windows build shipped
+      // without sqlcipher.dll and the app reported a failed upgrade).
+      (widget.enginePreflightOverride ?? assertDatabaseEngineAvailable)();
+
       // Determine if migration is needed before opening the database
       final dbPath = await widget.locationService.getDatabasePath();
 
@@ -240,6 +292,7 @@ class _StartupWrapperState extends State<StartupWrapper>
           }
           return;
         }
+        _phase = StartupPhase.upgrading;
         if (mounted) {
           setState(() {
             _state = _StartupState.migrating;
@@ -249,6 +302,8 @@ class _StartupWrapperState extends State<StartupWrapper>
             );
           });
         }
+      } else {
+        _phase = StartupPhase.opening;
       }
 
       // Run DB init and minimum splash duration in parallel
@@ -307,23 +362,30 @@ class _StartupWrapperState extends State<StartupWrapper>
           });
         }
       } else {
-        debugPrint('FATAL: App initialization failed: $e');
-        if (mounted) {
-          setState(() {
-            _state = _StartupState.error;
-            _errorMessage = '$e';
-          });
-        }
+        _enterFailureState(e);
       }
     } catch (e) {
-      debugPrint('FATAL: App initialization failed: $e');
-      if (mounted) {
-        setState(() {
-          _state = _StartupState.error;
-          _errorMessage = '$e';
-        });
-      }
+      _enterFailureState(e);
     }
+  }
+
+  /// Routes a terminal startup failure to the error screen under the class it
+  /// actually belongs to, and starts looking for a way out.
+  ///
+  /// Before issue #1134 every failure landed here under the fixed title
+  /// "Database upgrade failed", which was wrong in both directions: it told
+  /// divers their upgrade failed when the database had never been opened, and
+  /// it pointed diagnosis at migration code.
+  void _enterFailureState(Object error) {
+    final kind = classifyStartupFailure(error, _phase);
+    debugPrint('FATAL: App initialization failed (${kind.name}): $error');
+    if (!mounted) return;
+    setState(() {
+      _state = _StartupState.error;
+      _failureKind = kind;
+      _errorMessage = '$error';
+    });
+    unawaited(_loadRecoveryOptions());
   }
 
   /// Resolves the App Security gate before any database access.
@@ -529,8 +591,26 @@ class _StartupWrapperState extends State<StartupWrapper>
     }
   }
 
+  /// Leaves [StartupPhase.upgrading] now that the schema ladder is no longer
+  /// in flight.
+  ///
+  /// Everything after the ladder is ordinary service startup, so a failure
+  /// there must not be reported as a failed database upgrade. Observed at two
+  /// points because neither alone is sufficient: the ladder's final progress
+  /// report is the precise instant it finishes and is the one a test can
+  /// drive, while the return of `initialize()` is the backstop that still
+  /// holds if the reported step count ever drifts from the ladder's real one.
+  void _markUpgradeFinished() {
+    _phase = StartupPhase.opening;
+  }
+
   Future<void> _initializeServices() async {
     void onProgress(int currentStep, int totalSteps) {
+      // reportProgress() in the migration ladder increments BEFORE it calls
+      // back, so the final report means the last step already completed.
+      if (totalSteps > 0 && currentStep >= totalSteps) {
+        _markUpgradeFinished();
+      }
       if (mounted) {
         setState(() {
           _progress = MigrationProgress(
@@ -558,6 +638,10 @@ class _StartupWrapperState extends State<StartupWrapper>
         onMigrationProgress: onProgress,
       ),
     );
+
+    // Backstop for the same rule the final progress report already applies:
+    // whatever the ladder reported, it is finished once initialize() returns.
+    _markUpgradeFinished();
 
     await timeStartupStep(
       'localCache',
@@ -712,6 +796,7 @@ class _StartupWrapperState extends State<StartupWrapper>
       await _runPreMigrationBackup(dbPath: dbPath, stored: stored);
       if (!mounted) return;
       final totalSteps = AppDatabase.migrationStepCount(stored);
+      _phase = StartupPhase.upgrading;
       setState(() {
         _state = _StartupState.migrating;
         _progress = MigrationProgress(currentStep: 0, totalSteps: totalSteps);
@@ -728,12 +813,171 @@ class _StartupWrapperState extends State<StartupWrapper>
         });
       }
     } catch (e) {
+      _enterFailureState(e);
+    }
+  }
+
+  /// Finds a backup the diver could swap in, plus the folder it lives in.
+  ///
+  /// Reads the backup registry straight from [SharedPreferences], which is the
+  /// only reason this works at all: the database is closed and the router does
+  /// not exist yet, so the normal backup UI is out of reach.
+  ///
+  /// Best-effort and silent on failure. This runs on a screen the diver has
+  /// already reached because something went wrong; a second failure here must
+  /// degrade to the plain error screen, not replace one terminal state with
+  /// another.
+  Future<void> _loadRecoveryOptions() async {
+    // No restore can fix a build that cannot open a database at all, and
+    // offering one would repeat exactly the misdirection #1134 is about.
+    if (!_failureKind.dataIsAtRisk) return;
+
+    try {
+      final history = BackupPreferences(widget.prefs).getHistory();
+
+      // Prefer the automatic pre-migration safety copy, the newest snapshot
+      // of the database as it was before this launch touched it, then fall
+      // back to the newest local backup of any kind.
+      final candidates = [
+        ...history.where((r) => r.type == BackupType.preMigration),
+        ...history.where((r) => r.type != BackupType.preMigration),
+      ];
+
+      for (final record in candidates) {
+        final path = record.localPath;
+        // A SAF (content://) or cloud-only record cannot be swapped in by the
+        // plain file copy DatabaseService.restore performs.
+        if (path == null || isSafRef(path)) continue;
+        // Synchronous stat on purpose. The set is bounded (a handful of
+        // registry entries, read once, on a screen that is already terminal),
+        // so async buys nothing here; and empirically the async form left the
+        // widget tests covering this screen pumping until their timeout
+        // instead of settling.
+        if (!File(path).existsSync()) continue;
+        if (!mounted) return;
+        setState(() {
+          _recoveryBackup = record;
+          _backupsDirectory = p.dirname(path);
+        });
+        return;
+      }
+
+      // No usable backup, but the folder is still worth showing: the diver may
+      // have moved their backups somewhere this registry no longer knows about.
+      final fallbackDir = await BackupService.resolveDefaultBackupsDirectory();
+      if (!mounted) return;
+      setState(() => _backupsDirectory = fallbackDir);
+    } catch (e) {
+      debugPrint('Startup recovery options unavailable: $e');
+    }
+  }
+
+  /// Swaps [_recoveryBackup] in for the live database, then resumes startup.
+  ///
+  /// Safe here precisely because startup failed: the database is closed, so
+  /// [DatabaseService.restore] does its staged swap without contending with an
+  /// open connection, and it rolls the original file back if the swap fails.
+  Future<void> _restoreFromStartupBackup() async {
+    final record = _recoveryBackup;
+    final path = record?.localPath;
+    if (path == null) return;
+    if (_restoreStatus == StartupRestoreStatus.running) return;
+
+    setState(() {
+      _restoreStatus = StartupRestoreStatus.running;
+      _restoreError = null;
+    });
+
+    void onProgress(int currentStep, int totalSteps) {
       if (mounted) {
         setState(() {
-          _state = _StartupState.error;
-          _errorMessage = '$e';
+          _progress = MigrationProgress(
+            currentStep: currentStep,
+            totalSteps: totalSteps,
+          );
         });
       }
+    }
+
+    try {
+      if (widget.restoreOverride != null) {
+        await widget.restoreOverride!(path, onProgress);
+      } else {
+        // [restore] resolves its destination through the location service,
+        // which a failed launch may never have registered. Without this the
+        // swap would target the DEFAULT path and miss a custom location.
+        DatabaseService.instance.adoptLocationService(widget.locationService);
+        await DatabaseService.instance.restore(
+          path,
+          onMigrationProgress: onProgress,
+        );
+      }
+      if (!mounted) return;
+      // The restored file carries an older schema, so the reopen inside
+      // restore() has already run the ladder. Resume startup from the top so
+      // the security gate and the remaining services run exactly as on a
+      // normal launch.
+      setState(() {
+        _restoreStatus = StartupRestoreStatus.idle;
+        _state = _StartupState.initializing;
+        _errorMessage = '';
+        _recoveryBackup = null;
+      });
+      await _runInitialization();
+    } catch (e) {
+      debugPrint('Startup restore failed: $e');
+      if (!mounted) return;
+      setState(() {
+        _restoreStatus = StartupRestoreStatus.failed;
+        _restoreError = '$e';
+      });
+    }
+  }
+
+  /// True where "show me that folder" means something. Mobile file managers
+  /// have no addressable folder concept to hand off to.
+  bool get _canRevealBackupsFolder =>
+      Platform.isMacOS || Platform.isWindows || Platform.isLinux;
+
+  Future<void> _showBackupsFolder() async {
+    final dir = _backupsDirectory;
+    if (dir == null) return;
+    // launchUrl signals a refused hand-off by RETURNING false as often as by
+    // throwing (no registered handler for a file:// directory is the common
+    // case here), so both have to be logged or the button is a silent no-op.
+    // Either way the path is on screen as selectable text, so the diver still
+    // has something to paste into a file manager.
+    try {
+      final launched = await launchUrl(Uri.directory(dir));
+      if (!launched) {
+        debugPrint('Could not open backups folder: launchUrl returned false');
+      }
+    } catch (e) {
+      debugPrint('Could not open backups folder: $e');
+    }
+  }
+
+  static final Uri _previousReleasesUri = Uri.parse(
+    StartupFailureView.previousReleasesUrl,
+  );
+
+  Future<void> _openPreviousReleases() async {
+    // Same reasoning as _showBackupsFolder: a refused hand-off shows up as a
+    // false return at least as often as an exception, and an unlogged one
+    // makes the button look broken. The address is rendered beneath the
+    // button either way, so the diver keeps a usable route.
+    try {
+      final launched = await launchUrl(
+        _previousReleasesUri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched) {
+        debugPrint(
+          'Could not open the releases page: launchUrl returned false',
+        );
+      }
+    } catch (e) {
+      debugPrint('Could not open the releases page: $e');
     }
   }
 
@@ -984,41 +1228,23 @@ class _StartupWrapperState extends State<StartupWrapper>
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
-          const SizedBox(height: 24),
-          Text(
-            context.l10n.startup_error_title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            _errorMessage,
-            style: TextStyle(fontSize: 14, color: subtitleColor),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            context.l10n.startup_error_body,
-            style: TextStyle(fontSize: 14, color: subtitleColor),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          FilledButton(
-            onPressed: _closeApp,
-            child: Text(context.l10n.common_action_close),
-          ),
-        ],
-      ),
+    return StartupFailureView(
+      kind: _failureKind,
+      details: _errorMessage,
+      textColor: textColor,
+      subtitleColor: subtitleColor,
+      recoveryBackup: _recoveryBackup,
+      onRestoreBackup: _recoveryBackup == null
+          ? null
+          : _restoreFromStartupBackup,
+      restoreStatus: _restoreStatus,
+      restoreError: _restoreError,
+      backupsDirectory: _backupsDirectory,
+      onShowBackupsFolder: _backupsDirectory != null && _canRevealBackupsFolder
+          ? _showBackupsFolder
+          : null,
+      onViewPreviousReleases: _openPreviousReleases,
+      onClose: _closeApp,
     );
   }
 
