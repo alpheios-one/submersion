@@ -14443,17 +14443,24 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' e ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count dispositivos sincronizam a partir de uma versão mais recente do Submersion. Atualize este dispositivo para receber as alterações mais recentes deles.',
-      one:
-          '1 dispositivo sincroniza a partir de uma versão mais recente do Submersion. Atualize este dispositivo para receber as alterações mais recentes dele.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList sincroniza a partir de uma versão mais recente do Submersion, por isso as suas alterações mais recentes ficam retidas por agora.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList sincronizam a partir de uma versão mais recente do Submersion, por isso as suas alterações mais recentes ficam retidas por agora.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Atualize este dispositivo para as receber.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'Serão aplicadas automaticamente quando a atualização da loja de aplicações deste dispositivo chegar; a atualização pode ainda estar em revisão.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Conectado';
@@ -31256,6 +31263,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'Atualize o Submersion para a versão mais recente. Seus dados estão seguros e não foram modificados. Se um backup foi feito antes da atualização, ele está na sua pasta Backups e pode ser restaurado após a atualização.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'Esta app foi instalada a partir de uma loja de aplicações e é mais antiga do que a versão que criou os seus dados. Os seus dados estão seguros e não foram modificados. Atualize o Submersion quando a nova versão aparecer na loja e volte a abri-lo.';
 
   @override
   String get startup_versionMismatch_download => 'Baixar versão mais recente';

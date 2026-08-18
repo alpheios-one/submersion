@@ -13760,15 +13760,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => '和';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收它们的最新更改。',
-      one: '1 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收其最新更改。',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList 正在从更新版本的 Submersion 同步，因此其最新更改暂时被保留。';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList 正在从更新版本的 Submersion 同步，因此它们的最新更改暂时被保留。';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      '更新此设备即可接收这些更改。';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      '此设备的应用商店更新到达后，这些更改将自动应用；该更新可能仍在审核中。';
 
   @override
   String get settings_cloudSync_provider_connected => '已连接';
@@ -29478,6 +29487,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       '请将 Submersion 更新到最新版本。您的数据是安全的，未被修改。如果升级前已创建备份，它位于您的 Backups 文件夹中，更新后可以恢复。';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      '此应用安装自应用商店，版本低于创建您数据的版本。您的数据是安全的，未被修改。当新版本在商店上架后，请更新 Submersion 并重新打开。';
 
   @override
   String get startup_versionMismatch_download => '下载最新版本';

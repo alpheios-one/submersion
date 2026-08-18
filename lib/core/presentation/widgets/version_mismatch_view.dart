@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:submersion/features/auto_update/domain/entities/update_channel.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Startup screen shown when the database on disk was written by a newer
@@ -16,6 +17,7 @@ class VersionMismatchView extends StatelessWidget {
     required this.subtitleColor,
     required this.onDownloadLatest,
     required this.onClose,
+    this.channelOverride,
   });
 
   /// Canonical download location, shown on screen and opened by the button.
@@ -33,8 +35,18 @@ class VersionMismatchView extends StatelessWidget {
   final VoidCallback onDownloadLatest;
   final VoidCallback onClose;
 
+  /// Test seam: UpdateChannelConfig.current reads a compile-time constant,
+  /// which a test binary cannot vary.
+  final UpdateChannel? channelOverride;
+
   @override
   Widget build(BuildContext context) {
+    // A store build cannot act on a GitHub download link, and its update
+    // arrives on the store's schedule (possibly still in review), so it gets
+    // a different instruction and no download affordances (issue #1089).
+    final channel = channelOverride ?? UpdateChannelConfig.current;
+    final isStore = UpdateChannelConfig.isStoreChannel(channel);
+
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -62,27 +74,31 @@ class VersionMismatchView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            context.l10n.startup_versionMismatch_instructions,
+            isStore
+                ? context.l10n.startup_versionMismatch_storeInstructions
+                : context.l10n.startup_versionMismatch_instructions,
             style: TextStyle(fontSize: 14, color: subtitleColor),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
-          FilledButton(
-            onPressed: onDownloadLatest,
-            child: Text(context.l10n.startup_versionMismatch_download),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            context.l10n.startup_versionMismatch_manualLink,
-            style: TextStyle(fontSize: 12, color: subtitleColor),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 4),
-          SelectableText(
-            latestReleaseUrl,
-            style: TextStyle(fontSize: 12, color: subtitleColor),
-            textAlign: TextAlign.center,
-          ),
+          if (!isStore) ...[
+            const SizedBox(height: 24),
+            FilledButton(
+              onPressed: onDownloadLatest,
+              child: Text(context.l10n.startup_versionMismatch_download),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              context.l10n.startup_versionMismatch_manualLink,
+              style: TextStyle(fontSize: 12, color: subtitleColor),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+            SelectableText(
+              latestReleaseUrl,
+              style: TextStyle(fontSize: 12, color: subtitleColor),
+              textAlign: TextAlign.center,
+            ),
+          ],
           const SizedBox(height: 8),
           TextButton(
             onPressed: onClose,

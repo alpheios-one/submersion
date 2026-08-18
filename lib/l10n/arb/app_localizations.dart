@@ -24315,11 +24315,31 @@ abstract class AppLocalizations {
   /// **' and '**
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator;
 
-  /// No description provided for @settings_cloudSync_peerRequiresUpdate_banner.
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamed.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}'**
-  String settings_cloudSync_peerRequiresUpdate_banner(num count);
+  /// **'{deviceList} syncs from a newer version of Submersion, so its latest changes are held for now.'**
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamedPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'{deviceList} sync from a newer version of Submersion, so their latest changes are held for now.'**
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  );
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_updateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Update this device to receive them.'**
+  String get settings_cloudSync_peerRequiresUpdate_updateAction;
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_storeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'They will apply automatically once this device\'s app store update arrives; the update may still be in review.'**
+  String get settings_cloudSync_peerRequiresUpdate_storeAction;
 
   /// No description provided for @settings_cloudSync_provider_connected.
   ///
@@ -51857,6 +51877,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please update Submersion to the latest version. Your data is safe and has not been modified. If a backup was taken before the upgrade, it is in your Backups folder and can be restored after updating.'**
   String get startup_versionMismatch_instructions;
+
+  /// No description provided for @startup_versionMismatch_storeInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'This app was installed from an app store and is older than the version that created your data. Your data is safe and has not been modified. Update Submersion when the new version appears in the store, then reopen it.'**
+  String get startup_versionMismatch_storeInstructions;
 
   /// No description provided for @startup_versionMismatch_download.
   ///

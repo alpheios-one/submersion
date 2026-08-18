@@ -14190,17 +14190,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' و';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count أجهزة تتزامن من إصدار أحدث من Submersion. حدّث هذا الجهاز لتلقي أحدث تغييراتها.',
-      one:
-          'جهاز واحد يتزامن من إصدار أحدث من Submersion. حدّث هذا الجهاز لتلقي أحدث تغييراته.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList يزامن من إصدار أحدث من Submersion، لذا يتم تعليق أحدث تغييراته مؤقتًا.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList تزامن من إصدار أحدث من Submersion، لذا يتم تعليق أحدث تغييراتها مؤقتًا.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'حدّث هذا الجهاز لاستلامها.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'سيتم تطبيقها تلقائيًا فور وصول تحديث متجر التطبيقات لهذا الجهاز؛ وقد يكون التحديث لا يزال قيد المراجعة.';
 
   @override
   String get settings_cloudSync_provider_connected => 'متصل';
@@ -30940,6 +30947,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'يرجى تحديث Submersion إلى أحدث إصدار. بياناتك آمنة ولم تُعدَّل. إذا أُخذت نسخة احتياطية قبل الترقية، فهي موجودة في مجلد Backups ويمكن استعادتها بعد التحديث.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'تم تثبيت هذا التطبيق من متجر تطبيقات وهو أقدم من الإصدار الذي أنشأ بياناتك. بياناتك آمنة ولم يتم تعديلها. حدّث Submersion عندما يظهر الإصدار الجديد في المتجر، ثم أعد فتحه.';
 
   @override
   String get startup_versionMismatch_download => 'تنزيل أحدث إصدار';
