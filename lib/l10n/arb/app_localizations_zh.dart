@@ -15934,6 +15934,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_profile_deco_noDeco => '无减压';
 
   @override
+  String get statistics_profile_deco_notRecorded => '未记录';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count 次潜水没有已记录或可计算的减压数据，未计入比例';
+  }
+
+  @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
     return '减压比率：$percentage% 的潜水需要减压停留';
   }

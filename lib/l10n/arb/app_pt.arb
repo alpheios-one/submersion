@@ -5066,6 +5066,8 @@
   "statistics_profile_deco_empty": "Nenhum dado de deco disponivel",
   "statistics_profile_deco_error": "Falha ao carregar dados de deco",
   "statistics_profile_deco_noDeco": "Sem Deco",
+  "statistics_profile_deco_notRecorded": "Não registado",
+  "statistics_profile_deco_notRecordedHint": "{count} mergulhos não têm dados de descompressão registados ou calculáveis e são excluídos da taxa",
   "statistics_profile_deco_semanticLabel": "Taxa de descompressao: {percentage}% dos mergulhos exigiram paradas de deco",
   "statistics_profile_deco_subtitle": "Mergulhos que exigiram paradas de deco",
   "statistics_profile_deco_title": "Obrigacao de Descompressao",

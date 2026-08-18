@@ -5244,6 +5244,8 @@
   "statistics_profile_deco_empty": "无减压数据可用",
   "statistics_profile_deco_error": "加载减压数据失败",
   "statistics_profile_deco_noDeco": "无减压",
+  "statistics_profile_deco_notRecorded": "未记录",
+  "statistics_profile_deco_notRecordedHint": "{count} 次潜水没有已记录或可计算的减压数据，未计入比例",
   "statistics_profile_deco_semanticLabel": "减压比率：{percentage}% 的潜水需要减压停留",
   "statistics_profile_deco_subtitle": "产生减压停留的潜水",
   "statistics_profile_deco_title": "减压义务",

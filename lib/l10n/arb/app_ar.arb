@@ -5066,6 +5066,8 @@
   "statistics_profile_deco_empty": "لا توجد بيانات تخفيف ضغط متاحة",
   "statistics_profile_deco_error": "فشل تحميل بيانات تخفيف الضغط",
   "statistics_profile_deco_noDeco": "بدون تخفيف ضغط",
+  "statistics_profile_deco_notRecorded": "غير مسجل",
+  "statistics_profile_deco_notRecordedHint": "{count} غطسة ليس لها بيانات انضغاط مسجلة أو قابلة للحساب، وهي مستبعدة من النسبة",
   "statistics_profile_deco_semanticLabel": "معدل تخفيف الضغط: {percentage}% من الغوصات تطلبت توقفات تخفيف ضغط",
   "statistics_profile_deco_subtitle": "الغوصات التي تطلبت توقفات تخفيف ضغط",
   "statistics_profile_deco_title": "التزام تخفيف الضغط",

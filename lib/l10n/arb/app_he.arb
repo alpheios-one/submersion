@@ -5066,6 +5066,8 @@
   "statistics_profile_deco_empty": "אין נתוני דקו זמינים",
   "statistics_profile_deco_error": "שגיאה בטעינת נתוני דקו",
   "statistics_profile_deco_noDeco": "ללא דקו",
+  "statistics_profile_deco_notRecorded": "לא נרשם",
+  "statistics_profile_deco_notRecordedHint": "ל-{count} צלילות אין נתוני דקומפרסיה שנרשמו או שניתן לחשב, והן אינן נכללות בשיעור",
   "statistics_profile_deco_semanticLabel": "שיעור דקומפרסיה: {percentage}% מהצלילות דרשו עצירות דקו",
   "statistics_profile_deco_subtitle": "צלילות שדרשו עצירות דקו",
   "statistics_profile_deco_title": "חובת דקומפרסיה",

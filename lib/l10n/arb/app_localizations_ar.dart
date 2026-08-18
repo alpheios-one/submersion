@@ -16462,6 +16462,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statistics_profile_deco_noDeco => 'بدون تخفيف ضغط';
 
   @override
+  String get statistics_profile_deco_notRecorded => 'غير مسجل';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count غطسة ليس لها بيانات انضغاط مسجلة أو قابلة للحساب، وهي مستبعدة من النسبة';
+  }
+
+  @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
     return 'معدل تخفيف الضغط: $percentage% من الغوصات تطلبت توقفات تخفيف ضغط';
   }

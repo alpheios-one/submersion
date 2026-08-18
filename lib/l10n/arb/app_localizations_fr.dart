@@ -16825,6 +16825,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get statistics_profile_deco_noDeco => 'Sans deco';
 
   @override
+  String get statistics_profile_deco_notRecorded => 'Non enregistré';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count plongées n\'ont aucune donnée de décompression enregistrée ou calculable et sont exclues du taux';
+  }
+
+  @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
     return 'Taux de decompression : $percentage% des plongees ont necessite des paliers de decompression';
   }

@@ -5066,6 +5066,8 @@
   "statistics_profile_deco_empty": "Geen decogegevens beschikbaar",
   "statistics_profile_deco_error": "Kan decogegevens niet laden",
   "statistics_profile_deco_noDeco": "Geen deco",
+  "statistics_profile_deco_notRecorded": "Niet vastgelegd",
+  "statistics_profile_deco_notRecordedHint": "{count} duiken hebben geen vastgelegde of berekenbare decogegevens en tellen niet mee voor het percentage",
   "statistics_profile_deco_semanticLabel": "Decompressiepercentage: {percentage}% van de duiken vereiste decostops",
   "statistics_profile_deco_subtitle": "Duiken met decostops",
   "statistics_profile_deco_title": "Decompressieverplichting",
