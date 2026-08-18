@@ -73,6 +73,11 @@ class HealthKitService implements HealthImportService {
   /// [HealthDataType.UNDERWATER_DEPTH] and [HealthDataType.WATER_TEMPERATURE]
   /// are the dive-specific series an Apple Watch Ultra records; without them
   /// an imported dive has no profile and a max depth of zero.
+  ///
+  /// Safe to request wholesale below iOS 16, where the plugin never registers
+  /// those two. Its `requestAuthorization` logs an unknown type and moves on,
+  /// leaving it out of the read set, then authorises the types it did resolve.
+  /// An older device is granted workouts and heart rate as usual.
   static const List<HealthDataType> _readTypes = [
     HealthDataType.WORKOUT,
     HealthDataType.HEART_RATE,
@@ -82,9 +87,10 @@ class HealthKitService implements HealthImportService {
 
   /// Types used to probe permission state.
   ///
-  /// Deliberately excludes the iOS 16+ dive types: the plugin reports an
-  /// unknown type as an outright denial, which would make every pre-iOS-16
-  /// device look permanently denied.
+  /// Deliberately narrower than [_readTypes]. Where `requestAuthorization`
+  /// shrugs an unknown type off, `hasPermissions` short-circuits the whole
+  /// probe to false on one, so probing with the iOS 16+ dive types would make
+  /// every pre-iOS-16 device look permanently denied.
   static const List<HealthDataType> _probeTypes = [
     HealthDataType.WORKOUT,
     HealthDataType.HEART_RATE,
