@@ -1,20 +1,62 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:health/health.dart';
 import 'package:submersion/features/dive_import/domain/entities/imported_dive.dart';
 import 'package:submersion/features/dive_import/domain/services/health_import_service.dart';
+
+/// Answers "can this device do HealthKit at all", or null when unknowable.
+typedef HealthDataAvailabilityProbe = Future<bool?> Function();
 
 /// HealthKit implementation of HealthImportService for Apple platforms.
 ///
 /// Fetches underwater diving workouts and associated data (depth, temperature,
 /// heart rate) from Apple HealthKit. Only available on iOS.
 class HealthKitService implements HealthImportService {
-  HealthKitService({Health? health, bool? isPlatformSupported})
-    : _health = health ?? Health(),
-      _isPlatformSupported = isPlatformSupported ?? Platform.isIOS;
+  HealthKitService({
+    Health? health,
+    bool? isPlatformSupported,
+    HealthDataAvailabilityProbe? healthDataAvailable,
+  }) : _health = health ?? Health(),
+       _isPlatformSupported = isPlatformSupported ?? Platform.isIOS,
+       _healthDataAvailableProbe = healthDataAvailable ?? _askPlatform;
 
   final Health _health;
   final bool _isPlatformSupported;
+  final HealthDataAvailabilityProbe _healthDataAvailableProbe;
+
+  /// The health plugin's own method channel.
+  static const MethodChannel _pluginChannel = MethodChannel('flutter_health');
+
+  /// Ask the platform whether HealthKit exists on this device.
+  ///
+  /// `Platform.isIOS` is not a capability check: it says yes on hardware with
+  /// no Health app at all (iPadOS before 17). `HKHealthStore
+  /// .isHealthDataAvailable()` is the honest answer, and the plugin's native
+  /// side already serves it under `checkIfHealthDataAvailable` — its Dart API
+  /// simply never calls it, so we go to the channel directly.
+  ///
+  /// Returns null when the answer cannot be obtained (channel missing, no
+  /// binding in a unit test, plugin renamed the handler). Null is "unknown",
+  /// never a refusal.
+  static Future<bool?> _askPlatform() async {
+    try {
+      return await _pluginChannel.invokeMethod<bool>(
+        'checkIfHealthDataAvailable',
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// True unless the platform states outright that HealthKit is unavailable.
+  Future<bool> get _healthKitExists async {
+    try {
+      return await _healthDataAvailableProbe() ?? true;
+    } catch (e) {
+      return true;
+    }
+  }
 
   /// Everything we ask HealthKit for read access to.
   ///
@@ -46,11 +88,12 @@ class HealthKitService implements HealthImportService {
   ImportSource get source => ImportSource.appleWatch;
 
   @override
-  Future<bool> isAvailable() async => _isPlatformSupported;
+  Future<bool> isAvailable() async =>
+      _isPlatformSupported && await _healthKitExists;
 
   @override
   Future<HealthPermissionStatus> permissionStatus() async {
-    if (!_isPlatformSupported) {
+    if (!_isPlatformSupported || !await _healthKitExists) {
       return HealthPermissionStatus.unsupported;
     }
 
@@ -79,7 +122,7 @@ class HealthKitService implements HealthImportService {
 
   @override
   Future<bool> requestPermissions() async {
-    if (!_isPlatformSupported) {
+    if (!_isPlatformSupported || !await _healthKitExists) {
       return false;
     }
 

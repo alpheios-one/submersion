@@ -26,7 +26,7 @@ void main() {
     });
 
     group('isAvailable', () {
-      test('reports platform capability, not permission state', () async {
+      test('reports device capability, not permission state', () async {
         expect(await service.isAvailable(), isTrue);
         expect(
           await HealthKitService(
@@ -36,6 +36,72 @@ void main() {
           isFalse,
         );
         verifyNever(mockHealth.hasPermissions(any));
+      });
+
+      test('is false when the device has no HealthKit', () async {
+        // Platform.isIOS is not a capability check: iPadOS before 17 has no
+        // Health app at all. HKHealthStore.isHealthDataAvailable() is.
+        expect(
+          await _serviceWithProbe(mockHealth, false).isAvailable(),
+          isFalse,
+        );
+      });
+
+      test('is true when the probe cannot answer', () async {
+        // Unknown is not a refusal.
+        expect(await _serviceWithProbe(mockHealth, null).isAvailable(), isTrue);
+      });
+
+      test('is true when the probe throws', () async {
+        final thrower = HealthKitService(
+          health: mockHealth,
+          isPlatformSupported: true,
+          healthDataAvailable: () async => throw Exception('no channel'),
+        );
+
+        expect(await thrower.isAvailable(), isTrue);
+      });
+    });
+
+    group('device capability gating', () {
+      test('permissionStatus is unsupported without HealthKit', () async {
+        expect(
+          await _serviceWithProbe(mockHealth, false).permissionStatus(),
+          equals(HealthPermissionStatus.unsupported),
+        );
+        verifyNever(
+          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
+        );
+      });
+
+      test('requestPermissions is refused without HealthKit', () async {
+        expect(
+          await _serviceWithProbe(mockHealth, false).requestPermissions(),
+          isFalse,
+        );
+        verifyNever(mockHealth.configure());
+      });
+
+      test('fetchDives returns nothing without HealthKit', () async {
+        expect(
+          await _serviceWithProbe(mockHealth, false).fetchDives(
+            startDate: DateTime(2024, 1, 1),
+            endDate: DateTime(2024, 1, 31),
+          ),
+          isEmpty,
+        );
+      });
+
+      test('an unknown probe never blocks the read', () async {
+        final unknown = _serviceWithProbe(mockHealth, null);
+        when(
+          mockHealth.hasPermissions(any, permissions: anyNamed('permissions')),
+        ).thenAnswer((_) async => null);
+
+        expect(
+          await unknown.permissionStatus(),
+          equals(HealthPermissionStatus.undetermined),
+        );
       });
     });
 
@@ -646,6 +712,15 @@ void main() {
       });
     });
   });
+}
+
+/// A service whose device-capability probe returns [available].
+HealthKitService _serviceWithProbe(MockHealth health, bool? available) {
+  return HealthKitService(
+    health: health,
+    isPlatformSupported: true,
+    healthDataAvailable: () async => available,
+  );
 }
 
 /// Helper to create a workout data point for testing.
