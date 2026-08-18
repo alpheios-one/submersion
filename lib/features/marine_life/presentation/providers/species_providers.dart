@@ -286,6 +286,10 @@ final siteSpottedSpeciesProvider =
 final siteExpectedSpeciesProvider =
     FutureProvider.family<List<SiteSpeciesEntry>, String>((ref, siteId) async {
       final repository = ref.watch(speciesRepositoryProvider);
+      // Reads site_species JOIN species, so it goes stale on a write to
+      // either. Curating the list only ever touches site_species, so watching
+      // species alone left the list unchanged after an add.
+      ref.invalidateSelfWhen(repository.watchSiteSpeciesChanges());
       ref.invalidateSelfWhen(repository.watchSpeciesChanges());
       return repository.getExpectedSpeciesForSite(siteId);
     });
