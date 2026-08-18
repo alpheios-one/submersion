@@ -14202,17 +14202,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' and ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count devices sync from a newer version of Submersion. Update this device to receive their latest changes.',
-      one:
-          '1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList syncs from a newer version of Submersion, so its latest changes are held for now.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList sync from a newer version of Submersion, so their latest changes are held for now.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Update this device to receive them.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'They will apply automatically once this device\'s app store update arrives; the update may still be in review.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Connected';
@@ -30836,6 +30843,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'Please update Submersion to the latest version. Your data is safe and has not been modified. If a backup was taken before the upgrade, it is in your Backups folder and can be restored after updating.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'This app was installed from an app store and is older than the version that created your data. Your data is safe and has not been modified. Update Submersion when the new version appears in the store, then reopen it.';
 
   @override
   String get startup_versionMismatch_download => 'Download Latest Version';

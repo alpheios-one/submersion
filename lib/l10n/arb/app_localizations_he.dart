@@ -14091,17 +14091,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' ו-';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count מכשירים מסתנכרנים מגרסה חדשה יותר של Submersion. עדכן מכשיר זה כדי לקבל את השינויים האחרונים שלהם.',
-      one:
-          'מכשיר אחד מסתנכרן מגרסה חדשה יותר של Submersion. עדכן מכשיר זה כדי לקבל את השינויים האחרונים שלו.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList מסתנכרן מגרסה חדשה יותר של Submersion, ולכן השינויים האחרונים שלו מוחזקים בינתיים.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList מסתנכרנים מגרסה חדשה יותר של Submersion, ולכן השינויים האחרונים שלהם מוחזקים בינתיים.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'עדכן מכשיר זה כדי לקבל אותם.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'הם יוחלו אוטומטית ברגע שעדכון חנות האפליקציות של מכשיר זה יגיע; ייתכן שהעדכון עדיין בבדיקה.';
 
   @override
   String get settings_cloudSync_provider_connected => 'מחובר';
@@ -30706,6 +30713,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'עדכנו את Submersion לגרסה האחרונה. הנתונים שלכם בטוחים ולא שונו. אם נוצר גיבוי לפני השדרוג, הוא נמצא בתיקיית Backups וניתן לשחזר אותו לאחר העדכון.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'אפליקציה זו הותקנה מחנות אפליקציות והיא ישנה יותר מהגרסה שיצרה את הנתונים שלך. הנתונים שלך בטוחים ולא שונו. עדכן את Submersion כשהגרסה החדשה תופיע בחנות, ואז פתח את האפליקציה מחדש.';
 
   @override
   String get startup_versionMismatch_download => 'הורדת הגרסה האחרונה';

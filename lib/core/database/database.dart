@@ -3071,6 +3071,27 @@ class AppDatabase extends _$AppDatabase {
   /// (e.g. version-mismatch guard) can reference it without an instance.
   static const int currentSchemaVersion = 153;
 
+  /// The oldest schema whose reader can apply this build's sync payloads
+  /// without loss or misinterpretation (the compatibility floor).
+  ///
+  /// Stamped into every published manifest's `schemaVersion` field, which
+  /// shipped readers compare against their own schema to decide whether to
+  /// hold a peer (changeset_reader.dart). Keeping the floor low lets older
+  /// builds keep syncing across additive schema changes; the receiving-side
+  /// overlay merge (issue #474) preserves columns an older peer omits, and
+  /// test/core/services/sync/cross_version_roundtrip_test.dart locks that in.
+  ///
+  /// Raise this to the NEW schema version ONLY when a migration:
+  ///  - drops, renames, or retypes an existing synced column,
+  ///  - changes the meaning or units of an existing column's values,
+  ///  - removes or folds a synced entity (the v147 buddyRoles case),
+  ///  - tightens a constraint an old writer's payloads would violate.
+  /// Do NOT raise it for new tables or synced entities, new nullable or
+  /// defaulted columns, new indexes, dedupe passes, or data repairs that
+  /// preserve meaning. When raising it, extend the round-trip test's
+  /// projection so the new boundary stays covered.
+  static const int minimumCompatibleSchemaVersion = 137;
+
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
   /// append the new version number here.

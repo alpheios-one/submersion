@@ -14394,17 +14394,24 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' és ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count eszköz a Submersion újabb verziójából szinkronizál. Frissítsd ezt az eszközt, hogy megkapd a legújabb változtatásaikat.',
-      one:
-          '1 eszköz a Submersion újabb verziójából szinkronizál. Frissítsd ezt az eszközt, hogy megkapd a legújabb változtatásait.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList a Submersion újabb verziójából szinkronizál, ezért a legújabb változtatásai egyelőre visszatartva maradnak.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList a Submersion újabb verziójából szinkronizálnak, ezért a legújabb változtatásaik egyelőre visszatartva maradnak.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Frissítsd ezt az eszközt, hogy megkapd őket.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'Automatikusan érvénybe lépnek, amint megérkezik az eszköz alkalmazásbolti frissítése; a frissítés még ellenőrzés alatt állhat.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Csatlakoztatva';
@@ -31200,6 +31207,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'Kérjük, frissítse a Submersiont a legújabb verzióra. Az adatai biztonságban vannak, és nem módosultak. Ha a frissítés előtt készült biztonsági mentés, az a Backups mappában található, és a frissítés után visszaállítható.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'Ezt az alkalmazást alkalmazásboltból telepítetted, és régebbi, mint az adataidat létrehozó verzió. Az adataid biztonságban vannak, nem módosultak. Frissítsd a Submersiont, amint az új verzió megjelenik a boltban, majd nyisd meg újra.';
 
   @override
   String get startup_versionMismatch_download => 'Legújabb verzió letöltése';

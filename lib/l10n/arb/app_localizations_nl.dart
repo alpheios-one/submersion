@@ -14331,17 +14331,24 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' en ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count apparaten synchroniseren vanaf een nieuwere versie van Submersion. Werk dit apparaat bij om hun nieuwste wijzigingen te ontvangen.',
-      one:
-          '1 apparaat synchroniseert vanaf een nieuwere versie van Submersion. Werk dit apparaat bij om de nieuwste wijzigingen ervan te ontvangen.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList synchroniseert vanaf een nieuwere versie van Submersion, dus de nieuwste wijzigingen worden voorlopig vastgehouden.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList synchroniseren vanaf een nieuwere versie van Submersion, dus hun nieuwste wijzigingen worden voorlopig vastgehouden.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Werk dit apparaat bij om ze te ontvangen.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'Ze worden automatisch toegepast zodra de appstore-update voor dit apparaat beschikbaar is; de update is mogelijk nog in beoordeling.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Verbonden';
@@ -31098,6 +31105,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'Werk Submersion bij naar de nieuwste versie. Je gegevens zijn veilig en zijn niet gewijzigd. Als er vóór de upgrade een back-up is gemaakt, staat die in je map Backups en kan die na het bijwerken worden teruggezet.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'Deze app is geïnstalleerd vanuit een appstore en is ouder dan de versie die uw gegevens heeft gemaakt. Uw gegevens zijn veilig en niet gewijzigd. Werk Submersion bij zodra de nieuwe versie in de store verschijnt en open de app daarna opnieuw.';
 
   @override
   String get startup_versionMismatch_download => 'Nieuwste versie downloaden';

@@ -14423,17 +14423,24 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' und ';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count Geräte synchronisieren von einer neueren Version von Submersion. Aktualisieren Sie dieses Gerät, um deren neueste Änderungen zu erhalten.',
-      one:
-          '1 Gerät synchronisiert von einer neueren Version von Submersion. Aktualisieren Sie dieses Gerät, um dessen neueste Änderungen zu erhalten.',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList synchronisiert von einer neueren Version von Submersion, daher werden die neuesten Änderungen vorerst zurückgehalten.';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList synchronisieren von einer neueren Version von Submersion, daher werden ihre neuesten Änderungen vorerst zurückgehalten.';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      'Aktualisieren Sie dieses Gerät, um sie zu erhalten.';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      'Sie werden automatisch übernommen, sobald das App-Store-Update für dieses Gerät verfügbar ist; das Update befindet sich möglicherweise noch in der Prüfung.';
 
   @override
   String get settings_cloudSync_provider_connected => 'Verbunden';
@@ -31248,6 +31255,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       'Bitte aktualisieren Sie Submersion auf die neueste Version. Ihre Daten sind sicher und wurden nicht verändert. Falls vor dem Upgrade eine Sicherung erstellt wurde, liegt sie in Ihrem Ordner Backups und kann nach dem Update wiederhergestellt werden.';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      'Diese App wurde aus einem App Store installiert und ist älter als die Version, die Ihre Daten erstellt hat. Ihre Daten sind sicher und wurden nicht verändert. Aktualisieren Sie Submersion, sobald die neue Version im Store erscheint, und öffnen Sie die App dann erneut.';
 
   @override
   String get startup_versionMismatch_download =>
