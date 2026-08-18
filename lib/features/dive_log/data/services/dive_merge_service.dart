@@ -393,7 +393,7 @@ class DiveMergeService {
       //     rewriting the dives row and tanks. ReparseService step 4 calls
       //     _replaceDiveProfiles unconditionally, so re-parsing a merged
       //     dive today still wipes the merged profile. Tracked separately.
-      // saveComputerReading (dive_repository_impl.dart:4437) does not call
+      // DiveRepository.saveComputerReading does not call
       // markRecordPending for diveDataSources rows either -- it relies on
       // the parent dive's pending record (step 1) to carry the change, so
       // no per-row markRecordPending here mirrors that.
