@@ -41,6 +41,9 @@ class _FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
   @override
   AppDatabase get database =>
       throw UnimplementedError('Fake database does not support queries');
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 /// Per-file temp root, so the backup service's fixed `Submersion/Backups`

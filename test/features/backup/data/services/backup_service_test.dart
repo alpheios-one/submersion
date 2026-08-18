@@ -57,6 +57,9 @@ class FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
   @override
   AppDatabase get database =>
       throw UnimplementedError('Fake database does not support direct queries');
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 /// Spy sync repository: records the post-restore re-baseline without touching a

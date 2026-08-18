@@ -37,6 +37,9 @@ class _NoopAdapter implements BackupDatabaseAdapter {
 
   @override
   AppDatabase get database => throw UnimplementedError();
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 /// Records restore invocations so the notifier's threading of [RestoreMode]
@@ -76,8 +79,10 @@ class _RecordingBackupService extends BackupService {
   }
 
   @override
-  Future<BackupValidationResult> validateBackupFile(String filePath) async =>
-      const BackupValidationResult.valid(sizeBytes: 1);
+  Future<BackupValidationResult> validateBackupFile(
+    String filePath, {
+    bool allowLiveDatabaseEncryption = false,
+  }) async => const BackupValidationResult.valid(sizeBytes: 1);
 
   @override
   Future<void> restoreFromBackup(

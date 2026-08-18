@@ -25,6 +25,9 @@ class _NoopAdapter implements BackupDatabaseAdapter {
 
   @override
   AppDatabase get database => throw UnimplementedError();
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 class _RecordingSafPort implements BackupSafPort {

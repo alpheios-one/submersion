@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
+import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/backup/domain/entities/backup_record.dart';
@@ -22,6 +23,10 @@ class PreMigrationBackupService {
   final AsyncPathResolver _backupsDirProvider;
   final AsyncPathResolver? _fallbackBackupsDirProvider;
   final BackupPreferences _preferences;
+
+  /// The live database's SQLCipher key when protection is on, else null.
+  /// Only used to open the database for the pre-copy WAL checkpoint.
+  final String? Function()? _databaseKeyHexProvider;
   final DateTime Function() _clock;
   final String Function() _idGenerator;
   final _log = LoggerService.forClass(PreMigrationBackupService);
@@ -31,12 +36,14 @@ class PreMigrationBackupService {
     required AsyncPathResolver backupsDirProvider,
     AsyncPathResolver? fallbackBackupsDirProvider,
     required BackupPreferences preferences,
+    String? Function()? databaseKeyHexProvider,
     DateTime Function()? clock,
     String Function()? idGenerator,
   }) : _livePathProvider = livePathProvider,
        _backupsDirProvider = backupsDirProvider,
        _fallbackBackupsDirProvider = fallbackBackupsDirProvider,
        _preferences = preferences,
+       _databaseKeyHexProvider = databaseKeyHexProvider,
        _clock = clock ?? DateTime.now,
        _idGenerator = idGenerator ?? (() => const Uuid().v4());
 
@@ -54,6 +61,8 @@ class PreMigrationBackupService {
     } catch (e, stack) {
       throw BackupFailedException.fromError(e, stack);
     }
+
+    await _checkpointHotWal(livePath);
 
     final now = _clock().toUtc();
     final filename = '${_formatTimestamp(now)}-v$stored-v$target.db';
@@ -118,6 +127,68 @@ class PreMigrationBackupService {
     } catch (e, stack) {
       _log.warning(
         'Pre-migration prune failed (backup kept)',
+        error: e,
+        stackTrace: stack,
+      );
+    }
+  }
+
+  /// Folds a hot `-wal` back into the main database file so the byte copy
+  /// below is a complete snapshot of what the migration is about to touch.
+  ///
+  /// A SQLite database is not one file. A crash or force-kill leaves
+  /// committed transactions in `<db>-wal`, uncheckpointed; the migration
+  /// replays them when it opens the database, so a copy of `<db>` alone is
+  /// missing the tail of the user's data: precisely the data a safety copy
+  /// exists to protect. Copying the sidecar alongside would not help:
+  /// `DatabaseService.restore` stages only the single backup file and deletes
+  /// the destination's sidecars before the swap, so a `-wal` next to the
+  /// backup would never travel. Checkpointing yields a self-contained file
+  /// the existing restore path already handles.
+  ///
+  /// Best-effort by contract. A database that cannot be opened read-write
+  /// (ejected volume, read-only mount, missing or wrong key) still gets its
+  /// plain copy: an incomplete safety net beats a bricked startup, and the
+  /// migration that follows will surface the real problem itself.
+  ///
+  /// Opens only when a non-empty `-wal` is actually present, so the common
+  /// case (a cleanly closed database) never touches the file at all.
+  Future<void> _checkpointHotWal(String livePath) async {
+    try {
+      final wal = File('$livePath-wal');
+      if (!await wal.exists() || await wal.length() == 0) return;
+    } catch (e, stack) {
+      _log.warning(
+        'Could not inspect the WAL sidecar for $livePath; copying as-is',
+        error: e,
+        stackTrace: stack,
+      );
+      return;
+    }
+
+    try {
+      final db = DatabaseService.openRaw(
+        livePath,
+        keyHex: _databaseKeyHexProvider?.call(),
+      );
+      try {
+        // Returns one row (busy, log, checkpointed); busy != 0 means frames
+        // were left behind, so say so rather than implying a clean snapshot.
+        final result = db.select('PRAGMA wal_checkpoint(TRUNCATE)');
+        final busy = result.isEmpty ? null : result.first.values.first;
+        if (busy != 0) {
+          _log.warning(
+            'WAL checkpoint before the pre-migration backup did not complete '
+            '(busy=$busy); the copy may omit WAL-resident rows',
+          );
+        }
+      } finally {
+        db.close();
+      }
+    } catch (e, stack) {
+      _log.warning(
+        'WAL checkpoint before the pre-migration backup failed; copying the '
+        'database file as-is',
         error: e,
         stackTrace: stack,
       );

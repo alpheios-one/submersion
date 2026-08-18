@@ -12,6 +12,8 @@ import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/services/backup_bookmark_service.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/security/database_security_sidecar.dart'
+    show isEncryptedDatabaseFile;
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/sync/crypto/encryption_key_store.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
@@ -554,7 +556,19 @@ class BackupService {
   ///
   /// Checks: file exists, has correct extension, is a valid SQLite database,
   /// and contains expected Submersion tables.
-  Future<BackupValidationResult> validateBackupFile(String filePath) async {
+  ///
+  /// [allowLiveDatabaseEncryption] opts into the one artifact kind that may
+  /// legitimately be SQLCipher ciphertext: a [BackupType.preMigration] copy,
+  /// which is a raw byte copy of the live database and so carries the live
+  /// database's encryption. Such a file is deep-checked with the live key
+  /// instead of being rejected. Portable backups keep the strict plaintext
+  /// rule: they are decrypted on export precisely so they restore on a
+  /// device where the database password is unknown, and an encrypted-looking
+  /// one is a real problem that must fail loudly.
+  Future<BackupValidationResult> validateBackupFile(
+    String filePath, {
+    bool allowLiveDatabaseEncryption = false,
+  }) async {
     final file = File(filePath);
 
     // Check file exists
@@ -589,15 +603,32 @@ class BackupService {
       return const BackupValidationResult.invalid('File is empty');
     }
 
+    // A pre-migration copy of a protected database is SQLCipher ciphertext,
+    // so the deep check below needs the live key. Without one there is
+    // nothing to open the file with, and nothing a restore could do with it
+    // either, since the key is the only way back to the data.
+    String? deepCheckKeyHex;
+    if (allowLiveDatabaseEncryption && isEncryptedDatabaseFile(filePath)) {
+      deepCheckKeyHex = _dbAdapter.databaseKeyHex;
+      if (deepCheckKeyHex == null) {
+        return const BackupValidationResult.invalid(
+          'This safety copy was taken from a protected database, but this '
+          'install has no database key to open it with',
+        );
+      }
+    }
+
     // Use sqlite3 directly in read-only mode to avoid Drift's migration
     // system triggering ALTER TABLE on older-schema backups. The backup file
     // may also be in a read-only sandboxed directory (iOS/macOS file picker).
-    // Deliberately keyless: backup artifacts are portable plaintext by
-    // design, and an encrypted-looking file should fail validation loudly.
+    // Keyless unless the caller opted in above: backup artifacts are portable
+    // plaintext by design, and an encrypted-looking file should fail
+    // validation loudly.
     try {
       final testDb = DatabaseService.openRaw(
         filePath,
         mode: sqlite3.OpenMode.readOnly,
+        keyHex: deepCheckKeyHex,
       );
       try {
         // Verify it's a valid SQLite database
@@ -676,7 +707,17 @@ class BackupService {
     try {
       // Parity with the file-picker path: the file on disk (or the fresh
       // download) may have been corrupted since the record was written.
-      final validation = await validateBackupFile(materialized.path);
+      //
+      // A pre-migration copy is the one kind that may legitimately be
+      // SQLCipher ciphertext (it is a raw copy of the live file, taken before
+      // the migration with the database closed), so it is deep-checked with
+      // the live key rather than rejected. DatabaseService.restore already
+      // handles such a source: it detects the encrypted header and skips the
+      // re-encryption it would otherwise apply.
+      final validation = await validateBackupFile(
+        materialized.path,
+        allowLiveDatabaseEncryption: record.type == BackupType.preMigration,
+      );
       if (!validation.isValid) {
         throw BackupException(
           validation.error ?? 'Backup file failed validation',

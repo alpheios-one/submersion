@@ -30,6 +30,9 @@ class _FakeAdapter implements BackupDatabaseAdapter {
 
   @override
   AppDatabase get database => throw UnimplementedError();
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 class _FakeSafPort implements BackupSafPort {

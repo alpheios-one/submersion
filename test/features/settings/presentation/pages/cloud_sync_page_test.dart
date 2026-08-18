@@ -121,6 +121,9 @@ class _NoopBackupAdapter implements BackupDatabaseAdapter {
 
   @override
   AppDatabase get database => throw UnimplementedError();
+
+  @override
+  String? get databaseKeyHex => null;
 }
 
 /// Fake [BackupService] recording safety-backup calls from the adopt flow.
