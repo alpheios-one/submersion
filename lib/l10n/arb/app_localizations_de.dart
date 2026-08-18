@@ -15990,6 +15990,30 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => 'AMV-Einheit';
 
   @override
+  String get settings_units_gasModel => 'Gasberechnungen';
+
+  @override
+  String get settings_units_gasModel_real => 'Reales Gas';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      'Berücksichtigt die Kompressibilität. Eine 12-l-Flasche mit 200 bar fasst etwa 2317 l.';
+
+  @override
+  String get settings_units_gasModel_ideal => 'Ideales Gas';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      'Entspricht der Handrechnung und den Tauchtabellen. Eine 12-l-Flasche mit 200 bar fasst 2400 l.';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      'Wie der Flaschendruck in ein Gasvolumen umgerechnet wird. Dies betrifft das AMV, die Gasstatistik, den Planer und die Gasrechner. Ideales Gas entspricht der von den Verbänden gelehrten Rechnung; reales Gas ist physikalisch genau und ergibt beim AMV etwa 5 % niedrigere Werte.';
+
+  @override
+  String get settings_units_dialog_gasModel => 'Gasberechnungen';
+
+  @override
   String get settings_units_dialog_temperatureUnit => 'Temperatureinheit';
 
   @override
@@ -24450,6 +24474,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'Zu erwarteten Arten hinzufügen';
+
+  @override
+  String reef_species_showAll(int count) {
+    return 'Alle $count anzeigen';
+  }
+
+  @override
+  String get reef_species_showFewer => 'Weniger anzeigen';
 
   @override
   String get reef_attribution_title => 'Riff-Datenquellen';

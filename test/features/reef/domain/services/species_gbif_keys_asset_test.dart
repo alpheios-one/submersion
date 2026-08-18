@@ -29,10 +29,52 @@ void main() {
       );
     });
 
-    test('order whitelist is non-empty and plausible', () {
-      final orders = (keys['orderKeys'] as List).cast<int>();
-      expect(orders, isNotEmpty);
-      expect(orders.toSet().length, orders.length, reason: 'no duplicates');
+    test('taxon whitelist is non-empty and plausible', () {
+      final taxa = (keys['taxonKeys'] as List).cast<int>();
+      expect(taxa, isNotEmpty);
+      expect(taxa.toSet().length, taxa.length, reason: 'no duplicates');
+    });
+
+    // Issue #1036: a taxon that straddles land and sea drags its terrestrial
+    // relatives into the nearby list. Carnivora, admitted because the catalog
+    // holds seals and a sea otter, is what put foxes, badgers, martens and
+    // polecats in front of a diver at a freshwater quarry.
+    test('whitelist excludes taxa that straddle land and sea', () {
+      final taxa = (keys['taxonKeys'] as List).cast<int>().toSet();
+      const straddlers = {
+        732: 'Carnivora, which readmits foxes and cats',
+        5307: 'Mustelidae, which readmits badger, marten and polecat',
+        9455: 'Elapidae, which readmits cobras, mambas and taipans',
+        6935: 'Iguanidae, which readmits tree-dwelling iguanas',
+        11418114: 'Testudines as a class, which readmits tortoises',
+      };
+      for (final entry in straddlers.entries) {
+        expect(taxa, isNot(contains(entry.key)), reason: entry.value);
+      }
+    });
+
+    // Narrowing must stop at the broadest rank that stays aquatic, so seals
+    // keep a family and only the sea otter, whose family holds the badger,
+    // drops all the way to its genus.
+    test('whitelist admits marine mammals at the broadest aquatic rank', () {
+      final taxa = (keys['taxonKeys'] as List).cast<int>().toSet();
+      expect(taxa, contains(5310), reason: 'Phocidae, all seals');
+      expect(taxa, contains(5309), reason: 'Otariidae, all sea lions');
+      expect(taxa, contains(2433669), reason: 'Enhydra, the sea otter');
+      expect(taxa, contains(733), reason: 'Cetacea, wholly aquatic');
+    });
+
+    // GBIF's backbone ranks reptiles as classes, so none of them carries an
+    // order key. Collecting order keys alone dropped every marine reptile
+    // from the whitelist, which kept green turtles out of the nearby list
+    // everywhere on earth.
+    test('whitelist admits marine reptiles, which have no GBIF order key', () {
+      final taxa = (keys['taxonKeys'] as List).cast<int>().toSet();
+      expect(taxa, contains(9413), reason: 'Cheloniidae, hard-shell turtles');
+      expect(taxa, contains(5464), reason: 'Dermochelyidae, the leatherback');
+      expect(taxa, contains(5685), reason: 'Crocodylidae');
+      expect(taxa, contains(2450145), reason: 'Laticauda, the sea kraits');
+      expect(taxa, contains(2459538), reason: 'Amblyrhynchus, marine iguana');
     });
 
     test('every mapped key points at a real catalog species id', () {

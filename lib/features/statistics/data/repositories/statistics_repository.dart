@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/deco/ascent_rate_calculator.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
@@ -90,6 +91,14 @@ class EntryExitPairCount {
 
 /// Repository for all advanced statistics queries
 class StatisticsRepository {
+  /// Equation of state used to convert cylinder pressure to gas volume.
+  ///
+  /// Injected from `gasModelProvider` so flipping the preference rebuilds this
+  /// repository and refreshes every gas statistic (issue #828).
+  final GasModel gasModel;
+
+  StatisticsRepository({this.gasModel = GasModel.real});
+
   AppDatabase get _db => DatabaseService.instance.database;
   final _log = LoggerService.forClass(StatisticsRepository);
 
@@ -252,12 +261,14 @@ class StatisticsRepository {
               pressureBar: startP,
               o2Percent: o2,
               hePercent: he,
+              model: gasModel,
             ) -
             gasVolume(
               tankSizeLiters: vol,
               pressureBar: endP,
               o2Percent: o2,
               hePercent: he,
+              model: gasModel,
             );
         if (gasUsed <= 0) continue;
 
@@ -499,12 +510,14 @@ class StatisticsRepository {
               pressureBar: row.read<double>('start_pressure'),
               o2Percent: o2,
               hePercent: he,
+              model: gasModel,
             ) -
             gasVolume(
               tankSizeLiters: vol,
               pressureBar: row.read<double>('end_pressure'),
               o2Percent: o2,
               hePercent: he,
+              model: gasModel,
             );
         if (used <= 0) continue;
 
@@ -679,18 +692,20 @@ class StatisticsRepository {
               pressureBar: row.read<double>('start_pressure'),
               o2Percent: o2,
               hePercent: he,
+              model: gasModel,
             ) -
             gasVolume(
               tankSizeLiters: vol,
               pressureBar: row.read<double>('end_pressure'),
               o2Percent: o2,
               hePercent: he,
+              model: gasModel,
             );
         if (used <= 0) continue;
 
         final durationMin = row.read<int>('duration_sec') / 60.0;
-        final ambientAtm = (row.read<double>('avg_depth') / 10.0) + 1.0;
-        final sac = used / durationMin / ambientAtm;
+        final ambientBar = (row.read<double>('avg_depth') / 10.0) + 1.0;
+        final sac = used / durationMin / ambientBar;
         if (sac > 0) {
           sacsByRole.putIfAbsent(role, () => []).add(sac);
         }

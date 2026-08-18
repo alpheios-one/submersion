@@ -12,9 +12,12 @@ import 'package:submersion/features/statistics/data/services/deco_classification
 import 'package:submersion/features/statistics/domain/entities/species_statistics.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_filter_provider.dart';
 
-/// Repository provider
+/// Repository provider.
+///
+/// Watches the gas model so flipping the preference rebuilds the repository
+/// and refreshes every gas statistic downstream of it (issue #828).
 final statisticsRepositoryProvider = Provider<StatisticsRepository>((ref) {
-  return StatisticsRepository();
+  return StatisticsRepository(gasModel: ref.watch(gasModelProvider));
 });
 
 /// Overview totals scoped by the Statistics filter. Kept separate from

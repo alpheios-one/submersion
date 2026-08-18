@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/database/database.dart' as db;
 import 'package:submersion/core/providers/provider.dart';
@@ -58,6 +59,10 @@ void main() {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         validatedCurrentDiverIdProvider.overrideWith((ref) async => diverId),
+        // statisticsRepositoryProvider watches the gas model (issue #828),
+        // which otherwise builds the real SettingsNotifier and leaves its
+        // async load running past this container's disposal.
+        gasModelProvider.overrideWith((ref) => GasModel.real),
       ],
     );
     addTearDown(container.dispose);

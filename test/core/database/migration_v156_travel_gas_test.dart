@@ -19,9 +19,9 @@ Future<int?> _defaultAsInt(AppDatabase db, String table, String column) async {
 }
 
 void main() {
-  test('v155 is in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(155));
-    expect(AppDatabase.migrationVersions, contains(155));
+  test('v156 is in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(156));
+    expect(AppDatabase.migrationVersions, contains(156));
   });
 
   test('a fresh database has dive_plan_tanks.is_travel_gas', () async {
@@ -53,7 +53,7 @@ void main() {
   });
 
   test(
-    'a database stranded before v155 gains the column via beforeOpen',
+    'a database stranded before v156 gains the column via beforeOpen',
     () async {
       final nativeDb = NativeDatabase.memory(
         setup: (rawDb) {

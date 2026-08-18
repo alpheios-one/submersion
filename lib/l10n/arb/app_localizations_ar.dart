@@ -15729,6 +15729,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => 'وحدة معدل SAC';
 
   @override
+  String get settings_units_gasModel => 'حسابات الغاز';
+
+  @override
+  String get settings_units_gasModel_real => 'الغاز الحقيقي';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      'يأخذ الانضغاطية في الحسبان. أسطوانة سعة 12 لترًا عند 200 بار تحتوي نحو 2317 لترًا.';
+
+  @override
+  String get settings_units_gasModel_ideal => 'الغاز المثالي';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      'يطابق الحساب اليدوي وجداول الغوص. أسطوانة سعة 12 لترًا عند 200 بار تحتوي 2400 لتر.';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      'كيفية تحويل ضغط الأسطوانة إلى حجم غاز. يؤثر ذلك على معدل استهلاك الهواء والإحصاءات ومخطط الغوص وحاسبات الغاز. الغاز المثالي يطابق الحساب الذي تُعلّمه هيئات التدريب، أما الغاز الحقيقي فدقيق فيزيائيًا ويعطي معدل استهلاك أقل بنحو 5%.';
+
+  @override
+  String get settings_units_dialog_gasModel => 'حسابات الغاز';
+
+  @override
   String get settings_units_dialog_temperatureUnit => 'وحدة درجة الحرارة';
 
   @override
@@ -24057,6 +24081,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'إضافة إلى الأنواع المتوقعة';
+
+  @override
+  String reef_species_showAll(int count) {
+    return 'عرض الكل ($count)';
+  }
+
+  @override
+  String get reef_species_showFewer => 'عرض أقل';
 
   @override
   String get reef_attribution_title => 'مصادر بيانات الشعاب';

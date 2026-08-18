@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -239,6 +240,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setSacUnit(SacUnit unit) async =>
       state = state.copyWith(sacUnit: unit);
+
+  @override
+  Future<void> setGasModel(GasModel model) async =>
+      state = state.copyWith(gasModel: model);
   @override
   Future<void> setDefaultCurrency(String currencyCode) async =>
       state = state.copyWith(defaultCurrency: currencyCode);

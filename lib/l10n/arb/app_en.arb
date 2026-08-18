@@ -9131,6 +9131,13 @@
   "settings_units_dialog_depthUnit": "Depth Unit",
   "settings_units_dialog_pressureUnit": "Pressure Unit",
   "settings_units_dialog_sacRateUnit": "SAC Rate Unit",
+  "settings_units_gasModel": "Gas calculations",
+  "settings_units_gasModel_real": "Real gas",
+  "settings_units_gasModel_real_subtitle": "Accounts for compressibility. A 12 L cylinder at 200 bar holds about 2317 L.",
+  "settings_units_gasModel_ideal": "Ideal gas",
+  "settings_units_gasModel_ideal_subtitle": "Matches hand calculation and dive tables. A 12 L cylinder at 200 bar holds 2400 L.",
+  "settings_units_gasModel_explanation": "How cylinder pressure is converted to gas volume. This affects SAC rate, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for SAC.",
+  "settings_units_dialog_gasModel": "Gas calculations",
   "settings_units_dialog_temperatureUnit": "Temperature Unit",
   "settings_units_dialog_timeFormat": "Time Format",
   "settings_units_dialog_volumeUnit": "Volume Unit",
@@ -15770,6 +15777,17 @@
   },
   "reef_species_recordedNearby": "Recorded nearby",
   "reef_species_addToExpected": "Add to expected species",
+  "reef_species_showAll": "Show all {count}",
+  "@reef_species_showAll": {
+    "description": "Expands the capped nearby-species chip list to its full length",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "reef_species_showFewer": "Show fewer",
+  "@reef_species_showFewer": {
+    "description": "Collapses the nearby-species chip list back to its capped length"
+  },
   "reef_attribution_title": "Reef data sources",
   "reef_attribution_wri": "Reef presence and threat level. CC BY 3.0.",
   "reef_attribution_noaa": "Sea surface temperature and bleaching heat stress. Public domain.",

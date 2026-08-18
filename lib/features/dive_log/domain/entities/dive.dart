@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/deco/constants/buhlmann_coefficients.dart';
 import 'package:submersion/core/utils/gas_compressibility.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
@@ -352,9 +353,16 @@ class Dive extends Equatable {
       tanks.where((t) => t.role == TankRole.bailout).toList();
 
   /// Air consumption rate in L/min at surface (Surface Air Consumption)
-  /// Calculates total gas consumed across all tanks with valid data.
-  /// Uses gas compressibility (Z-factor) and bar→atm conversion for accuracy.
-  double? get sac {
+  /// under [model], summing gas consumed across all tanks with valid data.
+  ///
+  /// Takes the model as a parameter rather than reading a provider so the
+  /// entity stays free of container dependencies, mirroring how
+  /// `extractDiveFieldValue` threads the SAC unit preference. Callers source
+  /// it from `gasModelProvider`.
+  ///
+  /// The runtime is used verbatim: nothing is added for a safety stop
+  /// (issue #828).
+  double? sacFor(GasModel model) {
     if (tanks.isEmpty || effectiveRuntime == null || avgDepth == null) {
       return null;
     }
@@ -362,9 +370,11 @@ class Dive extends Equatable {
     final minutes = effectiveRuntime!.inSeconds / 60;
     if (minutes <= 0) return null;
 
-    final avgPressureAtm = (avgDepth! / 10) + 1; // Convert depth to ATM
+    // Ambient pressure ratio in bar, matching the 1 bar reference that
+    // gasVolume returns volumes against.
+    final avgPressureBar = (avgDepth! / 10) + 1;
 
-    // Sum gas consumed across all tanks (in liters at surface pressure)
+    // Sum gas consumed across all tanks (in liters at 1 bar)
     double totalGasLiters = 0;
     int tanksWithData = 0;
 
@@ -378,18 +388,19 @@ class Dive extends Equatable {
       final pressureUsed = tank.startPressure! - tank.endPressure!;
       if (pressureUsed <= 0) continue;
 
-      // Gas volume using real-gas compressibility correction
       final startVolume = gasVolume(
         tankSizeLiters: tank.volume!,
         pressureBar: tank.startPressure!,
         o2Percent: tank.gasMix.o2,
         hePercent: tank.gasMix.he,
+        model: model,
       );
       final endVolume = gasVolume(
         tankSizeLiters: tank.volume!,
         pressureBar: tank.endPressure!,
         o2Percent: tank.gasMix.o2,
         hePercent: tank.gasMix.he,
+        model: model,
       );
       final gasLiters = startVolume - endVolume;
       if (gasLiters <= 0) continue;
@@ -401,7 +412,7 @@ class Dive extends Equatable {
     if (tanksWithData == 0 || totalGasLiters <= 0) return null;
 
     // SAC in liters/min at surface
-    return totalGasLiters / minutes / avgPressureAtm;
+    return totalGasLiters / minutes / avgPressureBar;
   }
 
   /// Air consumption rate in pressure units per minute (bar/min or psi/min)

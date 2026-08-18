@@ -16007,6 +16007,30 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => 'Unità SAC Rate';
 
   @override
+  String get settings_units_gasModel => 'Calcoli del gas';
+
+  @override
+  String get settings_units_gasModel_real => 'Gas reale';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      'Tiene conto della comprimibilità. Una bombola da 12 L a 200 bar contiene circa 2317 L.';
+
+  @override
+  String get settings_units_gasModel_ideal => 'Gas ideale';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      'Corrisponde al calcolo manuale e alle tabelle. Una bombola da 12 L a 200 bar contiene 2400 L.';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      'Come la pressione della bombola viene convertita in volume di gas. Riguarda il SAC, le statistiche del gas, il pianificatore e i calcolatori. Il gas ideale corrisponde al calcolo insegnato dalle didattiche; il gas reale è fisicamente accurato e restituisce un SAC inferiore di circa il 5%.';
+
+  @override
+  String get settings_units_dialog_gasModel => 'Calcoli del gas';
+
+  @override
   String get settings_units_dialog_temperatureUnit => 'Unità di temperatura';
 
   @override
@@ -24488,6 +24512,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'Aggiungi alle specie attese';
+
+  @override
+  String reef_species_showAll(int count) {
+    return 'Mostra tutte ($count)';
+  }
+
+  @override
+  String get reef_species_showFewer => 'Mostra meno';
 
   @override
   String get reef_attribution_title => 'Fonti dei dati sulla barriera';
