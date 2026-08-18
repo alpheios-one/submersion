@@ -70,6 +70,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/pickers/edit_s
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_membership_editor.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/equipment_picker_sheet.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/equipment_set_picker_sheet.dart';
+import 'package:submersion/features/dive_log/presentation/utils/entry_exit_autofill.dart';
 import 'package:submersion/features/dive_log/presentation/utils/water_type_autofill.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/site_picker_sheet.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/species_picker_sheet.dart';
@@ -2093,13 +2094,23 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     }
   }
 
-  /// Assigns [site] to the dive and snaps the water type from it (manual
-  /// overrides survive when the site has none). Use for user-initiated
-  /// assignments and new-dive prefill — NOT the load path, which restores the
-  /// dive's own saved water type.
+  /// Assigns [site] to the dive and snaps the water type and the entry/exit
+  /// methods from it (manual overrides survive; see the rules on
+  /// [entryExitAfterSiteAssign]). Use for user-initiated assignments and
+  /// new-dive prefill — NOT the load path, which restores the dive's own
+  /// saved values.
   void _assignSite(DiveSite? site) {
     _selectedSite = site;
     _waterType = waterTypeAfterSiteAssign(_waterType, site);
+    final entryExit = entryExitAfterSiteAssign(
+      currentEntry: _entryMethod,
+      currentExit: _exitMethod,
+      currentLinked: _exitMethodLinked,
+      site: site,
+    );
+    _entryMethod = entryExit.entry;
+    _exitMethod = entryExit.exit;
+    _exitMethodLinked = entryExit.linked;
     unawaited(_maybeAutoFillAltitude());
   }
 
