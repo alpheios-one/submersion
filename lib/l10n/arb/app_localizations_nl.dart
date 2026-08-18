@@ -10964,6 +10964,31 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get equipment_service_filterTaskAll => 'Alle taken';
+
+  @override
+  String get equipment_service_filterTypeAll => 'Alle typen';
+
+  @override
+  String get equipment_service_filterYearAll => 'Alle jaren';
+
+  @override
+  String get equipment_service_filterUntagged =>
+      'Niet aan een interval gekoppeld';
+
+  @override
+  String get equipment_service_filterClear => 'Filter wissen';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'Geen onderhoud voldoet aan dit filter';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '$count van $total getoond';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => 'Servicerecord verwijderd';
 
   @override

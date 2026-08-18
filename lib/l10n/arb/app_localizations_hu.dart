@@ -11019,6 +11019,30 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get equipment_service_filterTaskAll => 'Minden feladat';
+
+  @override
+  String get equipment_service_filterTypeAll => 'Minden típus';
+
+  @override
+  String get equipment_service_filterYearAll => 'Minden év';
+
+  @override
+  String get equipment_service_filterUntagged => 'Nincs intervallumhoz kötve';
+
+  @override
+  String get equipment_service_filterClear => 'Szűrő törlése';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'Nincs a szűrőnek megfelelő karbantartás';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '$count / $total megjelenítve';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => 'Szervizrekord torolve';
 
   @override

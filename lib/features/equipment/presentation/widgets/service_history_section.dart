@@ -5,6 +5,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/domain/entities/service_record.dart';
+import 'package:submersion/features/equipment/domain/entities/maintenance_history_filter.dart';
 import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/utils/service_type_label.dart';
@@ -13,13 +14,25 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Service History Section Widget
-class ServiceHistorySection extends ConsumerWidget {
+class ServiceHistorySection extends ConsumerStatefulWidget {
   final String equipmentId;
 
   const ServiceHistorySection({super.key, required this.equipmentId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ServiceHistorySection> createState() =>
+      _ServiceHistorySectionState();
+}
+
+class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
+  /// Local rather than a provider: the filter is a view of this page and does
+  /// not need to outlive it, matching EquipmentListContent's filter dropdown.
+  MaintenanceHistoryFilter _filter = const MaintenanceHistoryFilter();
+
+  String get equipmentId => widget.equipmentId;
+
+  @override
+  Widget build(BuildContext context) {
     final recordsAsync = ref.watch(serviceRecordNotifierProvider(equipmentId));
     final totalCostAsync = ref.watch(
       serviceRecordTotalCostProvider(equipmentId),
@@ -107,8 +120,12 @@ class ServiceHistorySection extends ConsumerWidget {
                   );
                 }
 
+                final visible = records.where(_filter.matches).toList();
+
                 return Column(
                   children: [
+                    if (_showFilterBar(records))
+                      _buildFilterBar(context, records, kindsById),
                     // Total cost summary, one row per currency: a history
                     // priced in more than one currency has no single total.
                     totalCostAsync.when(
@@ -162,17 +179,36 @@ class ServiceHistorySection extends ConsumerWidget {
                       loading: () => const SizedBox.shrink(),
                       error: (_, _) => const SizedBox.shrink(),
                     ),
-                    // Service records list
-                    ...records.map(
-                      (record) => _ServiceRecordTile(
-                        record: record,
-                        kindsById: kindsById,
-                        onTap: () =>
-                            _showEditServiceDialog(context, ref, record),
-                        onDelete: () =>
-                            _confirmDeleteRecord(context, ref, record),
+                    // Service records list. "Nothing logged yet" and "your
+                    // filter hides everything" are different situations and
+                    // call for different actions, so they stay distinct.
+                    if (visible.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Center(
+                          child: Text(
+                            context.l10n.equipment_service_filterNoMatches,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ),
+                      )
+                    else
+                      ...visible.map(
+                        (record) => _ServiceRecordTile(
+                          record: record,
+                          kindsById: kindsById,
+                          onTap: () =>
+                              _showEditServiceDialog(context, ref, record),
+                          onDelete: () =>
+                              _confirmDeleteRecord(context, ref, record),
+                        ),
                       ),
-                    ),
                   ],
                 );
               },
@@ -190,6 +226,132 @@ class ServiceHistorySection extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Options come from the records themselves, so a diver never sees a task
+  /// they have never logged and every option yields at least one row.
+  /// The leading null is the "All" entry.
+  List<String?> _taskOptions(List<ServiceRecord> records) {
+    final ids = <String?>{for (final r in records) r.serviceKindId};
+    final tagged = ids.whereType<String>().toList()..sort();
+    return [
+      null,
+      ...tagged,
+      if (ids.contains(null)) MaintenanceHistoryFilter.untaggedSentinel,
+    ];
+  }
+
+  List<ServiceType?> _typeOptions(List<ServiceRecord> records) {
+    final types = {for (final r in records) r.serviceType}.toList()
+      ..sort((a, b) => a.index.compareTo(b.index));
+    return [null, ...types];
+  }
+
+  List<int?> _yearOptions(List<ServiceRecord> records) {
+    final years = {for (final r in records) r.serviceDate.year}.toList()
+      ..sort((a, b) => b.compareTo(a));
+    return [null, ...years];
+  }
+
+  /// Three controls above a short list is noise. The bar appears only once
+  /// some dimension actually has a choice to make (more than "All" plus one).
+  bool _showFilterBar(List<ServiceRecord> records) =>
+      _taskOptions(records).length > 2 ||
+      _typeOptions(records).length > 2 ||
+      _yearOptions(records).length > 2;
+
+  Widget _buildFilterBar(
+    BuildContext context,
+    List<ServiceRecord> records,
+    Map<String, ServiceKind> kindsById,
+  ) {
+    final l10n = context.l10n;
+    final visibleCount = records.where(_filter.matches).length;
+
+    String taskLabel(String? id) {
+      if (id == null) return l10n.equipment_service_filterTaskAll;
+      if (id == MaintenanceHistoryFilter.untaggedSentinel) {
+        return l10n.equipment_service_filterUntagged;
+      }
+      return kindsById[id]?.name ?? id;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Wrap rather than Row: three dropdowns fit one line on a tablet
+          // and stack on a phone instead of overflowing.
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _FilterDropdown<String?>(
+                value: _filter.serviceKindId,
+                options: _taskOptions(records),
+                labelOf: taskLabel,
+                onChanged: (value) => setState(
+                  () => _filter = _filter.copyWith(
+                    serviceKindId: value,
+                    serviceType: _filter.serviceType,
+                    year: _filter.year,
+                  ),
+                ),
+              ),
+              _FilterDropdown<ServiceType?>(
+                value: _filter.serviceType,
+                options: _typeOptions(records),
+                labelOf: (type) => type == null
+                    ? l10n.equipment_service_filterTypeAll
+                    : type.label(l10n),
+                onChanged: (value) => setState(
+                  () => _filter = _filter.copyWith(
+                    serviceKindId: _filter.serviceKindId,
+                    serviceType: value,
+                    year: _filter.year,
+                  ),
+                ),
+              ),
+              _FilterDropdown<int?>(
+                value: _filter.year,
+                options: _yearOptions(records),
+                labelOf: (year) => year == null
+                    ? l10n.equipment_service_filterYearAll
+                    : '$year',
+                onChanged: (value) => setState(
+                  () => _filter = _filter.copyWith(
+                    serviceKindId: _filter.serviceKindId,
+                    serviceType: _filter.serviceType,
+                    year: value,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (_filter.isActive)
+            Row(
+              children: [
+                Text(
+                  l10n.equipment_service_filterMatchCount(
+                    visibleCount,
+                    records.length,
+                  ),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: () => setState(
+                    () => _filter = const MaintenanceHistoryFilter(),
+                  ),
+                  icon: const Icon(Icons.close, size: 16),
+                  label: Text(l10n.equipment_service_filterClear),
+                ),
+              ],
+            ),
+        ],
       ),
     );
   }
@@ -408,5 +570,46 @@ class _ServiceRecordTile extends ConsumerWidget {
       case ServiceType.other:
         return Icons.handyman;
     }
+  }
+}
+
+/// One compact dropdown in the maintenance history filter bar.
+///
+/// Bordered container with the underline suppressed, matching the filter
+/// dropdown in EquipmentListContent so the two read as the same control.
+class _FilterDropdown<T> extends StatelessWidget {
+  final T value;
+  final List<T> options;
+  final String Function(T) labelOf;
+  final ValueChanged<T> onChanged;
+
+  const _FilterDropdown({
+    required this.value,
+    required this.options,
+    required this.labelOf,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: DropdownButton<T>(
+        value: value,
+        underline: const SizedBox(),
+        isDense: true,
+        items: [
+          for (final option in options)
+            DropdownMenuItem<T>(value: option, child: Text(labelOf(option))),
+        ],
+        onChanged: (selected) {
+          if (selected is T) onChanged(selected);
+        },
+      ),
+    );
   }
 }

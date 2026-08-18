@@ -145,6 +145,75 @@ void main() {
 
     expect(tester.getSize(find.text(longName)).width, greaterThan(150));
   });
+
+  testWidgets('selecting a task narrows the list', (tester) async {
+    await pumpSection(
+      tester,
+      records: [
+        record(id: 'r1', kindId: 'disinfect'),
+        record(id: 'r2', kindId: 'scrubber-repack'),
+      ],
+      kinds: [
+        kind('disinfect', 'Disinfect'),
+        kind('scrubber-repack', 'Scrubber repack'),
+      ],
+    );
+
+    expect(find.text('Disinfect'), findsOneWidget);
+    expect(find.text('Scrubber repack'), findsOneWidget);
+
+    await tester.tap(find.text('All tasks'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Disinfect').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Scrubber repack'), findsNothing);
+  });
+
+  testWidgets('a filter matching nothing shows its own empty state', (
+    tester,
+  ) async {
+    await pumpSection(
+      tester,
+      records: [
+        record(id: 'r1', kindId: 'disinfect', date: DateTime(2026, 3, 14)),
+        record(
+          id: 'r2',
+          kindId: 'disinfect',
+          type: ServiceType.repair,
+          date: DateTime(2024, 3, 14),
+        ),
+      ],
+      kinds: [kind('disinfect', 'Disinfect')],
+    );
+
+    // Both dimensions exist in the data, but this combination does not: the
+    // only 2026 record is a Cleaning, and the only Repair is from 2024.
+    await tester.tap(find.text('All years'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('2026').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('All types'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Repair').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('No maintenance matches this filter'), findsOneWidget);
+    // Distinct from the "nothing logged at all" state.
+    expect(find.text('No service records yet'), findsNothing);
+  });
+
+  testWidgets('the filter bar is hidden when there is nothing to filter', (
+    tester,
+  ) async {
+    await pumpSection(
+      tester,
+      records: [record(id: 'r1', kindId: 'disinfect')],
+      kinds: [kind('disinfect', 'Disinfect')],
+    );
+
+    expect(find.text('All tasks'), findsNothing);
+  });
 }
 
 class _MockServiceRecordNotifier

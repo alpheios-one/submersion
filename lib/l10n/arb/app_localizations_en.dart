@@ -10868,6 +10868,30 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get equipment_service_filterTaskAll => 'All tasks';
+
+  @override
+  String get equipment_service_filterTypeAll => 'All types';
+
+  @override
+  String get equipment_service_filterYearAll => 'All years';
+
+  @override
+  String get equipment_service_filterUntagged => 'Not tied to a clock';
+
+  @override
+  String get equipment_service_filterClear => 'Clear filter';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'No maintenance matches this filter';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '$count of $total shown';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => 'Service record deleted';
 
   @override

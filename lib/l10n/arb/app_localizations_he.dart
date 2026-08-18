@@ -10789,6 +10789,29 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get equipment_service_filterTaskAll => 'כל המשימות';
+
+  @override
+  String get equipment_service_filterTypeAll => 'כל הסוגים';
+
+  @override
+  String get equipment_service_filterYearAll => 'כל השנים';
+
+  @override
+  String get equipment_service_filterUntagged => 'לא משויך למחזור';
+
+  @override
+  String get equipment_service_filterClear => 'ניקוי הסינון';
+
+  @override
+  String get equipment_service_filterNoMatches => 'אין תחזוקה התואמת לסינון זה';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return 'מוצגים $count מתוך $total';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => 'רשומת טיפול נמחקה';
 
   @override

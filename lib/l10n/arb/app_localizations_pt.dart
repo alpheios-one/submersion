@@ -11042,6 +11042,30 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get equipment_service_filterTaskAll => 'Todas as tarefas';
+
+  @override
+  String get equipment_service_filterTypeAll => 'Todos os tipos';
+
+  @override
+  String get equipment_service_filterYearAll => 'Todos os anos';
+
+  @override
+  String get equipment_service_filterUntagged => 'Sem intervalo associado';
+
+  @override
+  String get equipment_service_filterClear => 'Limpar filtro';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'Nenhuma manutenção corresponde a este filtro';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '$count de $total exibidos';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted =>
       'Registro de manutencao excluido';
 

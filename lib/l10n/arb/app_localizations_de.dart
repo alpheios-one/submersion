@@ -11039,6 +11039,30 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get equipment_service_filterTaskAll => 'Alle Aufgaben';
+
+  @override
+  String get equipment_service_filterTypeAll => 'Alle Typen';
+
+  @override
+  String get equipment_service_filterYearAll => 'Alle Jahre';
+
+  @override
+  String get equipment_service_filterUntagged => 'Keinem Intervall zugeordnet';
+
+  @override
+  String get equipment_service_filterClear => 'Filter zurücksetzen';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'Keine Wartung entspricht diesem Filter';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '$count von $total angezeigt';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => 'Wartungseintrag gelöscht';
 
   @override

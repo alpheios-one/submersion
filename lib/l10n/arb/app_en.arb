@@ -6121,6 +6121,23 @@
       }
     }
   },
+  "equipment_service_filterTaskAll": "All tasks",
+  "equipment_service_filterTypeAll": "All types",
+  "equipment_service_filterYearAll": "All years",
+  "equipment_service_filterUntagged": "Not tied to a clock",
+  "equipment_service_filterClear": "Clear filter",
+  "equipment_service_filterNoMatches": "No maintenance matches this filter",
+  "equipment_service_filterMatchCount": "{count} of {total} shown",
+  "@equipment_service_filterMatchCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "equipment_service_snackbar_deleted": "Service record deleted",
   "equipment_service_totalCostLabel": "Total Service Cost",
   "equipment_setDetail_addEquipmentButton": "Add Equipment",

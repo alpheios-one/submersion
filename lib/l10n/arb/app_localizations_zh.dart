@@ -10549,6 +10549,29 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get equipment_service_filterTaskAll => '全部任务';
+
+  @override
+  String get equipment_service_filterTypeAll => '全部类型';
+
+  @override
+  String get equipment_service_filterYearAll => '全部年份';
+
+  @override
+  String get equipment_service_filterUntagged => '未关联保养周期';
+
+  @override
+  String get equipment_service_filterClear => '清除筛选';
+
+  @override
+  String get equipment_service_filterNoMatches => '没有符合此筛选条件的保养记录';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '显示 $count / $total';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => '维护记录已删除';
 
   @override

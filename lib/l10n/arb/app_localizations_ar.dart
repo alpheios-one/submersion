@@ -10853,6 +10853,30 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get equipment_service_filterTaskAll => 'كل المهام';
+
+  @override
+  String get equipment_service_filterTypeAll => 'كل الأنواع';
+
+  @override
+  String get equipment_service_filterYearAll => 'كل السنوات';
+
+  @override
+  String get equipment_service_filterUntagged => 'غير مرتبط بمؤقت';
+
+  @override
+  String get equipment_service_filterClear => 'مسح عامل التصفية';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'لا توجد صيانة تطابق عامل التصفية';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return 'عرض $count من $total';
+  }
+
+  @override
   String get equipment_service_snackbar_deleted => 'تم حذف سجل الصيانة';
 
   @override

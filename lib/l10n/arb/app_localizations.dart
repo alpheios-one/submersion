@@ -18843,6 +18843,48 @@ abstract class AppLocalizations {
   /// **'Next due {date}'**
   String equipment_service_nextDueLabel(String date);
 
+  /// No description provided for @equipment_service_filterTaskAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All tasks'**
+  String get equipment_service_filterTaskAll;
+
+  /// No description provided for @equipment_service_filterTypeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All types'**
+  String get equipment_service_filterTypeAll;
+
+  /// No description provided for @equipment_service_filterYearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All years'**
+  String get equipment_service_filterYearAll;
+
+  /// No description provided for @equipment_service_filterUntagged.
+  ///
+  /// In en, this message translates to:
+  /// **'Not tied to a clock'**
+  String get equipment_service_filterUntagged;
+
+  /// No description provided for @equipment_service_filterClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filter'**
+  String get equipment_service_filterClear;
+
+  /// No description provided for @equipment_service_filterNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No maintenance matches this filter'**
+  String get equipment_service_filterNoMatches;
+
+  /// No description provided for @equipment_service_filterMatchCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {total} shown'**
+  String equipment_service_filterMatchCount(int count, int total);
+
   /// No description provided for @equipment_service_snackbar_deleted.
   ///
   /// In en, this message translates to:
