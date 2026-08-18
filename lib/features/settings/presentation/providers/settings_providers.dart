@@ -54,7 +54,6 @@ class SettingsKeys {
   static const String volumeUnit = 'volume_unit';
   static const String weightUnit = 'weight_unit';
   static const String sacUnit = 'sac_unit';
-  static const String gasModel = 'gas_model';
   static const String defaultCurrency = 'default_currency';
   static const String unitPreset = 'unit_preset';
   static const String themeMode = 'theme_mode';

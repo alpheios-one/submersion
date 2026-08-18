@@ -602,7 +602,7 @@ void main() {
       expect(result as double, closeTo(9.70, 0.1));
     });
 
-    test('sacRate volume mode returns L/min from dive.sac', () {
+    test('sacRate volume mode returns L/min from Dive.sacFor', () {
       final result = DiveField.sacRate.extractFromDive(
         testDive,
         sacUnit: SacUnit.litersPerMin,

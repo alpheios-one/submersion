@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/gas_consumption_calculator.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -16,10 +17,20 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-Widget _host({required AppSettings settings}) {
+Widget _host({
+  required AppSettings settings,
+  double? depthMeters,
+  int? minutes,
+  double? sacLpm,
+}) {
   return ProviderScope(
     overrides: [
       settingsProvider.overrideWith((ref) => _TestSettingsNotifier(settings)),
+      if (depthMeters != null)
+        consumptionDepthProvider.overrideWith((ref) => depthMeters),
+      if (minutes != null)
+        consumptionTimeProvider.overrideWith((ref) => minutes),
+      if (sacLpm != null) consumptionSacProvider.overrideWith((ref) => sacLpm),
     ],
     child: const MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -84,5 +95,26 @@ void main() {
     await tester.pumpWidget(_host(settings: _imperial));
     await tester.pumpAndSettle();
     expect(find.text('psi'), findsWidgets);
+  });
+
+  testWidgets('a plan that overruns the cylinder shows no negative remaining', (
+    tester,
+  ) async {
+    // 25 L/min at 40 m for 90 min wants 11250 L from a 12 L cylinder that
+    // holds ~2317. The card already turns red and says the plan exceeds
+    // capacity; showing "-8933 L (-744 bar) remaining" on top of that is
+    // nonsense, so the remaining figures floor at zero.
+    await tester.pumpWidget(
+      _host(
+        settings: const AppSettings(),
+        depthMeters: 40.0,
+        minutes: 90,
+        sacLpm: 25.0,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('-'), findsNothing);
+    expect(find.textContaining('0 L (0 bar)'), findsOneWidget);
   });
 }

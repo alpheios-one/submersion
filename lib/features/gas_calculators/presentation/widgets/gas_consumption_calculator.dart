@@ -302,8 +302,13 @@ class GasConsumptionCalculator extends ConsumerWidget {
                       _buildBreakdownRow(
                         context,
                         context.l10n.gasCalculators_consumption_remainingGas,
-                        '${units.convertVolume(result.litersRemaining).toStringAsFixed(0)} $volumeSymbol '
-                        '(${units.convertPressure(result.barRemaining).toStringAsFixed(0)} $pressureSymbol)',
+                        // Floored at zero: a plan that overruns the cylinder
+                        // leaves nothing, not a negative amount. The result
+                        // keeps the signed values so callers can read the
+                        // deficit, and the card is already in its error state
+                        // saying the plan exceeds capacity.
+                        '${units.convertVolume(result.litersRemaining.clamp(0.0, double.infinity)).toStringAsFixed(0)} $volumeSymbol '
+                        '(${units.convertPressure(result.barRemaining.clamp(0.0, double.infinity)).toStringAsFixed(0)} $pressureSymbol)',
                         isHighlight: true,
                       ),
                     ],
