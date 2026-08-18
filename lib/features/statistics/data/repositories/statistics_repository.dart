@@ -131,6 +131,20 @@ class StatisticsRepository {
   /// actually go up and down".
   static const double _sustainedTransitThreshold = 3.0;
 
+  /// How many times its own mean sample interval a profile may skip before
+  /// [getTimeAtDepthRanges] stops crediting the skip as time at that depth.
+  ///
+  /// Recording gaps are real: a computer paused mid-dive, a surface interval
+  /// swallowed into one dive record, a profile stitched from two downloads.
+  /// Charging the whole pause to whichever bucket the last sample before it
+  /// happened to sit in would invent hours of bottom time. The bound is
+  /// relative to the profile's own cadence rather than an absolute number of
+  /// seconds because recording intervals in a real library run from 1 s to a
+  /// minute or more, and a manually keyed profile is sparser still. Four times
+  /// the mean leaves room for ordinary jitter and the occasional dropped
+  /// sample while cutting anything an order of magnitude larger down to size.
+  static const int _maxSampleGapFactor = 4;
+
   /// Builds the `AND <alias>.id IN (<subquery>)` fragment + raw params for a
   /// stats filter. Empty (no-op) when the filter has no active axes.
   ({String clause, List<Object?> params}) _diveFilter(
@@ -2144,6 +2158,37 @@ class StatisticsRepository {
   /// display layer converts to the user's preferred depth unit so the chart's
   /// axis label and bucket labels match the setting. The top bucket is
   /// open-ended ([upperDepth] is null).
+  ///
+  /// Minutes come from the sample timestamps, not from a row count: the
+  /// interval between one sample and the next is credited to the bucket the
+  /// earlier sample sits in. Counting rows and calling each one a second, as
+  /// this query used to, is only right for a computer sampling at 1 Hz: for
+  /// the many that record every 2, 4, 5, 10 or 20 seconds it divides every
+  /// bucket by that interval. Differencing timestamps needs no
+  /// assumption about the recording rate at all, and it makes duplicate rows
+  /// from a repeated import harmless: the repeat adds a zero-length interval
+  /// rather than a second helping of time.
+  ///
+  /// Each dive's intervals are capped at [_maxSampleGapFactor] times that
+  /// profile's own mean interval so a recording pause is not banked as bottom
+  /// time. A profile's total therefore spans its first sample to its last: the
+  /// last sample opens no interval, and whatever time the diver spent after it
+  /// was never recorded and cannot be recovered here.
+  ///
+  /// Samples are ordered by `(timestamp, id)` rather than timestamp alone.
+  /// Ties cannot lose time whichever way they fall -- every row but the last
+  /// of a tied group yields a zero-length interval, and the last carries the
+  /// whole step to the next timestamp -- but if tied rows sit in different
+  /// buckets, the tie order decides which bucket that step lands in. Ordering
+  /// by row id makes that choice reproducible instead of leaving it to
+  /// SQLite.
+  ///
+  /// Only primary profile rows are counted, matching [getAscentDescentRates]:
+  /// a dive logged by two computers, or one whose original profile was demoted
+  /// by an edit, otherwise contributes both sample streams and roughly doubles
+  /// every bucket. Note that a dive left with no primary rows at all is
+  /// skipped entirely -- see issue #1149, which tracks the promotion bug that
+  /// can produce that state.
   Future<List<({int lowerDepth, int? upperDepth, int minutes})>>
   getTimeAtDepthRanges({
     String? diverId,
@@ -2155,31 +2200,61 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
+        WITH samples AS (
+          SELECT
+            p.dive_id AS dive_id,
+            p.computer_id AS computer_id,
+            p.id AS sample_id,
+            p.timestamp AS at,
+            p.depth AS depth
+          FROM dive_profiles p
+          JOIN dives d ON d.id = p.dive_id
+          WHERE p.is_primary = 1 $diverFilter ${df.clause}
+        ),
+        cadence AS (
+          SELECT
+            dive_id,
+            computer_id,
+            (MAX(at) - MIN(at)) * $_maxSampleGapFactor / (COUNT(*) - 1.0)
+              AS max_interval
+          FROM samples
+          GROUP BY dive_id, computer_id
+          HAVING COUNT(*) > 1
+        ),
+        intervals AS (
+          SELECT
+            dive_id,
+            computer_id,
+            depth,
+            LEAD(at) OVER w - at AS seconds
+          FROM samples
+          WINDOW w AS (
+            PARTITION BY dive_id, computer_id ORDER BY at, sample_id
+          )
+        )
         SELECT
           CASE
-            WHEN p.depth < 10 THEN 0
-            WHEN p.depth < 20 THEN 10
-            WHEN p.depth < 30 THEN 20
-            WHEN p.depth < 40 THEN 30
+            WHEN i.depth < 10 THEN 0
+            WHEN i.depth < 20 THEN 10
+            WHEN i.depth < 30 THEN 20
+            WHEN i.depth < 40 THEN 30
             ELSE 40
           END AS bucket_lo,
-          COUNT(*) AS sample_count
-        FROM dive_profiles p
-        JOIN dives d ON d.id = p.dive_id
-        WHERE 1=1 $diverFilter ${df.clause}
+          SUM(MIN(i.seconds * 1.0, c.max_interval)) AS seconds
+        FROM intervals i
+        JOIN cadence c
+          ON c.dive_id = i.dive_id AND c.computer_id IS i.computer_id
+        WHERE i.seconds > 0
         GROUP BY bucket_lo
         ORDER BY bucket_lo
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
-      // Sample count approximates minutes (profiles are usually sampled every
-      // second or few seconds) — a rough estimate matching the original
-      // implementation.
       return results.map((row) {
         final lo = row.read<int>('bucket_lo');
         return (
           lowerDepth: lo,
           upperDepth: lo >= 40 ? null : lo + 10,
-          minutes: (row.read<int>('sample_count') / 60).round(),
+          minutes: (row.read<double>('seconds') / 60).round(),
         );
       }).toList();
     } catch (e, stackTrace) {
