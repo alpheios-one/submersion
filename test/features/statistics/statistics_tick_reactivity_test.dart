@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
@@ -42,6 +44,10 @@ void main() {
       currentDiverIdProvider.overrideWith(
         (ref) => MockCurrentDiverIdNotifier(),
       ),
+      // statisticsRepositoryProvider watches the gas model (issue #828), which
+      // otherwise pulls in settingsProvider and its SharedPreferences
+      // dependency. Pin it instead of standing up the whole settings stack.
+      gasModelProvider.overrideWith((ref) => GasModel.real),
     ],
   );
 

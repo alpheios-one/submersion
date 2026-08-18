@@ -15874,6 +15874,30 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => 'SAC-snelheidseenheid';
 
   @override
+  String get settings_units_gasModel => 'Gasberekeningen';
+
+  @override
+  String get settings_units_gasModel_real => 'Reëel gas';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      'Houdt rekening met samendrukbaarheid. Een 12 L-fles op 200 bar bevat ongeveer 2317 L.';
+
+  @override
+  String get settings_units_gasModel_ideal => 'Ideaal gas';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      'Komt overeen met handmatige berekening en duiktabellen. Een 12 L-fles op 200 bar bevat 2400 L.';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      'Hoe flesdruk wordt omgerekend naar gasvolume. Dit beïnvloedt het SAC, de gasstatistieken, de planner en de gasrekenmachines. Ideaal gas komt overeen met de berekening die opleidingen leren; reëel gas is fysisch nauwkeurig en geeft een ongeveer 5% lager SAC.';
+
+  @override
+  String get settings_units_dialog_gasModel => 'Gasberekeningen';
+
+  @override
   String get settings_units_dialog_temperatureUnit => 'Temperatuureenheid';
 
   @override

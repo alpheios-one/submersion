@@ -19,6 +19,7 @@ import 'package:submersion/features/settings/presentation/widgets/visibility_sca
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
+import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/services/notification_service.dart';
 import 'package:submersion/features/notifications/presentation/providers/notification_providers.dart';
@@ -513,6 +514,16 @@ class _UnitsSectionContent extends ConsumerWidget {
                 const Divider(height: 1),
                 _buildUnitTile(
                   context,
+                  title: context.l10n.settings_units_gasModel,
+                  value: settings.gasModel == GasModel.ideal
+                      ? context.l10n.settings_units_gasModel_ideal
+                      : context.l10n.settings_units_gasModel_real,
+                  onTap: () =>
+                      _showGasModelPicker(context, ref, settings.gasModel),
+                ),
+                const Divider(height: 1),
+                _buildUnitTile(
+                  context,
                   title: context.l10n.settings_units_defaultCurrency,
                   value: settings.defaultCurrency,
                   onTap: () => _showCurrencyPicker(
@@ -883,6 +894,77 @@ class _UnitsSectionContent extends ConsumerWidget {
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Pick the equation of state behind every pressure-to-volume conversion.
+  ///
+  /// The dialog spells out the consequence, because the difference between the
+  /// two answers is what divers read as a bug when their hand calculation
+  /// disagrees with the app (issue #828).
+  void _showGasModelPicker(
+    BuildContext context,
+    WidgetRef ref,
+    GasModel currentModel,
+  ) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.l10n.settings_units_dialog_gasModel),
+        // Scrollable: unlike the sibling unit pickers this one carries an
+        // explanatory paragraph above two subtitled options, which overflows
+        // a short dialog on small screens or at large text scales.
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  context.l10n.settings_units_gasModel_explanation,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+              ListTile(
+                title: Text(context.l10n.settings_units_gasModel_real),
+                subtitle: Text(
+                  context.l10n.settings_units_gasModel_real_subtitle,
+                ),
+                trailing: currentModel == GasModel.real
+                    ? Icon(
+                        Icons.check,
+                        color: Theme.of(context).colorScheme.primary,
+                      )
+                    : null,
+                onTap: () {
+                  ref
+                      .read(settingsProvider.notifier)
+                      .setGasModel(GasModel.real);
+                  Navigator.of(dialogContext).pop();
+                },
+              ),
+              ListTile(
+                title: Text(context.l10n.settings_units_gasModel_ideal),
+                subtitle: Text(
+                  context.l10n.settings_units_gasModel_ideal_subtitle,
+                ),
+                trailing: currentModel == GasModel.ideal
+                    ? Icon(
+                        Icons.check,
+                        color: Theme.of(context).colorScheme.primary,
+                      )
+                    : null,
+                onTap: () {
+                  ref
+                      .read(settingsProvider.notifier)
+                      .setGasModel(GasModel.ideal);
+                  Navigator.of(dialogContext).pop();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

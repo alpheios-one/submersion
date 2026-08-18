@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/tank_presets.dart';
+import 'package:submersion/core/utils/gas_compressibility.dart';
 
 /// A cylinder described the way gas planning needs it: water capacity plus a
 /// working pressure.
@@ -33,11 +35,17 @@ class TankSpec extends Equatable {
 
   /// Free gas at the surface, in liters, at the rated working pressure.
   ///
-  /// Ideal-gas figure. It runs a few percent above the manufacturer's rated
-  /// capacity for high-pressure cylinders because it ignores compressibility;
-  /// that is acceptable for planning and matches what the rest of the app
-  /// already does in [TankPreset.volumeCuft].
-  double get freeGasLiters => waterVolumeLiters * workingPressureBar;
+  /// Under [GasModel.ideal] this is simply water volume times working
+  /// pressure, which runs a few percent above the manufacturer's rated
+  /// capacity for high-pressure cylinders because it ignores compressibility.
+  /// Under [GasModel.real] it honors compressibility and lands close to the
+  /// rated figure (issue #828).
+  double freeGasLitersFor(GasModel model) => gasVolume(
+    tankSizeLiters: waterVolumeLiters,
+    pressureBar: workingPressureBar,
+    o2Percent: 21,
+    model: model,
+  );
 
   factory TankSpec.fromPreset(TankPreset preset) => TankSpec(
     waterVolumeLiters: preset.volumeLiters,

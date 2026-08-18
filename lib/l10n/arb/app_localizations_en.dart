@@ -15734,6 +15734,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => 'SAC Rate Unit';
 
   @override
+  String get settings_units_gasModel => 'Gas calculations';
+
+  @override
+  String get settings_units_gasModel_real => 'Real gas';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      'Accounts for compressibility. A 12 L cylinder at 200 bar holds about 2317 L.';
+
+  @override
+  String get settings_units_gasModel_ideal => 'Ideal gas';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      'Matches hand calculation and dive tables. A 12 L cylinder at 200 bar holds 2400 L.';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      'How cylinder pressure is converted to gas volume. This affects SAC rate, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for SAC.';
+
+  @override
+  String get settings_units_dialog_gasModel => 'Gas calculations';
+
+  @override
   String get settings_units_dialog_temperatureUnit => 'Temperature Unit';
 
   @override
