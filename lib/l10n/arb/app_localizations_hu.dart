@@ -8011,6 +8011,47 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveSites_edit_access_parkingInfo_label => 'Parkolasi informaciok';
 
   @override
+  String get diveSites_edit_access_entryMethod_label => 'Belépés módja';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Kilépés módja';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Az itteni $count merülésed: belépés $entry, kilépés $exit',
+      one: 'Az itteni merülésed: belépés $entry, kilépés $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Az itteni $count merülésed: belépés $entry',
+      one: 'Az itteni merülésed: belépés $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Belépés';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Kilépés';
+
+  @override
   String get diveSites_edit_altitude_helperText =>
       'Helyszin tengerszint feletti magassaga (magassagi meruleshez)';
 
@@ -24987,6 +25028,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'Besz.';
+
+  @override
+  String get enum_siteField_exitMethod => 'Kilépés módja';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Kilépés';
 
   @override
   String get enum_siteField_bestSeason_short => 'Évszak';

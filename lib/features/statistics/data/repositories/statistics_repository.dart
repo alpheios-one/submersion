@@ -57,6 +57,22 @@ class DistributionSegment {
   });
 }
 
+/// One observed (entry method, exit method) pairing and how often it occurs.
+///
+/// Both values are stored EntryMethod enum names; the presentation layer
+/// translates them.
+class EntryExitPairCount {
+  const EntryExitPairCount({
+    required this.entryMethod,
+    required this.exitMethod,
+    required this.count,
+  });
+
+  final String entryMethod;
+  final String? exitMethod;
+  final int count;
+}
+
 /// Repository for all advanced statistics queries
 class StatisticsRepository {
   AppDatabase get _db => DatabaseService.instance.database;
@@ -1233,6 +1249,53 @@ class StatisticsRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get entry method distribution',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return [];
+    }
+  }
+
+  /// Observed entry/exit method pairings among a diver's dives at one site,
+  /// most frequent first (issue #1104).
+  ///
+  /// Grouping on the pair is deliberate, not incidental. The dive form
+  /// defaults exit method to mirror entry, so taking the most common
+  /// exit_method independently would over-report "in and out the same way"
+  /// for values the diver never actually set. Rows with no entry method carry
+  /// no information and are excluded; a null exit method is meaningful and is
+  /// carried through as null.
+  Future<List<EntryExitPairCount>> getEntryExitMethodPairsForSite({
+    required String siteId,
+    String? diverId,
+  }) async {
+    try {
+      final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
+      final params = diverId != null ? [siteId, diverId] : [siteId];
+
+      final results = await _db.customSelect('''
+        SELECT
+          entry_method,
+          exit_method,
+          COUNT(*) AS count
+        FROM dives
+        WHERE site_id = ?
+          AND entry_method IS NOT NULL AND entry_method != '' $diverFilter
+        GROUP BY entry_method, exit_method
+        ORDER BY count DESC
+        ''', variables: params.map((p) => Variable(p)).toList()).get();
+
+      return results.map((row) {
+        final exit = row.read<String?>('exit_method');
+        return EntryExitPairCount(
+          entryMethod: row.read<String>('entry_method'),
+          exitMethod: (exit == null || exit.isEmpty) ? null : exit,
+          count: row.read<int>('count'),
+        );
+      }).toList();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get entry/exit method pairs for site: $siteId',
         error: e,
         stackTrace: stackTrace,
       );

@@ -8030,6 +8030,47 @@ class AppLocalizationsPt extends AppLocalizations {
       'Informacoes de Estacionamento';
 
   @override
+  String get diveSites_edit_access_entryMethod_label => 'Método de entrada';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Método de saída';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Os teus $count mergulhos aqui: entrada $entry, saída $exit',
+      one: 'O teu mergulho aqui: entrada $entry, saída $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Os teus $count mergulhos aqui: entrada $entry',
+      one: 'O teu mergulho aqui: entrada $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Entrada';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Saída';
+
+  @override
   String get diveSites_edit_altitude_helperText =>
       'Elevacao do ponto acima do nivel do mar (para mergulho em altitude)';
 
@@ -25068,6 +25109,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'Entr.';
+
+  @override
+  String get enum_siteField_exitMethod => 'Método de saída';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Saída';
 
   @override
   String get enum_siteField_bestSeason_short => 'Época';

@@ -7965,6 +7965,47 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveSites_edit_access_parkingInfo_label => 'Parkeerinformatie';
 
   @override
+  String get diveSites_edit_access_entryMethod_label => 'Instapmethode';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Uitstapmethode';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Jouw $count duiken hier: instap $entry, uitstap $exit',
+      one: 'Jouw duik hier: instap $entry, uitstap $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Jouw $count duiken hier: instap $entry',
+      one: 'Jouw duik hier: instap $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Instap';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Uitstap';
+
+  @override
   String get diveSites_edit_altitude_helperText =>
       'Hoogte van de stek boven zeeniveau (voor hoogteduiken)';
 
@@ -24888,6 +24929,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'Instap';
+
+  @override
+  String get enum_siteField_exitMethod => 'Uitstapmethode';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Uitstap';
 
   @override
   String get enum_siteField_bestSeason_short => 'Seizoen';

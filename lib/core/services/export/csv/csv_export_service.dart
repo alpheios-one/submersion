@@ -227,9 +227,11 @@ class CsvExportService {
         site.location?.latitude.toStringAsFixed(6) ?? '',
         site.location?.longitude.toStringAsFixed(6) ?? '',
         site.maxDepth?.toStringAsFixed(1) ?? '',
-        site.conditions?.waterType ?? '',
-        site.conditions?.typicalCurrent ?? '',
-        site.conditions?.entryType ?? '',
+        site.waterType?.displayName ?? '',
+        // Typical current has no backing column; the header position is kept
+        // so existing consumers of this CSV keep their column offsets.
+        '',
+        site.entryMethod?.displayName ?? '',
         site.rating?.toStringAsFixed(1) ?? '',
         site.description.replaceAll('\n', ' '),
         site.notes.replaceAll('\n', ' '),

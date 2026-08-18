@@ -8030,6 +8030,47 @@ class AppLocalizationsIt extends AppLocalizations {
       'Informazioni parcheggio';
 
   @override
+  String get diveSites_edit_access_entryMethod_label => 'Metodo di entrata';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'Metodo di uscita';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Le tue $count immersioni qui: entrata $entry, uscita $exit',
+      one: 'La tua immersione qui: entrata $entry, uscita $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Le tue $count immersioni qui: entrata $entry',
+      one: 'La tua immersione qui: entrata $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'Entrata';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'Uscita';
+
+  @override
   String get diveSites_edit_altitude_helperText =>
       'Altitudine del sito sul livello del mare (per immersioni in quota)';
 
@@ -25070,6 +25111,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'Ingr.';
+
+  @override
+  String get enum_siteField_exitMethod => 'Metodo di uscita';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Uscita';
 
   @override
   String get enum_siteField_bestSeason_short => 'Stagione';

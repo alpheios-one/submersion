@@ -13586,6 +13586,49 @@ abstract class AppLocalizations {
   /// **'Parking Information'**
   String get diveSites_edit_access_parkingInfo_label;
 
+  /// Site form row: the typical way into the water at this site
+  ///
+  /// In en, this message translates to:
+  /// **'Entry Method'**
+  String get diveSites_edit_access_entryMethod_label;
+
+  /// Site form row: the typical way out of the water at this site
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Method'**
+  String get diveSites_edit_access_exitMethod_label;
+
+  /// Chip offering to fill a site's entry and exit method from the dives already logged there
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Your dive here: {entry} in, {exit} out} other{Your {count} dives here: {entry} in, {exit} out}}'**
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  );
+
+  /// Chip offering to fill a site's entry method when the logged dives record no exit method
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Your dive here: {entry}} other{Your {count} dives here: {entry}}}'**
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  );
+
+  /// Site detail access card: entry method row label
+  ///
+  /// In en, this message translates to:
+  /// **'Entry'**
+  String get diveSites_detail_access_entryMethod;
+
+  /// Site detail access card: exit method row label
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get diveSites_detail_access_exitMethod;
+
   /// No description provided for @diveSites_edit_altitude_helperText.
   ///
   /// In en, this message translates to:
@@ -41936,6 +41979,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Entry'**
   String get enum_siteField_entryType_short;
+
+  /// Site table column: exit method
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Method'**
+  String get enum_siteField_exitMethod;
+
+  /// Site table column (short): exit method
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get enum_siteField_exitMethod_short;
 
   /// No description provided for @enum_siteField_bestSeason_short.
   ///

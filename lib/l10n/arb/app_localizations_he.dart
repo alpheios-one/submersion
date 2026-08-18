@@ -7830,6 +7830,47 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveSites_edit_access_parkingInfo_label => 'מידע על חניה';
 
   @override
+  String get diveSites_edit_access_entryMethod_label => 'שיטת כניסה';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => 'שיטת יציאה';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count הצלילות שלך כאן: כניסה $entry, יציאה $exit',
+      one: 'הצלילה שלך כאן: כניסה $entry, יציאה $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count הצלילות שלך כאן: כניסה $entry',
+      one: 'הצלילה שלך כאן: כניסה $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => 'כניסה';
+
+  @override
+  String get diveSites_detail_access_exitMethod => 'יציאה';
+
+  @override
   String get diveSites_edit_altitude_helperText =>
       'גובה האתר מעל פני הים (לצלילת גובה)';
 
@@ -24467,6 +24508,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => 'כניסה';
+
+  @override
+  String get enum_siteField_exitMethod => 'שיטת יציאה';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'יציאה';
 
   @override
   String get enum_siteField_bestSeason_short => 'עונה';
