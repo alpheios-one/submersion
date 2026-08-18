@@ -6,6 +6,7 @@ import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/service_record.dart';
 import 'package:submersion/features/equipment/presentation/pages/equipment_detail_page.dart';
+import 'package:submersion/features/equipment/presentation/widgets/service_record_dialog.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
