@@ -12,6 +12,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/environment_enum_display.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -93,6 +94,8 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
   double _rating = 0;
   SiteDifficulty? _difficulty;
   WaterType? _waterType;
+  EntryMethod? _entryMethod;
+  EntryMethod? _exitMethod;
   bool _isLoading = false;
   bool _isInitialized = false;
   bool _hasChanges = false;
@@ -108,6 +111,8 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
   final Map<String, int> _mergeFieldIndices = {};
   List<_MergeFieldCandidate<SiteDifficulty?>> _difficultyCandidates = [];
   List<_MergeFieldCandidate<WaterType?>> _waterTypeCandidates = [];
+  List<_MergeFieldCandidate<EntryMethod?>> _entryMethodCandidates = [];
+  List<_MergeFieldCandidate<EntryMethod?>> _exitMethodCandidates = [];
   List<_MergeFieldCandidate<double>> _ratingCandidates = [];
   List<_MergeFieldCandidate<_CoordinateCandidate>> _coordinateCandidates = [];
 
@@ -272,6 +277,8 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     _rating = site.rating ?? 0;
     _difficulty = site.difficulty;
     _waterType = site.waterType;
+    _entryMethod = site.entryMethod;
+    _exitMethod = site.exitMethod;
     _isShared = site.isShared;
     _altitudeController.text = site.altitude != null
         ? _altitudeForInput(units.convertAltitude(site.altitude!))
@@ -426,6 +433,30 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     );
     _waterType =
         _waterTypeCandidates[_mergeFieldIndices['waterType'] ?? 0].value;
+
+    _entryMethodCandidates = _buildDistinctCandidates<EntryMethod?>(
+      data.sites,
+      (site) => site.entryMethod,
+      equals: (a, b) => a == b,
+    );
+    _mergeFieldIndices['entryMethod'] = _firstMeaningfulIndex(
+      _entryMethodCandidates,
+      (value) => value != null,
+    );
+    _entryMethod =
+        _entryMethodCandidates[_mergeFieldIndices['entryMethod'] ?? 0].value;
+
+    _exitMethodCandidates = _buildDistinctCandidates<EntryMethod?>(
+      data.sites,
+      (site) => site.exitMethod,
+      equals: (a, b) => a == b,
+    );
+    _mergeFieldIndices['exitMethod'] = _firstMeaningfulIndex(
+      _exitMethodCandidates,
+      (value) => value != null,
+    );
+    _exitMethod =
+        _exitMethodCandidates[_mergeFieldIndices['exitMethod'] ?? 0].value;
 
     _ratingCandidates = _buildDistinctCandidates<double>(
       data.sites,
@@ -730,6 +761,86 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     );
   }
 
+  /// The one-tap fill offered when this site has no entry or exit method yet
+  /// but the diver has already logged dives here.
+  ///
+  /// Gated on both fields being empty. Once a site carries a value, dives that
+  /// inherited it would otherwise become evidence "confirming" the value the
+  /// site itself produced.
+  Widget? _entrySuggestionChip() {
+    if (!widget.isEditing || widget.siteId == null) return null;
+    if (widget.isMerging) return null;
+    if (_entryMethod != null || _exitMethod != null) return null;
+
+    return Consumer(
+      builder: (context, ref, _) {
+        final l10n = context.l10n;
+        final async = ref.watch(
+          siteEntryExitSuggestionProvider(widget.siteId!),
+        );
+        return async.when(
+          loading: () => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
+          data: (suggestion) {
+            if (suggestion == null) return const SizedBox.shrink();
+            final entryLabel = suggestion.entry.localizedName(l10n);
+            final label = suggestion.exit == null
+                ? l10n.diveSites_edit_access_entrySuggestionEntryOnly(
+                    suggestion.count,
+                    entryLabel,
+                  )
+                : l10n.diveSites_edit_access_entrySuggestionPair(
+                    suggestion.count,
+                    entryLabel,
+                    suggestion.exit!.localizedName(l10n),
+                  );
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ActionChip(
+                  avatar: const Icon(Icons.history, size: 18),
+                  label: Text(label),
+                  onPressed: () => setState(() {
+                    _entryMethod = suggestion.entry;
+                    _exitMethod = suggestion.exit;
+                    _hasChanges = true;
+                  }),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  MergeFieldExtras? _entryMethodExtras() {
+    if (!widget.isMerging || _entryMethodCandidates.length < 2) return null;
+    final index = _mergeFieldIndices['entryMethod'] ?? 0;
+    return MergeFieldExtras(
+      sourceLabel: context.l10n.diveSites_edit_merge_fieldSourceLabel(
+        _entryMethodCandidates[index].siteName,
+        index + 1,
+        _entryMethodCandidates.length,
+      ),
+      onCycle: _cycleEntryMethod,
+    );
+  }
+
+  MergeFieldExtras? _exitMethodExtras() {
+    if (!widget.isMerging || _exitMethodCandidates.length < 2) return null;
+    final index = _mergeFieldIndices['exitMethod'] ?? 0;
+    return MergeFieldExtras(
+      sourceLabel: context.l10n.diveSites_edit_merge_fieldSourceLabel(
+        _exitMethodCandidates[index].siteName,
+        index + 1,
+        _exitMethodCandidates.length,
+      ),
+      onCycle: _cycleExitMethod,
+    );
+  }
+
   MergeFieldExtras? _ratingExtras() {
     if (!widget.isMerging || _ratingCandidates.length < 2) return null;
     final index = _mergeFieldIndices['rating'] ?? 0;
@@ -779,6 +890,11 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
   String _accessSummary() => [
     if (_accessNotesController.text.trim().isNotEmpty)
       context.l10n.diveSites_edit_access_accessNotes_label,
+    if (_entryMethod != null) _entryMethod!.localizedName(context.l10n),
+    // Only when it differs, so the common mirrored case does not read
+    // "Boat Entry · Boat Entry".
+    if (_exitMethod != null && _exitMethod != _entryMethod)
+      _exitMethod!.localizedName(context.l10n),
     if (_mooringNumberController.text.trim().isNotEmpty)
       context.l10n.diveSites_edit_access_mooringNumber_label,
     if (_parkingInfoController.text.trim().isNotEmpty)
@@ -898,6 +1014,19 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
             parkingInfoController: _parkingInfoController,
             hazardsController: _hazardsController,
             mergeExtras: widget.isMerging ? _mergeExtras : null,
+            entryMethod: _entryMethod,
+            exitMethod: _exitMethod,
+            onEntryMethodChanged: (value) => setState(() {
+              _entryMethod = value;
+              _hasChanges = true;
+            }),
+            onExitMethodChanged: (value) => setState(() {
+              _exitMethod = value;
+              _hasChanges = true;
+            }),
+            entryMethodExtras: _entryMethodExtras(),
+            exitMethodExtras: _exitMethodExtras(),
+            entrySuggestion: _entrySuggestionChip(),
           ),
           LifeNotesSection(
             expanded: _siteSectionExpanded('life'),
@@ -1067,6 +1196,10 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     final candidates = _mergeTextCandidates[key];
     if (candidates == null || index < 0 || index >= candidates.length) return;
 
+    // Text rows only. Enum-valued merge fields (difficulty, waterType,
+    // entryMethod, exitMethod) and rating are cycled by their own _cycleX
+    // methods against their own candidate lists, so their absence from this
+    // switch is deliberate rather than a missing case.
     final controller = switch (key) {
       'name' => _nameController,
       'description' => _descriptionController,
@@ -1123,6 +1256,30 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
           _waterTypeCandidates.length;
       _mergeFieldIndices['waterType'] = nextIndex;
       _waterType = _waterTypeCandidates[nextIndex].value;
+      _hasChanges = true;
+    });
+  }
+
+  void _cycleEntryMethod() {
+    if (_entryMethodCandidates.length < 2) return;
+    setState(() {
+      final nextIndex =
+          ((_mergeFieldIndices['entryMethod'] ?? 0) + 1) %
+          _entryMethodCandidates.length;
+      _mergeFieldIndices['entryMethod'] = nextIndex;
+      _entryMethod = _entryMethodCandidates[nextIndex].value;
+      _hasChanges = true;
+    });
+  }
+
+  void _cycleExitMethod() {
+    if (_exitMethodCandidates.length < 2) return;
+    setState(() {
+      final nextIndex =
+          ((_mergeFieldIndices['exitMethod'] ?? 0) + 1) %
+          _exitMethodCandidates.length;
+      _mergeFieldIndices['exitMethod'] = nextIndex;
+      _exitMethod = _exitMethodCandidates[nextIndex].value;
       _hasChanges = true;
     });
   }
@@ -1418,6 +1575,8 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
             : _parkingInfoController.text.trim(),
         altitude: altitudeMeters,
         waterType: _waterType,
+        entryMethod: _entryMethod,
+        exitMethod: _exitMethod,
         isShared: _isShared,
       );
 

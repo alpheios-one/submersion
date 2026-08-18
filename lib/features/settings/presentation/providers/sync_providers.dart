@@ -502,10 +502,11 @@ class SyncState {
   final int pendingChanges;
   final int conflicts;
 
-  /// How many peers were held during the last pull because they publish from
-  /// a newer database schema than this build. Drives the "update this
-  /// device" banner; cleared when a fresh sync starts.
-  final int newerSchemaPeerCount;
+  /// Peers held during the last pull because their declared compatibility
+  /// floor exceeds this build's schema, as (name, shortId) pairs. Drives the
+  /// newer-schema banner; cleared when a fresh sync starts. A null name means
+  /// the peer published none, and the UI renders a short id instead.
+  final List<({String? name, String shortId})> newerSchemaPeerLabels;
 
   /// Peers held back by the library-epoch fence during the last pull, as
   /// (name, shortId) pairs. Drives the "needs to adopt" banner; cleared when a
@@ -554,7 +555,7 @@ class SyncState {
     this.lastSync,
     this.pendingChanges = 0,
     this.conflicts = 0,
-    this.newerSchemaPeerCount = 0,
+    this.newerSchemaPeerLabels = const [],
     this.skippedPeerLabels = const [],
     this.isAuthenticated = false,
     this.firstSyncAwaitingConfirmation = false,
@@ -573,7 +574,7 @@ class SyncState {
     DateTime? lastSync,
     int? pendingChanges,
     int? conflicts,
-    int? newerSchemaPeerCount,
+    List<({String? name, String shortId})>? newerSchemaPeerLabels,
     List<({String? name, String shortId})>? skippedPeerLabels,
     bool? isAuthenticated,
     bool? firstSyncAwaitingConfirmation,
@@ -593,7 +594,8 @@ class SyncState {
       lastSync: lastSync ?? this.lastSync,
       pendingChanges: pendingChanges ?? this.pendingChanges,
       conflicts: conflicts ?? this.conflicts,
-      newerSchemaPeerCount: newerSchemaPeerCount ?? this.newerSchemaPeerCount,
+      newerSchemaPeerLabels:
+          newerSchemaPeerLabels ?? this.newerSchemaPeerLabels,
       skippedPeerLabels: skippedPeerLabels ?? this.skippedPeerLabels,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       firstSyncAwaitingConfirmation:
@@ -949,10 +951,19 @@ class SyncNotifier extends StateNotifier<SyncState> {
   @visibleForTesting
   static List<({String? name, String shortId})> skippedPeerLabels(
     SyncResult result,
+  ) => heldPeerLabels(result.skippedPeerDeviceIds, result.skippedPeerNames);
+
+  /// (name, shortId) per held peer, shared by the epoch-fence and
+  /// newer-schema banners. Sorted so the banner text is stable across syncs
+  /// instead of reordering each pull.
+  @visibleForTesting
+  static List<({String? name, String shortId})> heldPeerLabels(
+    Set<String> ids,
+    Map<String, String> names,
   ) {
     final entries =
-        result.skippedPeerDeviceIds.map((id) {
-          final name = result.skippedPeerNames[id];
+        ids.map((id) {
+          final name = names[id];
           final shortId = id.length > 8 ? id.substring(0, 8) : id;
           return (
             name: (name != null && name.isNotEmpty) ? name : null,
@@ -1213,7 +1224,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
         status: SyncStatus.syncing,
         message: _l10n.settings_cloudSync_message_startingSync,
         progress: 0.0,
-        newerSchemaPeerCount: 0,
+        newerSchemaPeerLabels: const [],
         skippedPeerLabels: const [],
         firstSyncAwaitingConfirmation: false,
         replaceAwaitingAdoption: false,
@@ -1285,7 +1296,10 @@ class SyncNotifier extends StateNotifier<SyncState> {
             message: result.message ?? defaultMessage,
             lastSync: result.lastSyncTime,
             conflicts: result.conflictsFound,
-            newerSchemaPeerCount: result.newerSchemaPeerDeviceIds.length,
+            newerSchemaPeerLabels: heldPeerLabels(
+              result.newerSchemaPeerDeviceIds,
+              result.newerSchemaPeerNames,
+            ),
             skippedPeerLabels: skippedPeerLabels(result),
             progress: 1.0,
           );

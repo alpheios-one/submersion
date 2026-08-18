@@ -31,6 +31,29 @@ void main() {
     expect(back.schemaVersion, 136);
   });
 
+  test('writerSchemaVersion round-trips through JSON and defaults null', () {
+    final manifest = SyncManifest.fromJson({
+      'deviceId': 'd1',
+      'provider': 'fake',
+      'headSeq': 0,
+      'updatedAt': 0,
+      'schemaVersion': 137,
+      'writerSchemaVersion': 153,
+    });
+    expect(manifest.schemaVersion, 137);
+    expect(manifest.writerSchemaVersion, 153);
+    expect(SyncManifest.fromJson(manifest.toJson()).writerSchemaVersion, 153);
+
+    // A manifest written before the field existed parses as null.
+    final legacy = SyncManifest.fromJson({
+      'deviceId': 'd1',
+      'provider': 'fake',
+      'headSeq': 0,
+      'updatedAt': 0,
+    });
+    expect(legacy.writerSchemaVersion, isNull);
+  });
+
   test('legacy manifest without schemaVersion parses as null', () {
     final back = SyncManifest.fromJson({
       'deviceId': 'dev-1',

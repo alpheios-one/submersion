@@ -74,9 +74,13 @@ class SyncResult {
   /// hostname identifies nothing; render a short id instead.
   final Map<String, String> skippedPeerNames;
 
-  /// Peers held because they publish from a newer database schema than this
-  /// build understands. Their data applies after this device updates.
+  /// Peers held because their declared compatibility floor exceeds this
+  /// build's schema. Their data applies after this device updates.
   final Set<String> newerSchemaPeerDeviceIds;
+
+  /// Display names for [newerSchemaPeerDeviceIds], same contract as
+  /// [skippedPeerNames].
+  final Map<String, String> newerSchemaPeerNames;
 
   /// Set with [SyncResultStatus.awaitingAdoption]: the cloud library was
   /// replaced under this marker's epoch and the user must adopt (or defer)
@@ -93,6 +97,7 @@ class SyncResult {
     this.skippedPeerDeviceIds = const {},
     this.skippedPeerNames = const {},
     this.newerSchemaPeerDeviceIds = const {},
+    this.newerSchemaPeerNames = const {},
     this.replaceMarker,
   });
 
@@ -462,9 +467,11 @@ class SyncService {
       );
       await _syncRepository.ensureSyncClockConfigured();
 
-      // Self-heal: stamp an HLC on pre-v130 enrichment rows so the depth/time
-      // association replicates and repairs peers that lost it (schema v130).
-      await _syncRepository.backfillMediaEnrichmentHlc();
+      // Self-heal: stamp an HLC on rows written while their table was not
+      // HLC-capable (pre-v130 enrichment rows, and the tables whose entity
+      // types were missing from hlcTargets until #1144), so they replicate
+      // instead of waiting for a full base republish.
+      await _syncRepository.backfillMissingHlc();
 
       // ---- Library epoch gate (restore Replace mode) ----
       // A pending replace runs INSTEAD of a merge, and a marker from an
@@ -743,6 +750,7 @@ class SyncService {
         skippedPeerDeviceIds: pullResult.skippedPeerDeviceIds,
         skippedPeerNames: pullResult.skippedPeerNames,
         newerSchemaPeerDeviceIds: pullResult.newerSchemaPeerDeviceIds,
+        newerSchemaPeerNames: pullResult.newerSchemaPeerNames,
       );
     } on TimeoutException {
       _log.warning('Sync timed out');

@@ -87,7 +87,8 @@ void main() {
 
       final decoStats = await repository.getDecoObligationStats();
       expect(decoStats.decoCount, equals(0));
-      expect(decoStats.totalCount, equals(0));
+      expect(decoStats.noDecoCount, equals(0));
+      expect(decoStats.unknownCount, equals(0));
 
       // Methods that return empty entity
       final speciesStats = await repository.getSpeciesStatistics(

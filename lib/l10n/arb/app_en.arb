@@ -322,7 +322,25 @@
   "diveLog_bulkEdit_modeAdd": "Add",
   "diveLog_bulkEdit_modeRemove": "Remove",
   "diveLog_bulkEdit_modeReplace": "Replace",
+  "diveLog_bulkEdit_modeUpdate": "Update",
   "diveLog_bulkEdit_tankOnlyIfEmpty": "Only dives that don't already have a tank",
+  "diveLog_bulkEdit_tankSpecsHint": "Choose which attributes to overwrite on the tanks these dives already have. Start and end pressures are never changed.",
+  "diveLog_bulkEdit_tankSpecsNoFields": "Choose at least one tank attribute to update.",
+  "diveLog_bulkEdit_tankFieldPreset": "Preset",
+  "diveLog_bulkEdit_tankFieldRole": "Role",
+  "diveLog_bulkEdit_tankFieldVolume": "Volume",
+  "diveLog_bulkEdit_tankFieldWorkingPressure": "Working pressure",
+  "diveLog_bulkEdit_tankFieldMaterial": "Material",
+  "diveLog_bulkEdit_tankFieldGasMix": "Gas mix",
+  "diveLog_bulkEdit_tankFieldName": "Name",
+  "diveLog_bulkEdit_tankSpecsSkipped": "{count, plural, =1{1 selected dive has no tanks and will be skipped.} other{{count} selected dives have no tanks and will be skipped.}}",
+  "@diveLog_bulkEdit_tankSpecsSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "diveLog_bulkEdit_confirmTitle": "Apply changes?",
   "diveLog_bulkEdit_confirmApply": "Apply",
   "diveLog_bulkEdit_nothingSelected": "Turn on at least one field to apply changes.",
@@ -3201,6 +3219,7 @@
   "diveLog_filter_showOnlyFavorites": "Show only favorite dives",
   "diveLog_filter_startDate": "Start Date",
   "diveLog_filter_title": "Filter Dives",
+  "diveLog_filter_resizeGrip": "Resize filter panel",
   "diveLog_filter_tooltip_close": "Close filter",
   "diveLog_fullscreenProfile_close": "Close fullscreen",
   "diveLog_fullscreenProfile_readoutHint": "Hover or scrub the profile",
@@ -4620,6 +4639,49 @@
   "diveSites_edit_access_mooringNumber_label": "Mooring Number",
   "diveSites_edit_access_parkingInfo_hint": "Parking availability, fees, tips",
   "diveSites_edit_access_parkingInfo_label": "Parking Information",
+  "diveSites_edit_access_entryMethod_label": "Entry Method",
+  "@diveSites_edit_access_entryMethod_label": {
+    "description": "Site form row: the typical way into the water at this site"
+  },
+  "diveSites_edit_access_exitMethod_label": "Exit Method",
+  "@diveSites_edit_access_exitMethod_label": {
+    "description": "Site form row: the typical way out of the water at this site"
+  },
+  "diveSites_edit_access_entrySuggestionPair": "{count, plural, =1{Your dive here: {entry} in, {exit} out} other{Your {count} dives here: {entry} in, {exit} out}}",
+  "@diveSites_edit_access_entrySuggestionPair": {
+    "description": "Chip offering to fill a site's entry and exit method from the dives already logged there",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "entry": {
+        "type": "String"
+      },
+      "exit": {
+        "type": "String"
+      }
+    }
+  },
+  "diveSites_edit_access_entrySuggestionEntryOnly": "{count, plural, =1{Your dive here: {entry}} other{Your {count} dives here: {entry}}}",
+  "@diveSites_edit_access_entrySuggestionEntryOnly": {
+    "description": "Chip offering to fill a site's entry method when the logged dives record no exit method",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "entry": {
+        "type": "String"
+      }
+    }
+  },
+  "diveSites_detail_access_entryMethod": "Entry",
+  "@diveSites_detail_access_entryMethod": {
+    "description": "Site detail access card: entry method row label"
+  },
+  "diveSites_detail_access_exitMethod": "Exit",
+  "@diveSites_detail_access_exitMethod": {
+    "description": "Site detail access card: exit method row label"
+  },
   "diveSites_edit_altitude_helperText": "Site elevation above sea level (for altitude diving)",
   "diveSites_edit_altitude_hint": "e.g., 2000",
   "diveSites_edit_altitude_label": "Altitude ({symbol})",
@@ -8593,7 +8655,10 @@
   "@settings_cloudSync_peerNeedsAdopt_listLastSeparator": {
     "description": "Joins the final two device names, e.g. \"Erics-iPhone and Erics-iPad\". Include the surrounding spaces the locale needs."
   },
-  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}",
+  "settings_cloudSync_peerRequiresUpdate_bannerNamed": "{deviceList} syncs from a newer version of Submersion, so its latest changes are held for now.",
+  "settings_cloudSync_peerRequiresUpdate_bannerNamedPlural": "{deviceList} sync from a newer version of Submersion, so their latest changes are held for now.",
+  "settings_cloudSync_peerRequiresUpdate_updateAction": "Update this device to receive them.",
+  "settings_cloudSync_peerRequiresUpdate_storeAction": "They will apply automatically once this device's app store update arrives; the update may still be in review.",
   "settings_cloudSync_provider_connected": "Connected",
   "settings_cloudSync_provider_connectedTo": "Connected to {providerName}",
   "settings_cloudSync_provider_connectionFailed": "{providerName} connection failed: {error}",
@@ -9057,6 +9122,13 @@
   "settings_units_dialog_depthUnit": "Depth Unit",
   "settings_units_dialog_pressureUnit": "Pressure Unit",
   "settings_units_dialog_sacRateUnit": "SAC Rate Unit",
+  "settings_units_gasModel": "Gas calculations",
+  "settings_units_gasModel_real": "Real gas",
+  "settings_units_gasModel_real_subtitle": "Accounts for compressibility. A 12 L cylinder at 200 bar holds about 2317 L.",
+  "settings_units_gasModel_ideal": "Ideal gas",
+  "settings_units_gasModel_ideal_subtitle": "Matches hand calculation and dive tables. A 12 L cylinder at 200 bar holds 2400 L.",
+  "settings_units_gasModel_explanation": "How cylinder pressure is converted to gas volume. This affects SAC rate, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for SAC.",
+  "settings_units_dialog_gasModel": "Gas calculations",
   "settings_units_dialog_temperatureUnit": "Temperature Unit",
   "settings_units_dialog_timeFormat": "Time Format",
   "settings_units_dialog_volumeUnit": "Volume Unit",
@@ -9755,6 +9827,8 @@
   "statistics_profile_deco_empty": "No deco data available",
   "statistics_profile_deco_error": "Failed to load deco data",
   "statistics_profile_deco_noDeco": "No Deco",
+  "statistics_profile_deco_notRecorded": "Not Recorded",
+  "statistics_profile_deco_notRecordedHint": "{count} dives have no recorded or computable deco data and are excluded from the rate",
   "statistics_profile_deco_semanticLabel": "Decompression rate: {percentage}% of dives required deco stops",
   "statistics_profile_deco_subtitle": "Dives that incurred deco stops",
   "statistics_profile_deco_title": "Decompression Obligation",
@@ -10004,6 +10078,13 @@
       },
       "topCount": {
         "type": "Object"
+      }
+    }
+  },
+  "@statistics_profile_deco_notRecordedHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   },
@@ -12952,7 +13033,7 @@
   "diveImport_healthkit_noDivesFound": "No Dives Found",
   "diveImport_healthkit_noDivesFoundDescription": "No underwater diving activities found in the selected date range.",
   "diveImport_healthkit_notAvailable": "Not Available",
-  "diveImport_healthkit_notAvailableDescription": "Apple Watch import is only available on iOS and macOS devices.",
+  "diveImport_healthkit_notAvailableDescription": "Apple Watch import needs an iPhone with the Health app.",
   "diveImport_healthkit_permissionCheckFailed": "Failed to check permissions",
   "diveImport_healthkit_title": "Import from Apple Watch",
   "diveImport_healthkit_watchTitle": "Import from Watch",
@@ -15985,6 +16066,14 @@
   "enum_siteField_typicalCurrent_short": "Current",
   "enum_siteField_difficulty_short": "Diff",
   "enum_siteField_entryType_short": "Entry",
+  "enum_siteField_exitMethod": "Exit Method",
+  "@enum_siteField_exitMethod": {
+    "description": "Site table column: exit method"
+  },
+  "enum_siteField_exitMethod_short": "Exit",
+  "@enum_siteField_exitMethod_short": {
+    "description": "Site table column (short): exit method"
+  },
   "enum_siteField_bestSeason_short": "Season",
   "enum_siteField_mooringNumber_short": "Mooring",
   "enum_siteField_hazards_short": "Hazards",
@@ -17806,8 +17895,27 @@
   "lock_startFresh_confirm": "Set aside and start fresh",
   "lock_biometric_reason": "Unlock your dive log",
   "startup_migrating_progress": "Upgrading database... step {currentStep} of {totalSteps}",
-  "startup_error_title": "Database upgrade failed",
-  "startup_error_body": "Try restarting the app. If this persists, contact support. Your data is still on disk and does not require a reinstall.",
+  "startup_error_title": "Submersion could not start",
+  "startup_error_body": "Something went wrong before your dive log finished opening. Your data is still on disk and does not require a reinstall. Try restarting the app; if this persists, contact support.",
+  "startup_engineUnavailable_title": "This build can't open a database",
+  "startup_engineUnavailable_body": "Submersion's database engine is missing from this build, so your dive log was never opened. Nothing on disk has changed and no data is at risk.",
+  "startup_engineUnavailable_guidance": "Reinstalling or restoring a backup will not help. Install a working build of Submersion, and please report this: it is a fault in the app package, not in your data.",
+  "startup_migrationFailed_title": "Database upgrade failed",
+  "startup_migrationFailed_body": "Your dive log could not be upgraded to the format this version needs. A safety copy was taken before the upgrade started, so nothing is lost.",
+  "startup_dataUnreadable_title": "Your dive log could not be read",
+  "startup_dataUnreadable_body": "The database file is there, but Submersion cannot read it. This usually means the file is damaged. Restoring a backup is the fastest way back.",
+  "startup_failure_technicalDetails": "Technical details",
+  "startup_failure_backupAvailable_title": "A backup is available",
+  "startup_failure_backupAvailable_taken": "Taken {timestamp}",
+  "startup_failure_backupAvailable_preMigration": "Safety copy taken before the upgrade from schema v{fromVersion} to v{toVersion}.",
+  "startup_failure_restoreAction": "Restore this backup",
+  "startup_failure_restoring": "Restoring your dive log...",
+  "startup_failure_restoreFailed": "The backup could not be restored. Your dive log has been left exactly as it was.",
+  "startup_failure_backupsFolder": "Your backups are in:",
+  "startup_failure_showBackupsFolder": "Show backup folder",
+  "startup_failure_downgrade_title": "Going back to the previous version",
+  "startup_failure_downgrade_body": "If the upgrade keeps failing, install the version of Submersion you were running before, then restore the safety copy from inside that version. Restoring it here would only run the same upgrade again. Submersion does not downgrade itself: moving you onto older builds automatically would quietly keep you on versions with known problems.",
+  "startup_failure_downgrade_action": "View previous releases",
   "startup_recovering_title": "Recovering database...",
   "startup_recovering_body": "Rolling back the interrupted transaction. This usually takes a few seconds.",
   "startup_recoveryFailed_title": "Recovery did not complete",
@@ -17832,6 +17940,7 @@
   "startup_versionMismatch_title": "Update Required",
   "startup_versionMismatch_body": "Your dive data was saved by a newer version of Submersion (schema v{databaseVersion}). This version only supports up to schema v{appVersion}.",
   "startup_versionMismatch_instructions": "Please update Submersion to the latest version. Your data is safe and has not been modified. If a backup was taken before the upgrade, it is in your Backups folder and can be restored after updating.",
+  "startup_versionMismatch_storeInstructions": "This app was installed from an app store and is older than the version that created your data. Your data is safe and has not been modified. Update Submersion when the new version appears in the store, then reopen it.",
   "startup_versionMismatch_download": "Download Latest Version",
   "startup_versionMismatch_manualLink": "If that does not open a browser, visit:",
   "universalImport_compare_downloaded": "Downloaded",
@@ -17906,6 +18015,27 @@
   "@startup_migrating_progress": {"description": "Splash progress line during a schema migration", "placeholders": {"currentStep": {"type": "Object", "example": "3"}, "totalSteps": {"type": "Object", "example": "12"}}},
   "@startup_recovery_sqliteCode": {"description": "Diagnostic line under the recovery screen. Object, not int, so the raw SQLite extended result code is never group-separated.", "placeholders": {"code": {"type": "Object", "example": "1032"}}},
   "@startup_versionMismatch_body": {"description": "Explains a database written by a newer app build. Object, not int, so schema numbers are never group-separated.", "placeholders": {"databaseVersion": {"type": "Object", "example": "142"}, "appVersion": {"type": "Object", "example": "138"}}},
+  "@startup_error_title": {"description": "Terminal startup screen title when the failure could not be classified. Deliberately neutral: it must NOT claim the database upgrade failed, since most failures reach this screen without a migration having been attempted."},
+  "@startup_error_body": {"description": "Body for an unclassified terminal startup failure."},
+  "@startup_engineUnavailable_title": {"description": "Terminal startup screen title when the app's native database engine is missing or is not a SQLCipher build. The diver's database was never opened."},
+  "@startup_engineUnavailable_body": {"description": "Explains that an engine failure happens before the database is opened, so no dive data is at risk."},
+  "@startup_engineUnavailable_guidance": {"description": "Tells the diver that reinstalling or restoring cannot fix a broken app package, and asks them to report it."},
+  "@startup_migrationFailed_title": {"description": "Terminal startup screen title when the schema upgrade ladder genuinely failed. This is the ONLY class that may say the upgrade failed."},
+  "@startup_migrationFailed_body": {"description": "Explains a failed schema upgrade and points at the pre-migration safety copy."},
+  "@startup_dataUnreadable_title": {"description": "Terminal startup screen title when the database file was reached but is corrupt or unreadable."},
+  "@startup_dataUnreadable_body": {"description": "Explains a damaged database file and points at restoring a backup."},
+  "@startup_failure_technicalDetails": {"description": "Label above the raw error text on the terminal startup failure screen."},
+  "@startup_failure_backupAvailable_title": {"description": "Heading of the recovery card offering a backup found on disk during a failed startup."},
+  "@startup_failure_backupAvailable_taken": {"description": "When the offered backup was taken.", "placeholders": {"timestamp": {"type": "Object", "example": "17 Aug 2026 12:00"}}},
+  "@startup_failure_backupAvailable_preMigration": {"description": "Extra line shown when the offered backup is the automatic pre-migration safety copy. Object, not int, so schema numbers are never group-separated.", "placeholders": {"fromVersion": {"type": "Object", "example": "141"}, "toVersion": {"type": "Object", "example": "142"}}},
+  "@startup_failure_restoreAction": {"description": "Button that swaps the offered backup in for the live database and restarts startup."},
+  "@startup_failure_restoring": {"description": "Progress label while the offered backup is being restored."},
+  "@startup_failure_restoreFailed": {"description": "Shown when the restore failed. Reassures the diver that the live database was rolled back untouched."},
+  "@startup_failure_backupsFolder": {"description": "Label before the filesystem path where backups are kept."},
+  "@startup_failure_showBackupsFolder": {"description": "Desktop-only button that opens the backups folder in the system file manager."},
+  "@startup_failure_downgrade_title": {"description": "Heading of the guided-downgrade section on a failed schema upgrade."},
+  "@startup_failure_downgrade_body": {"description": "Explains how to go back to the previous app version, and why Submersion never downgrades itself."},
+  "@startup_failure_downgrade_action": {"description": "Button opening the app's releases page so the diver can pick the previous version."},
   "@universalImport_compare_sameFields": {"description": "Summary line listing the fields that match between the existing and incoming dive.", "placeholders": {"fields": {"type": "Object", "example": "date/time, max depth, duration"}}},
   "@universalImport_compare_serial": {"description": "Dive computer serial number in a compact label", "placeholders": {"serial": {"type": "Object", "example": "A1B2C3"}}},
   "@diveLog_tooltip_ndlOverMax": {"description": "Profile readout NDL value when the no-decompression limit is longer than the chart tracks (over one hour). NDL is a diving acronym and is not translated."},
@@ -18210,5 +18340,17 @@
   "media_status_queued": "Waiting to upload",
   "media_status_cloudOnly": "Stored in the cloud only",
   "media_status_notBackedUp": "Not backed up",
-  "media_tile_infoMenuItem": "Media info"
+  "media_tile_infoMenuItem": "Media info",
+  "diveImport_healthkit_accessGrantedHint": "Apple Health never tells apps whether read access was granted. If no dives turn up, open Health, then Sharing, Apps, Submersion, and turn on Workouts, Underwater Depth, Water Temperature, and Heart Rate.",
+  "diveImport_healthkit_foundNoDivesHint": "No underwater diving workouts in this range. Check that the dates cover the dive, and that Health, Sharing, Apps, Submersion has Workouts and Underwater Depth turned on.",
+  "settings_dataSources_appleHealth_dataTypeDepth": "Underwater Depth - depth samples recorded during dives",
+  "settings_dataSources_appleHealth_dataTypeWaterTemp": "Water Temperature - water temperature samples recorded during dives",
+  "settings_dataSources_appleHealth_permissionManagedInHealth": "HealthKit access is managed in the Health app",
+  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit is not available on this device",
+  "@diveImport_healthkit_accessGrantedHint": {"description": "Hint under the HealthKit access headline explaining that iOS will not confirm read access."},
+  "@diveImport_healthkit_foundNoDivesHint": {"description": "Hint shown when a HealthKit fetch returned zero dives."},
+  "@settings_dataSources_appleHealth_dataTypeDepth": {"description": "HealthKit data type disclosure: underwater depth."},
+  "@settings_dataSources_appleHealth_dataTypeWaterTemp": {"description": "HealthKit data type disclosure: water temperature."},
+  "@settings_dataSources_appleHealth_permissionManagedInHealth": {"description": "Permission row shown when the platform will not disclose read access."},
+  "@settings_dataSources_appleHealth_permissionUnsupported": {"description": "Permission row shown when HealthKit is unavailable on this device."}
 }

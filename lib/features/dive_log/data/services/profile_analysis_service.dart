@@ -23,6 +23,15 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
 import 'package:submersion/features/dive_log/domain/entities/profile_event.dart';
 import 'package:submersion/features/dive_log/domain/services/deco_stop_curve.dart';
 
+/// Version of the deco computation behind [ProfileAnalysis].
+///
+/// Bump this whenever a change could flip [ProfileAnalysis.hadDecoObligation]
+/// for an unchanged profile: a different algorithm, altered coefficients, or a
+/// changed ceiling convention. Consumers that memoize an analysis-derived
+/// answer fold it into their cache key, so a bump invalidates their stored
+/// results. Currently used by the statistics deco-classification cache (#623).
+const int analysisEngineVersion = 1;
+
 /// Represents SAC calculated over a segment of the dive.
 class SacSegment extends Equatable {
   /// Start timestamp of this segment (seconds from dive start)

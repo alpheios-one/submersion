@@ -109,6 +109,25 @@ void main() {
         );
       });
 
+      test('$path enables the USB device entitlement (issue #732)', () {
+        // Some dive-computer cables are FTDI chips carrying a custom USB
+        // product ID that macOS does not claim, so no /dev/cu.* node is ever
+        // created and the serial entitlement above cannot help. Those cables
+        // are driven over raw USB instead, which the sandbox gates on this
+        // key: application.sb grants IOUSBDeviceUserClientV2 and
+        // IOUSBInterfaceUserClientV3 only when it is present.
+        expect(
+          typesOf(path)['com.apple.security.device.usb'],
+          'true',
+          reason:
+              'Sandboxed macOS builds cannot open a USB device directly '
+              'without com.apple.security.device.usb. Removing it, or setting '
+              'it to false, silently breaks downloads from dive computers '
+              'whose cable macOS does not expose as a serial port (issue '
+              '#732).',
+        );
+      });
+
       test('$path keeps the sandbox enabled', () {
         // Anchor for the assertion above: if a build ever turns the sandbox
         // off, the serial entitlement stops meaning what it claims to mean.

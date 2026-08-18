@@ -8,6 +8,7 @@ import 'package:submersion/features/equipment/data/services/dive_equipment_defau
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
 import 'package:submersion/core/services/location_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/core/utils/number_utils.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
@@ -912,6 +913,37 @@ class UddfEntityImporter {
 
   // -- Site import --
 
+  /// How close a deselected site must be to an existing row to bind to it
+  /// when their names differ. Matches the radius `ImportDuplicateChecker`
+  /// uses to flag the site as a duplicate in the first place.
+  static const double _siteProximityMeters = 100;
+
+  /// Nearest existing site within [_siteProximityMeters] of [item]'s
+  /// coordinates, or null when the item has no coordinates or nothing sits
+  /// close enough.
+  DiveSite? _nearestExistingSite(
+    List<DiveSite> existingSites,
+    Map<String, dynamic> item,
+  ) {
+    final lat = (item['latitude'] as num?)?.toDouble();
+    final lon = (item['longitude'] as num?)?.toDouble();
+    if (lat == null || lon == null) return null;
+    final point = GeoPoint(lat, lon);
+
+    DiveSite? nearest;
+    var nearestMeters = double.infinity;
+    for (final site in existingSites) {
+      final location = site.location;
+      if (location == null) continue;
+      final meters = distanceMeters(location, point);
+      if (meters <= _siteProximityMeters && meters < nearestMeters) {
+        nearest = site;
+        nearestMeters = meters;
+      }
+    }
+    return nearest;
+  }
+
   Future<int> _importSites(
     List<Map<String, dynamic>> items,
     Set<int> selected,
@@ -922,8 +954,14 @@ class UddfEntityImporter {
     ImportProgressCallback? onProgress,
   ) async {
     // For deselected sites (duplicates the user chose not to re-import),
-    // resolve their UDDF IDs to existing database sites by name so that
-    // dives referencing them still get linked correctly.
+    // resolve their UDDF IDs to existing database sites so that dives
+    // referencing them still get linked correctly.
+    //
+    // The name lookup alone is not enough: ImportDuplicateChecker flags a site
+    // as a duplicate on name OR on proximity, so a site suppressed by the
+    // proximity arm carries a name that matches nothing here. Without the
+    // coordinate fallback its dives import with no site and no location at
+    // all, silently.
     final existingSites = await repository.getAllSites(diverId: diverId);
     final existingByName = <String, DiveSite>{};
     final existingById = <String, DiveSite>{};
@@ -935,12 +973,13 @@ class UddfEntityImporter {
       if (selected.contains(i)) continue; // will be imported below
       if (overrides.containsKey(i)) continue; // will be overwritten below
       final uddfId = items[i]['uddfId'] as String?;
+      if (uddfId == null) continue;
       final name = items[i]['name'] as String?;
-      if (uddfId != null && name != null) {
-        final existing = existingByName[name.toLowerCase()];
-        if (existing != null) {
-          idMapping[uddfId] = existing;
-        }
+      final existing =
+          (name == null ? null : existingByName[name.toLowerCase()]) ??
+          _nearestExistingSite(existingSites, items[i]);
+      if (existing != null) {
+        idMapping[uddfId] = existing;
       }
     }
 

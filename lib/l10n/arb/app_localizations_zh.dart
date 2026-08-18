@@ -371,7 +371,49 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_bulkEdit_modeReplace => '替换';
 
   @override
+  String get diveLog_bulkEdit_modeUpdate => '更新';
+
+  @override
   String get diveLog_bulkEdit_tankOnlyIfEmpty => '仅没有气瓶的潜水';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsHint =>
+      '选择要覆盖这些潜水已有气瓶的哪些属性。起始和结束压力不会被更改。';
+
+  @override
+  String get diveLog_bulkEdit_tankSpecsNoFields => '请至少选择一个要更新的气瓶属性。';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldPreset => '预设';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldRole => '用途';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldVolume => '容积';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldWorkingPressure => '工作压力';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldMaterial => '材质';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldGasMix => '混合气';
+
+  @override
+  String get diveLog_bulkEdit_tankFieldName => '名称';
+
+  @override
+  String diveLog_bulkEdit_tankSpecsSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次所选潜水没有气瓶，将被跳过。',
+      one: '1 次所选潜水没有气瓶，将被跳过。',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_bulkEdit_confirmTitle => '应用更改？';
@@ -5490,6 +5532,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_filter_title => '筛选潜水';
 
   @override
+  String get diveLog_filter_resizeGrip => '调整筛选面板大小';
+
+  @override
   String get diveLog_filter_tooltip_close => '关闭筛选';
 
   @override
@@ -7601,6 +7646,47 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveSites_edit_access_parkingInfo_label => '停车信息';
+
+  @override
+  String get diveSites_edit_access_entryMethod_label => '入水方式';
+
+  @override
+  String get diveSites_edit_access_exitMethod_label => '出水方式';
+
+  @override
+  String diveSites_edit_access_entrySuggestionPair(
+    int count,
+    String entry,
+    String exit,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '你在此的 $count 次潜水：入水 $entry，出水 $exit',
+      one: '你在此的潜水：入水 $entry，出水 $exit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_edit_access_entrySuggestionEntryOnly(
+    int count,
+    String entry,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '你在此的 $count 次潜水：入水 $entry',
+      one: '你在此的潜水：入水 $entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveSites_detail_access_entryMethod => '入水';
+
+  @override
+  String get diveSites_detail_access_exitMethod => '出水';
 
   @override
   String get diveSites_edit_altitude_helperText => '潜水点海拔高度（用于高海拔潜水）';
@@ -13760,15 +13846,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => '和';
 
   @override
-  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收它们的最新更改。',
-      one: '1 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收其最新更改。',
-    );
-    return '$_temp0';
+  String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
+    return '$deviceList 正在从更新版本的 Submersion 同步，因此其最新更改暂时被保留。';
   }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_bannerNamedPlural(
+    Object deviceList,
+  ) {
+    return '$deviceList 正在从更新版本的 Submersion 同步，因此它们的最新更改暂时被保留。';
+  }
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_updateAction =>
+      '更新此设备即可接收这些更改。';
+
+  @override
+  String get settings_cloudSync_peerRequiresUpdate_storeAction =>
+      '此设备的应用商店更新到达后，这些更改将自动应用；该更新可能仍在审核中。';
 
   @override
   String get settings_cloudSync_provider_connected => '已连接';
@@ -15130,6 +15225,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_units_dialog_sacRateUnit => '耗气率单位';
 
   @override
+  String get settings_units_gasModel => '气体计算';
+
+  @override
+  String get settings_units_gasModel_real => '真实气体';
+
+  @override
+  String get settings_units_gasModel_real_subtitle =>
+      '考虑压缩性。12 升气瓶在 200 巴下约装 2317 升。';
+
+  @override
+  String get settings_units_gasModel_ideal => '理想气体';
+
+  @override
+  String get settings_units_gasModel_ideal_subtitle =>
+      '与手工计算和潜水表一致。12 升气瓶在 200 巴下装 2400 升。';
+
+  @override
+  String get settings_units_gasModel_explanation =>
+      '如何将气瓶压力换算为气体体积。这会影响 SAC 耗气率、气体统计、计划器和气体计算器。理想气体与各潜水机构教授的算法一致；真实气体在物理上更准确，SAC 约低 5%。';
+
+  @override
+  String get settings_units_dialog_gasModel => '气体计算';
+
+  @override
   String get settings_units_dialog_temperatureUnit => '温度单位';
 
   @override
@@ -15837,6 +15956,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get statistics_profile_deco_noDeco => '无减压';
+
+  @override
+  String get statistics_profile_deco_notRecorded => '未记录';
+
+  @override
+  String statistics_profile_deco_notRecordedHint(int count) {
+    return '$count 次潜水没有已记录或可计算的减压数据，未计入比例';
+  }
 
   @override
   String statistics_profile_deco_semanticLabel(Object percentage) {
@@ -19251,7 +19378,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_notAvailableDescription =>
-      'Apple Watch 导入仅在 iOS 和 macOS 设备上可用。';
+      '从 Apple Watch 导入需要装有“健康”App 的 iPhone。';
 
   @override
   String get diveImport_healthkit_permissionCheckFailed => '权限检查失败';
@@ -23795,6 +23922,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_siteField_entryType_short => '入水';
+
+  @override
+  String get enum_siteField_exitMethod => '出水方式';
+
+  @override
+  String get enum_siteField_exitMethod_short => '出水';
 
   @override
   String get enum_siteField_bestSeason_short => '季节';
@@ -29399,10 +29532,80 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get startup_error_title => '数据库升级失败';
+  String get startup_error_title => 'Submersion 无法启动';
 
   @override
-  String get startup_error_body => '请尝试重启应用。如果问题持续存在，请联系支持人员：您的数据仍在磁盘上，无需重新安装。';
+  String get startup_error_body =>
+      '在潜水日志完全打开之前出现了问题。您的数据仍在磁盘上，无需重新安装。请尝试重启应用；如果问题持续存在，请联系支持人员。';
+
+  @override
+  String get startup_engineUnavailable_title => '此版本无法打开数据库';
+
+  @override
+  String get startup_engineUnavailable_body =>
+      '此版本缺少 Submersion 的数据库引擎，因此您的潜水日志从未被打开。磁盘上没有任何变化，也没有数据面临风险。';
+
+  @override
+  String get startup_engineUnavailable_guidance =>
+      '重新安装或恢复备份都无济于事。请安装可正常工作的 Submersion 版本，并请报告此问题：这是应用安装包的缺陷，而非您的数据问题。';
+
+  @override
+  String get startup_migrationFailed_title => '数据库升级失败';
+
+  @override
+  String get startup_migrationFailed_body =>
+      '无法将您的潜水日志升级到此版本所需的格式。升级开始前已创建安全副本，因此没有丢失任何内容。';
+
+  @override
+  String get startup_dataUnreadable_title => '无法读取您的潜水日志';
+
+  @override
+  String get startup_dataUnreadable_body =>
+      '数据库文件存在，但 Submersion 无法读取它。这通常意味着文件已损坏。恢复备份是最快的解决办法。';
+
+  @override
+  String get startup_failure_technicalDetails => '技术详情';
+
+  @override
+  String get startup_failure_backupAvailable_title => '有可用的备份';
+
+  @override
+  String startup_failure_backupAvailable_taken(Object timestamp) {
+    return '创建于 $timestamp';
+  }
+
+  @override
+  String startup_failure_backupAvailable_preMigration(
+    Object fromVersion,
+    Object toVersion,
+  ) {
+    return '在从架构 v$fromVersion 升级到 v$toVersion 之前创建的安全副本。';
+  }
+
+  @override
+  String get startup_failure_restoreAction => '恢复此备份';
+
+  @override
+  String get startup_failure_restoring => '正在恢复您的潜水日志...';
+
+  @override
+  String get startup_failure_restoreFailed => '无法恢复该备份。您的潜水日志已保持原样。';
+
+  @override
+  String get startup_failure_backupsFolder => '您的备份位于：';
+
+  @override
+  String get startup_failure_showBackupsFolder => '显示备份文件夹';
+
+  @override
+  String get startup_failure_downgrade_title => '回到上一个版本';
+
+  @override
+  String get startup_failure_downgrade_body =>
+      '如果升级持续失败，请安装您之前使用的 Submersion 版本，然后在该版本中恢复安全副本。在这里恢复只会再次运行同一次升级。Submersion 不会自动降级：自动把您切换到旧版本会在您不知情的情况下让您停留在存在已知问题的版本上。';
+
+  @override
+  String get startup_failure_downgrade_action => '查看以往版本';
 
   @override
   String get startup_recovering_title => '正在恢复数据库...';
@@ -29486,6 +29689,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get startup_versionMismatch_instructions =>
       '请将 Submersion 更新到最新版本。您的数据是安全的，未被修改。如果升级前已创建备份，它位于您的 Backups 文件夹中，更新后可以恢复。';
+
+  @override
+  String get startup_versionMismatch_storeInstructions =>
+      '此应用安装自应用商店，版本低于创建您数据的版本。您的数据是安全的，未被修改。当新版本在商店上架后，请更新 Submersion 并重新打开。';
 
   @override
   String get startup_versionMismatch_download => '下载最新版本';
@@ -30394,4 +30601,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_tile_infoMenuItem => '媒体信息';
+
+  @override
+  String get diveImport_healthkit_accessGrantedHint =>
+      'Apple 健康从不告知 App 是否已获得读取权限。如果没有出现潜水记录，请打开“健康”，依次进入“共享”“App”“Submersion”，并开启“体能训练”“水下深度”“水温”和“心率”。';
+
+  @override
+  String get diveImport_healthkit_foundNoDivesHint =>
+      '此时间范围内没有潜水体能训练。请确认日期涵盖该次潜水，并在“健康”“共享”“App”“Submersion”中开启“体能训练”和“水下深度”。';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeDepth =>
+      '水下深度 - 潜水过程中记录的深度采样';
+
+  @override
+  String get settings_dataSources_appleHealth_dataTypeWaterTemp =>
+      '水温 - 潜水过程中记录的水温采样';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionManagedInHealth =>
+      'HealthKit 访问权限在“健康”App 中管理';
+
+  @override
+  String get settings_dataSources_appleHealth_permissionUnsupported =>
+      '此设备不支持 HealthKit';
 }

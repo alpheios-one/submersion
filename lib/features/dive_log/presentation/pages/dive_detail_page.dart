@@ -4014,10 +4014,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     // Determine which SAC value to show based on setting
     if (sacUnit == SacUnit.litersPerMin) {
-      // Volume-based SAC (L/min) - requires tank volume
-      if (dive.sac == null) return const SizedBox.shrink();
+      // Volume-based SAC (L/min) - requires tank volume and a gas model
+      final sac = dive.sacFor(ref.watch(gasModelProvider));
+      if (sac == null) return const SizedBox.shrink();
       final value =
-          '${units.convertVolume(dive.sac!).toStringAsFixed(1)} ${units.volumeSymbol}/min';
+          '${units.convertVolume(sac).toStringAsFixed(1)} ${units.volumeSymbol}/min';
       return _buildDetailRow(
         context,
         context.l10n.diveLog_detail_label_sacRate,

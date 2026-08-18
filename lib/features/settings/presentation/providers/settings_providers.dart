@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
+import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/presentation/startup_brightness.dart';
@@ -119,6 +120,11 @@ class AppSettings {
   final WeightUnit weightUnit;
   final AltitudeUnit altitudeUnit;
   final SacUnit sacUnit;
+
+  /// Equation of state used everywhere the app converts cylinder pressure to
+  /// gas volume: logged SAC, gas statistics, the planner, and the gas
+  /// calculators (issue #828).
+  final GasModel gasModel;
 
   /// ISO 4217 code used as the default currency for new priced items
   /// (e.g. equipment purchase price).
@@ -457,6 +463,7 @@ class AppSettings {
     this.weightUnit = WeightUnit.kilograms,
     this.altitudeUnit = AltitudeUnit.meters,
     this.sacUnit = SacUnit.pressurePerMin,
+    this.gasModel = GasModel.real,
     this.defaultCurrency = 'USD',
     this.visibilityScalePreset = VisibilityScalePreset.tropical,
     this.visibilityScaleExcellentM,
@@ -615,6 +622,7 @@ class AppSettings {
     WeightUnit? weightUnit,
     AltitudeUnit? altitudeUnit,
     SacUnit? sacUnit,
+    GasModel? gasModel,
     String? defaultCurrency,
     VisibilityScalePreset? visibilityScalePreset,
     double? visibilityScaleExcellentM,
@@ -739,6 +747,7 @@ class AppSettings {
       weightUnit: weightUnit ?? this.weightUnit,
       altitudeUnit: altitudeUnit ?? this.altitudeUnit,
       sacUnit: sacUnit ?? this.sacUnit,
+      gasModel: gasModel ?? this.gasModel,
       defaultCurrency: defaultCurrency ?? this.defaultCurrency,
       visibilityScalePreset:
           visibilityScalePreset ?? this.visibilityScalePreset,
@@ -1131,13 +1140,20 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   void _scheduleNotificationsIfNeeded() {
     // Use Future.microtask to avoid calling during build
     Future.microtask(() async {
-      if (!state.notificationsEnabled) return;
+      // The notifier can be disposed before this microtask runs -- a
+      // short-lived ProviderContainer in a test, or a diver switch tearing
+      // settings down mid-load. Reading `state` after dispose throws, so
+      // check first and snapshot the value rather than reading it again
+      // across the await below.
+      if (!mounted) return;
+      final loaded = state;
+      if (!loaded.notificationsEnabled) return;
 
       final diverId = _validatedDiverId;
       final scheduler = NotificationScheduler();
 
       try {
-        await scheduler.scheduleAll(settings: state, diverId: diverId);
+        await scheduler.scheduleAll(settings: loaded, diverId: diverId);
       } catch (e) {
         // Log but don't rethrow - notification scheduling shouldn't block settings
         LoggerService.forClass(SettingsNotifier).error(
@@ -1240,6 +1256,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setSacUnit(SacUnit unit) async {
     state = state.copyWith(sacUnit: unit);
+    await _saveSettings();
+  }
+
+  Future<void> setGasModel(GasModel model) async {
+    state = state.copyWith(gasModel: model);
     await _saveSettings();
   }
 
@@ -1920,6 +1941,15 @@ final temperatureUnitProvider = Provider<TemperatureUnit>((ref) {
 
 final pressureUnitProvider = Provider<PressureUnit>((ref) {
   return ref.watch(settingsProvider.select((s) => s.pressureUnit));
+});
+
+/// The equation of state every gas calculation in the app runs on.
+///
+/// Services that convert pressure to volume take this in their constructor, so
+/// changing the preference rebuilds them and refreshes every dependent readout
+/// without any manual cache invalidation (issue #828).
+final gasModelProvider = Provider<GasModel>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.gasModel));
 });
 
 final sacUnitProvider = Provider<SacUnit>((ref) {

@@ -69,3 +69,33 @@ swiftc -o "$BUILD_DIR/serial_port_opener_tests" \
     Tests/SerialPortOpenerTests/main.swift
 
 "$BUILD_DIR/serial_port_opener_tests"
+
+# FTDI wire-protocol encoding (issue #732). The Aeris/Oceanic cable is an FTDI
+# chip with a custom product ID that macOS does not claim, so there is no
+# /dev/cu.* node and the chip is driven directly over USB. Divisor vectors come
+# from FTDI application note AN232B-05, not from our implementation.
+swiftc -o "$BUILD_DIR/ftdi_protocol_tests" \
+    Sources/LibDCDarwin/FtdiProtocol.swift \
+    Tests/FtdiProtocolTests/main.swift
+
+"$BUILD_DIR/ftdi_protocol_tests"
+
+# FTDI bulk-IN read accumulation (issue #732). libdivecomputer's contract is
+# "exactly N bytes or timeout"; FTDI packets add a two-byte status header on
+# top of the USB chunking that broke issue #334. A scripted packet source
+# stands in for the USB pipe.
+swiftc -o "$BUILD_DIR/ftdi_read_accumulator_tests" \
+    Sources/LibDCDarwin/FtdiProtocol.swift \
+    Sources/LibDCDarwin/FtdiReadAccumulator.swift \
+    Tests/FtdiReadAccumulatorTests/main.swift
+
+"$BUILD_DIR/ftdi_read_accumulator_tests"
+
+# Dive-cable USB allowlist (issue #732). -framework IOKit satisfies the IOKit
+# references in enumerateDiveCables(); the test itself calls only the pure
+# classification functions.
+swiftc -framework IOKit -o "$BUILD_DIR/usb_ftdi_device_enumerator_tests" \
+    Sources/LibDCDarwin/UsbFtdiDeviceEnumerator.swift \
+    Tests/UsbFtdiDeviceEnumeratorTests/main.swift
+
+"$BUILD_DIR/usb_ftdi_device_enumerator_tests"

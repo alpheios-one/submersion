@@ -24,15 +24,27 @@ class SyncManifest {
     this.appliedPeerHlc = const {},
     this.formatVersion = 1,
     this.schemaVersion,
+    this.writerSchemaVersion,
     this.deviceName,
   });
 
   final int formatVersion;
 
-  /// The database schema version of the publishing device, used by readers to
-  /// hold data from newer-schema peers rather than lossily merging it.
-  /// Null on manifests written before this field existed.
+  /// The oldest database schema that can apply this device's payloads
+  /// without loss (the compatibility floor,
+  /// AppDatabase.minimumCompatibleSchemaVersion). Readers hold a peer when
+  /// this exceeds their own schema. Manifests written before 2026-08 carried
+  /// the writer's actual schema version here instead, which is strictly
+  /// higher, so old manifests are held MORE eagerly, never less safely. The
+  /// writer's true version now travels in [writerSchemaVersion]. Null on
+  /// manifests written before the field existed.
   final int? schemaVersion;
+
+  /// The publishing device's actual database schema version, for
+  /// diagnostics and support tooling. Never used for gating; the gate
+  /// compares [schemaVersion]. Null on manifests written before the field
+  /// existed.
+  final int? writerSchemaVersion;
 
   /// Display name of the publishing device, used to name peers in the "still
   /// needs to adopt" banner. Null on manifests written before this field
@@ -61,6 +73,7 @@ class SyncManifest {
   Map<String, dynamic> toJson() => {
     'formatVersion': formatVersion,
     'schemaVersion': schemaVersion,
+    'writerSchemaVersion': writerSchemaVersion,
     'deviceName': deviceName,
     'deviceId': deviceId,
     'provider': provider,
@@ -80,6 +93,7 @@ class SyncManifest {
   factory SyncManifest.fromJson(Map<String, dynamic> json) => SyncManifest(
     formatVersion: (json['formatVersion'] as int?) ?? 1,
     schemaVersion: json['schemaVersion'] as int?,
+    writerSchemaVersion: json['writerSchemaVersion'] as int?,
     deviceName: json['deviceName'] as String?,
     deviceId: json['deviceId'] as String,
     provider: json['provider'] as String,
