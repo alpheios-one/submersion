@@ -41888,6 +41888,18 @@ abstract class AppLocalizations {
   /// **'Entry'**
   String get enum_siteField_entryType_short;
 
+  /// Site table column: exit method
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Method'**
+  String get enum_siteField_exitMethod;
+
+  /// Site table column (short): exit method
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get enum_siteField_exitMethod_short;
+
   /// No description provided for @enum_siteField_bestSeason_short.
   ///
   /// In en, this message translates to:

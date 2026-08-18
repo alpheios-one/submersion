@@ -25134,6 +25134,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get enum_siteField_entryType_short => 'Entrée';
 
   @override
+  String get enum_siteField_exitMethod => 'Méthode de sortie';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Sortie';
+
+  @override
   String get enum_siteField_bestSeason_short => 'Saison';
 
   @override

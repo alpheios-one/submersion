@@ -7593,6 +7593,8 @@
   "enum_siteField_typicalCurrent_short": "Corrente",
   "enum_siteField_difficulty_short": "Diff.",
   "enum_siteField_entryType_short": "Ingr.",
+  "enum_siteField_exitMethod": "Metodo di uscita",
+  "enum_siteField_exitMethod_short": "Uscita",
   "enum_siteField_bestSeason_short": "Stagione",
   "enum_siteField_mooringNumber_short": "Ormeggio",
   "enum_siteField_hazards_short": "Pericoli",

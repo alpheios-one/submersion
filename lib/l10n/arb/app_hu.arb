@@ -7593,6 +7593,8 @@
   "enum_siteField_typicalCurrent_short": "Áramlat",
   "enum_siteField_difficulty_short": "Neh.",
   "enum_siteField_entryType_short": "Besz.",
+  "enum_siteField_exitMethod": "Kilépés módja",
+  "enum_siteField_exitMethod_short": "Kilépés",
   "enum_siteField_bestSeason_short": "Évszak",
   "enum_siteField_mooringNumber_short": "Kikötő",
   "enum_siteField_hazards_short": "Veszély",

@@ -24457,6 +24457,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_siteField_entryType_short => 'כניסה';
 
   @override
+  String get enum_siteField_exitMethod => 'שיטת יציאה';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'יציאה';
+
+  @override
   String get enum_siteField_bestSeason_short => 'עונה';
 
   @override

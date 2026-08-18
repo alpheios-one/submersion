@@ -267,9 +267,16 @@ produced. A site whose entry method is already set is never second-guessed.
   longer matches the column name.
 - The blank "Entry Type" column in the CSV, Excel, and KML site exports is
   repointed at the real field, and an exit column is added alongside.
-- UDDF site import gains an `entrytype` mapping into the new column, joining
-  the existing `watertype` / `bodyofwater` / `difficulty` map in
-  `uddf_full_import_service.dart`.
+- **UDDF is deliberately left alone.** This was planned and then dropped
+  during implementation: `entrytype` is a *dive-level* element in UDDF, living
+  under `<informationbeforedive>`, and both of this project's exporters emit it
+  there (`uddf_export_builders.dart:274`, `uddf_export_service.dart:243`).
+  UDDF defines no site-level entry type, so adding one would mean inventing a
+  non-standard element that no other tool reads and that other parsers might
+  reject. The dive-level import path already maps `entrytype` onto
+  `Dive.entryMethod` and is unaffected. Nothing is lost for this project's own
+  round trip, since backups copy the SQLite file and sync serializes whole
+  rows.
 - Retiring `SiteConditions` (`dive_site.dart:225-254`) is a **separate,
   independently rejectable final task**, because the class has three more dead
   readers beyond `entryType`: `SiteField.typicalVisibility`,

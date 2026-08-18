@@ -25021,6 +25021,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_siteField_entryType_short => 'Einst.';
 
   @override
+  String get enum_siteField_exitMethod => 'Ausstiegsart';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Ausstieg';
+
+  @override
   String get enum_siteField_bestSeason_short => 'Saison';
 
   @override

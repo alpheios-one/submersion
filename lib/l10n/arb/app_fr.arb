@@ -7593,6 +7593,8 @@
   "enum_siteField_typicalCurrent_short": "Courant",
   "enum_siteField_difficulty_short": "Diff.",
   "enum_siteField_entryType_short": "Entrée",
+  "enum_siteField_exitMethod": "Méthode de sortie",
+  "enum_siteField_exitMethod_short": "Sortie",
   "enum_siteField_bestSeason_short": "Saison",
   "enum_siteField_mooringNumber_short": "Mouill.",
   "enum_siteField_hazards_short": "Dangers",

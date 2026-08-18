@@ -24634,6 +24634,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_siteField_entryType_short => 'الدخول';
 
   @override
+  String get enum_siteField_exitMethod => 'طريقة الخروج';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'خروج';
+
+  @override
   String get enum_siteField_bestSeason_short => 'الموسم';
 
   @override

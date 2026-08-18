@@ -7593,6 +7593,8 @@
   "enum_siteField_typicalCurrent_short": "זרם",
   "enum_siteField_difficulty_short": "קושי",
   "enum_siteField_entryType_short": "כניסה",
+  "enum_siteField_exitMethod": "שיטת יציאה",
+  "enum_siteField_exitMethod_short": "יציאה",
   "enum_siteField_bestSeason_short": "עונה",
   "enum_siteField_mooringNumber_short": "עגינה",
   "enum_siteField_hazards_short": "סכנות",

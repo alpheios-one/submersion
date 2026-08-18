@@ -23830,6 +23830,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_siteField_entryType_short => '入水';
 
   @override
+  String get enum_siteField_exitMethod => '出水方式';
+
+  @override
+  String get enum_siteField_exitMethod_short => '出水';
+
+  @override
   String get enum_siteField_bestSeason_short => '季节';
 
   @override

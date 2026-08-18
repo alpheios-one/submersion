@@ -7593,6 +7593,8 @@
   "enum_siteField_typicalCurrent_short": "Strömung",
   "enum_siteField_difficulty_short": "Schw.",
   "enum_siteField_entryType_short": "Einst.",
+  "enum_siteField_exitMethod": "Ausstiegsart",
+  "enum_siteField_exitMethod_short": "Ausstieg",
   "enum_siteField_bestSeason_short": "Saison",
   "enum_siteField_mooringNumber_short": "Boje",
   "enum_siteField_hazards_short": "Gefahren",

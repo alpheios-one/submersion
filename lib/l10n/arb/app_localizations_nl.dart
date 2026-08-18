@@ -24877,6 +24877,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_siteField_entryType_short => 'Instap';
 
   @override
+  String get enum_siteField_exitMethod => 'Uitstapmethode';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Uitstap';
+
+  @override
   String get enum_siteField_bestSeason_short => 'Seizoen';
 
   @override

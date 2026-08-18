@@ -7593,6 +7593,8 @@
   "enum_siteField_typicalCurrent_short": "Stroming",
   "enum_siteField_difficulty_short": "Moeil.",
   "enum_siteField_entryType_short": "Instap",
+  "enum_siteField_exitMethod": "Uitstapmethode",
+  "enum_siteField_exitMethod_short": "Uitstap",
   "enum_siteField_bestSeason_short": "Seizoen",
   "enum_siteField_mooringNumber_short": "Boei",
   "enum_siteField_hazards_short": "Gevaren",

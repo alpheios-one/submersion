@@ -16017,6 +16017,14 @@
   "enum_siteField_typicalCurrent_short": "Current",
   "enum_siteField_difficulty_short": "Diff",
   "enum_siteField_entryType_short": "Entry",
+  "enum_siteField_exitMethod": "Exit Method",
+  "@enum_siteField_exitMethod": {
+    "description": "Site table column: exit method"
+  },
+  "enum_siteField_exitMethod_short": "Exit",
+  "@enum_siteField_exitMethod_short": {
+    "description": "Site table column (short): exit method"
+  },
   "enum_siteField_bestSeason_short": "Season",
   "enum_siteField_mooringNumber_short": "Mooring",
   "enum_siteField_hazards_short": "Hazards",

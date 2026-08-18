@@ -24977,6 +24977,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_siteField_entryType_short => 'Besz.';
 
   @override
+  String get enum_siteField_exitMethod => 'Kilépés módja';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Kilépés';
+
+  @override
   String get enum_siteField_bestSeason_short => 'Évszak';
 
   @override

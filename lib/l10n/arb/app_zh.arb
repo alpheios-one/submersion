@@ -7593,6 +7593,8 @@
   "enum_siteField_typicalCurrent_short": "水流",
   "enum_siteField_difficulty_short": "难度",
   "enum_siteField_entryType_short": "入水",
+  "enum_siteField_exitMethod": "出水方式",
+  "enum_siteField_exitMethod_short": "出水",
   "enum_siteField_bestSeason_short": "季节",
   "enum_siteField_mooringNumber_short": "系泊",
   "enum_siteField_hazards_short": "危险",

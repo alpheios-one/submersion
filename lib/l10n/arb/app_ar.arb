@@ -7593,6 +7593,8 @@
   "enum_siteField_typicalCurrent_short": "التيار",
   "enum_siteField_difficulty_short": "الصعوبة",
   "enum_siteField_entryType_short": "الدخول",
+  "enum_siteField_exitMethod": "طريقة الخروج",
+  "enum_siteField_exitMethod_short": "خروج",
   "enum_siteField_bestSeason_short": "الموسم",
   "enum_siteField_mooringNumber_short": "المرسى",
   "enum_siteField_hazards_short": "المخاطر",

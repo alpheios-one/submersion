@@ -25057,6 +25057,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_siteField_entryType_short => 'Entr.';
 
   @override
+  String get enum_siteField_exitMethod => 'Método de saída';
+
+  @override
+  String get enum_siteField_exitMethod_short => 'Saída';
+
+  @override
   String get enum_siteField_bestSeason_short => 'Época';
 
   @override

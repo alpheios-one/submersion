@@ -7593,6 +7593,8 @@
   "enum_siteField_typicalCurrent_short": "Corr.",
   "enum_siteField_difficulty_short": "Dif.",
   "enum_siteField_entryType_short": "Entrada",
+  "enum_siteField_exitMethod": "Método de salida",
+  "enum_siteField_exitMethod_short": "Salida",
   "enum_siteField_bestSeason_short": "Época",
   "enum_siteField_mooringNumber_short": "Amarre",
   "enum_siteField_hazards_short": "Peligros",

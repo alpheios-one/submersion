@@ -38,7 +38,11 @@ enum SiteField implements EntityField {
   typicalVisibility,
   typicalCurrent,
   difficulty,
+  // Named entryType for historical reasons; it reads DiveSite.entryMethod.
+  // Renaming it would throw on users' saved table layouts, which store these
+  // members by name.
   entryType,
+  exitMethod,
   bestSeason,
 
   // Details
@@ -89,6 +93,8 @@ enum SiteField implements EntityField {
         return 'Difficulty';
       case SiteField.entryType:
         return 'Entry Type';
+      case SiteField.exitMethod:
+        return 'Exit Method';
       case SiteField.bestSeason:
         return 'Best Season';
       case SiteField.mooringNumber:
@@ -141,6 +147,8 @@ enum SiteField implements EntityField {
         return 'Diff';
       case SiteField.entryType:
         return 'Entry';
+      case SiteField.exitMethod:
+        return 'Exit';
       case SiteField.bestSeason:
         return 'Season';
       case SiteField.mooringNumber:
@@ -176,6 +184,7 @@ enum SiteField implements EntityField {
     SiteField.typicalCurrent => l10n.enum_siteField_typicalCurrent,
     SiteField.difficulty => l10n.enum_siteField_difficulty,
     SiteField.entryType => l10n.enum_siteField_entryType,
+    SiteField.exitMethod => l10n.enum_siteField_exitMethod,
     SiteField.bestSeason => l10n.enum_siteField_bestSeason,
     SiteField.mooringNumber => l10n.enum_siteField_mooringNumber,
     SiteField.hazards => l10n.enum_siteField_hazards,
@@ -203,6 +212,7 @@ enum SiteField implements EntityField {
     SiteField.typicalCurrent => l10n.enum_siteField_typicalCurrent_short,
     SiteField.difficulty => l10n.enum_siteField_difficulty_short,
     SiteField.entryType => l10n.enum_siteField_entryType_short,
+    SiteField.exitMethod => l10n.enum_siteField_exitMethod_short,
     SiteField.bestSeason => l10n.enum_siteField_bestSeason_short,
     SiteField.mooringNumber => l10n.enum_siteField_mooringNumber_short,
     SiteField.hazards => l10n.enum_siteField_hazards_short,
@@ -247,6 +257,8 @@ enum SiteField implements EntityField {
         return Icons.signal_cellular_alt;
       case SiteField.entryType:
         return Icons.login;
+      case SiteField.exitMethod:
+        return Icons.logout;
       case SiteField.bestSeason:
         return Icons.calendar_month;
       case SiteField.mooringNumber:
@@ -298,6 +310,8 @@ enum SiteField implements EntityField {
       case SiteField.difficulty:
         return 90;
       case SiteField.entryType:
+        return 90;
+      case SiteField.exitMethod:
         return 90;
       case SiteField.bestSeason:
         return 100;
@@ -351,6 +365,8 @@ enum SiteField implements EntityField {
         return 60;
       case SiteField.entryType:
         return 60;
+      case SiteField.exitMethod:
+        return 60;
       case SiteField.bestSeason:
         return 60;
       case SiteField.mooringNumber:
@@ -391,6 +407,7 @@ enum SiteField implements EntityField {
       case SiteField.typicalVisibility:
       case SiteField.typicalCurrent:
       case SiteField.entryType:
+      case SiteField.exitMethod:
       case SiteField.bestSeason:
       case SiteField.mooringNumber:
       case SiteField.hazards:
@@ -420,6 +437,7 @@ enum SiteField implements EntityField {
       case SiteField.typicalCurrent:
       case SiteField.difficulty:
       case SiteField.entryType:
+      case SiteField.exitMethod:
       case SiteField.bestSeason:
         return SiteFieldCategory.conditions.name;
       case SiteField.mooringNumber:
@@ -456,6 +474,7 @@ enum SiteField implements EntityField {
       case SiteField.typicalCurrent:
       case SiteField.difficulty:
       case SiteField.entryType:
+      case SiteField.exitMethod:
       case SiteField.bestSeason:
       case SiteField.mooringNumber:
       case SiteField.hazards:
@@ -520,7 +539,9 @@ class SiteFieldAdapter extends EntityFieldAdapter<SiteWithCount, SiteField> {
       case SiteField.difficulty:
         return site.difficulty;
       case SiteField.entryType:
-        return site.conditions?.entryType;
+        return site.entryMethod?.displayName;
+      case SiteField.exitMethod:
+        return site.exitMethod?.displayName;
       case SiteField.bestSeason:
         return site.conditions?.bestSeason;
       case SiteField.mooringNumber:
@@ -553,6 +574,7 @@ class SiteFieldAdapter extends EntityFieldAdapter<SiteWithCount, SiteField> {
       case SiteField.typicalVisibility:
       case SiteField.typicalCurrent:
       case SiteField.entryType:
+      case SiteField.exitMethod:
       case SiteField.bestSeason:
       case SiteField.mooringNumber:
       case SiteField.hazards:
