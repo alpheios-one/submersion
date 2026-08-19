@@ -272,43 +272,94 @@ class DatabaseService {
     }
 
     if (migrationPending) {
-      final migrator = AppDatabase(
-        NativeDatabase(file, setup: _connectionSetup(keyHex)),
-        onMigrationProgress: onMigrationProgress,
+      // Each retry re-runs the ladder from the top on a brand new connection.
+      // That is safe -- every step is idempotent by contract -- but it does
+      // mean onMigrationProgress can restart at step 1, so a progress bar may
+      // visibly rewind. A rewinding bar beats a bricked launch.
+      await retryWhileDatabaseBusy(
+        () => _runUpgradeLadder(file, keyHex, onMigrationProgress),
       );
-      try {
-        // Force the upgrade ladder to completion before switching
-        // executors.
-        await migrator.customSelect('SELECT 1').get();
-      } catch (_) {
-        // Migration failed: best-effort close so we don't leak the
-        // connection, then let the original error surface.
-        await migrator
-            .close()
-            .timeout(const Duration(seconds: 5), onTimeout: () {})
-            .catchError((_) {});
-        rethrow;
-      }
-      // The synchronous connection MUST fully close (releasing its file
-      // locks) before the background executor reopens the same file.
-      // A timed-out close would leave locks held and risk "database is
-      // locked"/corruption on the reopen, so fail fast rather than
-      // silently proceed.
-      await migrator.close().timeout(const Duration(seconds: 5));
       lastOpenMode = DatabaseOpenMode.migrationThenBackground;
     } else {
       lastOpenMode = DatabaseOpenMode.background;
     }
 
+    return retryWhileDatabaseBusy(
+      () => _openOnBackgroundExecutor(file, keyHex, onMigrationProgress),
+    );
+  }
+
+  /// Runs the pending upgrade ladder to completion on a synchronous
+  /// main-isolate connection, then closes it.
+  ///
+  /// Self-contained so [retryWhileDatabaseBusy] can simply call it again: a
+  /// drift executor caches the error from a failed migration and rethrows it
+  /// on every later use, so a retry has to start from a new connection, and
+  /// the old one's locks have to be gone before the next attempt takes any.
+  Future<void> _runUpgradeLadder(
+    File file,
+    String? keyHex,
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
+  ) async {
+    final migrator = AppDatabase(
+      NativeDatabase(file, setup: _connectionSetup(keyHex)),
+      onMigrationProgress: onMigrationProgress,
+    );
+    try {
+      // Force the upgrade ladder to completion before switching executors.
+      await migrator.customSelect('SELECT 1').get();
+    } catch (_) {
+      // Best-effort close so we don't leak the connection (or its locks, which
+      // would defeat the retry), then let the original error surface.
+      await migrator
+          .close()
+          .timeout(const Duration(seconds: 5), onTimeout: () {})
+          .catchError((_) {});
+      rethrow;
+    }
+    // The synchronous connection MUST fully close (releasing its file locks)
+    // before the background executor reopens the same file. A timed-out close
+    // would leave locks held and risk "database is locked"/corruption on the
+    // reopen, so fail fast rather than silently proceed.
+    await migrator.close().timeout(const Duration(seconds: 5));
+  }
+
+  /// Opens on the worker isolate and forces the connection all the way open
+  /// before returning it.
+  ///
+  /// The forcing statement is the point. Drift opens lazily, so without it
+  /// `beforeOpen` -- which re-asserts schema and re-seeds reference data with
+  /// dozens of writes -- would not run until some unrelated screen happened to
+  /// issue the first query. That put a lock failure an arbitrary distance away
+  /// from the open that caused it: too late for the retry here, too late for
+  /// the startup screen to classify it, and reported against whatever feature
+  /// asked first. (It also silently made `flutter test` opens do nothing,
+  /// because the one statement that used to force them,
+  /// [_assertCipherAvailable]'s `PRAGMA cipher_version`, short-circuits under
+  /// FLUTTER_TEST.)
+  Future<AppDatabase> _openOnBackgroundExecutor(
+    File file,
+    String? keyHex,
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
+  ) async {
     final background = await BackgroundDatabaseConnection.open(
       file,
       keyHex: keyHex,
     );
-    _background = background;
-    return AppDatabase(
+    final database = AppDatabase(
       background.connection,
       onMigrationProgress: onMigrationProgress,
     );
+    try {
+      await database.customSelect('SELECT 1').get();
+    } catch (_) {
+      // Tear the whole attempt down, worker isolate included, so a retry does
+      // not race this connection's locks.
+      await closeDatabaseForAppShutdown(database, background: background);
+      rethrow;
+    }
+    _background = background;
+    return database;
   }
 
   /// Reinitialize the database at a specific path (used during migration)

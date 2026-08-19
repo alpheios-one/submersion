@@ -181,6 +181,34 @@ void main() {
     });
   });
 
+  test('initialize opens the database rather than deferring it', () async {
+    // Drift opens lazily and _assertCipherAvailable's PRAGMA short-circuits
+    // under FLUTTER_TEST, so initialize() used to return in about a
+    // millisecond having touched nothing: beforeOpen, and every write it
+    // makes, ran later on whatever query happened first. That put a lock
+    // failure an arbitrary distance from the open that caused it, out of
+    // reach of both the retry and the startup screen's classifier.
+    await seedDatabaseFile();
+    final probe = DatabaseService.openRaw(dbPath);
+    probe.execute('DELETE FROM pre_dive_checklist_templates');
+    probe.close();
+
+    await DatabaseService.instance.initialize(
+      locationService: _FakeLocation(dbPath),
+    );
+
+    // Read on a SEPARATE raw connection, so nothing here can be what forces
+    // the drift connection open.
+    final after = DatabaseService.openRaw(dbPath);
+    addTearDown(after.close);
+    final seeded = after
+        .select('SELECT COUNT(*) AS c FROM pre_dive_checklist_templates')
+        .single
+        .values
+        .first;
+    expect(seeded, greaterThan(0));
+  });
+
   group('an open survives a lock another isolate holds', () {
     test('a normal open waits rather than failing', () async {
       await seedDatabaseFile();
@@ -188,28 +216,21 @@ void main() {
 
       // beforeOpen re-asserts schema and re-seeds the built-in reference data
       // (pre_dive_checklist_templates among it) on EVERY open, so the open
-      // writes while the other isolate holds the lock. Without the busy
-      // timeout the first of those writes throws SqliteException(5), which is
-      // the reported crash.
-      //
-      // The first QUERY is what has to be inside the stopwatch, not
-      // initialize(). Drift opens lazily, and the one statement that would
-      // otherwise force it -- _assertCipherAvailable's `PRAGMA
-      // cipher_version` -- short-circuits under FLUTTER_TEST. So on this path
-      // initialize() returns in about a millisecond having touched nothing,
-      // and beforeOpen does not run until something asks for data.
+      // writes while the other isolate holds the lock. Unprotected, the first
+      // of those writes throws SqliteException(5), which is the reported
+      // crash.
       final elapsed = Stopwatch()..start();
       await DatabaseService.instance.initialize(
         locationService: _FakeLocation(dbPath),
       );
+      elapsed.stop();
+
       final seeds = await DatabaseService.instance.database
           .customSelect(
             'SELECT COUNT(*) AS c FROM pre_dive_checklist_templates '
             'WHERE is_built_in = 1',
           )
           .getSingle();
-      elapsed.stop();
-
       expect(seeds.read<int>('c'), greaterThan(0));
       // Proves the open genuinely met the lock rather than racing past it
       // before the holder acquired one, which would make this vacuous.
