@@ -19,6 +19,9 @@ class ServiceKind extends Equatable {
   final double? defaultCost;
   final String? defaultCurrency;
 
+  /// v159: the category a record logged against this service type
+  /// prefills. Null means the type has no opinion.
+  final ServiceCategory? defaultCategory;
   final bool autoAttach;
   final bool isBuiltIn;
   final DateTime createdAt;
@@ -34,6 +37,7 @@ class ServiceKind extends Equatable {
     this.defaultIntervalHours,
     this.defaultCost,
     this.defaultCurrency,
+    this.defaultCategory,
     this.autoAttach = false,
     this.isBuiltIn = false,
     required this.createdAt,
@@ -44,7 +48,7 @@ class ServiceKind extends Equatable {
       applicableTypes.isEmpty || applicableTypes.contains(type);
 
   /// The nullable fields (diverId/defaultInterval*/defaultCost/
-  /// defaultCurrency) use the [_undefined] sentinel so callers can explicitly
+  /// defaultCurrency/defaultCategory) use the [_undefined] sentinel so callers can explicitly
   /// clear them to null (e.g. promote a custom kind to shared by clearing
   /// diverId, drop a default interval, or remove a default price) rather than
   /// only ever overwriting with a non-null value. Mirrors
@@ -59,6 +63,7 @@ class ServiceKind extends Equatable {
     Object? defaultIntervalHours = _undefined,
     Object? defaultCost = _undefined,
     Object? defaultCurrency = _undefined,
+    Object? defaultCategory = _undefined,
     bool? autoAttach,
     bool? isBuiltIn,
     DateTime? createdAt,
@@ -84,6 +89,9 @@ class ServiceKind extends Equatable {
       defaultCurrency: defaultCurrency == _undefined
           ? this.defaultCurrency
           : defaultCurrency as String?,
+      defaultCategory: defaultCategory == _undefined
+          ? this.defaultCategory
+          : defaultCategory as ServiceCategory?,
       autoAttach: autoAttach ?? this.autoAttach,
       isBuiltIn: isBuiltIn ?? this.isBuiltIn,
       createdAt: createdAt ?? this.createdAt,
@@ -102,6 +110,7 @@ class ServiceKind extends Equatable {
     defaultIntervalHours,
     defaultCost,
     defaultCurrency,
+    defaultCategory,
     autoAttach,
     isBuiltIn,
     createdAt,
