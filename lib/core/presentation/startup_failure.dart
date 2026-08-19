@@ -1,5 +1,6 @@
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
+import 'package:submersion/core/database/database_connection_setup.dart';
 import 'package:submersion/core/database/database_engine_preflight.dart';
 
 /// How far startup had got when it failed.
@@ -71,12 +72,6 @@ enum StartupFailureKind {
 /// SQLite primary result code 11, SQLITE_CORRUPT.
 const int _sqliteCorrupt = 11;
 
-/// SQLite primary result code 5, SQLITE_BUSY: another CONNECTION holds the
-/// lock. Result code 6, SQLITE_LOCKED, is the same story within one
-/// connection; both mean the statement never ran.
-const int _sqliteBusy = 5;
-const int _sqliteLocked = 6;
-
 /// SQLite primary result code 26, SQLITE_NOTADB. Also what SQLCipher answers
 /// when reading an encrypted file with a missing or wrong key. The startup
 /// gate resolves that case into [DatabaseLockedException] long before
@@ -104,14 +99,6 @@ const List<String> _engineFailureMarkers = [
 const List<String> _unreadableDataMarkers = [
   'database disk image is malformed',
   'file is not a database',
-];
-
-/// Substrings that identify a lock where the SQLite result code is not
-/// reachable, for the same wrapping reason as [_unreadableDataMarkers].
-const List<String> _busyMarkers = [
-  'database is locked',
-  'database table is locked',
-  'database schema is locked',
 ];
 
 /// Classifies a terminal startup failure into the class whose title and body
@@ -146,12 +133,11 @@ StartupFailureKind classifyStartupFailure(Object error, StartupPhase phase) {
   // upgrade. SQLite refused to start the write, so the ladder changed
   // nothing, and reporting it as a failed migration told the diver their data
   // was at risk and offered to restore an older backup over an intact file.
-  if (error is sqlite3.SqliteException &&
-      (error.resultCode == _sqliteBusy || error.resultCode == _sqliteLocked)) {
-    return StartupFailureKind.databaseBusy;
-  }
-
-  if (_busyMarkers.any(message.contains)) {
+  //
+  // Shares [isDatabaseBusyError] with the open path that RETRIES on a lock,
+  // so what the screen calls a lock and what the retry gives up on can never
+  // drift apart. By the time a lock reaches here the retries are exhausted.
+  if (isDatabaseBusyError(error)) {
     return StartupFailureKind.databaseBusy;
   }
 

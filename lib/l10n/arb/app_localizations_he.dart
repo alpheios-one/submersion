@@ -7398,6 +7398,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_travelGas => 'משמש גם כגז מעבר';
+
+  @override
   String divePlanner_field_volume(Object volumeSymbol) {
     return 'נפח ($volumeSymbol)';
   }
@@ -10812,6 +10815,36 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'עדכן';
 
   @override
+  String get equipment_serviceType_annual => 'טיפול שנתי';
+
+  @override
+  String get equipment_serviceType_repair => 'תיקון';
+
+  @override
+  String get equipment_serviceType_inspection => 'בדיקה';
+
+  @override
+  String get equipment_serviceType_overhaul => 'שיפוץ כללי';
+
+  @override
+  String get equipment_serviceType_replacement => 'החלפת חלקים';
+
+  @override
+  String get equipment_serviceType_cleaning => 'ניקוי';
+
+  @override
+  String get equipment_serviceType_calibration => 'כיול';
+
+  @override
+  String get equipment_serviceType_warranty => 'שירות אחריות';
+
+  @override
+  String get equipment_serviceType_recall => 'ריקול/בטיחות';
+
+  @override
+  String get equipment_serviceType_other => 'אחר';
+
+  @override
   String get equipment_service_addButton => 'הוסף';
 
   @override
@@ -10839,6 +10872,74 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get equipment_service_historyTitle => 'היסטוריית טיפול';
+
+  @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'מועד הבא $date';
+  }
+
+  @override
+  String get equipment_service_filterTaskAll => 'כל המשימות';
+
+  @override
+  String get equipment_service_filterTypeAll => 'כל הסוגים';
+
+  @override
+  String get equipment_service_filterYearAll => 'כל השנים';
+
+  @override
+  String get equipment_service_filterUntagged => 'לא משויך למחזור';
+
+  @override
+  String get equipment_service_filterClear => 'ניקוי הסינון';
+
+  @override
+  String get equipment_service_filterNoMatches => 'אין תחזוקה התואמת לסינון זה';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return 'מוצגים $count מתוך $total';
+  }
+
+  @override
+  String get equipment_serviceKinds_defaultCostLabel => 'מחיר ברירת מחדל';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'השאירו ריק ללא ברירת מחדל';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'מחיר ברירת מחדל לפריט זה';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'מטבע';
+
+  @override
+  String get equipment_service_exportMenuItem => 'ייצוא יומן התחזוקה';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'יומן תחזוקה';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'היסטוריית הטיפולים של כל הציוד כגיליון אלקטרוני';
+
+  @override
+  String get settings_export_progress_maintenance => 'מייצא את יומן התחזוקה...';
+
+  @override
+  String get settings_export_success_maintenance => 'יומן התחזוקה יוצא';
+
+  @override
+  String get settings_export_saved_maintenance => 'יומן התחזוקה נשמר';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'שימוש במטבע ברירת המחדל';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel => 'מטבע לפריט זה';
 
   @override
   String get equipment_service_snackbar_deleted => 'רשומת טיפול נמחקה';
@@ -12793,6 +12894,11 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String plannerCanvas_contingency_lostGas(String gas) {
     return 'אבדן $gas';
+  }
+
+  @override
+  String plannerCanvas_contingency_previewing(String label) {
+    return 'תצוגה מקדימה: $label';
   }
 
   @override

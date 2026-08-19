@@ -25,6 +25,19 @@ void main() {
     expect(reg.defaultIntervalDives, 100);
   });
 
+  test('built-in kinds carry no default cost', () async {
+    // Prices are personal and regional, and kSeedBuiltInServiceKindsSql is
+    // INSERT OR IGNORE, so a seeded value would never reach an existing
+    // install anyway. Leaving the seed alone also keeps its positional
+    // column list intact.
+    final kinds = await db.select(db.serviceKinds).get();
+    expect(kinds, isNotEmpty);
+    for (final kind in kinds.where((k) => k.isBuiltIn)) {
+      expect(kind.defaultCost, isNull, reason: '${kind.id} has a seeded cost');
+      expect(kind.defaultCurrency, isNull, reason: '${kind.id} has a currency');
+    }
+  });
+
   test('pre-existing built-in kinds keep null hour intervals', () async {
     // Characterization: pins the current seed so adding an hours column to
     // kSeedBuiltInServiceKindsSql cannot silently shift a positional value.

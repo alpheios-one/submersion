@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
@@ -296,6 +297,11 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
   late final TextEditingController _days;
   late final TextEditingController _dives;
   late final TextEditingController _hours;
+  late final TextEditingController _defaultCost;
+
+  /// Null means "no opinion, use the diver's default currency". A dropdown
+  /// entry maps to it explicitly so a chosen currency can be cleared again.
+  String? _defaultCurrency;
   late Set<EquipmentType> _types;
   late bool _autoAttach;
 
@@ -317,6 +323,12 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
     _hours = TextEditingController(
       text: hours == null ? '' : formatDecimalForInput(hours),
     );
+    // Same decimal-separator pairing as the hours field above (#1091).
+    final cost = k?.defaultCost;
+    _defaultCost = TextEditingController(
+      text: cost == null ? '' : formatDecimalForInput(cost),
+    );
+    _defaultCurrency = k?.defaultCurrency;
     _types = {...(k?.applicableTypes ?? const [])};
     _autoAttach = k?.autoAttach ?? false;
   }
@@ -327,6 +339,7 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
     _days.dispose();
     _dives.dispose();
     _hours.dispose();
+    _defaultCost.dispose();
     super.dispose();
   }
 
@@ -382,6 +395,56 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
                   decoration: InputDecoration(
                     labelText: l10n.equipment_scheduleDialog_intervalHours,
                   ),
+                ),
+                const SizedBox(height: 12),
+                // Default price for this maintenance, prefilled when a record
+                // is logged. A per-item schedule can override it (#829).
+                TextFormField(
+                  key: const Key('service-kind-default-cost'),
+                  controller: _defaultCost,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: l10n.equipment_serviceKinds_defaultCostLabel,
+                    hintText: l10n.equipment_serviceKinds_defaultCostHint,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return null;
+                    final parsed = parseUserDecimal(value);
+                    if (parsed == null || parsed < 0) {
+                      return l10n.equipment_serviceDialog_costValidation;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                // Full width rather than sharing a row with the price: the
+                // inherit entry is a sentence, not a 3-letter code, and it
+                // overflowed a half-width dropdown even in English.
+                DropdownButtonFormField<String?>(
+                  key: const Key('service-kind-default-currency'),
+                  initialValue: _defaultCurrency,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: l10n.equipment_serviceKinds_defaultCurrencyLabel,
+                  ),
+                  items: [
+                    // The null entry is what makes a chosen currency clearable
+                    // again; without it there is no way back to "inherit the
+                    // diver's default".
+                    DropdownMenuItem<String?>(
+                      value: null,
+                      child: Text(
+                        l10n.equipment_serviceKinds_defaultCurrencyInherit,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    for (final code in currencyCodesWith(_defaultCurrency))
+                      DropdownMenuItem<String?>(value: code, child: Text(code)),
+                  ],
+                  onChanged: (value) =>
+                      setState(() => _defaultCurrency = value),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -451,6 +514,8 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
           defaultIntervalDays: parseUserInt(_days.text),
           defaultIntervalDives: parseUserInt(_dives.text),
           defaultIntervalHours: parseUserDecimal(_hours.text),
+          defaultCost: parseUserDecimal(_defaultCost.text),
+          defaultCurrency: _defaultCurrency,
           autoAttach: _autoAttach,
           createdAt: now,
           updatedAt: now,
@@ -467,6 +532,8 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
           defaultIntervalDays: parseUserInt(_days.text),
           defaultIntervalDives: parseUserInt(_dives.text),
           defaultIntervalHours: parseUserDecimal(_hours.text),
+          defaultCost: parseUserDecimal(_defaultCost.text),
+          defaultCurrency: _defaultCurrency,
           autoAttach: _autoAttach,
           isBuiltIn: false,
           createdAt: existing.createdAt,

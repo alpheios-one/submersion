@@ -7225,6 +7225,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_travelGas => '也用作过渡气';
+
+  @override
   String divePlanner_field_volume(Object volumeSymbol) {
     return '容积 ($volumeSymbol)';
   }
@@ -10571,6 +10574,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => '更新';
 
   @override
+  String get equipment_serviceType_annual => '年度保养';
+
+  @override
+  String get equipment_serviceType_repair => '维修';
+
+  @override
+  String get equipment_serviceType_inspection => '检查';
+
+  @override
+  String get equipment_serviceType_overhaul => '大修';
+
+  @override
+  String get equipment_serviceType_replacement => '部件更换';
+
+  @override
+  String get equipment_serviceType_cleaning => '清洁';
+
+  @override
+  String get equipment_serviceType_calibration => '校准';
+
+  @override
+  String get equipment_serviceType_warranty => '保修服务';
+
+  @override
+  String get equipment_serviceType_recall => '召回/安全';
+
+  @override
+  String get equipment_serviceType_other => '其他';
+
+  @override
   String get equipment_service_addButton => '添加';
 
   @override
@@ -10598,6 +10631,70 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get equipment_service_historyTitle => '维护历史';
+
+  @override
+  String equipment_service_nextDueLabel(String date) {
+    return '下次到期 $date';
+  }
+
+  @override
+  String get equipment_service_filterTaskAll => '全部任务';
+
+  @override
+  String get equipment_service_filterTypeAll => '全部类型';
+
+  @override
+  String get equipment_service_filterYearAll => '全部年份';
+
+  @override
+  String get equipment_service_filterUntagged => '未关联保养周期';
+
+  @override
+  String get equipment_service_filterClear => '清除筛选';
+
+  @override
+  String get equipment_service_filterNoMatches => '没有符合此筛选条件的保养记录';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '显示 $count / $total';
+  }
+
+  @override
+  String get equipment_serviceKinds_defaultCostLabel => '默认价格';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint => '留空表示无默认值';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel => '此装备的默认价格';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => '货币';
+
+  @override
+  String get equipment_service_exportMenuItem => '导出保养记录';
+
+  @override
+  String get transfer_export_maintenanceTitle => '保养记录';
+
+  @override
+  String get transfer_export_maintenanceSubtitle => '以电子表格导出所有装备的保养历史';
+
+  @override
+  String get settings_export_progress_maintenance => '正在导出保养记录...';
+
+  @override
+  String get settings_export_success_maintenance => '保养记录已导出';
+
+  @override
+  String get settings_export_saved_maintenance => '保养记录已保存';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyInherit => '使用默认货币';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel => '此装备的货币';
 
   @override
   String get equipment_service_snackbar_deleted => '维护记录已删除';
@@ -12523,6 +12620,11 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String plannerCanvas_contingency_lostGas(String gas) {
     return '失去 $gas';
+  }
+
+  @override
+  String plannerCanvas_contingency_previewing(String label) {
+    return '预览：$label';
   }
 
   @override

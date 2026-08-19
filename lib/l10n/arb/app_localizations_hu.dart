@@ -7567,6 +7567,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_travelGas => 'Utazógázként is használva';
+
+  @override
   String divePlanner_field_volume(Object volumeSymbol) {
     return 'Térfogat ($volumeSymbol)';
   }
@@ -11042,6 +11045,36 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Frissites';
 
   @override
+  String get equipment_serviceType_annual => 'Éves szerviz';
+
+  @override
+  String get equipment_serviceType_repair => 'Javítás';
+
+  @override
+  String get equipment_serviceType_inspection => 'Ellenőrzés';
+
+  @override
+  String get equipment_serviceType_overhaul => 'Nagyjavítás';
+
+  @override
+  String get equipment_serviceType_replacement => 'Alkatrészcsere';
+
+  @override
+  String get equipment_serviceType_cleaning => 'Tisztítás';
+
+  @override
+  String get equipment_serviceType_calibration => 'Kalibrálás';
+
+  @override
+  String get equipment_serviceType_warranty => 'Garanciális szerviz';
+
+  @override
+  String get equipment_serviceType_recall => 'Visszahívás/Biztonság';
+
+  @override
+  String get equipment_serviceType_other => 'Egyéb';
+
+  @override
   String get equipment_service_addButton => 'Hozzaadas';
 
   @override
@@ -11069,6 +11102,79 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get equipment_service_historyTitle => 'Szerviz elozmeny';
+
+  @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'Következő esedékesség $date';
+  }
+
+  @override
+  String get equipment_service_filterTaskAll => 'Minden feladat';
+
+  @override
+  String get equipment_service_filterTypeAll => 'Minden típus';
+
+  @override
+  String get equipment_service_filterYearAll => 'Minden év';
+
+  @override
+  String get equipment_service_filterUntagged => 'Nincs intervallumhoz kötve';
+
+  @override
+  String get equipment_service_filterClear => 'Szűrő törlése';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'Nincs a szűrőnek megfelelő karbantartás';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '$count / $total megjelenítve';
+  }
+
+  @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Alapértelmezett ár';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Hagyja üresen, ha nincs alapértelmezés';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Alapértelmezett ár ehhez a felszereléshez';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Pénznem';
+
+  @override
+  String get equipment_service_exportMenuItem =>
+      'Karbantartási napló exportálása';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'Karbantartási napló';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'A teljes felszerelés szerviztörténete táblázatként';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'Karbantartási napló exportálása...';
+
+  @override
+  String get settings_export_success_maintenance =>
+      'Karbantartási napló exportálva';
+
+  @override
+  String get settings_export_saved_maintenance => 'Karbantartási napló mentve';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Alapértelmezett pénznem használata';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Pénznem ehhez a felszereléshez';
 
   @override
   String get equipment_service_snackbar_deleted => 'Szervizrekord torolve';
@@ -13068,6 +13174,11 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String plannerCanvas_contingency_lostGas(String gas) {
     return '$gas elveszett';
+  }
+
+  @override
+  String plannerCanvas_contingency_previewing(String label) {
+    return 'Előnézet: $label';
   }
 
   @override

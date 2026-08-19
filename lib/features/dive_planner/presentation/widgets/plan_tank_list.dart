@@ -193,6 +193,7 @@ class _TankEditDialogState extends State<_TankEditDialog> {
   late TextEditingController _o2Controller;
   late TextEditingController _heController;
   TankRole _role = TankRole.backGas;
+  bool _isTravelGas = false;
 
   @override
   void initState() {
@@ -217,6 +218,7 @@ class _TankEditDialogState extends State<_TankEditDialog> {
       text: formatDecimalForInput(widget.tank?.gasMix.he ?? 0),
     );
     _role = widget.tank?.role ?? TankRole.backGas;
+    _isTravelGas = widget.tank?.isTravelGas ?? false;
   }
 
   @override
@@ -324,6 +326,15 @@ class _TankEditDialogState extends State<_TankEditDialog> {
                 ),
               ),
             ),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              value: _isTravelGas,
+              title: Text(context.l10n.divePlanner_field_travelGas),
+              onChanged: (value) {
+                setState(() => _isTravelGas = value ?? false);
+              },
+            ),
           ],
         ),
       ),
@@ -359,6 +370,7 @@ class _TankEditDialogState extends State<_TankEditDialog> {
       ),
       role: _role,
       order: widget.tank?.order ?? 0,
+      isTravelGas: _isTravelGas,
     );
 
     widget.onSave(tank);
