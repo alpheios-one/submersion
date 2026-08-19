@@ -246,13 +246,22 @@ static void test_flow_control_constants_match_libdivecomputer(void) {
     printf("PASS: test_flow_control_constants_match_libdivecomputer\n");
 }
 
-// Reproduces the flow-control decision the serial backends make. Each one
-// applies it through its own platform API (termios CRTSCTS and IXON/IXOFF on
-// darwin and Linux, DCB fOutxCtsFlow and fOutX/fInX on Windows), but they all
-// reduce to the same two independent choices, so the mapping is asserted here
-// in platform-neutral terms.
-static void flow_control_flags(unsigned int flowcontrol, int *rts_cts,
-                               int *xon_xoff) {
+// Mirrors the flow-control decision the serial backends make, in the
+// platform-neutral terms all of them reduce to: hardware means RTS/CTS,
+// software means XON/XOFF, anything else means neither.
+//
+// Scope, to be clear about what this does and does not cover: it exercises the
+// mirror below, not the backends. Each backend applies the decision through its
+// own platform API in its own language (termios CRTSCTS and IXON/IXOFF on
+// darwin and Linux, DCB fOutxCtsFlow and fOutX/fInX on Windows), so there is no
+// one production mapping a C test could call; an abstraction whose only caller
+// was this test would not be worth the indirection. What keeps the backends
+// correct is that they now name the LIBDC_FLOWCONTROL_* constants instead of
+// bare 1 and 2, together with the pin above that fixes what those names mean.
+// This case records the intended decision in one readable place so a backend
+// can be checked against it by eye.
+static void mirrored_flow_control_flags(unsigned int flowcontrol, int *rts_cts,
+                                        int *xon_xoff) {
     *rts_cts = (flowcontrol == LIBDC_FLOWCONTROL_HARDWARE);
     *xon_xoff = (flowcontrol == LIBDC_FLOWCONTROL_SOFTWARE);
 }
@@ -260,19 +269,19 @@ static void flow_control_flags(unsigned int flowcontrol, int *rts_cts,
 static void test_flow_control_maps_to_the_right_handshake(void) {
     int rts_cts = 0, xon_xoff = 0;
 
-    flow_control_flags(LIBDC_FLOWCONTROL_NONE, &rts_cts, &xon_xoff);
+    mirrored_flow_control_flags(LIBDC_FLOWCONTROL_NONE, &rts_cts, &xon_xoff);
     assert(!rts_cts && !xon_xoff);
 
-    flow_control_flags(LIBDC_FLOWCONTROL_HARDWARE, &rts_cts, &xon_xoff);
+    mirrored_flow_control_flags(LIBDC_FLOWCONTROL_HARDWARE, &rts_cts, &xon_xoff);
     assert(rts_cts && !xon_xoff);
 
-    flow_control_flags(LIBDC_FLOWCONTROL_SOFTWARE, &rts_cts, &xon_xoff);
+    mirrored_flow_control_flags(LIBDC_FLOWCONTROL_SOFTWARE, &rts_cts, &xon_xoff);
     assert(!rts_cts && xon_xoff);
 
     // An unknown value must fall back to no flow control rather than picking
     // one of the two handshakes, which is what the backends' default branch
     // does.
-    flow_control_flags(99, &rts_cts, &xon_xoff);
+    mirrored_flow_control_flags(99, &rts_cts, &xon_xoff);
     assert(!rts_cts && !xon_xoff);
 
     printf("PASS: test_flow_control_maps_to_the_right_handshake\n");
