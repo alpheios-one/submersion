@@ -740,6 +740,28 @@ class DiveComputerRepository {
     }
   }
 
+  /// The dive_data_sources row on [diveId] that describes [computerId], or
+  /// null when the dive has no source row for that computer yet.
+  ///
+  /// Used to stamp `dive_profiles.sourceId` at insert time (issue #1149).
+  /// Primary first so a dive that somehow carries two rows for one computer
+  /// resolves to the one the rest of the app treats as canonical.
+  Future<String?> _dataSourceIdFor(String diveId, String computerId) async {
+    final row =
+        await (_db.select(_db.diveDataSources)
+              ..where(
+                (t) =>
+                    t.diveId.equals(diveId) & t.computerId.equals(computerId),
+              )
+              ..orderBy([
+                (t) => OrderingTerm.desc(t.isPrimary),
+                (t) => OrderingTerm.asc(t.createdAt),
+              ])
+              ..limit(1))
+            .getSingleOrNull();
+    return row?.id;
+  }
+
   /// Get the primary profile's computer for a dive
   Future<String?> getPrimaryComputerId(String diveId) async {
     try {
@@ -1277,6 +1299,13 @@ class DiveComputerRepository {
         isPrimary = true;
       }
 
+      // Attribute the samples to the dive_data_sources row that describes
+      // this computer's reading (issue #1149), so a later primary swap
+      // promotes them by identity instead of re-deriving ownership from
+      // computerId. Null when no source row exists yet; consumers fall back
+      // to the pre-v154 computerId convention.
+      final ownerSourceId = await _dataSourceIdFor(diveId, computerId);
+
       // Batch insert profile points for performance (~100x faster than individual)
       // No individual sync records needed - parent dive sync covers child data
       await _db.batch((batch) {
@@ -1287,6 +1316,7 @@ class DiveComputerRepository {
               id: Value(_uuid.v4()),
               diveId: Value(diveId),
               computerId: Value(computerId),
+              sourceId: Value(ownerSourceId),
               timestamp: Value(point.timestamp),
               depth: Value(point.depth),
               pressure: const Value(null),
