@@ -297,13 +297,6 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
 
     final notifier = ref.read(playbackProvider(widget.diveId).notifier);
 
-    final photoMarkers = dive.profile.isEmpty
-        ? const <PhotoChartMarker>[]
-        : photoMarkersFromMedia(
-            photoMedia,
-            maxProfileSeconds: dive.profile.last.timestamp,
-          );
-
     // Active source and overlays (mirrors the detail page's wiring).
     final labels = SourceNameLabels(
       unknownComputer: context.l10n.diveLog_sources_unknownComputer,
@@ -324,9 +317,21 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     // A metadata-only active source has an entry with no points; the chart
     // then renders its empty-profile placeholder instead of silently
     // falling back to the primary's profile (mixed attribution).
+    //
+    // Everything overlaid on the chart is derived from THIS series, never
+    // from dive.profile: the merged series spans every source, so markers
+    // computed against it can report a depth the drawn curve never reaches
+    // and photo pins scaled to it drift off the visible span (#1167).
     final chartProfile = (dataSources.length >= 2 && activeProfile != null)
         ? activeProfile.points
         : dive.profile;
+
+    final photoMarkers = chartProfile.isEmpty
+        ? const <PhotoChartMarker>[]
+        : photoMarkersFromMedia(
+            photoMedia,
+            maxProfileSeconds: chartProfile.last.timestamp,
+          );
     final sourceColorById = <String, Color>{
       for (final (index, s) in dataSources.indexed) s.id: sourceColorAt(index),
     };
@@ -441,7 +446,8 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                           sacNormalizationFactor:
                               calculateSacNormalizationFactor(dive, analysis),
                           markers: _calculateMarkers(
-                            dive: dive,
+                            profile: chartProfile,
+                            tanks: dive.tanks,
                             analysis: analysis,
                             tankPressures: tankPressures,
                             showMaxDepth: showMaxDepthMarker,
@@ -628,30 +634,38 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     );
   }
 
+  /// Markers to overlay on the profile chart.
+  ///
+  /// [profile] must be the series the chart is actually drawing (the active
+  /// source's points), not `dive.profile`. The analysis these markers are
+  /// positioned from is the active source's, so indexing it into the merged
+  /// series would place the max-depth flag at another computer's reading
+  /// (#1167).
   List<ProfileMarker> _calculateMarkers({
-    required Dive dive,
+    required List<DiveProfilePoint> profile,
+    required List<DiveTank> tanks,
     required ProfileAnalysis? analysis,
     required Map<String, List<TankPressurePoint>>? tankPressures,
     required bool showMaxDepth,
     required bool showPressureThresholds,
   }) {
     final markers = <ProfileMarker>[];
-    if (dive.profile.isEmpty) return markers;
+    if (profile.isEmpty) return markers;
 
     if (showMaxDepth && analysis != null) {
       final maxDepthMarker = ProfileMarkersService.getMaxDepthMarker(
-        profile: dive.profile,
+        profile: profile,
         maxDepthTimestamp: analysis.maxDepthTimestamp,
         maxDepth: analysis.maxDepth,
       );
       if (maxDepthMarker != null) markers.add(maxDepthMarker);
     }
 
-    if (showPressureThresholds && dive.tanks.isNotEmpty) {
+    if (showPressureThresholds && tanks.isNotEmpty) {
       markers.addAll(
         ProfileMarkersService.getPressureThresholdMarkers(
-          profile: dive.profile,
-          tanks: dive.tanks,
+          profile: profile,
+          tanks: tanks,
           tankPressures: tankPressures,
         ),
       );
