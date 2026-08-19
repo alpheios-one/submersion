@@ -46,11 +46,21 @@ Future<void> vacuumIntoSnapshot({
   required String sourcePath,
   required String targetPath,
 }) async {
-  // Read-write, deliberately: a database left with a hot rollback journal is
-  // only recoverable by a connection that can write, and a read-only open
-  // would fail outright on it. Same reasoning as
+  // readWrite, deliberately, and NOT the readWriteCreate that
+  // `sqlite3.open` defaults to.
+  //
+  // Write, because a database left with a hot rollback journal is only
+  // recoverable by a connection that can write and a read-only open would fail
+  // outright on it. Same reasoning as
   // DatabaseService.getStoredSchemaVersion.
-  final db = sqlite3.sqlite3.open(sourcePath);
+  //
+  // Never create, because the caller checks the source exists and then opens
+  // it, so arriving here with the file gone means it vanished in between (an
+  // ejected volume, a raced delete). With the default, SQLite would CREATE an
+  // empty database at the live path and export that: a backup reporting
+  // success while holding nothing, which is the exact silent loss the SQL
+  // export exists to prevent.
+  final db = sqlite3.sqlite3.open(sourcePath, mode: sqlite3.OpenMode.readWrite);
   try {
     // Before anything else touches a page: the source may be open in another
     // isolate, and without this the first statement to meet a lock fails
