@@ -107,4 +107,23 @@ void main() {
     // 200 x 3.0 dpr = 600, unchanged by the viewport fallback.
     expect((image.image as ResizeImage).width, 600);
   });
+
+  testWidgets('a sizeless thumbnail decodes to the default thumbnail target', (
+    tester,
+  ) async {
+    // `thumbnail: true` alone is the caller's statement that a few hundred
+    // pixels are all this will ever draw, and `_resolveInner` already honours
+    // it by resolving against kDefaultThumbnailTarget when no size is given.
+    // The decode bound has to agree: taking the full-screen fallback here
+    // would hand a 128 px tile the viewer's budget, which is the same
+    // "the flag is a silent no-op unless you also pass a Size" bug this
+    // widget was fixed for once already.
+    useViewport(tester);
+
+    final image = await pumpViewer(tester, thumbnail: true);
+
+    // kDefaultThumbnailTarget is 200x200; 200 x 3.0 dpr = 600. The viewport
+    // fallback would be 2400.
+    expect((image.image as ResizeImage).width, 600);
+  });
 }

@@ -365,8 +365,17 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
         // ImageCache's budget only governs images with no listener. That is
         // the Android OOM in #1175. Falling back to the viewport keeps the
         // decode proportional to what can actually be displayed.
+        //
+        // The effective target is computed exactly as [_resolveInner] computes
+        // it, and must stay that way. A sizeless `thumbnail: true` resolves
+        // against kDefaultThumbnailTarget, so decoding it at the full-screen
+        // bound would hand a 128 px tile the viewer's budget -- reintroducing,
+        // in the decode, the same "the flag does nothing unless you also pass
+        // a Size" defect this widget was fixed for once already.
         final dpr = MediaQuery.devicePixelRatioOf(context);
-        final target = widget.targetSize;
+        final target =
+            widget.targetSize ??
+            (widget.thumbnail ? kDefaultThumbnailTarget : null);
         final cacheWidth = target != null
             ? (target.longestSide * dpr).round()
             : (MediaQuery.sizeOf(context).longestSide *
