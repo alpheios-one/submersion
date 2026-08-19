@@ -3461,6 +3461,8 @@
   "equipment_service_filterClear": "Réinitialiser le filtre",
   "equipment_service_filterNoMatches": "Aucun entretien ne correspond à ce filtre",
   "equipment_service_filterMatchCount": "{count} sur {total} affichés",
+  "equipment_serviceKinds_defaultCategoryLabel": "Catégorie par défaut",
+  "equipment_serviceKinds_defaultCategoryNone": "Aucune par défaut",
   "equipment_serviceKinds_defaultCostLabel": "Prix par défaut",
   "equipment_serviceKinds_defaultCostHint": "Laisser vide pour aucune valeur par défaut",
   "equipment_scheduleDialog_defaultCostLabel": "Prix par défaut pour cet équipement",

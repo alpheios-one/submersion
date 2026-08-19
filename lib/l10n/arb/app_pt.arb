@@ -3533,6 +3533,8 @@
   "equipment_service_filterClear": "Limpar filtro",
   "equipment_service_filterNoMatches": "Nenhuma manutenção corresponde a este filtro",
   "equipment_service_filterMatchCount": "{count} de {total} exibidos",
+  "equipment_serviceKinds_defaultCategoryLabel": "Categoria padrão",
+  "equipment_serviceKinds_defaultCategoryNone": "Sem padrão",
   "equipment_serviceKinds_defaultCostLabel": "Preço padrão",
   "equipment_serviceKinds_defaultCostHint": "Deixe em branco para nenhum valor padrão",
   "equipment_scheduleDialog_defaultCostLabel": "Preço padrão para este equipamento",

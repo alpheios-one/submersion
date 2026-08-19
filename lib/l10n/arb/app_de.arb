@@ -3533,6 +3533,8 @@
   "equipment_service_filterClear": "Filter zurücksetzen",
   "equipment_service_filterNoMatches": "Keine Wartung entspricht diesem Filter",
   "equipment_service_filterMatchCount": "{count} von {total} angezeigt",
+  "equipment_serviceKinds_defaultCategoryLabel": "Standardkategorie",
+  "equipment_serviceKinds_defaultCategoryNone": "Kein Standard",
   "equipment_serviceKinds_defaultCostLabel": "Standardpreis",
   "equipment_serviceKinds_defaultCostHint": "Leer lassen für keinen Standardwert",
   "equipment_scheduleDialog_defaultCostLabel": "Standardpreis für dieses Teil",

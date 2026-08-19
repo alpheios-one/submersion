@@ -10967,6 +10967,12 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCategoryLabel => 'الفئة الافتراضية';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => 'بدون افتراضي';
+
+  @override
   String get equipment_serviceKinds_defaultCostLabel => 'السعر الافتراضي';
 
   @override

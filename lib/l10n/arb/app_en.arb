@@ -6201,6 +6201,8 @@
       }
     }
   },
+  "equipment_serviceKinds_defaultCategoryLabel": "Default category",
+  "equipment_serviceKinds_defaultCategoryNone": "No default",
   "equipment_serviceKinds_defaultCostLabel": "Default price",
   "equipment_serviceKinds_defaultCostHint": "Leave blank for no default",
   "equipment_scheduleDialog_defaultCostLabel": "Default price for this item",

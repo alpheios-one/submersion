@@ -11080,6 +11080,13 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCategoryLabel =>
+      'Standaardcategorie';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => 'Geen standaard';
+
+  @override
   String get equipment_serviceKinds_defaultCostLabel => 'Standaardprijs';
 
   @override

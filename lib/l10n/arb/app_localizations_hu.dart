@@ -11133,6 +11133,14 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCategoryLabel =>
+      'Alapértelmezett kategória';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone =>
+      'Nincs alapértelmezés';
+
+  @override
   String get equipment_serviceKinds_defaultCostLabel => 'Alapértelmezett ár';
 
   @override

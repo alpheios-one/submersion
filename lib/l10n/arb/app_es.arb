@@ -3533,6 +3533,8 @@
   "equipment_service_filterClear": "Borrar filtro",
   "equipment_service_filterNoMatches": "Ningún mantenimiento coincide con este filtro",
   "equipment_service_filterMatchCount": "{count} de {total} mostrados",
+  "equipment_serviceKinds_defaultCategoryLabel": "Categoría predeterminada",
+  "equipment_serviceKinds_defaultCategoryNone": "Sin predeterminado",
   "equipment_serviceKinds_defaultCostLabel": "Precio predeterminado",
   "equipment_serviceKinds_defaultCostHint": "Dejar en blanco para no usar valor predeterminado",
   "equipment_scheduleDialog_defaultCostLabel": "Precio predeterminado para este equipo",

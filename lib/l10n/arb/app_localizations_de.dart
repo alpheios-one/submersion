@@ -11154,6 +11154,12 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCategoryLabel => 'Standardkategorie';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => 'Kein Standard';
+
+  @override
   String get equipment_serviceKinds_defaultCostLabel => 'Standardpreis';
 
   @override

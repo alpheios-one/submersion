@@ -3533,6 +3533,8 @@
   "equipment_service_filterClear": "مسح عامل التصفية",
   "equipment_service_filterNoMatches": "لا توجد صيانة تطابق عامل التصفية",
   "equipment_service_filterMatchCount": "عرض {count} من {total}",
+  "equipment_serviceKinds_defaultCategoryLabel": "الفئة الافتراضية",
+  "equipment_serviceKinds_defaultCategoryNone": "بدون افتراضي",
   "equipment_serviceKinds_defaultCostLabel": "السعر الافتراضي",
   "equipment_serviceKinds_defaultCostHint": "اتركه فارغًا لعدم وجود قيمة افتراضية",
   "equipment_scheduleDialog_defaultCostLabel": "السعر الافتراضي لهذه المعدة",

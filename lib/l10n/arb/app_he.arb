@@ -3461,6 +3461,8 @@
   "equipment_service_filterClear": "ניקוי הסינון",
   "equipment_service_filterNoMatches": "אין תחזוקה התואמת לסינון זה",
   "equipment_service_filterMatchCount": "מוצגים {count} מתוך {total}",
+  "equipment_serviceKinds_defaultCategoryLabel": "קטגוריית ברירת מחדל",
+  "equipment_serviceKinds_defaultCategoryNone": "ללא ברירת מחדל",
   "equipment_serviceKinds_defaultCostLabel": "מחיר ברירת מחדל",
   "equipment_serviceKinds_defaultCostHint": "השאירו ריק ללא ברירת מחדל",
   "equipment_scheduleDialog_defaultCostLabel": "מחיר ברירת מחדל לפריט זה",

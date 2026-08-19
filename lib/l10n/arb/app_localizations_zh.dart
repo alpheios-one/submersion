@@ -10661,6 +10661,12 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCategoryLabel => '默认类别';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => '无默认值';
+
+  @override
   String get equipment_serviceKinds_defaultCostLabel => '默认价格';
 
   @override

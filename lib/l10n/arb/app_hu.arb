@@ -3461,6 +3461,8 @@
   "equipment_service_filterClear": "Szűrő törlése",
   "equipment_service_filterNoMatches": "Nincs a szűrőnek megfelelő karbantartás",
   "equipment_service_filterMatchCount": "{count} / {total} megjelenítve",
+  "equipment_serviceKinds_defaultCategoryLabel": "Alapértelmezett kategória",
+  "equipment_serviceKinds_defaultCategoryNone": "Nincs alapértelmezés",
   "equipment_serviceKinds_defaultCostLabel": "Alapértelmezett ár",
   "equipment_serviceKinds_defaultCostHint": "Hagyja üresen, ha nincs alapértelmezés",
   "equipment_scheduleDialog_defaultCostLabel": "Alapértelmezett ár ehhez a felszereléshez",

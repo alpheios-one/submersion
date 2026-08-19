@@ -10902,6 +10902,13 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCategoryLabel =>
+      'קטגוריית ברירת מחדל';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => 'ללא ברירת מחדל';
+
+  @override
   String get equipment_serviceKinds_defaultCostLabel => 'מחיר ברירת מחדל';
 
   @override

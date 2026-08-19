@@ -11153,6 +11153,13 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCategoryLabel =>
+      'Categoría predeterminada';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => 'Sin predeterminado';
+
+  @override
   String get equipment_serviceKinds_defaultCostLabel => 'Precio predeterminado';
 
   @override

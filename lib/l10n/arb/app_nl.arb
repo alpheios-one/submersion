@@ -3533,6 +3533,8 @@
   "equipment_service_filterClear": "Filter wissen",
   "equipment_service_filterNoMatches": "Geen onderhoud voldoet aan dit filter",
   "equipment_service_filterMatchCount": "{count} van {total} getoond",
+  "equipment_serviceKinds_defaultCategoryLabel": "Standaardcategorie",
+  "equipment_serviceKinds_defaultCategoryNone": "Geen standaard",
   "equipment_serviceKinds_defaultCostLabel": "Standaardprijs",
   "equipment_serviceKinds_defaultCostHint": "Laat leeg voor geen standaardwaarde",
   "equipment_scheduleDialog_defaultCostLabel": "Standaardprijs voor dit item",

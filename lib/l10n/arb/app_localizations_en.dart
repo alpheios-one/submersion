@@ -10982,6 +10982,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceKinds_defaultCategoryLabel => 'Default category';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => 'No default';
+
+  @override
   String get equipment_serviceKinds_defaultCostLabel => 'Default price';
 
   @override

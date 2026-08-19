@@ -19006,6 +19006,18 @@ abstract class AppLocalizations {
   /// **'{count} of {total} shown'**
   String equipment_service_filterMatchCount(int count, int total);
 
+  /// No description provided for @equipment_serviceKinds_defaultCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Default category'**
+  String get equipment_serviceKinds_defaultCategoryLabel;
+
+  /// No description provided for @equipment_serviceKinds_defaultCategoryNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No default'**
+  String get equipment_serviceKinds_defaultCategoryNone;
+
   /// No description provided for @equipment_serviceKinds_defaultCostLabel.
   ///
   /// In en, this message translates to:
