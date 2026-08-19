@@ -83,12 +83,26 @@ class ReparseService {
       // ------------------------------------------------------------------
       final computerId = sourceRow.computerId;
       if (ownsStrand) {
+        // Parsed times are on this computer's own clock. Multi-computer
+        // consolidation re-based the folded-in strand onto the dive's clock
+        // and recorded the shift on the source row; the raw bytes carry no
+        // trace of it, so re-applying it is the only way the re-parsed strand
+        // still lines up with the primary's (#1177). Zero for every
+        // unconsolidated source, which is the overwhelming majority.
+        //
+        // Only this strand needs it. The event/gas-switch/tank-pressure
+        // re-inserts below are gated on `!isMultiSource`, and a consolidated
+        // dive is always multi-source: apply() backfills a primary source row
+        // on the target before folding anything in, so the offset-bearing row
+        // never arrives alone. A row that did arrive alone would be
+        // non-primary, which _sourceOwnsProfileStrand already refuses.
         await _replaceDiveProfiles(
           diveId: diveId,
           computerId: computerId,
           sourceId: sourceRow.id,
           parsed: parsed,
           isPrimary: sourceRow.isPrimary,
+          timeOffset: sourceRow.timeOffsetSeconds ?? 0,
         );
       }
 
@@ -460,12 +474,15 @@ class ReparseService {
     );
   }
 
+  /// [timeOffset] shifts every re-inserted sample onto the dive's timeline;
+  /// see the note at the call site (issue #1177).
   Future<void> _replaceDiveProfiles({
     required String diveId,
     required String? computerId,
     required String sourceId,
     required pigeon.ParsedDive parsed,
     required bool isPrimary,
+    required int timeOffset,
   }) async {
     // Delete existing profiles for this (diveId, computerId)
     if (computerId != null) {
@@ -492,7 +509,7 @@ class ReparseService {
             // replacements belong to the same source row (issue #1149).
             sourceId: Value(sourceId),
             isPrimary: Value(isPrimary),
-            timestamp: Value(s.timeSeconds),
+            timestamp: Value(s.timeSeconds + timeOffset),
             depth: Value(s.depthMeters),
             temperature: Value(s.temperatureCelsius),
             heartRate: Value(s.heartRate),

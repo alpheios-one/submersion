@@ -2459,6 +2459,15 @@ class DiveDataSources extends Table {
   TextColumn get libdivecomputerVersion => text().nullable()();
   DateTimeColumn get lastParsedAt => dateTime().nullable()();
 
+  /// Seconds added to this source's own sample times to place them on the
+  /// dive's timeline (issue #1177). Multi-computer consolidation re-bases a
+  /// folded-in computer's profile so both strands share one clock; the shift
+  /// it applied is recorded here because it cannot be recovered from the raw
+  /// bytes. Re-parsing this source must add it back, or the strand slides
+  /// away from the primary's. Null and 0 both mean "already on the dive's
+  /// time base", which is every source that was never consolidated.
+  IntColumn get timeOffsetSeconds => integer().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -3116,7 +3125,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 158;
+  static const int currentSchemaVersion = 159;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3380,6 +3389,12 @@ class AppDatabase extends _$AppDatabase {
     // from 154 and then 156, which #1104, #1127 and #829 claimed first
     // on main.
     158,
+    // v159 (issue #1177): dive_data_sources.time_offset_seconds, the shift
+    // multi-computer consolidation applied to a folded-in source's timeline.
+    // Without it a re-parse re-inserts the secondary strand on the raw
+    // download's clock and it slides away from the primary's. Renumbered
+    // from 158, which #1149 claimed first on main.
+    159,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4851,6 +4866,23 @@ class AppDatabase extends _$AppDatabase {
           'ALTER TABLE $table ADD COLUMN default_currency TEXT',
         );
       }
+    }
+  }
+
+  /// Idempotent DDL for the v159 dive_data_sources.time_offset_seconds
+  /// column (issue #1177). Same dual-call contract (onUpgrade + beforeOpen
+  /// backstop) as the other column-assert helpers. Nullable with no default,
+  /// so every pre-existing row reads back as "no offset applied".
+  Future<void> _assertDataSourceTimeOffsetColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('time_offset_seconds')) {
+      await customStatement(
+        'ALTER TABLE dive_data_sources ADD COLUMN time_offset_seconds INTEGER',
+      );
     }
   }
 
@@ -8366,6 +8398,13 @@ class AppDatabase extends _$AppDatabase {
           await _backfillProfileSourceIds();
         }
         if (from < 158) await reportProgress();
+        // v159: the consolidation time offset carried on a folded-in
+        // source, so a re-parse can put its strand back on the dive's
+        // clock (issue #1177).
+        if (from < 159) {
+          await _assertDataSourceTimeOffsetColumn();
+        }
+        if (from < 159) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8539,6 +8578,11 @@ class AppDatabase extends _$AppDatabase {
         // v157 backstop: re-assert the default service price columns (issue
         // #829; same parallel-branch version-collision self-heal).
         await _assertServiceCostColumns();
+
+        // v159 backstop: re-assert the consolidation time offset column
+        // (issue #1177; same parallel-branch version-collision self-heal).
+        // Reading a consolidated dive's sources throws without it.
+        await _assertDataSourceTimeOffsetColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
