@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/core/constants/pdf_templates.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/export/excel/maintenance_excel_export_service.dart';
 import 'package:submersion/core/services/export/export_service.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_fonts.dart';
@@ -661,6 +662,111 @@ class ExportNotifier extends StateNotifier<ExportState> {
       state = state.copyWith(
         status: ExportStatus.success,
         message: _l10n.settings_export_saved_excel,
+        filePath: path,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        status: ExportStatus.error,
+        message: _l10n.settings_export_saveFailed('$e'),
+      );
+    }
+  }
+
+  /// Flattens every equipment item's service history into log rows.
+  ///
+  /// Resolved here rather than inside the export service so that service
+  /// stays a pure sheet builder with no repository dependencies.
+  Future<List<MaintenanceLogRow>> _buildMaintenanceRows() async {
+    final equipment = await _ref.read(allEquipmentProvider.future);
+    final kinds = await _ref.read(serviceKindsProvider.future);
+    final kindsById = {for (final k in kinds) k.id: k};
+    final repository = _ref.read(serviceRecordRepositoryProvider);
+
+    final rows = <MaintenanceLogRow>[];
+    for (final item in equipment) {
+      final records = await repository.getRecordsForEquipment(item.id);
+      for (final record in records) {
+        rows.add((
+          equipmentName: item.name,
+          equipmentType: item.type.displayName,
+          // Blank when the record is not tied to a clock.
+          taskName: kindsById[record.serviceKindId]?.name ?? '',
+          serviceType: record.serviceType,
+          record: record,
+        ));
+      }
+    }
+    return rows;
+  }
+
+  /// Export the maintenance log for all equipment and share it.
+  Future<void> exportMaintenanceLog() async {
+    state = state.copyWith(
+      status: ExportStatus.exporting,
+      message: _l10n.settings_export_progress_maintenance,
+    );
+    try {
+      final rows = await _buildMaintenanceRows();
+      if (rows.isEmpty) {
+        state = state.copyWith(
+          status: ExportStatus.error,
+          message: _l10n.settings_export_empty_data,
+        );
+        return;
+      }
+      final settings = _ref.read(settingsProvider);
+      final path = await _exportService.exportMaintenanceLog(
+        rows: rows,
+        dateFormat: settings.dateFormat,
+      );
+      state = state.copyWith(
+        status: ExportStatus.success,
+        message: _l10n.settings_export_success_maintenance,
+        filePath: path,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        status: ExportStatus.error,
+        message: _l10n.settings_data_export_failed('$e'),
+      );
+    }
+  }
+
+  /// Save the maintenance log to a user-selected location.
+  Future<void> saveMaintenanceLogToFile() async {
+    state = state.copyWith(
+      status: ExportStatus.exporting,
+      message: _l10n.settings_export_progress_maintenance,
+    );
+    try {
+      final rows = await _buildMaintenanceRows();
+      if (rows.isEmpty) {
+        state = state.copyWith(
+          status: ExportStatus.error,
+          message: _l10n.settings_export_empty_data,
+        );
+        return;
+      }
+      final settings = _ref.read(settingsProvider);
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_chooseLocation,
+      );
+      final path = await _exportService.saveMaintenanceLogToFile(
+        rows: rows,
+        dateFormat: settings.dateFormat,
+      );
+      // null means the diver cancelled the save panel, which is a no-op and
+      // must never be reported as success.
+      if (path == null) {
+        state = state.copyWith(
+          status: ExportStatus.idle,
+          message: _l10n.settings_export_cancelled_save,
+        );
+        return;
+      }
+      state = state.copyWith(
+        status: ExportStatus.success,
+        message: _l10n.settings_export_saved_maintenance,
         filePath: path,
       );
     } catch (e) {

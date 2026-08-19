@@ -7436,6 +7436,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_travelGas => 'يُستخدم أيضًا كغاز سفر';
+
+  @override
   String divePlanner_field_volume(Object volumeSymbol) {
     return 'الحجم ($volumeSymbol)';
   }
@@ -10876,6 +10879,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'تحديث';
 
   @override
+  String get equipment_serviceType_annual => 'الصيانة السنوية';
+
+  @override
+  String get equipment_serviceType_repair => 'إصلاح';
+
+  @override
+  String get equipment_serviceType_inspection => 'فحص';
+
+  @override
+  String get equipment_serviceType_overhaul => 'عمرة شاملة';
+
+  @override
+  String get equipment_serviceType_replacement => 'استبدال قطع';
+
+  @override
+  String get equipment_serviceType_cleaning => 'تنظيف';
+
+  @override
+  String get equipment_serviceType_calibration => 'معايرة';
+
+  @override
+  String get equipment_serviceType_warranty => 'خدمة الضمان';
+
+  @override
+  String get equipment_serviceType_recall => 'استدعاء/سلامة';
+
+  @override
+  String get equipment_serviceType_other => 'أخرى';
+
+  @override
   String get equipment_service_addButton => 'إضافة';
 
   @override
@@ -10903,6 +10936,76 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get equipment_service_historyTitle => 'سجل الصيانة';
+
+  @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'الاستحقاق التالي $date';
+  }
+
+  @override
+  String get equipment_service_filterTaskAll => 'كل المهام';
+
+  @override
+  String get equipment_service_filterTypeAll => 'كل الأنواع';
+
+  @override
+  String get equipment_service_filterYearAll => 'كل السنوات';
+
+  @override
+  String get equipment_service_filterUntagged => 'غير مرتبط بمؤقت';
+
+  @override
+  String get equipment_service_filterClear => 'مسح عامل التصفية';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'لا توجد صيانة تطابق عامل التصفية';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return 'عرض $count من $total';
+  }
+
+  @override
+  String get equipment_serviceKinds_defaultCostLabel => 'السعر الافتراضي';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'اتركه فارغًا لعدم وجود قيمة افتراضية';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'السعر الافتراضي لهذه المعدة';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'العملة';
+
+  @override
+  String get equipment_service_exportMenuItem => 'تصدير سجل الصيانة';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'سجل الصيانة';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'سجل صيانة جميع المعدات كجدول بيانات';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'جارٍ تصدير سجل الصيانة...';
+
+  @override
+  String get settings_export_success_maintenance => 'تم تصدير سجل الصيانة';
+
+  @override
+  String get settings_export_saved_maintenance => 'تم حفظ سجل الصيانة';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'استخدام العملة الافتراضية';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel => 'عملة هذه المعدة';
 
   @override
   String get equipment_service_snackbar_deleted => 'تم حذف سجل الصيانة';
@@ -12875,6 +12978,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String plannerCanvas_contingency_lostGas(String gas) {
     return 'فقدان $gas';
+  }
+
+  @override
+  String plannerCanvas_contingency_previewing(String label) {
+    return 'معاينة: $label';
   }
 
   @override

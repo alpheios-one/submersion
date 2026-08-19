@@ -331,7 +331,7 @@ class _CourseEditPageState extends ConsumerState<CourseEditPage> {
     if (widget.embedded) {
       return Column(
         children: [
-          _buildEmbeddedHeader(context),
+          _buildEmbeddedHeader(context, existingCourse),
           Expanded(child: form),
         ],
       );
@@ -359,7 +359,12 @@ class _CourseEditPageState extends ConsumerState<CourseEditPage> {
     );
   }
 
-  Widget _buildEmbeddedHeader(BuildContext context) {
+  /// Header for the master-detail (embedded) editor.
+  ///
+  /// [existingCourse] must be forwarded to [_save]: without it the save builds
+  /// a course with an empty id while still taking the update branch, so the
+  /// write becomes an `UPDATE ... WHERE id = ''` that matches nothing.
+  Widget _buildEmbeddedHeader(BuildContext context, Course? existingCourse) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 8, 8),
@@ -382,7 +387,7 @@ class _CourseEditPageState extends ConsumerState<CourseEditPage> {
               child: Text(context.l10n.common_action_cancel),
             ),
           TextButton(
-            onPressed: _isLoading ? null : () => _save(null),
+            onPressed: _isLoading ? null : () => _save(existingCourse),
             child: Text(context.l10n.common_action_save),
           ),
         ],

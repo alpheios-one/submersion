@@ -7450,6 +7450,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_travelGas => 'Also used as travel gas';
+
+  @override
   String divePlanner_field_volume(Object volumeSymbol) {
     return 'Volume ($volumeSymbol)';
   }
@@ -10891,6 +10894,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Update';
 
   @override
+  String get equipment_serviceType_annual => 'Annual Service';
+
+  @override
+  String get equipment_serviceType_repair => 'Repair';
+
+  @override
+  String get equipment_serviceType_inspection => 'Inspection';
+
+  @override
+  String get equipment_serviceType_overhaul => 'Overhaul';
+
+  @override
+  String get equipment_serviceType_replacement => 'Part Replacement';
+
+  @override
+  String get equipment_serviceType_cleaning => 'Cleaning';
+
+  @override
+  String get equipment_serviceType_calibration => 'Calibration';
+
+  @override
+  String get equipment_serviceType_warranty => 'Warranty Service';
+
+  @override
+  String get equipment_serviceType_recall => 'Recall/Safety';
+
+  @override
+  String get equipment_serviceType_other => 'Other';
+
+  @override
   String get equipment_service_addButton => 'Add';
 
   @override
@@ -10918,6 +10951,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get equipment_service_historyTitle => 'Service History';
+
+  @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'Next due $date';
+  }
+
+  @override
+  String get equipment_service_filterTaskAll => 'All tasks';
+
+  @override
+  String get equipment_service_filterTypeAll => 'All types';
+
+  @override
+  String get equipment_service_filterYearAll => 'All years';
+
+  @override
+  String get equipment_service_filterUntagged => 'Not tied to a clock';
+
+  @override
+  String get equipment_service_filterClear => 'Clear filter';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'No maintenance matches this filter';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '$count of $total shown';
+  }
+
+  @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Default price';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Leave blank for no default';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Default price for this item';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Currency';
+
+  @override
+  String get equipment_service_exportMenuItem => 'Export maintenance log';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'Maintenance Log';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'Service history for all equipment as a spreadsheet';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'Exporting maintenance log...';
+
+  @override
+  String get settings_export_success_maintenance => 'Maintenance log exported';
+
+  @override
+  String get settings_export_saved_maintenance => 'Maintenance log saved';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Use default currency';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Currency for this item';
 
   @override
   String get equipment_service_snackbar_deleted => 'Service record deleted';
@@ -12895,6 +12999,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String plannerCanvas_contingency_lostGas(String gas) {
     return 'Lost $gas';
+  }
+
+  @override
+  String plannerCanvas_contingency_previewing(String label) {
+    return 'Previewing: $label';
   }
 
   @override

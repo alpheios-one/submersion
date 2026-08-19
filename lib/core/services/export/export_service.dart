@@ -1,6 +1,7 @@
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/services/export/csv/csv_export_service.dart';
 import 'package:submersion/core/services/export/excel/excel_export_service.dart';
+import 'package:submersion/core/services/export/excel/maintenance_excel_export_service.dart';
 import 'package:submersion/core/services/export/kml/kml_export_service.dart';
 import 'package:submersion/core/services/export/models/export_service_record.dart';
 import 'package:submersion/core/services/export/models/uddf_import_result.dart';
@@ -49,6 +50,7 @@ class ExportService {
   final _pdf = PdfExportService();
   final _pdfCourse = PdfCourseExportService();
   final _excel = ExcelExportService();
+  final _maintenance = MaintenanceExcelExportService();
   final _kml = KmlExportService();
   final _uddf = UddfExportService();
   final _uddfFull = UddfFullExportService();
@@ -220,6 +222,18 @@ class ExportService {
     preDiveSessions: preDiveSessions,
     preDiveItemsBySession: preDiveItemsBySession,
   );
+
+  // ==================== Maintenance Log Export ====================
+
+  Future<String> exportMaintenanceLog({
+    required List<MaintenanceLogRow> rows,
+    required DateFormatPreference dateFormat,
+  }) => _maintenance.exportToExcel(rows: rows, dateFormat: dateFormat);
+
+  Future<String?> saveMaintenanceLogToFile({
+    required List<MaintenanceLogRow> rows,
+    required DateFormatPreference dateFormat,
+  }) => _maintenance.saveToFile(rows: rows, dateFormat: dateFormat);
 
   // ==================== KML Export ====================
 

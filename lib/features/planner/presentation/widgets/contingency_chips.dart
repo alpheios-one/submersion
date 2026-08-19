@@ -28,8 +28,13 @@ class ContingencyChips extends ConsumerWidget {
         '+${units.formatDepth(state.deviationDepthDelta, decimals: 0)}';
     final timeLabel = '+${state.deviationTimeMinutes}′';
 
-    void select(String? key) =>
-        ref.read(selectedDeviationProvider.notifier).state = key;
+    void select(String? key) {
+      ref.read(selectedDeviationProvider.notifier).state = key;
+      // Only one contingency ghost can be on the chart at a time.
+      if (key != null) {
+        ref.read(selectedLostGasTankIdProvider.notifier).state = null;
+      }
+    }
 
     Widget chip(String? key, String label) => InkWell(
       borderRadius: BorderRadius.circular(12),
