@@ -208,6 +208,7 @@ class DiveConsolidationService {
                   gradientFactorHigh: Value(secRow.gradientFactorHigh),
                   importedAt: Value(nowDt),
                   createdAt: Value(nowDt),
+                  timeOffsetSeconds: Value(offset),
                 ),
               );
         } else {
@@ -221,6 +222,15 @@ class DiveConsolidationService {
                         id: Value(_uuid.v4()),
                         diveId: Value(targetDiveId),
                         isPrimary: const Value(false),
+                        // Record the shift the profile rows below are
+                        // re-based by, so a re-parse can reapply it (#1177);
+                        // the raw bytes carry no trace of it. Composes when
+                        // the secondary was itself consolidated once
+                        // already: its own offset is relative to its
+                        // timeline, which this pass moves again.
+                        timeOffsetSeconds: Value(
+                          (row.timeOffsetSeconds ?? 0) + offset,
+                        ),
                       ),
                 );
           }

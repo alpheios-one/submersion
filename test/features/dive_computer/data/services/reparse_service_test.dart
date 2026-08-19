@@ -92,6 +92,7 @@ void main() {
     double? avgDepth,
     int? duration,
     double? waterTemp,
+    int? timeOffsetSeconds,
   }) async {
     final now = DateTime.fromMillisecondsSinceEpoch(nowMs);
     await db
@@ -107,6 +108,7 @@ void main() {
             avgDepth: Value(avgDepth),
             duration: Value(duration),
             waterTemp: Value(waterTemp),
+            timeOffsetSeconds: Value(timeOffsetSeconds),
             importedAt: Value(now),
             createdAt: Value(now),
           ),
@@ -775,6 +777,186 @@ void main() {
 
       expect(comp2Profiles.length, 1);
       expect(comp2Profiles[0].id, 'prof-other');
+    });
+
+    test('re-parsing a consolidated source re-bases its profile onto the '
+        "dive's time base, not the raw download's (#1177)", () async {
+      await insertDive('dive-1');
+      await insertComputer('comp-primary');
+      await insertComputer('comp-secondary');
+      await insertSource(
+        id: 'src-primary',
+        diveId: 'dive-1',
+        computerId: 'comp-primary',
+        isPrimary: true,
+      );
+      // Consolidation folded this computer in and shifted its samples 60s
+      // forward to line them up with the primary's clock.
+      await insertSource(
+        id: 'src-secondary',
+        diveId: 'dive-1',
+        computerId: 'comp-secondary',
+        isPrimary: false,
+        timeOffsetSeconds: 60,
+      );
+      await insertProfile(
+        id: 'prof-secondary',
+        diveId: 'dive-1',
+        computerId: 'comp-secondary',
+        timestamp: 60,
+        depth: 0.0,
+        isPrimary: false,
+      );
+
+      final parsed = makeParsedDive(
+        samples: [
+          pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0),
+          pigeon.ProfileSample(timeSeconds: 30, depthMeters: 5.0),
+          pigeon.ProfileSample(timeSeconds: 60, depthMeters: 12.0),
+        ],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-secondary',
+        parsed: parsed,
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      final profiles =
+          await (db.select(db.diveProfiles)
+                ..where((t) => t.computerId.equals('comp-secondary'))
+                ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+              .get();
+
+      // Without the offset these land at 0/30/60 and the secondary strand
+      // sits a minute to the left of the primary's on every comparison view.
+      expect(profiles.map((p) => p.timestamp), [60, 90, 120]);
+      expect(profiles.map((p) => p.depth), [0.0, 5.0, 12.0]);
+    });
+
+    test('re-parsing leaves the recorded offset intact, so a second '
+        're-parse lands on the same time base (#1177)', () async {
+      await insertDive('dive-1');
+      await insertComputer('comp-primary');
+      await insertComputer('comp-secondary');
+      await insertSource(
+        id: 'src-primary',
+        diveId: 'dive-1',
+        computerId: 'comp-primary',
+        isPrimary: true,
+      );
+      await insertSource(
+        id: 'src-secondary',
+        diveId: 'dive-1',
+        computerId: 'comp-secondary',
+        isPrimary: false,
+        timeOffsetSeconds: 60,
+      );
+
+      final parsed = makeParsedDive(
+        samples: [pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0)],
+      );
+
+      // reparseAllForComputer walks every dive for a computer after a
+      // libdivecomputer upgrade, so the same row is re-parsed repeatedly over
+      // the app's life. Each pass must find the offset still there.
+      for (var i = 0; i < 2; i++) {
+        await service.applyParsedUpdate(
+          diveId: 'dive-1',
+          sourceRowId: 'src-secondary',
+          parsed: parsed,
+          descriptorVendor: null,
+          descriptorProduct: null,
+          descriptorModel: null,
+          libdivecomputerVersion: null,
+        );
+      }
+
+      expect((await getSource('src-secondary')).timeOffsetSeconds, 60);
+      final profiles = await (db.select(
+        db.diveProfiles,
+      )..where((t) => t.computerId.equals('comp-secondary'))).get();
+      expect(profiles.map((p) => p.timestamp), [60]);
+    });
+
+    test('a source with no recorded offset re-parses on the raw time base '
+        '(#1177)', () async {
+      await insertDive('dive-1');
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+      );
+
+      final parsed = makeParsedDive(
+        samples: [
+          pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0),
+          pigeon.ProfileSample(timeSeconds: 30, depthMeters: 5.0),
+        ],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: parsed,
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      final profiles =
+          await (db.select(db.diveProfiles)
+                ..where((t) => t.diveId.equals('dive-1'))
+                ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+              .get();
+      expect(profiles.map((p) => p.timestamp), [0, 30]);
+    });
+
+    test('a consolidated source that is the dive\'s only source re-bases its '
+        'events too (#1177)', () async {
+      // Reachable when the target had no dive_data_sources row of its own:
+      // consolidation carries the secondary\'s row over and the dive ends up
+      // single-source, which is the branch that re-inserts events.
+      await insertDive('dive-1');
+      await insertComputer('comp-secondary');
+      await insertSource(
+        id: 'src-secondary',
+        diveId: 'dive-1',
+        computerId: 'comp-secondary',
+        isPrimary: false,
+        timeOffsetSeconds: 90,
+      );
+
+      final parsed = makeParsedDive(
+        events: [
+          pigeon.DiveEvent(timeSeconds: 0, type: 'bookmark'),
+          pigeon.DiveEvent(timeSeconds: 120, type: 'deco'),
+        ],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-secondary',
+        parsed: parsed,
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      final events =
+          await (db.select(db.diveProfileEvents)
+                ..where((t) => t.diveId.equals('dive-1'))
+                ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+              .get();
+      expect(events.map((e) => e.timestamp), [90, 210]);
     });
 
     test('does not overwrite existing rawData with null on re-parse', () async {

@@ -71,11 +71,19 @@ class ReparseService {
       // 4. Replace DiveProfiles for this source's computerId
       // ------------------------------------------------------------------
       final computerId = sourceRow.computerId;
+      // Parsed times are on this computer's own clock. Multi-computer
+      // consolidation re-based the folded-in strand onto the dive's clock and
+      // recorded the shift here; the raw bytes carry no trace of it, so
+      // re-applying it is the only way the re-parsed strand still lines up
+      // with the primary's (issue #1177). Zero for every unconsolidated
+      // source, which is the overwhelming majority.
+      final timeOffset = sourceRow.timeOffsetSeconds ?? 0;
       await _replaceDiveProfiles(
         diveId: diveId,
         computerId: computerId,
         parsed: parsed,
         isPrimary: sourceRow.isPrimary,
+        timeOffset: timeOffset,
       );
 
       // ------------------------------------------------------------------
@@ -112,6 +120,7 @@ class ReparseService {
           computerId: computerId,
           parsed: parsed,
           now: now,
+          timeOffset: timeOffset,
         );
       }
 
@@ -131,12 +140,14 @@ class ReparseService {
           computerId: computerId,
           parsed: parsed,
           tankIdsByIndex: tankIdsByIndex,
+          timeOffset: timeOffset,
         );
         await _insertGasSwitches(
           diveId: diveId,
           parsed: parsed,
           tankIdsByIndex: tankIdsByIndex,
           now: now,
+          timeOffset: timeOffset,
         );
       }
     });
@@ -405,11 +416,14 @@ class ReparseService {
     );
   }
 
+  /// [timeOffset] shifts every re-inserted sample onto the dive's timeline;
+  /// see the note at the call site (issue #1177).
   Future<void> _replaceDiveProfiles({
     required String diveId,
     required String? computerId,
     required pigeon.ParsedDive parsed,
     required bool isPrimary,
+    required int timeOffset,
   }) async {
     // Delete existing profiles for this (diveId, computerId)
     if (computerId != null) {
@@ -433,7 +447,7 @@ class ReparseService {
             diveId: Value(diveId),
             computerId: Value(computerId),
             isPrimary: Value(isPrimary),
-            timestamp: Value(s.timeSeconds),
+            timestamp: Value(s.timeSeconds + timeOffset),
             depth: Value(s.depthMeters),
             temperature: Value(s.temperatureCelsius),
             heartRate: Value(s.heartRate),
@@ -471,6 +485,7 @@ class ReparseService {
     required String? computerId,
     required pigeon.ParsedDive parsed,
     required DateTime now,
+    required int timeOffset,
   }) async {
     if (parsed.events.isEmpty) return;
 
@@ -487,7 +502,7 @@ class ReparseService {
             id: Value(_uuid.v4()),
             diveId: Value(diveId),
             computerId: Value(computerId),
-            timestamp: Value(e.timeSeconds),
+            timestamp: Value(e.timeSeconds + timeOffset),
             eventType: Value(eventType),
             severity: Value(_eventSeverity(eventType)),
             source: const Value('imported'), // native DC events are imports
@@ -514,6 +529,7 @@ class ReparseService {
     required pigeon.ParsedDive parsed,
     required Map<int, String> tankIdsByIndex,
     required DateTime now,
+    required int timeOffset,
   }) async {
     final switches = resolveGasSwitches(parsed);
     if (switches.isEmpty) return;
@@ -529,7 +545,7 @@ class ReparseService {
           GasSwitchesCompanion(
             id: Value(_uuid.v4()),
             diveId: Value(diveId),
-            timestamp: Value(sw.timeSeconds),
+            timestamp: Value(sw.timeSeconds + timeOffset),
             tankId: Value(tankId),
             depth: Value(sw.depth),
             createdAt: Value(nowMs),
@@ -630,6 +646,7 @@ class ReparseService {
     required String? computerId,
     required pigeon.ParsedDive parsed,
     required Map<int, String> tankIdsByIndex,
+    required int timeOffset,
   }) async {
     if (tankIdsByIndex.isEmpty) return;
 
@@ -640,7 +657,7 @@ class ReparseService {
       if (pressure != null) {
         final idx = s.tankIndex ?? 0;
         pressuresByTank.putIfAbsent(idx, () => []).add((
-          timestamp: s.timeSeconds,
+          timestamp: s.timeSeconds + timeOffset,
           pressure: pressure,
         ));
       }

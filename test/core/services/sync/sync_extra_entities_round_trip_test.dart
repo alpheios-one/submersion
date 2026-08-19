@@ -216,6 +216,10 @@ void main() {
           'importedAt': 1700000000000,
           'createdAt': 1700000000000,
           'rawFingerprint': fingerprint,
+          // Consolidation's time re-base (#1177). It cannot be recovered from
+          // the raw bytes, so a peer that loses it re-parses the folded-in
+          // strand onto the wrong clock.
+          'timeOffsetSeconds': 60,
         });
 
         await seedPeerLog(cloud, 'device-a');
@@ -234,6 +238,7 @@ void main() {
           reason: 'data-source row (with BLOB) must round-trip',
         );
         expect(restored!['sourceFormat'], 'shearwater');
+        expect(restored['timeOffsetSeconds'], 60);
 
         // BLOB survives the JSON round-trip. The sync layer encodes BLOBs as
         // base64 strings (see sync_blob_base64_test.dart); fetchRecord decodes
@@ -249,6 +254,34 @@ void main() {
           restoredBytes = (restoredBlob as List).cast<int>();
         }
         expect(restoredBytes, [0x01, 0x02, 0x03, 0xFE, 0xFF]);
+      },
+    );
+
+    test(
+      'a DiveDataSources payload from a pre-v158 peer, with no '
+      'timeOffsetSeconds key at all, still applies (#1177)',
+      () async {
+        final serializer = SyncDataSerializer();
+        final diveRepo = DiveRepository();
+
+        await diveRepo.createDive(
+          createTestDiveWithBottomTime(id: 'dive-ds-2', diveNumber: 103),
+        );
+
+        // Older writers do not know the column exists. The receiving side
+        // must read that as "no offset", not reject the row.
+        await serializer.upsertRecord('diveDataSources', {
+          'id': 'ds-2',
+          'diveId': 'dive-ds-2',
+          'isPrimary': true,
+          'sourceFormat': 'shearwater',
+          'importedAt': 1700000000000,
+          'createdAt': 1700000000000,
+        });
+
+        final stored = await serializer.fetchRecord('diveDataSources', 'ds-2');
+        expect(stored, isNotNull);
+        expect(stored!['timeOffsetSeconds'], isNull);
       },
     );
   });
