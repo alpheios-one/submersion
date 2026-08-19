@@ -112,7 +112,14 @@ void main() {
       type: EquipmentType.regulator,
     );
     await pumpDetail(tester, item: item, clockStatuses: const []);
-    await tester.tap(find.byIcon(Icons.more_vert));
+    // Scoped to the app bar: the service history card carries its own
+    // overflow menu (#829), so a bare byIcon finder is ambiguous.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AppBar),
+        matching: find.byIcon(Icons.more_vert),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(find.text('Mark as Serviced'), findsNothing);
   });

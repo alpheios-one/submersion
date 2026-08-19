@@ -11066,6 +11066,36 @@ class AppLocalizationsDe extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Aktualisieren';
 
   @override
+  String get equipment_serviceType_annual => 'Jahresservice';
+
+  @override
+  String get equipment_serviceType_repair => 'Reparatur';
+
+  @override
+  String get equipment_serviceType_inspection => 'Inspektion';
+
+  @override
+  String get equipment_serviceType_overhaul => 'Überholung';
+
+  @override
+  String get equipment_serviceType_replacement => 'Teiletausch';
+
+  @override
+  String get equipment_serviceType_cleaning => 'Reinigung';
+
+  @override
+  String get equipment_serviceType_calibration => 'Kalibrierung';
+
+  @override
+  String get equipment_serviceType_warranty => 'Garantieservice';
+
+  @override
+  String get equipment_serviceType_recall => 'Rückruf/Sicherheit';
+
+  @override
+  String get equipment_serviceType_other => 'Sonstiges';
+
+  @override
   String get equipment_service_addButton => 'Hinzufügen';
 
   @override
@@ -11093,6 +11123,80 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get equipment_service_historyTitle => 'Wartungsverlauf';
+
+  @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'Nächste Fälligkeit $date';
+  }
+
+  @override
+  String get equipment_service_filterTaskAll => 'Alle Aufgaben';
+
+  @override
+  String get equipment_service_filterTypeAll => 'Alle Typen';
+
+  @override
+  String get equipment_service_filterYearAll => 'Alle Jahre';
+
+  @override
+  String get equipment_service_filterUntagged => 'Keinem Intervall zugeordnet';
+
+  @override
+  String get equipment_service_filterClear => 'Filter zurücksetzen';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'Keine Wartung entspricht diesem Filter';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '$count von $total angezeigt';
+  }
+
+  @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Standardpreis';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Leer lassen für keinen Standardwert';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Standardpreis für dieses Teil';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Währung';
+
+  @override
+  String get equipment_service_exportMenuItem =>
+      'Wartungsprotokoll exportieren';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'Wartungsprotokoll';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'Serviceverlauf der gesamten Ausrüstung als Tabelle';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'Wartungsprotokoll wird exportiert...';
+
+  @override
+  String get settings_export_success_maintenance =>
+      'Wartungsprotokoll exportiert';
+
+  @override
+  String get settings_export_saved_maintenance =>
+      'Wartungsprotokoll gespeichert';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Standardwährung verwenden';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Währung für dieses Teil';
 
   @override
   String get equipment_service_snackbar_deleted => 'Wartungseintrag gelöscht';

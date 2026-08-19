@@ -18844,6 +18844,66 @@ abstract class AppLocalizations {
   /// **'Update'**
   String get equipment_serviceDialog_updateButton;
 
+  /// No description provided for @equipment_serviceType_annual.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual Service'**
+  String get equipment_serviceType_annual;
+
+  /// No description provided for @equipment_serviceType_repair.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair'**
+  String get equipment_serviceType_repair;
+
+  /// No description provided for @equipment_serviceType_inspection.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspection'**
+  String get equipment_serviceType_inspection;
+
+  /// No description provided for @equipment_serviceType_overhaul.
+  ///
+  /// In en, this message translates to:
+  /// **'Overhaul'**
+  String get equipment_serviceType_overhaul;
+
+  /// No description provided for @equipment_serviceType_replacement.
+  ///
+  /// In en, this message translates to:
+  /// **'Part Replacement'**
+  String get equipment_serviceType_replacement;
+
+  /// No description provided for @equipment_serviceType_cleaning.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleaning'**
+  String get equipment_serviceType_cleaning;
+
+  /// No description provided for @equipment_serviceType_calibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Calibration'**
+  String get equipment_serviceType_calibration;
+
+  /// No description provided for @equipment_serviceType_warranty.
+  ///
+  /// In en, this message translates to:
+  /// **'Warranty Service'**
+  String get equipment_serviceType_warranty;
+
+  /// No description provided for @equipment_serviceType_recall.
+  ///
+  /// In en, this message translates to:
+  /// **'Recall/Safety'**
+  String get equipment_serviceType_recall;
+
+  /// No description provided for @equipment_serviceType_other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get equipment_serviceType_other;
+
   /// No description provided for @equipment_service_addButton.
   ///
   /// In en, this message translates to:
@@ -18897,6 +18957,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Service History'**
   String get equipment_service_historyTitle;
+
+  /// No description provided for @equipment_service_nextDueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Next due {date}'**
+  String equipment_service_nextDueLabel(String date);
+
+  /// No description provided for @equipment_service_filterTaskAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All tasks'**
+  String get equipment_service_filterTaskAll;
+
+  /// No description provided for @equipment_service_filterTypeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All types'**
+  String get equipment_service_filterTypeAll;
+
+  /// No description provided for @equipment_service_filterYearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All years'**
+  String get equipment_service_filterYearAll;
+
+  /// No description provided for @equipment_service_filterUntagged.
+  ///
+  /// In en, this message translates to:
+  /// **'Not tied to a clock'**
+  String get equipment_service_filterUntagged;
+
+  /// No description provided for @equipment_service_filterClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filter'**
+  String get equipment_service_filterClear;
+
+  /// No description provided for @equipment_service_filterNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No maintenance matches this filter'**
+  String get equipment_service_filterNoMatches;
+
+  /// No description provided for @equipment_service_filterMatchCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {total} shown'**
+  String equipment_service_filterMatchCount(int count, int total);
+
+  /// No description provided for @equipment_serviceKinds_defaultCostLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Default price'**
+  String get equipment_serviceKinds_defaultCostLabel;
+
+  /// No description provided for @equipment_serviceKinds_defaultCostHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave blank for no default'**
+  String get equipment_serviceKinds_defaultCostHint;
+
+  /// No description provided for @equipment_scheduleDialog_defaultCostLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Default price for this item'**
+  String get equipment_scheduleDialog_defaultCostLabel;
+
+  /// No description provided for @equipment_serviceKinds_defaultCurrencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get equipment_serviceKinds_defaultCurrencyLabel;
+
+  /// No description provided for @equipment_service_exportMenuItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Export maintenance log'**
+  String get equipment_service_exportMenuItem;
+
+  /// No description provided for @transfer_export_maintenanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance Log'**
+  String get transfer_export_maintenanceTitle;
+
+  /// No description provided for @transfer_export_maintenanceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Service history for all equipment as a spreadsheet'**
+  String get transfer_export_maintenanceSubtitle;
+
+  /// No description provided for @settings_export_progress_maintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting maintenance log...'**
+  String get settings_export_progress_maintenance;
+
+  /// No description provided for @settings_export_success_maintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance log exported'**
+  String get settings_export_success_maintenance;
+
+  /// No description provided for @settings_export_saved_maintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance log saved'**
+  String get settings_export_saved_maintenance;
+
+  /// No description provided for @equipment_serviceKinds_defaultCurrencyInherit.
+  ///
+  /// In en, this message translates to:
+  /// **'Use default currency'**
+  String get equipment_serviceKinds_defaultCurrencyInherit;
+
+  /// No description provided for @equipment_scheduleDialog_defaultCurrencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency for this item'**
+  String get equipment_scheduleDialog_defaultCurrencyLabel;
 
   /// No description provided for @equipment_service_snackbar_deleted.
   ///

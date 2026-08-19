@@ -377,6 +377,26 @@ class _ExportSectionContent extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
+                  leading: const Icon(Icons.build_circle_outlined),
+                  title: Text(context.l10n.transfer_export_maintenanceTitle),
+                  subtitle: Text(
+                    context.l10n.transfer_export_maintenanceSubtitle,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _showExportOptions(
+                    context,
+                    ref,
+                    title: context.l10n.transfer_export_maintenanceTitle,
+                    shareAction: () => ref
+                        .read(exportNotifierProvider.notifier)
+                        .exportMaintenanceLog(),
+                    saveAction: () => ref
+                        .read(exportNotifierProvider.notifier)
+                        .saveMaintenanceLogToFile(),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
                   leading: const Icon(Icons.map),
                   title: Text(context.l10n.transfer_export_kmlTitle),
                   subtitle: Text(context.l10n.transfer_export_kmlSubtitle),

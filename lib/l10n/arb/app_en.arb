@@ -6157,6 +6157,16 @@
   "equipment_serviceDialog_snackbar_error": "Error: {error}",
   "equipment_serviceDialog_snackbar_updated": "Service record updated",
   "equipment_serviceDialog_updateButton": "Update",
+  "equipment_serviceType_annual": "Annual Service",
+  "equipment_serviceType_repair": "Repair",
+  "equipment_serviceType_inspection": "Inspection",
+  "equipment_serviceType_overhaul": "Overhaul",
+  "equipment_serviceType_replacement": "Part Replacement",
+  "equipment_serviceType_cleaning": "Cleaning",
+  "equipment_serviceType_calibration": "Calibration",
+  "equipment_serviceType_warranty": "Warranty Service",
+  "equipment_serviceType_recall": "Recall/Safety",
+  "equipment_serviceType_other": "Other",
   "equipment_service_addButton": "Add",
   "equipment_service_deleteDialog_cancel": "Cancel",
   "equipment_service_deleteDialog_confirm": "Delete",
@@ -6166,6 +6176,43 @@
   "equipment_service_editMenuItem": "Edit",
   "equipment_service_emptyState": "No service records yet",
   "equipment_service_historyTitle": "Service History",
+  "equipment_service_nextDueLabel": "Next due {date}",
+  "@equipment_service_nextDueLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "equipment_service_filterTaskAll": "All tasks",
+  "equipment_service_filterTypeAll": "All types",
+  "equipment_service_filterYearAll": "All years",
+  "equipment_service_filterUntagged": "Not tied to a clock",
+  "equipment_service_filterClear": "Clear filter",
+  "equipment_service_filterNoMatches": "No maintenance matches this filter",
+  "equipment_service_filterMatchCount": "{count} of {total} shown",
+  "@equipment_service_filterMatchCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "equipment_serviceKinds_defaultCostLabel": "Default price",
+  "equipment_serviceKinds_defaultCostHint": "Leave blank for no default",
+  "equipment_scheduleDialog_defaultCostLabel": "Default price for this item",
+  "equipment_serviceKinds_defaultCurrencyLabel": "Currency",
+  "equipment_service_exportMenuItem": "Export maintenance log",
+  "transfer_export_maintenanceTitle": "Maintenance Log",
+  "transfer_export_maintenanceSubtitle": "Service history for all equipment as a spreadsheet",
+  "settings_export_progress_maintenance": "Exporting maintenance log...",
+  "settings_export_success_maintenance": "Maintenance log exported",
+  "settings_export_saved_maintenance": "Maintenance log saved",
+  "equipment_serviceKinds_defaultCurrencyInherit": "Use default currency",
+  "equipment_scheduleDialog_defaultCurrencyLabel": "Currency for this item",
   "equipment_service_snackbar_deleted": "Service record deleted",
   "equipment_service_totalCostLabel": "Total Service Cost",
   "equipment_setDetail_addEquipmentButton": "Add Equipment",

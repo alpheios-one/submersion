@@ -10990,6 +10990,36 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Bijwerken';
 
   @override
+  String get equipment_serviceType_annual => 'Jaarlijkse service';
+
+  @override
+  String get equipment_serviceType_repair => 'Reparatie';
+
+  @override
+  String get equipment_serviceType_inspection => 'Inspectie';
+
+  @override
+  String get equipment_serviceType_overhaul => 'Revisie';
+
+  @override
+  String get equipment_serviceType_replacement => 'Onderdeelvervanging';
+
+  @override
+  String get equipment_serviceType_cleaning => 'Reiniging';
+
+  @override
+  String get equipment_serviceType_calibration => 'Kalibratie';
+
+  @override
+  String get equipment_serviceType_warranty => 'Garantieservice';
+
+  @override
+  String get equipment_serviceType_recall => 'Terugroepactie/Veiligheid';
+
+  @override
+  String get equipment_serviceType_other => 'Overig';
+
+  @override
   String get equipment_service_addButton => 'Toevoegen';
 
   @override
@@ -11018,6 +11048,80 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get equipment_service_historyTitle => 'Servicegeschiedenis';
+
+  @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'Volgende vervaldatum $date';
+  }
+
+  @override
+  String get equipment_service_filterTaskAll => 'Alle taken';
+
+  @override
+  String get equipment_service_filterTypeAll => 'Alle typen';
+
+  @override
+  String get equipment_service_filterYearAll => 'Alle jaren';
+
+  @override
+  String get equipment_service_filterUntagged =>
+      'Niet aan een interval gekoppeld';
+
+  @override
+  String get equipment_service_filterClear => 'Filter wissen';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'Geen onderhoud voldoet aan dit filter';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '$count van $total getoond';
+  }
+
+  @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Standaardprijs';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Laat leeg voor geen standaardwaarde';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Standaardprijs voor dit item';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Valuta';
+
+  @override
+  String get equipment_service_exportMenuItem => 'Onderhoudslogboek exporteren';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'Onderhoudslogboek';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'Servicegeschiedenis van alle uitrusting als spreadsheet';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'Onderhoudslogboek exporteren...';
+
+  @override
+  String get settings_export_success_maintenance =>
+      'Onderhoudslogboek geëxporteerd';
+
+  @override
+  String get settings_export_saved_maintenance =>
+      'Onderhoudslogboek opgeslagen';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Standaardvaluta gebruiken';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Valuta voor dit item';
 
   @override
   String get equipment_service_snackbar_deleted => 'Servicerecord verwijderd';

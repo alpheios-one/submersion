@@ -11072,6 +11072,36 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Aggiorna';
 
   @override
+  String get equipment_serviceType_annual => 'Manutenzione annuale';
+
+  @override
+  String get equipment_serviceType_repair => 'Riparazione';
+
+  @override
+  String get equipment_serviceType_inspection => 'Ispezione';
+
+  @override
+  String get equipment_serviceType_overhaul => 'Revisione generale';
+
+  @override
+  String get equipment_serviceType_replacement => 'Sostituzione ricambi';
+
+  @override
+  String get equipment_serviceType_cleaning => 'Pulizia';
+
+  @override
+  String get equipment_serviceType_calibration => 'Calibrazione';
+
+  @override
+  String get equipment_serviceType_warranty => 'Assistenza in garanzia';
+
+  @override
+  String get equipment_serviceType_recall => 'Richiamo/Sicurezza';
+
+  @override
+  String get equipment_serviceType_other => 'Altro';
+
+  @override
   String get equipment_service_addButton => 'Aggiungi';
 
   @override
@@ -11100,6 +11130,81 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get equipment_service_historyTitle => 'Storico manutenzioni';
+
+  @override
+  String equipment_service_nextDueLabel(String date) {
+    return 'Prossima scadenza $date';
+  }
+
+  @override
+  String get equipment_service_filterTaskAll => 'Tutte le attività';
+
+  @override
+  String get equipment_service_filterTypeAll => 'Tutti i tipi';
+
+  @override
+  String get equipment_service_filterYearAll => 'Tutti gli anni';
+
+  @override
+  String get equipment_service_filterUntagged =>
+      'Non associato a un intervallo';
+
+  @override
+  String get equipment_service_filterClear => 'Azzera filtro';
+
+  @override
+  String get equipment_service_filterNoMatches =>
+      'Nessuna manutenzione corrisponde a questo filtro';
+
+  @override
+  String equipment_service_filterMatchCount(int count, int total) {
+    return '$count di $total mostrati';
+  }
+
+  @override
+  String get equipment_serviceKinds_defaultCostLabel => 'Prezzo predefinito';
+
+  @override
+  String get equipment_serviceKinds_defaultCostHint =>
+      'Lascia vuoto per nessun valore predefinito';
+
+  @override
+  String get equipment_scheduleDialog_defaultCostLabel =>
+      'Prezzo predefinito per questa attrezzatura';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyLabel => 'Valuta';
+
+  @override
+  String get equipment_service_exportMenuItem =>
+      'Esporta registro di manutenzione';
+
+  @override
+  String get transfer_export_maintenanceTitle => 'Registro di manutenzione';
+
+  @override
+  String get transfer_export_maintenanceSubtitle =>
+      'Cronologia di manutenzione di tutta l\'attrezzatura come foglio di calcolo';
+
+  @override
+  String get settings_export_progress_maintenance =>
+      'Esportazione del registro di manutenzione...';
+
+  @override
+  String get settings_export_success_maintenance =>
+      'Registro di manutenzione esportato';
+
+  @override
+  String get settings_export_saved_maintenance =>
+      'Registro di manutenzione salvato';
+
+  @override
+  String get equipment_serviceKinds_defaultCurrencyInherit =>
+      'Usa la valuta predefinita';
+
+  @override
+  String get equipment_scheduleDialog_defaultCurrencyLabel =>
+      'Valuta per questa attrezzatura';
 
   @override
   String get equipment_service_snackbar_deleted =>

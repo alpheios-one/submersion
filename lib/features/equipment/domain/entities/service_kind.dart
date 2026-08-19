@@ -13,6 +13,12 @@ class ServiceKind extends Equatable {
   final int? defaultIntervalDays;
   final int? defaultIntervalDives;
   final double? defaultIntervalHours;
+
+  /// Default price prefilled when logging this maintenance. Null currency
+  /// means "no opinion, use the diver's default currency".
+  final double? defaultCost;
+  final String? defaultCurrency;
+
   final bool autoAttach;
   final bool isBuiltIn;
   final DateTime createdAt;
@@ -26,6 +32,8 @@ class ServiceKind extends Equatable {
     this.defaultIntervalDays,
     this.defaultIntervalDives,
     this.defaultIntervalHours,
+    this.defaultCost,
+    this.defaultCurrency,
     this.autoAttach = false,
     this.isBuiltIn = false,
     required this.createdAt,
@@ -35,10 +43,11 @@ class ServiceKind extends Equatable {
   bool appliesTo(EquipmentType type) =>
       applicableTypes.isEmpty || applicableTypes.contains(type);
 
-  /// The nullable fields (diverId/defaultInterval*) use the [_undefined]
-  /// sentinel so callers can explicitly clear them to null (e.g. promote a
-  /// custom kind to shared by clearing diverId, or drop a default interval)
-  /// rather than only ever overwriting with a non-null value. Mirrors
+  /// The nullable fields (diverId/defaultInterval*/defaultCost/
+  /// defaultCurrency) use the [_undefined] sentinel so callers can explicitly
+  /// clear them to null (e.g. promote a custom kind to shared by clearing
+  /// diverId, drop a default interval, or remove a default price) rather than
+  /// only ever overwriting with a non-null value. Mirrors
   /// [ServiceSchedule.copyWith].
   ServiceKind copyWith({
     String? id,
@@ -48,6 +57,8 @@ class ServiceKind extends Equatable {
     Object? defaultIntervalDays = _undefined,
     Object? defaultIntervalDives = _undefined,
     Object? defaultIntervalHours = _undefined,
+    Object? defaultCost = _undefined,
+    Object? defaultCurrency = _undefined,
     bool? autoAttach,
     bool? isBuiltIn,
     DateTime? createdAt,
@@ -67,6 +78,12 @@ class ServiceKind extends Equatable {
       defaultIntervalHours: defaultIntervalHours == _undefined
           ? this.defaultIntervalHours
           : defaultIntervalHours as double?,
+      defaultCost: defaultCost == _undefined
+          ? this.defaultCost
+          : defaultCost as double?,
+      defaultCurrency: defaultCurrency == _undefined
+          ? this.defaultCurrency
+          : defaultCurrency as String?,
       autoAttach: autoAttach ?? this.autoAttach,
       isBuiltIn: isBuiltIn ?? this.isBuiltIn,
       createdAt: createdAt ?? this.createdAt,
@@ -83,6 +100,8 @@ class ServiceKind extends Equatable {
     defaultIntervalDays,
     defaultIntervalDives,
     defaultIntervalHours,
+    defaultCost,
+    defaultCurrency,
     autoAttach,
     isBuiltIn,
     createdAt,

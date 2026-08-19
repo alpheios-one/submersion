@@ -61,6 +61,8 @@ class ServiceScheduleRepository {
             intervalDays: Value(schedule.intervalDays),
             intervalDives: Value(schedule.intervalDives),
             intervalHours: Value(schedule.intervalHours),
+            defaultCost: Value(schedule.defaultCost),
+            defaultCurrency: Value(schedule.defaultCurrency),
             anchorDate: Value(schedule.anchorDate?.millisecondsSinceEpoch),
             enabled: Value(schedule.enabled),
             createdAt: Value(now.millisecondsSinceEpoch),
@@ -85,6 +87,8 @@ class ServiceScheduleRepository {
         intervalDays: Value(schedule.intervalDays),
         intervalDives: Value(schedule.intervalDives),
         intervalHours: Value(schedule.intervalHours),
+        defaultCost: Value(schedule.defaultCost),
+        defaultCurrency: Value(schedule.defaultCurrency),
         anchorDate: Value(schedule.anchorDate?.millisecondsSinceEpoch),
         enabled: Value(schedule.enabled),
         updatedAt: Value(now),
@@ -173,6 +177,8 @@ class ServiceScheduleRepository {
       intervalDays: row.intervalDays,
       intervalDives: row.intervalDives,
       intervalHours: row.intervalHours,
+      defaultCost: row.defaultCost,
+      defaultCurrency: row.defaultCurrency,
       anchorDate: row.anchorDate == null
           ? null
           : DateTime.fromMillisecondsSinceEpoch(row.anchorDate!),
