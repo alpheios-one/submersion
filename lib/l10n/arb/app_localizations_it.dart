@@ -11053,7 +11053,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Seleziona data manutenzione';
 
   @override
-  String get equipment_serviceDialog_serviceTypeLabel => 'Tipo di manutenzione';
+  String get equipment_serviceDialog_categoryLabel => 'Categoria';
 
   @override
   String get equipment_serviceDialog_snackbar_added =>
@@ -11072,34 +11072,34 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Aggiorna';
 
   @override
-  String get equipment_serviceType_annual => 'Manutenzione annuale';
+  String get equipment_serviceCategory_annual => 'Manutenzione annuale';
 
   @override
-  String get equipment_serviceType_repair => 'Riparazione';
+  String get equipment_serviceCategory_repair => 'Riparazione';
 
   @override
-  String get equipment_serviceType_inspection => 'Ispezione';
+  String get equipment_serviceCategory_inspection => 'Ispezione';
 
   @override
-  String get equipment_serviceType_overhaul => 'Revisione generale';
+  String get equipment_serviceCategory_overhaul => 'Revisione generale';
 
   @override
-  String get equipment_serviceType_replacement => 'Sostituzione ricambi';
+  String get equipment_serviceCategory_replacement => 'Sostituzione ricambi';
 
   @override
-  String get equipment_serviceType_cleaning => 'Pulizia';
+  String get equipment_serviceCategory_cleaning => 'Pulizia';
 
   @override
-  String get equipment_serviceType_calibration => 'Calibrazione';
+  String get equipment_serviceCategory_calibration => 'Calibrazione';
 
   @override
-  String get equipment_serviceType_warranty => 'Assistenza in garanzia';
+  String get equipment_serviceCategory_warranty => 'Assistenza in garanzia';
 
   @override
-  String get equipment_serviceType_recall => 'Richiamo/Sicurezza';
+  String get equipment_serviceCategory_recall => 'Richiamo/Sicurezza';
 
   @override
-  String get equipment_serviceType_other => 'Altro';
+  String get equipment_serviceCategory_other => 'Altro';
 
   @override
   String get equipment_service_addButton => 'Aggiungi';

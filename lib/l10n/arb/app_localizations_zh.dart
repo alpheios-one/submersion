@@ -10557,7 +10557,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceDialog_serviceDateSemanticLabel => '选择维护日期';
 
   @override
-  String get equipment_serviceDialog_serviceTypeLabel => '维护类型';
+  String get equipment_serviceDialog_categoryLabel => '类别';
 
   @override
   String get equipment_serviceDialog_snackbar_added => '维护记录已添加';
@@ -10574,34 +10574,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => '更新';
 
   @override
-  String get equipment_serviceType_annual => '年度保养';
+  String get equipment_serviceCategory_annual => '年度保养';
 
   @override
-  String get equipment_serviceType_repair => '维修';
+  String get equipment_serviceCategory_repair => '维修';
 
   @override
-  String get equipment_serviceType_inspection => '检查';
+  String get equipment_serviceCategory_inspection => '检查';
 
   @override
-  String get equipment_serviceType_overhaul => '大修';
+  String get equipment_serviceCategory_overhaul => '大修';
 
   @override
-  String get equipment_serviceType_replacement => '部件更换';
+  String get equipment_serviceCategory_replacement => '部件更换';
 
   @override
-  String get equipment_serviceType_cleaning => '清洁';
+  String get equipment_serviceCategory_cleaning => '清洁';
 
   @override
-  String get equipment_serviceType_calibration => '校准';
+  String get equipment_serviceCategory_calibration => '校准';
 
   @override
-  String get equipment_serviceType_warranty => '保修服务';
+  String get equipment_serviceCategory_warranty => '保修服务';
 
   @override
-  String get equipment_serviceType_recall => '召回/安全';
+  String get equipment_serviceCategory_recall => '召回/安全';
 
   @override
-  String get equipment_serviceType_other => '其他';
+  String get equipment_serviceCategory_other => '其他';
 
   @override
   String get equipment_service_addButton => '添加';

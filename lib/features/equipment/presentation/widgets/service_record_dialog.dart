@@ -10,7 +10,7 @@ import 'package:submersion/features/equipment/domain/entities/service_record.dar
 import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
 import 'package:submersion/features/equipment/domain/services/default_service_cost_resolver.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
-import 'package:submersion/features/equipment/presentation/utils/service_type_label.dart';
+import 'package:submersion/features/equipment/presentation/utils/service_category_label.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
@@ -39,7 +39,7 @@ class ServiceRecordDialog extends ConsumerStatefulWidget {
 
 class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   final _formKey = GlobalKey<FormState>();
-  late ServiceType _serviceType;
+  late ServiceCategory _serviceCategory;
   late DateTime _serviceDate;
   final _providerController = TextEditingController();
   final _costController = TextEditingController();
@@ -71,7 +71,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
     super.initState();
     if (isEditing) {
       final record = widget.existingRecord!;
-      _serviceType = record.serviceType;
+      _serviceCategory = record.serviceCategory;
       _serviceDate = record.serviceDate;
       _providerController.text = record.provider ?? '';
       // Seeded in the diver's locale to match how the field is read back;
@@ -83,7 +83,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
       _nextServiceDue = record.nextServiceDue;
       _serviceKindId = record.serviceKindId;
     } else {
-      _serviceType = ServiceType.annual;
+      _serviceCategory = ServiceCategory.annual;
       _serviceDate = DateTime.now();
       _serviceKindId = widget.serviceKindId;
       _initialCurrencyCode = _fallbackCurrencyCode();
@@ -184,14 +184,14 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Service type dropdown
-                DropdownButtonFormField<ServiceType>(
-                  initialValue: _serviceType,
+                DropdownButtonFormField<ServiceCategory>(
+                  initialValue: _serviceCategory,
                   decoration: InputDecoration(
                     labelText:
-                        context.l10n.equipment_serviceDialog_serviceTypeLabel,
+                        context.l10n.equipment_serviceDialog_categoryLabel,
                     prefixIcon: const Icon(Icons.build),
                   ),
-                  items: ServiceType.values.map((type) {
+                  items: ServiceCategory.values.map((type) {
                     return DropdownMenuItem(
                       value: type,
                       child: Text(type.label(context.l10n)),
@@ -199,7 +199,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
                   }).toList(),
                   onChanged: (value) {
                     if (value != null) {
-                      setState(() => _serviceType = value);
+                      setState(() => _serviceCategory = value);
                     }
                   },
                 ),
@@ -478,7 +478,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
       final record = ServiceRecord(
         id: widget.existingRecord?.id ?? '',
         equipmentId: widget.equipmentId,
-        serviceType: _serviceType,
+        serviceCategory: _serviceCategory,
         serviceKindId: _serviceKindId,
         serviceDate: _serviceDate,
         provider: _providerController.text.trim().isEmpty

@@ -832,11 +832,11 @@ class UddfImportParsers {
 
     record['equipmentRef'] = getElementText(recordElement, 'equipmentref');
 
-    final serviceType = getElementText(recordElement, 'servicetype');
-    if (serviceType != null) {
-      record['serviceType'] = parseEnumValue(
-        serviceType,
-        enums.ServiceType.values,
+    final serviceCategory = getElementText(recordElement, 'servicetype');
+    if (serviceCategory != null) {
+      record['serviceCategory'] = parseEnumValue(
+        serviceCategory,
+        enums.ServiceCategory.values,
       );
     }
 

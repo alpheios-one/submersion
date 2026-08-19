@@ -24,11 +24,11 @@ void main() {
     required String id,
     required String equipmentId,
     String? kindId,
-    ServiceType type = ServiceType.cleaning,
+    ServiceCategory type = ServiceCategory.cleaning,
   }) => ServiceRecord(
     id: id,
     equipmentId: equipmentId,
-    serviceType: type,
+    serviceCategory: type,
     serviceKindId: kindId,
     serviceDate: t0,
     cost: 45,

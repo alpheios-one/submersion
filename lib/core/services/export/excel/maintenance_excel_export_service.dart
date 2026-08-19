@@ -19,7 +19,7 @@ typedef MaintenanceLogRow = ({
   String equipmentName,
   String equipmentType,
   String taskName,
-  ServiceType serviceType,
+  ServiceCategory serviceCategory,
   ServiceRecord record,
 });
 
@@ -67,7 +67,7 @@ class MaintenanceExcelExportService {
         entry.equipmentName,
         entry.equipmentType,
         entry.taskName,
-        entry.serviceType.displayName,
+        entry.serviceCategory.displayName,
         formatDateForExport(record.serviceDate, dateFormat),
         record.provider ?? '',
         record.cost,

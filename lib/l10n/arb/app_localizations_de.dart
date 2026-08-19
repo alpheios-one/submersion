@@ -11047,7 +11047,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wartungsdatum auswählen';
 
   @override
-  String get equipment_serviceDialog_serviceTypeLabel => 'Wartungsart';
+  String get equipment_serviceDialog_categoryLabel => 'Kategorie';
 
   @override
   String get equipment_serviceDialog_snackbar_added =>
@@ -11066,34 +11066,34 @@ class AppLocalizationsDe extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Aktualisieren';
 
   @override
-  String get equipment_serviceType_annual => 'Jahresservice';
+  String get equipment_serviceCategory_annual => 'Jahresservice';
 
   @override
-  String get equipment_serviceType_repair => 'Reparatur';
+  String get equipment_serviceCategory_repair => 'Reparatur';
 
   @override
-  String get equipment_serviceType_inspection => 'Inspektion';
+  String get equipment_serviceCategory_inspection => 'Inspektion';
 
   @override
-  String get equipment_serviceType_overhaul => 'Überholung';
+  String get equipment_serviceCategory_overhaul => 'Überholung';
 
   @override
-  String get equipment_serviceType_replacement => 'Teiletausch';
+  String get equipment_serviceCategory_replacement => 'Teiletausch';
 
   @override
-  String get equipment_serviceType_cleaning => 'Reinigung';
+  String get equipment_serviceCategory_cleaning => 'Reinigung';
 
   @override
-  String get equipment_serviceType_calibration => 'Kalibrierung';
+  String get equipment_serviceCategory_calibration => 'Kalibrierung';
 
   @override
-  String get equipment_serviceType_warranty => 'Garantieservice';
+  String get equipment_serviceCategory_warranty => 'Garantieservice';
 
   @override
-  String get equipment_serviceType_recall => 'Rückruf/Sicherheit';
+  String get equipment_serviceCategory_recall => 'Rückruf/Sicherheit';
 
   @override
-  String get equipment_serviceType_other => 'Sonstiges';
+  String get equipment_serviceCategory_other => 'Sonstiges';
 
   @override
   String get equipment_service_addButton => 'Hinzufügen';

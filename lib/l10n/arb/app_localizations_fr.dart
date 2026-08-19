@@ -11085,7 +11085,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Choisir la date de revision';
 
   @override
-  String get equipment_serviceDialog_serviceTypeLabel => 'Type de revision';
+  String get equipment_serviceDialog_categoryLabel => 'Catégorie';
 
   @override
   String get equipment_serviceDialog_snackbar_added =>
@@ -11104,34 +11104,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Mettre a jour';
 
   @override
-  String get equipment_serviceType_annual => 'Révision annuelle';
+  String get equipment_serviceCategory_annual => 'Révision annuelle';
 
   @override
-  String get equipment_serviceType_repair => 'Réparation';
+  String get equipment_serviceCategory_repair => 'Réparation';
 
   @override
-  String get equipment_serviceType_inspection => 'Inspection';
+  String get equipment_serviceCategory_inspection => 'Inspection';
 
   @override
-  String get equipment_serviceType_overhaul => 'Révision complète';
+  String get equipment_serviceCategory_overhaul => 'Révision complète';
 
   @override
-  String get equipment_serviceType_replacement => 'Remplacement de pièces';
+  String get equipment_serviceCategory_replacement => 'Remplacement de pièces';
 
   @override
-  String get equipment_serviceType_cleaning => 'Nettoyage';
+  String get equipment_serviceCategory_cleaning => 'Nettoyage';
 
   @override
-  String get equipment_serviceType_calibration => 'Étalonnage';
+  String get equipment_serviceCategory_calibration => 'Étalonnage';
 
   @override
-  String get equipment_serviceType_warranty => 'Service sous garantie';
+  String get equipment_serviceCategory_warranty => 'Service sous garantie';
 
   @override
-  String get equipment_serviceType_recall => 'Rappel/Sécurité';
+  String get equipment_serviceCategory_recall => 'Rappel/Sécurité';
 
   @override
-  String get equipment_serviceType_other => 'Autre';
+  String get equipment_serviceCategory_other => 'Autre';
 
   @override
   String get equipment_service_addButton => 'Ajouter';

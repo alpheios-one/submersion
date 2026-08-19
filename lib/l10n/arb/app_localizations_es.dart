@@ -11045,7 +11045,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Seleccionar fecha de servicio';
 
   @override
-  String get equipment_serviceDialog_serviceTypeLabel => 'Tipo de servicio';
+  String get equipment_serviceDialog_categoryLabel => 'Categoría';
 
   @override
   String get equipment_serviceDialog_snackbar_added =>
@@ -11064,34 +11064,34 @@ class AppLocalizationsEs extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Actualizar';
 
   @override
-  String get equipment_serviceType_annual => 'Servicio anual';
+  String get equipment_serviceCategory_annual => 'Servicio anual';
 
   @override
-  String get equipment_serviceType_repair => 'Reparación';
+  String get equipment_serviceCategory_repair => 'Reparación';
 
   @override
-  String get equipment_serviceType_inspection => 'Inspección';
+  String get equipment_serviceCategory_inspection => 'Inspección';
 
   @override
-  String get equipment_serviceType_overhaul => 'Revisión general';
+  String get equipment_serviceCategory_overhaul => 'Revisión general';
 
   @override
-  String get equipment_serviceType_replacement => 'Sustitución de piezas';
+  String get equipment_serviceCategory_replacement => 'Sustitución de piezas';
 
   @override
-  String get equipment_serviceType_cleaning => 'Limpieza';
+  String get equipment_serviceCategory_cleaning => 'Limpieza';
 
   @override
-  String get equipment_serviceType_calibration => 'Calibración';
+  String get equipment_serviceCategory_calibration => 'Calibración';
 
   @override
-  String get equipment_serviceType_warranty => 'Servicio en garantía';
+  String get equipment_serviceCategory_warranty => 'Servicio en garantía';
 
   @override
-  String get equipment_serviceType_recall => 'Retirada/Seguridad';
+  String get equipment_serviceCategory_recall => 'Retirada/Seguridad';
 
   @override
-  String get equipment_serviceType_other => 'Otro';
+  String get equipment_serviceCategory_other => 'Otro';
 
   @override
   String get equipment_service_addButton => 'Agregar';

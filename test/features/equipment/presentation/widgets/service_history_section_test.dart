@@ -27,7 +27,7 @@ void main() {
   ServiceRecord record({
     required String id,
     String? kindId,
-    ServiceType type = ServiceType.cleaning,
+    ServiceCategory type = ServiceCategory.cleaning,
     DateTime? date,
     double? cost,
     String? provider,
@@ -38,7 +38,7 @@ void main() {
     return ServiceRecord(
       id: id,
       equipmentId: equipmentId,
-      serviceType: type,
+      serviceCategory: type,
       serviceKindId: kindId,
       serviceDate: when,
       provider: provider,
@@ -125,7 +125,7 @@ void main() {
   ) async {
     await pumpSection(
       tester,
-      records: [record(id: 'r1', type: ServiceType.cleaning)],
+      records: [record(id: 'r1', type: ServiceCategory.cleaning)],
       kinds: const [],
       locale: const Locale('de'),
     );
@@ -203,7 +203,7 @@ void main() {
         record(
           id: 'r2',
           kindId: 'disinfect',
-          type: ServiceType.repair,
+          type: ServiceCategory.repair,
           date: DateTime(2024, 3, 14),
         ),
       ],
@@ -313,10 +313,10 @@ void main() {
       await pumpSection(
         tester,
         records: [
-          for (var i = 0; i < ServiceType.values.length; i++)
+          for (var i = 0; i < ServiceCategory.values.length; i++)
             record(
               id: 'r$i',
-              type: ServiceType.values[i],
+              type: ServiceCategory.values[i],
               date: DateTime(2026, 1, i + 1),
             ),
         ],
@@ -327,7 +327,7 @@ void main() {
       // falling through to a shared default.
       expect(
         find.byType(CircleAvatar),
-        findsNWidgets(ServiceType.values.length),
+        findsNWidgets(ServiceCategory.values.length),
       );
     });
   });

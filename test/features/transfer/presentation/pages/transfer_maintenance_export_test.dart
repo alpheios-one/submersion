@@ -30,7 +30,7 @@ void main() {
   ServiceRecord record() => ServiceRecord(
     id: 'r1',
     equipmentId: 'e1',
-    serviceType: ServiceType.cleaning,
+    serviceCategory: ServiceCategory.cleaning,
     serviceKindId: null,
     serviceDate: t0,
     cost: 45,

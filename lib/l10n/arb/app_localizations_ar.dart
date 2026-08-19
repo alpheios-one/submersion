@@ -10862,7 +10862,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'اختيار تاريخ الصيانة';
 
   @override
-  String get equipment_serviceDialog_serviceTypeLabel => 'نوع الصيانة';
+  String get equipment_serviceDialog_categoryLabel => 'الفئة';
 
   @override
   String get equipment_serviceDialog_snackbar_added => 'تمت إضافة سجل الصيانة';
@@ -10879,34 +10879,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'تحديث';
 
   @override
-  String get equipment_serviceType_annual => 'الصيانة السنوية';
+  String get equipment_serviceCategory_annual => 'الصيانة السنوية';
 
   @override
-  String get equipment_serviceType_repair => 'إصلاح';
+  String get equipment_serviceCategory_repair => 'إصلاح';
 
   @override
-  String get equipment_serviceType_inspection => 'فحص';
+  String get equipment_serviceCategory_inspection => 'فحص';
 
   @override
-  String get equipment_serviceType_overhaul => 'عمرة شاملة';
+  String get equipment_serviceCategory_overhaul => 'عمرة شاملة';
 
   @override
-  String get equipment_serviceType_replacement => 'استبدال قطع';
+  String get equipment_serviceCategory_replacement => 'استبدال قطع';
 
   @override
-  String get equipment_serviceType_cleaning => 'تنظيف';
+  String get equipment_serviceCategory_cleaning => 'تنظيف';
 
   @override
-  String get equipment_serviceType_calibration => 'معايرة';
+  String get equipment_serviceCategory_calibration => 'معايرة';
 
   @override
-  String get equipment_serviceType_warranty => 'خدمة الضمان';
+  String get equipment_serviceCategory_warranty => 'خدمة الضمان';
 
   @override
-  String get equipment_serviceType_recall => 'استدعاء/سلامة';
+  String get equipment_serviceCategory_recall => 'استدعاء/سلامة';
 
   @override
-  String get equipment_serviceType_other => 'أخرى';
+  String get equipment_serviceCategory_other => 'أخرى';
 
   @override
   String get equipment_service_addButton => 'إضافة';

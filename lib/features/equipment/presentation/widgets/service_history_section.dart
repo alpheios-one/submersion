@@ -10,7 +10,7 @@ import 'package:submersion/features/equipment/domain/entities/service_record.dar
 import 'package:submersion/features/equipment/domain/entities/maintenance_history_filter.dart';
 import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
-import 'package:submersion/features/equipment/presentation/utils/service_type_label.dart';
+import 'package:submersion/features/equipment/presentation/utils/service_category_label.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_record_dialog.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -275,7 +275,7 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
           equipmentName: item?.name ?? '',
           equipmentType: item?.type.displayName ?? '',
           taskName: kindsById[record.serviceKindId]?.name ?? '',
-          serviceType: record.serviceType,
+          serviceCategory: record.serviceCategory,
           record: record,
         ),
     ];
@@ -319,8 +319,8 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
     ];
   }
 
-  List<ServiceType?> _typeOptions(List<ServiceRecord> records) {
-    final types = {for (final r in records) r.serviceType}.toList()
+  List<ServiceCategory?> _typeOptions(List<ServiceRecord> records) {
+    final types = {for (final r in records) r.serviceCategory}.toList()
       ..sort((a, b) => a.index.compareTo(b.index));
     return [null, ...types];
   }
@@ -375,13 +375,13 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
                 onChanged: (value) => setState(
                   () => _filter = _filter.copyWith(
                     serviceKindId: value,
-                    serviceType: _filter.serviceType,
+                    serviceCategory: _filter.serviceCategory,
                     year: _filter.year,
                   ),
                 ),
               ),
-              _FilterDropdown<ServiceType?>(
-                value: _filter.serviceType,
+              _FilterDropdown<ServiceCategory?>(
+                value: _filter.serviceCategory,
                 options: _typeOptions(records),
                 labelOf: (type) => type == null
                     ? l10n.equipment_service_filterTypeAll
@@ -389,7 +389,7 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
                 onChanged: (value) => setState(
                   () => _filter = _filter.copyWith(
                     serviceKindId: _filter.serviceKindId,
-                    serviceType: value,
+                    serviceCategory: value,
                     year: _filter.year,
                   ),
                 ),
@@ -403,7 +403,7 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
                 onChanged: (value) => setState(
                   () => _filter = _filter.copyWith(
                     serviceKindId: _filter.serviceKindId,
-                    serviceType: _filter.serviceType,
+                    serviceCategory: _filter.serviceCategory,
                     year: value,
                   ),
                 ),
@@ -479,7 +479,7 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
         title: Text(context.l10n.equipment_service_deleteDialog_title),
         content: Text(
           context.l10n.equipment_service_deleteDialog_content(
-            record.serviceType.label(context.l10n),
+            record.serviceCategory.label(context.l10n),
           ),
         ),
         actions: [
@@ -542,7 +542,7 @@ class _ServiceRecordTile extends ConsumerWidget {
     // category of work". Issue #829 asks for both, and the task is the one
     // that identifies the row, so it takes the title.
     final kindName = kindsById[record.serviceKindId]?.name;
-    final typeLabel = record.serviceType.label(l10n);
+    final typeLabel = record.serviceCategory.label(l10n);
 
     final providerAndCost = [
       if (record.provider != null && record.provider!.isNotEmpty)
@@ -556,7 +556,7 @@ class _ServiceRecordTile extends ConsumerWidget {
       leading: CircleAvatar(
         backgroundColor: theme.colorScheme.primaryContainer,
         child: Icon(
-          _getServiceTypeIcon(record.serviceType),
+          _getServiceCategoryIcon(record.serviceCategory),
           color: theme.colorScheme.onPrimaryContainer,
           size: 20,
         ),
@@ -626,27 +626,27 @@ class _ServiceRecordTile extends ConsumerWidget {
     );
   }
 
-  IconData _getServiceTypeIcon(ServiceType type) {
+  IconData _getServiceCategoryIcon(ServiceCategory type) {
     switch (type) {
-      case ServiceType.annual:
+      case ServiceCategory.annual:
         return Icons.event_repeat;
-      case ServiceType.repair:
+      case ServiceCategory.repair:
         return Icons.build;
-      case ServiceType.inspection:
+      case ServiceCategory.inspection:
         return Icons.search;
-      case ServiceType.overhaul:
+      case ServiceCategory.overhaul:
         return Icons.settings_suggest;
-      case ServiceType.replacement:
+      case ServiceCategory.replacement:
         return Icons.swap_horiz;
-      case ServiceType.cleaning:
+      case ServiceCategory.cleaning:
         return Icons.cleaning_services;
-      case ServiceType.calibration:
+      case ServiceCategory.calibration:
         return Icons.tune;
-      case ServiceType.warranty:
+      case ServiceCategory.warranty:
         return Icons.verified_user;
-      case ServiceType.recall:
+      case ServiceCategory.recall:
         return Icons.warning;
-      case ServiceType.other:
+      case ServiceCategory.other:
         return Icons.handyman;
     }
   }

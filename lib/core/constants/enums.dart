@@ -236,8 +236,11 @@ enum CertificationLevel {
   };
 }
 
-/// Service type for equipment maintenance
-enum ServiceType {
+/// The category of work a maintenance record represents (what kind of job it
+/// was), as distinct from the service type it fulfills, which is the
+/// user-extensible ServiceKind catalog. Renamed from ServiceType in v159:
+/// the catalog owns the words "service type" in the UI.
+enum ServiceCategory {
   annual('Annual Service'),
   repair('Repair'),
   inspection('Inspection'),
@@ -250,7 +253,7 @@ enum ServiceType {
   other('Other');
 
   final String displayName;
-  const ServiceType(this.displayName);
+  const ServiceCategory(this.displayName);
 }
 
 /// Current direction

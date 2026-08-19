@@ -26,7 +26,7 @@ ServiceRecord _record({
   return ServiceRecord(
     id: id,
     equipmentId: _equipment.id,
-    serviceType: ServiceType.annual,
+    serviceCategory: ServiceCategory.annual,
     serviceDate: DateTime(2026, 1, 1),
     cost: cost,
     currency: currency,

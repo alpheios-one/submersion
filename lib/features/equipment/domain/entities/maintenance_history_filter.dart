@@ -15,17 +15,17 @@ class MaintenanceHistoryFilter extends Equatable {
   static const untaggedSentinel = '__untagged__';
 
   final String? serviceKindId;
-  final ServiceType? serviceType;
+  final ServiceCategory? serviceCategory;
   final int? year;
 
   const MaintenanceHistoryFilter({
     this.serviceKindId,
-    this.serviceType,
+    this.serviceCategory,
     this.year,
   });
 
   bool get isActive =>
-      serviceKindId != null || serviceType != null || year != null;
+      serviceKindId != null || serviceCategory != null || year != null;
 
   bool matches(ServiceRecord record) {
     if (serviceKindId == untaggedSentinel) {
@@ -33,7 +33,9 @@ class MaintenanceHistoryFilter extends Equatable {
     } else if (serviceKindId != null && record.serviceKindId != serviceKindId) {
       return false;
     }
-    if (serviceType != null && record.serviceType != serviceType) return false;
+    if (serviceCategory != null && record.serviceCategory != serviceCategory) {
+      return false;
+    }
     if (year != null && record.serviceDate.year != year) return false;
     return true;
   }
@@ -46,14 +48,14 @@ class MaintenanceHistoryFilter extends Equatable {
   /// only thing any caller ever wants, so callers pass every field they keep.
   MaintenanceHistoryFilter copyWith({
     String? serviceKindId,
-    ServiceType? serviceType,
+    ServiceCategory? serviceCategory,
     int? year,
   }) => MaintenanceHistoryFilter(
     serviceKindId: serviceKindId,
-    serviceType: serviceType,
+    serviceCategory: serviceCategory,
     year: year,
   );
 
   @override
-  List<Object?> get props => [serviceKindId, serviceType, year];
+  List<Object?> get props => [serviceKindId, serviceCategory, year];
 }

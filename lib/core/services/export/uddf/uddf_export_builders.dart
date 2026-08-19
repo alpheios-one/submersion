@@ -1132,7 +1132,7 @@ class UddfExportBuilders {
                         );
                         builder.element(
                           'servicetype',
-                          nest: record.serviceType.name,
+                          nest: record.serviceCategory.name,
                         );
                         builder.element(
                           'servicedate',

@@ -10971,7 +10971,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kies servicedatum';
 
   @override
-  String get equipment_serviceDialog_serviceTypeLabel => 'Type service';
+  String get equipment_serviceDialog_categoryLabel => 'Categorie';
 
   @override
   String get equipment_serviceDialog_snackbar_added =>
@@ -10990,34 +10990,34 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Bijwerken';
 
   @override
-  String get equipment_serviceType_annual => 'Jaarlijkse service';
+  String get equipment_serviceCategory_annual => 'Jaarlijkse service';
 
   @override
-  String get equipment_serviceType_repair => 'Reparatie';
+  String get equipment_serviceCategory_repair => 'Reparatie';
 
   @override
-  String get equipment_serviceType_inspection => 'Inspectie';
+  String get equipment_serviceCategory_inspection => 'Inspectie';
 
   @override
-  String get equipment_serviceType_overhaul => 'Revisie';
+  String get equipment_serviceCategory_overhaul => 'Revisie';
 
   @override
-  String get equipment_serviceType_replacement => 'Onderdeelvervanging';
+  String get equipment_serviceCategory_replacement => 'Onderdeelvervanging';
 
   @override
-  String get equipment_serviceType_cleaning => 'Reiniging';
+  String get equipment_serviceCategory_cleaning => 'Reiniging';
 
   @override
-  String get equipment_serviceType_calibration => 'Kalibratie';
+  String get equipment_serviceCategory_calibration => 'Kalibratie';
 
   @override
-  String get equipment_serviceType_warranty => 'Garantieservice';
+  String get equipment_serviceCategory_warranty => 'Garantieservice';
 
   @override
-  String get equipment_serviceType_recall => 'Terugroepactie/Veiligheid';
+  String get equipment_serviceCategory_recall => 'Terugroepactie/Veiligheid';
 
   @override
-  String get equipment_serviceType_other => 'Overig';
+  String get equipment_serviceCategory_other => 'Overig';
 
   @override
   String get equipment_service_addButton => 'Toevoegen';

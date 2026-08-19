@@ -18814,11 +18814,11 @@ abstract class AppLocalizations {
   /// **'Pick service date'**
   String get equipment_serviceDialog_serviceDateSemanticLabel;
 
-  /// No description provided for @equipment_serviceDialog_serviceTypeLabel.
+  /// No description provided for @equipment_serviceDialog_categoryLabel.
   ///
   /// In en, this message translates to:
-  /// **'Service Type'**
-  String get equipment_serviceDialog_serviceTypeLabel;
+  /// **'Category'**
+  String get equipment_serviceDialog_categoryLabel;
 
   /// No description provided for @equipment_serviceDialog_snackbar_added.
   ///
@@ -18844,65 +18844,65 @@ abstract class AppLocalizations {
   /// **'Update'**
   String get equipment_serviceDialog_updateButton;
 
-  /// No description provided for @equipment_serviceType_annual.
+  /// No description provided for @equipment_serviceCategory_annual.
   ///
   /// In en, this message translates to:
   /// **'Annual Service'**
-  String get equipment_serviceType_annual;
+  String get equipment_serviceCategory_annual;
 
-  /// No description provided for @equipment_serviceType_repair.
+  /// No description provided for @equipment_serviceCategory_repair.
   ///
   /// In en, this message translates to:
   /// **'Repair'**
-  String get equipment_serviceType_repair;
+  String get equipment_serviceCategory_repair;
 
-  /// No description provided for @equipment_serviceType_inspection.
+  /// No description provided for @equipment_serviceCategory_inspection.
   ///
   /// In en, this message translates to:
   /// **'Inspection'**
-  String get equipment_serviceType_inspection;
+  String get equipment_serviceCategory_inspection;
 
-  /// No description provided for @equipment_serviceType_overhaul.
+  /// No description provided for @equipment_serviceCategory_overhaul.
   ///
   /// In en, this message translates to:
   /// **'Overhaul'**
-  String get equipment_serviceType_overhaul;
+  String get equipment_serviceCategory_overhaul;
 
-  /// No description provided for @equipment_serviceType_replacement.
+  /// No description provided for @equipment_serviceCategory_replacement.
   ///
   /// In en, this message translates to:
   /// **'Part Replacement'**
-  String get equipment_serviceType_replacement;
+  String get equipment_serviceCategory_replacement;
 
-  /// No description provided for @equipment_serviceType_cleaning.
+  /// No description provided for @equipment_serviceCategory_cleaning.
   ///
   /// In en, this message translates to:
   /// **'Cleaning'**
-  String get equipment_serviceType_cleaning;
+  String get equipment_serviceCategory_cleaning;
 
-  /// No description provided for @equipment_serviceType_calibration.
+  /// No description provided for @equipment_serviceCategory_calibration.
   ///
   /// In en, this message translates to:
   /// **'Calibration'**
-  String get equipment_serviceType_calibration;
+  String get equipment_serviceCategory_calibration;
 
-  /// No description provided for @equipment_serviceType_warranty.
+  /// No description provided for @equipment_serviceCategory_warranty.
   ///
   /// In en, this message translates to:
   /// **'Warranty Service'**
-  String get equipment_serviceType_warranty;
+  String get equipment_serviceCategory_warranty;
 
-  /// No description provided for @equipment_serviceType_recall.
+  /// No description provided for @equipment_serviceCategory_recall.
   ///
   /// In en, this message translates to:
   /// **'Recall/Safety'**
-  String get equipment_serviceType_recall;
+  String get equipment_serviceCategory_recall;
 
-  /// No description provided for @equipment_serviceType_other.
+  /// No description provided for @equipment_serviceCategory_other.
   ///
   /// In en, this message translates to:
   /// **'Other'**
-  String get equipment_serviceType_other;
+  String get equipment_serviceCategory_other;
 
   /// No description provided for @equipment_service_addButton.
   ///
