@@ -25,7 +25,7 @@ void main() {
   }) => (
     equipmentName: 'JJ-CCR',
     equipmentType: 'Rebreather',
-    taskName: task,
+    serviceTypeName: task,
     serviceCategory: ServiceCategory.cleaning,
     record: ServiceRecord(
       id: 'r1',
@@ -64,7 +64,7 @@ void main() {
     expect(headers, [
       'Equipment',
       'Equipment Type',
-      'Task',
+      'Service Type',
       'Category',
       'Date',
       'Provider',

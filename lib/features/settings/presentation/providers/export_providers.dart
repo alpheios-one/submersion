@@ -690,7 +690,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
           equipmentName: item.name,
           equipmentType: item.type.displayName,
           // Blank when the record is not tied to a clock.
-          taskName: kindsById[record.serviceKindId]?.name ?? '',
+          serviceTypeName: kindsById[record.serviceKindId]?.name ?? '',
           serviceCategory: record.serviceCategory,
           record: record,
         ));

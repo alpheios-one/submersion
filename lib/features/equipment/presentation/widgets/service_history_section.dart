@@ -274,7 +274,7 @@ class _ServiceHistorySectionState extends ConsumerState<ServiceHistorySection> {
         (
           equipmentName: item?.name ?? '',
           equipmentType: item?.type.displayName ?? '',
-          taskName: kindsById[record.serviceKindId]?.name ?? '',
+          serviceTypeName: kindsById[record.serviceKindId]?.name ?? '',
           serviceCategory: record.serviceCategory,
           record: record,
         ),

@@ -98,9 +98,9 @@ void main() {
         expect(fake.sharedRows, hasLength(2));
         expect(fake.sharedRows.first.equipmentName, 'JJ-CCR');
         expect(fake.sharedRows.first.equipmentType, 'Rebreather');
-        expect(fake.sharedRows.first.taskName, 'Scrubber repack');
+        expect(fake.sharedRows.first.serviceTypeName, 'Scrubber repack');
         // An untagged record still exports, with a blank task column.
-        expect(fake.sharedRows.last.taskName, isEmpty);
+        expect(fake.sharedRows.last.serviceTypeName, isEmpty);
 
         final state = container.read(exportNotifierProvider);
         expect(state.status, ExportStatus.success);

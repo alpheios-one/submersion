@@ -547,7 +547,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(fake.sharedRows, hasLength(1));
-      expect(fake.sharedRows.single.taskName, 'Disinfect');
+      expect(fake.sharedRows.single.serviceTypeName, 'Disinfect');
       expect(fake.sharedRows.single.equipmentName, 'JJ-CCR');
       expect(fake.savedRows, isEmpty);
     });

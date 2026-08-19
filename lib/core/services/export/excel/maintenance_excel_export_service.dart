@@ -18,7 +18,7 @@ import 'package:submersion/features/equipment/domain/entities/service_record.dar
 typedef MaintenanceLogRow = ({
   String equipmentName,
   String equipmentType,
-  String taskName,
+  String serviceTypeName,
   ServiceCategory serviceCategory,
   ServiceRecord record,
 });
@@ -26,7 +26,8 @@ typedef MaintenanceLogRow = ({
 /// Exports maintenance history to a spreadsheet.
 ///
 /// One row per service record, carrying both classifications the diver cares
-/// about: the task (which of my jobs) and the category (what kind of work).
+/// about: the service type (which of my maintenance jobs, from the catalog)
+/// and the category (what kind of work it was).
 ///
 /// Column headers and the category are English constants, matching
 /// [ExcelExportService]: the workbook is an analysis target, not a UI surface.
@@ -50,7 +51,7 @@ class MaintenanceExcelExportService {
     _writeRow(sheet, 0, const [
       'Equipment',
       'Equipment Type',
-      'Task',
+      'Service Type',
       'Category',
       'Date',
       'Provider',
@@ -66,7 +67,7 @@ class MaintenanceExcelExportService {
       _writeRow(sheet, i + 1, [
         entry.equipmentName,
         entry.equipmentType,
-        entry.taskName,
+        entry.serviceTypeName,
         entry.serviceCategory.displayName,
         formatDateForExport(record.serviceDate, dateFormat),
         record.provider ?? '',
