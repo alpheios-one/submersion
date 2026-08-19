@@ -31220,6 +31220,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Het databasebestand is er wel, maar Submersion kan het niet lezen. Meestal betekent dit dat het bestand beschadigd is. Een back-up terugzetten is de snelste weg terug.';
 
   @override
+  String get startup_databaseBusy_title => 'Je duiklogboek was bezet';
+
+  @override
+  String get startup_databaseBusy_body =>
+      'Iets anders gebruikte het databasebestand nog, dus Submersion is gestopt in plaats van ernaar te schrijven. Er is niets gewijzigd en niets beschadigd. Sluit Submersion volledig af en open het opnieuw.';
+
+  @override
   String get startup_failure_technicalDetails => 'Technische details';
 
   @override

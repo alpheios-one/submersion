@@ -1,5 +1,6 @@
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
+import 'package:submersion/core/database/database_connection_setup.dart';
 import 'package:submersion/core/database/database_engine_preflight.dart';
 
 /// How far startup had got when it failed.
@@ -46,6 +47,12 @@ enum StartupFailureKind {
   /// not a database at all. Restoring a backup is the fastest way back.
   dataUnreadable,
 
+  /// Another connection held a lock the whole time SQLite was willing to wait
+  /// for it. Nothing is damaged and nothing was changed -- SQLITE_BUSY is a
+  /// refusal to START the statement, so the transaction rolled back intact.
+  /// Closing Submersion fully and reopening is the whole fix.
+  databaseBusy,
+
   /// Nothing more specific could be established. Treated conservatively: the
   /// failure is assumed to have reached the database, so the recovery routes
   /// stay on offer, but the app does not claim an upgrade failed.
@@ -54,8 +61,12 @@ enum StartupFailureKind {
   /// Whether the diver's database could plausibly have been touched.
   ///
   /// Drives both the reassurance wording and whether restore is offered.
-  /// [engineUnavailable] is the only class that can promise it was not.
-  bool get dataIsAtRisk => this != StartupFailureKind.engineUnavailable;
+  /// [engineUnavailable] promises the file was never opened; [databaseBusy]
+  /// promises it was opened but never written. Offering a restore for a lock
+  /// would invite a diver to overwrite a perfectly intact database.
+  bool get dataIsAtRisk =>
+      this != StartupFailureKind.engineUnavailable &&
+      this != StartupFailureKind.databaseBusy;
 }
 
 /// SQLite primary result code 11, SQLITE_CORRUPT.
@@ -116,6 +127,18 @@ StartupFailureKind classifyStartupFailure(Object error, StartupPhase phase) {
 
   if (_unreadableDataMarkers.any(message.contains)) {
     return StartupFailureKind.dataUnreadable;
+  }
+
+  // Before the phase check: a lock met while the ladder ran is NOT a failed
+  // upgrade. SQLite refused to start the write, so the ladder changed
+  // nothing, and reporting it as a failed migration told the diver their data
+  // was at risk and offered to restore an older backup over an intact file.
+  //
+  // Shares [isDatabaseBusyError] with the open path that RETRIES on a lock,
+  // so what the screen calls a lock and what the retry gives up on can never
+  // drift apart. By the time a lock reaches here the retries are exhausted.
+  if (isDatabaseBusyError(error)) {
+    return StartupFailureKind.databaseBusy;
   }
 
   if (phase == StartupPhase.upgrading) {

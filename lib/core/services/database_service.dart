@@ -9,6 +9,7 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import 'package:submersion/core/database/background_database_connection.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/database_connection_setup.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/database/sqlcipher_setup.dart'
     as sqlcipher_setup;
@@ -27,11 +28,11 @@ enum DatabaseOpenMode {
   migrationThenBackground,
 }
 
-/// drift setup callback that keys a SQLCipher connection before any other
-/// statement. Null when no key — plaintext open, zero overhead.
-void Function(sqlite3.Database)? _cipherSetup(String? keyHex) {
-  if (keyHex == null) return null;
-  return (db) => db.execute(DatabaseService.cipherKeyPragma(keyHex));
+/// drift setup callback for a main-database connection: keys SQLCipher before
+/// any other statement, then applies the busy timeout. Never null -- the busy
+/// timeout is needed on plaintext databases too.
+void Function(sqlite3.Database) _connectionSetup(String? keyHex) {
+  return (db) => applyMainDatabaseSetup(db, keyHex: keyHex);
 }
 
 class DatabaseService {
@@ -138,10 +139,18 @@ class DatabaseService {
     _locationService ??= locationService;
   }
 
-  /// Initialize the database with optional location service for custom paths
+  /// Initialize the database with optional location service for custom paths.
+  ///
+  /// [allowSchemaUpgrade] false makes a pending upgrade a hard stop: no drift
+  /// connection is created and [SchemaUpgradePendingException] is thrown
+  /// instead. The version probe still opens and closes the file to read
+  /// `PRAGMA user_version`, but nothing writes to it. Headless callers pass
+  /// false -- see [SchemaUpgradePendingException] for why the background
+  /// isolate must never run the ladder.
   Future<void> initialize({
     DatabaseLocationService? locationService,
     void Function(int currentStep, int totalSteps)? onMigrationProgress,
+    bool allowSchemaUpgrade = true,
   }) async {
     if (_database != null) return;
 
@@ -162,6 +171,7 @@ class DatabaseService {
     _database = await _openDatabase(
       dbPath,
       onMigrationProgress: onMigrationProgress,
+      allowSchemaUpgrade: allowSchemaUpgrade,
     );
 
     await _assertCipherAvailable(_database!);
@@ -222,6 +232,7 @@ class DatabaseService {
   Future<AppDatabase> _openDatabase(
     String dbPath, {
     void Function(int currentStep, int totalSteps)? onMigrationProgress,
+    bool allowSchemaUpgrade = true,
   }) async {
     final file = File(dbPath);
     final keyHex = databaseKeyHex;
@@ -240,44 +251,115 @@ class DatabaseService {
         stored > 0 &&
         stored < AppDatabase.currentSchemaVersion;
 
-    if (migrationPending) {
-      final migrator = AppDatabase(
-        NativeDatabase(file, setup: _cipherSetup(keyHex)),
-        onMigrationProgress: onMigrationProgress,
+    // Refused before any drift connection exists: drift runs the ladder on
+    // the first statement, so a caller barred from upgrading must never be
+    // handed a connection at all.
+    //
+    // The FILE has been opened by this point -- [getStoredSchemaVersion] a
+    // few lines up opens it read-write and closes it again, which is also
+    // what rolls back a hot journal (see StartupPhase.preflight, which
+    // documents the same distinction). What the guard promises is narrower
+    // and is what the tests assert: nothing wrote to it, so the stored
+    // version is exactly as the foreground will find it.
+    //
+    // A missing file is not a pending upgrade -- creation is onCreate, which
+    // a headless first run may legitimately do.
+    if (migrationPending && !allowSchemaUpgrade) {
+      throw SchemaUpgradePendingException(
+        storedSchemaVersion: stored,
+        supportedSchemaVersion: AppDatabase.currentSchemaVersion,
       );
-      try {
-        // Force the upgrade ladder to completion before switching
-        // executors.
-        await migrator.customSelect('SELECT 1').get();
-      } catch (_) {
-        // Migration failed: best-effort close so we don't leak the
-        // connection, then let the original error surface.
-        await migrator
-            .close()
-            .timeout(const Duration(seconds: 5), onTimeout: () {})
-            .catchError((_) {});
-        rethrow;
-      }
-      // The synchronous connection MUST fully close (releasing its file
-      // locks) before the background executor reopens the same file.
-      // A timed-out close would leave locks held and risk "database is
-      // locked"/corruption on the reopen, so fail fast rather than
-      // silently proceed.
-      await migrator.close().timeout(const Duration(seconds: 5));
+    }
+
+    if (migrationPending) {
+      // Each retry re-runs the ladder from the top on a brand new connection.
+      // That is safe -- every step is idempotent by contract -- but it does
+      // mean onMigrationProgress can restart at step 1, so a progress bar may
+      // visibly rewind. A rewinding bar beats a bricked launch.
+      await retryWhileDatabaseBusy(
+        () => _runUpgradeLadder(file, keyHex, onMigrationProgress),
+      );
       lastOpenMode = DatabaseOpenMode.migrationThenBackground;
     } else {
       lastOpenMode = DatabaseOpenMode.background;
     }
 
+    return retryWhileDatabaseBusy(
+      () => _openOnBackgroundExecutor(file, keyHex, onMigrationProgress),
+    );
+  }
+
+  /// Runs the pending upgrade ladder to completion on a synchronous
+  /// main-isolate connection, then closes it.
+  ///
+  /// Self-contained so [retryWhileDatabaseBusy] can simply call it again: a
+  /// drift executor caches the error from a failed migration and rethrows it
+  /// on every later use, so a retry has to start from a new connection, and
+  /// the old one's locks have to be gone before the next attempt takes any.
+  Future<void> _runUpgradeLadder(
+    File file,
+    String? keyHex,
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
+  ) async {
+    final migrator = AppDatabase(
+      NativeDatabase(file, setup: _connectionSetup(keyHex)),
+      onMigrationProgress: onMigrationProgress,
+    );
+    try {
+      // Force the upgrade ladder to completion before switching executors.
+      await migrator.customSelect('SELECT 1').get();
+    } catch (_) {
+      // Best-effort close so we don't leak the connection (or its locks, which
+      // would defeat the retry), then let the original error surface.
+      await migrator
+          .close()
+          .timeout(const Duration(seconds: 5), onTimeout: () {})
+          .catchError((_) {});
+      rethrow;
+    }
+    // The synchronous connection MUST fully close (releasing its file locks)
+    // before the background executor reopens the same file. A timed-out close
+    // would leave locks held and risk "database is locked"/corruption on the
+    // reopen, so fail fast rather than silently proceed.
+    await migrator.close().timeout(const Duration(seconds: 5));
+  }
+
+  /// Opens on the worker isolate and forces the connection all the way open
+  /// before returning it.
+  ///
+  /// The forcing statement is the point. Drift opens lazily, so without it
+  /// `beforeOpen` -- which re-asserts schema and re-seeds reference data with
+  /// dozens of writes -- would not run until some unrelated screen happened to
+  /// issue the first query. That put a lock failure an arbitrary distance away
+  /// from the open that caused it: too late for the retry here, too late for
+  /// the startup screen to classify it, and reported against whatever feature
+  /// asked first. (It also silently made `flutter test` opens do nothing,
+  /// because the one statement that used to force them,
+  /// [_assertCipherAvailable]'s `PRAGMA cipher_version`, short-circuits under
+  /// FLUTTER_TEST.)
+  Future<AppDatabase> _openOnBackgroundExecutor(
+    File file,
+    String? keyHex,
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
+  ) async {
     final background = await BackgroundDatabaseConnection.open(
       file,
       keyHex: keyHex,
     );
-    _background = background;
-    return AppDatabase(
+    final database = AppDatabase(
       background.connection,
       onMigrationProgress: onMigrationProgress,
     );
+    try {
+      await database.customSelect('SELECT 1').get();
+    } catch (_) {
+      // Tear the whole attempt down, worker isolate included, so a retry does
+      // not race this connection's locks.
+      await closeDatabaseForAppShutdown(database, background: background);
+      rethrow;
+    }
+    _background = background;
+    return database;
   }
 
   /// Reinitialize the database at a specific path (used during migration)
@@ -451,20 +533,23 @@ class DatabaseService {
       sqlcipher_setup.cipherKeyPragma(keyHex);
 
   /// Single choke point for raw (non-drift) opens of the main database.
-  /// Applies the cipher key when given, and disposes the handle on failure.
+  /// Applies the cipher key and busy timeout, and disposes the handle on
+  /// failure.
+  ///
+  /// The busy timeout matters as much here as on the drift connections: the
+  /// version probe and the pre-migration WAL checkpoint both run at startup,
+  /// the very moment a headless isolate is most likely to be holding a lock.
   static sqlite3.Database openRaw(
     String path, {
     sqlite3.OpenMode mode = sqlite3.OpenMode.readWrite,
     String? keyHex,
   }) {
     final db = sqlite3.sqlite3.open(path, mode: mode);
-    if (keyHex != null) {
-      try {
-        db.execute(cipherKeyPragma(keyHex));
-      } catch (_) {
-        db.close();
-        rethrow;
-      }
+    try {
+      applyMainDatabaseSetup(db, keyHex: keyHex);
+    } catch (_) {
+      db.close();
+      rethrow;
     }
     return db;
   }

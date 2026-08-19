@@ -9304,6 +9304,8 @@
   "startup_migrationFailed_body": "Ihr Tauchlogbuch konnte nicht auf das Format aktualisiert werden, das diese Version benötigt. Vor Beginn des Upgrades wurde eine Sicherungskopie erstellt, es geht also nichts verloren.",
   "startup_dataUnreadable_title": "Ihr Tauchlogbuch konnte nicht gelesen werden",
   "startup_dataUnreadable_body": "Die Datenbankdatei ist vorhanden, aber Submersion kann sie nicht lesen. Das bedeutet meist, dass die Datei beschädigt ist. Das Wiederherstellen einer Sicherung ist der schnellste Weg zurück.",
+  "startup_databaseBusy_title": "Ihr Tauchlogbuch war belegt",
+  "startup_databaseBusy_body": "Etwas anderes hat die Datenbankdatei noch verwendet, deshalb hat Submersion angehalten, statt hineinzuschreiben. Es wurde nichts geändert und nichts beschädigt. Schließen Sie Submersion vollständig und öffnen Sie es erneut.",
   "startup_failure_technicalDetails": "Technische Details",
   "startup_failure_backupAvailable_title": "Eine Sicherung ist verfügbar",
   "startup_failure_backupAvailable_taken": "Erstellt am {timestamp}",

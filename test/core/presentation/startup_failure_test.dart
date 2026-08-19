@@ -3,6 +3,7 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
 import 'package:submersion/core/database/database_engine_preflight.dart';
 import 'package:submersion/core/presentation/startup_failure.dart';
+import 'package:submersion/core/services/security/database_locked_exception.dart';
 
 /// Builds a [sqlite3.SqliteException] carrying [extendedResultCode]. The
 /// primary `resultCode` the classifier reads is its low byte.
@@ -122,6 +123,81 @@ void main() {
     });
   });
 
+  group('classifyStartupFailure - database busy', () {
+    test('a locked database mid-upgrade is not a failed migration', () {
+      // The field report this class exists for: an INSERT in the v128 seed
+      // met a lock another isolate held. SQLite refused to START the write,
+      // so the ladder changed nothing -- calling it a failed upgrade told the
+      // diver their data was at risk and offered to overwrite an intact
+      // database with an older backup.
+      final error = _sqliteError(5, 'database is locked');
+
+      expect(
+        classifyStartupFailure(error, StartupPhase.upgrading),
+        StartupFailureKind.databaseBusy,
+      );
+    });
+
+    test('SQLITE_LOCKED classifies the same way as SQLITE_BUSY', () {
+      expect(
+        classifyStartupFailure(
+          _sqliteError(6, 'database table is locked'),
+          StartupPhase.opening,
+        ),
+        StartupFailureKind.databaseBusy,
+      );
+    });
+
+    test('a lock is recognised in every phase', () {
+      for (final phase in StartupPhase.values) {
+        expect(
+          classifyStartupFailure(_sqliteError(5, 'database is locked'), phase),
+          StartupFailureKind.databaseBusy,
+          reason: 'phase $phase must not reclassify a lock',
+        );
+      }
+    });
+
+    test('a lock is recognised through a wrapper that loses the type', () {
+      // Drift and the isolate boundary both re-wrap some failures, so the
+      // result code is not always reachable.
+      expect(
+        classifyStartupFailure(
+          Exception(
+            'SqliteException(5): while executing, database is locked, '
+            'database is locked (code 5)',
+          ),
+          StartupPhase.upgrading,
+        ),
+        StartupFailureKind.databaseBusy,
+      );
+    });
+
+    test('the encrypted-database exception is not mistaken for a lock', () {
+      // Two unrelated senses of "locked" live in this codebase. The unlock
+      // exception never reaches the classifier (startup routes it to the
+      // password screen), but the message markers must not claim it either:
+      // telling a diver to relaunch would strand them short of the prompt.
+      expect(
+        classifyStartupFailure(
+          const DatabaseLockedException('/tmp/submersion.db'),
+          StartupPhase.preflight,
+        ),
+        isNot(StartupFailureKind.databaseBusy),
+      );
+    });
+
+    test('an engine failure still outranks a lock', () {
+      expect(
+        classifyStartupFailure(
+          const DatabaseEngineUnavailableException('database is locked'),
+          StartupPhase.upgrading,
+        ),
+        StartupFailureKind.engineUnavailable,
+      );
+    });
+  });
+
   group('classifyStartupFailure - phase decides the rest', () {
     test('an unrecognised error during the upgrade is a failed migration', () {
       expect(
@@ -158,6 +234,12 @@ void main() {
     test('the classes that touched the file do', () {
       expect(StartupFailureKind.migrationFailed.dataIsAtRisk, isTrue);
       expect(StartupFailureKind.dataUnreadable.dataIsAtRisk, isTrue);
+    });
+
+    test('a lock never puts data at risk', () {
+      // SQLITE_BUSY is refusal, not damage: the write never started. Offering
+      // a restore here would invite a diver to overwrite an intact database.
+      expect(StartupFailureKind.databaseBusy.dataIsAtRisk, isFalse);
     });
 
     test('an unclassified failure is treated as touching the file', () {

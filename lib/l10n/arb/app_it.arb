@@ -9304,6 +9304,8 @@
   "startup_migrationFailed_body": "Non è stato possibile aggiornare il tuo diario di immersione al formato richiesto da questa versione. Prima dell'aggiornamento è stata creata una copia di sicurezza, quindi non è andato perso nulla.",
   "startup_dataUnreadable_title": "Non è stato possibile leggere il tuo diario di immersione",
   "startup_dataUnreadable_body": "Il file del database c'è, ma Submersion non riesce a leggerlo. Di solito significa che il file è danneggiato. Ripristinare un backup è il modo più rapido per ripartire.",
+  "startup_databaseBusy_title": "Il tuo diario di immersione era occupato",
+  "startup_databaseBusy_body": "Qualcos’altro stava ancora usando il file del database, quindi Submersion si è fermato invece di scriverci. Non è stato modificato nulla e nulla è danneggiato. Chiudi completamente Submersion, poi riaprilo.",
   "startup_failure_technicalDetails": "Dettagli tecnici",
   "startup_failure_backupAvailable_title": "È disponibile un backup",
   "startup_failure_backupAvailable_taken": "Creato il {timestamp}",

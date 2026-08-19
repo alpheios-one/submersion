@@ -15,6 +15,12 @@ enum StartupRestoreStatus { idle, running, failed }
 /// database really was involved, offers a way out instead of only a Close
 /// button.
 ///
+/// The recovery routes are gated on [StartupFailureKind.dataIsAtRisk], so a
+/// class that provably did not write to the file shows no restore card and no
+/// downgrade section. That gating is the point rather than a detail: offering
+/// a restore after a lock would invite a diver to overwrite an intact
+/// database with an older backup to fix a problem that a relaunch fixes.
+///
 /// ## Why there is no automatic downgrade
 ///
 /// The guided-downgrade section links to the releases page and explains the
@@ -110,6 +116,12 @@ class StartupFailureView extends StatelessWidget {
       icon: Icons.broken_image_outlined,
       color: Colors.red,
     ),
+    // Orange, like the engine failure and for the same reason: a lock means
+    // the database was never written to.
+    StartupFailureKind.databaseBusy => (
+      icon: Icons.lock_clock,
+      color: Colors.orange,
+    ),
     StartupFailureKind.migrationFailed || StartupFailureKind.unknown => (
       icon: Icons.error_outline,
       color: Colors.red,
@@ -123,6 +135,7 @@ class StartupFailureView extends StatelessWidget {
       context.l10n.startup_migrationFailed_title,
     StartupFailureKind.dataUnreadable =>
       context.l10n.startup_dataUnreadable_title,
+    StartupFailureKind.databaseBusy => context.l10n.startup_databaseBusy_title,
     StartupFailureKind.unknown => context.l10n.startup_error_title,
   };
 
@@ -133,6 +146,7 @@ class StartupFailureView extends StatelessWidget {
       context.l10n.startup_migrationFailed_body,
     StartupFailureKind.dataUnreadable =>
       context.l10n.startup_dataUnreadable_body,
+    StartupFailureKind.databaseBusy => context.l10n.startup_databaseBusy_body,
     StartupFailureKind.unknown => context.l10n.startup_error_body,
   };
 

@@ -31512,6 +31512,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le fichier de base de données est bien là, mais Submersion ne parvient pas à le lire. Cela signifie généralement qu’il est endommagé. Restaurer une sauvegarde est le moyen le plus rapide de repartir.';
 
   @override
+  String get startup_databaseBusy_title =>
+      'Votre carnet de plongée était occupé';
+
+  @override
+  String get startup_databaseBusy_body =>
+      'Quelque chose utilisait encore le fichier de base de données ; Submersion s’est donc arrêté au lieu d’y écrire. Rien n’a été modifié ni endommagé. Fermez complètement Submersion, puis rouvrez-le.';
+
+  @override
   String get startup_failure_technicalDetails => 'Détails techniques';
 
   @override

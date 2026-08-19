@@ -29666,6 +29666,13 @@ class AppLocalizationsZh extends AppLocalizations {
       '数据库文件存在，但 Submersion 无法读取它。这通常意味着文件已损坏。恢复备份是最快的解决办法。';
 
   @override
+  String get startup_databaseBusy_title => '您的潜水日志正忙';
+
+  @override
+  String get startup_databaseBusy_body =>
+      '有其他程序仍在使用数据库文件，因此 Submersion 停止了操作，没有写入。没有任何内容被更改或损坏。请完全关闭 Submersion，然后重新打开。';
+
+  @override
   String get startup_failure_technicalDetails => '技术详情';
 
   @override

@@ -31315,6 +31315,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az adatbázisfájl megvan, de a Submersion nem tudja elolvasni. Ez általában azt jelenti, hogy a fájl sérült. Egy biztonsági másolat visszaállítása a leggyorsabb út vissza.';
 
   @override
+  String get startup_databaseBusy_title => 'A merülési naplód foglalt volt';
+
+  @override
+  String get startup_databaseBusy_body =>
+      'Valami más még használta az adatbázisfájlt, ezért a Submersion megállt ahelyett, hogy írt volna bele. Semmi nem változott és semmi nem sérült meg. Zárd be teljesen a Submersiont, majd nyisd meg újra.';
+
+  @override
   String get startup_failure_technicalDetails => 'Technikai részletek';
 
   @override

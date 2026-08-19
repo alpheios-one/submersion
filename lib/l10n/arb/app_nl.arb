@@ -9304,6 +9304,8 @@
   "startup_migrationFailed_body": "Je duiklogboek kon niet worden bijgewerkt naar het formaat dat deze versie nodig heeft. Voordat de upgrade begon is een veiligheidskopie gemaakt, dus er is niets verloren.",
   "startup_dataUnreadable_title": "Je duiklogboek kon niet worden gelezen",
   "startup_dataUnreadable_body": "Het databasebestand is er wel, maar Submersion kan het niet lezen. Meestal betekent dit dat het bestand beschadigd is. Een back-up terugzetten is de snelste weg terug.",
+  "startup_databaseBusy_title": "Je duiklogboek was bezet",
+  "startup_databaseBusy_body": "Iets anders gebruikte het databasebestand nog, dus Submersion is gestopt in plaats van ernaar te schrijven. Er is niets gewijzigd en niets beschadigd. Sluit Submersion volledig af en open het opnieuw.",
   "startup_failure_technicalDetails": "Technische details",
   "startup_failure_backupAvailable_title": "Er is een back-up beschikbaar",
   "startup_failure_backupAvailable_taken": "Gemaakt op {timestamp}",

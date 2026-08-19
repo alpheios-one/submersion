@@ -92,6 +92,16 @@ void main() {
       expect(find.textContaining('could not be read'), findsOneWidget);
     });
 
+    testWidgets('a locked database does not claim the upgrade failed', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_host(kind: StartupFailureKind.databaseBusy));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Database upgrade failed'), findsNothing);
+      expect(find.textContaining('was busy'), findsOneWidget);
+    });
+
     testWidgets('an unclassified failure gets a neutral title', (tester) async {
       await tester.pumpWidget(_host(kind: StartupFailureKind.unknown));
       await tester.pumpAndSettle();
@@ -137,6 +147,50 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Restore this backup'), findsNothing);
+    });
+  });
+
+  group('a lock offers no destructive way out', () {
+    testWidgets('never offers a restore, even when a backup was passed in', (
+      tester,
+    ) async {
+      // The whole reason this class exists. SQLITE_BUSY means the write never
+      // started, so the database on disk is intact and NEWER than any backup.
+      // Offering a restore here asks the diver to throw away good dives to
+      // fix a problem that relaunching fixes.
+      await tester.pumpWidget(
+        _host(
+          kind: StartupFailureKind.databaseBusy,
+          recoveryBackup: _preMigrationRecord(),
+          onRestoreBackup: () {},
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Restore this backup'), findsNothing);
+    });
+
+    testWidgets('never offers a downgrade', (tester) async {
+      // An older build cannot help either: nothing about the schema failed.
+      await tester.pumpWidget(
+        _host(
+          kind: StartupFailureKind.databaseBusy,
+          onViewPreviousReleases: () {},
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(StartupFailureView.previousReleasesUrl), findsNothing);
+    });
+
+    testWidgets('says nothing was changed and gives the one fix', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_host(kind: StartupFailureKind.databaseBusy));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Nothing was changed'), findsOneWidget);
+      expect(find.textContaining('open it again'), findsOneWidget);
     });
   });
 

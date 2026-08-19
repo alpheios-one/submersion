@@ -30955,6 +30955,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'The database file is there, but Submersion cannot read it. This usually means the file is damaged. Restoring a backup is the fastest way back.';
 
   @override
+  String get startup_databaseBusy_title => 'Your dive log was busy';
+
+  @override
+  String get startup_databaseBusy_body =>
+      'Something else was still using the database file, so Submersion stopped rather than write to it. Nothing was changed and nothing is damaged. Close Submersion completely, then open it again.';
+
+  @override
   String get startup_failure_technicalDetails => 'Technical details';
 
   @override
