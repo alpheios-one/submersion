@@ -1948,7 +1948,13 @@ class ServiceRecords extends Table {
   TextColumn get id => text()();
   TextColumn get equipmentId =>
       text().references(Equipment, #id, onDelete: KeyAction.cascade)();
-  TextColumn get serviceType => text()(); // annual, repair, inspection, etc.
+
+  /// v159: renamed from serviceType. The Drift getter name is also the sync
+  /// wire key, so this rename raises minimumCompatibleSchemaVersion; see
+  /// SyncDataSerializer._withRenamedKeys for the receiving-side tolerance
+  /// that the floor cannot provide.
+  TextColumn get serviceCategory =>
+      text()(); // annual, repair, inspection, etc.
 
   /// v122: which service kind this record fulfills (resets that clock).
   /// Plain text (no FK) so records survive custom-kind deletion.
@@ -3172,7 +3178,14 @@ class AppDatabase extends _$AppDatabase {
   /// defaulted columns, new indexes, dedupe passes, or data repairs that
   /// preserve meaning. When raising it, extend the round-trip test's
   /// projection so the new boundary stays covered.
-  static const int minimumCompatibleSchemaVersion = 137;
+  ///
+  /// Raised 137 -> 159 by the service type unification: v159 renames the
+  /// synced column service_records.service_type to service_category, which
+  /// the first rule above classifies as breaking. Peers below 159 are held
+  /// until they update. Note the gate is one-directional, so this does NOT
+  /// protect us from THEIR payloads; SyncDataSerializer._withRenamedKeys
+  /// carries the receiving-side tolerance.
+  static const int minimumCompatibleSchemaVersion = 159;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -4903,6 +4916,25 @@ class AppDatabase extends _$AppDatabase {
         'UPDATE service_kinds SET default_category = ? '
         'WHERE id = ? AND default_category IS NULL',
         [entry.value, entry.key],
+      );
+    }
+  }
+
+  /// v159: service_records.service_type becomes service_category.
+  ///
+  /// Separate from [_assertServiceCategoryColumn] so a database missing one
+  /// table still gets the other. ALTER TABLE RENAME COLUMN needs SQLite 3.25
+  /// (2018), which every supported platform ships.
+  Future<void> _assertServiceCategoryRename() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('service_records')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('service_type') && !names.contains('service_category')) {
+      await customStatement(
+        'ALTER TABLE service_records '
+        'RENAME COLUMN service_type TO service_category',
       );
     }
   }
@@ -8466,6 +8498,7 @@ class AppDatabase extends _$AppDatabase {
         // (service type unification).
         if (from < 160) {
           await _assertServiceCategoryColumn();
+          await _assertServiceCategoryRename();
         }
         if (from < 160) await reportProgress();
       },
@@ -8652,6 +8685,11 @@ class AppDatabase extends _$AppDatabase {
         // the `from < 160` block above, and the seed SQL below is
         // INSERT OR IGNORE, so it cannot add the column to existing rows.
         await _assertServiceCategoryColumn();
+
+        // v159 backstop: re-assert the service_records column rename. A
+        // database that arrives by restore or sync-adopt never runs
+        // onUpgrade, and every read of a service record would throw.
+        await _assertServiceCategoryRename();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

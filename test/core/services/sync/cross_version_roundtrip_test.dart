@@ -9,6 +9,13 @@
 // The compatibility floor (AppDatabase.minimumCompatibleSchemaVersion)
 // asserts this safety; when a migration raises the floor, extend
 // postV137DiveKeys and add the analogous projection for the new boundary.
+//
+// The floor moved 137 -> 159 with the service type unification, which renamed
+// the synced column service_records.service_type to service_category. That
+// stops pre-159 peers applying OUR payloads, but the gate is one-directional,
+// so the second group below covers the direction the floor cannot reach: a
+// pre-159 peer's payload, keyed with the old spelling, arriving here.
+// postV137DiveKeys stays as the record of the previous boundary.
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
@@ -182,6 +189,77 @@ void main() {
         isNull,
         reason: 'nullable post-137 column backfills as null, not garbage',
       );
+    });
+  });
+
+  group('pre-159 peer publishing a service record (service type rename)', () {
+    late FakeCloudStorageProvider cloud;
+
+    setUp(() async {
+      await setUpTestDatabase();
+      cloud = FakeCloudStorageProvider();
+      // service_records.equipment_id is a real FK and foreign_keys is ON.
+      await DatabaseService.instance.database.customStatement(
+        "INSERT INTO equipment (id, name, type, purchase_currency, "
+        "custom_reminder_enabled, custom_reminder_days, created_at, "
+        "updated_at) VALUES ('e-xver', 'Reg', 'regulator', 'USD', 0, '', 1, 1)",
+      );
+    });
+
+    tearDown(() => DatabaseService.instance.resetForTesting());
+
+    SyncService buildService() => SyncService(
+      syncRepository: SyncRepository(),
+      serializer: SyncDataSerializer(),
+      cloudProvider: cloud,
+    );
+
+    /// Publishes one service-record row as a peer and pulls it through the
+    /// full real pipeline (performSync, _mergeEntity, overlay, upsert).
+    Future<void> pullPeerServiceRecord(Map<String, dynamic> row) async {
+      final data = SyncData(serviceRecords: [row]);
+      final payload = SyncPayload(
+        version: syncFormatVersion,
+        exportedAt: 9000,
+        deviceId: 'peer-158',
+        checksum: sha256
+            .convert(utf8.encode(jsonEncode(data.toJson())))
+            .toString(),
+        data: data,
+        deletions: const {},
+      );
+      await seedPeerBaseFromPayload(cloud, 'peer-158', payload);
+      final result = await buildService().performSync();
+      expect(result.status, isNot(SyncResultStatus.error));
+    }
+
+    Map<String, dynamic> legacyRow(String id, String category) => {
+      'id': id,
+      'equipmentId': 'e-xver',
+      // The pre-159 spelling. This is the whole point of the test.
+      'serviceType': category,
+      'serviceKindId': null,
+      'serviceDate': 1700000000000,
+      'provider': null,
+      'cost': null,
+      'currency': 'USD',
+      'nextServiceDue': null,
+      'notes': '',
+      'createdAt': 1700000000000,
+      'updatedAt': 1700000000000,
+      'hlc': const Hlc(1700000000000, 0, 'peer-158').toString(),
+    };
+
+    test('an old-key payload applies through the merge path', () async {
+      await pullPeerServiceRecord(legacyRow('rec-xver', 'repair'));
+
+      final row = await DatabaseService.instance.database
+          .customSelect(
+            "SELECT service_category FROM service_records "
+            "WHERE id = 'rec-xver'",
+          )
+          .getSingle();
+      expect(row.read<String>('service_category'), 'repair');
     });
   });
 }

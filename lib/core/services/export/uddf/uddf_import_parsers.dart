@@ -832,7 +832,12 @@ class UddfImportParsers {
 
     record['equipmentRef'] = getElementText(recordElement, 'equipmentref');
 
-    final serviceCategory = getElementText(recordElement, 'servicetype');
+    // Files exported before v159 spell this 'servicetype'. UDDF files have no
+    // version handshake and live on disk indefinitely, so both spellings are
+    // read forever rather than behind a version gate.
+    final serviceCategory =
+        getElementText(recordElement, 'servicecategory') ??
+        getElementText(recordElement, 'servicetype');
     if (serviceCategory != null) {
       record['serviceCategory'] = parseEnumValue(
         serviceCategory,

@@ -105,6 +105,100 @@ void main() {
     expect(AppDatabase.migrationVersions, contains(159));
   });
 
+  test(
+    'v159 renames service_type to service_category, preserving values',
+    () async {
+      final native = NativeDatabase.memory(
+        setup: (db) {
+          db.execute('PRAGMA user_version = 158');
+          db.execute('''
+          CREATE TABLE service_records (
+            id TEXT NOT NULL PRIMARY KEY,
+            equipment_id TEXT NOT NULL,
+            service_type TEXT NOT NULL,
+            service_kind_id TEXT,
+            service_date INTEGER NOT NULL,
+            provider TEXT,
+            cost REAL,
+            currency TEXT NOT NULL DEFAULT 'USD',
+            next_service_due INTEGER,
+            notes TEXT NOT NULL DEFAULT '',
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL,
+            hlc TEXT
+          )
+        ''');
+          db.execute(
+            "INSERT INTO service_records (id, equipment_id, service_type, "
+            "service_date, created_at, updated_at) "
+            "VALUES ('r1', 'e1', 'overhaul', 1, 1, 1)",
+          );
+        },
+      );
+      final db = AppDatabase(native);
+      addTearDown(db.close);
+
+      final row = await db
+          .customSelect(
+            'SELECT service_category, service_kind_id '
+            'FROM service_records',
+          )
+          .getSingle();
+      expect(row.read<String>('service_category'), 'overhaul');
+      expect(
+        row.read<String?>('service_kind_id'),
+        isNull,
+        reason:
+            'the migration must not attach a kind, which would move a clock',
+      );
+    },
+  );
+
+  test(
+    'the rename is idempotent when service_category already exists',
+    () async {
+      final native = NativeDatabase.memory(
+        setup: (db) {
+          db.execute('PRAGMA user_version = 158');
+          db.execute('''
+          CREATE TABLE service_records (
+            id TEXT NOT NULL PRIMARY KEY,
+            equipment_id TEXT NOT NULL,
+            service_category TEXT NOT NULL,
+            service_kind_id TEXT,
+            service_date INTEGER NOT NULL,
+            provider TEXT,
+            cost REAL,
+            currency TEXT NOT NULL DEFAULT 'USD',
+            next_service_due INTEGER,
+            notes TEXT NOT NULL DEFAULT '',
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL,
+            hlc TEXT
+          )
+        ''');
+        },
+      );
+      final db = AppDatabase(native);
+      addTearDown(db.close);
+
+      final cols = await db
+          .customSelect("PRAGMA table_info('service_records')")
+          .get();
+      final names = cols.map((c) => c.read<String>('name')).toList();
+      expect(names.where((n) => n == 'service_category').length, 1);
+      expect(names, isNot(contains('service_type')));
+    },
+  );
+
+  test('the compatibility floor records the rename', () {
+    expect(
+      AppDatabase.minimumCompatibleSchemaVersion,
+      159,
+      reason: 'renaming a synced column is breaking under the #1089 rules',
+    );
+  });
+
   test('every built-in slug in the seed SQL has a category', () {
     for (final slug in kBuiltInServiceKindCategories.keys) {
       expect(

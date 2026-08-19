@@ -62,7 +62,7 @@ class ServiceRecordRepository {
           ServiceRecordsCompanion(
             id: Value(id),
             equipmentId: Value(record.equipmentId),
-            serviceType: Value(record.serviceCategory.name),
+            serviceCategory: Value(record.serviceCategory.name),
             serviceKindId: Value(record.serviceKindId),
             serviceDate: Value(record.serviceDate.millisecondsSinceEpoch),
             provider: Value(record.provider),
@@ -101,7 +101,7 @@ class ServiceRecordRepository {
       _db.serviceRecords,
     )..where((t) => t.id.equals(record.id))).write(
       ServiceRecordsCompanion(
-        serviceType: Value(record.serviceCategory.name),
+        serviceCategory: Value(record.serviceCategory.name),
         serviceKindId: Value(record.serviceKindId),
         serviceDate: Value(record.serviceDate.millisecondsSinceEpoch),
         provider: Value(record.provider),
@@ -290,7 +290,7 @@ class ServiceRecordRepository {
     return domain.ServiceRecord(
       id: row.id,
       equipmentId: row.equipmentId,
-      serviceCategory: _parseServiceCategory(row.serviceType),
+      serviceCategory: _parseServiceCategory(row.serviceCategory),
       serviceKindId: row.serviceKindId,
       serviceDate: DateTime.fromMillisecondsSinceEpoch(row.serviceDate),
       provider: row.provider,
@@ -310,7 +310,7 @@ class ServiceRecordRepository {
       id: row.data['id'] as String,
       equipmentId: row.data['equipment_id'] as String,
       serviceCategory: _parseServiceCategory(
-        row.data['service_type'] as String,
+        row.data['service_category'] as String,
       ),
       serviceKindId: row.data['service_kind_id'] as String?,
       serviceDate: DateTime.fromMillisecondsSinceEpoch(

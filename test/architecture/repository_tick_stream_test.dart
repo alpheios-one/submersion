@@ -284,7 +284,7 @@ void main() {
                 ServiceRecordsCompanion.insert(
                   id: 'r1',
                   equipmentId: 'e1',
-                  serviceType: 'annual',
+                  serviceCategory: 'annual',
                   serviceDate: now,
                   createdAt: now,
                   updatedAt: now,
