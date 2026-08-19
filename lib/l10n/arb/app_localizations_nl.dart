@@ -15455,6 +15455,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Aangepaste flesconfiguraties beheren';
 
   @override
+  String get settings_manage_serviceTypes => 'Servicetypes';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'Welk onderhoud je uitrusting nodig heeft, en hoe vaak';
+
+  @override
   String get settings_migrationProgress_doNotClose => 'Sluit de app niet';
 
   @override

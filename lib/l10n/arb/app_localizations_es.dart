@@ -15573,6 +15573,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Administrar configuraciones de tanques personalizadas';
 
   @override
+  String get settings_manage_serviceTypes => 'Tipos de servicio';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'Mantenimiento que necesita tu equipo y con qué frecuencia';
+
+  @override
   String get settings_migrationProgress_doNotClose =>
       'Por favor, no cierres la aplicacion';
 

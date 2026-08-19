@@ -4700,6 +4700,8 @@
   "settings_manage_tags_subtitle": "Administrar, fusionar y eliminar etiquetas",
   "settings_manage_tankPresets": "Preajustes de tanques",
   "settings_manage_tankPresets_subtitle": "Administrar configuraciones de tanques personalizadas",
+  "settings_manage_serviceTypes": "Tipos de servicio",
+  "settings_manage_serviceTypes_subtitle": "Mantenimiento que necesita tu equipo y con qué frecuencia",
   "settings_migrationProgress_doNotClose": "Por favor, no cierres la aplicacion",
   "settings_migration_backupInfo": "Se creara un respaldo antes del traslado. Tus datos no se perderan.",
   "settings_migration_cancel": "Cancelar",

@@ -4628,6 +4628,8 @@
   "settings_manage_tags_subtitle": "Címkék kezelése, összevonása és törlése",
   "settings_manage_tankPresets": "Palack elore beallitott ertekek",
   "settings_manage_tankPresets_subtitle": "Egyedi palack konfiguraciok kezelese",
+  "settings_manage_serviceTypes": "Szerviz típusok",
+  "settings_manage_serviceTypes_subtitle": "Milyen karbantartást igényel a felszerelésed, és milyen gyakran",
   "settings_migrationProgress_doNotClose": "Kerem, ne zarja be az alkalmazast",
   "settings_migration_backupInfo": "Az athelyezes elott biztonsagi mentes keszül. Az adatok nem vesznek el.",
   "settings_migration_cancel": "Megse",

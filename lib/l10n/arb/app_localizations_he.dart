@@ -15184,6 +15184,13 @@ class AppLocalizationsHe extends AppLocalizations {
       'ניהול תצורות בלון מותאמות אישית';
 
   @override
+  String get settings_manage_serviceTypes => 'סוגי טיפול';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'הטיפולים שהציוד שלך צריך, ובאיזו תדירות';
+
+  @override
   String get settings_migrationProgress_doNotClose =>
       'נא לא לסגור את האפליקציה';
 

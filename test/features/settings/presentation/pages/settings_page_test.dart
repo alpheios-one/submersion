@@ -1345,6 +1345,10 @@ void main() {
             path: '/checklist-templates',
             builder: (context, state) => const Text('Checklist Templates Stub'),
           ),
+          GoRoute(
+            path: '/equipment/service-types',
+            builder: (context, state) => const Text('Service Types Stub'),
+          ),
         ],
       );
 
@@ -1375,6 +1379,27 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Checklist Templates Stub'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    // The service type catalog used to be reachable only from the add-a-clock
+    // flow on an equipment item, which is why nobody could find it.
+    testWidgets('renders the service types tile and navigates on tap', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildManageWidget(getOverrides()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Service types'), findsOneWidget);
+      expect(
+        find.text('Maintenance your gear needs, and how often'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Service types'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Service Types Stub'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

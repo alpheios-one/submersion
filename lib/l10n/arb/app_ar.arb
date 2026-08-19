@@ -4700,6 +4700,8 @@
   "settings_manage_tags_subtitle": "إدارة ودمج وحذف الوسوم",
   "settings_manage_tankPresets": "إعدادات الأسطوانات المسبقة",
   "settings_manage_tankPresets_subtitle": "إدارة تهيئات الأسطوانات المخصصة",
+  "settings_manage_serviceTypes": "أنواع الصيانة",
+  "settings_manage_serviceTypes_subtitle": "الصيانة التي تحتاجها معداتك، وعدد مراتها",
   "settings_migrationProgress_doNotClose": "يرجى عدم إغلاق التطبيق",
   "settings_migration_backupInfo": "سيتم إنشاء نسخة احتياطية قبل النقل. لن تُفقد بياناتك.",
   "settings_migration_cancel": "إلغاء",

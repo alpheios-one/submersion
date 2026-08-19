@@ -15311,6 +15311,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Manage custom tank configurations';
 
   @override
+  String get settings_manage_serviceTypes => 'Service types';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'Maintenance your gear needs, and how often';
+
+  @override
   String get settings_migrationProgress_doNotClose =>
       'Please do not close the app';
 

@@ -2267,6 +2267,16 @@ class _ManageSectionContent extends StatelessWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
+                  leading: const Icon(Icons.build_circle_outlined),
+                  title: Text(context.l10n.settings_manage_serviceTypes),
+                  subtitle: Text(
+                    context.l10n.settings_manage_serviceTypes_subtitle,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/equipment/service-types'),
+                ),
+                const Divider(height: 1),
+                ListTile(
                   leading: const Icon(Icons.auto_fix_high),
                   title: Text(context.l10n.settings_manage_setupAssistant),
                   subtitle: Text(

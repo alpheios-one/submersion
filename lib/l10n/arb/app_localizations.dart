@@ -26129,6 +26129,18 @@ abstract class AppLocalizations {
   /// **'Manage custom tank configurations'**
   String get settings_manage_tankPresets_subtitle;
 
+  /// No description provided for @settings_manage_serviceTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Service types'**
+  String get settings_manage_serviceTypes;
+
+  /// No description provided for @settings_manage_serviceTypes_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance your gear needs, and how often'**
+  String get settings_manage_serviceTypes_subtitle;
+
   /// No description provided for @settings_migrationProgress_doNotClose.
   ///
   /// In en, this message translates to:

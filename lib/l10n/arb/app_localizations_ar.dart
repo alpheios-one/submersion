@@ -15296,6 +15296,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'إدارة تهيئات الأسطوانات المخصصة';
 
   @override
+  String get settings_manage_serviceTypes => 'أنواع الصيانة';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'الصيانة التي تحتاجها معداتك، وعدد مراتها';
+
+  @override
   String get settings_migrationProgress_doNotClose => 'يرجى عدم إغلاق التطبيق';
 
   @override

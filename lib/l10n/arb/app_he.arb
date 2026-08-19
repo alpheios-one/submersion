@@ -4700,6 +4700,8 @@
   "settings_manage_tags_subtitle": "ניהול, מיזוג ומחיקת תגיות",
   "settings_manage_tankPresets": "הגדרות בלון מוכנות",
   "settings_manage_tankPresets_subtitle": "ניהול תצורות בלון מותאמות אישית",
+  "settings_manage_serviceTypes": "סוגי טיפול",
+  "settings_manage_serviceTypes_subtitle": "הטיפולים שהציוד שלך צריך, ובאיזו תדירות",
   "settings_migrationProgress_doNotClose": "נא לא לסגור את האפליקציה",
   "settings_migration_backupInfo": "ייווצר גיבוי לפני ההעברה. הנתונים שלך לא יאבדו.",
   "settings_migration_cancel": "ביטול",

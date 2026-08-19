@@ -15625,6 +15625,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Gerer les configurations de blocs personnalisees';
 
   @override
+  String get settings_manage_serviceTypes => 'Types de révision';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'L\'entretien dont votre matériel a besoin, et à quelle fréquence';
+
+  @override
   String get settings_migrationProgress_doNotClose =>
       'Veuillez ne pas fermer l\'application';
 

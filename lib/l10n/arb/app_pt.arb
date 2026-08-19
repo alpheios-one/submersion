@@ -4700,6 +4700,8 @@
   "settings_manage_tags_subtitle": "Gerenciar, mesclar e excluir etiquetas",
   "settings_manage_tankPresets": "Predefinicoes de Cilindro",
   "settings_manage_tankPresets_subtitle": "Gerenciar configuracoes personalizadas de cilindro",
+  "settings_manage_serviceTypes": "Tipos de manutenção",
+  "settings_manage_serviceTypes_subtitle": "A manutenção de que o seu equipamento precisa, e com que frequência",
   "settings_migrationProgress_doNotClose": "Por favor, nao feche o aplicativo",
   "settings_migration_backupInfo": "Um backup sera criado antes da movimentacao. Seus dados nao serao perdidos.",
   "settings_migration_cancel": "Cancelar",

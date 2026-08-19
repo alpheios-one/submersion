@@ -4700,6 +4700,8 @@
   "settings_manage_tags_subtitle": "Tags beheren, samenvoegen en verwijderen",
   "settings_manage_tankPresets": "Flesvoorinstellingen",
   "settings_manage_tankPresets_subtitle": "Aangepaste flesconfiguraties beheren",
+  "settings_manage_serviceTypes": "Servicetypes",
+  "settings_manage_serviceTypes_subtitle": "Welk onderhoud je uitrusting nodig heeft, en hoe vaak",
   "settings_migrationProgress_doNotClose": "Sluit de app niet",
   "settings_migration_backupInfo": "Er wordt een back-up gemaakt voor de verplaatsing. Je gegevens gaan niet verloren.",
   "settings_migration_cancel": "Annuleren",

@@ -4628,6 +4628,8 @@
   "settings_manage_tags_subtitle": "Gerer, fusionner et supprimer les etiquettes",
   "settings_manage_tankPresets": "Preselections de blocs",
   "settings_manage_tankPresets_subtitle": "Gerer les configurations de blocs personnalisees",
+  "settings_manage_serviceTypes": "Types de révision",
+  "settings_manage_serviceTypes_subtitle": "L'entretien dont votre matériel a besoin, et à quelle fréquence",
   "settings_migrationProgress_doNotClose": "Veuillez ne pas fermer l'application",
   "settings_migration_backupInfo": "Une sauvegarde sera creee avant le deplacement. Vos donnees ne seront pas perdues.",
   "settings_migration_cancel": "Annuler",

@@ -15577,6 +15577,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Gerenciar configuracoes personalizadas de cilindro';
 
   @override
+  String get settings_manage_serviceTypes => 'Tipos de manutenção';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'A manutenção de que o seu equipamento precisa, e com que frequência';
+
+  @override
   String get settings_migrationProgress_doNotClose =>
       'Por favor, nao feche o aplicativo';
 

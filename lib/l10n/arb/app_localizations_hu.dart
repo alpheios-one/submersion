@@ -15531,6 +15531,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Egyedi palack konfiguraciok kezelese';
 
   @override
+  String get settings_manage_serviceTypes => 'Szerviz típusok';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'Milyen karbantartást igényel a felszerelésed, és milyen gyakran';
+
+  @override
   String get settings_migrationProgress_doNotClose =>
       'Kerem, ne zarja be az alkalmazast';
 

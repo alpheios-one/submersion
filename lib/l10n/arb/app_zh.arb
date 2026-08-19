@@ -4871,6 +4871,8 @@
   "settings_manage_tags_subtitle": "管理、合并和删除标签",
   "settings_manage_tankPresets": "气瓶预设",
   "settings_manage_tankPresets_subtitle": "管理自定义气瓶配置",
+  "settings_manage_serviceTypes": "维护类型",
+  "settings_manage_serviceTypes_subtitle": "装备需要的保养项目及其频率",
   "settings_migrationProgress_doNotClose": "请不要关闭应用",
   "settings_migration_backupInfo": "迁移前将创建备份。您的数据不会丢失。",
   "settings_migration_cancel": "取消",

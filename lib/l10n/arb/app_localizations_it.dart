@@ -15576,6 +15576,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Gestisci configurazioni bombole personalizzate';
 
   @override
+  String get settings_manage_serviceTypes => 'Tipi di manutenzione';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'La manutenzione che serve alla tua attrezzatura, e ogni quanto';
+
+  @override
   String get settings_migrationProgress_doNotClose => 'Non chiudere l\'app';
 
   @override

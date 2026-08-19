@@ -15557,6 +15557,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Benutzerdefinierte Flaschenkonfigurationen verwalten';
 
   @override
+  String get settings_manage_serviceTypes => 'Wartungsarten';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'Welche Wartung deine Ausrüstung braucht und wie oft';
+
+  @override
   String get settings_migrationProgress_doNotClose =>
       'Bitte schließen Sie die App nicht';
 
