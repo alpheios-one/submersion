@@ -6321,6 +6321,7 @@
   "diveLog_detail_menu_reparseRawData": "Ruwe data opnieuw verwerken",
   "diveLog_detail_reparseFailed": "Opnieuw verwerken mislukt: {error}",
   "diveLog_detail_reparseSuccess": "Duik succesvol opnieuw verwerkt",
+  "diveLog_detail_reparseProfilePreserved": "Brongegevens vernieuwd. Deze duik is samengevoegd uit andere duiken, dus het profiel is ongewijzigd gebleven.",
   "settings_appearance_mapStyle": "Kaartstijl",
   "settings_appearance_mapStyle_esriSatellite": "Satelliet",
   "settings_appearance_mapStyle_openStreetMap": "Stratenkaart",

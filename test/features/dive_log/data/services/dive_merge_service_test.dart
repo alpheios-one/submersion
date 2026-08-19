@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/features/dive_computer/data/services/reparse_service.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/services/dive_merge_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
@@ -600,7 +602,10 @@ void main() {
         expect(rows.map((r) => r.sourceUuid).toSet(), {'uuid-a', 'uuid-b'});
         expect(rows.map((r) => r.rawFingerprint?.first).toSet(), {0xA1, 0xB2});
         // ReparseService.getSourcesForDiveReparse selects on rawData, so
-        // both halves stay re-parseable after a libdivecomputer upgrade.
+        // both halves keep their bytes for a libdivecomputer upgrade. What
+        // a re-parse does with them is scoped by
+        // ReparseService._sourceOwnsProfileStrand: it refreshes each row's
+        // provenance snapshot but leaves the merged profile alone (#1164).
         expect(rows.where((r) => r.rawData != null), hasLength(2));
 
         // The import duplicate checker unions keys across ALL rows: a
@@ -615,5 +620,89 @@ void main() {
         expect(canonical, hasLength(1));
       },
     );
+  });
+
+  group('re-parsing a merged dive (#1164)', () {
+    /// Gives both originals' source rows the raw blob and descriptor triple
+    /// that make them eligible for re-parse, so the merged dive inherits two
+    /// re-parseable carried rows sharing one computer.
+    Future<void> makeSourceReparseable(String diveId) async {
+      await (db.update(
+        db.diveDataSources,
+      )..where((t) => t.id.equals('src-$diveId'))).write(
+        DiveDataSourcesCompanion(
+          computerId: const Value('comp-1'),
+          rawData: Value(Uint8List.fromList([1, 2, 3, 4])),
+          descriptorVendor: const Value('Shearwater'),
+          descriptorProduct: const Value('Perdix'),
+          descriptorModel: const Value(42),
+        ),
+      );
+    }
+
+    test('leaves the combined profile and its surface gap intact', () async {
+      await seedDive(
+        'a',
+        entry: DateTime.utc(2026, 7, 1, 9),
+        depth: 10,
+        computerId: 'comp-1',
+      );
+      await seedDive(
+        'b',
+        entry: DateTime.utc(2026, 7, 1, 10),
+        depth: 20,
+        runtimeMin: 20,
+        computerId: 'comp-1',
+      );
+      await makeSourceReparseable('a');
+      await makeSourceReparseable('b');
+
+      final mergedId = (await service.apply(['a', 'b'])).mergedDive.id;
+
+      Future<List<int>> profileTimestamps() async {
+        final rows =
+            await (db.select(db.diveProfiles)
+                  ..where((t) => t.diveId.equals(mergedId))
+                  ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+                .get();
+        return rows.map((r) => r.timestamp).toList();
+      }
+
+      final before = await profileTimestamps();
+      // Both halves plus the synthesized surface-gap fill.
+      expect(before.length, greaterThan(6));
+      expect(before.any((t) => t > 1800 && t < 3600), isTrue);
+
+      // The parser returns the first half's download verbatim: four samples
+      // in the original dive's frame, exactly what would overwrite the
+      // merged timeline if the guard were missing.
+      final result = await ReparseService(db: db).reparseDive(
+        mergedId,
+        parseFn: (vendor, product, model, rawData) async => pigeon.ParsedDive(
+          fingerprint: 'fp',
+          dateTimeYear: 2026,
+          dateTimeMonth: 7,
+          dateTimeDay: 1,
+          dateTimeHour: 9,
+          dateTimeMinute: 0,
+          dateTimeSecond: 0,
+          maxDepthMeters: 10,
+          avgDepthMeters: 5,
+          durationSeconds: 1800,
+          samples: [
+            pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0),
+            pigeon.ProfileSample(timeSeconds: 900, depthMeters: 10),
+            pigeon.ProfileSample(timeSeconds: 1800, depthMeters: 0),
+          ],
+          tanks: const [],
+          gasMixes: const [],
+          events: const [],
+        ),
+      );
+
+      expect(await profileTimestamps(), before);
+      expect(result.errors, isEmpty);
+      expect(result.profilesPreserved, 2);
+    });
   });
 }
