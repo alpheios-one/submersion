@@ -21935,6 +21935,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_detail_reparseSuccess => 'Duik succesvol opnieuw verwerkt';
 
   @override
+  String get diveLog_detail_reparseProfilePreserved =>
+      'Brongegevens vernieuwd. Deze duik is samengevoegd uit andere duiken, dus het profiel is ongewijzigd gebleven.';
+
+  @override
   String diveLog_detail_reparseFailed(String error) {
     return 'Opnieuw verwerken mislukt: $error';
   }

@@ -519,11 +519,12 @@ class DatabaseMigrationService {
       DatabaseLocationService.databaseFilename,
     );
 
-    // Create backup of the existing database at target before overwriting
-    final existingFile = File(newPath);
-    if (await existingFile.exists()) {
-      final existingBackupPath = _generateBackupPath(newPath);
-      await existingFile.copy(existingBackupPath);
+    // Create backup of the existing database at target before overwriting.
+    // Through _createBackup so the copy carries the target's `-wal`: that file
+    // is not ours and may well have been left with an uncheckpointed sidecar,
+    // and this copy is the only way back from an overwrite.
+    if (await File(newPath).exists()) {
+      await _createBackup(newPath);
     }
 
     return migrateToCustomFolder(folderPath);

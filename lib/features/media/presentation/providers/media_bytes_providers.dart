@@ -7,6 +7,7 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/services/asset_resolution_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
+import 'package:submersion/features/media/presentation/providers/media_byte_retention.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_serving_providers.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
@@ -33,6 +34,10 @@ const _log = LoggerService('mediaBytesProvider');
 /// purpose, indistinguishable from an absent one.
 final mediaBytesProvider =
     FutureProvider.family<ResolvedAssetResult, MediaItem>((ref, item) async {
+      // A full-resolution buffer per item. Riverpod 3 keeps a family entry
+      // forever unless told otherwise, so before #1175 every document and
+      // photo opened stayed on the heap for the process lifetime.
+      retainFor(ref, fullResolutionRetention);
       // Always thumbnail: false. This provider resolves full-resolution
       // bytes only; grid thumbnails go through MediaItemView.
       final recorder = ref.read(mediaServingRecorderProvider);
@@ -88,7 +93,7 @@ final mediaBytesProvider =
         storeFallbackUsed: true,
       );
       return const ResolvedAssetResult(status: ResolutionStatus.unavailable);
-    });
+    }, isAutoDispose: true);
 
 /// Resolves [item] through its registered source resolver.
 ///

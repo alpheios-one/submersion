@@ -36809,6 +36809,12 @@ abstract class AppLocalizations {
   /// **'Dive re-parsed successfully'**
   String get diveLog_detail_reparseSuccess;
 
+  /// Snackbar message after re-parsing a combined dive, whose user-authored merged profile is deliberately not rewritten
+  ///
+  /// In en, this message translates to:
+  /// **'Source details refreshed. This dive was combined from other dives, so its profile was left unchanged.'**
+  String get diveLog_detail_reparseProfilePreserved;
+
   /// No description provided for @diveLog_detail_reparseFailed.
   ///
   /// In en, this message translates to:

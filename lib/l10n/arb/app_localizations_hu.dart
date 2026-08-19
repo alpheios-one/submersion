@@ -22033,6 +22033,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_reparseSuccess => 'Merülés sikeresen újraelemezve';
 
   @override
+  String get diveLog_detail_reparseProfilePreserved =>
+      'A forrás adatai frissítve. Ez a merülés több merülésből lett összevonva, ezért a profilja változatlan maradt.';
+
+  @override
   String diveLog_detail_reparseFailed(String error) {
     return 'Újraelemzés sikertelen: $error';
   }

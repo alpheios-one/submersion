@@ -22105,6 +22105,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Immersione rianalizzata con successo';
 
   @override
+  String get diveLog_detail_reparseProfilePreserved =>
+      'Dettagli della sorgente aggiornati. Questa immersione è stata combinata da altre immersioni, quindi il suo profilo è rimasto invariato.';
+
+  @override
   String diveLog_detail_reparseFailed(String error) {
     return 'Rianalisi non riuscita: $error';
   }

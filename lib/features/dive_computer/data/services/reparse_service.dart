@@ -24,7 +24,10 @@ class ReparseService {
   ///
   /// [rawData] and [rawFingerprint] use `Value.absent()` when null to avoid
   /// overwriting existing blobs during the re-parse path.
-  Future<void> applyParsedUpdate({
+  ///
+  /// Returns whether the dive's profile strand was left untouched because
+  /// this source does not own it -- see [_sourceOwnsProfileStrand].
+  Future<({bool profilePreserved})> applyParsedUpdate({
     required String diveId,
     required String sourceRowId,
     required pigeon.ParsedDive parsed,
@@ -35,7 +38,7 @@ class ReparseService {
     Uint8List? rawData,
     Uint8List? rawFingerprint,
   }) async {
-    await db.transaction(() async {
+    return db.transaction(() async {
       final now = DateTime.now();
 
       // ------------------------------------------------------------------
@@ -67,24 +70,40 @@ class ReparseService {
         await _updateDiveRow(diveId: diveId, parsed: parsed, now: now);
       }
 
+      final sourceRows = await (db.select(
+        db.diveDataSources,
+      )..where((t) => t.diveId.equals(diveId))).get();
+      final isMultiSource = sourceRows.length > 1;
+      final ownsStrand = _sourceOwnsProfileStrand(sourceRow, sourceRows);
+
       // ------------------------------------------------------------------
-      // 4. Replace DiveProfiles for this source's computerId
+      // 4. Replace DiveProfiles for this source's computerId -- but only
+      //    when this source actually authored that strand in its own parse
+      //    frame (#1164).
       // ------------------------------------------------------------------
       final computerId = sourceRow.computerId;
-      // Parsed times are on this computer's own clock. Multi-computer
-      // consolidation re-based the folded-in strand onto the dive's clock and
-      // recorded the shift here; the raw bytes carry no trace of it, so
-      // re-applying it is the only way the re-parsed strand still lines up
-      // with the primary's (issue #1177). Zero for every unconsolidated
-      // source, which is the overwhelming majority.
-      final timeOffset = sourceRow.timeOffsetSeconds ?? 0;
-      await _replaceDiveProfiles(
-        diveId: diveId,
-        computerId: computerId,
-        parsed: parsed,
-        isPrimary: sourceRow.isPrimary,
-        timeOffset: timeOffset,
-      );
+      if (ownsStrand) {
+        // Parsed times are on this computer's own clock. Multi-computer
+        // consolidation re-based the folded-in strand onto the dive's clock
+        // and recorded the shift on the source row; the raw bytes carry no
+        // trace of it, so re-applying it is the only way the re-parsed strand
+        // still lines up with the primary's (#1177). Zero for every
+        // unconsolidated source, which is the overwhelming majority.
+        //
+        // Only this strand needs it. The event/gas-switch/tank-pressure
+        // re-inserts below are gated on `!isMultiSource`, and a consolidated
+        // dive is always multi-source: apply() backfills a primary source row
+        // on the target before folding anything in, so the offset-bearing row
+        // never arrives alone. A row that did arrive alone would be
+        // non-primary, which _sourceOwnsProfileStrand already refuses.
+        await _replaceDiveProfiles(
+          diveId: diveId,
+          computerId: computerId,
+          parsed: parsed,
+          isPrimary: sourceRow.isPrimary,
+          timeOffset: sourceRow.timeOffsetSeconds ?? 0,
+        );
+      }
 
       // ------------------------------------------------------------------
       // 5. Replace DiveProfileEvents, GasSwitches, TankPressureProfiles
@@ -93,17 +112,13 @@ class ReparseService {
       //    with this source's computer below.
       // ------------------------------------------------------------------
 
-      // Check if this is a multi-source dive
-      final sourceRows = await (db.select(
-        db.diveDataSources,
-      )..where((t) => t.diveId.equals(diveId))).get();
-      final isMultiSource = sourceRows.length > 1;
-
       // Only replace events/switches/pressure for single-source dives.
       // Multi-source dives skip this to avoid destroying data from other
       // sources (gas_switches lacks a computerId column for per-source
-      // scoping).
-      if (!isMultiSource) {
+      // scoping). A combined dive can carry a single source row when only
+      // one original had one, so the ownership guard applies here too --
+      // otherwise the merge's own surface-gap markers are deleted (#1164).
+      if (!isMultiSource && ownsStrand) {
         await (db.delete(
           db.diveProfileEvents,
         )..where((t) => t.diveId.equals(diveId))).go();
@@ -120,7 +135,6 @@ class ReparseService {
           computerId: computerId,
           parsed: parsed,
           now: now,
-          timeOffset: timeOffset,
         );
       }
 
@@ -140,17 +154,55 @@ class ReparseService {
           computerId: computerId,
           parsed: parsed,
           tankIdsByIndex: tankIdsByIndex,
-          timeOffset: timeOffset,
         );
         await _insertGasSwitches(
           diveId: diveId,
           parsed: parsed,
           tankIdsByIndex: tankIdsByIndex,
           now: now,
-          timeOffset: timeOffset,
         );
       }
+
+      return (profilePreserved: !ownsStrand);
     });
+  }
+
+  /// Whether [row] is the sole author of its `(dive_id, computer_id)` profile
+  /// strand, with that strand still in [row]'s own parse frame.
+  ///
+  /// Re-parsing deletes the strand and re-inserts the parsed samples at their
+  /// own `timeSeconds`, so it is only safe when both hold. A sequential
+  /// combine breaks both: [DiveMergeService.apply] re-bases each segment onto
+  /// the merged timeline and carries every original's source row over demoted
+  /// to non-primary, so re-parsing one of them would drop half a dive back at
+  /// the original download's timestamps and delete the synthesized
+  /// surface-gap samples along the way (#1164).
+  ///
+  /// Two signals, either of which disqualifies the row:
+  ///
+  /// - **No row on the dive is primary.** That is exactly a combined dive:
+  ///   the merge demotes all carried rows and the merged dive has no source
+  ///   row of its own. [DiveConsolidationService] demotes only its
+  ///   secondaries, so a consolidated dive keeps a primary row and its
+  ///   per-computer strands stay re-parseable.
+  /// - **A re-parseable sibling row shares this row's `computerId`** (null
+  ///   counts as equal to null). The strand has more than one author, so
+  ///   whichever source re-parses last would wipe out what the others wrote
+  ///   -- true of same-computer halves regardless of the primary flag. Only
+  ///   siblings carrying raw data count: deleting a computer nulls its
+  ///   sources' `computerId` (FK `setNull`) and
+  ///   `_backfillProvenanceSnapshots` adds rows with no `computerId` at all,
+  ///   so sharing a null strand with a row that can never be re-parsed is an
+  ///   ordinary shape, not contention.
+  bool _sourceOwnsProfileStrand(
+    DiveDataSourcesData row,
+    List<DiveDataSourcesData> allRowsForDive,
+  ) {
+    if (!allRowsForDive.any((r) => r.isPrimary)) return false;
+    return !allRowsForDive.any(
+      (r) =>
+          r.id != row.id && r.computerId == row.computerId && r.rawData != null,
+    );
   }
 
   /// Count how many sources for a given computer have raw data vs not.
@@ -267,8 +319,11 @@ class ReparseService {
   ///
   /// [parseFn] is the function that calls the native Pigeon API.
   ///
-  /// Returns a list of error messages (empty on full success).
-  Future<List<String>> reparseDive(
+  /// Returns the error messages (empty on full success) alongside the number
+  /// of sources whose profile strand was deliberately left alone -- see
+  /// [_sourceOwnsProfileStrand]. Callers surface that count so a re-parse on
+  /// a combined dive does not look like an unexplained no-op (#1164).
+  Future<({List<String> errors, int profilesPreserved})> reparseDive(
     String diveId, {
     required Future<pigeon.ParsedDive> Function(
       String vendor,
@@ -280,6 +335,7 @@ class ReparseService {
   }) async {
     final sources = await getSourcesForDiveReparse(diveId);
     final errors = <String>[];
+    var profilesPreserved = 0;
 
     for (final source in sources) {
       if (source.descriptorVendor == null ||
@@ -294,7 +350,7 @@ class ReparseService {
           source.descriptorModel!,
           source.rawData!,
         );
-        await applyParsedUpdate(
+        final outcome = await applyParsedUpdate(
           diveId: diveId,
           sourceRowId: source.id,
           parsed: parsed,
@@ -303,12 +359,13 @@ class ReparseService {
           descriptorModel: source.descriptorModel,
           libdivecomputerVersion: source.libdivecomputerVersion,
         );
+        if (outcome.profilePreserved) profilesPreserved++;
       } catch (e) {
         errors.add(e.toString());
       }
     }
 
-    return errors;
+    return (errors: errors, profilesPreserved: profilesPreserved);
   }
 
   // ==========================================================================
@@ -485,7 +542,6 @@ class ReparseService {
     required String? computerId,
     required pigeon.ParsedDive parsed,
     required DateTime now,
-    required int timeOffset,
   }) async {
     if (parsed.events.isEmpty) return;
 
@@ -502,7 +558,7 @@ class ReparseService {
             id: Value(_uuid.v4()),
             diveId: Value(diveId),
             computerId: Value(computerId),
-            timestamp: Value(e.timeSeconds + timeOffset),
+            timestamp: Value(e.timeSeconds),
             eventType: Value(eventType),
             severity: Value(_eventSeverity(eventType)),
             source: const Value('imported'), // native DC events are imports
@@ -529,7 +585,6 @@ class ReparseService {
     required pigeon.ParsedDive parsed,
     required Map<int, String> tankIdsByIndex,
     required DateTime now,
-    required int timeOffset,
   }) async {
     final switches = resolveGasSwitches(parsed);
     if (switches.isEmpty) return;
@@ -545,7 +600,7 @@ class ReparseService {
           GasSwitchesCompanion(
             id: Value(_uuid.v4()),
             diveId: Value(diveId),
-            timestamp: Value(sw.timeSeconds + timeOffset),
+            timestamp: Value(sw.timeSeconds),
             tankId: Value(tankId),
             depth: Value(sw.depth),
             createdAt: Value(nowMs),
@@ -646,7 +701,6 @@ class ReparseService {
     required String? computerId,
     required pigeon.ParsedDive parsed,
     required Map<int, String> tankIdsByIndex,
-    required int timeOffset,
   }) async {
     if (tankIdsByIndex.isEmpty) return;
 
@@ -657,7 +711,7 @@ class ReparseService {
       if (pressure != null) {
         final idx = s.tankIndex ?? 0;
         pressuresByTank.putIfAbsent(idx, () => []).add((
-          timestamp: s.timeSeconds + timeOffset,
+          timestamp: s.timeSeconds,
           pressure: pressure,
         ));
       }

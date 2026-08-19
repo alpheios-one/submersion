@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/utils/stream_debounce.dart';
+import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/repositories/media_row_mapper.dart';
 import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
@@ -219,9 +221,22 @@ class MediaLibraryRepository {
   /// Emits whenever the media table changes. Deliberately coarse: consumers
   /// reload page one rather than patching rows (per the Media section spec's
   /// invalidation-storm avoidance).
-  Stream<void> watchMediaChanges() {
-    final m = _db.media;
-    final count = countAll();
-    return (_db.selectOnly(m)..addColumns([count])).watchSingle().map((_) {});
-  }
+  ///
+  /// Built on `tableUpdates`, exactly like [MediaRepository.watchMediaChanges],
+  /// and NOT on a watched COUNT query. A Drift query stream delivers its
+  /// current value the moment it is listened to, and every consumer here feeds
+  /// this stream to `ref.invalidateSelfWhen`. That combination is a live loop:
+  /// build subscribes, the subscription immediately ticks, the tick invalidates
+  /// the provider that just subscribed, the rebuild subscribes again. It ran
+  /// one COUNT(*) over `media` per event-loop turn for as long as the Media
+  /// section stayed open, which is enough to starve the UI isolate on a large
+  /// library (#1175). `tableUpdates` only fires on a real write.
+  ///
+  /// Debounced on the same window as [MediaRepository.changeTickDebounce] so a
+  /// sync's per-changeset commits -- or the media store worker stamping
+  /// `remote_uploaded_at` row by row as it drains -- collapse into one reload
+  /// instead of one per write.
+  Stream<void> watchMediaChanges() => _db
+      .tableUpdates(TableUpdateQuery.onTable(_db.media))
+      .debounce(MediaRepository.changeTickDebounce);
 }

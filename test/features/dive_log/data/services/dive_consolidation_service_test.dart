@@ -1244,7 +1244,7 @@ void main() {
 
       // Re-parse the whole dive, as the dive detail page and a post-upgrade
       // bulk re-parse from the device page both do.
-      final errors = await ReparseService(db: db).reparseDive(
+      final result = await ReparseService(db: db).reparseDive(
         't',
         parseFn: (vendor, product, model, rawData) async => pigeon.ParsedDive(
           fingerprint: 'fp',
@@ -1269,7 +1269,11 @@ void main() {
           events: const [],
         ),
       );
-      expect(errors, isEmpty);
+      expect(result.errors, isEmpty);
+      // A consolidated dive keeps a primary source row, so #1164's ownership
+      // guard lets the secondary strand re-parse rather than preserving it.
+      // That is exactly why the offset has to be reapplied here.
+      expect(result.profilesPreserved, 0);
 
       final afterReparse =
           await (db.select(db.diveProfiles)

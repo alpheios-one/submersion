@@ -21561,6 +21561,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_detail_reparseSuccess => 'הצלילה נותחה מחדש בהצלחה';
 
   @override
+  String get diveLog_detail_reparseProfilePreserved =>
+      'פרטי המקור רועננו. צלילה זו אוחדה מצלילות אחרות, ולכן הפרופיל שלה נותר ללא שינוי.';
+
+  @override
   String diveLog_detail_reparseFailed(String error) {
     return 'הניתוח מחדש נכשל: $error';
   }

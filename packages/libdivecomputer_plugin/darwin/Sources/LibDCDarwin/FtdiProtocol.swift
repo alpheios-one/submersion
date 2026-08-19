@@ -144,10 +144,11 @@ enum FtdiProtocol {
     /// encoding, or nil if it is not a value libdivecomputer defines.
     ///
     /// Note the ordering: libdivecomputer defines HARDWARE as 1 and SOFTWARE
-    /// as 2 (`iostream.h`). The termios backends in this repository have those
-    /// two swapped. That is latent, because no driver requests anything but
-    /// NONE, but this mapping follows libdivecomputer rather than its
-    /// neighbours. Do not "align" it with them.
+    /// as 2 (`iostream.h`), which reads as the wrong way round to anyone who
+    /// thinks of XON/XOFF as the simpler case. The termios and DCB backends
+    /// once had the two swapped (issue #1155); they now share the
+    /// `LIBDC_FLOWCONTROL_*` constants in `libdc_wrapper.h`, which this file
+    /// cannot use because it is compiled standalone by `run_native_tests.sh`.
     static func flowControl(fromLibdc value: UInt32) -> FlowControl? {
         switch value {
         case 0: return FlowControl.none

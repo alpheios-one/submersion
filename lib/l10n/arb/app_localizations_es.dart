@@ -22122,6 +22122,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Inmersión reanalizada correctamente';
 
   @override
+  String get diveLog_detail_reparseProfilePreserved =>
+      'Detalles de la fuente actualizados. Esta inmersión se combinó a partir de otras inmersiones, por lo que su perfil no se modificó.';
+
+  @override
   String diveLog_detail_reparseFailed(String error) {
     return 'Error al reanalizar: $error';
   }
