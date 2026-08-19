@@ -6,6 +6,7 @@ import 'package:submersion/features/media/data/repositories/local_asset_cache_re
 import 'package:submersion/features/media/data/services/asset_resolution_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
+import 'package:submersion/features/media/presentation/providers/media_byte_retention.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 
@@ -44,6 +45,10 @@ class ResolvedAssetResult {
 // tick would re-run resolution every time the eviction itself wrote a row.
 final resolvedThumbnailProvider =
     FutureProvider.family<ResolvedAssetResult, MediaItem>((ref, item) async {
+      // Auto-disposing with a window rather than caching forever: this family
+      // holds decoded thumbnail bytes per item, and before #1175 every item
+      // ever displayed kept its buffer for the process lifetime.
+      retainFor(ref, thumbnailRetention);
       final service = ref.watch(assetResolutionServiceProvider);
       final resolution = await service.resolveAssetId(item);
 
@@ -65,7 +70,7 @@ final resolvedThumbnailProvider =
         bytes: bytes,
         status: ResolutionStatus.resolved,
       );
-    });
+    }, isAutoDispose: true);
 
 /// Resolved full-resolution provider for photo viewer.
 ///
@@ -74,6 +79,9 @@ final resolvedThumbnailProvider =
 // clearEntry cache eviction, not a read.
 final resolvedFullResolutionProvider =
     FutureProvider.family<ResolvedAssetResult, MediaItem>((ref, item) async {
+      // A FULL-RESOLUTION buffer per item, which is megabytes each. Kept only
+      // long enough to serve a swipe back to the photo just left (#1175).
+      retainFor(ref, fullResolutionRetention);
       final service = ref.watch(assetResolutionServiceProvider);
       final resolution = await service.resolveAssetId(item);
 
@@ -94,7 +102,7 @@ final resolvedFullResolutionProvider =
         bytes: bytes,
         status: ResolutionStatus.resolved,
       );
-    });
+    }, isAutoDispose: true);
 
 /// Resolved file path provider for video playback.
 ///

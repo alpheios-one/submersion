@@ -16,6 +16,16 @@ import 'package:submersion/features/media_store/presentation/providers/media_sto
 /// cheaper than the original.
 const Size kDefaultThumbnailTarget = Size(200, 200);
 
+/// How far past the viewport a full-screen image is decoded, so pinch-zoom
+/// still has pixels to show.
+///
+/// The viewers run `PhotoViewGallery` at `maxScale: covered * 3.0`, so a bound
+/// of exactly one viewport would go soft the moment the user zooms. Two keeps
+/// detail through the range people actually use while still cutting a 24 MP
+/// original (~96 MB of RGBA) to roughly a tenth of that on a phone. Raising it
+/// buys sharpness at 3x zoom for a quadratic cost in bytes.
+const double _viewerZoomHeadroom = 2.0;
+
 /// Universal display widget for any [MediaItem] regardless of its source
 /// type.
 ///
@@ -345,10 +355,23 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
         // those decodes would otherwise stay resident for the whole visit.
         // Width only: passing both dimensions decodes to exact bounds and
         // distorts the aspect ratio.
+        //
+        // With no targetSize this used to pass null, which is the FULL-SCREEN
+        // viewer's case: media_viewer_page and site_media_viewer_page both
+        // build `MediaItemView(item: item, fit: BoxFit.contain)`. So the one
+        // surface that draws whole originals was the one with no decode bound
+        // at all -- a 24 MP JPEG at ~96 MB of RGBA, two of them alive while a
+        // PageView swipe is in flight, and neither evictable because
+        // ImageCache's budget only governs images with no listener. That is
+        // the Android OOM in #1175. Falling back to the viewport keeps the
+        // decode proportional to what can actually be displayed.
+        final dpr = MediaQuery.devicePixelRatioOf(context);
         final target = widget.targetSize;
-        final cacheWidth = target == null
-            ? null
-            : (target.longestSide * MediaQuery.devicePixelRatioOf(context))
+        final cacheWidth = target != null
+            ? (target.longestSide * dpr).round()
+            : (MediaQuery.sizeOf(context).longestSide *
+                      dpr *
+                      _viewerZoomHeadroom)
                   .round();
         return switch (data) {
           FileData() when widget.item.isDocument && !documentRenderable =>
