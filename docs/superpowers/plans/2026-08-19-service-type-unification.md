@@ -13,8 +13,8 @@
 ## Global Constraints
 
 - **Worktree:** all work happens in `.claude/worktrees/service-type-unification` on branch `worktree-service-type-unification`. Use worktree-absolute paths for every file operation; a main-tree absolute path edits the wrong checkout.
-- **Schema version:** this plan claims **v158**. `AppDatabase.currentSchemaVersion` is 157 at `lib/core/database/database.dart:3099`. If another PR takes 158 first, renumber the migration block, `migrationVersions`, the test filenames, and every docstring together.
-- **Compatibility floor:** `AppDatabase.minimumCompatibleSchemaVersion` is 137 at `lib/core/database/database.dart:3120` and rises to **158** in Task 3. This is deliberate and holds every peer below 158 until it updates.
+- **Schema version:** this plan claims **v159**. `AppDatabase.currentSchemaVersion` is 158 at `lib/core/database/database.dart:3119`. If another PR takes 159 first, renumber the migration block, `migrationVersions`, the test filenames, and every docstring together.
+- **Compatibility floor:** `AppDatabase.minimumCompatibleSchemaVersion` is 137 at `lib/core/database/database.dart:3140` and rises to **159** in Task 3. This is deliberate and holds every peer below 159 until it updates.
 - **Localization:** every new or renamed key is added to **all 11** ARB files: `app_en.arb`, `app_ar.arb`, `app_de.arb`, `app_es.arb`, `app_fr.arb`, `app_he.arb`, `app_hu.arb`, `app_it.arb`, `app_nl.arb`, `app_pt.arb`, `app_zh.arb`. Regenerate with `flutter gen-l10n` and commit the regenerated `lib/l10n/arb/app_localizations*.dart`.
 - **Writing style:** no em-dashes (U+2014) anywhere, including code comments, docstrings and commit messages. No en-dashes as prose punctuation. No emojis in code, comments or docs.
 - **Formatting:** run `dart format lib/ test/` before every commit. `flutter analyze` must be clean; informational lints are fatal in CI.
@@ -29,7 +29,7 @@
 | `lib/features/equipment/domain/entities/service_record.dart` | Domain record, `serviceCategory` field | 1 |
 | `lib/features/equipment/domain/entities/maintenance_history_filter.dart` | History filter, `serviceCategory` dimension | 1 |
 | `lib/features/equipment/presentation/utils/service_category_label.dart` | Localized enum labels (renamed file) | 1 |
-| `lib/core/database/database.dart` | Tables, v158 migration, floor constant, seed SQL | 2, 3 |
+| `lib/core/database/database.dart` | Tables, v159 migration, floor constant, seed SQL | 2, 3 |
 | `lib/core/services/sync/sync_data_serializer.dart` | Legacy wire-key normaliser at both apply chokepoints | 3 |
 | `lib/features/equipment/domain/entities/service_kind.dart` | `defaultCategory` field | 2 |
 | `lib/features/equipment/data/repositories/service_kind_repository.dart` | `defaultCategory` persistence | 2 |
@@ -39,7 +39,7 @@
 | `lib/features/settings/presentation/pages/settings_page.dart` | Manage > Service types tile | 7 |
 | `lib/core/services/export/excel/maintenance_excel_export_service.dart` | Header vocabulary | 8 |
 
-Tasks 1 through 3 must run in order: Task 1 makes the code compile under the new name, Task 2 adds the v158 block, Task 3 extends that same block. Tasks 4 through 8 depend on 1 through 3 but not on each other.
+Tasks 1 through 3 must run in order: Task 1 makes the code compile under the new name, Task 2 adds the v159 block, Task 3 extends that same block. Tasks 4 through 8 depend on 1 through 3 but not on each other.
 
 ---
 
@@ -127,7 +127,7 @@ In `lib/core/constants/enums.dart`, replace the `ServiceType` declaration with:
 ```dart
 /// The category of work a maintenance record represents (what kind of job it
 /// was), as distinct from the service type it fulfills, which is the
-/// user-extensible ServiceKind catalog. Renamed from ServiceType in v158:
+/// user-extensible ServiceKind catalog. Renamed from ServiceType in v159:
 /// the catalog owns the words "service type" in the UI.
 enum ServiceCategory {
   annual('Annual Service'),
@@ -314,13 +314,13 @@ Database column, Drift getter and sync wire key are unchanged here."
 
 ---
 
-### Task 2: Add service_kinds.default_category (schema v158, part A)
+### Task 2: Add service_kinds.default_category (schema v159, part A)
 
 **Files:**
-- Modify: `lib/core/database/database.dart` (`ServiceKinds` table around line 1155, `kSeedBuiltInServiceKindsSql` at 2247, `currentSchemaVersion` at 3099, `migrationVersions` list, `onUpgrade` after the `from < 157` block at 8249, `beforeOpen` backstops near 8420, new helper beside `_assertServiceCostColumns` at 4815)
+- Modify: `lib/core/database/database.dart` (`ServiceKinds` table around line 1175, `kSeedBuiltInServiceKindsSql` at 2267, `currentSchemaVersion` at 3119, `migrationVersions` list, `onUpgrade` after the `from < 158` block at 8364, `beforeOpen` backstops near 8420, new helper beside `_assertServiceCostColumns` at 4839)
 - Modify: `lib/features/equipment/domain/entities/service_kind.dart`
 - Modify: `lib/features/equipment/data/repositories/service_kind_repository.dart`
-- Test: `test/core/database/migration_v158_service_category_test.dart` (new)
+- Test: `test/core/database/migration_v159_service_category_test.dart` (new)
 
 **Interfaces:**
 - Consumes: `ServiceCategory` from Task 1.
@@ -328,7 +328,7 @@ Database column, Drift getter and sync wire key are unchanged here."
 
 - [ ] **Step 1: Write the failing migration test**
 
-Create `test/core/database/migration_v158_service_category_test.dart`:
+Create `test/core/database/migration_v159_service_category_test.dart`:
 
 ```dart
 import 'package:drift/native.dart';
@@ -342,7 +342,7 @@ void main() {
   /// A v157 service_kinds table carrying one custom kind and one built-in.
   NativeDatabase seededV157() => NativeDatabase.memory(
     setup: (db) {
-      db.execute('PRAGMA user_version = 157');
+      db.execute('PRAGMA user_version = 158');
       db.execute('''
         CREATE TABLE service_kinds (
           id TEXT NOT NULL PRIMARY KEY,
@@ -372,7 +372,7 @@ void main() {
     },
   );
 
-  test('v158 adds default_category and seeds built-ins only', () async {
+  test('v159 adds default_category and seeds built-ins only', () async {
     final db = AppDatabase(seededV157());
     addTearDown(db.close);
 
@@ -401,10 +401,10 @@ void main() {
     expect(custom.read<String?>('default_category'), isNull);
   });
 
-  test('v158 does not resurrect a built-in the diver deleted', () async {
+  test('v159 does not resurrect a built-in the diver deleted', () async {
     final native = NativeDatabase.memory(
       setup: (db) {
-        db.execute('PRAGMA user_version = 157');
+        db.execute('PRAGMA user_version = 158');
         db.execute('''
           CREATE TABLE service_kinds (
             id TEXT NOT NULL PRIMARY KEY,
@@ -436,7 +436,7 @@ void main() {
 
   test('the helper no-ops when service_kinds is absent', () async {
     final native = NativeDatabase.memory(
-      setup: (db) => db.execute('PRAGMA user_version = 157'),
+      setup: (db) => db.execute('PRAGMA user_version = 158'),
     );
     final db = AppDatabase(native);
     addTearDown(db.close);
@@ -444,18 +444,18 @@ void main() {
     await expectLater(db.customSelect('SELECT 1').get(), completes);
   });
 
-  test('migration list includes v158 and schema is at least 158', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(158));
-    expect(AppDatabase.migrationVersions, contains(158));
+  test('migration list includes v159 and schema is at least 159', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(159));
+    expect(AppDatabase.migrationVersions, contains(159));
   });
 }
 ```
 
-Note on the second test: `kSeedBuiltInServiceKindsSql` runs in `beforeOpen` and would normally seed `vip`, but this fixture's `service_kinds` table exists and is empty, so the assertion documents that the v158 category step is an `UPDATE` that adds no rows of its own. If the seed constant repopulates the table on open, adjust the assertion to check that the seeded `vip` row carries `default_category = 'inspection'` from the seed SQL rather than from the migration, and keep the intent: the migration itself inserts nothing.
+Note on the second test: `kSeedBuiltInServiceKindsSql` runs in `beforeOpen` and would normally seed `vip`, but this fixture's `service_kinds` table exists and is empty, so the assertion documents that the v159 category step is an `UPDATE` that adds no rows of its own. If the seed constant repopulates the table on open, adjust the assertion to check that the seeded `vip` row carries `default_category = 'inspection'` from the seed SQL rather than from the migration, and keep the intent: the migration itself inserts nothing.
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `flutter test test/core/database/migration_v158_service_category_test.dart`
+Run: `flutter test test/core/database/migration_v159_service_category_test.dart`
 Expected: FAIL on the missing `default_category` column and on `currentSchemaVersion` being 157.
 
 - [ ] **Step 3: Add the Drift column**
@@ -463,7 +463,7 @@ Expected: FAIL on the missing `default_category` column and on `currentSchemaVer
 In `lib/core/database/database.dart`, inside `class ServiceKinds`, directly after `defaultCurrency`:
 
 ```dart
-  /// v158: the category prefilled into a new service record logged against
+  /// v159: the category prefilled into a new service record logged against
   /// this service type. Nullable because a custom type has no opinion until
   /// the diver gives it one; a NOT NULL default would make every custom type
   /// silently claim "annual".
@@ -472,10 +472,10 @@ In `lib/core/database/database.dart`, inside `class ServiceKinds`, directly afte
 
 - [ ] **Step 4: Add the migration helper**
 
-Beside `_assertServiceCostColumns` (around line 4815), add:
+Beside `_assertServiceCostColumns` (around line 4839), add:
 
 ```dart
-  /// v158: service_kinds.default_category, plus the built-in seeding.
+  /// v159: service_kinds.default_category, plus the built-in seeding.
   ///
   /// Self-guards on the table existing, because minimal migration fixtures
   /// ride the ladder from versions that predate service_kinds. The seeding is
@@ -502,12 +502,12 @@ Beside `_assertServiceCostColumns` (around line 4815), add:
   }
 ```
 
-Above `kSeedBuiltInServiceKindsSql` (line 2247), add the mapping so the seed SQL and the migration cannot drift apart:
+Above `kSeedBuiltInServiceKindsSql` (line 2267), add the mapping so the seed SQL and the migration cannot drift apart:
 
 ```dart
 /// The category each built-in service type prefills, by stable slug id.
 /// Consumed by both kSeedBuiltInServiceKindsSql (fresh installs) and the
-/// v158 migration (existing installs).
+/// v159 migration (existing installs).
 const Map<String, String> kBuiltInServiceKindCategories = {
   'hydro': 'inspection',
   'vip': 'inspection',
@@ -549,35 +549,35 @@ and each row gains a trailing category, for example:
 
 - [ ] **Step 6: Wire the migration and the backstop**
 
-Bump `currentSchemaVersion` at line 3099 to `158`. Append to `migrationVersions`:
+Bump `currentSchemaVersion` at line 3119 to `159`. Append to `migrationVersions`:
 
 ```dart
-    // v158 (service type unification): service_kinds.default_category, the
+    // v159 (service type unification): service_kinds.default_category, the
     // category prefilled when a maintenance record is logged.
-    158,
+    159,
 ```
 
-In `onUpgrade`, after the `if (from < 157) await reportProgress();` line:
+In `onUpgrade`, after the `if (from < 158) await reportProgress();` line:
 
 ```dart
-        if (from < 158) {
+        if (from < 159) {
           await _assertServiceCategoryColumn();
         }
-        if (from < 158) await reportProgress();
+        if (from < 159) await reportProgress();
 ```
 
 In `beforeOpen`, beside the `_assertServiceCostColumns()` backstop:
 
 ```dart
-        // v158 backstop: re-assert service_kinds.default_category. A device
-        // that reached 158 or higher through a parallel branch never enters
-        // the `from < 158` block above.
+        // v159 backstop: re-assert service_kinds.default_category. A device
+        // that reached 159 or higher through a parallel branch never enters
+        // the `from < 159` block above.
         await _assertServiceCategoryColumn();
 ```
 
 - [ ] **Step 7: Run the migration test**
 
-Run: `flutter test test/core/database/migration_v158_service_category_test.dart`
+Run: `flutter test test/core/database/migration_v159_service_category_test.dart`
 Expected: PASS.
 
 - [ ] **Step 8: Regenerate Drift code**
@@ -635,7 +635,7 @@ Expected: PASS.
 
 ```bash
 git add -A
-git commit -m "feat(equipment): add default_category to service types (v158)
+git commit -m "feat(equipment): add default_category to service types (v159)
 
 Each service type can now name the category a record logged against it
 should prefill. Built-ins are seeded by slug; custom types start null."
@@ -643,21 +643,21 @@ should prefill. Built-ins are seeded by slug; custom types start null."
 
 ---
 
-### Task 3: Rename the column and the wire key, raise the compatibility floor (schema v158, part B)
+### Task 3: Rename the column and the wire key, raise the compatibility floor (schema v159, part B)
 
-This is the task with a cost to shipped users. It renames the SQL column and the sync wire key, raises `minimumCompatibleSchemaVersion` to 158, and adds the normaliser that lets payloads and backups written with the old key still apply.
+This is the task with a cost to shipped users. It renames the SQL column and the sync wire key, raises `minimumCompatibleSchemaVersion` to 159, and adds the normaliser that lets payloads and backups written with the old key still apply.
 
 **Files:**
-- Modify: `lib/core/database/database.dart` (`ServiceRecords.serviceType` at line 1925, `minimumCompatibleSchemaVersion` at 3120, `_assertServiceCategoryColumn`)
-- Modify: `lib/core/services/sync/sync_data_serializer.dart` (`upsertRecord` at 2368, `upsertRecords` at 2858)
+- Modify: `lib/core/database/database.dart` (`ServiceRecords.serviceType` at line 1945, `minimumCompatibleSchemaVersion` at 3120, `_assertServiceCategoryColumn`)
+- Modify: `lib/core/services/sync/sync_data_serializer.dart` (`upsertRecord` at 2368, `upsertRecords` at 2855)
 - Modify: `lib/features/equipment/data/repositories/service_record_repository.dart`
 - Modify: `lib/core/services/export/uddf/uddf_export_builders.dart`, `uddf_import_parsers.dart`
 - Test: `test/core/services/sync/legacy_service_key_test.dart` (new)
-- Test: `test/core/database/migration_v158_service_category_test.dart` (extend)
+- Test: `test/core/database/migration_v159_service_category_test.dart` (extend)
 - Test: `test/core/services/sync/cross_version_roundtrip_test.dart` (extend)
 
 **Interfaces:**
-- Consumes: `ServiceCategory` (Task 1), the v158 migration block (Task 2).
+- Consumes: `ServiceCategory` (Task 1), the v159 migration block (Task 2).
 - Produces: SQL column `service_records.service_category`; Drift getter `ServiceRecords.serviceCategory`; wire key `serviceCategory`; private `SyncDataSerializer._withRenamedKeys(String entityType, Map<String, dynamic> data)` applied at both apply chokepoints.
 
 - [ ] **Step 1: Write the failing normaliser test**
@@ -665,7 +665,7 @@ This is the task with a cost to shipped users. It renames the SQL column and the
 Create `test/core/services/sync/legacy_service_key_test.dart`:
 
 ```dart
-// A peer or backup written before v158 keys the maintenance category as
+// A peer or backup written before v159 keys the maintenance category as
 // 'serviceType'. The floor bump stops OLD readers applying OUR payloads, but
 // the gate is one-directional: their payloads still arrive here, so the apply
 // path has to accept the old spelling.
@@ -771,13 +771,13 @@ Expected: FAIL, "no such column: service_category".
 In `lib/core/database/database.dart`, in `class ServiceRecords`:
 
 ```dart
-  /// v158: renamed from serviceType. The Drift getter name is also the sync
+  /// v159: renamed from serviceType. The Drift getter name is also the sync
   /// wire key, so this rename raises minimumCompatibleSchemaVersion; see
   /// SyncDataSerializer._withRenamedKeys for the receiving-side tolerance.
   TextColumn get serviceCategory => text()();
 ```
 
-- [ ] **Step 4: Extend the v158 migration with the rename**
+- [ ] **Step 4: Extend the v159 migration with the rename**
 
 Add to `_assertServiceCategoryColumn`, after the `service_kinds` work:
 
@@ -802,18 +802,18 @@ Add to `_assertServiceCategoryColumn`, after the `service_kinds` work:
 
 - [ ] **Step 5: Raise the compatibility floor**
 
-At `lib/core/database/database.dart:3120`:
+At `lib/core/database/database.dart:3140`:
 
 ```dart
-  static const int minimumCompatibleSchemaVersion = 158;
+  static const int minimumCompatibleSchemaVersion = 159;
 ```
 
 Extend the doc comment with a line recording why:
 
 ```dart
-  /// Raised 137 -> 158 by the service type unification: v158 renames the
+  /// Raised 137 -> 159 by the service type unification: v159 renames the
   /// synced column service_records.service_type to service_category, which
-  /// the rules below classify as breaking. Peers below 158 are held until
+  /// the rules below classify as breaking. Peers below 159 are held until
   /// they update.
 ```
 
@@ -824,7 +824,7 @@ In `lib/core/services/sync/sync_data_serializer.dart`, beside `_withSchemaDefaul
 ```dart
   /// Wire keys this build renamed, as oldKey -> newKey per entity type.
   ///
-  /// Payloads published by peers below schema 158, and backups written by
+  /// Payloads published by peers below schema 159, and backups written by
   /// them, spell the maintenance category 'serviceType'. The compatibility
   /// floor stops those peers applying OUR payloads, but the gate is
   /// one-directional (changeset_reader.dart compares the writer's floor to
@@ -868,7 +868,7 @@ In `upsertRecord` (line 2368):
     );
 ```
 
-In `upsertRecords` (line 2858):
+In `upsertRecords` (line 2855):
 
 ```dart
     records = records
@@ -893,7 +893,7 @@ In `service_record_repository.dart`, the raw-SQL read becomes `row.data['service
 In `uddf_export_builders.dart`, the element name becomes `'servicecategory'`. In `uddf_import_parsers.dart`, accept both spellings permanently, because exported files live on disk with no version handshake:
 
 ```dart
-    // Files exported before v158 spell this 'servicetype'. UDDF files have no
+    // Files exported before v159 spell this 'servicetype'. UDDF files have no
     // version handshake, so both spellings are read forever.
     final serviceCategory =
         getElementText(recordElement, 'servicecategory') ??
@@ -940,14 +940,14 @@ Expected: PASS.
 
 - [ ] **Step 10: Extend the migration test**
 
-Append to `test/core/database/migration_v158_service_category_test.dart`:
+Append to `test/core/database/migration_v159_service_category_test.dart`:
 
 ```dart
-  test('v158 renames service_type to service_category, preserving values',
+  test('v159 renames service_type to service_category, preserving values',
       () async {
     final native = NativeDatabase.memory(
       setup: (db) {
-        db.execute('PRAGMA user_version = 157');
+        db.execute('PRAGMA user_version = 158');
         db.execute('''
           CREATE TABLE service_records (
             id TEXT NOT NULL PRIMARY KEY,
@@ -982,7 +982,7 @@ Append to `test/core/database/migration_v158_service_category_test.dart`:
   });
 
   test('the compatibility floor records the rename', () {
-    expect(AppDatabase.minimumCompatibleSchemaVersion, 158);
+    expect(AppDatabase.minimumCompatibleSchemaVersion, 159);
   });
 ```
 
@@ -990,12 +990,12 @@ Append to `test/core/database/migration_v158_service_category_test.dart`:
 
 That file's header comment instructs the next migration that raises the floor to extend it. Do two things.
 
-First, update the header comment to record that the floor moved to 158 and why, keeping the existing `postV137DiveKeys` constant as the record of the previous boundary.
+First, update the header comment to record that the floor moved to 159 and why, keeping the existing `postV137DiveKeys` constant as the record of the previous boundary.
 
 Second, add a group that drives an old-spelling service record through the real merge path rather than through `upsertRecord` directly, so the normaliser is proven where sync actually calls it:
 
 ```dart
-  group('pre-158 peer publishing a service record (service type rename)', () {
+  group('pre-159 peer publishing a service record (service type rename)', () {
     test('an old-key payload applies through the merge path', () async {
       final service = buildService();
       final record = {
@@ -1037,10 +1037,10 @@ Expected: PASS.
 
 ```bash
 git add -A
-git commit -m "feat(sync): rename service_type to service_category (v158)
+git commit -m "feat(sync): rename service_type to service_category (v159)
 
 The Drift getter name is the sync wire key, so this rename is breaking
-under the #1089 rules and raises minimumCompatibleSchemaVersion to 158.
+under the #1089 rules and raises minimumCompatibleSchemaVersion to 159.
 The gate is one-directional, so the apply path also accepts the old key
 from peers and backups that have not updated."
 ```
@@ -1765,7 +1765,7 @@ git commit -m "refactor(export): name the maintenance log columns as the UI does
 - [ ] Run `dart format lib/ test/` and confirm no files change.
 - [ ] Run `flutter analyze` and confirm zero issues, including informational lints.
 - [ ] Run the full suite **twice**: `flutter test`. Do not pipe the output through `grep` or `tail`, because the pipeline's exit code hides the test runner's. Disjoint failure sets across the two runs indicate pre-existing flakes rather than a regression from this work; known flaky areas are the encrypted-backup tests, the recovery-code split, the security-settings recovery dialog, and the zip temp-dir tests.
-- [ ] Restore a backup produced by a pre-158 build and confirm its service records land with their categories intact. The spec asks for this as an automated test; Task 3 covers the mechanism instead, by pinning both wire spellings at `upsertRecord` and `upsertRecords`, which are the only paths reaching `ServiceRecord.fromJson`. Verify the end-to-end path here at least once by hand.
-- [ ] Confirm no other PR has claimed schema 158; renumber everything together if one has.
+- [ ] Restore a backup produced by a pre-159 build and confirm its service records land with their categories intact. The spec asks for this as an automated test; Task 3 covers the mechanism instead, by pinning both wire spellings at `upsertRecord` and `upsertRecords`, which are the only paths reaching `ServiceRecord.fromJson`. Verify the end-to-end path here at least once by hand.
+- [ ] Confirm no other PR has claimed schema 159; renumber everything together if one has.
 - [ ] Interactive macOS smoke: log a service record and confirm the type is required, the category prefills and stays put once changed; open Settings > Manage > Service types; set a default category on a custom type; confirm the history row title and the clock reset still behave.
-- [ ] PR body must state the compatibility floor change in plain terms: peers below schema 158 are held until they update, which includes the App Store fleet during the review window. Also note the inherited #1144 gap, which leaves `default_category` on custom service types out of incremental sync to a second device.
+- [ ] PR body must state the compatibility floor change in plain terms: peers below schema 159 are held until they update, which includes the App Store fleet during the review window. Also note the inherited #1144 gap, which leaves `default_category` on custom service types out of incremental sync to a second device.
