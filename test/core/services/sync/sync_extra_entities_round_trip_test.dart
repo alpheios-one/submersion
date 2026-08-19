@@ -257,32 +257,29 @@ void main() {
       },
     );
 
-    test(
-      'a DiveDataSources payload from a pre-v158 peer, with no '
-      'timeOffsetSeconds key at all, still applies (#1177)',
-      () async {
-        final serializer = SyncDataSerializer();
-        final diveRepo = DiveRepository();
+    test('a DiveDataSources payload from a pre-v158 peer, with no '
+        'timeOffsetSeconds key at all, still applies (#1177)', () async {
+      final serializer = SyncDataSerializer();
+      final diveRepo = DiveRepository();
 
-        await diveRepo.createDive(
-          createTestDiveWithBottomTime(id: 'dive-ds-2', diveNumber: 103),
-        );
+      await diveRepo.createDive(
+        createTestDiveWithBottomTime(id: 'dive-ds-2', diveNumber: 103),
+      );
 
-        // Older writers do not know the column exists. The receiving side
-        // must read that as "no offset", not reject the row.
-        await serializer.upsertRecord('diveDataSources', {
-          'id': 'ds-2',
-          'diveId': 'dive-ds-2',
-          'isPrimary': true,
-          'sourceFormat': 'shearwater',
-          'importedAt': 1700000000000,
-          'createdAt': 1700000000000,
-        });
+      // Older writers do not know the column exists. The receiving side
+      // must read that as "no offset", not reject the row.
+      await serializer.upsertRecord('diveDataSources', {
+        'id': 'ds-2',
+        'diveId': 'dive-ds-2',
+        'isPrimary': true,
+        'sourceFormat': 'shearwater',
+        'importedAt': 1700000000000,
+        'createdAt': 1700000000000,
+      });
 
-        final stored = await serializer.fetchRecord('diveDataSources', 'ds-2');
-        expect(stored, isNotNull);
-        expect(stored!['timeOffsetSeconds'], isNull);
-      },
-    );
+      final stored = await serializer.fetchRecord('diveDataSources', 'ds-2');
+      expect(stored, isNotNull);
+      expect(stored!['timeOffsetSeconds'], isNull);
+    });
   });
 }
