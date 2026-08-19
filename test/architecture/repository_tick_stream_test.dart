@@ -10,6 +10,8 @@ import 'package:submersion/features/equipment/data/repositories/service_record_r
 import 'package:submersion/features/equipment/data/repositories/service_schedule_repository.dart';
 import 'package:submersion/features/maps/data/repositories/offline_map_repository.dart';
 import 'package:submersion/features/media/data/repositories/manifest_subscription_repository.dart';
+import 'package:submersion/features/media/data/repositories/media_library_repository.dart';
+import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media_store/data/media_stores_repository.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 import 'package:submersion/features/statistics/data/repositories/statistics_repository.dart';
@@ -127,6 +129,82 @@ void main() {
     }
     return fired;
   }
+
+  /// Subscribes to [tick] and reports whether it emitted with NO write at all.
+  ///
+  /// The other half of the contract, and the half nothing checked before
+  /// #1175. Every consumer of these streams feeds them to
+  /// `Ref.invalidateSelfWhen`, which rebuilds the provider on each tick. A
+  /// stream that emits on subscribe therefore invalidates the provider that
+  /// just subscribed; the rebuild subscribes again and emits again, and the
+  /// provider spins for as long as anything watches it -- running its query
+  /// once per event-loop turn on the main-isolate database.
+  ///
+  /// This is exactly what a Drift QUERY stream does: `watchSingle()` and
+  /// friends deliver the current row set on listen. A tick must be built on
+  /// `tableUpdates`, which fires only on a real write.
+  Future<bool> firesWithoutAWrite(Stream<void> tick) async {
+    var fired = false;
+    final sub = tick.listen((_) => fired = true);
+    addTearDown(sub.cancel);
+
+    // Generous relative to the 300 ms debounce the slowest tick applies, so a
+    // late emission is not mistaken for silence.
+    for (var i = 0; i < 60 && !fired; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    }
+    return fired;
+  }
+
+  group('silence before a write', () {
+    // Regression guard for #1175: MediaLibraryRepository.watchMediaChanges was
+    // a watched COUNT query, so subscribing to it emitted immediately. Fed to
+    // invalidateSelfWhen by unlinkedCountProvider, missingCountProvider and
+    // sourceCountsProvider, that turned opening the Media section into an
+    // unbounded rebuild loop, one COUNT(*) over `media` per event-loop turn.
+    //
+    // Covers every tick this file already exercises for firing, so the two
+    // halves of the contract are checked over the same set.
+    final ticks = <String, Stream<void> Function()>{
+      'MediaLibraryRepository.watchMediaChanges':
+          MediaLibraryRepository().watchMediaChanges,
+      'MediaRepository.watchMediaChanges': MediaRepository().watchMediaChanges,
+      'StatisticsRepository.watchStatisticsChanges':
+          StatisticsRepository().watchStatisticsChanges,
+      'ServiceRecordRepository.watchServiceRecordsChanges':
+          ServiceRecordRepository().watchServiceRecordsChanges,
+      'ServiceKindRepository.watchServiceKindsChanges':
+          ServiceKindRepository().watchServiceKindsChanges,
+      'ServiceScheduleRepository.watchSchedulesChanges':
+          ServiceScheduleRepository().watchSchedulesChanges,
+      'CylinderConfigRepository.watchConfigsChanges':
+          CylinderConfigRepository().watchConfigsChanges,
+      'DiveComputerRepository.watchComputersChanges':
+          DiveComputerRepository().watchComputersChanges,
+      'OfflineMapRepository.watchRegionsChanges':
+          OfflineMapRepository().watchRegionsChanges,
+      'AppSettingsRepository.watchSettingsChanges':
+          AppSettingsRepository().watchSettingsChanges,
+      'ManifestSubscriptionRepository.watchSubscriptionsChanges':
+          ManifestSubscriptionRepository().watchSubscriptionsChanges,
+      'CsvPresetRepository.watchPresetsChanges':
+          CsvPresetRepository().watchPresetsChanges,
+    };
+
+    for (final entry in ticks.entries) {
+      test('${entry.key} stays silent until something is written', () async {
+        expect(
+          await firesWithoutAWrite(entry.value()),
+          isFalse,
+          reason:
+              '${entry.key} emitted on subscribe. Every caller feeds this to '
+              'Ref.invalidateSelfWhen, so an emit-on-listen tick makes the '
+              'provider rebuild, resubscribe and tick again forever. Build the '
+              'tick on tableUpdates(), not on a watched query.',
+        );
+      });
+    }
+  });
 
   group('statistics', () {
     test('watchStatisticsChanges fires on a dives write', () async {

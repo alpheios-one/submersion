@@ -16,6 +16,15 @@ import 'package:submersion/features/media_store/presentation/providers/media_sto
 /// from `watchLatestForMedia` rather than from the watch, and both must sit
 /// inside the guard. Widget tests routinely run without that database, and a
 /// media item's provenance is not worth failing a tree over.
+///
+/// AUTO-DISPOSING, unlike Riverpod 3's default for StreamProvider. Every
+/// rendered grid tile opens one entry here, and each entry holds a live Drift
+/// watch on `media_transfer_queue`. Kept forever, a scrolled library
+/// accumulated one permanent subscription per row it had ever shown -- and
+/// Drift re-runs every registered watch query on every write to that table, so
+/// an upload drain cost O(rows ever rendered) queries per row it stamped
+/// (#1175). Disposing when the tile scrolls away bounds that to what is
+/// on screen.
 // no-tick: already reactive on a real change stream (watchLatestForMedia).
 final mediaQueueFactsProvider = StreamProvider.family<QueueFacts?, String>((
   ref,
@@ -33,7 +42,7 @@ final mediaQueueFactsProvider = StreamProvider.family<QueueFacts?, String>((
   } on StateError {
     return Stream.value(null);
   }
-});
+}, isAutoDispose: true);
 
 /// Origin and backup facts for one media item.
 ///
@@ -50,6 +59,10 @@ final mediaQueueFactsProvider = StreamProvider.family<QueueFacts?, String>((
 /// synchronously. "Not yet known" reads the same as "not attached", which is
 /// the conservative direction: it under-claims backup coverage rather than
 /// over-claiming it.
+///
+/// Auto-disposing for the same reason as [mediaQueueFactsProvider], which it
+/// keeps alive by watching. The family key is a whole [MediaItem] -- Equatable
+/// over ~40 props -- so a retained entry is not free either.
 final mediaProvenanceProvider = Provider.family<MediaProvenance, MediaItem>((
   ref,
   item,
@@ -57,7 +70,7 @@ final mediaProvenanceProvider = Provider.family<MediaProvenance, MediaItem>((
   final attached = ref.watch(mediaStoreAttachedProvider).value ?? false;
   final queue = ref.watch(mediaQueueFactsProvider(item.id)).value;
   return MediaProvenance.from(item, storeAttached: attached, queue: queue);
-});
+}, isAutoDispose: true);
 
 /// Checks one item's source and persists the outcome.
 ///
