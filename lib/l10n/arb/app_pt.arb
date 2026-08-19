@@ -6291,6 +6291,7 @@
   "diveLog_detail_menu_reparseRawData": "Reanalisar dados brutos",
   "diveLog_detail_reparseFailed": "Falha na reanálise: {error}",
   "diveLog_detail_reparseSuccess": "Mergulho reanalisado com sucesso",
+  "diveLog_detail_reparseProfilePreserved": "Detalhes da fonte atualizados. Este mergulho foi combinado a partir de outros mergulhos, por isso o seu perfil não foi alterado.",
   "settings_appearance_mapStyle": "Estilo do Mapa",
   "settings_appearance_mapStyle_esriSatellite": "Satélite",
   "settings_appearance_mapStyle_openStreetMap": "Mapa de Ruas",

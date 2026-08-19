@@ -423,7 +423,10 @@ void main() {
           );
         }
 
-        final errors = await service.reparseDive('dive-1', parseFn: fakeParse);
+        final errors = (await service.reparseDive(
+          'dive-1',
+          parseFn: fakeParse,
+        )).errors;
 
         expect(errors, isEmpty);
         final dive = await getDive('dive-1');
@@ -472,7 +475,10 @@ void main() {
           return makeParsedDive();
         }
 
-        final errors = await service.reparseDive('dive-1', parseFn: fakeParse);
+        final errors = (await service.reparseDive(
+          'dive-1',
+          parseFn: fakeParse,
+        )).errors;
 
         // Documents current behavior: no errors reported, parser not invoked.
         expect(errors, isEmpty);
@@ -2232,7 +2238,10 @@ void main() {
         computerId: 'comp-1',
       );
 
-      final errors = await service.reparseDive('dive-1', parseFn: fakeParseFn);
+      final errors = (await service.reparseDive(
+        'dive-1',
+        parseFn: fakeParseFn,
+      )).errors;
 
       expect(errors, isEmpty);
     });
@@ -2249,7 +2258,10 @@ void main() {
         descriptorModel: null,
       );
 
-      final errors = await service.reparseDive('dive-1', parseFn: fakeParseFn);
+      final errors = (await service.reparseDive(
+        'dive-1',
+        parseFn: fakeParseFn,
+      )).errors;
 
       expect(errors, isEmpty);
     });
@@ -2263,12 +2275,12 @@ void main() {
         computerId: 'comp-1',
       );
 
-      final errors = await service.reparseDive(
+      final errors = (await service.reparseDive(
         'dive-1',
         parseFn: (vendor, product, model, rawData) async {
           throw Exception('native bridge error');
         },
-      );
+      )).errors;
 
       expect(errors.length, 1);
       expect(errors.first, contains('native bridge error'));
@@ -2293,7 +2305,10 @@ void main() {
             ),
           );
 
-      final errors = await service.reparseDive('dive-1', parseFn: fakeParseFn);
+      final errors = (await service.reparseDive(
+        'dive-1',
+        parseFn: fakeParseFn,
+      )).errors;
 
       expect(errors, isEmpty);
     });
@@ -2323,7 +2338,7 @@ void main() {
           descriptorModel: 99,
         );
 
-        final errors = await service.reparseDive(
+        final errors = (await service.reparseDive(
           'dive-1',
           parseFn: (vendor, product, model, rawData) async {
             if (vendor == 'Suunto') {
@@ -2331,7 +2346,7 @@ void main() {
             }
             return makeParsedDive();
           },
-        );
+        )).errors;
 
         expect(errors.length, 1);
         expect(errors.first, contains('Suunto parse failure'));
@@ -2758,5 +2773,298 @@ void main() {
       // Maximum CNS across all samples is 45.0
       expect(dive.cnsEnd, 45.0);
     });
+  });
+
+  // ---------------------------------------------------------------------------
+  // #1164: a source row may only rewrite the profile strand it exclusively
+  // authored, in its own parse frame. A sequential combine (DiveMergeService)
+  // carries every original's source row onto the merged dive demoted to
+  // non-primary and re-bases the samples, so no carried row satisfies that.
+  // ---------------------------------------------------------------------------
+  group('ReparseService merged-dive profile guard', () {
+    /// The shape DiveMergeService.apply leaves behind: a brand-new dive whose
+    /// only dive_data_sources rows are carried provenance, every one demoted.
+    Future<void> insertMergedDive(
+      List<({String sourceId, String? computerId})> carried,
+    ) async {
+      await insertDive('merged-1', maxDepth: 25.0, runtime: 4200);
+      final seenComputers = <String>{};
+      for (final c in carried) {
+        if (c.computerId != null && seenComputers.add(c.computerId!)) {
+          await insertComputer(c.computerId!);
+        }
+        await insertSource(
+          id: c.sourceId,
+          diveId: 'merged-1',
+          computerId: c.computerId,
+          isPrimary: false,
+        );
+      }
+    }
+
+    /// First half at 0..180, surface gap filled at 240..300, second half
+    /// re-based to 360..540 -- the timeline DiveMergeService produces.
+    const mergedTimestamps = [0, 60, 120, 180, 240, 300, 360, 420, 480, 540];
+
+    Future<void> insertMergedProfile(String? computerId) async {
+      for (var i = 0; i < mergedTimestamps.length; i++) {
+        final ts = mergedTimestamps[i];
+        await insertProfile(
+          id: 'merged-prof-$i',
+          diveId: 'merged-1',
+          computerId: computerId,
+          timestamp: ts,
+          depth: ts >= 240 && ts <= 300 ? 0.0 : 20.0,
+        );
+      }
+    }
+
+    Future<List<DiveProfile>> mergedProfiles() {
+      return (db.select(db.diveProfiles)
+            ..where((t) => t.diveId.equals('merged-1'))
+            ..orderBy([(t) => OrderingTerm(expression: t.timestamp)]))
+          .get();
+    }
+
+    test('both halves and the synthesized gap survive when the carried sources '
+        'share one computer', () async {
+      await insertMergedDive([
+        (sourceId: 'src-a', computerId: 'comp-1'),
+        (sourceId: 'src-b', computerId: 'comp-1'),
+      ]);
+      await insertMergedProfile('comp-1');
+
+      for (final sourceId in ['src-a', 'src-b']) {
+        await service.applyParsedUpdate(
+          diveId: 'merged-1',
+          sourceRowId: sourceId,
+          parsed: makeParsedDive(),
+          descriptorVendor: null,
+          descriptorProduct: null,
+          descriptorModel: null,
+          libdivecomputerVersion: null,
+        );
+      }
+
+      final profiles = await mergedProfiles();
+      expect(profiles.map((p) => p.timestamp), mergedTimestamps);
+      expect(profiles.map((p) => p.id), everyElement(startsWith('merged-')));
+      expect(profiles.every((p) => p.isPrimary), isTrue);
+    });
+
+    test(
+      'the profile survives when the halves came from different computers',
+      () async {
+        await insertMergedDive([
+          (sourceId: 'src-a', computerId: 'comp-1'),
+          (sourceId: 'src-b', computerId: 'comp-2'),
+        ]);
+        await insertMergedProfile('comp-1');
+
+        await service.applyParsedUpdate(
+          diveId: 'merged-1',
+          sourceRowId: 'src-a',
+          parsed: makeParsedDive(),
+          descriptorVendor: null,
+          descriptorProduct: null,
+          descriptorModel: null,
+          libdivecomputerVersion: null,
+        );
+
+        expect(
+          (await mergedProfiles()).map((p) => p.timestamp),
+          mergedTimestamps,
+        );
+      },
+    );
+
+    test(
+      'surface-gap events survive when only one original had a source row',
+      () async {
+        // A single carried row leaves isMultiSource false, so step 5 would
+        // otherwise delete the merge's own surface markers.
+        await insertMergedDive([(sourceId: 'src-a', computerId: 'comp-1')]);
+        await insertMergedProfile('comp-1');
+        for (final ts in [240, 300]) {
+          await db
+              .into(db.diveProfileEvents)
+              .insert(
+                DiveProfileEventsCompanion.insert(
+                  id: 'gap-event-$ts',
+                  diveId: 'merged-1',
+                  timestamp: ts,
+                  eventType: 'surface',
+                  source: const Value('app'),
+                  createdAt: nowMs,
+                ),
+              );
+        }
+
+        await service.applyParsedUpdate(
+          diveId: 'merged-1',
+          sourceRowId: 'src-a',
+          parsed: makeParsedDive(),
+          descriptorVendor: null,
+          descriptorProduct: null,
+          descriptorModel: null,
+          libdivecomputerVersion: null,
+        );
+
+        final events = await (db.select(
+          db.diveProfileEvents,
+        )..where((t) => t.diveId.equals('merged-1'))).get();
+        expect(
+          events.map((e) => e.id),
+          containsAll(['gap-event-240', 'gap-event-300']),
+        );
+        expect((await mergedProfiles()).length, mergedTimestamps.length);
+      },
+    );
+
+    test(
+      'a consolidated dive still re-parses its non-primary secondary strand',
+      () async {
+        // DiveConsolidationService demotes only the secondaries, so the target
+        // keeps a primary source row -- that strand is genuinely the secondary
+        // source's to rewrite and must not be caught by the guard.
+        await insertDive('dive-1');
+        await insertComputer('comp-1');
+        await insertComputer('comp-2');
+        await insertSource(
+          id: 'src-primary',
+          diveId: 'dive-1',
+          computerId: 'comp-1',
+          isPrimary: true,
+        );
+        await insertSource(
+          id: 'src-secondary',
+          diveId: 'dive-1',
+          computerId: 'comp-2',
+          isPrimary: false,
+        );
+        await insertProfile(
+          id: 'stale-secondary',
+          diveId: 'dive-1',
+          computerId: 'comp-2',
+          timestamp: 999,
+          depth: 40.0,
+          isPrimary: false,
+        );
+
+        await service.applyParsedUpdate(
+          diveId: 'dive-1',
+          sourceRowId: 'src-secondary',
+          parsed: makeParsedDive(
+            samples: [
+              pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0),
+              pigeon.ProfileSample(timeSeconds: 60, depthMeters: 12.0),
+            ],
+          ),
+          descriptorVendor: null,
+          descriptorProduct: null,
+          descriptorModel: null,
+          libdivecomputerVersion: null,
+        );
+
+        final secondary =
+            await (db.select(db.diveProfiles)
+                  ..where((t) => t.computerId.equals('comp-2'))
+                  ..orderBy([(t) => OrderingTerm(expression: t.timestamp)]))
+                .get();
+        expect(secondary.map((p) => p.timestamp), [0, 60]);
+        expect(secondary.any((p) => p.isPrimary), isFalse);
+      },
+    );
+
+    test(
+      'a provenance-only sibling sharing the strand does not block a re-parse',
+      () async {
+        // Deleting a computer nulls its sources' computerId (FK setNull) and
+        // _backfillProvenanceSnapshots adds rows with no computerId of their
+        // own, so two rows sharing a null strand is an ordinary shape. A
+        // sibling with no raw data can never be re-parsed, so it cannot
+        // contend for the strand.
+        await insertDive('dive-1');
+        await insertSource(id: 'src-download', diveId: 'dive-1');
+        await insertSource(
+          id: 'src-provenance',
+          diveId: 'dive-1',
+          isPrimary: false,
+        );
+        await (db.update(
+          db.diveDataSources,
+        )..where((t) => t.id.equals('src-download'))).write(
+          DiveDataSourcesCompanion(
+            rawData: Value(Uint8List.fromList([1, 2, 3])),
+          ),
+        );
+        await insertProfile(
+          id: 'stale',
+          diveId: 'dive-1',
+          timestamp: 999,
+          depth: 40.0,
+        );
+
+        await service.applyParsedUpdate(
+          diveId: 'dive-1',
+          sourceRowId: 'src-download',
+          parsed: makeParsedDive(
+            samples: [
+              pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0),
+              pigeon.ProfileSample(timeSeconds: 60, depthMeters: 12.0),
+            ],
+          ),
+          descriptorVendor: null,
+          descriptorProduct: null,
+          descriptorModel: null,
+          libdivecomputerVersion: null,
+        );
+
+        final profiles =
+            await (db.select(db.diveProfiles)
+                  ..where((t) => t.diveId.equals('dive-1'))
+                  ..orderBy([(t) => OrderingTerm(expression: t.timestamp)]))
+                .get();
+        expect(profiles.map((p) => p.timestamp), [0, 60]);
+      },
+    );
+
+    test(
+      'reparseDive reports how many sources had their profile preserved',
+      () async {
+        await insertMergedDive([
+          (sourceId: 'src-a', computerId: 'comp-1'),
+          (sourceId: 'src-b', computerId: 'comp-1'),
+        ]);
+        await insertMergedProfile('comp-1');
+        for (final sourceId in ['src-a', 'src-b']) {
+          await (db.update(
+            db.diveDataSources,
+          )..where((t) => t.id.equals(sourceId))).write(
+            DiveDataSourcesCompanion(
+              rawData: Value(Uint8List.fromList([1, 2, 3])),
+              descriptorVendor: const Value('Shearwater'),
+              descriptorProduct: const Value('Perdix'),
+              descriptorModel: const Value(42),
+            ),
+          );
+        }
+
+        Future<pigeon.ParsedDive> fakeParse(
+          String vendor,
+          String product,
+          int model,
+          Uint8List raw,
+        ) async => makeParsedDive();
+
+        final result = await service.reparseDive(
+          'merged-1',
+          parseFn: fakeParse,
+        );
+
+        expect(result.errors, isEmpty);
+        expect(result.profilesPreserved, 2);
+      },
+    );
   });
 }

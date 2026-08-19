@@ -21630,6 +21630,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_detail_reparseSuccess => 'Dive re-parsed successfully';
 
   @override
+  String get diveLog_detail_reparseProfilePreserved =>
+      'Source details refreshed. This dive was combined from other dives, so its profile was left unchanged.';
+
+  @override
   String diveLog_detail_reparseFailed(String error) {
     return 'Re-parse failed: $error';
   }

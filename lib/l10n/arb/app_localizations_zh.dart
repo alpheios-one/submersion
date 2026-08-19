@@ -20905,6 +20905,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_reparseSuccess => '潜水已成功重新解析';
 
   @override
+  String get diveLog_detail_reparseProfilePreserved =>
+      '已刷新数据源详情。此潜水由多次潜水合并而成，因此其剖面保持不变。';
+
+  @override
   String diveLog_detail_reparseFailed(String error) {
     return '重新解析失败：$error';
   }

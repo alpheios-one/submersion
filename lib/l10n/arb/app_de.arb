@@ -6291,6 +6291,7 @@
   "diveLog_detail_menu_reparseRawData": "Rohdaten neu auswerten",
   "diveLog_detail_reparseFailed": "Neu-Auswertung fehlgeschlagen: {error}",
   "diveLog_detail_reparseSuccess": "Tauchgang erfolgreich neu ausgewertet",
+  "diveLog_detail_reparseProfilePreserved": "Quelldetails aktualisiert. Dieser Tauchgang wurde aus mehreren Tauchgängen zusammengeführt, daher blieb sein Profil unverändert.",
   "settings_appearance_mapStyle": "Kartenstil",
   "settings_appearance_mapStyle_esriSatellite": "Satellit",
   "settings_appearance_mapStyle_openStreetMap": "Straßenkarte",

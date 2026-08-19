@@ -22005,6 +22005,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Mergulho reanalisado com sucesso';
 
   @override
+  String get diveLog_detail_reparseProfilePreserved =>
+      'Detalhes da fonte atualizados. Este mergulho foi combinado a partir de outros mergulhos, por isso o seu perfil não foi alterado.';
+
+  @override
   String diveLog_detail_reparseFailed(String error) {
     return 'Falha na reanálise: $error';
   }

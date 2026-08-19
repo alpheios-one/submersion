@@ -21962,6 +21962,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Tauchgang erfolgreich neu ausgewertet';
 
   @override
+  String get diveLog_detail_reparseProfilePreserved =>
+      'Quelldetails aktualisiert. Dieser Tauchgang wurde aus mehreren Tauchgängen zusammengeführt, daher blieb sein Profil unverändert.';
+
+  @override
   String diveLog_detail_reparseFailed(String error) {
     return 'Neu-Auswertung fehlgeschlagen: $error';
   }

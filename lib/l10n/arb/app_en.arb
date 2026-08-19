@@ -14080,6 +14080,10 @@
   "@diveLog_detail_reparseSuccess": {
     "description": "Snackbar message after successful re-parse"
   },
+  "diveLog_detail_reparseProfilePreserved": "Source details refreshed. This dive was combined from other dives, so its profile was left unchanged.",
+  "@diveLog_detail_reparseProfilePreserved": {
+    "description": "Snackbar message after re-parsing a combined dive, whose user-authored merged profile is deliberately not rewritten"
+  },
   "diveLog_detail_reparseFailed": "Re-parse failed: {error}",
   "@diveLog_detail_reparseFailed": {
     "placeholders": {

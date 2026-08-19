@@ -21617,6 +21617,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_detail_reparseSuccess => 'تمت إعادة تحليل الغطسة بنجاح';
 
   @override
+  String get diveLog_detail_reparseProfilePreserved =>
+      'تم تحديث تفاصيل المصدر. دُمجت هذه الغطسة من غطسات أخرى، لذلك بقي مخططها دون تغيير.';
+
+  @override
   String diveLog_detail_reparseFailed(String error) {
     return 'فشلت إعادة التحليل: $error';
   }

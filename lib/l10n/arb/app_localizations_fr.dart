@@ -22074,6 +22074,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_detail_reparseSuccess => 'Plongée réanalysée avec succès';
 
   @override
+  String get diveLog_detail_reparseProfilePreserved =>
+      'Détails de la source actualisés. Cette plongée a été combinée à partir d\'autres plongées, son profil est donc resté inchangé.';
+
+  @override
   String diveLog_detail_reparseFailed(String error) {
     return 'Échec de la réanalyse : $error';
   }

@@ -5112,10 +5112,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     final service = ref.read(reparseServiceProvider);
     final l10n = context.l10n;
 
-    final errors = await service.reparseDive(
+    final result = await service.reparseDive(
       dive.id,
       parseFn: pigeon.DiveComputerHostApi().parseRawDiveData,
     );
+    final errors = result.errors;
 
     // Invalidate providers so the UI reflects the re-parsed data.
     ref.invalidate(diveProvider(dive.id));
@@ -5125,8 +5126,17 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     if (context.mounted) {
       if (errors.isEmpty) {
+        // A combined dive's profile is user-authored, so re-parse refreshes
+        // only the source provenance and says so -- otherwise the action
+        // looks like an unexplained no-op (#1164).
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.diveLog_detail_reparseSuccess)),
+          SnackBar(
+            content: Text(
+              result.profilesPreserved > 0
+                  ? l10n.diveLog_detail_reparseProfilePreserved
+                  : l10n.diveLog_detail_reparseSuccess,
+            ),
+          ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
