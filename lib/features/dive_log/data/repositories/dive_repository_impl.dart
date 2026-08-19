@@ -590,6 +590,18 @@ class DiveRepository {
       final now = DateTime.now().millisecondsSinceEpoch;
 
       await _db.transaction(() async {
+        // The edit belongs to whichever source is primary right now: it is a
+        // correction of that source's samples, not a new source. Read the id
+        // before the demote so setPrimaryDataSource can later promote the
+        // edit by identity (issue #1149).
+        final primarySource =
+            await (_db.select(_db.diveDataSources)
+                  ..where(
+                    (t) => t.diveId.equals(diveId) & t.isPrimary.equals(true),
+                  )
+                  ..limit(1))
+                .getSingleOrNull();
+
         // Demote all existing profiles to non-primary
         await (_db.update(_db.diveProfiles)
               ..where((t) => t.diveId.equals(diveId)))
@@ -603,6 +615,7 @@ class DiveRepository {
               DiveProfilesCompanion(
                 id: Value(_uuid.v4()),
                 diveId: Value(diveId),
+                sourceId: Value(primarySource?.id),
                 isPrimary: const Value(true),
                 timestamp: Value(point.timestamp),
                 depth: Value(point.depth),
@@ -825,15 +838,25 @@ class DiveRepository {
                 ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
               .get();
 
-      // A row belongs to the primary source's "family" when its computerId
-      // is null (schema convention for primary/manual/edited rows) or is the
-      // primary's own computer. Only family rows participate in
-      // edited-profile detection: an edit demotes the family originals to
-      // isPrimary=false and writes edited rows with isPrimary=true, whereas
-      // secondary computers' rows are ALWAYS isPrimary=false and must never
-      // be mistaken for demoted originals.
-      bool isPrimaryFamily(DiveProfile r) =>
-          r.computerId == null || r.computerId == primary.computerId;
+      // A row belongs to the primary source's "family" when the v154
+      // sourceId FK names the primary source, or -- for rows that carry no
+      // sourceId (written before the migration, or synced from a peer on an
+      // older schema) -- when its computerId is null (the pre-v154
+      // convention for primary/manual/edited rows) or is the primary's own
+      // computer. Only family rows participate in edited-profile detection:
+      // an edit demotes the family originals to isPrimary=false and writes
+      // edited rows with isPrimary=true, whereas secondary computers' rows
+      // are ALWAYS isPrimary=false and must never be mistaken for demoted
+      // originals.
+      //
+      // Preferring the FK is what stops a dive carrying two file-imported
+      // sources from being misread as edited: both sets are null-computerId,
+      // so the legacy rule sees one primary-flagged set beside one demoted
+      // set and drops the second source's samples outright (issue #1149).
+      final sourceIds = {for (final s in sourceRows) s.id};
+      bool isPrimaryFamily(DiveProfile r) => sourceIds.contains(r.sourceId)
+          ? r.sourceId == primary.id
+          : r.computerId == null || r.computerId == primary.computerId;
 
       final familyRows = rows.where(isPrimaryFamily);
       final hasEditedProfile =
@@ -846,7 +869,11 @@ class DiveRepository {
       var primaryIsEdited = false;
 
       for (final row in rows) {
-        final owner = row.computerId == null
+        // The FK is authoritative when present and still resolvable; the
+        // computerId convention is the fallback for unattributed rows.
+        final owner = sourceIds.contains(row.sourceId)
+            ? row.sourceId!
+            : row.computerId == null
             ? primary.id
             : (sourceIdByComputer[row.computerId!] ?? primary.id);
         if (hasEditedProfile && isPrimaryFamily(row)) {
@@ -5922,6 +5949,7 @@ class DiveRepository {
   Future<void> saveComputerReading(DiveDataSourcesCompanion reading) async {
     try {
       await _db.into(_db.diveDataSources).insert(reading);
+      await _adoptUnattributedProfiles(reading);
       SyncEventBus.notifyLocalChange();
     } catch (e, stackTrace) {
       _log.error(
@@ -5931,6 +5959,35 @@ class DiveRepository {
       );
       rethrow;
     }
+  }
+
+  /// Claim a dive's unattributed profile rows for a just-inserted source.
+  ///
+  /// The file-import pipeline writes samples before it writes the source row
+  /// describing them (createDive runs first, saveComputerReading second), so
+  /// those rows would carry no sourceId and depend on the pre-v154 computerId
+  /// convention forever. Adopting them the moment their owner first exists
+  /// closes that gap for newly imported dives (issue #1149).
+  ///
+  /// Only when this is the dive's sole source row. With a second source
+  /// present the unattributed rows could belong to either, and a guess would
+  /// be worse than leaving the documented fallback to handle them.
+  Future<void> _adoptUnattributedProfiles(
+    DiveDataSourcesCompanion reading,
+  ) async {
+    if (!reading.id.present || !reading.diveId.present) return;
+    final diveId = reading.diveId.value;
+
+    final sources =
+        await (_db.select(_db.diveDataSources)
+              ..where((t) => t.diveId.equals(diveId))
+              ..limit(2))
+            .get();
+    if (sources.length != 1) return;
+
+    await (_db.update(_db.diveProfiles)
+          ..where((t) => t.diveId.equals(diveId) & t.sourceId.isNull()))
+        .write(DiveProfilesCompanion(sourceId: Value(reading.id.value)));
   }
 
   /// Delete a computer reading snapshot by its ID.
@@ -6074,20 +6131,22 @@ class DiveRepository {
           ),
         );
 
-        // Swap isPrimary on dive_profiles:
-        // Demote all profiles for this dive.
-        await (_db.update(_db.diveProfiles)
-              ..where((t) => t.diveId.equals(diveId)))
-            .write(const DiveProfilesCompanion(isPrimary: Value(false)));
-
-        // Promote profiles belonging to the new primary computer.
-        if (newPrimary.computerId != null) {
-          await (_db.update(_db.diveProfiles)..where(
-                (t) =>
-                    t.diveId.equals(diveId) &
-                    t.computerId.equals(newPrimary.computerId!),
-              ))
-              .write(const DiveProfilesCompanion(isPrimary: Value(true)));
+        // Swap isPrimary on dive_profiles.
+        //
+        // Resolve what to promote BEFORE demoting anything (issue #1149).
+        // The old order -- demote every row for the dive, then promote --
+        // stranded the dive with zero `is_primary = 1` rows whenever the
+        // promote matched nothing, which happened for every file-imported
+        // source (null computerId on both the source row and its profile
+        // rows) and for any metadata-only source that owns no samples. The
+        // dive kept rendering, because getDiveById and getMergedProfile do
+        // not filter on the flag, while getDiveProfile, getAscentDescentRates
+        // and the data-quality prefilters silently skipped it.
+        if (await _sourceOwnsProfiles(diveId, newPrimary)) {
+          await (_db.update(_db.diveProfiles)
+                ..where((t) => t.diveId.equals(diveId)))
+              .write(const DiveProfilesCompanion(isPrimary: Value(false)));
+          await _promoteProfilesOwnedBySource(diveId, newPrimary);
         }
       });
       SyncEventBus.notifyLocalChange();
@@ -6099,6 +6158,101 @@ class DiveRepository {
       );
       rethrow;
     }
+  }
+
+  /// Matches the [DiveProfiles] rows on a dive that [source] owns.
+  ///
+  /// Ownership prefers the v154 `sourceId` FK and falls back to the pre-v154
+  /// convention for rows that carry none -- rows written before the migration
+  /// backfilled them, and rows synced from a peer still on an older schema.
+  /// That convention, which [getProfilesByDataSource] also implements, is:
+  /// a row belongs to [source] when their `computerId`s match, and a
+  /// null-`computerId` row belongs to whichever source is primary.
+  ///
+  /// `computer_id IS ?` rather than `=` is load-bearing. `=` never matches
+  /// NULL, which is exactly how issue #1149 began: the old promote could not
+  /// address a file-imported source's rows at all. `IS` compares null-safely,
+  /// so one predicate covers both a real computer id and the null every file
+  /// import and manual entry carries.
+  ///
+  /// `source.isPrimary` is deliberately not consulted: callers load the row
+  /// before swapping the source flags, so it still reads false for the very
+  /// source being promoted. The convention is applied prospectively -- this
+  /// source is about to be primary, so the dive's unattributed
+  /// null-computerId rows are the ones it will own.
+  static const String _ownedBySourceSql =
+      '(p.source_id = ?2 OR (p.source_id IS NULL AND p.computer_id IS ?3))';
+
+  List<Variable<Object>> _ownershipVars(
+    String diveId,
+    DiveDataSourcesData source,
+  ) => [
+    Variable<String>(diveId),
+    Variable<String>(source.id),
+    Variable<String>(source.computerId),
+  ];
+
+  /// Whether [source] owns any of the dive's profile rows.
+  ///
+  /// Read before the demote so a source that owns nothing leaves the existing
+  /// primary set alone rather than stranding the dive (issue #1149).
+  Future<bool> _sourceOwnsProfiles(
+    String diveId,
+    DiveDataSourcesData source,
+  ) async {
+    final row = await _db
+        .customSelect(
+          'SELECT EXISTS(SELECT 1 FROM dive_profiles p '
+          'WHERE p.dive_id = ?1 AND $_ownedBySourceSql) AS owns',
+          variables: _ownershipVars(diveId, source),
+          readsFrom: {_db.diveProfiles},
+        )
+        .getSingle();
+    return row.read<int>('owns') == 1;
+  }
+
+  /// Promotes the rows [source] owns, one per timestamp.
+  ///
+  /// Expressed as a predicate rather than a list of ids on purpose. Binding
+  /// one variable per sample capped the method at SQLite's bound-variable
+  /// limit -- 999 on builds before 3.32, 32766 after -- so a long enough dive
+  /// failed with "too many SQL variables". The limit varies by platform build
+  /// (system SQLite on Android, the bundled SQLCipher elsewhere), so this
+  /// binds a fixed three variables at any dive length instead of chunking to
+  /// whichever ceiling the current build happens to have.
+  ///
+  /// The ranking is what keeps an edited profile from rendering twice.
+  /// [saveEditedProfile] does not replace the rows it supersedes: it demotes
+  /// them and inserts a second, null-computerId generation alongside. Both
+  /// generations belong to the same source and share timestamps, so promoting
+  /// the whole owned set would resurrect the originals next to the edit. Only
+  /// the winner at each timestamp is promoted: the null-computerId row first,
+  /// which is the same "the edit is the live one" rule
+  /// [restoreOriginalProfile] encodes, then the greatest id. Both halves are
+  /// deterministic and derived from synced values, so every device resolves
+  /// the same winner and the flag does not ping-pong through sync.
+  ///
+  /// ROW_NUMBER, not a correlated subquery matching on timestamp. There is no
+  /// index on dive_profiles(timestamp) -- only dive_id -- so a correlated form
+  /// rescans the dive once per row, which measured 45 seconds on a
+  /// 32767-sample dive. The window function sorts the dive's rows once
+  /// instead. The same pattern already appears in the dedupe migrations in
+  /// database.dart.
+  Future<void> _promoteProfilesOwnedBySource(
+    String diveId,
+    DiveDataSourcesData source,
+  ) async {
+    await _db.customStatement(
+      'UPDATE dive_profiles SET is_primary = 1 WHERE id IN ('
+      'SELECT id FROM ('
+      'SELECT p.id AS id, ROW_NUMBER() OVER ('
+      'PARTITION BY p.timestamp '
+      'ORDER BY (p.computer_id IS NULL) DESC, p.id DESC) AS rn '
+      'FROM dive_profiles p '
+      'WHERE p.dive_id = ?1 AND $_ownedBySourceSql'
+      ') WHERE rn = 1)',
+      _ownershipVars(diveId, source).map((v) => v.value).toList(),
+    );
   }
 
   /// Resolves a `{ computerId -> friendly name }` map for the given source

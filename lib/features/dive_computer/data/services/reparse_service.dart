@@ -99,6 +99,7 @@ class ReparseService {
         await _replaceDiveProfiles(
           diveId: diveId,
           computerId: computerId,
+          sourceId: sourceRow.id,
           parsed: parsed,
           isPrimary: sourceRow.isPrimary,
           timeOffset: sourceRow.timeOffsetSeconds ?? 0,
@@ -478,6 +479,7 @@ class ReparseService {
   Future<void> _replaceDiveProfiles({
     required String diveId,
     required String? computerId,
+    required String sourceId,
     required pigeon.ParsedDive parsed,
     required bool isPrimary,
     required int timeOffset,
@@ -503,6 +505,9 @@ class ReparseService {
             id: Value(_uuid.v4()),
             diveId: Value(diveId),
             computerId: Value(computerId),
+            // Re-parsing rewrites this source's samples in place, so the
+            // replacements belong to the same source row (issue #1149).
+            sourceId: Value(sourceId),
             isPrimary: Value(isPrimary),
             timestamp: Value(s.timeSeconds + timeOffset),
             depth: Value(s.depthMeters),

@@ -2008,6 +2008,7 @@ class SyncService {
     'diveProfiles': [
       (field: 'diveId', parent: 'dives', nullable: false),
       (field: 'computerId', parent: 'diveComputers', nullable: true),
+      (field: 'sourceId', parent: 'diveDataSources', nullable: true),
     ],
     'diveTanks': [
       (field: 'diveId', parent: 'dives', nullable: false),

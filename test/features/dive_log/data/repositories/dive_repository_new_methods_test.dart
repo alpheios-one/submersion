@@ -1704,59 +1704,65 @@ void main() {
       }
     });
 
-    test('handles reading with null computerId (no profile swap)', () async {
-      final diveId = await insertTestDive(id: 'dive-null-comp');
+    test(
+      'promoting a null-computerId reading keeps a primary profile',
+      () async {
+        final diveId = await insertTestDive(id: 'dive-null-comp');
 
-      // Save a reading without computerId.
-      await repository.saveComputerReading(
-        buildReading(
-          id: 'reading-no-comp',
-          diveId: diveId,
-          isPrimary: false,
-          computerModel: 'Manual Entry',
-          maxDepth: 20.0,
-        ),
-      );
+        // Save a reading without computerId.
+        await repository.saveComputerReading(
+          buildReading(
+            id: 'reading-no-comp',
+            diveId: diveId,
+            isPrimary: false,
+            computerModel: 'Manual Entry',
+            maxDepth: 20.0,
+          ),
+        );
 
-      await repository.saveComputerReading(
-        buildReading(
-          id: 'reading-primary',
+        await repository.saveComputerReading(
+          buildReading(
+            id: 'reading-primary',
+            diveId: diveId,
+            isPrimary: true,
+            computerModel: 'Original',
+          ),
+        );
+
+        // Insert a profile with no computerId.
+        await insertTestProfile(
           diveId: diveId,
+          sourceTag: 'p1',
           isPrimary: true,
-          computerModel: 'Original',
-        ),
-      );
+          timestamp: 0,
+          depth: 15.0,
+        );
 
-      // Insert a profile with no computerId.
-      await insertTestProfile(
-        diveId: diveId,
-        sourceTag: 'p1',
-        isPrimary: true,
-        timestamp: 0,
-        depth: 15.0,
-      );
+        // Switch primary to reading with no computerId.
+        await repository.setPrimaryDataSource(
+          diveId: diveId,
+          computerReadingId: 'reading-no-comp',
+        );
 
-      // Switch primary to reading with no computerId.
-      await repository.setPrimaryDataSource(
-        diveId: diveId,
-        computerReadingId: 'reading-no-comp',
-      );
+        // The data source should be promoted.
+        final sources = await repository.getDataSources(diveId);
+        final promoted = sources.firstWhere((s) => s.id == 'reading-no-comp');
+        expect(promoted.isPrimary, isTrue);
 
-      // The data source should be promoted.
-      final sources = await repository.getDataSources(diveId);
-      final promoted = sources.firstWhere((s) => s.id == 'reading-no-comp');
-      expect(promoted.isPrimary, isTrue);
+        // The unattributed null-computerId row belongs to whichever source is
+        // primary, so promoting a null-computerId reading takes it along.
+        //
+        // This asserted the opposite until issue #1149 ("no profiles are
+        // re-promoted"), which is precisely the stranding: the dive kept its
+        // samples but every is_primary consumer -- getDiveProfile,
+        // getAscentDescentRates, the data-quality prefilters -- skipped it.
+        final profiles = await (db.select(
+          db.diveProfiles,
+        )..where((t) => t.diveId.equals(diveId))).get();
 
-      // Profile should be demoted (since computerId is null, no profiles
-      // are re-promoted).
-      final profiles = await (db.select(
-        db.diveProfiles,
-      )..where((t) => t.diveId.equals(diveId))).get();
-
-      for (final p in profiles) {
-        expect(p.isPrimary, isFalse);
-      }
-    });
+        expect(profiles.where((p) => p.isPrimary), isNotEmpty);
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------

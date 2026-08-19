@@ -3,15 +3,15 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/database/database.dart';
 
-/// v158 adds `dive_data_sources.time_offset_seconds`: the number of seconds
+/// v159 adds `dive_data_sources.time_offset_seconds`: the number of seconds
 /// consolidation shifted this source's own timeline by to land it on the
 /// target dive's clock (issue #1177). Nullable, because null and 0 both mean
 /// "this source is already on the dive's time base", and a nullable column
-/// survives a payload from a pre-v158 writer that omits the key entirely.
+/// survives a payload from a pre-v159 writer that omits the key entirely.
 void main() {
-  test('v158 is in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(158));
-    expect(AppDatabase.migrationVersions, contains(158));
+  test('v159 is in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(159));
+    expect(AppDatabase.migrationVersions, contains(159));
   });
 
   test('a fresh database has dive_data_sources.time_offset_seconds', () async {
@@ -43,7 +43,7 @@ void main() {
   });
 
   test(
-    'a database stranded before v158 gains the column via beforeOpen',
+    'a database stranded before v159 gains the column via beforeOpen',
     () async {
       final nativeDb = NativeDatabase.memory(
         setup: (rawDb) {

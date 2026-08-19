@@ -257,7 +257,7 @@ void main() {
       },
     );
 
-    test('a DiveDataSources payload from a pre-v158 peer, with no '
+    test('a DiveDataSources payload from a pre-v159 peer, with no '
         'timeOffsetSeconds key at all, still applies (#1177)', () async {
       final serializer = SyncDataSerializer();
       final diveRepo = DiveRepository();

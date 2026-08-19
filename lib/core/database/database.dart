@@ -773,6 +773,26 @@ class DiveProfiles extends Table {
       text().references(Dives, #id, onDelete: KeyAction.cascade)();
   TextColumn get computerId =>
       text().nullable().references(DiveComputers, #id)();
+
+  /// Owning [DiveDataSources] row (issue #1149).
+  ///
+  /// [computerId] cannot identify the owner on its own: file imports and
+  /// manual entries leave it null on both the source row and the profile
+  /// rows, so two file-imported sources on one dive are indistinguishable.
+  /// This FK names the owner outright, which is what `setPrimaryDataSource`
+  /// promotes on.
+  ///
+  /// Nullable, and consumers must tolerate null: rows written before v158,
+  /// and rows synced from a peer running an older schema, carry none. The
+  /// fallback is the legacy convention (match on [computerId]; null belongs
+  /// to the primary source). `onDelete: setNull` because samples must
+  /// outlive their metadata row -- dropping a source must never destroy the
+  /// profile it describes.
+  TextColumn get sourceId => text().nullable().references(
+    DiveDataSources,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
   BoolColumn get isPrimary => boolean().withDefault(
     const Constant(true),
   )(); // Primary profile for stats
@@ -3105,7 +3125,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 158;
+  static const int currentSchemaVersion = 159;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3365,11 +3385,16 @@ class AppDatabase extends _$AppDatabase {
     // Renumbered from 154 and then 156, which #1104, #828 and #1127 claimed
     // first on main.
     157,
-    // v158 (issue #1177): dive_data_sources.time_offset_seconds, the shift
+    // v158 (issue #1149): owning-source FK on dive_profiles. Renumbered
+    // from 154 and then 156, which #1104, #1127 and #829 claimed first
+    // on main.
+    158,
+    // v159 (issue #1177): dive_data_sources.time_offset_seconds, the shift
     // multi-computer consolidation applied to a folded-in source's timeline.
     // Without it a re-parse re-inserts the secondary strand on the raw
-    // download's clock and it slides away from the primary's.
-    158,
+    // download's clock and it slides away from the primary's. Renumbered
+    // from 158, which #1149 claimed first on main.
+    159,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4844,7 +4869,7 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  /// Idempotent DDL for the v158 dive_data_sources.time_offset_seconds
+  /// Idempotent DDL for the v159 dive_data_sources.time_offset_seconds
   /// column (issue #1177). Same dual-call contract (onUpgrade + beforeOpen
   /// backstop) as the other column-assert helpers. Nullable with no default,
   /// so every pre-existing row reads back as "no offset applied".
@@ -4895,6 +4920,91 @@ class AppDatabase extends _$AppDatabase {
         'INTEGER NOT NULL DEFAULT 0',
       );
     }
+  }
+
+  /// Owning-source FK on dive_profiles (issue #1149). PRAGMA-guarded so a
+  /// healthy database no-ops and a partial schema does not throw.
+  Future<void> _assertProfileSourceIdColumn() async {
+    final cols = await customSelect("PRAGMA table_info('dive_profiles')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('source_id')) return;
+    await customStatement(
+      'ALTER TABLE dive_profiles ADD COLUMN source_id TEXT '
+      'REFERENCES dive_data_sources(id) ON DELETE SET NULL',
+    );
+  }
+
+  /// One-time attribution of existing dive_profiles rows to their owning
+  /// dive_data_sources row (issue #1149).
+  ///
+  /// Reproduces the pre-v158 read convention that `getProfilesByDataSource`
+  /// implements, so nothing changes owner as a result of the migration:
+  ///
+  /// 1. A row whose `computer_id` matches a source on the same dive belongs
+  ///    to that source.
+  /// 2. Everything else -- a null `computer_id` (file imports, manual
+  ///    entries, and the rows `saveEditedProfile` writes) or a `computer_id`
+  ///    matching no source -- belongs to the dive's primary source.
+  ///
+  /// Rule 2 is lossy for the one case this FK exists to fix: a dive carrying
+  /// two file-imported sources has two indistinguishable null-`computer_id`
+  /// row sets, and they all land on the primary. That is exactly where the
+  /// old read path already put them, so this is not a regression, and every
+  /// row written from v158 on is attributed at insert time instead.
+  ///
+  /// Runs in the ladder only, never in `beforeOpen`: dive_profiles is the
+  /// largest table in the database and an "is anything unowned?" probe on
+  /// every open would be a full scan once the answer is no.
+  Future<void> _backfillProfileSourceIds() async {
+    // Probe BOTH tables' columns, not just dive_profiles'. PRAGMA table_info
+    // returns empty for a missing table, so this covers "table absent" and
+    // "column absent" in one check -- the same guard _backfillDiveComputerIds
+    // uses. Migration-test fixtures and databases caught mid-upgrade routinely
+    // hold dive_profiles without dive_data_sources, and the correlated
+    // subqueries below would fail with "no such table".
+    final cols = await customSelect("PRAGMA table_info('dive_profiles')").get();
+    if (!cols.map((c) => c.read<String>('name')).contains('source_id')) return;
+
+    final sourceCols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    final sourceNames = sourceCols.map((c) => c.read<String>('name')).toSet();
+    if (!sourceNames.containsAll({
+      'id',
+      'dive_id',
+      'computer_id',
+      'is_primary',
+      'created_at',
+    })) {
+      return;
+    }
+
+    // Deterministic pick so a re-run cannot move a row: primary first, then
+    // oldest. Mirrors the ordering getProfilesByDataSource reads sources in.
+    const primaryForDive =
+        'SELECT s.id FROM dive_data_sources s '
+        'WHERE s.dive_id = dive_profiles.dive_id '
+        'ORDER BY s.is_primary DESC, s.created_at ASC LIMIT 1';
+
+    await customStatement(
+      'UPDATE dive_profiles SET source_id = ('
+      'SELECT s.id FROM dive_data_sources s '
+      'WHERE s.dive_id = dive_profiles.dive_id '
+      'AND s.computer_id = dive_profiles.computer_id '
+      'ORDER BY s.is_primary DESC, s.created_at ASC LIMIT 1) '
+      'WHERE source_id IS NULL AND computer_id IS NOT NULL '
+      'AND EXISTS (SELECT 1 FROM dive_data_sources s '
+      'WHERE s.dive_id = dive_profiles.dive_id '
+      'AND s.computer_id = dive_profiles.computer_id)',
+    );
+
+    await customStatement(
+      'UPDATE dive_profiles SET source_id = ($primaryForDive) '
+      'WHERE source_id IS NULL '
+      'AND EXISTS (SELECT 1 FROM dive_data_sources s '
+      'WHERE s.dive_id = dive_profiles.dive_id)',
+    );
   }
 
   /// One-time clear of weather descriptions this app generated itself.
@@ -8281,13 +8391,20 @@ class AppDatabase extends _$AppDatabase {
           await _assertServiceCostColumns();
         }
         if (from < 157) await reportProgress();
-        // v158: the consolidation time offset carried on a folded-in
-        // source, so a re-parse can put its strand back on the dive's
-        // clock (issue #1177).
+        // v158: owning-source FK on dive_profiles (issue #1149), plus the
+        // one-time attribution of existing rows.
         if (from < 158) {
-          await _assertDataSourceTimeOffsetColumn();
+          await _assertProfileSourceIdColumn();
+          await _backfillProfileSourceIds();
         }
         if (from < 158) await reportProgress();
+        // v159: the consolidation time offset carried on a folded-in
+        // source, so a re-parse can put its strand back on the dive's
+        // clock (issue #1177).
+        if (from < 159) {
+          await _assertDataSourceTimeOffsetColumn();
+        }
+        if (from < 159) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8448,6 +8565,11 @@ class AppDatabase extends _$AppDatabase {
         // onUpgrade, and reading settings without this column throws. This
         // also covers a database stranded at 154 by the #1104 collision.
         await _assertGasModelColumn();
+        // v158 backstop: re-assert the dive_profiles owning-source column
+        // (issue #1149; same parallel-branch version-collision self-heal).
+        // Column only -- _backfillProfileSourceIds is a full-table pass and
+        // belongs to the ladder, not to every open.
+        await _assertProfileSourceIdColumn();
 
         // v156 backstop: re-assert the dive_plan_tanks travel-gas column
         // (same parallel-branch version-collision self-heal).
@@ -8457,7 +8579,7 @@ class AppDatabase extends _$AppDatabase {
         // #829; same parallel-branch version-collision self-heal).
         await _assertServiceCostColumns();
 
-        // v158 backstop: re-assert the consolidation time offset column
+        // v159 backstop: re-assert the consolidation time offset column
         // (issue #1177; same parallel-branch version-collision self-heal).
         // Reading a consolidated dive's sources throws without it.
         await _assertDataSourceTimeOffsetColumn();
