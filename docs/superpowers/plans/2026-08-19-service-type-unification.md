@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - **Worktree:** all work happens in `.claude/worktrees/service-type-unification` on branch `worktree-service-type-unification`. Use worktree-absolute paths for every file operation; a main-tree absolute path edits the wrong checkout.
-- **Schema version:** this plan claims **v159**. `AppDatabase.currentSchemaVersion` is 158 at `lib/core/database/database.dart:3119`. If another PR takes 159 first, renumber the migration block, `migrationVersions`, the test filenames, and every docstring together.
+- **Schema version:** this plan claims **v160**. `AppDatabase.currentSchemaVersion` is 158 at `lib/core/database/database.dart:3119`. If another PR takes 159 first, renumber the migration block, `migrationVersions`, the test filenames, and every docstring together.
 - **Compatibility floor:** `AppDatabase.minimumCompatibleSchemaVersion` is 137 at `lib/core/database/database.dart:3140` and rises to **159** in Task 3. This is deliberate and holds every peer below 159 until it updates.
 - **Localization:** every new or renamed key is added to **all 11** ARB files: `app_en.arb`, `app_ar.arb`, `app_de.arb`, `app_es.arb`, `app_fr.arb`, `app_he.arb`, `app_hu.arb`, `app_it.arb`, `app_nl.arb`, `app_pt.arb`, `app_zh.arb`. Regenerate with `flutter gen-l10n` and commit the regenerated `lib/l10n/arb/app_localizations*.dart`.
 - **Writing style:** no em-dashes (U+2014) anywhere, including code comments, docstrings and commit messages. No en-dashes as prose punctuation. No emojis in code, comments or docs.
@@ -29,7 +29,7 @@
 | `lib/features/equipment/domain/entities/service_record.dart` | Domain record, `serviceCategory` field | 1 |
 | `lib/features/equipment/domain/entities/maintenance_history_filter.dart` | History filter, `serviceCategory` dimension | 1 |
 | `lib/features/equipment/presentation/utils/service_category_label.dart` | Localized enum labels (renamed file) | 1 |
-| `lib/core/database/database.dart` | Tables, v159 migration, floor constant, seed SQL | 2, 3 |
+| `lib/core/database/database.dart` | Tables, v160 migration, floor constant, seed SQL | 2, 3 |
 | `lib/core/services/sync/sync_data_serializer.dart` | Legacy wire-key normaliser at both apply chokepoints | 3 |
 | `lib/features/equipment/domain/entities/service_kind.dart` | `defaultCategory` field | 2 |
 | `lib/features/equipment/data/repositories/service_kind_repository.dart` | `defaultCategory` persistence | 2 |
@@ -372,7 +372,7 @@ void main() {
     },
   );
 
-  test('v159 adds default_category and seeds built-ins only', () async {
+  test('v160 adds default_category and seeds built-ins only', () async {
     final db = AppDatabase(seededV157());
     addTearDown(db.close);
 
@@ -444,9 +444,9 @@ void main() {
     await expectLater(db.customSelect('SELECT 1').get(), completes);
   });
 
-  test('migration list includes v159 and schema is at least 159', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(159));
-    expect(AppDatabase.migrationVersions, contains(159));
+  test('migration list includes v160 and schema is at least 160', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(160));
+    expect(AppDatabase.migrationVersions, contains(160));
   });
 }
 ```
@@ -507,7 +507,7 @@ Above `kSeedBuiltInServiceKindsSql` (line 2267), add the mapping so the seed SQL
 ```dart
 /// The category each built-in service type prefills, by stable slug id.
 /// Consumed by both kSeedBuiltInServiceKindsSql (fresh installs) and the
-/// v159 migration (existing installs).
+/// v160 migration (existing installs).
 const Map<String, String> kBuiltInServiceKindCategories = {
   'hydro': 'inspection',
   'vip': 'inspection',
@@ -552,7 +552,7 @@ and each row gains a trailing category, for example:
 Bump `currentSchemaVersion` at line 3119 to `159`. Append to `migrationVersions`:
 
 ```dart
-    // v159 (service type unification): service_kinds.default_category, the
+    // v160 (service type unification): service_kinds.default_category, the
     // category prefilled when a maintenance record is logged.
     159,
 ```
@@ -657,7 +657,7 @@ This is the task with a cost to shipped users. It renames the SQL column and the
 - Test: `test/core/services/sync/cross_version_roundtrip_test.dart` (extend)
 
 **Interfaces:**
-- Consumes: `ServiceCategory` (Task 1), the v159 migration block (Task 2).
+- Consumes: `ServiceCategory` (Task 1), the v160 migration block (Task 2).
 - Produces: SQL column `service_records.service_category`; Drift getter `ServiceRecords.serviceCategory`; wire key `serviceCategory`; private `SyncDataSerializer._withRenamedKeys(String entityType, Map<String, dynamic> data)` applied at both apply chokepoints.
 
 - [ ] **Step 1: Write the failing normaliser test**
@@ -665,7 +665,7 @@ This is the task with a cost to shipped users. It renames the SQL column and the
 Create `test/core/services/sync/legacy_service_key_test.dart`:
 
 ```dart
-// A peer or backup written before v159 keys the maintenance category as
+// A peer or backup written before v160 keys the maintenance category as
 // 'serviceType'. The floor bump stops OLD readers applying OUR payloads, but
 // the gate is one-directional: their payloads still arrive here, so the apply
 // path has to accept the old spelling.
@@ -771,13 +771,13 @@ Expected: FAIL, "no such column: service_category".
 In `lib/core/database/database.dart`, in `class ServiceRecords`:
 
 ```dart
-  /// v159: renamed from serviceType. The Drift getter name is also the sync
+  /// v160: renamed from serviceType. The Drift getter name is also the sync
   /// wire key, so this rename raises minimumCompatibleSchemaVersion; see
   /// SyncDataSerializer._withRenamedKeys for the receiving-side tolerance.
   TextColumn get serviceCategory => text()();
 ```
 
-- [ ] **Step 4: Extend the v159 migration with the rename**
+- [ ] **Step 4: Extend the v160 migration with the rename**
 
 Add to `_assertServiceCategoryColumn`, after the `service_kinds` work:
 
@@ -805,15 +805,15 @@ Add to `_assertServiceCategoryColumn`, after the `service_kinds` work:
 At `lib/core/database/database.dart:3140`:
 
 ```dart
-  static const int minimumCompatibleSchemaVersion = 159;
+  static const int minimumCompatibleSchemaVersion = 160;
 ```
 
 Extend the doc comment with a line recording why:
 
 ```dart
-  /// Raised 137 -> 159 by the service type unification: v159 renames the
+  /// Raised 137 -> 160 by the service type unification: v160 renames the
   /// synced column service_records.service_type to service_category, which
-  /// the rules below classify as breaking. Peers below 159 are held until
+  /// the rules below classify as breaking. Peers below 160 are held until
   /// they update.
 ```
 
@@ -824,7 +824,7 @@ In `lib/core/services/sync/sync_data_serializer.dart`, beside `_withSchemaDefaul
 ```dart
   /// Wire keys this build renamed, as oldKey -> newKey per entity type.
   ///
-  /// Payloads published by peers below schema 159, and backups written by
+  /// Payloads published by peers below schema 160, and backups written by
   /// them, spell the maintenance category 'serviceType'. The compatibility
   /// floor stops those peers applying OUR payloads, but the gate is
   /// one-directional (changeset_reader.dart compares the writer's floor to
@@ -893,7 +893,7 @@ In `service_record_repository.dart`, the raw-SQL read becomes `row.data['service
 In `uddf_export_builders.dart`, the element name becomes `'servicecategory'`. In `uddf_import_parsers.dart`, accept both spellings permanently, because exported files live on disk with no version handshake:
 
 ```dart
-    // Files exported before v159 spell this 'servicetype'. UDDF files have no
+    // Files exported before v160 spell this 'servicetype'. UDDF files have no
     // version handshake, so both spellings are read forever.
     final serviceCategory =
         getElementText(recordElement, 'servicecategory') ??
@@ -943,7 +943,7 @@ Expected: PASS.
 Append to `test/core/database/migration_v159_service_category_test.dart`:
 
 ```dart
-  test('v159 renames service_type to service_category, preserving values',
+  test('v160 renames service_type to service_category, preserving values',
       () async {
     final native = NativeDatabase.memory(
       setup: (db) {
@@ -995,7 +995,7 @@ First, update the header comment to record that the floor moved to 159 and why, 
 Second, add a group that drives an old-spelling service record through the real merge path rather than through `upsertRecord` directly, so the normaliser is proven where sync actually calls it:
 
 ```dart
-  group('pre-159 peer publishing a service record (service type rename)', () {
+  group('pre-160 peer publishing a service record (service type rename)', () {
     test('an old-key payload applies through the merge path', () async {
       final service = buildService();
       final record = {
@@ -1768,4 +1768,4 @@ git commit -m "refactor(export): name the maintenance log columns as the UI does
 - [ ] Restore a backup produced by a pre-159 build and confirm its service records land with their categories intact. The spec asks for this as an automated test; Task 3 covers the mechanism instead, by pinning both wire spellings at `upsertRecord` and `upsertRecords`, which are the only paths reaching `ServiceRecord.fromJson`. Verify the end-to-end path here at least once by hand.
 - [ ] Confirm no other PR has claimed schema 159; renumber everything together if one has.
 - [ ] Interactive macOS smoke: log a service record and confirm the type is required, the category prefills and stays put once changed; open Settings > Manage > Service types; set a default category on a custom type; confirm the history row title and the clock reset still behave.
-- [ ] PR body must state the compatibility floor change in plain terms: peers below schema 159 are held until they update, which includes the App Store fleet during the review window. Also note the inherited #1144 gap, which leaves `default_category` on custom service types out of incremental sync to a second device.
+- [ ] PR body must state the compatibility floor change in plain terms: peers below schema 160 are held until they update, which includes the App Store fleet during the review window. Also note the inherited #1144 gap, which leaves `default_category` on custom service types out of incremental sync to a second device.

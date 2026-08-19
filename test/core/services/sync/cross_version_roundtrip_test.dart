@@ -10,11 +10,11 @@
 // asserts this safety; when a migration raises the floor, extend
 // postV137DiveKeys and add the analogous projection for the new boundary.
 //
-// The floor moved 137 -> 159 with the service type unification, which renamed
+// The floor moved 137 -> 160 with the service type unification, which renamed
 // the synced column service_records.service_type to service_category. That
-// stops pre-159 peers applying OUR payloads, but the gate is one-directional,
+// stops pre-160 peers applying OUR payloads, but the gate is one-directional,
 // so the second group below covers the direction the floor cannot reach: a
-// pre-159 peer's payload, keyed with the old spelling, arriving here.
+// pre-160 peer's payload, keyed with the old spelling, arriving here.
 // postV137DiveKeys stays as the record of the previous boundary.
 import 'dart:convert';
 
@@ -192,7 +192,7 @@ void main() {
     });
   });
 
-  group('pre-159 peer publishing a service record (service type rename)', () {
+  group('pre-160 peer publishing a service record (service type rename)', () {
     late FakeCloudStorageProvider cloud;
 
     setUp(() async {
@@ -221,14 +221,14 @@ void main() {
       final payload = SyncPayload(
         version: syncFormatVersion,
         exportedAt: 9000,
-        deviceId: 'peer-158',
+        deviceId: 'peer-159',
         checksum: sha256
             .convert(utf8.encode(jsonEncode(data.toJson())))
             .toString(),
         data: data,
         deletions: const {},
       );
-      await seedPeerBaseFromPayload(cloud, 'peer-158', payload);
+      await seedPeerBaseFromPayload(cloud, 'peer-159', payload);
       final result = await buildService().performSync();
       expect(result.status, isNot(SyncResultStatus.error));
     }
@@ -236,7 +236,7 @@ void main() {
     Map<String, dynamic> legacyRow(String id, String category) => {
       'id': id,
       'equipmentId': 'e-xver',
-      // The pre-159 spelling. This is the whole point of the test.
+      // The pre-160 spelling. This is the whole point of the test.
       'serviceType': category,
       'serviceKindId': null,
       'serviceDate': 1700000000000,
@@ -247,7 +247,7 @@ void main() {
       'notes': '',
       'createdAt': 1700000000000,
       'updatedAt': 1700000000000,
-      'hlc': const Hlc(1700000000000, 0, 'peer-158').toString(),
+      'hlc': const Hlc(1700000000000, 0, 'peer-159').toString(),
     };
 
     test('an old-key payload applies through the merge path', () async {

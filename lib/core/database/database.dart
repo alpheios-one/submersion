@@ -1949,7 +1949,7 @@ class ServiceRecords extends Table {
   TextColumn get equipmentId =>
       text().references(Equipment, #id, onDelete: KeyAction.cascade)();
 
-  /// v159: renamed from serviceType. The Drift getter name is also the sync
+  /// v160: renamed from serviceType. The Drift getter name is also the sync
   /// wire key, so this rename raises minimumCompatibleSchemaVersion; see
   /// SyncDataSerializer._withRenamedKeys for the receiving-side tolerance
   /// that the floor cannot provide.
@@ -3179,13 +3179,13 @@ class AppDatabase extends _$AppDatabase {
   /// preserve meaning. When raising it, extend the round-trip test's
   /// projection so the new boundary stays covered.
   ///
-  /// Raised 137 -> 159 by the service type unification: v159 renames the
+  /// Raised 137 -> 160 by the service type unification: v160 renames the
   /// synced column service_records.service_type to service_category, which
-  /// the first rule above classifies as breaking. Peers below 159 are held
+  /// the first rule above classifies as breaking. Peers below 160 are held
   /// until they update. Note the gate is one-directional, so this does NOT
   /// protect us from THEIR payloads; SyncDataSerializer._withRenamedKeys
   /// carries the receiving-side tolerance.
-  static const int minimumCompatibleSchemaVersion = 159;
+  static const int minimumCompatibleSchemaVersion = 160;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -4920,7 +4920,7 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  /// v159: service_records.service_type becomes service_category.
+  /// v160: service_records.service_type becomes service_category.
   ///
   /// Separate from [_assertServiceCategoryColumn] so a database missing one
   /// table still gets the other. ALTER TABLE RENAME COLUMN needs SQLite 3.25
@@ -8686,7 +8686,7 @@ class AppDatabase extends _$AppDatabase {
         // INSERT OR IGNORE, so it cannot add the column to existing rows.
         await _assertServiceCategoryColumn();
 
-        // v159 backstop: re-assert the service_records column rename. A
+        // v160 backstop: re-assert the service_records column rename. A
         // database that arrives by restore or sync-adopt never runs
         // onUpgrade, and every read of a service record would throw.
         await _assertServiceCategoryRename();

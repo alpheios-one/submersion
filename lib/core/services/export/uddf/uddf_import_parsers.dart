@@ -832,7 +832,7 @@ class UddfImportParsers {
 
     record['equipmentRef'] = getElementText(recordElement, 'equipmentref');
 
-    // Files exported before v159 spell this 'servicetype'. UDDF files have no
+    // Files exported before v160 spell this 'servicetype'. UDDF files have no
     // version handshake and live on disk indefinitely, so both spellings are
     // read forever rather than behind a version gate.
     final serviceCategory =

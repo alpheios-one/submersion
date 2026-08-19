@@ -97,7 +97,7 @@ could jump by years and an overdue badge could appear or vanish on upgrade. A
 diver who wants an old record to count against a clock can attach one by
 editing that record, deliberately, one at a time.
 
-### 4. Schema v159
+### 4. Schema v160
 
 Two changes, neither touching `service_records` rows.
 

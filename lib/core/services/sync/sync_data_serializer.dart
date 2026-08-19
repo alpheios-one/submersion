@@ -5449,7 +5449,7 @@ class SyncDataSerializer {
   /// the exporting device, so this is a faithful reconstruction, not a guess.
   /// Wire keys this build renamed, as oldKey -> newKey per entity type.
   ///
-  /// Payloads published by peers below schema 159, and backups written by
+  /// Payloads published by peers below schema 160, and backups written by
   /// them, spell the maintenance category 'serviceType'. The compatibility
   /// floor stops those peers applying OUR payloads, but the gate is
   /// one-directional (changeset_reader.dart compares the writer's floor to

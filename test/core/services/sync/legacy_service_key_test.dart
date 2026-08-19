@@ -1,4 +1,4 @@
-// A peer or backup written before v159 keys the maintenance category as
+// A peer or backup written before v160 keys the maintenance category as
 // 'serviceType'. Raising minimumCompatibleSchemaVersion stops OLD readers
 // applying OUR payloads, but the gate in changeset_reader.dart compares the
 // writer's floor to the reader's schema, so it is one-directional: their

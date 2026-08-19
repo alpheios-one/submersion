@@ -6,10 +6,10 @@ import 'package:submersion/core/database/database.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  /// A v158 service_kinds table carrying one built-in and one custom kind.
-  NativeDatabase seededV158() => NativeDatabase.memory(
+  /// A v159 service_kinds table carrying one built-in and one custom kind.
+  NativeDatabase seededV159() => NativeDatabase.memory(
     setup: (db) {
-      db.execute('PRAGMA user_version = 158');
+      db.execute('PRAGMA user_version = 159');
       db.execute('''
         CREATE TABLE service_kinds (
           id TEXT NOT NULL PRIMARY KEY,
@@ -39,8 +39,8 @@ void main() {
     },
   );
 
-  test('v159 adds default_category and seeds built-ins only', () async {
-    final db = AppDatabase(seededV158());
+  test('v160 adds default_category and seeds built-ins only', () async {
+    final db = AppDatabase(seededV159());
     addTearDown(db.close);
 
     final cols = await db
@@ -73,10 +73,10 @@ void main() {
   });
 
   test('the migration itself inserts no kinds', () async {
-    final db = AppDatabase(seededV158());
+    final db = AppDatabase(seededV159());
     addTearDown(db.close);
 
-    // The v159 step is an UPDATE keyed on existing ids, so it can only ever
+    // The v160 step is an UPDATE keyed on existing ids, so it can only ever
     // touch rows already present. Any row beyond the two seeded here came
     // from kSeedBuiltInServiceKindsSql in beforeOpen, never from the
     // migration, which is what keeps a deleted built-in deleted.
@@ -92,7 +92,7 @@ void main() {
 
   test('the helper no-ops when service_kinds is absent', () async {
     final native = NativeDatabase.memory(
-      setup: (db) => db.execute('PRAGMA user_version = 158'),
+      setup: (db) => db.execute('PRAGMA user_version = 159'),
     );
     final db = AppDatabase(native);
     addTearDown(db.close);
@@ -100,17 +100,17 @@ void main() {
     await expectLater(db.customSelect('SELECT 1').get(), completes);
   });
 
-  test('migration list includes v159 and schema is at least 159', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(159));
-    expect(AppDatabase.migrationVersions, contains(159));
+  test('migration list includes v160 and schema is at least 160', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(160));
+    expect(AppDatabase.migrationVersions, contains(160));
   });
 
   test(
-    'v159 renames service_type to service_category, preserving values',
+    'v160 renames service_type to service_category, preserving values',
     () async {
       final native = NativeDatabase.memory(
         setup: (db) {
-          db.execute('PRAGMA user_version = 158');
+          db.execute('PRAGMA user_version = 159');
           db.execute('''
           CREATE TABLE service_records (
             id TEXT NOT NULL PRIMARY KEY,
@@ -159,7 +159,7 @@ void main() {
     () async {
       final native = NativeDatabase.memory(
         setup: (db) {
-          db.execute('PRAGMA user_version = 158');
+          db.execute('PRAGMA user_version = 159');
           db.execute('''
           CREATE TABLE service_records (
             id TEXT NOT NULL PRIMARY KEY,
@@ -194,7 +194,7 @@ void main() {
   test('the compatibility floor records the rename', () {
     expect(
       AppDatabase.minimumCompatibleSchemaVersion,
-      159,
+      160,
       reason: 'renaming a synced column is breaking under the #1089 rules',
     );
   });

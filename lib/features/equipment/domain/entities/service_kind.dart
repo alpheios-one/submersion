@@ -19,7 +19,7 @@ class ServiceKind extends Equatable {
   final double? defaultCost;
   final String? defaultCurrency;
 
-  /// v159: the category a record logged against this service type
+  /// v160: the category a record logged against this service type
   /// prefills. Null means the type has no opinion.
   final ServiceCategory? defaultCategory;
   final bool autoAttach;
