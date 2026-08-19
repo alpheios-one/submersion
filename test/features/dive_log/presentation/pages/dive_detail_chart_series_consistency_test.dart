@@ -120,6 +120,10 @@ void main() {
   Future<void> pumpPage(WidgetTester tester) async {
     final base = await getBaseOverrides();
     final originalOnError = FlutterError.onError;
+    // The explicit restore below runs on the happy path so assertions see the
+    // real handler. This tearDown is the safety net: if pumpWidget throws, the
+    // suppressing handler would otherwise leak into every later test here.
+    addTearDown(() => FlutterError.onError = originalOnError);
     FlutterError.onError = (d) {
       if (d.toString().contains('overflowed')) return;
       originalOnError?.call(d);

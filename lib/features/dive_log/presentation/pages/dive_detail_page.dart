@@ -1572,19 +1572,34 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // cases leave the range slider running past the end of the visible curve
     // (#1167). Re-initializing resets playback position and range selection,
     // which is the wanted behavior when the series underneath them changed.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (chartProfile.isEmpty) return;
+    //
+    // The comparison runs here in build, against state this method already
+    // watches, so a frame callback is only scheduled on the rare build that
+    // has work to do. Scheduling unconditionally would queue a no-op closure
+    // 40 times a second while a profile plays: the playback timer ticks every
+    // 25ms and this page watches its state.
+    if (chartProfile.isNotEmpty) {
       final maxTimestamp = chartProfile.last.timestamp;
-      if (ref.read(playbackProvider(dive.id)).maxTimestamp != maxTimestamp) {
-        ref.read(playbackProvider(dive.id).notifier).initialize(maxTimestamp);
+      if (playbackState.maxTimestamp != maxTimestamp ||
+          rangeState.maxTimestamp != maxTimestamp) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          // Re-read rather than trusting the build-time snapshot: the rest of
+          // the frame may have moved either extent already.
+          if (ref.read(playbackProvider(dive.id)).maxTimestamp !=
+              maxTimestamp) {
+            ref
+                .read(playbackProvider(dive.id).notifier)
+                .initialize(maxTimestamp);
+          }
+          if (ref.read(rangeSelectionProvider(dive.id)).maxTimestamp !=
+              maxTimestamp) {
+            ref
+                .read(rangeSelectionProvider(dive.id).notifier)
+                .initialize(maxTimestamp);
+          }
+        });
       }
-      if (ref.read(rangeSelectionProvider(dive.id)).maxTimestamp !=
-          maxTimestamp) {
-        ref
-            .read(rangeSelectionProvider(dive.id).notifier)
-            .initialize(maxTimestamp);
-      }
-    });
+    }
 
     // Calculate profile markers (with tank pressure data for accurate thresholds)
     final markers = _calculateProfileMarkers(
