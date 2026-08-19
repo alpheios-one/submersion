@@ -10971,6 +10971,28 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kies servicedatum';
 
   @override
+  String get equipment_serviceDialog_serviceTypeLabel => 'Type service';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'Dit vastleggen zet de teller van dit servicetype terug';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Kies een servicetype';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Niet ingesteld';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Gebruikt voor filteren en exporteren';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Servicetypes beheren';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => 'Categorie';
 
   @override

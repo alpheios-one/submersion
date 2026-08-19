@@ -11026,6 +11026,28 @@ class AppLocalizationsHu extends AppLocalizations {
       'Szerviz datum kivalasztasa';
 
   @override
+  String get equipment_serviceDialog_serviceTypeLabel => 'Szerviz típus';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'A rögzítés nullázza ennek a szerviz típusnak az óráját';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Válassz szerviz típust';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Nincs beállítva';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Szűréshez és exportáláshoz használt';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Szerviz típusok kezelése';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => 'Kategória';
 
   @override

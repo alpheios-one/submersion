@@ -18814,6 +18814,42 @@ abstract class AppLocalizations {
   /// **'Pick service date'**
   String get equipment_serviceDialog_serviceDateSemanticLabel;
 
+  /// No description provided for @equipment_serviceDialog_serviceTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Service type'**
+  String get equipment_serviceDialog_serviceTypeLabel;
+
+  /// No description provided for @equipment_serviceDialog_serviceTypeHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Logging this resets the clock for this service type'**
+  String get equipment_serviceDialog_serviceTypeHelper;
+
+  /// No description provided for @equipment_serviceDialog_serviceTypeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a service type'**
+  String get equipment_serviceDialog_serviceTypeRequired;
+
+  /// No description provided for @equipment_serviceDialog_serviceTypeNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get equipment_serviceDialog_serviceTypeNotSet;
+
+  /// No description provided for @equipment_serviceDialog_categoryHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Used for filtering and export'**
+  String get equipment_serviceDialog_categoryHelper;
+
+  /// No description provided for @equipment_serviceDialog_manageServiceTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage service types'**
+  String get equipment_serviceDialog_manageServiceTypes;
+
   /// No description provided for @equipment_serviceDialog_categoryLabel.
   ///
   /// In en, this message translates to:

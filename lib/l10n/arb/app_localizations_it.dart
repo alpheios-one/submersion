@@ -11053,6 +11053,28 @@ class AppLocalizationsIt extends AppLocalizations {
       'Seleziona data manutenzione';
 
   @override
+  String get equipment_serviceDialog_serviceTypeLabel => 'Tipo di manutenzione';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'Registrarla azzera il contatore di questo tipo di manutenzione';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Scegli un tipo di manutenzione';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Non impostato';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Usata per filtri ed esportazione';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Gestisci tipi di manutenzione';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => 'Categoria';
 
   @override

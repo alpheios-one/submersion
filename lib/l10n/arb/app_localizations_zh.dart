@@ -10557,6 +10557,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceDialog_serviceDateSemanticLabel => '选择维护日期';
 
   @override
+  String get equipment_serviceDialog_serviceTypeLabel => '维护类型';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper => '记录后将重置该维护类型的计时';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired => '请选择维护类型';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => '未设置';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper => '用于筛选和导出';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes => '管理维护类型';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => '类别';
 
   @override

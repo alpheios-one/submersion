@@ -10798,6 +10798,25 @@ class AppLocalizationsHe extends AppLocalizations {
       'בחר תאריך טיפול';
 
   @override
+  String get equipment_serviceDialog_serviceTypeLabel => 'סוג טיפול';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'רישום מאפס את השעון של סוג טיפול זה';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired => 'בחר סוג טיפול';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'לא הוגדר';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper => 'משמשת לסינון ולייצוא';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes => 'ניהול סוגי טיפול';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => 'קטגוריה';
 
   @override

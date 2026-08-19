@@ -10862,6 +10862,27 @@ class AppLocalizationsAr extends AppLocalizations {
       'اختيار تاريخ الصيانة';
 
   @override
+  String get equipment_serviceDialog_serviceTypeLabel => 'نوع الصيانة';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'تسجيل هذا يعيد ضبط مؤقت نوع الصيانة هذا';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired => 'اختر نوع الصيانة';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'غير محدد';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'تستخدم للتصفية والتصدير';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'إدارة أنواع الصيانة';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => 'الفئة';
 
   @override

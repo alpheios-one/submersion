@@ -11045,6 +11045,28 @@ class AppLocalizationsEs extends AppLocalizations {
       'Seleccionar fecha de servicio';
 
   @override
+  String get equipment_serviceDialog_serviceTypeLabel => 'Tipo de servicio';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'Registrarlo reinicia el contador de este tipo de servicio';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Elige un tipo de servicio';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Sin definir';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Se usa para filtrar y exportar';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Gestionar tipos de servicio';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => 'Categoría';
 
   @override

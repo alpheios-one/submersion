@@ -11085,6 +11085,28 @@ class AppLocalizationsFr extends AppLocalizations {
       'Choisir la date de revision';
 
   @override
+  String get equipment_serviceDialog_serviceTypeLabel => 'Type de révision';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'L\'enregistrer réinitialise le compteur de ce type de révision';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Choisissez un type de révision';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Non défini';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Utilisée pour le filtrage et l\'export';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Gérer les types de révision';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => 'Catégorie';
 
   @override

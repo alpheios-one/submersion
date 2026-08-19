@@ -10876,6 +10876,28 @@ class AppLocalizationsEn extends AppLocalizations {
       'Pick service date';
 
   @override
+  String get equipment_serviceDialog_serviceTypeLabel => 'Service type';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'Logging this resets the clock for this service type';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Pick a service type';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Not set';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Used for filtering and export';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Manage service types';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => 'Category';
 
   @override

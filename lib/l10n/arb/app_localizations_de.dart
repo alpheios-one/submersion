@@ -11047,6 +11047,28 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wartungsdatum auswählen';
 
   @override
+  String get equipment_serviceDialog_serviceTypeLabel => 'Wartungsart';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'Das Erfassen setzt den Zähler dieser Wartungsart zurück';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Wartungsart auswählen';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Nicht gesetzt';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Für Filter und Export verwendet';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Wartungsarten verwalten';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => 'Kategorie';
 
   @override

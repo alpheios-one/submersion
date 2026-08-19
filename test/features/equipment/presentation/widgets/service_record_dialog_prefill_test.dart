@@ -50,6 +50,11 @@ void main() {
     ServiceRecord? existingRecord,
     Future<void> Function(ServiceRecord)? onSave,
   }) async {
+    // The dialog body is a scroll view and does not fit an 800x600 surface,
+    // so a tap on a lower field would land outside the viewport.
+    await tester.binding.setSurfaceSize(const Size(800, 4000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
       ProviderScope(
