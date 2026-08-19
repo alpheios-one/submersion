@@ -373,6 +373,69 @@ void main() {
   });
 
   test(
+    'a failed swap rolls back the WAL sidecar too, not just the main file',
+    () async {
+      // The main database is opened from two isolates, so `close(strict:true)`
+      // is not always the LAST close: a second connection keeps the -wal alive
+      // with committed rows still in it. Deleting the sidecar at that point
+      // would leave the .pre-restore copy incomplete, and the rollback below
+      // would put back a database missing its newest data.
+      final defaultPath = p.join(tempDir.path, 'Submersion', 'submersion.db');
+      await DatabaseService.instance.initialize(
+        locationService: _FakeLocation(defaultPath),
+      );
+      // Force the lazy open so the database file exists before it is backed up.
+      await DatabaseService.instance.database
+          .customSelect('SELECT 1')
+          .getSingle();
+      final backupPath = p.join(tempDir.path, 'backup.db');
+      await DatabaseService.instance.backup(backupPath);
+
+      // Written AFTER the backup, so this row can only come from the original
+      // database, and only survives if its WAL sidecar did.
+      final now = DateTime.now();
+      await DiverRepository().createDiver(
+        domain.Diver(id: '', name: 'Keep Me', createdAt: now, updatedAt: now),
+      );
+
+      // Stand in for the headless isolate: a second connection that outlives
+      // the restore's close, so SQLite cannot checkpoint the -wal away.
+      final sibling = DatabaseService.openRaw(defaultPath);
+      addTearDown(sibling.close);
+      sibling.select('SELECT 1');
+
+      // Sabotage the swap so the rollback path runs.
+      DatabaseService.instance.debugOnRestoreWindowOpen = (stagingPath) {
+        expect(
+          File('$defaultPath-wal').existsSync(),
+          isTrue,
+          reason:
+              'the sibling connection should have kept the -wal from being '
+              'checkpointed away by the close, or this proves nothing',
+        );
+        File(stagingPath).deleteSync();
+      };
+
+      await expectLater(
+        DatabaseService.instance.restore(backupPath),
+        throwsA(anything),
+      );
+
+      final divers = await DiverRepository().getAllDivers();
+      expect(
+        divers.map((d) => d.name),
+        contains('Keep Me'),
+        reason:
+            'the row was WAL-resident; dropping the sidecar on the way aside '
+            'would have lost it',
+      );
+      expect(File('$defaultPath.pre-restore').existsSync(), isFalse);
+      expect(File('$defaultPath.pre-restore-wal').existsSync(), isFalse);
+      expect(File('$defaultPath.pre-restore-shm').existsSync(), isFalse);
+    },
+  );
+
+  test(
     'the restore window seam is one-shot and does not leak across restores',
     () async {
       // The service is a singleton, so a seam left set by one restore must not

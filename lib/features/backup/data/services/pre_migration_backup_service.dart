@@ -25,7 +25,7 @@ class PreMigrationBackupService {
   final BackupPreferences _preferences;
 
   /// The live database's SQLCipher key when protection is on, else null.
-  /// Only used to open the database for the pre-copy WAL checkpoint.
+  /// Only used to open the database for the pre-copy journal-mode settle.
   final String? Function()? _databaseKeyHexProvider;
   final DateTime Function() _clock;
   final String Function() _idGenerator;
@@ -62,7 +62,7 @@ class PreMigrationBackupService {
       throw BackupFailedException.fromError(e, stack);
     }
 
-    await _checkpointHotWal(livePath);
+    await _settleJournalMode(livePath);
 
     final now = _clock().toUtc();
     final filename = '${_formatTimestamp(now)}-v$stored-v$target.db';
@@ -133,53 +133,52 @@ class PreMigrationBackupService {
     }
   }
 
-  /// Folds a hot `-wal` back into the main database file so the byte copy
-  /// below is a complete snapshot of what the migration is about to touch.
+  /// Takes the closed database out of WAL so the byte copy below is a
+  /// complete, self-contained snapshot of what the migration is about to
+  /// touch.
   ///
-  /// A SQLite database is not one file. A crash or force-kill leaves
-  /// committed transactions in `<db>-wal`, uncheckpointed; the migration
-  /// replays them when it opens the database, so a copy of `<db>` alone is
-  /// missing the tail of the user's data: precisely the data a safety copy
-  /// exists to protect. Copying the sidecar alongside would not help:
-  /// `DatabaseService.restore` stages only the single backup file and deletes
-  /// the destination's sidecars before the swap, so a `-wal` next to the
-  /// backup would never travel. Checkpointing yields a self-contained file
-  /// the existing restore path already handles.
+  /// A SQLite database is not one file. In WAL mode committed transactions
+  /// live in `<db>-wal` until a checkpoint folds them back, and a crash or
+  /// force-kill leaves them there; the migration replays them when it opens
+  /// the database, so a copy of `<db>` alone is missing the tail of the user's
+  /// data: precisely the data a safety copy exists to protect. Copying the
+  /// sidecar alongside would not help: `DatabaseService.restore` stages only
+  /// the single backup file and deletes the destination's sidecars before the
+  /// swap, so a `-wal` next to the backup would never travel.
+  ///
+  /// `journal_mode = DELETE` settles both halves of the problem in one
+  /// statement. It checkpoints and removes the `-wal`, AND it clears the WAL
+  /// flag from the header -- which a checkpoint alone does not. That second
+  /// half matters because the flag is what a byte copy inherits: a WAL-mode
+  /// artifact makes SQLite create an `-shm` beside it on the next READ-ONLY
+  /// open, which is how `BackupService.validateBackupFile` and the schema
+  /// probe read backups, and which fails outright on a file the picker handed
+  /// over from a read-only directory.
+  ///
+  /// The live database goes straight back to WAL the next time
+  /// `applyMainDatabaseSetup` opens it, which on this path is the migration
+  /// itself, moments later.
   ///
   /// Best-effort by contract. A database that cannot be opened read-write
   /// (ejected volume, read-only mount, missing or wrong key) still gets its
   /// plain copy: an incomplete safety net beats a bricked startup, and the
   /// migration that follows will surface the real problem itself.
-  ///
-  /// Opens only when a non-empty `-wal` is actually present, so the common
-  /// case (a cleanly closed database) never touches the file at all.
-  Future<void> _checkpointHotWal(String livePath) async {
-    try {
-      final wal = File('$livePath-wal');
-      if (!await wal.exists() || await wal.length() == 0) return;
-    } catch (e, stack) {
-      _log.warning(
-        'Could not inspect the WAL sidecar for $livePath; copying as-is',
-        error: e,
-        stackTrace: stack,
-      );
-      return;
-    }
-
+  Future<void> _settleJournalMode(String livePath) async {
     try {
       final db = DatabaseService.openRaw(
         livePath,
         keyHex: _databaseKeyHexProvider?.call(),
       );
       try {
-        // Returns one row (busy, log, checkpointed); busy != 0 means frames
-        // were left behind, so say so rather than implying a clean snapshot.
-        final result = db.select('PRAGMA wal_checkpoint(TRUNCATE)');
-        final busy = result.isEmpty ? null : result.first.values.first;
-        if (busy != 0) {
+        // Returns one row holding the resulting mode. Anything other than
+        // 'delete' means frames may have been left behind, so say so rather
+        // than implying a clean snapshot.
+        final result = db.select('PRAGMA journal_mode = DELETE');
+        final mode = result.isEmpty ? null : result.first.values.first;
+        if (mode != 'delete') {
           _log.warning(
-            'WAL checkpoint before the pre-migration backup did not complete '
-            '(busy=$busy); the copy may omit WAL-resident rows',
+            'Could not take the database out of WAL before the pre-migration '
+            'backup (mode=$mode); the copy may omit WAL-resident rows',
           );
         }
       } finally {
@@ -187,8 +186,8 @@ class PreMigrationBackupService {
       }
     } catch (e, stack) {
       _log.warning(
-        'WAL checkpoint before the pre-migration backup failed; copying the '
-        'database file as-is',
+        'Settling the journal mode before the pre-migration backup failed; '
+        'copying the database file as-is',
         error: e,
         stackTrace: stack,
       );

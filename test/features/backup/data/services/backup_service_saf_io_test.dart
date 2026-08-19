@@ -138,7 +138,13 @@ void main() {
 
       expect(record.localPath, startsWith('content://tree/doc/'));
       expect(record.sizeBytes, greaterThan(0));
-      expect(port.wroteFrom, live);
+      // The port streams an EXPORT of the database, never the live file: `<db>`
+      // alone omits the rows still in the WAL, and under database password
+      // protection it is ciphertext where a backup must be portable plaintext.
+      expect(port.wroteFrom, isNotNull);
+      expect(port.wroteFrom, isNot(live));
+      // And the staged plaintext export does not outlive the write.
+      expect(File(port.wroteFrom!).existsSync(), isFalse);
     },
   );
 
