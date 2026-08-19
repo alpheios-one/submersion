@@ -242,4 +242,112 @@ void main() {
     expect(File(backupPath).existsSync(), isTrue);
     expect(prefs.getHistory(), hasLength(1));
   });
+
+  test(
+    'the artifact is left out of WAL mode, so a read-only open needs no sidecar',
+    () async {
+      // The live database runs in WAL (applyMainDatabaseSetup puts it there),
+      // and journal mode is written into the header, so a byte copy inherits
+      // it. A WAL-mode artifact is not self-contained: opening it READ-ONLY --
+      // which is exactly how BackupService.validateBackupFile and the schema
+      // probe read backups -- has to create an `-shm` beside it, and fails
+      // outright when the picker handed the file out of a read-only directory.
+      final tmp = await Directory.systemTemp.createTemp('pmbs_mode_');
+      addTearDown(() => tmp.delete(recursive: true));
+
+      final livePath = p.join(tmp.path, 'submersion.db');
+      final backupsDir = p.join(tmp.path, 'backups');
+      await Directory(backupsDir).create(recursive: true);
+
+      final seed = sqlite3.sqlite3.open(livePath);
+      seed.select('PRAGMA journal_mode = WAL');
+      seed.execute('PRAGMA user_version = 63');
+      seed.execute('CREATE TABLE sentinel (id INTEGER PRIMARY KEY)');
+      seed.execute('INSERT INTO sentinel VALUES (42)');
+      seed.close();
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = BackupPreferences(await SharedPreferences.getInstance());
+
+      await PreMigrationBackupService(
+        livePathProvider: () async => livePath,
+        backupsDirProvider: () async => backupsDir,
+        preferences: prefs,
+        clock: () => DateTime.utc(2026, 4, 12, 8, 12, 1),
+        idGenerator: () => 'mode-id',
+      ).backupIfMigrationPending(
+        stored: 63,
+        target: 64,
+        appVersion: '1.6.0.1241',
+      );
+
+      final backupPath = p.join(backupsDir, '20260412-081201000-v63-v64.db');
+      final verify = sqlite3.sqlite3.open(
+        backupPath,
+        mode: sqlite3.OpenMode.readOnly,
+      );
+      try {
+        expect(
+          verify.select('PRAGMA journal_mode').first.values.first,
+          'delete',
+        );
+        expect(verify.select('SELECT id FROM sentinel').first.values.first, 42);
+      } finally {
+        verify.close();
+      }
+      // A read-only open of a WAL-mode file would have littered these next to
+      // the artifact.
+      expect(File('$backupPath-wal').existsSync(), isFalse);
+      expect(File('$backupPath-shm').existsSync(), isFalse);
+    },
+  );
+
+  test('a read-only directory can still hold the artifact', () async {
+    // The concrete failure the test above prevents: iOS/macOS hand a picked
+    // backup out of a read-only sandbox directory, where SQLite cannot create
+    // the `-shm` a WAL-mode file needs and the read-only open fails outright.
+    final tmp = await Directory.systemTemp.createTemp('pmbs_rodir_');
+    final backupsDir = p.join(tmp.path, 'sealed');
+    addTearDown(() async {
+      await Process.run('chmod', ['755', backupsDir]);
+      await tmp.delete(recursive: true);
+    });
+
+    final livePath = p.join(tmp.path, 'submersion.db');
+    await Directory(backupsDir).create(recursive: true);
+
+    final seed = sqlite3.sqlite3.open(livePath);
+    seed.select('PRAGMA journal_mode = WAL');
+    seed.execute('PRAGMA user_version = 63');
+    seed.execute('CREATE TABLE sentinel (id INTEGER PRIMARY KEY)');
+    seed.close();
+
+    SharedPreferences.setMockInitialValues({});
+    final prefs = BackupPreferences(await SharedPreferences.getInstance());
+
+    await PreMigrationBackupService(
+      livePathProvider: () async => livePath,
+      backupsDirProvider: () async => backupsDir,
+      preferences: prefs,
+      clock: () => DateTime.utc(2026, 4, 12, 8, 12, 1),
+      idGenerator: () => 'rodir-id',
+    ).backupIfMigrationPending(
+      stored: 63,
+      target: 64,
+      appVersion: '1.6.0.1241',
+    );
+
+    final backupPath = p.join(backupsDir, '20260412-081201000-v63-v64.db');
+    await Process.run('chmod', ['555', backupsDir]);
+
+    final verify = sqlite3.sqlite3.open(
+      backupPath,
+      mode: sqlite3.OpenMode.readOnly,
+    );
+    try {
+      expect(verify.select('PRAGMA user_version').first.values.first, 63);
+    } finally {
+      verify.close();
+    }
+  }, testOn: 'mac-os || linux');
 }

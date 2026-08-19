@@ -176,15 +176,13 @@ class BackupService {
     final String storedName;
     if (encKey == null) {
       storedName = filename;
-      // Write the backup; ref is a filesystem path or a content:// document URI.
-      ref = await target.write(_dbAdapter, filename);
-
-      // SAF refs are content URIs (no File length). The backup is a byte copy
-      // of the live DB, so its size equals the source's. Filesystem refs keep
-      // the existing File(ref).length() behavior.
-      sizeBytes = isSafRef(ref)
-          ? await File(await _dbAdapter.databasePath).length()
-          : await File(ref).length();
+      // Write the backup; ref is a filesystem path or a content:// document
+      // URI, and the size comes back with it. A SAF ref has no File length to
+      // ask, and the live database file's length is not the answer either: the
+      // export is compacted and folds in rows that were still in the WAL.
+      final written = await target.write(_dbAdapter, filename);
+      ref = written.ref;
+      sizeBytes = written.sizeBytes;
     } else {
       // Backup encryption on: encrypt to a temp .sbe off to the side, then
       // write that into the target (filesystem copy or SAF stream).

@@ -26,6 +26,11 @@ Future<void> sqlcipherExport({
   String? sourceKeyHex,
   String? targetKeyHex,
 }) async {
+  // readWriteCreate (the default), unlike the sibling export in
+  // database_snapshot.dart, which deliberately drops the create flag. A
+  // connection's open flags apply to every database it ATTACHes, so without
+  // create the ATTACH below cannot bring the target file into existence and
+  // the export fails before it starts.
   final db = sqlite3.sqlite3.open(sourcePath);
   try {
     if (sourceKeyHex != null) {

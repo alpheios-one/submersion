@@ -50,8 +50,11 @@ void main() {
   );
 
   test(
-    'backup of a plaintext db still file-copies (no exporter call)',
+    'backup of a plaintext db never reaches the sqlcipher exporter',
     () async {
+      // Not a real database, so the SQL-level export cannot run and the
+      // degraded byte-copy fallback produces the artifact. Either way the
+      // encrypted branch must stay untouched -- that is what is asserted here.
       final src = '${tmp.path}/submersion.db';
       File(src).writeAsBytesSync([
         ...'SQLite format 3'.codeUnits,

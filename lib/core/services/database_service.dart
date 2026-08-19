@@ -10,10 +10,12 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:submersion/core/database/background_database_connection.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_connection_setup.dart';
+import 'package:submersion/core/database/database_snapshot.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/database/sqlcipher_setup.dart'
     as sqlcipher_setup;
 import 'package:submersion/core/services/database_location_service.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/security/database_encryption_migrator.dart';
 import 'package:submersion/core/services/security/database_locked_exception.dart';
 import 'package:submersion/core/services/security/database_security_sidecar.dart';
@@ -29,8 +31,12 @@ enum DatabaseOpenMode {
 }
 
 /// drift setup callback for a main-database connection: keys SQLCipher before
-/// any other statement, then applies the busy timeout. Never null -- the busy
-/// timeout is needed on plaintext databases too.
+/// any other statement, then applies the busy timeout and the WAL journal
+/// mode. Never null -- neither of those is conditional on encryption.
+///
+/// The single place WAL is turned on. Every other opener of a database file
+/// (the raw probes in [DatabaseService.openRaw], the backup exporters) is
+/// deliberately journal-mode-neutral.
 void Function(sqlite3.Database) _connectionSetup(String? keyHex) {
   return (db) => applyMainDatabaseSetup(db, keyHex: keyHex);
 }
@@ -39,6 +45,8 @@ class DatabaseService {
   DatabaseService._();
 
   static final DatabaseService instance = DatabaseService._();
+
+  final _log = LoggerService.forClass(DatabaseService);
 
   AppDatabase? _database;
 
@@ -120,6 +128,7 @@ class DatabaseService {
     _currentDatabasePath = null;
     databaseKeyHex = null;
     debugExporterOverride = null;
+    debugSnapshotterOverride = null;
     lastOpenMode = null;
     // The service is a singleton, so a restore seam set by one test would
     // otherwise leak into the next and fire unexpectedly.
@@ -546,7 +555,11 @@ class DatabaseService {
   }) {
     final db = sqlite3.sqlite3.open(path, mode: mode);
     try {
-      applyMainDatabaseSetup(db, keyHex: keyHex);
+      // Basics only, never the journal mode: this opens backup artifacts and
+      // candidate files at other locations as well as the live database, and
+      // a probe has no business rewriting the header of a file it is only
+      // looking at. WAL is set by _connectionSetup, on the real connection.
+      applyConnectionBasics(db, keyHex: keyHex);
     } catch (_) {
       db.close();
       rethrow;
@@ -653,8 +666,56 @@ class DatabaseService {
       return;
     }
 
+    // Plaintext live DB. Export through SQLite rather than copying bytes: the
+    // database is OPEN and serving while this runs (no caller closes it), so a
+    // byte copy would miss every committed row still in `<db>-wal` under WAL,
+    // and could capture a torn mid-transaction state under DELETE.
+    final snapshotter = debugSnapshotterOverride ?? vacuumIntoSnapshot;
+    final staging = '$destinationPath.export-staging';
+    await _deleteIfExists(staging);
+    var exported = false;
+    try {
+      await snapshotter(sourcePath: sourcePath, targetPath: staging);
+      exported = true;
+    } catch (e, stack) {
+      await _bestEffortDelete(staging);
+      // Degraded fallback, deliberately not a rethrow -- and scoped to the
+      // EXPORT alone. A source SQLite cannot open (corrupt, truncated, a
+      // foreign file at the database path) has no SQL-level export, but its
+      // bytes are still the only copy of whatever survives in it and may be
+      // all a recovery has to work with. The pre-migration backup makes the
+      // same trade for the same reason.
+      _log.warning(
+        'Database export for the backup failed; falling back to a raw file '
+        'copy, which may omit WAL-resident rows',
+        error: e,
+        stackTrace: stack,
+      );
+    }
+
+    if (exported) {
+      // Past this point the artifact is good and only its PLACEMENT can fail
+      // (an unwritable destination, a cross-device rename). Falling back to a
+      // byte copy there would swap a correct backup for a lossy one over a
+      // problem the copy would hit as well, so these errors surface.
+      try {
+        await _deleteIfExists(destinationPath);
+        await File(staging).rename(destinationPath);
+      } catch (_) {
+        await _bestEffortDelete(staging);
+        rethrow;
+      }
+      return;
+    }
+
     await sourceFile.copy(destinationPath);
   }
+
+  /// Test seam for the SQL-level export used by [backup] on a plaintext
+  /// database. Mirrors [debugExporterOverride], which covers the encrypted
+  /// branch.
+  @visibleForTesting
+  DatabaseSnapshotter? debugSnapshotterOverride;
 
   /// Test seam: invoked synchronously the instant the live database has been
   /// closed during [restore] — i.e. when the "database unavailable" window
@@ -733,20 +794,27 @@ class DatabaseService {
     final hadDest = await destFile.exists();
     try {
       if (hadDest) await destFile.rename(asidePath);
-      // The old WAL/SHM sidecars belong to the pre-restore database. Left in
-      // place, SQLite would replay them into the swapped-in file and corrupt
-      // it, so they must go before the new file is opened.
-      await _deleteIfExists('$destinationPath-wal');
-      await _deleteIfExists('$destinationPath-shm');
+      // The old WAL/SHM sidecars belong to the pre-restore database and must
+      // not be next to the swapped-in file: SQLite would replay them into it
+      // and corrupt it. They travel WITH the file they belong to rather than
+      // being deleted, because the rollback below has to put back a complete
+      // database. A clean close normally checkpoints the -wal away, but not
+      // when another isolate still holds the database open -- and that is
+      // exactly when a restore is most likely to fail its swap.
+      await _moveIfExists('$destinationPath-wal', '$asidePath-wal');
+      await _moveIfExists('$destinationPath-shm', '$asidePath-shm');
       await File(stagingPath).rename(destinationPath);
     } catch (_) {
-      // The swap failed with the database closed. Roll the original file back
-      // into place, drop the orphaned staging copy, and reopen so the app is
-      // never left with a dead (null) database, then surface the error.
+      // The swap failed with the database closed. Roll the original file and
+      // its sidecars back into place, drop the orphaned staging copy, and
+      // reopen so the app is never left with a dead (null) database, then
+      // surface the error.
       if (hadDest &&
           !await destFile.exists() &&
           await File(asidePath).exists()) {
         await File(asidePath).rename(destinationPath);
+        await _moveIfExists('$asidePath-wal', '$destinationPath-wal');
+        await _moveIfExists('$asidePath-shm', '$destinationPath-shm');
       }
       await _deleteIfExists(stagingPath);
       await initialize();
@@ -784,6 +852,8 @@ class DatabaseService {
       await _deleteIfExists('$destinationPath-shm');
       if (hadDest && await File(asidePath).exists()) {
         await File(asidePath).rename(destinationPath);
+        await _moveIfExists('$asidePath-wal', '$destinationPath-wal');
+        await _moveIfExists('$asidePath-shm', '$destinationPath-shm');
       }
       await initialize();
       rethrow;
@@ -796,6 +866,16 @@ class DatabaseService {
     // leftover copy is harmless and is swept by the next restore (including a
     // no-op one).
     await _bestEffortDelete(asidePath);
+    await _bestEffortDelete('$asidePath-wal');
+    await _bestEffortDelete('$asidePath-shm');
+  }
+
+  /// Renames [from] onto [to] when [from] exists, replacing [to].
+  Future<void> _moveIfExists(String from, String to) async {
+    final source = File(from);
+    if (!await source.exists()) return;
+    await _deleteIfExists(to);
+    await source.rename(to);
   }
 
   Future<void> _deleteIfExists(String path) async {
@@ -821,6 +901,9 @@ class DatabaseService {
   Future<void> _sweepRestoreTempFiles(String destinationPath) async {
     await _bestEffortDelete('$destinationPath.restore-staging');
     await _bestEffortDelete('$destinationPath.pre-restore');
+    // The aside copy carries its sidecars now, so they can be stranded too.
+    await _bestEffortDelete('$destinationPath.pre-restore-wal');
+    await _bestEffortDelete('$destinationPath.pre-restore-shm');
   }
 
   /// Delete all data and recreate a fresh empty database.
