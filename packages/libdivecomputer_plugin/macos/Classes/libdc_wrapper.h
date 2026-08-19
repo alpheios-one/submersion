@@ -110,6 +110,20 @@ typedef int (*libdc_io_configure_fn)(void *userdata, unsigned int baudrate,
 typedef int (*libdc_io_set_dtr_fn)(void *userdata, unsigned int value);
 typedef int (*libdc_io_set_rts_fn)(void *userdata, unsigned int value);
 
+// Flow-control values passed to libdc_io_configure_fn (mirror dc_flowcontrol_t
+// in third_party/libdivecomputer/include/libdivecomputer/iostream.h).
+//
+// The callback signature uses plain unsigned int so a platform backend does not
+// have to include libdivecomputer's headers, which also costs it the enum's
+// names. Backends should compare against these constants rather than against
+// bare 1 and 2: hardware comes first in dc_flowcontrol_t, which reads as the
+// wrong way round to anyone who thinks of XON/XOFF as the simpler case, and
+// every termios and DCB backend here had the two swapped (issue #1155).
+// test_serial_callbacks.c pins these against the real enum.
+#define LIBDC_FLOWCONTROL_NONE     0  // No flow control
+#define LIBDC_FLOWCONTROL_HARDWARE 1  // RTS/CTS
+#define LIBDC_FLOWCONTROL_SOFTWARE 2  // XON/XOFF
+
 typedef struct {
     libdc_io_set_timeout_fn set_timeout;  // may be NULL
     libdc_io_read_fn read;                // required
