@@ -66,8 +66,19 @@ Future<bool> prepareHeadlessDatabaseLocation({
   // On iOS/macOS the custom folder is only reachable through the stored
   // bookmark. It may well fail to resolve headlessly; the readability probe
   // below is what decides, so a failure here is not fatal on its own.
+  //
+  // resolveStoredBookmark already swallows the native call, but its prefs read
+  // sits outside that guard. Nothing in this function may escape: its contract
+  // is to answer skip-or-proceed, and a throw would instead fail the task and
+  // put it in Workmanager's retry queue.
   if (config.isCustomLocation) {
-    await location.resolveStoredBookmark();
+    try {
+      await location.resolveStoredBookmark();
+    } catch (e) {
+      _log.info(
+        'Headless bookmark resolution failed, letting the probe decide: $e',
+      );
+    }
   }
 
   final dbPath = await location.getDatabasePath();
@@ -98,8 +109,15 @@ Future<bool> _isReadableDatabase(String dbPath) async {
     return false;
   } finally {
     // Close even when the read throws, or the handle leaks on every
-    // background run that hits a revoked-permission folder.
-    await handle?.close();
+    // background run that hits a revoked-permission folder. The close is
+    // itself guarded because an exception raised in a finally block REPLACES
+    // the value the try/catch settled on, which would turn "skip this run"
+    // into "the task failed".
+    try {
+      await handle?.close();
+    } catch (_) {
+      // Nothing to do: the probe's answer is already decided.
+    }
   }
 }
 

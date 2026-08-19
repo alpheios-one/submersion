@@ -28,6 +28,7 @@ void main() {
   late String customFolder;
   late String defaultFolder;
   late String defaultDbPath;
+  late PathProviderPlatform originalPathProvider;
 
   setUp(() {
     tempDir = Directory.systemTemp.createTempSync('headless-db-location-');
@@ -35,11 +36,15 @@ void main() {
     Directory(customFolder).createSync(recursive: true);
     defaultFolder = p.join(tempDir.path, 'Submersion');
     defaultDbPath = p.join(defaultFolder, 'submersion.db');
+    originalPathProvider = PathProviderPlatform.instance;
     PathProviderPlatform.instance = _FakePathProvider(tempDir.path);
     DatabaseService.instance.resetForTesting();
   });
 
   tearDown(() {
+    // The fake points into a temp dir this tearDown is about to delete, so it
+    // must not outlive the test that installed it.
+    PathProviderPlatform.instance = originalPathProvider;
     DatabaseService.instance.resetForTesting();
     if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
   });
@@ -49,7 +54,13 @@ void main() {
     return SharedPreferences.getInstance();
   }
 
-  /// A file that looks enough like a database for the readability probe.
+  /// Puts a file where the database belongs.
+  ///
+  /// The bytes are deliberately arbitrary. The gate's probe asks only whether
+  /// this isolate can OPEN the path, never what the file contains: deciding
+  /// that a database is valid is the job of the open that follows, and a
+  /// header check here would reject an encrypted database, which is
+  /// SQLCipher ciphertext from byte zero.
   String seedDatabase(String folder) {
     final path = p.join(folder, 'submersion.db');
     File(path)
