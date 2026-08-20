@@ -42,6 +42,32 @@ class NotificationPermissionCard extends ConsumerStatefulWidget {
 
 class _NotificationPermissionCardState
     extends ConsumerState<NotificationPermissionCard> {
+  late final AppLifecycleListener _lifecycleListener;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycleListener = AppLifecycleListener(onResume: _recheckPermission);
+  }
+
+  @override
+  void dispose() {
+    _lifecycleListener.dispose();
+    super.dispose();
+  }
+
+  /// Re-read the permission after the user has been away.
+  ///
+  /// [notificationPermissionProvider] caches, and the only route out of this
+  /// card sends the user to the Settings app, where the answer can change
+  /// behind our back. Without this the card would keep offering "Open
+  /// Settings" after the user had already granted there, until something
+  /// unrelated happened to invalidate the provider.
+  void _recheckPermission() {
+    if (!mounted) return;
+    ref.invalidate(notificationPermissionProvider);
+  }
+
   @override
   Widget build(BuildContext context) {
     final refused = ref.watch(notificationPromptRefusedProvider);
