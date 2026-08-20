@@ -17249,6 +17249,11 @@ class AppLocalizationsHe extends AppLocalizations {
       'אין עדיין תגיות. הקלד שם תגית כדי ליצור את הראשונה.';
 
   @override
+  String tags_picker_errorLoading(String error) {
+    return 'שגיאה בטעינת התגיות: $error';
+  }
+
+  @override
   String get tags_picker_allAdded => 'כל התגיות כבר נוספו.';
 
   @override

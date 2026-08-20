@@ -5310,6 +5310,7 @@
   "tags_action_browse": "Durchsuchen",
   "tags_picker_title": "Tags auswählen",
   "tags_picker_empty": "Noch keine Tags. Gib einen Tag-Namen ein, um deinen ersten zu erstellen.",
+  "tags_picker_errorLoading": "Fehler beim Laden der Tags: {error}",
   "tags_picker_allAdded": "Alle Tags sind bereits hinzugefügt.",
   "tags_picker_noMatches": "Keine Tags entsprechen deiner Suche.",
   "tags_picker_addCount": "{count, plural, =0{Tags hinzufügen} =1{1 Tag hinzufügen} other{{count} Tags hinzufügen}}",

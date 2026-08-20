@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -36,12 +38,23 @@ void main() {
   Widget buildTestWidget({
     List<TagStatistic>? stats,
     Set<String> selectedTagIds = const {},
+    Object? error,
+    bool pending = false,
   }) {
     return ProviderScope(
       overrides: [
-        tagStatisticsProvider.overrideWith((ref) async => stats ?? testStats),
+        tagStatisticsProvider.overrideWith((ref) {
+          // A future that never completes keeps the sheet in its loading
+          // state for as long as the test needs it.
+          if (pending) return Completer<List<TagStatistic>>().future;
+          if (error != null) return Future<List<TagStatistic>>.error(error);
+          return Future.value(stats ?? testStats);
+        }),
       ],
       child: MaterialApp(
+        // Every assertion below matches an English label, so pin the
+        // locale instead of inheriting the ambient platform one.
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
@@ -176,6 +189,23 @@ void main() {
 
       expect(find.byType(CheckboxListTile), findsNothing);
       expect(find.text('No tags match your search.'), findsOneWidget);
+    });
+
+    testWidgets('a load failure reports tags, not some other noun', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildTestWidget(error: Exception('boom')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CheckboxListTile), findsNothing);
+      expect(find.textContaining('Error loading tags'), findsOneWidget);
+    });
+
+    testWidgets('shows a spinner until the tag list resolves', (tester) async {
+      await tester.pumpWidget(buildTestWidget(pending: true));
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
   });
 }

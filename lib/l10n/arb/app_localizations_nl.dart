@@ -17559,6 +17559,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Nog geen tags. Typ een tagnaam om je eerste aan te maken.';
 
   @override
+  String tags_picker_errorLoading(String error) {
+    return 'Fout bij het laden van tags: $error';
+  }
+
+  @override
   String get tags_picker_allAdded => 'Alle tags zijn al toegevoegd.';
 
   @override

@@ -10691,6 +10691,15 @@
   "tags_action_browse": "Browse",
   "tags_picker_title": "Pick Tags",
   "tags_picker_empty": "No tags yet. Type a tag name to create your first one.",
+  "tags_picker_errorLoading": "Error loading tags: {error}",
+  "@tags_picker_errorLoading": {
+    "description": "Shown in the tag picker sheet when the tag list fails to load",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "tags_picker_allAdded": "All tags are already added.",
   "tags_picker_noMatches": "No tags match your search.",
   "tags_picker_addCount": "{count, plural, =0{Add tags} =1{Add 1 tag} other{Add {count} tags}}",

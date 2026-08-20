@@ -65,6 +65,9 @@ void main() {
           ),
         ].cast(),
         child: const MaterialApp(
+          // Every assertion below matches an English label, so pin the
+          // locale instead of inheriting the ambient platform one.
+          locale: Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(body: DiveEditPage(embedded: true)),

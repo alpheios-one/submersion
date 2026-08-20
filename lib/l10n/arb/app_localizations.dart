@@ -29634,6 +29634,12 @@ abstract class AppLocalizations {
   /// **'No tags yet. Type a tag name to create your first one.'**
   String get tags_picker_empty;
 
+  /// Shown in the tag picker sheet when the tag list fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading tags: {error}'**
+  String tags_picker_errorLoading(String error);
+
   /// No description provided for @tags_picker_allAdded.
   ///
   /// In en, this message translates to:

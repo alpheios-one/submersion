@@ -17769,6 +17769,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucun tag pour le moment. Saisissez un nom de tag pour créer le premier.';
 
   @override
+  String tags_picker_errorLoading(String error) {
+    return 'Erreur lors du chargement des tags : $error';
+  }
+
+  @override
   String get tags_picker_allAdded => 'Tous les tags sont déjà ajoutés.';
 
   @override

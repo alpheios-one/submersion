@@ -5488,6 +5488,7 @@
   "tags_action_browse": "浏览",
   "tags_picker_title": "选择标签",
   "tags_picker_empty": "还没有标签。输入标签名称即可创建第一个。",
+  "tags_picker_errorLoading": "加载标签时出错：{error}",
   "tags_picker_allAdded": "所有标签均已添加。",
   "tags_picker_noMatches": "没有标签与您的搜索匹配。",
   "tags_picker_addCount": "{count, plural, =0{添加标签} other{添加 {count} 个标签}}",

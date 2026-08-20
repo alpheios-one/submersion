@@ -17713,6 +17713,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Ainda não há etiquetas. Escreva um nome para criar a primeira.';
 
   @override
+  String tags_picker_errorLoading(String error) {
+    return 'Erro ao carregar as etiquetas: $error';
+  }
+
+  @override
   String get tags_picker_allAdded => 'Todas as etiquetas já foram adicionadas.';
 
   @override

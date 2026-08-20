@@ -107,7 +107,7 @@ class _TagPickerSheetState extends ConsumerState<TagPickerSheet> {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  l10n.diveLog_equipmentPicker_errorLoading(error.toString()),
+                  l10n.tags_picker_errorLoading(error.toString()),
                   textAlign: TextAlign.center,
                 ),
               ),

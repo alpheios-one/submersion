@@ -16797,6 +16797,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tags_picker_empty => '还没有标签。输入标签名称即可创建第一个。';
 
   @override
+  String tags_picker_errorLoading(String error) {
+    return '加载标签时出错：$error';
+  }
+
+  @override
   String get tags_picker_allAdded => '所有标签均已添加。';
 
   @override

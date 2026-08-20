@@ -17652,6 +17652,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Még nincsenek címkék. Írj be egy címkenevet az első létrehozásához.';
 
   @override
+  String tags_picker_errorLoading(String error) {
+    return 'Hiba a címkék betöltésekor: $error';
+  }
+
+  @override
   String get tags_picker_allAdded => 'Minden címke már hozzá van adva.';
 
   @override

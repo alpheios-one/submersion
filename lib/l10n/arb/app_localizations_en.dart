@@ -17397,6 +17397,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'No tags yet. Type a tag name to create your first one.';
 
   @override
+  String tags_picker_errorLoading(String error) {
+    return 'Error loading tags: $error';
+  }
+
+  @override
   String get tags_picker_allAdded => 'All tags are already added.';
 
   @override

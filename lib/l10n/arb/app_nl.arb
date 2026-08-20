@@ -5310,6 +5310,7 @@
   "tags_action_browse": "Bladeren",
   "tags_picker_title": "Tags kiezen",
   "tags_picker_empty": "Nog geen tags. Typ een tagnaam om je eerste aan te maken.",
+  "tags_picker_errorLoading": "Fout bij het laden van tags: {error}",
   "tags_picker_allAdded": "Alle tags zijn al toegevoegd.",
   "tags_picker_noMatches": "Geen tags komen overeen met je zoekopdracht.",
   "tags_picker_addCount": "{count, plural, =0{Tags toevoegen} =1{1 tag toevoegen} other{{count} tags toevoegen}}",

@@ -17380,6 +17380,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا توجد وسوم بعد. اكتب اسم وسم لإنشاء أول وسم لك.';
 
   @override
+  String tags_picker_errorLoading(String error) {
+    return 'خطأ في تحميل الوسوم: $error';
+  }
+
+  @override
   String get tags_picker_allAdded => 'تمت إضافة جميع الوسوم بالفعل.';
 
   @override
