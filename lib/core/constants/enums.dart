@@ -238,7 +238,7 @@ enum CertificationLevel {
 
 /// The category of work a maintenance record represents (what kind of job it
 /// was), as distinct from the service type it fulfills, which is the
-/// user-extensible ServiceKind catalog. Renamed from ServiceType in v159:
+/// user-extensible ServiceKind catalog. Renamed from ServiceType in v160:
 /// the catalog owns the words "service type" in the UI.
 enum ServiceCategory {
   annual('Annual Service'),

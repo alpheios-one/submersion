@@ -199,12 +199,48 @@ void main() {
     );
   });
 
+  // The seed SQL writes its category literals inline rather than reading the
+  // map, because it is a const SQL string. These two tests are what actually
+  // keeps the pair in step: the first pins the slug set, the second pins the
+  // category each slug is seeded with. Without them a fresh install and an
+  // upgraded install could disagree about what "hydro" defaults to.
   test('every built-in slug in the seed SQL has a category', () {
     for (final slug in kBuiltInServiceKindCategories.keys) {
       expect(
         kSeedBuiltInServiceKindsSql,
         contains("'$slug'"),
         reason: 'the category map names a slug the seed SQL does not create',
+      );
+    }
+  });
+
+  test('a fresh install seeds the same categories the migration would', () async {
+    // A database created from scratch runs the seed SQL, never the migration.
+    final db = AppDatabase(NativeDatabase.memory());
+    addTearDown(db.close);
+
+    final rows = await db
+        .customSelect(
+          'SELECT id, default_category FROM service_kinds WHERE is_built_in = 1',
+        )
+        .get();
+    final seeded = {
+      for (final r in rows)
+        r.read<String>('id'): r.read<String?>('default_category'),
+    };
+
+    expect(
+      seeded.keys.toSet(),
+      kBuiltInServiceKindCategories.keys.toSet(),
+      reason: 'the seed SQL and the category map disagree about the slug set',
+    );
+    for (final entry in kBuiltInServiceKindCategories.entries) {
+      expect(
+        seeded[entry.key],
+        entry.value,
+        reason:
+            'seed SQL seeds ${entry.key} as ${seeded[entry.key]}, but the map '
+            'the migration reads says ${entry.value}',
       );
     }
   });

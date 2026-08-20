@@ -87,6 +87,16 @@ void main() {
     await pickServiceType(tester, 'hydro');
 
     expect(categoryValue(tester), ServiceCategory.inspection);
+    // Also pin what the diver actually sees: initialValue is the widget
+    // parameter, so on its own it would pass even if the rendered selection
+    // had drifted from the state behind it.
+    expect(
+      find.descendant(
+        of: find.byKey(categoryKey),
+        matching: find.text('Inspection'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('a service type with no default leaves the category alone', (
@@ -96,6 +106,13 @@ void main() {
     await pickServiceType(tester, 'disinfect');
 
     expect(categoryValue(tester), ServiceCategory.annual);
+    expect(
+      find.descendant(
+        of: find.byKey(categoryKey),
+        matching: find.text('Annual Service'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('a category the diver chose survives changing the type', (
@@ -114,6 +131,15 @@ void main() {
       categoryValue(tester),
       ServiceCategory.overhaul,
       reason: 'the touched flag must block the o2-clean default',
+    );
+    // The same check after a manual tap and a later rebuild, which is where
+    // a parameter-only assertion would be most likely to false-pass.
+    expect(
+      find.descendant(
+        of: find.byKey(categoryKey),
+        matching: find.text('Overhaul'),
+      ),
+      findsOneWidget,
     );
   });
 

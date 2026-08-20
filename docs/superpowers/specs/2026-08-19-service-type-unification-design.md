@@ -49,7 +49,7 @@ leaves the naming collision in place.
 | Legacy records with no catalog entry | Left alone, no data migration |
 | Where the category prefill comes from | A `defaultCategory` column on the catalog entry |
 | Code-level rename | Full rename, `ServiceType` becomes `ServiceCategory` |
-| Sync wire key | Renamed, with the compatibility floor raised to 159 |
+| Sync wire key | Renamed, with the compatibility floor raised to 160 |
 
 ### 1. Naming
 
@@ -168,11 +168,11 @@ contract classifies as breaking: the bump rules on
 `AppDatabase.minimumCompatibleSchemaVersion` say to raise the floor when a
 migration "drops, renames, or retypes an existing synced column."
 
-**The floor goes 137 to 159.** Consequences, accepted deliberately:
+**The floor goes 137 to 160.** Consequences, accepted deliberately:
 
-- Every peer publishing from a schema below 159 is held by updated readers
+- Every peer publishing from a schema below 160 is held by updated readers
   until it updates. Per #1089's own figures that is the entire App Store fleet
-  (schema 137 at the time of writing) and GitHub-channel devices below 159.
+  (schema 137 at the time of writing) and GitHub-channel devices below 160.
 - The hold is per-peer, non-destructive, and self-heals when the peer updates.
 - #1089's channel-aware banner already tells store users the truth rather than
   "update this device", so the messaging for this window exists.
@@ -184,7 +184,7 @@ migration "drops, renames, or retypes an existing synced column."
 reader's check on the writer's floor. It is one-directional. Raising our floor
 stops old devices applying our payloads; it does nothing about old devices'
 payloads arriving here, because their floor (137) is not greater than our
-schema (159), so we accept them. Those payloads are keyed `serviceType`, and
+schema (160), so we accept them. Those payloads are keyed `serviceType`, and
 `sync_data_serializer.dart:2549` runs
 `ServiceRecord.fromJson(data).toCompanion(false)` against a NOT NULL
 `serviceCategory` column. Drift's generated `fromJson` throws when the key is
@@ -238,7 +238,7 @@ service type.
 
 ## Testing
 
-- Migration test for v159, self-guarding on table existence, asserting the
+- Migration test for v160, self-guarding on table existence, asserting the
   column rename and the built-in category seeding, and asserting that a
   deleted built-in stays deleted.
 - Unit tests for `resolveDefaultServiceCategory`, including a custom kind with
@@ -261,8 +261,8 @@ service type.
 - **The compatibility floor bump is the dominant risk** and is a chosen cost,
   not an oversight. It should ship in a release whose store submission is
   already queued, so the hold window is as short as Apple review allows.
-- **Schema renumbering.** v159 is free as of 2026-08-19; another PR may take
-  it first, in which case the migration, its test, and every docstring
+- **Schema renumbering.** Claimed v160 after 158 went to #1149 and 159 to
+  #1177 during implementation, in which case the migration, its test, and every docstring
   renumber together.
 - **Rename breadth.** Roughly 169 references, several inside export and import
   paths that carry their own fixtures. The rename is mechanical but wide, and

@@ -2277,8 +2277,13 @@ const String kSeedBuiltInDiveRolesSql = '''
 /// (service_schedules.service_kind_id references them), INSERT OR IGNORE
 /// so re-running is a no-op. Intervals per tech-diving convention.
 /// The category each built-in service type prefills, by stable slug id.
-/// Consumed by both [kSeedBuiltInServiceKindsSql] (fresh installs) and the
-/// v160 migration (existing installs), so the two cannot drift apart.
+///
+/// The v160 migration reads this map directly (existing installs).
+/// [kSeedBuiltInServiceKindsSql] cannot: it is a const SQL string, so it
+/// repeats the same categories as inline literals (fresh installs). The two
+/// are held in step by migration_v160_service_category_test.dart, which pins
+/// both the slug set and the category each slug is seeded with. Change one
+/// and change the other.
 const Map<String, String> kBuiltInServiceKindCategories = {
   'hydro': 'inspection',
   'vip': 'inspection',
