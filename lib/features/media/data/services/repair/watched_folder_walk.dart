@@ -101,15 +101,17 @@ class WatchedFolderWalkResult {
   /// channel and be deserialized ON THE UI ISOLATE, work proportional to the
   /// archive and exactly what moving the walk off it was meant to avoid.
   ///
-  /// Only meaningful when [listingComplete]: a partial listing did not reach
-  /// every file, so paths missing from it may still exist.
+  /// Always empty when [listingComplete] is false: a partial listing did not
+  /// reach every file, so a path missing from it may still exist. Enforced
+  /// here rather than left to the caller, both because the difference would
+  /// be meaningless and because it would be unboundedly large.
   final Set<String> vanished;
 
   final int filesSeen;
 
   /// False when the listing threw part-way (an unreadable subtree, a root
-  /// that vanished). [vanished] is then unreliable and MUST NOT drive a
-  /// prune: a file the listing never reached is not a file that is gone.
+  /// that vanished), which is why [vanished] is empty in that case: a file
+  /// the listing never reached is not a file that is gone.
   final bool listingComplete;
 
   /// True when at least one file went un-hashed for want of budget. Does not
@@ -229,10 +231,20 @@ Future<WatchedFolderWalkResult> walkWatchedFolder(
     changed: changed,
     // The difference is taken here, on this isolate, so only the rows that
     // actually need deleting travel back.
-    vanished: {
-      for (final relative in request.known.keys)
-        if (!seen.contains(relative)) relative,
-    },
+    //
+    // Skipped entirely when the listing was cut short. An incomplete listing
+    // has not shown that anything is gone, so the difference would be
+    // meaningless -- and in the worst case (a root that threw immediately,
+    // which is a watched folder on an unplugged drive) it is the ENTIRE
+    // stored index, serialized across the boundary for the caller to
+    // discard. That is the payload this walk exists to avoid, in the
+    // commonest failure mode there is.
+    vanished: listingComplete
+        ? {
+            for (final relative in request.known.keys)
+              if (!seen.contains(relative)) relative,
+          }
+        : const <String>{},
     filesSeen: filesSeen,
     listingComplete: listingComplete,
     hashBudgetExhausted: budgetExhausted,

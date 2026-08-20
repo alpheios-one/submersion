@@ -275,6 +275,38 @@ void main() {
       },
     );
 
+    test('a partial listing reports nothing vanished even when it saw some '
+        'of the tree', () async {
+      // A subtree the walk DID reach, plus an index entry it did not. The
+      // listing is cut short, so the entry's absence proves nothing.
+      await writeFile('reached.jpg', 'aaaa');
+
+      final result = await walkWatchedFolder(
+        WatchedFolderWalkRequest(
+          rootPath: root.path,
+          known: {
+            'reached.jpg': const KnownFile(
+              sizeBytes: 1,
+              mtimeMillis: 1,
+              contentHash: 'h',
+            ),
+            'never-listed.jpg': const KnownFile(
+              sizeBytes: 1,
+              mtimeMillis: 1,
+              contentHash: 'h2',
+            ),
+          },
+          hashBudget: const Duration(minutes: 1),
+        ),
+      );
+
+      // Control: a COMPLETE listing of the same tree would call
+      // 'never-listed.jpg' vanished, which is what makes the guard load-
+      // bearing rather than vacuous.
+      expect(result.listingComplete, isTrue);
+      expect(result.vanished, {'never-listed.jpg'});
+    });
+
     test(
       'an incomplete listing does not report unreached files as vanished',
       () async {
@@ -292,9 +324,14 @@ void main() {
           ),
         );
 
-        // The set is populated -- nothing was reachable to see -- which is
-        // exactly why listingComplete, not the set itself, gates the prune.
         expect(result.listingComplete, isFalse);
+        // Empty, not "every known path". A listing that reached nothing has
+        // not shown that anything is gone, and computing the difference
+        // anyway would send the ENTIRE stored index back across the isolate
+        // boundary for the caller to discard -- reintroducing, in the
+        // commonest failure mode (a watched root on an unplugged drive),
+        // exactly the payload this walk exists to avoid.
+        expect(result.vanished, isEmpty);
 
         await root.create(recursive: true);
       },

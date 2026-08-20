@@ -145,6 +145,11 @@ class WatchedFolderScanner {
       // denies a hash, so a truncated pass still saw every file and pruning
       // stays safe. The walk already took the difference against `stored`, so
       // only the rows that need deleting crossed back.
+      //
+      // The `listingComplete` half is belt and braces -- the walk returns an
+      // empty `vanished` for an incomplete listing -- but it keeps the rule
+      // that governs a DESTRUCTIVE write visible at the site of that write,
+      // rather than resting on a guarantee made in another isolate.
       if (result.listingComplete && result.vanished.isNotEmpty) {
         await watched.deleteIndexed(root, result.vanished);
       }
