@@ -4521,6 +4521,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'معاملات التدرج: منخفض $low، مرتفع $high';
+  }
+
+  @override
   String get diveLog_deco_gf_tooltipFromSettings =>
       'لم يسجّل حاسوب الغوص هذا معاملات التدرج الخاصة به، لذا تُحلَّل هذه الغطسة باستخدام المعاملات من إعداداتك.';
 

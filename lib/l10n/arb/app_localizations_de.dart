@@ -4617,6 +4617,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Gradientenfaktoren: niedrig $low, hoch $high';
+  }
+
+  @override
   String get diveLog_deco_gf_tooltipFromSettings =>
       'Dieser Tauchcomputer hat seine Gradientenfaktoren nicht aufgezeichnet, daher wird dieser Tauchgang mit denen aus deinen Einstellungen ausgewertet.';
 

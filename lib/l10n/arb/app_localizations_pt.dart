@@ -4614,6 +4614,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Fatores de gradiente: baixo $low, alto $high';
+  }
+
+  @override
   String get diveLog_deco_gf_tooltipFromSettings =>
       'Este computador de mergulho não registou os seus fatores de gradiente, por isso este mergulho é analisado com os das suas definições.';
 

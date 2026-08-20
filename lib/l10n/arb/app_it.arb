@@ -1606,6 +1606,7 @@
   "diveLog_deco_gf_chip": "GF: {low}/{high}",
   "diveLog_deco_gf_chipFromSettings": "GF: {low}/{high} · le tue impostazioni",
   "diveLog_deco_gf_chipRecordedAlgorithm": "{algorithm} · analizzata con GF {low}/{high}",
+  "diveLog_deco_gf_semantics": "Fattori di gradiente: basso {low}, alto {high}",
   "diveLog_deco_gf_tooltipFromSettings": "Questo computer subacqueo non ha registrato i suoi fattori di gradiente, quindi questa immersione viene analizzata con quelli delle tue impostazioni.",
   "diveLog_deco_gf_tooltipRecordedAlgorithm": "Questa immersione è stata calcolata con {algorithm}, che non usa i fattori di gradiente. Submersion la analizza con quelli delle tue impostazioni.",
   "diveLog_deco_sectionDecoStops": "Soste deco",

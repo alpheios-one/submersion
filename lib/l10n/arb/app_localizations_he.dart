@@ -4493,6 +4493,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'מקדמי מדרון: נמוך $low, גבוה $high';
+  }
+
+  @override
   String get diveLog_deco_gf_tooltipFromSettings =>
       'מחשב הצלילה הזה לא תיעד את מקדמי המדרון שלו, ולכן הצלילה מנותחת עם אלה שבהגדרות שלך.';
 

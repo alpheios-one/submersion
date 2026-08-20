@@ -1678,6 +1678,7 @@
   "diveLog_deco_gf_chip": "GF: {low}/{high}",
   "diveLog_deco_gf_chipFromSettings": "GF: {low}/{high} · إعداداتك",
   "diveLog_deco_gf_chipRecordedAlgorithm": "{algorithm} · جرى تحليلها بـ GF {low}/{high}",
+  "diveLog_deco_gf_semantics": "معاملات التدرج: منخفض {low}، مرتفع {high}",
   "diveLog_deco_gf_tooltipFromSettings": "لم يسجّل حاسوب الغوص هذا معاملات التدرج الخاصة به، لذا تُحلَّل هذه الغطسة باستخدام المعاملات من إعداداتك.",
   "diveLog_deco_gf_tooltipRecordedAlgorithm": "حُسبت هذه الغطسة باستخدام {algorithm} الذي لا يستخدم معاملات التدرج. يحللها Submersion باستخدام المعاملات من إعداداتك.",
   "diveLog_deco_sectionDecoStops": "توقفات تخفيف الضغط",

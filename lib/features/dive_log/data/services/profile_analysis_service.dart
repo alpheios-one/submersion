@@ -312,10 +312,16 @@ class ProfileAnalysis {
   /// Every deco-derived number here -- [ceilingCurve], [ndlCurve], [ttsCurve],
   /// [gfCurve], [surfaceGfCurve], [decoStatuses] -- is a function of this pair,
   /// so a surface that prints any of them can say what produced them. When the
-  /// dive recorded no gradient factors the origin is
-  /// [GfOrigin.diverSettings], and displaying the numbers without that
-  /// qualifier is the #1047 bug.
-  final GradientFactorSource gfSource;
+  /// dive recorded no gradient factors the origin is [GfOrigin.diverSettings],
+  /// and displaying the numbers without that qualifier is the #1047 bug.
+  ///
+  /// Null means unattributed, which is a state rather than a number: an
+  /// analysis nobody configured has no business claiming any diver's settings.
+  /// [ProfileAnalysisService] always stamps its own, so null in practice means
+  /// a directly-constructed [ProfileAnalysis] (chiefly [ProfileAnalysis.empty]
+  /// and tests built on it). Consumers fall back to the per-sample
+  /// [DecoStatus] pair and show no provenance.
+  final GradientFactorSource? gfSource;
 
   const ProfileAnalysis({
     required this.ascentRates,
@@ -348,11 +354,7 @@ class ProfileAnalysis {
     required this.averageDepth,
     required this.maxDepthTimestamp,
     required this.durationSeconds,
-    this.gfSource = const GradientFactorSource(
-      low: 30,
-      high: 70,
-      origin: GfOrigin.diverSettings,
-    ),
+    this.gfSource,
   });
 
   /// Whether diver went into decompression obligation
@@ -615,7 +617,9 @@ class ProfileAnalysisService {
     List<double>? rebreatherPpO2Curve,
   }) {
     if (depths.isEmpty || depths.length != timestamps.length) {
-      return ProfileAnalysis.empty();
+      // Still an answer from a configured service, so it can say which
+      // gradient factors it would have used.
+      return ProfileAnalysis.empty().copyWith(gfSource: _gfSource);
     }
 
     // Repair implausible single-sample depth readings once, here, so every

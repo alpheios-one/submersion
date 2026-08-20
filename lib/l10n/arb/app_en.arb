@@ -2724,6 +2724,7 @@
   "diveLog_deco_gf_chip": "GF: {low}/{high}",
   "diveLog_deco_gf_chipFromSettings": "GF: {low}/{high} · your settings",
   "diveLog_deco_gf_chipRecordedAlgorithm": "{algorithm} · analyzed at GF {low}/{high}",
+  "diveLog_deco_gf_semantics": "Gradient factors: low {low}, high {high}",
   "diveLog_deco_gf_tooltipFromSettings": "This dive computer did not record its gradient factors, so this dive is analyzed with the ones from your settings.",
   "diveLog_deco_gf_tooltipRecordedAlgorithm": "This dive was computed on {algorithm}, which does not use gradient factors. Submersion analyzes it with the ones from your settings.",
   "diveLog_deco_sectionDecoStops": "Deco Stops",
@@ -4076,6 +4077,16 @@
   "@diveLog_cylinderSac_avgDepth": {
     "placeholders": {
       "depth": {
+        "type": "Object"
+      }
+    }
+  },
+  "@diveLog_deco_gf_semantics": {
+    "placeholders": {
+      "low": {
+        "type": "Object"
+      },
+      "high": {
         "type": "Object"
       }
     }

@@ -1678,6 +1678,7 @@
   "diveLog_deco_gf_chip": "GF: {low}/{high}",
   "diveLog_deco_gf_chipFromSettings": "GF: {low}/{high} · jouw instellingen",
   "diveLog_deco_gf_chipRecordedAlgorithm": "{algorithm} · geanalyseerd met GF {low}/{high}",
+  "diveLog_deco_gf_semantics": "Gradiëntfactoren: laag {low}, hoog {high}",
   "diveLog_deco_gf_tooltipFromSettings": "Deze duikcomputer heeft zijn gradiëntfactoren niet vastgelegd, dus deze duik wordt geanalyseerd met die uit jouw instellingen.",
   "diveLog_deco_gf_tooltipRecordedAlgorithm": "Deze duik is berekend met {algorithm}, dat geen gradiëntfactoren gebruikt. Submersion analyseert hem met die uit jouw instellingen.",
   "diveLog_deco_sectionDecoStops": "Decostops",

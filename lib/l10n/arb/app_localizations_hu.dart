@@ -4595,6 +4595,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Gradiensfaktorok: alacsony $low, magas $high';
+  }
+
+  @override
   String get diveLog_deco_gf_tooltipFromSettings =>
       'Ez a búvárkomputer nem rögzítette a gradiensfaktorait, ezért ezt a merülést a beállításaidban szereplő értékekkel elemezzük.';
 

@@ -1606,6 +1606,7 @@
   "diveLog_deco_gf_chip": "GF: {low}/{high}",
   "diveLog_deco_gf_chipFromSettings": "GF: {low}/{high} · ההגדרות שלך",
   "diveLog_deco_gf_chipRecordedAlgorithm": "{algorithm} · נותחה עם GF {low}/{high}",
+  "diveLog_deco_gf_semantics": "מקדמי מדרון: נמוך {low}, גבוה {high}",
   "diveLog_deco_gf_tooltipFromSettings": "מחשב הצלילה הזה לא תיעד את מקדמי המדרון שלו, ולכן הצלילה מנותחת עם אלה שבהגדרות שלך.",
   "diveLog_deco_gf_tooltipRecordedAlgorithm": "הצלילה הזו חושבה עם {algorithm}, שאינו משתמש במקדמי מדרון. Submersion מנתח אותה עם אלה שבהגדרות שלך.",
   "diveLog_deco_sectionDecoStops": "עצירות דקו",

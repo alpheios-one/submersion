@@ -105,9 +105,9 @@ void main() {
       );
 
       expect(analysis, isNotNull);
-      expect(analysis!.gfSource.low, 45);
-      expect(analysis.gfSource.high, 80);
-      expect(analysis.gfSource.origin, GfOrigin.computer);
+      expect(analysis!.gfSource!.low, 45);
+      expect(analysis.gfSource!.high, 80);
+      expect(analysis.gfSource!.origin, GfOrigin.computer);
     });
 
     test('marks the diver settings as the origin when the dive recorded no '
@@ -119,9 +119,9 @@ void main() {
       expect(analysis, isNotNull);
       // The shipped default, and the exact pair the reporter saw on a dive
       // from a 45/80 computer.
-      expect(analysis!.gfSource.low, 50);
-      expect(analysis.gfSource.high, 85);
-      expect(analysis.gfSource.origin, GfOrigin.diverSettings);
+      expect(analysis!.gfSource!.low, 50);
+      expect(analysis.gfSource!.high, 85);
+      expect(analysis.gfSource!.origin, GfOrigin.diverSettings);
     });
 
     test('surfaces a recorded non-GF deco model alongside the fallback', () {
@@ -131,9 +131,9 @@ void main() {
       );
 
       expect(analysis, isNotNull);
-      expect(analysis!.gfSource.origin, GfOrigin.diverSettings);
-      expect(analysis.gfSource.recordedNonGfAlgorithm, isTrue);
-      expect(analysis.gfSource.recordedAlgorithm, 'vpm');
+      expect(analysis!.gfSource!.origin, GfOrigin.diverSettings);
+      expect(analysis.gfSource!.recordedNonGfAlgorithm, isTrue);
+      expect(analysis.gfSource!.recordedAlgorithm, 'vpm');
     });
 
     test('analyzes with the dive\'s gradient factors, not the settings', () {

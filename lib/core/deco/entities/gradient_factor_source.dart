@@ -77,16 +77,33 @@ class GradientFactorSource extends Equatable {
   /// anything the dive recorded.
   bool get isFromDiverSettings => origin == GfOrigin.diverSettings;
 
-  /// Whether the dive recorded a deco model that does not use gradient
-  /// factors at all (VPM, RGBM, DCIEM).
+  /// The deco models known not to use gradient factors.
+  ///
+  /// libdivecomputer emits the first three; the VPM-B spellings turn up in
+  /// UDDF and other file imports.
+  static const _knownNonGfAlgorithms = {
+    'vpm',
+    'rgbm',
+    'dciem',
+    'vpmb',
+    'vpm-b',
+  };
+
+  /// Whether the dive recorded a deco model known not to use gradient factors.
   ///
   /// A Shearwater run in VPM reports its model with no GF pair, so the app
   /// analyzes it with the diver's gradient factors. Saying so is the
   /// difference between an explained approximation and a wrong number.
+  ///
+  /// Deliberately a whitelist, not "anything that is not Buhlmann". UDDF and
+  /// other imports can carry an arbitrary string, and announcing that an
+  /// unrecognized model "does not use gradient factors" asserts something we
+  /// have no basis for. An unknown name is left unflagged, which costs a
+  /// missing explanation rather than a wrong one.
   bool get recordedNonGfAlgorithm {
-    final algorithm = recordedAlgorithm?.toLowerCase();
+    final algorithm = recordedAlgorithm?.trim().toLowerCase();
     if (algorithm == null || algorithm.isEmpty) return false;
-    return !algorithm.contains('buhlmann') && !algorithm.startsWith('zhl');
+    return _knownNonGfAlgorithms.contains(algorithm);
   }
 
   /// GF Low as a 0.0-1.0 fraction, the form the deco engine takes.

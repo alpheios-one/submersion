@@ -85,6 +85,42 @@ void main() {
       expect(source.recordedNonGfAlgorithm, isFalse);
     });
 
+    test('does not claim an unrecognized algorithm skips gradient factors', () {
+      // UDDF and other imports can carry any string. Saying "X does not use
+      // gradient factors" about a model we do not recognize asserts something
+      // we cannot know, so an unknown name falls back to the plain treatment.
+      final source = GradientFactorSource.resolve(
+        diveGfLow: null,
+        diveGfHigh: null,
+        settingsGfLow: 50,
+        settingsGfHigh: 85,
+        recordedAlgorithm: 'Some Vendor Model',
+      );
+
+      expect(source.recordedAlgorithm, 'Some Vendor Model');
+      expect(source.recordedNonGfAlgorithm, isFalse);
+    });
+
+    test(
+      'recognizes the known non-GF models regardless of spacing or case',
+      () {
+        for (final name in ['VPM', ' vpm ', 'VPM-B', 'vpmb', 'RGBM', 'dciem']) {
+          final source = GradientFactorSource.resolve(
+            diveGfLow: null,
+            diveGfHigh: null,
+            settingsGfLow: 50,
+            settingsGfHigh: 85,
+            recordedAlgorithm: name,
+          );
+          expect(
+            source.recordedNonGfAlgorithm,
+            isTrue,
+            reason: '$name is a non-GF model',
+          );
+        }
+      },
+    );
+
     test('treats an unrecorded algorithm as nothing worth naming', () {
       final source = GradientFactorSource.resolve(
         diveGfLow: null,

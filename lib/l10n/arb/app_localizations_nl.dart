@@ -4575,6 +4575,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Gradiëntfactoren: laag $low, hoog $high';
+  }
+
+  @override
   String get diveLog_deco_gf_tooltipFromSettings =>
       'Deze duikcomputer heeft zijn gradiëntfactoren niet vastgelegd, dus deze duik wordt geanalyseerd met die uit jouw instellingen.';
 

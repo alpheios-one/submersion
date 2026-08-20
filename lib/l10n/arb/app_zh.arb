@@ -1781,6 +1781,7 @@
   "diveLog_deco_gf_chip": "GF：{low}/{high}",
   "diveLog_deco_gf_chipFromSettings": "GF：{low}/{high} · 来自你的设置",
   "diveLog_deco_gf_chipRecordedAlgorithm": "{algorithm} · 以 GF {low}/{high} 分析",
+  "diveLog_deco_gf_semantics": "梯度因子：低 {low}，高 {high}",
   "diveLog_deco_gf_tooltipFromSettings": "这台潜水电脑没有记录它的梯度因子，因此本次潜水使用你设置中的梯度因子进行分析。",
   "diveLog_deco_gf_tooltipRecordedAlgorithm": "本次潜水由 {algorithm} 计算，该算法不使用梯度因子。Submersion 使用你设置中的梯度因子进行分析。",
   "diveLog_deco_sectionDecoStops": "减压停留",

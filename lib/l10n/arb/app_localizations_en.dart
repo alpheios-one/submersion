@@ -4526,6 +4526,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Gradient factors: low $low, high $high';
+  }
+
+  @override
   String get diveLog_deco_gf_tooltipFromSettings =>
       'This dive computer did not record its gradient factors, so this dive is analyzed with the ones from your settings.';
 

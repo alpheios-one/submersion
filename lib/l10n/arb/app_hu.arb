@@ -1606,6 +1606,7 @@
   "diveLog_deco_gf_chip": "GF: {low}/{high}",
   "diveLog_deco_gf_chipFromSettings": "GF: {low}/{high} · a te beállításaid",
   "diveLog_deco_gf_chipRecordedAlgorithm": "{algorithm} · GF {low}/{high} értékkel elemezve",
+  "diveLog_deco_gf_semantics": "Gradiensfaktorok: alacsony {low}, magas {high}",
   "diveLog_deco_gf_tooltipFromSettings": "Ez a búvárkomputer nem rögzítette a gradiensfaktorait, ezért ezt a merülést a beállításaidban szereplő értékekkel elemezzük.",
   "diveLog_deco_gf_tooltipRecordedAlgorithm": "Ezt a merülést {algorithm} algoritmussal számolták, amely nem használ gradiensfaktorokat. A Submersion a beállításaidban szereplő értékekkel elemzi.",
   "diveLog_deco_sectionDecoStops": "Deko megallok",

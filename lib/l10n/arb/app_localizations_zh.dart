@@ -4376,6 +4376,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return '梯度因子：低 $low，高 $high';
+  }
+
+  @override
   String get diveLog_deco_gf_tooltipFromSettings =>
       '这台潜水电脑没有记录它的梯度因子，因此本次潜水使用你设置中的梯度因子进行分析。';
 

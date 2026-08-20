@@ -7686,6 +7686,12 @@ abstract class AppLocalizations {
     Object high,
   );
 
+  /// No description provided for @diveLog_deco_gf_semantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Gradient factors: low {low}, high {high}'**
+  String diveLog_deco_gf_semantics(Object low, Object high);
+
   /// No description provided for @diveLog_deco_gf_tooltipFromSettings.
   ///
   /// In en, this message translates to:

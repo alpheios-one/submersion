@@ -1678,6 +1678,7 @@
   "diveLog_deco_gf_chip": "GF: {low}/{high}",
   "diveLog_deco_gf_chipFromSettings": "GF: {low}/{high} · as suas definições",
   "diveLog_deco_gf_chipRecordedAlgorithm": "{algorithm} · analisado com GF {low}/{high}",
+  "diveLog_deco_gf_semantics": "Fatores de gradiente: baixo {low}, alto {high}",
   "diveLog_deco_gf_tooltipFromSettings": "Este computador de mergulho não registou os seus fatores de gradiente, por isso este mergulho é analisado com os das suas definições.",
   "diveLog_deco_gf_tooltipRecordedAlgorithm": "Este mergulho foi calculado com {algorithm}, que não usa fatores de gradiente. O Submersion analisa-o com os das suas definições.",
   "diveLog_deco_sectionDecoStops": "Paradas Deco",

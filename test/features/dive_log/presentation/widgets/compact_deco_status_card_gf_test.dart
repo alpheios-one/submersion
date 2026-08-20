@@ -38,10 +38,17 @@ const _status = DecoStatus(
   ambientPressureBar: 2.0,
 );
 
-Widget buildCard(GradientFactorSource gfSource) {
+Widget buildCard(
+  GradientFactorSource gfSource, {
+  Locale locale = const Locale('en'),
+}) {
   return ProviderScope(
     overrides: [settingsProvider.overrideWith((ref) => MockSettingsNotifier())],
     child: MaterialApp(
+      // Pinned: an unpinned MaterialApp resolves against the host
+      // machine's locale list, so English label assertions below fail
+      // on a non-English dev machine.
+      locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
@@ -106,6 +113,49 @@ void main() {
 
     expect(find.textContaining('VPM'), findsOneWidget);
     expect(find.textContaining('50/85'), findsOneWidget);
+  });
+
+  testWidgets('speaks the gradient factors in the app locale, not a mix', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildCard(
+        const GradientFactorSource(
+          low: 50,
+          high: 85,
+          origin: GfOrigin.diverSettings,
+        ),
+        locale: const Locale('de'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final labels = tester
+        .widgetList<Semantics>(find.byType(Semantics))
+        .map((s) => s.properties.label)
+        .whereType<String>()
+        .toList();
+
+    // German throughout: an English lead-in stitched to a translated
+    // qualifier is what a screen reader would otherwise announce.
+    expect(labels.where((l) => l.contains('Gradientenfaktoren')), hasLength(1));
+    expect(labels.where((l) => l.contains('Gradient factors')), isEmpty);
+  });
+
+  testWidgets('normalizes a recorded model name for display', (tester) async {
+    await tester.pumpWidget(
+      buildCard(
+        const GradientFactorSource(
+          low: 50,
+          high: 85,
+          origin: GfOrigin.diverSettings,
+          recordedAlgorithm: ' vpm-b ',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('VPM-B'), findsOneWidget);
   });
 
   testWidgets('does not name a recorded Buhlmann model, which is what the app '

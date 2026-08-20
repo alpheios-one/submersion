@@ -262,10 +262,12 @@ class CompactDecoStatusCard extends StatelessWidget {
 
     return Semantics(
       // Spelled out rather than reusing the chip's compact label, whose
-      // separators do not read aloud well. The qualifier is the same sentence
-      // the tooltip shows, so a screen reader learns the provenance too.
+      // separators do not read aloud well. Localized, so a non-English app
+      // does not stitch an English lead-in onto a translated qualifier. The
+      // qualifier is the tooltip's own sentence, so a screen reader learns
+      // the provenance too.
       label:
-          'Gradient factors: low $low, high $high'
+          '${context.l10n.diveLog_deco_gf_semantics(low, high)}'
           '${gfTooltip != null ? '. $gfTooltip' : ''}'
           '${status.decoStops.isNotEmpty ? '. ${context.l10n.diveLog_deco_sectionDecoStops}: ${status.decoStops.map((s) => '${s.durationFormatted} at ${s.depthFormatted()}').join(', ')}' : ''}',
       child: Wrap(
@@ -313,15 +315,16 @@ class CompactDecoStatusCard extends StatelessWidget {
 
   /// Display form of a recorded deco model.
   ///
-  /// libdivecomputer reports the three non-GF models as lowercase acronyms,
-  /// which read correctly upper-cased. Anything else -- an algorithm name an
-  /// import supplied -- is shown as recorded rather than mangled.
+  /// Only reached for the models [GradientFactorSource.recordedNonGfAlgorithm]
+  /// recognizes, so this covers that whitelist; anything unexpected is shown
+  /// as recorded rather than mangled.
   static String _algorithmLabel(String algorithm) {
-    return switch (algorithm.toLowerCase()) {
+    return switch (algorithm.trim().toLowerCase()) {
       'vpm' => 'VPM',
+      'vpmb' || 'vpm-b' => 'VPM-B',
       'rgbm' => 'RGBM',
       'dciem' => 'DCIEM',
-      _ => algorithm,
+      _ => algorithm.trim(),
     };
   }
 }
