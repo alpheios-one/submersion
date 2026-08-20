@@ -26,10 +26,25 @@ class _MediaSectionPageState extends ConsumerState<MediaSectionPage> {
   MediaConsoleSection _section = MediaConsoleSection.library;
 
   @override
+  void initState() {
+    super.initState();
+    // Opportunistic watcher pass, gated to once a day inside the provider:
+    // the console is the app's stand-in for a startup hook.
+    //
+    // Kicked from initState behind a post-frame callback, NOT from build().
+    // The pass walks every watched root recursively, and hanging that off a
+    // build meant it started while the section was still laying out (#1182).
+    // After the frame, the console is on screen before any filesystem work
+    // begins, and the guard inside WatcherAutoScan keeps a remount from
+    // starting a second overlapping pass.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(watcherAutoScanProvider).kick();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Opportunistic watcher pass, gated to once a day inside the
-    // provider: the console is the app's stand-in for a startup hook.
-    ref.watch(watcherAutoScanProvider);
     final unlinkedCount = ref.watch(unlinkedCountProvider).value ?? 0;
     final missingCount = ref.watch(missingCountProvider).value ?? 0;
 
