@@ -14124,6 +14124,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Associez une combinaison à cette plongée pour un tableau plus complet';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'Aucun lest enregistré : ajoutez du lest à cette plongée ou un poids à sec à votre équipement de lestage';
+
+  @override
   String get buoyancy_chartNet => 'Net';
 
   @override

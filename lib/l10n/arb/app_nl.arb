@@ -1468,6 +1468,7 @@
   "buoyancy_drysuitGas": "Droogpakgas toegevoegd",
   "buoyancy_estimatedPressures": "Flesdrukken zijn geschat",
   "buoyancy_linkSuitHint": "Koppel een duikpak aan deze duik voor een vollediger beeld",
+  "buoyancy_noLeadHint": "Geen lood vastgelegd: voeg lood toe aan deze duik of een drooggewicht aan je loodmateriaal",
   "buoyancy_chartNet": "Netto",
   "buoyancy_chartRig": "Uitrusting + lood",
   "buoyancy_chartMinutes": "Tijd (min)",

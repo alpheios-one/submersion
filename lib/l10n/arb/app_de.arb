@@ -1468,6 +1468,7 @@
   "buoyancy_drysuitGas": "Trocki-Gas zugegeben",
   "buoyancy_estimatedPressures": "Flaschendrücke sind geschätzt",
   "buoyancy_linkSuitHint": "Verknüpfe einen Tauchanzug mit diesem Tauchgang für ein vollständigeres Bild",
+  "buoyancy_noLeadHint": "Kein Blei erfasst: Füge diesem Tauchgang Blei hinzu oder trage bei deiner Bleiausrüstung ein Trockengewicht ein",
   "buoyancy_chartNet": "Netto",
   "buoyancy_chartRig": "Rig + Blei",
   "buoyancy_chartMinutes": "Zeit (min)",

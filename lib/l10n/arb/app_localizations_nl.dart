@@ -13978,6 +13978,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Koppel een duikpak aan deze duik voor een vollediger beeld';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'Geen lood vastgelegd: voeg lood toe aan deze duik of een drooggewicht aan je loodmateriaal';
+
+  @override
   String get buoyancy_chartNet => 'Netto';
 
   @override

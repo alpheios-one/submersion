@@ -23772,6 +23772,12 @@ abstract class AppLocalizations {
   /// **'Link an exposure suit to this dive for a fuller picture'**
   String get buoyancy_linkSuitHint;
 
+  /// No description provided for @buoyancy_noLeadHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No lead recorded: add weights to this dive, or a dry weight to your weights gear'**
+  String get buoyancy_noLeadHint;
+
   /// No description provided for @buoyancy_chartNet.
   ///
   /// In en, this message translates to:

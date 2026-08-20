@@ -8,6 +8,7 @@ import 'package:submersion/features/dive_planner/domain/entities/plan_segment.da
 import 'package:submersion/features/dive_planner/presentation/providers/dive_planner_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_weight_entry_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/domain/services/equipment_lead.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/weight_planner/presentation/providers/weight_planner_providers.dart';
 
@@ -61,7 +62,21 @@ final planBuoyancyTwinProvider = Provider<BuoyancyTwinOutcome?>((ref) {
 
   if (model == null || equipment == null || state.tanks.isEmpty) return null;
 
-  final lead = state.plannedWeightKg ?? prediction?.totalKg ?? 0.0;
+  final itemsById = {for (final e in equipment) e.id: e};
+  final items = <EquipmentItem>[
+    for (final id in state.equipmentIds) ?itemsById[id],
+  ];
+
+  // Ballast built into the planned rig (weighted plates, weighted STAs) is
+  // lead the diver will carry but never types into the planned-weight field.
+  // Only the explicit figure needs it added: the prediction is trained on
+  // observations that already count gear-carried lead (issue #1103), so
+  // adding it there would double-count.
+  final gearLead = EquipmentLead.totalKg(items);
+  final planned = state.plannedWeightKg;
+  final lead = planned != null
+      ? planned + gearLead
+      : (prediction?.totalKg ?? 0.0);
   if (lead <= 0) return null;
 
   final consumptionByTank = {
@@ -87,11 +102,6 @@ final planBuoyancyTwinProvider = Provider<BuoyancyTwinOutcome?>((ref) {
       ),
   ];
 
-  final itemsById = {for (final e in equipment) e.id: e};
-  final items = <EquipmentItem>[
-    for (final id in state.equipmentIds) ?itemsById[id],
-  ];
-
   final rig = BuoyancyTwinAssembler.composeRigTerms(
     items: items,
     tanks: tanks,
@@ -103,11 +113,17 @@ final planBuoyancyTwinProvider = Provider<BuoyancyTwinOutcome?>((ref) {
 
   // Some planned lead may be non-ditchable (e.g. backplate/trim). When the
   // planner carries a per-WeightType placement, count only the droppable
-  // (belt + integrated) portion; otherwise assume all lead is droppable.
+  // (belt + integrated) portion; otherwise fall back to the coarse
+  // everything-is-droppable assumption, gear ballast included.
+  //
+  // On the placement branch, gear-carried ballast is added separately: the
+  // planner's placement map only ever describes typed lead, so the gear share
+  // is classified by each item's own weight_style (unstyled counts as fixed).
   final placement = state.plannedWeightPlacement;
   final droppableLead = placement == null
       ? lead
-      : BuoyancyTwinAssembler.droppableLeadFromPlacement(placement);
+      : BuoyancyTwinAssembler.droppableLeadFromPlacement(placement) +
+            EquipmentLead.droppableKg(items);
 
   final input = TwinInput(
     profile: synthesizePlanProfile(state.segments),

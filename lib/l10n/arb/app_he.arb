@@ -4339,6 +4339,7 @@
   "buoyancy_drysuitGas": "גז יבשה שנוסף",
   "buoyancy_estimatedPressures": "לחצי המכלים משוערים",
   "buoyancy_linkSuitHint": "קשר חליפת חשיפה לצלילה זו לתמונה מלאה יותר",
+  "buoyancy_noLeadHint": "לא נרשמו משקולות: הוסף משקולות לצלילה זו או משקל יבש לציוד המשקולות שלך",
   "buoyancy_chartNet": "נטו",
   "buoyancy_chartRig": "ציוד + משקולות",
   "buoyancy_chartMinutes": "זמן (דק')",
