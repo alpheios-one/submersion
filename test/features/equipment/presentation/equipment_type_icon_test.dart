@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/icons/mdi_icons.dart';
+import 'package:submersion/core/icons/submersion_icons.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_type_icon.dart';
 
 void main() {
@@ -11,7 +13,7 @@ void main() {
   });
 
   test('a DPV shows the scooter glyph everywhere', () {
-    expect(equipmentTypeIcon(EquipmentType.dpv), Icons.electric_scooter);
+    expect(equipmentTypeIcon(EquipmentType.dpv), SubmersionIcons.dpv);
   });
 
   test('only the catch-all type gets the generic glyph', () {
@@ -30,10 +32,75 @@ void main() {
     }
   });
 
-  test('the two exposure suits deliberately share one glyph', () {
+  test('the two exposure suits no longer share a glyph', () {
+    // They did until #1189, which reported the shared hanger as a defect: the
+    // drysuit is drawn with its attached hood and boots.
     expect(
       equipmentTypeIcon(EquipmentType.wetsuit),
-      equipmentTypeIcon(EquipmentType.drysuit),
+      isNot(equipmentTypeIcon(EquipmentType.drysuit)),
     );
+  });
+
+  group('the drawn glyphs', () {
+    // Every type whose glyph had to be drawn because no icon font has the
+    // shape. A code point that never made it into the generated font would
+    // render as tofu on a device, so the family is asserted here.
+    const drawn = <EquipmentType, IconData>{
+      EquipmentType.regulator: SubmersionIcons.regulator,
+      EquipmentType.bcd: SubmersionIcons.bcd,
+      EquipmentType.wetsuit: SubmersionIcons.wetsuit,
+      EquipmentType.drysuit: SubmersionIcons.drysuit,
+      EquipmentType.rebreather: SubmersionIcons.rebreather,
+      EquipmentType.hood: SubmersionIcons.hood,
+      EquipmentType.gloves: SubmersionIcons.gloves,
+      EquipmentType.boots: SubmersionIcons.boots,
+      EquipmentType.reel: SubmersionIcons.reel,
+      EquipmentType.dpv: SubmersionIcons.dpv,
+    };
+
+    test('are wired to the equipment font', () {
+      for (final entry in drawn.entries) {
+        expect(
+          equipmentTypeIcon(entry.key),
+          entry.value,
+          reason: entry.key.name,
+        );
+        expect(
+          entry.value.fontFamily,
+          SubmersionIcons.fontFamily,
+          reason: entry.key.name,
+        );
+      }
+    });
+
+    test('have distinct code points', () {
+      // A copy-paste in the constants file would otherwise alias two types to
+      // one glyph, which the uniqueness test above cannot see because it
+      // compares only against the generic glyph.
+      final codePoints = drawn.values.map((icon) => icon.codePoint).toSet();
+      expect(codePoints, hasLength(drawn.length));
+    });
+  });
+
+  test('the remapped types use the bundled Material Design Icons font', () {
+    // These five swapped from a Material metaphor (waves for fins, an eyeball
+    // for a mask) to dive glyphs that were already in the bundled webfont.
+    const remapped = <EquipmentType, IconData>{
+      EquipmentType.fins: MdiIcons.divingFlippers,
+      EquipmentType.mask: MdiIcons.divingScubaMask,
+      EquipmentType.knife: MdiIcons.knifeMilitary,
+      EquipmentType.weights: MdiIcons.weight,
+      EquipmentType.smb: MdiIcons.divingScubaFlag,
+      EquipmentType.tank: MdiIcons.divingScubaTank,
+    };
+
+    for (final entry in remapped.entries) {
+      expect(equipmentTypeIcon(entry.key), entry.value, reason: entry.key.name);
+      expect(
+        entry.value.fontFamily,
+        'Material Design Icons',
+        reason: entry.key.name,
+      );
+    }
   });
 }
