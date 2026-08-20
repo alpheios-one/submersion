@@ -2123,6 +2123,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     final decoCard = CompactDecoStatusCard(
       status: status,
+      gfSource: analysis.gfSource,
       subtitle: timeSubtitle,
     );
 

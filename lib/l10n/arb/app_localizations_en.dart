@@ -4507,6 +4507,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF: $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF: $low/$high · your settings';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · analyzed at GF $low/$high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'This dive computer did not record its gradient factors, so this dive is analyzed with the ones from your settings.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'This dive was computed on $algorithm, which does not use gradient factors. Submersion analyzes it with the ones from your settings.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'Deco Stops';
 
   @override

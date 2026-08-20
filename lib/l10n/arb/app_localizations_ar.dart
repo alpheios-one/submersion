@@ -4502,6 +4502,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF: $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF: $low/$high · إعداداتك';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · جرى تحليلها بـ GF $low/$high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'لم يسجّل حاسوب الغوص هذا معاملات التدرج الخاصة به، لذا تُحلَّل هذه الغطسة باستخدام المعاملات من إعداداتك.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'حُسبت هذه الغطسة باستخدام $algorithm الذي لا يستخدم معاملات التدرج. يحللها Submersion باستخدام المعاملات من إعداداتك.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'توقفات تخفيف الضغط';
 
   @override

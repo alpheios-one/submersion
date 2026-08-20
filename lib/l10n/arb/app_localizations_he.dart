@@ -4474,6 +4474,34 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF: $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF: $low/$high · ההגדרות שלך';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · נותחה עם GF $low/$high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'מחשב הצלילה הזה לא תיעד את מקדמי המדרון שלו, ולכן הצלילה מנותחת עם אלה שבהגדרות שלך.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'הצלילה הזו חושבה עם $algorithm, שאינו משתמש במקדמי מדרון. Submersion מנתח אותה עם אלה שבהגדרות שלך.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'עצירות דקו';
 
   @override
