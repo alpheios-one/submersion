@@ -10,6 +10,7 @@ import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/providers/provider.dart';
 
+import 'package:submersion/features/settings/presentation/widgets/notification_permission_card.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/security_settings_page.dart';
@@ -2066,32 +2067,7 @@ class _NotificationsSectionContent extends ConsumerWidget {
                   permissionAsync.when(
                     data: (granted) {
                       if (!granted) {
-                        return ListTile(
-                          leading: const Icon(
-                            Icons.warning,
-                            color: Colors.orange,
-                          ),
-                          title: Text(
-                            context.l10n.settings_notifications_disabled_title,
-                          ),
-                          subtitle: Text(
-                            context
-                                .l10n
-                                .settings_notifications_disabled_subtitle,
-                          ),
-                          trailing: TextButton(
-                            onPressed: () async {
-                              await NotificationService.instance
-                                  .requestPermission();
-                              ref.invalidate(notificationPermissionProvider);
-                            },
-                            child: Text(
-                              context
-                                  .l10n
-                                  .settings_notifications_disabled_enableButton,
-                            ),
-                          ),
-                        );
+                        return const NotificationPermissionCard();
                       }
                       return const SizedBox.shrink();
                     },

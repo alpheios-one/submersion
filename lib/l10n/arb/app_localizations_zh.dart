@@ -11913,7 +11913,7 @@ class AppLocalizationsZh extends AppLocalizations {
       'Submersion 需要访问您的照片库以添加潜水照片。';
 
   @override
-  String get media_photoPicker_permissionTitle => '照片访问必填';
+  String get media_photoPicker_permissionTitle => '潜水照片';
 
   @override
   String get media_photoPicker_selectAllButton => '全选';
@@ -14830,7 +14830,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get settings_notifications_disabled_enableButton => '启用';
+  String get settings_notifications_disabled_continueButton => '继续';
+
+  @override
+  String get settings_notifications_disabled_openSettingsButton => '打开设置';
+
+  @override
+  String get settings_notifications_disabled_subtitleUnrequested =>
+      '服务提醒需要发送通知的权限';
 
   @override
   String get settings_notifications_disabled_subtitle => '在系统设置中启用以接收提醒';
@@ -19436,7 +19443,7 @@ class AppLocalizationsZh extends AppLocalizations {
       'Submersion 使用 Apple HealthKit 读取水下潜水运动数据，包括深度、持续时间、水温和心率，以创建详细的潜水日志。';
 
   @override
-  String get diveImport_healthkit_accessRequired => 'Apple HealthKit 访问必填';
+  String get diveImport_healthkit_accessRequired => 'Apple HealthKit';
 
   @override
   String get diveImport_healthkit_attribution => '提供支持按 Apple HealthKit';
@@ -29517,9 +29524,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_requesting => '正在请求...';
-
-  @override
-  String get diveImport_healthkit_grantAccessButton => '授予 HealthKit 访问权限';
 
   @override
   String get diveImport_healthkit_selectDateRange => '选择日期范围';

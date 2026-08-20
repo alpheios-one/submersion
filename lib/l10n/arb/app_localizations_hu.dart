@@ -12436,7 +12436,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'A Submersion hozzaferest igenyel a fotogaleriajahoz merülesi fotok hozzaadasahoz.';
 
   @override
-  String get media_photoPicker_permissionTitle => 'Foto hozzaferes szukseges';
+  String get media_photoPicker_permissionTitle => 'Merulesi fotok';
 
   @override
   String get media_photoPicker_selectAllButton => 'Összes kijelölése';
@@ -15537,7 +15537,15 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get settings_notifications_disabled_enableButton => 'Engedelyezes';
+  String get settings_notifications_disabled_continueButton => 'Tovább';
+
+  @override
+  String get settings_notifications_disabled_openSettingsButton =>
+      'Beallitasok megnyitasa';
+
+  @override
+  String get settings_notifications_disabled_subtitleUnrequested =>
+      'A szervizemlekeztetokhoz ertesitesi engedely szukseges';
 
   @override
   String get settings_notifications_disabled_subtitle =>
@@ -20407,8 +20415,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'Submersion uses Apple HealthKit to read underwater diving workout data, including depth, duration, water temperature, and heart rate, to create detailed dive logs.';
 
   @override
-  String get diveImport_healthkit_accessRequired =>
-      'Apple HealthKit Access Required';
+  String get diveImport_healthkit_accessRequired => 'Apple HealthKit';
 
   @override
   String get diveImport_healthkit_attribution =>
@@ -31154,10 +31161,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_requesting => 'Kérés folyamatban...';
-
-  @override
-  String get diveImport_healthkit_grantAccessButton =>
-      'HealthKit hozzáférés megadása';
 
   @override
   String get diveImport_healthkit_selectDateRange => 'Időszak kiválasztása';

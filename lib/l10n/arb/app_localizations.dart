@@ -21099,7 +21099,7 @@ abstract class AppLocalizations {
   /// No description provided for @media_photoPicker_permissionTitle.
   ///
   /// In en, this message translates to:
-  /// **'Photo Access Required'**
+  /// **'Dive Photos'**
   String get media_photoPicker_permissionTitle;
 
   /// No description provided for @media_photoPicker_selectAllButton.
@@ -26141,11 +26141,23 @@ abstract class AppLocalizations {
   /// **'{count} days'**
   String settings_notifications_days(Object count);
 
-  /// No description provided for @settings_notifications_disabled_enableButton.
+  /// No description provided for @settings_notifications_disabled_continueButton.
   ///
   /// In en, this message translates to:
-  /// **'Enable'**
-  String get settings_notifications_disabled_enableButton;
+  /// **'Continue'**
+  String get settings_notifications_disabled_continueButton;
+
+  /// No description provided for @settings_notifications_disabled_openSettingsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get settings_notifications_disabled_openSettingsButton;
+
+  /// No description provided for @settings_notifications_disabled_subtitleUnrequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Service reminders need permission to send notifications'**
+  String get settings_notifications_disabled_subtitleUnrequested;
 
   /// No description provided for @settings_notifications_disabled_subtitle.
   ///
@@ -34110,7 +34122,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveImport_healthkit_accessRequired.
   ///
   /// In en, this message translates to:
-  /// **'Apple HealthKit Access Required'**
+  /// **'Apple HealthKit'**
   String get diveImport_healthkit_accessRequired;
 
   /// No description provided for @diveImport_healthkit_attribution.
@@ -51905,12 +51917,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Requesting...'**
   String get diveImport_healthkit_requesting;
-
-  /// No description provided for @diveImport_healthkit_grantAccessButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Grant HealthKit Access'**
-  String get diveImport_healthkit_grantAccessButton;
 
   /// No description provided for @diveImport_healthkit_selectDateRange.
   ///

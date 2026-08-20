@@ -1818,7 +1818,7 @@ void main() {
 
       verify(service.requestPermissions()).called(1);
       expect(find.text('HealthKit Access Granted'), findsOneWidget);
-      expect(find.text('Grant HealthKit Access'), findsNothing);
+      expect(find.text('Continue'), findsNothing);
     });
 
     testWidgets('explains where to fix access once it is requested', (
@@ -1865,8 +1865,8 @@ void main() {
       await tester.pumpWidget(buildPermissionsStep(service));
       await tester.pumpAndSettle();
 
-      expect(find.text('Apple HealthKit Access Required'), findsOneWidget);
-      expect(find.text('Grant HealthKit Access'), findsOneWidget);
+      expect(find.text('Apple HealthKit'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
       expect(find.byIcon(Icons.health_and_safety), findsAtLeast(1));
       expect(
         find.text(
@@ -1894,7 +1894,7 @@ void main() {
       await tester.pumpWidget(buildPermissionsStep(service));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Grant HealthKit Access'));
+      await tester.tap(find.text('Continue'));
       await tester.pump();
 
       verify(service.requestPermissions()).called(1);
@@ -1923,8 +1923,8 @@ void main() {
       await tester.pumpWidget(buildPermissionsStep(service));
       await tester.pumpAndSettle();
 
-      expect(find.text('Apple HealthKit Access Required'), findsOneWidget);
-      expect(find.text('Grant HealthKit Access'), findsOneWidget);
+      expect(find.text('Apple HealthKit'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
     });
 
     testWidgets('requests access when the status check throws', (tester) async {
@@ -1953,8 +1953,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should recover -- still on request screen, not crashed
-      expect(find.text('Apple HealthKit Access Required'), findsOneWidget);
-      expect(find.text('Grant HealthKit Access'), findsOneWidget);
+      expect(find.text('Apple HealthKit'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
     });
 
     testWidgets(
