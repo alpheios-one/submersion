@@ -82,25 +82,35 @@ void main() {
     });
   });
 
-  test('the remapped types use the bundled Material Design Icons font', () {
-    // These five swapped from a Material metaphor (waves for fins, an eyeball
-    // for a mask) to dive glyphs that were already in the bundled webfont.
-    const remapped = <EquipmentType, IconData>{
-      EquipmentType.fins: MdiIcons.divingFlippers,
-      EquipmentType.mask: MdiIcons.divingScubaMask,
-      EquipmentType.knife: MdiIcons.knifeMilitary,
-      EquipmentType.weights: MdiIcons.weight,
-      EquipmentType.smb: MdiIcons.divingScubaFlag,
-      EquipmentType.tank: MdiIcons.divingScubaTank,
-    };
+  test(
+    'the types on the bundled Material Design Icons font keep their glyph',
+    () {
+      // Five of these swapped from a Material metaphor (waves for fins, an
+      // eyeball for a mask) to dive glyphs that were already in the bundled
+      // webfont. `tank` was not remapped and is here as a regression guard: it
+      // was the only type already pointing at the MDI font, so it is what proves
+      // the family assertion below can fail.
+      const onMdiFont = <EquipmentType, IconData>{
+        EquipmentType.fins: MdiIcons.divingFlippers,
+        EquipmentType.mask: MdiIcons.divingScubaMask,
+        EquipmentType.knife: MdiIcons.knifeMilitary,
+        EquipmentType.weights: MdiIcons.weight,
+        EquipmentType.smb: MdiIcons.divingScubaFlag,
+        EquipmentType.tank: MdiIcons.divingScubaTank,
+      };
 
-    for (final entry in remapped.entries) {
-      expect(equipmentTypeIcon(entry.key), entry.value, reason: entry.key.name);
-      expect(
-        entry.value.fontFamily,
-        'Material Design Icons',
-        reason: entry.key.name,
-      );
-    }
-  });
+      for (final entry in onMdiFont.entries) {
+        expect(
+          equipmentTypeIcon(entry.key),
+          entry.value,
+          reason: entry.key.name,
+        );
+        expect(
+          entry.value.fontFamily,
+          'Material Design Icons',
+          reason: entry.key.name,
+        );
+      }
+    },
+  );
 }

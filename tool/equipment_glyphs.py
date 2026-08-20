@@ -1,8 +1,8 @@
 """Source of truth for the custom Submersion equipment glyphs.
 
-Each glyph is composed on a 24x24 grid. Solid contours are wound clockwise and
-holes counter-clockwise, which is what the nonzero fill rule TrueType uses
-needs, so the same path data renders identically in the preview and in the
+Each glyph is composed on a 24x24 grid. TrueType fills with the nonzero winding
+rule, so solid contours are wound clockwise and holes counter-clockwise. That
+way the same path data renders identically in an SVG preview and in the
 generated font.
 
 Polygon winding is normalised by signed area rather than trusted from the

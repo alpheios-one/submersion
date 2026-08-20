@@ -46,6 +46,11 @@ GRID = 24
 # under a device pixel at any size the app renders icons at.
 MAX_ERR = UPEM / GRID / 2
 
+# 2026-01-01T00:00:00Z expressed in the TrueType epoch, which starts at
+# 1904-01-01 (Unix time plus 2082844800). Any fixed value works; what matters
+# is that it never changes, so the build is reproducible.
+FONT_EPOCH_STAMP = 1767225600 + 2082844800
+
 
 def build_glyph(path_data):
     """Convert one 24-grid SVG path into a TrueType glyph.
@@ -100,6 +105,14 @@ def build():
         achVendID="SUBM",
     )
     fb.setupPost(keepGlyphNames=False)
+
+    # fontTools stamps head.created and head.modified with the current time, so
+    # rebuilding unchanged geometry would still produce a byte-different file
+    # and churn the committed binary. Pin both to a fixed date (seconds since
+    # the 1904 font epoch) to keep the build reproducible: an unchanged rebuild
+    # then leaves the .ttf untouched in git.
+    head = fb.font["head"]
+    head.created = head.modified = FONT_EPOCH_STAMP
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     fb.save(OUT)
