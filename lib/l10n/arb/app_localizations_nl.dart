@@ -23055,6 +23055,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Volume niet gekoppeld';
 
   @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'Nog aan het laden. Tik om opnieuw te proberen.';
+
+  @override
   String get attrLabel_size => 'Maat';
 
   @override

@@ -22814,6 +22814,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'وحدة التخزين غير مثبتة';
 
   @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'ما زال قيد التحميل. اضغط لإعادة المحاولة.';
+
+  @override
   String get attrLabel_size => 'المقاس';
 
   @override

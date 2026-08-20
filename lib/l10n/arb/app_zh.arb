@@ -6795,6 +6795,7 @@
   "settings_setupGuide_open": "打开",
   "settings_connectedAccounts_loadError": "无法加载账户",
   "media_unavailablePlaceholder_volumeOffline": "卷未挂载",
+  "media_unavailablePlaceholder_stillFetching": "仍在加载。点按重试。",
   "attrLabel_size": "尺码",
   "attrLabel_thickness_mm": "厚度（毫米）",
   "attrLabel_suit_style": "潜水服款式",

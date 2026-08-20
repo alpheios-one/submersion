@@ -6795,6 +6795,7 @@
   "settings_setupGuide_open": "Megnyitás",
   "settings_connectedAccounts_loadError": "A fiókok nem tölthetők be",
   "media_unavailablePlaceholder_volumeOffline": "A kötet nincs csatlakoztatva",
+  "media_unavailablePlaceholder_stillFetching": "Még töltődik. Koppintson az újrapróbálkozáshoz.",
   "attrLabel_size": "Méret",
   "attrLabel_thickness_mm": "Vastagság (mm)",
   "attrLabel_suit_style": "Ruha fazonja",

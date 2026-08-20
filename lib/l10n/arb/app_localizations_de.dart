@@ -23188,6 +23188,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Volume nicht eingebunden';
 
   @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'Wird noch geladen. Zum Wiederholen tippen.';
+
+  @override
   String get attrLabel_size => 'Größe';
 
   @override

@@ -23152,6 +23152,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'A kötet nincs csatlakoztatva';
 
   @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'Még töltődik. Koppintson az újrapróbálkozáshoz.';
+
+  @override
   String get attrLabel_size => 'Méret';
 
   @override

@@ -23,6 +23,16 @@ enum UnavailableKind {
   /// The file's volume (network share, external disk) is not mounted right
   /// now. Recovers by itself when the volume comes back; never orphaned.
   volumeOffline,
+
+  /// The fetch is still running and outlived the caller's budget.
+  ///
+  /// Distinct from every other kind because nothing is wrong: the bytes exist
+  /// and are on their way. It exists so a slow source (a network share, a cold
+  /// store object, an iCloud asset still coming down) can stop occupying a
+  /// concurrency slot without the tile claiming the item is missing. Always
+  /// recoverable by retrying, and the underlying fetch may well have finished
+  /// by the time the user does.
+  stillFetching,
 }
 
 /// Which concrete source produced a [MediaSourceData]'s bytes.

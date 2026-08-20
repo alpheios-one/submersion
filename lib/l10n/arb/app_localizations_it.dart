@@ -23231,6 +23231,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_unavailablePlaceholder_volumeOffline => 'Volume non montato';
 
   @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'Ancora in caricamento. Tocca per riprovare.';
+
+  @override
   String get attrLabel_size => 'Taglia';
 
   @override

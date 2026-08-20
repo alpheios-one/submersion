@@ -22648,6 +22648,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_unavailablePlaceholder_volumeOffline => 'הכונן אינו מחובר';
 
   @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'עדיין נטען. הקש כדי לנסות שוב.';
+
+  @override
   String get attrLabel_size => 'מידה';
 
   @override
