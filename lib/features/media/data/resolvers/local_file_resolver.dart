@@ -384,6 +384,14 @@ class LocalFileResolver implements MediaSourceResolver {
     if (data.kind == UnavailableKind.volumeOffline) {
       return VerifyResult.volumeOffline;
     }
+    // "Still fetching" is a statement about time, not about whether the file
+    // is there: the read outlived the gate's budget and is very likely still
+    // running. Falling through would put a hung-but-mounted share on the
+    // notFound path below, and notFound flips isOrphaned, so a share that was
+    // merely slow during a sweep would mark its whole library missing.
+    if (data.kind == UnavailableKind.stillFetching) {
+      return VerifyResult.transientError;
+    }
     // A file that is present but unreadable (sandbox denial, revoked
     // permission) is not a dead pointer: the bytes are still on disk and a
     // re-grant restores access. Reporting notFound here would let the
