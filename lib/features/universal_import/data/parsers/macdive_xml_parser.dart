@@ -30,6 +30,23 @@ import 'package:submersion/features/universal_import/data/services/macdive_xml_r
 class MacDiveXmlParser implements ImportParser {
   const MacDiveXmlParser();
 
+  /// MacDive's XML exporter writes neither certifications nor equipment
+  /// service records, so those two entity types can never come out of this
+  /// parser no matter what the diver's library holds (issue #1135: a 540-dive
+  /// export whose `MacDive.sqlite` had 4 certifications and 1 service record
+  /// produced an XML file containing no element for either).
+  ///
+  /// `MacDiveDbReader` does read both from `ZCERTIFICATION` and
+  /// `ZSERVICERECORD`, so the diver has a real remedy. Say so on every import
+  /// rather than letting the gap look like a failed parse.
+  static const _formatGapNotice = ImportWarning(
+    severity: ImportWarningSeverity.info,
+    message:
+        'MacDive XML exports do not contain certifications or equipment '
+        'service records, so none were found in this file. To import those, '
+        'choose your MacDive.sqlite database instead of the XML export.',
+  );
+
   @override
   List<ImportFormat> get supportedFormats => const [ImportFormat.macdiveXml];
 
@@ -237,6 +254,10 @@ class MacDiveXmlParser implements ImportParser {
     }
     if (tagsByName.isNotEmpty) {
       entities[ImportEntityType.tags] = tagsByName.values.toList();
+    }
+
+    if (diveMaps.isNotEmpty) {
+      warnings.add(_formatGapNotice);
     }
 
     return ImportPayload(
