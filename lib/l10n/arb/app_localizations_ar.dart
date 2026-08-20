@@ -17370,6 +17370,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tags_action_createTag => 'إنشاء وسم';
 
   @override
+  String get tags_action_browse => 'تصفح';
+
+  @override
+  String get tags_picker_title => 'اختيار الوسوم';
+
+  @override
+  String get tags_picker_empty =>
+      'لا توجد وسوم بعد. اكتب اسم وسم لإنشاء أول وسم لك.';
+
+  @override
+  String get tags_picker_allAdded => 'تمت إضافة جميع الوسوم بالفعل.';
+
+  @override
+  String get tags_picker_noMatches => 'لا توجد وسوم تطابق بحثك.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'إضافة $count وسم',
+      one: 'إضافة وسم واحد',
+      zero: 'إضافة وسوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_action_deleteTag => 'حذف الوسم';
 
   @override

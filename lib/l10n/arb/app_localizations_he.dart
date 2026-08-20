@@ -17239,6 +17239,34 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tags_action_createTag => 'צור תגית';
 
   @override
+  String get tags_action_browse => 'עיון';
+
+  @override
+  String get tags_picker_title => 'בחירת תגיות';
+
+  @override
+  String get tags_picker_empty =>
+      'אין עדיין תגיות. הקלד שם תגית כדי ליצור את הראשונה.';
+
+  @override
+  String get tags_picker_allAdded => 'כל התגיות כבר נוספו.';
+
+  @override
+  String get tags_picker_noMatches => 'אין תגיות התואמות לחיפוש שלך.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'הוספת $count תגיות',
+      one: 'הוספת תגית אחת',
+      zero: 'הוספת תגיות',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_action_deleteTag => 'מחק תגית';
 
   @override

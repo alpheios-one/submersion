@@ -17759,6 +17759,35 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tags_action_createTag => 'Créer une étiquette';
 
   @override
+  String get tags_action_browse => 'Parcourir';
+
+  @override
+  String get tags_picker_title => 'Choisir des tags';
+
+  @override
+  String get tags_picker_empty =>
+      'Aucun tag pour le moment. Saisissez un nom de tag pour créer le premier.';
+
+  @override
+  String get tags_picker_allAdded => 'Tous les tags sont déjà ajoutés.';
+
+  @override
+  String get tags_picker_noMatches =>
+      'Aucun tag ne correspond à votre recherche.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ajouter $count tags',
+      one: 'Ajouter 1 tag',
+      zero: 'Ajouter des tags',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_action_deleteTag => 'Supprimer l\'étiquette';
 
   @override

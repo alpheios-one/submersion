@@ -17703,6 +17703,35 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tags_action_createTag => 'Criar tag';
 
   @override
+  String get tags_action_browse => 'Explorar';
+
+  @override
+  String get tags_picker_title => 'Escolher etiquetas';
+
+  @override
+  String get tags_picker_empty =>
+      'Ainda não há etiquetas. Escreva um nome para criar a primeira.';
+
+  @override
+  String get tags_picker_allAdded => 'Todas as etiquetas já foram adicionadas.';
+
+  @override
+  String get tags_picker_noMatches =>
+      'Nenhuma etiqueta corresponde à sua pesquisa.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Adicionar $count etiquetas',
+      one: 'Adicionar 1 etiqueta',
+      zero: 'Adicionar etiquetas',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_action_deleteTag => 'Excluir tag';
 
   @override

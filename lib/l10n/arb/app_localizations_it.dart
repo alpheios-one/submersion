@@ -17696,6 +17696,34 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tags_action_createTag => 'Crea tag';
 
   @override
+  String get tags_action_browse => 'Sfoglia';
+
+  @override
+  String get tags_picker_title => 'Scegli tag';
+
+  @override
+  String get tags_picker_empty =>
+      'Nessun tag. Digita un nome per creare il primo.';
+
+  @override
+  String get tags_picker_allAdded => 'Tutti i tag sono già stati aggiunti.';
+
+  @override
+  String get tags_picker_noMatches => 'Nessun tag corrisponde alla ricerca.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Aggiungi $count tag',
+      one: 'Aggiungi 1 tag',
+      zero: 'Aggiungi tag',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_action_deleteTag => 'Elimina tag';
 
   @override
