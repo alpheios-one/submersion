@@ -97,9 +97,9 @@ class DeviceDisplayNameService {
     return sanitizeDeviceName(identity.name) ?? _composeModelName(identity);
   }
 
-  /// "samsung" + "SM-S921B" -> "Samsung SM-S921B", but "Google" + "Pixel 8 Pro"
-  /// -> "Pixel 8 Pro": models that already carry their vendor must not be
-  /// prefixed with it again.
+  /// "samsung" + "SM-S921B" -> "Samsung SM-S921B", and "Google" + "Pixel 8 Pro"
+  /// -> "Google Pixel 8 Pro", but "Xiaomi" + "Xiaomi 14" -> "Xiaomi 14": a
+  /// model that already carries its vendor must not be prefixed with it again.
   static String? _composeModelName(NativeDeviceIdentity identity) {
     final model = sanitizeDeviceName(identity.model);
     final manufacturer = sanitizeDeviceName(identity.manufacturer);

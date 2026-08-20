@@ -15,6 +15,15 @@ DeviceDisplayNameService _service({
   readHostname: () => hostname,
 );
 
+/// The shape the Android and iOS handlers put on the channel.
+abstract final class _ChannelFixture {
+  static const Map<Object?, Object?> full = {
+    'name': "Eric's Pixel",
+    'manufacturer': 'Google',
+    'model': 'Pixel 8 Pro',
+  };
+}
+
 void main() {
   group('sanitizeDeviceName', () {
     test('keeps a real hostname', () {
@@ -51,6 +60,25 @@ void main() {
     test('treats placeholder model strings as absent', () {
       expect(DeviceDisplayNameService.sanitizeDeviceName('unknown'), isNull);
       expect(DeviceDisplayNameService.sanitizeDeviceName('Android'), isNull);
+    });
+  });
+
+  group('NativeDeviceIdentity.fromChannel', () {
+    test('reads the three fields the native handlers report', () {
+      const identity = _ChannelFixture.full;
+      final parsed = NativeDeviceIdentity.fromChannel(identity);
+      expect(parsed.name, "Eric's Pixel");
+      expect(parsed.manufacturer, 'Google');
+      expect(parsed.model, 'Pixel 8 Pro');
+    });
+
+    test('tolerates a handler that reports nothing', () {
+      // A future platform, or a handler that could not read a field: every
+      // field is nullable by contract.
+      final parsed = NativeDeviceIdentity.fromChannel(const {});
+      expect(parsed.name, isNull);
+      expect(parsed.manufacturer, isNull);
+      expect(parsed.model, isNull);
     });
   });
 
@@ -110,6 +138,21 @@ void main() {
         expect(name, 'Motorola edge 50');
       },
     );
+
+    test('names the vendor alone when the model says nothing', () async {
+      // A ROM that reports 'unknown' as its model still knows who built it.
+      final name = await _service(
+        native: const NativeDeviceIdentity(
+          manufacturer: 'oneplus',
+          model: 'unknown',
+        ),
+      ).resolve();
+      // Title-casing only lifts the first letter of each word, so a vendor
+      // whose own spelling is camel-cased comes back as 'Oneplus'. That is a
+      // fallback for a device that told us nothing better; do not build a
+      // vendor spelling table for it.
+      expect(name, 'Oneplus');
+    });
 
     test('uses the hostname when the platform has no native handler', () async {
       // The desktop path: no handler, and the hostname IS the device name.

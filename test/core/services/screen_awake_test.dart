@@ -56,6 +56,18 @@ void main() {
     expect(toggles, [true, false]);
   });
 
+  test('debugReset releases a hold a test leaked', () {
+    // A test that fails mid-hold never reaches its own release. Clearing the
+    // count without releasing would pin the screen on for the rest of the run.
+    unawaited(ScreenAwake.hold(() => Completer<void>().future));
+    expect(toggles, [true]);
+
+    ScreenAwake.debugReset();
+
+    expect(toggles, [true, false]);
+    expect(ScreenAwake.debugHolders, 0);
+  });
+
   test('a plugin that fails does not disturb the work', () async {
     ScreenAwake.debugToggle = ({required bool enable}) async {
       throw MissingPluginException('no wakelock here');

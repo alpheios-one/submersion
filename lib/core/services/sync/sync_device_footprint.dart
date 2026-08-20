@@ -51,7 +51,7 @@ class SyncDeviceFootprint {
   final int byteCount;
 
   /// Published display name, absent on legacy manifests and on devices that
-  /// nothing identified by name. Callers fall back to a short id.
+  /// nothing identifies by name. Callers fall back to a short id.
   final String? deviceName;
 
   /// This install's own footprint. Never offered for deletion through the peer

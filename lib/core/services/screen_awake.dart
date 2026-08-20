@@ -26,11 +26,17 @@ class ScreenAwake {
   @visibleForTesting
   static int get debugHolders => _holders;
 
-  /// Drops the seam and any leaked holds between tests.
+  /// Drops the seam and any leaked holds between tests. A leaked hold is
+  /// released through the seam that took it BEFORE the seam is dropped:
+  /// clearing the count on its own would leave the screen pinned on for the
+  /// rest of the run, and on a device for the rest of the session.
   @visibleForTesting
   static void debugReset() {
+    if (_holders > 0) {
+      _holders = 0;
+      _toggle(enable: false);
+    }
     debugToggle = null;
-    _holders = 0;
   }
 
   /// Runs [body] with the screen held awake, releasing the lock however [body]
