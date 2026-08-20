@@ -10801,6 +10801,25 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_serviceDialog_serviceTypeLabel => 'סוג טיפול';
 
   @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'רישום מאפס את השעון של סוג טיפול זה';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired => 'בחר סוג טיפול';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'לא הוגדר';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper => 'משמשת לסינון ולייצוא';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes => 'ניהול סוגי טיפול';
+
+  @override
+  String get equipment_serviceDialog_categoryLabel => 'קטגוריה';
+
+  @override
   String get equipment_serviceDialog_snackbar_added => 'רשומת טיפול נוספה';
 
   @override
@@ -10815,34 +10834,34 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'עדכן';
 
   @override
-  String get equipment_serviceType_annual => 'טיפול שנתי';
+  String get equipment_serviceCategory_annual => 'טיפול שנתי';
 
   @override
-  String get equipment_serviceType_repair => 'תיקון';
+  String get equipment_serviceCategory_repair => 'תיקון';
 
   @override
-  String get equipment_serviceType_inspection => 'בדיקה';
+  String get equipment_serviceCategory_inspection => 'בדיקה';
 
   @override
-  String get equipment_serviceType_overhaul => 'שיפוץ כללי';
+  String get equipment_serviceCategory_overhaul => 'שיפוץ כללי';
 
   @override
-  String get equipment_serviceType_replacement => 'החלפת חלקים';
+  String get equipment_serviceCategory_replacement => 'החלפת חלקים';
 
   @override
-  String get equipment_serviceType_cleaning => 'ניקוי';
+  String get equipment_serviceCategory_cleaning => 'ניקוי';
 
   @override
-  String get equipment_serviceType_calibration => 'כיול';
+  String get equipment_serviceCategory_calibration => 'כיול';
 
   @override
-  String get equipment_serviceType_warranty => 'שירות אחריות';
+  String get equipment_serviceCategory_warranty => 'שירות אחריות';
 
   @override
-  String get equipment_serviceType_recall => 'ריקול/בטיחות';
+  String get equipment_serviceCategory_recall => 'ריקול/בטיחות';
 
   @override
-  String get equipment_serviceType_other => 'אחר';
+  String get equipment_serviceCategory_other => 'אחר';
 
   @override
   String get equipment_service_addButton => 'הוסף';
@@ -10900,6 +10919,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String equipment_service_filterMatchCount(int count, int total) {
     return 'מוצגים $count מתוך $total';
   }
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryLabel =>
+      'קטגוריית ברירת מחדל';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => 'ללא ברירת מחדל';
 
   @override
   String get equipment_serviceKinds_defaultCostLabel => 'מחיר ברירת מחדל';
@@ -15156,6 +15182,13 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_manage_tankPresets_subtitle =>
       'ניהול תצורות בלון מותאמות אישית';
+
+  @override
+  String get settings_manage_serviceTypes => 'סוגי טיפול';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'הטיפולים שהציוד שלך צריך, ובאיזו תדירות';
 
   @override
   String get settings_migrationProgress_doNotClose =>

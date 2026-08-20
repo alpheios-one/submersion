@@ -11026,7 +11026,29 @@ class AppLocalizationsHu extends AppLocalizations {
       'Szerviz datum kivalasztasa';
 
   @override
-  String get equipment_serviceDialog_serviceTypeLabel => 'Szerviz tipus';
+  String get equipment_serviceDialog_serviceTypeLabel => 'Szerviz típus';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'A rögzítés nullázza ennek a szerviz típusnak az óráját';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Válassz szerviz típust';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Nincs beállítva';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Szűréshez és exportáláshoz használt';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Szerviz típusok kezelése';
+
+  @override
+  String get equipment_serviceDialog_categoryLabel => 'Kategória';
 
   @override
   String get equipment_serviceDialog_snackbar_added =>
@@ -11045,34 +11067,34 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Frissites';
 
   @override
-  String get equipment_serviceType_annual => 'Éves szerviz';
+  String get equipment_serviceCategory_annual => 'Éves szerviz';
 
   @override
-  String get equipment_serviceType_repair => 'Javítás';
+  String get equipment_serviceCategory_repair => 'Javítás';
 
   @override
-  String get equipment_serviceType_inspection => 'Ellenőrzés';
+  String get equipment_serviceCategory_inspection => 'Ellenőrzés';
 
   @override
-  String get equipment_serviceType_overhaul => 'Nagyjavítás';
+  String get equipment_serviceCategory_overhaul => 'Nagyjavítás';
 
   @override
-  String get equipment_serviceType_replacement => 'Alkatrészcsere';
+  String get equipment_serviceCategory_replacement => 'Alkatrészcsere';
 
   @override
-  String get equipment_serviceType_cleaning => 'Tisztítás';
+  String get equipment_serviceCategory_cleaning => 'Tisztítás';
 
   @override
-  String get equipment_serviceType_calibration => 'Kalibrálás';
+  String get equipment_serviceCategory_calibration => 'Kalibrálás';
 
   @override
-  String get equipment_serviceType_warranty => 'Garanciális szerviz';
+  String get equipment_serviceCategory_warranty => 'Garanciális szerviz';
 
   @override
-  String get equipment_serviceType_recall => 'Visszahívás/Biztonság';
+  String get equipment_serviceCategory_recall => 'Visszahívás/Biztonság';
 
   @override
-  String get equipment_serviceType_other => 'Egyéb';
+  String get equipment_serviceCategory_other => 'Egyéb';
 
   @override
   String get equipment_service_addButton => 'Hozzaadas';
@@ -11131,6 +11153,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String equipment_service_filterMatchCount(int count, int total) {
     return '$count / $total megjelenítve';
   }
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryLabel =>
+      'Alapértelmezett kategória';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone =>
+      'Nincs alapértelmezés';
 
   @override
   String get equipment_serviceKinds_defaultCostLabel => 'Alapértelmezett ár';
@@ -15499,6 +15529,13 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_manage_tankPresets_subtitle =>
       'Egyedi palack konfiguraciok kezelese';
+
+  @override
+  String get settings_manage_serviceTypes => 'Szerviz típusok';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'Milyen karbantartást igényel a felszerelésed, és milyen gyakran';
 
   @override
   String get settings_migrationProgress_doNotClose =>

@@ -18817,8 +18817,44 @@ abstract class AppLocalizations {
   /// No description provided for @equipment_serviceDialog_serviceTypeLabel.
   ///
   /// In en, this message translates to:
-  /// **'Service Type'**
+  /// **'Service type'**
   String get equipment_serviceDialog_serviceTypeLabel;
+
+  /// No description provided for @equipment_serviceDialog_serviceTypeHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Logging this resets the clock for this service type'**
+  String get equipment_serviceDialog_serviceTypeHelper;
+
+  /// No description provided for @equipment_serviceDialog_serviceTypeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a service type'**
+  String get equipment_serviceDialog_serviceTypeRequired;
+
+  /// No description provided for @equipment_serviceDialog_serviceTypeNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get equipment_serviceDialog_serviceTypeNotSet;
+
+  /// No description provided for @equipment_serviceDialog_categoryHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Used for filtering and export'**
+  String get equipment_serviceDialog_categoryHelper;
+
+  /// No description provided for @equipment_serviceDialog_manageServiceTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage service types'**
+  String get equipment_serviceDialog_manageServiceTypes;
+
+  /// No description provided for @equipment_serviceDialog_categoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get equipment_serviceDialog_categoryLabel;
 
   /// No description provided for @equipment_serviceDialog_snackbar_added.
   ///
@@ -18844,65 +18880,65 @@ abstract class AppLocalizations {
   /// **'Update'**
   String get equipment_serviceDialog_updateButton;
 
-  /// No description provided for @equipment_serviceType_annual.
+  /// No description provided for @equipment_serviceCategory_annual.
   ///
   /// In en, this message translates to:
   /// **'Annual Service'**
-  String get equipment_serviceType_annual;
+  String get equipment_serviceCategory_annual;
 
-  /// No description provided for @equipment_serviceType_repair.
+  /// No description provided for @equipment_serviceCategory_repair.
   ///
   /// In en, this message translates to:
   /// **'Repair'**
-  String get equipment_serviceType_repair;
+  String get equipment_serviceCategory_repair;
 
-  /// No description provided for @equipment_serviceType_inspection.
+  /// No description provided for @equipment_serviceCategory_inspection.
   ///
   /// In en, this message translates to:
   /// **'Inspection'**
-  String get equipment_serviceType_inspection;
+  String get equipment_serviceCategory_inspection;
 
-  /// No description provided for @equipment_serviceType_overhaul.
+  /// No description provided for @equipment_serviceCategory_overhaul.
   ///
   /// In en, this message translates to:
   /// **'Overhaul'**
-  String get equipment_serviceType_overhaul;
+  String get equipment_serviceCategory_overhaul;
 
-  /// No description provided for @equipment_serviceType_replacement.
+  /// No description provided for @equipment_serviceCategory_replacement.
   ///
   /// In en, this message translates to:
   /// **'Part Replacement'**
-  String get equipment_serviceType_replacement;
+  String get equipment_serviceCategory_replacement;
 
-  /// No description provided for @equipment_serviceType_cleaning.
+  /// No description provided for @equipment_serviceCategory_cleaning.
   ///
   /// In en, this message translates to:
   /// **'Cleaning'**
-  String get equipment_serviceType_cleaning;
+  String get equipment_serviceCategory_cleaning;
 
-  /// No description provided for @equipment_serviceType_calibration.
+  /// No description provided for @equipment_serviceCategory_calibration.
   ///
   /// In en, this message translates to:
   /// **'Calibration'**
-  String get equipment_serviceType_calibration;
+  String get equipment_serviceCategory_calibration;
 
-  /// No description provided for @equipment_serviceType_warranty.
+  /// No description provided for @equipment_serviceCategory_warranty.
   ///
   /// In en, this message translates to:
   /// **'Warranty Service'**
-  String get equipment_serviceType_warranty;
+  String get equipment_serviceCategory_warranty;
 
-  /// No description provided for @equipment_serviceType_recall.
+  /// No description provided for @equipment_serviceCategory_recall.
   ///
   /// In en, this message translates to:
   /// **'Recall/Safety'**
-  String get equipment_serviceType_recall;
+  String get equipment_serviceCategory_recall;
 
-  /// No description provided for @equipment_serviceType_other.
+  /// No description provided for @equipment_serviceCategory_other.
   ///
   /// In en, this message translates to:
   /// **'Other'**
-  String get equipment_serviceType_other;
+  String get equipment_serviceCategory_other;
 
   /// No description provided for @equipment_service_addButton.
   ///
@@ -19005,6 +19041,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} of {total} shown'**
   String equipment_service_filterMatchCount(int count, int total);
+
+  /// No description provided for @equipment_serviceKinds_defaultCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Default category'**
+  String get equipment_serviceKinds_defaultCategoryLabel;
+
+  /// No description provided for @equipment_serviceKinds_defaultCategoryNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No default'**
+  String get equipment_serviceKinds_defaultCategoryNone;
 
   /// No description provided for @equipment_serviceKinds_defaultCostLabel.
   ///
@@ -26080,6 +26128,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage custom tank configurations'**
   String get settings_manage_tankPresets_subtitle;
+
+  /// No description provided for @settings_manage_serviceTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Service types'**
+  String get settings_manage_serviceTypes;
+
+  /// No description provided for @settings_manage_serviceTypes_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance your gear needs, and how often'**
+  String get settings_manage_serviceTypes_subtitle;
 
   /// No description provided for @settings_migrationProgress_doNotClose.
   ///

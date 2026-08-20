@@ -25,12 +25,12 @@ void main() {
   }) => (
     equipmentName: 'JJ-CCR',
     equipmentType: 'Rebreather',
-    taskName: task,
-    serviceType: ServiceType.cleaning,
+    serviceTypeName: task,
+    serviceCategory: ServiceCategory.cleaning,
     record: ServiceRecord(
       id: 'r1',
       equipmentId: 'e1',
-      serviceType: ServiceType.cleaning,
+      serviceCategory: ServiceCategory.cleaning,
       serviceKindId: 'scrubber-repack',
       serviceDate: date,
       provider: 'DiveShop Bonn',
@@ -64,7 +64,7 @@ void main() {
     expect(headers, [
       'Equipment',
       'Equipment Type',
-      'Task',
+      'Service Type',
       'Category',
       'Date',
       'Provider',

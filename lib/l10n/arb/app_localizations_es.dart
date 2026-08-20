@@ -11048,6 +11048,28 @@ class AppLocalizationsEs extends AppLocalizations {
   String get equipment_serviceDialog_serviceTypeLabel => 'Tipo de servicio';
 
   @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'Registrarlo reinicia el contador de este tipo de servicio';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Elige un tipo de servicio';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Sin definir';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Se usa para filtrar y exportar';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Gestionar tipos de servicio';
+
+  @override
+  String get equipment_serviceDialog_categoryLabel => 'Categoría';
+
+  @override
   String get equipment_serviceDialog_snackbar_added =>
       'Registro de servicio agregado';
 
@@ -11064,34 +11086,34 @@ class AppLocalizationsEs extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Actualizar';
 
   @override
-  String get equipment_serviceType_annual => 'Servicio anual';
+  String get equipment_serviceCategory_annual => 'Servicio anual';
 
   @override
-  String get equipment_serviceType_repair => 'Reparación';
+  String get equipment_serviceCategory_repair => 'Reparación';
 
   @override
-  String get equipment_serviceType_inspection => 'Inspección';
+  String get equipment_serviceCategory_inspection => 'Inspección';
 
   @override
-  String get equipment_serviceType_overhaul => 'Revisión general';
+  String get equipment_serviceCategory_overhaul => 'Revisión general';
 
   @override
-  String get equipment_serviceType_replacement => 'Sustitución de piezas';
+  String get equipment_serviceCategory_replacement => 'Sustitución de piezas';
 
   @override
-  String get equipment_serviceType_cleaning => 'Limpieza';
+  String get equipment_serviceCategory_cleaning => 'Limpieza';
 
   @override
-  String get equipment_serviceType_calibration => 'Calibración';
+  String get equipment_serviceCategory_calibration => 'Calibración';
 
   @override
-  String get equipment_serviceType_warranty => 'Servicio en garantía';
+  String get equipment_serviceCategory_warranty => 'Servicio en garantía';
 
   @override
-  String get equipment_serviceType_recall => 'Retirada/Seguridad';
+  String get equipment_serviceCategory_recall => 'Retirada/Seguridad';
 
   @override
-  String get equipment_serviceType_other => 'Otro';
+  String get equipment_serviceCategory_other => 'Otro';
 
   @override
   String get equipment_service_addButton => 'Agregar';
@@ -11151,6 +11173,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String equipment_service_filterMatchCount(int count, int total) {
     return '$count de $total mostrados';
   }
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryLabel =>
+      'Categoría predeterminada';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => 'Sin predeterminado';
 
   @override
   String get equipment_serviceKinds_defaultCostLabel => 'Precio predeterminado';
@@ -15542,6 +15571,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_manage_tankPresets_subtitle =>
       'Administrar configuraciones de tanques personalizadas';
+
+  @override
+  String get settings_manage_serviceTypes => 'Tipos de servicio';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'Mantenimiento que necesita tu equipo y con qué frecuencia';
 
   @override
   String get settings_migrationProgress_doNotClose =>

@@ -6,14 +6,14 @@ import 'package:submersion/features/equipment/domain/entities/service_record.dar
 
 ServiceRecord record({
   String? kindId,
-  ServiceType type = ServiceType.cleaning,
+  ServiceCategory type = ServiceCategory.cleaning,
   int year = 2026,
 }) {
   final date = DateTime(year, 3, 14);
   return ServiceRecord(
     id: 'r-$kindId-$year-${type.name}',
     equipmentId: 'e1',
-    serviceType: type,
+    serviceCategory: type,
     serviceKindId: kindId,
     serviceDate: date,
     createdAt: date,
@@ -48,13 +48,13 @@ void main() {
   test('type and year filters intersect with the kind filter', () {
     const filter = MaintenanceHistoryFilter(
       serviceKindId: 'disinfect',
-      serviceType: ServiceType.cleaning,
+      serviceCategory: ServiceCategory.cleaning,
       year: 2026,
     );
     expect(filter.matches(record(kindId: 'disinfect', year: 2026)), isTrue);
     expect(filter.matches(record(kindId: 'disinfect', year: 2025)), isFalse);
     expect(
-      filter.matches(record(kindId: 'disinfect', type: ServiceType.repair)),
+      filter.matches(record(kindId: 'disinfect', type: ServiceCategory.repair)),
       isFalse,
     );
   });
@@ -70,7 +70,7 @@ void main() {
     // one dimension must not compare equal.
     const base = MaintenanceHistoryFilter(
       serviceKindId: 'disinfect',
-      serviceType: ServiceType.cleaning,
+      serviceCategory: ServiceCategory.cleaning,
       year: 2026,
     );
 
@@ -78,7 +78,7 @@ void main() {
       base,
       const MaintenanceHistoryFilter(
         serviceKindId: 'disinfect',
-        serviceType: ServiceType.cleaning,
+        serviceCategory: ServiceCategory.cleaning,
         year: 2026,
       ),
     );
@@ -88,7 +88,7 @@ void main() {
       isNot(
         const MaintenanceHistoryFilter(
           serviceKindId: 'disinfect',
-          serviceType: ServiceType.repair,
+          serviceCategory: ServiceCategory.repair,
           year: 2026,
         ),
       ),
@@ -98,7 +98,7 @@ void main() {
       isNot(
         const MaintenanceHistoryFilter(
           serviceKindId: 'disinfect',
-          serviceType: ServiceType.cleaning,
+          serviceCategory: ServiceCategory.cleaning,
           year: 2025,
         ),
       ),

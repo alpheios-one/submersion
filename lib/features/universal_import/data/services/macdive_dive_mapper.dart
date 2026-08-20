@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 
 import 'package:submersion/core/constants/enums.dart'
-    show EquipmentStatus, ServiceType;
+    show EquipmentStatus, ServiceCategory;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
@@ -416,7 +416,7 @@ class MacDiveDiveMapper {
         if (r.servicedBy != null) 'provider': r.servicedBy,
         if (r.notes != null) 'notes': r.notes,
         // MacDive does not categorise service events.
-        'serviceType': ServiceType.annual.name,
+        'serviceCategory': ServiceCategory.annual.name,
       });
     }
     return out;

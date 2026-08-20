@@ -10560,6 +10560,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceDialog_serviceTypeLabel => '维护类型';
 
   @override
+  String get equipment_serviceDialog_serviceTypeHelper => '记录后将重置该维护类型的计时';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired => '请选择维护类型';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => '未设置';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper => '用于筛选和导出';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes => '管理维护类型';
+
+  @override
+  String get equipment_serviceDialog_categoryLabel => '类别';
+
+  @override
   String get equipment_serviceDialog_snackbar_added => '维护记录已添加';
 
   @override
@@ -10574,34 +10592,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => '更新';
 
   @override
-  String get equipment_serviceType_annual => '年度保养';
+  String get equipment_serviceCategory_annual => '年度保养';
 
   @override
-  String get equipment_serviceType_repair => '维修';
+  String get equipment_serviceCategory_repair => '维修';
 
   @override
-  String get equipment_serviceType_inspection => '检查';
+  String get equipment_serviceCategory_inspection => '检查';
 
   @override
-  String get equipment_serviceType_overhaul => '大修';
+  String get equipment_serviceCategory_overhaul => '大修';
 
   @override
-  String get equipment_serviceType_replacement => '部件更换';
+  String get equipment_serviceCategory_replacement => '部件更换';
 
   @override
-  String get equipment_serviceType_cleaning => '清洁';
+  String get equipment_serviceCategory_cleaning => '清洁';
 
   @override
-  String get equipment_serviceType_calibration => '校准';
+  String get equipment_serviceCategory_calibration => '校准';
 
   @override
-  String get equipment_serviceType_warranty => '保修服务';
+  String get equipment_serviceCategory_warranty => '保修服务';
 
   @override
-  String get equipment_serviceType_recall => '召回/安全';
+  String get equipment_serviceCategory_recall => '召回/安全';
 
   @override
-  String get equipment_serviceType_other => '其他';
+  String get equipment_serviceCategory_other => '其他';
 
   @override
   String get equipment_service_addButton => '添加';
@@ -10659,6 +10677,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String equipment_service_filterMatchCount(int count, int total) {
     return '显示 $count / $total';
   }
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryLabel => '默认类别';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => '无默认值';
 
   @override
   String get equipment_serviceKinds_defaultCostLabel => '默认价格';
@@ -14795,6 +14819,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_manage_tankPresets_subtitle => '管理自定义气瓶配置';
+
+  @override
+  String get settings_manage_serviceTypes => '维护类型';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle => '装备需要的保养项目及其频率';
 
   @override
   String get settings_migrationProgress_doNotClose => '请不要关闭应用';

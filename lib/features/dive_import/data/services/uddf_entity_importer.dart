@@ -520,9 +520,9 @@ class UddfEntityImporter {
       final record = equipment_domain.ServiceRecord(
         id: _uuid.v4(),
         equipmentId: equipmentId,
-        serviceType:
-            _parseEnum(recordData['serviceType'], ServiceType.values) ??
-            ServiceType.other,
+        serviceCategory:
+            _parseEnum(recordData['serviceCategory'], ServiceCategory.values) ??
+            ServiceCategory.other,
         serviceDate: serviceDate,
         provider: recordData['provider'] as String?,
         cost: asDoubleOrNull(recordData['cost']),

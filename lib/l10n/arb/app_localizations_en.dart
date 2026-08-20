@@ -10876,7 +10876,29 @@ class AppLocalizationsEn extends AppLocalizations {
       'Pick service date';
 
   @override
-  String get equipment_serviceDialog_serviceTypeLabel => 'Service Type';
+  String get equipment_serviceDialog_serviceTypeLabel => 'Service type';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'Logging this resets the clock for this service type';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Pick a service type';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Not set';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Used for filtering and export';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Manage service types';
+
+  @override
+  String get equipment_serviceDialog_categoryLabel => 'Category';
 
   @override
   String get equipment_serviceDialog_snackbar_added => 'Service record added';
@@ -10894,34 +10916,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Update';
 
   @override
-  String get equipment_serviceType_annual => 'Annual Service';
+  String get equipment_serviceCategory_annual => 'Annual Service';
 
   @override
-  String get equipment_serviceType_repair => 'Repair';
+  String get equipment_serviceCategory_repair => 'Repair';
 
   @override
-  String get equipment_serviceType_inspection => 'Inspection';
+  String get equipment_serviceCategory_inspection => 'Inspection';
 
   @override
-  String get equipment_serviceType_overhaul => 'Overhaul';
+  String get equipment_serviceCategory_overhaul => 'Overhaul';
 
   @override
-  String get equipment_serviceType_replacement => 'Part Replacement';
+  String get equipment_serviceCategory_replacement => 'Part Replacement';
 
   @override
-  String get equipment_serviceType_cleaning => 'Cleaning';
+  String get equipment_serviceCategory_cleaning => 'Cleaning';
 
   @override
-  String get equipment_serviceType_calibration => 'Calibration';
+  String get equipment_serviceCategory_calibration => 'Calibration';
 
   @override
-  String get equipment_serviceType_warranty => 'Warranty Service';
+  String get equipment_serviceCategory_warranty => 'Warranty Service';
 
   @override
-  String get equipment_serviceType_recall => 'Recall/Safety';
+  String get equipment_serviceCategory_recall => 'Recall/Safety';
 
   @override
-  String get equipment_serviceType_other => 'Other';
+  String get equipment_serviceCategory_other => 'Other';
 
   @override
   String get equipment_service_addButton => 'Add';
@@ -10980,6 +11002,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String equipment_service_filterMatchCount(int count, int total) {
     return '$count of $total shown';
   }
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryLabel => 'Default category';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => 'No default';
 
   @override
   String get equipment_serviceKinds_defaultCostLabel => 'Default price';
@@ -15281,6 +15309,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_manage_tankPresets_subtitle =>
       'Manage custom tank configurations';
+
+  @override
+  String get settings_manage_serviceTypes => 'Service types';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'Maintenance your gear needs, and how often';
 
   @override
   String get settings_migrationProgress_doNotClose =>

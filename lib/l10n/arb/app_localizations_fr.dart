@@ -11085,7 +11085,29 @@ class AppLocalizationsFr extends AppLocalizations {
       'Choisir la date de revision';
 
   @override
-  String get equipment_serviceDialog_serviceTypeLabel => 'Type de revision';
+  String get equipment_serviceDialog_serviceTypeLabel => 'Type de révision';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'L\'enregistrer réinitialise le compteur de ce type de révision';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Choisissez un type de révision';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Non défini';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Utilisée pour le filtrage et l\'export';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Gérer les types de révision';
+
+  @override
+  String get equipment_serviceDialog_categoryLabel => 'Catégorie';
 
   @override
   String get equipment_serviceDialog_snackbar_added =>
@@ -11104,34 +11126,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Mettre a jour';
 
   @override
-  String get equipment_serviceType_annual => 'Révision annuelle';
+  String get equipment_serviceCategory_annual => 'Révision annuelle';
 
   @override
-  String get equipment_serviceType_repair => 'Réparation';
+  String get equipment_serviceCategory_repair => 'Réparation';
 
   @override
-  String get equipment_serviceType_inspection => 'Inspection';
+  String get equipment_serviceCategory_inspection => 'Inspection';
 
   @override
-  String get equipment_serviceType_overhaul => 'Révision complète';
+  String get equipment_serviceCategory_overhaul => 'Révision complète';
 
   @override
-  String get equipment_serviceType_replacement => 'Remplacement de pièces';
+  String get equipment_serviceCategory_replacement => 'Remplacement de pièces';
 
   @override
-  String get equipment_serviceType_cleaning => 'Nettoyage';
+  String get equipment_serviceCategory_cleaning => 'Nettoyage';
 
   @override
-  String get equipment_serviceType_calibration => 'Étalonnage';
+  String get equipment_serviceCategory_calibration => 'Étalonnage';
 
   @override
-  String get equipment_serviceType_warranty => 'Service sous garantie';
+  String get equipment_serviceCategory_warranty => 'Service sous garantie';
 
   @override
-  String get equipment_serviceType_recall => 'Rappel/Sécurité';
+  String get equipment_serviceCategory_recall => 'Rappel/Sécurité';
 
   @override
-  String get equipment_serviceType_other => 'Autre';
+  String get equipment_serviceCategory_other => 'Autre';
 
   @override
   String get equipment_service_addButton => 'Ajouter';
@@ -11191,6 +11213,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String equipment_service_filterMatchCount(int count, int total) {
     return '$count sur $total affichés';
   }
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryLabel =>
+      'Catégorie par défaut';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => 'Aucune par défaut';
 
   @override
   String get equipment_serviceKinds_defaultCostLabel => 'Prix par défaut';
@@ -15594,6 +15623,13 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_manage_tankPresets_subtitle =>
       'Gerer les configurations de blocs personnalisees';
+
+  @override
+  String get settings_manage_serviceTypes => 'Types de révision';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'L\'entretien dont votre matériel a besoin, et à quelle fréquence';
 
   @override
   String get settings_migrationProgress_doNotClose =>

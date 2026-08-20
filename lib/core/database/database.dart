@@ -1179,6 +1179,12 @@ class ServiceKinds extends Table {
   RealColumn get defaultCost => real().nullable()();
   TextColumn get defaultCurrency => text().nullable()();
 
+  /// v160: the category prefilled into a new service record logged against
+  /// this service type. Nullable because a custom type has no opinion until
+  /// the diver gives it one; a NOT NULL default would make every custom type
+  /// silently claim "annual".
+  TextColumn get defaultCategory => text().nullable()();
+
   /// Auto-create a schedule when matching equipment is created.
   BoolColumn get autoAttach => boolean().withDefault(const Constant(false))();
   BoolColumn get isBuiltIn => boolean().withDefault(const Constant(false))();
@@ -1942,7 +1948,13 @@ class ServiceRecords extends Table {
   TextColumn get id => text()();
   TextColumn get equipmentId =>
       text().references(Equipment, #id, onDelete: KeyAction.cascade)();
-  TextColumn get serviceType => text()(); // annual, repair, inspection, etc.
+
+  /// v160: renamed from serviceType. The Drift getter name is also the sync
+  /// wire key, so this rename raises minimumCompatibleSchemaVersion; see
+  /// SyncDataSerializer._withRenamedKeys for the receiving-side tolerance
+  /// that the floor cannot provide.
+  TextColumn get serviceCategory =>
+      text()(); // annual, repair, inspection, etc.
 
   /// v122: which service kind this record fulfills (resets that clock).
   /// Plain text (no FK) so records survive custom-kind deletion.
@@ -2264,41 +2276,66 @@ const String kSeedBuiltInDiveRolesSql = '''
 /// Built-in service kinds: identical on every device, stable slug ids
 /// (service_schedules.service_kind_id references them), INSERT OR IGNORE
 /// so re-running is a no-op. Intervals per tech-diving convention.
+/// The category each built-in service type prefills, by stable slug id.
+///
+/// The v160 migration reads this map directly (existing installs).
+/// [kSeedBuiltInServiceKindsSql] cannot: it is a const SQL string, so it
+/// repeats the same categories as inline literals (fresh installs). The two
+/// are held in step by migration_v160_service_category_test.dart, which pins
+/// both the slug set and the category each slug is seeded with. Change one
+/// and change the other.
+const Map<String, String> kBuiltInServiceKindCategories = {
+  'hydro': 'inspection',
+  'vip': 'inspection',
+  'bcd-inspection': 'inspection',
+  'o2-clean': 'cleaning',
+  'regulator-service': 'annual',
+  'rebreather-annual': 'annual',
+  'general-service': 'annual',
+  'computer-battery': 'replacement',
+  'transmitter-battery': 'replacement',
+  'scrubber-repack': 'replacement',
+  'o2-cell-replacement': 'replacement',
+  'drysuit-seals': 'repair',
+};
+
 const String kSeedBuiltInServiceKindsSql = '''
   INSERT OR IGNORE INTO service_kinds
     (id, diver_id, name, applicable_types, default_interval_days,
      default_interval_dives, default_interval_hours, auto_attach,
-     is_built_in, created_at, updated_at)
-  SELECT t.id, NULL, t.name, t.types, t.days, t.dives, t.hours, t.auto, 1,
-         n.now_ms, n.now_ms
+     default_category, is_built_in, created_at, updated_at)
+  SELECT t.id, NULL, t.name, t.types, t.days, t.dives, t.hours, t.auto,
+         t.category, 1, n.now_ms, n.now_ms
   FROM (
     SELECT 'hydro' AS id, 'Hydrostatic test' AS name, '["tank"]' AS types,
-           1825 AS days, NULL AS dives, NULL AS hours, 1 AS auto
+           1825 AS days, NULL AS dives, NULL AS hours, 1 AS auto,
+           'inspection' AS category
     UNION ALL SELECT 'vip', 'Visual inspection (VIP)', '["tank"]',
-           365, NULL, NULL, 1
-    UNION ALL SELECT 'o2-clean', 'O2 clean', '["tank"]', 365, NULL, NULL, 0
+           365, NULL, NULL, 1, 'inspection'
+    UNION ALL SELECT 'o2-clean', 'O2 clean', '["tank"]', 365, NULL, NULL, 0,
+           'cleaning'
     UNION ALL SELECT 'regulator-service', 'Regulator service',
-           '["regulator"]', 365, 100, NULL, 1
+           '["regulator"]', 365, 100, NULL, 1, 'annual'
     UNION ALL SELECT 'computer-battery', 'Computer battery', '["computer"]',
-           730, NULL, NULL, 1
+           730, NULL, NULL, 1, 'replacement'
     UNION ALL SELECT 'transmitter-battery', 'Transmitter battery',
-           '["transmitter"]', 365, NULL, NULL, 1
+           '["transmitter"]', 365, NULL, NULL, 1, 'replacement'
     UNION ALL SELECT 'bcd-inspection', 'BCD/wing inspection', '["bcd"]',
-           365, NULL, NULL, 1
+           365, NULL, NULL, 1, 'inspection'
     UNION ALL SELECT 'drysuit-seals', 'Drysuit seals', '["drysuit"]',
-           730, NULL, NULL, 0
+           730, NULL, NULL, 0, 'repair'
     -- A scrubber is consumed by loop time, not by the calendar, so this is
     -- the only built-in with an hours-only clock. 3.0 h is conservative
     -- across the 2-6 h range real units are rated for; the diver overrides
     -- it per unit via ServiceSchedule.intervalHours.
     UNION ALL SELECT 'scrubber-repack', 'Scrubber repack', '["rebreather"]',
-           NULL, NULL, 3.0, 1
+           NULL, NULL, 3.0, 1, 'replacement'
     UNION ALL SELECT 'o2-cell-replacement', 'O2 cell replacement',
-           '["rebreather"]', 365, NULL, NULL, 1
+           '["rebreather"]', 365, NULL, NULL, 1, 'replacement'
     UNION ALL SELECT 'rebreather-annual', 'Rebreather annual service',
-           '["rebreather"]', 365, NULL, NULL, 1
+           '["rebreather"]', 365, NULL, NULL, 1, 'annual'
     UNION ALL SELECT 'general-service', 'General service', '[]',
-           NULL, NULL, NULL, 0
+           NULL, NULL, NULL, 0, 'annual'
   ) t
   CROSS JOIN (SELECT CAST(strftime('%s','now') AS INTEGER) * 1000 AS now_ms) n
 ''';
@@ -3125,7 +3162,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 159;
+  static const int currentSchemaVersion = 160;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3146,7 +3183,14 @@ class AppDatabase extends _$AppDatabase {
   /// defaulted columns, new indexes, dedupe passes, or data repairs that
   /// preserve meaning. When raising it, extend the round-trip test's
   /// projection so the new boundary stays covered.
-  static const int minimumCompatibleSchemaVersion = 137;
+  ///
+  /// Raised 137 -> 160 by the service type unification: v160 renames the
+  /// synced column service_records.service_type to service_category, which
+  /// the first rule above classifies as breaking. Peers below 160 are held
+  /// until they update. Note the gate is one-directional, so this does NOT
+  /// protect us from THEIR payloads; SyncDataSerializer._withRenamedKeys
+  /// carries the receiving-side tolerance.
+  static const int minimumCompatibleSchemaVersion = 160;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3395,6 +3439,11 @@ class AppDatabase extends _$AppDatabase {
     // download's clock and it slides away from the primary's. Renumbered
     // from 158, which #1149 claimed first on main.
     159,
+    // v160 (service type unification): service_kinds.default_category, the
+    // category prefilled when a maintenance record is logged, plus the
+    // service_records.service_type -> service_category rename. Renumbered
+    // from 158 and then 159, which #1149 and #1177 claimed first on main.
+    160,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4851,6 +4900,50 @@ class AppDatabase extends _$AppDatabase {
   /// (issue #829). PRAGMA-guarded so a healthy database no-ops. The
   /// cols.isEmpty guard matters: minimal migration fixtures build databases
   /// without these tables and would otherwise crash the whole migration.
+  /// v160: service_kinds.default_category, plus the built-in seeding.
+  ///
+  /// Self-guards on the table existing, because minimal migration fixtures
+  /// ride the ladder from versions that predate service_kinds. The seeding is
+  /// an UPDATE rather than an upsert so it cannot resurrect a built-in the
+  /// diver deleted (the v109 rule), and it only fills a NULL so it never
+  /// overwrites a category the diver chose.
+  Future<void> _assertServiceCategoryColumn() async {
+    final cols = await customSelect("PRAGMA table_info('service_kinds')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('default_category')) {
+      await customStatement(
+        'ALTER TABLE service_kinds ADD COLUMN default_category TEXT',
+      );
+    }
+    for (final entry in kBuiltInServiceKindCategories.entries) {
+      await customStatement(
+        'UPDATE service_kinds SET default_category = ? '
+        'WHERE id = ? AND default_category IS NULL',
+        [entry.value, entry.key],
+      );
+    }
+  }
+
+  /// v160: service_records.service_type becomes service_category.
+  ///
+  /// Separate from [_assertServiceCategoryColumn] so a database missing one
+  /// table still gets the other. ALTER TABLE RENAME COLUMN needs SQLite 3.25
+  /// (2018), which every supported platform ships.
+  Future<void> _assertServiceCategoryRename() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('service_records')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('service_type') && !names.contains('service_category')) {
+      await customStatement(
+        'ALTER TABLE service_records '
+        'RENAME COLUMN service_type TO service_category',
+      );
+    }
+  }
+
   Future<void> _assertServiceCostColumns() async {
     for (final table in const ['service_kinds', 'service_schedules']) {
       final cols = await customSelect("PRAGMA table_info('$table')").get();
@@ -8405,6 +8498,14 @@ class AppDatabase extends _$AppDatabase {
           await _assertDataSourceTimeOffsetColumn();
         }
         if (from < 159) await reportProgress();
+        // v160: default category on service_kinds, prefilled into a new
+        // maintenance record, plus the service_records category rename
+        // (service type unification).
+        if (from < 160) {
+          await _assertServiceCategoryColumn();
+          await _assertServiceCategoryRename();
+        }
+        if (from < 160) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8583,6 +8684,17 @@ class AppDatabase extends _$AppDatabase {
         // (issue #1177; same parallel-branch version-collision self-heal).
         // Reading a consolidated dive's sources throws without it.
         await _assertDataSourceTimeOffsetColumn();
+
+        // v160 backstop: re-assert service_kinds.default_category. A device
+        // that reached 160 or higher through a parallel branch never enters
+        // the `from < 160` block above, and the seed SQL below is
+        // INSERT OR IGNORE, so it cannot add the column to existing rows.
+        await _assertServiceCategoryColumn();
+
+        // v160 backstop: re-assert the service_records column rename. A
+        // database that arrives by restore or sync-adopt never runs
+        // onUpgrade, and every read of a service record would throw.
+        await _assertServiceCategoryRename();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
