@@ -12511,7 +12511,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Submersion a besoin d\'acceder a votre phototheque pour ajouter des photos de plongee.';
 
   @override
-  String get media_photoPicker_permissionTitle => 'Acces aux photos requis';
+  String get media_photoPicker_permissionTitle => 'Photos de plongee';
 
   @override
   String get media_photoPicker_selectAllButton => 'Tout selectionner';
@@ -15632,7 +15632,15 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get settings_notifications_disabled_enableButton => 'Activer';
+  String get settings_notifications_disabled_continueButton => 'Continuer';
+
+  @override
+  String get settings_notifications_disabled_openSettingsButton =>
+      'Ouvrir les reglages';
+
+  @override
+  String get settings_notifications_disabled_subtitleUnrequested =>
+      'Les rappels d\'entretien necessitent l\'autorisation d\'envoyer des notifications';
 
   @override
   String get settings_notifications_disabled_subtitle =>
@@ -20541,8 +20549,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Submersion uses Apple HealthKit to read underwater diving workout data, including depth, duration, water temperature, and heart rate, to create detailed dive logs.';
 
   @override
-  String get diveImport_healthkit_accessRequired =>
-      'Apple HealthKit Access Required';
+  String get diveImport_healthkit_accessRequired => 'Apple HealthKit';
 
   @override
   String get diveImport_healthkit_attribution => 'Fourni par Apple HealthKit';
@@ -31349,10 +31356,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_requesting => 'Demande en cours...';
-
-  @override
-  String get diveImport_healthkit_grantAccessButton =>
-      'Accorder l’accès à HealthKit';
 
   @override
   String get diveImport_healthkit_selectDateRange => 'Sélectionner la période';
