@@ -39,12 +39,18 @@ class MacDiveXmlParser implements ImportParser {
   /// `MacDiveDbReader` does read both from `ZCERTIFICATION` and
   /// `ZSERVICERECORD`, so the diver has a real remedy. Say so on every import
   /// rather than letting the gap look like a failed parse.
+  ///
+  /// Worded as a claim about *this file*, not about the import. A batch parses
+  /// each file with its own detected format and `PayloadMerger` concatenates
+  /// every file's warnings, so a MacDive.sqlite alongside the XML export puts
+  /// this notice next to a non-zero Certifications count. Scoped this way it
+  /// stays true there and still names the remedy.
   static const _formatGapNotice = ImportWarning(
     severity: ImportWarningSeverity.info,
     message:
-        'MacDive XML exports do not contain certifications or equipment '
-        'service records, so none were found in this file. To import those, '
-        'choose your MacDive.sqlite database instead of the XML export.',
+        'This MacDive XML file contains no certifications or equipment '
+        'service records: MacDive omits both from its XML export. To bring '
+        'them in, add your MacDive.sqlite database to this import.',
   );
 
   @override
