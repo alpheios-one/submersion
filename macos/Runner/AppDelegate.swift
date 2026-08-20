@@ -130,9 +130,14 @@ class AppDelegate: FlutterAppDelegate {
   /// because a wedged main thread is precisely the case this guards. For the
   /// same reason it cannot rely on `reply(toApplicationShouldTerminate:)`
   /// landing: that must be called on the main thread, so it is attempted first
-  /// and `exit(0)` follows if the process is still here a moment later. By then
-  /// both databases have had their own budget and drift runs in WAL mode, so an
-  /// abrupt exit is recoverable.
+  /// and `exit(0)` follows only if the main queue never ran the block that
+  /// delivers it. By then both databases have had their own budget and drift
+  /// runs in WAL mode, so an abrupt exit is recoverable.
+  ///
+  /// `exit(0)` is deliberately gated on the *reply* having been delivered, not
+  /// on termination having completed: once AppKit has the reply, finishing the
+  /// quit is its business and however long it takes is not this watchdog's to
+  /// cut short.
   private func armTerminateWatchdog() {
     let deadline: DispatchTime = .now() + AppDelegate.terminateWatchdogInterval
     DispatchQueue.global(qos: .utility).asyncAfter(deadline: deadline) {
@@ -141,16 +146,25 @@ class AppDelegate: FlutterAppDelegate {
       NSLog(
         "[AppDelegate] No exit-request answer after "
           + "\(AppDelegate.terminateWatchdogInterval)s; forcing termination")
-      DispatchQueue.main.async {
+      DispatchQueue.main.async { [weak self] in
+        // Marked answered HERE rather than left to applicationWillTerminate.
+        // Delivering the reply is the single event this watchdog exists to
+        // force; what follows it is AppKit's own teardown, whose duration is
+        // nothing to do with the grace period. Deciding on willTerminate
+        // instead would let the grace path call exit(0) in the middle of an
+        // orderly termination that was already under way.
+        self?.markTerminateAnswered()
         NSApplication.shared.reply(toApplicationShouldTerminate: true)
       }
       DispatchQueue.global(qos: .utility).asyncAfter(
         deadline: .now() + AppDelegate.terminateWatchdogGrace
       ) { [weak self] in
-        // applicationWillTerminate sets the flag, so reaching here means the
-        // polite reply never ran: the main thread is not turning.
+        // The flag is set by the block above, on the main queue. Reaching here
+        // unset therefore means that block never ran: the main thread is not
+        // turning, so no reply can ever be delivered and there is nothing left
+        // to wait for.
         guard let self, !self.hasAnsweredTerminate() else { return }
-        NSLog("[AppDelegate] Exit still pending; calling exit(0)")
+        NSLog("[AppDelegate] Main thread never delivered the reply; calling exit(0)")
         exit(0)
       }
     }
@@ -162,10 +176,18 @@ class AppDelegate: FlutterAppDelegate {
     return terminateAnswered
   }
 
-  override func applicationWillTerminate(_ notification: Notification) {
+  /// Records that the exit request has been answered, so the watchdog stands
+  /// down. Called on the main queue when the reply is delivered, and again
+  /// from `applicationWillTerminate` as a backstop for a termination this
+  /// watchdog never had to force.
+  private func markTerminateAnswered() {
     terminateLock.lock()
     terminateAnswered = true
     terminateLock.unlock()
+  }
+
+  override func applicationWillTerminate(_ notification: Notification) {
+    markTerminateAnswered()
     bookmarkHandler?.cleanup()
     backupBookmarkHandler?.releaseAll()
     // Released here as well as in its own deinit, which does not run on
