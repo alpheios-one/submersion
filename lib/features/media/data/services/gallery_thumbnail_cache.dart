@@ -2,6 +2,16 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
 
+/// How long a PhotoKit fetch may hold a concurrency slot.
+///
+/// photo_manager asks PhotoKit with `networkAccessAllowed = YES`, so an
+/// iCloud-only asset triggers a full cloud download behind a plain `await`.
+/// Four of those used to hold every slot this cache has, which is a gallery of
+/// permanent shimmer on a slow connection. Matching `MediaFetchGate`'s budget:
+/// the two caps govern the same grid and staggering them would only make the
+/// slower one invisible.
+const Duration kGalleryThumbnailSlotBudget = Duration(seconds: 5);
+
 /// Bounded, deduplicating, concurrency-capped cache for gallery thumbnail
 /// bytes.
 ///
@@ -24,16 +34,6 @@ import 'dart:typed_data';
 /// bytes` and `Uint8List` does not override `==`, so its `ImageCache` key is
 /// reference identity. Handing back a fresh copy would make every `ImageCache`
 /// lookup miss, which is what made gallery thumbnails uncacheable before.
-/// How long a PhotoKit fetch may hold a concurrency slot.
-///
-/// photo_manager asks PhotoKit with `networkAccessAllowed = YES`, so an
-/// iCloud-only asset triggers a full cloud download behind a plain `await`.
-/// Four of those used to hold every slot this cache has, which is a gallery of
-/// permanent shimmer on a slow connection. Matching `MediaFetchGate`'s budget:
-/// the two caps govern the same grid and staggering them would only make the
-/// slower one invisible.
-const Duration kGalleryThumbnailSlotBudget = Duration(seconds: 5);
-
 class GalleryThumbnailCache {
   GalleryThumbnailCache({
     this.maxBytes = 32 * 1024 * 1024,

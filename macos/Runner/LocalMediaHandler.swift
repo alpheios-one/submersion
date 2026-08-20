@@ -55,17 +55,24 @@ class LocalMediaHandler: NSObject {
     /// too: `deinit` does not run when the process terminates, and the app
     /// delegate holds this handler for the whole session.
     ///
-    /// **Call this on the main thread.** `active` is main-thread-owned (see
-    /// `resolveBookmark`, which hops back to main purely to mutate it), so a
-    /// caller on any other queue would race the dictionary. The two callers
-    /// today both satisfy that: `applicationWillTerminate` runs on main, and
-    /// `deinit` runs only once the reference count reaches zero, which means no
-    /// other reference exists and therefore nothing can be concurrently inside
-    /// a method that touches `active`.
+    /// **Contract: the caller must have exclusive access to `active`.** That is
+    /// the real requirement; being on the main thread is just the ordinary way
+    /// to satisfy it, since `active` is main-thread-owned (see
+    /// `resolveBookmark`, which hops back to main purely to mutate it).
     ///
-    /// Not enforced with `dispatchPrecondition`: that traps in release builds,
-    /// and trading a theoretical race for a definite crash on the path the user
-    /// takes to quit is the worse of the two failures.
+    /// The two callers satisfy it in different ways, which is why the contract
+    /// is stated as exclusivity rather than as "call this on main":
+    ///   * `applicationWillTerminate` runs on the main thread.
+    ///   * `deinit` may run on any thread, and does not need to be on main:
+    ///     it runs only once the reference count reaches zero, so no other
+    ///     reference exists and nothing can be concurrently inside a method
+    ///     that touches `active`. Exclusivity holds by construction.
+    ///
+    /// A third caller on some other queue would break it. Not enforced with
+    /// `dispatchPrecondition`, which would be wrong twice over: it would reject
+    /// the legitimate `deinit` case, and it traps in release builds, so it
+    /// would trade a theoretical race for a definite crash on the path the user
+    /// takes to quit.
     func releaseAllActiveBookmarks() {
         for (_, url) in active {
             url.stopAccessingSecurityScopedResource()

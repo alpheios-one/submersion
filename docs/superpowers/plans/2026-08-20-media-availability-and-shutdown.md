@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- No em-dashes (`—`, U+2014) anywhere: code, comments, docs, ARB strings, commit messages. En-dashes and " - " as prose punctuation are equally forbidden. Rewrite with commas, parentheses, colons, or semicolons.
+- No em-dashes (U+2014) anywhere: code, comments, docs, ARB strings, commit messages. En-dashes (U+2013) and " - " used as prose punctuation are equally forbidden. Rewrite with commas, parentheses, colons, or semicolons. The characters are named by code point rather than shown, so that this line does not itself violate the rule it states.
 - No emojis in code, comments, or documentation.
 - `dart format .` must leave the tree unchanged before every commit.
 - `flutter analyze` must report "No issues found!" over the whole project. Infos are fatal in CI.
