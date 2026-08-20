@@ -38,7 +38,8 @@ final weightHistoryRepositoryProvider = Provider<WeightHistoryRepository>((
 
 /// The active diver's weight-bearing dive history, oldest first.
 ///
-/// Self-invalidates on any dives-table change (edits, imports, sync).
+/// Self-invalidates on any dives-table change (edits, imports, sync) and on
+/// equipment or equipment-attribute changes, which feed gear-carried lead.
 final weightObservationsProvider = FutureProvider<List<WeightObservation>>((
   ref,
 ) async {
@@ -47,6 +48,11 @@ final weightObservationsProvider = FutureProvider<List<WeightObservation>>((
   if (diverId == null) return const [];
 
   ref.invalidateSelfWhen(DiveRepository().watchDivesChanges());
+  // Carried lead is also read off weights-type equipment and its attributes
+  // (#1103), which a dives-table write does not cover: editing a weight
+  // block's dry weight would otherwise leave carriedKg stale and refit the
+  // calibration against the old ballast until some dive happened to change.
+  ref.invalidateSelfWhen(repository.watchGearLeadChanges());
 
   return repository.observationsForDiver(diverId);
 });

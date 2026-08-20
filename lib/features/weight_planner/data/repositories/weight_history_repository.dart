@@ -18,6 +18,17 @@ class WeightHistoryRepository {
   final AppDatabase? _dbOverride;
   AppDatabase get _db => _dbOverride ?? DatabaseService.instance.database;
 
+  /// Emits when the gear side of an observation's carried lead changes.
+  ///
+  /// Since #1103 an observation's `carriedKg` also comes from weights-type
+  /// equipment, whose mass lives in `equipment_attributes`. `saveAttributes`
+  /// writes that table alone, so watching `equipment` would miss an
+  /// attribute-only write (a sync apply, for instance) entirely; both tables
+  /// are needed. Dives-table changes are watched separately by the caller.
+  Stream<void> watchGearLeadChanges() => _db.tableUpdates(
+    TableUpdateQuery.onAllTables([_db.equipment, _db.equipmentAttributes]),
+  );
+
   /// All dives of [diverId] that recorded any weight, ordered oldest-first.
   Future<List<WeightObservation>> observationsForDiver(String diverId) async {
     final diveRows =
