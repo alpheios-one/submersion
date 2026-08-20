@@ -28857,6 +28857,29 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_syncMaintenance_phase_publishingLibrary => '正在发布资料库';
 
   @override
+  String get settings_cloudSync_adopt_progressTitle => '正在接管已恢复的资料库';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle => '正在替换云端资料库';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name（$shortId）';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary => '正在应用资料库';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp => '正在备份此设备';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing => '正在清除本地同步状态';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle => '正在修复同步';
+
+  @override
   String get settings_syncMaintenance_phase_working => '处理中...';
 
   @override

@@ -70,8 +70,8 @@ class SyncResult {
   final Set<String> skippedPeerDeviceIds;
 
   /// Display names for the entries in [skippedPeerDeviceIds] that published
-  /// one. An absent entry means the peer is on an older manifest, or its
-  /// hostname identifies nothing; render a short id instead.
+  /// one. An absent entry means the peer is on an older manifest, or nothing
+  /// identifies it by name; render a short id instead.
   final Map<String, String> skippedPeerNames;
 
   /// Peers held because their declared compatibility floor exceeds this
@@ -785,9 +785,9 @@ class SyncService {
   bool _deviceNameResolved = false;
 
   /// The name published on this device's manifest so peers can name it in the
-  /// "still needs to adopt" banner. Resolved once per service lifetime: the
-  /// hostname does not change while the app runs, and publish is on the sync
-  /// hot path. Null when the hostname identifies nothing.
+  /// "still needs to adopt" banner. Resolved once per service lifetime: a
+  /// device is not renamed while the app runs, and publish is on the sync hot
+  /// path. Null when nothing on this platform identifies the device.
   Future<String?> _deviceNameForManifest() async {
     if (_deviceNameResolved) return _cachedDeviceName;
     _cachedDeviceName = (await SyncDeviceMetadata(

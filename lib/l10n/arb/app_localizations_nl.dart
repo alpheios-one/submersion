@@ -30342,6 +30342,35 @@ class AppLocalizationsNl extends AppLocalizations {
       'Bibliotheek publiceren';
 
   @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'Herstelde bibliotheek overnemen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'Cloudbibliotheek vervangen';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'Bibliotheek toepassen';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'Back-up van dit apparaat maken';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'Lokale synchronisatiestatus wissen';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'Synchronisatie herstellen';
+
+  @override
   String get settings_syncMaintenance_phase_working => 'Bezig...';
 
   @override

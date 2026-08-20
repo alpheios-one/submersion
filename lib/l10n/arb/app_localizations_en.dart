@@ -30097,6 +30097,34 @@ class AppLocalizationsEn extends AppLocalizations {
       'Publishing library';
 
   @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'Adopting the restored library';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'Replacing the cloud library';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'Applying the library';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'Backing up this device';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'Clearing local sync state';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle => 'Repairing sync';
+
+  @override
   String get settings_syncMaintenance_phase_working => 'Working...';
 
   @override

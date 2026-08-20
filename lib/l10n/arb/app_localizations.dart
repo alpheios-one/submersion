@@ -50933,6 +50933,48 @@ abstract class AppLocalizations {
   /// **'Publishing library'**
   String get settings_syncMaintenance_phase_publishingLibrary;
 
+  /// No description provided for @settings_cloudSync_adopt_progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adopting the restored library'**
+  String get settings_cloudSync_adopt_progressTitle;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replacing the cloud library'**
+  String get settings_cloudSync_replaceLibrary_progressTitle;
+
+  /// Device name qualified by its short id, used only when two devices published the same name (two phones of one model, or iOS 16+ handing out the model as the name).
+  ///
+  /// In en, this message translates to:
+  /// **'{name} ({shortId})'**
+  String settings_syncDevices_nameWithId(String name, String shortId);
+
+  /// No description provided for @settings_syncMaintenance_phase_applyingLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Applying the library'**
+  String get settings_syncMaintenance_phase_applyingLibrary;
+
+  /// No description provided for @settings_syncMaintenance_phase_backingUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Backing up this device'**
+  String get settings_syncMaintenance_phase_backingUp;
+
+  /// No description provided for @settings_syncMaintenance_phase_repairing.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing local sync state'**
+  String get settings_syncMaintenance_phase_repairing;
+
+  /// No description provided for @settings_troubleshootSync_repair_progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Repairing sync'**
+  String get settings_troubleshootSync_repair_progressTitle;
+
   /// No description provided for @settings_syncMaintenance_phase_working.
   ///
   /// In en, this message translates to:

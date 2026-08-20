@@ -30209,6 +30209,35 @@ class AppLocalizationsAr extends AppLocalizations {
       'جارٍ نشر المكتبة';
 
   @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'جارٍ اعتماد المكتبة المستعادة';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'جارٍ استبدال مكتبة السحابة';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'جارٍ تطبيق المكتبة';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'جارٍ إنشاء نسخة احتياطية لهذا الجهاز';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'جارٍ مسح حالة المزامنة المحلية';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'جارٍ إصلاح المزامنة';
+
+  @override
   String get settings_syncMaintenance_phase_working => 'جارٍ العمل...';
 
   @override

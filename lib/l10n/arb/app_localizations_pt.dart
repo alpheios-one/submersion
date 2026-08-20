@@ -30569,6 +30569,35 @@ class AppLocalizationsPt extends AppLocalizations {
       'Publicando a biblioteca';
 
   @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'Adotando a biblioteca restaurada';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'Substituindo a biblioteca na nuvem';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'Aplicando a biblioteca';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'Fazendo backup deste dispositivo';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'Limpando o estado de sincronização local';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'Reparando a sincronização';
+
+  @override
   String get settings_syncMaintenance_phase_working => 'Trabalhando...';
 
   @override
