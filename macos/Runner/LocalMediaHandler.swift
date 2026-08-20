@@ -54,6 +54,18 @@ class LocalMediaHandler: NSObject {
     /// Internal rather than private so `applicationWillTerminate` can call it
     /// too: `deinit` does not run when the process terminates, and the app
     /// delegate holds this handler for the whole session.
+    ///
+    /// **Call this on the main thread.** `active` is main-thread-owned (see
+    /// `resolveBookmark`, which hops back to main purely to mutate it), so a
+    /// caller on any other queue would race the dictionary. The two callers
+    /// today both satisfy that: `applicationWillTerminate` runs on main, and
+    /// `deinit` runs only once the reference count reaches zero, which means no
+    /// other reference exists and therefore nothing can be concurrently inside
+    /// a method that touches `active`.
+    ///
+    /// Not enforced with `dispatchPrecondition`: that traps in release builds,
+    /// and trading a theoretical race for a definite crash on the path the user
+    /// takes to quit is the worse of the two failures.
     func releaseAllActiveBookmarks() {
         for (_, url) in active {
             url.stopAccessingSecurityScopedResource()
