@@ -42,11 +42,19 @@ class LocalMediaHandler: NSObject {
     }
 
     deinit {
-        // Defensive cleanup: balance any startAccessingSecurityScopedResource()
-        // calls whose matching releaseBookmark never came in (Dart-side bug,
-        // missed teardown, etc.). On normal app exit the OS would reclaim
-        // these anyway, but draining the dictionary keeps long-lived sandbox
-        // accounting clean if the handler is ever recreated mid-process.
+        releaseAllActiveBookmarks()
+    }
+
+    /// Defensive cleanup: balances any startAccessingSecurityScopedResource()
+    /// calls whose matching releaseBookmark never came in (Dart-side bug,
+    /// missed teardown, etc.). On normal app exit the OS would reclaim these
+    /// anyway, but draining the dictionary keeps long-lived sandbox accounting
+    /// clean if the handler is ever recreated mid-process.
+    ///
+    /// Internal rather than private so `applicationWillTerminate` can call it
+    /// too: `deinit` does not run when the process terminates, and the app
+    /// delegate holds this handler for the whole session.
+    func releaseAllActiveBookmarks() {
         for (_, url) in active {
             url.stopAccessingSecurityScopedResource()
         }

@@ -14,6 +14,10 @@ class AppDelegate: FlutterAppDelegate {
   private var updateChannel: FlutterMethodChannel?
   private var displayChannel: FlutterMethodChannel?
 
+  /// Guards `terminateAnswered` across the watchdog queue and the main thread.
+  private let terminateLock = NSLock()
+  private var terminateAnswered = false
+
   /// Mac App Store and TestFlight builds contain a receipt file;
   /// direct-distribution (DMG / GitHub) builds do not.
   private var isAppStoreBuild: Bool {
@@ -91,9 +95,82 @@ class AppDelegate: FlutterAppDelegate {
     return true
   }
 
+  /// How long to wait for Dart's answer to the exit request before quitting
+  /// anyway.
+  ///
+  /// Generous next to the 8s budget `closeDatabasesForExit` holds itself to, so
+  /// a healthy quit never comes near it. It exists for the case that budget
+  /// cannot cover: a blocked main isolate or a blocked main thread has no
+  /// thread left to run a `Future.timeout` or a run-loop `Timer`.
+  private static let terminateWatchdogInterval: TimeInterval = 20
+
+  /// Extra grace after the watchdog asks AppKit nicely, before it stops asking.
+  private static let terminateWatchdogGrace: TimeInterval = 2
+
+  override func applicationShouldTerminate(
+    _ sender: NSApplication
+  ) -> NSApplication.TerminateReply {
+    let reply = super.applicationShouldTerminate(sender)
+    guard reply == .terminateLater else { return reply }
+    armTerminateWatchdog()
+    return reply
+  }
+
+  /// Force-quits if Dart never answers the exit request.
+  ///
+  /// FlutterAppDelegate returns `NSTerminateLater` and asks Dart over the
+  /// `flutter/platform` channel. Nothing on the native side re-checks, so a
+  /// Dart side that never replies leaves AppKit deferring forever. AppKit has
+  /// already dismissed the window by then, so the user sees the app quit while
+  /// the process lives on. That is the reported symptom, and the Media
+  /// section's local-file reads are the likeliest thing to be in flight at
+  /// quit.
+  ///
+  /// Runs on a background queue rather than a `Timer` on the main run loop,
+  /// because a wedged main thread is precisely the case this guards. For the
+  /// same reason it cannot rely on `reply(toApplicationShouldTerminate:)`
+  /// landing: that must be called on the main thread, so it is attempted first
+  /// and `exit(0)` follows if the process is still here a moment later. By then
+  /// both databases have had their own budget and drift runs in WAL mode, so an
+  /// abrupt exit is recoverable.
+  private func armTerminateWatchdog() {
+    let deadline: DispatchTime = .now() + AppDelegate.terminateWatchdogInterval
+    DispatchQueue.global(qos: .utility).asyncAfter(deadline: deadline) {
+      [weak self] in
+      guard let self, !self.hasAnsweredTerminate() else { return }
+      NSLog(
+        "[AppDelegate] No exit-request answer after "
+          + "\(AppDelegate.terminateWatchdogInterval)s; forcing termination")
+      DispatchQueue.main.async {
+        NSApplication.shared.reply(toApplicationShouldTerminate: true)
+      }
+      DispatchQueue.global(qos: .utility).asyncAfter(
+        deadline: .now() + AppDelegate.terminateWatchdogGrace
+      ) { [weak self] in
+        // applicationWillTerminate sets the flag, so reaching here means the
+        // polite reply never ran: the main thread is not turning.
+        guard let self, !self.hasAnsweredTerminate() else { return }
+        NSLog("[AppDelegate] Exit still pending; calling exit(0)")
+        exit(0)
+      }
+    }
+  }
+
+  private func hasAnsweredTerminate() -> Bool {
+    terminateLock.lock()
+    defer { terminateLock.unlock() }
+    return terminateAnswered
+  }
+
   override func applicationWillTerminate(_ notification: Notification) {
+    terminateLock.lock()
+    terminateAnswered = true
+    terminateLock.unlock()
     bookmarkHandler?.cleanup()
     backupBookmarkHandler?.releaseAll()
+    // Released here as well as in its own deinit, which does not run on
+    // terminate: these are security-scoped URLs the Media section opened.
+    localMediaHandler?.releaseAllActiveBookmarks()
   }
 
   override func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
