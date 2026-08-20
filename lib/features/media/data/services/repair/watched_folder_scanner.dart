@@ -1,12 +1,10 @@
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
-
 import 'package:submersion/core/services/logger_service.dart';
-import 'package:submersion/core/services/media_store/store_keys.dart';
 import 'package:submersion/features/media/data/repositories/media_repair_log_repository.dart';
 import 'package:submersion/features/media/data/repositories/watched_folder_repository.dart';
 import 'package:submersion/features/media/data/services/repair/media_repair_service.dart';
+import 'package:submersion/features/media/data/services/repair/watched_folder_walk.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/services/media_repair_types.dart';
 
@@ -27,12 +25,24 @@ class WatcherScanReport {
     required this.filesIndexed,
     required this.rehashed,
     required this.autoRepaired,
+    this.hashBudgetExhausted = false,
   });
 
   final int filesIndexed;
   final int rehashed;
   final int autoRepaired;
+
+  /// True when at least one root ran out of hashing budget. The pass is still
+  /// stamped, so the remainder is picked up on the next daily run -- every
+  /// file hashed this pass is an unchanged file next pass, so the backlog
+  /// only ever shrinks.
+  final bool hashBudgetExhausted;
 }
+
+/// Walks one root and hashes what changed. Injected so tests can run the walk
+/// in-process; production hands it to a background isolate.
+typedef WatchedFolderWalk =
+    Future<WatchedFolderWalkResult> Function(WatchedFolderWalkRequest request);
 
 /// Maintains the watched-folder index and auto-repairs missing media whose
 /// bytes turn up under a watched root (Media section Phase 5).
@@ -46,7 +56,18 @@ class WatchedFolderScanner {
     required this.repair,
     required this.loadMissingRows,
     required this.isAutoApplyEnabled,
-  });
+    WatchedFolderWalk? walk,
+    this.hashBudget = kDefaultHashBudget,
+  }) : walk = walk ?? walkWatchedFolderInIsolate;
+
+  /// Where the listing, the per-file `stat` and the SHA-256 actually happen.
+  ///
+  /// Defaults to the background isolate. All of it used to run here, on the
+  /// UI isolate, kicked from a widget `build()` (#1182).
+  final WatchedFolderWalk walk;
+
+  /// Ceiling on time spent hashing per root, per pass.
+  final Duration hashBudget;
 
   final WatchedFolderRepository watched;
   final MediaRepairService repair;
@@ -66,6 +87,7 @@ class WatchedFolderScanner {
   Future<WatcherScanReport> scan({required DateTime now}) async {
     var filesIndexed = 0;
     var rehashed = 0;
+    var budgetExhausted = false;
 
     for (final root in await watched.getRoots()) {
       final dir = Directory(root);
@@ -75,57 +97,56 @@ class WatchedFolderScanner {
       }
 
       final stored = await watched.indexForRoot(root);
-      final seen = <String>{};
-      var listingComplete = true;
 
-      try {
-        await for (final entity in dir.list(
-          recursive: true,
-          followLinks: false,
-        )) {
-          if (entity is! File) continue;
-          // p.relative handles the platform separator and a root written
-          // with a trailing one. Hand-rolled prefix stripping produced the
-          // whole absolute path on Windows, which then got written into
-          // media.local_path as a healthy pointer to nothing.
-          final relative = p.relative(entity.path, from: root);
-          seen.add(relative);
-          filesIndexed++;
+      // Everything expensive happens over there: the recursive listing, the
+      // per-file stat and the SHA-256 of whatever changed. What comes back is
+      // bounded by the CHANGES, not by the size of the tree, and every drift
+      // write below stays on this isolate where the database lives.
+      final result = await walk(
+        WatchedFolderWalkRequest(
+          rootPath: root,
+          known: {
+            for (final entry in stored.entries)
+              entry.key: KnownFile(
+                sizeBytes: entry.value.sizeBytes,
+                mtimeMillis: entry.value.mtimeMillis,
+                contentHash: entry.value.contentHash,
+              ),
+          },
+          hashBudget: hashBudget,
+        ),
+      );
 
-          final stat = await entity.stat();
-          final mtime = stat.modified.millisecondsSinceEpoch;
-          final previous = stored[relative];
-          final unchanged =
-              previous != null &&
-              previous.contentHash != null &&
-              previous.sizeBytes == stat.size &&
-              previous.mtimeMillis == mtime;
-          if (unchanged) continue;
-
-          // Changed, new, or never hashed: this is the only path that pays
-          // for a full read.
-          final digest = await sha256OfFile(entity);
-          rehashed++;
-          await watched.upsertIndexed(
-            IndexedFile(
-              rootPath: root,
-              relativePath: relative,
-              sizeBytes: digest.sizeBytes,
-              mtimeMillis: mtime,
-              contentHash: digest.hash,
-            ),
-          );
-        }
-      } on FileSystemException catch (e) {
-        // Partial coverage is fine: an unreadable subtree just contributes
-        // nothing this pass. But `seen` is now incomplete, so pruning
-        // against it would delete index rows for files that still exist.
-        listingComplete = false;
-        _log.warning('Watched scan failed under $root: $e');
+      filesIndexed += result.filesSeen;
+      rehashed += result.hashedCount;
+      if (!result.listingComplete) {
+        _log.warning('Watched scan could not fully list $root');
+      }
+      if (result.hashBudgetExhausted) {
+        budgetExhausted = true;
+        _log.info(
+          'Hash budget spent under $root; the rest is picked up next pass',
+        );
       }
 
-      if (listingComplete) {
-        await watched.deleteIndexed(root, stored.keys.toSet().difference(seen));
+      for (final file in result.changed) {
+        await watched.upsertIndexed(
+          IndexedFile(
+            rootPath: root,
+            relativePath: file.relativePath,
+            sizeBytes: file.sizeBytes,
+            mtimeMillis: file.mtimeMillis,
+            contentHash: file.contentHash,
+          ),
+        );
+      }
+
+      // Judged against the LISTING, not the hashing: the budget only ever
+      // denies a hash, so a truncated pass still saw every file and pruning
+      // stays safe. The walk already took the difference against `stored`, so
+      // only the rows that need deleting crossed back.
+      if (result.listingComplete && result.vanished.isNotEmpty) {
+        await watched.deleteIndexed(root, result.vanished);
       }
       // Stamped even after a partial listing, on purpose. The stamp drives
       // the daily cadence, and the cadence gate treats a null stamp as
@@ -143,6 +164,7 @@ class WatchedFolderScanner {
         filesIndexed: filesIndexed,
         rehashed: rehashed,
         autoRepaired: 0,
+        hashBudgetExhausted: budgetExhausted,
       );
     }
 
@@ -184,6 +206,7 @@ class WatchedFolderScanner {
         filesIndexed: filesIndexed,
         rehashed: rehashed,
         autoRepaired: 0,
+        hashBudgetExhausted: budgetExhausted,
       );
     }
 
@@ -195,6 +218,7 @@ class WatchedFolderScanner {
       filesIndexed: filesIndexed,
       rehashed: rehashed,
       autoRepaired: report.relinked,
+      hashBudgetExhausted: budgetExhausted,
     );
   }
 }

@@ -107,20 +107,57 @@ final watcherScannerProvider = Provider<WatchedFolderScanner>((ref) {
   );
 });
 
-// no-tick: this is a side effect, not a cached query -- recomputing it
-// re-runs a filesystem scan that can rewrite media.local_path. Subscribing to
-// a tick would make every media write trigger another scan, and the scan
-// itself writes media, so the tick would drive it in a loop.
-/// Opportunistic automatic pass, read once when the Media console builds.
+/// Runs the opportunistic watcher pass, at most one at a time.
 ///
-/// The app has no startup-maintenance host, so the console is the hook;
-/// the daily [shouldAutoScan] gate keeps that from meaning "every time you
-/// open the section". Fire-and-forget and failure-swallowing on purpose: a
-/// scan problem must never break the section that triggered it.
-final watcherAutoScanProvider = Provider<void>((ref) {
-  unawaited(() async {
+/// Deliberately an object with a method rather than a `Provider<void>` whose
+/// constructor fires the scan. That older shape meant the only way to trigger
+/// a pass was to `ref.watch` it from `MediaSectionPage.build()`, which welded
+/// a recursive filesystem walk to a widget's build phase (#1182) -- a section
+/// opening is a strange place to start unbounded filesystem work, and the
+/// once-per-provider-construction firing was an accident of Riverpod caching
+/// rather than a decision anyone made.
+///
+/// [kick] carries the re-entrancy guard that the old shape got for free: an
+/// explicit call can arrive again on the next mount (a tab switch, a route
+/// pop), and the daily cadence gate alone would not stop a long pass from
+/// overlapping itself.
+class WatcherAutoScan {
+  WatcherAutoScan(this._ref);
+
+  final Ref _ref;
+  Future<void>? _inFlight;
+
+  static const _log = LoggerService('WatcherAutoScan');
+
+  /// Fire-and-forget entry point for UI callers.
+  ///
+  /// Failure-swallowing on purpose: a scan problem must never break the
+  /// section that triggered it.
+  void kick() => unawaited(run());
+
+  /// The awaitable form, for tests and for anything that wants to know when
+  /// the pass finished. Returns the running pass when one is already going.
+  Future<void> run() {
+    final running = _inFlight;
+    if (running != null) return running;
+    // `_run()` is `async`, so it suspends at its first `await` and returns
+    // before the assignment below -- the field is always populated before
+    // any second caller can observe it.
+    final started = _run().whenComplete(() => _inFlight = null);
+    _inFlight = started;
+    return started;
+  }
+
+  Future<void> _run() async {
+    // Yield before touching a provider. Callers reach this from a widget
+    // lifecycle, and an `async` body runs synchronously up to its first
+    // await -- so a provider initialized here would be initialized during
+    // the build phase, which Riverpod turns into "setState() or
+    // markNeedsBuild() called during build". Same defense as
+    // `MediaItemView._resolveInner`.
+    await null;
     try {
-      final watched = ref.read(watchedFolderRepositoryProvider);
+      final watched = _ref.read(watchedFolderRepositoryProvider);
       final roots = await watched.getRoots();
       if (roots.isEmpty) return;
       // The oldest root's stamp drives the cadence: if any root is due, the
@@ -136,17 +173,28 @@ final watcherAutoScanProvider = Provider<void>((ref) {
       }
       if (!shouldAutoScan(lastScanAt: oldest, now: DateTime.now())) return;
 
-      final report = await ref
+      final report = await _ref
           .read(watcherScannerProvider)
           .scan(now: DateTime.now());
-      LoggerService.forClass(WatchedFolderScanner).info(
+      _log.info(
         'Watcher scan: ${report.filesIndexed} indexed, '
-        '${report.rehashed} hashed, ${report.autoRepaired} auto-repaired',
+        '${report.rehashed} hashed, ${report.autoRepaired} auto-repaired'
+        '${report.hashBudgetExhausted ? ' (hash budget spent)' : ''}',
       );
     } catch (e) {
-      LoggerService.forClass(
-        WatchedFolderScanner,
-      ).warning('Watcher scan failed', error: e);
+      _log.warning('Watcher scan failed', error: e);
     }
-  }());
-});
+  }
+}
+
+// no-tick: this is a side effect, not a cached query -- running it re-runs a
+// filesystem scan that can rewrite media.local_path. Subscribing to a tick
+// would make every media write trigger another scan, and the scan itself
+// writes media, so the tick would drive it in a loop.
+/// Host for the opportunistic automatic pass.
+///
+/// The app has no startup-maintenance host, so the Media console is the hook;
+/// the daily [shouldAutoScan] gate keeps that from meaning "every time you
+/// open the section". Constructing this provider does nothing -- the caller
+/// has to ask, via [WatcherAutoScan.kick].
+final watcherAutoScanProvider = Provider<WatcherAutoScan>(WatcherAutoScan.new);
