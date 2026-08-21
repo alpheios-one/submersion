@@ -4609,6 +4609,39 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF : $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF : $low/$high · vos réglages';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · analysé avec GF $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Facteurs de gradient : bas $low, haut $high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'Cet ordinateur de plongée n\'a pas enregistré ses facteurs de gradient ; cette plongée est donc analysée avec ceux de vos réglages.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'Cette plongée a été calculée avec $algorithm, qui n\'utilise pas de facteurs de gradient. Submersion l\'analyse avec ceux de vos réglages.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'Paliers de decompression';
 
   @override

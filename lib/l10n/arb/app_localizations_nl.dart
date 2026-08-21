@@ -4556,6 +4556,39 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF: $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF: $low/$high · jouw instellingen';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · geanalyseerd met GF $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Gradiëntfactoren: laag $low, hoog $high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'Deze duikcomputer heeft zijn gradiëntfactoren niet vastgelegd, dus deze duik wordt geanalyseerd met die uit jouw instellingen.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'Deze duik is berekend met $algorithm, dat geen gradiëntfactoren gebruikt. Submersion analyseert hem met die uit jouw instellingen.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'Decostops';
 
   @override

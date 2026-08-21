@@ -4576,6 +4576,39 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF: $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF: $low/$high · a te beállításaid';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · GF $low/$high értékkel elemezve';
+  }
+
+  @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Gradiensfaktorok: alacsony $low, magas $high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'Ez a búvárkomputer nem rögzítette a gradiensfaktorait, ezért ezt a merülést a beállításaidban szereplő értékekkel elemezzük.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'Ezt a merülést $algorithm algoritmussal számolták, amely nem használ gradiensfaktorokat. A Submersion a beállításaidban szereplő értékekkel elemzi.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'Deko megallok';
 
   @override

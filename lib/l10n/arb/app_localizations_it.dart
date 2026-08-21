@@ -4592,6 +4592,39 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF: $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF: $low/$high · le tue impostazioni';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · analizzata con GF $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Fattori di gradiente: basso $low, alto $high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'Questo computer subacqueo non ha registrato i suoi fattori di gradiente, quindi questa immersione viene analizzata con quelli delle tue impostazioni.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'Questa immersione è stata calcolata con $algorithm, che non usa i fattori di gradiente. Submersion la analizza con quelli delle tue impostazioni.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'Soste deco';
 
   @override

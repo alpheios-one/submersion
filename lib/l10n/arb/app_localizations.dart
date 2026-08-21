@@ -7664,6 +7664,46 @@ abstract class AppLocalizations {
   /// **'TTS'**
   String get diveLog_deco_label_tts;
 
+  /// No description provided for @diveLog_deco_gf_chip.
+  ///
+  /// In en, this message translates to:
+  /// **'GF: {low}/{high}'**
+  String diveLog_deco_gf_chip(Object low, Object high);
+
+  /// No description provided for @diveLog_deco_gf_chipFromSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'GF: {low}/{high} · your settings'**
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high);
+
+  /// No description provided for @diveLog_deco_gf_chipRecordedAlgorithm.
+  ///
+  /// In en, this message translates to:
+  /// **'{algorithm} · analyzed at GF {low}/{high}'**
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  );
+
+  /// No description provided for @diveLog_deco_gf_semantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Gradient factors: low {low}, high {high}'**
+  String diveLog_deco_gf_semantics(Object low, Object high);
+
+  /// No description provided for @diveLog_deco_gf_tooltipFromSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'This dive computer did not record its gradient factors, so this dive is analyzed with the ones from your settings.'**
+  String get diveLog_deco_gf_tooltipFromSettings;
+
+  /// No description provided for @diveLog_deco_gf_tooltipRecordedAlgorithm.
+  ///
+  /// In en, this message translates to:
+  /// **'This dive was computed on {algorithm}, which does not use gradient factors. Submersion analyzes it with the ones from your settings.'**
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm);
+
   /// No description provided for @diveLog_deco_sectionDecoStops.
   ///
   /// In en, this message translates to:

@@ -4357,6 +4357,39 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF：$low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF：$low/$high · 来自你的设置';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · 以 GF $low/$high 分析';
+  }
+
+  @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return '梯度因子：低 $low，高 $high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      '这台潜水电脑没有记录它的梯度因子，因此本次潜水使用你设置中的梯度因子进行分析。';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return '本次潜水由 $algorithm 计算，该算法不使用梯度因子。Submersion 使用你设置中的梯度因子进行分析。';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => '减压停留';
 
   @override
