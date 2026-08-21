@@ -13425,6 +13425,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get buoyancy_linkSuitHint => '为本次潜水关联一件暴露服以获得更完整的分析';
 
   @override
+  String get buoyancy_noLeadHint => '未记录配重：请为本次潜水添加配重，或为配重装备填写干重';
+
+  @override
   String get buoyancy_chartNet => '净值';
 
   @override

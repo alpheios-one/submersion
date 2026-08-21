@@ -13853,6 +13853,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Link an exposure suit to this dive for a fuller picture';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'No lead recorded: add weights to this dive, or a dry weight to your weights gear';
+
+  @override
   String get buoyancy_chartNet => 'Net';
 
   @override

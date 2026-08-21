@@ -14082,6 +14082,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Associe uma roupa de exposição a este mergulho para um quadro mais completo';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'Nenhum lastro registado: adicione lastro a este mergulho ou um peso seco ao seu equipamento de lastro';
+
+  @override
   String get buoyancy_chartNet => 'Líquido';
 
   @override

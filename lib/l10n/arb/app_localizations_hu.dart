@@ -14038,6 +14038,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Kapcsolj egy búvárruhát ehhez a merüléshez a teljesebb képért';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'Nincs rögzített ólom: adj ólmot ehhez a merüléshez, vagy száraz tömeget az ólomfelszerelésedhez';
+
+  @override
   String get buoyancy_chartNet => 'Nettó';
 
   @override

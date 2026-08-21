@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/data/repositories/connected_accounts_repository.dart';
 import 'package:submersion/core/database/database.dart';
@@ -18,6 +19,7 @@ import 'package:submersion/features/statistics/data/repositories/statistics_repo
 import 'package:submersion/features/trips/data/repositories/itinerary_day_repository.dart';
 import 'package:submersion/features/trips/data/repositories/liveaboard_details_repository.dart';
 import 'package:submersion/features/universal_import/data/repositories/csv_preset_repository.dart';
+import 'package:submersion/features/weight_planner/data/repositories/weight_history_repository.dart';
 
 import '../helpers/test_database.dart';
 
@@ -187,6 +189,8 @@ void main() {
           AppSettingsRepository().watchSettingsChanges,
       'ManifestSubscriptionRepository.watchSubscriptionsChanges':
           ManifestSubscriptionRepository().watchSubscriptionsChanges,
+      'WeightHistoryRepository.watchGearLeadChanges':
+          WeightHistoryRepository().watchGearLeadChanges,
       'CsvPresetRepository.watchPresetsChanges':
           CsvPresetRepository().watchPresetsChanges,
     };
@@ -313,6 +317,36 @@ void main() {
         isTrue,
       );
     });
+
+    test(
+      'watchGearLeadChanges fires on an equipment_attributes write',
+      () async {
+        await seedParents();
+        // Not the headline table: since #1103 a weight observation's carriedKg
+        // also comes from weights-type gear, whose mass lives in
+        // equipment_attributes. saveAttributes writes that table ALONE, so a
+        // tick watching only `equipment` would be inert for an attribute-only
+        // write and leave the calibration refitting against stale ballast.
+        expect(
+          await fires(
+            WeightHistoryRepository().watchGearLeadChanges(),
+            () => db
+                .into(db.equipmentAttributes)
+                .insert(
+                  EquipmentAttributesCompanion.insert(
+                    id: 'attr_e1_dry_weight_kg',
+                    equipmentId: 'e1',
+                    attrKey: 'dry_weight_kg',
+                    valueNum: const Value(3.63),
+                    createdAt: now,
+                    updatedAt: now,
+                  ),
+                ),
+          ),
+          isTrue,
+        );
+      },
+    );
 
     test('watchSchedulesChanges fires on a diver_settings write', () async {
       await seedParents();

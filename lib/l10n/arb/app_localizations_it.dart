@@ -14083,6 +14083,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Associa una muta a questa immersione per un quadro più completo';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'Nessuna zavorra registrata: aggiungi zavorra a questa immersione o un peso a secco alla tua attrezzatura di zavorra';
+
+  @override
   String get buoyancy_chartNet => 'Netto';
 
   @override

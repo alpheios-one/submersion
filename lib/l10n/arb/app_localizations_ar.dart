@@ -13835,6 +13835,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'اربط بدلة تعرّض بهذه الغطسة للحصول على صورة أوفى';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'لم يتم تسجيل أي أثقال: أضف أثقالًا إلى هذه الغطسة أو وزنًا جافًا إلى معدات الأثقال';
+
+  @override
   String get buoyancy_chartNet => 'الصافي';
 
   @override

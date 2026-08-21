@@ -13741,6 +13741,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'קשר חליפת חשיפה לצלילה זו לתמונה מלאה יותר';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'לא נרשמו משקולות: הוסף משקולות לצלילה זו או משקל יבש לציוד המשקולות שלך';
+
+  @override
   String get buoyancy_chartNet => 'נטו';
 
   @override

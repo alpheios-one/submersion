@@ -14076,6 +14076,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Asocia un traje a esta inmersión para un panorama más completo';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'No se registró lastre: añade lastre a esta inmersión o un peso en seco a tu equipo de lastre';
+
+  @override
   String get buoyancy_chartNet => 'Neto';
 
   @override

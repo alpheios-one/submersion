@@ -14066,6 +14066,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Verknüpfe einen Tauchanzug mit diesem Tauchgang für ein vollständigeres Bild';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'Kein Blei erfasst: Füge diesem Tauchgang Blei hinzu oder trage bei deiner Bleiausrüstung ein Trockengewicht ein';
+
+  @override
   String get buoyancy_chartNet => 'Netto';
 
   @override

@@ -6034,6 +6034,7 @@
   "buoyancy_drysuitGas": "Hozzáadott szárazruha-gáz",
   "buoyancy_estimatedPressures": "A palacknyomások becsültek",
   "buoyancy_linkSuitHint": "Kapcsolj egy búvárruhát ehhez a merüléshez a teljesebb képért",
+  "buoyancy_noLeadHint": "Nincs rögzített ólom: adj ólmot ehhez a merüléshez, vagy száraz tömeget az ólomfelszerelésedhez",
   "buoyancy_chartNet": "Nettó",
   "buoyancy_chartRig": "Felszerelés + ólom",
   "buoyancy_chartMinutes": "Idő (perc)",
