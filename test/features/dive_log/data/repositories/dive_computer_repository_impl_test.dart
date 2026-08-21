@@ -1024,6 +1024,49 @@ void main() {
       expect(dataSources.first.cns, equals(42.0));
     });
 
+    test('new dive derives cnsEnd from profile samples', () async {
+      final computerId = await insertComputer();
+
+      final entryTime = DateTime(2026, 3, 15, 10, 0);
+      final diveId = await repository.importProfile(
+        computerId: computerId,
+        profileStartTime: entryTime,
+        points: [
+          const ProfilePointData(timestamp: 0, depth: 0.0, cns: 10.0),
+          const ProfilePointData(timestamp: 60, depth: 15.0, cns: 25.0),
+          const ProfilePointData(timestamp: 120, depth: 25.0, cns: 42.0),
+        ],
+        durationSeconds: 30 * 60,
+        maxDepth: 25.0,
+      );
+
+      final dive = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).getSingle();
+      expect(dive.cnsEnd, equals(42.0));
+    });
+
+    test('new dive cnsEnd is null when no samples report CNS', () async {
+      final computerId = await insertComputer();
+
+      final entryTime = DateTime(2026, 3, 15, 10, 0);
+      final diveId = await repository.importProfile(
+        computerId: computerId,
+        profileStartTime: entryTime,
+        points: [
+          const ProfilePointData(timestamp: 0, depth: 0.0),
+          const ProfilePointData(timestamp: 60, depth: 15.0),
+        ],
+        durationSeconds: 30 * 60,
+        maxDepth: 15.0,
+      );
+
+      final dive = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).getSingle();
+      expect(dive.cnsEnd, isNull);
+    });
+
     test(
       'data source waterTemp is null when no samples have temperature',
       () async {

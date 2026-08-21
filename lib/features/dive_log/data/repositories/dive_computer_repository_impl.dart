@@ -1115,6 +1115,14 @@ class DiveComputerRepository {
       final diveId = matchedDiveId ?? _uuid.v4();
       final isNewDive = matchedDiveId == null;
 
+      // Max CNS across the profile samples. Both the new dive row and the
+      // provenance row below are filled from it, so ReparseService (which
+      // derives the same value from stored raw_data) stays in agreement.
+      final sampleCns = points.map((p) => p.cns).whereType<double>().toList();
+      final maxCns = sampleCns.isNotEmpty
+          ? sampleCns.reduce((a, b) => a > b ? a : b)
+          : null;
+
       if (isNewDive) {
         // Create a new dive for this profile
         _log.info('No matching dive found, creating new dive');
@@ -1152,6 +1160,7 @@ class DiveComputerRepository {
                 runtime: Value(durationSeconds),
                 maxDepth: Value(maxDepth),
                 avgDepth: Value(effectiveAvgDepth),
+                cnsEnd: Value(maxCns),
                 // Populated so DiveConsolidationService (Task 5) can attribute
                 // consolidated children and enforce its same-computer guard;
                 // without this the dives row's own computerId stayed null
@@ -1213,18 +1222,14 @@ class DiveComputerRepository {
         );
 
         // Create a data source record for provenance tracking.
-        // Derive water temp and CNS from profile samples when not provided
-        // as top-level values (e.g. Shearwater).
+        // Derive water temp from profile samples when not provided as a
+        // top-level value (e.g. Shearwater); maxCns is derived above.
         final sampleTemps = points
             .map((p) => p.temperature)
             .whereType<double>()
             .toList();
         final minWaterTemp = sampleTemps.isNotEmpty
             ? sampleTemps.reduce((a, b) => a < b ? a : b)
-            : null;
-        final sampleCns = points.map((p) => p.cns).whereType<double>().toList();
-        final maxCns = sampleCns.isNotEmpty
-            ? sampleCns.reduce((a, b) => a > b ? a : b)
             : null;
 
         final nowDt = DateTime.fromMillisecondsSinceEpoch(now);

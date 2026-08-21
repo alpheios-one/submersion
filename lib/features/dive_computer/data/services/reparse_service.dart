@@ -394,6 +394,10 @@ class ReparseService {
         ),
         duration: Value(parsed.durationSeconds),
         waterTemp: Value(parsed.minTemperatureCelsius),
+        // Derived from the samples, matching how the download path fills this
+        // column. Written unconditionally so a parser change that drops CNS
+        // clears the old value instead of leaving a stale one behind.
+        cns: Value(_extractMaxCns(parsed.samples)),
         decoAlgorithm: Value(parsed.decoAlgorithm),
         gradientFactorLow: Value(parsed.gfLow),
         gradientFactorHigh: Value(parsed.gfHigh),
