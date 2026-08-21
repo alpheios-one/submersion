@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_field.dart';
 import 'package:submersion/core/constants/dive_search.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/constants/map_tile_config.dart';
@@ -24,6 +25,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/add_dive_botto
 import 'package:submersion/features/dive_log/presentation/widgets/dive_filter_sheet.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_list_content.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_map_content.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_mode_badge.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_numbering_dialog.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_panel.dart';
@@ -35,6 +37,7 @@ import 'package:submersion/features/tags/domain/entities/tag.dart';
 import 'package:submersion/features/tags/presentation/widgets/tag_input_widget.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/selection_leading.dart';
+import 'package:submersion/shared/utils/ink_centered_text_style.dart';
 import 'package:submersion/shared/widgets/debounced_search_results.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
 import 'package:submersion/shared/widgets/master_detail/master_detail_scaffold.dart';
@@ -850,6 +853,7 @@ class DiveListTile extends ConsumerWidget {
           final chartWidth = availableWidth < 400
               ? (availableWidth * 0.25).clamp(60.0, 120.0)
               : (availableWidth * 0.20).clamp(80.0, 120.0);
+          final titleStyle = Theme.of(context).textTheme.titleMedium;
 
           return Padding(
             padding: const EdgeInsets.all(12),
@@ -903,12 +907,24 @@ class DiveListTile extends ConsumerWidget {
                               Expanded(
                                 child: Text(
                                   buildTitleText(),
-                                  style: Theme.of(context).textTheme.titleMedium
+                                  // Same ink-centering fix as DiveModeBadge
+                                  // and the header's rating number, but
+                                  // without shrinking the space this line
+                                  // occupies: strutStyle pins the reserved
+                                  // line height to titleMedium's own natural
+                                  // value (so the date line below doesn't
+                                  // shift up) while textHeightBehavior only
+                                  // repositions the ink within that space.
+                                  style: titleStyle
                                       ?.copyWith(
                                         fontWeight: FontWeight.w600,
                                         color: primaryTextColor,
-                                      ),
+                                      )
+                                      .inkCentered,
                                   overflow: TextOverflow.ellipsis,
+                                  textHeightBehavior:
+                                      inkCenteredTextHeightBehavior,
+                                  strutStyle: titleStyle?.preservingStrut,
                                 ),
                               ),
                               if (isFavorite) ...[
@@ -957,6 +973,11 @@ class DiveListTile extends ConsumerWidget {
                                       ),
                                 ),
                               ],
+                              const SizedBox(width: 8),
+                              DiveModeBadge(
+                                mode: summary?.diveMode ?? DiveMode.oc,
+                                dense: true,
+                              ),
                             ],
                           ),
                           // Site location (country/region)

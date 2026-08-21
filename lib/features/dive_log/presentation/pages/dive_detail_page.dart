@@ -36,6 +36,8 @@ import 'package:submersion/features/dive_log/presentation/formatters/dive_mode_l
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_detail_ui_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_mode_badge.dart';
+import 'package:submersion/shared/utils/ink_centered_text_style.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_nav_buttons.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_analysis_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
@@ -1223,9 +1225,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   ],
                 ),
               ),
-              if (dive.rating != null)
-                Row(
-                  children: [
+              Row(
+                children: [
+                  if (dive.rating != null) ...[
                     ExcludeSemantics(
                       child: Icon(
                         Icons.star,
@@ -1236,10 +1238,20 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                     const SizedBox(width: 4),
                     Text(
                       '${dive.rating}',
-                      style: Theme.of(context).textTheme.titleMedium,
+                      // Same ink-centering fix as DiveModeBadge: without it
+                      // this number's default line leading isn't split
+                      // evenly around its own glyph, so it doesn't sit on
+                      // the same visual line as the star icon next to it.
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleMedium?.inkCentered,
+                      textHeightBehavior: inkCenteredTextHeightBehavior,
                     ),
+                    const SizedBox(width: 8),
                   ],
-                ),
+                  DiveModeBadge(mode: dive.diveMode),
+                ],
+              ),
             ],
           ),
           const SizedBox(height: 16),

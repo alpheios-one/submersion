@@ -1803,7 +1803,7 @@ class DiveRepository {
             'd.id, d.dive_number, d.name AS dive_name, '
             'd.dive_date_time, d.entry_time, '
             'd.max_depth, d.bottom_time, d.runtime, d.water_temp, d.rating, '
-            'd.is_favorite, d.dive_type, '
+            'd.is_favorite, d.dive_type, d.dive_mode, '
             'COALESCE(d.entry_time, d.dive_date_time) AS sort_timestamp, '
             's.name AS site_name, s.country AS site_country, '
             's.region AS site_region, s.latitude AS site_latitude, '
@@ -2393,7 +2393,7 @@ class DiveRepository {
           'd.id, d.dive_number, d.name AS dive_name, '
           'd.dive_date_time, d.entry_time, '
           'd.max_depth, d.bottom_time, d.runtime, d.water_temp, d.rating, '
-          'd.is_favorite, d.dive_type, '
+          'd.is_favorite, d.dive_type, d.dive_mode, '
           'COALESCE(d.entry_time, d.dive_date_time) AS sort_timestamp, '
           's.name AS site_name, s.country AS site_country, '
           's.region AS site_region, s.latitude AS site_latitude, '
@@ -2456,6 +2456,7 @@ class DiveRepository {
         waterTemp: row.readNullable<double>('water_temp'),
         rating: row.readNullable<int>('rating'),
         isFavorite: row.read<int>('is_favorite') == 1,
+        diveMode: DiveMode.fromCode(row.read<String>('dive_mode')),
         diveTypeIds: diveTypesByDive[id] ?? [row.read<String>('dive_type')],
         tags: tagsByDive[id] ?? [],
         siteName: row.readNullable<String>('site_name'),
