@@ -29662,6 +29662,48 @@ abstract class AppLocalizations {
   /// **'Create tag'**
   String get tags_action_createTag;
 
+  /// No description provided for @tags_action_browse.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse'**
+  String get tags_action_browse;
+
+  /// No description provided for @tags_picker_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Tags'**
+  String get tags_picker_title;
+
+  /// No description provided for @tags_picker_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags yet. Type a tag name to create your first one.'**
+  String get tags_picker_empty;
+
+  /// Shown in the tag picker sheet when the tag list fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading tags: {error}'**
+  String tags_picker_errorLoading(String error);
+
+  /// No description provided for @tags_picker_allAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'All tags are already added.'**
+  String get tags_picker_allAdded;
+
+  /// No description provided for @tags_picker_noMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags match your search.'**
+  String get tags_picker_noMatches;
+
+  /// Confirm button on the tag picker sheet; count is how many tags are ticked
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Add tags} =1{Add 1 tag} other{Add {count} tags}}'**
+  String tags_picker_addCount(int count);
+
   /// No description provided for @tags_action_deleteTag.
   ///
   /// In en, this message translates to:

@@ -17679,6 +17679,39 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tags_action_createTag => 'Címke létrehozása';
 
   @override
+  String get tags_action_browse => 'Tallózás';
+
+  @override
+  String get tags_picker_title => 'Címkék kiválasztása';
+
+  @override
+  String get tags_picker_empty =>
+      'Még nincsenek címkék. Írj be egy címkenevet az első létrehozásához.';
+
+  @override
+  String tags_picker_errorLoading(String error) {
+    return 'Hiba a címkék betöltésekor: $error';
+  }
+
+  @override
+  String get tags_picker_allAdded => 'Minden címke már hozzá van adva.';
+
+  @override
+  String get tags_picker_noMatches => 'Nincs a keresésnek megfelelő címke.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count címke hozzáadása',
+      one: '1 címke hozzáadása',
+      zero: 'Címkék hozzáadása',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_action_deleteTag => 'Címke törlése';
 
   @override

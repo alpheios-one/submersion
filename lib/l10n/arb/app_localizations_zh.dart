@@ -16824,6 +16824,37 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tags_action_createTag => '创建标签';
 
   @override
+  String get tags_action_browse => '浏览';
+
+  @override
+  String get tags_picker_title => '选择标签';
+
+  @override
+  String get tags_picker_empty => '还没有标签。输入标签名称即可创建第一个。';
+
+  @override
+  String tags_picker_errorLoading(String error) {
+    return '加载标签时出错：$error';
+  }
+
+  @override
+  String get tags_picker_allAdded => '所有标签均已添加。';
+
+  @override
+  String get tags_picker_noMatches => '没有标签与您的搜索匹配。';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '添加 $count 个标签',
+      zero: '添加标签',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_action_deleteTag => '删除标签';
 
   @override

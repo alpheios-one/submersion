@@ -17586,6 +17586,40 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tags_action_createTag => 'Tag aanmaken';
 
   @override
+  String get tags_action_browse => 'Bladeren';
+
+  @override
+  String get tags_picker_title => 'Tags kiezen';
+
+  @override
+  String get tags_picker_empty =>
+      'Nog geen tags. Typ een tagnaam om je eerste aan te maken.';
+
+  @override
+  String tags_picker_errorLoading(String error) {
+    return 'Fout bij het laden van tags: $error';
+  }
+
+  @override
+  String get tags_picker_allAdded => 'Alle tags zijn al toegevoegd.';
+
+  @override
+  String get tags_picker_noMatches =>
+      'Geen tags komen overeen met je zoekopdracht.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tags toevoegen',
+      one: '1 tag toevoegen',
+      zero: 'Tags toevoegen',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_action_deleteTag => 'Tag verwijderen';
 
   @override
