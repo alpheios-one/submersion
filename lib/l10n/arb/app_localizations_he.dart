@@ -29947,6 +29947,34 @@ class AppLocalizationsHe extends AppLocalizations {
       'מפרסם את הספרייה';
 
   @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'מאמץ את הספרייה ששוחזרה';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'מחליף את ספריית הענן';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'מחיל את הספרייה';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp => 'מגבה את המכשיר הזה';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'מנקה את מצב הסנכרון המקומי';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'מתקן את הסנכרון';
+
+  @override
   String get settings_syncMaintenance_phase_working => 'מעבד...';
 
   @override

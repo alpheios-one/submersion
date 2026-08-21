@@ -30497,6 +30497,35 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bibliothek wird veröffentlicht';
 
   @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'Wiederhergestellte Bibliothek wird übernommen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'Cloud-Bibliothek wird ersetzt';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'Bibliothek wird angewendet';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'Dieses Gerät wird gesichert';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'Lokaler Sync-Status wird gelöscht';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'Synchronisierung wird repariert';
+
+  @override
   String get settings_syncMaintenance_phase_working => 'Wird ausgeführt...';
 
   @override

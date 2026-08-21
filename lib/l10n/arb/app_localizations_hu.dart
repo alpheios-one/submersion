@@ -30449,6 +30449,35 @@ class AppLocalizationsHu extends AppLocalizations {
       'Könyvtár közzététele';
 
   @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'A visszaállított könyvtár átvétele';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'A felhőkönyvtár cseréje';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'Könyvtár alkalmazása';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'Az eszköz biztonsági mentése';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'Helyi szinkronizálási állapot törlése';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'A szinkronizálás javítása';
+
+  @override
   String get settings_syncMaintenance_phase_working => 'Feldolgozás...';
 
   @override

@@ -30639,6 +30639,35 @@ class AppLocalizationsFr extends AppLocalizations {
       'Publication de la bibliothèque';
 
   @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'Adoption de la bibliothèque restaurée';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'Remplacement de la bibliothèque cloud';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'Application de la bibliothèque';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'Sauvegarde de cet appareil';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'Suppression de l\'état de synchronisation local';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'Réparation de la synchronisation';
+
+  @override
   String get settings_syncMaintenance_phase_working => 'Traitement en cours...';
 
   @override

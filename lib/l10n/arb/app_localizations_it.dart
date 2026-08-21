@@ -30566,6 +30566,35 @@ class AppLocalizationsIt extends AppLocalizations {
       'Pubblicazione della libreria';
 
   @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'Adozione della libreria ripristinata';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'Sostituzione della libreria cloud';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'Applicazione della libreria';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'Backup di questo dispositivo';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'Eliminazione dello stato di sincronizzazione locale';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'Riparazione della sincronizzazione';
+
+  @override
   String get settings_syncMaintenance_phase_working => 'Operazione in corso...';
 
   @override
