@@ -393,7 +393,7 @@ class ReparseService {
           parsed.avgDepthMeters != 0.0 ? parsed.avgDepthMeters : null,
         ),
         duration: Value(parsed.durationSeconds),
-        waterTemp: Value(parsed.minTemperatureCelsius),
+        waterTemp: Value(_minWaterTemp(parsed)),
         decoAlgorithm: Value(parsed.decoAlgorithm),
         gradientFactorLow: Value(parsed.gfLow),
         gradientFactorHigh: Value(parsed.gfHigh),
@@ -433,6 +433,7 @@ class ReparseService {
     final diveDateTimeMs = diveDateTime.millisecondsSinceEpoch;
     final exitTimeMs = diveDateTimeMs + (parsed.durationSeconds * 1000);
     final bottomTimeSeconds = _calculateBottomTimeFromSamples(parsed.samples);
+    final waterTemp = _minWaterTemp(parsed);
 
     await (db.update(db.dives)..where((t) => t.id.equals(diveId))).write(
       DivesCompanion(
@@ -445,7 +446,11 @@ class ReparseService {
         entryTime: Value(diveDateTimeMs),
         exitTime: Value(exitTimeMs),
         bottomTime: Value(bottomTimeSeconds ?? parsed.durationSeconds),
-        waterTemp: Value(parsed.minTemperatureCelsius),
+        // Only overwrite the dive's water temp when this parse produced one,
+        // for the same reason as the GPS fields below: Value.absent() keeps a
+        // temperature stamped by hand or by another source, while the
+        // dive_data_sources row above still records the computer's own answer.
+        waterTemp: waterTemp != null ? Value(waterTemp) : const Value.absent(),
         diveMode: Value(mapLibdcDiveModeCode(parsed.diveMode)),
         cnsEnd: Value(_extractMaxCns(parsed.samples)),
         otu: const Value.absent(), // OTU is not directly in ParsedDive
@@ -793,6 +798,27 @@ class ReparseService {
     return BottomTimeCalculator.secondsFromSamples([
       for (final s in samples) (timestamp: s.timeSeconds, depth: s.depthMeters),
     ]);
+  }
+
+  /// Minimum water temperature for this parse, in Celsius.
+  ///
+  /// Some computers (Shearwater among them) report no top-level minimum and
+  /// carry temperature only in the per-sample stream, so the download path
+  /// derives the minimum from the samples when the header value is missing
+  /// (`parsed_dive_mapper.dart`, and the profile import in
+  /// `dive_computer_repository_impl.dart`). Re-parse mirrors that path; taking
+  /// `minTemperatureCelsius` at face value here blanked the water temp of any
+  /// already-downloaded dive from such a computer.
+  static double? _minWaterTemp(pigeon.ParsedDive parsed) {
+    final headerTemp = parsed.minTemperatureCelsius;
+    if (headerTemp != null) return headerTemp;
+    double? minTemp;
+    for (final s in parsed.samples) {
+      final t = s.temperatureCelsius;
+      if (t == null) continue;
+      if (minTemp == null || t < minTemp) minTemp = t;
+    }
+    return minTemp;
   }
 
   /// Extract maximum CNS percentage from profile samples.

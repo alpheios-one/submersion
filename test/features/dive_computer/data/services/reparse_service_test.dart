@@ -619,6 +619,132 @@ void main() {
       expect(src.lastParsedAt, isNotNull);
     });
 
+    test('derives water temp from profile samples when the computer reports no '
+        'top-level minimum', () async {
+      // Shearwater and friends leave ParsedDive.minTemperatureCelsius null
+      // and carry temperature only in the per-sample stream. The download
+      // path derives the minimum from those samples; re-parse must too, or
+      // re-parsing an already-downloaded dive blanks its water temp and the
+      // Data Sources row renders "-".
+      await insertDive('dive-1', waterTemp: 18.0);
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+        waterTemp: 18.0,
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: makeParsedDive(
+          minTemperatureCelsius: null,
+          samples: [
+            pigeon.ProfileSample(
+              timeSeconds: 0,
+              depthMeters: 0.0,
+              temperatureCelsius: 21.0,
+            ),
+            pigeon.ProfileSample(
+              timeSeconds: 60,
+              depthMeters: 20.0,
+              temperatureCelsius: 14.5,
+            ),
+            pigeon.ProfileSample(
+              timeSeconds: 120,
+              depthMeters: 10.0,
+              temperatureCelsius: 16.0,
+            ),
+          ],
+        ),
+        descriptorVendor: 'Shearwater',
+        descriptorProduct: 'Perdix',
+        descriptorModel: 42,
+        libdivecomputerVersion: '0.9.0',
+      );
+
+      final src = await getSource('src-1');
+      expect(src.waterTemp, 14.5);
+      final dive = await getDive('dive-1');
+      expect(dive.waterTemp, 14.5);
+    });
+
+    test('a top-level minimum still wins over the sample stream', () async {
+      await insertDive('dive-1');
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: makeParsedDive(
+          minTemperatureCelsius: 12.0,
+          samples: [
+            pigeon.ProfileSample(
+              timeSeconds: 0,
+              depthMeters: 0.0,
+              temperatureCelsius: 21.0,
+            ),
+          ],
+        ),
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      final src = await getSource('src-1');
+      expect(src.waterTemp, 12.0);
+      final dive = await getDive('dive-1');
+      expect(dive.waterTemp, 12.0);
+    });
+
+    test(
+      'a re-parse with no temperature anywhere preserves the dive water temp '
+      'a diver entered by hand',
+      () async {
+        // Mirrors the entry/exit GPS treatment on the Dives row: the source
+        // row records exactly what the computer provided (null), but the dive
+        // keeps the value stamped from another source.
+        await insertDive('dive-1', waterTemp: 24.0);
+        await insertComputer('comp-1');
+        await insertSource(
+          id: 'src-1',
+          diveId: 'dive-1',
+          computerId: 'comp-1',
+          isPrimary: true,
+        );
+
+        await service.applyParsedUpdate(
+          diveId: 'dive-1',
+          sourceRowId: 'src-1',
+          parsed: makeParsedDive(
+            minTemperatureCelsius: null,
+            samples: [
+              pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0),
+              pigeon.ProfileSample(timeSeconds: 60, depthMeters: 20.0),
+            ],
+          ),
+          descriptorVendor: null,
+          descriptorProduct: null,
+          descriptorModel: null,
+          libdivecomputerVersion: null,
+        );
+
+        final dive = await getDive('dive-1');
+        expect(dive.waterTemp, 24.0);
+        final src = await getSource('src-1');
+        expect(src.waterTemp, isNull);
+      },
+    );
+
     test(
       'is idempotent: same data applied twice yields identical DB state',
       () async {
