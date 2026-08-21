@@ -11917,7 +11917,128 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      'Mélange par pressions partielles pour le mélange cible, avec comportement de gaz réel (Van der Waals). Ajoutez chaque gaz de remplissage dans l\'ordre, jusqu\'à la pression indiquée. Les gaz et leur ordre sont configurables ; analysez toujours le mélange final avant de plonger.';
+      'Mélange par pressions partielles pour le mélange cible. Ajoutez chaque gaz de remplissage dans l\'ordre, jusqu\'à la pression indiquée, puis laissez le bloc se stabiliser. Les gaz de remplissage et leur ordre sont configurables : en réglant le dernier gaz sur 32/0, le complément se fait à l\'EAN32 au lieu de l\'air. Analysez toujours le mélange final avant de le plonger.';
+
+  @override
+  String get gasCalculators_blender_conditions => 'Conditions de mélange';
+
+  @override
+  String get gasCalculators_blender_fillTemp => 'Température de remplissage';
+
+  @override
+  String get gasCalculators_blender_fillTempHelp =>
+      'La température du bloc pendant le remplissage. Chaque pression de la procédure est la valeur au manomètre à cette température.';
+
+  @override
+  String get gasCalculators_blender_settledTemp => 'Température stabilisée';
+
+  @override
+  String get gasCalculators_blender_settledTempHelp =>
+      'La température que le bloc atteint au repos. La pression cible est ce qu\'il indique une fois stabilisé.';
+
+  @override
+  String get gasCalculators_blender_gasModel => 'Modèle de gaz';
+
+  @override
+  String get gasCalculators_blender_modelIdeal => 'Gaz parfait';
+
+  @override
+  String get gasCalculators_blender_modelVanDerWaals => 'Van der Waals';
+
+  @override
+  String get gasCalculators_blender_modelZFactor => 'Gaz réel (facteur Z)';
+
+  @override
+  String get gasCalculators_blender_modelRecommended => 'Recommandé';
+
+  @override
+  String get gasCalculators_blender_modelHelp =>
+      'Le gaz réel (facteur Z) est le plus précis aux pressions de bloc. Le gaz parfait correspond à la plupart des tables de mélange publiées. Van der Waals est proposé pour comparaison avec d\'autres logiciels de mélange et s\'écarte de plusieurs pour cent à la pression de remplissage.';
+
+  @override
+  String gasCalculators_blender_stepAdd(String gas) {
+    return 'Ajouter $gas';
+  }
+
+  @override
+  String get gasCalculators_blender_stepStartLabel => 'Départ';
+
+  @override
+  String gasCalculators_blender_settlesTo(String pressure, String temperature) {
+    return 'Se stabilise à $pressure à $temperature';
+  }
+
+  @override
+  String get gasCalculators_blender_templates => 'Modèles';
+
+  @override
+  String get gasCalculators_blender_templatesTitle =>
+      'Modèles de mélange cible';
+
+  @override
+  String get gasCalculators_blender_saveTemplate =>
+      'Enregistrer le mélange actuel';
+
+  @override
+  String get gasCalculators_blender_manageTemplates => 'Gérer les modèles';
+
+  @override
+  String gasCalculators_blender_templateSaved(String mix) {
+    return '$mix enregistré';
+  }
+
+  @override
+  String get gasCalculators_blender_templateExists =>
+      'Ce mélange est déjà enregistré.';
+
+  @override
+  String get gasCalculators_blender_templateInvalid =>
+      'O₂ + He ne peut pas dépasser 100 %.';
+
+  @override
+  String gasCalculators_blender_templateLimit(int count) {
+    return 'Vous pouvez enregistrer jusqu\'à $count modèles.';
+  }
+
+  @override
+  String get gasCalculators_blender_templateNone =>
+      'Aucun modèle pour l\'instant. Enregistrez un mélange cible pour le réutiliser ici.';
+
+  @override
+  String gasCalculators_blender_templateDelete(String mix) {
+    return 'Supprimer $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_templateAdd => 'Ajouter un modèle';
+
+  @override
+  String get gasCalculators_blender_billing => 'Coût';
+
+  @override
+  String get gasCalculators_blender_cylinderVolume => 'Volume d\'eau du bloc';
+
+  @override
+  String get gasCalculators_blender_cylinderPresets => 'Préréglages';
+
+  @override
+  String gasCalculators_blender_unitPrice(String unit) {
+    return 'Prix pour 100 $unit';
+  }
+
+  @override
+  String get gasCalculators_blender_currency => 'Devise';
+
+  @override
+  String get gasCalculators_blender_costTotal => 'Total';
+
+  @override
+  String get gasCalculators_blender_costBasis =>
+      'Facturé sur la pression délivrée (volume d\'eau du bloc × bars ajoutés), comme le mesure une station de gonflage.';
+
+  @override
+  String get gasCalculators_blender_costMissingPrice =>
+      'Saisissez un prix pour chaque gaz afin de voir le total.';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';

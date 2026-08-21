@@ -11869,7 +11869,129 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      'Partialdruck-Mischung für das Zielgemisch mit realem Gasverhalten (Van der Waals). Fülle jedes Füllgas der Reihe nach bis zum angezeigten Druck. Füllgase und ihre Reihenfolge sind einstellbar; analysiere das fertige Gemisch immer, bevor du damit tauchst.';
+      'Partialdruck-Mischung für die Zielmischung. Gib jedes Füllgas der Reihe nach bis zum angezeigten Druck zu und lass die Flasche danach ruhen. Füllgase und ihre Reihenfolge sind einstellbar: Setzt du das letzte Gas auf 32/0, wird statt mit Luft mit EAN32 aufgefüllt. Analysiere die fertige Mischung immer, bevor du sie tauchst.';
+
+  @override
+  String get gasCalculators_blender_conditions => 'Mischbedingungen';
+
+  @override
+  String get gasCalculators_blender_fillTemp => 'Fülltemperatur';
+
+  @override
+  String get gasCalculators_blender_fillTempHelp =>
+      'Die Temperatur der Flasche während des Füllens. Jeder Druck in der Reihenfolge ist der Manometerwert bei dieser Temperatur.';
+
+  @override
+  String get gasCalculators_blender_settledTemp => 'Ruhetemperatur';
+
+  @override
+  String get gasCalculators_blender_settledTempHelp =>
+      'Die Temperatur, die die Flasche am Ende annimmt. Der Zieldruck ist der Wert, den sie dann anzeigt.';
+
+  @override
+  String get gasCalculators_blender_gasModel => 'Gasmodell';
+
+  @override
+  String get gasCalculators_blender_modelIdeal => 'Ideales Gas';
+
+  @override
+  String get gasCalculators_blender_modelVanDerWaals => 'Van der Waals';
+
+  @override
+  String get gasCalculators_blender_modelZFactor => 'Reales Gas (Z-Faktor)';
+
+  @override
+  String get gasCalculators_blender_modelRecommended => 'Empfohlen';
+
+  @override
+  String get gasCalculators_blender_modelHelp =>
+      'Reales Gas (Z-Faktor) ist bei Flaschendrücken am genauesten. Ideales Gas entspricht den meisten veröffentlichten Mischtabellen. Van der Waals dient dem Vergleich mit anderer Mischsoftware und weicht bei Fülldruck um mehrere Prozent ab.';
+
+  @override
+  String gasCalculators_blender_stepAdd(String gas) {
+    return '$gas zugeben';
+  }
+
+  @override
+  String get gasCalculators_blender_stepStartLabel => 'Start';
+
+  @override
+  String gasCalculators_blender_settlesTo(String pressure, String temperature) {
+    return 'Endet bei $pressure bei $temperature';
+  }
+
+  @override
+  String get gasCalculators_blender_templates => 'Vorlagen';
+
+  @override
+  String get gasCalculators_blender_templatesTitle =>
+      'Vorlagen für Zielmischungen';
+
+  @override
+  String get gasCalculators_blender_saveTemplate =>
+      'Aktuelle Mischung speichern';
+
+  @override
+  String get gasCalculators_blender_manageTemplates => 'Vorlagen verwalten';
+
+  @override
+  String gasCalculators_blender_templateSaved(String mix) {
+    return '$mix gespeichert';
+  }
+
+  @override
+  String get gasCalculators_blender_templateExists =>
+      'Diese Mischung ist bereits gespeichert.';
+
+  @override
+  String get gasCalculators_blender_templateInvalid =>
+      'O₂ + He darf 100 % nicht überschreiten.';
+
+  @override
+  String gasCalculators_blender_templateLimit(int count) {
+    return 'Du kannst bis zu $count Vorlagen speichern.';
+  }
+
+  @override
+  String get gasCalculators_blender_templateNone =>
+      'Noch keine Vorlagen. Speichere eine Zielmischung, um sie hier wiederzuverwenden.';
+
+  @override
+  String gasCalculators_blender_templateDelete(String mix) {
+    return '$mix löschen';
+  }
+
+  @override
+  String get gasCalculators_blender_templateAdd => 'Vorlage hinzufügen';
+
+  @override
+  String get gasCalculators_blender_billing => 'Kosten';
+
+  @override
+  String get gasCalculators_blender_cylinderVolume =>
+      'Wasservolumen der Flasche';
+
+  @override
+  String get gasCalculators_blender_cylinderPresets => 'Voreinstellungen';
+
+  @override
+  String gasCalculators_blender_unitPrice(String unit) {
+    return 'Preis pro 100 $unit';
+  }
+
+  @override
+  String get gasCalculators_blender_currency => 'Währung';
+
+  @override
+  String get gasCalculators_blender_costTotal => 'Gesamt';
+
+  @override
+  String get gasCalculators_blender_costBasis =>
+      'Abgerechnet wird der gelieferte Druck (Wasservolumen der Flasche × zugeführte bar), so wie eine Füllstation misst.';
+
+  @override
+  String get gasCalculators_blender_costMissingPrice =>
+      'Gib für jedes Gas einen Preis ein, um die Summe zu sehen.';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
