@@ -24,6 +24,7 @@ import sys
 from fontTools.fontBuilder import FontBuilder
 from fontTools.misc.transform import Transform
 from fontTools.pens.cu2quPen import Cu2QuPen
+from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.recordingPen import RecordingPen
 from fontTools.pens.reverseContourPen import ReverseContourPen
 from fontTools.pens.transformPen import TransformPen
@@ -42,9 +43,25 @@ FAMILY = "Submersion Equipment"
 VERSION = "1.000"
 UPEM = 1000
 GRID = 24
-# Cubic-to-quadratic tolerance in font units: half of one 24-grid unit is well
-# under a device pixel at any size the app renders icons at.
-MAX_ERR = UPEM / GRID / 2
+# Cubic-to-quadratic tolerance, in font units. This was half a grid unit, which
+# is loose enough that the converted outline drifts away from the bounds
+# measured on the source cubics: it left the gloves glyph a quarter of a unit
+# off-centre after normalisation. One unit in 1000 keeps the approximation well
+# inside rounding, and costs a handful of points in a 2.5 KB font.
+MAX_ERR = 1.0
+
+# Material's icon guidance keeps artwork inside a 20x20 live area on a 24x24
+# grid, leaving a 2-unit margin so glyphs never touch the edge of their box.
+# Every glyph is scaled to fill this in its larger dimension, which is what
+# makes a set drawn by hand read as one set.
+LIVE_AREA = 20.0
+
+# Tolerances for --verify, in 24-grid units. Both are generous enough to absorb
+# rounding into integer font units and the cubic-to-quadratic conversion, and
+# tight enough to catch a glyph that was never normalised: the worst offender
+# before normalisation existed sat 1.91 units high.
+CENTRE_TOLERANCE = 0.10
+SIZE_TOLERANCE = 0.10
 
 # 2026-01-01T00:00:00Z expressed in the TrueType epoch, which starts at
 # 1904-01-01 (Unix time plus 2082844800). Any fixed value works; what matters
@@ -53,21 +70,50 @@ FONT_EPOCH_STAMP = 1767225600 + 2082844800
 
 
 def build_glyph(path_data):
-    """Convert one 24-grid SVG path into a TrueType glyph.
+    """Convert one 24-grid SVG path into a normalised TrueType glyph.
 
-    SVG is y-down and the font is y-up, so the transform flips Y and lands the
-    icon box exactly on the em box: SVG y=0 maps to the ascender and y=24 to
-    the baseline. Reversing the contours afterwards restores TrueType's
-    convention of clockwise outer contours, which the Y flip would otherwise
-    invert. Nonzero winding would fill correctly either way, but matching the
-    convention keeps font validators quiet.
+    Two transforms are applied, in this order.
+
+    First, normalisation. Flutter's Icon widget centres the *em box*, never the
+    ink, so a glyph drawn off to one side of the 24-grid renders off-centre in
+    the app however the surrounding layout is written. Ten glyphs drawn
+    independently had ten different centres and ranged from 16.4 to 22.0 units
+    across, which read as icons that wander and jump size down a list. Each
+    outline is therefore scaled to fill LIVE_AREA in its larger dimension and
+    translated so its ink centre lands on the middle of the grid. Doing it here
+    rather than by hand means the drawings in equipment_glyphs.py never have to
+    care where they sit.
+
+    Second, the move into font space. SVG is y-down and the font is y-up, so
+    the transform flips Y and lands the icon box exactly on the em box: y=0
+    maps to the ascender and y=24 to the baseline. Reversing the contours
+    afterwards restores TrueType's convention of clockwise outer contours,
+    which the Y flip would otherwise invert. Nonzero winding fills correctly
+    either way, but matching the convention keeps font validators quiet.
     """
+    outline = RecordingPen()
+    parse_path(path_data, outline)
+
+    bounds = BoundsPen(None)
+    outline.replay(bounds)
+    if bounds.bounds is None:
+        raise ValueError("path produced no outline")
+    x0, y0, x1, y1 = bounds.bounds
+    scale = LIVE_AREA / max(x1 - x0, y1 - y0)
+
+    normalise = (
+        Transform()
+        .translate(GRID / 2, GRID / 2)
+        .scale(scale)
+        .translate(-(x0 + x1) / 2, -(y0 + y1) / 2)
+    )
+
     pen = TTGlyphPen(None)
-    chain = TransformPen(
+    to_font_space = TransformPen(
         ReverseContourPen(Cu2QuPen(pen, MAX_ERR)),
         Transform(UPEM / GRID, 0, 0, -UPEM / GRID, 0, UPEM),
     )
-    parse_path(path_data, chain)
+    outline.replay(TransformPen(to_font_space, normalise))
     return pen.glyph()
 
 
@@ -149,16 +195,39 @@ def verify():
         # instead would flag off-curve control points, which legitimately sit
         # outside the shape they steer.
         glyph = font["glyf"][mapped]
+
+        # Report in 24-grid units, which is what the drawings use, and measure
+        # the ink centre against the middle of the box. Flutter centres the em
+        # box rather than the ink, so this offset is exactly how far off-centre
+        # the icon renders.
+        k = GRID / UPEM
+        cx = (glyph.xMin + glyph.xMax) / 2 * k
+        cy = (glyph.yMin + glyph.yMax) / 2 * k
+        dx, dy = cx - GRID / 2, cy - GRID / 2
+        size = max(glyph.xMax - glyph.xMin, glyph.yMax - glyph.yMin) * k
+
         print(
             f"  {name:12s} U+{cp:04X}  "
             f"x {glyph.xMin:4d}..{glyph.xMax:4d}  y {glyph.yMin:4d}..{glyph.yMax:4d}  "
+            f"size {size:5.2f}u  offset {dx:+5.2f},{dy:+5.2f}  "
             f"{glyph.numberOfContours} contours"
         )
+
         if glyph.xMin < 0 or glyph.xMax > UPEM or glyph.yMin < 0 or glyph.yMax > UPEM:
             problems.append(
                 f"{name}: ink escapes the em box "
                 f"(x {glyph.xMin}..{glyph.xMax}, y {glyph.yMin}..{glyph.yMax}); "
                 f"it would be clipped on device"
+            )
+        if abs(dx) > CENTRE_TOLERANCE or abs(dy) > CENTRE_TOLERANCE:
+            problems.append(
+                f"{name}: ink is off-centre by {dx:+.2f},{dy:+.2f} grid units; "
+                f"it would render off-centre in the app"
+            )
+        if abs(size - LIVE_AREA) > SIZE_TOLERANCE:
+            problems.append(
+                f"{name}: fills {size:.2f} units rather than {LIVE_AREA:.0f}; "
+                f"it would look a different size from the rest of the set"
             )
 
     return problems
