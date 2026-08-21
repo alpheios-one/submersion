@@ -8,6 +8,7 @@ import 'package:submersion/core/deco/constants/buhlmann_coefficients.dart';
 import 'package:submersion/core/deco/o2_toxicity_calculator.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/deco/entities/dive_environment.dart';
+import 'package:submersion/core/deco/entities/gradient_factor_source.dart';
 import 'package:submersion/core/deco/entities/o2_exposure.dart';
 import 'package:submersion/core/deco/entities/profile_gas_segment.dart';
 import 'package:submersion/core/deco/entities/tissue_compartment.dart';
@@ -353,26 +354,36 @@ List<AvailableGas> buildAvailableGases(
 
 /// Creates a ProfileAnalysisService using dive-specific GF and environment
 /// (altitude, water type) when available, falling back to user settings.
+///
+/// [recordedAlgorithm] is the dive's own `decoAlgorithm`. It changes no
+/// calculation -- the app always decompresses with Buhlmann-GF -- but it
+/// travels with the resolved [GradientFactorSource] so a display can say that
+/// a dive computed on, say, VPM was analyzed here with the diver's gradient
+/// factors instead (#1047).
 ProfileAnalysisService _resolveAnalysisService(
   Ref ref,
   int? gradientFactorLow,
   int? gradientFactorHigh, {
   DiveEnvironment environment = DiveEnvironment.standard,
+  String? recordedAlgorithm,
 }) {
-  if (gradientFactorLow == null &&
-      gradientFactorHigh == null &&
-      environment == DiveEnvironment.standard) {
+  final gfSource = GradientFactorSource.resolve(
+    diveGfLow: gradientFactorLow,
+    diveGfHigh: gradientFactorHigh,
+    settingsGfLow: ref.watch(gfLowProvider),
+    settingsGfHigh: ref.watch(gfHighProvider),
+    recordedAlgorithm: recordedAlgorithm,
+  );
+  // The shared, settings-configured service already stamps exactly this
+  // source -- the diver's own gradient factors with no dive-recorded model to
+  // name -- so reuse it rather than building a per-dive copy.
+  if (environment == DiveEnvironment.standard &&
+      gfSource.isFromDiverSettings &&
+      gfSource.recordedAlgorithm == null) {
     return ref.watch(profileAnalysisServiceProvider);
   }
-  final gfLow = gradientFactorLow != null && gradientFactorHigh != null
-      ? (gradientFactorLow / 100.0).clamp(0.0, 1.0)
-      : ref.watch(gfLowProvider) / 100.0;
-  final gfHigh = gradientFactorLow != null && gradientFactorHigh != null
-      ? (gradientFactorHigh / 100.0).clamp(0.0, 1.0)
-      : ref.watch(gfHighProvider) / 100.0;
   return ProfileAnalysisService(
-    gfLow: gfLow,
-    gfHigh: gfHigh,
+    gfSource: gfSource,
     ppO2WarningThreshold: ref.watch(ppO2MaxWorkingProvider),
     ppO2CriticalThreshold: ref.watch(ppO2MaxDecoProvider),
     cnsWarningThreshold: ref.watch(cnsWarningThresholdProvider),
@@ -909,19 +920,22 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
               .where((t) => t.computerId == null || t.computerId == computerId)
               .toList();
     final repository = ref.watch(diveRepositoryProvider);
-    // Resolve GF values: use dive-specific if provided, else user settings
-    final double gfLow;
-    final double gfHigh;
-    if (dive.gradientFactorLow != null && dive.gradientFactorHigh != null) {
+    // Resolve GF values: use dive-specific if provided, else user settings.
+    // Resolved here rather than inside the isolate because only this side
+    // knows the dive; the source is stamped onto the returned analysis below
+    // so a display can name the origin of every deco number it prints (#1047).
+    final gfSource = GradientFactorSource.resolve(
+      diveGfLow: dive.gradientFactorLow,
+      diveGfHigh: dive.gradientFactorHigh,
+      settingsGfLow: ref.watch(gfLowProvider),
+      settingsGfHigh: ref.watch(gfHighProvider),
+      recordedAlgorithm: dive.decoAlgorithm,
+    );
+    if (gfSource.origin == GfOrigin.computer) {
       _log.debug(
-        'Using dive-specific GF ${dive.gradientFactorLow}/'
-        '${dive.gradientFactorHigh} for dive $diveId',
+        'Using dive-specific GF ${gfSource.low}/${gfSource.high} '
+        'for dive $diveId',
       );
-      gfLow = (dive.gradientFactorLow! / 100.0).clamp(0.0, 1.0);
-      gfHigh = (dive.gradientFactorHigh! / 100.0).clamp(0.0, 1.0);
-    } else {
-      gfLow = ref.watch(gfLowProvider) / 100.0;
-      gfHigh = ref.watch(gfHighProvider) / 100.0;
     }
 
     // Extract profile data
@@ -1035,11 +1049,11 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
       'pressures: ${pressures?.length ?? 0}, mode: ${dive.diveMode}, '
       'startCns: ${startCns.toStringAsFixed(1)}',
     );
-    final analysis = await compute(
+    final computed = await compute(
       _runProfileAnalysis,
       _ProfileAnalysisInput(
-        gfLow: gfLow,
-        gfHigh: gfHigh,
+        gfLow: gfSource.lowFraction,
+        gfHigh: gfSource.highFraction,
         ppO2WarningThreshold: ref.watch(ppO2MaxWorkingProvider),
         ppO2CriticalThreshold: ref.watch(ppO2MaxDecoProvider),
         cnsWarningThreshold: ref.watch(cnsWarningThresholdProvider),
@@ -1074,6 +1088,10 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
         rebreatherPpO2Curve: rebreatherPpO2?.curve,
       ),
     );
+    // The isolate only ever saw two fractions, so it stamped the conservative
+    // settings origin. Restore the source resolved above, whose fractions are
+    // the very ones it decompressed with.
+    final analysis = computed.copyWith(gfSource: gfSource);
 
     // Overlay computer-reported deco data where available
     final (overlaid, sourceInfo) = overlayComputerDecoData(
@@ -1494,6 +1512,7 @@ final diveProfileAnalysisProvider = Provider.family<ProfileAnalysis?, Dive>((
         waterType: dive.waterType,
         surfacePressureBar: dive.surfacePressure,
       ),
+      recordedAlgorithm: dive.decoAlgorithm,
     );
 
     // Extract profile data

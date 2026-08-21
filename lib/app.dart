@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/core/app/app_exit.dart';
 import 'package:submersion/core/presentation/providers/app_lock_provider.dart';
 import 'package:submersion/core/presentation/widgets/lock_barrier.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -26,6 +27,7 @@ import 'package:submersion/shared/services/file_share_handler.dart';
 import 'package:submersion/shared/services/incoming_file_handler.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/library_epoch.dart';
 
 const Locale _defaultFallbackLocale = Locale('en');
@@ -121,16 +123,22 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
   /// NSApplicationDelegate.applicationShouldTerminate: on macOS) which is
   /// async and fires before the Dart VM begins isolate/FFI teardown. Without
   /// this, the Drift background isolate can outlive the FFI subsystem and
-  /// crash in sqlite3_close_v2 → functionDestroy ("GetFfiCallbackMetadata
-  /// called after shutdown"), which stalls the quit. The close() calls run
-  /// sequentially — awaiting the databases in parallel is not worth racing
-  /// two shutdown sequences, and each one is bounded by its own timeouts
-  /// (see closeDatabaseForAppShutdown).
-  Future<AppExitResponse> _closeDatabases() async {
-    await DatabaseService.instance.close();
-    await LocalCacheDatabaseService.instance.close();
-    return AppExitResponse.exit;
-  }
+  /// crash in sqlite3_close_v2 -> functionDestroy ("GetFfiCallbackMetadata
+  /// called after shutdown"), which stalls the quit.
+  ///
+  /// The guarantees that make this safe to be the platform's only reply path
+  /// (always answers, never throws, never exceeds its budget) live in
+  /// [closeDatabasesForExit]; see its doc for why totality matters here and
+  /// what happens natively when the reply never arrives.
+  Future<AppExitResponse> _closeDatabases() => closeDatabasesForExit(
+    closeMain: () => DatabaseService.instance.close(),
+    closeCache: () => LocalCacheDatabaseService.instance.close(),
+    onError: (error, stack) => LoggerService.forClass(SubmersionApp).warning(
+      'Database close during app exit did not finish cleanly',
+      error: error,
+      stackTrace: stack,
+    ),
+  );
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {

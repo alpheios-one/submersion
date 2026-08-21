@@ -7664,6 +7664,46 @@ abstract class AppLocalizations {
   /// **'TTS'**
   String get diveLog_deco_label_tts;
 
+  /// No description provided for @diveLog_deco_gf_chip.
+  ///
+  /// In en, this message translates to:
+  /// **'GF: {low}/{high}'**
+  String diveLog_deco_gf_chip(Object low, Object high);
+
+  /// No description provided for @diveLog_deco_gf_chipFromSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'GF: {low}/{high} · your settings'**
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high);
+
+  /// No description provided for @diveLog_deco_gf_chipRecordedAlgorithm.
+  ///
+  /// In en, this message translates to:
+  /// **'{algorithm} · analyzed at GF {low}/{high}'**
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  );
+
+  /// No description provided for @diveLog_deco_gf_semantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Gradient factors: low {low}, high {high}'**
+  String diveLog_deco_gf_semantics(Object low, Object high);
+
+  /// No description provided for @diveLog_deco_gf_tooltipFromSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'This dive computer did not record its gradient factors, so this dive is analyzed with the ones from your settings.'**
+  String get diveLog_deco_gf_tooltipFromSettings;
+
+  /// No description provided for @diveLog_deco_gf_tooltipRecordedAlgorithm.
+  ///
+  /// In en, this message translates to:
+  /// **'This dive was computed on {algorithm}, which does not use gradient factors. Submersion analyzes it with the ones from your settings.'**
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm);
+
   /// No description provided for @diveLog_deco_sectionDecoStops.
   ///
   /// In en, this message translates to:
@@ -23772,6 +23812,12 @@ abstract class AppLocalizations {
   /// **'Link an exposure suit to this dive for a fuller picture'**
   String get buoyancy_linkSuitHint;
 
+  /// No description provided for @buoyancy_noLeadHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No lead recorded: add weights to this dive, or a dry weight to your weights gear'**
+  String get buoyancy_noLeadHint;
+
   /// No description provided for @buoyancy_chartNet.
   ///
   /// In en, this message translates to:
@@ -29615,6 +29661,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create tag'**
   String get tags_action_createTag;
+
+  /// No description provided for @tags_action_browse.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse'**
+  String get tags_action_browse;
+
+  /// No description provided for @tags_picker_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Tags'**
+  String get tags_picker_title;
+
+  /// No description provided for @tags_picker_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags yet. Type a tag name to create your first one.'**
+  String get tags_picker_empty;
+
+  /// Shown in the tag picker sheet when the tag list fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading tags: {error}'**
+  String tags_picker_errorLoading(String error);
+
+  /// No description provided for @tags_picker_allAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'All tags are already added.'**
+  String get tags_picker_allAdded;
+
+  /// No description provided for @tags_picker_noMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags match your search.'**
+  String get tags_picker_noMatches;
+
+  /// Confirm button on the tag picker sheet; count is how many tags are ticked
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Add tags} =1{Add 1 tag} other{Add {count} tags}}'**
+  String tags_picker_addCount(int count);
 
   /// No description provided for @tags_action_deleteTag.
   ///
@@ -38679,6 +38767,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Volume not mounted'**
   String get media_unavailablePlaceholder_volumeOffline;
+
+  /// No description provided for @media_unavailablePlaceholder_stillFetching.
+  ///
+  /// In en, this message translates to:
+  /// **'Still loading. Tap to retry.'**
+  String get media_unavailablePlaceholder_stillFetching;
 
   /// No description provided for @attrLabel_size.
   ///
@@ -50932,6 +51026,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Publishing library'**
   String get settings_syncMaintenance_phase_publishingLibrary;
+
+  /// No description provided for @settings_cloudSync_adopt_progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adopting the restored library'**
+  String get settings_cloudSync_adopt_progressTitle;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replacing the cloud library'**
+  String get settings_cloudSync_replaceLibrary_progressTitle;
+
+  /// Device name qualified by its short id, used only when two devices published the same name (two phones of one model, or iOS 16+ handing out the model as the name).
+  ///
+  /// In en, this message translates to:
+  /// **'{name} ({shortId})'**
+  String settings_syncDevices_nameWithId(String name, String shortId);
+
+  /// No description provided for @settings_syncMaintenance_phase_applyingLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Applying the library'**
+  String get settings_syncMaintenance_phase_applyingLibrary;
+
+  /// No description provided for @settings_syncMaintenance_phase_backingUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Backing up this device'**
+  String get settings_syncMaintenance_phase_backingUp;
+
+  /// No description provided for @settings_syncMaintenance_phase_repairing.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing local sync state'**
+  String get settings_syncMaintenance_phase_repairing;
+
+  /// No description provided for @settings_troubleshootSync_repair_progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Repairing sync'**
+  String get settings_troubleshootSync_repair_progressTitle;
 
   /// No description provided for @settings_syncMaintenance_phase_working.
   ///

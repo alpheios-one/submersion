@@ -4592,6 +4592,39 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF: $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF: $low/$high · le tue impostazioni';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · analizzata con GF $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Fattori di gradiente: basso $low, alto $high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'Questo computer subacqueo non ha registrato i suoi fattori di gradiente, quindi questa immersione viene analizzata con quelli delle tue impostazioni.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'Questa immersione è stata calcolata con $algorithm, che non usa i fattori di gradiente. Submersion la analizza con quelli delle tue impostazioni.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'Soste deco';
 
   @override
@@ -14083,6 +14116,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Associa una muta a questa immersione per un quadro più completo';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'Nessuna zavorra registrata: aggiungi zavorra a questa immersione o un peso a secco alla tua attrezzatura di zavorra';
+
+  @override
   String get buoyancy_chartNet => 'Netto';
 
   @override
@@ -17694,6 +17731,39 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tags_action_createTag => 'Crea tag';
+
+  @override
+  String get tags_action_browse => 'Sfoglia';
+
+  @override
+  String get tags_picker_title => 'Scegli tag';
+
+  @override
+  String get tags_picker_empty =>
+      'Nessun tag. Digita un nome per creare il primo.';
+
+  @override
+  String tags_picker_errorLoading(String error) {
+    return 'Errore durante il caricamento dei tag: $error';
+  }
+
+  @override
+  String get tags_picker_allAdded => 'Tutti i tag sono già stati aggiunti.';
+
+  @override
+  String get tags_picker_noMatches => 'Nessun tag corrisponde alla ricerca.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Aggiungi $count tag',
+      one: 'Aggiungi 1 tag',
+      zero: 'Aggiungi tag',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get tags_action_deleteTag => 'Elimina tag';
@@ -23229,6 +23299,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get media_unavailablePlaceholder_volumeOffline => 'Volume non montato';
+
+  @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'Ancora in caricamento. Tocca per riprovare.';
 
   @override
   String get attrLabel_size => 'Taglia';
@@ -30556,6 +30630,35 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_syncMaintenance_phase_publishingLibrary =>
       'Pubblicazione della libreria';
+
+  @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'Adozione della libreria ripristinata';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'Sostituzione della libreria cloud';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'Applicazione della libreria';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'Backup di questo dispositivo';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'Eliminazione dello stato di sincronizzazione locale';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'Riparazione della sincronizzazione';
 
   @override
   String get settings_syncMaintenance_phase_working => 'Operazione in corso...';

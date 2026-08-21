@@ -4556,6 +4556,39 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF: $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF: $low/$high · jouw instellingen';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · geanalyseerd met GF $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Gradiëntfactoren: laag $low, hoog $high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'Deze duikcomputer heeft zijn gradiëntfactoren niet vastgelegd, dus deze duik wordt geanalyseerd met die uit jouw instellingen.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'Deze duik is berekend met $algorithm, dat geen gradiëntfactoren gebruikt. Submersion analyseert hem met die uit jouw instellingen.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'Decostops';
 
   @override
@@ -13978,6 +14011,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Koppel een duikpak aan deze duik voor een vollediger beeld';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'Geen lood vastgelegd: voeg lood toe aan deze duik of een drooggewicht aan je loodmateriaal';
+
+  @override
   String get buoyancy_chartNet => 'Netto';
 
   @override
@@ -17547,6 +17584,40 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get tags_action_createTag => 'Tag aanmaken';
+
+  @override
+  String get tags_action_browse => 'Bladeren';
+
+  @override
+  String get tags_picker_title => 'Tags kiezen';
+
+  @override
+  String get tags_picker_empty =>
+      'Nog geen tags. Typ een tagnaam om je eerste aan te maken.';
+
+  @override
+  String tags_picker_errorLoading(String error) {
+    return 'Fout bij het laden van tags: $error';
+  }
+
+  @override
+  String get tags_picker_allAdded => 'Alle tags zijn al toegevoegd.';
+
+  @override
+  String get tags_picker_noMatches =>
+      'Geen tags komen overeen met je zoekopdracht.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tags toevoegen',
+      one: '1 tag toevoegen',
+      zero: 'Tags toevoegen',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get tags_action_deleteTag => 'Tag verwijderen';
@@ -23053,6 +23124,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_volumeOffline =>
       'Volume niet gekoppeld';
+
+  @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'Nog aan het laden. Tik om opnieuw te proberen.';
 
   @override
   String get attrLabel_size => 'Maat';
@@ -30340,6 +30415,35 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_syncMaintenance_phase_publishingLibrary =>
       'Bibliotheek publiceren';
+
+  @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'Herstelde bibliotheek overnemen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'Cloudbibliotheek vervangen';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'Bibliotheek toepassen';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'Back-up van dit apparaat maken';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'Lokale synchronisatiestatus wissen';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'Synchronisatie herstellen';
 
   @override
   String get settings_syncMaintenance_phase_working => 'Bezig...';

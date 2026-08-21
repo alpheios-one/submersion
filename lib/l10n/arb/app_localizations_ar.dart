@@ -4502,6 +4502,39 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF: $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF: $low/$high · إعداداتك';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · جرى تحليلها بـ GF $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'معاملات التدرج: منخفض $low، مرتفع $high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'لم يسجّل حاسوب الغوص هذا معاملات التدرج الخاصة به، لذا تُحلَّل هذه الغطسة باستخدام المعاملات من إعداداتك.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'حُسبت هذه الغطسة باستخدام $algorithm الذي لا يستخدم معاملات التدرج. يحللها Submersion باستخدام المعاملات من إعداداتك.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'توقفات تخفيف الضغط';
 
   @override
@@ -13835,6 +13868,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'اربط بدلة تعرّض بهذه الغطسة للحصول على صورة أوفى';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'لم يتم تسجيل أي أثقال: أضف أثقالًا إلى هذه الغطسة أو وزنًا جافًا إلى معدات الأثقال';
+
+  @override
   String get buoyancy_chartNet => 'الصافي';
 
   @override
@@ -17368,6 +17405,39 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tags_action_createTag => 'إنشاء وسم';
+
+  @override
+  String get tags_action_browse => 'تصفح';
+
+  @override
+  String get tags_picker_title => 'اختيار الوسوم';
+
+  @override
+  String get tags_picker_empty =>
+      'لا توجد وسوم بعد. اكتب اسم وسم لإنشاء أول وسم لك.';
+
+  @override
+  String tags_picker_errorLoading(String error) {
+    return 'خطأ في تحميل الوسوم: $error';
+  }
+
+  @override
+  String get tags_picker_allAdded => 'تمت إضافة جميع الوسوم بالفعل.';
+
+  @override
+  String get tags_picker_noMatches => 'لا توجد وسوم تطابق بحثك.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'إضافة $count وسم',
+      one: 'إضافة وسم واحد',
+      zero: 'إضافة وسوم',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get tags_action_deleteTag => 'حذف الوسم';
@@ -22812,6 +22882,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_volumeOffline =>
       'وحدة التخزين غير مثبتة';
+
+  @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'ما زال قيد التحميل. اضغط لإعادة المحاولة.';
 
   @override
   String get attrLabel_size => 'المقاس';
@@ -30207,6 +30281,35 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_syncMaintenance_phase_publishingLibrary =>
       'جارٍ نشر المكتبة';
+
+  @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'جارٍ اعتماد المكتبة المستعادة';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'جارٍ استبدال مكتبة السحابة';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'جارٍ تطبيق المكتبة';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'جارٍ إنشاء نسخة احتياطية لهذا الجهاز';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'جارٍ مسح حالة المزامنة المحلية';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'جارٍ إصلاح المزامنة';
 
   @override
   String get settings_syncMaintenance_phase_working => 'جارٍ العمل...';

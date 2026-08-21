@@ -44,7 +44,7 @@ class ChangesetReadResult {
 
   /// Display names for the entries in [skippedPeerDeviceIds] that published
   /// one, keyed by device id. Peers on manifests written before the name field
-  /// existed, and peers whose hostname identifies nothing, are simply absent;
+  /// existed, and peers that nothing identifies by name, are simply absent;
   /// the UI falls back to a short id label for those.
   final Map<String, String> skippedPeerNames;
 

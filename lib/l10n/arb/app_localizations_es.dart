@@ -4594,6 +4594,39 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF: $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF: $low/$high · tus ajustes';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · analizado con GF $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Factores de gradiente: bajo $low, alto $high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'Este ordenador de buceo no registró sus factores de gradiente, así que esta inmersión se analiza con los de tus ajustes.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'Esta inmersión se calculó con $algorithm, que no usa factores de gradiente. Submersion la analiza con los de tus ajustes.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'Paradas de descompresión';
 
   @override
@@ -14076,6 +14109,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Asocia un traje a esta inmersión para un panorama más completo';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'No se registró lastre: añade lastre a esta inmersión o un peso en seco a tu equipo de lastre';
+
+  @override
   String get buoyancy_chartNet => 'Neto';
 
   @override
@@ -17699,6 +17736,40 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tags_action_createTag => 'Crear etiqueta';
+
+  @override
+  String get tags_action_browse => 'Explorar';
+
+  @override
+  String get tags_picker_title => 'Elegir etiquetas';
+
+  @override
+  String get tags_picker_empty =>
+      'Aún no hay etiquetas. Escribe un nombre para crear la primera.';
+
+  @override
+  String tags_picker_errorLoading(String error) {
+    return 'Error al cargar las etiquetas: $error';
+  }
+
+  @override
+  String get tags_picker_allAdded => 'Todas las etiquetas ya están añadidas.';
+
+  @override
+  String get tags_picker_noMatches =>
+      'Ninguna etiqueta coincide con tu búsqueda.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Añadir $count etiquetas',
+      one: 'Añadir 1 etiqueta',
+      zero: 'Añadir etiquetas',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get tags_action_deleteTag => 'Eliminar etiqueta';
@@ -23243,6 +23314,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_unavailablePlaceholder_volumeOffline => 'Volumen no montado';
+
+  @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'Aún se está cargando. Toca para reintentar.';
 
   @override
   String get attrLabel_size => 'Talla';
@@ -30580,6 +30655,35 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_syncMaintenance_phase_publishingLibrary =>
       'Publicando la biblioteca';
+
+  @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'Adoptando la biblioteca restaurada';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'Reemplazando la biblioteca en la nube';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'Aplicando la biblioteca';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'Creando una copia de seguridad de este dispositivo';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'Borrando el estado de sincronización local';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'Reparando la sincronización';
 
   @override
   String get settings_syncMaintenance_phase_working => 'Trabajando...';

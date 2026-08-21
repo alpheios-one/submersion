@@ -2721,6 +2721,12 @@
   "diveLog_deco_label_ndl": "NDL",
   "diveLog_deco_label_time": "Time",
   "diveLog_deco_label_tts": "TTS",
+  "diveLog_deco_gf_chip": "GF: {low}/{high}",
+  "diveLog_deco_gf_chipFromSettings": "GF: {low}/{high} · your settings",
+  "diveLog_deco_gf_chipRecordedAlgorithm": "{algorithm} · analyzed at GF {low}/{high}",
+  "diveLog_deco_gf_semantics": "Gradient factors: low {low}, high {high}",
+  "diveLog_deco_gf_tooltipFromSettings": "This dive computer did not record its gradient factors, so this dive is analyzed with the ones from your settings.",
+  "diveLog_deco_gf_tooltipRecordedAlgorithm": "This dive was computed on {algorithm}, which does not use gradient factors. Submersion analyzes it with the ones from your settings.",
   "diveLog_deco_sectionDecoStops": "Deco Stops",
   "diveLog_deco_sectionTissueLoading": "Tissue Loading",
   "diveLog_deco_semantics_notRequired": "No decompression required",
@@ -4071,6 +4077,56 @@
   "@diveLog_cylinderSac_avgDepth": {
     "placeholders": {
       "depth": {
+        "type": "Object"
+      }
+    }
+  },
+  "@diveLog_deco_gf_semantics": {
+    "placeholders": {
+      "low": {
+        "type": "Object"
+      },
+      "high": {
+        "type": "Object"
+      }
+    }
+  },
+  "@diveLog_deco_gf_chip": {
+    "placeholders": {
+      "low": {
+        "type": "Object"
+      },
+      "high": {
+        "type": "Object"
+      }
+    }
+  },
+  "@diveLog_deco_gf_chipFromSettings": {
+    "placeholders": {
+      "low": {
+        "type": "Object"
+      },
+      "high": {
+        "type": "Object"
+      }
+    }
+  },
+  "@diveLog_deco_gf_chipRecordedAlgorithm": {
+    "placeholders": {
+      "algorithm": {
+        "type": "Object"
+      },
+      "low": {
+        "type": "Object"
+      },
+      "high": {
+        "type": "Object"
+      }
+    }
+  },
+  "@diveLog_deco_gf_tooltipRecordedAlgorithm": {
+    "placeholders": {
+      "algorithm": {
         "type": "Object"
       }
     }
@@ -8430,6 +8486,7 @@
   "buoyancy_drysuitGas": "Drysuit gas added",
   "buoyancy_estimatedPressures": "Tank pressures are estimated",
   "buoyancy_linkSuitHint": "Link an exposure suit to this dive for a fuller picture",
+  "buoyancy_noLeadHint": "No lead recorded: add weights to this dive, or a dry weight to your weights gear",
   "buoyancy_chartNet": "Net",
   "buoyancy_chartRig": "Rig + lead",
   "buoyancy_chartMinutes": "Time (min)",
@@ -10688,6 +10745,29 @@
   },
   "tags_action_createNamed": "Create \"{tagName}\"",
   "tags_action_createTag": "Create tag",
+  "tags_action_browse": "Browse",
+  "tags_picker_title": "Pick Tags",
+  "tags_picker_empty": "No tags yet. Type a tag name to create your first one.",
+  "tags_picker_errorLoading": "Error loading tags: {error}",
+  "@tags_picker_errorLoading": {
+    "description": "Shown in the tag picker sheet when the tag list fails to load",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "tags_picker_allAdded": "All tags are already added.",
+  "tags_picker_noMatches": "No tags match your search.",
+  "tags_picker_addCount": "{count, plural, =0{Add tags} =1{Add 1 tag} other{Add {count} tags}}",
+  "@tags_picker_addCount": {
+    "description": "Confirm button on the tag picker sheet; count is how many tags are ticked",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "tags_action_deleteTag": "Delete tag",
   "tags_dialog_deleteMessage": "Are you sure you want to delete \"{tagName}\"? This will remove it from all dives.",
   "tags_dialog_deleteTitle": "Delete Tag?",
@@ -15010,6 +15090,7 @@
   "settings_setupGuide_open": "Open",
   "settings_connectedAccounts_loadError": "Could not load accounts",
   "media_unavailablePlaceholder_volumeOffline": "Volume not mounted",
+  "media_unavailablePlaceholder_stillFetching": "Still loading. Tap to retry.",
   "attrLabel_size": "Size",
   "attrLabel_thickness_mm": "Thickness (mm)",
   "attrLabel_suit_style": "Suit style",
@@ -17665,6 +17746,13 @@
   "settings_syncMaintenance_phase_clearingOldFiles": "Clearing old files",
   "settings_syncMaintenance_phase_deleting": "Deleting",
   "settings_syncMaintenance_phase_publishingLibrary": "Publishing library",
+  "settings_cloudSync_adopt_progressTitle": "Adopting the restored library",
+  "settings_cloudSync_replaceLibrary_progressTitle": "Replacing the cloud library",
+  "settings_syncDevices_nameWithId": "{name} ({shortId})",
+  "settings_syncMaintenance_phase_applyingLibrary": "Applying the library",
+  "settings_syncMaintenance_phase_backingUp": "Backing up this device",
+  "settings_syncMaintenance_phase_repairing": "Clearing local sync state",
+  "settings_troubleshootSync_repair_progressTitle": "Repairing sync",
   "settings_syncMaintenance_phase_working": "Working...",
   "settings_syncMaintenance_progress_filesOfTotal": "{total, plural, =1{{done} of 1 file} other{{done} of {total} files}}",
   "settings_syncMaintenance_removedFiles": "{count, plural, =1{Removed 1 file} other{Removed {count} files}}",
@@ -17722,6 +17810,7 @@
   "@settings_syncDevices_tile_filesSize": {"description": "Device row subtitle when no timestamp is known.", "placeholders": {"count": {"example": "42", "type": "int"}, "size": {"example": "1.4 MB", "type": "String"}}},
   "@settings_syncDevices_tile_filesSizeSeen": {"description": "Device row subtitle including the publish/modify timestamp.", "placeholders": {"count": {"example": "42", "type": "int"}, "size": {"example": "1.4 MB", "type": "String"}, "when": {"example": "Jan 3, 2026 4:15 PM", "type": "String"}}},
   "@settings_syncDevices_unnamedDevice": {"description": "Title-case fallback name for a device that published no name. The mid-sentence lowercase form is settings_cloudSync_peerNeedsAdopt_unnamedDevice.", "placeholders": {"shortId": {"example": "a1b2c3", "type": "String"}}},
+  "@settings_syncDevices_nameWithId": {"description": "Device name qualified by its short id, used only when two devices published the same name (two phones of one model, or iOS 16+ handing out the model as the name).", "placeholders": {"name": {"example": "iPhone", "type": "String"}, "shortId": {"example": "a1b2c3d4", "type": "String"}}},
   "@settings_syncMaintenance_progress_filesOfTotal": {"description": "Progress counter inside the sync maintenance dialog, e.g. \"12 of 400 files\".", "placeholders": {"done": {"example": "12", "type": "int"}, "total": {"example": "400", "type": "int"}}},
   "@settings_syncMaintenance_removedFiles": {"description": "Snackbar after a fully successful cloud file removal.", "placeholders": {"count": {"example": "12", "type": "int"}}},
   "@settings_syncMaintenance_removedFilesPartial": {"description": "Snackbar after a partially successful removal. {trouble} is an already localized clause built from the trouble_* keys.", "placeholders": {"count": {"example": "12", "type": "int"}, "trouble": {"example": "3 could not be deleted", "type": "String"}}},

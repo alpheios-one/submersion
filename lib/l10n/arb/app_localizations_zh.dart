@@ -4357,6 +4357,39 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF：$low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF：$low/$high · 来自你的设置';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · 以 GF $low/$high 分析';
+  }
+
+  @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return '梯度因子：低 $low，高 $high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      '这台潜水电脑没有记录它的梯度因子，因此本次潜水使用你设置中的梯度因子进行分析。';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return '本次潜水由 $algorithm 计算，该算法不使用梯度因子。Submersion 使用你设置中的梯度因子进行分析。';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => '减压停留';
 
   @override
@@ -13425,6 +13458,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get buoyancy_linkSuitHint => '为本次潜水关联一件暴露服以获得更完整的分析';
 
   @override
+  String get buoyancy_noLeadHint => '未记录配重：请为本次潜水添加配重，或为配重装备填写干重';
+
+  @override
   String get buoyancy_chartNet => '净值';
 
   @override
@@ -16786,6 +16822,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tags_action_createTag => '创建标签';
+
+  @override
+  String get tags_action_browse => '浏览';
+
+  @override
+  String get tags_picker_title => '选择标签';
+
+  @override
+  String get tags_picker_empty => '还没有标签。输入标签名称即可创建第一个。';
+
+  @override
+  String tags_picker_errorLoading(String error) {
+    return '加载标签时出错：$error';
+  }
+
+  @override
+  String get tags_picker_allAdded => '所有标签均已添加。';
+
+  @override
+  String get tags_picker_noMatches => '没有标签与您的搜索匹配。';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '添加 $count 个标签',
+      zero: '添加标签',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get tags_action_deleteTag => '删除标签';
@@ -22059,6 +22126,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_unavailablePlaceholder_volumeOffline => '卷未挂载';
+
+  @override
+  String get media_unavailablePlaceholder_stillFetching => '仍在加载。点按重试。';
 
   @override
   String get attrLabel_size => '尺码';
@@ -28855,6 +28925,29 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_syncMaintenance_phase_publishingLibrary => '正在发布资料库';
+
+  @override
+  String get settings_cloudSync_adopt_progressTitle => '正在接管已恢复的资料库';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle => '正在替换云端资料库';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name（$shortId）';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary => '正在应用资料库';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp => '正在备份此设备';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing => '正在清除本地同步状态';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle => '正在修复同步';
 
   @override
   String get settings_syncMaintenance_phase_working => '处理中...';

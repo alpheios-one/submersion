@@ -17,6 +17,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/pickers/equipm
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/equipment_set_picker_sheet.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/tags/presentation/widgets/tag_picker_sheet.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -460,6 +461,45 @@ void main() {
       await tester.tap(useSet);
       await tester.pumpAndSettle();
       expect(find.byType(EquipmentSetPickerSheet), findsOneWidget);
+    });
+
+    testWidgets('the bulk tag dialog can browse previously used tags', (
+      tester,
+    ) async {
+      // Seeded but unattached, so it is absent from the member list and
+      // available in the picker.
+      await seedTag('t9', 'Nitrox');
+      await seedDive('d1');
+      await seedDive('d2');
+      await pump(tester, ['d1', 'd2']);
+
+      await tapAdd(tester, 'Tags');
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text('Browse'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(TagPickerSheet), findsOneWidget);
+      await tester.tap(find.text('Nitrox'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Add 1 tag'));
+      await tester.pumpAndSettle();
+
+      // Back in the dialog with the browsed tag staged as a chip.
+      expect(find.byType(TagPickerSheet), findsNothing);
+      expect(find.widgetWithText(Chip, 'Nitrox'), findsOneWidget);
+
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.widgetWithText(FilledButton, 'Add'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Nitrox'), findsOneWidget); // added as a tag member
     });
   });
 }

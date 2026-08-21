@@ -40,6 +40,7 @@ import 'package:submersion/features/tags/presentation/providers/tag_providers.da
 import 'package:submersion/features/dive_types/presentation/dive_type_display.dart';
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
 import 'package:submersion/features/tags/presentation/widgets/tag_input_widget.dart';
+import 'package:submersion/features/tags/presentation/widgets/tag_picker_sheet.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -2468,29 +2469,72 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   }
 
   Widget _tagsChild() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            context.l10n.diveLog_edit_section_tags,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        FormOverline(
+          label: context.l10n.diveLog_edit_section_tags,
+          actions: [
+            FormOverlineAction(
+              label: context.l10n.tags_action_browse,
+              icon: Icons.label_outline,
+              onPressed: _showTagPicker,
             ),
-          ),
-          const SizedBox(height: 8),
-          TagInputWidget(
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
+          child: TagInputWidget(
             selectedTags: _selectedTags,
             onTagsChanged: (tags) {
               _markDirty();
               setState(() => _selectedTags = tags);
             },
           ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  /// Opens the previously-used-tag picker (#1171) over [selected], so tagging
+  /// stays consistent without having to recall earlier spellings. Reports the
+  /// merged list (existing plus newly picked) through [onPicked].
+  void _showTagPickerFor({
+    required List<Tag> selected,
+    required ValueChanged<List<Tag>> onPicked,
+  }) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (_, scrollController) => TagPickerSheet(
+          scrollController: scrollController,
+          selectedTagIds: selected.map((t) => t.id).toSet(),
+          onTagsPicked: (tags) {
+            // The sheet already excludes selected tags, but guard anyway so a
+            // stale list can never produce a duplicate chip.
+            final additions = tags.where(
+              (tag) => !selected.any((t) => t.id == tag.id),
+            );
+            if (additions.isNotEmpty) onPicked([...selected, ...additions]);
+            Navigator.of(sheetContext).pop();
+          },
+        ),
       ),
     );
   }
+
+  void _showTagPicker() => _showTagPickerFor(
+    selected: _selectedTags,
+    onPicked: (tags) {
+      _markDirty();
+      setState(() => _selectedTags = tags);
+    },
+  );
 
   /// Opens the profile editor, optionally prompting the user to choose which
   /// computer's profile to start from when the dive has multiple computers.
@@ -3386,27 +3430,36 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     var picked = <Tag>[];
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(context.l10n.diveLog_edit_section_tags),
-        content: StatefulBuilder(
-          builder: (ctx, setSt) => TagInputWidget(
+      // The StatefulBuilder wraps the whole dialog, not just its content, so
+      // the Browse action in the button row can restage `picked` too.
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSt) => AlertDialog(
+          title: Text(context.l10n.diveLog_edit_section_tags),
+          content: TagInputWidget(
             selectedTags: picked,
             onTagsChanged: (t) => setSt(() => picked = t),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => _showTagPickerFor(
+                selected: picked,
+                onPicked: (tags) => setSt(() => picked = tags),
+              ),
+              child: Text(context.l10n.tags_action_browse),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(context.l10n.diveLog_edit_cancel),
+            ),
+            FilledButton(
+              onPressed: () {
+                _addTagMembers(picked);
+                Navigator.pop(ctx);
+              },
+              child: Text(context.l10n.diveLog_edit_add),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(context.l10n.diveLog_edit_cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              _addTagMembers(picked);
-              Navigator.pop(ctx);
-            },
-            child: Text(context.l10n.diveLog_edit_add),
-          ),
-        ],
       ),
     );
   }
