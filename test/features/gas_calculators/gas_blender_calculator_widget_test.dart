@@ -116,9 +116,9 @@ void main() {
   ) async {
     await _pump(tester);
 
-    // 27.164 and 167.921 surface litres per litre of cylinder, in a 12 L tank.
+    // 27.174 and 167.984 surface litres per litre of cylinder, in a 12 L tank.
     expect(find.textContaining('326 L'), findsOneWidget);
-    expect(find.textContaining('2015 L'), findsOneWidget);
+    expect(find.textContaining('2016 L'), findsOneWidget);
   });
 
   testWidgets('a larger cylinder scales the amounts', (tester) async {
@@ -129,8 +129,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // 27.164 x 15 L = 407 L of oxygen.
-    expect(find.textContaining('407 L'), findsOneWidget);
+    // 27.174 x 15 L = 408 L of oxygen.
+    expect(find.textContaining('408 L'), findsOneWidget);
   });
 
   testWidgets('renders English even on a non-English host machine', (

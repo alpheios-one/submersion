@@ -391,4 +391,114 @@ void main() {
       }
     });
   });
+
+  group('blending temperature', () {
+    GasBlenderInputs tempInputs({
+      required double fillC,
+      required double settledC,
+      BlendGasModel model = BlendGasModel.zFactor,
+    }) => GasBlenderInputs(
+      startPressureBar: 0,
+      start: _air,
+      targetPressureBar: 200,
+      target: const GasMix(o2: 18, he: 45),
+      fillGas1: _o2,
+      fillGas2: _he,
+      fillGas3: _air,
+      model: model,
+      fillTempC: fillC,
+      settledTempC: settledC,
+    );
+
+    test('equal temperatures reproduce the untemperatured procedure', () {
+      final plain = computeBlend(
+        _inputs(
+          targetBar: 200,
+          target: const GasMix(o2: 18, he: 45),
+          g2: _he,
+          g3: _air,
+        ),
+      );
+      final explicit = computeBlend(tempInputs(fillC: 20, settledC: 20));
+      for (var i = 0; i < plain.steps.length; i++) {
+        expect(
+          explicit.steps[i].pressureBar,
+          closeTo(plain.steps[i].pressureBar, 1e-6),
+        );
+      }
+    });
+
+    test('a cylinder filled cold stops at a lower gauge reading', () {
+      final cold = computeBlend(tempInputs(fillC: 5, settledC: 20));
+      expect(cold.steps[1].pressureBar, closeTo(14.532, 0.05));
+      expect(cold.steps[2].pressureBar, closeTo(98.733, 0.05));
+      expect(cold.steps[3].pressureBar, closeTo(188.763, 0.05));
+      expect(cold.settledPressureBar, 200);
+    });
+
+    test('a cylinder filled warm has to overshoot', () {
+      final warm = computeBlend(tempInputs(fillC: 35, settledC: 20));
+      expect(warm.steps[1].pressureBar, closeTo(16.083, 0.05));
+      expect(warm.steps[3].pressureBar, closeTo(211.411, 0.05));
+      expect(warm.settledPressureBar, 200);
+    });
+
+    test('temperature does not change the mix reached', () {
+      for (final fill in [0.0, 5.0, 20.0, 35.0]) {
+        final r = computeBlend(tempInputs(fillC: fill, settledC: 20));
+        expect(r.steps.last.resultingMix.o2, closeTo(18, 0.01));
+        expect(r.steps.last.resultingMix.he, closeTo(45, 0.01));
+      }
+    });
+
+    test('addedBar is the gauge difference between consecutive steps', () {
+      final r = computeBlend(tempInputs(fillC: 5, settledC: 20));
+      expect(r.steps.first.addedBar, 0);
+      for (var i = 1; i < r.steps.length; i++) {
+        expect(
+          r.steps[i].addedBar,
+          closeTo(r.steps[i].pressureBar - r.steps[i - 1].pressureBar, 1e-9),
+        );
+      }
+    });
+  });
+
+  group('gas model selection', () {
+    GasBlenderInputs modelInputs(BlendGasModel model) => GasBlenderInputs(
+      startPressureBar: 0,
+      start: _air,
+      targetPressureBar: 200,
+      target: const GasMix(o2: 18, he: 45),
+      fillGas1: _o2,
+      fillGas2: _he,
+      fillGas3: _air,
+      model: model,
+    );
+
+    test('each model gives its own O2 intermediate pressure', () {
+      expect(
+        computeBlend(modelInputs(BlendGasModel.zFactor)).steps[1].pressureBar,
+        closeTo(15.308, 0.05),
+      );
+      expect(
+        computeBlend(modelInputs(BlendGasModel.ideal)).steps[1].pressureBar,
+        closeTo(16.329, 0.05),
+      );
+      expect(
+        computeBlend(
+          modelInputs(BlendGasModel.vanDerWaals),
+        ).steps[1].pressureBar,
+        closeTo(14.247, 0.05),
+      );
+    });
+
+    test('every model reaches the requested mix and pressure', () {
+      for (final model in BlendGasModel.values) {
+        final r = computeBlend(modelInputs(model));
+        expect(r.steps.last.resultingMix.o2, closeTo(18, 0.01));
+        expect(r.steps.last.resultingMix.he, closeTo(45, 0.01));
+        expect(r.steps.last.pressureBar, closeTo(200, 0.01));
+      }
+    });
+  });
 }

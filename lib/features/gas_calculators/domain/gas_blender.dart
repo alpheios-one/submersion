@@ -1,7 +1,11 @@
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
+import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
 
-/// Partial-pressure gas blending with real-gas (Van der Waals) behaviour.
+export 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart'
+    show BlendGasModel, zFactor, kReferenceTempC, celsiusToKelvin;
+
+/// Partial-pressure gas blending with a selectable equation of state.
 ///
 /// Given a cylinder's starting fill (pressure + mix) and a desired end fill,
 /// this computes the fill order and the intermediate pressures to top up to,
@@ -9,43 +13,19 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
 /// handled by the same solver: a two-gas linear solve for nitrox targets and a
 /// three-gas solve for trimix.
 ///
-/// Ported from the Blei-Log blender. All pressures are in bar; the virial
-/// coefficients are calibrated for bar, so callers must convert other pressure
-/// units before calling and convert results back for display.
-
-// Virial coefficients (bar) for the compressibility factor of each component.
-const List<double> _o2Coef = [
-  -7.18092073703e-04,
-  2.81852572808e-06,
-  -1.50290620492e-09,
-];
-const List<double> _n2Coef = [
-  -2.19260353292e-04,
-  2.92844845532e-06,
-  -2.07613482075e-09,
-];
-const List<double> _heCoef = [
-  4.87320026468e-04,
-  -8.83632921053e-08,
-  5.33304543646e-11,
-];
-
-double _virial(double p, List<double> c) =>
-    c[0] * p + c[1] * p * p + c[2] * p * p * p;
-
-double _fO2(GasMix m) => m.o2 / 100;
-double _fHe(GasMix m) => m.he / 100;
-double _fN2(GasMix m) => (100 - m.o2 - m.he) / 100;
-
-/// Real-gas compressibility factor Z of [m] at pressure [p] bar.
-double zFactor(double p, GasMix m) =>
-    1 +
-    _fO2(m) * _virial(p, _o2Coef) +
-    _fHe(m) * _virial(p, _heCoef) +
-    _fN2(m) * _virial(p, _n2Coef);
+/// The conserved quantity is molar density, because mixing adds moles exactly
+/// while it adds neither pressure nor volume exactly. That is also what makes
+/// two temperatures expressible: the solve itself is temperature-free, and
+/// temperature enters only when converting a gauge reading to moles and back.
+///
+/// All pressures are in bar and all temperatures in Celsius; callers convert
+/// for display.
 
 /// Surface-equivalent ("normal") gas volume for [p] bar of mix [m], per unit
-/// cylinder volume.
+/// cylinder volume, at [kReferenceTempC].
+///
+/// Retained for callers that predate the molar-density rewrite. Equal to
+/// `molarDensity(zFactor, p, m, T20) * kGasConstant * T20 * zFactor(1, m)`.
 double normalVolume(double p, GasMix m) => p * zFactor(1, m) / zFactor(p, m);
 
 /// Inverse of [normalVolume]: the real pressure (bar) holding surface volume
@@ -88,8 +68,8 @@ class BlendException implements Exception {
   final BlendError error;
 
   /// For [BlendError.negativeAmountRequired]: the pressure the cylinder must
-  /// be drained down to before this blend becomes possible. Null when the
-  /// blend fails for a reason draining cannot fix.
+  /// be drained down to before this blend becomes possible, read at the fill
+  /// temperature. Null when the blend fails for a reason draining cannot fix.
   final double? drainToBar;
 }
 
@@ -98,6 +78,7 @@ class BlendStep {
   const BlendStep({
     required this.fillGas,
     required this.pressureBar,
+    required this.addedBar,
     required this.resultingMix,
     required this.addedVolumePerLiter,
   });
@@ -105,23 +86,34 @@ class BlendStep {
   /// The gas topped up in this step; null for the starting condition.
   final GasMix? fillGas;
 
-  /// Fill the cylinder up to this pressure (bar). For the starting step this
-  /// is the pressure already in the cylinder.
+  /// Fill the cylinder up to this pressure (bar), read at the fill
+  /// temperature. For the starting step this is the pressure already in the
+  /// cylinder, likewise at the fill temperature.
   final double pressureBar;
+
+  /// How much the gauge moves during this step, in bar. Zero for the starting
+  /// step. This is the figure a fill station meters and bills on.
+  final double addedBar;
 
   /// The mix in the cylinder after this step.
   final GasMix resultingMix;
 
   /// Surface-equivalent volume of [fillGas] added per litre of cylinder
-  /// volume; null for the starting step.
+  /// volume, referenced to the settled temperature; null for the starting
+  /// step.
   final double? addedVolumePerLiter;
 }
 
 class BlendResult {
-  const BlendResult({required this.steps});
+  const BlendResult({required this.steps, required this.settledPressureBar});
 
-  /// Starting condition first, then one entry per fill gas.
+  /// Starting condition first, then one entry per fill gas. Every pressure is
+  /// read at the fill temperature.
   final List<BlendStep> steps;
+
+  /// What the cylinder reads once it equalises at the settled temperature.
+  /// This is the target pressure the diver requested, verbatim.
+  final double settledPressureBar;
 }
 
 class GasBlenderInputs {
@@ -133,10 +125,18 @@ class GasBlenderInputs {
     required this.fillGas1,
     required this.fillGas2,
     required this.fillGas3,
+    this.model = BlendGasModel.zFactor,
+    this.fillTempC = kReferenceTempC,
+    this.settledTempC = kReferenceTempC,
   });
 
+  /// Pressure already in the cylinder, as read at [fillTempC]. It is the gauge
+  /// in front of the blender.
   final double startPressureBar;
   final GasMix start;
+
+  /// The pressure the diver wants once the cylinder has equalised at
+  /// [settledTempC]. It is the only reading they can later verify.
   final double targetPressureBar;
   final GasMix target;
 
@@ -146,17 +146,32 @@ class GasBlenderInputs {
   final GasMix fillGas1;
   final GasMix fillGas2;
   final GasMix fillGas3;
+
+  final BlendGasModel model;
+
+  /// Temperature of the cylinder while it is being filled.
+  final double fillTempC;
+
+  /// Temperature the cylinder settles to afterwards.
+  final double settledTempC;
 }
 
-/// Fill amounts smaller than this (surface volume per litre of cylinder) are
-/// treated as nothing: below a hundredth of a bar in a 1 L cylinder, no fill
-/// station can meter them and no gauge can show them.
-const double _volumeTolerance = 0.01;
+/// Fill amounts smaller than this (mol per litre of cylinder) are treated as
+/// nothing. This is the molar equivalent, at [kReferenceTempC], of the 0.01
+/// surface litres per litre the blender used before the rewrite: below a
+/// hundredth of a bar in a 1 L cylinder, no fill station can meter it and no
+/// gauge can show it.
+final double _densityTolerance =
+    0.01 / (kGasConstant * celsiusToKelvin(kReferenceTempC));
 
 /// Percentage points below which a mix counts as helium-free.
 const double _heliumEpsilon = 1e-9;
 
 bool _isHeliumFree(GasMix m) => m.he <= _heliumEpsilon;
+
+double _fO2(GasMix m) => m.o2 / 100;
+double _fHe(GasMix m) => m.he / 100;
+double _fN2(GasMix m) => (100 - m.o2 - m.he) / 100;
 
 void _validateMix(GasMix m) {
   if (m.o2 < 0 || m.he < 0 || m.o2 + m.he > 100) {
@@ -189,7 +204,7 @@ List<GasMix> _selectFillGases(GasMix target, List<GasMix> available) {
   return heliumFree.take(2).toList();
 }
 
-/// Surface volume of each gas in [gases] needed to turn [startVol] of [start]
+/// Molar amount of each gas in [gases] needed to turn [startVol] of [start]
 /// into [targetVol] of [target], per litre of cylinder volume.
 ///
 /// Amounts may come back negative: that means the cylinder already holds gas
@@ -251,10 +266,10 @@ List<double> _solveTops({
   return [top1, (targetVol - startVol) - top1];
 }
 
-/// The largest starting volume that still blends, or null when even an empty
+/// The largest starting amount that still blends, or null when even an empty
 /// cylinder cannot produce the target from these gases.
 ///
-/// Every fill amount is affine in the starting volume, so the feasible set is
+/// Every fill amount is affine in the starting amount, so the feasible set is
 /// an interval. When an empty cylinder is feasible that interval starts at
 /// zero, which makes feasibility monotonic and a bisection exact.
 double? _largestFeasibleStartVolume({
@@ -272,7 +287,7 @@ double? _largestFeasibleStartVolume({
         target: target,
         targetVol: targetVol,
         gases: gases,
-      ).every((t) => t >= -_volumeTolerance);
+      ).every((t) => t >= -_densityTolerance);
     } on BlendException {
       return false;
     }
@@ -300,6 +315,9 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
   final pf = inputs.targetPressureBar;
   final gasI = inputs.start;
   final gasF = inputs.target;
+  final model = inputs.model;
+  final fillK = celsiusToKelvin(inputs.fillTempC);
+  final settledK = celsiusToKelvin(inputs.settledTempC);
 
   if (pf <= pi) {
     throw const BlendException(BlendError.targetPressureNotHigher);
@@ -323,8 +341,10 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
     inputs.fillGas3,
   ]);
 
-  final iVol = normalVolume(pi, gasI);
-  final fVol = normalVolume(pf, gasF);
+  // The start pressure is a gauge reading taken while the cylinder is at the
+  // fill temperature; the target is what it must read once settled.
+  final iVol = molarDensity(model, pi, gasI, fillK);
+  final fVol = molarDensity(model, pf, gasF, settledK);
 
   final tops = _solveTops(
     start: gasI,
@@ -334,7 +354,7 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
     gases: gases,
   );
 
-  if (tops.any((t) => t < -_volumeTolerance)) {
+  if (tops.any((t) => t < -_densityTolerance)) {
     final drainVol = _largestFeasibleStartVolume(
       start: gasI,
       startVol: iVol,
@@ -344,7 +364,9 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
     );
     throw BlendException(
       BlendError.negativeAmountRequired,
-      drainToBar: drainVol == null ? null : pressureForVolume(gasI, drainVol),
+      drainToBar: drainVol == null
+          ? null
+          : pressureAt(model, drainVol, gasI, fillK),
     );
   }
 
@@ -352,6 +374,7 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
     BlendStep(
       fillGas: null,
       pressureBar: pi,
+      addedBar: 0,
       resultingMix: gasI,
       addedVolumePerLiter: null,
     ),
@@ -359,31 +382,44 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
 
   var mix = gasI;
   var vol = iVol;
+  var previousBar = pi;
   for (var i = 0; i < gases.length; i++) {
     final top = tops[i];
     // A gas the blend does not need is left out rather than listed as a fill
     // to the pressure already in the cylinder.
-    if (top.abs() < _volumeTolerance) continue;
+    if (top.abs() < _densityTolerance) continue;
     mix = _blend(mix, vol, gases[i], top);
     vol += top;
+    final bar = pressureAt(model, vol, mix, fillK);
     steps.add(
       BlendStep(
         fillGas: gases[i],
-        pressureBar: pressureForVolume(mix, vol),
+        pressureBar: bar,
+        addedBar: bar - previousBar,
         resultingMix: mix,
-        addedVolumePerLiter: top,
+        // Reported as a surface-equivalent volume at the settled temperature,
+        // which is the figure a bank gauge and a gas invoice both speak in.
+        addedVolumePerLiter: top * kGasConstant * settledK,
       ),
     );
+    previousBar = bar;
   }
 
-  // The requested pressure is what the blender fills to; use it verbatim
-  // rather than the fixed-point iteration's approximation of it.
+  // The final reading comes from the exact target state, not from the running
+  // total, which carries the drift of every intermediate inversion. When the
+  // cylinder is filled at its settled temperature that reading is the pressure
+  // the diver typed, so use it verbatim rather than handing back an
+  // iteration's approximation of their own number.
   if (steps.length > 1) {
     final last = steps.removeLast();
+    final finalBar = inputs.fillTempC == inputs.settledTempC
+        ? pf
+        : pressureAt(model, fVol, gasF, fillK);
     steps.add(
       BlendStep(
         fillGas: last.fillGas,
-        pressureBar: pf,
+        pressureBar: finalBar,
+        addedBar: finalBar - steps.last.pressureBar,
         resultingMix: last.resultingMix,
         addedVolumePerLiter: last.addedVolumePerLiter,
       ),
@@ -395,5 +431,5 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
     throw const BlendException(BlendError.targetNotReached);
   }
 
-  return BlendResult(steps: steps);
+  return BlendResult(steps: steps, settledPressureBar: pf);
 }
