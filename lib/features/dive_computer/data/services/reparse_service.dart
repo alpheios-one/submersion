@@ -800,7 +800,6 @@ class ReparseService {
     ]);
   }
 
-  /// Extract maximum CNS percentage from profile samples.
   /// Minimum water temperature for this parse, in Celsius.
   ///
   /// Some computers (Shearwater among them) report no top-level minimum and
@@ -822,6 +821,7 @@ class ReparseService {
     return minTemp;
   }
 
+  /// Extract maximum CNS percentage from profile samples.
   static double? _extractMaxCns(List<pigeon.ProfileSample> samples) {
     double? maxCns;
     for (final s in samples) {
