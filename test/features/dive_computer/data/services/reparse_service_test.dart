@@ -93,6 +93,8 @@ void main() {
     int? duration,
     double? waterTemp,
     int? timeOffsetSeconds,
+    DateTime? entryTime,
+    DateTime? exitTime,
   }) async {
     final now = DateTime.fromMillisecondsSinceEpoch(nowMs);
     await db
@@ -109,6 +111,8 @@ void main() {
             duration: Value(duration),
             waterTemp: Value(waterTemp),
             timeOffsetSeconds: Value(timeOffsetSeconds),
+            entryTime: Value(entryTime),
+            exitTime: Value(exitTime),
             importedAt: Value(now),
             createdAt: Value(now),
           ),
@@ -744,6 +748,90 @@ void main() {
         expect(src.waterTemp, isNull);
       },
     );
+
+    test('refreshes the source row entry/exit window from the re-parsed '
+        'clock (#1207)', () async {
+      // Arrange: a source row stamped with the original download's window.
+      await insertDive('dive-1');
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+        duration: 2400,
+        entryTime: DateTime.utc(2026, 1, 15, 10, 0),
+        exitTime: DateTime.utc(2026, 1, 15, 10, 40),
+      );
+
+      // Act: re-parse moves the start by an hour and lengthens the dive.
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: makeParsedDive(hour: 11, durationSeconds: 3000),
+        descriptorVendor: 'Suunto',
+        descriptorProduct: 'EON Core',
+        descriptorModel: 99,
+        libdivecomputerVersion: '0.9.0',
+      );
+
+      // Assert: the source row's window tracks the dive's own clock.
+      final src = await getSource('src-1');
+      final dive = await getDive('dive-1');
+      expect(
+        src.entryTime!.millisecondsSinceEpoch,
+        DateTime.utc(2026, 1, 15, 11, 0).millisecondsSinceEpoch,
+      );
+      expect(
+        src.exitTime!.millisecondsSinceEpoch,
+        DateTime.utc(2026, 1, 15, 11, 50).millisecondsSinceEpoch,
+      );
+      expect(src.entryTime!.millisecondsSinceEpoch, dive.entryTime);
+      expect(src.exitTime!.millisecondsSinceEpoch, dive.exitTime);
+    });
+
+    test('records the raw parsed window on an offset-bearing source, not the '
+        're-based one (#1207)', () async {
+      // Arrange: a consolidated secondary whose profile is re-based by 10
+      // minutes. entry_time/exit_time stay in the source's own parse frame --
+      // the download path stamps them unshifted and consolidation copies them
+      // across untouched, recording the shift in timeOffsetSeconds instead.
+      await insertDive('dive-1');
+      await insertComputer('comp-1');
+      await insertSource(id: 'src-primary', diveId: 'dive-1', isPrimary: true);
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: false,
+        timeOffsetSeconds: 600,
+        entryTime: DateTime.utc(2026, 1, 15, 10, 0),
+        exitTime: DateTime.utc(2026, 1, 15, 10, 40),
+      );
+
+      // Act
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: makeParsedDive(hour: 11, durationSeconds: 3000),
+        descriptorVendor: 'Suunto',
+        descriptorProduct: 'EON Core',
+        descriptorModel: 99,
+        libdivecomputerVersion: '0.9.0',
+      );
+
+      // Assert: no offset folded into the recorded window.
+      final src = await getSource('src-1');
+      expect(
+        src.entryTime!.millisecondsSinceEpoch,
+        DateTime.utc(2026, 1, 15, 11, 0).millisecondsSinceEpoch,
+      );
+      expect(
+        src.exitTime!.millisecondsSinceEpoch,
+        DateTime.utc(2026, 1, 15, 11, 50).millisecondsSinceEpoch,
+      );
+      expect(src.timeOffsetSeconds, 600);
+    });
 
     test(
       'is idempotent: same data applied twice yields identical DB state',
