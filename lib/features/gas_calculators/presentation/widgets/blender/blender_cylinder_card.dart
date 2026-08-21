@@ -7,6 +7,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_mix_row.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/mix_template_menu.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -58,7 +59,24 @@ class BlenderCylinderCard extends ConsumerWidget {
                   GasMix(o2: num(startO2.text), he: num(startHe.text)),
             ),
             const SizedBox(height: 20),
-            BlenderSectionTitle(context.l10n.gasCalculators_blender_targetFill),
+            Row(
+              children: [
+                Expanded(
+                  child: BlenderSectionTitle(
+                    context.l10n.gasCalculators_blender_targetFill,
+                  ),
+                ),
+                MixTemplateMenu(
+                  onSelected: (t) {
+                    // The fields hold their own text, so a template chosen from
+                    // the menu has to be written back into them or the diver
+                    // sees their old mix over the new procedure.
+                    targetO2.text = formatDecimalForInput(t.o2);
+                    targetHe.text = formatDecimalForInput(t.he);
+                  },
+                ),
+              ],
+            ),
             BlenderMixRow(
               pressureSymbol: units.pressureSymbol,
               pressureController: targetPressure,
