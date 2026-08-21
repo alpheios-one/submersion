@@ -66,13 +66,21 @@ class MediaStoreWorker {
   Future<void> drain() async {
     if (_disposed || _running) return;
     _running = true;
+    // Set only on the one exit that means "nothing was due, and I looked":
+    // every other way out of the loop - a failed preflight, a gate that
+    // stopped the drain, an exception out of the pipeline - leaves work
+    // behind on purpose, and must not arm the immediate wakeup below.
+    var drainedToEmpty = false;
     try {
       while (true) {
         // Re-checked per entry, not once per drain: a store wipe or user
         // disconnect mid-drain must suspend the rest of the queue.
         if (!await _preflightPasses()) return;
         final entry = await _queue.nextPending(DateTime.now());
-        if (entry == null) break;
+        if (entry == null) {
+          drainedToEmpty = true;
+          break;
+        }
         if (_gate != null) {
           final decision = await _gate(entry);
           if (decision == WorkerGate.stopDraining) {
@@ -99,7 +107,7 @@ class MediaStoreWorker {
       }
     } finally {
       _running = false;
-      await _armWakeup();
+      await _armWakeup(drainedToEmpty: drainedToEmpty);
     }
   }
 
@@ -147,7 +155,10 @@ class MediaStoreWorker {
   ///
   /// Runs in drain's finally and must never throw: an exception here would
   /// replace whatever the drain itself was reporting.
-  Future<void> _armWakeup() async {
+  ///
+  /// [drainedToEmpty] says the drain looked and found nothing due. That is
+  /// what makes the already-due branch below safe; see it for why.
+  Future<void> _armWakeup({required bool drainedToEmpty}) async {
     _wakeup?.cancel();
     _wakeup = null;
     _wakeupDelay = null;
@@ -160,6 +171,24 @@ class MediaStoreWorker {
       // One clock reading for both the query and the delay, so the timer
       // cannot be handed a negative duration by the query's own latency.
       final now = DateTime.now();
+      // The drain asked "what is due?" against its own clock reading, and
+      // earliestPendingWakeup asks "what is not due yet?" against this one.
+      // Those are complements only if no time passed in between, so a row
+      // whose backoff expired since - or one enqueued since, which the
+      // single-flight guard turned into a no-op kick - answers to neither
+      // query and would wait for an unrelated trigger (#1210). Hand it
+      // straight back to a fresh drain.
+      //
+      // Only when the drain reached an empty queue. A drain that declined to
+      // run (offline, failed preflight) left its due row behind deliberately,
+      // and re-kicking that would spin against a drain that keeps declining.
+      // A drain that emptied the queue cannot: every loop exit consumes its
+      // entry, so the next drain either takes this row or is itself a decline.
+      if (drainedToEmpty && await _queue.nextPending(now) != null) {
+        _wakeupDelay = Duration.zero;
+        _wakeup = Timer(Duration.zero, () => unawaited(drain()));
+        return;
+      }
       final due = await _queue.earliestPendingWakeup(now);
       if (due == null) return;
       final delay = due.difference(now);
