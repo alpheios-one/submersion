@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:submersion/core/constants/tank_presets.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
-import 'package:submersion/features/gas_calculators/domain/tank_spec.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/gas_blender_calculator.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -109,28 +107,6 @@ void main() {
     // Defaults are an empty cylinder to EAN32: O2 then air, no helium step.
     expect(find.textContaining('Fill Air to'), findsOneWidget);
     expect(find.textContaining('Helium'), findsNothing);
-  });
-
-  testWidgets('amounts are real gas quantities for the chosen cylinder', (
-    tester,
-  ) async {
-    await _pump(tester);
-
-    // 27.174 and 167.984 surface litres per litre of cylinder, in a 12 L tank.
-    expect(find.textContaining('326 L'), findsOneWidget);
-    expect(find.textContaining('2016 L'), findsOneWidget);
-  });
-
-  testWidgets('a larger cylinder scales the amounts', (tester) async {
-    final ref = await _pump(tester);
-
-    ref.read(blenderTankProvider.notifier).state = TankSpec.fromPreset(
-      TankPresets.steel15,
-    );
-    await tester.pumpAndSettle();
-
-    // 27.174 x 15 L = 408 L of oxygen.
-    expect(find.textContaining('408 L'), findsOneWidget);
   });
 
   testWidgets('renders English even on a non-English host machine', (

@@ -3,13 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
-import 'package:submersion/features/gas_calculators/domain/tank_spec.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
@@ -162,37 +160,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
     ),
   );
 
-  /// Cylinder choices, offered in whichever unit the diver thinks in.
-  Widget _cylinderChips(BuildContext context) {
-    final selected = ref.watch(blenderTankProvider);
-    final units = _units;
-    final choices = ref.watch(settingsProvider).volumeUnit == VolumeUnit.liters
-        ? metricTankChoices()
-        : imperialTankChoices();
-
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (final choice in choices)
-          FilterChip(
-            label: Text(
-              units.formatTankVolume(
-                choice.waterVolumeLiters,
-                choice.workingPressureBar,
-                ratedCapacityCuft: choice.ratedCapacityCuft,
-              ),
-            ),
-            selected: choice == selected,
-            onSelected: (_) =>
-                ref.read(blenderTankProvider.notifier).state = choice,
-            selectedColor: Theme.of(context).colorScheme.primaryContainer,
-            checkmarkColor: Theme.of(context).colorScheme.onPrimaryContainer,
-          ),
-      ],
-    );
-  }
-
   Widget _cylinderCard(BuildContext context) {
     return Card(
       child: Padding(
@@ -200,9 +167,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionTitle(context.l10n.gasCalculators_blender_cylinder),
-            _cylinderChips(context),
-            const SizedBox(height: 20),
             _sectionTitle(context.l10n.gasCalculators_blender_startCylinder),
             _mixRow(
               pressureController: _startP,
@@ -370,7 +334,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
     }
 
     final steps = outcome.result!.steps;
-    final tank = ref.watch(blenderTankProvider);
     return Card(
       color: colorScheme.primaryContainer,
       child: Padding(
@@ -396,27 +359,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
                   ),
                 ),
               ),
-            const Divider(height: 24),
-            Text(
-              context.l10n.gasCalculators_blender_amounts,
-              style: textTheme.labelMedium?.copyWith(
-                color: colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              [
-                // The solver works per litre of cylinder volume; multiplying by
-                // water capacity turns that into the gas actually drawn from
-                // each bank, in the diver's own volume unit.
-                for (final s in steps.where((s) => s.fillGas != null))
-                  '${_gasName(s.fillGas!)}: '
-                      '${_units.formatVolume(s.addedVolumePerLiter! * tank.waterVolumeLiters)}',
-              ].join('   ·   '),
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onPrimaryContainer,
-              ),
-            ),
           ],
         ),
       ),
