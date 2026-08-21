@@ -1,4 +1,5 @@
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
@@ -144,21 +145,36 @@ final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
   }
 });
 
+const _log = LoggerService('GasBlenderPreferences');
+
 /// Persist everything the blender remembers. Called after a settled edit, not
 /// per keystroke, so typing a price is one database write rather than one per
 /// character.
-Future<void> saveBlenderPreferences(WidgetRef ref) {
-  return AppSettingsRepository().setBlenderPreferences(
-    BlenderPreferences(
-      templates: ref.read(blenderTemplatesProvider),
-      gasPrices: ref.read(blenderGasPricesProvider),
-      currencyCode: ref.read(blenderCurrencyProvider),
-      fillTempC: ref.read(blenderFillTempProvider),
-      settledTempC: ref.read(blenderSettledTempProvider),
-      cylinderWaterLiters: ref.read(blenderCylinderLitersProvider),
-      model: ref.read(blenderGasModelProvider),
-    ),
-  );
+///
+/// A failed write is logged rather than propagated. The repository rethrows so
+/// the failure is never invisible, but a blender preference is not worth
+/// interrupting a fill procedure over, and the value the diver just chose is
+/// already live in the provider either way.
+Future<void> saveBlenderPreferences(WidgetRef ref) async {
+  try {
+    await AppSettingsRepository().setBlenderPreferences(
+      BlenderPreferences(
+        templates: ref.read(blenderTemplatesProvider),
+        gasPrices: ref.read(blenderGasPricesProvider),
+        currencyCode: ref.read(blenderCurrencyProvider),
+        fillTempC: ref.read(blenderFillTempProvider),
+        settledTempC: ref.read(blenderSettledTempProvider),
+        cylinderWaterLiters: ref.read(blenderCylinderLitersProvider),
+        model: ref.read(blenderGasModelProvider),
+      ),
+    );
+  } catch (e, stackTrace) {
+    _log.error(
+      'Failed to save blender preferences',
+      error: e,
+      stackTrace: stackTrace,
+    );
+  }
 }
 
 /// Reset the gas blender inputs to defaults and re-seed its input fields.

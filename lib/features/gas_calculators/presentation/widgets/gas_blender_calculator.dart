@@ -7,6 +7,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_about_card.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_conditions_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_cylinder_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
@@ -140,6 +141,8 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
                 o2Controllers: _gasO2,
                 heControllers: _gasHe,
               ),
+              const SizedBox(height: 16),
+              const BlenderConditionsCard(),
               const SizedBox(height: 16),
               _resultCard(context, outcome),
               const SizedBox(height: 16),
