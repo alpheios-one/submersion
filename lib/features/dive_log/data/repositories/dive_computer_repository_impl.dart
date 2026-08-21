@@ -1115,17 +1115,19 @@ class DiveComputerRepository {
       final diveId = matchedDiveId ?? _uuid.v4();
       final isNewDive = matchedDiveId == null;
 
-      // Max CNS across the profile samples. Both the new dive row and the
-      // provenance row below are filled from it, so ReparseService (which
-      // derives the same value from stored raw_data) stays in agreement.
-      final sampleCns = points.map((p) => p.cns).whereType<double>().toList();
-      final maxCns = sampleCns.isNotEmpty
-          ? sampleCns.reduce((a, b) => a > b ? a : b)
-          : null;
-
       if (isNewDive) {
         // Create a new dive for this profile
         _log.info('No matching dive found, creating new dive');
+
+        // Max CNS across the profile samples. Both the dive row and the
+        // provenance row below are filled from it, so ReparseService (which
+        // derives the same value from stored raw_data) stays in agreement.
+        // Scoped to this branch because both consumers live here; a profile
+        // that matches an existing dive must not pay the traversal.
+        final sampleCns = points.map((p) => p.cns).whereType<double>().toList();
+        final maxCns = sampleCns.isNotEmpty
+            ? sampleCns.reduce((a, b) => a > b ? a : b)
+            : null;
 
         // Calculate exit time from entry time + duration
         final entryTimeMs = profileStartTime.millisecondsSinceEpoch;
@@ -1223,7 +1225,8 @@ class DiveComputerRepository {
 
         // Create a data source record for provenance tracking.
         // Derive water temp from profile samples when not provided as a
-        // top-level value (e.g. Shearwater); maxCns is derived above.
+        // top-level value (e.g. Shearwater); maxCns is derived at the top of
+        // this branch.
         final sampleTemps = points
             .map((p) => p.temperature)
             .whereType<double>()
