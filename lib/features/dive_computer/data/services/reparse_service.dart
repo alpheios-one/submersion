@@ -373,6 +373,21 @@ class ReparseService {
   // Private helpers
   // ==========================================================================
 
+  /// The dive's start instant as this parse reports it, in the source's own
+  /// time frame.
+  ///
+  /// Both the source row's provenance window and the dive row's own clock
+  /// derive from this one expression so they cannot drift apart across a
+  /// re-parse (#1207).
+  static DateTime _parsedEntryTime(pigeon.ParsedDive parsed) => DateTime.utc(
+    parsed.dateTimeYear,
+    parsed.dateTimeMonth,
+    parsed.dateTimeDay,
+    parsed.dateTimeHour,
+    parsed.dateTimeMinute,
+    parsed.dateTimeSecond,
+  );
+
   Future<void> _updateSourceRow({
     required String sourceRowId,
     required pigeon.ParsedDive parsed,
@@ -384,6 +399,7 @@ class ReparseService {
     required Uint8List? rawFingerprint,
     required DateTime now,
   }) async {
+    final entryTime = _parsedEntryTime(parsed);
     await (db.update(
       db.diveDataSources,
     )..where((t) => t.id.equals(sourceRowId))).write(
@@ -401,6 +417,22 @@ class ReparseService {
         entryLongitude: Value(parsed.entryLongitude),
         exitLatitude: Value(parsed.exitLatitude),
         exitLongitude: Value(parsed.exitLongitude),
+        // The download path stamps this window when it inserts the row, so a
+        // re-parse has to refresh it or the source keeps advertising the
+        // original download's clock while the dive itself moves (#1207).
+        // These are load-bearing: DiveSplitService dates a split-out dive
+        // from them and DiveConsolidationService carries them onto the
+        // target.
+        //
+        // Raw parse frame, deliberately unshifted by timeOffsetSeconds. The
+        // samples in _replaceDiveProfiles are re-based onto the dive's
+        // timeline; this window is not, because consolidation copies a
+        // folded-in source's entry/exit across untouched and records the
+        // shift in timeOffsetSeconds instead.
+        entryTime: Value(entryTime),
+        exitTime: Value(
+          entryTime.add(Duration(seconds: parsed.durationSeconds)),
+        ),
         descriptorVendor: Value(descriptorVendor),
         descriptorProduct: Value(descriptorProduct),
         descriptorModel: Value(descriptorModel),
@@ -421,16 +453,7 @@ class ReparseService {
     required pigeon.ParsedDive parsed,
     required DateTime now,
   }) async {
-    // Build UTC DateTime from parsed components
-    final diveDateTime = DateTime.utc(
-      parsed.dateTimeYear,
-      parsed.dateTimeMonth,
-      parsed.dateTimeDay,
-      parsed.dateTimeHour,
-      parsed.dateTimeMinute,
-      parsed.dateTimeSecond,
-    );
-    final diveDateTimeMs = diveDateTime.millisecondsSinceEpoch;
+    final diveDateTimeMs = _parsedEntryTime(parsed).millisecondsSinceEpoch;
     final exitTimeMs = diveDateTimeMs + (parsed.durationSeconds * 1000);
     final bottomTimeSeconds = _calculateBottomTimeFromSamples(parsed.samples);
     final waterTemp = _minWaterTemp(parsed);
