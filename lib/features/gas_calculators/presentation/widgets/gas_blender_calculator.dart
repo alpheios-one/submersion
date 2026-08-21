@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/l10n/l10n_extension.dart';
 
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
-import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_about_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_conditions_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_cylinder_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_procedure_card.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 /// Real-gas partial-pressure blender: given what's in the cylinder and the
@@ -116,7 +115,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
 
   @override
   Widget build(BuildContext context) {
-    final outcome = ref.watch(blenderResultProvider);
     // Subscribes to unit changes; the value is read through [_units].
     ref.watch(settingsProvider);
 
@@ -144,7 +142,7 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
               const SizedBox(height: 16),
               const BlenderConditionsCard(),
               const SizedBox(height: 16),
-              _resultCard(context, outcome),
+              const BlenderProcedureCard(),
               const SizedBox(height: 16),
               const BlenderAboutCard(),
             ],
@@ -152,110 +150,5 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
         ),
       ),
     );
-  }
-
-  Widget _resultCard(BuildContext context, BlenderOutcome outcome) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    if (outcome.error != null) {
-      return Card(
-        color: colorScheme.errorContainer,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Icon(Icons.error_outline, color: colorScheme.onErrorContainer),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  _errorText(context, outcome.error!, outcome.drainToBar),
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onErrorContainer,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    final steps = outcome.result!.steps;
-    return Card(
-      color: colorScheme.primaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.l10n.gasCalculators_blender_procedure,
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onPrimaryContainer,
-              ),
-            ),
-            const SizedBox(height: 16),
-            for (var i = 0; i < steps.length; i++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  _stepText(context, steps[i], i, steps.length),
-                  style: textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onPrimaryContainer,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _stepText(BuildContext context, BlendStep step, int index, int total) {
-    final pressure = _units.formatPressure(
-      step.pressureBar,
-      decimals: pressureDecimalsFor(ref.read(settingsProvider).pressureUnit),
-    );
-    if (step.fillGas == null) {
-      return '${index + 1}. ${context.l10n.gasCalculators_blender_stepStart(pressure, formatPreciseGasName(context, step.resultingMix))}';
-    }
-    return '${index + 1}. ${context.l10n.gasCalculators_blender_stepFill(formatPreciseGasName(context, step.fillGas!), pressure, formatPreciseGasName(context, step.resultingMix))}';
-  }
-
-  String _errorText(
-    BuildContext context,
-    BlendError error,
-    double? drainToBar,
-  ) {
-    switch (error) {
-      case BlendError.targetPressureNotHigher:
-        return context.l10n.gasCalculators_blender_error_targetPressure;
-      case BlendError.invalidMix:
-        return context.l10n.gasCalculators_blender_error_invalidMix;
-      case BlendError.identicalNitroxGases:
-        return context.l10n.gasCalculators_blender_error_identicalGases;
-      case BlendError.linearlyDependentGases:
-        return context.l10n.gasCalculators_blender_error_linearlyDependent;
-      case BlendError.cannotRemoveHelium:
-        return context.l10n.gasCalculators_blender_error_cannotRemoveHelium;
-      case BlendError.insufficientFillGases:
-        return context.l10n.gasCalculators_blender_error_insufficientGases;
-      case BlendError.targetNotReached:
-        return context.l10n.gasCalculators_blender_error_targetNotReached;
-      case BlendError.negativeAmountRequired:
-        // Naming the pressure to bleed down to is the whole answer here; a
-        // bare "not achievable" leaves the blender to guess it.
-        if (drainToBar == null) {
-          return context.l10n.gasCalculators_blender_error_negativeAmount;
-        }
-        if (drainToBar < 1) {
-          return context.l10n.gasCalculators_blender_error_drainEmpty;
-        }
-        return context.l10n.gasCalculators_blender_error_drainTo(
-          _units.formatPressure(drainToBar),
-        );
-    }
   }
 }

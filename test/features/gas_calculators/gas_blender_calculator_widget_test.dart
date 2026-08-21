@@ -105,7 +105,7 @@ void main() {
     await _pump(tester);
 
     // Defaults are an empty cylinder to EAN32: O2 then air, no helium step.
-    expect(find.textContaining('Fill Air to'), findsOneWidget);
+    expect(find.text('Add Air'), findsOneWidget);
     expect(find.textContaining('Helium'), findsNothing);
   });
 
@@ -201,5 +201,37 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await _pump(tester);
     expect(tester.takeException(), isNull);
+  });
+  testWidgets('each fill step shows the bar delivered', (tester) async {
+    final ref = await _pump(tester);
+    ref.read(blenderTargetMixProvider.notifier).state = const GasMix(
+      o2: 18,
+      he: 45,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('+15.3'), findsOneWidget);
+    expect(find.textContaining('104.3'), findsOneWidget);
+  });
+
+  testWidgets('a chilled fill names the settled pressure', (tester) async {
+    final ref = await _pump(tester);
+    ref.read(blenderFillTempProvider.notifier).state = 5;
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Settles to'), findsOneWidget);
+    expect(find.textContaining('200.0'), findsWidgets);
+  });
+
+  testWidgets('an equal-temperature fill does not claim a settle', (
+    tester,
+  ) async {
+    await _pump(tester);
+    expect(find.textContaining('Settles to'), findsNothing);
+  });
+
+  testWidgets('the litres summary line is gone', (tester) async {
+    await _pump(tester);
+    expect(find.text('Gas to add'), findsNothing);
   });
 }
