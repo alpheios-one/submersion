@@ -130,7 +130,21 @@ def build():
 
     # A full-em advance keeps every icon square, which is what Icon() assumes
     # when it sizes the glyph by font size.
-    fb.setupHorizontalMetrics({name: (UPEM, 0) for name in glyphs})
+    #
+    # The left side bearing must equal the glyph's own xMin. Hardcoding it to 0
+    # while the outlines start anywhere from 83 to 184 units in leaves the font
+    # internally inconsistent, and consumers that honour the declared lsb shift
+    # the outline by exactly (lsb - xMin) to reconcile the two. That displaced
+    # every glyph left by up to 4.4 grid units while glyf's own bounds still
+    # reported them perfectly centred, so the table said one thing and the
+    # rendering did another.
+    glyf = fb.font["glyf"]
+    metrics = {}
+    for name in glyphs:
+        glyph = glyf[name]
+        glyph.recalcBounds(glyf)
+        metrics[name] = (UPEM, glyph.xMin if glyph.numberOfContours else 0)
+    fb.setupHorizontalMetrics(metrics)
     fb.setupHorizontalHeader(ascent=UPEM, descent=0)
     fb.setupNameTable(
         {
@@ -191,6 +205,23 @@ def verify():
         if not rec.value:
             problems.append(f"{name}: empty outline")
             continue
+
+        # Measure the glyph as a consumer *draws* it, not only as glyf
+        # tabulates it. These two disagree whenever hmtx lsb does not match
+        # xMin, and that disagreement is invisible to a check that reads the
+        # table alone: glyf reported dead-centre ink while every glyph drew up
+        # to 4.4 grid units to the left.
+        drawn = BoundsPen(None)
+        rec.replay(drawn)
+        advance, lsb = font["hmtx"][mapped]
+        if lsb != font["glyf"][mapped].xMin:
+            problems.append(
+                f"{name}: hmtx lsb {lsb} does not match glyf xMin "
+                f"{font['glyf'][mapped].xMin}; consumers that honour lsb will "
+                f"shift the outline by {lsb - font['glyf'][mapped].xMin} units"
+            )
+        if advance != UPEM:
+            problems.append(f"{name}: advance {advance} is not one em")
         # glyf's own bounds are the ink bounds. Measuring the drawn points
         # instead would flag off-curve control points, which legitimately sit
         # outside the shape they steer.
@@ -201,10 +232,11 @@ def verify():
         # box rather than the ink, so this offset is exactly how far off-centre
         # the icon renders.
         k = GRID / UPEM
-        cx = (glyph.xMin + glyph.xMax) / 2 * k
-        cy = (glyph.yMin + glyph.yMax) / 2 * k
+        dx0, dy0, dx1, dy1 = drawn.bounds
+        cx = (dx0 + dx1) / 2 * k
+        cy = (dy0 + dy1) / 2 * k
         dx, dy = cx - GRID / 2, cy - GRID / 2
-        size = max(glyph.xMax - glyph.xMin, glyph.yMax - glyph.yMin) * k
+        size = max(dx1 - dx0, dy1 - dy0) * k
 
         print(
             f"  {name:12s} U+{cp:04X}  "
