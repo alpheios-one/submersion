@@ -764,6 +764,49 @@ void main() {
           .timeout(const Duration(seconds: 5));
     });
   });
+
+  /// Only notFound and unauthenticated flip `MediaItem.isOrphaned`, so a slow
+  /// share must never reach either. The gate answers stillFetching once a read
+  /// outlives its budget, which is a statement about time, not about whether
+  /// the file exists.
+  group('verify does not orphan a row for being slow', () {
+    test('a still-fetching read reports transientError', () async {
+      final platform = _StubPlatform()
+        // Never completes: the shape of a read against a hung-but-mounted
+        // share, which is exactly what the budget exists to bound.
+        ..onReadBookmarkBytes = ((_) => Completer<Uint8List>().future);
+
+      final resolver = LocalFileResolver(
+        bookmarkStorage: _StubBookmarkStorage(Uint8List.fromList([1, 2, 3])),
+        platform: platform,
+        exifExtractor: ExifExtractor(),
+        usesSecurityScopedBookmarks: () => true,
+        gate: MediaFetchGate(
+          maxConcurrent: 1,
+          slotBudget: Duration.zero,
+          totalBudget: Duration.zero,
+        ),
+      );
+
+      final data = await resolver
+          .resolve(_localFile(bookmarkRef: 'ref'))
+          .timeout(const Duration(seconds: 5));
+      expect(
+        (data as UnavailableData).kind,
+        UnavailableKind.stillFetching,
+        reason: 'precondition: the budget produced the state under test',
+      );
+
+      final result = await resolver
+          .verify(_localFile(bookmarkRef: 'ref'))
+          .timeout(const Duration(seconds: 5));
+      expect(
+        result,
+        VerifyResult.transientError,
+        reason: 'notFound here would flag a reachable file missing, stickily',
+      );
+    });
+  });
 }
 
 /// A [VolumeStatus] that treats every path as living on one mount root.

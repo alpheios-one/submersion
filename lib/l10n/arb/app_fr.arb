@@ -6795,6 +6795,7 @@
   "settings_setupGuide_open": "Ouvrir",
   "settings_connectedAccounts_loadError": "Impossible de charger les comptes",
   "media_unavailablePlaceholder_volumeOffline": "Volume non monté",
+  "media_unavailablePlaceholder_stillFetching": "Chargement en cours. Touchez pour réessayer.",
   "attrLabel_size": "Taille",
   "attrLabel_thickness_mm": "Épaisseur (mm)",
   "attrLabel_suit_style": "Type de combinaison",

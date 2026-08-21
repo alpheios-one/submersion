@@ -160,6 +160,23 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
     return resolution;
   }
 
+  /// Re-runs resolution after the user taps a still-loading tile.
+  ///
+  /// Only [UnavailableKind.stillFetching] is retryable by tapping. It is the
+  /// one kind that means "nothing is wrong, this is just slow", so a retry has
+  /// a real chance of a different answer; offering one for a dead pointer or an
+  /// unmounted volume would be a placebo. `MediaFetchGate` coalesces the retry
+  /// onto the fetch still in flight, so the tap joins the live download rather
+  /// than starting a second one.
+  /// A block body, not an arrow: `setState(() => _future = _resolve())` makes
+  /// the closure evaluate to the assigned Future, and setState asserts that
+  /// its callback returns nothing so an `async` body cannot slip through.
+  void _retry() {
+    setState(() {
+      _future = _resolve();
+    });
+  }
+
   // Declared `async` (not just returning a Future from a sync body) so any
   // synchronous throw — e.g. `MediaSourceResolverRegistry.resolverFor`
   // throwing UnsupportedError when a row's source_type has no registered
@@ -416,6 +433,16 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
             cacheWidth: cacheWidth,
             errorBuilder: _imageError,
           ),
+          UnavailableData(kind: UnavailableKind.stillFetching) =>
+            GestureDetector(
+              onTap: _retry,
+              // The placeholder paints an opaque background, but the Column
+              // inside it does not fill the tile, so without this the gaps
+              // around the icon are not hit-testable and the tap falls through
+              // to whatever is behind the grid.
+              behavior: HitTestBehavior.opaque,
+              child: UnavailableMediaPlaceholder(data: data),
+            ),
           UnavailableData() => UnavailableMediaPlaceholder(data: data),
         };
       },

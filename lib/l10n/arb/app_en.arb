@@ -15010,6 +15010,7 @@
   "settings_setupGuide_open": "Open",
   "settings_connectedAccounts_loadError": "Could not load accounts",
   "media_unavailablePlaceholder_volumeOffline": "Volume not mounted",
+  "media_unavailablePlaceholder_stillFetching": "Still loading. Tap to retry.",
   "attrLabel_size": "Size",
   "attrLabel_thickness_mm": "Thickness (mm)",
   "attrLabel_suit_style": "Suit style",

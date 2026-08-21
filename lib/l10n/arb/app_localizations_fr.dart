@@ -23303,6 +23303,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_unavailablePlaceholder_volumeOffline => 'Volume non monté';
 
   @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'Chargement en cours. Touchez pour réessayer.';
+
+  @override
   String get attrLabel_size => 'Taille';
 
   @override

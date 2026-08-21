@@ -38680,6 +38680,12 @@ abstract class AppLocalizations {
   /// **'Volume not mounted'**
   String get media_unavailablePlaceholder_volumeOffline;
 
+  /// No description provided for @media_unavailablePlaceholder_stillFetching.
+  ///
+  /// In en, this message translates to:
+  /// **'Still loading. Tap to retry.'**
+  String get media_unavailablePlaceholder_stillFetching;
+
   /// No description provided for @attrLabel_size.
   ///
   /// In en, this message translates to:
