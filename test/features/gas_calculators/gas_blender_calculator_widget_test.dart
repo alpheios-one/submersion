@@ -151,4 +151,55 @@ void main() {
     expect(find.textContaining('Drain to'), findsOneWidget);
     expect(find.text('Fill procedure'), findsNothing);
   });
+  testWidgets('a fractional pressure survives a unit change', (tester) async {
+    final ref = await _pump(tester);
+
+    await tester.enterText(
+      find
+          .byWidgetPredicate(
+            (w) =>
+                w is TextField &&
+                (w.decoration?.labelText ?? '').startsWith('Pressure'),
+          )
+          .first,
+      '207.6',
+    );
+    await tester.pumpAndSettle();
+    expect(ref.read(blenderStartPressureProvider), closeTo(207.6, 0.001));
+
+    _settings.apply(const AppSettings(pressureUnit: PressureUnit.psi));
+    await tester.pumpAndSettle();
+    _settings.apply(const AppSettings());
+    await tester.pumpAndSettle();
+
+    expect(ref.read(blenderStartPressureProvider), closeTo(207.6, 0.05));
+    expect(find.widgetWithText(TextField, '208'), findsNothing);
+  });
+
+  testWidgets('a fractional trimix is labelled without rounding', (
+    tester,
+  ) async {
+    final ref = await _pump(tester);
+    ref.read(blenderStartMixProvider.notifier).state = const GasMix(
+      o2: 8.3,
+      he: 73.4,
+    );
+    ref.read(blenderTargetMixProvider.notifier).state = const GasMix(
+      o2: 8.3,
+      he: 73.4,
+    );
+    ref.read(blenderStartPressureProvider.notifier).state = 80;
+    ref.read(blenderTargetPressureProvider.notifier).state = 220;
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Tx 8.3/73.4'), findsWidgets);
+    expect(find.textContaining('Tx 8/73'), findsNothing);
+  });
+
+  testWidgets('a narrow surface does not overflow', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(320, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await _pump(tester);
+    expect(tester.takeException(), isNull);
+  });
 }

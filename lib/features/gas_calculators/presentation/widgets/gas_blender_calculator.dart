@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
-import 'package:submersion/features/dive_log/domain/entities/dive.dart'
-    show GasMix;
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_about_card.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_cylinder_card.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 /// Real-gas partial-pressure blender: given what's in the cylinder and the
@@ -56,11 +57,16 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
   void initState() {
     super.initState();
 
-    String p(double bar) => _units.convertPressure(bar).toStringAsFixed(0);
-    // Seeding must be lossless: a re-seed now also happens on a unit change,
-    // and rounding would silently rewrite a 32.5% mix as 32%.
-    String n(double v) =>
-        v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
+    // Seeding must be lossless: a re-seed happens on every pressure-unit
+    // change, and rounding would silently rewrite 207.6 bar as 208, or a
+    // 32.5% mix as 32%. formatDecimalForInput is also locale-correct, so it
+    // pairs with the parseUserDecimal used to read these fields back.
+    final decimals = pressureDecimalsFor(
+      ref.read(settingsProvider).pressureUnit,
+    );
+    String p(double bar) =>
+        formatRoundedForInput(_units.convertPressure(bar), decimals);
+    String n(double v) => formatDecimalForInput(v);
 
     final startMix = ref.read(blenderStartMixProvider);
     final targetMix = ref.read(blenderTargetMixProvider);
@@ -107,21 +113,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
     super.dispose();
   }
 
-  /// Read in the diver's locale. A blanket replaceAll(',', '.') would misread
-  /// the en_US thousands separator, turning "1,250" into 1.25 (#1091).
-  double _num(String s) => parseUserDecimal(s) ?? 0;
-
-  void _updateMix(
-    StateProvider<GasMix> provider,
-    TextEditingController o2,
-    TextEditingController he,
-  ) {
-    ref.read(provider.notifier).state = GasMix(
-      o2: _num(o2.text),
-      he: _num(he.text),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final outcome = ref.watch(blenderResultProvider);
@@ -136,174 +127,28 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _cylinderCard(context),
+              BlenderCylinderCard(
+                startPressure: _startP,
+                startO2: _startO2,
+                startHe: _startHe,
+                targetPressure: _targetP,
+                targetO2: _targetO2,
+                targetHe: _targetHe,
+              ),
               const SizedBox(height: 16),
-              _fillGasesCard(context),
+              BlenderFillGasesCard(
+                o2Controllers: _gasO2,
+                heControllers: _gasHe,
+              ),
               const SizedBox(height: 16),
               _resultCard(context, outcome),
               const SizedBox(height: 16),
-              _aboutCard(context),
+              const BlenderAboutCard(),
             ],
           ),
         ),
       ),
     );
-  }
-
-  Widget _sectionTitle(String text) => Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: Text(
-      text,
-      style: Theme.of(
-        context,
-      ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-    ),
-  );
-
-  Widget _cylinderCard(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _sectionTitle(context.l10n.gasCalculators_blender_startCylinder),
-            _mixRow(
-              pressureController: _startP,
-              o2Controller: _startO2,
-              heController: _startHe,
-              onPressure: (v) =>
-                  ref.read(blenderStartPressureProvider.notifier).state = _units
-                      .pressureToBar(_num(v)),
-              onMix: () =>
-                  _updateMix(blenderStartMixProvider, _startO2, _startHe),
-            ),
-            const SizedBox(height: 20),
-            _sectionTitle(context.l10n.gasCalculators_blender_targetFill),
-            _mixRow(
-              pressureController: _targetP,
-              o2Controller: _targetO2,
-              heController: _targetHe,
-              onPressure: (v) =>
-                  ref.read(blenderTargetPressureProvider.notifier).state =
-                      _units.pressureToBar(_num(v)),
-              onMix: () =>
-                  _updateMix(blenderTargetMixProvider, _targetO2, _targetHe),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _fillGasesCard(BuildContext context) {
-    final providers = [
-      blenderFillGas1Provider,
-      blenderFillGas2Provider,
-      blenderFillGas3Provider,
-    ];
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _sectionTitle(context.l10n.gasCalculators_blender_fillGases),
-            for (var i = 0; i < 3; i++) ...[
-              if (i > 0) const SizedBox(height: 12),
-              _mixRow(
-                leading: '${i + 1}.',
-                o2Controller: _gasO2[i],
-                heController: _gasHe[i],
-                onMix: () => _updateMix(providers[i], _gasO2[i], _gasHe[i]),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// A row of pressure (optional) + O₂ + He fields.
-  Widget _mixRow({
-    String? leading,
-    TextEditingController? pressureController,
-    ValueChanged<String>? onPressure,
-    required TextEditingController o2Controller,
-    required TextEditingController heController,
-    required VoidCallback onMix,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        if (leading != null)
-          Padding(
-            padding: const EdgeInsets.only(right: 8, bottom: 14),
-            child: Text(leading, style: Theme.of(context).textTheme.titleSmall),
-          ),
-        if (pressureController != null) ...[
-          Expanded(
-            flex: 3,
-            child: _field(
-              controller: pressureController,
-              label: context.l10n.gasCalculators_blender_pressure,
-              suffix: _units.pressureSymbol,
-              onChanged: onPressure!,
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-        Expanded(
-          flex: 2,
-          child: _field(
-            controller: o2Controller,
-            label: context.l10n.gasCalculators_blender_o2,
-            suffix: '%',
-            onChanged: (_) => onMix(),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          flex: 2,
-          child: _field(
-            controller: heController,
-            label: context.l10n.gasCalculators_blender_he,
-            suffix: '%',
-            onChanged: (_) => onMix(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _field({
-    required TextEditingController controller,
-    required String label,
-    required String suffix,
-    required ValueChanged<String> onChanged,
-  }) {
-    return TextField(
-      controller: controller,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
-      decoration: InputDecoration(
-        labelText: label,
-        suffixText: suffix,
-        isDense: true,
-        border: const OutlineInputBorder(),
-      ),
-      onChanged: onChanged,
-    );
-  }
-
-  /// Localizes "Air" and prettifies the O2 subscript; everything else defers
-  /// to [GasMix.name] so the blender labels gases the way the rest of the app
-  /// does ("Tx 18/45", not a second convention).
-  String _gasName(GasMix m) {
-    if (m.isAir) return context.l10n.gasCalculators_blender_air;
-    if (m.he >= 99.5) return context.l10n.gasCalculators_blender_helium;
-    if (m.isOxygen) return 'O₂';
-    return m.name;
   }
 
   Widget _resultCard(BuildContext context, BlenderOutcome outcome) {
@@ -366,11 +211,14 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
   }
 
   String _stepText(BuildContext context, BlendStep step, int index, int total) {
-    final pressure = _units.formatPressure(step.pressureBar);
+    final pressure = _units.formatPressure(
+      step.pressureBar,
+      decimals: pressureDecimalsFor(ref.read(settingsProvider).pressureUnit),
+    );
     if (step.fillGas == null) {
-      return '${index + 1}. ${context.l10n.gasCalculators_blender_stepStart(pressure, _gasName(step.resultingMix))}';
+      return '${index + 1}. ${context.l10n.gasCalculators_blender_stepStart(pressure, formatPreciseGasName(context, step.resultingMix))}';
     }
-    return '${index + 1}. ${context.l10n.gasCalculators_blender_stepFill(_gasName(step.fillGas!), pressure, _gasName(step.resultingMix))}';
+    return '${index + 1}. ${context.l10n.gasCalculators_blender_stepFill(formatPreciseGasName(context, step.fillGas!), pressure, formatPreciseGasName(context, step.resultingMix))}';
   }
 
   String _errorText(
@@ -406,39 +254,5 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
           _units.formatPressure(drainToBar),
         );
     }
-  }
-
-  Widget _aboutCard(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.info_outline, size: 20, color: colorScheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  context.l10n.gasCalculators_blender_about,
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              context.l10n.gasCalculators_blender_aboutBody,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
