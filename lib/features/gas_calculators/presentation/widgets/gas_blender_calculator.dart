@@ -29,6 +29,11 @@ class GasBlenderCalculator extends ConsumerWidget {
     final pressureUnit = ref.watch(
       settingsProvider.select((s) => s.pressureUnit),
     );
+    // Loads the saved templates, prices and blending conditions once. A first
+    // run has no stored blob, which is what leaves the seeded templates in
+    // place. No AsyncValue branching: the state providers already hold usable
+    // defaults while this resolves, so there is nothing to wait for.
+    ref.watch(blenderPreferencesLoaderProvider);
     return _GasBlenderBody(key: ValueKey('$epoch/${pressureUnit.name}'));
   }
 }
