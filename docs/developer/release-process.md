@@ -130,9 +130,16 @@ Pass `--no-attribution` to `generate_changelog.sh` to reproduce the older,
 uncredited body.
 
 **In the announcement, too.** Every `docs/releases/v<version>.md` ends with a
-`## Contributors` section thanking the release's contributors by name and
-handle, with first-time contributors called out. Take the list from the
-generated release body rather than reconstructing it.
+`## 🙏 Contributors` section thanking the release's contributors by handle,
+with first-time contributors called out. Take the list from the generated
+release body rather than reconstructing it.
+
+The emoji is deliberate and local to these files. `docs/releases/*.md` are
+ScubaBoard posts rather than developer documentation, and every section
+heading in them carries one (`## ✨ New and improved`, `## 🐞 Bug fixes`,
+`## 🔧 Under the hood`, `## ⚠️ Upgrade notes`). No other document under
+`docs/` does. A bare `## Contributors` would be the odd heading out in its own
+file; the no-emoji rule in CLAUDE.md governs everything except this format.
 
 ## Play Store state
 
