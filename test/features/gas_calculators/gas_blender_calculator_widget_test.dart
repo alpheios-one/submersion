@@ -210,7 +210,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('+15.3'), findsOneWidget);
+    // The procedure card and the costing card both name the bar delivered:
+    // one so the blender knows when to stop, one so the bill reconciles.
+    expect(find.textContaining('+15.3'), findsWidgets);
     expect(find.textContaining('104.3'), findsOneWidget);
   });
 
