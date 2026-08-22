@@ -29694,9 +29694,9 @@ class AppLocalizationsNl extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count items konden niet worden gecontroleerd. Submersion heeft geen toegang tot je fotobibliotheek.',
+          'Geen van de $count items kon worden gecontroleerd. Hun bronnen zijn momenteel niet bereikbaar.',
       one:
-          '$count item kon niet worden gecontroleerd. Submersion heeft geen toegang tot je fotobibliotheek.',
+          'Het item kon niet worden gecontroleerd. De bron is momenteel niet bereikbaar.',
     );
     return '$_temp0';
   }

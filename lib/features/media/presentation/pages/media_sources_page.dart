@@ -119,14 +119,21 @@ class MediaSourcesPage extends ConsumerWidget {
                         try {
                           final outcome = await sweep.run();
                           if (!context.mounted) return;
+                          // Only a WHOLLY inconclusive pass is reported as
+                          // blocked. That pass checked nothing, so "0 items
+                          // updated" would read as a clean bill of health.
+                          // A partial one did real work, and inconclusive
+                          // aggregates several causes, so letting a single
+                          // unreachable row take over the message would both
+                          // hide the real result and name a cause that may
+                          // not apply to it.
+                          final blocked =
+                              outcome.processed > 0 &&
+                              outcome.inconclusive == outcome.processed;
                           messenger.showSnackBar(
                             SnackBar(
-                              // Inconclusive wins the message. A pass that
-                              // could not read the photo library checked
-                              // nothing, and "0 items updated" would read as
-                              // a clean bill of health.
                               content: Text(
-                                outcome.inconclusive > 0
+                                blocked
                                     ? l10n.settings_mediaSources_checkAllBlocked(
                                         outcome.inconclusive,
                                       )

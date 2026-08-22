@@ -29912,9 +29912,9 @@ class AppLocalizationsIt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          'Non è stato possibile controllare $count elementi. Submersion non può accedere alla tua libreria foto.',
+          'Impossibile controllare nessuno dei $count elementi. Le loro origini non sono raggiungibili al momento.',
       one:
-          'Non è stato possibile controllare $count elemento. Submersion non può accedere alla tua libreria foto.',
+          'Impossibile controllare l’elemento. La sua origine non è raggiungibile al momento.',
     );
     return '$_temp0';
   }

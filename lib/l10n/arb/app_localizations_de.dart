@@ -29845,9 +29845,9 @@ class AppLocalizationsDe extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count Elemente konnten nicht geprüft werden. Submersion hat keinen Zugriff auf deine Fotomediathek.',
+          'Keines der $count Elemente konnte geprüft werden. Ihre Quellen sind derzeit nicht erreichbar.',
       one:
-          '$count Element konnte nicht geprüft werden. Submersion hat keinen Zugriff auf deine Fotomediathek.',
+          'Das Element konnte nicht geprüft werden. Seine Quelle ist derzeit nicht erreichbar.',
     );
     return '$_temp0';
   }

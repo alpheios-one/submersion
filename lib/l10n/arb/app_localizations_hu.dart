@@ -29799,9 +29799,9 @@ class AppLocalizationsHu extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count elemet nem sikerült ellenőrizni. A Submersion nem fér hozzá a fotókönyvtáradhoz.',
+          'A(z) $count elem egyikét sem sikerült ellenőrizni. A forrásaik jelenleg nem érhetők el.',
       one:
-          '$count elemet nem sikerült ellenőrizni. A Submersion nem fér hozzá a fotókönyvtáradhoz.',
+          'Az elemet nem sikerült ellenőrizni. A forrása jelenleg nem érhető el.',
     );
     return '$_temp0';
   }

@@ -29914,9 +29914,9 @@ class AppLocalizationsPt extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          'Não foi possível verificar $count itens. O Submersion não consegue acessar sua biblioteca de fotos.',
+          'Não foi possível verificar nenhum dos $count itens. As origens deles não estão acessíveis no momento.',
       one:
-          'Não foi possível verificar $count item. O Submersion não consegue acessar sua biblioteca de fotos.',
+          'Não foi possível verificar o item. A origem dele não está acessível no momento.',
     );
     return '$_temp0';
   }

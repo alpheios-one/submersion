@@ -29464,9 +29464,8 @@ class AppLocalizationsEn extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count items could not be checked. Submersion cannot access your photo library.',
-      one:
-          '$count item could not be checked. Submersion cannot access your photo library.',
+          'Could not check any of the $count items. Their sources are not reachable right now.',
+      one: 'Could not check the item. Its source is not reachable right now.',
     );
     return '$_temp0';
   }

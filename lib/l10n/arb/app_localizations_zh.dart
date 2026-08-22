@@ -28268,7 +28268,7 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '有 $count 个项目无法检查。Submersion 无法访问你的照片库。',
+      other: '无法检查这 $count 个项目中的任何一个。它们的来源当前无法访问。',
     );
     return '$_temp0';
   }

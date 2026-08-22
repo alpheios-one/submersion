@@ -24,8 +24,17 @@ class SweepOutcome {
   /// Rows whose orphan flag actually changed.
   final int flipped;
 
-  /// Rows whose source could not be consulted: no permission, an unmounted
-  /// volume, or a transient error. Their orphan flag was left alone.
+  /// Rows whose source could not be REACHED, so nothing was learned about
+  /// whether their bytes still exist and their orphan flag was left alone.
+  ///
+  /// Every [VerifyResult] other than `available` and `notFound`: no photo
+  /// permission, an unmounted volume, a transient error, a disconnected
+  /// connector account, and a row whose bytes live on another machine.
+  /// Deliberately defined as "not a positive finding" rather than as a list,
+  /// so it stays in step with the verifier when the enum grows.
+  ///
+  /// Callers must not attribute a CAUSE to this count: it aggregates several,
+  /// and a message naming one of them would be wrong for the others.
   final int inconclusive;
 
   /// Rows whose verification threw.

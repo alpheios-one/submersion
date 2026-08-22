@@ -29982,9 +29982,9 @@ class AppLocalizationsFr extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count éléments n\'ont pas pu être vérifiés. Submersion n\'a pas accès à votre photothèque.',
+          'Impossible de vérifier les $count éléments. Leurs sources sont actuellement inaccessibles.',
       one:
-          '$count élément n\'a pas pu être vérifié. Submersion n\'a pas accès à votre photothèque.',
+          'Impossible de vérifier cet élément. Sa source est actuellement inaccessible.',
     );
     return '$_temp0';
   }

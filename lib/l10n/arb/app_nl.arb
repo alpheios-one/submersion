@@ -8946,7 +8946,7 @@
   "settings_mediaSources_reverifyResult": "{count, plural, one{{count} item bijgewerkt} other{{count} items bijgewerkt}}",
   "settings_mediaSources_checkAll": "Alle media controleren",
   "settings_mediaSources_checkAllResult": "{count, plural, one{{count} item bijgewerkt} other{{count} items bijgewerkt}}",
-  "settings_mediaSources_checkAllBlocked": "{count, plural, one{{count} item kon niet worden gecontroleerd. Submersion heeft geen toegang tot je fotobibliotheek.} other{{count} items konden niet worden gecontroleerd. Submersion heeft geen toegang tot je fotobibliotheek.}}",
+  "settings_mediaSources_checkAllBlocked": "{count, plural, one{Het item kon niet worden gecontroleerd. De bron is momenteel niet bereikbaar.} other{Geen van de {count} items kon worden gecontroleerd. Hun bronnen zijn momenteel niet bereikbaar.}}",
   "settings_mediaSources_title": "Mediabronnen",
   "settings_networkSources_scanDescription": "Controleert elke via URL of manifest geïmporteerde foto opnieuw bij de bijbehorende host. Onbereikbare items worden gemarkeerd zodat ze als ‘ontbrekend’ in je bibliotheek verschijnen en kunnen worden opgeruimd.",
   "statistics_conditions_entryMethod_semanticLabel": "Staafdiagram. Instapmethoden. {description}",

@@ -50017,10 +50017,10 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{{count} item updated} other{{count} items updated}}'**
   String settings_mediaSources_checkAllResult(int count);
 
-  /// Media Sources: the check-all pass could not read some rows sources
+  /// Media Sources: the check-all pass reached none of the rows sources
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, one{{count} item could not be checked. Submersion cannot access your photo library.} other{{count} items could not be checked. Submersion cannot access your photo library.}}'**
+  /// **'{count, plural, one{Could not check the item. Its source is not reachable right now.} other{Could not check any of the {count} items. Their sources are not reachable right now.}}'**
   String settings_mediaSources_checkAllBlocked(int count);
 
   /// Media Sources settings page app bar title

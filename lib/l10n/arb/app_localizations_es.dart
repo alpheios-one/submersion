@@ -29923,9 +29923,9 @@ class AppLocalizationsEs extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          'No se pudieron comprobar $count elementos. Submersion no puede acceder a tu fototeca.',
+          'No se pudo comprobar ninguno de los $count elementos. Sus orígenes no están accesibles ahora mismo.',
       one:
-          'No se pudo comprobar $count elemento. Submersion no puede acceder a tu fototeca.',
+          'No se pudo comprobar el elemento. Su origen no está accesible ahora mismo.',
     );
     return '$_temp0';
   }

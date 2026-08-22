@@ -341,8 +341,45 @@ void main() {
       await tester.tap(find.text('Check all media'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('could not be checked'), findsOneWidget);
+      // Cause-neutral wording: inconclusive aggregates a missing photo
+      // permission, an unmounted volume, a disconnected connector account and
+      // rows from another machine, so the message must not name one of them.
+      expect(find.textContaining('Could not check'), findsOneWidget);
+      expect(find.textContaining('photo library'), findsNothing);
       expect(find.text('0 items updated'), findsNothing);
+    });
+
+    // inconclusive aggregates several causes (no photo permission, an
+    // unmounted volume, a disconnected connector account, a row from another
+    // machine), so one unreachable row must not replace the real result with
+    // a message about any single one of them.
+    testWidgets('a partly inconclusive pass still reports what changed', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrapWith([
+          localFilesDiagnosticsServiceProvider.overrideWithValue(
+            _StubDiagnosticsService(),
+          ),
+          mediaVerificationSweepProvider.overrideWithValue(
+            _StubSweep(
+              const SweepOutcome(
+                processed: 453,
+                flipped: 2,
+                inconclusive: 1,
+                failed: 0,
+              ),
+            ),
+          ),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Check all media'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('2 items updated'), findsOneWidget);
+      expect(find.textContaining('Could not check'), findsNothing);
     });
 
     testWidgets('sweeps every source type, unfiltered', (tester) async {
