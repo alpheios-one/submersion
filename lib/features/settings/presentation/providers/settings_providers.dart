@@ -977,6 +977,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   SettingsNotifier(this._repository, this._ref) : super(const AppSettings()) {
     _initialLoad = _initializeAndLoad();
+    _logIfItFails(_initialLoad);
 
     // Listen for diver changes and reload settings
     _ref.listen<String?>(currentDiverIdProvider, (previous, next) {
@@ -985,8 +986,33 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         _validatedDiverId = null;
         _isLoading =
             false; // Allow loading even if previous load was in progress
-        _initializeAndLoad();
+        _logIfItFails(_initializeAndLoad());
       }
+    });
+  }
+
+  /// Give [load] a listener so a failure is logged instead of reaching the
+  /// zone handler.
+  ///
+  /// State starts at, and stays at, the [AppSettings] defaults when a load
+  /// fails, so nothing downstream acts on the error. Left unlistened it
+  /// escapes to the zone, and package:test blames whichever test happens to be
+  /// running at that moment: a test that sets up a database, touches any
+  /// settings-derived provider and finishes while this read is still in flight
+  /// tears the database down underneath it, and an unrelated test later in the
+  /// shard fails with "This test failed after it had already completed". Which
+  /// test that is depends on timing, which is why re-running usually clears it.
+  ///
+  /// This does not change what [initialLoad] does. A Dart future may carry
+  /// several listeners, so callers that await it still see the error and still
+  /// have to fall back to the defaults themselves.
+  void _logIfItFails(Future<void> load) {
+    load.catchError((Object error, StackTrace stackTrace) {
+      LoggerService.forClass(SettingsNotifier).error(
+        'Failed to load diver settings',
+        error: error,
+        stackTrace: stackTrace,
+      );
     });
   }
 
