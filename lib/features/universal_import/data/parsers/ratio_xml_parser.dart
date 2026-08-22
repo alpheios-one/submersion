@@ -53,6 +53,7 @@ class RatioXmlParser implements ImportParser {
             message: 'Invalid XML file: ${e.message}',
           ),
         ],
+        metadata: const {'source': 'ratio_xml'},
       );
     }
 
@@ -68,6 +69,7 @@ class RatioXmlParser implements ImportParser {
                 'expected <diveSegment> root element.',
           ),
         ],
+        metadata: {'source': 'ratio_xml'},
       );
     }
 
@@ -81,6 +83,7 @@ class RatioXmlParser implements ImportParser {
             message: 'Ratio XML file is missing <segmentHeader>.',
           ),
         ],
+        metadata: {'source': 'ratio_xml'},
       );
     }
 
@@ -118,6 +121,7 @@ class RatioXmlParser implements ImportParser {
           ),
           ...warnings,
         ],
+        metadata: const {'source': 'ratio_xml'},
       );
     }
 
@@ -127,7 +131,7 @@ class RatioXmlParser implements ImportParser {
       },
       warnings: warnings,
       metadata: {
-        'sourceApp': 'Ratio Computers',
+        'source': 'ratio_xml',
         if (diveData['diveComputerModel'] != null)
           'computerModel': diveData['diveComputerModel'],
         if (diveData['diveComputerSerial'] != null)
@@ -183,15 +187,10 @@ class RatioXmlParser implements ImportParser {
     }
 
     // Surface pressure (stored as mbar * 10, e.g. 9971 = 997.1 mbar)
+    // Converted to bar: 9971 / 10000.0 = 0.9971 bar
     final surfacePressure = _intElement(header, 'surfacePressureMbar');
     if (surfacePressure != null) {
-      diveData['surfacePressure'] = surfacePressure / 10.0;
-    }
-
-    // Desaturation time
-    final desatTimeS = _intElement(header, 'desaturationTimeS');
-    if (desatTimeS != null && desatTimeS > 0) {
-      diveData['desaturationTime'] = Duration(seconds: desatTimeS);
+      diveData['surfacePressure'] = surfacePressure / 10000.0;
     }
   }
 

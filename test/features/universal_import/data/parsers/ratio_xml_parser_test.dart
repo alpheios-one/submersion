@@ -213,11 +213,11 @@ void main() {
       expect(dive['surfaceInterval'], const Duration(seconds: 2739));
     });
 
-    test('parses surface pressure in mbar', () async {
+    test('parses surface pressure in bar', () async {
       final xml = _buildRatioXml(surfacePressureMbar: 9971);
       final payload = await parser.parse(_toBytes(xml));
       final dive = payload.entities[ImportEntityType.dives]!.single;
-      expect(dive['surfacePressure'], closeTo(997.1, 0.1));
+      expect(dive['surfacePressure'], closeTo(0.9971, 0.0001));
     });
   });
 
@@ -455,6 +455,19 @@ void main() {
       expect(switches[0]['o2'], 50);
       expect(switches[0]['he'], 0);
       expect(switches[0]['depth'], closeTo(6.0, 0.001));
+      expect(switches[0]['tankIndex'], 1);
+
+      // Verify that tanks were correctly mapped from tankMixes
+      final tanks = dive['tanks'] as List<Map<String, dynamic>>;
+      expect(tanks, hasLength(2));
+
+      final tank0Mix = tanks[0]['gasMix'] as GasMix;
+      expect(tank0Mix.o2, 21.0);
+      expect(tank0Mix.he, 0.0);
+
+      final tank1Mix = tanks[1]['gasMix'] as GasMix;
+      expect(tank1Mix.o2, 50.0);
+      expect(tank1Mix.he, 0.0);
     });
 
     test('no gasSwitches when gas stays constant', () async {
@@ -516,7 +529,7 @@ void main() {
   });
 
   group('metadata', () {
-    test('sets sourceApp to Ratio Computers in metadata', () async {
+    test('sets source to ratio_xml in metadata', () async {
       final xml = _buildRatioXml();
       final payload = await parser.parse(
         _toBytes(xml),
@@ -524,7 +537,7 @@ void main() {
           'IX3M_2_PRO_012345-dive_16-19880819_165840.xml',
         ),
       );
-      expect(payload.metadata['sourceApp'], 'Ratio Computers');
+      expect(payload.metadata['source'], 'ratio_xml');
       expect(payload.metadata['computerModel'], 'IX3M 2 PRO');
       expect(payload.metadata['computerSerial'], '012345');
     });
@@ -557,6 +570,35 @@ void main() {
       );
       // Should still produce a dive from header data
       expect(payload.entities[ImportEntityType.dives], hasLength(1));
+    });
+    test('does not throw when samples element is empty', () async {
+      const xml =
+          '<?xml version="1.0" encoding="UTF-8"?>'
+          '<diveSegment version="1.2">'
+          '<segmentHeader>'
+          '<UTCStartingTimeS>586371714</UTCStartingTimeS>'
+          '</segmentHeader>'
+          '<samples></samples>'
+          '</diveSegment>';
+      final payload = await parser.parse(_toBytes(xml));
+      expect(payload.entities[ImportEntityType.dives], hasLength(1));
+    });
+
+    test('handles sample with missing tankId and tankPressure', () async {
+      final samples = [
+        {
+          'runtimeS': 10,
+          'depthDm': 400,
+          'temperatureDc': 150,
+          'activeMixO2Percent': 21,
+          'activeMixHePercent': 0,
+        },
+      ];
+      final xml = _buildRatioXml(samples: samples);
+      final payload = await parser.parse(_toBytes(xml));
+      final dive = payload.entities[ImportEntityType.dives]!.single;
+      final profile = dive['profile'] as List<Map<String, dynamic>>;
+      expect(profile.first.containsKey('allTankPressures'), isFalse);
     });
   });
 }

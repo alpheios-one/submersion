@@ -138,7 +138,7 @@ void main() {
   group('SourceOverrideOption', () {
     group('supported list', () {
       test('contains expected number of entries', () {
-        expect(SourceOverrideOption.supported.length, 18);
+        expect(SourceOverrideOption.supported.length, 19);
       });
 
       test('contains Submersion CSV entry', () {
