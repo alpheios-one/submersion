@@ -3080,6 +3080,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             ),
             if (dive.trip != null) _buildTripRow(context, dive),
             if (dive.diveCenter != null) _buildDiveCenterRow(context, dive),
+            if (dive.courseId != null) _buildCourseRow(context, ref, dive),
             if (dive.visibility != null)
               _buildDetailRow(
                 context,
@@ -4319,6 +4320,63 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
   }
 
+  /// Training-course row for the Details card (#1219).
+  ///
+  /// The linked course used to surface only as a chip in the Signatures card
+  /// header, which is an optional section far down the page, so read-only
+  /// viewers had no way to see the link short of opening the edit form.
+  /// Callers gate on `dive.courseId != null`, so the provider is only reached
+  /// for dives that actually carry a link; the row stays empty until the
+  /// lookup resolves rather than reserving blank space.
+  Widget _buildCourseRow(BuildContext context, WidgetRef ref, Dive dive) {
+    final course = ref.watch(courseForDiveProvider(dive.id)).valueOrNull;
+    if (course == null) return const SizedBox.shrink();
+
+    return Semantics(
+      button: true,
+      label: context.l10n.diveLog_detail_semantics_viewCourse(course.name),
+      child: InkWell(
+        onTap: () => context.push('/courses/${course.id}'),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                context.l10n.diveLog_edit_section_trainingCourse,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              Flexible(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        course.name,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    ExcludeSemantics(
+                      child: Icon(
+                        Icons.chevron_right,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildBuddiesSection(BuildContext context, WidgetRef ref, Dive dive) {
     final buddiesAsync = ref.watch(buddiesForDiveProvider(diveId));
 
@@ -4889,49 +4947,63 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // spaceBetween with two loose Flexible children, never a Spacer:
+            // a Spacer is tight and claims its half of the free space whether
+            // or not the chip needs it, which both strands a gap after the
+            // chip and leaves the chip itself unbounded. An unbounded chip
+            // overflowed this header by 15px on a phone-width pane as soon as
+            // the course name ran past a word or two.
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  context.l10n.diveLog_detail_section_trainingSignature,
-                  style: Theme.of(context).textTheme.titleMedium,
+                Flexible(
+                  child: Text(
+                    context.l10n.diveLog_detail_section_trainingSignature,
+                    style: Theme.of(context).textTheme.titleMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                const Spacer(),
                 if (courseAsync.hasValue && courseAsync.value != null) ...[
-                  Semantics(
-                    button: true,
-                    label: context.l10n.diveLog_detail_semantics_viewCourse(
-                      courseAsync.value!.name,
-                    ),
-                    child: InkWell(
-                      onTap: () =>
-                          context.push('/courses/${courseAsync.value!.id}'),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.school,
-                              size: 14,
-                              color: colorScheme.onPrimaryContainer,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              courseAsync.value!.name,
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: colorScheme.onPrimaryContainer,
-                                  ),
-                            ),
-                          ],
+                  Flexible(
+                    child: Semantics(
+                      button: true,
+                      label: context.l10n.diveLog_detail_semantics_viewCourse(
+                        courseAsync.value!.name,
+                      ),
+                      child: InkWell(
+                        onTap: () =>
+                            context.push('/courses/${courseAsync.value!.id}'),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.school,
+                                size: 14,
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  courseAsync.value!.name,
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: colorScheme.onPrimaryContainer,
+                                      ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
