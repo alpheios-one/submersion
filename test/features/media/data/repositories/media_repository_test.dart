@@ -922,6 +922,20 @@ void main() {
         );
         expect(result, isEmpty);
       });
+
+      // Null and empty mean opposite things here, and getting them backwards
+      // would either sweep the whole library or sweep none of it.
+      test(
+        'a null filter returns every row, an empty set returns none',
+        () async {
+          await repository.createMedia(
+            createTestMediaItem(platformAssetId: 'gallery-1'),
+          );
+
+          expect(await repository.getAllBySourceTypes(null), isNotEmpty);
+          expect(await repository.getAllBySourceTypes(const {}), isEmpty);
+        },
+      );
     });
 
     group('markVerified', () {
@@ -955,6 +969,28 @@ void main() {
         expect(after.caption, 'reef at 18m');
         expect(after.platformAssetId, 'asset-1');
         expect(after.diveId, created.diveId);
+      });
+
+      test('is a no-op when the row already has the desired flag', () async {
+        // Idempotent at the DB layer, not merely at the caller. The write is
+        // sync-visible (markRecordPending), and reconciledOrphanFlag's guard
+        // compares against the CALLER's snapshot, which for a grid tile can
+        // lag the row. A caller holding a stale snapshot must not be able to
+        // queue redundant sync work by asking for a state the row already has.
+        final created = await repository.createMedia(
+          createTestMediaItem(isOrphaned: true),
+        );
+        final before = await repository.getMediaById(created.id);
+
+        await repository.markVerified(
+          created.id,
+          isOrphaned: true,
+          verifiedAt: DateTime.utc(2026, 8, 22, 11),
+        );
+
+        final after = await repository.getMediaById(created.id);
+        expect(after!.updatedAt, before!.updatedAt, reason: 'no row written');
+        expect(after.lastVerifiedAt, before.lastVerifiedAt);
       });
 
       test('clears the flag as readily as it sets it', () async {

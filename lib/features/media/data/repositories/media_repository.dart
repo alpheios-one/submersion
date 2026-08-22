@@ -494,6 +494,15 @@ class MediaRepository {
   Future<List<domain.MediaItem>> getAllBySourceTypes(
     Set<MediaSourceType>? sourceTypes,
   ) async {
+    // Null means every row; an EMPTY set means none, and asking the database
+    // to prove that is pointless. Not a correctness guard (SQLite accepts the
+    // `IN ()` an empty list compiles to and matches nothing), but it matches
+    // partitionMediaForDiveDeletion's convention and keeps the null-versus-
+    // empty distinction obvious at the top of the method, where getting it
+    // backwards would sweep the whole library instead of none of it.
+    if (sourceTypes != null && sourceTypes.isEmpty) {
+      return const <domain.MediaItem>[];
+    }
     try {
       final query = _db.select(_db.media).join([
         leftOuterJoin(
@@ -601,25 +610,41 @@ class MediaRepository {
   /// Differs from [markOrphaned] only by also stamping `lastVerifiedAt`,
   /// which the callers of this one have actually earned: they checked.
   ///
-  /// Sync-visible like every other write here, so callers must only call it
-  /// when something actually changed. See `reconciledOrphanFlag`, which
-  /// returns null precisely so that this is not called on every tile.
+  /// Idempotent: the UPDATE is guarded on the flag actually differing, and
+  /// the sync record is only marked pending when a row was written.
+  ///
+  /// Deliberately enforced HERE rather than left to the caller.
+  /// `reconciledOrphanFlag` compares against the caller's snapshot, and a grid
+  /// tile's snapshot can lag the row it describes, so a stale caller can ask
+  /// for a state the row already holds. Since every write here is sync-visible
+  /// through [markRecordPending], letting that through would queue redundant
+  /// sync work for an item nothing changed about. The consumers that feed
+  /// tiles do refresh on media-table ticks today, but that makes this a race
+  /// window rather than a guarantee, and the guarantee belongs at the layer
+  /// that owns the row.
   Future<void> markVerified(
     String id, {
     required bool isOrphaned,
     required DateTime verifiedAt,
   }) async {
     try {
-      _log.info('Marking media verified: $id (isOrphaned=$isOrphaned)');
       final now = DateTime.now().millisecondsSinceEpoch;
 
-      await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
-        MediaCompanion(
-          isOrphaned: Value(isOrphaned),
-          lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
-          updatedAt: Value(now),
-        ),
-      );
+      final rowsWritten =
+          await (_db.update(_db.media)..where(
+                // Matching on the OPPOSITE flag is what makes this a no-op
+                // when the row already agrees.
+                (t) => t.id.equals(id) & t.isOrphaned.equals(!isOrphaned),
+              ))
+              .write(
+                MediaCompanion(
+                  isOrphaned: Value(isOrphaned),
+                  lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
+                  updatedAt: Value(now),
+                ),
+              );
+      if (rowsWritten == 0) return;
+      _log.info('Marked media verified: $id (isOrphaned=$isOrphaned)');
 
       await _syncRepository.markRecordPending(
         entityType: 'media',
