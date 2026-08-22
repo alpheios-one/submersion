@@ -287,7 +287,8 @@ class _BackupSection extends ConsumerWidget {
           label: l10n.media_info_store,
           value: identity?.displayHint ?? l10n.media_info_storeNotConnected,
         ),
-        DiveDetailRow(label: '', value: _summary(l10n)),
+        if (_summary(l10n) case final summary?)
+          DiveDetailRow(label: '', value: summary),
         if (backup.originalUploadedAt != null)
           DiveDetailRow(
             label: '',
@@ -304,9 +305,14 @@ class _BackupSection extends ConsumerWidget {
   /// Precedence matters: an ineligible source is not "not backed up", it is
   /// something the pipeline would never carry, and saying otherwise reads as
   /// a problem the user could fix.
-  String _summary(AppLocalizations l10n) {
+  /// Null when the row above has already said everything there is to say.
+  ///
+  /// With no store attached the store row falls back to the same
+  /// not-connected string this used to return, so the panel printed the
+  /// identical sentence twice.
+  String? _summary(AppLocalizations l10n) {
     if (!backup.eligible) return l10n.media_info_notEligible;
-    if (!backup.storeAttached) return l10n.media_info_storeNotConnected;
+    if (!backup.storeAttached) return null;
     return switch (backup.tier) {
       BackupTier.full => l10n.media_info_backupFull,
       BackupTier.thumbOnly => l10n.media_info_backupThumbOnly,

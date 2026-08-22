@@ -264,12 +264,15 @@ void main() {
       expect(find.text('Not backed up'), findsNothing);
     });
 
-    testWidgets('no store connected renders the not-connected line', (
+    testWidgets('no store connected renders the not-connected line ONCE', (
       tester,
     ) async {
+      // findsOneWidget, not findsWidgets. The store row and the summary row
+      // both fell back to this same string, so the panel printed it twice and
+      // a one-or-more matcher could not see the difference.
       await pump(tester, _item(), attached: false);
 
-      expect(find.text('No cloud store connected'), findsWidgets);
+      expect(find.text('No cloud store connected'), findsOneWidget);
     });
 
     testWidgets('a thumb-only row says the original was not sent', (
