@@ -11998,6 +11998,61 @@ class AppLocalizationsDe extends AppLocalizations {
       'Gib für jedes Gas einen Preis ein, um die Summe zu sehen.';
 
   @override
+  String get gasCalculators_blender_saveFill => 'Diese Füllung speichern';
+
+  @override
+  String get gasCalculators_blender_billed => 'Abgerechnet';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Noch nichts abgerechnet. Schliesse eine Füllung ab und speichere sie hier.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Rechnung an';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Position hinzufügen';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Bezeichnung';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Betrag';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Leeren';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Rechnung leeren?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'Damit werden alle $count gespeicherten Füllungen entfernt.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return '$label bearbeiten';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return '$label löschen';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix zur Rechnung hinzugefügt';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'Mindestens eine Position hat keinen Preis, die Summe ist daher unvollständig.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Gesamt';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

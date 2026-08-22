@@ -11978,6 +11978,61 @@ class AppLocalizationsHu extends AppLocalizations {
       'Adj meg árat minden gázhoz, hogy lásd az összeget.';
 
   @override
+  String get gasCalculators_blender_saveFill => 'Töltés mentése';
+
+  @override
+  String get gasCalculators_blender_billed => 'Számlázva';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Még nincs semmi számlázva. Fejezz be egy töltést, és mentsd ide.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Számla címzettje';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Tétel hozzáadása';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Megnevezés';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Összeg';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Ürítés';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Üríted a számlát?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'Ezzel mind a(z) $count mentett töltés törlődik.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return '$label szerkesztése';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return '$label törlése';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix felkerült a számlára';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'Legalább egy tételnek nincs ára, ezért az összeg hiányos.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Összesen';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

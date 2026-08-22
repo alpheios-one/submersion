@@ -11919,6 +11919,61 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voer voor elk gas een prijs in om het totaal te zien.';
 
   @override
+  String get gasCalculators_blender_saveFill => 'Deze vulling opslaan';
+
+  @override
+  String get gasCalculators_blender_billed => 'Gefactureerd';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Nog niets gefactureerd. Rond een vulling af en sla die hier op.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Gefactureerd aan';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Regel toevoegen';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Omschrijving';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Bedrag';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Wissen';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Factuur wissen?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'Dit verwijdert alle $count opgeslagen vullingen.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return '$label bewerken';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return '$label verwijderen';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix toegevoegd aan de factuur';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'Een of meer regels hebben geen prijs, dus dit totaal is onvolledig.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Totaal';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

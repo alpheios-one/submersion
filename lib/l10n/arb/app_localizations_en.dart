@@ -11811,6 +11811,61 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter a price for every gas to see the total.';
 
   @override
+  String get gasCalculators_blender_saveFill => 'Save this fill';
+
+  @override
+  String get gasCalculators_blender_billed => 'Billed';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Nothing billed yet. Finish a fill and save it here.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Billed to';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Add a line';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Description';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Amount';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Clear';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Clear the bill?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'This removes all $count saved fills.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return 'Edit $label';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return 'Delete $label';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix added to the bill';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'One or more lines have no price, so this total is incomplete.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Total';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

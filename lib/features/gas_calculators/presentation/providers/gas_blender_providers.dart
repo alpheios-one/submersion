@@ -2,6 +2,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
+import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
@@ -73,6 +74,15 @@ final blenderTemplatesProvider = StateProvider<List<MixTemplate>>(
   (ref) => BlenderPreferences.seedTemplates,
 );
 
+/// Cylinders already finished and put on the bill, oldest first.
+final blenderBilledFillsProvider = StateProvider<List<BilledFill>>(
+  (ref) => const [],
+);
+
+/// Who the bill is for. Free text; the costing card seeds it from the
+/// logbook's diver.
+final blenderBilledToProvider = StateProvider<String>((ref) => '');
+
 /// Bumped by a reset so the input fields re-seed their controllers.
 final blenderResetEpochProvider = StateProvider<int>((ref) => 0);
 
@@ -140,6 +150,8 @@ final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
   ref.read(blenderCylinderLitersProvider.notifier).state =
       stored.cylinderWaterLiters;
   ref.read(blenderGasModelProvider.notifier).state = stored.model;
+  ref.read(blenderBilledFillsProvider.notifier).state = stored.billedFills;
+  ref.read(blenderBilledToProvider.notifier).state = stored.billedTo;
   if (stored.currencyCode != null) {
     ref.read(blenderCurrencyProvider.notifier).state = stored.currencyCode!;
   }
@@ -171,6 +183,8 @@ Future<void> saveBlenderPreferences(WidgetRef ref) async {
         settledTempC: ref.read(blenderSettledTempProvider),
         cylinderWaterLiters: ref.read(blenderCylinderLitersProvider),
         model: ref.read(blenderGasModelProvider),
+        billedFills: ref.read(blenderBilledFillsProvider),
+        billedTo: ref.read(blenderBilledToProvider),
       ),
     );
   } catch (e, stackTrace) {

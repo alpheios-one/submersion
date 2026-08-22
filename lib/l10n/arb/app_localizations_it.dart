@@ -12011,6 +12011,61 @@ class AppLocalizationsIt extends AppLocalizations {
       'Inserisci un prezzo per ogni gas per vedere il totale.';
 
   @override
+  String get gasCalculators_blender_saveFill => 'Salva questo riempimento';
+
+  @override
+  String get gasCalculators_blender_billed => 'Fatturato';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Ancora nulla da fatturare. Completa un riempimento e salvalo qui.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Intestato a';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Aggiungi una voce';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Descrizione';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Importo';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Svuota';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Svuotare la fattura?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'Rimuove tutti i $count riempimenti salvati.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return 'Modifica $label';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return 'Elimina $label';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix aggiunto alla fattura';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'Almeno una voce non ha prezzo, quindi il totale è incompleto.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Totale';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

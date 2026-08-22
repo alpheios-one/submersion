@@ -11458,6 +11458,59 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_costMissingPrice => '为每种气体输入价格后即可看到合计。';
 
   @override
+  String get gasCalculators_blender_saveFill => '保存本次充填';
+
+  @override
+  String get gasCalculators_blender_billed => '已计费';
+
+  @override
+  String get gasCalculators_blender_billedNone => '尚无计费内容。完成一次充填后保存到这里。';
+
+  @override
+  String get gasCalculators_blender_billedTo => '计费给';
+
+  @override
+  String get gasCalculators_blender_addManualLine => '添加条目';
+
+  @override
+  String get gasCalculators_blender_lineDescription => '说明';
+
+  @override
+  String get gasCalculators_blender_lineAmount => '金额';
+
+  @override
+  String get gasCalculators_blender_clearBilled => '清空';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => '清空账单？';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return '这将删除全部 $count 条已保存的充填记录。';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return '编辑 $label';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return '删除 $label';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix 已加入账单';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete => '有条目未填价格，因此合计不完整。';
+
+  @override
+  String get gasCalculators_blender_billedTotal => '合计';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

@@ -5,6 +5,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
 import 'package:submersion/features/gas_calculators/domain/tank_spec.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
@@ -79,7 +80,25 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BlenderSectionTitle(context.l10n.gasCalculators_blender_billing),
+            // A Wrap rather than a Row: the heading and the action together
+            // are a few pixels too wide for the narrowest phone, and dropping
+            // the button to its own line reads better than truncating it.
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                BlenderSectionTitle(
+                  context.l10n.gasCalculators_blender_billing,
+                ),
+                if (billing.lines.isNotEmpty)
+                  TextButton.icon(
+                    key: const Key('blender-save-fill'),
+                    onPressed: () => _saveFill(context, billing, currency),
+                    icon: const Icon(Icons.playlist_add, size: 18),
+                    label: Text(context.l10n.gasCalculators_blender_saveFill),
+                  ),
+              ],
+            ),
             _cylinderRow(context, settings, units),
             const SizedBox(height: 16),
             _currencyField(context, currency),
@@ -109,6 +128,38 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  /// Put the current blend on the running bill.
+  ///
+  /// The figures are frozen at save time rather than referenced: the next
+  /// cylinder is about to replace this blend, and a bill has to survive that.
+  void _saveFill(BuildContext context, BillingResult billing, String currency) {
+    final target = ref.read(blenderTargetMixProvider);
+    final label = formatPreciseMix(context, target);
+    final fill = BilledFill(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      label: label,
+      lines: [
+        for (final line in billing.lines)
+          BilledGasLine(
+            gas: formatPreciseGasName(context, line.gas),
+            addedBar: line.addedBar,
+            cost: line.cost,
+          ),
+      ],
+      total: billing.total,
+    );
+    ref.read(blenderBilledFillsProvider.notifier).state = [
+      ...ref.read(blenderBilledFillsProvider),
+      fill,
+    ];
+    saveBlenderPreferences(ref);
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      SnackBar(
+        content: Text(context.l10n.gasCalculators_blender_fillAdded(label)),
       ),
     );
   }

@@ -11794,6 +11794,61 @@ class AppLocalizationsAr extends AppLocalizations {
       'أدخل سعرًا لكل غاز لعرض الإجمالي.';
 
   @override
+  String get gasCalculators_blender_saveFill => 'حفظ هذه التعبئة';
+
+  @override
+  String get gasCalculators_blender_billed => 'الفاتورة';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'لا شيء في الفاتورة بعد. أكمل تعبئة واحفظها هنا.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'الفاتورة باسم';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'إضافة بند';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'الوصف';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'المبلغ';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'إفراغ';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'إفراغ الفاتورة؟';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'سيؤدي هذا إلى حذف جميع التعبئات المحفوظة وعددها $count.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return 'تعديل $label';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return 'حذف $label';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return 'تمت إضافة $mix إلى الفاتورة';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'أحد البنود بلا سعر، لذا فالإجمالي غير مكتمل.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'الإجمالي';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

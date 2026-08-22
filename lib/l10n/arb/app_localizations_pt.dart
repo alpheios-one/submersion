@@ -12009,6 +12009,61 @@ class AppLocalizationsPt extends AppLocalizations {
       'Introduz um preço para cada gás para veres o total.';
 
   @override
+  String get gasCalculators_blender_saveFill => 'Guardar este enchimento';
+
+  @override
+  String get gasCalculators_blender_billed => 'Faturado';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Ainda nada faturado. Termina um enchimento e guarda-o aqui.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Faturado a';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Adicionar uma linha';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Descrição';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Valor';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Limpar';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Limpar a fatura?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'Isto remove os $count enchimentos guardados.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return 'Editar $label';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return 'Eliminar $label';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix adicionado à fatura';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'Uma ou mais linhas não têm preço, por isso este total está incompleto.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Total';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

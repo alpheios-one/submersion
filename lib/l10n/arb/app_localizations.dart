@@ -20432,6 +20432,96 @@ abstract class AppLocalizations {
   /// **'Enter a price for every gas to see the total.'**
   String get gasCalculators_blender_costMissingPrice;
 
+  /// No description provided for @gasCalculators_blender_saveFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this fill'**
+  String get gasCalculators_blender_saveFill;
+
+  /// No description provided for @gasCalculators_blender_billed.
+  ///
+  /// In en, this message translates to:
+  /// **'Billed'**
+  String get gasCalculators_blender_billed;
+
+  /// No description provided for @gasCalculators_blender_billedNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing billed yet. Finish a fill and save it here.'**
+  String get gasCalculators_blender_billedNone;
+
+  /// No description provided for @gasCalculators_blender_billedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Billed to'**
+  String get gasCalculators_blender_billedTo;
+
+  /// No description provided for @gasCalculators_blender_addManualLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a line'**
+  String get gasCalculators_blender_addManualLine;
+
+  /// No description provided for @gasCalculators_blender_lineDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get gasCalculators_blender_lineDescription;
+
+  /// No description provided for @gasCalculators_blender_lineAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get gasCalculators_blender_lineAmount;
+
+  /// No description provided for @gasCalculators_blender_clearBilled.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get gasCalculators_blender_clearBilled;
+
+  /// No description provided for @gasCalculators_blender_clearBilledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear the bill?'**
+  String get gasCalculators_blender_clearBilledTitle;
+
+  /// No description provided for @gasCalculators_blender_clearBilledBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This removes all {count} saved fills.'**
+  String gasCalculators_blender_clearBilledBody(int count);
+
+  /// No description provided for @gasCalculators_blender_editLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {label}'**
+  String gasCalculators_blender_editLine(String label);
+
+  /// No description provided for @gasCalculators_blender_deleteLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {label}'**
+  String gasCalculators_blender_deleteLine(String label);
+
+  /// No description provided for @gasCalculators_blender_fillAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{mix} added to the bill'**
+  String gasCalculators_blender_fillAdded(String mix);
+
+  /// No description provided for @gasCalculators_blender_billedIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'One or more lines have no price, so this total is incomplete.'**
+  String get gasCalculators_blender_billedIncomplete;
+
+  /// No description provided for @gasCalculators_blender_billedTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get gasCalculators_blender_billedTotal;
+
   /// No description provided for @gasCalculators_tab_mod.
   ///
   /// In en, this message translates to:

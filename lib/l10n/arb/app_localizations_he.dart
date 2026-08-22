@@ -11718,6 +11718,61 @@ class AppLocalizationsHe extends AppLocalizations {
       'הזן מחיר לכל גז כדי לראות את הסכום הכולל.';
 
   @override
+  String get gasCalculators_blender_saveFill => 'שמור את המילוי הזה';
+
+  @override
+  String get gasCalculators_blender_billed => 'חיוב';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'עדיין אין חיובים. סיים מילוי ושמור אותו כאן.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'החיוב על שם';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'הוסף שורה';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'תיאור';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'סכום';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'נקה';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'לנקות את החיוב?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'פעולה זו תמחק את כל $count המילויים השמורים.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return 'עריכת $label';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return 'מחיקת $label';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix נוסף לחיוב';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'לשורה אחת או יותר אין מחיר, ולכן הסכום חלקי.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'סה\"כ';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

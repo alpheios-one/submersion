@@ -1,3 +1,4 @@
+import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
 
 /// A saved target mix, e.g. 10/70. Pressure is deliberately not part of a
@@ -52,6 +53,8 @@ class BlenderPreferences {
     required this.settledTempC,
     required this.cylinderWaterLiters,
     required this.model,
+    required this.billedFills,
+    required this.billedTo,
   });
 
   /// Enough to keep a synced blob small. Nobody blends 50 distinct mixes.
@@ -82,6 +85,18 @@ class BlenderPreferences {
   final double cylinderWaterLiters;
   final BlendGasModel model;
 
+  /// Cylinders finished and put on the bill, oldest first. A blending session
+  /// outlives any one blend, and a fill station doing four cylinders needs the
+  /// first three to survive the fourth (issue #1100).
+  final List<BilledFill> billedFills;
+
+  /// Who the bill is for. Seeded from the logbook's diver but free text, since
+  /// a fill station fills other people's cylinders.
+  final String billedTo;
+
+  /// Enough for a busy Saturday without letting a synced blob grow forever.
+  static const int maxBilledFills = 100;
+
   factory BlenderPreferences.defaults({required double cylinderWaterLiters}) =>
       BlenderPreferences(
         templates: seedTemplates,
@@ -91,6 +106,8 @@ class BlenderPreferences {
         settledTempC: kReferenceTempC,
         cylinderWaterLiters: cylinderWaterLiters,
         model: BlendGasModel.zFactor,
+        billedFills: const [],
+        billedTo: '',
       );
 
   BlenderPreferences copyWith({
@@ -101,6 +118,8 @@ class BlenderPreferences {
     double? settledTempC,
     double? cylinderWaterLiters,
     BlendGasModel? model,
+    List<BilledFill>? billedFills,
+    String? billedTo,
   }) => BlenderPreferences(
     templates: (templates ?? this.templates).take(maxTemplates).toList(),
     gasPrices: gasPrices ?? this.gasPrices,
@@ -109,6 +128,10 @@ class BlenderPreferences {
     settledTempC: settledTempC ?? this.settledTempC,
     cylinderWaterLiters: cylinderWaterLiters ?? this.cylinderWaterLiters,
     model: model ?? this.model,
+    billedFills: (billedFills ?? this.billedFills)
+        .take(maxBilledFills)
+        .toList(),
+    billedTo: billedTo ?? this.billedTo,
   );
 
   Map<String, dynamic> toJson() => {
@@ -119,6 +142,8 @@ class BlenderPreferences {
     'settledTempC': settledTempC,
     'cylinderWaterLiters': cylinderWaterLiters,
     'model': model.name,
+    'billedFills': billedFills.map((f) => f.toJson()).toList(),
+    'billedTo': billedTo,
   };
 
   /// Every field falls back independently, so one corrupt entry never costs
@@ -143,6 +168,17 @@ class BlenderPreferences {
 
     final currency = json['currencyCode'];
 
+    final rawFills = json['billedFills'];
+    final fills = rawFills is List
+        ? rawFills
+              .map(BilledFill.fromJson)
+              .whereType<BilledFill>()
+              .take(maxBilledFills)
+              .toList()
+        : <BilledFill>[];
+
+    final billedTo = json['billedTo'];
+
     return BlenderPreferences(
       templates: templates,
       gasPrices: prices,
@@ -155,6 +191,8 @@ class BlenderPreferences {
       model: BlendGasModel.fromName(
         json['model'] is String ? json['model'] as String : null,
       ),
+      billedFills: fills,
+      billedTo: billedTo is String ? billedTo : '',
     );
   }
 }
