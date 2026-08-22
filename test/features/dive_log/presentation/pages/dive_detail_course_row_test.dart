@@ -82,6 +82,11 @@ void main() {
         ],
         child: MaterialApp.router(
           routerConfig: router,
+          // Pinned: an unpinned MaterialApp resolves against the HOST
+          // machine's locale list, and this app ships 11 locales, so the
+          // English literals below would vanish for a contributor whose
+          // primary locale is one of them.
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
         ),
@@ -96,7 +101,6 @@ void main() {
 
     expect(find.text('Training Course'), findsOneWidget);
     expect(find.text('Advanced Open Water'), findsWidgets);
-    tester.takeException();
   });
 
   testWidgets('Details card omits the course row when none is linked', (
@@ -105,22 +109,18 @@ void main() {
     await pumpDetail(tester, diveWith());
 
     expect(find.text('Training Course'), findsNothing);
-    tester.takeException();
   });
 
   testWidgets('tapping the course row opens the course', (tester) async {
     await pumpDetail(tester, diveWith(courseId: course.id));
 
-    final row = find.ancestor(
-      of: find.text('Training Course'),
-      matching: find.byType(InkWell),
-    );
-    expect(row, findsWidgets);
-    tester.widget<InkWell>(row.first).onTap!();
+    // Drive a REAL pointer rather than invoking InkWell.onTap directly: the
+    // row sits inside a Card full of stacked decorated boxes, and only a real
+    // tap proves it is not a hit-test dead zone.
+    await tester.tap(find.text('Training Course'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('COURSE_STUB_PAGE'), findsOneWidget);
-    tester.takeException();
   });
 }

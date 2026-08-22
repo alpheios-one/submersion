@@ -4947,49 +4947,63 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // spaceBetween with two loose Flexible children, never a Spacer:
+            // a Spacer is tight and claims its half of the free space whether
+            // or not the chip needs it, which both strands a gap after the
+            // chip and leaves the chip itself unbounded. An unbounded chip
+            // overflowed this header by 15px on a phone-width pane as soon as
+            // the course name ran past a word or two.
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  context.l10n.diveLog_detail_section_trainingSignature,
-                  style: Theme.of(context).textTheme.titleMedium,
+                Flexible(
+                  child: Text(
+                    context.l10n.diveLog_detail_section_trainingSignature,
+                    style: Theme.of(context).textTheme.titleMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                const Spacer(),
                 if (courseAsync.hasValue && courseAsync.value != null) ...[
-                  Semantics(
-                    button: true,
-                    label: context.l10n.diveLog_detail_semantics_viewCourse(
-                      courseAsync.value!.name,
-                    ),
-                    child: InkWell(
-                      onTap: () =>
-                          context.push('/courses/${courseAsync.value!.id}'),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.school,
-                              size: 14,
-                              color: colorScheme.onPrimaryContainer,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              courseAsync.value!.name,
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: colorScheme.onPrimaryContainer,
-                                  ),
-                            ),
-                          ],
+                  Flexible(
+                    child: Semantics(
+                      button: true,
+                      label: context.l10n.diveLog_detail_semantics_viewCourse(
+                        courseAsync.value!.name,
+                      ),
+                      child: InkWell(
+                        onTap: () =>
+                            context.push('/courses/${courseAsync.value!.id}'),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.school,
+                                size: 14,
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  courseAsync.value!.name,
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: colorScheme.onPrimaryContainer,
+                                      ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
