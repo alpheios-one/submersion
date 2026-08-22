@@ -204,7 +204,7 @@ class FormatDetector {
     }
 
     // Ratio Computers XML: <diveSegment> root with <segmentHeader>
-    if (lower.contains('<divesegment')) {
+    if (lower.contains('<divesegment') && lower.contains('<segmentheader')) {
       return const DetectionResult(
         format: ImportFormat.ratioXml,
         sourceApp: SourceApp.ratio,
