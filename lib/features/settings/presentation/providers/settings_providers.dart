@@ -58,6 +58,10 @@ class SettingsKeys {
   static const String unitPreset = 'unit_preset';
   static const String themeMode = 'theme_mode';
   static const String displayZoom = 'display_zoom';
+
+  /// Device-local: whether media grids draw a provenance badge on every
+  /// thumbnail. Health badges are not covered by it.
+  static const String mediaProvenanceBadges = 'media_provenance_badges';
   static const String defaultDiveType = 'default_dive_type';
   static const String defaultTankVolume = 'default_tank_volume';
   static const String defaultStartPressure = 'default_start_pressure';

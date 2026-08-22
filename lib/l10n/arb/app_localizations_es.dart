@@ -23216,6 +23216,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Cuentas';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Visualización';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Configuración guiada';
 
   @override
@@ -32767,6 +32770,39 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Falta y sin copia';
+
+  @override
+  String get media_servedFrom_localDisk => 'En este dispositivo';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Fototeca';
+
+  @override
+  String get media_servedFrom_storeCache => 'Almacén en la nube, en caché aquí';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Almacén en la nube';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Enlace web';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Servicio conectado, en caché aquí';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Servicio conectado';
+
+  @override
+  String get media_servedFrom_embedded => 'Guardado en este cuaderno';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Mostrar distintivos de origen en las miniaturas';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Un pequeño icono que indica de dónde procede cada elemento. Los distintivos de problemas siempre se muestran.';
 
   @override
   String get media_status_transferFailed => 'Falló la subida';

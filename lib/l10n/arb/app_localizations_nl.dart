@@ -23026,6 +23026,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Accounts';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Weergave';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Begeleide installatie';
 
   @override
@@ -32502,6 +32505,39 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Ontbreekt en geen back-up';
+
+  @override
+  String get media_servedFrom_localDisk => 'Op dit apparaat';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Fotobibliotheek';
+
+  @override
+  String get media_servedFrom_storeCache => 'Cloudopslag, hier in cache';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Cloudopslag';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Weblink';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Verbonden service, hier in cache';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Verbonden service';
+
+  @override
+  String get media_servedFrom_embedded => 'Opgeslagen in dit logboek';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Bronbadges op miniaturen tonen';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Een klein pictogram dat laat zien waar elk item vandaan komt. Probleembadges blijven altijd zichtbaar.';
 
   @override
   String get media_status_transferFailed => 'Uploaden mislukt';

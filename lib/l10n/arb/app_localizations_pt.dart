@@ -23201,6 +23201,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Contas';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Exibição';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Configuração guiada';
 
   @override
@@ -32740,6 +32743,40 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Ausente e sem backup';
+
+  @override
+  String get media_servedFrom_localDisk => 'Neste dispositivo';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Biblioteca de fotos';
+
+  @override
+  String get media_servedFrom_storeCache =>
+      'Armazenamento na nuvem, em cache aqui';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Armazenamento na nuvem';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Link da web';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Serviço conectado, em cache aqui';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Serviço conectado';
+
+  @override
+  String get media_servedFrom_embedded => 'Salvo neste diário';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Mostrar selos de origem nas miniaturas';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Um pequeno ícone que mostra de onde cada item vem. Os selos de problema sempre aparecem.';
 
   @override
   String get media_status_transferFailed => 'Falha no envio';

@@ -22788,6 +22788,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'الحسابات';
 
   @override
+  String get settings_photosMedia_displayHeader => 'العرض';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'إعداد موجه';
 
   @override
@@ -32419,6 +32422,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_status_broken => 'مفقود وغير منسوخ احتياطيًا';
+
+  @override
+  String get media_servedFrom_localDisk => 'على هذا الجهاز';
+
+  @override
+  String get media_servedFrom_platformGallery => 'مكتبة الصور';
+
+  @override
+  String get media_servedFrom_storeCache => 'تخزين سحابي، مخزن مؤقتا هنا';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'تخزين سحابي';
+
+  @override
+  String get media_servedFrom_networkUrl => 'رابط ويب';
+
+  @override
+  String get media_servedFrom_connectorCache => 'خدمة متصلة، مخزنة مؤقتا هنا';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'خدمة متصلة';
+
+  @override
+  String get media_servedFrom_embedded => 'محفوظ في سجل الغوص هذا';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'إظهار شارات المصدر على الصور المصغرة';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'رمز صغير يوضح مصدر كل عنصر. تظهر شارات المشكلات دائما.';
 
   @override
   String get media_status_transferFailed => 'فشل الرفع';

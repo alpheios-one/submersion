@@ -23274,6 +23274,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Comptes';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Affichage';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Configuration guidée';
 
   @override
@@ -32814,6 +32817,39 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Absent et non sauvegardé';
+
+  @override
+  String get media_servedFrom_localDisk => 'Sur cet appareil';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Photothèque';
+
+  @override
+  String get media_servedFrom_storeCache => 'Stockage cloud, en cache ici';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Stockage cloud';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Lien web';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Service connecté, en cache ici';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Service connecté';
+
+  @override
+  String get media_servedFrom_embedded => 'Enregistré dans ce carnet';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Afficher les badges de source sur les vignettes';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Une petite icône indiquant d\'où provient chaque élément. Les badges de problème restent toujours visibles.';
 
   @override
   String get media_status_transferFailed => 'Échec du téléversement';

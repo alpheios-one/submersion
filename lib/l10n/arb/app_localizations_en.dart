@@ -22810,6 +22810,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Accounts';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Display';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Guided setup';
 
   @override
@@ -32212,6 +32215,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Missing and not backed up';
+
+  @override
+  String get media_servedFrom_localDisk => 'On this device';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Photo library';
+
+  @override
+  String get media_servedFrom_storeCache => 'Cloud store, cached here';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Cloud store';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Web link';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Connected service, cached here';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Connected service';
+
+  @override
+  String get media_servedFrom_embedded => 'Stored in this logbook';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Show source badges on thumbnails';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'A small glyph showing where each item is served from. Problem badges always show.';
 
   @override
   String get media_status_transferFailed => 'Upload failed';

@@ -22625,6 +22625,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'חשבונות';
 
   @override
+  String get settings_photosMedia_displayHeader => 'תצוגה';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'הגדרה מודרכת';
 
   @override
@@ -32078,6 +32081,38 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_status_broken => 'חסר ולא מגובה';
+
+  @override
+  String get media_servedFrom_localDisk => 'במכשיר הזה';
+
+  @override
+  String get media_servedFrom_platformGallery => 'ספריית התמונות';
+
+  @override
+  String get media_servedFrom_storeCache => 'אחסון ענן, שמור במטמון כאן';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'אחסון ענן';
+
+  @override
+  String get media_servedFrom_networkUrl => 'קישור אינטרנט';
+
+  @override
+  String get media_servedFrom_connectorCache => 'שירות מחובר, שמור במטמון כאן';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'שירות מחובר';
+
+  @override
+  String get media_servedFrom_embedded => 'שמור ביומן הזה';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'הצגת תגי מקור על תמונות ממוזערות';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'סמל קטן שמראה מאיפה כל פריט מוגש. תגי בעיה מוצגים תמיד.';
 
   @override
   String get media_status_transferFailed => 'ההעלאה נכשלה';
