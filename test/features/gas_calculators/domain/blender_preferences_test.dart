@@ -109,4 +109,56 @@ void main() {
       expect(capped.templates, hasLength(BlenderPreferences.maxTemplates));
     });
   });
+  group('copyWith', () {
+    test('can clear the currency back to the diver default', () {
+      // Raised in review on PR #1215. Null is meaningful here (inherit the
+      // diver's setting), so a plain `?? this.currencyCode` could never
+      // express it.
+      final prefs = BlenderPreferences.defaults(
+        cylinderWaterLiters: 12,
+      ).copyWith(currencyCode: 'CHF');
+      expect(prefs.currencyCode, 'CHF');
+      expect(prefs.copyWith(currencyCode: null).currencyCode, isNull);
+    });
+
+    test('leaves the currency alone when it is not named', () {
+      final prefs = BlenderPreferences.defaults(
+        cylinderWaterLiters: 12,
+      ).copyWith(currencyCode: 'CHF');
+      expect(prefs.copyWith(fillTempC: 5).currencyCode, 'CHF');
+    });
+  });
+
+  group('rejectionFor', () {
+    test('accepts a fresh, valid mix', () {
+      expect(rejectionFor(const [], const MixTemplate(o2: 18, he: 45)), isNull);
+    });
+
+    test('names an impossible mix', () {
+      expect(
+        rejectionFor(const [], const MixTemplate(o2: 60, he: 70)),
+        MixTemplateRejection.invalid,
+      );
+    });
+
+    test('names a duplicate', () {
+      expect(
+        rejectionFor(const [
+          MixTemplate(o2: 10, he: 70),
+        ], const MixTemplate(o2: 10, he: 70)),
+        MixTemplateRejection.duplicate,
+      );
+    });
+
+    test('names the cap', () {
+      final full = List.generate(
+        BlenderPreferences.maxTemplates,
+        (i) => MixTemplate(o2: 10 + i * 0.1, he: 50),
+      );
+      expect(
+        rejectionFor(full, const MixTemplate(o2: 18, he: 45)),
+        MixTemplateRejection.limitReached,
+      );
+    });
+  });
 }

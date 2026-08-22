@@ -5,6 +5,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/mix_template_dialog.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/mix_template_messages.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Sentinels for the two actions at the foot of the menu. Plain objects rather
@@ -86,16 +87,10 @@ class MixTemplateMenu extends ConsumerWidget {
     final candidate = MixTemplate(o2: mix.o2, he: mix.he);
     final existing = ref.read(blenderTemplatesProvider);
 
-    String? problem;
-    if (!candidate.isValid) {
-      problem = context.l10n.gasCalculators_blender_templateInvalid;
-    } else if (existing.contains(candidate)) {
-      problem = context.l10n.gasCalculators_blender_templateExists;
-    } else if (existing.length >= BlenderPreferences.maxTemplates) {
-      problem = context.l10n.gasCalculators_blender_templateLimit(
-        BlenderPreferences.maxTemplates,
-      );
-    }
+    final problem = describeTemplateRejection(
+      context,
+      rejectionFor(existing, candidate),
+    );
 
     if (problem == null) {
       ref.read(blenderTemplatesProvider.notifier).state = [

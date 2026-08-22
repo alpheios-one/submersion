@@ -4,6 +4,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/mix_template_messages.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Add and delete saved target mixes.
@@ -29,6 +30,9 @@ class _MixTemplateDialogState extends ConsumerState<_MixTemplateDialog> {
   final _o2 = TextEditingController();
   final _he = TextEditingController();
 
+  /// The outcome of the last add attempt, shown under the entry row.
+  String? _message;
+
   @override
   void dispose() {
     _o2.dispose();
@@ -36,15 +40,25 @@ class _MixTemplateDialogState extends ConsumerState<_MixTemplateDialog> {
     super.dispose();
   }
 
+  /// Add the typed mix, saying why when it cannot be added.
+  ///
+  /// Returning quietly reads as a broken button, and the menu's save action
+  /// already explains itself (PR #1215 review).
   void _add() {
     final o2 = parseUserDecimal(_o2.text);
     final he = parseUserDecimal(_he.text);
-    if (o2 == null || he == null) return;
+    if (o2 == null || he == null) {
+      _say(context.l10n.gasCalculators_blender_templateInvalid);
+      return;
+    }
     final candidate = MixTemplate(o2: o2, he: he);
     final existing = ref.read(blenderTemplatesProvider);
-    if (!candidate.isValid ||
-        existing.contains(candidate) ||
-        existing.length >= BlenderPreferences.maxTemplates) {
+    final problem = describeTemplateRejection(
+      context,
+      rejectionFor(existing, candidate),
+    );
+    if (problem != null) {
+      _say(problem);
       return;
     }
     ref.read(blenderTemplatesProvider.notifier).state = [
@@ -52,9 +66,14 @@ class _MixTemplateDialogState extends ConsumerState<_MixTemplateDialog> {
       candidate,
     ];
     saveBlenderPreferences(ref);
+    _say(context.l10n.gasCalculators_blender_templateSaved(candidate.label));
     _o2.clear();
     _he.clear();
   }
+
+  /// The dialog sits above the page's ScaffoldMessenger, so a SnackBar posted
+  /// from here would slide in behind it. Say it in the dialog instead.
+  void _say(String message) => setState(() => _message = message);
 
   void _delete(MixTemplate t) {
     ref.read(blenderTemplatesProvider.notifier).state = [
@@ -98,6 +117,14 @@ class _MixTemplateDialogState extends ConsumerState<_MixTemplateDialog> {
                 ),
               ),
             const Divider(),
+            if (_message != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  _message!,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
             Row(
               children: [
                 Expanded(child: _numberField(_o2, 'O₂')),

@@ -39,6 +39,35 @@ class MixTemplate {
   String toString() => 'MixTemplate($label)';
 }
 
+/// Why a target mix cannot be saved as a template.
+///
+/// Decided here rather than at each call site: the menu and the manage dialog
+/// both add templates, and they were disagreeing about whether to explain
+/// themselves (PR #1215 review).
+enum MixTemplateRejection {
+  /// O2 + He over 100%, or a negative fraction.
+  invalid,
+
+  /// The same mix is already saved.
+  duplicate,
+
+  /// [BlenderPreferences.maxTemplates] reached.
+  limitReached,
+}
+
+/// Why [candidate] cannot join [existing], or null when it can.
+MixTemplateRejection? rejectionFor(
+  List<MixTemplate> existing,
+  MixTemplate candidate,
+) {
+  if (!candidate.isValid) return MixTemplateRejection.invalid;
+  if (existing.contains(candidate)) return MixTemplateRejection.duplicate;
+  if (existing.length >= BlenderPreferences.maxTemplates) {
+    return MixTemplateRejection.limitReached;
+  }
+  return null;
+}
+
 /// Everything the blender remembers between sessions.
 ///
 /// Stored as one JSON object in the `settings` key-value table rather than as
@@ -110,10 +139,16 @@ class BlenderPreferences {
         billedTo: '',
       );
 
+  /// Distinguishes "leave this alone" from "set it to null" in [copyWith].
+  /// A plain `String?` default cannot: `currencyCode ?? this.currencyCode`
+  /// silently keeps the old value, and null is meaningful here (inherit the
+  /// diver's default currency).
+  static const Object _unchanged = Object();
+
   BlenderPreferences copyWith({
     List<MixTemplate>? templates,
     List<double?>? gasPrices,
-    String? currencyCode,
+    Object? currencyCode = _unchanged,
     double? fillTempC,
     double? settledTempC,
     double? cylinderWaterLiters,
@@ -123,7 +158,9 @@ class BlenderPreferences {
   }) => BlenderPreferences(
     templates: (templates ?? this.templates).take(maxTemplates).toList(),
     gasPrices: gasPrices ?? this.gasPrices,
-    currencyCode: currencyCode ?? this.currencyCode,
+    currencyCode: identical(currencyCode, _unchanged)
+        ? this.currencyCode
+        : currencyCode as String?,
     fillTempC: fillTempC ?? this.fillTempC,
     settledTempC: settledTempC ?? this.settledTempC,
     cylinderWaterLiters: cylinderWaterLiters ?? this.cylinderWaterLiters,

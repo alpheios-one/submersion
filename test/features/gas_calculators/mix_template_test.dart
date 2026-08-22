@@ -129,4 +129,41 @@ void main() {
     );
     expect(ref.read(blenderTemplatesProvider), hasLength(4));
   });
+  testWidgets('the manage dialog says why an add was refused', (tester) async {
+    // Raised in review on PR #1215: the dialog used to return quietly, which
+    // reads as a broken button, while the menu explained itself.
+    await _pump(tester);
+    await tester.tap(find.byType(MixTemplateMenu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Manage templates'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, '10');
+    await tester.enterText(find.byType(TextField).last, '70');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Add template'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('That mix is already saved.'), findsOneWidget);
+  });
+
+  testWidgets('the manage dialog confirms a successful add', (tester) async {
+    final ref = await _pump(tester);
+    await tester.tap(find.byType(MixTemplateMenu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Manage templates'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, '21');
+    await tester.enterText(find.byType(TextField).last, '35');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Add template'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('21/35'), findsWidgets);
+    expect(
+      ref.read(blenderTemplatesProvider).last,
+      const MixTemplate(o2: 21, he: 35),
+    );
+  });
 }
