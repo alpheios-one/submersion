@@ -365,6 +365,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_bulkEdit_fieldMyRole => 'Saját szerep';
 
   @override
+  String get diveLog_bulkEdit_buddyRoleMixed => 'Vegyes';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'Súlyok';
 
   @override

@@ -367,6 +367,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_bulkEdit_fieldMyRole => 'Mi rol';
 
   @override
+  String get diveLog_bulkEdit_buddyRoleMixed => 'Variado';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'Lastres';
 
   @override

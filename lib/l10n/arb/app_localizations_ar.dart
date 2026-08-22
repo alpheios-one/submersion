@@ -364,6 +364,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_bulkEdit_fieldMyRole => 'دوري';
 
   @override
+  String get diveLog_bulkEdit_buddyRoleMixed => 'متنوع';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'الأوزان';
 
   @override

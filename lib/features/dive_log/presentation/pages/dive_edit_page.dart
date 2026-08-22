@@ -1226,6 +1226,49 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     });
   }
 
+  /// The role id to show for a buddy row, or null when the selection has no
+  /// single answer: the buddy's links disagree across the selected dives, so
+  /// [_existingBuddyRoleIds] (unanimous only) has nothing for them.
+  String? _bulkBuddyRoleId(String id) {
+    final picked = _buddyRoleById[id];
+    if (picked != null) return picked.id;
+    final existing = _existingBuddyRoleIds[id];
+    if (existing != null) return existing;
+    // Not on any selected dive yet (a fresh picker add): the link the save
+    // will create defaults to Buddy, so say so rather than "Mixed".
+    return (_buddyCounts[id] ?? 0) == 0 ? DiveRole.buddyId : null;
+  }
+
+  String _bulkBuddyRoleLabel(String id) {
+    final rolesById =
+        ref.watch(diveRoleMapProvider).value ?? const <String, DiveRole>{};
+    final roleId = _bulkBuddyRoleId(id);
+    if (roleId == null) return context.l10n.diveLog_bulkEdit_buddyRoleMixed;
+    return (rolesById[roleId] ?? DiveRole.synthetic(roleId)).localizedName(
+      context.l10n,
+    );
+  }
+
+  Future<void> _showBulkBuddyRolePicker(BulkMembershipItem item) async {
+    final roles = await ref.read(allDiveRolesProvider.future);
+    if (!mounted) return;
+    final selection = await showDiveRoleSelector(
+      context,
+      title: context.l10n.buddies_picker_selectRole(item.label),
+      roles: roles,
+      selectedRoleId: _bulkBuddyRoleId(item.id),
+      onCreateCustomRole: (name) => ref
+          .read(diveRoleListNotifierProvider.notifier)
+          .addDiveRoleByName(name),
+    );
+    final role = selection?.role;
+    if (role == null || !mounted) return;
+    setState(() {
+      _markDirty();
+      _buddyRoleById[item.id] = role;
+    });
+  }
+
   Widget _bulkTanksEditor(UnitFormatter units) {
     // Update edits the tanks each dive already has, so it takes a template plus
     // a field mask instead of a tank list (#797).
@@ -1320,6 +1363,13 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           counts: _buddyCounts,
           onAdd: _bulkAddBuddies,
           onChanged: (d) => setState(() => _buddyDelta = d),
+          // Each dive_buddies link carries a role, so the row needs an
+          // affordance membership alone cannot express (#1220).
+          trailingBuilder: (item) => TextButton(
+            key: ValueKey('buddy-role-${item.id}'),
+            onPressed: () => _showBulkBuddyRolePicker(item),
+            child: Text(_bulkBuddyRoleLabel(item.id)),
+          ),
         ),
         // The diver's own role is a scalar column, not a membership row, so it
         // rides the gate lane. It sits with Buddies because that is where the
@@ -1409,18 +1459,27 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       );
     }
     // Membership and role are separate instructions. A row the user only
-    // ticked on must not rewrite the role of links that already exist, while a
-    // role picked in the picker applies even when membership does not change
-    // because the buddy is already on every selected dive (#893).
+    // ticked on must not rewrite the role of links that already exist (#893).
     final membershipOnlyAdds = _buddyDelta.addIds
         .where((id) => !_buddyRoleById.containsKey(id))
         .toList();
+    // A picked role on a buddy who is also being added rides the add, so the
+    // links it creates carry that role from the start.
     final pickedRoleAdds = _buddyRoleById.keys
         .where(
           (id) =>
               !_buddyDelta.removeIds.contains(id) &&
-              (_buddyDelta.addIds.contains(id) ||
-                  _buddyOnEverySelectedDive(id)),
+              _buddyDelta.addIds.contains(id),
+        )
+        .toList();
+    // A picked role with no membership change is role-only: rewrite the links
+    // that exist and create none, so re-roling a buddy who is on some of the
+    // selection cannot add them to the rest (#1220).
+    final roleOnlyUpdates = _buddyRoleById.keys
+        .where(
+          (id) =>
+              !_buddyDelta.removeIds.contains(id) &&
+              !_buddyDelta.addIds.contains(id),
         )
         .toList();
     if (membershipOnlyAdds.isNotEmpty) {
@@ -1437,6 +1496,14 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         BuddiesOp(
           mode: BulkCollectionMode.add,
           buddies: pickedRoleAdds.map(_buddyWithRole).toList(),
+        ),
+      );
+    }
+    if (roleOnlyUpdates.isNotEmpty) {
+      ops.add(
+        BuddiesOp(
+          mode: BulkCollectionMode.update,
+          buddies: roleOnlyUpdates.map(_buddyWithRole).toList(),
         ),
       );
     }
@@ -3647,13 +3714,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         ),
     role: _roleForBuddy(id),
   );
-
-  /// Mirrors BulkMembershipEditor's "on all" presence, which is what makes a
-  /// picked role a no-op for the membership delta.
-  bool _buddyOnEverySelectedDive(String id) {
-    final total = widget.bulkDiveIds!.length;
-    return total > 0 && (_buddyCounts[id] ?? 0) >= total;
-  }
 
   /// A picked role wins; otherwise reuse the role the buddy already has across
   /// the selection so a membership-only add cannot demote them to Buddy. Only

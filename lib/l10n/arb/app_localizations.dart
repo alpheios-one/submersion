@@ -661,6 +661,12 @@ abstract class AppLocalizations {
   /// **'My role'**
   String get diveLog_bulkEdit_fieldMyRole;
 
+  /// No description provided for @diveLog_bulkEdit_buddyRoleMixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mixed'**
+  String get diveLog_bulkEdit_buddyRoleMixed;
+
   /// No description provided for @diveLog_bulkEdit_collectionWeights.
   ///
   /// In en, this message translates to:

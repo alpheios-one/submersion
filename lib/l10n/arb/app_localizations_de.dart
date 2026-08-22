@@ -363,6 +363,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_bulkEdit_fieldMyRole => 'Meine Rolle';
 
   @override
+  String get diveLog_bulkEdit_buddyRoleMixed => 'Gemischt';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'Gewichte';
 
   @override
