@@ -6,26 +6,51 @@ import 'package:submersion/features/media/data/repositories/media_repository.dar
 import 'package:submersion/features/media/data/resolvers/local_file_resolver.dart';
 import 'package:submersion/features/media/data/services/local_files_diagnostics_service.dart';
 import 'package:submersion/features/media/data/services/local_media_platform.dart';
+import 'package:submersion/features/media/data/services/media_verification_sweep.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
-import 'package:submersion/features/media/domain/value_objects/verify_result.dart';
 
 import 'local_files_diagnostics_service_test.mocks.dart';
+
+/// Records the filter it was handed and returns a canned outcome. Hand
+/// written rather than generated: mocking the sweep would let a signature
+/// change pass silently until the next build_runner run.
+class _StubSweep implements MediaVerificationSweep {
+  _StubSweep(this.outcome);
+
+  final SweepOutcome outcome;
+  final List<Set<MediaSourceType>?> asked = [];
+
+  @override
+  Future<SweepOutcome> run({
+    Set<MediaSourceType>? sourceTypes,
+    void Function(int done, int total)? onProgress,
+  }) async {
+    asked.add(sourceTypes);
+    return outcome;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} is not stubbed');
+}
 
 @GenerateMocks([MediaRepository, LocalFileResolver, LocalMediaPlatform])
 void main() {
   late MockMediaRepository mockRepo;
-  late MockLocalFileResolver mockResolver;
   late MockLocalMediaPlatform mockPlatform;
+  late _StubSweep idleSweep;
   late LocalFilesDiagnosticsService subject;
 
   setUp(() {
     mockRepo = MockMediaRepository();
-    mockResolver = MockLocalFileResolver();
     mockPlatform = MockLocalMediaPlatform();
+    idleSweep = _StubSweep(
+      const SweepOutcome(processed: 0, flipped: 0, inconclusive: 0, failed: 0),
+    );
     subject = LocalFilesDiagnosticsService(
       repository: mockRepo,
-      resolver: mockResolver,
+      sweep: idleSweep,
       platform: mockPlatform,
     );
   });
@@ -64,8 +89,9 @@ void main() {
         expect(result.total, 3);
         expect(result.available, 2);
         expect(result.unavailable, 1);
-        // Read path must not invoke the resolver.
-        verifyNever(mockResolver.verify(any));
+        // Read path must never touch the filesystem: it reports the
+        // persisted flag and must not trigger a sweep.
+        expect(idleSweep.asked, isEmpty);
       },
     );
 
@@ -83,138 +109,49 @@ void main() {
   });
 
   group('reverifyAll', () {
-    test(
-      'updates lastVerifiedAt for every item and returns the number whose orphan status flipped',
-      () async {
-        final a = item(id: 'a', isOrphaned: false); // stays available
-        final b = item(id: 'b', isOrphaned: false); // flips to orphan
-        final c = item(id: 'c', isOrphaned: true); // flips to available
-        final d = item(id: 'd', isOrphaned: true); // stays orphan
-        when(
-          mockRepo.getAllBySourceType(MediaSourceType.localFile),
-        ).thenAnswer((_) async => [a, b, c, d]);
-
-        when(
-          mockResolver.verify(a),
-        ).thenAnswer((_) async => VerifyResult.available);
-        when(
-          mockResolver.verify(b),
-        ).thenAnswer((_) async => VerifyResult.notFound);
-        when(
-          mockResolver.verify(c),
-        ).thenAnswer((_) async => VerifyResult.available);
-        when(
-          mockResolver.verify(d),
-        ).thenAnswer((_) async => VerifyResult.notFound);
-        when(mockRepo.updateMedia(any)).thenAnswer((_) async {});
-
-        final flipped = await subject.reverifyAll();
-
-        expect(flipped, 2);
-        // Every item must be updated, with lastVerifiedAt populated.
-        final captured = verify(
-          mockRepo.updateMedia(captureAny),
-        ).captured.cast<MediaItem>();
-        expect(captured.length, 4);
-        for (final updated in captured) {
-          expect(updated.lastVerifiedAt, isNotNull);
-        }
-        // Verify orphan flags got written correctly.
-        final byId = {for (final u in captured) u.id: u};
-        expect(byId['a']!.isOrphaned, isFalse);
-        expect(byId['b']!.isOrphaned, isTrue);
-        expect(byId['c']!.isOrphaned, isFalse);
-        expect(byId['d']!.isOrphaned, isTrue);
-      },
-    );
-
-    test(
-      'volumeOffline items keep their orphan state (only stamped)',
-      () async {
-        final mounted = item(id: 'a', isOrphaned: false); // share offline
-        final orphan = item(id: 'b', isOrphaned: true); // share offline too
-        when(
-          mockRepo.getAllBySourceType(MediaSourceType.localFile),
-        ).thenAnswer((_) async => [mounted, orphan]);
-        when(
-          mockResolver.verify(any),
-        ).thenAnswer((_) async => VerifyResult.volumeOffline);
-        when(mockRepo.updateMedia(any)).thenAnswer((_) async {});
-
-        final flipped = await subject.reverifyAll();
-
-        expect(flipped, 0, reason: 'an unmounted share never flips anything');
-        final captured = verify(
-          mockRepo.updateMedia(captureAny),
-        ).captured.cast<MediaItem>();
-        final byId = {for (final u in captured) u.id: u};
-        expect(byId['a']!.isOrphaned, isFalse, reason: 'not orphaned');
-        expect(byId['b']!.isOrphaned, isTrue, reason: 'state preserved');
-        expect(byId['a']!.lastVerifiedAt, isNotNull);
-      },
-    );
-
-    test(
-      'transientError items keep their orphan state (only stamped)',
-      () async {
-        // A present-but-unreadable file (sandbox denial / revoked
-        // permission): the bytes are on disk, so the sweep must not flip a
-        // healthy row to "missing from device".
-        final healthy = item(id: 'a', isOrphaned: false);
-        final orphan = item(id: 'b', isOrphaned: true);
-        when(
-          mockRepo.getAllBySourceType(MediaSourceType.localFile),
-        ).thenAnswer((_) async => [healthy, orphan]);
-        when(
-          mockResolver.verify(any),
-        ).thenAnswer((_) async => VerifyResult.transientError);
-        when(mockRepo.updateMedia(any)).thenAnswer((_) async {});
-
-        final flipped = await subject.reverifyAll();
-
-        expect(flipped, 0, reason: 'a transient failure never flips anything');
-        final captured = verify(
-          mockRepo.updateMedia(captureAny),
-        ).captured.cast<MediaItem>();
-        final byId = {for (final u in captured) u.id: u};
-        expect(byId['a']!.isOrphaned, isFalse, reason: 'not orphaned');
-        expect(byId['b']!.isOrphaned, isTrue, reason: 'state preserved');
-        expect(byId['a']!.lastVerifiedAt, isNotNull);
-      },
-    );
-
-    test('on empty repository returns zero', () async {
-      when(
-        mockRepo.getAllBySourceType(MediaSourceType.localFile),
-      ).thenAnswer((_) async => []);
+    // The sweep loop itself moved to MediaVerificationSweep, and its
+    // behaviour (flip counting, inconclusive results, per-item failures) is
+    // covered by media_verification_sweep_test.dart. What belongs here is the
+    // delegation contract: the local-files subsection must keep asking for
+    // local files only, and must keep returning the flipped count its
+    // snackbar shows.
+    test('delegates to the sweep filtered to local files', () async {
+      final sweep = _StubSweep(
+        const SweepOutcome(
+          processed: 9,
+          flipped: 2,
+          inconclusive: 0,
+          failed: 0,
+        ),
+      );
+      final subject = LocalFilesDiagnosticsService(
+        repository: mockRepo,
+        sweep: sweep,
+        platform: mockPlatform,
+      );
 
       final flipped = await subject.reverifyAll();
 
-      expect(flipped, 0);
-      verifyNever(mockResolver.verify(any));
-      verifyNever(mockRepo.updateMedia(any));
+      expect(flipped, 2);
+      expect(sweep.asked.single, {MediaSourceType.localFile});
     });
 
-    test('tolerates per-item failures: skips bad item, continues sweep, '
-        'returns flipped count excluding the failure', () async {
-      final a = item(id: 'a', isOrphaned: false); // throws on verify
-      final b = item(id: 'b', isOrphaned: false); // flips to orphan
-      when(
-        mockRepo.getAllBySourceType(MediaSourceType.localFile),
-      ).thenAnswer((_) async => [a, b]);
+    test('reports zero when nothing changed', () async {
+      final sweep = _StubSweep(
+        const SweepOutcome(
+          processed: 9,
+          flipped: 0,
+          inconclusive: 9,
+          failed: 0,
+        ),
+      );
+      final subject = LocalFilesDiagnosticsService(
+        repository: mockRepo,
+        sweep: sweep,
+        platform: mockPlatform,
+      );
 
-      when(mockResolver.verify(a)).thenThrow(Exception('verify boom'));
-      when(
-        mockResolver.verify(b),
-      ).thenAnswer((_) async => VerifyResult.notFound);
-      when(mockRepo.updateMedia(any)).thenAnswer((_) async {});
-
-      final flipped = await subject.reverifyAll();
-
-      // Only `b` flipped — `a` failed and was excluded.
-      expect(flipped, 1);
-      // `a` failed before update; only `b` got an update call.
-      verify(mockRepo.updateMedia(any)).called(1);
+      expect(await subject.reverifyAll(), 0);
     });
   });
 

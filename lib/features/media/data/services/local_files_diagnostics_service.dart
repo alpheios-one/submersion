@@ -2,12 +2,10 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 
-import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
-import 'package:submersion/features/media/data/resolvers/local_file_resolver.dart';
 import 'package:submersion/features/media/data/services/local_media_platform.dart';
+import 'package:submersion/features/media/data/services/media_verification_sweep.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
-import 'package:submersion/features/media/domain/value_objects/verify_result.dart';
 
 /// Aggregated counts shown in Settings → Media Sources → Local files.
 ///
@@ -33,21 +31,19 @@ class LocalFilesDiagnostics extends Equatable {
 /// action.
 ///
 /// Read path ([diagnose]) reads the persisted [MediaItem.isOrphaned] flag
-/// and never touches the filesystem. Write path ([reverifyAll]) walks every
-/// local-file row, calls the resolver, updates the orphan flag, and bumps
-/// `lastVerifiedAt` for every row.
+/// and never touches the filesystem. Write path ([reverifyAll]) delegates to
+/// [MediaVerificationSweep], filtered to local-file rows.
 class LocalFilesDiagnosticsService {
   final MediaRepository _repository;
-  final LocalFileResolver _resolver;
+  final MediaVerificationSweep _sweep;
   final LocalMediaPlatform _platform;
-  final _log = LoggerService.forClass(LocalFilesDiagnosticsService);
 
   LocalFilesDiagnosticsService({
     required MediaRepository repository,
-    required LocalFileResolver resolver,
+    required MediaVerificationSweep sweep,
     required LocalMediaPlatform platform,
   }) : _repository = repository,
-       _resolver = resolver,
+       _sweep = sweep,
        _platform = platform;
 
   /// Returns aggregated counts of local-file media items.
@@ -74,53 +70,20 @@ class LocalFilesDiagnosticsService {
     );
   }
 
-  /// Re-runs [LocalFileResolver.verify] against every local-file media item
-  /// and updates the orphan flag plus `lastVerifiedAt`.
+  /// Re-verifies every local-file media item, updating the orphan flag and
+  /// `lastVerifiedAt`.
   ///
-  /// Always writes `lastVerifiedAt` for every row so the displayed timestamps
-  /// reflect a fresh check. Returns the number of items whose orphan status
-  /// changed (used for the snackbar count, excluding failed items). The
-  /// N-write cost (1 UPDATE per item even when nothing changed) is acceptable
-  /// for libraries up to a few thousand items; can be optimized in a
-  /// follow-up if it ever becomes a perf concern.
+  /// The loop lives in [MediaVerificationSweep], which does the same work for
+  /// any source type. Keeping a second copy here would mean two answers to
+  /// "what does this VerifyResult mean for isOrphaned", and they would
+  /// eventually disagree about the same row.
   ///
-  /// Per-item failures (verify or update errors) are logged and skipped; the
-  /// sweep continues so a single bad row cannot abort the whole pass.
+  /// This stays as the Local files subsection's own entry point and keeps
+  /// returning the flipped count its snackbar shows. Per-item failures are
+  /// logged and skipped inside the sweep, so one bad row cannot abort a pass.
   Future<int> reverifyAll() async {
-    _log.info('Starting Re-verify all (local files)');
-    final all = await _repository.getAllBySourceType(MediaSourceType.localFile);
-    final now = DateTime.now();
-    int flipped = 0;
-    int failed = 0;
-    for (final item in all) {
-      try {
-        final result = await _resolver.verify(item);
-        // Transient states keep the row's current orphan flag rather than
-        // flagging files that are still on disk: an unmounted volume
-        // reappears on remount, and a present-but-unreadable file (sandbox
-        // denial, revoked permission) comes back when access is re-granted.
-        // This is the contract VerifyResult documents.
-        if (result == VerifyResult.volumeOffline ||
-            result == VerifyResult.accessDenied ||
-            result == VerifyResult.transientError) {
-          await _repository.updateMedia(item.copyWith(lastVerifiedAt: now));
-          continue;
-        }
-        final isOrphan = result != VerifyResult.available;
-        if (item.isOrphaned != isOrphan) flipped++;
-        await _repository.updateMedia(
-          item.copyWith(isOrphaned: isOrphan, lastVerifiedAt: now),
-        );
-      } catch (e, st) {
-        failed++;
-        _log.error('Re-verify failed for ${item.id}', error: e, stackTrace: st);
-      }
-    }
-    _log.info(
-      'Re-verify all complete: ${all.length} processed, '
-      '$flipped flipped, $failed failed',
-    );
-    return flipped;
+    final outcome = await _sweep.run(sourceTypes: {MediaSourceType.localFile});
+    return outcome.flipped;
   }
 
   /// Returns the number of persistable URI permissions Android currently

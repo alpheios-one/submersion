@@ -483,6 +483,16 @@ class MediaRepository {
   /// vs. available items here).
   Future<List<domain.MediaItem>> getAllBySourceType(
     MediaSourceType sourceType,
+  ) => getAllBySourceTypes({sourceType});
+
+  /// Every row of the given source types, or every row when [sourceTypes] is
+  /// null.
+  ///
+  /// Null rather than defaulting to "all types" so a caller cannot sweep the
+  /// whole library by forgetting an argument: asking for everything has to be
+  /// written down.
+  Future<List<domain.MediaItem>> getAllBySourceTypes(
+    Set<MediaSourceType>? sourceTypes,
   ) async {
     try {
       final query = _db.select(_db.media).join([
@@ -490,7 +500,12 @@ class MediaRepository {
           _db.mediaEnrichment,
           _db.mediaEnrichment.mediaId.equalsExp(_db.media.id),
         ),
-      ])..where(_db.media.sourceType.equals(sourceType.name));
+      ]);
+      if (sourceTypes != null) {
+        query.where(
+          _db.media.sourceType.isIn(sourceTypes.map((t) => t.name).toList()),
+        );
+      }
 
       final rows = await query.get();
       return rows.map((row) {
@@ -500,7 +515,8 @@ class MediaRepository {
       }).toList();
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to get media by source type: ${sourceType.name}',
+        'Failed to get media by source types: '
+        '${sourceTypes?.map((t) => t.name).join(',') ?? 'all'}',
         error: e,
         stackTrace: stackTrace,
       );
