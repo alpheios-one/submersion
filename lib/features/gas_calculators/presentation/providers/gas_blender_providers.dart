@@ -6,7 +6,6 @@ import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
-import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 /// Starting cylinder pressure (bar), read at the fill temperature. Zero means
@@ -141,7 +140,9 @@ final blenderBillingProvider = Provider<BillingResult>((ref) {
 /// templates. Deleting every template afterwards stores an empty list, and an
 /// empty list is not an absent blob, so the deletion sticks.
 final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
-  final stored = await AppSettingsRepository().getBlenderPreferences();
+  final stored = await ref
+      .read(appSettingsRepositoryProvider)
+      .getBlenderPreferences();
   if (stored == null) return;
   ref.read(blenderTemplatesProvider.notifier).state = stored.templates;
   ref.read(blenderGasPricesProvider.notifier).state = stored.gasPrices;
@@ -174,19 +175,21 @@ const _log = LoggerService('GasBlenderPreferences');
 /// already live in the provider either way.
 Future<void> saveBlenderPreferences(WidgetRef ref) async {
   try {
-    await AppSettingsRepository().setBlenderPreferences(
-      BlenderPreferences(
-        templates: ref.read(blenderTemplatesProvider),
-        gasPrices: ref.read(blenderGasPricesProvider),
-        currencyCode: ref.read(blenderCurrencyProvider),
-        fillTempC: ref.read(blenderFillTempProvider),
-        settledTempC: ref.read(blenderSettledTempProvider),
-        cylinderWaterLiters: ref.read(blenderCylinderLitersProvider),
-        model: ref.read(blenderGasModelProvider),
-        billedFills: ref.read(blenderBilledFillsProvider),
-        billedTo: ref.read(blenderBilledToProvider),
-      ),
-    );
+    await ref
+        .read(appSettingsRepositoryProvider)
+        .setBlenderPreferences(
+          BlenderPreferences(
+            templates: ref.read(blenderTemplatesProvider),
+            gasPrices: ref.read(blenderGasPricesProvider),
+            currencyCode: ref.read(blenderCurrencyProvider),
+            fillTempC: ref.read(blenderFillTempProvider),
+            settledTempC: ref.read(blenderSettledTempProvider),
+            cylinderWaterLiters: ref.read(blenderCylinderLitersProvider),
+            model: ref.read(blenderGasModelProvider),
+            billedFills: ref.read(blenderBilledFillsProvider),
+            billedTo: ref.read(blenderBilledToProvider),
+          ),
+        );
   } catch (e, stackTrace) {
     _log.error(
       'Failed to save blender preferences',

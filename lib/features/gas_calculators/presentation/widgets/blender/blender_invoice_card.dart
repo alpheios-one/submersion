@@ -26,6 +26,10 @@ class BlenderInvoiceCard extends ConsumerStatefulWidget {
 class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
   late final TextEditingController _billedTo;
 
+  /// The logbook name is a starting point, offered once. Re-seeding on every
+  /// rebuild would fight the diver as they typed a customer's name.
+  bool _seededBilledTo = false;
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +42,23 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     super.dispose();
   }
 
+  /// Fill in [name] the first time one is available and the field is still
+  /// untouched. Scheduled off the build because it writes provider state.
+  void _seedBilledTo(String name) {
+    if (name.isEmpty || _seededBilledTo) return;
+    if (ref.read(blenderBilledToProvider).isNotEmpty) {
+      _seededBilledTo = true;
+      return;
+    }
+    _seededBilledTo = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (ref.read(blenderBilledToProvider).isNotEmpty) return;
+      ref.read(blenderBilledToProvider.notifier).state = name;
+      _billedTo.text = name;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final fills = ref.watch(blenderBilledFillsProvider);
@@ -48,16 +69,15 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     final total = totalOf(fills);
     final theme = Theme.of(context);
 
-    // Seed the name from the logbook once, and only when the diver has not
+    // Seed the name from the logbook, once, and only when the diver has not
     // typed one. A fill station fills other people's cylinders, so this is a
     // starting point rather than a fixed label.
-    ref.listen(currentDiverProvider, (_, next) {
-      final name = next.valueOrNull?.name.trim() ?? '';
-      if (name.isEmpty) return;
-      if (ref.read(blenderBilledToProvider).isNotEmpty) return;
-      ref.read(blenderBilledToProvider.notifier).state = name;
-      _billedTo.text = name;
-    });
+    //
+    // Watched, not listened to: currentDiverProvider is resolved long before
+    // anyone opens the calculators tab, and ref.listen fires only on a later
+    // change, so the listener never ran in the real app (PR #1215 review).
+    final diver = ref.watch(currentDiverProvider).valueOrNull;
+    _seedBilledTo(diver?.name.trim() ?? '');
 
     return Card(
       child: Padding(
@@ -267,20 +287,24 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
 
     final fills = ref.read(blenderBilledFillsProvider);
     if (fill == null) {
-      ref.read(blenderBilledFillsProvider.notifier).state = [
-        ...fills,
+      ref.read(blenderBilledFillsProvider.notifier).state = appendCapped(
+        fills,
         BilledFill(
           id: DateTime.now().microsecondsSinceEpoch.toString(),
           label: edited.label,
           lines: const [],
           total: edited.amount,
         ),
-      ];
+      );
     } else {
       ref.read(blenderBilledFillsProvider.notifier).state = [
         for (final f in fills)
           if (f.id == fill.id)
-            f.copyWith(label: edited.label, total: edited.amount)
+            f.copyWith(
+              label: edited.label,
+              total: edited.amount,
+              clearTotal: edited.amount == null,
+            )
           else
             f,
       ];

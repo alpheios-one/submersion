@@ -118,7 +118,7 @@ void main() {
         cylinderWaterLiters: 12,
       ).copyWith(currencyCode: 'CHF');
       expect(prefs.currencyCode, 'CHF');
-      expect(prefs.copyWith(currencyCode: null).currencyCode, isNull);
+      expect(prefs.copyWith(clearCurrencyCode: true).currencyCode, isNull);
     });
 
     test('leaves the currency alone when it is not named', () {

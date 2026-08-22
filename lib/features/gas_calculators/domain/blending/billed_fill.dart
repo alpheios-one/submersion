@@ -1,3 +1,6 @@
+/// Enough for a busy Saturday without letting a synced blob grow forever.
+const int kMaxBilledFills = 100;
+
 /// One line of a saved fill: a gas, the bar it delivered, and what it cost.
 class BilledGasLine {
   const BilledGasLine({
@@ -63,11 +66,23 @@ class BilledFill {
 
   bool get isManual => lines.isEmpty;
 
-  BilledFill copyWith({String? label, double? total}) => BilledFill(
+  /// [clearTotal] is how an amount gets removed. Null is meaningful here: it
+  /// marks a line as not yet priced, which is what makes the grand total
+  /// report itself incomplete, and `total ?? this.total` could not express it,
+  /// so deleting an amount silently kept the old one (PR #1215 review).
+  ///
+  /// A boolean rather than an `Object?` sentinel because the sentinel form
+  /// gives up compile-time typing: `copyWith(total: 40)` then compiles and
+  /// throws at run time on the int literal.
+  BilledFill copyWith({
+    String? label,
+    double? total,
+    bool clearTotal = false,
+  }) => BilledFill(
     id: id,
     label: label ?? this.label,
     lines: lines,
-    total: total ?? this.total,
+    total: clearTotal ? null : (total ?? this.total),
   );
 
   Map<String, dynamic> toJson() => {
@@ -120,4 +135,16 @@ BilledTotal totalOf(List<BilledFill> fills) {
     }
   }
   return BilledTotal(amount: amount, complete: complete);
+}
+
+/// [fills] with [fill] on the end, dropping the oldest to stay within
+/// [kMaxBilledFills].
+///
+/// The cap used to be applied only on read, as `take(max)` over an oldest-first
+/// list, so a session past the cap persisted everything and then lost its most
+/// RECENT lines on the next launch: exactly backwards (PR #1215 review).
+List<BilledFill> appendCapped(List<BilledFill> fills, BilledFill fill) {
+  final next = [...fills, fill];
+  if (next.length <= kMaxBilledFills) return next;
+  return next.sublist(next.length - kMaxBilledFills);
 }

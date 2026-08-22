@@ -65,7 +65,11 @@ BillingResult computeBlendCost({
   required List<double?> pricesPer100,
 }) {
   final fills = blend.steps.where((s) => s.fillGas != null).toList();
-  final volume = waterLiters <= 0 ? 0.0 : waterLiters;
+  // No cylinder means nothing can be priced yet. Treating it as zero volume
+  // produced a finished-looking bill reading 0.00, which is the same shape of
+  // failure as a blank mix box meaning 0% (PR #1215 review).
+  final priceable = waterLiters > 0;
+  final volume = priceable ? waterLiters : 0.0;
 
   final lines = <GasCostLine>[];
   var total = 0.0;
@@ -73,7 +77,9 @@ BillingResult computeBlendCost({
 
   for (final step in fills) {
     final slot = step.fillGasIndex ?? 0;
-    final price = slot < pricesPer100.length ? pricesPer100[slot] : null;
+    final price = !priceable || slot >= pricesPer100.length
+        ? null
+        : pricesPer100[slot];
     final liters = volume * step.addedBar;
     final cost = price == null ? null : liters / 100 * price;
     if (cost == null) {

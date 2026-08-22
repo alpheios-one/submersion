@@ -24,18 +24,21 @@ class GasBlenderCalculator extends ConsumerWidget {
     // A reset bumps the epoch, forcing the body (and its controllers) to rebuild
     // from the reset provider values.
     final epoch = ref.watch(blenderResetEpochProvider);
-    // Changing the pressure unit re-seeds the same way. Provider state is held
-    // in bar, so recreating the controllers reprints every field in the new
-    // unit; leaving them alone would show "200" as psi after a bar fill.
-    final pressureUnit = ref.watch(
-      settingsProvider.select((s) => s.pressureUnit),
+    // Changing a unit re-seeds the same way. Provider state is canonical (bar,
+    // litres, currency per 100 L), so recreating the controllers reprints
+    // every field in the new unit; leaving them alone would show "200" as psi
+    // after a bar fill, or a per-100-litre price under a per-100-cu-ft label.
+    final units = ref.watch(
+      settingsProvider.select((s) => (s.pressureUnit, s.volumeUnit)),
     );
     // Loads the saved templates, prices and blending conditions once. A first
     // run has no stored blob, which is what leaves the seeded templates in
     // place. No AsyncValue branching: the state providers already hold usable
     // defaults while this resolves, so there is nothing to wait for.
     ref.watch(blenderPreferencesLoaderProvider);
-    return _GasBlenderBody(key: ValueKey('$epoch/${pressureUnit.name}'));
+    return _GasBlenderBody(
+      key: ValueKey('$epoch/${units.$1.name}/${units.$2.name}'),
+    );
   }
 }
 

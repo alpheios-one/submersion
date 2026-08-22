@@ -238,4 +238,28 @@ void main() {
       expect(find.textContaining('incomplete'), findsOneWidget);
     });
   });
+  group('review findings', () {
+    test('an amount can be cleared on an edited line', () {
+      // Raised in review on PR #1215. Null marks a line as not yet priced,
+      // which is what makes the grand total report itself incomplete, so
+      // copyWith has to be able to express it.
+      const fill = BilledFill(id: 'a', label: 'Tx 18/45', lines: [], total: 35);
+      expect(fill.copyWith(label: 'x').total, 35);
+      expect(fill.copyWith(clearTotal: true).total, isNull);
+      expect(fill.copyWith(total: 40.0).total, 40.0);
+    });
+
+    test('appending past the cap drops the oldest, not the newest', () {
+      var fills = <BilledFill>[];
+      for (var i = 0; i < kMaxBilledFills + 5; i++) {
+        fills = appendCapped(
+          fills,
+          BilledFill(id: '$i', label: 'fill $i', lines: const [], total: 1),
+        );
+      }
+      expect(fills, hasLength(kMaxBilledFills));
+      expect(fills.last.label, 'fill ${kMaxBilledFills + 4}');
+      expect(fills.first.label, 'fill 5');
+    });
+  });
 }

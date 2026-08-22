@@ -123,8 +123,9 @@ class BlenderPreferences {
   /// a fill station fills other people's cylinders.
   final String billedTo;
 
-  /// Enough for a busy Saturday without letting a synced blob grow forever.
-  static const int maxBilledFills = 100;
+  /// Lives beside [BilledFill] itself; re-exposed here because the JSON read
+  /// path enforces it.
+  static const int maxBilledFills = kMaxBilledFills;
 
   factory BlenderPreferences.defaults({required double cylinderWaterLiters}) =>
       BlenderPreferences(
@@ -139,16 +140,11 @@ class BlenderPreferences {
         billedTo: '',
       );
 
-  /// Distinguishes "leave this alone" from "set it to null" in [copyWith].
-  /// A plain `String?` default cannot: `currencyCode ?? this.currencyCode`
-  /// silently keeps the old value, and null is meaningful here (inherit the
-  /// diver's default currency).
-  static const Object _unchanged = Object();
-
   BlenderPreferences copyWith({
     List<MixTemplate>? templates,
     List<double?>? gasPrices,
-    Object? currencyCode = _unchanged,
+    String? currencyCode,
+    bool clearCurrencyCode = false,
     double? fillTempC,
     double? settledTempC,
     double? cylinderWaterLiters,
@@ -158,9 +154,11 @@ class BlenderPreferences {
   }) => BlenderPreferences(
     templates: (templates ?? this.templates).take(maxTemplates).toList(),
     gasPrices: gasPrices ?? this.gasPrices,
-    currencyCode: identical(currencyCode, _unchanged)
-        ? this.currencyCode
-        : currencyCode as String?,
+    // clearCurrencyCode is how it gets removed: null is meaningful here
+    // (inherit the diver's default) and `??` cannot express it.
+    currencyCode: clearCurrencyCode
+        ? null
+        : (currencyCode ?? this.currencyCode),
     fillTempC: fillTempC ?? this.fillTempC,
     settledTempC: settledTempC ?? this.settledTempC,
     cylinderWaterLiters: cylinderWaterLiters ?? this.cylinderWaterLiters,

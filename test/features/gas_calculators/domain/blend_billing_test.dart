@@ -102,15 +102,18 @@ void main() {
       expect(result.total, isNull);
     });
 
-    test('a non-positive cylinder volume prices nothing', () {
+    test('a cylinder with no volume yet is unpriced, not free', () {
+      // Raised in review on PR #1215: reporting 0.00 rendered a
+      // finished-looking bill for a cylinder the diver had not entered, the
+      // same shape of failure as a blank mix box meaning 0% oxygen.
       final result = computeBlendCost(
         blend: _blend([_step(null, 0), _step(_o2, 10, slot: 0)]),
         waterLiters: 0,
         pricesPer100: [2.0],
       );
       expect(result.lines.single.freeGasLiters, 0);
-      expect(result.lines.single.cost, 0);
-      expect(result.total, 0);
+      expect(result.lines.single.cost, isNull);
+      expect(result.total, isNull);
     });
     test('a skipped bank does not slide the prices along', () {
       // Raised in review on PR #1215. A helium-free target skips the helium

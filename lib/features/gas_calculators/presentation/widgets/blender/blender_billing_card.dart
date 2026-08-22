@@ -14,10 +14,14 @@ import 'package:submersion/features/gas_calculators/presentation/widgets/blender
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Litres in a cubic foot. Storage is always litres; a cubic-foot diver prices
-/// per 100 cu ft, which is the same arithmetic on a converted volume rather
-/// than a second formula.
-const double _litersPerCubicFoot = 28.3168;
+/// Cubic feet in a litre, matching `VolumeUnit.convert`.
+///
+/// Storage is canonical: litres for volumes, currency per 100 litres for
+/// prices. Every conversion to and from the diver's unit happens at the text
+/// field, and nowhere else. Adding a second conversion path is what let the
+/// volume column convert twice while the price never converted at all
+/// (PR #1215 review).
+const double _cubicFeetPerLiter = 0.0353147;
 
 /// What the blend costs at the fill station's prices.
 ///
@@ -46,7 +50,9 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     _prices = [
       for (final p in ref.read(blenderGasPricesProvider))
         TextEditingController(
-          text: p == null ? '' : formatRoundedForInput(p, 2),
+          text: p == null
+              ? ''
+              : formatRoundedForInput(_toDisplayPrice(p, settings), 2),
         ),
     ];
   }
@@ -60,11 +66,25 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     super.dispose();
   }
 
+  static bool _metric(AppSettings s) => s.volumeUnit == VolumeUnit.liters;
+
+  /// Litres to the diver's volume unit, for seeding the cylinder field.
   static double _toDisplayVolume(double liters, AppSettings s) =>
-      s.volumeUnit == VolumeUnit.liters ? liters : liters / _litersPerCubicFoot;
+      _metric(s) ? liters : liters * _cubicFeetPerLiter;
 
   static double _toLiters(double shown, AppSettings s) =>
-      s.volumeUnit == VolumeUnit.liters ? shown : shown * _litersPerCubicFoot;
+      _metric(s) ? shown : shown / _cubicFeetPerLiter;
+
+  /// A price per 100 litres, shown as a price per 100 of the diver's unit.
+  ///
+  /// Gas priced at 7.99 per 100 cu ft is 0.28 per 100 L: the same gas, the
+  /// same money, a unit that is 28 times larger. Storing the entered number
+  /// without this conversion charged a cubic-foot diver 28 times over.
+  static double _toDisplayPrice(double per100Liters, AppSettings s) =>
+      _metric(s) ? per100Liters : per100Liters / _cubicFeetPerLiter;
+
+  static double _toPricePer100Liters(double shown, AppSettings s) =>
+      _metric(s) ? shown : shown * _cubicFeetPerLiter;
 
   @override
   Widget build(BuildContext context) {
@@ -152,10 +172,10 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
       ],
       total: billing.total,
     );
-    ref.read(blenderBilledFillsProvider.notifier).state = [
-      ...ref.read(blenderBilledFillsProvider),
+    ref.read(blenderBilledFillsProvider.notifier).state = appendCapped(
+      ref.read(blenderBilledFillsProvider),
       fill,
-    ];
+    );
     saveBlenderPreferences(ref);
     ScaffoldMessenger.maybeOf(context)?.showSnackBar(
       SnackBar(
@@ -289,10 +309,14 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         border: const OutlineInputBorder(),
       ),
       onChanged: (_) {
-        final prices = <double?>[
-          for (final c in _prices) parseUserDecimal(c.text),
+        final settings = ref.read(settingsProvider);
+        ref.read(blenderGasPricesProvider.notifier).state = [
+          for (final c in _prices)
+            switch (parseUserDecimal(c.text)) {
+              final double entered => _toPricePer100Liters(entered, settings),
+              null => null,
+            },
         ];
-        ref.read(blenderGasPricesProvider.notifier).state = prices;
       },
       onEditingComplete: () => saveBlenderPreferences(ref),
       onSubmitted: (_) => saveBlenderPreferences(ref),
@@ -327,9 +351,9 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
           Expanded(
             flex: 4,
             child: Text(
-              units.formatVolume(
-                _toDisplayVolume(line.freeGasLiters, settings),
-              ),
+              // formatVolume converts litres to the diver's unit itself.
+              // Converting first made a cubic-foot diver's column read zero.
+              units.formatVolume(line.freeGasLiters),
               style: style,
               textAlign: TextAlign.end,
             ),
