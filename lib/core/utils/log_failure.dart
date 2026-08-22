@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:submersion/core/services/logger_service.dart';
 
 /// Start [work] without awaiting it, attributing a failure to [owner] in the
@@ -22,9 +24,14 @@ import 'package:submersion/core/services/logger_service.dart';
 /// Dart future may carry several listeners, so anything that also awaits it
 /// still sees the error and still has to handle it.
 void logFailure(Future<void> work, Type owner, String task) {
-  work.catchError((Object error, StackTrace stackTrace) {
-    LoggerService.forClass(
-      owner,
-    ).error('Failed to $task', error: error, stackTrace: stackTrace);
-  });
+  // The future catchError hands back is of no interest: attaching the listener
+  // is the entire point, and unawaited says that rather than leaving a reader
+  // to wonder whether the drop was an oversight.
+  unawaited(
+    work.catchError((Object error, StackTrace stackTrace) {
+      LoggerService.forClass(
+        owner,
+      ).error('Failed to $task', error: error, stackTrace: stackTrace);
+    }),
+  );
 }
