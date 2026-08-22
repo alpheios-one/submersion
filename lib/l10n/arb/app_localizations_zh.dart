@@ -11243,7 +11243,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_tab_mnd => '最大麻醉深度/等效麻醉深度';
 
   @override
-  String get gasCalculators_tab_blender => '配气';
+  String get gasCalculators_tab_blender => '三混气配气器';
 
   @override
   String get gasCalculators_blender_cylinder => '气瓶';
@@ -11330,6 +11330,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_targetNotReached =>
       '这些充填气体无法精确达到目标混合气。请检查充填气体及其顺序。';
+
+  @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      '气瓶有压力，但既无氧气也无氦气，那将是纯氮气。请检查瓶内现有的混合气。';
 
   @override
   String get gasCalculators_blender_about => '关于配气';

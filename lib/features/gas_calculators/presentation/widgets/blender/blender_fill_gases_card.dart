@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/core/utils/number_input.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_field_parsing.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
@@ -30,8 +30,6 @@ class BlenderFillGasesCard extends ConsumerWidget {
       blenderFillGas3Provider,
     ];
 
-    double num(String s) => parseUserDecimal(s) ?? 0;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -46,10 +44,14 @@ class BlenderFillGasesCard extends ConsumerWidget {
                 leading: '${i + 1}.',
                 o2Controller: o2Controllers[i],
                 heController: heControllers[i],
-                onMix: () => ref.read(providers[i].notifier).state = GasMix(
-                  o2: num(o2Controllers[i].text),
-                  he: num(heControllers[i].text),
-                ),
+                // A blank box keeps the value it had. See mixPercentOrKeep.
+                onMix: () {
+                  final current = ref.read(providers[i]);
+                  ref.read(providers[i].notifier).state = GasMix(
+                    o2: mixPercentOrKeep(o2Controllers[i].text, current.o2),
+                    he: mixPercentOrKeep(heControllers[i].text, current.he),
+                  );
+                },
               ),
             ],
           ],

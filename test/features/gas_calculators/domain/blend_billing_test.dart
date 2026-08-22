@@ -8,8 +8,9 @@ const _o2 = GasMix(o2: 100);
 const _he = GasMix(o2: 0, he: 100);
 const _air = GasMix(o2: 21);
 
-BlendStep _step(GasMix? gas, double addedBar) => BlendStep(
+BlendStep _step(GasMix? gas, double addedBar, {int? slot}) => BlendStep(
   fillGas: gas,
+  fillGasIndex: gas == null ? null : slot,
   pressureBar: 0,
   addedBar: addedBar,
   resultingMix: _air,
@@ -25,9 +26,9 @@ void main() {
       final result = computeBlendCost(
         blend: _blend([
           _step(null, 0),
-          _step(_o2, 7.3),
-          _step(_he, 19.8),
-          _step(_air, 48.1),
+          _step(_o2, 7.3, slot: 0),
+          _step(_he, 19.8, slot: 1),
+          _step(_air, 48.1, slot: 2),
         ]),
         waterLiters: 3,
         pricesPer100: [2.00, 10.00, 0.10],
@@ -42,7 +43,7 @@ void main() {
 
     test('reproduces the helium example from issue #1100', () {
       final result = computeBlendCost(
-        blend: _blend([_step(null, 0), _step(_he, 50)]),
+        blend: _blend([_step(null, 0), _step(_he, 50, slot: 0)]),
         waterLiters: 3,
         pricesPer100: [7.99],
       );
@@ -54,7 +55,7 @@ void main() {
 
     test('free gas is water volume times bar delivered', () {
       final result = computeBlendCost(
-        blend: _blend([_step(null, 0), _step(_air, 48.1)]),
+        blend: _blend([_step(null, 0), _step(_air, 48.1, slot: 0)]),
         waterLiters: 12,
         pricesPer100: [null],
       );
@@ -64,7 +65,7 @@ void main() {
 
     test('the start step is not a billable line', () {
       final result = computeBlendCost(
-        blend: _blend([_step(null, 0), _step(_o2, 10)]),
+        blend: _blend([_step(null, 0), _step(_o2, 10, slot: 0)]),
         waterLiters: 3,
         pricesPer100: [1.0],
       );
@@ -74,7 +75,11 @@ void main() {
 
     test('a missing price yields a null cost and a null total', () {
       final result = computeBlendCost(
-        blend: _blend([_step(null, 0), _step(_o2, 10), _step(_air, 20)]),
+        blend: _blend([
+          _step(null, 0),
+          _step(_o2, 10, slot: 0),
+          _step(_air, 20, slot: 1),
+        ]),
         waterLiters: 3,
         pricesPer100: [2.0, null],
       );
@@ -85,7 +90,11 @@ void main() {
 
     test('a price list shorter than the step list prices what it can', () {
       final result = computeBlendCost(
-        blend: _blend([_step(null, 0), _step(_o2, 10), _step(_air, 20)]),
+        blend: _blend([
+          _step(null, 0),
+          _step(_o2, 10, slot: 0),
+          _step(_air, 20, slot: 1),
+        ]),
         waterLiters: 3,
         pricesPer100: [2.0],
       );
@@ -95,13 +104,34 @@ void main() {
 
     test('a non-positive cylinder volume prices nothing', () {
       final result = computeBlendCost(
-        blend: _blend([_step(null, 0), _step(_o2, 10)]),
+        blend: _blend([_step(null, 0), _step(_o2, 10, slot: 0)]),
         waterLiters: 0,
         pricesPer100: [2.0],
       );
       expect(result.lines.single.freeGasLiters, 0);
       expect(result.lines.single.cost, 0);
       expect(result.total, 0);
+    });
+    test('a skipped bank does not slide the prices along', () {
+      // Raised in review on PR #1215. A helium-free target skips the helium
+      // bank, so the SECOND step is the THIRD bank. Pricing by step order
+      // charged air at helium's rate.
+      final result = computeBlendCost(
+        blend: _blend([
+          _step(null, 0),
+          _step(_o2, 10, slot: 0),
+          _step(_air, 20, slot: 2),
+        ]),
+        waterLiters: 10,
+        // O2 at 2.00, helium at 50.00, air at 0.10 per 100 L.
+        pricesPer100: [2.0, 50.0, 0.10],
+      );
+
+      expect(result.lines[1].gas, _air);
+      expect(result.lines[1].unitPricePer100, 0.10);
+      // 10 L x 20 bar / 100 x 0.10 = 0.20, not the 100.00 helium would cost.
+      expect(result.lines[1].cost, closeTo(0.20, 1e-9));
+      expect(result.total, closeTo(2.0 + 0.20, 1e-9));
     });
   });
 }

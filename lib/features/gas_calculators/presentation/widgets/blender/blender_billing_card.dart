@@ -84,9 +84,14 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
             const SizedBox(height: 16),
             _currencyField(context, currency),
             const SizedBox(height: 16),
-            for (var i = 0; i < billing.lines.length; i++) ...[
-              if (i > 0) const SizedBox(height: 12),
-              _priceField(context, billing.lines[i], i, units),
+            // One field per configured bank, always, rather than one per
+            // step of this particular blend. A blend that skips a bank would
+            // otherwise slide the labels along and charge the next gas at the
+            // wrong rate (PR #1215 review), and prices belong to the banks
+            // anyway, not to today's fill.
+            for (var slot = 0; slot < 3; slot++) ...[
+              if (slot > 0) const SizedBox(height: 12),
+              _priceField(context, slot, units),
             ],
             if (billing.lines.isNotEmpty) ...[
               const Divider(height: 28),
@@ -113,9 +118,10 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     AppSettings settings,
     UnitFormatter units,
   ) {
-    final choices = settings.volumeUnit == VolumeUnit.liters
-        ? metricTankChoices()
-        : imperialTankChoices();
+    // The blending-bench list, not the dive-planning one: the same presets
+    // serve both unit systems because formatTankVolume renders them in the
+    // diver's own unit (issue #1100 review).
+    final choices = blenderTankChoices();
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,6 +192,8 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
   }
 
   Widget _currencyField(BuildContext context, String currency) {
+    // Controlled so a stored currency arriving from the async preference load
+    // moves the dropdown with it (PR #1215 review).
     return DropdownButtonFormField<String>(
       key: const Key('blender-currency'),
       initialValue: currency,
@@ -210,19 +218,21 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     );
   }
 
-  Widget _priceField(
-    BuildContext context,
-    GasCostLine line,
-    int index,
-    UnitFormatter units,
-  ) {
+  Widget _priceField(BuildContext context, int slot, UnitFormatter units) {
+    final gas = ref.watch(
+      [
+        blenderFillGas1Provider,
+        blenderFillGas2Provider,
+        blenderFillGas3Provider,
+      ][slot],
+    );
     return TextField(
-      controller: _prices[index],
+      controller: _prices[slot],
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
       decoration: InputDecoration(
         labelText:
-            '${formatPreciseGasName(context, line.gas)}  '
+            '${formatPreciseGasName(context, gas)}  '
             '${context.l10n.gasCalculators_blender_unitPrice(units.volumeSymbol)}',
         isDense: true,
         border: const OutlineInputBorder(),

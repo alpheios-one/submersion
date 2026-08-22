@@ -11697,7 +11697,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Mixer';
+  String get gasCalculators_tab_blender => 'Trimix-menger';
 
   @override
   String get gasCalculators_blender_cylinder => 'Fles';
@@ -11786,6 +11786,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_targetNotReached =>
       'Deze vulgassen bereiken het doelmengsel niet exact. Controleer de vulgassen en hun volgorde.';
+
+  @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'De fles staat onder druk maar bevat geen zuurstof en geen helium, dus pure stikstof. Controleer het mengsel dat al in de fles zit.';
 
   @override
   String get gasCalculators_blender_about => 'Over het mengen';

@@ -6,6 +6,7 @@ import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
 class GasCostLine {
   const GasCostLine({
     required this.gas,
+    required this.gasIndex,
     required this.addedBar,
     required this.freeGasLiters,
     required this.unitPricePer100,
@@ -13,6 +14,10 @@ class GasCostLine {
   });
 
   final GasMix gas;
+
+  /// Which configured bank this line charges, so the UI can label it against
+  /// the same slot the price was entered under.
+  final int gasIndex;
 
   /// Bar delivered for this gas, read at the fill temperature.
   final double addedBar;
@@ -48,8 +53,12 @@ class BillingResult {
 /// the physical one. Every line carries its [GasCostLine.addedBar] so the
 /// arithmetic can be checked by hand against an invoice.
 ///
-/// [pricesPer100] is positional against the fill steps. A short list, or a
-/// null entry, leaves that line unpriced and the total null.
+/// [pricesPer100] is indexed by CONFIGURED BANK, not by step order. A blend
+/// that skips a bank (a helium-free target skips the helium source) would
+/// otherwise charge the second gas it actually used at the second bank's
+/// price, which is how air came to be billed at helium's rate (PR #1215
+/// review). A short list, or a null entry, leaves that line unpriced and the
+/// total null.
 BillingResult computeBlendCost({
   required BlendResult blend,
   required double waterLiters,
@@ -62,9 +71,9 @@ BillingResult computeBlendCost({
   var total = 0.0;
   var complete = true;
 
-  for (var i = 0; i < fills.length; i++) {
-    final step = fills[i];
-    final price = i < pricesPer100.length ? pricesPer100[i] : null;
+  for (final step in fills) {
+    final slot = step.fillGasIndex ?? 0;
+    final price = slot < pricesPer100.length ? pricesPer100[slot] : null;
     final liters = volume * step.addedBar;
     final cost = price == null ? null : liters / 100 * price;
     if (cost == null) {
@@ -75,6 +84,7 @@ BillingResult computeBlendCost({
     lines.add(
       GasCostLine(
         gas: step.fillGas!,
+        gasIndex: slot,
         addedBar: step.addedBar,
         freeGasLiters: liters,
         unitPricePer100: price,

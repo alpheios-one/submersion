@@ -11498,7 +11498,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'מערבל';
+  String get gasCalculators_tab_blender => 'מערבל טרימיקס';
 
   @override
   String get gasCalculators_blender_cylinder => 'בלון';
@@ -11587,6 +11587,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_targetNotReached =>
       'גזי המילוי האלה לא מגיעים בדיוק לתערובת היעד. בדקו את הגזים ואת סדרם.';
+
+  @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'הבלון תחת לחץ אך ללא חמצן וללא הליום, כלומר חנקן טהור. בדוק את התערובת שכבר נמצאת בבלון.';
 
   @override
   String get gasCalculators_blender_about => 'על הערבוב';

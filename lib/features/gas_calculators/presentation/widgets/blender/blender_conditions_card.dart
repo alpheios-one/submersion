@@ -101,6 +101,9 @@ class BlenderConditionsCard extends ConsumerWidget {
         ..sort();
     }
 
+    // Controlled, not seeded: a stored preference arriving from the async
+    // load, or a temperature-unit change that rebuilds the ladder, has to move
+    // the dropdown with it (PR #1215 review).
     return DropdownButtonFormField<double>(
       key: key,
       initialValue: values.firstWhere((v) => (v - shown).abs() < 0.05),

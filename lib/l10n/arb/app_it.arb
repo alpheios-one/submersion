@@ -17,7 +17,7 @@
       }
     }
   },
-  "gasCalculators_tab_blender": "Miscelatore",
+  "gasCalculators_tab_blender": "Miscelatore trimix",
   "gasCalculators_blender_cylinder": "Bombola",
   "gasCalculators_blender_startCylinder": "Nella bombola",
   "gasCalculators_blender_targetFill": "Riempimento target",
@@ -41,6 +41,7 @@
   "gasCalculators_blender_error_cannotRemoveHelium": "La bombola contiene elio mentre la miscela target no. Il rabbocco diluisce l'elio ma non lo rimuove: la bombola va prima svuotata.",
   "gasCalculators_blender_error_insufficientGases": "Un target senza elio richiede due gas di riempimento senza elio con contenuto di O₂ diverso.",
   "gasCalculators_blender_error_targetNotReached": "Questi gas di riempimento non raggiungono esattamente la miscela target. Controlla i gas e il loro ordine.",
+  "gasCalculators_blender_error_implausibleStartMix": "La bombola è in pressione ma non contiene né ossigeno né elio, quindi azoto puro. Controlla la miscela già presente nella bombola.",
   "gasCalculators_blender_about": "Informazioni sulla miscelazione",
   "gasCalculators_blender_aboutBody": "Miscelazione a pressioni parziali per la miscela target. Aggiungi ogni gas di riempimento nell'ordine, fino alla pressione indicata, poi lascia stabilizzare la bombola. I gas di riempimento e il loro ordine sono configurabili: impostando l'ultimo gas su 32/0 il rabbocco avviene con EAN32 invece che con aria. Analizza sempre la miscela finale prima di immergerti.",
   "gasCalculators_blender_conditions": "Condizioni di miscelazione",

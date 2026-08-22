@@ -143,6 +143,11 @@ final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
   if (stored.currencyCode != null) {
     ref.read(blenderCurrencyProvider.notifier).state = stored.currencyCode!;
   }
+  // The input fields hold their own text, seeded once in initState. Without
+  // this the cylinder volume and price boxes keep showing defaults over
+  // freshly loaded preferences, and the next edit saves those defaults back
+  // over what was stored (PR #1215 review).
+  ref.read(blenderResetEpochProvider.notifier).state++;
 });
 
 const _log = LoggerService('GasBlenderPreferences');

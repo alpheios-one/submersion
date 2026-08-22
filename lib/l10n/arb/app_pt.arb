@@ -17,7 +17,7 @@
       }
     }
   },
-  "gasCalculators_tab_blender": "Misturador",
+  "gasCalculators_tab_blender": "Misturador de trimix",
   "gasCalculators_blender_cylinder": "Cilindro",
   "gasCalculators_blender_startCylinder": "No cilindro",
   "gasCalculators_blender_targetFill": "Enchimento alvo",
@@ -41,6 +41,7 @@
   "gasCalculators_blender_error_cannotRemoveHelium": "O cilindro contém hélio e a mistura alvo não. Atestar dilui o hélio mas não o remove: o cilindro tem de ser esvaziado primeiro.",
   "gasCalculators_blender_error_insufficientGases": "Um alvo sem hélio precisa de dois gases de enchimento sem hélio com teores de O₂ diferentes.",
   "gasCalculators_blender_error_targetNotReached": "Estes gases de enchimento não atingem exatamente a mistura alvo. Verifique os gases e a sua ordem.",
+  "gasCalculators_blender_error_implausibleStartMix": "O cilindro tem pressão mas nem oxigénio nem hélio, o que seria azoto puro. Verifica a mistura que já está no cilindro.",
   "gasCalculators_blender_about": "Sobre a mistura",
   "gasCalculators_blender_aboutBody": "Mistura por pressões parciais para a mistura alvo. Adiciona cada gás de enchimento pela ordem, até à pressão indicada, e deixa o cilindro estabilizar. Os gases de enchimento e a sua ordem são configuráveis: se definires o último gás como 32/0, o remate é feito com EAN32 em vez de ar. Analisa sempre a mistura final antes de a mergulhares.",
   "gasCalculators_blender_conditions": "Condições de mistura",

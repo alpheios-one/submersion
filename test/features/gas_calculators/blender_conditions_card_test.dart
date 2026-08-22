@@ -90,4 +90,20 @@ void main() {
     await _pump(tester);
     expect(find.textContaining('Recommended'), findsOneWidget);
   });
+  testWidgets('the dropdowns follow a programmatic change', (tester) async {
+    // Raised in review on PR #1215 against an older Flutter API, where the
+    // controlled property was `value`. In this version `value` is deprecated
+    // and `initialValue` is its replacement, and it does track. This test is
+    // the proof, so a future refactor cannot quietly break the preference load.
+    final ref = await _pump(tester);
+    expect(find.text('20 °C'), findsNWidgets(2));
+
+    ref.read(blenderGasModelProvider.notifier).state = BlendGasModel.ideal;
+    ref.read(blenderFillTempProvider.notifier).state = 5;
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ideal gas'), findsOneWidget);
+    expect(find.text('5 °C'), findsOneWidget);
+    expect(find.text('20 °C'), findsOneWidget);
+  });
 }

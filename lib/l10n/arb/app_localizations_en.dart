@@ -11590,7 +11590,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Blender';
+  String get gasCalculators_tab_blender => 'Trimix blender';
 
   @override
   String get gasCalculators_blender_cylinder => 'Cylinder';
@@ -11679,6 +11679,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_targetNotReached =>
       'These fill gases cannot reach the target mix exactly. Check the fill gases and their order.';
+
+  @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'The cylinder is holding pressure but no oxygen and no helium, which would be pure nitrogen. Check the mix already in the cylinder.';
 
   @override
   String get gasCalculators_blender_about => 'About blending';

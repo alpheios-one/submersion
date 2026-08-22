@@ -11757,7 +11757,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Keverő';
+  String get gasCalculators_tab_blender => 'Trimix keverő';
 
   @override
   String get gasCalculators_blender_cylinder => 'Palack';
@@ -11846,6 +11846,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_targetNotReached =>
       'Ezekkel a töltőgázokkal a célkeverék nem érhető el pontosan. Ellenőrizd a töltőgázokat és a sorrendjüket.';
+
+  @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'A palack nyomás alatt van, de sem oxigént, sem héliumot nem tartalmaz, ami tiszta nitrogén lenne. Ellenőrizd a palackban lévő keveréket.';
 
   @override
   String get gasCalculators_blender_about => 'A keverésről';

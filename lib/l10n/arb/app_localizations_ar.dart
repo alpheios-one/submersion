@@ -11573,7 +11573,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'الخلاط';
+  String get gasCalculators_tab_blender => 'خلاط ترايمكس';
 
   @override
   String get gasCalculators_blender_cylinder => 'الأسطوانة';
@@ -11662,6 +11662,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_targetNotReached =>
       'غازات التعبئة هذه لا تصل إلى الخليط المستهدف بدقة. تحقق من الغازات وترتيبها.';
+
+  @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'الأسطوانة تحت ضغط لكنها لا تحتوي على أكسجين ولا هيليوم، أي نيتروجين نقي. تحقّق من الخليط الموجود في الأسطوانة.';
 
   @override
   String get gasCalculators_blender_about => 'حول الخلط';

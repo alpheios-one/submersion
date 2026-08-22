@@ -105,8 +105,11 @@ void main() {
     await _pump(tester);
 
     // Defaults are an empty cylinder to EAN32: O2 then air, no helium step.
+    // Scoped to the procedure card: the costing card names every configured
+    // bank, helium included, because a price belongs to the bank rather than
+    // to this particular fill.
     expect(find.text('Add Air'), findsOneWidget);
-    expect(find.textContaining('Helium'), findsNothing);
+    expect(find.text('Add Helium'), findsNothing);
   });
 
   testWidgets('renders English even on a non-English host machine', (
@@ -235,5 +238,57 @@ void main() {
   testWidgets('the litres summary line is gone', (tester) async {
     await _pump(tester);
     expect(find.text('Gas to add'), findsNothing);
+  });
+  testWidgets('clearing a mix box does not silently mean zero', (tester) async {
+    // Reported on PR #1215. Clearing O2 and He before typing a replacement
+    // left the blender solving for 0% O2 and 0% He, i.e. pure nitrogen, and it
+    // answered with a well-formed fill procedure for a cylinder nobody has.
+    // Only a cross-check against three other blending tools caught it.
+    final ref = await _pump(tester);
+    final fields = find.byType(TextField);
+
+    await tester.enterText(fields.at(0), '40');
+    await tester.enterText(fields.at(1), '14.5');
+    await tester.enterText(fields.at(2), '57.2');
+    await tester.pumpAndSettle();
+    expect(ref.read(blenderStartMixProvider).o2, closeTo(14.5, 0.001));
+
+    await tester.enterText(fields.at(1), '');
+    await tester.enterText(fields.at(2), '');
+    await tester.pumpAndSettle();
+
+    final mix = ref.read(blenderStartMixProvider);
+    expect(mix.o2, closeTo(14.5, 0.001));
+    expect(mix.he, closeTo(57.2, 0.001));
+  });
+
+  testWidgets('a cylinder holding neither oxygen nor helium is refused', (
+    tester,
+  ) async {
+    final ref = await _pump(tester);
+    ref.read(blenderStartPressureProvider.notifier).state = 40;
+    ref.read(blenderStartMixProvider.notifier).state = const GasMix(o2: 0);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fill procedure'), findsNothing);
+    expect(find.textContaining('oxygen'), findsOneWidget);
+  });
+
+  testWidgets('the reporter cylinder now blends', (tester) async {
+    final ref = await _pump(tester);
+    ref.read(blenderStartPressureProvider.notifier).state = 40;
+    ref.read(blenderStartMixProvider.notifier).state = const GasMix(
+      o2: 14.5,
+      he: 57.2,
+    );
+    ref.read(blenderTargetMixProvider.notifier).state = const GasMix(
+      o2: 15,
+      he: 55,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fill procedure'), findsOneWidget);
+    // Z-factor: 10.2 / 86.9 / 62.8, in line with Multideco and arcusblender.
+    expect(find.textContaining('+86.9'), findsWidgets);
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/number_input.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_field_parsing.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
@@ -34,10 +35,6 @@ class BlenderCylinderCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final units = UnitFormatter(ref.watch(settingsProvider));
 
-    /// Read in the diver's locale. A blanket replaceAll(',', '.') would misread
-    /// the en_US thousands separator, turning "1,250" into 1.25 (#1091).
-    double num(String s) => parseUserDecimal(s) ?? 0;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -54,9 +51,15 @@ class BlenderCylinderCard extends ConsumerWidget {
               heController: startHe,
               onPressure: (v) =>
                   ref.read(blenderStartPressureProvider.notifier).state = units
-                      .pressureToBar(num(v)),
-              onMix: () => ref.read(blenderStartMixProvider.notifier).state =
-                  GasMix(o2: num(startO2.text), he: num(startHe.text)),
+                      .pressureToBar(pressureOrZero(v)),
+              // A blank box keeps the value it had. See mixPercentOrKeep.
+              onMix: () {
+                final current = ref.read(blenderStartMixProvider);
+                ref.read(blenderStartMixProvider.notifier).state = GasMix(
+                  o2: mixPercentOrKeep(startO2.text, current.o2),
+                  he: mixPercentOrKeep(startHe.text, current.he),
+                );
+              },
             ),
             const SizedBox(height: 20),
             Row(
@@ -84,9 +87,14 @@ class BlenderCylinderCard extends ConsumerWidget {
               heController: targetHe,
               onPressure: (v) =>
                   ref.read(blenderTargetPressureProvider.notifier).state = units
-                      .pressureToBar(num(v)),
-              onMix: () => ref.read(blenderTargetMixProvider.notifier).state =
-                  GasMix(o2: num(targetO2.text), he: num(targetHe.text)),
+                      .pressureToBar(pressureOrZero(v)),
+              onMix: () {
+                final current = ref.read(blenderTargetMixProvider);
+                ref.read(blenderTargetMixProvider.notifier).state = GasMix(
+                  o2: mixPercentOrKeep(targetO2.text, current.o2),
+                  he: mixPercentOrKeep(targetHe.text, current.he),
+                );
+              },
             ),
           ],
         ),

@@ -63,7 +63,7 @@ class MixTemplateMenu extends ConsumerWidget {
           _saveCurrent(context, ref);
           return;
         }
-        showMixTemplateDialog(context, ref);
+        showMixTemplateDialog(context);
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),

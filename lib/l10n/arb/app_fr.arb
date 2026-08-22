@@ -17,7 +17,7 @@
       }
     }
   },
-  "gasCalculators_tab_blender": "Mélangeur",
+  "gasCalculators_tab_blender": "Mélangeur trimix",
   "gasCalculators_blender_cylinder": "Bloc",
   "gasCalculators_blender_startCylinder": "Dans le bloc",
   "gasCalculators_blender_targetFill": "Remplissage cible",
@@ -41,6 +41,7 @@
   "gasCalculators_blender_error_cannotRemoveHelium": "Le bloc contient de l'hélium alors que le mélange cible n'en contient pas. Le remplissage dilue l'hélium mais ne l'élimine pas : le bloc doit d'abord être vidé.",
   "gasCalculators_blender_error_insufficientGases": "Une cible sans hélium nécessite deux gaz de remplissage sans hélium de teneurs en O₂ différentes.",
   "gasCalculators_blender_error_targetNotReached": "Ces gaz de remplissage n'atteignent pas exactement le mélange cible. Vérifiez les gaz et leur ordre.",
+  "gasCalculators_blender_error_implausibleStartMix": "Le bloc est sous pression mais ne contient ni oxygène ni hélium, ce qui serait de l'azote pur. Vérifiez le mélange déjà présent dans le bloc.",
   "gasCalculators_blender_about": "À propos du mélange",
   "gasCalculators_blender_aboutBody": "Mélange par pressions partielles pour le mélange cible. Ajoutez chaque gaz de remplissage dans l'ordre, jusqu'à la pression indiquée, puis laissez le bloc se stabiliser. Les gaz de remplissage et leur ordre sont configurables : en réglant le dernier gaz sur 32/0, le complément se fait à l'EAN32 au lieu de l'air. Analysez toujours le mélange final avant de le plonger.",
   "gasCalculators_blender_conditions": "Conditions de mélange",

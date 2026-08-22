@@ -11776,7 +11776,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Mezclador';
+  String get gasCalculators_tab_blender => 'Mezclador de trimix';
 
   @override
   String get gasCalculators_blender_cylinder => 'Cilindro';
@@ -11865,6 +11865,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_targetNotReached =>
       'Estos gases de llenado no alcanzan exactamente la mezcla objetivo. Revisa los gases y su orden.';
+
+  @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'El cilindro tiene presión pero ni oxígeno ni helio, lo que sería nitrógeno puro. Comprueba la mezcla que ya hay en el cilindro.';
 
   @override
   String get gasCalculators_blender_about => 'Sobre la mezcla';

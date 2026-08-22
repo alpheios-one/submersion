@@ -20071,7 +20071,7 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_tab_blender.
   ///
   /// In en, this message translates to:
-  /// **'Blender'**
+  /// **'Trimix blender'**
   String get gasCalculators_tab_blender;
 
   /// No description provided for @gasCalculators_blender_cylinder.
@@ -20215,6 +20215,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'These fill gases cannot reach the target mix exactly. Check the fill gases and their order.'**
   String get gasCalculators_blender_error_targetNotReached;
+
+  /// No description provided for @gasCalculators_blender_error_implausibleStartMix.
+  ///
+  /// In en, this message translates to:
+  /// **'The cylinder is holding pressure but no oxygen and no helium, which would be pure nitrogen. Check the mix already in the cylinder.'**
+  String get gasCalculators_blender_error_implausibleStartMix;
 
   /// No description provided for @gasCalculators_blender_about.
   ///

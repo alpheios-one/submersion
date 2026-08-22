@@ -11774,7 +11774,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Mischer';
+  String get gasCalculators_tab_blender => 'Trimix-Mischer';
 
   @override
   String get gasCalculators_blender_cylinder => 'Flasche';
@@ -11863,6 +11863,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_targetNotReached =>
       'Mit diesen Füllgasen wird das Zielgemisch nicht exakt erreicht. Füllgase und ihre Reihenfolge prüfen.';
+
+  @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'Die Flasche steht unter Druck, enthält aber weder Sauerstoff noch Helium, also reinen Stickstoff. Prüfe die Mischung, die bereits in der Flasche ist.';
 
   @override
   String get gasCalculators_blender_about => 'Über das Mischen';

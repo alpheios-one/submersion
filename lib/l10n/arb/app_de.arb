@@ -17,7 +17,7 @@
       }
     }
   },
-  "gasCalculators_tab_blender": "Mischer",
+  "gasCalculators_tab_blender": "Trimix-Mischer",
   "gasCalculators_blender_cylinder": "Flasche",
   "gasCalculators_blender_startCylinder": "In der Flasche",
   "gasCalculators_blender_targetFill": "Zielfüllung",
@@ -41,6 +41,7 @@
   "gasCalculators_blender_error_cannotRemoveHelium": "Die Flasche enthält Helium, das Zielgemisch nicht. Nachfüllen verdünnt Helium, entfernt es aber nicht: die Flasche muss zuerst entleert werden.",
   "gasCalculators_blender_error_insufficientGases": "Ein heliumfreies Ziel braucht zwei heliumfreie Füllgase mit unterschiedlichem O₂-Gehalt.",
   "gasCalculators_blender_error_targetNotReached": "Mit diesen Füllgasen wird das Zielgemisch nicht exakt erreicht. Füllgase und ihre Reihenfolge prüfen.",
+  "gasCalculators_blender_error_implausibleStartMix": "Die Flasche steht unter Druck, enthält aber weder Sauerstoff noch Helium, also reinen Stickstoff. Prüfe die Mischung, die bereits in der Flasche ist.",
   "gasCalculators_blender_about": "Über das Mischen",
   "gasCalculators_blender_aboutBody": "Partialdruck-Mischung für die Zielmischung. Gib jedes Füllgas der Reihe nach bis zum angezeigten Druck zu und lass die Flasche danach ruhen. Füllgase und ihre Reihenfolge sind einstellbar: Setzt du das letzte Gas auf 32/0, wird statt mit Luft mit EAN32 aufgefüllt. Analysiere die fertige Mischung immer, bevor du sie tauchst.",
   "gasCalculators_blender_conditions": "Mischbedingungen",

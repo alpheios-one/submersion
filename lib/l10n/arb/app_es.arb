@@ -17,7 +17,7 @@
       }
     }
   },
-  "gasCalculators_tab_blender": "Mezclador",
+  "gasCalculators_tab_blender": "Mezclador de trimix",
   "gasCalculators_blender_cylinder": "Cilindro",
   "gasCalculators_blender_startCylinder": "En el cilindro",
   "gasCalculators_blender_targetFill": "Llenado objetivo",
@@ -41,6 +41,7 @@
   "gasCalculators_blender_error_cannotRemoveHelium": "El cilindro contiene helio y la mezcla objetivo no. Rellenar diluye el helio pero no lo elimina: hay que vaciar el cilindro primero.",
   "gasCalculators_blender_error_insufficientGases": "Un objetivo sin helio necesita dos gases de llenado sin helio con distinto contenido de O₂.",
   "gasCalculators_blender_error_targetNotReached": "Estos gases de llenado no alcanzan exactamente la mezcla objetivo. Revisa los gases y su orden.",
+  "gasCalculators_blender_error_implausibleStartMix": "El cilindro tiene presión pero ni oxígeno ni helio, lo que sería nitrógeno puro. Comprueba la mezcla que ya hay en el cilindro.",
   "gasCalculators_blender_about": "Sobre la mezcla",
   "gasCalculators_blender_aboutBody": "Mezcla por presiones parciales para la mezcla objetivo. Añade cada gas de llenado en orden, hasta la presión indicada, y deja que el cilindro se estabilice. Los gases de llenado y su orden son configurables: si ajustas el último gas a 32/0, el remate se hace con EAN32 en lugar de aire. Analiza siempre la mezcla final antes de bucearla.",
   "gasCalculators_blender_conditions": "Condiciones de mezcla",

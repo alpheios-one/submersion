@@ -75,14 +75,19 @@ void main() {
 
   test('billing follows the current cylinder and prices', () {
     container.read(blenderCylinderLitersProvider.notifier).state = 12;
+    // Prices are indexed by configured bank. The default EAN32 target skips
+    // the helium bank, so its two steps draw on banks 0 and 2, and pricing
+    // bank 1 does nothing for this blend.
     container.read(blenderGasPricesProvider.notifier).state = const [
       2.0,
+      50.0,
       0.1,
-      null,
     ];
     final billing = container.read(blenderBillingProvider);
     expect(billing.lines, hasLength(2));
-    expect(billing.lines.first.cost, isNotNull);
+    expect(billing.lines[0].gasIndex, 0);
+    expect(billing.lines[1].gasIndex, 2);
+    expect(billing.lines[1].unitPricePer100, 0.1);
     expect(billing.total, isNotNull);
   });
 

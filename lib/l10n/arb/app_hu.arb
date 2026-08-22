@@ -17,7 +17,7 @@
       }
     }
   },
-  "gasCalculators_tab_blender": "Keverő",
+  "gasCalculators_tab_blender": "Trimix keverő",
   "gasCalculators_blender_cylinder": "Palack",
   "gasCalculators_blender_startCylinder": "A palackban",
   "gasCalculators_blender_targetFill": "Cél töltés",
@@ -41,6 +41,7 @@
   "gasCalculators_blender_error_cannotRemoveHelium": "A palack héliumot tartalmaz, a célkeverék viszont nem. A rátöltés hígítja a héliumot, de nem távolítja el: a palackot előbb ki kell üríteni.",
   "gasCalculators_blender_error_insufficientGases": "A hélium nélküli célhoz két hélium nélküli töltőgáz kell, eltérő O₂-tartalommal.",
   "gasCalculators_blender_error_targetNotReached": "Ezekkel a töltőgázokkal a célkeverék nem érhető el pontosan. Ellenőrizd a töltőgázokat és a sorrendjüket.",
+  "gasCalculators_blender_error_implausibleStartMix": "A palack nyomás alatt van, de sem oxigént, sem héliumot nem tartalmaz, ami tiszta nitrogén lenne. Ellenőrizd a palackban lévő keveréket.",
   "gasCalculators_blender_about": "A keverésről",
   "gasCalculators_blender_aboutBody": "Parciális nyomású keverés a cél keverékhez. Add hozzá a töltőgázokat sorrendben, a megadott nyomásig, majd hagyd a palackot kiegyenlítődni. A töltőgázok és a sorrendjük állítható: ha az utolsó gázt 32/0-ra állítod, levegő helyett EAN32-vel tölt fel. A kész keveréket mindig elemezd, mielőtt lemerülnél vele.",
   "gasCalculators_blender_conditions": "Keverési körülmények",

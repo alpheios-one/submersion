@@ -17,7 +17,7 @@
       }
     }
   },
-  "gasCalculators_tab_blender": "מערבל",
+  "gasCalculators_tab_blender": "מערבל טרימיקס",
   "gasCalculators_blender_cylinder": "בלון",
   "gasCalculators_blender_startCylinder": "בבלון",
   "gasCalculators_blender_targetFill": "מילוי יעד",
@@ -41,6 +41,7 @@
   "gasCalculators_blender_error_cannotRemoveHelium": "הבלון מכיל הליום והתערובת המבוקשת לא. מילוי נוסף מדלל את ההליום אך אינו מסלק אותו, ולכן יש לרוקן את הבלון תחילה.",
   "gasCalculators_blender_error_insufficientGases": "יעד ללא הליום דורש שני גזי מילוי ללא הליום עם תכולת O₂ שונה.",
   "gasCalculators_blender_error_targetNotReached": "גזי המילוי האלה לא מגיעים בדיוק לתערובת היעד. בדקו את הגזים ואת סדרם.",
+  "gasCalculators_blender_error_implausibleStartMix": "הבלון תחת לחץ אך ללא חמצן וללא הליום, כלומר חנקן טהור. בדוק את התערובת שכבר נמצאת בבלון.",
   "gasCalculators_blender_about": "על הערבוב",
   "gasCalculators_blender_aboutBody": "ערבוב בלחצים חלקיים לתערובת היעד. הוסף כל גז מילוי לפי הסדר עד ללחץ המוצג, ואז תן לבלון להתייצב. גזי המילוי וסדרם ניתנים להגדרה, כך שקביעת הגז האחרון ל-32/0 משלימה את המילוי ב-EAN32 במקום באוויר. תמיד נתח את התערובת הסופית לפני צלילה איתה.",
   "gasCalculators_blender_conditions": "תנאי הערבוב",

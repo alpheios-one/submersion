@@ -90,12 +90,25 @@ void main() {
   });
 
   testWidgets('a cylinder preset fills the volume field', (tester) async {
+    // The presets are the blending-bench sizes named in issue #1100: the 2 and
+    // 3 litre decant bottles, an AL80, and a steel twinset.
     final ref = await _pump(tester);
     await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
     await tester.pumpAndSettle();
-    await tester.tap(find.textContaining('15').last);
+    await tester.tap(find.text('3 L').last);
     await tester.pumpAndSettle();
 
-    expect(ref.read(blenderCylinderLitersProvider), closeTo(15, 0.01));
+    expect(ref.read(blenderCylinderLitersProvider), closeTo(3, 0.01));
+  });
+
+  testWidgets('the preset list offers the blending-bench sizes', (
+    tester,
+  ) async {
+    await _pump(tester);
+    await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
+    await tester.pumpAndSettle();
+    for (final label in ['2 L', '3 L', '24 L']) {
+      expect(find.text(label), findsOneWidget);
+    }
   });
 }

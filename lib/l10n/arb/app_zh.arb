@@ -17,7 +17,7 @@
       }
     }
   },
-  "gasCalculators_tab_blender": "配气",
+  "gasCalculators_tab_blender": "三混气配气器",
   "gasCalculators_blender_cylinder": "气瓶",
   "gasCalculators_blender_startCylinder": "瓶内现有",
   "gasCalculators_blender_targetFill": "目标充填",
@@ -41,6 +41,7 @@
   "gasCalculators_blender_error_cannotRemoveHelium": "瓶内含氦气，而目标混合气不含。补充充填只会稀释氦气而无法去除，需先排空气瓶。",
   "gasCalculators_blender_error_insufficientGases": "无氦目标需要两种不含氦、含氧量不同的充填气体。",
   "gasCalculators_blender_error_targetNotReached": "这些充填气体无法精确达到目标混合气。请检查充填气体及其顺序。",
+  "gasCalculators_blender_error_implausibleStartMix": "气瓶有压力，但既无氧气也无氦气，那将是纯氮气。请检查瓶内现有的混合气。",
   "gasCalculators_blender_about": "关于配气",
   "gasCalculators_blender_aboutBody": "按分压法配制目标混合气。依次充入每种充填气体至显示的压力，然后让气瓶静置。充填气体及其顺序可自行设置：将最后一种气体设为 32/0，即以 EAN32 而非空气收尾。下水前务必分析配好的混合气。",
   "gasCalculators_blender_conditions": "配气条件",

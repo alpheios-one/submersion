@@ -11822,7 +11822,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Mélangeur';
+  String get gasCalculators_tab_blender => 'Mélangeur trimix';
 
   @override
   String get gasCalculators_blender_cylinder => 'Bloc';
@@ -11911,6 +11911,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_targetNotReached =>
       'Ces gaz de remplissage n\'atteignent pas exactement le mélange cible. Vérifiez les gaz et leur ordre.';
+
+  @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'Le bloc est sous pression mais ne contient ni oxygène ni hélium, ce qui serait de l\'azote pur. Vérifiez le mélange déjà présent dans le bloc.';
 
   @override
   String get gasCalculators_blender_about => 'À propos du mélange';

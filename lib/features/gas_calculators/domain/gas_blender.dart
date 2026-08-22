@@ -61,6 +61,13 @@ enum BlendError {
   /// The computed procedure does not land on the requested mix. A guard
   /// against a solver that reports a target it did not actually reach.
   targetNotReached,
+
+  /// The cylinder is said to hold pressure but neither oxygen nor helium,
+  /// which is 100% nitrogen. No fill station stocks that, so it is far more
+  /// likely to be a half-finished entry than a real cylinder (PR #1215): the
+  /// blender reported a confident procedure for exactly this phantom fill,
+  /// and it disagreed with every other blending tool.
+  implausibleStartMix,
 }
 
 class BlendException implements Exception {
@@ -77,6 +84,7 @@ class BlendException implements Exception {
 class BlendStep {
   const BlendStep({
     required this.fillGas,
+    required this.fillGasIndex,
     required this.pressureBar,
     required this.addedBar,
     required this.resultingMix,
@@ -85,6 +93,15 @@ class BlendStep {
 
   /// The gas topped up in this step; null for the starting condition.
   final GasMix? fillGas;
+
+  /// Which configured bank this came from: 0 for [GasBlenderInputs.fillGas1],
+  /// 1 for fillGas2, 2 for fillGas3. Null for the starting condition.
+  ///
+  /// Carried explicitly because a blend does not always use every bank: a
+  /// helium-free target skips the helium source, so the second STEP is the
+  /// third BANK. Costing keyed on step order rather than bank charged air at
+  /// helium's price (PR #1215 review).
+  final int? fillGasIndex;
 
   /// Fill the cylinder up to this pressure (bar), read at the fill
   /// temperature. For the starting step this is the pressure already in the
@@ -188,16 +205,22 @@ GasMix _blend(GasMix a, double volA, GasMix b, double volB) {
   );
 }
 
-/// The fill gases to use for [target], in fill order.
+/// Which banks to draw from for [target], in fill order, as indices into
+/// [available].
 ///
 /// The configured order is a fill sequence, not a fixed set of roles: the
 /// default is O2 -> helium -> air so that the compressor tops off last, which
 /// is how a fill station actually works. A helium-free target therefore has to
 /// skip the helium source rather than blend with it, otherwise it would report
 /// a nitrox mix while producing a trimix.
-List<GasMix> _selectFillGases(GasMix target, List<GasMix> available) {
-  if (!_isHeliumFree(target)) return available;
-  final heliumFree = available.where(_isHeliumFree).toList();
+List<int> _selectFillGases(GasMix target, List<GasMix> available) {
+  if (!_isHeliumFree(target)) {
+    return [for (var i = 0; i < available.length; i++) i];
+  }
+  final heliumFree = [
+    for (var i = 0; i < available.length; i++)
+      if (_isHeliumFree(available[i])) i,
+  ];
   if (heliumFree.length < 2) {
     throw const BlendException(BlendError.insufficientFillGases);
   }
@@ -328,6 +351,15 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
   _validateMix(inputs.fillGas2);
   _validateMix(inputs.fillGas3);
 
+  // A cylinder that holds pressure holds a gas somebody filled it with. Zero
+  // oxygen and zero helium is pure nitrogen, which is not one of those, and
+  // solving for it produces a plausible-looking procedure for a cylinder that
+  // does not exist. An empty cylinder is exempt: it holds nothing by
+  // definition, and starting empty is the common case.
+  if (pi > 0 && gasI.o2 <= 0 && gasI.he <= 0) {
+    throw const BlendException(BlendError.implausibleStartMix);
+  }
+
   // Topping up dilutes helium; it never removes it. Solving the O2 balance
   // alone would report the requested nitrox while leaving helium in the
   // cylinder, and an O2 analyser would confirm the wrong label.
@@ -335,11 +367,9 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
     throw const BlendException(BlendError.cannotRemoveHelium);
   }
 
-  final gases = _selectFillGases(gasF, [
-    inputs.fillGas1,
-    inputs.fillGas2,
-    inputs.fillGas3,
-  ]);
+  final banks = [inputs.fillGas1, inputs.fillGas2, inputs.fillGas3];
+  final bankOrder = _selectFillGases(gasF, banks);
+  final gases = [for (final i in bankOrder) banks[i]];
 
   // The start pressure is a gauge reading taken while the cylinder is at the
   // fill temperature; the target is what it must read once settled.
@@ -373,6 +403,7 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
   final steps = <BlendStep>[
     BlendStep(
       fillGas: null,
+      fillGasIndex: null,
       pressureBar: pi,
       addedBar: 0,
       resultingMix: gasI,
@@ -394,6 +425,7 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
     steps.add(
       BlendStep(
         fillGas: gases[i],
+        fillGasIndex: bankOrder[i],
         pressureBar: bar,
         addedBar: bar - previousBar,
         resultingMix: mix,
@@ -418,6 +450,7 @@ BlendResult computeBlend(GasBlenderInputs inputs) {
     steps.add(
       BlendStep(
         fillGas: last.fillGas,
+        fillGasIndex: last.fillGasIndex,
         pressureBar: finalBar,
         addedBar: finalBar - steps.last.pressureBar,
         resultingMix: last.resultingMix,

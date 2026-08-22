@@ -17,7 +17,7 @@
       }
     }
   },
-  "gasCalculators_tab_blender": "Mixer",
+  "gasCalculators_tab_blender": "Trimix-menger",
   "gasCalculators_blender_cylinder": "Fles",
   "gasCalculators_blender_startCylinder": "In de fles",
   "gasCalculators_blender_targetFill": "Doelvulling",
@@ -41,6 +41,7 @@
   "gasCalculators_blender_error_cannotRemoveHelium": "De fles bevat helium en het doelmengsel niet. Bijvullen verdunt helium maar verwijdert het niet: de fles moet eerst leeg.",
   "gasCalculators_blender_error_insufficientGases": "Een heliumvrij doel heeft twee heliumvrije vulgassen met verschillend O₂-gehalte nodig.",
   "gasCalculators_blender_error_targetNotReached": "Deze vulgassen bereiken het doelmengsel niet exact. Controleer de vulgassen en hun volgorde.",
+  "gasCalculators_blender_error_implausibleStartMix": "De fles staat onder druk maar bevat geen zuurstof en geen helium, dus pure stikstof. Controleer het mengsel dat al in de fles zit.",
   "gasCalculators_blender_about": "Over het mengen",
   "gasCalculators_blender_aboutBody": "Partiaaldrukmenging voor het doelmengsel. Voeg elk vulgas op volgorde toe tot de getoonde druk en laat de fles daarna stabiliseren. Vulgassen en hun volgorde zijn instelbaar: zet je het laatste gas op 32/0, dan wordt met EAN32 in plaats van lucht afgevuld. Analyseer het uiteindelijke mengsel altijd voordat je ermee duikt.",
   "gasCalculators_blender_conditions": "Mengcondities",

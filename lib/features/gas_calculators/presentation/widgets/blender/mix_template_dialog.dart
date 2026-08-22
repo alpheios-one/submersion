@@ -7,25 +7,25 @@ import 'package:submersion/features/gas_calculators/presentation/providers/gas_b
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Add and delete saved target mixes.
-Future<void> showMixTemplateDialog(BuildContext context, WidgetRef ref) {
+Future<void> showMixTemplateDialog(BuildContext context) {
   return showDialog<void>(
     context: context,
-    builder: (context) => _MixTemplateDialog(parentRef: ref),
+    builder: (context) => const _MixTemplateDialog(),
   );
 }
 
-class _MixTemplateDialog extends StatefulWidget {
-  const _MixTemplateDialog({required this.parentRef});
-
-  /// The dialog opens in its own route, above the ProviderScope's consumer, so
-  /// it borrows the opener's ref rather than reaching for a new one.
-  final WidgetRef parentRef;
+/// A consumer in its own right rather than a borrower of the opener's ref.
+/// Watching through someone else's ref registers the dependency on THEIR
+/// element: the dialog never rebuilds, and the parent rebuilds for changes it
+/// does not care about (PR #1215 review).
+class _MixTemplateDialog extends ConsumerStatefulWidget {
+  const _MixTemplateDialog();
 
   @override
-  State<_MixTemplateDialog> createState() => _MixTemplateDialogState();
+  ConsumerState<_MixTemplateDialog> createState() => _MixTemplateDialogState();
 }
 
-class _MixTemplateDialogState extends State<_MixTemplateDialog> {
+class _MixTemplateDialogState extends ConsumerState<_MixTemplateDialog> {
   final _o2 = TextEditingController();
   final _he = TextEditingController();
 
@@ -36,42 +36,36 @@ class _MixTemplateDialogState extends State<_MixTemplateDialog> {
     super.dispose();
   }
 
-  WidgetRef get _ref => widget.parentRef;
-
   void _add() {
     final o2 = parseUserDecimal(_o2.text);
     final he = parseUserDecimal(_he.text);
     if (o2 == null || he == null) return;
     final candidate = MixTemplate(o2: o2, he: he);
-    final existing = _ref.read(blenderTemplatesProvider);
+    final existing = ref.read(blenderTemplatesProvider);
     if (!candidate.isValid ||
         existing.contains(candidate) ||
         existing.length >= BlenderPreferences.maxTemplates) {
       return;
     }
-    setState(() {
-      _ref.read(blenderTemplatesProvider.notifier).state = [
-        ...existing,
-        candidate,
-      ];
-    });
-    saveBlenderPreferences(_ref);
+    ref.read(blenderTemplatesProvider.notifier).state = [
+      ...existing,
+      candidate,
+    ];
+    saveBlenderPreferences(ref);
     _o2.clear();
     _he.clear();
   }
 
   void _delete(MixTemplate t) {
-    setState(() {
-      _ref.read(blenderTemplatesProvider.notifier).state = [
-        ..._ref.read(blenderTemplatesProvider).where((x) => x != t),
-      ];
-    });
-    saveBlenderPreferences(_ref);
+    ref.read(blenderTemplatesProvider.notifier).state = [
+      ...ref.read(blenderTemplatesProvider).where((x) => x != t),
+    ];
+    saveBlenderPreferences(ref);
   }
 
   @override
   Widget build(BuildContext context) {
-    final templates = _ref.watch(blenderTemplatesProvider);
+    final templates = ref.watch(blenderTemplatesProvider);
     return AlertDialog(
       title: Text(context.l10n.gasCalculators_blender_templatesTitle),
       content: SizedBox(

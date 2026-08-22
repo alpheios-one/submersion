@@ -169,6 +169,8 @@ class BlenderProcedureCard extends ConsumerWidget {
         return context.l10n.gasCalculators_blender_error_insufficientGases;
       case BlendError.targetNotReached:
         return context.l10n.gasCalculators_blender_error_targetNotReached;
+      case BlendError.implausibleStartMix:
+        return context.l10n.gasCalculators_blender_error_implausibleStartMix;
       case BlendError.negativeAmountRequired:
         // Naming the pressure to bleed down to is the whole answer here; a
         // bare "not achievable" leaves the blender to guess it.
