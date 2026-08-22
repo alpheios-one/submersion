@@ -38774,6 +38774,12 @@ abstract class AppLocalizations {
   /// **'Still loading. Tap to retry.'**
   String get media_unavailablePlaceholder_stillFetching;
 
+  /// No description provided for @media_unavailablePlaceholder_accessDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'No photo library access'**
+  String get media_unavailablePlaceholder_accessDenied;
+
   /// No description provided for @attrLabel_size.
   ///
   /// In en, this message translates to:

@@ -6810,6 +6810,7 @@
   "settings_connectedAccounts_loadError": "Accounts konden niet worden geladen",
   "media_unavailablePlaceholder_volumeOffline": "Volume niet gekoppeld",
   "media_unavailablePlaceholder_stillFetching": "Nog aan het laden. Tik om opnieuw te proberen.",
+  "media_unavailablePlaceholder_accessDenied": "Geen toegang tot fotobibliotheek",
   "attrLabel_size": "Maat",
   "attrLabel_thickness_mm": "Dikte (mm)",
   "attrLabel_suit_style": "Type pak",

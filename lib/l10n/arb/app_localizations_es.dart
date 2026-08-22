@@ -23320,6 +23320,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Aún se está cargando. Toca para reintentar.';
 
   @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Sin acceso a la fototeca';
+
+  @override
   String get attrLabel_size => 'Talla';
 
   @override

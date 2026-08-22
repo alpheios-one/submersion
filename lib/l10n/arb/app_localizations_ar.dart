@@ -22888,6 +22888,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'ما زال قيد التحميل. اضغط لإعادة المحاولة.';
 
   @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'لا يوجد وصول إلى مكتبة الصور';
+
+  @override
   String get attrLabel_size => 'المقاس';
 
   @override

@@ -101,6 +101,7 @@ class LocalFilesDiagnosticsService {
         // denial, revoked permission) comes back when access is re-granted.
         // This is the contract VerifyResult documents.
         if (result == VerifyResult.volumeOffline ||
+            result == VerifyResult.accessDenied ||
             result == VerifyResult.transientError) {
           await _repository.updateMedia(item.copyWith(lastVerifiedAt: now));
           continue;

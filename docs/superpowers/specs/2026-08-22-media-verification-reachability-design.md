@@ -116,6 +116,26 @@ apply the 24h+ backoff to a transient, user-recoverable condition"
 (`asset_resolution_service.dart:152-159`). It just has no way to tell its
 caller.
 
+**F6b. The SERVING path collapses the same distinction, and it is the path
+that feeds Part 2.** `PlatformGalleryResolver.resolve` and
+`resolveThumbnail` return `UnavailableData(kind: UnavailableKind.notFound)` at
+all six of their failure exits
+(`platform_gallery_resolver.dart:49,53,60,64,77,88`). `resolveThumbnail`
+delegates to `_fetchThumbnail`, whose `Uint8List?` return type discards the
+reason entirely, and which returns null when `_resolveId` returns null, which
+is what `accessDenied` produces (`:103-104`).
+
+Grid tiles call `resolveThumbnail`. So on a permission-revoked device every
+tile serves `notFound`, and a reconciler keyed on `UnavailableKind` alone
+would orphan the entire library. `ResolutionStatus.accessDenied` is therefore
+necessary but NOT sufficient: `UnavailableKind` needs the same third value,
+and the gallery resolver's serving path has to produce it.
+
+`GalleryThumbnailCache.getOrFetch` deliberately does not cache nulls
+(`gallery_thumbnail_cache.dart:99-103`), so re-deriving the reason on the
+failure path costs nothing in the common case and cannot be poisoned by a
+cached miss.
+
 **F7. Every resolver implements `verify`.** `platform_gallery_resolver.dart:149`,
 `http_url_media_resolver.dart:131`, `connector_media_resolver.dart:66`,
 `signature_resolver.dart:52`, `local_file_resolver.dart:381`,
@@ -162,7 +182,31 @@ stamps `lastVerifiedAt` and leaves `isOrphaned` untouched
 `local_files_diagnostics_service.dart:100-106`). `accessDenied` joins
 `volumeOffline` and `transientError` there.
 
-This alone fixes the latent bug in F6.
+Add a third `UnavailableKind.accessDenied` for the serving path (F6b), and
+have the gallery resolver produce it. `resolve` can read the status directly.
+`resolveThumbnail` cannot, because `_fetchThumbnail` returns `Uint8List?` and
+has already discarded the reason, so on a null it re-derives the status:
+
+```dart
+    if (bytes == null) {
+      // Failure path only, and getOrFetch never caches a null, so this costs
+      // nothing in the common case. resolveAssetId short-circuits at the
+      // permission check before any gallery query.
+      final status = (await _resolutionService.resolveAssetId(item)).status;
+      return UnavailableData(
+        kind: status == ResolutionStatus.accessDenied
+            ? UnavailableKind.accessDenied
+            : UnavailableKind.notFound,
+      );
+    }
+```
+
+`UnavailableMediaPlaceholder` has two exhaustive switches over
+`UnavailableKind` (`unavailable_media_placeholder.dart:47-78`); both gain an
+`accessDenied` arm, with `Icons.no_photography_outlined` and one new ARB key.
+
+Together these fix the latent bug in F6 and close the F6b path before Part 2
+can drive it.
 
 ### Part 2: passive reconciliation from the serving path
 
@@ -187,6 +231,7 @@ Mapping, chosen so that only a positive finding may orphan a row:
 | `null` (bytes served) | positive finding: present | `false` |
 | `notFound` | positive finding: absent | `true` |
 | `unauthenticated` | positive finding: absent to us | `true` |
+| `accessDenied` | the source refused to answer | leave alone |
 | `signInRequired` | recoverable, user action | leave alone |
 | `fromOtherDevice` | not a claim about this device | leave alone |
 | `networkError` | transient | leave alone |

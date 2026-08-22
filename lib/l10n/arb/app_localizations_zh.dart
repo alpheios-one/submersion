@@ -22131,6 +22131,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_unavailablePlaceholder_stillFetching => '仍在加载。点按重试。';
 
   @override
+  String get media_unavailablePlaceholder_accessDenied => '无照片库访问权限';
+
+  @override
   String get attrLabel_size => '尺码';
 
   @override

@@ -23130,6 +23130,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Nog aan het laden. Tik om opnieuw te proberen.';
 
   @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Geen toegang tot fotobibliotheek';
+
+  @override
   String get attrLabel_size => 'Maat';
 
   @override

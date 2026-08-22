@@ -23378,6 +23378,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Chargement en cours. Touchez pour réessayer.';
 
   @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Aucun accès à la photothèque';
+
+  @override
   String get attrLabel_size => 'Taille';
 
   @override

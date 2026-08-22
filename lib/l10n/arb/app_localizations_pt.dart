@@ -23303,6 +23303,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Ainda a carregar. Toque para tentar novamente.';
 
   @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Sem acesso à biblioteca de fotos';
+
+  @override
   String get attrLabel_size => 'Tamanho';
 
   @override

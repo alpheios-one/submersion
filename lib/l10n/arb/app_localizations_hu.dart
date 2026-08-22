@@ -23226,6 +23226,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Még töltődik. Koppintson az újrapróbálkozáshoz.';
 
   @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Nincs hozzáférés a fotókönyvtárhoz';
+
+  @override
   String get attrLabel_size => 'Méret';
 
   @override

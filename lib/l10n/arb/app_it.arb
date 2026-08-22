@@ -6810,6 +6810,7 @@
   "settings_connectedAccounts_loadError": "Impossibile caricare gli account",
   "media_unavailablePlaceholder_volumeOffline": "Volume non montato",
   "media_unavailablePlaceholder_stillFetching": "Ancora in caricamento. Tocca per riprovare.",
+  "media_unavailablePlaceholder_accessDenied": "Nessun accesso alla libreria foto",
   "attrLabel_size": "Taglia",
   "attrLabel_thickness_mm": "Spessore (mm)",
   "attrLabel_suit_style": "Tipo di muta",

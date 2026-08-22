@@ -36,7 +36,9 @@
 **Modify:**
 - `lib/features/media/data/services/asset_resolution_service.dart` - third `ResolutionStatus`, returned at the two permission sites.
 - `lib/features/media/domain/value_objects/verify_result.dart` - `accessDenied`.
-- `lib/features/media/data/resolvers/platform_gallery_resolver.dart:149-167` - propagate the status instead of collapsing to a nullable id.
+- `lib/features/media/domain/value_objects/media_source_data.dart` - `UnavailableKind.accessDenied`, for the serving path (F6b).
+- `lib/features/media/presentation/widgets/unavailable_media_placeholder.dart:47-78` - an arm in each of the two exhaustive switches.
+- `lib/features/media/data/resolvers/platform_gallery_resolver.dart:46-95,149-167` - propagate the status in `verify`, `resolve`, and `resolveThumbnail` instead of collapsing every failure to `notFound`.
 - `lib/features/media/data/services/media_item_verifier.dart:60-64` - `accessDenied` joins the transient branch.
 - `lib/features/media/data/services/local_files_diagnostics_service.dart:89-122` - `reverifyAll` delegates to the sweep.
 - `lib/features/media/data/repositories/media_repository.dart` - `markVerified`, `getAllBySourceTypes`.
@@ -223,6 +225,73 @@ Replace `_resolveId` and the gallery `verify`:
 
 Keep `_resolveId` only if other callers remain; otherwise delete it.
 
+- [ ] **Step 4b: Add `UnavailableKind.accessDenied` and produce it while serving**
+
+REQUIRED. `ResolutionStatus.accessDenied` alone is not enough. Grid tiles call
+`resolveThumbnail`, whose helper `_fetchThumbnail` returns `Uint8List?` and has
+already discarded the reason, so every permission failure currently reaches the
+serving path as `notFound`. Task 5 would then orphan the entire library on a
+permission-revoked device.
+
+In `media_source_data.dart`, after `stillFetching`:
+
+```dart
+  /// The source refused to answer, so nothing is known about the item. The
+  /// gallery case is a revoked or not-yet-granted photo permission.
+  ///
+  /// Never evidence of absence. `reconciledOrphanFlag` must leave the orphan
+  /// flag alone for this kind: it is the difference between "your photo is
+  /// gone" and "let me look at your photos".
+  accessDenied,
+```
+
+In `PlatformGalleryResolver.resolve`, replace the `_resolveId` null branch:
+
+```dart
+    final resolution = await _resolutionService.resolveAssetId(item);
+    if (resolution.status == ResolutionStatus.accessDenied) {
+      return const UnavailableData(kind: UnavailableKind.accessDenied);
+    }
+    final resolvedId = resolution.localAssetId;
+    if (resolvedId == null) {
+      return const UnavailableData(kind: UnavailableKind.notFound);
+    }
+```
+
+In `resolveThumbnail`, replace the `bytes == null` branch:
+
+```dart
+    if (bytes == null) {
+      // Failure path only, and getOrFetch never caches a null
+      // (gallery_thumbnail_cache.dart:99-103), so this costs nothing in the
+      // common case. resolveAssetId short-circuits at the permission check
+      // before it queries the gallery.
+      final status = (await _resolutionService.resolveAssetId(item)).status;
+      return UnavailableData(
+        kind: status == ResolutionStatus.accessDenied
+            ? UnavailableKind.accessDenied
+            : UnavailableKind.notFound,
+      );
+    }
+```
+
+- [ ] **Step 4c: Give the placeholder an arm and a string**
+
+`unavailable_media_placeholder.dart` has two exhaustive switches. Add to
+`_iconFor`: `UnavailableKind.accessDenied => Icons.no_photography_outlined,`
+and to `_messageFor`:
+`UnavailableKind.accessDenied => l10n.media_unavailablePlaceholder_accessDenied,`.
+
+New ARB key in all 11 catalogs, English:
+
+```json
+"media_unavailablePlaceholder_accessDenied": "No photo library access"
+```
+
+with `"@media_unavailablePlaceholder_accessDenied": {"description": "Media placeholder: the photo library could not be read"}`.
+
+Run `flutter gen-l10n` afterwards.
+
 - [ ] **Step 5: Add `accessDenied` to both transient branches**
 
 `media_item_verifier.dart:60-64`:
@@ -322,6 +391,7 @@ void main() {
     // asset exists. Orphaning on any of them would report a recoverable
     // condition as permanent data loss, and sync would replicate it.
     for (final kind in const [
+      UnavailableKind.accessDenied,
       UnavailableKind.stillFetching,
       UnavailableKind.networkError,
       UnavailableKind.volumeOffline,
@@ -387,6 +457,11 @@ bool? _desiredFlag(UnavailableKind? failure) {
     // The source was consulted and does not have this item.
     UnavailableKind.notFound => true,
     UnavailableKind.unauthenticated => true,
+
+    // The source refused to answer. The single most important null in this
+    // function: without it, one revoked photo permission orphans every
+    // gallery row in the library and syncs that claim everywhere.
+    UnavailableKind.accessDenied => null,
 
     // Recoverable by a user action; the item is probably still there.
     UnavailableKind.signInRequired => null,

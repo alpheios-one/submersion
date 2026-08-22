@@ -23305,6 +23305,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Ancora in caricamento. Tocca per riprovare.';
 
   @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Nessun accesso alla libreria foto';
+
+  @override
   String get attrLabel_size => 'Taglia';
 
   @override

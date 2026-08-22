@@ -6810,6 +6810,7 @@
   "settings_connectedAccounts_loadError": "A fiókok nem tölthetők be",
   "media_unavailablePlaceholder_volumeOffline": "A kötet nincs csatlakoztatva",
   "media_unavailablePlaceholder_stillFetching": "Még töltődik. Koppintson az újrapróbálkozáshoz.",
+  "media_unavailablePlaceholder_accessDenied": "Nincs hozzáférés a fotókönyvtárhoz",
   "attrLabel_size": "Méret",
   "attrLabel_thickness_mm": "Vastagság (mm)",
   "attrLabel_suit_style": "Ruha fazonja",

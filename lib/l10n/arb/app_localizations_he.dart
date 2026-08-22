@@ -22722,6 +22722,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'עדיין נטען. הקש כדי לנסות שוב.';
 
   @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'אין גישה לספריית התמונות';
+
+  @override
   String get attrLabel_size => 'מידה';
 
   @override

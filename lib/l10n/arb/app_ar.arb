@@ -6810,6 +6810,7 @@
   "settings_connectedAccounts_loadError": "تعذر تحميل الحسابات",
   "media_unavailablePlaceholder_volumeOffline": "وحدة التخزين غير مثبتة",
   "media_unavailablePlaceholder_stillFetching": "ما زال قيد التحميل. اضغط لإعادة المحاولة.",
+  "media_unavailablePlaceholder_accessDenied": "لا يوجد وصول إلى مكتبة الصور",
   "attrLabel_size": "المقاس",
   "attrLabel_thickness_mm": "السماكة (مم)",
   "attrLabel_suit_style": "نوع البدلة",

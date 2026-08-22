@@ -23262,6 +23262,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wird noch geladen. Zum Wiederholen tippen.';
 
   @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Kein Zugriff auf die Fotomediathek';
+
+  @override
   String get attrLabel_size => 'Größe';
 
   @override

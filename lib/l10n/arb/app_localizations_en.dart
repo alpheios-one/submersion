@@ -22910,6 +22910,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Still loading. Tap to retry.';
 
   @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'No photo library access';
+
+  @override
   String get attrLabel_size => 'Size';
 
   @override

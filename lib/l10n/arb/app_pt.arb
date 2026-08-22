@@ -6810,6 +6810,7 @@
   "settings_connectedAccounts_loadError": "Não foi possível carregar as contas",
   "media_unavailablePlaceholder_volumeOffline": "Volume não montado",
   "media_unavailablePlaceholder_stillFetching": "Ainda a carregar. Toque para tentar novamente.",
+  "media_unavailablePlaceholder_accessDenied": "Sem acesso à biblioteca de fotos",
   "attrLabel_size": "Tamanho",
   "attrLabel_thickness_mm": "Espessura (mm)",
   "attrLabel_suit_style": "Tipo de roupa",
