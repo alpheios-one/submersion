@@ -581,11 +581,20 @@ class _TopSitesSection extends StatelessWidget {
 }
 
 const _depthColors = [
-  Color(0xFF4FC3F7), // lightBlue.shade300
-  Color(0xFF42A5F5), // blue.shade400
-  Color(0xFF1E88E5), // blue.shade600
-  Color(0xFF3949AB), // indigo.shade600
-  Color(0xFF1A237E), // indigo.shade900
+  Color(0xFF81D4FA), // lightBlue.shade200 (0-10m)
+  Color(0xFF4FC3F7), // lightBlue.shade300 (10-20m)
+  Color(0xFF29B6F6), // lightBlue.shade400 (20-30m)
+  Color(0xFF03A9F4), // lightBlue (30-40m)
+  Color(0xFF039BE5), // lightBlue.shade600 (40-50m)
+  Color(0xFF0288D1), // lightBlue.shade700 (50-60m)
+  Color(0xFF1E88E5), // blue.shade600 (60-70m)
+  Color(0xFF1976D2), // blue.shade700 (70-80m)
+  Color(0xFF1565C0), // blue.shade800 (80-90m)
+  Color(0xFF3949AB), // indigo.shade600 (90-100m)
+  Color(0xFF303F9F), // indigo.shade700 (100-110m)
+  Color(0xFF283593), // indigo.shade800 (110-120m)
+  Color(0xFF1A237E), // indigo.shade900 (120-130m)
+  Color(0xFF4A148C), // purple.shade900 (130m+)
 ];
 
 const _typeColors = [
@@ -633,6 +642,14 @@ class _DistributionsSection extends ConsumerWidget {
 
     final wide = MediaQuery.of(context).size.width >= 600;
 
+    // Every dive type's count and summed dive time (issue #641), listed in
+    // full underneath the pie charts above -- unlike the pie chart's legend,
+    // this isn't truncated to the top 6, since every type must be shown.
+    final typeStats = diveTypesAsync.maybeWhen(
+      data: (diveTypes) => diveTypes,
+      orElse: () => const <DistributionSegment>[],
+    );
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -662,7 +679,36 @@ class _DistributionsSection extends ConsumerWidget {
               Column(
                 children: [depthChart, const SizedBox(height: 8), typeChart],
               ),
+            if (typeStats.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const Divider(height: 1),
+              for (final segment in typeStats)
+                _DiveTypeStatRow(segment: segment),
+            ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DiveTypeStatRow extends StatelessWidget {
+  final DistributionSegment segment;
+  const _DiveTypeStatRow({required this.segment});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final duration = Duration(seconds: segment.totalDurationSeconds ?? 0);
+    return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      title: Text(diveTypeDistributionLabel(segment.label, l10n)),
+      trailing: Text(
+        '${l10n.statistics_filterBar_diveCount(segment.count)} • '
+        '${duration.inHours}h ${duration.inMinutes % 60}m',
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
       ),
     );
@@ -748,7 +794,7 @@ class _DepthPieCard extends StatelessWidget {
                             final maxDisplay = fmt
                                 .convertDepth(data.maxDepth.toDouble())
                                 .round();
-                            final label = data.maxDepth >= 100
+                            final label = data.openEnded
                                 ? l10n.statistics_summary_depthBucket_over(
                                     '$minDisplay',
                                     fmt.depthSymbol,

@@ -2541,52 +2541,53 @@ class DiveRepository {
           )
           .toList();
 
-      // Depth distribution
+      // Depth distribution: 10 m buckets from the surface to 130 m, plus an
+      // open-ended bucket for anything deeper (issue #641). A dive lands in
+      // a bucket by its max depth, same rule the 0-40 m version used.
       final depthWhereClause = diverId != null
           ? 'WHERE max_depth IS NOT NULL AND diver_id = ?'
           : 'WHERE max_depth IS NOT NULL';
+      const depthBucketSizeMeters = 10;
+      const depthBucketCount = 13; // 0-10m, 10-20m, ..., 120-130m
       final depthStats = await _db.customSelect('''
       SELECT
-        CASE
-          WHEN max_depth < 10 THEN '0-10m'
-          WHEN max_depth < 20 THEN '10-20m'
-          WHEN max_depth < 30 THEN '20-30m'
-          WHEN max_depth < 40 THEN '30-40m'
-          ELSE '40m+'
-        END as depth_range,
+        MIN(CAST(max_depth / $depthBucketSizeMeters AS INTEGER), $depthBucketCount) as depth_bucket,
         COUNT(*) as count
       FROM dives
       $depthWhereClause $fBare
-      GROUP BY depth_range
-      ORDER BY
-        CASE depth_range
-          WHEN '0-10m' THEN 1
-          WHEN '10-20m' THEN 2
-          WHEN '20-30m' THEN 3
-          WHEN '30-40m' THEN 4
-          ELSE 5
-        END
+      GROUP BY depth_bucket
     ''', variables: vars).get();
 
       final depthRanges = [
-        DepthRangeStat(label: '0-10m', minDepth: 0, maxDepth: 10, count: 0),
-        DepthRangeStat(label: '10-20m', minDepth: 10, maxDepth: 20, count: 0),
-        DepthRangeStat(label: '20-30m', minDepth: 20, maxDepth: 30, count: 0),
-        DepthRangeStat(label: '30-40m', minDepth: 30, maxDepth: 40, count: 0),
-        DepthRangeStat(label: '40m+', minDepth: 40, maxDepth: 100, count: 0),
+        for (var i = 0; i < depthBucketCount; i++)
+          DepthRangeStat(
+            label:
+                '${i * depthBucketSizeMeters}-${(i + 1) * depthBucketSizeMeters}m',
+            minDepth: i * depthBucketSizeMeters,
+            maxDepth: (i + 1) * depthBucketSizeMeters,
+            count: 0,
+          ),
+        DepthRangeStat(
+          label: '${depthBucketCount * depthBucketSizeMeters}m+',
+          minDepth: depthBucketCount * depthBucketSizeMeters,
+          maxDepth: depthBucketCount * depthBucketSizeMeters,
+          count: 0,
+          openEnded: true,
+        ),
       ];
 
-      final depthDistribution = depthRanges.map((range) {
-        final found = depthStats.where(
-          (row) => row.data['depth_range'] == range.label,
-        );
-        return DepthRangeStat(
-          label: range.label,
-          minDepth: range.minDepth,
-          maxDepth: range.maxDepth,
-          count: found.isNotEmpty ? found.first.data['count'] as int : 0,
-        );
-      }).toList();
+      final depthDistribution = [
+        for (var i = 0; i < depthRanges.length; i++)
+          DepthRangeStat(
+            label: depthRanges[i].label,
+            minDepth: depthRanges[i].minDepth,
+            maxDepth: depthRanges[i].maxDepth,
+            openEnded: depthRanges[i].openEnded,
+            count: depthStats
+                .where((row) => row.data['depth_bucket'] == i)
+                .fold<int>(0, (sum, row) => sum + (row.data['count'] as int)),
+          ),
+      ];
 
       // Top sites
       final siteWhereClause = diverId != null
@@ -6459,11 +6460,16 @@ class DepthRangeStat {
   final int maxDepth;
   final int count;
 
+  /// Whether this is the deepest, open-ended bucket (e.g. "130m+"), which
+  /// has no real upper bound unlike every other bucket.
+  final bool openEnded;
+
   DepthRangeStat({
     required this.label,
     required this.minDepth,
     required this.maxDepth,
     required this.count,
+    this.openEnded = false,
   });
 }
 

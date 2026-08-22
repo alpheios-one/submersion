@@ -570,8 +570,18 @@ void main() {
       );
 
       final diveTypes = [
-        DistributionSegment(label: 'Recreational', count: 10, percentage: 66.7),
-        DistributionSegment(label: 'Technical', count: 5, percentage: 33.3),
+        DistributionSegment(
+          label: 'Recreational',
+          count: 10,
+          percentage: 66.7,
+          totalDurationSeconds: 36000, // 10h 0m
+        ),
+        DistributionSegment(
+          label: 'Technical',
+          count: 5,
+          percentage: 33.3,
+          totalDurationSeconds: 19800, // 5h 30m
+        ),
       ];
 
       await tester.pumpWidget(
@@ -599,6 +609,12 @@ void main() {
       expect(find.text('Distributions'), findsOneWidget);
       // Depth range legend labels should contain depth values.
       expect(find.textContaining('10'), findsWidgets);
+      // Per-type count + total dive time list (issue #641). The type name
+      // also appears once in the pie chart's own legend above the list.
+      expect(find.text('Recreational'), findsNWidgets(2));
+      expect(find.text('10 dives • 10h 0m'), findsOneWidget);
+      expect(find.text('Technical'), findsNWidgets(2));
+      expect(find.text('5 dives • 5h 30m'), findsOneWidget);
     });
 
     testWidgets('hides Distributions when totalDives is 0', (tester) async {

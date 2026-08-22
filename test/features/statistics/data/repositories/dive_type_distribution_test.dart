@@ -42,6 +42,32 @@ void main() {
     expect(byLabel['wreck'], 1); // only dive 'a'
   });
 
+  test("totalDurationSeconds sums each type's dive durations", () async {
+    await diveRepo.createDive(
+      domain.Dive(
+        id: 'a',
+        dateTime: DateTime(2026, 1, 1),
+        diveTypeIds: const ['night', 'wreck'],
+        bottomTime: const Duration(minutes: 30),
+      ),
+    );
+    await diveRepo.createDive(
+      domain.Dive(
+        id: 'b',
+        dateTime: DateTime(2026, 1, 2),
+        diveTypeIds: const ['night'],
+        bottomTime: const Duration(minutes: 45),
+      ),
+    );
+
+    final dist = await stats.getDiveTypeDistribution();
+    final byLabel = {for (final s in dist) s.label: s.totalDurationSeconds};
+    // 'night' is on both dives, so its total is the sum of both durations;
+    // 'wreck' only carries dive 'a'.
+    expect(byLabel['night'], (30 + 45) * 60);
+    expect(byLabel['wreck'], 30 * 60);
+  });
+
   test('isDiveTypeInUse is true when a type is on any dive', () async {
     await diveRepo.createDive(
       domain.Dive(

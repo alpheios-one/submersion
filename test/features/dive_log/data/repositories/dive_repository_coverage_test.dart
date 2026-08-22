@@ -302,6 +302,52 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
+  // getStatistics - depth distribution buckets (issue #641)
+  // ---------------------------------------------------------------------------
+
+  group('getStatistics depth distribution', () {
+    test(
+      'buckets max depth into 10m ranges up to 130m, with an open-ended tail',
+      () async {
+        await insertDive(id: 'dive-5m', maxDepth: 5.0);
+        await insertDive(id: 'dive-35m', maxDepth: 35.0);
+        await insertDive(id: 'dive-40m', maxDepth: 40.0);
+        await insertDive(id: 'dive-125m', maxDepth: 125.0);
+        await insertDive(id: 'dive-150m', maxDepth: 150.0);
+
+        final stats = await repository.getStatistics();
+        final byLabel = {for (final d in stats.depthDistribution) d.label: d};
+
+        expect(stats.depthDistribution.length, 14);
+        expect(byLabel['0-10m']!.count, 1);
+        expect(byLabel['30-40m']!.count, 1);
+        // A dive at exactly 40m now falls in its own 40-50m bucket instead of
+        // the old open-ended "40m+" catch-all.
+        expect(byLabel['40-50m']!.count, 1);
+        expect(byLabel['40-50m']!.openEnded, isFalse);
+        expect(byLabel['120-130m']!.count, 1);
+        expect(byLabel['130m+']!.count, 1);
+        expect(byLabel['130m+']!.openEnded, isTrue);
+      },
+    );
+
+    test(
+      'dives under 40m are still counted correctly (no regression)',
+      () async {
+        await insertDive(id: 'dive-a', maxDepth: 12.0);
+        await insertDive(id: 'dive-b', maxDepth: 12.0);
+        await insertDive(id: 'dive-c', maxDepth: 38.0);
+
+        final stats = await repository.getStatistics();
+        final byLabel = {for (final d in stats.depthDistribution) d.label: d};
+
+        expect(byLabel['10-20m']!.count, 2);
+        expect(byLabel['30-40m']!.count, 1);
+      },
+    );
+  });
+
+  // ---------------------------------------------------------------------------
   // getDiveRecords - bottom_time mapping in DiveRecord
   // ---------------------------------------------------------------------------
 

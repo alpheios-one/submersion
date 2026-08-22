@@ -66,10 +66,19 @@ class DistributionSegment {
   final int count;
   final double percentage;
 
+  /// Summed dive duration (seconds) behind this segment.
+  ///
+  /// Only populated by distributions where a per-segment total makes sense
+  /// (e.g. dive type); null for distributions like time-of-day where a
+  /// summed duration would double count against other segments' overlapping
+  /// dives or simply isn't meaningful.
+  final int? totalDurationSeconds;
+
   DistributionSegment({
     required this.label,
     required this.count,
     required this.percentage,
+    this.totalDurationSeconds,
   });
 }
 
@@ -799,7 +808,8 @@ class StatisticsRepository {
       final results = await _db.customSelect('''
         SELECT
           ddt.dive_type_id AS dive_type,
-          COUNT(*) AS count
+          COUNT(*) AS count,
+          SUM(COALESCE(d.runtime, d.bottom_time)) AS total_time
         FROM dive_dive_types ddt
         JOIN dives d ON d.id = ddt.dive_id
         WHERE 1=1 $diverFilter ${df.clause}
@@ -820,6 +830,7 @@ class StatisticsRepository {
           label: label,
           count: count,
           percentage: count / total * 100,
+          totalDurationSeconds: row.read<int?>('total_time') ?? 0,
         );
       }).toList();
     } catch (e, stackTrace) {
