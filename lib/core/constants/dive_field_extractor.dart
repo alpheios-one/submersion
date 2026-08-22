@@ -189,6 +189,8 @@ extension DiveFieldExtractor on DiveField {
         return summary.rating;
       case DiveField.isFavorite:
         return summary.isFavorite;
+      case DiveField.diveMode:
+        return summary.diveMode.name.toUpperCase();
       case DiveField.diveTypeName:
         return summary.diveTypeIds
             .map(diveTypeLabel ?? Dive.diveTypeDisplayName)

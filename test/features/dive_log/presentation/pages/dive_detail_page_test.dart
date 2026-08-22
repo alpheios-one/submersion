@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/constants/buhlmann_coefficients.dart';
 import 'package:submersion/core/deco/entities/deco_status.dart';
@@ -1562,6 +1563,24 @@ void main() {
 
       chart.onSafetyFindingTap!(finding);
       expect(container.read(selectedSafetyFindingProvider(dive.id)), isNull);
+    });
+  });
+
+  group('DiveDetailPage dive mode badge', () {
+    testWidgets('shows the short code for a CCR dive', (tester) async {
+      final dive = createTestDiveWithBottomTime().copyWith(
+        diveMode: DiveMode.ccr,
+      );
+      await _pumpDetailPage(tester, dive);
+
+      expect(find.text('CCR'), findsOneWidget);
+    });
+
+    testWidgets('shows OC for the default open-circuit dive', (tester) async {
+      final dive = createTestDiveWithBottomTime();
+      await _pumpDetailPage(tester, dive);
+
+      expect(find.text('OC'), findsOneWidget);
     });
   });
 }

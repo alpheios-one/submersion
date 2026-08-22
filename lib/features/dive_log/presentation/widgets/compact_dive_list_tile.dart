@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_field.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/dive_type_label_resolver.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_mode_badge.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/selection_leading.dart';
@@ -317,11 +319,19 @@ class CompactDiveListTile extends ConsumerWidget {
                         ),
                       ],
                       const SizedBox(width: 8),
-                      Text(
-                        dateText,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: secondaryTextColor,
+                      Flexible(
+                        child: Text(
+                          dateText,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: secondaryTextColor),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
+                      ),
+                      const SizedBox(width: 6),
+                      DiveModeBadge(
+                        mode: summary?.diveMode ?? DiveMode.oc,
+                        dense: true,
                       ),
                       ExcludeSemantics(
                         child: Icon(
