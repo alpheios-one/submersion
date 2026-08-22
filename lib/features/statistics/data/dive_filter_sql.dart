@@ -121,7 +121,7 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
   if (filter.noBuddyOnly == true) {
     conditions.add(
       "(buddy IS NULL OR buddy = '') AND "
-      'NOT EXISTS (SELECT 1 FROM dive_buddies WHERE dive_id = id)',
+      'NOT EXISTS (SELECT 1 FROM dive_buddies WHERE dive_buddies.dive_id = dives.id)',
     );
   }
 

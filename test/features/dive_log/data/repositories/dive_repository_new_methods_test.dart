@@ -1466,26 +1466,23 @@ void main() {
   // ---------------------------------------------------------------------------
 
   group('noBuddyOnly filter', () {
-    test(
-      'excludes dives with a legacy buddy or a linked buddy',
-      () async {
-        await insertTestDive(id: 'dive-legacy-buddy', buddy: 'Alice Diver');
-        await insertBuddy(id: 'b1', name: 'Bob Buddy');
-        await insertTestDive(id: 'dive-linked-buddy');
-        await linkBuddy('dive-linked-buddy', 'b1');
-        await insertTestDive(id: 'dive-no-buddy');
-        await insertTestDive(id: 'dive-empty-buddy', buddy: '');
+    test('excludes dives with a legacy buddy or a linked buddy', () async {
+      await insertTestDive(id: 'dive-legacy-buddy', buddy: 'Alice Diver');
+      await insertBuddy(id: 'b1', name: 'Bob Buddy');
+      await insertTestDive(id: 'dive-linked-buddy');
+      await linkBuddy('dive-linked-buddy', 'b1');
+      await insertTestDive(id: 'dive-no-buddy');
+      await insertTestDive(id: 'dive-empty-buddy', buddy: '');
 
-        final summaries = await repository.getDiveSummaries(
-          filter: const DiveFilterState(noBuddyOnly: true),
-        );
+      final summaries = await repository.getDiveSummaries(
+        filter: const DiveFilterState(noBuddyOnly: true),
+      );
 
-        expect(summaries.map((s) => s.id).toSet(), {
-          'dive-no-buddy',
-          'dive-empty-buddy',
-        });
-      },
-    );
+      expect(summaries.map((s) => s.id).toSet(), {
+        'dive-no-buddy',
+        'dive-empty-buddy',
+      });
+    });
 
     test('returns all dives when noBuddyOnly is not set', () async {
       await insertTestDive(id: 'dive-a', buddy: 'Alice Diver');

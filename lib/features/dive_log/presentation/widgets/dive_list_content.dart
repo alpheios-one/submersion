@@ -1580,15 +1580,11 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
     if (filter.noBuddyOnly == true) {
       chips.add(
-        _buildFilterChip(
-          context,
-          context.l10n.diveLog_filterChip_noBuddy,
-          () {
-            ref.read(diveFilterProvider.notifier).state = filter.copyWith(
-              clearNoBuddyOnly: true,
-            );
-          },
-        ),
+        _buildFilterChip(context, context.l10n.diveLog_filterChip_noBuddy, () {
+          ref.read(diveFilterProvider.notifier).state = filter.copyWith(
+            clearNoBuddyOnly: true,
+          );
+        }),
       );
     }
 
