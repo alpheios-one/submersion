@@ -403,7 +403,7 @@ void main() {
       final pressures = profile[0]['allTankPressures'] as List;
       expect(pressures, hasLength(1));
       final reading = pressures[0] as Map<String, dynamic>;
-      expect(reading['tankIndex'], 14);
+      expect(reading['tankIndex'], 0);
       expect(reading['pressure'], 200.0);
     });
   });

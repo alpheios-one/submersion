@@ -207,6 +207,8 @@ class RatioXmlParser implements ImportParser {
 
     final profile = <Map<String, dynamic>>[];
     final tankPressures = <int, List<_TankReading>>{};
+    final tankMixes = <int, GasMix>{};
+    final tankIdToIndex = <int, int>{};
     final gasSwitches = <Map<String, dynamic>>[];
 
     int? prevO2;
@@ -268,21 +270,45 @@ class RatioXmlParser implements ImportParser {
       final otu = _intElement(sample, 'OTU');
       if (otu != null) lastOtu = otu;
 
+      // Map tankId to a sequential 0-based tankIndex
+      final tankId = _intElement(sample, 'tankId');
+      int? currentTankIndex;
+      if (tankId != null) {
+        currentTankIndex = tankIdToIndex.putIfAbsent(
+          tankId,
+          () => tankIdToIndex.length,
+        );
+      }
+
       // Gas mix tracking
       final o2 = _intElement(sample, 'activeMixO2Percent');
       final he = _intElement(sample, 'activeMixHePercent');
-      if (o2 != null && (o2 != prevO2 || he != prevHe)) {
-        if (prevO2 != null) {
-          // Gas switch occurred
-          gasSwitches.add(<String, dynamic>{
-            'timestamp': runtimeS,
-            'depth': depthM,
-            'o2': o2,
-            'he': he ?? 0,
-          });
+      if (o2 != null) {
+        // Track the gas mix for this tank
+        if (tankId != null && !tankMixes.containsKey(tankId)) {
+          tankMixes[tankId] = GasMix(
+            o2: o2.toDouble(),
+            he: (he ?? 0).toDouble(),
+          );
         }
-        prevO2 = o2;
-        prevHe = he;
+
+        if (o2 != prevO2 || he != prevHe) {
+          if (prevO2 != null) {
+            // Gas switch occurred
+            final switchEvent = <String, dynamic>{
+              'timestamp': runtimeS,
+              'depth': depthM,
+              'o2': o2, // kept for debugging/reference
+              'he': he ?? 0,
+            };
+            if (currentTankIndex != null) {
+              switchEvent['tankIndex'] = currentTankIndex;
+            }
+            gasSwitches.add(switchEvent);
+          }
+          prevO2 = o2;
+          prevHe = he;
+        }
       }
 
       // GF values (capture from first sample)
@@ -293,7 +319,6 @@ class RatioXmlParser implements ImportParser {
 
       // Tank pressure tracking
       final tankPressure = _intElement(sample, 'tankPressure');
-      final tankId = _intElement(sample, 'tankId');
       if (tankPressure != null && tankId != null) {
         tankPressures
             .putIfAbsent(tankId, () => [])
@@ -301,7 +326,7 @@ class RatioXmlParser implements ImportParser {
 
         point['allTankPressures'] = [
           <String, dynamic>{
-            'tankIndex': tankId,
+            'tankIndex': currentTankIndex,
             'pressure': tankPressure.toDouble(),
           },
         ];
@@ -352,8 +377,15 @@ class RatioXmlParser implements ImportParser {
     }
 
     // Build tank data
-    if (tankPressures.isNotEmpty) {
-      _buildTanks(tankPressures, diveData, prevO2, prevHe);
+    if (tankIdToIndex.isNotEmpty) {
+      _buildTanks(
+        tankIdToIndex,
+        tankMixes,
+        tankPressures,
+        diveData,
+        prevO2,
+        prevHe,
+      );
     }
 
     // Gas switches
@@ -363,6 +395,8 @@ class RatioXmlParser implements ImportParser {
   }
 
   void _buildTanks(
+    Map<int, int> tankIdToIndex,
+    Map<int, GasMix> tankMixes,
     Map<int, List<_TankReading>> tankPressures,
     Map<String, dynamic> diveData,
     int? lastO2,
@@ -371,18 +405,24 @@ class RatioXmlParser implements ImportParser {
     final tanks = <Map<String, dynamic>>[];
     var order = 0;
 
-    for (final entry in tankPressures.entries) {
-      final readings = entry.value;
-      if (readings.isEmpty) continue;
+    // Ensure tanks are ordered by their sequential index
+    final sortedTankIds = tankIdToIndex.keys.toList()
+      ..sort((a, b) => tankIdToIndex[a]!.compareTo(tankIdToIndex[b]!));
 
-      final tank = <String, dynamic>{
-        'order': order,
-        'startPressure': readings.first.pressureBar.toDouble(),
-        'endPressure': readings.last.pressureBar.toDouble(),
-      };
+    for (final tankId in sortedTankIds) {
+      final tank = <String, dynamic>{'order': order};
 
-      // For a single-tank dive, use the known gas mix
-      if (tankPressures.length == 1 && lastO2 != null) {
+      final readings = tankPressures[tankId];
+      if (readings != null && readings.isNotEmpty) {
+        tank['startPressure'] = readings.first.pressureBar.toDouble();
+        tank['endPressure'] = readings.last.pressureBar.toDouble();
+      }
+
+      final mix = tankMixes[tankId];
+      if (mix != null) {
+        tank['gasMix'] = mix;
+      } else if (tankIdToIndex.length == 1 && lastO2 != null) {
+        // Fallback for single-tank dive if we missed the mix somehow
         tank['gasMix'] = GasMix(
           o2: lastO2.toDouble(),
           he: (lastHe ?? 0).toDouble(),
