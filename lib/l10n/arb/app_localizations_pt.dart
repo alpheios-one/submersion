@@ -29895,6 +29895,33 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Verificar todas as mídias';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count itens atualizados',
+      one: '$count item atualizado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Não foi possível verificar $count itens. O Submersion não consegue acessar sua biblioteca de fotos.',
+      one:
+          'Não foi possível verificar $count item. O Submersion não consegue acessar sua biblioteca de fotos.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Fontes de mídia';
 
   @override

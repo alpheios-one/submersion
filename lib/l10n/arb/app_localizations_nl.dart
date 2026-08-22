@@ -29675,6 +29675,33 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Alle media controleren';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items bijgewerkt',
+      one: '$count item bijgewerkt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count items konden niet worden gecontroleerd. Submersion heeft geen toegang tot je fotobibliotheek.',
+      one:
+          '$count item kon niet worden gecontroleerd. Submersion heeft geen toegang tot je fotobibliotheek.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Mediabronnen';
 
   @override

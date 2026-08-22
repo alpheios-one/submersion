@@ -29491,6 +29491,42 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'فحص جميع الوسائط';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تحديث $count عنصر',
+      many: 'تم تحديث $count عنصرا',
+      few: 'تم تحديث $count عناصر',
+      two: 'تم تحديث عنصرين',
+      one: 'تم تحديث عنصر واحد',
+      zero: 'لم يتم تحديث أي عنصر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'تعذر فحص $count عنصر. لا يمكن لـ Submersion الوصول إلى مكتبة الصور.',
+      many:
+          'تعذر فحص $count عنصرا. لا يمكن لـ Submersion الوصول إلى مكتبة الصور.',
+      few:
+          'تعذر فحص $count عناصر. لا يمكن لـ Submersion الوصول إلى مكتبة الصور.',
+      two: 'تعذر فحص عنصرين. لا يمكن لـ Submersion الوصول إلى مكتبة الصور.',
+      one: 'تعذر فحص عنصر واحد. لا يمكن لـ Submersion الوصول إلى مكتبة الصور.',
+      zero: 'تعذر فحص أي عنصر. لا يمكن لـ Submersion الوصول إلى مكتبة الصور.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'مصادر الوسائط';
 
   @override

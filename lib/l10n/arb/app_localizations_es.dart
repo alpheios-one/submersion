@@ -29904,6 +29904,33 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Comprobar todos los archivos';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementos actualizados',
+      one: '$count elemento actualizado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'No se pudieron comprobar $count elementos. Submersion no puede acceder a tu fototeca.',
+      one:
+          'No se pudo comprobar $count elemento. Submersion no puede acceder a tu fototeca.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Fuentes de medios';
 
   @override

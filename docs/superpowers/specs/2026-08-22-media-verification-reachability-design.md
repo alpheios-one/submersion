@@ -274,9 +274,19 @@ It reuses `MediaItemVerifier` per item rather than reimplementing the
 persistence contract, which is what `MediaItemVerifier`'s own doc comment says
 that contract exists for.
 
-`LocalFilesDiagnosticsService.reverifyAll` becomes a delegate that passes
-`sourceTypes: {MediaSourceType.localFile}` and returns the flipped count, so
-its callers, its counts, and its tests are unchanged.
+`LocalFilesDiagnosticsService` loses `reverifyAll` entirely and keeps only its
+read path. The Settings page calls the sweep directly for both actions: with
+`sourceTypes: {MediaSourceType.localFile}` for the existing Local files
+re-verify tile, and unfiltered for the new one.
+
+**Corrected during implementation.** The first attempt injected the sweep into
+`LocalFilesDiagnosticsService` and delegated. That put
+`mediaSourceResolverRegistryProvider` on the dependency path of
+`localFilesDiagnosticsProvider`, so merely rendering two integers constructed
+every resolver in the app, and the Media Sources page tests failed with
+`ProviderException: Tried to use a provider that is in error state`. The read
+path must stay cheap: a service that answers "how many rows are flagged" has
+no business owning the machinery that checks them.
 
 Settings gets a second action under Media Sources, "Check all media", calling
 the sweep with no filter. It reports counts and, when any row came back

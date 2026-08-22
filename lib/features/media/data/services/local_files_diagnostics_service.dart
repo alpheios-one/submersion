@@ -27,23 +27,24 @@ class LocalFilesDiagnostics extends Equatable {
 }
 
 /// Diagnostics service backing the Settings → Media Sources → Local files
-/// subsection. Provides cheap read-only counts and an explicit re-verify
-/// action.
+/// subsection. Cheap read-only counts, and nothing else.
 ///
-/// Read path ([diagnose]) reads the persisted [MediaItem.isOrphaned] flag
-/// and never touches the filesystem. Write path ([reverifyAll]) delegates to
-/// [MediaVerificationSweep], filtered to local-file rows.
+/// [diagnose] reads the persisted [MediaItem.isOrphaned] flag and never
+/// touches the filesystem. Re-verification deliberately does NOT live here:
+/// it is [MediaVerificationSweep], which the Settings page calls directly.
+///
+/// That separation is load-bearing. Injecting the sweep here would put the
+/// whole resolver registry on the dependency path of a page that only wants
+/// two integers, so merely rendering the counts would construct every
+/// resolver in the app.
 class LocalFilesDiagnosticsService {
   final MediaRepository _repository;
-  final MediaVerificationSweep _sweep;
   final LocalMediaPlatform _platform;
 
   LocalFilesDiagnosticsService({
     required MediaRepository repository,
-    required MediaVerificationSweep sweep,
     required LocalMediaPlatform platform,
   }) : _repository = repository,
-       _sweep = sweep,
        _platform = platform;
 
   /// Returns aggregated counts of local-file media items.
@@ -68,22 +69,6 @@ class LocalFilesDiagnosticsService {
       available: available,
       unavailable: unavailable,
     );
-  }
-
-  /// Re-verifies every local-file media item, updating the orphan flag and
-  /// `lastVerifiedAt`.
-  ///
-  /// The loop lives in [MediaVerificationSweep], which does the same work for
-  /// any source type. Keeping a second copy here would mean two answers to
-  /// "what does this VerifyResult mean for isOrphaned", and they would
-  /// eventually disagree about the same row.
-  ///
-  /// This stays as the Local files subsection's own entry point and keeps
-  /// returning the flipped count its snackbar shows. Per-item failures are
-  /// logged and skipped inside the sweep, so one bad row cannot abort a pass.
-  Future<int> reverifyAll() async {
-    final outcome = await _sweep.run(sourceTypes: {MediaSourceType.localFile});
-    return outcome.flipped;
   }
 
   /// Returns the number of persistable URI permissions Android currently

@@ -28251,6 +28251,29 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => '检查所有媒体';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已更新 $count 个项目',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '有 $count 个项目无法检查。Submersion 无法访问你的照片库。',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => '媒体来源';
 
   @override

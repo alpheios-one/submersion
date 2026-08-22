@@ -191,7 +191,6 @@ final localFilesDiagnosticsServiceProvider =
     Provider<LocalFilesDiagnosticsService>(
       (ref) => LocalFilesDiagnosticsService(
         repository: ref.read(mediaRepositoryProvider),
-        sweep: ref.read(mediaVerificationSweepProvider),
         platform: ref.read(localMediaPlatformProvider),
       ),
     );

@@ -29963,6 +29963,33 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Vérifier tous les médias';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count éléments mis à jour',
+      one: '$count élément mis à jour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count éléments n\'ont pas pu être vérifiés. Submersion n\'a pas accès à votre photothèque.',
+      one:
+          '$count élément n\'a pas pu être vérifié. Submersion n\'a pas accès à votre photothèque.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Sources de médias';
 
   @override
