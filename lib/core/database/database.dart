@@ -1874,6 +1874,7 @@ class Buddies extends Table {
   TextColumn get phone => text().nullable()();
   TextColumn get photoPath => text().nullable()();
   TextColumn get notes => text().withDefault(const Constant(''))();
+  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -3162,7 +3163,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 160;
+  static const int currentSchemaVersion = 161;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3444,6 +3445,9 @@ class AppDatabase extends _$AppDatabase {
     // service_records.service_type -> service_category rename. Renumbered
     // from 158 and then 159, which #1149 and #1177 claimed first on main.
     160,
+    // v161 (issue #638): buddies.is_favorite, so frequently-dived buddies can
+    // be pinned to the top of the "Add buddy" picker regardless of sort.
+    161,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4959,6 +4963,21 @@ class AppDatabase extends _$AppDatabase {
           'ALTER TABLE $table ADD COLUMN default_currency TEXT',
         );
       }
+    }
+  }
+
+  /// Idempotent DDL for the v161 buddies.is_favorite column (issue #638),
+  /// letting frequently-dived buddies be pinned to the top of the "Add
+  /// buddy" picker regardless of sort. Self-guards on the table existing, and
+  /// defaults every pre-existing row to not-favorited.
+  Future<void> _assertBuddyFavoriteColumn() async {
+    final cols = await customSelect("PRAGMA table_info('buddies')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('is_favorite')) {
+      await customStatement(
+        'ALTER TABLE buddies ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0',
+      );
     }
   }
 
@@ -8506,6 +8525,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertServiceCategoryRename();
         }
         if (from < 160) await reportProgress();
+        // v161 (issue #638): buddies.is_favorite, so frequently-dived buddies
+        // can be pinned to the top of the "Add buddy" picker regardless of
+        // sort.
+        if (from < 161) {
+          await _assertBuddyFavoriteColumn();
+        }
+        if (from < 161) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8695,6 +8721,11 @@ class AppDatabase extends _$AppDatabase {
         // database that arrives by restore or sync-adopt never runs
         // onUpgrade, and every read of a service record would throw.
         await _assertServiceCategoryRename();
+
+        // v161 backstop: re-assert buddies.is_favorite (issue #638). A
+        // database that arrives by restore or sync-adopt never runs
+        // onUpgrade, and every read of a buddy would throw without it.
+        await _assertBuddyFavoriteColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

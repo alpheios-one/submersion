@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart'
+    show BuddyWithDiveCount;
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/dive_roles/presentation/providers/dive_role_providers.dart';
@@ -35,6 +37,16 @@ final _testBuddies = [
     updatedAt: _now,
   ),
   Buddy(id: '3', name: 'Charlie Brown', createdAt: _now, updatedAt: _now),
+];
+
+/// [_testBuddies] wrapped with a dive count of 0, matching what the picker
+/// sheet's providers return (it sorts by dive count -- see issue #638).
+final _testBuddiesWithCount = [
+  for (final b in _testBuddies) BuddyWithDiveCount(buddy: b, diveCount: 0),
+];
+
+List<BuddyWithDiveCount> _withCount(Iterable<Buddy> buddies) => [
+  for (final b in buddies) BuddyWithDiveCount(buddy: b, diveCount: 0),
 ];
 
 Widget _buildPicker({
@@ -83,8 +95,12 @@ void main() {
       await tester.pumpWidget(
         _buildPicker(
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
-            buddySearchProvider.overrideWith((ref, q) async => []),
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
+            buddySearchWithDiveCountProvider.overrideWith(
+              (ref, q) async => [],
+            ),
           ],
         ),
       );
@@ -100,7 +116,9 @@ void main() {
       await tester.pumpWidget(
         _buildPicker(
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
           ],
         ),
       );
@@ -115,13 +133,15 @@ void main() {
       await tester.pumpWidget(
         _buildPicker(
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
-            buddySearchProvider.overrideWith((ref, query) async {
-              return _testBuddies
-                  .where(
-                    (b) => b.name.toLowerCase().contains(query.toLowerCase()),
-                  )
-                  .toList();
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
+            buddySearchWithDiveCountProvider.overrideWith((ref, query) async {
+              return _withCount(
+                _testBuddies.where(
+                  (b) => b.name.toLowerCase().contains(query.toLowerCase()),
+                ),
+              );
             }),
           ],
         ),
@@ -151,13 +171,15 @@ void main() {
       await tester.pumpWidget(
         _buildPicker(
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
-            buddySearchProvider.overrideWith((ref, query) async {
-              return _testBuddies
-                  .where(
-                    (b) => b.name.toLowerCase().contains(query.toLowerCase()),
-                  )
-                  .toList();
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
+            buddySearchWithDiveCountProvider.overrideWith((ref, query) async {
+              return _withCount(
+                _testBuddies.where(
+                  (b) => b.name.toLowerCase().contains(query.toLowerCase()),
+                ),
+              );
             }),
           ],
         ),
@@ -187,13 +209,15 @@ void main() {
       await tester.pumpWidget(
         _buildPicker(
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
-            buddySearchProvider.overrideWith((ref, query) async {
-              return _testBuddies
-                  .where(
-                    (b) => b.name.toLowerCase().contains(query.toLowerCase()),
-                  )
-                  .toList();
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
+            buddySearchWithDiveCountProvider.overrideWith((ref, query) async {
+              return _withCount(
+                _testBuddies.where(
+                  (b) => b.name.toLowerCase().contains(query.toLowerCase()),
+                ),
+              );
             }),
           ],
         ),
@@ -228,7 +252,9 @@ void main() {
         _buildPicker(
           selectedBuddies: [selectedBuddy],
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
           ],
         ),
       );
@@ -244,7 +270,9 @@ void main() {
       await tester.pumpWidget(
         _buildPicker(
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
           ],
         ),
       );
@@ -266,7 +294,9 @@ void main() {
       await tester.pumpWidget(
         _buildPicker(
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
           ],
         ),
       );
@@ -296,7 +326,9 @@ void main() {
         _buildPicker(
           selectedBuddies: [selectedBuddy],
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
           ],
         ),
       );
@@ -322,7 +354,9 @@ void main() {
       await tester.pumpWidget(
         _buildPicker(
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => <Buddy>[]),
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => <BuddyWithDiveCount>[],
+            ),
           ],
         ),
       );
@@ -337,8 +371,12 @@ void main() {
       await tester.pumpWidget(
         _buildPicker(
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
-            buddySearchProvider.overrideWith((ref, query) async => <Buddy>[]),
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
+            buddySearchWithDiveCountProvider.overrideWith(
+              (ref, query) async => <BuddyWithDiveCount>[],
+            ),
           ],
         ),
       );
@@ -357,7 +395,7 @@ void main() {
     testWidgets('shows loading spinner when provider is loading', (
       tester,
     ) async {
-      final completer = Completer<List<Buddy>>();
+      final completer = Completer<List<BuddyWithDiveCount>>();
       addTearDown(() {
         if (!completer.isCompleted) completer.complete([]);
       });
@@ -365,7 +403,9 @@ void main() {
       await tester.pumpWidget(
         _buildPicker(
           overrides: [
-            allBuddiesProvider.overrideWith((ref) => completer.future),
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) => completer.future,
+            ),
           ],
         ),
       );
@@ -384,7 +424,7 @@ void main() {
     testWidgets('caches search results and shows LinearProgressIndicator '
         'during subsequent loading', (tester) async {
       var callCount = 0;
-      final secondSearchCompleter = Completer<List<Buddy>>();
+      final secondSearchCompleter = Completer<List<BuddyWithDiveCount>>();
       addTearDown(() {
         if (!secondSearchCompleter.isCompleted) {
           secondSearchCompleter.complete([]);
@@ -394,18 +434,20 @@ void main() {
       await tester.pumpWidget(
         _buildPicker(
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
-            buddySearchProvider.overrideWith((ref, query) {
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
+            buddySearchWithDiveCountProvider.overrideWith((ref, query) {
               callCount++;
               if (callCount <= 1) {
                 // First search completes immediately
                 return Future.value(
-                  _testBuddies
-                      .where(
-                        (b) =>
-                            b.name.toLowerCase().contains(query.toLowerCase()),
-                      )
-                      .toList(),
+                  _withCount(
+                    _testBuddies.where(
+                      (b) =>
+                          b.name.toLowerCase().contains(query.toLowerCase()),
+                    ),
+                  ),
                 );
               }
               // Second search hangs in loading
@@ -444,7 +486,9 @@ void main() {
         _buildPicker(
           onChanged: (buddies) => result = buddies,
           overrides: [
-            allBuddiesProvider.overrideWith((ref) async => _testBuddies),
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => _testBuddiesWithCount,
+            ),
           ],
         ),
       );
@@ -457,12 +501,12 @@ void main() {
       await tester.tap(find.text('Instructor'));
       await tester.pumpAndSettle();
 
-      // Tap "Done" -- it's a TextButton in the sheet header
-      // Find all TextButtons and tap the one inside the bottom sheet
-      // The "Done" button is rendered by the _BuddySelectionSheet header
+      // Tap "Done" -- it's the TextButton in the sheet header. The sheet
+      // also has a sort-toggle TextButton (issue #638), so disambiguate by
+      // label rather than by type alone.
       final doneButton = find.descendant(
         of: find.byType(DraggableScrollableSheet),
-        matching: find.byType(TextButton),
+        matching: find.widgetWithText(TextButton, 'Done'),
       );
       await tester.tap(doneButton);
       await tester.pumpAndSettle();

@@ -702,6 +702,10 @@ class _BuddyEditPageState extends ConsumerState<BuddyEditPage> {
             ? _mergeCtrl?.mergedPhotoPath
             : _originalBuddy?.photoPath,
         notes: _notesController.text.trim(),
+        // Preserve favorite status (issue #638): this form has no favorite
+        // control, so a full-constructor rebuild would otherwise silently
+        // reset it to false on every save.
+        isFavorite: _originalBuddy?.isFavorite ?? false,
         createdAt: _originalBuddy?.createdAt ?? now,
         updatedAt: now,
       );

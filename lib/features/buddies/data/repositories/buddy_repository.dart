@@ -146,6 +146,7 @@ class BuddyRepository {
         ),
         photoPath: row.data['photo_path'] as String?,
         notes: (row.data['notes'] as String?) ?? '',
+        isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
         createdAt: DateTime.fromMillisecondsSinceEpoch(
           row.data['created_at'] as int,
         ),
@@ -175,6 +176,7 @@ class BuddyRepository {
               phone: Value(buddy.phone),
               photoPath: Value(buddy.photoPath),
               notes: Value(buddy.notes),
+              isFavorite: Value(buddy.isFavorite),
               createdAt: Value(now.millisecondsSinceEpoch),
               updatedAt: Value(now.millisecondsSinceEpoch),
             ),
@@ -236,6 +238,7 @@ class BuddyRepository {
           ),
           photoPath: row.data['photo_path'] as String?,
           notes: (row.data['notes'] as String?) ?? '',
+          isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
           createdAt: DateTime.fromMillisecondsSinceEpoch(
             row.data['created_at'] as int,
           ),
@@ -283,6 +286,7 @@ class BuddyRepository {
           phone: Value(buddy.phone),
           photoPath: Value(buddy.photoPath),
           notes: Value(buddy.notes),
+          isFavorite: Value(buddy.isFavorite),
           updatedAt: Value(now),
         ),
       );
@@ -375,6 +379,7 @@ class BuddyRepository {
         ),
         photoPath: row.data['photo_path'] as String?,
         notes: (row.data['notes'] as String?) ?? '',
+        isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
         createdAt: DateTime.fromMillisecondsSinceEpoch(
           row.data['created_at'] as int,
         ),
@@ -436,6 +441,7 @@ class BuddyRepository {
         phone: b.phone,
         photoPath: b.photoPath,
         notes: b.notes,
+        isFavorite: b.isFavorite,
         createdAt: DateTime.fromMillisecondsSinceEpoch(b.createdAt),
         updatedAt: DateTime.fromMillisecondsSinceEpoch(b.updatedAt),
       );
@@ -712,13 +718,35 @@ class BuddyRepository {
     }
   }
 
-  /// Get all buddies with their dive counts in a single efficient query
+  /// Get all buddies with their dive counts in a single efficient query.
+  ///
+  /// [query] optionally filters by name/email/phone (case-insensitive), for
+  /// the "Add buddy" picker's search box, which needs dive counts too so it
+  /// can sort search results the same way as the unfiltered list.
   Future<List<BuddyWithDiveCount>> getAllBuddiesWithDiveCount({
     String? diverId,
+    String? query,
   }) async {
     try {
-      final diverFilter = diverId != null ? 'WHERE b.diver_id = ?' : '';
-      final variables = [if (diverId != null) Variable.withString(diverId)];
+      final conditions = <String>[
+        if (diverId != null) 'b.diver_id = ?',
+        if (query != null && query.isNotEmpty)
+          '(LOWER(b.name) LIKE ? OR LOWER(b.email) LIKE ? OR b.phone LIKE ?)',
+      ];
+      final where = conditions.isEmpty
+          ? ''
+          : 'WHERE ${conditions.join(' AND ')}';
+      final searchTerm = query != null && query.isNotEmpty
+          ? '%${query.toLowerCase()}%'
+          : null;
+      final variables = [
+        if (diverId != null) Variable.withString(diverId),
+        if (searchTerm != null) ...[
+          Variable.withString(searchTerm),
+          Variable.withString(searchTerm),
+          Variable.withString(searchTerm),
+        ],
+      ];
 
       final results = await _db.customSelect('''
         SELECT b.*, COALESCE(dc.dive_count, 0) as dive_count
@@ -728,7 +756,7 @@ class BuddyRepository {
           FROM dive_buddies
           GROUP BY buddy_id
         ) dc ON b.id = dc.buddy_id
-        $diverFilter
+        $where
         ORDER BY b.name ASC
       ''', variables: variables).get();
 
@@ -747,6 +775,7 @@ class BuddyRepository {
           ),
           photoPath: row.data['photo_path'] as String?,
           notes: (row.data['notes'] as String?) ?? '',
+          isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
           createdAt: DateTime.fromMillisecondsSinceEpoch(
             row.data['created_at'] as int,
           ),
@@ -768,6 +797,63 @@ class BuddyRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get buddies with dive counts',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Toggle favorite status for a buddy
+  Future<void> toggleFavorite(String buddyId) async {
+    try {
+      _log.info('Toggling favorite for buddy: $buddyId');
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final buddy = await (_db.select(
+        _db.buddies,
+      )..where((t) => t.id.equals(buddyId))).getSingleOrNull();
+      if (buddy == null) return;
+      await (_db.update(_db.buddies)..where((t) => t.id.equals(buddyId))).write(
+        BuddiesCompanion(
+          isFavorite: Value(!buddy.isFavorite),
+          updatedAt: Value(now),
+        ),
+      );
+      await _syncRepository.markRecordPending(
+        entityType: 'buddies',
+        recordId: buddyId,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+      _log.info('Toggled favorite for buddy: $buddyId');
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to toggle favorite for buddy: $buddyId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Set favorite status for a buddy
+  Future<void> setFavorite(String buddyId, bool isFavorite) async {
+    try {
+      _log.info('Setting favorite=$isFavorite for buddy: $buddyId');
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await (_db.update(_db.buddies)..where((t) => t.id.equals(buddyId))).write(
+        BuddiesCompanion(isFavorite: Value(isFavorite), updatedAt: Value(now)),
+      );
+      await _syncRepository.markRecordPending(
+        entityType: 'buddies',
+        recordId: buddyId,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+      _log.info('Set favorite=$isFavorite for buddy: $buddyId');
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to set favorite for buddy: $buddyId',
         error: e,
         stackTrace: stackTrace,
       );
@@ -928,6 +1014,7 @@ class BuddyRepository {
       certificationAgency: null,
       photoPath: row.photoPath,
       notes: row.notes,
+      isFavorite: row.isFavorite,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
     );
