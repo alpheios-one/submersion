@@ -572,6 +572,55 @@ class MediaRepository {
     }
   }
 
+  /// Writes the orphan flag and the verification stamp together, and nothing
+  /// else.
+  ///
+  /// Deliberately NOT [updateMedia], which writes every column from the
+  /// caller's snapshot. The passive reconciliation path is driven by grid
+  /// tiles, and a tile's snapshot comes from a FutureProvider that an
+  /// upload's stamp write does not invalidate, so it goes stale the moment an
+  /// upload completes. A full-row write from there would silently roll back
+  /// `remoteUploadedAt` and anything else that changed since the tile built.
+  ///
+  /// Differs from [markOrphaned] only by also stamping `lastVerifiedAt`,
+  /// which the callers of this one have actually earned: they checked.
+  ///
+  /// Sync-visible like every other write here, so callers must only call it
+  /// when something actually changed. See `reconciledOrphanFlag`, which
+  /// returns null precisely so that this is not called on every tile.
+  Future<void> markVerified(
+    String id, {
+    required bool isOrphaned,
+    required DateTime verifiedAt,
+  }) async {
+    try {
+      _log.info('Marking media verified: $id (isOrphaned=$isOrphaned)');
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
+        MediaCompanion(
+          isOrphaned: Value(isOrphaned),
+          lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
+          updatedAt: Value(now),
+        ),
+      );
+
+      await _syncRepository.markRecordPending(
+        entityType: 'media',
+        recordId: id,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to mark media verified: $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Get all orphaned media
   /// Includes enrichment data (depth, temperature) if available
   Future<List<domain.MediaItem>> getOrphanedMedia() async {
