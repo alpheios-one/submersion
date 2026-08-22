@@ -110,6 +110,7 @@ import 'package:submersion/core/constants/tank_presets.dart';
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
 import 'package:submersion/features/tank_presets/domain/services/default_tank_preset_resolver.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 
 const _createNewSiteSentinel = '__create_new__';
 const _createNewDiveCenterSentinel = '__create_new_dive_center__';
@@ -369,7 +370,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     _entryTime = TimeOfDay.now();
 
     // Eagerly resolve built-in presets (sync), async for custom
-    _loadDefaultPreset();
+    logFailure(_loadDefaultPreset(), _DiveEditPageState, 'load default preset');
 
     // New single dive: auto-apply the diver's default/geofenced equipment set
     // once the form is up, only when no gear is present.
@@ -403,9 +404,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       // default would make enabling the collection silently operate on it.
       _selectedDiveTypeIds = <String>[];
       _suppressDirty = false;
-      _loadBulkMembers();
+      logFailure(_loadBulkMembers(), _DiveEditPageState, 'load bulk members');
     } else if (widget.isEditing) {
-      _loadExistingDive();
+      logFailure(_loadExistingDive(), _DiveEditPageState, 'load existing dive');
     } else {
       // For new dives, capture GPS in the background to suggest nearby sites
       _captureLocationForNearby();
