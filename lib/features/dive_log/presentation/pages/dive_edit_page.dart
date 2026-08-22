@@ -1473,8 +1473,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         )
         .toList();
     // A picked role with no membership change is role-only: rewrite the links
-    // that exist and create none, so re-roling a buddy who is on some of the
-    // selection cannot add them to the rest (#1220).
+    // that exist and create none, so changing the role of a buddy who is on
+    // some of the selection cannot add them to the rest (#1220).
     final roleOnlyUpdates = _buddyRoleById.keys
         .where(
           (id) =>

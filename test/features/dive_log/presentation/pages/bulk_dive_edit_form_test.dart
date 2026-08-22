@@ -268,7 +268,7 @@ void main() {
       );
     });
 
-    testWidgets('a buddy row shows its role and re-roles every link', (
+    testWidgets('a buddy row shows its role and changes it on every link', (
       tester,
     ) async {
       tester.view.physicalSize = const Size(800, 1600);
@@ -342,8 +342,8 @@ void main() {
       }
     });
 
-    testWidgets('re-roling a buddy on some dives does not add them to the '
-        'rest', (tester) async {
+    testWidgets('changing the role of a buddy on some dives does not add '
+        'them to the rest', (tester) async {
       tester.view.physicalSize = const Size(800, 1600);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {

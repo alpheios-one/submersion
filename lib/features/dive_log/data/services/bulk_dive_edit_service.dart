@@ -283,9 +283,10 @@ class BulkDiveEditService {
             await _buddyRepo.bulkReplaceBuddies(ids, buddies);
           case BulkCollectionMode.update:
             // Role-only: rewrite the links each dive already has and insert
-            // nothing, so re-roling a buddy who is on some of the selection
-            // cannot add them to the rest (#1220). A role change that SHOULD
-            // travel with membership still rides add + overwriteRole (#893).
+            // nothing, so changing the role of a buddy who is on some of the
+            // selection cannot add them to the rest (#1220). A role change
+            // that SHOULD travel with membership still rides
+            // add + overwriteRole (#893).
             await _buddyRepo.bulkUpdateBuddyRoles(ids, buddies);
         }
       // Owned collections never support remove; reject it explicitly so a
