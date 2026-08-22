@@ -5755,6 +5755,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'Sin compañero';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Hasta $date';
   }
@@ -5815,6 +5818,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_filter_min => 'Mín';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'Sin compañero asignado';
+
+  @override
   String get diveLog_filter_noTagsYet => 'Aún no se han creado etiquetas';
 
   @override
@@ -5860,6 +5866,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get diveLog_filter_showOnlyFavorites =>
       'Mostrar solo inmersiones favoritas';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Mostrar solo inmersiones sin compañero';
 
   @override
   String get diveLog_filter_startDate => 'Fecha de inicio';

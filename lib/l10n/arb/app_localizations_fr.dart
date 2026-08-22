@@ -5775,6 +5775,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'Sans binome';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Jusqu\'au $date';
   }
@@ -5836,6 +5839,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_filter_min => 'Min';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'Aucun binome assigne';
+
+  @override
   String get diveLog_filter_noTagsYet => 'Aucun tag cree pour le moment';
 
   @override
@@ -5880,6 +5886,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get diveLog_filter_showOnlyFavorites =>
       'Afficher uniquement les plongees favorites';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Afficher uniquement les plongees sans binome';
 
   @override
   String get diveLog_filter_startDate => 'Date de debut';

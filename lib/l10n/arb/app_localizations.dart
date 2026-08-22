@@ -9539,6 +9539,12 @@ abstract class AppLocalizations {
   /// **'From {date}'**
   String diveLog_filterChip_from(Object date);
 
+  /// No description provided for @diveLog_filterChip_noBuddy.
+  ///
+  /// In en, this message translates to:
+  /// **'No Buddy'**
+  String get diveLog_filterChip_noBuddy;
+
   /// No description provided for @diveLog_filterChip_until.
   ///
   /// In en, this message translates to:
@@ -9653,6 +9659,12 @@ abstract class AppLocalizations {
   /// **'Min'**
   String get diveLog_filter_min;
 
+  /// No description provided for @diveLog_filter_noBuddyOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'No Buddy Assigned'**
+  String get diveLog_filter_noBuddyOnly;
+
   /// No description provided for @diveLog_filter_noTagsYet.
   ///
   /// In en, this message translates to:
@@ -9742,6 +9754,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show only favorite dives'**
   String get diveLog_filter_showOnlyFavorites;
+
+  /// No description provided for @diveLog_filter_showOnlyNoBuddy.
+  ///
+  /// In en, this message translates to:
+  /// **'Show only dives without a buddy'**
+  String get diveLog_filter_showOnlyNoBuddy;
 
   /// No description provided for @diveLog_filter_startDate.
   ///

@@ -5646,6 +5646,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'No Buddy';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Until $date';
   }
@@ -5705,6 +5708,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_filter_min => 'Min';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'No Buddy Assigned';
+
+  @override
   String get diveLog_filter_noTagsYet => 'No tags created yet';
 
   @override
@@ -5748,6 +5754,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'Show only favorite dives';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Show only dives without a buddy';
 
   @override
   String get diveLog_filter_startDate => 'Start Date';

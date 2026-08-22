@@ -5632,6 +5632,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'بدون زميل';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'حتى $date';
   }
@@ -5691,6 +5694,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filter_min => 'الأدنى';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'بدون زميل غوص';
+
+  @override
   String get diveLog_filter_noTagsYet => 'لم يتم إنشاء وسوم بعد';
 
   @override
@@ -5734,6 +5740,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'عرض الغوصات المفضلة فقط';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy => 'عرض الغوصات بدون زميل غوص فقط';
 
   @override
   String get diveLog_filter_startDate => 'تاريخ البدء';
