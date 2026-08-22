@@ -117,7 +117,7 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
   }
 
   // No buddy: neither the legacy scalar column nor a junction-linked buddy
-  // is set, mirroring DiveRepositoryImpl and DiveFilterState.apply.
+  // is set, mirroring DiveRepository and DiveFilterState.apply.
   if (filter.noBuddyOnly == true) {
     conditions.add(
       "(buddy IS NULL OR buddy = '') AND "
@@ -129,7 +129,7 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
   // column OR any junction-linked buddy's name. The dive editor writes only
   // the dive_buddies junction; the scalar covers old data (#757).
   // Comma-separated names must each match (AND semantics), mirroring
-  // DiveRepositoryImpl and DiveFilterState.apply.
+  // DiveRepository and DiveFilterState.apply.
   if (filter.buddyNameFilter != null && filter.buddyNameFilter!.isNotEmpty) {
     final names = filter.buddyNameFilter!
         .split(',')
