@@ -134,6 +134,12 @@ final blenderBillingProvider = Provider<BillingResult>((ref) {
   );
 });
 
+// no-tick: a one-shot SEED with side effects, not a cached query. Re-running
+// it rewrites seven StateProviders and bumps the reset epoch, so a tick from
+// the blender's own save would re-seed every text field while the diver was
+// still typing in it. The trade is deliberate and bounded: preferences changed
+// on another device arrive on the next open of the calculator rather than
+// mid-session, and nothing here renders a stale query result.
 /// Loads the saved preferences once and pushes them into the state providers.
 ///
 /// A first run has no stored blob, which is exactly what seeds the default
