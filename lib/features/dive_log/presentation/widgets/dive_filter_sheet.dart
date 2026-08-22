@@ -62,6 +62,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
 
   // v1.5 filters
   late String? _buddyNameFilter;
+  late bool _noBuddyOnly;
   late double? _minO2Percent;
   late double? _maxO2Percent;
   late int? _minRating;
@@ -103,6 +104,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
     // v1.5 filters
     _buddyNameFilter = filter.buddyNameFilter;
     _buddyNameController.text = _buddyNameFilter ?? '';
+    _noBuddyOnly = filter.noBuddyOnly ?? false;
     _minO2Percent = filter.minO2Percent;
     _maxO2Percent = filter.maxO2Percent;
     _minRating = filter.minRating;
@@ -742,6 +744,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
 
                               setState(() {
                                 _buddyNameFilter = newText;
+                                _noBuddyOnly = false;
                               });
                             },
                             fieldViewBuilder:
@@ -766,6 +769,9 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                                         _buddyNameFilter = value.isEmpty
                                             ? null
                                             : value;
+                                        if (value.isNotEmpty) {
+                                          _noBuddyOnly = false;
+                                        }
                                       });
                                     },
                                     // Commits the highlighted suggestion when the
@@ -802,6 +808,26 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                               );
                             },
                           );
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      // Mutually exclusive with the buddy name filter above: a
+                      // dive either has a buddy to search for, or has none.
+                      SwitchListTile(
+                        title: Text(context.l10n.diveLog_filter_noBuddyOnly),
+                        subtitle: Text(
+                          context.l10n.diveLog_filter_showOnlyNoBuddy,
+                        ),
+                        secondary: const Icon(Icons.person_off),
+                        value: _noBuddyOnly,
+                        onChanged: (value) {
+                          setState(() {
+                            _noBuddyOnly = value;
+                            if (value) {
+                              _buddyNameFilter = null;
+                              _buddyNameController.clear();
+                            }
+                          });
                         },
                       ),
                       const SizedBox(height: 24),
@@ -1107,6 +1133,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
       tagIds: _selectedTagIds,
       // v1.5 filters
       buddyNameFilter: _buddyNameFilter,
+      noBuddyOnly: _noBuddyOnly ? true : null,
       minO2Percent: _minO2Percent,
       maxO2Percent: _maxO2Percent,
       minRating: _minRating,

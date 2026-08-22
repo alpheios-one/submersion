@@ -116,6 +116,15 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
     conditions.add('is_favorite = 1');
   }
 
+  // No buddy: neither the legacy scalar column nor a junction-linked buddy
+  // is set, mirroring DiveRepositoryImpl and DiveFilterState.apply.
+  if (filter.noBuddyOnly == true) {
+    conditions.add(
+      "(buddy IS NULL OR buddy = '') AND "
+      'NOT EXISTS (SELECT 1 FROM dive_buddies WHERE dive_id = id)',
+    );
+  }
+
   // Buddy free-text: case-insensitive substring against the legacy scalar
   // column OR any junction-linked buddy's name. The dive editor writes only
   // the dive_buddies junction; the scalar covers old data (#757).
