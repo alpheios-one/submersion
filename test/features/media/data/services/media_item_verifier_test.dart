@@ -96,8 +96,37 @@ void main() {
     expect(repository.written.single.lastVerifiedAt, stamp);
   });
 
-  test('unauthenticated sets the orphan flag', () async {
-    await build(VerifyResult.unauthenticated).verify(_item());
+  // notFound is the ONLY positive finding. Everything below describes a
+  // failure to REACH the source, which says nothing about whether the bytes
+  // still exist, and the orphan flag is sticky and syncs.
+  test('unauthenticated stamps the date but never orphans', () async {
+    // Emitted when a Lightroom account is not connected
+    // (connector_media_resolver.dart:67) and on a 401. Orphaning here would
+    // empty a connector library because a token expired.
+    final result = await build(
+      VerifyResult.unauthenticated,
+    ).verify(_item(isOrphaned: false));
+
+    expect(result, VerifyResult.unauthenticated);
+    expect(repository.written.single.isOrphaned, isFalse);
+    expect(repository.written.single.lastVerifiedAt, stamp);
+  });
+
+  test('fromOtherDevice stamps the date but never orphans', () async {
+    // "Not resolvable HERE" is not "absent". Orphaning would mark a row
+    // missing on this device and sync that claim to the device the file
+    // actually lives on.
+    final result = await build(
+      VerifyResult.fromOtherDevice,
+    ).verify(_item(isOrphaned: false));
+
+    expect(result, VerifyResult.fromOtherDevice);
+    expect(repository.written.single.isOrphaned, isFalse);
+    expect(repository.written.single.lastVerifiedAt, stamp);
+  });
+
+  test('neither clears an existing orphan flag', () async {
+    await build(VerifyResult.fromOtherDevice).verify(_item(isOrphaned: true));
 
     expect(repository.written.single.isOrphaned, isTrue);
   });

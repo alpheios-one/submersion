@@ -125,10 +125,15 @@ void main() {
     // A pass that could not read the photo library checked nothing. Reporting
     // "0 items updated" would read as a clean bill of health for a library
     // nobody looked at.
+    // Must stay in step with MediaItemVerifier: anything it declines to act
+    // on is a row this pass did not verify, and counting it as flipped would
+    // report work that never happened.
     for (final result in const [
       VerifyResult.accessDenied,
       VerifyResult.volumeOffline,
       VerifyResult.transientError,
+      VerifyResult.unauthenticated,
+      VerifyResult.fromOtherDevice,
     ]) {
       test('$result counts as inconclusive and never as flipped', () async {
         final repository = _StubRepository([_item('a', isOrphaned: false)]);

@@ -422,12 +422,14 @@ class _CheckNowButtonState extends ConsumerState<_CheckNowButton> {
       if (!mounted) return;
       final message = switch (result) {
         VerifyResult.available => l10n.media_info_checkFound,
-        VerifyResult.notFound ||
+        VerifyResult.notFound => l10n.media_info_checkMissing,
+        // Everything below is a reachability problem, not data loss, and the
+        // wording has to match what the verifier actually did: none of these
+        // move the orphan flag, so "Source is missing" would tell the user
+        // their photo is gone over a revoked permission, a disconnected
+        // Lightroom account, or a file that lives on their other machine.
         VerifyResult.unauthenticated ||
-        VerifyResult.fromOtherDevice => l10n.media_info_checkMissing,
-        // accessDenied belongs here rather than with checkMissing: the check
-        // did not conclude, and "Source is missing" would report a revoked
-        // photo permission as data loss.
+        VerifyResult.fromOtherDevice ||
         VerifyResult.transientError ||
         VerifyResult.volumeOffline ||
         VerifyResult.accessDenied => l10n.media_info_checkUnavailable,

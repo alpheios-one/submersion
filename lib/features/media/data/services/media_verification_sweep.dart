@@ -74,12 +74,16 @@ class MediaVerificationSweep {
       final item = items[i];
       try {
         final result = await _verifier.verify(item);
-        if (result == VerifyResult.accessDenied ||
-            result == VerifyResult.transientError ||
-            result == VerifyResult.volumeOffline) {
+        // Mirrors MediaItemVerifier's own predicate rather than restating its
+        // exclusion list. The two drifting apart is exactly how the sweep
+        // would start reporting updates for rows the verifier declined to
+        // touch, so both are written as "notFound is the only positive
+        // finding".
+        if (result != VerifyResult.available &&
+            result != VerifyResult.notFound) {
           // Nothing was learned, and MediaItemVerifier left the flag alone.
           inconclusive++;
-        } else if ((result != VerifyResult.available) != item.isOrphaned) {
+        } else if ((result == VerifyResult.notFound) != item.isOrphaned) {
           flipped++;
         }
       } catch (e, st) {

@@ -30,13 +30,23 @@ bool? _desiredFlag(UnavailableKind? failure) {
   // Bytes arrived, so the source demonstrably still has it.
   if (failure == null) return false;
   return switch (failure) {
-    // The source was consulted and does not have this item.
+    // The ONLY positive finding: the source was consulted and does not have
+    // this item. Every other kind below describes a failure to reach the
+    // source, which teaches nothing about whether the bytes still exist.
     UnavailableKind.notFound => true,
-    UnavailableKind.unauthenticated => true,
 
-    // The source refused to answer. The single most important null here:
-    // a revoked photo permission makes EVERY gallery row fail at once, so
-    // getting this wrong is a whole-library event, not a one-row event.
+    // "We lack the credentials or config to reach this", never "it is gone".
+    // MediaStoreSourceResolver returns it for EVERY mediaStore row when no
+    // store is configured, with the comment "the bytes exist, this device
+    // just cannot reach them. Renders as needs-setup, never as missing".
+    // ConnectorMediaResolver returns it for every Lightroom row when the
+    // account is not connected, and on a 401. Orphaning here would empty a
+    // library because a token expired.
+    UnavailableKind.unauthenticated => null,
+
+    // The source refused to answer. A revoked photo permission fails EVERY
+    // gallery row at once, so getting this wrong is a whole-library event,
+    // not a one-row event.
     UnavailableKind.accessDenied => null,
 
     // Recoverable by a user action; the item is probably still there.

@@ -20,16 +20,6 @@ void main() {
         isTrue,
       );
     });
-
-    test('unauthenticated orphans a row currently marked present', () {
-      expect(
-        reconciledOrphanFlag(
-          currentlyOrphaned: false,
-          failure: UnavailableKind.unauthenticated,
-        ),
-        isTrue,
-      );
-    });
   });
 
   group('no write when the flag already agrees', () {
@@ -60,11 +50,22 @@ void main() {
     // asset exists. Orphaning on any of them would report a recoverable
     // condition as permanent data loss, and sync would replicate it.
     //
-    // accessDenied is the most dangerous of the set: a revoked photo
-    // permission makes every gallery row fail at once, so a single wrong
-    // answer here is a whole-library event rather than a one-row event.
+    // Two of these are whole-library events rather than one-row events, so a
+    // wrong answer is catastrophic rather than untidy:
+    //
+    // accessDenied: a revoked photo permission fails every gallery row at
+    // once.
+    //
+    // unauthenticated: it means "we lack the credentials or config to reach
+    // this", never "it is gone". MediaStoreSourceResolver returns it for
+    // EVERY mediaStore row when no store is configured, with the comment
+    // "the bytes exist, this device just cannot reach them. Renders as
+    // needs-setup, never as missing" (media_store_source_resolver.dart:39-42).
+    // ConnectorMediaResolver returns it for every Lightroom row when the
+    // account is not connected, and on a 401.
     for (final kind in const [
       UnavailableKind.accessDenied,
+      UnavailableKind.unauthenticated,
       UnavailableKind.stillFetching,
       UnavailableKind.networkError,
       UnavailableKind.volumeOffline,
