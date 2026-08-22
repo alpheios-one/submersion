@@ -17,6 +17,7 @@ import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
+import 'package:submersion/shared/widgets/forms/form_row.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -70,9 +71,10 @@ void main() {
     testWidgets('renders gated Logistics + Notes fields', (tester) async {
       await pumpBulk(tester);
 
-      // 4 Logistics + 9 Conditions + 6 Weather + 6 Rebreather + 1 Notes gates.
+      // 4 Logistics + 9 Conditions + 6 Weather + 6 Rebreather + 1 Buddies
+      // (my role, #1220) + 1 Notes gates.
       // (dive type moved from a scalar gate to the collection lane, #414)
-      expect(find.byType(BulkFieldGate), findsNWidgets(26));
+      expect(find.byType(BulkFieldGate), findsNWidgets(27));
       expect(find.text('Favorite'), findsOneWidget);
       // Only the 3 owned collections (weights, tanks, sightings) still use a
       // mode selector; the 4 reference collections (tags, diveTypes,
@@ -199,6 +201,72 @@ void main() {
         expect(saved.single.role.id, DiveRole.instructorId);
       },
     );
+
+    testWidgets('the My role gate applies the picked role to every dive', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final d1 = await repository.createDive(
+        createTestDiveWithBottomTime().copyWith(id: 'my-role-1'),
+      );
+      final d2 = await repository.createDive(
+        createTestDiveWithBottomTime().copyWith(id: 'my-role-2'),
+      );
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: buildOverrides(overrides).cast(),
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: DiveEditPage(bulkDiveIds: [d1.id, d2.id], embedded: true),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final roleGate = find.ancestor(
+        of: find.text('My role'),
+        matching: find.byType(BulkFieldGate),
+      );
+      await tester.ensureVisible(roleGate);
+      await tester.tap(
+        find.descendant(of: roleGate, matching: find.byType(Checkbox)),
+      );
+      await tester.pumpAndSettle();
+
+      // Open the role selector from the picker row and choose Instructor.
+      await tester.tap(
+        find.descendant(of: roleGate, matching: find.byType(FormRow)),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Instructor'));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Apply'));
+      await tester.pumpAndSettle();
+
+      expect(
+        (await repository.getDiveById(d1.id))!.diverRoleId,
+        DiveRole.instructorId,
+      );
+      expect(
+        (await repository.getDiveById(d2.id))!.diverRoleId,
+        DiveRole.instructorId,
+      );
+    });
 
     testWidgets('toggling a gate enables its checkbox', (tester) async {
       await pumpBulk(tester);

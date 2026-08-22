@@ -364,6 +364,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => 'Preferito';
 
   @override
+  String get diveLog_bulkEdit_fieldMyRole => 'Il mio ruolo';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'Zavorre';
 
   @override

@@ -358,6 +358,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => 'מועדף';
 
   @override
+  String get diveLog_bulkEdit_fieldMyRole => 'התפקיד שלי';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'משקולות';
 
   @override

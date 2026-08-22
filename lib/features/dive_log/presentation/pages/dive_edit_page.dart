@@ -20,6 +20,9 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/visibility_display.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
+import 'package:submersion/features/dive_roles/presentation/dive_role_display.dart';
+import 'package:submersion/features/dive_roles/presentation/providers/dive_role_providers.dart';
+import 'package:submersion/features/dive_roles/presentation/widgets/dive_role_selector_sheet.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/buddies/presentation/widgets/buddy_picker.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -1105,6 +1108,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       diveCenterId: _selectedDiveCenter?.id,
       tripId: _selectedTrip?.id,
       courseId: _selectedCourse?.id,
+      diverRoleId: _diverRoleId,
       rating: _rating > 0 ? _rating : null,
       isFavorite: _bulkFavorite,
       waterType: _waterType?.name,
@@ -1187,6 +1191,39 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         if (mode != null) editor,
       ],
     );
+  }
+
+  /// Localized name of the role currently staged for the bulk "My role" gate,
+  /// or null when no role is staged (the row then shows its placeholder).
+  String? _bulkDiverRoleLabel() {
+    // Watched before the null check so the row stays subscribed while no role
+    // is staged and relabels itself once the role list resolves.
+    final rolesById =
+        ref.watch(diveRoleMapProvider).value ?? const <String, DiveRole>{};
+    final id = _diverRoleId;
+    if (id == null) return null;
+    return (rolesById[id] ?? DiveRole.synthetic(id)).localizedName(
+      context.l10n,
+    );
+  }
+
+  Future<void> _showBulkDiverRolePicker() async {
+    // Awaited rather than read off the AsyncValue: nothing here watches the
+    // role list, so a plain read can hand back a still-loading empty list.
+    final roles = await ref.read(allDiveRolesProvider.future);
+    if (!mounted) return;
+    final selection = await showDiveRoleSelector(
+      context,
+      title: context.l10n.buddies_picker_selectMyRole,
+      roles: roles,
+      allowNone: true,
+      selectedRoleId: _diverRoleId,
+    );
+    if (selection == null || !mounted) return;
+    setState(() {
+      _markDirty();
+      _diverRoleId = selection.role?.id;
+    });
   }
 
   Widget _bulkTanksEditor(UnitFormatter units) {
@@ -1283,6 +1320,24 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           counts: _buddyCounts,
           onAdd: _bulkAddBuddies,
           onChanged: (d) => setState(() => _buddyDelta = d),
+        ),
+        // The diver's own role is a scalar column, not a membership row, so it
+        // rides the gate lane. It sits with Buddies because that is where the
+        // single-dive editor keeps it (#1220).
+        _gatedRow(
+          BulkField.diverRole,
+          FormRow.picker(
+            label: l10n.diveLog_bulkEdit_fieldMyRole,
+            value: _bulkDiverRoleLabel(),
+            placeholder: l10n.diveLog_edit_row_notSet,
+            onTap: _showBulkDiverRolePicker,
+            onClear: _diverRoleId == null
+                ? null
+                : () => setState(() {
+                    _markDirty();
+                    _diverRoleId = null;
+                  }),
+          ),
         ),
         _collectionEntry(
           type: BulkCollectionType.weights,
