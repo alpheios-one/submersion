@@ -92,6 +92,7 @@ void main() {
     double? avgDepth,
     int? duration,
     double? waterTemp,
+    double? cns,
     int? timeOffsetSeconds,
     DateTime? entryTime,
     DateTime? exitTime,
@@ -110,6 +111,7 @@ void main() {
             avgDepth: Value(avgDepth),
             duration: Value(duration),
             waterTemp: Value(waterTemp),
+            cns: Value(cns),
             timeOffsetSeconds: Value(timeOffsetSeconds),
             entryTime: Value(entryTime),
             exitTime: Value(exitTime),
@@ -622,6 +624,78 @@ void main() {
       expect(src.libdivecomputerVersion, '0.9.0');
       expect(src.lastParsedAt, isNotNull);
     });
+
+    test('refreshes DiveDataSources.cns from the re-parsed samples', () async {
+      // Arrange: the source row carries the CNS the original download derived.
+      await insertDive('dive-1');
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+        cns: 12.0,
+      );
+
+      // Act: re-parse produces a higher CNS, as a libdivecomputer fix might.
+      final parsed = makeParsedDive(
+        samples: [
+          pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0, cns: 5.0),
+          pigeon.ProfileSample(timeSeconds: 60, depthMeters: 20.0, cns: 41.0),
+          pigeon.ProfileSample(timeSeconds: 120, depthMeters: 25.0, cns: 55.0),
+          pigeon.ProfileSample(timeSeconds: 180, depthMeters: 5.0, cns: 55.0),
+        ],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: parsed,
+        descriptorVendor: 'Shearwater',
+        descriptorProduct: 'Perdix',
+        descriptorModel: 42,
+        libdivecomputerVersion: '0.9.0',
+      );
+
+      // Assert: the source row and the dive row agree, both on the new value.
+      final src = await getSource('src-1');
+      final dive = await getDive('dive-1');
+      expect(src.cns, 55.0);
+      expect(dive.cnsEnd, 55.0);
+    });
+
+    test(
+      'clears DiveDataSources.cns when the re-parse reports no CNS',
+      () async {
+        // Arrange
+        await insertDive('dive-1', cnsEnd: 12.0);
+        await insertComputer('comp-1');
+        await insertSource(
+          id: 'src-1',
+          diveId: 'dive-1',
+          computerId: 'comp-1',
+          isPrimary: true,
+          cns: 12.0,
+        );
+
+        // Act: the default samples carry no CNS at all.
+        await service.applyParsedUpdate(
+          diveId: 'dive-1',
+          sourceRowId: 'src-1',
+          parsed: makeParsedDive(),
+          descriptorVendor: 'Shearwater',
+          descriptorProduct: 'Perdix',
+          descriptorModel: 42,
+          libdivecomputerVersion: '0.9.0',
+        );
+
+        // Assert: a stale value is not left behind on either row.
+        final src = await getSource('src-1');
+        final dive = await getDive('dive-1');
+        expect(src.cns, isNull);
+        expect(dive.cnsEnd, isNull);
+      },
+    );
 
     test('derives water temp from profile samples when the computer reports no '
         'top-level minimum', () async {
