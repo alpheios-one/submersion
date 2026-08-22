@@ -65,6 +65,7 @@
   "gasCalculators_blender_templateSaved": "{mix} guardada",
   "gasCalculators_blender_templateExists": "Essa mistura já está guardada.",
   "gasCalculators_blender_templateInvalid": "O₂ + He não pode exceder 100%.",
+  "gasCalculators_blender_templateNeedsNumbers": "Introduz O₂ e He como números.",
   "gasCalculators_blender_templateLimit": "Podes guardar até {count} modelos.",
   "gasCalculators_blender_templateNone": "Ainda sem modelos. Guarda uma mistura alvo para a reutilizares aqui.",
   "gasCalculators_blender_templateDelete": "Eliminar {mix}",

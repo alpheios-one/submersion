@@ -11874,6 +11874,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'O₂ + He mag niet meer dan 100% zijn.';
 
   @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'Voer zowel O₂ als He als getal in.';
+
+  @override
   String gasCalculators_blender_templateLimit(int count) {
     return 'Je kunt maximaal $count sjablonen opslaan.';
   }

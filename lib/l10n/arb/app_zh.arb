@@ -65,6 +65,7 @@
   "gasCalculators_blender_templateSaved": "已保存 {mix}",
   "gasCalculators_blender_templateExists": "该混合气已保存。",
   "gasCalculators_blender_templateInvalid": "O₂ + He 不能超过 100%。",
+  "gasCalculators_blender_templateNeedsNumbers": "请将 O₂ 和 He 都填成数字。",
   "gasCalculators_blender_templateLimit": "最多可保存 {count} 个模板。",
   "gasCalculators_blender_templateNone": "还没有模板。保存一个目标混合气即可在此重复使用。",
   "gasCalculators_blender_templateDelete": "删除 {mix}",

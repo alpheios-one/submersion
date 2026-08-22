@@ -136,5 +136,46 @@ void main() {
       expect(result.lines[1].cost, closeTo(0.20, 1e-9));
       expect(result.total, closeTo(2.0 + 0.20, 1e-9));
     });
+    test('a billable step with no bank trips the guard in debug', () {
+      // Raised in review on PR #1215. BlendStep says a billable step always
+      // names its bank, but defaulting a missing one to 0 would charge
+      // oxygen's rate for whatever the gas actually is. Debug builds fail
+      // loudly rather than mis-bill.
+      expect(
+        () => computeBlendCost(
+          blend: _blend([_step(null, 0), _step(_he, 50)]),
+          waterLiters: 10,
+          pricesPer100: [2.0, 50.0, 0.10],
+        ),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('every step from a real blend names its bank', () {
+      // The invariant the assert protects, exercised through the solver rather
+      // than through hand-built steps.
+      final blend = computeBlend(
+        const GasBlenderInputs(
+          startPressureBar: 0,
+          start: GasMix(o2: 21),
+          targetPressureBar: 200,
+          target: GasMix(o2: 32),
+          fillGas1: _o2,
+          fillGas2: GasMix(o2: 0, he: 100),
+          fillGas3: _air,
+        ),
+      );
+      for (final step in blend.steps) {
+        expect(step.fillGasIndex == null, step.fillGas == null);
+      }
+      final result = computeBlendCost(
+        blend: blend,
+        waterLiters: 12,
+        pricesPer100: [2.0, 50.0, 0.10],
+      );
+      // O2 came from bank 0 and air from bank 2, the helium bank untouched.
+      expect(result.lines.map((l) => l.gasIndex).toList(), [0, 2]);
+      expect(result.total, isNotNull);
+    });
   });
 }

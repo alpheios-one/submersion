@@ -65,6 +65,7 @@
   "gasCalculators_blender_templateSaved": "{mix} elmentve",
   "gasCalculators_blender_templateExists": "Ez a keverék már mentve van.",
   "gasCalculators_blender_templateInvalid": "Az O₂ + He nem haladhatja meg a 100%-ot.",
+  "gasCalculators_blender_templateNeedsNumbers": "Az O₂ és a He értékét is számként add meg.",
   "gasCalculators_blender_templateLimit": "Legfeljebb {count} sablont menthetsz.",
   "gasCalculators_blender_templateNone": "Még nincs sablon. Ments el egy cél keveréket, hogy itt újra használhasd.",
   "gasCalculators_blender_templateDelete": "{mix} törlése",

@@ -11415,6 +11415,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_templateInvalid => 'O₂ + He 不能超过 100%。';
 
   @override
+  String get gasCalculators_blender_templateNeedsNumbers => '请将 O₂ 和 He 都填成数字。';
+
+  @override
   String gasCalculators_blender_templateLimit(int count) {
     return '最多可保存 $count 个模板。';
   }

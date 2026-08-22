@@ -48,7 +48,10 @@ class _MixTemplateDialogState extends ConsumerState<_MixTemplateDialog> {
     final o2 = parseUserDecimal(_o2.text);
     final he = parseUserDecimal(_he.text);
     if (o2 == null || he == null) {
-      _say(context.l10n.gasCalculators_blender_templateInvalid);
+      // Not the same complaint as an impossible mix: a blank or half-typed
+      // box is missing a number, and saying "O2 + He cannot exceed 100%"
+      // sends the user looking for a problem that is not there.
+      _say(context.l10n.gasCalculators_blender_templateNeedsNumbers);
       return;
     }
     final candidate = MixTemplate(o2: o2, he: he);

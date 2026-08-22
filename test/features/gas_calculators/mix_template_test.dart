@@ -166,4 +166,38 @@ void main() {
       const MixTemplate(o2: 21, he: 35),
     );
   });
+  testWidgets('a blank box is reported as missing, not as an impossible mix', (
+    tester,
+  ) async {
+    // Raised in review on PR #1215: an empty field showed "O2 + He cannot
+    // exceed 100%", which sends the user looking for a problem that is not
+    // there.
+    await _pump(tester);
+    await tester.tap(find.byType(MixTemplateMenu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Manage templates'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add template'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('as numbers'), findsOneWidget);
+    expect(find.textContaining('cannot exceed 100%'), findsNothing);
+  });
+
+  testWidgets('an impossible mix still says so', (tester) async {
+    await _pump(tester);
+    await tester.tap(find.byType(MixTemplateMenu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Manage templates'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, '60');
+    await tester.enterText(find.byType(TextField).last, '70');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Add template'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('cannot exceed 100%'), findsOneWidget);
+  });
 }

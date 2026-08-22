@@ -11673,6 +11673,10 @@ class AppLocalizationsHe extends AppLocalizations {
       '‏O₂ + He לא יכולים לעלות על 100%.';
 
   @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'הזן גם O₂ וגם He כמספרים.';
+
+  @override
   String gasCalculators_blender_templateLimit(int count) {
     return 'אפשר לשמור עד $count תבניות.';
   }

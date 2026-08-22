@@ -17,7 +17,12 @@ class GasCostLine {
 
   /// Which configured bank this line charges, so the UI can label it against
   /// the same slot the price was entered under.
-  final int gasIndex;
+  ///
+  /// Null only if a billable step reached costing without naming its bank,
+  /// which [BlendStep.fillGasIndex] says cannot happen. It is nullable anyway
+  /// because the cost of being wrong is a wrongly priced invoice, and an
+  /// unpriced line is a far better failure than a confidently mispriced one.
+  final int? gasIndex;
 
   /// Bar delivered for this gas, read at the fill temperature.
   final double addedBar;
@@ -76,8 +81,12 @@ BillingResult computeBlendCost({
   var complete = true;
 
   for (final step in fills) {
-    final slot = step.fillGasIndex ?? 0;
-    final price = !priceable || slot >= pricesPer100.length
+    final slot = step.fillGasIndex;
+    // Defaulting a missing bank to 0 would quietly charge oxygen's rate for
+    // whatever gas this actually is. Leaving it unpriced makes the total
+    // report itself incomplete instead (PR #1215 review).
+    assert(slot != null, 'a billable step must name the bank it drew from');
+    final price = !priceable || slot == null || slot >= pricesPer100.length
         ? null
         : pricesPer100[slot];
     final liters = volume * step.addedBar;

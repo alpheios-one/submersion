@@ -65,6 +65,7 @@
   "gasCalculators_blender_templateSaved": "{mix} נשמרה",
   "gasCalculators_blender_templateExists": "התערובת הזו כבר שמורה.",
   "gasCalculators_blender_templateInvalid": "‏O₂ + He לא יכולים לעלות על 100%.",
+  "gasCalculators_blender_templateNeedsNumbers": "הזן גם O₂ וגם He כמספרים.",
   "gasCalculators_blender_templateLimit": "אפשר לשמור עד {count} תבניות.",
   "gasCalculators_blender_templateNone": "אין עדיין תבניות. שמור תערובת יעד כדי להשתמש בה כאן שוב.",
   "gasCalculators_blender_templateDelete": "מחק {mix}",

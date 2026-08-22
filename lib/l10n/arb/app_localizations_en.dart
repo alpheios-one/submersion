@@ -11766,6 +11766,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'O₂ + He cannot exceed 100%.';
 
   @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'Enter both O₂ and He as numbers.';
+
+  @override
   String gasCalculators_blender_templateLimit(int count) {
     return 'You can save up to $count templates.';
   }

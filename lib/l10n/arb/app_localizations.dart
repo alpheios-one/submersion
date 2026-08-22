@@ -20360,6 +20360,12 @@ abstract class AppLocalizations {
   /// **'O₂ + He cannot exceed 100%.'**
   String get gasCalculators_blender_templateInvalid;
 
+  /// No description provided for @gasCalculators_blender_templateNeedsNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter both O₂ and He as numbers.'**
+  String get gasCalculators_blender_templateNeedsNumbers;
+
   /// No description provided for @gasCalculators_blender_templateLimit.
   ///
   /// In en, this message translates to:

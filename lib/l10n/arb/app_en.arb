@@ -6774,6 +6774,7 @@
   "gasCalculators_blender_templateSaved": "Saved {mix}",
   "gasCalculators_blender_templateExists": "That mix is already saved.",
   "gasCalculators_blender_templateInvalid": "O₂ + He cannot exceed 100%.",
+  "gasCalculators_blender_templateNeedsNumbers": "Enter both O₂ and He as numbers.",
   "gasCalculators_blender_templateLimit": "You can save up to {count} templates.",
   "gasCalculators_blender_templateNone": "No templates yet. Save a target mix to reuse it here.",
   "gasCalculators_blender_templateDelete": "Delete {mix}",

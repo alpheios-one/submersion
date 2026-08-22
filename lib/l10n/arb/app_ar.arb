@@ -65,6 +65,7 @@
   "gasCalculators_blender_templateSaved": "تم حفظ {mix}",
   "gasCalculators_blender_templateExists": "هذا الخليط محفوظ بالفعل.",
   "gasCalculators_blender_templateInvalid": "لا يمكن أن يتجاوز O₂ + He‏ 100%.",
+  "gasCalculators_blender_templateNeedsNumbers": "أدخل كلًا من O₂ وHe كأرقام.",
   "gasCalculators_blender_templateLimit": "يمكنك حفظ ما يصل إلى {count} قالبًا.",
   "gasCalculators_blender_templateNone": "لا توجد قوالب بعد. احفظ خليطًا مستهدفًا لإعادة استخدامه هنا.",
   "gasCalculators_blender_templateDelete": "حذف {mix}",

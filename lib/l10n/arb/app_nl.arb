@@ -65,6 +65,7 @@
   "gasCalculators_blender_templateSaved": "{mix} opgeslagen",
   "gasCalculators_blender_templateExists": "Dat mengsel is al opgeslagen.",
   "gasCalculators_blender_templateInvalid": "O₂ + He mag niet meer dan 100% zijn.",
+  "gasCalculators_blender_templateNeedsNumbers": "Voer zowel O₂ als He als getal in.",
   "gasCalculators_blender_templateLimit": "Je kunt maximaal {count} sjablonen opslaan.",
   "gasCalculators_blender_templateNone": "Nog geen sjablonen. Sla een doelmengsel op om het hier opnieuw te gebruiken.",
   "gasCalculators_blender_templateDelete": "{mix} verwijderen",

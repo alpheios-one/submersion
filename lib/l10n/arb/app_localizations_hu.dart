@@ -11933,6 +11933,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az O₂ + He nem haladhatja meg a 100%-ot.';
 
   @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'Az O₂ és a He értékét is számként add meg.';
+
+  @override
   String gasCalculators_blender_templateLimit(int count) {
     return 'Legfeljebb $count sablont menthetsz.';
   }

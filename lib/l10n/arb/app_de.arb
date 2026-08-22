@@ -65,6 +65,7 @@
   "gasCalculators_blender_templateSaved": "{mix} gespeichert",
   "gasCalculators_blender_templateExists": "Diese Mischung ist bereits gespeichert.",
   "gasCalculators_blender_templateInvalid": "O₂ + He darf 100 % nicht überschreiten.",
+  "gasCalculators_blender_templateNeedsNumbers": "Gib O₂ und He beide als Zahl ein.",
   "gasCalculators_blender_templateLimit": "Du kannst bis zu {count} Vorlagen speichern.",
   "gasCalculators_blender_templateNone": "Noch keine Vorlagen. Speichere eine Zielmischung, um sie hier wiederzuverwenden.",
   "gasCalculators_blender_templateDelete": "{mix} löschen",

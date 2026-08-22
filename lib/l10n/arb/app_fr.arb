@@ -65,6 +65,7 @@
   "gasCalculators_blender_templateSaved": "{mix} enregistré",
   "gasCalculators_blender_templateExists": "Ce mélange est déjà enregistré.",
   "gasCalculators_blender_templateInvalid": "O₂ + He ne peut pas dépasser 100 %.",
+  "gasCalculators_blender_templateNeedsNumbers": "Saisissez O₂ et He sous forme de nombres.",
   "gasCalculators_blender_templateLimit": "Vous pouvez enregistrer jusqu'à {count} modèles.",
   "gasCalculators_blender_templateNone": "Aucun modèle pour l'instant. Enregistrez un mélange cible pour le réutiliser ici.",
   "gasCalculators_blender_templateDelete": "Supprimer {mix}",

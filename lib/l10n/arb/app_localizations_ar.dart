@@ -11749,6 +11749,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يمكن أن يتجاوز O₂ + He‏ 100%.';
 
   @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'أدخل كلًا من O₂ وHe كأرقام.';
+
+  @override
   String gasCalculators_blender_templateLimit(int count) {
     return 'يمكنك حفظ ما يصل إلى $count قالبًا.';
   }
