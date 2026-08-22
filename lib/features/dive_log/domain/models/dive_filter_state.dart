@@ -16,6 +16,13 @@ class DiveFilterState {
   final double? minDepth;
   final double? maxDepth;
   final bool? favoritesOnly;
+  /// Decompression status, from the recorded profile signal (deco stop type,
+  /// deco-stop events, or a positive ceiling with no deco-type data at all —
+  /// see `scanRecordedDecoSignals` in StatisticsRepository). Null means no
+  /// filter; true/false restrict to deco/no-deco dives. Dives whose status is
+  /// unrecorded (no profile, or a profile needing the computed fallback)
+  /// match neither.
+  final bool? decoOnly;
   final List<String> tagIds;
 
   // v1.5: Additional filter criteria
@@ -56,6 +63,7 @@ class DiveFilterState {
     this.minDepth,
     this.maxDepth,
     this.favoritesOnly,
+    this.decoOnly,
     this.tagIds = const [],
     this.equipmentIds = const [],
     this.buddyNameFilter,
@@ -85,6 +93,7 @@ class DiveFilterState {
       minDepth != null ||
       maxDepth != null ||
       favoritesOnly == true ||
+      decoOnly != null ||
       tagIds.isNotEmpty ||
       equipmentIds.isNotEmpty ||
       (buddyNameFilter != null && buddyNameFilter!.isNotEmpty) ||
@@ -109,6 +118,7 @@ class DiveFilterState {
     double? minDepth,
     double? maxDepth,
     bool? favoritesOnly,
+    bool? decoOnly,
     List<String>? tagIds,
     List<String>? equipmentIds,
     String? buddyNameFilter,
@@ -135,6 +145,7 @@ class DiveFilterState {
     bool clearMinDepth = false,
     bool clearMaxDepth = false,
     bool clearFavoritesOnly = false,
+    bool clearDecoOnly = false,
     bool clearTagIds = false,
     bool clearEquipmentIds = false,
     bool clearBuddyNameFilter = false,
@@ -164,6 +175,7 @@ class DiveFilterState {
       favoritesOnly: clearFavoritesOnly
           ? null
           : (favoritesOnly ?? this.favoritesOnly),
+      decoOnly: clearDecoOnly ? null : (decoOnly ?? this.decoOnly),
       tagIds: clearTagIds ? const [] : (tagIds ?? this.tagIds),
       equipmentIds: clearEquipmentIds
           ? const []
@@ -252,6 +264,9 @@ class DiveFilterState {
         return false;
       }
       if (favoritesOnly == true && !dive.isFavorite) {
+        return false;
+      }
+      if (decoOnly != null && !_matchesDecoFilter(dive, decoOnly!)) {
         return false;
       }
       if (tagIds.isNotEmpty) {
@@ -356,4 +371,22 @@ class DiveFilterState {
       return true;
     }).toList();
   }
+}
+
+/// Recorded-signal deco classification, mirroring
+/// `StatisticsRepository.scanRecordedDecoSignals` (SQL) using the profile
+/// points already hydrated on [dive]. Deco-stop *events* are not loaded onto
+/// the entity, so unlike the SQL path this only sees the deco-type/ceiling
+/// signal; that gap only matters for dives whose computer logs a deco-stop
+/// event without also writing profile deco_type/ceiling data, which the
+/// paginated (SQL-backed) dive list still classifies correctly.
+bool _matchesDecoFilter(Dive dive, bool wantDeco) {
+  final hasDecoType = dive.profile.any((p) => p.decoType != null);
+  final hasDecoStop = dive.profile.any((p) => p.decoType == 2);
+  final hasPositiveCeiling = dive.profile.any(
+    (p) => p.ceiling != null && p.ceiling! > 0,
+  );
+  final isDeco = hasDecoStop || (!hasDecoType && hasPositiveCeiling);
+  final isNoDeco = hasDecoType && !hasDecoStop;
+  return wantDeco ? isDeco : isNoDeco;
 }

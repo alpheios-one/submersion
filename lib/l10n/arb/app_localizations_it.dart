@@ -7075,6 +7075,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
 
   @override
+  String get diveLog_search_label_deco => 'Decompressione';
+
+  @override
   String get diveLog_search_label_depthRange => 'Intervallo profondita (m)';
 
   @override

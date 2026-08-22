@@ -2236,6 +2236,7 @@
   "diveLog_search_errorLoadingDiveTypes": "Hiba a merülés típusok betöltésekor",
   "diveLog_search_errorLoadingTrips": "Hiba az utazasok betoltesekor",
   "diveLog_search_gasTrimix": "Trimix (<21% O₂)",
+  "diveLog_search_label_deco": "Dekompresszio",
   "diveLog_search_label_depthRange": "Melyseg tartomany (m)",
   "diveLog_search_label_diveCenter": "Merulokozpont",
   "diveLog_search_label_diveSite": "Merulohely",

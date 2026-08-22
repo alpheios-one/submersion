@@ -2236,6 +2236,7 @@
   "diveLog_search_errorLoadingDiveTypes": "שגיאה בטעינת סוגי צלילה",
   "diveLog_search_errorLoadingTrips": "שגיאה בטעינת טיולים",
   "diveLog_search_gasTrimix": "טריימיקס (<21% O₂)",
+  "diveLog_search_label_deco": "דקומפרסיה",
   "diveLog_search_label_depthRange": "טווח עומק (m)",
   "diveLog_search_label_diveCenter": "מרכז צלילה",
   "diveLog_search_label_diveSite": "אתר צלילה",

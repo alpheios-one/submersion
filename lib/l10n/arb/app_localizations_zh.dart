@@ -6722,6 +6722,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_search_gasTrimix => '三混气 (<21% O₂)';
 
   @override
+  String get diveLog_search_label_deco => '减压';
+
+  @override
   String get diveLog_search_label_depthRange => '深度范围（米）';
 
   @override

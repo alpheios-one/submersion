@@ -116,6 +116,12 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
     conditions.add('is_favorite = 1');
   }
 
+  if (filter.decoOnly != null) {
+    conditions.add(
+      decoSignalCondition(wantDeco: filter.decoOnly!, diveIdRef: 'dives.id'),
+    );
+  }
+
   // Buddy free-text: case-insensitive substring against the legacy scalar
   // column OR any junction-linked buddy's name. The dive editor writes only
   // the dive_buddies junction; the scalar covers old data (#757).
@@ -205,4 +211,45 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
     subquery: 'SELECT id FROM dives WHERE ${conditions.join(' AND ')}',
     params: params,
   );
+}
+
+/// Recorded deco-signal SQL condition (no bind params), shared by
+/// [buildFilteredDiveIdSubquery] and
+/// `DiveRepositoryImpl._buildFilterWhereClauses` so the two SQL paths
+/// (Statistics vs. the paginated dive list) can't drift apart. Mirrors
+/// `StatisticsRepository.scanRecordedDecoSignals`:
+///
+/// - A deco-stop profile point (`deco_type = 2`) or a `decoStopStart` event
+///   means deco.
+/// - A profile that carries `deco_type` values, none of which is 2, means
+///   no-deco: the computer recorded obligations and reported none.
+/// - A positive `ceiling` on a profile with no `deco_type` at all also means
+///   deco (some import sources only ever write a stop depth).
+/// - A dive with no qualifying profile data matches neither branch; it is
+///   only classifiable via the computed fallback, which this SQL-only axis
+///   does not have access to.
+///
+/// [diveIdRef] must be a reference to the enclosing query's `dives.id`
+/// resolvable from inside these correlated subqueries (e.g. `d.id` when the
+/// caller aliases `dives` as `d`, or `dives.id` when it does not).
+String decoSignalCondition({
+  required bool wantDeco,
+  required String diveIdRef,
+}) {
+  final hasDecoStop =
+      'EXISTS (SELECT 1 FROM dive_profiles p '
+      'WHERE p.dive_id = $diveIdRef AND p.deco_type = 2) '
+      "OR EXISTS (SELECT 1 FROM dive_profile_events e "
+      "WHERE e.dive_id = $diveIdRef AND e.event_type = 'decoStopStart')";
+  final hasDecoType =
+      'EXISTS (SELECT 1 FROM dive_profiles p '
+      'WHERE p.dive_id = $diveIdRef AND p.deco_type IS NOT NULL)';
+  final hasPositiveCeiling =
+      'EXISTS (SELECT 1 FROM dive_profiles p '
+      'WHERE p.dive_id = $diveIdRef AND p.ceiling > 0)';
+
+  if (wantDeco) {
+    return '($hasDecoStop OR (NOT ($hasDecoType) AND $hasPositiveCeiling))';
+  }
+  return '($hasDecoType AND NOT ($hasDecoStop))';
 }

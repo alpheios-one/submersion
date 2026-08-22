@@ -22,6 +22,7 @@ Dive _makeDive({
   String? tripId,
   List<DiveCustomField> customFields = const [],
   List<EquipmentItem> equipment = const [],
+  List<DiveProfilePoint> profile = const [],
 }) {
   return Dive(
     id: id,
@@ -35,7 +36,7 @@ Dive _makeDive({
     bottomTime: duration,
     tripId: tripId,
     tanks: const [],
-    profile: const [],
+    profile: profile,
     equipment: equipment,
     notes: '',
     photoIds: const [],
@@ -75,6 +76,7 @@ void main() {
         expect(filter.minDepth, isNull);
         expect(filter.maxDepth, isNull);
         expect(filter.favoritesOnly, isNull);
+        expect(filter.decoOnly, isNull);
         expect(filter.tagIds, isEmpty);
         expect(filter.equipmentIds, isEmpty);
         expect(filter.buddyNameFilter, isNull);
@@ -152,6 +154,18 @@ void main() {
         expect(filter.hasActiveFilters, isFalse);
       });
 
+      test('returns true when decoOnly is true', () {
+        const filter = DiveFilterState(decoOnly: true);
+
+        expect(filter.hasActiveFilters, isTrue);
+      });
+
+      test('returns true when decoOnly is false', () {
+        const filter = DiveFilterState(decoOnly: false);
+
+        expect(filter.hasActiveFilters, isTrue);
+      });
+
       test('returns true when diveIds is non-empty', () {
         const filter = DiveFilterState(diveIds: ['d1', 'd2']);
 
@@ -206,6 +220,22 @@ void main() {
         );
 
         expect(updated.computerId, isNull);
+      });
+
+      test('sets decoOnly', () {
+        const original = DiveFilterState();
+
+        final updated = original.copyWith(decoOnly: true);
+
+        expect(updated.decoOnly, isTrue);
+      });
+
+      test('clears decoOnly with clearDecoOnly', () {
+        const original = DiveFilterState(decoOnly: false);
+
+        final updated = original.copyWith(clearDecoOnly: true);
+
+        expect(updated.decoOnly, isNull);
       });
 
       test('sets and clears multiple fields simultaneously', () {
@@ -616,6 +646,91 @@ void main() {
 
         expect(result, hasLength(2));
         expect(result.map((d) => d.id), containsAll(['d1', 'd2']));
+      });
+
+      group('decoOnly axis', () {
+        test('decoOnly: true matches a dive with a recorded deco stop', () {
+          const filter = DiveFilterState(decoOnly: true);
+          final dives = [
+            _makeDive(
+              id: 'd1',
+              profile: const [
+                DiveProfilePoint(timestamp: 0, depth: 30, decoType: 0),
+                DiveProfilePoint(timestamp: 60, depth: 30, decoType: 2),
+              ],
+            ),
+            _makeDive(
+              id: 'd2',
+              profile: const [
+                DiveProfilePoint(timestamp: 0, depth: 20, decoType: 0),
+              ],
+            ),
+          ];
+
+          expect(filter.apply(dives).map((d) => d.id), ['d1']);
+        });
+
+        test(
+          'decoOnly: true matches a positive ceiling with no deco_type data',
+          () {
+            const filter = DiveFilterState(decoOnly: true);
+            final dives = [
+              _makeDive(
+                id: 'd1',
+                profile: const [
+                  DiveProfilePoint(timestamp: 0, depth: 30, ceiling: 3),
+                ],
+              ),
+            ];
+
+            expect(filter.apply(dives).map((d) => d.id), ['d1']);
+          },
+        );
+
+        test(
+          'decoOnly: false matches a profile with deco_type but no stop',
+          () {
+            const filter = DiveFilterState(decoOnly: false);
+            final dives = [
+              _makeDive(
+                id: 'd1',
+                profile: const [
+                  DiveProfilePoint(timestamp: 0, depth: 20, decoType: 0),
+                ],
+              ),
+              _makeDive(
+                id: 'd2',
+                profile: const [
+                  DiveProfilePoint(timestamp: 0, depth: 30, decoType: 2),
+                ],
+              ),
+            ];
+
+            expect(filter.apply(dives).map((d) => d.id), ['d1']);
+          },
+        );
+
+        test('decoOnly excludes dives with no profile data either way', () {
+          final dives = [_makeDive(id: 'd1')];
+
+          expect(const DiveFilterState(decoOnly: true).apply(dives), isEmpty);
+          expect(const DiveFilterState(decoOnly: false).apply(dives), isEmpty);
+        });
+
+        test('decoOnly null applies no deco filtering', () {
+          const filter = DiveFilterState();
+          final dives = [
+            _makeDive(id: 'd1'),
+            _makeDive(
+              id: 'd2',
+              profile: const [
+                DiveProfilePoint(timestamp: 0, depth: 30, decoType: 2),
+              ],
+            ),
+          ];
+
+          expect(filter.apply(dives), hasLength(2));
+        });
       });
 
       group('equipmentAttr axis', () {

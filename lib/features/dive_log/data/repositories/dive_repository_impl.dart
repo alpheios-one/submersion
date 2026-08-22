@@ -2022,6 +2022,11 @@ class DiveRepository {
     if (filter.favoritesOnly == true) {
       clauses.add('d.is_favorite = 1');
     }
+    if (filter.decoOnly != null) {
+      clauses.add(
+        decoSignalCondition(wantDeco: filter.decoOnly!, diveIdRef: 'd.id'),
+      );
+    }
     if (filter.tagIds.isNotEmpty) {
       final placeholders = List.filled(filter.tagIds.length, '?').join(', ');
       clauses.add(

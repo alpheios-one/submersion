@@ -7051,6 +7051,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
 
   @override
+  String get diveLog_search_label_deco => 'Dekompresszio';
+
+  @override
   String get diveLog_search_label_depthRange => 'Melyseg tartomany (m)';
 
   @override
