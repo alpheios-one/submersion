@@ -77,12 +77,23 @@ double _fO2(GasMix m) => m.o2 / 100;
 double _fHe(GasMix m) => m.he / 100;
 double _fN2(GasMix m) => (100 - m.o2 - m.he) / 100;
 
+/// The pressure beyond which the virial fit stops meaning anything.
+///
+/// A cubic diverges outside the range it was fitted over: for air the p^3 term
+/// takes Z negative somewhere past 1000 bar, which sends the fixed-point
+/// iteration in [pressureAt] to NaN rather than to an answer. Clamping matches
+/// what `core/utils/gas_compressibility.dart` has always done, and 500 bar is
+/// far above any cylinder a diver fills.
+const double _virialMaxBar = 500.0;
+
 /// Real-gas compressibility factor Z of [m] at pressure [p] bar.
-double zFactor(double p, GasMix m) =>
-    1 +
-    _fO2(m) * _virial(p, _o2Coef) +
-    _fHe(m) * _virial(p, _heCoef) +
-    _fN2(m) * _virial(p, _n2Coef);
+double zFactor(double p, GasMix m) {
+  final clamped = p.clamp(0.0, _virialMaxBar);
+  return 1 +
+      _fO2(m) * _virial(clamped, _o2Coef) +
+      _fHe(m) * _virial(clamped, _heCoef) +
+      _fN2(m) * _virial(clamped, _n2Coef);
+}
 
 /// One-fluid van der Waals mixing: `a_mix = (sum x_i sqrt(a_i))^2`.
 double _aMix(GasMix m) {

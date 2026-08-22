@@ -170,4 +170,42 @@ void main() {
       }
     });
   });
+  group('beyond the fitted range', () {
+    // The virial is a cubic fitted over cylinder pressures. Extrapolated far
+    // past them its p^3 term takes Z negative, and the fixed-point iteration
+    // in pressureAt then walks off to NaN rather than to an answer. Nothing
+    // stops a diver typing 5000 bar as a target, so it is clamped, matching
+    // what core/utils/gas_compressibility.dart has always done.
+    test('Z stays positive and finite well past any cylinder', () {
+      for (final p in [500.0, 1000.0, 5000.0, 50000.0]) {
+        for (final mix in [_air, _o2, _he, _tx]) {
+          final z = zFactor(p, mix);
+          expect(z.isFinite, isTrue, reason: 'Z($p, ${mix.o2}/${mix.he})');
+          expect(z, greaterThan(0), reason: 'Z($p, ${mix.o2}/${mix.he})');
+        }
+      }
+    });
+
+    test('Z is flat above the clamp rather than diverging', () {
+      expect(zFactor(600, _air), zFactor(500, _air));
+      expect(zFactor(5000, _air), zFactor(500, _air));
+    });
+
+    test('pressureAt never returns NaN, however dense', () {
+      for (final model in BlendGasModel.values) {
+        for (final rho in [1.0, 10.0, 25.0, 39.0]) {
+          final p = pressureAt(model, rho, _air, _k20);
+          expect(p.isNaN, isFalse, reason: 'model=$model rho=$rho');
+        }
+      }
+    });
+
+    test('an absurd target pressure still yields a finite density', () {
+      for (final model in BlendGasModel.values) {
+        final rho = molarDensity(model, 5000, _air, _k20);
+        expect(rho.isFinite, isTrue, reason: '$model');
+        expect(rho, greaterThan(0), reason: '$model');
+      }
+    });
+  });
 }
