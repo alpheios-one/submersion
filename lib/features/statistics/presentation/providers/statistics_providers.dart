@@ -57,27 +57,6 @@ void _keepAliveWithExpiry(Ref ref) {
 // Gas Statistics Providers
 // ============================================================================
 
-/// SAC trend provider that uses the appropriate calculation based on sacUnit setting
-final sacTrendProvider = FutureProvider<List<TrendDataPoint>>((ref) async {
-  _keepAliveWithExpiry(ref);
-  final repository = ref.watch(statisticsRepositoryProvider);
-  final currentDiverId = ref.watch(currentDiverIdProvider);
-  final sacUnit = ref.watch(sacUnitProvider);
-  final filter = ref.watch(statisticsFilterProvider);
-
-  if (sacUnit == SacUnit.litersPerMin) {
-    return repository.getSacVolumeTrend(
-      diverId: currentDiverId,
-      filter: filter,
-    );
-  } else {
-    return repository.getSacPressureTrend(
-      diverId: currentDiverId,
-      filter: filter,
-    );
-  }
-});
-
 final gasMixDistributionProvider = FutureProvider<List<DistributionSegment>>((
   ref,
 ) async {
@@ -107,6 +86,30 @@ final sacRecordsProvider =
         );
       } else {
         return repository.getSacPressureRecords(
+          diverId: currentDiverId,
+          filter: filter,
+        );
+      }
+    });
+
+/// SAC trend per tank role (back gas, stage, deco, diluent, oxygen, etc.),
+/// so OC and CCR dives logged in the same library never blend into one
+/// misleading combined trend (issue #771).
+final sacTrendByRoleProvider =
+    FutureProvider<Map<String, List<TrendDataPoint>>>((ref) async {
+      _keepAliveWithExpiry(ref);
+      final repository = ref.watch(statisticsRepositoryProvider);
+      final currentDiverId = ref.watch(currentDiverIdProvider);
+      final sacUnit = ref.watch(sacUnitProvider);
+      final filter = ref.watch(statisticsFilterProvider);
+
+      if (sacUnit == SacUnit.litersPerMin) {
+        return repository.getSacVolumeTrendByRole(
+          diverId: currentDiverId,
+          filter: filter,
+        );
+      } else {
+        return repository.getSacPressureTrendByRole(
           diverId: currentDiverId,
           filter: filter,
         );

@@ -380,7 +380,7 @@ void main() {
     // DiveFilterState.apply() and buildFilteredDiveIdSubquery() select the
     // same ids for a battery of filters -- one per axis, plus a few
     // multi-axis combinations. That "SQL mirrors apply()" property is what
-    // lets getStatistics/getSacVolumeTrend/etc. push filtering into SQL
+    // lets getStatistics/getSacVolumeTrendByRole/etc. push filtering into SQL
     // instead of loading every dive into Dart.
 
     // --- Parents (FK=ON: must precede the dives that reference them) ---

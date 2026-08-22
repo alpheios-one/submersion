@@ -49,12 +49,53 @@ class StatisticsGasPage extends ConsumerWidget {
     );
   }
 
+  /// Canonical display order for tank roles: OC roles first, then CCR roles,
+  /// matching the order divers typically think about their gas sources.
+  static const _tankRoleOrder = [
+    'backGas',
+    'sidemountLeft',
+    'sidemountRight',
+    'stage',
+    'pony',
+    'deco',
+    'bailout',
+    'diluent',
+    'oxygenSupply',
+  ];
+
+  static const _tankRoleColors = [
+    Colors.blue,
+    Colors.orange,
+    Colors.green,
+    Colors.purple,
+    Colors.red,
+    Colors.teal,
+    Colors.brown,
+    Colors.pink,
+    Colors.indigo,
+  ];
+
+  String _tankRoleDisplayName(BuildContext context, String role) {
+    return switch (role) {
+      'backGas' => context.l10n.statistics_gas_tankRole_backGas,
+      'stage' => context.l10n.statistics_gas_tankRole_stage,
+      'deco' => context.l10n.statistics_gas_tankRole_deco,
+      'bailout' => context.l10n.statistics_gas_tankRole_bailout,
+      'sidemountLeft' => context.l10n.statistics_gas_tankRole_sidemountLeft,
+      'sidemountRight' => context.l10n.statistics_gas_tankRole_sidemountRight,
+      'pony' => context.l10n.statistics_gas_tankRole_pony,
+      'diluent' => context.l10n.statistics_gas_tankRole_diluent,
+      'oxygenSupply' => context.l10n.statistics_gas_tankRole_oxygenSupply,
+      _ => role,
+    };
+  }
+
   Widget _buildSacTrendSection(
     BuildContext context,
     WidgetRef ref,
     UnitFormatter units,
   ) {
-    final sacTrendAsync = ref.watch(sacTrendProvider);
+    final sacTrendByRoleAsync = ref.watch(sacTrendByRoleProvider);
     final sacUnit = ref.watch(sacUnitProvider);
 
     // Determine unit symbol based on SAC calculation method
@@ -65,19 +106,50 @@ class StatisticsGasPage extends ConsumerWidget {
     return StatSectionCard(
       title: context.l10n.statistics_gas_sacTrend_title,
       subtitle: context.l10n.statistics_gas_sacTrend_subtitle,
-      child: sacTrendAsync.when(
+      child: sacTrendByRoleAsync.when(
         data: (data) {
+          if (data.isEmpty) {
+            return StatEmptyState(
+              icon: MdiIcons.divingScubaTank,
+              message: context.l10n.statistics_gas_sacTrend_empty,
+            );
+          }
+
           double convert(double v) => sacUnit == SacUnit.litersPerMin
               ? units.convertVolume(v)
               : units.convertPressure(v);
 
-          return TrendLineChart(
-            data: data,
-            lineColor: Colors.blue,
-            yAxisLabel: unitSymbol,
+          // Present roles in canonical order; any role outside the known
+          // set (should not normally happen) is appended at the end.
+          final roles = [
+            ..._tankRoleOrder.where(data.containsKey),
+            ...data.keys.where((r) => !_tankRoleOrder.contains(r)),
+          ];
+
+          List<TrendDataPoint> convertSeries(List<TrendDataPoint> series) =>
+              series
+                  .map(
+                    (p) => TrendDataPoint(
+                      date: p.date,
+                      value: convert(p.value),
+                      label: p.label,
+                    ),
+                  )
+                  .toList();
+
+          return MultiTrendLineChart(
+            dataSeries: roles.map((r) => convertSeries(data[r]!)).toList(),
+            seriesLabels: roles
+                .map((r) => _tankRoleDisplayName(context, r))
+                .toList(),
+            // Color by position in roles, so a role keeps the same color
+            // across renders regardless of which other roles are present.
+            seriesColors: List.generate(
+              roles.length,
+              (i) => _tankRoleColors[i % _tankRoleColors.length],
+            ),
             valueFormatter: (value) =>
-                '${convert(value).toStringAsFixed(1)} $unitSymbol',
-            yAxisFormatter: (value) => convert(value).toStringAsFixed(1),
+                '${value.toStringAsFixed(1)} $unitSymbol',
           );
         },
         loading: () => const SizedBox(
@@ -132,22 +204,6 @@ class StatisticsGasPage extends ConsumerWidget {
         ? '${units.volumeSymbol}/min'
         : '${units.pressureSymbol}/min';
 
-    // Map tank role keys to display names
-    String getRoleDisplayName(String role) {
-      return switch (role) {
-        'backGas' => context.l10n.statistics_gas_tankRole_backGas,
-        'stage' => context.l10n.statistics_gas_tankRole_stage,
-        'deco' => context.l10n.statistics_gas_tankRole_deco,
-        'bailout' => context.l10n.statistics_gas_tankRole_bailout,
-        'sidemountLeft' => context.l10n.statistics_gas_tankRole_sidemountLeft,
-        'sidemountRight' => context.l10n.statistics_gas_tankRole_sidemountRight,
-        'pony' => context.l10n.statistics_gas_tankRole_pony,
-        'diluent' => context.l10n.statistics_gas_tankRole_diluent,
-        'oxygenSupply' => context.l10n.statistics_gas_tankRole_oxygenSupply,
-        _ => role,
-      };
-    }
-
     return StatSectionCard(
       title: context.l10n.statistics_gas_sacByRole_title,
       subtitle: context.l10n.statistics_gas_sacByRole_subtitle,
@@ -165,7 +221,7 @@ class StatisticsGasPage extends ConsumerWidget {
               final role = entry.key;
               final sac = entry.value;
               final isFirst = entry.key == data.keys.first;
-              final displayName = getRoleDisplayName(role);
+              final displayName = _tankRoleDisplayName(context, role);
               final convertedSac = sacUnit == SacUnit.litersPerMin
                   ? units.convertVolume(sac)
                   : units.convertPressure(sac);

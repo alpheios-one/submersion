@@ -16773,6 +16773,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get statistics_gas_sacRecords_title => 'Record SAC';
 
   @override
+  String get statistics_gas_sacTrend_empty => 'Nessun dato SAC disponibile';
+
+  @override
   String get statistics_gas_sacTrend_error =>
       'Impossibile caricare la tendenza SAC';
 

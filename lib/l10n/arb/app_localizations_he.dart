@@ -16348,6 +16348,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get statistics_gas_sacRecords_title => 'שיאי קצב SAC';
 
   @override
+  String get statistics_gas_sacTrend_empty => 'אין עדיין נתוני SAC זמינים';
+
+  @override
   String get statistics_gas_sacTrend_error => 'שגיאה בטעינת מגמת SAC';
 
   @override

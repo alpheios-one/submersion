@@ -97,10 +97,10 @@ void main() {
   }
 
   // ---------------------------------------------------------------------------
-  // SAC Volume Trend (uses COALESCE(d.runtime, d.bottom_time))
+  // SAC Volume Trend By Role (uses COALESCE(d.runtime, d.bottom_time))
   // ---------------------------------------------------------------------------
 
-  group('getSacVolumeTrend', () {
+  group('getSacVolumeTrendByRole', () {
     test('computes SAC using runtime when available', () async {
       await insertDiveWithTank(
         id: 'dive-runtime',
@@ -112,11 +112,12 @@ void main() {
         volume: 11.1,
       );
 
-      final results = await repository.getSacVolumeTrend();
+      final results = await repository.getSacVolumeTrendByRole();
 
-      expect(results, hasLength(1));
+      expect(results.keys, ['backGas']);
+      expect(results['backGas'], hasLength(1));
       // SAC with Z-factor: gasVol(200)-gasVol(50) at 11.1L / 42 / 3.0 ≈ 12.40 L/min
-      expect(results.first.value, closeTo(12.40, 0.5));
+      expect(results['backGas']!.first.value, closeTo(12.40, 0.5));
     });
 
     test('falls back to bottom_time when runtime is null', () async {
@@ -130,61 +131,67 @@ void main() {
         volume: 11.1,
       );
 
-      final results = await repository.getSacVolumeTrend();
+      final results = await repository.getSacVolumeTrendByRole();
 
-      expect(results, hasLength(1));
+      expect(results['backGas'], hasLength(1));
       // SAC with Z-factor: gasVol(200)-gasVol(50) at 11.1L / 35 / 3.0 ≈ 14.88 L/min
-      expect(results.first.value, closeTo(14.88, 0.5));
+      expect(results['backGas']!.first.value, closeTo(14.88, 0.5));
     });
 
     test('returns empty when no valid data', () async {
-      final results = await repository.getSacVolumeTrend();
+      final results = await repository.getSacVolumeTrendByRole();
       expect(results, isEmpty);
     });
 
-    test('sums gas across all tanks for a multi-tank dive', () async {
-      // Insert a dive with two tanks
-      // Back gas: 12L, 200->100 bar (1200L gas used)
-      // Stage: 7L, 200->150 bar (350L gas used)
-      // Total: 1550L
-      // runtime: 42 min, avgDepth: 20m, ambientPressure: 3.0 atm
-      // Expected SAC: 1550 / 42 / 3.0 ≈ 12.30 L/min
-      //
-      // OLD (broken) behavior: treats each tank row as independent ->
-      //   tank1 SAC: 1200/42/3 = 9.52, tank2 SAC: 350/42/3 = 2.78, avg: 6.15
-      //   The new query must return ~12.30, not ~6.15.
-      final diveId = await insertDiveWithTank(
-        id: 'dive-multi-vol-trend',
-        bottomTimeSeconds: 35 * 60,
-        runtimeSeconds: 42 * 60,
-        avgDepth: 20.0,
-        startPressure: 200,
-        endPressure: 100,
-        volume: 12.0,
-        tankRole: 'backGas',
-      );
-      await insertTank(
-        diveId: diveId,
-        startPressure: 200,
-        endPressure: 150,
-        volume: 7.0,
-        tankRole: 'stage',
-        tankOrder: 2,
-      );
+    test(
+      'keeps each tank role separate instead of summing across roles',
+      () async {
+        // Back gas: 12L, 200->100 bar (1200L ideal-gas liters used)
+        // Stage: 7L, 200->150 bar (350L ideal-gas liters used)
+        // runtime: 42 min, avgDepth: 20m, ambientPressure: 3.0 atm
+        //
+        // A combined-across-tanks query would report one blended trend point;
+        // the by-role query must instead report each role's own SAC so OC
+        // back gas and CCR diluent never blend (issue #771). Back gas moved
+        // far more gas than stage, so its SAC must come out clearly higher.
+        final diveId = await insertDiveWithTank(
+          id: 'dive-multi-vol-trend',
+          bottomTimeSeconds: 35 * 60,
+          runtimeSeconds: 42 * 60,
+          avgDepth: 20.0,
+          startPressure: 200,
+          endPressure: 100,
+          volume: 12.0,
+          tankRole: 'backGas',
+        );
+        await insertTank(
+          diveId: diveId,
+          startPressure: 200,
+          endPressure: 150,
+          volume: 7.0,
+          tankRole: 'stage',
+          tankOrder: 2,
+        );
 
-      final results = await repository.getSacVolumeTrend();
+        final results = await repository.getSacVolumeTrendByRole();
 
-      expect(results, hasLength(1));
-      // With Z-factor: ≈ 11.15 L/min
-      expect(results.first.value, closeTo(11.15, 0.5));
-    });
+        expect(results.keys, containsAll(['backGas', 'stage']));
+        final backGasSac = results['backGas']!.first.value;
+        final stageSac = results['stage']!.first.value;
+        // Below the naive ideal-gas value (9.52 L/min) since the real-gas
+        // model accounts for compressibility, but well above stage's SAC.
+        expect(backGasSac, allOf(greaterThan(7.5), lessThan(9.6)));
+        expect(stageSac, allOf(greaterThan(1.5), lessThan(3.0)));
+        expect(backGasSac, greaterThan(stageSac * 2));
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------
-  // SAC Pressure Trend (uses COALESCE(d.runtime, d.bottom_time))
+  // SAC Pressure Trend By Role (uses COALESCE(d.runtime, d.bottom_time))
   // ---------------------------------------------------------------------------
 
-  group('getSacPressureTrend', () {
+  group('getSacPressureTrendByRole', () {
     test('computes pressure SAC using runtime', () async {
       await insertDiveWithTank(
         id: 'dive-pressure-rt',
@@ -195,12 +202,12 @@ void main() {
         endPressure: 50,
       );
 
-      final results = await repository.getSacPressureTrend();
+      final results = await repository.getSacPressureTrendByRole();
 
-      expect(results, hasLength(1));
+      expect(results['backGas'], hasLength(1));
       // pressure SAC = (200-50) / (42) / ((20/10)+1)
       // = 150 / 42 / 3 = 1.19 bar/min
-      expect(results.first.value, closeTo(1.19, 0.1));
+      expect(results['backGas']!.first.value, closeTo(1.19, 0.1));
     });
 
     test('falls back to bottom_time when runtime null', () async {
@@ -213,50 +220,52 @@ void main() {
         endPressure: 50,
       );
 
-      final results = await repository.getSacPressureTrend();
+      final results = await repository.getSacPressureTrendByRole();
 
-      expect(results, hasLength(1));
+      expect(results['backGas'], hasLength(1));
       // pressure SAC = 150 / 35 / 3 = 1.43 bar/min
-      expect(results.first.value, closeTo(1.43, 0.1));
-    });
-
-    test('uses back gas tank only for multi-tank dive', () async {
-      // Back gas: 200->100 bar (100 bar used), role 'backGas'
-      // Stage: 200->150 bar (50 bar used), role 'stage'
-      // runtime: 42 min, avgDepth: 20m, ambientPressure: 3.0 atm
-      // Expected: 100 / 42 / 3.0 ≈ 0.794 bar/min (back gas only)
-      // NOT: averaged or combined with stage
-      final diveId = await insertDiveWithTank(
-        id: 'dive-multi-pres-trend',
-        bottomTimeSeconds: 35 * 60,
-        runtimeSeconds: 42 * 60,
-        avgDepth: 20.0,
-        startPressure: 200,
-        endPressure: 100,
-        tankRole: 'backGas',
-      );
-      await insertTank(
-        diveId: diveId,
-        startPressure: 200,
-        endPressure: 150,
-        tankRole: 'stage',
-        tankOrder: 2,
-      );
-
-      final results = await repository.getSacPressureTrend();
-
-      expect(results, hasLength(1));
-      // 100 / 42 / 3.0 = 0.794 bar/min
-      expect(results.first.value, closeTo(0.794, 0.05));
+      expect(results['backGas']!.first.value, closeTo(1.43, 0.1));
     });
 
     test(
-      'excludes dive when back gas tank has no valid pressure drop',
+      'keeps each tank role separate instead of back-gas-only',
       () async {
-        // backGas: start=100, end=200 (invalid — no drop)
-        // stage: start=200, end=100 (valid — 100 bar drop)
-        // Must NOT fall back to stage; must exclude dive entirely,
-        // matching Dive.sacPressure which returns null in this case.
+        // Back gas: 200->100 bar (100 bar used), role 'backGas'
+        // Stage: 200->150 bar (50 bar used), role 'stage'
+        // runtime: 42 min, avgDepth: 20m, ambientPressure: 3.0 atm
+        // Both roles must report their own trend point, not just back gas.
+        final diveId = await insertDiveWithTank(
+          id: 'dive-multi-pres-trend',
+          bottomTimeSeconds: 35 * 60,
+          runtimeSeconds: 42 * 60,
+          avgDepth: 20.0,
+          startPressure: 200,
+          endPressure: 100,
+          tankRole: 'backGas',
+        );
+        await insertTank(
+          diveId: diveId,
+          startPressure: 200,
+          endPressure: 150,
+          tankRole: 'stage',
+          tankOrder: 2,
+        );
+
+        final results = await repository.getSacPressureTrendByRole();
+
+        expect(results.keys, containsAll(['backGas', 'stage']));
+        // 100 / 42 / 3.0 = 0.794 bar/min
+        expect(results['backGas']!.first.value, closeTo(0.794, 0.05));
+        // 50 / 42 / 3.0 = 0.397 bar/min
+        expect(results['stage']!.first.value, closeTo(0.397, 0.05));
+      },
+    );
+
+    test(
+      'excludes only the role with an invalid pressure drop',
+      () async {
+        // backGas: start=100, end=200 (invalid — no drop) -> excluded
+        // stage: start=200, end=100 (valid — 100 bar drop) -> included
         final diveId = await insertDiveWithTank(
           id: 'dive-pres-trend-invalid-bg',
           bottomTimeSeconds: 35 * 60,
@@ -274,9 +283,60 @@ void main() {
           tankOrder: 2,
         );
 
-        final results = await repository.getSacPressureTrend();
+        final results = await repository.getSacPressureTrendByRole();
 
-        expect(results, isEmpty);
+        expect(results.containsKey('backGas'), isFalse);
+        expect(results['stage'], hasLength(1));
+      },
+    );
+
+    test(
+      'CCR diluent and oxygen trends stay separate from OC back gas',
+      () async {
+        // Regression for issue #771: a library mixing OC and CCR dives must
+        // report distinct trends per role rather than one blended SAC.
+        await insertDiveWithTank(
+          id: 'dive-oc',
+          bottomTimeSeconds: 35 * 60,
+          runtimeSeconds: 42 * 60,
+          avgDepth: 20.0,
+          startPressure: 200,
+          endPressure: 50, // large drop -> high SAC
+          tankRole: 'backGas',
+        );
+        final ccrDiveId = await insertDiveWithTank(
+          id: 'dive-ccr',
+          bottomTimeSeconds: 35 * 60,
+          runtimeSeconds: 42 * 60,
+          avgDepth: 20.0,
+          startPressure: 200,
+          endPressure: 190, // small drop -> low SAC
+          tankRole: 'diluent',
+        );
+        await insertTank(
+          diveId: ccrDiveId,
+          startPressure: 200,
+          endPressure: 195, // even smaller drop -> lower SAC
+          tankRole: 'oxygenSupply',
+          tankOrder: 2,
+        );
+
+        final results = await repository.getSacPressureTrendByRole();
+
+        expect(
+          results.keys,
+          containsAll(['backGas', 'diluent', 'oxygenSupply']),
+        );
+        // The OC back gas SAC must be markedly higher than either CCR role,
+        // proving they were never averaged together.
+        expect(
+          results['backGas']!.first.value,
+          greaterThan(results['diluent']!.first.value * 2),
+        );
+        expect(
+          results['backGas']!.first.value,
+          greaterThan(results['oxygenSupply']!.first.value * 2),
+        );
       },
     );
   });

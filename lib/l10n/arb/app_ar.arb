@@ -5070,6 +5070,7 @@
   "statistics_gas_sacRecords_highest": "أعلى معدل SAC",
   "statistics_gas_sacRecords_subtitle": "أفضل وأسوأ استهلاك للهواء",
   "statistics_gas_sacRecords_title": "سجلات معدل SAC",
+  "statistics_gas_sacTrend_empty": "لا توجد بيانات SAC متاحة بعد",
   "statistics_gas_sacTrend_error": "فشل تحميل اتجاه SAC",
   "statistics_gas_sacTrend_subtitle": "المتوسط الشهري على مدى 5 سنوات",
   "statistics_gas_sacTrend_title": "اتجاه معدل SAC",

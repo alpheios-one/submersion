@@ -4993,6 +4993,7 @@
   "statistics_gas_sacRecords_highest": "SAC piu alto",
   "statistics_gas_sacRecords_subtitle": "Miglior e peggior consumo d'aria",
   "statistics_gas_sacRecords_title": "Record SAC",
+  "statistics_gas_sacTrend_empty": "Nessun dato SAC disponibile",
   "statistics_gas_sacTrend_error": "Impossibile caricare la tendenza SAC",
   "statistics_gas_sacTrend_subtitle": "Media mensile su 5 anni",
   "statistics_gas_sacTrend_title": "Tendenza SAC",

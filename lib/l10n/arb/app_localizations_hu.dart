@@ -16722,6 +16722,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get statistics_gas_sacRecords_title => 'SAC rata rekordok';
 
   @override
+  String get statistics_gas_sacTrend_empty => 'Meg nincsenek SAC adatok';
+
+  @override
   String get statistics_gas_sacTrend_error =>
       'Nem sikerult a SAC trend betoltese';
 

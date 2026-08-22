@@ -16782,6 +16782,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_gas_sacRecords_title => 'Registros de Taxa SAC';
 
   @override
+  String get statistics_gas_sacTrend_empty =>
+      'Nenhum dado de SAC disponivel ainda';
+
+  @override
   String get statistics_gas_sacTrend_error =>
       'Falha ao carregar tendencia de SAC';
 

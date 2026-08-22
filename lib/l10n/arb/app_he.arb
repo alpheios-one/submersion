@@ -5070,6 +5070,7 @@
   "statistics_gas_sacRecords_highest": "קצב SAC הגבוה ביותר",
   "statistics_gas_sacRecords_subtitle": "צריכת אוויר הטובה והגרועה ביותר",
   "statistics_gas_sacRecords_title": "שיאי קצב SAC",
+  "statistics_gas_sacTrend_empty": "אין עדיין נתוני SAC זמינים",
   "statistics_gas_sacTrend_error": "שגיאה בטעינת מגמת SAC",
   "statistics_gas_sacTrend_subtitle": "ממוצע חודשי על פני 5 שנים",
   "statistics_gas_sacTrend_title": "מגמת קצב SAC",

@@ -200,206 +200,6 @@ class StatisticsRepository {
   // Gas Statistics
   // ============================================================================
 
-  /// Get SAC rate trend by month in L/min (last 5 years)
-  /// Requires tank volume data
-  Future<List<TrendDataPoint>> getSacVolumeTrend({
-    String? diverId,
-    DiveFilterState filter = const DiveFilterState(),
-  }) async {
-    try {
-      final fiveYearsAgo = DateTime.now().subtract(
-        const Duration(days: 365 * 5),
-      );
-      final cutoff = fiveYearsAgo.millisecondsSinceEpoch;
-
-      final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
-      final df = _diveFilter(filter, alias: 'd');
-      final params = diverId != null
-          ? [cutoff, diverId, ...df.params]
-          : [cutoff, ...df.params];
-
-      final results = await _db.customSelect('''
-        SELECT
-          d.id AS dive_id,
-          d.dive_date_time,
-          d.avg_depth,
-          COALESCE(d.runtime, d.bottom_time) AS duration_sec,
-          t.start_pressure,
-          t.end_pressure,
-          t.volume,
-          t.o2_percent,
-          t.he_percent
-        FROM dives d
-        JOIN dive_tanks t ON t.dive_id = d.id
-        WHERE d.dive_date_time >= ? AND d.dive_mode <> 'gauge' $diverFilter ${df.clause}
-          AND COALESCE(d.runtime, d.bottom_time) > 0
-          AND d.avg_depth > 0
-          AND t.start_pressure > t.end_pressure
-          AND t.volume > 0
-        ORDER BY d.dive_date_time
-        ''', variables: params.map((p) => Variable(p)).toList()).get();
-
-      // Group by dive, compute SAC per dive, then average by month
-      final Map<
-        String,
-        ({double gas, DateTime dateTime, int durationSec, double avgDepth})
-      >
-      diveSacs = {};
-
-      for (final row in results) {
-        final diveId = row.read<String>('dive_id');
-        final startP = row.read<double>('start_pressure');
-        final endP = row.read<double>('end_pressure');
-        final vol = row.read<double>('volume');
-        final o2 = row.read<double>('o2_percent');
-        final he = row.read<double>('he_percent');
-        final dateTimeMs = row.read<int>('dive_date_time');
-
-        final gasUsed =
-            gasVolume(
-              tankSizeLiters: vol,
-              pressureBar: startP,
-              o2Percent: o2,
-              hePercent: he,
-              model: gasModel,
-            ) -
-            gasVolume(
-              tankSizeLiters: vol,
-              pressureBar: endP,
-              o2Percent: o2,
-              hePercent: he,
-              model: gasModel,
-            );
-        if (gasUsed <= 0) continue;
-
-        final existing = diveSacs[diveId];
-        if (existing == null) {
-          diveSacs[diveId] = (
-            gas: gasUsed,
-            dateTime: DateTime.fromMillisecondsSinceEpoch(
-              dateTimeMs,
-              isUtc: true,
-            ),
-            durationSec: row.read<int>('duration_sec'),
-            avgDepth: row.read<double>('avg_depth'),
-          );
-        } else {
-          diveSacs[diveId] = (
-            gas: existing.gas + gasUsed,
-            dateTime: existing.dateTime,
-            durationSec: existing.durationSec,
-            avgDepth: existing.avgDepth,
-          );
-        }
-      }
-
-      // Compute SAC per dive and group by month
-      final Map<String, List<double>> monthSacs = {};
-      for (final entry in diveSacs.entries) {
-        final d = entry.value;
-        final sac =
-            d.gas / (d.durationSec / 60.0) / ((d.avgDepth / 10.0) + 1.0);
-        if (sac <= 0) continue;
-
-        final dt = d.dateTime;
-        final key = '${dt.year}-${dt.month.toString().padLeft(2, '0')}';
-        monthSacs.putIfAbsent(key, () => []).add(sac);
-      }
-
-      // Average per month
-      final trend = <TrendDataPoint>[];
-      for (final entry in monthSacs.entries) {
-        final parts = entry.key.split('-');
-        final year = int.parse(parts[0]);
-        final month = int.parse(parts[1]);
-        final avg = entry.value.reduce((a, b) => a + b) / entry.value.length;
-        trend.add(
-          TrendDataPoint(
-            date: DateTime(year, month),
-            value: avg,
-            label: '${_monthAbbr(month)} $year',
-          ),
-        );
-      }
-      trend.sort((a, b) => a.date.compareTo(b.date));
-      return trend;
-    } catch (e, stackTrace) {
-      _log.error(
-        'Failed to get SAC volume trend',
-        error: e,
-        stackTrace: stackTrace,
-      );
-      return [];
-    }
-  }
-
-  /// Get SAC rate trend by month in pressure/min (last 5 years)
-  /// Does not require tank volume - uses pressure drop normalized to surface
-  Future<List<TrendDataPoint>> getSacPressureTrend({
-    String? diverId,
-    DiveFilterState filter = const DiveFilterState(),
-  }) async {
-    try {
-      final fiveYearsAgo = DateTime.now().subtract(
-        const Duration(days: 365 * 5),
-      );
-      final cutoff = fiveYearsAgo.millisecondsSinceEpoch;
-
-      final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
-      final df = _diveFilter(filter, alias: 'd');
-      final params = diverId != null
-          ? [cutoff, diverId, ...df.params]
-          : [cutoff, ...df.params];
-
-      final results = await _db.customSelect('''
-        SELECT
-          strftime('%Y', d.dive_date_time / 1000, 'unixepoch') AS year,
-          strftime('%m', d.dive_date_time / 1000, 'unixepoch') AS month,
-          AVG(
-            (t.start_pressure - t.end_pressure) / (COALESCE(d.runtime, d.bottom_time) / 60.0) / ((d.avg_depth / 10.0) + 1)
-          ) AS avg_sac
-        FROM dives d
-        JOIN dive_tanks t ON t.id = (
-          SELECT t2.id FROM dive_tanks t2
-          WHERE t2.dive_id = d.id
-            AND t2.start_pressure > t2.end_pressure
-            AND (
-              t2.tank_role = 'backGas'
-              OR NOT EXISTS (
-                SELECT 1 FROM dive_tanks t3
-                WHERE t3.dive_id = d.id AND t3.tank_role = 'backGas'
-              )
-            )
-          ORDER BY t2.tank_order, t2.rowid
-          LIMIT 1
-        )
-        WHERE d.dive_date_time >= ? AND d.dive_mode <> 'gauge' $diverFilter ${df.clause}
-          AND COALESCE(d.runtime, d.bottom_time) > 0
-          AND d.avg_depth > 0
-        GROUP BY year, month
-        HAVING avg_sac IS NOT NULL
-        ORDER BY year, month
-        ''', variables: params.map((p) => Variable(p)).toList()).get();
-
-      return results.map((row) {
-        final year = int.parse(row.read<String>('year'));
-        final month = int.parse(row.read<String>('month'));
-        return TrendDataPoint(
-          date: DateTime(year, month),
-          value: row.read<double>('avg_sac'),
-          label: '${_monthAbbr(month)} $year',
-        );
-      }).toList();
-    } catch (e, stackTrace) {
-      _log.error(
-        'Failed to get SAC pressure trend',
-        error: e,
-        stackTrace: stackTrace,
-      );
-      return [];
-    }
-  }
-
   /// Get gas mix distribution (Air, Nitrox, Trimix)
   Future<List<DistributionSegment>> getGasMixDistribution({
     String? diverId,
@@ -774,6 +574,197 @@ class StatisticsRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get SAC in pressure by tank role',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return {};
+    }
+  }
+
+  /// Get SAC rate trend by month in L/min, split by tank role (last 5 years).
+  ///
+  /// Keeps each tank role's gas usage separate rather than summing every
+  /// tank on a dive into one combined SAC, so OC (back gas/stage/deco) and
+  /// CCR (diluent/oxygen) dives never blend into one misleading trend
+  /// (issue #771).
+  ///
+  /// Requires tank volume data. Returns a map of tank role to its monthly
+  /// trend, ordered chronologically within each role.
+  Future<Map<String, List<TrendDataPoint>>> getSacVolumeTrendByRole({
+    String? diverId,
+    DiveFilterState filter = const DiveFilterState(),
+  }) async {
+    try {
+      final fiveYearsAgo = DateTime.now().subtract(
+        const Duration(days: 365 * 5),
+      );
+      final cutoff = fiveYearsAgo.millisecondsSinceEpoch;
+
+      final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
+      final df = _diveFilter(filter, alias: 'd');
+      final params = diverId != null
+          ? [cutoff, diverId, ...df.params]
+          : [cutoff, ...df.params];
+
+      final results = await _db.customSelect('''
+        SELECT
+          t.tank_role,
+          d.dive_date_time,
+          d.avg_depth,
+          COALESCE(d.runtime, d.bottom_time) AS duration_sec,
+          t.start_pressure,
+          t.end_pressure,
+          t.volume,
+          t.o2_percent,
+          t.he_percent
+        FROM dives d
+        JOIN dive_tanks t ON t.dive_id = d.id
+        WHERE d.dive_date_time >= ? AND d.dive_mode <> 'gauge' $diverFilter ${df.clause}
+          AND COALESCE(d.runtime, d.bottom_time) > 0
+          AND d.avg_depth > 0
+          AND t.start_pressure > t.end_pressure
+          AND t.volume > 0
+        ORDER BY d.dive_date_time
+        ''', variables: params.map((p) => Variable(p)).toList()).get();
+
+      // Group by (role, month): each tank contributes its own SAC value,
+      // computed against the dive's total duration/depth (same convention
+      // as getSacVolumeByTankRole).
+      final Map<String, Map<String, List<double>>> roleMonthSacs = {};
+
+      for (final row in results) {
+        final role = row.read<String>('tank_role');
+        final startP = row.read<double>('start_pressure');
+        final endP = row.read<double>('end_pressure');
+        final vol = row.read<double>('volume');
+        final o2 = row.read<double>('o2_percent');
+        final he = row.read<double>('he_percent');
+        final dateTimeMs = row.read<int>('dive_date_time');
+        final durationSec = row.read<int>('duration_sec');
+        final avgDepth = row.read<double>('avg_depth');
+
+        final gasUsed =
+            gasVolume(
+              tankSizeLiters: vol,
+              pressureBar: startP,
+              o2Percent: o2,
+              hePercent: he,
+              model: gasModel,
+            ) -
+            gasVolume(
+              tankSizeLiters: vol,
+              pressureBar: endP,
+              o2Percent: o2,
+              hePercent: he,
+              model: gasModel,
+            );
+        if (gasUsed <= 0) continue;
+
+        final sac =
+            gasUsed / (durationSec / 60.0) / ((avgDepth / 10.0) + 1.0);
+        if (sac <= 0) continue;
+
+        final dt = DateTime.fromMillisecondsSinceEpoch(
+          dateTimeMs,
+          isUtc: true,
+        );
+        final key = '${dt.year}-${dt.month.toString().padLeft(2, '0')}';
+        roleMonthSacs
+            .putIfAbsent(role, () => {})
+            .putIfAbsent(key, () => [])
+            .add(sac);
+      }
+
+      final Map<String, List<TrendDataPoint>> trendsByRole = {};
+      for (final roleEntry in roleMonthSacs.entries) {
+        final trend = <TrendDataPoint>[];
+        for (final entry in roleEntry.value.entries) {
+          final parts = entry.key.split('-');
+          final year = int.parse(parts[0]);
+          final month = int.parse(parts[1]);
+          final avg = entry.value.reduce((a, b) => a + b) / entry.value.length;
+          trend.add(
+            TrendDataPoint(
+              date: DateTime(year, month),
+              value: avg,
+              label: '${_monthAbbr(month)} $year',
+            ),
+          );
+        }
+        trend.sort((a, b) => a.date.compareTo(b.date));
+        trendsByRole[roleEntry.key] = trend;
+      }
+      return trendsByRole;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get SAC volume trend by role',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return {};
+    }
+  }
+
+  /// Get SAC rate trend by month in pressure/min, split by tank role
+  /// (last 5 years). Does not require tank volume.
+  ///
+  /// Returns every tank role's own trend, computed via `GROUP BY tank_role`,
+  /// so CCR diluent/oxygen consumption is never conflated with OC back
+  /// gas/stage/deco (issue #771).
+  Future<Map<String, List<TrendDataPoint>>> getSacPressureTrendByRole({
+    String? diverId,
+    DiveFilterState filter = const DiveFilterState(),
+  }) async {
+    try {
+      final fiveYearsAgo = DateTime.now().subtract(
+        const Duration(days: 365 * 5),
+      );
+      final cutoff = fiveYearsAgo.millisecondsSinceEpoch;
+
+      final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
+      final df = _diveFilter(filter, alias: 'd');
+      final params = diverId != null
+          ? [cutoff, diverId, ...df.params]
+          : [cutoff, ...df.params];
+
+      final results = await _db.customSelect('''
+        SELECT
+          t.tank_role,
+          strftime('%Y', d.dive_date_time / 1000, 'unixepoch') AS year,
+          strftime('%m', d.dive_date_time / 1000, 'unixepoch') AS month,
+          AVG(
+            (t.start_pressure - t.end_pressure) / (COALESCE(d.runtime, d.bottom_time) / 60.0) / ((d.avg_depth / 10.0) + 1)
+          ) AS avg_sac
+        FROM dives d
+        JOIN dive_tanks t ON t.dive_id = d.id
+        WHERE d.dive_date_time >= ? AND d.dive_mode <> 'gauge' $diverFilter ${df.clause}
+          AND COALESCE(d.runtime, d.bottom_time) > 0
+          AND d.avg_depth > 0
+          AND t.start_pressure > t.end_pressure
+        GROUP BY t.tank_role, year, month
+        HAVING avg_sac IS NOT NULL
+        ORDER BY t.tank_role, year, month
+        ''', variables: params.map((p) => Variable(p)).toList()).get();
+
+      final Map<String, List<TrendDataPoint>> trendsByRole = {};
+      for (final row in results) {
+        final role = row.read<String>('tank_role');
+        final year = int.parse(row.read<String>('year'));
+        final month = int.parse(row.read<String>('month'));
+        trendsByRole
+            .putIfAbsent(role, () => [])
+            .add(
+              TrendDataPoint(
+                date: DateTime(year, month),
+                value: row.read<double>('avg_sac'),
+                label: '${_monthAbbr(month)} $year',
+              ),
+            );
+      }
+      return trendsByRole;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get SAC pressure trend by role',
         error: e,
         stackTrace: stackTrace,
       );

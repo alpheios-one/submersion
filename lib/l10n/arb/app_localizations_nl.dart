@@ -16638,6 +16638,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get statistics_gas_sacRecords_title => 'SAC-records';
 
   @override
+  String get statistics_gas_sacTrend_empty =>
+      'Nog geen SAC-gegevens beschikbaar';
+
+  @override
   String get statistics_gas_sacTrend_error => 'Kan SAC-trend niet laden';
 
   @override

@@ -105,7 +105,7 @@ void main() {
     // MockSettingsNotifier defaults to SacUnit.pressurePerMin, so the else
     // branch of each SAC provider runs here.
     final container = await makeContainer();
-    expect(await container.read(sacTrendProvider.future), isEmpty);
+    expect(await container.read(sacTrendByRoleProvider.future), isEmpty);
     final records = await container.read(sacRecordsProvider.future);
     expect(records.best, isNull);
     expect(await container.read(sacByTankRoleProvider.future), isEmpty);
@@ -115,7 +115,7 @@ void main() {
     'SAC providers use the liters-per-minute branch when configured',
     () async {
       final container = await makeContainer(sacUnit: SacUnit.litersPerMin);
-      expect(await container.read(sacTrendProvider.future), isEmpty);
+      expect(await container.read(sacTrendByRoleProvider.future), isEmpty);
       final records = await container.read(sacRecordsProvider.future);
       expect(records.best, isNull);
       expect(await container.read(sacByTankRoleProvider.future), isEmpty);

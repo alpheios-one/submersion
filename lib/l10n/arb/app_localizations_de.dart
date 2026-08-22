@@ -16749,12 +16749,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get statistics_gas_sacRecords_title => 'AMV-Rekorde';
 
   @override
+  String get statistics_gas_sacTrend_empty => 'Noch keine AMV-Daten verfügbar';
+
+  @override
   String get statistics_gas_sacTrend_error =>
       'AMV-Trend konnte nicht geladen werden';
 
   @override
   String get statistics_gas_sacTrend_subtitle =>
-      'Monatlicher Durchschnitt über 5 Jahre';
+      'Monatlicher Durchschnitt pro Flaschenrolle über 5 Jahre';
 
   @override
   String get statistics_gas_sacTrend_title => 'AMV-Trend';

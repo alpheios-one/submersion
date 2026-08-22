@@ -16488,10 +16488,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statistics_gas_sacRecords_title => 'SAC Rate Records';
 
   @override
+  String get statistics_gas_sacTrend_empty => 'No SAC data available yet';
+
+  @override
   String get statistics_gas_sacTrend_error => 'Failed to load SAC trend';
 
   @override
-  String get statistics_gas_sacTrend_subtitle => 'Monthly average over 5 years';
+  String get statistics_gas_sacTrend_subtitle =>
+      'Monthly average per tank role over 5 years';
 
   @override
   String get statistics_gas_sacTrend_title => 'SAC Rate Trend';

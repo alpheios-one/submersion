@@ -4997,6 +4997,7 @@
   "statistics_gas_sacRecords_highest": "Taux SAC le plus eleve",
   "statistics_gas_sacRecords_subtitle": "Meilleure et pire consommation d'air",
   "statistics_gas_sacRecords_title": "Records de taux SAC",
+  "statistics_gas_sacTrend_empty": "Aucune donnee SAC disponible",
   "statistics_gas_sacTrend_error": "Echec du chargement de la tendance SAC",
   "statistics_gas_sacTrend_subtitle": "Moyenne mensuelle sur 5 ans",
   "statistics_gas_sacTrend_title": "Tendance du taux SAC",

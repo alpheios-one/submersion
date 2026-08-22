@@ -28150,6 +28150,12 @@ abstract class AppLocalizations {
   /// **'SAC Rate Records'**
   String get statistics_gas_sacRecords_title;
 
+  /// No description provided for @statistics_gas_sacTrend_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No SAC data available yet'**
+  String get statistics_gas_sacTrend_empty;
+
   /// No description provided for @statistics_gas_sacTrend_error.
   ///
   /// In en, this message translates to:
@@ -28159,7 +28165,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_gas_sacTrend_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Monthly average over 5 years'**
+  /// **'Monthly average per tank role over 5 years'**
   String get statistics_gas_sacTrend_subtitle;
 
   /// No description provided for @statistics_gas_sacTrend_title.

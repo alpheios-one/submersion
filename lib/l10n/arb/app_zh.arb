@@ -5248,6 +5248,7 @@
   "statistics_gas_sacRecords_highest": "最高耗气率",
   "statistics_gas_sacRecords_subtitle": "最佳和最差耗气量",
   "statistics_gas_sacRecords_title": "耗气率记录",
+  "statistics_gas_sacTrend_empty": "暂无耗气率数据",
   "statistics_gas_sacTrend_error": "加载耗气率趋势失败",
   "statistics_gas_sacTrend_subtitle": "5年月均值",
   "statistics_gas_sacTrend_title": "耗气率趋势",

@@ -15941,6 +15941,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_gas_sacRecords_title => '耗气率记录';
 
   @override
+  String get statistics_gas_sacTrend_empty => '暂无耗气率数据';
+
+  @override
   String get statistics_gas_sacTrend_error => '加载耗气率趋势失败';
 
   @override

@@ -5070,6 +5070,7 @@
   "statistics_gas_sacRecords_highest": "Hoogste SAC-waarde",
   "statistics_gas_sacRecords_subtitle": "Beste en slechtste luchtverbruik",
   "statistics_gas_sacRecords_title": "SAC-records",
+  "statistics_gas_sacTrend_empty": "Nog geen SAC-gegevens beschikbaar",
   "statistics_gas_sacTrend_error": "Kan SAC-trend niet laden",
   "statistics_gas_sacTrend_subtitle": "Maandelijks gemiddelde over 5 jaar",
   "statistics_gas_sacTrend_title": "SAC-trend",

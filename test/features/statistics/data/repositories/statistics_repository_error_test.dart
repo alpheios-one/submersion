@@ -24,8 +24,6 @@ void main() {
       DatabaseService.instance.resetForTesting();
 
       // Methods that return empty list
-      expect(await repository.getSacVolumeTrend(), isEmpty);
-      expect(await repository.getSacPressureTrend(), isEmpty);
       expect(await repository.getGasMixDistribution(), isEmpty);
       expect(await repository.getDiveTypeDistribution(), isEmpty);
       expect(await repository.getDepthProgressionTrend(), isEmpty);
@@ -70,6 +68,8 @@ void main() {
       // Methods that return empty map
       expect(await repository.getSacVolumeByTankRole(), isEmpty);
       expect(await repository.getSacPressureByTankRole(), isEmpty);
+      expect(await repository.getSacVolumeTrendByRole(), isEmpty);
+      expect(await repository.getSacPressureTrendByRole(), isEmpty);
 
       // Methods that return tuple defaults
       final soloVsBuddy = await repository.getSoloVsBuddyCount();

@@ -5070,6 +5070,7 @@
   "statistics_gas_sacRecords_highest": "Maior Taxa SAC",
   "statistics_gas_sacRecords_subtitle": "Melhor e pior consumo de ar",
   "statistics_gas_sacRecords_title": "Registros de Taxa SAC",
+  "statistics_gas_sacTrend_empty": "Nenhum dado de SAC disponivel ainda",
   "statistics_gas_sacTrend_error": "Falha ao carregar tendencia de SAC",
   "statistics_gas_sacTrend_subtitle": "Media mensal ao longo de 5 anos",
   "statistics_gas_sacTrend_title": "Tendencia da Taxa SAC",

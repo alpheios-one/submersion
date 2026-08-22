@@ -4997,6 +4997,7 @@
   "statistics_gas_sacRecords_highest": "Legmagasabb SAC rata",
   "statistics_gas_sacRecords_subtitle": "Legjobb es legrosszabb levegofelhasznalas",
   "statistics_gas_sacRecords_title": "SAC rata rekordok",
+  "statistics_gas_sacTrend_empty": "Meg nincsenek SAC adatok",
   "statistics_gas_sacTrend_error": "Nem sikerult a SAC trend betoltese",
   "statistics_gas_sacTrend_subtitle": "Havi atlag 5 even at",
   "statistics_gas_sacTrend_title": "SAC rata trend",
