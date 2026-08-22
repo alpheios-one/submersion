@@ -400,6 +400,12 @@ jobs:
       - name: Run changelog generator test
         run: ./scripts/release/generate_changelog_test.sh
 
+      - name: Run release contributors test
+        # Stubs the GitHub API, so no token or network is needed here. Guards
+        # the two properties the credits depend on: PR numbers resolve from
+        # git alone, and no API failure can abort a release.
+        run: ./scripts/release/contributors_test.sh
+
       - name: Run fastlane beta changelog test
         run: ruby scripts/release/fastlane_beta_changelog_test.rb
 

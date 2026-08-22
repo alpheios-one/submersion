@@ -92,6 +92,55 @@ Two things still want a human:
   `phased_release: true` in `ios/fastlane/Fastfile` for a haltable 7-day iOS
   rollout, or put `automatic_release` back to `false` in both Fastfiles.
 
+## Contributor credits
+
+The stable release body credits work as it goes. `generate_changelog.sh`
+attributes every bullet to the person who wrote it and the PR that merged it
+(`- fixed a thing by @octocat in #42`), and closes with a **New Contributors**
+section naming anyone whose first commit to the repository landed in this
+release. Nothing to run by hand: `promote.yml` generates it.
+
+Where the authorship comes from, in `scripts/release/contributors.sh`:
+
+- **PR numbers come from git alone.** A merge commit records
+  `Merge pull request #N`, and its second parent names the commits that PR
+  contributed. A squash-merged commit carries `(#N)` in its subject instead.
+  Either way no network is involved.
+- **GitHub logins come from the API.** Git records a name and an email, never
+  a login, so an @mention that actually notifies someone has to be looked up
+  through `repos/.../compare`. First contributions are a second lookup per
+  contributor.
+
+Credits never block a release. If the API is unavailable the script falls back
+to logins derived from `@users.noreply.github.com` commit emails, and where
+even that fails the bullet simply renders without a name. First contributions
+are only ever claimed from the API, because announcing someone as a first-time
+contributor when they are not is worse than saying nothing. Bots are never
+credited and never announced.
+
+Two consumers treat the credits differently, from the same source:
+
+- The **Sparkle update dialog** and the GitHub release page show them in full.
+- The **App Store "What's New"** does not.
+  `sanitize_apple_store_notes.py` strips the handles, the PR numbers and the
+  whole New Contributors section, because `promote.yml` derives that field
+  from the published release body and an @handle is not a name.
+
+Pass `--no-attribution` to `generate_changelog.sh` to reproduce the older,
+uncredited body.
+
+**In the announcement, too.** Every `docs/releases/v<version>.md` ends with a
+`## 🙏 Contributors` section thanking the release's contributors by handle,
+with first-time contributors called out. Take the list from the generated
+release body rather than reconstructing it.
+
+The emoji is deliberate and local to these files. `docs/releases/*.md` are
+ScubaBoard posts rather than developer documentation, and every section
+heading in them carries one (`## ✨ New and improved`, `## 🐞 Bug fixes`,
+`## 🔧 Under the hood`, `## ⚠️ Upgrade notes`). No other document under
+`docs/` does. A bare `## Contributors` would be the odd heading out in its own
+file; the no-emoji rule in CLAUDE.md governs everything except this format.
+
 ## Play Store state
 
 Until Google grants production access (earned by a closed test with 12+
@@ -123,6 +172,7 @@ a build number above the current commit count. Expected to be rare.
 - Secrets (App Store, Play, Sparkle, `BETA_BUILDS_TOKEN`,
   `RELEASE_BOT_TOKEN`): `docs/developer/release-secrets-setup.md`
 - Workflows: `.github/workflows/{build-all,beta,promote,release}.yml`
-- Scripts: `scripts/release/` (`promote.sh`, `bump_version.sh`; the old
-  `release.sh` orchestrator belongs to the legacy tag path)
+- Scripts: `scripts/release/` (`promote.sh`, `bump_version.sh`,
+  `contributors.sh`; the old `release.sh` orchestrator belongs to the legacy
+  tag path)
 - Beta artifact host: `github.com/submersion-app/beta-builds`

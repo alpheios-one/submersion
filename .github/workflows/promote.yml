@@ -121,6 +121,11 @@ jobs:
       - name: Generate release notes and stable appcast
         env:
           TAG_NAME: ${{ steps.resolve.outputs.tag }}
+          # The changelog credits each bullet to its author and lists
+          # first-time contributors, which needs the API to turn commit emails
+          # into GitHub logins. Without a token it quietly falls back to
+          # unattributed bullets rather than failing the promotion.
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           git checkout "${{ steps.resolve.outputs.sha }}"
