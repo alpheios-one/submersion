@@ -21152,7 +21152,7 @@ abstract class AppLocalizations {
   /// No description provided for @media_diveMediaSection_unlinkSelectedContent.
   ///
   /// In en, this message translates to:
-  /// **'This will remove {count} media items from this dive. The original files won\'t be deleted.'**
+  /// **'This removes {count} media items from your library, including their cloud copies and thumbnails. Your original files are not affected.'**
   String media_diveMediaSection_unlinkSelectedContent(int count);
 
   /// No description provided for @media_diveMediaSection_unlinkSelectedSuccess.
@@ -22521,6 +22521,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unlink from site'**
   String get media_library_unlinkFromSite;
+
+  /// Confirm dialog title when unlinking would lose saved details
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink and discard details?'**
+  String get media_unlink_metadataLossTitle;
+
+  /// Confirm dialog body naming what an unlink discards
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural, =1{1 selected item has a caption or favourite saved in Submersion. Unlinking removes it from your library, so those details are lost. Your original file is not affected.} other{{count} selected items have a caption or favourite saved in Submersion. Unlinking removes them from your library, so those details are lost. Your original files are not affected.}}'**
+  String media_unlink_metadataLossContent(int count);
 
   /// Library selection action: clear the dive link
   ///

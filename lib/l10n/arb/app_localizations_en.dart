@@ -12251,7 +12251,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'This will remove $count media items from this dive. The original files won\'t be deleted.';
+    return 'This removes $count media items from your library, including their cloud copies and thumbnails. Your original files are not affected.';
   }
 
   @override
@@ -13101,6 +13101,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_library_unlinkFromSite => 'Unlink from site';
+
+  @override
+  String get media_unlink_metadataLossTitle => 'Unlink and discard details?';
+
+  @override
+  String media_unlink_metadataLossContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count selected items have a caption or favourite saved in Submersion. Unlinking removes them from your library, so those details are lost. Your original files are not affected.',
+      one:
+          '1 selected item has a caption or favourite saved in Submersion. Unlinking removes it from your library, so those details are lost. Your original file is not affected.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_library_unlinkSelected => 'Unlink';

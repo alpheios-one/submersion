@@ -6,6 +6,7 @@ import 'package:submersion/features/media/presentation/helpers/media_share_helpe
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_selection_provider.dart';
 import 'package:submersion/features/media/presentation/widgets/dive_picker_sheet.dart';
+import 'package:submersion/features/media/presentation/widgets/unlink_metadata_warning_dialog.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -60,6 +61,29 @@ class MediaSelectionBar extends ConsumerWidget {
   List<String> get _siteLinkedIds =>
       selectedItems.where((m) => m.siteId != null).map((m) => m.id).toList();
 
+  /// Unlinking removes the media from the library along with its cloud
+  /// proxies and thumbnails; the original source file is untouched, and
+  /// anything a dive site still needs keeps its row. Only a caption or a
+  /// favourite is unrecoverable, so that is the one case worth a dialog.
+  Future<void> _unlinkFromDive(BuildContext context, WidgetRef ref) async {
+    final ids = _diveLinkedIds;
+    if (ids.isEmpty) return;
+    final service = ref.read(mediaUnlinkServiceProvider);
+
+    final wouldLose = await service.idsWithUserMetadata(ids);
+    if (wouldLose.isNotEmpty) {
+      if (!context.mounted) return;
+      final go = await confirmUnlinkDiscardsMetadata(
+        context,
+        count: wouldLose.length,
+      );
+      if (!go) return;
+    }
+
+    await service.unlinkFromDive(ids);
+    ref.read(mediaSelectionProvider.notifier).clear();
+  }
+
   Future<void> _moveToDive(BuildContext context, WidgetRef ref) async {
     final diveId = await showDivePickerSheet(context);
     if (diveId == null) return;
@@ -100,12 +124,7 @@ class MediaSelectionBar extends ConsumerWidget {
                       TextButton.icon(
                         icon: const Icon(Icons.link_off),
                         label: Text(context.l10n.media_library_unlinkSelected),
-                        onPressed: () async {
-                          await ref
-                              .read(mediaRepositoryProvider)
-                              .unlinkFromDive(_diveLinkedIds);
-                          ref.read(mediaSelectionProvider.notifier).clear();
-                        },
+                        onPressed: () => _unlinkFromDive(context, ref),
                       ),
                     if (anySiteLinked)
                       TextButton.icon(

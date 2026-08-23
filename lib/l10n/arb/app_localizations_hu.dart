@@ -12421,7 +12421,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Ez eltávolít $count média elemet erről a merülésről. Az eredeti fájlok nem kerülnek törlésre.';
+    return 'Ez $count médiaelemet eltávolít a médiatárból, a felhőmásolatokkal és bélyegképekkel együtt. Az eredeti fájlok érintetlenek maradnak.';
   }
 
   @override
@@ -13278,6 +13278,23 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_library_unlinkFromSite => 'Leválasztás a merülőhelyről';
+
+  @override
+  String get media_unlink_metadataLossTitle =>
+      'Leválasztás és a részletek elvetése?';
+
+  @override
+  String media_unlink_metadataLossContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count kiválasztott elemhez felirat vagy kedvenc jelölés tartozik a Submersionben. A leválasztás eltávolítja őket a médiatárból, így ezek a részletek elvesznek. Az eredeti fájlok érintetlenek maradnak.',
+      one:
+          '1 kiválasztott elemhez felirat vagy kedvenc jelölés tartozik a Submersionben. A leválasztás eltávolítja a médiatárból, így ezek a részletek elvesznek. Az eredeti fájl érintetlen marad.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_library_unlinkSelected => 'Leválasztás';

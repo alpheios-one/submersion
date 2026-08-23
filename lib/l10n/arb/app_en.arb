@@ -7074,7 +7074,7 @@
   "media_diveMediaSection_unlinkDialogTitle": "Unlink Photo",
   "media_diveMediaSection_unlinkError": "Failed to unlink: {error}",
   "media_diveMediaSection_unlinkSelectedButton": "Unlink {count}",
-  "media_diveMediaSection_unlinkSelectedContent": "This will remove {count} media items from this dive. The original files won't be deleted.",
+  "media_diveMediaSection_unlinkSelectedContent": "This removes {count} media items from your library, including their cloud copies and thumbnails. Your original files are not affected.",
   "media_diveMediaSection_unlinkSelectedSuccess": "Unlinked {count} items",
   "media_diveMediaSection_unlinkSelectedTitle": "Unlink {count} items?",
   "media_diveMediaSection_unlinkSuccess": "Photo unlinked",
@@ -7878,6 +7878,19 @@
   "media_library_unlinkFromSite": "Unlink from site",
   "@media_library_unlinkFromSite": {
     "description": "Library selection action: clear the site link"
+  },
+  "media_unlink_metadataLossTitle": "Unlink and discard details?",
+  "@media_unlink_metadataLossTitle": {
+    "description": "Confirm dialog title when unlinking would lose saved details"
+  },
+  "media_unlink_metadataLossContent": "{count,plural, =1{1 selected item has a caption or favourite saved in Submersion. Unlinking removes it from your library, so those details are lost. Your original file is not affected.} other{{count} selected items have a caption or favourite saved in Submersion. Unlinking removes them from your library, so those details are lost. Your original files are not affected.}}",
+  "@media_unlink_metadataLossContent": {
+    "description": "Confirm dialog body naming what an unlink discards",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "media_library_unlinkSelected": "Unlink",
   "@media_library_unlinkSelected": {

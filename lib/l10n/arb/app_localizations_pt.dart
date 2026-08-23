@@ -12459,7 +12459,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Isso removera $count itens de midia deste mergulho. Os arquivos originais nao serao excluidos.';
+    return 'Isto remove $count itens de media da sua biblioteca, incluindo as copias na nuvem e as miniaturas. Os seus ficheiros originais nao sao afetados.';
   }
 
   @override
@@ -13320,6 +13320,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_library_unlinkFromSite => 'Desvincular do ponto';
+
+  @override
+  String get media_unlink_metadataLossTitle =>
+      'Desvincular e descartar os detalhes?';
+
+  @override
+  String media_unlink_metadataLossContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count itens selecionados tem legenda ou favorito guardados no Submersion. Ao desvincular, sao removidos da sua biblioteca e esses detalhes perdem-se. Os seus ficheiros originais nao sao afetados.',
+      one:
+          '1 item selecionado tem uma legenda ou favorito guardados no Submersion. Ao desvincular, ele e removido da sua biblioteca e esses detalhes perdem-se. O seu ficheiro original nao e afetado.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_library_unlinkSelected => 'Desvincular';

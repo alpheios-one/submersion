@@ -1302,6 +1302,78 @@ class MediaRepository {
     SyncEventBus.notifyLocalChange();
   }
 
+  /// Deletes the enrichment rows of [mediaIds], each with a tombstone.
+  ///
+  /// An enrichment is the join product of a media item and ONE dive's
+  /// profile, so it is stale the moment that dive link changes: both the
+  /// move path and the unlink path have to drop it rather than leave the
+  /// photo reporting a depth and elapsed time from a dive it has left.
+  /// mediaEnrichment is an HLC-synced entity, so the drop needs a logged
+  /// deletion or peers would replay the stale row straight back.
+  ///
+  /// Caller supplies the transaction; this does no committing of its own.
+  Future<void> _dropEnrichmentRows(List<String> mediaIds) async {
+    final stale = await (_db.select(
+      _db.mediaEnrichment,
+    )..where((t) => t.mediaId.isIn(mediaIds))).get();
+    for (final row in stale) {
+      await (_db.delete(
+        _db.mediaEnrichment,
+      )..where((t) => t.id.equals(row.id))).go();
+      await _syncRepository.logDeletion(
+        entityType: 'mediaEnrichment',
+        recordId: row.id,
+      );
+    }
+  }
+
+  /// Splits [mediaIds] by whether anything other than the dive still needs
+  /// the row, for the dive-unlink path.
+  ///
+  /// `siteLinked` rows survive a dive unlink with the link merely cleared,
+  /// the same carve-out the dive-deletion cascade makes: a dive-scoped
+  /// action must never destroy a site's only photo as a side effect.
+  Future<({List<String> deletable, List<String> siteLinked})>
+  partitionForDiveUnlink(List<String> mediaIds) async {
+    if (mediaIds.isEmpty) {
+      return (deletable: const <String>[], siteLinked: const <String>[]);
+    }
+    final rows = await (_db.select(
+      _db.media,
+    )..where((t) => t.id.isIn(mediaIds))).get();
+    final deletable = <String>[];
+    final siteLinked = <String>[];
+    for (final row in rows) {
+      if (row.siteId != null ||
+          libraryLevelSourceTypes.contains(row.sourceType)) {
+        siteLinked.add(row.id);
+      } else {
+        deletable.add(row.id);
+      }
+    }
+    return (deletable: deletable, siteLinked: siteLinked);
+  }
+
+  /// Of [mediaIds], those carrying metadata a user typed or set that no
+  /// source file holds: a caption, or the favourite flag.
+  ///
+  /// Used to decide whether an unlink needs to warn before it removes the
+  /// rows. Deliberately no join against `media_species`: that table is
+  /// declared but nothing in the app reads or writes it, so joining it
+  /// would cost a scan to always return nothing.
+  Future<Set<String>> idsWithUserMetadata(List<String> mediaIds) async {
+    if (mediaIds.isEmpty) return {};
+    final rows =
+        await (_db.select(_db.media)..where(
+              (t) =>
+                  t.id.isIn(mediaIds) &
+                  (t.isFavorite.equals(true) |
+                      (t.caption.isNotNull() & t.caption.equals('').not())),
+            ))
+            .get();
+    return {for (final row in rows) row.id};
+  }
+
   /// Moves media to [newDiveId] (also the link path for unlinked rows).
   /// Enrichment rows are join products of media x the OLD dive's profile:
   /// stale after the move, so they are deleted with tombstones (enrichment
@@ -1314,18 +1386,7 @@ class MediaRepository {
     if (mediaIds.isEmpty) return;
     final now = DateTime.now().millisecondsSinceEpoch;
     await _db.transaction(() async {
-      final stale = await (_db.select(
-        _db.mediaEnrichment,
-      )..where((t) => t.mediaId.isIn(mediaIds))).get();
-      for (final row in stale) {
-        await (_db.delete(
-          _db.mediaEnrichment,
-        )..where((t) => t.id.equals(row.id))).go();
-        await _syncRepository.logDeletion(
-          entityType: 'mediaEnrichment',
-          recordId: row.id,
-        );
-      }
+      await _dropEnrichmentRows(mediaIds);
       await (_db.update(_db.media)..where((t) => t.id.isIn(mediaIds))).write(
         MediaCompanion(diveId: Value(newDiveId), updatedAt: Value(now)),
       );
@@ -1340,14 +1401,22 @@ class MediaRepository {
     SyncEventBus.notifyLocalChange();
   }
 
-  /// User-initiated unlink (Media section Phase 2): clears the dive link,
-  /// keeps the row, and sets retain_in_library so the orphan sweep never
-  /// GCs the blobs of media the user deliberately kept. Same sync-safe
-  /// shape as [unlinkMediaFromDeletedDives], which deliberately does NOT
-  /// set the flag (dive-deletion leftovers stay sweepable).
+  /// Clears the dive link, keeps the row, and sets retain_in_library so the
+  /// orphan sweep never GCs the blobs of media deliberately kept. Same
+  /// sync-safe shape as [unlinkMediaFromDeletedDives], which deliberately
+  /// does NOT set the flag (dive-deletion leftovers stay sweepable).
+  ///
+  /// Reached from [MediaUnlinkService] for media a dive site still needs.
+  /// Media with no other attachment is deleted outright instead, so this is
+  /// no longer the whole of what a user-initiated unlink does.
+  ///
+  /// Drops the enrichment as part of the same transaction: it was computed
+  /// against the dive being left, so keeping it would leave the photo
+  /// reporting that dive's depth and elapsed time from the site gallery.
   Future<void> unlinkFromDive(List<String> mediaIds) => _unlinkColumns(
     mediaIds,
     const MediaCompanion(diveId: Value(null), retainInLibrary: Value(true)),
+    dropEnrichment: true,
   );
 
   /// Same mechanic for the site link.
@@ -1368,11 +1437,13 @@ class MediaRepository {
 
   Future<void> _unlinkColumns(
     List<String> mediaIds,
-    MediaCompanion changes,
-  ) async {
+    MediaCompanion changes, {
+    bool dropEnrichment = false,
+  }) async {
     if (mediaIds.isEmpty) return;
     final now = DateTime.now().millisecondsSinceEpoch;
     await _db.transaction(() async {
+      if (dropEnrichment) await _dropEnrichmentRows(mediaIds);
       await (_db.update(_db.media)..where((t) => t.id.isIn(mediaIds))).write(
         changes.copyWith(updatedAt: Value(now)),
       );
