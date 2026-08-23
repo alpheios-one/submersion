@@ -301,21 +301,33 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
           );
 
           final dive = diveAsync.value;
+          // Whether this item is synced to a moment in the profile, decided
+          // from the enrichment alone. Media that is not synced can never
+          // show the Perdix face, whatever the analysis would say.
+          final perdixPrecondition =
+              enrichment?.elapsedSeconds != null &&
+              enrichment!.matchConfidence != MatchConfidence.noProfile;
+
           // Same source-aware profile/analysis pairing as the fullscreen
           // profile page: analysis curves are read by index, so the profile
           // passed to the resolver must be the one the analysis was computed
-          // over (multi-computer dives). Skipped entirely for items with no
-          // dive link — there is no profile to resolve against.
-          final PerdixFaceResolver perdixResolver;
-          if (currentDiveId == null) {
-            perdixResolver = PerdixFaceResolver(
-              profile: const [],
-              analysis: null,
-              tanks: const [],
-              gasSwitches: const [],
-              tankPressures: null,
-            );
-          } else {
+          // over (multi-computer dives).
+          //
+          // Built ONLY when the face can actually render: a dive-linked,
+          // profile-synced item with the overlay turned on. The watches
+          // below start the per-source profile analysis, and through it the
+          // full Buhlmann pipeline with its recursive residual-CNS/tissue
+          // lookback across the surrounding dives. Watching that
+          // unconditionally ran the whole cascade on the UI isolate for
+          // every dive-linked item the viewer showed, with the result
+          // discarded whenever the overlay was off -- the first ingredient
+          // of the app-wide freeze after viewing media (2026-08 hang
+          // reports). Toggling the overlay on simply rebuilds and starts the
+          // watches then.
+          PerdixFaceResolver? perdixResolver;
+          if (currentDiveId != null &&
+              perdixPrecondition &&
+              settings.perdixOverlayEnabled) {
             final activeSourceId = ref.watch(
               activeDiveSourceProvider(currentDiveId),
             );
@@ -365,10 +377,17 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
               tankPressures: tankPressures,
             );
           }
-          final perdixAvailable =
-              enrichment?.elapsedSeconds != null &&
-              enrichment!.matchConfidence != MatchConfidence.noProfile &&
-              perdixResolver.isAvailable;
+          // With the overlay on, availability is the resolver's own answer.
+          // With it off, no resolver exists (that is the point: no analysis
+          // runs), so the toolbar toggle is offered from what is known
+          // cheaply: a synced item and a non-empty profile. For a
+          // multi-computer dive the source-scoped profile can differ from
+          // the merged one, so this can rarely offer a toggle the resolver
+          // would then decline; the cost is an inert toggle, not a wrongly
+          // hidden one.
+          final perdixAvailable = perdixResolver != null
+              ? perdixResolver.isAvailable
+              : perdixPrecondition && (diveProfile?.isNotEmpty ?? false);
 
           final viewer = GestureDetector(
             // Swipe down to close (common pattern for fullscreen viewers)
@@ -498,7 +517,9 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                 // The face absorbs pointer events over its own bounds (drags
                 // move it, taps do nothing); chrome-toggle and video
                 // play/pause taps work anywhere outside it.
-                if (perdixAvailable && settings.perdixOverlayEnabled)
+                if (perdixAvailable &&
+                    settings.perdixOverlayEnabled &&
+                    perdixResolver != null)
                   DraggablePerdixOverlay(
                     // Re-key when the persisted seed first arrives so a late
                     // settings load re-seeds the position (same trick as the
@@ -508,7 +529,9 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                       '${settings.perdixOverlayX}-${settings.perdixOverlayY}',
                     ),
                     resolver: perdixResolver,
-                    baseElapsedSeconds: enrichment.elapsedSeconds!,
+                    // Non-null under perdixAvailable: the resolver is only
+                    // ever built for items passing perdixPrecondition.
+                    baseElapsedSeconds: enrichment!.elapsedSeconds!,
                     settings: settings,
                     topReserve:
                         MediaQuery.paddingOf(context).top + _topChromeHeight,
