@@ -9599,6 +9599,12 @@ abstract class AppLocalizations {
   /// **'Clear rating filter'**
   String get diveLog_filter_clearRating;
 
+  /// No description provided for @diveLog_filter_clearWeekdays.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear weekdays'**
+  String get diveLog_filter_clearWeekdays;
+
   /// No description provided for @diveLog_filter_dateSeparator.
   ///
   /// In en, this message translates to:
@@ -9748,6 +9754,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tags'**
   String get diveLog_filter_sectionTags;
+
+  /// No description provided for @diveLog_filter_sectionWeekdays.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekdays'**
+  String get diveLog_filter_sectionWeekdays;
 
   /// No description provided for @diveLog_filter_showOnlyFavorites.
   ///

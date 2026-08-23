@@ -58,6 +58,19 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
     params.addAll(filter.tagIds);
   }
 
+  // Weekdays: match ANY selected weekday. dive_date_time is wall-clock-as-UTC
+  // epoch ms, so strftime('%w', ...) (0=Sunday..6=Saturday) already lines up
+  // with the wall-clock day -- no 'utc' modifier needed. Converting
+  // DateTime.weekday (1=Monday..7=Sunday) via `% 7` matches that numbering.
+  if (filter.weekdays.isNotEmpty) {
+    final ph = List.filled(filter.weekdays.length, '?').join(', ');
+    conditions.add(
+      "CAST(strftime('%w', dive_date_time / 1000, 'unixepoch') AS INTEGER) "
+      'IN ($ph)',
+    );
+    params.addAll(filter.weekdays.map((w) => w % 7));
+  }
+
   // Equipment: match ANY selected item.
   if (filter.equipmentIds.isNotEmpty) {
     final ph = List.filled(filter.equipmentIds.length, '?').join(', ');

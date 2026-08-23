@@ -5787,6 +5787,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_filter_clearRating => 'Borrar filtro de valoración';
 
   @override
+  String get diveLog_filter_clearWeekdays => 'Borrar días de la semana';
+
+  @override
   String get diveLog_filter_dateSeparator => 'hasta';
 
   @override
@@ -5862,6 +5865,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionTags => 'Etiquetas';
+
+  @override
+  String get diveLog_filter_sectionWeekdays => 'Días de la semana';
 
   @override
   String get diveLog_filter_showOnlyFavorites =>

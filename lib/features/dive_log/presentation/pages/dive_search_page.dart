@@ -12,6 +12,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/weekday_filter_selector.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
@@ -44,6 +45,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
   // Date Range
   DateTime? _startDate;
   DateTime? _endDate;
+  List<int> _selectedWeekdays = [];
 
   // Location
   String? _siteId;
@@ -110,6 +112,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     final filter = ref.read(_filterProvider);
     _startDate = filter.startDate;
     _endDate = filter.endDate;
+    _selectedWeekdays = List.from(filter.weekdays);
     _siteId = filter.siteId;
     _tripId = filter.tripId;
     _diveCenterId = filter.diveCenterId;
@@ -138,7 +141,11 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     _buddyNameController.text = _buddyNameFilter ?? '';
 
     // Auto-expand sections with active filters
-    if (_startDate != null || _endDate != null) _expanded['date'] = true;
+    if (_startDate != null ||
+        _endDate != null ||
+        _selectedWeekdays.isNotEmpty) {
+      _expanded['date'] = true;
+    }
     if (_siteId != null || _tripId != null || _diveCenterId != null) {
       _expanded['location'] = true;
     }
@@ -375,6 +382,31 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
             ),
           ),
         ],
+        const SizedBox(height: 16),
+
+        // Weekdays. ANDs with the date range above: when both are set, only
+        // dives inside the range AND on one of these weekdays match.
+        Text(
+          context.l10n.diveLog_filter_sectionWeekdays,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        const SizedBox(height: 8),
+        WeekdayFilterSelector(
+          selectedWeekdays: _selectedWeekdays,
+          onChanged: (weekdays) {
+            setState(() => _selectedWeekdays = weekdays);
+          },
+        ),
+        if (_selectedWeekdays.isNotEmpty)
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: TextButton(
+              onPressed: () {
+                setState(() => _selectedWeekdays = []);
+              },
+              child: Text(context.l10n.diveLog_filter_clearWeekdays),
+            ),
+          ),
       ],
     );
   }
@@ -807,6 +839,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     setState(() {
       _startDate = null;
       _endDate = null;
+      _selectedWeekdays = [];
       _siteId = null;
       _tripId = null;
       _diveCenterId = null;
@@ -840,6 +873,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     ref.read(_filterProvider.notifier).state = DiveFilterState(
       startDate: _startDate,
       endDate: _endDate,
+      weekdays: _selectedWeekdays,
       siteId: _siteId,
       tripId: _tripId,
       diveCenterId: _diveCenterId,

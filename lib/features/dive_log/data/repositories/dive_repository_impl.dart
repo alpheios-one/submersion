@@ -2038,6 +2038,20 @@ class DiveRepository {
         args.add(Variable(tagId));
       }
     }
+    if (filter.weekdays.isNotEmpty) {
+      // d.dive_date_time is wall-clock-as-UTC epoch ms, so strftime('%w', ...)
+      // (0=Sunday..6=Saturday) already lines up with the wall-clock day.
+      // Converting DateTime.weekday (1=Monday..7=Sunday) via `% 7` matches
+      // that numbering, mirroring buildFilteredDiveIdSubquery.
+      final placeholders = List.filled(filter.weekdays.length, '?').join(', ');
+      clauses.add(
+        "CAST(strftime('%w', d.dive_date_time / 1000, 'unixepoch') AS INTEGER) "
+        'IN ($placeholders)',
+      );
+      for (final weekday in filter.weekdays) {
+        args.add(Variable(weekday % 7));
+      }
+    }
     if (filter.equipmentIds.isNotEmpty) {
       final placeholders = List.filled(
         filter.equipmentIds.length,

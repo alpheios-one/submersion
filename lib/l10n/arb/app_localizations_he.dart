@@ -5635,6 +5635,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_filter_clearRating => 'ניקוי מסנן דירוג';
 
   @override
+  String get diveLog_filter_clearWeekdays => 'ניקוי ימי השבוע';
+
+  @override
   String get diveLog_filter_dateSeparator => 'עד';
 
   @override
@@ -5708,6 +5711,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionTags => 'תגיות';
+
+  @override
+  String get diveLog_filter_sectionWeekdays => 'ימי השבוע';
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'הצגת צלילות מועדפות בלבד';

@@ -5782,6 +5782,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_filter_clearRating => 'Bewertungsfilter zurücksetzen';
 
   @override
+  String get diveLog_filter_clearWeekdays => 'Wochentage zurücksetzen';
+
+  @override
   String get diveLog_filter_dateSeparator => 'bis';
 
   @override
@@ -5856,6 +5859,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionTags => 'Tags';
+
+  @override
+  String get diveLog_filter_sectionWeekdays => 'Wochentage';
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'Nur Favoriten anzeigen';

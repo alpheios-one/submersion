@@ -5493,6 +5493,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_filter_clearRating => '清除评分筛选';
 
   @override
+  String get diveLog_filter_clearWeekdays => '清除星期筛选';
+
+  @override
   String get diveLog_filter_dateSeparator => '至';
 
   @override
@@ -5566,6 +5569,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionTags => '标签';
+
+  @override
+  String get diveLog_filter_sectionWeekdays => '星期';
 
   @override
   String get diveLog_filter_showOnlyFavorites => '仅显示收藏的潜水';

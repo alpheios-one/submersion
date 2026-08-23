@@ -22,6 +22,12 @@ class DiveFilterState {
   final bool? noBuddyOnly;
   final List<String> tagIds;
 
+  /// Restricts results to dives whose [Dive.dateTime] falls on one of these
+  /// weekdays, using [DateTime.weekday] numbering (1 = Monday, 7 = Sunday).
+  /// ANDs with [startDate]/[endDate] when both are set, like every other
+  /// axis in this filter.
+  final List<int> weekdays;
+
   // v1.5: Additional filter criteria
   final List<String> equipmentIds;
   final String? buddyNameFilter;
@@ -62,6 +68,7 @@ class DiveFilterState {
     this.favoritesOnly,
     this.noBuddyOnly,
     this.tagIds = const [],
+    this.weekdays = const [],
     this.equipmentIds = const [],
     this.buddyNameFilter,
     this.buddyId,
@@ -92,6 +99,7 @@ class DiveFilterState {
       favoritesOnly == true ||
       noBuddyOnly == true ||
       tagIds.isNotEmpty ||
+      weekdays.isNotEmpty ||
       equipmentIds.isNotEmpty ||
       (buddyNameFilter != null && buddyNameFilter!.isNotEmpty) ||
       buddyId != null ||
@@ -117,6 +125,7 @@ class DiveFilterState {
     bool? favoritesOnly,
     bool? noBuddyOnly,
     List<String>? tagIds,
+    List<int>? weekdays,
     List<String>? equipmentIds,
     String? buddyNameFilter,
     String? buddyId,
@@ -144,6 +153,7 @@ class DiveFilterState {
     bool clearFavoritesOnly = false,
     bool clearNoBuddyOnly = false,
     bool clearTagIds = false,
+    bool clearWeekdays = false,
     bool clearEquipmentIds = false,
     bool clearBuddyNameFilter = false,
     bool clearBuddyId = false,
@@ -174,6 +184,7 @@ class DiveFilterState {
           : (favoritesOnly ?? this.favoritesOnly),
       noBuddyOnly: clearNoBuddyOnly ? null : (noBuddyOnly ?? this.noBuddyOnly),
       tagIds: clearTagIds ? const [] : (tagIds ?? this.tagIds),
+      weekdays: clearWeekdays ? const [] : (weekdays ?? this.weekdays),
       equipmentIds: clearEquipmentIds
           ? const []
           : (equipmentIds ?? this.equipmentIds),
@@ -274,6 +285,9 @@ class DiveFilterState {
         if (!tagIds.any((tagId) => diveTagIds.contains(tagId))) {
           return false;
         }
+      }
+      if (weekdays.isNotEmpty && !weekdays.contains(dive.dateTime.weekday)) {
+        return false;
       }
       if (buddyNameFilter != null && buddyNameFilter!.isNotEmpty) {
         final filters = buddyNameFilter!

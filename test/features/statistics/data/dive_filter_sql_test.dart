@@ -288,6 +288,44 @@ void main() {
     });
   });
 
+  test('weekday filter matches ANY selected weekday', () async {
+    // 28 days apart (4 whole weeks) guarantees the same weekday regardless
+    // of which actual day of the week these calendar dates land on.
+    final mondayA = DateTime(2026, 6, 8);
+    final mondayB = DateTime(2026, 7, 6);
+    final tuesday = DateTime(2026, 6, 9);
+    await insertDive('mon-a', date: mondayA);
+    await insertDive('mon-b', date: mondayB);
+    await insertDive('tue', date: tuesday);
+
+    expect(await idsMatching(DiveFilterState(weekdays: [mondayA.weekday])), {
+      'mon-a',
+      'mon-b',
+    });
+    expect(
+      await idsMatching(
+        DiveFilterState(weekdays: [mondayA.weekday, tuesday.weekday]),
+      ),
+      {'mon-a', 'mon-b', 'tue'},
+    );
+  });
+
+  test('weekday filter ANDs with date range when both are set', () async {
+    final mondayInRange = DateTime(2026, 6, 8);
+    final mondayOutOfRange = DateTime(2026, 7, 6);
+    final tuesdayInRange = DateTime(2026, 6, 9);
+    await insertDive('mon-in', date: mondayInRange);
+    await insertDive('mon-out', date: mondayOutOfRange);
+    await insertDive('tue-in', date: tuesdayInRange);
+
+    final filter = DiveFilterState(
+      startDate: DateTime(2026, 6, 1),
+      endDate: DateTime(2026, 6, 30),
+      weekdays: [mondayInRange.weekday],
+    );
+    expect(await idsMatching(filter), {'mon-in'});
+  });
+
   test('site, depth, rating, favorites axes', () async {
     await insertSite('s1');
     await insertDive(
@@ -553,6 +591,9 @@ void main() {
       'diveCenterId': const DiveFilterState(diveCenterId: 'c1'),
       'tripId': const DiveFilterState(tripId: 't1'),
       'single tag': const DiveFilterState(tagIds: ['dry']),
+      'weekday (ANY)': DiveFilterState(
+        weekdays: [DateTime(2026, 1, 10).weekday, DateTime(2026, 4, 1).weekday],
+      ),
       'multi tag (ANY)': const DiveFilterState(tagIds: ['dry', 'night']),
       'equipment (ANY)': const DiveFilterState(equipmentIds: ['eq1']),
       'minDepth (null-exclusion)': const DiveFilterState(minDepth: 20),

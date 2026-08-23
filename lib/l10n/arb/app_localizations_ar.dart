@@ -5664,6 +5664,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filter_clearRating => 'مسح تصفية التقييم';
 
   @override
+  String get diveLog_filter_clearWeekdays => 'مسح أيام الأسبوع';
+
+  @override
   String get diveLog_filter_dateSeparator => 'إلى';
 
   @override
@@ -5737,6 +5740,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionTags => 'الوسوم';
+
+  @override
+  String get diveLog_filter_sectionWeekdays => 'أيام الأسبوع';
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'عرض الغوصات المفضلة فقط';
