@@ -129,15 +129,19 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
   ///
   /// Reading the one item actually on screen straight from the database
   /// settles both: the library keeps its lean grid, and the viewer keeps
-  /// showing the truth. [mediaByIdProvider] self-invalidates on media
-  /// changes, so a re-link performed while the viewer is open lands too.
+  /// showing the truth. [mediaByIdProvider] self-invalidates on media and
+  /// enrichment changes, so a re-link or a backfill that happens while the
+  /// viewer is open lands too.
   ///
-  /// The early return keeps the dive-detail path free of a second read: its
-  /// list already arrives enriched and reactive.
-  MediaItem _hydrate(MediaItem item) {
-    if (item.enrichment != null) return item;
-    return ref.watch(mediaByIdProvider(item.id)).value ?? item;
-  }
+  /// Deliberately unconditional. Skipping the read for a snapshot that
+  /// already carries an enrichment would save one keyed lookup on the
+  /// dive-detail path, but a snapshot holding an enrichment is no more
+  /// current than one holding none: both were captured when the route was
+  /// pushed. Trusting it is what produced this class of bug twice already,
+  /// so the rule is that the on-screen item always comes from the database.
+  /// The passed item stands in only while the read is in flight.
+  MediaItem _hydrate(MediaItem item) =>
+      ref.watch(mediaByIdProvider(item.id)).value ?? item;
 
   /// Computes and saves the missing [MediaEnrichment] rows for [diveId], the
   /// same idempotent backfill dive detail runs on open.
