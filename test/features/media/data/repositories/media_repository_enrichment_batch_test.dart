@@ -129,4 +129,36 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 300));
     expect(ticks, 0);
   });
+
+  test('a failing row rolls back the whole batch and rethrows', () async {
+    await seedDiveAndMedia(['m1']);
+
+    // 'm-missing' violates mediaEnrichment's media FK (enforced at open),
+    // so the second insert throws mid-transaction. All-or-nothing is the
+    // point of the batch: a partial backfill would leave some photos
+    // enriched and some not, with no pending-sync rows to say which.
+    await expectLater(
+      repository.saveEnrichments([
+        enrichmentFor('m1'),
+        enrichmentFor('m-missing'),
+      ]),
+      throwsA(anything),
+    );
+
+    expect(
+      await repository.getEnrichmentForMedia('m1'),
+      isNull,
+      reason:
+          'the transaction must roll back the rows written before the '
+          'failure, not persist a partial batch',
+    );
+    final pending = await db.select(db.syncRecords).get();
+    expect(
+      pending.where((r) => r.entityType == 'mediaEnrichment'),
+      isEmpty,
+      reason:
+          'pending-sync marks ride the same transaction and must roll '
+          'back with it',
+    );
+  });
 }
