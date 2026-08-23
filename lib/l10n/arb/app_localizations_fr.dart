@@ -23474,6 +23474,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Comptes';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Affichage';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Configuration guidée';
 
   @override
@@ -23576,6 +23579,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'Chargement en cours. Touchez pour réessayer.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Aucun accès à la photothèque';
 
   @override
   String get attrLabel_size => 'Taille';
@@ -30159,6 +30166,33 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Vérifier tous les médias';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count éléments mis à jour',
+      one: '$count élément mis à jour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Impossible de vérifier les $count éléments. Leurs sources sont actuellement inaccessibles.',
+      one:
+          'Impossible de vérifier cet élément. Sa source est actuellement inaccessible.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Sources de médias';
 
   @override
@@ -32983,6 +33017,39 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Absent et non sauvegardé';
+
+  @override
+  String get media_servedFrom_localDisk => 'Sur cet appareil';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Photothèque';
+
+  @override
+  String get media_servedFrom_storeCache => 'Stockage cloud, en cache ici';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Stockage cloud';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Lien web';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Service connecté, en cache ici';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Service connecté';
+
+  @override
+  String get media_servedFrom_embedded => 'Enregistré dans ce carnet';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Afficher les badges de source sur les vignettes';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Une petite icône indiquant d\'où provient chaque élément. Les badges de problème restent toujours visibles.';
 
   @override
   String get media_status_transferFailed => 'Échec du téléversement';

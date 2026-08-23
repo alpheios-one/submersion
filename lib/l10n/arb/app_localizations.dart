@@ -38930,6 +38930,12 @@ abstract class AppLocalizations {
   /// **'Accounts'**
   String get settings_photosMedia_accountsHeader;
 
+  /// No description provided for @settings_photosMedia_displayHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Display'**
+  String get settings_photosMedia_displayHeader;
+
   /// No description provided for @settings_photosMedia_guidedSetup.
   ///
   /// In en, this message translates to:
@@ -39103,6 +39109,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Still loading. Tap to retry.'**
   String get media_unavailablePlaceholder_stillFetching;
+
+  /// No description provided for @media_unavailablePlaceholder_accessDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'No photo library access'**
+  String get media_unavailablePlaceholder_accessDenied;
 
   /// No description provided for @attrLabel_size.
   ///
@@ -50329,6 +50341,24 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{{count} item updated} other{{count} items updated}}'**
   String settings_mediaSources_reverifyResult(int count);
 
+  /// Media Sources: verify every media row regardless of source type
+  ///
+  /// In en, this message translates to:
+  /// **'Check all media'**
+  String get settings_mediaSources_checkAll;
+
+  /// Media Sources: how many rows the check-all pass updated
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} item updated} other{{count} items updated}}'**
+  String settings_mediaSources_checkAllResult(int count);
+
+  /// Media Sources: the check-all pass reached none of the rows sources
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Could not check the item. Its source is not reachable right now.} other{Could not check any of the {count} items. Their sources are not reachable right now.}}'**
+  String settings_mediaSources_checkAllBlocked(int count);
+
   /// Media Sources settings page app bar title
   ///
   /// In en, this message translates to:
@@ -54417,6 +54447,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Missing and not backed up'**
   String get media_status_broken;
+
+  /// No description provided for @media_servedFrom_localDisk.
+  ///
+  /// In en, this message translates to:
+  /// **'On this device'**
+  String get media_servedFrom_localDisk;
+
+  /// No description provided for @media_servedFrom_platformGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo library'**
+  String get media_servedFrom_platformGallery;
+
+  /// No description provided for @media_servedFrom_storeCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud store, cached here'**
+  String get media_servedFrom_storeCache;
+
+  /// No description provided for @media_servedFrom_storeNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud store'**
+  String get media_servedFrom_storeNetwork;
+
+  /// No description provided for @media_servedFrom_networkUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Web link'**
+  String get media_servedFrom_networkUrl;
+
+  /// No description provided for @media_servedFrom_connectorCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected service, cached here'**
+  String get media_servedFrom_connectorCache;
+
+  /// No description provided for @media_servedFrom_connectorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected service'**
+  String get media_servedFrom_connectorNetwork;
+
+  /// No description provided for @media_servedFrom_embedded.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored in this logbook'**
+  String get media_servedFrom_embedded;
+
+  /// No description provided for @settings_media_provenanceBadges.
+  ///
+  /// In en, this message translates to:
+  /// **'Show source badges on thumbnails'**
+  String get settings_media_provenanceBadges;
+
+  /// No description provided for @settings_media_provenanceBadgesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A small glyph showing where each item is served from. Problem badges always show.'**
+  String get settings_media_provenanceBadgesSubtitle;
 
   /// No description provided for @media_status_transferFailed.
   ///

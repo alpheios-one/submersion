@@ -22821,6 +22821,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'חשבונות';
 
   @override
+  String get settings_photosMedia_displayHeader => 'תצוגה';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'הגדרה מודרכת';
 
   @override
@@ -22916,6 +22919,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'עדיין נטען. הקש כדי לנסות שוב.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'אין גישה לספריית התמונות';
 
   @override
   String get attrLabel_size => 'מידה';
@@ -29451,6 +29458,38 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'בדיקת כל המדיה';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטים עודכנו',
+      many: '$count פריטים עודכנו',
+      two: '$count פריטים עודכנו',
+      one: 'פריט אחד עודכן',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'לא ניתן היה לבדוק אף אחד מ-$count הפריטים. המקורות שלהם אינם זמינים כרגע.',
+      many:
+          'לא ניתן היה לבדוק אף אחד מ-$count הפריטים. המקורות שלהם אינם זמינים כרגע.',
+      two:
+          'לא ניתן היה לבדוק אף אחד מ-$count הפריטים. המקורות שלהם אינם זמינים כרגע.',
+      one: 'לא ניתן היה לבדוק את הפריט. המקור שלו אינו זמין כרגע.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'מקורות מדיה';
 
   @override
@@ -32238,6 +32277,38 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_status_broken => 'חסר ולא מגובה';
+
+  @override
+  String get media_servedFrom_localDisk => 'במכשיר הזה';
+
+  @override
+  String get media_servedFrom_platformGallery => 'ספריית התמונות';
+
+  @override
+  String get media_servedFrom_storeCache => 'אחסון ענן, שמור במטמון כאן';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'אחסון ענן';
+
+  @override
+  String get media_servedFrom_networkUrl => 'קישור אינטרנט';
+
+  @override
+  String get media_servedFrom_connectorCache => 'שירות מחובר, שמור במטמון כאן';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'שירות מחובר';
+
+  @override
+  String get media_servedFrom_embedded => 'שמור ביומן הזה';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'הצגת תגי מקור על תמונות ממוזערות';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'סמל קטן שמראה מאיפה כל פריט מוגש. תגי בעיה מוצגים תמיד.';
 
   @override
   String get media_status_transferFailed => 'ההעלאה נכשלה';

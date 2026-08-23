@@ -23359,6 +23359,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Konten';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Anzeige';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Geführte Einrichtung';
 
   @override
@@ -23461,6 +23464,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'Wird noch geladen. Zum Wiederholen tippen.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Kein Zugriff auf die Fotomediathek';
 
   @override
   String get attrLabel_size => 'Größe';
@@ -30023,6 +30030,33 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Alle Medien prüfen';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente aktualisiert',
+      one: '$count Element aktualisiert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Keines der $count Elemente konnte geprüft werden. Ihre Quellen sind derzeit nicht erreichbar.',
+      one:
+          'Das Element konnte nicht geprüft werden. Seine Quelle ist derzeit nicht erreichbar.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Medienquellen';
 
   @override
@@ -32832,6 +32866,40 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Fehlt und nicht gesichert';
+
+  @override
+  String get media_servedFrom_localDisk => 'Auf diesem Gerät';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Fotomediathek';
+
+  @override
+  String get media_servedFrom_storeCache =>
+      'Cloud-Speicher, hier zwischengespeichert';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Cloud-Speicher';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Weblink';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Verbundener Dienst, hier zwischengespeichert';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Verbundener Dienst';
+
+  @override
+  String get media_servedFrom_embedded => 'In diesem Logbuch gespeichert';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Quellen-Badges auf Miniaturen anzeigen';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Ein kleines Symbol, das zeigt, woher jedes Element geladen wird. Problem-Badges werden immer angezeigt.';
 
   @override
   String get media_status_transferFailed => 'Upload fehlgeschlagen';

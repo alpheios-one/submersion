@@ -23320,6 +23320,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Fiókok';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Megjelenítés';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Vezetett beállítás';
 
   @override
@@ -23422,6 +23425,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'Még töltődik. Koppintson az újrapróbálkozáshoz.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Nincs hozzáférés a fotókönyvtárhoz';
 
   @override
   String get attrLabel_size => 'Méret';
@@ -29974,6 +29981,33 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Az összes média ellenőrzése';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem frissítve',
+      one: '$count elem frissítve',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'A(z) $count elem egyikét sem sikerült ellenőrizni. A forrásaik jelenleg nem érhetők el.',
+      one:
+          'Az elemet nem sikerült ellenőrizni. A forrása jelenleg nem érhető el.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Médiaforrások';
 
   @override
@@ -32776,6 +32810,40 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Hiányzik és nincs mentve';
+
+  @override
+  String get media_servedFrom_localDisk => 'Ezen az eszközön';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Fotókönyvtár';
+
+  @override
+  String get media_servedFrom_storeCache => 'Felhőtár, itt gyorsítótárazva';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Felhőtár';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Webhivatkozás';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Csatlakoztatott szolgáltatás, itt gyorsítótárazva';
+
+  @override
+  String get media_servedFrom_connectorNetwork =>
+      'Csatlakoztatott szolgáltatás';
+
+  @override
+  String get media_servedFrom_embedded => 'Ebben a naplóban tárolva';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Forrásjelvények megjelenítése a bélyegképeken';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Kis ikon, amely megmutatja, honnan érkezik az egyes elemek tartalma. A problémajelvények mindig láthatók.';
 
   @override
   String get media_status_transferFailed => 'A feltöltés sikertelen';

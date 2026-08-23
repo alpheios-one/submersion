@@ -23416,6 +23416,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Cuentas';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Visualización';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Configuración guiada';
 
   @override
@@ -23518,6 +23521,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'Aún se está cargando. Toca para reintentar.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Sin acceso a la fototeca';
 
   @override
   String get attrLabel_size => 'Talla';
@@ -30100,6 +30107,33 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Comprobar todos los archivos';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementos actualizados',
+      one: '$count elemento actualizado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'No se pudo comprobar ninguno de los $count elementos. Sus orígenes no están accesibles ahora mismo.',
+      one:
+          'No se pudo comprobar el elemento. Su origen no está accesible ahora mismo.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Fuentes de medios';
 
   @override
@@ -32936,6 +32970,39 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Falta y sin copia';
+
+  @override
+  String get media_servedFrom_localDisk => 'En este dispositivo';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Fototeca';
+
+  @override
+  String get media_servedFrom_storeCache => 'Almacén en la nube, en caché aquí';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Almacén en la nube';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Enlace web';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Servicio conectado, en caché aquí';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Servicio conectado';
+
+  @override
+  String get media_servedFrom_embedded => 'Guardado en este cuaderno';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Mostrar distintivos de origen en las miniaturas';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Un pequeño icono que indica de dónde procede cada elemento. Los distintivos de problemas siempre se muestran.';
 
   @override
   String get media_status_transferFailed => 'Falló la subida';

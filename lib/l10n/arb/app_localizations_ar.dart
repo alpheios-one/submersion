@@ -22985,6 +22985,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'الحسابات';
 
   @override
+  String get settings_photosMedia_displayHeader => 'العرض';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'إعداد موجه';
 
   @override
@@ -23083,6 +23086,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'ما زال قيد التحميل. اضغط لإعادة المحاولة.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'لا يوجد وصول إلى مكتبة الصور';
 
   @override
   String get attrLabel_size => 'المقاس';
@@ -29684,6 +29691,39 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'فحص جميع الوسائط';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تحديث $count عنصر',
+      many: 'تم تحديث $count عنصرا',
+      few: 'تم تحديث $count عناصر',
+      two: 'تم تحديث عنصرين',
+      one: 'تم تحديث عنصر واحد',
+      zero: 'لم يتم تحديث أي عنصر',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تعذر فحص أي من العناصر $count. مصادرها غير متاحة حاليا.',
+      many: 'تعذر فحص أي من العناصر $count. مصادرها غير متاحة حاليا.',
+      few: 'تعذر فحص أي من العناصر $count. مصادرها غير متاحة حاليا.',
+      two: 'تعذر فحص العنصرين. مصادرهما غير متاحة حاليا.',
+      one: 'تعذر فحص العنصر. مصدره غير متاح حاليا.',
+      zero: 'تعذر فحص أي عنصر. مصادرها غير متاحة حاليا.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'مصادر الوسائط';
 
   @override
@@ -32579,6 +32619,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_status_broken => 'مفقود وغير منسوخ احتياطيًا';
+
+  @override
+  String get media_servedFrom_localDisk => 'على هذا الجهاز';
+
+  @override
+  String get media_servedFrom_platformGallery => 'مكتبة الصور';
+
+  @override
+  String get media_servedFrom_storeCache => 'تخزين سحابي، مخزن مؤقتا هنا';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'تخزين سحابي';
+
+  @override
+  String get media_servedFrom_networkUrl => 'رابط ويب';
+
+  @override
+  String get media_servedFrom_connectorCache => 'خدمة متصلة، مخزنة مؤقتا هنا';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'خدمة متصلة';
+
+  @override
+  String get media_servedFrom_embedded => 'محفوظ في سجل الغوص هذا';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'إظهار شارات المصدر على الصور المصغرة';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'رمز صغير يوضح مصدر كل عنصر. تظهر شارات المشكلات دائما.';
 
   @override
   String get media_status_transferFailed => 'فشل الرفع';

@@ -22231,6 +22231,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => '账户';
 
   @override
+  String get settings_photosMedia_displayHeader => '显示';
+
+  @override
   String get settings_photosMedia_guidedSetup => '引导设置';
 
   @override
@@ -22319,6 +22322,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_unavailablePlaceholder_stillFetching => '仍在加载。点按重试。';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied => '无照片库访问权限';
 
   @override
   String get attrLabel_size => '尺码';
@@ -28438,6 +28444,29 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => '检查所有媒体';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已更新 $count 个项目',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '无法检查这 $count 个项目中的任何一个。它们的来源当前无法访问。',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => '媒体来源';
 
   @override
@@ -31013,6 +31042,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_status_broken => '缺失且未备份';
+
+  @override
+  String get media_servedFrom_localDisk => '在此设备上';
+
+  @override
+  String get media_servedFrom_platformGallery => '照片库';
+
+  @override
+  String get media_servedFrom_storeCache => '云存储，已在此缓存';
+
+  @override
+  String get media_servedFrom_storeNetwork => '云存储';
+
+  @override
+  String get media_servedFrom_networkUrl => '网络链接';
+
+  @override
+  String get media_servedFrom_connectorCache => '已连接的服务，已在此缓存';
+
+  @override
+  String get media_servedFrom_connectorNetwork => '已连接的服务';
+
+  @override
+  String get media_servedFrom_embedded => '存储在此日志中';
+
+  @override
+  String get settings_media_provenanceBadges => '在缩略图上显示来源徽章';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      '一个小图标，显示每个项目的来源。问题徽章始终显示。';
 
   @override
   String get media_status_transferFailed => '上传失败';

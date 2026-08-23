@@ -23008,6 +23008,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Accounts';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Display';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Guided setup';
 
   @override
@@ -23106,6 +23109,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'Still loading. Tap to retry.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'No photo library access';
 
   @override
   String get attrLabel_size => 'Size';
@@ -29639,6 +29646,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Check all media';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items updated',
+      one: '$count item updated',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Could not check any of the $count items. Their sources are not reachable right now.',
+      one: 'Could not check the item. Its source is not reachable right now.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Media Sources';
 
   @override
@@ -32380,6 +32413,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Missing and not backed up';
+
+  @override
+  String get media_servedFrom_localDisk => 'On this device';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Photo library';
+
+  @override
+  String get media_servedFrom_storeCache => 'Cloud store, cached here';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Cloud store';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Web link';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Connected service, cached here';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Connected service';
+
+  @override
+  String get media_servedFrom_embedded => 'Stored in this logbook';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Show source badges on thumbnails';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'A small glyph showing where each item is served from. Problem badges always show.';
 
   @override
   String get media_status_transferFailed => 'Upload failed';
