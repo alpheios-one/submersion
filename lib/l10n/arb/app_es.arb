@@ -4237,6 +4237,7 @@
   "media_library_filter_trip": "Viaje",
   "media_library_filter_dates": "Fechas",
   "media_library_filter_clear": "Borrar filtros",
+  "media_library_filter_any": "Cualquiera",
   "media_library_filter_title": "Filtrar medios",
   "media_library_filter_apply": "Aplicar",
   "media_library_sort_title": "Ordenar medios",

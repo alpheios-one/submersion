@@ -200,7 +200,10 @@ class _MediaLibraryFilterSheetState
     final tripName = _tripId == null
         ? null
         : trips.where((t) => t.id == _tripId).firstOrNull?.name;
-    final anyLabel = l10n.media_library_filter_all;
+    // "Any", not "All": these read as "Site: Any", and reusing the type
+    // chip's "All" both reads wrong and puts four identical labels in one
+    // sheet.
+    final anyLabel = l10n.media_library_filter_any;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
@@ -269,7 +272,7 @@ class _MediaLibraryFilterSheetState
                         spacing: 8,
                         children: [
                           ChoiceChip(
-                            label: Text(anyLabel),
+                            label: Text(l10n.media_library_filter_all),
                             selected: _mediaType == null,
                             onSelected: (_) =>
                                 setState(() => _mediaType = null),

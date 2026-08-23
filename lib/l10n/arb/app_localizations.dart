@@ -22522,6 +22522,12 @@ abstract class AppLocalizations {
   /// **'Clear filters'**
   String get media_library_filter_clear;
 
+  /// Value shown for a filter facet that is not constrained, e.g. Site: Any
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get media_library_filter_any;
+
   /// Title of the media library filter sheet, and the filter button's tooltip
   ///
   /// In en, this message translates to:

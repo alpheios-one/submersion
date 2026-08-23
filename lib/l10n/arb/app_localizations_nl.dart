@@ -13221,6 +13221,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_library_filter_clear => 'Filters wissen';
 
   @override
+  String get media_library_filter_any => 'Alle';
+
+  @override
   String get media_library_filter_title => 'Media filteren';
 
   @override

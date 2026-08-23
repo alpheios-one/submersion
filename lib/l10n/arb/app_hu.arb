@@ -4164,6 +4164,7 @@
   "media_library_filter_trip": "Utazás",
   "media_library_filter_dates": "Dátumok",
   "media_library_filter_clear": "Szűrők törlése",
+  "media_library_filter_any": "Bármely",
   "media_library_filter_title": "Média szűrése",
   "media_library_filter_apply": "Alkalmaz",
   "media_library_sort_title": "Média rendezése",

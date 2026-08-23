@@ -13278,6 +13278,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_library_filter_clear => 'Szűrők törlése';
 
   @override
+  String get media_library_filter_any => 'Bármely';
+
+  @override
   String get media_library_filter_title => 'Média szűrése';
 
   @override

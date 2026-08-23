@@ -13358,6 +13358,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_library_filter_clear => 'Effacer les filtres';
 
   @override
+  String get media_library_filter_any => 'Indifférent';
+
+  @override
   String get media_library_filter_title => 'Filtrer les médias';
 
   @override

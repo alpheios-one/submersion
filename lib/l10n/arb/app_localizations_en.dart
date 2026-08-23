@@ -13101,6 +13101,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_library_filter_clear => 'Clear filters';
 
   @override
+  String get media_library_filter_any => 'Any';
+
+  @override
   String get media_library_filter_title => 'Filter media';
 
   @override

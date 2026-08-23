@@ -12993,6 +12993,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_library_filter_clear => 'ניקוי מסננים';
 
   @override
+  String get media_library_filter_any => 'הכול';
+
+  @override
   String get media_library_filter_title => 'סינון מדיה';
 
   @override

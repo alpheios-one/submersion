@@ -13079,6 +13079,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_library_filter_clear => 'مسح عوامل التصفية';
 
   @override
+  String get media_library_filter_any => 'أي';
+
+  @override
   String get media_library_filter_title => 'تصفية الوسائط';
 
   @override

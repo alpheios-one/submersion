@@ -13321,6 +13321,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_library_filter_clear => 'Cancella filtri';
 
   @override
+  String get media_library_filter_any => 'Qualsiasi';
+
+  @override
   String get media_library_filter_title => 'Filtra media';
 
   @override

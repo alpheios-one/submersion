@@ -13306,6 +13306,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_library_filter_clear => 'Borrar filtros';
 
   @override
+  String get media_library_filter_any => 'Cualquiera';
+
+  @override
   String get media_library_filter_title => 'Filtrar medios';
 
   @override
