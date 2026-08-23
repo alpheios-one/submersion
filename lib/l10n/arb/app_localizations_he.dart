@@ -9846,6 +9846,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_sortField_dateIssued => 'תאריך הנפקה';
 
   @override
+  String get enum_sortField_dateTaken => 'תאריך הצילום';
+
+  @override
   String get enum_sortField_difficulty => 'רמת קושי';
 
   @override
@@ -9859,6 +9862,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'תאריך סיום';
+
+  @override
+  String get enum_sortField_fileName => 'שם הקובץ';
+
+  @override
+  String get enum_sortField_fileSize => 'גודל הקובץ';
 
   @override
   String get enum_sortField_lastServiceDate => 'טיפול אחרון';

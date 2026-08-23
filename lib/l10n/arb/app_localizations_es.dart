@@ -10080,6 +10080,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Fecha de emisión';
 
   @override
+  String get enum_sortField_dateTaken => 'Fecha de captura';
+
+  @override
   String get enum_sortField_difficulty => 'Dificultad';
 
   @override
@@ -10093,6 +10096,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'Fecha de fin';
+
+  @override
+  String get enum_sortField_fileName => 'Nombre de archivo';
+
+  @override
+  String get enum_sortField_fileSize => 'Tamaño de archivo';
 
   @override
   String get enum_sortField_lastServiceDate => 'Último servicio';

@@ -10004,6 +10004,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Datum uitgegeven';
 
   @override
+  String get enum_sortField_dateTaken => 'Opnamedatum';
+
+  @override
   String get enum_sortField_difficulty => 'Moeilijkheid';
 
   @override
@@ -10017,6 +10020,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'Einddatum';
+
+  @override
+  String get enum_sortField_fileName => 'Bestandsnaam';
+
+  @override
+  String get enum_sortField_fileSize => 'Bestandsgrootte';
 
   @override
   String get enum_sortField_lastServiceDate => 'Laatste onderhoud';

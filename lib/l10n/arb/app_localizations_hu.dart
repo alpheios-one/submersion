@@ -10060,6 +10060,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Kiallitas datuma';
 
   @override
+  String get enum_sortField_dateTaken => 'Keszites datuma';
+
+  @override
   String get enum_sortField_difficulty => 'Nehezsegi szint';
 
   @override
@@ -10073,6 +10076,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'Zaras datuma';
+
+  @override
+  String get enum_sortField_fileName => 'Fajlnev';
+
+  @override
+  String get enum_sortField_fileSize => 'Fajlmeret';
 
   @override
   String get enum_sortField_lastServiceDate => 'Utolso szerviz';

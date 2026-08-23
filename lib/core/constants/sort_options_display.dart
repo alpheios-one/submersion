@@ -86,3 +86,11 @@ extension CourseSortFieldDisplay on CourseSortField {
     CourseSortField.status => l10n.enum_sortField_status,
   };
 }
+
+extension MediaSortFieldDisplay on MediaSortField {
+  String localizedName(AppLocalizations l10n) => switch (this) {
+    MediaSortField.dateTaken => l10n.enum_sortField_dateTaken,
+    MediaSortField.fileName => l10n.enum_sortField_fileName,
+    MediaSortField.fileSize => l10n.enum_sortField_fileSize,
+  };
+}

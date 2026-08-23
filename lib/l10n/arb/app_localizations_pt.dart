@@ -10077,6 +10077,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Data de Emissao';
 
   @override
+  String get enum_sortField_dateTaken => 'Data da captura';
+
+  @override
   String get enum_sortField_difficulty => 'Dificuldade';
 
   @override
@@ -10090,6 +10093,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'Data Final';
+
+  @override
+  String get enum_sortField_fileName => 'Nome do arquivo';
+
+  @override
+  String get enum_sortField_fileSize => 'Tamanho do arquivo';
 
   @override
   String get enum_sortField_lastServiceDate => 'Ultima Manutencao';

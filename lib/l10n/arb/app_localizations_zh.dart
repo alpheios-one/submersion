@@ -9634,6 +9634,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_sortField_dateIssued => '签发日期';
 
   @override
+  String get enum_sortField_dateTaken => '拍摄日期';
+
+  @override
   String get enum_sortField_difficulty => '难度';
 
   @override
@@ -9647,6 +9650,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => '结束日期';
+
+  @override
+  String get enum_sortField_fileName => '文件名';
+
+  @override
+  String get enum_sortField_fileSize => '文件大小';
 
   @override
   String get enum_sortField_lastServiceDate => '最近维护';

@@ -17168,6 +17168,12 @@ abstract class AppLocalizations {
   /// **'Date Issued'**
   String get enum_sortField_dateIssued;
 
+  /// No description provided for @enum_sortField_dateTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Taken'**
+  String get enum_sortField_dateTaken;
+
   /// No description provided for @enum_sortField_difficulty.
   ///
   /// In en, this message translates to:
@@ -17197,6 +17203,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End Date'**
   String get enum_sortField_endDate;
+
+  /// No description provided for @enum_sortField_fileName.
+  ///
+  /// In en, this message translates to:
+  /// **'File Name'**
+  String get enum_sortField_fileName;
+
+  /// No description provided for @enum_sortField_fileSize.
+  ///
+  /// In en, this message translates to:
+  /// **'File Size'**
+  String get enum_sortField_fileSize;
 
   /// No description provided for @enum_sortField_lastServiceDate.
   ///
