@@ -46,12 +46,12 @@ void main() {
       expect(dive['maxDepth'], closeTo(13.29, 0.01));
       // avgDepth = 748 cm -> 7.48 m
       expect(dive['avgDepth'], closeTo(7.48, 0.01));
-      // surfacePressureMbar = 9971 -> 0.9971 bar
-      expect(dive['surfacePressure'], closeTo(0.9971, 0.0001));
+      // surfacePressureMbar = 870 hPa to 1086 hPa
+      expect(dive['surfacePressure'], closeTo(1.0019, 0.0001));
 
       // Verify environment
-      expect(dive['waterType'], 'salt');
-      expect(dive['surfaceInterval'], const Duration(seconds: 0));
+      expect(dive['waterType'], 'fresh');
+      expect(dive['surfaceInterval'], const Duration(seconds: 2935));
 
       // Verify tanks
       final tanks = dive['tanks'] as List<Map<String, dynamic>>;

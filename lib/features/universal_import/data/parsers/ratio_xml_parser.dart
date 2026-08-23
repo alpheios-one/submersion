@@ -174,10 +174,10 @@ class RatioXmlParser implements ImportParser {
       diveData['diveMode'] = _diveModeString(diveMode);
     }
 
-    // Water type: 0=fresh, 1=salt
+    // Water type: 1=fresh, 0=salt
     final water = _intElement(header, 'water');
     if (water != null) {
-      diveData['waterType'] = water == 0 ? 'fresh' : 'salt';
+      diveData['waterType'] = water == 1 ? 'fresh' : 'salt';
     }
 
     // Surface interval (seconds before this dive)

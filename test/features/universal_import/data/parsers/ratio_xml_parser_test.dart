@@ -192,18 +192,18 @@ void main() {
       expect(dive['diveMode'], 'CCR');
     });
 
-    test('maps water type 1 to salt', () async {
+    test('maps water type 1 to fresh', () async {
       final xml = _buildRatioXml(water: 1);
       final payload = await parser.parse(_toBytes(xml));
       final dive = payload.entities[ImportEntityType.dives]!.single;
-      expect(dive['waterType'], 'salt');
+      expect(dive['waterType'], 'fresh');
     });
 
-    test('maps water type 0 to fresh', () async {
+    test('maps water type 0 to salt', () async {
       final xml = _buildRatioXml(water: 0);
       final payload = await parser.parse(_toBytes(xml));
       final dive = payload.entities[ImportEntityType.dives]!.single;
-      expect(dive['waterType'], 'fresh');
+      expect(dive['waterType'], 'salt');
     });
 
     test('parses surface interval', () async {
