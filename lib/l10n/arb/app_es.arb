@@ -4006,7 +4006,7 @@
   "media_diveMediaSection_unlinkDialogTitle": "Desvincular foto",
   "media_diveMediaSection_unlinkError": "Error al desvincular: {error}",
   "media_diveMediaSection_unlinkSelectedButton": "Desvincular {count}",
-  "media_diveMediaSection_unlinkSelectedContent": "Esto elimina {count} elementos multimedia de tu biblioteca, incluidas sus copias en la nube y miniaturas. Tus archivos originales no se ven afectados.",
+  "media_diveMediaSection_unlinkSelectedContent": "Elimina {count} elementos multimedia de tu biblioteca, junto con sus copias en la nube y miniaturas. Se conservan los elementos que aún usa un sitio de buceo. Tus archivos originales no se ven afectados.",
   "media_diveMediaSection_unlinkSelectedSuccess": "{count} elementos desvinculados",
   "media_diveMediaSection_unlinkSelectedTitle": "Desvincular {count} elementos?",
   "media_diveMediaSection_unlinkSuccess": "Foto desvinculada",

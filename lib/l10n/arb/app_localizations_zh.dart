@@ -11884,7 +11884,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return '此操作会从您的媒体库中移除 $count 个媒体项目，包括其云端副本和缩略图。您的原始文件不受影响。';
+    return '从您的媒体库中移除 $count 个媒体项目，包括其云端副本和缩略图。潜点仍在使用的项目会被保留。您的原始文件不受影响。';
   }
 
   @override

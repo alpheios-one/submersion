@@ -12459,7 +12459,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Isto remove $count itens de media da sua biblioteca, incluindo as copias na nuvem e as miniaturas. Os seus ficheiros originais nao sao afetados.';
+    return 'Remove $count itens de media da sua biblioteca, juntamente com as copias na nuvem e as miniaturas. Os itens que um ponto de mergulho ainda usa sao mantidos. Os seus ficheiros originais nao sao afetados.';
   }
 
   @override

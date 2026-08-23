@@ -4006,7 +4006,7 @@
   "media_diveMediaSection_unlinkDialogTitle": "Desvincular Foto",
   "media_diveMediaSection_unlinkError": "Falha ao desvincular: {error}",
   "media_diveMediaSection_unlinkSelectedButton": "Desvincular {count}",
-  "media_diveMediaSection_unlinkSelectedContent": "Isto remove {count} itens de media da sua biblioteca, incluindo as copias na nuvem e as miniaturas. Os seus ficheiros originais nao sao afetados.",
+  "media_diveMediaSection_unlinkSelectedContent": "Remove {count} itens de media da sua biblioteca, juntamente com as copias na nuvem e as miniaturas. Os itens que um ponto de mergulho ainda usa sao mantidos. Os seus ficheiros originais nao sao afetados.",
   "media_diveMediaSection_unlinkSelectedSuccess": "{count} itens desvinculados",
   "media_diveMediaSection_unlinkSelectedTitle": "Desvincular {count} itens?",
   "media_diveMediaSection_unlinkSuccess": "Foto desvinculada",

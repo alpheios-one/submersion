@@ -64,7 +64,7 @@ class MediaSelectionBar extends ConsumerWidget {
   /// Unlinking removes the media from the library along with its cloud
   /// proxies and thumbnails; the original source file is untouched, and
   /// anything a dive site still needs keeps its row. Only a caption or a
-  /// favourite is unrecoverable, so that is the one case worth a dialog.
+  /// favorite is unrecoverable, so that is the one case worth a dialog.
   Future<void> _unlinkFromDive(BuildContext context, WidgetRef ref) async {
     final ids = _diveLinkedIds;
     if (ids.isEmpty) return;

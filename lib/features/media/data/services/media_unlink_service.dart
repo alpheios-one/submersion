@@ -68,7 +68,7 @@ class MediaUnlinkService {
   /// non-empty, and go straight through when it is not.
   ///
   /// Scoped to the rows this unlink would DELETE, not everything selected: a
-  /// site-linked row survives, so its caption and favourite survive with it,
+  /// site-linked row survives, so its caption and favorite survive with it,
   /// and warning about them would be false.
   Future<Set<String>> idsWithUserMetadataAtRisk(List<String> mediaIds) async {
     if (mediaIds.isEmpty) return {};

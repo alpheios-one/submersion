@@ -12234,7 +12234,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'سيؤدي هذا إلى إزالة $count من عناصر الوسائط من مكتبتك، بما في ذلك نسخها السحابية والصور المصغرة. لن تتأثر ملفاتك الأصلية.';
+    return 'يزيل $count من عناصر الوسائط من مكتبتك، مع نسخها السحابية والصور المصغرة. تبقى العناصر التي لا يزال موقع غوص يستخدمها. لن تتأثر ملفاتك الأصلية.';
   }
 
   @override

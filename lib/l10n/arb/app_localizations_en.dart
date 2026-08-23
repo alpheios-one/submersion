@@ -12251,7 +12251,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'This removes $count media items from your library, including their cloud copies and thumbnails. Your original files are not affected.';
+    return 'Removes $count media items from your library, along with their cloud copies and thumbnails. Media a dive site still uses is kept. Your original files are not affected.';
   }
 
   @override
@@ -13111,9 +13111,9 @@ class AppLocalizationsEn extends AppLocalizations {
       count,
       locale: localeName,
       other:
-          '$count selected items have a caption or favourite saved in Submersion. Unlinking removes them from your library, so those details are lost. Your original files are not affected.',
+          '$count selected items have a caption or favorite saved in Submersion. Unlinking removes them from your library, so those details are lost. Your original files are not affected.',
       one:
-          '1 selected item has a caption or favourite saved in Submersion. Unlinking removes it from your library, so those details are lost. Your original file is not affected.',
+          '1 selected item has a caption or favorite saved in Submersion. Unlinking removes it from your library, so those details are lost. Your original file is not affected.',
     );
     return '$_temp0';
   }

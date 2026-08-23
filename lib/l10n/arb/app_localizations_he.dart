@@ -12152,7 +12152,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'פעולה זו תסיר $count פריטי מדיה מהספרייה שלך, כולל העותקים בענן והתמונות הממוזערות. קובצי המקור שלך לא ייפגעו.';
+    return 'מסיר $count פריטי מדיה מהספרייה שלך, יחד עם העותקים בענן והתמונות הממוזערות. פריטים שאתר צלילה עדיין משתמש בהם יישמרו. קובצי המקור שלך לא ייפגעו.';
   }
 
   @override

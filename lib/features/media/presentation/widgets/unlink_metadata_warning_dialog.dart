@@ -7,7 +7,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// Unlinking removes media from the library, and almost everything that goes
 /// with it is derived: the cloud proxies and thumbnails rebuild from the
 /// source file the moment it is linked again, and the original file is never
-/// touched. A caption and the favourite flag are the exceptions. They live
+/// touched. A caption and the favorite flag are the exceptions. They live
 /// only in Submersion's own row, so they are the only part of an unlink that
 /// cannot be undone by re-linking.
 ///

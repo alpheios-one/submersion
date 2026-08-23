@@ -12496,7 +12496,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Cette action retire $count medias de votre bibliotheque, y compris leurs copies cloud et miniatures. Vos fichiers originaux ne sont pas affectes.';
+    return 'Retire $count medias de votre bibliotheque, ainsi que leurs copies cloud et miniatures. Les medias encore utilises par un site de plongee sont conserves. Vos fichiers originaux ne sont pas affectes.';
   }
 
   @override

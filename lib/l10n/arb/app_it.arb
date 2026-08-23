@@ -3933,7 +3933,7 @@
   "media_diveMediaSection_unlinkDialogTitle": "Scollega foto",
   "media_diveMediaSection_unlinkError": "Scollegamento non riuscito: {error}",
   "media_diveMediaSection_unlinkSelectedButton": "Scollega {count}",
-  "media_diveMediaSection_unlinkSelectedContent": "Questa azione rimuove {count} elementi multimediali dalla libreria, comprese le copie nel cloud e le miniature. I file originali non vengono toccati.",
+  "media_diveMediaSection_unlinkSelectedContent": "Rimuove {count} elementi multimediali dalla libreria, insieme alle copie nel cloud e alle miniature. Gli elementi ancora usati da un sito di immersione vengono mantenuti. I file originali non vengono toccati.",
   "media_diveMediaSection_unlinkSelectedSuccess": "{count} elementi scollegati",
   "media_diveMediaSection_unlinkSelectedTitle": "Scollegare {count} elementi?",
   "media_diveMediaSection_unlinkSuccess": "Foto scollegata",

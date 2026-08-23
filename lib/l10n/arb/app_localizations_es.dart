@@ -12447,7 +12447,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Esto elimina $count elementos multimedia de tu biblioteca, incluidas sus copias en la nube y miniaturas. Tus archivos originales no se ven afectados.';
+    return 'Elimina $count elementos multimedia de tu biblioteca, junto con sus copias en la nube y miniaturas. Se conservan los elementos que aún usa un sitio de buceo. Tus archivos originales no se ven afectados.';
   }
 
   @override

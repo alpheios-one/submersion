@@ -1371,7 +1371,7 @@ class MediaRepository {
   }
 
   /// Of [mediaIds], those carrying metadata a user typed or set that no
-  /// source file holds: a caption, or the favourite flag.
+  /// source file holds: a caption, or the favorite flag.
   ///
   /// Used to decide whether an unlink needs to warn before it removes the
   /// rows. Deliberately no join against `media_species`: that table is

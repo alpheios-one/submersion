@@ -88,7 +88,7 @@ class _RecordingMediaRepo implements MediaRepository {
   /// kept rather than deleted. Empty by default: most media is dive-only.
   final Set<String> siteLinkedIds = {};
 
-  /// Ids the probe should report as carrying a caption or favourite.
+  /// Ids the probe should report as carrying a caption or favorite.
   final Set<String> withUserMetadata = {};
 
   @override
@@ -264,7 +264,7 @@ void main() {
       expect(mediaRepo.unlinkedFromDive, ['b']);
     });
 
-    testWidgets('Unlink warns before discarding a caption or favourite', (
+    testWidgets('Unlink warns before discarding a caption or favorite', (
       tester,
     ) async {
       await tester.pumpWidget(

@@ -4006,7 +4006,7 @@
   "media_diveMediaSection_unlinkDialogTitle": "إلغاء ربط الصورة",
   "media_diveMediaSection_unlinkError": "فشل في إلغاء الربط: {error}",
   "media_diveMediaSection_unlinkSelectedButton": "إلغاء ربط {count}",
-  "media_diveMediaSection_unlinkSelectedContent": "سيؤدي هذا إلى إزالة {count} من عناصر الوسائط من مكتبتك، بما في ذلك نسخها السحابية والصور المصغرة. لن تتأثر ملفاتك الأصلية.",
+  "media_diveMediaSection_unlinkSelectedContent": "يزيل {count} من عناصر الوسائط من مكتبتك، مع نسخها السحابية والصور المصغرة. تبقى العناصر التي لا يزال موقع غوص يستخدمها. لن تتأثر ملفاتك الأصلية.",
   "media_diveMediaSection_unlinkSelectedSuccess": "تم إلغاء ربط {count} عنصر",
   "media_diveMediaSection_unlinkSelectedTitle": "إلغاء ربط {count} عنصر؟",
   "media_diveMediaSection_unlinkSuccess": "تم إلغاء ربط الصورة",

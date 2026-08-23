@@ -4153,7 +4153,7 @@
   "media_diveMediaSection_unlinkDialogTitle": "取消关联照片",
   "media_diveMediaSection_unlinkError": "取消关联失败：{error}",
   "media_diveMediaSection_unlinkSelectedButton": "取消关联 {count}",
-  "media_diveMediaSection_unlinkSelectedContent": "此操作会从您的媒体库中移除 {count} 个媒体项目，包括其云端副本和缩略图。您的原始文件不受影响。",
+  "media_diveMediaSection_unlinkSelectedContent": "从您的媒体库中移除 {count} 个媒体项目，包括其云端副本和缩略图。潜点仍在使用的项目会被保留。您的原始文件不受影响。",
   "media_diveMediaSection_unlinkSelectedSuccess": "已取消关联 {count} 个项目",
   "media_diveMediaSection_unlinkSelectedTitle": "取消关联 {count} 项目?",
   "media_diveMediaSection_unlinkSuccess": "照片已取消关联",

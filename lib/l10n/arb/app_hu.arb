@@ -3933,7 +3933,7 @@
   "media_diveMediaSection_unlinkDialogTitle": "Foto levalasztasa",
   "media_diveMediaSection_unlinkError": "Nem sikerult a levalasztas: {error}",
   "media_diveMediaSection_unlinkSelectedButton": "{count} leválasztása",
-  "media_diveMediaSection_unlinkSelectedContent": "Ez {count} médiaelemet eltávolít a médiatárból, a felhőmásolatokkal és bélyegképekkel együtt. Az eredeti fájlok érintetlenek maradnak.",
+  "media_diveMediaSection_unlinkSelectedContent": "Eltávolít {count} médiaelemet a médiatárból, a felhőmásolatokkal és bélyegképekkel együtt. A merülőhely által még használt elemek megmaradnak. Az eredeti fájlok érintetlenek maradnak.",
   "media_diveMediaSection_unlinkSelectedSuccess": "{count} elem leválasztva",
   "media_diveMediaSection_unlinkSelectedTitle": "{count} elem leválasztása?",
   "media_diveMediaSection_unlinkSuccess": "Foto levalasztva",

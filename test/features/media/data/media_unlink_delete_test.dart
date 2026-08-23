@@ -234,23 +234,23 @@ void main() {
   });
 
   group('user metadata probe', () {
-    test('reports only the rows carrying a caption or a favourite', () async {
+    test('reports only the rows carrying a caption or a favorite', () async {
       await insertDive('d1');
       final plain = await repo.createMedia(item('m1', diveId: 'd1'));
       final captioned = await repo.createMedia(
         item('m2', diveId: 'd1', caption: 'Grey reef shark on the wall'),
       );
-      final favourite = await repo.createMedia(
+      final favorite = await repo.createMedia(
         item('m3', diveId: 'd1', isFavorite: true),
       );
 
       final withData = await repo.idsWithUserMetadata([
         plain.id,
         captioned.id,
-        favourite.id,
+        favorite.id,
       ]);
 
-      expect(withData, {captioned.id, favourite.id});
+      expect(withData, {captioned.id, favorite.id});
     });
 
     test('treats an empty caption as nothing to lose', () async {

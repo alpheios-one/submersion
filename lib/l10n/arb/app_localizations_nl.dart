@@ -12367,7 +12367,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Hiermee worden $count media-items uit je bibliotheek verwijderd, inclusief hun cloudkopieen en miniaturen. Je originele bestanden blijven ongemoeid.';
+    return 'Verwijdert $count media-items uit je bibliotheek, samen met hun cloudkopieen en miniaturen. Items die een duikstek nog gebruikt blijven behouden. Je originele bestanden blijven ongemoeid.';
   }
 
   @override

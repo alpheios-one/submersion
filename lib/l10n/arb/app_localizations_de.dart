@@ -12446,7 +12446,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Damit werden $count Medien aus deiner Mediathek entfernt, samt Cloud-Kopien und Miniaturansichten. Deine Originaldateien bleiben unberührt.';
+    return 'Entfernt $count Medien samt Cloud-Kopien und Miniaturansichten aus deiner Mediathek. Medien, die ein Tauchplatz noch verwendet, bleiben erhalten. Deine Originaldateien bleiben unberührt.';
   }
 
   @override

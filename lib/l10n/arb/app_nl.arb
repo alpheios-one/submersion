@@ -4006,7 +4006,7 @@
   "media_diveMediaSection_unlinkDialogTitle": "Foto ontkoppelen",
   "media_diveMediaSection_unlinkError": "Ontkoppelen mislukt: {error}",
   "media_diveMediaSection_unlinkSelectedButton": "{count} ontkoppelen",
-  "media_diveMediaSection_unlinkSelectedContent": "Hiermee worden {count} media-items uit je bibliotheek verwijderd, inclusief hun cloudkopieen en miniaturen. Je originele bestanden blijven ongemoeid.",
+  "media_diveMediaSection_unlinkSelectedContent": "Verwijdert {count} media-items uit je bibliotheek, samen met hun cloudkopieen en miniaturen. Items die een duikstek nog gebruikt blijven behouden. Je originele bestanden blijven ongemoeid.",
   "media_diveMediaSection_unlinkSelectedSuccess": "{count} items ontkoppeld",
   "media_diveMediaSection_unlinkSelectedTitle": "{count} items ontkoppelen?",
   "media_diveMediaSection_unlinkSuccess": "Foto ontkoppeld",

@@ -3933,7 +3933,7 @@
   "media_diveMediaSection_unlinkDialogTitle": "Dissocier la photo",
   "media_diveMediaSection_unlinkError": "Echec de la dissociation : {error}",
   "media_diveMediaSection_unlinkSelectedButton": "Dissocier {count}",
-  "media_diveMediaSection_unlinkSelectedContent": "Cette action retire {count} medias de votre bibliotheque, y compris leurs copies cloud et miniatures. Vos fichiers originaux ne sont pas affectes.",
+  "media_diveMediaSection_unlinkSelectedContent": "Retire {count} medias de votre bibliotheque, ainsi que leurs copies cloud et miniatures. Les medias encore utilises par un site de plongee sont conserves. Vos fichiers originaux ne sont pas affectes.",
   "media_diveMediaSection_unlinkSelectedSuccess": "{count} elements dissocies",
   "media_diveMediaSection_unlinkSelectedTitle": "Dissocier {count} elements ?",
   "media_diveMediaSection_unlinkSuccess": "Photo dissociee",
