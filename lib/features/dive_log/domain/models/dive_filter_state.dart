@@ -16,6 +16,7 @@ class DiveFilterState {
   final double? minDepth;
   final double? maxDepth;
   final bool? favoritesOnly;
+
   /// Decompression status, from the recorded profile signal (deco stop type,
   /// deco-stop events, or a positive ceiling with no deco-type data at all —
   /// see `scanRecordedDecoSignals` in StatisticsRepository). Null means no

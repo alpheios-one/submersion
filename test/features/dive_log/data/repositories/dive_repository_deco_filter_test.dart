@@ -15,44 +15,41 @@ void main() {
   });
   tearDown(() async => tearDownTestDatabase());
 
-  test(
-    'decoOnly: true matches a recorded deco stop, decoOnly: false matches '
-    'a recorded no-deco profile',
-    () async {
-      await repository.createDive(
-        domain.Dive(
-          id: 'deco',
-          dateTime: DateTime(2026, 1, 1),
-          profile: const [
-            domain.DiveProfilePoint(timestamp: 0, depth: 30, decoType: 0),
-            domain.DiveProfilePoint(timestamp: 60, depth: 30, decoType: 2),
-          ],
-        ),
-      );
-      await repository.createDive(
-        domain.Dive(
-          id: 'noDeco',
-          dateTime: DateTime(2026, 1, 2),
-          profile: const [
-            domain.DiveProfilePoint(timestamp: 0, depth: 18, decoType: 0),
-          ],
-        ),
-      );
-      await repository.createDive(
-        domain.Dive(id: 'unrecorded', dateTime: DateTime(2026, 1, 3)),
-      );
+  test('decoOnly: true matches a recorded deco stop, decoOnly: false matches '
+      'a recorded no-deco profile', () async {
+    await repository.createDive(
+      domain.Dive(
+        id: 'deco',
+        dateTime: DateTime(2026, 1, 1),
+        profile: const [
+          domain.DiveProfilePoint(timestamp: 0, depth: 30, decoType: 0),
+          domain.DiveProfilePoint(timestamp: 60, depth: 30, decoType: 2),
+        ],
+      ),
+    );
+    await repository.createDive(
+      domain.Dive(
+        id: 'noDeco',
+        dateTime: DateTime(2026, 1, 2),
+        profile: const [
+          domain.DiveProfilePoint(timestamp: 0, depth: 18, decoType: 0),
+        ],
+      ),
+    );
+    await repository.createDive(
+      domain.Dive(id: 'unrecorded', dateTime: DateTime(2026, 1, 3)),
+    );
 
-      final decoResults = await repository.getDiveSummaries(
-        filter: const DiveFilterState(decoOnly: true),
-      );
-      expect(decoResults.map((d) => d.id).toSet(), {'deco'});
+    final decoResults = await repository.getDiveSummaries(
+      filter: const DiveFilterState(decoOnly: true),
+    );
+    expect(decoResults.map((d) => d.id).toSet(), {'deco'});
 
-      final noDecoResults = await repository.getDiveSummaries(
-        filter: const DiveFilterState(decoOnly: false),
-      );
-      expect(noDecoResults.map((d) => d.id).toSet(), {'noDeco'});
-    },
-  );
+    final noDecoResults = await repository.getDiveSummaries(
+      filter: const DiveFilterState(decoOnly: false),
+    );
+    expect(noDecoResults.map((d) => d.id).toSet(), {'noDeco'});
+  });
 
   test('in-memory apply() agrees with the SQL path', () {
     final dives = [
