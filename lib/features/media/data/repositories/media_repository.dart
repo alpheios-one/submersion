@@ -36,8 +36,20 @@ class MediaRepository {
   /// the joined `media_enrichment` values, and enrichment is backfilled on
   /// every dive-detail open (see `DiveMediaEnricher`), which would otherwise
   /// churn listeners for data they do not display.
+  /// Fires on writes to `media` AND `media_enrichment`.
+  ///
+  /// Every read behind this tick left-outer-joins the enrichment table, so a
+  /// row written there changes what consumers would return just as much as a
+  /// write to `media` itself. Watching only `media` made the enrichment
+  /// backfill invisible: it computed and saved the depth/elapsed values, no
+  /// provider re-read them, and the depth chips, mini profile and dive
+  /// computer stayed absent until the viewer was closed and reopened. Newly
+  /// linked media hit that every time, since linking is precisely when the
+  /// enrichment does not exist yet.
   Stream<void> watchMediaChanges() => _db
-      .tableUpdates(TableUpdateQuery.onTable(_db.media))
+      .tableUpdates(
+        TableUpdateQuery.onAllTables([_db.media, _db.mediaEnrichment]),
+      )
       .debounce(changeTickDebounce);
 
   /// Get all media for a dive, ordered by takenAt
@@ -766,6 +778,11 @@ class MediaRepository {
           _db.mediaEnrichment,
         )..where((t) => t.mediaId.equals(enrichment.mediaId))).write(
           MediaEnrichmentCompanion(
+            // The dive is part of the value, not just a back-pointer: an
+            // enrichment is the join product of this media and ONE dive's
+            // profile. Leaving it behind would let a row repaired against a
+            // different dive keep claiming the old one.
+            diveId: Value(enrichment.diveId),
             depthMeters: Value(enrichment.depthMeters),
             temperatureCelsius: Value(enrichment.temperatureCelsius),
             elapsedSeconds: Value(enrichment.elapsedSeconds),

@@ -460,6 +460,38 @@ void main() {
         final result = await repository.getEnrichmentForMedia(media.id);
         expect(result!.depthMeters, equals(20.0));
       });
+
+      // An enrichment is a join product of the media and ONE dive's profile,
+      // so its diveId is part of the value, not just a back-pointer. The
+      // update path used to leave it at whatever the row was first written
+      // with, which meant a row repaired against a different dive kept
+      // claiming the old one.
+      test('should update the dive link when saving over an existing '
+          'enrichment', () async {
+        final dive = await createTestDiveInDb(diveNumber: 1);
+        final otherDive = await createTestDiveInDb(diveNumber: 2);
+        final media = await repository.createMedia(
+          createTestMediaItem(diveId: dive.id, filePath: '/photos/moved.jpg'),
+        );
+
+        await repository.saveEnrichment(
+          createTestEnrichment(
+            mediaId: media.id,
+            diveId: otherDive.id,
+            depthMeters: 10.0,
+          ),
+        );
+        await repository.saveEnrichment(
+          createTestEnrichment(
+            mediaId: media.id,
+            diveId: dive.id,
+            depthMeters: 20.0,
+          ),
+        );
+
+        final result = await repository.getEnrichmentForMedia(media.id);
+        expect(result!.diveId, equals(dive.id));
+      });
     });
 
     group('media count', () {
