@@ -641,7 +641,7 @@ void main() {
         isTrue,
         reason:
             'a media read joins media_enrichment, so an enrichment write '
-            'changes what the tick s consumers would return',
+            'changes what the consumers of this tick would return',
       );
     });
 

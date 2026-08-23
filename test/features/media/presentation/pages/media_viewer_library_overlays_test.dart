@@ -236,6 +236,30 @@ void main() {
     expect(find.byType(PerdixFace), findsOneWidget);
   });
 
+  // The snapshot already carrying an enrichment is not a reason to trust it.
+  // It is still a route-time capture, so a re-link (or a backfill) since then
+  // leaves it describing the wrong dive, and skipping the read would render
+  // that stale context for as long as the viewer stayed open.
+  testWidgets('an item that arrived already enriched still follows the '
+      'database', (tester) async {
+    await pump(
+      tester,
+      mediaList: [_item('m1', diveId: 'd-old', enrichment: _enrichment('m1'))],
+      initialMediaId: 'm1',
+      overrides: [
+        mediaByIdProvider('m1').overrideWith(
+          (ref) async =>
+              _item('m1', diveId: 'd1', enrichment: _enrichment('m1')),
+        ),
+      ],
+    );
+
+    // d1 is the dive the database reports; only it has a profile here, so
+    // the overlays render exactly when the stale d-old was NOT used.
+    expect(find.byType(MiniDiveProfileOverlay), findsOneWidget);
+    expect(find.byType(PerdixFace), findsOneWidget);
+  });
+
   testWidgets('a re-linked item with no enrichment yet backfills the dive the '
       'database reports', (tester) async {
     final enrichedDives = <String>[];

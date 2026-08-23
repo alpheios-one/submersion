@@ -93,8 +93,13 @@ class DiveMediaEnricher {
   }
 
   /// Whether [existing] already records exactly what [result] computes for
-  /// [diveId]. Every persisted field is compared: a partial match still means
-  /// the stored row is wrong and has to be rewritten.
+  /// [diveId].
+  ///
+  /// Compares the computed values and the dive they belong to, not the row's
+  /// own identity or bookkeeping: `id` and `createdAt` are persisted but say
+  /// nothing about whether the enrichment is correct, and the repository's
+  /// update path does not rewrite them either. A partial match still counts
+  /// as a mismatch, since a stored row disagreeing on any value is wrong.
   bool _matches(
     MediaEnrichment existing,
     EnrichmentResult result,

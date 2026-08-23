@@ -32,20 +32,19 @@ class MediaRepository {
   /// straight to the database and so bypass the notifier paths that invalidate
   /// per-dive media providers.
   ///
-  /// Scoped to `media` alone: consumers render the media rows themselves, not
-  /// the joined `media_enrichment` values, and enrichment is backfilled on
-  /// every dive-detail open (see `DiveMediaEnricher`), which would otherwise
-  /// churn listeners for data they do not display.
-  /// Fires on writes to `media` AND `media_enrichment`.
+  /// Covers `media_enrichment` as well as `media`.
   ///
-  /// Every read behind this tick left-outer-joins the enrichment table, so a
-  /// row written there changes what consumers would return just as much as a
-  /// write to `media` itself. Watching only `media` made the enrichment
-  /// backfill invisible: it computed and saved the depth/elapsed values, no
-  /// provider re-read them, and the depth chips, mini profile and dive
-  /// computer stayed absent until the viewer was closed and reopened. Newly
-  /// linked media hit that every time, since linking is precisely when the
-  /// enrichment does not exist yet.
+  /// This tick was scoped to `media` alone on the reasoning that consumers
+  /// render the media rows themselves and not the joined enrichment values.
+  /// That is not true of the fullscreen viewer, and the reads behind the tick
+  /// left-outer-join the enrichment table regardless, so a row written there
+  /// changes what they return just as much as a write to `media` does.
+  ///
+  /// The narrower scope made the enrichment backfill invisible: it computed
+  /// and saved the depth and elapsed values, no provider re-read them, and
+  /// the depth chips, mini profile and dive computer stayed absent until the
+  /// viewer was closed and reopened. Newly linked media hit that every time,
+  /// since linking is precisely when the enrichment does not exist yet.
   Stream<void> watchMediaChanges() => _db
       .tableUpdates(
         TableUpdateQuery.onAllTables([_db.media, _db.mediaEnrichment]),
