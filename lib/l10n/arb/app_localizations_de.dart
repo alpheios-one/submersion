@@ -12456,7 +12456,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Dies entfernt $count Medienelemente von diesem Tauchgang. Die Originaldateien werden nicht gelöscht.';
+    return 'Entfernt $count Medien samt Cloud-Kopien und Miniaturansichten aus deiner Mediathek. Medien, die ein Tauchplatz noch verwendet, bleiben erhalten. Deine Originaldateien bleiben unberührt.';
   }
 
   @override
@@ -13320,6 +13320,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_library_unlinkFromSite => 'Vom Tauchplatz lösen';
+
+  @override
+  String get media_unlink_metadataLossTitle => 'Lösen und Details verwerfen?';
+
+  @override
+  String media_unlink_metadataLossContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count ausgewählte Elemente haben eine Bildunterschrift oder Favoritenmarkierung in Submersion. Beim Lösen werden sie aus deiner Mediathek entfernt, diese Details gehen verloren. Deine Originaldateien bleiben unberührt.',
+      one:
+          '1 ausgewähltes Element hat eine Bildunterschrift oder Favoritenmarkierung in Submersion. Beim Lösen wird es aus deiner Mediathek entfernt, diese Details gehen verloren. Deine Originaldatei bleibt unberührt.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_library_unlinkSelected => 'Lösen';

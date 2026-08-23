@@ -12506,7 +12506,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Cela retirera $count elements multimédias de cette plongee. Les fichiers originaux ne seront pas supprimes.';
+    return 'Retire $count medias de votre bibliotheque, ainsi que leurs copies cloud et miniatures. Les medias encore utilises par un site de plongee sont conserves. Vos fichiers originaux ne sont pas affectes.';
   }
 
   @override
@@ -13368,6 +13368,23 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_library_unlinkFromSite => 'Dissocier du site';
+
+  @override
+  String get media_unlink_metadataLossTitle =>
+      'Dissocier et supprimer les details ?';
+
+  @override
+  String media_unlink_metadataLossContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count elements selectionnes possedent une legende ou un favori enregistre dans Submersion. La dissociation les retire de votre bibliotheque et ces details sont perdus. Vos fichiers originaux ne sont pas affectes.',
+      one:
+          '1 element selectionne possede une legende ou un favori enregistre dans Submersion. La dissociation le retire de votre bibliotheque et ces details sont perdus. Votre fichier original n\'est pas affecte.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_library_unlinkSelected => 'Dissocier';

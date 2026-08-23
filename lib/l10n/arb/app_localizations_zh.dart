@@ -11893,7 +11893,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return '这将从此次潜水中移除 $count 个媒体项目。原始文件不会被删除。';
+    return '从您的媒体库中移除 $count 个媒体项目，包括其云端副本和缩略图。潜点仍在使用的项目会被保留。您的原始文件不受影响。';
   }
 
   @override
@@ -12724,6 +12724,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_library_unlinkFromSite => '取消关联潜点';
+
+  @override
+  String get media_unlink_metadataLossTitle => '取消关联并丢弃详细信息？';
+
+  @override
+  String media_unlink_metadataLossContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '有 $count 个所选项目在 Submersion 中保存了说明文字或收藏标记。取消关联会将它们从媒体库中移除，这些信息将会丢失。您的原始文件不受影响。',
+      one:
+          '有 1 个所选项目在 Submersion 中保存了说明文字或收藏标记。取消关联会将其从媒体库中移除，这些信息将会丢失。您的原始文件不受影响。',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_library_unlinkSelected => '取消关联';

@@ -12377,7 +12377,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Dit verwijdert $count media-items van deze duik. De originele bestanden worden niet verwijderd.';
+    return 'Verwijdert $count media-items uit je bibliotheek, samen met hun cloudkopieen en miniaturen. Items die een duikstek nog gebruikt blijven behouden. Je originele bestanden blijven ongemoeid.';
   }
 
   @override
@@ -13231,6 +13231,23 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_library_unlinkFromSite => 'Loskoppelen van duikstek';
+
+  @override
+  String get media_unlink_metadataLossTitle =>
+      'Loskoppelen en details verwijderen?';
+
+  @override
+  String media_unlink_metadataLossContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count geselecteerde items hebben een bijschrift of favoriet opgeslagen in Submersion. Loskoppelen verwijdert ze uit je bibliotheek, waardoor die details verloren gaan. Je originele bestanden blijven ongemoeid.',
+      one:
+          '1 geselecteerd item heeft een bijschrift of favoriet opgeslagen in Submersion. Loskoppelen verwijdert het uit je bibliotheek, waardoor die details verloren gaan. Je originele bestand blijft ongemoeid.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_library_unlinkSelected => 'Loskoppelen';
