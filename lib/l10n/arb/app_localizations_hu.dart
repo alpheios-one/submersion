@@ -362,6 +362,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => 'Kedvenc';
 
   @override
+  String get diveLog_bulkEdit_fieldMyRole => 'Saját szerep';
+
+  @override
+  String get diveLog_bulkEdit_buddyRoleMixed => 'Vegyes';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'Súlyok';
 
   @override
@@ -5728,6 +5734,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'Nincs buddy';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Eddig: $date';
   }
@@ -5788,6 +5797,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_min => 'Min';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'Nincs buddy hozzarendelve';
+
+  @override
   String get diveLog_filter_noTagsYet => 'Meg nincsenek letrehozott cimkek';
 
   @override
@@ -5832,6 +5844,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get diveLog_filter_showOnlyFavorites =>
       'Csak kedvenc merulesek mutatasa';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Csak buddy nelkuli merulesek mutatasa';
 
   @override
   String get diveLog_filter_startDate => 'Kezdes datuma';
@@ -11757,7 +11773,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Keverő';
+  String get gasCalculators_tab_blender => 'Trimix keverő';
 
   @override
   String get gasCalculators_blender_cylinder => 'Palack';
@@ -11848,11 +11864,193 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ezekkel a töltőgázokkal a célkeverék nem érhető el pontosan. Ellenőrizd a töltőgázokat és a sorrendjüket.';
 
   @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'A palack nyomás alatt van, de sem oxigént, sem héliumot nem tartalmaz, ami tiszta nitrogén lenne. Ellenőrizd a palackban lévő keveréket.';
+
+  @override
   String get gasCalculators_blender_about => 'A keverésről';
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      'Parciális nyomású keverés a célkeverékhez, valós gáz (Van der Waals) viselkedéssel. Add hozzá az egyes töltőgázokat sorban, a megjelenített nyomásig. A töltőgázok és sorrendjük állítható; a kész keveréket mindig elemezd, mielőtt lemerülnél vele.';
+      'Parciális nyomású keverés a cél keverékhez. Add hozzá a töltőgázokat sorrendben, a megadott nyomásig, majd hagyd a palackot kiegyenlítődni. A töltőgázok és a sorrendjük állítható: ha az utolsó gázt 32/0-ra állítod, levegő helyett EAN32-vel tölt fel. A kész keveréket mindig elemezd, mielőtt lemerülnél vele.';
+
+  @override
+  String get gasCalculators_blender_conditions => 'Keverési körülmények';
+
+  @override
+  String get gasCalculators_blender_fillTemp => 'Töltési hőmérséklet';
+
+  @override
+  String get gasCalculators_blender_fillTempHelp =>
+      'A palack hőmérséklete töltés közben. A sorrend minden nyomásértéke az ezen a hőmérsékleten leolvasott manométerérték.';
+
+  @override
+  String get gasCalculators_blender_settledTemp => 'Kiegyenlített hőmérséklet';
+
+  @override
+  String get gasCalculators_blender_settledTempHelp =>
+      'Az a hőmérséklet, amelyre a palack végül beáll. A célnyomás az az érték, amit ekkor mutat.';
+
+  @override
+  String get gasCalculators_blender_gasModel => 'Gázmodell';
+
+  @override
+  String get gasCalculators_blender_modelIdeal => 'Ideális gáz';
+
+  @override
+  String get gasCalculators_blender_modelVanDerWaals => 'Van der Waals';
+
+  @override
+  String get gasCalculators_blender_modelZFactor => 'Valós gáz (Z-tényező)';
+
+  @override
+  String get gasCalculators_blender_modelRecommended => 'Ajánlott';
+
+  @override
+  String get gasCalculators_blender_modelHelp =>
+      'A valós gáz (Z-tényező) a legpontosabb palacknyomásokon. Az ideális gáz a legtöbb közzétett keverési táblázattal egyezik. A Van der Waals más keverőprogramokkal való összehasonlításhoz érhető el, és töltési nyomáson több százalékkal eltér.';
+
+  @override
+  String gasCalculators_blender_stepAdd(String gas) {
+    return '$gas hozzáadása';
+  }
+
+  @override
+  String get gasCalculators_blender_stepStartLabel => 'Kezdés';
+
+  @override
+  String gasCalculators_blender_settlesTo(String pressure, String temperature) {
+    return '$temperature hőmérsékleten $pressure lesz';
+  }
+
+  @override
+  String get gasCalculators_blender_templates => 'Sablonok';
+
+  @override
+  String get gasCalculators_blender_templatesTitle => 'Cél gázkeverék sablonok';
+
+  @override
+  String get gasCalculators_blender_saveTemplate => 'Aktuális keverék mentése';
+
+  @override
+  String get gasCalculators_blender_manageTemplates => 'Sablonok kezelése';
+
+  @override
+  String gasCalculators_blender_templateSaved(String mix) {
+    return '$mix elmentve';
+  }
+
+  @override
+  String get gasCalculators_blender_templateExists =>
+      'Ez a keverék már mentve van.';
+
+  @override
+  String get gasCalculators_blender_templateInvalid =>
+      'Az O₂ + He nem haladhatja meg a 100%-ot.';
+
+  @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'Az O₂ és a He értékét is számként add meg.';
+
+  @override
+  String gasCalculators_blender_templateLimit(int count) {
+    return 'Legfeljebb $count sablont menthetsz.';
+  }
+
+  @override
+  String get gasCalculators_blender_templateNone =>
+      'Még nincs sablon. Ments el egy cél keveréket, hogy itt újra használhasd.';
+
+  @override
+  String gasCalculators_blender_templateDelete(String mix) {
+    return '$mix törlése';
+  }
+
+  @override
+  String get gasCalculators_blender_templateAdd => 'Sablon hozzáadása';
+
+  @override
+  String get gasCalculators_blender_billing => 'Költség';
+
+  @override
+  String get gasCalculators_blender_cylinderVolume => 'A palack víztérfogata';
+
+  @override
+  String get gasCalculators_blender_cylinderPresets => 'Előbeállítások';
+
+  @override
+  String gasCalculators_blender_unitPrice(String unit) {
+    return 'Ár 100 $unit egységenként';
+  }
+
+  @override
+  String get gasCalculators_blender_currency => 'Pénznem';
+
+  @override
+  String get gasCalculators_blender_costTotal => 'Összesen';
+
+  @override
+  String get gasCalculators_blender_costBasis =>
+      'A számlázás a betöltött nyomás alapján történik (palack víztérfogata × hozzáadott bar), ahogy a töltőállomás is méri.';
+
+  @override
+  String get gasCalculators_blender_costMissingPrice =>
+      'Adj meg árat minden gázhoz, hogy lásd az összeget.';
+
+  @override
+  String get gasCalculators_blender_saveFill => 'Töltés mentése';
+
+  @override
+  String get gasCalculators_blender_billed => 'Számlázva';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Még nincs semmi számlázva. Fejezz be egy töltést, és mentsd ide.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Számla címzettje';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Tétel hozzáadása';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Megnevezés';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Összeg';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Ürítés';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Üríted a számlát?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'Ezzel mind a(z) $count mentett töltés törlődik.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return '$label szerkesztése';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return '$label törlése';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix felkerült a számlára';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'Legalább egy tételnek nincs ára, ezért az összeg hiányos.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Összesen';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
@@ -23122,6 +23320,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Fiókok';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Megjelenítés';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Vezetett beállítás';
 
   @override
@@ -23224,6 +23425,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'Még töltődik. Koppintson az újrapróbálkozáshoz.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Nincs hozzáférés a fotókönyvtárhoz';
 
   @override
   String get attrLabel_size => 'Méret';
@@ -29776,6 +29981,33 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Az összes média ellenőrzése';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem frissítve',
+      one: '$count elem frissítve',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'A(z) $count elem egyikét sem sikerült ellenőrizni. A forrásaik jelenleg nem érhetők el.',
+      one:
+          'Az elemet nem sikerült ellenőrizni. A forrása jelenleg nem érhető el.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Médiaforrások';
 
   @override
@@ -32578,6 +32810,40 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Hiányzik és nincs mentve';
+
+  @override
+  String get media_servedFrom_localDisk => 'Ezen az eszközön';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Fotókönyvtár';
+
+  @override
+  String get media_servedFrom_storeCache => 'Felhőtár, itt gyorsítótárazva';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Felhőtár';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Webhivatkozás';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Csatlakoztatott szolgáltatás, itt gyorsítótárazva';
+
+  @override
+  String get media_servedFrom_connectorNetwork =>
+      'Csatlakoztatott szolgáltatás';
+
+  @override
+  String get media_servedFrom_embedded => 'Ebben a naplóban tárolva';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Forrásjelvények megjelenítése a bélyegképeken';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Kis ikon, amely megmutatja, honnan érkezik az egyes elemek tartalma. A problémajelvények mindig láthatók.';
 
   @override
   String get media_status_transferFailed => 'A feltöltés sikertelen';

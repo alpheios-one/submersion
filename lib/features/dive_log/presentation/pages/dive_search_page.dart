@@ -64,6 +64,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
 
   // Social
   String? _buddyNameFilter;
+  bool _noBuddyOnly = false;
 
   // Organization
   List<String> _selectedTagIds = [];
@@ -121,6 +122,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     _maxO2Percent = filter.maxO2Percent;
     _equipmentIds = List.from(filter.equipmentIds);
     _buddyNameFilter = filter.buddyNameFilter;
+    _noBuddyOnly = filter.noBuddyOnly ?? false;
     _selectedTagIds = List.from(filter.tagIds);
     _minRating = filter.minRating;
     _favoritesOnly = filter.favoritesOnly ?? false;
@@ -152,7 +154,8 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
         _equipmentIds.isNotEmpty) {
       _expanded['gas'] = true;
     }
-    if (_buddyNameFilter != null && _buddyNameFilter!.isNotEmpty) {
+    if ((_buddyNameFilter != null && _buddyNameFilter!.isNotEmpty) ||
+        _noBuddyOnly) {
       _expanded['social'] = true;
     }
     if (_selectedTagIds.isNotEmpty || _minRating != null || _favoritesOnly) {
@@ -638,16 +641,44 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
   }
 
   Widget _buildSocialContent() {
-    return TextField(
-      controller: _buddyNameController,
-      decoration: InputDecoration(
-        labelText: context.l10n.diveLog_filter_buddyName,
-        hintText: context.l10n.diveLog_filter_buddyHint,
-        prefixIcon: const Icon(Icons.person),
-      ),
-      onChanged: (value) {
-        _buddyNameFilter = value.isEmpty ? null : value;
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: _buddyNameController,
+          decoration: InputDecoration(
+            labelText: context.l10n.diveLog_filter_buddyName,
+            hintText: context.l10n.diveLog_filter_buddyHint,
+            prefixIcon: const Icon(Icons.person),
+          ),
+          onChanged: (value) {
+            setState(() {
+              _buddyNameFilter = value.isEmpty ? null : value;
+              if (value.isNotEmpty) {
+                _noBuddyOnly = false;
+              }
+            });
+          },
+        ),
+        // Mutually exclusive with the buddy name filter above: a dive either
+        // has a buddy to search for, or has none.
+        SwitchListTile(
+          title: Text(context.l10n.diveLog_filter_noBuddyOnly),
+          subtitle: Text(context.l10n.diveLog_filter_showOnlyNoBuddy),
+          secondary: const Icon(Icons.person_off),
+          value: _noBuddyOnly,
+          contentPadding: EdgeInsets.zero,
+          onChanged: (value) {
+            setState(() {
+              _noBuddyOnly = value;
+              if (value) {
+                _buddyNameFilter = null;
+                _buddyNameController.clear();
+              }
+            });
+          },
+        ),
+      ],
     );
   }
 
@@ -788,6 +819,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
       _maxO2Percent = null;
       _equipmentIds = [];
       _buddyNameFilter = null;
+      _noBuddyOnly = false;
       _selectedTagIds = [];
       _minRating = null;
       _favoritesOnly = false;
@@ -820,6 +852,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
       maxO2Percent: _maxO2Percent,
       equipmentIds: _equipmentIds,
       buddyNameFilter: _buddyNameFilter,
+      noBuddyOnly: _noBuddyOnly ? true : null,
       tagIds: _selectedTagIds,
       minRating: _minRating,
       favoritesOnly: _favoritesOnly ? true : null,

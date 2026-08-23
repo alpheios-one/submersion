@@ -365,6 +365,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => 'Favori';
 
   @override
+  String get diveLog_bulkEdit_fieldMyRole => 'Mon rôle';
+
+  @override
+  String get diveLog_bulkEdit_buddyRoleMixed => 'Variable';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'Lestage';
 
   @override
@@ -5769,6 +5775,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'Sans binome';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Jusqu\'au $date';
   }
@@ -5830,6 +5839,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_filter_min => 'Min';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'Aucun binome assigne';
+
+  @override
   String get diveLog_filter_noTagsYet => 'Aucun tag cree pour le moment';
 
   @override
@@ -5874,6 +5886,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get diveLog_filter_showOnlyFavorites =>
       'Afficher uniquement les plongees favorites';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Afficher uniquement les plongees sans binome';
 
   @override
   String get diveLog_filter_startDate => 'Date de debut';
@@ -11822,7 +11838,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Mélangeur';
+  String get gasCalculators_tab_blender => 'Mélangeur trimix';
 
   @override
   String get gasCalculators_blender_cylinder => 'Bloc';
@@ -11913,11 +11929,195 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ces gaz de remplissage n\'atteignent pas exactement le mélange cible. Vérifiez les gaz et leur ordre.';
 
   @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'Le bloc est sous pression mais ne contient ni oxygène ni hélium, ce qui serait de l\'azote pur. Vérifiez le mélange déjà présent dans le bloc.';
+
+  @override
   String get gasCalculators_blender_about => 'À propos du mélange';
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      'Mélange par pressions partielles pour le mélange cible, avec comportement de gaz réel (Van der Waals). Ajoutez chaque gaz de remplissage dans l\'ordre, jusqu\'à la pression indiquée. Les gaz et leur ordre sont configurables ; analysez toujours le mélange final avant de plonger.';
+      'Mélange par pressions partielles pour le mélange cible. Ajoutez chaque gaz de remplissage dans l\'ordre, jusqu\'à la pression indiquée, puis laissez le bloc se stabiliser. Les gaz de remplissage et leur ordre sont configurables : en réglant le dernier gaz sur 32/0, le complément se fait à l\'EAN32 au lieu de l\'air. Analysez toujours le mélange final avant de le plonger.';
+
+  @override
+  String get gasCalculators_blender_conditions => 'Conditions de mélange';
+
+  @override
+  String get gasCalculators_blender_fillTemp => 'Température de remplissage';
+
+  @override
+  String get gasCalculators_blender_fillTempHelp =>
+      'La température du bloc pendant le remplissage. Chaque pression de la procédure est la valeur au manomètre à cette température.';
+
+  @override
+  String get gasCalculators_blender_settledTemp => 'Température stabilisée';
+
+  @override
+  String get gasCalculators_blender_settledTempHelp =>
+      'La température que le bloc atteint au repos. La pression cible est ce qu\'il indique une fois stabilisé.';
+
+  @override
+  String get gasCalculators_blender_gasModel => 'Modèle de gaz';
+
+  @override
+  String get gasCalculators_blender_modelIdeal => 'Gaz parfait';
+
+  @override
+  String get gasCalculators_blender_modelVanDerWaals => 'Van der Waals';
+
+  @override
+  String get gasCalculators_blender_modelZFactor => 'Gaz réel (facteur Z)';
+
+  @override
+  String get gasCalculators_blender_modelRecommended => 'Recommandé';
+
+  @override
+  String get gasCalculators_blender_modelHelp =>
+      'Le gaz réel (facteur Z) est le plus précis aux pressions de bloc. Le gaz parfait correspond à la plupart des tables de mélange publiées. Van der Waals est proposé pour comparaison avec d\'autres logiciels de mélange et s\'écarte de plusieurs pour cent à la pression de remplissage.';
+
+  @override
+  String gasCalculators_blender_stepAdd(String gas) {
+    return 'Ajouter $gas';
+  }
+
+  @override
+  String get gasCalculators_blender_stepStartLabel => 'Départ';
+
+  @override
+  String gasCalculators_blender_settlesTo(String pressure, String temperature) {
+    return 'Se stabilise à $pressure à $temperature';
+  }
+
+  @override
+  String get gasCalculators_blender_templates => 'Modèles';
+
+  @override
+  String get gasCalculators_blender_templatesTitle =>
+      'Modèles de mélange cible';
+
+  @override
+  String get gasCalculators_blender_saveTemplate =>
+      'Enregistrer le mélange actuel';
+
+  @override
+  String get gasCalculators_blender_manageTemplates => 'Gérer les modèles';
+
+  @override
+  String gasCalculators_blender_templateSaved(String mix) {
+    return '$mix enregistré';
+  }
+
+  @override
+  String get gasCalculators_blender_templateExists =>
+      'Ce mélange est déjà enregistré.';
+
+  @override
+  String get gasCalculators_blender_templateInvalid =>
+      'O₂ + He ne peut pas dépasser 100 %.';
+
+  @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'Saisissez O₂ et He sous forme de nombres.';
+
+  @override
+  String gasCalculators_blender_templateLimit(int count) {
+    return 'Vous pouvez enregistrer jusqu\'à $count modèles.';
+  }
+
+  @override
+  String get gasCalculators_blender_templateNone =>
+      'Aucun modèle pour l\'instant. Enregistrez un mélange cible pour le réutiliser ici.';
+
+  @override
+  String gasCalculators_blender_templateDelete(String mix) {
+    return 'Supprimer $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_templateAdd => 'Ajouter un modèle';
+
+  @override
+  String get gasCalculators_blender_billing => 'Coût';
+
+  @override
+  String get gasCalculators_blender_cylinderVolume => 'Volume d\'eau du bloc';
+
+  @override
+  String get gasCalculators_blender_cylinderPresets => 'Préréglages';
+
+  @override
+  String gasCalculators_blender_unitPrice(String unit) {
+    return 'Prix pour 100 $unit';
+  }
+
+  @override
+  String get gasCalculators_blender_currency => 'Devise';
+
+  @override
+  String get gasCalculators_blender_costTotal => 'Total';
+
+  @override
+  String get gasCalculators_blender_costBasis =>
+      'Facturé sur la pression délivrée (volume d\'eau du bloc × bars ajoutés), comme le mesure une station de gonflage.';
+
+  @override
+  String get gasCalculators_blender_costMissingPrice =>
+      'Saisissez un prix pour chaque gaz afin de voir le total.';
+
+  @override
+  String get gasCalculators_blender_saveFill => 'Enregistrer ce remplissage';
+
+  @override
+  String get gasCalculators_blender_billed => 'Facturé';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Rien de facturé pour l\'instant. Terminez un remplissage et enregistrez-le ici.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Facturé à';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Ajouter une ligne';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Désignation';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Montant';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Vider';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Vider la facture ?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'Cela supprime les $count remplissages enregistrés.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return 'Modifier $label';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return 'Supprimer $label';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix ajouté à la facture';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'Au moins une ligne n\'a pas de prix, le total est donc incomplet.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Total';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
@@ -23274,6 +23474,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Comptes';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Affichage';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Configuration guidée';
 
   @override
@@ -23376,6 +23579,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'Chargement en cours. Touchez pour réessayer.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Aucun accès à la photothèque';
 
   @override
   String get attrLabel_size => 'Taille';
@@ -29959,6 +30166,33 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Vérifier tous les médias';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count éléments mis à jour',
+      one: '$count élément mis à jour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Impossible de vérifier les $count éléments. Leurs sources sont actuellement inaccessibles.',
+      one:
+          'Impossible de vérifier cet élément. Sa source est actuellement inaccessible.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Sources de médias';
 
   @override
@@ -32783,6 +33017,39 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Absent et non sauvegardé';
+
+  @override
+  String get media_servedFrom_localDisk => 'Sur cet appareil';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Photothèque';
+
+  @override
+  String get media_servedFrom_storeCache => 'Stockage cloud, en cache ici';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Stockage cloud';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Lien web';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Service connecté, en cache ici';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Service connecté';
+
+  @override
+  String get media_servedFrom_embedded => 'Enregistré dans ce carnet';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Afficher les badges de source sur les vignettes';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Une petite icône indiquant d\'où provient chaque élément. Les badges de problème restent toujours visibles.';
 
   @override
   String get media_status_transferFailed => 'Échec du téléversement';

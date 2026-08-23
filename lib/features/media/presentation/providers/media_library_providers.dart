@@ -6,6 +6,7 @@ import 'package:submersion/features/media/data/repositories/media_library_reposi
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 
 /// Library browse presentations. Values are persisted by name via the app
 /// settings key-value store.
@@ -35,7 +36,7 @@ final mediaLibraryViewModeProvider =
 class MediaLibraryViewModeNotifier extends StateNotifier<MediaLibraryViewMode> {
   MediaLibraryViewModeNotifier(this._settings)
     : super(MediaLibraryViewMode.grid) {
-    _prime();
+    logFailure(_prime(), MediaLibraryViewModeNotifier, 'prime');
   }
 
   static const String _settingKey = 'media_library_view_mode';

@@ -9,6 +9,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart'
 import 'package:submersion/features/dive_computer/presentation/widgets/pin_code_dialog.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 
 /// Widget for the download step of the discovery wizard.
 class DownloadStepWidget extends ConsumerStatefulWidget {
@@ -84,7 +85,11 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
     if (!_promptApplies) {
       // Start download when widget is shown.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _startDownload();
+        logFailure(
+          _startDownload(),
+          _DownloadStepWidgetState,
+          'start download',
+        );
       });
     }
   }
@@ -151,7 +156,7 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
       _useCutoff = useCutoff;
       _promptResolved = true;
     });
-    _startDownload();
+    logFailure(_startDownload(), _DownloadStepWidgetState, 'start download');
   }
 
   @override
@@ -401,7 +406,11 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
     final retryButton = OutlinedButton.icon(
       onPressed: () {
         _hasStarted = false;
-        _startDownload();
+        logFailure(
+          _startDownload(),
+          _DownloadStepWidgetState,
+          'start download',
+        );
       },
       icon: const Icon(Icons.refresh),
       label: Text(context.l10n.diveComputer_downloadStep_retry),
@@ -416,7 +425,11 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
         FilledButton.icon(
           onPressed: () {
             _hasStarted = false;
-            _startDownload();
+            logFailure(
+              _startDownload(),
+              _DownloadStepWidgetState,
+              'start download',
+            );
           },
           icon: const Icon(Icons.refresh),
           label: Text(context.l10n.diveComputer_downloadStep_retry),
