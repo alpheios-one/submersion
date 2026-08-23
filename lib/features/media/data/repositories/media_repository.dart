@@ -770,63 +770,7 @@ class MediaRepository {
   Future<void> saveEnrichment(domain.MediaEnrichment enrichment) async {
     try {
       _log.info('Saving enrichment for media: ${enrichment.mediaId}');
-      final now = DateTime.now();
-      final id = enrichment.id.isEmpty ? _uuid.v4() : enrichment.id;
-
-      // Check if enrichment already exists for this media
-      final existing = await (_db.select(
-        _db.mediaEnrichment,
-      )..where((t) => t.mediaId.equals(enrichment.mediaId))).getSingleOrNull();
-
-      if (existing != null) {
-        // Update existing enrichment
-        await (_db.update(
-          _db.mediaEnrichment,
-        )..where((t) => t.mediaId.equals(enrichment.mediaId))).write(
-          MediaEnrichmentCompanion(
-            // The dive is part of the value, not just a back-pointer: an
-            // enrichment is the join product of this media and ONE dive's
-            // profile. Leaving it behind would let a row repaired against a
-            // different dive keep claiming the old one.
-            diveId: Value(enrichment.diveId),
-            depthMeters: Value(enrichment.depthMeters),
-            temperatureCelsius: Value(enrichment.temperatureCelsius),
-            elapsedSeconds: Value(enrichment.elapsedSeconds),
-            matchConfidence: Value(enrichment.matchConfidence.name),
-            timestampOffsetSeconds: Value(enrichment.timestampOffsetSeconds),
-          ),
-        );
-        await _syncRepository.markRecordPending(
-          entityType: 'mediaEnrichment',
-          recordId: existing.id,
-          localUpdatedAt: now.millisecondsSinceEpoch,
-        );
-      } else {
-        // Insert new enrichment
-        await _db
-            .into(_db.mediaEnrichment)
-            .insert(
-              MediaEnrichmentCompanion(
-                id: Value(id),
-                mediaId: Value(enrichment.mediaId),
-                diveId: Value(enrichment.diveId),
-                depthMeters: Value(enrichment.depthMeters),
-                temperatureCelsius: Value(enrichment.temperatureCelsius),
-                elapsedSeconds: Value(enrichment.elapsedSeconds),
-                matchConfidence: Value(enrichment.matchConfidence.name),
-                timestampOffsetSeconds: Value(
-                  enrichment.timestampOffsetSeconds,
-                ),
-                createdAt: Value(now.millisecondsSinceEpoch),
-              ),
-            );
-        await _syncRepository.markRecordPending(
-          entityType: 'mediaEnrichment',
-          recordId: id,
-          localUpdatedAt: now.millisecondsSinceEpoch,
-        );
-      }
-
+      await _writeEnrichmentRow(enrichment);
       SyncEventBus.notifyLocalChange();
       _log.info('Saved enrichment for media: ${enrichment.mediaId}');
     } catch (e, stackTrace) {
@@ -836,6 +780,100 @@ class MediaRepository {
         stackTrace: stackTrace,
       );
       rethrow;
+    }
+  }
+
+  /// Saves a batch of enrichments in one transaction.
+  ///
+  /// One transaction means ONE mediaEnrichment table tick when it commits,
+  /// where per-row [saveEnrichment] calls tick once each. The dive-media
+  /// backfill runs from the open media viewer and can write a row per photo
+  /// of a dive; per-row ticks re-ran every provider on `watchMediaChanges`
+  /// (the library re-query included) once per 300ms debounce window for the
+  /// whole burst. An empty batch returns without touching the database, so
+  /// the common "everything already enriched" pass costs no tick at all.
+  Future<void> saveEnrichments(List<domain.MediaEnrichment> enrichments) async {
+    if (enrichments.isEmpty) return;
+    try {
+      _log.info('Saving ${enrichments.length} enrichments');
+      // markRecordPending opens its own transaction; Drift nests it as a
+      // savepoint because both repositories share the one database instance.
+      await _db.transaction(() async {
+        for (final enrichment in enrichments) {
+          await _writeEnrichmentRow(enrichment);
+        }
+      });
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to save enrichment batch of ${enrichments.length}',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Upserts one enrichment row and marks it pending for sync.
+  ///
+  /// Shared by [saveEnrichment] (single write, then notify) and
+  /// [saveEnrichments] (many writes in one transaction, then one notify);
+  /// deliberately does NOT call [SyncEventBus.notifyLocalChange] so the
+  /// batch path can notify once.
+  Future<void> _writeEnrichmentRow(domain.MediaEnrichment enrichment) async {
+    final now = DateTime.now();
+    final id = enrichment.id.isEmpty ? _uuid.v4() : enrichment.id;
+
+    // Check if enrichment already exists for this media
+    final existing = await (_db.select(
+      _db.mediaEnrichment,
+    )..where((t) => t.mediaId.equals(enrichment.mediaId))).getSingleOrNull();
+
+    if (existing != null) {
+      // Update existing enrichment
+      await (_db.update(
+        _db.mediaEnrichment,
+      )..where((t) => t.mediaId.equals(enrichment.mediaId))).write(
+        MediaEnrichmentCompanion(
+          // The dive is part of the value, not just a back-pointer: an
+          // enrichment is the join product of this media and ONE dive's
+          // profile. Leaving it behind would let a row repaired against a
+          // different dive keep claiming the old one.
+          diveId: Value(enrichment.diveId),
+          depthMeters: Value(enrichment.depthMeters),
+          temperatureCelsius: Value(enrichment.temperatureCelsius),
+          elapsedSeconds: Value(enrichment.elapsedSeconds),
+          matchConfidence: Value(enrichment.matchConfidence.name),
+          timestampOffsetSeconds: Value(enrichment.timestampOffsetSeconds),
+        ),
+      );
+      await _syncRepository.markRecordPending(
+        entityType: 'mediaEnrichment',
+        recordId: existing.id,
+        localUpdatedAt: now.millisecondsSinceEpoch,
+      );
+    } else {
+      // Insert new enrichment
+      await _db
+          .into(_db.mediaEnrichment)
+          .insert(
+            MediaEnrichmentCompanion(
+              id: Value(id),
+              mediaId: Value(enrichment.mediaId),
+              diveId: Value(enrichment.diveId),
+              depthMeters: Value(enrichment.depthMeters),
+              temperatureCelsius: Value(enrichment.temperatureCelsius),
+              elapsedSeconds: Value(enrichment.elapsedSeconds),
+              matchConfidence: Value(enrichment.matchConfidence.name),
+              timestampOffsetSeconds: Value(enrichment.timestampOffsetSeconds),
+              createdAt: Value(now.millisecondsSinceEpoch),
+            ),
+          );
+      await _syncRepository.markRecordPending(
+        entityType: 'mediaEnrichment',
+        recordId: id,
+        localUpdatedAt: now.millisecondsSinceEpoch,
+      );
     }
   }
 
