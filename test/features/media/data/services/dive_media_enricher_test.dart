@@ -39,7 +39,7 @@ void main() {
         // Shutter at 12:08 == 2520s (42 min) after the 11:26 entry.
         _media('m1', takenAt: DateTime.utc(2025, 12, 27, 12, 8)),
       ],
-      saveEnrichment: (e) async => saved.add(e),
+      saveEnrichments: (rows) async => saved.addAll(rows),
     );
 
     final count = await enricher.enrichMissingForDive('d1');
@@ -79,7 +79,7 @@ void main() {
             ),
           ),
         ],
-        saveEnrichment: (e) async => saved.add(e),
+        saveEnrichments: (rows) async => saved.addAll(rows),
       );
 
       expect(await enricher.enrichMissingForDive('d1'), 0);
@@ -113,7 +113,7 @@ void main() {
             ),
           ),
         ],
-        saveEnrichment: (e) async => saved.add(e),
+        saveEnrichments: (rows) async => saved.addAll(rows),
       );
 
       expect(await enricher.enrichMissingForDive('d1'), 1);
@@ -149,7 +149,7 @@ void main() {
           ),
         ),
       ],
-      saveEnrichment: (e) async => saved.add(e),
+      saveEnrichments: (rows) async => saved.addAll(rows),
     );
 
     expect(await enricher.enrichMissingForDive('d1'), 1);
@@ -163,7 +163,7 @@ void main() {
       loadMediaForDive: (_) async => [
         _media('m1', takenAt: DateTime.utc(2025, 12, 27, 12, 8)),
       ],
-      saveEnrichment: (e) async => saved.add(e),
+      saveEnrichments: (rows) async => saved.addAll(rows),
     );
 
     expect(await enricher.enrichMissingForDive('d1'), 0);
@@ -184,7 +184,7 @@ void main() {
     final enricher = DiveMediaEnricher(
       loadDive: (_) async => _diveWithProfile(),
       loadMediaForDive: (_) async => [signature],
-      saveEnrichment: (e) async => saved.add(e),
+      saveEnrichments: (rows) async => saved.addAll(rows),
     );
 
     expect(await enricher.enrichMissingForDive('d1'), 0);
@@ -198,10 +198,66 @@ void main() {
       loadMediaForDive: (_) async => [
         _media('m1', takenAt: DateTime.utc(2025, 12, 27, 12, 8)),
       ],
-      saveEnrichment: (e) async => saved.add(e),
+      saveEnrichments: (rows) async => saved.addAll(rows),
     );
 
     expect(await enricher.enrichMissingForDive('d1'), 0);
     expect(saved, isEmpty);
+  });
+
+  /// The backfill fires from the media viewer, where each write used to tick
+  /// watchMediaChanges and re-run every media provider. All of a dive's
+  /// missing rows must therefore leave in ONE batched save (one transaction,
+  /// one tick), not one save per item.
+  test('saves all missing enrichments in a single batched call', () async {
+    final batches = <List<MediaEnrichment>>[];
+    final enricher = DiveMediaEnricher(
+      loadDive: (_) async => _diveWithProfile(),
+      loadMediaForDive: (_) async => [
+        _media('m1', takenAt: DateTime.utc(2025, 12, 27, 12, 8)),
+        _media('m2', takenAt: DateTime.utc(2025, 12, 27, 12, 9)),
+      ],
+      saveEnrichments: (rows) async => batches.add(rows),
+    );
+
+    final count = await enricher.enrichMissingForDive('d1');
+
+    expect(count, 2);
+    expect(batches, hasLength(1), reason: 'one save call for the whole dive');
+    expect(batches.single.map((e) => e.mediaId), ['m1', 'm2']);
+  });
+
+  test('a dive with nothing to enrich never calls the save at all', () async {
+    var calls = 0;
+    final enricher = DiveMediaEnricher(
+      loadDive: (_) async => _diveWithProfile(),
+      loadMediaForDive: (_) async => [
+        _media(
+          'm1',
+          takenAt: DateTime.utc(2025, 12, 27, 12, 8),
+          enrichment: MediaEnrichment(
+            id: 'e1',
+            mediaId: 'm1',
+            diveId: 'd1',
+            elapsedSeconds: 2520,
+            depthMeters: 20,
+            temperatureCelsius: 26,
+            timestampOffsetSeconds: 0,
+            matchConfidence: MatchConfidence.exact,
+            createdAt: DateTime.utc(2025),
+          ),
+        ),
+      ],
+      saveEnrichments: (rows) async => calls++,
+    );
+
+    expect(await enricher.enrichMissingForDive('d1'), 0);
+    expect(
+      calls,
+      0,
+      reason:
+          'an empty batch must not reach the repository: even a no-op save '
+          'would tick watchMediaChanges and invalidate the media providers',
+    );
   });
 }

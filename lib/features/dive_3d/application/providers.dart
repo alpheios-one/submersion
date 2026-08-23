@@ -15,10 +15,11 @@ import 'package:submersion/features/dive_3d/domain/scene_geometry_service.dart';
 
 /// Assembles scene data from the primary/active source. Returns null when
 /// the dive has no usable profile (manual logs) so the UI can hide all 3D
-/// entry points. Reactivity comes from the upstream providers, which all
-/// self-invalidate on watchDiveDetailChanges. A null active source id
-/// means "the primary source"; sourceProfilesProvider orders primary
-/// first.
+/// entry points. Reactivity comes from the upstream providers: the
+/// profile/pressure/gas/event ones self-invalidate on
+/// watchAnalysisInputChanges, and mediaForDiveProvider on the broad
+/// watchDiveDetailChanges. A null active source id means "the primary
+/// source"; sourceProfilesProvider orders primary first.
 final dive3dSceneDataProvider = FutureProvider.family<Dive3dSceneData?, String>(
   (ref, diveId) async {
     final sourceProfiles = await ref.watch(

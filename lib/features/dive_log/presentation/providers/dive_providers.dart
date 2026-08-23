@@ -232,7 +232,10 @@ final sourceProfilesProvider =
       diveId,
     ) async {
       final repository = ref.watch(diveRepositoryProvider);
-      ref.invalidateSelfWhen(repository.watchDiveDetailChanges());
+      // Analysis-input tick: this hydration feeds sourceProfileAnalysisProvider
+      // and reads only profile/source tables, so the broad detail tick (which
+      // includes media) re-ran the per-source analysis after viewing a photo.
+      ref.invalidateSelfWhen(repository.watchAnalysisInputChanges());
       return repository.getProfilesByDataSource(diveId);
     });
 
@@ -1031,8 +1034,11 @@ final tankPressuresProvider =
       diveId,
     ) async {
       final repository = ref.watch(tankPressureRepositoryProvider);
+      // Analysis-input tick covers tank_pressure_profiles (and the dives
+      // cascade); the broad detail tick made every pressure curve re-query
+      // on unrelated writes such as media.
       ref.invalidateSelfWhen(
-        ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
+        ref.watch(diveRepositoryProvider).watchAnalysisInputChanges(),
       );
       return repository.getTankPressuresForDive(diveId);
     });
@@ -1072,7 +1078,10 @@ final estimatedTankPressuresProvider =
 final diveDataSourcesProvider =
     FutureProvider.family<List<DiveDataSource>, String>((ref, diveId) async {
       final repository = ref.watch(diveRepositoryProvider);
-      ref.invalidateSelfWhen(repository.watchDiveDetailChanges());
+      // Analysis-input tick: reads dive_data_sources/dive_computers only, and
+      // sourceProfileAnalysisProvider watches this, so the broad detail tick
+      // re-ran the per-source analysis on unrelated writes such as media.
+      ref.invalidateSelfWhen(repository.watchAnalysisInputChanges());
       return repository.getDataSources(diveId);
     });
 
