@@ -38,8 +38,14 @@ final metricSourceInfoProvider = StateProvider<MetricSourceInfo?>(
 final diveComputerEventsProvider =
     FutureProvider.family<List<ProfileEvent>, String>((ref, diveId) async {
       final repository = ref.watch(diveComputerRepositoryProvider);
+      // The analysis-input tick, not the broad detail tick: every
+      // profileAnalysisProvider watches this provider, so its invalidation
+      // re-runs the whole Buhlmann chain. The detail tick fired for media
+      // and 15 other tables this query never reads -- and, being built
+      // before dive_profile_events existed, never fired for the one table
+      // it DOES read.
       ref.invalidateSelfWhen(
-        ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
+        ref.watch(diveRepositoryProvider).watchAnalysisInputChanges(),
       );
       final dbEvents = await repository.getEventsForDive(diveId);
       return dbEvents.map(mapDiveProfileEventToProfileEvent).toList();
@@ -823,15 +829,18 @@ ProfileAnalysis _runProfileAnalysis(_ProfileAnalysisInput input) {
 /// performance). keepAlive family, so a residual-chain walk over a
 /// repetitive dive week hydrates each prior dive once per session instead
 /// of fully re-hydrating on every detail open. Self-invalidates on the
-/// detail-table tick exactly like diveProvider, preserving the analysis
-/// refresh behavior that previously arrived transitively through
-/// diveProvider.
+/// analysis-input tick (the tables this hydration actually reads), so the
+/// residual-chain cache survives writes to unrelated detail tables such as
+/// media.
 final analysisDiveProvider = FutureProvider.family<Dive?, String>((
   ref,
   diveId,
 ) async {
   final repository = ref.watch(diveRepositoryProvider);
-  ref.invalidateSelfWhen(repository.watchDiveDetailChanges());
+  // Analysis-input tick only: this provider feeds profileAnalysisProvider,
+  // so invalidating it on the broad detail tick (which includes media)
+  // re-ran the full analysis cascade after merely viewing a photo.
+  ref.invalidateSelfWhen(repository.watchAnalysisInputChanges());
   return repository.getDiveForAnalysis(diveId);
 });
 
