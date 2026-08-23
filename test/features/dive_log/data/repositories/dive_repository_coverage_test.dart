@@ -346,37 +346,34 @@ void main() {
       },
     );
 
-    test(
-      'sums dive time per bucket, preferring runtime over bottom_time '
-      '(issue #641 follow-up)',
-      () async {
-        await insertDive(
-          id: 'dive-a',
-          maxDepth: 12.0,
-          bottomTimeSeconds: 20 * 60,
-          runtimeSeconds: 25 * 60,
-        );
-        await insertDive(
-          id: 'dive-b',
-          maxDepth: 15.0,
-          bottomTimeSeconds: 30 * 60,
-        );
-        await insertDive(
-          id: 'dive-c',
-          maxDepth: 38.0,
-          bottomTimeSeconds: 45 * 60,
-        );
+    test('sums dive time per bucket, preferring runtime over bottom_time '
+        '(issue #641 follow-up)', () async {
+      await insertDive(
+        id: 'dive-a',
+        maxDepth: 12.0,
+        bottomTimeSeconds: 20 * 60,
+        runtimeSeconds: 25 * 60,
+      );
+      await insertDive(
+        id: 'dive-b',
+        maxDepth: 15.0,
+        bottomTimeSeconds: 30 * 60,
+      );
+      await insertDive(
+        id: 'dive-c',
+        maxDepth: 38.0,
+        bottomTimeSeconds: 45 * 60,
+      );
 
-        final stats = await repository.getStatistics();
-        final byLabel = {for (final d in stats.depthDistribution) d.label: d};
+      final stats = await repository.getStatistics();
+      final byLabel = {for (final d in stats.depthDistribution) d.label: d};
 
-        // dive-a prefers runtime (25m) over bottom_time (20m); dive-b has no
-        // runtime and falls back to bottom_time (30m). Same bucket: 55m total.
-        expect(byLabel['10-20m']!.totalDurationSeconds, 55 * 60);
-        expect(byLabel['30-40m']!.totalDurationSeconds, 45 * 60);
-        expect(byLabel['0-10m']!.totalDurationSeconds, 0);
-      },
-    );
+      // dive-a prefers runtime (25m) over bottom_time (20m); dive-b has no
+      // runtime and falls back to bottom_time (30m). Same bucket: 55m total.
+      expect(byLabel['10-20m']!.totalDurationSeconds, 55 * 60);
+      expect(byLabel['30-40m']!.totalDurationSeconds, 45 * 60);
+      expect(byLabel['0-10m']!.totalDurationSeconds, 0);
+    });
   });
 
   // ---------------------------------------------------------------------------
