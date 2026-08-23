@@ -44,8 +44,18 @@ class GoogleDriveClientConfig {
   /// block and forks do not inherit this project's client.
   ///
   /// Empty in `flutter test` and in any build that omits the define, which
-  /// closes [hasDesktopClient] and hides Drive rather than offering a tile
-  /// whose sign-in cannot finish.
+  /// closes [hasDesktopClient]. What that means differs by platform:
+  ///
+  /// - **Windows/Linux**: [isSupportedOnThisPlatform] goes false and the Drive
+  ///   tile is hidden, since the loopback flow is the only option there.
+  /// - **macOS**: the tile is still offered, because a sandboxed build signs
+  ///   in through google_sign_in and needs no secret. Only the no-sandbox DMG
+  ///   is stuck, and KeychainGatedAuthenticator detects exactly that case and
+  ///   fails with a message naming this define instead of a keychain error.
+  ///   Deciding availability up front would mean probing the keychain just to
+  ///   render the settings list, for every macOS user including those who
+  ///   never touch Drive.
+  /// - **iOS/Android**: unaffected; they never use the Desktop client.
   static const String desktopClientSecret = String.fromEnvironment(
     'GOOGLE_DRIVE_CLIENT_SECRET',
   );

@@ -1,6 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/desktop_oauth_authenticator.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_authenticator.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_client_config.dart';
@@ -108,15 +109,16 @@ class KeychainGatedAuthenticator implements GoogleDriveAuthenticator {
     if (!needsLoopback) return _buildGoogleSignIn();
 
     if (!_desktopClientConfigured()) {
-      // The Desktop client id or its build-time secret is missing, so the
-      // loopback exchange cannot complete. Sign-in still fails on this build,
-      // but no worse than before the gate existed.
+      // Neither backend can work here: google_sign_in dies in the keychain
+      // (above) and the loopback exchange has no client secret. Returning
+      // google_sign_in anyway would reproduce the misleading "keychain error"
+      // this gate exists to eliminate, so say what is actually wrong.
       _log.warning(
         'Data-protection keychain unavailable and the Desktop OAuth client is '
         'incomplete (needs --dart-define=GOOGLE_DRIVE_CLIENT_SECRET); Google '
-        'Drive sign-in will fail on this build',
+        'Drive sign-in is disabled in this build',
       );
-      return _buildGoogleSignIn();
+      return const _UnconfiguredDesktopAuthenticator();
     }
 
     _log.info(
@@ -157,4 +159,42 @@ class KeychainGatedAuthenticator implements GoogleDriveAuthenticator {
   @override
   Future<void> handleAuthFailure() async =>
       (await _resolve()).handleAuthFailure();
+}
+
+/// Stands in when the build can use neither backend: the data-protection
+/// keychain is unavailable (so google_sign_in cannot persist a token) and no
+/// Desktop client secret was compiled in (so the loopback exchange cannot
+/// complete).
+///
+/// Reports "not signed in" for every silent path and names the real cause on
+/// the one path a user actually triggers, rather than deferring to a backend
+/// known to fail with an unrelated message.
+class _UnconfiguredDesktopAuthenticator implements GoogleDriveAuthenticator {
+  const _UnconfiguredDesktopAuthenticator();
+
+  static const String _message =
+      'Google Drive is unavailable in this build: it was compiled without '
+      'the Desktop OAuth client secret '
+      '(--dart-define=GOOGLE_DRIVE_CLIENT_SECRET).';
+
+  @override
+  http.Client? get authClient => null;
+
+  @override
+  Future<void> authenticate() async =>
+      throw const CloudStorageException(_message);
+
+  /// False, never throwing: the seam contract forbids it, and a cold launch
+  /// must read as "not signed in" rather than crash.
+  @override
+  Future<bool> attemptSilentAuth() async => false;
+
+  @override
+  Future<String?> get userEmail async => null;
+
+  @override
+  Future<void> signOut() async {}
+
+  @override
+  Future<void> handleAuthFailure() async {}
 }

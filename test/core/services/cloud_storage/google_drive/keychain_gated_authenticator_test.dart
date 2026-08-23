@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
+import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_authenticator.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/keychain_gated_authenticator.dart';
 import 'package:submersion/core/services/secure_storage/fallback_secure_storage.dart';
@@ -107,23 +108,61 @@ void main() {
         expect(probes, 1);
       },
     );
-    test(
-      'falls back to google_sign_in when the Desktop client secret is absent',
-      () async {
-        // A build without --dart-define=GOOGLE_DRIVE_CLIENT_SECRET cannot
-        // complete the loopback token exchange, so binding a socket for it
-        // would only fail later and more confusingly.
-        final gate = gateOver(
-          FallbackSecureStorage(NoEntitlementKeychain()),
-          desktopClientConfigured: false,
+    group('keychain unavailable AND no Desktop client secret', () {
+      // Neither backend can work: google_sign_in dies in the keychain and the
+      // loopback exchange has no secret. Routing to google_sign_in anyway
+      // would reproduce the misleading "keychain error" this gate exists to
+      // eliminate, so the gate names the real cause instead.
+      KeychainGatedAuthenticator unconfiguredGate() => gateOver(
+        FallbackSecureStorage(NoEntitlementKeychain()),
+        desktopClientConfigured: false,
+      );
+
+      test('authenticate throws naming the missing define', () async {
+        final gate = unconfiguredGate();
+
+        await expectLater(
+          gate.authenticate(),
+          throwsA(
+            isA<CloudStorageException>().having(
+              (e) => e.message,
+              'message',
+              contains('GOOGLE_DRIVE_CLIENT_SECRET'),
+            ),
+          ),
         );
+      });
 
-        await gate.authenticate();
+      test('it does not route to an authenticator that cannot work', () async {
+        final gate = unconfiguredGate();
 
-        expect(googleSignIn.authenticateCalls, 1);
+        await gate.attemptSilentAuth();
+
+        expect(googleSignIn.authenticateCalls, 0);
+        expect(googleSignIn.silentAuthCalls, 0);
         expect(loopback.authenticateCalls, 0);
-      },
-    );
+        expect(loopback.silentAuthCalls, 0);
+      });
+
+      test(
+        'attemptSilentAuth reports not-signed-in without throwing',
+        () async {
+          final gate = unconfiguredGate();
+
+          expect(await gate.attemptSilentAuth(), isFalse);
+          expect(gate.authClient, isNull);
+          expect(await gate.userEmail, isNull);
+        },
+      );
+
+      test('signOut and handleAuthFailure are inert', () async {
+        final gate = unconfiguredGate();
+
+        // Must not throw: both run on paths that treat failure as fatal.
+        await gate.signOut();
+        await gate.handleAuthFailure();
+      });
+    });
   });
 
   group('laziness', () {
