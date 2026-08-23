@@ -27,11 +27,23 @@ class DiveMediaEnricher {
   final Future<void> Function(MediaEnrichment enrichment) saveEnrichment;
   final EnrichmentService enrichmentService;
 
-  /// Enriches every media item linked to [diveId] that has no enrichment yet.
-  /// Idempotent — already-enriched items are skipped — so it is safe to call
-  /// after a fresh link and repeatedly as a backfill. Returns the number of
-  /// items newly enriched (0 means nothing changed; callers can skip a
-  /// refresh).
+  /// Enriches every media item linked to [diveId] whose stored enrichment is
+  /// missing, or disagrees with what the dive's profile says it should be.
+  ///
+  /// Recomputing every item and writing only on a difference is what makes
+  /// this a repair as well as a backfill. Skipping anything that merely HAD a
+  /// row meant two classes of wrong data could never heal: rows surviving a
+  /// re-link still pointing at the previous dive, and rows written before the
+  /// taken_at wall-clock-UTC fix, whose elapsed time is skewed by the host's
+  /// offset and whose depth is clamped to the first profile point. The only
+  /// remedy used to be unlinking and re-adding the photo.
+  ///
+  /// Rows that already match are left untouched. That matters beyond saving a
+  /// query: mediaEnrichment is an HLC-synced entity, so rewriting an unchanged
+  /// row would bump its clock and ship a no-op to every other device.
+  ///
+  /// Returns the number of rows written (0 means nothing changed, so callers
+  /// can skip a refresh).
   Future<int> enrichMissingForDive(String diveId) async {
     final dive = await loadDive(diveId);
     if (dive == null || dive.profile.isEmpty) return 0;
@@ -39,7 +51,6 @@ class DiveMediaEnricher {
     final media = await loadMediaForDive(diveId);
     var enriched = 0;
     for (final item in media) {
-      if (item.enrichment != null) continue;
       // Signatures are attached to a dive but not moments within it, and the
       // chart excludes them regardless — don't fabricate a depth/time for one.
       if (item.mediaType == MediaType.instructorSignature) continue;
@@ -51,15 +62,21 @@ class DiveMediaEnricher {
       );
 
       // Mirror the gallery path: don't persist a row we couldn't actually
-      // place (no depth and no usable profile match).
+      // place (no depth and no usable profile match). An existing row is left
+      // alone rather than overwritten with the unplaceable result.
       if (result.depthMeters == null &&
           result.matchConfidence == MatchConfidence.noProfile) {
         continue;
       }
 
+      final existing = item.enrichment;
+      if (existing != null && _matches(existing, result, diveId)) continue;
+
       await saveEnrichment(
         MediaEnrichment(
-          id: '',
+          // Keep the row's identity so the repository updates in place
+          // instead of minting a second row for the same media.
+          id: existing?.id ?? '',
           mediaId: item.id,
           diveId: diveId,
           depthMeters: result.depthMeters,
@@ -74,4 +91,19 @@ class DiveMediaEnricher {
     }
     return enriched;
   }
+
+  /// Whether [existing] already records exactly what [result] computes for
+  /// [diveId]. Every persisted field is compared: a partial match still means
+  /// the stored row is wrong and has to be rewritten.
+  bool _matches(
+    MediaEnrichment existing,
+    EnrichmentResult result,
+    String diveId,
+  ) =>
+      existing.diveId == diveId &&
+      existing.depthMeters == result.depthMeters &&
+      existing.temperatureCelsius == result.temperatureCelsius &&
+      existing.elapsedSeconds == result.elapsedSeconds &&
+      existing.matchConfidence == result.matchConfidence &&
+      existing.timestampOffsetSeconds == result.timestampOffsetSeconds;
 }
