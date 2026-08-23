@@ -75,6 +75,7 @@ void main() {
         expect(filter.minDepth, isNull);
         expect(filter.maxDepth, isNull);
         expect(filter.favoritesOnly, isNull);
+        expect(filter.noBuddyOnly, isNull);
         expect(filter.tagIds, isEmpty);
         expect(filter.equipmentIds, isEmpty);
         expect(filter.buddyNameFilter, isNull);
@@ -152,6 +153,18 @@ void main() {
         expect(filter.hasActiveFilters, isFalse);
       });
 
+      test('returns true when noBuddyOnly is true', () {
+        const filter = DiveFilterState(noBuddyOnly: true);
+
+        expect(filter.hasActiveFilters, isTrue);
+      });
+
+      test('returns false when noBuddyOnly is false', () {
+        const filter = DiveFilterState(noBuddyOnly: false);
+
+        expect(filter.hasActiveFilters, isFalse);
+      });
+
       test('returns true when diveIds is non-empty', () {
         const filter = DiveFilterState(diveIds: ['d1', 'd2']);
 
@@ -206,6 +219,22 @@ void main() {
         );
 
         expect(updated.computerId, isNull);
+      });
+
+      test('sets noBuddyOnly', () {
+        const original = DiveFilterState();
+
+        final updated = original.copyWith(noBuddyOnly: true);
+
+        expect(updated.noBuddyOnly, isTrue);
+      });
+
+      test('clears noBuddyOnly with clearNoBuddyOnly', () {
+        const original = DiveFilterState(noBuddyOnly: true);
+
+        final updated = original.copyWith(clearNoBuddyOnly: true);
+
+        expect(updated.noBuddyOnly, isNull);
       });
 
       test('sets and clears multiple fields simultaneously', () {
@@ -461,6 +490,39 @@ void main() {
 
         expect(result, hasLength(1));
         expect(result.first.id, 'd1');
+      });
+
+      test('filters by noBuddyOnly (excludes legacy and linked buddies)', () {
+        const filter = DiveFilterState(noBuddyOnly: true);
+        final buddyJohn = Buddy(
+          id: 'b1',
+          name: 'John Doe',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        final dives = [
+          Dive(id: 'd1', dateTime: DateTime.now(), notes: ''),
+          Dive(
+            id: 'd2',
+            dateTime: DateTime.now(),
+            buddy: 'Jane Smith',
+            notes: '',
+          ),
+          Dive(
+            id: 'd3',
+            dateTime: DateTime.now(),
+            notes: '',
+            buddies: [
+              BuddyWithRole(buddy: buddyJohn, role: DiveRole.builtInBuddy()),
+            ],
+          ),
+          Dive(id: 'd4', dateTime: DateTime.now(), buddy: '', notes: ''),
+        ];
+
+        final result = filter.apply(dives);
+
+        expect(result.map((d) => d.id), containsAll(['d1', 'd4']));
+        expect(result, hasLength(2));
       });
 
       test('filters by depth range', () {

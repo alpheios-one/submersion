@@ -5757,6 +5757,9 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'Sem Dupla';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Ate $date';
   }
@@ -5817,6 +5820,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_filter_min => 'Min';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'Sem Dupla Atribuida';
+
+  @override
   String get diveLog_filter_noTagsYet => 'Nenhuma tag criada ainda';
 
   @override
@@ -5862,6 +5868,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get diveLog_filter_showOnlyFavorites =>
       'Mostrar apenas mergulhos favoritos';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Mostrar apenas mergulhos sem dupla';
 
   @override
   String get diveLog_filter_startDate => 'Data Inicial';

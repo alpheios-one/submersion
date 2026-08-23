@@ -5603,6 +5603,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'ללא שותף';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'עד $date';
   }
@@ -5662,6 +5665,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_filter_min => 'מזערי';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'ללא שותף';
+
+  @override
   String get diveLog_filter_noTagsYet => 'לא נוצרו תגיות עדיין';
 
   @override
@@ -5705,6 +5711,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'הצגת צלילות מועדפות בלבד';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy => 'הצגת צלילות ללא שותף בלבד';
 
   @override
   String get diveLog_filter_startDate => 'תאריך התחלה';

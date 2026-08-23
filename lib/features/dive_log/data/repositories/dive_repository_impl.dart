@@ -2022,6 +2022,12 @@ class DiveRepository {
     if (filter.favoritesOnly == true) {
       clauses.add('d.is_favorite = 1');
     }
+    if (filter.noBuddyOnly == true) {
+      clauses.add(
+        "(d.buddy IS NULL OR d.buddy = '') AND "
+        'NOT EXISTS (SELECT 1 FROM dive_buddies db WHERE db.dive_id = d.id)',
+      );
+    }
     if (filter.tagIds.isNotEmpty) {
       final placeholders = List.filled(filter.tagIds.length, '?').join(', ');
       clauses.add(

@@ -307,6 +307,23 @@ void main() {
   });
 
   test(
+    'noBuddyOnly excludes both legacy and junction-linked buddies',
+    () async {
+      await insertDive('legacy', buddy: 'Alice');
+      await insertDive('none');
+      await insertDive('empty', buddy: '');
+      await insertBuddy('b1', 'Bob Buddy');
+      await insertDive('linked');
+      await linkBuddy('linked', 'b1');
+
+      expect(await idsMatching(const DiveFilterState(noBuddyOnly: true)), {
+        'none',
+        'empty',
+      });
+    },
+  );
+
+  test(
     'bottom-time filter truncates to whole minutes like Duration.inMinutes',
     () async {
       // 149s = 2 min (truncated); with maxBottomTimeMinutes: 2 it must pass.
@@ -542,6 +559,7 @@ void main() {
       'maxDepth (null-exclusion)': const DiveFilterState(maxDepth: 20),
       'favoritesOnly': const DiveFilterState(favoritesOnly: true),
       'buddyNameFilter': const DiveFilterState(buddyNameFilter: 'alice'),
+      'noBuddyOnly': const DiveFilterState(noBuddyOnly: true),
       'diveIds': const DiveFilterState(diveIds: ['d1', 'd4']),
       'minO2Percent (any-tank)': const DiveFilterState(minO2Percent: 30),
       'maxO2Percent (any-tank)': const DiveFilterState(maxO2Percent: 20),
@@ -622,6 +640,13 @@ void main() {
       battery['buddyNameFilter']!.apply(domainDives).map((d) => d.id).toSet(),
       {'d1', 'd6'},
       reason: 'apply() must consult dive.buddies, not only dive.buddy',
+    );
+    expect(
+      await idsMatching(battery['noBuddyOnly']!),
+      {'d3', 'd4', 'd5', 'd7'},
+      reason:
+          'no-buddy filter must exclude both the legacy scalar column (d1, '
+          'd2) and junction-linked buddies (d6)',
     );
     expect(
       (await DiveRepository().getDiveSummaries(

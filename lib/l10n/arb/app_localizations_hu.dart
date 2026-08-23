@@ -5734,6 +5734,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'Nincs buddy';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Eddig: $date';
   }
@@ -5794,6 +5797,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_min => 'Min';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'Nincs buddy hozzarendelve';
+
+  @override
   String get diveLog_filter_noTagsYet => 'Meg nincsenek letrehozott cimkek';
 
   @override
@@ -5838,6 +5844,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get diveLog_filter_showOnlyFavorites =>
       'Csak kedvenc merulesek mutatasa';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Csak buddy nelkuli merulesek mutatasa';
 
   @override
   String get diveLog_filter_startDate => 'Kezdes datuma';
