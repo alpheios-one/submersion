@@ -12993,6 +12993,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_library_filter_clear => 'ניקוי מסננים';
 
   @override
+  String get media_library_filter_title => 'סינון מדיה';
+
+  @override
+  String get media_library_filter_apply => 'החל';
+
+  @override
+  String get media_library_sort_title => 'מיון מדיה';
+
+  @override
+  String get media_smartAlbum_load => 'טעינת אלבום';
+
+  @override
   String get media_divePicker_title => 'העברה לצלילה';
 
   @override

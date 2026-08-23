@@ -13079,6 +13079,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_library_filter_clear => 'مسح عوامل التصفية';
 
   @override
+  String get media_library_filter_title => 'تصفية الوسائط';
+
+  @override
+  String get media_library_filter_apply => 'تطبيق';
+
+  @override
+  String get media_library_sort_title => 'فرز الوسائط';
+
+  @override
+  String get media_smartAlbum_load => 'تحميل الألبوم';
+
+  @override
   String get media_divePicker_title => 'نقل إلى غطسة';
 
   @override

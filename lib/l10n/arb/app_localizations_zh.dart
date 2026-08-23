@@ -12715,6 +12715,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_library_filter_clear => '清除筛选';
 
   @override
+  String get media_library_filter_title => '筛选媒体';
+
+  @override
+  String get media_library_filter_apply => '应用';
+
+  @override
+  String get media_library_sort_title => '排序媒体';
+
+  @override
+  String get media_smartAlbum_load => '加载相册';
+
+  @override
   String get media_divePicker_title => '移至潜水';
 
   @override

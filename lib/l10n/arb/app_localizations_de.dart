@@ -13310,6 +13310,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_library_filter_clear => 'Filter zurücksetzen';
 
   @override
+  String get media_library_filter_title => 'Medien filtern';
+
+  @override
+  String get media_library_filter_apply => 'Übernehmen';
+
+  @override
+  String get media_library_sort_title => 'Medien sortieren';
+
+  @override
+  String get media_smartAlbum_load => 'Album laden';
+
+  @override
   String get media_divePicker_title => 'Zu Tauchgang verschieben';
 
   @override

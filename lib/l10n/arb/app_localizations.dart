@@ -22522,6 +22522,30 @@ abstract class AppLocalizations {
   /// **'Clear filters'**
   String get media_library_filter_clear;
 
+  /// Title of the media library filter sheet, and the filter button's tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Filter media'**
+  String get media_library_filter_title;
+
+  /// Button that applies the drafted media filter
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get media_library_filter_apply;
+
+  /// Title of the media library sort sheet, and the sort button's tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Sort media'**
+  String get media_library_sort_title;
+
+  /// Opens the list of saved smart albums to load one
+  ///
+  /// In en, this message translates to:
+  /// **'Load album'**
+  String get media_smartAlbum_load;
+
   /// Title of the dive picker sheet
   ///
   /// In en, this message translates to:
