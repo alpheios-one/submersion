@@ -360,6 +360,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => 'Favorite';
 
   @override
+  String get diveLog_bulkEdit_fieldMyRole => 'My role';
+
+  @override
+  String get diveLog_bulkEdit_buddyRoleMixed => 'Mixed';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'Weights';
 
   @override
@@ -5640,6 +5646,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'No Buddy';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Until $date';
   }
@@ -5699,6 +5708,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_filter_min => 'Min';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'No Buddy Assigned';
+
+  @override
   String get diveLog_filter_noTagsYet => 'No tags created yet';
 
   @override
@@ -5742,6 +5754,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'Show only favorite dives';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Show only dives without a buddy';
 
   @override
   String get diveLog_filter_startDate => 'Start Date';
@@ -11590,7 +11606,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Blender';
+  String get gasCalculators_tab_blender => 'Trimix blender';
 
   @override
   String get gasCalculators_blender_cylinder => 'Cylinder';
@@ -11681,11 +11697,193 @@ class AppLocalizationsEn extends AppLocalizations {
       'These fill gases cannot reach the target mix exactly. Check the fill gases and their order.';
 
   @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'The cylinder is holding pressure but no oxygen and no helium, which would be pure nitrogen. Check the mix already in the cylinder.';
+
+  @override
   String get gasCalculators_blender_about => 'About blending';
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      'Partial-pressure blend for the target mix, using real-gas (Van der Waals) behaviour. Add each fill gas in order, up to the pressure shown. Fill gases and their order are configurable; always analyse the finished mix before diving it.';
+      'Partial-pressure blend for the target mix. Add each fill gas in order, up to the pressure shown, then let the cylinder settle. Fill gases and their order are configurable, so setting the last gas to 32/0 tops off with EAN32 instead of air. Always analyse the finished mix before diving it.';
+
+  @override
+  String get gasCalculators_blender_conditions => 'Blending conditions';
+
+  @override
+  String get gasCalculators_blender_fillTemp => 'Fill temperature';
+
+  @override
+  String get gasCalculators_blender_fillTempHelp =>
+      'The cylinder\'s temperature while you fill it. Every pressure in the procedure is the gauge reading at this temperature.';
+
+  @override
+  String get gasCalculators_blender_settledTemp => 'Settled temperature';
+
+  @override
+  String get gasCalculators_blender_settledTempHelp =>
+      'The temperature the cylinder ends up at. The target pressure is what it reads once it gets there.';
+
+  @override
+  String get gasCalculators_blender_gasModel => 'Gas model';
+
+  @override
+  String get gasCalculators_blender_modelIdeal => 'Ideal gas';
+
+  @override
+  String get gasCalculators_blender_modelVanDerWaals => 'Van der Waals';
+
+  @override
+  String get gasCalculators_blender_modelZFactor => 'Real gas (Z-factor)';
+
+  @override
+  String get gasCalculators_blender_modelRecommended => 'Recommended';
+
+  @override
+  String get gasCalculators_blender_modelHelp =>
+      'Real gas (Z-factor) is the most accurate at cylinder pressures. Ideal gas matches most published blending tables. Van der Waals is offered for comparison with other blending software and is several percent off at fill pressure.';
+
+  @override
+  String gasCalculators_blender_stepAdd(String gas) {
+    return 'Add $gas';
+  }
+
+  @override
+  String get gasCalculators_blender_stepStartLabel => 'Start';
+
+  @override
+  String gasCalculators_blender_settlesTo(String pressure, String temperature) {
+    return 'Settles to $pressure at $temperature';
+  }
+
+  @override
+  String get gasCalculators_blender_templates => 'Templates';
+
+  @override
+  String get gasCalculators_blender_templatesTitle => 'Target mix templates';
+
+  @override
+  String get gasCalculators_blender_saveTemplate => 'Save current mix';
+
+  @override
+  String get gasCalculators_blender_manageTemplates => 'Manage templates';
+
+  @override
+  String gasCalculators_blender_templateSaved(String mix) {
+    return 'Saved $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_templateExists =>
+      'That mix is already saved.';
+
+  @override
+  String get gasCalculators_blender_templateInvalid =>
+      'O₂ + He cannot exceed 100%.';
+
+  @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'Enter both O₂ and He as numbers.';
+
+  @override
+  String gasCalculators_blender_templateLimit(int count) {
+    return 'You can save up to $count templates.';
+  }
+
+  @override
+  String get gasCalculators_blender_templateNone =>
+      'No templates yet. Save a target mix to reuse it here.';
+
+  @override
+  String gasCalculators_blender_templateDelete(String mix) {
+    return 'Delete $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_templateAdd => 'Add template';
+
+  @override
+  String get gasCalculators_blender_billing => 'Cost';
+
+  @override
+  String get gasCalculators_blender_cylinderVolume => 'Cylinder water capacity';
+
+  @override
+  String get gasCalculators_blender_cylinderPresets => 'Presets';
+
+  @override
+  String gasCalculators_blender_unitPrice(String unit) {
+    return 'Price per 100 $unit';
+  }
+
+  @override
+  String get gasCalculators_blender_currency => 'Currency';
+
+  @override
+  String get gasCalculators_blender_costTotal => 'Total';
+
+  @override
+  String get gasCalculators_blender_costBasis =>
+      'Billed on the pressure delivered (cylinder water capacity × bar added), the way a fill station meters it.';
+
+  @override
+  String get gasCalculators_blender_costMissingPrice =>
+      'Enter a price for every gas to see the total.';
+
+  @override
+  String get gasCalculators_blender_saveFill => 'Save this fill';
+
+  @override
+  String get gasCalculators_blender_billed => 'Billed';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Nothing billed yet. Finish a fill and save it here.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Billed to';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Add a line';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Description';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Amount';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Clear';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Clear the bill?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'This removes all $count saved fills.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return 'Edit $label';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return 'Delete $label';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix added to the bill';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'One or more lines have no price, so this total is incomplete.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Total';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
@@ -22810,6 +23008,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Accounts';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Display';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Guided setup';
 
   @override
@@ -22908,6 +23109,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'Still loading. Tap to retry.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'No photo library access';
 
   @override
   String get attrLabel_size => 'Size';
@@ -29441,6 +29646,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Check all media';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items updated',
+      one: '$count item updated',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Could not check any of the $count items. Their sources are not reachable right now.',
+      one: 'Could not check the item. Its source is not reachable right now.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Media Sources';
 
   @override
@@ -32182,6 +32413,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Missing and not backed up';
+
+  @override
+  String get media_servedFrom_localDisk => 'On this device';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Photo library';
+
+  @override
+  String get media_servedFrom_storeCache => 'Cloud store, cached here';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Cloud store';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Web link';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Connected service, cached here';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Connected service';
+
+  @override
+  String get media_servedFrom_embedded => 'Stored in this logbook';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Show source badges on thumbnails';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'A small glyph showing where each item is served from. Problem badges always show.';
 
   @override
   String get media_status_transferFailed => 'Upload failed';

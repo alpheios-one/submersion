@@ -24,6 +24,7 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/presentation/helpers/media_share_helper.dart';
 import 'package:submersion/features/media/presentation/providers/lightroom_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
 import 'package:submersion/features/media/presentation/widgets/media_nav_arrows.dart';
@@ -88,6 +89,10 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
 
   bool _showOverlay = true;
 
+  /// Dives whose enrichment backfill has already been attempted this session,
+  /// so a swipe through several un-enriched items of one dive runs it once.
+  final Set<String> _enrichAttempted = {};
+
   /// Live video controllers hoisted from _VideoItem, keyed by media id, so
   /// the Perdix overlay (mounted at page level) can follow playback. Entries
   /// come and go as gallery pages initialize/dispose.
@@ -110,6 +115,58 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
     } else {
       setState(() => _videoControllers[mediaId] = controller);
     }
+  }
+
+  /// Resolves the live record for the item on screen when the caller passed a
+  /// lean one.
+  ///
+  /// Two things make the passed item untrustworthy for dive context. The
+  /// Media section's library query hydrates rows without the enrichment join
+  /// on purpose (grids never render photo-time depth), so its items always
+  /// carry `enrichment == null`. And [MediaViewerPage.mediaList] is an
+  /// immutable snapshot taken when the route was pushed, so a re-link since
+  /// then leaves it reporting the *old* dive link, or none at all.
+  ///
+  /// Reading the one item actually on screen straight from the database
+  /// settles both: the library keeps its lean grid, and the viewer keeps
+  /// showing the truth. [mediaByIdProvider] self-invalidates on media and
+  /// enrichment changes, so a re-link or a backfill that happens while the
+  /// viewer is open lands too.
+  ///
+  /// Deliberately unconditional. Skipping the read for a snapshot that
+  /// already carries an enrichment would save one keyed lookup on the
+  /// dive-detail path, but a snapshot holding an enrichment is no more
+  /// current than one holding none: both were captured when the route was
+  /// pushed. Trusting it is what produced this class of bug twice already,
+  /// so the rule is that the on-screen item always comes from the database.
+  /// The passed item stands in only while the read is in flight.
+  MediaItem _hydrate(MediaItem item) =>
+      ref.watch(mediaByIdProvider(item.id)).value ?? item;
+
+  /// Computes and saves the missing [MediaEnrichment] rows for [diveId], the
+  /// same idempotent backfill dive detail runs on open.
+  ///
+  /// Media linked from a local file gets a row but no enrichment, and until
+  /// now only dive detail ever closed that gap: a photo could show its depth
+  /// and profile marker there and nothing at all in the Media section.
+  void _backfillEnrichment(String diveId) {
+    if (!_enrichAttempted.add(diveId)) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // The callback can fire after this state is disposed; touching `ref`
+      // then throws, so bail before using it.
+      if (!mounted) return;
+      try {
+        // Nothing to invalidate by hand: saving an enrichment ticks
+        // watchMediaChanges, and mediaByIdProvider self-invalidates on it, so
+        // the overlays pick the row up on the next frame. An invalidate here
+        // would also have to guess which ids were affected, and guessing from
+        // widget.mediaList is exactly what failed -- the snapshot still says
+        // diveId == null for the media that was just linked.
+        await ref.read(diveMediaEnricherProvider).enrichMissingForDive(diveId);
+      } catch (_) {
+        // Best-effort: a failure just leaves the overlays absent this session.
+      }
+    });
   }
 
   @override
@@ -202,9 +259,14 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
     final currentIndex = mediaList.isEmpty
         ? 0
         : _currentIndex.clamp(0, mediaList.length - 1);
-    final currentDiveId = mediaList.isEmpty
+    // Resolve the live record BEFORE reading any dive context off it. Taking
+    // the dive link from the snapshot instead is what left a freshly
+    // re-linked photo looking unlinked: no Go-to-dive, no depth chips, no
+    // mini profile, no dive computer.
+    final hydratedItem = mediaList.isEmpty
         ? null
-        : mediaList[currentIndex].diveId;
+        : _hydrate(mediaList[currentIndex]);
+    final currentDiveId = hydratedItem?.diveId;
     final diveAsync = currentDiveId == null
         ? const AsyncValue<Dive?>.data(null)
         : ref.watch(diveProvider(currentDiveId));
@@ -223,8 +285,15 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
             );
           }
 
-          final currentItem = mediaList[currentIndex];
+          // Non-null once mediaList is known non-empty. Every consumer below
+          // reads the hydrated record: the mini profile, the Perdix gate, the
+          // toolbar's Go-to-dive and hasEnrichment flags, the bottom
+          // depth/temp/elapsed chips and the info sheet.
+          final currentItem = hydratedItem!;
           final enrichment = currentItem.enrichment;
+          if (enrichment == null && currentDiveId != null) {
+            _backfillEnrichment(currentDiveId);
+          }
 
           // Get dive profile for the mini chart overlay
           final diveProfile = diveAsync.whenOrNull(

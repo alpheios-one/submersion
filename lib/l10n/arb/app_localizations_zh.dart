@@ -350,6 +350,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => '收藏';
 
   @override
+  String get diveLog_bulkEdit_fieldMyRole => '我的角色';
+
+  @override
+  String get diveLog_bulkEdit_buddyRoleMixed => '不一致';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => '配重';
 
   @override
@@ -5455,6 +5461,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => '无潜伴';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return '至 $date';
   }
@@ -5514,6 +5523,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_filter_min => '最小';
 
   @override
+  String get diveLog_filter_noBuddyOnly => '无潜伴';
+
+  @override
   String get diveLog_filter_noTagsYet => '尚未创建标签';
 
   @override
@@ -5557,6 +5569,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyFavorites => '仅显示收藏的潜水';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy => '仅显示无潜伴的潜水';
 
   @override
   String get diveLog_filter_startDate => '开始日期';
@@ -11243,7 +11258,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_tab_mnd => '最大麻醉深度/等效麻醉深度';
 
   @override
-  String get gasCalculators_tab_blender => '配气';
+  String get gasCalculators_tab_blender => '三混气配气器';
 
   @override
   String get gasCalculators_blender_cylinder => '气瓶';
@@ -11332,11 +11347,186 @@ class AppLocalizationsZh extends AppLocalizations {
       '这些充填气体无法精确达到目标混合气。请检查充填气体及其顺序。';
 
   @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      '气瓶有压力，但既无氧气也无氦气，那将是纯氮气。请检查瓶内现有的混合气。';
+
+  @override
   String get gasCalculators_blender_about => '关于配气';
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      '按分压法配制目标混合气，采用真实气体（范德华）模型。按顺序充入每种气体至所示压力。充填气体及其顺序可配置；下水前务必分析最终混合气。';
+      '按分压法配制目标混合气。依次充入每种充填气体至显示的压力，然后让气瓶静置。充填气体及其顺序可自行设置：将最后一种气体设为 32/0，即以 EAN32 而非空气收尾。下水前务必分析配好的混合气。';
+
+  @override
+  String get gasCalculators_blender_conditions => '配气条件';
+
+  @override
+  String get gasCalculators_blender_fillTemp => '充填温度';
+
+  @override
+  String get gasCalculators_blender_fillTempHelp =>
+      '充填过程中气瓶的温度。步骤中的每个压力都是该温度下的压力表读数。';
+
+  @override
+  String get gasCalculators_blender_settledTemp => '静置温度';
+
+  @override
+  String get gasCalculators_blender_settledTempHelp =>
+      '气瓶最终稳定到的温度。目标压力就是达到该温度后的读数。';
+
+  @override
+  String get gasCalculators_blender_gasModel => '气体模型';
+
+  @override
+  String get gasCalculators_blender_modelIdeal => '理想气体';
+
+  @override
+  String get gasCalculators_blender_modelVanDerWaals => '范德华';
+
+  @override
+  String get gasCalculators_blender_modelZFactor => '真实气体（Z 因子）';
+
+  @override
+  String get gasCalculators_blender_modelRecommended => '推荐';
+
+  @override
+  String get gasCalculators_blender_modelHelp =>
+      '真实气体（Z 因子）在气瓶压力下最为准确。理想气体与大多数已发布的配气表一致。范德华模型用于与其他配气软件对比，在充填压力下有百分之几的偏差。';
+
+  @override
+  String gasCalculators_blender_stepAdd(String gas) {
+    return '充入 $gas';
+  }
+
+  @override
+  String get gasCalculators_blender_stepStartLabel => '起始';
+
+  @override
+  String gasCalculators_blender_settlesTo(String pressure, String temperature) {
+    return '在 $temperature 下静置后为 $pressure';
+  }
+
+  @override
+  String get gasCalculators_blender_templates => '模板';
+
+  @override
+  String get gasCalculators_blender_templatesTitle => '目标混合气模板';
+
+  @override
+  String get gasCalculators_blender_saveTemplate => '保存当前混合气';
+
+  @override
+  String get gasCalculators_blender_manageTemplates => '管理模板';
+
+  @override
+  String gasCalculators_blender_templateSaved(String mix) {
+    return '已保存 $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_templateExists => '该混合气已保存。';
+
+  @override
+  String get gasCalculators_blender_templateInvalid => 'O₂ + He 不能超过 100%。';
+
+  @override
+  String get gasCalculators_blender_templateNeedsNumbers => '请将 O₂ 和 He 都填成数字。';
+
+  @override
+  String gasCalculators_blender_templateLimit(int count) {
+    return '最多可保存 $count 个模板。';
+  }
+
+  @override
+  String get gasCalculators_blender_templateNone => '还没有模板。保存一个目标混合气即可在此重复使用。';
+
+  @override
+  String gasCalculators_blender_templateDelete(String mix) {
+    return '删除 $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_templateAdd => '添加模板';
+
+  @override
+  String get gasCalculators_blender_billing => '费用';
+
+  @override
+  String get gasCalculators_blender_cylinderVolume => '气瓶水容积';
+
+  @override
+  String get gasCalculators_blender_cylinderPresets => '预设';
+
+  @override
+  String gasCalculators_blender_unitPrice(String unit) {
+    return '每 100 $unit 价格';
+  }
+
+  @override
+  String get gasCalculators_blender_currency => '货币';
+
+  @override
+  String get gasCalculators_blender_costTotal => '合计';
+
+  @override
+  String get gasCalculators_blender_costBasis =>
+      '按实际充入的压力计费（气瓶水容积 × 充入的 bar），与充气站的计量方式一致。';
+
+  @override
+  String get gasCalculators_blender_costMissingPrice => '为每种气体输入价格后即可看到合计。';
+
+  @override
+  String get gasCalculators_blender_saveFill => '保存本次充填';
+
+  @override
+  String get gasCalculators_blender_billed => '已计费';
+
+  @override
+  String get gasCalculators_blender_billedNone => '尚无计费内容。完成一次充填后保存到这里。';
+
+  @override
+  String get gasCalculators_blender_billedTo => '计费给';
+
+  @override
+  String get gasCalculators_blender_addManualLine => '添加条目';
+
+  @override
+  String get gasCalculators_blender_lineDescription => '说明';
+
+  @override
+  String get gasCalculators_blender_lineAmount => '金额';
+
+  @override
+  String get gasCalculators_blender_clearBilled => '清空';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => '清空账单？';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return '这将删除全部 $count 条已保存的充填记录。';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return '编辑 $label';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return '删除 $label';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix 已加入账单';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete => '有条目未填价格，因此合计不完整。';
+
+  @override
+  String get gasCalculators_blender_billedTotal => '合计';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
@@ -22041,6 +22231,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => '账户';
 
   @override
+  String get settings_photosMedia_displayHeader => '显示';
+
+  @override
   String get settings_photosMedia_guidedSetup => '引导设置';
 
   @override
@@ -22129,6 +22322,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_unavailablePlaceholder_stillFetching => '仍在加载。点按重试。';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied => '无照片库访问权限';
 
   @override
   String get attrLabel_size => '尺码';
@@ -28248,6 +28444,29 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => '检查所有媒体';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已更新 $count 个项目',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '无法检查这 $count 个项目中的任何一个。它们的来源当前无法访问。',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => '媒体来源';
 
   @override
@@ -30823,6 +31042,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_status_broken => '缺失且未备份';
+
+  @override
+  String get media_servedFrom_localDisk => '在此设备上';
+
+  @override
+  String get media_servedFrom_platformGallery => '照片库';
+
+  @override
+  String get media_servedFrom_storeCache => '云存储，已在此缓存';
+
+  @override
+  String get media_servedFrom_storeNetwork => '云存储';
+
+  @override
+  String get media_servedFrom_networkUrl => '网络链接';
+
+  @override
+  String get media_servedFrom_connectorCache => '已连接的服务，已在此缓存';
+
+  @override
+  String get media_servedFrom_connectorNetwork => '已连接的服务';
+
+  @override
+  String get media_servedFrom_embedded => '存储在此日志中';
+
+  @override
+  String get settings_media_provenanceBadges => '在缩略图上显示来源徽章';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      '一个小图标，显示每个项目的来源。问题徽章始终显示。';
 
   @override
   String get media_status_transferFailed => '上传失败';

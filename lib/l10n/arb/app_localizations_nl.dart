@@ -361,6 +361,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => 'Favoriet';
 
   @override
+  String get diveLog_bulkEdit_fieldMyRole => 'Mijn rol';
+
+  @override
+  String get diveLog_bulkEdit_buddyRoleMixed => 'Gemengd';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'Loodgewichten';
 
   @override
@@ -5704,6 +5710,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'Geen buddy';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Tot $date';
   }
@@ -5763,6 +5772,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_filter_min => 'Min';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'Geen buddy toegewezen';
+
+  @override
   String get diveLog_filter_noTagsYet => 'Nog geen tags aangemaakt';
 
   @override
@@ -5806,6 +5818,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'Toon alleen favoriete duiken';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Toon alleen duiken zonder buddy';
 
   @override
   String get diveLog_filter_startDate => 'Startdatum';
@@ -11697,7 +11713,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Mixer';
+  String get gasCalculators_tab_blender => 'Trimix-menger';
 
   @override
   String get gasCalculators_blender_cylinder => 'Fles';
@@ -11788,11 +11804,194 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deze vulgassen bereiken het doelmengsel niet exact. Controleer de vulgassen en hun volgorde.';
 
   @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'De fles staat onder druk maar bevat geen zuurstof en geen helium, dus pure stikstof. Controleer het mengsel dat al in de fles zit.';
+
+  @override
   String get gasCalculators_blender_about => 'Over het mengen';
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      'Partiaaldrukmenging voor het doelmengsel, met reëel gasgedrag (Van der Waals). Voeg elk vulgas op volgorde toe, tot de getoonde druk. Vulgassen en hun volgorde zijn instelbaar; analyseer het eindmengsel altijd voordat je ermee duikt.';
+      'Partiaaldrukmenging voor het doelmengsel. Voeg elk vulgas op volgorde toe tot de getoonde druk en laat de fles daarna stabiliseren. Vulgassen en hun volgorde zijn instelbaar: zet je het laatste gas op 32/0, dan wordt met EAN32 in plaats van lucht afgevuld. Analyseer het uiteindelijke mengsel altijd voordat je ermee duikt.';
+
+  @override
+  String get gasCalculators_blender_conditions => 'Mengcondities';
+
+  @override
+  String get gasCalculators_blender_fillTemp => 'Vultemperatuur';
+
+  @override
+  String get gasCalculators_blender_fillTempHelp =>
+      'De temperatuur van de fles tijdens het vullen. Elke druk in de procedure is de manometerwaarde bij deze temperatuur.';
+
+  @override
+  String get gasCalculators_blender_settledTemp => 'Rusttemperatuur';
+
+  @override
+  String get gasCalculators_blender_settledTempHelp =>
+      'De temperatuur waarop de fles uiteindelijk uitkomt. De doeldruk is wat hij dan aangeeft.';
+
+  @override
+  String get gasCalculators_blender_gasModel => 'Gasmodel';
+
+  @override
+  String get gasCalculators_blender_modelIdeal => 'Ideaal gas';
+
+  @override
+  String get gasCalculators_blender_modelVanDerWaals => 'Van der Waals';
+
+  @override
+  String get gasCalculators_blender_modelZFactor => 'Reëel gas (Z-factor)';
+
+  @override
+  String get gasCalculators_blender_modelRecommended => 'Aanbevolen';
+
+  @override
+  String get gasCalculators_blender_modelHelp =>
+      'Reëel gas (Z-factor) is het nauwkeurigst bij flesdrukken. Ideaal gas komt overeen met de meeste gepubliceerde mengtabellen. Van der Waals is bedoeld voor vergelijking met andere mengsoftware en wijkt bij vuldruk enkele procenten af.';
+
+  @override
+  String gasCalculators_blender_stepAdd(String gas) {
+    return '$gas toevoegen';
+  }
+
+  @override
+  String get gasCalculators_blender_stepStartLabel => 'Start';
+
+  @override
+  String gasCalculators_blender_settlesTo(String pressure, String temperature) {
+    return 'Stabiliseert op $pressure bij $temperature';
+  }
+
+  @override
+  String get gasCalculators_blender_templates => 'Sjablonen';
+
+  @override
+  String get gasCalculators_blender_templatesTitle =>
+      'Sjablonen voor doelmengsels';
+
+  @override
+  String get gasCalculators_blender_saveTemplate => 'Huidig mengsel opslaan';
+
+  @override
+  String get gasCalculators_blender_manageTemplates => 'Sjablonen beheren';
+
+  @override
+  String gasCalculators_blender_templateSaved(String mix) {
+    return '$mix opgeslagen';
+  }
+
+  @override
+  String get gasCalculators_blender_templateExists =>
+      'Dat mengsel is al opgeslagen.';
+
+  @override
+  String get gasCalculators_blender_templateInvalid =>
+      'O₂ + He mag niet meer dan 100% zijn.';
+
+  @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'Voer zowel O₂ als He als getal in.';
+
+  @override
+  String gasCalculators_blender_templateLimit(int count) {
+    return 'Je kunt maximaal $count sjablonen opslaan.';
+  }
+
+  @override
+  String get gasCalculators_blender_templateNone =>
+      'Nog geen sjablonen. Sla een doelmengsel op om het hier opnieuw te gebruiken.';
+
+  @override
+  String gasCalculators_blender_templateDelete(String mix) {
+    return '$mix verwijderen';
+  }
+
+  @override
+  String get gasCalculators_blender_templateAdd => 'Sjabloon toevoegen';
+
+  @override
+  String get gasCalculators_blender_billing => 'Kosten';
+
+  @override
+  String get gasCalculators_blender_cylinderVolume => 'Waterinhoud van de fles';
+
+  @override
+  String get gasCalculators_blender_cylinderPresets => 'Voorinstellingen';
+
+  @override
+  String gasCalculators_blender_unitPrice(String unit) {
+    return 'Prijs per 100 $unit';
+  }
+
+  @override
+  String get gasCalculators_blender_currency => 'Valuta';
+
+  @override
+  String get gasCalculators_blender_costTotal => 'Totaal';
+
+  @override
+  String get gasCalculators_blender_costBasis =>
+      'Er wordt afgerekend op de geleverde druk (waterinhoud van de fles × toegevoegde bar), zoals een vulstation meet.';
+
+  @override
+  String get gasCalculators_blender_costMissingPrice =>
+      'Voer voor elk gas een prijs in om het totaal te zien.';
+
+  @override
+  String get gasCalculators_blender_saveFill => 'Deze vulling opslaan';
+
+  @override
+  String get gasCalculators_blender_billed => 'Gefactureerd';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Nog niets gefactureerd. Rond een vulling af en sla die hier op.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Gefactureerd aan';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Regel toevoegen';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Omschrijving';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Bedrag';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Wissen';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Factuur wissen?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'Dit verwijdert alle $count opgeslagen vullingen.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return '$label bewerken';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return '$label verwijderen';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix toegevoegd aan de factuur';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'Een of meer regels hebben geen prijs, dus dit totaal is onvolledig.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Totaal';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
@@ -23026,6 +23225,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Accounts';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Weergave';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Begeleide installatie';
 
   @override
@@ -23128,6 +23330,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'Nog aan het laden. Tik om opnieuw te proberen.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Geen toegang tot fotobibliotheek';
 
   @override
   String get attrLabel_size => 'Maat';
@@ -29671,6 +29877,33 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Alle media controleren';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items bijgewerkt',
+      one: '$count item bijgewerkt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Geen van de $count items kon worden gecontroleerd. Hun bronnen zijn momenteel niet bereikbaar.',
+      one:
+          'Het item kon niet worden gecontroleerd. De bron is momenteel niet bereikbaar.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Mediabronnen';
 
   @override
@@ -32471,6 +32704,39 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Ontbreekt en geen back-up';
+
+  @override
+  String get media_servedFrom_localDisk => 'Op dit apparaat';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Fotobibliotheek';
+
+  @override
+  String get media_servedFrom_storeCache => 'Cloudopslag, hier in cache';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Cloudopslag';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Weblink';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Verbonden service, hier in cache';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Verbonden service';
+
+  @override
+  String get media_servedFrom_embedded => 'Opgeslagen in dit logboek';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Bronbadges op miniaturen tonen';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Een klein pictogram dat laat zien waar elk item vandaan komt. Probleembadges blijven altijd zichtbaar.';
 
   @override
   String get media_status_transferFailed => 'Uploaden mislukt';

@@ -52,7 +52,82 @@ void main() {
     expect(saved.single.depthMeters, 20.0);
   });
 
-  test('is idempotent: skips items already enriched', () async {
+  /// The recompute is cheap arithmetic over an in-memory profile, but the
+  /// WRITE is not free: mediaEnrichment is an HLC-synced entity, so saving a
+  /// row that did not change would bump its clock and ship a no-op to every
+  /// other device. Matching rows must therefore be left completely alone.
+  test(
+    'is idempotent: writes nothing when the stored enrichment matches',
+    () async {
+      final saved = <MediaEnrichment>[];
+      final enricher = DiveMediaEnricher(
+        loadDive: (_) async => _diveWithProfile(),
+        loadMediaForDive: (_) async => [
+          _media(
+            'm1',
+            takenAt: DateTime.utc(2025, 12, 27, 12, 8),
+            enrichment: MediaEnrichment(
+              id: 'e1',
+              mediaId: 'm1',
+              diveId: 'd1',
+              elapsedSeconds: 2520,
+              depthMeters: 20,
+              temperatureCelsius: 26,
+              timestampOffsetSeconds: 0,
+              matchConfidence: MatchConfidence.exact,
+              createdAt: DateTime.utc(2025),
+            ),
+          ),
+        ],
+        saveEnrichment: (e) async => saved.add(e),
+      );
+
+      expect(await enricher.enrichMissingForDive('d1'), 0);
+      expect(saved, isEmpty);
+    },
+  );
+
+  /// Rows written before the taken_at wall-clock-UTC fix carry an elapsed
+  /// time skewed by the host's offset and a depth clamped to the first
+  /// profile point. Skipping every item that merely HAS a row meant those
+  /// never healed: the only remedy was unlinking and re-adding the photo.
+  test(
+    'recomputes a stored enrichment that disagrees with the profile',
+    () async {
+      final saved = <MediaEnrichment>[];
+      final enricher = DiveMediaEnricher(
+        loadDive: (_) async => _diveWithProfile(),
+        loadMediaForDive: (_) async => [
+          _media(
+            'm1',
+            takenAt: DateTime.utc(2025, 12, 27, 12, 8),
+            enrichment: MediaEnrichment(
+              id: 'e1',
+              mediaId: 'm1',
+              diveId: 'd1',
+              // The -5h skew and clamped surface depth the old bug produced.
+              elapsedSeconds: -16692,
+              depthMeters: 0.4572,
+              matchConfidence: MatchConfidence.estimated,
+              createdAt: DateTime.utc(2025),
+            ),
+          ),
+        ],
+        saveEnrichment: (e) async => saved.add(e),
+      );
+
+      expect(await enricher.enrichMissingForDive('d1'), 1);
+      expect(saved, hasLength(1));
+      expect(saved.single.elapsedSeconds, 2520);
+      expect(saved.single.depthMeters, 20.0);
+      expect(saved.single.matchConfidence, MatchConfidence.exact);
+    },
+  );
+
+  /// Defence in depth for the re-link path: reassignMediaToDive deletes the
+  /// stale rows itself, but a row that reaches the new dive still pointing at
+  /// the old one is wrong by definition and must not be trusted.
+  test('recomputes an enrichment still pointing at a different dive', () async {
     final saved = <MediaEnrichment>[];
     final enricher = DiveMediaEnricher(
       loadDive: (_) async => _diveWithProfile(),
@@ -63,8 +138,12 @@ void main() {
           enrichment: MediaEnrichment(
             id: 'e1',
             mediaId: 'm1',
-            diveId: 'd1',
+            // Values happen to match; only the dive is wrong.
+            diveId: 'some-other-dive',
             elapsedSeconds: 2520,
+            depthMeters: 20,
+            temperatureCelsius: 26,
+            timestampOffsetSeconds: 0,
             matchConfidence: MatchConfidence.exact,
             createdAt: DateTime.utc(2025),
           ),
@@ -73,8 +152,8 @@ void main() {
       saveEnrichment: (e) async => saved.add(e),
     );
 
-    expect(await enricher.enrichMissingForDive('d1'), 0);
-    expect(saved, isEmpty);
+    expect(await enricher.enrichMissingForDive('d1'), 1);
+    expect(saved.single.diveId, 'd1');
   });
 
   test('returns 0 and saves nothing when the dive has no profile', () async {

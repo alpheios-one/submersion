@@ -16,6 +16,10 @@ class DiveFilterState {
   final double? minDepth;
   final double? maxDepth;
   final bool? favoritesOnly;
+
+  /// True to restrict the list to dives with no buddy assigned: neither the
+  /// legacy free-text `buddy` field nor a linked buddy is set.
+  final bool? noBuddyOnly;
   final List<String> tagIds;
 
   // v1.5: Additional filter criteria
@@ -56,6 +60,7 @@ class DiveFilterState {
     this.minDepth,
     this.maxDepth,
     this.favoritesOnly,
+    this.noBuddyOnly,
     this.tagIds = const [],
     this.equipmentIds = const [],
     this.buddyNameFilter,
@@ -85,6 +90,7 @@ class DiveFilterState {
       minDepth != null ||
       maxDepth != null ||
       favoritesOnly == true ||
+      noBuddyOnly == true ||
       tagIds.isNotEmpty ||
       equipmentIds.isNotEmpty ||
       (buddyNameFilter != null && buddyNameFilter!.isNotEmpty) ||
@@ -109,6 +115,7 @@ class DiveFilterState {
     double? minDepth,
     double? maxDepth,
     bool? favoritesOnly,
+    bool? noBuddyOnly,
     List<String>? tagIds,
     List<String>? equipmentIds,
     String? buddyNameFilter,
@@ -135,6 +142,7 @@ class DiveFilterState {
     bool clearMinDepth = false,
     bool clearMaxDepth = false,
     bool clearFavoritesOnly = false,
+    bool clearNoBuddyOnly = false,
     bool clearTagIds = false,
     bool clearEquipmentIds = false,
     bool clearBuddyNameFilter = false,
@@ -164,6 +172,7 @@ class DiveFilterState {
       favoritesOnly: clearFavoritesOnly
           ? null
           : (favoritesOnly ?? this.favoritesOnly),
+      noBuddyOnly: clearNoBuddyOnly ? null : (noBuddyOnly ?? this.noBuddyOnly),
       tagIds: clearTagIds ? const [] : (tagIds ?? this.tagIds),
       equipmentIds: clearEquipmentIds
           ? const []
@@ -253,6 +262,12 @@ class DiveFilterState {
       }
       if (favoritesOnly == true && !dive.isFavorite) {
         return false;
+      }
+      if (noBuddyOnly == true) {
+        final hasLegacyBuddy = dive.buddy != null && dive.buddy!.isNotEmpty;
+        if (hasLegacyBuddy || dive.buddies.isNotEmpty) {
+          return false;
+        }
       }
       if (tagIds.isNotEmpty) {
         final diveTagIds = dive.tags.map((t) => t.id).toSet();

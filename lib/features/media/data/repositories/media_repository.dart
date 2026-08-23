@@ -32,12 +32,23 @@ class MediaRepository {
   /// straight to the database and so bypass the notifier paths that invalidate
   /// per-dive media providers.
   ///
-  /// Scoped to `media` alone: consumers render the media rows themselves, not
-  /// the joined `media_enrichment` values, and enrichment is backfilled on
-  /// every dive-detail open (see `DiveMediaEnricher`), which would otherwise
-  /// churn listeners for data they do not display.
+  /// Covers `media_enrichment` as well as `media`.
+  ///
+  /// This tick was scoped to `media` alone on the reasoning that consumers
+  /// render the media rows themselves and not the joined enrichment values.
+  /// That is not true of the fullscreen viewer, and the reads behind the tick
+  /// left-outer-join the enrichment table regardless, so a row written there
+  /// changes what they return just as much as a write to `media` does.
+  ///
+  /// The narrower scope made the enrichment backfill invisible: it computed
+  /// and saved the depth and elapsed values, no provider re-read them, and
+  /// the depth chips, mini profile and dive computer stayed absent until the
+  /// viewer was closed and reopened. Newly linked media hit that every time,
+  /// since linking is precisely when the enrichment does not exist yet.
   Stream<void> watchMediaChanges() => _db
-      .tableUpdates(TableUpdateQuery.onTable(_db.media))
+      .tableUpdates(
+        TableUpdateQuery.onAllTables([_db.media, _db.mediaEnrichment]),
+      )
       .debounce(changeTickDebounce);
 
   /// Get all media for a dive, ordered by takenAt
@@ -483,14 +494,38 @@ class MediaRepository {
   /// vs. available items here).
   Future<List<domain.MediaItem>> getAllBySourceType(
     MediaSourceType sourceType,
+  ) => getAllBySourceTypes({sourceType});
+
+  /// Every row of the given source types, or every row when [sourceTypes] is
+  /// null.
+  ///
+  /// Null rather than defaulting to "all types" so a caller cannot sweep the
+  /// whole library by forgetting an argument: asking for everything has to be
+  /// written down.
+  Future<List<domain.MediaItem>> getAllBySourceTypes(
+    Set<MediaSourceType>? sourceTypes,
   ) async {
+    // Null means every row; an EMPTY set means none, and asking the database
+    // to prove that is pointless. Not a correctness guard (SQLite accepts the
+    // `IN ()` an empty list compiles to and matches nothing), but it matches
+    // partitionMediaForDiveDeletion's convention and keeps the null-versus-
+    // empty distinction obvious at the top of the method, where getting it
+    // backwards would sweep the whole library instead of none of it.
+    if (sourceTypes != null && sourceTypes.isEmpty) {
+      return const <domain.MediaItem>[];
+    }
     try {
       final query = _db.select(_db.media).join([
         leftOuterJoin(
           _db.mediaEnrichment,
           _db.mediaEnrichment.mediaId.equalsExp(_db.media.id),
         ),
-      ])..where(_db.media.sourceType.equals(sourceType.name));
+      ]);
+      if (sourceTypes != null) {
+        query.where(
+          _db.media.sourceType.isIn(sourceTypes.map((t) => t.name).toList()),
+        );
+      }
 
       final rows = await query.get();
       return rows.map((row) {
@@ -500,7 +535,8 @@ class MediaRepository {
       }).toList();
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to get media by source type: ${sourceType.name}',
+        'Failed to get media by source types: '
+        '${sourceTypes?.map((t) => t.name).join(',') ?? 'all'}',
         error: e,
         stackTrace: stackTrace,
       );
@@ -565,6 +601,71 @@ class MediaRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to set isOrphaned for media: $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Writes the orphan flag and the verification stamp together, and nothing
+  /// else.
+  ///
+  /// Deliberately NOT [updateMedia], which writes every column from the
+  /// caller's snapshot. The passive reconciliation path is driven by grid
+  /// tiles, and a tile's snapshot comes from a FutureProvider that an
+  /// upload's stamp write does not invalidate, so it goes stale the moment an
+  /// upload completes. A full-row write from there would silently roll back
+  /// `remoteUploadedAt` and anything else that changed since the tile built.
+  ///
+  /// Differs from [markOrphaned] only by also stamping `lastVerifiedAt`,
+  /// which the callers of this one have actually earned: they checked.
+  ///
+  /// Idempotent: the UPDATE is guarded on the flag actually differing, and
+  /// the sync record is only marked pending when a row was written.
+  ///
+  /// Deliberately enforced HERE rather than left to the caller.
+  /// `reconciledOrphanFlag` compares against the caller's snapshot, and a grid
+  /// tile's snapshot can lag the row it describes, so a stale caller can ask
+  /// for a state the row already holds. Since every write here is sync-visible
+  /// through [markRecordPending], letting that through would queue redundant
+  /// sync work for an item nothing changed about. The consumers that feed
+  /// tiles do refresh on media-table ticks today, but that makes this a race
+  /// window rather than a guarantee, and the guarantee belongs at the layer
+  /// that owns the row.
+  Future<void> markVerified(
+    String id, {
+    required bool isOrphaned,
+    required DateTime verifiedAt,
+  }) async {
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      final rowsWritten =
+          await (_db.update(_db.media)..where(
+                // Matching on the OPPOSITE flag is what makes this a no-op
+                // when the row already agrees.
+                (t) => t.id.equals(id) & t.isOrphaned.equals(!isOrphaned),
+              ))
+              .write(
+                MediaCompanion(
+                  isOrphaned: Value(isOrphaned),
+                  lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
+                  updatedAt: Value(now),
+                ),
+              );
+      if (rowsWritten == 0) return;
+      _log.info('Marked media verified: $id (isOrphaned=$isOrphaned)');
+
+      await _syncRepository.markRecordPending(
+        entityType: 'media',
+        recordId: id,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to mark media verified: $id',
         error: e,
         stackTrace: stackTrace,
       );
@@ -676,6 +777,11 @@ class MediaRepository {
           _db.mediaEnrichment,
         )..where((t) => t.mediaId.equals(enrichment.mediaId))).write(
           MediaEnrichmentCompanion(
+            // The dive is part of the value, not just a back-pointer: an
+            // enrichment is the join product of this media and ONE dive's
+            // profile. Leaving it behind would let a row repaired against a
+            // different dive keep claiming the old one.
+            diveId: Value(enrichment.diveId),
             depthMeters: Value(enrichment.depthMeters),
             temperatureCelsius: Value(enrichment.temperatureCelsius),
             elapsedSeconds: Value(enrichment.elapsedSeconds),

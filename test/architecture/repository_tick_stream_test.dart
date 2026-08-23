@@ -590,6 +590,61 @@ void main() {
       );
     });
 
+    // Every read behind this tick (getMediaById, getMediaForDive, the library
+    // page) LEFT JOINs media_enrichment, so the enrichment table is part of
+    // the answer, not a detail of some other feature. Watching only `media`
+    // made the depth/elapsed chips, the mini profile and the dive computer
+    // stay absent after a backfill computed them: the row was written, the
+    // provider never re-read it, and the overlays only appeared if the viewer
+    // was closed and reopened. Newly linked media hit this every time, since
+    // linking is exactly when the enrichment does not exist yet.
+    test('watchMediaChanges fires on an enrichment-only write', () async {
+      await seedParents();
+      await db
+          .into(db.dives)
+          .insert(
+            DivesCompanion.insert(
+              id: 'd1',
+              diveDateTime: now,
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      await db
+          .into(db.media)
+          .insert(
+            MediaCompanion.insert(
+              id: 'm1',
+              diveId: const Value('d1'),
+              filePath: '/photos/m1.jpg',
+              fileType: const Value('photo'),
+              sourceType: const Value('localFile'),
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+
+      expect(
+        await fires(
+          MediaRepository().watchMediaChanges(),
+          () => db
+              .into(db.mediaEnrichment)
+              .insert(
+                MediaEnrichmentCompanion.insert(
+                  id: 'e1',
+                  mediaId: 'm1',
+                  diveId: 'd1',
+                  createdAt: now,
+                ),
+              ),
+        ),
+        isTrue,
+        reason:
+            'a media read joins media_enrichment, so an enrichment write '
+            'changes what the consumers of this tick would return',
+      );
+    });
+
     test('watchStoresChanges fires', () async {
       expect(
         await fires(
