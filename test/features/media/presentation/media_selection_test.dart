@@ -84,6 +84,30 @@ class _RecordingMediaRepo implements MediaRepository {
   final List<String> unlinkedFromSite = [];
   (List<String>, String)? reassigned;
 
+  /// Ids the partition should report as still needed by a dive site, i.e.
+  /// kept rather than deleted. Empty by default: most media is dive-only.
+  final Set<String> siteLinkedIds = {};
+
+  /// Ids the probe should report as carrying a caption or favorite.
+  final Set<String> withUserMetadata = {};
+
+  @override
+  Future<({List<String> deletable, List<String> siteLinked})>
+  partitionForDiveUnlink(List<String> mediaIds) async => (
+    deletable: [
+      for (final id in mediaIds)
+        if (!siteLinkedIds.contains(id)) id,
+    ],
+    siteLinked: [
+      for (final id in mediaIds)
+        if (siteLinkedIds.contains(id)) id,
+    ],
+  );
+
+  @override
+  Future<Set<String>> idsWithUserMetadata(List<String> mediaIds) async =>
+      mediaIds.where(withUserMetadata.contains).toSet();
+
   @override
   Future<void> unlinkFromDive(List<String> mediaIds) async {
     unlinkedFromDive.addAll(mediaIds);
@@ -191,9 +215,10 @@ void main() {
       );
     }
 
-    testWidgets('Unlink calls unlinkFromDive and clears selection', (
-      tester,
-    ) async {
+    // Unlinking removes the media from the library outright: the row, the
+    // cloud proxies and the thumbnails. Only the ORIGINAL source file is
+    // spared, and nothing on this path reads or writes its path.
+    testWidgets('Unlink deletes the selection and clears it', (tester) async {
       await tester.pumpWidget(
         host([entry('a', diveId: 'd1'), entry('b', diveId: 'd1')]),
       );
@@ -207,11 +232,106 @@ void main() {
       await tester.tap(find.text('Unlink'));
       await tester.pumpAndSettle();
 
-      expect(mediaRepo.unlinkedFromDive.toSet(), {'a', 'b'});
+      expect(coordinator.deleted.toSet(), {'a', 'b'});
+      expect(
+        mediaRepo.unlinkedFromDive,
+        isEmpty,
+        reason: 'nothing here is site media, so nothing is merely detached',
+      );
       final container = ProviderScope.containerOf(
         tester.element(find.byType(MediaLibraryView)),
       );
       expect(container.read(mediaSelectionProvider), isEmpty);
+    });
+
+    testWidgets('Unlink keeps media a dive site still needs', (tester) async {
+      await tester.pumpWidget(
+        host([entry('a', diveId: 'd1'), entry('b', diveId: 'd1')]),
+      );
+      // After host(), which mints the fakes this group asserts against.
+      mediaRepo.siteLinkedIds.add('b');
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.byType(MediaLibraryTile).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(MediaLibraryTile).at(1));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Unlink'));
+      await tester.pumpAndSettle();
+
+      expect(coordinator.deleted, ['a']);
+      expect(mediaRepo.unlinkedFromDive, ['b']);
+    });
+
+    testWidgets('Unlink warns before discarding a caption or favorite', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host([entry('a', diveId: 'd1'), entry('b', diveId: 'd1')]),
+      );
+      mediaRepo.withUserMetadata.add('a');
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.byType(MediaLibraryTile).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(MediaLibraryTile).at(1));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Unlink'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Unlink and discard details?'), findsOneWidget);
+      expect(
+        coordinator.deleted,
+        isEmpty,
+        reason: 'nothing may go before the dialog is answered',
+      );
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(coordinator.deleted, isEmpty);
+    });
+
+    testWidgets('confirming the warning goes through with the unlink', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host([entry('a', diveId: 'd1')]));
+      mediaRepo.withUserMetadata.add('a');
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.byType(MediaLibraryTile).first);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Unlink'));
+      await tester.pumpAndSettle();
+      // The dialog's confirm reuses the bar's own "Unlink" label, so target
+      // the one inside the AlertDialog rather than the bar behind it.
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text('Unlink'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(coordinator.deleted, ['a']);
+    });
+
+    testWidgets('media with nothing to lose is unlinked without a dialog', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host([entry('a', diveId: 'd1')]));
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.byType(MediaLibraryTile).first);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Unlink'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(coordinator.deleted, ['a']);
     });
 
     testWidgets('Unlink from site appears only when a selected item has a '
@@ -251,7 +371,9 @@ void main() {
       await tester.tap(find.text('Unlink'));
       await tester.pumpAndSettle();
 
-      expect(mediaRepo.unlinkedFromDive.toSet(), {'b'});
+      // Only the dive-linked id is acted on: the unlinked row and the
+      // site-only row are none of this action's business.
+      expect(coordinator.deleted.toSet(), {'b'});
     });
 
     testWidgets('Move to dive opens the picker and reassigns', (tester) async {

@@ -12243,7 +12243,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'سيؤدي هذا إلى إزالة $count عنصر وسائط من هذه الغوصة. لن يتم حذف الملفات الأصلية.';
+    return 'يزيل $count من عناصر الوسائط من مكتبتك، مع نسخها السحابية والصور المصغرة. تبقى العناصر التي لا يزال موقع غوص يستخدمها. لن تتأثر ملفاتك الأصلية.';
   }
 
   @override
@@ -13089,6 +13089,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_library_unlinkFromSite => 'إلغاء الربط بالموقع';
+
+  @override
+  String get media_unlink_metadataLossTitle => 'إلغاء الربط وحذف التفاصيل؟';
+
+  @override
+  String media_unlink_metadataLossContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'تحتوي $count عناصر محددة على تعليق أو علامة مفضلة محفوظة في Submersion. إلغاء الربط يزيلها من مكتبتك، لذا تُفقد هذه التفاصيل. لن تتأثر ملفاتك الأصلية.',
+      one:
+          'يحتوي عنصر واحد محدد على تعليق أو علامة مفضلة محفوظة في Submersion. إلغاء الربط يزيله من مكتبتك، لذا تُفقد هذه التفاصيل. لن يتأثر ملفك الأصلي.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_library_unlinkSelected => 'إلغاء الربط';

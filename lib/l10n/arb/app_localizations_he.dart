@@ -12161,7 +12161,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'פעולה זו תסיר $count פריטי מדיה מצלילה זו. הקבצים המקוריים לא יימחקו.';
+    return 'מסיר $count פריטי מדיה מהספרייה שלך, יחד עם העותקים בענן והתמונות הממוזערות. פריטים שאתר צלילה עדיין משתמש בהם יישמרו. קובצי המקור שלך לא ייפגעו.';
   }
 
   @override
@@ -13003,6 +13003,22 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_library_unlinkFromSite => 'ניתוק מהאתר';
+
+  @override
+  String get media_unlink_metadataLossTitle => 'לנתק ולמחוק את הפרטים?';
+
+  @override
+  String media_unlink_metadataLossContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'ל-$count פריטים שנבחרו יש כיתוב או סימון מועדף השמורים ב-Submersion. הניתוק מסיר אותם מהספרייה, ולכן הפרטים האלה יאבדו. קובצי המקור שלך לא ייפגעו.',
+      one:
+          'לפריט אחד שנבחר יש כיתוב או סימון מועדף השמורים ב-Submersion. הניתוק מסיר אותו מהספרייה, ולכן הפרטים האלה יאבדו. קובץ המקור שלך לא ייפגע.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_library_unlinkSelected => 'ניתוק';
