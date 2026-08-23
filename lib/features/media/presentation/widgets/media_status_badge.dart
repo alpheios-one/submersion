@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/features/media/data/services/media_serving_recorder.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_provenance.dart';
 import 'package:submersion/features/media/domain/entities/media_status.dart';
@@ -79,51 +80,102 @@ class MediaStatusBadge extends ConsumerWidget {
 /// tile, so a grid of healthy photos still reads as photos while the
 /// saturated health colours stay reserved for things that need attention.
 ///
-/// Listens to [mediaServingRecorderProvider] through a ListenableBuilder for
-/// the same reason `_ServingSection` does: Riverpod 3 auto-pause trips an
-/// assertion on providers that self-invalidate from a listener the framework
-/// cannot see, and `Ref.invalidateSelfWhen` takes a Stream, which a
-/// ChangeNotifier is not.
-class _ProvenanceBadge extends ConsumerWidget {
+/// Subscribes to [mediaServingRecorderProvider] by hand rather than through a
+/// ListenableBuilder, and rebuilds only when THIS item's answer changes.
+///
+/// The recorder fires one global `notifyListeners` per resolved tile with no
+/// per-key granularity, and every visible badge listens. A ListenableBuilder
+/// therefore rebuilt its whole subtree N times per resolution: on a 40-tile
+/// screenful that is ~1600 builder runs and ~6400 widget constructions per
+/// scroll, all on the most latency-sensitive path in the app, to change at
+/// most one glyph.
+///
+/// Listening directly keeps the per-notification cost at a map lookup and a
+/// switch, and turns actual rebuilds into O(tiles) instead of
+/// O(tiles x resolutions), since a tile's source settles once when its
+/// observation replaces the fallback.
+///
+/// Not a Riverpod provider for the reason `_ServingSection` documents:
+/// Riverpod 3 auto-pause trips an assertion on providers that self-invalidate
+/// from a listener the framework cannot see, and `Ref.invalidateSelfWhen`
+/// takes a Stream, which a ChangeNotifier is not.
+class _ProvenanceBadge extends ConsumerStatefulWidget {
   const _ProvenanceBadge({required this.item});
 
   final MediaItem item;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ProvenanceBadge> createState() => _ProvenanceBadgeState();
+}
+
+class _ProvenanceBadgeState extends ConsumerState<_ProvenanceBadge> {
+  late final MediaServingRecorder _recorder;
+  late ServedFrom _source;
+
+  @override
+  void initState() {
+    super.initState();
+    _recorder = ref.read(mediaServingRecorderProvider);
+    _source = _currentSource();
+    _recorder.addListener(_onRecorded);
+  }
+
+  @override
+  void didUpdateWidget(covariant _ProvenanceBadge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A recycled grid tile can be handed a different row without being
+    // rebuilt from scratch, and the cached source belongs to the old one.
+    if (oldWidget.item.id != widget.item.id) _refresh();
+  }
+
+  @override
+  void dispose() {
+    _recorder.removeListener(_onRecorded);
+    super.dispose();
+  }
+
+  /// thumbnail: true, because a GRID tile is what records here. The viewer
+  /// records the same row under thumbnail: false, and reading that one would
+  /// leave every grid badge stuck on its fallback.
+  ServedFrom _currentSource() => displayedSourceFor(
+    widget.item,
+    ServingFacts.from(_recorder.lastFor(widget.item.id, thumbnail: true)),
+  );
+
+  /// Runs for EVERY tile's resolution, not just this one, so it has to stay
+  /// cheap and must not rebuild unless this item's own answer moved.
+  void _onRecorded() {
+    if (!mounted) return;
+    _refresh();
+  }
+
+  void _refresh() {
+    final next = _currentSource();
+    if (next == _source) return;
+    setState(() => _source = next);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     if (!ref.watch(mediaProvenanceBadgesProvider)) {
       return const SizedBox.shrink();
     }
-    final recorder = ref.watch(mediaServingRecorderProvider);
 
-    return ListenableBuilder(
-      listenable: recorder,
-      builder: (context, _) {
-        // thumbnail: true, because a GRID tile is what records here. The
-        // viewer records the same row under thumbnail: false, and reading
-        // that one would leave every grid badge on its fallback.
-        final serving = ServingFacts.from(
-          recorder.lastFor(item.id, thumbnail: true),
-        );
-        final source = displayedSourceFor(item, serving);
-
-        return Tooltip(
-          message: mediaSourceLabel(context.l10n, source),
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => showMediaInfoSheet(context, item),
-            child: Container(
-              key: const Key('media-provenance-badge'),
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Icon(_iconFor(source), size: 12, color: Colors.white),
-            ),
+    return Tooltip(
+      message: mediaSourceLabel(context.l10n, _source),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => showMediaInfoSheet(context, widget.item),
+        child: Container(
+          key: const Key('media-provenance-badge'),
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(4),
           ),
-        );
-      },
+          child: Icon(_iconFor(_source), size: 12, color: Colors.white),
+        ),
+      ),
     );
   }
 

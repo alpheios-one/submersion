@@ -176,6 +176,48 @@ void main() {
     expect(find.byIcon(Icons.photo_library_outlined), findsOneWidget);
   });
 
+  testWidgets('an observation arriving later updates the badge', (
+    tester,
+  ) async {
+    // The subscription is hand-rolled rather than a ListenableBuilder, so the
+    // live-update path needs its own guard: a badge that never notices its
+    // observation would sit on the fallback forever and quietly lie.
+    final recorder = MediaServingRecorder();
+    await pump(tester, _item(uploaded: true), recorder: recorder);
+    expect(find.byIcon(Icons.photo_library_outlined), findsOneWidget);
+
+    recorder.record(
+      'm1',
+      thumbnail: true,
+      servedFrom: ServedFrom.storeCache,
+      servedTier: ServedTier.thumbnail,
+    );
+    await tester.pump();
+
+    expect(find.byIcon(Icons.cloud_done_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.photo_library_outlined), findsNothing);
+  });
+
+  testWidgets('another item resolving does not change this badge', (
+    tester,
+  ) async {
+    // The recorder notifies globally, so every visible badge hears every
+    // resolution. Only its own answer may move it.
+    final recorder = MediaServingRecorder();
+    await pump(tester, _item(uploaded: true), recorder: recorder);
+
+    recorder.record(
+      'some-other-item',
+      thumbnail: true,
+      servedFrom: ServedFrom.storeNetwork,
+      servedTier: ServedTier.thumbnail,
+    );
+    await tester.pump();
+
+    expect(find.byIcon(Icons.photo_library_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.cloud_outlined), findsNothing);
+  });
+
   testWidgets('a missing item renders the broken glyph', (tester) async {
     await pump(tester, _item(missing: true));
 
