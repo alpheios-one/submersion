@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media/data/resolvers/media_store_resolver.dart';
+import 'package:submersion/features/media_store/data/media_cache_store.dart';
+import 'package:submersion/core/services/media_store/media_object_store.dart';
+import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/media/data/services/media_source_resolver_registry.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -67,6 +71,58 @@ class _CapturingRepository implements MediaRepository {
       throw UnimplementedError('${invocation.memberName} is not stubbed');
 }
 
+/// Stands in for the store runtime so the fallback can SUCCEED, which is the
+/// only way to reach the case where what reached the screen and what the
+/// origin reported disagree.
+class _FakeStoreResolver implements MediaStoreResolver {
+  _FakeStoreResolver(this.remote);
+
+  final MediaSourceData? remote;
+
+  @override
+  Future<MediaSourceData?> tryResolveRemote(
+    MediaItem item, {
+    required bool thumbnail,
+  }) async => remote;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} is not stubbed');
+}
+
+class _FakeObjectStore implements MediaObjectStore {
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} is not stubbed');
+}
+
+class _FakeCacheStore implements MediaCacheStore {
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} is not stubbed');
+}
+
+MediaStoreRuntime _runtimeServing(MediaSourceData? remote) => MediaStoreRuntime(
+  storeId: 'store-1',
+  store: _FakeObjectStore(),
+  cache: _FakeCacheStore(),
+  resolver: _FakeStoreResolver(remote),
+);
+
+/// Carries the stamps `_resolveInner` requires before it will consult the
+/// store at all (contentHash plus a confirmed upload).
+MediaItem _storeBackedItem({bool isOrphaned = false}) => MediaItem(
+  id: 'x',
+  mediaType: MediaType.photo,
+  sourceType: MediaSourceType.platformGallery,
+  isOrphaned: isOrphaned,
+  contentHash: 'abc123',
+  remoteUploadedAt: DateTime.utc(2026, 2),
+  takenAt: DateTime.utc(2026, 1, 1),
+  createdAt: DateTime.utc(2026, 1, 1),
+  updatedAt: DateTime.utc(2026, 1, 1),
+);
+
 MediaItem _item({bool isOrphaned = false}) => MediaItem(
   id: 'x',
   mediaType: MediaType.photo,
@@ -82,6 +138,8 @@ Future<void> _pump(
   required MediaSourceData data,
   required MediaRepository repository,
   bool isOrphaned = false,
+  MediaItem? item,
+  MediaStoreRuntime? runtime,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -92,6 +150,7 @@ Future<void> _pump(
           }),
         ),
         mediaRepositoryProvider.overrideWithValue(repository),
+        mediaStoreRuntimeProvider.overrideWith((ref) async => runtime),
       ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -102,7 +161,7 @@ Future<void> _pump(
               width: 140,
               height: 140,
               child: MediaItemView(
-                item: _item(isOrphaned: isOrphaned),
+                item: item ?? _item(isOrphaned: isOrphaned),
                 thumbnail: true,
               ),
             ),
@@ -180,6 +239,65 @@ void main() {
       tester,
       data: const UnavailableData(kind: UnavailableKind.stillFetching),
       repository: repository,
+    );
+
+    expect(repository.writes, isEmpty);
+  });
+
+  // The case where what reached the screen and what the ORIGIN reported
+  // disagree. Reconciling from the final bytes would clear the flag here,
+  // which is self-defeating: MediaStatus.cloudOnly requires isOrphaned, so
+  // the cloud successfully covering for a dead origin would erase the very
+  // state that makes cloudOnly render.
+  testWidgets('a store fallback covering a dead origin still orphans', (
+    tester,
+  ) async {
+    final repository = _CapturingRepository();
+
+    await _pump(
+      tester,
+      data: const UnavailableData(kind: UnavailableKind.notFound),
+      repository: repository,
+      item: _storeBackedItem(),
+      runtime: _runtimeServing(
+        BytesData(bytes: _png, servedFrom: ServedFrom.storeNetwork),
+      ),
+    );
+
+    expect(repository.writes, [(id: 'x', isOrphaned: true)]);
+  });
+
+  testWidgets('a store fallback that finds nothing still orphans', (
+    tester,
+  ) async {
+    final repository = _CapturingRepository();
+
+    await _pump(
+      tester,
+      data: const UnavailableData(kind: UnavailableKind.notFound),
+      repository: repository,
+      item: _storeBackedItem(),
+      runtime: _runtimeServing(null),
+    );
+
+    expect(repository.writes, [(id: 'x', isOrphaned: true)]);
+  });
+
+  testWidgets('a store fallback does not orphan on an inconclusive origin', (
+    tester,
+  ) async {
+    // accessDenied still means nothing was learned, whether or not the cloud
+    // covered for it.
+    final repository = _CapturingRepository();
+
+    await _pump(
+      tester,
+      data: const UnavailableData(kind: UnavailableKind.accessDenied),
+      repository: repository,
+      item: _storeBackedItem(),
+      runtime: _runtimeServing(
+        BytesData(bytes: _png, servedFrom: ServedFrom.storeNetwork),
+      ),
     );
 
     expect(repository.writes, isEmpty);

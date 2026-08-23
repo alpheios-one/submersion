@@ -94,11 +94,20 @@ class MediaItemView extends ConsumerStatefulWidget {
 /// this: it is a fact about the SEQUENCE of attempts rather than about any
 /// single one, and it is what lets the info panel say "the photo library
 /// lookup failed" instead of merely "served from cloud".
+///
+/// [nativeFailure] is why the row's OWN source could not produce bytes, or
+/// null when it did. Deliberately separate from [data], which is what ended
+/// up on screen: when the store covers for a dead origin, `data` is bytes and
+/// carries no failure at all, so anything reasoning about whether the ORIGIN
+/// still exists has to read this instead. `MediaItem.isOrphaned` is exactly
+/// such a fact, and driving it from `data` would clear the flag every time
+/// the cloud successfully covered for a missing local file.
 typedef _Resolution = ({
   MediaSourceData data,
   bool videoPosterMissing,
   bool documentRenderable,
   bool storeFallbackUsed,
+  UnavailableKind? nativeFailure,
 });
 
 class _MediaItemViewState extends ConsumerState<MediaItemView> {
@@ -161,7 +170,7 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
           failure: data is UnavailableData ? data.kind : null,
           storeFallbackUsed: resolution.storeFallbackUsed,
         );
-    _reconcileOrphanState(data);
+    _reconcileOrphanState(resolution.nativeFailure);
     return resolution;
   }
 
@@ -179,10 +188,10 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
   /// `MediaRepository` write calls `markRecordPending`, and a write per
   /// visible tile would queue one pending sync row per thumbnail scrolled
   /// past.
-  void _reconcileOrphanState(MediaSourceData data) {
+  void _reconcileOrphanState(UnavailableKind? nativeFailure) {
     final desired = reconciledOrphanFlag(
       currentlyOrphaned: widget.item.isOrphaned,
-      failure: data is UnavailableData ? data.kind : null,
+      failure: nativeFailure,
     );
     if (desired == null) return;
     // Unawaited and fully guarded: this runs on the resolve path of a grid
@@ -274,6 +283,7 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
           videoPosterMissing: false,
           documentRenderable: true,
           storeFallbackUsed: false,
+          nativeFailure: null,
         );
       }
       // No local render (bytes unavailable here, or an unreadable PDF):
@@ -297,8 +307,13 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
         videoPosterMissing: false,
         documentRenderable: false,
         storeFallbackUsed: false,
+        nativeFailure: null,
       );
     }
+    // Captured once, here, where `native` is promoted. Every return below
+    // this line describes a resolution whose ORIGIN failed, whether or not
+    // the store went on to cover for it.
+    final nativeFailure = native.kind;
     // Media store fallback (design spec section 10): only engages when the
     // native source cannot produce bytes on this device and the row is
     // confirmed uploaded - for thumbnail requests the thumb stamp alone
@@ -325,6 +340,7 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
         // The store was never consulted: the row carries no stamp saying it
         // would have anything to offer.
         storeFallbackUsed: false,
+        nativeFailure: nativeFailure,
       );
     }
     try {
@@ -341,6 +357,7 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
           // store here to answer it, which is a different situation from
           // never having looked.
           storeFallbackUsed: true,
+          nativeFailure: nativeFailure,
         );
       }
       final remote = await runtime.resolver.tryResolveRemote(
@@ -359,6 +376,10 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
           documentRenderable:
               widget.thumbnail && remote is FileData && remote.isPoster,
           storeFallbackUsed: true,
+          // The store covered, but the ORIGIN still failed and that is what
+          // the orphan flag is about. Reporting null here would clear the
+          // flag on exactly the rows MediaStatus.cloudOnly exists for.
+          nativeFailure: nativeFailure,
         );
       }
       // The movie tile claims something specific -- this video has no poster
@@ -376,6 +397,7 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
             widget.item.remoteThumbUploadedAt == null,
         documentRenderable: false,
         storeFallbackUsed: true,
+        nativeFailure: nativeFailure,
       );
     } catch (_) {
       return (
@@ -383,6 +405,7 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
         videoPosterMissing: false,
         documentRenderable: false,
         storeFallbackUsed: true,
+        nativeFailure: nativeFailure,
       );
     }
   }
