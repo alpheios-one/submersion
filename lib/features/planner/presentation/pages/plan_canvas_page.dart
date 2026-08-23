@@ -33,6 +33,7 @@ import 'package:submersion/features/planner/presentation/widgets/plan_status_chi
 import 'package:submersion/features/planner/presentation/widgets/saved_plans_sheet.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 
 /// Whether [id] refers to a plan that already exists in the store. Drives the
 /// visibility of the destructive "Delete plan" action: a brand-new, never-saved
@@ -272,15 +273,15 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
       case 'settings':
         _focusSetup('deco');
       case 'convert':
-        _convertToDive();
+        logFailure(_convertToDive(), _PlanCanvasPageState, 'convert to dive');
       case 'slate':
-        _exportSlate();
+        logFailure(_exportSlate(), _PlanCanvasPageState, 'export slate');
       case 'share':
-        _sharePlanFile();
+        logFailure(_sharePlanFile(), _PlanCanvasPageState, 'share plan file');
       case 'reset':
         _resetPlan();
       case 'delete':
-        _deletePlan();
+        logFailure(_deletePlan(), _PlanCanvasPageState, 'delete plan');
     }
   }
 

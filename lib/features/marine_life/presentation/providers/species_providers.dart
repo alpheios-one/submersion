@@ -4,6 +4,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 
 /// Repository provider
 final speciesRepositoryProvider = Provider<SpeciesRepository>((ref) {
@@ -80,7 +81,7 @@ class SightingsNotifier extends StateNotifier<List<Sighting>> {
 
   SightingsNotifier(this._repository, this._diveId) : super([]) {
     if (_diveId != null) {
-      _loadSightings();
+      logFailure(_loadSightings(), SightingsNotifier, 'load sightings');
     }
   }
 
@@ -301,7 +302,11 @@ class SiteExpectedSpeciesNotifier
   final String _siteId;
 
   SiteExpectedSpeciesNotifier(this._repository, this._siteId) : super([]) {
-    _loadExpectedSpecies();
+    logFailure(
+      _loadExpectedSpecies(),
+      SiteExpectedSpeciesNotifier,
+      'load expected species',
+    );
   }
 
   Future<void> _loadExpectedSpecies() async {
@@ -340,7 +345,11 @@ class SiteExpectedSpeciesNotifier
   }
 
   void refresh() {
-    _loadExpectedSpecies();
+    logFailure(
+      _loadExpectedSpecies(),
+      SiteExpectedSpeciesNotifier,
+      'load expected species',
+    );
   }
 }
 
