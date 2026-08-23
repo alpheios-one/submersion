@@ -377,17 +377,18 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
               tankPressures: tankPressures,
             );
           }
-          // With the overlay on, availability is the resolver's own answer.
-          // With it off, no resolver exists (that is the point: no analysis
-          // runs), so the toolbar toggle is offered from what is known
-          // cheaply: a synced item and a non-empty profile. For a
-          // multi-computer dive the source-scoped profile can differ from
-          // the merged one, so this can rarely offer a toggle the resolver
-          // would then decline; the cost is an inert toggle, not a wrongly
-          // hidden one.
-          final perdixAvailable = perdixResolver != null
-              ? perdixResolver.isAvailable
-              : perdixPrecondition && (diveProfile?.isNotEmpty ?? false);
+          // Toolbar-toggle visibility, decided the same cheap way in BOTH
+          // toggle states: a synced item and a non-empty merged profile.
+          // Deliberately NOT the resolver's answer. On a multi-computer dive
+          // whose ACTIVE source is metadata-only, the resolver scopes to an
+          // empty bucket and reports unavailable; a toggle that followed it
+          // would vanish the moment the user turned it on, stranding the
+          // setting with no control on this page to turn it back off. The
+          // cheap test's cost is an inert toggle in that case, never a
+          // vanished one. The resolver's own availability still gates the
+          // face mount below.
+          final perdixToggleAvailable =
+              perdixPrecondition && (diveProfile?.isNotEmpty ?? false);
 
           final viewer = GestureDetector(
             // Swipe down to close (common pattern for fullscreen viewers)
@@ -452,7 +453,7 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                         ? () => context.pushOrReturnTo('/dives/$currentDiveId')
                         : null,
                     hasEnrichment: enrichment?.depthMeters != null,
-                    showPerdixToggle: perdixAvailable,
+                    showPerdixToggle: perdixToggleAvailable,
                     perdixEnabled: settings.perdixOverlayEnabled,
                     onTogglePerdix: () => ref
                         .read(settingsProvider.notifier)
@@ -517,9 +518,9 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                 // The face absorbs pointer events over its own bounds (drags
                 // move it, taps do nothing); chrome-toggle and video
                 // play/pause taps work anywhere outside it.
-                if (perdixAvailable &&
-                    settings.perdixOverlayEnabled &&
-                    perdixResolver != null)
+                if (settings.perdixOverlayEnabled &&
+                    perdixResolver != null &&
+                    perdixResolver.isAvailable)
                   DraggablePerdixOverlay(
                     // Re-key when the persisted seed first arrives so a late
                     // settings load re-seeds the position (same trick as the
@@ -529,8 +530,8 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                       '${settings.perdixOverlayX}-${settings.perdixOverlayY}',
                     ),
                     resolver: perdixResolver,
-                    // Non-null under perdixAvailable: the resolver is only
-                    // ever built for items passing perdixPrecondition.
+                    // Non-null here: the resolver is only ever built for
+                    // items passing perdixPrecondition.
                     baseElapsedSeconds: enrichment!.elapsedSeconds!,
                     settings: settings,
                     topReserve:

@@ -12,13 +12,13 @@ import '../../../../helpers/test_database.dart';
 /// Guards the batched write path the enrichment backfill uses.
 ///
 /// The viewer's backfill used to save each enrichment row with its own
-/// [MediaRepository.saveEnrichment] call. Every save is a separate top-level
-/// write, so a dive with N un-enriched photos produced N mediaEnrichment
-/// table ticks in a burst, each one (after the 300ms debounce window
-/// re-opened) re-running every media provider that watches
-/// `watchMediaChanges` -- the library re-query included. [saveEnrichments]
-/// exists so the whole backfill commits as ONE transaction and lands as ONE
-/// tick.
+/// [MediaRepository.saveEnrichment] call: N separate top-level writes and
+/// commits. `watchMediaChanges` trailing-debounces at 300ms, so a fast burst
+/// coalesced -- but a backfill spanning longer than the window re-ran every
+/// media provider (the library re-query included) once per quiet gap, from
+/// inside the open viewer. [saveEnrichments] exists so the whole backfill
+/// commits as ONE atomic transaction and lands as ONE tick regardless of
+/// how long the writes take.
 void main() {
   late db_schema.AppDatabase db;
   late MediaRepository repository;

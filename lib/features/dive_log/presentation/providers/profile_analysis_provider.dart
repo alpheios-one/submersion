@@ -1422,10 +1422,12 @@ final weeklyOtuProvider = FutureProvider.family<double, String>((
 ) async {
   final repository = ref.watch(diveRepositoryProvider);
   // Sums OTU across every dive in the surrounding week, so it goes stale when
-  // ANY of those dives is added or removed -- not just this one. The rest of
-  // the file subscribes to watchDiveDetailChanges; this needs the wider dives
-  // tick, or the "Prior" figure keeps counting a merged-away same-week dive
-  // after the rest of the page has refreshed (issue #974).
+  // ANY of those dives is added or removed -- not just this one. The dives
+  // tick covers exactly that, or the "Prior" figure keeps counting a
+  // merged-away same-week dive after the rest of the page has refreshed
+  // (issue #974). watchAnalysisInputChanges, which the rest of the file now
+  // subscribes to, would also fire (it includes dives); the plain dives tick
+  // simply names the one table this query reads.
   ref.invalidateSelfWhen(repository.watchDivesChanges());
   try {
     final currentDive = await repository.getDiveTimes(diveId);

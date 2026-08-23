@@ -27,9 +27,10 @@ class DiveMediaEnricher {
 
   /// Persists a whole dive's new/changed rows in one call
   /// (`MediaRepository.saveEnrichments`: one transaction, one table tick).
-  /// A per-row save here ticked `watchMediaChanges` once per photo, and the
-  /// backfill runs from the OPEN media viewer: each tick re-ran the library
-  /// query and the other media providers while the user was mid-swipe.
+  /// Per-row saves here committed once per photo, and the backfill runs
+  /// from the OPEN media viewer: whenever the burst outlasted the 300ms
+  /// tick debounce, the library query and the other media providers re-ran
+  /// while the user was mid-swipe.
   final Future<void> Function(List<MediaEnrichment> enrichments)
   saveEnrichments;
   final EnrichmentService enrichmentService;

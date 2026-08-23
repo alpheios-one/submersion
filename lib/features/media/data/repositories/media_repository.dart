@@ -785,13 +785,15 @@ class MediaRepository {
 
   /// Saves a batch of enrichments in one transaction.
   ///
-  /// One transaction means ONE mediaEnrichment table tick when it commits,
-  /// where per-row [saveEnrichment] calls tick once each. The dive-media
-  /// backfill runs from the open media viewer and can write a row per photo
-  /// of a dive; per-row ticks re-ran every provider on `watchMediaChanges`
-  /// (the library re-query included) once per 300ms debounce window for the
-  /// whole burst. An empty batch returns without touching the database, so
-  /// the common "everything already enriched" pass costs no tick at all.
+  /// One transaction means one commit, all-or-nothing persistence, and ONE
+  /// mediaEnrichment table tick, where per-row [saveEnrichment] calls each
+  /// tick separately. `watchMediaChanges` trailing-debounces at 300ms, so a
+  /// fast per-row burst already coalesced -- but a burst SLOWER than the
+  /// window (the dive-media backfill runs from the open media viewer and
+  /// can write a row per photo of a dive) re-ran every subscribed provider
+  /// (the library re-query included) once per quiet gap. An empty batch
+  /// returns without touching the database, so the common "everything
+  /// already enriched" pass costs no tick at all.
   Future<void> saveEnrichments(List<domain.MediaEnrichment> enrichments) async {
     if (enrichments.isEmpty) return;
     try {

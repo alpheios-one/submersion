@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
+import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
+import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_analysis_provider.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
@@ -163,4 +165,90 @@ void main() {
     );
     expect(find.byType(PerdixFace), findsOneWidget);
   });
+
+  testWidgets(
+    'the toggle survives enabling on a multi-computer dive whose active '
+    'source has no samples',
+    (tester) async {
+      // A metadata-only primary source: getProfilesByDataSource represents
+      // every source, even one with no profile points, and the resolver
+      // scopes to the ACTIVE source's bucket on multi-source dives. If the
+      // toolbar toggle follows the resolver's availability, tapping it on
+      // such a dive builds a resolver with an empty profile and the toggle
+      // vanishes with the setting stuck on -- no control left on the page
+      // to turn it back off.
+      await setUpWithPerdixEnabled(true);
+
+      final sources = <DiveDataSource>[
+        DiveDataSource(
+          id: 's1',
+          diveId: 'd1',
+          isPrimary: true,
+          importedAt: DateTime.utc(2026, 7, 1),
+          createdAt: DateTime.utc(2026, 7, 1),
+        ),
+        DiveDataSource(
+          id: 's2',
+          diveId: 'd1',
+          isPrimary: false,
+          importedAt: DateTime.utc(2026, 7, 1),
+          createdAt: DateTime.utc(2026, 7, 1),
+        ),
+      ];
+      final sourceProfiles = {
+        's1': const SourceProfile(
+          sourceId: 's1',
+          computerId: null,
+          isEdited: false,
+          points: [],
+        ),
+        's2': SourceProfile(
+          sourceId: 's2',
+          computerId: null,
+          isEdited: false,
+          points: dive.profile,
+        ),
+      };
+
+      await tester.runAsync(() async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(prefs),
+              diveProvider('d1').overrideWith((ref) async => dive),
+              diveDataSourcesProvider(
+                'd1',
+              ).overrideWith((ref) async => sources),
+              sourceProfilesProvider(
+                'd1',
+              ).overrideWith((ref) async => sourceProfiles),
+              sourceProfileAnalysisProvider.overrideWith(
+                (ref, key) async => null,
+              ),
+            ],
+            child: MaterialApp(
+              locale: const Locale('en'),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: MediaViewerPage(mediaList: [media], initialMediaId: 'm1'),
+            ),
+          ),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await tester.pump();
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await tester.pump();
+      });
+
+      expect(
+        find.byIcon(Icons.watch),
+        findsOneWidget,
+        reason:
+            'the toggle must stay reachable while the setting is on, even '
+            'when the active source cannot render a face',
+      );
+      // No face: the active source has no samples to drive one.
+      expect(find.byType(PerdixFace), findsNothing);
+    },
+  );
 }
