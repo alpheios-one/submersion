@@ -186,6 +186,45 @@ void main() {
     },
   );
 
+  // Every other path that invalidates an enrichment tombstones it. Deletion
+  // left that to the FK cascade, which removes the row but logs nothing, so
+  // the one case that destroys the most data was the one case that told peers
+  // the least. A peer's live child is already skipped on merge (the
+  // mediaEnrichment parentRefs are nullable: false), so this is about not
+  // depending on that interplay, and on the cascade being enabled at all.
+  test(
+    'deleting media tombstones its enrichment, not just the media',
+    () async {
+      await insertDive('d1');
+      final m = await repo.createMedia(item('m1', diveId: 'd1'));
+      await repo.saveEnrichment(
+        domain.MediaEnrichment(
+          id: 'e1',
+          mediaId: m.id,
+          diveId: 'd1',
+          elapsedSeconds: 2520,
+          depthMeters: 20,
+          matchConfidence: MatchConfidence.exact,
+          createdAt: DateTime.utc(2026, 6, 1),
+        ),
+      );
+
+      await repo.deleteMultipleMedia([m.id]);
+
+      final tombstoned = await db
+          .customSelect(
+            "SELECT entity_type, record_id FROM deletion_log "
+            "WHERE record_id IN ('m1', 'e1')",
+          )
+          .get();
+      final pairs = {
+        for (final r in tombstoned)
+          '${r.read<String>('entity_type')}:${r.read<String>('record_id')}',
+      };
+      expect(pairs, containsAll(<String>['media:m1', 'mediaEnrichment:e1']));
+    },
+  );
+
   test('an empty selection is a no-op', () async {
     final built = buildService();
     final outcome = await built.service.unlinkFromDive(const []);
@@ -225,6 +264,31 @@ void main() {
 
     test('an empty id list asks the database nothing', () async {
       expect(await repo.idsWithUserMetadata(const []), isEmpty);
+    });
+
+    // Warning about a caption on media the unlink is going to KEEP would be
+    // a lie: a site-linked row survives, so its caption survives with it.
+    test('ignores metadata on media the unlink would keep', () async {
+      await insertDive('d1');
+      await insertSite('s1');
+      final kept = await repo.createMedia(
+        item('m1', diveId: 'd1', siteId: 's1', caption: 'Stays put'),
+      );
+      final built = buildService();
+
+      expect(await built.service.idsWithUserMetadataAtRisk([kept.id]), isEmpty);
+    });
+
+    test('reports metadata on media the unlink would delete', () async {
+      await insertDive('d1');
+      final doomed = await repo.createMedia(
+        item('m1', diveId: 'd1', caption: 'Goes away'),
+      );
+      final built = buildService();
+
+      expect(await built.service.idsWithUserMetadataAtRisk([doomed.id]), {
+        doomed.id,
+      });
     });
   });
 }

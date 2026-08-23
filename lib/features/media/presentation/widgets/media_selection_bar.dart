@@ -70,7 +70,7 @@ class MediaSelectionBar extends ConsumerWidget {
     if (ids.isEmpty) return;
     final service = ref.read(mediaUnlinkServiceProvider);
 
-    final wouldLose = await service.idsWithUserMetadata(ids);
+    final wouldLose = await service.idsWithUserMetadataAtRisk(ids);
     if (wouldLose.isNotEmpty) {
       if (!context.mounted) return;
       final go = await confirmUnlinkDiscardsMetadata(

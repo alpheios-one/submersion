@@ -63,9 +63,17 @@ class MediaUnlinkService {
     );
   }
 
-  /// Of [mediaIds], those whose removal would lose something a user entered
+  /// Of [mediaIds], those that would actually lose something a user entered
   /// and no source file carries. Callers warn before unlinking when this is
   /// non-empty, and go straight through when it is not.
-  Future<Set<String>> idsWithUserMetadata(List<String> mediaIds) =>
-      repository.idsWithUserMetadata(mediaIds);
+  ///
+  /// Scoped to the rows this unlink would DELETE, not everything selected: a
+  /// site-linked row survives, so its caption and favourite survive with it,
+  /// and warning about them would be false.
+  Future<Set<String>> idsWithUserMetadataAtRisk(List<String> mediaIds) async {
+    if (mediaIds.isEmpty) return {};
+    final split = await repository.partitionForDiveUnlink(mediaIds);
+    if (split.deletable.isEmpty) return {};
+    return repository.idsWithUserMetadata(split.deletable);
+  }
 }

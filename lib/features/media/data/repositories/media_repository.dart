@@ -367,8 +367,11 @@ class MediaRepository {
   Future<void> deleteMedia(String id) async {
     try {
       _log.info('Deleting media: $id');
-      await (_db.delete(_db.media)..where((t) => t.id.equals(id))).go();
-      await _syncRepository.logDeletion(entityType: 'media', recordId: id);
+      await _db.transaction(() async {
+        await _dropEnrichmentRows([id]);
+        await (_db.delete(_db.media)..where((t) => t.id.equals(id))).go();
+        await _syncRepository.logDeletion(entityType: 'media', recordId: id);
+      });
       SyncEventBus.notifyLocalChange();
       _log.info('Deleted media: $id');
     } catch (e, stackTrace) {
@@ -388,6 +391,10 @@ class MediaRepository {
     try {
       _log.info('Deleting ${ids.length} media items');
       await _db.transaction(() async {
+        // Before the parents: the enrichment rows would otherwise vanish on
+        // the FK cascade, which removes them without logging anything. See
+        // [_dropEnrichmentRows] for why the tombstone matters.
+        await _dropEnrichmentRows(ids);
         for (final id in ids) {
           await (_db.delete(_db.media)..where((t) => t.id.equals(id))).go();
           await _syncRepository.logDeletion(entityType: 'media', recordId: id);
@@ -1309,7 +1316,16 @@ class MediaRepository {
   /// move path and the unlink path have to drop it rather than leave the
   /// photo reporting a depth and elapsed time from a dive it has left.
   /// mediaEnrichment is an HLC-synced entity, so the drop needs a logged
-  /// deletion or peers would replay the stale row straight back.
+  /// deletion rather than a silent disappearance.
+  ///
+  /// Deletion needs this as much as the link-changing paths do, even though
+  /// the FK cascade would remove the child rows on its own: the cascade logs
+  /// nothing, so the one operation that destroys the most data would be the
+  /// one telling peers the least. A peer's live child of a media row we have
+  /// deleted is already skipped on merge (mediaEnrichment's parentRefs are
+  /// `nullable: false`), so this is not the only thing standing between us
+  /// and a resurrected row; it removes the dependence on that interplay, and
+  /// on foreign keys being enabled at all.
   ///
   /// Caller supplies the transaction; this does no committing of its own.
   Future<void> _dropEnrichmentRows(List<String> mediaIds) async {
