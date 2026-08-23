@@ -14,6 +14,7 @@ import 'package:submersion/features/statistics/domain/career_totals.dart';
 import 'package:submersion/features/statistics/presentation/formatters/distribution_labels.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_filter_provider.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 class StatisticsOverviewPage extends ConsumerWidget {
@@ -649,6 +650,12 @@ class _DistributionsSection extends ConsumerWidget {
       data: (diveTypes) => diveTypes,
       orElse: () => const <DistributionSegment>[],
     );
+    // Same for depth buckets: every bucket that has a dive in it, with its
+    // count and summed dive time, regardless of how many the pie's own
+    // legend can fit (issue #641 follow-up).
+    final depthStats = stats.depthDistribution
+        .where((d) => d.count > 0)
+        .toList();
 
     return Card(
       child: Padding(
@@ -679,9 +686,29 @@ class _DistributionsSection extends ConsumerWidget {
               Column(
                 children: [depthChart, const SizedBox(height: 8), typeChart],
               ),
+            if (depthStats.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 4),
+                child: Text(
+                  context.l10n.statistics_summary_depthDistribution_title,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
+              for (final segment in depthStats)
+                _DepthRangeStatRow(segment: segment, fmt: fmt),
+            ],
             if (typeStats.isNotEmpty) ...[
               const SizedBox(height: 12),
               const Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 4),
+                child: Text(
+                  context.l10n.statistics_summary_diveTypes_title,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
               for (final segment in typeStats)
                 _DiveTypeStatRow(segment: segment),
             ],
@@ -713,6 +740,48 @@ class _DiveTypeStatRow extends StatelessWidget {
       ),
     );
   }
+}
+
+class _DepthRangeStatRow extends StatelessWidget {
+  final DepthRangeStat segment;
+  final UnitFormatter fmt;
+  const _DepthRangeStatRow({required this.segment, required this.fmt});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final duration = Duration(seconds: segment.totalDurationSeconds);
+    return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      title: Text(_depthBucketLabel(segment, fmt, l10n)),
+      trailing: Text(
+        '${l10n.statistics_filterBar_diveCount(segment.count)} • '
+        '${duration.inHours}h ${duration.inMinutes % 60}m',
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+}
+
+/// Shared with the pie card's own legend so both agree on how a bucket is
+/// worded in the diver's active unit.
+String _depthBucketLabel(
+  DepthRangeStat data,
+  UnitFormatter fmt,
+  AppLocalizations l10n,
+) {
+  final minDisplay = fmt.convertDepth(data.minDepth.toDouble()).round();
+  final maxDisplay = fmt.convertDepth(data.maxDepth.toDouble()).round();
+  return data.openEnded
+      ? l10n.statistics_summary_depthBucket_over('$minDisplay', fmt.depthSymbol)
+      : l10n.statistics_summary_depthBucket_range(
+          '$minDisplay',
+          '$maxDisplay',
+          fmt.depthSymbol,
+        );
 }
 
 class _DepthPieCard extends StatelessWidget {
@@ -783,27 +852,18 @@ class _DepthPieCard extends StatelessWidget {
                               nonEmptyEntries.add((i, depthDistribution[i]));
                             }
                           }
-                          return nonEmptyEntries.map((
+                          // Caps the inline legend the same way the dive-type
+                          // pie does (max 6 rows) so a diver with many
+                          // occupied depth buckets can't push the legend
+                          // below the fixed-height chart box. The full,
+                          // uncapped breakdown with count and time is listed
+                          // underneath both pie charts.
+                          return nonEmptyEntries.take(6).map((
                             (int, DepthRangeStat) entry,
                           ) {
                             final index = entry.$1;
                             final data = entry.$2;
-                            final minDisplay = fmt
-                                .convertDepth(data.minDepth.toDouble())
-                                .round();
-                            final maxDisplay = fmt
-                                .convertDepth(data.maxDepth.toDouble())
-                                .round();
-                            final label = data.openEnded
-                                ? l10n.statistics_summary_depthBucket_over(
-                                    '$minDisplay',
-                                    fmt.depthSymbol,
-                                  )
-                                : l10n.statistics_summary_depthBucket_range(
-                                    '$minDisplay',
-                                    '$maxDisplay',
-                                    fmt.depthSymbol,
-                                  );
+                            final label = _depthBucketLabel(data, fmt, l10n);
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 2),
                               child: Row(

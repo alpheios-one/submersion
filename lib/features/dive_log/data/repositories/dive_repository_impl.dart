@@ -2552,7 +2552,8 @@ class DiveRepository {
       final depthStats = await _db.customSelect('''
       SELECT
         MIN(CAST(max_depth / $depthBucketSizeMeters AS INTEGER), $depthBucketCount) as depth_bucket,
-        COUNT(*) as count
+        COUNT(*) as count,
+        SUM(COALESCE(runtime, bottom_time)) as total_time
       FROM dives
       $depthWhereClause $fBare
       GROUP BY depth_bucket
@@ -2586,6 +2587,12 @@ class DiveRepository {
             count: depthStats
                 .where((row) => row.data['depth_bucket'] == i)
                 .fold<int>(0, (sum, row) => sum + (row.data['count'] as int)),
+            totalDurationSeconds: depthStats
+                .where((row) => row.data['depth_bucket'] == i)
+                .fold<int>(
+                  0,
+                  (sum, row) => sum + (row.data['total_time'] as int? ?? 0),
+                ),
           ),
       ];
 
@@ -6464,12 +6471,18 @@ class DepthRangeStat {
   /// has no real upper bound unlike every other bucket.
   final bool openEnded;
 
+  /// Summed dive duration (seconds) across dives whose max depth landed in
+  /// this bucket (issue #641), mirroring
+  /// [DistributionSegment.totalDurationSeconds].
+  final int totalDurationSeconds;
+
   DepthRangeStat({
     required this.label,
     required this.minDepth,
     required this.maxDepth,
     required this.count,
     this.openEnded = false,
+    this.totalDurationSeconds = 0,
   });
 }
 

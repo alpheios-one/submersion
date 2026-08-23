@@ -563,9 +563,27 @@ void main() {
         totalSites: 2,
         firstDiveDate: DateTime.now().subtract(const Duration(days: 365)),
         depthDistribution: [
-          DepthRangeStat(label: '0-10m', minDepth: 0, maxDepth: 10, count: 5),
-          DepthRangeStat(label: '10-20m', minDepth: 10, maxDepth: 20, count: 7),
-          DepthRangeStat(label: '20-30m', minDepth: 20, maxDepth: 30, count: 3),
+          DepthRangeStat(
+            label: '0-10m',
+            minDepth: 0,
+            maxDepth: 10,
+            count: 5,
+            totalDurationSeconds: 18000, // 5h 0m
+          ),
+          DepthRangeStat(
+            label: '10-20m',
+            minDepth: 10,
+            maxDepth: 20,
+            count: 7,
+            totalDurationSeconds: 27000, // 7h 30m
+          ),
+          DepthRangeStat(
+            label: '20-30m',
+            minDepth: 20,
+            maxDepth: 30,
+            count: 3,
+            totalDurationSeconds: 11700, // 3h 15m
+          ),
         ],
       );
 
@@ -609,6 +627,15 @@ void main() {
       expect(find.text('Distributions'), findsOneWidget);
       // Depth range legend labels should contain depth values.
       expect(find.textContaining('10'), findsWidgets);
+      // Per-depth-bucket count + total dive time list (issue #641 follow-up).
+      // The bucket label also appears once in the pie chart's own legend
+      // above the list.
+      expect(find.text('0-10m'), findsNWidgets(2));
+      expect(find.text('5 dives • 5h 0m'), findsOneWidget);
+      expect(find.text('10-20m'), findsNWidgets(2));
+      expect(find.text('7 dives • 7h 30m'), findsOneWidget);
+      expect(find.text('20-30m'), findsNWidgets(2));
+      expect(find.text('3 dives • 3h 15m'), findsOneWidget);
       // Per-type count + total dive time list (issue #641). The type name
       // also appears once in the pie chart's own legend above the list.
       expect(find.text('Recreational'), findsNWidgets(2));
@@ -616,6 +643,59 @@ void main() {
       expect(find.text('Technical'), findsNWidgets(2));
       expect(find.text('5 dives • 5h 30m'), findsOneWidget);
     });
+
+    testWidgets(
+      'caps the depth pie legend at 6 rows but lists every occupied '
+      'bucket underneath (issue #641 follow-up: legend overflow)',
+      (tester) async {
+        final stats = DiveStatistics(
+          totalDives: 8,
+          totalTimeSeconds: 28800,
+          maxDepth: 80.0,
+          avgMaxDepth: 40.0,
+          totalSites: 1,
+          firstDiveDate: DateTime.now().subtract(const Duration(days: 365)),
+          depthDistribution: [
+            for (var i = 0; i < 8; i++)
+              DepthRangeStat(
+                label: '${i * 10}-${(i + 1) * 10}m',
+                minDepth: i * 10,
+                maxDepth: (i + 1) * 10,
+                count: 1,
+                totalDurationSeconds: 3600,
+              ),
+          ],
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              diveStatisticsProvider.overrideWith((ref) async => stats),
+              filteredDiveStatisticsProvider.overrideWith((ref) async => stats),
+              diveRecordsProvider.overrideWith((ref) async => DiveRecords()),
+              diveTypeDistributionProvider.overrideWith((ref) async => []),
+              sharedPreferencesProvider.overrideWithValue(prefs),
+              settingsProvider.overrideWith((ref) => _MockSettingsNotifier()),
+              currentDiverIdProvider.overrideWith(
+                (ref) => _MockCurrentDiverIdNotifier(),
+              ),
+            ],
+            child: const MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: StatisticsOverviewPage(embedded: true),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // The 8th bucket (70-80m) only appears once: in the full list below
+        // the chart, not in the space-limited inline legend.
+        expect(find.text('70-80m'), findsOneWidget);
+        // Every bucket's count + time is listed in full underneath the pies.
+        expect(find.text('1 dive • 1h 0m'), findsNWidgets(8));
+      },
+    );
 
     testWidgets('hides Distributions when totalDives is 0', (tester) async {
       final stats = DiveStatistics(
