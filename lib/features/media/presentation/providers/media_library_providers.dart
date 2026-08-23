@@ -1,9 +1,12 @@
 import 'dart:async';
 
+import 'package:submersion/core/constants/sort_options.dart';
+import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/data/repositories/media_library_repository.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
+import 'package:submersion/features/media/presentation/providers/media_library_sort_provider.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/core/utils/log_failure.dart';
@@ -99,18 +102,19 @@ class MediaLibraryState {
   }
 }
 
-/// Paged library notifier. Rebuilt whenever the filter or active diver
+/// Paged library notifier. Rebuilt whenever the filter, sort, or active diver
 /// changes; refreshed (page one reload) whenever the media table changes.
 final mediaLibraryNotifierProvider =
     StateNotifierProvider<MediaLibraryNotifier, MediaLibraryState>((ref) {
       final repo = ref.watch(mediaLibraryRepositoryProvider);
       final diverId = ref.watch(currentDiverIdProvider);
       final filter = ref.watch(mediaLibraryFilterProvider);
-      return MediaLibraryNotifier(repo, diverId, filter);
+      final sort = ref.watch(mediaLibrarySortProvider);
+      return MediaLibraryNotifier(repo, diverId, filter, sort);
     });
 
 class MediaLibraryNotifier extends StateNotifier<MediaLibraryState> {
-  MediaLibraryNotifier(this._repo, this._diverId, this._filter)
+  MediaLibraryNotifier(this._repo, this._diverId, this._filter, this._sort)
     : super(const MediaLibraryState()) {
     _changesSub = _repo.watchMediaChanges().listen((_) => loadFirstPage());
     loadFirstPage();
@@ -119,6 +123,7 @@ class MediaLibraryNotifier extends StateNotifier<MediaLibraryState> {
   final MediaLibraryRepository _repo;
   final String? _diverId;
   final MediaLibraryFilter _filter;
+  final SortState<MediaSortField> _sort;
   StreamSubscription<void>? _changesSub;
 
   Future<void> loadFirstPage() async {
@@ -131,7 +136,11 @@ class MediaLibraryNotifier extends StateNotifier<MediaLibraryState> {
     // load still shows the spinner, because entries are empty then anyway.
     state = state.copyWith(isLoading: true);
     try {
-      final page = await _repo.getPage(diverId: _diverId, filter: _filter);
+      final page = await _repo.getPage(
+        diverId: _diverId,
+        filter: _filter,
+        sort: _sort,
+      );
       if (!mounted) return;
       state = MediaLibraryState(
         entries: page.entries,
@@ -151,6 +160,7 @@ class MediaLibraryNotifier extends StateNotifier<MediaLibraryState> {
       final page = await _repo.getPage(
         diverId: _diverId,
         filter: _filter,
+        sort: _sort,
         after: cursor,
       );
       if (!mounted) return;
