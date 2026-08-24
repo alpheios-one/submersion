@@ -16,11 +16,13 @@ import 'package:submersion/shared/widgets/sort_bottom_sheet.dart';
 /// replaced was an Expanded horizontal scroller that claimed all free width
 /// and squeezed the view-mode selector beside it.
 ///
-/// Fixed widths also mean the row has a hard budget: at 320dp, the narrowest
-/// phone the app ships to, three default-density icon buttons plus the
-/// view-mode selector overflow by 16px. The icons are compact for that
-/// reason, matching the dive media section's header, and a fourth control
-/// does not fit without finding space somewhere else.
+/// Fixed widths also mean the row has a hard budget, and grid mode already
+/// spends nearly all of it: three icon buttons plus the view-mode selector.
+/// At 320dp, the narrowest phone the app ships to, those three at default
+/// density overflow by 16px, so they are `VisualDensity.compact` (matching
+/// the dive media section's header), which reclaims 8dp each and leaves
+/// roughly 8dp spare. A FOURTH icon button would overflow by about 32dp;
+/// adding one means finding space elsewhere in the row, not just adding it.
 class MediaLibraryToolbar extends ConsumerWidget {
   const MediaLibraryToolbar({
     super.key,

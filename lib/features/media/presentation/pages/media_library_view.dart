@@ -71,9 +71,20 @@ class _MediaLibraryViewState extends ConsumerState<MediaLibraryView> {
     final visibleIds = state.entries.map((e) => e.item.id).toList();
     // Drop checked ids that a filter or sort change pushed off screen, so a
     // bulk action can never reach a row the user cannot see.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _selection.pruneTo(visibleIds);
-    });
+    //
+    // Guarded rather than scheduled unconditionally, unlike the dive media
+    // section: `pruneTo` walks the whole visible set to build its lookup, and
+    // this library pages through thousands of rows where a dive holds a
+    // handful. The guard cannot skip a prune that mattered -- `state.entries`
+    // comes from a watched provider, so every change to it runs this build,
+    // and entering the mode starts from an empty checked set with nothing
+    // stale to drop. Selection changes alone do not reach here at all; the
+    // ValueListenableBuilder below owns those.
+    if (_selection.value.isActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _selection.pruneTo(visibleIds);
+      });
+    }
 
     return SelectableListScope(
       controller: _selection,
