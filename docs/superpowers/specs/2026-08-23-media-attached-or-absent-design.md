@@ -1,6 +1,6 @@
 # Media: Attached or Absent. Design
 
-**Status:** approved 2026-08-23
+**Status:** approved 2026-08-23, implemented on this branch
 **Branch:** `worktree-media-attached-or-absent`
 **Supersedes:** the "Unlinked inbox" and `retainInLibrary` decisions of the
 2026-08-05 Media section design (Phase 2), and the library-level source-type

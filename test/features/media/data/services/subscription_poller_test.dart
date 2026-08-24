@@ -106,8 +106,8 @@ class _NoExtractExtractor implements UrlMetadataExtractor {
   }
 }
 
-/// Build a fully prefilled `ManifestEntry` so the pipeline's
-/// `ingestManifestEntries` path skips network extraction entirely.
+/// Build a fully prefilled `ManifestEntry` so the pipeline's manifest path
+/// skips network extraction entirely.
 ManifestEntry _entry(String key, String url, {DateTime? takenAt}) {
   return ManifestEntry(
     entryKey: key,

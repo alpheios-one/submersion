@@ -3514,7 +3514,7 @@ not-yet-upgraded peer syncs in."
 Run: `grep -rn "retainInLibrary: Value(true)\|markRetainedInLibrary\|libraryLevelSourceTypes\|kLibraryLevelSourceTypes\|importPhotosToLibrary\|MediaHealthFilter.unlinked\|unlinkedCountProvider\|MediaConsoleSection.unlinked\|MediaConsoleSection.missing\|ingestManifestEntries\|_tryAutoMatch\|autoMatchByDate" lib test --include="*.dart"`
 Expected: no matches.
 
-Run: `grep -rn "—\|–" lib/features/media lib/features/media_store lib/l10n/arb/app_en.arb docs/superpowers/plans/2026-08-23-media-attached-or-absent.md docs/superpowers/specs/2026-08-23-media-attached-or-absent-design.md | grep -v "^lib/l10n/arb/app_localizations" | head`
+Run: `git diff origin/main...HEAD -U0 -- . ':(exclude)lib/l10n/arb/app_localizations*' ':(exclude)*.mocks.dart' | grep '^+' | grep -v '^+++' | LC_ALL=C grep -n $'\xe2\x80\x94\|\xe2\x80\x93' | head` (the two byte sequences are the em-dash and en-dash characters, spelled out so the plan itself contains neither)
 Expected: no lines introduced by this branch (compare against `git diff origin/main --stat` scope; pre-existing dashes in untouched lines are fine).
 
 - [ ] **Step 2: Format, analyze, full suite twice**
