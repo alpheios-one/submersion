@@ -7,16 +7,22 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_provide
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/media/data/services/network_credentials_service.dart';
 import 'package:submersion/features/media/domain/entities/import_candidate.dart';
 import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 import 'package:submersion/features/media/presentation/pages/media_import_review_page.dart';
+import 'package:submersion/features/media/domain/value_objects/import_preview.dart';
 import 'package:submersion/features/media/presentation/providers/media_import_suggestion_providers.dart';
+import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
+import 'package:submersion/features/media/presentation/providers/url_tab_providers.dart';
+import 'package:submersion/features/media/presentation/widgets/network_thumbnail.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 // `Override` is not exported from flutter_riverpod's public barrel; the
 // shared test helper re-types it for widget tests.
 import '../../../helpers/mock_providers.dart' show Override;
+import 'support/media_widget_harness.dart' show onePixelPng;
 
 final t1 = DateTime.utc(2026, 6, 12, 10);
 final t2 = DateTime.utc(2026, 6, 12, 11);
@@ -71,13 +77,18 @@ void main() {
     );
   }
 
-  ImportCandidate candidate(String key, DateTime? takenAt, {String? error}) =>
-      ImportCandidate(
-        key: key,
-        title: '$key.jpg',
-        takenAt: takenAt,
-        error: error,
-      );
+  ImportCandidate candidate(
+    String key,
+    DateTime? takenAt, {
+    String? error,
+    ImportPreview? preview,
+  }) => ImportCandidate(
+    key: key,
+    title: '$key.jpg',
+    takenAt: takenAt,
+    error: error,
+    preview: preview,
+  );
 
   testWidgets('confident matches are pre-checked; the rest are not', (
     tester,
@@ -271,6 +282,69 @@ void main() {
     expect(confirmed, {'a': const DiveAttachTarget('d5')});
     await tester.pumpAndSettle();
   });
+
+  testWidgets('an asset candidate paints the gallery thumbnail bytes', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      host(
+        [candidate('a', t1, preview: const AssetImportPreview('asset-a'))],
+        {t1: none},
+        extraOverrides: [
+          assetThumbnailProvider(
+            'asset-a',
+          ).overrideWith((ref) async => onePixelPng()),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Image), findsOneWidget);
+    expect(tester.widget<Image>(find.byType(Image)).image, isA<MemoryImage>());
+  });
+
+  testWidgets('a url candidate paints a network thumbnail', (tester) async {
+    await tester.pumpWidget(
+      host(
+        [
+          candidate(
+            'a',
+            t1,
+            preview: const UrlImportPreview('https://example.com/a.jpg'),
+          ),
+        ],
+        {t1: none},
+        extraOverrides: [
+          networkCredentialsServiceProvider.overrideWithValue(_FakeCreds()),
+        ],
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(NetworkThumbnail), findsOneWidget);
+  });
+
+  testWidgets('a candidate with no preview paints no thumbnail', (
+    tester,
+  ) async {
+    await tester.pumpWidget(host([candidate('a', t1)], {t1: none}));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Image), findsNothing);
+    expect(find.byType(NetworkThumbnail), findsNothing);
+  });
+}
+
+/// [NetworkThumbnail] asks for an `Authorization` header before it paints,
+/// and the real service reaches for the database.
+class _FakeCreds implements NetworkCredentialsService {
+  @override
+  Future<Map<String, String>?> headersFor(Uri uri) async => null;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError(
+    '${invocation.memberName} not stubbed in _FakeCreds',
+  );
 }
 
 class _FakeDiveRepo implements DiveRepository {
