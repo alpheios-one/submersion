@@ -233,7 +233,10 @@ void main() {
         diverId: 'd1',
         filter: const MediaLibraryFilter(health: MediaHealthFilter.unlinked),
       );
-      expect(unlinked.entries.map((e) => e.item.id), ['unlinked-1']);
+      expect(unlinked.entries.map((e) => e.item.id).toSet(), {
+        'unlinked-1',
+        'unlinked-url-1',
+      });
 
       final dive2 = await repo.getPage(
         diverId: 'd1',
@@ -347,12 +350,9 @@ void main() {
   });
 
   group('counts', () {
-    test(
-      'countUnlinked excludes library-level sources and signatures',
-      () async {
-        expect(await repo.countUnlinked(), 1);
-      },
-    );
+    test('countUnlinked excludes signatures only', () async {
+      expect(await repo.countUnlinked(), 2);
+    });
 
     test('countMissing counts is_orphaned rows', () async {
       expect(await repo.countMissing(), 1);
@@ -394,7 +394,7 @@ void main() {
 
       // Unchanged from the baseline: the legacy signature is not an
       // unlinked library item, and does not appear under any source type.
-      expect(await repo.countUnlinked(), 1);
+      expect(await repo.countUnlinked(), 2);
       final bySource = await repo.countBySourceType();
       expect(bySource.containsKey(MediaSourceType.signature), isFalse);
     });

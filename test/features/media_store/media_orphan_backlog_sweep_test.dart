@@ -73,7 +73,7 @@ void main() {
   // 24h age guard is satisfied by running "two days in the future".
   final sweepTime = DateTime.now().add(const Duration(days: 2));
 
-  test('sweeps old unlinked non-library rows exactly once', () async {
+  test('sweeps every old unlinked row exactly once', () async {
     final epoch = DateTime(2026, 1, 1).millisecondsSinceEpoch;
     await db
         .into(db.dives)
@@ -88,15 +88,15 @@ void main() {
     final orphan = await repo.createMedia(
       item('orphan.jpg', hash: 'h1', uploadedAt: DateTime(2026, 2)),
     );
-    final library = await repo.createMedia(
-      item('lib.jpg', sourceType: MediaSourceType.networkUrl),
+    final url = await repo.createMedia(
+      item('url.jpg', sourceType: MediaSourceType.networkUrl),
     );
     final linked = await repo.createMedia(item('linked.jpg', diveId: 'd1'));
 
     final swept = await sweep.runIfNeeded(now: sweepTime);
-    expect(swept, 1);
+    expect(swept, 2);
     expect(await repo.getMediaById(orphan.id), isNull);
-    expect(await repo.getMediaById(library.id), isNotNull);
+    expect(await repo.getMediaById(url.id), isNull);
     expect(await repo.getMediaById(linked.id), isNotNull);
     // The uploaded orphan produced a blob-delete intent.
     final entry = (await queue.allForTesting()).single;

@@ -169,10 +169,6 @@ class MediaUnlinkedInboxView extends ConsumerWidget {
                         await _pickAndLinkDive(context, ref, item.id);
                       case 'linkSite':
                         await _pickAndLinkSite(context, ref, item.id);
-                      case 'keep':
-                        await ref
-                            .read(mediaRepositoryProvider)
-                            .markRetainedInLibrary([item.id]);
                     }
                   },
                   itemBuilder: (context) => [
@@ -183,10 +179,6 @@ class MediaUnlinkedInboxView extends ConsumerWidget {
                     PopupMenuItem(
                       value: 'linkSite',
                       child: Text(context.l10n.media_inbox_linkToSite),
-                    ),
-                    PopupMenuItem(
-                      value: 'keep',
-                      child: Text(context.l10n.media_inbox_keep),
                     ),
                   ],
                 ),

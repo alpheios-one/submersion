@@ -54,7 +54,6 @@ class _UnavailableResolver implements MediaSourceResolver {
 
 class _RecordingMediaRepo implements MediaRepository {
   (List<String>, String)? reassigned;
-  final List<String> retained = [];
 
   @override
   Future<void> reassignMediaToDive(
@@ -62,11 +61,6 @@ class _RecordingMediaRepo implements MediaRepository {
     String newDiveId,
   ) async {
     reassigned = (mediaIds, newDiveId);
-  }
-
-  @override
-  Future<void> markRetainedInLibrary(List<String> mediaIds) async {
-    retained.addAll(mediaIds);
   }
 
   @override
@@ -232,26 +226,6 @@ void main() {
       await tester.pumpAndSettle();
       expect(mediaRepo.reassigned?.$1, ['m1']);
       expect(mediaRepo.reassigned?.$2, 'd7');
-    });
-
-    testWidgets('Keep calls markRetainedInLibrary', (tester) async {
-      await tester.pumpWidget(
-        host(
-          entries: [MediaLibraryEntry(item: mediaItem('m1'))],
-          suggestions: {
-            'm1': const InboxSuggestion(
-              match: TimestampMatch(kind: TimestampMatchKind.none),
-            ),
-          },
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byType(PopupMenuButton<String>).first);
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Keep'));
-      await tester.pumpAndSettle();
-      expect(mediaRepo.retained, ['m1']);
     });
 
     testWidgets('empty inbox shows the localized empty state', (tester) async {
