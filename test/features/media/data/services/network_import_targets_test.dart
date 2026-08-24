@@ -6,6 +6,7 @@ import 'package:submersion/features/media/data/services/dive_link_matcher.dart';
 import 'package:submersion/features/media/data/services/network_fetch_pipeline.dart';
 import 'package:submersion/features/media/data/services/network_import_targets.dart';
 import 'package:submersion/features/media/data/services/url_metadata_extractor.dart';
+import 'package:submersion/features/media/domain/value_objects/import_preview.dart';
 import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 
 class _FakeDiveRepo implements DiveRepository {
@@ -87,6 +88,17 @@ void main() {
     expect(candidates[0].title, 'a.jpg');
     expect(candidates[1].error, 'HTTP 404');
     expect(candidates[1].takenAt, isNull);
+  });
+
+  test('candidatesFor gives every row a url preview, failures included', () {
+    final candidates = candidatesFor([a, broken]);
+    expect(
+      candidates[0].preview,
+      const UrlImportPreview('https://e.com/a.jpg'),
+    );
+    // A failed fetch still has a URL, and the art may well load even when
+    // the metadata probe did not.
+    expect(candidates[1].preview, isA<UrlImportPreview>());
   });
 
   test('candidatesFor prefers a manifest caption, then a custom title', () {

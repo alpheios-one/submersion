@@ -7,6 +7,7 @@ import 'package:submersion/features/media/data/services/media_import_service.dar
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
 import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/import_candidate.dart';
+import 'package:submersion/features/media/domain/value_objects/import_preview.dart';
 import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 import 'package:submersion/features/media/presentation/pages/media_import_review_page.dart';
 import 'package:submersion/features/media/presentation/pages/photo_picker_page.dart';
@@ -128,6 +129,7 @@ class MediaImportView extends ConsumerWidget {
           // The same value the import persists as takenAt, so the match
           // shown here is the match the row would get.
           takenAt: TripMediaScanner.toWallClockUtc(a.createDateTime),
+          preview: AssetImportPreview(a.id),
         ),
     ];
     await Navigator.of(context).push(

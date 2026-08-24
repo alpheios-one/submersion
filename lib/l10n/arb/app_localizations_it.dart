@@ -12426,28 +12426,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_diveMediaSection_title => 'Foto e video';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'Elimina';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'Eliminazione non riuscita: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'Questo li rimuove dall\'app e da qualsiasi archivio multimediale. Non può essere annullato.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '$count elementi eliminati';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return 'Eliminare $count elementi?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'Ricollega';
 
   @override
@@ -12460,13 +12438,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => 'Scollega';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'Rimuovere questa foto dall\'immersione? La foto rimarrà nella tua galleria.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'Scollega foto';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12494,7 +12465,31 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'Foto scollegata';
+  String media_library_unlinkConfirmTitle(int count) {
+    return 'Scollegare $count elementi?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(Object error) {
+    return 'Scollegamento non riuscito: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'Escono dalla tua libreria, insieme alle copie nel cloud e alle miniature. I file originali non vengono toccati. Non può essere annullato.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count di questi hanno una didascalia o un preferito salvati in Submersion, e quei dettagli vanno persi.',
+      one:
+          'Uno di questi ha una didascalia o un preferito salvati in Submersion, e quei dettagli vanno persi.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'Media del sito';
@@ -12519,7 +12514,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Rimuovere $count allegati?';
+    return 'Scollegare $count elementi?';
   }
 
   @override
@@ -12529,7 +12524,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return '$count allegati rimossi';
+    return '$count elementi scollegati';
   }
 
   @override
@@ -13348,36 +13343,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_divePicker_search => 'Cerca immersioni';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'Questo li rimuove dall\'app e da qualsiasi archivio multimediale. Non può essere annullato.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return 'Eliminare $count elementi?';
-  }
-
-  @override
   String get media_library_moveToDive => 'Sposta in un\'immersione';
-
-  @override
-  String get media_library_unlinkFromSite => 'Scollega dal sito';
-
-  @override
-  String get media_unlink_metadataLossTitle =>
-      'Scollegare ed eliminare i dettagli?';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count elementi selezionati hanno una didascalia o un preferito salvati in Submersion. Scollegandoli vengono rimossi dalla libreria e quei dettagli vanno persi. I file originali non vengono toccati.',
-      one:
-          '1 elemento selezionato ha una didascalia o un preferito salvati in Submersion. Scollegandolo viene rimosso dalla libreria e quei dettagli vanno persi. Il file originale non viene toccato.',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get media_library_unlinkSelected => 'Scollega';

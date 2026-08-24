@@ -5,7 +5,6 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/helpers/media_share_helper.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/dive_picker_sheet.dart';
-import 'package:submersion/features/media/presentation/widgets/unlink_metadata_warning_dialog.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
@@ -14,11 +13,10 @@ import 'package:submersion/shared/selection/selection_controller.dart';
 
 /// The library's contextual bar while a selection is active.
 ///
-/// The chrome -- count, close, select all, deselect all, and delete tucked
-/// into the overflow behind a divider -- comes from the shared
-/// [SelectionAppBar], so the library cannot drift from every other selectable
-/// surface. This widget contributes only the media-specific bulk actions and
-/// the logic behind them.
+/// The chrome -- count, close, select all, deselect all, and the overflow --
+/// comes from the shared [SelectionAppBar], so the library cannot drift from
+/// every other selectable surface. This widget contributes only the
+/// media-specific bulk actions and the logic behind them.
 class MediaSelectionBar extends ConsumerWidget {
   const MediaSelectionBar({
     super.key,
@@ -35,17 +33,46 @@ class MediaSelectionBar extends ConsumerWidget {
   final List<String> selectableIds;
 
   /// The currently selected items, resolved by the caller from the visible
-  /// entries so share/delete operate on real MediaItems.
+  /// entries so share/unlink operate on real MediaItems.
   final List<MediaItem> selectedItems;
 
-  Future<void> _deleteSelected(BuildContext context, WidgetRef ref) async {
+  List<String> get _ids => selectedItems.map((m) => m.id).toList();
+
+  /// The library's one destructive action.
+  ///
+  /// A dive or a site can unlink from its own side and leave the row alive
+  /// for the other one, but the library IS every side at once: unlinking
+  /// here clears every link the row has, and a row with no link cannot stay
+  /// in the library. So the row, its cloud proxies and its thumbnails go,
+  /// and only the original source file is left alone. That single outcome is
+  /// why this surface no longer carries an unlink-per-link pair alongside a
+  /// separate Delete.
+  ///
+  /// Routed through the deletion coordinator so the remote-blob delete
+  /// intent is enqueued before the rows die (orphan-prevention spec 5.2).
+  Future<void> _unlinkSelected(BuildContext context, WidgetRef ref) async {
+    final ids = _ids;
+    if (ids.isEmpty) return;
+
+    // Everything else an unlink discards is derived and rebuilds from the
+    // source file on a re-link. A caption and the favorite flag live only in
+    // Submersion's own row, so they are the part worth naming.
+    final atRisk = await ref
+        .read(mediaRepositoryProvider)
+        .idsWithUserMetadata(ids);
+    if (!context.mounted) return;
+
     final l10n = context.l10n;
-    final count = selectedItems.length;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.media_library_deleteConfirmTitle(count)),
-        content: Text(l10n.media_library_deleteConfirmBody),
+        title: Text(l10n.media_library_unlinkConfirmTitle(ids.length)),
+        content: Text(
+          atRisk.isEmpty
+              ? l10n.media_library_unlinkConfirmBody
+              : '${l10n.media_library_unlinkConfirmBody}\n\n'
+                    '${l10n.media_library_unlinkMetadataNote(atRisk.length)}',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -53,71 +80,14 @@ class MediaSelectionBar extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l10n.common_action_delete),
+            child: Text(l10n.media_library_unlinkSelected),
           ),
         ],
       ),
     );
     if (confirmed != true) return;
 
-    // Routed through the deletion coordinator so the remote-blob delete
-    // intent is enqueued before the rows die (orphan-prevention spec 5.2).
-    await ref
-        .read(mediaDeletionCoordinatorProvider)
-        .deleteMultipleMedia(selectedItems.map((m) => m.id).toList());
-    controller.exit();
-  }
-
-  List<String> get _ids => selectedItems.map((m) => m.id).toList();
-
-  /// Ids of the selection that actually carry a dive link: the service must
-  /// only see rows the action applies to.
-  List<String> get _diveLinkedIds =>
-      selectedItems.where((m) => m.diveId != null).map((m) => m.id).toList();
-
-  /// Same guard for the site link.
-  List<String> get _siteLinkedIds =>
-      selectedItems.where((m) => m.siteId != null).map((m) => m.id).toList();
-
-  /// Unlinking removes the media from the library along with its cloud
-  /// proxies and thumbnails; the original source file is untouched, and
-  /// anything a dive site still needs keeps its row. Only a caption or a
-  /// favorite is unrecoverable, so that is the one case worth a dialog.
-  Future<void> _unlinkFromDive(BuildContext context, WidgetRef ref) async {
-    final ids = _diveLinkedIds;
-    if (ids.isEmpty) return;
-    final service = ref.read(mediaUnlinkServiceProvider);
-
-    final wouldLose = await service.idsWithUserMetadataAtRisk(ids);
-    if (wouldLose.isNotEmpty) {
-      if (!context.mounted) return;
-      final go = await confirmUnlinkDiscardsMetadata(
-        context,
-        count: wouldLose.length,
-      );
-      if (!go) return;
-    }
-
-    await service.unlinkFromDive(ids);
-    controller.exit();
-  }
-
-  Future<void> _unlinkFromSite(BuildContext context, WidgetRef ref) async {
-    final ids = _siteLinkedIds;
-    if (ids.isEmpty) return;
-    final service = ref.read(mediaUnlinkServiceProvider);
-
-    final wouldLose = await service.idsWithUserMetadataAtRiskForSite(ids);
-    if (wouldLose.isNotEmpty) {
-      if (!context.mounted) return;
-      final go = await confirmUnlinkDiscardsMetadata(
-        context,
-        count: wouldLose.length,
-      );
-      if (!go) return;
-    }
-
-    await service.unlinkFromSite(ids);
+    await ref.read(mediaDeletionCoordinatorProvider).deleteMultipleMedia(ids);
     controller.exit();
   }
 
@@ -131,17 +101,20 @@ class MediaSelectionBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final anyDiveLinked = selectedItems.any((m) => m.diveId != null);
-    final anySiteLinked = selectedItems.any((m) => m.siteId != null);
 
-    // Share and Move come first so they hold the same two inline slots
-    // whatever the selection contains; the conditional unlinks follow, which
-    // keeps the row that can delete media out of the leftmost reach.
+    // [onDelete] is null and Unlink is an ordinary action because this
+    // surface has no control named Delete: unlinking here destroys the rows,
+    // but calling it Delete would claim the source files go too, and they do
+    // not. The shared bar's safety property is kept by other means --
+    // [maxInlineActions] is 2, so the two benign actions hold the inline
+    // slots and the destructive one is reached by open-then-choose, the same
+    // deliberate gesture the baseline delete entry requires.
     return SelectionAppBar(
       controller: controller,
       selectableIds: selectableIds,
       shell: SelectionBarShell.pane,
-      onDelete: () => _deleteSelected(context, ref),
+      onDelete: null,
+      maxInlineActions: 2,
       actions: [
         BulkAction(
           id: 'share',
@@ -155,20 +128,13 @@ class MediaSelectionBar extends ConsumerWidget {
           label: l10n.media_library_moveToDive,
           onInvoke: () => _moveToDive(context, ref),
         ),
-        if (anyDiveLinked)
-          BulkAction(
-            id: 'unlink',
-            icon: Icons.link_off,
-            label: l10n.media_library_unlinkSelected,
-            onInvoke: () => _unlinkFromDive(context, ref),
-          ),
-        if (anySiteLinked)
-          BulkAction(
-            id: 'unlink_site',
-            icon: Icons.location_off,
-            label: l10n.media_library_unlinkFromSite,
-            onInvoke: () => _unlinkFromSite(context, ref),
-          ),
+        BulkAction(
+          id: 'unlink',
+          icon: Icons.link_off,
+          label: l10n.media_library_unlinkSelected,
+          isDestructive: true,
+          onInvoke: () => _unlinkSelected(context, ref),
+        ),
       ],
     );
   }

@@ -1,3 +1,5 @@
+import 'package:submersion/features/media/domain/value_objects/import_preview.dart';
+
 /// One thing the user is about to import, before any row exists for it.
 class ImportCandidate {
   const ImportCandidate({
@@ -5,6 +7,7 @@ class ImportCandidate {
     required this.title,
     this.takenAt,
     this.error,
+    this.preview,
   });
 
   /// Caller-defined identity (asset id, URL, manifest entry key).
@@ -17,6 +20,10 @@ class ImportCandidate {
   /// Why the candidate could not be examined (a failed fetch). Such a
   /// candidate can still be imported against an explicit target.
   final String? error;
+
+  /// Where to find this candidate's thumbnail, or null when the caller has
+  /// no art for it and the row should render text-only.
+  final ImportPreview? preview;
 }
 
 /// What confirming did, for the result snackbar.

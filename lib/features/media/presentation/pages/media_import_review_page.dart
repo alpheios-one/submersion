@@ -7,6 +7,7 @@ import 'package:submersion/features/media/domain/value_objects/media_attach_targ
 import 'package:submersion/features/media/presentation/providers/media_import_suggestion_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/ambiguous_dive_sheet.dart';
 import 'package:submersion/features/media/presentation/widgets/dive_picker_sheet.dart';
+import 'package:submersion/features/media/presentation/widgets/import_preview_thumbnail.dart';
 import 'package:submersion/features/media/presentation/widgets/site_picker_sheet.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -154,9 +155,26 @@ class _MediaImportReviewPageState extends ConsumerState<MediaImportReviewPage> {
               itemBuilder: (context, index) {
                 final (c, s, target) = rows[index];
                 final subtitle = _subtitle(context, c, s, target);
-                return CheckboxListTile(
-                  value: target != null,
-                  onChanged: _busy ? null : (_) => _toggle(c, s),
+                final preview = c.preview;
+                // A plain ListTile rather than CheckboxListTile: that widget
+                // has two slots (control and `secondary`) and the row needs
+                // three, since the art sits between the checkbox and the
+                // title.
+                return ListTile(
+                  onTap: _busy ? null : () => _toggle(c, s),
+                  leading: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Checkbox(
+                        value: target != null,
+                        onChanged: _busy ? null : (_) => _toggle(c, s),
+                      ),
+                      if (preview != null) ...[
+                        const SizedBox(width: 4),
+                        ImportPreviewThumbnail(preview: preview),
+                      ],
+                    ],
+                  ),
                   title: Text(
                     c.title,
                     maxLines: 1,
@@ -168,7 +186,7 @@ class _MediaImportReviewPageState extends ConsumerState<MediaImportReviewPage> {
                         ? TextStyle(color: Theme.of(context).colorScheme.error)
                         : null,
                   ),
-                  secondary: PopupMenuButton<String>(
+                  trailing: PopupMenuButton<String>(
                     enabled: !_busy,
                     onSelected: (action) {
                       if (action == 'dive') {

@@ -12117,28 +12117,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_diveMediaSection_title => 'תמונות וסרטונים';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'מחיקה';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'המחיקה נכשלה: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '$count פריטים נמחקו';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return 'למחוק $count פריטים?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'קישור מחדש';
 
   @override
@@ -12150,13 +12128,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => 'בטל קישור';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'להסיר תמונה זו מהצלילה? התמונה תישאר בגלריה שלך.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'ביטול קישור תמונה';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12184,7 +12155,31 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'קישור התמונה בוטל';
+  String media_library_unlinkConfirmTitle(int count) {
+    return 'לבטל קישור של $count פריטים?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(Object error) {
+    return 'ביטול הקישור נכשל: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'הם יוסרו מהספרייה שלך, יחד עם העותקים בענן והתמונות הממוזערות. קובצי המקור שלך לא ייפגעו. לא ניתן לבטל זאת.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'ל-$count מהם יש כיתוב או סימון מועדף השמורים ב-Submersion, והפרטים האלה יאבדו.',
+      one:
+          'לאחד מהם יש כיתוב או סימון מועדף השמורים ב-Submersion, והפרטים האלה יאבדו.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'מדיה של האתר';
@@ -12209,7 +12204,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'להסיר $count קבצים מצורפים?';
+    return 'לבטל קישור של $count פריטים?';
   }
 
   @override
@@ -12219,7 +12214,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'הוסרו $count קבצים מצורפים';
+    return 'בוטל קישור של $count פריטים';
   }
 
   @override
@@ -13020,38 +13015,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_divePicker_search => 'חיפוש צלילות';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return 'למחוק $count פריטים?';
-  }
-
-  @override
   String get media_library_moveToDive => 'העברה לצלילה';
 
   @override
-  String get media_library_unlinkFromSite => 'ניתוק מהאתר';
-
-  @override
-  String get media_unlink_metadataLossTitle => 'לנתק ולמחוק את הפרטים?';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          'ל-$count פריטים שנבחרו יש כיתוב או סימון מועדף השמורים ב-Submersion. הניתוק מסיר אותם מהספרייה, ולכן הפרטים האלה יאבדו. קובצי המקור שלך לא ייפגעו.',
-      one:
-          'לפריט אחד שנבחר יש כיתוב או סימון מועדף השמורים ב-Submersion. הניתוק מסיר אותו מהספרייה, ולכן הפרטים האלה יאבדו. קובץ המקור שלך לא ייפגע.',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get media_library_unlinkSelected => 'ניתוק';
+  String get media_library_unlinkSelected => 'בטל קישור';
 
   @override
   String media_library_selectedCount(int count) {

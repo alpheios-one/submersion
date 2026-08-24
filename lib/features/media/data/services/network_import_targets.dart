@@ -1,6 +1,7 @@
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/services/dive_link_matcher.dart';
 import 'package:submersion/features/media/data/services/network_fetch_pipeline.dart';
+import 'package:submersion/features/media/domain/value_objects/import_preview.dart';
 import 'package:submersion/features/media/domain/entities/import_candidate.dart';
 import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
@@ -51,6 +52,10 @@ List<ImportCandidate> candidatesFor(
                 m.uri.toString()),
         takenAt: m.takenAt,
         error: m.failure,
+        // Set even for a failed probe: the art and the metadata resolve
+        // independently, so a row that could not be examined may still
+        // paint.
+        preview: UrlImportPreview(m.uri.toString()),
       ),
   ];
 }
