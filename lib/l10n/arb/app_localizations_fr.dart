@@ -12461,28 +12461,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_diveMediaSection_title => 'Photos et video';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'Supprimer';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'Echec de la suppression : $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'Cela les supprime de l\'application et de tout stockage multimédia. Cette action est irréversible.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '$count éléments supprimés';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return 'Supprimer $count éléments ?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'Relier';
 
   @override
@@ -12495,13 +12473,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => 'Dissocier';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'Retirer cette photo de la plongee ? La photo restera dans ta galerie.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'Dissocier la photo';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12529,7 +12500,31 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'Photo dissociee';
+  String media_library_unlinkConfirmTitle(int count) {
+    return 'Dissocier $count elements ?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(String error) {
+    return 'Echec de la dissociation : $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'Ils quittent votre bibliothèque, ainsi que leurs copies cloud et leurs miniatures. Vos fichiers originaux ne sont pas affectés. Cette action est irréversible.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count d\'entre eux possèdent une légende ou un favori enregistré dans Submersion, et ces détails sont perdus.',
+      one:
+          'L\'un d\'eux possède une légende ou un favori enregistré dans Submersion, et ces détails sont perdus.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'Médias du site';
@@ -12554,7 +12549,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Retirer $count pièces jointes ?';
+    return 'Dissocier $count elements ?';
   }
 
   @override
@@ -12564,7 +12559,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return '$count pièces jointes retirées';
+    return '$count elements dissocies';
   }
 
   @override
@@ -13386,36 +13381,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_divePicker_search => 'Rechercher des plongées';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'Cela les supprime de l\'application et de tout stockage multimédia. Cette action est irréversible.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return 'Supprimer $count éléments ?';
-  }
-
-  @override
   String get media_library_moveToDive => 'Déplacer vers une plongée';
-
-  @override
-  String get media_library_unlinkFromSite => 'Dissocier du site';
-
-  @override
-  String get media_unlink_metadataLossTitle =>
-      'Dissocier et supprimer les details ?';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count elements selectionnes possedent une legende ou un favori enregistre dans Submersion. La dissociation les retire de votre bibliotheque et ces details sont perdus. Vos fichiers originaux ne sont pas affectes.',
-      one:
-          '1 element selectionne possede une legende ou un favori enregistre dans Submersion. La dissociation le retire de votre bibliotheque et ces details sont perdus. Votre fichier original n\'est pas affecte.',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get media_library_unlinkSelected => 'Dissocier';

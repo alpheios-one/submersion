@@ -7030,39 +7030,6 @@
   "media_diveMediaSection_selectedCount": "{count} selected",
   "media_diveMediaSection_thumbnailLabel": "View photo. Long press to select",
   "media_diveMediaSection_title": "Photos & Video",
-  "media_diveMediaSection_deleteButton": "Delete",
-  "@media_diveMediaSection_deleteButton": {
-    "description": "Dive media selection: destructive delete action"
-  },
-  "media_diveMediaSection_deleteError": "Failed to delete: {error}",
-  "@media_diveMediaSection_deleteError": {
-    "description": "Error snackbar when the dive media bulk delete fails",
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
-  "media_diveMediaSection_deleteSelectedContent": "This removes them from the app and any media store. This cannot be undone.",
-  "@media_diveMediaSection_deleteSelectedContent": {
-    "description": "Body of the dive media bulk delete confirmation"
-  },
-  "media_diveMediaSection_deleteSelectedSuccess": "Deleted {count} items",
-  "@media_diveMediaSection_deleteSelectedSuccess": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "media_diveMediaSection_deleteSelectedTitle": "Delete {count} items?",
-  "@media_diveMediaSection_deleteSelectedTitle": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "media_diveMediaSection_replaceButton": "Re-link",
   "@media_diveMediaSection_replaceButton": {
     "description": "Replace-link confirm action for a changed file"
@@ -7076,21 +7043,49 @@
     "description": "Title of the changed-bytes replace-link confirmation"
   },
   "media_diveMediaSection_unlinkButton": "Unlink",
-  "media_diveMediaSection_unlinkDialogContent": "Remove this photo from the dive? The photo will remain in your gallery.",
-  "media_diveMediaSection_unlinkDialogTitle": "Unlink Photo",
   "media_diveMediaSection_unlinkError": "Failed to unlink: {error}",
   "media_diveMediaSection_unlinkSelectedButton": "Unlink {count}",
   "media_diveMediaSection_unlinkSelectedContent": "Removes {count} media items from your library, along with their cloud copies and thumbnails. Media a dive site still uses is kept. Your original files are not affected.",
   "media_diveMediaSection_unlinkSelectedSuccess": "Unlinked {count} items",
   "media_diveMediaSection_unlinkSelectedTitle": "Unlink {count} items?",
-  "media_diveMediaSection_unlinkSuccess": "Photo unlinked",
+  "media_library_unlinkConfirmTitle": "Unlink {count} items?",
+  "media_siteMediaSection_unlinkError": "Failed to unlink: {error}",
+  "media_library_unlinkConfirmBody": "They leave your library, along with their cloud copies and thumbnails. Your original files are not affected. This cannot be undone.",
+  "media_library_unlinkMetadataNote": "{count,plural, =1{1 of these has a caption or favorite saved in Submersion, and those details are lost.} other{{count} of these have a caption or favorite saved in Submersion, and those details are lost.}}",
+  "@media_library_unlinkConfirmTitle": {
+    "description": "Title of the library unlink confirmation dialog",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_library_unlinkConfirmBody": {
+    "description": "Body of the library unlink confirmation dialog"
+  },
+  "@media_library_unlinkMetadataNote": {
+    "description": "Extra line naming the captions and favorites an unlink discards",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_siteMediaSection_unlinkError": {
+    "description": "Site page unlink failure snackbar",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "media_siteMediaSection_title": "Site Media",
   "media_siteMediaSection_addPhotos": "Add photos or videos",
   "media_siteMediaSection_addDocument": "Add document",
   "media_siteMediaSection_emptyState": "No maps, photos, or documents attached to this site",
   "media_siteMediaSection_divePhotosGroup": "Photos from dives here ({count})",
   "media_siteMediaSection_divePhotoLabel": "Dive photo",
-  "media_siteMediaSection_unlinkSelectedTitle": "Remove {count} attachments?",
+  "media_siteMediaSection_unlinkSelectedTitle": "Unlink {count} items?",
   "media_siteMediaSection_unlinkSelectedContent": "Removes {count} items from your library, along with their cloud copies and thumbnails. Media a dive still uses is kept. Your original files are not affected.",
   "@media_siteMediaSection_unlinkSelectedContent": {
     "description": "Site page unlink confirmation body",
@@ -7101,7 +7096,7 @@
     }
   },
   
-  "media_siteMediaSection_unlinkSelectedSuccess": "Removed {count} attachments",
+  "media_siteMediaSection_unlinkSelectedSuccess": "Unlinked {count} items",
   "media_documentViewer_title": "Document",
   "media_documentViewer_unavailable": "This document is not available on this device",
   "media_documentViewer_availableOnOriginDevice": "It is available on the device it was added from, or via a configured media store.",
@@ -7921,43 +7916,13 @@
   "@media_divePicker_search": {
     "description": "Search hint in the dive picker sheet"
   },
-  "media_library_deleteConfirmBody": "This removes them from the app and any media store. This cannot be undone.",
-  "@media_library_deleteConfirmBody": {
-    "description": "Body of the bulk delete confirmation dialog"
-  },
-  "media_library_deleteConfirmTitle": "Delete {count} items?",
-  "@media_library_deleteConfirmTitle": {
-    "description": "Title of the bulk delete confirmation dialog",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "media_library_moveToDive": "Move to dive",
   "@media_library_moveToDive": {
     "description": "Library selection action: reassign media to a dive"
   },
-  "media_library_unlinkFromSite": "Unlink from site",
-  "@media_library_unlinkFromSite": {
-    "description": "Library selection action: clear the site link"
-  },
-  "media_unlink_metadataLossTitle": "Unlink and discard details?",
-  "@media_unlink_metadataLossTitle": {
-    "description": "Confirm dialog title when unlinking would lose saved details"
-  },
-  "media_unlink_metadataLossContent": "{count,plural, =1{1 selected item has a caption or favorite saved in Submersion. Unlinking removes it from your library, so those details are lost. Your original file is not affected.} other{{count} selected items have a caption or favorite saved in Submersion. Unlinking removes them from your library, so those details are lost. Your original files are not affected.}}",
-  "@media_unlink_metadataLossContent": {
-    "description": "Confirm dialog body naming what an unlink discards",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "media_library_unlinkSelected": "Unlink",
   "@media_library_unlinkSelected": {
-    "description": "Library selection action: clear the dive link"
+    "description": "Library selection action, and its confirm button: clear every link the row has, which removes it from the library"
   },
   "media_library_selectedCount": "{count} selected",
   "@media_library_selectedCount": {

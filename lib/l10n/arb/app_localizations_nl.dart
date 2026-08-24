@@ -12332,28 +12332,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_diveMediaSection_title => 'Foto\'s & video';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'Verwijderen';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'Verwijderen mislukt: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '$count items verwijderd';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return '$count items verwijderen?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'Opnieuw koppelen';
 
   @override
@@ -12366,13 +12344,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => 'Ontkoppelen';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'Deze foto van de duik verwijderen? De foto blijft in je galerij staan.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'Foto ontkoppelen';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12400,7 +12371,31 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'Foto ontkoppeld';
+  String media_library_unlinkConfirmTitle(int count) {
+    return '$count items ontkoppelen?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(String error) {
+    return 'Ontkoppelen mislukt: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'Ze verdwijnen uit je bibliotheek, samen met hun cloudkopieën en miniaturen. Je originele bestanden blijven ongemoeid. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count daarvan hebben een bijschrift of favoriet opgeslagen in Submersion, en die details gaan verloren.',
+      one:
+          'Een daarvan heeft een bijschrift of favoriet opgeslagen in Submersion, en die details gaan verloren.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'Media van de duikstek';
@@ -12426,7 +12421,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return '$count bijlagen verwijderen?';
+    return '$count items ontkoppelen?';
   }
 
   @override
@@ -12436,7 +12431,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return '$count bijlagen verwijderd';
+    return '$count items ontkoppeld';
   }
 
   @override
@@ -13248,39 +13243,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_divePicker_search => 'Duiken zoeken';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return '$count items verwijderen?';
-  }
-
-  @override
   String get media_library_moveToDive => 'Naar duik verplaatsen';
 
   @override
-  String get media_library_unlinkFromSite => 'Loskoppelen van duikstek';
-
-  @override
-  String get media_unlink_metadataLossTitle =>
-      'Loskoppelen en details verwijderen?';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count geselecteerde items hebben een bijschrift of favoriet opgeslagen in Submersion. Loskoppelen verwijdert ze uit je bibliotheek, waardoor die details verloren gaan. Je originele bestanden blijven ongemoeid.',
-      one:
-          '1 geselecteerd item heeft een bijschrift of favoriet opgeslagen in Submersion. Loskoppelen verwijdert het uit je bibliotheek, waardoor die details verloren gaan. Je originele bestand blijft ongemoeid.',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get media_library_unlinkSelected => 'Loskoppelen';
+  String get media_library_unlinkSelected => 'Ontkoppelen';
 
   @override
   String media_library_selectedCount(int count) {

@@ -12386,28 +12386,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_diveMediaSection_title => 'Fotok es videok';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'Törlés';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'Nem sikerult a torles: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'Ez eltávolítja őket az alkalmazásból és minden médiatárból. Nem vonható vissza.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '$count elem törölve';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return '$count elem törlése?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'Újracsatolás';
 
   @override
@@ -12419,14 +12397,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'A fájl tartalma eltér';
 
   @override
-  String get media_diveMediaSection_unlinkButton => 'Levalasztas';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'Eltavolitja ezt a fotot a merülesrol? A foto megmarad a galeriadjaban.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'Foto levalasztasa';
+  String get media_diveMediaSection_unlinkButton => 'Leválasztás';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12454,7 +12425,31 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'Foto levalasztva';
+  String media_library_unlinkConfirmTitle(int count) {
+    return '$count elem leválasztása?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(String error) {
+    return 'Nem sikerult a levalasztas: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'Kikerülnek a médiatárból, a felhőmásolatokkal és bélyegképekkel együtt. Az eredeti fájlok érintetlenek maradnak. Nem vonható vissza.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Közülük $count elemhez felirat vagy kedvenc jelölés tartozik a Submersionben, és ezek a részletek elvesznek.',
+      one:
+          'Egyikükhöz felirat vagy kedvenc jelölés tartozik a Submersionben, és ezek a részletek elvesznek.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'Merülőhely médiafájljai';
@@ -12479,7 +12474,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Eltávolítasz $count mellékletet?';
+    return '$count elem leválasztása?';
   }
 
   @override
@@ -12489,7 +12484,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return '$count melléklet eltávolítva';
+    return '$count elem leválasztva';
   }
 
   @override
@@ -13305,36 +13300,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_divePicker_search => 'Merülések keresése';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'Ez eltávolítja őket az alkalmazásból és minden médiatárból. Nem vonható vissza.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return '$count elem törlése?';
-  }
-
-  @override
   String get media_library_moveToDive => 'Áthelyezés merüléshez';
-
-  @override
-  String get media_library_unlinkFromSite => 'Leválasztás a merülőhelyről';
-
-  @override
-  String get media_unlink_metadataLossTitle =>
-      'Leválasztás és a részletek elvetése?';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count kiválasztott elemhez felirat vagy kedvenc jelölés tartozik a Submersionben. A leválasztás eltávolítja őket a médiatárból, így ezek a részletek elvesznek. Az eredeti fájlok érintetlenek maradnak.',
-      one:
-          '1 kiválasztott elemhez felirat vagy kedvenc jelölés tartozik a Submersionben. A leválasztás eltávolítja a médiatárból, így ezek a részletek elvesznek. Az eredeti fájl érintetlen marad.',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get media_library_unlinkSelected => 'Leválasztás';

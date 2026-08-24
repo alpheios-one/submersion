@@ -12424,28 +12424,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_diveMediaSection_title => 'Fotos e Video';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'Excluir';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'Falha ao excluir: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'Isso os remove do aplicativo e de qualquer armazenamento de mídia. Não pode ser desfeito.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '$count itens excluídos';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return 'Excluir $count itens?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'Revincular';
 
   @override
@@ -12458,13 +12436,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => 'Desvincular';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'Remover esta foto do mergulho? A foto permanecera na sua galeria.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'Desvincular Foto';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12492,7 +12463,31 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'Foto desvinculada';
+  String media_library_unlinkConfirmTitle(int count) {
+    return 'Desvincular $count itens?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(String error) {
+    return 'Falha ao desvincular: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'Saem da sua biblioteca, juntamente com as cópias na nuvem e as miniaturas. Os seus ficheiros originais não são afetados. Não pode ser desfeito.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count deles têm legenda ou favorito guardados no Submersion, e esses detalhes perdem-se.',
+      one:
+          'Um deles tem uma legenda ou favorito guardados no Submersion, e esses detalhes perdem-se.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'Mídia do ponto de mergulho';
@@ -12517,7 +12512,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Remover $count anexos?';
+    return 'Desvincular $count itens?';
   }
 
   @override
@@ -12527,7 +12522,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return '$count anexos removidos';
+    return '$count itens desvinculados';
   }
 
   @override
@@ -13347,36 +13342,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_divePicker_search => 'Pesquisar mergulhos';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'Isso os remove do aplicativo e de qualquer armazenamento de mídia. Não pode ser desfeito.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return 'Excluir $count itens?';
-  }
-
-  @override
   String get media_library_moveToDive => 'Mover para um mergulho';
-
-  @override
-  String get media_library_unlinkFromSite => 'Desvincular do ponto';
-
-  @override
-  String get media_unlink_metadataLossTitle =>
-      'Desvincular e descartar os detalhes?';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count itens selecionados tem legenda ou favorito guardados no Submersion. Ao desvincular, sao removidos da sua biblioteca e esses detalhes perdem-se. Os seus ficheiros originais nao sao afetados.',
-      one:
-          '1 item selecionado tem uma legenda ou favorito guardados no Submersion. Ao desvincular, ele e removido da sua biblioteca e esses detalhes perdem-se. O seu ficheiro original nao e afetado.',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get media_library_unlinkSelected => 'Desvincular';

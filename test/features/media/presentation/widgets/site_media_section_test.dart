@@ -410,7 +410,9 @@ void main() {
       await openUnlinkDialog(tester);
 
       expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.text('Remove 2 attachments?'), findsOneWidget);
+      // Same verb as every other media surface; the body is what makes this
+      // one the site's, by naming the carve-out a dive still holds.
+      expect(find.text('Unlink 2 items?'), findsOneWidget);
       expect(
         find.text(
           'Removes 2 items from your library, along with their cloud copies '
@@ -446,7 +448,7 @@ void main() {
       expect(deleteCalls, [
         ['m1', 'm2'],
       ]);
-      expect(find.text('Removed 2 attachments'), findsOneWidget);
+      expect(find.text('Unlinked 2 items'), findsOneWidget);
       // Selection mode exits once the unlink lands.
       expect(find.byKey(const ValueKey('selection_exit')), findsNothing);
       expect(find.text('Site Media'), findsOneWidget);
@@ -463,7 +465,7 @@ void main() {
         find.text('Failed to unlink: Exception: row locked'),
         findsOneWidget,
       );
-      expect(find.text('Removed 2 attachments'), findsNothing);
+      expect(find.text('Unlinked 2 items'), findsNothing);
       expect(find.text('2 selected'), findsOneWidget);
     });
   });

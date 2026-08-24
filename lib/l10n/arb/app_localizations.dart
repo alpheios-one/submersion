@@ -21107,36 +21107,6 @@ abstract class AppLocalizations {
   /// **'Photos & Video'**
   String get media_diveMediaSection_title;
 
-  /// Dive media selection: destructive delete action
-  ///
-  /// In en, this message translates to:
-  /// **'Delete'**
-  String get media_diveMediaSection_deleteButton;
-
-  /// Error snackbar when the dive media bulk delete fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to delete: {error}'**
-  String media_diveMediaSection_deleteError(Object error);
-
-  /// Body of the dive media bulk delete confirmation
-  ///
-  /// In en, this message translates to:
-  /// **'This removes them from the app and any media store. This cannot be undone.'**
-  String get media_diveMediaSection_deleteSelectedContent;
-
-  /// No description provided for @media_diveMediaSection_deleteSelectedSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Deleted {count} items'**
-  String media_diveMediaSection_deleteSelectedSuccess(int count);
-
-  /// No description provided for @media_diveMediaSection_deleteSelectedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete {count} items?'**
-  String media_diveMediaSection_deleteSelectedTitle(int count);
-
   /// Replace-link confirm action for a changed file
   ///
   /// In en, this message translates to:
@@ -21160,18 +21130,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unlink'**
   String get media_diveMediaSection_unlinkButton;
-
-  /// No description provided for @media_diveMediaSection_unlinkDialogContent.
-  ///
-  /// In en, this message translates to:
-  /// **'Remove this photo from the dive? The photo will remain in your gallery.'**
-  String get media_diveMediaSection_unlinkDialogContent;
-
-  /// No description provided for @media_diveMediaSection_unlinkDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlink Photo'**
-  String get media_diveMediaSection_unlinkDialogTitle;
 
   /// No description provided for @media_diveMediaSection_unlinkError.
   ///
@@ -21203,11 +21161,29 @@ abstract class AppLocalizations {
   /// **'Unlink {count} items?'**
   String media_diveMediaSection_unlinkSelectedTitle(int count);
 
-  /// No description provided for @media_diveMediaSection_unlinkSuccess.
+  /// Title of the library unlink confirmation dialog
   ///
   /// In en, this message translates to:
-  /// **'Photo unlinked'**
-  String get media_diveMediaSection_unlinkSuccess;
+  /// **'Unlink {count} items?'**
+  String media_library_unlinkConfirmTitle(int count);
+
+  /// Site page unlink failure snackbar
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to unlink: {error}'**
+  String media_siteMediaSection_unlinkError(String error);
+
+  /// Body of the library unlink confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'They leave your library, along with their cloud copies and thumbnails. Your original files are not affected. This cannot be undone.'**
+  String get media_library_unlinkConfirmBody;
+
+  /// Extra line naming the captions and favorites an unlink discards
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural, =1{1 of these has a caption or favorite saved in Submersion, and those details are lost.} other{{count} of these have a caption or favorite saved in Submersion, and those details are lost.}}'**
+  String media_library_unlinkMetadataNote(int count);
 
   /// No description provided for @media_siteMediaSection_title.
   ///
@@ -21248,7 +21224,7 @@ abstract class AppLocalizations {
   /// No description provided for @media_siteMediaSection_unlinkSelectedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Remove {count} attachments?'**
+  /// **'Unlink {count} items?'**
   String media_siteMediaSection_unlinkSelectedTitle(int count);
 
   /// Site page unlink confirmation body
@@ -21260,7 +21236,7 @@ abstract class AppLocalizations {
   /// No description provided for @media_siteMediaSection_unlinkSelectedSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Removed {count} attachments'**
+  /// **'Unlinked {count} items'**
   String media_siteMediaSection_unlinkSelectedSuccess(int count);
 
   /// No description provided for @media_documentViewer_title.
@@ -22570,43 +22546,13 @@ abstract class AppLocalizations {
   /// **'Search dives'**
   String get media_divePicker_search;
 
-  /// Body of the bulk delete confirmation dialog
-  ///
-  /// In en, this message translates to:
-  /// **'This removes them from the app and any media store. This cannot be undone.'**
-  String get media_library_deleteConfirmBody;
-
-  /// Title of the bulk delete confirmation dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Delete {count} items?'**
-  String media_library_deleteConfirmTitle(int count);
-
   /// Library selection action: reassign media to a dive
   ///
   /// In en, this message translates to:
   /// **'Move to dive'**
   String get media_library_moveToDive;
 
-  /// Library selection action: clear the site link
-  ///
-  /// In en, this message translates to:
-  /// **'Unlink from site'**
-  String get media_library_unlinkFromSite;
-
-  /// Confirm dialog title when unlinking would lose saved details
-  ///
-  /// In en, this message translates to:
-  /// **'Unlink and discard details?'**
-  String get media_unlink_metadataLossTitle;
-
-  /// Confirm dialog body naming what an unlink discards
-  ///
-  /// In en, this message translates to:
-  /// **'{count,plural, =1{1 selected item has a caption or favorite saved in Submersion. Unlinking removes it from your library, so those details are lost. Your original file is not affected.} other{{count} selected items have a caption or favorite saved in Submersion. Unlinking removes them from your library, so those details are lost. Your original files are not affected.}}'**
-  String media_unlink_metadataLossContent(int count);
-
-  /// Library selection action: clear the dive link
+  /// Library selection action, and its confirm button: clear every link the row has, which removes it from the library
   ///
   /// In en, this message translates to:
   /// **'Unlink'**

@@ -12216,28 +12216,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_diveMediaSection_title => 'Photos & Video';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'Delete';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'Failed to delete: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'This removes them from the app and any media store. This cannot be undone.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return 'Deleted $count items';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return 'Delete $count items?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'Re-link';
 
   @override
@@ -12250,13 +12228,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => 'Unlink';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'Remove this photo from the dive? The photo will remain in your gallery.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'Unlink Photo';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12284,7 +12255,31 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'Photo unlinked';
+  String media_library_unlinkConfirmTitle(int count) {
+    return 'Unlink $count items?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(String error) {
+    return 'Failed to unlink: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'They leave your library, along with their cloud copies and thumbnails. Your original files are not affected. This cannot be undone.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count of these have a caption or favorite saved in Submersion, and those details are lost.',
+      one:
+          '1 of these has a caption or favorite saved in Submersion, and those details are lost.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'Site Media';
@@ -12309,7 +12304,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Remove $count attachments?';
+    return 'Unlink $count items?';
   }
 
   @override
@@ -12319,7 +12314,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'Removed $count attachments';
+    return 'Unlinked $count items';
   }
 
   @override
@@ -13128,35 +13123,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_divePicker_search => 'Search dives';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'This removes them from the app and any media store. This cannot be undone.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return 'Delete $count items?';
-  }
-
-  @override
   String get media_library_moveToDive => 'Move to dive';
-
-  @override
-  String get media_library_unlinkFromSite => 'Unlink from site';
-
-  @override
-  String get media_unlink_metadataLossTitle => 'Unlink and discard details?';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count selected items have a caption or favorite saved in Submersion. Unlinking removes them from your library, so those details are lost. Your original files are not affected.',
-      one:
-          '1 selected item has a caption or favorite saved in Submersion. Unlinking removes it from your library, so those details are lost. Your original file is not affected.',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get media_library_unlinkSelected => 'Unlink';

@@ -12199,28 +12199,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_diveMediaSection_title => 'الصور والفيديو';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'حذف';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'فشل في الحذف: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return 'تم حذف $count عناصر';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return 'حذف $count عناصر؟';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'إعادة الربط';
 
   @override
@@ -12232,13 +12210,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => 'إلغاء الربط';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'هل تريد إزالة هذه الصورة من الغوصة؟ ستبقى الصورة في معرض الصور.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'إلغاء ربط الصورة';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12266,7 +12237,31 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'تم إلغاء ربط الصورة';
+  String media_library_unlinkConfirmTitle(int count) {
+    return 'إلغاء ربط $count عنصر؟';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(String error) {
+    return 'فشل في إلغاء الربط: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'ستغادر مكتبتك، مع نسخها السحابية والصور المصغرة. لن تتأثر ملفاتك الأصلية. لا يمكن التراجع عن هذا.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'يحتوي $count منها على تعليق أو علامة مفضلة محفوظة في Submersion، وستُفقد هذه التفاصيل.',
+      one:
+          'يحتوي واحد منها على تعليق أو علامة مفضلة محفوظة في Submersion، وستُفقد هذه التفاصيل.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'وسائط الموقع';
@@ -12291,7 +12286,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'إزالة $count من المرفقات؟';
+    return 'إلغاء ربط $count عنصر؟';
   }
 
   @override
@@ -12301,7 +12296,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'تمت إزالة $count من المرفقات';
+    return 'تم إلغاء ربط $count عنصر';
   }
 
   @override
@@ -13106,35 +13101,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_divePicker_search => 'البحث في الغطسات';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return 'حذف $count عناصر؟';
-  }
-
-  @override
   String get media_library_moveToDive => 'نقل إلى غطسة';
-
-  @override
-  String get media_library_unlinkFromSite => 'إلغاء الربط بالموقع';
-
-  @override
-  String get media_unlink_metadataLossTitle => 'إلغاء الربط وحذف التفاصيل؟';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          'تحتوي $count عناصر محددة على تعليق أو علامة مفضلة محفوظة في Submersion. إلغاء الربط يزيلها من مكتبتك، لذا تُفقد هذه التفاصيل. لن تتأثر ملفاتك الأصلية.',
-      one:
-          'يحتوي عنصر واحد محدد على تعليق أو علامة مفضلة محفوظة في Submersion. إلغاء الربط يزيله من مكتبتك، لذا تُفقد هذه التفاصيل. لن يتأثر ملفك الأصلي.',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get media_library_unlinkSelected => 'إلغاء الربط';
