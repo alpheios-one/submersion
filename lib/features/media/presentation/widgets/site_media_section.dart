@@ -125,9 +125,7 @@ class _SiteMediaSectionState extends ConsumerState<SiteMediaSection> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                context.l10n.media_siteMediaSection_unlinkError(e.toString()),
-              ),
+              content: Text(context.l10n.media_siteMediaSection_unlinkError(e)),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );

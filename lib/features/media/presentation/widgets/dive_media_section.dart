@@ -222,9 +222,7 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                context.l10n.media_diveMediaSection_unlinkError(e.toString()),
-              ),
+              content: Text(context.l10n.media_diveMediaSection_unlinkError(e)),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
