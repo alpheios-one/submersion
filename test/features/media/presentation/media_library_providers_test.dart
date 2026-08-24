@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/constants/sort_options.dart';
+import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/data/repositories/media_library_repository.dart';
@@ -8,6 +10,8 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
+import 'package:submersion/features/media/domain/entities/media_library_sort.dart';
+import 'package:submersion/features/media/presentation/providers/media_library_sort_provider.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
@@ -23,9 +27,18 @@ MediaLibraryEntry entry(String id) => MediaLibraryEntry(
   ),
 );
 
+/// Deliberately NOT kDefaultMediaSort. If the notifier ever stops passing a
+/// sort, lastSort lands on this instead and the pass-through test fails
+/// rather than passing vacuously on a matching default.
+const SortState<MediaSortField> _unpassedSortSentinel = SortState(
+  field: MediaSortField.fileName,
+  direction: SortDirection.ascending,
+);
+
 class _FakeLibraryRepo implements MediaLibraryRepository {
   int pageCalls = 0;
   MediaLibraryFilter? lastFilter;
+  SortState<MediaSortField>? lastSort;
   String? lastDiverId;
   final changes = StreamController<void>.broadcast();
 
@@ -33,11 +46,13 @@ class _FakeLibraryRepo implements MediaLibraryRepository {
   Future<MediaLibraryPageResult> getPage({
     required String? diverId,
     MediaLibraryFilter filter = MediaLibraryFilter.none,
+    SortState<MediaSortField> sort = _unpassedSortSentinel,
     MediaLibraryCursor? after,
     int limit = 60,
   }) async {
     pageCalls++;
     lastFilter = filter;
+    lastSort = sort;
     lastDiverId = diverId;
     if (after == null) {
       return MediaLibraryPageResult(
@@ -167,5 +182,35 @@ void main() {
 
   test('the missing count provider reads the repository', () async {
     expect(await container.read(missingCountProvider.future), 9);
+  });
+
+  group('sort', () {
+    test('passes the default sort to the repository', () async {
+      container.read(mediaLibraryNotifierProvider);
+      await tick();
+
+      expect(fakeRepo.lastSort, kDefaultMediaSort);
+    });
+
+    test('changing the sort reloads page one with the new sort', () async {
+      container.read(mediaLibraryNotifierProvider);
+      await tick();
+      final callsBefore = fakeRepo.pageCalls;
+
+      await container
+          .read(mediaLibrarySortProvider.notifier)
+          .setSort(MediaSortField.fileSize, SortDirection.ascending);
+      container.read(mediaLibraryNotifierProvider);
+      await tick();
+
+      expect(fakeRepo.pageCalls, greaterThan(callsBefore));
+      expect(
+        fakeRepo.lastSort,
+        const SortState(
+          field: MediaSortField.fileSize,
+          direction: SortDirection.ascending,
+        ),
+      );
+    });
   });
 }

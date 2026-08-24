@@ -9919,6 +9919,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Date Issued';
 
   @override
+  String get enum_sortField_dateTaken => 'Date Taken';
+
+  @override
   String get enum_sortField_difficulty => 'Difficulty';
 
   @override
@@ -9932,6 +9935,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'End Date';
+
+  @override
+  String get enum_sortField_fileName => 'File Name';
+
+  @override
+  String get enum_sortField_fileSize => 'File Size';
 
   @override
   String get enum_sortField_lastServiceDate => 'Last Service';
@@ -13096,6 +13105,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_library_filter_clear => 'Clear filters';
+
+  @override
+  String get media_library_filter_any => 'Any';
+
+  @override
+  String get media_library_filter_title => 'Filter media';
+
+  @override
+  String get media_library_filter_apply => 'Apply';
+
+  @override
+  String get media_library_sort_title => 'Sort media';
+
+  @override
+  String get media_smartAlbum_load => 'Load album';
 
   @override
   String get media_divePicker_title => 'Move to dive';

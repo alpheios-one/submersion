@@ -5788,11 +5788,14 @@
   "enum_sortField_agency": "Agency",
   "enum_sortField_date": "Date",
   "enum_sortField_dateIssued": "Date Issued",
+  "enum_sortField_dateTaken": "Date Taken",
   "enum_sortField_difficulty": "Difficulty",
   "enum_sortField_diveCount": "Dive Count",
   "enum_sortField_diveNumber": "Dive Number",
   "enum_sortField_duration": "Duration",
   "enum_sortField_endDate": "End Date",
+  "enum_sortField_fileName": "File Name",
+  "enum_sortField_fileSize": "File Size",
   "enum_sortField_lastServiceDate": "Last Service",
   "enum_sortField_maxDepth": "Max Depth",
   "enum_sortField_name": "Name",
@@ -7887,6 +7890,26 @@
   
   
   "media_library_filter_clear": "Clear filters",
+  "media_library_filter_any": "Any",
+  "@media_library_filter_any": {
+    "description": "Value shown for a filter facet that is not constrained, e.g. Site: Any"
+  },
+  "media_library_filter_title": "Filter media",
+  "@media_library_filter_title": {
+    "description": "Title of the media library filter sheet, and the filter button's tooltip"
+  },
+  "media_library_filter_apply": "Apply",
+  "@media_library_filter_apply": {
+    "description": "Button that applies the drafted media filter"
+  },
+  "media_library_sort_title": "Sort media",
+  "@media_library_sort_title": {
+    "description": "Title of the media library sort sheet, and the sort button's tooltip"
+  },
+  "media_smartAlbum_load": "Load album",
+  "@media_smartAlbum_load": {
+    "description": "Opens the list of saved smart albums to load one"
+  },
   "@media_library_filter_clear": {
     "description": "Library filter chip: reset every filter"
   },

@@ -10060,6 +10060,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Kiallitas datuma';
 
   @override
+  String get enum_sortField_dateTaken => 'Készítés dátuma';
+
+  @override
   String get enum_sortField_difficulty => 'Nehezsegi szint';
 
   @override
@@ -10073,6 +10076,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'Zaras datuma';
+
+  @override
+  String get enum_sortField_fileName => 'Fájlnév';
+
+  @override
+  String get enum_sortField_fileSize => 'Fájlméret';
 
   @override
   String get enum_sortField_lastServiceDate => 'Utolso szerviz';
@@ -13273,6 +13282,21 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_library_filter_clear => 'Szűrők törlése';
+
+  @override
+  String get media_library_filter_any => 'Bármely';
+
+  @override
+  String get media_library_filter_title => 'Média szűrése';
+
+  @override
+  String get media_library_filter_apply => 'Alkalmaz';
+
+  @override
+  String get media_library_sort_title => 'Média rendezése';
+
+  @override
+  String get media_smartAlbum_load => 'Album betöltése';
 
   @override
   String get media_divePicker_title => 'Áthelyezés merüléshez';

@@ -9846,6 +9846,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_sortField_dateIssued => 'תאריך הנפקה';
 
   @override
+  String get enum_sortField_dateTaken => 'תאריך הצילום';
+
+  @override
   String get enum_sortField_difficulty => 'רמת קושי';
 
   @override
@@ -9859,6 +9862,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'תאריך סיום';
+
+  @override
+  String get enum_sortField_fileName => 'שם הקובץ';
+
+  @override
+  String get enum_sortField_fileSize => 'גודל הקובץ';
 
   @override
   String get enum_sortField_lastServiceDate => 'טיפול אחרון';
@@ -12988,6 +12997,21 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_library_filter_clear => 'ניקוי מסננים';
+
+  @override
+  String get media_library_filter_any => 'הכול';
+
+  @override
+  String get media_library_filter_title => 'סינון מדיה';
+
+  @override
+  String get media_library_filter_apply => 'החל';
+
+  @override
+  String get media_library_sort_title => 'מיון מדיה';
+
+  @override
+  String get media_smartAlbum_load => 'טעינת אלבום';
 
   @override
   String get media_divePicker_title => 'העברה לצלילה';

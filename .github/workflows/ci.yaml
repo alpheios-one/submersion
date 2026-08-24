@@ -691,7 +691,7 @@ jobs:
             macos/Runner.xcodeproj/project.pbxproj
 
           # Build with Flutter
-          flutter build macos --release "${{ env.DART_DEFINES }}"
+          flutter build macos --release "${{ env.DART_DEFINES }}" "--dart-define=GOOGLE_DRIVE_CLIENT_SECRET=${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}"
 
           # Re-sign with ad-hoc signature and no-sandbox entitlements
           codesign --force --deep --sign - \
@@ -928,7 +928,7 @@ jobs:
         run: tar -xzf generated-code.tar.gz
 
       - name: Build Linux
-        run: flutter build linux --release "${{ env.DART_DEFINES }}" -v
+        run: flutter build linux --release "${{ env.DART_DEFINES }}" "--dart-define=GOOGLE_DRIVE_CLIENT_SECRET=${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}" -v
 
       - name: Check bundled native assets
         # Same guard as the Windows job. Linux uses the stock Flutter install
@@ -1010,7 +1010,7 @@ jobs:
         run: tar -xzf generated-code.tar.gz
 
       - name: Build Windows
-        run: flutter build windows --release "${{ env.DART_DEFINES }}" -v
+        run: flutter build windows --release "${{ env.DART_DEFINES }}" "--dart-define=GOOGLE_DRIVE_CLIENT_SECRET=${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}" -v
 
       - name: Check bundled native assets
         # A Windows build that never bundles sqlcipher.dll still compiles,

@@ -154,12 +154,18 @@ class MediaLibraryFilter {
   );
 }
 
-/// Keyset cursor: the sort key (epoch millis of COALESCE(taken_at,
-/// created_at)) and row id of the last entry on the previous page.
+/// Keyset cursor: the last entry's value for the active sort key, plus its
+/// row id as the tiebreaker.
+///
+/// [sortKey] is an int for the date and size fields and a String for the name
+/// field. It is always non-null: the repository coalesces every sort
+/// expression, because a NULL key makes the keyset predicate (`key < ?`)
+/// evaluate to NULL, which is falsy, and silently truncates the result set at
+/// the first NULL row.
 class MediaLibraryCursor {
   const MediaLibraryCursor({required this.sortKey, required this.id});
 
-  final int sortKey;
+  final Object sortKey;
   final String id;
 }
 

@@ -10080,6 +10080,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Fecha de emisión';
 
   @override
+  String get enum_sortField_dateTaken => 'Fecha de captura';
+
+  @override
   String get enum_sortField_difficulty => 'Dificultad';
 
   @override
@@ -10093,6 +10096,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'Fecha de fin';
+
+  @override
+  String get enum_sortField_fileName => 'Nombre de archivo';
+
+  @override
+  String get enum_sortField_fileSize => 'Tamaño de archivo';
 
   @override
   String get enum_sortField_lastServiceDate => 'Último servicio';
@@ -13301,6 +13310,21 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_library_filter_clear => 'Borrar filtros';
+
+  @override
+  String get media_library_filter_any => 'Cualquiera';
+
+  @override
+  String get media_library_filter_title => 'Filtrar medios';
+
+  @override
+  String get media_library_filter_apply => 'Aplicar';
+
+  @override
+  String get media_library_sort_title => 'Ordenar medios';
+
+  @override
+  String get media_smartAlbum_load => 'Cargar álbum';
 
   @override
   String get media_divePicker_title => 'Mover a una inmersión';
