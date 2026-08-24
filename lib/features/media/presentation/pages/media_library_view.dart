@@ -11,11 +11,13 @@ import 'package:submersion/features/media/presentation/widgets/media_library_act
 import 'package:submersion/features/media/presentation/widgets/media_library_toolbar.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_grouped_list.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_groupers.dart';
+import 'package:submersion/features/media/presentation/widgets/media_missing_banner.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The Library section content: the filter and sort toolbar, the active
-/// filter chips, then the active view mode. The by-dive and timeline
-/// presentations reuse the same paged state.
+/// filter chips, the repair banner while the Missing files facet is active,
+/// then the active view mode. The by-dive and timeline presentations reuse
+/// the same paged state.
 class MediaLibraryView extends ConsumerWidget {
   const MediaLibraryView({super.key});
 
@@ -41,6 +43,9 @@ class MediaLibraryView extends ConsumerWidget {
     final state = ref.watch(mediaLibraryNotifierProvider);
     final mode = ref.watch(mediaLibraryViewModeProvider);
     final selection = ref.watch(mediaSelectionProvider);
+    final showingMissing =
+        ref.watch(mediaLibraryFilterProvider).health ==
+        MediaHealthFilter.missing;
 
     return Column(
       children: [
@@ -56,7 +61,8 @@ class MediaLibraryView extends ConsumerWidget {
           child: MediaLibraryToolbar(),
         ),
         const MediaLibraryActiveFilterChips(),
-        Expanded(child: _buildBody(context, ref, state, mode)),
+        if (showingMissing) MediaMissingBanner(isEmpty: state.entries.isEmpty),
+        Expanded(child: _buildBody(context, ref, state, mode, showingMissing)),
       ],
     );
   }
@@ -66,12 +72,19 @@ class MediaLibraryView extends ConsumerWidget {
     WidgetRef ref,
     MediaLibraryState state,
     MediaLibraryViewMode mode,
+    bool showingMissing,
   ) {
     if (state.isLoading && state.entries.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.entries.isEmpty) {
-      return Center(child: Text(context.l10n.media_library_empty));
+      return Center(
+        child: Text(
+          showingMissing
+              ? context.l10n.media_missing_empty
+              : context.l10n.media_library_empty,
+        ),
+      );
     }
     void loadMore() =>
         ref.read(mediaLibraryNotifierProvider.notifier).loadMore();

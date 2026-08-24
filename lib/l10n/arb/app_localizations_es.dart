@@ -12509,8 +12509,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'Los elementos seleccionados se quitarán de este punto de buceo. Los archivos de tu fototeca o del disco no se eliminan.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Elimina $count elementos de tu biblioteca, junto con sus copias en la nube y miniaturas. Los medios que un buceo todavía usa se conservan. Tus archivos originales no se ven afectados.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
@@ -13064,8 +13065,47 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_import_launch => 'Importar contenido...';
 
   @override
+  String get media_import_review_title => 'Revisar importación';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Importar $count elementos';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked vinculados, $skipped omitidos, $failed fallidos';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Elegir sitio';
+
+  @override
+  String get media_import_review_ambiguous => 'Varios buceos coinciden';
+
+  @override
+  String get media_import_review_noMatch => 'Ningún buceo coincide';
+
+  @override
+  String get media_import_review_skipped => 'No importado';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Vincular a #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Vincular a una inmersión';
+
+  @override
+  String get media_import_review_linkToSite => 'Vincular a un sitio';
+
+  @override
+  String get media_import_review_chooseDive => 'Elegir inmersión';
+
+  @override
   String get media_import_intro =>
-      'El contenido importado se conserva en su biblioteca y puede vincularse a las inmersiones automáticamente.';
+      'Las fotos se vinculan a un buceo o a un sitio de buceo al importarlas.';
 
   @override
   String get media_console_sources => 'Orígenes';
@@ -13178,9 +13218,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Faltantes';
-
-  @override
   String get media_missing_empty => 'No hay archivos faltantes';
 
   @override
@@ -13243,45 +13280,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Sin vincular';
-
-  @override
-  String get media_import_linkTitle => 'Vincular contenido importado';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'Vincular $count elementos';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Permanece sin vincular';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count elementos vinculados';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Elegir inmersión';
-
-  @override
-  String get media_inbox_empty => 'No hay contenido multimedia sin vincular';
-
-  @override
-  String get media_inbox_keep => 'Conservar';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Vincular a #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Vincular a una inmersión';
-
-  @override
-  String get media_inbox_linkToSite => 'Vincular a un sitio';
-
-  @override
   String get media_library_empty => 'Todavía no hay contenido multimedia';
 
   @override
@@ -13301,6 +13299,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'Fechas';
+
+  @override
+  String get media_library_filter_missing => 'Archivos faltantes';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Archivos faltantes ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'Borrar filtros';

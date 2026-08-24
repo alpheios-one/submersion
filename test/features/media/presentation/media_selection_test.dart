@@ -104,6 +104,22 @@ class _RecordingMediaRepo implements MediaRepository {
     ],
   );
 
+  /// Ids the site partition should report as still needed by a dive.
+  final Set<String> diveLinkedIds = {};
+
+  @override
+  Future<({List<String> deletable, List<String> diveLinked})>
+  partitionForSiteUnlink(List<String> mediaIds) async => (
+    deletable: [
+      for (final id in mediaIds)
+        if (!diveLinkedIds.contains(id)) id,
+    ],
+    diveLinked: [
+      for (final id in mediaIds)
+        if (diveLinkedIds.contains(id)) id,
+    ],
+  );
+
   @override
   Future<Set<String>> idsWithUserMetadata(List<String> mediaIds) async =>
       mediaIds.where(withUserMetadata.contains).toSet();
@@ -347,11 +363,37 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Unlink from site'), findsOneWidget);
 
-      // Only the site-linked id is sent: unlinkFromSite latches
-      // retainInLibrary, which would permanently un-sweep 'a' otherwise.
+      // Only the site-linked id reaches the service, and with no dive
+      // holding it the row leaves the library rather than lingering
+      // unlinked.
       await tester.tap(find.text('Unlink from site'));
       await tester.pumpAndSettle();
-      expect(mediaRepo.unlinkedFromSite.toSet(), {'b'});
+      expect(coordinator.deleted, ['b']);
+      expect(mediaRepo.unlinkedFromSite, isEmpty);
+    });
+
+    testWidgets('Unlink from site warns before discarding details', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host([entry('b', siteId: 's1')]));
+      await tester.pumpAndSettle();
+      mediaRepo.withUserMetadata.add('b');
+
+      await tester.longPress(find.byType(MediaLibraryTile).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Unlink from site'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Unlink and discard details?'), findsOneWidget);
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text('Unlink'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(coordinator.deleted, ['b']);
     });
 
     testWidgets('Unlink sends only the dive-linked ids', (tester) async {

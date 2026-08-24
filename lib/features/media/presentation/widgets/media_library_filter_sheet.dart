@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_smart_album_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_filter_labels.dart';
@@ -24,9 +25,9 @@ Future<void> showMediaLibraryFilterSheet(BuildContext context) {
 /// SiteFilterSheet pattern: local state previews the change and nothing
 /// reaches the provider until Apply.
 ///
-/// Owns four facets: media type, site, trip, and date range. It deliberately
-/// does NOT own sourceType or health, which other console sections set
-/// programmatically, and which Apply preserves.
+/// Owns five facets: media type, site, trip, date range, and the missing
+/// files health facet. It deliberately does NOT own sourceType, which the
+/// Sources section sets programmatically and which Apply preserves.
 class MediaLibraryFilterSheet extends ConsumerStatefulWidget {
   const MediaLibraryFilterSheet({super.key});
 
@@ -42,6 +43,7 @@ class _MediaLibraryFilterSheetState
   String? _tripId;
   DateTime? _fromDate;
   DateTime? _toDate;
+  bool _missingOnly = false;
 
   @override
   void initState() {
@@ -52,6 +54,7 @@ class _MediaLibraryFilterSheetState
     _tripId = filter.tripId;
     _fromDate = filter.fromDate;
     _toDate = filter.toDate;
+    _missingOnly = filter.health == MediaHealthFilter.missing;
   }
 
   void _clearAll() {
@@ -61,6 +64,7 @@ class _MediaLibraryFilterSheetState
       _tripId = null;
       _fromDate = null;
       _toDate = null;
+      _missingOnly = false;
     });
   }
 
@@ -76,6 +80,7 @@ class _MediaLibraryFilterSheetState
       tripId: _tripId,
       fromDate: _fromDate,
       toDate: _toDate,
+      health: _missingOnly ? MediaHealthFilter.missing : null,
     );
     Navigator.of(context).pop();
   }
@@ -163,6 +168,8 @@ class _MediaLibraryFilterSheetState
                     _tripId = album.filter.tripId;
                     _fromDate = album.filter.fromDate;
                     _toDate = album.filter.toDate;
+                    _missingOnly =
+                        album.filter.health == MediaHealthFilter.missing;
                   });
                 },
               ),
@@ -193,6 +200,7 @@ class _MediaLibraryFilterSheetState
     final sites = ref.watch(sitesProvider).value ?? const [];
     final trips = ref.watch(allTripsProvider).value ?? const [];
     final albums = ref.watch(mediaSmartAlbumsProvider).value ?? const [];
+    final missingCount = ref.watch(missingCountProvider).value ?? 0;
 
     final siteName = _siteId == null
         ? null
@@ -328,6 +336,23 @@ class _MediaLibraryFilterSheetState
                         ),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: _pickDates,
+                      ),
+                      const Divider(height: 32),
+                      // The one health facet: rows whose backing file is
+                      // gone. The count in the title is what used to be the
+                      // Missing section's sidebar badge.
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        secondary: const Icon(Icons.warning_amber_outlined),
+                        title: Text(
+                          missingCount == 0
+                              ? l10n.media_library_filter_missing
+                              : l10n.media_library_filter_missingCount(
+                                  missingCount,
+                                ),
+                        ),
+                        value: _missingOnly,
+                        onChanged: (on) => setState(() => _missingOnly = on),
                       ),
                     ],
                   ),

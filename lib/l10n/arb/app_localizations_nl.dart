@@ -12430,8 +12430,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'De geselecteerde items worden van deze duikstek verwijderd. Bestanden in je fotobibliotheek of op schijf worden niet gewist.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Verwijdert $count items uit je bibliotheek, inclusief cloudkopieën en miniaturen. Media die een duik nog gebruikt, blijven bewaard. Je originele bestanden blijven onaangetast.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
@@ -12979,8 +12980,47 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_import_launch => 'Media importeren...';
 
   @override
+  String get media_import_review_title => 'Import controleren';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return '$count items importeren';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked gekoppeld, $skipped overgeslagen, $failed mislukt';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Site kiezen';
+
+  @override
+  String get media_import_review_ambiguous => 'Meerdere duiken komen overeen';
+
+  @override
+  String get media_import_review_noMatch => 'Geen overeenkomende duik';
+
+  @override
+  String get media_import_review_skipped => 'Niet geïmporteerd';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Koppelen aan #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Aan duik koppelen';
+
+  @override
+  String get media_import_review_linkToSite => 'Aan duikstek koppelen';
+
+  @override
+  String get media_import_review_chooseDive => 'Duik kiezen';
+
+  @override
   String get media_import_intro =>
-      'Geïmporteerde media blijft in je bibliotheek en kan automatisch aan duiken worden gekoppeld.';
+      'Foto\'s worden tijdens het importeren aan een duik of duiksite gekoppeld.';
 
   @override
   String get media_console_sources => 'Bronnen';
@@ -13093,9 +13133,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Ontbrekend';
-
-  @override
   String get media_missing_empty => 'Geen ontbrekende bestanden';
 
   @override
@@ -13158,45 +13195,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Niet gekoppeld';
-
-  @override
-  String get media_import_linkTitle => 'Geïmporteerde media koppelen';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return '$count items koppelen';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Blijft bij Niet gekoppeld';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count items gekoppeld';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Duik kiezen';
-
-  @override
-  String get media_inbox_empty => 'Geen niet-gekoppelde media';
-
-  @override
-  String get media_inbox_keep => 'Behouden';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Koppelen aan #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Aan duik koppelen';
-
-  @override
-  String get media_inbox_linkToSite => 'Aan duikstek koppelen';
-
-  @override
   String get media_library_empty => 'Nog geen media';
 
   @override
@@ -13216,6 +13214,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'Datums';
+
+  @override
+  String get media_library_filter_missing => 'Ontbrekende bestanden';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Ontbrekende bestanden ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'Filters wissen';

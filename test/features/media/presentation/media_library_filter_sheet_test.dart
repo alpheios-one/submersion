@@ -30,6 +30,7 @@ void main() {
       overrides: [
         sitesProvider.overrideWith((ref) async => [site]),
         allTripsProvider.overrideWith((ref) async => [trip]),
+        missingCountProvider.overrideWith((ref) async => 3),
       ],
     );
     addTearDown(container.dispose);
@@ -148,5 +149,38 @@ void main() {
     final filter = container.read(mediaLibraryFilterProvider);
     expect(filter.mediaType, isNull);
     expect(filter.siteId, isNull);
+  });
+
+  testWidgets('Missing files drafts the health facet and writes it on Apply', (
+    tester,
+  ) async {
+    await openSheet(tester);
+
+    // The count rides in the title, where the Missing section's sidebar
+    // badge used to be.
+    expect(find.text('Missing files (3)'), findsOneWidget);
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pumpAndSettle();
+    expect(container.read(mediaLibraryFilterProvider).health, isNull);
+
+    await tester.tap(find.text('Apply'));
+    await tester.pumpAndSettle();
+    expect(
+      container.read(mediaLibraryFilterProvider).health,
+      MediaHealthFilter.missing,
+    );
+  });
+
+  testWidgets('Clear All also drops the health facet', (tester) async {
+    container.read(mediaLibraryFilterProvider.notifier).state =
+        const MediaLibraryFilter(health: MediaHealthFilter.missing);
+    await openSheet(tester);
+
+    await tester.tap(find.text('Clear All'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Apply'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(mediaLibraryFilterProvider).health, isNull);
   });
 }

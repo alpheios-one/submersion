@@ -119,4 +119,16 @@ void main() {
 
     expect(container.read(mediaLibraryFilterProvider).isEmpty, isTrue);
   });
+
+  testWidgets('the missing files facet gets a removable chip', (tester) async {
+    container.read(mediaLibraryFilterProvider.notifier).state =
+        const MediaLibraryFilter(health: MediaHealthFilter.missing);
+    await pump(tester);
+
+    expect(find.text('Missing files'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.clear).first);
+    await tester.pumpAndSettle();
+
+    expect(container.read(mediaLibraryFilterProvider).health, isNull);
+  });
 }

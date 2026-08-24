@@ -12483,8 +12483,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'A kijelölt elemek eltávolításra kerülnek erről a merülőhelyről. A fotókönyvtárban vagy a lemezen lévő fájlok nem törlődnek.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Eltávolít $count elemet a könyvtárból, a felhőmásolatokkal és bélyegképekkel együtt. A merülés által még használt médiák megmaradnak. Az eredeti fájlok nem változnak.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
@@ -13036,8 +13037,47 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_import_launch => 'Média importálása...';
 
   @override
+  String get media_import_review_title => 'Importálás ellenőrzése';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return '$count elem importálása';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked összekapcsolva, $skipped kihagyva, $failed sikertelen';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Merülőhely kiválasztása';
+
+  @override
+  String get media_import_review_ambiguous => 'Több merülés is egyezik';
+
+  @override
+  String get media_import_review_noMatch => 'Nincs egyező merülés';
+
+  @override
+  String get media_import_review_skipped => 'Nincs importálva';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Csatolás: #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Csatolás merüléshez';
+
+  @override
+  String get media_import_review_linkToSite => 'Csatolás merülőhelyhez';
+
+  @override
+  String get media_import_review_chooseDive => 'Merülés kiválasztása';
+
+  @override
   String get media_import_intro =>
-      'Az importált média a könyvtáradban marad, és automatikusan csatolható a merülésekhez.';
+      'A fotók importáláskor egy merüléshez vagy merülőhelyhez kapcsolódnak.';
 
   @override
   String get media_console_sources => 'Források';
@@ -13150,9 +13190,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Hiányzó';
-
-  @override
   String get media_missing_empty => 'Nincs hiányzó fájl';
 
   @override
@@ -13215,45 +13252,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Nem csatolt';
-
-  @override
-  String get media_import_linkTitle => 'Importált média csatolása';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return '$count elem csatolása';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'A Nem csatolt között marad';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count elem csatolva';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Merülés kiválasztása';
-
-  @override
-  String get media_inbox_empty => 'Nincs nem csatolt média';
-
-  @override
-  String get media_inbox_keep => 'Megtartás';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Csatolás: #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Csatolás merüléshez';
-
-  @override
-  String get media_inbox_linkToSite => 'Csatolás merülőhelyhez';
-
-  @override
   String get media_library_empty => 'Még nincs média';
 
   @override
@@ -13273,6 +13271,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'Dátumok';
+
+  @override
+  String get media_library_filter_missing => 'Hiányzó fájlok';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Hiányzó fájlok ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'Szűrők törlése';

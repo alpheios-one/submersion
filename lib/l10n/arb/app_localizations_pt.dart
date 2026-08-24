@@ -12521,8 +12521,9 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'Os itens selecionados serão removidos deste ponto de mergulho. Os arquivos na sua galeria ou no disco não são excluídos.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Remove $count itens da sua biblioteca, junto com as cópias na nuvem e miniaturas. Mídias que um mergulho ainda usa são mantidas. Seus arquivos originais não são afetados.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
@@ -13076,8 +13077,47 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_import_launch => 'Importar mídia...';
 
   @override
+  String get media_import_review_title => 'Revisar importação';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Importar $count itens';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked vinculados, $skipped ignorados, $failed com falha';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Escolher local';
+
+  @override
+  String get media_import_review_ambiguous => 'Vários mergulhos correspondem';
+
+  @override
+  String get media_import_review_noMatch => 'Nenhum mergulho correspondente';
+
+  @override
+  String get media_import_review_skipped => 'Não importado';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Vincular a #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Vincular a um mergulho';
+
+  @override
+  String get media_import_review_linkToSite => 'Vincular a um ponto';
+
+  @override
+  String get media_import_review_chooseDive => 'Escolher mergulho';
+
+  @override
   String get media_import_intro =>
-      'A mídia importada fica na sua biblioteca e pode ser vinculada aos mergulhos automaticamente.';
+      'As fotos são vinculadas a um mergulho ou ponto de mergulho ao importar.';
 
   @override
   String get media_console_sources => 'Origens';
@@ -13192,9 +13232,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Ausentes';
-
-  @override
   String get media_missing_empty => 'Nenhum arquivo ausente';
 
   @override
@@ -13257,45 +13294,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Sem vínculo';
-
-  @override
-  String get media_import_linkTitle => 'Vincular mídia importada';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'Vincular $count itens';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Permanece sem vínculo';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count itens vinculados';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Escolher mergulho';
-
-  @override
-  String get media_inbox_empty => 'Nenhuma mídia sem vínculo';
-
-  @override
-  String get media_inbox_keep => 'Manter';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Vincular a #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Vincular a um mergulho';
-
-  @override
-  String get media_inbox_linkToSite => 'Vincular a um ponto';
-
-  @override
   String get media_library_empty => 'Nenhuma mídia ainda';
 
   @override
@@ -13315,6 +13313,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'Datas';
+
+  @override
+  String get media_library_filter_missing => 'Arquivos ausentes';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Arquivos ausentes ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'Limpar filtros';

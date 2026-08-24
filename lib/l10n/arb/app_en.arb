@@ -7091,7 +7091,16 @@
   "media_siteMediaSection_divePhotosGroup": "Photos from dives here ({count})",
   "media_siteMediaSection_divePhotoLabel": "Dive photo",
   "media_siteMediaSection_unlinkSelectedTitle": "Remove {count} attachments?",
-  "media_siteMediaSection_unlinkSelectedContent": "The selected items will be removed from this site. Files in your photo library or on disk are not deleted.",
+  "media_siteMediaSection_unlinkSelectedContent": "Removes {count} items from your library, along with their cloud copies and thumbnails. Media a dive still uses is kept. Your original files are not affected.",
+  "@media_siteMediaSection_unlinkSelectedContent": {
+    "description": "Site page unlink confirmation body",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
   "media_siteMediaSection_unlinkSelectedSuccess": "Removed {count} attachments",
   "media_documentViewer_title": "Document",
   "media_documentViewer_unavailable": "This document is not available on this device",
@@ -7512,7 +7521,83 @@
   "@media_import_launch": {
     "description": "Import section: open the picker"
   },
-  "media_import_intro": "Imported media is kept in your library and can be linked to dives automatically.",
+  "media_import_review_title": "Review import",
+  "@media_import_review_title": {
+    "description": "App bar title of the pre-import review"
+  },
+  "media_import_review_confirm": "Import {count} items",
+  "@media_import_review_confirm": {
+    "description": "Confirm button of the pre-import review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_import_review_result": "{linked} linked, {skipped} skipped, {failed} failed",
+  "@media_import_review_result": {
+    "description": "Snackbar after the review imports",
+    "placeholders": {
+      "linked": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "media_import_review_chooseSite": "Choose site",
+  "@media_import_review_chooseSite": {
+    "description": "Review row menu: attach to a dive site"
+  },
+  "media_import_review_ambiguous": "Several dives match",
+  "@media_import_review_ambiguous": {
+    "description": "Review row subtitle when several dives match the timestamp"
+  },
+  "media_import_review_noMatch": "No matching dive",
+  "@media_import_review_noMatch": {
+    "description": "Review row subtitle when no dive matches the timestamp"
+  },
+  "media_import_review_skipped": "Not imported",
+  "@media_import_review_skipped": {
+    "description": "Review row subtitle for a row the user unchecked"
+  },
+  "media_import_review_linkChip": "Link to #{number}",
+  "@media_import_review_linkChip": {
+    "description": "Review row subtitle for a confident auto-match",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "media_import_review_linkToDive": "Link to dive",
+  "@media_import_review_linkToDive": {
+    "description": "Review row menu: attach to a dive"
+  },
+  "media_import_review_linkToSite": "Link to site",
+  "@media_import_review_linkToSite": {
+    "description": "Review row subtitle when attached to a site"
+  },
+  "media_import_review_chooseDive": "Choose dive",
+  "@media_import_review_chooseDive": {
+    "description": "Review row menu: pick a dive"
+  },
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  "media_import_intro": "Photos are linked to a dive or a dive site as you import them.",
   "@media_import_intro": {
     "description": "Import section intro text"
   },
@@ -7659,10 +7744,6 @@
       "source": { "type": "String" }
     }
   },
-  "media_console_missing": "Missing",
-  "@media_console_missing": {
-    "description": "Media console sidebar/tab label for the missing-files view"
-  },
   "media_missing_empty": "No missing files",
   "@media_missing_empty": {
     "description": "Empty state for the missing-files view"
@@ -7765,65 +7846,6 @@
       }
     }
   },
-  "media_console_unlinked": "Unlinked",
-  "@media_console_unlinked": {
-    "description": "Media console sidebar/tab label for the unlinked inbox"
-  },
-  "media_import_linkTitle": "Link imported media",
-  "@media_import_linkTitle": {
-    "description": "Title of the post-import batch link screen"
-  },
-  "media_import_linkConfirm": "Link {count} items",
-  "@media_import_linkConfirm": {
-    "description": "Confirm button on the post-import batch link screen",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "media_import_staysUnlinked": "Stays in Unlinked",
-  "@media_import_staysUnlinked": {
-    "description": "Row subtitle for imports without a confident dive match"
-  },
-  "media_import_linkedResult": "{count} items linked",
-  "@media_import_linkedResult": {
-    "description": "Snackbar after the batch link applies",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "media_inbox_chooseDive": "Choose dive",
-  "@media_inbox_chooseDive": {
-    "description": "Inbox chip for an ambiguous auto-match"
-  },
-  "media_inbox_empty": "No unlinked media",
-  "@media_inbox_empty": {
-    "description": "Empty state for the unlinked inbox"
-  },
-  "media_inbox_keep": "Keep",
-  "@media_inbox_keep": {
-    "description": "Inbox action: keep the item in the library unlinked"
-  },
-  "media_inbox_linkChip": "Link to #{number}",
-  "@media_inbox_linkChip": {
-    "description": "Inbox chip for a confident auto-match",
-    "placeholders": {
-      "number": {
-        "type": "int"
-      }
-    }
-  },
-  "media_inbox_linkToDive": "Link to dive",
-  "@media_inbox_linkToDive": {
-    "description": "Inbox menu action: pick a dive manually"
-  },
-  "media_inbox_linkToSite": "Link to site",
-  "@media_inbox_linkToSite": {
-    "description": "Inbox menu action: pick a site manually"
-  },
   "media_library_empty": "No media yet",
   "@media_library_empty": {
     "description": "Empty state for the media library"
@@ -7852,6 +7874,21 @@
   "@media_library_filter_dates": {
     "description": "Library filter chip: pick a date range"
   },
+  "media_library_filter_missing": "Missing files",
+  "@media_library_filter_missing": {
+    "description": "Library filter chip: rows whose backing file is missing"
+  },
+  "media_library_filter_missingCount": "Missing files ({count})",
+  "@media_library_filter_missingCount": {
+    "description": "Library filter chip with the missing-file count",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  
   "media_library_filter_clear": "Clear filters",
   "media_library_filter_any": "Any",
   "@media_library_filter_any": {

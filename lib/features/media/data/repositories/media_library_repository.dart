@@ -13,10 +13,6 @@ import 'package:submersion/features/media/domain/entities/media_library_filter.d
 import 'package:submersion/features/media/domain/entities/media_library_sort.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 
-/// Source types that live at library level by design (subscription feeds and
-/// URL media): they are never "unlinked" problems and never orphan-swept.
-const List<String> kLibraryLevelSourceTypes = ['networkUrl', 'manifestEntry'];
-
 /// Paginated, filtered, cross-dive media reads for the Media section.
 ///
 /// Deliberately separate from MediaRepository (per-dive CRUD): this class
@@ -107,12 +103,6 @@ class MediaLibraryRepository {
     switch (filter.health) {
       case MediaHealthFilter.missing:
         where = where & m.isOrphaned.equals(true);
-      case MediaHealthFilter.unlinked:
-        where =
-            where &
-            m.diveId.isNull() &
-            m.siteId.isNull() &
-            m.sourceType.isNotIn(kLibraryLevelSourceTypes);
       case null:
         break;
     }
@@ -260,21 +250,6 @@ class MediaLibraryRepository {
       );
       rethrow;
     }
-  }
-
-  /// Rows attached to neither a dive nor a site, excluding signatures and
-  /// library-level source types. Backs the Unlinked sidebar badge.
-  Future<int> countUnlinked() async {
-    final m = _db.media;
-    final count = countAll(
-      filter:
-          m.diveId.isNull() &
-          m.siteId.isNull() &
-          _notSignature &
-          m.sourceType.isNotIn(kLibraryLevelSourceTypes),
-    );
-    final row = await (_db.selectOnly(m)..addColumns([count])).getSingle();
-    return row.read(count) ?? 0;
   }
 
   /// How many library rows each source type holds (Media section Phase 5's

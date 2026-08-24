@@ -12523,8 +12523,9 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'Gli elementi selezionati verranno rimossi da questo sito. I file nella libreria foto o su disco non vengono eliminati.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Rimuove $count elementi dalla libreria, insieme alle copie cloud e alle miniature. I media ancora usati da un\'immersione vengono conservati. I file originali non vengono toccati.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
@@ -13079,8 +13080,47 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_import_launch => 'Importa contenuti...';
 
   @override
+  String get media_import_review_title => 'Rivedi importazione';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Importa $count elementi';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked collegati, $skipped saltati, $failed falliti';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Scegli sito';
+
+  @override
+  String get media_import_review_ambiguous => 'Più immersioni corrispondono';
+
+  @override
+  String get media_import_review_noMatch => 'Nessuna immersione corrispondente';
+
+  @override
+  String get media_import_review_skipped => 'Non importato';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Collega a #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Collega a un\'immersione';
+
+  @override
+  String get media_import_review_linkToSite => 'Collega a un sito';
+
+  @override
+  String get media_import_review_chooseDive => 'Scegli immersione';
+
+  @override
   String get media_import_intro =>
-      'I contenuti importati restano nella tua libreria e possono essere collegati automaticamente alle immersioni.';
+      'Le foto vengono collegate a un\'immersione o a un sito durante l\'importazione.';
 
   @override
   String get media_console_sources => 'Origini';
@@ -13193,9 +13233,6 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Mancanti';
-
-  @override
   String get media_missing_empty => 'Nessun file mancante';
 
   @override
@@ -13258,45 +13295,6 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Non collegati';
-
-  @override
-  String get media_import_linkTitle => 'Collega i contenuti importati';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'Collega $count elementi';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Resta tra i non collegati';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count elementi collegati';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Scegli immersione';
-
-  @override
-  String get media_inbox_empty => 'Nessun contenuto multimediale non collegato';
-
-  @override
-  String get media_inbox_keep => 'Mantieni';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Collega a #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Collega a un\'immersione';
-
-  @override
-  String get media_inbox_linkToSite => 'Collega a un sito';
-
-  @override
   String get media_library_empty => 'Ancora nessun contenuto multimediale';
 
   @override
@@ -13316,6 +13314,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'Date';
+
+  @override
+  String get media_library_filter_missing => 'File mancanti';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'File mancanti ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'Cancella filtri';

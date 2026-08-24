@@ -12508,8 +12508,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'Die ausgewählten Elemente werden von diesem Tauchplatz entfernt. Dateien in deiner Fotobibliothek oder auf der Festplatte werden nicht gelöscht.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Entfernt $count Elemente aus Ihrer Bibliothek, einschließlich Cloud-Kopien und Vorschaubildern. Medien, die ein Tauchgang noch verwendet, bleiben erhalten. Ihre Originaldateien sind nicht betroffen.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
@@ -13067,8 +13068,47 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_import_launch => 'Medien importieren...';
 
   @override
+  String get media_import_review_title => 'Import prüfen';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return '$count Elemente importieren';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked verknüpft, $skipped übersprungen, $failed fehlgeschlagen';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Tauchplatz wählen';
+
+  @override
+  String get media_import_review_ambiguous => 'Mehrere Tauchgänge passen';
+
+  @override
+  String get media_import_review_noMatch => 'Kein passender Tauchgang';
+
+  @override
+  String get media_import_review_skipped => 'Nicht importiert';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Mit #$number verknüpfen';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Mit Tauchgang verknüpfen';
+
+  @override
+  String get media_import_review_linkToSite => 'Mit Tauchplatz verknüpfen';
+
+  @override
+  String get media_import_review_chooseDive => 'Tauchgang wählen';
+
+  @override
   String get media_import_intro =>
-      'Importierte Medien bleiben in Ihrer Bibliothek und können automatisch mit Tauchgängen verknüpft werden.';
+      'Fotos werden beim Import mit einem Tauchgang oder Tauchplatz verknüpft.';
 
   @override
   String get media_console_sources => 'Quellen';
@@ -13182,9 +13222,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Fehlend';
-
-  @override
   String get media_missing_empty => 'Keine fehlenden Dateien';
 
   @override
@@ -13247,45 +13284,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Nicht verknüpft';
-
-  @override
-  String get media_import_linkTitle => 'Importierte Medien verknüpfen';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return '$count Elemente verknüpfen';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Bleibt unter Nicht verknüpft';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count Elemente verknüpft';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Tauchgang wählen';
-
-  @override
-  String get media_inbox_empty => 'Keine nicht verknüpften Medien';
-
-  @override
-  String get media_inbox_keep => 'Behalten';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Mit #$number verknüpfen';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Mit Tauchgang verknüpfen';
-
-  @override
-  String get media_inbox_linkToSite => 'Mit Tauchplatz verknüpfen';
-
-  @override
   String get media_library_empty => 'Noch keine Medien';
 
   @override
@@ -13305,6 +13303,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'Zeitraum';
+
+  @override
+  String get media_library_filter_missing => 'Fehlende Dateien';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Fehlende Dateien ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'Filter zurücksetzen';

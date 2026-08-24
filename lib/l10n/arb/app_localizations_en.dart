@@ -12313,8 +12313,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Removes $count items from your library, along with their cloud copies and thumbnails. Media a dive still uses is kept. Your original files are not affected.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
@@ -12861,8 +12862,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_import_launch => 'Import media...';
 
   @override
+  String get media_import_review_title => 'Review import';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Import $count items';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked linked, $skipped skipped, $failed failed';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Choose site';
+
+  @override
+  String get media_import_review_ambiguous => 'Several dives match';
+
+  @override
+  String get media_import_review_noMatch => 'No matching dive';
+
+  @override
+  String get media_import_review_skipped => 'Not imported';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Link to #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Link to dive';
+
+  @override
+  String get media_import_review_linkToSite => 'Link to site';
+
+  @override
+  String get media_import_review_chooseDive => 'Choose dive';
+
+  @override
   String get media_import_intro =>
-      'Imported media is kept in your library and can be linked to dives automatically.';
+      'Photos are linked to a dive or a dive site as you import them.';
 
   @override
   String get media_console_sources => 'Sources';
@@ -12973,9 +13013,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Missing';
-
-  @override
   String get media_missing_empty => 'No missing files';
 
   @override
@@ -13038,45 +13075,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Unlinked';
-
-  @override
-  String get media_import_linkTitle => 'Link imported media';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'Link $count items';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Stays in Unlinked';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count items linked';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Choose dive';
-
-  @override
-  String get media_inbox_empty => 'No unlinked media';
-
-  @override
-  String get media_inbox_keep => 'Keep';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Link to #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Link to dive';
-
-  @override
-  String get media_inbox_linkToSite => 'Link to site';
-
-  @override
   String get media_library_empty => 'No media yet';
 
   @override
@@ -13096,6 +13094,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'Dates';
+
+  @override
+  String get media_library_filter_missing => 'Missing files';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Missing files ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'Clear filters';

@@ -5,6 +5,7 @@ import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/data/repositories/media_library_repository.dart';
+import 'package:submersion/features/media/data/services/volume_status.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_sort_provider.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
@@ -186,16 +187,36 @@ class MediaLibraryNotifier extends StateNotifier<MediaLibraryState> {
   }
 }
 
-/// Unlinked-media count for the console badge (Phase 2 section).
-final unlinkedCountProvider = FutureProvider<int>((ref) async {
-  final repo = ref.watch(mediaLibraryRepositoryProvider);
-  ref.invalidateSelfWhen(repo.watchMediaChanges());
-  return repo.countUnlinked();
-});
-
-/// Missing-files count for the console badge (Phase 3 section).
+/// Missing-files count for the Library badge and the Missing files chip.
 final missingCountProvider = FutureProvider<int>((ref) async {
   final repo = ref.watch(mediaLibraryRepositoryProvider);
   ref.invalidateSelfWhen(repo.watchMediaChanges());
   return repo.countMissing();
+});
+
+/// Of the rows currently shown by the Missing filter, how many sit on
+/// unmounted volumes (informational: those are offline, not broken, and
+/// the repair wizard skips them). One probe per mount root per pass; a
+/// fresh probe each time the provider recomputes, so remounting is picked
+/// up.
+///
+/// Only the repair banner watches this, and the banner is only mounted
+/// while the Missing files facet is active. autoDispose tears the provider
+/// down when the banner goes, and the facet check below means the volume
+/// probes never run against a page the facet is not filtering.
+final missingOfflineCountProvider = FutureProvider.autoDispose<int>((
+  ref,
+) async {
+  final health = ref.watch(mediaLibraryFilterProvider.select((f) => f.health));
+  if (health != MediaHealthFilter.missing) return 0;
+  final state = ref.watch(mediaLibraryNotifierProvider);
+  final isOnline = VolumeStatus().newPassProbe();
+  var offline = 0;
+  for (final entry in state.entries) {
+    if (!entry.item.isOrphaned) continue;
+    final path = entry.item.localPath ?? entry.item.filePath;
+    if (path == null || path.isEmpty) continue;
+    if (!await isOnline(path)) offline++;
+  }
+  return offline;
 });

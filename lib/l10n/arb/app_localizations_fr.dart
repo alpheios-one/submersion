@@ -12558,8 +12558,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'Les éléments sélectionnés seront retirés de ce site. Les fichiers de votre photothèque ou sur disque ne sont pas supprimés.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Supprime $count éléments de votre bibliothèque, ainsi que leurs copies cloud et vignettes. Les médias encore utilisés par une plongée sont conservés. Vos fichiers d\'origine ne sont pas affectés.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
@@ -13116,8 +13117,48 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_import_launch => 'Importer des médias...';
 
   @override
+  String get media_import_review_title => 'Vérifier l\'import';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Importer $count éléments';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked liés, $skipped ignorés, $failed en échec';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Choisir un site';
+
+  @override
+  String get media_import_review_ambiguous =>
+      'Plusieurs plongées correspondent';
+
+  @override
+  String get media_import_review_noMatch => 'Aucune plongée correspondante';
+
+  @override
+  String get media_import_review_skipped => 'Non importé';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Lier à #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Lier à une plongée';
+
+  @override
+  String get media_import_review_linkToSite => 'Lier à un site';
+
+  @override
+  String get media_import_review_chooseDive => 'Choisir la plongée';
+
+  @override
   String get media_import_intro =>
-      'Les médias importés sont conservés dans votre bibliothèque et peuvent être liés automatiquement aux plongées.';
+      'Les photos sont liées à une plongée ou à un site au moment de l\'import.';
 
   @override
   String get media_console_sources => 'Sources';
@@ -13230,9 +13271,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Manquants';
-
-  @override
   String get media_missing_empty => 'Aucun fichier manquant';
 
   @override
@@ -13295,45 +13333,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Non liés';
-
-  @override
-  String get media_import_linkTitle => 'Lier les médias importés';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'Lier $count éléments';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Reste dans Non liés';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count éléments liés';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Choisir la plongée';
-
-  @override
-  String get media_inbox_empty => 'Aucun média non lié';
-
-  @override
-  String get media_inbox_keep => 'Conserver';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Lier à #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Lier à une plongée';
-
-  @override
-  String get media_inbox_linkToSite => 'Lier à un site';
-
-  @override
   String get media_library_empty => 'Aucun média pour le moment';
 
   @override
@@ -13353,6 +13352,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'Dates';
+
+  @override
+  String get media_library_filter_missing => 'Fichiers manquants';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Fichiers manquants ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'Effacer les filtres';

@@ -16,7 +16,7 @@ void main() {
     l10n.media_siteMediaSection_divePhotosGroup(3),
     l10n.media_siteMediaSection_divePhotoLabel,
     l10n.media_siteMediaSection_unlinkSelectedTitle(2),
-    l10n.media_siteMediaSection_unlinkSelectedContent,
+    l10n.media_siteMediaSection_unlinkSelectedContent(2),
     l10n.media_siteMediaSection_unlinkSelectedSuccess(2),
     l10n.media_documentViewer_title,
     l10n.media_documentViewer_unavailable,

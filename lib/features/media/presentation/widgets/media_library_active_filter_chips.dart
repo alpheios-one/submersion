@@ -112,6 +112,15 @@ class MediaLibraryActiveFilterChips extends ConsumerWidget {
       );
     }
 
+    if (filter.health == MediaHealthFilter.missing) {
+      chips.add(
+        chip(
+          l10n.media_library_filter_missing,
+          () => _update(ref, (f) => f.copyWith(health: null)),
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
       child: Wrap(
