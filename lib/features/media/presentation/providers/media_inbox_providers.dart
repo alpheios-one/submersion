@@ -4,6 +4,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_reposit
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
+import 'package:submersion/features/media/domain/entities/media_library_sort.dart';
 import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
@@ -96,5 +97,8 @@ final unlinkedInboxProvider =
         repo,
         diverId,
         const MediaLibraryFilter(health: MediaHealthFilter.unlinked),
+        // Newest first. The inbox has no sort control of its own; only the
+        // Library section offers one.
+        kDefaultMediaSort,
       );
     });

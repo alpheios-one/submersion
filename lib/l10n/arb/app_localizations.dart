@@ -17168,6 +17168,12 @@ abstract class AppLocalizations {
   /// **'Date Issued'**
   String get enum_sortField_dateIssued;
 
+  /// No description provided for @enum_sortField_dateTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Taken'**
+  String get enum_sortField_dateTaken;
+
   /// No description provided for @enum_sortField_difficulty.
   ///
   /// In en, this message translates to:
@@ -17197,6 +17203,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End Date'**
   String get enum_sortField_endDate;
+
+  /// No description provided for @enum_sortField_fileName.
+  ///
+  /// In en, this message translates to:
+  /// **'File Name'**
+  String get enum_sortField_fileName;
+
+  /// No description provided for @enum_sortField_fileSize.
+  ///
+  /// In en, this message translates to:
+  /// **'File Size'**
+  String get enum_sortField_fileSize;
 
   /// No description provided for @enum_sortField_lastServiceDate.
   ///
@@ -22503,6 +22521,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear filters'**
   String get media_library_filter_clear;
+
+  /// Value shown for a filter facet that is not constrained, e.g. Site: Any
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get media_library_filter_any;
+
+  /// Title of the media library filter sheet, and the filter button's tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Filter media'**
+  String get media_library_filter_title;
+
+  /// Button that applies the drafted media filter
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get media_library_filter_apply;
+
+  /// Title of the media library sort sheet, and the sort button's tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Sort media'**
+  String get media_library_sort_title;
+
+  /// Opens the list of saved smart albums to load one
+  ///
+  /// In en, this message translates to:
+  /// **'Load album'**
+  String get media_smartAlbum_load;
 
   /// Title of the dive picker sheet
   ///

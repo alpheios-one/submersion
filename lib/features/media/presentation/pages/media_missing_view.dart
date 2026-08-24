@@ -4,6 +4,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/data/services/volume_status.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
+import 'package:submersion/features/media/domain/entities/media_library_sort.dart';
 import 'package:submersion/features/media/presentation/pages/media_repair_history_view.dart';
 import 'package:submersion/features/media/presentation/pages/media_repair_wizard_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
@@ -21,6 +22,9 @@ final missingViewProvider =
         repo,
         diverId,
         const MediaLibraryFilter(health: MediaHealthFilter.missing),
+        // Newest first. This list has no sort control of its own; only the
+        // Library section offers one.
+        kDefaultMediaSort,
       );
     });
 

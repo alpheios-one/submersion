@@ -9902,6 +9902,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_sortField_dateIssued => 'تاريخ الإصدار';
 
   @override
+  String get enum_sortField_dateTaken => 'تاريخ الالتقاط';
+
+  @override
   String get enum_sortField_difficulty => 'الصعوبة';
 
   @override
@@ -9915,6 +9918,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'تاريخ الانتهاء';
+
+  @override
+  String get enum_sortField_fileName => 'اسم الملف';
+
+  @override
+  String get enum_sortField_fileSize => 'حجم الملف';
 
   @override
   String get enum_sortField_lastServiceDate => 'آخر صيانة';
@@ -13068,6 +13077,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_library_filter_clear => 'مسح عوامل التصفية';
+
+  @override
+  String get media_library_filter_any => 'أي';
+
+  @override
+  String get media_library_filter_title => 'تصفية الوسائط';
+
+  @override
+  String get media_library_filter_apply => 'تطبيق';
+
+  @override
+  String get media_library_sort_title => 'فرز الوسائط';
+
+  @override
+  String get media_smartAlbum_load => 'تحميل الألبوم';
 
   @override
   String get media_divePicker_title => 'نقل إلى غطسة';

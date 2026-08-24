@@ -10077,6 +10077,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Data de Emissao';
 
   @override
+  String get enum_sortField_dateTaken => 'Data da captura';
+
+  @override
   String get enum_sortField_difficulty => 'Dificuldade';
 
   @override
@@ -10090,6 +10093,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'Data Final';
+
+  @override
+  String get enum_sortField_fileName => 'Nome do arquivo';
+
+  @override
+  String get enum_sortField_fileSize => 'Tamanho do arquivo';
 
   @override
   String get enum_sortField_lastServiceDate => 'Ultima Manutencao';
@@ -13309,6 +13318,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_library_filter_clear => 'Limpar filtros';
+
+  @override
+  String get media_library_filter_any => 'Qualquer';
+
+  @override
+  String get media_library_filter_title => 'Filtrar mídia';
+
+  @override
+  String get media_library_filter_apply => 'Aplicar';
+
+  @override
+  String get media_library_sort_title => 'Ordenar mídia';
+
+  @override
+  String get media_smartAlbum_load => 'Carregar álbum';
 
   @override
   String get media_divePicker_title => 'Mover para um mergulho';
