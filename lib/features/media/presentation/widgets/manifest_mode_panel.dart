@@ -42,6 +42,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/features/media/data/services/network_import_targets.dart';
+import 'package:submersion/features/media/domain/entities/import_candidate.dart';
+import 'package:submersion/features/media/presentation/pages/media_import_review_page.dart';
 import 'package:submersion/features/media/presentation/providers/manifest_tab_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/providers/url_tab_providers.dart';
@@ -78,16 +81,18 @@ class _ManifestModePanelState extends ConsumerState<ManifestModePanel> {
     await notifier.fetch(_urlController.text);
   }
 
-  /// Triggered by the Import button on the preview pane. Drives the
-  /// notifier through `ShowingPreview -> Committing -> Idle` while
-  /// (optionally) creating a `MediaSubscription` row and ingesting the
-  /// manifest entries via [NetworkFetchPipeline.ingestManifestEntries].
+  /// Triggered by the Import button on the preview pane. Resolves the
+  /// entries, lets the user give each one a dive or a site in
+  /// [MediaImportReviewPage], and only then creates the subscription row
+  /// and inserts the decided entries. Drives the notifier through
+  /// `ShowingPreview -> Committing -> Idle` around all of that.
   ///
-  /// Captures the [ScaffoldMessenger] before the await so the snackbar
-  /// fires correctly across the async gap, and bails out via
-  /// `context.mounted` if the user navigated away mid-import.
+  /// Captures the [ScaffoldMessenger] and [Navigator] before the await so
+  /// the snackbar and the pushed review fire correctly across the async
+  /// gap, and bails out via `mounted` if the user navigated away.
   Future<void> _commit() async {
     final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
     String? committedSubscriptionId;
     List<String>? committedMediaIds;
     bool subscriptionPersisted = false;
@@ -96,39 +101,57 @@ class _ManifestModePanelState extends ConsumerState<ManifestModePanel> {
         .read(manifestTabProvider.notifier)
         .commit(
           onCommit: (preview) async {
-            final subRepo = ref.read(manifestSubscriptionRepositoryProvider);
             final pipeline = ref.read(networkFetchPipelineProvider);
-            final format = preview.formatOverride ?? preview.result.format;
-            // Every commit creates a subscription row because the pipeline
-            // requires a non-null subscriptionId (the partial unique index
-            // on `(subscription_id, entry_key)` is keyed off it). When the
-            // user did NOT subscribe, the row is created `isActive: false`
-            // so no future poll cycle will pick it up, and Undo deletes
-            // the row entirely.
-            final created = await subRepo.createSubscription(
-              manifestUrl: preview.url,
-              format: format,
-              pollIntervalSeconds: preview.pollIntervalSeconds,
-              isActive: preview.subscribe,
-            );
-            subscriptionPersisted = preview.subscribe;
-            committedSubscriptionId = created.id;
-            final ids = await pipeline.ingestManifestEntries(
+            final resolved = await pipeline.resolveManifestEntries(
               preview.result.entries,
-              created.id,
             );
-            committedMediaIds = ids;
+            if (!mounted) return;
+            await navigator.push(
+              MaterialPageRoute<void>(
+                builder: (_) => MediaImportReviewPage(
+                  candidates: candidatesFor(resolved),
+                  onConfirm: (targets) async {
+                    final subRepo = ref.read(
+                      manifestSubscriptionRepositoryProvider,
+                    );
+                    final format =
+                        preview.formatOverride ?? preview.result.format;
+                    // Every commit creates a subscription row because the
+                    // pipeline keys manifest rows on it (the partial unique
+                    // index on `(subscription_id, entry_key)`). Subscribe off
+                    // means an inert `isActive: false` row that Undo removes.
+                    final created = await subRepo.createSubscription(
+                      manifestUrl: preview.url,
+                      format: format,
+                      pollIntervalSeconds: preview.pollIntervalSeconds,
+                      isActive: preview.subscribe,
+                    );
+                    subscriptionPersisted = preview.subscribe;
+                    committedSubscriptionId = created.id;
+                    final requests = requestsFromReview(resolved, targets);
+                    final ids = await pipeline.insertResolved(
+                      requests,
+                      subscriptionId: created.id,
+                    );
+                    committedMediaIds = ids;
+                    return ImportReviewResult(
+                      linked: ids.length,
+                      skipped: resolved.length - requests.length,
+                    );
+                  },
+                ),
+              ),
+            );
           },
         );
 
     if (!mounted) return;
-    if (!context.mounted) return;
     final ids = committedMediaIds;
     final subId = committedSubscriptionId;
     if (ids == null || subId == null) {
-      // Commit failed — the notifier state machine has already moved to
-      // [ManifestTabError]; the panel body renders the message. Nothing
-      // else to do.
+      // Cancelled in the review, or the fetch failed (the notifier state
+      // machine has already moved to [ManifestTabError] and the panel body
+      // renders the message): nothing was created.
       return;
     }
     messenger.showSnackBar(

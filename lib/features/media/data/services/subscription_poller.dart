@@ -32,8 +32,10 @@ import 'package:submersion/features/media/data/parsers/manifest_entry.dart';
 import 'package:submersion/features/media/data/parsers/manifest_parse_result.dart';
 import 'package:submersion/features/media/data/repositories/manifest_subscription_repository.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media/data/services/dive_link_matcher.dart';
 import 'package:submersion/features/media/data/services/manifest_fetch_service.dart';
 import 'package:submersion/features/media/data/services/network_fetch_pipeline.dart';
+import 'package:submersion/features/media/data/services/network_import_targets.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 
 /// Drives one polling cycle across all active-due manifest subscriptions.
@@ -48,8 +50,8 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 ///      backoff via `recordPollFailure`.
 ///    - `Success` → diff the parsed entries against existing
 ///      `manifestEntry` rows for this subscription:
-///      - new `entryKey`s → hand to [NetworkFetchPipeline.ingestManifestEntries]
-///        (which inserts rows and fills metadata in the background).
+///      - new `entryKey`s → resolve their metadata, match each against the
+///        logbook, and insert only the confident matches (already linked).
 ///      - existing `entryKey`s with changed fields → patch via
 ///        `MediaRepository.updateMedia`.
 ///      - DB rows whose `entryKey` is not in the fetched manifest → flip
@@ -67,12 +69,14 @@ class SubscriptionPoller {
     required this.mediaRepo,
     required this.fetchService,
     required this.pipeline,
+    required this.diveLinkMatcher,
   });
 
   final ManifestSubscriptionRepository subscriptions;
   final MediaRepository mediaRepo;
   final ManifestFetchService fetchService;
   final NetworkFetchPipeline pipeline;
+  final DiveLinkMatcher diveLinkMatcher;
   final _log = LoggerService.forClass(SubscriptionPoller);
 
   /// Poll a single subscription right now, ignoring its `nextPollAt`.
@@ -214,15 +218,24 @@ class SubscriptionPoller {
       }
     }
 
-    // Hand the freshly-introduced entries to the pipeline. It inserts the
-    // rows synchronously and kicks off background metadata fill — exactly
-    // the same path as URL ingest, but stamped with `subscriptionId` and
-    // `entryKey` for cross-device dedup.
+    // Fresh entries are resolved first and inserted only against a
+    // confident dive match: nobody is here to pick a dive, and a row with
+    // no dive has no place in the library. Anything skipped is still absent
+    // from the DB, so the next poll sees it as new and tries again.
     if (newEntries.isNotEmpty) {
-      await pipeline.ingestManifestEntries(newEntries, sub.id);
+      final resolved = await pipeline.resolveManifestEntries(newEntries);
+      final decided = await requestsForConfidentMatches(
+        resolved,
+        diveLinkMatcher,
+      );
+      final ids = await pipeline.insertResolved(
+        decided.requests,
+        subscriptionId: sub.id,
+      );
       _log.info(
         'Polled ${sub.id} at ${now.toIso8601String()}: '
-        '${newEntries.length} new entries enqueued',
+        '${ids.length} new entries inserted, ${decided.skipped} skipped '
+        '(no confident dive)',
       );
     }
   }
