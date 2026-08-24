@@ -1,32 +1,20 @@
-// Adapted from plan `docs/superpowers/plans/2026-04-28-media-source-extension-phase3b.md`
-// Task 11. Single-pass polling cycle: list active-due subscriptions, fetch
-// each manifest, diff against existing `manifestEntry` rows, and apply the
+// Single-pass polling cycle: list active-due subscriptions, fetch each
+// manifest, diff against existing `manifestEntry` rows, and apply the
 // resulting insert / patch / orphan operations. App-launch + periodic +
-// Poll-now scheduling lives in Task 12.
+// Poll-now scheduling lives in SubscriptionPollerScheduler.
 //
-// Plan deviations:
+// New entries go through the pipeline's resolve-then-insert contract, and
+// the pipeline generates the row ids; the partial unique index
+// `idx_media_subscription_entry` provides cross-device dedup so duplicate
+// inserts on the same `(subscriptionId, entryKey)` are rejected at the DB
+// level.
 //
-// - The plan's example calls `pipeline.enqueueManifestEntries(newItems)`
-//   with already-inserted `MediaItem` rows. Task 10's actual API is
-//   `NetworkFetchPipeline.ingestManifestEntries(List<ManifestEntry>,
-//   String subscriptionId)`, which inserts the rows itself and kicks off
-//   background metadata fill. The poller therefore hands new entries
-//   directly to the pipeline rather than calling `mediaRepo.createMedia`
-//   first; the pipeline's insert path uses `MediaCompanion.insert` and
-//   the partial unique index `idx_media_subscription_entry` provides
-//   cross-device dedup so duplicate inserts on the same `(subscriptionId,
-//   entryKey)` are rejected at the DB level.
-//
-// - The plan listed `_uuid` as a field, but with the `enqueueManifestEntries`
-//   call replaced by `ingestManifestEntries` the poller itself never
-//   generates row IDs (the pipeline does). The field is dropped.
-//
-// - "Changed entries" detection is intentionally simple: build the patched
-//   `MediaItem` from the existing row and the manifest entry, and skip the
-//   write only when the result is `==` to the current row. Equality is
-//   provided by the `Equatable` mixin on `MediaItem`, so the comparison
-//   ignores nothing. This avoids a verbose field-by-field diff and lets
-//   the row's `updatedAt` advance only on real changes.
+// "Changed entries" detection is intentionally simple: build the patched
+// `MediaItem` from the existing row and the manifest entry, and skip the
+// write only when the result is `==` to the current row. Equality is
+// provided by the `Equatable` mixin on `MediaItem`, so the comparison
+// ignores nothing. This avoids a verbose field-by-field diff and lets the
+// row's `updatedAt` advance only on real changes.
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/parsers/manifest_entry.dart';
 import 'package:submersion/features/media/data/parsers/manifest_parse_result.dart';

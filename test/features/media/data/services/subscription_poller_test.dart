@@ -213,7 +213,6 @@ void main() {
 
     final now = DateTime.utc(2024, 4, 27, 10, 0, 0);
     final visited = await poller.pollAllDue(now);
-    await pipeline.idle();
 
     expect(visited, 1);
     final rows = await mediaRepo.getAllBySubscription(sub.id);
@@ -324,7 +323,6 @@ void main() {
     );
 
     final visited = await poller.pollAllDue(secondNow);
-    await pipeline.idle();
 
     expect(visited, 1);
     // No media inserted on a 304.
@@ -417,7 +415,6 @@ void main() {
 
       final now = DateTime.utc(2024, 4, 27, 10, 0, 0);
       final visited = await poller.pollAllDue(now);
-      await pipeline.idle();
 
       expect(visited, 2);
 
@@ -465,7 +462,6 @@ void main() {
 
     final t0 = DateTime.utc(2024, 4, 27, 10, 0, 0);
     await poller.pollAllDue(t0);
-    await pipeline.idle();
     expect(await mediaRepo.getAllBySubscription(sub.id), hasLength(2));
 
     // Second poll: only k1 still in the manifest. k2 should be orphaned.
@@ -476,7 +472,6 @@ void main() {
     );
     final t1 = t0.add(const Duration(hours: 2));
     await poller.pollAllDue(t1);
-    await pipeline.idle();
 
     final rows = await mediaRepo.getAllBySubscription(sub.id);
     expect(rows, hasLength(2)); // not deleted, just orphaned
@@ -511,7 +506,6 @@ void main() {
 
     final t0 = DateTime.utc(2024, 4, 27, 10, 0, 0);
     await poller.pollAllDue(t0);
-    await pipeline.idle();
 
     final firstRow = (await mediaRepo.getAllBySubscription(sub.id)).single;
     expect(firstRow.caption, 'cap');
@@ -535,7 +529,6 @@ void main() {
     );
     final t1 = t0.add(const Duration(hours: 2));
     await poller.pollAllDue(t1);
-    await pipeline.idle();
 
     // Still only one row (no duplicate insert), but it's been patched.
     final rows = await mediaRepo.getAllBySubscription(sub.id);

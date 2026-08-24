@@ -1,9 +1,7 @@
-// Manifest mode panel inside the URL tab (Phase 3b, Tasks 13-14).
+// Manifest mode panel inside the URL tab.
 //
-// Adapted from plan
-// `docs/superpowers/plans/2026-04-28-media-source-extension-phase3b.md`
-// Tasks 13 & 14. The panel renders one of four bodies based on the
-// [ManifestTabState] discriminated union:
+// The panel renders one of four bodies based on the [ManifestTabState]
+// discriminated union:
 //
 // - [ManifestTabIdle]            -> hint text "Paste a manifest URL to begin."
 // - [ManifestTabFetching]        -> CircularProgressIndicator
@@ -13,31 +11,15 @@
 //                                   Import button
 // - [ManifestTabCommitting]      -> CircularProgressIndicator
 //
-// Task 14 wires the Import button to a `commit()` flow that:
-//   - If Subscribe is OFF: calls
-//     [NetworkFetchPipeline.ingestManifestEntries] with an ephemeral
-//     subscription row created with `isActive: false`. The schema's
-//     unique partial index `(subscription_id, entry_key)` requires a
-//     non-null subscriptionId, so a sentinel sub row is created per
-//     one-shot import (and torn down on Undo).
-//   - If Subscribe is ON: creates a `MediaSubscription` row via
-//     [ManifestSubscriptionRepository.createSubscription] (active = true),
-//     then ingests the entries with the persisted subscriptionId.
-// Both paths show a snackbar with an Undo action that deletes the
-// inserted [MediaItem] rows AND the subscription created in this commit.
-//
-// Plan deviations:
-//
-// - The plan (lines 3920-3964) routes ingest through
-//   `MediaRepository.createMedia` per entry plus a non-existent
-//   `pipeline.enqueueManifestEntries(items)`. The actual codebase API is
-//   `pipeline.ingestManifestEntries(List<ManifestEntry>, String
-//   subscriptionId)`, which already inserts media rows itself. The plan
-//   code predates Task 10's API choice; we follow the API.
-// - Because the pipeline requires a non-null `subscriptionId`, every
-//   commit creates a `MediaSubscriptions` row (see comment above). For
-//   one-shot imports the row is `isActive: false` and is deleted by
-//   Undo.
+// The Import button resolves the entries, opens the import review so each
+// one gets a dive or a site, then creates a `MediaSubscription` row and
+// inserts the decided entries under it. The schema's unique partial index
+// `(subscription_id, entry_key)` requires a non-null subscriptionId, so
+// with Subscribe OFF a sentinel `isActive: false` row is created per
+// one-shot import (and torn down on Undo); with Subscribe ON the row is
+// active and polled. Both paths show a snackbar with an Undo action that
+// deletes the inserted [MediaItem] rows AND, for one-shot imports, the
+// sentinel subscription.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
