@@ -576,7 +576,7 @@ class SectionAppearancePage extends ConsumerWidget {
         subtitle: Text(
           context.l10n.settings_appearance_metricsEnabledCount(
             _countEnabledMetrics(settings),
-            18,
+            19,
           ),
         ),
         trailing: const Icon(Icons.chevron_right),
@@ -732,6 +732,7 @@ class SectionAppearancePage extends ConsumerWidget {
       settings.defaultShowGf,
       settings.defaultShowSurfaceGf,
       settings.defaultShowMeanDepth,
+      settings.defaultShowO2CellMv,
     ];
     return values.where((v) => v).length;
   }

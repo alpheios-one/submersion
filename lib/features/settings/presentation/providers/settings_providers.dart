@@ -391,6 +391,9 @@ class AppSettings {
   /// Default visibility for the gas-usage timeline strip on the dive profile
   final bool defaultShowGasTimeline;
 
+  /// Default visibility for the per-cell O2 mV traces on the dive profile
+  final bool defaultShowO2CellMv;
+
   /// Default visibility for the separate ascent-rate magnitude line on the
   /// dive profile (distinct from [showAscentRateColors], which tints the depth
   /// line by velocity band).
@@ -557,6 +560,7 @@ class AppSettings {
     this.defaultShowGasSwitchMarkers = true,
     this.defaultShowPhotoMarkers = true,
     this.defaultShowGasTimeline = false,
+    this.defaultShowO2CellMv = false,
     this.defaultShowAscentRateLine = false,
     // Notification defaults
     this.notificationsEnabled = true,
@@ -716,6 +720,7 @@ class AppSettings {
     bool? defaultShowGasSwitchMarkers,
     bool? defaultShowPhotoMarkers,
     bool? defaultShowGasTimeline,
+    bool? defaultShowO2CellMv,
     bool? defaultShowAscentRateLine,
     bool? notificationsEnabled,
     List<int>? serviceReminderDays,
@@ -864,6 +869,7 @@ class AppSettings {
           defaultShowPhotoMarkers ?? this.defaultShowPhotoMarkers,
       defaultShowGasTimeline:
           defaultShowGasTimeline ?? this.defaultShowGasTimeline,
+      defaultShowO2CellMv: defaultShowO2CellMv ?? this.defaultShowO2CellMv,
       defaultShowAscentRateLine:
           defaultShowAscentRateLine ?? this.defaultShowAscentRateLine,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
@@ -1785,6 +1791,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setDefaultShowGasTimeline(bool value) async {
     state = state.copyWith(defaultShowGasTimeline: value);
+    await _saveSettings();
+  }
+
+  Future<void> setDefaultShowO2CellMv(bool value) async {
+    state = state.copyWith(defaultShowO2CellMv: value);
     await _saveSettings();
   }
 
