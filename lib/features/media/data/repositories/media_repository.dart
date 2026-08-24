@@ -1633,28 +1633,6 @@ class MediaRepository {
     return rows.map((r) => r.read(id)!).toList();
   }
 
-  /// Every distinct platform asset id in the library (import dedupe,
-  /// Media section Phase 4).
-  Future<Set<String>> getAllPlatformAssetIds() async {
-    final column = _db.media.platformAssetId;
-    final query = _db.selectOnly(_db.media, distinct: true)
-      ..addColumns([column])
-      ..where(column.isNotNull());
-    final rows = await query.get();
-    return rows.map((r) => r.read(column)!).toSet();
-  }
-
-  /// Every distinct local path in the library (import dedupe, Media
-  /// section Phase 4).
-  Future<Set<String>> getAllLocalPaths() async {
-    final column = _db.media.localPath;
-    final query = _db.selectOnly(_db.media, distinct: true)
-      ..addColumns([column])
-      ..where(column.isNotNull());
-    final rows = await query.get();
-    return rows.map((r) => r.read(column)!).toSet();
-  }
-
   /// Every distinct non-null content hash - the verify sweep's referenced
   /// set (orphan-prevention spec 6.1). Same conservative rule as
   /// [countRowsWithHash]: a hash counts whether or not its rows uploaded.

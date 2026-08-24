@@ -1,26 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/features/media/presentation/pages/media_import_link_page.dart';
-import 'package:submersion/features/media/presentation/pages/media_import_view.dart';
-import 'package:submersion/features/media/presentation/providers/media_inbox_providers.dart';
-import 'package:submersion/features/media/presentation/providers/media_providers.dart';
+import 'package:submersion/features/media/data/services/photo_picker_service.dart';
 import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
+import 'package:submersion/features/media/presentation/pages/media_import_review_page.dart';
+import 'package:submersion/features/media/presentation/pages/media_import_view.dart';
+import 'package:submersion/features/media/presentation/providers/media_import_suggestion_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+AssetInfo asset(String id) => AssetInfo(
+  id: id,
+  type: AssetType.image,
+  createDateTime: DateTime(2026, 6, 12, 10),
+  width: 100,
+  height: 100,
+  filename: '$id.jpg',
+);
+
 void main() {
-  Widget host({Future<List<String>> Function(BuildContext)? launchOverride}) {
+  Widget host({
+    Future<List<AssetInfo>> Function(BuildContext)? launchOverride,
+  }) {
     return ProviderScope(
       overrides: [
-        // The pushed link page resolves these per id; keep them inert.
-        for (final id in ['m1', 'm2']) ...[
-          mediaByIdProvider(id).overrideWith((ref) async => null),
-          inboxSuggestionProvider(id).overrideWith(
-            (ref) async => const InboxSuggestion(
-              match: TimestampMatch(kind: TimestampMatchKind.none),
-            ),
+        importSuggestionProvider(DateTime.utc(2026, 6, 12, 10)).overrideWith(
+          (ref) async => const ImportSuggestion(
+            match: TimestampMatch(kind: TimestampMatchKind.none),
           ),
-        ],
+        ),
       ],
       child: MaterialApp(
         locale: const Locale('en'),
@@ -36,30 +43,32 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       find.text(
-        'Imported media is kept in your library and can be linked to '
-        'dives automatically.',
+        'Photos are linked to a dive or a dive site as you import them.',
       ),
       findsOneWidget,
     );
     expect(find.text('Import media...'), findsOneWidget);
   });
 
-  testWidgets('a non-empty import pushes the link page with the ids', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      host(launchOverride: (context) async => ['m1', 'm2']),
-    );
-    await tester.pumpAndSettle();
+  testWidgets(
+    'a non-empty pick opens the review with one candidate per asset',
+    (tester) async {
+      await tester.pumpWidget(
+        host(launchOverride: (context) async => [asset('a1'), asset('a2')]),
+      );
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Import media...'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Import media...'));
+      await tester.pumpAndSettle();
 
-    final page = tester.widget<MediaImportLinkPage>(
-      find.byType(MediaImportLinkPage),
-    );
-    expect(page.mediaIds, ['m1', 'm2']);
-  });
+      final page = tester.widget<MediaImportReviewPage>(
+        find.byType(MediaImportReviewPage),
+      );
+      expect(page.candidates.map((c) => c.key), ['a1', 'a2']);
+      expect(page.candidates.first.title, 'a1.jpg');
+      expect(page.candidates.first.takenAt, DateTime.utc(2026, 6, 12, 10));
+    },
+  );
 
   test('the library import window has no effective lower bound', () {
     // A dive-less import must offer the whole gallery. The mobile picker
@@ -72,12 +81,11 @@ void main() {
     );
   });
 
-  testWidgets('an empty import stays on the view', (tester) async {
+  testWidgets('an empty pick stays on the view', (tester) async {
     await tester.pumpWidget(host(launchOverride: (context) async => []));
     await tester.pumpAndSettle();
-
     await tester.tap(find.text('Import media...'));
     await tester.pumpAndSettle();
-    expect(find.byType(MediaImportLinkPage), findsNothing);
+    expect(find.byType(MediaImportReviewPage), findsNothing);
   });
 }
