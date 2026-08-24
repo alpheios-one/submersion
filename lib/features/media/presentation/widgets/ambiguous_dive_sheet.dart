@@ -42,15 +42,18 @@ class AmbiguousDiveTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dive = ref.watch(diveProvider(diveId)).value;
     final locale = Localizations.localeOf(context).toString();
-    final label = dive == null
-        ? diveId
+    final parts = dive == null
+        ? const <String>[]
         : [
             if (dive.diveNumber != null) '#${dive.diveNumber}',
             if (dive.name != null && dive.name!.isNotEmpty)
               dive.name!
             else if (dive.site?.name != null)
               dive.site!.name,
-          ].join(' ');
+          ];
+    // A dive with no number, name, or site would otherwise render a blank
+    // title; the id is at least a stable handle.
+    final label = parts.isEmpty ? diveId : parts.join(' ');
     return ListTile(
       title: Text(label),
       subtitle: dive == null

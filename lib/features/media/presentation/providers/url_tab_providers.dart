@@ -151,10 +151,13 @@ class UrlTabNotifier extends StateNotifier<UrlTabState> {
   }
 
   /// Parses each non-empty draft line and resolves the OK URIs through the
-  /// pipeline: metadata only, no rows. Clears the draft so the UI returns
-  /// to its blank state, and flags [UrlTabState.resolving] while the fetch
-  /// runs (it used to run in the background; now the link decision waits
-  /// on it).
+  /// pipeline: metadata only, no rows. Flags [UrlTabState.resolving] while
+  /// the fetch runs (it used to run in the background; now the link
+  /// decision waits on it).
+  ///
+  /// The draft is deliberately kept: with no picker target the resolved
+  /// URLs go through a review the user can back out of, and the pasted
+  /// lines must still be there when they do. [commitRequests] clears it.
   ///
   /// Empty lines are dropped silently. Invalid lines are also dropped: the
   /// UI disables the "Add" button when any line fails validation, so
@@ -172,17 +175,17 @@ class UrlTabNotifier extends StateNotifier<UrlTabState> {
     try {
       return await _pipeline.resolve(uris);
     } finally {
-      state = state.copyWith(resolving: false, draftLines: const []);
+      state = state.copyWith(resolving: false);
     }
   }
 
-  /// Inserts the decided rows and stamps [UrlTabState.committedIds] for
-  /// the undo path.
+  /// Inserts the decided rows, stamps [UrlTabState.committedIds] for the
+  /// undo path, and clears the draft now that it has become rows.
   Future<List<String>> commitRequests(
     List<NetworkInsertRequest> requests,
   ) async {
     final ids = await _pipeline.insertResolved(requests);
-    state = state.copyWith(committedIds: ids);
+    state = state.copyWith(committedIds: ids, draftLines: const []);
     return ids;
   }
 

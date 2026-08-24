@@ -306,6 +306,41 @@ void main() {
     );
   });
 
+  testWidgets('backing out of the review keeps the pasted URLs', (
+    tester,
+  ) async {
+    stubResolveAndInsert();
+
+    await tester.pumpWidget(
+      wrap(
+        const UrlTab(),
+        seed: const UrlTabState(draftLines: ['https://example.com/a.jpg']),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Add'));
+    await tester.pumpAndSettle();
+    expect(find.byType(MediaImportReviewPage), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MediaImportReviewPage), findsNothing);
+    final element = tester.element(find.byType(UrlTab));
+    final state = ProviderScope.containerOf(
+      element,
+    ).read(urlTabNotifierProvider);
+    expect(state.draftLines, ['https://example.com/a.jpg']);
+    expect(
+      tester.widget<TextField>(find.byType(TextField).first).controller?.text,
+      'https://example.com/a.jpg',
+    );
+    verifyNever(
+      pipeline.insertResolved(any, subscriptionId: anyNamed('subscriptionId')),
+    );
+  });
+
   testWidgets('undo calls notifier.undoCommit(ids)', (tester) async {
     stubResolveAndInsert(ids: ['id-1', 'id-2']);
     when(repo.deleteMedia(any)).thenAnswer((_) async {});

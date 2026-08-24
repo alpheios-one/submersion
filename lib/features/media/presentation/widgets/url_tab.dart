@@ -72,9 +72,6 @@ class _UrlTabState extends ConsumerState<UrlTab> {
     final navigator = Navigator.of(context);
     final resolved = await notifier.resolveDraft();
     if (!mounted) return;
-    // Sync the multi-line controller with the cleared draft state so
-    // the textarea visibly empties once the fetch is done.
-    _multiLine.text = '';
 
     final target = widget.target;
     if (target != null) {
@@ -82,11 +79,14 @@ class _UrlTabState extends ConsumerState<UrlTab> {
         requestsForTarget(resolved, target),
       );
       if (!mounted) return;
+      _draftBecameRows();
       _showUndo(messenger, notifier, ids);
       return;
     }
 
-    // No owner: every URL needs a dive or a site before it may land.
+    // No owner: every URL needs a dive or a site before it may land. The
+    // draft stays in the field until Confirm, so backing out of the review
+    // leaves the pasted URLs where they were.
     await navigator.push(
       MaterialPageRoute<void>(
         builder: (_) => MediaImportReviewPage(
@@ -94,6 +94,7 @@ class _UrlTabState extends ConsumerState<UrlTab> {
           onConfirm: (targets) async {
             final requests = requestsFromReview(resolved, targets);
             final ids = await notifier.commitRequests(requests);
+            if (mounted) _draftBecameRows();
             _showUndo(messenger, notifier, ids);
             return ImportReviewResult(
               linked: ids.length,
@@ -103,6 +104,12 @@ class _UrlTabState extends ConsumerState<UrlTab> {
         ),
       ),
     );
+  }
+
+  /// Syncs the multi-line controller with the draft the notifier just
+  /// cleared, so the textarea visibly empties once rows exist.
+  void _draftBecameRows() {
+    _multiLine.text = '';
   }
 
   void _showUndo(
