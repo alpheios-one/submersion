@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -41,6 +43,34 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(picked, 's2');
+  });
+
+  testWidgets('shows a spinner while sites are still loading', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          // Never completes: the sheet must not read as an empty picker.
+          sitesProvider.overrideWith(
+            (ref) => Completer<List<DiveSite>>().future,
+          ),
+        ],
+        child: MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () => showSitePickerSheet(context),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
   testWidgets('dismissing resolves null', (tester) async {

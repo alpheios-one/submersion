@@ -58,6 +58,7 @@ class SubscriptionPoller {
     required this.fetchService,
     required this.pipeline,
     required this.diveLinkMatcher,
+    this.activeDiverId,
   });
 
   final ManifestSubscriptionRepository subscriptions;
@@ -65,6 +66,11 @@ class SubscriptionPoller {
   final ManifestFetchService fetchService;
   final NetworkFetchPipeline pipeline;
   final DiveLinkMatcher diveLinkMatcher;
+
+  /// The diver whose dives new entries may attach to, read per poll. Null
+  /// scopes nothing, which in a multi-diver database could hand a photo to
+  /// another diver's dive.
+  final String? Function()? activeDiverId;
   final _log = LoggerService.forClass(SubscriptionPoller);
 
   /// Poll a single subscription right now, ignoring its `nextPollAt`.
@@ -215,6 +221,7 @@ class SubscriptionPoller {
       final decided = await requestsForConfidentMatches(
         resolved,
         diveLinkMatcher,
+        diverId: activeDiverId?.call(),
       );
       final ids = await pipeline.insertResolved(
         decided.requests,

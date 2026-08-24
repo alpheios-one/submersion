@@ -129,13 +129,17 @@ ManifestParseResult _parsed(List<ManifestEntry> entries) =>
 class _FakeDiveRepo implements DiveRepository {
   _FakeDiveRepo(this.dives);
   final List<domain.Dive> dives;
+  String? lastDiverId;
 
   @override
   Future<List<domain.Dive>> getDivesInRange(
     DateTime start,
     DateTime end, {
     String? diverId,
-  }) async => dives;
+  }) async {
+    lastDiverId = diverId;
+    return dives;
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -154,6 +158,7 @@ void main() {
   late MediaRepository mediaRepo;
   late NetworkFetchPipeline pipeline;
   late DiveLinkMatcher matcher;
+  late _FakeDiveRepo diveRepo;
 
   setUp(() async {
     db = AppDatabase(NativeDatabase.memory());
@@ -175,11 +180,8 @@ void main() {
             updatedAt: Value(epoch),
           ),
         );
-    matcher = DiveLinkMatcher(
-      diveRepository: _FakeDiveRepo([
-        _dive('d1', DateTime.utc(2024, 6, 1, 11, 50)),
-      ]),
-    );
+    diveRepo = _FakeDiveRepo([_dive('d1', DateTime.utc(2024, 6, 1, 11, 50))]);
+    matcher = DiveLinkMatcher(diveRepository: diveRepo);
   });
 
   tearDown(() async {
@@ -209,6 +211,7 @@ void main() {
       fetchService: fetcher,
       pipeline: pipeline,
       diveLinkMatcher: matcher,
+      activeDiverId: () => 'diver-42',
     );
 
     final now = DateTime.utc(2024, 4, 27, 10, 0, 0);
@@ -229,6 +232,9 @@ void main() {
     expect(k1.isOrphaned, isFalse);
     // Unattended polling links at insert; a row with no dive never lands.
     expect(rows.every((r) => r.diveId == 'd1'), isTrue);
+    // Matching is scoped to the active diver, so a multi-diver database
+    // never hands a subscription photo to someone else's dive.
+    expect(diveRepo.lastDiverId, 'diver-42');
 
     // recordPollSuccess should have written ETag + bumped nextPollAt.
     final after = await subscriptions.getById(sub.id);

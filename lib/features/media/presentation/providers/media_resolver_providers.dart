@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
+import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/data/repositories/manifest_subscription_repository.dart';
 import 'package:submersion/features/media/data/resolvers/http_url_media_resolver.dart';
 import 'package:submersion/features/media/data/resolvers/local_file_resolver.dart';
@@ -252,6 +253,10 @@ final subscriptionPollerProvider = Provider<SubscriptionPoller>((ref) {
     diveLinkMatcher: DiveLinkMatcher(
       diveRepository: ref.watch(diveRepositoryProvider),
     ),
+    // Read per poll, not captured: the active diver can change between
+    // cycles, and matching against another diver's dives would hand the
+    // photo to the wrong logbook.
+    activeDiverId: () => ref.read(currentDiverIdProvider),
   );
 });
 

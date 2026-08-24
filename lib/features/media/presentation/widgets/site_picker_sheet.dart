@@ -10,7 +10,18 @@ Future<String?> showSitePickerSheet(BuildContext context) {
     context: context,
     builder: (sheetContext) => Consumer(
       builder: (context, ref, _) {
-        final sites = ref.watch(sitesProvider).value ?? const [];
+        final async = ref.watch(sitesProvider);
+        // A spinner while loading, like the dive picker: an empty list at
+        // this moment would read as a blank, broken sheet.
+        if (async.isLoading && !async.hasValue) {
+          return const SafeArea(
+            child: SizedBox(
+              height: 120,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+        final sites = async.value ?? const [];
         return SafeArea(
           child: ListView(
             shrinkWrap: true,
