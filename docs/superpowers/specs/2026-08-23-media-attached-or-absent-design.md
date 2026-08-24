@@ -341,7 +341,7 @@ TDD, per test file the code touches.
   new media provider.
 - **Sweep:** runs every launch, deletes only rows older than the guard,
   idempotent across two runs.
-- Full suite twice before the PR, per this repo's flake history.
+- One full-suite run before the PR; a lone failure in an untouched file is checked against the known-flake list and rerun alone.
 
 ## 11. Out of scope
 

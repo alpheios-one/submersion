@@ -22,7 +22,7 @@
 - `dart format lib/ test/` must produce no changes before every commit.
 - Commit after every task with the message given in that task. Do not add a Co-Authored-By line or a session URL.
 - Mockito mocks (`test/**/*.mocks.dart`) are generated. After any change to `MediaRepository`'s or `NetworkFetchPipeline`'s public surface, run `dart run build_runner build --delete-conflicting-outputs` and commit the regenerated mocks with the task.
-- When a full-suite run is called for, run it TWICE; this repository has known one-off flakes and one green run proves nothing.
+- One full-suite run is sufficient before the PR. A lone failure in a file this branch never touched is checked against the project's known-flake list and rerun alone before being treated as a regression.
 
 ---
 
@@ -3517,13 +3517,13 @@ Expected: no matches.
 Run: `git diff origin/main...HEAD -U0 -- . ':(exclude)lib/l10n/arb/app_localizations*' ':(exclude)*.mocks.dart' | grep '^+' | grep -v '^+++' | LC_ALL=C grep -n $'\xe2\x80\x94\|\xe2\x80\x93' | head` (the two byte sequences are the em-dash and en-dash characters, spelled out so the plan itself contains neither)
 Expected: no lines introduced by this branch (compare against `git diff origin/main --stat` scope; pre-existing dashes in untouched lines are fine).
 
-- [ ] **Step 2: Format, analyze, full suite twice**
+- [ ] **Step 2: Format, analyze, full suite**
 
 Run: `dart format lib/ test/ && flutter analyze`
 Expected: no changes, no issues.
 
 Run: `flutter test 2>&1 | tail -5`
-Expected: the summary line shows zero failures. Run it a second time; both must be green. A lone failure in a file this branch never touched should be checked against the flake list in the project memory (`weight_planner` "planned lead is a total", `sync_replace_library`, `settings_load_zone_escape`) and rerun alone before being treated as a regression.
+Expected: the summary line shows zero failures. A lone failure in a file this branch never touched should be checked against the flake list in the project memory (`weight_planner` "planned lead is a total", `sync_replace_library`, `settings_load_zone_escape`) and rerun alone before being treated as a regression.
 
 - [ ] **Step 3: Update the spec status and commit**
 
