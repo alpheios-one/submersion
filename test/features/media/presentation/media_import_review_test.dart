@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -16,6 +19,7 @@ import 'package:submersion/features/media/domain/value_objects/import_preview.da
 import 'package:submersion/features/media/presentation/providers/media_import_suggestion_providers.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
 import 'package:submersion/features/media/presentation/providers/url_tab_providers.dart';
+import 'package:submersion/features/media/presentation/widgets/import_preview_thumbnail.dart';
 import 'package:submersion/features/media/presentation/widgets/network_thumbnail.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -322,6 +326,68 @@ void main() {
     await tester.pump();
 
     expect(find.byType(NetworkThumbnail), findsOneWidget);
+  });
+
+  testWidgets('an asset whose bytes are gone shows a centred placeholder', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      host(
+        [candidate('a', t1, preview: const AssetImportPreview('asset-a'))],
+        {t1: none},
+        extraOverrides: [
+          assetThumbnailProvider('asset-a').overrideWith((ref) async => null),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final icon = find.byIcon(Icons.broken_image_outlined);
+    expect(icon, findsOneWidget);
+    expect(
+      tester.getCenter(icon),
+      tester.getCenter(find.byType(ImportPreviewThumbnail)),
+    );
+  });
+
+  testWidgets('a thumbnail that fails to resolve falls back to the icon', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      host(
+        [candidate('a', t1, preview: const AssetImportPreview('asset-a'))],
+        {t1: none},
+        extraOverrides: [
+          assetThumbnailProvider(
+            'asset-a',
+          ).overrideWith((ref) async => throw StateError('gallery gone')),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.broken_image_outlined), findsOneWidget);
+  });
+
+  testWidgets('a thumbnail still loading paints neither art nor an icon', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      host(
+        [candidate('a', t1, preview: const AssetImportPreview('asset-a'))],
+        {t1: none},
+        extraOverrides: [
+          assetThumbnailProvider(
+            'asset-a',
+          ).overrideWith((ref) => Completer<Uint8List?>().future),
+        ],
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(ImportPreviewThumbnail), findsOneWidget);
+    expect(find.byType(Image), findsNothing);
+    expect(find.byIcon(Icons.broken_image_outlined), findsNothing);
   });
 
   testWidgets('a candidate with no preview paints no thumbnail', (

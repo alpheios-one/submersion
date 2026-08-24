@@ -10,9 +10,16 @@ import 'package:equatable/equatable.dart';
 /// the resolving.
 ///
 /// A sealed hierarchy rather than two nullable strings, matching
-/// [MediaAttachTarget]: a candidate is a gallery asset or a remote URL,
-/// never both, and `switch` over it is exhaustive so a third import path
-/// cannot quietly render a blank row.
+/// `MediaAttachTarget`: a candidate's art lives in the gallery or behind a
+/// URL, never both, and `switch` over it is exhaustive, so adding a third
+/// kind fails to compile at every site that renders one instead of falling
+/// through to a blank box.
+///
+/// That constrains the *kinds* of art, not whether a row has any.
+/// `ImportCandidate.preview` is deliberately nullable: a caller with no art
+/// for a row wants it rendered text-only, and `ListTile` indents its title
+/// for any non-null leading widget, so an explicit "no preview" variant
+/// would still have to be special-cased back into rendering nothing.
 sealed class ImportPreview extends Equatable {
   const ImportPreview();
 
