@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
@@ -671,6 +672,160 @@ void main() {
       ], 'sub-1');
       await pipeline.idle();
       expect(await diveIdOf(ids.single), 'd1');
+    });
+  });
+
+  group('resolve / insertResolved', () {
+    Future<void> insertDiveRow(String id) => db
+        .into(db.dives)
+        .insert(
+          DivesCompanion(
+            id: Value(id),
+            diveDateTime: const Value(1700000000000),
+            createdAt: const Value(1700000000000),
+            updatedAt: const Value(1700000000000),
+          ),
+        );
+
+    Future<void> insertSubscriptionRow(String id) => db.customStatement(
+      "INSERT INTO media_subscriptions (id, manifest_url, format, "
+      "created_at, updated_at) VALUES ('$id', 'https://x/f', 'atom', 0, 0)",
+    );
+
+    test('resolve returns metadata in input order without inserting', () async {
+      const a = 'https://example.com/a.jpg';
+      const b = 'https://example.com/b.jpg';
+      final extractor = _StubExtractor(
+        results: {a: _ok(a), b: _err(b, 'HTTP 404')},
+      );
+      final pipeline = NetworkFetchPipeline(db: db, extractor: extractor);
+
+      final resolved = await pipeline.resolve([Uri.parse(a), Uri.parse(b)]);
+
+      expect(resolved.map((r) => r.uri.toString()), [a, b]);
+      expect(resolved[0].takenAt, DateTime.utc(2024, 6, 1, 12));
+      expect(resolved[0].failed, isFalse);
+      expect(resolved[1].failed, isTrue);
+      expect(resolved[1].failure, 'HTTP 404');
+      expect(await db.select(db.media).get(), isEmpty);
+    });
+
+    test(
+      'a prefilled manifest entry resolves without touching the network',
+      () async {
+        final entry = ManifestEntry(
+          entryKey: 'k1',
+          url: 'https://example.com/m.jpg',
+          takenAt: DateTime.utc(2024, 6, 1, 12),
+          latitude: 1,
+          longitude: 2,
+          width: 800,
+          height: 600,
+        );
+        final extractor = _StubExtractor(results: const {});
+        final pipeline = NetworkFetchPipeline(db: db, extractor: extractor);
+
+        final resolved = await pipeline.resolveManifestEntries([entry]);
+
+        expect(extractor.calls, isEmpty);
+        expect(resolved.single.entry, entry);
+        expect(resolved.single.takenAt, entry.takenAt);
+      },
+    );
+
+    test('insertResolved writes a linked, verified row', () async {
+      const url = 'https://example.com/a.jpg';
+      await insertDiveRow('d1');
+      final pipeline = NetworkFetchPipeline(
+        db: db,
+        extractor: _StubExtractor(results: {url: _ok(url)}),
+      );
+      final resolved = await pipeline.resolve([Uri.parse(url)]);
+
+      final ids = await pipeline.insertResolved([
+        NetworkInsertRequest(media: resolved.single, diveId: 'd1'),
+      ]);
+
+      final row = await (db.select(
+        db.media,
+      )..where((t) => t.id.equals(ids.single))).getSingle();
+      expect(row.sourceType, 'networkUrl');
+      expect(row.diveId, 'd1');
+      expect(row.siteId, isNull);
+      expect(row.url, url);
+      expect(row.width, 1024);
+      expect(row.lastVerifiedAt, isNotNull);
+      expect(row.isOrphaned, isFalse);
+    });
+
+    test('insertResolved on a failed fetch writes an orphaned row with '
+        'diagnostics', () async {
+      const url = 'https://example.com/gone.jpg';
+      await insertDiveRow('d1');
+      final pipeline = NetworkFetchPipeline(
+        db: db,
+        extractor: _StubExtractor(results: {url: _err(url, 'HTTP 404')}),
+      );
+      final resolved = await pipeline.resolve([Uri.parse(url)]);
+
+      final ids = await pipeline.insertResolved([
+        NetworkInsertRequest(media: resolved.single, diveId: 'd1'),
+      ]);
+
+      final row = await (db.select(
+        db.media,
+      )..where((t) => t.id.equals(ids.single))).getSingle();
+      expect(row.isOrphaned, isTrue);
+      expect(row.lastVerifiedAt, isNull);
+      final diag = await (db.select(
+        db.mediaFetchDiagnostics,
+      )..where((t) => t.mediaItemId.equals(ids.single))).getSingle();
+      expect(diag.lastErrorMessage, 'HTTP 404');
+    });
+
+    test(
+      'insertResolved stamps manifest rows with subscription and entry key',
+      () async {
+        await insertDiveRow('d1');
+        await insertSubscriptionRow('sub-1');
+        final entry = ManifestEntry(
+          entryKey: 'k1',
+          url: 'https://example.com/m.jpg',
+          takenAt: DateTime.utc(2024, 6, 1, 12),
+          latitude: 1,
+          longitude: 2,
+          width: 800,
+          height: 600,
+          caption: 'cap',
+        );
+        final pipeline = NetworkFetchPipeline(
+          db: db,
+          extractor: _StubExtractor(results: const {}),
+        );
+        final resolved = await pipeline.resolveManifestEntries([entry]);
+
+        final ids = await pipeline.insertResolved([
+          NetworkInsertRequest(media: resolved.single, diveId: 'd1'),
+        ], subscriptionId: 'sub-1');
+
+        final row = await (db.select(
+          db.media,
+        )..where((t) => t.id.equals(ids.single))).getSingle();
+        expect(row.sourceType, 'manifestEntry');
+        expect(row.subscriptionId, 'sub-1');
+        expect(row.entryKey, 'k1');
+        expect(row.caption, 'cap');
+        expect(row.diveId, 'd1');
+      },
+    );
+
+    test('a request needs exactly one target', () {
+      final media = ResolvedNetworkMedia(uri: Uri.parse('https://e.com/a.jpg'));
+      expect(() => NetworkInsertRequest(media: media), throwsAssertionError);
+      expect(
+        () => NetworkInsertRequest(media: media, diveId: 'd', siteId: 's'),
+        throwsAssertionError,
+      );
     });
   });
 }

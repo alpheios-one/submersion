@@ -53,6 +53,50 @@ import 'package:submersion/features/media/data/parsers/manifest_entry.dart';
 import 'package:submersion/features/media/data/services/url_metadata_extractor.dart';
 import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 
+/// What the pipeline learned about one URL or manifest entry before any row
+/// exists for it: the caller decides the link, then hands it back to
+/// [NetworkFetchPipeline.insertResolved].
+class ResolvedNetworkMedia {
+  const ResolvedNetworkMedia({
+    required this.uri,
+    this.entry,
+    this.result,
+    this.failure,
+  });
+
+  final Uri uri;
+
+  /// Present for manifest entries; carries the feed-supplied scalars.
+  final ManifestEntry? entry;
+
+  /// Extractor output; null when extraction was skipped (fully prefilled
+  /// manifest entry) or failed.
+  final UrlExtractionResult? result;
+
+  /// Why extraction failed, when it did.
+  final String? failure;
+
+  bool get failed => failure != null;
+
+  /// Manifest wins over extraction: the publisher knows more than EXIF.
+  DateTime? get takenAt => entry?.takenAt ?? result?.takenAt;
+}
+
+/// A resolved item paired with the ONE thing that owns it. A row with
+/// neither link has no business in the library, and one with both would
+/// belong to a dive the site never named, so the constructor refuses both.
+class NetworkInsertRequest {
+  NetworkInsertRequest({required this.media, this.diveId, this.siteId})
+    : assert(
+        (diveId == null) != (siteId == null),
+        'exactly one of diveId / siteId',
+      );
+
+  final ResolvedNetworkMedia media;
+  final String? diveId;
+  final String? siteId;
+}
+
 /// Background-fetch pipeline for ad-hoc HTTP(S) media URLs.
 ///
 /// `ingest` synchronously inserts a `media` row per URL with
@@ -240,6 +284,140 @@ class NetworkFetchPipeline {
     }
     _scheduleFill(specs);
     return ids;
+  }
+
+  /// Extracts metadata for [uris] through the worker pool and per-host
+  /// throttle. Writes nothing. Results come back in input order.
+  Future<List<ResolvedNetworkMedia>> resolve(List<Uri> uris) {
+    return Future.wait([
+      for (final uri in uris) _resolveOne(_FillSpec(id: '', uri: uri)),
+    ]);
+  }
+
+  /// [resolve] for manifest entries. An entry that already carries every
+  /// field the extractor would populate skips the network round-trip.
+  Future<List<ResolvedNetworkMedia>> resolveManifestEntries(
+    List<ManifestEntry> entries,
+  ) {
+    return Future.wait([
+      for (final entry in entries)
+        _resolveOne(
+          _FillSpec.fromManifest(
+            id: '',
+            uri: Uri.parse(entry.url),
+            entry: entry,
+          ),
+        ),
+    ]);
+  }
+
+  /// Inserts one row per request, already linked. A failed fetch still
+  /// gets its row (orphaned, with a diagnostics record) because the caller
+  /// chose a target for it; nothing here ever inserts an unlinked row.
+  Future<List<String>> insertResolved(
+    List<NetworkInsertRequest> requests, {
+    String? subscriptionId,
+  }) async {
+    final ids = <String>[];
+    final nowMillis = _now().millisecondsSinceEpoch;
+    for (final request in requests) {
+      final media = request.media;
+      final entry = media.entry;
+      final result = media.result;
+      final id = _uuid.v4();
+      await _db
+          .into(_db.media)
+          .insert(
+            MediaCompanion.insert(
+              id: id,
+              filePath: '',
+              fileType: Value(_fileTypeFromMediaType(entry?.mediaType)),
+              sourceType: Value(entry == null ? 'networkUrl' : 'manifestEntry'),
+              subscriptionId: Value(entry == null ? null : subscriptionId),
+              entryKey: Value(entry?.entryKey),
+              url: Value(result?.url ?? media.uri.toString()),
+              diveId: Value(request.diveId),
+              siteId: Value(request.siteId),
+              latitude: Value(entry?.latitude ?? result?.lat),
+              longitude: Value(entry?.longitude ?? result?.lon),
+              takenAt: Value(media.takenAt?.millisecondsSinceEpoch),
+              width: Value(entry?.width ?? result?.width),
+              height: Value(entry?.height ?? result?.height),
+              durationSeconds: Value(entry?.durationSeconds),
+              caption: Value(entry?.caption),
+              isOrphaned: Value(media.failed),
+              lastVerifiedAt: Value(media.failed ? null : nowMillis),
+              createdAt: nowMillis,
+              updatedAt: nowMillis,
+            ),
+          );
+      if (media.failed) {
+        await _db
+            .into(_db.mediaFetchDiagnostics)
+            .insertOnConflictUpdate(
+              MediaFetchDiagnosticsCompanion.insert(
+                mediaItemId: id,
+                lastErrorAt: Value(nowMillis),
+                lastErrorMessage: Value(media.failure),
+                errorCount: const Value(1),
+              ),
+            );
+      }
+      // The link is part of the row from its first synced version.
+      await _syncRepository.markRecordPending(
+        entityType: 'media',
+        recordId: id,
+        localUpdatedAt: nowMillis,
+      );
+      ids.add(id);
+    }
+    if (ids.isNotEmpty) SyncEventBus.notifyLocalChange();
+    return ids;
+  }
+
+  /// The extraction half of [_processOne], with no database writes.
+  Future<ResolvedNetworkMedia> _resolveOne(_FillSpec spec) async {
+    if (spec.skipExtract) {
+      return ResolvedNetworkMedia(uri: spec.uri, entry: spec.entry);
+    }
+    await _acquireSlot();
+    try {
+      final previous = _hostChain[spec.uri.host] ?? Future<void>.value();
+      final completer = Completer<void>();
+      _hostChain[spec.uri.host] = completer.future;
+      try {
+        await previous;
+      } catch (_) {
+        // Errors on the previous call don't block subsequent ones.
+      }
+      try {
+        await _waitForHostThrottle(spec.uri.host);
+        _hostLastCall[spec.uri.host] = _now();
+      } finally {
+        completer.complete();
+      }
+      final result = await _extractor.extract(spec.uri);
+      if (result.failure != null) {
+        return ResolvedNetworkMedia(
+          uri: spec.uri,
+          entry: spec.entry,
+          failure: result.failure,
+        );
+      }
+      return ResolvedNetworkMedia(
+        uri: spec.uri,
+        entry: spec.entry,
+        result: result,
+      );
+    } catch (e) {
+      return ResolvedNetworkMedia(
+        uri: spec.uri,
+        entry: spec.entry,
+        failure: 'pipeline: $e',
+      );
+    } finally {
+      _releaseSlot();
+    }
   }
 
   /// Awaits any pending background work. Tests use this to deterministically
@@ -505,6 +683,7 @@ class _FillSpec {
   /// set, and extraction is always required.
   _FillSpec({required this.id, required this.uri, this.autoMatch = false})
     : skipExtract = false,
+      entry = null,
       manifestTakenAt = null,
       manifestLatitude = null,
       manifestLongitude = null,
@@ -520,7 +699,8 @@ class _FillSpec {
     required this.uri,
     required ManifestEntry entry,
     this.autoMatch = false,
-  }) : manifestTakenAt = entry.takenAt,
+  }) : entry = entry,
+       manifestTakenAt = entry.takenAt,
        manifestLatitude = entry.latitude,
        manifestLongitude = entry.longitude,
        manifestWidth = entry.width,
@@ -540,6 +720,9 @@ class _FillSpec {
   final Uri uri;
   final bool skipExtract;
   final bool autoMatch;
+
+  /// The manifest entry this spec came from, null on the URL path.
+  final ManifestEntry? entry;
   final DateTime? manifestTakenAt;
   final double? manifestLatitude;
   final double? manifestLongitude;
