@@ -4020,7 +4020,7 @@
   "media_siteMediaSection_divePhotosGroup": "Fotos de inmersiones aquí ({count})",
   "media_siteMediaSection_divePhotoLabel": "Foto de inmersión",
   "media_siteMediaSection_unlinkSelectedTitle": "¿Quitar {count} adjuntos?",
-  "media_siteMediaSection_unlinkSelectedContent": "Los elementos seleccionados se quitarán de este punto de buceo. Los archivos de tu fototeca o del disco no se eliminan.",
+  "media_siteMediaSection_unlinkSelectedContent": "Elimina {count} elementos de tu biblioteca, junto con sus copias en la nube y miniaturas. Los medios que un buceo todavía usa se conservan. Tus archivos originales no se ven afectados.",
   "media_siteMediaSection_unlinkSelectedSuccess": "Se quitaron {count} adjuntos",
   "media_documentViewer_title": "Documento",
   "media_documentViewer_unavailable": "Este documento no está disponible en este dispositivo",

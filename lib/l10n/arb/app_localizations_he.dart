@@ -12204,8 +12204,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'הפריטים שנבחרו יוסרו מאתר זה. קבצים בספריית התמונות או בדיסק לא יימחקו.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'מסיר $count פריטים מהספרייה שלך, יחד עם עותקי הענן והתמונות הממוזערות. מדיה שצלילה עדיין משתמשת בה נשמרת. הקבצים המקוריים שלך אינם מושפעים.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {

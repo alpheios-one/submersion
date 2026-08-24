@@ -51,9 +51,8 @@ class MediaSelectionBar extends ConsumerWidget {
 
   List<String> get _ids => selectedItems.map((m) => m.id).toList();
 
-  /// Ids of the selection that actually carry a dive link. The unlink ops
-  /// latch `retainInLibrary`, which permanently excludes a row from the
-  /// orphan sweep - so they must only ever see rows the action applies to.
+  /// Ids of the selection that actually carry a dive link: the service must
+  /// only see rows the action applies to.
   List<String> get _diveLinkedIds =>
       selectedItems.where((m) => m.diveId != null).map((m) => m.id).toList();
 
@@ -81,6 +80,25 @@ class MediaSelectionBar extends ConsumerWidget {
     }
 
     await service.unlinkFromDive(ids);
+    ref.read(mediaSelectionProvider.notifier).clear();
+  }
+
+  Future<void> _unlinkFromSite(BuildContext context, WidgetRef ref) async {
+    final ids = _siteLinkedIds;
+    if (ids.isEmpty) return;
+    final service = ref.read(mediaUnlinkServiceProvider);
+
+    final wouldLose = await service.idsWithUserMetadataAtRiskForSite(ids);
+    if (wouldLose.isNotEmpty) {
+      if (!context.mounted) return;
+      final go = await confirmUnlinkDiscardsMetadata(
+        context,
+        count: wouldLose.length,
+      );
+      if (!go) return;
+    }
+
+    await service.unlinkFromSite(ids);
     ref.read(mediaSelectionProvider.notifier).clear();
   }
 
@@ -130,12 +148,7 @@ class MediaSelectionBar extends ConsumerWidget {
                       TextButton.icon(
                         icon: const Icon(Icons.location_off),
                         label: Text(context.l10n.media_library_unlinkFromSite),
-                        onPressed: () async {
-                          await ref
-                              .read(mediaRepositoryProvider)
-                              .unlinkFromSite(_siteLinkedIds);
-                          ref.read(mediaSelectionProvider.notifier).clear();
-                        },
+                        onPressed: () => _unlinkFromSite(context, ref),
                       ),
                     TextButton.icon(
                       icon: const Icon(Icons.drive_file_move_outline),

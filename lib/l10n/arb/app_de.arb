@@ -4020,7 +4020,7 @@
   "media_siteMediaSection_divePhotosGroup": "Fotos von Tauchgängen hier ({count})",
   "media_siteMediaSection_divePhotoLabel": "Tauchgangsfoto",
   "media_siteMediaSection_unlinkSelectedTitle": "{count} Anhänge entfernen?",
-  "media_siteMediaSection_unlinkSelectedContent": "Die ausgewählten Elemente werden von diesem Tauchplatz entfernt. Dateien in deiner Fotobibliothek oder auf der Festplatte werden nicht gelöscht.",
+  "media_siteMediaSection_unlinkSelectedContent": "Entfernt {count} Elemente aus Ihrer Bibliothek, einschließlich Cloud-Kopien und Vorschaubildern. Medien, die ein Tauchgang noch verwendet, bleiben erhalten. Ihre Originaldateien sind nicht betroffen.",
   "media_siteMediaSection_unlinkSelectedSuccess": "{count} Anhänge entfernt",
   "media_documentViewer_title": "Dokument",
   "media_documentViewer_unavailable": "Dieses Dokument ist auf diesem Gerät nicht verfügbar",

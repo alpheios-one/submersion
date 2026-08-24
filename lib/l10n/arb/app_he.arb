@@ -3947,7 +3947,7 @@
   "media_siteMediaSection_divePhotosGroup": "תמונות מצלילות כאן ({count})",
   "media_siteMediaSection_divePhotoLabel": "תמונת צלילה",
   "media_siteMediaSection_unlinkSelectedTitle": "להסיר {count} קבצים מצורפים?",
-  "media_siteMediaSection_unlinkSelectedContent": "הפריטים שנבחרו יוסרו מאתר זה. קבצים בספריית התמונות או בדיסק לא יימחקו.",
+  "media_siteMediaSection_unlinkSelectedContent": "מסיר {count} פריטים מהספרייה שלך, יחד עם עותקי הענן והתמונות הממוזערות. מדיה שצלילה עדיין משתמשת בה נשמרת. הקבצים המקוריים שלך אינם מושפעים.",
   "media_siteMediaSection_unlinkSelectedSuccess": "הוסרו {count} קבצים מצורפים",
   "media_documentViewer_title": "מסמך",
   "media_documentViewer_unavailable": "מסמך זה אינו זמין במכשיר זה",

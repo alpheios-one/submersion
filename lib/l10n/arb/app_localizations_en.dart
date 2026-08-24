@@ -12304,8 +12304,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Removes $count items from your library, along with their cloud copies and thumbnails. Media a dive still uses is kept. Your original files are not affected.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {

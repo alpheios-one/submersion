@@ -12500,8 +12500,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'Los elementos seleccionados se quitarán de este punto de buceo. Los archivos de tu fototeca o del disco no se eliminan.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Elimina $count elementos de tu biblioteca, junto con sus copias en la nube y miniaturas. Los medios que un buceo todavía usa se conservan. Tus archivos originales no se ven afectados.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {

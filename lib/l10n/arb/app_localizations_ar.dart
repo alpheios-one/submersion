@@ -12286,8 +12286,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'ستتم إزالة العناصر المحددة من هذا الموقع. لن يتم حذف الملفات في مكتبة الصور أو على القرص.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'يزيل $count عنصرًا من مكتبتك مع نسخها السحابية وصورها المصغرة. تُحفظ الوسائط التي لا تزال غطسة تستخدمها. ملفاتك الأصلية لا تتأثر.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {

@@ -12514,8 +12514,9 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'Gli elementi selezionati verranno rimossi da questo sito. I file nella libreria foto o su disco non vengono eliminati.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Rimuove $count elementi dalla libreria, insieme alle copie cloud e alle miniature. I media ancora usati da un\'immersione vengono conservati. I file originali non vengono toccati.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {

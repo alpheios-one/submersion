@@ -4020,7 +4020,7 @@
   "media_siteMediaSection_divePhotosGroup": "صور من الغوصات هنا ({count})",
   "media_siteMediaSection_divePhotoLabel": "صورة غوص",
   "media_siteMediaSection_unlinkSelectedTitle": "إزالة {count} من المرفقات؟",
-  "media_siteMediaSection_unlinkSelectedContent": "ستتم إزالة العناصر المحددة من هذا الموقع. لن يتم حذف الملفات في مكتبة الصور أو على القرص.",
+  "media_siteMediaSection_unlinkSelectedContent": "يزيل {count} عنصرًا من مكتبتك مع نسخها السحابية وصورها المصغرة. تُحفظ الوسائط التي لا تزال غطسة تستخدمها. ملفاتك الأصلية لا تتأثر.",
   "media_siteMediaSection_unlinkSelectedSuccess": "تمت إزالة {count} من المرفقات",
   "media_documentViewer_title": "مستند",
   "media_documentViewer_unavailable": "هذا المستند غير متاح على هذا الجهاز",

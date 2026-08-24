@@ -12474,8 +12474,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'A kijelölt elemek eltávolításra kerülnek erről a merülőhelyről. A fotókönyvtárban vagy a lemezen lévő fájlok nem törlődnek.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Eltávolít $count elemet a könyvtárból, a felhőmásolatokkal és bélyegképekkel együtt. A merülés által még használt médiák megmaradnak. Az eredeti fájlok nem változnak.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {

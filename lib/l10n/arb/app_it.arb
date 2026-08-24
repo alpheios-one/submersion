@@ -3947,7 +3947,7 @@
   "media_siteMediaSection_divePhotosGroup": "Foto dalle immersioni qui ({count})",
   "media_siteMediaSection_divePhotoLabel": "Foto dell'immersione",
   "media_siteMediaSection_unlinkSelectedTitle": "Rimuovere {count} allegati?",
-  "media_siteMediaSection_unlinkSelectedContent": "Gli elementi selezionati verranno rimossi da questo sito. I file nella libreria foto o su disco non vengono eliminati.",
+  "media_siteMediaSection_unlinkSelectedContent": "Rimuove {count} elementi dalla libreria, insieme alle copie cloud e alle miniature. I media ancora usati da un'immersione vengono conservati. I file originali non vengono toccati.",
   "media_siteMediaSection_unlinkSelectedSuccess": "{count} allegati rimossi",
   "media_documentViewer_title": "Documento",
   "media_documentViewer_unavailable": "Questo documento non è disponibile su questo dispositivo",

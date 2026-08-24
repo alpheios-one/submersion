@@ -291,4 +291,70 @@ void main() {
       });
     });
   });
+
+  group('unlinkFromSite', () {
+    test('a site-only photo is deleted from the library', () async {
+      await insertSite('s1');
+      final m = await repo.createMedia(item('m1', siteId: 's1'));
+      final built = buildService();
+
+      final outcome = await built.service.unlinkFromSite([m.id]);
+
+      expect(built.deleted, [m.id]);
+      expect(await repo.getMediaById(m.id), isNull);
+      expect(outcome.deleted, 1);
+      expect(outcome.keptAsDiveMedia, 0);
+    });
+
+    test(
+      'a dive-linked photo survives with only the site link cleared',
+      () async {
+        await insertDive('d1');
+        await insertSite('s1');
+        final m = await repo.createMedia(
+          item('m1', diveId: 'd1', siteId: 's1'),
+        );
+        final built = buildService();
+
+        final outcome = await built.service.unlinkFromSite([m.id]);
+
+        expect(built.deleted, isEmpty, reason: 'a dive still needs this photo');
+        final kept = await repo.getMediaById(m.id);
+        expect(kept!.siteId, isNull);
+        expect(kept.diveId, 'd1');
+        expect(outcome.deleted, 0);
+        expect(outcome.keptAsDiveMedia, 1);
+      },
+    );
+
+    test(
+      'metadata at risk is scoped to the rows the site unlink deletes',
+      () async {
+        await insertDive('d1');
+        await insertSite('s1');
+        final kept = await repo.createMedia(
+          item('kept', diveId: 'd1', siteId: 's1', caption: 'stays'),
+        );
+        final gone = await repo.createMedia(
+          item('gone', siteId: 's1', isFavorite: true),
+        );
+        final built = buildService();
+
+        final atRisk = await built.service.idsWithUserMetadataAtRiskForSite([
+          kept.id,
+          gone.id,
+        ]);
+
+        expect(atRisk, {gone.id});
+      },
+    );
+
+    test('an empty list is a no-op', () async {
+      final built = buildService();
+      final outcome = await built.service.unlinkFromSite(const []);
+      expect(outcome.deleted, 0);
+      expect(outcome.keptAsDiveMedia, 0);
+      expect(built.deleted, isEmpty);
+    });
+  });
 }

@@ -4167,7 +4167,7 @@
   "media_siteMediaSection_divePhotosGroup": "此处潜水的照片（{count}）",
   "media_siteMediaSection_divePhotoLabel": "潜水照片",
   "media_siteMediaSection_unlinkSelectedTitle": "移除 {count} 个附件？",
-  "media_siteMediaSection_unlinkSelectedContent": "所选项目将从此潜水点移除。照片库或磁盘中的文件不会被删除。",
+  "media_siteMediaSection_unlinkSelectedContent": "从媒体库中移除 {count} 个项目及其云端副本和缩略图。仍被潜水使用的媒体会保留。您的原始文件不受影响。",
   "media_siteMediaSection_unlinkSelectedSuccess": "已移除 {count} 个附件",
   "media_documentViewer_title": "文档",
   "media_documentViewer_unavailable": "此文档在本设备上不可用",

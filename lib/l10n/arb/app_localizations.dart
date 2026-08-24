@@ -21233,11 +21233,11 @@ abstract class AppLocalizations {
   /// **'Remove {count} attachments?'**
   String media_siteMediaSection_unlinkSelectedTitle(int count);
 
-  /// No description provided for @media_siteMediaSection_unlinkSelectedContent.
+  /// Site page unlink confirmation body
   ///
   /// In en, this message translates to:
-  /// **'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.'**
-  String get media_siteMediaSection_unlinkSelectedContent;
+  /// **'Removes {count} items from your library, along with their cloud copies and thumbnails. Media a dive still uses is kept. Your original files are not affected.'**
+  String media_siteMediaSection_unlinkSelectedContent(int count);
 
   /// No description provided for @media_siteMediaSection_unlinkSelectedSuccess.
   ///

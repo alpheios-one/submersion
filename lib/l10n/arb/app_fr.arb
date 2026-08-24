@@ -3947,7 +3947,7 @@
   "media_siteMediaSection_divePhotosGroup": "Photos des plongées ici ({count})",
   "media_siteMediaSection_divePhotoLabel": "Photo de plongée",
   "media_siteMediaSection_unlinkSelectedTitle": "Retirer {count} pièces jointes ?",
-  "media_siteMediaSection_unlinkSelectedContent": "Les éléments sélectionnés seront retirés de ce site. Les fichiers de votre photothèque ou sur disque ne sont pas supprimés.",
+  "media_siteMediaSection_unlinkSelectedContent": "Supprime {count} éléments de votre bibliothèque, ainsi que leurs copies cloud et vignettes. Les médias encore utilisés par une plongée sont conservés. Vos fichiers d'origine ne sont pas affectés.",
   "media_siteMediaSection_unlinkSelectedSuccess": "{count} pièces jointes retirées",
   "media_documentViewer_title": "Document",
   "media_documentViewer_unavailable": "Ce document n'est pas disponible sur cet appareil",

@@ -3947,7 +3947,7 @@
   "media_siteMediaSection_divePhotosGroup": "Fotók az itteni merülésekről ({count})",
   "media_siteMediaSection_divePhotoLabel": "Merülésfotó",
   "media_siteMediaSection_unlinkSelectedTitle": "Eltávolítasz {count} mellékletet?",
-  "media_siteMediaSection_unlinkSelectedContent": "A kijelölt elemek eltávolításra kerülnek erről a merülőhelyről. A fotókönyvtárban vagy a lemezen lévő fájlok nem törlődnek.",
+  "media_siteMediaSection_unlinkSelectedContent": "Eltávolít {count} elemet a könyvtárból, a felhőmásolatokkal és bélyegképekkel együtt. A merülés által még használt médiák megmaradnak. Az eredeti fájlok nem változnak.",
   "media_siteMediaSection_unlinkSelectedSuccess": "{count} melléklet eltávolítva",
   "media_documentViewer_title": "Dokumentum",
   "media_documentViewer_unavailable": "Ez a dokumentum nem érhető el ezen az eszközön",

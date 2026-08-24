@@ -12512,8 +12512,9 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'Os itens selecionados serão removidos deste ponto de mergulho. Os arquivos na sua galeria ou no disco não são excluídos.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Remove $count itens da sua biblioteca, junto com as cópias na nuvem e miniaturas. Mídias que um mergulho ainda usa são mantidas. Seus arquivos originais não são afetados.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {

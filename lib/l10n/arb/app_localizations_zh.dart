@@ -11935,8 +11935,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      '所选项目将从此潜水点移除。照片库或磁盘中的文件不会被删除。';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return '从媒体库中移除 $count 个项目及其云端副本和缩略图。仍被潜水使用的媒体会保留。您的原始文件不受影响。';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {

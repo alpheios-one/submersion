@@ -4020,7 +4020,7 @@
   "media_siteMediaSection_divePhotosGroup": "Fotos de mergulhos aqui ({count})",
   "media_siteMediaSection_divePhotoLabel": "Foto de mergulho",
   "media_siteMediaSection_unlinkSelectedTitle": "Remover {count} anexos?",
-  "media_siteMediaSection_unlinkSelectedContent": "Os itens selecionados serão removidos deste ponto de mergulho. Os arquivos na sua galeria ou no disco não são excluídos.",
+  "media_siteMediaSection_unlinkSelectedContent": "Remove {count} itens da sua biblioteca, junto com as cópias na nuvem e miniaturas. Mídias que um mergulho ainda usa são mantidas. Seus arquivos originais não são afetados.",
   "media_siteMediaSection_unlinkSelectedSuccess": "{count} anexos removidos",
   "media_documentViewer_title": "Documento",
   "media_documentViewer_unavailable": "Este documento não está disponível neste dispositivo",

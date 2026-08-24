@@ -4020,7 +4020,7 @@
   "media_siteMediaSection_divePhotosGroup": "Foto's van duiken hier ({count})",
   "media_siteMediaSection_divePhotoLabel": "Duikfoto",
   "media_siteMediaSection_unlinkSelectedTitle": "{count} bijlagen verwijderen?",
-  "media_siteMediaSection_unlinkSelectedContent": "De geselecteerde items worden van deze duikstek verwijderd. Bestanden in je fotobibliotheek of op schijf worden niet gewist.",
+  "media_siteMediaSection_unlinkSelectedContent": "Verwijdert {count} items uit je bibliotheek, inclusief cloudkopieën en miniaturen. Media die een duik nog gebruikt, blijven bewaard. Je originele bestanden blijven onaangetast.",
   "media_siteMediaSection_unlinkSelectedSuccess": "{count} bijlagen verwijderd",
   "media_documentViewer_title": "Document",
   "media_documentViewer_unavailable": "Dit document is niet beschikbaar op dit apparaat",

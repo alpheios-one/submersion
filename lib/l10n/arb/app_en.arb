@@ -7088,7 +7088,16 @@
   "media_siteMediaSection_divePhotosGroup": "Photos from dives here ({count})",
   "media_siteMediaSection_divePhotoLabel": "Dive photo",
   "media_siteMediaSection_unlinkSelectedTitle": "Remove {count} attachments?",
-  "media_siteMediaSection_unlinkSelectedContent": "The selected items will be removed from this site. Files in your photo library or on disk are not deleted.",
+  "media_siteMediaSection_unlinkSelectedContent": "Removes {count} items from your library, along with their cloud copies and thumbnails. Media a dive still uses is kept. Your original files are not affected.",
+  "@media_siteMediaSection_unlinkSelectedContent": {
+    "description": "Site page unlink confirmation body",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
   "media_siteMediaSection_unlinkSelectedSuccess": "Removed {count} attachments",
   "media_documentViewer_title": "Document",
   "media_documentViewer_unavailable": "This document is not available on this device",
