@@ -11,9 +11,10 @@
 //   the [ManifestModePanel] (Phase 3b Task 13 swap).
 // - Multi-line text field per-line validation via `UrlValidator`.
 // - "Add URL" single-line entry that appends to the staged set.
-// - Auto-match-by-date checkbox is on by default.
 // - "Add" button disabled when staged set is empty or has any invalid lines.
-// - Tapping "Add" calls `commit()` and shows a success snackbar with "Undo".
+// - Tapping "Add" resolves the draft, inserts against the picker's dive or
+//   site target (or opens the import review when there is none), and shows
+//   a success snackbar with "Undo".
 // - Tapping "Undo" calls `undoCommit(ids)`.
 // - On a 401 (unauthenticated host) a "Sign in" badge appears; tapping it
 //   opens the sign-in sheet.
@@ -45,10 +46,12 @@ import 'package:submersion/features/media/data/services/manifest_fetch_service.d
 import 'package:submersion/features/media/data/services/network_credentials_service.dart';
 import 'package:submersion/features/media/data/services/network_fetch_pipeline.dart';
 import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
+import 'package:submersion/features/media/presentation/pages/media_import_review_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/providers/url_tab_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/network_signin_sheet.dart';
 import 'package:submersion/features/media/presentation/widgets/url_tab.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import 'url_tab_test.mocks.dart';
 
@@ -137,9 +140,34 @@ void main() {
             ),
           ),
       ],
-      child: MaterialApp(home: Scaffold(body: child)),
+      // The review page the no-target flow opens reads context.l10n.
+      child: MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(body: child),
+      ),
     );
   }
+
+  ResolvedNetworkMedia resolvedA() =>
+      ResolvedNetworkMedia(uri: Uri.parse('https://example.com/a.jpg'));
+
+  void stubResolveAndInsert({List<String> ids = const ['id-1']}) {
+    when(pipeline.resolve(any)).thenAnswer((_) async => [resolvedA()]);
+    when(
+      pipeline.insertResolved(any, subscriptionId: anyNamed('subscriptionId')),
+    ).thenAnswer((_) async => ids);
+  }
+
+  List<NetworkInsertRequest> capturedRequests() =>
+      verify(
+            pipeline.insertResolved(
+              captureAny,
+              subscriptionId: anyNamed('subscriptionId'),
+            ),
+          ).captured.single
+          as List<NetworkInsertRequest>;
 
   testWidgets('renders mode segmented control with URLs default', (
     tester,
@@ -213,12 +241,6 @@ void main() {
     );
   });
 
-  testWidgets('autoMatchByDate checkbox is on by default', (tester) async {
-    await tester.pumpWidget(wrap(const UrlTab()));
-    final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
-    expect(checkbox.value, isTrue);
-  });
-
   testWidgets('Add button disabled when staged set is empty', (tester) async {
     await tester.pumpWidget(wrap(const UrlTab()));
     final addButton = tester.widget<FilledButton>(
@@ -242,22 +264,15 @@ void main() {
     expect(addButton.onPressed, isNull);
   });
 
-  testWidgets('committing calls notifier.commit and shows undo snack', (
+  testWidgets('Add resolves the draft and inserts against the dive target', (
     tester,
   ) async {
-    when(
-      pipeline.ingest(any, autoMatch: anyNamed('autoMatch')),
-    ).thenAnswer((_) async => ['id-1', 'id-2']);
+    stubResolveAndInsert();
 
     await tester.pumpWidget(
       wrap(
-        const UrlTab(),
-        seed: const UrlTabState(
-          draftLines: [
-            'https://example.com/a.jpg',
-            'https://example.com/b.jpg',
-          ],
-        ),
+        const UrlTab(target: DiveAttachTarget('dive-1')),
+        seed: const UrlTabState(draftLines: ['https://example.com/a.jpg']),
       ),
     );
 
@@ -265,26 +280,40 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    verify(pipeline.ingest(any, autoMatch: anyNamed('autoMatch'))).called(1);
-    expect(find.byType(SnackBar), findsOneWidget);
+    final requests = capturedRequests();
+    expect(requests.single.diveId, 'dive-1');
+    expect(requests.single.siteId, isNull);
+    expect(find.text('Added 1 URL'), findsOneWidget);
     expect(find.text('Undo'), findsOneWidget);
   });
 
-  testWidgets('undo calls notifier.undoCommit(ids)', (tester) async {
-    when(
-      pipeline.ingest(any, autoMatch: anyNamed('autoMatch')),
-    ).thenAnswer((_) async => ['id-1', 'id-2']);
-    when(repo.deleteMedia(any)).thenAnswer((_) async {});
+  testWidgets('with no target, Add opens the review page', (tester) async {
+    stubResolveAndInsert();
 
     await tester.pumpWidget(
       wrap(
         const UrlTab(),
-        seed: const UrlTabState(
-          draftLines: [
-            'https://example.com/a.jpg',
-            'https://example.com/b.jpg',
-          ],
-        ),
+        seed: const UrlTabState(draftLines: ['https://example.com/a.jpg']),
+      ),
+    );
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Add'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MediaImportReviewPage), findsOneWidget);
+    verifyNever(
+      pipeline.insertResolved(any, subscriptionId: anyNamed('subscriptionId')),
+    );
+  });
+
+  testWidgets('undo calls notifier.undoCommit(ids)', (tester) async {
+    stubResolveAndInsert(ids: ['id-1', 'id-2']);
+    when(repo.deleteMedia(any)).thenAnswer((_) async {});
+
+    await tester.pumpWidget(
+      wrap(
+        const UrlTab(target: DiveAttachTarget('dive-1')),
+        seed: const UrlTabState(draftLines: ['https://example.com/a.jpg']),
       ),
     );
 
@@ -369,25 +398,8 @@ void main() {
   // rows that could only ever land on a dive, so the site never gained the
   // attachment the user asked for.
   group('site target', () {
-    testWidgets('hides the dive auto-match checkbox', (tester) async {
-      await tester.pumpWidget(
-        wrap(const UrlTab(target: SiteAttachTarget('site-1'))),
-      );
-
-      expect(find.byType(Checkbox), findsNothing);
-      expect(find.textContaining('Auto-match'), findsNothing);
-    });
-
-    testWidgets('ingests against the site with dive matching off', (
-      tester,
-    ) async {
-      when(
-        pipeline.ingest(
-          any,
-          autoMatch: anyNamed('autoMatch'),
-          siteId: anyNamed('siteId'),
-        ),
-      ).thenAnswer((_) async => ['id-1']);
+    testWidgets('inserts against the site', (tester) async {
+      stubResolveAndInsert();
 
       await tester.pumpWidget(
         wrap(
@@ -397,16 +409,16 @@ void main() {
       );
       await tester.tap(find.widgetWithText(FilledButton, 'Add'));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       verify(
-        pipeline.ingest(
+        pipeline.resolve(
           argThat(equals([Uri.parse('https://example.com/a.jpg')])),
-          // A site has no time window, so a date match here would attach the
-          // photo to some unrelated dive instead of to the site.
-          autoMatch: false,
-          siteId: 'site-1',
         ),
       ).called(1);
+      final requests = capturedRequests();
+      expect(requests.single.siteId, 'site-1');
+      expect(requests.single.diveId, isNull);
     });
   });
 }
