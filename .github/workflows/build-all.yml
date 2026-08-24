@@ -183,7 +183,7 @@ jobs:
           echo 'CODE_SIGN_IDENTITY = ' >> macos/Runner/Configs/Release.xcconfig
 
       - name: Build macOS release
-        run: flutter build macos --release --dart-define=UPDATE_CHANNEL=github
+        run: flutter build macos --release --dart-define=UPDATE_CHANNEL=github --dart-define=GOOGLE_DRIVE_CLIENT_SECRET=${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}
 
       # -- Developer ID DMG (for GitHub Release) --
 
@@ -453,7 +453,7 @@ jobs:
           grep '^version:' pubspec.yaml
 
       - name: Build Windows release
-        run: flutter build windows --release --dart-define=UPDATE_CHANNEL=github
+        run: flutter build windows --release --dart-define=UPDATE_CHANNEL=github --dart-define=GOOGLE_DRIVE_CLIENT_SECRET=${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}
 
       - name: Check bundled native assets
         # Runs before the installer is compiled: the .iss packages whatever is
@@ -595,7 +595,7 @@ jobs:
           grep '^version:' pubspec.yaml
 
       - name: Build Linux release
-        run: flutter build linux --release --dart-define=UPDATE_CHANNEL=github
+        run: flutter build linux --release --dart-define=UPDATE_CHANNEL=github --dart-define=GOOGLE_DRIVE_CLIENT_SECRET=${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}
 
       - name: Check bundled native assets
         # Runs before the tarball is rolled, for the same reason as the Windows
