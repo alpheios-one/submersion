@@ -4,6 +4,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
+import 'package:submersion/features/media/domain/value_objects/import_preview.dart';
 import 'package:submersion/features/media/data/services/media_import_service.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
@@ -73,6 +74,10 @@ void main() {
       expect(page.candidates.map((c) => c.key), ['a1', 'a2']);
       expect(page.candidates.first.title, 'a1.jpg');
       expect(page.candidates.first.takenAt, DateTime.utc(2026, 6, 12, 10));
+      expect(page.candidates.map((c) => c.preview), [
+        const AssetImportPreview('a1'),
+        const AssetImportPreview('a2'),
+      ]);
     },
   );
 

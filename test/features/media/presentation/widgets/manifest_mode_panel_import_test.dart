@@ -6,6 +6,7 @@ import 'package:submersion/features/media/data/parsers/manifest_format.dart';
 import 'package:submersion/features/media/data/parsers/manifest_parse_result.dart';
 import 'package:submersion/features/media/data/repositories/manifest_subscription_repository.dart';
 import 'package:submersion/features/media/data/services/manifest_fetch_service.dart';
+import 'package:submersion/features/media/data/services/network_credentials_service.dart';
 import 'package:submersion/features/media/data/services/network_fetch_pipeline.dart';
 import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/features/media/presentation/pages/media_import_review_page.dart';
@@ -142,6 +143,10 @@ void main() {
       overrides: [
         manifestFetchServiceProvider.overrideWithValue(stub),
         networkFetchPipelineProvider.overrideWithValue(pipeline),
+        // The review page renders [NetworkThumbnail] for each entry, which
+        // reads the credentials provider; the real one reaches into the
+        // not-initialized [DatabaseService] in tests.
+        networkCredentialsServiceProvider.overrideWithValue(_FakeCreds()),
         manifestTabProvider.overrideWith(
           (ref) => _SeededManifestTabNotifier(
             ManifestTabShowingPreview(
@@ -238,4 +243,14 @@ void main() {
     expect(subRepo.deleted, ['sub-1']);
     await tester.pumpAndSettle();
   });
+}
+
+class _FakeCreds implements NetworkCredentialsService {
+  @override
+  Future<Map<String, String>?> headersFor(Uri uri) async => null;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError(
+    '${invocation.memberName} not stubbed in _FakeCreds',
+  );
 }
