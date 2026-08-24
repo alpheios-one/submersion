@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
+import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/data/repositories/manifest_subscription_repository.dart';
 import 'package:submersion/features/media/data/resolvers/http_url_media_resolver.dart';
 import 'package:submersion/features/media/data/resolvers/local_file_resolver.dart';
 import 'package:submersion/features/media/data/resolvers/platform_gallery_resolver.dart';
 import 'package:submersion/features/media/data/resolvers/signature_resolver.dart';
+import 'package:submersion/features/media/data/services/dive_link_matcher.dart';
 import 'package:submersion/features/media/data/services/exif_extractor.dart';
 import 'package:submersion/features/media/data/services/media_item_verifier.dart';
 import 'package:submersion/features/media/data/services/media_verification_sweep.dart';
@@ -238,15 +241,22 @@ final manifestSubscriptionRepositoryProvider =
     );
 
 /// Singleton [SubscriptionPoller]. Composes the subscription repository,
-/// the media repository, the manifest fetch service, and 3a's network
-/// fetch pipeline (which actually inserts the new manifest entries and
-/// fills metadata in the background).
+/// the media repository, the manifest fetch service, the network fetch
+/// pipeline (resolve, then insert already linked) and the dive matcher that
+/// decides which new entries earn a row.
 final subscriptionPollerProvider = Provider<SubscriptionPoller>((ref) {
   return SubscriptionPoller(
     subscriptions: ref.watch(manifestSubscriptionRepositoryProvider),
     mediaRepo: ref.watch(mediaRepositoryProvider),
     fetchService: ref.watch(manifestFetchServiceProvider),
     pipeline: ref.watch(networkFetchPipelineProvider),
+    diveLinkMatcher: DiveLinkMatcher(
+      diveRepository: ref.watch(diveRepositoryProvider),
+    ),
+    // Read per poll, not captured: the active diver can change between
+    // cycles, and matching against another diver's dives would hand the
+    // photo to the wrong logbook.
+    activeDiverId: () => ref.read(currentDiverIdProvider),
   );
 });
 

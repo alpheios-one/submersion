@@ -16,7 +16,7 @@ class DiveMediaEnricher {
   DiveMediaEnricher({
     required this.loadDive,
     required this.loadMediaForDive,
-    required this.saveEnrichment,
+    required this.saveEnrichments,
     this.enrichmentService = const EnrichmentService(),
   });
 
@@ -24,7 +24,15 @@ class DiveMediaEnricher {
   /// which populates `profile`; list queries do not).
   final Future<Dive?> Function(String diveId) loadDive;
   final Future<List<MediaItem>> Function(String diveId) loadMediaForDive;
-  final Future<void> Function(MediaEnrichment enrichment) saveEnrichment;
+
+  /// Persists a whole dive's new/changed rows in one call
+  /// (`MediaRepository.saveEnrichments`: one transaction, one table tick).
+  /// Per-row saves here committed once per photo, and the backfill runs
+  /// from the OPEN media viewer: whenever the burst outlasted the 300ms
+  /// tick debounce, the library query and the other media providers re-ran
+  /// while the user was mid-swipe.
+  final Future<void> Function(List<MediaEnrichment> enrichments)
+  saveEnrichments;
   final EnrichmentService enrichmentService;
 
   /// Enriches every media item linked to [diveId] whose stored enrichment is
@@ -49,7 +57,7 @@ class DiveMediaEnricher {
     if (dive == null || dive.profile.isEmpty) return 0;
 
     final media = await loadMediaForDive(diveId);
-    var enriched = 0;
+    final toSave = <MediaEnrichment>[];
     for (final item in media) {
       // Signatures are attached to a dive but not moments within it, and the
       // chart excludes them regardless — don't fabricate a depth/time for one.
@@ -72,7 +80,7 @@ class DiveMediaEnricher {
       final existing = item.enrichment;
       if (existing != null && _matches(existing, result, diveId)) continue;
 
-      await saveEnrichment(
+      toSave.add(
         MediaEnrichment(
           // Keep the row's identity so the repository updates in place
           // instead of minting a second row for the same media.
@@ -87,9 +95,13 @@ class DiveMediaEnricher {
           createdAt: DateTime.now(),
         ),
       );
-      enriched++;
     }
-    return enriched;
+    // One batched save for the whole dive; skipped entirely when nothing
+    // changed, so the idempotent re-run costs no write and no tick.
+    if (toSave.isNotEmpty) {
+      await saveEnrichments(toSave);
+    }
+    return toSave.length;
   }
 
   /// Whether [existing] already records exactly what [result] computes for

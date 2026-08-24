@@ -17168,6 +17168,12 @@ abstract class AppLocalizations {
   /// **'Date Issued'**
   String get enum_sortField_dateIssued;
 
+  /// No description provided for @enum_sortField_dateTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Taken'**
+  String get enum_sortField_dateTaken;
+
   /// No description provided for @enum_sortField_difficulty.
   ///
   /// In en, this message translates to:
@@ -17197,6 +17203,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End Date'**
   String get enum_sortField_endDate;
+
+  /// No description provided for @enum_sortField_fileName.
+  ///
+  /// In en, this message translates to:
+  /// **'File Name'**
+  String get enum_sortField_fileName;
+
+  /// No description provided for @enum_sortField_fileSize.
+  ///
+  /// In en, this message translates to:
+  /// **'File Size'**
+  String get enum_sortField_fileSize;
 
   /// No description provided for @enum_sortField_lastServiceDate.
   ///
@@ -21089,36 +21107,6 @@ abstract class AppLocalizations {
   /// **'Photos & Video'**
   String get media_diveMediaSection_title;
 
-  /// Dive media selection: destructive delete action
-  ///
-  /// In en, this message translates to:
-  /// **'Delete'**
-  String get media_diveMediaSection_deleteButton;
-
-  /// Error snackbar when the dive media bulk delete fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to delete: {error}'**
-  String media_diveMediaSection_deleteError(Object error);
-
-  /// Body of the dive media bulk delete confirmation
-  ///
-  /// In en, this message translates to:
-  /// **'This removes them from the app and any media store. This cannot be undone.'**
-  String get media_diveMediaSection_deleteSelectedContent;
-
-  /// No description provided for @media_diveMediaSection_deleteSelectedSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Deleted {count} items'**
-  String media_diveMediaSection_deleteSelectedSuccess(int count);
-
-  /// No description provided for @media_diveMediaSection_deleteSelectedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete {count} items?'**
-  String media_diveMediaSection_deleteSelectedTitle(int count);
-
   /// Replace-link confirm action for a changed file
   ///
   /// In en, this message translates to:
@@ -21142,18 +21130,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unlink'**
   String get media_diveMediaSection_unlinkButton;
-
-  /// No description provided for @media_diveMediaSection_unlinkDialogContent.
-  ///
-  /// In en, this message translates to:
-  /// **'Remove this photo from the dive? The photo will remain in your gallery.'**
-  String get media_diveMediaSection_unlinkDialogContent;
-
-  /// No description provided for @media_diveMediaSection_unlinkDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlink Photo'**
-  String get media_diveMediaSection_unlinkDialogTitle;
 
   /// No description provided for @media_diveMediaSection_unlinkError.
   ///
@@ -21185,11 +21161,29 @@ abstract class AppLocalizations {
   /// **'Unlink {count} items?'**
   String media_diveMediaSection_unlinkSelectedTitle(int count);
 
-  /// No description provided for @media_diveMediaSection_unlinkSuccess.
+  /// Title of the library unlink confirmation dialog
   ///
   /// In en, this message translates to:
-  /// **'Photo unlinked'**
-  String get media_diveMediaSection_unlinkSuccess;
+  /// **'Unlink {count} items?'**
+  String media_library_unlinkConfirmTitle(int count);
+
+  /// Site page unlink failure snackbar
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to unlink: {error}'**
+  String media_siteMediaSection_unlinkError(Object error);
+
+  /// Body of the library unlink confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'They leave your library, along with their cloud copies and thumbnails. Your original files are not affected. This cannot be undone.'**
+  String get media_library_unlinkConfirmBody;
+
+  /// Extra line naming the captions and favorites an unlink discards
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural, =1{1 of these has a caption or favorite saved in Submersion, and those details are lost.} other{{count} of these have a caption or favorite saved in Submersion, and those details are lost.}}'**
+  String media_library_unlinkMetadataNote(int count);
 
   /// No description provided for @media_siteMediaSection_title.
   ///
@@ -21230,19 +21224,19 @@ abstract class AppLocalizations {
   /// No description provided for @media_siteMediaSection_unlinkSelectedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Remove {count} attachments?'**
+  /// **'Unlink {count} items?'**
   String media_siteMediaSection_unlinkSelectedTitle(int count);
 
-  /// No description provided for @media_siteMediaSection_unlinkSelectedContent.
+  /// Site page unlink confirmation body
   ///
   /// In en, this message translates to:
-  /// **'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.'**
-  String get media_siteMediaSection_unlinkSelectedContent;
+  /// **'Removes {count} items from your library, along with their cloud copies and thumbnails. Media a dive still uses is kept. Your original files are not affected.'**
+  String media_siteMediaSection_unlinkSelectedContent(int count);
 
   /// No description provided for @media_siteMediaSection_unlinkSelectedSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Removed {count} attachments'**
+  /// **'Unlinked {count} items'**
   String media_siteMediaSection_unlinkSelectedSuccess(int count);
 
   /// No description provided for @media_documentViewer_title.
@@ -22072,10 +22066,76 @@ abstract class AppLocalizations {
   /// **'Import media...'**
   String get media_import_launch;
 
+  /// App bar title of the pre-import review
+  ///
+  /// In en, this message translates to:
+  /// **'Review import'**
+  String get media_import_review_title;
+
+  /// Confirm button of the pre-import review
+  ///
+  /// In en, this message translates to:
+  /// **'Import {count} items'**
+  String media_import_review_confirm(int count);
+
+  /// Snackbar after the review imports
+  ///
+  /// In en, this message translates to:
+  /// **'{linked} linked, {skipped} skipped, {failed} failed'**
+  String media_import_review_result(int linked, int skipped, int failed);
+
+  /// Review row menu: attach to a dive site
+  ///
+  /// In en, this message translates to:
+  /// **'Choose site'**
+  String get media_import_review_chooseSite;
+
+  /// Review row subtitle when several dives match the timestamp
+  ///
+  /// In en, this message translates to:
+  /// **'Several dives match'**
+  String get media_import_review_ambiguous;
+
+  /// Review row subtitle when no dive matches the timestamp
+  ///
+  /// In en, this message translates to:
+  /// **'No matching dive'**
+  String get media_import_review_noMatch;
+
+  /// Review row subtitle for a row the user unchecked
+  ///
+  /// In en, this message translates to:
+  /// **'Not imported'**
+  String get media_import_review_skipped;
+
+  /// Review row subtitle for a confident auto-match
+  ///
+  /// In en, this message translates to:
+  /// **'Link to #{number}'**
+  String media_import_review_linkChip(int number);
+
+  /// Review row menu: attach to a dive
+  ///
+  /// In en, this message translates to:
+  /// **'Link to dive'**
+  String get media_import_review_linkToDive;
+
+  /// Review row subtitle when attached to a site
+  ///
+  /// In en, this message translates to:
+  /// **'Link to site'**
+  String get media_import_review_linkToSite;
+
+  /// Review row menu: pick a dive
+  ///
+  /// In en, this message translates to:
+  /// **'Choose dive'**
+  String get media_import_review_chooseDive;
+
   /// Import section intro text
   ///
   /// In en, this message translates to:
-  /// **'Imported media is kept in your library and can be linked to dives automatically.'**
+  /// **'Photos are linked to a dive or a dive site as you import them.'**
   String get media_import_intro;
 
   /// Media console label for the sources section
@@ -22282,12 +22342,6 @@ abstract class AppLocalizations {
   /// **'via {source}'**
   String media_repairHistory_source(String source);
 
-  /// Media console sidebar/tab label for the missing-files view
-  ///
-  /// In en, this message translates to:
-  /// **'Missing'**
-  String get media_console_missing;
-
   /// Empty state for the missing-files view
   ///
   /// In en, this message translates to:
@@ -22390,72 +22444,6 @@ abstract class AppLocalizations {
     int skipped,
   );
 
-  /// Media console sidebar/tab label for the unlinked inbox
-  ///
-  /// In en, this message translates to:
-  /// **'Unlinked'**
-  String get media_console_unlinked;
-
-  /// Title of the post-import batch link screen
-  ///
-  /// In en, this message translates to:
-  /// **'Link imported media'**
-  String get media_import_linkTitle;
-
-  /// Confirm button on the post-import batch link screen
-  ///
-  /// In en, this message translates to:
-  /// **'Link {count} items'**
-  String media_import_linkConfirm(int count);
-
-  /// Row subtitle for imports without a confident dive match
-  ///
-  /// In en, this message translates to:
-  /// **'Stays in Unlinked'**
-  String get media_import_staysUnlinked;
-
-  /// Snackbar after the batch link applies
-  ///
-  /// In en, this message translates to:
-  /// **'{count} items linked'**
-  String media_import_linkedResult(int count);
-
-  /// Inbox chip for an ambiguous auto-match
-  ///
-  /// In en, this message translates to:
-  /// **'Choose dive'**
-  String get media_inbox_chooseDive;
-
-  /// Empty state for the unlinked inbox
-  ///
-  /// In en, this message translates to:
-  /// **'No unlinked media'**
-  String get media_inbox_empty;
-
-  /// Inbox action: keep the item in the library unlinked
-  ///
-  /// In en, this message translates to:
-  /// **'Keep'**
-  String get media_inbox_keep;
-
-  /// Inbox chip for a confident auto-match
-  ///
-  /// In en, this message translates to:
-  /// **'Link to #{number}'**
-  String media_inbox_linkChip(int number);
-
-  /// Inbox menu action: pick a dive manually
-  ///
-  /// In en, this message translates to:
-  /// **'Link to dive'**
-  String get media_inbox_linkToDive;
-
-  /// Inbox menu action: pick a site manually
-  ///
-  /// In en, this message translates to:
-  /// **'Link to site'**
-  String get media_inbox_linkToSite;
-
   /// Empty state for the media library
   ///
   /// In en, this message translates to:
@@ -22498,11 +22486,53 @@ abstract class AppLocalizations {
   /// **'Dates'**
   String get media_library_filter_dates;
 
+  /// Library filter chip: rows whose backing file is missing
+  ///
+  /// In en, this message translates to:
+  /// **'Missing files'**
+  String get media_library_filter_missing;
+
+  /// Library filter chip with the missing-file count
+  ///
+  /// In en, this message translates to:
+  /// **'Missing files ({count})'**
+  String media_library_filter_missingCount(int count);
+
   /// Library filter chip: reset every filter
   ///
   /// In en, this message translates to:
   /// **'Clear filters'**
   String get media_library_filter_clear;
+
+  /// Value shown for a filter facet that is not constrained, e.g. Site: Any
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get media_library_filter_any;
+
+  /// Title of the media library filter sheet, and the filter button's tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Filter media'**
+  String get media_library_filter_title;
+
+  /// Button that applies the drafted media filter
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get media_library_filter_apply;
+
+  /// Title of the media library sort sheet, and the sort button's tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Sort media'**
+  String get media_library_sort_title;
+
+  /// Opens the list of saved smart albums to load one
+  ///
+  /// In en, this message translates to:
+  /// **'Load album'**
+  String get media_smartAlbum_load;
 
   /// Title of the dive picker sheet
   ///
@@ -22516,43 +22546,13 @@ abstract class AppLocalizations {
   /// **'Search dives'**
   String get media_divePicker_search;
 
-  /// Body of the bulk delete confirmation dialog
-  ///
-  /// In en, this message translates to:
-  /// **'This removes them from the app and any media store. This cannot be undone.'**
-  String get media_library_deleteConfirmBody;
-
-  /// Title of the bulk delete confirmation dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Delete {count} items?'**
-  String media_library_deleteConfirmTitle(int count);
-
   /// Library selection action: reassign media to a dive
   ///
   /// In en, this message translates to:
   /// **'Move to dive'**
   String get media_library_moveToDive;
 
-  /// Library selection action: clear the site link
-  ///
-  /// In en, this message translates to:
-  /// **'Unlink from site'**
-  String get media_library_unlinkFromSite;
-
-  /// Confirm dialog title when unlinking would lose saved details
-  ///
-  /// In en, this message translates to:
-  /// **'Unlink and discard details?'**
-  String get media_unlink_metadataLossTitle;
-
-  /// Confirm dialog body naming what an unlink discards
-  ///
-  /// In en, this message translates to:
-  /// **'{count,plural, =1{1 selected item has a caption or favorite saved in Submersion. Unlinking removes it from your library, so those details are lost. Your original file is not affected.} other{{count} selected items have a caption or favorite saved in Submersion. Unlinking removes them from your library, so those details are lost. Your original files are not affected.}}'**
-  String media_unlink_metadataLossContent(int count);
-
-  /// Library selection action: clear the dive link
+  /// Library selection action, and its confirm button: clear every link the row has, which removes it from the library
   ///
   /// In en, this message translates to:
   /// **'Unlink'**

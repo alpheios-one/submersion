@@ -10079,6 +10079,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Ausstellungsdatum';
 
   @override
+  String get enum_sortField_dateTaken => 'Aufnahmedatum';
+
+  @override
   String get enum_sortField_difficulty => 'Schwierigkeitsgrad';
 
   @override
@@ -10092,6 +10095,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'Enddatum';
+
+  @override
+  String get enum_sortField_fileName => 'Dateiname';
+
+  @override
+  String get enum_sortField_fileSize => 'Dateigröße';
 
   @override
   String get enum_sortField_lastServiceDate => 'Letzte Wartung';
@@ -12402,28 +12411,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_diveMediaSection_title => 'Fotos & Video';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'Löschen';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'Löschen fehlgeschlagen: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'Dies entfernt sie aus der App und aus jedem Medienspeicher. Dies kann nicht rückgängig gemacht werden.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '$count Elemente gelöscht';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return '$count Elemente löschen?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'Neu verknüpfen';
 
   @override
@@ -12436,13 +12423,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => 'Trennen';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'Dieses Foto vom Tauchgang entfernen? Das Foto bleibt in Ihrer Galerie erhalten.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'Foto trennen';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12470,7 +12450,31 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'Foto getrennt';
+  String media_library_unlinkConfirmTitle(int count) {
+    return '$count Elemente trennen?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(Object error) {
+    return 'Trennen fehlgeschlagen: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'Sie verlassen deine Mediathek, samt Cloud-Kopien und Miniaturansichten. Deine Originaldateien bleiben unberührt. Dies kann nicht rückgängig gemacht werden.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count davon haben eine Bildunterschrift oder Favoritenmarkierung in Submersion, diese Details gehen verloren.',
+      one:
+          'Eines davon hat eine Bildunterschrift oder Favoritenmarkierung in Submersion, diese Details gehen verloren.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'Medien des Tauchplatzes';
@@ -12495,16 +12499,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return '$count Anhänge entfernen?';
+    return '$count Elemente trennen?';
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'Die ausgewählten Elemente werden von diesem Tauchplatz entfernt. Dateien in deiner Fotobibliothek oder auf der Festplatte werden nicht gelöscht.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Entfernt $count Elemente aus Ihrer Bibliothek, einschließlich Cloud-Kopien und Vorschaubildern. Medien, die ein Tauchgang noch verwendet, bleiben erhalten. Ihre Originaldateien sind nicht betroffen.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return '$count Anhänge entfernt';
+    return '$count Elemente getrennt';
   }
 
   @override
@@ -13058,8 +13063,47 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_import_launch => 'Medien importieren...';
 
   @override
+  String get media_import_review_title => 'Import prüfen';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return '$count Elemente importieren';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked verknüpft, $skipped übersprungen, $failed fehlgeschlagen';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Tauchplatz wählen';
+
+  @override
+  String get media_import_review_ambiguous => 'Mehrere Tauchgänge passen';
+
+  @override
+  String get media_import_review_noMatch => 'Kein passender Tauchgang';
+
+  @override
+  String get media_import_review_skipped => 'Nicht importiert';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Mit #$number verknüpfen';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Mit Tauchgang verknüpfen';
+
+  @override
+  String get media_import_review_linkToSite => 'Mit Tauchplatz verknüpfen';
+
+  @override
+  String get media_import_review_chooseDive => 'Tauchgang wählen';
+
+  @override
   String get media_import_intro =>
-      'Importierte Medien bleiben in Ihrer Bibliothek und können automatisch mit Tauchgängen verknüpft werden.';
+      'Fotos werden beim Import mit einem Tauchgang oder Tauchplatz verknüpft.';
 
   @override
   String get media_console_sources => 'Quellen';
@@ -13173,9 +13217,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Fehlend';
-
-  @override
   String get media_missing_empty => 'Keine fehlenden Dateien';
 
   @override
@@ -13238,45 +13279,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Nicht verknüpft';
-
-  @override
-  String get media_import_linkTitle => 'Importierte Medien verknüpfen';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return '$count Elemente verknüpfen';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Bleibt unter Nicht verknüpft';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count Elemente verknüpft';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Tauchgang wählen';
-
-  @override
-  String get media_inbox_empty => 'Keine nicht verknüpften Medien';
-
-  @override
-  String get media_inbox_keep => 'Behalten';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Mit #$number verknüpfen';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Mit Tauchgang verknüpfen';
-
-  @override
-  String get media_inbox_linkToSite => 'Mit Tauchplatz verknüpfen';
-
-  @override
   String get media_library_empty => 'Noch keine Medien';
 
   @override
@@ -13298,7 +13300,30 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_library_filter_dates => 'Zeitraum';
 
   @override
+  String get media_library_filter_missing => 'Fehlende Dateien';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Fehlende Dateien ($count)';
+  }
+
+  @override
   String get media_library_filter_clear => 'Filter zurücksetzen';
+
+  @override
+  String get media_library_filter_any => 'Beliebig';
+
+  @override
+  String get media_library_filter_title => 'Medien filtern';
+
+  @override
+  String get media_library_filter_apply => 'Übernehmen';
+
+  @override
+  String get media_library_sort_title => 'Medien sortieren';
+
+  @override
+  String get media_smartAlbum_load => 'Album laden';
 
   @override
   String get media_divePicker_title => 'Zu Tauchgang verschieben';
@@ -13307,38 +13332,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_divePicker_search => 'Tauchgänge durchsuchen';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'Dies entfernt sie aus der App und aus jedem Medienspeicher. Dies kann nicht rückgängig gemacht werden.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return '$count Elemente löschen?';
-  }
-
-  @override
   String get media_library_moveToDive => 'Zu Tauchgang verschieben';
 
   @override
-  String get media_library_unlinkFromSite => 'Vom Tauchplatz lösen';
-
-  @override
-  String get media_unlink_metadataLossTitle => 'Lösen und Details verwerfen?';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count ausgewählte Elemente haben eine Bildunterschrift oder Favoritenmarkierung in Submersion. Beim Lösen werden sie aus deiner Mediathek entfernt, diese Details gehen verloren. Deine Originaldateien bleiben unberührt.',
-      one:
-          '1 ausgewähltes Element hat eine Bildunterschrift oder Favoritenmarkierung in Submersion. Beim Lösen wird es aus deiner Mediathek entfernt, diese Details gehen verloren. Deine Originaldatei bleibt unberührt.',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get media_library_unlinkSelected => 'Lösen';
+  String get media_library_unlinkSelected => 'Trennen';
 
   @override
   String media_library_selectedCount(int count) {

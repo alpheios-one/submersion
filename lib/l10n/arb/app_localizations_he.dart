@@ -9846,6 +9846,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_sortField_dateIssued => 'תאריך הנפקה';
 
   @override
+  String get enum_sortField_dateTaken => 'תאריך הצילום';
+
+  @override
   String get enum_sortField_difficulty => 'רמת קושי';
 
   @override
@@ -9859,6 +9862,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'תאריך סיום';
+
+  @override
+  String get enum_sortField_fileName => 'שם הקובץ';
+
+  @override
+  String get enum_sortField_fileSize => 'גודל הקובץ';
 
   @override
   String get enum_sortField_lastServiceDate => 'טיפול אחרון';
@@ -12108,28 +12117,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_diveMediaSection_title => 'תמונות וסרטונים';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'מחיקה';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'המחיקה נכשלה: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '$count פריטים נמחקו';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return 'למחוק $count פריטים?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'קישור מחדש';
 
   @override
@@ -12141,13 +12128,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => 'בטל קישור';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'להסיר תמונה זו מהצלילה? התמונה תישאר בגלריה שלך.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'ביטול קישור תמונה';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12175,7 +12155,31 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'קישור התמונה בוטל';
+  String media_library_unlinkConfirmTitle(int count) {
+    return 'לבטל קישור של $count פריטים?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(Object error) {
+    return 'ביטול הקישור נכשל: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'הם יוסרו מהספרייה שלך, יחד עם העותקים בענן והתמונות הממוזערות. קובצי המקור שלך לא ייפגעו. לא ניתן לבטל זאת.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'ל-$count מהם יש כיתוב או סימון מועדף השמורים ב-Submersion, והפרטים האלה יאבדו.',
+      one:
+          'לאחד מהם יש כיתוב או סימון מועדף השמורים ב-Submersion, והפרטים האלה יאבדו.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'מדיה של האתר';
@@ -12200,16 +12204,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'להסיר $count קבצים מצורפים?';
+    return 'לבטל קישור של $count פריטים?';
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'הפריטים שנבחרו יוסרו מאתר זה. קבצים בספריית התמונות או בדיסק לא יימחקו.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'מסיר $count פריטים מהספרייה שלך, יחד עם עותקי הענן והתמונות הממוזערות. מדיה שצלילה עדיין משתמשת בה נשמרת. הקבצים המקוריים שלך אינם מושפעים.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'הוסרו $count קבצים מצורפים';
+    return 'בוטל קישור של $count פריטים';
   }
 
   @override
@@ -12744,8 +12749,47 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_import_launch => 'ייבוא מדיה...';
 
   @override
+  String get media_import_review_title => 'סקירת ייבוא';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'ייבוא $count פריטים';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked מקושרים, $skipped דולגו, $failed נכשלו';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'בחירת אתר';
+
+  @override
+  String get media_import_review_ambiguous => 'כמה צלילות תואמות';
+
+  @override
+  String get media_import_review_noMatch => 'אין צלילה תואמת';
+
+  @override
+  String get media_import_review_skipped => 'לא יובא';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'קישור אל #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'קישור לצלילה';
+
+  @override
+  String get media_import_review_linkToSite => 'קישור לאתר';
+
+  @override
+  String get media_import_review_chooseDive => 'בחירת צלילה';
+
+  @override
   String get media_import_intro =>
-      'מדיה מיובאת נשמרת בספרייה שלך וניתן לקשר אותה לצלילות באופן אוטומטי.';
+      'תמונות מקושרות לצלילה או לאתר צלילה בעת הייבוא.';
 
   @override
   String get media_console_sources => 'מקורות';
@@ -12856,9 +12900,6 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'חסרים';
-
-  @override
   String get media_missing_empty => 'אין קבצים חסרים';
 
   @override
@@ -12921,45 +12962,6 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'לא מקושרים';
-
-  @override
-  String get media_import_linkTitle => 'קישור מדיה מיובאת';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'קישור $count פריטים';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'נשאר בלא מקושרים';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count פריטים קושרו';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'בחירת צלילה';
-
-  @override
-  String get media_inbox_empty => 'אין מדיה לא מקושרת';
-
-  @override
-  String get media_inbox_keep => 'שמירה';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'קישור אל #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'קישור לצלילה';
-
-  @override
-  String get media_inbox_linkToSite => 'קישור לאתר';
-
-  @override
   String get media_library_empty => 'אין מדיה עדיין';
 
   @override
@@ -12981,7 +12983,30 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_library_filter_dates => 'תאריכים';
 
   @override
+  String get media_library_filter_missing => 'קבצים חסרים';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'קבצים חסרים ($count)';
+  }
+
+  @override
   String get media_library_filter_clear => 'ניקוי מסננים';
+
+  @override
+  String get media_library_filter_any => 'הכול';
+
+  @override
+  String get media_library_filter_title => 'סינון מדיה';
+
+  @override
+  String get media_library_filter_apply => 'החל';
+
+  @override
+  String get media_library_sort_title => 'מיון מדיה';
+
+  @override
+  String get media_smartAlbum_load => 'טעינת אלבום';
 
   @override
   String get media_divePicker_title => 'העברה לצלילה';
@@ -12990,38 +13015,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_divePicker_search => 'חיפוש צלילות';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return 'למחוק $count פריטים?';
-  }
-
-  @override
   String get media_library_moveToDive => 'העברה לצלילה';
 
   @override
-  String get media_library_unlinkFromSite => 'ניתוק מהאתר';
-
-  @override
-  String get media_unlink_metadataLossTitle => 'לנתק ולמחוק את הפרטים?';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          'ל-$count פריטים שנבחרו יש כיתוב או סימון מועדף השמורים ב-Submersion. הניתוק מסיר אותם מהספרייה, ולכן הפרטים האלה יאבדו. קובצי המקור שלך לא ייפגעו.',
-      one:
-          'לפריט אחד שנבחר יש כיתוב או סימון מועדף השמורים ב-Submersion. הניתוק מסיר אותו מהספרייה, ולכן הפרטים האלה יאבדו. קובץ המקור שלך לא ייפגע.',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get media_library_unlinkSelected => 'ניתוק';
+  String get media_library_unlinkSelected => 'בטל קישור';
 
   @override
   String media_library_selectedCount(int count) {

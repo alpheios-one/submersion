@@ -134,7 +134,7 @@ void main() {
           ],
         ),
         loadMediaForDive: repo.getMediaForDive,
-        saveEnrichment: repo.saveEnrichment,
+        saveEnrichments: repo.saveEnrichments,
       );
 
       expect(await enricher.enrichMissingForDive('d2'), 1);

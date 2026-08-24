@@ -9919,6 +9919,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Date Issued';
 
   @override
+  String get enum_sortField_dateTaken => 'Date Taken';
+
+  @override
   String get enum_sortField_difficulty => 'Difficulty';
 
   @override
@@ -9932,6 +9935,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'End Date';
+
+  @override
+  String get enum_sortField_fileName => 'File Name';
+
+  @override
+  String get enum_sortField_fileSize => 'File Size';
 
   @override
   String get enum_sortField_lastServiceDate => 'Last Service';
@@ -12207,28 +12216,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_diveMediaSection_title => 'Photos & Video';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'Delete';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'Failed to delete: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'This removes them from the app and any media store. This cannot be undone.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return 'Deleted $count items';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return 'Delete $count items?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'Re-link';
 
   @override
@@ -12241,13 +12228,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => 'Unlink';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'Remove this photo from the dive? The photo will remain in your gallery.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'Unlink Photo';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12275,7 +12255,31 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'Photo unlinked';
+  String media_library_unlinkConfirmTitle(int count) {
+    return 'Unlink $count items?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(Object error) {
+    return 'Failed to unlink: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'They leave your library, along with their cloud copies and thumbnails. Your original files are not affected. This cannot be undone.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count of these have a caption or favorite saved in Submersion, and those details are lost.',
+      one:
+          '1 of these has a caption or favorite saved in Submersion, and those details are lost.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'Site Media';
@@ -12300,16 +12304,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Remove $count attachments?';
+    return 'Unlink $count items?';
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Removes $count items from your library, along with their cloud copies and thumbnails. Media a dive still uses is kept. Your original files are not affected.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'Removed $count attachments';
+    return 'Unlinked $count items';
   }
 
   @override
@@ -12852,8 +12857,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_import_launch => 'Import media...';
 
   @override
+  String get media_import_review_title => 'Review import';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Import $count items';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked linked, $skipped skipped, $failed failed';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Choose site';
+
+  @override
+  String get media_import_review_ambiguous => 'Several dives match';
+
+  @override
+  String get media_import_review_noMatch => 'No matching dive';
+
+  @override
+  String get media_import_review_skipped => 'Not imported';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Link to #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Link to dive';
+
+  @override
+  String get media_import_review_linkToSite => 'Link to site';
+
+  @override
+  String get media_import_review_chooseDive => 'Choose dive';
+
+  @override
   String get media_import_intro =>
-      'Imported media is kept in your library and can be linked to dives automatically.';
+      'Photos are linked to a dive or a dive site as you import them.';
 
   @override
   String get media_console_sources => 'Sources';
@@ -12964,9 +13008,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Missing';
-
-  @override
   String get media_missing_empty => 'No missing files';
 
   @override
@@ -13029,45 +13070,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Unlinked';
-
-  @override
-  String get media_import_linkTitle => 'Link imported media';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'Link $count items';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Stays in Unlinked';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count items linked';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Choose dive';
-
-  @override
-  String get media_inbox_empty => 'No unlinked media';
-
-  @override
-  String get media_inbox_keep => 'Keep';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Link to #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Link to dive';
-
-  @override
-  String get media_inbox_linkToSite => 'Link to site';
-
-  @override
   String get media_library_empty => 'No media yet';
 
   @override
@@ -13089,7 +13091,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_library_filter_dates => 'Dates';
 
   @override
+  String get media_library_filter_missing => 'Missing files';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Missing files ($count)';
+  }
+
+  @override
   String get media_library_filter_clear => 'Clear filters';
+
+  @override
+  String get media_library_filter_any => 'Any';
+
+  @override
+  String get media_library_filter_title => 'Filter media';
+
+  @override
+  String get media_library_filter_apply => 'Apply';
+
+  @override
+  String get media_library_sort_title => 'Sort media';
+
+  @override
+  String get media_smartAlbum_load => 'Load album';
 
   @override
   String get media_divePicker_title => 'Move to dive';
@@ -13098,35 +13123,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_divePicker_search => 'Search dives';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'This removes them from the app and any media store. This cannot be undone.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return 'Delete $count items?';
-  }
-
-  @override
   String get media_library_moveToDive => 'Move to dive';
-
-  @override
-  String get media_library_unlinkFromSite => 'Unlink from site';
-
-  @override
-  String get media_unlink_metadataLossTitle => 'Unlink and discard details?';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '$count selected items have a caption or favorite saved in Submersion. Unlinking removes them from your library, so those details are lost. Your original files are not affected.',
-      one:
-          '1 selected item has a caption or favorite saved in Submersion. Unlinking removes it from your library, so those details are lost. Your original file is not affected.',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get media_library_unlinkSelected => 'Unlink';

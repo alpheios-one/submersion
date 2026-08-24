@@ -13,9 +13,24 @@ class UnlinkOutcome {
   int get total => deleted + keptAsSiteMedia;
 }
 
-/// The single implementation of "unlink media from a dive", shared by the
-/// Media section's selection bar and dive detail's, so the two can never
-/// drift apart on what unlinking means.
+/// What a site unlink did. Kept separate from [UnlinkOutcome] because the
+/// carve-out runs the other way: here it is the DIVE that can still need
+/// the row.
+class SiteUnlinkOutcome {
+  const SiteUnlinkOutcome({
+    required this.deleted,
+    required this.keptAsDiveMedia,
+  });
+
+  final int deleted;
+  final int keptAsDiveMedia;
+
+  int get total => deleted + keptAsDiveMedia;
+}
+
+/// The single implementation of "unlink media from a dive or a site",
+/// shared by the Media section's selection bar and the dive and site detail
+/// pages, so they can never drift apart on what unlinking means.
 ///
 /// Unlinking removes the media from the library: the row, the cloud proxies
 /// and the thumbnails, with a sync tombstone so the removal reaches the
@@ -73,6 +88,37 @@ class MediaUnlinkService {
   Future<Set<String>> idsWithUserMetadataAtRisk(List<String> mediaIds) async {
     if (mediaIds.isEmpty) return {};
     final split = await repository.partitionForDiveUnlink(mediaIds);
+    if (split.deletable.isEmpty) return {};
+    return repository.idsWithUserMetadata(split.deletable);
+  }
+
+  /// The site-scoped twin of [unlinkFromDive]: rows a dive still references
+  /// keep their row with the site link cleared, everything else leaves the
+  /// library through the same destructive path.
+  Future<SiteUnlinkOutcome> unlinkFromSite(List<String> mediaIds) async {
+    if (mediaIds.isEmpty) {
+      return const SiteUnlinkOutcome(deleted: 0, keptAsDiveMedia: 0);
+    }
+    final split = await repository.partitionForSiteUnlink(mediaIds);
+    if (split.diveLinked.isNotEmpty) {
+      await repository.unlinkFromSite(split.diveLinked);
+    }
+    if (split.deletable.isNotEmpty) {
+      await deleteMedia(split.deletable);
+    }
+    return SiteUnlinkOutcome(
+      deleted: split.deletable.length,
+      keptAsDiveMedia: split.diveLinked.length,
+    );
+  }
+
+  /// [idsWithUserMetadataAtRisk] for the site path: only rows the site
+  /// unlink would delete can lose a caption or favorite.
+  Future<Set<String>> idsWithUserMetadataAtRiskForSite(
+    List<String> mediaIds,
+  ) async {
+    if (mediaIds.isEmpty) return {};
+    final split = await repository.partitionForSiteUnlink(mediaIds);
     if (split.deletable.isEmpty) return {};
     return repository.idsWithUserMetadata(split.deletable);
   }
