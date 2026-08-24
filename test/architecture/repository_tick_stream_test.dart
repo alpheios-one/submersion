@@ -162,7 +162,7 @@ void main() {
   group('silence before a write', () {
     // Regression guard for #1175: MediaLibraryRepository.watchMediaChanges was
     // a watched COUNT query, so subscribing to it emitted immediately. Fed to
-    // invalidateSelfWhen by unlinkedCountProvider, missingCountProvider and
+    // invalidateSelfWhen by missingCountProvider and
     // sourceCountsProvider, that turned opening the Media section into an
     // unbounded rebuild loop, one COUNT(*) over `media` per event-loop turn.
     //

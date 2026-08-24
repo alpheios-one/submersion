@@ -83,8 +83,6 @@ class MediaLibraryRepository {
     switch (filter.health) {
       case MediaHealthFilter.missing:
         where = where & m.isOrphaned.equals(true);
-      case MediaHealthFilter.unlinked:
-        where = where & m.diveId.isNull() & m.siteId.isNull();
       case null:
         break;
     }
@@ -164,17 +162,6 @@ class MediaLibraryRepository {
       );
       rethrow;
     }
-  }
-
-  /// Rows attached to neither a dive nor a site, excluding signatures.
-  /// Backs the Unlinked sidebar badge.
-  Future<int> countUnlinked() async {
-    final m = _db.media;
-    final count = countAll(
-      filter: m.diveId.isNull() & m.siteId.isNull() & _notSignature,
-    );
-    final row = await (_db.selectOnly(m)..addColumns([count])).getSingle();
-    return row.read(count) ?? 0;
   }
 
   /// How many library rows each source type holds (Media section Phase 5's

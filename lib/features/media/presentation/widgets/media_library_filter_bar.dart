@@ -11,9 +11,9 @@ import 'package:submersion/features/trips/presentation/providers/trip_providers.
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 
-/// The library filter chip row: media type, site, trip, and date range, all
-/// writing [mediaLibraryFilterProvider]. Stateless — active state renders
-/// from the watched filter.
+/// The library filter chip row: media type, site, trip, date range, and
+/// missing files, all writing [mediaLibraryFilterProvider]. Stateless:
+/// active state renders from the watched filter.
 class MediaLibraryFilterBar extends ConsumerWidget {
   const MediaLibraryFilterBar({super.key});
 
@@ -113,6 +113,7 @@ class MediaLibraryFilterBar extends ConsumerWidget {
     final sites = ref.watch(sitesProvider).value ?? const [];
     final trips = ref.watch(allTripsProvider).value ?? const [];
     final albums = ref.watch(mediaSmartAlbumsProvider).value ?? const [];
+    final missingCount = ref.watch(missingCountProvider).value ?? 0;
 
     final siteName = filter.siteId == null
         ? null
@@ -189,6 +190,22 @@ class MediaLibraryFilterBar extends ConsumerWidget {
             onOpen: () => _pickDates(context, ref),
             onClear: () =>
                 _update(ref, (f) => f.copyWith(fromDate: null, toDate: null)),
+          ),
+          const SizedBox(width: 6),
+          FilterChip(
+            avatar: const Icon(Icons.warning_amber_outlined, size: 18),
+            label: Text(
+              missingCount == 0
+                  ? context.l10n.media_library_filter_missing
+                  : context.l10n.media_library_filter_missingCount(
+                      missingCount,
+                    ),
+            ),
+            selected: filter.health == MediaHealthFilter.missing,
+            onSelected: (on) => _update(
+              ref,
+              (f) => f.copyWith(health: on ? MediaHealthFilter.missing : null),
+            ),
           ),
           if (!filter.isEmpty) ...[
             const SizedBox(width: 6),

@@ -13213,9 +13213,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Fehlend';
-
-  @override
   String get media_missing_empty => 'Keine fehlenden Dateien';
 
   @override
@@ -13278,45 +13275,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Nicht verknüpft';
-
-  @override
-  String get media_import_linkTitle => 'Importierte Medien verknüpfen';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return '$count Elemente verknüpfen';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Bleibt unter Nicht verknüpft';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count Elemente verknüpft';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Tauchgang wählen';
-
-  @override
-  String get media_inbox_empty => 'Keine nicht verknüpften Medien';
-
-  @override
-  String get media_inbox_keep => 'Behalten';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Mit #$number verknüpfen';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Mit Tauchgang verknüpfen';
-
-  @override
-  String get media_inbox_linkToSite => 'Mit Tauchplatz verknüpfen';
-
-  @override
   String get media_library_empty => 'Noch keine Medien';
 
   @override
@@ -13336,6 +13294,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'Zeitraum';
+
+  @override
+  String get media_library_filter_missing => 'Fehlende Dateien';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Fehlende Dateien ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'Filter zurücksetzen';

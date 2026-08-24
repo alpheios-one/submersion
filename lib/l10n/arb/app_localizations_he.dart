@@ -12896,9 +12896,6 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'חסרים';
-
-  @override
   String get media_missing_empty => 'אין קבצים חסרים';
 
   @override
@@ -12961,45 +12958,6 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'לא מקושרים';
-
-  @override
-  String get media_import_linkTitle => 'קישור מדיה מיובאת';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'קישור $count פריטים';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'נשאר בלא מקושרים';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count פריטים קושרו';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'בחירת צלילה';
-
-  @override
-  String get media_inbox_empty => 'אין מדיה לא מקושרת';
-
-  @override
-  String get media_inbox_keep => 'שמירה';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'קישור אל #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'קישור לצלילה';
-
-  @override
-  String get media_inbox_linkToSite => 'קישור לאתר';
-
-  @override
   String get media_library_empty => 'אין מדיה עדיין';
 
   @override
@@ -13019,6 +12977,14 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'תאריכים';
+
+  @override
+  String get media_library_filter_missing => 'קבצים חסרים';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'קבצים חסרים ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'ניקוי מסננים';

@@ -22348,12 +22348,6 @@ abstract class AppLocalizations {
   /// **'via {source}'**
   String media_repairHistory_source(String source);
 
-  /// Media console sidebar/tab label for the missing-files view
-  ///
-  /// In en, this message translates to:
-  /// **'Missing'**
-  String get media_console_missing;
-
   /// Empty state for the missing-files view
   ///
   /// In en, this message translates to:
@@ -22456,72 +22450,6 @@ abstract class AppLocalizations {
     int skipped,
   );
 
-  /// Media console sidebar/tab label for the unlinked inbox
-  ///
-  /// In en, this message translates to:
-  /// **'Unlinked'**
-  String get media_console_unlinked;
-
-  /// Title of the post-import batch link screen
-  ///
-  /// In en, this message translates to:
-  /// **'Link imported media'**
-  String get media_import_linkTitle;
-
-  /// Confirm button on the post-import batch link screen
-  ///
-  /// In en, this message translates to:
-  /// **'Link {count} items'**
-  String media_import_linkConfirm(int count);
-
-  /// Row subtitle for imports without a confident dive match
-  ///
-  /// In en, this message translates to:
-  /// **'Stays in Unlinked'**
-  String get media_import_staysUnlinked;
-
-  /// Snackbar after the batch link applies
-  ///
-  /// In en, this message translates to:
-  /// **'{count} items linked'**
-  String media_import_linkedResult(int count);
-
-  /// Inbox chip for an ambiguous auto-match
-  ///
-  /// In en, this message translates to:
-  /// **'Choose dive'**
-  String get media_inbox_chooseDive;
-
-  /// Empty state for the unlinked inbox
-  ///
-  /// In en, this message translates to:
-  /// **'No unlinked media'**
-  String get media_inbox_empty;
-
-  /// Inbox action: keep the item in the library unlinked
-  ///
-  /// In en, this message translates to:
-  /// **'Keep'**
-  String get media_inbox_keep;
-
-  /// Inbox chip for a confident auto-match
-  ///
-  /// In en, this message translates to:
-  /// **'Link to #{number}'**
-  String media_inbox_linkChip(int number);
-
-  /// Inbox menu action: pick a dive manually
-  ///
-  /// In en, this message translates to:
-  /// **'Link to dive'**
-  String get media_inbox_linkToDive;
-
-  /// Inbox menu action: pick a site manually
-  ///
-  /// In en, this message translates to:
-  /// **'Link to site'**
-  String get media_inbox_linkToSite;
-
   /// Empty state for the media library
   ///
   /// In en, this message translates to:
@@ -22563,6 +22491,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dates'**
   String get media_library_filter_dates;
+
+  /// Library filter chip: rows whose backing file is missing
+  ///
+  /// In en, this message translates to:
+  /// **'Missing files'**
+  String get media_library_filter_missing;
+
+  /// Library filter chip with the missing-file count
+  ///
+  /// In en, this message translates to:
+  /// **'Missing files ({count})'**
+  String media_library_filter_missingCount(int count);
 
   /// Library filter chip: reset every filter
   ///

@@ -49,9 +49,6 @@ class _FakeLibraryRepo implements MediaLibraryRepository {
   }
 
   @override
-  Future<int> countUnlinked() async => 4;
-
-  @override
   Future<int> countMissing() async => 9;
 
   @override
@@ -168,8 +165,7 @@ void main() {
     );
   });
 
-  test('count providers read the repository', () async {
-    expect(await container.read(unlinkedCountProvider.future), 4);
+  test('the missing count provider reads the repository', () async {
     expect(await container.read(missingCountProvider.future), 9);
   });
 }

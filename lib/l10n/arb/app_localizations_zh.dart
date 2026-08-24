@@ -12618,9 +12618,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => '缺失';
-
-  @override
   String get media_missing_empty => '没有缺失的文件';
 
   @override
@@ -12683,45 +12680,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => '未关联';
-
-  @override
-  String get media_import_linkTitle => '关联导入的媒体';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return '关联 $count 个项目';
-  }
-
-  @override
-  String get media_import_staysUnlinked => '保留在未关联中';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '已关联 $count 个项目';
-  }
-
-  @override
-  String get media_inbox_chooseDive => '选择潜水';
-
-  @override
-  String get media_inbox_empty => '没有未关联的媒体';
-
-  @override
-  String get media_inbox_keep => '保留';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return '关联到 #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => '关联到潜水';
-
-  @override
-  String get media_inbox_linkToSite => '关联到潜点';
-
-  @override
   String get media_library_empty => '暂无媒体';
 
   @override
@@ -12741,6 +12699,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => '日期';
+
+  @override
+  String get media_library_filter_missing => '缺失的文件';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return '缺失的文件（$count）';
+  }
 
   @override
   String get media_library_filter_clear => '清除筛选';

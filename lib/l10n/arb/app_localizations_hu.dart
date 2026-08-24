@@ -13181,9 +13181,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Hiányzó';
-
-  @override
   String get media_missing_empty => 'Nincs hiányzó fájl';
 
   @override
@@ -13246,45 +13243,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Nem csatolt';
-
-  @override
-  String get media_import_linkTitle => 'Importált média csatolása';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return '$count elem csatolása';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'A Nem csatolt között marad';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count elem csatolva';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Merülés kiválasztása';
-
-  @override
-  String get media_inbox_empty => 'Nincs nem csatolt média';
-
-  @override
-  String get media_inbox_keep => 'Megtartás';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Csatolás: #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Csatolás merüléshez';
-
-  @override
-  String get media_inbox_linkToSite => 'Csatolás merülőhelyhez';
-
-  @override
   String get media_library_empty => 'Még nincs média';
 
   @override
@@ -13304,6 +13262,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'Dátumok';
+
+  @override
+  String get media_library_filter_missing => 'Hiányzó fájlok';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Hiányzó fájlok ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'Szűrők törlése';

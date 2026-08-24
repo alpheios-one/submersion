@@ -12982,9 +12982,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'مفقودة';
-
-  @override
   String get media_missing_empty => 'لا توجد ملفات مفقودة';
 
   @override
@@ -13047,45 +13044,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'غير مرتبطة';
-
-  @override
-  String get media_import_linkTitle => 'ربط الوسائط المستوردة';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'ربط $count عناصر';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'تبقى غير مرتبطة';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return 'تم ربط $count عناصر';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'اختيار الغطسة';
-
-  @override
-  String get media_inbox_empty => 'لا توجد وسائط غير مرتبطة';
-
-  @override
-  String get media_inbox_keep => 'احتفاظ';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'ربط بالغطسة رقم $number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'ربط بغطسة';
-
-  @override
-  String get media_inbox_linkToSite => 'ربط بموقع';
-
-  @override
   String get media_library_empty => 'لا توجد وسائط بعد';
 
   @override
@@ -13105,6 +13063,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'التواريخ';
+
+  @override
+  String get media_library_filter_missing => 'ملفات مفقودة';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'ملفات مفقودة ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'مسح عوامل التصفية';

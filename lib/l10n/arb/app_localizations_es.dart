@@ -13209,9 +13209,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Faltantes';
-
-  @override
   String get media_missing_empty => 'No hay archivos faltantes';
 
   @override
@@ -13274,45 +13271,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Sin vincular';
-
-  @override
-  String get media_import_linkTitle => 'Vincular contenido importado';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'Vincular $count elementos';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Permanece sin vincular';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count elementos vinculados';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Elegir inmersión';
-
-  @override
-  String get media_inbox_empty => 'No hay contenido multimedia sin vincular';
-
-  @override
-  String get media_inbox_keep => 'Conservar';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Vincular a #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Vincular a una inmersión';
-
-  @override
-  String get media_inbox_linkToSite => 'Vincular a un sitio';
-
-  @override
   String get media_library_empty => 'Todavía no hay contenido multimedia';
 
   @override
@@ -13332,6 +13290,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_library_filter_dates => 'Fechas';
+
+  @override
+  String get media_library_filter_missing => 'Archivos faltantes';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Archivos faltantes ($count)';
+  }
 
   @override
   String get media_library_filter_clear => 'Borrar filtros';

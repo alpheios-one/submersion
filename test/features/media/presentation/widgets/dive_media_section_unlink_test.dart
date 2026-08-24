@@ -119,7 +119,8 @@ void main() {
     expect(kept, isNotNull);
     expect(kept!.diveId, isNull);
     expect(kept.siteId, 's1');
-    expect(kept.retainInLibrary, isTrue);
+    // The site link is what keeps the row; nothing latches a retain flag.
+    expect(kept.retainInLibrary, isFalse);
     expect(outcome.deleted, 0);
     expect(outcome.keptAsSiteMedia, 1);
   });

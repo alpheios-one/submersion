@@ -26,6 +26,7 @@ void main() {
       overrides: [
         sitesProvider.overrideWith((ref) async => [site]),
         allTripsProvider.overrideWith((ref) async => [trip]),
+        missingCountProvider.overrideWith((ref) async => 3),
       ],
       child: const MaterialApp(
         locale: Locale('en'),
@@ -40,6 +41,36 @@ void main() {
       ProviderScope.containerOf(
         tester.element(find.byType(MediaLibraryFilterBar)),
       );
+
+  testWidgets(
+    'Missing files chip toggles the health filter and shows the count',
+    (tester) async {
+      await tester.pumpWidget(host());
+      await tester.pumpAndSettle();
+
+      // The chip row scrolls horizontally and this chip sits past the test
+      // viewport's right edge, so bring it on screen before tapping.
+      final chip = find.text('Missing files (3)');
+      expect(chip, findsOneWidget);
+      await tester.ensureVisible(chip);
+      await tester.pumpAndSettle();
+      await tester.tap(chip);
+      await tester.pumpAndSettle();
+      expect(
+        containerOf(tester).read(mediaLibraryFilterProvider).health,
+        MediaHealthFilter.missing,
+      );
+
+      await tester.ensureVisible(chip);
+      await tester.pumpAndSettle();
+      await tester.tap(chip);
+      await tester.pumpAndSettle();
+      expect(
+        containerOf(tester).read(mediaLibraryFilterProvider).health,
+        isNull,
+      );
+    },
+  );
 
   testWidgets('site chip opens picker and writes siteId to the filter', (
     tester,
