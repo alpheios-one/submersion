@@ -13059,8 +13059,47 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_import_launch => 'Medien importieren...';
 
   @override
+  String get media_import_review_title => 'Import prüfen';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return '$count Elemente importieren';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked verknüpft, $skipped übersprungen, $failed fehlgeschlagen';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Tauchplatz wählen';
+
+  @override
+  String get media_import_review_ambiguous => 'Mehrere Tauchgänge passen';
+
+  @override
+  String get media_import_review_noMatch => 'Kein passender Tauchgang';
+
+  @override
+  String get media_import_review_skipped => 'Nicht importiert';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Mit #$number verknüpfen';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Mit Tauchgang verknüpfen';
+
+  @override
+  String get media_import_review_linkToSite => 'Mit Tauchplatz verknüpfen';
+
+  @override
+  String get media_import_review_chooseDive => 'Tauchgang wählen';
+
+  @override
   String get media_import_intro =>
-      'Importierte Medien bleiben in Ihrer Bibliothek und können automatisch mit Tauchgängen verknüpft werden.';
+      'Fotos werden beim Import mit einem Tauchgang oder Tauchplatz verknüpft.';
 
   @override
   String get media_console_sources => 'Quellen';

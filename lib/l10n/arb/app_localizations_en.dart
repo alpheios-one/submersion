@@ -12853,8 +12853,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_import_launch => 'Import media...';
 
   @override
+  String get media_import_review_title => 'Review import';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Import $count items';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked linked, $skipped skipped, $failed failed';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Choose site';
+
+  @override
+  String get media_import_review_ambiguous => 'Several dives match';
+
+  @override
+  String get media_import_review_noMatch => 'No matching dive';
+
+  @override
+  String get media_import_review_skipped => 'Not imported';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Link to #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Link to dive';
+
+  @override
+  String get media_import_review_linkToSite => 'Link to site';
+
+  @override
+  String get media_import_review_chooseDive => 'Choose dive';
+
+  @override
   String get media_import_intro =>
-      'Imported media is kept in your library and can be linked to dives automatically.';
+      'Photos are linked to a dive or a dive site as you import them.';
 
   @override
   String get media_console_sources => 'Sources';

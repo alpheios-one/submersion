@@ -13071,8 +13071,47 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_import_launch => 'Importa contenuti...';
 
   @override
+  String get media_import_review_title => 'Rivedi importazione';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Importa $count elementi';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked collegati, $skipped saltati, $failed falliti';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Scegli sito';
+
+  @override
+  String get media_import_review_ambiguous => 'Più immersioni corrispondono';
+
+  @override
+  String get media_import_review_noMatch => 'Nessuna immersione corrispondente';
+
+  @override
+  String get media_import_review_skipped => 'Non importato';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Collega a #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Collega a un\'immersione';
+
+  @override
+  String get media_import_review_linkToSite => 'Collega a un sito';
+
+  @override
+  String get media_import_review_chooseDive => 'Scegli immersione';
+
+  @override
   String get media_import_intro =>
-      'I contenuti importati restano nella tua libreria e possono essere collegati automaticamente alle immersioni.';
+      'Le foto vengono collegate a un\'immersione o a un sito durante l\'importazione.';
 
   @override
   String get media_console_sources => 'Origini';

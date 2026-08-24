@@ -22072,10 +22072,76 @@ abstract class AppLocalizations {
   /// **'Import media...'**
   String get media_import_launch;
 
+  /// App bar title of the pre-import review
+  ///
+  /// In en, this message translates to:
+  /// **'Review import'**
+  String get media_import_review_title;
+
+  /// Confirm button of the pre-import review
+  ///
+  /// In en, this message translates to:
+  /// **'Import {count} items'**
+  String media_import_review_confirm(int count);
+
+  /// Snackbar after the review imports
+  ///
+  /// In en, this message translates to:
+  /// **'{linked} linked, {skipped} skipped, {failed} failed'**
+  String media_import_review_result(int linked, int skipped, int failed);
+
+  /// Review row menu: attach to a dive site
+  ///
+  /// In en, this message translates to:
+  /// **'Choose site'**
+  String get media_import_review_chooseSite;
+
+  /// Review row subtitle when several dives match the timestamp
+  ///
+  /// In en, this message translates to:
+  /// **'Several dives match'**
+  String get media_import_review_ambiguous;
+
+  /// Review row subtitle when no dive matches the timestamp
+  ///
+  /// In en, this message translates to:
+  /// **'No matching dive'**
+  String get media_import_review_noMatch;
+
+  /// Review row subtitle for a row the user unchecked
+  ///
+  /// In en, this message translates to:
+  /// **'Not imported'**
+  String get media_import_review_skipped;
+
+  /// Review row subtitle for a confident auto-match
+  ///
+  /// In en, this message translates to:
+  /// **'Link to #{number}'**
+  String media_import_review_linkChip(int number);
+
+  /// Review row menu: attach to a dive
+  ///
+  /// In en, this message translates to:
+  /// **'Link to dive'**
+  String get media_import_review_linkToDive;
+
+  /// Review row subtitle when attached to a site
+  ///
+  /// In en, this message translates to:
+  /// **'Link to site'**
+  String get media_import_review_linkToSite;
+
+  /// Review row menu: pick a dive
+  ///
+  /// In en, this message translates to:
+  /// **'Choose dive'**
+  String get media_import_review_chooseDive;
+
   /// Import section intro text
   ///
   /// In en, this message translates to:
-  /// **'Imported media is kept in your library and can be linked to dives automatically.'**
+  /// **'Photos are linked to a dive or a dive site as you import them.'**
   String get media_import_intro;
 
   /// Media console label for the sources section

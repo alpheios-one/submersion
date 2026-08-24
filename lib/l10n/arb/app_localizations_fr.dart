@@ -13108,8 +13108,48 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_import_launch => 'Importer des médias...';
 
   @override
+  String get media_import_review_title => 'Vérifier l\'import';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Importer $count éléments';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked liés, $skipped ignorés, $failed en échec';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Choisir un site';
+
+  @override
+  String get media_import_review_ambiguous =>
+      'Plusieurs plongées correspondent';
+
+  @override
+  String get media_import_review_noMatch => 'Aucune plongée correspondante';
+
+  @override
+  String get media_import_review_skipped => 'Non importé';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Lier à #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Lier à une plongée';
+
+  @override
+  String get media_import_review_linkToSite => 'Lier à un site';
+
+  @override
+  String get media_import_review_chooseDive => 'Choisir la plongée';
+
+  @override
   String get media_import_intro =>
-      'Les médias importés sont conservés dans votre bibliothèque et peuvent être liés automatiquement aux plongées.';
+      'Les photos sont liées à une plongée ou à un site au moment de l\'import.';
 
   @override
   String get media_console_sources => 'Sources';

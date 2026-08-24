@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
-import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/features/media/presentation/providers/media_inbox_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
+import 'package:submersion/features/media/presentation/widgets/ambiguous_dive_sheet.dart';
 import 'package:submersion/features/media/presentation/widgets/dive_picker_sheet.dart';
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
+import 'package:submersion/features/media/presentation/widgets/site_picker_sheet.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The Unlinked inbox: media attached to no dive or site, each with an
@@ -38,22 +38,7 @@ class MediaUnlinkedInboxView extends ConsumerWidget {
     WidgetRef ref,
     String mediaId,
   ) async {
-    final sites = ref.read(sitesProvider).value ?? const [];
-    final siteId = await showModalBottomSheet<String>(
-      context: context,
-      builder: (sheetContext) => SafeArea(
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            for (final site in sites)
-              ListTile(
-                title: Text(site.name),
-                onTap: () => Navigator.of(sheetContext).pop(site.id),
-              ),
-          ],
-        ),
-      ),
-    );
+    final siteId = await showSitePickerSheet(context);
     if (siteId == null) return;
     await ref.read(mediaRepositoryProvider).linkMediaToSite([mediaId], siteId);
   }
@@ -64,21 +49,7 @@ class MediaUnlinkedInboxView extends ConsumerWidget {
     String mediaId,
     List<String> candidateDiveIds,
   ) async {
-    final diveId = await showModalBottomSheet<String>(
-      context: context,
-      builder: (sheetContext) => SafeArea(
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            for (final id in candidateDiveIds)
-              _AmbiguousDiveTile(
-                diveId: id,
-                onTap: () => Navigator.of(sheetContext).pop(id),
-              ),
-          ],
-        ),
-      ),
-    );
+    final diveId = await showAmbiguousDiveSheet(context, candidateDiveIds);
     if (diveId == null) return;
     await _linkToDive(ref, mediaId, diveId);
   }
@@ -187,36 +158,6 @@ class MediaUnlinkedInboxView extends ConsumerWidget {
           );
         },
       ),
-    );
-  }
-}
-
-/// Candidate row in the ambiguous chooser: dive number, name/site, date.
-class _AmbiguousDiveTile extends ConsumerWidget {
-  const _AmbiguousDiveTile({required this.diveId, required this.onTap});
-
-  final String diveId;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final dive = ref.watch(diveProvider(diveId)).value;
-    final locale = Localizations.localeOf(context).toString();
-    final label = dive == null
-        ? diveId
-        : [
-            if (dive.diveNumber != null) '#${dive.diveNumber}',
-            if (dive.name != null && dive.name!.isNotEmpty)
-              dive.name!
-            else if (dive.site?.name != null)
-              dive.site!.name,
-          ].join(' ');
-    return ListTile(
-      title: Text(label),
-      subtitle: dive == null
-          ? null
-          : Text(DateFormat.yMMMd(locale).format(dive.dateTime)),
-      onTap: onTap,
     );
   }
 }

@@ -12831,8 +12831,47 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_import_launch => 'استيراد الوسائط...';
 
   @override
+  String get media_import_review_title => 'مراجعة الاستيراد';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'استيراد $count عنصرًا';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked مرتبطة، $skipped متخطاة، $failed فاشلة';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'اختر الموقع';
+
+  @override
+  String get media_import_review_ambiguous => 'تتطابق عدة غطسات';
+
+  @override
+  String get media_import_review_noMatch => 'لا توجد غطسة مطابقة';
+
+  @override
+  String get media_import_review_skipped => 'لم يتم الاستيراد';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'ربط بالغطسة رقم $number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'ربط بغطسة';
+
+  @override
+  String get media_import_review_linkToSite => 'ربط بموقع';
+
+  @override
+  String get media_import_review_chooseDive => 'اختيار الغطسة';
+
+  @override
   String get media_import_intro =>
-      'يتم الاحتفاظ بالوسائط المستوردة في مكتبتك ويمكن ربطها بالغطسات تلقائيًا.';
+      'تُربط الصور بغطسة أو موقع غطس أثناء استيرادها.';
 
   @override
   String get media_console_sources => 'المصادر';

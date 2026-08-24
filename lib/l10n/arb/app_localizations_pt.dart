@@ -13068,8 +13068,47 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_import_launch => 'Importar mídia...';
 
   @override
+  String get media_import_review_title => 'Revisar importação';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Importar $count itens';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked vinculados, $skipped ignorados, $failed com falha';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Escolher local';
+
+  @override
+  String get media_import_review_ambiguous => 'Vários mergulhos correspondem';
+
+  @override
+  String get media_import_review_noMatch => 'Nenhum mergulho correspondente';
+
+  @override
+  String get media_import_review_skipped => 'Não importado';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Vincular a #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Vincular a um mergulho';
+
+  @override
+  String get media_import_review_linkToSite => 'Vincular a um ponto';
+
+  @override
+  String get media_import_review_chooseDive => 'Escolher mergulho';
+
+  @override
   String get media_import_intro =>
-      'A mídia importada fica na sua biblioteca e pode ser vinculada aos mergulhos automaticamente.';
+      'As fotos são vinculadas a um mergulho ou ponto de mergulho ao importar.';
 
   @override
   String get media_console_sources => 'Origens';

@@ -12745,8 +12745,47 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_import_launch => 'ייבוא מדיה...';
 
   @override
+  String get media_import_review_title => 'סקירת ייבוא';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'ייבוא $count פריטים';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked מקושרים, $skipped דולגו, $failed נכשלו';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'בחירת אתר';
+
+  @override
+  String get media_import_review_ambiguous => 'כמה צלילות תואמות';
+
+  @override
+  String get media_import_review_noMatch => 'אין צלילה תואמת';
+
+  @override
+  String get media_import_review_skipped => 'לא יובא';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'קישור אל #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'קישור לצלילה';
+
+  @override
+  String get media_import_review_linkToSite => 'קישור לאתר';
+
+  @override
+  String get media_import_review_chooseDive => 'בחירת צלילה';
+
+  @override
   String get media_import_intro =>
-      'מדיה מיובאת נשמרת בספרייה שלך וניתן לקשר אותה לצלילות באופן אוטומטי.';
+      'תמונות מקושרות לצלילה או לאתר צלילה בעת הייבוא.';
 
   @override
   String get media_console_sources => 'מקורות';

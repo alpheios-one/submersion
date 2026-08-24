@@ -13056,8 +13056,47 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_import_launch => 'Importar contenido...';
 
   @override
+  String get media_import_review_title => 'Revisar importación';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Importar $count elementos';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked vinculados, $skipped omitidos, $failed fallidos';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Elegir sitio';
+
+  @override
+  String get media_import_review_ambiguous => 'Varios buceos coinciden';
+
+  @override
+  String get media_import_review_noMatch => 'Ningún buceo coincide';
+
+  @override
+  String get media_import_review_skipped => 'No importado';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Vincular a #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Vincular a una inmersión';
+
+  @override
+  String get media_import_review_linkToSite => 'Vincular a un sitio';
+
+  @override
+  String get media_import_review_chooseDive => 'Elegir inmersión';
+
+  @override
   String get media_import_intro =>
-      'El contenido importado se conserva en su biblioteca y puede vincularse a las inmersiones automáticamente.';
+      'Las fotos se vinculan a un buceo o a un sitio de buceo al importarlas.';
 
   @override
   String get media_console_sources => 'Orígenes';

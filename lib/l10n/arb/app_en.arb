@@ -7518,7 +7518,83 @@
   "@media_import_launch": {
     "description": "Import section: open the picker"
   },
-  "media_import_intro": "Imported media is kept in your library and can be linked to dives automatically.",
+  "media_import_review_title": "Review import",
+  "@media_import_review_title": {
+    "description": "App bar title of the pre-import review"
+  },
+  "media_import_review_confirm": "Import {count} items",
+  "@media_import_review_confirm": {
+    "description": "Confirm button of the pre-import review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_import_review_result": "{linked} linked, {skipped} skipped, {failed} failed",
+  "@media_import_review_result": {
+    "description": "Snackbar after the review imports",
+    "placeholders": {
+      "linked": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "media_import_review_chooseSite": "Choose site",
+  "@media_import_review_chooseSite": {
+    "description": "Review row menu: attach to a dive site"
+  },
+  "media_import_review_ambiguous": "Several dives match",
+  "@media_import_review_ambiguous": {
+    "description": "Review row subtitle when several dives match the timestamp"
+  },
+  "media_import_review_noMatch": "No matching dive",
+  "@media_import_review_noMatch": {
+    "description": "Review row subtitle when no dive matches the timestamp"
+  },
+  "media_import_review_skipped": "Not imported",
+  "@media_import_review_skipped": {
+    "description": "Review row subtitle for a row the user unchecked"
+  },
+  "media_import_review_linkChip": "Link to #{number}",
+  "@media_import_review_linkChip": {
+    "description": "Review row subtitle for a confident auto-match",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "media_import_review_linkToDive": "Link to dive",
+  "@media_import_review_linkToDive": {
+    "description": "Review row menu: attach to a dive"
+  },
+  "media_import_review_linkToSite": "Link to site",
+  "@media_import_review_linkToSite": {
+    "description": "Review row subtitle when attached to a site"
+  },
+  "media_import_review_chooseDive": "Choose dive",
+  "@media_import_review_chooseDive": {
+    "description": "Review row menu: pick a dive"
+  },
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  "media_import_intro": "Photos are linked to a dive or a dive site as you import them.",
   "@media_import_intro": {
     "description": "Import section intro text"
   },
