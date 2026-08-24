@@ -5,6 +5,7 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
+import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_active_filter_chips.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
@@ -92,6 +93,20 @@ void main() {
     final filter = container.read(mediaLibraryFilterProvider);
     expect(filter.siteId, isNull);
     expect(filter.mediaType, MediaType.photo);
+  });
+
+  testWidgets('the source chip shows the localized label, not the enum', (
+    tester,
+  ) async {
+    // The Sources section writes this facet when the user taps "browse this
+    // source". The chip has to name the source the way that row did, not
+    // leak the enum identifier.
+    container.read(mediaLibraryFilterProvider.notifier).state =
+        const MediaLibraryFilter(sourceType: MediaSourceType.networkUrl);
+    await pump(tester);
+
+    expect(find.text('Web links'), findsOneWidget);
+    expect(find.text('networkUrl'), findsNothing);
   });
 
   testWidgets('Clear filters empties the whole filter', (tester) async {

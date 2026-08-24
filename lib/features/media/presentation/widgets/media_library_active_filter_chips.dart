@@ -4,6 +4,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
+import 'package:submersion/features/media/presentation/helpers/media_source_labels.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_smart_album_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_filter_labels.dart';
@@ -99,12 +100,13 @@ class MediaLibraryActiveFilterChips extends ConsumerWidget {
 
     // Set by the Sources section's "browse this source", not by the filter
     // sheet. Without a chip the library sits filtered with nothing on screen
-    // saying why.
+    // saying why. Labelled through the same helper the Sources list uses, so
+    // the chip names the source the way the row the user just tapped did.
     final sourceType = filter.sourceType;
     if (sourceType != null) {
       chips.add(
         chip(
-          sourceType.name,
+          mediaSourceLabel(context, sourceType),
           () => _update(ref, (f) => f.copyWith(sourceType: null)),
         ),
       );
