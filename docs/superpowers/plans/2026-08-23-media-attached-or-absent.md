@@ -821,10 +821,15 @@ class DiveLinkMatcher {
 }
 ```
 
-- [ ] **Step 4: Run the matcher test**
+- [ ] **Step 4: Run the matcher test, then commit it on its own**
 
-Run: `flutter test test/features/media/data/services/dive_link_matcher_test.dart`
-Expected: PASS.
+Run: `flutter test test/features/media/data/services/dive_link_matcher_test.dart && flutter analyze && dart format lib/ test/`
+Expected: PASS, clean.
+
+```bash
+git add lib/features/media/data/services/dive_link_matcher.dart test/features/media/data/services/dive_link_matcher_test.dart
+git commit -m "feat(media): add DiveLinkMatcher, the one timestamp-to-dive answer"
+```
 
 - [ ] **Step 5: Add the ARB keys the review page needs**
 
@@ -1399,10 +1404,19 @@ class _MediaImportReviewPageState extends ConsumerState<MediaImportReviewPage> {
 }
 ```
 
-- [ ] **Step 11: Run the review test**
+- [ ] **Step 11: Run the review test, then commit the review page on its own**
 
-Run: `flutter test test/features/media/presentation/media_import_review_test.dart`
-Expected: PASS. (If the pattern `case DiveAttachTarget():` with field access needs `case DiveAttachTarget(:final diveId):`, adjust to that form.)
+Run: `flutter test test/features/media/presentation/media_import_review_test.dart test/features/media/presentation/media_inbox_test.dart && flutter analyze && dart format lib/ test/`
+Expected: PASS, clean. (If the pattern `case DiveAttachTarget():` with field access needs `case DiveAttachTarget(:final diveId):`, adjust to that form.)
+
+```bash
+git add lib test
+git commit -m "feat(media): add the shared pre-import review page
+
+Candidates resolve to a dive, a site, or nothing before the caller
+writes a row. The site and ambiguous-dive pickers move out of the inbox
+so the review can reuse them."
+```
 
 - [ ] **Step 12: Rewrite the import view and its test**
 
