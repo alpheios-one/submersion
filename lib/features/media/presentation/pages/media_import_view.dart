@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
+import 'package:submersion/features/media/data/services/media_import_service.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
 import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/import_candidate.dart';
@@ -47,12 +49,15 @@ class MediaImportView extends ConsumerWidget {
   }
 
   /// Imports the resolved assets, one service call per dive and per site.
-  /// A failing group never blocks another; its failures ride the result.
-  static Future<ImportReviewResult> importResolved(
-    WidgetRef ref,
-    List<AssetInfo> assets,
-    Map<String, MediaAttachTarget> targets,
-  ) async {
+  /// A failing group never blocks another: a throw inside one group is
+  /// recorded against that group's assets and the loop moves on.
+  @visibleForTesting
+  static Future<ImportReviewResult> importResolved({
+    required MediaImportService service,
+    required DiveRepository diveRepository,
+    required List<AssetInfo> assets,
+    required Map<String, MediaAttachTarget> targets,
+  }) async {
     final byId = {for (final a in assets) a.id: a};
     final byDive = <String, List<AssetInfo>>{};
     final bySite = <String, List<AssetInfo>>{};
@@ -67,32 +72,43 @@ class MediaImportView extends ConsumerWidget {
       }
     }
 
-    final service = ref.read(mediaImportServiceProvider);
-    final diveRepository = ref.read(diveRepositoryProvider);
     var linked = 0;
     final failures = <String, String>{};
-    for (final MapEntry(:key, :value) in byDive.entries) {
-      final dive = await diveRepository.getDiveById(key);
-      if (dive == null) {
-        for (final a in value) {
-          failures[a.id] = 'dive $key no longer exists';
-        }
-        continue;
+
+    void failGroup(List<AssetInfo> group, Object reason) {
+      for (final a in group) {
+        failures[a.id] = reason.toString();
       }
-      final result = await service.importPhotosForDive(
-        selectedAssets: value,
-        dive: dive,
-      );
-      linked += result.imported.length;
-      failures.addAll(result.failures);
+    }
+
+    for (final MapEntry(:key, :value) in byDive.entries) {
+      try {
+        final dive = await diveRepository.getDiveById(key);
+        if (dive == null) {
+          failGroup(value, 'dive $key no longer exists');
+          continue;
+        }
+        final result = await service.importPhotosForDive(
+          selectedAssets: value,
+          dive: dive,
+        );
+        linked += result.imported.length;
+        failures.addAll(result.failures);
+      } catch (e) {
+        failGroup(value, e);
+      }
     }
     for (final MapEntry(:key, :value) in bySite.entries) {
-      final result = await service.importPhotosForSite(
-        selectedAssets: value,
-        siteId: key,
-      );
-      linked += result.imported.length;
-      failures.addAll(result.failures);
+      try {
+        final result = await service.importPhotosForSite(
+          selectedAssets: value,
+          siteId: key,
+        );
+        linked += result.imported.length;
+        failures.addAll(result.failures);
+      } catch (e) {
+        failGroup(value, e);
+      }
     }
     return ImportReviewResult(
       linked: linked,
@@ -118,7 +134,12 @@ class MediaImportView extends ConsumerWidget {
       MaterialPageRoute<void>(
         builder: (_) => MediaImportReviewPage(
           candidates: candidates,
-          onConfirm: (targets) => importResolved(ref, assets, targets),
+          onConfirm: (targets) => importResolved(
+            service: ref.read(mediaImportServiceProvider),
+            diveRepository: ref.read(diveRepositoryProvider),
+            assets: assets,
+            targets: targets,
+          ),
         ),
       ),
     );

@@ -54,6 +54,32 @@ void main() {
     expect(match.candidateDiveIds.toSet(), {'d1', 'd2'});
   });
 
+  test('a dive with no exit time falls back to its runtime', () {
+    final d1 = Dive(
+      id: 'd1',
+      dateTime: DateTime(2026, 6, 12, 9),
+      runtime: const Duration(minutes: 50),
+    );
+
+    final match = DiveLinkMatcher.matchAgainst(
+      takenAt: DateTime(2026, 6, 12, 9, 45),
+      candidateDives: [d1],
+    );
+
+    expect(match.kind, TimestampMatchKind.confident);
+  });
+
+  test('a dive with no times at all gets a 60-minute window', () {
+    final d1 = Dive(id: 'd1', dateTime: DateTime(2026, 6, 12, 9));
+
+    final match = DiveLinkMatcher.matchAgainst(
+      takenAt: DateTime(2026, 6, 12, 9, 55),
+      candidateDives: [d1],
+    );
+
+    expect(match.kind, TimestampMatchKind.confident);
+  });
+
   test('a local timestamp and a local dive compare on wall clock', () {
     // Photo timestamps arrive wall-clock-as-UTC; dive times are local.
     // Both sides are normalized the same way, so a 09:20 photo matches a

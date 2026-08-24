@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
+import 'package:submersion/features/media/data/services/media_import_service.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
+import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
 import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/features/media/presentation/pages/media_import_review_page.dart';
 import 'package:submersion/features/media/presentation/pages/media_import_view.dart';
@@ -88,4 +94,88 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(MediaImportReviewPage), findsNothing);
   });
+
+  testWidgets('confirming the review imports through the service', (
+    tester,
+  ) async {
+    final service = _RecordingImportService();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          importSuggestionProvider(DateTime.utc(2026, 6, 12, 10)).overrideWith(
+            (ref) async => const ImportSuggestion(
+              match: TimestampMatch(
+                kind: TimestampMatchKind.confident,
+                diveId: 'd1',
+              ),
+              diveNumber: 1,
+            ),
+          ),
+          mediaImportServiceProvider.overrideWithValue(service),
+          diveRepositoryProvider.overrideWithValue(_OneDiveRepo()),
+        ],
+        child: MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: MediaImportView(
+              launchOverride: (context) async => [asset('a1')],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Import media...'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Import 1 items'));
+    await tester.pump();
+    await tester.pump();
+
+    expect(service.diveCalls.single.$1, 'd1');
+    expect(service.diveCalls.single.$2, ['a1']);
+    expect(find.text('1 linked, 0 skipped, 0 failed'), findsOneWidget);
+    await tester.pumpAndSettle();
+  });
+}
+
+/// Records dive imports and reports every asset as imported.
+class _RecordingImportService implements MediaImportService {
+  final List<(String diveId, List<String> assetIds)> diveCalls = [];
+
+  @override
+  Future<ImportResult> importPhotosForDive({
+    required List<AssetInfo> selectedAssets,
+    required Dive dive,
+  }) async {
+    diveCalls.add((dive.id, [for (final a in selectedAssets) a.id]));
+    return ImportResult(
+      imported: [
+        for (final a in selectedAssets)
+          MediaItem(
+            id: 'row-${a.id}',
+            mediaType: MediaType.photo,
+            takenAt: DateTime(2026, 6, 12, 10),
+            createdAt: DateTime(2026, 6, 12),
+            updatedAt: DateTime(2026, 6, 12),
+          ),
+      ],
+      failures: const {},
+      skippedDuplicates: 0,
+    );
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _OneDiveRepo implements DiveRepository {
+  @override
+  Future<Dive?> getDiveById(String id) async =>
+      Dive(id: id, dateTime: DateTime(2026, 6, 12));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

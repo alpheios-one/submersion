@@ -199,7 +199,16 @@ final missingCountProvider = FutureProvider<int>((ref) async {
 /// the repair wizard skips them). One probe per mount root per pass; a
 /// fresh probe each time the provider recomputes, so remounting is picked
 /// up.
-final missingOfflineCountProvider = FutureProvider<int>((ref) async {
+///
+/// Only the repair banner watches this, and the banner is only mounted
+/// while the Missing files facet is active. autoDispose tears the provider
+/// down when the banner goes, and the facet check below means the volume
+/// probes never run against a page the facet is not filtering.
+final missingOfflineCountProvider = FutureProvider.autoDispose<int>((
+  ref,
+) async {
+  final health = ref.watch(mediaLibraryFilterProvider.select((f) => f.health));
+  if (health != MediaHealthFilter.missing) return 0;
   final state = ref.watch(mediaLibraryNotifierProvider);
   final isOnline = VolumeStatus().newPassProbe();
   var offline = 0;

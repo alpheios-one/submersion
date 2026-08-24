@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/media/data/parsers/manifest_entry.dart';
 import 'package:submersion/features/media/data/services/dive_link_matcher.dart';
 import 'package:submersion/features/media/data/services/network_fetch_pipeline.dart';
 import 'package:submersion/features/media/data/services/network_import_targets.dart';
@@ -83,8 +84,27 @@ void main() {
     final candidates = candidatesFor([a, broken]);
     expect(candidates[0].key, 'https://e.com/a.jpg');
     expect(candidates[0].takenAt, DateTime.utc(2026, 6, 12, 9, 10));
+    expect(candidates[0].title, 'a.jpg');
     expect(candidates[1].error, 'HTTP 404');
     expect(candidates[1].takenAt, isNull);
+  });
+
+  test('candidatesFor prefers a manifest caption, then a custom title', () {
+    const entry = ManifestEntry(
+      entryKey: 'k1',
+      url: 'https://e.com/m.jpg',
+      caption: 'Reef at dawn',
+    );
+    final withCaption = ResolvedNetworkMedia(
+      uri: Uri.parse(entry.url),
+      entry: entry,
+    );
+
+    expect(candidatesFor([withCaption]).single.title, 'Reef at dawn');
+    expect(
+      candidatesFor([withCaption], title: (m) => m.uri.host).single.title,
+      'e.com',
+    );
   });
 
   test('requestsFromReview keeps only decided items', () {

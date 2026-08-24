@@ -45,8 +45,11 @@ import 'package:submersion/features/media/data/repositories/media_repository.dar
 import 'package:submersion/features/media/data/services/manifest_fetch_service.dart';
 import 'package:submersion/features/media/data/services/network_credentials_service.dart';
 import 'package:submersion/features/media/data/services/network_fetch_pipeline.dart';
+import 'package:submersion/features/media/data/services/url_metadata_extractor.dart';
+import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 import 'package:submersion/features/media/presentation/pages/media_import_review_page.dart';
+import 'package:submersion/features/media/presentation/providers/media_import_suggestion_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/providers/url_tab_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/network_signin_sheet.dart';
@@ -54,6 +57,10 @@ import 'package:submersion/features/media/presentation/widgets/url_tab.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import 'url_tab_test.mocks.dart';
+
+// `Override` is not exported from flutter_riverpod's public barrel; the
+// shared test helper re-types it for widget tests.
+import '../../../../helpers/mock_providers.dart' show Override;
 
 /// Stub fetcher used by the Manifest mode tab tests so the widget can
 /// be pumped without a real HTTP stack. The Manifest mode body itself
@@ -109,9 +116,14 @@ void main() {
     when(credentials.headersFor(any)).thenAnswer((_) async => null);
   });
 
-  Widget wrap(Widget child, {UrlTabState? seed}) {
+  Widget wrap(
+    Widget child, {
+    UrlTabState? seed,
+    List<Override> extraOverrides = const [],
+  }) {
     return ProviderScope(
       overrides: [
+        ...extraOverrides,
         // Override the credentials provider so [NetworkThumbnail] does
         // not try to construct the real service (which reaches into the
         // not-initialized [DatabaseService] in tests).
@@ -304,6 +316,57 @@ void main() {
     verifyNever(
       pipeline.insertResolved(any, subscriptionId: anyNamed('subscriptionId')),
     );
+  });
+
+  testWidgets('confirming the review inserts the decided URLs', (tester) async {
+    final takenAt = DateTime.utc(2026, 6, 12, 10);
+    when(pipeline.resolve(any)).thenAnswer(
+      (_) async => [
+        ResolvedNetworkMedia(
+          uri: Uri.parse('https://example.com/a.jpg'),
+          result: UrlExtractionResult(
+            url: 'https://example.com/a.jpg',
+            finalUrl: 'https://example.com/a.jpg',
+            takenAt: takenAt,
+          ),
+        ),
+      ],
+    );
+    when(
+      pipeline.insertResolved(any, subscriptionId: anyNamed('subscriptionId')),
+    ).thenAnswer((_) async => ['id-1']);
+
+    await tester.pumpWidget(
+      wrap(
+        const UrlTab(),
+        seed: const UrlTabState(draftLines: ['https://example.com/a.jpg']),
+        extraOverrides: [
+          importSuggestionProvider(takenAt).overrideWith(
+            (ref) async => const ImportSuggestion(
+              match: TimestampMatch(
+                kind: TimestampMatchKind.confident,
+                diveId: 'd3',
+              ),
+              diveNumber: 3,
+            ),
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Add'));
+    await tester.pumpAndSettle();
+    expect(find.text('Link to #3'), findsOneWidget);
+
+    await tester.tap(find.text('Import 1 items'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final requests = capturedRequests();
+    expect(requests.single.diveId, 'd3');
+    expect(find.text('Added 1 URL'), findsOneWidget);
+    await tester.pumpAndSettle();
   });
 
   testWidgets('backing out of the review keeps the pasted URLs', (

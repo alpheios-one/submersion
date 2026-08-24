@@ -324,6 +324,7 @@ void main() {
         expect(kept.diveId, 'd1');
         expect(outcome.deleted, 0);
         expect(outcome.keptAsDiveMedia, 1);
+        expect(outcome.total, 1);
       },
     );
 

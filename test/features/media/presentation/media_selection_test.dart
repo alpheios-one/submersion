@@ -372,6 +372,30 @@ void main() {
       expect(mediaRepo.unlinkedFromSite, isEmpty);
     });
 
+    testWidgets('Unlink from site warns before discarding details', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host([entry('b', siteId: 's1')]));
+      await tester.pumpAndSettle();
+      mediaRepo.withUserMetadata.add('b');
+
+      await tester.longPress(find.byType(MediaLibraryTile).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Unlink from site'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Unlink and discard details?'), findsOneWidget);
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text('Unlink'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(coordinator.deleted, ['b']);
+    });
+
     testWidgets('Unlink sends only the dive-linked ids', (tester) async {
       await tester.pumpWidget(
         host([entry('a'), entry('b', diveId: 'd1'), entry('c', siteId: 's1')]),
