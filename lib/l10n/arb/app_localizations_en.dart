@@ -12260,7 +12260,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String media_siteMediaSection_unlinkError(String error) {
+  String media_siteMediaSection_unlinkError(Object error) {
     return 'Failed to unlink: $error';
   }
 

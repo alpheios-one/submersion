@@ -11892,7 +11892,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String media_siteMediaSection_unlinkError(String error) {
+  String media_siteMediaSection_unlinkError(Object error) {
     return '取消关联失败：$error';
   }
 

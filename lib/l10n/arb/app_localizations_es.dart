@@ -12456,7 +12456,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String media_siteMediaSection_unlinkError(String error) {
+  String media_siteMediaSection_unlinkError(Object error) {
     return 'Error al desvincular: $error';
   }
 

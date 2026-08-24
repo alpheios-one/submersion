@@ -7075,7 +7075,7 @@
     "description": "Site page unlink failure snackbar",
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "Object"
       }
     }
   },

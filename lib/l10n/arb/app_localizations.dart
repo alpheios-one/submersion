@@ -21171,7 +21171,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Failed to unlink: {error}'**
-  String media_siteMediaSection_unlinkError(String error);
+  String media_siteMediaSection_unlinkError(Object error);
 
   /// Body of the library unlink confirmation dialog
   ///

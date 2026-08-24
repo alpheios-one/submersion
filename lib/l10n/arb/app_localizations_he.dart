@@ -12160,7 +12160,7 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String media_siteMediaSection_unlinkError(String error) {
+  String media_siteMediaSection_unlinkError(Object error) {
     return 'ביטול הקישור נכשל: $error';
   }
 
