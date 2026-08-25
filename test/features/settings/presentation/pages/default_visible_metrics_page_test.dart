@@ -26,6 +26,10 @@ class _StubSettingsNotifier extends StateNotifier<AppSettings>
       state = state.copyWith(defaultShowPhotoMarkers: value);
 
   @override
+  Future<void> setDefaultShowO2CellMv(bool value) async =>
+      state = state.copyWith(defaultShowO2CellMv: value);
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
@@ -132,5 +136,23 @@ void main() {
     await tester.tap(tile);
     await tester.pumpAndSettle();
     expect(tester.widget<SwitchListTile>(tile).value, isFalse);
+  });
+
+  testWidgets('toggles O2 cells default', (tester) async {
+    await tester.pumpWidget(buildPage(_StubSettingsNotifier()));
+    await tester.pumpAndSettle();
+
+    final tile = find.widgetWithText(SwitchListTile, 'O2 cells');
+    await tester.dragUntilVisible(
+      tile,
+      find.byType(Scrollable),
+      const Offset(0, -200),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.widget<SwitchListTile>(tile).value, isFalse);
+
+    await tester.tap(tile);
+    await tester.pumpAndSettle();
+    expect(tester.widget<SwitchListTile>(tile).value, isTrue);
   });
 }

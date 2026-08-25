@@ -277,4 +277,41 @@ void main() {
     expect(exported, isNotNull);
     expect(exported!['gasModel'], 'ideal');
   });
+
+  test(
+    'applies a pre-v161 diver_settings payload missing defaultShowO2CellMv',
+    () async {
+      await db.customStatement('PRAGMA foreign_keys = OFF');
+
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await db
+          .into(db.diverSettings)
+          .insert(
+            DiverSettingsCompanion.insert(
+              id: 'ds8',
+              diverId: 'diver-8',
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      final exported = await serializer.fetchRecord('diverSettings', 'ds8');
+      expect(exported, isNotNull);
+
+      // A peer still on v160 exports no defaultShowO2CellMv. The column is
+      // NOT NULL, so an unseeded import would throw in DiverSetting.fromJson.
+      final legacy = Map<String, dynamic>.from(exported!)
+        ..remove('defaultShowO2CellMv');
+
+      await (db.delete(
+        db.diverSettings,
+      )..where((t) => t.id.equals('ds8'))).go();
+
+      await serializer.upsertRecord('diverSettings', legacy);
+
+      final row = await (db.select(
+        db.diverSettings,
+      )..where((t) => t.id.equals('ds8'))).getSingle();
+      expect(row.defaultShowO2CellMv, isFalse);
+    },
+  );
 }
