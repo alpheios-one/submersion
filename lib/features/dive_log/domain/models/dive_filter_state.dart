@@ -24,6 +24,7 @@ class DiveFilterState {
   /// unrecorded (no profile, or a profile needing the computed fallback)
   /// match neither.
   final bool? decoOnly;
+
   /// True to restrict the list to dives with no buddy assigned: neither the
   /// legacy free-text `buddy` field nor a linked buddy is set.
   final bool? noBuddyOnly;
