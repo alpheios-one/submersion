@@ -19,6 +19,7 @@ import 'package:submersion/features/marine_life/presentation/providers/species_p
 import 'package:submersion/shared/models/entity_card_view_config.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 
 // ============================================================================
 // Site Filter State
@@ -352,7 +353,7 @@ class SiteListNotifier
 
   SiteListNotifier(this._repository, this._ref)
     : super(const AsyncValue.loading()) {
-    _initializeAndLoad();
+    logFailure(_initializeAndLoad(), SiteListNotifier, 'initialize and load');
 
     // Listen for diver changes and reload
     _ref.listen<String?>(currentDiverIdProvider, (previous, next) {
@@ -361,7 +362,11 @@ class SiteListNotifier
         _ref.invalidate(validatedCurrentDiverIdProvider);
         _ref.invalidate(sitesProvider);
         _ref.invalidate(sitesWithCountsProvider);
-        _initializeAndLoad();
+        logFailure(
+          _initializeAndLoad(),
+          SiteListNotifier,
+          'initialize and load',
+        );
       }
     });
   }

@@ -360,6 +360,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => 'Favorit';
 
   @override
+  String get diveLog_bulkEdit_fieldMyRole => 'Meine Rolle';
+
+  @override
+  String get diveLog_bulkEdit_buddyRoleMixed => 'Gemischt';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'Gewichte';
 
   @override
@@ -5744,6 +5750,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'Kein Buddy';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Bis $date';
   }
@@ -5804,6 +5813,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_filter_min => 'Min';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'Kein Buddy zugewiesen';
+
+  @override
   String get diveLog_filter_noTagsYet => 'Noch keine Tags erstellt';
 
   @override
@@ -5847,6 +5859,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'Nur Favoriten anzeigen';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Nur Tauchgänge ohne Buddy anzeigen';
 
   @override
   String get diveLog_filter_startDate => 'Startdatum';
@@ -10063,6 +10079,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Ausstellungsdatum';
 
   @override
+  String get enum_sortField_dateTaken => 'Aufnahmedatum';
+
+  @override
   String get enum_sortField_difficulty => 'Schwierigkeitsgrad';
 
   @override
@@ -10076,6 +10095,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'Enddatum';
+
+  @override
+  String get enum_sortField_fileName => 'Dateiname';
+
+  @override
+  String get enum_sortField_fileSize => 'Dateigröße';
 
   @override
   String get enum_sortField_lastServiceDate => 'Letzte Wartung';
@@ -11774,7 +11799,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Mischer';
+  String get gasCalculators_tab_blender => 'Trimix-Mischer';
 
   @override
   String get gasCalculators_blender_cylinder => 'Flasche';
@@ -11865,11 +11890,196 @@ class AppLocalizationsDe extends AppLocalizations {
       'Mit diesen Füllgasen wird das Zielgemisch nicht exakt erreicht. Füllgase und ihre Reihenfolge prüfen.';
 
   @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'Die Flasche steht unter Druck, enthält aber weder Sauerstoff noch Helium, also reinen Stickstoff. Prüfe die Mischung, die bereits in der Flasche ist.';
+
+  @override
   String get gasCalculators_blender_about => 'Über das Mischen';
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      'Partialdruck-Mischung für das Zielgemisch mit realem Gasverhalten (Van der Waals). Fülle jedes Füllgas der Reihe nach bis zum angezeigten Druck. Füllgase und ihre Reihenfolge sind einstellbar; analysiere das fertige Gemisch immer, bevor du damit tauchst.';
+      'Partialdruck-Mischung für die Zielmischung. Gib jedes Füllgas der Reihe nach bis zum angezeigten Druck zu und lass die Flasche danach ruhen. Füllgase und ihre Reihenfolge sind einstellbar: Setzt du das letzte Gas auf 32/0, wird statt mit Luft mit EAN32 aufgefüllt. Analysiere die fertige Mischung immer, bevor du sie tauchst.';
+
+  @override
+  String get gasCalculators_blender_conditions => 'Mischbedingungen';
+
+  @override
+  String get gasCalculators_blender_fillTemp => 'Fülltemperatur';
+
+  @override
+  String get gasCalculators_blender_fillTempHelp =>
+      'Die Temperatur der Flasche während des Füllens. Jeder Druck in der Reihenfolge ist der Manometerwert bei dieser Temperatur.';
+
+  @override
+  String get gasCalculators_blender_settledTemp => 'Ruhetemperatur';
+
+  @override
+  String get gasCalculators_blender_settledTempHelp =>
+      'Die Temperatur, die die Flasche am Ende annimmt. Der Zieldruck ist der Wert, den sie dann anzeigt.';
+
+  @override
+  String get gasCalculators_blender_gasModel => 'Gasmodell';
+
+  @override
+  String get gasCalculators_blender_modelIdeal => 'Ideales Gas';
+
+  @override
+  String get gasCalculators_blender_modelVanDerWaals => 'Van der Waals';
+
+  @override
+  String get gasCalculators_blender_modelZFactor => 'Reales Gas (Z-Faktor)';
+
+  @override
+  String get gasCalculators_blender_modelRecommended => 'Empfohlen';
+
+  @override
+  String get gasCalculators_blender_modelHelp =>
+      'Reales Gas (Z-Faktor) ist bei Flaschendrücken am genauesten. Ideales Gas entspricht den meisten veröffentlichten Mischtabellen. Van der Waals dient dem Vergleich mit anderer Mischsoftware und weicht bei Fülldruck um mehrere Prozent ab.';
+
+  @override
+  String gasCalculators_blender_stepAdd(String gas) {
+    return '$gas zugeben';
+  }
+
+  @override
+  String get gasCalculators_blender_stepStartLabel => 'Start';
+
+  @override
+  String gasCalculators_blender_settlesTo(String pressure, String temperature) {
+    return 'Endet bei $pressure bei $temperature';
+  }
+
+  @override
+  String get gasCalculators_blender_templates => 'Vorlagen';
+
+  @override
+  String get gasCalculators_blender_templatesTitle =>
+      'Vorlagen für Zielmischungen';
+
+  @override
+  String get gasCalculators_blender_saveTemplate =>
+      'Aktuelle Mischung speichern';
+
+  @override
+  String get gasCalculators_blender_manageTemplates => 'Vorlagen verwalten';
+
+  @override
+  String gasCalculators_blender_templateSaved(String mix) {
+    return '$mix gespeichert';
+  }
+
+  @override
+  String get gasCalculators_blender_templateExists =>
+      'Diese Mischung ist bereits gespeichert.';
+
+  @override
+  String get gasCalculators_blender_templateInvalid =>
+      'O₂ + He darf 100 % nicht überschreiten.';
+
+  @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'Gib O₂ und He beide als Zahl ein.';
+
+  @override
+  String gasCalculators_blender_templateLimit(int count) {
+    return 'Du kannst bis zu $count Vorlagen speichern.';
+  }
+
+  @override
+  String get gasCalculators_blender_templateNone =>
+      'Noch keine Vorlagen. Speichere eine Zielmischung, um sie hier wiederzuverwenden.';
+
+  @override
+  String gasCalculators_blender_templateDelete(String mix) {
+    return '$mix löschen';
+  }
+
+  @override
+  String get gasCalculators_blender_templateAdd => 'Vorlage hinzufügen';
+
+  @override
+  String get gasCalculators_blender_billing => 'Kosten';
+
+  @override
+  String get gasCalculators_blender_cylinderVolume =>
+      'Wasservolumen der Flasche';
+
+  @override
+  String get gasCalculators_blender_cylinderPresets => 'Voreinstellungen';
+
+  @override
+  String gasCalculators_blender_unitPrice(String unit) {
+    return 'Preis pro 100 $unit';
+  }
+
+  @override
+  String get gasCalculators_blender_currency => 'Währung';
+
+  @override
+  String get gasCalculators_blender_costTotal => 'Gesamt';
+
+  @override
+  String get gasCalculators_blender_costBasis =>
+      'Abgerechnet wird der gelieferte Druck (Wasservolumen der Flasche × zugeführte bar), so wie eine Füllstation misst.';
+
+  @override
+  String get gasCalculators_blender_costMissingPrice =>
+      'Gib für jedes Gas einen Preis ein, um die Summe zu sehen.';
+
+  @override
+  String get gasCalculators_blender_saveFill => 'Diese Füllung speichern';
+
+  @override
+  String get gasCalculators_blender_billed => 'Abgerechnet';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Noch nichts abgerechnet. Schliesse eine Füllung ab und speichere sie hier.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Rechnung an';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Position hinzufügen';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Bezeichnung';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Betrag';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Leeren';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Rechnung leeren?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'Damit werden alle $count gespeicherten Füllungen entfernt.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return '$label bearbeiten';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return '$label löschen';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix zur Rechnung hinzugefügt';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'Mindestens eine Position hat keinen Preis, die Summe ist daher unvollständig.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Gesamt';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
@@ -12201,28 +12411,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_diveMediaSection_title => 'Fotos & Video';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'Löschen';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'Löschen fehlgeschlagen: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'Dies entfernt sie aus der App und aus jedem Medienspeicher. Dies kann nicht rückgängig gemacht werden.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '$count Elemente gelöscht';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return '$count Elemente löschen?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'Neu verknüpfen';
 
   @override
@@ -12237,13 +12425,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_diveMediaSection_unlinkButton => 'Trennen';
 
   @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'Dieses Foto vom Tauchgang entfernen? Das Foto bleibt in Ihrer Galerie erhalten.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'Foto trennen';
-
-  @override
   String media_diveMediaSection_unlinkError(Object error) {
     return 'Trennen fehlgeschlagen: $error';
   }
@@ -12255,7 +12436,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Dies entfernt $count Medienelemente von diesem Tauchgang. Die Originaldateien werden nicht gelöscht.';
+    return 'Entfernt $count Medien samt Cloud-Kopien und Miniaturansichten aus deiner Mediathek. Medien, die ein Tauchplatz noch verwendet, bleiben erhalten. Deine Originaldateien bleiben unberührt.';
   }
 
   @override
@@ -12269,7 +12450,31 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'Foto getrennt';
+  String media_library_unlinkConfirmTitle(int count) {
+    return '$count Elemente trennen?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(Object error) {
+    return 'Trennen fehlgeschlagen: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'Sie verlassen deine Mediathek, samt Cloud-Kopien und Miniaturansichten. Deine Originaldateien bleiben unberührt. Dies kann nicht rückgängig gemacht werden.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count davon haben eine Bildunterschrift oder Favoritenmarkierung in Submersion, diese Details gehen verloren.',
+      one:
+          'Eines davon hat eine Bildunterschrift oder Favoritenmarkierung in Submersion, diese Details gehen verloren.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'Medien des Tauchplatzes';
@@ -12294,16 +12499,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return '$count Anhänge entfernen?';
+    return '$count Elemente trennen?';
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'Die ausgewählten Elemente werden von diesem Tauchplatz entfernt. Dateien in deiner Fotobibliothek oder auf der Festplatte werden nicht gelöscht.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Entfernt $count Elemente aus Ihrer Bibliothek, einschließlich Cloud-Kopien und Vorschaubildern. Medien, die ein Tauchgang noch verwendet, bleiben erhalten. Ihre Originaldateien sind nicht betroffen.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return '$count Anhänge entfernt';
+    return '$count Elemente getrennt';
   }
 
   @override
@@ -12857,8 +13063,47 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_import_launch => 'Medien importieren...';
 
   @override
+  String get media_import_review_title => 'Import prüfen';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return '$count Elemente importieren';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked verknüpft, $skipped übersprungen, $failed fehlgeschlagen';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Tauchplatz wählen';
+
+  @override
+  String get media_import_review_ambiguous => 'Mehrere Tauchgänge passen';
+
+  @override
+  String get media_import_review_noMatch => 'Kein passender Tauchgang';
+
+  @override
+  String get media_import_review_skipped => 'Nicht importiert';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Mit #$number verknüpfen';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Mit Tauchgang verknüpfen';
+
+  @override
+  String get media_import_review_linkToSite => 'Mit Tauchplatz verknüpfen';
+
+  @override
+  String get media_import_review_chooseDive => 'Tauchgang wählen';
+
+  @override
   String get media_import_intro =>
-      'Importierte Medien bleiben in Ihrer Bibliothek und können automatisch mit Tauchgängen verknüpft werden.';
+      'Fotos werden beim Import mit einem Tauchgang oder Tauchplatz verknüpft.';
 
   @override
   String get media_console_sources => 'Quellen';
@@ -12972,9 +13217,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Fehlend';
-
-  @override
   String get media_missing_empty => 'Keine fehlenden Dateien';
 
   @override
@@ -13037,45 +13279,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Nicht verknüpft';
-
-  @override
-  String get media_import_linkTitle => 'Importierte Medien verknüpfen';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return '$count Elemente verknüpfen';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Bleibt unter Nicht verknüpft';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count Elemente verknüpft';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Tauchgang wählen';
-
-  @override
-  String get media_inbox_empty => 'Keine nicht verknüpften Medien';
-
-  @override
-  String get media_inbox_keep => 'Behalten';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Mit #$number verknüpfen';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Mit Tauchgang verknüpfen';
-
-  @override
-  String get media_inbox_linkToSite => 'Mit Tauchplatz verknüpfen';
-
-  @override
   String get media_library_empty => 'Noch keine Medien';
 
   @override
@@ -13097,7 +13300,30 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_library_filter_dates => 'Zeitraum';
 
   @override
+  String get media_library_filter_missing => 'Fehlende Dateien';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Fehlende Dateien ($count)';
+  }
+
+  @override
   String get media_library_filter_clear => 'Filter zurücksetzen';
+
+  @override
+  String get media_library_filter_any => 'Beliebig';
+
+  @override
+  String get media_library_filter_title => 'Medien filtern';
+
+  @override
+  String get media_library_filter_apply => 'Übernehmen';
+
+  @override
+  String get media_library_sort_title => 'Medien sortieren';
+
+  @override
+  String get media_smartAlbum_load => 'Album laden';
 
   @override
   String get media_divePicker_title => 'Zu Tauchgang verschieben';
@@ -13106,22 +13332,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_divePicker_search => 'Tauchgänge durchsuchen';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'Dies entfernt sie aus der App und aus jedem Medienspeicher. Dies kann nicht rückgängig gemacht werden.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return '$count Elemente löschen?';
-  }
-
-  @override
   String get media_library_moveToDive => 'Zu Tauchgang verschieben';
 
   @override
-  String get media_library_unlinkFromSite => 'Vom Tauchplatz lösen';
-
-  @override
-  String get media_library_unlinkSelected => 'Lösen';
+  String get media_library_unlinkSelected => 'Trennen';
 
   @override
   String media_library_selectedCount(int count) {
@@ -23158,6 +23372,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Konten';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Anzeige';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Geführte Einrichtung';
 
   @override
@@ -23260,6 +23477,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'Wird noch geladen. Zum Wiederholen tippen.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Kein Zugriff auf die Fotomediathek';
 
   @override
   String get attrLabel_size => 'Größe';
@@ -29822,6 +30043,33 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Alle Medien prüfen';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente aktualisiert',
+      one: '$count Element aktualisiert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Keines der $count Elemente konnte geprüft werden. Ihre Quellen sind derzeit nicht erreichbar.',
+      one:
+          'Das Element konnte nicht geprüft werden. Seine Quelle ist derzeit nicht erreichbar.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Medienquellen';
 
   @override
@@ -32631,6 +32879,40 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Fehlt und nicht gesichert';
+
+  @override
+  String get media_servedFrom_localDisk => 'Auf diesem Gerät';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Fotomediathek';
+
+  @override
+  String get media_servedFrom_storeCache =>
+      'Cloud-Speicher, hier zwischengespeichert';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Cloud-Speicher';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Weblink';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Verbundener Dienst, hier zwischengespeichert';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Verbundener Dienst';
+
+  @override
+  String get media_servedFrom_embedded => 'In diesem Logbuch gespeichert';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Quellen-Badges auf Miniaturen anzeigen';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Ein kleines Symbol, das zeigt, woher jedes Element geladen wird. Problem-Badges werden immer angezeigt.';
 
   @override
   String get media_status_transferFailed => 'Upload fehlgeschlagen';

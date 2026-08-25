@@ -2,9 +2,10 @@ import 'package:submersion/core/util/wall_clock_utc.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 
-/// Library health facets: rows whose backing file is missing (persisted
-/// orphan flag) or rows attached to neither a dive nor a site.
-enum MediaHealthFilter { missing, unlinked }
+/// Library health facet: rows whose backing file is missing (persisted
+/// orphan flag). Every row carries a dive or site link, so there is no
+/// "unlinked" facet; an album saved with one decodes to no constraint.
+enum MediaHealthFilter { missing }
 
 /// Cross-dive library filter. Compiled to SQL by MediaLibraryRepository;
 /// all fields combine with AND. Phase 5 serializes this for smart albums.
@@ -153,12 +154,18 @@ class MediaLibraryFilter {
   );
 }
 
-/// Keyset cursor: the sort key (epoch millis of COALESCE(taken_at,
-/// created_at)) and row id of the last entry on the previous page.
+/// Keyset cursor: the last entry's value for the active sort key, plus its
+/// row id as the tiebreaker.
+///
+/// [sortKey] is an int for the date and size fields and a String for the name
+/// field. It is always non-null: the repository coalesces every sort
+/// expression, because a NULL key makes the keyset predicate (`key < ?`)
+/// evaluate to NULL, which is falsy, and silently truncates the result set at
+/// the first NULL row.
 class MediaLibraryCursor {
   const MediaLibraryCursor({required this.sortKey, required this.id});
 
-  final int sortKey;
+  final Object sortKey;
   final String id;
 }
 

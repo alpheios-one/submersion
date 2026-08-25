@@ -177,6 +177,42 @@ class DiveRepository {
       )
       .debounce(changeTickDebounce);
 
+  /// Change tick for the Buhlmann analysis chain and its input providers:
+  /// exactly the tables the pipeline reads, nothing else.
+  ///
+  /// The analysis providers used to subscribe to [watchDiveDetailChanges],
+  /// which includes `media`. Viewing a photo writes media rows (orphan
+  /// reconciliation, enrichment backfill), so every cached analysis in the
+  /// app was discarded and recomputed on the UI isolate -- the recursive
+  /// residual-CNS/tissue lookback across a whole trip included. That
+  /// recompute wave is the "20-30s of UI stutter" [changeTickDebounce]
+  /// documents, and it fired for writes the analysis never reads.
+  ///
+  /// Table set = the reads of [getDiveForAnalysis] (dives, dive_profiles,
+  /// dive_tanks, plus dive_data_sources/dive_computers for primary-source
+  /// resolution in [getMergedProfile]), the pipeline's direct queries
+  /// (gas_switches, tank_pressure_profiles), and dive_profile_events --
+  /// which the detail tick never covered at all, leaving
+  /// `diveComputerEventsProvider` blind to writes of its own table.
+  ///
+  /// `dives` also covers FK cascades: SQLite performs a cascade delete of
+  /// child rows without Drift seeing a write on the child tables, so the
+  /// parent tick is what keeps child readers from going stale.
+  Stream<void> watchAnalysisInputChanges() => _db
+      .tableUpdates(
+        TableUpdateQuery.allOf([
+          TableUpdateQuery.onTable(_db.dives),
+          TableUpdateQuery.onTable(_db.diveProfiles),
+          TableUpdateQuery.onTable(_db.diveTanks),
+          TableUpdateQuery.onTable(_db.tankPressureProfiles),
+          TableUpdateQuery.onTable(_db.gasSwitches),
+          TableUpdateQuery.onTable(_db.diveDataSources),
+          TableUpdateQuery.onTable(_db.diveComputers),
+          TableUpdateQuery.onTable(_db.diveProfileEvents),
+        ]),
+      )
+      .debounce(changeTickDebounce);
+
   /// Get all dives, ordered by date (newest first)
   /// This method is optimized to avoid N+1 queries by batch loading related data
   /// Optionally filter by [diverId] for multi-diver support
@@ -2021,6 +2057,12 @@ class DiveRepository {
     }
     if (filter.favoritesOnly == true) {
       clauses.add('d.is_favorite = 1');
+    }
+    if (filter.noBuddyOnly == true) {
+      clauses.add(
+        "(d.buddy IS NULL OR d.buddy = '') AND "
+        'NOT EXISTS (SELECT 1 FROM dive_buddies db WHERE db.dive_id = d.id)',
+      );
     }
     if (filter.tagIds.isNotEmpty) {
       final placeholders = List.filled(filter.tagIds.length, '?').join(', ');

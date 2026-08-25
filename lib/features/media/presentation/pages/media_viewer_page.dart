@@ -24,6 +24,7 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/presentation/helpers/media_share_helper.dart';
 import 'package:submersion/features/media/presentation/providers/lightroom_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
 import 'package:submersion/features/media/presentation/widgets/media_nav_arrows.dart';
@@ -88,6 +89,10 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
 
   bool _showOverlay = true;
 
+  /// Dives whose enrichment backfill has already been attempted this session,
+  /// so a swipe through several un-enriched items of one dive runs it once.
+  final Set<String> _enrichAttempted = {};
+
   /// Live video controllers hoisted from _VideoItem, keyed by media id, so
   /// the Perdix overlay (mounted at page level) can follow playback. Entries
   /// come and go as gallery pages initialize/dispose.
@@ -110,6 +115,58 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
     } else {
       setState(() => _videoControllers[mediaId] = controller);
     }
+  }
+
+  /// Resolves the live record for the item on screen when the caller passed a
+  /// lean one.
+  ///
+  /// Two things make the passed item untrustworthy for dive context. The
+  /// Media section's library query hydrates rows without the enrichment join
+  /// on purpose (grids never render photo-time depth), so its items always
+  /// carry `enrichment == null`. And [MediaViewerPage.mediaList] is an
+  /// immutable snapshot taken when the route was pushed, so a re-link since
+  /// then leaves it reporting the *old* dive link, or none at all.
+  ///
+  /// Reading the one item actually on screen straight from the database
+  /// settles both: the library keeps its lean grid, and the viewer keeps
+  /// showing the truth. [mediaByIdProvider] self-invalidates on media and
+  /// enrichment changes, so a re-link or a backfill that happens while the
+  /// viewer is open lands too.
+  ///
+  /// Deliberately unconditional. Skipping the read for a snapshot that
+  /// already carries an enrichment would save one keyed lookup on the
+  /// dive-detail path, but a snapshot holding an enrichment is no more
+  /// current than one holding none: both were captured when the route was
+  /// pushed. Trusting it is what produced this class of bug twice already,
+  /// so the rule is that the on-screen item always comes from the database.
+  /// The passed item stands in only while the read is in flight.
+  MediaItem _hydrate(MediaItem item) =>
+      ref.watch(mediaByIdProvider(item.id)).value ?? item;
+
+  /// Computes and saves the missing [MediaEnrichment] rows for [diveId], the
+  /// same idempotent backfill dive detail runs on open.
+  ///
+  /// Media linked from a local file gets a row but no enrichment, and until
+  /// now only dive detail ever closed that gap: a photo could show its depth
+  /// and profile marker there and nothing at all in the Media section.
+  void _backfillEnrichment(String diveId) {
+    if (!_enrichAttempted.add(diveId)) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // The callback can fire after this state is disposed; touching `ref`
+      // then throws, so bail before using it.
+      if (!mounted) return;
+      try {
+        // Nothing to invalidate by hand: saving an enrichment ticks
+        // watchMediaChanges, and mediaByIdProvider self-invalidates on it, so
+        // the overlays pick the row up on the next frame. An invalidate here
+        // would also have to guess which ids were affected, and guessing from
+        // widget.mediaList is exactly what failed -- the snapshot still says
+        // diveId == null for the media that was just linked.
+        await ref.read(diveMediaEnricherProvider).enrichMissingForDive(diveId);
+      } catch (_) {
+        // Best-effort: a failure just leaves the overlays absent this session.
+      }
+    });
   }
 
   @override
@@ -202,9 +259,14 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
     final currentIndex = mediaList.isEmpty
         ? 0
         : _currentIndex.clamp(0, mediaList.length - 1);
-    final currentDiveId = mediaList.isEmpty
+    // Resolve the live record BEFORE reading any dive context off it. Taking
+    // the dive link from the snapshot instead is what left a freshly
+    // re-linked photo looking unlinked: no Go-to-dive, no depth chips, no
+    // mini profile, no dive computer.
+    final hydratedItem = mediaList.isEmpty
         ? null
-        : mediaList[currentIndex].diveId;
+        : _hydrate(mediaList[currentIndex]);
+    final currentDiveId = hydratedItem?.diveId;
     final diveAsync = currentDiveId == null
         ? const AsyncValue<Dive?>.data(null)
         : ref.watch(diveProvider(currentDiveId));
@@ -223,8 +285,15 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
             );
           }
 
-          final currentItem = mediaList[currentIndex];
+          // Non-null once mediaList is known non-empty. Every consumer below
+          // reads the hydrated record: the mini profile, the Perdix gate, the
+          // toolbar's Go-to-dive and hasEnrichment flags, the bottom
+          // depth/temp/elapsed chips and the info sheet.
+          final currentItem = hydratedItem!;
           final enrichment = currentItem.enrichment;
+          if (enrichment == null && currentDiveId != null) {
+            _backfillEnrichment(currentDiveId);
+          }
 
           // Get dive profile for the mini chart overlay
           final diveProfile = diveAsync.whenOrNull(
@@ -232,21 +301,33 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
           );
 
           final dive = diveAsync.value;
+          // Whether this item is synced to a moment in the profile, decided
+          // from the enrichment alone. Media that is not synced can never
+          // show the Perdix face, whatever the analysis would say.
+          final perdixPrecondition =
+              enrichment?.elapsedSeconds != null &&
+              enrichment!.matchConfidence != MatchConfidence.noProfile;
+
           // Same source-aware profile/analysis pairing as the fullscreen
           // profile page: analysis curves are read by index, so the profile
           // passed to the resolver must be the one the analysis was computed
-          // over (multi-computer dives). Skipped entirely for items with no
-          // dive link — there is no profile to resolve against.
-          final PerdixFaceResolver perdixResolver;
-          if (currentDiveId == null) {
-            perdixResolver = PerdixFaceResolver(
-              profile: const [],
-              analysis: null,
-              tanks: const [],
-              gasSwitches: const [],
-              tankPressures: null,
-            );
-          } else {
+          // over (multi-computer dives).
+          //
+          // Built ONLY when the face can actually render: a dive-linked,
+          // profile-synced item with the overlay turned on. The watches
+          // below start the per-source profile analysis, and through it the
+          // full Buhlmann pipeline with its recursive residual-CNS/tissue
+          // lookback across the surrounding dives. Watching that
+          // unconditionally ran the whole cascade on the UI isolate for
+          // every dive-linked item the viewer showed, with the result
+          // discarded whenever the overlay was off -- the first ingredient
+          // of the app-wide freeze after viewing media (2026-08 hang
+          // reports). Toggling the overlay on simply rebuilds and starts the
+          // watches then.
+          PerdixFaceResolver? perdixResolver;
+          if (currentDiveId != null &&
+              perdixPrecondition &&
+              settings.perdixOverlayEnabled) {
             final activeSourceId = ref.watch(
               activeDiveSourceProvider(currentDiveId),
             );
@@ -296,10 +377,18 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
               tankPressures: tankPressures,
             );
           }
-          final perdixAvailable =
-              enrichment?.elapsedSeconds != null &&
-              enrichment!.matchConfidence != MatchConfidence.noProfile &&
-              perdixResolver.isAvailable;
+          // Toolbar-toggle visibility, decided the same cheap way in BOTH
+          // toggle states: a synced item and a non-empty merged profile.
+          // Deliberately NOT the resolver's answer. On a multi-computer dive
+          // whose ACTIVE source is metadata-only, the resolver scopes to an
+          // empty bucket and reports unavailable; a toggle that followed it
+          // would vanish the moment the user turned it on, stranding the
+          // setting with no control on this page to turn it back off. The
+          // cheap test's cost is an inert toggle in that case, never a
+          // vanished one. The resolver's own availability still gates the
+          // face mount below.
+          final perdixToggleAvailable =
+              perdixPrecondition && (diveProfile?.isNotEmpty ?? false);
 
           final viewer = GestureDetector(
             // Swipe down to close (common pattern for fullscreen viewers)
@@ -364,7 +453,7 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                         ? () => context.pushOrReturnTo('/dives/$currentDiveId')
                         : null,
                     hasEnrichment: enrichment?.depthMeters != null,
-                    showPerdixToggle: perdixAvailable,
+                    showPerdixToggle: perdixToggleAvailable,
                     perdixEnabled: settings.perdixOverlayEnabled,
                     onTogglePerdix: () => ref
                         .read(settingsProvider.notifier)
@@ -429,7 +518,9 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                 // The face absorbs pointer events over its own bounds (drags
                 // move it, taps do nothing); chrome-toggle and video
                 // play/pause taps work anywhere outside it.
-                if (perdixAvailable && settings.perdixOverlayEnabled)
+                if (settings.perdixOverlayEnabled &&
+                    perdixResolver != null &&
+                    perdixResolver.isAvailable)
                   DraggablePerdixOverlay(
                     // Re-key when the persisted seed first arrives so a late
                     // settings load re-seeds the position (same trick as the
@@ -439,7 +530,9 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                       '${settings.perdixOverlayX}-${settings.perdixOverlayY}',
                     ),
                     resolver: perdixResolver,
-                    baseElapsedSeconds: enrichment.elapsedSeconds!,
+                    // Non-null here: the resolver is only ever built for
+                    // items passing perdixPrecondition.
+                    baseElapsedSeconds: enrichment!.elapsedSeconds!,
                     settings: settings,
                     topReserve:
                         MediaQuery.paddingOf(context).top + _topChromeHeight,

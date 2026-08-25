@@ -13,7 +13,7 @@ void main() {
       fromDate: DateTime(2026, 6, 1),
       toDate: DateTime(2026, 6, 30),
       sourceType: MediaSourceType.localFile,
-      health: MediaHealthFilter.unlinked,
+      health: MediaHealthFilter.missing,
     );
 
     expect(MediaLibraryFilter.fromJson(filter.toJson()), filter);
@@ -35,6 +35,13 @@ void main() {
     expect(decoded.mediaType, isNull);
     expect(decoded.health, isNull);
     expect(decoded.sourceType, isNull);
+  });
+
+  test('an album saved with the retired unlinked facet decodes to none', () {
+    // Every row carries a dive or site link now, so the facet is gone; an
+    // album a pre-upgrade build wrote must degrade to "no constraint"
+    // rather than take the library view down.
+    expect(MediaLibraryFilter.fromJson({'health': 'unlinked'}).health, isNull);
   });
 
   test('malformed dates decode to null rather than throwing', () {
@@ -137,7 +144,7 @@ void main() {
         base ==
             const MediaLibraryFilter(
               siteId: 's1',
-              health: MediaHealthFilter.unlinked,
+              health: MediaHealthFilter.missing,
             ),
         isFalse,
       );
@@ -160,7 +167,7 @@ void main() {
     test('a round trip through JSON preserves equality', () {
       const filter = MediaLibraryFilter(
         siteId: 's1',
-        health: MediaHealthFilter.unlinked,
+        health: MediaHealthFilter.missing,
       );
       final restored = MediaLibraryFilter.fromJson(filter.toJson());
       expect(restored, filter);

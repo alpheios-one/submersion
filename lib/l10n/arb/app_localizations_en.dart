@@ -360,6 +360,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => 'Favorite';
 
   @override
+  String get diveLog_bulkEdit_fieldMyRole => 'My role';
+
+  @override
+  String get diveLog_bulkEdit_buddyRoleMixed => 'Mixed';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'Weights';
 
   @override
@@ -5640,6 +5646,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'No Buddy';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Until $date';
   }
@@ -5699,6 +5708,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_filter_min => 'Min';
 
   @override
+  String get diveLog_filter_noBuddyOnly => 'No Buddy Assigned';
+
+  @override
   String get diveLog_filter_noTagsYet => 'No tags created yet';
 
   @override
@@ -5742,6 +5754,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'Show only favorite dives';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Show only dives without a buddy';
 
   @override
   String get diveLog_filter_startDate => 'Start Date';
@@ -9903,6 +9919,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Date Issued';
 
   @override
+  String get enum_sortField_dateTaken => 'Date Taken';
+
+  @override
   String get enum_sortField_difficulty => 'Difficulty';
 
   @override
@@ -9916,6 +9935,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'End Date';
+
+  @override
+  String get enum_sortField_fileName => 'File Name';
+
+  @override
+  String get enum_sortField_fileSize => 'File Size';
 
   @override
   String get enum_sortField_lastServiceDate => 'Last Service';
@@ -11590,7 +11615,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Blender';
+  String get gasCalculators_tab_blender => 'Trimix blender';
 
   @override
   String get gasCalculators_blender_cylinder => 'Cylinder';
@@ -11681,11 +11706,193 @@ class AppLocalizationsEn extends AppLocalizations {
       'These fill gases cannot reach the target mix exactly. Check the fill gases and their order.';
 
   @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'The cylinder is holding pressure but no oxygen and no helium, which would be pure nitrogen. Check the mix already in the cylinder.';
+
+  @override
   String get gasCalculators_blender_about => 'About blending';
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      'Partial-pressure blend for the target mix, using real-gas (Van der Waals) behaviour. Add each fill gas in order, up to the pressure shown. Fill gases and their order are configurable; always analyse the finished mix before diving it.';
+      'Partial-pressure blend for the target mix. Add each fill gas in order, up to the pressure shown, then let the cylinder settle. Fill gases and their order are configurable, so setting the last gas to 32/0 tops off with EAN32 instead of air. Always analyse the finished mix before diving it.';
+
+  @override
+  String get gasCalculators_blender_conditions => 'Blending conditions';
+
+  @override
+  String get gasCalculators_blender_fillTemp => 'Fill temperature';
+
+  @override
+  String get gasCalculators_blender_fillTempHelp =>
+      'The cylinder\'s temperature while you fill it. Every pressure in the procedure is the gauge reading at this temperature.';
+
+  @override
+  String get gasCalculators_blender_settledTemp => 'Settled temperature';
+
+  @override
+  String get gasCalculators_blender_settledTempHelp =>
+      'The temperature the cylinder ends up at. The target pressure is what it reads once it gets there.';
+
+  @override
+  String get gasCalculators_blender_gasModel => 'Gas model';
+
+  @override
+  String get gasCalculators_blender_modelIdeal => 'Ideal gas';
+
+  @override
+  String get gasCalculators_blender_modelVanDerWaals => 'Van der Waals';
+
+  @override
+  String get gasCalculators_blender_modelZFactor => 'Real gas (Z-factor)';
+
+  @override
+  String get gasCalculators_blender_modelRecommended => 'Recommended';
+
+  @override
+  String get gasCalculators_blender_modelHelp =>
+      'Real gas (Z-factor) is the most accurate at cylinder pressures. Ideal gas matches most published blending tables. Van der Waals is offered for comparison with other blending software and is several percent off at fill pressure.';
+
+  @override
+  String gasCalculators_blender_stepAdd(String gas) {
+    return 'Add $gas';
+  }
+
+  @override
+  String get gasCalculators_blender_stepStartLabel => 'Start';
+
+  @override
+  String gasCalculators_blender_settlesTo(String pressure, String temperature) {
+    return 'Settles to $pressure at $temperature';
+  }
+
+  @override
+  String get gasCalculators_blender_templates => 'Templates';
+
+  @override
+  String get gasCalculators_blender_templatesTitle => 'Target mix templates';
+
+  @override
+  String get gasCalculators_blender_saveTemplate => 'Save current mix';
+
+  @override
+  String get gasCalculators_blender_manageTemplates => 'Manage templates';
+
+  @override
+  String gasCalculators_blender_templateSaved(String mix) {
+    return 'Saved $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_templateExists =>
+      'That mix is already saved.';
+
+  @override
+  String get gasCalculators_blender_templateInvalid =>
+      'O₂ + He cannot exceed 100%.';
+
+  @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'Enter both O₂ and He as numbers.';
+
+  @override
+  String gasCalculators_blender_templateLimit(int count) {
+    return 'You can save up to $count templates.';
+  }
+
+  @override
+  String get gasCalculators_blender_templateNone =>
+      'No templates yet. Save a target mix to reuse it here.';
+
+  @override
+  String gasCalculators_blender_templateDelete(String mix) {
+    return 'Delete $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_templateAdd => 'Add template';
+
+  @override
+  String get gasCalculators_blender_billing => 'Cost';
+
+  @override
+  String get gasCalculators_blender_cylinderVolume => 'Cylinder water capacity';
+
+  @override
+  String get gasCalculators_blender_cylinderPresets => 'Presets';
+
+  @override
+  String gasCalculators_blender_unitPrice(String unit) {
+    return 'Price per 100 $unit';
+  }
+
+  @override
+  String get gasCalculators_blender_currency => 'Currency';
+
+  @override
+  String get gasCalculators_blender_costTotal => 'Total';
+
+  @override
+  String get gasCalculators_blender_costBasis =>
+      'Billed on the pressure delivered (cylinder water capacity × bar added), the way a fill station meters it.';
+
+  @override
+  String get gasCalculators_blender_costMissingPrice =>
+      'Enter a price for every gas to see the total.';
+
+  @override
+  String get gasCalculators_blender_saveFill => 'Save this fill';
+
+  @override
+  String get gasCalculators_blender_billed => 'Billed';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Nothing billed yet. Finish a fill and save it here.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Billed to';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Add a line';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Description';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Amount';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Clear';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Clear the bill?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'This removes all $count saved fills.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return 'Edit $label';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return 'Delete $label';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix added to the bill';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'One or more lines have no price, so this total is incomplete.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Total';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
@@ -12009,28 +12216,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_diveMediaSection_title => 'Photos & Video';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'Delete';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'Failed to delete: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'This removes them from the app and any media store. This cannot be undone.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return 'Deleted $count items';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return 'Delete $count items?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'Re-link';
 
   @override
@@ -12045,13 +12230,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_diveMediaSection_unlinkButton => 'Unlink';
 
   @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'Remove this photo from the dive? The photo will remain in your gallery.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'Unlink Photo';
-
-  @override
   String media_diveMediaSection_unlinkError(Object error) {
     return 'Failed to unlink: $error';
   }
@@ -12063,7 +12241,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'This will remove $count media items from this dive. The original files won\'t be deleted.';
+    return 'Removes $count media items from your library, along with their cloud copies and thumbnails. Media a dive site still uses is kept. Your original files are not affected.';
   }
 
   @override
@@ -12077,7 +12255,31 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'Photo unlinked';
+  String media_library_unlinkConfirmTitle(int count) {
+    return 'Unlink $count items?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(Object error) {
+    return 'Failed to unlink: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'They leave your library, along with their cloud copies and thumbnails. Your original files are not affected. This cannot be undone.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count of these have a caption or favorite saved in Submersion, and those details are lost.',
+      one:
+          '1 of these has a caption or favorite saved in Submersion, and those details are lost.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'Site Media';
@@ -12102,16 +12304,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Remove $count attachments?';
+    return 'Unlink $count items?';
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Removes $count items from your library, along with their cloud copies and thumbnails. Media a dive still uses is kept. Your original files are not affected.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'Removed $count attachments';
+    return 'Unlinked $count items';
   }
 
   @override
@@ -12654,8 +12857,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_import_launch => 'Import media...';
 
   @override
+  String get media_import_review_title => 'Review import';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'Import $count items';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked linked, $skipped skipped, $failed failed';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Choose site';
+
+  @override
+  String get media_import_review_ambiguous => 'Several dives match';
+
+  @override
+  String get media_import_review_noMatch => 'No matching dive';
+
+  @override
+  String get media_import_review_skipped => 'Not imported';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Link to #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Link to dive';
+
+  @override
+  String get media_import_review_linkToSite => 'Link to site';
+
+  @override
+  String get media_import_review_chooseDive => 'Choose dive';
+
+  @override
   String get media_import_intro =>
-      'Imported media is kept in your library and can be linked to dives automatically.';
+      'Photos are linked to a dive or a dive site as you import them.';
 
   @override
   String get media_console_sources => 'Sources';
@@ -12766,9 +13008,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Missing';
-
-  @override
   String get media_missing_empty => 'No missing files';
 
   @override
@@ -12831,45 +13070,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Unlinked';
-
-  @override
-  String get media_import_linkTitle => 'Link imported media';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'Link $count items';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Stays in Unlinked';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count items linked';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Choose dive';
-
-  @override
-  String get media_inbox_empty => 'No unlinked media';
-
-  @override
-  String get media_inbox_keep => 'Keep';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Link to #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Link to dive';
-
-  @override
-  String get media_inbox_linkToSite => 'Link to site';
-
-  @override
   String get media_library_empty => 'No media yet';
 
   @override
@@ -12891,7 +13091,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_library_filter_dates => 'Dates';
 
   @override
+  String get media_library_filter_missing => 'Missing files';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Missing files ($count)';
+  }
+
+  @override
   String get media_library_filter_clear => 'Clear filters';
+
+  @override
+  String get media_library_filter_any => 'Any';
+
+  @override
+  String get media_library_filter_title => 'Filter media';
+
+  @override
+  String get media_library_filter_apply => 'Apply';
+
+  @override
+  String get media_library_sort_title => 'Sort media';
+
+  @override
+  String get media_smartAlbum_load => 'Load album';
 
   @override
   String get media_divePicker_title => 'Move to dive';
@@ -12900,19 +13123,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_divePicker_search => 'Search dives';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'This removes them from the app and any media store. This cannot be undone.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return 'Delete $count items?';
-  }
-
-  @override
   String get media_library_moveToDive => 'Move to dive';
-
-  @override
-  String get media_library_unlinkFromSite => 'Unlink from site';
 
   @override
   String get media_library_unlinkSelected => 'Unlink';
@@ -22810,6 +23021,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Accounts';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Display';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Guided setup';
 
   @override
@@ -22908,6 +23122,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_stillFetching =>
       'Still loading. Tap to retry.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'No photo library access';
 
   @override
   String get attrLabel_size => 'Size';
@@ -29441,6 +29659,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Check all media';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items updated',
+      one: '$count item updated',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Could not check any of the $count items. Their sources are not reachable right now.',
+      one: 'Could not check the item. Its source is not reachable right now.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Media Sources';
 
   @override
@@ -32182,6 +32426,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Missing and not backed up';
+
+  @override
+  String get media_servedFrom_localDisk => 'On this device';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Photo library';
+
+  @override
+  String get media_servedFrom_storeCache => 'Cloud store, cached here';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Cloud store';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Web link';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Connected service, cached here';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Connected service';
+
+  @override
+  String get media_servedFrom_embedded => 'Stored in this logbook';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Show source badges on thumbnails';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'A small glyph showing where each item is served from. Problem badges always show.';
 
   @override
   String get media_status_transferFailed => 'Upload failed';

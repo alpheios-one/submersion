@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/desktop_oauth_authenticator.dart';
+import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_client_config.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_token_store.dart';
 
 class _MemoryTokenStore implements GoogleDriveTokenStore {
@@ -94,6 +95,50 @@ void main() {
     baseClientFactory: baseClient,
     launchBrowser: (url) async {},
   );
+
+  group('client credentials', () {
+    // Google rejects the token exchange for Desktop-app clients with
+    // `invalid_request: client_secret is missing`, with or without PKCE and
+    // whether the field is omitted or sent empty. Verified against
+    // oauth2.googleapis.com; the secret is NOT optional here.
+    Future<gauth.ClientId> capturedClientId({String? clientSecret}) async {
+      late gauth.ClientId seen;
+      final auth = DesktopOAuthAuthenticator(
+        tokenStore: store,
+        clientSecret: clientSecret,
+        obtainConsent: (clientId, scopes, client, prompt) async {
+          seen = clientId;
+          return creds();
+        },
+        buildClient: (clientId, credentials, base) =>
+            _FakeRefreshingClient(credentials),
+        baseClientFactory: baseClient,
+        launchBrowser: (url) async {},
+      );
+      await auth.authenticate();
+      return seen;
+    }
+
+    test('the build-time secret reaches the token exchange', () async {
+      final clientId = await capturedClientId(clientSecret: 'build-time-value');
+
+      expect(clientId.secret, 'build-time-value');
+    });
+
+    test('an absent secret yields a null secret rather than empty', () async {
+      // googleapis_auth serialises `secret ?? ''`, so both spellings reach
+      // Google identically; null keeps the "not configured" state legible.
+      final clientId = await capturedClientId(clientSecret: '');
+
+      expect(clientId.secret, isNull);
+    });
+
+    test('the client id still comes from the committed config', () async {
+      final clientId = await capturedClientId(clientSecret: 'x');
+
+      expect(clientId.identifier, GoogleDriveClientConfig.desktopClientId);
+    });
+  });
 
   test('attemptSilentAuth returns false with no stored credentials', () async {
     final auth = authenticator();
