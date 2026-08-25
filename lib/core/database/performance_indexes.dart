@@ -273,6 +273,27 @@ const List<PerformanceIndex> kPerformanceIndexes = [
         'CREATE INDEX IF NOT EXISTS idx_media_local_path '
         'ON media(local_path)',
   ),
+  // Library sort keys, one per MediaSortField. Expression indexes: COALESCE
+  // is deterministic, so SQLite accepts it here. The date one also covers the
+  // default library ordering, which had no index before.
+  (
+    name: 'idx_media_sort_date',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_media_sort_date '
+        'ON media(COALESCE(taken_at, created_at) DESC, id DESC)',
+  ),
+  (
+    name: 'idx_media_sort_name',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_media_sort_name '
+        'ON media(COALESCE(original_filename, file_path), id)',
+  ),
+  (
+    name: 'idx_media_sort_size',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_media_sort_size '
+        'ON media(COALESCE(content_size_bytes, -1) DESC, id DESC)',
+  ),
   (
     name: 'idx_media_file_path',
     ddl:

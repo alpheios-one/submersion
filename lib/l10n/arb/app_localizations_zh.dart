@@ -350,6 +350,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => '收藏';
 
   @override
+  String get diveLog_bulkEdit_fieldMyRole => '我的角色';
+
+  @override
+  String get diveLog_bulkEdit_buddyRoleMixed => '不一致';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => '配重';
 
   @override
@@ -5455,6 +5461,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => '无潜伴';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return '至 $date';
   }
@@ -5514,6 +5523,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_filter_min => '最小';
 
   @override
+  String get diveLog_filter_noBuddyOnly => '无潜伴';
+
+  @override
   String get diveLog_filter_noTagsYet => '尚未创建标签';
 
   @override
@@ -5557,6 +5569,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_filter_showOnlyFavorites => '仅显示收藏的潜水';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy => '仅显示无潜伴的潜水';
 
   @override
   String get diveLog_filter_startDate => '开始日期';
@@ -9622,6 +9637,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_sortField_dateIssued => '签发日期';
 
   @override
+  String get enum_sortField_dateTaken => '拍摄日期';
+
+  @override
   String get enum_sortField_difficulty => '难度';
 
   @override
@@ -9635,6 +9653,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => '结束日期';
+
+  @override
+  String get enum_sortField_fileName => '文件名';
+
+  @override
+  String get enum_sortField_fileSize => '文件大小';
 
   @override
   String get enum_sortField_lastServiceDate => '最近维护';
@@ -11246,7 +11270,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_tab_mnd => '最大麻醉深度/等效麻醉深度';
 
   @override
-  String get gasCalculators_tab_blender => '配气';
+  String get gasCalculators_tab_blender => '三混气配气器';
 
   @override
   String get gasCalculators_blender_cylinder => '气瓶';
@@ -11335,11 +11359,186 @@ class AppLocalizationsZh extends AppLocalizations {
       '这些充填气体无法精确达到目标混合气。请检查充填气体及其顺序。';
 
   @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      '气瓶有压力，但既无氧气也无氦气，那将是纯氮气。请检查瓶内现有的混合气。';
+
+  @override
   String get gasCalculators_blender_about => '关于配气';
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      '按分压法配制目标混合气，采用真实气体（范德华）模型。按顺序充入每种气体至所示压力。充填气体及其顺序可配置；下水前务必分析最终混合气。';
+      '按分压法配制目标混合气。依次充入每种充填气体至显示的压力，然后让气瓶静置。充填气体及其顺序可自行设置：将最后一种气体设为 32/0，即以 EAN32 而非空气收尾。下水前务必分析配好的混合气。';
+
+  @override
+  String get gasCalculators_blender_conditions => '配气条件';
+
+  @override
+  String get gasCalculators_blender_fillTemp => '充填温度';
+
+  @override
+  String get gasCalculators_blender_fillTempHelp =>
+      '充填过程中气瓶的温度。步骤中的每个压力都是该温度下的压力表读数。';
+
+  @override
+  String get gasCalculators_blender_settledTemp => '静置温度';
+
+  @override
+  String get gasCalculators_blender_settledTempHelp =>
+      '气瓶最终稳定到的温度。目标压力就是达到该温度后的读数。';
+
+  @override
+  String get gasCalculators_blender_gasModel => '气体模型';
+
+  @override
+  String get gasCalculators_blender_modelIdeal => '理想气体';
+
+  @override
+  String get gasCalculators_blender_modelVanDerWaals => '范德华';
+
+  @override
+  String get gasCalculators_blender_modelZFactor => '真实气体（Z 因子）';
+
+  @override
+  String get gasCalculators_blender_modelRecommended => '推荐';
+
+  @override
+  String get gasCalculators_blender_modelHelp =>
+      '真实气体（Z 因子）在气瓶压力下最为准确。理想气体与大多数已发布的配气表一致。范德华模型用于与其他配气软件对比，在充填压力下有百分之几的偏差。';
+
+  @override
+  String gasCalculators_blender_stepAdd(String gas) {
+    return '充入 $gas';
+  }
+
+  @override
+  String get gasCalculators_blender_stepStartLabel => '起始';
+
+  @override
+  String gasCalculators_blender_settlesTo(String pressure, String temperature) {
+    return '在 $temperature 下静置后为 $pressure';
+  }
+
+  @override
+  String get gasCalculators_blender_templates => '模板';
+
+  @override
+  String get gasCalculators_blender_templatesTitle => '目标混合气模板';
+
+  @override
+  String get gasCalculators_blender_saveTemplate => '保存当前混合气';
+
+  @override
+  String get gasCalculators_blender_manageTemplates => '管理模板';
+
+  @override
+  String gasCalculators_blender_templateSaved(String mix) {
+    return '已保存 $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_templateExists => '该混合气已保存。';
+
+  @override
+  String get gasCalculators_blender_templateInvalid => 'O₂ + He 不能超过 100%。';
+
+  @override
+  String get gasCalculators_blender_templateNeedsNumbers => '请将 O₂ 和 He 都填成数字。';
+
+  @override
+  String gasCalculators_blender_templateLimit(int count) {
+    return '最多可保存 $count 个模板。';
+  }
+
+  @override
+  String get gasCalculators_blender_templateNone => '还没有模板。保存一个目标混合气即可在此重复使用。';
+
+  @override
+  String gasCalculators_blender_templateDelete(String mix) {
+    return '删除 $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_templateAdd => '添加模板';
+
+  @override
+  String get gasCalculators_blender_billing => '费用';
+
+  @override
+  String get gasCalculators_blender_cylinderVolume => '气瓶水容积';
+
+  @override
+  String get gasCalculators_blender_cylinderPresets => '预设';
+
+  @override
+  String gasCalculators_blender_unitPrice(String unit) {
+    return '每 100 $unit 价格';
+  }
+
+  @override
+  String get gasCalculators_blender_currency => '货币';
+
+  @override
+  String get gasCalculators_blender_costTotal => '合计';
+
+  @override
+  String get gasCalculators_blender_costBasis =>
+      '按实际充入的压力计费（气瓶水容积 × 充入的 bar），与充气站的计量方式一致。';
+
+  @override
+  String get gasCalculators_blender_costMissingPrice => '为每种气体输入价格后即可看到合计。';
+
+  @override
+  String get gasCalculators_blender_saveFill => '保存本次充填';
+
+  @override
+  String get gasCalculators_blender_billed => '已计费';
+
+  @override
+  String get gasCalculators_blender_billedNone => '尚无计费内容。完成一次充填后保存到这里。';
+
+  @override
+  String get gasCalculators_blender_billedTo => '计费给';
+
+  @override
+  String get gasCalculators_blender_addManualLine => '添加条目';
+
+  @override
+  String get gasCalculators_blender_lineDescription => '说明';
+
+  @override
+  String get gasCalculators_blender_lineAmount => '金额';
+
+  @override
+  String get gasCalculators_blender_clearBilled => '清空';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => '清空账单？';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return '这将删除全部 $count 条已保存的充填记录。';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return '编辑 $label';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return '删除 $label';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix 已加入账单';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete => '有条目未填价格，因此合计不完整。';
+
+  @override
+  String get gasCalculators_blender_billedTotal => '合计';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
@@ -11653,28 +11852,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_diveMediaSection_title => '照片 & 视频';
 
   @override
-  String get media_diveMediaSection_deleteButton => '删除';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return '删除失败：$error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '已删除 $count 个项目';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return '删除 $count 个项目？';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => '重新关联';
 
   @override
@@ -11688,13 +11865,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_diveMediaSection_unlinkButton => '取消关联';
 
   @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      '从此次潜水中移除此照片吗？照片将保留在您的相册中。';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => '取消关联照片';
-
-  @override
   String media_diveMediaSection_unlinkError(Object error) {
     return '取消关联失败：$error';
   }
@@ -11706,7 +11876,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return '这将从此次潜水中移除 $count 个媒体项目。原始文件不会被删除。';
+    return '从您的媒体库中移除 $count 个媒体项目，包括其云端副本和缩略图。潜点仍在使用的项目会被保留。您的原始文件不受影响。';
   }
 
   @override
@@ -11720,7 +11890,29 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => '照片已取消关联';
+  String media_library_unlinkConfirmTitle(int count) {
+    return '取消关联 $count 项目?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(Object error) {
+    return '取消关联失败：$error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      '它们将从您的媒体库中移除，包括其云端副本和缩略图。您的原始文件不受影响。此操作无法撤销。';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '其中 $count 个在 Submersion 中保存了说明文字或收藏标记，这些信息将会丢失。',
+      one: '其中 1 个在 Submersion 中保存了说明文字或收藏标记，这些信息将会丢失。',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => '潜水点媒体';
@@ -11744,16 +11936,17 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return '移除 $count 个附件？';
+    return '取消关联 $count 项目?';
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      '所选项目将从此潜水点移除。照片库或磁盘中的文件不会被删除。';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return '从媒体库中移除 $count 个项目及其云端副本和缩略图。仍被潜水使用的媒体会保留。您的原始文件不受影响。';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return '已移除 $count 个附件';
+    return '已取消关联 $count 个项目';
   }
 
   @override
@@ -12280,7 +12473,46 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_import_launch => '导入媒体...';
 
   @override
-  String get media_import_intro => '导入的媒体会保留在您的媒体库中，并可自动关联到潜水。';
+  String get media_import_review_title => '检查导入';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return '导入 $count 个项目';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '已关联 $linked 个，跳过 $skipped 个，失败 $failed 个';
+  }
+
+  @override
+  String get media_import_review_chooseSite => '选择潜点';
+
+  @override
+  String get media_import_review_ambiguous => '多次潜水匹配';
+
+  @override
+  String get media_import_review_noMatch => '没有匹配的潜水';
+
+  @override
+  String get media_import_review_skipped => '未导入';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return '关联到 #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => '关联到潜水';
+
+  @override
+  String get media_import_review_linkToSite => '关联到潜点';
+
+  @override
+  String get media_import_review_chooseDive => '选择潜水';
+
+  @override
+  String get media_import_intro => '照片在导入时会关联到潜水或潜点。';
 
   @override
   String get media_console_sources => '来源';
@@ -12391,9 +12623,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => '缺失';
-
-  @override
   String get media_missing_empty => '没有缺失的文件';
 
   @override
@@ -12456,45 +12685,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => '未关联';
-
-  @override
-  String get media_import_linkTitle => '关联导入的媒体';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return '关联 $count 个项目';
-  }
-
-  @override
-  String get media_import_staysUnlinked => '保留在未关联中';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '已关联 $count 个项目';
-  }
-
-  @override
-  String get media_inbox_chooseDive => '选择潜水';
-
-  @override
-  String get media_inbox_empty => '没有未关联的媒体';
-
-  @override
-  String get media_inbox_keep => '保留';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return '关联到 #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => '关联到潜水';
-
-  @override
-  String get media_inbox_linkToSite => '关联到潜点';
-
-  @override
   String get media_library_empty => '暂无媒体';
 
   @override
@@ -12516,7 +12706,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_library_filter_dates => '日期';
 
   @override
+  String get media_library_filter_missing => '缺失的文件';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return '缺失的文件（$count）';
+  }
+
+  @override
   String get media_library_filter_clear => '清除筛选';
+
+  @override
+  String get media_library_filter_any => '任意';
+
+  @override
+  String get media_library_filter_title => '筛选媒体';
+
+  @override
+  String get media_library_filter_apply => '应用';
+
+  @override
+  String get media_library_sort_title => '排序媒体';
+
+  @override
+  String get media_smartAlbum_load => '加载相册';
 
   @override
   String get media_divePicker_title => '移至潜水';
@@ -12525,18 +12738,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_divePicker_search => '搜索潜水';
 
   @override
-  String get media_library_deleteConfirmBody => '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return '删除 $count 个项目？';
-  }
-
-  @override
   String get media_library_moveToDive => '移至潜水';
-
-  @override
-  String get media_library_unlinkFromSite => '取消关联潜点';
 
   @override
   String get media_library_unlinkSelected => '取消关联';
@@ -22044,6 +22246,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => '账户';
 
   @override
+  String get settings_photosMedia_displayHeader => '显示';
+
+  @override
   String get settings_photosMedia_guidedSetup => '引导设置';
 
   @override
@@ -22132,6 +22337,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_unavailablePlaceholder_stillFetching => '仍在加载。点按重试。';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied => '无照片库访问权限';
 
   @override
   String get attrLabel_size => '尺码';
@@ -28251,6 +28459,29 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => '检查所有媒体';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已更新 $count 个项目',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '无法检查这 $count 个项目中的任何一个。它们的来源当前无法访问。',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => '媒体来源';
 
   @override
@@ -30826,6 +31057,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_status_broken => '缺失且未备份';
+
+  @override
+  String get media_servedFrom_localDisk => '在此设备上';
+
+  @override
+  String get media_servedFrom_platformGallery => '照片库';
+
+  @override
+  String get media_servedFrom_storeCache => '云存储，已在此缓存';
+
+  @override
+  String get media_servedFrom_storeNetwork => '云存储';
+
+  @override
+  String get media_servedFrom_networkUrl => '网络链接';
+
+  @override
+  String get media_servedFrom_connectorCache => '已连接的服务，已在此缓存';
+
+  @override
+  String get media_servedFrom_connectorNetwork => '已连接的服务';
+
+  @override
+  String get media_servedFrom_embedded => '存储在此日志中';
+
+  @override
+  String get settings_media_provenanceBadges => '在缩略图上显示来源徽章';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      '一个小图标，显示每个项目的来源。问题徽章始终显示。';
 
   @override
   String get media_status_transferFailed => '上传失败';

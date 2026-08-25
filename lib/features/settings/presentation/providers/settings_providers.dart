@@ -6,6 +6,7 @@ import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/theme/app_theme_preset.dart';
@@ -58,6 +59,10 @@ class SettingsKeys {
   static const String unitPreset = 'unit_preset';
   static const String themeMode = 'theme_mode';
   static const String displayZoom = 'display_zoom';
+
+  /// Device-local: whether media grids draw a provenance badge on every
+  /// thumbnail. Health badges are not covered by it.
+  static const String mediaProvenanceBadges = 'media_provenance_badges';
   static const String defaultDiveType = 'default_dive_type';
   static const String defaultTankVolume = 'default_tank_volume';
   static const String defaultStartPressure = 'default_start_pressure';
@@ -977,6 +982,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   SettingsNotifier(this._repository, this._ref) : super(const AppSettings()) {
     _initialLoad = _initializeAndLoad();
+    logFailure(_initialLoad, SettingsNotifier, 'load diver settings');
 
     // Listen for diver changes and reload settings
     _ref.listen<String?>(currentDiverIdProvider, (previous, next) {
@@ -985,7 +991,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         _validatedDiverId = null;
         _isLoading =
             false; // Allow loading even if previous load was in progress
-        _initializeAndLoad();
+        logFailure(
+          _initializeAndLoad(),
+          SettingsNotifier,
+          'reload settings after a diver change',
+        );
       }
     });
   }

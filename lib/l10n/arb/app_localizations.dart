@@ -655,6 +655,18 @@ abstract class AppLocalizations {
   /// **'Favorite'**
   String get diveLog_bulkEdit_fieldFavorite;
 
+  /// No description provided for @diveLog_bulkEdit_fieldMyRole.
+  ///
+  /// In en, this message translates to:
+  /// **'My role'**
+  String get diveLog_bulkEdit_fieldMyRole;
+
+  /// No description provided for @diveLog_bulkEdit_buddyRoleMixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mixed'**
+  String get diveLog_bulkEdit_buddyRoleMixed;
+
   /// No description provided for @diveLog_bulkEdit_collectionWeights.
   ///
   /// In en, this message translates to:
@@ -9527,6 +9539,12 @@ abstract class AppLocalizations {
   /// **'From {date}'**
   String diveLog_filterChip_from(Object date);
 
+  /// No description provided for @diveLog_filterChip_noBuddy.
+  ///
+  /// In en, this message translates to:
+  /// **'No Buddy'**
+  String get diveLog_filterChip_noBuddy;
+
   /// No description provided for @diveLog_filterChip_until.
   ///
   /// In en, this message translates to:
@@ -9641,6 +9659,12 @@ abstract class AppLocalizations {
   /// **'Min'**
   String get diveLog_filter_min;
 
+  /// No description provided for @diveLog_filter_noBuddyOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'No Buddy Assigned'**
+  String get diveLog_filter_noBuddyOnly;
+
   /// No description provided for @diveLog_filter_noTagsYet.
   ///
   /// In en, this message translates to:
@@ -9730,6 +9754,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show only favorite dives'**
   String get diveLog_filter_showOnlyFavorites;
+
+  /// No description provided for @diveLog_filter_showOnlyNoBuddy.
+  ///
+  /// In en, this message translates to:
+  /// **'Show only dives without a buddy'**
+  String get diveLog_filter_showOnlyNoBuddy;
 
   /// No description provided for @diveLog_filter_startDate.
   ///
@@ -17144,6 +17174,12 @@ abstract class AppLocalizations {
   /// **'Date Issued'**
   String get enum_sortField_dateIssued;
 
+  /// No description provided for @enum_sortField_dateTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Taken'**
+  String get enum_sortField_dateTaken;
+
   /// No description provided for @enum_sortField_difficulty.
   ///
   /// In en, this message translates to:
@@ -17173,6 +17209,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End Date'**
   String get enum_sortField_endDate;
+
+  /// No description provided for @enum_sortField_fileName.
+  ///
+  /// In en, this message translates to:
+  /// **'File Name'**
+  String get enum_sortField_fileName;
+
+  /// No description provided for @enum_sortField_fileSize.
+  ///
+  /// In en, this message translates to:
+  /// **'File Size'**
+  String get enum_sortField_fileSize;
 
   /// No description provided for @enum_sortField_lastServiceDate.
   ///
@@ -20077,7 +20125,7 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_tab_blender.
   ///
   /// In en, this message translates to:
-  /// **'Blender'**
+  /// **'Trimix blender'**
   String get gasCalculators_tab_blender;
 
   /// No description provided for @gasCalculators_blender_cylinder.
@@ -20222,6 +20270,12 @@ abstract class AppLocalizations {
   /// **'These fill gases cannot reach the target mix exactly. Check the fill gases and their order.'**
   String get gasCalculators_blender_error_targetNotReached;
 
+  /// No description provided for @gasCalculators_blender_error_implausibleStartMix.
+  ///
+  /// In en, this message translates to:
+  /// **'The cylinder is holding pressure but no oxygen and no helium, which would be pure nitrogen. Check the mix already in the cylinder.'**
+  String get gasCalculators_blender_error_implausibleStartMix;
+
   /// No description provided for @gasCalculators_blender_about.
   ///
   /// In en, this message translates to:
@@ -20231,8 +20285,302 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_blender_aboutBody.
   ///
   /// In en, this message translates to:
-  /// **'Partial-pressure blend for the target mix, using real-gas (Van der Waals) behaviour. Add each fill gas in order, up to the pressure shown. Fill gases and their order are configurable; always analyse the finished mix before diving it.'**
+  /// **'Partial-pressure blend for the target mix. Add each fill gas in order, up to the pressure shown, then let the cylinder settle. Fill gases and their order are configurable, so setting the last gas to 32/0 tops off with EAN32 instead of air. Always analyse the finished mix before diving it.'**
   String get gasCalculators_blender_aboutBody;
+
+  /// No description provided for @gasCalculators_blender_conditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Blending conditions'**
+  String get gasCalculators_blender_conditions;
+
+  /// No description provided for @gasCalculators_blender_fillTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill temperature'**
+  String get gasCalculators_blender_fillTemp;
+
+  /// No description provided for @gasCalculators_blender_fillTempHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The cylinder\'s temperature while you fill it. Every pressure in the procedure is the gauge reading at this temperature.'**
+  String get gasCalculators_blender_fillTempHelp;
+
+  /// No description provided for @gasCalculators_blender_settledTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'Settled temperature'**
+  String get gasCalculators_blender_settledTemp;
+
+  /// No description provided for @gasCalculators_blender_settledTempHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The temperature the cylinder ends up at. The target pressure is what it reads once it gets there.'**
+  String get gasCalculators_blender_settledTempHelp;
+
+  /// No description provided for @gasCalculators_blender_gasModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas model'**
+  String get gasCalculators_blender_gasModel;
+
+  /// No description provided for @gasCalculators_blender_modelIdeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideal gas'**
+  String get gasCalculators_blender_modelIdeal;
+
+  /// No description provided for @gasCalculators_blender_modelVanDerWaals.
+  ///
+  /// In en, this message translates to:
+  /// **'Van der Waals'**
+  String get gasCalculators_blender_modelVanDerWaals;
+
+  /// No description provided for @gasCalculators_blender_modelZFactor.
+  ///
+  /// In en, this message translates to:
+  /// **'Real gas (Z-factor)'**
+  String get gasCalculators_blender_modelZFactor;
+
+  /// No description provided for @gasCalculators_blender_modelRecommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get gasCalculators_blender_modelRecommended;
+
+  /// No description provided for @gasCalculators_blender_modelHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Real gas (Z-factor) is the most accurate at cylinder pressures. Ideal gas matches most published blending tables. Van der Waals is offered for comparison with other blending software and is several percent off at fill pressure.'**
+  String get gasCalculators_blender_modelHelp;
+
+  /// No description provided for @gasCalculators_blender_stepAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {gas}'**
+  String gasCalculators_blender_stepAdd(String gas);
+
+  /// No description provided for @gasCalculators_blender_stepStartLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get gasCalculators_blender_stepStartLabel;
+
+  /// No description provided for @gasCalculators_blender_settlesTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Settles to {pressure} at {temperature}'**
+  String gasCalculators_blender_settlesTo(String pressure, String temperature);
+
+  /// No description provided for @gasCalculators_blender_templates.
+  ///
+  /// In en, this message translates to:
+  /// **'Templates'**
+  String get gasCalculators_blender_templates;
+
+  /// No description provided for @gasCalculators_blender_templatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Target mix templates'**
+  String get gasCalculators_blender_templatesTitle;
+
+  /// No description provided for @gasCalculators_blender_saveTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Save current mix'**
+  String get gasCalculators_blender_saveTemplate;
+
+  /// No description provided for @gasCalculators_blender_manageTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage templates'**
+  String get gasCalculators_blender_manageTemplates;
+
+  /// No description provided for @gasCalculators_blender_templateSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {mix}'**
+  String gasCalculators_blender_templateSaved(String mix);
+
+  /// No description provided for @gasCalculators_blender_templateExists.
+  ///
+  /// In en, this message translates to:
+  /// **'That mix is already saved.'**
+  String get gasCalculators_blender_templateExists;
+
+  /// No description provided for @gasCalculators_blender_templateInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'O₂ + He cannot exceed 100%.'**
+  String get gasCalculators_blender_templateInvalid;
+
+  /// No description provided for @gasCalculators_blender_templateNeedsNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter both O₂ and He as numbers.'**
+  String get gasCalculators_blender_templateNeedsNumbers;
+
+  /// No description provided for @gasCalculators_blender_templateLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You can save up to {count} templates.'**
+  String gasCalculators_blender_templateLimit(int count);
+
+  /// No description provided for @gasCalculators_blender_templateNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No templates yet. Save a target mix to reuse it here.'**
+  String get gasCalculators_blender_templateNone;
+
+  /// No description provided for @gasCalculators_blender_templateDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {mix}'**
+  String gasCalculators_blender_templateDelete(String mix);
+
+  /// No description provided for @gasCalculators_blender_templateAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add template'**
+  String get gasCalculators_blender_templateAdd;
+
+  /// No description provided for @gasCalculators_blender_billing.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost'**
+  String get gasCalculators_blender_billing;
+
+  /// No description provided for @gasCalculators_blender_cylinderVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder water capacity'**
+  String get gasCalculators_blender_cylinderVolume;
+
+  /// No description provided for @gasCalculators_blender_cylinderPresets.
+  ///
+  /// In en, this message translates to:
+  /// **'Presets'**
+  String get gasCalculators_blender_cylinderPresets;
+
+  /// No description provided for @gasCalculators_blender_unitPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per 100 {unit}'**
+  String gasCalculators_blender_unitPrice(String unit);
+
+  /// No description provided for @gasCalculators_blender_currency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get gasCalculators_blender_currency;
+
+  /// No description provided for @gasCalculators_blender_costTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get gasCalculators_blender_costTotal;
+
+  /// No description provided for @gasCalculators_blender_costBasis.
+  ///
+  /// In en, this message translates to:
+  /// **'Billed on the pressure delivered (cylinder water capacity × bar added), the way a fill station meters it.'**
+  String get gasCalculators_blender_costBasis;
+
+  /// No description provided for @gasCalculators_blender_costMissingPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a price for every gas to see the total.'**
+  String get gasCalculators_blender_costMissingPrice;
+
+  /// No description provided for @gasCalculators_blender_saveFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this fill'**
+  String get gasCalculators_blender_saveFill;
+
+  /// No description provided for @gasCalculators_blender_billed.
+  ///
+  /// In en, this message translates to:
+  /// **'Billed'**
+  String get gasCalculators_blender_billed;
+
+  /// No description provided for @gasCalculators_blender_billedNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing billed yet. Finish a fill and save it here.'**
+  String get gasCalculators_blender_billedNone;
+
+  /// No description provided for @gasCalculators_blender_billedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Billed to'**
+  String get gasCalculators_blender_billedTo;
+
+  /// No description provided for @gasCalculators_blender_addManualLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a line'**
+  String get gasCalculators_blender_addManualLine;
+
+  /// No description provided for @gasCalculators_blender_lineDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get gasCalculators_blender_lineDescription;
+
+  /// No description provided for @gasCalculators_blender_lineAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get gasCalculators_blender_lineAmount;
+
+  /// No description provided for @gasCalculators_blender_clearBilled.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get gasCalculators_blender_clearBilled;
+
+  /// No description provided for @gasCalculators_blender_clearBilledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear the bill?'**
+  String get gasCalculators_blender_clearBilledTitle;
+
+  /// No description provided for @gasCalculators_blender_clearBilledBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This removes all {count} saved fills.'**
+  String gasCalculators_blender_clearBilledBody(int count);
+
+  /// No description provided for @gasCalculators_blender_editLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {label}'**
+  String gasCalculators_blender_editLine(String label);
+
+  /// No description provided for @gasCalculators_blender_deleteLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {label}'**
+  String gasCalculators_blender_deleteLine(String label);
+
+  /// No description provided for @gasCalculators_blender_fillAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{mix} added to the bill'**
+  String gasCalculators_blender_fillAdded(String mix);
+
+  /// No description provided for @gasCalculators_blender_billedIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'One or more lines have no price, so this total is incomplete.'**
+  String get gasCalculators_blender_billedIncomplete;
+
+  /// No description provided for @gasCalculators_blender_billedTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get gasCalculators_blender_billedTotal;
 
   /// No description provided for @gasCalculators_tab_mod.
   ///
@@ -20765,36 +21113,6 @@ abstract class AppLocalizations {
   /// **'Photos & Video'**
   String get media_diveMediaSection_title;
 
-  /// Dive media selection: destructive delete action
-  ///
-  /// In en, this message translates to:
-  /// **'Delete'**
-  String get media_diveMediaSection_deleteButton;
-
-  /// Error snackbar when the dive media bulk delete fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to delete: {error}'**
-  String media_diveMediaSection_deleteError(Object error);
-
-  /// Body of the dive media bulk delete confirmation
-  ///
-  /// In en, this message translates to:
-  /// **'This removes them from the app and any media store. This cannot be undone.'**
-  String get media_diveMediaSection_deleteSelectedContent;
-
-  /// No description provided for @media_diveMediaSection_deleteSelectedSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Deleted {count} items'**
-  String media_diveMediaSection_deleteSelectedSuccess(int count);
-
-  /// No description provided for @media_diveMediaSection_deleteSelectedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete {count} items?'**
-  String media_diveMediaSection_deleteSelectedTitle(int count);
-
   /// Replace-link confirm action for a changed file
   ///
   /// In en, this message translates to:
@@ -20819,18 +21137,6 @@ abstract class AppLocalizations {
   /// **'Unlink'**
   String get media_diveMediaSection_unlinkButton;
 
-  /// No description provided for @media_diveMediaSection_unlinkDialogContent.
-  ///
-  /// In en, this message translates to:
-  /// **'Remove this photo from the dive? The photo will remain in your gallery.'**
-  String get media_diveMediaSection_unlinkDialogContent;
-
-  /// No description provided for @media_diveMediaSection_unlinkDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlink Photo'**
-  String get media_diveMediaSection_unlinkDialogTitle;
-
   /// No description provided for @media_diveMediaSection_unlinkError.
   ///
   /// In en, this message translates to:
@@ -20846,7 +21152,7 @@ abstract class AppLocalizations {
   /// No description provided for @media_diveMediaSection_unlinkSelectedContent.
   ///
   /// In en, this message translates to:
-  /// **'This will remove {count} media items from this dive. The original files won\'t be deleted.'**
+  /// **'Removes {count} media items from your library, along with their cloud copies and thumbnails. Media a dive site still uses is kept. Your original files are not affected.'**
   String media_diveMediaSection_unlinkSelectedContent(int count);
 
   /// No description provided for @media_diveMediaSection_unlinkSelectedSuccess.
@@ -20861,11 +21167,29 @@ abstract class AppLocalizations {
   /// **'Unlink {count} items?'**
   String media_diveMediaSection_unlinkSelectedTitle(int count);
 
-  /// No description provided for @media_diveMediaSection_unlinkSuccess.
+  /// Title of the library unlink confirmation dialog
   ///
   /// In en, this message translates to:
-  /// **'Photo unlinked'**
-  String get media_diveMediaSection_unlinkSuccess;
+  /// **'Unlink {count} items?'**
+  String media_library_unlinkConfirmTitle(int count);
+
+  /// Site page unlink failure snackbar
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to unlink: {error}'**
+  String media_siteMediaSection_unlinkError(Object error);
+
+  /// Body of the library unlink confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'They leave your library, along with their cloud copies and thumbnails. Your original files are not affected. This cannot be undone.'**
+  String get media_library_unlinkConfirmBody;
+
+  /// Extra line naming the captions and favorites an unlink discards
+  ///
+  /// In en, this message translates to:
+  /// **'{count,plural, =1{1 of these has a caption or favorite saved in Submersion, and those details are lost.} other{{count} of these have a caption or favorite saved in Submersion, and those details are lost.}}'**
+  String media_library_unlinkMetadataNote(int count);
 
   /// No description provided for @media_siteMediaSection_title.
   ///
@@ -20906,19 +21230,19 @@ abstract class AppLocalizations {
   /// No description provided for @media_siteMediaSection_unlinkSelectedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Remove {count} attachments?'**
+  /// **'Unlink {count} items?'**
   String media_siteMediaSection_unlinkSelectedTitle(int count);
 
-  /// No description provided for @media_siteMediaSection_unlinkSelectedContent.
+  /// Site page unlink confirmation body
   ///
   /// In en, this message translates to:
-  /// **'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.'**
-  String get media_siteMediaSection_unlinkSelectedContent;
+  /// **'Removes {count} items from your library, along with their cloud copies and thumbnails. Media a dive still uses is kept. Your original files are not affected.'**
+  String media_siteMediaSection_unlinkSelectedContent(int count);
 
   /// No description provided for @media_siteMediaSection_unlinkSelectedSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Removed {count} attachments'**
+  /// **'Unlinked {count} items'**
   String media_siteMediaSection_unlinkSelectedSuccess(int count);
 
   /// No description provided for @media_documentViewer_title.
@@ -21748,10 +22072,76 @@ abstract class AppLocalizations {
   /// **'Import media...'**
   String get media_import_launch;
 
+  /// App bar title of the pre-import review
+  ///
+  /// In en, this message translates to:
+  /// **'Review import'**
+  String get media_import_review_title;
+
+  /// Confirm button of the pre-import review
+  ///
+  /// In en, this message translates to:
+  /// **'Import {count} items'**
+  String media_import_review_confirm(int count);
+
+  /// Snackbar after the review imports
+  ///
+  /// In en, this message translates to:
+  /// **'{linked} linked, {skipped} skipped, {failed} failed'**
+  String media_import_review_result(int linked, int skipped, int failed);
+
+  /// Review row menu: attach to a dive site
+  ///
+  /// In en, this message translates to:
+  /// **'Choose site'**
+  String get media_import_review_chooseSite;
+
+  /// Review row subtitle when several dives match the timestamp
+  ///
+  /// In en, this message translates to:
+  /// **'Several dives match'**
+  String get media_import_review_ambiguous;
+
+  /// Review row subtitle when no dive matches the timestamp
+  ///
+  /// In en, this message translates to:
+  /// **'No matching dive'**
+  String get media_import_review_noMatch;
+
+  /// Review row subtitle for a row the user unchecked
+  ///
+  /// In en, this message translates to:
+  /// **'Not imported'**
+  String get media_import_review_skipped;
+
+  /// Review row subtitle for a confident auto-match
+  ///
+  /// In en, this message translates to:
+  /// **'Link to #{number}'**
+  String media_import_review_linkChip(int number);
+
+  /// Review row menu: attach to a dive
+  ///
+  /// In en, this message translates to:
+  /// **'Link to dive'**
+  String get media_import_review_linkToDive;
+
+  /// Review row subtitle when attached to a site
+  ///
+  /// In en, this message translates to:
+  /// **'Link to site'**
+  String get media_import_review_linkToSite;
+
+  /// Review row menu: pick a dive
+  ///
+  /// In en, this message translates to:
+  /// **'Choose dive'**
+  String get media_import_review_chooseDive;
+
   /// Import section intro text
   ///
   /// In en, this message translates to:
-  /// **'Imported media is kept in your library and can be linked to dives automatically.'**
+  /// **'Photos are linked to a dive or a dive site as you import them.'**
   String get media_import_intro;
 
   /// Media console label for the sources section
@@ -21958,12 +22348,6 @@ abstract class AppLocalizations {
   /// **'via {source}'**
   String media_repairHistory_source(String source);
 
-  /// Media console sidebar/tab label for the missing-files view
-  ///
-  /// In en, this message translates to:
-  /// **'Missing'**
-  String get media_console_missing;
-
   /// Empty state for the missing-files view
   ///
   /// In en, this message translates to:
@@ -22066,72 +22450,6 @@ abstract class AppLocalizations {
     int skipped,
   );
 
-  /// Media console sidebar/tab label for the unlinked inbox
-  ///
-  /// In en, this message translates to:
-  /// **'Unlinked'**
-  String get media_console_unlinked;
-
-  /// Title of the post-import batch link screen
-  ///
-  /// In en, this message translates to:
-  /// **'Link imported media'**
-  String get media_import_linkTitle;
-
-  /// Confirm button on the post-import batch link screen
-  ///
-  /// In en, this message translates to:
-  /// **'Link {count} items'**
-  String media_import_linkConfirm(int count);
-
-  /// Row subtitle for imports without a confident dive match
-  ///
-  /// In en, this message translates to:
-  /// **'Stays in Unlinked'**
-  String get media_import_staysUnlinked;
-
-  /// Snackbar after the batch link applies
-  ///
-  /// In en, this message translates to:
-  /// **'{count} items linked'**
-  String media_import_linkedResult(int count);
-
-  /// Inbox chip for an ambiguous auto-match
-  ///
-  /// In en, this message translates to:
-  /// **'Choose dive'**
-  String get media_inbox_chooseDive;
-
-  /// Empty state for the unlinked inbox
-  ///
-  /// In en, this message translates to:
-  /// **'No unlinked media'**
-  String get media_inbox_empty;
-
-  /// Inbox action: keep the item in the library unlinked
-  ///
-  /// In en, this message translates to:
-  /// **'Keep'**
-  String get media_inbox_keep;
-
-  /// Inbox chip for a confident auto-match
-  ///
-  /// In en, this message translates to:
-  /// **'Link to #{number}'**
-  String media_inbox_linkChip(int number);
-
-  /// Inbox menu action: pick a dive manually
-  ///
-  /// In en, this message translates to:
-  /// **'Link to dive'**
-  String get media_inbox_linkToDive;
-
-  /// Inbox menu action: pick a site manually
-  ///
-  /// In en, this message translates to:
-  /// **'Link to site'**
-  String get media_inbox_linkToSite;
-
   /// Empty state for the media library
   ///
   /// In en, this message translates to:
@@ -22174,11 +22492,53 @@ abstract class AppLocalizations {
   /// **'Dates'**
   String get media_library_filter_dates;
 
+  /// Library filter chip: rows whose backing file is missing
+  ///
+  /// In en, this message translates to:
+  /// **'Missing files'**
+  String get media_library_filter_missing;
+
+  /// Library filter chip with the missing-file count
+  ///
+  /// In en, this message translates to:
+  /// **'Missing files ({count})'**
+  String media_library_filter_missingCount(int count);
+
   /// Library filter chip: reset every filter
   ///
   /// In en, this message translates to:
   /// **'Clear filters'**
   String get media_library_filter_clear;
+
+  /// Value shown for a filter facet that is not constrained, e.g. Site: Any
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get media_library_filter_any;
+
+  /// Title of the media library filter sheet, and the filter button's tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Filter media'**
+  String get media_library_filter_title;
+
+  /// Button that applies the drafted media filter
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get media_library_filter_apply;
+
+  /// Title of the media library sort sheet, and the sort button's tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Sort media'**
+  String get media_library_sort_title;
+
+  /// Opens the list of saved smart albums to load one
+  ///
+  /// In en, this message translates to:
+  /// **'Load album'**
+  String get media_smartAlbum_load;
 
   /// Title of the dive picker sheet
   ///
@@ -22192,31 +22552,13 @@ abstract class AppLocalizations {
   /// **'Search dives'**
   String get media_divePicker_search;
 
-  /// Body of the bulk delete confirmation dialog
-  ///
-  /// In en, this message translates to:
-  /// **'This removes them from the app and any media store. This cannot be undone.'**
-  String get media_library_deleteConfirmBody;
-
-  /// Title of the bulk delete confirmation dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Delete {count} items?'**
-  String media_library_deleteConfirmTitle(int count);
-
   /// Library selection action: reassign media to a dive
   ///
   /// In en, this message translates to:
   /// **'Move to dive'**
   String get media_library_moveToDive;
 
-  /// Library selection action: clear the site link
-  ///
-  /// In en, this message translates to:
-  /// **'Unlink from site'**
-  String get media_library_unlinkFromSite;
-
-  /// Library selection action: clear the dive link
+  /// Library selection action, and its confirm button: clear every link the row has, which removes it from the library
   ///
   /// In en, this message translates to:
   /// **'Unlink'**
@@ -38606,6 +38948,12 @@ abstract class AppLocalizations {
   /// **'Accounts'**
   String get settings_photosMedia_accountsHeader;
 
+  /// No description provided for @settings_photosMedia_displayHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Display'**
+  String get settings_photosMedia_displayHeader;
+
   /// No description provided for @settings_photosMedia_guidedSetup.
   ///
   /// In en, this message translates to:
@@ -38779,6 +39127,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Still loading. Tap to retry.'**
   String get media_unavailablePlaceholder_stillFetching;
+
+  /// No description provided for @media_unavailablePlaceholder_accessDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'No photo library access'**
+  String get media_unavailablePlaceholder_accessDenied;
 
   /// No description provided for @attrLabel_size.
   ///
@@ -50005,6 +50359,24 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{{count} item updated} other{{count} items updated}}'**
   String settings_mediaSources_reverifyResult(int count);
 
+  /// Media Sources: verify every media row regardless of source type
+  ///
+  /// In en, this message translates to:
+  /// **'Check all media'**
+  String get settings_mediaSources_checkAll;
+
+  /// Media Sources: how many rows the check-all pass updated
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} item updated} other{{count} items updated}}'**
+  String settings_mediaSources_checkAllResult(int count);
+
+  /// Media Sources: the check-all pass reached none of the rows sources
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Could not check the item. Its source is not reachable right now.} other{Could not check any of the {count} items. Their sources are not reachable right now.}}'**
+  String settings_mediaSources_checkAllBlocked(int count);
+
   /// Media Sources settings page app bar title
   ///
   /// In en, this message translates to:
@@ -54093,6 +54465,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Missing and not backed up'**
   String get media_status_broken;
+
+  /// No description provided for @media_servedFrom_localDisk.
+  ///
+  /// In en, this message translates to:
+  /// **'On this device'**
+  String get media_servedFrom_localDisk;
+
+  /// No description provided for @media_servedFrom_platformGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo library'**
+  String get media_servedFrom_platformGallery;
+
+  /// No description provided for @media_servedFrom_storeCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud store, cached here'**
+  String get media_servedFrom_storeCache;
+
+  /// No description provided for @media_servedFrom_storeNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud store'**
+  String get media_servedFrom_storeNetwork;
+
+  /// No description provided for @media_servedFrom_networkUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Web link'**
+  String get media_servedFrom_networkUrl;
+
+  /// No description provided for @media_servedFrom_connectorCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected service, cached here'**
+  String get media_servedFrom_connectorCache;
+
+  /// No description provided for @media_servedFrom_connectorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected service'**
+  String get media_servedFrom_connectorNetwork;
+
+  /// No description provided for @media_servedFrom_embedded.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored in this logbook'**
+  String get media_servedFrom_embedded;
+
+  /// No description provided for @settings_media_provenanceBadges.
+  ///
+  /// In en, this message translates to:
+  /// **'Show source badges on thumbnails'**
+  String get settings_media_provenanceBadges;
+
+  /// No description provided for @settings_media_provenanceBadgesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A small glyph showing where each item is served from. Problem badges always show.'**
+  String get settings_media_provenanceBadgesSubtitle;
 
   /// No description provided for @media_status_transferFailed.
   ///
