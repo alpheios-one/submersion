@@ -4907,9 +4907,9 @@
   "diveSites_import_snackbar_viewAction": "View",
   "diveSites_list_activeFilter_clear": "Clear",
   "diveSites_list_activeFilter_country": "Country: {country}",
-  "diveSites_list_activeFilter_depthRangeBoth": "{min}-{max}m",
-  "diveSites_list_activeFilter_depthRangeMax": "Up to {max}m",
-  "diveSites_list_activeFilter_depthRangeMin": "{min}m+",
+  "diveSites_list_activeFilter_depthRangeBoth": "{min}-{max}",
+  "diveSites_list_activeFilter_depthRangeMax": "Up to {max}",
+  "diveSites_list_activeFilter_depthRangeMin": "{min}+",
   "diveSites_list_activeFilter_hasCoordinates": "Has coordinates",
   "diveSites_list_activeFilter_hasDives": "Has dives",
   "diveSites_list_activeFilter_region": "Region: {region}",
@@ -5140,6 +5140,7 @@
     }
   },
   "@diveSites_list_activeFilter_depthRangeBoth": {
+    "description": "Active depth filter chip for a two-ended range. Both values arrive already converted to the diver's depth unit; max already carries the unit symbol, so do not add one.",
     "placeholders": {
       "min": {
         "type": "Object"
@@ -5150,6 +5151,7 @@
     }
   },
   "@diveSites_list_activeFilter_depthRangeMax": {
+    "description": "Active depth filter chip for an upper bound only. The value arrives already converted and already carries the diver's depth unit symbol, so do not add one.",
     "placeholders": {
       "max": {
         "type": "Object"
@@ -5157,6 +5159,7 @@
     }
   },
   "@diveSites_list_activeFilter_depthRangeMin": {
+    "description": "Active depth filter chip for a lower bound only. The value arrives already converted and already carries the diver's depth unit symbol, so do not add one.",
     "placeholders": {
       "min": {
         "type": "Object"
