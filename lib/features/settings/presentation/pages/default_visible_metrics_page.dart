@@ -128,6 +128,11 @@ class DefaultVisibleMetricsPage extends ConsumerWidget {
             value: settings.defaultShowGasDensity,
             onChanged: notifier.setDefaultShowGasDensity,
           ),
+          SwitchListTile(
+            title: Text(context.l10n.diveLog_legend_label_o2Cells),
+            value: settings.defaultShowO2CellMv,
+            onChanged: notifier.setDefaultShowO2CellMv,
+          ),
           const Divider(),
           _buildSectionHeader(
             context,

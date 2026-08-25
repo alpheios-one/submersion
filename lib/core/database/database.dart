@@ -1807,6 +1807,9 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(true))();
   BoolColumn get defaultShowGasTimeline =>
       boolean().withDefault(const Constant(false))();
+  // v161: default visibility for the per-cell O2 mV traces (issue #1235).
+  BoolColumn get defaultShowO2CellMv =>
+      boolean().withDefault(const Constant(false))();
   // Drift column declarations are codegen inputs shadowed by the generated
   // table at runtime, so this line is never executed (every sibling column
   // getter is likewise uncovered). The default is verified via the migration
@@ -3162,7 +3165,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 160;
+  static const int currentSchemaVersion = 161;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3444,6 +3447,9 @@ class AppDatabase extends _$AppDatabase {
     // service_records.service_type -> service_category rename. Renumbered
     // from 158 and then 159, which #1149 and #1177 claimed first on main.
     160,
+    // v161: diver_settings.default_show_o2_cell_mv, a persisted default for
+    // the per-cell O2 mV toggle on the profile chart (issue #1235).
+    161,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4893,6 +4899,24 @@ class AppDatabase extends _$AppDatabase {
           'ALTER TABLE dive_profiles ADD COLUMN o2_sensor_mv$n INTEGER',
         );
       }
+    }
+  }
+
+  /// v161: default_show_o2_cell_mv on diver_settings (issue #1235). The
+  /// per-cell O2 mV toggle previously had no persisted default; this lets a
+  /// diver make it visible by default on the profile chart.
+  Future<void> _assertO2CellMvDefaultColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('default_show_o2_cell_mv')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN default_show_o2_cell_mv '
+        'INTEGER NOT NULL DEFAULT 0 '
+        'CHECK (default_show_o2_cell_mv IN (0, 1))',
+      );
     }
   }
 
@@ -8506,6 +8530,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertServiceCategoryRename();
         }
         if (from < 160) await reportProgress();
+        // v161: default_show_o2_cell_mv on diver_settings (issue #1235).
+        if (from < 161) {
+          await _assertO2CellMvDefaultColumn();
+        }
+        if (from < 161) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8695,6 +8724,10 @@ class AppDatabase extends _$AppDatabase {
         // database that arrives by restore or sync-adopt never runs
         // onUpgrade, and every read of a service record would throw.
         await _assertServiceCategoryRename();
+
+        // v161 backstop: re-assert diver_settings.default_show_o2_cell_mv
+        // (issue #1235; same parallel-branch version-collision self-heal).
+        await _assertO2CellMvDefaultColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

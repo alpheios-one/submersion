@@ -15,10 +15,10 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_reposit
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/presentation/pages/media_library_view.dart';
+import 'package:submersion/features/media/presentation/pages/media_viewer_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
-import 'package:submersion/features/media/presentation/providers/media_selection_provider.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_grid.dart';
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
@@ -153,23 +153,6 @@ MediaLibraryEntry entry(String id, {String? diveId, String? siteId}) =>
     );
 
 void main() {
-  group('MediaSelectionNotifier', () {
-    test('toggle adds then removes an id; clear empties', () {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-      final notifier = container.read(mediaSelectionProvider.notifier);
-
-      notifier.toggle('a');
-      expect(container.read(mediaSelectionProvider), {'a'});
-      notifier.toggle('b');
-      expect(container.read(mediaSelectionProvider), {'a', 'b'});
-      notifier.toggle('a');
-      expect(container.read(mediaSelectionProvider), {'b'});
-      notifier.clear();
-      expect(container.read(mediaSelectionProvider), isEmpty);
-    });
-  });
-
   group('selection UI', () {
     late _RecordingDeletionCoordinator coordinator;
     late _RecordingMediaRepo mediaRepo;
@@ -203,9 +186,28 @@ void main() {
       );
     }
 
-    /// Taps the bar's Unlink, which always opens the confirmation.
+    /// Enters selection mode through the Select control, then checks the
+    /// tiles at [indices]. There is no gesture entry to fall back on: the
+    /// control is the whole affordance.
+    Future<void> selectTiles(WidgetTester tester, List<int> indices) async {
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      for (final index in indices) {
+        await tester.tap(find.byType(MediaLibraryTile).at(index));
+        await tester.pumpAndSettle();
+      }
+    }
+
+    /// Opens the shared bar's overflow, where the destructive action sits.
+    Future<void> openOverflow(WidgetTester tester) async {
+      await tester.tap(find.byKey(const ValueKey('selection_overflow')));
+      await tester.pumpAndSettle();
+    }
+
+    /// Taps Unlink, which always opens the confirmation.
     Future<void> tapUnlink(WidgetTester tester) async {
-      await tester.tap(find.byKey(const ValueKey('media_library_unlink')));
+      await openOverflow(tester);
+      await tester.tap(find.byKey(const ValueKey('selection_menu_unlink')));
       await tester.pumpAndSettle();
     }
 
@@ -229,21 +231,35 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.longPress(find.byType(MediaLibraryTile).first);
-      await tester.pumpAndSettle();
-      await tester.tap(find.byType(MediaLibraryTile).at(1));
-      await tester.pumpAndSettle();
+      await selectTiles(tester, [0, 1]);
 
       expect(find.text('2 selected'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('selection_action_share')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('selection_action_move_to_dive')),
+        findsOneWidget,
+      );
+      // Destructive actions are never one tap away in the shared bar, so the
+      // library's only one is reached by open-then-choose.
+      expect(
+        find.byKey(const ValueKey('selection_action_unlink')),
+        findsNothing,
+      );
+
+      await openOverflow(tester);
       expect(find.text('Unlink'), findsOneWidget);
-      expect(find.text('Move to dive'), findsOneWidget);
-      expect(find.text('Share'), findsOneWidget);
       // The per-link pair and the separate Delete are gone, and a site-linked
-      // item in the selection no longer grows a second unlink button.
+      // item in the selection no longer grows a second unlink entry.
       expect(find.byIcon(Icons.link_off), findsOneWidget);
       expect(find.byIcon(Icons.location_off), findsNothing);
-      expect(find.byIcon(Icons.delete_outline), findsNothing);
-      expect(find.text('Delete'), findsNothing);
+      expect(
+        find.byKey(const ValueKey('selection_delete')),
+        findsNothing,
+        reason: 'Delete would claim the source files go too, and they do not',
+      );
       expect(find.text('Unlink from site'), findsNothing);
     });
 
@@ -263,12 +279,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.longPress(find.byType(MediaLibraryTile).first);
-      await tester.pumpAndSettle();
-      await tester.tap(find.byType(MediaLibraryTile).at(1));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byType(MediaLibraryTile).at(2));
-      await tester.pumpAndSettle();
+      await selectTiles(tester, [0, 1, 2]);
       expect(find.text('3 selected'), findsOneWidget);
 
       await tapUnlink(tester);
@@ -289,10 +300,11 @@ void main() {
         reason: 'the library detaches nothing; it removes',
       );
       expect(mediaRepo.unlinkedFromSite, isEmpty);
-      final container = ProviderScope.containerOf(
-        tester.element(find.byType(MediaLibraryView)),
+      expect(
+        find.byKey(const ValueKey('selection_exit')),
+        findsNothing,
+        reason: 'a completed bulk action leaves selection mode',
       );
-      expect(container.read(mediaSelectionProvider), isEmpty);
     });
 
     testWidgets('cancelling deletes nothing and keeps the selection', (
@@ -303,8 +315,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.longPress(find.byType(MediaLibraryTile).first);
-      await tester.pumpAndSettle();
+      await selectTiles(tester, [0]);
       await tapUnlink(tester);
 
       await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
@@ -325,10 +336,7 @@ void main() {
       mediaRepo.withUserMetadata.add('a');
       await tester.pumpAndSettle();
 
-      await tester.longPress(find.byType(MediaLibraryTile).first);
-      await tester.pumpAndSettle();
-      await tester.tap(find.byType(MediaLibraryTile).at(1));
-      await tester.pumpAndSettle();
+      await selectTiles(tester, [0, 1]);
 
       await tapUnlink(tester);
 
@@ -352,8 +360,7 @@ void main() {
       await tester.pumpWidget(host([entry('a', diveId: 'd1')]));
       await tester.pumpAndSettle();
 
-      await tester.longPress(find.byType(MediaLibraryTile).first);
-      await tester.pumpAndSettle();
+      await selectTiles(tester, [0]);
       await tapUnlink(tester);
 
       expect(find.text('Unlink 1 items?'), findsOneWidget);
@@ -364,10 +371,11 @@ void main() {
       await tester.pumpWidget(host([entry('a')]));
       await tester.pumpAndSettle();
 
-      await tester.longPress(find.byType(MediaLibraryTile).first);
-      await tester.pumpAndSettle();
+      await selectTiles(tester, [0]);
 
-      await tester.tap(find.text('Move to dive'));
+      await tester.tap(
+        find.byKey(const ValueKey('selection_action_move_to_dive')),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.textContaining('#2'));
       await tester.pumpAndSettle();
@@ -384,12 +392,49 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.longPress(find.byType(MediaLibraryTile).first);
-      await tester.pumpAndSettle();
-      // Tap the already-selected tile: deselects, bar disappears.
+      await selectTiles(tester, [0]);
+      expect(find.text('1 selected'), findsOneWidget);
+
+      // Unchecking the last item leaves the mode standing: the user asked for
+      // it with the Select control, so only they can end it. The old id-set
+      // could not tell a deliberate entry from an incidental one and dropped
+      // the bar here.
       await tester.tap(find.byType(MediaLibraryTile).first);
       await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('media_library_unlink')), findsNothing);
+      expect(find.text('0 selected'), findsOneWidget);
+      expect(find.byType(MediaViewerPage), findsNothing);
+    });
+
+    // The dive media section swaps its whole header for the bar. The library
+    // keeps filter and sort reachable -- narrowing the list and then hitting
+    // Select All is a real flow -- but the control that opens a mode already
+    // open is dead weight.
+    testWidgets('the Select control hides while the bar is up', (tester) async {
+      await tester.pumpWidget(host([entry('a'), entry('b')]));
+      await tester.pumpAndSettle();
+
+      await selectTiles(tester, [0]);
+
+      expect(find.byKey(const ValueKey('enter_selection')), findsNothing);
+      expect(find.byIcon(Icons.filter_list), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('selection_exit')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('enter_selection')), findsOneWidget);
+    });
+
+    // The old entry gesture is gone everywhere, and nothing replaced it: a
+    // hold now resolves as a plain tap, which opens the viewer rather than
+    // starting a selection nobody asked for.
+    testWidgets('a long press does not enter selection mode', (tester) async {
+      await tester.pumpWidget(host([entry('a'), entry('b')]));
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.byType(MediaLibraryTile).first);
+      await tester.pump();
+
+      expect(find.byKey(const ValueKey('selection_exit')), findsNothing);
     });
 
     testWidgets('the close button leaves selection mode', (tester) async {
@@ -398,21 +443,18 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.longPress(find.byType(MediaLibraryTile).first);
+      await selectTiles(tester, [0]);
+      expect(find.text('1 selected'), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('selection_exit')));
       await tester.pumpAndSettle();
+
+      expect(find.text('1 selected'), findsNothing);
       expect(
-        find.byKey(const ValueKey('media_library_unlink')),
-        findsOneWidget,
+        find.byKey(const ValueKey('selection_exit')),
+        findsNothing,
+        reason: 'a completed bulk action leaves selection mode',
       );
-
-      await tester.tap(find.byIcon(Icons.close));
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(const ValueKey('media_library_unlink')), findsNothing);
-      final container = ProviderScope.containerOf(
-        tester.element(find.byType(MediaLibraryView)),
-      );
-      expect(container.read(mediaSelectionProvider), isEmpty);
     });
   });
 }
