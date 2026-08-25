@@ -50,9 +50,7 @@ void main() {
         : materialLocalizations.firstDayOfWeekIndex;
     final expectedFirstLabel = weekdayAbbreviation(context, firstWeekday);
 
-    final firstChip = tester.widget<FilterChip>(
-      find.byType(FilterChip).first,
-    );
+    final firstChip = tester.widget<FilterChip>(find.byType(FilterChip).first);
     final labelText = (firstChip.label as Text).data;
 
     expect(labelText, expectedFirstLabel);

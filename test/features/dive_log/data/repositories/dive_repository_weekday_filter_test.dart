@@ -36,9 +36,7 @@ void main() {
     final mondayInRange = DateTime(2026, 6, 8);
     final mondayOutOfRange = DateTime(2026, 7, 6);
     final tuesdayInRange = DateTime(2026, 6, 9);
-    await repository.createDive(
-      domain.Dive(id: 'd1', dateTime: mondayInRange),
-    );
+    await repository.createDive(domain.Dive(id: 'd1', dateTime: mondayInRange));
     await repository.createDive(
       domain.Dive(id: 'd2', dateTime: mondayOutOfRange),
     );
@@ -63,9 +61,7 @@ void main() {
       domain.Dive(id: 'a', dateTime: monday),
       domain.Dive(id: 'b', dateTime: tuesday),
     ];
-    final filtered = DiveFilterState(
-      weekdays: [monday.weekday],
-    ).apply(dives);
+    final filtered = DiveFilterState(weekdays: [monday.weekday]).apply(dives);
     expect(filtered.map((d) => d.id), ['a']);
   });
 }
