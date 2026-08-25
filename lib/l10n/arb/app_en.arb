@@ -5790,11 +5790,14 @@
   "enum_sortField_agency": "Agency",
   "enum_sortField_date": "Date",
   "enum_sortField_dateIssued": "Date Issued",
+  "enum_sortField_dateTaken": "Date Taken",
   "enum_sortField_difficulty": "Difficulty",
   "enum_sortField_diveCount": "Dive Count",
   "enum_sortField_diveNumber": "Dive Number",
   "enum_sortField_duration": "Duration",
   "enum_sortField_endDate": "End Date",
+  "enum_sortField_fileName": "File Name",
+  "enum_sortField_fileSize": "File Size",
   "enum_sortField_lastServiceDate": "Last Service",
   "enum_sortField_maxDepth": "Max Depth",
   "enum_sortField_name": "Name",
@@ -7029,39 +7032,6 @@
   "media_diveMediaSection_selectedCount": "{count} selected",
   "media_diveMediaSection_thumbnailLabel": "View photo. Long press to select",
   "media_diveMediaSection_title": "Photos & Video",
-  "media_diveMediaSection_deleteButton": "Delete",
-  "@media_diveMediaSection_deleteButton": {
-    "description": "Dive media selection: destructive delete action"
-  },
-  "media_diveMediaSection_deleteError": "Failed to delete: {error}",
-  "@media_diveMediaSection_deleteError": {
-    "description": "Error snackbar when the dive media bulk delete fails",
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
-  "media_diveMediaSection_deleteSelectedContent": "This removes them from the app and any media store. This cannot be undone.",
-  "@media_diveMediaSection_deleteSelectedContent": {
-    "description": "Body of the dive media bulk delete confirmation"
-  },
-  "media_diveMediaSection_deleteSelectedSuccess": "Deleted {count} items",
-  "@media_diveMediaSection_deleteSelectedSuccess": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "media_diveMediaSection_deleteSelectedTitle": "Delete {count} items?",
-  "@media_diveMediaSection_deleteSelectedTitle": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "media_diveMediaSection_replaceButton": "Re-link",
   "@media_diveMediaSection_replaceButton": {
     "description": "Replace-link confirm action for a changed file"
@@ -7075,23 +7045,60 @@
     "description": "Title of the changed-bytes replace-link confirmation"
   },
   "media_diveMediaSection_unlinkButton": "Unlink",
-  "media_diveMediaSection_unlinkDialogContent": "Remove this photo from the dive? The photo will remain in your gallery.",
-  "media_diveMediaSection_unlinkDialogTitle": "Unlink Photo",
   "media_diveMediaSection_unlinkError": "Failed to unlink: {error}",
   "media_diveMediaSection_unlinkSelectedButton": "Unlink {count}",
   "media_diveMediaSection_unlinkSelectedContent": "Removes {count} media items from your library, along with their cloud copies and thumbnails. Media a dive site still uses is kept. Your original files are not affected.",
   "media_diveMediaSection_unlinkSelectedSuccess": "Unlinked {count} items",
   "media_diveMediaSection_unlinkSelectedTitle": "Unlink {count} items?",
-  "media_diveMediaSection_unlinkSuccess": "Photo unlinked",
+  "media_library_unlinkConfirmTitle": "Unlink {count} items?",
+  "media_siteMediaSection_unlinkError": "Failed to unlink: {error}",
+  "media_library_unlinkConfirmBody": "They leave your library, along with their cloud copies and thumbnails. Your original files are not affected. This cannot be undone.",
+  "media_library_unlinkMetadataNote": "{count,plural, =1{1 of these has a caption or favorite saved in Submersion, and those details are lost.} other{{count} of these have a caption or favorite saved in Submersion, and those details are lost.}}",
+  "@media_library_unlinkConfirmTitle": {
+    "description": "Title of the library unlink confirmation dialog",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_library_unlinkConfirmBody": {
+    "description": "Body of the library unlink confirmation dialog"
+  },
+  "@media_library_unlinkMetadataNote": {
+    "description": "Extra line naming the captions and favorites an unlink discards",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_siteMediaSection_unlinkError": {
+    "description": "Site page unlink failure snackbar",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
   "media_siteMediaSection_title": "Site Media",
   "media_siteMediaSection_addPhotos": "Add photos or videos",
   "media_siteMediaSection_addDocument": "Add document",
   "media_siteMediaSection_emptyState": "No maps, photos, or documents attached to this site",
   "media_siteMediaSection_divePhotosGroup": "Photos from dives here ({count})",
   "media_siteMediaSection_divePhotoLabel": "Dive photo",
-  "media_siteMediaSection_unlinkSelectedTitle": "Remove {count} attachments?",
-  "media_siteMediaSection_unlinkSelectedContent": "The selected items will be removed from this site. Files in your photo library or on disk are not deleted.",
-  "media_siteMediaSection_unlinkSelectedSuccess": "Removed {count} attachments",
+  "media_siteMediaSection_unlinkSelectedTitle": "Unlink {count} items?",
+  "media_siteMediaSection_unlinkSelectedContent": "Removes {count} items from your library, along with their cloud copies and thumbnails. Media a dive still uses is kept. Your original files are not affected.",
+  "@media_siteMediaSection_unlinkSelectedContent": {
+    "description": "Site page unlink confirmation body",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "media_siteMediaSection_unlinkSelectedSuccess": "Unlinked {count} items",
   "media_documentViewer_title": "Document",
   "media_documentViewer_unavailable": "This document is not available on this device",
   "media_documentViewer_availableOnOriginDevice": "It is available on the device it was added from, or via a configured media store.",
@@ -7511,7 +7518,83 @@
   "@media_import_launch": {
     "description": "Import section: open the picker"
   },
-  "media_import_intro": "Imported media is kept in your library and can be linked to dives automatically.",
+  "media_import_review_title": "Review import",
+  "@media_import_review_title": {
+    "description": "App bar title of the pre-import review"
+  },
+  "media_import_review_confirm": "Import {count} items",
+  "@media_import_review_confirm": {
+    "description": "Confirm button of the pre-import review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_import_review_result": "{linked} linked, {skipped} skipped, {failed} failed",
+  "@media_import_review_result": {
+    "description": "Snackbar after the review imports",
+    "placeholders": {
+      "linked": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "media_import_review_chooseSite": "Choose site",
+  "@media_import_review_chooseSite": {
+    "description": "Review row menu: attach to a dive site"
+  },
+  "media_import_review_ambiguous": "Several dives match",
+  "@media_import_review_ambiguous": {
+    "description": "Review row subtitle when several dives match the timestamp"
+  },
+  "media_import_review_noMatch": "No matching dive",
+  "@media_import_review_noMatch": {
+    "description": "Review row subtitle when no dive matches the timestamp"
+  },
+  "media_import_review_skipped": "Not imported",
+  "@media_import_review_skipped": {
+    "description": "Review row subtitle for a row the user unchecked"
+  },
+  "media_import_review_linkChip": "Link to #{number}",
+  "@media_import_review_linkChip": {
+    "description": "Review row subtitle for a confident auto-match",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "media_import_review_linkToDive": "Link to dive",
+  "@media_import_review_linkToDive": {
+    "description": "Review row menu: attach to a dive"
+  },
+  "media_import_review_linkToSite": "Link to site",
+  "@media_import_review_linkToSite": {
+    "description": "Review row subtitle when attached to a site"
+  },
+  "media_import_review_chooseDive": "Choose dive",
+  "@media_import_review_chooseDive": {
+    "description": "Review row menu: pick a dive"
+  },
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  "media_import_intro": "Photos are linked to a dive or a dive site as you import them.",
   "@media_import_intro": {
     "description": "Import section intro text"
   },
@@ -7658,10 +7741,6 @@
       "source": { "type": "String" }
     }
   },
-  "media_console_missing": "Missing",
-  "@media_console_missing": {
-    "description": "Media console sidebar/tab label for the missing-files view"
-  },
   "media_missing_empty": "No missing files",
   "@media_missing_empty": {
     "description": "Empty state for the missing-files view"
@@ -7764,65 +7843,6 @@
       }
     }
   },
-  "media_console_unlinked": "Unlinked",
-  "@media_console_unlinked": {
-    "description": "Media console sidebar/tab label for the unlinked inbox"
-  },
-  "media_import_linkTitle": "Link imported media",
-  "@media_import_linkTitle": {
-    "description": "Title of the post-import batch link screen"
-  },
-  "media_import_linkConfirm": "Link {count} items",
-  "@media_import_linkConfirm": {
-    "description": "Confirm button on the post-import batch link screen",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "media_import_staysUnlinked": "Stays in Unlinked",
-  "@media_import_staysUnlinked": {
-    "description": "Row subtitle for imports without a confident dive match"
-  },
-  "media_import_linkedResult": "{count} items linked",
-  "@media_import_linkedResult": {
-    "description": "Snackbar after the batch link applies",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "media_inbox_chooseDive": "Choose dive",
-  "@media_inbox_chooseDive": {
-    "description": "Inbox chip for an ambiguous auto-match"
-  },
-  "media_inbox_empty": "No unlinked media",
-  "@media_inbox_empty": {
-    "description": "Empty state for the unlinked inbox"
-  },
-  "media_inbox_keep": "Keep",
-  "@media_inbox_keep": {
-    "description": "Inbox action: keep the item in the library unlinked"
-  },
-  "media_inbox_linkChip": "Link to #{number}",
-  "@media_inbox_linkChip": {
-    "description": "Inbox chip for a confident auto-match",
-    "placeholders": {
-      "number": {
-        "type": "int"
-      }
-    }
-  },
-  "media_inbox_linkToDive": "Link to dive",
-  "@media_inbox_linkToDive": {
-    "description": "Inbox menu action: pick a dive manually"
-  },
-  "media_inbox_linkToSite": "Link to site",
-  "@media_inbox_linkToSite": {
-    "description": "Inbox menu action: pick a site manually"
-  },
   "media_library_empty": "No media yet",
   "@media_library_empty": {
     "description": "Empty state for the media library"
@@ -7851,7 +7871,42 @@
   "@media_library_filter_dates": {
     "description": "Library filter chip: pick a date range"
   },
+  "media_library_filter_missing": "Missing files",
+  "@media_library_filter_missing": {
+    "description": "Library filter chip: rows whose backing file is missing"
+  },
+  "media_library_filter_missingCount": "Missing files ({count})",
+  "@media_library_filter_missingCount": {
+    "description": "Library filter chip with the missing-file count",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  
   "media_library_filter_clear": "Clear filters",
+  "media_library_filter_any": "Any",
+  "@media_library_filter_any": {
+    "description": "Value shown for a filter facet that is not constrained, e.g. Site: Any"
+  },
+  "media_library_filter_title": "Filter media",
+  "@media_library_filter_title": {
+    "description": "Title of the media library filter sheet, and the filter button's tooltip"
+  },
+  "media_library_filter_apply": "Apply",
+  "@media_library_filter_apply": {
+    "description": "Button that applies the drafted media filter"
+  },
+  "media_library_sort_title": "Sort media",
+  "@media_library_sort_title": {
+    "description": "Title of the media library sort sheet, and the sort button's tooltip"
+  },
+  "media_smartAlbum_load": "Load album",
+  "@media_smartAlbum_load": {
+    "description": "Opens the list of saved smart albums to load one"
+  },
   "@media_library_filter_clear": {
     "description": "Library filter chip: reset every filter"
   },
@@ -7863,43 +7918,13 @@
   "@media_divePicker_search": {
     "description": "Search hint in the dive picker sheet"
   },
-  "media_library_deleteConfirmBody": "This removes them from the app and any media store. This cannot be undone.",
-  "@media_library_deleteConfirmBody": {
-    "description": "Body of the bulk delete confirmation dialog"
-  },
-  "media_library_deleteConfirmTitle": "Delete {count} items?",
-  "@media_library_deleteConfirmTitle": {
-    "description": "Title of the bulk delete confirmation dialog",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "media_library_moveToDive": "Move to dive",
   "@media_library_moveToDive": {
     "description": "Library selection action: reassign media to a dive"
   },
-  "media_library_unlinkFromSite": "Unlink from site",
-  "@media_library_unlinkFromSite": {
-    "description": "Library selection action: clear the site link"
-  },
-  "media_unlink_metadataLossTitle": "Unlink and discard details?",
-  "@media_unlink_metadataLossTitle": {
-    "description": "Confirm dialog title when unlinking would lose saved details"
-  },
-  "media_unlink_metadataLossContent": "{count,plural, =1{1 selected item has a caption or favorite saved in Submersion. Unlinking removes it from your library, so those details are lost. Your original file is not affected.} other{{count} selected items have a caption or favorite saved in Submersion. Unlinking removes them from your library, so those details are lost. Your original files are not affected.}}",
-  "@media_unlink_metadataLossContent": {
-    "description": "Confirm dialog body naming what an unlink discards",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "media_library_unlinkSelected": "Unlink",
   "@media_library_unlinkSelected": {
-    "description": "Library selection action: clear the dive link"
+    "description": "Library selection action, and its confirm button: clear every link the row has, which removes it from the library"
   },
   "media_library_selectedCount": "{count} selected",
   "@media_library_selectedCount": {

@@ -674,10 +674,9 @@ class _StartupWrapperState extends State<StartupWrapper>
       await speciesRepository.seedBuiltInSpecies();
     });
 
-    // One-time orphaned-media backlog sweep (orphan-prevention spec 4.3).
-    // Fire-and-forget: it must not delay first frame, runs against the
-    // now-open databases, and self-guards with a persisted flag that is
-    // only set on success (a failed run retries next launch).
+    // Unlinked-media sweep, every launch. Fire-and-forget: it must not delay
+    // first frame and runs against the now-open databases. Empty on a
+    // healthy library; catches anything a not-yet-upgraded peer syncs in.
     final mediaRepository = MediaRepository();
     final sweep = MediaOrphanBacklogSweep(
       mediaRepository: mediaRepository,
@@ -685,7 +684,6 @@ class _StartupWrapperState extends State<StartupWrapper>
         mediaRepository: mediaRepository,
         queue: () => MediaTransferQueueRepository(),
       ),
-      prefs: SharedPreferences.getInstance,
     );
     // An async closure rather than `.catchError` on the Future<int>: it
     // hands `unawaited` a genuine Future<void> instead of a swept-row count
@@ -696,7 +694,7 @@ class _StartupWrapperState extends State<StartupWrapper>
     // Exception, and a failed sweep must never take down startup.
     unawaited(() async {
       try {
-        await sweep.runIfNeeded();
+        await sweep.run();
       } catch (e, stackTrace) {
         debugPrint(
           'Orphaned-media backlog sweep failed (will retry): $e\n$stackTrace',

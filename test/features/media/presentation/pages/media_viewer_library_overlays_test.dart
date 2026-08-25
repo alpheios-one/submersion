@@ -269,7 +269,7 @@ void main() {
         return _dive;
       },
       loadMediaForDive: (diveId) async => const [],
-      saveEnrichment: (enrichment) async {},
+      saveEnrichments: (enrichments) async {},
     );
 
     await pump(
@@ -296,7 +296,7 @@ void main() {
         return _dive;
       },
       loadMediaForDive: (diveId) async => const [],
-      saveEnrichment: (enrichment) async {},
+      saveEnrichments: (enrichments) async {},
     );
 
     await pump(

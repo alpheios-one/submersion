@@ -770,63 +770,7 @@ class MediaRepository {
   Future<void> saveEnrichment(domain.MediaEnrichment enrichment) async {
     try {
       _log.info('Saving enrichment for media: ${enrichment.mediaId}');
-      final now = DateTime.now();
-      final id = enrichment.id.isEmpty ? _uuid.v4() : enrichment.id;
-
-      // Check if enrichment already exists for this media
-      final existing = await (_db.select(
-        _db.mediaEnrichment,
-      )..where((t) => t.mediaId.equals(enrichment.mediaId))).getSingleOrNull();
-
-      if (existing != null) {
-        // Update existing enrichment
-        await (_db.update(
-          _db.mediaEnrichment,
-        )..where((t) => t.mediaId.equals(enrichment.mediaId))).write(
-          MediaEnrichmentCompanion(
-            // The dive is part of the value, not just a back-pointer: an
-            // enrichment is the join product of this media and ONE dive's
-            // profile. Leaving it behind would let a row repaired against a
-            // different dive keep claiming the old one.
-            diveId: Value(enrichment.diveId),
-            depthMeters: Value(enrichment.depthMeters),
-            temperatureCelsius: Value(enrichment.temperatureCelsius),
-            elapsedSeconds: Value(enrichment.elapsedSeconds),
-            matchConfidence: Value(enrichment.matchConfidence.name),
-            timestampOffsetSeconds: Value(enrichment.timestampOffsetSeconds),
-          ),
-        );
-        await _syncRepository.markRecordPending(
-          entityType: 'mediaEnrichment',
-          recordId: existing.id,
-          localUpdatedAt: now.millisecondsSinceEpoch,
-        );
-      } else {
-        // Insert new enrichment
-        await _db
-            .into(_db.mediaEnrichment)
-            .insert(
-              MediaEnrichmentCompanion(
-                id: Value(id),
-                mediaId: Value(enrichment.mediaId),
-                diveId: Value(enrichment.diveId),
-                depthMeters: Value(enrichment.depthMeters),
-                temperatureCelsius: Value(enrichment.temperatureCelsius),
-                elapsedSeconds: Value(enrichment.elapsedSeconds),
-                matchConfidence: Value(enrichment.matchConfidence.name),
-                timestampOffsetSeconds: Value(
-                  enrichment.timestampOffsetSeconds,
-                ),
-                createdAt: Value(now.millisecondsSinceEpoch),
-              ),
-            );
-        await _syncRepository.markRecordPending(
-          entityType: 'mediaEnrichment',
-          recordId: id,
-          localUpdatedAt: now.millisecondsSinceEpoch,
-        );
-      }
-
+      await _writeEnrichmentRow(enrichment);
       SyncEventBus.notifyLocalChange();
       _log.info('Saved enrichment for media: ${enrichment.mediaId}');
     } catch (e, stackTrace) {
@@ -836,6 +780,102 @@ class MediaRepository {
         stackTrace: stackTrace,
       );
       rethrow;
+    }
+  }
+
+  /// Saves a batch of enrichments in one transaction.
+  ///
+  /// One transaction means one commit, all-or-nothing persistence, and ONE
+  /// mediaEnrichment table tick, where per-row [saveEnrichment] calls each
+  /// tick separately. `watchMediaChanges` trailing-debounces at 300ms, so a
+  /// fast per-row burst already coalesced -- but a burst SLOWER than the
+  /// window (the dive-media backfill runs from the open media viewer and
+  /// can write a row per photo of a dive) re-ran every subscribed provider
+  /// (the library re-query included) once per quiet gap. An empty batch
+  /// returns without touching the database, so the common "everything
+  /// already enriched" pass costs no tick at all.
+  Future<void> saveEnrichments(List<domain.MediaEnrichment> enrichments) async {
+    if (enrichments.isEmpty) return;
+    try {
+      _log.info('Saving ${enrichments.length} enrichments');
+      // markRecordPending opens its own transaction; Drift nests it as a
+      // savepoint because both repositories share the one database instance.
+      await _db.transaction(() async {
+        for (final enrichment in enrichments) {
+          await _writeEnrichmentRow(enrichment);
+        }
+      });
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to save enrichment batch of ${enrichments.length}',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Upserts one enrichment row and marks it pending for sync.
+  ///
+  /// Shared by [saveEnrichment] (single write, then notify) and
+  /// [saveEnrichments] (many writes in one transaction, then one notify);
+  /// deliberately does NOT call [SyncEventBus.notifyLocalChange] so the
+  /// batch path can notify once.
+  Future<void> _writeEnrichmentRow(domain.MediaEnrichment enrichment) async {
+    final now = DateTime.now();
+    final id = enrichment.id.isEmpty ? _uuid.v4() : enrichment.id;
+
+    // Check if enrichment already exists for this media
+    final existing = await (_db.select(
+      _db.mediaEnrichment,
+    )..where((t) => t.mediaId.equals(enrichment.mediaId))).getSingleOrNull();
+
+    if (existing != null) {
+      // Update existing enrichment
+      await (_db.update(
+        _db.mediaEnrichment,
+      )..where((t) => t.mediaId.equals(enrichment.mediaId))).write(
+        MediaEnrichmentCompanion(
+          // The dive is part of the value, not just a back-pointer: an
+          // enrichment is the join product of this media and ONE dive's
+          // profile. Leaving it behind would let a row repaired against a
+          // different dive keep claiming the old one.
+          diveId: Value(enrichment.diveId),
+          depthMeters: Value(enrichment.depthMeters),
+          temperatureCelsius: Value(enrichment.temperatureCelsius),
+          elapsedSeconds: Value(enrichment.elapsedSeconds),
+          matchConfidence: Value(enrichment.matchConfidence.name),
+          timestampOffsetSeconds: Value(enrichment.timestampOffsetSeconds),
+        ),
+      );
+      await _syncRepository.markRecordPending(
+        entityType: 'mediaEnrichment',
+        recordId: existing.id,
+        localUpdatedAt: now.millisecondsSinceEpoch,
+      );
+    } else {
+      // Insert new enrichment
+      await _db
+          .into(_db.mediaEnrichment)
+          .insert(
+            MediaEnrichmentCompanion(
+              id: Value(id),
+              mediaId: Value(enrichment.mediaId),
+              diveId: Value(enrichment.diveId),
+              depthMeters: Value(enrichment.depthMeters),
+              temperatureCelsius: Value(enrichment.temperatureCelsius),
+              elapsedSeconds: Value(enrichment.elapsedSeconds),
+              matchConfidence: Value(enrichment.matchConfidence.name),
+              timestampOffsetSeconds: Value(enrichment.timestampOffsetSeconds),
+              createdAt: Value(now.millisecondsSinceEpoch),
+            ),
+          );
+      await _syncRepository.markRecordPending(
+        entityType: 'mediaEnrichment',
+        recordId: id,
+        localUpdatedAt: now.millisecondsSinceEpoch,
+      );
     }
   }
 
@@ -1205,26 +1245,15 @@ class MediaRepository {
 
   /// A media row is linked to the logbook when it references a dive or a
   /// site (orphan-prevention spec section 3). Single definition shared by
-  /// backfill scoping, the dive-deletion cascade, and the orphan backlog
-  /// sweep so the three predicates cannot drift apart.
+  /// the deletion cascades, the unlink partitions, and the orphan backlog
+  /// sweep so the predicates cannot drift apart.
   static Expression<bool> isLinkedToDiveOrSite($MediaTable m) =>
       m.diveId.isNotNull() | m.siteId.isNotNull();
 
-  /// Source types whose rows are legitimate as library-level media with no
-  /// dive/site linkage (orphan-prevention spec section 3, gate audit
-  /// 2026-07-23): URL-tab and manifest-subscription imports. Auto-match is
-  /// additive for them, so unlinkedness is a normal permanent state - the
-  /// dive-deletion cascade unlinks instead of deleting, and the backlog
-  /// sweep never touches them.
-  static const List<String> libraryLevelSourceTypes = [
-    'networkUrl',
-    'manifestEntry',
-  ];
-
   /// Splits a dying dive's media (orphan-prevention spec 4.2): `doomed`
-  /// rows die with the dive (dive-only, non-library; full items because
-  /// the blob-delete intent needs contentHash/filename/type), `unlinkIds`
-  /// survive as site-linked or library-level rows with diveId nulled.
+  /// rows die with the dive (dive-only; full items because the blob-delete
+  /// intent needs contentHash/filename/type), `unlinkIds` survive as
+  /// site-linked rows with diveId nulled.
   Future<({List<domain.MediaItem> doomed, List<String> unlinkIds})>
   partitionMediaForDiveDeletion(List<String> diveIds) async {
     // Not a correctness guard - SQLite accepts the `IN ()` an empty list
@@ -1241,9 +1270,7 @@ class MediaRepository {
     final doomed = <domain.MediaItem>[];
     final unlinkIds = <String>[];
     for (final row in rows) {
-      final keep =
-          row.siteId != null ||
-          libraryLevelSourceTypes.contains(row.sourceType);
+      final keep = row.siteId != null;
       if (keep) {
         unlinkIds.add(row.id);
       } else {
@@ -1275,10 +1302,9 @@ class MediaRepository {
   }
 
   /// Splits a dying site's media: `doomed` rows die with the site
-  /// (site-only, non-library; full items because the blob-delete intent
-  /// needs contentHash/filename/type), `unlinkIds` survive as dive-linked
-  /// or library-level rows with siteId nulled. Site counterpart of
-  /// [partitionMediaForDiveDeletion].
+  /// (site-only; full items because the blob-delete intent needs
+  /// contentHash/filename/type), `unlinkIds` survive as dive-linked rows
+  /// with siteId nulled. Site counterpart of [partitionMediaForDiveDeletion].
   Future<({List<domain.MediaItem> doomed, List<String> unlinkIds})>
   partitionMediaForSiteDeletion(List<String> siteIds) async {
     // Empty-guard mirrors [partitionMediaForDiveDeletion]: bulk callers
@@ -1292,9 +1318,7 @@ class MediaRepository {
     final doomed = <domain.MediaItem>[];
     final unlinkIds = <String>[];
     for (final row in rows) {
-      final keep =
-          row.diveId != null ||
-          libraryLevelSourceTypes.contains(row.sourceType);
+      final keep = row.diveId != null;
       if (keep) {
         unlinkIds.add(row.id);
       } else {
@@ -1466,14 +1490,36 @@ class MediaRepository {
     final deletable = <String>[];
     final siteLinked = <String>[];
     for (final row in rows) {
-      if (row.siteId != null ||
-          libraryLevelSourceTypes.contains(row.sourceType)) {
+      if (row.siteId != null) {
         siteLinked.add(row.id);
       } else {
         deletable.add(row.id);
       }
     }
     return (deletable: deletable, siteLinked: siteLinked);
+  }
+
+  /// Mirror of [partitionForDiveUnlink] for the site-unlink path: rows a
+  /// dive still references survive with only the site link cleared, the
+  /// rest leave the library.
+  Future<({List<String> deletable, List<String> diveLinked})>
+  partitionForSiteUnlink(List<String> mediaIds) async {
+    if (mediaIds.isEmpty) {
+      return (deletable: const <String>[], diveLinked: const <String>[]);
+    }
+    final rows = await (_db.select(
+      _db.media,
+    )..where((t) => t.id.isIn(mediaIds))).get();
+    final deletable = <String>[];
+    final diveLinked = <String>[];
+    for (final row in rows) {
+      if (row.diveId != null) {
+        diveLinked.add(row.id);
+      } else {
+        deletable.add(row.id);
+      }
+    }
+    return (deletable: deletable, diveLinked: diveLinked);
   }
 
   /// Of [mediaIds], those carrying metadata a user typed or set that no
@@ -1523,37 +1569,24 @@ class MediaRepository {
     SyncEventBus.notifyLocalChange();
   }
 
-  /// Clears the dive link, keeps the row, and sets retain_in_library so the
-  /// orphan sweep never GCs the blobs of media deliberately kept. Same
-  /// sync-safe shape as [unlinkMediaFromDeletedDives], which deliberately
-  /// does NOT set the flag (dive-deletion leftovers stay sweepable).
-  ///
-  /// Reached from [MediaUnlinkService] for media a dive site still needs.
-  /// Media with no other attachment is deleted outright instead, so this is
-  /// no longer the whole of what a user-initiated unlink does.
+  /// Clears the dive link and keeps the row. Reached from
+  /// [MediaUnlinkService] for media a dive site still needs; media with no
+  /// other attachment is deleted outright instead.
   ///
   /// Drops the enrichment as part of the same transaction: it was computed
   /// against the dive being left, so keeping it would leave the photo
   /// reporting that dive's depth and elapsed time from the site gallery.
   Future<void> unlinkFromDive(List<String> mediaIds) => _unlinkColumns(
     mediaIds,
-    const MediaCompanion(diveId: Value(null), retainInLibrary: Value(true)),
+    const MediaCompanion(diveId: Value(null)),
     dropEnrichment: true,
   );
 
-  /// Same mechanic for the site link.
-  Future<void> unlinkFromSite(List<String> mediaIds) => _unlinkColumns(
-    mediaIds,
-    const MediaCompanion(siteId: Value(null), retainInLibrary: Value(true)),
-  );
+  /// Same mechanic for the site link, for media a dive still needs.
+  Future<void> unlinkFromSite(List<String> mediaIds) =>
+      _unlinkColumns(mediaIds, const MediaCompanion(siteId: Value(null)));
 
-  /// Inbox "keep": marks rows retained without touching links.
-  Future<void> markRetainedInLibrary(List<String> mediaIds) => _unlinkColumns(
-    mediaIds,
-    const MediaCompanion(retainInLibrary: Value(true)),
-  );
-
-  /// Inbox "link to site": attaches the site link, same sync-safe shape.
+  /// Attaches the site link, same sync-safe shape.
   Future<void> linkMediaToSite(List<String> mediaIds, String siteId) =>
       _unlinkColumns(mediaIds, MediaCompanion(siteId: Value(siteId)));
 
@@ -1580,10 +1613,10 @@ class MediaRepository {
     SyncEventBus.notifyLocalChange();
   }
 
-  /// Backlog-sweep candidates (orphan-prevention spec 4.3): unlinked,
-  /// non-library, NOT explicitly retained in the library, and created
-  /// before [olderThan] (the 24h age guard protects any future
-  /// add-then-link creator the gate audit could not foresee).
+  /// Unlinked rows older than [olderThan]. Every source type qualifies: a
+  /// row with no dive and no site has no business in the library, and the
+  /// age guard only exists so an insert racing this query is never caught
+  /// mid-flight.
   Future<List<String>> getSweepableOrphanIds({
     required DateTime olderThan,
   }) async {
@@ -1592,36 +1625,12 @@ class MediaRepository {
       ..addColumns([id])
       ..where(
         isLinkedToDiveOrSite(_db.media).not() &
-            _db.media.retainInLibrary.equals(false) &
-            _db.media.sourceType.isNotIn(libraryLevelSourceTypes) &
             _db.media.createdAt.isSmallerThanValue(
               olderThan.millisecondsSinceEpoch,
             ),
       );
     final rows = await query.get();
     return rows.map((r) => r.read(id)!).toList();
-  }
-
-  /// Every distinct platform asset id in the library (import dedupe,
-  /// Media section Phase 4).
-  Future<Set<String>> getAllPlatformAssetIds() async {
-    final column = _db.media.platformAssetId;
-    final query = _db.selectOnly(_db.media, distinct: true)
-      ..addColumns([column])
-      ..where(column.isNotNull());
-    final rows = await query.get();
-    return rows.map((r) => r.read(column)!).toSet();
-  }
-
-  /// Every distinct local path in the library (import dedupe, Media
-  /// section Phase 4).
-  Future<Set<String>> getAllLocalPaths() async {
-    final column = _db.media.localPath;
-    final query = _db.selectOnly(_db.media, distinct: true)
-      ..addColumns([column])
-      ..where(column.isNotNull());
-    final rows = await query.get();
-    return rows.map((r) => r.read(column)!).toSet();
   }
 
   /// Every distinct non-null content hash - the verify sweep's referenced

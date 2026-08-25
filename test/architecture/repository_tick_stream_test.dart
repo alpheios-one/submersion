@@ -4,6 +4,7 @@ import 'package:submersion/core/data/repositories/connected_accounts_repository.
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/cylinder_configs/data/repositories/cylinder_config_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_custom_field_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/view_config_repository.dart';
 import 'package:submersion/features/equipment/data/repositories/service_kind_repository.dart';
@@ -161,7 +162,7 @@ void main() {
   group('silence before a write', () {
     // Regression guard for #1175: MediaLibraryRepository.watchMediaChanges was
     // a watched COUNT query, so subscribing to it emitted immediately. Fed to
-    // invalidateSelfWhen by unlinkedCountProvider, missingCountProvider and
+    // invalidateSelfWhen by missingCountProvider and
     // sourceCountsProvider, that turned opening the Media section into an
     // unbounded rebuild loop, one COUNT(*) over `media` per event-loop turn.
     //
@@ -193,6 +194,8 @@ void main() {
           WeightHistoryRepository().watchGearLeadChanges,
       'CsvPresetRepository.watchPresetsChanges':
           CsvPresetRepository().watchPresetsChanges,
+      'DiveRepository.watchAnalysisInputChanges':
+          DiveRepository().watchAnalysisInputChanges,
     };
 
     for (final entry in ticks.entries) {
@@ -704,6 +707,72 @@ void main() {
               ),
         ),
         isTrue,
+      );
+    });
+  });
+
+  group('analysis inputs', () {
+    Future<void> seedDive(String id) => db
+        .into(db.dives)
+        .insert(
+          DivesCompanion.insert(
+            id: id,
+            diveDateTime: now,
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+
+    test(
+      'watchAnalysisInputChanges fires on a dive_profile_events write',
+      () async {
+        // The coupling watchDiveDetailChanges never had: dive_profile_events is
+        // read by diveComputerEventsProvider and merged into every analysis,
+        // but the broad detail tick does not include the table at all.
+        await seedDive('d1');
+        expect(
+          await fires(
+            DiveRepository().watchAnalysisInputChanges(),
+            () => db
+                .into(db.diveProfileEvents)
+                .insert(
+                  DiveProfileEventsCompanion.insert(
+                    id: 'ev1',
+                    diveId: 'd1',
+                    timestamp: 120,
+                    eventType: 'gasSwitch',
+                    createdAt: now,
+                  ),
+                ),
+          ),
+          isTrue,
+        );
+      },
+    );
+
+    test('watchAnalysisInputChanges stays silent on a media write', () async {
+      // The other half of the contract, and the reason this tick exists.
+      // media IS in watchDiveDetailChanges, so the analysis chain used to be
+      // discarded by every media write (orphan reconcile, enrichment
+      // backfill) -- re-running the Buhlmann cascade after merely viewing a
+      // photo. The analysis reads nothing from media; its tick must not
+      // fire for it.
+      await seedDive('d1');
+      expect(
+        await fires(
+          DiveRepository().watchAnalysisInputChanges(),
+          () => db
+              .into(db.media)
+              .insert(
+                MediaCompanion.insert(
+                  id: 'm1',
+                  filePath: '/tmp/m1.jpg',
+                  createdAt: now,
+                  updatedAt: now,
+                ),
+              ),
+        ),
+        isFalse,
       );
     });
   });

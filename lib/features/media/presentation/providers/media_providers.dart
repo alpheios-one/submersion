@@ -32,7 +32,7 @@ final diveMediaEnricherProvider = Provider<DiveMediaEnricher>((ref) {
   return DiveMediaEnricher(
     loadDive: diveRepo.getDiveById,
     loadMediaForDive: mediaRepo.getMediaForDive,
-    saveEnrichment: mediaRepo.saveEnrichment,
+    saveEnrichments: mediaRepo.saveEnrichments,
   );
 });
 

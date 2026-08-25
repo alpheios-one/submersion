@@ -9640,6 +9640,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_sortField_dateIssued => '签发日期';
 
   @override
+  String get enum_sortField_dateTaken => '拍摄日期';
+
+  @override
   String get enum_sortField_difficulty => '难度';
 
   @override
@@ -9653,6 +9656,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => '结束日期';
+
+  @override
+  String get enum_sortField_fileName => '文件名';
+
+  @override
+  String get enum_sortField_fileSize => '文件大小';
 
   @override
   String get enum_sortField_lastServiceDate => '最近维护';
@@ -11846,28 +11855,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_diveMediaSection_title => '照片 & 视频';
 
   @override
-  String get media_diveMediaSection_deleteButton => '删除';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return '删除失败：$error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '已删除 $count 个项目';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return '删除 $count 个项目？';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => '重新关联';
 
   @override
@@ -11879,13 +11866,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => '取消关联';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      '从此次潜水中移除此照片吗？照片将保留在您的相册中。';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => '取消关联照片';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -11913,7 +11893,29 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => '照片已取消关联';
+  String media_library_unlinkConfirmTitle(int count) {
+    return '取消关联 $count 项目?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(Object error) {
+    return '取消关联失败：$error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      '它们将从您的媒体库中移除，包括其云端副本和缩略图。您的原始文件不受影响。此操作无法撤销。';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '其中 $count 个在 Submersion 中保存了说明文字或收藏标记，这些信息将会丢失。',
+      one: '其中 1 个在 Submersion 中保存了说明文字或收藏标记，这些信息将会丢失。',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => '潜水点媒体';
@@ -11937,16 +11939,17 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return '移除 $count 个附件？';
+    return '取消关联 $count 项目?';
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      '所选项目将从此潜水点移除。照片库或磁盘中的文件不会被删除。';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return '从媒体库中移除 $count 个项目及其云端副本和缩略图。仍被潜水使用的媒体会保留。您的原始文件不受影响。';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return '已移除 $count 个附件';
+    return '已取消关联 $count 个项目';
   }
 
   @override
@@ -12473,7 +12476,46 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_import_launch => '导入媒体...';
 
   @override
-  String get media_import_intro => '导入的媒体会保留在您的媒体库中，并可自动关联到潜水。';
+  String get media_import_review_title => '检查导入';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return '导入 $count 个项目';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '已关联 $linked 个，跳过 $skipped 个，失败 $failed 个';
+  }
+
+  @override
+  String get media_import_review_chooseSite => '选择潜点';
+
+  @override
+  String get media_import_review_ambiguous => '多次潜水匹配';
+
+  @override
+  String get media_import_review_noMatch => '没有匹配的潜水';
+
+  @override
+  String get media_import_review_skipped => '未导入';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return '关联到 #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => '关联到潜水';
+
+  @override
+  String get media_import_review_linkToSite => '关联到潜点';
+
+  @override
+  String get media_import_review_chooseDive => '选择潜水';
+
+  @override
+  String get media_import_intro => '照片在导入时会关联到潜水或潜点。';
 
   @override
   String get media_console_sources => '来源';
@@ -12584,9 +12626,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => '缺失';
-
-  @override
   String get media_missing_empty => '没有缺失的文件';
 
   @override
@@ -12649,45 +12688,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => '未关联';
-
-  @override
-  String get media_import_linkTitle => '关联导入的媒体';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return '关联 $count 个项目';
-  }
-
-  @override
-  String get media_import_staysUnlinked => '保留在未关联中';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '已关联 $count 个项目';
-  }
-
-  @override
-  String get media_inbox_chooseDive => '选择潜水';
-
-  @override
-  String get media_inbox_empty => '没有未关联的媒体';
-
-  @override
-  String get media_inbox_keep => '保留';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return '关联到 #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => '关联到潜水';
-
-  @override
-  String get media_inbox_linkToSite => '关联到潜点';
-
-  @override
   String get media_library_empty => '暂无媒体';
 
   @override
@@ -12709,7 +12709,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_library_filter_dates => '日期';
 
   @override
+  String get media_library_filter_missing => '缺失的文件';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return '缺失的文件（$count）';
+  }
+
+  @override
   String get media_library_filter_clear => '清除筛选';
+
+  @override
+  String get media_library_filter_any => '任意';
+
+  @override
+  String get media_library_filter_title => '筛选媒体';
+
+  @override
+  String get media_library_filter_apply => '应用';
+
+  @override
+  String get media_library_sort_title => '排序媒体';
+
+  @override
+  String get media_smartAlbum_load => '加载相册';
 
   @override
   String get media_divePicker_title => '移至潜水';
@@ -12718,34 +12741,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_divePicker_search => '搜索潜水';
 
   @override
-  String get media_library_deleteConfirmBody => '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return '删除 $count 个项目？';
-  }
-
-  @override
   String get media_library_moveToDive => '移至潜水';
-
-  @override
-  String get media_library_unlinkFromSite => '取消关联潜点';
-
-  @override
-  String get media_unlink_metadataLossTitle => '取消关联并丢弃详细信息？';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          '有 $count 个所选项目在 Submersion 中保存了说明文字或收藏标记。取消关联会将它们从媒体库中移除，这些信息将会丢失。您的原始文件不受影响。',
-      one:
-          '有 1 个所选项目在 Submersion 中保存了说明文字或收藏标记。取消关联会将其从媒体库中移除，这些信息将会丢失。您的原始文件不受影响。',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get media_library_unlinkSelected => '取消关联';

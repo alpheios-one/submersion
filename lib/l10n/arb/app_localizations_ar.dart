@@ -9908,6 +9908,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_sortField_dateIssued => 'تاريخ الإصدار';
 
   @override
+  String get enum_sortField_dateTaken => 'تاريخ الالتقاط';
+
+  @override
   String get enum_sortField_difficulty => 'الصعوبة';
 
   @override
@@ -9921,6 +9924,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'تاريخ الانتهاء';
+
+  @override
+  String get enum_sortField_fileName => 'اسم الملف';
+
+  @override
+  String get enum_sortField_fileSize => 'حجم الملف';
 
   @override
   String get enum_sortField_lastServiceDate => 'آخر صيانة';
@@ -12196,28 +12205,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_diveMediaSection_title => 'الصور والفيديو';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'حذف';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'فشل في الحذف: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return 'تم حذف $count عناصر';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return 'حذف $count عناصر؟';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'إعادة الربط';
 
   @override
@@ -12229,13 +12216,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkButton => 'إلغاء الربط';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'هل تريد إزالة هذه الصورة من الغوصة؟ ستبقى الصورة في معرض الصور.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'إلغاء ربط الصورة';
 
   @override
   String media_diveMediaSection_unlinkError(Object error) {
@@ -12263,7 +12243,31 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'تم إلغاء ربط الصورة';
+  String media_library_unlinkConfirmTitle(int count) {
+    return 'إلغاء ربط $count عنصر؟';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(Object error) {
+    return 'فشل في إلغاء الربط: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'ستغادر مكتبتك، مع نسخها السحابية والصور المصغرة. لن تتأثر ملفاتك الأصلية. لا يمكن التراجع عن هذا.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'يحتوي $count منها على تعليق أو علامة مفضلة محفوظة في Submersion، وستُفقد هذه التفاصيل.',
+      one:
+          'يحتوي واحد منها على تعليق أو علامة مفضلة محفوظة في Submersion، وستُفقد هذه التفاصيل.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'وسائط الموقع';
@@ -12288,16 +12292,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'إزالة $count من المرفقات؟';
+    return 'إلغاء ربط $count عنصر؟';
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'ستتم إزالة العناصر المحددة من هذا الموقع. لن يتم حذف الملفات في مكتبة الصور أو على القرص.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'يزيل $count عنصرًا من مكتبتك مع نسخها السحابية وصورها المصغرة. تُحفظ الوسائط التي لا تزال غطسة تستخدمها. ملفاتك الأصلية لا تتأثر.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'تمت إزالة $count من المرفقات';
+    return 'تم إلغاء ربط $count عنصر';
   }
 
   @override
@@ -12836,8 +12841,47 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_import_launch => 'استيراد الوسائط...';
 
   @override
+  String get media_import_review_title => 'مراجعة الاستيراد';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return 'استيراد $count عنصرًا';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked مرتبطة، $skipped متخطاة، $failed فاشلة';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'اختر الموقع';
+
+  @override
+  String get media_import_review_ambiguous => 'تتطابق عدة غطسات';
+
+  @override
+  String get media_import_review_noMatch => 'لا توجد غطسة مطابقة';
+
+  @override
+  String get media_import_review_skipped => 'لم يتم الاستيراد';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'ربط بالغطسة رقم $number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'ربط بغطسة';
+
+  @override
+  String get media_import_review_linkToSite => 'ربط بموقع';
+
+  @override
+  String get media_import_review_chooseDive => 'اختيار الغطسة';
+
+  @override
   String get media_import_intro =>
-      'يتم الاحتفاظ بالوسائط المستوردة في مكتبتك ويمكن ربطها بالغطسات تلقائيًا.';
+      'تُربط الصور بغطسة أو موقع غطس أثناء استيرادها.';
 
   @override
   String get media_console_sources => 'المصادر';
@@ -12948,9 +12992,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'مفقودة';
-
-  @override
   String get media_missing_empty => 'لا توجد ملفات مفقودة';
 
   @override
@@ -13013,45 +13054,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'غير مرتبطة';
-
-  @override
-  String get media_import_linkTitle => 'ربط الوسائط المستوردة';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return 'ربط $count عناصر';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'تبقى غير مرتبطة';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return 'تم ربط $count عناصر';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'اختيار الغطسة';
-
-  @override
-  String get media_inbox_empty => 'لا توجد وسائط غير مرتبطة';
-
-  @override
-  String get media_inbox_keep => 'احتفاظ';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'ربط بالغطسة رقم $number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'ربط بغطسة';
-
-  @override
-  String get media_inbox_linkToSite => 'ربط بموقع';
-
-  @override
   String get media_library_empty => 'لا توجد وسائط بعد';
 
   @override
@@ -13073,7 +13075,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_library_filter_dates => 'التواريخ';
 
   @override
+  String get media_library_filter_missing => 'ملفات مفقودة';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'ملفات مفقودة ($count)';
+  }
+
+  @override
   String get media_library_filter_clear => 'مسح عوامل التصفية';
+
+  @override
+  String get media_library_filter_any => 'أي';
+
+  @override
+  String get media_library_filter_title => 'تصفية الوسائط';
+
+  @override
+  String get media_library_filter_apply => 'تطبيق';
+
+  @override
+  String get media_library_sort_title => 'فرز الوسائط';
+
+  @override
+  String get media_smartAlbum_load => 'تحميل الألبوم';
 
   @override
   String get media_divePicker_title => 'نقل إلى غطسة';
@@ -13082,35 +13107,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_divePicker_search => 'البحث في الغطسات';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return 'حذف $count عناصر؟';
-  }
-
-  @override
   String get media_library_moveToDive => 'نقل إلى غطسة';
-
-  @override
-  String get media_library_unlinkFromSite => 'إلغاء الربط بالموقع';
-
-  @override
-  String get media_unlink_metadataLossTitle => 'إلغاء الربط وحذف التفاصيل؟';
-
-  @override
-  String media_unlink_metadataLossContent(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other:
-          'تحتوي $count عناصر محددة على تعليق أو علامة مفضلة محفوظة في Submersion. إلغاء الربط يزيلها من مكتبتك، لذا تُفقد هذه التفاصيل. لن تتأثر ملفاتك الأصلية.',
-      one:
-          'يحتوي عنصر واحد محدد على تعليق أو علامة مفضلة محفوظة في Submersion. إلغاء الربط يزيله من مكتبتك، لذا تُفقد هذه التفاصيل. لن يتأثر ملفك الأصلي.',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get media_library_unlinkSelected => 'إلغاء الربط';

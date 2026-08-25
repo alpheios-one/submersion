@@ -38,8 +38,14 @@ final metricSourceInfoProvider = StateProvider<MetricSourceInfo?>(
 final diveComputerEventsProvider =
     FutureProvider.family<List<ProfileEvent>, String>((ref, diveId) async {
       final repository = ref.watch(diveComputerRepositoryProvider);
+      // The analysis-input tick, not the broad detail tick: every
+      // profileAnalysisProvider watches this provider, so its invalidation
+      // re-runs the whole Buhlmann chain. The detail tick fired for media
+      // and 15 other tables this query never reads -- and, being built
+      // before dive_profile_events existed, never fired for the one table
+      // it DOES read.
       ref.invalidateSelfWhen(
-        ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
+        ref.watch(diveRepositoryProvider).watchAnalysisInputChanges(),
       );
       final dbEvents = await repository.getEventsForDive(diveId);
       return dbEvents.map(mapDiveProfileEventToProfileEvent).toList();
@@ -823,15 +829,18 @@ ProfileAnalysis _runProfileAnalysis(_ProfileAnalysisInput input) {
 /// performance). keepAlive family, so a residual-chain walk over a
 /// repetitive dive week hydrates each prior dive once per session instead
 /// of fully re-hydrating on every detail open. Self-invalidates on the
-/// detail-table tick exactly like diveProvider, preserving the analysis
-/// refresh behavior that previously arrived transitively through
-/// diveProvider.
+/// analysis-input tick (the tables this hydration actually reads), so the
+/// residual-chain cache survives writes to unrelated detail tables such as
+/// media.
 final analysisDiveProvider = FutureProvider.family<Dive?, String>((
   ref,
   diveId,
 ) async {
   final repository = ref.watch(diveRepositoryProvider);
-  ref.invalidateSelfWhen(repository.watchDiveDetailChanges());
+  // Analysis-input tick only: this provider feeds profileAnalysisProvider,
+  // so invalidating it on the broad detail tick (which includes media)
+  // re-ran the full analysis cascade after merely viewing a photo.
+  ref.invalidateSelfWhen(repository.watchAnalysisInputChanges());
   return repository.getDiveForAnalysis(diveId);
 });
 
@@ -1413,10 +1422,12 @@ final weeklyOtuProvider = FutureProvider.family<double, String>((
 ) async {
   final repository = ref.watch(diveRepositoryProvider);
   // Sums OTU across every dive in the surrounding week, so it goes stale when
-  // ANY of those dives is added or removed -- not just this one. The rest of
-  // the file subscribes to watchDiveDetailChanges; this needs the wider dives
-  // tick, or the "Prior" figure keeps counting a merged-away same-week dive
-  // after the rest of the page has refreshed (issue #974).
+  // ANY of those dives is added or removed -- not just this one. The dives
+  // tick covers exactly that, or the "Prior" figure keeps counting a
+  // merged-away same-week dive after the rest of the page has refreshed
+  // (issue #974). watchAnalysisInputChanges, which the rest of the file now
+  // subscribes to, would also fire (it includes dives); the plain dives tick
+  // simply names the one table this query reads.
   ref.invalidateSelfWhen(repository.watchDivesChanges());
   try {
     final currentDive = await repository.getDiveTimes(diveId);
