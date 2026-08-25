@@ -63,10 +63,7 @@ final allBuddiesWithDiveCountProvider =
 /// Search results with dive counts, for the "Add buddy" picker sheet, which
 /// sorts by dive count and needs that even while a search query is active.
 final buddySearchWithDiveCountProvider =
-    FutureProvider.family<List<BuddyWithDiveCount>, String>((
-      ref,
-      query,
-    ) async {
+    FutureProvider.family<List<BuddyWithDiveCount>, String>((ref, query) async {
       if (query.isEmpty) {
         return ref.watch(allBuddiesWithDiveCountProvider).value ?? [];
       }

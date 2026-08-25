@@ -34,70 +34,60 @@ void main() {
     expect(column.read<String?>('dflt_value'), '0');
   });
 
-  test(
-    'a database stranded at v160 gains the column via onUpgrade and '
-    'existing rows default to not-favorited',
-    () async {
-      final nativeDb = NativeDatabase.memory(
-        setup: (rawDb) {
-          rawDb.execute('PRAGMA user_version = 160');
-          rawDb.execute('''
+  test('a database stranded at v160 gains the column via onUpgrade and '
+      'existing rows default to not-favorited', () async {
+    final nativeDb = NativeDatabase.memory(
+      setup: (rawDb) {
+        rawDb.execute('PRAGMA user_version = 160');
+        rawDb.execute('''
           CREATE TABLE buddies (
             id TEXT NOT NULL PRIMARY KEY, diver_id TEXT, name TEXT NOT NULL,
             email TEXT, phone TEXT, photo_path TEXT,
             notes TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL,
             updated_at INTEGER NOT NULL, hlc TEXT)
         ''');
-          rawDb.execute(
-            "INSERT INTO buddies (id, name, created_at, updated_at) "
-            "VALUES ('b1', 'B1', 0, 0)",
-          );
-        },
-      );
-      final db = AppDatabase(nativeDb);
-      addTearDown(db.close);
+        rawDb.execute(
+          "INSERT INTO buddies (id, name, created_at, updated_at) "
+          "VALUES ('b1', 'B1', 0, 0)",
+        );
+      },
+    );
+    final db = AppDatabase(nativeDb);
+    addTearDown(db.close);
 
-      final cols = await db
-          .customSelect("PRAGMA table_info('buddies')")
-          .get();
-      final names = cols.map((c) => c.read<String>('name')).toSet();
-      expect(names, contains('is_favorite'));
+    final cols = await db.customSelect("PRAGMA table_info('buddies')").get();
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    expect(names, contains('is_favorite'));
 
-      final row = await db
-          .customSelect("SELECT is_favorite FROM buddies WHERE id = 'b1'")
-          .getSingle();
-      expect(row.read<int>('is_favorite'), 0);
-    },
-  );
+    final row = await db
+        .customSelect("SELECT is_favorite FROM buddies WHERE id = 'b1'")
+        .getSingle();
+    expect(row.read<int>('is_favorite'), 0);
+  });
 
-  test(
-    'beforeOpen backstop adds the column when a parallel-branch collision '
-    'stranded a DB past v161 without running the onUpgrade block',
-    () async {
-      final nativeDb = NativeDatabase.memory(
-        setup: (rawDb) {
-          rawDb.execute(
-            'PRAGMA user_version = ${AppDatabase.currentSchemaVersion}',
-          );
-          rawDb.execute('''
+  test('beforeOpen backstop adds the column when a parallel-branch collision '
+      'stranded a DB past v161 without running the onUpgrade block', () async {
+    final nativeDb = NativeDatabase.memory(
+      setup: (rawDb) {
+        rawDb.execute(
+          'PRAGMA user_version = ${AppDatabase.currentSchemaVersion}',
+        );
+        rawDb.execute('''
           CREATE TABLE buddies (
             id TEXT NOT NULL PRIMARY KEY, diver_id TEXT, name TEXT NOT NULL,
             email TEXT, phone TEXT, photo_path TEXT,
             notes TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL,
             updated_at INTEGER NOT NULL, hlc TEXT)
         ''');
-        },
-      );
-      final db = AppDatabase(nativeDb);
-      addTearDown(db.close);
+      },
+    );
+    final db = AppDatabase(nativeDb);
+    addTearDown(db.close);
 
-      final cols = await db
-          .customSelect("PRAGMA table_info('buddies')")
-          .get();
-      final names = cols.map((c) => c.read<String>('name')).toSet();
-      expect(names, contains('is_favorite'));
-    },
-  );
+    final cols = await db.customSelect("PRAGMA table_info('buddies')").get();
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    expect(names, contains('is_favorite'));
+  });
 
   test('the assert is a no-op when the buddies table is absent', () async {
     final nativeDb = NativeDatabase.memory(

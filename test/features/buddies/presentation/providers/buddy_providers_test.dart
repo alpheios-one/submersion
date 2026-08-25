@@ -242,9 +242,9 @@ void main() {
       final container = makeContainer();
       addTearDown(container.dispose);
 
-      await container.read(buddyListNotifierProvider.notifier).toggleFavorite(
-        buddy.id,
-      );
+      await container
+          .read(buddyListNotifierProvider.notifier)
+          .toggleFavorite(buddy.id);
 
       final updated = await buddyRepo.getBuddyById(buddy.id);
       expect(updated!.isFavorite, isTrue);

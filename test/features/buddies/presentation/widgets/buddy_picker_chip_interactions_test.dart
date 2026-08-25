@@ -50,9 +50,7 @@ Widget _buildPicker({
       allBuddiesWithDiveCountProvider.overrideWith(
         (ref) async => [BuddyWithDiveCount(buddy: _alice, diveCount: 0)],
       ),
-      buddySearchWithDiveCountProvider.overrideWith(
-        (ref, q) async => const [],
-      ),
+      buddySearchWithDiveCountProvider.overrideWith((ref, q) async => const []),
     ],
     child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,

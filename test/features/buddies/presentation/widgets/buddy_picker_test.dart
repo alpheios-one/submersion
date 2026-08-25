@@ -98,9 +98,7 @@ void main() {
             allBuddiesWithDiveCountProvider.overrideWith(
               (ref) async => _testBuddiesWithCount,
             ),
-            buddySearchWithDiveCountProvider.overrideWith(
-              (ref, q) async => [],
-            ),
+            buddySearchWithDiveCountProvider.overrideWith((ref, q) async => []),
           ],
         ),
       );
@@ -444,8 +442,7 @@ void main() {
                 return Future.value(
                   _withCount(
                     _testBuddies.where(
-                      (b) =>
-                          b.name.toLowerCase().contains(query.toLowerCase()),
+                      (b) => b.name.toLowerCase().contains(query.toLowerCase()),
                     ),
                   ),
                 );

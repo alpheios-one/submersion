@@ -323,10 +323,7 @@ void main() {
         expect((await repository.getBuddyById(buddy.id))!.isFavorite, isTrue);
 
         await repository.toggleFavorite(buddy.id);
-        expect(
-          (await repository.getBuddyById(buddy.id))!.isFavorite,
-          isFalse,
-        );
+        expect((await repository.getBuddyById(buddy.id))!.isFavorite, isFalse);
       });
 
       test('setFavorite sets the flag explicitly', () async {
@@ -338,10 +335,7 @@ void main() {
         expect((await repository.getBuddyById(buddy.id))!.isFavorite, isTrue);
 
         await repository.setFavorite(buddy.id, false);
-        expect(
-          (await repository.getBuddyById(buddy.id))!.isFavorite,
-          isFalse,
-        );
+        expect((await repository.getBuddyById(buddy.id))!.isFavorite, isFalse);
       });
     });
 
