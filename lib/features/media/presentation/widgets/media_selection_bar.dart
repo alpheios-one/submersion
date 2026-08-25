@@ -4,15 +4,33 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/helpers/media_share_helper.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
-import 'package:submersion/features/media/presentation/providers/media_selection_provider.dart';
 import 'package:submersion/features/media/presentation/widgets/dive_picker_sheet.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/bulk_action.dart';
+import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_controller.dart';
 
-/// Action bar shown above the library while a selection is active: count,
-/// Move to dive, Share, Unlink (with confirm), and a clear affordance.
+/// The library's contextual bar while a selection is active.
+///
+/// The chrome -- count, close, select all, deselect all, and the overflow --
+/// comes from the shared [SelectionAppBar], so the library cannot drift from
+/// every other selectable surface. This widget contributes only the
+/// media-specific bulk actions and the logic behind them.
 class MediaSelectionBar extends ConsumerWidget {
-  const MediaSelectionBar({super.key, required this.selectedItems});
+  const MediaSelectionBar({
+    super.key,
+    required this.controller,
+    required this.selectableIds,
+    required this.selectedItems,
+  });
+
+  /// The library's selection state machine, shared with the view that hosts
+  /// this bar.
+  final SelectionController controller;
+
+  /// Every id currently on screen, which is what Select All checks.
+  final List<String> selectableIds;
 
   /// The currently selected items, resolved by the caller from the visible
   /// entries so share/unlink operate on real MediaItems.
@@ -70,71 +88,54 @@ class MediaSelectionBar extends ConsumerWidget {
     if (confirmed != true) return;
 
     await ref.read(mediaDeletionCoordinatorProvider).deleteMultipleMedia(ids);
-    ref.read(mediaSelectionProvider.notifier).clear();
+    controller.exit();
   }
 
   Future<void> _moveToDive(BuildContext context, WidgetRef ref) async {
     final diveId = await showDivePickerSheet(context);
     if (diveId == null) return;
     await ref.read(mediaRepositoryProvider).reassignMediaToDive(_ids, diveId);
-    ref.read(mediaSelectionProvider.notifier).clear();
+    controller.exit();
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Material(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.close),
-              tooltip: context.l10n.common_action_cancel,
-              onPressed: () =>
-                  ref.read(mediaSelectionProvider.notifier).clear(),
-            ),
-            Text(
-              context.l10n.media_library_selectedCount(selectedItems.length),
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(width: 8),
-            // Three labelled actions plus the count still overflow a phone
-            // in portrait, so the row scrolls rather than clipping.
-            Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    TextButton.icon(
-                      icon: const Icon(Icons.drive_file_move_outline),
-                      label: Text(context.l10n.media_library_moveToDive),
-                      onPressed: selectedItems.isEmpty
-                          ? null
-                          : () => _moveToDive(context, ref),
-                    ),
-                    TextButton.icon(
-                      icon: const Icon(Icons.share),
-                      label: Text(context.l10n.common_action_share),
-                      onPressed: selectedItems.isEmpty
-                          ? null
-                          : () => shareMediaItems(context, ref, selectedItems),
-                    ),
-                    TextButton.icon(
-                      key: const ValueKey('media_library_unlink'),
-                      icon: const Icon(Icons.link_off),
-                      label: Text(context.l10n.media_library_unlinkSelected),
-                      onPressed: selectedItems.isEmpty
-                          ? null
-                          : () => _unlinkSelected(context, ref),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+    final l10n = context.l10n;
+
+    // [onDelete] is null and Unlink is an ordinary action because this
+    // surface has no control named Delete: unlinking here destroys the rows,
+    // but calling it Delete would claim the source files go too, and they do
+    // not. The shared bar's safety property is kept by other means --
+    // [maxInlineActions] is 2, so the two benign actions hold the inline
+    // slots and the destructive one is reached by open-then-choose, the same
+    // deliberate gesture the baseline delete entry requires.
+    return SelectionAppBar(
+      controller: controller,
+      selectableIds: selectableIds,
+      shell: SelectionBarShell.pane,
+      onDelete: null,
+      maxInlineActions: 2,
+      actions: [
+        BulkAction(
+          id: 'share',
+          icon: Icons.share,
+          label: l10n.common_action_share,
+          onInvoke: () => shareMediaItems(context, ref, selectedItems),
         ),
-      ),
+        BulkAction(
+          id: 'move_to_dive',
+          icon: Icons.drive_file_move_outline,
+          label: l10n.media_library_moveToDive,
+          onInvoke: () => _moveToDive(context, ref),
+        ),
+        BulkAction(
+          id: 'unlink',
+          icon: Icons.link_off,
+          label: l10n.media_library_unlinkSelected,
+          isDestructive: true,
+          onInvoke: () => _unlinkSelected(context, ref),
+        ),
+      ],
     );
   }
 }
