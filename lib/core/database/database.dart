@@ -1812,9 +1812,13 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(false))();
   // v163: whether synthesized ("(est.)") tank pressure lines are drawn on the
   // profile chart at all (issue #731). Defaults to true, preserving the
-  // behavior estimates shipped with.
+  // behavior estimates shipped with. Ignored for coverage for the reason
+  // given below: the declaration is a codegen input, never executed. Its
+  // default is pinned by migration_v163_estimated_tank_pressure_default_test.
+  // coverage:ignore-start
   BoolColumn get defaultShowEstimatedTankPressure =>
       boolean().withDefault(const Constant(true))();
+  // coverage:ignore-end
   // Drift column declarations are codegen inputs shadowed by the generated
   // table at runtime, so this line is never executed (every sibling column
   // getter is likewise uncovered). The default is verified via the migration
