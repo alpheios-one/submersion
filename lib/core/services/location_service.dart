@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
+import 'package:submersion/core/services/geocoding/nominatim_throttle.dart';
 import 'package:submersion/core/services/geocoding/place_lookup.dart';
 import 'package:submersion/core/services/logger_service.dart';
 
@@ -112,6 +113,11 @@ class LocationService {
   static bool debugForceNativeGeocoder = false;
 
   static bool get _useNativeGeocoder => debugForceNativeGeocoder || _isMobile;
+
+  /// Process-wide spacing for every Nominatim request. Tests replace it with
+  /// a zero-gap instance so lookups do not wait a real second each.
+  @visibleForTesting
+  static NominatimThrottle throttle = NominatimThrottle();
 
   static final _log = LoggerService.forClass(LocationService);
   static LocationService? _instance;
@@ -393,6 +399,7 @@ class LocationService {
     Uri url,
     String languageCode,
   ) async {
+    await throttle.wait();
     final client = HttpClient();
     client.userAgent = 'Submersion Dive Log App';
     try {
@@ -419,6 +426,7 @@ class LocationService {
 
       final url = buildForwardGeocodeUri(address);
 
+      await throttle.wait();
       final client = HttpClient();
       client.userAgent = 'Submersion Dive Log App';
 

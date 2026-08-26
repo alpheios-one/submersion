@@ -3,12 +3,16 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' show Locale;
 
+import 'package:clock/clock.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geocoding/geocoding.dart';
 // `geocoding` declares its own app-facing `Geocoding`, which shadows the
 // platform-interface class of the same name that fakes must extend.
 import 'package:geocoding_platform_interface/geocoding_platform_interface.dart'
     as gpi;
+import 'package:submersion/core/services/geocoding/nominatim_throttle.dart';
+import 'package:submersion/core/services/geocoding/place_lookup.dart';
 import 'package:submersion/core/services/location_service.dart';
 
 /// One canned HTTP exchange plus a record of what the service actually sent.
@@ -143,6 +147,10 @@ class _FakeHttpClientResponse extends Stream<List<int>>
 
 void main() {
   final service = LocationService.instance;
+
+  setUp(() {
+    LocationService.throttle = NominatimThrottle(minimumGap: Duration.zero);
+  });
 
   group('Nominatim URIs pin English results (#214)', () {
     test('reverse geocode URI carries the requested accept-language', () {
@@ -741,6 +749,30 @@ void main() {
       expect(result.locality, 'Weggis');
       expect(result.bodyOfWater, isNull);
       expect(result.networkFailed, isFalse);
+    });
+
+    test('the address and natural requests are a second apart', () {
+      fakeAsync((async) {
+        LocationService.throttle = NominatimThrottle();
+        final start = clock.now();
+        final seenAt = <Duration>[];
+        final server = _FakeNominatim(
+          body: jsonEncode(address()),
+          bodyFor: (uri) {
+            seenAt.add(clock.now().difference(start));
+            return uri.queryParameters['layer'] == 'natural'
+                ? jsonEncode({'class': 'water', 'type': 'lake', 'name': 'L'})
+                : null;
+          },
+        );
+        PlaceLookup? result;
+        server
+            .run(() => service.reverseGeocode(47.0, 8.4, languageCode: 'en'))
+            .then((r) => result = r);
+        async.elapse(const Duration(seconds: 1));
+        expect(seenAt, [Duration.zero, const Duration(seconds: 1)]);
+        expect(result?.bodyOfWater, 'L');
+      });
     });
   });
 }
