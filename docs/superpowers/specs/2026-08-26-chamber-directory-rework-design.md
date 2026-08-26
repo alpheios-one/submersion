@@ -110,6 +110,32 @@ diver before and after treatment.
 6. **Unverifiable rows ship flagged, not dropped**, consistent with the tiered
    model in decision 2.
 
+## Implementation notes
+
+Two decisions changed during implementation, both recorded here because they
+contradict what this spec originally said.
+
+**SPUMS is not parsed.** The spec named it as one of four structured sources.
+Its page turned out to be flat prose with no record delimiter: unit names,
+clinicians' names, and several labelled phone numbers per unit run together. A
+trial parser attached the national Diver Emergency Service hotline to a named
+hospital unit and a clinician's name to another unit's switchboard. A wrong
+number in an emergency directory is worse than a missing one, so the twelve
+Australian and New Zealand units are hand-curated instead, and a test asserts
+`parse_spums` does not exist so nobody re-adds it.
+
+**One preserved id was deliberately dropped.** `th-samui` was on the
+preserve list, but the SSS Chamber Network's own site now lists exactly two
+Thai locations, Koh Tao and Phuket, and the only Samui page still reachable
+carries a 2010 copyright. The preserve rule exists to stop a surviving
+facility being silently renamed, not to freeze a chamber that has closed. The
+removal is asserted by its own test, with the reasoning attached.
+
+The verification pass also corrected two rows that had shipped wrong:
+`nz-slark` carried North Shore Hospital's general switchboard rather than the
+hyperbaric unit's own line, and `mt-gozo`'s number had changed. Neither error
+was detectable by schema validation, since both were well-formed numbers.
+
 ## Data model
 
 `assets/data/chambers.json` gains a metadata block and per-row provenance,
