@@ -1695,6 +1695,11 @@ class UddfEntityImporter {
         // Best-effort for the same reason as the registration above, and more
         // pressingly: the dive is already committed, so throwing here would
         // abort the loop and leave a half-imported logbook behind.
+        //
+        // The provenance row below is still stamped on failure, deliberately.
+        // The #1064 beforeOpen heal adopts dives.computer_id from exactly that
+        // column, so leaving it is what recovers the attribution on the next
+        // open; clearing it for symmetry would discard the recovery.
         try {
           await repos.diveComputerRepository?.attributeDiveToComputer(
             diveId: diveId,
@@ -1703,7 +1708,8 @@ class UddfEntityImporter {
         } catch (e, stackTrace) {
           _log.error(
             'Failed to attribute imported dive $diveId to computer '
-            '$computerId; the dive keeps its model snapshot only',
+            '$computerId; the data source keeps the link, so the beforeOpen '
+            'self-heal will adopt it on the next open',
             error: e,
             stackTrace: stackTrace,
           );

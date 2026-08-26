@@ -267,6 +267,52 @@ void main() {
     expect(dives.single.diveComputerModel, 'Perdix 2');
   });
 
+  test(
+    'a failed attribution leaves the provenance link for the self-heal',
+    () async {
+      // Deliberately NOT symmetric: when the dive-level write fails, the
+      // dive_data_sources.computer_id stamp is kept on purpose. The #1064
+      // beforeOpen heal adopts dives.computer_id from exactly that column, so
+      // the breadcrumb is what recovers the attribution on the next open.
+      // Clearing it for tidiness would throw the recovery away.
+      final result = await importer.import(
+        data: UddfImportResult(
+          dives: [diveEntry(day: 1, model: 'Perdix 2', serial: 'SN-1')],
+        ),
+        selections: const UddfImportSelections(dives: {0}),
+        repositories: ImportRepositories(
+          tripRepository: TripRepository(),
+          equipmentRepository: EquipmentRepository(),
+          equipmentSetRepository: EquipmentSetRepository(),
+          buddyRepository: BuddyRepository(),
+          diveCenterRepository: DiveCenterRepository(),
+          certificationRepository: CertificationRepository(),
+          tagRepository: TagRepository(),
+          diveTypeRepository: DiveTypeRepository(),
+          siteRepository: SiteRepository(),
+          diveRepository: DiveRepository(),
+          tankPressureRepository: TankPressureRepository(),
+          courseRepository: CourseRepository(),
+          diveComputerRepository: _AttributionFailingComputerRepository(),
+        ),
+        diverId: diverId,
+      );
+
+      expect(result.dives, 1);
+      final computer = (await db.select(db.diveComputers).get()).single;
+      expect((await db.select(db.dives).get()).single.computerId, isNull);
+      expect(
+        (await db.select(db.diveDataSources).get()).single.computerId,
+        computer.id,
+      );
+
+      // The next app open recovers it.
+      await db.backfillDiveComputerIdsForTest();
+
+      expect((await db.select(db.dives).get()).single.computerId, computer.id);
+    },
+  );
+
   test('adopts a computer already registered by a download', () async {
     // The download path stores vendor and product separately; the file
     // carries them as one string. The dive must join the existing device,
@@ -307,4 +353,14 @@ class _FailingComputerRepository extends DiveComputerRepository {
     String? firmwareVersion,
     String? diverId,
   }) async => throw StateError('registry unavailable');
+}
+
+/// Registers normally but cannot write the dive-level attribution, to pin
+/// that the provenance link survives for the #1064 self-heal.
+class _AttributionFailingComputerRepository extends DiveComputerRepository {
+  @override
+  Future<void> attributeDiveToComputer({
+    required String diveId,
+    required String computerId,
+  }) async => throw StateError('dives table unavailable');
 }

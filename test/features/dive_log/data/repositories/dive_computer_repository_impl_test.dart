@@ -1363,6 +1363,36 @@ void main() {
       expect(await db.select(db.diveComputers).get(), hasLength(1));
     });
 
+    test('breaks a tie on id so every device resolves alike', () async {
+      // matchImportedComputer's contract is that candidates arrive in a
+      // deterministic preference order. Ordering on updatedAt alone leaves
+      // same-timestamp rows in whatever order SQLite happens to return, so
+      // two devices could attribute the same dives to different rows.
+      await insertComputer(
+        id: 'dc-z',
+        diverId: 'diver-1',
+        manufacturer: null,
+        model: 'Perdix 2',
+        serialNumber: null,
+      );
+      await insertComputer(
+        id: 'dc-a',
+        diverId: 'diver-1',
+        manufacturer: null,
+        model: 'Perdix 2',
+        serialNumber: null,
+      );
+      // Same updatedAt on both, which insertComputer already guarantees.
+      await db.customStatement('UPDATE dive_computers SET updated_at = 1000');
+
+      final computer = await repository.findOrRegisterImportedComputer(
+        model: 'Perdix 2',
+        diverId: 'diver-1',
+      );
+
+      expect(computer!.id, 'dc-a');
+    });
+
     test('registers nothing when the model is blank', () async {
       final computer = await repository.findOrRegisterImportedComputer(
         model: '   ',

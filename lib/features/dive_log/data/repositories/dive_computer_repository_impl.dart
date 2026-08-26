@@ -1671,8 +1671,15 @@ class DiveComputerRepository {
       final normalizedModel = normalizeComputerIdentityPart(model);
       if (normalizedModel.isEmpty) return null;
 
+      // Most recently updated first, ties broken on id: matchImportedComputer
+      // takes the first candidate that matches, so an unstable order would let
+      // two devices attribute the same dives to different rows. Mirrors the
+      // backfill's `ORDER BY updated_at DESC, id`.
       final query = _db.select(_db.diveComputers)
-        ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)]);
+        ..orderBy([
+          (t) => OrderingTerm.desc(t.updatedAt),
+          (t) => OrderingTerm.asc(t.id),
+        ]);
       final normalizedDiverId = diverId?.trim();
       if (normalizedDiverId != null && normalizedDiverId.isNotEmpty) {
         query.where((t) => t.diverId.equals(normalizedDiverId));
