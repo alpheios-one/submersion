@@ -14510,6 +14510,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_appearance_metric_events => 'Ereignisse';
 
   @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Geschätzter Flaschendruck';
+
+  @override
   String get settings_appearance_metric_gasDensity => 'Gasdichte';
 
   @override

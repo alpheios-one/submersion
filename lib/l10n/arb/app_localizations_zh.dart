@@ -13845,6 +13845,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_appearance_metric_events => '事件';
 
   @override
+  String get settings_appearance_metric_estimatedTankPressure => '估算气瓶压力';
+
+  @override
   String get settings_appearance_metric_gasDensity => '气体密度';
 
   @override

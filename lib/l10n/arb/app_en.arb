@@ -8671,6 +8671,10 @@
   "settings_appearance_metric_ascentRateColors": "Ascent Rate Colors",
   "settings_appearance_metric_ceiling": "Ceiling",
   "settings_appearance_metric_events": "Events",
+  "settings_appearance_metric_estimatedTankPressure": "Estimated Tank Pressure",
+  "@settings_appearance_metric_estimatedTankPressure": {
+    "description": "Settings switch that turns off the synthesized (estimated) tank pressure line on the dive profile chart."
+  },
   "settings_appearance_metric_gasDensity": "Gas Density",
   "settings_appearance_metric_gfPercent": "GF%",
   "settings_appearance_metric_heartRate": "Heart Rate",
