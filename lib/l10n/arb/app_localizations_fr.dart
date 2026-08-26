@@ -804,6 +804,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'Redimensionner le panneau principal';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Partagé avec tous les profils de plongée';
 
@@ -15376,6 +15380,119 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_conflict_previous_tooltip => 'Conflit precedent';
 
   @override
+  String get settings_conflict_ref_buddy => 'Binome';
+
+  @override
+  String get settings_conflict_ref_certification => 'Certification';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate =>
+      'Modele de liste de controle';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Compte connecte';
+
+  @override
+  String get settings_conflict_ref_course => 'Cours';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'Exigence du cours';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Configuration de blocs';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Source de donnees';
+
+  @override
+  String get settings_conflict_ref_dive => 'Plongee';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Centre de plongee';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Ordinateur de plongee';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Plan de plongee';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Site de plongee';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Type de plongee';
+
+  @override
+  String get settings_conflict_ref_diver => 'Plongeur';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Equipement';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Ensemble d\'equipement';
+
+  @override
+  String get settings_conflict_ref_finding => 'Anomalie';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Moniteur';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Plongee liee';
+
+  @override
+  String get settings_conflict_ref_media => 'Medias';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Abonnement media';
+
+  @override
+  String get settings_conflict_ref_missing =>
+      'N\'est plus dans cette bibliotheque';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Bloc planifie';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Modele de liste avant plongee';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'Liste avant plongee';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Plongee associee';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Type de revision';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Observation';
+
+  @override
+  String get settings_conflict_ref_signer => 'Signe par';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Plongee source';
+
+  @override
+  String get settings_conflict_ref_species => 'Especes';
+
+  @override
+  String get settings_conflict_ref_tag => 'Etiquette';
+
+  @override
+  String get settings_conflict_ref_tank => 'Bloc';
+
+  @override
+  String get settings_conflict_ref_trip => 'Voyage';
+
+  @override
   String get settings_conflict_remoteVersion => 'Version distante';
 
   @override
@@ -18152,6 +18269,43 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => 'Tags';
+
+  @override
+  String get importWizard_photos_stepLabel => 'Photos';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos référencées dans ce carnet',
+      one: '1 photo référencée dans ce carnet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder =>
+      'Choisir un dossier de photos...';
+
+  @override
+  String get importWizard_photos_scanning => 'Analyse du dossier...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched associées, $byName par nom de fichier uniquement, $missing introuvables';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Ignorer les photos';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'L\'import de photos nécessite un dossier sur le disque de cet appareil. Lancez cet import sur un ordinateur pour les inclure. Les plongées et les sites s\'importent normalement.';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -21203,6 +21357,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'Tags';
+
+  @override
+  String get diveImport_uddf_media => 'Photos';
 
   @override
   String get diveImport_uddf_title => 'Import depuis UDDF';
@@ -32979,6 +33136,46 @@ class AppLocalizationsFr extends AppLocalizations {
   String media_info_lastChecked(String date) {
     return 'Dernière vérification $date';
   }
+
+  @override
+  String get media_timeInDive_label => 'Moment dans la plongée';
+
+  @override
+  String get media_timeInDive_unknown => 'Moment dans la plongée inconnu';
+
+  @override
+  String get media_timeInDive_setAction => 'Définir le moment dans la plongée';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (défini manuellement)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel =>
+      'Temps depuis le début de la plongée';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Entre 0:00 et $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Saisissez un temps entre 0:00 et $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Enregistrer';
+
+  @override
+  String get media_timeInDive_cancel => 'Annuler';
+
+  @override
+  String get media_timeInDive_reset => 'Rétablir le mode automatique';
 
   @override
   String get media_info_backupSection => 'Sauvegarde';

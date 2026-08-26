@@ -792,6 +792,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'تغيير حجم اللوحة الرئيسية';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'مشترك مع جميع ملفات الغوص';
 
@@ -15061,6 +15065,117 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_previous_tooltip => 'التعارض السابق';
 
   @override
+  String get settings_conflict_ref_buddy => 'رفيق الغوص';
+
+  @override
+  String get settings_conflict_ref_certification => 'الشهادة';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'قالب قائمة التحقق';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'الحساب المتصل';
+
+  @override
+  String get settings_conflict_ref_course => 'الدورة';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'متطلب الدورة';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'إعداد الأسطوانات';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'مصدر البيانات';
+
+  @override
+  String get settings_conflict_ref_dive => 'الغوصة';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'مركز الغوص';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'حاسوب الغوص';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'خطة الغوص';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'موقع الغوص';
+
+  @override
+  String get settings_conflict_ref_diveType => 'نوع الغوصة';
+
+  @override
+  String get settings_conflict_ref_diver => 'الغواص';
+
+  @override
+  String get settings_conflict_ref_equipment => 'المعدات';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'طقم المعدات';
+
+  @override
+  String get settings_conflict_ref_finding => 'الملاحظة';
+
+  @override
+  String get settings_conflict_ref_instructor => 'المدرب';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'الغوصة المرتبطة';
+
+  @override
+  String get settings_conflict_ref_media => 'الوسائط';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'اشتراك الوسائط';
+
+  @override
+  String get settings_conflict_ref_missing => 'لم تعد موجودة في هذه المكتبة';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'الأسطوانة المخططة';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'قالب قائمة التحقق قبل الغوص';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'قائمة التحقق قبل الغوص';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'الغوصة ذات الصلة';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'نوع الصيانة';
+
+  @override
+  String get settings_conflict_ref_sighting => 'المشاهدة';
+
+  @override
+  String get settings_conflict_ref_signer => 'وقّع بواسطة';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'الغوصة المصدر';
+
+  @override
+  String get settings_conflict_ref_species => 'الأنواع';
+
+  @override
+  String get settings_conflict_ref_tag => 'الوسم';
+
+  @override
+  String get settings_conflict_ref_tank => 'الأسطوانة';
+
+  @override
+  String get settings_conflict_ref_trip => 'الرحلة';
+
+  @override
   String get settings_conflict_remoteVersion => 'النسخة البعيدة';
 
   @override
@@ -17754,6 +17869,42 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => 'Tags';
+
+  @override
+  String get importWizard_photos_stepLabel => 'الصور';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صور مشار إليها في هذا السجل',
+      one: 'صورة واحدة مشار إليها في هذا السجل',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'اختر مجلد الصور...';
+
+  @override
+  String get importWizard_photos_scanning => 'جارٍ فحص المجلد...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched مطابقة، $byName بالاسم فقط، $missing غير موجودة';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'تخطي الصور';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'يتطلب استيراد الصور مجلدًا على قرص هذا الجهاز. شغّل هذا الاستيراد على جهاز كمبيوتر لتضمينها. تُستورد الغطسات والمواقع بشكل طبيعي.';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -20751,6 +20902,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'الوسوم';
+
+  @override
+  String get diveImport_uddf_media => 'الصور';
 
   @override
   String get diveImport_uddf_title => 'استيراد من UDDF';
@@ -32583,6 +32737,45 @@ class AppLocalizationsAr extends AppLocalizations {
   String media_info_lastChecked(String date) {
     return 'آخر فحص $date';
   }
+
+  @override
+  String get media_timeInDive_label => 'الوقت في الغوصة';
+
+  @override
+  String get media_timeInDive_unknown => 'الوقت في الغوصة غير معروف';
+
+  @override
+  String get media_timeInDive_setAction => 'تعيين الوقت في الغوصة';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (تم تعيينه يدويًا)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'الوقت من بداية الغوصة';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'بين 0:00 و $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'أدخل وقتًا بين 0:00 و $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'حفظ';
+
+  @override
+  String get media_timeInDive_cancel => 'إلغاء';
+
+  @override
+  String get media_timeInDive_reset => 'إعادة التعيين إلى التلقائي';
 
   @override
   String get media_info_backupSection => 'النسخ الاحتياطي';

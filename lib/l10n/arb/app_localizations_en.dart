@@ -788,6 +788,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane => 'Resize master pane';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Shared with all dive profiles';
 
@@ -15079,6 +15082,117 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_conflict_previous_tooltip => 'Previous conflict';
 
   @override
+  String get settings_conflict_ref_buddy => 'Buddy';
+
+  @override
+  String get settings_conflict_ref_certification => 'Certification';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'Checklist template';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Connected account';
+
+  @override
+  String get settings_conflict_ref_course => 'Course';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'Course requirement';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Cylinder configuration';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Data source';
+
+  @override
+  String get settings_conflict_ref_dive => 'Dive';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Dive center';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Dive computer';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Dive plan';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Dive site';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Dive type';
+
+  @override
+  String get settings_conflict_ref_diver => 'Diver';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Equipment';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Equipment set';
+
+  @override
+  String get settings_conflict_ref_finding => 'Finding';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Instructor';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Linked dive';
+
+  @override
+  String get settings_conflict_ref_media => 'Media';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Media subscription';
+
+  @override
+  String get settings_conflict_ref_missing => 'No longer in this library';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Planned tank';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Pre-dive checklist template';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'Pre-dive checklist run';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Related dive';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Service type';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Sighting';
+
+  @override
+  String get settings_conflict_ref_signer => 'Signed by';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Source dive';
+
+  @override
+  String get settings_conflict_ref_species => 'Species';
+
+  @override
+  String get settings_conflict_ref_tag => 'Tag';
+
+  @override
+  String get settings_conflict_ref_tank => 'Tank';
+
+  @override
+  String get settings_conflict_ref_trip => 'Trip';
+
+  @override
   String get settings_conflict_remoteVersion => 'Remote Version';
 
   @override
@@ -17773,6 +17887,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => 'Tags';
+
+  @override
+  String get importWizard_photos_stepLabel => 'Photos';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos referenced in this logbook',
+      one: '1 photo referenced in this logbook',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'Choose photo folder...';
+
+  @override
+  String get importWizard_photos_scanning => 'Scanning folder...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched matched, $byName by filename only, $missing not found';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Skip photos';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'Importing photos needs a folder on this device\'s disk. Run this import on a computer to include them. Dives and sites import normally.';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -20773,6 +20923,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'Tags';
+
+  @override
+  String get diveImport_uddf_media => 'Photos';
 
   @override
   String get diveImport_uddf_title => 'Import from UDDF';
@@ -32378,6 +32531,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String media_info_lastChecked(String date) {
     return 'Last checked $date';
   }
+
+  @override
+  String get media_timeInDive_label => 'Time in dive';
+
+  @override
+  String get media_timeInDive_unknown => 'Time in dive unknown';
+
+  @override
+  String get media_timeInDive_setAction => 'Set time in dive';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (set manually)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'Time from dive start';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Between 0:00 and $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Enter a time between 0:00 and $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Save';
+
+  @override
+  String get media_timeInDive_cancel => 'Cancel';
+
+  @override
+  String get media_timeInDive_reset => 'Reset to automatic';
 
   @override
   String get media_info_backupSection => 'Backup';
