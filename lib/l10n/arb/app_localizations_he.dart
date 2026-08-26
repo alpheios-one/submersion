@@ -23435,6 +23435,11 @@ class AppLocalizationsHe extends AppLocalizations {
       'לאתר זה רשום גובה אך לצלילה אין, ולכן ניתוח הדקומפרסיה הניח גובה פני הים. הגדר את גובה הצלילה כדי לתקן.';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return 'הוסף נפח בלון כדי להציג קצב SAC ב-$unit/min';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return 'איסור טיסה: נותרו $remaining';
   }

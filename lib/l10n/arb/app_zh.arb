@@ -7214,6 +7214,7 @@
   },
   "diveLog_detail_altitudeMismatch_title": "潜点位于高海拔",
   "diveLog_detail_altitudeMismatch_subtitle": "该潜点记录了海拔,但此次潜水未设置海拔,因此减压分析按海平面计算。请设置潜水海拔以更正。",
+  "diveLog_detail_sacVolumeHint": "添加气瓶容积以按 {unit}/min 显示气体消耗率",
   "emergencyCard_title": "紧急情况",
   "emergencyCard_callDan": "呼叫 {name}",
   "@emergencyCard_callDan": {

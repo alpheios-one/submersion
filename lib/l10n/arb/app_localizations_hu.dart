@@ -23944,6 +23944,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ehhez a helyhez magasság van rögzítve, a merüléshez azonban nincs, így a dekompressziós elemzés tengerszintet feltételezett. A javításhoz állítsd be a merülés magasságát.';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return 'Add meg a palack térfogatát, hogy a SAC érték $unit/min-ben jelenjen meg';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return 'Repülési tilalom: $remaining van hátra';
   }

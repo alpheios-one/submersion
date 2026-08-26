@@ -22833,6 +22833,11 @@ class AppLocalizationsZh extends AppLocalizations {
       '该潜点记录了海拔,但此次潜水未设置海拔,因此减压分析按海平面计算。请设置潜水海拔以更正。';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return '添加气瓶容积以按 $unit/min 显示气体消耗率';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return '禁飞:剩余 $remaining';
   }
