@@ -24256,6 +24256,68 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get emergencyCard_chambersNearby => 'Câmaras mais próximas';
+
+  @override
+  String emergencyCard_chamberViewAll(int count) {
+    return 'Ver todas as $count câmaras';
+  }
+
+  @override
+  String get emergencyCard_chambersNoneNearby =>
+      'Nenhuma câmara listada dentro do alcance. Ligue para a linha de emergência para mergulhadores: eles encaminharão você para a unidade mais próxima capaz de tratá-lo.';
+
+  @override
+  String get emergencyCard_chamberCapability_divingEmergency =>
+      'Trata acidentes de mergulho';
+
+  @override
+  String get emergencyCard_chamberCapability_hyperbaricUnit =>
+      'Unidade hiperbárica hospitalar';
+
+  @override
+  String get emergencyCard_chamberCapability_elective =>
+      'Apenas terapia eletiva';
+
+  @override
+  String get emergencyCard_chamberCapability_unknown =>
+      'Capacidade não confirmada';
+
+  @override
+  String get emergencyCard_chamberAvailability_h24 => '24 h';
+
+  @override
+  String get emergencyCard_chamberAvailability_onCall => 'De sobreaviso';
+
+  @override
+  String get emergencyCard_chamberAvailability_businessHours =>
+      'Horário comercial';
+
+  @override
+  String get emergencyCard_chamberUnverified => 'Não confirmado com a unidade';
+
+  @override
+  String get chambersDirectory_title => 'Câmaras hiperbáricas';
+
+  @override
+  String get chambersDirectory_search => 'Pesquisar por nome, cidade ou país';
+
+  @override
+  String get chambersDirectory_empty =>
+      'Nenhuma câmara corresponde a essa pesquisa.';
+
+  @override
+  String chambersDirectory_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count câmaras',
+      one: '1 câmara',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get emergencyCard_hideChamber => 'Ocultar';
 
   @override

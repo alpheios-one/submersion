@@ -23833,6 +23833,64 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get emergencyCard_chambersNearby => 'أقرب غرف الضغط';
+
+  @override
+  String emergencyCard_chamberViewAll(int count) {
+    return 'عرض جميع غرف الضغط ($count)';
+  }
+
+  @override
+  String get emergencyCard_chambersNoneNearby =>
+      'لا توجد غرفة ضغط ضمن النطاق. اتصل بخط الطوارئ للغواصين: سيحيلونك إلى أقرب منشأة قادرة على علاجك.';
+
+  @override
+  String get emergencyCard_chamberCapability_divingEmergency =>
+      'يعالج إصابات الغوص';
+
+  @override
+  String get emergencyCard_chamberCapability_hyperbaricUnit =>
+      'وحدة ضغط عالٍ بمستشفى';
+
+  @override
+  String get emergencyCard_chamberCapability_elective => 'علاج مجدول فقط';
+
+  @override
+  String get emergencyCard_chamberCapability_unknown => 'القدرة غير مؤكدة';
+
+  @override
+  String get emergencyCard_chamberAvailability_h24 => '٢٤ ساعة';
+
+  @override
+  String get emergencyCard_chamberAvailability_onCall => 'تحت الطلب';
+
+  @override
+  String get emergencyCard_chamberAvailability_businessHours => 'ساعات العمل';
+
+  @override
+  String get emergencyCard_chamberUnverified => 'غير مؤكد مع المنشأة';
+
+  @override
+  String get chambersDirectory_title => 'غرف الضغط العالي';
+
+  @override
+  String get chambersDirectory_search => 'ابحث بالاسم أو المدينة أو الدولة';
+
+  @override
+  String get chambersDirectory_empty => 'لا توجد غرفة ضغط تطابق البحث.';
+
+  @override
+  String chambersDirectory_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غرف ضغط',
+      one: 'غرفة ضغط واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get emergencyCard_hideChamber => 'إخفاء';
 
   @override

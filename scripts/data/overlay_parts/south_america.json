@@ -1,0 +1,117 @@
+{
+  "chambers": [
+    {
+      "id": "ec-galapagos-puerto-ayora",
+      "name": "SSS Recompression Chamber Network Galapagos (Protesub)",
+      "country": "EC",
+      "city": "Puerto Ayora, Santa Cruz",
+      "phone": "+593-5-252-6911",
+      "emergencyPhone": "+593-984-488-231",
+      "capability": "diving_emergency",
+      "availability": "h24",
+      "verified": {"date": "2026-08-26", "via": "facility", "url": "https://www.sssnetwork.com/pages/galapagoshome.html"}
+    },
+    {
+      "id": "co-san-andres",
+      "name": "Hospital Departamental Amor de Patria, Camara Hiperbarica",
+      "country": "CO",
+      "city": "San Andres",
+      "phone": "+57-8-512-0753",
+      "capability": "diving_emergency",
+      "availability": "unknown",
+      "verified": {"date": "2026-08-26", "via": "registry", "url": "https://tic.sanandres.gov.co/index.php/prensa/enterese/noticias/151-rotador-de-noticias/2617-gobierno-departamental-inicio-instalacion-de-camara-hiperbarica-en-hospital-amor-de-patria-de-san-andres"}
+    },
+    {
+      "id": "co-cartagena-honac",
+      "name": "Hospital Naval de Cartagena (HONAC), Centro Hiperbarico del Caribe",
+      "country": "CO",
+      "city": "Cartagena",
+      "phone": "+57-605-677-8021",
+      "capability": "diving_emergency",
+      "availability": "h24",
+      "verified": {"date": "2026-08-26", "via": "registry", "url": "https://info-hospitales.epsenlinea.com.co/hospital-naval-de-cartagena-honac/"}
+    },
+    {
+      "id": "co-bogota-baromedica",
+      "name": "Baromedica Camara Hiperbarica",
+      "country": "CO",
+      "city": "Bogota",
+      "phone": "+57-313-801-7840",
+      "capability": "elective",
+      "availability": "unknown",
+      "verified": {"date": "2026-08-26", "via": "facility", "url": "https://www.baromedica.com/"}
+    },
+    {
+      "id": "br-fernando-de-noronha",
+      "name": "Hospital Sao Lucas, Camara Hiperbarica",
+      "country": "BR",
+      "city": "Fernando de Noronha, PE",
+      "phone": "+55-81-3619-0923",
+      "capability": "diving_emergency",
+      "availability": "on_call",
+      "verified": {"date": "2026-08-26", "via": "registry", "url": "https://portal.saude.pe.gov.br/hospitais/hospital-sao-lucas/"}
+    },
+    {
+      "id": "ar-buenos-aires-hiperbayres",
+      "name": "Hiperbayres, Centro de Medicina Subacuatica e Hiperbarica",
+      "country": "AR",
+      "city": "Buenos Aires",
+      "phone": "+54-11-4572-6203",
+      "emergencyPhone": "+54-11-15-5014-8196",
+      "capability": "diving_emergency",
+      "availability": "h24",
+      "verified": {"date": "2026-08-26", "via": "facility", "url": "https://www.hiperbayres.com.ar/"}
+    },
+    {
+      "id": "ar-buenos-aires-hospital-naval",
+      "name": "Hospital Naval Buenos Aires, Camara Hiperbarica",
+      "country": "AR",
+      "city": "Buenos Aires",
+      "phone": "+54-11-4864-7899",
+      "capability": "hyperbaric_unit",
+      "availability": "unknown",
+      "verified": {"date": "2026-08-26", "via": "registry", "url": "https://www.hiperbayres.com.ar/centros.html"}
+    },
+    {
+      "id": "ar-mar-del-plata-escuela-buceo",
+      "name": "Escuela de Submarinos y Buceo, Camara Hiperbarica",
+      "country": "AR",
+      "city": "Mar del Plata",
+      "phone": "+54-223-451-9907",
+      "capability": "diving_emergency",
+      "availability": "unknown",
+      "verified": {"date": "2026-08-26", "via": "registry", "url": "https://www.hiperbayres.com.ar/centros.html"}
+    },
+    {
+      "id": "ar-mar-del-plata-cmh",
+      "name": "Centro de Medicina Hiperbarica Mar del Plata",
+      "country": "AR",
+      "city": "Mar del Plata",
+      "phone": "+54-223-473-7870",
+      "emergencyPhone": "+54-223-155-240960",
+      "capability": "diving_emergency",
+      "availability": "on_call",
+      "verified": {"date": "2026-08-26", "via": "registry", "url": "https://www.hiperbayres.com.ar/centros.html"}
+    },
+    {
+      "id": "ar-puerto-belgrano",
+      "name": "Hospital Naval Puerto Belgrano, Camara Hiperbarica",
+      "country": "AR",
+      "city": "Puerto Belgrano, Punta Alta",
+      "phone": "+54-2932-489698",
+      "capability": "diving_emergency",
+      "availability": "h24",
+      "verified": {"date": "2026-08-26", "via": "registry", "url": "https://gacetamarinera.com.ar/nota/1395?title=La-C%C3%A1mara-Hiperb%C3%A1rica-del-Hospital-Naval-Puerto-Belgrano-salva-vidas"}
+    },
+    {
+      "id": "ar-ushuaia",
+      "name": "Hospital Naval Ushuaia, Camara Hiperbarica",
+      "country": "AR",
+      "city": "Ushuaia",
+      "phone": "+54-2901-42-2038",
+      "capability": "hyperbaric_unit",
+      "availability": "unknown",
+      "verified": {"date": "2026-08-26", "via": "registry", "url": "https://www.hiperbayres.com.ar/centros.html"}
+    }
+  ]
+}

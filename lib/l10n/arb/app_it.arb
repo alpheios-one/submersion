@@ -7325,6 +7325,35 @@
       }
     }
   },
+  "emergencyCard_chambersNearby": "Camere più vicine",
+  "emergencyCard_chamberViewAll": "Vedi tutte le {count} camere",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "Nessuna camera nel raggio disponibile. Chiama la linea di emergenza per subacquei: ti indirizzerà al centro più vicino in grado di trattarti.",
+  "emergencyCard_chamberCapability_divingEmergency": "Tratta gli incidenti subacquei",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "Unità iperbarica ospedaliera",
+  "emergencyCard_chamberCapability_elective": "Solo terapia elettiva",
+  "emergencyCard_chamberCapability_unknown": "Capacità non confermata",
+  "emergencyCard_chamberAvailability_h24": "24 h",
+  "emergencyCard_chamberAvailability_onCall": "Reperibilità",
+  "emergencyCard_chamberAvailability_businessHours": "Orario di servizio",
+  "emergencyCard_chamberUnverified": "Non confermato con il centro",
+  "chambersDirectory_title": "Camere iperbariche",
+  "chambersDirectory_search": "Cerca per nome, città o paese",
+  "chambersDirectory_empty": "Nessuna camera corrisponde alla ricerca.",
+  "chambersDirectory_count": "{count, plural, =1{1 camera} other{{count} camere}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "emergencyCard_hideChamber": "Nascondi",
   "emergencyCard_chamberHidden": "Camera nascosta",
   "emergencyCard_undo": "Annulla",

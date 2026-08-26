@@ -7325,6 +7325,35 @@
       }
     }
   },
+  "emergencyCard_chambersNearby": "Câmaras mais próximas",
+  "emergencyCard_chamberViewAll": "Ver todas as {count} câmaras",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "Nenhuma câmara listada dentro do alcance. Ligue para a linha de emergência para mergulhadores: eles encaminharão você para a unidade mais próxima capaz de tratá-lo.",
+  "emergencyCard_chamberCapability_divingEmergency": "Trata acidentes de mergulho",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "Unidade hiperbárica hospitalar",
+  "emergencyCard_chamberCapability_elective": "Apenas terapia eletiva",
+  "emergencyCard_chamberCapability_unknown": "Capacidade não confirmada",
+  "emergencyCard_chamberAvailability_h24": "24 h",
+  "emergencyCard_chamberAvailability_onCall": "De sobreaviso",
+  "emergencyCard_chamberAvailability_businessHours": "Horário comercial",
+  "emergencyCard_chamberUnverified": "Não confirmado com a unidade",
+  "chambersDirectory_title": "Câmaras hiperbáricas",
+  "chambersDirectory_search": "Pesquisar por nome, cidade ou país",
+  "chambersDirectory_empty": "Nenhuma câmara corresponde a essa pesquisa.",
+  "chambersDirectory_count": "{count, plural, =1{1 câmara} other{{count} câmaras}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "emergencyCard_hideChamber": "Ocultar",
   "emergencyCard_chamberHidden": "Câmara ocultada",
   "emergencyCard_undo": "Desfazer",

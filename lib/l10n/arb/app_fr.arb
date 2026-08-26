@@ -7325,6 +7325,35 @@
       }
     }
   },
+  "emergencyCard_chambersNearby": "Caissons les plus proches",
+  "emergencyCard_chamberViewAll": "Voir les {count} caissons",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "Aucun caisson listé à proximité. Appelez la ligne d'urgence plongée : elle vous orientera vers l'établissement le plus proche capable de vous traiter.",
+  "emergencyCard_chamberCapability_divingEmergency": "Traite les accidents de plongée",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "Unité hyperbare hospitalière",
+  "emergencyCard_chamberCapability_elective": "Thérapie programmée uniquement",
+  "emergencyCard_chamberCapability_unknown": "Capacité non confirmée",
+  "emergencyCard_chamberAvailability_h24": "24 h/24",
+  "emergencyCard_chamberAvailability_onCall": "Astreinte",
+  "emergencyCard_chamberAvailability_businessHours": "Heures ouvrables",
+  "emergencyCard_chamberUnverified": "Non confirmé auprès de l'établissement",
+  "chambersDirectory_title": "Caissons hyperbares",
+  "chambersDirectory_search": "Rechercher par nom, ville ou pays",
+  "chambersDirectory_empty": "Aucun caisson ne correspond à cette recherche.",
+  "chambersDirectory_count": "{count, plural, =1{1 caisson} other{{count} caissons}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "emergencyCard_hideChamber": "Masquer",
   "emergencyCard_chamberHidden": "Caisson masqué",
   "emergencyCard_undo": "Annuler",

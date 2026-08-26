@@ -7325,6 +7325,35 @@
       }
     }
   },
+  "emergencyCard_chambersNearby": "Dichtstbijzijnde caissons",
+  "emergencyCard_chamberViewAll": "Alle {count} caissons bekijken",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "Geen caisson binnen bereik. Bel de duikers-noodlijn: zij verwijzen u door naar de dichtstbijzijnde instelling die u kan behandelen.",
+  "emergencyCard_chamberCapability_divingEmergency": "Behandelt duikongevallen",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "Hyperbare afdeling ziekenhuis",
+  "emergencyCard_chamberCapability_elective": "Alleen electieve therapie",
+  "emergencyCard_chamberCapability_unknown": "Mogelijkheden niet bevestigd",
+  "emergencyCard_chamberAvailability_h24": "24 uur",
+  "emergencyCard_chamberAvailability_onCall": "Oproepbaar",
+  "emergencyCard_chamberAvailability_businessHours": "Kantooruren",
+  "emergencyCard_chamberUnverified": "Niet bevestigd bij de instelling",
+  "chambersDirectory_title": "Hyperbare caissons",
+  "chambersDirectory_search": "Zoeken op naam, stad of land",
+  "chambersDirectory_empty": "Geen caisson komt overeen met die zoekopdracht.",
+  "chambersDirectory_count": "{count, plural, =1{1 caisson} other{{count} caissons}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "emergencyCard_hideChamber": "Verbergen",
   "emergencyCard_chamberHidden": "Kamer verborgen",
   "emergencyCard_undo": "Ongedaan maken",

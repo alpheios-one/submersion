@@ -15588,6 +15588,35 @@
       }
     }
   },
+  "emergencyCard_chambersNearby": "Nearest chambers",
+  "emergencyCard_chamberViewAll": "View all {count} chambers",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "No chamber listed within range. Call the diver emergency hotline: they will route you to the nearest facility that can treat you.",
+  "emergencyCard_chamberCapability_divingEmergency": "Treats diving injuries",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "Hospital hyperbaric unit",
+  "emergencyCard_chamberCapability_elective": "Elective therapy only",
+  "emergencyCard_chamberCapability_unknown": "Capability unconfirmed",
+  "emergencyCard_chamberAvailability_h24": "24h",
+  "emergencyCard_chamberAvailability_onCall": "On call",
+  "emergencyCard_chamberAvailability_businessHours": "Business hours",
+  "emergencyCard_chamberUnverified": "Not confirmed with the facility",
+  "chambersDirectory_title": "Hyperbaric chambers",
+  "chambersDirectory_search": "Search by name, city or country",
+  "chambersDirectory_empty": "No chamber matches that search.",
+  "chambersDirectory_count": "{count, plural, =1{1 chamber} other{{count} chambers}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "emergencyCard_hideChamber": "Hide",
   "emergencyCard_chamberHidden": "Chamber hidden",
   "emergencyCard_undo": "Undo",

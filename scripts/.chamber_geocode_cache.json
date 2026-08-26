@@ -1,0 +1,440 @@
+{
+  "FR|(EPAT) 4eme régiment du Génie": null,
+  "FR|130 traverse de la Gouffone": null,
+  "FR|29 av de Lattre de Tassigny": {
+    "lat": 50.7272543,
+    "lon": 1.6195927
+  },
+  "FR|55 bd Port Royal": {
+    "lat": 48.8378311,
+    "lon": 2.3436796
+  },
+  "FR|74 BD Port Royal": {
+    "lat": 48.8380892,
+    "lon": 2.3442424
+  },
+  "FR|Aix en Provence": {
+    "lat": 43.5298424,
+    "lon": 5.4474738
+  },
+  "FR|Ajaccio": {
+    "lat": 41.9263991,
+    "lon": 8.7376029
+  },
+  "FR|Angers": {
+    "lat": 47.4739884,
+    "lon": -0.5515588
+  },
+  "FR|Besançon": {
+    "lat": 47.2380222,
+    "lon": 6.0243622
+  },
+  "FR|Bordeaux": {
+    "lat": 44.841225,
+    "lon": -0.5800364
+  },
+  "FR|Brest": {
+    "lat": 48.3905283,
+    "lon": -4.4860088
+  },
+  "FR|C.H.R.U Jean Minjoz, Besançon": null,
+  "FR|C.H.U. de la Cavale Blanche, Brest": null,
+  "FR|Centre Hospitalier Pointe à Pitre (les Abymes)": {
+    "lat": 16.2371398,
+    "lon": -61.5254467
+  },
+  "FR|Centre Hospitalier Régional d'Angers, Angers": null,
+  "FR|Centre Hyperbare Hôpital Font-Pré, Toulon": null,
+  "FR|Centre Régional d'examen médical du personnel de la 2ème région maritime": null,
+  "FR|Centre Régional de Médecine Hyperbare, Lille": null,
+  "FR|Centre chirurgical Porte de Pantin, Paris": null,
+  "FR|Centre de médecine hyperbare, Perpignan": null,
+  "FR|Centre hospitalier Fort de France": {
+    "lat": 14.6873041,
+    "lon": -61.0872119
+  },
+  "FR|Centre hospitalier de la Miséricorde, Ajaccio": null,
+  "FR|Cherbourg": {
+    "lat": 49.6425343,
+    "lon": -1.6249565
+  },
+  "FR|Clinique Cardiovasculaire Valmante, 130 traverse de la Gouffone": null,
+  "FR|Clinique d'Angiologie, Aix en Provence": null,
+  "FR|Dakar Unité Marine Cap-Vert": null,
+  "FR|Direction du Port, Cherbourg": null,
+  "FR|Ecole de plongée de l'Armée de Terre, (EPAT) 4eme régiment du Génie": null,
+  "FR|Grenoble": {
+    "lat": 45.1875602,
+    "lon": 5.7357819
+  },
+  "FR|Guadeloupe, Centre Hospitalier Pointe à Pitre (les Abymes)": null,
+  "FR|HIA ST ANNE S.U.S.I (service urgence-soins intensifs)": null,
+  "FR|HIA VAL DE GRACE, 74 BD Port Royal": null,
+  "FR|Hôpital Central Service de Réanimation, 29 av de Lattre de Tassigny": null,
+  "FR|Hôpital J Monod, avenue Mendès-France, Le Havre": null,
+  "FR|Hôpital Lapeyronie, Montpellier": {
+    "lat": 43.6316947,
+    "lon": 3.8526454
+  },
+  "FR|Hôpital Maison Blanche, Reims": {
+    "lat": 49.2298987,
+    "lon": 4.0190884
+  },
+  "FR|Hôpital Pasteur, Nice": {
+    "lat": 43.7233482,
+    "lon": 7.2852557
+  },
+  "FR|Hôpital Régional des Armées, Le Gouest": null,
+  "FR|Hôpital de Hautepierre, Strasbourg": {
+    "lat": 48.5915938,
+    "lon": 7.7069086
+  },
+  "FR|Institut de Recherche Chirurgical, Nancy": null,
+  "FR|Le Gouest": {
+    "lat": 48.043255,
+    "lon": 3.9098076
+  },
+  "FR|Le Havre": {
+    "lat": 49.4938975,
+    "lon": 0.1079732
+  },
+  "FR|Lille": {
+    "lat": 50.6365654,
+    "lon": 3.0635282
+  },
+  "FR|Lyon": {
+    "lat": 45.7578137,
+    "lon": 4.8320114
+  },
+  "FR|Martinique, Centre hospitalier Fort de France": null,
+  "FR|Metz": {
+    "lat": 49.1196964,
+    "lon": 6.1763552
+  },
+  "FR|Nancy": {
+    "lat": 48.6937223,
+    "lon": 6.1834097
+  },
+  "FR|Océan Atlantique, Dakar Unité Marine Cap-Vert": null,
+  "FR|Océan Pacifique, Polynésie Française base de FARE UTE": null,
+  "FR|Paris": {
+    "lat": 48.8588897,
+    "lon": 2.320041
+  },
+  "FR|Perpignan": {
+    "lat": 42.6985304,
+    "lon": 2.8953121
+  },
+  "FR|Polynésie Française base de FARE UTE": null,
+  "FR|Résidence du Parc, rue Gaston Berger": null,
+  "FR|S A M U 94, hôpital Henri Mondor": {
+    "lat": 48.7965078,
+    "lon": 2.4523576
+  },
+  "FR|Sapeurs Pompiers Chefferie santé, 55 bd Port Royal": null,
+  "FR|Service de Réanimation Pavillon N, Lyon": null,
+  "FR|Service de réanimation, Bordeaux": null,
+  "FR|Toulon": {
+    "lat": 43.1257311,
+    "lon": 5.9304919
+  },
+  "FR|Unité Mobile d'Oxygénothérapie hyperbare, Metz": null,
+  "FR|Unité de soins Hyperbare du C H U, Grenoble": null,
+  "FR|rue Gaston Berger": {
+    "lat": 43.2705625,
+    "lon": 5.415807
+  },
+  "GB|BHA Emergency Helpline: 07831 151523, Members - British Hyperbaric Association": null,
+  "GB|Chichester": {
+    "lat": 50.8364862,
+    "lon": -0.7791721
+  },
+  "GB|DDRC Healthcare, Plymouth": {
+    "lat": 50.4168212,
+    "lon": -4.1100881
+  },
+  "GB|Great Yarmouth": {
+    "lat": 52.6071742,
+    "lon": 1.7314845
+  },
+  "GB|Hull": {
+    "lat": 53.7623863,
+    "lon": -0.3301214
+  },
+  "GB|Hyperbaric Medicine Unit, Chichester": null,
+  "GB|Hyperbaric Treatment & Training, Wirral": null,
+  "GB|LHM Healthcare – East of England Hyperbaric Unit, Great Yarmouth": null,
+  "GB|LHM Healthcare – Whipps Cross Hyperbaric Unit, London": null,
+  "GB|London": {
+    "lat": 51.5074456,
+    "lon": -0.1277653
+  },
+  "GB|Members - British Hyperbaric Association": null,
+  "GB|Midlands Diving Chamber, Rugby": {
+    "lat": 52.365024,
+    "lon": -1.2572861
+  },
+  "GB|North of England Medical Hyperbaric Unit, Hull": null,
+  "GB|Oban": {
+    "lat": 56.4120166,
+    "lon": -5.4723731
+  },
+  "GB|Orkney": {
+    "lat": 58.9418231,
+    "lon": -3.1296944
+  },
+  "GB|Orkney Hyperbaric Unit, Orkney": null,
+  "GB|West Scotland Centre for Diving and Hyperbaric Medicine, Oban": null,
+  "GB|Wirral": {
+    "lat": 53.3409714,
+    "lon": -3.0500916
+  },
+  "IT|A.O.R.N. \"A. Cardarelli\", Napoli": null,
+  "IT|ATiP - Associazione Tecnici Iperbarici Padova, Padova": null,
+  "IT|Acerra (NA)": {
+    "lat": 40.9460532,
+    "lon": 14.3750083
+  },
+  "IT|Avellino": {
+    "lat": 40.9965446,
+    "lon": 15.140569
+  },
+  "IT|Az. Osp. Rilievo Naz. \"A. Moscati\", Avellino": null,
+  "IT|Az. Osp. Rilievo Nazionale \"Santobono\", Napoli": null,
+  "IT|Az. Osp. S. Antonio Abate Servizio Anestesia Rianimazione Terapia Iperbarica, Trapani": null,
+  "IT|Az. Osp. Umberto 1° Servizio Anestesia Rianimazione, Siracusa": null,
+  "IT|Az. Osp. Univ. \"S. Giovanni e Ruggi d'Aragona\", Salerno": null,
+  "IT|Az. Policlinico \"Federico II\", Napoli": null,
+  "IT|Azienda AUSL di Parma, Fidenza (PR)": null,
+  "IT|Azienda Ospedaliera Pisa Santa Chiara Servizio Terapia Iperbarica, Pisa": null,
+  "IT|Azienda Ospedaliera Universitaria Policlinico Paolo Giaccone, Palermo": {
+    "lat": 38.104453,
+    "lon": 13.3610802
+  },
+  "IT|Bari": {
+    "lat": 41.1257843,
+    "lon": 16.8620293
+  },
+  "IT|Brescia": {
+    "lat": 45.7795805,
+    "lon": 10.425873
+  },
+  "IT|CLINICA \"Villa dei Fiori\", Acerra (NA)": null,
+  "IT|Casa di cura Habilita spa, Zingonia (BG)": null,
+  "IT|Casa di cura Privata Domus Medica S.p.a., Repubblica di San Marino": null,
+  "IT|Catania": {
+    "lat": 37.5023612,
+    "lon": 15.0873718
+  },
+  "IT|Ce.M.I.S. Centro di Medicina Iperbarica e Subacquea, Massa": null,
+  "IT|Ce.M.S.I., Salerno": {
+    "lat": 40.4194416,
+    "lon": 15.3106085
+  },
+  "IT|Centro IPAR, Soccavo (NA)": null,
+  "IT|Centro Iperbarico Bologna, Quarto Inferiore (BO)": null,
+  "IT|Centro Iperbarico Bolzano, Bolzano": {
+    "lat": 46.4756526,
+    "lon": 11.325927
+  },
+  "IT|Centro Iperbarico ICOT, Latina": null,
+  "IT|Centro Iperbarico MAU Srl, Porto Sant'Elpidio (Fermo)": null,
+  "IT|Centro Iperbarico Molisano presso la Casa della Salute del Distretto Sanitario di Larino, Larino": null,
+  "IT|Centro Iperbarico Ravenna, Ravenna": {
+    "lat": 44.4108258,
+    "lon": 12.164502
+  },
+  "IT|Centro Iperbarico Sassarese, Sassari (SS)": null,
+  "IT|Centro Iperbarico dell'AOE Cannizzaro di Catania, Catania": null,
+  "IT|Centro di Medicina Iperbarica ASST - Grande Ospedale Metropolitano Niguarda, Milano": null,
+  "IT|Centro iperbarico \"I cedri\", Fara Novarese (No)": null,
+  "IT|Dipartimento di emergenza urgenza e accettazione ; SC(UCO) di Anestesia Rianimazione e Terapia antalgica, Trieste": null,
+  "IT|Fano": {
+    "lat": 43.8424173,
+    "lon": 13.0146632
+  },
+  "IT|Fara Novarese (No)": {
+    "lat": 45.5551594,
+    "lon": 8.4589412
+  },
+  "IT|Favignana (TP)": {
+    "lat": 37.9314018,
+    "lon": 12.3274291
+  },
+  "IT|Fidenza (PR)": {
+    "lat": 44.866522,
+    "lon": 10.0611939
+  },
+  "IT|Firenze": {
+    "lat": 43.7697955,
+    "lon": 11.2556404
+  },
+  "IT|Gazzi di Messina (ME)": {
+    "lat": 38.1656389,
+    "lon": 15.5382728
+  },
+  "IT|Genova": {
+    "lat": 44.40726,
+    "lon": 8.9338624
+  },
+  "IT|Grosseto": {
+    "lat": 42.7751102,
+    "lon": 11.2878044
+  },
+  "IT|I.L.M.I. Istituto Lombardo Medicina Iperbarica, Milano": null,
+  "IT|IPER S.R.L. Societa Per La Gestione Dei Centri Di Medicina Iperbarica, Pozzuoli (NA)": null,
+  "IT|Iperbarica Adriatica Srl, Fano": null,
+  "IT|Istituto Iperbarico S.p.A., Villafranca di Verona(VR)": null,
+  "IT|La Maddalena (OT)": {
+    "lat": 41.2128379,
+    "lon": 9.4054906
+  },
+  "IT|Lampedusa (AG)": {
+    "lat": 35.5111342,
+    "lon": 12.5962914
+  },
+  "IT|Larino": {
+    "lat": 41.8005697,
+    "lon": 14.9107419
+  },
+  "IT|Latina": {
+    "lat": 41.4595261,
+    "lon": 13.0125912
+  },
+  "IT|Lecce": {
+    "lat": 40.1522173,
+    "lon": 18.2260628
+  },
+  "IT|Lipari (ME)": {
+    "lat": 38.4692717,
+    "lon": 14.9564504
+  },
+  "IT|Massa": {
+    "lat": 44.0359323,
+    "lon": 10.1395519
+  },
+  "IT|Milano": {
+    "lat": 45.4641943,
+    "lon": 9.1896346
+  },
+  "IT|Napoli": {
+    "lat": 40.8358846,
+    "lon": 14.2487679
+  },
+  "IT|O.T.I. Services, Marghera (VE)": {
+    "lat": 45.4753768,
+    "lon": 12.2378682
+  },
+  "IT|OTI Medicale, Torri di Quartesolo (VI)": null,
+  "IT|Osp. Civico di Palermo Servizio di Ossigenoterapia Iperbarica, Palermo": null,
+  "IT|Osp. Civile Servizio Anestesia Rianimazione Medicina Iperbarica, Lipari (ME)": null,
+  "IT|Osp. Nagar A.S.L.9 Trapani Servizio Anestesia Rianimazione Terapia Iperbarica, Pantelleria (TP)": null,
+  "IT|Ospedale Elbano. Centro Iperbarico Portoferraio, Portoferraio (LI)": null,
+  "IT|Ospedale Marino, Cagliari": {
+    "lat": 39.21419,
+    "lon": 9.1731071
+  },
+  "IT|Ospedale Misericordia Servizio di Ossigenoterapia Iperbarica, Grosseto": null,
+  "IT|Ospedale Paolo Merlo, ASL Olbia, La Maddalena (OT)": null,
+  "IT|Otip Ossigenoterapia Iperbarica Piemontese, Torino": null,
+  "IT|Padova": {
+    "lat": 45.391408,
+    "lon": 11.8058487
+  },
+  "IT|Palermo": {
+    "lat": 38.1112268,
+    "lon": 13.3524434
+  },
+  "IT|Pantelleria (TP)": {
+    "lat": 36.8314576,
+    "lon": 11.9450395
+  },
+  "IT|Pisa": {
+    "lat": 43.4714722,
+    "lon": 10.6797912
+  },
+  "IT|Policlinico Universitario Istituto Anestesia Rianimazione e Terapia Iperbarica U.O. Medicina Iperbarica, Gazzi di Messina (ME)": null,
+  "IT|Porto Sant'Elpidio (Fermo)": {
+    "lat": 43.2586872,
+    "lon": 13.7584226
+  },
+  "IT|Portoferraio (LI)": {
+    "lat": 42.7978119,
+    "lon": 10.2992572
+  },
+  "IT|Pozzuoli (NA)": {
+    "lat": 40.822643,
+    "lon": 14.1219109
+  },
+  "IT|Quarto Inferiore (BO)": {
+    "lat": 44.5313774,
+    "lon": 11.4218061
+  },
+  "IT|Repubblica di San Marino": {
+    "lat": 45.1560812,
+    "lon": 10.1076774
+  },
+  "IT|Roma": {
+    "lat": 41.8933203,
+    "lon": 12.4829321
+  },
+  "IT|Salerno": {
+    "lat": 40.4194416,
+    "lon": 15.3106085
+  },
+  "IT|Sassari (SS)": {
+    "lat": 40.7234746,
+    "lon": 8.5612674
+  },
+  "IT|Servizio OTI \"Renato Moroni\" - Istituto Clinico Città Di Brescia, Brescia": null,
+  "IT|Servizio Terapia A.S.L., Favignana (TP)": null,
+  "IT|Servizio Terapia Iperbarica A.S.L.6 c/o Poliambulatorio Isola Lampedusa, Lampedusa (AG)": null,
+  "IT|Servizio Terapia Iperbarica A.S.L.6 c/o Poliambulatorio Isola Ustica, Ustica (PA)": null,
+  "IT|Servizio di Medicina Iperbarica - Anestesia e Rianimazione del Dipartimento di Emergenza, Firenze": null,
+  "IT|Servizio di Medicina Iperbarica - Centro Ospedaliero Militare Taranto, Taranto": null,
+  "IT|Siracusa": {
+    "lat": 37.0315752,
+    "lon": 15.2124277
+  },
+  "IT|Soccavo (NA)": {
+    "lat": 40.8409476,
+    "lon": 14.1959078
+  },
+  "IT|Taranto": {
+    "lat": 40.5488156,
+    "lon": 17.0805801
+  },
+  "IT|Torino": {
+    "lat": 45.0677551,
+    "lon": 7.6824892
+  },
+  "IT|Torri di Quartesolo (VI)": {
+    "lat": 45.5254607,
+    "lon": 11.6303291
+  },
+  "IT|Trapani": {
+    "lat": 37.9003731,
+    "lon": 12.7116255
+  },
+  "IT|Trieste": {
+    "lat": 45.6496485,
+    "lon": 13.7772781
+  },
+  "IT|U.O.S.D. Medicina Iperbarica - Ospedale \"San Paolo\", Bari": null,
+  "IT|UOC Anestesia e Rianimazione - Policlinico Umberto I° \"La Sapienza\", Roma": null,
+  "IT|UOC Anestesia e Rianimazione, Medicina Iperbarica - Ospedale \"Sacro Cuore di Gesù\", Lecce": null,
+  "IT|UOC di Anestesia e Rianimazione- Medicina Iperbarica": null,
+  "IT|Unità semplice Ossigenoterapia Iperbarica del Policlinico San Martino di Genova, Genova": null,
+  "IT|Ustica (PA)": {
+    "lat": 38.7104559,
+    "lon": 13.1912999
+  },
+  "IT|Villafranca di Verona(VR)": {
+    "lat": 45.3614277,
+    "lon": 10.8312572
+  },
+  "IT|Zingonia (BG)": {
+    "lat": 45.5989949,
+    "lon": 9.601036
+  }
+}

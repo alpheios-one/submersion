@@ -7325,6 +7325,35 @@
       }
     }
   },
+  "emergencyCard_chambersNearby": "Nächstgelegene Druckkammern",
+  "emergencyCard_chamberViewAll": "Alle {count} Druckkammern anzeigen",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "Keine Druckkammer in Reichweite gelistet. Rufen Sie die Notfall-Hotline für Taucher an: Sie vermittelt Ihnen die nächste Einrichtung, die Sie behandeln kann.",
+  "emergencyCard_chamberCapability_divingEmergency": "Behandelt Tauchunfälle",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "Klinische Druckkammer",
+  "emergencyCard_chamberCapability_elective": "Nur elektive Therapie",
+  "emergencyCard_chamberCapability_unknown": "Leistungsumfang unbestätigt",
+  "emergencyCard_chamberAvailability_h24": "24 Std.",
+  "emergencyCard_chamberAvailability_onCall": "Rufbereitschaft",
+  "emergencyCard_chamberAvailability_businessHours": "Geschäftszeiten",
+  "emergencyCard_chamberUnverified": "Nicht mit der Einrichtung bestätigt",
+  "chambersDirectory_title": "Druckkammern",
+  "chambersDirectory_search": "Nach Name, Stadt oder Land suchen",
+  "chambersDirectory_empty": "Keine Druckkammer entspricht dieser Suche.",
+  "chambersDirectory_count": "{count, plural, =1{1 Druckkammer} other{{count} Druckkammern}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "emergencyCard_hideChamber": "Ausblenden",
   "emergencyCard_chamberHidden": "Kammer ausgeblendet",
   "emergencyCard_undo": "Rückgängig",

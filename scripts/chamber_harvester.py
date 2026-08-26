@@ -26,6 +26,7 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 OUTPUT_PATH = os.path.join(PROJECT_ROOT, "assets", "data", "chambers.json")
 LEADS_PATH = os.path.join(SCRIPT_DIR, "chamber_leads.json")
 OVERLAY_PATH = os.path.join(SCRIPT_DIR, "data", "chambers_overlay.json")
+OVERLAY_PARTS_DIR = os.path.join(SCRIPT_DIR, "data", "overlay_parts")
 FIXTURE_DIR = os.path.join(SCRIPT_DIR, "fixtures", "chambers")
 
 MIN_CHAMBERS = 100
@@ -166,6 +167,53 @@ def _load_json(path, default):
         return json.load(handle)
 
 
+def assemble_overlay():
+    """Combine the per-region curation files into the overlay.
+
+    The overlay is split by region while it is being curated because each
+    region is researched independently, and a single file would be a merge
+    conflict waiting to happen. Assembling it here keeps the build reading one
+    input.
+    """
+    geocode = _load_module("chamber_geocode.py", "chamber_geocode")
+
+    rows = []
+    for name in sorted(os.listdir(OVERLAY_PARTS_DIR)):
+        if not name.endswith(".json"):
+            continue
+        part = _load_json(os.path.join(OVERLAY_PARTS_DIR, name), {"chambers": []})
+        part_rows = part.get("chambers", [])
+        print(f"  {name}: {len(part_rows)} rows")
+        rows.extend(part_rows)
+
+    geocode.geocode_rows(rows)
+    placed = [r for r in rows if r.get("latitude") is not None]
+    dropped = len(rows) - len(placed)
+    if dropped:
+        print(f"Dropped {dropped} curated rows that could not be placed on a map")
+
+    with open(OVERLAY_PATH, "w", encoding="utf-8") as handle:
+        json.dump(
+            {
+                "sources": [
+                    {
+                        "id": "curated",
+                        "name": "Hand-curated, each row verified against the facility",
+                        "url": "https://github.com/submersion-app/submersion",
+                        "retrieved": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                    }
+                ],
+                "chambers": sorted(placed, key=lambda r: r["id"]),
+            },
+            handle,
+            indent=2,
+            ensure_ascii=False,
+        )
+        handle.write("\n")
+    print(f"Wrote {len(placed)} curated chambers to {OVERLAY_PATH}")
+    return 0
+
+
 def build():
     leads_doc = _load_json(LEADS_PATH, {"chambers": [], "sources": []})
     overlay_doc = _load_json(OVERLAY_PATH, {"chambers": [], "sources": []})
@@ -187,10 +235,112 @@ def build():
     return 0
 
 
+SOURCES = [
+    {
+        "id": "simsi",
+        "name": "SIMSI (Societa Italiana di Medicina Subacquea e Iperbarica)",
+        "url": "https://simsi.it/centri-iperbarici-italiani/",
+        "fixture": "simsi.html",
+        "parser": "parse_simsi",
+    },
+    {
+        "id": "bha",
+        "name": "British Hyperbaric Association",
+        "url": "https://ukhyperbaric.com/members/",
+        "fixture": "bha.html",
+        "parser": "parse_bha",
+    },
+    {
+        "id": "ffessm",
+        "name": "FFESSM liste des caissons",
+        "url": "https://ffessm74.com/wp-content/uploads/2014/03/Liste_Caissons2.pdf",
+        "fixture": "ffessm.pdf",
+        "parser": "parse_ffessm",
+    },
+]
+
+
+def _load_module(filename, name):
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        name, os.path.join(SCRIPT_DIR, filename)
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def harvest_leads():
+    """Parse the committed fixtures into leads, geocode them, and write
+    chamber_leads.json.
+
+    Fixtures rather than live fetches: the parsers are pinned to the page
+    versions the tests assert against, so refreshing the data is a deliberate
+    act of recapturing a fixture and re-running the tests, not a silent change
+    that lands whenever a registry restyles its site.
+    """
+    sources = _load_module("chamber_sources.py", "chamber_sources")
+    geocode = _load_module("chamber_geocode.py", "chamber_geocode")
+    retrieved = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    rows = []
+    descriptors = []
+    for source in SOURCES:
+        path = os.path.join(FIXTURE_DIR, source["fixture"])
+        if not os.path.exists(path):
+            print(f"  missing fixture, skipping: {source['fixture']}")
+            continue
+
+        if source["fixture"].endswith(".pdf"):
+            import pypdf
+
+            reader = pypdf.PdfReader(path)
+            payload = "\n".join(page.extract_text() or "" for page in reader.pages)
+        else:
+            with open(path, encoding="utf-8") as handle:
+                payload = handle.read()
+
+        parser = getattr(sources, source["parser"])
+        parsed = parser(payload, retrieved=retrieved, source_url=source["url"])
+        print(f"  {source['id']}: {len(parsed)} leads")
+        rows.extend(parsed)
+        descriptors.append(
+            {
+                "id": source["id"],
+                "name": source["name"],
+                "url": source["url"],
+                "retrieved": retrieved,
+            }
+        )
+
+    geocode.geocode_rows(rows)
+    placed = [r for r in rows if r.get("latitude") is not None]
+    dropped = len(rows) - len(placed)
+    if dropped:
+        print(f"Dropped {dropped} leads that could not be placed on a map")
+
+    with open(LEADS_PATH, "w", encoding="utf-8") as handle:
+        json.dump(
+            {"sources": descriptors, "chambers": placed},
+            handle,
+            indent=2,
+            ensure_ascii=False,
+        )
+        handle.write("\n")
+    print(f"Wrote {len(placed)} leads to {LEADS_PATH}")
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--leads", action="store_true", help="refresh leads from registries"
+    )
+    parser.add_argument(
+        "--overlay",
+        action="store_true",
+        help="assemble the curated per-region files into the overlay",
     )
     parser.add_argument(
         "--build", action="store_true", help="merge, validate and write the asset"
@@ -198,9 +348,9 @@ def main():
     args = parser.parse_args()
 
     if args.leads:
-        raise SystemExit(
-            "lead parsers are not wired up yet; see chamber_sources.py"
-        )
+        raise SystemExit(harvest_leads())
+    if args.overlay:
+        raise SystemExit(assemble_overlay())
     if args.build:
         raise SystemExit(build())
     parser.print_help()

@@ -24333,6 +24333,69 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get emergencyCard_chambersNearby => 'Caissons les plus proches';
+
+  @override
+  String emergencyCard_chamberViewAll(int count) {
+    return 'Voir les $count caissons';
+  }
+
+  @override
+  String get emergencyCard_chambersNoneNearby =>
+      'Aucun caisson listé à proximité. Appelez la ligne d\'urgence plongée : elle vous orientera vers l\'établissement le plus proche capable de vous traiter.';
+
+  @override
+  String get emergencyCard_chamberCapability_divingEmergency =>
+      'Traite les accidents de plongée';
+
+  @override
+  String get emergencyCard_chamberCapability_hyperbaricUnit =>
+      'Unité hyperbare hospitalière';
+
+  @override
+  String get emergencyCard_chamberCapability_elective =>
+      'Thérapie programmée uniquement';
+
+  @override
+  String get emergencyCard_chamberCapability_unknown =>
+      'Capacité non confirmée';
+
+  @override
+  String get emergencyCard_chamberAvailability_h24 => '24 h/24';
+
+  @override
+  String get emergencyCard_chamberAvailability_onCall => 'Astreinte';
+
+  @override
+  String get emergencyCard_chamberAvailability_businessHours =>
+      'Heures ouvrables';
+
+  @override
+  String get emergencyCard_chamberUnverified =>
+      'Non confirmé auprès de l\'établissement';
+
+  @override
+  String get chambersDirectory_title => 'Caissons hyperbares';
+
+  @override
+  String get chambersDirectory_search => 'Rechercher par nom, ville ou pays';
+
+  @override
+  String get chambersDirectory_empty =>
+      'Aucun caisson ne correspond à cette recherche.';
+
+  @override
+  String chambersDirectory_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count caissons',
+      one: '1 caisson',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get emergencyCard_hideChamber => 'Masquer';
 
   @override

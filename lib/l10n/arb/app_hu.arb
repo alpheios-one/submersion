@@ -7325,6 +7325,35 @@
       }
     }
   },
+  "emergencyCard_chambersNearby": "Legközelebbi kamrák",
+  "emergencyCard_chamberViewAll": "Mind a(z) {count} kamra megtekintése",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "Nincs kamra a közelben. Hívja a búvár vészhelyzeti vonalat: a legközelebbi ellátásra képes intézménybe irányítják.",
+  "emergencyCard_chamberCapability_divingEmergency": "Búvárbaleseteket lát el",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "Kórházi hiperbár egység",
+  "emergencyCard_chamberCapability_elective": "Csak tervezett kezelés",
+  "emergencyCard_chamberCapability_unknown": "Ellátási kör nem megerősített",
+  "emergencyCard_chamberAvailability_h24": "24 óra",
+  "emergencyCard_chamberAvailability_onCall": "Készenlét",
+  "emergencyCard_chamberAvailability_businessHours": "Munkaidőben",
+  "emergencyCard_chamberUnverified": "Az intézmény nem erősítette meg",
+  "chambersDirectory_title": "Hiperbár kamrák",
+  "chambersDirectory_search": "Keresés név, város vagy ország szerint",
+  "chambersDirectory_empty": "Nincs a keresésnek megfelelő kamra.",
+  "chambersDirectory_count": "{count, plural, =1{1 kamra} other{{count} kamra}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "emergencyCard_hideChamber": "Elrejtés",
   "emergencyCard_chamberHidden": "Kamra elrejtve",
   "emergencyCard_undo": "Visszavonás",
