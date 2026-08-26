@@ -18,6 +18,7 @@ void main() {
 
   setUp(() {
     LocationService.throttle = NominatimThrottle(minimumGap: Duration.zero);
+    addTearDown(() => LocationService.throttle = NominatimThrottle());
     sites = MockSiteRepository();
     when(
       sites.getAllSites(diverId: anyNamed('diverId')),

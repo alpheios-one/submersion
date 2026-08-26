@@ -24,9 +24,10 @@ abstract final class PlaceNameLanguage {
     'zh',
   ];
 
-  /// A supported code, or [defaultCode] for anything else. A synced peer on a
-  /// newer build could send a code this build does not know, and a hand-edited
-  /// or padded value should not silently fall back to English.
+  /// A supported code, or [defaultCode] for anything else: null, blank, or a
+  /// code this build does not know (a synced peer on a newer build could send
+  /// one). Case and surrounding whitespace are forgiven first, so a padded or
+  /// upper-cased copy of a supported code still counts as that code.
   static String normalize(String? code) {
     final cleaned = code?.trim().toLowerCase();
     return cleaned != null && supportedCodes.contains(cleaned)

@@ -21,6 +21,7 @@ void main() {
 
   setUp(() {
     LocationService.throttle = NominatimThrottle(minimumGap: Duration.zero);
+    addTearDown(() => LocationService.throttle = NominatimThrottle());
   });
 
   group('Nominatim URIs pin English results (#214)', () {

@@ -74,6 +74,7 @@ void main() {
   setUp(() async {
     // Nominatim spacing would add a real second per geocode here.
     LocationService.throttle = NominatimThrottle(minimumGap: Duration.zero);
+    addTearDown(() => LocationService.throttle = NominatimThrottle());
     // Create fresh in-memory database for each test
     testDb = AppDatabase(NativeDatabase.memory());
     DatabaseService.instance.setTestDatabase(testDb);
