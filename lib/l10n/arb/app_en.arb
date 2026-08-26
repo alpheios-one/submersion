@@ -472,6 +472,10 @@
   "accessibility_label_listPane": "{title} list pane",
   "accessibility_label_mapPane": "{title} map pane",
   "accessibility_label_mapViewTitle": "{title} map view",
+  "accessibility_label_resizeMasterPane": "Resize master pane",
+  "@accessibility_label_resizeMasterPane": {
+    "description": "Semantics label for the draggable divider between the master and detail panes in master-detail scaffold"
+  },
   "accessibility_label_sharedWithAllProfiles": "Shared with all dive profiles",
   "@accessibility_label_sharedWithAllProfiles": {
     "description": "Screen-reader / tooltip label for the people icon shown on trip and site list tiles when a record is shared across dive profiles. Descriptive form (state), distinct from the imperative form used on the edit-page switch."
@@ -7238,6 +7242,7 @@
   "media_writeMetadata_diveTimeLabel": "Dive time",
   "media_writeMetadata_gpsLabel": "GPS",
   "media_writeMetadata_keepOriginalVideo": "Keep original video",
+  "media_writeMetadata_livePhotoUnsupported": "Live Photos are not supported yet. Duplicate this as a still photo, then write the dive data to the copy.",
   "media_writeMetadata_noDataAvailable": "No dive data available to write.",
   "media_writeMetadata_siteLabel": "Site",
   "media_writeMetadata_temperatureLabel": "Temperature",
@@ -8967,6 +8972,42 @@
   "settings_conflict_noConflicts_title": "No Conflicts",
   "settings_conflict_noDataAvailable": "No data available",
   "settings_conflict_previous_tooltip": "Previous conflict",
+  "settings_conflict_ref_buddy": "Buddy",
+  "settings_conflict_ref_certification": "Certification",
+  "settings_conflict_ref_checklistTemplate": "Checklist template",
+  "settings_conflict_ref_connectedAccount": "Connected account",
+  "settings_conflict_ref_course": "Course",
+  "settings_conflict_ref_courseRequirement": "Course requirement",
+  "settings_conflict_ref_cylinderConfig": "Cylinder configuration",
+  "settings_conflict_ref_dataSource": "Data source",
+  "settings_conflict_ref_dive": "Dive",
+  "settings_conflict_ref_diveCenter": "Dive center",
+  "settings_conflict_ref_diveComputer": "Dive computer",
+  "settings_conflict_ref_divePlan": "Dive plan",
+  "settings_conflict_ref_diveSite": "Dive site",
+  "settings_conflict_ref_diveType": "Dive type",
+  "settings_conflict_ref_diver": "Diver",
+  "settings_conflict_ref_equipment": "Equipment",
+  "settings_conflict_ref_equipmentSet": "Equipment set",
+  "settings_conflict_ref_finding": "Finding",
+  "settings_conflict_ref_instructor": "Instructor",
+  "settings_conflict_ref_linkedDive": "Linked dive",
+  "settings_conflict_ref_media": "Media",
+  "settings_conflict_ref_mediaSubscription": "Media subscription",
+  "settings_conflict_ref_missing": "No longer in this library",
+  "settings_conflict_ref_named": "{name} ({date})",
+  "settings_conflict_ref_plannedTank": "Planned tank",
+  "settings_conflict_ref_preDiveChecklistTemplate": "Pre-dive checklist template",
+  "settings_conflict_ref_preDiveSession": "Pre-dive checklist run",
+  "settings_conflict_ref_relatedDive": "Related dive",
+  "settings_conflict_ref_serviceKind": "Service type",
+  "settings_conflict_ref_sighting": "Sighting",
+  "settings_conflict_ref_signer": "Signed by",
+  "settings_conflict_ref_sourceDive": "Source dive",
+  "settings_conflict_ref_species": "Species",
+  "settings_conflict_ref_tag": "Tag",
+  "settings_conflict_ref_tank": "Tank",
+  "settings_conflict_ref_trip": "Trip",
   "settings_conflict_remoteVersion": "Remote Version",
   "settings_conflict_resolved": "Resolved {count, plural, =1{1 conflict} other{{count} conflicts}}",
   "settings_conflict_title": "Resolve Conflicts",
@@ -9553,6 +9594,16 @@
         "type": "Object"
       },
       "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "@settings_conflict_ref_named": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      },
+      "date": {
         "type": "Object"
       }
     }
@@ -10884,6 +10935,50 @@
   "tags_empty": "No tags yet. Create tags when editing dives.",
   "tags_hint_addMoreTags": "Add more tags...",
   "importWizard_tagsLabel": "Tags",
+  "importWizard_photos_stepLabel": "Photos",
+  "@importWizard_photos_stepLabel": {
+    "description": "Wizard step label for resolving photos referenced by an imported logbook"
+  },
+  "importWizard_photos_foundCount": "{count, plural, one{1 photo referenced in this logbook} other{{count} photos referenced in this logbook}}",
+  "@importWizard_photos_foundCount": {
+    "description": "Count of photos the imported logbook refers to",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importWizard_photos_chooseFolder": "Choose photo folder...",
+  "@importWizard_photos_chooseFolder": {
+    "description": "Button that opens a folder picker for locating referenced photos"
+  },
+  "importWizard_photos_scanning": "Scanning folder...",
+  "@importWizard_photos_scanning": {
+    "description": "Progress label while the picked folder is being scanned"
+  },
+  "importWizard_photos_matchSummary": "{matched} matched, {byName} by filename only, {missing} not found",
+  "@importWizard_photos_matchSummary": {
+    "description": "Result of resolving referenced photos against the picked folder",
+    "placeholders": {
+      "matched": {
+        "type": "int"
+      },
+      "byName": {
+        "type": "int"
+      },
+      "missing": {
+        "type": "int"
+      }
+    }
+  },
+  "importWizard_photos_skip": "Skip photos",
+  "@importWizard_photos_skip": {
+    "description": "Button to continue the import without photos"
+  },
+  "importWizard_photos_mobileUnsupported": "Importing photos needs a folder on this device's disk. Run this import on a computer to include them. Dives and sites import normally.",
+  "@importWizard_photos_mobileUnsupported": {
+    "description": "Shown on mobile, where a photo folder cannot be picked"
+  },
   "importWizard_review_olderDivesSkipped": "{count, plural, one{1 older dive skipped — already in your log} other{{count} older dives skipped — already in your log}}",
   "@importWizard_review_olderDivesSkipped": {
     "description": "Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff",
@@ -13395,6 +13490,10 @@
   "diveImport_uddf_tabTrips": "Trips",
   "diveImport_uddf_tabTypes": "Types",
   "diveImport_uddf_tags": "Tags",
+  "diveImport_uddf_media": "Photos",
+  "@diveImport_uddf_media": {
+    "description": "Entity type label for photos referenced by an imported logbook"
+  },
   "diveImport_uddf_title": "Import from UDDF",
   "diveImport_uddf_toggleDiveSelection": "Toggle selection for dive",
   "diveImport_uddf_toggleEntitySelection": "Toggle selection for {name}",
@@ -18525,6 +18624,49 @@
       }
     }
   },
+  "media_timeInDive_label": "Time in dive",
+  "@media_timeInDive_label": {"description": "Media info row label and Set-time dialog title: the moment in the dive a media item was taken."},
+  "media_timeInDive_unknown": "Time in dive unknown",
+  "@media_timeInDive_unknown": {"description": "Viewer chip shown when a media item's capture time falls outside its dive; tapping it opens the Set-time dialog."},
+  "media_timeInDive_setAction": "Set time in dive",
+  "@media_timeInDive_setAction": {"description": "Button and tooltip that opens the dialog to pin a media item to a moment in the dive."},
+  "media_timeInDive_manual": "{time} (set manually)",
+  "@media_timeInDive_manual": {
+    "description": "Media info row value for a position the diver set themselves; {time} is a minutes:seconds offset.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "media_timeInDive_fieldLabel": "Time from dive start",
+  "@media_timeInDive_fieldLabel": {"description": "Set-time dialog: label of the minutes:seconds field."},
+  "media_timeInDive_fieldHint": "mm:ss",
+  "@media_timeInDive_fieldHint": {"description": "Set-time dialog: placeholder showing the minutes:seconds format."},
+  "media_timeInDive_range": "Between 0:00 and {max}",
+  "@media_timeInDive_range": {
+    "description": "Set-time dialog: helper text under the field; {max} is the dive length as minutes:seconds.",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "media_timeInDive_invalid": "Enter a time between 0:00 and {max}",
+  "@media_timeInDive_invalid": {
+    "description": "Set-time dialog: error shown for malformed or out-of-range input; {max} is the dive length as minutes:seconds.",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "media_timeInDive_save": "Save",
+  "@media_timeInDive_save": {"description": "Set-time dialog: confirm button."},
+  "media_timeInDive_cancel": "Cancel",
+  "@media_timeInDive_cancel": {"description": "Set-time dialog: dismiss button."},
+  "media_timeInDive_reset": "Reset to automatic",
+  "@media_timeInDive_reset": {"description": "Set-time dialog: button that removes the diver's pin so the position derives from the capture time again."},
   "media_info_backupSection": "Backup",
   "media_info_store": "Cloud store",
   "media_info_storeNotConnected": "No cloud store connected",

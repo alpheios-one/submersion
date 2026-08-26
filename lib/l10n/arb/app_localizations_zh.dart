@@ -744,6 +744,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane => '调整主窗格大小';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles => '已与所有潜水员资料共享';
 
   @override
@@ -12409,6 +12412,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => '保留原始视频';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      '尚不支持实况照片。请将其复制为静态照片，然后将潜水数据写入副本。';
+
+  @override
   String get media_writeMetadata_noDataAvailable => '没有可写入的潜水数据。';
 
   @override
@@ -14514,6 +14521,116 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_conflict_previous_tooltip => '上一个冲突';
+
+  @override
+  String get settings_conflict_ref_buddy => '潜伴';
+
+  @override
+  String get settings_conflict_ref_certification => '证书';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => '清单模板';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => '已连接账户';
+
+  @override
+  String get settings_conflict_ref_course => '课程';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => '课程要求';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => '气瓶配置';
+
+  @override
+  String get settings_conflict_ref_dataSource => '数据来源';
+
+  @override
+  String get settings_conflict_ref_dive => '潜水';
+
+  @override
+  String get settings_conflict_ref_diveCenter => '潜水中心';
+
+  @override
+  String get settings_conflict_ref_diveComputer => '潜水电脑';
+
+  @override
+  String get settings_conflict_ref_divePlan => '潜水计划';
+
+  @override
+  String get settings_conflict_ref_diveSite => '潜水点';
+
+  @override
+  String get settings_conflict_ref_diveType => '潜水类型';
+
+  @override
+  String get settings_conflict_ref_diver => '潜水员';
+
+  @override
+  String get settings_conflict_ref_equipment => '装备';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => '装备套装';
+
+  @override
+  String get settings_conflict_ref_finding => '发现项';
+
+  @override
+  String get settings_conflict_ref_instructor => '教练';
+
+  @override
+  String get settings_conflict_ref_linkedDive => '关联潜水';
+
+  @override
+  String get settings_conflict_ref_media => '媒体';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => '媒体订阅';
+
+  @override
+  String get settings_conflict_ref_missing => '已不在此库中';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name（$date）';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => '计划气瓶';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate => '潜前清单模板';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => '潜前清单';
+
+  @override
+  String get settings_conflict_ref_relatedDive => '相关潜水';
+
+  @override
+  String get settings_conflict_ref_serviceKind => '维护类型';
+
+  @override
+  String get settings_conflict_ref_sighting => '目击记录';
+
+  @override
+  String get settings_conflict_ref_signer => '签署人';
+
+  @override
+  String get settings_conflict_ref_sourceDive => '源潜水';
+
+  @override
+  String get settings_conflict_ref_species => '物种';
+
+  @override
+  String get settings_conflict_ref_tag => '标签';
+
+  @override
+  String get settings_conflict_ref_tank => '气瓶';
+
+  @override
+  String get settings_conflict_ref_trip => '行程';
 
   @override
   String get settings_conflict_remoteVersion => '远程版本';
@@ -17078,6 +17195,41 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => '标签';
+
+  @override
+  String get importWizard_photos_stepLabel => '照片';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '此日志引用了 $count 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => '选择照片文件夹...';
+
+  @override
+  String get importWizard_photos_scanning => '正在扫描文件夹...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '已匹配 $matched 张，仅按文件名匹配 $byName 张，未找到 $missing 张';
+  }
+
+  @override
+  String get importWizard_photos_skip => '跳过照片';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      '导入照片需要此设备磁盘上的文件夹。请在电脑上运行此导入以包含照片。潜水记录和潜点会正常导入。';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -19985,6 +20137,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => '标签';
+
+  @override
+  String get diveImport_uddf_media => '照片';
 
   @override
   String get diveImport_uddf_title => '从 UDDF 导入';
@@ -30925,6 +31080,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String media_info_lastChecked(String date) {
     return '上次检查 $date';
   }
+
+  @override
+  String get media_timeInDive_label => '潜水中的时间点';
+
+  @override
+  String get media_timeInDive_unknown => '潜水中的时间点未知';
+
+  @override
+  String get media_timeInDive_setAction => '设置潜水中的时间点';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time（手动设置）';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => '距潜水开始的时间';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return '介于 0:00 和 $max 之间';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return '请输入介于 0:00 和 $max 之间的时间';
+  }
+
+  @override
+  String get media_timeInDive_save => '保存';
+
+  @override
+  String get media_timeInDive_cancel => '取消';
+
+  @override
+  String get media_timeInDive_reset => '重置为自动';
 
   @override
   String get media_info_backupSection => '备份';

@@ -800,6 +800,10 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'Ridimensiona riquadro principale';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Condiviso con tutti i profili subacquei';
 
@@ -13010,6 +13014,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Mantieni video originale';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Le Live Photo non sono ancora supportate. Duplica questa foto come immagine statica, poi scrivi i dati dell\'immersione sulla copia.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Nessun dato immersione disponibile da scrivere.';
 
@@ -15248,6 +15256,118 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_conflict_previous_tooltip => 'Conflitto precedente';
+
+  @override
+  String get settings_conflict_ref_buddy => 'Compagno';
+
+  @override
+  String get settings_conflict_ref_certification => 'Certificazione';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate =>
+      'Modello di lista di controllo';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Account collegato';
+
+  @override
+  String get settings_conflict_ref_course => 'Corso';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'Requisito del corso';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Configurazione bombole';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Origine dati';
+
+  @override
+  String get settings_conflict_ref_dive => 'Immersione';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Centro immersioni';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Computer subacqueo';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Piano di immersione';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Sito di immersione';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Tipo di immersione';
+
+  @override
+  String get settings_conflict_ref_diver => 'Subacqueo';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Attrezzatura';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Set di attrezzatura';
+
+  @override
+  String get settings_conflict_ref_finding => 'Rilievo';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Istruttore';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Immersione collegata';
+
+  @override
+  String get settings_conflict_ref_media => 'Media';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Abbonamento media';
+
+  @override
+  String get settings_conflict_ref_missing => 'Non è più in questa libreria';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Bombola pianificata';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Modello di lista pre-immersione';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'Lista pre-immersione';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Immersione correlata';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Tipo di revisione';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Avvistamento';
+
+  @override
+  String get settings_conflict_ref_signer => 'Firmato da';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Immersione di origine';
+
+  @override
+  String get settings_conflict_ref_species => 'Specie';
+
+  @override
+  String get settings_conflict_ref_tag => 'Tag';
+
+  @override
+  String get settings_conflict_ref_tank => 'Bombola';
+
+  @override
+  String get settings_conflict_ref_trip => 'Viaggio';
 
   @override
   String get settings_conflict_remoteVersion => 'Versione remota';
@@ -18002,6 +18122,43 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => 'Tags';
+
+  @override
+  String get importWizard_photos_stepLabel => 'Foto';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto referenziate in questo diario',
+      one: '1 foto referenziata in questo diario',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder =>
+      'Scegli la cartella delle foto...';
+
+  @override
+  String get importWizard_photos_scanning => 'Scansione della cartella...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched associate, $byName solo per nome file, $missing non trovate';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Salta le foto';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'L\'importazione delle foto richiede una cartella sul disco di questo dispositivo. Esegui questa importazione su un computer per includerle. Immersioni e siti vengono importati normalmente.';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -21043,6 +21200,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'Tag';
+
+  @override
+  String get diveImport_uddf_media => 'Foto';
 
   @override
   String get diveImport_uddf_title => 'Importa da UDDF';
@@ -32806,6 +32966,47 @@ class AppLocalizationsIt extends AppLocalizations {
   String media_info_lastChecked(String date) {
     return 'Ultimo controllo $date';
   }
+
+  @override
+  String get media_timeInDive_label => 'Momento dell\'immersione';
+
+  @override
+  String get media_timeInDive_unknown => 'Momento dell\'immersione sconosciuto';
+
+  @override
+  String get media_timeInDive_setAction =>
+      'Imposta il momento dell\'immersione';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (impostato manualmente)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel =>
+      'Tempo dall\'inizio dell\'immersione';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Tra 0:00 e $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Inserisci un tempo tra 0:00 e $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Salva';
+
+  @override
+  String get media_timeInDive_cancel => 'Annulla';
+
+  @override
+  String get media_timeInDive_reset => 'Ripristina automatico';
 
   @override
   String get media_info_backupSection => 'Backup';

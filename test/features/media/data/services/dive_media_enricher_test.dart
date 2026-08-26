@@ -31,6 +31,7 @@ MediaItem _media(
 );
 
 void main() {
+  manualPositionTests();
   test('enriches a linked item that has no enrichment yet', () async {
     final saved = <MediaEnrichment>[];
     final enricher = DiveMediaEnricher(
@@ -259,5 +260,91 @@ void main() {
           'an empty batch must not reach the repository: even a no-op save '
           'would tick watchMediaChanges and invalidate the media providers',
     );
+  });
+}
+
+/// Issue #1090: a diver can pin a media item to a moment in the dive when
+/// the file's capture time is wrong or missing. The pin lives on the media
+/// row, so the enricher (the only writer of enrichment rows) must derive
+/// the row from it instead of from the capture time, and must not revert it
+/// on the next backfill pass.
+void manualPositionTests() {
+  test(
+    'positions a pinned item at its manual offset, not its capture time',
+    () async {
+      final saved = <MediaEnrichment>[];
+      final enricher = DiveMediaEnricher(
+        loadDive: (_) async => _diveWithProfile(),
+        loadMediaForDive: (_) async => [
+          // Capture time is a decade off; the diver pinned it 42 min in.
+          _media(
+            'm1',
+            takenAt: DateTime.utc(2016, 1, 6, 0, 3),
+          ).copyWith(manualElapsedSeconds: 2520),
+        ],
+        saveEnrichments: (rows) async => saved.addAll(rows),
+      );
+
+      expect(await enricher.enrichMissingForDive('d1'), 1);
+      expect(saved.single.elapsedSeconds, 2520);
+      expect(saved.single.depthMeters, 20.0);
+      expect(saved.single.matchConfidence, MatchConfidence.manual);
+    },
+  );
+
+  test('leaves a stored manual row alone when it already matches', () async {
+    final saved = <MediaEnrichment>[];
+    final enricher = DiveMediaEnricher(
+      loadDive: (_) async => _diveWithProfile(),
+      loadMediaForDive: (_) async => [
+        _media(
+          'm1',
+          takenAt: DateTime.utc(2016, 1, 6, 0, 3),
+          enrichment: MediaEnrichment(
+            id: 'e1',
+            mediaId: 'm1',
+            diveId: 'd1',
+            elapsedSeconds: 2520,
+            depthMeters: 20,
+            temperatureCelsius: 26,
+            timestampOffsetSeconds: 0,
+            matchConfidence: MatchConfidence.manual,
+            createdAt: DateTime.utc(2025),
+          ),
+        ).copyWith(manualElapsedSeconds: 2520),
+      ],
+      saveEnrichments: (rows) async => saved.addAll(rows),
+    );
+
+    expect(await enricher.enrichMissingForDive('d1'), 0);
+    expect(saved, isEmpty);
+  });
+
+  test('clearing the pin recomputes from the capture time again', () async {
+    final saved = <MediaEnrichment>[];
+    final enricher = DiveMediaEnricher(
+      loadDive: (_) async => _diveWithProfile(),
+      loadMediaForDive: (_) async => [
+        _media(
+          'm1',
+          takenAt: DateTime.utc(2025, 12, 27, 12, 8),
+          enrichment: MediaEnrichment(
+            id: 'e1',
+            mediaId: 'm1',
+            diveId: 'd1',
+            elapsedSeconds: 600,
+            depthMeters: 20,
+            matchConfidence: MatchConfidence.manual,
+            createdAt: DateTime.utc(2025),
+          ),
+        ),
+      ],
+      saveEnrichments: (rows) async => saved.addAll(rows),
+    );
+
+    expect(await enricher.enrichMissingForDive('d1'), 1);
+    expect(saved.single.id, 'e1');
+    expect(saved.single.elapsedSeconds, 2520);
+    expect(saved.single.matchConfidence, MatchConfidence.exact);
   });
 }

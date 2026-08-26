@@ -1357,6 +1357,12 @@ abstract class AppLocalizations {
   /// **'{title} map view'**
   String accessibility_label_mapViewTitle(Object title);
 
+  /// Semantics label for the draggable divider between the master and detail panes in master-detail scaffold
+  ///
+  /// In en, this message translates to:
+  /// **'Resize master pane'**
+  String get accessibility_label_resizeMasterPane;
+
   /// Screen-reader / tooltip label for the people icon shown on trip and site list tiles when a record is shared across dive profiles. Descriptive form (state), distinct from the imperative form used on the edit-page switch.
   ///
   /// In en, this message translates to:
@@ -21946,6 +21952,12 @@ abstract class AppLocalizations {
   /// **'Keep original video'**
   String get media_writeMetadata_keepOriginalVideo;
 
+  /// No description provided for @media_writeMetadata_livePhotoUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Photos are not supported yet. Duplicate this as a still photo, then write the dive data to the copy.'**
+  String get media_writeMetadata_livePhotoUnsupported;
+
   /// No description provided for @media_writeMetadata_noDataAvailable.
   ///
   /// In en, this message translates to:
@@ -25554,6 +25566,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Previous conflict'**
   String get settings_conflict_previous_tooltip;
+
+  /// No description provided for @settings_conflict_ref_buddy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddy'**
+  String get settings_conflict_ref_buddy;
+
+  /// No description provided for @settings_conflict_ref_certification.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification'**
+  String get settings_conflict_ref_certification;
+
+  /// No description provided for @settings_conflict_ref_checklistTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist template'**
+  String get settings_conflict_ref_checklistTemplate;
+
+  /// No description provided for @settings_conflict_ref_connectedAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected account'**
+  String get settings_conflict_ref_connectedAccount;
+
+  /// No description provided for @settings_conflict_ref_course.
+  ///
+  /// In en, this message translates to:
+  /// **'Course'**
+  String get settings_conflict_ref_course;
+
+  /// No description provided for @settings_conflict_ref_courseRequirement.
+  ///
+  /// In en, this message translates to:
+  /// **'Course requirement'**
+  String get settings_conflict_ref_courseRequirement;
+
+  /// No description provided for @settings_conflict_ref_cylinderConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder configuration'**
+  String get settings_conflict_ref_cylinderConfig;
+
+  /// No description provided for @settings_conflict_ref_dataSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Data source'**
+  String get settings_conflict_ref_dataSource;
+
+  /// No description provided for @settings_conflict_ref_dive.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive'**
+  String get settings_conflict_ref_dive;
+
+  /// No description provided for @settings_conflict_ref_diveCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive center'**
+  String get settings_conflict_ref_diveCenter;
+
+  /// No description provided for @settings_conflict_ref_diveComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive computer'**
+  String get settings_conflict_ref_diveComputer;
+
+  /// No description provided for @settings_conflict_ref_divePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive plan'**
+  String get settings_conflict_ref_divePlan;
+
+  /// No description provided for @settings_conflict_ref_diveSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive site'**
+  String get settings_conflict_ref_diveSite;
+
+  /// No description provided for @settings_conflict_ref_diveType.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive type'**
+  String get settings_conflict_ref_diveType;
+
+  /// No description provided for @settings_conflict_ref_diver.
+  ///
+  /// In en, this message translates to:
+  /// **'Diver'**
+  String get settings_conflict_ref_diver;
+
+  /// No description provided for @settings_conflict_ref_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get settings_conflict_ref_equipment;
+
+  /// No description provided for @settings_conflict_ref_equipmentSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment set'**
+  String get settings_conflict_ref_equipmentSet;
+
+  /// No description provided for @settings_conflict_ref_finding.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding'**
+  String get settings_conflict_ref_finding;
+
+  /// No description provided for @settings_conflict_ref_instructor.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor'**
+  String get settings_conflict_ref_instructor;
+
+  /// No description provided for @settings_conflict_ref_linkedDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked dive'**
+  String get settings_conflict_ref_linkedDive;
+
+  /// No description provided for @settings_conflict_ref_media.
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get settings_conflict_ref_media;
+
+  /// No description provided for @settings_conflict_ref_mediaSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Media subscription'**
+  String get settings_conflict_ref_mediaSubscription;
+
+  /// No description provided for @settings_conflict_ref_missing.
+  ///
+  /// In en, this message translates to:
+  /// **'No longer in this library'**
+  String get settings_conflict_ref_missing;
+
+  /// No description provided for @settings_conflict_ref_named.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} ({date})'**
+  String settings_conflict_ref_named(Object name, Object date);
+
+  /// No description provided for @settings_conflict_ref_plannedTank.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned tank'**
+  String get settings_conflict_ref_plannedTank;
+
+  /// No description provided for @settings_conflict_ref_preDiveChecklistTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-dive checklist template'**
+  String get settings_conflict_ref_preDiveChecklistTemplate;
+
+  /// No description provided for @settings_conflict_ref_preDiveSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-dive checklist run'**
+  String get settings_conflict_ref_preDiveSession;
+
+  /// No description provided for @settings_conflict_ref_relatedDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Related dive'**
+  String get settings_conflict_ref_relatedDive;
+
+  /// No description provided for @settings_conflict_ref_serviceKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Service type'**
+  String get settings_conflict_ref_serviceKind;
+
+  /// No description provided for @settings_conflict_ref_sighting.
+  ///
+  /// In en, this message translates to:
+  /// **'Sighting'**
+  String get settings_conflict_ref_sighting;
+
+  /// No description provided for @settings_conflict_ref_signer.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed by'**
+  String get settings_conflict_ref_signer;
+
+  /// No description provided for @settings_conflict_ref_sourceDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Source dive'**
+  String get settings_conflict_ref_sourceDive;
+
+  /// No description provided for @settings_conflict_ref_species.
+  ///
+  /// In en, this message translates to:
+  /// **'Species'**
+  String get settings_conflict_ref_species;
+
+  /// No description provided for @settings_conflict_ref_tag.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get settings_conflict_ref_tag;
+
+  /// No description provided for @settings_conflict_ref_tank.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank'**
+  String get settings_conflict_ref_tank;
+
+  /// No description provided for @settings_conflict_ref_trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get settings_conflict_ref_trip;
 
   /// No description provided for @settings_conflict_remoteVersion.
   ///
@@ -30087,6 +30315,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tags'**
   String get importWizard_tagsLabel;
+
+  /// Wizard step label for resolving photos referenced by an imported logbook
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get importWizard_photos_stepLabel;
+
+  /// Count of photos the imported logbook refers to
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 photo referenced in this logbook} other{{count} photos referenced in this logbook}}'**
+  String importWizard_photos_foundCount(int count);
+
+  /// Button that opens a folder picker for locating referenced photos
+  ///
+  /// In en, this message translates to:
+  /// **'Choose photo folder...'**
+  String get importWizard_photos_chooseFolder;
+
+  /// Progress label while the picked folder is being scanned
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning folder...'**
+  String get importWizard_photos_scanning;
+
+  /// Result of resolving referenced photos against the picked folder
+  ///
+  /// In en, this message translates to:
+  /// **'{matched} matched, {byName} by filename only, {missing} not found'**
+  String importWizard_photos_matchSummary(int matched, int byName, int missing);
+
+  /// Button to continue the import without photos
+  ///
+  /// In en, this message translates to:
+  /// **'Skip photos'**
+  String get importWizard_photos_skip;
+
+  /// Shown on mobile, where a photo folder cannot be picked
+  ///
+  /// In en, this message translates to:
+  /// **'Importing photos needs a folder on this device\'s disk. Run this import on a computer to include them. Dives and sites import normally.'**
+  String get importWizard_photos_mobileUnsupported;
 
   /// Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff
   ///
@@ -35038,6 +35308,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tags'**
   String get diveImport_uddf_tags;
+
+  /// Entity type label for photos referenced by an imported logbook
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get diveImport_uddf_media;
 
   /// No description provided for @diveImport_uddf_title.
   ///
@@ -54207,6 +54483,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last checked {date}'**
   String media_info_lastChecked(String date);
+
+  /// Media info row label and Set-time dialog title: the moment in the dive a media item was taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Time in dive'**
+  String get media_timeInDive_label;
+
+  /// Viewer chip shown when a media item's capture time falls outside its dive; tapping it opens the Set-time dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Time in dive unknown'**
+  String get media_timeInDive_unknown;
+
+  /// Button and tooltip that opens the dialog to pin a media item to a moment in the dive.
+  ///
+  /// In en, this message translates to:
+  /// **'Set time in dive'**
+  String get media_timeInDive_setAction;
+
+  /// Media info row value for a position the diver set themselves; {time} is a minutes:seconds offset.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} (set manually)'**
+  String media_timeInDive_manual(String time);
+
+  /// Set-time dialog: label of the minutes:seconds field.
+  ///
+  /// In en, this message translates to:
+  /// **'Time from dive start'**
+  String get media_timeInDive_fieldLabel;
+
+  /// Set-time dialog: placeholder showing the minutes:seconds format.
+  ///
+  /// In en, this message translates to:
+  /// **'mm:ss'**
+  String get media_timeInDive_fieldHint;
+
+  /// Set-time dialog: helper text under the field; {max} is the dive length as minutes:seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Between 0:00 and {max}'**
+  String media_timeInDive_range(String max);
+
+  /// Set-time dialog: error shown for malformed or out-of-range input; {max} is the dive length as minutes:seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a time between 0:00 and {max}'**
+  String media_timeInDive_invalid(String max);
+
+  /// Set-time dialog: confirm button.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get media_timeInDive_save;
+
+  /// Set-time dialog: dismiss button.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get media_timeInDive_cancel;
+
+  /// Set-time dialog: button that removes the diver's pin so the position derives from the capture time again.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to automatic'**
+  String get media_timeInDive_reset;
 
   /// No description provided for @media_info_backupSection.
   ///
