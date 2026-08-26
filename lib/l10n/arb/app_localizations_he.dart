@@ -20980,6 +20980,15 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get gpsLogger_summary_tracks => 'מסלולים';
+
+  @override
+  String get gpsLogger_summary_recordedTime => 'זמן מוקלט';
+
+  @override
+  String get gpsLogger_summary_divesCovered => 'צלילות מכוסות';
+
+  @override
   String gpsLogger_trackSubtitle(num count, String duration) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

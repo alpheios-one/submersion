@@ -21447,6 +21447,15 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get gpsLogger_summary_tracks => 'Útvonalak';
+
+  @override
+  String get gpsLogger_summary_recordedTime => 'Rögzített idő';
+
+  @override
+  String get gpsLogger_summary_divesCovered => 'Lefedett merülések';
+
+  @override
   String gpsLogger_trackSubtitle(num count, String duration) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

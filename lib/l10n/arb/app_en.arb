@@ -13747,6 +13747,9 @@
       }
     }
   },
+  "gpsLogger_summary_tracks": "Tracks",
+  "gpsLogger_summary_recordedTime": "Recorded time",
+  "gpsLogger_summary_divesCovered": "Dives covered",
   "gpsLogger_trackSubtitle": "{count, plural, one{{count} point} other{{count} points}}, {duration}",
   "@gpsLogger_trackSubtitle": {
     "placeholders": {
