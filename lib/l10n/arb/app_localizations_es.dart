@@ -801,6 +801,10 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'Cambiar el tamano del panel principal';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Compartido con todos los perfiles de buceo';
 

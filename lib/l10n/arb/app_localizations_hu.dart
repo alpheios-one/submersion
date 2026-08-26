@@ -797,6 +797,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane => 'Fo panel atmeretezese';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Megosztva az összes búvárprofillal';
 

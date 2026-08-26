@@ -1357,6 +1357,12 @@ abstract class AppLocalizations {
   /// **'{title} map view'**
   String accessibility_label_mapViewTitle(Object title);
 
+  /// Semantics label for the draggable divider between the master and detail panes in master-detail scaffold
+  ///
+  /// In en, this message translates to:
+  /// **'Resize master pane'**
+  String get accessibility_label_resizeMasterPane;
+
   /// Screen-reader / tooltip label for the people icon shown on trip and site list tiles when a record is shared across dive profiles. Descriptive form (state), distinct from the imperative form used on the edit-page switch.
   ///
   /// In en, this message translates to:

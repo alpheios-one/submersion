@@ -429,6 +429,7 @@
   "accessibility_label_listPane": "Volet liste {title}",
   "accessibility_label_mapPane": "Volet carte {title}",
   "accessibility_label_mapViewTitle": "Vue carte {title}",
+  "accessibility_label_resizeMasterPane": "Redimensionner le panneau principal",
   "accessibility_label_showList": "Afficher la liste",
   "accessibility_label_showMapView": "Afficher la vue carte",
   "accessibility_label_viewDetails": "Voir les details",

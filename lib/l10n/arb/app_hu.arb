@@ -429,6 +429,7 @@
   "accessibility_label_listPane": "{title} lista panel",
   "accessibility_label_mapPane": "{title} terkep panel",
   "accessibility_label_mapViewTitle": "{title} terkepi nezet",
+  "accessibility_label_resizeMasterPane": "Fo panel atmeretezese",
   "accessibility_label_showList": "Lista megjelenitese",
   "accessibility_label_showMapView": "Terkepi nezet megjelenitese",
   "accessibility_label_viewDetails": "Reszletek megtekintese",

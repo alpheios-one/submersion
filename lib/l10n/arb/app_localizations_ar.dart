@@ -792,6 +792,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'تغيير حجم اللوحة الرئيسية';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'مشترك مع جميع ملفات الغوص';
 

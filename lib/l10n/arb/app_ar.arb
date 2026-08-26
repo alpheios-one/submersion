@@ -429,6 +429,7 @@
   "accessibility_label_listPane": "لوحة قائمة {title}",
   "accessibility_label_mapPane": "لوحة خريطة {title}",
   "accessibility_label_mapViewTitle": "عرض خريطة {title}",
+  "accessibility_label_resizeMasterPane": "تغيير حجم اللوحة الرئيسية",
   "accessibility_label_showList": "عرض القائمة",
   "accessibility_label_showMapView": "عرض الخريطة",
   "accessibility_label_viewDetails": "عرض التفاصيل",

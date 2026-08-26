@@ -800,6 +800,10 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'Ridimensiona riquadro principale';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Condiviso con tutti i profili subacquei';
 

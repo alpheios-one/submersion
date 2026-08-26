@@ -429,6 +429,7 @@
   "accessibility_label_listPane": "{title} Listenbereich",
   "accessibility_label_mapPane": "{title} Kartenbereich",
   "accessibility_label_mapViewTitle": "{title} Kartenansicht",
+  "accessibility_label_resizeMasterPane": "Hauptbereich in der Groesse aendern",
   "accessibility_label_showList": "Liste anzeigen",
   "accessibility_label_showMapView": "Kartenansicht anzeigen",
   "accessibility_label_viewDetails": "Details anzeigen",

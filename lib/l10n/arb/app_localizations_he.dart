@@ -782,6 +782,10 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'שינוי גודל החלונית הראשית';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'משותף עם כל פרופילי הצלילה';
 

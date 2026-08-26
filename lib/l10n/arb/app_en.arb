@@ -472,6 +472,10 @@
   "accessibility_label_listPane": "{title} list pane",
   "accessibility_label_mapPane": "{title} map pane",
   "accessibility_label_mapViewTitle": "{title} map view",
+  "accessibility_label_resizeMasterPane": "Resize master pane",
+  "@accessibility_label_resizeMasterPane": {
+    "description": "Semantics label for the draggable divider between the master and detail panes in master-detail scaffold"
+  },
   "accessibility_label_sharedWithAllProfiles": "Shared with all dive profiles",
   "@accessibility_label_sharedWithAllProfiles": {
     "description": "Screen-reader / tooltip label for the people icon shown on trip and site list tiles when a record is shared across dive profiles. Descriptive form (state), distinct from the imperative form used on the edit-page switch."

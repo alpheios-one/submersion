@@ -744,6 +744,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane => '调整主窗格大小';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles => '已与所有潜水员资料共享';
 
   @override
