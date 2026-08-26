@@ -177,14 +177,6 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
           if (site.hasCoordinates) ...[
             _buildMapSection(context, ref, site),
             const SizedBox(height: 16),
-            // Diver-placed annotations; placement happens on the map, so
-            // the add action opens the fullscreen scape armed to place.
-            SiteFeaturesSection(
-              siteId: site.id,
-              onAddFeature: () =>
-                  _showFullscreenMap(context, ref, site, startPlacing: true),
-            ),
-            const SizedBox(height: 16),
           ],
 
           // Basic Info Section (Name + Location String)
@@ -210,6 +202,18 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
           // Altitude Section (only if altitude is set)
           if (site.altitude != null) ...[
             _buildAltitudeSection(context, ref, site),
+            const SizedBox(height: 16),
+          ],
+
+          // Site Features Section (diver-placed annotations; placement happens
+          // on the map, so the add action opens the fullscreen scape armed to
+          // place)
+          if (site.hasCoordinates) ...[
+            SiteFeaturesSection(
+              siteId: site.id,
+              onAddFeature: () =>
+                  _showFullscreenMap(context, ref, site, startPlacing: true),
+            ),
             const SizedBox(height: 16),
           ],
 

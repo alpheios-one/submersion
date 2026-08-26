@@ -528,6 +528,12 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setDefaultShowOtu(bool value) async =>
       state = state.copyWith(defaultShowOtu: value);
   @override
+  Future<void> setDefaultShowO2CellMv(bool value) async =>
+      state = state.copyWith(defaultShowO2CellMv: value);
+  @override
+  Future<void> setDefaultShowEstimatedTankPressure(bool value) async =>
+      state = state.copyWith(defaultShowEstimatedTankPressure: value);
+  @override
   Future<void> setShowDataSourceBadges(bool value) async =>
       state = state.copyWith(showDataSourceBadges: value);
   @override

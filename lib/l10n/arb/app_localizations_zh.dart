@@ -8232,17 +8232,17 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-${max}m';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return '深度不超过 ${max}m';
+    return '深度不超过 $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '${min}m+';
+    return '$min+';
   }
 
   @override
@@ -13843,6 +13843,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => '事件';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure => '估算气瓶压力';
 
   @override
   String get settings_appearance_metric_gasDensity => '气体密度';

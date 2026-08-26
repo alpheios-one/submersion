@@ -191,8 +191,16 @@ final diveIdsForBuddyProvider = FutureProvider.family<List<String>, String>((
   return repository.getDiveIdsForBuddy(buddyId);
 });
 
+/// How many shared dives the buddy detail page previews before the caller has
+/// to tap "view all".
+const buddySharedDivePreviewLimit = 5;
+
 /// Full dive data for a buddy provider (for display in buddy detail page)
-/// Returns the most recent dives first, limited to a reasonable count for preview
+///
+/// Returns the most recent dives first, limited to a reasonable count for
+/// preview. [diveIdsForBuddyProvider] already orders by dive date descending,
+/// so truncating to the preview limit keeps the newest dives; the Dart sort
+/// below only re-asserts that order over the hydrated entities.
 final divesForBuddyProvider = FutureProvider.family<List<domain.Dive>, String>((
   ref,
   buddyId,
@@ -200,19 +208,41 @@ final divesForBuddyProvider = FutureProvider.family<List<domain.Dive>, String>((
   final diveIds = await ref.watch(diveIdsForBuddyProvider(buddyId).future);
   if (diveIds.isEmpty) return [];
 
-  // Fetch full dive data for each ID (limit to first 5 for preview)
   final dives = <domain.Dive>[];
-  for (final diveId in diveIds.take(5)) {
+  for (final diveId in diveIds.take(buddySharedDivePreviewLimit)) {
     final dive = await ref.watch(diveProvider(diveId).future);
     if (dive != null) {
       dives.add(dive);
     }
   }
 
-  // Sort by date descending (most recent first)
-  dives.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+  dives.sort(compareSharedDivesForPreview);
   return dives;
 });
+
+/// Orders two shared dives exactly as `BuddyRepository.getDiveIdsForBuddy`
+/// does: newest effective entry time first, then dive number descending, then
+/// id ascending.
+///
+/// The dive-number step is null-aware rather than coalescing to zero. SQLite
+/// sorts NULL below every value, so `ORDER BY dive_number DESC` puts a null
+/// dive number *last*, behind a real `0` or a negative one. Coalescing to zero
+/// would instead tie a null with a real zero and rank it above a negative,
+/// which would reorder the list the repository already ordered.
+int compareSharedDivesForPreview(domain.Dive a, domain.Dive b) {
+  final byTime = b.effectiveEntryTime.compareTo(a.effectiveEntryTime);
+  if (byTime != 0) return byTime;
+
+  final aNumber = a.diveNumber;
+  final bNumber = b.diveNumber;
+  if (aNumber != bNumber) {
+    if (aNumber == null) return 1;
+    if (bNumber == null) return -1;
+    return bNumber.compareTo(aNumber);
+  }
+
+  return a.id.compareTo(b.id);
+}
 
 /// Buddy list notifier for mutations
 class BuddyListNotifier extends StateNotifier<AsyncValue<List<Buddy>>> {

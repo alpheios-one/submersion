@@ -54,8 +54,8 @@ class ProfileLegendState {
   final bool showCns;
   final bool showOtu;
 
-  /// Raw O2 cell output lines (issue #810). Session-only: no persisted
-  /// default backs it, following the showMod precedent.
+  /// Raw O2 cell output lines (issue #810). Seeds from the persisted
+  /// [AppSettings.defaultShowO2CellMv] default (issue #1235).
   final bool showO2CellMv;
 
   // Per-metric data source preferences (session overrides).
@@ -364,6 +364,7 @@ class ProfileLegend extends _$ProfileLegend {
           defaultShowGasSwitchMarkers: s.defaultShowGasSwitchMarkers,
           defaultShowPhotoMarkers: s.defaultShowPhotoMarkers,
           defaultShowGasTimeline: s.defaultShowGasTimeline,
+          defaultShowO2CellMv: s.defaultShowO2CellMv,
           showNdlOnProfile: s.showNdlOnProfile,
           defaultShowPpO2: s.defaultShowPpO2,
           defaultShowPpN2: s.defaultShowPpN2,
@@ -399,6 +400,7 @@ class ProfileLegend extends _$ProfileLegend {
       showGasSwitchMarkers: settings.defaultShowGasSwitchMarkers,
       showPhotoMarkers: settings.defaultShowPhotoMarkers,
       showGas: settings.defaultShowGasTimeline,
+      showO2CellMv: settings.defaultShowO2CellMv,
       showNdl: settings.showNdlOnProfile,
       showPpO2: settings.defaultShowPpO2,
       showPpN2: settings.defaultShowPpN2,

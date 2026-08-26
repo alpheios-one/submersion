@@ -1104,19 +1104,25 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
     );
   }
 
+  /// Chip label for the active depth filter.
+  ///
+  /// The bounds are held in meters, like every other stored depth, so they are
+  /// converted for display. A two-ended range carries a single trailing symbol,
+  /// so only the upper bound is formatted with one.
   String _formatDepthRange(double? min, double? max) {
+    final units = UnitFormatter(ref.watch(settingsProvider));
     if (min != null && max != null) {
       return context.l10n.diveSites_list_activeFilter_depthRangeBoth(
-        min.toInt(),
-        max.toInt(),
+        units.convertDepth(min).toStringAsFixed(0),
+        units.formatDepth(max, decimals: 0),
       );
     } else if (min != null) {
       return context.l10n.diveSites_list_activeFilter_depthRangeMin(
-        min.toInt(),
+        units.formatDepth(min, decimals: 0),
       );
     } else if (max != null) {
       return context.l10n.diveSites_list_activeFilter_depthRangeMax(
-        max.toInt(),
+        units.formatDepth(max, decimals: 0),
       );
     }
     return '';
@@ -1303,16 +1309,6 @@ class SiteListTile extends ConsumerStatefulWidget {
     this.showSharedBadge = false,
   });
 
-  String? get _depthString {
-    if (minDepth != null && maxDepth != null) {
-      return '${minDepth!.toStringAsFixed(0)}-${maxDepth!.toStringAsFixed(0)}m';
-    }
-    if (maxDepth != null) {
-      return '${maxDepth!.toStringAsFixed(0)}m';
-    }
-    return null;
-  }
-
   bool get _hasLocation => latitude != null && longitude != null;
 
   @override
@@ -1321,6 +1317,24 @@ class SiteListTile extends ConsumerStatefulWidget {
 
 class _SiteListTileState extends ConsumerState<SiteListTile> {
   final MapController _mapController = MapController();
+
+  /// Depth summary in the diver's chosen unit.
+  ///
+  /// Depths are stored in meters, so they must be converted before display.
+  /// A range carries a single trailing symbol ("16-98ft"), matching how the
+  /// table view renders the same two columns.
+  String? _depthString(UnitFormatter units) {
+    final minDepth = widget.minDepth;
+    final maxDepth = widget.maxDepth;
+    if (minDepth != null && maxDepth != null) {
+      final min = units.convertDepth(minDepth).toStringAsFixed(0);
+      return '$min-${units.formatDepth(maxDepth, decimals: 0)}';
+    }
+    if (maxDepth != null) {
+      return units.formatDepth(maxDepth, decimals: 0);
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1338,6 +1352,9 @@ class _SiteListTileState extends ConsumerState<SiteListTile> {
     final showSharedBadge = widget.showSharedBadge;
 
     final colorScheme = Theme.of(context).colorScheme;
+    final depthString = _depthString(
+      UnitFormatter(ref.watch(settingsProvider)),
+    );
     final showMapBackground = ref.watch(showMapBackgroundOnSiteCardsProvider);
     final shouldShowMap =
         showMapBackground && widget._hasLocation && !isSelected && !isChecked;
@@ -1410,9 +1427,9 @@ class _SiteListTileState extends ConsumerState<SiteListTile> {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                if (widget._depthString != null)
+                if (depthString != null)
                   Text(
-                    widget._depthString!,
+                    depthString,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: secondaryTextColor,
                       fontWeight: FontWeight.w500,

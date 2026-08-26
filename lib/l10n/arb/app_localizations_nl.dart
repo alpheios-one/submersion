@@ -8573,17 +8573,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-${max}m';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'Tot ${max}m';
+    return 'Tot $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '${min}m+';
+    return '$min+';
   }
 
   @override
@@ -14417,6 +14417,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'Gebeurtenissen';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Geschatte flesdruk';
 
   @override
   String get settings_appearance_metric_gasDensity => 'Gasdichtheid';

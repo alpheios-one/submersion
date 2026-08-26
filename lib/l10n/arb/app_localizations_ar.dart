@@ -8477,17 +8477,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-$maxم';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'حتى $maxم';
+    return 'حتى $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '$minم+';
+    return '$min+';
   }
 
   @override
@@ -14272,6 +14272,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'الأحداث';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'ضغط الأسطوانة المقدر';
 
   @override
   String get settings_appearance_metric_gasDensity => 'كثافة الغاز';

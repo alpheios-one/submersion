@@ -1054,9 +1054,26 @@ final estimatedTankPressuresProvider =
       final realFuture = ref.watch(tankPressuresProvider(diveId).future);
       final diveFuture = ref.watch(diveProvider(diveId).future);
       final switchesFuture = ref.watch(gasSwitchesProvider(diveId).future);
+      // Read synchronously, before the first await, so the dependency is
+      // registered while the provider is certainly still alive.
+      final showEstimates = ref.watch(
+        settingsProvider.select((s) => s.defaultShowEstimatedTankPressure),
+      );
       final real = await realFuture;
       final dive = await diveFuture;
       if (dive == null) {
+        return EstimatedTankPressures(real, const <String>{});
+      }
+      // A gauge (bottom-timer) dive models no gas at all, so a synthesized
+      // pressure trace would be fabricated rather than measured (issue #731).
+      // Real transmitter samples, if the dive has any, still pass through.
+      if (dive.isGauge) {
+        return EstimatedTankPressures(real, const <String>{});
+      }
+      // The diver can switch estimates off entirely (issue #731). Gating here
+      // rather than at the chart means the series never exists, so no legend
+      // chip, tooltip row, or "(est.)" label survives anywhere.
+      if (!showEstimates) {
         return EstimatedTankPressures(real, const <String>{});
       }
       final switches = await switchesFuture;

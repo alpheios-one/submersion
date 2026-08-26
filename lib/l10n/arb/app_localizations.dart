@@ -14579,22 +14579,22 @@ abstract class AppLocalizations {
   /// **'Country: {country}'**
   String diveSites_list_activeFilter_country(Object country);
 
-  /// No description provided for @diveSites_list_activeFilter_depthRangeBoth.
+  /// Active depth filter chip for a two-ended range. Both values arrive already converted to the diver's depth unit; max already carries the unit symbol, so do not add one.
   ///
   /// In en, this message translates to:
-  /// **'{min}-{max}m'**
+  /// **'{min}-{max}'**
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max);
 
-  /// No description provided for @diveSites_list_activeFilter_depthRangeMax.
+  /// Active depth filter chip for an upper bound only. The value arrives already converted and already carries the diver's depth unit symbol, so do not add one.
   ///
   /// In en, this message translates to:
-  /// **'Up to {max}m'**
+  /// **'Up to {max}'**
   String diveSites_list_activeFilter_depthRangeMax(Object max);
 
-  /// No description provided for @diveSites_list_activeFilter_depthRangeMin.
+  /// Active depth filter chip for a lower bound only. The value arrives already converted and already carries the diver's depth unit symbol, so do not add one.
   ///
   /// In en, this message translates to:
-  /// **'{min}m+'**
+  /// **'{min}+'**
   String diveSites_list_activeFilter_depthRangeMin(Object min);
 
   /// No description provided for @diveSites_list_activeFilter_hasCoordinates.
@@ -24501,6 +24501,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Events'**
   String get settings_appearance_metric_events;
+
+  /// Settings switch that turns off the synthesized (estimated) tank pressure line on the dive profile chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated Tank Pressure'**
+  String get settings_appearance_metric_estimatedTankPressure;
 
   /// No description provided for @settings_appearance_metric_gasDensity.
   ///

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
+import 'package:submersion/core/utils/app_version.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
@@ -2998,9 +2999,7 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
         ref.watch(releaseChannelProvider) == ReleaseChannel.beta;
     final versionString = packageInfoAsync.when(
       data: (info) {
-        final version = info.version.endsWith('.${info.buildNumber}')
-            ? info.version
-            : '${info.version}.${info.buildNumber}';
+        final version = formatAppVersion(info);
         final base = context.l10n.settings_about_version(version);
         return isBetaChannel
             ? context.l10n.settings_updates_channelBadgeBeta(base)
@@ -3039,9 +3038,9 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
                 ),
                 // Beta enrollment signpost for store builds: the app cannot
                 // switch channels itself there, so link to the store's beta
-                // program. Hidden until the enrollment links exist.
-                if (!UpdateChannelConfig.isAutoUpdateEnabled &&
-                    _betaEnrollUrl.isNotEmpty) ...[
+                // program. Null on every build that has its own updater, and
+                // on platforms whose program is not live.
+                if (betaEnrollUrl case final enrollUrl?) ...[
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.science_outlined),
@@ -3050,7 +3049,7 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
                       context.l10n.settings_updates_joinBetaSubtitle,
                     ),
                     onTap: () => launchUrl(
-                      Uri.parse(_betaEnrollUrl),
+                      Uri.parse(enrollUrl),
                       mode: LaunchMode.externalApplication,
                     ),
                   ),
@@ -3202,13 +3201,6 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
         ],
       ),
     );
-  }
-
-  /// The store beta-program URL for this platform ('' hides the signpost).
-  String get _betaEnrollUrl {
-    if (Platform.isIOS || Platform.isMacOS) return kTestFlightBetaUrl;
-    if (Platform.isAndroid) return kPlayBetaOptInUrl;
-    return '';
   }
 
   Future<void> _showChannelPicker(BuildContext context) async {
