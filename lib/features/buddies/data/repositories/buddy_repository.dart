@@ -763,16 +763,34 @@ class BuddyRepository {
       final variables = [if (diverId != null) Variable.withString(diverId)];
 
       final results = await _db.customSelect('''
-        SELECT b.*, COALESCE(dc.dive_count, 0) as dive_count
+        SELECT b.*, COALESCE(dc.dive_count, 0) AS dive_count, dc.last_dive
         FROM buddies b
         LEFT JOIN (
-          SELECT buddy_id, COUNT(*) as dive_count
-          FROM dive_buddies
-          GROUP BY buddy_id
+          SELECT db.buddy_id,
+                 COUNT(*) AS dive_count,
+                 MAX(d.dive_date_time) AS last_dive
+          FROM dive_buddies db
+          LEFT JOIN dives d ON d.id = db.dive_id
+          GROUP BY db.buddy_id
         ) dc ON b.id = dc.buddy_id
         $diverFilter
         ORDER BY b.name ASC
       ''', variables: variables).get();
+
+      // Second whole-table query: how often each buddy held each role. The
+      // per-buddy winner is picked in Dart by usualRoleFor.
+      final roleRows = await _db.customSelect('''
+        SELECT buddy_id, role, COUNT(*) AS role_count
+        FROM dive_buddies
+        GROUP BY buddy_id, role
+      ''').get();
+      final roleCountsByBuddy = <String, Map<String, int>>{};
+      for (final r in roleRows) {
+        roleCountsByBuddy.putIfAbsent(
+          r.data['buddy_id'] as String,
+          () => {},
+        )[r.data['role'] as String] = r.data['role_count'] as int;
+      }
 
       final list = results.map((row) {
         final buddy = domain.Buddy(
@@ -796,16 +814,26 @@ class BuddyRepository {
             row.data['updated_at'] as int,
           ),
         );
+        final lastDive = row.data['last_dive'] as int?;
         return BuddyWithDiveCount(
           buddy: buddy,
           diveCount: row.data['dive_count'] as int,
+          lastDiveAt: lastDive == null
+              ? null
+              : DateTime.fromMillisecondsSinceEpoch(lastDive),
+          usualRoleId: usualRoleFor(roleCountsByBuddy[buddy.id] ?? const {}),
         );
       }).toList();
       final filled = await _withPrimaryCerts(list.map((w) => w.buddy).toList());
       final byId = {for (final b in filled) b.id: b};
       return [
         for (final w in list)
-          BuddyWithDiveCount(buddy: byId[w.buddy.id]!, diveCount: w.diveCount),
+          BuddyWithDiveCount(
+            buddy: byId[w.buddy.id]!,
+            diveCount: w.diveCount,
+            lastDiveAt: w.lastDiveAt,
+            usualRoleId: w.usualRoleId,
+          ),
       ];
     } catch (e, stackTrace) {
       _log.error(
