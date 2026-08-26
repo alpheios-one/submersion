@@ -408,11 +408,15 @@ class _SiteChip extends StatelessWidget {
         children: [
           ExcludeSemantics(child: Icon(icon, size: 12, color: color)),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: textColor),
+          Flexible(
+            child: Text(
+              label,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: textColor),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),

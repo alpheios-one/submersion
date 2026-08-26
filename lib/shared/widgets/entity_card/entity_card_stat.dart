@@ -50,7 +50,14 @@ class EntityCardStat<T, F extends EntityField> extends StatelessWidget {
           ExcludeSemantics(child: Icon(icon, size: 14, color: color)),
           const SizedBox(width: 4),
         ],
-        Text(formatted, style: style),
+        Flexible(
+          child: Text(
+            formatted,
+            style: style,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ],
     );
   }
