@@ -15,7 +15,7 @@ import 'package:submersion/shared/widgets/forms/unit_slider.dart';
 /// Rock Bottom calculator.
 ///
 /// Calculates the minimum gas reserve needed for emergency ascent,
-/// accounting for buddy breathing, stressed SAC rates, problem-solving time
+/// accounting for buddy breathing, a stressed RMV, problem-solving time
 /// at depth, and safety stops.
 class RockBottomCalculator extends ConsumerWidget {
   const RockBottomCalculator({super.key});
@@ -134,7 +134,7 @@ class RockBottomCalculator extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
 
-              // SAC rates card
+              // RMV card
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),

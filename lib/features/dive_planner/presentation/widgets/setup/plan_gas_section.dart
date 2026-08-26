@@ -11,8 +11,8 @@ import 'package:submersion/features/planner/presentation/providers/plan_canvas_p
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Gas settings for the Setup accordion: SAC (with one-tap logged average)
-/// and reserve pressure. Bottom/deco SAC split and SAC factor land here in
+/// Gas settings for the Setup accordion: RMV (with one-tap logged average)
+/// and reserve pressure. Bottom/deco RMV split and RMV factor land here in
 /// later phases (spec G25).
 class PlanGasSection extends ConsumerWidget {
   const PlanGasSection({super.key});
@@ -82,7 +82,7 @@ class PlanGasSection extends ConsumerWidget {
   }
 }
 
-/// One-tap SAC auto-fill from the diver's logged average ("from your log").
+/// One-tap RMV auto-fill from the diver's logged average ("from your log").
 /// Hidden when no logged average exists or it already matches the plan.
 class _LoggedSacButton extends ConsumerWidget {
   const _LoggedSacButton({required this.currentSac, required this.units});
