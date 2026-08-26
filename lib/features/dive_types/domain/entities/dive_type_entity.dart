@@ -10,6 +10,13 @@ class DiveTypeEntity extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  /// Abbreviated form for space-constrained surfaces like the dive detail
+  /// header's type badges (e.g. "Wreck" -> "Wreck", "Search & Recovery" ->
+  /// "S&R"). Only settable on custom types -- built-ins use the fixed
+  /// translated abbreviation in [builtInDiveTypeShortName] instead. Null
+  /// means the diver hasn't set one, so callers fall back to [name].
+  final String? shortName;
+
   const DiveTypeEntity({
     required this.id,
     this.diverId,
@@ -18,6 +25,7 @@ class DiveTypeEntity extends Equatable {
     this.sortOrder = 0,
     required this.createdAt,
     required this.updatedAt,
+    this.shortName,
   });
 
   /// Create a new custom dive type
@@ -26,6 +34,7 @@ class DiveTypeEntity extends Equatable {
     required String name,
     String? diverId,
     int sortOrder = 0,
+    String? shortName,
   }) {
     final now = DateTime.now();
     return DiveTypeEntity(
@@ -36,6 +45,7 @@ class DiveTypeEntity extends Equatable {
       sortOrder: sortOrder,
       createdAt: now,
       updatedAt: now,
+      shortName: shortName,
     );
   }
 
@@ -56,6 +66,7 @@ class DiveTypeEntity extends Equatable {
     int? sortOrder,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? shortName,
   }) {
     return DiveTypeEntity(
       id: id ?? this.id,
@@ -65,6 +76,7 @@ class DiveTypeEntity extends Equatable {
       sortOrder: sortOrder ?? this.sortOrder,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      shortName: shortName ?? this.shortName,
     );
   }
 
@@ -77,5 +89,6 @@ class DiveTypeEntity extends Equatable {
     sortOrder,
     createdAt,
     updatedAt,
+    shortName,
   ];
 }

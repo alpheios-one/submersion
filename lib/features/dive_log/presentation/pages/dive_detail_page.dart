@@ -40,6 +40,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_compute
 import 'package:submersion/features/dive_log/presentation/providers/dive_detail_ui_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_mode_badge.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge_row.dart';
 import 'package:submersion/shared/utils/ink_centered_text_style.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_nav_buttons.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_analysis_providers.dart';
@@ -1225,6 +1226,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     final hasLocation = siteLoc != null || hasGps;
     final colorScheme = Theme.of(context).colorScheme;
     final cardColor = Theme.of(context).cardColor;
+    final diveTypesById = {
+      for (final t
+          in ref.watch(diveTypesProvider).value ?? const <DiveTypeEntity>[])
+        t.id: t,
+    };
 
     final content = Padding(
       padding: const EdgeInsets.all(16),
@@ -1321,31 +1327,58 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   ],
                 ),
               ),
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (dive.rating != null) ...[
-                    ExcludeSemantics(
-                      child: Icon(
-                        Icons.star,
-                        color: Colors.amber.shade600,
-                        size: 20,
+                  Row(
+                    children: [
+                      if (dive.rating != null) ...[
+                        ExcludeSemantics(
+                          child: Icon(
+                            Icons.star,
+                            color: Colors.amber.shade600,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${dive.rating}',
+                          // Same ink-centering fix as DiveModeBadge: without
+                          // it this number's default line leading isn't
+                          // split evenly around its own glyph, so it
+                          // doesn't sit on the same visual line as the star
+                          // icon next to it.
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.inkCentered,
+                          textHeightBehavior: inkCenteredTextHeightBehavior,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      DiveModeBadge(mode: dive.diveMode),
+                    ],
+                  ),
+                  if (dive.diveTypeIds.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    // Capped rather than left unbounded: Row hands a
+                    // non-flex child unbounded width, which would let a
+                    // long run of type badges grow without limit instead of
+                    // wrapping under the rating/mode row.
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 200),
+                      child: DiveTypeBadgeRow(
+                        labels: [
+                          for (final typeId in dive.diveTypeIds)
+                            diveTypeShortLabel(
+                              context.l10n,
+                              typeId,
+                              typesById: diveTypesById,
+                            ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${dive.rating}',
-                      // Same ink-centering fix as DiveModeBadge: without it
-                      // this number's default line leading isn't split
-                      // evenly around its own glyph, so it doesn't sit on
-                      // the same visual line as the star icon next to it.
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleMedium?.inkCentered,
-                      textHeightBehavior: inkCenteredTextHeightBehavior,
-                    ),
-                    const SizedBox(width: 8),
                   ],
-                  DiveModeBadge(mode: dive.diveMode),
                 ],
               ),
             ],

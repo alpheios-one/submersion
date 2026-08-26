@@ -9188,46 +9188,91 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveType_builtin_altitude => 'Bergseetauchen';
 
   @override
+  String get diveType_builtin_altitude_short => 'Bergsee';
+
+  @override
   String get diveType_builtin_boat => 'Bootstauchgang';
+
+  @override
+  String get diveType_builtin_boat_short => 'Boot';
 
   @override
   String get diveType_builtin_cave => 'Höhlentauchen';
 
   @override
+  String get diveType_builtin_cave_short => 'Höhle';
+
+  @override
   String get diveType_builtin_cavern => 'Cavern';
+
+  @override
+  String get diveType_builtin_cavern_short => 'Cavern';
 
   @override
   String get diveType_builtin_deep => 'Tieftauchen';
 
   @override
+  String get diveType_builtin_deep_short => 'Tief';
+
+  @override
   String get diveType_builtin_drift => 'Strömungstauchen';
+
+  @override
+  String get diveType_builtin_drift_short => 'Strömung';
 
   @override
   String get diveType_builtin_freedive => 'Apnoetauchen';
 
   @override
+  String get diveType_builtin_freedive_short => 'Apnoe';
+
+  @override
   String get diveType_builtin_ice => 'Eistauchen';
+
+  @override
+  String get diveType_builtin_ice_short => 'Eis';
 
   @override
   String get diveType_builtin_liveaboard => 'Tauchsafari';
 
   @override
+  String get diveType_builtin_liveaboard_short => 'Safari';
+
+  @override
   String get diveType_builtin_night => 'Nachttauchen';
+
+  @override
+  String get diveType_builtin_night_short => 'Nacht';
 
   @override
   String get diveType_builtin_recreational => 'Sporttauchen';
 
   @override
+  String get diveType_builtin_recreational_short => 'Rec';
+
+  @override
   String get diveType_builtin_shore => 'Ufertauchgang';
+
+  @override
+  String get diveType_builtin_shore_short => 'Ufer';
 
   @override
   String get diveType_builtin_technical => 'Technisches Tauchen';
 
   @override
+  String get diveType_builtin_technical_short => 'Tec';
+
+  @override
   String get diveType_builtin_training => 'Ausbildung';
 
   @override
+  String get diveType_builtin_training_short => 'Kurs';
+
+  @override
   String get diveType_builtin_wreck => 'Wracktauchen';
+
+  @override
+  String get diveType_builtin_wreck_short => 'Wrack';
 
   @override
   String get diveTypes_addDialog_addButton => 'Hinzufügen';
@@ -9241,6 +9286,16 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get diveTypes_addDialog_nameValidation =>
       'Bitte geben Sie einen Namen ein';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper =>
+      'Wird im Tauchgang-Header angezeigt, wenn der Platz knapp ist';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => 'z.B. S&B';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => 'Kurzname (optional)';
 
   @override
   String get diveTypes_addDialog_title =>

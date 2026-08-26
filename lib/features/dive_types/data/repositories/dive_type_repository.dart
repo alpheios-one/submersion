@@ -192,6 +192,7 @@ class DiveTypeRepository {
               ),
               createdAt: Value(now),
               updatedAt: Value(now),
+              shortName: Value(diveType.shortName),
             ),
           );
 
@@ -240,6 +241,7 @@ class DiveTypeRepository {
           name: Value(diveType.name),
           sortOrder: Value(diveType.sortOrder),
           updatedAt: Value(now),
+          shortName: Value(diveType.shortName),
         ),
       );
       await _syncRepository.markRecordPending(
@@ -343,6 +345,7 @@ class DiveTypeRepository {
                 updatedAt: DateTime.fromMillisecondsSinceEpoch(
                   row.data['updated_at'] as int,
                 ),
+                shortName: row.data['short_name'] as String?,
               ),
               diveCount: row.data['dive_count'] as int,
             ),
@@ -400,6 +403,7 @@ class DiveTypeRepository {
       sortOrder: row.sortOrder,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
+      shortName: row.shortName,
     );
   }
 }

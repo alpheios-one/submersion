@@ -28,6 +28,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/compact_tissue
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/field_attribution_badge.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/o2_toxicity_card.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -48,6 +49,7 @@ Widget _buildDetailPage(Dive dive, List<Override> overrides) {
       ).overrideWith((ref) async => <DiveDataSource>[]),
     ],
     child: MaterialApp(
+      locale: const Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: DiveDetailPage(diveId: dive.id, embedded: true),
@@ -1581,6 +1583,25 @@ void main() {
       await _pumpDetailPage(tester, dive);
 
       expect(find.text('OC'), findsOneWidget);
+    });
+  });
+
+  group('DiveDetailPage dive type badges', () {
+    testWidgets('shows a badge for each of the dive\'s types', (tester) async {
+      final dive = createTestDiveWithBottomTime().copyWith(
+        diveTypeIds: ['wreck', 'night'],
+      );
+      await _pumpDetailPage(tester, dive);
+
+      expect(find.text('Wreck'), findsOneWidget);
+      expect(find.text('Night'), findsOneWidget);
+    });
+
+    testWidgets('shows no badges for a dive with no types', (tester) async {
+      final dive = createTestDiveWithBottomTime().copyWith(diveTypeIds: []);
+      await _pumpDetailPage(tester, dive);
+
+      expect(find.byType(DiveTypeBadge), findsNothing);
     });
   });
 }

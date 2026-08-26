@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge.dart';
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
 import 'package:submersion/features/dive_types/presentation/dive_type_display.dart';
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
@@ -83,6 +84,21 @@ class DiveTypesPage extends ConsumerWidget {
     DiveTypeEntity diveType, {
     required bool canDelete,
   }) {
+    // Previewed here so a diver knows what a header badge collapses their
+    // selection to: the fixed translated abbreviation for a built-in type
+    // (see builtInDiveTypeShortName), or the diver's own short name for a
+    // custom one. Hidden when there's nothing to preview -- no short name
+    // set, or (for a built-in) identical to the full name (e.g. English
+    // "Wreck").
+    final fullName = diveType.localizedName(context.l10n);
+    final builtInShort = canDelete
+        ? null
+        : builtInDiveTypeShortName(context.l10n, diveType.id);
+    final customShort = canDelete ? diveType.shortName?.trim() : null;
+    final shortName = canDelete
+        ? (customShort?.isNotEmpty == true ? customShort : null)
+        : (builtInShort == fullName ? null : builtInShort);
+
     return ListTile(
       leading: Icon(
         canDelete ? Icons.label_outline : Icons.label,
@@ -90,17 +106,25 @@ class DiveTypesPage extends ConsumerWidget {
             ? Theme.of(context).colorScheme.secondary
             : Theme.of(context).colorScheme.primary,
       ),
-      title: Text(diveType.localizedName(context.l10n)),
+      title: Text(fullName),
       subtitle: canDelete
           ? Text(context.l10n.diveTypes_custom)
           : Text(context.l10n.diveTypes_builtIn),
-      trailing: canDelete
-          ? IconButton(
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (shortName != null) ...[
+            DiveTypeBadge(label: shortName),
+            if (canDelete) const SizedBox(width: 8),
+          ],
+          if (canDelete)
+            IconButton(
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _confirmDelete(context, ref, diveType),
               tooltip: context.l10n.diveTypes_deleteTooltip,
-            )
-          : null,
+            ),
+        ],
+      ),
     );
   }
 
@@ -109,28 +133,50 @@ class DiveTypesPage extends ConsumerWidget {
     WidgetRef ref,
   ) async {
     final nameController = TextEditingController();
+    final shortNameController = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
-    final result = await showDialog<String>(
+    final result = await showDialog<({String name, String? shortName})>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(dialogContext.l10n.diveTypes_addDialog_title),
         content: Form(
           key: formKey,
-          child: TextFormField(
-            controller: nameController,
-            autofocus: true,
-            decoration: InputDecoration(
-              labelText: dialogContext.l10n.diveTypes_addDialog_nameLabel,
-              hintText: dialogContext.l10n.diveTypes_addDialog_nameHint,
-            ),
-            textCapitalization: TextCapitalization.words,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return dialogContext.l10n.diveTypes_addDialog_nameValidation;
-              }
-              return null;
-            },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: nameController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  labelText: dialogContext.l10n.diveTypes_addDialog_nameLabel,
+                  hintText: dialogContext.l10n.diveTypes_addDialog_nameHint,
+                ),
+                textCapitalization: TextCapitalization.words,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return dialogContext
+                        .l10n
+                        .diveTypes_addDialog_nameValidation;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: shortNameController,
+                decoration: InputDecoration(
+                  labelText:
+                      dialogContext.l10n.diveTypes_addDialog_shortNameLabel,
+                  hintText:
+                      dialogContext.l10n.diveTypes_addDialog_shortNameHint,
+                  helperText:
+                      dialogContext.l10n.diveTypes_addDialog_shortNameHelper,
+                  helperMaxLines: 2,
+                ),
+                textCapitalization: TextCapitalization.words,
+              ),
+            ],
           ),
         ),
         actions: [
@@ -141,7 +187,12 @@ class DiveTypesPage extends ConsumerWidget {
           FilledButton(
             onPressed: () {
               if (formKey.currentState!.validate()) {
-                Navigator.of(dialogContext).pop(nameController.text.trim());
+                Navigator.of(dialogContext).pop((
+                  name: nameController.text.trim(),
+                  shortName: shortNameController.text.trim().isEmpty
+                      ? null
+                      : shortNameController.text.trim(),
+                ));
               }
             },
             child: Text(dialogContext.l10n.diveTypes_addDialog_addButton),
@@ -150,14 +201,17 @@ class DiveTypesPage extends ConsumerWidget {
       ),
     );
 
-    if (result != null && result.isNotEmpty) {
+    if (result != null && result.name.isNotEmpty) {
       try {
         final notifier = ref.read(diveTypeListNotifierProvider.notifier);
-        await notifier.addDiveTypeByName(result);
+        await notifier.addDiveTypeByName(
+          result.name,
+          shortName: result.shortName,
+        );
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(context.l10n.diveTypes_snackbar_added(result)),
+              content: Text(context.l10n.diveTypes_snackbar_added(result.name)),
             ),
           );
         }

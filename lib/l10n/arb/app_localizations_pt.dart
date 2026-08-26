@@ -9190,46 +9190,91 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveType_builtin_altitude => 'Altitude';
 
   @override
+  String get diveType_builtin_altitude_short => 'Altitude';
+
+  @override
   String get diveType_builtin_boat => 'A partir de barco';
+
+  @override
+  String get diveType_builtin_boat_short => 'Barco';
 
   @override
   String get diveType_builtin_cave => 'Gruta';
 
   @override
+  String get diveType_builtin_cave_short => 'Gruta';
+
+  @override
   String get diveType_builtin_cavern => 'Caverna';
+
+  @override
+  String get diveType_builtin_cavern_short => 'Caverna';
 
   @override
   String get diveType_builtin_deep => 'Profundo';
 
   @override
+  String get diveType_builtin_deep_short => 'Profundo';
+
+  @override
   String get diveType_builtin_drift => 'Deriva';
+
+  @override
+  String get diveType_builtin_drift_short => 'Deriva';
 
   @override
   String get diveType_builtin_freedive => 'Apneia';
 
   @override
+  String get diveType_builtin_freedive_short => 'Apneia';
+
+  @override
   String get diveType_builtin_ice => 'Gelo';
+
+  @override
+  String get diveType_builtin_ice_short => 'Gelo';
 
   @override
   String get diveType_builtin_liveaboard => 'Cruzeiro de mergulho';
 
   @override
+  String get diveType_builtin_liveaboard_short => 'Cruzeiro';
+
+  @override
   String get diveType_builtin_night => 'Noturno';
+
+  @override
+  String get diveType_builtin_night_short => 'Noturno';
 
   @override
   String get diveType_builtin_recreational => 'Recreativo';
 
   @override
+  String get diveType_builtin_recreational_short => 'Rec';
+
+  @override
   String get diveType_builtin_shore => 'A partir da costa';
+
+  @override
+  String get diveType_builtin_shore_short => 'Costa';
 
   @override
   String get diveType_builtin_technical => 'Técnico';
 
   @override
+  String get diveType_builtin_technical_short => 'Tec';
+
+  @override
   String get diveType_builtin_training => 'Treinamento';
 
   @override
+  String get diveType_builtin_training_short => 'Treinamento';
+
+  @override
   String get diveType_builtin_wreck => 'Naufrágio';
+
+  @override
+  String get diveType_builtin_wreck_short => 'Naufrágio';
 
   @override
   String get diveTypes_addDialog_addButton => 'Adicionar';
@@ -9242,6 +9287,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_nameValidation => 'Digite um nome';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper =>
+      'Exibido no cabeçalho de detalhes do mergulho quando o espaço é limitado';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => 'ex: ByR';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => 'Nome curto (opcional)';
 
   @override
   String get diveTypes_addDialog_title =>

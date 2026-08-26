@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge.dart';
 import 'package:submersion/features/dive_types/presentation/pages/dive_types_page.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -66,5 +67,58 @@ void main() {
     expect(find.text('Recreational'), findsNothing);
     expect(find.text('Wreck'), findsNothing);
     expect(find.text('Night'), findsNothing);
+  });
+
+  group('custom dive type short name', () {
+    testWidgets(
+      'adding a custom type with a short name shows both on its tile',
+      (tester) async {
+        await tester.pumpWidget(
+          _buildPage(diverIdNotifier, const Locale('en')),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byType(FloatingActionButton));
+        await tester.pumpAndSettle();
+
+        await tester.enterText(
+          find.byType(TextFormField).at(0),
+          'Search & Recovery',
+        );
+        await tester.enterText(find.byType(TextFormField).at(1), 'S&R');
+        await tester.tap(find.widgetWithText(FilledButton, 'Add'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Search & Recovery'), findsOneWidget);
+        expect(find.text('S&R'), findsOneWidget);
+      },
+    );
+
+    testWidgets('a custom type added with no short name shows no badge', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_buildPage(diverIdNotifier, const Locale('en')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextFormField).at(0), 'Cenote');
+      await tester.tap(find.widgetWithText(FilledButton, 'Add'));
+      await tester.pumpAndSettle();
+
+      final tile = find.ancestor(
+        of: find.text('Cenote'),
+        matching: find.byType(ListTile),
+      );
+      expect(tile, findsOneWidget);
+      // Built-in types elsewhere on the page (Recreational -> "Rec", etc.)
+      // legitimately carry their own badge, so the check is scoped to this
+      // tile rather than asserting no DiveTypeBadge exists anywhere.
+      expect(
+        find.descendant(of: tile, matching: find.byType(DiveTypeBadge)),
+        findsNothing,
+      );
+    });
   });
 }

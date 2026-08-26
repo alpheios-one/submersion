@@ -179,7 +179,10 @@ class DiveTypeListNotifier
 
   /// Add a custom dive type by name (generates ID automatically)
   /// Throws if no valid diver profile exists
-  Future<DiveTypeEntity> addDiveTypeByName(String name) async {
+  Future<DiveTypeEntity> addDiveTypeByName(
+    String name, {
+    String? shortName,
+  }) async {
     // Get fresh validated diver ID before creating
     final validatedId = await _ref.read(validatedCurrentDiverIdProvider.future);
 
@@ -187,10 +190,12 @@ class DiveTypeListNotifier
       throw Exception('Cannot create custom dive type without a diver profile');
     }
 
+    final trimmedShortName = shortName?.trim();
     final diveType = DiveTypeEntity.create(
       id: DiveTypeEntity.generateSlug(name),
       name: name.trim(),
       diverId: validatedId,
+      shortName: trimmedShortName?.isNotEmpty == true ? trimmedShortName : null,
     );
     return addDiveType(diveType);
   }
