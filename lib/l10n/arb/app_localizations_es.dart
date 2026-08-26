@@ -14521,6 +14521,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_appearance_metric_events => 'Eventos';
 
   @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Presión estimada del tanque';
+
+  @override
   String get settings_appearance_metric_gasDensity => 'Densidad del gas';
 
   @override

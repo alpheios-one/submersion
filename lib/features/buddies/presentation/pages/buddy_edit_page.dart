@@ -431,7 +431,7 @@ class _BuddyEditPageState extends ConsumerState<BuddyEditPage> {
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.card_membership),
                   title: Text(certificationTitle(cert)),
-                  subtitle: Text(cert.agency.displayName),
+                  subtitle: Text(certificationAgencyAndLevel(cert)),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

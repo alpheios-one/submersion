@@ -2,8 +2,8 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 
-/// Minimal pre-v163 shape: a diver_settings table without the surfacing
-/// pressure column, stamped at v161 so the upgrade to 163 runs.
+/// Minimal pre-v165 shape: a diver_settings table without the surfacing
+/// pressure column, stamped at v161 so the upgrade to 165 runs.
 NativeDatabase _dbAt161() {
   return NativeDatabase.memory(
     setup: (rawDb) {
@@ -19,7 +19,7 @@ NativeDatabase _dbAt161() {
 }
 
 void main() {
-  test('v163 adds trim_tank_pressure_at_surfacing defaulting to 1', () async {
+  test('v165 adds trim_tank_pressure_at_surfacing defaulting to 1', () async {
     final db = AppDatabase(_dbAt161());
     addTearDown(() => db.close());
 
@@ -63,8 +63,8 @@ void main() {
     await expectLater(db.customSelect('SELECT 1').get(), completes);
   });
 
-  test('v163 is present in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(163));
-    expect(AppDatabase.migrationVersions, contains(163));
+  test('v165 is present in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(165));
+    expect(AppDatabase.migrationVersions, contains(165));
   });
 }

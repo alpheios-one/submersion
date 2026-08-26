@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
+import 'package:submersion/core/utils/app_version.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
@@ -3012,9 +3013,7 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
         ref.watch(releaseChannelProvider) == ReleaseChannel.beta;
     final versionString = packageInfoAsync.when(
       data: (info) {
-        final version = info.version.endsWith('.${info.buildNumber}')
-            ? info.version
-            : '${info.version}.${info.buildNumber}';
+        final version = formatAppVersion(info);
         final base = context.l10n.settings_about_version(version);
         return isBetaChannel
             ? context.l10n.settings_updates_channelBadgeBeta(base)

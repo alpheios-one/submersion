@@ -4357,6 +4357,7 @@
   "settings_appearance_metric_ceiling": "Plafon",
   "settings_appearance_metric_cns": "CNS% (O2 toxicitás)",
   "settings_appearance_metric_events": "Esemenyek",
+  "settings_appearance_metric_estimatedTankPressure": "Becsült palacknyomás",
   "settings_appearance_metric_gasDensity": "Gaz suruseg",
   "settings_appearance_metric_gfPercent": "GF%",
   "settings_appearance_metric_heartRate": "Szivfrekvencia",

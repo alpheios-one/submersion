@@ -4434,6 +4434,7 @@
   "settings_appearance_metric_ceiling": "תקרה",
   "settings_appearance_metric_cns": "CNS% (רעילות חמצן)",
   "settings_appearance_metric_events": "אירועים",
+  "settings_appearance_metric_estimatedTankPressure": "לחץ בלון משוער",
   "settings_appearance_metric_gasDensity": "צפיפות גז",
   "settings_appearance_metric_gfPercent": "GF%",
   "settings_appearance_metric_heartRate": "קצב לב",
