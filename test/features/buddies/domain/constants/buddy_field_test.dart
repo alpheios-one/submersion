@@ -227,25 +227,25 @@ void main() {
       );
     });
 
-    test('formats certification level using enum name', () {
+    test('formats certification level using its display name', () {
       expect(
         adapter.formatValue(
           BuddyField.certificationLevel,
           CertificationLevel.advancedOpenWater,
           units,
         ),
-        equals('advancedOpenWater'),
+        equals('Advanced Open Water'),
       );
     });
 
-    test('formats certification agency using enum name', () {
+    test('formats certification agency using its display name', () {
       expect(
         adapter.formatValue(
           BuddyField.certificationAgency,
           CertificationAgency.padi,
           units,
         ),
-        equals('padi'),
+        equals('PADI'),
       );
     });
 
@@ -426,6 +426,51 @@ void main() {
           );
         }
       }
+    });
+  });
+
+  group('lastDive and display names', () {
+    test('lastDive reads the aggregate and formats as a date', () {
+      final entry = BuddyWithDiveCount(
+        buddy: testBuddy,
+        diveCount: 15,
+        lastDiveAt: DateTime(2024, 3, 5),
+      );
+      final value = BuddyFieldAdapter.instance.extractValue(
+        BuddyField.lastDive,
+        entry,
+      );
+      expect(value, DateTime(2024, 3, 5));
+      expect(
+        BuddyFieldAdapter.instance.formatValue(
+          BuddyField.lastDive,
+          value,
+          units,
+        ),
+        units.formatDate(DateTime(2024, 3, 5)),
+      );
+      expect(BuddyField.lastDive.categoryName, 'statistics');
+      expect(BuddyField.lastDive.sortable, isTrue);
+      expect(BuddyField.lastDive.icon, Icons.history);
+    });
+
+    test('certification level and agency format as display names', () {
+      expect(
+        BuddyFieldAdapter.instance.formatValue(
+          BuddyField.certificationLevel,
+          CertificationLevel.advancedOpenWater,
+          units,
+        ),
+        'Advanced Open Water',
+      );
+      expect(
+        BuddyFieldAdapter.instance.formatValue(
+          BuddyField.certificationAgency,
+          CertificationAgency.padi,
+          units,
+        ),
+        'PADI',
+      );
     });
   });
 }

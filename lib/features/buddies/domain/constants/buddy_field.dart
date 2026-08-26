@@ -18,7 +18,8 @@ enum BuddyField implements EntityField {
   certificationLevel,
   certificationAgency,
   diveCount,
-  notes;
+  notes,
+  lastDive;
 
   @override
   String get name => toString().split('.').last;
@@ -32,6 +33,7 @@ enum BuddyField implements EntityField {
     BuddyField.certificationAgency => 'Certification Agency',
     BuddyField.diveCount => 'Dive Count',
     BuddyField.notes => 'Notes',
+    BuddyField.lastDive => 'Last Dive',
   };
 
   @override
@@ -43,6 +45,7 @@ enum BuddyField implements EntityField {
     BuddyField.certificationAgency => 'Agency',
     BuddyField.diveCount => 'Dives',
     BuddyField.notes => 'Notes',
+    BuddyField.lastDive => 'Last dive',
   };
 
   @override
@@ -54,6 +57,7 @@ enum BuddyField implements EntityField {
     BuddyField.certificationAgency => l10n.enum_buddyField_certificationAgency,
     BuddyField.diveCount => l10n.enum_buddyField_diveCount,
     BuddyField.notes => l10n.enum_buddyField_notes,
+    BuddyField.lastDive => l10n.enum_buddyField_lastDive,
   };
 
   @override
@@ -67,6 +71,7 @@ enum BuddyField implements EntityField {
       l10n.enum_buddyField_certificationAgency_short,
     BuddyField.diveCount => l10n.enum_buddyField_diveCount_short,
     BuddyField.notes => l10n.enum_buddyField_notes_short,
+    BuddyField.lastDive => l10n.enum_buddyField_lastDive_short,
   };
 
   @override
@@ -78,6 +83,7 @@ enum BuddyField implements EntityField {
     BuddyField.certificationAgency => Icons.business,
     BuddyField.diveCount => Icons.scuba_diving,
     BuddyField.notes => Icons.notes,
+    BuddyField.lastDive => Icons.history,
   };
 
   @override
@@ -89,6 +95,7 @@ enum BuddyField implements EntityField {
     BuddyField.certificationAgency => 110,
     BuddyField.diveCount => 80,
     BuddyField.notes => 150,
+    BuddyField.lastDive => 110,
   };
 
   @override
@@ -100,6 +107,7 @@ enum BuddyField implements EntityField {
     BuddyField.certificationAgency => 70,
     BuddyField.diveCount => 50,
     BuddyField.notes => 60,
+    BuddyField.lastDive => 70,
   };
 
   @override
@@ -117,6 +125,7 @@ enum BuddyField implements EntityField {
     BuddyField.certificationLevel => 'certification',
     BuddyField.certificationAgency => 'certification',
     BuddyField.notes => 'other',
+    BuddyField.lastDive => 'statistics',
   };
 
   @override
@@ -158,6 +167,7 @@ class BuddyFieldAdapter extends EntityFieldAdapter<BuddyWithCount, BuddyField> {
       BuddyField.certificationAgency => entity.buddy.certificationAgency,
       BuddyField.diveCount => entity.diveCount,
       BuddyField.notes => entity.buddy.notes,
+      BuddyField.lastDive => entity.lastDiveAt,
     };
   }
 
@@ -165,9 +175,12 @@ class BuddyFieldAdapter extends EntityFieldAdapter<BuddyWithCount, BuddyField> {
   String formatValue(BuddyField field, dynamic value, UnitFormatter units) {
     if (value == null) return '--';
     return switch (field) {
-      BuddyField.certificationLevel => (value as CertificationLevel).name,
-      BuddyField.certificationAgency => (value as CertificationAgency).name,
+      BuddyField.certificationLevel =>
+        (value as CertificationLevel).displayName,
+      BuddyField.certificationAgency =>
+        (value as CertificationAgency).displayName,
       BuddyField.diveCount => (value as int).toString(),
+      BuddyField.lastDive => units.formatDate(value as DateTime),
       _ => value is String ? (value.isEmpty ? '--' : value) : value.toString(),
     };
   }
