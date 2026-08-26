@@ -34,6 +34,14 @@ class FilesTabState extends Equatable {
   final int totalToExtract;
   final MatchedSelection match;
 
+  /// A correction added to every staged file's capture time before matching
+  /// and before persisting.
+  ///
+  /// Scoped to one picking session. Cleared by [FilesTabNotifier.clearStagedFiles]
+  /// along with the files themselves: the notifier is not autoDispose, so an
+  /// offset left set would silently follow the user into their next import.
+  final Duration captureTimeOffset;
+
   const FilesTabState({
     required this.files,
     required this.autoMatchByDate,
@@ -41,6 +49,7 @@ class FilesTabState extends Equatable {
     required this.extractedCount,
     required this.totalToExtract,
     required this.match,
+    required this.captureTimeOffset,
   });
 
   factory FilesTabState.initial() => FilesTabState(
@@ -50,6 +59,7 @@ class FilesTabState extends Equatable {
     extractedCount: 0,
     totalToExtract: 0,
     match: MatchedSelection.empty(),
+    captureTimeOffset: Duration.zero,
   );
 
   FilesTabState copyWith({
@@ -59,6 +69,7 @@ class FilesTabState extends Equatable {
     int? extractedCount,
     int? totalToExtract,
     MatchedSelection? match,
+    Duration? captureTimeOffset,
   }) => FilesTabState(
     files: files ?? this.files,
     autoMatchByDate: autoMatchByDate ?? this.autoMatchByDate,
@@ -66,6 +77,7 @@ class FilesTabState extends Equatable {
     extractedCount: extractedCount ?? this.extractedCount,
     totalToExtract: totalToExtract ?? this.totalToExtract,
     match: match ?? this.match,
+    captureTimeOffset: captureTimeOffset ?? this.captureTimeOffset,
   );
 
   @override
@@ -76,6 +88,7 @@ class FilesTabState extends Equatable {
     extractedCount,
     totalToExtract,
     match,
+    captureTimeOffset,
   ];
 }
 
@@ -154,11 +167,25 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
       isExtracting: false,
       extractedCount: 0,
       totalToExtract: 0,
+      captureTimeOffset: Duration.zero,
     );
   }
 
   void setFiles(List<ExtractedFile> files, {required MatchedSelection match}) {
     state = state.copyWith(files: files, match: match);
+  }
+
+  /// Applies a new capture-time [offset] together with the [match] it produced.
+  ///
+  /// Both move in one state update so the review pane's summary count and the
+  /// rendered groups can never disagree: a caller that set the offset first and
+  /// the match second would publish an intermediate state showing the new
+  /// offset against the old grouping.
+  void setCaptureTimeOffset(
+    Duration offset, {
+    required MatchedSelection match,
+  }) {
+    state = state.copyWith(captureTimeOffset: offset, match: match);
   }
 
   void setExtractionProgress({required int done, required int total}) {
@@ -187,7 +214,7 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
         .toList();
     state = state.copyWith(
       files: remainingFiles,
-      match: MatchedSelection(matched: newMatched, unmatched: newUnmatched),
+      match: state.match.copyWith(matched: newMatched, unmatched: newUnmatched),
     );
   }
 
@@ -218,7 +245,7 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
     );
 
     state = state.copyWith(
-      match: MatchedSelection(
+      match: state.match.copyWith(
         matched: newMatched,
         unmatched: state.match.unmatched
             .where((f) => f.sourcePath != sourcePath)
@@ -244,7 +271,7 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
     );
 
     state = state.copyWith(
-      match: MatchedSelection(matched: newMatched, unmatched: const []),
+      match: state.match.copyWith(matched: newMatched, unmatched: const []),
     );
   }
 

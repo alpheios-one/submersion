@@ -187,6 +187,7 @@ class FilesTab extends ConsumerWidget {
     final result = const DivePhotoMatcher().match(
       files: extracted,
       dives: bounds,
+      offset: state.captureTimeOffset,
     );
     notifier.setFiles(extracted, match: result);
   }

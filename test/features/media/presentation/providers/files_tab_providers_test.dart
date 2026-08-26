@@ -951,4 +951,110 @@ void main() {
       expect(bounds.single.exitTime, DateTime.utc(2025, 12, 27, 12, 26));
     });
   });
+
+  group('capture time offset', () {
+    FilesTabNotifier makeNotifier() => FilesTabNotifier(
+      mediaRepository: mockRepo,
+      bookmarkStorage: mockBookmarkStorage,
+      platform: mockPlatform,
+    );
+
+    test('defaults to zero', () {
+      expect(FilesTabState.initial().captureTimeOffset, Duration.zero);
+    });
+
+    test('setCaptureTimeOffset updates the offset and the match together', () {
+      final notifier = makeNotifier();
+      final rematched = MatchedSelection(
+        matched: {
+          'dive-1': [_ef('/a.jpg')],
+        },
+        unmatched: const [],
+      );
+
+      notifier.setCaptureTimeOffset(
+        const Duration(hours: -5),
+        match: rematched,
+      );
+
+      expect(notifier.state.captureTimeOffset, const Duration(hours: -5));
+      expect(notifier.state.match, rematched);
+    });
+
+    test('clearStagedFiles resets the offset but keeps auto-match', () {
+      final notifier = makeNotifier();
+      notifier.toggleAutoMatch();
+      notifier.setCaptureTimeOffset(
+        const Duration(hours: 5),
+        match: MatchedSelection.empty(),
+      );
+
+      notifier.clearStagedFiles();
+
+      expect(notifier.state.captureTimeOffset, Duration.zero);
+      expect(notifier.state.autoMatchByDate, isFalse);
+    });
+
+    test('the diagnostics survive a manual assignment', () {
+      final notifier = makeNotifier();
+      final file = _ef('/a.jpg');
+      notifier.setFiles(
+        [file],
+        match: MatchedSelection(
+          matched: const {},
+          unmatched: [file],
+          diagnostics: const {
+            '/a.jpg': UnmatchedDiagnostic(reason: UnmatchedReason.noTimestamp),
+          },
+        ),
+      );
+
+      notifier.assignToDive('/a.jpg', 'dive-1');
+
+      expect(notifier.state.match.diagnostics, isNotEmpty);
+      expect(notifier.state.match.matched['dive-1'], [file]);
+    });
+
+    test('the diagnostics survive removing a file', () {
+      final notifier = makeNotifier();
+      final kept = _ef('/a.jpg');
+      final dropped = _ef('/b.jpg');
+      notifier.setFiles(
+        [kept, dropped],
+        match: MatchedSelection(
+          matched: const {},
+          unmatched: [kept, dropped],
+          diagnostics: const {
+            '/a.jpg': UnmatchedDiagnostic(reason: UnmatchedReason.noTimestamp),
+            '/b.jpg': UnmatchedDiagnostic(reason: UnmatchedReason.noTimestamp),
+          },
+        ),
+      );
+
+      notifier.removeFile('/b.jpg');
+
+      expect(notifier.state.match.diagnostics.containsKey('/a.jpg'), isTrue);
+      expect(notifier.state.match.unmatched, [kept]);
+    });
+
+    test('the diagnostics survive a bulk assignment', () {
+      final notifier = makeNotifier();
+      final file = _ef('/a.jpg');
+      notifier.setFiles(
+        [file],
+        match: MatchedSelection(
+          matched: const {},
+          unmatched: [file],
+          diagnostics: const {
+            '/a.jpg': UnmatchedDiagnostic(reason: UnmatchedReason.noTimestamp),
+          },
+        ),
+      );
+
+      notifier.assignAllUnmatched('dive-1');
+
+      expect(notifier.state.match.diagnostics, isNotEmpty);
+      expect(notifier.state.match.unmatched, isEmpty);
+    });
+  });
 }
