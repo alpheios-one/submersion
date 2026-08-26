@@ -258,6 +258,53 @@ void main() {
       expect(seenLongitude, closeTo(-66.084902, 1e-6));
     });
 
+    test('leaves out a photo the user deselected in review', () async {
+      final attached = <String>[];
+
+      final count = await UniversalAdapter.attachResolvedPhotos(
+        media: [
+          {'filename': '/p/a.jpg', 'offsetSeconds': 0, '_diveIndex': 0},
+          {'filename': '/p/b.jpg', 'offsetSeconds': 0, '_diveIndex': 0},
+        ],
+        resolvedPathByIndex: const {0: '/x/a.jpg', 1: '/x/b.jpg'},
+        diveIdByIndex: const {0: 'dive-a'},
+        removedDiveIds: const {},
+        dives: [
+          {'dateTime': DateTime.utc(2025, 1, 15, 10)},
+        ],
+        selectedIndices: const {0},
+        attach: (file, diveId, takenAt, latitude, longitude) async {
+          attached.add(file.path);
+        },
+      );
+
+      expect(count, 1);
+      expect(attached, ['/x/a.jpg']);
+    });
+
+    test('a null selection attaches every resolved photo', () async {
+      var attachCalls = 0;
+
+      final count = await UniversalAdapter.attachResolvedPhotos(
+        media: [
+          {'filename': '/p/a.jpg', 'offsetSeconds': 0, '_diveIndex': 0},
+          {'filename': '/p/b.jpg', 'offsetSeconds': 0, '_diveIndex': 0},
+        ],
+        resolvedPathByIndex: const {0: '/x/a.jpg', 1: '/x/b.jpg'},
+        diveIdByIndex: const {0: 'dive-a'},
+        removedDiveIds: const {},
+        dives: [
+          {'dateTime': DateTime.utc(2025, 1, 15, 10)},
+        ],
+        attach: (file, diveId, takenAt, latitude, longitude) async {
+          attachCalls++;
+        },
+      );
+
+      expect(count, 2);
+      expect(attachCalls, 2);
+    });
+
     test(
       'ignores a picture whose dive never made it into the import',
       () async {

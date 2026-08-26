@@ -651,6 +651,7 @@ class UniversalAdapter implements ImportSourceAdapter {
             diveIdByIndex: result.diveIdByIndex,
             removedDiveIds: removedDiveIds,
             dives: payload.entitiesOf(ui.ImportEntityType.dives),
+            selectedIndices: selections[wizard.ImportEntityType.media],
             attach: (file, diveId, takenAt, latitude, longitude) async {
               await _ref
                   .read(mediaImportServiceProvider)
@@ -1019,6 +1020,9 @@ class UniversalAdapter implements ImportSourceAdapter {
   /// multi-dive logbook attaches each photo to exactly the dive that
   /// referenced it.
   ///
+  /// [selectedIndices] is the review step's selection for the media group;
+  /// null means every resolved photo is attached.
+  ///
   /// A copy failure is counted and skipped rather than thrown: the dive
   /// import has already succeeded and must not be undone by a photo. Unlike
   /// [attachImportedPhotos] the failure is not silent, because the caller
@@ -1031,6 +1035,7 @@ class UniversalAdapter implements ImportSourceAdapter {
     required Map<int, String> diveIdByIndex,
     required Set<String> removedDiveIds,
     required List<Map<String, dynamic>> dives,
+    Set<int>? selectedIndices,
     required Future<void> Function(
       File file,
       String diveId,
@@ -1045,6 +1050,11 @@ class UniversalAdapter implements ImportSourceAdapter {
     for (final entry in resolvedPathByIndex.entries) {
       final mediaIndex = entry.key;
       if (mediaIndex < 0 || mediaIndex >= media.length) continue;
+      // Photos appear in review like any other entity, so a deselected one
+      // must actually be left out rather than quietly imported anyway.
+      if (selectedIndices != null && !selectedIndices.contains(mediaIndex)) {
+        continue;
+      }
       final picture = media[mediaIndex];
 
       final diveIndex = picture['_diveIndex'];
