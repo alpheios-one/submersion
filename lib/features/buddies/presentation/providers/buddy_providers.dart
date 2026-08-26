@@ -14,6 +14,7 @@ import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/shared/models/entity_card_view_config.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
+import 'package:submersion/shared/providers/entity_card_config_providers.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 import 'package:submersion/core/utils/log_failure.dart';
 
@@ -530,35 +531,56 @@ final buddyTableConfigProvider =
 // Buddy Card View Config
 // ============================================================================
 
-/// Default card slot configuration for the detailed buddy card view.
+/// Detailed buddy card slots. Persisted per diver under
+/// `card_detailed_buddies`.
 final buddyDetailedCardConfigProvider =
-    StateProvider<EntityCardViewConfig<BuddyField>>(
-      (ref) => const EntityCardViewConfig<BuddyField>(
-        slots: [
-          EntityCardSlotConfig(slotId: 'title', field: BuddyField.buddyName),
-          EntityCardSlotConfig(slotId: 'subtitle', field: BuddyField.email),
-          EntityCardSlotConfig(
-            slotId: 'stat1',
-            field: BuddyField.certificationLevel,
-          ),
-          EntityCardSlotConfig(slotId: 'stat2', field: BuddyField.diveCount),
-        ],
-        extraFields: [],
-      ),
-    );
+    StateNotifierProvider<
+      EntityCardConfigNotifier<BuddyField>,
+      EntityCardViewConfig<BuddyField>
+    >((ref) {
+      final notifier = EntityCardConfigNotifier<BuddyField>(
+        defaultConfig: const EntityCardViewConfig<BuddyField>(
+          slots: [
+            EntityCardSlotConfig(slotId: 'title', field: BuddyField.buddyName),
+            EntityCardSlotConfig(slotId: 'subtitle', field: BuddyField.email),
+            EntityCardSlotConfig(slotId: 'stat1', field: BuddyField.diveCount),
+            EntityCardSlotConfig(slotId: 'stat2', field: BuddyField.lastDive),
+          ],
+        ),
+        fieldFromName: BuddyFieldAdapter.instance.fieldFromName,
+      );
+      final diverId = ref.watch(currentDiverIdProvider);
+      if (diverId != null) {
+        final repo = ref.watch(viewConfigRepositoryProvider);
+        notifier.init(repo, diverId, 'card_detailed_buddies');
+      }
+      return notifier;
+    });
 
-/// Default card slot configuration for the compact buddy card view.
+/// Compact buddy card slots. Persisted per diver under `card_compact_buddies`.
 final buddyCompactCardConfigProvider =
-    StateProvider<EntityCardViewConfig<BuddyField>>(
-      (ref) => const EntityCardViewConfig<BuddyField>(
-        slots: [
-          EntityCardSlotConfig(slotId: 'title', field: BuddyField.buddyName),
-          EntityCardSlotConfig(slotId: 'subtitle', field: BuddyField.email),
-          EntityCardSlotConfig(
-            slotId: 'stat1',
-            field: BuddyField.certificationLevel,
-          ),
-          EntityCardSlotConfig(slotId: 'stat2', field: BuddyField.diveCount),
-        ],
-      ),
-    );
+    StateNotifierProvider<
+      EntityCardConfigNotifier<BuddyField>,
+      EntityCardViewConfig<BuddyField>
+    >((ref) {
+      final notifier = EntityCardConfigNotifier<BuddyField>(
+        defaultConfig: const EntityCardViewConfig<BuddyField>(
+          slots: [
+            EntityCardSlotConfig(slotId: 'title', field: BuddyField.buddyName),
+            EntityCardSlotConfig(
+              slotId: 'subtitle',
+              field: BuddyField.certificationLevel,
+            ),
+            EntityCardSlotConfig(slotId: 'stat1', field: BuddyField.diveCount),
+            EntityCardSlotConfig(slotId: 'stat2', field: BuddyField.lastDive),
+          ],
+        ),
+        fieldFromName: BuddyFieldAdapter.instance.fieldFromName,
+      );
+      final diverId = ref.watch(currentDiverIdProvider);
+      if (diverId != null) {
+        final repo = ref.watch(viewConfigRepositoryProvider);
+        notifier.init(repo, diverId, 'card_compact_buddies');
+      }
+      return notifier;
+    });
