@@ -8039,11 +8039,17 @@ abstract class AppLocalizations {
   /// **'Rate of Change'**
   String get diveLog_detail_label_rateOfChange;
 
-  /// No description provided for @diveLog_detail_label_sacRate.
+  /// No description provided for @diveLog_detail_label_rmv.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate'**
-  String get diveLog_detail_label_sacRate;
+  /// **'RMV'**
+  String get diveLog_detail_label_rmv;
+
+  /// No description provided for @diveLog_detail_label_sac.
+  ///
+  /// In en, this message translates to:
+  /// **'SAC'**
+  String get diveLog_detail_label_sac;
 
   /// No description provided for @diveLog_detail_label_state.
   ///
@@ -8192,7 +8198,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_detail_section_sacRateBySegment.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate by Segment'**
+  /// **'Gas consumption by segment'**
   String get diveLog_detail_section_sacRateBySegment;
 
   /// No description provided for @diveLog_detail_section_tags.
@@ -9944,7 +9950,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_legend_label_sacRate.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate'**
+  /// **'Consumption'**
   String get diveLog_legend_label_sacRate;
 
   /// No description provided for @diveLog_legend_label_showGas.
@@ -10907,11 +10913,11 @@ abstract class AppLocalizations {
   /// **'Pressure'**
   String get setup_units_pressure;
 
-  /// No description provided for @setup_units_sac.
+  /// No description provided for @setup_units_gasConsumption.
   ///
   /// In en, this message translates to:
-  /// **'SAC rate'**
-  String get setup_units_sac;
+  /// **'Gas consumption'**
+  String get setup_units_gasConsumption;
 
   /// No description provided for @setup_units_subtitle.
   ///
@@ -11728,12 +11734,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Min Temp'**
   String get diveLog_rangeStats_label_minTemp;
-
-  /// No description provided for @diveLog_rangeStats_label_sacRate.
-  ///
-  /// In en, this message translates to:
-  /// **'SAC Rate'**
-  String get diveLog_rangeStats_label_sacRate;
 
   /// No description provided for @diveLog_rangeStats_title.
   ///
@@ -12587,11 +12587,17 @@ abstract class AppLocalizations {
   /// **'Rate'**
   String get diveLog_tooltip_rate;
 
-  /// No description provided for @diveLog_tooltip_sac.
+  /// No description provided for @gasConsumption_rmv.
+  ///
+  /// In en, this message translates to:
+  /// **'RMV'**
+  String get gasConsumption_rmv;
+
+  /// No description provided for @gasConsumption_sac.
   ///
   /// In en, this message translates to:
   /// **'SAC'**
-  String get diveLog_tooltip_sac;
+  String get gasConsumption_sac;
 
   /// No description provided for @diveLog_tooltip_sensor.
   ///
@@ -17003,13 +17009,13 @@ abstract class AppLocalizations {
   /// No description provided for @enum_profileMetric_sacRate.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate'**
+  /// **'Gas consumption'**
   String get enum_profileMetric_sacRate;
 
   /// No description provided for @enum_profileMetric_sacRate_short.
   ///
   /// In en, this message translates to:
-  /// **'SAC'**
+  /// **'Consumption'**
   String get enum_profileMetric_sacRate_short;
 
   /// No description provided for @enum_profileMetric_surfaceGf.
@@ -23869,13 +23875,13 @@ abstract class AppLocalizations {
   /// No description provided for @diveDetailSection_sacSegments_name.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate by Segment'**
+  /// **'Gas consumption by segment'**
   String get diveDetailSection_sacSegments_name;
 
   /// No description provided for @diveDetailSection_sacSegments_description.
   ///
   /// In en, this message translates to:
-  /// **'Phase/time SAC segmentation'**
+  /// **'SAC and RMV by phase or time'**
   String get diveDetailSection_sacSegments_description;
 
   /// No description provided for @diveDetailSection_details_name.
@@ -24271,7 +24277,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveDetailSection_tanks_description.
   ///
   /// In en, this message translates to:
-  /// **'Cylinder list, gas mixes, pressures, MOD/MND, per-tank SAC'**
+  /// **'Cylinder list, gas mixes, pressures, MOD/MND, per-tank consumption'**
   String get diveDetailSection_tanks_description;
 
   /// No description provided for @diveDetailSection_buddies_name.
@@ -24577,7 +24583,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_appearance_metric_sacRate.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate'**
+  /// **'Gas consumption'**
   String get settings_appearance_metric_sacRate;
 
   /// No description provided for @settings_appearance_metric_surfaceGf.
@@ -27745,12 +27751,6 @@ abstract class AppLocalizations {
   /// **'Pressure Unit'**
   String get settings_units_dialog_pressureUnit;
 
-  /// No description provided for @settings_units_dialog_sacRateUnit.
-  ///
-  /// In en, this message translates to:
-  /// **'SAC Rate Unit'**
-  String get settings_units_dialog_sacRateUnit;
-
   /// No description provided for @settings_units_gasModel.
   ///
   /// In en, this message translates to:
@@ -27871,11 +27871,41 @@ abstract class AppLocalizations {
   /// **'Quick Select'**
   String get settings_units_quickSelect;
 
-  /// No description provided for @settings_units_sacRate.
+  /// No description provided for @settings_units_gasConsumption_both_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate'**
-  String get settings_units_sacRate;
+  /// **'Show SAC and RMV side by side.'**
+  String get settings_units_gasConsumption_both_subtitle;
+
+  /// No description provided for @settings_units_gasConsumption_both.
+  ///
+  /// In en, this message translates to:
+  /// **'Both'**
+  String get settings_units_gasConsumption_both;
+
+  /// No description provided for @settings_units_gasConsumption_rmv_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas volume breathed per minute at the surface ({unit}). Needs a tank volume.'**
+  String settings_units_gasConsumption_rmv_subtitle(String unit);
+
+  /// No description provided for @settings_units_gasConsumption_sac_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank pressure drop per minute ({unit}). Works with any logged pressures.'**
+  String settings_units_gasConsumption_sac_subtitle(String unit);
+
+  /// No description provided for @settings_units_dialog_gasConsumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas consumption display'**
+  String get settings_units_dialog_gasConsumption;
+
+  /// No description provided for @settings_units_gasConsumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas consumption'**
+  String get settings_units_gasConsumption;
 
   /// No description provided for @settings_units_defaultCurrency.
   ///
@@ -27888,30 +27918,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Default Currency'**
   String get settings_units_dialog_defaultCurrency;
-
-  /// No description provided for @settings_units_sac_pressurePerMinute.
-  ///
-  /// In en, this message translates to:
-  /// **'Pressure per minute'**
-  String get settings_units_sac_pressurePerMinute;
-
-  /// No description provided for @settings_units_sac_pressurePerMinute_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'No tank volume needed (bar/min or psi/min)'**
-  String get settings_units_sac_pressurePerMinute_subtitle;
-
-  /// No description provided for @settings_units_sac_volumePerMinute.
-  ///
-  /// In en, this message translates to:
-  /// **'Volume per minute'**
-  String get settings_units_sac_volumePerMinute;
-
-  /// No description provided for @settings_units_sac_volumePerMinute_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Requires tank volume (L/min or cuft/min)'**
-  String get settings_units_sac_volumePerMinute_subtitle;
 
   /// No description provided for @settings_units_temperature.
   ///
@@ -28330,7 +28336,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_category_gas_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'SAC rates & gas mixes'**
+  /// **'Gas consumption & gas mixes'**
   String get statistics_category_gas_subtitle;
 
   /// No description provided for @statistics_category_gas_title.
@@ -28675,7 +28681,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_gas_sacByRole_error.
   ///
   /// In en, this message translates to:
-  /// **'Failed to load SAC by role'**
+  /// **'Failed to load consumption by role'**
   String get statistics_gas_sacByRole_error;
 
   /// No description provided for @statistics_gas_sacByRole_subtitle.
@@ -28687,32 +28693,44 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_gas_sacByRole_title.
   ///
   /// In en, this message translates to:
-  /// **'SAC by Tank Role'**
+  /// **'Gas consumption by tank role'**
   String get statistics_gas_sacByRole_title;
-
-  /// No description provided for @statistics_gas_sacRecords_best.
-  ///
-  /// In en, this message translates to:
-  /// **'Best SAC Rate'**
-  String get statistics_gas_sacRecords_best;
 
   /// No description provided for @statistics_gas_sacRecords_empty.
   ///
   /// In en, this message translates to:
-  /// **'No SAC data available yet'**
+  /// **'No consumption data yet'**
   String get statistics_gas_sacRecords_empty;
 
   /// No description provided for @statistics_gas_sacRecords_error.
   ///
   /// In en, this message translates to:
-  /// **'Failed to load SAC records'**
+  /// **'Failed to load consumption records'**
   String get statistics_gas_sacRecords_error;
 
-  /// No description provided for @statistics_gas_sacRecords_highest.
+  /// No description provided for @statistics_gas_sacRecords_highestRmv.
   ///
   /// In en, this message translates to:
-  /// **'Highest SAC Rate'**
-  String get statistics_gas_sacRecords_highest;
+  /// **'Highest RMV'**
+  String get statistics_gas_sacRecords_highestRmv;
+
+  /// No description provided for @statistics_gas_sacRecords_highestSac.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest SAC'**
+  String get statistics_gas_sacRecords_highestSac;
+
+  /// No description provided for @statistics_gas_sacRecords_bestRmv.
+  ///
+  /// In en, this message translates to:
+  /// **'Best RMV'**
+  String get statistics_gas_sacRecords_bestRmv;
+
+  /// No description provided for @statistics_gas_sacRecords_bestSac.
+  ///
+  /// In en, this message translates to:
+  /// **'Best SAC'**
+  String get statistics_gas_sacRecords_bestSac;
 
   /// No description provided for @statistics_gas_sacRecords_subtitle.
   ///
@@ -28723,13 +28741,13 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_gas_sacRecords_title.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate Records'**
+  /// **'Gas consumption records'**
   String get statistics_gas_sacRecords_title;
 
   /// No description provided for @statistics_gas_sacTrend_error.
   ///
   /// In en, this message translates to:
-  /// **'Failed to load SAC trend'**
+  /// **'Failed to load consumption trend'**
   String get statistics_gas_sacTrend_error;
 
   /// No description provided for @statistics_gas_sacTrend_subtitle.
@@ -28741,7 +28759,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_gas_sacTrend_title.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate Trend'**
+  /// **'Gas consumption trend'**
   String get statistics_gas_sacTrend_title;
 
   /// No description provided for @statistics_gas_tankRole_backGas.
@@ -32863,18 +32881,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'mV'**
   String get units_profileMetric_millivolts;
-
-  /// Symbol for SAC rate in liters per minute
-  ///
-  /// In en, this message translates to:
-  /// **'L/min'**
-  String get units_sac_litersPerMin;
-
-  /// Symbol for SAC rate in pressure units per minute
-  ///
-  /// In en, this message translates to:
-  /// **'pressure/min'**
-  String get units_sac_pressurePerMin;
 
   /// Symbol for Celsius temperature unit
   ///
@@ -40361,7 +40367,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_detail_sacVolumeHint.
   ///
   /// In en, this message translates to:
-  /// **'Add a cylinder volume to show SAC in {unit}/min'**
+  /// **'Add a cylinder volume to show RMV in {unit}/min'**
   String diveLog_detail_sacVolumeHint(String unit);
 
   /// No description provided for @safetyHub_alert_noFly.
@@ -42296,11 +42302,17 @@ abstract class AppLocalizations {
   /// **'End Pressure'**
   String get enum_diveField_endPressure;
 
-  /// No description provided for @enum_diveField_sacRate.
+  /// No description provided for @enum_diveField_rmv.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate'**
-  String get enum_diveField_sacRate;
+  /// **'RMV (volume rate)'**
+  String get enum_diveField_rmv;
+
+  /// No description provided for @enum_diveField_sac.
+  ///
+  /// In en, this message translates to:
+  /// **'SAC (pressure rate)'**
+  String get enum_diveField_sac;
 
   /// No description provided for @enum_diveField_gasConsumed.
   ///
@@ -42644,11 +42656,17 @@ abstract class AppLocalizations {
   /// **'End P'**
   String get enum_diveField_endPressure_short;
 
-  /// No description provided for @enum_diveField_sacRate_short.
+  /// No description provided for @enum_diveField_rmv_short.
+  ///
+  /// In en, this message translates to:
+  /// **'RMV'**
+  String get enum_diveField_rmv_short;
+
+  /// No description provided for @enum_diveField_sac_short.
   ///
   /// In en, this message translates to:
   /// **'SAC'**
-  String get enum_diveField_sacRate_short;
+  String get enum_diveField_sac_short;
 
   /// No description provided for @enum_diveField_gasConsumed_short.
   ///

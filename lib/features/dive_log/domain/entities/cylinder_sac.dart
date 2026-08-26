@@ -28,13 +28,14 @@ class CylinderSac extends Equatable {
   /// SAC rate in bar/min at surface
   final double? sacRate;
 
-  /// SAC rate in L/min at surface (computed if tankVolume available).
+  /// RMV for this cylinder in L/min at surface (computed if tankVolume
+  /// available).
   ///
   /// [sacRate] is bar/min against a 1 bar reference, so scaling it by the
   /// cylinder's size is the whole conversion. Dividing by the standard
   /// atmosphere as well shaved 1.3% off this readout while the dive's
-  /// headline SAC used a different reference (issue #828).
-  double? get sacVolume =>
+  /// headline value used a different reference (issue #828).
+  double? get rmv =>
       sacRate != null && tankVolume != null ? sacRate! * tankVolume! : null;
 
   /// Start pressure in bar

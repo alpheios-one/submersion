@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/cylinder_sac.dart';
@@ -94,7 +95,7 @@ Widget _buildCard({
   Map<String, List<TankPressurePoint>> tankPressures = const {},
   UnitFormatter units = _units,
   AppSettings settings = _settings,
-  SacUnit sacUnit = SacUnit.pressurePerMin,
+  GasConsumptionDisplay display = GasConsumptionDisplay.sac,
 }) {
   return testApp(
     overrides: [
@@ -107,7 +108,7 @@ Widget _buildCard({
         dive: dive,
         units: units,
         settings: settings,
-        sacUnit: sacUnit,
+        display: display,
       ),
     ),
   );
@@ -139,8 +140,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // sacRate 2.0 bar/min, pressurePerMin mode, metric.
-      expect(find.text('2.0 bar/min'), findsOneWidget);
+      // sacRate 2.0 bar/min, SAC lane, metric.
+      expect(find.text('SAC 2.0 bar/min'), findsOneWidget);
       // gasUsedLiters = (200 - 50) * 11.1 = 1665 L.
       expect(find.text('1665 L used'), findsOneWidget);
     });
@@ -193,26 +194,55 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('2.0 bar/min'), findsOneWidget);
-      expect(find.text('1.2 bar/min'), findsOneWidget);
+      expect(find.text('SAC 2.0 bar/min'), findsOneWidget);
+      expect(find.text('SAC 1.2 bar/min'), findsOneWidget);
       expect(find.textContaining('Deco O2'), findsOneWidget);
     });
 
-    testWidgets('formats SAC as L/min when unit is litersPerMin', (
-      tester,
-    ) async {
+    testWidgets('formats RMV when the display is rmv', (tester) async {
       await tester.pumpWidget(
         _buildCard(
           dive: _makeDive([_makeTank()]),
           cylinderSacs: [_makeSac()],
-          sacUnit: SacUnit.litersPerMin,
+          display: GasConsumptionDisplay.rmv,
         ),
       );
       await tester.pumpAndSettle();
 
       // sacVolume = 2.0 * 11.1 = 22.2 -> '22.2 L/min'. The standard-atmosphere
       // divisor is gone now that both sides share a 1 bar reference (#828).
-      expect(find.text('22.2 L/min'), findsOneWidget);
+      expect(find.text('RMV 22.2 L/min'), findsOneWidget);
+      expect(find.textContaining('bar/min'), findsNothing);
+    });
+
+    testWidgets('both shows a SAC line and an RMV line', (tester) async {
+      await tester.pumpWidget(
+        _buildCard(
+          dive: _makeDive([_makeTank()]),
+          cylinderSacs: [_makeSac()],
+          display: GasConsumptionDisplay.both,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('SAC 2.0 bar/min'), findsOneWidget);
+      expect(find.text('RMV 22.2 L/min'), findsOneWidget);
+    });
+
+    testWidgets('both omits the RMV line for a cylinder without a volume', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildCard(
+          dive: _makeDive([_makeTank(volume: null)]),
+          cylinderSacs: [_makeSac(tankVolume: null)],
+          display: GasConsumptionDisplay.both,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('SAC 2.0 bar/min'), findsOneWidget);
+      expect(find.textContaining('RMV'), findsNothing);
     });
 
     testWidgets('formats pressures and SAC in imperial units', (tester) async {
@@ -231,8 +261,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // 2.0 bar/min * 14.5038 = 29.0076 -> '29.0 psi/min'.
-      expect(find.text('29.0 psi/min'), findsOneWidget);
+      // 2.0 bar/min * 14.5038 = 29.0076 -> '29 psi/min' (no decimal for psi).
+      expect(find.text('SAC 29 psi/min'), findsOneWidget);
       // Pressure line rendered in psi.
       expect(find.textContaining('psi →'), findsOneWidget);
     });
