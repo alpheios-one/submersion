@@ -7651,7 +7651,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get divePlanner_label_runtime => 'Looptijd';
 
   @override
-  String get divePlanner_label_sacRate => 'SAC tempo:';
+  String get divePlanner_label_sacRate => 'RMV:';
 
   @override
   String get divePlanner_label_status => 'Status';
@@ -11714,7 +11714,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_resetAll => 'Alle calculators resetten';
 
   @override
-  String get gasCalculators_sacRate => 'SAC tempo';
+  String get gasCalculators_sacRate => 'RMV';
 
   @override
   String get gasCalculators_tab_bestMix => 'Beste mengsel';
@@ -16420,7 +16420,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_units_gasModel_explanation =>
-      'Hoe flesdruk wordt omgerekend naar gasvolume. Dit beïnvloedt het SAC, de gasstatistieken, de planner en de gasrekenmachines. Ideaal gas komt overeen met de berekening die opleidingen leren; reëel gas is fysisch nauwkeurig en geeft een ongeveer 5% lager SAC.';
+      'Hoe flesdruk wordt omgerekend naar gasvolume. Dit beïnvloedt het RMV, de gasstatistieken, de planner en de gasrekenmachines. Ideaal gas komt overeen met de berekening die opleidingen leren; reëel gas is fysisch nauwkeurig en geeft een ongeveer 5% lager RMV.';
 
   @override
   String get settings_units_dialog_gasModel => 'Gasberekeningen';
@@ -21170,7 +21170,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_aboutDescription =>
-      'Rock bottom is de minimale gasreserve voor een noodopstijging terwijl je lucht deelt met je buddy.\n\n• Gebruikt verhoogde SAC-waarden (2-3x normaal)\n• Gaat ervan uit dat beide duikers op een fles zitten\n• Inclusief veiligheidsstop indien ingeschakeld\n\nKeer de duik altijd om VOOR je rock bottom bereikt!';
+      'Rock bottom is de minimale gasreserve voor een noodopstijging terwijl je lucht deelt met je buddy.\n\n• Gebruikt verhoogde RMV-waarden (2-3x normaal)\n• Gaat ervan uit dat beide duikers op een fles zitten\n• Inclusief veiligheidsstop indien ingeschakeld\n\nKeer de duik altijd om VOOR je rock bottom bereikt!';
 
   @override
   String get gasCalculators_rockBottom_aboutTitle => 'Over Rock Bottom';
@@ -21195,11 +21195,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Stijgtijd naar oppervlak';
 
   @override
-  String get gasCalculators_rockBottom_buddySac => 'SAC buddy';
+  String get gasCalculators_rockBottom_buddySac => 'RMV buddy';
 
   @override
   String get gasCalculators_rockBottom_combinedStressedSac =>
-      'Gecombineerde stress-SAC';
+      'Gecombineerde stress-RMV';
 
   @override
   String get gasCalculators_rockBottom_emergencyAscentBreakdown =>
@@ -21243,10 +21243,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_stressedSacHint =>
-      'Gebruik hogere SAC-waarden om rekening te houden met stress tijdens een noodsituatie';
+      'Gebruik een hogere RMV om rekening te houden met stress tijdens een noodsituatie';
 
   @override
-  String get gasCalculators_rockBottom_stressedSacRates => 'Stress-SAC-waarden';
+  String get gasCalculators_rockBottom_stressedSacRates => 'Stress-RMV';
 
   @override
   String get gasCalculators_rockBottom_tankSize => 'Flesgrootte';
@@ -21264,7 +21264,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get gasCalculators_rockBottom_yourSac => 'Jouw SAC';
+  String get gasCalculators_rockBottom_yourSac => 'Jouw RMV';
 
   @override
   String get gpsLogger_androidNotificationText =>
@@ -31249,7 +31249,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
-    return 'SAC-verbruik: $value $volumeSymbol per minuut';
+    return 'RMV: $value $volumeSymbol per minuut';
   }
 
   @override

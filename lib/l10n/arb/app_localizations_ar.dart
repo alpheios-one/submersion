@@ -7559,7 +7559,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get divePlanner_label_runtime => 'وقت التشغيل';
 
   @override
-  String get divePlanner_label_sacRate => 'معدل SAC:';
+  String get divePlanner_label_sacRate => 'RMV:';
 
   @override
   String get divePlanner_label_status => 'الحالة';
@@ -11589,7 +11589,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_resetAll => 'إعادة تعيين جميع الحاسبات';
 
   @override
-  String get gasCalculators_sacRate => 'معدل SAC';
+  String get gasCalculators_sacRate => 'RMV';
 
   @override
   String get gasCalculators_tab_bestMix => 'أفضل خليط';
@@ -20955,7 +20955,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_aboutDescription =>
-      'الحد الأدنى للغاز هو أقل احتياطي غاز للصعود الطارئ أثناء مشاركة الهواء مع رفيقك.\n\n- يستخدم معدلات SAC تحت الضغط (2-3 أضعاف المعدل الطبيعي)\n- يفترض أن كلا الغواصين على أسطوانة واحدة\n- يشمل وقفة الأمان عند تفعيلها\n\nقم بإنهاء الغطسة دائمًا قبل الوصول إلى الحد الأدنى!';
+      'الحد الأدنى للغاز هو أقل احتياطي غاز للصعود الطارئ أثناء مشاركة الهواء مع رفيقك.\n\n- يستخدم معدلات RMV تحت الضغط (2-3 أضعاف المعدل الطبيعي)\n- يفترض أن كلا الغواصين على أسطوانة واحدة\n- يشمل وقفة الأمان عند تفعيلها\n\nقم بإنهاء الغطسة دائمًا قبل الوصول إلى الحد الأدنى!';
 
   @override
   String get gasCalculators_rockBottom_aboutTitle => 'حول الحد الأدنى للغاز';
@@ -20980,11 +20980,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'وقت الصعود إلى السطح';
 
   @override
-  String get gasCalculators_rockBottom_buddySac => 'SAC الرفيق';
+  String get gasCalculators_rockBottom_buddySac => 'RMV الرفيق';
 
   @override
   String get gasCalculators_rockBottom_combinedStressedSac =>
-      'SAC المشترك تحت الضغط';
+      'RMV المشترك تحت الضغط';
 
   @override
   String get gasCalculators_rockBottom_emergencyAscentBreakdown =>
@@ -21027,11 +21027,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_stressedSacHint =>
-      'استخدم معدلات SAC أعلى لاحتساب الإجهاد أثناء الطوارئ';
+      'استخدم RMV أعلى لاحتساب الإجهاد أثناء الطوارئ';
 
   @override
-  String get gasCalculators_rockBottom_stressedSacRates =>
-      'معدلات SAC تحت الضغط';
+  String get gasCalculators_rockBottom_stressedSacRates => 'RMV تحت الضغط';
 
   @override
   String get gasCalculators_rockBottom_tankSize => 'حجم الأسطوانة';
@@ -21049,7 +21048,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get gasCalculators_rockBottom_yourSac => 'SAC الخاص بك';
+  String get gasCalculators_rockBottom_yourSac => 'RMV الخاص بك';
 
   @override
   String get gpsLogger_androidNotificationText => 'يجري تسجيل مسار السطح';
@@ -31145,7 +31144,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
-    return 'معدل SAC: $value $volumeSymbol في الدقيقة';
+    return 'RMV: $value $volumeSymbol في الدقيقة';
   }
 
   @override

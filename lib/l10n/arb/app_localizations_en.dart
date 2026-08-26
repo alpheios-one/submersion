@@ -7572,7 +7572,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get divePlanner_label_runtime => 'Runtime';
 
   @override
-  String get divePlanner_label_sacRate => 'SAC Rate:';
+  String get divePlanner_label_sacRate => 'RMV:';
 
   @override
   String get divePlanner_label_status => 'Status';
@@ -11606,7 +11606,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_resetAll => 'Reset all calculators';
 
   @override
-  String get gasCalculators_sacRate => 'SAC Rate';
+  String get gasCalculators_sacRate => 'RMV';
 
   @override
   String get gasCalculators_tab_bestMix => 'Best Mix';
@@ -16274,7 +16274,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_units_gasModel_explanation =>
-      'How cylinder pressure is converted to gas volume. This affects SAC rate, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for SAC.';
+      'How cylinder pressure is converted to gas volume. This affects RMV, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for RMV.';
 
   @override
   String get settings_units_dialog_gasModel => 'Gas calculations';
@@ -20975,7 +20975,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_aboutDescription =>
-      'Rock bottom is the minimum gas reserve for an emergency ascent while sharing air with your buddy.\n\n• Uses stressed SAC rates (2-3x normal)\n• Assumes both divers on one tank\n• Includes safety stop when enabled\n\nAlways turn the dive BEFORE reaching rock bottom!';
+      'Rock bottom is the minimum gas reserve for an emergency ascent while sharing air with your buddy.\n\n• Uses a stressed RMV (2-3x normal)\n• Assumes both divers on one tank\n• Includes safety stop when enabled\n\nAlways turn the dive BEFORE reaching rock bottom!';
 
   @override
   String get gasCalculators_rockBottom_aboutTitle => 'About Rock Bottom';
@@ -21000,11 +21000,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Ascent time to surface';
 
   @override
-  String get gasCalculators_rockBottom_buddySac => 'Buddy SAC';
+  String get gasCalculators_rockBottom_buddySac => 'Buddy RMV';
 
   @override
   String get gasCalculators_rockBottom_combinedStressedSac =>
-      'Combined stressed SAC';
+      'Combined stressed RMV';
 
   @override
   String get gasCalculators_rockBottom_emergencyAscentBreakdown =>
@@ -21049,10 +21049,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_stressedSacHint =>
-      'Use higher SAC rates to account for stress during emergency';
+      'Use a higher RMV to account for stress during an emergency';
 
   @override
-  String get gasCalculators_rockBottom_stressedSacRates => 'Stressed SAC Rates';
+  String get gasCalculators_rockBottom_stressedSacRates => 'Stressed RMV';
 
   @override
   String get gasCalculators_rockBottom_tankSize => 'Tank Size';
@@ -21070,7 +21070,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get gasCalculators_rockBottom_yourSac => 'Your SAC';
+  String get gasCalculators_rockBottom_yourSac => 'Your RMV';
 
   @override
   String get gpsLogger_androidNotificationText =>
@@ -30987,7 +30987,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
-    return 'SAC Rate: $value $volumeSymbol per minute';
+    return 'RMV: $value $volumeSymbol per minute';
   }
 
   @override

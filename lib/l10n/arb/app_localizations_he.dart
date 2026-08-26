@@ -7520,7 +7520,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get divePlanner_label_runtime => 'זמן ריצה';
 
   @override
-  String get divePlanner_label_sacRate => 'קצב SAC:';
+  String get divePlanner_label_sacRate => 'RMV:';
 
   @override
   String get divePlanner_label_status => 'סטטוס';
@@ -11514,7 +11514,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_resetAll => 'אפס את כל המחשבונים';
 
   @override
-  String get gasCalculators_sacRate => 'קצב SAC';
+  String get gasCalculators_sacRate => 'RMV';
 
   @override
   String get gasCalculators_tab_bestMix => 'תערובת מיטבית';
@@ -20808,7 +20808,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_aboutDescription =>
-      'Rock Bottom הוא מינימום עתודת הגז הנדרש לעלייה חירומית תוך שיתוף אוויר עם השותף שלך.\n\n• משתמש בקצבי SAC במצב לחץ (2-3 כפול מהרגיל)\n• מניח ששני הצוללים על מיכל אחד\n• כולל עצירת בטיחות כשמופעלת\n\nתמיד סיים את הצלילה לפני שמגיעים ל-Rock Bottom!';
+      'Rock Bottom הוא מינימום עתודת הגז הנדרש לעלייה חירומית תוך שיתוף אוויר עם השותף שלך.\n\n• משתמש בקצבי RMV במצב לחץ (2-3 כפול מהרגיל)\n• מניח ששני הצוללים על מיכל אחד\n• כולל עצירת בטיחות כשמופעלת\n\nתמיד סיים את הצלילה לפני שמגיעים ל-Rock Bottom!';
 
   @override
   String get gasCalculators_rockBottom_aboutTitle => 'אודות Rock Bottom';
@@ -20832,11 +20832,11 @@ class AppLocalizationsHe extends AppLocalizations {
       'זמן עלייה לפני השטח';
 
   @override
-  String get gasCalculators_rockBottom_buddySac => 'SAC השותף';
+  String get gasCalculators_rockBottom_buddySac => 'RMV השותף';
 
   @override
   String get gasCalculators_rockBottom_combinedStressedSac =>
-      'SAC משולב במצב לחץ';
+      'RMV משולב במצב לחץ';
 
   @override
   String get gasCalculators_rockBottom_emergencyAscentBreakdown =>
@@ -20879,10 +20879,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_stressedSacHint =>
-      'השתמש בקצבי SAC גבוהים יותר לפיצוי על לחץ במצב חירום';
+      'השתמש ב-RMV גבוה יותר לפיצוי על לחץ במצב חירום';
 
   @override
-  String get gasCalculators_rockBottom_stressedSacRates => 'קצבי SAC במצב לחץ';
+  String get gasCalculators_rockBottom_stressedSacRates => 'RMV במצב לחץ';
 
   @override
   String get gasCalculators_rockBottom_tankSize => 'גודל מיכל';
@@ -20899,7 +20899,7 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get gasCalculators_rockBottom_yourSac => 'ה-SAC שלך';
+  String get gasCalculators_rockBottom_yourSac => 'ה-RMV שלך';
 
   @override
   String get gpsLogger_androidNotificationText => 'מקליט את מסלול פני המים';
@@ -30847,7 +30847,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
-    return 'קצב SAC: $value $volumeSymbol לדקה';
+    return 'RMV: $value $volumeSymbol לדקה';
   }
 
   @override

@@ -7711,7 +7711,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get divePlanner_label_runtime => 'Tempo Totale';
 
   @override
-  String get divePlanner_label_sacRate => 'Velocità SAC:';
+  String get divePlanner_label_sacRate => 'RMV:';
 
   @override
   String get divePlanner_label_status => 'Stato';
@@ -11805,7 +11805,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gasCalculators_resetAll => 'Ripristina tutti i calcolatori';
 
   @override
-  String get gasCalculators_sacRate => 'Velocità SAC';
+  String get gasCalculators_sacRate => 'RMV';
 
   @override
   String get gasCalculators_tab_bestMix => 'Miscela Migliore';
@@ -16549,7 +16549,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_units_gasModel_explanation =>
-      'Come la pressione della bombola viene convertita in volume di gas. Riguarda il SAC, le statistiche del gas, il pianificatore e i calcolatori. Il gas ideale corrisponde al calcolo insegnato dalle didattiche; il gas reale è fisicamente accurato e restituisce un SAC inferiore di circa il 5%.';
+      'Come la pressione della bombola viene convertita in volume di gas. Riguarda l\'RMV, le statistiche del gas, il pianificatore e i calcolatori. Il gas ideale corrisponde al calcolo insegnato dalle didattiche; il gas reale è fisicamente accurato e restituisce un RMV inferiore di circa il 5%.';
 
   @override
   String get settings_units_dialog_gasModel => 'Calcoli del gas';
@@ -21332,7 +21332,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_aboutDescription =>
-      'Il rock bottom è la riserva minima di gas per una risalita di emergenza condividendo l\'aria con il compagno.\n\n• Usa consumi SAC da stress (2-3x il normale)\n• Presuppone entrambi i subacquei su una bombola\n• Include la tappa di sicurezza se abilitata\n\nInverti sempre l\'immersione PRIMA di raggiungere il rock bottom!';
+      'Il rock bottom è la riserva minima di gas per una risalita di emergenza condividendo l\'aria con il compagno.\n\n• Usa consumi RMV da stress (2-3x il normale)\n• Presuppone entrambi i subacquei su una bombola\n• Include la tappa di sicurezza se abilitata\n\nInverti sempre l\'immersione PRIMA di raggiungere il rock bottom!';
 
   @override
   String get gasCalculators_rockBottom_aboutTitle =>
@@ -21358,11 +21358,11 @@ class AppLocalizationsIt extends AppLocalizations {
       'Tempo di risalita in superficie';
 
   @override
-  String get gasCalculators_rockBottom_buddySac => 'SAC compagno';
+  String get gasCalculators_rockBottom_buddySac => 'RMV compagno';
 
   @override
   String get gasCalculators_rockBottom_combinedStressedSac =>
-      'SAC combinato sotto stress';
+      'RMV combinato sotto stress';
 
   @override
   String get gasCalculators_rockBottom_emergencyAscentBreakdown =>
@@ -21407,11 +21407,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_stressedSacHint =>
-      'Usa valori SAC più alti per tenere conto dello stress durante l\'emergenza';
+      'Usa un RMV più alto per tenere conto dello stress durante l\'emergenza';
 
   @override
-  String get gasCalculators_rockBottom_stressedSacRates =>
-      'Valori SAC sotto stress';
+  String get gasCalculators_rockBottom_stressedSacRates => 'RMV sotto stress';
 
   @override
   String get gasCalculators_rockBottom_tankSize => 'Dimensione bombola';
@@ -21429,7 +21428,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get gasCalculators_rockBottom_yourSac => 'Il tuo SAC';
+  String get gasCalculators_rockBottom_yourSac => 'Il tuo RMV';
 
   @override
   String get gpsLogger_androidNotificationText =>
@@ -31463,7 +31462,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
-    return 'Consumo SAC: $value $volumeSymbol al minuto';
+    return 'RMV: $value $volumeSymbol al minuto';
   }
 
   @override
