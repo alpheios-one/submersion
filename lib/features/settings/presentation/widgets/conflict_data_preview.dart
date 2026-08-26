@@ -1,0 +1,250 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:submersion/core/providers/provider.dart';
+
+import 'package:submersion/core/services/sync/conflict_reference.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/data_quality/domain/entities/quality_finding.dart';
+// buildQualityUnitFormatters is the one place that binds the finding renderer
+// to the diver's unit settings; it lives beside the inbox that first needed it.
+import 'package:submersion/features/data_quality/presentation/pages/data_quality_inbox_page.dart'
+    show buildQualityUnitFormatters;
+import 'package:submersion/features/data_quality/presentation/widgets/quality_finding_message.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/settings/presentation/widgets/conflict_reference_labels.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
+
+/// One labelled line of a conflict's data preview.
+typedef ConflictPreviewRow = ({String label, String value});
+
+/// Sync bookkeeping present on nearly every record. None of it helps a user
+/// choose between two versions.
+const _alwaysHidden = <String>{
+  'id',
+  'hlc',
+  'deviceId',
+  'originDeviceId',
+  'syncedAt',
+};
+
+/// Fields an entity renders some other way, and so must not repeat as raw
+/// columns. Quality findings store facts, not prose: `detectorId` and `params`
+/// become a localized sentence, so the raw values would only be noise.
+const _entityHidden = <String, Set<String>>{
+  'qualityFindings': {'detectorId', 'detectorVersion', 'params', 'category'},
+};
+
+/// Fields worth leading with when an entity has them, carried over from the
+/// original preview so dives, sites and gear keep reading the way they did.
+const _preferredFields = <String>[
+  'name',
+  'title',
+  'description',
+  'date',
+  'location',
+  'maxDepth',
+  'duration',
+  'notes',
+];
+
+/// A record's data preview: resolved references first, then the fields that
+/// distinguish the two versions.
+class ConflictDataPreview extends ConsumerWidget {
+  const ConflictDataPreview({
+    super.key,
+    required this.entityType,
+    required this.data,
+    required this.references,
+  });
+
+  final String entityType;
+  final Map<String, dynamic> data;
+  final List<ConflictReference> references;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    if (data.isEmpty) {
+      return Text(
+        context.l10n.settings_conflict_noDataAvailable,
+        style: theme.textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+      );
+    }
+
+    final rows = conflictPreviewRows(
+      l10n: context.l10n,
+      units: UnitFormatter(ref.watch(settingsProvider)),
+      findingFormatters: buildQualityUnitFormatters(ref),
+      entityType: entityType,
+      data: data,
+      references: references,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final row in rows)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 100,
+                  child: Text(
+                    '${row.label}:',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(row.value, style: theme.textTheme.bodySmall),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Builds the preview lines for one side of a conflict.
+///
+/// References come first because for a junction entity they are the only
+/// real-world content the record has; the remaining columns follow, with
+/// bookkeeping and already-rendered fields dropped.
+List<ConflictPreviewRow> conflictPreviewRows({
+  required AppLocalizations l10n,
+  required UnitFormatter units,
+  required QualityUnitFormatters findingFormatters,
+  required String entityType,
+  required Map<String, dynamic> data,
+  required List<ConflictReference> references,
+}) {
+  final rows = <ConflictPreviewRow>[
+    for (final reference in references)
+      (
+        label: conflictReferenceLabel(l10n, reference),
+        value: conflictReferenceValue(l10n, units, reference),
+      ),
+  ];
+
+  final message = entityType == 'qualityFindings'
+      ? _findingMessage(l10n, findingFormatters, data)
+      : null;
+  if (message != null) {
+    rows.add((
+      label: l10n.settings_conflict_ref_finding,
+      value: '${message.title}: ${message.detail}',
+    ));
+  }
+
+  final hidden = {
+    ..._alwaysHidden,
+    ...?_entityHidden[entityType],
+    for (final reference in references) reference.field,
+  };
+  for (final entry in _scalarFields(data, hidden).entries) {
+    rows.add((
+      label: entry.key,
+      value: formatConflictScalar(l10n, units, entry.key, entry.value),
+    ));
+  }
+  return rows;
+}
+
+/// Renders a value the way the app renders it elsewhere: epoch millis as a
+/// date, a flag as yes/no. Everything else prints as stored.
+String formatConflictScalar(
+  AppLocalizations l10n,
+  UnitFormatter units,
+  String key,
+  Object value,
+) {
+  if (value is bool) {
+    return value ? l10n.common_action_yes : l10n.common_action_no;
+  }
+  if (value is int && _isTimestamp(key, value)) {
+    return units.formatDateTime(
+      DateTime.fromMillisecondsSinceEpoch(value),
+      l10n: l10n,
+    );
+  }
+  return value.toString();
+}
+
+/// True for a column that stores a moment rather than a duration. Both the
+/// name and the magnitude must agree: `bottomTime` and `runtime` are seconds,
+/// so only values large enough to be Unix millis are treated as dates.
+bool _isTimestamp(String key, int value) {
+  const millisFloor = 100000000000; // ~1973 in Unix millis
+  final named =
+      key.endsWith('At') || key.endsWith('Time') || key.endsWith('Date');
+  return named && value >= millisFloor;
+}
+
+Map<String, dynamic> _scalarFields(
+  Map<String, dynamic> data,
+  Set<String> hidden,
+) {
+  bool usable(String key) => !hidden.contains(key) && data[key] != null;
+
+  final preferred = <String, dynamic>{
+    for (final key in _preferredFields)
+      if (data.containsKey(key) && usable(key)) key: data[key],
+  };
+  if (preferred.isNotEmpty) return preferred;
+
+  // Nothing recognizable: show the first few columns that survived the filter,
+  // which for a junction row is what is left after its foreign keys.
+  final fallback = <String, dynamic>{};
+  for (final entry in data.entries) {
+    if (fallback.length >= 5) break;
+    if (usable(entry.key)) fallback[entry.key] = entry.value;
+  }
+  return fallback;
+}
+
+/// Rebuilds a finding from its synced row so the data-quality renderer can
+/// turn its numeric params into a localized sentence.
+///
+/// Returns null when the row cannot be read as a finding (a category from a
+/// newer schema, malformed params); the preview then falls back to showing the
+/// raw columns, which is what it did before.
+QualityFindingMessage? _findingMessage(
+  AppLocalizations l10n,
+  QualityUnitFormatters formatters,
+  Map<String, dynamic> data,
+) {
+  final detectorId = data['detectorId'];
+  if (detectorId is! String || detectorId.isEmpty) return null;
+  try {
+    final finding = QualityFinding(
+      id: data['id'] as String? ?? '',
+      diveId: data['diveId'] as String? ?? '',
+      detectorId: detectorId,
+      detectorVersion: (data['detectorVersion'] as num?)?.toInt() ?? 0,
+      category: QualityCategory.values.byName(data['category'] as String),
+      severity: QualitySeverity.values.byName(data['severity'] as String),
+      status: QualityStatus.values.byName(data['status'] as String),
+      params:
+          jsonDecode(data['params'] as String? ?? '{}') as Map<String, Object?>,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        (data['createdAt'] as num?)?.toInt() ?? 0,
+      ),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(
+        (data['updatedAt'] as num?)?.toInt() ?? 0,
+      ),
+    );
+    return buildFindingMessage(l10n, finding, formatters);
+  } on ArgumentError {
+    return null;
+  } on FormatException {
+    return null;
+  } on TypeError {
+    return null;
+  }
+}

@@ -14992,6 +14992,117 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_conflict_previous_tooltip => 'Previous conflict';
 
   @override
+  String get settings_conflict_ref_buddy => 'Buddy';
+
+  @override
+  String get settings_conflict_ref_certification => 'Certification';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'Checklist template';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Connected account';
+
+  @override
+  String get settings_conflict_ref_course => 'Course';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'Course requirement';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Cylinder configuration';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Data source';
+
+  @override
+  String get settings_conflict_ref_dive => 'Dive';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Dive center';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Dive computer';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Dive plan';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Dive site';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Dive type';
+
+  @override
+  String get settings_conflict_ref_diver => 'Diver';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Equipment';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Equipment set';
+
+  @override
+  String get settings_conflict_ref_finding => 'Finding';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Instructor';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Linked dive';
+
+  @override
+  String get settings_conflict_ref_media => 'Media';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Media subscription';
+
+  @override
+  String get settings_conflict_ref_missing => 'No longer in this library';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Planned tank';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Pre-dive checklist template';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'Pre-dive checklist run';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Related dive';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Service type';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Sighting';
+
+  @override
+  String get settings_conflict_ref_signer => 'Signed by';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Source dive';
+
+  @override
+  String get settings_conflict_ref_species => 'Species';
+
+  @override
+  String get settings_conflict_ref_tag => 'Tag';
+
+  @override
+  String get settings_conflict_ref_tank => 'Tank';
+
+  @override
+  String get settings_conflict_ref_trip => 'Trip';
+
+  @override
   String get settings_conflict_remoteVersion => 'Remote Version';
 
   @override

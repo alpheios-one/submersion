@@ -73,6 +73,46 @@ void main() {
       expect(conflicts.first.recordId, 'd-getc');
     });
 
+    test('getConflicts resolves foreign keys on both sides (#1031)', () async {
+      final serializer = SyncDataSerializer();
+      await serializer.upsertRecord('tags', {
+        'id': 'tag-local',
+        'name': 'Wreck',
+        'createdAt': 1000,
+        'updatedAt': 1000,
+      });
+      await serializer.upsertRecord('tags', {
+        'id': 'tag-remote',
+        'name': 'Night',
+        'createdAt': 1000,
+        'updatedAt': 1000,
+      });
+      await seedDive('d-refs', 10);
+      await serializer.upsertRecord('diveTags', {
+        'id': 'dt-1',
+        'diveId': 'd-refs',
+        'tagId': 'tag-local',
+        'createdAt': 1000,
+      });
+      await raiseConflict('diveTags', 'dt-1', {
+        'id': 'dt-1',
+        'diveId': 'd-refs',
+        'tagId': 'tag-remote',
+        'createdAt': 2000,
+      });
+
+      final conflict = (await buildService().getConflicts()).single;
+
+      expect(
+        conflict.localReferences.firstWhere((r) => r.field == 'tagId').name,
+        'Wreck',
+      );
+      expect(
+        conflict.remoteReferences.firstWhere((r) => r.field == 'tagId').name,
+        'Night',
+      );
+    });
+
     test(
       'keepLocal preserves the local value and clears the conflict',
       () async {

@@ -25549,6 +25549,222 @@ abstract class AppLocalizations {
   /// **'Previous conflict'**
   String get settings_conflict_previous_tooltip;
 
+  /// No description provided for @settings_conflict_ref_buddy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buddy'**
+  String get settings_conflict_ref_buddy;
+
+  /// No description provided for @settings_conflict_ref_certification.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification'**
+  String get settings_conflict_ref_certification;
+
+  /// No description provided for @settings_conflict_ref_checklistTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist template'**
+  String get settings_conflict_ref_checklistTemplate;
+
+  /// No description provided for @settings_conflict_ref_connectedAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected account'**
+  String get settings_conflict_ref_connectedAccount;
+
+  /// No description provided for @settings_conflict_ref_course.
+  ///
+  /// In en, this message translates to:
+  /// **'Course'**
+  String get settings_conflict_ref_course;
+
+  /// No description provided for @settings_conflict_ref_courseRequirement.
+  ///
+  /// In en, this message translates to:
+  /// **'Course requirement'**
+  String get settings_conflict_ref_courseRequirement;
+
+  /// No description provided for @settings_conflict_ref_cylinderConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder configuration'**
+  String get settings_conflict_ref_cylinderConfig;
+
+  /// No description provided for @settings_conflict_ref_dataSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Data source'**
+  String get settings_conflict_ref_dataSource;
+
+  /// No description provided for @settings_conflict_ref_dive.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive'**
+  String get settings_conflict_ref_dive;
+
+  /// No description provided for @settings_conflict_ref_diveCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive center'**
+  String get settings_conflict_ref_diveCenter;
+
+  /// No description provided for @settings_conflict_ref_diveComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive computer'**
+  String get settings_conflict_ref_diveComputer;
+
+  /// No description provided for @settings_conflict_ref_divePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive plan'**
+  String get settings_conflict_ref_divePlan;
+
+  /// No description provided for @settings_conflict_ref_diveSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive site'**
+  String get settings_conflict_ref_diveSite;
+
+  /// No description provided for @settings_conflict_ref_diveType.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive type'**
+  String get settings_conflict_ref_diveType;
+
+  /// No description provided for @settings_conflict_ref_diver.
+  ///
+  /// In en, this message translates to:
+  /// **'Diver'**
+  String get settings_conflict_ref_diver;
+
+  /// No description provided for @settings_conflict_ref_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get settings_conflict_ref_equipment;
+
+  /// No description provided for @settings_conflict_ref_equipmentSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment set'**
+  String get settings_conflict_ref_equipmentSet;
+
+  /// No description provided for @settings_conflict_ref_finding.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding'**
+  String get settings_conflict_ref_finding;
+
+  /// No description provided for @settings_conflict_ref_instructor.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructor'**
+  String get settings_conflict_ref_instructor;
+
+  /// No description provided for @settings_conflict_ref_linkedDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked dive'**
+  String get settings_conflict_ref_linkedDive;
+
+  /// No description provided for @settings_conflict_ref_media.
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get settings_conflict_ref_media;
+
+  /// No description provided for @settings_conflict_ref_mediaSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Media subscription'**
+  String get settings_conflict_ref_mediaSubscription;
+
+  /// No description provided for @settings_conflict_ref_missing.
+  ///
+  /// In en, this message translates to:
+  /// **'No longer in this library'**
+  String get settings_conflict_ref_missing;
+
+  /// No description provided for @settings_conflict_ref_named.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} ({date})'**
+  String settings_conflict_ref_named(Object name, Object date);
+
+  /// No description provided for @settings_conflict_ref_plannedTank.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned tank'**
+  String get settings_conflict_ref_plannedTank;
+
+  /// No description provided for @settings_conflict_ref_preDiveChecklistTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-dive checklist template'**
+  String get settings_conflict_ref_preDiveChecklistTemplate;
+
+  /// No description provided for @settings_conflict_ref_preDiveSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-dive checklist run'**
+  String get settings_conflict_ref_preDiveSession;
+
+  /// No description provided for @settings_conflict_ref_relatedDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Related dive'**
+  String get settings_conflict_ref_relatedDive;
+
+  /// No description provided for @settings_conflict_ref_serviceKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Service type'**
+  String get settings_conflict_ref_serviceKind;
+
+  /// No description provided for @settings_conflict_ref_sighting.
+  ///
+  /// In en, this message translates to:
+  /// **'Sighting'**
+  String get settings_conflict_ref_sighting;
+
+  /// No description provided for @settings_conflict_ref_signer.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed by'**
+  String get settings_conflict_ref_signer;
+
+  /// No description provided for @settings_conflict_ref_sourceDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Source dive'**
+  String get settings_conflict_ref_sourceDive;
+
+  /// No description provided for @settings_conflict_ref_species.
+  ///
+  /// In en, this message translates to:
+  /// **'Species'**
+  String get settings_conflict_ref_species;
+
+  /// No description provided for @settings_conflict_ref_tag.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get settings_conflict_ref_tag;
+
+  /// No description provided for @settings_conflict_ref_tank.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank'**
+  String get settings_conflict_ref_tank;
+
+  /// No description provided for @settings_conflict_ref_trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get settings_conflict_ref_trip;
+
   /// No description provided for @settings_conflict_remoteVersion.
   ///
   /// In en, this message translates to:

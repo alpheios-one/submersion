@@ -15226,6 +15226,118 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_conflict_previous_tooltip => 'Vorheriger Konflikt';
 
   @override
+  String get settings_conflict_ref_buddy => 'Tauchpartner';
+
+  @override
+  String get settings_conflict_ref_certification => 'Zertifizierung';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'Checklisten-Vorlage';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Verbundenes Konto';
+
+  @override
+  String get settings_conflict_ref_course => 'Kurs';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'Kursanforderung';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Flaschenkonfiguration';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Datenquelle';
+
+  @override
+  String get settings_conflict_ref_dive => 'Tauchgang';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Tauchbasis';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Tauchcomputer';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Tauchplan';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Tauchplatz';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Tauchgangart';
+
+  @override
+  String get settings_conflict_ref_diver => 'Taucher';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Ausrüstung';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Ausrüstungsset';
+
+  @override
+  String get settings_conflict_ref_finding => 'Befund';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Instructor';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Verknüpfter Tauchgang';
+
+  @override
+  String get settings_conflict_ref_media => 'Medien';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Medien-Abonnement';
+
+  @override
+  String get settings_conflict_ref_missing => 'Nicht mehr in dieser Bibliothek';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Geplante Flasche';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Vorlage für Checkliste vor dem Tauchgang';
+
+  @override
+  String get settings_conflict_ref_preDiveSession =>
+      'Checkliste vor dem Tauchgang';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Zugehöriger Tauchgang';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Wartungsart';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Sichtung';
+
+  @override
+  String get settings_conflict_ref_signer => 'Unterschrieben von';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Quell-Tauchgang';
+
+  @override
+  String get settings_conflict_ref_species => 'Art';
+
+  @override
+  String get settings_conflict_ref_tag => 'Tag';
+
+  @override
+  String get settings_conflict_ref_tank => 'Flasche';
+
+  @override
+  String get settings_conflict_ref_trip => 'Reise';
+
+  @override
   String get settings_conflict_remoteVersion => 'Remote-Version';
 
   @override

@@ -15196,6 +15196,119 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_conflict_previous_tooltip => 'Elozo ütközes';
 
   @override
+  String get settings_conflict_ref_buddy => 'Buvartars';
+
+  @override
+  String get settings_conflict_ref_certification => 'Kepesites';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'Ellenorzolista sablon';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Csatlakoztatott fiok';
+
+  @override
+  String get settings_conflict_ref_course => 'Tanfolyam';
+
+  @override
+  String get settings_conflict_ref_courseRequirement =>
+      'Tanfolyami kovetelmeny';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Palackkonfiguracio';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Adatforras';
+
+  @override
+  String get settings_conflict_ref_dive => 'Merules';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Merulocentrum';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Merulesszamitogep';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Merulesi terv';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Merulohely';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Merules tipusa';
+
+  @override
+  String get settings_conflict_ref_diver => 'Merulo';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Felszereles';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Felszereleskeszlet';
+
+  @override
+  String get settings_conflict_ref_finding => 'Eszrevetel';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Oktato';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Kapcsolt merules';
+
+  @override
+  String get settings_conflict_ref_media => 'Media';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Media-elofizetes';
+
+  @override
+  String get settings_conflict_ref_missing => 'Mar nincs ebben a konyvtarban';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Tervezett palack';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Merules elotti ellenorzolista sablon';
+
+  @override
+  String get settings_conflict_ref_preDiveSession =>
+      'Merules elotti ellenorzolista';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Kapcsolodo merules';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Szerviz tipusa';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Eszleles';
+
+  @override
+  String get settings_conflict_ref_signer => 'Alairta';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Forras merules';
+
+  @override
+  String get settings_conflict_ref_species => 'Fajok';
+
+  @override
+  String get settings_conflict_ref_tag => 'Cimke';
+
+  @override
+  String get settings_conflict_ref_tank => 'Palack';
+
+  @override
+  String get settings_conflict_ref_trip => 'Utazas';
+
+  @override
   String get settings_conflict_remoteVersion => 'Tavoli valtozat';
 
   @override

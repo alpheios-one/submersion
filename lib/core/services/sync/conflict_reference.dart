@@ -1,0 +1,186 @@
+import 'package:submersion/core/services/sync/sync_data_serializer.dart';
+
+/// A foreign-key column of a conflicting record, resolved to whatever
+/// real-world anchor the row it points at carries.
+///
+/// Junction and relation entities (`diveTags`, `qualityFindings`, ...) store
+/// nothing but ids, so the Resolve Conflicts dialog has no way to describe them
+/// from the raw record alone (#1031). Resolving the reference gives the dialog
+/// a tag's name or a dive's date to show instead of a UUID.
+class ConflictReference {
+  const ConflictReference({
+    required this.field,
+    required this.targetType,
+    required this.recordId,
+    this.name,
+    this.timestamp,
+  });
+
+  /// The column on the conflicting record, e.g. `diveId`.
+  final String field;
+
+  /// The sync entity type the column points at, e.g. `dives`.
+  final String targetType;
+
+  /// The referenced row's id.
+  final String recordId;
+
+  /// The referenced row's human name, when it has one. A dive borrows its
+  /// site's name, matching how the rest of the app names an unnamed dive.
+  final String? name;
+
+  /// The referenced row's date anchor, for entities dated rather than named.
+  final DateTime? timestamp;
+
+  /// True when the referenced row is not in the local database: it was deleted
+  /// here, or the conflicting record arrived from a peer that still has it.
+  /// The dialog says so rather than showing a blank line.
+  bool get isMissing => name == null && timestamp == null;
+}
+
+/// Resolves the foreign keys of a conflicting record into [ConflictReference]s.
+///
+/// Lookups go through [SyncDataSerializer.fetchRecord], the same method that
+/// loads the conflicting row itself, so every entity the serializer can sync is
+/// resolvable without a second query layer.
+class ConflictReferenceResolver {
+  const ConflictReferenceResolver(this._serializer);
+
+  final SyncDataSerializer _serializer;
+
+  /// Foreign-key column -> sync entity type, transcribed from the
+  /// `.references(Table, #id)` clauses in `database.dart`. Columns whose name
+  /// is ambiguous across tables are disambiguated by [_targetOverrides].
+  static const _defaultTargets = <String, String>{
+    'diveId': 'dives',
+    'relatedDiveId': 'dives',
+    'linkedDiveId': 'dives',
+    'sourceDiveId': 'dives',
+    'siteId': 'diveSites',
+    'tagId': 'tags',
+    'diveTypeId': 'diveTypes',
+    'diverId': 'divers',
+    'buddyId': 'buddies',
+    'instructorId': 'buddies',
+    'signerId': 'buddies',
+    'equipmentId': 'equipment',
+    'setId': 'equipmentSets',
+    'equipmentSetId': 'equipmentSets',
+    'configId': 'cylinderConfigs',
+    'computerId': 'diveComputers',
+    'sourceId': 'diveDataSources',
+    'tankId': 'diveTanks',
+    'switchToTankId': 'divePlanTanks',
+    'planId': 'divePlans',
+    'tripId': 'trips',
+    'diveCenterId': 'diveCenters',
+    'courseId': 'courses',
+    'certificationId': 'certifications',
+    'requirementId': 'courseRequirements',
+    'serviceKindId': 'serviceKinds',
+    'speciesId': 'species',
+    'sightingId': 'sightings',
+    'mediaId': 'media',
+    'subscriptionId': 'mediaSubscriptions',
+    'connectorAccountId': 'connectedAccounts',
+    'sessionId': 'preDiveSessions',
+    'templateId': 'checklistTemplates',
+  };
+
+  /// Owning entity type -> column -> target, for the two column names the
+  /// schema reuses across unrelated tables.
+  static const _targetOverrides = <String, Map<String, String>>{
+    'divePlanSegments': {'tankId': 'divePlanTanks'},
+    'preDiveSessions': {'templateId': 'preDiveChecklistTemplates'},
+    'preDiveChecklistTemplateItems': {
+      'templateId': 'preDiveChecklistTemplates',
+    },
+  };
+
+  /// Name-carrying columns, in the order the app prefers them.
+  static const _nameFields = <String>[
+    'name',
+    'title',
+    'commonName',
+    'caption',
+    'originalFilename',
+  ];
+
+  /// Date-carrying columns (Unix millis) for entities that are dated, not
+  /// named.
+  static const _timestampFields = <String>[
+    'diveDateTime',
+    'startDateTime',
+    'startDate',
+  ];
+
+  /// The entity type [field] on an [entityType] record points at, or null when
+  /// the column is not a foreign key.
+  static String? targetTypeFor(String entityType, String field) =>
+      _targetOverrides[entityType]?[field] ?? _defaultTargets[field];
+
+  /// Resolves every foreign key in [data]. Null and non-string values are
+  /// skipped, so a nullable reference that is unset produces no entry.
+  Future<List<ConflictReference>> resolve(
+    String entityType,
+    Map<String, dynamic> data,
+  ) async {
+    final references = <ConflictReference>[];
+    for (final entry in data.entries) {
+      final target = targetTypeFor(entityType, entry.key);
+      if (target == null) continue;
+      final id = entry.value;
+      if (id is! String || id.isEmpty) continue;
+      references.add(await _resolveOne(entry.key, target, id));
+    }
+    return references;
+  }
+
+  Future<ConflictReference> _resolveOne(
+    String field,
+    String targetType,
+    String recordId,
+  ) async {
+    final row = await _serializer.fetchRecord(targetType, recordId);
+    if (row == null) {
+      return ConflictReference(
+        field: field,
+        targetType: targetType,
+        recordId: recordId,
+      );
+    }
+    return ConflictReference(
+      field: field,
+      targetType: targetType,
+      recordId: recordId,
+      name: _nameOf(row) ?? await _borrowedSiteName(row),
+      timestamp: _timestampOf(row),
+    );
+  }
+
+  /// An unnamed dive is displayed by its site everywhere else in the app, so
+  /// borrow that name here too. Exactly one hop: the site's own name is read
+  /// directly and never resolved further.
+  Future<String?> _borrowedSiteName(Map<String, dynamic> row) async {
+    final siteId = row['siteId'];
+    if (siteId is! String || siteId.isEmpty) return null;
+    final site = await _serializer.fetchRecord('diveSites', siteId);
+    return site == null ? null : _nameOf(site);
+  }
+
+  static String? _nameOf(Map<String, dynamic> row) {
+    for (final field in _nameFields) {
+      final value = row[field];
+      if (value is String && value.isNotEmpty) return value;
+    }
+    return null;
+  }
+
+  static DateTime? _timestampOf(Map<String, dynamic> row) {
+    for (final field in _timestampFields) {
+      final value = row[field];
+      if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    }
+    return null;
+  }
+}
