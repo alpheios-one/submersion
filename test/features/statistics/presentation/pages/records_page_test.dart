@@ -11,7 +11,6 @@ import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
-import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/map_style.dart';
@@ -24,6 +23,10 @@ import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/statistics/presentation/pages/records_page.dart';
+import 'package:submersion/features/statistics/presentation/widgets/statistics_filter_bar.dart';
+import 'package:submersion/features/statistics/presentation/providers/statistics_filter_provider.dart';
+import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
+import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 typedef Override = riverpod.Override;
@@ -497,13 +500,28 @@ void main() {
       prefs = await SharedPreferences.getInstance();
     });
 
-    /// Helper to create common provider overrides
+    /// Helper to create common provider overrides.
+    ///
+    /// [filter] drives the Statistics scope the page now follows (issue
+    /// #1028); an active one also makes StatisticsFilterBar read the filtered
+    /// statistics, hence the paired override.
     List<Override> getOverrides({
       Future<DiveRecords> Function(Ref)? diveRecordsOverride,
+      DiveFilterState filter = const DiveFilterState(),
     }) {
       return [
-        diveRecordsProvider.overrideWith(
+        filteredDiveRecordsProvider.overrideWith(
           diveRecordsOverride ?? (ref) async => DiveRecords(),
+        ),
+        statisticsFilterProvider.overrideWith((ref) => filter),
+        filteredDiveStatisticsProvider.overrideWith(
+          (ref) async => DiveStatistics(
+            totalDives: 0,
+            totalTimeSeconds: 0,
+            maxDepth: 0,
+            avgMaxDepth: 0,
+            totalSites: 0,
+          ),
         ),
         sharedPreferencesProvider.overrideWithValue(prefs),
         // Mock the settingsProvider to avoid database access
@@ -550,6 +568,68 @@ void main() {
         find.text('Start logging dives to see your records here'),
         findsOneWidget,
       );
+    });
+
+    // Issue #1028: the page follows the Statistics filter, so an empty result
+    // can mean "the filter is too narrow" rather than "no dives logged".
+    testWidgets('shows the filtered empty state when a filter is active', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: getOverrides(
+            filter: const DiveFilterState(favoritesOnly: true),
+          ),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: RecordsPage(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('No dives match your filters'), findsOneWidget);
+      expect(find.text('No Records Yet'), findsNothing);
+    });
+
+    testWidgets('hosts the filter bar, collapsed while no filter is active', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: getOverrides(),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: RecordsPage(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(StatisticsFilterBar), findsOneWidget);
+      expect(find.byIcon(Icons.filter_list), findsNothing);
+    });
+
+    testWidgets('shows the filter bar summary while a filter is active', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: getOverrides(
+            filter: const DiveFilterState(favoritesOnly: true),
+          ),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: RecordsPage(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.filter_list), findsOneWidget);
     });
 
     testWidgets('should display refresh button in app bar', (tester) async {

@@ -2681,21 +2681,48 @@ class DiveRepository {
   }
 
   /// Get dive records (superlatives)
-  /// Optionally filter by [diverId] for per-diver records
-  Future<DiveRecords> getRecords({String? diverId}) async {
+  ///
+  /// Optionally filter by [diverId] for per-diver records, and by [filter] for
+  /// a narrowed scope. Issue #1028: the Statistics tab shows these superlatives
+  /// beside totals that already honour its filter, so a deepest dive drawn from
+  /// the whole logbook contradicted the panel right above it.
+  Future<DiveRecords> getRecords({
+    String? diverId,
+    DiveFilterState filter = const DiveFilterState(),
+  }) async {
     try {
-      final vars = diverId != null
-          ? [Variable<String>(diverId)]
-          : <Variable<Object>>[];
+      // Explicitly typed List<Variable<Object>>: a bare `[Variable<String>(...)]`
+      // literal would reify as List<Variable<String>>, and the later addAll of
+      // the filter binds would then throw (mirrors getStatistics).
+      final List<Variable<Object>> vars = [
+        if (diverId != null) Variable<String>(diverId),
+      ];
+      final df = buildFilteredDiveIdSubquery(filter);
+      // params are always non-null so `p!` is safe.
+      vars.addAll(df.params.map((p) => Variable<Object>(p!)));
+
+      // Every statement below binds the same `vars` list, so the diver `?` must
+      // always precede the filter `?`s -- hence the fixed clause order.
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
-      final diverFilterFirst = diverId != null ? 'WHERE d.diver_id = ?' : '';
+      final filterClause = df.subquery.isEmpty
+          ? ''
+          : 'AND d.id IN (${df.subquery})';
+      // The first/last statements have no WHERE of their own, so their scope
+      // clauses have to open one.
+      final scopeConditions = [
+        if (diverId != null) 'd.diver_id = ?',
+        if (df.subquery.isNotEmpty) 'd.id IN (${df.subquery})',
+      ];
+      final diverFilterFirst = scopeConditions.isEmpty
+          ? ''
+          : 'WHERE ${scopeConditions.join(' AND ')}';
 
       // Deepest dive
       final deepestResult = await _db.customSelect('''
       SELECT d.*, s.name as site_name
       FROM dives d
       LEFT JOIN dive_sites s ON d.site_id = s.id
-      WHERE d.max_depth IS NOT NULL $diverFilter
+      WHERE d.max_depth IS NOT NULL $diverFilter $filterClause
       ORDER BY d.max_depth DESC
       LIMIT 1
     ''', variables: vars).getSingleOrNull();
@@ -2706,7 +2733,7 @@ class DiveRepository {
         COALESCE(d.runtime, d.bottom_time) as effective_runtime
       FROM dives d
       LEFT JOIN dive_sites s ON d.site_id = s.id
-      WHERE COALESCE(d.runtime, d.bottom_time) IS NOT NULL $diverFilter
+      WHERE COALESCE(d.runtime, d.bottom_time) IS NOT NULL $diverFilter $filterClause
       ORDER BY effective_runtime DESC
       LIMIT 1
     ''', variables: vars).getSingleOrNull();
@@ -2716,7 +2743,7 @@ class DiveRepository {
       SELECT d.*, s.name as site_name
       FROM dives d
       LEFT JOIN dive_sites s ON d.site_id = s.id
-      WHERE d.water_temp IS NOT NULL $diverFilter
+      WHERE d.water_temp IS NOT NULL $diverFilter $filterClause
       ORDER BY d.water_temp ASC
       LIMIT 1
     ''', variables: vars).getSingleOrNull();
@@ -2726,7 +2753,7 @@ class DiveRepository {
       SELECT d.*, s.name as site_name
       FROM dives d
       LEFT JOIN dive_sites s ON d.site_id = s.id
-      WHERE d.water_temp IS NOT NULL $diverFilter
+      WHERE d.water_temp IS NOT NULL $diverFilter $filterClause
       ORDER BY d.water_temp DESC
       LIMIT 1
     ''', variables: vars).getSingleOrNull();
@@ -2756,7 +2783,7 @@ class DiveRepository {
       SELECT d.*, s.name as site_name
       FROM dives d
       LEFT JOIN dive_sites s ON d.site_id = s.id
-      WHERE d.max_depth IS NOT NULL AND d.max_depth > 0 $diverFilter
+      WHERE d.max_depth IS NOT NULL AND d.max_depth > 0 $diverFilter $filterClause
       ORDER BY d.max_depth ASC
       LIMIT 1
     ''', variables: vars).getSingleOrNull();
