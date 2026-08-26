@@ -51,21 +51,22 @@ class RibbonBuilder {
   static MeshData curtain({
     required List<double> times,
     required List<double> depths,
+    required List<double> zs,
     required SceneBounds bounds,
   }) {
     final n = times.length;
     final positions = Float32List(n * 6);
     final colors = Float32List(n * 6);
-    const floorY = -SceneBounds.ySpan;
+    final floorY = bounds.sceneMinY;
     for (var i = 0; i < n; i++) {
       final x = bounds.xOf(times[i]);
       final p = i * 6;
       positions[p] = x;
       positions[p + 1] = bounds.yOf(depths[i]);
-      positions[p + 2] = 0;
+      positions[p + 2] = zs[i];
       positions[p + 3] = x;
       positions[p + 4] = floorY;
-      positions[p + 5] = 0;
+      positions[p + 5] = zs[i];
       for (var k = 0; k < 2; k++) {
         colors[p + k * 3] = _curtainColor.r;
         colors[p + k * 3 + 1] = _curtainColor.g;
