@@ -29,6 +29,12 @@ void showTerrainAppearanceSheet(BuildContext context) {
     // The custom-level rows open a keypad. Without a viewInsets pad the sheet
     // keeps its full height, so the lower rows and the add button sit behind
     // the keyboard with no scroll extent left to bring them up (issue #1094).
+    // Not redundant with useSafeArea: that inserts SafeArea(bottom: false),
+    // so the sheet deliberately runs to the bottom edge of the screen. This
+    // one supplies the bottom inset the outer one skips, keeping the last
+    // control clear of the home indicator. Nothing is applied twice -- a
+    // SafeArea strips the padding it consumes out of the MediaQuery, so the
+    // horizontal insets are already zero by the time this one reads them.
     builder: (sheetContext) => SafeArea(
       child: Padding(
         key: const ValueKey('terrainAppearanceSheetInsets'),

@@ -81,6 +81,7 @@ void main() {
   Future<ProviderContainer> pumpSheetRoute(
     WidgetTester tester, {
     AppSettings initial = const AppSettings(),
+    EdgeInsets systemPadding = EdgeInsets.zero,
   }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
@@ -98,6 +99,12 @@ void main() {
           locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          // MaterialApp.builder wraps the Navigator, so padding stated here is
+          // what the modal route's own SafeArea sees.
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(padding: systemPadding),
+            child: child!,
+          ),
           home: Scaffold(
             body: Builder(
               builder: (context) => TextButton(
@@ -154,6 +161,34 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(tester.getRect(closeButton), before);
+  });
+
+  // `useSafeArea: true` inserts `SafeArea(bottom: false)`, so it covers top,
+  // left and right and deliberately lets the sheet run to the bottom edge --
+  // the SDK doc says so outright. The SafeArea in the builder is what applies
+  // the bottom inset, and it is not a double application: SafeArea strips the
+  // padding it consumes out of the MediaQuery, so each inset lands once.
+  testWidgets('every system inset is applied exactly once', (tester) async {
+    const insets = EdgeInsets.only(top: 44, left: 30, right: 30, bottom: 34);
+    await tester.binding.setSurfaceSize(const Size(400, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await pumpSheetRoute(tester, systemPadding: insets);
+
+    final screen = tester.getRect(find.byType(MaterialApp));
+    final sheet = tester.getRect(find.byType(BottomSheet));
+    final body = tester.getRect(
+      find.byKey(const ValueKey('terrainAppearanceSheetInsets')),
+    );
+
+    // Outer SafeArea: horizontal insets once, and no bottom inset at all.
+    expect(sheet.left, insets.left);
+    expect(sheet.right, screen.right - insets.right);
+    expect(sheet.bottom, screen.bottom);
+    // Inner SafeArea: the bottom inset the outer one skipped, and nothing
+    // horizontal on top of what the outer one already applied.
+    expect(body.bottom, screen.bottom - insets.bottom);
+    expect(body.left, sheet.left);
+    expect(body.right, sheet.right);
   });
 
   testWidgets('banded switch writes through to settings', (tester) async {
