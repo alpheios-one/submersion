@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/conflict_reference.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/data_quality/domain/entities/quality_finding.dart';
@@ -15,6 +16,8 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/settings/presentation/widgets/conflict_reference_labels.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+
+final _log = LoggerService.forClass(ConflictDataPreview);
 
 /// One labelled line of a conflict's data preview.
 typedef ConflictPreviewRow = ({String label, String value});
@@ -124,7 +127,22 @@ List<ConflictPreviewRow> conflictPreviewRows({
   required Map<String, dynamic> data,
   required List<ConflictReference> references,
 }) {
+  final hidden = {
+    ..._alwaysHidden,
+    ...?_entityHidden[entityType],
+    for (final reference in references) reference.field,
+  };
+  final preferred = _preferredScalars(data, hidden);
+
+  ConflictPreviewRow scalarRow(MapEntry<String, dynamic> entry) => (
+    label: entry.key,
+    value: formatConflictScalar(l10n, units, entry.key, entry.value),
+  );
+
+  // A named entity leads with its own name; a junction row has no preferred
+  // field, so its references lead instead.
   final rows = <ConflictPreviewRow>[
+    for (final entry in preferred.entries) scalarRow(entry),
     for (final reference in references)
       (
         label: conflictReferenceLabel(l10n, reference),
@@ -142,22 +160,36 @@ List<ConflictPreviewRow> conflictPreviewRows({
     ));
   }
 
-  final hidden = {
-    ..._alwaysHidden,
-    ...?_entityHidden[entityType],
-    for (final reference in references) reference.field,
-  };
-  for (final entry in _scalarFields(data, hidden).entries) {
-    rows.add((
-      label: entry.key,
-      value: formatConflictScalar(l10n, units, entry.key, entry.value),
-    ));
+  if (preferred.isEmpty) {
+    for (final entry in _remainingScalars(data, hidden).entries) {
+      rows.add(scalarRow(entry));
+    }
   }
   return rows;
 }
 
-/// Renders a value the way the app renders it elsewhere: epoch millis as a
-/// date, a flag as yes/no. Everything else prints as stored.
+/// Columns stored in metres, bar and Celsius. Rendering them raw would show a
+/// metric number to an imperial diver, so each goes through the diver's own
+/// formatter.
+const _depthFields = <String>{'maxDepth', 'avgDepth', 'depth'};
+const _pressureFields = <String>{
+  'startPressure',
+  'endPressure',
+  'workingPressure',
+};
+const _temperatureFields = <String>{
+  'waterTemp',
+  'airTemp',
+  'temperature',
+  'minTemp',
+};
+
+/// Columns stored as a count of seconds.
+const _durationFields = <String>{'bottomTime', 'runtime', 'duration'};
+
+/// Renders a value the way the app renders it elsewhere: measurements in the
+/// diver's units, epoch millis as a date, a flag as yes/no. Everything else
+/// prints as stored.
 String formatConflictScalar(
   AppLocalizations l10n,
   UnitFormatter units,
@@ -167,6 +199,16 @@ String formatConflictScalar(
   if (value is bool) {
     return value ? l10n.common_action_yes : l10n.common_action_no;
   }
+  if (value is num) {
+    if (_depthFields.contains(key)) return units.formatDepth(value.toDouble());
+    if (_pressureFields.contains(key)) {
+      return units.formatPressure(value.toDouble());
+    }
+    if (_temperatureFields.contains(key)) {
+      return units.formatTemperature(value.toDouble());
+    }
+    if (_durationFields.contains(key)) return _formatSeconds(value.toInt());
+  }
   if (value is int && _isTimestamp(key, value)) {
     return units.formatDateTime(
       DateTime.fromMillisecondsSinceEpoch(value),
@@ -174,6 +216,15 @@ String formatConflictScalar(
     );
   }
   return value.toString();
+}
+
+/// A stored count of seconds as "1h 5m" or "45min", matching how the dive
+/// field formatter renders a duration elsewhere.
+String _formatSeconds(int seconds) {
+  final totalMinutes = seconds ~/ 60;
+  final hours = totalMinutes ~/ 60;
+  final minutes = totalMinutes % 60;
+  return hours > 0 ? '${hours}h ${minutes}m' : '${minutes}min';
 }
 
 /// True for a column that stores a moment rather than a duration. Both the
@@ -186,24 +237,27 @@ bool _isTimestamp(String key, int value) {
   return named && value >= millisFloor;
 }
 
-Map<String, dynamic> _scalarFields(
+bool _usable(Map<String, dynamic> data, Set<String> hidden, String key) =>
+    !hidden.contains(key) && data[key] != null;
+
+Map<String, dynamic> _preferredScalars(
+  Map<String, dynamic> data,
+  Set<String> hidden,
+) => {
+  for (final key in _preferredFields)
+    if (data.containsKey(key) && _usable(data, hidden, key)) key: data[key],
+};
+
+/// Nothing recognizable: show the first few columns that survived the filter,
+/// which for a junction row is what is left after its foreign keys.
+Map<String, dynamic> _remainingScalars(
   Map<String, dynamic> data,
   Set<String> hidden,
 ) {
-  bool usable(String key) => !hidden.contains(key) && data[key] != null;
-
-  final preferred = <String, dynamic>{
-    for (final key in _preferredFields)
-      if (data.containsKey(key) && usable(key)) key: data[key],
-  };
-  if (preferred.isNotEmpty) return preferred;
-
-  // Nothing recognizable: show the first few columns that survived the filter,
-  // which for a junction row is what is left after its foreign keys.
   final fallback = <String, dynamic>{};
   for (final entry in data.entries) {
     if (fallback.length >= 5) break;
-    if (usable(entry.key)) fallback[entry.key] = entry.value;
+    if (_usable(data, hidden, entry.key)) fallback[entry.key] = entry.value;
   }
   return fallback;
 }
@@ -240,11 +294,14 @@ QualityFindingMessage? _findingMessage(
       ),
     );
     return buildFindingMessage(l10n, finding, formatters);
-  } on ArgumentError {
+  } on ArgumentError catch (e) {
+    _log.warning('Conflict preview could not read a finding row', error: e);
     return null;
-  } on FormatException {
+  } on FormatException catch (e) {
+    _log.warning('Conflict preview could not read a finding row', error: e);
     return null;
-  } on TypeError {
+  } on TypeError catch (e) {
+    _log.warning('Conflict preview could not read a finding row', error: e);
     return null;
   }
 }

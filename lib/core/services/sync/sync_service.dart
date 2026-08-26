@@ -356,6 +356,10 @@ class SyncService {
   Future<List<SyncConflict>> getConflicts() async {
     final conflictRecords = await _syncRepository.getConflictRecords();
     final conflicts = <SyncConflict>[];
+    // One resolver for the whole batch: a restore raises many conflicts
+    // pointing at the same diver, dive or site, and the resolver caches the
+    // rows it has already read.
+    final resolver = ConflictReferenceResolver(_serializer);
 
     for (final record in conflictRecords) {
       if (record.conflictData != null) {
@@ -379,10 +383,12 @@ class SyncService {
                   DateTime.fromMillisecondsSinceEpoch(record.localUpdatedAt),
               remoteModified: remoteModified ?? DateTime.now(),
               localReferences: await _resolveReferences(
+                resolver,
                 record.entityType,
                 localData ?? {},
               ),
               remoteReferences: await _resolveReferences(
+                resolver,
                 record.entityType,
                 remoteData,
               ),
@@ -404,14 +410,13 @@ class SyncService {
   /// failure degrades to an unresolved preview rather than dropping the whole
   /// conflict, which would leave the user unable to resolve it at all.
   Future<List<ConflictReference>> _resolveReferences(
+    ConflictReferenceResolver resolver,
     String entityType,
     Map<String, dynamic> data,
   ) async {
     if (data.isEmpty) return const [];
     try {
-      return await ConflictReferenceResolver(
-        _serializer,
-      ).resolve(entityType, data);
+      return await resolver.resolve(entityType, data);
     } catch (e) {
       _log.warning(
         'Could not resolve display references for $entityType',

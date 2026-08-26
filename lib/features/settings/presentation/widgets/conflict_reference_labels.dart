@@ -89,7 +89,9 @@ String conflictReferenceLabel(
 }
 
 /// The referenced record in one line: its name, its date, or both. A record
-/// that is not in the local library says so rather than rendering blank.
+/// that is not in the local library says so rather than rendering blank; one
+/// that is present but carries no anchor at all (an unnamed dive tank, say)
+/// falls back to a short id, which at least tells the two versions apart.
 String conflictReferenceValue(
   AppLocalizations l10n,
   UnitFormatter units,
@@ -103,8 +105,12 @@ String conflictReferenceValue(
   if (name != null && date != null) {
     return l10n.settings_conflict_ref_named(name, date);
   }
-  return name ?? date!;
+  return name ?? date ?? shortRecordId(reference.recordId);
 }
+
+/// The leading segment of a record id, the way a user would quote one.
+String shortRecordId(String recordId) =>
+    '#${recordId.length <= 8 ? recordId : recordId.substring(0, 8)}';
 
 /// Names the conflicting record from the records it points at, for junction
 /// and relation entities that have no name of their own. Null when nothing

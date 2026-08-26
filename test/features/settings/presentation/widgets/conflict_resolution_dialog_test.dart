@@ -72,6 +72,7 @@ void main() {
         field: 'tagId',
         targetType: 'tags',
         recordId: 'a7136f77-5628-4d6c-abaf-eed97f618cc8',
+        exists: !tagMissing,
         name: tagMissing ? null : localTagName,
       ),
     ],
@@ -124,6 +125,43 @@ void main() {
     expect(find.text('No longer in this library'), findsOneWidget);
   });
 
+  testWidgets('falls back to a short id for a nameless record that exists', (
+    tester,
+  ) async {
+    // A dive tank carries no name, date, or any other anchor unless the diver
+    // named it. The reference still exists, so the preview must identify it
+    // rather than claim it was deleted.
+    await pumpDialog(
+      tester,
+      SyncConflict(
+        entityType: 'gasSwitches',
+        recordId: 'gs-1',
+        localData: const {'id': 'gs-1', 'tankId': 'aabbccdd-1111-2222'},
+        remoteData: const {'id': 'gs-1', 'tankId': 'eeff0011-3333-4444'},
+        localModified: DateTime(2026, 3, 28),
+        remoteModified: DateTime(2026, 3, 29),
+        localReferences: const [
+          ConflictReference(
+            field: 'tankId',
+            targetType: 'diveTanks',
+            recordId: 'aabbccdd-1111-2222',
+          ),
+        ],
+        remoteReferences: const [
+          ConflictReference(
+            field: 'tankId',
+            targetType: 'diveTanks',
+            recordId: 'eeff0011-3333-4444',
+          ),
+        ],
+      ),
+    );
+
+    expect(find.text('#aabbccdd'), findsOneWidget);
+    expect(find.text('#eeff0011'), findsOneWidget);
+    expect(find.text('No longer in this library'), findsNothing);
+  });
+
   testWidgets('describes the conflicting record in the header', (tester) async {
     await pumpDialog(tester, diveTagConflict());
 
@@ -149,6 +187,25 @@ void main() {
     );
 
     expect(find.byIcon(Icons.place), findsOneWidget);
+  });
+
+  testWidgets('renders a depth in the diver configured unit', (tester) async {
+    await pumpDialog(
+      tester,
+      SyncConflict(
+        entityType: 'dives',
+        recordId: 'd-1',
+        localData: const {'id': 'd-1', 'maxDepth': 30.48},
+        remoteData: const {'id': 'd-1', 'maxDepth': 30.48},
+        localModified: DateTime(2026, 3, 28),
+        remoteModified: DateTime(2026, 3, 29),
+      ),
+    );
+
+    // The mock settings default to metres, so the stored metres carry a unit
+    // rather than printing as a bare number.
+    expect(find.text('30.5m'), findsNWidgets(2));
+    expect(find.text('30.48'), findsNothing);
   });
 
   testWidgets('dates an epoch column but leaves a duration alone', (
@@ -180,8 +237,9 @@ void main() {
       ),
     );
 
-    expect(find.text('2700'), findsNWidgets(2));
+    expect(find.text('45min'), findsNWidgets(2));
     expect(find.textContaining('1786556582600'), findsNothing);
+    expect(find.textContaining('2700'), findsNothing);
   });
 
   testWidgets('renders a quality finding as its localized message', (

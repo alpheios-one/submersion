@@ -202,6 +202,50 @@ void main() {
     expect(refFor(refs, 'speciesId').name, 'Manta ray');
   });
 
+  test('a row that exists is never reported as missing', () async {
+    // diveTanks carries no name or date column, so "found no anchor" must not
+    // be read as "row is gone" -- telling a user a record was deleted right
+    // before they choose what to keep is worse than showing them an id.
+    await seedDive('dive-1');
+    await serializer.upsertRecord('diveTanks', {
+      'id': 'tank-1',
+      'diveId': 'dive-1',
+      'o2Percent': 21.0,
+      'hePercent': 0.0,
+      'tankOrder': 0,
+      'tankRole': 'primary',
+    });
+
+    final refs = await resolver.resolve('gasSwitches', {
+      'id': 'gs-1',
+      'diveId': 'dive-1',
+      'tankId': 'tank-1',
+    });
+
+    expect(refFor(refs, 'tankId').isMissing, isFalse);
+  });
+
+  test('names a tank by its user-facing tank name', () async {
+    await seedDive('dive-1');
+    await serializer.upsertRecord('diveTanks', {
+      'id': 'tank-1',
+      'diveId': 'dive-1',
+      'tankName': 'Primary AL80',
+      'o2Percent': 21.0,
+      'hePercent': 0.0,
+      'tankOrder': 0,
+      'tankRole': 'primary',
+    });
+
+    final refs = await resolver.resolve('gasSwitches', {
+      'id': 'gs-1',
+      'diveId': 'dive-1',
+      'tankId': 'tank-1',
+    });
+
+    expect(refFor(refs, 'tankId').name, 'Primary AL80');
+  });
+
   test('returns nothing for an entity with no foreign keys', () async {
     final refs = await resolver.resolve('tags', {
       'id': 'tag-1',

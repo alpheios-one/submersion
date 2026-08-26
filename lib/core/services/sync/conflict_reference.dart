@@ -12,6 +12,7 @@ class ConflictReference {
     required this.field,
     required this.targetType,
     required this.recordId,
+    this.exists = true,
     this.name,
     this.timestamp,
   });
@@ -32,10 +33,17 @@ class ConflictReference {
   /// The referenced row's date anchor, for entities dated rather than named.
   final DateTime? timestamp;
 
+  /// Whether the referenced row is in the local database. Tracked explicitly
+  /// rather than inferred from [name] and [timestamp] being null: several
+  /// tables (dive tanks, sightings, connected accounts) can carry neither, and
+  /// telling a user a record was deleted right before they choose which
+  /// version to keep is worse than showing them an id.
+  final bool exists;
+
   /// True when the referenced row is not in the local database: it was deleted
   /// here, or the conflicting record arrived from a peer that still has it.
   /// The dialog says so rather than showing a blank line.
-  bool get isMissing => name == null && timestamp == null;
+  bool get isMissing => !exists;
 }
 
 /// Resolves the foreign keys of a conflicting record into [ConflictReference]s.
@@ -44,9 +52,14 @@ class ConflictReference {
 /// loads the conflicting row itself, so every entity the serializer can sync is
 /// resolvable without a second query layer.
 class ConflictReferenceResolver {
-  const ConflictReferenceResolver(this._serializer);
+  ConflictReferenceResolver(this._serializer);
 
   final SyncDataSerializer _serializer;
+
+  /// Rows already fetched by this resolver. One resolver serves a whole
+  /// batch of conflicts, and a restore raises many conflicts pointing at the
+  /// same diver, dive or site, so each referenced row is read once.
+  final Map<String, Map<String, dynamic>?> _rows = {};
 
   /// Foreign-key column -> sync entity type, transcribed from the
   /// `.references(Table, #id)` clauses in `database.dart`. Columns whose name
@@ -97,11 +110,20 @@ class ConflictReferenceResolver {
     },
   };
 
-  /// Name-carrying columns, in the order the app prefers them.
+  /// Name-carrying columns, in the order the app prefers them. Several tables
+  /// name themselves through a column of their own (a tank's `tankName`, a
+  /// connected account's `label`), so the generic names are tried first and
+  /// the table-specific ones after.
   static const _nameFields = <String>[
     'name',
     'title',
     'commonName',
+    'displayName',
+    'label',
+    'tankName',
+    'presetName',
+    'templateName',
+    'sourceFileName',
     'caption',
     'originalFilename',
   ];
@@ -133,7 +155,7 @@ class ConflictReferenceResolver {
       if (id is! String || id.isEmpty) continue;
       references.add(await _resolveOne(entry.key, target, id));
     }
-    return references;
+    return List.unmodifiable(references);
   }
 
   Future<ConflictReference> _resolveOne(
@@ -141,31 +163,46 @@ class ConflictReferenceResolver {
     String targetType,
     String recordId,
   ) async {
-    final row = await _serializer.fetchRecord(targetType, recordId);
+    final row = await _fetch(targetType, recordId);
     if (row == null) {
       return ConflictReference(
         field: field,
         targetType: targetType,
         recordId: recordId,
+        exists: false,
       );
     }
     return ConflictReference(
       field: field,
       targetType: targetType,
       recordId: recordId,
-      name: _nameOf(row) ?? await _borrowedSiteName(row),
+      name: _nameOf(row) ?? await _borrowedName(row),
       timestamp: _timestampOf(row),
     );
   }
 
-  /// An unnamed dive is displayed by its site everywhere else in the app, so
-  /// borrow that name here too. Exactly one hop: the site's own name is read
-  /// directly and never resolved further.
-  Future<String?> _borrowedSiteName(Map<String, dynamic> row) async {
-    final siteId = row['siteId'];
-    if (siteId is! String || siteId.isEmpty) return null;
-    final site = await _serializer.fetchRecord('diveSites', siteId);
-    return site == null ? null : _nameOf(site);
+  /// An unnamed dive is displayed by its site everywhere else in the app, and
+  /// a sighting is only ever known by its species. Borrow those names here
+  /// too. Exactly one hop: the borrowed row's name is read directly and never
+  /// resolved further.
+  Future<String?> _borrowedName(Map<String, dynamic> row) async {
+    for (final borrow in const [
+      (field: 'siteId', target: 'diveSites'),
+      (field: 'speciesId', target: 'species'),
+    ]) {
+      final id = row[borrow.field];
+      if (id is! String || id.isEmpty) continue;
+      final parent = await _fetch(borrow.target, id);
+      final name = parent == null ? null : _nameOf(parent);
+      if (name != null) return name;
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> _fetch(String targetType, String id) async {
+    final key = '$targetType|$id';
+    if (_rows.containsKey(key)) return _rows[key];
+    return _rows[key] = await _serializer.fetchRecord(targetType, id);
   }
 
   static String? _nameOf(Map<String, dynamic> row) {
