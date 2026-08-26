@@ -45,12 +45,62 @@ final diveSortProvider = StateProvider<SortState<DiveSortField>>(
   ),
 );
 
+/// The ids of every dive matching one polarity of the decompression filter.
+///
+/// The deco axis cannot be evaluated in memory: [DiveRepository.getAllDives]
+/// deliberately skips profile hydration for list views, and deco-stop events
+/// never reach the [domain.Dive] entity at all, so
+/// [DiveFilterState.apply] has nothing to classify from. Resolving the ids in
+/// SQL instead keeps the entity-backed surfaces (table view, activity and heat
+/// maps) in exact agreement with the paginated list, which reads the same
+/// `decoSignalCondition`.
+///
+/// Keyed on the wanted polarity so flipping Yes/No lands on a fresh instance
+/// rather than briefly reusing the other polarity's cached ids.
+final decoFilteredDiveIdsProvider = FutureProvider.family<Set<String>, bool>((
+  ref,
+  wantDeco,
+) async {
+  final diverId = ref.watch(currentDiverIdProvider);
+  final repository = ref.watch(diveRepositoryProvider);
+  // Profile rows and deco-stop events both feed the classification, so the
+  // dives tick alone is not enough to keep this fresh.
+  ref.invalidateSelfWhen(repository.watchAnalysisInputChanges());
+  return repository.getDiveIdsWithDecoSignal(
+    wantDeco: wantDeco,
+    diverId: diverId,
+  );
+});
+
 /// Filtered dives provider - applies current filter to dive list
 final filteredDivesProvider = Provider<AsyncValue<List<domain.Dive>>>((ref) {
   final divesAsync = ref.watch(diveListNotifierProvider);
   final filter = ref.watch(diveFilterProvider);
 
-  return divesAsync.whenData((dives) => filter.apply(dives));
+  final decoOnly = filter.decoOnly;
+  if (decoOnly == null) {
+    return divesAsync.whenData((dives) => filter.apply(dives));
+  }
+
+  final decoAsync = ref.watch(decoFilteredDiveIdsProvider(decoOnly));
+  // Built-in AsyncValue.value, not the repo's valueOrNull polyfill: it retains
+  // the previous ids across a reload, so a profile write does not blank the
+  // list. Null means first load (or a failure), never a stale answer.
+  final decoIds = decoAsync.value;
+  if (decoIds == null) {
+    if (decoAsync.hasError) {
+      return AsyncValue.error(
+        decoAsync.error!,
+        decoAsync.stackTrace ?? StackTrace.empty,
+      );
+    }
+    return const AsyncValue.loading();
+  }
+
+  return divesAsync.whenData(
+    (dives) =>
+        filter.apply(dives).where((d) => decoIds.contains(d.id)).toList(),
+  );
 });
 
 /// Sorted and filtered dives provider - applies sort after filter

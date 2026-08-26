@@ -17,12 +17,16 @@ class DiveFilterState {
   final double? maxDepth;
   final bool? favoritesOnly;
 
-  /// Decompression status, from the recorded profile signal (deco stop type,
-  /// deco-stop events, or a positive ceiling with no deco-type data at all —
-  /// see `scanRecordedDecoSignals` in StatisticsRepository). Null means no
-  /// filter; true/false restrict to deco/no-deco dives. Dives whose status is
+  /// Decompression status, derived from the recorded profile signal: a
+  /// deco-stop profile point, a `decoStopStart` event, or a positive ceiling
+  /// on a profile carrying no deco-type data at all (mirroring
+  /// `scanRecordedDecoSignals` in StatisticsRepository). Null means no filter;
+  /// true/false restrict to deco/no-deco dives. Dives whose status is
   /// unrecorded (no profile, or a profile needing the computed fallback)
   /// match neither.
+  ///
+  /// This axis is SQL-only. It is applied by `decoSignalCondition` in the
+  /// query paths and deliberately NOT by [apply]; see the note there.
   final bool? decoOnly;
 
   /// True to restrict the list to dives with no buddy assigned: neither the
@@ -238,6 +242,13 @@ class DiveFilterState {
   /// buildFilteredDiveIdSubquery), so non-paginated views stay consistent with
   /// the SQL-backed list. It relies on dive.equipment being hydrated with its
   /// curated attributes (getAllDives does this).
+  ///
+  /// [decoOnly] is the one axis this method does NOT apply. getAllDives skips
+  /// profile hydration for list views and deco-stop events never reach the
+  /// entity, so there is nothing here to classify a dive from; evaluating it
+  /// anyway would silently match no dive at all. Callers that honour the deco
+  /// axis intersect this result with `decoFilteredDiveIdsProvider`, which
+  /// resolves it through the same SQL condition the paginated list uses.
   List<Dive> apply(List<Dive> dives) {
     return dives.where((dive) {
       if (startDate != null && dive.dateTime.isBefore(startDate!)) {
@@ -274,9 +285,6 @@ class DiveFilterState {
         return false;
       }
       if (favoritesOnly == true && !dive.isFavorite) {
-        return false;
-      }
-      if (decoOnly != null && !_matchesDecoFilter(dive, decoOnly!)) {
         return false;
       }
       if (noBuddyOnly == true) {
@@ -387,22 +395,4 @@ class DiveFilterState {
       return true;
     }).toList();
   }
-}
-
-/// Recorded-signal deco classification, mirroring
-/// `StatisticsRepository.scanRecordedDecoSignals` (SQL) using the profile
-/// points already hydrated on [dive]. Deco-stop *events* are not loaded onto
-/// the entity, so unlike the SQL path this only sees the deco-type/ceiling
-/// signal; that gap only matters for dives whose computer logs a deco-stop
-/// event without also writing profile deco_type/ceiling data, which the
-/// paginated (SQL-backed) dive list still classifies correctly.
-bool _matchesDecoFilter(Dive dive, bool wantDeco) {
-  final hasDecoType = dive.profile.any((p) => p.decoType != null);
-  final hasDecoStop = dive.profile.any((p) => p.decoType == 2);
-  final hasPositiveCeiling = dive.profile.any(
-    (p) => p.ceiling != null && p.ceiling! > 0,
-  );
-  final isDeco = hasDecoStop || (!hasDecoType && hasPositiveCeiling);
-  final isNoDeco = hasDecoType && !hasDecoStop;
-  return wantDeco ? isDeco : isNoDeco;
 }

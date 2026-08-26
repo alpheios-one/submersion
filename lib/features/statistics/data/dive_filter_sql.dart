@@ -223,9 +223,10 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
 }
 
 /// Recorded deco-signal SQL condition (no bind params), shared by
-/// [buildFilteredDiveIdSubquery] and
-/// `DiveRepositoryImpl._buildFilterWhereClauses` so the two SQL paths
-/// (Statistics vs. the paginated dive list) can't drift apart. Mirrors
+/// [buildFilteredDiveIdSubquery], `DiveRepository._buildFilterWhereClauses`
+/// and `DiveRepository.getDiveIdsWithDecoSignal` so the three SQL paths
+/// (Statistics, the paginated dive list, and the id set the entity-backed
+/// surfaces intersect with) can't drift apart. Mirrors
 /// `StatisticsRepository.scanRecordedDecoSignals`:
 ///
 /// - A deco-stop profile point (`deco_type = 2`) or a `decoStopStart` event
@@ -237,6 +238,10 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
 /// - A dive with no qualifying profile data matches neither branch; it is
 ///   only classifiable via the computed fallback, which this SQL-only axis
 ///   does not have access to.
+///
+/// This is the only place the deco axis is evaluated. `DiveFilterState.apply`
+/// deliberately skips it, because list-view entities carry neither profile
+/// points nor deco-stop events.
 ///
 /// [diveIdRef] must be a reference to the enclosing query's `dives.id`
 /// resolvable from inside these correlated subqueries (e.g. `d.id` when the

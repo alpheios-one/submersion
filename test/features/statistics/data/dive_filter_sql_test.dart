@@ -470,6 +470,13 @@ void main() {
     // multi-axis combinations. That "SQL mirrors apply()" property is what
     // lets getStatistics/getSacVolumeTrend/etc. push filtering into SQL
     // instead of loading every dive into Dart.
+    //
+    // decoOnly is the one axis deliberately left out of the battery: it is
+    // SQL-only. getAllDives does not hydrate profiles and deco-stop events
+    // never reach the entity, so apply() cannot classify a dive and does not
+    // try. Its own coverage is the decoOnly test above plus
+    // deco_filter_providers_test.dart, which pins the entity-backed surfaces
+    // to the SQL answer via decoFilteredDiveIdsProvider.
 
     // --- Parents (FK=ON: must precede the dives that reference them) ---
     await insertSite('s1');
