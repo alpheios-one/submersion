@@ -12995,6 +12995,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Conservar video original';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Las Live Photos aún no son compatibles. Duplica esta foto como imagen fija y luego escribe los datos de buceo en la copia.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'No hay datos de inmersion disponibles para escribir.';
 

@@ -4130,6 +4130,7 @@
   "media_writeMetadata_diveTimeLabel": "Hora de inmersion",
   "media_writeMetadata_gpsLabel": "GPS",
   "media_writeMetadata_keepOriginalVideo": "Conservar video original",
+  "media_writeMetadata_livePhotoUnsupported": "Las Live Photos aún no son compatibles. Duplica esta foto como imagen fija y luego escribe los datos de buceo en la copia.",
   "media_writeMetadata_noDataAvailable": "No hay datos de inmersion disponibles para escribir.",
   "media_writeMetadata_siteLabel": "Punto",
   "media_writeMetadata_temperatureLabel": "Temperatura",
