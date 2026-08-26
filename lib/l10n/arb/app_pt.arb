@@ -7261,6 +7261,7 @@
   },
   "diveLog_detail_altitudeMismatch_title": "O ponto de mergulho fica em altitude",
   "diveLog_detail_altitudeMismatch_subtitle": "Este ponto registra uma altitude, mas o mergulho não tem nenhuma, então a análise de descompressão assumiu o nível do mar. Defina a altitude do mergulho para corrigir.",
+  "diveLog_detail_sacVolumeHint": "Adicione o volume do cilindro para mostrar a taxa SAC em {unit}/min",
   "emergencyCard_title": "Emergência",
   "emergencyCard_callDan": "Ligar para {name}",
   "@emergencyCard_callDan": {

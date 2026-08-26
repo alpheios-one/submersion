@@ -24190,6 +24190,11 @@ class AppLocalizationsIt extends AppLocalizations {
       'Questo sito registra un\'altitudine ma l\'immersione non ne ha una, quindi l\'analisi di decompressione ha assunto il livello del mare. Imposta l\'altitudine dell\'immersione per correggere.';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return 'Aggiungi il volume della bombola per mostrare il consumo SAC in $unit/min';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return 'No-fly: mancano $remaining';
   }

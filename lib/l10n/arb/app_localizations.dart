@@ -40358,6 +40358,12 @@ abstract class AppLocalizations {
   /// **'This site records an altitude but the dive has none set, so decompression analysis assumed sea level. Set the dive\'s altitude to correct it.'**
   String get diveLog_detail_altitudeMismatch_subtitle;
 
+  /// No description provided for @diveLog_detail_sacVolumeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a cylinder volume to show SAC in {unit}/min'**
+  String diveLog_detail_sacVolumeHint(String unit);
+
   /// No description provided for @safetyHub_alert_noFly.
   ///
   /// In en, this message translates to:

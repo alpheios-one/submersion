@@ -506,8 +506,7 @@ class ChangesetWriter {
     String? uploadNonce,
   ) async {
     final dir = await _resumable.directory;
-    final target =
-        '${dir.path}/${base.path.split(Platform.pathSeparator).last}';
+    final target = basePublishTargetPath(dir.path, base.path);
     final source = File(base.path);
     try {
       await source.rename(target);
