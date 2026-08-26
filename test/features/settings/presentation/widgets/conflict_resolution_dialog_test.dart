@@ -132,6 +132,25 @@ void main() {
     expect(find.textContaining('7600a6e8'), findsNothing);
   });
 
+  testWidgets('shows the entity icon for a sync entity type', (tester) async {
+    // The sync entity types are camelCase plurals ('diveSites'), which the
+    // icon lookup lowercases; matching only 'divesite'/'dive_sites' left
+    // sites and gear on the generic document icon.
+    await pumpDialog(
+      tester,
+      SyncConflict(
+        entityType: 'diveSites',
+        recordId: 's-1',
+        localData: const {'id': 's-1', 'name': 'Blue Hole'},
+        remoteData: const {'id': 's-1', 'name': 'The Blue Hole'},
+        localModified: DateTime(2026, 3, 28),
+        remoteModified: DateTime(2026, 3, 29),
+      ),
+    );
+
+    expect(find.byIcon(Icons.place), findsOneWidget);
+  });
+
   testWidgets('dates an epoch column but leaves a duration alone', (
     tester,
   ) async {

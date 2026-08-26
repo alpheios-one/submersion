@@ -392,22 +392,40 @@ class _ConflictResolutionDialogState
     }
   }
 
+  /// Icon for a sync entity type. Matched on the entity type the sync layer
+  /// actually uses (camelCase plurals such as `diveSites`), lowercased so the
+  /// legacy snake_case spellings keep working.
   IconData _getEntityIcon(String entityType) {
     switch (entityType.toLowerCase()) {
       case 'dive':
       case 'dives':
         return Icons.scuba_diving;
       case 'divesite':
+      case 'divesites':
       case 'dive_sites':
         return Icons.place;
       case 'gear':
+      case 'equipment':
+      case 'equipmentsets':
         return Icons.backpack;
       case 'diver':
       case 'divers':
         return Icons.person;
+      case 'buddies':
+        return Icons.people;
       case 'trip':
       case 'trips':
         return Icons.card_travel;
+      case 'tags':
+      case 'divetags':
+        return Icons.label;
+      case 'media':
+        return Icons.photo_library;
+      case 'species':
+      case 'sightings':
+        return Icons.pets;
+      case 'qualityfindings':
+        return Icons.rule;
       default:
         return Icons.description;
     }
