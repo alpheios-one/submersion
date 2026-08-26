@@ -18787,6 +18787,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String get universalImport_summary_filesTitle => '文件';
 
   @override
+  String get universalImport_summary_noticesTitle => '文件中没有此数据';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureTitle => '未记录气瓶压力';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureBody =>
+      '无法计算耗气量和 SAC。您可以通过编辑潜水记录添加起始和结束压力。';
+
+  @override
+  String universalImport_summary_noticeAffectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '影响 $count 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String universalImport_summary_fileImported(num count) {
     return '已导入 $count 次潜水';
   }

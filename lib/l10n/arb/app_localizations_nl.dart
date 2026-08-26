@@ -19628,6 +19628,28 @@ class AppLocalizationsNl extends AppLocalizations {
   String get universalImport_summary_filesTitle => 'Bestanden';
 
   @override
+  String get universalImport_summary_noticesTitle => 'Niet in het bestand';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureTitle =>
+      'Flesdruk niet vastgelegd';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureBody =>
+      'Luchtverbruik en SAC kunnen niet worden berekend. Je kunt de begin- en einddruk toevoegen door de duik te bewerken.';
+
+  @override
+  String universalImport_summary_noticeAffectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Geldt voor $count duiken',
+      one: 'Geldt voor 1 duik',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String universalImport_summary_fileImported(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

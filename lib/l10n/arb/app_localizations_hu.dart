@@ -19724,6 +19724,28 @@ class AppLocalizationsHu extends AppLocalizations {
   String get universalImport_summary_filesTitle => 'Fájlok';
 
   @override
+  String get universalImport_summary_noticesTitle => 'Nincs a fájlban';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureTitle =>
+      'A palack nyomása nincs rögzítve';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureBody =>
+      'A levegőfogyasztás és a SAC nem számítható ki. A kezdő és záró nyomást a merülés szerkesztésével adhatod meg.';
+
+  @override
+  String universalImport_summary_noticeAffectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülést érint',
+      one: '1 merülést érint',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String universalImport_summary_fileImported(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

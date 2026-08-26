@@ -5434,6 +5434,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   /// which pops its dialog before calling the picker for the same reason).
   /// Generating a single dive's CSV/UDDF is in-memory work, so there is nothing
   /// to report progress on.
+  ///
+  /// Every pop of the progress dialog must pass `rootNavigator: true`.
+  /// [showDialog] defaults to `useRootNavigator: true`, but a bare
+  /// `Navigator.of(context)` resolves to the ShellRoute's navigator instead.
+  /// In master-detail layouts this page is embedded in the shell's only route,
+  /// so a bare pop removes that route and leaves a black screen under a modal
+  /// that can no longer be dismissed.
   Future<void> _handleSingleDiveExport(
     BuildContext context,
     WidgetRef ref, {
@@ -5467,7 +5474,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         ExportDestination.saveToFile => await saveFn(),
       };
       if (!context.mounted) return;
-      if (showProgress) Navigator.of(context).pop();
+      if (showProgress) Navigator.of(context, rootNavigator: true).pop();
       // A null path means the save panel was dismissed - not a failure.
       if (path == null) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -5478,7 +5485,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       );
     } catch (e) {
       if (context.mounted) {
-        if (showProgress) Navigator.of(context).pop();
+        if (showProgress) Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(context.l10n.diveLog_export_failed(e.toString())),
