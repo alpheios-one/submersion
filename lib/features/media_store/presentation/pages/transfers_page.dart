@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
@@ -32,6 +34,26 @@ class _TransfersPageState extends ConsumerState<TransfersPage> {
 
   bool get _isSelectionMode => _selection.value.isActive;
   Set<String> get _selectedIds => _selection.value.checkedIds;
+
+  @override
+  void initState() {
+    super.initState();
+    // Opening this page resumes the queue (issue #1270).
+    //
+    // The dashboard's "N uploads pending" chip pushes straight here, and this
+    // route is a plain `builder` nested under media-storage, so
+    // MediaStoragePage - whose build resolves the runtime, and which is
+    // therefore the app's only reliable drain trigger - never runs on the way
+    // in. Someone arriving to ask why nothing is uploading was shown the
+    // stuck rows and nothing else.
+    //
+    // Resolving the runtime IS the kick: see the unawaited worker.drain() at
+    // the end of mediaStoreRuntimeProvider. Deliberately a read from
+    // initState rather than a watch in build whose value is thrown away - the
+    // list's rebuilds have nothing to do with the store's lifecycle, and the
+    // intent should not have to be inferred from an unused expression.
+    unawaited(ref.read(mediaStoreRuntimeProvider.future));
+  }
 
   /// Retry is safe only for a terminally failed entry. A `transferring` row
   /// must never be retried: the worker still holds it and a requeue would
