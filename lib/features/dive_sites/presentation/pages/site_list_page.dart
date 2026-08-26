@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -180,7 +182,7 @@ class _SiteListPageState extends ConsumerState<SiteListPage> {
                 );
                 ref.read(siteListViewModeProvider.notifier).state = mode;
               } else if (value == 'fill_location_details') {
-                showSiteLocationBackfillFlow(context, ref);
+                unawaited(showSiteLocationBackfillFlow(context, ref));
               }
             },
             itemBuilder: (context) {

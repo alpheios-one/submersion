@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
@@ -521,7 +523,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                         } else if (value == 'import') {
                           context.push('/sites/import');
                         } else if (value == 'fill_location_details') {
-                          showSiteLocationBackfillFlow(context, ref);
+                          unawaited(showSiteLocationBackfillFlow(context, ref));
                         } else if (value.startsWith('view_')) {
                           final mode = ListViewMode.fromName(
                             value.replaceFirst('view_', ''),
@@ -797,7 +799,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
               } else if (value == 'import') {
                 context.push('/sites/import');
               } else if (value == 'fill_location_details') {
-                showSiteLocationBackfillFlow(context, ref);
+                unawaited(showSiteLocationBackfillFlow(context, ref));
               } else if (value.startsWith('view_')) {
                 final mode = ListViewMode.fromName(
                   value.replaceFirst('view_', ''),

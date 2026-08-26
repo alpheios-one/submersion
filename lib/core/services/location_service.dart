@@ -73,14 +73,17 @@ class LocationService {
   /// value, so unchanged users keep grouping exactly as before.
   static const String defaultLanguageCode = 'en';
 
-  /// Nominatim reverse-geocode URI for the address layer.
+  /// Nominatim reverse-geocode URI for the address layer. The language code
+  /// is user data (a synced setting), so it is query-encoded rather than
+  /// interpolated, which keeps a stray `&` from becoming a second parameter.
   static Uri buildReverseGeocodeUri(
     double latitude,
     double longitude, {
     required String languageCode,
   }) => Uri.parse(
     'https://nominatim.openstreetmap.org/reverse?format=json'
-    '&lat=$latitude&lon=$longitude&zoom=10&accept-language=$languageCode',
+    '&lat=$latitude&lon=$longitude&zoom=10'
+    '&accept-language=${Uri.encodeQueryComponent(languageCode)}',
   );
 
   /// Nominatim reverse-geocode URI for the natural layer, which answers with
@@ -94,7 +97,7 @@ class LocationService {
   }) => Uri.parse(
     'https://nominatim.openstreetmap.org/reverse?format=json'
     '&lat=$latitude&lon=$longitude&zoom=14&layer=natural'
-    '&accept-language=$languageCode',
+    '&accept-language=${Uri.encodeQueryComponent(languageCode)}',
   );
 
   /// The name of a water feature from a natural-layer answer, or null when

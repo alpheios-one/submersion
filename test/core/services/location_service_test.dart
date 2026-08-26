@@ -42,6 +42,26 @@ void main() {
       expect(uri.queryParameters['lon'], '-5.6');
     });
 
+    test('the language code is query-encoded, never interpolated', () {
+      // The code is synced user data; a stray separator must not become a
+      // second query parameter.
+      for (final uri in [
+        LocationService.buildReverseGeocodeUri(
+          36.0,
+          -5.6,
+          languageCode: 'en&foo=bar',
+        ),
+        LocationService.buildNaturalFeatureUri(
+          36.0,
+          -5.6,
+          languageCode: 'en&foo=bar',
+        ),
+      ]) {
+        expect(uri.queryParameters['accept-language'], 'en&foo=bar');
+        expect(uri.queryParameters.containsKey('foo'), isFalse);
+      }
+    });
+
     test('forward geocode URI carries accept-language=en', () {
       final uri = LocationService.buildForwardGeocodeUri('Blue Hole');
       expect(uri.queryParameters['accept-language'], 'en');

@@ -4,7 +4,9 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_location_backfill_provider.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Seconds per site: two Nominatim requests, one second apart.
+/// Seconds per site for the estimate: up to two Nominatim requests (address
+/// layer, then natural layer), one second apart. On mobile the address may
+/// come from the platform geocoder instead, so this is an upper bound.
 const int _secondsPerSite = 2;
 
 /// The bulk "fill in missing location details" flow (issue #1187):
