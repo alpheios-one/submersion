@@ -8,6 +8,8 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart'
+    as domain;
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/divers/data/repositories/diver_repository.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
@@ -245,6 +247,44 @@ void main() {
   // arbitrary five dives because the ids arrived in `dive_buddies.created_at`
   // order (when the link was written) and only the surviving five were sorted
   // by dive date. A dive from a previous year outranked the newest one.
+  // The provider re-sorts a list the repository has already ordered, so a
+  // provider-level test cannot tell a faithful comparator from a sloppy one.
+  // These exercise the comparator directly instead.
+  group('compareSharedDivesForPreview (#982)', () {
+    domain.Dive diveWith({required String id, int? diveNumber}) => domain.Dive(
+      id: id,
+      diveNumber: diveNumber,
+      dateTime: DateTime(2026, 3, 28),
+    );
+
+    List<String> sorted(List<domain.Dive> dives) =>
+        (dives.toList()..sort(compareSharedDivesForPreview))
+            .map((d) => d.id)
+            .toList();
+
+    test('places a null dive number last, behind zero and negatives', () {
+      // SQLite sorts NULL below every value, so DESC puts it last. Coalescing
+      // null to 0 would rank it above -1 and tie it with a real 0.
+      final dives = [
+        diveWith(id: 'null', diveNumber: null),
+        diveWith(id: 'negative', diveNumber: -1),
+        diveWith(id: 'zero', diveNumber: 0),
+        diveWith(id: 'three', diveNumber: 3),
+      ];
+
+      expect(sorted(dives), equals(['three', 'zero', 'negative', 'null']));
+    });
+
+    test('falls back to id when dive numbers are both null', () {
+      final dives = [
+        diveWith(id: 'zzz', diveNumber: null),
+        diveWith(id: 'aaa', diveNumber: null),
+      ];
+
+      expect(sorted(dives), equals(['aaa', 'zzz']));
+    });
+  });
+
   group('divesForBuddyProvider ordering (#982)', () {
     test('previews the five newest dives, newest first', () async {
       final diver = await seedCurrentDiver();
@@ -264,8 +304,9 @@ void main() {
         );
         await buddyRepo.addBuddyToDive(diveIds[i], buddy.id, DiveRole.buddyId);
         await database.customStatement(
-          'UPDATE dive_buddies SET created_at = ? WHERE dive_id = ?',
-          [diveIds.length - i, diveIds[i]],
+          'UPDATE dive_buddies SET created_at = ? '
+          'WHERE dive_id = ? AND buddy_id = ?',
+          [diveIds.length - i, diveIds[i], buddy.id],
         );
       }
 

@@ -216,18 +216,33 @@ final divesForBuddyProvider = FutureProvider.family<List<domain.Dive>, String>((
     }
   }
 
-  // Most recent first, matching the dive list's sort key. The id tiebreak
-  // mirrors the repository query so a tie on both keys resolves the same way
-  // here as it does in SQL.
-  dives.sort((a, b) {
-    final byTime = b.effectiveEntryTime.compareTo(a.effectiveEntryTime);
-    if (byTime != 0) return byTime;
-    final byNumber = (b.diveNumber ?? 0).compareTo(a.diveNumber ?? 0);
-    if (byNumber != 0) return byNumber;
-    return a.id.compareTo(b.id);
-  });
+  dives.sort(compareSharedDivesForPreview);
   return dives;
 });
+
+/// Orders two shared dives exactly as `BuddyRepository.getDiveIdsForBuddy`
+/// does: newest effective entry time first, then dive number descending, then
+/// id ascending.
+///
+/// The dive-number step is null-aware rather than coalescing to zero. SQLite
+/// sorts NULL below every value, so `ORDER BY dive_number DESC` puts a null
+/// dive number *last*, behind a real `0` or a negative one. Coalescing to zero
+/// would instead tie a null with a real zero and rank it above a negative,
+/// which would reorder the list the repository already ordered.
+int compareSharedDivesForPreview(domain.Dive a, domain.Dive b) {
+  final byTime = b.effectiveEntryTime.compareTo(a.effectiveEntryTime);
+  if (byTime != 0) return byTime;
+
+  final aNumber = a.diveNumber;
+  final bNumber = b.diveNumber;
+  if (aNumber != bNumber) {
+    if (aNumber == null) return 1;
+    if (bNumber == null) return -1;
+    return bNumber.compareTo(aNumber);
+  }
+
+  return a.id.compareTo(b.id);
+}
 
 /// Buddy list notifier for mutations
 class BuddyListNotifier extends StateNotifier<AsyncValue<List<Buddy>>> {

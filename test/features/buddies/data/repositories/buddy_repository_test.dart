@@ -447,11 +447,16 @@ void main() {
 
       /// Forces the junction row's link timestamp so link order can be made to
       /// contradict dive order.
-      Future<void> setLinkCreatedAt(String diveId, int createdAt) async {
+      Future<void> setLinkCreatedAt(
+        String buddyId,
+        String diveId,
+        int createdAt,
+      ) async {
         final db = DatabaseService.instance.database;
         await db.customStatement(
-          'UPDATE dive_buddies SET created_at = ? WHERE dive_id = ?',
-          [createdAt, diveId],
+          'UPDATE dive_buddies SET created_at = ? '
+          'WHERE dive_id = ? AND buddy_id = ?',
+          [createdAt, diveId, buddyId],
         );
       }
 
@@ -466,9 +471,9 @@ void main() {
             await repository.addBuddyToDive(id, buddy.id, DiveRole.buddyId);
           }
           // Link order deliberately inverted relative to dive date order.
-          await setLinkCreatedAt('old', 9000);
-          await setLinkCreatedAt('newest', 8000);
-          await setLinkCreatedAt('middle', 7000);
+          await setLinkCreatedAt(buddy.id, 'old', 9000);
+          await setLinkCreatedAt(buddy.id, 'newest', 8000);
+          await setLinkCreatedAt(buddy.id, 'middle', 7000);
 
           final diveIds = await repository.getDiveIdsForBuddy(buddy.id);
 
@@ -485,8 +490,8 @@ void main() {
           await repository.addBuddyToDive(id, buddy.id, DiveRole.buddyId);
         }
         // Link order deliberately inverted relative to entry time order.
-        await setLinkCreatedAt('earlier', 9000);
-        await setLinkCreatedAt('later', 1);
+        await setLinkCreatedAt(buddy.id, 'earlier', 9000);
+        await setLinkCreatedAt(buddy.id, 'later', 1);
 
         final diveIds = await repository.getDiveIdsForBuddy(buddy.id);
 
@@ -502,14 +507,29 @@ void main() {
           for (final id in ['lower', 'higher']) {
             await repository.addBuddyToDive(id, buddy.id, DiveRole.buddyId);
           }
-          await setLinkCreatedAt('lower', 9000);
-          await setLinkCreatedAt('higher', 1);
+          await setLinkCreatedAt(buddy.id, 'lower', 9000);
+          await setLinkCreatedAt(buddy.id, 'higher', 1);
 
           final diveIds = await repository.getDiveIdsForBuddy(buddy.id);
 
           expect(diveIds, equals(['higher', 'lower']));
         },
       );
+
+      test('sorts a null dive number last, as SQLite DESC does', () async {
+        final buddy = await repository.createBuddy(createTestBuddy(id: 'b1'));
+        // Ids are chosen so the id tiebreak would give the OPPOSITE order:
+        // only the dive-number rule can produce the expectation below.
+        await insertDive('aaa-no-number', diveDateTime: 1000);
+        await insertDive('zzz-has-number', diveDateTime: 1000, diveNumber: 3);
+        for (final id in ['aaa-no-number', 'zzz-has-number']) {
+          await repository.addBuddyToDive(id, buddy.id, DiveRole.buddyId);
+        }
+
+        final diveIds = await repository.getDiveIdsForBuddy(buddy.id);
+
+        expect(diveIds, equals(['zzz-has-number', 'aaa-no-number']));
+      });
 
       test(
         'is deterministic when timestamp and dive number both tie',

@@ -181,6 +181,9 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
+      // Installed before the first frame: an overflow thrown during
+      // pumpWidget would otherwise escape the handler.
+      _ignoreOverflowErrors();
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -201,7 +204,6 @@ void main() {
           ),
         ),
       );
-      _ignoreOverflowErrors();
       await tester.pumpAndSettle();
 
       // Should show bottomTime formatted as minutes in dive history
@@ -239,6 +241,9 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
+      // Installed before the first frame: an overflow thrown during
+      // pumpWidget would otherwise escape the handler.
+      _ignoreOverflowErrors();
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -260,7 +265,6 @@ void main() {
           ),
         ),
       );
-      _ignoreOverflowErrors();
       await tester.pumpAndSettle();
 
       expect(
