@@ -1057,4 +1057,66 @@ void main() {
       expect(notifier.state.match.unmatched, isEmpty);
     });
   });
+
+  group('offset is applied when persisting', () {
+    setUp(() {
+      when(
+        mockPlatform.createBookmark(any),
+      ).thenAnswer((_) async => Uint8List(0));
+      when(mockBookmarkStorage.write(any, any)).thenAnswer((_) async {});
+      when(
+        mockRepo.createMedia(any),
+      ).thenAnswer((_) async => _saved('media-1'));
+    });
+
+    FilesTabNotifier stagedNotifier(DateTime takenAt) {
+      final file = _ef(
+        '/a.jpg',
+        metadata: MediaSourceMetadata(takenAt: takenAt, mimeType: 'image/jpeg'),
+      );
+      final notifier = FilesTabNotifier(
+        mediaRepository: mockRepo,
+        bookmarkStorage: mockBookmarkStorage,
+        platform: mockPlatform,
+      );
+      notifier.setFiles(
+        [file],
+        match: MatchedSelection(
+          matched: {
+            'dive-1': [file],
+          },
+          unmatched: const [],
+        ),
+      );
+      return notifier;
+    }
+
+    test('commit writes taken_at shifted by the session offset', () async {
+      final notifier = stagedNotifier(DateTime.utc(2025, 12, 27, 16, 47));
+      notifier.setCaptureTimeOffset(
+        const Duration(hours: -5),
+        match: notifier.state.match,
+      );
+
+      await notifier.commit();
+
+      final captured = verify(mockRepo.createMedia(captureAny)).captured;
+      expect(
+        (captured.single as MediaItem).takenAt,
+        DateTime.utc(2025, 12, 27, 11, 47),
+      );
+    });
+
+    test('a zero offset writes the extracted time unchanged', () async {
+      final notifier = stagedNotifier(DateTime.utc(2025, 12, 27, 11, 47));
+
+      await notifier.commit();
+
+      final captured = verify(mockRepo.createMedia(captureAny)).captured;
+      expect(
+        (captured.single as MediaItem).takenAt,
+        DateTime.utc(2025, 12, 27, 11, 47),
+      );
+    });
+  });
 }

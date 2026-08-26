@@ -389,7 +389,13 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
       originalFilename: p.basename(file.sourcePath),
       localPath: localPath,
       bookmarkRef: bookmarkRef,
-      takenAt: file.metadata.takenAt ?? now,
+      // The session offset is baked into the stored value, not merely used
+      // for matching. EnrichmentService derives elapsed-since-entry from this
+      // column to place the photo on the profile chart and derive its depth
+      // badge; persisting an unshifted time for a file that only matched
+      // because of the shift would give every such photo a large negative
+      // elapsed, which resolves to the first profile sample's depth.
+      takenAt: file.metadata.takenAt?.add(state.captureTimeOffset) ?? now,
       latitude: file.metadata.latitude,
       longitude: file.metadata.longitude,
       width: file.metadata.width,
