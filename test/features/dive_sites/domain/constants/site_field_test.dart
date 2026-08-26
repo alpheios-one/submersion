@@ -4,6 +4,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_sites/domain/constants/site_field.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/domain/entities/site_with_dive_count.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 void main() {
@@ -31,7 +32,7 @@ void main() {
     exitMethod: EntryMethod.ladder,
   );
 
-  const testEntity = (site: testSite, diveCount: 12);
+  const testEntity = SiteWithDiveCount(site: testSite, diveCount: 12);
 
   group('SiteFieldAdapter.allFields', () {
     test('has expected count matching SiteField.values', () {
@@ -178,13 +179,13 @@ void main() {
 
     test('returns null for notes when empty', () {
       final emptyNotesSite = testSite.copyWith(notes: '');
-      final entity = (site: emptyNotesSite, diveCount: 0);
+      final entity = SiteWithDiveCount(site: emptyNotesSite, diveCount: 0);
       expect(adapter.extractValue(SiteField.notes, entity), isNull);
     });
 
     test('returns null for location when site has no GeoPoint', () {
       const noLocSite = DiveSite(id: 'no-loc', name: 'No Loc');
-      const entity = (site: noLocSite, diveCount: 0);
+      const entity = SiteWithDiveCount(site: noLocSite, diveCount: 0);
       expect(adapter.extractValue(SiteField.latitude, entity), isNull);
       expect(adapter.extractValue(SiteField.longitude, entity), isNull);
     });
@@ -679,7 +680,7 @@ void main() {
 
     test('returns null for condition fields on a bare site', () {
       const bareSite = DiveSite(id: 'bare', name: 'Bare Site');
-      const entity = (site: bareSite, diveCount: 0);
+      const entity = SiteWithDiveCount(site: bareSite, diveCount: 0);
       expect(adapter.extractValue(SiteField.waterType, entity), isNull);
       expect(adapter.extractValue(SiteField.typicalVisibility, entity), isNull);
       expect(adapter.extractValue(SiteField.typicalCurrent, entity), isNull);
@@ -690,19 +691,19 @@ void main() {
 
     test('returns null for difficulty when not set', () {
       const noDiffSite = DiveSite(id: 'no-diff', name: 'No Difficulty');
-      const entity = (site: noDiffSite, diveCount: 0);
+      const entity = SiteWithDiveCount(site: noDiffSite, diveCount: 0);
       expect(adapter.extractValue(SiteField.difficulty, entity), isNull);
     });
 
     test('returns null for mooringNumber when not set', () {
       const site = DiveSite(id: 'no-mooring', name: 'No Mooring');
-      const entity = (site: site, diveCount: 0);
+      const entity = SiteWithDiveCount(site: site, diveCount: 0);
       expect(adapter.extractValue(SiteField.mooringNumber, entity), isNull);
     });
 
     test('returns null for hazards when not set', () {
       const site = DiveSite(id: 'no-hazards', name: 'No Hazards');
-      const entity = (site: site, diveCount: 0);
+      const entity = SiteWithDiveCount(site: site, diveCount: 0);
       expect(adapter.extractValue(SiteField.hazards, entity), isNull);
     });
   });
@@ -870,7 +871,7 @@ void main() {
       island: 'Malapascua',
       bodyOfWater: 'Visayan Sea',
     );
-    const entity = (site: site, diveCount: 0);
+    const entity = SiteWithDiveCount(site: site, diveCount: 0);
 
     test('extracts city, island, bodyOfWater', () {
       expect(adapter.extractValue(SiteField.city, entity), 'Cebu City');

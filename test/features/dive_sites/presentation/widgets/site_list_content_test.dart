@@ -883,8 +883,8 @@ void main() {
         final p = await SharedPreferences.getInstance();
 
         final sites = [
-          SiteWithDiveCount(
-            site: const DiveSite(
+          const SiteWithDiveCount(
+            site: DiveSite(
               id: 's1',
               name: 'Located Reef',
               location: GeoPoint(17.3155, -87.5346),

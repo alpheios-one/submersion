@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/domain/entities/site_with_dive_count.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/constants/entity_field.dart';
 
-/// Wrapper pairing a [DiveSite] with its computed dive count.
-typedef SiteWithCount = ({DiveSite site, int diveCount});
+/// Entity handed to [SiteFieldAdapter]. An alias of the repository's class so
+/// the table view and the list cards share one type with no conversion.
+typedef SiteWithCount = SiteWithDiveCount;
 
 /// Categories grouping related site fields together.
 enum SiteFieldCategory { core, depth, conditions, details, coordinates }

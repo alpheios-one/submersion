@@ -656,19 +656,13 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
         final settings = ref.watch(settingsProvider);
         final units = UnitFormatter(settings);
 
-        // Convert SiteWithDiveCount (class) to SiteWithCount (record) as
-        // required by SiteFieldAdapter.
-        final siteRecords = sites
-            .map((s) => (site: s.site, diveCount: s.diveCount))
-            .toList();
-
         return Column(
           children: [
             if (filter.hasActiveFilters)
               _buildActiveFiltersBar(context, filter),
             Expanded(
               child: EntityTableView<SiteWithCount, SiteField>(
-                entities: siteRecords,
+                entities: sites,
                 idExtractor: (s) => s.site.id,
                 adapter: SiteFieldAdapter.instance,
                 config: config,
@@ -691,7 +685,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                 onEntityTap: (id) {
                   // Table mode honours modifier and shift clicks too, so
                   // selection works the same way as in the list view modes.
-                  final orderedIds = siteRecords.map((s) => s.site.id).toList();
+                  final orderedIds = sites.map((s) => s.site.id).toList();
                   if (SelectableListScope.isShiftPressed()) {
                     _selectRangeTo(id, orderedIds);
                   } else if (SelectableListScope.isModifierPressed()) {

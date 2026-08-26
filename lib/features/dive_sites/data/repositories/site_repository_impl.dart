@@ -12,10 +12,15 @@ import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_sites/data/mappers/dive_site_row_mapper.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
+import 'package:submersion/features/dive_sites/domain/entities/site_with_dive_count.dart';
 import 'package:submersion/features/dive_sites/domain/services/site_location_merge.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
+
+// Re-exported so the many existing `site_repository_impl.dart` importers of
+// SiteWithDiveCount keep compiling after the class moved to the domain layer.
+export 'package:submersion/features/dive_sites/domain/entities/site_with_dive_count.dart';
 
 class SiteRepository {
   /// Injectable seams mirror [DiveRepository]: tests hand in a coordinator
@@ -1081,13 +1086,6 @@ class SiteRepository {
       }
     }
   }
-}
-
-class SiteWithDiveCount {
-  final domain.DiveSite site;
-  final int diveCount;
-
-  SiteWithDiveCount({required this.site, required this.diveCount});
 }
 
 /// Result returned from a merge operation, containing the survivor ID
