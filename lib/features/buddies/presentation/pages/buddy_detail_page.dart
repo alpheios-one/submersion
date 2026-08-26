@@ -505,7 +505,7 @@ class _BuddyDetailContent extends ConsumerWidget {
                             contentPadding: EdgeInsets.zero,
                             leading: const Icon(Icons.card_membership),
                             title: Text(certificationTitle(cert)),
-                            subtitle: Text(cert.agency.displayName),
+                            subtitle: Text(certificationAgencyAndLevel(cert)),
                           ),
                       ],
                     ),
