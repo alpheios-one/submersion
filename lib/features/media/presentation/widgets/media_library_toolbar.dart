@@ -7,15 +7,36 @@ import 'package:submersion/features/media/presentation/providers/media_library_p
 import 'package:submersion/features/media/presentation/providers/media_library_sort_provider.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_filter_sheet.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/widgets/sort_bottom_sheet.dart';
 
-/// The library's control row: filter, sort, and view mode.
+/// The library's control row: filter, sort, select, and view mode.
 ///
 /// Every control is fixed-width, which is the point. The chip row this
 /// replaced was an Expanded horizontal scroller that claimed all free width
 /// and squeezed the view-mode selector beside it.
+///
+/// Fixed widths also mean the row has a hard budget, and grid mode already
+/// spends nearly all of it: three icon buttons plus the view-mode selector.
+/// At 320dp, the narrowest phone the app ships to, those three at default
+/// density overflow by 16px, so they are `VisualDensity.compact` (matching
+/// the dive media section's header), which reclaims 8dp each and leaves
+/// roughly 8dp spare. A FOURTH icon button would overflow by about 32dp;
+/// adding one means finding space elsewhere in the row, not just adding it.
 class MediaLibraryToolbar extends ConsumerWidget {
-  const MediaLibraryToolbar({super.key});
+  const MediaLibraryToolbar({
+    super.key,
+    required this.selection,
+    required this.canSelect,
+  });
+
+  /// The library's selection state machine. The Select control is the only
+  /// way into multi-select: long-press enters selection nowhere in the app.
+  final SelectionController selection;
+
+  /// Whether there is anything to select. An empty library hides the control
+  /// rather than offering a mode with no items in it.
+  final bool canSelect;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,6 +51,7 @@ class MediaLibraryToolbar extends ConsumerWidget {
             isLabelVisible: !filter.isEmpty,
             child: const Icon(Icons.filter_list, size: 20),
           ),
+          visualDensity: VisualDensity.compact,
           tooltip: l10n.media_library_filter_title,
           onPressed: () => showMediaLibraryFilterSheet(context),
         ),
@@ -39,6 +61,7 @@ class MediaLibraryToolbar extends ConsumerWidget {
         if (mode == MediaLibraryViewMode.grid)
           IconButton(
             icon: const Icon(Icons.sort, size: 20),
+            visualDensity: VisualDensity.compact,
             tooltip: l10n.media_library_sort_title,
             onPressed: () {
               final sort = ref.read(mediaLibrarySortProvider);
@@ -55,6 +78,14 @@ class MediaLibraryToolbar extends ConsumerWidget {
                     .setSort(field, direction),
               );
             },
+          ),
+        if (canSelect)
+          IconButton(
+            key: const ValueKey('enter_selection'),
+            icon: const Icon(Icons.checklist, size: 20),
+            visualDensity: VisualDensity.compact,
+            tooltip: l10n.common_selection_enterTooltip,
+            onPressed: selection.enterExplicit,
           ),
         const Spacer(),
         SegmentedButton<MediaLibraryViewMode>(

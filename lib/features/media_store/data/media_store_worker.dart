@@ -21,11 +21,15 @@ class MediaStoreWorker {
     MediaDeleteProcessor? deleteProcessor,
     Future<bool> Function()? preflight,
     Future<WorkerGate> Function(MediaTransferQueueEntry entry)? gate,
+    Duration entryBudget = defaultEntryBudget,
+    Duration preflightBudget = defaultPreflightBudget,
   }) : _queue = queue,
        _pipeline = pipeline,
        _deleteProcessor = deleteProcessor,
        _preflight = preflight,
-       _gate = gate;
+       _gate = gate,
+       _entryBudget = entryBudget,
+       _preflightBudget = preflightBudget;
 
   final MediaTransferQueueRepository _queue;
   final MediaUploadPipeline _pipeline;
@@ -44,6 +48,26 @@ class MediaStoreWorker {
 
   /// Deferral window for policy/connectivity-blocked entries.
   static const Duration deferWindow = Duration(minutes: 10);
+
+  /// How long the drain waits on one entry before moving to the next.
+  ///
+  /// Generous on purpose. This is not a policy on how fast a transfer ought
+  /// to be - an original-quality video over a slow uplink legitimately takes
+  /// a long time, and the adapters that do carry request timeouts (only S3,
+  /// at S3ApiClient.defaultUploadTimeout) already police that layer. Its one
+  /// job is to keep a transfer that will never come back from freezing the
+  /// whole queue, which is what happened in issue #1270.
+  static const Duration defaultEntryBudget = Duration(minutes: 30);
+
+  /// How long the drain waits on the preflight before giving up on it.
+  ///
+  /// Much shorter than [defaultEntryBudget] because the work is much
+  /// smaller: one GET of smv1/store.json. It runs before EVERY entry, so a
+  /// stall here wedges the drain without a single row being touched.
+  static const Duration defaultPreflightBudget = Duration(seconds: 30);
+
+  final Duration _entryBudget;
+  final Duration _preflightBudget;
 
   final _log = LoggerService.forClass(MediaStoreWorker);
   bool _running = false;
@@ -100,14 +124,50 @@ class MediaStoreWorker {
             await _queue.defer(entry.id, DateTime.now().add(deferWindow));
             continue;
           }
-          await deleteProcessor.process(entry);
+          await _withinBudget(entry, () => deleteProcessor.process(entry));
           continue;
         }
-        await _pipeline.process(entry);
+        await _withinBudget(entry, () async {
+          await _pipeline.process(entry);
+        });
       }
     } finally {
       _running = false;
       await _armWakeup(drainedToEmpty: drainedToEmpty);
+    }
+  }
+
+  /// Runs one entry's processing under [_entryBudget], moving on rather than
+  /// waiting forever (issue #1270).
+  ///
+  /// The budget stops the drain WAITING; it does not stop the transfer. Dart
+  /// cannot cancel a Future, so [work] keeps running and still owns its queue
+  /// row - which is what makes moving on safe. The row it left in
+  /// 'transferring' is invisible to [MediaTransferQueueRepository.nextPending]
+  /// until that call finally settles it, and every staging path is minted per
+  /// call ([MediaCacheStore.stagingFile]), so the entries that follow cannot
+  /// collide with the one still in flight.
+  ///
+  /// The deferral is load-bearing in exactly one case: a hang BEFORE
+  /// markTransferring (a stalled queue write, or a processor that never
+  /// reaches it) leaves the row 'pending' and re-selectable, and without a
+  /// future nextAttemptAt the loop would pick it straight back up and spin.
+  /// On the ordinary 'transferring' row the write is inert. [defer] is the
+  /// right verb either way: a budget expiry is a postponement, not a failed
+  /// attempt - the transfer may yet succeed, so it must not burn one of the
+  /// five attempts markFailed counts.
+  Future<void> _withinBudget(
+    MediaTransferQueueEntry entry,
+    Future<void> Function() work,
+  ) async {
+    try {
+      await work().timeout(_entryBudget);
+    } on TimeoutException {
+      _log.warning(
+        'Transfer entry ${entry.id} (media ${entry.mediaId}) exceeded its '
+        '${_entryBudget.inMinutes}m budget; deferring it and draining on',
+      );
+      await _queue.defer(entry.id, DateTime.now().add(deferWindow));
     }
   }
 
@@ -123,6 +183,12 @@ class MediaStoreWorker {
   /// stop transfers against a store this device may no longer be attached to,
   /// so "could not verify" must never be treated as "verified".
   ///
+  /// A preflight that never answers is the same case, and reaches the same
+  /// handler: [_preflightBudget] turns the stall into a TimeoutException.
+  /// Only the S3 adapter carries request timeouts of its own, so on the
+  /// others this is the sole thing standing between a stalled marker read
+  /// and a drain that hangs before touching a single row (issue #1270).
+  ///
   /// The throw is logged with its error and stack trace, not interpolated into
   /// the message: catching it is what stops the crash, so the log is now the
   /// only record of a preflight that keeps failing, and a bare string would
@@ -131,7 +197,7 @@ class MediaStoreWorker {
     final preflight = _preflight;
     if (preflight == null) return true;
     try {
-      if (await preflight()) return true;
+      if (await preflight().timeout(_preflightBudget)) return true;
       _log.warning('Media store preflight failed; drain suspended');
     } on Object catch (e, stackTrace) {
       _log.warning(

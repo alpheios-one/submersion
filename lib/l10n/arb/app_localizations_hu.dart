@@ -797,6 +797,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane => 'Fo panel atmeretezese';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Megosztva az összes búvárprofillal';
 
@@ -8622,17 +8625,17 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-${max}m';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'Legfeljebb ${max}m';
+    return 'Legfeljebb $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '${min}m+';
+    return '$min+';
   }
 
   @override
@@ -12968,6 +12971,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Eredeti video megtartasa';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'A Live Photo még nem támogatott. Készíts róla állóképes másolatot, majd a merülési adatokat a másolatba írd.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Nincs elerheto merülesi adat az irashoz.';
 
@@ -14480,6 +14487,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_appearance_metric_events => 'Esemenyek';
 
   @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Becsült palacknyomás';
+
+  @override
   String get settings_appearance_metric_gasDensity => 'Gaz suruseg';
 
   @override
@@ -15194,6 +15205,119 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_conflict_previous_tooltip => 'Elozo ütközes';
+
+  @override
+  String get settings_conflict_ref_buddy => 'Buvartars';
+
+  @override
+  String get settings_conflict_ref_certification => 'Kepesites';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'Ellenorzolista sablon';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Csatlakoztatott fiok';
+
+  @override
+  String get settings_conflict_ref_course => 'Tanfolyam';
+
+  @override
+  String get settings_conflict_ref_courseRequirement =>
+      'Tanfolyami kovetelmeny';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Palackkonfiguracio';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Adatforras';
+
+  @override
+  String get settings_conflict_ref_dive => 'Merules';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Merulocentrum';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Merulesszamitogep';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Merulesi terv';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Merulohely';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Merules tipusa';
+
+  @override
+  String get settings_conflict_ref_diver => 'Merulo';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Felszereles';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Felszereleskeszlet';
+
+  @override
+  String get settings_conflict_ref_finding => 'Eszrevetel';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Oktato';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Kapcsolt merules';
+
+  @override
+  String get settings_conflict_ref_media => 'Media';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Media-elofizetes';
+
+  @override
+  String get settings_conflict_ref_missing => 'Mar nincs ebben a konyvtarban';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Tervezett palack';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Merules elotti ellenorzolista sablon';
+
+  @override
+  String get settings_conflict_ref_preDiveSession =>
+      'Merules elotti ellenorzolista';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Kapcsolodo merules';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Szerviz tipusa';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Eszleles';
+
+  @override
+  String get settings_conflict_ref_signer => 'Alairta';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Forras merules';
+
+  @override
+  String get settings_conflict_ref_species => 'Fajok';
+
+  @override
+  String get settings_conflict_ref_tag => 'Cimke';
+
+  @override
+  String get settings_conflict_ref_tank => 'Palack';
+
+  @override
+  String get settings_conflict_ref_trip => 'Utazas';
 
   @override
   String get settings_conflict_remoteVersion => 'Tavoli valtozat';
@@ -17942,6 +18066,42 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => 'Tags';
+
+  @override
+  String get importWizard_photos_stepLabel => 'Fényképek';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fénykép szerepel ebben a naplóban',
+      one: '1 fénykép szerepel ebben a naplóban',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'Fényképmappa kiválasztása...';
+
+  @override
+  String get importWizard_photos_scanning => 'Mappa vizsgálata...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched párosítva, $byName csak fájlnév alapján, $missing nem található';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Fényképek kihagyása';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'A fényképek importálásához az eszköz lemezén lévő mappa szükséges. Futtasd ezt az importálást számítógépen, hogy a fényképek is bekerüljenek. A merülések és a merülőhelyek normálisan importálódnak.';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -20977,6 +21137,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'Cimkek';
+
+  @override
+  String get diveImport_uddf_media => 'Fényképek';
 
   @override
   String get diveImport_uddf_title => 'Importalas UDDF-bol';
@@ -32678,6 +32841,45 @@ class AppLocalizationsHu extends AppLocalizations {
   String media_info_lastChecked(String date) {
     return 'Utoljára ellenőrizve $date';
   }
+
+  @override
+  String get media_timeInDive_label => 'Időpont a merülésben';
+
+  @override
+  String get media_timeInDive_unknown => 'Időpont a merülésben ismeretlen';
+
+  @override
+  String get media_timeInDive_setAction => 'Időpont beállítása a merülésben';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (kézzel beállítva)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'Idő a merülés kezdetétől';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return '0:00 és $max között';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Adj meg egy időt 0:00 és $max között';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Mentes';
+
+  @override
+  String get media_timeInDive_cancel => 'Megse';
+
+  @override
+  String get media_timeInDive_reset => 'Visszaállítás automatikusra';
 
   @override
   String get media_info_backupSection => 'Biztonsági mentés';

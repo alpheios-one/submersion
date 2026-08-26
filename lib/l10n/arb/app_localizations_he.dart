@@ -782,6 +782,10 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'שינוי גודל החלונית הראשית';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'משותף עם כל פרופילי הצלילה';
 
@@ -8427,17 +8431,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-$maxמ\'';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'עד $maxמ\'';
+    return 'עד $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '$minמ\'+';
+    return '$min+';
   }
 
   @override
@@ -12686,6 +12690,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'שמור סרטון מקורי';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      '‏Live Photos עדיין אינן נתמכות. שכפל תמונה זו כתמונת סטילס, ולאחר מכן כתוב את נתוני הצלילה בעותק.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'אין נתוני צלילה זמינים לכתיבה.';
 
@@ -14178,6 +14186,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_appearance_metric_events => 'אירועים';
 
   @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'לחץ בלון משוער';
+
+  @override
   String get settings_appearance_metric_gasDensity => 'צפיפות גז';
 
   @override
@@ -14865,6 +14877,117 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_conflict_previous_tooltip => 'ההתנגשות הקודמת';
+
+  @override
+  String get settings_conflict_ref_buddy => 'שותף';
+
+  @override
+  String get settings_conflict_ref_certification => 'הסמכה';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'תבנית רשימת משימות';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'חשבון מחובר';
+
+  @override
+  String get settings_conflict_ref_course => 'קורס';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'דרישת קורס';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'תצורת בלונים';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'מקור נתונים';
+
+  @override
+  String get settings_conflict_ref_dive => 'צלילה';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'מועדון צלילה';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'מחשב צלילה';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'תוכנית צלילה';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'אתר צלילה';
+
+  @override
+  String get settings_conflict_ref_diveType => 'סוג צלילה';
+
+  @override
+  String get settings_conflict_ref_diver => 'צולל';
+
+  @override
+  String get settings_conflict_ref_equipment => 'ציוד';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'סט ציוד';
+
+  @override
+  String get settings_conflict_ref_finding => 'ממצא';
+
+  @override
+  String get settings_conflict_ref_instructor => 'מדריך';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'צלילה מקושרת';
+
+  @override
+  String get settings_conflict_ref_media => 'מדיה';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'מנוי מדיה';
+
+  @override
+  String get settings_conflict_ref_missing => 'כבר לא בספרייה הזו';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'בלון מתוכנן';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'תבנית רשימת בדיקות לפני צלילה';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'רשימת בדיקות לפני צלילה';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'צלילה קשורה';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'סוג טיפול';
+
+  @override
+  String get settings_conflict_ref_sighting => 'תצפית';
+
+  @override
+  String get settings_conflict_ref_signer => 'נחתם על ידי';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'צלילת מקור';
+
+  @override
+  String get settings_conflict_ref_species => 'מינים';
+
+  @override
+  String get settings_conflict_ref_tag => 'תגית';
+
+  @override
+  String get settings_conflict_ref_tank => 'בלון';
+
+  @override
+  String get settings_conflict_ref_trip => 'טיול';
 
   @override
   String get settings_conflict_remoteVersion => 'גרסה מרוחקת';
@@ -17536,6 +17659,42 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => 'Tags';
+
+  @override
+  String get importWizard_photos_stepLabel => 'תמונות';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תמונות מוזכרות ביומן הזה',
+      one: 'תמונה אחת מוזכרת ביומן הזה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'בחר תיקיית תמונות...';
+
+  @override
+  String get importWizard_photos_scanning => 'סורק את התיקייה...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched הותאמו, $byName לפי שם קובץ בלבד, $missing לא נמצאו';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'דלג על התמונות';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'ייבוא תמונות מחייב תיקייה בדיסק של המכשיר הזה. הרץ את הייבוא במחשב כדי לכלול אותן. צלילות ואתרים מיובאים כרגיל.';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -20518,6 +20677,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'תגיות';
+
+  @override
+  String get diveImport_uddf_media => 'תמונות';
 
   @override
   String get diveImport_uddf_title => 'ייבוא מ-UDDF';
@@ -32150,6 +32312,45 @@ class AppLocalizationsHe extends AppLocalizations {
   String media_info_lastChecked(String date) {
     return 'נבדק לאחרונה $date';
   }
+
+  @override
+  String get media_timeInDive_label => 'זמן בצלילה';
+
+  @override
+  String get media_timeInDive_unknown => 'זמן בצלילה לא ידוע';
+
+  @override
+  String get media_timeInDive_setAction => 'הגדרת זמן בצלילה';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (הוגדר ידנית)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'זמן מתחילת הצלילה';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'בין 0:00 ל-$max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'יש להזין זמן בין 0:00 ל-$max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'שמור';
+
+  @override
+  String get media_timeInDive_cancel => 'ביטול';
+
+  @override
+  String get media_timeInDive_reset => 'איפוס לאוטומטי';
 
   @override
   String get media_info_backupSection => 'גיבוי';

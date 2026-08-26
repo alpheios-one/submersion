@@ -915,15 +915,29 @@ class BuddyRepository {
     return result.data['count'] as int? ?? 0;
   }
 
-  /// Get dives shared with a buddy
+  /// Get dives shared with a buddy, newest dive first.
+  ///
+  /// Ordered by the dive's own timestamp rather than by when the
+  /// `dive_buddies` link row was written, so callers that truncate the result
+  /// (the detail page previews the first five) get the newest dives and not an
+  /// arbitrary slice of the import order. The sort key mirrors
+  /// `DiveRepository.getAllDives` so the preview agrees with the dive list,
+  /// with a final tiebreak on id so dives that tie on both keys keep a stable
+  /// order instead of an arbitrary one: the caller truncates this list, so an
+  /// unstable tail would change *which* dives the preview shows, not merely
+  /// their order.
+  /// The join also drops links whose dive row no longer exists.
   Future<List<String>> getDiveIdsForBuddy(String buddyId) async {
     final results = await _db
         .customSelect(
           '''
-      SELECT dive_id
-      FROM dive_buddies
-      WHERE buddy_id = ?
-      ORDER BY created_at DESC
+      SELECT db.dive_id
+      FROM dive_buddies db
+      INNER JOIN dives d ON d.id = db.dive_id
+      WHERE db.buddy_id = ?
+      ORDER BY COALESCE(d.entry_time, d.dive_date_time) DESC,
+               d.dive_number DESC,
+               d.id
     ''',
           variables: [Variable.withString(buddyId)],
         )

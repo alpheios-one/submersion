@@ -5,16 +5,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_detail_row.dart';
+import 'package:submersion/features/media/domain/entities/media_dive_window.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_provenance.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
 import 'package:submersion/features/media/domain/value_objects/verify_result.dart';
+import 'package:submersion/features/media/presentation/helpers/elapsed_time_format.dart';
 import 'package:submersion/features/media/presentation/helpers/media_link_replacer.dart';
+import 'package:submersion/features/media/presentation/helpers/set_time_seed.dart';
 import 'package:submersion/features/media/presentation/providers/media_provenance_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_serving_providers.dart';
+import 'package:submersion/features/media/presentation/widgets/set_media_time_dialog.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -111,16 +117,35 @@ class _Section extends StatelessWidget {
   }
 }
 
-class _FileSection extends StatelessWidget {
+class _FileSection extends ConsumerWidget {
   const _FileSection({required this.item, required this.units});
 
   final MediaItem item;
   final UnitFormatter units;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final unknown = l10n.media_info_unknown;
+    // The dive's profile decides whether the stored position is inside the
+    // dive window and gives the Set-time dialog its range (issue #1090).
+    final diveId = item.diveId;
+    final profile = diveId == null
+        ? const <DiveProfilePoint>[]
+        : ref.watch(diveProvider(diveId)).value?.profile ??
+              const <DiveProfilePoint>[];
+    final profileLength = MediaDiveWindow.profileLengthSeconds(profile);
+    final enrichment = item.enrichment;
+    final positioned = enrichment?.isWithinDiveWindow(profileLength) ?? false;
+    final String timeInDive;
+    if (!positioned) {
+      timeInDive = unknown;
+    } else {
+      final formatted = formatElapsedMmSs(enrichment!.elapsedSeconds!);
+      timeInDive = enrichment.isManual
+          ? l10n.media_timeInDive_manual(formatted)
+          : formatted;
+    }
     final width = item.width;
     final height = item.height;
     final size = item.contentSizeBytes;
@@ -129,6 +154,18 @@ class _FileSection extends StatelessWidget {
 
     return _Section(
       title: l10n.media_info_fileSection,
+      actions: [
+        // Pinning needs a profile to pin against.
+        if (diveId != null && profile.isNotEmpty)
+          _SetTimeButton(
+            item: item,
+            profile: profile,
+            initialElapsedSeconds: setTimeSeedFor(
+              item,
+              profileLengthSeconds: profileLength,
+            ),
+          ),
+      ],
       children: [
         DiveDetailRow(
           label: l10n.media_info_filename,
@@ -155,12 +192,46 @@ class _FileSection extends StatelessWidget {
           // takenAt is non-nullable on the row, so there is no unknown case.
           value: units.formatDateTime(item.takenAt, l10n: l10n),
         ),
+        if (diveId != null)
+          DiveDetailRow(label: l10n.media_timeInDive_label, value: timeInDive),
         if (lat != null && lon != null)
           DiveDetailRow(
             label: l10n.media_info_coordinates,
             value: '${lat.toStringAsFixed(5)}, ${lon.toStringAsFixed(5)}',
           ),
       ],
+    );
+  }
+}
+
+/// Opens the Set-time dialog and applies the diver's choice (issue #1090).
+class _SetTimeButton extends ConsumerWidget {
+  const _SetTimeButton({
+    required this.item,
+    required this.profile,
+    required this.initialElapsedSeconds,
+  });
+
+  final MediaItem item;
+  final List<DiveProfilePoint> profile;
+  final int initialElapsedSeconds;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return TextButton.icon(
+      icon: const Icon(Icons.push_pin_outlined),
+      label: Text(context.l10n.media_timeInDive_setAction),
+      onPressed: () async {
+        final choice = await showSetMediaTimeDialog(
+          context,
+          profile: profile,
+          initialElapsedSeconds: initialElapsedSeconds,
+          isPinned: item.manualElapsedSeconds != null,
+          settings: ref.read(settingsProvider),
+        );
+        if (choice == null || !context.mounted) return;
+        await ref.read(mediaTimePinnerProvider).apply(item, choice);
+      },
     );
   }
 }

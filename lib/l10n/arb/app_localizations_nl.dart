@@ -797,6 +797,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'Hoofdvenster formaat aanpassen';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Gedeeld met alle duikersprofielen';
 
@@ -8573,17 +8577,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-${max}m';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'Tot ${max}m';
+    return 'Tot $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '${min}m+';
+    return '$min+';
   }
 
   @override
@@ -12910,6 +12914,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'Originele video bewaren';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Live Photos worden nog niet ondersteund. Dupliceer deze als stilstaande foto en schrijf de duikgegevens vervolgens naar de kopie.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Geen duikgegevens beschikbaar om te schrijven.';
 
@@ -14419,6 +14427,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_appearance_metric_events => 'Gebeurtenissen';
 
   @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Geschatte flesdruk';
+
+  @override
   String get settings_appearance_metric_gasDensity => 'Gasdichtheid';
 
   @override
@@ -15127,6 +15139,117 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_conflict_previous_tooltip => 'Vorig conflict';
+
+  @override
+  String get settings_conflict_ref_buddy => 'Buddy';
+
+  @override
+  String get settings_conflict_ref_certification => 'Certificering';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'Checklistsjabloon';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Gekoppeld account';
+
+  @override
+  String get settings_conflict_ref_course => 'Cursus';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'Cursusvereiste';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Flesconfiguratie';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Gegevensbron';
+
+  @override
+  String get settings_conflict_ref_dive => 'Duik';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Duikcentrum';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Duikcomputer';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Duikplan';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Duikstek';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Duiktype';
+
+  @override
+  String get settings_conflict_ref_diver => 'Duiker';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Uitrusting';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Uitrustingsset';
+
+  @override
+  String get settings_conflict_ref_finding => 'Bevinding';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Instructeur';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Gekoppelde duik';
+
+  @override
+  String get settings_conflict_ref_media => 'Media';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Media-abonnement';
+
+  @override
+  String get settings_conflict_ref_missing => 'Niet meer in deze bibliotheek';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Geplande fles';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Sjabloon voor checklist voor de duik';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'Checklist voor de duik';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Gerelateerde duik';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Onderhoudstype';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Waarneming';
+
+  @override
+  String get settings_conflict_ref_signer => 'Ondertekend door';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Bronduik';
+
+  @override
+  String get settings_conflict_ref_species => 'Soorten';
+
+  @override
+  String get settings_conflict_ref_tag => 'Tag';
+
+  @override
+  String get settings_conflict_ref_tank => 'Fles';
+
+  @override
+  String get settings_conflict_ref_trip => 'Reis';
 
   @override
   String get settings_conflict_remoteVersion => 'Externe versie';
@@ -17851,6 +17974,42 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => 'Tags';
+
+  @override
+  String get importWizard_photos_stepLabel => 'Foto\'s';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto\'s waarnaar dit logboek verwijst',
+      one: '1 foto waarnaar dit logboek verwijst',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'Fotomap kiezen...';
+
+  @override
+  String get importWizard_photos_scanning => 'Map wordt gescand...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched gekoppeld, $byName alleen op bestandsnaam, $missing niet gevonden';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Foto\'s overslaan';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'Voor het importeren van foto\'s is een map op de schijf van dit apparaat nodig. Voer deze import uit op een computer om ze mee te nemen. Duiken en duikstekken worden normaal geïmporteerd.';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -20880,6 +21039,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'Tags';
+
+  @override
+  String get diveImport_uddf_media => 'Foto\'s';
 
   @override
   String get diveImport_uddf_title => 'Importeren vanuit UDDF';
@@ -32573,6 +32735,45 @@ class AppLocalizationsNl extends AppLocalizations {
   String media_info_lastChecked(String date) {
     return 'Laatst gecontroleerd $date';
   }
+
+  @override
+  String get media_timeInDive_label => 'Tijdstip in de duik';
+
+  @override
+  String get media_timeInDive_unknown => 'Tijdstip in de duik onbekend';
+
+  @override
+  String get media_timeInDive_setAction => 'Tijdstip in de duik instellen';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (handmatig ingesteld)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'Tijd sinds het begin van de duik';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Tussen 0:00 en $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Voer een tijd in tussen 0:00 en $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Opslaan';
+
+  @override
+  String get media_timeInDive_cancel => 'Annuleren';
+
+  @override
+  String get media_timeInDive_reset => 'Terugzetten naar automatisch';
 
   @override
   String get media_info_backupSection => 'Back-up';

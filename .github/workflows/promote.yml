@@ -289,7 +289,8 @@ jobs:
           set -euo pipefail
           # Apple requires whatsNew on a new App Store version; deliver reads
           # it from metadata/en-US/release_notes.txt (the only metadata file
-          # we provide, so nothing else is touched).
+          # generated here; the committed review_information/notes.txt beside
+          # it is uploaded as-is and must not be touched).
           #
           # The GitHub release body is written for every platform at once, and
           # App Review guideline 2.3.10 forbids naming other platforms in App

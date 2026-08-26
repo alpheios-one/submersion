@@ -271,6 +271,7 @@ class MediaRepository {
                 item.remoteCompressedUploadedAt?.millisecondsSinceEpoch,
               ),
               retainInLibrary: Value(item.retainInLibrary),
+              manualElapsedSeconds: Value(item.manualElapsedSeconds),
               createdAt: Value(now.millisecondsSinceEpoch),
               updatedAt: Value(now.millisecondsSinceEpoch),
             ),
@@ -293,6 +294,41 @@ class MediaRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to create media: ${item.filePath}',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Pins [id] to [elapsedSeconds] from its dive's start, or clears the pin
+  /// with null so the position derives from the capture time again
+  /// (issue #1090).
+  ///
+  /// Writes only the pin and updatedAt, so a stale caller snapshot cannot
+  /// clobber any other column. The enrichment row is NOT rewritten here:
+  /// [DiveMediaEnricher] is the one writer of enrichment and reads the pin
+  /// on its next pass, which callers trigger right after this returns.
+  Future<void> setManualElapsedSeconds(String id, int? elapsedSeconds) async {
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
+        MediaCompanion(
+          manualElapsedSeconds: Value(elapsedSeconds),
+          updatedAt: Value(now),
+        ),
+      );
+      _log.info('Set manual elapsed for media $id: $elapsedSeconds');
+
+      await _syncRepository.markRecordPending(
+        entityType: 'media',
+        recordId: id,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to set manual elapsed for media: $id',
         error: e,
         stackTrace: stackTrace,
       );
@@ -353,6 +389,7 @@ class MediaRepository {
             item.remoteCompressedUploadedAt?.millisecondsSinceEpoch,
           ),
           retainInLibrary: Value(item.retainInLibrary),
+          manualElapsedSeconds: Value(item.manualElapsedSeconds),
           updatedAt: Value(now),
         ),
       );

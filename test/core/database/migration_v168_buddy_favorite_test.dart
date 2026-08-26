@@ -3,14 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/database/database.dart';
 
-/// v161 adds `buddies.is_favorite` (issue #638): a diver can pin frequently
+/// v168 adds `buddies.is_favorite` (issue #638): a diver can pin frequently
 /// dived buddies to the top of the "Add buddy" picker regardless of the
 /// chosen sort. NOT NULL with a false default, so every pre-existing buddy
 /// reads back as not-favorited.
 void main() {
-  test('v161 is in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(161));
-    expect(AppDatabase.migrationVersions, contains(161));
+  test('v168 is in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(168));
+    expect(AppDatabase.migrationVersions, contains(168));
   });
 
   test('a fresh database has buddies.is_favorite', () async {
@@ -66,7 +66,7 @@ void main() {
   });
 
   test('beforeOpen backstop adds the column when a parallel-branch collision '
-      'stranded a DB past v161 without running the onUpgrade block', () async {
+      'stranded a DB past v168 without running the onUpgrade block', () async {
     final nativeDb = NativeDatabase.memory(
       setup: (rawDb) {
         rawDb.execute(

@@ -799,6 +799,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'Hauptbereich in der Groesse aendern';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Mit allen Taucherprofilen geteilt';
 
@@ -8633,17 +8637,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-${max}m';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'Bis zu ${max}m';
+    return 'Bis zu $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '${min}m+';
+    return '$min+';
   }
 
   @override
@@ -13000,6 +13004,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Originalvideo beibehalten';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Live Photos werden noch nicht unterstützt. Dupliziere dieses Foto als Standbild und schreibe die Tauchdaten dann in die Kopie.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Keine Tauchdaten zum Schreiben verfügbar.';
 
@@ -14510,6 +14518,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_appearance_metric_events => 'Ereignisse';
 
   @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Geschätzter Flaschendruck';
+
+  @override
   String get settings_appearance_metric_gasDensity => 'Gasdichte';
 
   @override
@@ -15224,6 +15236,118 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_conflict_previous_tooltip => 'Vorheriger Konflikt';
+
+  @override
+  String get settings_conflict_ref_buddy => 'Tauchpartner';
+
+  @override
+  String get settings_conflict_ref_certification => 'Zertifizierung';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'Checklisten-Vorlage';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Verbundenes Konto';
+
+  @override
+  String get settings_conflict_ref_course => 'Kurs';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'Kursanforderung';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Flaschenkonfiguration';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Datenquelle';
+
+  @override
+  String get settings_conflict_ref_dive => 'Tauchgang';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Tauchbasis';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Tauchcomputer';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Tauchplan';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Tauchplatz';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Tauchgangart';
+
+  @override
+  String get settings_conflict_ref_diver => 'Taucher';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Ausrüstung';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Ausrüstungsset';
+
+  @override
+  String get settings_conflict_ref_finding => 'Befund';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Instructor';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Verknüpfter Tauchgang';
+
+  @override
+  String get settings_conflict_ref_media => 'Medien';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Medien-Abonnement';
+
+  @override
+  String get settings_conflict_ref_missing => 'Nicht mehr in dieser Bibliothek';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Geplante Flasche';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Vorlage für Checkliste vor dem Tauchgang';
+
+  @override
+  String get settings_conflict_ref_preDiveSession =>
+      'Checkliste vor dem Tauchgang';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Zugehöriger Tauchgang';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Wartungsart';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Sichtung';
+
+  @override
+  String get settings_conflict_ref_signer => 'Unterschrieben von';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Quell-Tauchgang';
+
+  @override
+  String get settings_conflict_ref_species => 'Art';
+
+  @override
+  String get settings_conflict_ref_tag => 'Tag';
+
+  @override
+  String get settings_conflict_ref_tank => 'Flasche';
+
+  @override
+  String get settings_conflict_ref_trip => 'Reise';
 
   @override
   String get settings_conflict_remoteVersion => 'Remote-Version';
@@ -17963,6 +18087,42 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => 'Tags';
+
+  @override
+  String get importWizard_photos_stepLabel => 'Fotos';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos in diesem Logbuch referenziert',
+      one: '1 Foto in diesem Logbuch referenziert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'Fotoordner wählen...';
+
+  @override
+  String get importWizard_photos_scanning => 'Ordner wird durchsucht...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched zugeordnet, $byName nur über den Dateinamen, $missing nicht gefunden';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Fotos überspringen';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'Für den Fotoimport wird ein Ordner auf dem Speicher dieses Geräts benötigt. Führe diesen Import an einem Computer aus, um Fotos einzuschließen. Tauchgänge und Tauchplätze werden normal importiert.';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -21009,6 +21169,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'Tags';
+
+  @override
+  String get diveImport_uddf_media => 'Fotos';
 
   @override
   String get diveImport_uddf_title => 'Aus UDDF importieren';
@@ -32732,6 +32895,45 @@ class AppLocalizationsDe extends AppLocalizations {
   String media_info_lastChecked(String date) {
     return 'Zuletzt geprüft $date';
   }
+
+  @override
+  String get media_timeInDive_label => 'Zeitpunkt im Tauchgang';
+
+  @override
+  String get media_timeInDive_unknown => 'Zeitpunkt im Tauchgang unbekannt';
+
+  @override
+  String get media_timeInDive_setAction => 'Zeitpunkt im Tauchgang festlegen';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (manuell festgelegt)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'Zeit seit Tauchgangsbeginn';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Zwischen 0:00 und $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Gib eine Zeit zwischen 0:00 und $max ein';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Speichern';
+
+  @override
+  String get media_timeInDive_cancel => 'Abbrechen';
+
+  @override
+  String get media_timeInDive_reset => 'Auf automatisch zurücksetzen';
 
   @override
   String get media_info_backupSection => 'Sicherung';

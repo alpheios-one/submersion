@@ -1,3 +1,4 @@
+import 'package:submersion/features/media/domain/entities/media_dive_window.dart';
 import 'package:submersion/features/media/domain/value_objects/extracted_file.dart';
 import 'package:submersion/features/media/domain/value_objects/matched_selection.dart';
 
@@ -36,11 +37,11 @@ class DivePhotoMatcher {
   /// Pre-dive buffer applied before [DiveBounds.entryTime] when computing
   /// the match window. Catches photos taken at the boat / dock / on the
   /// surface before the descent.
-  static const Duration preBuffer = Duration(minutes: 30);
+  static const Duration preBuffer = MediaDiveWindow.before;
 
   /// Post-dive buffer applied after [DiveBounds.exitTime] when computing
   /// the match window. Catches surface-interval shots, debrief photos.
-  static const Duration postBuffer = Duration(minutes: 60);
+  static const Duration postBuffer = MediaDiveWindow.after;
 
   /// Routes [files] to [dives] by EXIF date.
   MatchedSelection match({

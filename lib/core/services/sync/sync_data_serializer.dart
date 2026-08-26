@@ -5660,6 +5660,9 @@ class SyncDataSerializer {
       'defaultShowOtu': false,
       'defaultShowGasSwitchMarkers': true,
       'defaultShowGasTimeline': false,
+      // v161: seed it so payloads predating the column hydrate instead of
+      // throwing in DiverSetting.fromJson.
+      'defaultShowO2CellMv': false,
       // Dive profile default-visible metrics. Non-nullable bool added in v91;
       // seed it so payloads predating the column hydrate instead of throwing in
       // DiverSetting.fromJson.

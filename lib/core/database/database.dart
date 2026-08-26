@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 
 import 'package:drift/drift.dart';
 
+import 'package:submersion/core/database/imported_computer_backfill.dart';
 import 'package:submersion/core/database/performance_indexes.dart';
 import 'package:submersion/core/database/tag_uniqueness.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -1333,6 +1334,11 @@ class Media extends Table {
   // where it is true. Synced with the row like every other media column.
   BoolColumn get retainInLibrary =>
       boolean().withDefault(const Constant(false))();
+  // v164: the moment in the dive the diver pinned this item to, in seconds
+  // from the dive start (issue #1090). Null means the position derives from
+  // taken_at. Lives on the media row, not on media_enrichment, so it syncs
+  // with the row and survives every enrichment recompute.
+  IntColumn get manualElapsedSeconds => integer().nullable()();
   // coverage:ignore-end
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -1807,6 +1813,18 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(true))();
   BoolColumn get defaultShowGasTimeline =>
       boolean().withDefault(const Constant(false))();
+  // v161: default visibility for the per-cell O2 mV traces (issue #1235).
+  BoolColumn get defaultShowO2CellMv =>
+      boolean().withDefault(const Constant(false))();
+  // v163: whether synthesized ("(est.)") tank pressure lines are drawn on the
+  // profile chart at all (issue #731). Defaults to true, preserving the
+  // behavior estimates shipped with. Ignored for coverage for the reason
+  // given below: the declaration is a codegen input, never executed. Its
+  // default is pinned by migration_v163_estimated_tank_pressure_default_test.
+  // coverage:ignore-start
+  BoolColumn get defaultShowEstimatedTankPressure =>
+      boolean().withDefault(const Constant(true))();
+  // coverage:ignore-end
   // Drift column declarations are codegen inputs shadowed by the generated
   // table at runtime, so this line is never executed (every sibling column
   // getter is likewise uncovered). The default is verified via the migration
@@ -3163,7 +3181,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 161;
+  static const int currentSchemaVersion = 168;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3445,9 +3463,30 @@ class AppDatabase extends _$AppDatabase {
     // service_records.service_type -> service_category rename. Renumbered
     // from 158 and then 159, which #1149 and #1177 claimed first on main.
     160,
-    // v161 (issue #638): buddies.is_favorite, so frequently-dived buddies can
-    // be pinned to the top of the "Add buddy" picker regardless of sort.
+    // v161: diver_settings.default_show_o2_cell_mv, a persisted default for
+    // the per-cell O2 mV toggle on the profile chart (issue #1235).
     161,
+    // v163: diver_settings.default_show_estimated_tank_pressure, the switch
+    // that suppresses synthesized "(est.)" tank pressure lines on the profile
+    // chart (issue #731). v162 is skipped rather than missing: main was at
+    // v161 when that branch was cut, and this branch had already written 162.
+    // Two branches writing the same scalar auto-merge with no conflict
+    // marker, so #731 took 163 instead and 162 stays permanently unused.
+    163,
+    // v164: media.manual_elapsed_seconds, the diver's own placement of a
+    // media item in the dive when its capture time is wrong (issue #1090).
+    // Renumbered from 162, which #731 landed past while this branch was open.
+    164,
+    // v165, v166 and v167 are deliberately absent, not missing: they are
+    // claimed by issue #1092 (PR #1290), issue #1187 (PR #1300) and issue
+    // #1269 (PR #1276) on branches that are still open. This ladder is
+    // monotonic and unique, not contiguous, so do not "fix" the gap by
+    // renumbering downwards.
+    // v168 (issue #638): buddies.is_favorite, so frequently-dived buddies can
+    // be pinned to the top of the "Add buddy" picker regardless of sort.
+    // Renumbered from 161, which #1235 landed on main while this branch was
+    // open.
+    168,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4200,6 +4239,21 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// v164: media.manual_elapsed_seconds (issue #1090). Idempotent; safe to
+  /// call from both onUpgrade and the beforeOpen backstop. Nullable with no
+  /// default, so every pre-existing row reads back as "position from
+  /// taken_at".
+  Future<void> _assertMediaManualElapsedColumn() async {
+    final cols = await customSelect("PRAGMA table_info('media')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('manual_elapsed_seconds')) {
+      await customStatement(
+        'ALTER TABLE media ADD COLUMN manual_elapsed_seconds INTEGER',
+      );
+    }
+  }
+
   /// v111: equipment_sets.is_default column + equipment_set_geofences table.
   /// Idempotent (createTable is IF NOT EXISTS; the ALTER is PRAGMA-guarded) so
   /// it is safe to call from both onUpgrade and the beforeOpen backstop.
@@ -4482,6 +4536,15 @@ class AppDatabase extends _$AppDatabase {
 
   /// Test-only hook exercising the #1064 attribution self-heal directly.
   Future<void> backfillDiveComputerIdsForTest() => _backfillDiveComputerIds();
+
+  /// Register the dive computers that file-imported dives name (issue
+  /// #1288). Body lives in `imported_computer_backfill.dart`.
+  Future<void> _backfillImportedDiveComputers() =>
+      backfillImportedDiveComputers(this);
+
+  /// Test-only hook exercising the #1288 registration self-heal directly.
+  Future<void> backfillImportedDiveComputersForTest() =>
+      _backfillImportedDiveComputers();
 
   /// Copy each buddy's inline certification into a certifications row owned by
   /// that buddy (issue #553). Invoked from the onUpgrade blocks only (v109
@@ -4900,6 +4963,43 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// v161: default_show_o2_cell_mv on diver_settings (issue #1235). The
+  /// per-cell O2 mV toggle previously had no persisted default; this lets a
+  /// diver make it visible by default on the profile chart.
+  Future<void> _assertO2CellMvDefaultColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('default_show_o2_cell_mv')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN default_show_o2_cell_mv '
+        'INTEGER NOT NULL DEFAULT 0 '
+        'CHECK (default_show_o2_cell_mv IN (0, 1))',
+      );
+    }
+  }
+
+  /// v163: default_show_estimated_tank_pressure on diver_settings (issue
+  /// #731). Synthesized "(est.)" pressure lines previously had no off switch.
+  /// Defaults to 1 so existing databases keep drawing them.
+  Future<void> _assertEstimatedTankPressureDefaultColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('default_show_estimated_tank_pressure')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN '
+        'default_show_estimated_tank_pressure '
+        'INTEGER NOT NULL DEFAULT 1 '
+        'CHECK (default_show_estimated_tank_pressure IN (0, 1))',
+      );
+    }
+  }
+
   /// Default service price columns on service_kinds and service_schedules
   /// (issue #829). PRAGMA-guarded so a healthy database no-ops. The
   /// cols.isEmpty guard matters: minimal migration fixtures build databases
@@ -4966,7 +5066,7 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  /// Idempotent DDL for the v161 buddies.is_favorite column (issue #638),
+  /// Idempotent DDL for the v168 buddies.is_favorite column (issue #638),
   /// letting frequently-dived buddies be pinned to the top of the "Add
   /// buddy" picker regardless of sort. Self-guards on the table existing, and
   /// defaults every pre-existing row to not-favorited.
@@ -8525,13 +8625,29 @@ class AppDatabase extends _$AppDatabase {
           await _assertServiceCategoryRename();
         }
         if (from < 160) await reportProgress();
-        // v161 (issue #638): buddies.is_favorite, so frequently-dived buddies
-        // can be pinned to the top of the "Add buddy" picker regardless of
-        // sort.
+        // v161: default_show_o2_cell_mv on diver_settings (issue #1235).
         if (from < 161) {
-          await _assertBuddyFavoriteColumn();
+          await _assertO2CellMvDefaultColumn();
         }
         if (from < 161) await reportProgress();
+        // v163: default_show_estimated_tank_pressure on diver_settings
+        // (issue #731).
+        if (from < 163) {
+          await _assertEstimatedTankPressureDefaultColumn();
+        }
+        if (from < 163) await reportProgress();
+        // v164: media.manual_elapsed_seconds (issue #1090).
+        if (from < 164) {
+          await _assertMediaManualElapsedColumn();
+        }
+        if (from < 164) await reportProgress();
+        // v168 (issue #638): buddies.is_favorite, so frequently-dived buddies
+        // can be pinned to the top of the "Add buddy" picker regardless of
+        // sort.
+        if (from < 168) {
+          await _assertBuddyFavoriteColumn();
+        }
+        if (from < 168) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8722,7 +8838,21 @@ class AppDatabase extends _$AppDatabase {
         // onUpgrade, and every read of a service record would throw.
         await _assertServiceCategoryRename();
 
-        // v161 backstop: re-assert buddies.is_favorite (issue #638). A
+        // v161 backstop: re-assert diver_settings.default_show_o2_cell_mv
+        // (issue #1235; same parallel-branch version-collision self-heal).
+        await _assertO2CellMvDefaultColumn();
+
+        // v163 backstop: re-assert
+        // diver_settings.default_show_estimated_tank_pressure (issue #731;
+        // same parallel-branch version-collision self-heal).
+        await _assertEstimatedTankPressureDefaultColumn();
+
+        // v164 backstop: re-assert media.manual_elapsed_seconds (issue
+        // #1090; same parallel-branch version-collision self-heal). The
+        // media row mapper reads it on every hydration.
+        await _assertMediaManualElapsedColumn();
+
+        // v168 backstop: re-assert buddies.is_favorite (issue #638). A
         // database that arrives by restore or sync-adopt never runs
         // onUpgrade, and every read of a buddy would throw without it.
         await _assertBuddyFavoriteColumn();
@@ -8897,6 +9027,12 @@ class AppDatabase extends _$AppDatabase {
         // bump). Also AFTER ensurePerformanceIndexes, for the same reason as
         // the backfill above.
         await _backfillDiveComputerIds();
+
+        // Data self-heal (issue #1288): register the computers that
+        // file-imported dives name, so they reach the filter at all. AFTER
+        // the #1064 heal above, which resolves the same column from the
+        // stronger download-derived signal.
+        await _backfillImportedDiveComputers();
       },
     );
   }

@@ -798,6 +798,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'Redimensionar painel principal';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Partilhado com todos os perfis de mergulho';
 
@@ -8644,17 +8648,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-${max}m';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'Até ${max}m';
+    return 'Até $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '${min}m+';
+    return '$min+';
   }
 
   @override
@@ -13007,6 +13011,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'Manter video original';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'As Live Photos ainda não são suportadas. Duplique esta como fotografia estática e escreva os dados do mergulho na cópia.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Nenhum dado de mergulho disponivel para gravar.';
 
@@ -14526,6 +14534,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_appearance_metric_events => 'Eventos';
 
   @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Pressão estimada do cilindro';
+
+  @override
   String get settings_appearance_metric_gasDensity => 'Densidade do Gas';
 
   @override
@@ -15242,6 +15254,119 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_conflict_previous_tooltip => 'Conflito anterior';
+
+  @override
+  String get settings_conflict_ref_buddy => 'Companheiro';
+
+  @override
+  String get settings_conflict_ref_certification => 'Certificacao';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate =>
+      'Modelo de lista de verificacao';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Conta conectada';
+
+  @override
+  String get settings_conflict_ref_course => 'Curso';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'Requisito do curso';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig =>
+      'Configuracao de cilindros';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Fonte de dados';
+
+  @override
+  String get settings_conflict_ref_dive => 'Mergulho';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Operadora de Mergulho';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Computador de Mergulho';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Plano de mergulho';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Ponto de Mergulho';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Tipo de Mergulho';
+
+  @override
+  String get settings_conflict_ref_diver => 'Mergulhador';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Equipamento';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Conjunto de equipamentos';
+
+  @override
+  String get settings_conflict_ref_finding => 'Constatacao';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Instrutor';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Mergulho vinculado';
+
+  @override
+  String get settings_conflict_ref_media => 'Midia';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Assinatura de midia';
+
+  @override
+  String get settings_conflict_ref_missing => 'Nao esta mais nesta biblioteca';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Cilindro planejado';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Modelo de lista pre-mergulho';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'Lista pre-mergulho';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Mergulho relacionado';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Tipo de manutencao';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Avistamento';
+
+  @override
+  String get settings_conflict_ref_signer => 'Assinado por';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Mergulho de origem';
+
+  @override
+  String get settings_conflict_ref_species => 'Especies';
+
+  @override
+  String get settings_conflict_ref_tag => 'Etiqueta';
+
+  @override
+  String get settings_conflict_ref_tank => 'Cilindro';
+
+  @override
+  String get settings_conflict_ref_trip => 'Viagem';
 
   @override
   String get settings_conflict_remoteVersion => 'Versao Remota';
@@ -18004,6 +18129,42 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => 'Tags';
+
+  @override
+  String get importWizard_photos_stepLabel => 'Fotos';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos referenciadas neste diário',
+      one: '1 foto referenciada neste diário',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'Escolher pasta de fotos...';
+
+  @override
+  String get importWizard_photos_scanning => 'A analisar a pasta...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched correspondidas, $byName apenas pelo nome do ficheiro, $missing não encontradas';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Ignorar fotos';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'Importar fotos requer uma pasta no disco deste dispositivo. Execute esta importação num computador para as incluir. Os mergulhos e locais são importados normalmente.';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -21041,6 +21202,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'Tags';
+
+  @override
+  String get diveImport_uddf_media => 'Fotos';
 
   @override
   String get diveImport_uddf_title => 'Importar de UDDF';
@@ -32809,6 +32973,45 @@ class AppLocalizationsPt extends AppLocalizations {
   String media_info_lastChecked(String date) {
     return 'Última verificação $date';
   }
+
+  @override
+  String get media_timeInDive_label => 'Momento do mergulho';
+
+  @override
+  String get media_timeInDive_unknown => 'Momento do mergulho desconhecido';
+
+  @override
+  String get media_timeInDive_setAction => 'Definir momento do mergulho';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (definido manualmente)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'Tempo desde o início do mergulho';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Entre 0:00 e $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Insira um tempo entre 0:00 e $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Salvar';
+
+  @override
+  String get media_timeInDive_cancel => 'Cancelar';
+
+  @override
+  String get media_timeInDive_reset => 'Redefinir para automático';
 
   @override
   String get media_info_backupSection => 'Backup';

@@ -93,6 +93,8 @@ class Dive3dInteractiveViewport extends StatefulWidget {
 class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
   static const double _initialYaw = -32;
   static const double _initialPitch = 22;
+  static const double _minZoom = 0.4;
+  static const double _maxZoom = 8.0;
   double _yaw = _initialYaw;
   double _pitch = _initialPitch;
   double _zoom = 1.0;
@@ -100,6 +102,9 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
   // as a Transform on the painted output; picks subtract it from the cursor.
   Offset _pan = Offset.zero;
   double _panZoomBaseZoom = 1.0;
+  // Zoom at the moment the active touch pinch began; ScaleUpdateDetails.scale
+  // is cumulative against the gesture start, not the previous tick.
+  double _scaleGestureBaseZoom = 1.0;
   // Last laid-out size, captured in build so camera-change handlers (which lack
   // the LayoutBuilder constraints) can re-project the hover pick.
   Size? _lastLayoutSize;
@@ -133,24 +138,68 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
     }
   }
 
-  void _onPanUpdate(DragUpdateDetails details) {
+  void _onScaleStart(ScaleStartDetails _) {
+    _scaleGestureBaseZoom = _zoom;
+  }
+
+  /// One recognizer serves both touch gestures, because Flutter cannot run a
+  /// pan and a scale recognizer in the same arena without one starving the
+  /// other. Pointer count decides the meaning: one finger orbits (or pans the
+  /// locked plan view in chart mode), two fingers pinch-zoom and pan. That is
+  /// the mapping issue #1188 asked for, and it is the only zoom a touchscreen
+  /// can reach -- pan/zoom pointer events are trackpad-only.
+  void _onScaleUpdate(Size size, ScaleUpdateDetails details) {
+    final delta = details.focalPointDelta;
+    if (details.pointerCount < 2) {
+      setState(() {
+        if (widget.chartMode) {
+          _pan += delta;
+        } else {
+          // Drag follows the object: dragging right spins it clockwise (yaw
+          // up), dragging down tilts it toward the viewer.
+          _yaw += delta.dx * 0.4;
+          _pitch = (_pitch + delta.dy * 0.4).clamp(-80.0, 80.0);
+        }
+      });
+      _refreshHoverAfterCameraChange();
+      return;
+    }
     setState(() {
-      if (widget.chartMode) {
-        // Chart mode is a locked plan view: one-finger drag pans the map.
-        _pan += details.delta;
-      } else {
-        // Drag follows the object: dragging right spins it clockwise (yaw
-        // up), dragging down tilts it toward the viewer.
-        _yaw += details.delta.dx * 0.4;
-        _pitch = (_pitch + details.delta.dy * 0.4).clamp(-80.0, 80.0);
-      }
+      _setZoomAnchored(
+        size,
+        (_scaleGestureBaseZoom * details.scale).clamp(_minZoom, _maxZoom),
+        focalPoint: details.localFocalPoint,
+        focalDelta: delta,
+      );
     });
     _refreshHoverAfterCameraChange();
   }
 
+  /// Scales the camera to [next] while keeping the scene point that sat under
+  /// the pinch's PREVIOUS focal point ([focalPoint] - [focalDelta]) welded to
+  /// the fingers, then carries the focal point's own travel as a pan.
+  ///
+  /// [SceneProjector] scales the scene about the canvas center, and the pan
+  /// Transform is applied on top, so a projected point lands at
+  /// `center + zoom * v + pan`. Solving that for the pan that pins one point
+  /// across a zoom change gives the single expression below; with
+  /// `next == _zoom` it degenerates to a plain `_pan += focalDelta`.
+  void _setZoomAnchored(
+    Size size,
+    double next, {
+    required Offset focalPoint,
+    Offset focalDelta = Offset.zero,
+  }) {
+    final ratio = next / _zoom;
+    final center = Offset(size.width / 2, size.height / 2);
+    _pan =
+        focalPoint - center - (focalPoint - focalDelta - center - _pan) * ratio;
+    _zoom = next;
+  }
+
   void _zoomBy(double factor) {
     setState(() {
-      _zoom = (_zoom * factor).clamp(0.4, 8.0);
+      _zoom = (_zoom * factor).clamp(_minZoom, _maxZoom);
     });
     _refreshHoverAfterCameraChange();
   }
@@ -164,7 +213,7 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
   void _onPanZoomUpdate(PointerPanZoomUpdateEvent event) {
     setState(() {
       _pan += event.panDelta;
-      _zoom = (_panZoomBaseZoom * event.scale).clamp(0.4, 8.0);
+      _zoom = (_panZoomBaseZoom * event.scale).clamp(_minZoom, _maxZoom);
     });
     _refreshHoverAfterCameraChange();
   }
@@ -413,12 +462,14 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
         final gestures = RawGestureDetector(
           behavior: HitTestBehavior.opaque,
           gestures: <Type, GestureRecognizerFactory>{
-            // Rotate: one-finger drag from mouse/touch/stylus. Trackpad
-            // two-finger pans are handled as pan by the Listener below, so we
-            // exclude trackpad here to avoid rotating while panning.
-            PanGestureRecognizer:
-                GestureRecognizerFactoryWithHandlers<PanGestureRecognizer>(
-                  () => PanGestureRecognizer(
+            // Rotate (one finger) and pinch-zoom + pan (two fingers) from
+            // mouse/touch/stylus. Trackpad pan-zoom pointers stay with the
+            // Listener below.
+            _TouchScaleGestureRecognizer:
+                GestureRecognizerFactoryWithHandlers<
+                  _TouchScaleGestureRecognizer
+                >(
+                  () => _TouchScaleGestureRecognizer(
                     supportedDevices: const {
                       PointerDeviceKind.touch,
                       PointerDeviceKind.mouse,
@@ -427,7 +478,9 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
                       PointerDeviceKind.unknown,
                     },
                   ),
-                  (r) => r.onUpdate = _onPanUpdate,
+                  (r) => r
+                    ..onStart = _onScaleStart
+                    ..onUpdate = (details) => _onScaleUpdate(size, details),
                 ),
             TapGestureRecognizer:
                 GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
@@ -488,6 +541,7 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
 
   Widget _zoomControls(BuildContext context) {
     return Column(
+      key: const ValueKey('dive3dZoomControls'),
       mainAxisSize: MainAxisSize.min,
       children: [
         _zoomButton(
@@ -535,6 +589,21 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
       ),
     );
   }
+}
+
+/// A scale recognizer that ignores trackpad pan/zoom pointers.
+///
+/// `supportedDevices` filters pointer-DOWN events only:
+/// [GestureRecognizer.isPointerPanZoomAllowed] returns true unconditionally,
+/// so a trackpad gesture reaches every recognizer no matter what devices it
+/// declares. The viewport handles trackpads on a [Listener], and without this
+/// refusal both paths would fire and every trackpad pan would move the camera
+/// twice.
+class _TouchScaleGestureRecognizer extends ScaleGestureRecognizer {
+  _TouchScaleGestureRecognizer({super.supportedDevices});
+
+  @override
+  bool isPointerPanZoomAllowed(PointerPanZoomStartEvent event) => false;
 }
 
 /// Foreground layer: only the scrub cursor. Repaints on every scrub tick
