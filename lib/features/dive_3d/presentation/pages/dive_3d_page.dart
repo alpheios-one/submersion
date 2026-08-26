@@ -353,6 +353,7 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
       SceneMetric.cns => context.l10n.dive3d_metric_cns,
       SceneMetric.heartRate => context.l10n.dive3d_metric_heartRate,
       SceneMetric.tankPressure => context.l10n.dive3d_metric_tankPressure,
+      SceneMetric.tts => 'TTS',
     };
   }
 

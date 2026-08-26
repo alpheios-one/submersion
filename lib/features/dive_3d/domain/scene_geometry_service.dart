@@ -109,6 +109,8 @@ class SceneGeometryService {
         return pick(data.heartRates);
       case SceneMetric.tankPressure:
         return _resampledPressure(data, indices);
+      case SceneMetric.tts:
+        return pick(data.ttsSeconds);
     }
   }
 
