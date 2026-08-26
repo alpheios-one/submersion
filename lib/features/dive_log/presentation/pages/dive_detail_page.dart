@@ -2274,40 +2274,33 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         ? analysis.sacSegments!
         : segments;
 
-    // Get tank volume for L/min conversion (use first tank with volume)
-    final tankVolume = dive.tanks
-        .where((t) => t.volume != null && t.volume! > 0)
-        .map((t) => t.volume!)
-        .firstOrNull;
+    // The volume that converts a segment to L/min. An attributed segment
+    // uses its own cylinder (sidemount tanks differ in size, so one shared
+    // volume misconverts half the segments, #110); an unattributed one uses
+    // the same reference cylinder the pressure lane reads. Never another
+    // bottle that merely happens to have a size: a stage's volume says
+    // nothing about the back gas the segment describes. Null means the
+    // segment stays in pressure units.
+    double? volumeForSegment(String? segmentTankId) {
+      final tank = segmentTankId == null
+          ? dive.sacReferenceTank
+          : dive.tanks.where((t) => t.id == segmentTankId).firstOrNull;
+      final volume = tank?.volume;
+      return volume != null && volume > 0 ? volume : null;
+    }
 
     // Use the top-level normalization function
     final normalizationFactor = calculateSacNormalizationFactor(dive, analysis);
 
     // Format SAC value based on unit setting, applying normalization.
-    // [segmentTankId] selects that segment's own cylinder volume for the
-    // L/min conversion -- sidemount tanks can differ in size, so one shared
-    // volume misconverts half the segments (#110). Falls back to the first
-    // tank with a volume when the segment carries no attribution.
     String formatSacValue(double sacBarPerMin, {String? segmentTankId}) {
       // Apply normalization to align with overall dive SAC
       final normalizedSac = sacBarPerMin * normalizationFactor;
+      final volume = volumeForSegment(segmentTankId);
 
-      final segmentVolume = segmentTankId == null
-          ? null
-          : dive.tanks
-                .where(
-                  (t) =>
-                      t.id == segmentTankId &&
-                      t.volume != null &&
-                      t.volume! > 0,
-                )
-                .map((t) => t.volume!)
-                .firstOrNull;
-      final effectiveVolume = segmentVolume ?? tankVolume;
-
-      if (sacUnit == SacUnit.litersPerMin && effectiveVolume != null) {
+      if (sacUnit == SacUnit.litersPerMin && volume != null) {
         // Convert bar/min to L/min: sacLPerMin = sacBarPerMin * tankVolume
-        final sacLPerMin = normalizedSac * effectiveVolume;
+        final sacLPerMin = normalizedSac * volume;
         return '${units.convertVolume(sacLPerMin).toStringAsFixed(1)} ${units.volumeSymbol}/min';
       } else {
         // Convert to user's pressure unit (bar or psi)
@@ -2480,8 +2473,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                     ),
                   );
                 }),
-                // Segments fell back to the pressure lane above: say why.
-                if (sacUnit == SacUnit.litersPerMin && tankVolume == null) ...[
+                // Some segment fell back to the pressure lane above: say why.
+                if (sacUnit == SacUnit.litersPerMin &&
+                    renderSegments.any(
+                      (s) => volumeForSegment(s.tankId) == null,
+                    )) ...[
                   const SizedBox(height: 8),
                   SacVolumeHint(
                     volumeSymbol: units.volumeSymbol,

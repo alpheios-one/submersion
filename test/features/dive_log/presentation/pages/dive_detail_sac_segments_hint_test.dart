@@ -20,11 +20,45 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
 
-/// The SAC-by-segment card converts its bar/min segments to L/min with the
-/// dive's cylinder volume. Without one it silently showed bar/min under an
-/// L/min preference (issue #386); now it says so.
+/// The SAC-by-segment card converts its bar/min segments to L/min with a
+/// cylinder volume. Without one it silently showed bar/min under an L/min
+/// preference (issue #386); now it says so. The volume comes from the
+/// segment's own cylinder when it is attributed, otherwise from the same
+/// reference (back gas) cylinder the pressure lane reads; never from an
+/// unrelated bottle that happens to have a size.
 void main() {
-  Dive diveWithProfile({double? tankVolume}) {
+  const backGasNoVolume = DiveTank(
+    id: 'back-gas',
+    startPressure: 200.0,
+    endPressure: 50.0,
+    gasMix: GasMix(),
+    role: TankRole.backGas,
+  );
+  const backGasWithVolume = DiveTank(
+    id: 'back-gas',
+    volume: 12.0,
+    startPressure: 200.0,
+    endPressure: 50.0,
+    gasMix: GasMix(),
+    role: TankRole.backGas,
+  );
+  const stageWithVolume = DiveTank(
+    id: 'stage',
+    volume: 11.1,
+    gasMix: GasMix(o2: 50.0),
+    role: TankRole.stage,
+    order: 1,
+  );
+  const decoNoVolume = DiveTank(
+    id: 'deco',
+    startPressure: 200.0,
+    endPressure: 150.0,
+    gasMix: GasMix(o2: 50.0),
+    role: TankRole.deco,
+    order: 1,
+  );
+
+  Dive diveWithProfile({required List<DiveTank> tanks}) {
     return createTestDiveWithBottomTime().copyWith(
       profile: List.generate(
         6,
@@ -33,22 +67,13 @@ void main() {
           depth: (i < 3 ? i * 8.0 : (5 - i) * 8.0),
         ),
       ),
-      tanks: [
-        DiveTank(
-          id: 'tank-1',
-          volume: tankVolume,
-          startPressure: 200.0,
-          endPressure: 50.0,
-          gasMix: const GasMix(),
-          role: TankRole.backGas,
-        ),
-      ],
+      tanks: tanks,
     );
   }
 
-  ProfileAnalysis analysisWithSacSegments() {
+  ProfileAnalysis analysisWithSacSegments({String? tankId}) {
     return ProfileAnalysis.empty().copyWith(
-      sacSegments: const [
+      sacSegments: [
         SacSegment(
           startTimestamp: 0,
           endTimestamp: 300,
@@ -58,6 +83,7 @@ void main() {
           sacRate: 0.8,
           gasConsumed: 4.0,
           segmentationType: SacSegmentationType.timeInterval,
+          tankId: tankId,
         ),
       ],
     );
@@ -67,6 +93,7 @@ void main() {
     WidgetTester tester, {
     required Dive dive,
     required AppSettings settings,
+    String? segmentTankId,
   }) async {
     final base = await getBaseOverrides(
       settingsNotifier: MockSettingsNotifier(settings),
@@ -86,9 +113,9 @@ void main() {
           diveDataSourcesProvider(
             dive.id,
           ).overrideWith((ref) async => <DiveDataSource>[]),
-          profileAnalysisProvider(
-            dive.id,
-          ).overrideWith((ref) async => analysisWithSacSegments()),
+          profileAnalysisProvider(dive.id).overrideWith(
+            (ref) async => analysisWithSacSegments(tankId: segmentTankId),
+          ),
           selectedSegmentationProvider.overrideWith(
             (ref) => SacSegmentationType.timeInterval,
           ),
@@ -114,7 +141,7 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
   }
 
-  Finder hintInSacCard(WidgetTester tester) {
+  Finder sacCard(WidgetTester tester) {
     final l10n = AppLocalizations.of(
       tester.element(find.byType(DiveDetailPage)),
     );
@@ -123,29 +150,44 @@ void main() {
       l10n.diveLog_detail_section_sacRateBySegment,
     );
     expect(card, findsOneWidget);
-    return find.descendant(of: card, matching: find.byType(SacVolumeHint));
+    return card;
   }
+
+  Finder hintIn(Finder card) =>
+      find.descendant(of: card, matching: find.byType(SacVolumeHint));
+
+  /// A segment VALUE in [unit] (e.g. "0.8 bar/min"); the hint's own text
+  /// also mentions L/min, so this must not match prose.
+  Finder unitIn(Finder card, String unit) => find.descendant(
+    of: card,
+    matching: find.textContaining(RegExp('^\\d+(\\.\\d+)? $unit/min\$')),
+  );
 
   testWidgets('explains the bar/min fallback when L/min is selected', (
     tester,
   ) async {
     await pumpWith(
       tester,
-      dive: diveWithProfile(),
+      dive: diveWithProfile(tanks: const [backGasNoVolume]),
       settings: const AppSettings(sacUnit: SacUnit.litersPerMin),
     );
 
-    expect(hintInSacCard(tester), findsOneWidget);
+    final card = sacCard(tester);
+    expect(hintIn(card), findsOneWidget);
+    expect(unitIn(card, 'bar'), findsWidgets);
+    expect(unitIn(card, 'L'), findsNothing);
   });
 
   testWidgets('shows no hint once the cylinder has a volume', (tester) async {
     await pumpWith(
       tester,
-      dive: diveWithProfile(tankVolume: 12.0),
+      dive: diveWithProfile(tanks: const [backGasWithVolume]),
       settings: const AppSettings(sacUnit: SacUnit.litersPerMin),
     );
 
-    expect(hintInSacCard(tester), findsNothing);
+    final card = sacCard(tester);
+    expect(hintIn(card), findsNothing);
+    expect(unitIn(card, 'L'), findsWidgets);
   });
 
   testWidgets('shows no hint under a pressure-per-minute preference', (
@@ -153,10 +195,46 @@ void main() {
   ) async {
     await pumpWith(
       tester,
-      dive: diveWithProfile(),
+      dive: diveWithProfile(tanks: const [backGasNoVolume]),
       settings: const AppSettings(sacUnit: SacUnit.pressurePerMin),
     );
 
-    expect(hintInSacCard(tester), findsNothing);
+    expect(hintIn(sacCard(tester)), findsNothing);
+  });
+
+  testWidgets('does not borrow a stage bottle\'s volume for the back gas', (
+    tester,
+  ) async {
+    // Only the stage has a size; the segments describe the back gas. They
+    // must stay in bar/min, with the hint, rather than be converted with a
+    // cylinder that never fed them.
+    await pumpWith(
+      tester,
+      dive: diveWithProfile(tanks: const [backGasNoVolume, stageWithVolume]),
+      settings: const AppSettings(sacUnit: SacUnit.litersPerMin),
+    );
+
+    final card = sacCard(tester);
+    expect(hintIn(card), findsOneWidget);
+    expect(unitIn(card, 'bar'), findsWidgets);
+    expect(unitIn(card, 'L'), findsNothing);
+  });
+
+  testWidgets('does not borrow the back gas volume for an attributed deco '
+      'segment', (tester) async {
+    // A gas-switch segment attributed to the deco bottle, which has no size,
+    // while the back gas does: that segment stays in bar/min and the hint
+    // points at the missing volume.
+    await pumpWith(
+      tester,
+      dive: diveWithProfile(tanks: const [backGasWithVolume, decoNoVolume]),
+      settings: const AppSettings(sacUnit: SacUnit.litersPerMin),
+      segmentTankId: 'deco',
+    );
+
+    final card = sacCard(tester);
+    expect(hintIn(card), findsOneWidget);
+    expect(unitIn(card, 'bar'), findsWidgets);
+    expect(unitIn(card, 'L'), findsNothing);
   });
 }

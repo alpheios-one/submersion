@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:submersion/core/constants/enums.dart';
@@ -194,6 +195,59 @@ void main() {
 
       expect(find.text('1.5 bar/min'), findsOneWidget);
       expect(find.byType(SacVolumeHint), findsNothing);
+    });
+
+    testWidgets('tapping the hint opens the dive editor', (tester) async {
+      final dive = reportedDive(volume: null);
+      final base = await getBaseOverrides(
+        settingsNotifier: MockSettingsNotifier(
+          const AppSettings(sacUnit: SacUnit.litersPerMin),
+        ),
+      );
+      final router = GoRouter(
+        initialLocation: '/test',
+        routes: [
+          GoRoute(
+            path: '/test',
+            builder: (context, state) =>
+                DiveDetailPage(diveId: dive.id, embedded: true),
+          ),
+          GoRoute(
+            path: '/dives/:id/edit',
+            builder: (context, state) =>
+                Scaffold(body: Text('EDIT_STUB ${state.pathParameters['id']}')),
+          ),
+        ],
+      );
+      final originalOnError = FlutterError.onError;
+      FlutterError.onError = (_) {};
+      addTearDown(() => FlutterError.onError = originalOnError);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...base,
+            diveProvider(dive.id).overrideWith((ref) async => dive),
+          ],
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      final hint = find.byType(SacVolumeHint);
+      expect(hint, findsOneWidget);
+      await tester.ensureVisible(hint);
+      await tester.pump();
+      await tester.tap(hint);
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.text('EDIT_STUB ${dive.id}'), findsOneWidget);
     });
 
     testWidgets('hides the row when there is no pressure data either', (
