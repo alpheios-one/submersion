@@ -15,6 +15,7 @@ import 'package:submersion/features/courses/presentation/providers/course_provid
 import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
 import 'package:submersion/features/dive_import/data/services/uddf_entity_importer.dart';
 import 'package:submersion/features/dive_import/domain/services/dive_matcher.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
@@ -52,6 +53,8 @@ import 'package:submersion/features/universal_import/data/models/picked_import_f
 import 'package:submersion/features/universal_import/data/services/import_duplicate_checker.dart';
 import 'package:submersion/features/universal_import/presentation/providers/import_consolidation_service.dart'
     show performConsolidations;
+import 'package:submersion/features/import_wizard/presentation/widgets/photo_folder_step.dart';
+import 'package:submersion/features/universal_import/domain/services/import_media_resolver.dart';
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_providers.dart';
 import 'package:submersion/features/universal_import/presentation/widgets/field_mapping_step.dart';
 import 'package:submersion/features/universal_import/presentation/widgets/file_selection_step.dart';
@@ -123,6 +126,8 @@ final universalAdapterPhotosReadyProvider = Provider<bool>((ref) {
 /// UDDF, auto-detected formats). Wraps [UniversalImportNotifier] into the
 /// unified import wizard framework.
 class UniversalAdapter implements ImportSourceAdapter {
+  static const _log = LoggerService('UniversalAdapter');
+
   UniversalAdapter({required WidgetRef ref, String displayName = 'File Import'})
     : _ref = ref,
       _displayName = displayName;
@@ -226,6 +231,17 @@ class UniversalAdapter implements ImportSourceAdapter {
         await notifier.confirmFieldMapping();
       },
     ),
+    WizardStepDef(
+      label: 'Photos',
+      icon: Icons.photo_library_outlined,
+      builder: (context) => const PhotoFolderStep(),
+      canAdvance: universalAdapterPhotosReadyProvider,
+      // Stricter than canAdvance on purpose: the step auto-skips only when
+      // the logbook references no photos at all, never past a decision the
+      // user has not made.
+      canAutoAdvance: universalAdapterNoPhotosProvider,
+      autoAdvance: true,
+    ),
   ];
 
   @override
@@ -309,6 +325,12 @@ class UniversalAdapter implements ImportSourceAdapter {
       wizard.ImportEntityType.courses,
       payload.entitiesOf(ui.ImportEntityType.courses),
       _courseToEntityItem,
+    );
+    _addGroupIfNotEmpty(
+      groups,
+      wizard.ImportEntityType.media,
+      payload.entitiesOf(ui.ImportEntityType.media),
+      _mediaToEntityItem,
     );
 
     return ImportBundle(
@@ -616,6 +638,33 @@ class UniversalAdapter implements ImportSourceAdapter {
       },
     );
 
+    // Attach photos the logbook referenced by absolute path, resolved against
+    // the folder picked in the Photos step. This and the ZIP path above cover
+    // different sources and cannot double-count: a ZIP sidecar and a
+    // <picture> reference never describe the same file.
+    final resolution = notifierState.photoResolution;
+    final resolvedPhotos = resolution == null
+        ? 0
+        : await attachResolvedPhotos(
+            media: payload.entitiesOf(ui.ImportEntityType.media),
+            resolvedPathByIndex: resolution.resolvedPathByIndex,
+            diveIdByIndex: result.diveIdByIndex,
+            removedDiveIds: removedDiveIds,
+            dives: payload.entitiesOf(ui.ImportEntityType.dives),
+            attach: (file, diveId, takenAt, latitude, longitude) async {
+              await _ref
+                  .read(mediaImportServiceProvider)
+                  .importLocalFileForDive(
+                    sourceFile: file,
+                    diveId: diveId,
+                    takenAt: takenAt,
+                    latitude: latitude,
+                    longitude: longitude,
+                    subdirectory: 'imported_photos',
+                  );
+            },
+          );
+
     // `importer.import` counted folded/removed dives as imported; subtract only
     // the dives that were ACTUALLY removed (folded, or compensating-deleted).
     // A dive whose fold AND cleanup both failed is still standalone in the DB,
@@ -684,8 +733,9 @@ class UniversalAdapter implements ImportSourceAdapter {
       skippedCount: skipped + cleanedUpFailures,
       importedDiveIds: netImportedDiveIds,
       fileOutcomes: fileOutcomes,
-      attachedPhotoCount: attachedPhotos,
-      unmatchedPhotoCount: notifierState.unmatchedPhotoCount,
+      attachedPhotoCount: attachedPhotos + resolvedPhotos,
+      unmatchedPhotoCount:
+          notifierState.unmatchedPhotoCount + (resolution?.notFoundCount ?? 0),
     );
   }
 
@@ -879,6 +929,13 @@ class UniversalAdapter implements ImportSourceAdapter {
     return EntityItem(title: name, subtitle: '');
   }
 
+  EntityItem _mediaToEntityItem(Map<String, dynamic> data) {
+    final filename = (data['filename'] as String?) ?? '';
+    // The foreign path may use either separator, so basename it accordingly.
+    final base = filename.isEmpty ? 'Unnamed' : foreignBasename(filename);
+    return EntityItem(title: base, subtitle: filename);
+  }
+
   EntityItem _courseToEntityItem(Map<String, dynamic> data) {
     final name = (data['name'] as String?) ?? 'Unnamed';
     final agency = data['agency'] as String?;
@@ -952,6 +1009,74 @@ class UniversalAdapter implements ImportSourceAdapter {
         }
       }
     }
+    return attachedCount;
+  }
+
+  /// Attaches resolved photos to the dives that survived import.
+  ///
+  /// Each payload media entry names its dive by `_diveIndex`, so unlike
+  /// [attachImportedPhotos] this needs no one-dive-per-file rule: a
+  /// multi-dive logbook attaches each photo to exactly the dive that
+  /// referenced it.
+  ///
+  /// A copy failure is counted and skipped rather than thrown: the dive
+  /// import has already succeeded and must not be undone by a photo. Unlike
+  /// [attachImportedPhotos] the failure is not silent, because the caller
+  /// reports the shortfall against the resolved count.
+  ///
+  /// Returns the number of photos actually attached.
+  static Future<int> attachResolvedPhotos({
+    required List<Map<String, dynamic>> media,
+    required Map<int, String> resolvedPathByIndex,
+    required Map<int, String> diveIdByIndex,
+    required Set<String> removedDiveIds,
+    required List<Map<String, dynamic>> dives,
+    required Future<void> Function(
+      File file,
+      String diveId,
+      DateTime? takenAt,
+      double? latitude,
+      double? longitude,
+    )
+    attach,
+  }) async {
+    var attachedCount = 0;
+
+    for (final entry in resolvedPathByIndex.entries) {
+      final mediaIndex = entry.key;
+      if (mediaIndex < 0 || mediaIndex >= media.length) continue;
+      final picture = media[mediaIndex];
+
+      final diveIndex = picture['_diveIndex'];
+      if (diveIndex is! int) continue;
+      final diveId = diveIdByIndex[diveIndex];
+      if (diveId == null || removedDiveIds.contains(diveId)) continue;
+
+      DateTime? takenAt;
+      if (diveIndex >= 0 && diveIndex < dives.length) {
+        final start = dives[diveIndex]['dateTime'] as DateTime?;
+        final offsetSeconds = picture['offsetSeconds'];
+        takenAt = start == null
+            ? null
+            : (offsetSeconds is int
+                  ? start.add(Duration(seconds: offsetSeconds))
+                  : start);
+      }
+
+      try {
+        await attach(
+          File(entry.value),
+          diveId,
+          takenAt,
+          asDoubleOrNull(picture['latitude']),
+          asDoubleOrNull(picture['longitude']),
+        );
+        attachedCount++;
+      } catch (e) {
+        _log.warning('Failed to attach imported photo ${entry.value}: $e');
+      }
+    }
+
     return attachedCount;
   }
 

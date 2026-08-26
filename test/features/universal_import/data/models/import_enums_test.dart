@@ -101,7 +101,7 @@ void main() {
 
   group('ImportEntityType', () {
     test('has all expected values', () {
-      expect(ImportEntityType.values, hasLength(12));
+      expect(ImportEntityType.values, hasLength(13));
     });
 
     test('displayName for each entity type', () {
@@ -113,6 +113,7 @@ void main() {
       expect(ImportEntityType.buddies.displayName, 'Buddies');
       expect(ImportEntityType.diveCenters.displayName, 'Dive Centers');
       expect(ImportEntityType.certifications.displayName, 'Certifications');
+      expect(ImportEntityType.media.displayName, 'Photos');
       expect(ImportEntityType.courses.displayName, 'Courses');
       expect(ImportEntityType.tags.displayName, 'Tags');
       expect(ImportEntityType.diveTypes.displayName, 'Dive Types');

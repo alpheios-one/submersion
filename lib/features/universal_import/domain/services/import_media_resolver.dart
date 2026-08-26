@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart' show visibleForTesting;
-
 import 'package:submersion/features/media/data/services/repair/folder_candidate_source.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -157,7 +155,6 @@ class ImportMediaResolver {
 /// separators are therefore treated as separators, which is safe in practice
 /// because a photo filename containing a literal backslash is vanishingly
 /// rare next to the certainty of Windows-exported logbooks.
-@visibleForTesting
 String foreignBasename(String path) {
   final index = path.lastIndexOf(RegExp(r'[/\\]'));
   return index < 0 ? path : path.substring(index + 1);
