@@ -8781,6 +8781,54 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveSites_list_menu_select => 'Tauchplätze auswählen';
 
   @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Fehlende Ortsangaben ergänzen';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      'Fehlende Ortsangaben ergänzen?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Tauchplätze mit Koordinaten haben kein Land, keine Region, keinen Ort oder kein Gewässer.',
+      one:
+          '1 Tauchplatz mit Koordinaten hat kein Land, keine Region, keinen Ort oder kein Gewässer.',
+    );
+    return '$_temp0 Submersion sucht jeden auf OpenStreetMap und füllt nur die leeren Felder aus. Das dauert etwa $minutes Minuten.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Starten';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Alle Tauchplätze mit Koordinaten haben bereits ihre Ortsangaben.';
+
+  @override
+  String get diveSites_backfill_progress_title => 'Ortsangaben werden ergänzt';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done von $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Abbrechen';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Aktualisiert $updated, unverändert $unchanged, fehlgeschlagen $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'Die Ortssuche ist nicht verfügbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Zurück';
 
   @override

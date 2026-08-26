@@ -9,6 +9,16 @@
   "settings_units_defaultCurrency": "Valuta predefinita",
   "settings_units_dialog_defaultCurrency": "Valuta predefinita",
   "diveSites_list_menu_select": "Seleziona siti",
+  "diveSites_list_menu_fillLocationDetails": "Completa i dettagli di località mancanti",
+  "diveSites_backfill_confirm_title": "Completare i dettagli di località mancanti?",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 sito con coordinate non ha paese, regione, città o specchio d'acqua.} other{{count} siti con coordinate non hanno paese, regione, città o specchio d'acqua.}} Submersion cercherà ciascuno su OpenStreetMap e compilerà solo i campi vuoti. Richiede circa {minutes} minuti.",
+  "diveSites_backfill_confirm_start": "Avvia",
+  "diveSites_backfill_nothingToFill": "Tutti i siti con coordinate hanno già i dettagli di località.",
+  "diveSites_backfill_progress_title": "Completamento dei dettagli di località",
+  "diveSites_backfill_progress_count": "{done} di {total}",
+  "diveSites_backfill_cancel": "Annulla",
+  "diveSites_backfill_summary": "Aggiornati {updated}, invariati {unchanged}, falliti {failed}",
+  "diveSites_backfill_offline": "La ricerca della località non è disponibile. Controlla la connessione e riprova.",
   "diveLog_edit_flightWindowWarning": "Questa immersione termina dopo l'ultimo orario sicuro di riemersione per il tuo volo ({time})",
   "@diveLog_edit_flightWindowWarning": {
     "placeholders": {

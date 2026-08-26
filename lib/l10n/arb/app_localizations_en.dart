@@ -8637,6 +8637,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveSites_list_menu_select => 'Select sites';
 
   @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Fill in missing location details';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      'Fill in missing location details?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count sites with coordinates have an empty country, region, town or body of water.',
+      one:
+          '1 site with coordinates has an empty country, region, town or body of water.',
+    );
+    return '$_temp0 Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about $minutes minutes.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Start';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Every site with coordinates already has its location details.';
+
+  @override
+  String get diveSites_backfill_progress_title => 'Filling in location details';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done of $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Cancel';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Updated $updated, unchanged $unchanged, failed $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'Location lookup is unavailable. Check your connection and try again.';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Back';
 
   @override

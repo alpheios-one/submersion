@@ -8621,6 +8621,53 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_list_menu_select => 'تحديد المواقع';
 
   @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'إكمال تفاصيل الموقع الناقصة';
+
+  @override
+  String get diveSites_backfill_confirm_title => 'إكمال تفاصيل الموقع الناقصة؟';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count مواقع غوص لها إحداثيات ينقصها البلد أو المنطقة أو البلدة أو المسطح المائي.',
+      one:
+          'موقع غوص واحد له إحداثيات ينقصه البلد أو المنطقة أو البلدة أو المسطح المائي.',
+    );
+    return '$_temp0 سيبحث Submersion عن كل منها في OpenStreetMap ويملأ الحقول الفارغة فقط. يستغرق ذلك نحو $minutes دقائق.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'بدء';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'كل مواقع الغوص التي لها إحداثيات لديها تفاصيل الموقع بالفعل.';
+
+  @override
+  String get diveSites_backfill_progress_title => 'جارٍ إكمال تفاصيل الموقع';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done من $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'إلغاء';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'تم تحديث $updated، بدون تغيير $unchanged، فشل $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'البحث عن الموقع غير متاح. تحقق من الاتصال وحاول مرة أخرى.';
+
+  @override
   String get diveSites_list_search_backTooltip => 'رجوع';
 
   @override

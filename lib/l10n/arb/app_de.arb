@@ -9,6 +9,16 @@
   "settings_units_defaultCurrency": "Standardwährung",
   "settings_units_dialog_defaultCurrency": "Standardwährung",
   "diveSites_list_menu_select": "Tauchplätze auswählen",
+  "diveSites_list_menu_fillLocationDetails": "Fehlende Ortsangaben ergänzen",
+  "diveSites_backfill_confirm_title": "Fehlende Ortsangaben ergänzen?",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 Tauchplatz mit Koordinaten hat kein Land, keine Region, keinen Ort oder kein Gewässer.} other{{count} Tauchplätze mit Koordinaten haben kein Land, keine Region, keinen Ort oder kein Gewässer.}} Submersion sucht jeden auf OpenStreetMap und füllt nur die leeren Felder aus. Das dauert etwa {minutes} Minuten.",
+  "diveSites_backfill_confirm_start": "Starten",
+  "diveSites_backfill_nothingToFill": "Alle Tauchplätze mit Koordinaten haben bereits ihre Ortsangaben.",
+  "diveSites_backfill_progress_title": "Ortsangaben werden ergänzt",
+  "diveSites_backfill_progress_count": "{done} von {total}",
+  "diveSites_backfill_cancel": "Abbrechen",
+  "diveSites_backfill_summary": "Aktualisiert {updated}, unverändert {unchanged}, fehlgeschlagen {failed}",
+  "diveSites_backfill_offline": "Die Ortssuche ist nicht verfügbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
   "diveLog_edit_flightWindowWarning": "Dieser Tauchgang endet nach der letzten sicheren Auftauchzeit für deinen Flug ({time})",
   "@diveLog_edit_flightWindowWarning": {
     "placeholders": {

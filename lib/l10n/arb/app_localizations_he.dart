@@ -8571,6 +8571,51 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveSites_list_menu_select => 'בחירת אתרים';
 
   @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'השלמת פרטי מיקום חסרים';
+
+  @override
+  String get diveSites_backfill_confirm_title => 'להשלים פרטי מיקום חסרים?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ל-$count אתרים עם קואורדינטות חסרים מדינה, אזור, עיר או גוף מים.',
+      one: 'לאתר אחד עם קואורדינטות חסרים מדינה, אזור, עיר או גוף מים.',
+    );
+    return '$_temp0 Submersion יחפש כל אחד מהם ב-OpenStreetMap וימלא רק שדות ריקים. זה נמשך כ-$minutes דקות.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'התחלה';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'לכל האתרים עם קואורדינטות כבר יש פרטי מיקום.';
+
+  @override
+  String get diveSites_backfill_progress_title => 'משלים פרטי מיקום';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done מתוך $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'ביטול';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'עודכנו $updated, ללא שינוי $unchanged, נכשלו $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'חיפוש המיקום אינו זמין. בדקו את החיבור ונסו שוב.';
+
+  @override
   String get diveSites_list_search_backTooltip => 'חזרה';
 
   @override

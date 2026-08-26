@@ -8789,6 +8789,55 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveSites_list_menu_select => 'Seleccionar puntos';
 
   @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Completar datos de ubicación que faltan';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      '¿Completar los datos de ubicación que faltan?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count puntos de buceo con coordenadas no tienen país, región, localidad o masa de agua.',
+      one:
+          '1 punto de buceo con coordenadas no tiene país, región, localidad o masa de agua.',
+    );
+    return '$_temp0 Submersion consultará cada uno en OpenStreetMap y rellenará solo los campos vacíos. Tarda unos $minutes minutos.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Iniciar';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Todos los puntos de buceo con coordenadas ya tienen sus datos de ubicación.';
+
+  @override
+  String get diveSites_backfill_progress_title =>
+      'Completando datos de ubicación';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done de $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Cancelar';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Actualizados $updated, sin cambios $unchanged, fallidos $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'La consulta de ubicación no está disponible. Comprueba tu conexión e inténtalo de nuevo.';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Atras';
 
   @override

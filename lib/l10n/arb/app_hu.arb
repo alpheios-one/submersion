@@ -9,6 +9,16 @@
   "settings_units_defaultCurrency": "Alapértelmezett pénznem",
   "settings_units_dialog_defaultCurrency": "Alapértelmezett pénznem",
   "diveSites_list_menu_select": "Merülőhelyek kiválasztása",
+  "diveSites_list_menu_fillLocationDetails": "Hiányzó helyadatok kitöltése",
+  "diveSites_backfill_confirm_title": "Kitölti a hiányzó helyadatokat?",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 koordinátával rendelkező merülőhelynek üres az országa, régiója, települése vagy víztestje.} other{{count} koordinátával rendelkező merülőhelynek üres az országa, régiója, települése vagy víztestje.}} A Submersion mindegyiket lekérdezi az OpenStreetMapról, és csak az üres mezőket tölti ki. Ez körülbelül {minutes} percet vesz igénybe.",
+  "diveSites_backfill_confirm_start": "Indítás",
+  "diveSites_backfill_nothingToFill": "Minden koordinátával rendelkező merülőhelynek megvannak a helyadatai.",
+  "diveSites_backfill_progress_title": "Helyadatok kitöltése",
+  "diveSites_backfill_progress_count": "{done} / {total}",
+  "diveSites_backfill_cancel": "Mégse",
+  "diveSites_backfill_summary": "Frissítve {updated}, változatlan {unchanged}, sikertelen {failed}",
+  "diveSites_backfill_offline": "A helylekérdezés nem érhető el. Ellenőrizze a kapcsolatot, és próbálja újra.",
   "diveLog_edit_flightWindowWarning": "Ez a merülés a járatod előtti utolsó biztonságos felszínre érési idő után ér véget ({time})",
   "@diveLog_edit_flightWindowWarning": {
     "placeholders": {

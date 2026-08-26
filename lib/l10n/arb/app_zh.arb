@@ -9,6 +9,16 @@
   "settings_units_defaultCurrency": "默认货币",
   "settings_units_dialog_defaultCurrency": "默认货币",
   "diveSites_list_menu_select": "选择潜水点",
+  "diveSites_list_menu_fillLocationDetails": "补全缺失的地点信息",
+  "diveSites_backfill_confirm_title": "补全缺失的地点信息？",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 个有坐标的潜点缺少国家、地区、城镇或水域。} other{{count} 个有坐标的潜点缺少国家、地区、城镇或水域。}} Submersion 将在 OpenStreetMap 上逐个查找，并仅填写空白字段。大约需要 {minutes} 分钟。",
+  "diveSites_backfill_confirm_start": "开始",
+  "diveSites_backfill_nothingToFill": "所有有坐标的潜点都已有地点信息。",
+  "diveSites_backfill_progress_title": "正在补全地点信息",
+  "diveSites_backfill_progress_count": "{done} / {total}",
+  "diveSites_backfill_cancel": "取消",
+  "diveSites_backfill_summary": "已更新 {updated}，未变 {unchanged}，失败 {failed}",
+  "diveSites_backfill_offline": "地点查找不可用。请检查网络连接后重试。",
   "diveLog_edit_flightWindowWarning": "此次潜水的结束时间晚于您航班的最后安全出水时间({time})",
   "@diveLog_edit_flightWindowWarning": {
     "placeholders": {

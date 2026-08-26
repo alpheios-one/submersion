@@ -9,6 +9,16 @@
   "settings_units_defaultCurrency": "Moeda padrão",
   "settings_units_dialog_defaultCurrency": "Moeda padrão",
   "diveSites_list_menu_select": "Selecionar pontos",
+  "diveSites_list_menu_fillLocationDetails": "Preencher detalhes de localização em falta",
+  "diveSites_backfill_confirm_title": "Preencher os detalhes de localização em falta?",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 local com coordenadas não tem país, região, cidade ou corpo de água.} other{{count} locais com coordenadas não têm país, região, cidade ou corpo de água.}} O Submersion consultará cada um no OpenStreetMap e preencherá apenas os campos vazios. Demora cerca de {minutes} minutos.",
+  "diveSites_backfill_confirm_start": "Iniciar",
+  "diveSites_backfill_nothingToFill": "Todos os locais com coordenadas já têm os seus detalhes de localização.",
+  "diveSites_backfill_progress_title": "A preencher detalhes de localização",
+  "diveSites_backfill_progress_count": "{done} de {total}",
+  "diveSites_backfill_cancel": "Cancelar",
+  "diveSites_backfill_summary": "Atualizados {updated}, inalterados {unchanged}, falhados {failed}",
+  "diveSites_backfill_offline": "A consulta de localização não está disponível. Verifique a sua ligação e tente novamente.",
   "diveLog_edit_flightWindowWarning": "Este mergulho termina depois do último horário seguro para emergir antes do seu voo ({time})",
   "@diveLog_edit_flightWindowWarning": {
     "placeholders": {

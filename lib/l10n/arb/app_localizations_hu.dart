@@ -8767,6 +8767,54 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveSites_list_menu_select => 'Merülőhelyek kiválasztása';
 
   @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Hiányzó helyadatok kitöltése';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      'Kitölti a hiányzó helyadatokat?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count koordinátával rendelkező merülőhelynek üres az országa, régiója, települése vagy víztestje.',
+      one:
+          '1 koordinátával rendelkező merülőhelynek üres az országa, régiója, települése vagy víztestje.',
+    );
+    return '$_temp0 A Submersion mindegyiket lekérdezi az OpenStreetMapról, és csak az üres mezőket tölti ki. Ez körülbelül $minutes percet vesz igénybe.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Indítás';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Minden koordinátával rendelkező merülőhelynek megvannak a helyadatai.';
+
+  @override
+  String get diveSites_backfill_progress_title => 'Helyadatok kitöltése';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done / $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Mégse';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Frissítve $updated, változatlan $unchanged, sikertelen $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'A helylekérdezés nem érhető el. Ellenőrizze a kapcsolatot, és próbálja újra.';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Vissza';
 
   @override

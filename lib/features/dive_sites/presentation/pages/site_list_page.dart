@@ -9,6 +9,7 @@ import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/features/dive_sites/domain/constants/site_field.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_filter_sheet.dart';
+import 'package:submersion/features/dive_sites/presentation/widgets/site_location_backfill_dialog.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_column_picker.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
@@ -178,6 +179,8 @@ class _SiteListPageState extends ConsumerState<SiteListPage> {
                   value.replaceFirst('view_', ''),
                 );
                 ref.read(siteListViewModeProvider.notifier).state = mode;
+              } else if (value == 'fill_location_details') {
+                showSiteLocationBackfillFlow(context, ref);
               }
             },
             itemBuilder: (context) {
@@ -191,6 +194,17 @@ class _SiteListPageState extends ConsumerState<SiteListPage> {
                     ListViewMode.compact,
                     ListViewMode.table,
                   ],
+                ),
+                const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: 'fill_location_details',
+                  child: ListTile(
+                    leading: const Icon(Icons.travel_explore),
+                    title: Text(
+                      context.l10n.diveSites_list_menu_fillLocationDetails,
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
                 ),
               ];
             },

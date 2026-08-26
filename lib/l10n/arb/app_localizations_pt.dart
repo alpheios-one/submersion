@@ -8791,6 +8791,55 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveSites_list_menu_select => 'Selecionar pontos';
 
   @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Preencher detalhes de localização em falta';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      'Preencher os detalhes de localização em falta?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count locais com coordenadas não têm país, região, cidade ou corpo de água.',
+      one:
+          '1 local com coordenadas não tem país, região, cidade ou corpo de água.',
+    );
+    return '$_temp0 O Submersion consultará cada um no OpenStreetMap e preencherá apenas os campos vazios. Demora cerca de $minutes minutos.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Iniciar';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Todos os locais com coordenadas já têm os seus detalhes de localização.';
+
+  @override
+  String get diveSites_backfill_progress_title =>
+      'A preencher detalhes de localização';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done de $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Cancelar';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Atualizados $updated, inalterados $unchanged, falhados $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'A consulta de localização não está disponível. Verifique a sua ligação e tente novamente.';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Voltar';
 
   @override

@@ -14789,6 +14789,66 @@ abstract class AppLocalizations {
   /// **'Select sites'**
   String get diveSites_list_menu_select;
 
+  /// No description provided for @diveSites_list_menu_fillLocationDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in missing location details'**
+  String get diveSites_list_menu_fillLocationDetails;
+
+  /// No description provided for @diveSites_backfill_confirm_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in missing location details?'**
+  String get diveSites_backfill_confirm_title;
+
+  /// No description provided for @diveSites_backfill_confirm_body.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 site with coordinates has an empty country, region, town or body of water.} other{{count} sites with coordinates have an empty country, region, town or body of water.}} Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about {minutes} minutes.'**
+  String diveSites_backfill_confirm_body(int count, int minutes);
+
+  /// No description provided for @diveSites_backfill_confirm_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get diveSites_backfill_confirm_start;
+
+  /// No description provided for @diveSites_backfill_nothingToFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Every site with coordinates already has its location details.'**
+  String get diveSites_backfill_nothingToFill;
+
+  /// No description provided for @diveSites_backfill_progress_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Filling in location details'**
+  String get diveSites_backfill_progress_title;
+
+  /// No description provided for @diveSites_backfill_progress_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total}'**
+  String diveSites_backfill_progress_count(int done, int total);
+
+  /// No description provided for @diveSites_backfill_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get diveSites_backfill_cancel;
+
+  /// No description provided for @diveSites_backfill_summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {updated}, unchanged {unchanged}, failed {failed}'**
+  String diveSites_backfill_summary(int updated, int unchanged, int failed);
+
+  /// No description provided for @diveSites_backfill_offline.
+  ///
+  /// In en, this message translates to:
+  /// **'Location lookup is unavailable. Check your connection and try again.'**
+  String get diveSites_backfill_offline;
+
   /// No description provided for @diveSites_list_search_backTooltip.
   ///
   /// In en, this message translates to:

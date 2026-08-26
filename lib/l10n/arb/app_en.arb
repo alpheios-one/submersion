@@ -4942,6 +4942,49 @@
   "diveSites_list_error_retry": "Retry",
   "diveSites_list_menu_import": "Import",
   "diveSites_list_menu_select": "Select sites",
+  "diveSites_list_menu_fillLocationDetails": "Fill in missing location details",
+  "diveSites_backfill_confirm_title": "Fill in missing location details?",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 site with coordinates has an empty country, region, town or body of water.} other{{count} sites with coordinates have an empty country, region, town or body of water.}} Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about {minutes} minutes.",
+  "@diveSites_backfill_confirm_body": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_confirm_start": "Start",
+  "diveSites_backfill_nothingToFill": "Every site with coordinates already has its location details.",
+  "diveSites_backfill_progress_title": "Filling in location details",
+  "diveSites_backfill_progress_count": "{done} of {total}",
+  "@diveSites_backfill_progress_count": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_cancel": "Cancel",
+  "diveSites_backfill_summary": "Updated {updated}, unchanged {unchanged}, failed {failed}",
+  "@diveSites_backfill_summary": {
+    "placeholders": {
+      "updated": {
+        "type": "int"
+      },
+      "unchanged": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_offline": "Location lookup is unavailable. Check your connection and try again.",
   "diveSites_list_search_backTooltip": "Back",
   "diveSites_list_search_clearTooltip": "Clear Search",
   "diveSites_list_search_emptyHint": "Search by site name, country, or region",
