@@ -132,8 +132,8 @@ class _CardBody extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 8),
-        for (final chamber in data.chambers)
-          _ChamberTile(chamber: chamber, onCall: _call),
+        for (final listing in data.nearbyChambers)
+          _ChamberTile(chamber: listing.chamber, onCall: _call),
       ],
     );
   }

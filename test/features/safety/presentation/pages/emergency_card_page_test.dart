@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/safety/data/repositories/emergency_chamber_repository.dart';
+import 'package:submersion/features/safety/domain/entities/chamber_listing.dart';
 import 'package:submersion/features/safety/domain/entities/emergency_info.dart';
 import 'package:submersion/features/safety/presentation/pages/emergency_card_page.dart';
 import 'package:submersion/features/safety/presentation/providers/emergency_providers.dart';
@@ -81,7 +82,11 @@ void main() {
               hotline: hotline,
               emsNumber: '000',
               diver: includeDiver ? diver : null,
-              chambers: chambers ?? [chamber],
+              nearbyChambers: [
+                for (final c in chambers ?? [chamber])
+                  ChamberListing(chamber: c),
+              ],
+              totalChamberCount: (chambers ?? [chamber]).length,
             ),
           ),
         ],
