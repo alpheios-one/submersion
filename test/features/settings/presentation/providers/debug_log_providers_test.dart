@@ -752,8 +752,9 @@ void main() {
     });
 
     test('copies the header alone when entries list is empty', () async {
-      // An excerpt filtered down to nothing still names the build, which is
-      // more useful than the bare empty string this used to produce.
+      // This is the function's contract, not a UI path: the Copy button
+      // guards on a non-empty list, so DebugLogViewerPage never reaches it.
+      // Pinned so the header stays unconditional if that guard is relaxed.
       await copyFilteredLogs([], environment: _environment);
 
       final setDataCall = clipboardCalls.firstWhere(
