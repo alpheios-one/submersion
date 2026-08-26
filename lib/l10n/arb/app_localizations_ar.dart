@@ -17678,6 +17678,42 @@ class AppLocalizationsAr extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String get importWizard_photos_stepLabel => 'الصور';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صور مشار إليها في هذا السجل',
+      one: 'صورة واحدة مشار إليها في هذا السجل',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'اختر مجلد الصور...';
+
+  @override
+  String get importWizard_photos_scanning => 'جارٍ فحص المجلد...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched مطابقة، $byName بالاسم فقط، $missing غير موجودة';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'تخطي الصور';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'يتطلب استيراد الصور مجلدًا على قرص هذا الجهاز. شغّل هذا الاستيراد على جهاز كمبيوتر لتضمينها. تُستورد الغطسات والمواقع بشكل طبيعي.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20673,6 +20709,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'الوسوم';
+
+  @override
+  String get diveImport_uddf_media => 'الصور';
 
   @override
   String get diveImport_uddf_title => 'استيراد من UDDF';

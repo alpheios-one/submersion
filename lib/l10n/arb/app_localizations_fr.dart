@@ -18073,6 +18073,43 @@ class AppLocalizationsFr extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String get importWizard_photos_stepLabel => 'Photos';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos référencées dans ce carnet',
+      one: '1 photo référencée dans ce carnet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder =>
+      'Choisir un dossier de photos...';
+
+  @override
+  String get importWizard_photos_scanning => 'Analyse du dossier...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched associées, $byName par nom de fichier uniquement, $missing introuvables';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Ignorer les photos';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'L\'import de photos nécessite un dossier sur le disque de cet appareil. Lancez cet import sur un ordinateur pour les inclure. Les plongées et les sites s\'importent normalement.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -21122,6 +21159,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'Tags';
+
+  @override
+  String get diveImport_uddf_media => 'Photos';
 
   @override
   String get diveImport_uddf_title => 'Import depuis UDDF';

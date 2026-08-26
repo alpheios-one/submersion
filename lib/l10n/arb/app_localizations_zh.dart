@@ -17084,6 +17084,41 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importWizard_tagsLabel => '标签';
 
   @override
+  String get importWizard_photos_stepLabel => '照片';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '此日志引用了 $count 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => '选择照片文件夹...';
+
+  @override
+  String get importWizard_photos_scanning => '正在扫描文件夹...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '已匹配 $matched 张，仅按文件名匹配 $byName 张，未找到 $missing 张';
+  }
+
+  @override
+  String get importWizard_photos_skip => '跳过照片';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      '导入照片需要此设备磁盘上的文件夹。请在电脑上运行此导入以包含照片。潜水记录和潜点会正常导入。';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -19989,6 +20024,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => '标签';
+
+  @override
+  String get diveImport_uddf_media => '照片';
 
   @override
   String get diveImport_uddf_title => '从 UDDF 导入';

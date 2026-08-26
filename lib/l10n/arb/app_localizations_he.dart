@@ -17546,6 +17546,42 @@ class AppLocalizationsHe extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String get importWizard_photos_stepLabel => 'תמונות';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תמונות מוזכרות ביומן הזה',
+      one: 'תמונה אחת מוזכרת ביומן הזה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'בחר תיקיית תמונות...';
+
+  @override
+  String get importWizard_photos_scanning => 'סורק את התיקייה...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched הותאמו, $byName לפי שם קובץ בלבד, $missing לא נמצאו';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'דלג על התמונות';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'ייבוא תמונות מחייב תיקייה בדיסק של המכשיר הזה. הרץ את הייבוא במחשב כדי לכלול אותן. צלילות ואתרים מיובאים כרגיל.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20526,6 +20562,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveImport_uddf_tags => 'תגיות';
+
+  @override
+  String get diveImport_uddf_media => 'תמונות';
 
   @override
   String get diveImport_uddf_title => 'ייבוא מ-UDDF';
