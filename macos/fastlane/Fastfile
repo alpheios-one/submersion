@@ -769,8 +769,13 @@ platform :mac do
       skip_screenshots: true,
       # skip_metadata false so deliver uploads metadata/en-US/release_notes.txt
       # (written by promote.yml from the GitHub release notes) - Apple requires
-      # whatsNew on a new version. Only files present are uploaded, and that is
-      # the only metadata file provided.
+      # whatsNew on a new version. Only files present are uploaded. The other
+      # file provided is the committed metadata/review_information/notes.txt,
+      # which lands in App Review Information > Notes on every submission: it
+      # explains that the app has no accounts, after 1.7.4 and 1.7.5 were both
+      # rejected under 5.1.1(v) for the first-launch "Create Your Profile"
+      # step. scripts/release/app_review_notes_test.sh keeps it in lockstep
+      # with the iOS copy.
       skip_metadata: false,
       # Required BECAUSE skip_metadata is false. deliver renders the metadata
       # it is about to upload to fastlane/Preview.html and blocks on "Does the

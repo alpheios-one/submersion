@@ -1,0 +1,22 @@
+Submersion is a scuba dive logging app. It has no user accounts: no sign-up, no login, no demo account, and no backend service operated by us. Every dive log, profile, setting and photo link is stored locally on the device.
+
+ABOUT "CREATE YOUR PROFILE" (guideline 5.1.1(v))
+The first-launch step titled "Create Your Profile" creates a local diver profile: a name used to label dive logs when more than one person shares a device. It is not an account. The name is never transmitted to us and there is nothing to register with.
+
+Diver profiles are deleted in-app: Settings > Diver Profile > Manage Divers, choose the diver, then Delete. The confirmation asks the user to type "Delete <name>". Deletion permanently removes the profile and every dive log, dive computer, equipment item, certification and site attached to it. This works for the only profile on the device as well. A screen recording of this flow, captured on a physical device, was attached to the review reply for version 1.7.5 (submission ce6d5c46-26d8-4c48-851c-4654ff4e60f5).
+
+ABOUT "SIGN IN" WORDING
+Where the app offers to sign in, it connects to a third-party storage account the user already owns (iCloud, Dropbox, Google Drive, or a user-supplied S3 bucket) so the user can sync or back up their own data to their own storage. We never receive that data. Those connections are removed at Settings > Photos & Media > Connected Accounts ("Remove from library"), which also discards the stored credentials.
+
+OPTIONAL LOCAL PROTECTIONS THAT ARE NOT ACCOUNTS
+- App Lock sets a device-local password or Face ID unlock for the app. It can be turned off from Settings > Security.
+- Backup encryption protects exported backup files with a user-chosen password. It can be turned off from the backup settings.
+
+PERMISSIONS REQUESTED AND WHY (all optional; the app is fully usable without any of them)
+- Bluetooth: download dives from a dive computer.
+- Location: record dive site coordinates and find nearby sites.
+- Photos and camera: attach photos to a dive.
+- Contacts: import dive buddies.
+- Health: import dives recorded by Apple Watch.
+
+No demo credentials are needed. A fresh install with any name entered in the profile step reaches every feature.
