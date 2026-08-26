@@ -25,8 +25,9 @@ NativeDatabase _dbAt161() {
 }
 
 /// v163 adds the switch that suppresses synthesized "(est.)" tank pressure
-/// lines on the profile chart (issue #731). v162 was claimed first on main by
-/// #1090.
+/// lines on the profile chart (issue #731). v162 is skipped rather than
+/// missing: main was at v161 when this branch was cut, and the open PR #1287
+/// (issue #1090) had already written 162 on its own branch.
 void main() {
   test('v163 is in the migration ladder', () {
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(163));

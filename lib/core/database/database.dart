@@ -3461,7 +3461,10 @@ class AppDatabase extends _$AppDatabase {
     161,
     // v163: diver_settings.default_show_estimated_tank_pressure, the switch
     // that suppresses synthesized "(est.)" tank pressure lines on the profile
-    // chart (issue #731). v162 was claimed first on main by #1090.
+    // chart (issue #731). v162 is skipped rather than missing: main was at
+    // v161 when this branch was cut, and the open PR #1287 (issue #1090) had
+    // already written 162 on its own branch. Two branches writing the same
+    // scalar auto-merge with no conflict marker, so 163 was taken instead.
     163,
   ];
 
