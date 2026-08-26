@@ -35770,6 +35770,24 @@ abstract class AppLocalizations {
   /// **'Recording GPS track · {count, plural, one{{count} point} other{{count} points}}'**
   String gpsLogger_stripStatus(num count);
 
+  /// No description provided for @gpsLogger_summary_tracks.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracks'**
+  String get gpsLogger_summary_tracks;
+
+  /// No description provided for @gpsLogger_summary_recordedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded time'**
+  String get gpsLogger_summary_recordedTime;
+
+  /// No description provided for @gpsLogger_summary_divesCovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives covered'**
+  String get gpsLogger_summary_divesCovered;
+
   /// No description provided for @gpsLogger_trackSubtitle.
   ///
   /// In en, this message translates to:

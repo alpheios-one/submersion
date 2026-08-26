@@ -21346,6 +21346,15 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get gpsLogger_summary_tracks => 'Tracks';
+
+  @override
+  String get gpsLogger_summary_recordedTime => 'Opgenomen tijd';
+
+  @override
+  String get gpsLogger_summary_divesCovered => 'Gedekte duiken';
+
+  @override
   String gpsLogger_trackSubtitle(num count, String duration) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

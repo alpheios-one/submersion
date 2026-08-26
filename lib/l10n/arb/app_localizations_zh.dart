@@ -20429,6 +20429,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get gpsLogger_summary_tracks => '轨迹';
+
+  @override
+  String get gpsLogger_summary_recordedTime => '记录时长';
+
+  @override
+  String get gpsLogger_summary_divesCovered => '覆盖的潜水';
+
+  @override
   String gpsLogger_trackSubtitle(num count, String duration) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

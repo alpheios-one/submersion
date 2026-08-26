@@ -21133,6 +21133,15 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get gpsLogger_summary_tracks => 'المسارات';
+
+  @override
+  String get gpsLogger_summary_recordedTime => 'الوقت المسجّل';
+
+  @override
+  String get gpsLogger_summary_divesCovered => 'الغطسات المغطاة';
+
+  @override
   String gpsLogger_trackSubtitle(num count, String duration) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
