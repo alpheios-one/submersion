@@ -14,6 +14,7 @@ import 'package:submersion/features/dive_3d/domain/tissue/subsurface_tissue_buil
 import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_grid.dart';
 import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/renderer/axis_labels.dart';
+import 'package:submersion/features/dive_3d/presentation/renderer/hover_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/renderer/tissue_chrome_painters.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/compare_profile_3d_view.dart';
@@ -54,7 +55,7 @@ class Dive3dPage extends ConsumerStatefulWidget {
 class _Dive3dPageState extends ConsumerState<Dive3dPage>
     with SingleTickerProviderStateMixin {
   final ValueNotifier<double> _position = ValueNotifier(0);
-  final ValueNotifier<TissuePick?> _hoverPick = ValueNotifier(null);
+  final ValueNotifier<ScenePick?> _hoverPick = ValueNotifier(null);
   late final AnimationController _player;
   late SceneKind _sceneKind;
   SceneMetric _metric = SceneMetric.depth;
@@ -155,14 +156,27 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
       controls: const SizedBox.shrink(),
       onMarkerTap: null,
       cornerOverlay: TissueLegend(colorFn: colorFn),
+      chromeMode: SceneChromeMode.tissue,
+      picker: GridHoverPicker(surface.grid),
       surfaceGrid: surface.grid,
       axisFrame: frame,
       axisLabels: labels,
-      tooltip: ValueListenableBuilder<TissuePick?>(
+      tooltip: ValueListenableBuilder<ScenePick?>(
         valueListenable: _hoverPick,
         builder: (context, pick, _) {
-          if (pick == null) return const SizedBox.shrink();
-          return _positionedTooltip(pick, surface.grid, runtime, colorFn);
+          final payload = pick?.payload;
+          if (pick == null || payload is! TissuePick) {
+            return const SizedBox.shrink();
+          }
+          return CustomSingleChildLayout(
+            delegate: TissueTooltipLayoutDelegate(pick.screenPos),
+            child: TissueHoverTooltip(
+              pick: payload,
+              grid: surface.grid,
+              runtimeSeconds: runtime,
+              colorFn: colorFn,
+            ),
+          );
         },
       ),
     );
@@ -185,26 +199,6 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
     );
   }
 
-  /// Places the tooltip near the pick, clamped inside the viewport using the
-  /// tooltip's real measured size (so localization / text scaling can't push it
-  /// off-screen -- see [TissueTooltipLayoutDelegate]).
-  Widget _positionedTooltip(
-    TissuePick pick,
-    TissueSurfaceGrid grid,
-    int? runtimeSeconds,
-    TissueColorFn colorFn,
-  ) {
-    return CustomSingleChildLayout(
-      delegate: TissueTooltipLayoutDelegate(pick.screenPos),
-      child: TissueHoverTooltip(
-        pick: pick,
-        grid: grid,
-        runtimeSeconds: runtimeSeconds,
-        colorFn: colorFn,
-      ),
-    );
-  }
-
   Widget _buildComputersBody() {
     return CompareProfile3dView(
       profiles: ref.watch(computerComparisonProfilesProvider(widget.diveId)),
@@ -223,6 +217,8 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
     AxisFrame? axisFrame,
     AxisLabelSet? axisLabels,
     Widget? tooltip,
+    SceneChromeMode chromeMode = SceneChromeMode.none,
+    HoverPicker? picker,
   }) {
     return Column(
       children: [
@@ -239,7 +235,11 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
                   axisFrame: axisFrame,
                   axisLabels: axisLabels,
                   chromeStyle: axisFrame == null ? null : _chromeStyle(context),
-                  hoverPick: axisFrame == null ? null : _hoverPick,
+                  hoverPick: chromeMode == SceneChromeMode.none
+                      ? null
+                      : _hoverPick,
+                  chromeMode: chromeMode,
+                  picker: picker,
                 ),
               ),
               if (tooltip != null)
