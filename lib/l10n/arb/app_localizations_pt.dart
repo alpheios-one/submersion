@@ -13082,6 +13082,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'Manter video original';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'As Live Photos ainda não são suportadas. Duplique esta como fotografia estática e escreva os dados do mergulho na cópia.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Nenhum dado de mergulho disponivel para gravar.';
 

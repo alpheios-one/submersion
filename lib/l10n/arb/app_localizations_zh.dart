@@ -12472,6 +12472,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => '保留原始视频';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      '尚不支持实况照片。请将其复制为静态照片，然后将潜水数据写入副本。';
+
+  @override
   String get media_writeMetadata_noDataAvailable => '没有可写入的潜水数据。';
 
   @override

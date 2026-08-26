@@ -4074,6 +4074,7 @@
   "media_writeMetadata_diveTimeLabel": "Heure de plongee",
   "media_writeMetadata_gpsLabel": "GPS",
   "media_writeMetadata_keepOriginalVideo": "Conserver la video originale",
+  "media_writeMetadata_livePhotoUnsupported": "Les Live Photos ne sont pas encore prises en charge. Dupliquez cette photo en image fixe, puis écrivez les données de plongée sur la copie.",
   "media_writeMetadata_noDataAvailable": "Aucune donnee de plongee disponible a ecrire.",
   "media_writeMetadata_siteLabel": "Site",
   "media_writeMetadata_temperatureLabel": "Temperature",

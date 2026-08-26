@@ -22048,6 +22048,12 @@ abstract class AppLocalizations {
   /// **'Keep original video'**
   String get media_writeMetadata_keepOriginalVideo;
 
+  /// No description provided for @media_writeMetadata_livePhotoUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Photos are not supported yet. Duplicate this as a still photo, then write the dive data to the copy.'**
+  String get media_writeMetadata_livePhotoUnsupported;
+
   /// No description provided for @media_writeMetadata_noDataAvailable.
   ///
   /// In en, this message translates to:

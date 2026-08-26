@@ -12867,6 +12867,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'Keep original video';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Live Photos are not supported yet. Duplicate this as a still photo, then write the dive data to the copy.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'No dive data available to write.';
 
