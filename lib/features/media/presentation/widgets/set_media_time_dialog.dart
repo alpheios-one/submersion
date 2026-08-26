@@ -124,7 +124,9 @@ class _SetMediaTimeDialogState extends State<SetMediaTimeDialog> {
           TextField(
             controller: _controller,
             autofocus: true,
-            keyboardType: const TextInputType.numberWithOptions(),
+            // datetime, not number: the number keypad on iOS and Android has
+            // no ':' key, and mm:ss cannot be typed without one.
+            keyboardType: TextInputType.datetime,
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp('[0-9:]')),
             ],

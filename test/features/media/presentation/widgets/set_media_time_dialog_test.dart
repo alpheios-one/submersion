@@ -71,6 +71,20 @@ void main() {
     expect(tester.widget<Slider>(find.byType(Slider)).max, 1800);
   });
 
+  testWidgets('the field asks for a keyboard that can type a colon', (
+    tester,
+  ) async {
+    await pump(tester);
+
+    // A digits-only keypad (iOS number pad, Android TYPE_CLASS_NUMBER) has
+    // no ':' key, so mm:ss could only be entered via the slider. The
+    // datetime type carries ':' on both platforms.
+    expect(
+      tester.widget<TextField>(field()).keyboardType,
+      TextInputType.datetime,
+    );
+  });
+
   testWidgets('previews the moment on the mini profile as it changes', (
     tester,
   ) async {
