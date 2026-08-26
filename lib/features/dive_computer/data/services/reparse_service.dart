@@ -682,7 +682,10 @@ class ReparseService {
           db.diveTanks,
         )..where((t) => t.id.equals(existing.id))).write(
           DiveTanksCompanion(
-            volume: Value(tank.volumeLiters),
+            // Computers report pressure, not cylinder size: a volume the
+            // parse lacks was entered by the diver (or filled from the
+            // default preset), so only overwrite it with a reported one.
+            volume: Value.absentIfNull(tank.volumeLiters),
             workingPressure: const Value.absent(),
             startPressure: Value(tank.startPressure),
             endPressure: Value(tank.endPressure),

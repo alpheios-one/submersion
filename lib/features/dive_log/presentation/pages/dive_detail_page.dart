@@ -83,6 +83,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/playback_stats
 import 'package:submersion/features/dive_log/presentation/widgets/range_selection_overlay.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/range_stats_panel.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/responsive_section_pair.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/sac_volume_hint.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_saturation_panel.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
@@ -2479,6 +2480,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                     ),
                   );
                 }),
+                // Segments fell back to the pressure lane above: say why.
+                if (sacUnit == SacUnit.litersPerMin && tankVolume == null) ...[
+                  const SizedBox(height: 8),
+                  SacVolumeHint(
+                    volumeSymbol: units.volumeSymbol,
+                    onTap: () => context.push('/dives/${dive.id}/edit'),
+                  ),
+                ],
               ],
             ),
           ),
@@ -4061,26 +4070,49 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     if (sacUnit == SacUnit.litersPerMin) {
       // Volume-based SAC (L/min) - requires tank volume and a gas model
       final sac = dive.sacFor(ref.watch(gasModelProvider));
-      if (sac == null) return const SizedBox.shrink();
-      final value =
-          '${units.convertVolume(sac).toStringAsFixed(1)} ${units.volumeSymbol}/min';
-      return _buildDetailRow(
-        context,
-        context.l10n.diveLog_detail_label_sacRate,
-        value,
+      if (sac != null) {
+        final value =
+            '${units.convertVolume(sac).toStringAsFixed(1)} ${units.volumeSymbol}/min';
+        return _buildDetailRow(
+          context,
+          context.l10n.diveLog_detail_label_sacRate,
+          value,
+        );
+      }
+      // No cylinder volume (the norm for dive-computer downloads): show the
+      // pressure lane and say why, rather than hiding the row and leaving
+      // the L/min preference looking broken (issue #386). With no pressure
+      // data either there is nothing to fall back to.
+      if (dive.hasCylinderVolume || dive.sacPressure == null) {
+        return const SizedBox.shrink();
+      }
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildDetailRow(
+            context,
+            context.l10n.diveLog_detail_label_sacRate,
+            _formatPressureSac(dive.sacPressure!, units),
+          ),
+          SacVolumeHint(
+            volumeSymbol: units.volumeSymbol,
+            onTap: () => context.push('/dives/${dive.id}/edit'),
+          ),
+        ],
       );
     } else {
       // Pressure-based SAC (bar/min or psi/min) - doesn't require tank volume
       if (dive.sacPressure == null) return const SizedBox.shrink();
-      final value =
-          '${units.convertPressure(dive.sacPressure!).toStringAsFixed(1)} ${units.pressureSymbol}/min';
       return _buildDetailRow(
         context,
         context.l10n.diveLog_detail_label_sacRate,
-        value,
+        _formatPressureSac(dive.sacPressure!, units),
       );
     }
   }
+
+  String _formatPressureSac(double sacPressure, UnitFormatter units) =>
+      '${units.convertPressure(sacPressure).toStringAsFixed(1)} ${units.pressureSymbol}/min';
 
   Widget _buildDetailRow(
     BuildContext context,

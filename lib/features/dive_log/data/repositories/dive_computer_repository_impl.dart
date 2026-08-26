@@ -1392,6 +1392,9 @@ class DiveComputerRepository {
                 diveId: Value(diveId),
                 computerId: Value(computerId),
                 volume: Value(tank.volumeLiters),
+                workingPressure: Value.absentIfNull(tank.workingPressure),
+                tankMaterial: Value.absentIfNull(tank.material),
+                presetName: Value.absentIfNull(tank.presetName),
                 startPressure: Value(tank.startPressure),
                 endPressure: Value(tank.endPressure),
                 o2Percent: Value(tank.o2Percent),
@@ -2024,6 +2027,16 @@ class TankData {
   final double? endPressure;
   final double? volumeLiters;
 
+  /// Rated working pressure in bar, when known (from the default tank preset;
+  /// computers do not report it).
+  final double? workingPressure;
+
+  /// Cylinder material (a `TankMaterial` name), when known.
+  final String? material;
+
+  /// The tank preset the physical attributes came from, when they did.
+  final String? presetName;
+
   /// Inferred cylinder role (a [TankRole] name), or null for the default.
   final String? role;
 
@@ -2034,6 +2047,9 @@ class TankData {
     this.startPressure,
     this.endPressure,
     this.volumeLiters,
+    this.workingPressure,
+    this.material,
+    this.presetName,
     this.role,
   });
 }

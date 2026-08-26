@@ -9,39 +9,46 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/pages/dive_detail_page.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/sac_volume_hint.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
 
-/// The dive detail SAC row honors the gas model preference (issue #828).
+/// The dive detail SAC row honors the gas model preference (issue #828) and,
+/// when volumetric SAC is selected but no cylinder has a volume, falls back
+/// to the pressure lane with a hint instead of vanishing (issue #386).
 ///
-/// The volumetric lane is the only one that can differ; bar/min is a pressure
-/// drop and carries no equation of state.
+/// The volumetric lane is the only one that can differ by gas model; bar/min
+/// is a pressure drop and carries no equation of state.
 void main() {
   /// The issue's cylinder: 12 L, 200 -> 50 bar, 44 min, 13.2 m average.
   /// Ideal reads 17.6 L/min, real reads 16.8.
-  Dive reportedDive() {
+  Dive reportedDive({double? volume = 12.0}) {
     return createTestDiveWithBottomTime(
       runtime: const Duration(minutes: 44),
       avgDepth: 13.2,
     ).copyWith(
-      tanks: const [
+      tanks: [
         DiveTank(
           id: 'tank-1',
-          volume: 12.0,
+          volume: volume,
           startPressure: 200.0,
           endPressure: 50.0,
-          gasMix: GasMix(o2: 21.0, he: 0.0),
+          gasMix: const GasMix(o2: 21.0, he: 0.0),
           role: TankRole.backGas,
         ),
       ],
     );
   }
 
-  Future<void> pumpWith(WidgetTester tester, AppSettings settings) async {
-    final dive = reportedDive();
+  Future<void> pumpWith(
+    WidgetTester tester,
+    AppSettings settings, {
+    Dive? dive,
+  }) async {
+    dive ??= reportedDive();
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
@@ -75,6 +82,9 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
   }
 
+  AppLocalizations l10nOf(WidgetTester tester) =>
+      AppLocalizations.of(tester.element(find.byType(DiveDetailPage)));
+
   testWidgets('volumetric SAC reads the ideal value when ideal is selected', (
     tester,
   ) async {
@@ -87,6 +97,7 @@ void main() {
     );
 
     expect(find.text('17.6 L/min'), findsOneWidget);
+    expect(find.byType(SacVolumeHint), findsNothing);
   });
 
   testWidgets('volumetric SAC reads the real value when real is selected', (
@@ -110,5 +121,73 @@ void main() {
       // equation of state is selected.
       expect(find.text('1.5 bar/min'), findsOneWidget);
     }
+  });
+
+  group('volumetric SAC without a cylinder volume (issue #386)', () {
+    testWidgets('falls back to the pressure lane and says why', (tester) async {
+      // A dive-computer download: transmitter pressures, no cylinder size.
+      await pumpWith(
+        tester,
+        const AppSettings(sacUnit: SacUnit.litersPerMin),
+        dive: reportedDive(volume: null),
+      );
+
+      expect(find.text('1.5 bar/min'), findsOneWidget);
+      expect(
+        find.text(l10nOf(tester).diveLog_detail_sacVolumeHint('L')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('names the diver\'s own volume unit in the hint', (
+      tester,
+    ) async {
+      await pumpWith(
+        tester,
+        const AppSettings(
+          sacUnit: SacUnit.litersPerMin,
+          volumeUnit: VolumeUnit.cubicFeet,
+        ),
+        dive: reportedDive(volume: null),
+      );
+
+      expect(
+        find.text(l10nOf(tester).diveLog_detail_sacVolumeHint('cuft')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('shows no hint in the pressure lane', (tester) async {
+      await pumpWith(
+        tester,
+        const AppSettings(sacUnit: SacUnit.pressurePerMin),
+        dive: reportedDive(volume: null),
+      );
+
+      expect(find.text('1.5 bar/min'), findsOneWidget);
+      expect(find.byType(SacVolumeHint), findsNothing);
+    });
+
+    testWidgets('hides the row when there is no pressure data either', (
+      tester,
+    ) async {
+      final dive = reportedDive(volume: null).copyWith(
+        tanks: const [
+          DiveTank(id: 'tank-1', gasMix: GasMix(), role: TankRole.backGas),
+        ],
+      );
+      await pumpWith(
+        tester,
+        const AppSettings(sacUnit: SacUnit.litersPerMin),
+        dive: dive,
+      );
+
+      // Nothing to fall back to, so a hint about volume would mislead.
+      expect(
+        find.text(l10nOf(tester).diveLog_detail_label_sacRate),
+        findsNothing,
+      );
+      expect(find.byType(SacVolumeHint), findsNothing);
+    });
   });
 }
