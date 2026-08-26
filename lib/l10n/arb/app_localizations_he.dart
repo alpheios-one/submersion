@@ -8585,7 +8585,13 @@ class AppLocalizationsHe extends AppLocalizations {
       other: 'ל-$count אתרים עם קואורדינטות חסרים מדינה, אזור, עיר או גוף מים.',
       one: 'לאתר אחד עם קואורדינטות חסרים מדינה, אזור, עיר או גוף מים.',
     );
-    return '$_temp0 Submersion יחפש כל אחד מהם ב-OpenStreetMap וימלא רק שדות ריקים. זה נמשך כ-$minutes דקות.';
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'כ-$minutes דקות',
+      one: 'כדקה',
+    );
+    return '$_temp0 Submersion יחפש כל אחד מהם ב-OpenStreetMap וימלא רק שדות ריקים. זה נמשך $_temp1.';
   }
 
   @override

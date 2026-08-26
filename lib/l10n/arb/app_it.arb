@@ -11,7 +11,7 @@
   "diveSites_list_menu_select": "Seleziona siti",
   "diveSites_list_menu_fillLocationDetails": "Completa i dettagli di località mancanti",
   "diveSites_backfill_confirm_title": "Completare i dettagli di località mancanti?",
-  "diveSites_backfill_confirm_body": "{count, plural, =1{1 sito con coordinate non ha paese, regione, città o specchio d'acqua.} other{{count} siti con coordinate non hanno paese, regione, città o specchio d'acqua.}} Submersion cercherà ciascuno su OpenStreetMap e compilerà solo i campi vuoti. Richiede circa {minutes} minuti.",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 sito con coordinate non ha paese, regione, città o specchio d'acqua.} other{{count} siti con coordinate non hanno paese, regione, città o specchio d'acqua.}} Submersion cercherà ciascuno su OpenStreetMap e compilerà solo i campi vuoti. Richiede circa {minutes, plural, =1{1 minuto} other{{minutes} minuti}}.",
   "diveSites_backfill_confirm_start": "Avvia",
   "diveSites_backfill_nothingToFill": "Tutti i siti con coordinate hanno già i dettagli di località.",
   "diveSites_backfill_progress_title": "Completamento dei dettagli di località",

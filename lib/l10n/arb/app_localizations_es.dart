@@ -8806,7 +8806,13 @@ class AppLocalizationsEs extends AppLocalizations {
       one:
           '1 punto de buceo con coordenadas no tiene país, región, localidad o masa de agua.',
     );
-    return '$_temp0 Submersion consultará cada uno en OpenStreetMap y rellenará solo los campos vacíos. Tarda unos $minutes minutos.';
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'unos $minutes minutos',
+      one: 'alrededor de 1 minuto',
+    );
+    return '$_temp0 Submersion consultará cada uno en OpenStreetMap y rellenará solo los campos vacíos. Tarda $_temp1.';
   }
 
   @override

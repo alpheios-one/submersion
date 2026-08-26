@@ -8798,7 +8798,13 @@ class AppLocalizationsDe extends AppLocalizations {
       one:
           '1 Tauchplatz mit Koordinaten hat kein Land, keine Region, keinen Ort oder kein Gewässer.',
     );
-    return '$_temp0 Submersion sucht jeden auf OpenStreetMap und füllt nur die leeren Felder aus. Das dauert etwa $minutes Minuten.';
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes Minuten',
+      one: '1 Minute',
+    );
+    return '$_temp0 Submersion sucht jeden auf OpenStreetMap und füllt nur die leeren Felder aus. Das dauert etwa $_temp1.';
   }
 
   @override

@@ -8805,7 +8805,13 @@ class AppLocalizationsIt extends AppLocalizations {
       one:
           '1 sito con coordinate non ha paese, regione, città o specchio d\'acqua.',
     );
-    return '$_temp0 Submersion cercherà ciascuno su OpenStreetMap e compilerà solo i campi vuoti. Richiede circa $minutes minuti.';
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minuti',
+      one: '1 minuto',
+    );
+    return '$_temp0 Submersion cercherà ciascuno su OpenStreetMap e compilerà solo i campi vuoti. Richiede circa $_temp1.';
   }
 
   @override

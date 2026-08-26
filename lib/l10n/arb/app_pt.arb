@@ -11,7 +11,7 @@
   "diveSites_list_menu_select": "Selecionar pontos",
   "diveSites_list_menu_fillLocationDetails": "Preencher detalhes de localização em falta",
   "diveSites_backfill_confirm_title": "Preencher os detalhes de localização em falta?",
-  "diveSites_backfill_confirm_body": "{count, plural, =1{1 local com coordenadas não tem país, região, cidade ou corpo de água.} other{{count} locais com coordenadas não têm país, região, cidade ou corpo de água.}} O Submersion consultará cada um no OpenStreetMap e preencherá apenas os campos vazios. Demora cerca de {minutes} minutos.",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 local com coordenadas não tem país, região, cidade ou corpo de água.} other{{count} locais com coordenadas não têm país, região, cidade ou corpo de água.}} O Submersion consultará cada um no OpenStreetMap e preencherá apenas os campos vazios. Demora cerca de {minutes, plural, =1{1 minuto} other{{minutes} minutos}}.",
   "diveSites_backfill_confirm_start": "Iniciar",
   "diveSites_backfill_nothingToFill": "Todos os locais com coordenadas já têm os seus detalhes de localização.",
   "diveSites_backfill_progress_title": "A preencher detalhes de localização",

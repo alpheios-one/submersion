@@ -8654,7 +8654,13 @@ class AppLocalizationsEn extends AppLocalizations {
       one:
           '1 site with coordinates has an empty country, region, town or body of water.',
     );
-    return '$_temp0 Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about $minutes minutes.';
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutes',
+      one: '1 minute',
+    );
+    return '$_temp0 Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about $_temp1.';
   }
 
   @override

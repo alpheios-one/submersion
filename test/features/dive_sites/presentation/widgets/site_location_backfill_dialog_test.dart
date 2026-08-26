@@ -111,6 +111,17 @@ void main() {
     expect(find.text('Updated 90, unchanged 13, failed 1'), findsOneWidget);
   });
 
+  testWidgets('a small batch is estimated in the singular', (tester) async {
+    // 20 sites at two seconds each rounds up to one minute.
+    final notifier = _ScriptedBackfill(candidates: 20, script: const []);
+    await tester.pumpWidget(host(notifier));
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('about 1 minute.'), findsOneWidget);
+    expect(find.textContaining('1 minutes'), findsNothing);
+  });
+
   testWidgets('cancel asks the notifier to stop', (tester) async {
     // Slow steps so the progress dialog has finished animating in before
     // the test taps its Cancel button.

@@ -14804,7 +14804,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveSites_backfill_confirm_body.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 site with coordinates has an empty country, region, town or body of water.} other{{count} sites with coordinates have an empty country, region, town or body of water.}} Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about {minutes} minutes.'**
+  /// **'{count, plural, =1{1 site with coordinates has an empty country, region, town or body of water.} other{{count} sites with coordinates have an empty country, region, town or body of water.}} Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about {minutes, plural, =1{1 minute} other{{minutes} minutes}}.'**
   String diveSites_backfill_confirm_body(int count, int minutes);
 
   /// No description provided for @diveSites_backfill_confirm_start.

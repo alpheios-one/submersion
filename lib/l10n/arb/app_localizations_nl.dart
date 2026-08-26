@@ -8735,7 +8735,13 @@ class AppLocalizationsNl extends AppLocalizations {
       one:
           '1 duikstek met coördinaten heeft geen land, regio, plaats of water.',
     );
-    return '$_temp0 Submersion zoekt elke stek op via OpenStreetMap en vult alleen lege velden in. Dit duurt ongeveer $minutes minuten.';
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minuten',
+      one: '1 minuut',
+    );
+    return '$_temp0 Submersion zoekt elke stek op via OpenStreetMap en vult alleen lege velden in. Dit duurt ongeveer $_temp1.';
   }
 
   @override

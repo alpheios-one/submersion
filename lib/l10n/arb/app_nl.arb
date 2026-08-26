@@ -11,7 +11,7 @@
   "diveSites_list_menu_select": "Duikstekken selecteren",
   "diveSites_list_menu_fillLocationDetails": "Ontbrekende locatiegegevens aanvullen",
   "diveSites_backfill_confirm_title": "Ontbrekende locatiegegevens aanvullen?",
-  "diveSites_backfill_confirm_body": "{count, plural, =1{1 duikstek met coördinaten heeft geen land, regio, plaats of water.} other{{count} duikstekken met coördinaten hebben geen land, regio, plaats of water.}} Submersion zoekt elke stek op via OpenStreetMap en vult alleen lege velden in. Dit duurt ongeveer {minutes} minuten.",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 duikstek met coördinaten heeft geen land, regio, plaats of water.} other{{count} duikstekken met coördinaten hebben geen land, regio, plaats of water.}} Submersion zoekt elke stek op via OpenStreetMap en vult alleen lege velden in. Dit duurt ongeveer {minutes, plural, =1{1 minuut} other{{minutes} minuten}}.",
   "diveSites_backfill_confirm_start": "Starten",
   "diveSites_backfill_nothingToFill": "Elke duikstek met coördinaten heeft al locatiegegevens.",
   "diveSites_backfill_progress_title": "Locatiegegevens aanvullen",

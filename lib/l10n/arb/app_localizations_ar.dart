@@ -8637,7 +8637,14 @@ class AppLocalizationsAr extends AppLocalizations {
       one:
           'موقع غوص واحد له إحداثيات ينقصه البلد أو المنطقة أو البلدة أو المسطح المائي.',
     );
-    return '$_temp0 سيبحث Submersion عن كل منها في OpenStreetMap ويملأ الحقول الفارغة فقط. يستغرق ذلك نحو $minutes دقائق.';
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes دقائق',
+      two: 'دقيقتين',
+      one: 'دقيقة واحدة',
+    );
+    return '$_temp0 سيبحث Submersion عن كل منها في OpenStreetMap ويملأ الحقول الفارغة فقط. يستغرق ذلك نحو $_temp1.';
   }
 
   @override

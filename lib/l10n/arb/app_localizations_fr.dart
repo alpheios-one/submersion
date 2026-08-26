@@ -8838,7 +8838,13 @@ class AppLocalizationsFr extends AppLocalizations {
       one:
           '1 site avec coordonnées n\'a pas de pays, de région, de ville ou de plan d\'eau.',
     );
-    return '$_temp0 Submersion recherchera chacun sur OpenStreetMap et ne remplira que les champs vides. Cela prend environ $minutes minutes.';
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutes',
+      one: '1 minute',
+    );
+    return '$_temp0 Submersion recherchera chacun sur OpenStreetMap et ne remplira que les champs vides. Cela prend environ $_temp1.';
   }
 
   @override

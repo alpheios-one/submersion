@@ -11,7 +11,7 @@
   "diveSites_list_menu_select": "تحديد المواقع",
   "diveSites_list_menu_fillLocationDetails": "إكمال تفاصيل الموقع الناقصة",
   "diveSites_backfill_confirm_title": "إكمال تفاصيل الموقع الناقصة؟",
-  "diveSites_backfill_confirm_body": "{count, plural, =1{موقع غوص واحد له إحداثيات ينقصه البلد أو المنطقة أو البلدة أو المسطح المائي.} other{{count} مواقع غوص لها إحداثيات ينقصها البلد أو المنطقة أو البلدة أو المسطح المائي.}} سيبحث Submersion عن كل منها في OpenStreetMap ويملأ الحقول الفارغة فقط. يستغرق ذلك نحو {minutes} دقائق.",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{موقع غوص واحد له إحداثيات ينقصه البلد أو المنطقة أو البلدة أو المسطح المائي.} other{{count} مواقع غوص لها إحداثيات ينقصها البلد أو المنطقة أو البلدة أو المسطح المائي.}} سيبحث Submersion عن كل منها في OpenStreetMap ويملأ الحقول الفارغة فقط. يستغرق ذلك نحو {minutes, plural, =1{دقيقة واحدة} =2{دقيقتين} other{{minutes} دقائق}}.",
   "diveSites_backfill_confirm_start": "بدء",
   "diveSites_backfill_nothingToFill": "كل مواقع الغوص التي لها إحداثيات لديها تفاصيل الموقع بالفعل.",
   "diveSites_backfill_progress_title": "جارٍ إكمال تفاصيل الموقع",
