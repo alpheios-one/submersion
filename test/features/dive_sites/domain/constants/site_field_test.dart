@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_sites/domain/constants/site_field.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -888,6 +889,115 @@ void main() {
         'Cebu City',
       );
       expect(adapter.formatValue(SiteField.island, null, units), '--');
+    });
+  });
+
+  group('statistics fields', () {
+    const imperial = UnitFormatter(AppSettings(depthUnit: DepthUnit.feet));
+
+    test('depthRange extracts a min/max record from the site', () {
+      final value = SiteFieldAdapter.instance.extractValue(
+        SiteField.depthRange,
+        testEntity,
+      );
+      expect(value, (min: 5.0, max: 50.0));
+    });
+
+    test('depthRange is null when the site has no depths', () {
+      const bare = SiteWithDiveCount(
+        site: DiveSite(id: 's', name: 'Bare'),
+        diveCount: 0,
+      );
+      expect(
+        SiteFieldAdapter.instance.extractValue(SiteField.depthRange, bare),
+        isNull,
+      );
+    });
+
+    test('depthRange formats as a single-symbol range in metric', () {
+      expect(
+        SiteFieldAdapter.instance.formatValue(SiteField.depthRange, (
+          min: 5.0,
+          max: 50.0,
+        ), units),
+        '5-50m',
+      );
+    });
+
+    test('depthRange converts both ends in imperial', () {
+      expect(
+        SiteFieldAdapter.instance.formatValue(SiteField.depthRange, (
+          min: 5.0,
+          max: 50.0,
+        ), imperial),
+        '16-164ft',
+      );
+    });
+
+    test('depthRange with only a max depth formats the max', () {
+      expect(
+        SiteFieldAdapter.instance.formatValue(SiteField.depthRange, (
+          min: null,
+          max: 50.0,
+        ), units),
+        '50m',
+      );
+    });
+
+    test('lastDived reads the aggregate and formats as a date', () {
+      final entry = SiteWithDiveCount(
+        site: testSite,
+        diveCount: 1,
+        lastDivedAt: DateTime(2024, 3, 5),
+      );
+      final value = SiteFieldAdapter.instance.extractValue(
+        SiteField.lastDived,
+        entry,
+      );
+      expect(value, DateTime(2024, 3, 5));
+      expect(
+        SiteFieldAdapter.instance.formatValue(
+          SiteField.lastDived,
+          value,
+          units,
+        ),
+        units.formatDate(DateTime(2024, 3, 5)),
+      );
+    });
+
+    test('maxDepthReached reads the aggregate and formats as a depth', () {
+      const entry = SiteWithDiveCount(
+        site: testSite,
+        diveCount: 1,
+        maxDepthReached: 31.5,
+      );
+      final value = SiteFieldAdapter.instance.extractValue(
+        SiteField.maxDepthReached,
+        entry,
+      );
+      expect(value, 31.5);
+      expect(
+        SiteFieldAdapter.instance.formatValue(
+          SiteField.maxDepthReached,
+          value,
+          units,
+        ),
+        '32m',
+      );
+    });
+
+    test('statistics fields carry the statistics category and icons', () {
+      for (final f in [
+        SiteField.depthRange,
+        SiteField.lastDived,
+        SiteField.maxDepthReached,
+      ]) {
+        expect(f.categoryName, 'statistics');
+        expect(f.icon, isNotNull);
+      }
+      expect(SiteField.depthRange.sortable, isFalse);
+      expect(SiteField.lastDived.sortable, isTrue);
+      expect(SiteField.maxDepthReached.sortable, isTrue);
     });
   });
 }

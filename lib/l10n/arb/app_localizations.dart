@@ -43262,6 +43262,42 @@ abstract class AppLocalizations {
   /// **'Lon'**
   String get enum_siteField_longitude_short;
 
+  /// No description provided for @enum_siteField_depthRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth Range'**
+  String get enum_siteField_depthRange;
+
+  /// No description provided for @enum_siteField_depthRange_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth'**
+  String get enum_siteField_depthRange_short;
+
+  /// No description provided for @enum_siteField_lastDived.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Dived'**
+  String get enum_siteField_lastDived;
+
+  /// No description provided for @enum_siteField_lastDived_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Last dived'**
+  String get enum_siteField_lastDived_short;
+
+  /// No description provided for @enum_siteField_maxDepthReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Max Depth'**
+  String get enum_siteField_maxDepthReached;
+
+  /// No description provided for @enum_siteField_maxDepthReached_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Your max'**
+  String get enum_siteField_maxDepthReached_short;
+
   /// No description provided for @enum_buddyField_buddyName.
   ///
   /// In en, this message translates to:
@@ -43345,6 +43381,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notes'**
   String get enum_buddyField_notes_short;
+
+  /// No description provided for @enum_buddyField_lastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Dive'**
+  String get enum_buddyField_lastDive;
+
+  /// No description provided for @enum_buddyField_lastDive_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Last dive'**
+  String get enum_buddyField_lastDive_short;
 
   /// No description provided for @enum_tripField_tripName.
   ///

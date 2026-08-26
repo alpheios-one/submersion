@@ -24626,6 +24626,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_siteField_longitude_short => '经度';
 
   @override
+  String get enum_siteField_depthRange => '深度范围';
+
+  @override
+  String get enum_siteField_depthRange_short => '深度';
+
+  @override
+  String get enum_siteField_lastDived => '最近潜水';
+
+  @override
+  String get enum_siteField_lastDived_short => '最近';
+
+  @override
+  String get enum_siteField_maxDepthReached => '你的最大深度';
+
+  @override
+  String get enum_siteField_maxDepthReached_short => '你的最大';
+
+  @override
   String get enum_buddyField_buddyName => '姓名';
 
   @override
@@ -24666,6 +24684,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_buddyField_notes_short => '备注';
+
+  @override
+  String get enum_buddyField_lastDive => '最近潜水';
+
+  @override
+  String get enum_buddyField_lastDive_short => '最近';
 
   @override
   String get enum_tripField_tripName => '名称';

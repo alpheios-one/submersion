@@ -25287,6 +25287,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_siteField_longitude_short => 'אורך';
 
   @override
+  String get enum_siteField_depthRange => 'טווח עומק';
+
+  @override
+  String get enum_siteField_depthRange_short => 'עומק';
+
+  @override
+  String get enum_siteField_lastDived => 'צלילה אחרונה';
+
+  @override
+  String get enum_siteField_lastDived_short => 'אחרונה';
+
+  @override
+  String get enum_siteField_maxDepthReached => 'העומק המרבי שלך';
+
+  @override
+  String get enum_siteField_maxDepthReached_short => 'המרבי שלך';
+
+  @override
   String get enum_buddyField_buddyName => 'שם';
 
   @override
@@ -25327,6 +25345,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_buddyField_notes_short => 'הערות';
+
+  @override
+  String get enum_buddyField_lastDive => 'צלילה אחרונה';
+
+  @override
+  String get enum_buddyField_lastDive_short => 'אחרונה';
 
   @override
   String get enum_tripField_tripName => 'שם';
