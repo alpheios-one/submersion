@@ -4130,6 +4130,7 @@
   "media_writeMetadata_diveTimeLabel": "Duiktijd",
   "media_writeMetadata_gpsLabel": "GPS",
   "media_writeMetadata_keepOriginalVideo": "Originele video bewaren",
+  "media_writeMetadata_livePhotoUnsupported": "Live Photos worden nog niet ondersteund. Dupliceer deze als stilstaande foto en schrijf de duikgegevens vervolgens naar de kopie.",
   "media_writeMetadata_noDataAvailable": "Geen duikgegevens beschikbaar om te schrijven.",
   "media_writeMetadata_siteLabel": "Duikstek",
   "media_writeMetadata_temperatureLabel": "Temperatuur",
