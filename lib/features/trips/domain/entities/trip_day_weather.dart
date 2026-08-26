@@ -59,13 +59,21 @@ class TripDayWeather extends Equatable {
     required this.updatedAt,
   });
 
-  /// True when at least one field the day header can render is present.
+  /// True when the day header's badge would actually show something.
   ///
-  /// A row with only wind and humidity would render as nothing and would
-  /// suppress the retry that a later archive update would satisfy, so it is
-  /// not worth storing.
+  /// Wind, humidity, and pressure are stored but never drawn, so a row
+  /// carrying only those renders as nothing and would suppress the retry that
+  /// a later archive update would satisfy.
+  ///
+  /// [Precipitation.none] does not count. `WeatherMapper.mapPrecipitation`
+  /// returns non-null always, defaulting a missing reading to `none`, so
+  /// `none` cannot be read as evidence that the fetch resolved anything. It
+  /// also earns no glyph of its own in `weatherIconFor`, which falls through
+  /// to cloud cover.
   bool get hasRenderableWeather =>
-      airTemp != null || cloudCover != null || precipitation != null;
+      airTemp != null ||
+      cloudCover != null ||
+      (precipitation != null && precipitation != Precipitation.none);
 
   /// The compact view model the day header consumes.
   TripStoryDayWeather toStoryWeather() => TripStoryDayWeather(

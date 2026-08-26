@@ -1,0 +1,97 @@
+import 'package:uuid/uuid.dart';
+
+import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/trips/data/repositories/trip_day_weather_repository.dart';
+import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart';
+import 'package:submersion/features/trips/domain/services/trip_day_weather_backfill.dart';
+import 'package:submersion/features/trips/presentation/providers/trip_story_providers.dart';
+import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
+
+final tripDayWeatherRepositoryProvider = Provider<TripDayWeatherRepository>(
+  (ref) => TripDayWeatherRepository(),
+);
+
+/// Stored weather for a trip, keyed by `date.millisecondsSinceEpoch`.
+///
+/// Subscribes to the table tick, so a row written by the backfill or arriving
+/// through sync re-renders the day headers without the widget knowing a fetch
+/// ever happened.
+final tripDayWeatherProvider =
+    FutureProvider.family<Map<int, TripDayWeather>, String>((
+      ref,
+      tripId,
+    ) async {
+      final repository = ref.watch(tripDayWeatherRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchWeatherChanges());
+      return repository.getForTrip(tripId);
+    });
+
+/// Fills the gaps: fetches historical weather for trip days that have none
+/// stored and no dive to supply it, then writes what it finds.
+///
+/// Deliberately does NOT watch [tripDayWeatherProvider]. Watching the rows it
+/// writes would invalidate this provider on every write and start another
+/// pass, so it reads the stored rows straight from the repository instead.
+/// The story is its only reactive input, which means assigning dives to a
+/// trip re-evaluates what is still missing.
+///
+/// Not auto-disposed: one pass per trip per provider container lifetime.
+final tripDayWeatherBackfillProvider = FutureProvider.family<void, String>((
+  ref,
+  tripId,
+) async {
+  final story = await ref.watch(tripStoryProvider(tripId).future);
+  final repository = ref.watch(tripDayWeatherRepositoryProvider);
+  final service = ref.watch(weatherServiceProvider);
+
+  final stored = await repository.getForTrip(tripId);
+  final targets = TripDayWeatherBackfill.targetsFor(
+    story: story,
+    stored: stored,
+  );
+  if (targets.isEmpty) return;
+
+  const uuid = Uuid();
+
+  // Sequential on purpose: a two-week trip would otherwise open with a burst
+  // of parallel requests, and rows landing one at a time let the day headers
+  // fill in progressively.
+  for (final target in targets) {
+    final weather = await service.fetchWeather(
+      latitude: target.latitude,
+      longitude: target.longitude,
+      date: target.date,
+      entryTime: target.localNoon,
+      useLocationTimezone: true,
+    );
+    // A miss writes nothing and is retried on the next view, which is what
+    // makes this correct against the archive's few-day publication lag.
+    if (weather == null) continue;
+
+    final now = DateTime.now();
+    final row = TripDayWeather(
+      id: uuid.v4(),
+      tripId: tripId,
+      date: target.date,
+      latitude: target.latitude,
+      longitude: target.longitude,
+      airTemp: weather.airTemp,
+      cloudCover: weather.cloudCover,
+      precipitation: weather.precipitation,
+      windSpeed: weather.windSpeed,
+      windDirection: weather.windDirection,
+      humidity: weather.humidity,
+      surfacePressure: weather.surfacePressure,
+      weatherCode: weather.weatherCode,
+      fetchedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    );
+
+    // A row the header could render nothing from is worse than no row: it
+    // would suppress the retry that a later archive update would satisfy.
+    if (!row.hasRenderableWeather) continue;
+
+    await repository.upsert(row);
+  }
+});
