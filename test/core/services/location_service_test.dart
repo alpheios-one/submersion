@@ -18,10 +18,15 @@ import 'package:submersion/core/services/location_service.dart';
 /// request the service makes is captured here so the tests can assert on the
 /// English pin (#214) that lives in the URI *and* in the request headers.
 class _FakeNominatim {
-  _FakeNominatim({this.statusCode = 200, this.body = '{}'});
+  _FakeNominatim({this.statusCode = 200, this.body = '{}', this.bodyFor});
 
   final int statusCode;
   final String body;
+
+  /// When set, wins over [body] for the given request.
+  final String? Function(Uri uri)? bodyFor;
+
+  String bodyForUri(Uri uri) => bodyFor?.call(uri) ?? body;
 
   final List<Uri> requestedUris = <Uri>[];
   final List<Map<String, String>> requestHeaders = <Map<String, String>>[];
@@ -89,7 +94,7 @@ class _FakeHttpClientRequest implements HttpClientRequest {
   @override
   Future<HttpClientResponse> close() async {
     _server.requestHeaders.add((headers as _FakeHttpHeaders).values);
-    return _FakeHttpClientResponse(_server.statusCode, _server.body);
+    return _FakeHttpClientResponse(_server.statusCode, _server.bodyForUri(uri));
   }
 
   @override
@@ -201,9 +206,9 @@ void main() {
           () => service.reverseGeocode(36.0143, -5.6044, languageCode: 'en'),
         );
 
-        expect(server.requestedUris, hasLength(1));
+        expect(server.requestedUris, hasLength(2));
         expect(
-          server.lastUri.queryParameters['accept-language'],
+          server.requestedUris.first.queryParameters['accept-language'],
           'en',
           reason: 'the request itself must carry the pin, not just the builder',
         );
@@ -340,8 +345,10 @@ void main() {
 
       expect(
         server.clientCloseCount,
-        1,
-        reason: 'the finally block must release the sockets on the error path',
+        server.requestedUris.length,
+        reason:
+            'the finally block must release the sockets on the error path, '
+            'once per request (address layer, then natural layer)',
       );
     });
   });
@@ -601,6 +608,139 @@ void main() {
         reason: 'a later lookup retries the native geocoder',
       );
       expect(geocoding.locales, [const Locale('en'), const Locale('en')]);
+    });
+  });
+
+  group('body of water (issue #1187)', () {
+    Map<String, dynamic> address() => <String, dynamic>{
+      'address': <String, dynamic>{
+        'country': 'Switzerland',
+        'state': 'Lucerne',
+        'village': 'Weggis',
+      },
+    };
+
+    String? natural(Uri uri, Map<String, dynamic> hit) =>
+        uri.queryParameters['layer'] == 'natural' ? jsonEncode(hit) : null;
+
+    test('the natural-layer URI asks for water features only', () {
+      final uri = LocationService.buildNaturalFeatureUri(
+        47.027631,
+        8.400640,
+        languageCode: 'de',
+      );
+      expect(uri.host, 'nominatim.openstreetmap.org');
+      expect(uri.path, '/reverse');
+      expect(uri.queryParameters['layer'], 'natural');
+      expect(uri.queryParameters['zoom'], '14');
+      expect(uri.queryParameters['accept-language'], 'de');
+      expect(uri.queryParameters['format'], 'json');
+    });
+
+    test('a lake on the natural layer becomes the body of water', () async {
+      final server = _FakeNominatim(
+        body: jsonEncode(address()),
+        bodyFor: (uri) => natural(uri, {
+          'class': 'water',
+          'type': 'lake',
+          'name': 'Lake Lucerne',
+        }),
+      );
+
+      final result = await server.run(
+        () => service.reverseGeocode(47.027631, 8.400640, languageCode: 'en'),
+      );
+
+      expect(result.locality, 'Weggis');
+      expect(result.bodyOfWater, 'Lake Lucerne');
+      expect(server.requestedUris, hasLength(2));
+      expect(server.requestedUris.last.queryParameters['layer'], 'natural');
+    });
+
+    test('a bay is accepted', () {
+      expect(
+        LocationService.bodyOfWaterFromNaturalFeature({
+          'class': 'natural',
+          'type': 'bay',
+          'name': 'Naama Bay',
+        }),
+        'Naama Bay',
+      );
+    });
+
+    test('a strait is accepted', () {
+      expect(
+        LocationService.bodyOfWaterFromNaturalFeature({
+          'class': 'natural',
+          'type': 'strait',
+          'name': 'Strait of Gibraltar',
+        }),
+        'Strait of Gibraltar',
+      );
+    });
+
+    test('a mountain range is not a body of water', () {
+      expect(
+        LocationService.bodyOfWaterFromNaturalFeature({
+          'class': 'natural',
+          'type': 'mountain_range',
+          'name': 'Urner Alps',
+        }),
+        isNull,
+      );
+    });
+
+    test('a saddle is not a body of water', () {
+      expect(
+        LocationService.bodyOfWaterFromNaturalFeature({
+          'class': 'natural',
+          'type': 'saddle',
+          'name': 'coll Roig',
+        }),
+        isNull,
+      );
+    });
+
+    test('an unable-to-geocode answer yields no body of water', () {
+      expect(
+        LocationService.bodyOfWaterFromNaturalFeature({
+          'error': 'Unable to geocode',
+        }),
+        isNull,
+      );
+    });
+
+    test('a water hit with a blank name is ignored', () {
+      expect(
+        LocationService.bodyOfWaterFromNaturalFeature({
+          'class': 'water',
+          'type': 'lake',
+          'name': '',
+        }),
+        isNull,
+      );
+    });
+
+    test('a failing natural-layer request keeps the address result', () async {
+      var calls = 0;
+      final server = _FakeNominatim(
+        body: jsonEncode(address()),
+        bodyFor: (uri) {
+          if (uri.queryParameters['layer'] != 'natural') return null;
+          calls++;
+          return 'this is not json';
+        },
+      );
+
+      final result = await server.run(
+        () => service.reverseGeocode(47.027631, 8.400640, languageCode: 'en'),
+      );
+
+      expect(calls, 1);
+      expect(result.country, 'Switzerland');
+      expect(result.locality, 'Weggis');
+      expect(result.bodyOfWater, isNull);
+      expect(result.networkFailed, isFalse);
     });
   });
 }

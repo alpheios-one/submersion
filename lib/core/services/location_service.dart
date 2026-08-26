@@ -64,6 +64,36 @@ class LocationService {
     '&lat=$latitude&lon=$longitude&zoom=10&accept-language=$languageCode',
   );
 
+  /// Nominatim reverse-geocode URI for the natural layer, which answers with
+  /// the lake, bay or strait a point lies in. zoom=14 keeps the answer to a
+  /// named feature rather than the whole region. Nominatim has no ocean
+  /// polygons, so open-sea points come back "Unable to geocode".
+  static Uri buildNaturalFeatureUri(
+    double latitude,
+    double longitude, {
+    required String languageCode,
+  }) => Uri.parse(
+    'https://nominatim.openstreetmap.org/reverse?format=json'
+    '&lat=$latitude&lon=$longitude&zoom=14&layer=natural'
+    '&accept-language=$languageCode',
+  );
+
+  /// The name of a water feature from a natural-layer answer, or null when
+  /// the hit is not water. The natural layer also carries mountain ranges,
+  /// saddles and peaks; class `water` covers lakes, reservoirs and rivers,
+  /// and bays and straits arrive as class `natural`.
+  static String? bodyOfWaterFromNaturalFeature(Map<String, dynamic> json) {
+    final osmClass = json['class'] as String?;
+    final type = json['type'] as String?;
+    final name = (json['name'] as String?)?.trim();
+    if (name == null || name.isEmpty) return null;
+    if (osmClass == 'water') return name;
+    if (osmClass == 'natural' && (type == 'bay' || type == 'strait')) {
+      return name;
+    }
+    return null;
+  }
+
   /// Nominatim forward-geocode URI, English-pinned: dive centres are matched
   /// by address text, not grouped in statistics.
   static Uri buildForwardGeocodeUri(String address) => Uri.parse(
@@ -259,10 +289,15 @@ class LocationService {
             _log.info(
               'Native geocoded: ${place.locality}, ${place.administrativeArea}, ${place.country}',
             );
-            return PlaceLookup(
-              country: place.country,
-              region: place.administrativeArea,
-              locality: place.locality,
+            return await _withBodyOfWater(
+              PlaceLookup(
+                country: place.country,
+                region: place.administrativeArea,
+                locality: place.locality,
+              ),
+              latitude,
+              longitude,
+              languageCode,
             );
           }
         } catch (e) {
@@ -271,7 +306,13 @@ class LocationService {
       }
 
       // Fallback to OpenStreetMap Nominatim API (works on all platforms)
-      return await _reverseGeocodeWeb(latitude, longitude, languageCode);
+      final address = await _reverseGeocodeWeb(
+        latitude,
+        longitude,
+        languageCode,
+      );
+      if (address.networkFailed) return address;
+      return await _withBodyOfWater(address, latitude, longitude, languageCode);
     } catch (e, stackTrace) {
       _log.error('Reverse geocoding failed', error: e, stackTrace: stackTrace);
       return const PlaceLookup.unavailable();
@@ -310,6 +351,37 @@ class LocationService {
     } catch (e) {
       _log.warning('Web reverse geocoding failed: $e');
       return const PlaceLookup.empty();
+    }
+  }
+
+  Future<PlaceLookup> _withBodyOfWater(
+    PlaceLookup address,
+    double latitude,
+    double longitude,
+    String languageCode,
+  ) async {
+    final water = await _lookupBodyOfWater(latitude, longitude, languageCode);
+    return water == null ? address : address.copyWith(bodyOfWater: water);
+  }
+
+  /// Best-effort: any failure here leaves the address result untouched.
+  Future<String?> _lookupBodyOfWater(
+    double latitude,
+    double longitude,
+    String languageCode,
+  ) async {
+    try {
+      final json = await _fetchNominatimJson(
+        buildNaturalFeatureUri(latitude, longitude, languageCode: languageCode),
+        languageCode,
+      );
+      if (json == null) return null;
+      final water = bodyOfWaterFromNaturalFeature(json);
+      _log.info('Natural layer: ${water ?? 'no water feature'}');
+      return water;
+    } catch (e) {
+      _log.warning('Body of water lookup failed: $e');
+      return null;
     }
   }
 
