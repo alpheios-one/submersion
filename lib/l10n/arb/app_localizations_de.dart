@@ -13000,6 +13000,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Originalvideo beibehalten';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Live Photos werden noch nicht unterstützt. Dupliziere dieses Foto als Standbild und schreibe die Tauchdaten dann in die Kopie.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Keine Tauchdaten zum Schreiben verfügbar.';
 
@@ -14508,6 +14512,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'Ereignisse';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Geschätzter Flaschendruck';
 
   @override
   String get settings_appearance_metric_gasDensity => 'Gasdichte';

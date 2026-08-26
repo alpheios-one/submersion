@@ -13047,6 +13047,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Conserver la video originale';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Les Live Photos ne sont pas encore prises en charge. Dupliquez cette photo en image fixe, puis écrivez les données de plongée sur la copie.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Aucune donnee de plongee disponible a ecrire.';
 
@@ -14568,6 +14572,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'Evenements';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Pression estimée du bloc';
 
   @override
   String get settings_appearance_metric_gasDensity => 'Densite du gaz';

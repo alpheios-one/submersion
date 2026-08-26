@@ -13010,6 +13010,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Mantieni video originale';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Le Live Photo non sono ancora supportate. Duplica questa foto come immagine statica, poi scrivi i dati dell\'immersione sulla copia.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Nessun dato immersione disponibile da scrivere.';
 
@@ -14525,6 +14529,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'Eventi';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Pressione stimata della bombola';
 
   @override
   String get settings_appearance_metric_gasDensity => 'Densità gas';

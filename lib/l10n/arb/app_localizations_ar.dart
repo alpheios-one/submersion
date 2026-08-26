@@ -12771,6 +12771,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'الاحتفاظ بالفيديو الأصلي';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'صور Live Photos غير مدعومة بعد. كرّر هذه الصورة كصورة ثابتة، ثم اكتب بيانات الغوص في النسخة.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'لا توجد بيانات غوص متاحة للكتابة.';
 
@@ -14272,6 +14276,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'الأحداث';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'ضغط الأسطوانة المقدر';
 
   @override
   String get settings_appearance_metric_gasDensity => 'كثافة الغاز';

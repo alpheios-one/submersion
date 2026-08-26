@@ -12794,6 +12794,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'Keep original video';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Live Photos are not supported yet. Duplicate this as a still photo, then write the dive data to the copy.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'No dive data available to write.';
 
@@ -14291,6 +14295,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'Events';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Estimated Tank Pressure';
 
   @override
   String get settings_appearance_metric_gasDensity => 'Gas Density';

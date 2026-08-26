@@ -12910,6 +12910,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'Originele video bewaren';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Live Photos worden nog niet ondersteund. Dupliceer deze als stilstaande foto en schrijf de duikgegevens vervolgens naar de kopie.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Geen duikgegevens beschikbaar om te schrijven.';
 
@@ -14417,6 +14421,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'Gebeurtenissen';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Geschatte flesdruk';
 
   @override
   String get settings_appearance_metric_gasDensity => 'Gasdichtheid';

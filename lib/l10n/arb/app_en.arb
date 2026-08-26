@@ -7238,6 +7238,7 @@
   "media_writeMetadata_diveTimeLabel": "Dive time",
   "media_writeMetadata_gpsLabel": "GPS",
   "media_writeMetadata_keepOriginalVideo": "Keep original video",
+  "media_writeMetadata_livePhotoUnsupported": "Live Photos are not supported yet. Duplicate this as a still photo, then write the dive data to the copy.",
   "media_writeMetadata_noDataAvailable": "No dive data available to write.",
   "media_writeMetadata_siteLabel": "Site",
   "media_writeMetadata_temperatureLabel": "Temperature",
@@ -8671,6 +8672,10 @@
   "settings_appearance_metric_ascentRateColors": "Ascent Rate Colors",
   "settings_appearance_metric_ceiling": "Ceiling",
   "settings_appearance_metric_events": "Events",
+  "settings_appearance_metric_estimatedTankPressure": "Estimated Tank Pressure",
+  "@settings_appearance_metric_estimatedTankPressure": {
+    "description": "Settings switch that turns off the synthesized (estimated) tank pressure line on the dive profile chart."
+  },
   "settings_appearance_metric_gasDensity": "Gas Density",
   "settings_appearance_metric_gfPercent": "GF%",
   "settings_appearance_metric_heartRate": "Heart Rate",

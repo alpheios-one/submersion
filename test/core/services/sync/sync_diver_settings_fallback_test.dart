@@ -314,4 +314,43 @@ void main() {
       expect(row.defaultShowO2CellMv, isFalse);
     },
   );
+
+  test(
+    'applies a pre-v163 diver_settings payload missing the estimate default',
+    () async {
+      await db.customStatement('PRAGMA foreign_keys = OFF');
+
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await db
+          .into(db.diverSettings)
+          .insert(
+            DiverSettingsCompanion.insert(
+              id: 'ds9',
+              diverId: 'diver-9',
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      final exported = await serializer.fetchRecord('diverSettings', 'ds9');
+      expect(exported, isNotNull);
+
+      // A peer still on v161 exports no defaultShowEstimatedTankPressure.
+      // _withSchemaDefaults fills it from the column's declared default, so a
+      // mixed-version sync must leave the estimate ON rather than silently
+      // switching it off (issue #731).
+      final legacy = Map<String, dynamic>.from(exported!)
+        ..remove('defaultShowEstimatedTankPressure');
+
+      await (db.delete(
+        db.diverSettings,
+      )..where((t) => t.id.equals('ds9'))).go();
+
+      await serializer.upsertRecord('diverSettings', legacy);
+
+      final row = await (db.select(
+        db.diverSettings,
+      )..where((t) => t.id.equals('ds9'))).getSingle();
+      expect(row.defaultShowEstimatedTankPressure, isTrue);
+    },
+  );
 }

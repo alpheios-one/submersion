@@ -21946,6 +21946,12 @@ abstract class AppLocalizations {
   /// **'Keep original video'**
   String get media_writeMetadata_keepOriginalVideo;
 
+  /// No description provided for @media_writeMetadata_livePhotoUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Photos are not supported yet. Duplicate this as a still photo, then write the dive data to the copy.'**
+  String get media_writeMetadata_livePhotoUnsupported;
+
   /// No description provided for @media_writeMetadata_noDataAvailable.
   ///
   /// In en, this message translates to:
@@ -24501,6 +24507,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Events'**
   String get settings_appearance_metric_events;
+
+  /// Settings switch that turns off the synthesized (estimated) tank pressure line on the dive profile chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated Tank Pressure'**
+  String get settings_appearance_metric_estimatedTankPressure;
 
   /// No description provided for @settings_appearance_metric_gasDensity.
   ///
