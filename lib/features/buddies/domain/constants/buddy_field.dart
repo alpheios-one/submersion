@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
-import 'package:submersion/features/buddies/domain/entities/buddy.dart';
+import 'package:submersion/features/buddies/domain/entities/buddy_with_dive_count.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/constants/entity_field.dart';
 
-/// Wrapper carrying a [Buddy] with its computed dive count.
-typedef BuddyWithCount = ({Buddy buddy, int diveCount});
+/// Entity handed to [BuddyFieldAdapter]. An alias of the repository's class so
+/// the table view and the list cards share one type with no conversion.
+typedef BuddyWithCount = BuddyWithDiveCount;
 
 /// Enumeration of every displayable field for the buddy table view.
 enum BuddyField implements EntityField {

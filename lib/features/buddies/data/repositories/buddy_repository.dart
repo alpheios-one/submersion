@@ -9,6 +9,7 @@ import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart'
     as domain;
+import 'package:submersion/features/buddies/domain/entities/buddy_with_dive_count.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_merge_repository.dart';
 import 'package:submersion/features/dive_roles/data/repositories/dive_role_repository.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
@@ -22,6 +23,9 @@ export 'package:submersion/features/buddies/data/repositories/buddy_merge_reposi
         BuddyMergeSnapshot,
         DiveBuddySnapshot,
         CertificationInstructorSnapshot;
+// Re-exported so existing importers of BuddyWithDiveCount keep compiling
+// after the class moved to the domain layer.
+export 'package:submersion/features/buddies/domain/entities/buddy_with_dive_count.dart';
 
 class BuddyRepository {
   AppDatabase get _db => DatabaseService.instance.database;
@@ -1015,12 +1019,4 @@ class BuddyStats {
     this.lastDive,
     this.favoriteSite,
   });
-}
-
-/// Buddy with dive count for efficient list sorting
-class BuddyWithDiveCount {
-  final domain.Buddy buddy;
-  final int diveCount;
-
-  const BuddyWithDiveCount({required this.buddy, required this.diveCount});
 }

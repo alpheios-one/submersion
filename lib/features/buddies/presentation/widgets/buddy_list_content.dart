@@ -614,14 +614,8 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
         final settings = ref.watch(settingsProvider);
         final units = UnitFormatter(settings);
 
-        // Convert BuddyWithDiveCount (class) to BuddyWithCount (record) as
-        // required by BuddyFieldAdapter.
-        final buddyRecords = buddies
-            .map((b) => (buddy: b.buddy, diveCount: b.diveCount))
-            .toList();
-
         return EntityTableView<BuddyWithCount, BuddyField>(
-          entities: buddyRecords,
+          entities: buddies,
           idExtractor: (b) => b.buddy.id,
           adapter: BuddyFieldAdapter.instance,
           config: config,
@@ -644,7 +638,7 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
           onEntityTap: (id) {
             // Table mode honours modifier and shift clicks too, so selection
             // works the same way as in the list view modes.
-            final orderedIds = buddyRecords.map((b) => b.buddy.id).toList();
+            final orderedIds = buddies.map((b) => b.buddy.id).toList();
             if (SelectableListScope.isShiftPressed()) {
               _selectRangeTo(id, orderedIds);
             } else if (SelectableListScope.isModifierPressed()) {
