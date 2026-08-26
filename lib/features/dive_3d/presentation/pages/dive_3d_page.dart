@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_3d/application/compare_providers.dart';
 import 'package:submersion/features/dive_3d/application/providers.dart';
 import 'package:submersion/features/dive_3d/application/tissue_providers.dart';
 import 'package:submersion/features/dive_3d/domain/compare/comparison_profile.dart';
 import 'package:submersion/features/dive_3d/domain/entities/dive_3d_scene_data.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/axis_frame.dart';
+import 'package:submersion/features/dive_3d/domain/geometry/dive_axes.dart';
+import 'package:submersion/features/dive_3d/domain/geometry/z_axis_spec.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
 import 'package:submersion/features/dive_3d/domain/metric_palette.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
@@ -16,9 +20,12 @@ import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_picker.
 import 'package:submersion/features/dive_3d/presentation/renderer/axis_labels.dart';
 import 'package:submersion/features/dive_3d/presentation/renderer/hover_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/renderer/tissue_chrome_painters.dart';
+import 'package:submersion/features/dive_3d/presentation/dive_chrome.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/compare_profile_3d_view.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
+import 'package:submersion/features/dive_3d/presentation/widgets/dive_hover_tooltip.dart';
+import 'package:submersion/features/dive_3d/presentation/widgets/dive_readout_rows.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/scene_readout_panel.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/time_scrub_bar.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/tissue_hover_tooltip.dart';
@@ -27,6 +34,8 @@ import 'package:submersion/features/dive_3d/presentation/widgets/tissue_tooltip_
 import 'package:submersion/features/dive_3d/presentation/widgets/tissue_readout_panel.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart'
+    show settingsProvider;
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Which scene the 3D page is showing.
@@ -58,8 +67,38 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
   final ValueNotifier<ScenePick?> _hoverPick = ValueNotifier(null);
   late final AnimationController _player;
   late SceneKind _sceneKind;
-  SceneMetric _metric = SceneMetric.depth;
-  Set<SceneOverlay> _overlays = SceneOverlay.values.toSet();
+  SceneMetric _colorMetric = SceneMetric.depth;
+  SceneMetric? _zMetric;
+  bool _zInitialized = false;
+  // Color follows the Z metric until the diver picks a color chip.
+  bool _colorFollowsZ = true;
+  Set<SceneOverlay> _overlays = {
+    SceneOverlay.ceiling,
+    SceneOverlay.markers,
+    SceneOverlay.shadows,
+  };
+
+  void _initZ(Dive3dSceneData data) {
+    if (_zInitialized) return;
+    _zInitialized = true;
+    final z = data.zAxisMetrics.contains(SceneMetric.temperature)
+        ? SceneMetric.temperature
+        : null;
+    _zMetric = z;
+    if (_colorFollowsZ) _colorMetric = z ?? SceneMetric.depth;
+  }
+
+  void _selectZ(SceneMetric? z) {
+    setState(() {
+      _zMetric = z;
+      if (_colorFollowsZ) _colorMetric = z ?? SceneMetric.depth;
+    });
+  }
+
+  String _zTitle(ZAxisInput z) {
+    final name = _metricLabel(z.metric);
+    return z.spec.symbol.isEmpty ? name : '$name (${z.spec.symbol})';
+  }
 
   @override
   void initState() {
@@ -104,23 +143,77 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
 
   Widget _buildDiveBody() {
     final sceneData = ref.watch(dive3dSceneDataProvider(widget.diveId)).value;
+    if (sceneData == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    _initZ(sceneData);
     final scene = ref
         .watch(
           dive3dGeometryProvider((
             diveId: widget.diveId,
-            colorMetric: _metric,
-            zMetric: null,
+            colorMetric: _colorMetric,
+            zMetric: _zMetric,
           )),
         )
         .value;
-    if (sceneData == null || scene == null) {
+    if (scene == null) {
       return const Center(child: CircularProgressIndicator());
     }
+    final zAxis = ref.watch(
+      dive3dZAxisProvider((diveId: widget.diveId, zMetric: _zMetric)),
+    );
+    final settings = ref.watch(settingsProvider);
+    final units = UnitFormatter(settings);
+    final l10n = context.l10n;
+    final axes = buildDiveAxes(
+      bounds: scene.bounds,
+      depthTicks: depthAxisTicks(
+        maxDepthMeters: sceneData.maxDepthMeters,
+        stepMeters: settings.depthUnit == DepthUnit.feet ? 7.62 : 10.0,
+        toDisplay: units.convertDepth,
+      ),
+      timeTicks: timeAxisTicks(sceneData.durationSeconds),
+      zAxis: zAxis?.spec,
+      depthTitle: l10n.dive3d_axis_depth(units.depthSymbol),
+      timeTitle: l10n.dive3d_axis_time,
+      zTitle: zAxis == null ? null : _zTitle(zAxis),
+    );
+    final scrubPath = scene.scrubPath!;
     return _sceneScaffold(
       scene: scene,
-      readout: SceneReadoutPanel(data: sceneData, position: _position),
+      readout: SceneReadoutPanel(
+        data: sceneData,
+        position: _position,
+        emphasize: _zMetric,
+      ),
       controls: _buildDiveControls(sceneData),
-      onMarkerTap: (marker) => _showMarkerSheet(context, marker),
+      onMarkerTap: (marker) => _showMarkerSheet(context, sceneData, marker),
+      chromeMode: SceneChromeMode.framed,
+      picker: PathHoverPicker(scrubPath),
+      axisFrame: axes.frame,
+      axisLabels: axes.labels,
+      chromeStyle: diveChromeStyle(context),
+      showPosePresets: true,
+      tooltip: ValueListenableBuilder<ScenePick?>(
+        valueListenable: _hoverPick,
+        builder: (context, pick, _) {
+          final payload = pick?.payload;
+          if (pick == null || payload is! PathPick) {
+            return const SizedBox.shrink();
+          }
+          final t =
+              scrubPath.normalizedTimes[payload.index] *
+              sceneData.durationSeconds;
+          return CustomSingleChildLayout(
+            delegate: TissueTooltipLayoutDelegate(pick.screenPos),
+            child: DiveHoverTooltip(
+              data: sceneData,
+              timestampSeconds: t,
+              emphasize: _zMetric,
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -219,6 +312,8 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
     Widget? tooltip,
     SceneChromeMode chromeMode = SceneChromeMode.none,
     HoverPicker? picker,
+    TissueChromeStyle? chromeStyle,
+    bool showPosePresets = false,
   }) {
     return Column(
       children: [
@@ -234,7 +329,10 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
                   surfaceGrid: surfaceGrid,
                   axisFrame: axisFrame,
                   axisLabels: axisLabels,
-                  chromeStyle: axisFrame == null ? null : _chromeStyle(context),
+                  chromeStyle:
+                      chromeStyle ??
+                      (axisFrame == null ? null : _chromeStyle(context)),
+                  showPosePresets: showPosePresets,
                   hoverPick: chromeMode == SceneChromeMode.none
                       ? null
                       : _hoverPick,
@@ -299,11 +397,40 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         _sceneSwitcher(),
+        PopupMenuButton<String>(
+          key: const ValueKey('dive3dZAxisMenu'),
+          tooltip: context.l10n.dive3d_zAxis,
+          onSelected: (v) =>
+              _selectZ(v == 'none' ? null : SceneMetric.values.byName(v)),
+          itemBuilder: (context) => [
+            CheckedPopupMenuItem(
+              value: 'none',
+              checked: _zMetric == null,
+              child: Text(context.l10n.dive3d_zAxis_none),
+            ),
+            for (final metric in sceneData.zAxisMetrics)
+              CheckedPopupMenuItem(
+                value: metric.name,
+                checked: _zMetric == metric,
+                child: Text(_metricLabel(metric)),
+              ),
+          ],
+          child: Chip(
+            avatar: const Icon(Icons.swap_vert, size: 16),
+            label: Text(
+              '${context.l10n.dive3d_zAxis}: '
+              '${_zMetric == null ? context.l10n.dive3d_zAxis_none : _metricLabel(_zMetric!)}',
+            ),
+          ),
+        ),
         for (final metric in sceneData.availableMetrics)
           ChoiceChip(
             label: Text(_metricLabel(metric)),
-            selected: _metric == metric,
-            onSelected: (_) => setState(() => _metric = metric),
+            selected: _colorMetric == metric,
+            onSelected: (_) => setState(() {
+              _colorMetric = metric;
+              _colorFollowsZ = false;
+            }),
           ),
         PopupMenuButton<SceneOverlay>(
           icon: const Icon(Icons.layers),
@@ -364,7 +491,18 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
     };
   }
 
-  void _showMarkerSheet(BuildContext context, SceneMarker marker) {
+  void _showMarkerSheet(
+    BuildContext context,
+    Dive3dSceneData data,
+    SceneMarker marker,
+  ) {
+    final rows = diveReadoutRows(
+      data: data,
+      timestampSeconds: marker.timestampSeconds.toDouble(),
+      units: UnitFormatter(ref.read(settingsProvider)),
+      l10n: context.l10n,
+      emphasize: _zMetric,
+    );
     showModalBottomSheet<void>(
       context: context,
       builder: (context) => Padding(
@@ -378,7 +516,23 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            Text('${marker.timestampSeconds ~/ 60} min'),
+            for (final row in rows)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    Expanded(child: Text(row.label)),
+                    Text(
+                      row.value,
+                      style: TextStyle(
+                        fontWeight: row.emphasized
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
