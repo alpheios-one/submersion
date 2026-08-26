@@ -415,11 +415,6 @@ class Dive extends Equatable {
     return totalGasLiters / minutes / avgPressureBar;
   }
 
-  /// Whether any cylinder carries a usable volume, the one input volumetric
-  /// (L/min) SAC needs and dive computers do not report (issue #386).
-  bool get hasCylinderVolume =>
-      tanks.any((t) => t.volume != null && t.volume! > 0);
-
   /// Air consumption rate in pressure units per minute (bar/min or psi/min)
   /// This is a simpler calculation that doesn't require tank volume.
   /// It calculates the average pressure drop per minute adjusted for depth.

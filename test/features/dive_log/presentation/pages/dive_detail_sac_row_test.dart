@@ -157,6 +157,34 @@ void main() {
       );
     });
 
+    testWidgets('still falls back when only a stage bottle has a volume', (
+      tester,
+    ) async {
+      // The back gas (the tank sacPressure reads) has pressures but no size;
+      // a stage carries a size but no pressures. No cylinder can yield L/min,
+      // so the row must fall back and the hint must still point at volume.
+      final dive = reportedDive(volume: null).copyWith(
+        tanks: [
+          ...reportedDive(volume: null).tanks,
+          const DiveTank(
+            id: 'stage-1',
+            volume: 11.1,
+            gasMix: GasMix(o2: 50.0, he: 0.0),
+            role: TankRole.stage,
+            order: 1,
+          ),
+        ],
+      );
+      await pumpWith(
+        tester,
+        const AppSettings(sacUnit: SacUnit.litersPerMin),
+        dive: dive,
+      );
+
+      expect(find.text('1.5 bar/min'), findsOneWidget);
+      expect(find.byType(SacVolumeHint), findsOneWidget);
+    });
+
     testWidgets('shows no hint in the pressure lane', (tester) async {
       await pumpWith(
         tester,

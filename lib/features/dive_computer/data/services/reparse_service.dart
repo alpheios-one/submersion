@@ -685,7 +685,10 @@ class ReparseService {
             // Computers report pressure, not cylinder size: a volume the
             // parse lacks was entered by the diver (or filled from the
             // default preset), so only overwrite it with a reported one.
-            volume: Value.absentIfNull(tank.volumeLiters),
+            // Zero means "unreported" throughout the tank code.
+            volume: (tank.volumeLiters ?? 0) > 0
+                ? Value(tank.volumeLiters)
+                : const Value.absent(),
             workingPressure: const Value.absent(),
             startPressure: Value(tank.startPressure),
             endPressure: Value(tank.endPressure),

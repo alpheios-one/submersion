@@ -4081,11 +4081,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       }
       // No cylinder volume (the norm for dive-computer downloads): show the
       // pressure lane and say why, rather than hiding the row and leaving
-      // the L/min preference looking broken (issue #386). With no pressure
-      // data either there is nothing to fall back to.
-      if (dive.hasCylinderVolume || dive.sacPressure == null) {
-        return const SizedBox.shrink();
-      }
+      // the L/min preference looking broken (issue #386). A pressure SAC
+      // with no volumetric one means no cylinder with a pressure drop has a
+      // volume, whatever a stage bottle carries, so the hint is accurate.
+      // With no pressure data either there is nothing to fall back to.
+      if (dive.sacPressure == null) return const SizedBox.shrink();
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
