@@ -114,6 +114,48 @@ void main() {
     return container;
   }
 
+  // Issue #1188: the scroll-controlled sheet grew until it touched the top
+  // edge of the screen. Its drag handle then sat inside Android's
+  // notification-shade swipe zone, and with no close action the sheet became
+  // impossible to dismiss.
+  testWidgets('the sheet stops short of the top edge on a phone', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(360, 560));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await pumpSheetRoute(tester);
+    final sheet = tester.getRect(find.byType(BottomSheet));
+    expect(sheet.top, greaterThan(0));
+  });
+
+  testWidgets('the Close action dismisses the sheet', (tester) async {
+    await pumpSheetRoute(tester);
+    expect(find.byType(TerrainAppearanceSheet), findsOneWidget);
+    await tester.tap(
+      find.byKey(const ValueKey('terrainAppearanceCloseButton')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(TerrainAppearanceSheet), findsNothing);
+  });
+
+  testWidgets('the Close action stays reachable when the body scrolls', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(360, 560));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await pumpSheetRoute(tester);
+    final closeButton = find.byKey(
+      const ValueKey('terrainAppearanceCloseButton'),
+    );
+    final before = tester.getRect(closeButton);
+    await tester.drag(
+      find.byKey(const ValueKey('seascapeBandedSwitch')),
+      const Offset(0, -200),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.getRect(closeButton), before);
+  });
+
   testWidgets('banded switch writes through to settings', (tester) async {
     final container = await pumpSheet(tester);
     expect(
