@@ -26,6 +26,11 @@ void main() {
     expect(PlaceNameLanguage.normalize('de'), 'de');
   });
 
+  test('normalize tolerates case and whitespace', () {
+    expect(PlaceNameLanguage.normalize(' DE '), 'de');
+    expect(PlaceNameLanguage.normalize('Zh'), 'zh');
+  });
+
   test('normalize falls back to English for unknown, null or blank', () {
     expect(PlaceNameLanguage.normalize('xx'), 'en');
     expect(PlaceNameLanguage.normalize(null), 'en');

@@ -14,7 +14,8 @@ import 'dart:io';
 /// The geocoding paths talk to Nominatim through `dart:io HttpClient`, so the
 /// only seam that does not require a real socket is [HttpOverrides]. Every
 /// request the service makes is captured here so the tests can assert on the
-/// English pin (#214) that lives in the URI *and* in the request headers.
+/// language the caller asked for (issue #1187), which must reach both the URI
+/// and the request headers.
 class FakeNominatim {
   FakeNominatim({this.statusCode = 200, this.body = '{}', this.bodyFor});
 

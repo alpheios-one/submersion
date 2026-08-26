@@ -25,7 +25,12 @@ abstract final class PlaceNameLanguage {
   ];
 
   /// A supported code, or [defaultCode] for anything else. A synced peer on a
-  /// newer build could send a code this build does not know.
-  static String normalize(String? code) =>
-      code != null && supportedCodes.contains(code) ? code : defaultCode;
+  /// newer build could send a code this build does not know, and a hand-edited
+  /// or padded value should not silently fall back to English.
+  static String normalize(String? code) {
+    final cleaned = code?.trim().toLowerCase();
+    return cleaned != null && supportedCodes.contains(cleaned)
+        ? cleaned
+        : defaultCode;
+  }
 }
