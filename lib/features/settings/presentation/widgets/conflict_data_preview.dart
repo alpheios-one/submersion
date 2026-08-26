@@ -34,7 +34,8 @@ const _alwaysHidden = <String>{
 
 /// Fields an entity renders some other way, and so must not repeat as raw
 /// columns. Quality findings store facts, not prose: `detectorId` and `params`
-/// become a localized sentence, so the raw values would only be noise.
+/// become a localized sentence, so the raw values would only be noise -- but
+/// only once that sentence has actually been built.
 const _entityHidden = <String, Set<String>>{
   'qualityFindings': {'detectorId', 'detectorVersion', 'params', 'category'},
 };
@@ -127,9 +128,16 @@ List<ConflictPreviewRow> conflictPreviewRows({
   required Map<String, dynamic> data,
   required List<ConflictReference> references,
 }) {
+  final message = entityType == 'qualityFindings'
+      ? _findingMessage(l10n, findingFormatters, data)
+      : null;
+
   final hidden = {
     ..._alwaysHidden,
-    ...?_entityHidden[entityType],
+    // Only drop the columns a rendered sentence replaced. If the row could
+    // not be read, hiding them too would leave the user with less than the
+    // raw preview gave them.
+    if (message != null) ...?_entityHidden[entityType],
     for (final reference in references) reference.field,
   };
   final preferred = _preferredScalars(data, hidden);
@@ -150,9 +158,6 @@ List<ConflictPreviewRow> conflictPreviewRows({
       ),
   ];
 
-  final message = entityType == 'qualityFindings'
-      ? _findingMessage(l10n, findingFormatters, data)
-      : null;
   if (message != null) {
     rows.add((
       label: l10n.settings_conflict_ref_finding,

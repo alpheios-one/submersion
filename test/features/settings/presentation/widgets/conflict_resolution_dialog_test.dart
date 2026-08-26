@@ -242,6 +242,97 @@ void main() {
     expect(find.textContaining('2700'), findsNothing);
   });
 
+  testWidgets('shows nothing at all for a side with no data', (tester) async {
+    await pumpDialog(
+      tester,
+      SyncConflict(
+        entityType: 'diveTags',
+        recordId: 'dt-1',
+        localData: const {},
+        remoteData: const {'id': 'dt-1', 'tagId': 't-1'},
+        localModified: DateTime(2026, 3, 28),
+        remoteModified: DateTime(2026, 3, 29),
+      ),
+    );
+
+    expect(find.text('No data available'), findsOneWidget);
+  });
+
+  testWidgets('falls back to raw columns when a finding cannot be read', (
+    tester,
+  ) async {
+    // params is not valid JSON, so the localized sentence cannot be built.
+    // Hiding detectorId and params only makes sense when the sentence
+    // replaced them; without it the user would be left with nothing at all.
+    await pumpDialog(
+      tester,
+      SyncConflict(
+        entityType: 'qualityFindings',
+        recordId: 'qf-1',
+        localData: const {
+          'id': 'qf-1',
+          'detectorId': 'depth_spike',
+          'detectorVersion': 1,
+          'category': 'profile',
+          'severity': 'warning',
+          'status': 'open',
+          'params': 'not json at all',
+          'createdAt': 1786556582600,
+        },
+        remoteData: const {
+          'id': 'qf-1',
+          'detectorId': 'depth_spike',
+          'detectorVersion': 1,
+          'category': 'profile',
+          'severity': 'critical',
+          'status': 'open',
+          'params': 'not json at all',
+          'createdAt': 1786556582600,
+        },
+        localModified: DateTime(2026, 3, 28),
+        remoteModified: DateTime(2026, 3, 29),
+      ),
+    );
+
+    expect(find.text('Finding:'), findsNothing);
+    expect(find.text('detectorId:'), findsNWidgets(2));
+    expect(find.text('depth_spike'), findsNWidgets(2));
+  });
+
+  testWidgets('falls back to raw columns for an unreadable finding category', (
+    tester,
+  ) async {
+    // A category written by a newer schema is not a value this build knows.
+    await pumpDialog(
+      tester,
+      SyncConflict(
+        entityType: 'qualityFindings',
+        recordId: 'qf-2',
+        localData: const {
+          'id': 'qf-2',
+          'detectorId': 'depth_spike',
+          'category': 'somethingNewer',
+          'severity': 'warning',
+          'status': 'open',
+          'params': '{}',
+        },
+        remoteData: const {
+          'id': 'qf-2',
+          'detectorId': 'depth_spike',
+          'category': 'somethingNewer',
+          'severity': 'critical',
+          'status': 'open',
+          'params': '{}',
+        },
+        localModified: DateTime(2026, 3, 28),
+        remoteModified: DateTime(2026, 3, 29),
+      ),
+    );
+
+    expect(find.text('Finding:'), findsNothing);
+    expect(find.text('detectorId:'), findsNWidgets(2));
+  });
+
   testWidgets('renders a quality finding as its localized message', (
     tester,
   ) async {

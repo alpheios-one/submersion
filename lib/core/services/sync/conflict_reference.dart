@@ -136,6 +136,14 @@ class ConflictReferenceResolver {
     'startDate',
   ];
 
+  /// Every entity type a foreign key can point at. Exposed so the dialog's
+  /// label table can prove it covers the whole set rather than silently
+  /// falling back to a humanized entity name for a target added later.
+  static Set<String> get targetTypes => {
+    ..._defaultTargets.values,
+    for (final columns in _targetOverrides.values) ...columns.values,
+  };
+
   /// The entity type [field] on an [entityType] record points at, or null when
   /// the column is not a foreign key.
   static String? targetTypeFor(String entityType, String field) =>
