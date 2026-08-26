@@ -44,6 +44,10 @@ void main() {
       child: const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
+        // Every finder below matches an English label, so pin the locale
+        // rather than depend on the host machine's, which flutter_test
+        // forwards.
+        locale: Locale('en'),
         home: DefaultVisibleMetricsPage(),
       ),
     );
