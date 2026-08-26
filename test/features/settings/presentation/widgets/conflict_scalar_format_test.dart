@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -11,10 +13,22 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 /// metric depth to an imperial diver and an epoch integer to everyone.
 void main() {
   late AppLocalizations l10n;
+  String? savedLocale;
 
   setUpAll(() async {
     l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    // UnitFormatter builds bare DateFormats, which resolve against
+    // Intl.defaultLocale -- a process global. Unpinned, this file rides on
+    // intl's implicit fallback: under ar_EG, fa, bn or ne the year renders in
+    // Eastern digits and the assertions below stop matching. This is a pure
+    // unit test with no MaterialApp, so the date symbols have to be loaded
+    // before the global is assigned or intl throws LocaleDataException.
+    await initializeDateFormatting('en');
+    savedLocale = Intl.defaultLocale;
+    Intl.defaultLocale = 'en';
   });
+
+  tearDownAll(() => Intl.defaultLocale = savedLocale);
 
   String format(UnitFormatter units, String key, Object value) =>
       formatConflictScalar(l10n, units, key, value);
