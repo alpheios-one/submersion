@@ -53,6 +53,9 @@ Widget _app(ProviderContainer container) {
   return UncontrolledProviderScope(
     container: container,
     child: const MaterialApp(
+      // Pinned so assertions on English labels ("Max", "Apply Filters") do not
+      // depend on the host machine's locale, which flutter_test forwards.
+      locale: Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: _SheetLauncher(),

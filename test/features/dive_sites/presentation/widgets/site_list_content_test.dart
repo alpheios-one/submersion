@@ -1053,6 +1053,7 @@ void main() {
       await tester.pumpWidget(
         testApp(
           overrides: overrides,
+          locale: const Locale('en'),
           child: const SiteListContent(showAppBar: false),
         ),
       );
@@ -1077,6 +1078,7 @@ void main() {
       await tester.pumpWidget(
         testApp(
           overrides: overrides,
+          locale: const Locale('en'),
           child: const SiteListContent(showAppBar: false),
         ),
       );
@@ -1098,6 +1100,7 @@ void main() {
       await tester.pumpWidget(
         testApp(
           overrides: overrides,
+          locale: const Locale('en'),
           child: const SiteListContent(showAppBar: false),
         ),
       );
@@ -1120,6 +1123,7 @@ void main() {
       await tester.pumpWidget(
         testApp(
           overrides: overrides,
+          locale: const Locale('en'),
           child: const SiteListContent(showAppBar: false),
         ),
       );
@@ -1139,6 +1143,7 @@ void main() {
       await tester.pumpWidget(
         testApp(
           overrides: overrides,
+          locale: const Locale('en'),
           child: const SiteListContent(showAppBar: false),
         ),
       );
@@ -1158,6 +1163,7 @@ void main() {
       await tester.pumpWidget(
         testApp(
           overrides: overrides,
+          locale: const Locale('en'),
           child: const SiteListContent(showAppBar: false),
         ),
       );
