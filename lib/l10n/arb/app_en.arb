@@ -3297,6 +3297,63 @@
   "diveLog_listPage_menuAdvancedSearch": "Advanced Search",
   "diveLog_listPage_menuDiveNumbering": "Dive Numbering",
   "diveLog_listPage_menuMatchSites": "Match Dives to Sites",
+  "diveLog_listPage_menuFetchConditions": "Fetch Conditions for All Dives",
+  "diveLog_fetchConditions_confirmTitle": "Fetch conditions?",
+  "diveLog_fetchConditions_confirmBody": "{count, plural, =1{1 dive is missing conditions.} other{{count} dives are missing conditions.}} Only empty fields are filled, so nothing you have already entered will change.",
+  "@diveLog_fetchConditions_confirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveLog_fetchConditions_confirmAction": "Fetch",
+  "diveLog_fetchConditions_noneNeeded": "No dives are missing conditions.",
+  "diveLog_fetchConditions_progressTitle": "Fetching conditions",
+  "diveLog_fetchConditions_progressCount": "{completed} of {total}",
+  "@diveLog_fetchConditions_progressCount": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "diveLog_fetchConditions_summaryTitle": "Conditions fetched",
+  "diveLog_fetchConditions_summaryFilled": "{count, plural, =1{1 dive updated} other{{count} dives updated}}",
+  "@diveLog_fetchConditions_summaryFilled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveLog_fetchConditions_summaryUnavailable": "{count, plural, =1{1 dive had no data available} other{{count} dives had no data available}}",
+  "@diveLog_fetchConditions_summaryUnavailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveLog_fetchConditions_summaryUnchanged": "{count, plural, =1{1 dive had nothing to fill} other{{count} dives had nothing to fill}}",
+  "@diveLog_fetchConditions_summaryUnchanged": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveLog_fetchConditions_summaryCancelled": "{count, plural, =1{Stopped early; 1 dive was processed.} other{Stopped early; {count} dives were processed.}}",
+  "@diveLog_fetchConditions_summaryCancelled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "diveLog_sighting_decreaseCount": "Decrease count",
   "@diveLog_sighting_decreaseCount": {
     "description": "Tooltip: decrease the sighting count"

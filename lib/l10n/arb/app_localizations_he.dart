@@ -5916,6 +5916,84 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_listPage_menuMatchSites => 'התאמת צלילות לאתרים';
 
   @override
+  String get diveLog_listPage_menuFetchConditions => 'אחזור תנאים לכל הצלילות';
+
+  @override
+  String get diveLog_fetchConditions_confirmTitle => 'לאחזר תנאים?';
+
+  @override
+  String diveLog_fetchConditions_confirmBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ב-$count צלילות חסרים תנאים.',
+      one: 'בצלילה אחת חסרים תנאים.',
+    );
+    return '$_temp0 רק שדות ריקים ימולאו, ושום דבר שכבר הזנת לא ישתנה.';
+  }
+
+  @override
+  String get diveLog_fetchConditions_confirmAction => 'אחזור';
+
+  @override
+  String get diveLog_fetchConditions_noneNeeded => 'לא חסרים תנאים באף צלילה.';
+
+  @override
+  String get diveLog_fetchConditions_progressTitle => 'מאחזר תנאים';
+
+  @override
+  String diveLog_fetchConditions_progressCount(int completed, int total) {
+    return '$completed מתוך $total';
+  }
+
+  @override
+  String get diveLog_fetchConditions_summaryTitle => 'התנאים אוחזרו';
+
+  @override
+  String diveLog_fetchConditions_summaryFilled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות עודכנו',
+      one: 'צלילה אחת עודכנה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnavailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ל-$count צלילות לא היו נתונים זמינים',
+      one: 'לצלילה אחת לא היו נתונים זמינים',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnchanged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ב-$count צלילות לא היה מה למלא',
+      one: 'בצלילה אחת לא היה מה למלא',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryCancelled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'הופסק מוקדם; $count צלילות עובדו.',
+      one: 'הופסק מוקדם; צלילה אחת עובדה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_sighting_decreaseCount => 'הקטנת הכמות';
 
   @override

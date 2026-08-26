@@ -6069,6 +6069,87 @@ class AppLocalizationsDe extends AppLocalizations {
       'Tauchgänge Tauchplätzen zuordnen';
 
   @override
+  String get diveLog_listPage_menuFetchConditions =>
+      'Bedingungen für alle Tauchgänge abrufen';
+
+  @override
+  String get diveLog_fetchConditions_confirmTitle => 'Bedingungen abrufen?';
+
+  @override
+  String diveLog_fetchConditions_confirmBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Bei $count Tauchgängen fehlen die Bedingungen.',
+      one: 'Bei 1 Tauchgang fehlen die Bedingungen.',
+    );
+    return '$_temp0 Es werden nur leere Felder gefüllt; bereits eingetragene Werte bleiben unverändert.';
+  }
+
+  @override
+  String get diveLog_fetchConditions_confirmAction => 'Abrufen';
+
+  @override
+  String get diveLog_fetchConditions_noneNeeded =>
+      'Bei keinem Tauchgang fehlen Bedingungen.';
+
+  @override
+  String get diveLog_fetchConditions_progressTitle =>
+      'Bedingungen werden abgerufen';
+
+  @override
+  String diveLog_fetchConditions_progressCount(int completed, int total) {
+    return '$completed von $total';
+  }
+
+  @override
+  String get diveLog_fetchConditions_summaryTitle => 'Bedingungen abgerufen';
+
+  @override
+  String diveLog_fetchConditions_summaryFilled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge aktualisiert',
+      one: '1 Tauchgang aktualisiert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnavailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Für $count Tauchgänge lagen keine Daten vor',
+      one: 'Für 1 Tauchgang lagen keine Daten vor',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnchanged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Bei $count Tauchgängen gab es nichts zu füllen',
+      one: 'Bei 1 Tauchgang gab es nichts zu füllen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryCancelled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Vorzeitig beendet; $count Tauchgänge wurden verarbeitet.',
+      one: 'Vorzeitig beendet; 1 Tauchgang wurde verarbeitet.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_sighting_decreaseCount => 'Anzahl verringern';
 
   @override

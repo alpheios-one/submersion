@@ -5946,6 +5946,85 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_listPage_menuMatchSites => 'مطابقة الغوصات بالمواقع';
 
   @override
+  String get diveLog_listPage_menuFetchConditions => 'جلب الظروف لجميع الغطسات';
+
+  @override
+  String get diveLog_fetchConditions_confirmTitle => 'جلب الظروف؟';
+
+  @override
+  String diveLog_fetchConditions_confirmBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تنقص الظروف في $count غطسات.',
+      one: 'تنقص الظروف في غطسة واحدة.',
+    );
+    return '$_temp0 تُملأ الحقول الفارغة فقط، ولن يتغير أي شيء أدخلته من قبل.';
+  }
+
+  @override
+  String get diveLog_fetchConditions_confirmAction => 'جلب';
+
+  @override
+  String get diveLog_fetchConditions_noneNeeded =>
+      'لا توجد غطسات تنقصها الظروف.';
+
+  @override
+  String get diveLog_fetchConditions_progressTitle => 'جارٍ جلب الظروف';
+
+  @override
+  String diveLog_fetchConditions_progressCount(int completed, int total) {
+    return '$completed من $total';
+  }
+
+  @override
+  String get diveLog_fetchConditions_summaryTitle => 'تم جلب الظروف';
+
+  @override
+  String diveLog_fetchConditions_summaryFilled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تحديث $count غطسات',
+      one: 'تم تحديث غطسة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnavailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'لا تتوفر بيانات لـ $count غطسات',
+      one: 'لا تتوفر بيانات لغطسة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnchanged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'لا يوجد ما يُملأ في $count غطسات',
+      one: 'لا يوجد ما يُملأ في غطسة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryCancelled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'توقّف مبكرًا؛ تمت معالجة $count غطسات.',
+      one: 'توقّف مبكرًا؛ تمت معالجة غطسة واحدة.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_sighting_decreaseCount => 'تقليل العدد';
 
   @override

@@ -5768,6 +5768,79 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_listPage_menuMatchSites => '将潜水匹配到潜水点';
 
   @override
+  String get diveLog_listPage_menuFetchConditions => '获取所有潜水的环境条件';
+
+  @override
+  String get diveLog_fetchConditions_confirmTitle => '获取环境条件？';
+
+  @override
+  String diveLog_fetchConditions_confirmBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '有 $count 次潜水缺少环境条件。',
+    );
+    return '$_temp0仅填充空白字段，您已填写的内容不会改变。';
+  }
+
+  @override
+  String get diveLog_fetchConditions_confirmAction => '获取';
+
+  @override
+  String get diveLog_fetchConditions_noneNeeded => '没有潜水缺少环境条件。';
+
+  @override
+  String get diveLog_fetchConditions_progressTitle => '正在获取环境条件';
+
+  @override
+  String diveLog_fetchConditions_progressCount(int completed, int total) {
+    return '$completed / $total';
+  }
+
+  @override
+  String get diveLog_fetchConditions_summaryTitle => '环境条件已获取';
+
+  @override
+  String diveLog_fetchConditions_summaryFilled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已更新 $count 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnavailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水没有可用数据',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnchanged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水没有可填充的内容',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryCancelled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '提前停止；已处理 $count 次潜水。',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_sighting_decreaseCount => '减少数量';
 
   @override

@@ -6073,6 +6073,88 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_listPage_menuMatchSites => 'Associa le immersioni ai siti';
 
   @override
+  String get diveLog_listPage_menuFetchConditions =>
+      'Recupera le condizioni di tutte le immersioni';
+
+  @override
+  String get diveLog_fetchConditions_confirmTitle =>
+      'Recuperare le condizioni?';
+
+  @override
+  String diveLog_fetchConditions_confirmBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'A $count immersioni mancano le condizioni.',
+      one: 'A 1 immersione mancano le condizioni.',
+    );
+    return '$_temp0 Vengono compilati solo i campi vuoti: nulla di quanto hai già inserito verrà modificato.';
+  }
+
+  @override
+  String get diveLog_fetchConditions_confirmAction => 'Recupera';
+
+  @override
+  String get diveLog_fetchConditions_noneNeeded =>
+      'Nessuna immersione è priva di condizioni.';
+
+  @override
+  String get diveLog_fetchConditions_progressTitle =>
+      'Recupero delle condizioni';
+
+  @override
+  String diveLog_fetchConditions_progressCount(int completed, int total) {
+    return '$completed di $total';
+  }
+
+  @override
+  String get diveLog_fetchConditions_summaryTitle => 'Condizioni recuperate';
+
+  @override
+  String diveLog_fetchConditions_summaryFilled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count immersioni aggiornate',
+      one: '1 immersione aggiornata',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnavailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Nessun dato disponibile per $count immersioni',
+      one: 'Nessun dato disponibile per 1 immersione',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnchanged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Nulla da compilare per $count immersioni',
+      one: 'Nulla da compilare per 1 immersione',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryCancelled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Interrotto in anticipo; $count immersioni sono state elaborate.',
+      one: 'Interrotto in anticipo; 1 immersione è stata elaborata.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_sighting_decreaseCount => 'Diminuisci conteggio';
 
   @override

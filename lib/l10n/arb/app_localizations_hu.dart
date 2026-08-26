@@ -6053,6 +6053,86 @@ class AppLocalizationsHu extends AppLocalizations {
       'Merülések hozzárendelése helyekhez';
 
   @override
+  String get diveLog_listPage_menuFetchConditions =>
+      'Körülmények lekérése minden merüléshez';
+
+  @override
+  String get diveLog_fetchConditions_confirmTitle => 'Lekéri a körülményeket?';
+
+  @override
+  String diveLog_fetchConditions_confirmBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülésből hiányoznak a körülmények.',
+      one: '1 merülésből hiányoznak a körülmények.',
+    );
+    return '$_temp0 Csak az üres mezők töltődnek ki, a már megadott adatok nem változnak.';
+  }
+
+  @override
+  String get diveLog_fetchConditions_confirmAction => 'Lekérés';
+
+  @override
+  String get diveLog_fetchConditions_noneNeeded =>
+      'Egyetlen merülésből sem hiányoznak a körülmények.';
+
+  @override
+  String get diveLog_fetchConditions_progressTitle => 'Körülmények lekérése';
+
+  @override
+  String diveLog_fetchConditions_progressCount(int completed, int total) {
+    return '$completed / $total';
+  }
+
+  @override
+  String get diveLog_fetchConditions_summaryTitle => 'Körülmények lekérve';
+
+  @override
+  String diveLog_fetchConditions_summaryFilled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés frissítve',
+      one: '1 merülés frissítve',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnavailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merüléshez nem volt elérhető adat',
+      one: '1 merüléshez nem volt elérhető adat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnchanged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülésnél nem volt mit kitölteni',
+      one: '1 merülésnél nem volt mit kitölteni',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryCancelled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Korán leállt; $count merülés lett feldolgozva.',
+      one: 'Korán leállt; 1 merülés lett feldolgozva.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_sighting_decreaseCount => 'Darabszám csökkentése';
 
   @override

@@ -19,6 +19,9 @@ import 'package:submersion/features/dive_log/presentation/pages/dive_detail_page
 import 'package:submersion/features/dive_log/presentation/pages/dive_edit_page.dart';
 import 'package:submersion/features/dive_sites/presentation/pages/site_edit_page.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
+import 'package:submersion/features/weather/presentation/widgets/fetch_all_conditions_flow.dart';
 import 'package:submersion/features/dive_log/presentation/providers/highlight_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/view_config_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/add_dive_bottom_sheet.dart';
@@ -97,6 +100,18 @@ class _DiveListPageState extends ConsumerState<DiveListPage> {
           context.push('/dives/new');
         }
       },
+    );
+  }
+
+  /// Backfills missing conditions across the logbook. The list refreshes on
+  /// its own: the fill writes through Drift, so the dive streams tick.
+  Future<void> _fetchAllConditions() async {
+    final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
+    if (!mounted) return;
+    await showFetchAllConditionsFlow(
+      context: context,
+      service: ref.read(bulkConditionsServiceProvider),
+      diverId: diverId,
     );
   }
 
@@ -248,6 +263,8 @@ class _DiveListPageState extends ConsumerState<DiveListPage> {
                 showDiveNumberingDialog(context);
               } else if (value == 'data_quality') {
                 context.push('/dives/quality');
+              } else if (value == 'fetch_conditions') {
+                _fetchAllConditions();
               } else if (value.startsWith('view_')) {
                 final mode = ListViewMode.fromName(
                   value.replaceFirst('view_', ''),
@@ -297,6 +314,20 @@ class _DiveListPageState extends ConsumerState<DiveListPage> {
                       Flexible(
                         child: Text(
                           context.l10n.diveLog_listPage_menuMatchSites,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'fetch_conditions',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.cloud_download_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Flexible(
+                        child: Text(
+                          context.l10n.diveLog_listPage_menuFetchConditions,
                         ),
                       ),
                     ],

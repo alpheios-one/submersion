@@ -51,6 +51,18 @@ import 'package:submersion/features/buddies/domain/entities/buddy.dart'
     as domain;
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 
+/// A dive that a conditions fetch can still do something for: its site carries
+/// coordinates and at least one weather column is empty.
+///
+/// [dateTime] is the dive's wall clock (entry time when recorded, otherwise the
+/// dive date), used to pick the hour to sample from the archive response.
+typedef ConditionsCandidate = ({
+  String id,
+  DateTime dateTime,
+  double latitude,
+  double longitude,
+});
+
 class DiveRepository {
   /// The media dependencies drive the dive-deletion cascade
   /// (orphan-prevention spec 4.2); injectable for tests, self-constructed
@@ -518,6 +530,162 @@ class DiveRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to set GPS on dive: $diveId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// The weather columns a conditions fetch is allowed to fill.
+  ///
+  /// `weatherDescription` is deliberately absent: the provider returns no
+  /// prose, and the column holds the diver's own words when it holds anything.
+  static Expression<bool> _hasConditionsGap(Dives t) =>
+      t.windSpeed.isNull() |
+      t.windDirection.isNull() |
+      t.cloudCover.isNull() |
+      t.precipitation.isNull() |
+      t.humidity.isNull() |
+      t.weatherCode.isNull() |
+      t.airTemp.isNull() |
+      t.surfacePressure.isNull();
+
+  /// Dives a conditions fetch can still fill something in for: the dive has a
+  /// site with coordinates and at least one empty weather column.
+  ///
+  /// Returns coordinates and a sample time rather than hydrated [domain.Dive]
+  /// entities, so scanning a large logbook stays cheap.
+  Future<List<ConditionsCandidate>> getDivesNeedingConditions({
+    String? diverId,
+  }) async {
+    try {
+      final sites = _db.diveSites;
+      final query = _db.select(_db.dives).join([
+        innerJoin(sites, sites.id.equalsExp(_db.dives.siteId)),
+      ]);
+      query.where(
+        sites.latitude.isNotNull() &
+            sites.longitude.isNotNull() &
+            _hasConditionsGap(_db.dives),
+      );
+      if (diverId != null) {
+        query.where(_db.dives.diverId.equals(diverId));
+      }
+      query.orderBy([OrderingTerm.desc(_db.dives.diveDateTime)]);
+
+      final rows = await query.get();
+      final candidates = <ConditionsCandidate>[];
+      for (final row in rows) {
+        final dive = row.readTable(_db.dives);
+        final site = row.readTable(sites);
+        final latitude = site.latitude;
+        final longitude = site.longitude;
+        if (latitude == null || longitude == null) continue;
+        candidates.add((
+          id: dive.id,
+          dateTime: DateTime.fromMillisecondsSinceEpoch(
+            dive.entryTime ?? dive.diveDateTime,
+            isUtc: true,
+          ),
+          latitude: latitude,
+          longitude: longitude,
+        ));
+      }
+      return candidates;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get dives needing conditions',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Stamps fetched conditions onto a dive, filling only columns that are
+  /// currently NULL. Anything the diver already recorded survives untouched:
+  /// an absent [Value] is left out of the UPDATE entirely rather than rewritten.
+  ///
+  /// The provenance stamp is only applied when the dive carries no
+  /// [WeatherSource] yet, so hand-entered weather is never relabelled as
+  /// provider data. Returns whether anything was written.
+  Future<bool> fillDiveConditions(
+    String diveId, {
+    double? windSpeed,
+    CurrentDirection? windDirection,
+    CloudCover? cloudCover,
+    Precipitation? precipitation,
+    double? humidity,
+    int? weatherCode,
+    double? airTemp,
+    double? surfacePressure,
+    required WeatherSource source,
+    required DateTime fetchedAt,
+  }) async {
+    try {
+      final row = await (_db.select(
+        _db.dives,
+      )..where((t) => t.id.equals(diveId))).getSingleOrNull();
+      if (row == null) return false;
+
+      Value<T> fill<T extends Object>(T? current, T? incoming) =>
+          current == null && incoming != null
+          ? Value(incoming)
+          : const Value.absent();
+
+      final wind = fill(row.windSpeed, windSpeed);
+      final windDir = fill(row.windDirection, windDirection?.name);
+      final cloud = fill(row.cloudCover, cloudCover?.name);
+      final precip = fill(row.precipitation, precipitation?.name);
+      final hum = fill(row.humidity, humidity);
+      final code = fill(row.weatherCode, weatherCode);
+      final air = fill(row.airTemp, airTemp);
+      final pressure = fill(row.surfacePressure, surfacePressure);
+
+      final wrote = [
+        wind,
+        windDir,
+        cloud,
+        precip,
+        hum,
+        code,
+        air,
+        pressure,
+      ].any((value) => value.present);
+      if (!wrote) return false;
+
+      final stampProvenance = row.weatherSource == null;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
+        DivesCompanion(
+          windSpeed: wind,
+          windDirection: windDir,
+          cloudCover: cloud,
+          precipitation: precip,
+          humidity: hum,
+          weatherCode: code,
+          airTemp: air,
+          surfacePressure: pressure,
+          weatherSource: stampProvenance
+              ? Value(source.name)
+              : const Value.absent(),
+          weatherFetchedAt: stampProvenance
+              ? Value(fetchedAt.millisecondsSinceEpoch)
+              : const Value.absent(),
+          updatedAt: Value(now),
+        ),
+      );
+      await _syncRepository.markRecordPending(
+        entityType: 'dives',
+        recordId: diveId,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+      return true;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to fill conditions on dive: $diveId',
         error: e,
         stackTrace: stackTrace,
       );
