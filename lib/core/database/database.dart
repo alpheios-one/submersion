@@ -1663,6 +1663,9 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(false))();
   // Locale (language preference: 'system', 'en', 'es', 'fr', etc.)
   TextColumn get locale => text().withDefault(const Constant('system'))();
+  // Language for reverse-geocoded place names, ISO 639-1 (issue #1187, v162)
+  TextColumn get placeNameLanguage =>
+      text().withDefault(const Constant('en'))();
   // Defaults
   TextColumn get defaultDiveType =>
       text().withDefault(const Constant('recreational'))();
@@ -3165,7 +3168,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 161;
+  static const int currentSchemaVersion = 162;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3450,6 +3453,9 @@ class AppDatabase extends _$AppDatabase {
     // v161: diver_settings.default_show_o2_cell_mv, a persisted default for
     // the per-cell O2 mV toggle on the profile chart (issue #1235).
     161,
+    // v162: diver_settings.place_name_language, the synced language used for
+    // reverse-geocoded country/region/town/body of water (issue #1187).
+    162,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4916,6 +4922,22 @@ class AppDatabase extends _$AppDatabase {
         'ALTER TABLE diver_settings ADD COLUMN default_show_o2_cell_mv '
         'INTEGER NOT NULL DEFAULT 0 '
         'CHECK (default_show_o2_cell_mv IN (0, 1))',
+      );
+    }
+  }
+
+  /// v162: place_name_language on diver_settings (issue #1187). Defaults to
+  /// 'en', the language every pre-v162 row was geocoded in (issue #214).
+  Future<void> _assertPlaceNameLanguageColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('place_name_language')) {
+      await customStatement(
+        "ALTER TABLE diver_settings ADD COLUMN place_name_language TEXT "
+        "NOT NULL DEFAULT 'en'",
       );
     }
   }
@@ -8535,6 +8557,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertO2CellMvDefaultColumn();
         }
         if (from < 161) await reportProgress();
+        // v162: place_name_language on diver_settings (issue #1187).
+        if (from < 162) {
+          await _assertPlaceNameLanguageColumn();
+        }
+        if (from < 162) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
