@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/core/utils/app_version.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/app_version.dart';
 import 'package:submersion/features/auto_update/data/repositories/update_preferences.dart';
 import 'package:submersion/features/auto_update/data/services/github_update_service.dart';
 import 'package:submersion/features/auto_update/data/services/sparkle_update_service.dart';
