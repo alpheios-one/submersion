@@ -314,4 +314,36 @@ void main() {
       expect(row.defaultShowO2CellMv, isFalse);
     },
   );
+
+  test(
+    'applies a pre-v162 diver_settings payload missing placeNameLanguage',
+    () async {
+      await db.customStatement('PRAGMA foreign_keys = OFF');
+
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await db
+          .into(db.diverSettings)
+          .insert(
+            DiverSettingsCompanion.insert(
+              id: 'ds-162',
+              diverId: 'diver-1',
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      final exported = await serializer.fetchRecord('diverSettings', 'ds-162');
+      final legacy = Map<String, dynamic>.from(exported!)
+        ..remove('placeNameLanguage');
+      await (db.delete(
+        db.diverSettings,
+      )..where((t) => t.id.equals('ds-162'))).go();
+
+      await serializer.upsertRecord('diverSettings', legacy);
+
+      final row = await (db.select(
+        db.diverSettings,
+      )..where((t) => t.id.equals('ds-162'))).getSingle();
+      expect(row.placeNameLanguage, 'en');
+    },
+  );
 }
