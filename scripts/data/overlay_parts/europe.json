@@ -163,6 +163,68 @@
       "capability": "diving_emergency",
       "availability": "on_call",
       "verified": {"date": "2026-08-26", "via": "facility", "url": "https://ucmmit.gdynia.pl/jednostki-szpitala/klinika-medycyny-hiperbarycznej-i-ratownictwa-morskiego/"}
+    },
+    {
+      "id": "de-kiel",
+      "name": "Schifffahrtmedizinisches Institut der Marine Hyperbaric and Diving Medicine",
+      "country": "DE",
+      "city": "Kronshagen (Kiel)",
+      "phone": "+49-431-5409-88",
+      "capability": "diving_emergency",
+      "availability": "h24",
+      "verified": {"date": "2026-08-26", "via": "facility", "url": "https://www.bundeswehr.de/de/organisation/marine/organisation/schifffahrtmedizinisches-institut"}
+    },
+    {
+      "id": "de-berlin",
+      "name": "Vivantes Klinikum im Friedrichshain Zentrum fur hyperbare Sauerstofftherapie und Tauchmedizin",
+      "country": "DE",
+      "city": "Berlin",
+      "phone": "+49-30-13023-1700",
+      "emergencyPhone": "+49-30-13023-1502",
+      "capability": "diving_emergency",
+      "availability": "h24",
+      "verified": {"date": "2026-08-26", "via": "registry", "url": "https://www.gtuem.org/liste-notfallzentren/c-24_65.html"}
+    },
+    {
+      "id": "nl-amsterdam",
+      "name": "Amsterdam UMC Hyperbare Geneeskunde",
+      "country": "NL",
+      "city": "Amsterdam",
+      "phone": "+31-20-566-4500",
+      "capability": "hyperbaric_unit",
+      "availability": "unknown",
+      "verified": {"date": "2026-08-26", "via": "facility", "url": "https://www.amsterdamumc.nl/nl/hyperbare-geneeskunde/home"}
+    },
+    {
+      "id": "be-brussels",
+      "name": "Hopital Militaire Reine Astrid Oxygenotherapie Hyperbare",
+      "country": "BE",
+      "city": "Brussels",
+      "phone": "+32-2-443-2183",
+      "capability": "hyperbaric_unit",
+      "availability": "unknown",
+      "verified": {"date": "2026-08-26", "via": "facility", "url": "https://www.hopitalmilitaire.be/consultatiediensten_fr.php"}
+    },
+    {
+      "id": "at-graz",
+      "name": "Medizinische Universitat Graz Druckkammer",
+      "country": "AT",
+      "city": "Graz",
+      "phone": "+43-316-385-2056",
+      "emergencyPhone": "+43-316-385-12803",
+      "capability": "diving_emergency",
+      "availability": "h24",
+      "verified": {"date": "2026-08-26", "via": "registry", "url": "https://www.gtuem.org/oesterreich/c-25.html"}
+    },
+    {
+      "id": "ch-geneva",
+      "name": "Hopitaux Universitaires de Geneve HBO-Zentrum",
+      "country": "CH",
+      "city": "Geneva",
+      "phone": "+41-22-372-2244",
+      "capability": "hyperbaric_unit",
+      "availability": "h24",
+      "verified": {"date": "2026-08-26", "via": "registry", "url": "https://www.gtuem.org/schweiz/c-26.html"}
     }
   ]
 }

@@ -140,6 +140,23 @@
       "longitude": -68.3084133
     },
     {
+      "id": "at-graz",
+      "name": "Medizinische Universitat Graz Druckkammer",
+      "country": "AT",
+      "city": "Graz",
+      "phone": "+43-316-385-2056",
+      "emergencyPhone": "+43-316-385-12803",
+      "capability": "diving_emergency",
+      "availability": "h24",
+      "verified": {
+        "date": "2026-08-26",
+        "via": "registry",
+        "url": "https://www.gtuem.org/oesterreich/c-25.html"
+      },
+      "latitude": 47.0708678,
+      "longitude": 15.4382786
+    },
+    {
       "id": "au-alfred",
       "name": "The Alfred Hospital Hyperbaric Medicine Unit",
       "country": "AU",
@@ -255,6 +272,22 @@
       },
       "latitude": -19.3204,
       "longitude": 146.7626
+    },
+    {
+      "id": "be-brussels",
+      "name": "Hopital Militaire Reine Astrid Oxygenotherapie Hyperbare",
+      "country": "BE",
+      "city": "Brussels",
+      "phone": "+32-2-443-2183",
+      "capability": "hyperbaric_unit",
+      "availability": "unknown",
+      "verified": {
+        "date": "2026-08-26",
+        "via": "facility",
+        "url": "https://www.hopitalmilitaire.be/consultatiediensten_fr.php"
+      },
+      "latitude": 50.8467372,
+      "longitude": 4.352493
     },
     {
       "id": "bq-bonaire",
@@ -438,6 +471,22 @@
       "longitude": -123.113952
     },
     {
+      "id": "ch-geneva",
+      "name": "Hopitaux Universitaires de Geneve HBO-Zentrum",
+      "country": "CH",
+      "city": "Geneva",
+      "phone": "+41-22-372-2244",
+      "capability": "hyperbaric_unit",
+      "availability": "h24",
+      "verified": {
+        "date": "2026-08-26",
+        "via": "registry",
+        "url": "https://www.gtuem.org/schweiz/c-26.html"
+      },
+      "latitude": 46.2017559,
+      "longitude": 6.1466014
+    },
+    {
       "id": "cl-santiago-ame",
       "name": "AME Hyperbaric",
       "country": "CL",
@@ -517,6 +566,39 @@
       },
       "latitude": 12.5830104,
       "longitude": -81.6975682
+    },
+    {
+      "id": "de-berlin",
+      "name": "Vivantes Klinikum im Friedrichshain Zentrum fur hyperbare Sauerstofftherapie und Tauchmedizin",
+      "country": "DE",
+      "city": "Berlin",
+      "phone": "+49-30-13023-1700",
+      "emergencyPhone": "+49-30-13023-1502",
+      "capability": "diving_emergency",
+      "availability": "h24",
+      "verified": {
+        "date": "2026-08-26",
+        "via": "registry",
+        "url": "https://www.gtuem.org/liste-notfallzentren/c-24_65.html"
+      },
+      "latitude": 52.5173885,
+      "longitude": 13.3951309
+    },
+    {
+      "id": "de-kiel",
+      "name": "Schifffahrtmedizinisches Institut der Marine Hyperbaric and Diving Medicine",
+      "country": "DE",
+      "city": "Kronshagen (Kiel)",
+      "phone": "+49-431-5409-88",
+      "capability": "diving_emergency",
+      "availability": "h24",
+      "verified": {
+        "date": "2026-08-26",
+        "via": "facility",
+        "url": "https://www.bundeswehr.de/de/organisation/marine/organisation/schifffahrtmedizinisches-institut"
+      },
+      "latitude": 54.341698,
+      "longitude": 10.0752454
     },
     {
       "id": "dk-copenhagen",
@@ -1200,6 +1282,22 @@
       },
       "latitude": -22.9557607,
       "longitude": 14.5071125
+    },
+    {
+      "id": "nl-amsterdam",
+      "name": "Amsterdam UMC Hyperbare Geneeskunde",
+      "country": "NL",
+      "city": "Amsterdam",
+      "phone": "+31-20-566-4500",
+      "capability": "hyperbaric_unit",
+      "availability": "unknown",
+      "verified": {
+        "date": "2026-08-26",
+        "via": "facility",
+        "url": "https://www.amsterdamumc.nl/nl/hyperbare-geneeskunde/home"
+      },
+      "latitude": 52.3730796,
+      "longitude": 4.8924534
     },
     {
       "id": "no-bergen",
