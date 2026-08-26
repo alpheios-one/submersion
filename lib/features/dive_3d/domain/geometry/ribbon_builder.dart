@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:submersion/features/dive_3d/domain/entities/mesh_data.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/scene_bounds.dart';
+import 'package:submersion/features/dive_3d/domain/geometry/strip_indices.dart';
 
 /// Builds the core dive object: the depth-time curve extruded laterally
 /// into a triangle-strip ribbon, plus the translucent curtain that falls
@@ -41,7 +42,7 @@ class RibbonBuilder {
     }
     return MeshData(
       positions: positions,
-      indices: _stripIndices(n),
+      indices: stripIndices(n),
       colors: colors,
       opacity: opacity,
     );
@@ -73,26 +74,9 @@ class RibbonBuilder {
     }
     return MeshData(
       positions: positions,
-      indices: _stripIndices(n),
+      indices: stripIndices(n),
       colors: colors,
       opacity: _curtainOpacity,
     );
-  }
-
-  /// Indices for a strip of n vertex pairs: two triangles per segment.
-  static Uint32List _stripIndices(int pairCount) {
-    if (pairCount < 2) return Uint32List(0);
-    final indices = Uint32List((pairCount - 1) * 6);
-    var j = 0;
-    for (var i = 0; i < pairCount - 1; i++) {
-      final a = i * 2, b = i * 2 + 1, c = i * 2 + 2, d = i * 2 + 3;
-      indices[j++] = a;
-      indices[j++] = b;
-      indices[j++] = c;
-      indices[j++] = b;
-      indices[j++] = d;
-      indices[j++] = c;
-    }
-    return indices;
   }
 }
