@@ -182,10 +182,13 @@ Future<void> shareLogFile(
   );
 }
 
-/// Copy the filtered log entries to clipboard.
+/// Copy the filtered log entries to clipboard, behind the export header.
 ///
-/// The header is prepended even when the filters exclude everything: an empty
-/// excerpt that still names the build is more useful than a bare empty string.
+/// The header is unconditional, so even a one-line excerpt names the build it
+/// came from. That is deliberately not special-cased for an empty list, but it
+/// is also not reachable that way today: the Copy button in
+/// [DebugLogViewerPage] guards on a non-empty list, so an empty filter result
+/// copies nothing at all rather than a bare header.
 Future<void> copyFilteredLogs(
   List<LogEntry> entries, {
   LogEnvironment? environment,
