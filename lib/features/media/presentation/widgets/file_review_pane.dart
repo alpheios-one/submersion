@@ -81,6 +81,7 @@ class FileReviewPane extends ConsumerWidget {
                         file: f,
                         targetDiveId: entry.key,
                         assignableDiveId: assignableDiveId,
+                        captureTimeOffset: state.captureTimeOffset,
                       ),
                   ],
                 ),
@@ -109,6 +110,8 @@ class FileReviewPane extends ConsumerWidget {
                         file: f,
                         targetDiveId: null,
                         assignableDiveId: assignableDiveId,
+                        diagnostic: state.match.diagnostics[f.sourcePath],
+                        captureTimeOffset: state.captureTimeOffset,
                       ),
                   ],
                 ),
@@ -141,7 +144,11 @@ class FileReviewPane extends ConsumerWidget {
           child: ListView(
             children: [
               for (final f in state.files)
-                FileReviewCard(file: f, targetDiveId: null),
+                FileReviewCard(
+                  file: f,
+                  targetDiveId: null,
+                  captureTimeOffset: state.captureTimeOffset,
+                ),
             ],
           ),
         ),
