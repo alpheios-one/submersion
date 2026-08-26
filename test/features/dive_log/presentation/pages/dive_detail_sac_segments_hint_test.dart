@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -200,6 +201,82 @@ void main() {
     );
 
     expect(hintIn(sacCard(tester)), findsNothing);
+  });
+
+  testWidgets('tapping the card\'s hint opens the dive editor', (tester) async {
+    final dive = diveWithProfile(tanks: const [backGasNoVolume]);
+    final base = await getBaseOverrides(
+      settingsNotifier: MockSettingsNotifier(
+        const AppSettings(sacUnit: SacUnit.litersPerMin),
+      ),
+    );
+    final router = GoRouter(
+      initialLocation: '/test',
+      routes: [
+        GoRoute(
+          path: '/test',
+          builder: (context, state) =>
+              DiveDetailPage(diveId: dive.id, embedded: true),
+        ),
+        GoRoute(
+          path: '/dives/:id/edit',
+          builder: (context, state) =>
+              Scaffold(body: Text('EDIT_STUB ${state.pathParameters['id']}')),
+        ),
+      ],
+    );
+    final originalOnError = FlutterError.onError;
+    addTearDown(() => FlutterError.onError = originalOnError);
+    FlutterError.onError = (d) {
+      if (d.toString().contains('overflowed')) return;
+      originalOnError?.call(d);
+    };
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          diveProvider(dive.id).overrideWith((ref) async => dive),
+          diveDataSourcesProvider(
+            dive.id,
+          ).overrideWith((ref) async => <DiveDataSource>[]),
+          profileAnalysisProvider(
+            dive.id,
+          ).overrideWith((ref) async => analysisWithSacSegments()),
+          selectedSegmentationProvider.overrideWith(
+            (ref) => SacSegmentationType.timeInterval,
+          ),
+          gasSwitchesProvider(
+            dive.id,
+          ).overrideWith((ref) async => <GasSwitchWithTank>[]),
+          tankPressuresProvider(
+            dive.id,
+          ).overrideWith((ref) async => <String, List<TankPressurePoint>>{}),
+          sourceProfilesProvider(
+            dive.id,
+          ).overrideWith((ref) async => <String, SourceProfile>{}),
+          weeklyOtuProvider(dive.id).overrideWith((ref) async => 0.0),
+        ],
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    // The Details row has its own hint; scope to the card's.
+    final hint = hintIn(sacCard(tester));
+    expect(hint, findsOneWidget);
+    await tester.ensureVisible(hint);
+    await tester.pump();
+    await tester.tap(hint);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.text('EDIT_STUB ${dive.id}'), findsOneWidget);
   });
 
   testWidgets('does not borrow a stage bottle\'s volume for the back gas', (

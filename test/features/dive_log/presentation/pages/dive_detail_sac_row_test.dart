@@ -44,6 +44,18 @@ void main() {
     );
   }
 
+  /// The detail page renders a profile chart that can overflow an
+  /// unconstrained test viewport. Ignore only that, and forward everything
+  /// else, so a real rendering or navigation failure still fails the test.
+  void ignoreOverflowErrors() {
+    final originalOnError = FlutterError.onError;
+    addTearDown(() => FlutterError.onError = originalOnError);
+    FlutterError.onError = (details) {
+      if (details.toString().contains('overflowed')) return;
+      originalOnError?.call(details);
+    };
+  }
+
   Future<void> pumpWith(
     WidgetTester tester,
     AppSettings settings, {
@@ -73,12 +85,7 @@ void main() {
       ),
     );
 
-    // The detail page renders a profile chart that can overflow an
-    // unconstrained test viewport; swallow layout errors so this stays
-    // scoped to the SAC row, matching the sibling detail-page tests.
-    final originalOnError = FlutterError.onError;
-    FlutterError.onError = (_) {};
-    addTearDown(() => FlutterError.onError = originalOnError);
+    ignoreOverflowErrors();
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
   }
@@ -219,9 +226,7 @@ void main() {
           ),
         ],
       );
-      final originalOnError = FlutterError.onError;
-      FlutterError.onError = (_) {};
-      addTearDown(() => FlutterError.onError = originalOnError);
+      ignoreOverflowErrors();
 
       await tester.pumpWidget(
         ProviderScope(
