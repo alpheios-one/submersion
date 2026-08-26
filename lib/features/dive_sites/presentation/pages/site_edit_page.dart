@@ -1416,10 +1416,14 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
       });
 
       if (mounted) {
+        // The position landed in the form either way; say so, but when the
+        // geocoder was unreachable explain why the place fields stayed empty.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              result.accuracy != null
+              result.place.networkFailed
+                  ? context.l10n.diveSites_edit_snackbar_lookupFailed
+                  : result.accuracy != null
                   ? context.l10n
                         .diveSites_edit_snackbar_locationCapturedWithAccuracy(
                           result.accuracy!.toStringAsFixed(0),
@@ -1462,7 +1466,9 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            context.l10n.diveSites_edit_snackbar_locationSelectedFromMap,
+            result.place.networkFailed
+                ? context.l10n.diveSites_edit_snackbar_lookupFailed
+                : context.l10n.diveSites_edit_snackbar_locationSelectedFromMap,
           ),
         ),
       );

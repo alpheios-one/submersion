@@ -44,6 +44,7 @@ class _FakeLocationService implements LocationService {
     region: place.region,
     locality: place.locality,
     bodyOfWater: place.bodyOfWater,
+    geocodeUnavailable: place.networkFailed,
   );
 
   @override
@@ -155,5 +156,24 @@ void main() {
 
     expect(find.text('Weggis'), findsOneWidget);
     expect(find.text('Lake Lucerne'), findsOneWidget);
+  });
+
+  testWidgets('Use my location reports an unreachable geocoder', (
+    tester,
+  ) async {
+    await pumpEditor(tester, place: const PlaceLookup.unavailable());
+
+    await tester.tap(find.text('Add GPS position or altitude'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Use My Location'));
+    await tester.pumpAndSettle();
+
+    // The coordinates still landed.
+    expect(find.text('47.027631'), findsOneWidget);
+    expect(
+      find.text('Location lookup failed. Check your connection and try again.'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Location captured'), findsNothing);
   });
 }
