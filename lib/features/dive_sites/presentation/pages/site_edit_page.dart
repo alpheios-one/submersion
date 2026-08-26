@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/providers/location_service_provider.dart';
+import 'package:submersion/core/services/geocoding/place_lookup.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -16,6 +17,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/environment_en
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/domain/services/site_location_merge.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/edit_sections/access_safety_section.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/edit_sections/dive_info_section.dart';
@@ -219,14 +221,40 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     if (!mounted) return;
     setState(() {
       _isApplyingInitialValues = true;
-      if (_countryController.text.isEmpty && result.country != null) {
-        _countryController.text = result.country!;
-      }
-      if (_regionController.text.isEmpty && result.region != null) {
-        _regionController.text = result.region!;
-      }
+      _applyPlaceLookup(result, overwrite: false);
       _isApplyingInitialValues = false;
     });
+  }
+
+  /// Writes [lookup] into the country, region, city and body of water
+  /// fields. With [overwrite] false only empty fields change (the rule lives
+  /// in [mergeMissingLocationDetails]); with it true every found value
+  /// replaces the current one. Returns whether any field changed. Callers
+  /// decide whether that dirties the form.
+  bool _applyPlaceLookup(PlaceLookup lookup, {required bool overwrite}) {
+    final current = overwrite
+        ? const SiteLocationDetails()
+        : SiteLocationDetails(
+            country: _countryController.text,
+            region: _regionController.text,
+            city: _cityController.text,
+            bodyOfWater: _bodyOfWaterController.text,
+          );
+    final merged = mergeMissingLocationDetails(current: current, found: lookup);
+    if (merged == null) return false;
+
+    var changed = false;
+    void set(TextEditingController controller, String? value) {
+      if (value == null || controller.text == value) return;
+      controller.text = value;
+      changed = true;
+    }
+
+    set(_countryController, merged.country);
+    set(_regionController, merged.region);
+    set(_cityController, merged.city);
+    set(_bodyOfWaterController, merged.bodyOfWater);
+    return changed;
   }
 
   @override
@@ -1381,13 +1409,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
         _latitudeController.text = result.latitude.toStringAsFixed(6);
         _longitudeController.text = result.longitude.toStringAsFixed(6);
         _hasChanges = true;
-
-        if (_countryController.text.isEmpty && result.country != null) {
-          _countryController.text = result.country!;
-        }
-        if (_regionController.text.isEmpty && result.region != null) {
-          _regionController.text = result.region!;
-        }
+        _applyPlaceLookup(result.place, overwrite: false);
       });
 
       if (mounted) {
@@ -1431,13 +1453,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
         _latitudeController.text = result.latitude.toStringAsFixed(6);
         _longitudeController.text = result.longitude.toStringAsFixed(6);
         _hasChanges = true;
-
-        if (_countryController.text.isEmpty && result.country != null) {
-          _countryController.text = result.country!;
-        }
-        if (_regionController.text.isEmpty && result.region != null) {
-          _regionController.text = result.region!;
-        }
+        _applyPlaceLookup(result.place, overwrite: false);
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
