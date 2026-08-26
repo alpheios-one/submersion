@@ -12188,6 +12188,153 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_photoPicker_thumbnailToggleSelectedLabel => '切换照片选择，已选中';
 
   @override
+  String get media_photoPicker_files_pickFilesButton => '选择文件…';
+
+  @override
+  String get media_photoPicker_files_pickFolderButton => '选择文件夹…';
+
+  @override
+  String get media_photoPicker_files_autoMatchLabel => '按日期自动将照片和视频匹配到潜水记录';
+
+  @override
+  String get media_photoPicker_files_emptyHint => '选择文件或文件夹以开始。';
+
+  @override
+  String media_photoPicker_files_linkButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '关联 $count 个项目',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachToSiteButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '将 $count 个项目附加到此潜点',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount 个文件',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount 次潜水',
+    );
+    return '$_temp0，$_temp1，$unmatchedCount 个未匹配';
+  }
+
+  @override
+  String media_photoPicker_files_itemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个项目',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_diveGroupTitle(String diveId) {
+    return '潜水 $diveId';
+  }
+
+  @override
+  String media_photoPicker_files_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个文件',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_unmatchedGroupTitle => '未匹配';
+
+  @override
+  String media_photoPicker_files_addAllToDive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '将全部 $count 个添加到此潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_addToDiveTooltip => '添加到此潜水';
+
+  @override
+  String get media_photoPicker_files_chooseDiveTooltip => '选择潜水记录';
+
+  @override
+  String get media_photoPicker_files_removeTooltip => '从选择中移除';
+
+  @override
+  String get media_photoPicker_files_sourceExif => '来自 EXIF';
+
+  @override
+  String get media_photoPicker_files_sourceContainer => '来自文件元数据';
+
+  @override
+  String get media_photoPicker_files_sourceFileDate => '来自文件日期';
+
+  @override
+  String get media_photoPicker_files_sourceNone => '未找到日期';
+
+  @override
+  String media_photoPicker_files_shiftedTime(String shifted, String original) {
+    return '$shifted（原为 $original）';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoTimestamp => '无法读取拍摄时间';
+
+  @override
+  String media_photoPicker_files_reasonBeforeDive(String gap) {
+    return '比最近的潜水早 $gap';
+  }
+
+  @override
+  String media_photoPicker_files_reasonAfterDive(String gap) {
+    return '比最近的潜水晚 $gap';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoDives => '没有可匹配的潜水记录';
+
+  @override
+  String get media_photoPicker_files_offsetLabel => '将拍摄时间平移';
+
+  @override
+  String get media_photoPicker_files_offsetResetTooltip => '重置为不平移';
+
+  @override
+  String media_photoPicker_files_offsetBackTooltip(String amount) {
+    return '提前 $amount';
+  }
+
+  @override
+  String media_photoPicker_files_offsetForwardTooltip(String amount) {
+    return '推后 $amount';
+  }
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel => '照片已关联到此次潜水';
 
   @override

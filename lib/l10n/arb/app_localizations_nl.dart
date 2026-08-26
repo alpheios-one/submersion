@@ -12676,6 +12676,168 @@ class AppLocalizationsNl extends AppLocalizations {
       'Selectie voor foto aan/uit, geselecteerd';
 
   @override
+  String get media_photoPicker_files_pickFilesButton => 'Bestanden kiezen…';
+
+  @override
+  String get media_photoPicker_files_pickFolderButton => 'Een map kiezen…';
+
+  @override
+  String get media_photoPicker_files_autoMatchLabel =>
+      'Foto\'s en video\'s automatisch op datum aan duiken koppelen';
+
+  @override
+  String get media_photoPicker_files_emptyHint =>
+      'Kies bestanden of een map om te beginnen.';
+
+  @override
+  String media_photoPicker_files_linkButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items koppelen',
+      one: '1 item koppelen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachToSiteButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items aan deze duiklocatie koppelen',
+      one: '1 item aan deze duiklocatie koppelen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount bestanden',
+      one: '1 bestand',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount duiken',
+      one: '1 duik',
+    );
+    return '$_temp0, $_temp1, $unmatchedCount niet gekoppeld';
+  }
+
+  @override
+  String media_photoPicker_files_itemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_diveGroupTitle(String diveId) {
+    return 'Duik $diveId';
+  }
+
+  @override
+  String media_photoPicker_files_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bestanden',
+      one: '1 bestand',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_unmatchedGroupTitle => 'Niet gekoppeld';
+
+  @override
+  String media_photoPicker_files_addAllToDive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Alle $count aan deze duik toevoegen',
+      one: '1 aan deze duik toevoegen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_addToDiveTooltip =>
+      'Aan deze duik toevoegen';
+
+  @override
+  String get media_photoPicker_files_chooseDiveTooltip => 'Een duik kiezen';
+
+  @override
+  String get media_photoPicker_files_removeTooltip =>
+      'Uit de selectie verwijderen';
+
+  @override
+  String get media_photoPicker_files_sourceExif => 'uit EXIF';
+
+  @override
+  String get media_photoPicker_files_sourceContainer => 'uit bestandsmetadata';
+
+  @override
+  String get media_photoPicker_files_sourceFileDate => 'uit bestandsdatum';
+
+  @override
+  String get media_photoPicker_files_sourceNone => 'geen datum gevonden';
+
+  @override
+  String media_photoPicker_files_shiftedTime(String shifted, String original) {
+    return '$shifted (was $original)';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoTimestamp =>
+      'Opnametijd kon niet worden gelezen';
+
+  @override
+  String media_photoPicker_files_reasonBeforeDive(String gap) {
+    return '$gap voor de dichtstbijzijnde duik';
+  }
+
+  @override
+  String media_photoPicker_files_reasonAfterDive(String gap) {
+    return '$gap na de dichtstbijzijnde duik';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoDives =>
+      'Geen duiken om mee te vergelijken';
+
+  @override
+  String get media_photoPicker_files_offsetLabel =>
+      'Opnametijden verschuiven met';
+
+  @override
+  String get media_photoPicker_files_offsetResetTooltip =>
+      'Verschuiving herstellen';
+
+  @override
+  String media_photoPicker_files_offsetBackTooltip(String amount) {
+    return '$amount eerder verschuiven';
+  }
+
+  @override
+  String media_photoPicker_files_offsetForwardTooltip(String amount) {
+    return '$amount later verschuiven';
+  }
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'Foto al gekoppeld aan deze duik';
 

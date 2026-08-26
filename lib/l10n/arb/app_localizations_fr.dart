@@ -12806,6 +12806,169 @@ class AppLocalizationsFr extends AppLocalizations {
       'Basculer la selection de la photo, selectionnee';
 
   @override
+  String get media_photoPicker_files_pickFilesButton => 'Choisir des fichiers…';
+
+  @override
+  String get media_photoPicker_files_pickFolderButton => 'Choisir un dossier…';
+
+  @override
+  String get media_photoPicker_files_autoMatchLabel =>
+      'Associer automatiquement les photos et vidéos aux plongées par date';
+
+  @override
+  String get media_photoPicker_files_emptyHint =>
+      'Choisissez des fichiers ou un dossier pour commencer.';
+
+  @override
+  String media_photoPicker_files_linkButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Lier $count éléments',
+      one: 'Lier 1 élément',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachToSiteButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Joindre $count éléments à ce site',
+      one: 'Joindre 1 élément à ce site',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount fichiers',
+      one: '1 fichier',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount plongées',
+      one: '1 plongée',
+    );
+    return '$_temp0, $_temp1, $unmatchedCount non associés';
+  }
+
+  @override
+  String media_photoPicker_files_itemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count éléments',
+      one: '1 élément',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_diveGroupTitle(String diveId) {
+    return 'Plongée $diveId';
+  }
+
+  @override
+  String media_photoPicker_files_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fichiers',
+      one: '1 fichier',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_unmatchedGroupTitle => 'Non associés';
+
+  @override
+  String media_photoPicker_files_addAllToDive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ajouter les $count à cette plongée',
+      one: 'Ajouter 1 à cette plongée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_addToDiveTooltip =>
+      'Ajouter à cette plongée';
+
+  @override
+  String get media_photoPicker_files_chooseDiveTooltip => 'Choisir une plongée';
+
+  @override
+  String get media_photoPicker_files_removeTooltip => 'Retirer de la sélection';
+
+  @override
+  String get media_photoPicker_files_sourceExif => 'depuis EXIF';
+
+  @override
+  String get media_photoPicker_files_sourceContainer =>
+      'depuis les métadonnées du fichier';
+
+  @override
+  String get media_photoPicker_files_sourceFileDate =>
+      'depuis la date du fichier';
+
+  @override
+  String get media_photoPicker_files_sourceNone => 'aucune date trouvée';
+
+  @override
+  String media_photoPicker_files_shiftedTime(String shifted, String original) {
+    return '$shifted (était $original)';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoTimestamp =>
+      'Heure de prise de vue illisible';
+
+  @override
+  String media_photoPicker_files_reasonBeforeDive(String gap) {
+    return '$gap avant la plongée la plus proche';
+  }
+
+  @override
+  String media_photoPicker_files_reasonAfterDive(String gap) {
+    return '$gap après la plongée la plus proche';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoDives =>
+      'Aucune plongée à comparer';
+
+  @override
+  String get media_photoPicker_files_offsetLabel =>
+      'Décaler les heures de prise de vue de';
+
+  @override
+  String get media_photoPicker_files_offsetResetTooltip =>
+      'Annuler le décalage';
+
+  @override
+  String media_photoPicker_files_offsetBackTooltip(String amount) {
+    return 'Décaler de $amount plus tôt';
+  }
+
+  @override
+  String media_photoPicker_files_offsetForwardTooltip(String amount) {
+    return 'Décaler de $amount plus tard';
+  }
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'Photo deja associee a cette plongee';
 
