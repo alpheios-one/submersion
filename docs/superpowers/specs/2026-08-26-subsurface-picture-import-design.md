@@ -81,10 +81,36 @@ step between Review and Import is not expressible without changing the wizard
 shell. `universal_adapter.dart:176` currently declares three acquisition steps:
 Select File, Confirm Source, Map Fields.
 
-**F8. The offset attribute has no native column yet.**
+**F8. The repair ladder assumes POSIX separators on both sides.**
+`folder_candidate_source.dart:41` and `media_repair_matcher.dart:154` both find
+a basename with `path.lastIndexOf('/')`, and `detectPrefixMove` splits on `'/'`
+(`:18`, `:22`). On a Windows host `Directory.list` yields backslash-separated
+paths, so the harvest indexes whole paths as keys and every lookup misses. That
+is a pre-existing defect in the repair feature. It becomes this feature's
+problem twice over, because a logbook exported from Windows carries
+`C:\Users\jai\...` on to whatever platform imports it.
+
+**F9. The offset attribute has no native column yet.**
 `database.dart:3168` pins `currentSchemaVersion = 161`, and `grep -rn
 "manualElapsed"` over `lib/` returns nothing. The `media.manual_elapsed_seconds`
 column (v162) that models exactly this quantity is still in the open PR #1287.
+
+### D9. Separator handling
+
+Two fixes, on opposite sides of the comparison (F8).
+
+The harvest is fixed in place: `FolderCandidateSource` switches to
+`p.basename`, which follows the host separator. This repairs the media repair
+feature on Windows as a side effect, which is the right outcome; the two
+features share the ladder precisely so they cannot disagree.
+
+The foreign side is normalised by the resolver, because only the resolver knows
+its input came from another machine. `ImportMediaResolver` converts backslashes
+to forward slashes before handing a path to `detectPrefixMove`, and sets
+`originalFilename` explicitly to a both-separator basename so the ladder never
+has to parse the foreign path at all. Treating `\` as a separator on POSIX is
+technically lossy, since a POSIX filename may legally contain one; that risk is
+accepted against the certainty of Windows-exported logbooks.
 
 ## Design
 
@@ -197,7 +223,7 @@ today. `takenAt` is the dive's `dateTime` plus `offsetSeconds` when both are
 known, and the dive's `dateTime` otherwise.
 
 `offsetSeconds` is retained on the payload map even though only `takenAt`
-consumes it now. When #1287 lands `media.manual_elapsed_seconds` (F8), adopting
+consumes it now. When #1287 lands `media.manual_elapsed_seconds` (F9), adopting
 it is a single additional field on the write, with no rework of the parser or
 resolver.
 
