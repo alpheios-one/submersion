@@ -16,6 +16,7 @@ import 'package:submersion/features/media/domain/value_objects/media_source_data
 import 'package:submersion/features/media/domain/value_objects/verify_result.dart';
 import 'package:submersion/features/media/presentation/helpers/elapsed_time_format.dart';
 import 'package:submersion/features/media/presentation/helpers/media_link_replacer.dart';
+import 'package:submersion/features/media/presentation/helpers/set_time_seed.dart';
 import 'package:submersion/features/media/presentation/providers/media_provenance_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_serving_providers.dart';
@@ -159,9 +160,10 @@ class _FileSection extends ConsumerWidget {
           _SetTimeButton(
             item: item,
             profile: profile,
-            initialElapsedSeconds:
-                item.manualElapsedSeconds ??
-                (positioned ? enrichment!.elapsedSeconds! : 0),
+            initialElapsedSeconds: setTimeSeedFor(
+              item,
+              profileLengthSeconds: profileLength,
+            ),
           ),
       ],
       children: [

@@ -25,6 +25,7 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/presentation/helpers/elapsed_time_format.dart';
 import 'package:submersion/features/media/presentation/helpers/media_share_helper.dart';
+import 'package:submersion/features/media/presentation/helpers/set_time_seed.dart';
 import 'package:submersion/features/media/presentation/providers/lightroom_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
@@ -154,18 +155,13 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
     List<DiveProfilePoint> profile,
     AppSettings settings,
   ) async {
-    final enrichment = item.enrichment;
-    final positioned =
-        enrichment?.isWithinDiveWindow(
-          MediaDiveWindow.profileLengthSeconds(profile),
-        ) ??
-        false;
     final choice = await showSetMediaTimeDialog(
       context,
       profile: profile,
-      initialElapsedSeconds:
-          item.manualElapsedSeconds ??
-          (positioned ? enrichment!.elapsedSeconds! : 0),
+      initialElapsedSeconds: setTimeSeedFor(
+        item,
+        profileLengthSeconds: MediaDiveWindow.profileLengthSeconds(profile),
+      ),
       isPinned: item.manualElapsedSeconds != null,
       settings: settings,
     );
