@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/features/media/domain/value_objects/extracted_file.dart';
 import 'package:submersion/features/media/domain/value_objects/matched_selection.dart';
@@ -151,8 +150,8 @@ class FilesTab extends ConsumerWidget {
   // _applyMatchAndStash is only reached through _pickFiles / _pickFolder,
   // both of which depend on FilePicker static methods that can't be mocked
   // from flutter_test. The matcher logic itself is covered by
-  // dive_photo_matcher_test; the dive-bounds derivation here is covered by
-  // trip_media_scanner_test (same shape).
+  // dive_photo_matcher_test; the dive-bounds derivation now lives in
+  // diveBoundsProvider and is covered by files_tab_providers_test.
   Future<void> _applyMatchAndStash(
     WidgetRef ref,
     List<ExtractedFile> extracted,
@@ -184,20 +183,7 @@ class FilesTab extends ConsumerWidget {
       );
       return;
     }
-    final dives = await ref.read(divesProvider.future);
-    final bounds = dives
-        .map(
-          (d) => DiveBounds(
-            diveId: d.id,
-            entryTime: d.effectiveEntryTime,
-            exitTime:
-                d.exitTime ??
-                d.effectiveEntryTime.add(
-                  d.effectiveRuntime ?? const Duration(hours: 1),
-                ),
-          ),
-        )
-        .toList();
+    final bounds = await ref.read(diveBoundsProvider.future);
     final result = const DivePhotoMatcher().match(
       files: extracted,
       dives: bounds,

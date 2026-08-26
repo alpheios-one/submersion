@@ -5,6 +5,8 @@ import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/services/local_bookmark_storage.dart';
 import 'package:submersion/features/media/data/services/local_media_platform.dart';
@@ -375,6 +377,34 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
     return saved.id;
   }
 }
+
+/// The dive time windows the Files tab matches picked media against.
+///
+/// Kept separate from [filesTabNotifierProvider] so the review pane can re-run
+/// [DivePhotoMatcher] with a new capture-time offset without sending the user
+/// back through the OS file picker.
+///
+/// A dive with no recorded exit time gets one synthesised from its runtime, and
+/// a dive with neither gets a one-hour window. That is deliberately generous:
+/// [DivePhotoMatcher] adds a 30-minute pre-buffer and a 60-minute post-buffer
+/// on top, and a window that is slightly too wide costs a correctable
+/// mis-assignment, while one that is too narrow silently drops photos into the
+/// unmatched bucket with nothing to explain it.
+final diveBoundsProvider = FutureProvider<List<DiveBounds>>((ref) async {
+  final dives = await ref.watch(divesProvider.future);
+  return [
+    for (final d in dives)
+      DiveBounds(
+        diveId: d.id,
+        entryTime: d.effectiveEntryTime,
+        exitTime:
+            d.exitTime ??
+            d.effectiveEntryTime.add(
+              d.effectiveRuntime ?? const Duration(hours: 1),
+            ),
+      ),
+  ];
+});
 
 final filesTabNotifierProvider =
     StateNotifierProvider<FilesTabNotifier, FilesTabState>(

@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/services/local_bookmark_storage.dart';
 import 'package:submersion/features/media/data/services/local_media_platform.dart';
@@ -14,6 +16,7 @@ import 'package:submersion/features/media/domain/value_objects/extracted_file.da
 import 'package:submersion/features/media/domain/value_objects/matched_selection.dart';
 import 'package:submersion/features/media/domain/value_objects/media_attach_target.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_metadata.dart';
+import 'package:submersion/features/media/domain/value_objects/unmatched_diagnostic.dart';
 import 'package:submersion/features/media/presentation/providers/files_tab_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
@@ -907,6 +910,45 @@ void main() {
 
       expect(captured.map((m) => m.diveId), ['dive-a', 'dive-b']);
       expect(captured.map((m) => m.siteId), [null, null]);
+    });
+  });
+
+  group('diveBoundsProvider', () {
+    test('uses the dive exit time when present', () async {
+      final dive = Dive(
+        id: 'dive-1',
+        dateTime: DateTime.utc(2025, 12, 27, 11, 26),
+        exitTime: DateTime.utc(2025, 12, 27, 12, 9),
+      );
+      final boundsContainer = ProviderContainer(
+        overrides: [
+          divesProvider.overrideWith((ref) async => [dive]),
+        ],
+      );
+      addTearDown(boundsContainer.dispose);
+
+      final bounds = await boundsContainer.read(diveBoundsProvider.future);
+
+      expect(bounds.single.diveId, 'dive-1');
+      expect(bounds.single.entryTime, DateTime.utc(2025, 12, 27, 11, 26));
+      expect(bounds.single.exitTime, DateTime.utc(2025, 12, 27, 12, 9));
+    });
+
+    test('falls back to entry plus one hour with no exit or runtime', () async {
+      final dive = Dive(
+        id: 'dive-2',
+        dateTime: DateTime.utc(2025, 12, 27, 11, 26),
+      );
+      final boundsContainer = ProviderContainer(
+        overrides: [
+          divesProvider.overrideWith((ref) async => [dive]),
+        ],
+      );
+      addTearDown(boundsContainer.dispose);
+
+      final bounds = await boundsContainer.read(diveBoundsProvider.future);
+
+      expect(bounds.single.exitTime, DateTime.utc(2025, 12, 27, 12, 26));
     });
   });
 }
