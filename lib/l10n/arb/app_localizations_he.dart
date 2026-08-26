@@ -22827,6 +22827,52 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_metric_tankPressure => 'לחץ';
 
   @override
+  String get dive3d_zAxis => 'ציר Z';
+
+  @override
+  String get dive3d_zAxis_none => 'ללא';
+
+  @override
+  String get dive3d_overlay_shadows => 'צללי קירות';
+
+  @override
+  String get dive3d_metric_tts => 'TTS';
+
+  @override
+  String dive3d_axis_depth(String unitSymbol) {
+    return 'עומק ($unitSymbol)';
+  }
+
+  @override
+  String get dive3d_axis_time => 'זמן צלילה (דק\')';
+
+  @override
+  String get dive3d_pose_menu => 'מצלמה';
+
+  @override
+  String get dive3d_pose_default => 'תצוגת ברירת מחדל';
+
+  @override
+  String get dive3d_pose_front => 'חזית (עומק מול זמן)';
+
+  @override
+  String get dive3d_pose_side => 'צד (עומק מול מדד)';
+
+  @override
+  String get dive3d_pose_top => 'מלמעלה (מדד מול זמן)';
+
+  @override
+  String get dive3d_readout_runTime => 'זמן צלילה';
+
+  @override
+  String get dive3d_readout_ceiling => 'תקרה';
+
+  @override
+  String dive3d_readout_tank(int n) {
+    return 'מיכל $n';
+  }
+
+  @override
   String get dive3d_scene_dive => 'צלילה';
 
   @override

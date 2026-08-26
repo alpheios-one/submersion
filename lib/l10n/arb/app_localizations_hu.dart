@@ -23325,6 +23325,52 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_metric_tankPressure => 'Nyomás';
 
   @override
+  String get dive3d_zAxis => 'Z tengely';
+
+  @override
+  String get dive3d_zAxis_none => 'Nincs';
+
+  @override
+  String get dive3d_overlay_shadows => 'Falárnyékok';
+
+  @override
+  String get dive3d_metric_tts => 'TTS';
+
+  @override
+  String dive3d_axis_depth(String unitSymbol) {
+    return 'Mélység ($unitSymbol)';
+  }
+
+  @override
+  String get dive3d_axis_time => 'Merülési idő (perc)';
+
+  @override
+  String get dive3d_pose_menu => 'Kamera';
+
+  @override
+  String get dive3d_pose_default => 'Alapnézet';
+
+  @override
+  String get dive3d_pose_front => 'Elölnézet (mélység / idő)';
+
+  @override
+  String get dive3d_pose_side => 'Oldalnézet (mélység / mérőszám)';
+
+  @override
+  String get dive3d_pose_top => 'Felülnézet (mérőszám / idő)';
+
+  @override
+  String get dive3d_readout_runTime => 'Merülési idő';
+
+  @override
+  String get dive3d_readout_ceiling => 'Plafon';
+
+  @override
+  String dive3d_readout_tank(int n) {
+    return 'Palack $n';
+  }
+
+  @override
   String get dive3d_scene_dive => 'Merülés';
 
   @override

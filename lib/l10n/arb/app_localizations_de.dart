@@ -23361,6 +23361,52 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dive3d_metric_tankPressure => 'Druck';
 
   @override
+  String get dive3d_zAxis => 'Z-Achse';
+
+  @override
+  String get dive3d_zAxis_none => 'Keine';
+
+  @override
+  String get dive3d_overlay_shadows => 'Wandschatten';
+
+  @override
+  String get dive3d_metric_tts => 'TTS';
+
+  @override
+  String dive3d_axis_depth(String unitSymbol) {
+    return 'Tiefe ($unitSymbol)';
+  }
+
+  @override
+  String get dive3d_axis_time => 'Laufzeit (min)';
+
+  @override
+  String get dive3d_pose_menu => 'Kamera';
+
+  @override
+  String get dive3d_pose_default => 'Standardansicht';
+
+  @override
+  String get dive3d_pose_front => 'Vorne (Tiefe vs. Zeit)';
+
+  @override
+  String get dive3d_pose_side => 'Seite (Tiefe vs. Messwert)';
+
+  @override
+  String get dive3d_pose_top => 'Oben (Messwert vs. Zeit)';
+
+  @override
+  String get dive3d_readout_runTime => 'Laufzeit';
+
+  @override
+  String get dive3d_readout_ceiling => 'Ceiling';
+
+  @override
+  String dive3d_readout_tank(int n) {
+    return 'Flasche $n';
+  }
+
+  @override
   String get dive3d_scene_dive => 'Tauchgang';
 
   @override

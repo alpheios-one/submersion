@@ -23405,6 +23405,52 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dive3d_metric_tankPressure => 'Pressione';
 
   @override
+  String get dive3d_zAxis => 'Asse Z';
+
+  @override
+  String get dive3d_zAxis_none => 'Nessuno';
+
+  @override
+  String get dive3d_overlay_shadows => 'Ombre sulle pareti';
+
+  @override
+  String get dive3d_metric_tts => 'TTS';
+
+  @override
+  String dive3d_axis_depth(String unitSymbol) {
+    return 'Profondità ($unitSymbol)';
+  }
+
+  @override
+  String get dive3d_axis_time => 'Tempo di immersione (min)';
+
+  @override
+  String get dive3d_pose_menu => 'Camera';
+
+  @override
+  String get dive3d_pose_default => 'Vista predefinita';
+
+  @override
+  String get dive3d_pose_front => 'Frontale (profondità / tempo)';
+
+  @override
+  String get dive3d_pose_side => 'Laterale (profondità / metrica)';
+
+  @override
+  String get dive3d_pose_top => 'Dall\'alto (metrica / tempo)';
+
+  @override
+  String get dive3d_readout_runTime => 'Tempo di immersione';
+
+  @override
+  String get dive3d_readout_ceiling => 'Soffitto';
+
+  @override
+  String dive3d_readout_tank(int n) {
+    return 'Bombola $n';
+  }
+
+  @override
   String get dive3d_scene_dive => 'Immersione';
 
   @override

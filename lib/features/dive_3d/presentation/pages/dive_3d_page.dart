@@ -328,7 +328,7 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
                     SceneOverlay.ceiling => context.l10n.dive3d_overlay_ceiling,
                     SceneOverlay.curtain => context.l10n.dive3d_overlay_curtain,
                     SceneOverlay.markers => context.l10n.dive3d_overlay_markers,
-                    SceneOverlay.shadows => 'Wall shadows',
+                    SceneOverlay.shadows => context.l10n.dive3d_overlay_shadows,
                     SceneOverlay.paths =>
                       context.l10n.dive3d_seascape_overlay_paths,
                     SceneOverlay.contours =>
@@ -360,7 +360,7 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
       SceneMetric.cns => context.l10n.dive3d_metric_cns,
       SceneMetric.heartRate => context.l10n.dive3d_metric_heartRate,
       SceneMetric.tankPressure => context.l10n.dive3d_metric_tankPressure,
-      SceneMetric.tts => 'TTS',
+      SceneMetric.tts => context.l10n.dive3d_metric_tts,
     };
   }
 
