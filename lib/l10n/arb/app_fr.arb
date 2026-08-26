@@ -7554,6 +7554,8 @@
   "visibility_range_under": "moins de {max} {unit}",
   "settings_coordinateFormat_title": "Format des coordonnées",
   "settings_coordinateFormat_subtitle": "Comment les positions GPS sont affichées et saisies",
+  "settings_placeNameLanguage_title": "Langue des noms de lieux",
+  "settings_placeNameLanguage_subtitle": "Utilisée lorsque le pays, la région, la ville et le plan d'eau sont déduits des coordonnées. Les sites existants ne sont pas modifiés.",
   "settings_coordinateFormat_decimalDegrees": "Degrés décimaux",
   "settings_coordinateFormat_degreesDecimalMinutes": "Degrés et minutes décimales",
   "settings_coordinateFormat_degreesMinutesSeconds": "Degrés, minutes, secondes",

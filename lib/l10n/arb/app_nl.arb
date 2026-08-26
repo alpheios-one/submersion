@@ -7554,6 +7554,8 @@
   "visibility_range_under": "minder dan {max} {unit}",
   "settings_coordinateFormat_title": "Coördinaatformaat",
   "settings_coordinateFormat_subtitle": "Hoe GPS-posities worden weergegeven en ingevoerd",
+  "settings_placeNameLanguage_title": "Taal van plaatsnamen",
+  "settings_placeNameLanguage_subtitle": "Gebruikt wanneer land, regio, plaats en water uit coördinaten worden opgezocht. Bestaande duikstekken worden niet gewijzigd.",
   "settings_coordinateFormat_decimalDegrees": "Decimale graden",
   "settings_coordinateFormat_degreesDecimalMinutes": "Graden en decimale minuten",
   "settings_coordinateFormat_degreesMinutesSeconds": "Graden, minuten, seconden",

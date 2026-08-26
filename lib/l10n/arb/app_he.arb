@@ -7554,6 +7554,8 @@
   "visibility_range_under": "מתחת ל-{max} {unit}",
   "settings_coordinateFormat_title": "פורמט קואורדינטות",
   "settings_coordinateFormat_subtitle": "כיצד מוצגים ומוזנים מיקומי GPS",
+  "settings_placeNameLanguage_title": "שפת שמות המקומות",
+  "settings_placeNameLanguage_subtitle": "בשימוש כאשר מדינה, אזור, עיר וגוף מים נשלפים מהקואורדינטות. אתרים קיימים אינם משתנים.",
   "settings_coordinateFormat_decimalDegrees": "מעלות עשרוניות",
   "settings_coordinateFormat_degreesDecimalMinutes": "מעלות ודקות עשרוניות",
   "settings_coordinateFormat_degreesMinutesSeconds": "מעלות, דקות, שניות",

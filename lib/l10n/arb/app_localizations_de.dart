@@ -24982,6 +24982,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wie GPS-Positionen angezeigt und eingegeben werden';
 
   @override
+  String get settings_placeNameLanguage_title => 'Sprache der Ortsnamen';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Wird verwendet, wenn Land, Region, Ort und Gewässer aus Koordinaten ermittelt werden. Bestehende Tauchplätze werden nicht geändert.';
+
+  @override
   String get settings_coordinateFormat_decimalDegrees => 'Dezimalgrad';
 
   @override

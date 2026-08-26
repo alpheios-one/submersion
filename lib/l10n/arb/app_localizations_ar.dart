@@ -24579,6 +24579,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'كيفية عرض مواقع GPS وإدخالها';
 
   @override
+  String get settings_placeNameLanguage_title => 'لغة أسماء الأماكن';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'تُستخدم عند البحث عن البلد والمنطقة والبلدة والمسطح المائي من الإحداثيات. لا يتم تغيير المواقع الحالية.';
+
+  @override
   String get settings_coordinateFormat_decimalDegrees => 'درجات عشرية';
 
   @override

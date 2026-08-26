@@ -24839,6 +24839,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Hoe GPS-posities worden weergegeven en ingevoerd';
 
   @override
+  String get settings_placeNameLanguage_title => 'Taal van plaatsnamen';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Gebruikt wanneer land, regio, plaats en water uit coördinaten worden opgezocht. Bestaande duikstekken worden niet gewijzigd.';
+
+  @override
   String get settings_coordinateFormat_decimalDegrees => 'Decimale graden';
 
   @override

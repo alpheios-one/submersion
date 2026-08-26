@@ -41660,6 +41660,18 @@ abstract class AppLocalizations {
   /// **'How GPS positions are shown and entered'**
   String get settings_coordinateFormat_subtitle;
 
+  /// No description provided for @settings_placeNameLanguage_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Place name language'**
+  String get settings_placeNameLanguage_title;
+
+  /// No description provided for @settings_placeNameLanguage_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Used when country, region, town and body of water are looked up from coordinates. Existing sites are not changed.'**
+  String get settings_placeNameLanguage_subtitle;
+
   /// No description provided for @settings_coordinateFormat_decimalDegrees.
   ///
   /// In en, this message translates to:

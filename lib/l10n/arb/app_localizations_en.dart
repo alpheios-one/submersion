@@ -24606,6 +24606,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'How GPS positions are shown and entered';
 
   @override
+  String get settings_placeNameLanguage_title => 'Place name language';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Used when country, region, town and body of water are looked up from coordinates. Existing sites are not changed.';
+
+  @override
   String get settings_coordinateFormat_decimalDegrees => 'Decimal degrees';
 
   @override

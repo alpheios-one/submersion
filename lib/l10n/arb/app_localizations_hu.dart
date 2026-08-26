@@ -24937,6 +24937,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Hogyan jelennek meg és hogyan adhatók meg a GPS-pozíciók';
 
   @override
+  String get settings_placeNameLanguage_title => 'Helynevek nyelve';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Akkor használjuk, amikor az ország, régió, település és víztest a koordinátákból kerül lekérdezésre. A meglévő merülőhelyek nem változnak.';
+
+  @override
   String get settings_coordinateFormat_decimalDegrees => 'Tizedes fok';
 
   @override

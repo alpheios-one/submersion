@@ -24401,6 +24401,13 @@ class AppLocalizationsHe extends AppLocalizations {
       'כיצד מוצגים ומוזנים מיקומי GPS';
 
   @override
+  String get settings_placeNameLanguage_title => 'שפת שמות המקומות';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'בשימוש כאשר מדינה, אזור, עיר וגוף מים נשלפים מהקואורדינטות. אתרים קיימים אינם משתנים.';
+
+  @override
   String get settings_coordinateFormat_decimalDegrees => 'מעלות עשרוניות';
 
   @override

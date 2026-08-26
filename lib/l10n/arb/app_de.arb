@@ -7554,6 +7554,8 @@
   "visibility_range_under": "unter {max} {unit}",
   "settings_coordinateFormat_title": "Koordinatenformat",
   "settings_coordinateFormat_subtitle": "Wie GPS-Positionen angezeigt und eingegeben werden",
+  "settings_placeNameLanguage_title": "Sprache der Ortsnamen",
+  "settings_placeNameLanguage_subtitle": "Wird verwendet, wenn Land, Region, Ort und Gewässer aus Koordinaten ermittelt werden. Bestehende Tauchplätze werden nicht geändert.",
   "settings_coordinateFormat_decimalDegrees": "Dezimalgrad",
   "settings_coordinateFormat_degreesDecimalMinutes": "Grad und Dezimalminuten",
   "settings_coordinateFormat_degreesMinutesSeconds": "Grad, Minuten, Sekunden",

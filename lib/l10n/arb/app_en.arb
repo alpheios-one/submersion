@@ -16087,6 +16087,8 @@
   },
   "settings_coordinateFormat_title": "Coordinate format",
   "settings_coordinateFormat_subtitle": "How GPS positions are shown and entered",
+  "settings_placeNameLanguage_title": "Place name language",
+  "settings_placeNameLanguage_subtitle": "Used when country, region, town and body of water are looked up from coordinates. Existing sites are not changed.",
   "settings_coordinateFormat_decimalDegrees": "Decimal degrees",
   "settings_coordinateFormat_degreesDecimalMinutes": "Degrees and decimal minutes",
   "settings_coordinateFormat_degreesMinutesSeconds": "Degrees, minutes, seconds",

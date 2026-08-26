@@ -23767,6 +23767,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_coordinateFormat_subtitle => 'GPS 位置的显示和输入方式';
 
   @override
+  String get settings_placeNameLanguage_title => '地名语言';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      '根据坐标查找国家、地区、城镇和水域时使用。现有潜点不会更改。';
+
+  @override
   String get settings_coordinateFormat_decimalDegrees => '十进制度';
 
   @override

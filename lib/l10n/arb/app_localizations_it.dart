@@ -25022,6 +25022,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Come vengono mostrate e inserite le posizioni GPS';
 
   @override
+  String get settings_placeNameLanguage_title => 'Lingua dei nomi dei luoghi';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Usata quando paese, regione, città e specchio d\'acqua vengono ricavati dalle coordinate. I siti esistenti non vengono modificati.';
+
+  @override
   String get settings_coordinateFormat_decimalDegrees => 'Gradi decimali';
 
   @override

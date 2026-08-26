@@ -7554,6 +7554,8 @@
   "visibility_range_under": "menos de {max} {unit}",
   "settings_coordinateFormat_title": "Formato de coordenadas",
   "settings_coordinateFormat_subtitle": "Cómo se muestran e introducen las posiciones GPS",
+  "settings_placeNameLanguage_title": "Idioma de los nombres de lugar",
+  "settings_placeNameLanguage_subtitle": "Se usa al obtener país, región, localidad y masa de agua a partir de las coordenadas. Los puntos de buceo existentes no cambian.",
   "settings_coordinateFormat_decimalDegrees": "Grados decimales",
   "settings_coordinateFormat_degreesDecimalMinutes": "Grados y minutos decimales",
   "settings_coordinateFormat_degreesMinutesSeconds": "Grados, minutos, segundos",

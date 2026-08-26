@@ -25036,6 +25036,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Cómo se muestran e introducen las posiciones GPS';
 
   @override
+  String get settings_placeNameLanguage_title =>
+      'Idioma de los nombres de lugar';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Se usa al obtener país, región, localidad y masa de agua a partir de las coordenadas. Los puntos de buceo existentes no cambian.';
+
+  @override
   String get settings_coordinateFormat_decimalDegrees => 'Grados decimales';
 
   @override
