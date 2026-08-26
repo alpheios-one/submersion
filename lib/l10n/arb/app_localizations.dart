@@ -36569,6 +36569,18 @@ abstract class AppLocalizations {
   /// **'How aggressively downloaded dives are matched to sites'**
   String get settings_siteMatch_subtitle;
 
+  /// No description provided for @settings_tankPressureAtSurfacing_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank pressure at surfacing'**
+  String get settings_tankPressureAtSurfacing_title;
+
+  /// No description provided for @settings_tankPressureAtSurfacing_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Read end pressure when you reached the surface, not when the computer stopped recording'**
+  String get settings_tankPressureAtSurfacing_subtitle;
+
   /// No description provided for @settings_siteMatch_strict.
   ///
   /// In en, this message translates to:

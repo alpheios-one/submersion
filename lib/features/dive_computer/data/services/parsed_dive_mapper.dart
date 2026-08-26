@@ -5,7 +5,14 @@ import 'package:submersion/features/dive_computer/data/services/parsed_tank_reso
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
 
 /// Convert a Pigeon ParsedDive to the app's DownloadedDive format.
-DownloadedDive parsedDiveToDownloaded(pigeon.ParsedDive parsed) {
+///
+/// [trimAtSurfacing] carries the diver's preference for reading cylinder end
+/// pressure at the moment of surfacing rather than at the end of the recording
+/// (issue #1092); see [resolveParsedTanks].
+DownloadedDive parsedDiveToDownloaded(
+  pigeon.ParsedDive parsed, {
+  bool trimAtSurfacing = true,
+}) {
   // Some computers (e.g. Shearwater) don't provide top-level min/max
   // temperature — derive from profile samples when missing.
   final sampleTemps = parsed.samples
@@ -85,7 +92,7 @@ DownloadedDive parsedDiveToDownloaded(pigeon.ParsedDive parsed) {
         .toList(),
     // Gas-mix linking, tankless synthesis, and gas-switch derivation live in
     // the shared resolver so the download and reparse paths cannot drift apart.
-    tanks: resolveParsedTanks(parsed),
+    tanks: resolveParsedTanks(parsed, trimAtSurfacing: trimAtSurfacing),
     gasSwitches: resolveGasSwitches(parsed),
     events: parsed.events
         .map(

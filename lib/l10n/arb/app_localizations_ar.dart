@@ -21626,6 +21626,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'مدى صرامة مطابقة الغوصات التي تم تنزيلها بالمواقع';
 
   @override
+  String get settings_tankPressureAtSurfacing_title =>
+      'ضغط الأسطوانة عند الصعود إلى السطح';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      'قراءة ضغط النهاية عند الوصول إلى السطح، وليس عند انتهاء التسجيل';
+
+  @override
   String get settings_siteMatch_strict => 'صارم';
 
   @override

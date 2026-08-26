@@ -6014,6 +6014,8 @@
   "settings_section_dataSources_subtitle": "Connected services & integrations",
   "settings_siteMatch_title": "Automatikus helyhozzárendelés",
   "settings_siteMatch_subtitle": "Mennyire agresszíven rendelődnek a letöltött merülések a helyekhez",
+  "settings_tankPressureAtSurfacing_title": "Palacknyomás felbukkanáskor",
+  "settings_tankPressureAtSurfacing_subtitle": "A végnyomás a felszínre érkezéskor legyen leolvasva, ne a rögzítés végén",
   "settings_siteMatch_strict": "Szigorú",
   "settings_siteMatch_balanced": "Kiegyensúlyozott",
   "settings_siteMatch_relaxed": "Laza",

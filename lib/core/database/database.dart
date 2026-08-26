@@ -1770,6 +1770,10 @@ class DiverSettings extends Table {
   // Auto site matching sensitivity (v76): strict | balanced | relaxed
   TextColumn get siteMatchSensitivity =>
       text().withDefault(const Constant('balanced'))();
+  // Read cylinder end pressure at surfacing rather than at the end of the
+  // recording (v163, issue #1092).
+  BoolColumn get trimTankPressureAtSurfacing =>
+      boolean().withDefault(const Constant(true))();
   // Dive profile chart defaults
   TextColumn get defaultRightAxisMetric =>
       text().withDefault(const Constant('temperature'))();
@@ -3165,7 +3169,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 161;
+  static const int currentSchemaVersion = 163;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3450,6 +3454,11 @@ class AppDatabase extends _$AppDatabase {
     // v161: diver_settings.default_show_o2_cell_mv, a persisted default for
     // the per-cell O2 mV toggle on the profile chart (issue #1235).
     161,
+    // v163: diver_settings.trim_tank_pressure_at_surfacing, which decides
+    // whether an import reads cylinder end pressure at the moment of
+    // surfacing rather than at the end of the recording (issue #1092).
+    // v162 is claimed by the dive type badges branch (#1269).
+    163,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4916,6 +4925,26 @@ class AppDatabase extends _$AppDatabase {
         'ALTER TABLE diver_settings ADD COLUMN default_show_o2_cell_mv '
         'INTEGER NOT NULL DEFAULT 0 '
         'CHECK (default_show_o2_cell_mv IN (0, 1))',
+      );
+    }
+  }
+
+  /// v163: trim_tank_pressure_at_surfacing on diver_settings (issue #1092).
+  /// Dive computers keep recording after the diver surfaces, so the last
+  /// pressure in the profile is not the pressure at the end of the dive. On
+  /// by default, because the reading it prefers can only ever be the higher,
+  /// earlier one.
+  Future<void> _assertSurfacingPressureColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('trim_tank_pressure_at_surfacing')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN trim_tank_pressure_at_surfacing '
+        'INTEGER NOT NULL DEFAULT 1 '
+        'CHECK (trim_tank_pressure_at_surfacing IN (0, 1))',
       );
     }
   }
@@ -8535,6 +8564,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertO2CellMvDefaultColumn();
         }
         if (from < 161) await reportProgress();
+        // v163: trim_tank_pressure_at_surfacing on diver_settings (#1092).
+        if (from < 163) {
+          await _assertSurfacingPressureColumn();
+        }
+        if (from < 163) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8728,6 +8762,10 @@ class AppDatabase extends _$AppDatabase {
         // v161 backstop: re-assert diver_settings.default_show_o2_cell_mv
         // (issue #1235; same parallel-branch version-collision self-heal).
         await _assertO2CellMvDefaultColumn();
+
+        // v163 backstop: re-assert diver_settings.trim_tank_pressure_at_
+        // surfacing (issue #1092; same parallel-branch collision self-heal).
+        await _assertSurfacingPressureColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

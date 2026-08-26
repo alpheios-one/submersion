@@ -17,6 +17,7 @@ import 'package:submersion/features/dive_computer/domain/services/first_sync_cut
 import 'package:submersion/features/dive_computer/presentation/providers/discovery_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 /// Provider for the dive computer repository.
 final diveComputerRepositoryProvider = Provider<DiveComputerRepository>((ref) {
@@ -130,11 +131,19 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
   // Stored for device info persistence after download completes.
   DiveComputer? _computer;
 
+  /// Reads the diver's surfacing-pressure preference at the moment a dive
+  /// arrives (issue #1092). A getter rather than a value so a settings change
+  /// never has to tear down a notifier with a download in flight; null means
+  /// the default, on.
+  final bool Function()? _trimTankPressureAtSurfacing;
+
   DownloadNotifier({
     required pigeon.DiveComputerService service,
     required DiveComputerRepository repository,
+    bool Function()? trimTankPressureAtSurfacing,
   }) : _service = service,
        _repository = repository,
+       _trimTankPressureAtSurfacing = trimTankPressureAtSurfacing,
        super(const DownloadState());
 
   /// Set whether to download new dives only.
@@ -225,7 +234,10 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
       case pigeon.PinCodeRequestEvent():
         state = state.copyWith(phase: DownloadPhase.pinRequired);
       case pigeon.DiveDownloadedEvent(:final dive):
-        final downloaded = parsedDiveToDownloaded(dive);
+        final downloaded = parsedDiveToDownloaded(
+          dive,
+          trimAtSurfacing: _trimTankPressureAtSurfacing?.call() ?? true,
+        );
         state = state.copyWith(
           downloadedDives: [...state.downloadedDives, downloaded],
         );
@@ -318,7 +330,12 @@ final downloadNotifierProvider =
       final service = ref.watch(diveComputerServiceProvider);
       final repository = ref.watch(diveComputerRepositoryProvider);
 
-      return DownloadNotifier(service: service, repository: repository);
+      return DownloadNotifier(
+        service: service,
+        repository: repository,
+        trimTankPressureAtSurfacing: () =>
+            ref.read(settingsProvider).trimTankPressureAtSurfacing,
+      );
     });
 
 /// Provider for checking if a download is in progress.

@@ -20906,6 +20906,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_siteMatch_subtitle => '下载的潜水与潜水点匹配的积极程度';
 
   @override
+  String get settings_tankPressureAtSurfacing_title => '出水时的气瓶压力';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      '以到达水面时的压力作为结束压力，而不是记录结束时的压力';
+
+  @override
   String get settings_siteMatch_strict => '严格';
 
   @override

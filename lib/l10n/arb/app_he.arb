@@ -6087,6 +6087,8 @@
   "settings_section_dataSources_subtitle": "Connected services & integrations",
   "settings_siteMatch_title": "התאמת אתרים אוטומטית",
   "settings_siteMatch_subtitle": "באיזו מידה צלילות שהורדו מותאמות לאתרים",
+  "settings_tankPressureAtSurfacing_title": "לחץ המיכל בעלייה לפני השטח",
+  "settings_tankPressureAtSurfacing_subtitle": "קריאת לחץ הסיום ברגע ההגעה לפני השטח, ולא בסוף ההקלטה",
   "settings_siteMatch_strict": "קפדני",
   "settings_siteMatch_balanced": "מאוזן",
   "settings_siteMatch_relaxed": "גמיש",
