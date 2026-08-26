@@ -915,9 +915,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
               onTap: () => _handleRowTap(site.id, sites),
             ),
             ListViewMode.compact => CompactSiteListTile(
-              name: site.name,
-              location: locationString,
-              diveCount: siteData.diveCount,
+              entry: siteData,
               isSelectionMode: _isSelectionMode,
               isSelected: isChecked,
               isHighlighted: !_isSelectionMode && isSelected,
