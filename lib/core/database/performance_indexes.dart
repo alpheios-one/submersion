@@ -129,6 +129,15 @@ const List<PerformanceIndex> kPerformanceIndexes = [
         'CREATE INDEX IF NOT EXISTS idx_dive_buddies_dive_id '
         'ON dive_buddies(dive_id)',
   ),
+  // The reverse direction: getDiveIdsForBuddy, getDiveCountForBuddy and
+  // addBuddyToDive's existing-row check all filter on buddy_id, which had no
+  // index and scanned the link table.
+  (
+    name: 'idx_dive_buddies_buddy_id',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_dive_buddies_buddy_id '
+        'ON dive_buddies(buddy_id, dive_id)',
+  ),
   (
     name: 'idx_dive_custom_fields_dive_id',
     ddl:

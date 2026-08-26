@@ -2493,6 +2493,62 @@ $diveXml
       },
     );
 
+    test('accepts comma-separated picture coordinates', () async {
+      final result = await parser.parse(
+        xmlBytes('''
+<divelog program='subsurface' version='3'>
+<dives>
+<dive number='1' date='2025-01-15' time='10:00:00'>
+  <picture filename='/p/a.jpg' gps='18.465562, -66.084902'/>
+</dive>
+</dives>
+</divelog>
+'''),
+      );
+
+      final media = result.entitiesOf(ImportEntityType.media);
+      expect(media.single['latitude'], closeTo(18.465562, 1e-6));
+      expect(media.single['longitude'], closeTo(-66.084902, 1e-6));
+    });
+
+    test('rejects NaN picture coordinates', () async {
+      final result = await parser.parse(
+        xmlBytes('''
+<divelog program='subsurface' version='3'>
+<dives>
+<dive number='1' date='2025-01-15' time='10:00:00'>
+  <picture filename='/p/a.jpg' gps='NaN NaN'/>
+</dive>
+</dives>
+</divelog>
+'''),
+      );
+
+      // double.tryParse happily parses 'NaN', and every comparison against
+      // NaN is false, so a range check alone would wave it through.
+      final media = result.entitiesOf(ImportEntityType.media);
+      expect(media.single['latitude'], isNull);
+      expect(media.single['longitude'], isNull);
+    });
+
+    test('rejects out-of-range picture coordinates', () async {
+      final result = await parser.parse(
+        xmlBytes('''
+<divelog program='subsurface' version='3'>
+<dives>
+<dive number='1' date='2025-01-15' time='10:00:00'>
+  <picture filename='/p/a.jpg' gps='91.0 -200.0'/>
+</dive>
+</dives>
+</divelog>
+'''),
+      );
+
+      final media = result.entitiesOf(ImportEntityType.media);
+      expect(media.single['latitude'], isNull);
+      expect(media.single['longitude'], isNull);
+    });
+
     test('parses a negative offset', () async {
       final result = await parser.parse(
         xmlBytes('''

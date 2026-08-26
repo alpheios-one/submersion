@@ -500,7 +500,9 @@ class SubsurfaceXmlParser implements ImportParser {
         continue;
       }
 
-      final gps = _parseGpsPair(picture.getAttribute('gps'));
+      // Same parser the <site> elements use: it accepts a comma
+      // separator and rejects NaN and out-of-range pairs.
+      final gps = _parseGps(picture.getAttribute('gps'));
       allMedia.add({
         'filename': filename,
         'offsetSeconds': _parseSignedDurationSeconds(
@@ -527,17 +529,6 @@ class SubsurfaceXmlParser implements ImportParser {
     final seconds = _parseDurationSeconds(magnitude);
     if (seconds == null) return null;
     return negative ? -seconds : seconds;
-  }
-
-  /// Parses a Subsurface `gps` attribute: two space-separated decimal degrees.
-  static (double, double)? _parseGpsPair(String? value) {
-    if (value == null || value.isEmpty) return null;
-    final parts = value.trim().split(RegExp(r'\s+'));
-    if (parts.length != 2) return null;
-    final latitude = double.tryParse(parts[0]);
-    final longitude = double.tryParse(parts[1]);
-    if (latitude == null || longitude == null) return null;
-    return (latitude, longitude);
   }
 
   /// Parses `<sample>` elements from a `<divecomputer>` into profile points.

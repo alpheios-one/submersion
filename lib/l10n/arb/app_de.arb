@@ -4431,6 +4431,7 @@
   "settings_appearance_metric_ceiling": "Ceiling",
   "settings_appearance_metric_cns": "CNS% (O2-Toxizität)",
   "settings_appearance_metric_events": "Ereignisse",
+  "settings_appearance_metric_estimatedTankPressure": "Geschätzter Flaschendruck",
   "settings_appearance_metric_gasDensity": "Gasdichte",
   "settings_appearance_metric_gfPercent": "GF%",
   "settings_appearance_metric_heartRate": "Herzfrequenz",

@@ -405,7 +405,6 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     state = state.copyWith(wasLoadedExternally: true);
   }
 
-  /// Desktop only: pick a folder and recursively gather importable files.
   /// Resolves the payload's referenced photos against [rootPath].
   ///
   /// Never throws into the wizard: a scan failure resolves to zero matches
@@ -449,6 +448,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     );
   }
 
+  /// Desktop only: pick a folder and recursively gather importable files.
   Future<void> pickFolder() async {
     state = state.copyWith(
       isLoading: true,

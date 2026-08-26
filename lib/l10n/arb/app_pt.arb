@@ -4431,6 +4431,7 @@
   "settings_appearance_metric_ceiling": "Teto",
   "settings_appearance_metric_cns": "CNS% (Toxicidade de O2)",
   "settings_appearance_metric_events": "Eventos",
+  "settings_appearance_metric_estimatedTankPressure": "Pressão estimada do cilindro",
   "settings_appearance_metric_gasDensity": "Densidade do Gas",
   "settings_appearance_metric_gfPercent": "GF%",
   "settings_appearance_metric_heartRate": "Frequencia Cardiaca",

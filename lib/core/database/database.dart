@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 
 import 'package:drift/drift.dart';
 
+import 'package:submersion/core/database/imported_computer_backfill.dart';
 import 'package:submersion/core/database/performance_indexes.dart';
 import 'package:submersion/core/database/tag_uniqueness.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -1810,6 +1811,15 @@ class DiverSettings extends Table {
   // v161: default visibility for the per-cell O2 mV traces (issue #1235).
   BoolColumn get defaultShowO2CellMv =>
       boolean().withDefault(const Constant(false))();
+  // v163: whether synthesized ("(est.)") tank pressure lines are drawn on the
+  // profile chart at all (issue #731). Defaults to true, preserving the
+  // behavior estimates shipped with. Ignored for coverage for the reason
+  // given below: the declaration is a codegen input, never executed. Its
+  // default is pinned by migration_v163_estimated_tank_pressure_default_test.
+  // coverage:ignore-start
+  BoolColumn get defaultShowEstimatedTankPressure =>
+      boolean().withDefault(const Constant(true))();
+  // coverage:ignore-end
   // Drift column declarations are codegen inputs shadowed by the generated
   // table at runtime, so this line is never executed (every sibling column
   // getter is likewise uncovered). The default is verified via the migration
@@ -3165,7 +3175,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 161;
+  static const int currentSchemaVersion = 163;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3450,6 +3460,13 @@ class AppDatabase extends _$AppDatabase {
     // v161: diver_settings.default_show_o2_cell_mv, a persisted default for
     // the per-cell O2 mV toggle on the profile chart (issue #1235).
     161,
+    // v163: diver_settings.default_show_estimated_tank_pressure, the switch
+    // that suppresses synthesized "(est.)" tank pressure lines on the profile
+    // chart (issue #731). v162 is skipped rather than missing: main was at
+    // v161 when this branch was cut, and the open PR #1287 (issue #1090) had
+    // already written 162 on its own branch. Two branches writing the same
+    // scalar auto-merge with no conflict marker, so 163 was taken instead.
+    163,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4485,6 +4502,15 @@ class AppDatabase extends _$AppDatabase {
   /// Test-only hook exercising the #1064 attribution self-heal directly.
   Future<void> backfillDiveComputerIdsForTest() => _backfillDiveComputerIds();
 
+  /// Register the dive computers that file-imported dives name (issue
+  /// #1288). Body lives in `imported_computer_backfill.dart`.
+  Future<void> _backfillImportedDiveComputers() =>
+      backfillImportedDiveComputers(this);
+
+  /// Test-only hook exercising the #1288 registration self-heal directly.
+  Future<void> backfillImportedDiveComputersForTest() =>
+      _backfillImportedDiveComputers();
+
   /// Copy each buddy's inline certification into a certifications row owned by
   /// that buddy (issue #553). Invoked from the onUpgrade blocks only (v109
   /// expand + the v110 contract safety-net), NEVER the beforeOpen backstop --
@@ -4916,6 +4942,25 @@ class AppDatabase extends _$AppDatabase {
         'ALTER TABLE diver_settings ADD COLUMN default_show_o2_cell_mv '
         'INTEGER NOT NULL DEFAULT 0 '
         'CHECK (default_show_o2_cell_mv IN (0, 1))',
+      );
+    }
+  }
+
+  /// v163: default_show_estimated_tank_pressure on diver_settings (issue
+  /// #731). Synthesized "(est.)" pressure lines previously had no off switch.
+  /// Defaults to 1 so existing databases keep drawing them.
+  Future<void> _assertEstimatedTankPressureDefaultColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('default_show_estimated_tank_pressure')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN '
+        'default_show_estimated_tank_pressure '
+        'INTEGER NOT NULL DEFAULT 1 '
+        'CHECK (default_show_estimated_tank_pressure IN (0, 1))',
       );
     }
   }
@@ -8535,6 +8580,12 @@ class AppDatabase extends _$AppDatabase {
           await _assertO2CellMvDefaultColumn();
         }
         if (from < 161) await reportProgress();
+        // v163: default_show_estimated_tank_pressure on diver_settings
+        // (issue #731).
+        if (from < 163) {
+          await _assertEstimatedTankPressureDefaultColumn();
+        }
+        if (from < 163) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8729,6 +8780,11 @@ class AppDatabase extends _$AppDatabase {
         // (issue #1235; same parallel-branch version-collision self-heal).
         await _assertO2CellMvDefaultColumn();
 
+        // v163 backstop: re-assert
+        // diver_settings.default_show_estimated_tank_pressure (issue #731;
+        // same parallel-branch version-collision self-heal).
+        await _assertEstimatedTankPressureDefaultColumn();
+
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
 
@@ -8899,6 +8955,12 @@ class AppDatabase extends _$AppDatabase {
         // bump). Also AFTER ensurePerformanceIndexes, for the same reason as
         // the backfill above.
         await _backfillDiveComputerIds();
+
+        // Data self-heal (issue #1288): register the computers that
+        // file-imported dives name, so they reach the filter at all. AFTER
+        // the #1064 heal above, which resolves the same column from the
+        // stronger download-derived signal.
+        await _backfillImportedDiveComputers();
       },
     );
   }
