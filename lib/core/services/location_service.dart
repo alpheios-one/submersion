@@ -23,6 +23,10 @@ class LocationResult {
   final String? locality;
   final String? bodyOfWater;
 
+  /// True when the position was found but the geocoder could not be
+  /// reached, so the empty place fields mean "unknown", not "nothing there".
+  final bool geocodeUnavailable;
+
   const LocationResult({
     required this.latitude,
     required this.longitude,
@@ -31,6 +35,7 @@ class LocationResult {
     this.region,
     this.locality,
     this.bodyOfWater,
+    this.geocodeUnavailable = false,
   });
 
   /// The geocoded part of this result, in the shape the site form consumes.
@@ -39,6 +44,7 @@ class LocationResult {
     region: region,
     locality: locality,
     bodyOfWater: bodyOfWater,
+    networkFailed: geocodeUnavailable,
   );
 
   @override
@@ -254,6 +260,7 @@ class LocationService {
         region: place.region,
         locality: place.locality,
         bodyOfWater: place.bodyOfWater,
+        geocodeUnavailable: place.networkFailed,
       );
     } catch (e, stackTrace) {
       _log.error(

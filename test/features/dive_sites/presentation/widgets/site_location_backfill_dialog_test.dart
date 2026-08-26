@@ -37,6 +37,9 @@ class _ScriptedBackfill extends StateNotifier<BackfillState>
   @override
   void cancel() => cancelled = true;
 
+  /// Puts the notifier mid-run without going through [start].
+  void pretendRunning() => state = const BackfillRunning(done: 1, total: 3);
+
   @override
   void reset() => state = const BackfillIdle();
 
@@ -177,5 +180,20 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('reopening the flow mid-run shows progress, not a new run', (
+    tester,
+  ) async {
+    final notifier = _ScriptedBackfill(candidates: 3, script: const []);
+    await tester.pumpWidget(host(notifier));
+    notifier.pretendRunning();
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Filling in location details'), findsOneWidget);
+    expect(find.text('1 of 3'), findsOneWidget);
+    expect(find.text('Fill in missing location details?'), findsNothing);
+    expect(notifier.startCalls, 0);
   });
 }

@@ -17,6 +17,17 @@ Future<void> showSiteLocationBackfillFlow(
   final notifier = ref.read(siteLocationBackfillProvider.notifier);
   final messenger = ScaffoldMessenger.of(context);
 
+  // A run already in progress (the progress dialog was popped by a system
+  // back gesture, say) is shown again rather than asked about twice.
+  if (ref.read(siteLocationBackfillProvider) is BackfillRunning) {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _BackfillProgressDialog(),
+    );
+    return;
+  }
+
   final count = await notifier.countCandidates();
   if (!context.mounted) return;
   if (count == 0) {
@@ -46,7 +57,7 @@ Future<void> showSiteLocationBackfillFlow(
   );
   if (confirmed != true || !context.mounted) return;
 
-  notifier.reset();
+  // No reset here: start() is the only guard against overlapping runs.
   final run = notifier.start();
   await showDialog<void>(
     context: context,

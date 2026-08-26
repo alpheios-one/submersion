@@ -490,6 +490,32 @@ void main() {
     });
   });
 
+  group('LocationResult.place', () {
+    test('carries the geocoder outage through to the site form', () {
+      const result = LocationResult(
+        latitude: 47.0,
+        longitude: 8.4,
+        geocodeUnavailable: true,
+      );
+      expect(result.place.networkFailed, isTrue);
+      expect(result.place.isEmpty, isTrue);
+    });
+
+    test('a geocoded result is a plain lookup', () {
+      const result = LocationResult(
+        latitude: 47.0,
+        longitude: 8.4,
+        country: 'Switzerland',
+        locality: 'Weggis',
+        bodyOfWater: 'Lake Lucerne',
+      );
+      expect(result.place.networkFailed, isFalse);
+      expect(result.place.country, 'Switzerland');
+      expect(result.place.locality, 'Weggis');
+      expect(result.place.bodyOfWater, 'Lake Lucerne');
+    });
+  });
+
   group('body of water (issue #1187)', () {
     Map<String, dynamic> address() => <String, dynamic>{
       'address': <String, dynamic>{
