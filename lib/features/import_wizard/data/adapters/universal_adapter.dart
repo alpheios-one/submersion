@@ -97,6 +97,28 @@ final _universalAdapterMappingAutoAdvanceProvider = Provider<bool>((ref) {
   return false;
 });
 
+/// True when the parsed payload references no photos at all.
+///
+/// Used as the Photos step's auto-advance condition, so the step is invisible
+/// for every import that has nothing to resolve.
+final universalAdapterNoPhotosProvider = Provider<bool>((ref) {
+  final payload = ref.watch(
+    universalImportNotifierProvider.select((s) => s.payload),
+  );
+  return (payload?.entitiesOf(ui.ImportEntityType.media) ?? const []).isEmpty;
+});
+
+/// True when the Photos step has nothing left to ask.
+///
+/// Deliberately looser than [universalAdapterNoPhotosProvider]: a user who
+/// picked a folder or chose to skip may advance, but the step is never
+/// auto-advanced past a decision they have not made.
+final universalAdapterPhotosReadyProvider = Provider<bool>((ref) {
+  if (ref.watch(universalAdapterNoPhotosProvider)) return true;
+  final state = ref.watch(universalImportNotifierProvider);
+  return state.photosSkipped || state.photoResolution != null;
+});
+
 /// Import source adapter for universal file imports (CSV, Subsurface XML,
 /// UDDF, auto-detected formats). Wraps [UniversalImportNotifier] into the
 /// unified import wizard framework.
