@@ -683,9 +683,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           settings: settings,
         );
         if (cards != null) {
-          // Details is the one section that emits no leading gap of its own
-          // (it butts against the profile chart); the pair keeps that.
-          if (pair.left != DiveDetailSectionId.details) {
+          // The row takes the leading gap of the slot it lands in, which is
+          // this half's -- not necessarily the pair's left half, since the
+          // diver may have ordered the right half first. Details is the one
+          // section that emits no gap of its own (it butts against the
+          // profile chart).
+          if (id != DiveDetailSectionId.details) {
             children.add(const SizedBox(height: 24));
           }
           children.add(

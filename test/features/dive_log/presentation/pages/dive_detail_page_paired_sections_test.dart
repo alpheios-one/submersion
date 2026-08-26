@@ -307,6 +307,52 @@ void main() {
       expect((detailsY - envY).abs(), lessThan(4));
       expect(notesY, greaterThan(detailsY));
     });
+
+    testWidgets('takes the leading gap of the slot it occupies', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(1000, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      // Details is the one section that emits no leading gap of its own;
+      // Environment emits the usual 24. A pair renders at the slot of
+      // whichever half the diver ordered first, so that is the gap it must
+      // inherit -- not whichever half the pair table calls the left one.
+      final dive = _diveWithConditions('gap-slot');
+
+      Future<double> pairTop(List<DiveDetailSectionId> order) async {
+        // Tear the tree down first: pumping a second ProviderScope over the
+        // live one keeps the existing SettingsNotifier, so the new section
+        // order would never reach the page.
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpWidget(
+          _buildTestWidget(
+            dive: dive,
+            settings: _settingsWithOrder(order),
+            extraOverrides: _renderOverrides(dive.id, prefs),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(ResponsiveSectionPair), findsOneWidget);
+        // Details stays on the left either way.
+        expect(
+          tester.getTopLeft(find.text('Details')).dx,
+          lessThan(tester.getTopLeft(find.text('Environment')).dx),
+        );
+        return tester.getTopLeft(find.byType(ResponsiveSectionPair)).dy;
+      }
+
+      final detailsFirst = await pairTop([
+        DiveDetailSectionId.details,
+        DiveDetailSectionId.environment,
+      ]);
+      final environmentFirst = await pairTop([
+        DiveDetailSectionId.environment,
+        DiveDetailSectionId.details,
+      ]);
+
+      expect(environmentFirst - detailsFirst, 24);
+    });
   });
 
   group('Buddies + Signatures pairing', () {
