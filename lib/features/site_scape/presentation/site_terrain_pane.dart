@@ -201,11 +201,14 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                       child: _sourceChip(sourceId, resolutionMeters),
                     ),
                     // The legend describes the depth ramp; a photographed
-                    // surface has no ramp to explain.
+                    // surface has no ramp to explain. It sits LEFT because the
+                    // viewport's zoom column owns the right edge, and on a
+                    // phone-sized pane a right-hand legend covers the +/-
+                    // buttons outright (issue #1188).
                     if (appearance.surfaceMode != SeascapeSurfaceMode.imagery)
                       Positioned(
                         top: 96,
-                        right: 8,
+                        left: 8,
                         child: SeascapeDepthLegend(
                           maxDepthMeters: axisInputs.maxDepth,
                           hasLand: grid.depthsMeters.any(

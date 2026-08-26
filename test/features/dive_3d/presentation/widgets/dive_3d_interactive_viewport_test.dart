@@ -267,6 +267,79 @@ void main() {
     expect(scenePainterOf(tester).zoom, 1.0);
   });
 
+  // Issue #1188: on a touchscreen there are no pan/zoom pointers at all, so
+  // the trackpad path below can never fire. Two fingers must pinch-zoom and
+  // pan, while one finger keeps orbiting.
+  testWidgets('two-finger pinch zooms about the focal point', (tester) async {
+    await pumpViewport(tester, scene: buildScene());
+    expect(scenePainterOf(tester).zoom, 1.0);
+    final before = scenePainterOf(tester);
+    final center = tester.getCenter(find.byType(Dive3dInteractiveViewport));
+
+    final f1 = await tester.startGesture(center - const Offset(20, 0));
+    final f2 = await tester.startGesture(center + const Offset(20, 0));
+    await tester.pump();
+    for (var i = 0; i < 4; i++) {
+      await f1.moveBy(const Offset(-15, 0));
+      await f2.moveBy(const Offset(15, 0));
+      await tester.pump();
+    }
+
+    final after = scenePainterOf(tester);
+    expect(after.zoom, greaterThan(1.0));
+    // A pinch must not double as a rotation.
+    expect(after.yawDegrees, before.yawDegrees);
+    expect(after.pitchDegrees, before.pitchDegrees);
+
+    await f1.up();
+    await f2.up();
+    // Let the double-tap recognizer's countdown expire before teardown.
+    await tester.pump(const Duration(milliseconds: 500));
+  });
+
+  testWidgets('two fingers moving together pan without rotating', (
+    tester,
+  ) async {
+    await pumpViewport(tester, scene: buildScene());
+    Offset panOffset() {
+      final t = tester
+          .widget<Transform>(find.byKey(const ValueKey('dive3dViewportPan')))
+          .transform
+          .getTranslation();
+      return Offset(t.x, t.y);
+    }
+
+    final before = scenePainterOf(tester);
+    final center = tester.getCenter(find.byType(Dive3dInteractiveViewport));
+    final f1 = await tester.startGesture(center - const Offset(20, 0));
+    final f2 = await tester.startGesture(center + const Offset(20, 0));
+    await tester.pump();
+    for (var i = 0; i < 3; i++) {
+      await f1.moveBy(const Offset(10, 6));
+      await f2.moveBy(const Offset(10, 6));
+      await tester.pump();
+    }
+
+    expect(panOffset().dx, greaterThan(0));
+    expect(panOffset().dy, greaterThan(0));
+    final after = scenePainterOf(tester);
+    expect(after.yawDegrees, before.yawDegrees);
+    expect(after.pitchDegrees, before.pitchDegrees);
+    expect(after.zoom, closeTo(1.0, 0.05));
+
+    await f1.up();
+    await f2.up();
+    // Let the double-tap recognizer's countdown expire before teardown.
+    await tester.pump(const Duration(milliseconds: 500));
+  });
+
+  testWidgets('zoom controls carry a stable key for host layout checks', (
+    tester,
+  ) async {
+    await pumpViewport(tester, scene: buildScene());
+    expect(find.byKey(const ValueKey('dive3dZoomControls')), findsOneWidget);
+  });
+
   testWidgets('trackpad pan translates the view and pinch zooms', (
     tester,
   ) async {
