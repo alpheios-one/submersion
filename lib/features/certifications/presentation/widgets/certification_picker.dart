@@ -190,9 +190,8 @@ class CertificationPickerSheet extends ConsumerWidget {
 
                   // Only non-null when a custom name owns the title, so the
                   // level is spoken exactly once either way.
-                  final levelLabel = certificationSubtitle(cert) != null
-                      ? ', ${certificationSubtitle(cert)}'
-                      : '';
+                  final level = certificationSubtitle(cert);
+                  final levelLabel = level != null ? ', $level' : '';
                   // Keep the agency: this label replaces the tile's own
                   // semantics, including the subtitle that shows the agency
                   // visually. The title is derived so it is not said twice.

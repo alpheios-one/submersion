@@ -745,9 +745,8 @@ class CertificationListTile extends StatelessWidget {
         : '';
     // Only non-null when a custom name owns the title, so the level is spoken
     // exactly once either way.
-    final levelLabel = certificationSubtitle(certification) != null
-        ? ', ${certificationSubtitle(certification)}'
-        : '';
+    final level = certificationSubtitle(certification);
+    final levelLabel = level != null ? ', $level' : '';
 
     return Semantics(
       // Keep the agency: this label stands in for the whole tile, so dropping

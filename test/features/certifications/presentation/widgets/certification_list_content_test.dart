@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
@@ -630,6 +631,20 @@ void main() {
   });
 
   group('title derivation', () {
+    // The subtitle dates itself with DateFormat.yMMMd(), which resolves
+    // against Intl.defaultLocale (a process global that app.dart sets from the
+    // app locale), NOT the MaterialApp.locale the harness passes. Pin it so
+    // the "Aug 24, 2026" assertions below state their real dependency instead
+    // of riding on intl's implicit en_US fallback, and restore it so the
+    // global stays contained. No initializeDateFormatting is needed: these are
+    // widget tests, so GlobalMaterialLocalizations loads the symbol data.
+    String? previousLocale;
+    setUp(() {
+      previousLocale = Intl.defaultLocale;
+      Intl.defaultLocale = 'en';
+    });
+    tearDown(() => Intl.defaultLocale = previousLocale);
+
     testWidgets('a cert with no stored name still shows a title', (
       tester,
     ) async {
