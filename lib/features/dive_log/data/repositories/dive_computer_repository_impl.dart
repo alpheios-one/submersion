@@ -1614,6 +1614,13 @@ class DiveComputerRepository {
           recordId: diveId,
           localUpdatedAt: now,
         );
+
+        // The replaceSource path clears this dive's data source on the way in
+        // and importProfile re-creates it above, so the linker can see this
+        // computer again by here. The creation-seam trio does not run for an
+        // existing dive, but the computer did log it. Idempotent through
+        // insertOnConflictUpdate.
+        await DiveComputerGearLinker().linkComputerGearForDive(diveId: diveId);
       }
 
       // Note: Computer stats (incrementDiveCount, updateLastDownload) are
