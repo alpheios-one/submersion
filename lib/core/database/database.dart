@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 
 import 'package:drift/drift.dart';
 
+import 'package:submersion/core/database/imported_computer_backfill.dart';
 import 'package:submersion/core/database/performance_indexes.dart';
 import 'package:submersion/core/database/tag_uniqueness.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -4485,6 +4486,15 @@ class AppDatabase extends _$AppDatabase {
   /// Test-only hook exercising the #1064 attribution self-heal directly.
   Future<void> backfillDiveComputerIdsForTest() => _backfillDiveComputerIds();
 
+  /// Register the dive computers that file-imported dives name (issue
+  /// #1288). Body lives in `imported_computer_backfill.dart`.
+  Future<void> _backfillImportedDiveComputers() =>
+      backfillImportedDiveComputers(this);
+
+  /// Test-only hook exercising the #1288 registration self-heal directly.
+  Future<void> backfillImportedDiveComputersForTest() =>
+      _backfillImportedDiveComputers();
+
   /// Copy each buddy's inline certification into a certifications row owned by
   /// that buddy (issue #553). Invoked from the onUpgrade blocks only (v109
   /// expand + the v110 contract safety-net), NEVER the beforeOpen backstop --
@@ -8899,6 +8909,12 @@ class AppDatabase extends _$AppDatabase {
         // bump). Also AFTER ensurePerformanceIndexes, for the same reason as
         // the backfill above.
         await _backfillDiveComputerIds();
+
+        // Data self-heal (issue #1288): register the computers that
+        // file-imported dives name, so they reach the filter at all. AFTER
+        // the #1064 heal above, which resolves the same column from the
+        // stronger download-derived signal.
+        await _backfillImportedDiveComputers();
       },
     );
   }

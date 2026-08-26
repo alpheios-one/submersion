@@ -17,6 +17,7 @@ import 'package:submersion/core/database/database.dart'
         DiveProfile,
         DiveProfileEvent,
         TankPressureProfilesCompanion;
+import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/core/matching/match_scorer.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
@@ -1594,6 +1595,161 @@ class DiveComputerRepository {
       return diveId;
     } catch (e, stackTrace) {
       _log.error('Failed to import profile', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Attribute a dive to a computer, with explicit intent.
+  ///
+  /// `Dive.computerId` is a read-only projection: the insert/update
+  /// companions deliberately omit the column so saving a dive never rewrites
+  /// attribution. Setting it therefore needs a deliberate write, which is
+  /// what the download, consolidation, split, and reparse paths do; file
+  /// import (#1288) joins them through here.
+  ///
+  /// Marks the dive pending so the restored link syncs, matching
+  /// [_relinkOrphanedRows].
+  Future<void> attributeDiveToComputer({
+    required String diveId,
+    required String computerId,
+  }) async {
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await _db.customStatement(
+        'UPDATE dives SET computer_id = ?, updated_at = ? WHERE id = ?',
+        [computerId, now, diveId],
+      );
+      await _syncRepository.markRecordPending(
+        entityType: 'dives',
+        recordId: diveId,
+        localUpdatedAt: now,
+      );
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to attribute dive $diveId to computer $computerId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Register the dive computer a file import names, reusing an existing row
+  /// when one already stands for the same physical device (#1288).
+  ///
+  /// File imports only ever wrote the `dive_computer_model`/`_serial`
+  /// display snapshots onto each dive, so a logbook built entirely from
+  /// files showed a computer on every dive and still reported "No dive
+  /// computers registered" in the filter, which reads `dive_computers`.
+  ///
+  /// The match key is weaker than the download path's, because a file offers
+  /// less to go on:
+  ///
+  /// - With a serial, match on the serial alone (scoped to the diver), the
+  ///   same strong key [findOrCreateComputer] uses. A file's model spelling
+  ///   must not defeat it.
+  /// - Without one, match a row that also has no serial and whose model, or
+  ///   whose manufacturer + model, normalizes to the same string. Matching
+  ///   the full name too is what lets a file's `'Shearwater Perdix'` find a
+  ///   downloaded row stored as manufacturer `'Shearwater'`, model
+  ///   `'Perdix'`.
+  ///
+  /// A serial-bearing row is deliberately never adopted by a serial-less
+  /// import: two units of one model are common, and collapsing them would
+  /// misattribute dives with no way to undo it.
+  ///
+  /// Returns null when the file names no model, which is the signal to leave
+  /// the dive unattributed rather than register a placeholder device.
+  Future<domain.DiveComputer?> findOrRegisterImportedComputer({
+    required String model,
+    String? manufacturer,
+    String? serialNumber,
+    String? firmwareVersion,
+    String? diverId,
+  }) async {
+    try {
+      final normalizedModel = normalizeComputerIdentityPart(model);
+      if (normalizedModel.isEmpty) return null;
+
+      final query = _db.select(_db.diveComputers)
+        ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)]);
+      final normalizedDiverId = diverId?.trim();
+      if (normalizedDiverId != null && normalizedDiverId.isNotEmpty) {
+        query.where((t) => t.diverId.equals(normalizedDiverId));
+      }
+
+      // Matched in Dart, like findByHardwareIdentity: a stored serial or
+      // model may itself carry whitespace from an older import, so trimming
+      // only the input would miss that row. The rule itself lives in
+      // [matchImportedComputer] because the beforeOpen self-heal has to apply
+      // exactly the same one.
+      final rows = await query.get();
+      final match = matchImportedComputer(
+        model: model,
+        serialNumber: serialNumber,
+        diverId: diverId,
+        candidates: rows.map(
+          (row) => ImportedComputerCandidate(
+            id: row.id,
+            diverId: row.diverId,
+            manufacturer: row.manufacturer,
+            model: row.model,
+            serialNumber: row.serialNumber,
+          ),
+        ),
+      );
+      if (match != null) {
+        return _mapRowToComputer(rows.firstWhere((r) => r.id == match.id));
+      }
+
+      // Deterministic, so the import and the beforeOpen self-heal agree and a
+      // synced fleet converges on one row per device.
+      final id = importedDiveComputerId(
+        model: model,
+        serialNumber: serialNumber,
+        diverId: diverId,
+      );
+
+      // The identity match above reads the row's CURRENT text while the id is
+      // derived from the FILE's text, so renaming a registered computer makes
+      // them disagree: the match misses and the id still collides. Adopt the
+      // row holding it rather than letting the insert throw and abort the
+      // import.
+      final byDerivedId = await (_db.select(
+        _db.diveComputers,
+      )..where((t) => t.id.equals(id))).getSingleOrNull();
+      if (byDerivedId != null) return _mapRowToComputer(byDerivedId);
+
+      final trimmedModel = model.trim();
+      final trimmedManufacturer = manufacturer?.trim();
+      final now = DateTime.now();
+      return await createComputer(
+        domain.DiveComputer(
+          id: id,
+          diverId: diverId,
+          name: trimmedManufacturer != null && trimmedManufacturer.isNotEmpty
+              ? '$trimmedManufacturer $trimmedModel'
+              : trimmedModel,
+          manufacturer: trimmedManufacturer?.isNotEmpty ?? false
+              ? trimmedManufacturer
+              : null,
+          model: trimmedModel,
+          serialNumber: serialNumber?.trim().isNotEmpty ?? false
+              ? serialNumber!.trim()
+              : null,
+          firmwareVersion: firmwareVersion?.trim().isNotEmpty ?? false
+              ? firmwareVersion!.trim()
+              : null,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to register imported dive computer',
+        error: e,
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }
