@@ -4,6 +4,6 @@ Submersion has no user accounts: no sign-up, no login, no demo account, and no b
 
 "SIGN IN": these options connect to a third-party storage account the user already owns (iCloud, Dropbox, Google Drive, or a user-supplied S3 bucket) so the user can sync or back up their own data to their own storage. We never receive it. Connections are removed at Settings > Photos & Media > Connected Accounts.
 
-App Lock (Settings > Security) and backup encryption are optional device-local passwords, not accounts, and can be turned off from the same screens.
+App Lock (Settings > Security, a password or biometric unlock for the app) and backup encryption (a password on exported backup files) are optional device-local protections, not accounts, and can be turned off from the same screens.
 
 No demo credentials are needed; entering any name in the profile step reaches every feature.
