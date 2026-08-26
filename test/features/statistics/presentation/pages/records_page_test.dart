@@ -538,6 +538,7 @@ void main() {
         ProviderScope(
           overrides: getOverrides(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: RecordsPage(),
@@ -555,6 +556,7 @@ void main() {
         ProviderScope(
           overrides: getOverrides(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: RecordsPage(),
@@ -581,6 +583,7 @@ void main() {
             filter: const DiveFilterState(favoritesOnly: true),
           ),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: RecordsPage(),
@@ -600,6 +603,7 @@ void main() {
         ProviderScope(
           overrides: getOverrides(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: RecordsPage(),
@@ -621,6 +625,7 @@ void main() {
             filter: const DiveFilterState(favoritesOnly: true),
           ),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: RecordsPage(),
@@ -637,6 +642,7 @@ void main() {
         ProviderScope(
           overrides: getOverrides(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: RecordsPage(),
@@ -672,6 +678,7 @@ void main() {
         ProviderScope(
           overrides: getOverrides(diveRecordsOverride: (ref) async => records),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: RecordsPage(),
@@ -685,6 +692,72 @@ void main() {
       expect(find.text('Longest Dive'), findsOneWidget);
     });
 
+    // firstDive/lastDive carry no field predicate, so a dive logged with only
+    // a date populates the milestones while every superlative stays null. The
+    // page must not call that "no records".
+    testWidgets('shows milestones when only first and last dive are known', (
+      tester,
+    ) async {
+      final records = DiveRecords(
+        firstDive: DiveRecord(
+          diveId: '1',
+          diveNumber: 1,
+          dateTime: DateTime(2024, 6, 15),
+        ),
+        lastDive: DiveRecord(
+          diveId: '2',
+          diveNumber: 2,
+          dateTime: DateTime(2024, 7, 20),
+        ),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: getOverrides(diveRecordsOverride: (ref) async => records),
+          child: const MaterialApp(
+            locale: Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: RecordsPage(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('No Records Yet'), findsNothing);
+      expect(find.text('First Dive'), findsOneWidget);
+      expect(find.text('Most Recent Dive'), findsOneWidget);
+    });
+
+    testWidgets('shows the shallowest dive card when it is the only record', (
+      tester,
+    ) async {
+      final records = DiveRecords(
+        shallowestDive: DiveRecord(
+          diveId: '1',
+          diveNumber: 1,
+          dateTime: DateTime(2024, 6, 15),
+          maxDepth: 6.0,
+        ),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: getOverrides(diveRecordsOverride: (ref) async => records),
+          child: const MaterialApp(
+            locale: Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: RecordsPage(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('No Records Yet'), findsNothing);
+      expect(find.text('Shallowest Dive'), findsOneWidget);
+    });
+
     testWidgets('should display error state with retry button', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -694,6 +767,7 @@ void main() {
             },
           ),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: RecordsPage(),

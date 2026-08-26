@@ -74,11 +74,19 @@ class RecordsPage extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
 
-    final hasRecords =
-        records.deepestDive != null ||
-        records.longestDive != null ||
-        records.coldestDive != null ||
-        records.warmestDive != null;
+    // Every slot the page can render, not just the four superlative cards:
+    // firstDive/lastDive carry no field predicate, so dives logged with only a
+    // date populate the milestones while all four superlatives stay null.
+    // Gating on the four alone hid milestone cards that had content.
+    final hasRecords = [
+      records.deepestDive,
+      records.longestDive,
+      records.coldestDive,
+      records.warmestDive,
+      records.shallowestDive,
+      records.firstDive,
+      records.lastDive,
+    ].any((record) => record != null);
 
     if (!hasRecords) {
       // "Start logging dives" is wrong advice when the logbook is full and the
