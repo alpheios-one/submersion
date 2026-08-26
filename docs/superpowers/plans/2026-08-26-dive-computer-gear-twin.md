@@ -4,7 +4,7 @@
 
 **Goal:** A dive computer that downloaded a dive appears as a piece of equipment on that dive.
 
-**Architecture:** A nullable `dive_computers.equipment_id` bridges the device registry to a real `equipment` row of type `computer` (its "gear twin"). The twin is created exactly once, at computer registration, at a deterministic UUID v5 id so a synced fleet converges on one row. A link-only service then attaches that twin to each dive at the non-interactive creation seams. A v168 migration backfills existing logbooks.
+**Architecture:** A nullable `dive_computers.equipment_id` bridges the device registry to a real `equipment` row of type `computer` (its "gear twin"). The twin is created exactly once, at computer registration, at a deterministic UUID v5 id so a synced fleet converges on one row. A link-only service then attaches that twin to each dive at the non-interactive creation seams. A v169 migration backfills existing logbooks.
 
 **Tech Stack:** Flutter, Dart, Drift ORM, SQLite, Riverpod, `uuid` package.
 
@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- **Schema version is v168.** Verified by diffing open PRs, not by grepping main: v165 (#1290), v166 (#1300) and v167 (#1276) are claimed by open PRs, and main is at v164. Do NOT renumber without re-running that scan.
+- **Schema version is v169.** Verified by diffing open PRs, not by grepping main: v165 (#1290), v166 (#1300), v167 (#1276) and v168 (#1237) are claimed by open PRs, and main is at v164. This plan originally claimed v168; #1237 renumbered onto it mid-implementation. Do NOT renumber without re-running that scan.
 - **`minimumCompatibleSchemaVersion` stays at 160.** The rule at `database.dart:3211` says not to raise it for a new nullable column.
 - **Never use em-dashes (`—`, U+2014)** in any output: code, comments, docs, commit messages. En-dashes as prose punctuation and spaced hyphens are equally forbidden. Use commas, colons, semicolons, or two sentences.
 - **No emojis** in code, comments, or documentation.
@@ -30,7 +30,7 @@
 
 **Create:**
 - `lib/core/database/dive_computer_gear_identity.dart` (~85 lines) - pure Dart: the frozen namespace, the deterministic id, the candidate struct, the match rule. No database import, so both the repository and the migration can use it.
-- `lib/core/database/dive_computer_gear_backfill.dart` (~140 lines) - the v168 two-pass backfill over a bare `DatabaseConnectionUser`.
+- `lib/core/database/dive_computer_gear_backfill.dart` (~140 lines) - the v169 two-pass backfill over a bare `DatabaseConnectionUser`.
 - `lib/features/equipment/data/services/dive_computer_gear_resolver.dart` (~110 lines) - runtime find-or-create.
 - `lib/features/equipment/data/services/dive_computer_gear_linker.dart` (~70 lines) - link-only, per dive.
 
@@ -215,7 +215,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/database/imported_computer_identity.dart';
 
-/// Namespace for deterministic gear-twin ids (v168).
+/// Namespace for deterministic gear-twin ids (v169).
 ///
 /// Frozen: every device must derive the same equipment id for the same
 /// registered computer, so changing this would fork one gear item into one per
@@ -237,7 +237,7 @@ String diveComputerGearId(String computerId) => const Uuid().v5(
 /// An equipment row reduced to the fields the gear-twin match needs.
 ///
 /// Lets the rule live in one place: the repository builds these from Drift
-/// rows, the v168 migration backfill from raw rows.
+/// rows, the v169 migration backfill from raw rows.
 class GearTwinCandidate {
   const GearTwinCandidate({
     required this.id,
@@ -310,21 +310,21 @@ git commit -m "feat(equipment): deterministic gear-twin identity for dive comput
 
 ---
 
-## Task 2: Schema column, sync parent ref, and the v168 ladder rung
+## Task 2: Schema column, sync parent ref, and the v169 ladder rung
 
 Column only. The backfill lands in Task 6, once the resolver exists.
 
 **Files:**
 - Modify: `lib/core/database/database.dart`
 - Modify: `lib/core/services/sync/sync_service.dart` (`parentRefs`, near `:2042`)
-- Test: `test/core/database/migration_v168_dive_computer_gear_test.dart`
+- Test: `test/core/database/migration_v169_dive_computer_gear_test.dart`
 
 **Interfaces:**
 - Produces: the `dive_computers.equipment_id` column; `AppDatabase.currentSchemaVersion == 168`; `_assertDiveComputerEquipmentColumn()`.
 
 - [ ] **Step 1: Write the failing test**
 
-Create `test/core/database/migration_v168_dive_computer_gear_test.dart`:
+Create `test/core/database/migration_v169_dive_computer_gear_test.dart`:
 
 ```dart
 import 'package:drift/native.dart';
@@ -332,15 +332,15 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/database/database.dart';
 
-/// v168 adds `dive_computers.equipment_id`: the equipment row that represents a
+/// v169 adds `dive_computers.equipment_id`: the equipment row that represents a
 /// registered computer as gear, so a downloaded dive lists the computer that
 /// logged it alongside the rest of the diver's kit. Nullable with no default,
 /// because a cleared value means the user deleted that gear item and it must
 /// not come back.
-NativeDatabase _dbAt167() {
+NativeDatabase _dbAt168() {
   return NativeDatabase.memory(
     setup: (rawDb) {
-      rawDb.execute('PRAGMA user_version = 167');
+      rawDb.execute('PRAGMA user_version = 168');
       rawDb.execute('''
         CREATE TABLE dive_computers (
           id TEXT NOT NULL PRIMARY KEY,
@@ -365,9 +365,9 @@ NativeDatabase _dbAt167() {
 }
 
 void main() {
-  test('v168 is in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(168));
-    expect(AppDatabase.migrationVersions, contains(168));
+  test('v169 is in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(169));
+    expect(AppDatabase.migrationVersions, contains(169));
   });
 
   test('a fresh database has dive_computers.equipment_id', () async {
@@ -397,8 +397,8 @@ void main() {
     expect(column.read<String?>('dflt_value'), isNull);
   });
 
-  test('a database at v167 gains the column and keeps its rows', () async {
-    final db = AppDatabase(_dbAt167());
+  test('a database at v168 gains the column and keeps its rows', () async {
+    final db = AppDatabase(_dbAt168());
     addTearDown(db.close);
 
     final row = await db
@@ -408,7 +408,7 @@ void main() {
     expect(row.read<String?>('equipment_id'), isNull);
   });
 
-  test('a database stranded at a parallel-branch v168 gains the column via '
+  test('a database stranded at a parallel-branch v169 gains the column via '
       'beforeOpen', () async {
     // Stamped AT 168 but without the column: the onUpgrade block never runs,
     // so only the beforeOpen backstop can add it.
@@ -446,7 +446,7 @@ void main() {
 
 - [ ] **Step 2: Run the test to verify it fails**
 
-Run: `flutter test test/core/database/migration_v168_dive_computer_gear_test.dart`
+Run: `flutter test test/core/database/migration_v169_dive_computer_gear_test.dart`
 Expected: FAIL, `currentSchemaVersion` is 164 and `equipment_id` is absent.
 
 - [ ] **Step 3: Add the column to the table class**
@@ -455,7 +455,7 @@ In `lib/core/database/database.dart`, inside `class DiveComputers extends Table`
 
 ```dart
   /// The equipment row representing this device as gear, its "gear twin"
-  /// (v168). Seeded once at registration, then owned by the user: renaming or
+  /// (v169). Seeded once at registration, then owned by the user: renaming or
   /// retiring the gear item never writes back here, and renaming the computer
   /// never overwrites the gear name.
   ///
@@ -481,7 +481,7 @@ Leave `minimumCompatibleSchemaVersion` at 160: the rule beside it says not to ra
 Append to the end of the `migrationVersions` list, matching the surrounding comment style:
 
 ```dart
-  // v168 (gear twins): dive_computers.equipment_id, the equipment row that
+  // v169 (gear twins): dive_computers.equipment_id, the equipment row that
   // represents a registered computer as gear, so a downloaded dive lists the
   // computer that logged it alongside the rest of the diver's kit. The ladder
   // is monotonic and unique but NOT contiguous: 162 is permanently skipped and
@@ -494,7 +494,7 @@ Append to the end of the `migrationVersions` list, matching the surrounding comm
 Add near the other `_assert*Column` helpers in `lib/core/database/database.dart`:
 
 ```dart
-  /// v168: dive_computers.equipment_id (gear twins). Idempotent; safe to call
+  /// v169: dive_computers.equipment_id (gear twins). Idempotent; safe to call
   /// from both onUpgrade and the beforeOpen backstop. Nullable with no default,
   /// because a null means "this computer has no gear item", which is also what
   /// a user deleting the gear item leaves behind.
@@ -517,10 +517,10 @@ Add near the other `_assert*Column` helpers in `lib/core/database/database.dart`
 At the end of the `onUpgrade` ladder, after the existing `if (from < 164)` block and its `reportProgress()` twin:
 
 ```dart
-      if (from < 168) {
+      if (from < 169) {
         await _assertDiveComputerEquipmentColumn();
       }
-      if (from < 168) await reportProgress();
+      if (from < 169) await reportProgress();
 ```
 
 - [ ] **Step 7: Add the beforeOpen backstop**
@@ -528,7 +528,7 @@ At the end of the `onUpgrade` ladder, after the existing `if (from < 164)` block
 Beside the other version backstops in `beforeOpen`:
 
 ```dart
-        // v168 backstop: re-assert dive_computers.equipment_id (gear twins;
+        // v169 backstop: re-assert dive_computers.equipment_id (gear twins;
         // same parallel-branch version-collision self-heal). Column only:
         // backfillDiveComputerGearTwins is a full-table pass that belongs to
         // the ladder, and re-running it on every open would resurrect a gear
@@ -552,7 +552,7 @@ No serializer change is needed: `diveComputers` round-trips through Drift's `row
 
 - [ ] **Step 9: Run both tests to verify they pass**
 
-Run: `flutter test test/core/database/migration_v168_dive_computer_gear_test.dart`
+Run: `flutter test test/core/database/migration_v169_dive_computer_gear_test.dart`
 Expected: PASS, 5 tests.
 
 Run: `flutter test test/core/services/sync/sync_parent_refs_completeness_test.dart`
@@ -563,8 +563,8 @@ Expected: PASS.
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 dart format .
-git add lib/core/database/database.dart lib/core/database/database.g.dart lib/core/services/sync/sync_service.dart test/core/database/migration_v168_dive_computer_gear_test.dart
-git commit -m "feat(db): add dive_computers.equipment_id gear-twin bridge at v168"
+git add lib/core/database/database.dart lib/core/database/database.g.dart lib/core/services/sync/sync_service.dart test/core/database/migration_v169_dive_computer_gear_test.dart
+git commit -m "feat(db): add dive_computers.equipment_id gear-twin bridge at v169"
 ```
 
 ---
@@ -752,7 +752,7 @@ Expected: FAIL, compile error, `dive_computer_gear_resolver.dart` does not exist
 In `lib/features/dive_log/domain/entities/dive_computer.dart`, add the field, the constructor parameter, the `copyWith` parameter and assignment, and the `props` entry, matching how `serialNumber` is threaded through. The doc comment:
 
 ```dart
-  /// The equipment row representing this device as gear (v168). Null when the
+  /// The equipment row representing this device as gear (v169). Null when the
   /// user has deleted that gear item, which is permanent: only a genuine
   /// computer registration mints a twin.
   final String? equipmentId;
@@ -1421,11 +1421,11 @@ git commit -m "feat(equipment): link the gear twin when a dive source is replace
 
 ---
 
-## Task 6: The v168 backfill
+## Task 6: The v169 backfill
 
 **Files:**
 - Create: `lib/core/database/dive_computer_gear_backfill.dart`
-- Modify: `lib/core/database/database.dart` (call it from the `if (from < 168)` block)
+- Modify: `lib/core/database/database.dart` (call it from the `if (from < 169)` block)
 - Test: `test/core/database/dive_computer_gear_backfill_test.dart`
 
 **Interfaces:**
@@ -1443,13 +1443,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/dive_computer_gear_identity.dart';
 
-/// The v168 backfill mints a gear twin per registered computer and links it to
-/// every dive that computer logged. Fixture is stamped at 167 so the ladder
+/// The v169 backfill mints a gear twin per registered computer and links it to
+/// every dive that computer logged. Fixture is stamped at 168 so the ladder
 /// runs the real migration.
 NativeDatabase _seeded() {
   return NativeDatabase.memory(
     setup: (rawDb) {
-      rawDb.execute('PRAGMA user_version = 167');
+      rawDb.execute('PRAGMA user_version = 168');
       rawDb.execute('''
         CREATE TABLE dive_computers (
           id TEXT NOT NULL PRIMARY KEY,
@@ -1598,7 +1598,7 @@ import 'package:drift/drift.dart';
 import 'package:submersion/core/database/dive_computer_gear_identity.dart';
 
 /// Seed a gear twin for every registered dive computer and link it to the
-/// dives that computer logged (v168).
+/// dives that computer logged (v169).
 ///
 /// Ladder-only, never a beforeOpen backstop, for two independent reasons:
 /// it is a full-table pass over every dive, and re-running it on every open
@@ -1761,14 +1761,14 @@ In `lib/core/database/database.dart`, add the import:
 import 'package:submersion/core/database/dive_computer_gear_backfill.dart';
 ```
 
-and extend the `if (from < 168)` block from Task 2 so it reads:
+and extend the `if (from < 169)` block from Task 2 so it reads:
 
 ```dart
-      if (from < 168) {
+      if (from < 169) {
         await _assertDiveComputerEquipmentColumn();
         await backfillDiveComputerGearTwins(this);
       }
-      if (from < 168) await reportProgress();
+      if (from < 169) await reportProgress();
 ```
 
 - [ ] **Step 5: Run the test to verify it passes**
@@ -1776,9 +1776,9 @@ and extend the `if (from < 168)` block from Task 2 so it reads:
 Run: `flutter test test/core/database/dive_computer_gear_backfill_test.dart`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 6: Re-run the v168 column test to confirm no regression**
+- [ ] **Step 6: Re-run the v169 column test to confirm no regression**
 
-Run: `flutter test test/core/database/migration_v168_dive_computer_gear_test.dart`
+Run: `flutter test test/core/database/migration_v169_dive_computer_gear_test.dart`
 Expected: PASS, 5 tests.
 
 - [ ] **Step 7: Format and commit**
@@ -1786,7 +1786,7 @@ Expected: PASS, 5 tests.
 ```bash
 dart format .
 git add -A
-git commit -m "feat(db): backfill dive computer gear twins at v168"
+git commit -m "feat(db): backfill dive computer gear twins at v169"
 ```
 
 ---
@@ -1904,7 +1904,7 @@ and immediately after the existing `INSERT OR IGNORE INTO dive_computers` statem
       }
 ```
 
-Guard the whole block behind an `equipment_id` column probe at the top of `backfillImportedDiveComputers`, alongside the existing guards, so an old fixture without the v168 column skips it:
+Guard the whole block behind an `equipment_id` column probe at the top of `backfillImportedDiveComputers`, alongside the existing guards, so an old fixture without the v169 column skips it:
 
 ```dart
   final hasGearColumn = computerCols.contains('equipment_id');
@@ -1945,7 +1945,7 @@ Add to `test/core/buoyancy/gear_feature_test.dart`:
 ```dart
   group('dive computers', () {
     test('contribute no dry mass', () {
-      // Gear twins (v168) put a computer on every downloaded dive. The
+      // Gear twins (v169) put a computer on every downloaded dive. The
       // _typeDryMass fallthrough of 0.5 kg would silently move every diver's
       // rig by that much per computer.
       final feature = GearFeature.fromEquipment(
@@ -2005,7 +2005,7 @@ In `lib/core/buoyancy/gear_feature.dart`:
     EquipmentType.gloves => 0.2,
     EquipmentType.boots => 0.4,
     // Stated rather than left to the fallthrough, which already returns 0.0:
-    // gear twins (v168) make this a case readers will look for.
+    // gear twins (v169) make this a case readers will look for.
     EquipmentType.computer => 0.0,
     _ => 0.0,
   };
@@ -2015,7 +2015,7 @@ In `lib/core/buoyancy/gear_feature.dart`:
     EquipmentType.drysuit => 3.0,
     EquipmentType.bcd => 3.5,
     // A wrist computer's dry mass is negligible against the rig, and gear
-    // twins (v168) put one on every downloaded dive: the 0.5 kg fallthrough
+    // twins (v169) put one on every downloaded dive: the 0.5 kg fallthrough
     // would move every diver's buoyancy by that much per computer. An explicit
     // dry_weight_kg attribute still wins, so a bulky console can be modeled.
     EquipmentType.computer => 0.0,
@@ -2222,7 +2222,7 @@ import 'package:submersion/features/equipment/presentation/providers/equipment_p
 and add the widget at the bottom of the file:
 
 ```dart
-/// The equipment row representing this device as gear, its gear twin (v168).
+/// The equipment row representing this device as gear, its gear twin (v169).
 ///
 /// Absent when the computer has no `equipmentId`, which is what deleting the
 /// gear item leaves behind and is permanent by design: only a genuine
@@ -2341,7 +2341,7 @@ One run is sufficient before opening a PR. Do not start a second run while this 
 ```bash
 for n in $(gh pr list --state open --json number --jq '.[].number'); do gh pr diff $n | grep -E '^\+\s*static const int currentSchemaVersion'; done
 ```
-Expected: no other open PR claims 168. If one does, renumber, remembering the claim touches six places: the scalar, the `migrationVersions` entry, the assert helper docstring, the `if (from < N)` guard and its `reportProgress` twin, the `beforeOpen` backstop comment, and the migration test filename with its `greaterThanOrEqualTo` and `contains` assertions.
+Expected: no other open PR claims 169. If one does, renumber, remembering the claim touches six places: the scalar, the `migrationVersions` entry, the assert helper docstring, the `if (from < N)` guard and its `reportProgress` twin, the `beforeOpen` backstop comment, and the migration test filename with its `greaterThanOrEqualTo` and `contains` assertions.
 
 - [ ] **Step 7: Commit any formatting or codegen drift**
 

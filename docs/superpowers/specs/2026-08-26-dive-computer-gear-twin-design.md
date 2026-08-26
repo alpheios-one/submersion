@@ -4,7 +4,7 @@
 **Issue:** none yet. Related to #1020 (equipment set keyed on the downloading
 computer), which this does not implement and does not block.
 **Branch:** `worktree-dive-computer-gear-twin`
-**Schema:** claims v168.
+**Schema:** claims v169.
 
 ## Problem
 
@@ -137,10 +137,17 @@ awaits resolve in microtasks, and an unbroken microtask chain never reaches the
 vsync queue, freezing the migration spinner (`database.dart:3696-3726`, fixed
 with `if (processed++ % 25 == 24) await Future<void>.delayed(Duration.zero);`).
 
-**F13. v168 is the next free schema version.** Main is at v164
+**F13. v169 is the next free schema version.** Main is at v164
 (`database.dart:3183`). A loop over open PR diffs returns v165 (#1290), v166
-(#1300), v167 (#1276); v161 (#1237) and v138 (#603) are stale. Grepping main
+(#1300), v167 (#1276) and v168 (#1237); v138 (#603) is stale. Grepping main
 alone would have said v165 was free and walked into a silent auto-merge.
+
+**Renumbered from v168 during implementation.** The first scan saw #1237 at
+v161. That PR was renumbered to v168 and pushed while this design was being
+written, so the claim was invisible to both the main grep and the open-PR scan
+at the moment they ran. Two branches writing the same scalar auto-merge with no
+conflict marker, so the collision would have surfaced only as a database
+silently skipping a rung. Re-run the scan immediately before opening the PR.
 
 **F14. #1297 is a working template for find-or-create with deterministic ids.**
 `findOrRegisterImportedComputer:1666` matches identity in Dart (not SQL, because
@@ -308,9 +315,9 @@ sets entirely. This ordering gets a regression test, not a comment.
 | Consolidation | covered for free, per F6 |
 | `importProfile` replaceSource branch (`isNewDive == false`) | new, per F7; idempotent through `insertOnConflictUpdate` |
 
-### D8. Migration v168
+### D8. Migration v169
 
-Two passes in the `if (from < 168)` block, both PRAGMA-guarded like every
+Two passes in the `if (from < 169)` block, both PRAGMA-guarded like every
 neighbouring helper.
 
 **Pass 1** resolves every existing `dive_computers` row through D3 and stamps
@@ -342,14 +349,14 @@ pass 1 writes.
 The claim touches six places, all of which must move together if the number is
 renumbered before merge: the `currentSchemaVersion` scalar, the
 `migrationVersions` ladder entry, the `_assert*` helper docstring, the
-`if (from < 168)` guard and its `reportProgress` twin, the `beforeOpen` backstop
+`if (from < 169)` guard and its `reportProgress` twin, the `beforeOpen` backstop
 comment, and the migration test filename with its version assertions. The ladder
 is monotonic and unique but **not** contiguous by design (162 is permanently
-skipped, and 165 through 167 are reserved by open PRs); the audit must not
+skipped, and 165 through 168 are reserved by open PRs); the audit must not
 "fix" that.
 
 A `beforeOpen` column assert is still required, per the F11 rule that a database
-arriving already stamped at or above v168 enters no ladder block. That assert is
+arriving already stamped at or above v169 enters no ladder block. That assert is
 schema-only. It adds the column if missing; it does not backfill.
 
 ### D9. Sync
@@ -435,8 +442,8 @@ Tests first, per the project guide.
 * null-serial computers match on brand plus model
 * a computer whose twin was deleted resolves to nothing and does not re-mint
 
-**Migration v168**
-* stranded-database fixture at v167 with computers, dives, and data sources
+**Migration v169**
+* stranded-database fixture at v168 with computers, dives, and data sources
 * twins minted, `equipment_id` stamped, join rows inserted
 * a multi-source dive links **both** computers (the F2 case)
 * idempotent across a re-run
