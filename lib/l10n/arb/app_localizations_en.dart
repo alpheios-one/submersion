@@ -12722,6 +12722,31 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Linked $count items',
+      one: 'Linked 1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Attached $count items to this site',
+      one: 'Attached 1 item to this site',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'Undo';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'Photo already linked to this dive';
 

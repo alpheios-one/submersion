@@ -12614,6 +12614,31 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטים קושרו',
+      one: 'פריט אחד קושר',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטים צורפו לאתר זה',
+      one: 'פריט אחד צורף לאתר זה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'ביטול';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'תמונה כבר מקושרת לצלילה זו';
 

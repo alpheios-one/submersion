@@ -49,7 +49,8 @@ void main() {
   testWidgets('summary shows file/dive/unmatched counts', (tester) async {
     await _pumpPane(tester, _staged());
 
-    expect(find.textContaining('3 photos'), findsOneWidget);
+    // "files", not "photos": the tab admits video too.
+    expect(find.textContaining('3 files'), findsOneWidget);
     expect(find.textContaining('1 dive'), findsOneWidget);
     expect(find.textContaining('1 unmatched'), findsOneWidget);
   });

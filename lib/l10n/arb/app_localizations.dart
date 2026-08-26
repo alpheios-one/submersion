@@ -21722,6 +21722,24 @@ abstract class AppLocalizations {
   /// **'Shift {amount} later'**
   String media_photoPicker_files_offsetForwardTooltip(String amount);
 
+  /// No description provided for @media_photoPicker_files_linkedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Linked 1 item} other{Linked {count} items}}'**
+  String media_photoPicker_files_linkedCount(int count);
+
+  /// No description provided for @media_photoPicker_files_attachedToSiteCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Attached 1 item to this site} other{Attached {count} items to this site}}'**
+  String media_photoPicker_files_attachedToSiteCount(int count);
+
+  /// No description provided for @media_photoPicker_files_undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get media_photoPicker_files_undo;
+
   /// No description provided for @media_photoPicker_thumbnailAlreadyLinkedLabel.
   ///
   /// In en, this message translates to:

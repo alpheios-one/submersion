@@ -12923,6 +12923,31 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente verknüpft',
+      one: '1 Element verknüpft',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente diesem Tauchplatz zugeordnet',
+      one: '1 Element diesem Tauchplatz zugeordnet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'Rückgängig';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'Foto bereits mit diesem Tauchgang verknüpft';
 

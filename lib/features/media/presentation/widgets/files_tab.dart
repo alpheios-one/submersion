@@ -12,6 +12,7 @@ import 'package:submersion/features/media/domain/value_objects/media_attach_targ
 import 'package:submersion/features/media/presentation/providers/files_tab_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/file_review_pane.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Files tab in the photo picker.
 ///
@@ -200,13 +201,14 @@ class FilesTab extends ConsumerWidget {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          // TODO(media): l10n
           Row(
             children: [
               Expanded(
                 child: FilledButton.icon(
                   icon: const Icon(Icons.upload_file),
-                  label: const Text('Pick files…'),
+                  label: Text(
+                    context.l10n.media_photoPicker_files_pickFilesButton,
+                  ),
                   // coverage:ignore-start
                   onPressed: () => _pickFiles(ref),
                   // coverage:ignore-end
@@ -216,7 +218,9 @@ class FilesTab extends ConsumerWidget {
               Expanded(
                 child: FilledButton.icon(
                   icon: const Icon(Icons.folder_open),
-                  label: const Text('Pick a folder…'),
+                  label: Text(
+                    context.l10n.media_photoPicker_files_pickFolderButton,
+                  ),
                   // coverage:ignore-start
                   onPressed: () => _pickFolder(ref),
                   // coverage:ignore-end
@@ -235,8 +239,10 @@ class FilesTab extends ConsumerWidget {
                       .read(filesTabNotifierProvider.notifier)
                       .toggleAutoMatch(),
                 ),
-                const Expanded(
-                  child: Text('Auto-match photos and videos to dives by date'),
+                Expanded(
+                  child: Text(
+                    context.l10n.media_photoPicker_files_autoMatchLabel,
+                  ),
                 ),
               ],
             ),
@@ -253,7 +259,7 @@ class FilesTab extends ConsumerWidget {
             child: state.files.isEmpty
                 ? Center(
                     child: Text(
-                      'Pick files or a folder to start.',
+                      context.l10n.media_photoPicker_files_emptyHint,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   )
@@ -279,7 +285,7 @@ class FilesTab extends ConsumerWidget {
                       // coverage:ignore-start
                       : () => _commit(context, ref),
                   // coverage:ignore-end
-                  child: Text(_commitLabel(state)),
+                  child: Text(_commitLabel(context, state)),
                 ),
               ),
             ),
@@ -293,15 +299,11 @@ class FilesTab extends ConsumerWidget {
       ? state.files.length
       : state.match.totalFiles - state.match.unmatched.length;
 
-  // TODO(media): l10n, pluralization. The whole tab is still hardcoded
-  // English behind `TODO(media): l10n` markers; localizing these two strings
-  // alone would not make the tab usable in another language.
-  String _commitLabel(FilesTabState state) {
+  String _commitLabel(BuildContext context, FilesTabState state) {
     final count = _committableCount(state);
-    if (_isSiteSession) {
-      return 'Attach $count item${count == 1 ? '' : 's'} to this site';
-    }
-    return 'Link $count items';
+    return _isSiteSession
+        ? context.l10n.media_photoPicker_files_attachToSiteButton(count)
+        : context.l10n.media_photoPicker_files_linkButton(count);
   }
 
   // coverage:ignore-start
@@ -317,6 +319,9 @@ class FilesTab extends ConsumerWidget {
     // on the dive-detail view we return to.
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
+    // Captured with the messenger and navigator: all three read from context,
+    // which must not be touched after the await below.
+    final l10n = context.l10n;
     final created = await notifier.commit(target: target);
     if (!context.mounted) return;
     // Return to the detail view now that the files are linked; the grid
@@ -324,18 +329,15 @@ class FilesTab extends ConsumerWidget {
     // and mediaForSiteProvider's invalidateSelfWhen(watchMediaChanges) does
     // the same for a site.
     navigator.pop();
-    // TODO(media): l10n
     messenger.showSnackBar(
       SnackBar(
         content: Text(
           _isSiteSession
-              ? 'Attached ${created.length} '
-                    'item${created.length == 1 ? '' : 's'} to this site'
-              // TODO(media): pluralization
-              : 'Linked ${created.length} items',
+              ? l10n.media_photoPicker_files_attachedToSiteCount(created.length)
+              : l10n.media_photoPicker_files_linkedCount(created.length),
         ),
         action: SnackBarAction(
-          label: 'Undo',
+          label: l10n.media_photoPicker_files_undo,
           onPressed: () => notifier.undoCommit(created),
         ),
       ),

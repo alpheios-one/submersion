@@ -12969,6 +12969,31 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count éléments liés',
+      one: '1 élément lié',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count éléments joints à ce site',
+      one: '1 élément joint à ce site',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'Annuler';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'Photo deja associee a cette plongee';
 

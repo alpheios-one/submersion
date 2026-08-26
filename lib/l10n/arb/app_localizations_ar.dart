@@ -12700,6 +12700,31 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم ربط $count عناصر',
+      one: 'تم ربط عنصر واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم إرفاق $count عناصر بهذا الموقع',
+      one: 'تم إرفاق عنصر واحد بهذا الموقع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'تراجع';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'الصورة مرتبطة بالفعل بهذه الغوصة';
 

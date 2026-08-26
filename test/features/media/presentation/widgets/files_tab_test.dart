@@ -358,7 +358,7 @@ void main() {
 
       // Without an assign affordance the unchecked checkbox made the whole
       // tab a no-op: nothing could ever reach commit().
-      expect(find.text('Add all 1 to this dive'), findsOneWidget);
+      expect(find.text('Add 1 to this dive'), findsOneWidget);
     });
   });
 

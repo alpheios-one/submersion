@@ -12893,6 +12893,31 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem összekapcsolva',
+      one: '1 elem összekapcsolva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem csatolva ehhez a helyszínhez',
+      one: '1 elem csatolva ehhez a helyszínhez',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'Visszavonás';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'A fotó már hozzá van kapcsolva ehhez a merüléshez';
 
