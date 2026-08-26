@@ -24,10 +24,7 @@ void main() {
   test('the English volume-only labels say RMV', () {
     final en = lookupAppLocalizations(const Locale('en'));
     expect(en.divePlanner_label_sacRate, 'RMV:');
-    expect(
-      en.divePlanner_semantics_sacRate('15', 'L'),
-      'RMV: 15 L per minute',
-    );
+    expect(en.divePlanner_semantics_sacRate('15', 'L'), 'RMV: 15 L per minute');
     expect(en.gasCalculators_sacRate, 'RMV');
     expect(en.gasCalculators_rockBottom_yourSac, 'Your RMV');
     expect(en.gasCalculators_rockBottom_buddySac, 'Buddy RMV');
