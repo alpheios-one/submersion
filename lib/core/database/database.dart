@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 
 import 'package:drift/drift.dart';
 
+import 'package:submersion/core/database/dive_computer_gear_backfill.dart';
 import 'package:submersion/core/database/imported_computer_backfill.dart';
 import 'package:submersion/core/database/performance_indexes.dart';
 import 'package:submersion/core/database/tag_uniqueness.dart';
@@ -8660,6 +8661,7 @@ class AppDatabase extends _$AppDatabase {
         // a later step; the column has to land first.
         if (from < 169) {
           await _assertDiveComputerEquipmentColumn();
+          await backfillDiveComputerGearTwins(this);
         }
         if (from < 169) await reportProgress();
       },
