@@ -56,6 +56,29 @@ void main() {
     expect(labelText, expectedFirstLabel);
   });
 
+  testWidgets('a Monday-first locale starts the row on Monday', (tester) async {
+    // The default `en` (en_US) locale is Sunday-first, so it only ever
+    // exercises one branch of the week-start conversion. German is
+    // Monday-first, which is the other branch.
+    final context = await _pump(
+      tester,
+      selected: const [],
+      onChanged: (_) {},
+      locale: const Locale('de'),
+    );
+
+    // Guards the premise of this test rather than the widget: if the bundled
+    // German data ever changed its week start, the assertion below would pass
+    // for the wrong reason.
+    expect(MaterialLocalizations.of(context).firstDayOfWeekIndex, 1);
+
+    final firstChip = tester.widget<FilterChip>(find.byType(FilterChip).first);
+    expect(
+      (firstChip.label as Text).data,
+      weekdayAbbreviation(context, DateTime.monday),
+    );
+  });
+
   testWidgets('marks selected weekdays as selected chips', (tester) async {
     await _pump(tester, selected: const [1], onChanged: (_) {});
 
