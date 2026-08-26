@@ -271,11 +271,17 @@ String _formatSeconds(int seconds) {
 /// True for a column that stores a moment rather than a duration. Both the
 /// name and the magnitude must agree: `bottomTime` and `runtime` are seconds,
 /// so only values large enough to be Unix millis are treated as dates.
+///
+/// The magnitude is absolute, because a moment before 1970 is a negative
+/// count. Those are real here rather than hypothetical: the clock-offset
+/// detector exists to flag dives "dated before 1950", so the epochs most
+/// likely to reach this dialog after a bad import are exactly the negative
+/// ones. Comparing the signed value would print them raw.
 bool _isTimestamp(String key, int value) {
-  const millisFloor = 100000000000; // ~1973 in Unix millis
+  const millisFloor = 100000000000; // ~1973 either side of the epoch
   final named =
       key.endsWith('At') || key.endsWith('Time') || key.endsWith('Date');
-  return named && value >= millisFloor;
+  return named && value.abs() >= millisFloor;
 }
 
 bool _usable(Map<String, dynamic> data, Set<String> hidden, String key) =>

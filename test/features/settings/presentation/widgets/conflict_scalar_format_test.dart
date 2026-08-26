@@ -87,6 +87,15 @@ void main() {
       expect(formatted, contains('2026'));
     });
 
+    test('dates a pre-1973 column, whose epoch millis are negative', () {
+      // The app models these: the clock-offset detector warns about dives
+      // "dated before 1950", so a negative diveDateTime is a real value and
+      // not a corruption to be printed raw.
+      final formatted = format(units, 'diveDateTime', -144720000000);
+      expect(formatted, isNot(contains('-144720000000')));
+      expect(formatted, contains('1965'));
+    });
+
     test('leaves a time-named column too small to be Unix millis alone', () {
       // Every time-named column in today's schema really is an epoch value,
       // so this rule is defensive: it makes the formatter fail safe. A future
@@ -94,6 +103,8 @@ void main() {
       // number it is rather than being dated to 1970.
       expect(format(units, 'surfaceIntervalTime', 300), '300');
       expect(format(units, 'holdTime', 90), '90');
+      // Small and negative, the boundary the absolute-magnitude check adds.
+      expect(format(units, 'holdTime', -90), '-90');
     });
   });
 }
