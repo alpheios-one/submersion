@@ -247,6 +247,7 @@ class SyncData {
   final List<Map<String, dynamic>> trips;
   final List<Map<String, dynamic>> liveaboardDetails;
   final List<Map<String, dynamic>> itineraryDays;
+  final List<Map<String, dynamic>> tripDayWeather;
   final List<Map<String, dynamic>> checklistTemplates;
   final List<Map<String, dynamic>> checklistTemplateItems;
   final List<Map<String, dynamic>> tripChecklistItems;
@@ -322,6 +323,7 @@ class SyncData {
     this.trips = const [],
     this.liveaboardDetails = const [],
     this.itineraryDays = const [],
+    this.tripDayWeather = const [],
     this.checklistTemplates = const [],
     this.checklistTemplateItems = const [],
     this.tripChecklistItems = const [],
@@ -398,6 +400,7 @@ class SyncData {
     'trips': trips,
     'liveaboardDetails': liveaboardDetails,
     'itineraryDays': itineraryDays,
+    'tripDayWeather': tripDayWeather,
     'checklistTemplates': checklistTemplates,
     'checklistTemplateItems': checklistTemplateItems,
     'tripChecklistItems': tripChecklistItems,
@@ -475,6 +478,7 @@ class SyncData {
       trips: _parseList(json['trips']),
       liveaboardDetails: _parseList(json['liveaboardDetails']),
       itineraryDays: _parseList(json['itineraryDays']),
+      tripDayWeather: _parseList(json['tripDayWeather']),
       checklistTemplates: _parseList(json['checklistTemplates']),
       checklistTemplateItems: _parseList(json['checklistTemplateItems']),
       tripChecklistItems: _parseList(json['tripChecklistItems']),
@@ -764,6 +768,7 @@ class SyncDataSerializer {
       blob: false,
       full: null,
     ),
+    (key: 'tripDayWeather', table: _db.tripDayWeather, blob: false, full: null),
     (
       key: 'checklistTemplates',
       table: _db.checklistTemplates,
@@ -1269,6 +1274,10 @@ class SyncDataSerializer {
         'itineraryDays',
         () => _exportItineraryDays(hlcSince),
       ),
+      tripDayWeather: await _safeExport(
+        'tripDayWeather',
+        () => _exportTripDayWeather(hlcSince),
+      ),
       checklistTemplates: await _safeExport(
         'checklistTemplates',
         () => _exportChecklistTemplates(hlcSince),
@@ -1709,6 +1718,11 @@ class SyncDataSerializer {
           _db.tripItineraryDays,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
+      case 'tripDayWeather':
+        final row = await (_db.select(
+          _db.tripDayWeather,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
       case 'checklistTemplates':
         final row = await (_db.select(
           _db.checklistTemplates,
@@ -2032,6 +2046,11 @@ class SyncDataSerializer {
       case 'itineraryDays':
         final rows = await (_db.select(
           _db.tripItineraryDays,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'tripDayWeather':
+        final rows = await (_db.select(
+          _db.tripDayWeather,
         )..where((t) => t.id.isIn(idList))).get();
         return {for (final r in rows) r.id: r.toJson()};
       case 'checklistTemplates':
@@ -2594,6 +2613,13 @@ class SyncDataSerializer {
             .into(_db.tripItineraryDays)
             .insertOnConflictUpdate(
               TripItineraryDay.fromJson(data).toCompanion(false),
+            );
+        return;
+      case 'tripDayWeather':
+        await _db
+            .into(_db.tripDayWeather)
+            .insertOnConflictUpdate(
+              TripDayWeatherData.fromJson(data).toCompanion(false),
             );
         return;
       case 'checklistTemplates':
@@ -3203,6 +3229,16 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'tripDayWeather':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.tripDayWeather,
+            records
+                .map((r) => TripDayWeatherData.fromJson(r).toCompanion(false))
+                .toList(),
+          ),
+        );
+        return;
       case 'checklistTemplates':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
@@ -3680,6 +3716,8 @@ class SyncDataSerializer {
         );
       case 'itineraryDays':
         return plain(_db.tripItineraryDays, _db.tripItineraryDays.id);
+      case 'tripDayWeather':
+        return plain(_db.tripDayWeather, _db.tripDayWeather.id);
       case 'checklistTemplates':
         return plain(_db.checklistTemplates, _db.checklistTemplates.id);
       case 'checklistTemplateItems':
@@ -3913,6 +3951,8 @@ class SyncDataSerializer {
         return _db.liveaboardDetailRecords;
       case 'itineraryDays':
         return _db.tripItineraryDays;
+      case 'tripDayWeather':
+        return _db.tripDayWeather;
       case 'checklistTemplates':
         return _db.checklistTemplates;
       case 'checklistTemplateItems':
@@ -4222,6 +4262,11 @@ class SyncDataSerializer {
       case 'itineraryDays':
         await (_db.delete(
           _db.tripItineraryDays,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'tripDayWeather':
+        await (_db.delete(
+          _db.tripDayWeather,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'checklistTemplates':
@@ -4893,6 +4938,17 @@ class SyncDataSerializer {
     String? hlcSince,
   ) async {
     final query = _db.select(_db.tripItineraryDays);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _exportTripDayWeather(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.tripDayWeather);
     if (hlcSince != null) {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }
