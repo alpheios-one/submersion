@@ -278,10 +278,19 @@ Future<bool> linkComputerGearForDive({
 });
 ```
 
-It reads the dive's computers via the existing `getComputerIdsForDive` (which
-reads `dive_data_sources`, per F2, so a multi-source dive links every computer
-that logged it), takes each computer's `equipmentId` **as stored**, and attaches
-the non-null ones via `bulkAddEquipment`.
+It resolves the dive's computers from the union of `dive_data_sources.computer_id`
+and `dives.computer_id` (per F2, so a multi-source dive links every computer that
+logged it), takes each computer's `equipmentId` **as stored**, and attaches the
+non-null ones via `bulkAddEquipment`.
+
+**Correction, found in implementation.** An earlier draft of this section said to
+reuse `DiveComputerRepository.getComputerIdsForDive`. That method reads
+`dive_profiles`, not `dive_data_sources`, so it sees only dives carrying profile
+samples. A file-imported dive registered by #1288 can have `computer_id` stamped
+and a data-source row while having no samples at all, and reusing the helper
+would have silently failed to link exactly the file-import case this feature was
+extended to cover. The linker owns a private query applying the same union the
+v169 backfill uses, so the migration and the runtime path cannot disagree.
 
 It performs no resolution and no minting. That is what makes deletion permanent:
 creation happens once at registration, linking happens per dive, and a cleared

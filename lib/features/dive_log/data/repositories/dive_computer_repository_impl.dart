@@ -26,6 +26,7 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     show GeoPoint;
 import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
+import 'package:submersion/features/equipment/data/services/dive_computer_gear_linker.dart';
 import 'package:submersion/features/equipment/data/services/dive_computer_gear_resolver.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
@@ -1228,6 +1229,11 @@ class DiveComputerRepository {
           diverId: diverId,
           divePoints: defaultPoints,
         );
+
+        // After the defaulter, never before: the defaulter bails on a dive
+        // that already has equipment, so linking first would suppress the
+        // diver's default and geofenced sets.
+        await DiveComputerGearLinker().linkComputerGearForDive(diveId: diveId);
 
         // Auto-link a pre-dive checklist session started shortly before
         // this dive's entry time.
