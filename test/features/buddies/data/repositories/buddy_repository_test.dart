@@ -510,6 +510,31 @@ void main() {
           expect(diveIds, equals(['higher', 'lower']));
         },
       );
+
+      test(
+        'is deterministic when timestamp and dive number both tie',
+        () async {
+          final buddy = await repository.createBuddy(createTestBuddy(id: 'b1'));
+          // Same instant, no dive number: only the id can separate these. They
+          // are inserted in reverse id order so a query with no id tiebreak
+          // returns them in insertion order instead.
+          await insertDive('zzz', diveDateTime: 1000);
+          await insertDive('aaa', diveDateTime: 1000);
+          for (final id in ['zzz', 'aaa']) {
+            await repository.addBuddyToDive(id, buddy.id, DiveRole.buddyId);
+          }
+
+          final diveIds = await repository.getDiveIdsForBuddy(buddy.id);
+
+          expect(
+            diveIds,
+            equals(['aaa', 'zzz']),
+            reason:
+                'the caller truncates this list, so an unstable tail would '
+                'change which dives the preview shows, not just their order',
+          );
+        },
+      );
     });
   });
 }

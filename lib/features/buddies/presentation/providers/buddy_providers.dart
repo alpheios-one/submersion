@@ -216,11 +216,15 @@ final divesForBuddyProvider = FutureProvider.family<List<domain.Dive>, String>((
     }
   }
 
-  // Most recent first, matching the dive list's sort key.
+  // Most recent first, matching the dive list's sort key. The id tiebreak
+  // mirrors the repository query so a tie on both keys resolves the same way
+  // here as it does in SQL.
   dives.sort((a, b) {
     final byTime = b.effectiveEntryTime.compareTo(a.effectiveEntryTime);
     if (byTime != 0) return byTime;
-    return (b.diveNumber ?? 0).compareTo(a.diveNumber ?? 0);
+    final byNumber = (b.diveNumber ?? 0).compareTo(a.diveNumber ?? 0);
+    if (byNumber != 0) return byNumber;
+    return a.id.compareTo(b.id);
   });
   return dives;
 });
