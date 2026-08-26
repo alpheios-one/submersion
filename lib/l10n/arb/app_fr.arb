@@ -4357,6 +4357,7 @@
   "settings_appearance_metric_ceiling": "Plafond",
   "settings_appearance_metric_cns": "CNS% (Toxicite O2)",
   "settings_appearance_metric_events": "Evenements",
+  "settings_appearance_metric_estimatedTankPressure": "Pression estimée du bloc",
   "settings_appearance_metric_gasDensity": "Densite du gaz",
   "settings_appearance_metric_gfPercent": "GF%",
   "settings_appearance_metric_heartRate": "Frequence cardiaque",

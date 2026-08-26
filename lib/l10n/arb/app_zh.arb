@@ -4586,6 +4586,7 @@
   "settings_appearance_metric_ceiling": "上升限制",
   "settings_appearance_metric_cns": "中枢神经系统% (O2 毒性)",
   "settings_appearance_metric_events": "事件",
+  "settings_appearance_metric_estimatedTankPressure": "估算气瓶压力",
   "settings_appearance_metric_gasDensity": "气体密度",
   "settings_appearance_metric_gfPercent": "梯度因子%",
   "settings_appearance_metric_heartRate": "心率",
