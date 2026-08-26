@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/features/media/presentation/providers/files_tab_providers.dart';
+import 'package:submersion/features/media/presentation/widgets/capture_time_offset_bar.dart';
 import 'package:submersion/features/media/presentation/widgets/file_review_card.dart';
 
 /// Review pane shown in the Files tab once one or more files have been
@@ -60,6 +61,12 @@ class FileReviewPane extends ConsumerWidget {
           padding: const EdgeInsets.all(8),
           child: Text(summary, style: theme.textTheme.titleMedium),
         ),
+        // Shown whenever files are staged and auto-match is on, including when
+        // everything already matched: gating on unmatched.isNotEmpty would make
+        // the control disappear the instant a shift worked, stranding the user
+        // with a correction they could no longer see or undo.
+        if (state.files.isNotEmpty && state.autoMatchByDate)
+          CaptureTimeOffsetBar(state: state),
         Expanded(
           child: ListView(
             children: [
