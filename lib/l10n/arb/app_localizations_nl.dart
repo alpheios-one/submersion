@@ -32575,6 +32575,45 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get media_timeInDive_label => 'Tijdstip in de duik';
+
+  @override
+  String get media_timeInDive_unknown => 'Tijdstip in de duik onbekend';
+
+  @override
+  String get media_timeInDive_setAction => 'Tijdstip in de duik instellen';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (handmatig ingesteld)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'Tijd sinds het begin van de duik';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Tussen 0:00 en $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Voer een tijd in tussen 0:00 en $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Opslaan';
+
+  @override
+  String get media_timeInDive_cancel => 'Annuleren';
+
+  @override
+  String get media_timeInDive_reset => 'Terugzetten naar automatisch';
+
+  @override
   String get media_info_backupSection => 'Back-up';
 
   @override

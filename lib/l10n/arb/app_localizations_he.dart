@@ -32152,6 +32152,45 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get media_timeInDive_label => 'זמן בצלילה';
+
+  @override
+  String get media_timeInDive_unknown => 'זמן בצלילה לא ידוע';
+
+  @override
+  String get media_timeInDive_setAction => 'הגדרת זמן בצלילה';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (הוגדר ידנית)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'זמן מתחילת הצלילה';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'בין 0:00 ל-$max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'יש להזין זמן בין 0:00 ל-$max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'שמור';
+
+  @override
+  String get media_timeInDive_cancel => 'ביטול';
+
+  @override
+  String get media_timeInDive_reset => 'איפוס לאוטומטי';
+
+  @override
   String get media_info_backupSection => 'גיבוי';
 
   @override

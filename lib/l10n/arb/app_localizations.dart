@@ -54190,6 +54190,72 @@ abstract class AppLocalizations {
   /// **'Last checked {date}'**
   String media_info_lastChecked(String date);
 
+  /// Media info row label and Set-time dialog title: the moment in the dive a media item was taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Time in dive'**
+  String get media_timeInDive_label;
+
+  /// Viewer chip shown when a media item's capture time falls outside its dive; tapping it opens the Set-time dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Time in dive unknown'**
+  String get media_timeInDive_unknown;
+
+  /// Button and tooltip that opens the dialog to pin a media item to a moment in the dive.
+  ///
+  /// In en, this message translates to:
+  /// **'Set time in dive'**
+  String get media_timeInDive_setAction;
+
+  /// Media info row value for a position the diver set themselves; {time} is a minutes:seconds offset.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} (set manually)'**
+  String media_timeInDive_manual(String time);
+
+  /// Set-time dialog: label of the minutes:seconds field.
+  ///
+  /// In en, this message translates to:
+  /// **'Time from dive start'**
+  String get media_timeInDive_fieldLabel;
+
+  /// Set-time dialog: placeholder showing the minutes:seconds format.
+  ///
+  /// In en, this message translates to:
+  /// **'mm:ss'**
+  String get media_timeInDive_fieldHint;
+
+  /// Set-time dialog: helper text under the field; {max} is the dive length as minutes:seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Between 0:00 and {max}'**
+  String media_timeInDive_range(String max);
+
+  /// Set-time dialog: error shown for malformed or out-of-range input; {max} is the dive length as minutes:seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a time between 0:00 and {max}'**
+  String media_timeInDive_invalid(String max);
+
+  /// Set-time dialog: confirm button.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get media_timeInDive_save;
+
+  /// Set-time dialog: dismiss button.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get media_timeInDive_cancel;
+
+  /// Set-time dialog: button that removes the diver's pin so the position derives from the capture time again.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to automatic'**
+  String get media_timeInDive_reset;
+
   /// No description provided for @media_info_backupSection.
   ///
   /// In en, this message translates to:

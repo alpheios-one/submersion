@@ -32286,6 +32286,45 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get media_timeInDive_label => 'Time in dive';
+
+  @override
+  String get media_timeInDive_unknown => 'Time in dive unknown';
+
+  @override
+  String get media_timeInDive_setAction => 'Set time in dive';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (set manually)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'Time from dive start';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Between 0:00 and $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Enter a time between 0:00 and $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Save';
+
+  @override
+  String get media_timeInDive_cancel => 'Cancel';
+
+  @override
+  String get media_timeInDive_reset => 'Reset to automatic';
+
+  @override
   String get media_info_backupSection => 'Backup';
 
   @override

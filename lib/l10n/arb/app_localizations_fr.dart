@@ -32885,6 +32885,46 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get media_timeInDive_label => 'Moment dans la plongée';
+
+  @override
+  String get media_timeInDive_unknown => 'Moment dans la plongée inconnu';
+
+  @override
+  String get media_timeInDive_setAction => 'Définir le moment dans la plongée';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (défini manuellement)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel =>
+      'Temps depuis le début de la plongée';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Entre 0:00 et $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Saisissez un temps entre 0:00 et $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Enregistrer';
+
+  @override
+  String get media_timeInDive_cancel => 'Annuler';
+
+  @override
+  String get media_timeInDive_reset => 'Rétablir le mode automatique';
+
+  @override
   String get media_info_backupSection => 'Sauvegarde';
 
   @override

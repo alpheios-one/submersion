@@ -63,11 +63,20 @@ class DiveMediaEnricher {
       // chart excludes them regardless — don't fabricate a depth/time for one.
       if (item.mediaType == MediaType.instructorSignature) continue;
 
-      final result = enrichmentService.calculateEnrichment(
-        profile: dive.profile,
-        diveStartTime: dive.effectiveEntryTime,
-        photoTime: item.takenAt,
-      );
+      // A pinned item (issue #1090) is positioned from the diver's offset,
+      // never from its capture time, so a backfill converges on the pin
+      // instead of reverting it.
+      final manual = item.manualElapsedSeconds;
+      final result = manual != null
+          ? enrichmentService.calculateEnrichmentAtElapsed(
+              profile: dive.profile,
+              elapsedSeconds: manual,
+            )
+          : enrichmentService.calculateEnrichment(
+              profile: dive.profile,
+              diveStartTime: dive.effectiveEntryTime,
+              photoTime: item.takenAt,
+            );
 
       // Mirror the gallery path: don't persist a row we couldn't actually
       // place (no depth and no usable profile match). An existing row is left
