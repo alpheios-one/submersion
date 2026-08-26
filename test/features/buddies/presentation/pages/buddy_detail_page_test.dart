@@ -13,6 +13,23 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
 
+/// Silences the RenderFlex overflow this page produces at phone widths while
+/// still surfacing every other framework error.
+///
+/// `FlutterError.onError` is process-global and `testWidgets` installs its own
+/// reporter on it, so the previous handler is captured and restored rather than
+/// assuming `FlutterError.presentError`. The restore is registered with
+/// `addTearDown` so it runs even when the test fails before reaching the end,
+/// which would otherwise leak a swallowing handler into later tests.
+void _ignoreOverflowErrors() {
+  final previousOnError = FlutterError.onError;
+  addTearDown(() => FlutterError.onError = previousOnError);
+  FlutterError.onError = (details) {
+    if (details.exception.toString().contains('overflowed')) return;
+    previousOnError?.call(details);
+  };
+}
+
 void main() {
   group('BuddyDetailPage desktop redirect', () {
     final buddy = Buddy(
@@ -184,11 +201,8 @@ void main() {
           ),
         ),
       );
-      // Tolerate overflow errors in test layout
-      final errors = <FlutterErrorDetails>[];
-      FlutterError.onError = (d) => errors.add(d);
+      _ignoreOverflowErrors();
       await tester.pumpAndSettle();
-      FlutterError.onError = FlutterError.presentError;
 
       // Should show bottomTime formatted as minutes in dive history
       expect(find.text('45min'), findsOneWidget);
@@ -246,11 +260,8 @@ void main() {
           ),
         ),
       );
-      // Tolerate overflow errors in test layout
-      final errors = <FlutterErrorDetails>[];
-      FlutterError.onError = (d) => errors.add(d);
+      _ignoreOverflowErrors();
       await tester.pumpAndSettle();
-      FlutterError.onError = FlutterError.presentError;
 
       expect(
         find.text(DateFormat.yMMMd().format(dives.first.dateTime)),
