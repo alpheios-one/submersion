@@ -8098,7 +8098,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'اختر طريقة تحديد الموقع - سيتم ملء الدولة والمنطقة تلقائياً';
+      'اختر طريقة لتحديد الموقع أو ابحث عن الإحداثيات لملء البلد والمنطقة والبلدة والمسطح المائي تلقائيًا';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'مثال: 21.4225';
@@ -8120,6 +8120,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'اختيار من الخريطة';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates => 'البحث من الإحداثيات';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'لم يتم العثور على تفاصيل موقع لهذه الإحداثيات';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'فشل البحث عن الموقع. تحقق من الاتصال وحاول مرة أخرى.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => 'استبدال تفاصيل الموقع؟';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'عثر البحث على قيم مختلفة لهذه الحقول:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'استبدال';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'إبقاء';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'استخدام موقعي';

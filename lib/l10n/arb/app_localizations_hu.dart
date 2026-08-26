@@ -8239,7 +8239,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'Valasszon helymeghatarozoasi modszert - a koordinatak automatikusan kitoltik az orszagot es a regiot';
+      'Válasszon helymeghatározási módot, vagy kérdezze le a koordinátákat az ország, régió, település és víztest automatikus kitöltéséhez';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'pl. 21.4225';
@@ -8261,6 +8261,31 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'Kivalasztas terkeprol';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'Lekérdezés a koordinátákból';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'Nem található helyadat ezekhez a koordinátákhoz';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'A helylekérdezés nem sikerült. Ellenőrizze a kapcsolatot, és próbálja újra.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => 'Lecseréli a helyadatokat?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'A lekérdezés eltérő értékeket talált ezekhez a mezőkhöz:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'Csere';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'Megtartás';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'Sajat helyzet hasznalata';

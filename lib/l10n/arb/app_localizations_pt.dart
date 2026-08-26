@@ -8257,7 +8257,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'Escolha um metodo de localizacao - as coordenadas preencherao automaticamente pais e regiao';
+      'Escolha um método de localização ou consulte as coordenadas para preencher país, região, cidade e corpo de água';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'ex., 21.4225';
@@ -8279,6 +8279,32 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'Escolher no Mapa';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'Consultar pelas coordenadas';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'Nenhum detalhe de localização encontrado para estas coordenadas';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'A consulta de localização falhou. Verifique a sua ligação e tente novamente.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title =>
+      'Substituir os detalhes de localização?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'A consulta encontrou valores diferentes para estes campos:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'Substituir';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'Manter';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'Usar Minha Localizacao';

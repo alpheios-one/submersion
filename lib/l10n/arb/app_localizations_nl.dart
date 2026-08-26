@@ -8191,7 +8191,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'Kies een locatiemethode - coordinaten vullen automatisch land en regio in';
+      'Kies een locatiemethode of zoek de coördinaten op om land, regio, plaats en water automatisch in te vullen';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'bijv. 21.4225';
@@ -8213,6 +8213,31 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'Kies op de kaart';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'Opzoeken op coördinaten';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'Geen locatiegegevens gevonden voor deze coördinaten';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'Locatie opzoeken mislukt. Controleer je verbinding en probeer het opnieuw.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => 'Locatiegegevens vervangen?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'Het opzoeken vond andere waarden voor deze velden:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'Vervangen';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'Behouden';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'Gebruik mijn locatie';

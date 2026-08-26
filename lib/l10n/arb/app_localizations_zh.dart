@@ -7867,7 +7867,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_edit_gps_gettingLocation => '获取中...';
 
   @override
-  String get diveSites_edit_gps_helperText => '选择定位方式 - 坐标将自动填充国家和地区';
+  String get diveSites_edit_gps_helperText => '选择定位方式或根据坐标查找，以自动填写国家、地区、城镇和水域';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'e.g., 21.4225';
@@ -7889,6 +7889,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => '选择从地图';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates => '根据坐标查找';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound => '未找到这些坐标的地点信息';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed => '地点查找失败。请检查网络连接后重试。';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => '替换地点信息？';
+
+  @override
+  String get diveSites_edit_lookupReplace_body => '查找结果中以下字段的值不同：';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => '替换';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => '保留';
 
   @override
   String get diveSites_edit_gps_useMyLocation => '使用我的位置';

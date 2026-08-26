@@ -8053,7 +8053,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'בחר שיטת מיקום - הקואורדינטות ימלאו אוטומטית את המדינה והאזור';
+      'בחרו שיטת מיקום או חפשו את הקואורדינטות כדי למלא אוטומטית מדינה, אזור, עיר וגוף מים';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'לדוגמה, 21.4225';
@@ -8075,6 +8075,31 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'בחר מהמפה';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'חיפוש לפי קואורדינטות';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'לא נמצאו פרטי מיקום לקואורדינטות אלה';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'חיפוש המיקום נכשל. בדקו את החיבור ונסו שוב.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => 'להחליף את פרטי המיקום?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'החיפוש מצא ערכים שונים לשדות אלה:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'החלפה';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'שמירה';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'השתמש במיקום שלי';

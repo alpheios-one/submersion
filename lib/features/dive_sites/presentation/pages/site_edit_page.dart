@@ -996,6 +996,9 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
             isGettingLocation: _isGettingLocation,
             onUseMyLocation: _useMyLocation,
             onPickFromMap: _pickFromMap,
+            onLookupFromCoordinates: _parsedCoordinates() == null
+                ? null
+                : _lookupFromCoordinates,
             units: units,
             coordinatesExtras: _coordinateExtras(),
             altitudeExtras: _mergeExtras('altitude'),
@@ -1464,6 +1467,140 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
         ),
       );
     }
+  }
+
+  /// The typed coordinates, or null while either field does not parse.
+  GeoPoint? _parsedCoordinates() {
+    final lat = double.tryParse(_latitudeController.text);
+    final lng = double.tryParse(_longitudeController.text);
+    if (lat == null || lng == null) return null;
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+    return GeoPoint(lat, lng);
+  }
+
+  /// Explicit lookup for the typed coordinates (issue #1187). Fills empty
+  /// fields; when nothing was empty and the lookup differs, offers to
+  /// replace. Never runs on save.
+  Future<void> _lookupFromCoordinates() async {
+    final point = _parsedCoordinates();
+    if (point == null) return;
+    setState(() => _isGettingLocation = true);
+    try {
+      final lookup = await ref
+          .read(locationServiceProvider)
+          .reverseGeocode(
+            point.latitude,
+            point.longitude,
+            languageCode: ref.read(placeNameLanguageProvider),
+          );
+      if (!mounted) return;
+      // The busy indicator must stop before any dialog waits for input.
+      setState(() => _isGettingLocation = false);
+
+      if (lookup.networkFailed) {
+        _showLookupSnackBar(context.l10n.diveSites_edit_snackbar_lookupFailed);
+        return;
+      }
+      if (lookup.isEmpty) {
+        _showLookupSnackBar(
+          context.l10n.diveSites_edit_snackbar_lookupNothingFound,
+        );
+        return;
+      }
+
+      var changed = false;
+      setState(() {
+        changed = _applyPlaceLookup(lookup, overwrite: false);
+        if (changed) _hasChanges = true;
+      });
+      if (changed) return;
+
+      final differing = _differingLookupValues(lookup);
+      if (differing.isEmpty) return;
+      final replace = await _confirmReplaceLocationDetails(differing);
+      if (!mounted || !replace) return;
+      setState(() {
+        if (_applyPlaceLookup(lookup, overwrite: true)) _hasChanges = true;
+      });
+    } finally {
+      if (mounted) setState(() => _isGettingLocation = false);
+    }
+  }
+
+  void _showLookupSnackBar(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// Field label to found value, for the fields whose found value is
+  /// non-blank and differs from what the form shows.
+  Map<String, String> _differingLookupValues(PlaceLookup lookup) {
+    final l10n = context.l10n;
+    final out = <String, String>{};
+    void compare(String label, String current, String? found) {
+      if (found == null || found.trim().isEmpty) return;
+      if (current.trim() == found.trim()) return;
+      out[label] = found.trim();
+    }
+
+    compare(
+      l10n.diveSites_edit_field_country_label,
+      _countryController.text,
+      lookup.country,
+    );
+    compare(
+      l10n.diveSites_edit_field_region_label,
+      _regionController.text,
+      lookup.region,
+    );
+    compare(
+      l10n.diveSites_edit_field_city_label,
+      _cityController.text,
+      lookup.locality,
+    );
+    compare(
+      l10n.diveSites_edit_field_bodyOfWater_label,
+      _bodyOfWaterController.text,
+      lookup.bodyOfWater,
+    );
+    return out;
+  }
+
+  Future<bool> _confirmReplaceLocationDetails(
+    Map<String, String> differing,
+  ) async {
+    final l10n = context.l10n;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.diveSites_edit_lookupReplace_title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.diveSites_edit_lookupReplace_body),
+            const SizedBox(height: 12),
+            for (final entry in differing.entries)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text('${entry.key}: ${entry.value}'),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.diveSites_edit_lookupReplace_keep),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.diveSites_edit_lookupReplace_replace),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 
   Future<void> _showSpeciesPicker() async {

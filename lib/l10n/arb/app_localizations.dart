@@ -13942,7 +13942,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveSites_edit_gps_helperText.
   ///
   /// In en, this message translates to:
-  /// **'Choose a location method - coordinates will auto-fill country and region'**
+  /// **'Choose a location method or look up the coordinates to auto-fill country, region, town and body of water'**
   String get diveSites_edit_gps_helperText;
 
   /// No description provided for @diveSites_edit_gps_latitude_hint.
@@ -13986,6 +13986,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick from Map'**
   String get diveSites_edit_gps_pickFromMap;
+
+  /// No description provided for @diveSites_edit_gps_lookupFromCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up from coordinates'**
+  String get diveSites_edit_gps_lookupFromCoordinates;
+
+  /// No description provided for @diveSites_edit_snackbar_lookupNothingFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No location details found for these coordinates'**
+  String get diveSites_edit_snackbar_lookupNothingFound;
+
+  /// No description provided for @diveSites_edit_snackbar_lookupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Location lookup failed. Check your connection and try again.'**
+  String get diveSites_edit_snackbar_lookupFailed;
+
+  /// No description provided for @diveSites_edit_lookupReplace_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace location details?'**
+  String get diveSites_edit_lookupReplace_title;
+
+  /// No description provided for @diveSites_edit_lookupReplace_body.
+  ///
+  /// In en, this message translates to:
+  /// **'The lookup found different values for these fields:'**
+  String get diveSites_edit_lookupReplace_body;
+
+  /// No description provided for @diveSites_edit_lookupReplace_replace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get diveSites_edit_lookupReplace_replace;
+
+  /// No description provided for @diveSites_edit_lookupReplace_keep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep'**
+  String get diveSites_edit_lookupReplace_keep;
 
   /// No description provided for @diveSites_edit_gps_useMyLocation.
   ///
