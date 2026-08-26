@@ -90,6 +90,18 @@ def normalize_phone(raw, default_country_code):
     return f"+{default_country_code}{digits}"
 
 
+def normalize_dashes(value):
+    """Replace en and em dashes with a plain hyphen.
+
+    Registry pages punctuate facility names with typographic dashes; the
+    project forbids them in any committed text, and a hyphen reads identically
+    in a facility name.
+    """
+    if value is None:
+        return None
+    return value.replace("—", "-").replace("–", "-")
+
+
 def slugify(value):
     value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode()
     value = re.sub(r"[^a-zA-Z0-9]+", "-", value).strip("-").lower()
@@ -114,6 +126,8 @@ def lead_row(
 ):
     """Build a lead row. Coordinates are filled by geocoding in the build step,
     so they are absent here."""
+    name = normalize_dashes(name.strip())
+    city = normalize_dashes(city.strip()) if city else None
     row = {
         "id": make_id(country, name),
         "name": name,

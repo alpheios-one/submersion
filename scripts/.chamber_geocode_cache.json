@@ -1,4 +1,214 @@
 {
+  "AE|Abu Dhabi": {
+    "lat": 24.4538352,
+    "lon": 54.3774014
+  },
+  "AE|Aqua Marine Diving Services Hyperbaric Chamber, Dubai": null,
+  "AE|Dubai": {
+    "lat": 25.0742823,
+    "lon": 55.1885624
+  },
+  "AE|Zayed Military Hospital Hyperbaric Unit, Abu Dhabi": null,
+  "AR|Buenos Aires": {
+    "lat": -34.6095579,
+    "lon": -58.3887904
+  },
+  "AR|Centro de Medicina Hiperbarica Mar del Plata, Mar del Plata": null,
+  "AR|Escuela de Submarinos y Buceo, Camara Hiperbarica, Mar del Plata": null,
+  "AR|Hiperbayres, Centro de Medicina Subacuatica e Hiperbarica, Buenos Aires": null,
+  "AR|Hospital Naval Buenos Aires, Camara Hiperbarica, Buenos Aires": null,
+  "AR|Hospital Naval Puerto Belgrano, Camara Hiperbarica, Puerto Belgrano, Punta Alta": null,
+  "AR|Hospital Naval Ushuaia, Camara Hiperbarica, Ushuaia": null,
+  "AR|Mar del Plata": {
+    "lat": -37.9976168,
+    "lon": -57.5482079
+  },
+  "AR|Puerto Belgrano, Punta Alta": {
+    "lat": -38.9025471,
+    "lon": -62.0525047
+  },
+  "AR|Ushuaia": {
+    "lat": -54.807306,
+    "lon": -68.3084133
+  },
+  "AU|Adelaide, SA": {
+    "lat": -34.9281805,
+    "lon": 138.5999312
+  },
+  "AU|Brisbane, QLD": {
+    "lat": -27.4689623,
+    "lon": 153.0235009
+  },
+  "AU|Fiona Stanley Hospital Hyperbaric Medicine Unit, Perth, WA": null,
+  "AU|Hobart, TAS": {
+    "lat": -42.8825088,
+    "lon": 147.3281233
+  },
+  "AU|Melbourne, VIC": {
+    "lat": -37.8142454,
+    "lon": 144.9631732
+  },
+  "AU|Perth, WA": {
+    "lat": -31.9558967,
+    "lon": 115.8605784
+  },
+  "AU|Prince of Wales Hospital Diving and Hyperbaric Medicine Unit, Sydney, NSW": null,
+  "AU|Royal Adelaide Hospital Hyperbaric Medicine Unit, Adelaide, SA": null,
+  "AU|Royal Brisbane and Women's Hospital Hyperbaric Medicine Service, Brisbane, QLD": null,
+  "AU|Royal Hobart Hospital Department of Diving and Hyperbaric Medicine, Hobart, TAS": null,
+  "AU|Sydney, NSW": {
+    "lat": -33.8698439,
+    "lon": 151.2082848
+  },
+  "AU|The Alfred Hospital Hyperbaric Medicine Unit, Melbourne, VIC": null,
+  "AU|Townsville University Hospital Hyperbaric Unit, Townsville, QLD": null,
+  "AU|Townsville, QLD": {
+    "lat": -19.2569391,
+    "lon": 146.8239537
+  },
+  "BQ|Kralendijk": null,
+  "BQ|Recompression Chamber Bonaire (Hospital San Francisco), Kralendijk": null,
+  "BR|Fernando de Noronha, PE": {
+    "lat": -3.8537498,
+    "lon": -32.4198018
+  },
+  "BR|Hospital Sao Lucas, Camara Hiperbarica, Fernando de Noronha, PE": null,
+  "BS|Nassau": {
+    "lat": 25.0782266,
+    "lon": -77.3383438
+  },
+  "BS|Princess Margaret Hospital (Hyperbaric Chamber), Nassau": null,
+  "BZ|Belize Hyperbaric Chamber, San Pedro (SSS Network), San Pedro, Ambergris Caye": null,
+  "BZ|San Pedro, Ambergris Caye": {
+    "lat": 18.0988732,
+    "lon": -87.8882333
+  },
+  "CA|Centre de Medecine de Plongee du Quebec (Hotel-Dieu de Levis), Levis, QC": null,
+  "CA|Halifax, NS": {
+    "lat": 44.648618,
+    "lon": -63.5859487
+  },
+  "CA|Hamilton Health Sciences Hyperbaric Medicine Program (Hamilton General Hospital), Hamilton, ON": null,
+  "CA|Hamilton, ON": {
+    "lat": 43.2560802,
+    "lon": -79.8728583
+  },
+  "CA|Hopital du Sacre-Coeur de Montreal, Service de Medecine Hyperbare, Montreal, QC": null,
+  "CA|Levis, QC": {
+    "lat": 46.8033114,
+    "lon": -71.1778792
+  },
+  "CA|Montreal, QC": {
+    "lat": 45.5031824,
+    "lon": -73.5698065
+  },
+  "CA|QEII Health Sciences Centre Hyperbaric Medicine Program, Halifax, NS": null,
+  "CA|Tobermory Hyperbaric Facility, Tobermory, ON": {
+    "lat": 45.2427128,
+    "lon": -81.6528743
+  },
+  "CA|Toronto, ON": {
+    "lat": 43.6534817,
+    "lon": -79.3839347
+  },
+  "CA|University Health Network Hyperbaric Medicine Unit (Toronto General Hospital), Toronto, ON": null,
+  "CA|Vancouver General Hospital Hyperbaric Unit, Vancouver, BC": null,
+  "CA|Vancouver, BC": {
+    "lat": 49.2608724,
+    "lon": -123.113952
+  },
+  "CL|AME Hyperbaric, Santiago (Providencia)": null,
+  "CL|Hospital Naval Almirante Nef, Servicio de Medicina Hiperbarica, Vina del Mar": null,
+  "CL|Santiago (Providencia)": {
+    "lat": -33.4828276,
+    "lon": -70.7440105
+  },
+  "CL|Vina del Mar": {
+    "lat": -33.0244535,
+    "lon": -71.5517636
+  },
+  "CO|Baromedica Camara Hiperbarica, Bogota": null,
+  "CO|Bogota": {
+    "lat": 4.6533817,
+    "lon": -74.0836331
+  },
+  "CO|Cartagena": {
+    "lat": 10.4265566,
+    "lon": -75.5441671
+  },
+  "CO|Hospital Departamental Amor de Patria, Camara Hiperbarica, San Andres": null,
+  "CO|Hospital Naval de Cartagena (HONAC), Centro Hiperbarico del Caribe, Cartagena": null,
+  "CO|San Andres": {
+    "lat": 12.5830104,
+    "lon": -81.6975682
+  },
+  "DK|Copenhagen": {
+    "lat": 55.6867243,
+    "lon": 12.5700724
+  },
+  "DK|Rigshospitalet Trykkammerfunktionen (Hyperbaric Medicine), Copenhagen": null,
+  "DO|Hospital Ricardo Limardo Hyperbaric Chamber, Puerto Plata": null,
+  "DO|Puerto Plata": {
+    "lat": 19.7976564,
+    "lon": -70.6932607
+  },
+  "EC|Clinica Pasteur, Camara Hiperbarica, Quito": null,
+  "EC|Guayaquil": {
+    "lat": -2.1900572,
+    "lon": -79.8868669
+  },
+  "EC|Hiperbarica Alcivar, Guayaquil": null,
+  "EC|Puerto Ayora, Santa Cruz": {
+    "lat": -0.7440514,
+    "lon": -90.3149677
+  },
+  "EC|Quito": {
+    "lat": -0.2201641,
+    "lon": -78.5123274
+  },
+  "EC|SSS Recompression Chamber Network Galapagos (Protesub), Puerto Ayora, Santa Cruz": null,
+  "EG|Baromedical Marsa Shagra, Marsa Alam": null,
+  "EG|DECO International, El Gouna Hospital, El Gouna": null,
+  "EG|DECO International, Port Ghalib Hospital, Marsa Alam": null,
+  "EG|DECO International, Safaga General Hospital, Safaga": null,
+  "EG|Dahab": {
+    "lat": 28.4963633,
+    "lon": 34.5145652
+  },
+  "EG|Dahab Hyperbaric Medical Centre, Dahab": null,
+  "EG|El Gouna": {
+    "lat": 27.3989266,
+    "lon": 33.6741556
+  },
+  "EG|Hurghada": {
+    "lat": 27.222556,
+    "lon": 33.8307062
+  },
+  "EG|Hypermed Diving Medicine Center, Hurghada": null,
+  "EG|Marsa Alam": {
+    "lat": 25.069992,
+    "lon": 34.893817
+  },
+  "EG|Naval Hyperbaric Medical Center, Hurghada": null,
+  "EG|Safaga": {
+    "lat": 26.7633325,
+    "lon": 33.9383817
+  },
+  "EG|Sharm el-Sheikh": {
+    "lat": 27.8644422,
+    "lon": 34.295447
+  },
+  "EG|Sharm el-Sheikh Hyperbaric Medical Center, Sharm el-Sheikh": null,
+  "ES|Hospital Universitario de Canarias Camara Hiperbarica, San Cristobal de La Laguna, Tenerife": null,
+  "ES|Hospital de Palamos Unitat de Medicina Hiperbarica, Palamos, Girona": null,
+  "ES|Palamos, Girona": {
+    "lat": 41.8495354,
+    "lon": 3.1278785
+  },
+  "ES|San Cristobal de La Laguna, Tenerife": {
+    "lat": 28.4857715,
+    "lon": -16.3159422
+  },
   "FR|(EPAT) 4eme régiment du Génie": null,
   "FR|130 traverse de la Gouffone": null,
   "FR|29 av de Lattre de Tassigny": {
@@ -163,6 +373,8 @@
   },
   "GB|Hyperbaric Medicine Unit, Chichester": null,
   "GB|Hyperbaric Treatment & Training, Wirral": null,
+  "GB|LHM Healthcare - East of England Hyperbaric Unit, Great Yarmouth": null,
+  "GB|LHM Healthcare - Whipps Cross Hyperbaric Unit, London": null,
   "GB|LHM Healthcare – East of England Hyperbaric Unit, Great Yarmouth": null,
   "GB|LHM Healthcare – Whipps Cross Hyperbaric Unit, London": null,
   "GB|London": {
@@ -188,6 +400,66 @@
   "GB|Wirral": {
     "lat": 53.3409714,
     "lon": -3.0500916
+  },
+  "GD|St. Augustine's Medical Services Hyperbaric Chamber, St. Paul's": null,
+  "GD|St. Paul's": {
+    "lat": 12.0500058,
+    "lon": -61.7250332
+  },
+  "GR|Athens": {
+    "lat": 37.9755648,
+    "lon": 23.7348324
+  },
+  "GR|Athens Naval Hospital Diving and Hyperbaric Medicine Department, Athens": null,
+  "HN|Cornerstone Medical Services Hyperbaric Chamber (Anthony's Key Resort), Roatan": null,
+  "HN|Roatan": {
+    "lat": 16.3490211,
+    "lon": -86.4977513
+  },
+  "HN|Utila": {
+    "lat": 16.1005116,
+    "lon": -86.8949856
+  },
+  "HN|Utila Hyperbaric Chamber and Trauma Center, Utila": null,
+  "HR|Institute for Underwater and Hyperbaric Medicine, KBC Rijeka, Rijeka": null,
+  "HR|Poliklinika za baromedicinu OXY, Pula": null,
+  "HR|Pula": {
+    "lat": 44.8702281,
+    "lon": 13.8455311
+  },
+  "HR|Rijeka": {
+    "lat": 45.3267976,
+    "lon": 14.442208
+  },
+  "ID|Denpasar": {
+    "lat": -8.6653349,
+    "lon": 115.2176191
+  },
+  "ID|Makassar": {
+    "lat": -5.1342962,
+    "lon": 119.4124282
+  },
+  "ID|RSUP Dr. Wahidin Sudirohusodo Hyperbaric Unit, Makassar": null,
+  "ID|Sanglah General Hospital (Prof. Dr. I.G.N.G. Ngoerah Hospital), Denpasar": null,
+  "IE|Galway": {
+    "lat": 53.2744122,
+    "lon": -9.0490601
+  },
+  "IE|National Hyperbaric Medicine Unit, University Hospital Galway, Galway": null,
+  "IL|Assaf Harofeh (Asaf Harofe) Institute of Hyperbaric Medicine, Be'er Ya'akov": null,
+  "IL|Be'er Ya'akov": {
+    "lat": 31.9443532,
+    "lon": 34.8398648
+  },
+  "IL|Eilat": {
+    "lat": 29.5569348,
+    "lon": 34.9497949
+  },
+  "IL|Yoseftal Hospital Hyperbaric Unit, Eilat": null,
+  "IS|Landspitali Hyperbaric and Diving Medicine Department, Reykjavik": null,
+  "IS|Reykjavik": {
+    "lat": 64.145981,
+    "lon": -21.9422367
   },
   "IT|A.O.R.N. \"A. Cardarelli\", Napoli": null,
   "IT|ATiP - Associazione Tecnici Iperbarici Padova, Padova": null,
@@ -436,5 +708,255 @@
   "IT|Zingonia (BG)": {
     "lat": 45.5989949,
     "lon": 9.601036
-  }
+  },
+  "JM|Discovery Bay, St. Ann": {
+    "lat": 18.4619125,
+    "lon": -77.3968127
+  },
+  "JM|UWI Discovery Bay Marine Lab Hyperbaric Chamber, Discovery Bay, St. Ann": null,
+  "JO|Aqaba": {
+    "lat": 29.5266483,
+    "lon": 35.0075433
+  },
+  "JO|Aqaba Diving Chamber, Princess Haya Hospital, Aqaba": null,
+  "KY|Cayman Islands Hyperbaric Services (Health Services Authority), George Town": null,
+  "KY|George Town": {
+    "lat": 19.2953549,
+    "lon": -81.3807776
+  },
+  "MT|Gozo General Hospital Hyperbaric Unit, Victoria, Gozo": null,
+  "MT|Mater Dei Hospital Hyperbaric Unit, Msida": null,
+  "MT|Msida": {
+    "lat": 35.8956943,
+    "lon": 14.4891829
+  },
+  "MT|Victoria, Gozo": {
+    "lat": 36.0428907,
+    "lon": 14.2398479
+  },
+  "MV|ADK Hospital Hyperbaric Treatment Unit, Male": null,
+  "MV|Bandos Hyperbaric and Medical Clinic, Maldives, Bandos Island, North Male Atoll": null,
+  "MV|Bandos Island, North Male Atoll": null,
+  "MV|Kuredu Medical Clinic and Hyperbaric Centre, Kuredu, Lhaviyani Atoll": null,
+  "MV|Kuredu, Lhaviyani Atoll": null,
+  "MV|Male": {
+    "lat": 4.1779879,
+    "lon": 73.5107387
+  },
+  "MX|AMCARE Camara Hiperbarica La Paz, La Paz": null,
+  "MX|BMM Hyperbaric Chamber Cabo San Lucas (SSS Network), Cabo San Lucas": null,
+  "MX|Cabo San Lucas": {
+    "lat": 22.8938884,
+    "lon": -109.92006
+  },
+  "MX|Costamed Hospital Cozumel (Hyperbaric Chamber), Cozumel": null,
+  "MX|Cozumel": {
+    "lat": 20.4320599,
+    "lon": -86.9206906
+  },
+  "MX|La Paz": {
+    "lat": 24.1619948,
+    "lon": -110.3158532
+  },
+  "MX|Playa del Carmen": {
+    "lat": 20.6462848,
+    "lon": -87.0807866
+  },
+  "MX|SSS Hyperbaric Chamber (International Hospital Cozumel), Cozumel": null,
+  "MX|SSS Hyperbaric Chamber Network Playa del Carmen (Buceo Medico Mexicano), Playa del Carmen": null,
+  "MY|Healing Chambers of Asia Kuala Lumpur Hyperbaric Center, Kuala Lumpur": null,
+  "MY|Kuala Lumpur": {
+    "lat": 3.1516964,
+    "lon": 101.6942371
+  },
+  "NA|Walvis Bay": {
+    "lat": -22.9557607,
+    "lon": 14.5071125
+  },
+  "NA|Welwitschia Hospital Hyperbaric Unit (Erongo Primary Health Services), Walvis Bay": null,
+  "NO|Bergen": {
+    "lat": 60.3943055,
+    "lon": 5.3259192
+  },
+  "NO|Haukeland University Hospital Section for Hyperbaric Medicine, Bergen": null,
+  "NZ|Auckland": {
+    "lat": -36.852095,
+    "lon": 174.7631803
+  },
+  "NZ|Christchurch": {
+    "lat": -43.530955,
+    "lon": 172.6364343
+  },
+  "NZ|Christchurch Hospital Hyperbaric Medicine Unit, Christchurch": null,
+  "NZ|Slark Hyperbaric Unit, North Shore Hospital, Auckland": null,
+  "PF|Centre Hospitalier de Polynesie Francaise Caisson Hyperbare, Pirae, Tahiti": null,
+  "PF|Pirae, Tahiti": null,
+  "PH|Batangas City": {
+    "lat": 13.7552594,
+    "lon": 121.0590753
+  },
+  "PH|Cebu City": {
+    "lat": 10.2934946,
+    "lon": 123.9018183
+  },
+  "PH|Cebu Doctors' University Hospital Center for Hyperbaric Medicine, Cebu City": null,
+  "PH|St. Luke's Medical Center Hyperbaric Medicine Unit, Taguig": null,
+  "PH|St. Patrick's Hospital Hyperbaric Unit, Batangas City, Batangas City": null,
+  "PH|Taguig": {
+    "lat": 14.5270538,
+    "lon": 121.0744942
+  },
+  "PL|Gdynia": {
+    "lat": 54.5233304,
+    "lon": 18.6040279
+  },
+  "PL|Klinika Medycyny Hiperbarycznej i Ratownictwa Morskiego, UCMMiT Gdynia, Gdynia": null,
+  "PR|Canii Institute Hyperbaric Chamber, Isabela": null,
+  "PR|Isabela": null,
+  "PR|Puerto Rico Medical Center Hyperbaric Chamber, San Juan": null,
+  "PR|San Juan": null,
+  "PW|Belau National Hospital Hyperbaric Chamber, Koror, Palau": null,
+  "PW|Koror, Palau": {
+    "lat": 7.2259863,
+    "lon": 134.131234
+  },
+  "SA|Diving and Hyperbaric Medicine Department, Armed Forces Hospital, Jubail": null,
+  "SA|Jubail": {
+    "lat": 27.0006968,
+    "lon": 49.6532161
+  },
+  "SE|Gothenburg": {
+    "lat": 57.7072326,
+    "lon": 11.9670171
+  },
+  "SE|Sahlgrenska University Hospital Tryckkammare Ostra (Hyperbaric Chamber), Gothenburg": null,
+  "SG|Hyperbaric and Diving Medicine Centre, Singapore General Hospital, Singapore": null,
+  "SG|Singapore": {
+    "lat": 1.357107,
+    "lon": 103.8194992
+  },
+  "TC|Associated Medical Practices Hyperbaric Chamber, Providenciales": null,
+  "TC|Providenciales": {
+    "lat": 21.8020614,
+    "lon": -72.3004456
+  },
+  "TH|Bangkok": {
+    "lat": 13.7524938,
+    "lon": 100.4935089
+  },
+  "TH|Bangkok Hospital Pattaya Hyperbaric Oxygen Therapy Center, Pattaya": null,
+  "TH|Bangkok Hospital Phuket Diving Medicine Center, Phuket": null,
+  "TH|Bumrungrad Hospital Hyperbaric Oxygen Therapy Center, Bangkok": null,
+  "TH|Hyperbaric Services of Thailand (SSS Chamber Network Phuket), Phuket": null,
+  "TH|Koh Tao": {
+    "lat": 10.0921822,
+    "lon": 99.8395362
+  },
+  "TH|Pattaya": {
+    "lat": 12.9366924,
+    "lon": 100.8865002
+  },
+  "TH|Phuket": {
+    "lat": 7.9366015,
+    "lon": 98.3529292
+  },
+  "TH|SSS Recompression Chamber Network Koh Tao, Koh Tao": null,
+  "TR|Antalya": {
+    "lat": 36.8865728,
+    "lon": 30.7030242
+  },
+  "TR|Antalya Training and Research Hospital Underwater and Hyperbaric Medicine, Antalya": null,
+  "TR|Haydarpasa Sultan Abdulhamit Training and Research Hospital Underwater and Hyperbaric Medicine, Istanbul": null,
+  "TR|Istanbul": {
+    "lat": 41.006381,
+    "lon": 28.9758715
+  },
+  "TR|Izmir": {
+    "lat": 38.4192537,
+    "lon": 27.128469
+  },
+  "TR|Izmir Bozyaka Training and Research Hospital Underwater and Hyperbaric Medicine Clinic, Izmir": null,
+  "TT|Roxborough Hyperbaric Chamber Facility (Tobago Regional Health Authority), Roxborough, Tobago": null,
+  "TT|Roxborough, Tobago": {
+    "lat": 11.2495139,
+    "lon": -60.5762208
+  },
+  "TZ|Matemwe, Zanzibar": {
+    "lat": -5.8421823,
+    "lon": 39.35816
+  },
+  "TZ|Zanzibar Hyperbaric Chamber, Fairmont Zanzibar, Matemwe, Zanzibar": null,
+  "US|Avalon, CA": {
+    "lat": 33.34221,
+    "lon": -118.3272612
+  },
+  "US|Duke Center for Hyperbaric Medicine and Environmental Physiology, Durham, NC": null,
+  "US|Durham, NC": {
+    "lat": 35.996653,
+    "lon": -78.9018053
+  },
+  "US|Gainesville, FL": {
+    "lat": 29.6519684,
+    "lon": -82.3249846
+  },
+  "US|Galveston, TX": {
+    "lat": 29.3872254,
+    "lon": -94.992736
+  },
+  "US|Hennepin Healthcare Center for Hyperbaric Medicine, Minneapolis, MN": null,
+  "US|Honolulu, HI": {
+    "lat": 21.304547,
+    "lon": -157.855676
+  },
+  "US|Hyperbaric Treatment Center (Kuakini Medical Center / University Health Partners of Hawaii), Honolulu, HI": null,
+  "US|Loma Linda University Medical Center Hyperbaric Medicine Service, Loma Linda, CA": null,
+  "US|Loma Linda, CA": {
+    "lat": 34.0537971,
+    "lon": -117.2610925
+  },
+  "US|Minneapolis, MN": {
+    "lat": 44.9772995,
+    "lon": -93.2654692
+  },
+  "US|San Diego, CA": {
+    "lat": 32.7174202,
+    "lon": -117.162772
+  },
+  "US|Seattle, WA": {
+    "lat": 47.6038321,
+    "lon": -122.330062
+  },
+  "US|UC San Diego Health Hyperbaric Medicine Center (Hillcrest), San Diego, CA": null,
+  "US|UF Health Wound Care and Hyperbaric Center, Gainesville, FL": null,
+  "US|USC Catalina Hyperbaric Chamber, Avalon, CA": null,
+  "US|UTMB Health Undersea and Diving Medicine, Galveston, TX": null,
+  "US|Virginia Mason Center for Hyperbaric Medicine, Seattle, WA": null,
+  "UY|Montevideo": {
+    "lat": -34.9058916,
+    "lon": -56.1913095
+  },
+  "UY|Servicio de Medicina Hiperbarica, Hospital Central de las Fuerzas Armadas, Montevideo": null,
+  "VE|Caracas": {
+    "lat": 10.5060934,
+    "lon": -66.9146008
+  },
+  "VE|Oxigenacion Hiperbarica Avila, Caracas": null,
+  "VI|Schneider Regional Medical Center Hyperbaric Chamber (Roy Lester Schneider Hospital), St. Thomas": null,
+  "VI|St. Thomas": null,
+  "ZA|Cape Town": {
+    "lat": -33.9288301,
+    "lon": 18.4172197
+  },
+  "ZA|Durban": {
+    "lat": -29.8618145,
+    "lon": 31.009909
+  },
+  "ZA|Hyperbaric Medicine Centre, Durban": null,
+  "ZA|Hyperbaric Treatment Centre, Johannesburg": null,
+  "ZA|Johannesburg": {
+    "lat": -26.205,
+    "lon": 28.049722
+  },
+  "ZA|National Hyperbarics, Cape Town": null,
+  "ZA|Tygerberg Hospital Hyperbaric Unit, Cape Town": null
 }

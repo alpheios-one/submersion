@@ -131,6 +131,23 @@ def validate_chambers(chambers, min_count=MIN_CHAMBERS):
     return errors
 
 
+# Ids that already ship. `hiddenChamberIds` in the app's settings stores raw
+# ids, so a facility arriving from a parser under a generated id must be mapped
+# back onto the id it shipped with, or a chamber a diver deliberately hid comes
+# back from the dead.
+ID_ALIASES = {
+    "gb-ddrc-healthcare": "gb-ddrc",
+}
+
+
+def canonicalize_ids(chambers):
+    for chamber in chambers:
+        alias = ID_ALIASES.get(chamber["id"])
+        if alias:
+            chamber["id"] = alias
+    return chambers
+
+
 def merge_rows(leads, overlay):
     """Merge harvested leads with the curated overlay. Overlay wins: it is
     hand-verified, the leads are not. Sorted by id so regenerating the asset
@@ -219,7 +236,8 @@ def build():
     overlay_doc = _load_json(OVERLAY_PATH, {"chambers": [], "sources": []})
 
     chambers = merge_rows(
-        leads_doc.get("chambers", []), overlay_doc.get("chambers", [])
+        canonicalize_ids(leads_doc.get("chambers", [])),
+        canonicalize_ids(overlay_doc.get("chambers", [])),
     )
     sources = leads_doc.get("sources", []) + overlay_doc.get("sources", [])
 

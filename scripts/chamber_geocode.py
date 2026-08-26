@@ -79,20 +79,47 @@ class Geocoder:
         return (lat, lon)
 
 
+MANUAL_PATH = os.path.join(SCRIPT_DIR, "data", "chamber_coordinates.json")
+
+
+def load_manual_coordinates():
+    """Hand-recorded coordinates, keyed by chamber id.
+
+    Nominatim cannot find a resort island clinic or a hospital department by
+    name, and a chamber the card cannot place is a chamber it cannot rank, so
+    it would otherwise be dropped. This file is the escape hatch, seeded with
+    the coordinates the placeholder dataset already shipped.
+    """
+    if not os.path.exists(MANUAL_PATH):
+        return {}
+    with open(MANUAL_PATH, encoding="utf-8") as handle:
+        return json.load(handle)
+
+
 def geocode_rows(rows, geocoder=None):
     """Fill latitude and longitude on rows that lack them.
 
-    Tries the most specific query first (facility name plus city), then falls
-    back to the city alone, which still puts the chamber in the right town for
-    distance sorting. Rows that resolve to neither are returned unchanged and
-    are dropped later by validation, since a chamber the card cannot place is a
-    chamber it cannot rank.
+    Order of preference: coordinates already on the row, then the hand-recorded
+    file, then Nominatim with the most specific query (facility name plus
+    city), then the city alone, which still puts the chamber in the right town
+    for distance sorting.
+
+    Rows that resolve to none of these are reported by name so they can be
+    added to the manual file, rather than disappearing quietly.
     """
     geocoder = geocoder or Geocoder()
+    manual = load_manual_coordinates()
     resolved = 0
+    unplaced = []
 
     for row in rows:
         if row.get("latitude") is not None and row.get("longitude") is not None:
+            continue
+
+        hit = manual.get(row["id"])
+        if hit:
+            row["latitude"], row["longitude"] = hit["lat"], hit["lon"]
+            resolved += 1
             continue
 
         attempts = []
@@ -108,7 +135,13 @@ def geocode_rows(rows, geocoder=None):
                 row["latitude"], row["longitude"] = point
                 resolved += 1
                 break
+        else:
+            unplaced.append(row)
 
     geocoder.save()
     print(f"Geocoded {resolved} rows")
+    if unplaced:
+        print(f"Could not place {len(unplaced)} rows; add them to {MANUAL_PATH}:")
+        for row in unplaced:
+            print(f"  {row['id']}: {row['name']} ({row.get('city')}, {row['country']})")
     return rows
