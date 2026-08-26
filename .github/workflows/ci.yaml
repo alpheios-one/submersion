@@ -416,6 +416,14 @@ jobs:
         # creating a new one and left it carrying the wrong build.
         run: ruby scripts/release/fastlane_submit_guard_test.rb
 
+      - name: Run App Review notes test
+        # Guards the committed App Review notes deliver uploads with every
+        # submission: present on both platforms, identical, within Apple's
+        # length limit, and free of other-platform names (2.3.10). iOS 1.7.4
+        # and 1.7.5 were rejected under 5.1.1(v) because nothing told the
+        # reviewer the app has no accounts.
+        run: ./scripts/release/app_review_notes_test.sh
+
       - name: Run pre-push hook test
         # Guards two hook bugs that both rejected pushes for reasons unrelated
         # to the change being pushed: running the checks against the main
