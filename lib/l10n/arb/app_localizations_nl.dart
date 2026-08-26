@@ -15141,6 +15141,117 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_conflict_previous_tooltip => 'Vorig conflict';
 
   @override
+  String get settings_conflict_ref_buddy => 'Buddy';
+
+  @override
+  String get settings_conflict_ref_certification => 'Certificering';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'Checklistsjabloon';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Gekoppeld account';
+
+  @override
+  String get settings_conflict_ref_course => 'Cursus';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'Cursusvereiste';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Flesconfiguratie';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Gegevensbron';
+
+  @override
+  String get settings_conflict_ref_dive => 'Duik';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Duikcentrum';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Duikcomputer';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Duikplan';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Duikstek';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Duiktype';
+
+  @override
+  String get settings_conflict_ref_diver => 'Duiker';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Uitrusting';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Uitrustingsset';
+
+  @override
+  String get settings_conflict_ref_finding => 'Bevinding';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Instructeur';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Gekoppelde duik';
+
+  @override
+  String get settings_conflict_ref_media => 'Media';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Media-abonnement';
+
+  @override
+  String get settings_conflict_ref_missing => 'Niet meer in deze bibliotheek';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Geplande fles';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Sjabloon voor checklist voor de duik';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'Checklist voor de duik';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Gerelateerde duik';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Onderhoudstype';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Waarneming';
+
+  @override
+  String get settings_conflict_ref_signer => 'Ondertekend door';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Bronduik';
+
+  @override
+  String get settings_conflict_ref_species => 'Soorten';
+
+  @override
+  String get settings_conflict_ref_tag => 'Tag';
+
+  @override
+  String get settings_conflict_ref_tank => 'Fles';
+
+  @override
+  String get settings_conflict_ref_trip => 'Reis';
+
+  @override
   String get settings_conflict_remoteVersion => 'Externe versie';
 
   @override

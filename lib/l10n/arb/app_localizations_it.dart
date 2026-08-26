@@ -15258,6 +15258,118 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_conflict_previous_tooltip => 'Conflitto precedente';
 
   @override
+  String get settings_conflict_ref_buddy => 'Compagno';
+
+  @override
+  String get settings_conflict_ref_certification => 'Certificazione';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate =>
+      'Modello di lista di controllo';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Account collegato';
+
+  @override
+  String get settings_conflict_ref_course => 'Corso';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'Requisito del corso';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Configurazione bombole';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Origine dati';
+
+  @override
+  String get settings_conflict_ref_dive => 'Immersione';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Centro immersioni';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Computer subacqueo';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Piano di immersione';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Sito di immersione';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Tipo di immersione';
+
+  @override
+  String get settings_conflict_ref_diver => 'Subacqueo';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Attrezzatura';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Set di attrezzatura';
+
+  @override
+  String get settings_conflict_ref_finding => 'Rilievo';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Istruttore';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Immersione collegata';
+
+  @override
+  String get settings_conflict_ref_media => 'Media';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Abbonamento media';
+
+  @override
+  String get settings_conflict_ref_missing => 'Non è più in questa libreria';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Bombola pianificata';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Modello di lista pre-immersione';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'Lista pre-immersione';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Immersione correlata';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Tipo di revisione';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Avvistamento';
+
+  @override
+  String get settings_conflict_ref_signer => 'Firmato da';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Immersione di origine';
+
+  @override
+  String get settings_conflict_ref_species => 'Specie';
+
+  @override
+  String get settings_conflict_ref_tag => 'Tag';
+
+  @override
+  String get settings_conflict_ref_tank => 'Bombola';
+
+  @override
+  String get settings_conflict_ref_trip => 'Viaggio';
+
+  @override
   String get settings_conflict_remoteVersion => 'Versione remota';
 
   @override

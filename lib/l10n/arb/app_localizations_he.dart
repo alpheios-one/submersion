@@ -14879,6 +14879,117 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_conflict_previous_tooltip => 'ההתנגשות הקודמת';
 
   @override
+  String get settings_conflict_ref_buddy => 'שותף';
+
+  @override
+  String get settings_conflict_ref_certification => 'הסמכה';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'תבנית רשימת משימות';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'חשבון מחובר';
+
+  @override
+  String get settings_conflict_ref_course => 'קורס';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'דרישת קורס';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'תצורת בלונים';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'מקור נתונים';
+
+  @override
+  String get settings_conflict_ref_dive => 'צלילה';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'מועדון צלילה';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'מחשב צלילה';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'תוכנית צלילה';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'אתר צלילה';
+
+  @override
+  String get settings_conflict_ref_diveType => 'סוג צלילה';
+
+  @override
+  String get settings_conflict_ref_diver => 'צולל';
+
+  @override
+  String get settings_conflict_ref_equipment => 'ציוד';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'סט ציוד';
+
+  @override
+  String get settings_conflict_ref_finding => 'ממצא';
+
+  @override
+  String get settings_conflict_ref_instructor => 'מדריך';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'צלילה מקושרת';
+
+  @override
+  String get settings_conflict_ref_media => 'מדיה';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'מנוי מדיה';
+
+  @override
+  String get settings_conflict_ref_missing => 'כבר לא בספרייה הזו';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'בלון מתוכנן';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'תבנית רשימת בדיקות לפני צלילה';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'רשימת בדיקות לפני צלילה';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'צלילה קשורה';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'סוג טיפול';
+
+  @override
+  String get settings_conflict_ref_sighting => 'תצפית';
+
+  @override
+  String get settings_conflict_ref_signer => 'נחתם על ידי';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'צלילת מקור';
+
+  @override
+  String get settings_conflict_ref_species => 'מינים';
+
+  @override
+  String get settings_conflict_ref_tag => 'תגית';
+
+  @override
+  String get settings_conflict_ref_tank => 'בלון';
+
+  @override
+  String get settings_conflict_ref_trip => 'טיול';
+
+  @override
   String get settings_conflict_remoteVersion => 'גרסה מרוחקת';
 
   @override

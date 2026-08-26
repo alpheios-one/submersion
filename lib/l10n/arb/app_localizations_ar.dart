@@ -14987,6 +14987,117 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_conflict_previous_tooltip => 'التعارض السابق';
 
   @override
+  String get settings_conflict_ref_buddy => 'رفيق الغوص';
+
+  @override
+  String get settings_conflict_ref_certification => 'الشهادة';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'قالب قائمة التحقق';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'الحساب المتصل';
+
+  @override
+  String get settings_conflict_ref_course => 'الدورة';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'متطلب الدورة';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'إعداد الأسطوانات';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'مصدر البيانات';
+
+  @override
+  String get settings_conflict_ref_dive => 'الغوصة';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'مركز الغوص';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'حاسوب الغوص';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'خطة الغوص';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'موقع الغوص';
+
+  @override
+  String get settings_conflict_ref_diveType => 'نوع الغوصة';
+
+  @override
+  String get settings_conflict_ref_diver => 'الغواص';
+
+  @override
+  String get settings_conflict_ref_equipment => 'المعدات';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'طقم المعدات';
+
+  @override
+  String get settings_conflict_ref_finding => 'الملاحظة';
+
+  @override
+  String get settings_conflict_ref_instructor => 'المدرب';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'الغوصة المرتبطة';
+
+  @override
+  String get settings_conflict_ref_media => 'الوسائط';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'اشتراك الوسائط';
+
+  @override
+  String get settings_conflict_ref_missing => 'لم تعد موجودة في هذه المكتبة';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'الأسطوانة المخططة';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'قالب قائمة التحقق قبل الغوص';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'قائمة التحقق قبل الغوص';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'الغوصة ذات الصلة';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'نوع الصيانة';
+
+  @override
+  String get settings_conflict_ref_sighting => 'المشاهدة';
+
+  @override
+  String get settings_conflict_ref_signer => 'وقّع بواسطة';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'الغوصة المصدر';
+
+  @override
+  String get settings_conflict_ref_species => 'الأنواع';
+
+  @override
+  String get settings_conflict_ref_tag => 'الوسم';
+
+  @override
+  String get settings_conflict_ref_tank => 'الأسطوانة';
+
+  @override
+  String get settings_conflict_ref_trip => 'الرحلة';
+
+  @override
   String get settings_conflict_remoteVersion => 'النسخة البعيدة';
 
   @override

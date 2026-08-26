@@ -8972,6 +8972,42 @@
   "settings_conflict_noConflicts_title": "No Conflicts",
   "settings_conflict_noDataAvailable": "No data available",
   "settings_conflict_previous_tooltip": "Previous conflict",
+  "settings_conflict_ref_buddy": "Buddy",
+  "settings_conflict_ref_certification": "Certification",
+  "settings_conflict_ref_checklistTemplate": "Checklist template",
+  "settings_conflict_ref_connectedAccount": "Connected account",
+  "settings_conflict_ref_course": "Course",
+  "settings_conflict_ref_courseRequirement": "Course requirement",
+  "settings_conflict_ref_cylinderConfig": "Cylinder configuration",
+  "settings_conflict_ref_dataSource": "Data source",
+  "settings_conflict_ref_dive": "Dive",
+  "settings_conflict_ref_diveCenter": "Dive center",
+  "settings_conflict_ref_diveComputer": "Dive computer",
+  "settings_conflict_ref_divePlan": "Dive plan",
+  "settings_conflict_ref_diveSite": "Dive site",
+  "settings_conflict_ref_diveType": "Dive type",
+  "settings_conflict_ref_diver": "Diver",
+  "settings_conflict_ref_equipment": "Equipment",
+  "settings_conflict_ref_equipmentSet": "Equipment set",
+  "settings_conflict_ref_finding": "Finding",
+  "settings_conflict_ref_instructor": "Instructor",
+  "settings_conflict_ref_linkedDive": "Linked dive",
+  "settings_conflict_ref_media": "Media",
+  "settings_conflict_ref_mediaSubscription": "Media subscription",
+  "settings_conflict_ref_missing": "No longer in this library",
+  "settings_conflict_ref_named": "{name} ({date})",
+  "settings_conflict_ref_plannedTank": "Planned tank",
+  "settings_conflict_ref_preDiveChecklistTemplate": "Pre-dive checklist template",
+  "settings_conflict_ref_preDiveSession": "Pre-dive checklist run",
+  "settings_conflict_ref_relatedDive": "Related dive",
+  "settings_conflict_ref_serviceKind": "Service type",
+  "settings_conflict_ref_sighting": "Sighting",
+  "settings_conflict_ref_signer": "Signed by",
+  "settings_conflict_ref_sourceDive": "Source dive",
+  "settings_conflict_ref_species": "Species",
+  "settings_conflict_ref_tag": "Tag",
+  "settings_conflict_ref_tank": "Tank",
+  "settings_conflict_ref_trip": "Trip",
   "settings_conflict_remoteVersion": "Remote Version",
   "settings_conflict_resolved": "Resolved {count, plural, =1{1 conflict} other{{count} conflicts}}",
   "settings_conflict_title": "Resolve Conflicts",
@@ -9558,6 +9594,16 @@
         "type": "Object"
       },
       "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "@settings_conflict_ref_named": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      },
+      "date": {
         "type": "Object"
       }
     }
