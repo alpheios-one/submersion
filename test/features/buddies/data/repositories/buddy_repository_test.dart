@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/database/database.dart' show AppDatabase;
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
@@ -10,9 +11,10 @@ import '../../../../helpers/test_database.dart';
 
 void main() {
   late BuddyRepository repository;
+  late AppDatabase db;
 
   setUp(() async {
-    await setUpTestDatabase();
+    db = await setUpTestDatabase();
     repository = BuddyRepository();
   });
 
@@ -337,6 +339,26 @@ void main() {
         await repository.setFavorite(buddy.id, false);
         expect((await repository.getBuddyById(buddy.id))!.isFavorite, isFalse);
       });
+
+      test(
+        'setFavorite on an unknown id leaves no pending sync record',
+        () async {
+          await repository.setFavorite('does-not-exist', true);
+
+          final pending = await db.select(db.syncRecords).get();
+          expect(pending, isEmpty);
+        },
+      );
+
+      test(
+        'toggleFavorite on an unknown id leaves no pending sync record',
+        () async {
+          await repository.toggleFavorite('does-not-exist');
+
+          final pending = await db.select(db.syncRecords).get();
+          expect(pending, isEmpty);
+        },
+      );
     });
 
     group('getBuddyStats', () {

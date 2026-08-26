@@ -463,9 +463,12 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
                 child: TextButton.icon(
                   onPressed: () {
                     final next = sort.field == BuddySortField.diveCount
+                        // Text fields invert direction throughout this
+                        // codebase: descending is what renders A->Z. Ascending
+                        // here would flip the alphabetical toggle to Z->A.
                         ? const SortState(
                             field: BuddySortField.name,
-                            direction: SortDirection.ascending,
+                            direction: SortDirection.descending,
                           )
                         : const SortState(
                             field: BuddySortField.diveCount,

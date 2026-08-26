@@ -514,4 +514,74 @@ void main() {
       expect(result![0].role.id, equals(DiveRole.instructorId));
     });
   });
+
+  group('BuddyPicker - sort toggle (issue #638)', () {
+    // Dive counts deliberately disagree with alphabetical order so the two
+    // sorts are distinguishable: by count it reads Charlie, Bob, Alice.
+    final rankedBuddies = [
+      BuddyWithDiveCount(buddy: _testBuddies[0], diveCount: 1), // Alice
+      BuddyWithDiveCount(buddy: _testBuddies[1], diveCount: 5), // Bob
+      BuddyWithDiveCount(buddy: _testBuddies[2], diveCount: 9), // Charlie
+    ];
+
+    /// The buddy names as the sheet actually renders them, top to bottom.
+    List<String> renderedNames(WidgetTester tester) => [
+      for (final tile in tester.widgetList<ListTile>(find.byType(ListTile)))
+        (tile.title! as Text).data!,
+    ];
+
+    Future<void> pumpSheet(WidgetTester tester) async {
+      _useTallScreen(tester);
+      await tester.pumpWidget(
+        _buildPicker(
+          overrides: [
+            allBuddiesWithDiveCountProvider.overrideWith(
+              (ref) async => rankedBuddies,
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+      await _openSheet(tester);
+    }
+
+    testWidgets('defaults to dive count, most dives first', (tester) async {
+      await pumpSheet(tester);
+
+      expect(renderedNames(tester), [
+        'Charlie Brown',
+        'Bob Jones',
+        'Alice Smith',
+      ]);
+    });
+
+    testWidgets('toggling to name sorts A to Z, not Z to A', (tester) async {
+      await pumpSheet(tester);
+
+      await tester.tap(find.widgetWithText(TextButton, 'Sort: Dive Count'));
+      await tester.pumpAndSettle();
+
+      expect(find.widgetWithText(TextButton, 'Sort: Name'), findsOneWidget);
+      expect(renderedNames(tester), [
+        'Alice Smith',
+        'Bob Jones',
+        'Charlie Brown',
+      ]);
+    });
+
+    testWidgets('toggling back restores the dive count order', (tester) async {
+      await pumpSheet(tester);
+
+      await tester.tap(find.widgetWithText(TextButton, 'Sort: Dive Count'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, 'Sort: Name'));
+      await tester.pumpAndSettle();
+
+      expect(renderedNames(tester), [
+        'Charlie Brown',
+        'Bob Jones',
+        'Alice Smith',
+      ]);
+    });
+  });
 }

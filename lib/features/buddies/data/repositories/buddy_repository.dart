@@ -879,9 +879,21 @@ class BuddyRepository {
     try {
       _log.info('Setting favorite=$isFavorite for buddy: $buddyId');
       final now = DateTime.now().millisecondsSinceEpoch;
-      await (_db.update(_db.buddies)..where((t) => t.id.equals(buddyId))).write(
-        BuddiesCompanion(isFavorite: Value(isFavorite), updatedAt: Value(now)),
-      );
+      final updated =
+          await (_db.update(
+            _db.buddies,
+          )..where((t) => t.id.equals(buddyId))).write(
+            BuddiesCompanion(
+              isFavorite: Value(isFavorite),
+              updatedAt: Value(now),
+            ),
+          );
+      // A stale or deleted buddyId updates nothing; marking it pending would
+      // leave a sync record pointing at a row that does not exist.
+      if (updated == 0) {
+        _log.info('No buddy matched id, skipping favorite update: $buddyId');
+        return;
+      }
       await _syncRepository.markRecordPending(
         entityType: 'buddies',
         recordId: buddyId,
