@@ -23,7 +23,7 @@ void main() {
   }
 
   testWidgets('renders imperial SAC with two decimals', (tester) async {
-    final axis = UnitAxis.stressedSac(
+    final axis = UnitAxis.stressedRmv(
       const UnitFormatter(AppSettings(volumeUnit: VolumeUnit.cubicFeet)),
     );
     await tester.pumpWidget(host(axis, 28.3, (_) {}));
@@ -33,7 +33,7 @@ void main() {
 
   testWidgets('emits canonical values from onChanged', (tester) async {
     double? emitted;
-    final axis = UnitAxis.stressedSac(
+    final axis = UnitAxis.stressedRmv(
       const UnitFormatter(AppSettings(volumeUnit: VolumeUnit.cubicFeet)),
     );
     await tester.pumpWidget(host(axis, 28.3, (v) => emitted = v));
@@ -47,7 +47,7 @@ void main() {
   });
 
   testWidgets('metric SAC renders whole numbers', (tester) async {
-    final axis = UnitAxis.stressedSac(const UnitFormatter(AppSettings()));
+    final axis = UnitAxis.stressedRmv(const UnitFormatter(AppSettings()));
     await tester.pumpWidget(host(axis, 20, (_) {}));
     expect(find.text('20 L/min'), findsOneWidget);
   });
@@ -64,7 +64,7 @@ void main() {
   });
 
   testWidgets('exposes the readout to accessibility', (tester) async {
-    final axis = UnitAxis.stressedSac(const UnitFormatter(AppSettings()));
+    final axis = UnitAxis.stressedRmv(const UnitFormatter(AppSettings()));
     await tester.pumpWidget(host(axis, 20, (_) {}));
     expect(find.bySemanticsLabel('Your SAC: 20 L/min'), findsOneWidget);
   });

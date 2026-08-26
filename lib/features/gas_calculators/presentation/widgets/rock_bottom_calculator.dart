@@ -168,7 +168,7 @@ class RockBottomCalculator extends ConsumerWidget {
                         icon: Icons.person,
                         label: context.l10n.gasCalculators_rockBottom_yourSac,
                         value: sac,
-                        axis: UnitAxis.stressedSac(units),
+                        axis: UnitAxis.stressedRmv(units),
                         onChanged: (v) =>
                             ref.read(rockBottomSacProvider.notifier).state = v,
                       ),
@@ -178,7 +178,7 @@ class RockBottomCalculator extends ConsumerWidget {
                         icon: Icons.people,
                         label: context.l10n.gasCalculators_rockBottom_buddySac,
                         value: buddySac,
-                        axis: UnitAxis.stressedSac(units),
+                        axis: UnitAxis.stressedRmv(units),
                         onChanged: (v) =>
                             ref
                                     .read(rockBottomBuddySacProvider.notifier)
