@@ -4374,6 +4374,7 @@
   "settings_appearance_metric_ceiling": "Ceiling",
   "settings_appearance_metric_cns": "CNS% (Tossicita O2)",
   "settings_appearance_metric_events": "Eventi",
+  "settings_appearance_metric_estimatedTankPressure": "Pressione stimata della bombola",
   "settings_appearance_metric_gasDensity": "Densità gas",
   "settings_appearance_metric_gfPercent": "GF%",
   "settings_appearance_metric_heartRate": "Frequenza cardiaca",

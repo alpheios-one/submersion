@@ -156,6 +156,9 @@ class UddfFullImportService {
                 'model': model ?? '',
                 'serial': serial ?? '',
                 'firmware': firmware ?? '',
+                'manufacturer':
+                    UddfImportParsers.getManufacturerName(computerElement) ??
+                    '',
               };
             }
           }
@@ -1290,6 +1293,9 @@ class UddfFullImportService {
             if (computer['firmware']?.isNotEmpty == true) {
               diveData['diveComputerFirmware'] = computer['firmware'];
             }
+            if (computer['manufacturer']?.isNotEmpty == true) {
+              diveData['diveComputerManufacturer'] = computer['manufacturer'];
+            }
           }
         }
       }
@@ -1308,6 +1314,9 @@ class UddfFullImportService {
             }
             if (computer['firmware']?.isNotEmpty == true) {
               diveData['diveComputerFirmware'] = computer['firmware'];
+            }
+            if (computer['manufacturer']?.isNotEmpty == true) {
+              diveData['diveComputerManufacturer'] = computer['manufacturer'];
             }
           }
         }

@@ -14248,6 +14248,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_appearance_metric_events => 'אירועים';
 
   @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'לחץ בלון משוער';
+
+  @override
   String get settings_appearance_metric_gasDensity => 'צפיפות גז';
 
   @override

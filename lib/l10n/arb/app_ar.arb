@@ -4447,6 +4447,7 @@
   "settings_appearance_metric_ceiling": "السقف",
   "settings_appearance_metric_cns": "CNS% (سمية الأكسجين)",
   "settings_appearance_metric_events": "الأحداث",
+  "settings_appearance_metric_estimatedTankPressure": "ضغط الأسطوانة المقدر",
   "settings_appearance_metric_gasDensity": "كثافة الغاز",
   "settings_appearance_metric_gfPercent": "GF%",
   "settings_appearance_metric_heartRate": "معدل ضربات القلب",

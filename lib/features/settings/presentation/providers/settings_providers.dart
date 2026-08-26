@@ -399,6 +399,11 @@ class AppSettings {
   /// Default visibility for the per-cell O2 mV traces on the dive profile
   final bool defaultShowO2CellMv;
 
+  /// Whether synthesized ("(est.)") tank pressure lines are drawn on the dive
+  /// profile at all. Off means the estimate is never built, so no legend chip,
+  /// tooltip row, or chart-options entry appears for it (issue #731).
+  final bool defaultShowEstimatedTankPressure;
+
   /// Default visibility for the separate ascent-rate magnitude line on the
   /// dive profile (distinct from [showAscentRateColors], which tints the depth
   /// line by velocity band).
@@ -567,6 +572,7 @@ class AppSettings {
     this.defaultShowPhotoMarkers = true,
     this.defaultShowGasTimeline = false,
     this.defaultShowO2CellMv = false,
+    this.defaultShowEstimatedTankPressure = true,
     this.defaultShowAscentRateLine = false,
     // Notification defaults
     this.notificationsEnabled = true,
@@ -728,6 +734,7 @@ class AppSettings {
     bool? defaultShowPhotoMarkers,
     bool? defaultShowGasTimeline,
     bool? defaultShowO2CellMv,
+    bool? defaultShowEstimatedTankPressure,
     bool? defaultShowAscentRateLine,
     bool? notificationsEnabled,
     List<int>? serviceReminderDays,
@@ -878,6 +885,9 @@ class AppSettings {
       defaultShowGasTimeline:
           defaultShowGasTimeline ?? this.defaultShowGasTimeline,
       defaultShowO2CellMv: defaultShowO2CellMv ?? this.defaultShowO2CellMv,
+      defaultShowEstimatedTankPressure:
+          defaultShowEstimatedTankPressure ??
+          this.defaultShowEstimatedTankPressure,
       defaultShowAscentRateLine:
           defaultShowAscentRateLine ?? this.defaultShowAscentRateLine,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
@@ -1811,6 +1821,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setDefaultShowO2CellMv(bool value) async {
     state = state.copyWith(defaultShowO2CellMv: value);
+    await _saveSettings();
+  }
+
+  Future<void> setDefaultShowEstimatedTankPressure(bool value) async {
+    state = state.copyWith(defaultShowEstimatedTankPressure: value);
     await _saveSettings();
   }
 

@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/data/visibility/visibility_filter.dart';
 import 'package:submersion/core/database/database.dart';
@@ -10,6 +9,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/geocoding/place_lookup.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/dive_sites/data/mappers/dive_site_row_mapper.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
 import 'package:submersion/features/dive_sites/domain/services/site_location_merge.dart';
@@ -235,6 +235,30 @@ class SiteRepository {
   ///
   /// Used by the UDDF importer to persist columns that do not flow through
   /// the [domain.DiveSite] entity (e.g. MacDive waterType).
+  /// Stores a looked-up altitude for [siteId] without touching any other
+  /// column. Use this, never `updateSite` with a copied entity, for the
+  /// altitude write-back (issue #1187).
+  Future<void> updateSiteAltitude(String siteId, double altitudeMeters) =>
+      applyImportedMetadata(
+        siteId,
+        DiveSitesCompanion(altitude: Value(altitudeMeters)),
+      );
+
+  /// Stores coordinates (and optionally an altitude) for [siteId] without
+  /// touching any other column.
+  Future<void> updateSiteCoordinates(
+    String siteId,
+    domain.GeoPoint location, {
+    double? altitude,
+  }) => applyImportedMetadata(
+    siteId,
+    DiveSitesCompanion(
+      latitude: Value(location.latitude),
+      longitude: Value(location.longitude),
+      altitude: altitude == null ? const Value.absent() : Value(altitude),
+    ),
+  );
+
   /// Fills whichever of country, region, city and body of water are still
   /// empty on [siteId] from [found], leaving every other column untouched
   /// (issue #1187). Returns true when a column was written. The row is
@@ -875,42 +899,7 @@ class SiteRepository {
     }
   }
 
-  domain.DiveSite _mapRowToSite(DiveSite row) {
-    return domain.DiveSite(
-      id: row.id,
-      diverId: row.diverId,
-      name: row.name,
-      description: row.description,
-      location: row.latitude != null && row.longitude != null
-          ? domain.GeoPoint(row.latitude!, row.longitude!)
-          : null,
-      minDepth: row.minDepth,
-      maxDepth: row.maxDepth,
-      difficulty: domain.SiteDifficulty.fromString(row.difficulty),
-      waterType: row.waterType == null
-          ? null
-          : WaterType.values.asNameMap()[row.waterType],
-      country: row.country,
-      region: row.region,
-      city: row.city,
-      island: row.island,
-      bodyOfWater: row.bodyOfWater,
-      rating: row.rating,
-      notes: row.notes,
-      hazards: row.hazards,
-      accessNotes: row.accessNotes,
-      mooringNumber: row.mooringNumber,
-      parkingInfo: row.parkingInfo,
-      altitude: row.altitude,
-      entryMethod: row.entryMethod == null
-          ? null
-          : EntryMethod.values.asNameMap()[row.entryMethod],
-      exitMethod: row.exitMethod == null
-          ? null
-          : EntryMethod.values.asNameMap()[row.exitMethod],
-      isShared: row.isShared,
-    );
-  }
+  domain.DiveSite _mapRowToSite(DiveSite row) => mapDiveSiteRow(row);
 
   Future<void> _updateSiteRow(domain.DiveSite site, int now) async {
     await (_db.update(_db.diveSites)..where((t) => t.id.equals(site.id))).write(

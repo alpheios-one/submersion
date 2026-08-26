@@ -33,6 +33,26 @@ final filteredDiveStatisticsProvider = FutureProvider<DiveStatistics>((
   return repository.getStatistics(diverId: currentDiverId, filter: filter);
 });
 
+/// Personal records (superlatives) scoped by the Statistics filter.
+///
+/// Split from diveRecordsProvider for the same reason
+/// [filteredDiveStatisticsProvider] is split from diveStatisticsProvider: the
+/// dive-log summary widget reads the unfiltered one and has no filter UI, so
+/// the Statistics tab's scope must not reach it. Issue #1028: before this
+/// split, the Statistics tab's records were the only panel on the page that
+/// ignored the filter.
+///
+/// Takes the same dives tick as its unfiltered sibling (issue #217): a merge,
+/// a bulk delete, or a sync pull rewrites the superlatives without going
+/// through any notifier.
+final filteredDiveRecordsProvider = FutureProvider<DiveRecords>((ref) async {
+  final repository = ref.watch(diveRepositoryProvider);
+  final currentDiverId = ref.watch(currentDiverIdProvider);
+  final filter = ref.watch(statisticsFilterProvider);
+  ref.invalidateSelfWhen(repository.watchDivesChanges());
+  return repository.getRecords(diverId: currentDiverId, filter: filter);
+});
+
 /// Adds keepAlive with a 5-minute expiry and subscribes to the statistics
 /// change tick, so all stats providers stay cached across navigations but
 /// refresh whenever any table they read is written.

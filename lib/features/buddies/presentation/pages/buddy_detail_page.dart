@@ -505,7 +505,7 @@ class _BuddyDetailContent extends ConsumerWidget {
                             contentPadding: EdgeInsets.zero,
                             leading: const Icon(Icons.card_membership),
                             title: Text(certificationTitle(cert)),
-                            subtitle: Text(cert.agency.displayName),
+                            subtitle: Text(certificationAgencyAndLevel(cert)),
                           ),
                       ],
                     ),
@@ -597,7 +597,9 @@ class _BuddyDetailContent extends ConsumerWidget {
     final diveIdsAsync = ref.watch(diveIdsForBuddyProvider(buddy.id));
     final divesAsync = ref.watch(divesForBuddyProvider(buddy.id));
     final theme = Theme.of(context);
-    final dateFormat = DateFormat.MMMd();
+    // Includes the year: shared dives routinely span several years, so a bare
+    // "Mar 28" is ambiguous (#982). Matches the stats card above.
+    final dateFormat = DateFormat.yMMMd();
 
     return Card(
       child: Padding(

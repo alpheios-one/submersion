@@ -10,6 +10,7 @@ import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.da
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_authenticator.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_client_config.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_token_store.dart';
+import 'package:submersion/core/services/cloud_storage/http_timeouts.dart';
 import 'package:submersion/core/services/logger_service.dart';
 
 /// Runs the user-consent step of the loopback flow and returns credentials.
@@ -57,10 +58,19 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
        _obtainConsent =
            obtainConsent ?? gauth.obtainAccessCredentialsViaUserConsent,
        _buildClient = buildClient ?? gauth.autoRefreshingClient,
-       _baseClientFactory = baseClientFactory ?? http.Client.new,
+       _baseClientFactory = baseClientFactory ?? _timedClient,
        _launchBrowser = launchBrowser ?? launchUrlString;
 
   static final _log = LoggerService.forClass(DesktopOAuthAuthenticator);
+
+  /// Base transport for the refreshing client, the consent-flow token
+  /// exchange, and revocation.
+  ///
+  /// A bare `http.Client()` has no connect, response or read deadline, so a
+  /// wedged socket parked every Drive call made through the refreshing client
+  /// on top of it -- on sync and, via `mediaHttpClient()`, on the media
+  /// transfer queue (#1279).
+  static http.Client _timedClient() => TimeoutHttpClient.overSockets();
 
   /// openid + email are included so the id_token carries the account email
   /// for the settings tile subtitle; drive.appdata is the only Drive scope.

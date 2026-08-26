@@ -14492,6 +14492,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_appearance_metric_events => 'Gebeurtenissen';
 
   @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Geschatte flesdruk';
+
+  @override
   String get settings_appearance_metric_gasDensity => 'Gasdichtheid';
 
   @override

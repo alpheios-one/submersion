@@ -180,6 +180,9 @@ class DiverSettingsRepository {
               defaultShowPhotoMarkers: Value(s.defaultShowPhotoMarkers),
               defaultShowGasTimeline: Value(s.defaultShowGasTimeline),
               defaultShowO2CellMv: Value(s.defaultShowO2CellMv),
+              defaultShowEstimatedTankPressure: Value(
+                s.defaultShowEstimatedTankPressure,
+              ),
               defaultShowAscentRateLine: Value(s.defaultShowAscentRateLine),
               notificationsEnabled: Value(s.notificationsEnabled),
               serviceReminderDays: Value(
@@ -345,6 +348,9 @@ class DiverSettingsRepository {
           defaultShowPhotoMarkers: Value(settings.defaultShowPhotoMarkers),
           defaultShowGasTimeline: Value(settings.defaultShowGasTimeline),
           defaultShowO2CellMv: Value(settings.defaultShowO2CellMv),
+          defaultShowEstimatedTankPressure: Value(
+            settings.defaultShowEstimatedTankPressure,
+          ),
           defaultShowAscentRateLine: Value(settings.defaultShowAscentRateLine),
           notificationsEnabled: Value(settings.notificationsEnabled),
           serviceReminderDays: Value(
@@ -548,6 +554,7 @@ class DiverSettingsRepository {
       defaultShowPhotoMarkers: row.defaultShowPhotoMarkers,
       defaultShowGasTimeline: row.defaultShowGasTimeline,
       defaultShowO2CellMv: row.defaultShowO2CellMv,
+      defaultShowEstimatedTankPressure: row.defaultShowEstimatedTankPressure,
       defaultShowAscentRateLine: row.defaultShowAscentRateLine,
       notificationsEnabled: row.notificationsEnabled,
       serviceReminderDays: _parseReminderDays(row.serviceReminderDays),

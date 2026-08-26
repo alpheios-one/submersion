@@ -2248,19 +2248,26 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     var updatedSite = _selectedSite!.copyWith(location: gps);
     // A site gaining coordinates should also gain its altitude, so later dives
     // there resolve locally without a lookup.
+    double? lookedUpAltitude;
     if (updatedSite.altitude == null) {
-      final meters = await ref
+      lookedUpAltitude = await ref
           .read(elevationServiceProvider)
           .fetchElevation(latitude: gps.latitude, longitude: gps.longitude);
       if (!mounted) return;
-      if (meters != null) {
-        updatedSite = updatedSite.copyWith(altitude: meters);
+      if (lookedUpAltitude != null) {
+        updatedSite = updatedSite.copyWith(altitude: lookedUpAltitude);
       }
     }
 
-    // Update the site via the notifier
+    // Patch only the coordinate columns: _selectedSite may be a partially
+    // hydrated entity, and a whole-entity update would wipe the rest
+    // (issue #1187).
     final siteNotifier = ref.read(siteListNotifierProvider.notifier);
-    await siteNotifier.updateSite(updatedSite);
+    await siteNotifier.updateSiteCoordinates(
+      updatedSite.id,
+      gps,
+      altitude: lookedUpAltitude,
+    );
 
     setState(() {
       _selectedSite = updatedSite;
@@ -4102,12 +4109,16 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     );
     if (!mounted) return;
 
-    final writeBack = resolution.siteWriteBack;
+    final writeBack = resolution.siteAltitudeWriteBack;
     if (writeBack != null) {
-      await ref.read(siteListNotifierProvider.notifier).updateSite(writeBack);
+      await ref
+          .read(siteListNotifierProvider.notifier)
+          .updateSiteAltitude(writeBack.siteId, writeBack.altitudeMeters);
       if (!mounted) return;
-      if (_selectedSite?.id == writeBack.id) {
-        _selectedSite = writeBack;
+      if (_selectedSite?.id == writeBack.siteId) {
+        _selectedSite = _selectedSite?.copyWith(
+          altitude: writeBack.altitudeMeters,
+        );
       }
     }
 

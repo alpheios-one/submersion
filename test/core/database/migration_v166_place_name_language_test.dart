@@ -2,8 +2,8 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 
-/// Minimal pre-v162 shape: a diver_settings table without the place name
-/// language column, stamped at v161 so the 161->162 upgrade runs.
+/// Minimal pre-v166 shape: a diver_settings table without the place name
+/// language column, stamped at v161 so the 161->166 upgrade runs.
 NativeDatabase _dbAt161() {
   return NativeDatabase.memory(
     setup: (rawDb) {
@@ -19,7 +19,7 @@ NativeDatabase _dbAt161() {
 }
 
 void main() {
-  test("v162 adds place_name_language defaulting to 'en'", () async {
+  test("v166 adds place_name_language defaulting to 'en'", () async {
     final db = AppDatabase(_dbAt161());
     addTearDown(() => db.close());
 
@@ -55,8 +55,8 @@ void main() {
     await expectLater(db.customSelect('SELECT 1').get(), completes);
   });
 
-  test('v162 is present in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(162));
-    expect(AppDatabase.migrationVersions, contains(162));
+  test('v166 is present in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(166));
+    expect(AppDatabase.migrationVersions, contains(166));
   });
 }

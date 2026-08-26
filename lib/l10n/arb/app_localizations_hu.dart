@@ -14553,6 +14553,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_appearance_metric_events => 'Esemenyek';
 
   @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Becsült palacknyomás';
+
+  @override
   String get settings_appearance_metric_gasDensity => 'Gaz suruseg';
 
   @override
