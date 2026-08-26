@@ -7,11 +7,8 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/conflict_reference.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/data_quality/domain/entities/quality_finding.dart';
-// buildQualityUnitFormatters is the one place that binds the finding renderer
-// to the diver's unit settings; it lives beside the inbox that first needed it.
-import 'package:submersion/features/data_quality/presentation/pages/data_quality_inbox_page.dart'
-    show buildQualityUnitFormatters;
 import 'package:submersion/features/data_quality/presentation/widgets/quality_finding_message.dart';
+import 'package:submersion/features/data_quality/presentation/widgets/quality_unit_formatters.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/widgets/conflict_reference_labels.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -80,7 +77,6 @@ class ConflictDataPreview extends ConsumerWidget {
     final rows = conflictPreviewRows(
       l10n: context.l10n,
       units: UnitFormatter(ref.watch(settingsProvider)),
-      findingFormatters: buildQualityUnitFormatters(ref),
       entityType: entityType,
       data: data,
       references: references,
@@ -123,13 +119,12 @@ class ConflictDataPreview extends ConsumerWidget {
 List<ConflictPreviewRow> conflictPreviewRows({
   required AppLocalizations l10n,
   required UnitFormatter units,
-  required QualityUnitFormatters findingFormatters,
   required String entityType,
   required Map<String, dynamic> data,
   required List<ConflictReference> references,
 }) {
   final message = entityType == 'qualityFindings'
-      ? _findingMessage(l10n, findingFormatters, data)
+      ? _findingMessage(l10n, units, data)
       : null;
 
   final hidden = {
@@ -275,7 +270,7 @@ Map<String, dynamic> _remainingScalars(
 /// raw columns, which is what it did before.
 QualityFindingMessage? _findingMessage(
   AppLocalizations l10n,
-  QualityUnitFormatters formatters,
+  UnitFormatter units,
   Map<String, dynamic> data,
 ) {
   final detectorId = data['detectorId'];
@@ -298,7 +293,7 @@ QualityFindingMessage? _findingMessage(
         (data['updatedAt'] as num?)?.toInt() ?? 0,
       ),
     );
-    return buildFindingMessage(l10n, finding, formatters);
+    return buildFindingMessage(l10n, finding, qualityUnitFormattersFor(units));
   } on ArgumentError catch (e) {
     _log.warning('Conflict preview could not read a finding row', error: e);
     return null;

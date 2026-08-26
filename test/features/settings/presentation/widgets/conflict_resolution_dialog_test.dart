@@ -189,7 +189,7 @@ void main() {
     expect(find.byIcon(Icons.place), findsOneWidget);
   });
 
-  testWidgets('renders a depth in the diver configured unit', (tester) async {
+  testWidgets("renders a depth in the diver's configured unit", (tester) async {
     await pumpDialog(
       tester,
       SyncConflict(
@@ -329,6 +329,78 @@ void main() {
       ),
     );
 
+    expect(find.text('Finding:'), findsNothing);
+    expect(find.text('detectorId:'), findsNWidgets(2));
+  });
+
+  testWidgets('renders a detector that dates its finding', (tester) async {
+    // A second detector, to show the preview inherits every detector's copy
+    // from the data-quality renderer rather than special-casing depth spikes.
+    // clock_offset formats its stored epoch through the diver's date format.
+    await pumpDialog(
+      tester,
+      SyncConflict(
+        entityType: 'qualityFindings',
+        recordId: 'qf-clock',
+        localData: const {
+          'id': 'qf-clock',
+          'detectorId': 'clock_offset',
+          'detectorVersion': 1,
+          'category': 'time',
+          'severity': 'warning',
+          'status': 'open',
+          'params': '{"entryTimeMs":-2208988800000}',
+        },
+        remoteData: const {
+          'id': 'qf-clock',
+          'detectorId': 'clock_offset',
+          'detectorVersion': 1,
+          'category': 'time',
+          'severity': 'critical',
+          'status': 'open',
+          'params': '{"entryTimeMs":-2208988800000}',
+        },
+        localModified: DateTime(2026, 3, 28),
+        remoteModified: DateTime(2026, 3, 29),
+      ),
+    );
+
+    expect(find.textContaining('Clock & timezone'), findsNWidgets(2));
+    expect(find.textContaining('dated before 1950'), findsNWidgets(2));
+    expect(find.textContaining('1900'), findsNWidgets(2));
+  });
+
+  testWidgets('falls back to raw columns for a finding missing a column', (
+    tester,
+  ) async {
+    // A row that reached this device without a category at all. Without the
+    // guard the cast throws and takes the whole dialog down with it, leaving
+    // the conflict unresolvable.
+    await pumpDialog(
+      tester,
+      SyncConflict(
+        entityType: 'qualityFindings',
+        recordId: 'qf-3',
+        localData: const {
+          'id': 'qf-3',
+          'detectorId': 'depth_spike',
+          'severity': 'warning',
+          'status': 'open',
+          'params': '{}',
+        },
+        remoteData: const {
+          'id': 'qf-3',
+          'detectorId': 'depth_spike',
+          'severity': 'critical',
+          'status': 'open',
+          'params': '{}',
+        },
+        localModified: DateTime(2026, 3, 28),
+        remoteModified: DateTime(2026, 3, 29),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
     expect(find.text('Finding:'), findsNothing);
     expect(find.text('detectorId:'), findsNWidgets(2));
   });

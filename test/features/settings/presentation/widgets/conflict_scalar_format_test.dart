@@ -56,7 +56,7 @@ void main() {
     });
   });
 
-  test('converts to the diver own units rather than the stored ones', () {
+  test("converts to the diver's own units rather than the stored ones", () {
     const imperial = UnitFormatter(
       AppSettings(
         depthUnit: DepthUnit.feet,

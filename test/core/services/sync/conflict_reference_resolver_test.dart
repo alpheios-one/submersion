@@ -110,7 +110,7 @@ void main() {
     expect(dive.isMissing, isFalse);
   });
 
-  test('ignores the record own id and non-reference fields', () async {
+  test("ignores the record's own id and non-reference fields", () async {
     await seedDive('dive-1');
 
     final refs = await resolver.resolve('qualityFindings', {
