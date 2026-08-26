@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/providers/location_service_provider.dart';
-import 'package:submersion/core/services/location_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -215,7 +214,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
         .reverseGeocode(
           loc.latitude,
           loc.longitude,
-          languageCode: LocationService.defaultLanguageCode,
+          languageCode: ref.read(placeNameLanguageProvider),
         );
     if (!mounted) return;
     setState(() {
@@ -1348,6 +1347,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
       final locationService = ref.read(locationServiceProvider);
       final result = await locationService.getCurrentLocation(
         includeGeocoding: true,
+        languageCode: ref.read(placeNameLanguageProvider),
       );
 
       if (result == null) {

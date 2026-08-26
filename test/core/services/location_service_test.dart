@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' show Locale;
@@ -15,135 +14,7 @@ import 'package:submersion/core/services/geocoding/nominatim_throttle.dart';
 import 'package:submersion/core/services/geocoding/place_lookup.dart';
 import 'package:submersion/core/services/location_service.dart';
 
-/// One canned HTTP exchange plus a record of what the service actually sent.
-///
-/// The geocoding paths talk to Nominatim through `dart:io HttpClient`, so the
-/// only seam that does not require a real socket is [HttpOverrides]. Every
-/// request the service makes is captured here so the tests can assert on the
-/// English pin (#214) that lives in the URI *and* in the request headers.
-class _FakeNominatim {
-  _FakeNominatim({this.statusCode = 200, this.body = '{}', this.bodyFor});
-
-  final int statusCode;
-  final String body;
-
-  /// When set, wins over [body] for the given request.
-  final String? Function(Uri uri)? bodyFor;
-
-  String bodyForUri(Uri uri) => bodyFor?.call(uri) ?? body;
-
-  final List<Uri> requestedUris = <Uri>[];
-  final List<Map<String, String>> requestHeaders = <Map<String, String>>[];
-  int clientCloseCount = 0;
-
-  Uri get lastUri => requestedUris.last;
-  Map<String, String> get lastHeaders => requestHeaders.last;
-
-  /// Run [body] with every `HttpClient` replaced by this fake server.
-  Future<T> run<T>(Future<T> Function() action) =>
-      HttpOverrides.runZoned<Future<T>>(
-        action,
-        createHttpClient: (SecurityContext? _) => _FakeHttpClient(this),
-      );
-}
-
-class _FakeHttpClient implements HttpClient {
-  _FakeHttpClient(this._server);
-
-  final _FakeNominatim _server;
-
-  @override
-  String? userAgent;
-
-  @override
-  Future<HttpClientRequest> getUrl(Uri url) async {
-    _server.requestedUris.add(url);
-    return _FakeHttpClientRequest(url, _server);
-  }
-
-  @override
-  void close({bool force = false}) => _server.clientCloseCount++;
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => null;
-}
-
-class _ThrowingHttpClient implements HttpClient {
-  @override
-  String? userAgent;
-
-  @override
-  Future<HttpClientRequest> getUrl(Uri url) async {
-    throw const SocketException('offline');
-  }
-
-  @override
-  void close({bool force = false}) {}
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => null;
-}
-
-class _FakeHttpClientRequest implements HttpClientRequest {
-  _FakeHttpClientRequest(this.uri, this._server);
-
-  final _FakeNominatim _server;
-
-  @override
-  final Uri uri;
-
-  @override
-  final HttpHeaders headers = _FakeHttpHeaders();
-
-  @override
-  Future<HttpClientResponse> close() async {
-    _server.requestHeaders.add((headers as _FakeHttpHeaders).values);
-    return _FakeHttpClientResponse(_server.statusCode, _server.bodyForUri(uri));
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => null;
-}
-
-class _FakeHttpHeaders implements HttpHeaders {
-  final Map<String, String> values = <String, String>{};
-
-  @override
-  void set(String name, Object value, {bool preserveHeaderCase = false}) {
-    values[name.toLowerCase()] = '$value';
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => null;
-}
-
-class _FakeHttpClientResponse extends Stream<List<int>>
-    implements HttpClientResponse {
-  _FakeHttpClientResponse(this.statusCode, this._body);
-
-  @override
-  final int statusCode;
-
-  final String _body;
-
-  @override
-  StreamSubscription<List<int>> listen(
-    void Function(List<int> event)? onData, {
-    Function? onError,
-    void Function()? onDone,
-    bool? cancelOnError,
-  }) {
-    return Stream<List<int>>.value(utf8.encode(_body)).listen(
-      onData,
-      onError: onError,
-      onDone: onDone,
-      cancelOnError: cancelOnError,
-    );
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => null;
-}
+import '../../helpers/fake_nominatim.dart';
 
 void main() {
   final service = LocationService.instance;
@@ -181,7 +52,7 @@ void main() {
     test(
       'parses country, region and locality from a Nominatim response',
       () async {
-        final server = _FakeNominatim(
+        final server = FakeNominatim(
           body: jsonEncode(<String, dynamic>{
             'address': <String, dynamic>{
               'country': 'Spain',
@@ -204,7 +75,7 @@ void main() {
     test(
       'sends the English pin in both the URI and the request headers',
       () async {
-        final server = _FakeNominatim(
+        final server = FakeNominatim(
           body: jsonEncode(<String, dynamic>{
             'address': <String, dynamic>{'country': 'Spain'},
           }),
@@ -236,7 +107,7 @@ void main() {
     );
 
     test('sends the requested language in the URI and the headers', () async {
-      final server = _FakeNominatim(
+      final server = FakeNominatim(
         body: jsonEncode(<String, dynamic>{
           'address': <String, dynamic>{'country': 'Schweiz'},
         }),
@@ -254,7 +125,7 @@ void main() {
     test('returns PlaceLookup.unavailable when the request throws', () async {
       final result = await HttpOverrides.runZoned(
         () => service.reverseGeocode(47.0, 8.4, languageCode: 'en'),
-        createHttpClient: (_) => _ThrowingHttpClient(),
+        createHttpClient: (_) => ThrowingHttpClient(),
       );
 
       expect(result.isEmpty, isTrue);
@@ -262,7 +133,7 @@ void main() {
     });
 
     test('falls back from state to province for the region', () async {
-      final server = _FakeNominatim(
+      final server = FakeNominatim(
         body: jsonEncode(<String, dynamic>{
           'address': <String, dynamic>{
             'country': 'Canada',
@@ -281,7 +152,7 @@ void main() {
     });
 
     test('falls back from province to region, and to village', () async {
-      final server = _FakeNominatim(
+      final server = FakeNominatim(
         body: jsonEncode(<String, dynamic>{
           'address': <String, dynamic>{
             'country': 'Egypt',
@@ -303,7 +174,7 @@ void main() {
     test(
       'returns empty fields when the payload has no address block',
       () async {
-        final server = _FakeNominatim(
+        final server = FakeNominatim(
           body: jsonEncode(<String, dynamic>{'error': 'Unable to geocode'}),
         );
 
@@ -318,7 +189,7 @@ void main() {
     );
 
     test('returns empty fields on a non-200 response', () async {
-      final server = _FakeNominatim(
+      final server = FakeNominatim(
         statusCode: 503,
         body: 'Service Unavailable',
       );
@@ -333,7 +204,7 @@ void main() {
     });
 
     test('swallows malformed JSON instead of throwing', () async {
-      final server = _FakeNominatim(body: '<html>rate limited</html>');
+      final server = FakeNominatim(body: '<html>rate limited</html>');
 
       final result = await server.run(
         () => service.reverseGeocode(36.0143, -5.6044, languageCode: 'en'),
@@ -345,7 +216,7 @@ void main() {
     });
 
     test('closes the HttpClient even when the body fails to parse', () async {
-      final server = _FakeNominatim(body: 'not json');
+      final server = FakeNominatim(body: 'not json');
 
       await server.run(
         () => service.reverseGeocode(36.0143, -5.6044, languageCode: 'en'),
@@ -363,7 +234,7 @@ void main() {
 
   group('forwardGeocode', () {
     test('returns the parsed coordinates and address details', () async {
-      final server = _FakeNominatim(
+      final server = FakeNominatim(
         body: jsonEncode(<dynamic>[
           <String, dynamic>{
             'lat': '36.0143',
@@ -391,7 +262,7 @@ void main() {
     test(
       'sends the English pin in both the URI and the request headers',
       () async {
-        final server = _FakeNominatim(
+        final server = FakeNominatim(
           body: jsonEncode(<dynamic>[
             <String, dynamic>{'lat': '36.0143', 'lon': '-5.6044'},
           ]),
@@ -407,7 +278,7 @@ void main() {
     );
 
     test('falls back from state to province, and from city to town', () async {
-      final server = _FakeNominatim(
+      final server = FakeNominatim(
         body: jsonEncode(<dynamic>[
           <String, dynamic>{
             'lat': '45.2542',
@@ -430,7 +301,7 @@ void main() {
     });
 
     test('falls back to region and village as the last options', () async {
-      final server = _FakeNominatim(
+      final server = FakeNominatim(
         body: jsonEncode(<dynamic>[
           <String, dynamic>{
             'lat': '28.5091',
@@ -453,7 +324,7 @@ void main() {
     test(
       'returns coordinates with null details when address is absent',
       () async {
-        final server = _FakeNominatim(
+        final server = FakeNominatim(
           body: jsonEncode(<dynamic>[
             <String, dynamic>{'lat': '12.5', 'lon': '-70.0'},
           ]),
@@ -470,7 +341,7 @@ void main() {
     );
 
     test('returns null when Nominatim has no match', () async {
-      final server = _FakeNominatim(body: '[]');
+      final server = FakeNominatim(body: '[]');
 
       final result = await server.run(
         () => service.forwardGeocode('Nowhere At All'),
@@ -480,7 +351,7 @@ void main() {
     });
 
     test('returns null when the coordinates are not parseable', () async {
-      final server = _FakeNominatim(
+      final server = FakeNominatim(
         body: jsonEncode(<dynamic>[
           <String, dynamic>{'lat': 'not-a-number', 'lon': '-5.6044'},
         ]),
@@ -492,7 +363,7 @@ void main() {
     });
 
     test('returns null on a non-200 response', () async {
-      final server = _FakeNominatim(statusCode: 429, body: 'Too Many Requests');
+      final server = FakeNominatim(statusCode: 429, body: 'Too Many Requests');
 
       final result = await server.run(() => service.forwardGeocode('Tarifa'));
 
@@ -505,7 +376,7 @@ void main() {
     });
 
     test('swallows malformed JSON instead of throwing', () async {
-      final server = _FakeNominatim(body: '<html>rate limited</html>');
+      final server = FakeNominatim(body: '<html>rate limited</html>');
 
       final result = await server.run(() => service.forwardGeocode('Tarifa'));
 
@@ -515,7 +386,7 @@ void main() {
     test(
       'short-circuits a blank address without hitting the network',
       () async {
-        final server = _FakeNominatim(body: '[]');
+        final server = FakeNominatim(body: '[]');
 
         final result = await server.run(() => service.forwardGeocode('   '));
 
@@ -592,7 +463,7 @@ void main() {
 
       // The first attempt throws inside the native branch; the service falls
       // through to the web fallback rather than surfacing the failure.
-      final server = _FakeNominatim(
+      final server = FakeNominatim(
         body: '{"address": {"country": "Fallback"}}',
       );
       final first = await server.run(
@@ -646,7 +517,7 @@ void main() {
     });
 
     test('a lake on the natural layer becomes the body of water', () async {
-      final server = _FakeNominatim(
+      final server = FakeNominatim(
         body: jsonEncode(address()),
         bodyFor: (uri) => natural(uri, {
           'class': 'water',
@@ -731,7 +602,7 @@ void main() {
 
     test('a failing natural-layer request keeps the address result', () async {
       var calls = 0;
-      final server = _FakeNominatim(
+      final server = FakeNominatim(
         body: jsonEncode(address()),
         bodyFor: (uri) {
           if (uri.queryParameters['layer'] != 'natural') return null;
@@ -756,7 +627,7 @@ void main() {
         LocationService.throttle = NominatimThrottle();
         final start = clock.now();
         final seenAt = <Duration>[];
-        final server = _FakeNominatim(
+        final server = FakeNominatim(
           body: jsonEncode(address()),
           bodyFor: (uri) {
             seenAt.add(clock.now().difference(start));
