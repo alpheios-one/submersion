@@ -26,6 +26,7 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     show GeoPoint;
 import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
+import 'package:submersion/features/equipment/data/services/dive_computer_gear_resolver.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -252,6 +253,25 @@ class DiveComputerRepository {
         localUpdatedAt: now,
       );
 
+      // Seed the gear twin once, here, because this is the only repository
+      // path that genuinely inserts a registry row (v169). Minting nowhere
+      // else is what makes a user-deleted twin permanent. Pass the resolved
+      // id: the caller's may have been empty and minted just above.
+      final twinId = await DiveComputerGearResolver().resolveGearTwin(
+        computer.copyWith(id: id),
+      );
+      if (twinId != null) {
+        await _db.customStatement(
+          'UPDATE dive_computers SET equipment_id = ? WHERE id = ?',
+          [twinId, id],
+        );
+        await _syncRepository.markRecordPending(
+          entityType: 'diveComputers',
+          recordId: id,
+          localUpdatedAt: now,
+        );
+      }
+
       // If a computer with this hardware identity was deleted earlier, its
       // dives kept provenance snapshots; give them their link back.
       await _relinkOrphanedRows(id, computer);
@@ -260,6 +280,7 @@ class DiveComputerRepository {
       _log.info('Created dive computer with id: $id');
       return computer.copyWith(
         id: id,
+        equipmentId: twinId,
         createdAt: DateTime.fromMillisecondsSinceEpoch(now),
         updatedAt: DateTime.fromMillisecondsSinceEpoch(now),
       );
@@ -1949,6 +1970,7 @@ class DiveComputerRepository {
       diveCount: row.diveCount,
       isFavorite: row.isFavorite,
       notes: row.notes,
+      equipmentId: row.equipmentId,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
     );
