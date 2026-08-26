@@ -14,6 +14,7 @@ import 'package:submersion/features/dive_sites/domain/constants/site_field.dart'
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
 import 'package:submersion/features/dive_sites/domain/models/entry_exit_suggestion.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/shared/models/entity_card_view_config.dart';
@@ -200,6 +201,11 @@ final sitesWithCountsProvider = FutureProvider<List<SiteWithDiveCount>>((
   );
   ref.invalidateSelfWhen(repository.watchSitesChanges());
   ref.invalidateSelfWhen(ref.read(diveRepositoryProvider).watchDivesChanges());
+  // Feature chips on the list card come from site_features, so a feature
+  // placed on the site map must refresh the list too.
+  ref.invalidateSelfWhen(
+    ref.read(siteFeatureRepositoryProvider).watchFeatureChanges(),
+  );
   return repository.getSitesWithDiveCounts(diverId: validatedDiverId);
 });
 
