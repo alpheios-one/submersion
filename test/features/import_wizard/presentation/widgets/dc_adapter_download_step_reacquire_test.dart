@@ -139,6 +139,7 @@ class _Harness {
         firstSyncCutoffDefaultProvider.overrideWith((ref) async => null),
       ],
       child: MaterialApp(
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
@@ -161,6 +162,12 @@ Future<void> _settle(WidgetTester tester) async {
     await tester.pump();
   }
 }
+
+/// The device currently selected in the discovery provider the step reads.
+DiscoveredDevice? _selectedDevice(WidgetTester tester) =>
+    ProviderScope.containerOf(
+      tester.element(find.byType(DcAdapterDownloadStep)),
+    ).read(discoveryNotifierProvider).selectedDevice;
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -252,11 +259,40 @@ void main() {
 
         expect(h.hostApi.calls, ['startDiscovery']);
         expect(find.byType(DownloadStepWidget), findsNothing);
+        // The stale selection is dropped from the provider itself, not just
+        // ignored here: the completion path reads the provider's selection
+        // to capture the descriptor the import service records.
+        expect(_selectedDevice(tester), isNull);
 
         h.service.onDeviceDiscovered(_advert(_savedAddress));
         await _settle(tester);
 
         expect(h.hostApi.downloads.single.address, _savedAddress);
+        expect(_selectedDevice(tester)?.address, _savedAddress);
+      },
+    );
+
+    testWidgets(
+      'drops a stale Bluetooth selection for a USB computer without scanning',
+      (tester) async {
+        final h = _Harness(
+          seed: DiscoveryState(
+            selectedDevice: _discovered('11:22:33:44:55:66'),
+          ),
+        );
+        await tester.pumpWidget(
+          h.build(
+            _savedComputer(
+              connectionType: 'usb',
+              bluetoothAddress: '/dev/ttyUSB0',
+            ),
+          ),
+        );
+        await _settle(tester);
+
+        expect(h.hostApi.calls, ['startDownload']);
+        expect(h.hostApi.downloads.single.address, '/dev/ttyUSB0');
+        expect(_selectedDevice(tester), isNull);
       },
     );
 

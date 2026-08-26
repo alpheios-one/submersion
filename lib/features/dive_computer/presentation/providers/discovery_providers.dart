@@ -310,6 +310,15 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
     );
   }
 
+  /// Drop the selected device without touching the rest of the state.
+  ///
+  /// Used when a selection left over from an earlier discovery session must
+  /// not be reused, e.g. it does not carry the address of the saved computer
+  /// about to be downloaded from.
+  void clearSelectedDevice() {
+    state = state.copyWith(clearDevice: true);
+  }
+
   /// Set a custom name for the device.
   void setCustomName(String name) {
     state = state.copyWith(customDeviceName: name);

@@ -321,11 +321,20 @@ class _DcAdapterDownloadStepState extends ConsumerState<DcAdapterDownloadStep> {
   Future<void> _reacquireKnownDevice(DiveComputer computer) async {
     if (!mounted) return;
     final address = computer.bluetoothAddress;
+    final notifier = ref.read(discoveryNotifierProvider.notifier);
     final selected = ref.read(discoveryNotifierProvider).selectedDevice;
     final alreadyAcquired =
         selected != null &&
         address != null &&
         bluetoothAddressesMatch(selected.address, address);
+    // A saved computer downloads only from a device carrying its stored
+    // address. A selection left over from an earlier discovery session is
+    // dropped from the provider itself, because the completion path reads
+    // the provider's selection to capture the descriptor the import
+    // service records; hiding it locally here would not be enough.
+    if (selected != null && !alreadyAcquired) {
+      notifier.clearSelectedDevice();
+    }
     final isBluetooth =
         _connectionTypeFromString(computer.connectionType) ==
         DeviceConnectionType.ble;
@@ -336,7 +345,6 @@ class _DcAdapterDownloadStepState extends ConsumerState<DcAdapterDownloadStep> {
     }
 
     setState(() => _searchingForKnownDevice = true);
-    final notifier = ref.read(discoveryNotifierProvider.notifier);
     final device = await notifier.scanForAddress(
       address,
       timeout: DcAdapterDownloadStep.knownDeviceScanTimeout,
@@ -388,16 +396,6 @@ class _DcAdapterDownloadStepState extends ConsumerState<DcAdapterDownloadStep> {
     final discoveryState = ref.watch(discoveryNotifierProvider);
     var device = discoveryState.selectedDevice;
     final computer = widget.knownComputer ?? widget.adapter.computer;
-
-    // A saved computer downloads only from a device carrying its stored
-    // address: a device left selected by an earlier discovery session must
-    // not be used in its place.
-    final storedAddress = widget.knownComputer?.bluetoothAddress;
-    if (device != null &&
-        storedAddress != null &&
-        !bluetoothAddressesMatch(device.address, storedAddress)) {
-      device = null;
-    }
 
     // For known-computer downloads, synthesize a DiscoveredDevice from the
     // computer's stored connection info when discovery state has no device.
