@@ -11,14 +11,14 @@ class LanguageSettingsPage extends ConsumerWidget {
   static const supportedLocales = [
     LocaleOption(code: 'system', nativeName: 'System Default', englishName: ''),
     LocaleOption(code: 'en', nativeName: 'English', englishName: 'English'),
-    LocaleOption(code: 'es', nativeName: 'Espanol', englishName: 'Spanish'),
-    LocaleOption(code: 'fr', nativeName: 'Francais', englishName: 'French'),
+    LocaleOption(code: 'es', nativeName: 'Español', englishName: 'Spanish'),
+    LocaleOption(code: 'fr', nativeName: 'Français', englishName: 'French'),
     LocaleOption(code: 'de', nativeName: 'Deutsch', englishName: 'German'),
     LocaleOption(code: 'it', nativeName: 'Italiano', englishName: 'Italian'),
     LocaleOption(code: 'nl', nativeName: 'Nederlands', englishName: 'Dutch'),
     LocaleOption(
       code: 'pt',
-      nativeName: 'Portugues',
+      nativeName: 'Português',
       englishName: 'Portuguese',
     ),
     LocaleOption(code: 'hu', nativeName: 'Magyar', englishName: 'Hungarian'),

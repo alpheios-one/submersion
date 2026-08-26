@@ -72,7 +72,7 @@ void main() {
     tester,
   ) async {
     await openPicker(tester);
-    for (final name in ['English', 'Deutsch', 'Espanol', 'Magyar', '简体中文']) {
+    for (final name in ['English', 'Deutsch', 'Español', 'Magyar', '简体中文']) {
       expect(find.text(name), findsOneWidget, reason: 'missing $name');
     }
     expect(find.text('System Default'), findsNothing);
