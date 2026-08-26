@@ -35033,6 +35033,12 @@ abstract class AppLocalizations {
   /// **'Tags'**
   String get diveImport_uddf_tags;
 
+  /// Entity type label for photos referenced by an imported logbook
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get diveImport_uddf_media;
+
   /// No description provided for @diveImport_uddf_title.
   ///
   /// In en, this message translates to:

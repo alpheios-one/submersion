@@ -1624,6 +1624,7 @@
   "diveImport_uddf_tabTrips": "Viajes",
   "diveImport_uddf_tabTypes": "Tipos",
   "diveImport_uddf_tags": "Etiquetas",
+  "diveImport_uddf_media": "Fotos",
   "diveImport_uddf_title": "Importar desde UDDF",
   "diveImport_uddf_toggleDiveSelection": "Alternar seleccion de inmersion",
   "diveImport_uddf_toggleEntitySelection": "Alternar seleccion de {name}",

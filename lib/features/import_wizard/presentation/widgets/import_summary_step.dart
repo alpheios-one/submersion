@@ -309,6 +309,8 @@ class _SuccessView extends StatelessWidget {
         return Icons.inventory;
       case ImportEntityType.courses:
         return Icons.school;
+      case ImportEntityType.media:
+        return Icons.photo_library;
     }
   }
 
@@ -336,6 +338,8 @@ class _SuccessView extends StatelessWidget {
         return l10n.diveImport_uddf_equipmentSets;
       case ImportEntityType.courses:
         return l10n.diveImport_uddf_tabCourses;
+      case ImportEntityType.media:
+        return l10n.diveImport_uddf_media;
     }
   }
 }

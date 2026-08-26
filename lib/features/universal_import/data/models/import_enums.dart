@@ -270,7 +270,8 @@ enum ImportEntityType {
   courses,
   tags,
   diveTypes,
-  serviceRecords;
+  serviceRecords,
+  media;
 
   String get displayName => switch (this) {
     dives => 'Dives',
@@ -285,6 +286,7 @@ enum ImportEntityType {
     tags => 'Tags',
     diveTypes => 'Dive Types',
     serviceRecords => 'Service Records',
+    media => 'Photos',
   };
 
   String get shortName => switch (this) {
@@ -300,5 +302,6 @@ enum ImportEntityType {
     tags => 'Tags',
     diveTypes => 'Types',
     serviceRecords => 'Service',
+    media => 'Photos',
   };
 }

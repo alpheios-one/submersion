@@ -20688,6 +20688,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveImport_uddf_tags => 'Tags';
 
   @override
+  String get diveImport_uddf_media => 'Photos';
+
+  @override
   String get diveImport_uddf_title => 'Import from UDDF';
 
   @override

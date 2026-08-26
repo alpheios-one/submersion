@@ -1551,6 +1551,7 @@
   "diveImport_uddf_tabTrips": "Voyages",
   "diveImport_uddf_tabTypes": "Types",
   "diveImport_uddf_tags": "Tags",
+  "diveImport_uddf_media": "Photos",
   "diveImport_uddf_title": "Import depuis UDDF",
   "diveImport_uddf_toggleDiveSelection": "Basculer la selection de la plongee",
   "diveImport_uddf_toggleEntitySelection": "Basculer la selection de {name}",

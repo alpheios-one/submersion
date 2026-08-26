@@ -13391,6 +13391,10 @@
   "diveImport_uddf_tabTrips": "Trips",
   "diveImport_uddf_tabTypes": "Types",
   "diveImport_uddf_tags": "Tags",
+  "diveImport_uddf_media": "Photos",
+  "@diveImport_uddf_media": {
+    "description": "Entity type label for photos referenced by an imported logbook"
+  },
   "diveImport_uddf_title": "Import from UDDF",
   "diveImport_uddf_toggleDiveSelection": "Toggle selection for dive",
   "diveImport_uddf_toggleEntitySelection": "Toggle selection for {name}",

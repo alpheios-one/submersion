@@ -20979,6 +20979,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveImport_uddf_tags => 'Cimkek';
 
   @override
+  String get diveImport_uddf_media => 'Fényképek';
+
+  @override
   String get diveImport_uddf_title => 'Importalas UDDF-bol';
 
   @override

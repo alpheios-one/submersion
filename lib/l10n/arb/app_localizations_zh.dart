@@ -19984,6 +19984,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveImport_uddf_tags => '标签';
 
   @override
+  String get diveImport_uddf_media => '照片';
+
+  @override
   String get diveImport_uddf_title => '从 UDDF 导入';
 
   @override
