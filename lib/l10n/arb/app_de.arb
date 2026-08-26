@@ -7263,6 +7263,7 @@
   },
   "diveLog_detail_altitudeMismatch_title": "Tauchplatz liegt in Höhenlage",
   "diveLog_detail_altitudeMismatch_subtitle": "Für diesen Platz ist eine Höhe hinterlegt, der Tauchgang hat jedoch keine, daher ging die Deko-Analyse von Meereshöhe aus. Höhe des Tauchgangs setzen, um dies zu korrigieren.",
+  "diveLog_detail_sacVolumeHint": "Flaschenvolumen eintragen, um den AMV in {unit}/min anzuzeigen",
   "emergencyCard_title": "Notfall",
   "emergencyCard_callDan": "{name} anrufen",
   "@emergencyCard_callDan": {

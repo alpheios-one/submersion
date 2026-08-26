@@ -24217,6 +24217,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'Este punto registra una altitud pero la inmersión no tiene ninguna, así que el análisis de descompresión asumió nivel del mar. Establece la altitud de la inmersión para corregirlo.';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return 'Añade el volumen del cilindro para mostrar el SAC en $unit/min';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return 'No volar: quedan $remaining';
   }

@@ -24018,6 +24018,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deze stek heeft een hoogte geregistreerd maar de duik niet, dus de deco-analyse ging uit van zeeniveau. Stel de hoogte van de duik in om dit te corrigeren.';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return 'Voeg een flesvolume toe om het SAC-verbruik in $unit/min te tonen';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return 'Vliegverbod: nog $remaining';
   }

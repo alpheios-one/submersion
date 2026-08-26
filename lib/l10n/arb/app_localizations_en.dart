@@ -23795,6 +23795,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'This site records an altitude but the dive has none set, so decompression analysis assumed sea level. Set the dive\'s altitude to correct it.';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return 'Add a cylinder volume to show SAC in $unit/min';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return 'No-fly: $remaining remaining';
   }

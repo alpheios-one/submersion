@@ -7263,6 +7263,7 @@
   },
   "diveLog_detail_altitudeMismatch_title": "Duikstek ligt op hoogte",
   "diveLog_detail_altitudeMismatch_subtitle": "Deze stek heeft een hoogte geregistreerd maar de duik niet, dus de deco-analyse ging uit van zeeniveau. Stel de hoogte van de duik in om dit te corrigeren.",
+  "diveLog_detail_sacVolumeHint": "Voeg een flesvolume toe om het SAC-verbruik in {unit}/min te tonen",
   "emergencyCard_title": "Noodgeval",
   "emergencyCard_callDan": "Bel {name}",
   "@emergencyCard_callDan": {

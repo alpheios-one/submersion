@@ -7263,6 +7263,7 @@
   },
   "diveLog_detail_altitudeMismatch_title": "A merülőhely magaslaton fekszik",
   "diveLog_detail_altitudeMismatch_subtitle": "Ehhez a helyhez magasság van rögzítve, a merüléshez azonban nincs, így a dekompressziós elemzés tengerszintet feltételezett. A javításhoz állítsd be a merülés magasságát.",
+  "diveLog_detail_sacVolumeHint": "Add meg a palack térfogatát, hogy a SAC érték {unit}/min-ben jelenjen meg",
   "emergencyCard_title": "Vészhelyzet",
   "emergencyCard_callDan": "{name} hívása",
   "@emergencyCard_callDan": {

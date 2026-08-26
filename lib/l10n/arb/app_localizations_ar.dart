@@ -23773,6 +23773,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'هذا الموقع مسجل له ارتفاع لكن الغطسة بلا ارتفاع، لذا افترض تحليل تخفيف الضغط مستوى سطح البحر. عيّن ارتفاع الغطسة للتصحيح.';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return 'أضف حجم الأسطوانة لعرض معدل SAC بوحدة $unit/min';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return 'حظر الطيران: متبقٍ $remaining';
   }

@@ -24156,6 +24156,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Für diesen Platz ist eine Höhe hinterlegt, der Tauchgang hat jedoch keine, daher ging die Deko-Analyse von Meereshöhe aus. Höhe des Tauchgangs setzen, um dies zu korrigieren.';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return 'Flaschenvolumen eintragen, um den AMV in $unit/min anzuzeigen';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return 'Flugverbot: noch $remaining';
   }
