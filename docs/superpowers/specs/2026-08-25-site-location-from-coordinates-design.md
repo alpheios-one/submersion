@@ -1,5 +1,10 @@
 # Dive Site Location From Coordinates: Design
 
+> **Schema version:** the column landed as **v166**, not v162. `origin/main`
+> claimed v163 while this branch was open and v164/v165 were reserved for two
+> other open PRs, so the migration, helper, ladder entry and test were
+> renumbered in the merge commit. Every "v162" below is the number as planned.
+
 **Status:** approved 2026-08-25
 **Issue:** #1187
 **Branches:** `worktree-issue-1187-site-field-wipe` (PR A, bounded fix) and

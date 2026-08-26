@@ -13,6 +13,18 @@ import 'package:submersion/core/services/logger_service.dart';
 /// Check if we're on a mobile platform (iOS/Android)
 bool get _isMobile => !kIsWeb && (Platform.isIOS || Platform.isAndroid);
 
+/// Nominatim answered with something other than 200. "Nothing here" is a
+/// 200 with an error body, so a non-200 is the service itself (rate limit,
+/// outage, blocked user agent), which callers must not mistake for "no
+/// location details found".
+class _NominatimStatusException implements Exception {
+  const _NominatimStatusException(this.statusCode);
+  final int statusCode;
+
+  @override
+  String toString() => 'Nominatim responded with HTTP $statusCode';
+}
+
 /// Result of a location capture
 class LocationResult {
   final double latitude;
@@ -343,7 +355,7 @@ class LocationService {
         buildReverseGeocodeUri(latitude, longitude, languageCode: languageCode),
         languageCode,
       );
-      final address = json?['address'] as Map<String, dynamic>?;
+      final address = json['address'] as Map<String, dynamic>?;
       if (address == null) return const PlaceLookup.empty();
 
       final country = address['country'] as String?;
@@ -360,6 +372,9 @@ class LocationService {
       return PlaceLookup(country: country, region: region, locality: locality);
     } on SocketException catch (e) {
       _log.warning('Web reverse geocoding unreachable: $e');
+      return const PlaceLookup.unavailable();
+    } on _NominatimStatusException catch (e) {
+      _log.warning('Web reverse geocoding refused: $e');
       return const PlaceLookup.unavailable();
     } catch (e) {
       _log.warning('Web reverse geocoding failed: $e');
@@ -388,7 +403,6 @@ class LocationService {
         buildNaturalFeatureUri(latitude, longitude, languageCode: languageCode),
         languageCode,
       );
-      if (json == null) return null;
       final water = bodyOfWaterFromNaturalFeature(json);
       _log.info('Natural layer: ${water ?? 'no water feature'}');
       return water;
@@ -398,11 +412,12 @@ class LocationService {
     }
   }
 
-  /// One Nominatim GET. Returns the decoded object, or null for a non-200
-  /// status. Lets socket errors propagate so callers can tell "offline" from
-  /// "nothing there". The client is closed in a finally so its sockets are
-  /// released even when the body or the JSON decode throws.
-  Future<Map<String, dynamic>?> _fetchNominatimJson(
+  /// One Nominatim GET, decoded. Throws [_NominatimStatusException] on a
+  /// non-200 status and lets socket errors propagate, so callers can tell
+  /// "offline" and "refused" from "nothing there". The client is closed in a
+  /// finally so its sockets are released even when the body or the JSON
+  /// decode throws.
+  Future<Map<String, dynamic>> _fetchNominatimJson(
     Uri url,
     String languageCode,
   ) async {
@@ -413,7 +428,9 @@ class LocationService {
       final request = await client.getUrl(url);
       request.headers.set('Accept-Language', languageCode);
       final response = await request.close();
-      if (response.statusCode != 200) return null;
+      if (response.statusCode != 200) {
+        throw _NominatimStatusException(response.statusCode);
+      }
       final body = await response.transform(utf8.decoder).join();
       return jsonDecode(body) as Map<String, dynamic>;
     } finally {

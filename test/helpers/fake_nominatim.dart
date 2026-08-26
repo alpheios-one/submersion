@@ -17,7 +17,12 @@ import 'dart:io';
 /// language the caller asked for (issue #1187), which must reach both the URI
 /// and the request headers.
 class FakeNominatim {
-  FakeNominatim({this.statusCode = 200, this.body = '{}', this.bodyFor});
+  FakeNominatim({
+    this.statusCode = 200,
+    this.body = '{}',
+    this.bodyFor,
+    this.statusFor,
+  });
 
   final int statusCode;
   final String body;
@@ -25,7 +30,11 @@ class FakeNominatim {
   /// When set, wins over [body] for the given request.
   final String? Function(Uri uri)? bodyFor;
 
+  /// When set, wins over [statusCode] for the given request.
+  final int? Function(Uri uri)? statusFor;
+
   String bodyForUri(Uri uri) => bodyFor?.call(uri) ?? body;
+  int statusForUri(Uri uri) => statusFor?.call(uri) ?? statusCode;
 
   final List<Uri> requestedUris = <Uri>[];
   final List<Map<String, String>> requestHeaders = <Map<String, String>>[];
@@ -93,7 +102,10 @@ class FakeHttpClientRequest implements HttpClientRequest {
   @override
   Future<HttpClientResponse> close() async {
     _server.requestHeaders.add((headers as FakeHttpHeaders).values);
-    return FakeHttpClientResponse(_server.statusCode, _server.bodyForUri(uri));
+    return FakeHttpClientResponse(
+      _server.statusForUri(uri),
+      _server.bodyForUri(uri),
+    );
   }
 
   @override

@@ -1,5 +1,10 @@
 # Site Location From Coordinates Implementation Plan
 
+> **Schema version:** the column landed as **v166**, not v162. `origin/main`
+> claimed v163 while this branch was open and v164/v165 were reserved for two
+> other open PRs, so the migration, helper, ladder entry and test were
+> renumbered in the merge commit. Every "v162" below is the number as planned.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Fill town and body of water (not only country and region) from a dive site's coordinates, in a synced per-diver language, with a per-site "Look up from coordinates" action and a bulk "Fill in missing location details" pass that never overwrites existing values.

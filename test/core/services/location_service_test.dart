@@ -189,7 +189,11 @@ void main() {
       },
     );
 
-    test('returns empty fields on a non-200 response', () async {
+    test('reports the geocoder as unavailable on a non-200 response', () async {
+      // Nominatim says "nothing here" with a 200 and an error body, so a
+      // non-200 is the service itself: a rate limit or an outage, which must
+      // not read as "no location details found" (and must not count as
+      // unchanged in the bulk backfill).
       final server = FakeNominatim(
         statusCode: 503,
         body: 'Service Unavailable',
@@ -199,9 +203,18 @@ void main() {
         () => service.reverseGeocode(36.0143, -5.6044, languageCode: 'en'),
       );
 
-      expect(result.country, isNull);
-      expect(result.region, isNull);
-      expect(result.locality, isNull);
+      expect(result.isEmpty, isTrue);
+      expect(result.networkFailed, isTrue);
+    });
+
+    test('a rate limit is reported the same way', () async {
+      final server = FakeNominatim(statusCode: 429, body: 'Too Many Requests');
+
+      final result = await server.run(
+        () => service.reverseGeocode(36.0143, -5.6044, languageCode: 'en'),
+      );
+
+      expect(result.networkFailed, isTrue);
     });
 
     test('swallows malformed JSON instead of throwing', () async {
@@ -625,6 +638,22 @@ void main() {
         }),
         isNull,
       );
+    });
+
+    test('a non-200 on the natural layer keeps the address result', () async {
+      final server = FakeNominatim(
+        body: jsonEncode(address()),
+        statusFor: (uri) =>
+            uri.queryParameters['layer'] == 'natural' ? 503 : null,
+      );
+
+      final result = await server.run(
+        () => service.reverseGeocode(47.027631, 8.400640, languageCode: 'en'),
+      );
+
+      expect(result.country, 'Switzerland');
+      expect(result.bodyOfWater, isNull);
+      expect(result.networkFailed, isFalse);
     });
 
     test('a failing natural-layer request keeps the address result', () async {
