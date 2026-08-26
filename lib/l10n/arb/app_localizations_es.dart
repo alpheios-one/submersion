@@ -14060,6 +14060,76 @@ class AppLocalizationsEs extends AppLocalizations {
   String get safetyReview_restore => 'Restaurar';
 
   @override
+  String get safetyReview_dismissAll => 'Descartar todo';
+
+  @override
+  String get safetyReview_restoreAll => 'Restaurar todo';
+
+  @override
+  String get safetySettings_dismissAll => 'Descartar todas las observaciones';
+
+  @override
+  String get safetySettings_dismissAll_subtitle =>
+      'Marcar como revisadas todas las observaciones de este cuaderno';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle =>
+      '¿Descartar todas las observaciones?';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      'Todas las observaciones de todas las inmersiones analizadas se marcarán como revisadas. Puedes restaurarlas inmersión por inmersión desde su sección de revisión de seguridad.';
+
+  @override
+  String get safetySettings_dismissAll_confirm => 'Descartar todo';
+
+  @override
+  String get safetySettings_dismissAll_cancel => 'Cancelar';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return '$done de $total inmersiones revisadas';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observaciones descartadas',
+      one: '1 observación descartada',
+      zero: 'No hay observaciones que descartar',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observaciones descartadas',
+      one: '1 observación descartada',
+      zero: 'No se descartó ninguna observación',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: 'no se pudieron actualizar $failed inmersiones',
+      one: 'no se pudo actualizar 1 inmersión',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed =>
+      'No se pudo leer la lista de inmersiones. No se cambió nada.';
+
+  @override
+  String get safetySettings_analyzeAll_failed =>
+      'No se pudieron analizar las inmersiones.';
+
+  @override
   String get safetyReview_details => 'Detalles';
 
   @override

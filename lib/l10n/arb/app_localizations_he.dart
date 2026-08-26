@@ -13729,6 +13729,74 @@ class AppLocalizationsHe extends AppLocalizations {
   String get safetyReview_restore => 'שחזר';
 
   @override
+  String get safetyReview_dismissAll => 'התעלם מהכול';
+
+  @override
+  String get safetyReview_restoreAll => 'שחזר הכול';
+
+  @override
+  String get safetySettings_dismissAll => 'התעלם מכל התצפיות';
+
+  @override
+  String get safetySettings_dismissAll_subtitle =>
+      'סמן את כל התצפיות ביומן זה כנסקרו';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle => 'להתעלם מכל התצפיות?';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      'כל תצפית בכל צלילה שנותחה תסומן כנסקרה. אפשר לשחזר אותן צלילה אחר צלילה במקטע סקירת הבטיחות שלה.';
+
+  @override
+  String get safetySettings_dismissAll_confirm => 'התעלם מהכול';
+
+  @override
+  String get safetySettings_dismissAll_cancel => 'ביטול';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return 'נבדקו $done מתוך $total צלילות';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'בוצעה התעלמות מ-$count תצפיות',
+      one: 'בוצעה התעלמות מתצפית אחת',
+      zero: 'אין תצפיות להתעלם מהן',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'בוצעה התעלמות מ-$count תצפיות',
+      one: 'בוצעה התעלמות מתצפית אחת',
+      zero: 'לא בוצעה התעלמות מתצפיות',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: 'לא ניתן היה לעדכן $failed צלילות',
+      one: 'לא ניתן היה לעדכן צלילה אחת',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed =>
+      'לא ניתן לקרוא את רשימת הצלילות. דבר לא שונה.';
+
+  @override
+  String get safetySettings_analyzeAll_failed => 'לא ניתן לנתח את הצלילות.';
+
+  @override
   String get safetyReview_details => 'פרטים';
 
   @override

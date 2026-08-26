@@ -13840,6 +13840,76 @@ class AppLocalizationsEn extends AppLocalizations {
   String get safetyReview_restore => 'Restore';
 
   @override
+  String get safetyReview_dismissAll => 'Dismiss all';
+
+  @override
+  String get safetyReview_restoreAll => 'Restore all';
+
+  @override
+  String get safetySettings_dismissAll => 'Dismiss all observations';
+
+  @override
+  String get safetySettings_dismissAll_subtitle =>
+      'Mark every observation in this logbook as reviewed';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle =>
+      'Dismiss all observations?';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      'Every observation on every analyzed dive is marked as reviewed. You can restore them one dive at a time from that dive’s safety review section.';
+
+  @override
+  String get safetySettings_dismissAll_confirm => 'Dismiss all';
+
+  @override
+  String get safetySettings_dismissAll_cancel => 'Cancel';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return 'Checked $done of $total dives';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observations dismissed',
+      one: '1 observation dismissed',
+      zero: 'No observations to dismiss',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observations dismissed',
+      one: '1 observation dismissed',
+      zero: 'No observations dismissed',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: '$failed dives could not be updated',
+      one: '1 dive could not be updated',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed =>
+      'Could not read your dive list. No dives were changed.';
+
+  @override
+  String get safetySettings_analyzeAll_failed =>
+      'Could not analyze your dives.';
+
+  @override
   String get safetyReview_details => 'Details';
 
   @override

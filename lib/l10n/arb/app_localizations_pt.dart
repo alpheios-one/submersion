@@ -14068,6 +14068,76 @@ class AppLocalizationsPt extends AppLocalizations {
   String get safetyReview_restore => 'Restaurar';
 
   @override
+  String get safetyReview_dismissAll => 'Dispensar tudo';
+
+  @override
+  String get safetyReview_restoreAll => 'Restaurar tudo';
+
+  @override
+  String get safetySettings_dismissAll => 'Dispensar todas as observações';
+
+  @override
+  String get safetySettings_dismissAll_subtitle =>
+      'Marcar como revistas todas as observações deste diário';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle =>
+      'Dispensar todas as observações?';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      'Todas as observações de todos os mergulhos analisados serão marcadas como revistas. Pode restaurá-las mergulho a mergulho na respetiva secção de revisão de segurança.';
+
+  @override
+  String get safetySettings_dismissAll_confirm => 'Dispensar tudo';
+
+  @override
+  String get safetySettings_dismissAll_cancel => 'Cancelar';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return '$done de $total mergulhos verificados';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observações dispensadas',
+      one: '1 observação dispensada',
+      zero: 'Nenhuma observação para dispensar',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observações dispensadas',
+      one: '1 observação dispensada',
+      zero: 'Nenhuma observação dispensada',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: '$failed mergulhos não puderam ser atualizados',
+      one: '1 mergulho não pôde ser atualizado',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed =>
+      'Não foi possível ler a lista de mergulhos. Nada foi alterado.';
+
+  @override
+  String get safetySettings_analyzeAll_failed =>
+      'Não foi possível analisar os mergulhos.';
+
+  @override
   String get safetyReview_details => 'Detalhes';
 
   @override

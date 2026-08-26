@@ -7128,6 +7128,46 @@
   },
   "safetyReview_dismiss": "Ignorer",
   "safetyReview_restore": "Restaurer",
+  "safetyReview_dismissAll": "Tout ignorer",
+  "safetyReview_restoreAll": "Tout restaurer",
+  "safetySettings_dismissAll": "Ignorer toutes les observations",
+  "safetySettings_dismissAll_subtitle": "Marquer comme relues toutes les observations de ce carnet",
+  "safetySettings_dismissAll_confirmTitle": "Ignorer toutes les observations ?",
+  "safetySettings_dismissAll_confirmBody": "Toutes les observations de toutes les plongées analysées seront marquées comme relues. Vous pouvez les restaurer plongée par plongée depuis sa section bilan de sécurité.",
+  "safetySettings_dismissAll_confirm": "Tout ignorer",
+  "safetySettings_dismissAll_cancel": "Annuler",
+  "safetySettings_dismissAll_progress": "{done} plongées sur {total} vérifiées",
+  "@safetySettings_dismissAll_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_done": "{count, plural, =0{Aucune observation à ignorer} =1{1 observation ignorée} other{{count} observations ignorées}}",
+  "@safetySettings_dismissAll_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{Aucune observation ignorée} =1{1 observation ignorée} other{{count} observations ignorées}}, {failed, plural, =1{1 plongée n’a pas pu être mise à jour} other{{failed} plongées n’ont pas pu être mises à jour}}",
+  "@safetySettings_dismissAll_doneWithErrors": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    },
+    "failed": {
+      "type": "int"
+    }
+  }
+},
+  "safetySettings_dismissAll_failed": "Impossible de lire la liste des plongées. Rien n’a été modifié.",
+  "safetySettings_analyzeAll_failed": "Impossible d’analyser les plongées.",
   "safetyReview_details": "Détails",
   "safetyReview_clearHighlight": "Effacer la surbrillance",
   "safetyReview_findingGroupSemantics": "{count, plural, =1{1 observation de sécurité} other{{count} observations de sécurité}}",

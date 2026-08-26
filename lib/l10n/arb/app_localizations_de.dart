@@ -14054,6 +14054,76 @@ class AppLocalizationsDe extends AppLocalizations {
   String get safetyReview_restore => 'Wiederherstellen';
 
   @override
+  String get safetyReview_dismissAll => 'Alle ausblenden';
+
+  @override
+  String get safetyReview_restoreAll => 'Alle wiederherstellen';
+
+  @override
+  String get safetySettings_dismissAll => 'Alle Beobachtungen ausblenden';
+
+  @override
+  String get safetySettings_dismissAll_subtitle =>
+      'Alle Beobachtungen in diesem Logbuch als geprüft markieren';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle =>
+      'Alle Beobachtungen ausblenden?';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      'Jede Beobachtung zu jedem analysierten Tauchgang wird als geprüft markiert. Du kannst sie im Abschnitt Sicherheitsüberprüfung eines Tauchgangs einzeln wiederherstellen.';
+
+  @override
+  String get safetySettings_dismissAll_confirm => 'Alle ausblenden';
+
+  @override
+  String get safetySettings_dismissAll_cancel => 'Abbrechen';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return '$done von $total Tauchgängen geprüft';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Beobachtungen ausgeblendet',
+      one: '1 Beobachtung ausgeblendet',
+      zero: 'Keine Beobachtungen zum Ausblenden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Beobachtungen ausgeblendet',
+      one: '1 Beobachtung ausgeblendet',
+      zero: 'Keine Beobachtungen ausgeblendet',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: '$failed Tauchgänge konnten nicht aktualisiert werden',
+      one: '1 Tauchgang konnte nicht aktualisiert werden',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed =>
+      'Die Tauchgangsliste konnte nicht gelesen werden. Es wurde nichts geändert.';
+
+  @override
+  String get safetySettings_analyzeAll_failed =>
+      'Die Tauchgänge konnten nicht analysiert werden.';
+
+  @override
   String get safetyReview_details => 'Details';
 
   @override

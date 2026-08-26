@@ -14110,6 +14110,76 @@ class AppLocalizationsFr extends AppLocalizations {
   String get safetyReview_restore => 'Restaurer';
 
   @override
+  String get safetyReview_dismissAll => 'Tout ignorer';
+
+  @override
+  String get safetyReview_restoreAll => 'Tout restaurer';
+
+  @override
+  String get safetySettings_dismissAll => 'Ignorer toutes les observations';
+
+  @override
+  String get safetySettings_dismissAll_subtitle =>
+      'Marquer comme relues toutes les observations de ce carnet';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle =>
+      'Ignorer toutes les observations ?';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      'Toutes les observations de toutes les plongées analysées seront marquées comme relues. Vous pouvez les restaurer plongée par plongée depuis sa section bilan de sécurité.';
+
+  @override
+  String get safetySettings_dismissAll_confirm => 'Tout ignorer';
+
+  @override
+  String get safetySettings_dismissAll_cancel => 'Annuler';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return '$done plongées sur $total vérifiées';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observations ignorées',
+      one: '1 observation ignorée',
+      zero: 'Aucune observation à ignorer',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observations ignorées',
+      one: '1 observation ignorée',
+      zero: 'Aucune observation ignorée',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: '$failed plongées n’ont pas pu être mises à jour',
+      one: '1 plongée n’a pas pu être mise à jour',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed =>
+      'Impossible de lire la liste des plongées. Rien n’a été modifié.';
+
+  @override
+  String get safetySettings_analyzeAll_failed =>
+      'Impossible d’analyser les plongées.';
+
+  @override
   String get safetyReview_details => 'Détails';
 
   @override

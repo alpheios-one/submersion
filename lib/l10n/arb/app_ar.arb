@@ -7128,6 +7128,46 @@
   },
   "safetyReview_dismiss": "تجاهل",
   "safetyReview_restore": "استعادة",
+  "safetyReview_dismissAll": "تجاهل الكل",
+  "safetyReview_restoreAll": "استعادة الكل",
+  "safetySettings_dismissAll": "تجاهل جميع الملاحظات",
+  "safetySettings_dismissAll_subtitle": "وضع علامة مراجَعة على جميع الملاحظات في هذا السجل",
+  "safetySettings_dismissAll_confirmTitle": "تجاهل جميع الملاحظات؟",
+  "safetySettings_dismissAll_confirmBody": "ستوضع علامة مراجَعة على كل ملاحظة في كل غطسة تم تحليلها. يمكنك استعادتها غطسة بغطسة من قسم مراجعة السلامة الخاص بها.",
+  "safetySettings_dismissAll_confirm": "تجاهل الكل",
+  "safetySettings_dismissAll_cancel": "إلغاء",
+  "safetySettings_dismissAll_progress": "تم فحص {done} من {total} غطسة",
+  "@safetySettings_dismissAll_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_done": "{count, plural, =0{لا توجد ملاحظات لتجاهلها} =1{تم تجاهل ملاحظة واحدة} other{تم تجاهل {count} ملاحظات}}",
+  "@safetySettings_dismissAll_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{لم يتم تجاهل أي ملاحظة} =1{تم تجاهل ملاحظة واحدة} other{تم تجاهل {count} ملاحظات}}، {failed, plural, =1{تعذّر تحديث غطسة واحدة} other{تعذّر تحديث {failed} غطسات}}",
+  "@safetySettings_dismissAll_doneWithErrors": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    },
+    "failed": {
+      "type": "int"
+    }
+  }
+},
+  "safetySettings_dismissAll_failed": "تعذّرت قراءة قائمة الغطسات. لم يتم تغيير أي شيء.",
+  "safetySettings_analyzeAll_failed": "تعذّر تحليل الغطسات.",
   "safetyReview_details": "التفاصيل",
   "safetyReview_clearHighlight": "مسح التمييز",
   "safetyReview_findingGroupSemantics": "{count, plural, =1{ملاحظة سلامة واحدة} other{{count} ملاحظات سلامة}}",

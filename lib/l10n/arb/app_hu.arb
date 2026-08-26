@@ -7128,6 +7128,46 @@
   },
   "safetyReview_dismiss": "Elvetés",
   "safetyReview_restore": "Visszaállítás",
+  "safetyReview_dismissAll": "Összes elvetése",
+  "safetyReview_restoreAll": "Összes visszaállítása",
+  "safetySettings_dismissAll": "Összes megfigyelés elvetése",
+  "safetySettings_dismissAll_subtitle": "A naplóban szereplő összes megfigyelés megjelölése átnézettként",
+  "safetySettings_dismissAll_confirmTitle": "Elveted az összes megfigyelést?",
+  "safetySettings_dismissAll_confirmBody": "Minden elemzett merülés minden megfigyelése átnézettként lesz megjelölve. Merülésenként visszaállíthatod őket az adott merülés biztonsági áttekintés szakaszában.",
+  "safetySettings_dismissAll_confirm": "Összes elvetése",
+  "safetySettings_dismissAll_cancel": "Mégse",
+  "safetySettings_dismissAll_progress": "{done} / {total} merülés ellenőrizve",
+  "@safetySettings_dismissAll_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_done": "{count, plural, =0{Nincs elvetendő megfigyelés} =1{1 megfigyelés elvetve} other{{count} megfigyelés elvetve}}",
+  "@safetySettings_dismissAll_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{Nem lett megfigyelés elvetve} =1{1 megfigyelés elvetve} other{{count} megfigyelés elvetve}}, {failed, plural, =1{1 merülést nem sikerült frissíteni} other{{failed} merülést nem sikerült frissíteni}}",
+  "@safetySettings_dismissAll_doneWithErrors": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    },
+    "failed": {
+      "type": "int"
+    }
+  }
+},
+  "safetySettings_dismissAll_failed": "A merüléslista nem olvasható. Semmi sem változott.",
+  "safetySettings_analyzeAll_failed": "A merüléseket nem sikerült elemezni.",
   "safetyReview_details": "Részletek",
   "safetyReview_clearHighlight": "Kiemelés törlése",
   "safetyReview_findingGroupSemantics": "{count, plural, =1{1 biztonsági megállapítás} other{{count} biztonsági megállapítás}}",
