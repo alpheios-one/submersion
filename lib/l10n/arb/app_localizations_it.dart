@@ -7088,6 +7088,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Errore nel caricamento dei viaggi';
 
   @override
+  String get diveLog_search_filter_any => 'Qualsiasi';
+
+  @override
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
 
   @override

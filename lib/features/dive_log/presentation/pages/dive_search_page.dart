@@ -557,7 +557,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
           runSpacing: 8,
           children: [
             ChoiceChip(
-              label: Text(context.l10n.diveSites_filter_difficulty_any),
+              label: Text(context.l10n.diveLog_search_filter_any),
               selected: _decoOnly == null,
               onSelected: (selected) {
                 if (selected) setState(() => _decoOnly = null);

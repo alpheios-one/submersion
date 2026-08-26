@@ -2363,6 +2363,7 @@
   "diveLog_search_errorLoadingCenters": "Fout bij laden van duikcentra",
   "diveLog_search_errorLoadingDiveTypes": "Fout bij laden duiktypes",
   "diveLog_search_errorLoadingTrips": "Fout bij laden van reizen",
+  "diveLog_search_filter_any": "Alle",
   "diveLog_search_gasTrimix": "Trimix (<21% O₂)",
   "diveLog_search_label_deco": "Decompressie",
   "diveLog_search_label_depthRange": "Dieptebereik (m)",

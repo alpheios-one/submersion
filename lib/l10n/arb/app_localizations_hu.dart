@@ -7064,6 +7064,9 @@ class AppLocalizationsHu extends AppLocalizations {
       'Hiba az utazasok betoltesekor';
 
   @override
+  String get diveLog_search_filter_any => 'Bármely';
+
+  @override
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
 
   @override

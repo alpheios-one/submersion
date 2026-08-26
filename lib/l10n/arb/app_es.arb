@@ -2363,6 +2363,7 @@
   "diveLog_search_errorLoadingCenters": "Error al cargar los centros de buceo",
   "diveLog_search_errorLoadingDiveTypes": "Error al cargar tipos de inmersión",
   "diveLog_search_errorLoadingTrips": "Error al cargar los viajes",
+  "diveLog_search_filter_any": "Cualquiera",
   "diveLog_search_gasTrimix": "Trimix (<21% O₂)",
   "diveLog_search_label_deco": "Descompresión",
   "diveLog_search_label_depthRange": "Rango de profundidad (m)",

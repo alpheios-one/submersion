@@ -7088,6 +7088,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => 'Erro ao carregar viagens';
 
   @override
+  String get diveLog_search_filter_any => 'Qualquer';
+
+  @override
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
 
   @override

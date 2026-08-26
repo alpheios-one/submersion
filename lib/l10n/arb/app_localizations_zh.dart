@@ -6734,6 +6734,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => '加载旅行出错';
 
   @override
+  String get diveLog_search_filter_any => '任意';
+
+  @override
   String get diveLog_search_gasTrimix => '三混气 (<21% O₂)';
 
   @override

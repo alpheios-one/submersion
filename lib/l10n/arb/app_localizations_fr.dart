@@ -7115,6 +7115,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Erreur de chargement des voyages';
 
   @override
+  String get diveLog_search_filter_any => 'Indifférent';
+
+  @override
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
 
   @override

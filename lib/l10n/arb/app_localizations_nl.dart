@@ -7030,6 +7030,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => 'Fout bij laden van reizen';
 
   @override
+  String get diveLog_search_filter_any => 'Alle';
+
+  @override
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
 
   @override

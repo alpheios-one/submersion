@@ -3791,6 +3791,7 @@
   "diveLog_search_errorLoadingCenters": "Error loading dive centers",
   "diveLog_search_errorLoadingDiveTypes": "Error loading dive types",
   "diveLog_search_errorLoadingTrips": "Error loading trips",
+  "diveLog_search_filter_any": "Any",
   "diveLog_search_gasTrimix": "Trimix (<21% O₂)",
   "diveLog_search_label_deco": "Decompression",
   "diveLog_search_label_depthRange": "Depth Range (m)",

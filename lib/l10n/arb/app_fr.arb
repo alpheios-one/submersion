@@ -2290,6 +2290,7 @@
   "diveLog_search_errorLoadingCenters": "Erreur de chargement des centres de plongee",
   "diveLog_search_errorLoadingDiveTypes": "Erreur lors du chargement des types de plongée",
   "diveLog_search_errorLoadingTrips": "Erreur de chargement des voyages",
+  "diveLog_search_filter_any": "Indifférent",
   "diveLog_search_gasTrimix": "Trimix (<21% O₂)",
   "diveLog_search_label_deco": "Décompression",
   "diveLog_search_label_depthRange": "Plage de profondeur (m)",

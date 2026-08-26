@@ -2290,6 +2290,7 @@
   "diveLog_search_errorLoadingCenters": "Errore nel caricamento dei centri immersione",
   "diveLog_search_errorLoadingDiveTypes": "Errore durante il caricamento dei tipi di immersione",
   "diveLog_search_errorLoadingTrips": "Errore nel caricamento dei viaggi",
+  "diveLog_search_filter_any": "Qualsiasi",
   "diveLog_search_gasTrimix": "Trimix (<21% O₂)",
   "diveLog_search_label_deco": "Decompressione",
   "diveLog_search_label_depthRange": "Intervallo profondita (m)",

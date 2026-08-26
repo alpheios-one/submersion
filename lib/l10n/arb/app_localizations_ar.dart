@@ -6940,6 +6940,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => 'خطأ في تحميل الرحلات';
 
   @override
+  String get diveLog_search_filter_any => 'أي';
+
+  @override
   String get diveLog_search_gasTrimix => 'ترايمكس (<21% O₂)';
 
   @override

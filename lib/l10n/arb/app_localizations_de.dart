@@ -7083,6 +7083,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => 'Fehler beim Laden der Reisen';
 
   @override
+  String get diveLog_search_filter_any => 'Beliebig';
+
+  @override
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
 
   @override

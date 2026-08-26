@@ -2363,6 +2363,7 @@
   "diveLog_search_errorLoadingCenters": "خطأ في تحميل مراكز الغوص",
   "diveLog_search_errorLoadingDiveTypes": "خطأ في تحميل أنواع الغوص",
   "diveLog_search_errorLoadingTrips": "خطأ في تحميل الرحلات",
+  "diveLog_search_filter_any": "أي",
   "diveLog_search_gasTrimix": "ترايمكس (<21% O₂)",
   "diveLog_search_label_deco": "تخفيف الضغط",
   "diveLog_search_label_depthRange": "نطاق العمق (m)",
