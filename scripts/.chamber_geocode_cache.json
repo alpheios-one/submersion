@@ -31,6 +31,11 @@
     "lat": -54.807306,
     "lon": -68.3084133
   },
+  "AT|Graz": {
+    "lat": 47.0708678,
+    "lon": 15.4382786
+  },
+  "AT|Medizinische Universitat Graz Druckkammer, Graz": null,
   "AU|Adelaide, SA": {
     "lat": -34.9281805,
     "lon": 138.5999312
@@ -66,6 +71,11 @@
     "lat": -19.2569391,
     "lon": 146.8239537
   },
+  "BE|Brussels": {
+    "lat": 50.8467372,
+    "lon": 4.352493
+  },
+  "BE|Hopital Militaire Reine Astrid Oxygenotherapie Hyperbare, Brussels": null,
   "BQ|Kralendijk": null,
   "BQ|Recompression Chamber Bonaire (Hospital San Francisco), Kralendijk": null,
   "BR|Fernando de Noronha, PE": {
@@ -117,6 +127,11 @@
     "lat": 49.2608724,
     "lon": -123.113952
   },
+  "CH|Geneva": {
+    "lat": 46.2017559,
+    "lon": 6.1466014
+  },
+  "CH|Hopitaux Universitaires de Geneve HBO-Zentrum, Geneva": null,
   "CL|AME Hyperbaric, Santiago (Providencia)": null,
   "CL|Hospital Naval Almirante Nef, Servicio de Medicina Hiperbarica, Vina del Mar": null,
   "CL|Santiago (Providencia)": {
@@ -142,6 +157,16 @@
     "lat": 12.5830104,
     "lon": -81.6975682
   },
+  "DE|Berlin": {
+    "lat": 52.5173885,
+    "lon": 13.3951309
+  },
+  "DE|Kronshagen (Kiel)": {
+    "lat": 54.341698,
+    "lon": 10.0752454
+  },
+  "DE|Schifffahrtmedizinisches Institut der Marine Hyperbaric and Diving Medicine, Kronshagen (Kiel)": null,
+  "DE|Vivantes Klinikum im Friedrichshain Zentrum fur hyperbare Sauerstofftherapie und Tauchmedizin, Berlin": null,
   "DK|Copenhagen": {
     "lat": 55.6867243,
     "lon": 12.5700724
@@ -774,6 +799,11 @@
     "lon": 14.5071125
   },
   "NA|Welwitschia Hospital Hyperbaric Unit (Erongo Primary Health Services), Walvis Bay": null,
+  "NL|Amsterdam": {
+    "lat": 52.3730796,
+    "lon": 4.8924534
+  },
+  "NL|Amsterdam UMC Hyperbare Geneeskunde, Amsterdam": null,
   "NO|Bergen": {
     "lat": 60.3943055,
     "lon": 5.3259192
