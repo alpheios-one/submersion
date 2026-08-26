@@ -6402,6 +6402,7 @@
   "diveComputer_detail_labelModel": "Model",
   "diveComputer_detail_labelName": "Naam",
   "diveComputer_detail_lastDownload": "Laatste download",
+  "diveComputer_detail_linkedGear": "Uitrustingsstuk",
   "diveComputer_detail_notesTitle": "Notities",
   "diveComputer_detail_statisticsTitle": "Statistieken",
   "diveComputer_detail_unknown": "Onbekend",

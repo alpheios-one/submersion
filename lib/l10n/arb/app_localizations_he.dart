@@ -19784,6 +19784,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveComputer_detail_lastDownload => 'הורדה אחרונה';
 
   @override
+  String get diveComputer_detail_linkedGear => 'פריט ציוד';
+
+  @override
   String get diveComputer_detail_notesTitle => 'הערות';
 
   @override

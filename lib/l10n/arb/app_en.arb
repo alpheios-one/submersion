@@ -12962,6 +12962,7 @@
   "diveComputer_detail_labelModel": "Model",
   "diveComputer_detail_labelName": "Name",
   "diveComputer_detail_lastDownload": "Last Download",
+  "diveComputer_detail_linkedGear": "Gear item",
   "diveComputer_detail_notesTitle": "Notes",
   "diveComputer_detail_reimportAllButton": "Re-import all dives",
   "diveComputer_detail_reimportDialogBody": "Download every dive from {computerName} and review them against your log. This may take several minutes.",
