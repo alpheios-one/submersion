@@ -8430,17 +8430,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-$maxמ\'';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'עד $maxמ\'';
+    return 'עד $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '$minמ\'+';
+    return '$min+';
   }
 
   @override
@@ -12689,6 +12689,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'שמור סרטון מקורי';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      '‏Live Photos עדיין אינן נתמכות. שכפל תמונה זו כתמונת סטילס, ולאחר מכן כתוב את נתוני הצלילה בעותק.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'אין נתוני צלילה זמינים לכתיבה.';
 
@@ -14179,6 +14183,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'אירועים';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'לחץ בלון משוער';
 
   @override
   String get settings_appearance_metric_gasDensity => 'צפיפות גז';

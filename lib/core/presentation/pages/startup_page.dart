@@ -37,6 +37,7 @@ import 'package:submersion/core/services/security/database_security_sidecar.dart
 import 'package:submersion/core/services/security/locked_database_escape.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/notification_service.dart';
+import 'package:submersion/core/utils/app_version.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/backup/data/services/backup_service.dart';
 import 'package:submersion/features/backup/data/services/backup_target.dart';
@@ -730,7 +731,7 @@ class _StartupWrapperState extends State<StartupWrapper>
       appVersion = '0.0.0.0';
     } else {
       final info = await PackageInfo.fromPlatform();
-      appVersion = '${info.version}.${info.buildNumber}';
+      appVersion = formatAppVersion(info);
       service = PreMigrationBackupService(
         livePathProvider: () async => dbPath,
         // Resolve LAZILY, inside the provider. Resolution arms any

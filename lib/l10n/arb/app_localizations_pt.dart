@@ -8647,17 +8647,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-${max}m';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'Até ${max}m';
+    return 'Até $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '${min}m+';
+    return '$min+';
   }
 
   @override
@@ -13010,6 +13010,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'Manter video original';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'As Live Photos ainda não são suportadas. Duplique esta como fotografia estática e escreva os dados do mergulho na cópia.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Nenhum dado de mergulho disponivel para gravar.';
 
@@ -14527,6 +14531,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'Eventos';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Pressão estimada do cilindro';
 
   @override
   String get settings_appearance_metric_gasDensity => 'Densidade do Gas';

@@ -8625,17 +8625,17 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-${max}m';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'Legfeljebb ${max}m';
+    return 'Legfeljebb $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '${min}m+';
+    return '$min+';
   }
 
   @override
@@ -12971,6 +12971,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Eredeti video megtartasa';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'A Live Photo még nem támogatott. Készíts róla állóképes másolatot, majd a merülési adatokat a másolatba írd.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Nincs elerheto merülesi adat az irashoz.';
 
@@ -14481,6 +14485,10 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'Esemenyek';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Becsült palacknyomás';
 
   @override
   String get settings_appearance_metric_gasDensity => 'Gaz suruseg';

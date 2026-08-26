@@ -8645,17 +8645,17 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-${max}m';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'Fino a ${max}m';
+    return 'Fino a $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '${min}m+';
+    return '$min+';
   }
 
   @override
@@ -13013,6 +13013,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Mantieni video originale';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Le Live Photo non sono ancora supportate. Duplica questa foto come immagine statica, poi scrivi i dati dell\'immersione sulla copia.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Nessun dato immersione disponibile da scrivere.';
 
@@ -14528,6 +14532,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'Eventi';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Pressione stimata della bombola';
 
   @override
   String get settings_appearance_metric_gasDensity => 'Densità gas';

@@ -767,6 +767,10 @@ void main() {
       name: 'filteredDiveStatisticsProvider',
       read: (c) => c.read(filteredDiveStatisticsProvider.future),
     ),
+    (
+      name: 'filteredDiveRecordsProvider',
+      read: (c) => c.read(filteredDiveRecordsProvider.future),
+    ),
   ]);
 
   _tickGroup('tags', [

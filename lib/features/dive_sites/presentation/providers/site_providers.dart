@@ -415,6 +415,29 @@ class SiteListNotifier
     await _loadSites();
   }
 
+  /// Altitude write-back for a looked-up site altitude. Patches the one
+  /// column; never send a copied entity through [updateSite] for this
+  /// (issue #1187).
+  Future<void> updateSiteAltitude(String siteId, double altitudeMeters) async {
+    await _repository.updateSiteAltitude(siteId, altitudeMeters);
+    await _loadSites();
+  }
+
+  /// Coordinates (and optionally altitude) write-back, e.g. from a photo's
+  /// GPS. Patches only those columns.
+  Future<void> updateSiteCoordinates(
+    String siteId,
+    domain.GeoPoint location, {
+    double? altitude,
+  }) async {
+    await _repository.updateSiteCoordinates(
+      siteId,
+      location,
+      altitude: altitude,
+    );
+    await _loadSites();
+  }
+
   Future<void> deleteSite(String id) async {
     await _repository.deleteSite(id);
     await _loadSites();

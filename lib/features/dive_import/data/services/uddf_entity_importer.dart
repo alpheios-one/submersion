@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/core/database/database.dart'
     show DiveDataSourcesCompanion, DiveSitesCompanion, DivesCompanion;
 import 'package:submersion/core/services/export/export_service.dart';
@@ -19,6 +20,7 @@ import 'package:submersion/features/courses/data/repositories/course_repository.
 import 'package:submersion/features/courses/domain/entities/course.dart';
 import 'package:submersion/features/dive_centers/data/repositories/dive_center_repository.dart';
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -72,6 +74,12 @@ class ImportRepositories {
   final TankPressureRepository tankPressureRepository;
   final CourseRepository courseRepository;
 
+  /// Optional for the same reason; when null, the dives keep their
+  /// `dive_computer_model`/`_serial` display snapshots but no
+  /// `dive_computers` row is registered and no attribution is stamped
+  /// (#1288).
+  final DiveComputerRepository? diveComputerRepository;
+
   const ImportRepositories({
     required this.tripRepository,
     required this.equipmentRepository,
@@ -87,6 +95,7 @@ class ImportRepositories {
     required this.diveRepository,
     required this.tankPressureRepository,
     required this.courseRepository,
+    this.diveComputerRepository,
   });
 }
 
@@ -1283,6 +1292,69 @@ class UddfEntityImporter {
 
   // -- Dive import --
 
+  /// Group key for the computer a parsed dive names, matching the identity
+  /// [DiveComputerRepository.findOrRegisterImportedComputer] dedupes on, so
+  /// two spellings of one device share a single registration.
+  ///
+  /// Null when the source names no model, which is the signal to leave the
+  /// dive unattributed rather than register a placeholder device.
+  String? _importedComputerKey(Map<String, dynamic> diveData) {
+    final model = normalizeComputerIdentityPart(
+      diveData['diveComputerModel'] as String?,
+    );
+    if (model.isEmpty) return null;
+    final serial = normalizeComputerIdentityPart(
+      diveData['diveComputerSerial'] as String?,
+    );
+    return serial.isNotEmpty ? 'serial:$serial' : 'model:$model';
+  }
+
+  /// Register every distinct computer the selected dives name, returning the
+  /// registry id for each [_importedComputerKey].
+  ///
+  /// Runs once per import rather than per dive so a hundred dives off one
+  /// computer cost one registration lookup, not a hundred.
+  ///
+  /// Best-effort per device, mirroring `_relinkOrphanedRows`: attribution is
+  /// cosmetic next to the dives themselves, so a registry failure degrades
+  /// that one device to unattributed instead of costing the user the whole
+  /// import. The dive still keeps its `dive_computer_model` snapshot, which
+  /// is what the Details card renders.
+  Future<Map<String, String>> _registerImportedComputers(
+    List<Map<String, dynamic>> items,
+    List<int> selected,
+    String diverId,
+    DiveComputerRepository? repository,
+  ) async {
+    if (repository == null) return const {};
+
+    final idByKey = <String, String>{};
+    for (final i in selected) {
+      final diveData = items[i];
+      final key = _importedComputerKey(diveData);
+      if (key == null || idByKey.containsKey(key)) continue;
+
+      try {
+        final computer = await repository.findOrRegisterImportedComputer(
+          model: diveData['diveComputerModel'] as String,
+          manufacturer: diveData['diveComputerManufacturer'] as String?,
+          serialNumber: diveData['diveComputerSerial'] as String?,
+          firmwareVersion: diveData['diveComputerFirmware'] as String?,
+          diverId: diverId,
+        );
+        if (computer != null) idByKey[key] = computer.id;
+      } catch (e, stackTrace) {
+        _log.error(
+          'Failed to register imported dive computer for "$key"; '
+          'its dives stay unattributed',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
+    }
+    return idByKey;
+  }
+
   Future<_DiveImportResult> _importDives(
     List<Map<String, dynamic>> items,
     Set<int> selected,
@@ -1325,6 +1397,19 @@ class UddfEntityImporter {
     // One instance for the run: its lookup cache collapses a batch of dives
     // at the same location into a single elevation request.
     final altitudeEnricher = DiveAltitudeEnricher();
+
+    // Register the computers this batch names, once per distinct device,
+    // before any dive is written. The filter, the statistics SQL, and "View
+    // dives from this computer" all read the `dive_computers` registry
+    // rather than the per-dive display snapshots, so without this a
+    // file-only logbook shows a computer on every dive and still reports
+    // "No dive computers registered" (#1288).
+    final computerIdByKey = await _registerImportedComputers(
+      items,
+      sortedSelected,
+      diverId,
+      repos.diveComputerRepository,
+    );
 
     for (final i in sortedSelected) {
       if (cancelToken?.isCancelled ?? false) break;
@@ -1599,6 +1684,38 @@ class UddfEntityImporter {
       }
 
       await repos.diveRepository.createDive(dive);
+
+      // createDive's companion deliberately omits computer_id, so attribution
+      // has to be an explicit second write (#1288).
+      final computerKey = _importedComputerKey(diveData);
+      final computerId = computerKey == null
+          ? null
+          : computerIdByKey[computerKey];
+      if (computerId != null) {
+        // Best-effort for the same reason as the registration above, and more
+        // pressingly: the dive is already committed, so throwing here would
+        // abort the loop and leave a half-imported logbook behind.
+        //
+        // The provenance row below is still stamped on failure, deliberately.
+        // The #1064 beforeOpen heal adopts dives.computer_id from exactly that
+        // column, so leaving it is what recovers the attribution on the next
+        // open; clearing it for symmetry would discard the recovery.
+        try {
+          await repos.diveComputerRepository?.attributeDiveToComputer(
+            diveId: diveId,
+            computerId: computerId,
+          );
+        } catch (e, stackTrace) {
+          _log.error(
+            'Failed to attribute imported dive $diveId to computer '
+            '$computerId; the data source keeps the link, so the beforeOpen '
+            'self-heal will adopt it on the next open',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
+      }
+
       await DiveEquipmentDefaulter().applyForImportedDive(dive);
       await ChecklistDiveLinker().applyForImportedDive(dive);
       await altitudeEnricher.applyForImportedDive(dive);
@@ -1910,6 +2027,7 @@ class UddfEntityImporter {
           id: Value(_uuid.v4()),
           diveId: Value(diveId),
           isPrimary: const Value(true),
+          computerId: Value(computerId),
           computerModel: Value(diveData['diveComputerModel'] as String?),
           computerSerial: Value(diveData['diveComputerSerial'] as String?),
           sourceFileName: Value(sourceFileName),

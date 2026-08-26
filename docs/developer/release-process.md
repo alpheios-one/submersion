@@ -85,7 +85,16 @@ and the next merge to `main` starts the next beta train.
 Two things still want a human:
 
 - **A rejection.** Auto-release only covers the approved path. A rejected
-  version sits in App Store Connect until someone addresses it.
+  version sits in App Store Connect until someone addresses it. If the
+  rejection is a misunderstanding rather than a defect (1.7.4 and 1.7.5 were
+  both flagged under 5.1.1(v) because the first-launch "Create Your Profile"
+  step reads as account creation), reply in the Resolution Center thread and
+  do **not** re-run promote: the submission is still open, Apple approves
+  from the reply, and promote would cancel that submission and start over.
+  The standing explanation Apple reads before every review lives in
+  `ios/fastlane/metadata/review_information/notes.txt` (macOS has an
+  identical copy; `scripts/release/app_review_notes_test.sh` enforces
+  that). Update it whenever a reviewer needs context a reply had to supply.
 - **A bad build.** There is no staged rollout to halt and no rollback once a
   version is live. Recovering means pulling it and shipping a fix through
   another review cycle. If that risk ever outweighs the convenience, set

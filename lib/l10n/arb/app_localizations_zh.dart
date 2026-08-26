@@ -8235,17 +8235,17 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-${max}m';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return '深度不超过 ${max}m';
+    return '深度不超过 $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '${min}m+';
+    return '$min+';
   }
 
   @override
@@ -12412,6 +12412,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => '保留原始视频';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      '尚不支持实况照片。请将其复制为静态照片，然后将潜水数据写入副本。';
+
+  @override
   String get media_writeMetadata_noDataAvailable => '没有可写入的潜水数据。';
 
   @override
@@ -13846,6 +13850,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => '事件';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure => '估算气瓶压力';
 
   @override
   String get settings_appearance_metric_gasDensity => '气体密度';
