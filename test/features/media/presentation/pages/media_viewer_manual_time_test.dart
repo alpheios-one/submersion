@@ -134,6 +134,19 @@ void main() {
     expect(find.byType(MiniDiveProfileOverlay), findsOneWidget);
   });
 
+  testWidgets('a surface shot just before the dive reads as a negative offset, '
+      'not +-', (tester) async {
+    await pump(
+      tester,
+      _item(
+        enrichment: _enrichment(-90, confidence: MatchConfidence.estimated),
+      ),
+    );
+
+    expect(find.text('-1:30'), findsOneWidget);
+    expect(find.textContaining('+-'), findsNothing);
+  });
+
   testWidgets('a position days outside the dive shows unknown instead of a '
       'raw offset', (tester) async {
     await pump(

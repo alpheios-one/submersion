@@ -32697,7 +32697,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_timeInDive_fieldLabel => 'Idő a merülés kezdetétől';
 
   @override
-  String get media_timeInDive_fieldHint => 'pp:mm';
+  String get media_timeInDive_fieldHint => 'mm:ss';
 
   @override
   String media_timeInDive_range(String max) {

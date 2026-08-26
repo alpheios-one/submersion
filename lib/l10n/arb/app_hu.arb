@@ -9636,7 +9636,7 @@
   "media_timeInDive_setAction": "Időpont beállítása a merülésben",
   "media_timeInDive_manual": "{time} (kézzel beállítva)",
   "media_timeInDive_fieldLabel": "Idő a merülés kezdetétől",
-  "media_timeInDive_fieldHint": "pp:mm",
+  "media_timeInDive_fieldHint": "mm:ss",
   "media_timeInDive_range": "0:00 és {max} között",
   "media_timeInDive_invalid": "Adj meg egy időt 0:00 és {max} között",
   "media_timeInDive_save": "Mentes",

@@ -1631,7 +1631,12 @@ class _BottomMetadataOverlay extends StatelessWidget {
     );
   }
 
-  String _formatElapsedTime(int seconds) => '+${formatElapsedMmSs(seconds)}';
+  /// `+3:00` into the dive, `-1:30` for a surface shot just before it; the
+  /// formatter already carries the minus, so the plus is only for the rest.
+  String _formatElapsedTime(int seconds) {
+    final formatted = formatElapsedMmSs(seconds);
+    return seconds < 0 ? formatted : '+$formatted';
+  }
 }
 
 /// Small metadata chip with icon and value.
