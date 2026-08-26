@@ -104,7 +104,13 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
   Widget _buildDiveBody() {
     final sceneData = ref.watch(dive3dSceneDataProvider(widget.diveId)).value;
     final scene = ref
-        .watch(dive3dGeometryProvider((diveId: widget.diveId, metric: _metric)))
+        .watch(
+          dive3dGeometryProvider((
+            diveId: widget.diveId,
+            colorMetric: _metric,
+            zMetric: null,
+          )),
+        )
         .value;
     if (sceneData == null || scene == null) {
       return const Center(child: CircularProgressIndicator());
