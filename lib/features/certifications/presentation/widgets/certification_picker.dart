@@ -204,6 +204,15 @@ class CertificationPickerSheet extends ConsumerWidget {
 
                   return Semantics(
                     label: certLabel,
+                    // Without excludeSemantics the label MERGES with the
+                    // tile's own text rather than standing in for it, so a
+                    // screen reader hears the name, agency and level twice.
+                    // Excluding the subtree drops the tile's tap action along
+                    // with its text, so restate it here or the row stops being
+                    // activatable.
+                    excludeSemantics: true,
+                    button: true,
+                    onTap: () => onCertificationSelected(cert),
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: isSelected

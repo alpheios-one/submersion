@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -82,23 +83,13 @@ Future<void> _pumpSheet(WidgetTester tester, List<Certification> certs) async {
 String _subtitleOf(WidgetTester tester, Finder tile) =>
     ((tester.widget<ListTile>(tile)).subtitle! as Text).data!;
 
-/// The label the sheet's [Semantics] wrapper declares for a tile.
+/// The label a tile's own [ListTile] contributes when it is NOT excluded from
+/// the semantics tree: its visible title and subtitle, newline-joined.
 ///
-/// Read off the widget rather than queried with `find.bySemanticsLabel`,
-/// following the precedent in certification_ecard_test.dart: this wrapper
-/// merges with the tile's own text instead of replacing it, so the rendered
-/// node is the declared label followed by the visible title and subtitle.
-String _tileSemanticsLabel(WidgetTester tester) {
-  final candidates = find.ancestor(
-    of: find.byType(ListTile),
-    matching: find.byType(Semantics),
-  );
-  for (final element in candidates.evaluate()) {
-    final label = (element.widget as Semantics).properties.label;
-    if (label != null && label.isNotEmpty) return label;
-  }
-  return '';
-}
+/// Asserting this is absent is what distinguishes a label that stands in for
+/// the tile from one that merely sits alongside it. Only the rendered tree
+/// shows the difference, so a check on the [Semantics] widget cannot see it.
+String _visibleTextNode(String title, String subtitle) => '$title\n$subtitle';
 
 void main() {
   // The sheet subtitle dates itself with DateFormat.yMMMd(), which resolves
@@ -170,23 +161,88 @@ void main() {
     testWidgets('the accessibility label names the certification too', (
       tester,
     ) async {
+      final handle = tester.ensureSemantics();
+
       await _pumpSheet(tester, [
         _makeCert(name: 'Bill Ansell', level: CertificationLevel.diveMaster),
       ]);
 
       // A screen reader must hear the level even when a custom name owns the
       // title, since the title alone no longer carries it.
-      expect(_tileSemanticsLabel(tester), 'PADI Bill Ansell, Divemaster');
+      expect(
+        find.bySemanticsLabel('PADI Bill Ansell, Divemaster'),
+        findsOneWidget,
+      );
+      // And exactly once: without excludeSemantics the tile keeps a second
+      // node carrying its visible text, so the row is announced twice.
+      expect(
+        find.bySemanticsLabel(
+          _visibleTextNode('Bill Ansell', 'PADI - Divemaster'),
+        ),
+        findsNothing,
+      );
+
+      handle.dispose();
+    });
+
+    testWidgets('the tile stays activatable through the semantics label', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      Certification? picked;
+
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          overrides: [
+            certificationListNotifierProvider.overrideWith(
+              (ref) => _MockCertListNotifier([
+                _makeCert(
+                  name: 'Bill Ansell',
+                  level: CertificationLevel.diveMaster,
+                ),
+              ]),
+            ),
+          ],
+          child: CertificationPickerSheet(
+            scrollController: ScrollController(),
+            selectedCertification: null,
+            onCertificationSelected: (cert) => picked = cert,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // Excluding the subtree drops the ListTile's own tap action, so the
+      // wrapper must carry one or the row becomes unreachable by a screen
+      // reader even though it still looks tappable.
+      tester.semantics.performAction(
+        find.semantics.byLabel('PADI Bill Ansell, Divemaster'),
+        SemanticsAction.tap,
+      );
+      await tester.pump();
+
+      expect(picked?.name, 'Bill Ansell');
+
+      handle.dispose();
     });
 
     testWidgets('a derived title does not repeat the level', (tester) async {
+      final handle = tester.ensureSemantics();
+
       await _pumpSheet(tester, [
         _makeCert(name: '', level: CertificationLevel.diveMaster),
       ]);
 
       expect(_subtitleOf(tester, find.byType(ListTile)), 'PADI');
       // The title is already the level, so the label says it once, not twice.
-      expect(_tileSemanticsLabel(tester), 'PADI Divemaster');
+      expect(find.bySemanticsLabel('PADI Divemaster'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel(_visibleTextNode('Divemaster', 'PADI')),
+        findsNothing,
+      );
+
+      handle.dispose();
     });
   });
 }
