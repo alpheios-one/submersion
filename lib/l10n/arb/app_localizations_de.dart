@@ -799,6 +799,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'Hauptbereich in der Groesse aendern';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Mit allen Taucherprofilen geteilt';
 

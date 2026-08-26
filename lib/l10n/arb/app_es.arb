@@ -429,6 +429,7 @@
   "accessibility_label_listPane": "Panel de lista de {title}",
   "accessibility_label_mapPane": "Panel de mapa de {title}",
   "accessibility_label_mapViewTitle": "Vista de mapa de {title}",
+  "accessibility_label_resizeMasterPane": "Cambiar el tamano del panel principal",
   "accessibility_label_showList": "Mostrar lista",
   "accessibility_label_showMapView": "Mostrar vista de mapa",
   "accessibility_label_viewDetails": "Ver detalles",

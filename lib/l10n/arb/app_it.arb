@@ -429,6 +429,7 @@
   "accessibility_label_listPane": "Pannello elenco {title}",
   "accessibility_label_mapPane": "Pannello mappa {title}",
   "accessibility_label_mapViewTitle": "Vista mappa {title}",
+  "accessibility_label_resizeMasterPane": "Ridimensiona riquadro principale",
   "accessibility_label_showList": "Mostra elenco",
   "accessibility_label_showMapView": "Mostra vista mappa",
   "accessibility_label_viewDetails": "Visualizza dettagli",

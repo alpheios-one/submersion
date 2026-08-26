@@ -788,6 +788,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane => 'Resize master pane';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Shared with all dive profiles';
 

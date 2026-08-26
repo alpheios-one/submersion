@@ -25,6 +25,9 @@ const double _kMasterPaneMaxWidth = 700;
 /// always keeps a usable minimum width.
 const double _kDetailPaneReservedWidth = 400;
 
+/// Width of the draggable divider between the master and detail panes.
+const double _kResizeHandleWidth = 8;
+
 /// Master pane width, user-resizable via the divider and shared across every
 /// [MasterDetailScaffold] instance for the lifetime of the app session (not
 /// persisted to disk, so it resets on restart).
@@ -333,8 +336,11 @@ class _MasterDetailScaffoldState extends ConsumerState<MasterDetailScaffold> {
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final maxWidth = (constraints.maxWidth - _kDetailPaneReservedWidth)
-              .clamp(_kMasterPaneMinWidth, _kMasterPaneMaxWidth);
+          final maxWidth =
+              (constraints.maxWidth -
+                      _kDetailPaneReservedWidth -
+                      _kResizeHandleWidth)
+                  .clamp(_kMasterPaneMinWidth, _kMasterPaneMaxWidth);
           final width = ref
               .watch(masterPaneWidthProvider)
               .clamp(_kMasterPaneMinWidth, maxWidth);
@@ -429,15 +435,18 @@ class _ResizeHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.resizeColumn,
-      child: GestureDetector(
-        key: const Key('master-detail-resize-handle'),
-        behavior: HitTestBehavior.opaque,
-        onHorizontalDragUpdate: (details) => onDrag(details.delta.dx),
-        child: const SizedBox(
-          width: 8,
-          child: Center(child: VerticalDivider(width: 1, thickness: 1)),
+    return Semantics(
+      label: context.l10n.accessibility_label_resizeMasterPane,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.resizeColumn,
+        child: GestureDetector(
+          key: const Key('master-detail-resize-handle'),
+          behavior: HitTestBehavior.opaque,
+          onHorizontalDragUpdate: (details) => onDrag(details.delta.dx),
+          child: const SizedBox(
+            width: _kResizeHandleWidth,
+            child: Center(child: VerticalDivider(width: 1, thickness: 1)),
+          ),
         ),
       ),
     );

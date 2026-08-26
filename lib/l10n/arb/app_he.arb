@@ -429,6 +429,7 @@
   "accessibility_label_listPane": "חלונית רשימת {title}",
   "accessibility_label_mapPane": "חלונית מפת {title}",
   "accessibility_label_mapViewTitle": "תצוגת מפה של {title}",
+  "accessibility_label_resizeMasterPane": "שינוי גודל החלונית הראשית",
   "accessibility_label_showList": "הצגת רשימה",
   "accessibility_label_showMapView": "הצגת תצוגת מפה",
   "accessibility_label_viewDetails": "הצגת פרטים",

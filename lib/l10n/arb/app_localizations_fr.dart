@@ -804,6 +804,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'Redimensionner le panneau principal';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Partagé avec tous les profils de plongée';
 

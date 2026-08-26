@@ -523,6 +523,7 @@
   "accessibility_label_listPane": "{title}列表面板",
   "accessibility_label_mapPane": "{title}地图面板",
   "accessibility_label_mapViewTitle": "{title}地图视图",
+  "accessibility_label_resizeMasterPane": "调整主窗格大小",
   "accessibility_label_showList": "显示列表",
   "accessibility_label_showMapView": "显示地图视图",
   "accessibility_label_viewDetails": "查看详情",

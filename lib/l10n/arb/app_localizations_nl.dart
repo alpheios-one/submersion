@@ -797,6 +797,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'Hoofdvenster formaat aanpassen';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Gedeeld met alle duikersprofielen';
 

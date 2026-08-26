@@ -798,6 +798,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get accessibility_label_resizeMasterPane =>
+      'Redimensionar painel principal';
+
+  @override
   String get accessibility_label_sharedWithAllProfiles =>
       'Partilhado com todos os perfis de mergulho';
 
