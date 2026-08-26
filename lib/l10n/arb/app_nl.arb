@@ -4430,6 +4430,7 @@
   "settings_appearance_metric_ceiling": "Plafond",
   "settings_appearance_metric_cns": "CNS% (O2-toxiciteit)",
   "settings_appearance_metric_events": "Gebeurtenissen",
+  "settings_appearance_metric_estimatedTankPressure": "Geschatte flesdruk",
   "settings_appearance_metric_gasDensity": "Gasdichtheid",
   "settings_appearance_metric_gfPercent": "GF%",
   "settings_appearance_metric_heartRate": "Hartslag",
