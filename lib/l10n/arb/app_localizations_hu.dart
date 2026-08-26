@@ -17944,6 +17944,42 @@ class AppLocalizationsHu extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String get importWizard_photos_stepLabel => 'Fényképek';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fénykép szerepel ebben a naplóban',
+      one: '1 fénykép szerepel ebben a naplóban',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'Fényképmappa kiválasztása...';
+
+  @override
+  String get importWizard_photos_scanning => 'Mappa vizsgálata...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched párosítva, $byName csak fájlnév alapján, $missing nem található';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Fényképek kihagyása';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'A fényképek importálásához az eszköz lemezén lévő mappa szükséges. Futtasd ezt az importálást számítógépen, hogy a fényképek is bekerüljenek. A merülések és a merülőhelyek normálisan importálódnak.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -30082,6 +30082,48 @@ abstract class AppLocalizations {
   /// **'Tags'**
   String get importWizard_tagsLabel;
 
+  /// Wizard step label for resolving photos referenced by an imported logbook
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get importWizard_photos_stepLabel;
+
+  /// Count of photos the imported logbook refers to
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 photo referenced in this logbook} other{{count} photos referenced in this logbook}}'**
+  String importWizard_photos_foundCount(int count);
+
+  /// Button that opens a folder picker for locating referenced photos
+  ///
+  /// In en, this message translates to:
+  /// **'Choose photo folder...'**
+  String get importWizard_photos_chooseFolder;
+
+  /// Progress label while the picked folder is being scanned
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning folder...'**
+  String get importWizard_photos_scanning;
+
+  /// Result of resolving referenced photos against the picked folder
+  ///
+  /// In en, this message translates to:
+  /// **'{matched} matched, {byName} by filename only, {missing} not found'**
+  String importWizard_photos_matchSummary(int matched, int byName, int missing);
+
+  /// Button to continue the import without photos
+  ///
+  /// In en, this message translates to:
+  /// **'Skip photos'**
+  String get importWizard_photos_skip;
+
+  /// Shown on mobile, where a photo folder cannot be picked
+  ///
+  /// In en, this message translates to:
+  /// **'Importing photos needs a folder on this device\'s disk. Run this import on a computer to include them. Dives and sites import normally.'**
+  String get importWizard_photos_mobileUnsupported;
+
   /// Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff
   ///
   /// In en, this message translates to:

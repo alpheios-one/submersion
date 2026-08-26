@@ -10880,6 +10880,50 @@
   "tags_empty": "No tags yet. Create tags when editing dives.",
   "tags_hint_addMoreTags": "Add more tags...",
   "importWizard_tagsLabel": "Tags",
+  "importWizard_photos_stepLabel": "Photos",
+  "@importWizard_photos_stepLabel": {
+    "description": "Wizard step label for resolving photos referenced by an imported logbook"
+  },
+  "importWizard_photos_foundCount": "{count, plural, one{1 photo referenced in this logbook} other{{count} photos referenced in this logbook}}",
+  "@importWizard_photos_foundCount": {
+    "description": "Count of photos the imported logbook refers to",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importWizard_photos_chooseFolder": "Choose photo folder...",
+  "@importWizard_photos_chooseFolder": {
+    "description": "Button that opens a folder picker for locating referenced photos"
+  },
+  "importWizard_photos_scanning": "Scanning folder...",
+  "@importWizard_photos_scanning": {
+    "description": "Progress label while the picked folder is being scanned"
+  },
+  "importWizard_photos_matchSummary": "{matched} matched, {byName} by filename only, {missing} not found",
+  "@importWizard_photos_matchSummary": {
+    "description": "Result of resolving referenced photos against the picked folder",
+    "placeholders": {
+      "matched": {
+        "type": "int"
+      },
+      "byName": {
+        "type": "int"
+      },
+      "missing": {
+        "type": "int"
+      }
+    }
+  },
+  "importWizard_photos_skip": "Skip photos",
+  "@importWizard_photos_skip": {
+    "description": "Button to continue the import without photos"
+  },
+  "importWizard_photos_mobileUnsupported": "Importing photos needs a folder on this device's disk. Run this import on a computer to include them. Dives and sites import normally.",
+  "@importWizard_photos_mobileUnsupported": {
+    "description": "Shown on mobile, where a photo folder cannot be picked"
+  },
   "importWizard_review_olderDivesSkipped": "{count, plural, one{1 older dive skipped — already in your log} other{{count} older dives skipped — already in your log}}",
   "@importWizard_review_olderDivesSkipped": {
     "description": "Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff",

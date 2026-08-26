@@ -18006,6 +18006,42 @@ class AppLocalizationsPt extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String get importWizard_photos_stepLabel => 'Fotos';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos referenciadas neste diário',
+      one: '1 foto referenciada neste diário',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'Escolher pasta de fotos...';
+
+  @override
+  String get importWizard_photos_scanning => 'A analisar a pasta...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched correspondidas, $byName apenas pelo nome do ficheiro, $missing não encontradas';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Ignorar fotos';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'Importar fotos requer uma pasta no disco deste dispositivo. Execute esta importação num computador para as incluir. Os mergulhos e locais são importados normalmente.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

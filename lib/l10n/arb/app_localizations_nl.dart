@@ -17853,6 +17853,42 @@ class AppLocalizationsNl extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String get importWizard_photos_stepLabel => 'Foto\'s';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto\'s waarnaar dit logboek verwijst',
+      one: '1 foto waarnaar dit logboek verwijst',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'Fotomap kiezen...';
+
+  @override
+  String get importWizard_photos_scanning => 'Map wordt gescand...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched gekoppeld, $byName alleen op bestandsnaam, $missing niet gevonden';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Foto\'s overslaan';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'Voor het importeren van foto\'s is een map op de schijf van dit apparaat nodig. Voer deze import uit op een computer om ze mee te nemen. Duiken en duikstekken worden normaal geïmporteerd.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

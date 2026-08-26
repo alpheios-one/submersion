@@ -17965,6 +17965,42 @@ class AppLocalizationsDe extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String get importWizard_photos_stepLabel => 'Fotos';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos in diesem Logbuch referenziert',
+      one: '1 Foto in diesem Logbuch referenziert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'Fotoordner wählen...';
+
+  @override
+  String get importWizard_photos_scanning => 'Ordner wird durchsucht...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched zugeordnet, $byName nur über den Dateinamen, $missing nicht gefunden';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Fotos überspringen';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'Für den Fotoimport wird ein Ordner auf dem Speicher dieses Geräts benötigt. Führe diesen Import an einem Computer aus, um Fotos einzuschließen. Tauchgänge und Tauchplätze werden normal importiert.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
