@@ -24188,6 +24188,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Este ponto registra uma altitude, mas o mergulho não tem nenhuma, então a análise de descompressão assumiu o nível do mar. Defina a altitude do mergulho para corrigir.';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return 'Adicione o volume do cilindro para mostrar a taxa SAC em $unit/min';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return 'Não voar: faltam $remaining';
   }

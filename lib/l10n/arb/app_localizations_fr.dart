@@ -24265,6 +24265,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ce site indique une altitude mais la plongée n\'en a aucune : l\'analyse de décompression a supposé le niveau de la mer. Définissez l\'altitude de la plongée pour corriger.';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return 'Ajoutez le volume du bloc pour afficher la consommation SAC en $unit/min';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return 'Interdiction de vol : $remaining restant';
   }

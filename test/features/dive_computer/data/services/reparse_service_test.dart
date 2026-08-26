@@ -1863,6 +1863,116 @@ void main() {
       expect(tanks.first.tankName, 'User Named Tank');
     });
 
+    test('DiveTanks carry-over keeps a stored volume the computer does not '
+        'report', () async {
+      // Computers report pressure, not cylinder size, so a volume on the row
+      // was entered by the diver (or filled from the default preset). A
+      // re-parse must not null it out and make L/min SAC vanish (issue #386).
+      await insertDive('dive-1');
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+      );
+      await db
+          .into(db.diveTanks)
+          .insert(
+            const DiveTanksCompanion(
+              id: Value('tank-0'),
+              diveId: Value('dive-1'),
+              volume: Value(12.0),
+              startPressure: Value(200.0),
+              endPressure: Value(50.0),
+              o2Percent: Value(21.0),
+              hePercent: Value(0.0),
+              tankOrder: Value(0),
+            ),
+          );
+
+      final parsed = makeParsedDive(
+        tanks: [
+          pigeon.TankInfo(
+            index: 0,
+            gasMixIndex: 0,
+            startPressureBar: 210.0,
+            endPressureBar: 40.0,
+          ),
+        ],
+        gasMixes: [pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0)],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: parsed,
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      final tank = await (db.select(
+        db.diveTanks,
+      )..where((t) => t.diveId.equals('dive-1'))).getSingle();
+      // Pressures follow the computer; the size the computer never saw stays.
+      expect(tank.startPressure, 210.0);
+      expect(tank.endPressure, 40.0);
+      expect(tank.volume, 12.0);
+    });
+
+    test(
+      'DiveTanks carry-over treats a zero parsed volume as unreported',
+      () async {
+        // The native bridges already map a libdc volume of 0 to null, but the
+        // Dart layer must not rely on that: 0 means "missing" everywhere else
+        // in the tank code, so it must not clobber a stored size either.
+        await insertDive('dive-1');
+        await insertComputer('comp-1');
+        await insertSource(
+          id: 'src-1',
+          diveId: 'dive-1',
+          computerId: 'comp-1',
+          isPrimary: true,
+        );
+        await db
+            .into(db.diveTanks)
+            .insert(
+              const DiveTanksCompanion(
+                id: Value('tank-0'),
+                diveId: Value('dive-1'),
+                volume: Value(12.0),
+                o2Percent: Value(21.0),
+                hePercent: Value(0.0),
+                tankOrder: Value(0),
+              ),
+            );
+
+        await service.applyParsedUpdate(
+          diveId: 'dive-1',
+          sourceRowId: 'src-1',
+          parsed: makeParsedDive(
+            tanks: [
+              pigeon.TankInfo(index: 0, gasMixIndex: 0, volumeLiters: 0.0),
+            ],
+            gasMixes: [
+              pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0),
+            ],
+          ),
+          descriptorVendor: null,
+          descriptorProduct: null,
+          descriptorModel: null,
+          libdivecomputerVersion: null,
+        );
+
+        final tank = await (db.select(
+          db.diveTanks,
+        )..where((t) => t.diveId.equals('dive-1'))).getSingle();
+        expect(tank.volume, 12.0);
+      },
+    );
+
     test('non-primary source skips tank carry-over', () async {
       // Arrange: two sources, re-parse the non-primary one
       await insertDive('dive-1');
