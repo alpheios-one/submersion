@@ -105,10 +105,9 @@ void main() {
     // Ribbon (last structural layer): 3 samples x 2 vertices.
     expect(
       scene!.layers.lastWhere((l) => l.overlay == null).mesh.vertexCount,
-      6,
+      12,
     );
-    // Grid (first structural layer) present for a 10m dive at 10m steps.
-    expect(scene.layers.first.overlay, isNull);
+    expect(scene.layers.last.overlay, isNull); // the path
     expect(scene.scrubPath, isNotNull);
   });
 }

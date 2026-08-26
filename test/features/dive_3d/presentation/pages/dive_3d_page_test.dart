@@ -95,7 +95,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.layers));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
-    expect(find.byType(CheckedPopupMenuItem<SceneOverlay>), findsNWidgets(4));
+    expect(find.byType(CheckedPopupMenuItem<SceneOverlay>), findsNWidgets(5));
     await tester.tap(find.text('Temperature layers'));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));

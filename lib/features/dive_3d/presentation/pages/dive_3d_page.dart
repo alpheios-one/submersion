@@ -322,6 +322,7 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
                     SceneOverlay.ceiling => context.l10n.dive3d_overlay_ceiling,
                     SceneOverlay.curtain => context.l10n.dive3d_overlay_curtain,
                     SceneOverlay.markers => context.l10n.dive3d_overlay_markers,
+                    SceneOverlay.shadows => 'Wall shadows',
                     SceneOverlay.paths =>
                       context.l10n.dive3d_seascape_overlay_paths,
                     SceneOverlay.contours =>
