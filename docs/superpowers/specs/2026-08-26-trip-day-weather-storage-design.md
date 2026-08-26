@@ -65,7 +65,7 @@ New table `TripDayWeather` in `lib/core/database/database.dart`:
 | --- | --- | --- |
 | `id` | text, pk | uuid v4 |
 | `tripId` | text | references `Trips(#id)` |
-| `date` | int | unix seconds, local midnight, same convention as `trip_itinerary_days.date` |
+| `date` | int | epoch **milliseconds** at local midnight, matching what `ItineraryDayRepository` writes for `trip_itinerary_days.date` (the column comment there says "Unix timestamp", but the repository writes `millisecondsSinceEpoch`) |
 | `latitude` | real | the coordinate the lookup used |
 | `longitude` | real | the coordinate the lookup used |
 | `airTemp` | real, nullable | celsius |
@@ -77,9 +77,9 @@ New table `TripDayWeather` in `lib/core/database/database.dart`:
 | `surfacePressure` | real, nullable | bar |
 | `weatherCode` | int, nullable | raw WMO code, so prose renders in the diver's locale at display time |
 | `weatherSource` | text | defaults to `openMeteo` |
-| `fetchedAt` | int | unix seconds |
-| `createdAt` | int | unix seconds |
-| `updatedAt` | int | unix seconds |
+| `fetchedAt` | int | epoch milliseconds |
+| `createdAt` | int | epoch milliseconds |
+| `updatedAt` | int | epoch milliseconds |
 | `hlc` | text, nullable | matches every other synced table |
 
 Unique index on (`tripId`, `date`).
@@ -105,7 +105,7 @@ auto-merge with no conflict marker.
 
 The claim touches the six places the ladder requires: the
 `currentSchemaVersion` scalar, the `migrationVersions` ladder entry, the
-`_assertTripDayWeatherTable()` helper docstring, the `if (from < 168)`
+`_assertTripDayWeatherSchema()` helper docstring, the `if (from < 168)`
 onUpgrade guard and its `reportProgress()` twin, the `beforeOpen` backstop
 comment, and the `migration_v168_trip_day_weather_test.dart` filename with its
 version assertions. The ladder is non-contiguous by design (v162 is
@@ -120,12 +120,17 @@ an older build simply ignores it.
 A new `TripDayWeatherRepository` in
 `lib/features/trips/data/repositories/trip_day_weather_repository.dart`:
 
-- `watchForTrip(String tripId)` streams the trip's rows keyed by date.
-- `getForTrip(String tripId)` reads them once.
-- `upsert(TripDayWeather)` writes one row, stamping `updatedAt` and `hlc` the
-  way the sibling trip repositories do.
-- `deleteForTrip(String tripId)` removes them, called from the trip-delete
+- `watchWeatherChanges()` emits on every table change, so the display
+  provider refreshes after a backfill write or a sync import.
+- `getForTrip(String tripId)` reads a trip's rows, keyed by
+  `date.millisecondsSinceEpoch`.
+- `upsert(TripDayWeather)` writes one row, keyed on (trip, date) rather than
+  on id so two devices that both fetch the same day converge on one row.
+- `deleteByTripId(String tripId)` removes them, called from the trip-delete
   path alongside itinerary days.
+
+The method names follow `ItineraryDayRepository`, which is the sibling to
+copy.
 
 A backfill service in
 `lib/features/trips/domain/services/trip_day_weather_backfill.dart` decides
@@ -139,9 +144,10 @@ fetched only when all of these hold:
 
 Each qualifying day is fetched through the existing
 `WeatherService.fetchWeather` at local noon with `useLocationTimezone: true`,
-matching what `surfaceDayWeatherProvider` does today. Requests run with a
-small concurrency cap rather than all at once, since widening from surface
-days to all dive-free days raises the first-view request count.
+matching what `surfaceDayWeatherProvider` does today. Requests run
+sequentially rather than all at once, since widening from surface days to all
+dive-free days raises the first-view request count. Sequential also means rows
+land progressively, so headers fill in as results arrive.
 
 **A fetch that returns null, or returns a `WeatherData` with no usable field,
 writes no row and is retried on the next view.** This mirrors the rule already
@@ -213,8 +219,8 @@ Tests come first, per the project's TDD rule.
   when two branches write the same number. Re-grep after every merge from
   main and re-run `test/core/database/`.
 - **Request volume on first view.** Widening from surface days to all
-  dive-free days increases first-view requests for a trip. Bounded by the
-  concurrency cap, and one-time per day per trip.
+  dive-free days increases first-view requests for a trip. Bounded by
+  sequential fetching, and one-time per day per trip.
 - **Coordinate drift.** Stored rows record the coordinate used. If a site
   later moves, the stored weather is not re-fetched. Accepted: the row records
   what it was fetched for, and a day's weather is not materially sensitive to
