@@ -50,6 +50,10 @@ void main() {
       (await container.read(filteredDiveStatisticsProvider.future)).totalDives,
       0,
     );
+    expect(
+      (await container.read(filteredDiveRecordsProvider.future)).deepestDive,
+      isNull,
+    );
     expect(await container.read(gasMixDistributionProvider.future), isEmpty);
     expect(await container.read(diveTypeDistributionProvider.future), isEmpty);
     expect(await container.read(depthProgressionTrendProvider.future), isEmpty);
@@ -131,6 +135,10 @@ void main() {
     expect(
       (await container.read(filteredDiveStatisticsProvider.future)).totalDives,
       0,
+    );
+    expect(
+      (await container.read(filteredDiveRecordsProvider.future)).deepestDive,
+      isNull,
     );
     expect(await container.read(topBuddiesProvider.future), isEmpty);
     expect(await container.read(divesPerYearProvider.future), isEmpty);

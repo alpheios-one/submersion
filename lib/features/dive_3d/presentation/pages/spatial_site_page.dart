@@ -155,13 +155,16 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
                       child: _captions(result!),
                     ),
                     // The legend describes the depth ramp; a photographed
-                    // surface has no ramp to explain.
+                    // surface has no ramp to explain. It sits LEFT because the
+                    // viewport's zoom column owns the right edge, and on a
+                    // phone-sized pane a right-hand legend covers the +/-
+                    // buttons outright (issue #1188).
                     if (result.grid != null &&
                         result.axisInputs != null &&
                         appearance.surfaceMode != SeascapeSurfaceMode.imagery)
                       Positioned(
                         top: 40,
-                        right: 8,
+                        left: 8,
                         child: SeascapeDepthLegend(
                           maxDepthMeters: result.axisInputs!.maxDepth,
                           hasLand: result.grid!.depthsMeters.any(

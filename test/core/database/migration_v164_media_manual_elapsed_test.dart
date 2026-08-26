@@ -3,10 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/database/database.dart';
 
-/// v162 adds `media.manual_elapsed_seconds`: the moment in the dive the diver
+/// v164 adds `media.manual_elapsed_seconds`: the moment in the dive the diver
 /// pinned a media item to when its capture time is wrong or missing
 /// (issue #1090). Nullable with no default, because null means "position it
-/// from the capture time" and a pre-v162 writer's payload omits the key.
+/// from the capture time" and a pre-v164 writer's payload omits the key.
 NativeDatabase _dbAt161() {
   return NativeDatabase.memory(
     setup: (rawDb) {
@@ -25,9 +25,9 @@ NativeDatabase _dbAt161() {
 }
 
 void main() {
-  test('v162 is in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(162));
-    expect(AppDatabase.migrationVersions, contains(162));
+  test('v164 is in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(164));
+    expect(AppDatabase.migrationVersions, contains(164));
   });
 
   test('a fresh database has media.manual_elapsed_seconds', () async {
@@ -65,13 +65,13 @@ void main() {
     expect(row.read<int?>('manual_elapsed_seconds'), isNull);
   });
 
-  test('a database stranded at a parallel-branch v162 gains the column via '
+  test('a database stranded at a parallel-branch v164 gains the column via '
       'beforeOpen', () async {
-    // Stamped AT 162 but without the column: the onUpgrade block never
+    // Stamped AT 164 but without the column: the onUpgrade block never
     // runs, so only the beforeOpen backstop can add it.
     final nativeDb = NativeDatabase.memory(
       setup: (rawDb) {
-        rawDb.execute('PRAGMA user_version = 162');
+        rawDb.execute('PRAGMA user_version = 164');
         rawDb.execute('''
             CREATE TABLE media (
               id TEXT NOT NULL PRIMARY KEY,

@@ -406,6 +406,96 @@ void main() {
       expect(await BuddyRepository().getBuddiesForDive(d2.id), isEmpty);
     });
 
+    testWidgets('re-picking an already-present buddy with a new role rewrites '
+        'that role (#700)', (tester) async {
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final buddy = await BuddyRepository().createBuddy(
+        Buddy(
+          id: '',
+          name: 'Casey Diver',
+          createdAt: DateTime(2026, 1, 1),
+          updatedAt: DateTime(2026, 1, 1),
+        ),
+      );
+      final d1 = await repository.createDive(
+        createTestDiveWithBottomTime().copyWith(id: 'repick-role-1'),
+      );
+      final d2 = await repository.createDive(
+        createTestDiveWithBottomTime().copyWith(id: 'repick-role-2'),
+      );
+      // Both dives already carry the buddy as a plain Buddy.
+      await BuddyRepository().bulkAddBuddies(
+        [d1.id, d2.id],
+        [BuddyWithRole(buddy: buddy, role: DiveRole.builtInBuddy())],
+      );
+
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: buildOverrides(overrides).cast(),
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: DiveEditPage(bulkDiveIds: [d1.id, d2.id], embedded: true),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Go through Add and re-pick the buddy who is already on both dives,
+      // this time as Instructor.
+      final buddiesSection = find.ancestor(
+        of: find.text('Buddies'),
+        matching: find.byType(BulkMembershipEditor),
+      );
+      final addToBuddies = find.descendant(
+        of: buddiesSection,
+        matching: find.byIcon(Icons.add),
+      );
+      await tester.ensureVisible(addToBuddies);
+      await tester.tap(addToBuddies);
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byIcon(Icons.add),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(buddy.name).last);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Instructor'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Done'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Add').last);
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Apply'));
+      await tester.pumpAndSettle();
+
+      // The existing links are re-roled in place, not duplicated.
+      for (final id in [d1.id, d2.id]) {
+        final saved = await BuddyRepository().getBuddiesForDive(id);
+        expect(saved, hasLength(1));
+        expect(saved.single.role.id, DiveRole.instructorId);
+      }
+    });
+
     testWidgets('toggling a gate enables its checkbox', (tester) async {
       await pumpBulk(tester);
 

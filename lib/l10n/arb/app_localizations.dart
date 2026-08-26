@@ -24502,6 +24502,12 @@ abstract class AppLocalizations {
   /// **'Events'**
   String get settings_appearance_metric_events;
 
+  /// Settings switch that turns off the synthesized (estimated) tank pressure line on the dive profile chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated Tank Pressure'**
+  String get settings_appearance_metric_estimatedTankPressure;
+
   /// No description provided for @settings_appearance_metric_gasDensity.
   ///
   /// In en, this message translates to:

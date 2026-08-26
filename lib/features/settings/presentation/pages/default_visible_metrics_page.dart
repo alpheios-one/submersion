@@ -39,6 +39,13 @@ class DefaultVisibleMetricsPage extends ConsumerWidget {
             onChanged: notifier.setDefaultShowPressure,
           ),
           SwitchListTile(
+            title: Text(
+              context.l10n.settings_appearance_metric_estimatedTankPressure,
+            ),
+            value: settings.defaultShowEstimatedTankPressure,
+            onChanged: notifier.setDefaultShowEstimatedTankPressure,
+          ),
+          SwitchListTile(
             title: Text(context.l10n.settings_appearance_metric_heartRate),
             value: settings.defaultShowHeartRate,
             onChanged: notifier.setDefaultShowHeartRate,
