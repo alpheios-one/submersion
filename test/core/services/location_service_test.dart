@@ -59,6 +59,22 @@ class _FakeHttpClient implements HttpClient {
   dynamic noSuchMethod(Invocation invocation) => null;
 }
 
+class _ThrowingHttpClient implements HttpClient {
+  @override
+  String? userAgent;
+
+  @override
+  Future<HttpClientRequest> getUrl(Uri url) async {
+    throw const SocketException('offline');
+  }
+
+  @override
+  void close({bool force = false}) {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
+}
+
 class _FakeHttpClientRequest implements HttpClientRequest {
   _FakeHttpClientRequest(this.uri, this._server);
 
@@ -124,11 +140,15 @@ void main() {
   final service = LocationService.instance;
 
   group('Nominatim URIs pin English results (#214)', () {
-    test('reverse geocode URI carries accept-language=en', () {
-      final uri = LocationService.buildReverseGeocodeUri(36.0, -5.6);
+    test('reverse geocode URI carries the requested accept-language', () {
+      final uri = LocationService.buildReverseGeocodeUri(
+        36.0,
+        -5.6,
+        languageCode: 'fr',
+      );
       expect(
         uri.queryParameters['accept-language'],
-        'en',
+        'fr',
         reason:
             'without a pinned language Nominatim answers in the request '
             'locale, splitting statistics into Spain/Spanien/España rows',
@@ -159,7 +179,7 @@ void main() {
         );
 
         final result = await server.run(
-          () => service.reverseGeocode(36.0143, -5.6044),
+          () => service.reverseGeocode(36.0143, -5.6044, languageCode: 'en'),
         );
 
         expect(result.country, 'Spain');
@@ -177,7 +197,9 @@ void main() {
           }),
         );
 
-        await server.run(() => service.reverseGeocode(36.0143, -5.6044));
+        await server.run(
+          () => service.reverseGeocode(36.0143, -5.6044, languageCode: 'en'),
+        );
 
         expect(server.requestedUris, hasLength(1));
         expect(
@@ -200,6 +222,32 @@ void main() {
       },
     );
 
+    test('sends the requested language in the URI and the headers', () async {
+      final server = _FakeNominatim(
+        body: jsonEncode(<String, dynamic>{
+          'address': <String, dynamic>{'country': 'Schweiz'},
+        }),
+      );
+
+      final result = await server.run(
+        () => service.reverseGeocode(47.0276, 8.4006, languageCode: 'de'),
+      );
+
+      expect(result.country, 'Schweiz');
+      expect(server.lastUri.queryParameters['accept-language'], 'de');
+      expect(server.lastHeaders['accept-language'], 'de');
+    });
+
+    test('returns PlaceLookup.unavailable when the request throws', () async {
+      final result = await HttpOverrides.runZoned(
+        () => service.reverseGeocode(47.0, 8.4, languageCode: 'en'),
+        createHttpClient: (_) => _ThrowingHttpClient(),
+      );
+
+      expect(result.isEmpty, isTrue);
+      expect(result.networkFailed, isTrue);
+    });
+
     test('falls back from state to province for the region', () async {
       final server = _FakeNominatim(
         body: jsonEncode(<String, dynamic>{
@@ -212,7 +260,7 @@ void main() {
       );
 
       final result = await server.run(
-        () => service.reverseGeocode(45.2542, -81.6653),
+        () => service.reverseGeocode(45.2542, -81.6653, languageCode: 'en'),
       );
 
       expect(result.region, 'Ontario');
@@ -231,7 +279,7 @@ void main() {
       );
 
       final result = await server.run(
-        () => service.reverseGeocode(28.5091, 34.5136),
+        () => service.reverseGeocode(28.5091, 34.5136, languageCode: 'en'),
       );
 
       expect(result.country, 'Egypt');
@@ -246,7 +294,9 @@ void main() {
           body: jsonEncode(<String, dynamic>{'error': 'Unable to geocode'}),
         );
 
-        final result = await server.run(() => service.reverseGeocode(0.0, 0.0));
+        final result = await server.run(
+          () => service.reverseGeocode(0.0, 0.0, languageCode: 'en'),
+        );
 
         expect(result.country, isNull);
         expect(result.region, isNull);
@@ -261,7 +311,7 @@ void main() {
       );
 
       final result = await server.run(
-        () => service.reverseGeocode(36.0143, -5.6044),
+        () => service.reverseGeocode(36.0143, -5.6044, languageCode: 'en'),
       );
 
       expect(result.country, isNull);
@@ -273,7 +323,7 @@ void main() {
       final server = _FakeNominatim(body: '<html>rate limited</html>');
 
       final result = await server.run(
-        () => service.reverseGeocode(36.0143, -5.6044),
+        () => service.reverseGeocode(36.0143, -5.6044, languageCode: 'en'),
       );
 
       expect(result.country, isNull);
@@ -284,7 +334,9 @@ void main() {
     test('closes the HttpClient even when the body fails to parse', () async {
       final server = _FakeNominatim(body: 'not json');
 
-      await server.run(() => service.reverseGeocode(36.0143, -5.6044));
+      await server.run(
+        () => service.reverseGeocode(36.0143, -5.6044, languageCode: 'en'),
+      );
 
       expect(
         server.clientCloseCount,
@@ -471,7 +523,7 @@ void main() {
       LocationService.debugForceNativeGeocoder = false;
     });
 
-    test('asks the geocoder for English results', () async {
+    test('asks the geocoder for the requested language', () async {
       final geocoding = _FakeGeocoding(
         placemarks: const [
           Placemark(
@@ -483,9 +535,13 @@ void main() {
       );
       GeocodingPlatformFactory.instance = _FakeGeocodingFactory(geocoding);
 
-      final result = await service.reverseGeocode(36.0143, -5.6044);
+      final result = await service.reverseGeocode(
+        36.0143,
+        -5.6044,
+        languageCode: 'es',
+      );
 
-      expect(geocoding.locales, [const Locale('en')]);
+      expect(geocoding.locales, [const Locale('es')]);
       expect(result.country, 'Spain');
       expect(result.region, 'Andalusia');
       expect(result.locality, 'Tarifa');
@@ -498,9 +554,9 @@ void main() {
       GeocodingPlatformFactory.instance = _FakeGeocodingFactory(geocoding);
 
       await Future.wait([
-        service.reverseGeocode(36.0, -5.6),
-        service.reverseGeocode(37.0, -5.7),
-        service.reverseGeocode(38.0, -5.8),
+        service.reverseGeocode(36.0, -5.6, languageCode: 'en'),
+        service.reverseGeocode(37.0, -5.7, languageCode: 'en'),
+        service.reverseGeocode(38.0, -5.8, languageCode: 'en'),
       ]);
 
       expect(
@@ -524,14 +580,20 @@ void main() {
       final server = _FakeNominatim(
         body: '{"address": {"country": "Fallback"}}',
       );
-      final first = await server.run(() => service.reverseGeocode(36.0, -5.6));
+      final first = await server.run(
+        () => service.reverseGeocode(36.0, -5.6, languageCode: 'en'),
+      );
       expect(
         first.country,
         'Fallback',
         reason: 'a native geocoder failure is non-fatal',
       );
 
-      final second = await service.reverseGeocode(36.0, -5.6);
+      final second = await service.reverseGeocode(
+        36.0,
+        -5.6,
+        languageCode: 'en',
+      );
 
       expect(
         second.country,

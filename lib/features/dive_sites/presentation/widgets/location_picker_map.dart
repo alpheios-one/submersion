@@ -64,6 +64,7 @@ class _LocationPickerMapState extends ConsumerState<LocationPickerMap> {
       final result = await LocationService.instance.reverseGeocode(
         _selectedLocation!.latitude,
         _selectedLocation!.longitude,
+        languageCode: LocationService.defaultLanguageCode,
       );
 
       if (mounted) {
@@ -99,6 +100,7 @@ class _LocationPickerMapState extends ConsumerState<LocationPickerMap> {
     final result = await LocationService.instance.reverseGeocode(
       _selectedLocation!.latitude,
       _selectedLocation!.longitude,
+      languageCode: LocationService.defaultLanguageCode,
     );
 
     if (mounted) {

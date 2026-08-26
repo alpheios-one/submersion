@@ -1035,6 +1035,7 @@ class UddfEntityImporter {
           final geocodeResult = await LocationService.instance.reverseGeocode(
             lat,
             lon,
+            languageCode: LocationService.defaultLanguageCode,
           );
           country ??= geocodeResult.country;
           region ??= geocodeResult.region;
@@ -1108,6 +1109,7 @@ class UddfEntityImporter {
           final geocodeResult = await LocationService.instance.reverseGeocode(
             lat,
             lon,
+            languageCode: LocationService.defaultLanguageCode,
           );
           country ??= geocodeResult.country;
           region ??= geocodeResult.region;

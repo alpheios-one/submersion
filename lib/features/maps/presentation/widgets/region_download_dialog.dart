@@ -71,6 +71,7 @@ class _RegionDownloadDialogState extends ConsumerState<RegionDownloadDialog> {
       final result = await LocationService.instance.reverseGeocode(
         centerLat,
         centerLng,
+        languageCode: LocationService.defaultLanguageCode,
       );
 
       if (mounted && _nameController.text.isEmpty) {
