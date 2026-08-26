@@ -32781,6 +32781,45 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get media_timeInDive_label => 'Zeitpunkt im Tauchgang';
+
+  @override
+  String get media_timeInDive_unknown => 'Zeitpunkt im Tauchgang unbekannt';
+
+  @override
+  String get media_timeInDive_setAction => 'Zeitpunkt im Tauchgang festlegen';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (manuell festgelegt)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'Zeit seit Tauchgangsbeginn';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Zwischen 0:00 und $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Gib eine Zeit zwischen 0:00 und $max ein';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Speichern';
+
+  @override
+  String get media_timeInDive_cancel => 'Abbrechen';
+
+  @override
+  String get media_timeInDive_reset => 'Auf automatisch zurücksetzen';
+
+  @override
   String get media_info_backupSection => 'Sicherung';
 
   @override

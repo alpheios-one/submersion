@@ -4,6 +4,7 @@ import 'package:submersion/features/media/data/repositories/media_repository.dar
 import 'package:submersion/features/media/data/services/dive_media_enricher.dart';
 import 'package:submersion/features/media/data/services/media_unlink_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/presentation/helpers/media_time_pinner.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 
 /// Repository provider (singleton)
@@ -33,6 +34,15 @@ final diveMediaEnricherProvider = Provider<DiveMediaEnricher>((ref) {
     loadDive: diveRepo.getDiveById,
     loadMediaForDive: mediaRepo.getMediaForDive,
     saveEnrichments: mediaRepo.saveEnrichments,
+  );
+});
+
+/// Applies the Set-time dialog's choice (issue #1090): one media-row write
+/// plus one enrichment pass, so the new position lands on the next tick.
+final mediaTimePinnerProvider = Provider<MediaTimePinner>((ref) {
+  return MediaTimePinner(
+    repository: ref.watch(mediaRepositoryProvider),
+    enricher: ref.watch(diveMediaEnricherProvider),
   );
 });
 

@@ -20,9 +20,12 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_provide
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_analysis_provider.dart';
 import 'package:submersion/features/media/data/services/metadata_write_service.dart';
+import 'package:submersion/features/media/domain/entities/media_dive_window.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
+import 'package:submersion/features/media/presentation/helpers/elapsed_time_format.dart';
 import 'package:submersion/features/media/presentation/helpers/media_share_helper.dart';
+import 'package:submersion/features/media/presentation/helpers/set_time_seed.dart';
 import 'package:submersion/features/media/presentation/providers/lightroom_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
@@ -33,6 +36,7 @@ import 'package:submersion/features/media/presentation/widgets/perdix_overlay/pe
 import 'package:submersion/features/media/presentation/widgets/write_metadata_dialog.dart';
 import 'package:submersion/features/media/presentation/widgets/mini_dive_profile_overlay.dart';
 import 'package:submersion/features/media/presentation/widgets/media_info_sheet.dart';
+import 'package:submersion/features/media/presentation/widgets/set_media_time_dialog.dart';
 import 'package:submersion/features/media_store/presentation/widgets/media_reupload_button.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -142,6 +146,28 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
   /// The passed item stands in only while the read is in flight.
   MediaItem _hydrate(MediaItem item) =>
       ref.watch(mediaByIdProvider(item.id)).value ?? item;
+
+  /// Opens the Set-time dialog for [item] and applies the diver's choice
+  /// (issue #1090). The viewer re-reads the row on the media tick the write
+  /// raises, so the chips, the mini profile and the face all move at once.
+  Future<void> _setTimeInDive(
+    MediaItem item,
+    List<DiveProfilePoint> profile,
+    AppSettings settings,
+  ) async {
+    final choice = await showSetMediaTimeDialog(
+      context,
+      profile: profile,
+      initialElapsedSeconds: setTimeSeedFor(
+        item,
+        profileLengthSeconds: MediaDiveWindow.profileLengthSeconds(profile),
+      ),
+      isPinned: item.manualElapsedSeconds != null,
+      settings: settings,
+    );
+    if (choice == null || !mounted) return;
+    await ref.read(mediaTimePinnerProvider).apply(item, choice);
+  }
 
   /// Computes and saves the missing [MediaEnrichment] rows for [diveId], the
   /// same idempotent backfill dive detail runs on open.
@@ -301,12 +327,17 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
           );
 
           final dive = diveAsync.value;
+          final profileLength = MediaDiveWindow.profileLengthSeconds(
+            diveProfile ?? const [],
+          );
           // Whether this item is synced to a moment in the profile, decided
-          // from the enrichment alone. Media that is not synced can never
-          // show the Perdix face, whatever the analysis would say.
-          final perdixPrecondition =
-              enrichment?.elapsedSeconds != null &&
-              enrichment!.matchConfidence != MatchConfidence.noProfile;
+          // from the enrichment alone (inside the dive-window tolerance, or
+          // pinned by the diver). Media that is not synced can never show
+          // the Perdix face, whatever the analysis would say.
+          final positioned =
+              enrichment != null &&
+              enrichment.isWithinDiveWindow(profileLength);
+          final perdixPrecondition = positioned;
 
           // Same source-aware profile/analysis pairing as the fullscreen
           // profile page: analysis curves are read by index, so the profile
@@ -482,10 +513,10 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                   // Mini dive profile overlay (lower right)
                   if (diveProfile != null &&
                       diveProfile.isNotEmpty &&
-                      enrichment?.elapsedSeconds != null)
+                      positioned)
                     PositionedMiniProfileOverlay(
                       profile: diveProfile,
-                      photoElapsedSeconds: enrichment!.elapsedSeconds!,
+                      photoElapsedSeconds: enrichment.elapsedSeconds!,
                       photoDepthMeters: enrichment.depthMeters,
                       settings: settings,
                       visible: _showOverlay,
@@ -495,6 +526,16 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                   _BottomMetadataOverlay(
                     item: currentItem,
                     settings: settings,
+                    profileLengthSeconds: profileLength,
+                    // Pinning needs a profile to pin against; a dive with
+                    // none has no moments to choose from.
+                    onSetTime: diveProfile == null || diveProfile.isEmpty
+                        ? null
+                        : () => _setTimeInDive(
+                            currentItem,
+                            diveProfile,
+                            settings,
+                          ),
                     siteName: diveAsync.whenOrNull(
                       data: (dive) => dive?.site?.name,
                     ),
@@ -1417,15 +1458,31 @@ class _BottomMetadataOverlay extends StatelessWidget {
   final AppSettings settings;
   final String? siteName;
 
+  /// Length of the dive's profile, for the dive-window tolerance.
+  final int profileLengthSeconds;
+
+  /// Opens the Set-time dialog (issue #1090); null when there is no profile
+  /// to pin against, which also hides the affordance.
+  final VoidCallback? onSetTime;
+
   const _BottomMetadataOverlay({
     required this.item,
     required this.settings,
+    required this.profileLengthSeconds,
+    this.onSetTime,
     this.siteName,
   });
 
   @override
   Widget build(BuildContext context) {
-    final enrichment = item.enrichment;
+    final l10n = context.l10n;
+    // Depth, temperature and the elapsed chip describe a moment in the
+    // dive, so they only render for a position inside the dive window (or
+    // pinned by the diver). Outside it the raw offset used to print as
+    // `+1879:28`; now the chip says the time is unknown and offers the fix.
+    final positioned =
+        item.enrichment?.isWithinDiveWindow(profileLengthSeconds) ?? false;
+    final enrichment = positioned ? item.enrichment : null;
     final formatter = UnitFormatter(settings);
     final timeFormat = DateFormat.jm();
     final dateFormat = DateFormat.yMMMd();
@@ -1503,13 +1560,25 @@ class _BottomMetadataOverlay extends StatelessWidget {
                       const SizedBox(width: 16),
                     ],
 
-                    // Elapsed time
-                    if (enrichment?.elapsedSeconds != null) ...[
+                    // Elapsed time: the diver's pin, the automatic
+                    // position, or an explicit unknown for a linked item
+                    // whose capture time fell outside the dive.
+                    if (enrichment?.elapsedSeconds != null)
                       _MetadataChip(
-                        icon: Icons.timer_outlined,
-                        value: _formatElapsedTime(enrichment!.elapsedSeconds!),
+                        icon: enrichment!.isManual
+                            ? Icons.push_pin_outlined
+                            : Icons.timer_outlined,
+                        value: _formatElapsedTime(enrichment.elapsedSeconds!),
+                        onTap: onSetTime,
+                        tooltip: l10n.media_timeInDive_setAction,
+                      )
+                    else if (item.diveId != null && onSetTime != null)
+                      _MetadataChip(
+                        icon: Icons.timer_off_outlined,
+                        value: l10n.media_timeInDive_unknown,
+                        onTap: onSetTime,
+                        tooltip: l10n.media_timeInDive_setAction,
                       ),
-                    ],
                   ],
                 ),
 
@@ -1526,11 +1595,14 @@ class _BottomMetadataOverlay extends StatelessWidget {
                       ),
                     ),
 
-                    // Confidence indicator
+                    // Confidence indicator. A manual position is the
+                    // diver's own statement, not an estimate, so it gets
+                    // the pin icon on the chip instead of a warning here.
                     if (enrichment != null &&
                         enrichment.matchConfidence != MatchConfidence.exact &&
                         enrichment.matchConfidence !=
-                            MatchConfidence.interpolated) ...[
+                            MatchConfidence.interpolated &&
+                        !enrichment.isManual) ...[
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -1561,10 +1633,11 @@ class _BottomMetadataOverlay extends StatelessWidget {
     );
   }
 
+  /// `+3:00` into the dive, `-1:30` for a surface shot just before it; the
+  /// formatter already carries the minus, so the plus is only for the rest.
   String _formatElapsedTime(int seconds) {
-    final minutes = seconds ~/ 60;
-    final secs = seconds % 60;
-    return '+$minutes:${secs.toString().padLeft(2, '0')}';
+    final formatted = formatElapsedMmSs(seconds);
+    return seconds < 0 ? formatted : '+$formatted';
   }
 }
 
@@ -1573,11 +1646,20 @@ class _MetadataChip extends StatelessWidget {
   final IconData icon;
   final String value;
 
-  const _MetadataChip({required this.icon, required this.value});
+  /// Makes the chip an action (the elapsed chip opens the Set-time dialog).
+  final VoidCallback? onTap;
+  final String? tooltip;
+
+  const _MetadataChip({
+    required this.icon,
+    required this.value,
+    this.onTap,
+    this.tooltip,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final row = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, color: Colors.white, size: 18),
@@ -1592,5 +1674,17 @@ class _MetadataChip extends StatelessWidget {
         ),
       ],
     );
+    if (onTap == null) return row;
+    final tappable = InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: row,
+      ),
+    );
+    return tooltip == null
+        ? tappable
+        : Tooltip(message: tooltip!, child: tappable);
   }
 }

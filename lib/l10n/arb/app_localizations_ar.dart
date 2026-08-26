@@ -32539,6 +32539,45 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get media_timeInDive_label => 'الوقت في الغوصة';
+
+  @override
+  String get media_timeInDive_unknown => 'الوقت في الغوصة غير معروف';
+
+  @override
+  String get media_timeInDive_setAction => 'تعيين الوقت في الغوصة';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (تم تعيينه يدويًا)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'الوقت من بداية الغوصة';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'بين 0:00 و $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'أدخل وقتًا بين 0:00 و $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'حفظ';
+
+  @override
+  String get media_timeInDive_cancel => 'إلغاء';
+
+  @override
+  String get media_timeInDive_reset => 'إعادة التعيين إلى التلقائي';
+
+  @override
   String get media_info_backupSection => 'النسخ الاحتياطي';
 
   @override

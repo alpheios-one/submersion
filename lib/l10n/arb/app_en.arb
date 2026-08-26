@@ -18572,6 +18572,49 @@
       }
     }
   },
+  "media_timeInDive_label": "Time in dive",
+  "@media_timeInDive_label": {"description": "Media info row label and Set-time dialog title: the moment in the dive a media item was taken."},
+  "media_timeInDive_unknown": "Time in dive unknown",
+  "@media_timeInDive_unknown": {"description": "Viewer chip shown when a media item's capture time falls outside its dive; tapping it opens the Set-time dialog."},
+  "media_timeInDive_setAction": "Set time in dive",
+  "@media_timeInDive_setAction": {"description": "Button and tooltip that opens the dialog to pin a media item to a moment in the dive."},
+  "media_timeInDive_manual": "{time} (set manually)",
+  "@media_timeInDive_manual": {
+    "description": "Media info row value for a position the diver set themselves; {time} is a minutes:seconds offset.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "media_timeInDive_fieldLabel": "Time from dive start",
+  "@media_timeInDive_fieldLabel": {"description": "Set-time dialog: label of the minutes:seconds field."},
+  "media_timeInDive_fieldHint": "mm:ss",
+  "@media_timeInDive_fieldHint": {"description": "Set-time dialog: placeholder showing the minutes:seconds format."},
+  "media_timeInDive_range": "Between 0:00 and {max}",
+  "@media_timeInDive_range": {
+    "description": "Set-time dialog: helper text under the field; {max} is the dive length as minutes:seconds.",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "media_timeInDive_invalid": "Enter a time between 0:00 and {max}",
+  "@media_timeInDive_invalid": {
+    "description": "Set-time dialog: error shown for malformed or out-of-range input; {max} is the dive length as minutes:seconds.",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "media_timeInDive_save": "Save",
+  "@media_timeInDive_save": {"description": "Set-time dialog: confirm button."},
+  "media_timeInDive_cancel": "Cancel",
+  "@media_timeInDive_cancel": {"description": "Set-time dialog: dismiss button."},
+  "media_timeInDive_reset": "Reset to automatic",
+  "@media_timeInDive_reset": {"description": "Set-time dialog: button that removes the diver's pin so the position derives from the capture time again."},
   "media_info_backupSection": "Backup",
   "media_info_store": "Cloud store",
   "media_info_storeNotConnected": "No cloud store connected",

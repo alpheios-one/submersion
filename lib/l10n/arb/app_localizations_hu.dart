@@ -32727,6 +32727,45 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get media_timeInDive_label => 'Időpont a merülésben';
+
+  @override
+  String get media_timeInDive_unknown => 'Időpont a merülésben ismeretlen';
+
+  @override
+  String get media_timeInDive_setAction => 'Időpont beállítása a merülésben';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (kézzel beállítva)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'Idő a merülés kezdetétől';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return '0:00 és $max között';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Adj meg egy időt 0:00 és $max között';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Mentes';
+
+  @override
+  String get media_timeInDive_cancel => 'Megse';
+
+  @override
+  String get media_timeInDive_reset => 'Visszaállítás automatikusra';
+
+  @override
   String get media_info_backupSection => 'Biztonsági mentés';
 
   @override

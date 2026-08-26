@@ -32886,6 +32886,46 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get media_timeInDive_label => 'Momento de la inmersión';
+
+  @override
+  String get media_timeInDive_unknown => 'Momento de la inmersión desconocido';
+
+  @override
+  String get media_timeInDive_setAction => 'Definir momento de la inmersión';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (definido manualmente)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel =>
+      'Tiempo desde el inicio de la inmersión';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Entre 0:00 y $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Introduce un tiempo entre 0:00 y $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Guardar';
+
+  @override
+  String get media_timeInDive_cancel => 'Cancelar';
+
+  @override
+  String get media_timeInDive_reset => 'Restablecer a automático';
+
+  @override
   String get media_info_backupSection => 'Copia de seguridad';
 
   @override

@@ -30962,6 +30962,45 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get media_timeInDive_label => '潜水中的时间点';
+
+  @override
+  String get media_timeInDive_unknown => '潜水中的时间点未知';
+
+  @override
+  String get media_timeInDive_setAction => '设置潜水中的时间点';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time（手动设置）';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => '距潜水开始的时间';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return '介于 0:00 和 $max 之间';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return '请输入介于 0:00 和 $max 之间的时间';
+  }
+
+  @override
+  String get media_timeInDive_save => '保存';
+
+  @override
+  String get media_timeInDive_cancel => '取消';
+
+  @override
+  String get media_timeInDive_reset => '重置为自动';
+
+  @override
   String get media_info_backupSection => '备份';
 
   @override

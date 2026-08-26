@@ -75,9 +75,15 @@ class Dive3dSceneData {
         for (final e in events)
           if (e.eventType == ProfileEventType.bookmark) e,
       ],
+      // Same dive-window rule as the profile chart's marker builder, so a
+      // wrong-dated photo is not drawn at the surface here either.
       photos: [
         for (final m in photos)
-          if (m.enrichment?.elapsedSeconds != null) m,
+          if (m.enrichment?.isWithinDiveWindow(
+                sorted.isEmpty ? 0 : sorted.last.timestamp,
+              ) ??
+              false)
+            m,
       ],
       durationSeconds: sorted.isEmpty ? 0 : sorted.last.timestamp.toDouble(),
       maxDepthMeters: maxDepth,

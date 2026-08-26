@@ -1334,6 +1334,11 @@ class Media extends Table {
   // where it is true. Synced with the row like every other media column.
   BoolColumn get retainInLibrary =>
       boolean().withDefault(const Constant(false))();
+  // v164: the moment in the dive the diver pinned this item to, in seconds
+  // from the dive start (issue #1090). Null means the position derives from
+  // taken_at. Lives on the media row, not on media_enrichment, so it syncs
+  // with the row and survives every enrichment recompute.
+  IntColumn get manualElapsedSeconds => integer().nullable()();
   // coverage:ignore-end
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -3175,7 +3180,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 163;
+  static const int currentSchemaVersion = 164;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3463,10 +3468,14 @@ class AppDatabase extends _$AppDatabase {
     // v163: diver_settings.default_show_estimated_tank_pressure, the switch
     // that suppresses synthesized "(est.)" tank pressure lines on the profile
     // chart (issue #731). v162 is skipped rather than missing: main was at
-    // v161 when this branch was cut, and the open PR #1287 (issue #1090) had
-    // already written 162 on its own branch. Two branches writing the same
-    // scalar auto-merge with no conflict marker, so 163 was taken instead.
+    // v161 when that branch was cut, and this branch had already written 162.
+    // Two branches writing the same scalar auto-merge with no conflict
+    // marker, so #731 took 163 instead and 162 stays permanently unused.
     163,
+    // v164: media.manual_elapsed_seconds, the diver's own placement of a
+    // media item in the dive when its capture time is wrong (issue #1090).
+    // Renumbered from 162, which #731 landed past while this branch was open.
+    164,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4215,6 +4224,21 @@ class AppDatabase extends _$AppDatabase {
       await customStatement(
         'ALTER TABLE media ADD COLUMN retain_in_library '
         'INTEGER NOT NULL DEFAULT 0 CHECK (retain_in_library IN (0, 1))',
+      );
+    }
+  }
+
+  /// v164: media.manual_elapsed_seconds (issue #1090). Idempotent; safe to
+  /// call from both onUpgrade and the beforeOpen backstop. Nullable with no
+  /// default, so every pre-existing row reads back as "position from
+  /// taken_at".
+  Future<void> _assertMediaManualElapsedColumn() async {
+    final cols = await customSelect("PRAGMA table_info('media')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('manual_elapsed_seconds')) {
+      await customStatement(
+        'ALTER TABLE media ADD COLUMN manual_elapsed_seconds INTEGER',
       );
     }
   }
@@ -8586,6 +8610,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertEstimatedTankPressureDefaultColumn();
         }
         if (from < 163) await reportProgress();
+        // v164: media.manual_elapsed_seconds (issue #1090).
+        if (from < 164) {
+          await _assertMediaManualElapsedColumn();
+        }
+        if (from < 164) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8784,6 +8813,11 @@ class AppDatabase extends _$AppDatabase {
         // diver_settings.default_show_estimated_tank_pressure (issue #731;
         // same parallel-branch version-collision self-heal).
         await _assertEstimatedTankPressureDefaultColumn();
+
+        // v164 backstop: re-assert media.manual_elapsed_seconds (issue
+        // #1090; same parallel-branch version-collision self-heal). The
+        // media row mapper reads it on every hydration.
+        await _assertMediaManualElapsedColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
