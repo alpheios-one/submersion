@@ -717,7 +717,13 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
     } on MetadataWriteException catch (e) {
       debugPrint('[MediaViewerPage] MetadataWriteException: ${e.message}');
       dismissLoadingDialog();
-      _showError(e.message);
+      // The service's messages are English-only; substitute a translation for
+      // the codes we have one for and fall back to its text otherwise.
+      _showError(
+        e.code == metadataWriteLivePhotoUnsupportedCode
+            ? l10n.media_writeMetadata_livePhotoUnsupported
+            : e.message,
+      );
     } catch (e) {
       debugPrint('[MediaViewerPage] Exception: $e');
       dismissLoadingDialog();

@@ -12910,6 +12910,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'Originele video bewaren';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Live Photos worden nog niet ondersteund. Dupliceer deze als stilstaande foto en schrijf de duikgegevens vervolgens naar de kopie.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Geen duikgegevens beschikbaar om te schrijven.';
 

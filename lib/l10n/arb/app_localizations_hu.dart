@@ -12968,6 +12968,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Eredeti video megtartasa';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'A Live Photo még nem támogatott. Készíts róla állóképes másolatot, majd a merülési adatokat a másolatba írd.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Nincs elerheto merülesi adat az irashoz.';
 

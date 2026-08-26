@@ -12771,6 +12771,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'الاحتفاظ بالفيديو الأصلي';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'صور Live Photos غير مدعومة بعد. كرّر هذه الصورة كصورة ثابتة، ثم اكتب بيانات الغوص في النسخة.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'لا توجد بيانات غوص متاحة للكتابة.';
 

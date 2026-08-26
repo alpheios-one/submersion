@@ -7238,6 +7238,7 @@
   "media_writeMetadata_diveTimeLabel": "Dive time",
   "media_writeMetadata_gpsLabel": "GPS",
   "media_writeMetadata_keepOriginalVideo": "Keep original video",
+  "media_writeMetadata_livePhotoUnsupported": "Live Photos are not supported yet. Duplicate this as a still photo, then write the dive data to the copy.",
   "media_writeMetadata_noDataAvailable": "No dive data available to write.",
   "media_writeMetadata_siteLabel": "Site",
   "media_writeMetadata_temperatureLabel": "Temperature",

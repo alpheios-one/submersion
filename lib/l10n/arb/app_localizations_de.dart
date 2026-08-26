@@ -13000,6 +13000,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Originalvideo beibehalten';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Live Photos werden noch nicht unterstützt. Dupliziere dieses Foto als Standbild und schreibe die Tauchdaten dann in die Kopie.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Keine Tauchdaten zum Schreiben verfügbar.';
 

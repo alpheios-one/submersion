@@ -4057,6 +4057,7 @@
   "media_writeMetadata_diveTimeLabel": "Tempo di immersione",
   "media_writeMetadata_gpsLabel": "GPS",
   "media_writeMetadata_keepOriginalVideo": "Mantieni video originale",
+  "media_writeMetadata_livePhotoUnsupported": "Le Live Photo non sono ancora supportate. Duplica questa foto come immagine statica, poi scrivi i dati dell'immersione sulla copia.",
   "media_writeMetadata_noDataAvailable": "Nessun dato immersione disponibile da scrivere.",
   "media_writeMetadata_siteLabel": "Sito",
   "media_writeMetadata_temperatureLabel": "Temperatura",

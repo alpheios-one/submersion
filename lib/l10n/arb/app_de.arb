@@ -4130,6 +4130,7 @@
   "media_writeMetadata_diveTimeLabel": "Tauchzeit",
   "media_writeMetadata_gpsLabel": "GPS",
   "media_writeMetadata_keepOriginalVideo": "Originalvideo beibehalten",
+  "media_writeMetadata_livePhotoUnsupported": "Live Photos werden noch nicht unterstützt. Dupliziere dieses Foto als Standbild und schreibe die Tauchdaten dann in die Kopie.",
   "media_writeMetadata_noDataAvailable": "Keine Tauchdaten zum Schreiben verfügbar.",
   "media_writeMetadata_siteLabel": "Tauchplatz",
   "media_writeMetadata_temperatureLabel": "Temperatur",

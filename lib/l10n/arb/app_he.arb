@@ -4057,6 +4057,7 @@
   "media_writeMetadata_diveTimeLabel": "זמן צלילה",
   "media_writeMetadata_gpsLabel": "GPS",
   "media_writeMetadata_keepOriginalVideo": "שמור סרטון מקורי",
+  "media_writeMetadata_livePhotoUnsupported": "‏Live Photos עדיין אינן נתמכות. שכפל תמונה זו כתמונת סטילס, ולאחר מכן כתוב את נתוני הצלילה בעותק.",
   "media_writeMetadata_noDataAvailable": "אין נתוני צלילה זמינים לכתיבה.",
   "media_writeMetadata_siteLabel": "אתר",
   "media_writeMetadata_temperatureLabel": "טמפרטורה",

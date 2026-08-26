@@ -12686,6 +12686,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'שמור סרטון מקורי';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      '‏Live Photos עדיין אינן נתמכות. שכפל תמונה זו כתמונת סטילס, ולאחר מכן כתוב את נתוני הצלילה בעותק.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'אין נתוני צלילה זמינים לכתיבה.';
 
