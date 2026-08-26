@@ -87,10 +87,12 @@ class _GpsTrackOverviewMapState extends ConsumerState<GpsTrackOverviewMap> {
 
     // A selection frames that track alone; clearing it frames the library
     // again. Same idea as the site map animating to the picked site.
+    //
+    // Null while nothing can be framed yet: a cold cache is still decoding
+    // and simplifying every track, or no track has two fixes. The basemap
+    // stays mounted at a world view rather than the pane going blank, and
+    // the framing below catches up when geometry lands.
     final camera = TrackCamera.forPoints(selectedPoints ?? allPoints);
-    if (camera == null) {
-      return const SizedBox.shrink();
-    }
 
     // Re-frame when the visible set changes: the date filter narrowing, a
     // selection promoting a track, or a per-track simplify finishing. A
@@ -99,9 +101,11 @@ class _GpsTrackOverviewMapState extends ConsumerState<GpsTrackOverviewMap> {
     final signature = '${tracks.length}:${allPoints.length}:$selectedId';
     if (_mapReady && _framedOn != signature) {
       _framedOn = signature;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) camera.applyTo(controller);
-      });
+      if (camera != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) camera.applyTo(controller);
+        });
+      }
     }
 
     return TrackpadZoomMap(
@@ -112,10 +116,14 @@ class _GpsTrackOverviewMapState extends ConsumerState<GpsTrackOverviewMap> {
           onMapReady: () {
             _mapReady = true;
             _framedOn = signature;
+            // Geometry that arrived between the first build and the map
+            // becoming ready would otherwise never be framed: the signature
+            // path above only fires while _mapReady is already true.
+            camera?.applyTo(controller);
           },
-          initialCameraFit: camera.fit,
-          initialCenter: camera.center ?? const LatLng(0, 0),
-          initialZoom: camera.zoom ?? 13.0,
+          initialCameraFit: camera?.fit,
+          initialCenter: camera?.center ?? const LatLng(20, 0),
+          initialZoom: camera?.zoom ?? 2.0,
           interactionOptions: rotatableMapInteraction,
         ),
         children: [

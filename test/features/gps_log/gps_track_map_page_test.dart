@@ -32,9 +32,12 @@ Future<void> _pump(
   WidgetTester tester, {
   Size size = const Size(1400, 900),
   List<GpsTrack>? tracks,
+  // Thumbnail-LOD geometry per track; defaults to the track's own points.
+  Future<List<GpsTrackPoint>> Function(GpsTrack track)? geometry,
 }) async {
   final base = await getBaseOverrides();
   final data = tracks ?? [_track('t1', 20.0), _track('t2', 25.0)];
+  final resolve = geometry ?? (t) async => t.points;
   await tester.binding.setSurfaceSize(size);
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -47,7 +50,7 @@ Future<void> _pump(
           gpsTrackGeometryProvider((
             t.id,
             TrackLod.thumbnail,
-          )).overrideWith((ref) async => t.points),
+          )).overrideWith((ref) => resolve(t)),
       ],
       child: MaterialApp(
         locale: const Locale('en'),
@@ -149,6 +152,33 @@ void main() {
     container.read(mapListSelectionProvider('gps-tracks').notifier).deselect();
     await tester.pumpAndSettle();
     expect(centreLat(), closeTo(22.5, 1.0));
+  });
+
+  testWidgets('mounts the basemap before geometry arrives and frames once it '
+      'does', (tester) async {
+    // A cold cache decodes and simplifies every track in an isolate; until
+    // the first one lands there is nothing to frame.
+    final pending = Completer<List<GpsTrackPoint>>();
+    final track = _track('t2', 25.0);
+    await _pump(tester, tracks: [track], geometry: (_) => pending.future);
+
+    FlutterMap overview() => tester.widget<FlutterMap>(
+      find.byWidgetPredicate((w) => w is FlutterMap && w.mapController != null),
+    );
+    // The map is already on screen, drawing nothing yet.
+    expect(overview, returnsNormally);
+    final layer = tester.widget<PolylineLayer<String>>(
+      find.byType(PolylineLayer<String>),
+    );
+    expect(layer.polylines, isEmpty);
+
+    pending.complete(track.points);
+    await tester.pumpAndSettle();
+
+    expect(
+      overview().mapController!.camera.center.latitude,
+      closeTo(25.0, 0.1),
+    );
   });
 
   testWidgets('the date filter starts unbounded', (tester) async {
