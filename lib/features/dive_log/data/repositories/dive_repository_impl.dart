@@ -21,6 +21,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive_times.dart'
 import 'package:submersion/features/dive_log/domain/entities/dive_weight.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
+import 'package:submersion/features/dive_sites/data/mappers/dive_site_row_mapper.dart';
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/profile_event.dart';
@@ -3022,22 +3023,7 @@ class DiveRepository {
     List<domain.BuddyWithRole> buddies = const [],
   }) {
     // Map site if exists
-    domain.DiveSite? domainSite;
-    if (site != null) {
-      domainSite = domain.DiveSite(
-        id: site.id,
-        name: site.name,
-        description: site.description,
-        location: site.latitude != null && site.longitude != null
-            ? domain.GeoPoint(site.latitude!, site.longitude!)
-            : null,
-        maxDepth: site.maxDepth,
-        country: site.country,
-        region: site.region,
-        rating: site.rating,
-        notes: site.notes,
-      );
-    }
+    final domainSite = site == null ? null : mapDiveSiteRow(site);
 
     // Map dive center if exists
     domain.DiveCenter? domainCenter;
@@ -3383,19 +3369,7 @@ class DiveRepository {
         ..where((t) => t.id.equals(row.siteId!));
       final siteRow = await siteQuery.getSingleOrNull();
       if (siteRow != null) {
-        site = domain.DiveSite(
-          id: siteRow.id,
-          name: siteRow.name,
-          description: siteRow.description,
-          location: siteRow.latitude != null && siteRow.longitude != null
-              ? domain.GeoPoint(siteRow.latitude!, siteRow.longitude!)
-              : null,
-          maxDepth: siteRow.maxDepth,
-          country: siteRow.country,
-          region: siteRow.region,
-          rating: siteRow.rating,
-          notes: siteRow.notes,
-        );
+        site = mapDiveSiteRow(siteRow);
       }
     }
 
