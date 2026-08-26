@@ -8427,17 +8427,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-$maxמ\'';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'עד $maxמ\'';
+    return 'עד $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '$minמ\'+';
+    return '$min+';
   }
 
   @override
