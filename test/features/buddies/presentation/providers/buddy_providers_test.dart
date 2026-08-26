@@ -8,6 +8,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
+import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/divers/data/repositories/diver_repository.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
@@ -41,6 +42,25 @@ Future<void> _insertDive(db.AppDatabase database, {required String id}) async {
         db.DivesCompanion(
           id: Value(id),
           diveDateTime: Value(now),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+}
+
+/// Like [_insertDive] but with a caller-chosen dive date, for ordering tests.
+Future<void> _insertDiveAt(
+  db.AppDatabase database, {
+  required String id,
+  required DateTime diveDateTime,
+}) async {
+  final now = DateTime.now().millisecondsSinceEpoch;
+  await database
+      .into(database.dives)
+      .insert(
+        db.DivesCompanion(
+          id: Value(id),
+          diveDateTime: Value(diveDateTime.millisecondsSinceEpoch),
           createdAt: Value(now),
           updatedAt: Value(now),
         ),
@@ -217,6 +237,51 @@ void main() {
         reason:
             'BuddyListNotifier should silently reload after a direct DB write '
             'without any manual refresh() call',
+      );
+    });
+  });
+
+  // Issue #982: the buddy detail page's shared-dives preview showed an
+  // arbitrary five dives because the ids arrived in `dive_buddies.created_at`
+  // order (when the link was written) and only the surviving five were sorted
+  // by dive date. A dive from a previous year outranked the newest one.
+  group('divesForBuddyProvider ordering (#982)', () {
+    test('previews the five newest dives, newest first', () async {
+      final diver = await seedCurrentDiver();
+      final buddy = await buddyRepo.createBuddy(
+        _makeBuddy(name: 'Dive Partner', diverId: diver.id),
+      );
+
+      // Six dives. The link timestamps are written in the exact reverse of the
+      // dive order, so an implementation that truncates before sorting keeps
+      // the five OLDEST dives.
+      final diveIds = ['d1', 'd2', 'd3', 'd4', 'd5', 'd6'];
+      for (var i = 0; i < diveIds.length; i++) {
+        await _insertDiveAt(
+          database,
+          id: diveIds[i],
+          diveDateTime: DateTime(2020 + i, 6, 1),
+        );
+        await buddyRepo.addBuddyToDive(diveIds[i], buddy.id, DiveRole.buddyId);
+        await database.customStatement(
+          'UPDATE dive_buddies SET created_at = ? WHERE dive_id = ?',
+          [diveIds.length - i, diveIds[i]],
+        );
+      }
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+
+      final dives = await container.read(
+        divesForBuddyProvider(buddy.id).future,
+      );
+
+      expect(
+        dives.map((d) => d.id).toList(),
+        equals(['d6', 'd5', 'd4', 'd3', 'd2']),
+        reason:
+            'the preview must take the five newest dives, not the first five '
+            'buddy links',
       );
     });
   });

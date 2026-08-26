@@ -191,8 +191,16 @@ final diveIdsForBuddyProvider = FutureProvider.family<List<String>, String>((
   return repository.getDiveIdsForBuddy(buddyId);
 });
 
+/// How many shared dives the buddy detail page previews before the caller has
+/// to tap "view all".
+const buddySharedDivePreviewLimit = 5;
+
 /// Full dive data for a buddy provider (for display in buddy detail page)
-/// Returns the most recent dives first, limited to a reasonable count for preview
+///
+/// Returns the most recent dives first, limited to a reasonable count for
+/// preview. [diveIdsForBuddyProvider] already orders by dive date descending,
+/// so truncating to the preview limit keeps the newest dives; the Dart sort
+/// below only re-asserts that order over the hydrated entities.
 final divesForBuddyProvider = FutureProvider.family<List<domain.Dive>, String>((
   ref,
   buddyId,
@@ -200,17 +208,20 @@ final divesForBuddyProvider = FutureProvider.family<List<domain.Dive>, String>((
   final diveIds = await ref.watch(diveIdsForBuddyProvider(buddyId).future);
   if (diveIds.isEmpty) return [];
 
-  // Fetch full dive data for each ID (limit to first 5 for preview)
   final dives = <domain.Dive>[];
-  for (final diveId in diveIds.take(5)) {
+  for (final diveId in diveIds.take(buddySharedDivePreviewLimit)) {
     final dive = await ref.watch(diveProvider(diveId).future);
     if (dive != null) {
       dives.add(dive);
     }
   }
 
-  // Sort by date descending (most recent first)
-  dives.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+  // Most recent first, matching the dive list's sort key.
+  dives.sort((a, b) {
+    final byTime = b.effectiveEntryTime.compareTo(a.effectiveEntryTime);
+    if (byTime != 0) return byTime;
+    return (b.diveNumber ?? 0).compareTo(a.diveNumber ?? 0);
+  });
   return dives;
 });
 

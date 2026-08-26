@@ -426,5 +426,90 @@ void main() {
         },
       );
     });
+    // Issue #982: the shared-dives preview showed an arbitrary five dives
+    // because the ids came back in `dive_buddies.created_at` order (when the
+    // link was written) and the caller truncated before sorting by dive date.
+    group('getDiveIdsForBuddy ordering (#982)', () {
+      Future<void> insertDive(
+        String id, {
+        required int diveDateTime,
+        int? entryTime,
+        int? diveNumber,
+      }) async {
+        final db = DatabaseService.instance.database;
+        await db.customStatement(
+          'INSERT INTO dives '
+          '(id, dive_date_time, entry_time, dive_number, created_at, updated_at) '
+          'VALUES (?, ?, ?, ?, 1000, 1000)',
+          [id, diveDateTime, entryTime, diveNumber],
+        );
+      }
+
+      /// Forces the junction row's link timestamp so link order can be made to
+      /// contradict dive order.
+      Future<void> setLinkCreatedAt(String diveId, int createdAt) async {
+        final db = DatabaseService.instance.database;
+        await db.customStatement(
+          'UPDATE dive_buddies SET created_at = ? WHERE dive_id = ?',
+          [createdAt, diveId],
+        );
+      }
+
+      test(
+        'returns newest dive first regardless of link creation order',
+        () async {
+          final buddy = await repository.createBuddy(createTestBuddy(id: 'b1'));
+          await insertDive('old', diveDateTime: 1000);
+          await insertDive('newest', diveDateTime: 3000);
+          await insertDive('middle', diveDateTime: 2000);
+          for (final id in ['old', 'newest', 'middle']) {
+            await repository.addBuddyToDive(id, buddy.id, DiveRole.buddyId);
+          }
+          // Link order deliberately inverted relative to dive date order.
+          await setLinkCreatedAt('old', 9000);
+          await setLinkCreatedAt('newest', 8000);
+          await setLinkCreatedAt('middle', 7000);
+
+          final diveIds = await repository.getDiveIdsForBuddy(buddy.id);
+
+          expect(diveIds, equals(['newest', 'middle', 'old']));
+        },
+      );
+
+      test('prefers entry time over dive date time', () async {
+        final buddy = await repository.createBuddy(createTestBuddy(id: 'b1'));
+        // `later` has the older dive_date_time but the newer entry_time.
+        await insertDive('earlier', diveDateTime: 5000);
+        await insertDive('later', diveDateTime: 4000, entryTime: 6000);
+        for (final id in ['earlier', 'later']) {
+          await repository.addBuddyToDive(id, buddy.id, DiveRole.buddyId);
+        }
+        // Link order deliberately inverted relative to entry time order.
+        await setLinkCreatedAt('earlier', 9000);
+        await setLinkCreatedAt('later', 1);
+
+        final diveIds = await repository.getDiveIdsForBuddy(buddy.id);
+
+        expect(diveIds, equals(['later', 'earlier']));
+      });
+
+      test(
+        'breaks ties on the same timestamp by dive number descending',
+        () async {
+          final buddy = await repository.createBuddy(createTestBuddy(id: 'b1'));
+          await insertDive('lower', diveDateTime: 1000, diveNumber: 893);
+          await insertDive('higher', diveDateTime: 1000, diveNumber: 894);
+          for (final id in ['lower', 'higher']) {
+            await repository.addBuddyToDive(id, buddy.id, DiveRole.buddyId);
+          }
+          await setLinkCreatedAt('lower', 9000);
+          await setLinkCreatedAt('higher', 1);
+
+          final diveIds = await repository.getDiveIdsForBuddy(buddy.id);
+
+          expect(diveIds, equals(['higher', 'lower']));
+        },
+      );
+    });
   });
 }
