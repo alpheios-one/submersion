@@ -61,9 +61,17 @@ class ConflictReferenceResolver {
   /// same diver, dive or site, so each referenced row is read once.
   final Map<String, Map<String, dynamic>?> _rows = {};
 
-  /// Foreign-key column -> sync entity type, transcribed from the
-  /// `.references(Table, #id)` clauses in `database.dart`. Columns whose name
-  /// is ambiguous across tables are disambiguated by [_targetOverrides].
+  /// Foreign-key column -> sync entity type.
+  ///
+  /// Most entries are transcribed from the `.references(Table, #id)` clauses
+  /// in `database.dart`. The rest are columns that hold another row's id
+  /// without a declared Drift constraint (`Media.subscriptionId` and
+  /// `connectorAccountId`, `DiveDiveTypes.diveTypeId`,
+  /// `DivePlanSegments.switchToTankId`, `DiveProfileEvents.tankId`); they are
+  /// listed here because the dialog can resolve them just as well, so verify
+  /// those against their table rather than expecting a `references` clause.
+  /// Columns whose name is ambiguous across tables are disambiguated by
+  /// [_targetOverrides].
   static const _defaultTargets = <String, String>{
     'diveId': 'dives',
     'relatedDiveId': 'dives',

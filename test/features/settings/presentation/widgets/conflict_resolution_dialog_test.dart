@@ -333,6 +333,48 @@ void main() {
     expect(find.text('detectorId:'), findsNWidgets(2));
   });
 
+  testWidgets('shows the column that actually differs between the sides', (
+    tester,
+  ) async {
+    // The whole point of the dialog is choosing between two versions. A
+    // record with a recognizable field must not hide the column the two sides
+    // disagree about just because that column is not on the preferred list.
+    await pumpDialog(
+      tester,
+      SyncConflict(
+        entityType: 'dives',
+        recordId: 'd-1',
+        localData: const {'id': 'd-1', 'name': 'Blue Hole', 'diveNumber': 12},
+        remoteData: const {'id': 'd-1', 'name': 'Blue Hole', 'diveNumber': 13},
+        localModified: DateTime(2026, 3, 28),
+        remoteModified: DateTime(2026, 3, 29),
+      ),
+    );
+
+    expect(find.text('diveNumber:'), findsNWidgets(2));
+    expect(find.text('12'), findsOneWidget);
+    expect(find.text('13'), findsOneWidget);
+  });
+
+  testWidgets('names a conflict from the remote side when the local row is '
+      'gone', (tester) async {
+    await pumpDialog(
+      tester,
+      SyncConflict(
+        entityType: 'diveSites',
+        recordId: 's-1',
+        localData: const {},
+        remoteData: const {'id': 's-1', 'name': 'The Arch'},
+        localModified: DateTime(2026, 3, 28),
+        remoteModified: DateTime(2026, 3, 29),
+      ),
+    );
+
+    // Once in the header, once in the remote preview.
+    expect(find.text('The Arch'), findsNWidgets(2));
+    expect(find.textContaining('diveSites #'), findsNothing);
+  });
+
   testWidgets('renders a detector that dates its finding', (tester) async {
     // A second detector, to show the preview inherits every detector's copy
     // from the data-quality renderer rather than special-casing depth spikes.

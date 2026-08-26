@@ -203,6 +203,7 @@ class _ConflictResolutionDialogState
                   entityType: conflict.entityType,
                   data: conflict.localData,
                   references: conflict.localReferences,
+                  counterpart: conflict.remoteData,
                 ),
               ],
             ),
@@ -240,6 +241,7 @@ class _ConflictResolutionDialogState
                   entityType: conflict.entityType,
                   data: conflict.remoteData,
                   references: conflict.remoteReferences,
+                  counterpart: conflict.localData,
                 ),
               ],
             ),
@@ -252,14 +254,21 @@ class _ConflictResolutionDialogState
   /// Names the record a user is being asked about. Junction and relation
   /// entities have no name of their own, so they are named by the records they
   /// point at; only a record that resolved to nothing falls back to its id.
+  ///
+  /// Either side can supply the name. When the local row is already gone the
+  /// remote one is all there is, and an id-based title would be a worse answer
+  /// than the name sitting in the version being offered.
   String _conflictTitle(SyncConflict conflict) {
-    final own =
-        conflict.localData['name'] as String? ??
-        conflict.localData['title'] as String?;
-    if (own != null && own.isNotEmpty) return own;
+    final own = _ownName(conflict.localData) ?? _ownName(conflict.remoteData);
+    if (own != null) return own;
     return conflictReferenceSummary(conflict.localReferences) ??
         conflictReferenceSummary(conflict.remoteReferences) ??
         conflict.displayName;
+  }
+
+  String? _ownName(Map<String, dynamic> data) {
+    final name = data['name'] as String? ?? data['title'] as String?;
+    return (name != null && name.isNotEmpty) ? name : null;
   }
 
   Widget _buildResolutionOptions(BuildContext context, SyncConflict conflict) {

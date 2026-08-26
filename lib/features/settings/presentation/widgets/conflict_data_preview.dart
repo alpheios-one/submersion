@@ -50,19 +50,26 @@ const _preferredFields = <String>[
   'notes',
 ];
 
-/// A record's data preview: resolved references first, then the fields that
-/// distinguish the two versions.
+/// A record's data preview: the record's own recognizable fields, then its
+/// resolved references, then whatever column the two versions disagree about.
+/// A junction row has no recognizable field of its own, so its references
+/// lead.
 class ConflictDataPreview extends ConsumerWidget {
   const ConflictDataPreview({
     super.key,
     required this.entityType,
     required this.data,
     required this.references,
+    this.counterpart = const {},
   });
 
   final String entityType;
   final Map<String, dynamic> data;
   final List<ConflictReference> references;
+
+  /// The other side of the same conflict, so the preview can surface the
+  /// columns the two versions disagree about.
+  final Map<String, dynamic> counterpart;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -80,6 +87,7 @@ class ConflictDataPreview extends ConsumerWidget {
       entityType: entityType,
       data: data,
       references: references,
+      counterpart: counterpart,
     );
 
     return Column(
@@ -113,15 +121,21 @@ class ConflictDataPreview extends ConsumerWidget {
 
 /// Builds the preview lines for one side of a conflict.
 ///
-/// References come first because for a junction entity they are the only
-/// real-world content the record has; the remaining columns follow, with
-/// bookkeeping and already-rendered fields dropped.
+/// Order is: the record's own preferred fields, its resolved references, then
+/// the columns whose value differs from [counterpart] (the other side of the
+/// same conflict). A junction entity has no preferred field, so its references
+/// lead. Bookkeeping and already-rendered columns are dropped throughout.
+///
+/// [counterpart] is what makes the differing column visible: a dive whose two
+/// versions share a name but disagree on `diveNumber` would otherwise show
+/// only the name, leaving nothing to choose between.
 List<ConflictPreviewRow> conflictPreviewRows({
   required AppLocalizations l10n,
   required UnitFormatter units,
   required String entityType,
   required Map<String, dynamic> data,
   required List<ConflictReference> references,
+  Map<String, dynamic> counterpart = const {},
 }) {
   final message = entityType == 'qualityFindings'
       ? _findingMessage(l10n, units, data)
@@ -136,6 +150,27 @@ List<ConflictPreviewRow> conflictPreviewRows({
     for (final reference in references) reference.field,
   };
   final preferred = _preferredScalars(data, hidden);
+  final differing = _differingScalars(
+    data,
+    counterpart,
+    hidden,
+    preferred.keys.toSet(),
+  );
+
+  // Difference and context are both needed: the differing column is what the
+  // user is choosing between, but a junction or finding row still has to say
+  // what it is. Preferred fields lead, the differing columns follow, and a
+  // record with no preferred field then fills up with its remaining columns.
+  final scalars = <String, dynamic>{...preferred};
+  for (final entry in differing.entries) {
+    scalars.putIfAbsent(entry.key, () => entry.value);
+  }
+  if (preferred.isEmpty) {
+    for (final entry in _remainingScalars(data, hidden).entries) {
+      if (scalars.length >= 6) break;
+      scalars.putIfAbsent(entry.key, () => entry.value);
+    }
+  }
 
   ConflictPreviewRow scalarRow(MapEntry<String, dynamic> entry) => (
     label: entry.key,
@@ -160,10 +195,9 @@ List<ConflictPreviewRow> conflictPreviewRows({
     ));
   }
 
-  if (preferred.isEmpty) {
-    for (final entry in _remainingScalars(data, hidden).entries) {
-      rows.add(scalarRow(entry));
-    }
+  for (final entry in scalars.entries) {
+    if (preferred.containsKey(entry.key)) continue; // already led the preview
+    rows.add(scalarRow(entry));
   }
   return rows;
 }
@@ -218,9 +252,16 @@ String formatConflictScalar(
   return value.toString();
 }
 
-/// A stored count of seconds as "1h 5m" or "45min", matching how the dive
-/// field formatter renders a duration elsewhere.
+/// A stored count of seconds as "1h 5m" or "45min".
+///
+/// Anything under a minute keeps its seconds instead of collapsing to "0min".
+/// The dive field formatter renders those as "--" (unavailable), which is
+/// right for a dive summary and wrong here: two versions differing only in a
+/// sub-minute value would render identically in the one dialog whose whole
+/// job is telling them apart. A negative value takes the same path and shows
+/// itself rather than wrapping into a plausible-looking positive minute count.
 String _formatSeconds(int seconds) {
+  if (seconds < 60) return '${seconds}s';
   final totalMinutes = seconds ~/ 60;
   final hours = totalMinutes ~/ 60;
   final minutes = totalMinutes % 60;
@@ -247,6 +288,27 @@ Map<String, dynamic> _preferredScalars(
   for (final key in _preferredFields)
     if (data.containsKey(key) && _usable(data, hidden, key)) key: data[key],
 };
+
+/// Columns this side disagrees with the other side about. These are the ones
+/// a user is actually choosing between, so they are shown even when they are
+/// not on the preferred list.
+Map<String, dynamic> _differingScalars(
+  Map<String, dynamic> data,
+  Map<String, dynamic> counterpart,
+  Set<String> hidden,
+  Set<String> alreadyShown,
+) {
+  final differing = <String, dynamic>{};
+  for (final entry in data.entries) {
+    if (differing.length >= 5) break;
+    if (alreadyShown.contains(entry.key)) continue;
+    if (!_usable(data, hidden, entry.key)) continue;
+    if (counterpart[entry.key] != entry.value) {
+      differing[entry.key] = entry.value;
+    }
+  }
+  return differing;
+}
 
 /// Nothing recognizable: show the first few columns that survived the filter,
 /// which for a junction row is what is left after its foreign keys.

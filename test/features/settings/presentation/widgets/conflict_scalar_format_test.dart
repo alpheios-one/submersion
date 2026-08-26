@@ -45,6 +45,14 @@ void main() {
       expect(format(units, 'runtime', 4500), '1h 15m');
     });
 
+    test('keeps a sub-minute duration distinguishable', () {
+      // Rounding these to "0min" would make two different stored values look
+      // identical, which is exactly the choice the dialog exists to support.
+      expect(format(units, 'bottomTime', 30), '30s');
+      expect(format(units, 'bottomTime', 45), '45s');
+      expect(format(units, 'bottomTime', 0), '0s');
+    });
+
     test('renders a flag as words', () {
       expect(format(units, 'isShared', true), 'Yes');
       expect(format(units, 'isShared', false), 'No');
