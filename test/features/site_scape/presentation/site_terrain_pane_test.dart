@@ -182,6 +182,30 @@ void main() {
     );
   });
 
+  // Issue #1188: on a phone-sized pane the legend and the viewport's zoom
+  // column both hugged the right edge, and the legend covered the +/-
+  // buttons outright.
+  testWidgets('the legend never overlaps the zoom controls', (tester) async {
+    for (final surface in const [Size(360, 640), Size(360, 380)]) {
+      await tester.binding.setSurfaceSize(surface);
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(page(readyState()));
+      await tester.pump();
+      await tester.pump();
+      final legend = tester.getRect(
+        find.byKey(const ValueKey('seascapeDepthLegend')),
+      );
+      final zoom = tester.getRect(
+        find.byKey(const ValueKey('dive3dZoomControls')),
+      );
+      expect(
+        legend.overlaps(zoom),
+        isFalse,
+        reason: 'legend $legend overlaps zoom controls $zoom at $surface',
+      );
+    }
+  });
+
   testWidgets('imagery reaches the viewport and shows attribution', (
     tester,
   ) async {

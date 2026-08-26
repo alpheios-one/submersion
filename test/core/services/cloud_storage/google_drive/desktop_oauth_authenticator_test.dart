@@ -9,6 +9,7 @@ import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.da
 import 'package:submersion/core/services/cloud_storage/google_drive/desktop_oauth_authenticator.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_client_config.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_token_store.dart';
+import 'package:submersion/core/services/cloud_storage/http_timeouts.dart';
 
 class _MemoryTokenStore implements GoogleDriveTokenStore {
   gauth.AccessCredentials? stored;
@@ -138,6 +139,34 @@ void main() {
 
       expect(clientId.identifier, GoogleDriveClientConfig.desktopClientId);
     });
+  });
+
+  test('the default base transport carries request deadlines', () async {
+    // The refreshing client sends every Drive call, and its own token
+    // refreshes, over this base. A bare http.Client() has no connect,
+    // response or read deadline, so a wedged socket parked the request
+    // forever -- on sync and, via mediaHttpClient(), on the media transfer
+    // queue (#1279).
+    store.stored = creds(refreshToken: 'rt-1');
+    late http.Client capturedBase;
+    final auth = DesktopOAuthAuthenticator(
+      tokenStore: store,
+      obtainConsent: (clientId, scopes, client, prompt) async => creds(),
+      buildClient: (clientId, credentials, base) {
+        capturedBase = base;
+        return _FakeRefreshingClient(credentials);
+      },
+      launchBrowser: (url) async {},
+    );
+
+    expect(await auth.attemptSilentAuth(), isTrue);
+
+    addTearDown(capturedBase.close);
+    expect(capturedBase, isA<TimeoutHttpClient>());
+    expect(
+      (capturedBase as TimeoutHttpClient).connectTimeout,
+      TimeoutHttpClient.defaultConnectTimeout,
+    );
   });
 
   test('attemptSilentAuth returns false with no stored credentials', () async {

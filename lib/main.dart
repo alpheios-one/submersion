@@ -9,6 +9,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/providers/root_overrides.dart';
 import 'package:submersion/core/services/global_error_handler.dart';
 import 'package:submersion/core/services/log_file_service.dart';
+import 'package:submersion/core/services/log_environment.dart';
 import 'package:submersion/core/services/logger_service.dart';
 
 import 'package:submersion/app.dart';
@@ -73,6 +74,11 @@ Future<void> _bootstrap() async {
   final debugEnabled = prefs.getBool('debug_mode_enabled') ?? false;
   if (debugEnabled) {
     LoggerService.setFileService(logFileService);
+    // Stamp the build and device at the top of the session so a log file that
+    // spans several app versions attributes each run to the build that wrote
+    // it (issue #1246). Not awaited: startup must not block on a platform
+    // channel, and the write is serialized behind LoggerService's queue.
+    unawaited(logSessionEnvironment());
   }
 
   // Create location service and get storage config
