@@ -388,6 +388,17 @@ jobs:
           python3 -m coverage xml --include="$guards" \
             -o coverage/scripts.xml
 
+      - name: Run chamber directory pipeline tests
+        # The harvester generates a safety-critical dataset: its validation
+        # gates are what stop a broken parser shipping blank phone numbers or
+        # duplicate ids. Kept out of the guards coverage set above so it does
+        # not perturb that report; pypdf is installed here because the FFESSM
+        # registry is a PDF (the test skips itself without it).
+        run: |
+          python3 -m pip install pypdf
+          python3 scripts/chamber_harvester_test.py
+          python3 scripts/chamber_sources_test.py
+
       - name: Run appcast beta feed test
         run: ./scripts/generate_appcast_beta_test.sh
 

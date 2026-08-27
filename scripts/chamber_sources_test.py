@@ -144,10 +144,17 @@ class SpumsIsNotParsedTest(unittest.TestCase):
         self.assertFalse(hasattr(chamber_sources, "parse_spums"))
 
 
+try:
+    import pypdf
+
+    HAVE_PYPDF = True
+except ImportError:  # pragma: no cover - depends on the local environment
+    HAVE_PYPDF = False
+
+
+@unittest.skipUnless(HAVE_PYPDF, "pypdf is not installed")
 class ParseFfessmTest(unittest.TestCase):
     def setUp(self):
-        import pypdf
-
         reader = pypdf.PdfReader(os.path.join(FIXTURES, "ffessm.pdf"))
         text = "\n".join(page.extract_text() or "" for page in reader.pages)
         self.rows = chamber_sources.parse_ffessm(
