@@ -22771,6 +22771,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wie aggressiv heruntergeladene Tauchgänge Tauchplätzen zugeordnet werden';
 
   @override
+  String get settings_tankPressureAtSurfacing_title =>
+      'Flaschendruck beim Auftauchen';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      'Enddruck beim Erreichen der Oberfläche übernehmen, nicht am Ende der Aufzeichnung';
+
+  @override
   String get settings_siteMatch_strict => 'Streng';
 
   @override

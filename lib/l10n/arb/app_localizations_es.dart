@@ -22832,6 +22832,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Con qué intensidad se asocian a puntos de buceo las inmersiones descargadas';
 
   @override
+  String get settings_tankPressureAtSurfacing_title =>
+      'Presión de la botella al salir a superficie';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      'Tomar la presión final al llegar a la superficie, no al terminar el registro';
+
+  @override
   String get settings_siteMatch_strict => 'Estricto';
 
   @override

@@ -407,6 +407,9 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setSiteMatchSensitivity(SiteMatchSensitivity value) async =>
       state = state.copyWith(siteMatchSensitivity: value);
   @override
+  Future<void> setTrimTankPressureAtSurfacing(bool value) async =>
+      state = state.copyWith(trimTankPressureAtSurfacing: value);
+  @override
   Future<void> setCardColorGradientPreset(String preset) async =>
       state = state.copyWith(cardColorGradientPreset: preset);
   @override

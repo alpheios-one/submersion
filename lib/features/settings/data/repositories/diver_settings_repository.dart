@@ -146,6 +146,7 @@ class DiverSettingsRepository {
               diveCenterListViewMode: Value(s.diveCenterListViewMode.name),
               mapStyle: Value(s.mapStyle.name),
               siteMatchSensitivity: Value(s.siteMatchSensitivity.name),
+              trimTankPressureAtSurfacing: Value(s.trimTankPressureAtSurfacing),
               cardColorGradientPreset: Value(s.cardColorGradientPreset),
               cardColorGradientStart: Value(s.cardColorGradientStart),
               cardColorGradientEnd: Value(s.cardColorGradientEnd),
@@ -312,6 +313,9 @@ class DiverSettingsRepository {
           diveCenterListViewMode: Value(settings.diveCenterListViewMode.name),
           mapStyle: Value(settings.mapStyle.name),
           siteMatchSensitivity: Value(settings.siteMatchSensitivity.name),
+          trimTankPressureAtSurfacing: Value(
+            settings.trimTankPressureAtSurfacing,
+          ),
           cardColorGradientPreset: Value(settings.cardColorGradientPreset),
           cardColorGradientStart: Value(settings.cardColorGradientStart),
           cardColorGradientEnd: Value(settings.cardColorGradientEnd),
@@ -528,6 +532,7 @@ class DiverSettingsRepository {
       siteMatchSensitivity: SiteMatchSensitivity.fromName(
         row.siteMatchSensitivity,
       ),
+      trimTankPressureAtSurfacing: row.trimTankPressureAtSurfacing,
       cardColorGradientPreset: row.cardColorGradientPreset,
       cardColorGradientStart: row.cardColorGradientStart,
       cardColorGradientEnd: row.cardColorGradientEnd,
