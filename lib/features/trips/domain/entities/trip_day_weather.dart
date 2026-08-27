@@ -29,13 +29,21 @@ const String kTripDayWeatherNamespace = '3f1c8a52-9e47-4d6b-8b3a-16c9d0f27e45';
 int tripDayMillis(DateTime date) =>
     DateTime.utc(date.year, date.month, date.day).millisecondsSinceEpoch;
 
-/// The calendar day [dayMillis] denotes, as a UTC DateTime at midnight.
+/// The instant [dayMillis] denotes, read in UTC.
 ///
-/// The inverse of [tripDayMillis], and the only correct way to read a stored
-/// day back. `DateTime.fromMillisecondsSinceEpoch` without `isUtc` returns a
-/// LOCAL DateTime, so re-extracting y/m/d from it reads the calendar fields in
-/// the device's frame: on any negative UTC offset, UTC midnight is the
-/// previous evening locally, and the day walks backwards on every round trip.
+/// The only correct way to read a stored day back. `fromMillisecondsSinceEpoch`
+/// without `isUtc` returns a LOCAL DateTime, so re-extracting y/m/d from it
+/// reads the calendar fields in the device's frame: on any negative UTC
+/// offset, UTC midnight is the previous evening locally, and the day walks
+/// backwards on every round trip.
+///
+/// It reads the value it is given and normalizes nothing, so it is the
+/// inverse of [tripDayMillis] only for a value [tripDayMillis] produced. A
+/// stored `date` is not guaranteed to be one: rows written before this branch
+/// derived ids can carry a time component, and the repository deliberately
+/// calls this on those raw values. Run the result back through
+/// [tripDayMillis] whenever you need the normalized day rather than the
+/// instant as stored.
 DateTime tripDayDate(int dayMillis) =>
     DateTime.fromMillisecondsSinceEpoch(dayMillis, isUtc: true);
 
@@ -49,8 +57,10 @@ DateTime tripDayDate(int dayMillis) =>
 /// target entirely and hits the index instead. That throws inside the merge
 /// transaction and aborts the whole sync pull.
 ///
-/// [dayMillis] must already be normalized to local midnight; pass it through
-/// [tripDayMillis].
+/// [dayMillis] must already be the normalized UTC-midnight day key; pass it
+/// through [tripDayMillis]. Local midnight would defeat the purpose: its epoch
+/// value differs in every timezone, so the derived id would too and the two
+/// devices this exists to converge would not.
 String tripDayWeatherRowId({required String tripId, required int dayMillis}) =>
     const Uuid().v5(kTripDayWeatherNamespace, '$tripId|$dayMillis');
 

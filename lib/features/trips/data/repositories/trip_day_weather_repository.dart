@@ -22,7 +22,7 @@ class TripDayWeatherRepository {
   final SyncRepository _syncRepository = SyncRepository();
   final _log = LoggerService.forClass(TripDayWeatherRepository);
 
-  /// Local midnight for [date], as epoch milliseconds.
+  /// The UTC-midnight day key for [date], as epoch milliseconds.
   ///
   /// The day is the identity, so normalizing here is what actually enforces
   /// the (trip, date) uniqueness intent. A caller that passes a DateTime with
@@ -193,10 +193,12 @@ class TripDayWeatherRepository {
 
   /// Every stored row for this trip that falls on [dayMillis]'s calendar day.
   ///
-  /// Filtered in Dart rather than SQL: local midnight is not something SQLite
-  /// can derive from the stored epoch millis without knowing the zone and its
-  /// DST history. A trip holds one row per day, so the scan is a few dozen
-  /// rows at most.
+  /// Filtered in Dart rather than SQL. It could be pushed down now that the
+  /// key is UTC, since the day is plain integer arithmetic on the stored
+  /// millis with no zone or DST to consult, but there is nothing to gain: a
+  /// trip holds one row per day, so the scan is a few dozen rows, and keeping
+  /// the rule in one Dart function is what stops it drifting from
+  /// [tripDayMillis].
   Future<List<TripDayWeatherData>> _rowsForDay({
     required String tripId,
     required int dayMillis,
