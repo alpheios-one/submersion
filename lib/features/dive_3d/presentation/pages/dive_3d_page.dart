@@ -320,7 +320,10 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
         Expanded(
           child: Stack(
             children: [
+              // Inset below the control row so the scene's top edge and the
+              // depth title never hide under the chips.
               Positioned.fill(
+                top: 52,
                 child: Dive3dInteractiveViewport(
                   scene: scene,
                   scrubPosition: _position,
