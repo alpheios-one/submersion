@@ -66,12 +66,18 @@ class DiveListItem extends ConsumerWidget {
   /// bug #643 fixed for the Dive Type slot.
   final DiveTypeLabelResolver diveTypeShortLabelResolver;
 
+  /// Whether a dive-type slug's badge should appear in the compact and
+  /// detailed cards' type-badge row (issue #1269 follow-up). Required for
+  /// the same reason as the resolvers above.
+  final DiveTypeListVisibilityPredicate diveTypeListVisibilityPredicate;
+
   const DiveListItem({
     super.key,
     required this.summary,
     required this.diveNumber,
     required this.diveTypeLabelResolver,
     required this.diveTypeShortLabelResolver,
+    required this.diveTypeListVisibilityPredicate,
     this.fullDive,
     this.colorValue,
     this.minValueInList,
@@ -127,6 +133,7 @@ class DiveListItem extends ConsumerWidget {
           stat2Field: _slotField(slots, 'stat2', DiveField.bottomTime),
           diveTypeLabelResolver: diveTypeLabelResolver,
           diveTypeShortLabelResolver: diveTypeShortLabelResolver,
+          diveTypeListVisibilityPredicate: diveTypeListVisibilityPredicate,
           onTap: onTap,
         );
       case ListViewMode.detailed:
@@ -160,6 +167,7 @@ class DiveListItem extends ConsumerWidget {
           fullDive: fullDive,
           diveTypeLabelResolver: diveTypeLabelResolver,
           diveTypeShortLabelResolver: diveTypeShortLabelResolver,
+          diveTypeListVisibilityPredicate: diveTypeListVisibilityPredicate,
         );
     }
   }

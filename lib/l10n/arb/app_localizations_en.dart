@@ -9176,6 +9176,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveTypes_deleteTooltip => 'Delete dive type';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper =>
+      'Built-in names can\'t be changed';
+
+  @override
+  String get diveTypes_editDialog_saveButton => 'Save';
+
+  @override
+  String get diveTypes_editDialog_title => 'Edit Dive Type';
+
+  @override
+  String get diveTypes_showInHeaderLabel => 'Header';
+
+  @override
+  String get diveTypes_showInHeaderTooltip =>
+      'Show this type\'s badge in the dive detail header';
+
+  @override
+  String get diveTypes_showInListLabel => 'List';
+
+  @override
+  String get diveTypes_showInListTooltip =>
+      'Show this type\'s badge in the dive list';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return 'Added dive type: $name';
   }
@@ -9198,6 +9222,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return 'Error deleting dive type: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return 'Error updating dive type: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return 'Updated \"$name\"';
   }
 
   @override

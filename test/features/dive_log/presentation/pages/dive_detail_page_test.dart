@@ -29,6 +29,8 @@ import 'package:submersion/features/dive_log/domain/entities/source_profile.dart
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge.dart';
+import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
+import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/field_attribution_badge.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/o2_toxicity_card.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -1618,6 +1620,34 @@ void main() {
         expect(find.text('Wreck'), findsOneWidget);
         expect(find.text('Night'), findsOneWidget);
         expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'hides a type whose showInDetailHeader is false, keeps the rest',
+      (tester) async {
+        final dive = createTestDiveWithBottomTime().copyWith(
+          diveTypeIds: ['wreck', 'night'],
+        );
+        final hiddenWreck = DiveTypeEntity(
+          id: 'wreck',
+          name: 'Wreck',
+          isBuiltIn: true,
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+          showInDetailHeader: false,
+        );
+        final overrides = await getBaseOverrides();
+        await tester.pumpWidget(
+          _buildDetailPage(dive, [
+            ...overrides,
+            diveTypesProvider.overrideWith((ref) async => [hiddenWreck]),
+          ]),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Wreck'), findsNothing);
+        expect(find.text('Night'), findsOneWidget);
       },
     );
   });

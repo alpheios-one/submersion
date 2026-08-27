@@ -11,6 +11,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/compact_dive_l
 import 'package:submersion/features/dive_log/presentation/widgets/dive_mode_badge.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge_row.dart';
+import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tags/domain/entities/tag.dart';
@@ -49,26 +50,37 @@ void main() {
   );
 
   Widget harness({
-    required Widget Function(DiveTypeLabelResolver resolve) builder,
+    required Widget Function(
+      DiveTypeLabelResolver resolve,
+      DiveTypeListVisibilityPredicate isVisible,
+    )
+    builder,
+    List<DiveTypeEntity> diveTypes = const [],
   }) {
     return testApp(
       overrides: [
         settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
-        diveTypesProvider.overrideWith((ref) async => const []),
+        diveTypesProvider.overrideWith((ref) async => diveTypes),
         detailedCardConfigProvider.overrideWith(
           (ref) => _TestCardConfigNotifier(),
         ),
       ],
       child: Consumer(
-        builder: (context, ref, _) =>
-            builder(watchDiveTypeShortLabelResolver(ref, context.l10n)),
+        builder: (context, ref, _) => builder(
+          watchDiveTypeShortLabelResolver(ref, context.l10n),
+          watchDiveTypeListVisibilityPredicate(ref),
+        ),
       ),
     );
   }
 
   group('CompactDiveListTile type badges', () {
-    Widget tile(List<String> diveTypeIds) => harness(
-      builder: (resolve) => CompactDiveListTile(
+    Widget tile(
+      List<String> diveTypeIds, {
+      List<DiveTypeEntity> diveTypes = const [],
+    }) => harness(
+      diveTypes: diveTypes,
+      builder: (resolve, isVisible) => CompactDiveListTile(
         diveId: 'd1',
         diveNumber: 7,
         dateTime: DateTime(2026, 3, 15),
@@ -78,6 +90,7 @@ void main() {
         summary: summaryWith(diveTypeIds),
         onTap: () {},
         diveTypeShortLabelResolver: resolve,
+        diveTypeListVisibilityPredicate: isVisible,
       ),
     );
 
@@ -117,12 +130,41 @@ void main() {
       final typeBadgeSize = tester.getSize(find.byType(DiveTypeBadge));
       final modeBadgeSize = tester.getSize(find.byType(DiveModeBadge));
       expect(typeBadgeSize.height, modeBadgeSize.height);
+    });
+
+    testWidgets('hides a type whose showInListView is false, keeps the rest', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        tile(
+          ['wreck', 'night'],
+          diveTypes: [
+            DiveTypeEntity(
+              id: 'wreck',
+              name: 'Wreck',
+              isBuiltIn: true,
+              createdAt: DateTime(2026),
+              updatedAt: DateTime(2026),
+              showInListView: false,
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DiveTypeBadge), findsNWidgets(1));
+      expect(find.text('Night'), findsOneWidget);
+      expect(find.text('Wreck'), findsNothing);
     });
   });
 
   group('DiveListTile detailed-view type badges', () {
-    Widget tile(List<String> diveTypeIds) => harness(
-      builder: (resolve) => DiveListTile(
+    Widget tile(
+      List<String> diveTypeIds, {
+      List<DiveTypeEntity> diveTypes = const [],
+    }) => harness(
+      diveTypes: diveTypes,
+      builder: (resolve, isVisible) => DiveListTile(
         diveId: 'd1',
         diveNumber: 7,
         dateTime: DateTime(2026, 3, 15),
@@ -132,6 +174,7 @@ void main() {
         summary: summaryWith(diveTypeIds),
         onTap: () {},
         diveTypeShortLabelResolver: resolve,
+        diveTypeListVisibilityPredicate: isVisible,
       ),
     );
 
@@ -171,6 +214,31 @@ void main() {
       final typeBadgeSize = tester.getSize(find.byType(DiveTypeBadge));
       final modeBadgeSize = tester.getSize(find.byType(DiveModeBadge));
       expect(typeBadgeSize.height, modeBadgeSize.height);
+    });
+
+    testWidgets('hides a type whose showInListView is false, keeps the rest', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        tile(
+          ['wreck', 'night'],
+          diveTypes: [
+            DiveTypeEntity(
+              id: 'wreck',
+              name: 'Wreck',
+              isBuiltIn: true,
+              createdAt: DateTime(2026),
+              updatedAt: DateTime(2026),
+              showInListView: false,
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DiveTypeBadge), findsNWidgets(1));
+      expect(find.text('Night'), findsOneWidget);
+      expect(find.text('Wreck'), findsNothing);
     });
 
     testWidgets('does not overflow with several types and a long tag name', (
@@ -183,7 +251,7 @@ void main() {
       // overflow (issue #1269 follow-up).
       await tester.pumpWidget(
         harness(
-          builder: (resolve) => Align(
+          builder: (resolve, isVisible) => Align(
             alignment: Alignment.topLeft,
             // Matches the narrow list panel in the real master-detail
             // layout where this overflow was observed -- the default test

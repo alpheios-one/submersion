@@ -1231,6 +1231,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           in ref.watch(diveTypesProvider).value ?? const <DiveTypeEntity>[])
         t.id: t,
     };
+    // A type absent from diveTypesById (not yet loaded, or deleted out from
+    // under a still-referencing dive) stays shown -- unknown is not the same
+    // as explicitly hidden.
+    final visibleHeaderTypeIds = dive.diveTypeIds
+        .where((id) => diveTypesById[id]?.showInDetailHeader ?? true)
+        .toList();
 
     final content = Padding(
       padding: const EdgeInsets.all(16),
@@ -1370,7 +1376,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                           DiveModeBadge(mode: dive.diveMode),
                         ],
                       ),
-                      if (dive.diveTypeIds.isNotEmpty) ...[
+                      if (visibleHeaderTypeIds.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         // Capped rather than left unbounded: Row hands a
                         // non-flex child unbounded width, which would let a
@@ -1382,7 +1388,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                           constraints: BoxConstraints(maxWidth: badgeMaxWidth),
                           child: DiveTypeBadgeRow(
                             labels: [
-                              for (final typeId in dive.diveTypeIds)
+                              for (final typeId in visibleHeaderTypeIds)
                                 diveTypeShortLabel(
                                   context.l10n,
                                   typeId,

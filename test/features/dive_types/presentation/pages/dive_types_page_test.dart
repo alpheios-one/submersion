@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge.dart';
+import 'package:submersion/features/dive_types/data/repositories/dive_type_repository.dart';
 import 'package:submersion/features/dive_types/presentation/pages/dive_types_page.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -119,6 +120,133 @@ void main() {
         find.descendant(of: tile, matching: find.byType(DiveTypeBadge)),
         findsNothing,
       );
+    });
+  });
+
+  group('edit dialog', () {
+    Future<void> openEditDialogFor(WidgetTester tester, String name) async {
+      await tester.tap(find.text(name));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('tapping a built-in type opens the edit dialog', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_buildPage(diverIdNotifier, const Locale('en')));
+      await tester.pumpAndSettle();
+
+      await openEditDialogFor(tester, 'Wreck');
+
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.byType(Checkbox), findsNWidgets(2));
+      for (final element in tester.widgetList<Checkbox>(
+        find.byType(Checkbox),
+      )) {
+        expect(element.value, isTrue);
+      }
+      // The name field exists but is disabled for a built-in type.
+      final nameField = tester.widget<TextFormField>(
+        find.byType(TextFormField).first,
+      );
+      expect(nameField.enabled, isFalse);
+      // No short-name field for built-ins -- it's never used for them.
+      expect(find.byType(TextFormField), findsOneWidget);
+    });
+
+    testWidgets(
+      'unchecking "Header" and saving persists and survives a rebuild',
+      (tester) async {
+        await tester.pumpWidget(
+          _buildPage(diverIdNotifier, const Locale('en')),
+        );
+        await tester.pumpAndSettle();
+
+        await openEditDialogFor(tester, 'Wreck');
+        await tester.tap(find.byType(Checkbox).first);
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+
+        final updated = await DiveTypeRepository().getDiveTypeById('wreck');
+        expect(updated?.showInDetailHeader, isFalse);
+        expect(updated?.showInListView, isTrue);
+
+        // Rebuilding the page (simulating navigating away and back) must not
+        // silently revert the toggle.
+        await tester.pumpWidget(
+          _buildPage(diverIdNotifier, const Locale('en')),
+        );
+        await tester.pumpAndSettle();
+        await openEditDialogFor(tester, 'Wreck');
+        final reloadedCheckbox = tester
+            .widgetList<Checkbox>(find.byType(Checkbox))
+            .first;
+        expect(reloadedCheckbox.value, isFalse);
+      },
+    );
+
+    testWidgets('unchecking "List" and saving leaves "Header" untouched', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_buildPage(diverIdNotifier, const Locale('en')));
+      await tester.pumpAndSettle();
+
+      await openEditDialogFor(tester, 'Wreck');
+      await tester.tap(find.byType(Checkbox).last);
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      final updated = await DiveTypeRepository().getDiveTypeById('wreck');
+      expect(updated?.showInListView, isFalse);
+      expect(updated?.showInDetailHeader, isTrue);
+    });
+
+    testWidgets('cancelling the dialog persists nothing', (tester) async {
+      await tester.pumpWidget(_buildPage(diverIdNotifier, const Locale('en')));
+      await tester.pumpAndSettle();
+
+      await openEditDialogFor(tester, 'Wreck');
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      final updated = await DiveTypeRepository().getDiveTypeById('wreck');
+      expect(updated?.showInDetailHeader, isTrue);
+    });
+
+    testWidgets('editing a custom type\'s name and short name persists', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_buildPage(diverIdNotifier, const Locale('en')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField).at(0), 'Cenote');
+      await tester.tap(find.widgetWithText(FilledButton, 'Add'));
+      await tester.pumpAndSettle();
+
+      await openEditDialogFor(tester, 'Cenote');
+      // The name field is enabled for a custom type, and a short-name field
+      // is offered too (unlike the built-in dialog above).
+      expect(find.byType(TextFormField), findsNWidgets(2));
+      final nameField = tester.widget<TextFormField>(
+        find.byType(TextFormField).at(0),
+      );
+      expect(nameField.enabled, isTrue);
+
+      await tester.enterText(find.byType(TextFormField).at(0), 'Cave System');
+      await tester.enterText(find.byType(TextFormField).at(1), 'Cave');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cave System'), findsOneWidget);
+      expect(find.text('Cenote'), findsNothing);
+
+      final dive = await DiveTypeRepository().getAllDiveTypes(
+        diverId: 'diver-1',
+      );
+      final saved = dive.firstWhere((t) => t.name == 'Cave System');
+      expect(saved.shortName, 'Cave');
     });
   });
 }

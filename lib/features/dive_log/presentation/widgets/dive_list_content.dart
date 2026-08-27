@@ -1369,6 +1369,8 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       ref,
       context.l10n,
     );
+    final diveTypeListVisibilityPredicate =
+        watchDiveTypeListVisibilityPredicate(ref);
 
     // Check if detailed mode needs full Dive objects for non-summary fields
     final detailedConfig = ref.watch(detailedCardConfigProvider);
@@ -1423,6 +1425,8 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                   summary: dive,
                   diveTypeLabelResolver: diveTypeLabelResolver,
                   diveTypeShortLabelResolver: diveTypeShortLabelResolver,
+                  diveTypeListVisibilityPredicate:
+                      diveTypeListVisibilityPredicate,
                   fullDive: fullDiveLookup[dive.id],
                   diveNumber: dive.diveNumber ?? index + 1,
                   colorValue: getCardColorValue(dive, colorAttribute),

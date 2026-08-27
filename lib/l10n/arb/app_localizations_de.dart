@@ -9331,6 +9331,30 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveTypes_deleteTooltip => 'Tauchgangstyp löschen';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper =>
+      'Interne Namen können nicht geändert werden';
+
+  @override
+  String get diveTypes_editDialog_saveButton => 'Speichern';
+
+  @override
+  String get diveTypes_editDialog_title => 'Tauchgangstyp bearbeiten';
+
+  @override
+  String get diveTypes_showInHeaderLabel => 'Kopfzeile';
+
+  @override
+  String get diveTypes_showInHeaderTooltip =>
+      'Badge dieses Typs in der Tauchgang-Kopfzeile anzeigen';
+
+  @override
+  String get diveTypes_showInListLabel => 'Liste';
+
+  @override
+  String get diveTypes_showInListTooltip =>
+      'Badge dieses Typs in der Tauchgangsliste anzeigen';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return 'Tauchgangstyp hinzugefügt: $name';
   }
@@ -9353,6 +9377,16 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return 'Fehler beim Löschen des Tauchgangstyps: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return 'Fehler beim Aktualisieren des Tauchgangstyps: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return '\"$name\" aktualisiert';
   }
 
   @override

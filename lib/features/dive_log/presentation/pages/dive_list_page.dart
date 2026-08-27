@@ -744,6 +744,10 @@ class DiveListTile extends ConsumerWidget {
   /// When omitted, badges fall back to the slug's capitalization.
   final DiveTypeLabelResolver? diveTypeShortLabelResolver;
 
+  /// Whether a dive-type slug's badge should appear in the badge row
+  /// (issue #1269 follow-up). When omitted, every type is shown.
+  final DiveTypeListVisibilityPredicate? diveTypeListVisibilityPredicate;
+
   const DiveListTile({
     super.key,
     required this.diveId,
@@ -774,6 +778,7 @@ class DiveListTile extends ConsumerWidget {
     this.fullDive,
     this.diveTypeLabelResolver,
     this.diveTypeShortLabelResolver,
+    this.diveTypeListVisibilityPredicate,
   });
 
   /// Calculate background color based on the active color attribute
@@ -862,7 +867,8 @@ class DiveListTile extends ConsumerWidget {
 
     final diveTypeLabels = [
       for (final id in summary?.diveTypeIds ?? const <String>[])
-        (diveTypeShortLabelResolver ?? Dive.diveTypeDisplayName)(id),
+        if (diveTypeListVisibilityPredicate?.call(id) ?? true)
+          (diveTypeShortLabelResolver ?? Dive.diveTypeDisplayName)(id),
     ];
 
     // Resolve the title and date lines from their slot assignments, keeping

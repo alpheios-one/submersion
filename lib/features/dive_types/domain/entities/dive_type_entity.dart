@@ -17,6 +17,14 @@ class DiveTypeEntity extends Equatable {
   /// means the diver hasn't set one, so callers fall back to [name].
   final String? shortName;
 
+  /// Whether this type's badge appears in the dive detail header's
+  /// type-badge row. Defaults to shown.
+  final bool showInDetailHeader;
+
+  /// Whether this type's badge appears in the dive list card's type-badge
+  /// row. Independent of [showInDetailHeader]. Defaults to shown.
+  final bool showInListView;
+
   const DiveTypeEntity({
     required this.id,
     this.diverId,
@@ -26,6 +34,8 @@ class DiveTypeEntity extends Equatable {
     required this.createdAt,
     required this.updatedAt,
     this.shortName,
+    this.showInDetailHeader = true,
+    this.showInListView = true,
   });
 
   /// Create a new custom dive type
@@ -35,6 +45,8 @@ class DiveTypeEntity extends Equatable {
     String? diverId,
     int sortOrder = 0,
     String? shortName,
+    bool showInDetailHeader = true,
+    bool showInListView = true,
   }) {
     final now = DateTime.now();
     return DiveTypeEntity(
@@ -46,6 +58,8 @@ class DiveTypeEntity extends Equatable {
       createdAt: now,
       updatedAt: now,
       shortName: shortName,
+      showInDetailHeader: showInDetailHeader,
+      showInListView: showInListView,
     );
   }
 
@@ -67,6 +81,8 @@ class DiveTypeEntity extends Equatable {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? shortName,
+    bool? showInDetailHeader,
+    bool? showInListView,
   }) {
     return DiveTypeEntity(
       id: id ?? this.id,
@@ -77,6 +93,8 @@ class DiveTypeEntity extends Equatable {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       shortName: shortName ?? this.shortName,
+      showInDetailHeader: showInDetailHeader ?? this.showInDetailHeader,
+      showInListView: showInListView ?? this.showInListView,
     );
   }
 
@@ -90,5 +108,7 @@ class DiveTypeEntity extends Equatable {
     createdAt,
     updatedAt,
     shortName,
+    showInDetailHeader,
+    showInListView,
   ];
 }

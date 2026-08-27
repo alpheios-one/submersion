@@ -15626,6 +15626,48 @@ abstract class AppLocalizations {
   /// **'Delete dive type'**
   String get diveTypes_deleteTooltip;
 
+  /// No description provided for @diveTypes_editDialog_builtInNameHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in names can\'t be changed'**
+  String get diveTypes_editDialog_builtInNameHelper;
+
+  /// No description provided for @diveTypes_editDialog_saveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get diveTypes_editDialog_saveButton;
+
+  /// No description provided for @diveTypes_editDialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Dive Type'**
+  String get diveTypes_editDialog_title;
+
+  /// No description provided for @diveTypes_showInHeaderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Header'**
+  String get diveTypes_showInHeaderLabel;
+
+  /// No description provided for @diveTypes_showInHeaderTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Show this type\'s badge in the dive detail header'**
+  String get diveTypes_showInHeaderTooltip;
+
+  /// No description provided for @diveTypes_showInListLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get diveTypes_showInListLabel;
+
+  /// No description provided for @diveTypes_showInListTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Show this type\'s badge in the dive list'**
+  String get diveTypes_showInListTooltip;
+
   /// No description provided for @diveTypes_snackbar_added.
   ///
   /// In en, this message translates to:
@@ -15655,6 +15697,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error deleting dive type: {error}'**
   String diveTypes_snackbar_errorDeleting(Object error);
+
+  /// No description provided for @diveTypes_snackbar_errorUpdating.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating dive type: {error}'**
+  String diveTypes_snackbar_errorUpdating(Object error);
+
+  /// No description provided for @diveTypes_snackbar_updated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated \"{name}\"'**
+  String diveTypes_snackbar_updated(Object name);
 
   /// No description provided for @divers_detail_activeDiver.
   ///

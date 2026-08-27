@@ -209,6 +209,25 @@ class DiveTypeListNotifier
     _ref.invalidate(customDiveTypesProvider);
   }
 
+  /// Set which badge rows a type's badge appears in. Allowed on built-in
+  /// types too, unlike [updateDiveType] (see
+  /// [DiveTypeRepository.setDiveTypeVisibility]).
+  Future<void> setDiveTypeVisibility(
+    String id, {
+    required bool showInDetailHeader,
+    required bool showInListView,
+  }) async {
+    await _repository.setDiveTypeVisibility(
+      id,
+      showInDetailHeader: showInDetailHeader,
+      showInListView: showInListView,
+    );
+    await _loadDiveTypes();
+    _ref.invalidate(diveTypesProvider);
+    _ref.invalidate(diveTypeStatisticsProvider);
+    _ref.invalidate(customDiveTypesProvider);
+  }
+
   /// Delete a custom dive type (built-in types cannot be deleted)
   Future<void> deleteDiveType(String id) async {
     await _repository.deleteDiveType(id);

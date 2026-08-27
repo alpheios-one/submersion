@@ -65,6 +65,10 @@ class CompactDiveListTile extends ConsumerWidget {
   /// When omitted, badges fall back to the slug's capitalization.
   final DiveTypeLabelResolver? diveTypeShortLabelResolver;
 
+  /// Whether a dive-type slug's badge should appear in the badge row
+  /// (issue #1269 follow-up). When omitted, every type is shown.
+  final DiveTypeListVisibilityPredicate? diveTypeListVisibilityPredicate;
+
   const CompactDiveListTile({
     super.key,
     required this.diveId,
@@ -90,6 +94,7 @@ class CompactDiveListTile extends ConsumerWidget {
     this.stat2Field = DiveField.bottomTime,
     this.diveTypeLabelResolver,
     this.diveTypeShortLabelResolver,
+    this.diveTypeListVisibilityPredicate,
   });
 
   Color? _getAttributeBackgroundColor() {
@@ -255,7 +260,8 @@ class CompactDiveListTile extends ConsumerWidget {
 
     final diveTypeLabels = [
       for (final id in summary?.diveTypeIds ?? const <String>[])
-        (diveTypeShortLabelResolver ?? Dive.diveTypeDisplayName)(id),
+        if (diveTypeListVisibilityPredicate?.call(id) ?? true)
+          (diveTypeShortLabelResolver ?? Dive.diveTypeDisplayName)(id),
     ];
 
     // The highlight is the fill above, not an edge stripe -- the key marks the
