@@ -6,6 +6,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_provide
 import 'package:submersion/features/dive_sites/data/services/site_matching_service.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 class SiteMatchReviewState {
@@ -93,6 +94,7 @@ class SiteMatchReviewNotifier extends StateNotifier<SiteMatchReviewState> {
         siteRepository: _ref.read(siteRepositoryProvider),
         apiService: _ref.read(diveSiteApiServiceProvider),
         diveRepository: diveRepo,
+        mediaRepository: _ref.read(mediaRepositoryProvider),
         diverId: diverId,
         thresholds: sensitivity.thresholds,
       );

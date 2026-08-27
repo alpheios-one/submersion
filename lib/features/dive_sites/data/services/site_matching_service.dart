@@ -1,4 +1,5 @@
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -9,6 +10,8 @@ import 'package:submersion/features/dive_sites/domain/matching/match_candidate.d
 import 'package:submersion/features/dive_sites/domain/matching/match_thresholds.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_match_outcome.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_matcher.dart';
+import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media/domain/services/photo_gps_point_selector.dart';
 
 enum ProposalStatus { clear, review, none }
 
@@ -46,6 +49,11 @@ class MatchCandidateView {
   });
 }
 
+/// Where a proposal's point came from. Dive-computer fixes are measured
+/// entry/exit positions; photo fixes are the surface position of the photo
+/// nearest the dive's entry time, so the review page labels them.
+enum PointSource { diveComputer, photo }
+
 /// One dive's matching proposal (no write state — selection lives in the
 /// notifier).
 class MatchProposal {
@@ -53,12 +61,16 @@ class MatchProposal {
   final ProposalStatus status;
   final List<MatchCandidateView> candidates; // distance-sorted
   final String? recommendedCandidateId; // matcher's pick (clear only)
+  final GeoPoint? point;
+  final PointSource pointSource;
 
   const MatchProposal({
     required this.dive,
     required this.status,
     this.candidates = const [],
     this.recommendedCandidateId,
+    this.point,
+    this.pointSource = PointSource.diveComputer,
   });
 }
 
@@ -80,6 +92,8 @@ class ApplyResult {
 /// pass-through that doesn't require a real database.
 typedef TransactionRunner = Future<void> Function(Future<void> Function() body);
 
+typedef _ResolvedPoint = ({GeoPoint point, PointSource source});
+
 /// Resolved candidate objects retained per dive so apply can act on a chosen id.
 class _CandidateRef {
   final DiveSite? existing; // non-null when existing
@@ -95,12 +109,14 @@ class SiteMatchingService {
     required SiteRepository siteRepository,
     required DiveSiteApiService apiService,
     required DiveRepository diveRepository,
+    required MediaRepository mediaRepository,
     required this.diverId,
     required this.thresholds,
     TransactionRunner? runInTransaction,
   }) : _siteRepository = siteRepository,
        _apiService = apiService,
        _diveRepository = diveRepository,
+       _mediaRepository = mediaRepository,
        _runInTransaction =
            runInTransaction ??
            ((body) => DatabaseService.instance.database.transaction(body));
@@ -108,9 +124,11 @@ class SiteMatchingService {
   final SiteRepository _siteRepository;
   final DiveSiteApiService _apiService;
   final DiveRepository _diveRepository;
+  final MediaRepository _mediaRepository;
   final String? diverId;
   final MatchThresholds thresholds;
   final TransactionRunner _runInTransaction;
+  final _log = LoggerService.forClass(SiteMatchingService);
 
   static const double _coincidenceMeters = 100;
 
@@ -120,7 +138,18 @@ class SiteMatchingService {
   // Reset at the start of each applyConfirmed pass (batch dedup).
   final Map<String, String> _createdByExternalId = {};
 
-  GeoPoint? _pointFor(Dive dive) => dive.entryLocation ?? dive.exitLocation;
+  /// Dive-computer fixes win; the photo fix is the fallback.
+  _ResolvedPoint? _pointFor(Dive dive, Map<String, PhotoGpsPoint> photoFixes) {
+    final measured = dive.entryLocation ?? dive.exitLocation;
+    if (measured != null) {
+      return (point: measured, source: PointSource.diveComputer);
+    }
+    final photo = photoFixes[dive.id];
+    if (photo != null) {
+      return (point: photo.location, source: PointSource.photo);
+    }
+    return null;
+  }
 
   /// Computes proposals for [dives]. Performs NO database writes.
   Future<List<MatchProposal>> computeProposals(List<Dive> dives) async {
@@ -128,10 +157,21 @@ class SiteMatchingService {
       diverId: diverId,
     )).where((s) => s.location != null).toList();
 
+    Map<String, PhotoGpsPoint> photoFixes = const {};
+    try {
+      photoFixes = await _mediaRepository.getBestPhotoGpsForDives([
+        for (final d in dives) d.id,
+      ]);
+    } catch (e, stackTrace) {
+      // Dive-computer points still match; only photo-only dives drop out.
+      _log.error('Photo GPS lookup failed', error: e, stackTrace: stackTrace);
+    }
+
     final proposals = <MatchProposal>[];
     for (final dive in dives) {
-      final point = _pointFor(dive);
-      if (point == null) continue;
+      final resolved = _pointFor(dive, photoFixes);
+      if (resolved == null) continue;
+      final point = resolved.point;
 
       final bundled = await _apiService.searchNearby(
         latitude: point.latitude,
@@ -174,17 +214,26 @@ class SiteMatchingService {
       final outcome = matchRanked(ranked, thresholds);
 
       proposals.add(switch (outcome) {
-        NoMatch() => MatchProposal(dive: dive, status: ProposalStatus.none),
+        NoMatch() => MatchProposal(
+          dive: dive,
+          status: ProposalStatus.none,
+          point: point,
+          pointSource: resolved.source,
+        ),
         Suggested() => MatchProposal(
           dive: dive,
           status: ProposalStatus.review,
           candidates: views,
+          point: point,
+          pointSource: resolved.source,
         ),
         AutoMatch(:final siteId) => MatchProposal(
           dive: dive,
           status: ProposalStatus.clear,
           candidates: views,
           recommendedCandidateId: siteId,
+          point: point,
+          pointSource: resolved.source,
         ),
       });
     }

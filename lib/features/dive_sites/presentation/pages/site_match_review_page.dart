@@ -176,7 +176,7 @@ class _MapPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = state.focusedProposal;
-    final point = p?.dive.entryLocation ?? p?.dive.exitLocation;
+    final point = p?.point;
     if (p == null || point == null) {
       return const SizedBox(height: 200);
     }

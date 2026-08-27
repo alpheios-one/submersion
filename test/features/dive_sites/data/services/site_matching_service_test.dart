@@ -9,6 +9,7 @@ import 'package:submersion/features/dive_sites/data/services/dive_site_api_servi
 import 'package:submersion/features/dive_sites/data/services/site_matching_service.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
+import 'package:submersion/features/media/data/repositories/media_repository.dart';
 
 import 'site_matching_service_test.mocks.dart';
 
@@ -22,17 +23,27 @@ Dive _diveAt(String id, GeoPoint where) => Dive(
   entryLocation: where,
 );
 
-@GenerateMocks([SiteRepository, DiveSiteApiService, DiveRepository])
+Dive _diveWithoutGps(String id) =>
+    Dive(id: id, diveNumber: 1, dateTime: DateTime(2026, 1, 1), maxDepth: 18);
+
+@GenerateMocks([
+  SiteRepository,
+  DiveSiteApiService,
+  DiveRepository,
+  MediaRepository,
+])
 void main() {
   late MockSiteRepository sites;
   late MockDiveSiteApiService api;
   late MockDiveRepository dives;
+  late MockMediaRepository media;
 
   // Pass-through transaction runner so apply runs without a real database.
   SiteMatchingService service() => SiteMatchingService(
     siteRepository: sites,
     apiService: api,
     diveRepository: dives,
+    mediaRepository: media,
     diverId: 'diver-1',
     thresholds: SiteMatchSensitivity.balanced.thresholds,
     runInTransaction: (body) => body(),
@@ -42,6 +53,8 @@ void main() {
     sites = MockSiteRepository();
     api = MockDiveSiteApiService();
     dives = MockDiveRepository();
+    media = MockMediaRepository();
+    when(media.getBestPhotoGpsForDives(any)).thenAnswer((_) async => const {});
     when(
       api.searchNearby(
         latitude: anyNamed('latitude'),
@@ -221,6 +234,72 @@ void main() {
       final result = await s.applyConfirmed(const []);
       expect(result.divesLinked, 0);
       verifyNever(dives.setSite(any, any));
+    });
+  });
+
+  group('photo point source', () {
+    test('falls back to the photo fix when the dive has no GPS', () async {
+      const existing = DiveSite(
+        id: 's1',
+        name: 'Blue Hole',
+        location: GeoPoint(0, 0),
+      );
+      when(
+        sites.getAllSites(diverId: anyNamed('diverId')),
+      ).thenAnswer((_) async => const [existing]);
+      when(media.getBestPhotoGpsForDives(['d1'])).thenAnswer(
+        (_) async => {
+          'd1': (
+            mediaId: 'm1',
+            location: _eastMeters(33),
+            takenAt: DateTime.utc(2026, 1, 1),
+          ),
+        },
+      );
+
+      final proposals = await service().computeProposals([
+        _diveWithoutGps('d1'),
+      ]);
+
+      expect(proposals.single.status, ProposalStatus.clear);
+      expect(proposals.single.recommendedCandidateId, 's1');
+      expect(proposals.single.pointSource, PointSource.photo);
+      expect(proposals.single.point, _eastMeters(33));
+    });
+
+    test('dive-computer GPS wins over a photo fix', () async {
+      when(media.getBestPhotoGpsForDives(['d1'])).thenAnswer(
+        (_) async => {
+          'd1': (
+            mediaId: 'm1',
+            location: const GeoPoint(10, 10),
+            takenAt: DateTime.utc(2026, 1, 1),
+          ),
+        },
+      );
+      final proposals = await service().computeProposals([
+        _diveAt('d1', _eastMeters(33)),
+      ]);
+      expect(proposals.single.pointSource, PointSource.diveComputer);
+      expect(proposals.single.point, _eastMeters(33));
+    });
+
+    test('a dive with neither point is skipped', () async {
+      final proposals = await service().computeProposals([
+        _diveWithoutGps('d1'),
+      ]);
+      expect(proposals, isEmpty);
+    });
+
+    test('a failing photo query degrades to no photo point', () async {
+      when(
+        media.getBestPhotoGpsForDives(any),
+      ).thenAnswer((_) async => throw StateError('db'));
+      final proposals = await service().computeProposals([
+        _diveAt('d1', _eastMeters(33)),
+        _diveWithoutGps('d2'),
+      ]);
+      expect(proposals.map((p) => p.dive.id), ['d1']);
     });
   });
 }
