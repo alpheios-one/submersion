@@ -12493,6 +12493,83 @@ class AppLocalizationsHu extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'Fajok keresese...';
 
   @override
+  String get marineLife_lookup_button => 'Keresés online';
+
+  @override
+  String get marineLife_lookup_title => 'Faj keresése';
+
+  @override
+  String get marineLife_lookup_searchHint => 'Köznapi vagy tudományos név';
+
+  @override
+  String get marineLife_lookup_search => 'Keresés';
+
+  @override
+  String get marineLife_lookup_createWithout => 'Létrehozás keresés nélkül';
+
+  @override
+  String get marineLife_lookup_attribution =>
+      'Fajadatok és fotók az iNaturalisttól';
+
+  @override
+  String get marineLife_lookup_idle =>
+      'Írj be egy nevet, és koppints a Keresés gombra.';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return 'Nincs találat erre: \"$query\"';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline =>
+      'Úgy tűnik, nincs internetkapcsolat.';
+
+  @override
+  String get marineLife_lookup_errorTimeout =>
+      'A keresés túllépte az időkorlátot.';
+
+  @override
+  String get marineLife_lookup_errorServer =>
+      'Az iNaturalist hibát adott vissza. Próbáld újra később.';
+
+  @override
+  String get marineLife_lookup_errorMalformed =>
+      'Váratlan válasz az iNaturalisttól.';
+
+  @override
+  String get marineLife_lookup_retry => 'Újra';
+
+  @override
+  String get marineLife_lookup_resolving => 'Részletek betöltése...';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count megfigyelés',
+      one: '1 megfigyelés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank: válassz egy fajt';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog =>
+      'Javaslat a katalógusba';
+
+  @override
+  String get marineLife_suggest_couldNotOpen =>
+      'Nem sikerült megnyitni a böngészőt';
+
+  @override
+  String get marineLife_suggest_copyLink => 'Link másolása';
+
+  @override
   String get marineLife_speciesPage_title => 'Fajok';
 
   @override
@@ -25742,6 +25819,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'Hozzáadás a várható fajokhoz';
+
+  @override
+  String get reef_species_addFromLookup => 'Keresés és hozzáadás a fajaidhoz';
 
   @override
   String reef_species_showAll(int count) {

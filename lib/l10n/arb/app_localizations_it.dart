@@ -12542,6 +12542,79 @@ class AppLocalizationsIt extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'Cerca specie...';
 
   @override
+  String get marineLife_lookup_button => 'Cerca online';
+
+  @override
+  String get marineLife_lookup_title => 'Cerca una specie';
+
+  @override
+  String get marineLife_lookup_searchHint => 'Nome comune o scientifico';
+
+  @override
+  String get marineLife_lookup_search => 'Cerca';
+
+  @override
+  String get marineLife_lookup_createWithout => 'Crea senza ricerca';
+
+  @override
+  String get marineLife_lookup_attribution =>
+      'Dati e foto delle specie da iNaturalist';
+
+  @override
+  String get marineLife_lookup_idle => 'Digita un nome e tocca Cerca.';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return 'Nessuna specie trovata per \"$query\"';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline => 'Sembra che tu sia offline.';
+
+  @override
+  String get marineLife_lookup_errorTimeout => 'La ricerca è scaduta.';
+
+  @override
+  String get marineLife_lookup_errorServer =>
+      'iNaturalist ha restituito un errore. Riprova più tardi.';
+
+  @override
+  String get marineLife_lookup_errorMalformed =>
+      'Risposta inattesa da iNaturalist.';
+
+  @override
+  String get marineLife_lookup_retry => 'Riprova';
+
+  @override
+  String get marineLife_lookup_resolving => 'Caricamento dei dettagli...';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count osservazioni',
+      one: '1 osservazione',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank: scegli una specie';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog =>
+      'Suggerisci per il catalogo';
+
+  @override
+  String get marineLife_suggest_couldNotOpen => 'Impossibile aprire il browser';
+
+  @override
+  String get marineLife_suggest_copyLink => 'Copia link';
+
+  @override
   String get marineLife_speciesPage_title => 'Specie';
 
   @override
@@ -25835,6 +25908,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'Aggiungi alle specie attese';
+
+  @override
+  String get reef_species_addFromLookup => 'Cerca e aggiungi alle tue specie';
 
   @override
   String reef_species_showAll(int count) {

@@ -21203,6 +21203,120 @@ abstract class AppLocalizations {
   /// **'Search species...'**
   String get marineLife_speciesManage_searchHint;
 
+  /// No description provided for @marineLife_lookup_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up online'**
+  String get marineLife_lookup_button;
+
+  /// No description provided for @marineLife_lookup_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up a species'**
+  String get marineLife_lookup_title;
+
+  /// No description provided for @marineLife_lookup_searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Common or scientific name'**
+  String get marineLife_lookup_searchHint;
+
+  /// No description provided for @marineLife_lookup_search.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up'**
+  String get marineLife_lookup_search;
+
+  /// No description provided for @marineLife_lookup_createWithout.
+  ///
+  /// In en, this message translates to:
+  /// **'Create without lookup'**
+  String get marineLife_lookup_createWithout;
+
+  /// No description provided for @marineLife_lookup_attribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Species data and photos from iNaturalist'**
+  String get marineLife_lookup_attribution;
+
+  /// No description provided for @marineLife_lookup_idle.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a name and tap Look up.'**
+  String get marineLife_lookup_idle;
+
+  /// No description provided for @marineLife_lookup_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No species found for \"{query}\"'**
+  String marineLife_lookup_empty(String query);
+
+  /// No description provided for @marineLife_lookup_errorOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'You appear to be offline.'**
+  String get marineLife_lookup_errorOffline;
+
+  /// No description provided for @marineLife_lookup_errorTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The lookup timed out.'**
+  String get marineLife_lookup_errorTimeout;
+
+  /// No description provided for @marineLife_lookup_errorServer.
+  ///
+  /// In en, this message translates to:
+  /// **'iNaturalist returned an error. Try again later.'**
+  String get marineLife_lookup_errorServer;
+
+  /// No description provided for @marineLife_lookup_errorMalformed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected response from iNaturalist.'**
+  String get marineLife_lookup_errorMalformed;
+
+  /// No description provided for @marineLife_lookup_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get marineLife_lookup_retry;
+
+  /// No description provided for @marineLife_lookup_resolving.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading details...'**
+  String get marineLife_lookup_resolving;
+
+  /// No description provided for @marineLife_lookup_observations.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 observation} other{{count} observations}}'**
+  String marineLife_lookup_observations(int count);
+
+  /// No description provided for @marineLife_lookup_unresolvableRank.
+  ///
+  /// In en, this message translates to:
+  /// **'{rank}: choose a species'**
+  String marineLife_lookup_unresolvableRank(String rank);
+
+  /// No description provided for @marineLife_speciesDetail_suggestForCatalog.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggest for the catalog'**
+  String get marineLife_speciesDetail_suggestForCatalog;
+
+  /// No description provided for @marineLife_suggest_couldNotOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the browser'**
+  String get marineLife_suggest_couldNotOpen;
+
+  /// No description provided for @marineLife_suggest_copyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get marineLife_suggest_copyLink;
+
   /// No description provided for @marineLife_speciesPage_title.
   ///
   /// In en, this message translates to:
@@ -42707,6 +42821,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add to expected species'**
   String get reef_species_addToExpected;
+
+  /// No description provided for @reef_species_addFromLookup.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up and add to your species'**
+  String get reef_species_addFromLookup;
 
   /// Expands the capped nearby-species chip list to its full length
   ///
