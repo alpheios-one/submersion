@@ -429,6 +429,34 @@ class DiveRepository {
     }
   }
 
+  /// Records (or clears, when [dismissed] is false) the diver's dismissal of
+  /// the site suggestion for this dive. Single-column update; the dive row
+  /// carries its own HLC, so marking it pending is what syncs the flag.
+  Future<void> setSiteSuggestionDismissed(String diveId, bool dismissed) async {
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
+        DivesCompanion(
+          siteSuggestionDismissedAt: Value(dismissed ? now : null),
+          updatedAt: Value(now),
+        ),
+      );
+      await _syncRepository.markRecordPending(
+        entityType: 'dives',
+        recordId: diveId,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to set site suggestion dismissal on dive: $diveId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Dives lacking an entry GPS position, as (id, start, end) timestamps for
   /// GPS-track matching. Times are wall-clock-as-UTC epoch milliseconds.
   Future<List<({String id, int startMs, int? endMs})>> getDivesMissingEntryGps({

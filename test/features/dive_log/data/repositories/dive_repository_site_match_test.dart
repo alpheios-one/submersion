@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 
 import '../../../../helpers/test_database.dart';
@@ -108,4 +110,62 @@ void main() {
       expect(result, isEmpty);
     },
   );
+
+  test('setSiteSuggestionDismissed writes and clears the timestamp', () async {
+    await insertDive('d1', lat: 1, lng: 2);
+
+    await repo.setSiteSuggestionDismissed('d1', true);
+    var row = await db
+        .customSelect(
+          "SELECT site_suggestion_dismissed_at AS v FROM dives WHERE id = 'd1'",
+        )
+        .getSingle();
+    expect(row.readNullable<int>('v'), isNotNull);
+
+    await repo.setSiteSuggestionDismissed('d1', false);
+    row = await db
+        .customSelect(
+          "SELECT site_suggestion_dismissed_at AS v FROM dives WHERE id = 'd1'",
+        )
+        .getSingle();
+    expect(row.readNullable<int>('v'), isNull);
+  });
+
+  test('a dismissal advances the dive HLC so it exports', () async {
+    await insertDive('d1', lat: 1, lng: 2);
+    final sync = SyncRepository();
+    await sync.markRecordPending(
+      entityType: 'dives',
+      recordId: 'd1',
+      localUpdatedAt: DateTime.now().millisecondsSinceEpoch,
+    );
+    final watermark =
+        (await db
+                .customSelect("SELECT hlc FROM dives WHERE id = 'd1'")
+                .getSingle())
+            .read<String>('hlc');
+    final serializer = SyncDataSerializer();
+    final deviceId = await sync.getDeviceId();
+
+    final before = await serializer.exportChangeset(
+      deviceId: deviceId,
+      hlcWatermark: watermark,
+      deletions: const [],
+    );
+    expect(before.data.dives.map((d) => d['id']), isNot(contains('d1')));
+
+    await repo.setSiteSuggestionDismissed('d1', true);
+
+    final after = await serializer.exportChangeset(
+      deviceId: deviceId,
+      hlcWatermark: watermark,
+      deletions: const [],
+    );
+    final exported = after.data.dives.firstWhere((d) => d['id'] == 'd1');
+    expect(
+      exported['siteSuggestionDismissedAt'],
+      isNotNull,
+      reason: 'the dismissal must ride the dive row to other devices',
+    );
+  });
 }
