@@ -85,13 +85,11 @@ class SiteSuggestionCard extends ConsumerWidget {
               // coincidence guard can link an existing site nearby instead.
               // Re-read the dive so the form gets the real, fully hydrated
               // site rather than a partial entity built from the candidate.
-              final linked = await ref
-                  .read(diveRepositoryProvider)
-                  .getDiveById(diveId);
+              final linked = await actions.linkedSite();
               return (
-                linked?.site,
+                linked,
                 l10n.siteSuggestion_assignedSnack(
-                  linked?.site?.name ?? recommended.name,
+                  linked?.name ?? recommended.name,
                 ),
               );
             }),
@@ -140,13 +138,20 @@ class SiteSuggestionCard extends ConsumerWidget {
     WidgetRef ref,
     Future<(DiveSite?, String)?> Function(AppLocalizations l10n) write,
   ) async {
+    // Captured up front: the messenger is the app's, so it stays usable even
+    // if this card is disposed while the write is in flight.
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
     try {
       final result = await write(l10n);
+      // The write is committed either way. If the diver navigated away while
+      // it ran, `ref` and the host's setState are both dead, and the table
+      // ticks the suggestion providers listen to refresh what matters.
+      if (!context.mounted) return;
       ref.invalidate(siteSuggestionForDiveProvider(diveId));
       ref.invalidate(diveProvider(diveId));
       await (refreshLists ?? () => _defaultRefresh(ref))();
+      if (!context.mounted) return;
       if (result != null) {
         final site = result.$1;
         if (site != null) onSiteChanged?.call(site);
@@ -158,6 +163,9 @@ class SiteSuggestionCard extends ConsumerWidget {
         );
       }
     } catch (_) {
+      // Same rule as the success path: a diver who has left the page gets no
+      // snackbar about it.
+      if (!context.mounted) return;
       messenger.showSnackBar(
         SnackBar(content: Text(l10n.siteMatchReview_applyError)),
       );

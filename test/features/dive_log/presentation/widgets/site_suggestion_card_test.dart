@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,6 +13,17 @@ import 'package:submersion/features/dive_sites/presentation/providers/site_sugge
 
 import '../../../media/presentation/support/media_widget_harness.dart';
 import '../support/fake_matching_service.dart';
+
+/// Holds the apply open so the test can dispose the card mid-write.
+class _BlockingMatchingService extends FakeMatchingService {
+  final gate = Completer<void>();
+
+  @override
+  Future<ApplyResult> applyConfirmed(List<ConfirmedMatch> confirmed) async {
+    await gate.future;
+    return super.applyConfirmed(confirmed);
+  }
+}
 
 class _StubDiveRepository implements DiveRepository {
   _StubDiveRepository({this.linkedSite});
@@ -182,5 +195,50 @@ void main() {
     expect(service.created.single.name, 'Wall');
     expect(reported?.id, 'created');
     expect(find.textContaining('Created site: Wall'), findsOneWidget);
+  });
+
+  testWidgets('a write that finishes after disposal does not throw', (
+    tester,
+  ) async {
+    // The diver taps Assign and navigates away before the write lands. The
+    // write still commits, but ref and the host's setState are gone by then.
+    final blocking = _BlockingMatchingService();
+    dives = _StubDiveRepository(
+      linkedSite: const DiveSite(id: 's1', name: 'Blue Hole'),
+    );
+    var reportedCount = 0;
+    await tester.pumpWidget(
+      await host(
+        suggestionFor(
+          blocking,
+          recommended: 's1',
+          candidates: const [
+            MatchCandidateView(
+              id: 's1',
+              name: 'Blue Hole',
+              isExisting: true,
+              distanceMeters: 40,
+              location: GeoPoint(0, 0),
+            ),
+          ],
+        ),
+        onSiteChanged: (_) => reportedCount++,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Assign Blue Hole'));
+    await tester.pump();
+
+    // Tear the card down, then let the write complete.
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: SizedBox())),
+    );
+    await tester.pumpAndSettle();
+    blocking.gate.complete();
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(reportedCount, 0, reason: 'no setState into a disposed host');
+    expect(refreshed, 0, reason: 'no ref use after dispose');
   });
 }

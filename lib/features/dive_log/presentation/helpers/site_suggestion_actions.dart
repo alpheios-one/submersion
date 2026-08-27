@@ -42,6 +42,15 @@ class SiteSuggestionActions {
   Future<DiveSite> create(DiveSite site) =>
       suggestion.service.createAndLink(diveId, site);
 
+  /// The site the dive is linked to right now, re-read after a write.
+  ///
+  /// The chosen candidate id is not the answer: a bundled candidate
+  /// materialises a new row and the coincidence guard can link an existing
+  /// site instead. Goes through the repository captured at build time, so it
+  /// is safe to call after an await even if the caller's widget is gone.
+  Future<DiveSite?> linkedSite() async =>
+      (await diveRepository.getDiveById(diveId))?.site;
+
   /// Hides the suggestion for this dive on every device.
   Future<void> dismiss() =>
       diveRepository.setSiteSuggestionDismissed(diveId, true);
