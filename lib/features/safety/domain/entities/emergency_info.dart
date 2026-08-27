@@ -108,8 +108,15 @@ class EmergencyChamber extends Equatable {
   final String? city;
   final String phone;
 
-  /// Dedicated emergency line where the facility publishes one separately from
-  /// its switchboard. Preferred by [callNumber].
+  /// The route a diver in trouble should take, when the facility publishes one
+  /// distinct from [phone]. Preferred by [callNumber].
+  ///
+  /// This is emphatically not "the more specific number". For a hospital unit
+  /// it is very often the main switchboard, because that is what pages the
+  /// on-call hyperbaric physician at 2am, while the unit's own direct line
+  /// rings an empty desk out of hours. Several Australian units publish
+  /// exactly that arrangement. Where a facility publishes a dedicated
+  /// emergency or after-hours line, that goes here instead.
   final String? emergencyPhone;
 
   final double? latitude;
@@ -147,8 +154,9 @@ class EmergencyChamber extends Equatable {
     required this.isBuiltIn,
   });
 
-  /// The number to dial: the dedicated emergency line when published, else the
-  /// switchboard.
+  /// The number to dial. [emergencyPhone] wins when the facility publishes a
+  /// separate emergency route, because reaching a switchboard that pages the
+  /// on-call physician beats reaching a direct line nobody answers.
   String get callNumber => emergencyPhone ?? phone;
 
   factory EmergencyChamber.fromBundledJson(Map<String, dynamic> json) {

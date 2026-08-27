@@ -79,11 +79,9 @@ void main() {
       expect(dialled, ['+61-7-4433-1111']);
     });
 
-    testWidgets('a dedicated emergency line wins over the switchboard', (
+    testWidgets('the published emergency route wins over the other number', (
       tester,
     ) async {
-      // The whole point of storing both: at 2am the switchboard is not the
-      // number a diver needs.
       final dialled = await pumpTile(
         tester,
         chamber: _chamber(emergencyPhone: '+61-7-4433-2080'),
@@ -93,6 +91,30 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(dialled, ['+61-7-4433-2080']);
+    });
+
+    testWidgets('a hospital switchboard is a valid emergency route', (
+      tester,
+    ) async {
+      // This looks backwards and is not. Several hospital units publish their
+      // direct line for enquiries and route emergencies through the
+      // switchboard, which pages the on-call hyperbaric physician; the direct
+      // line rings an empty desk at 2am. `emergencyPhone` means "the route to
+      // take in an emergency", not "the more specific number", so a reviewer
+      // seeing a switchboard here should not swap the fields.
+      final dialled = await pumpTile(
+        tester,
+        chamber: _chamber(
+          phone: '+61-7-4433-2080', // unit's direct line, business hours
+          emergencyPhone:
+              '+61-7-4433-1111', // switchboard, pages the duty doctor
+        ),
+      );
+
+      await tester.tap(find.byType(ListTile));
+      await tester.pumpAndSettle();
+
+      expect(dialled, ['+61-7-4433-1111']);
     });
   });
 

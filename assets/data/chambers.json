@@ -1,6 +1,6 @@
 {
   "datasetVersion": "2026-08",
-  "generatedAt": "2026-08-27T02:10:11.069029+00:00",
+  "generatedAt": "2026-08-27T02:57:46.144796+00:00",
   "note": "Hyperbaric facility directory. Availability changes without notice: ALWAYS call the diver emergency hotline first for referral. Each entry carries the date and source its details were verified against.",
   "sources": [
     {
@@ -1360,7 +1360,6 @@
         "via": "registry",
         "url": "https://ukhyperbaric.com/members/"
       },
-      "emergencyPhone": "+441516488000",
       "latitude": 53.3409714,
       "longitude": -3.0500916
     },
@@ -2693,7 +2692,6 @@
       "country": "MX",
       "city": "Playa del Carmen",
       "phone": "+52-984-873-1365",
-      "emergencyPhone": "+52-984-873-1365",
       "capability": "diving_emergency",
       "availability": "h24",
       "verified": {

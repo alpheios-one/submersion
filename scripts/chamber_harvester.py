@@ -163,6 +163,19 @@ def canonicalize_ids(chambers):
     return chambers
 
 
+def drop_redundant_emergency_lines(chambers):
+    """Remove emergencyPhone when it just repeats phone.
+
+    A duplicate carries no information and invites the reader to believe the
+    two fields were mixed up, which is a costly thing to second-guess in a
+    directory someone dials during an emergency.
+    """
+    for chamber in chambers:
+        if chamber.get("emergencyPhone") == chamber.get("phone"):
+            chamber.pop("emergencyPhone", None)
+    return chambers
+
+
 def merge_rows(leads, overlay):
     """Merge harvested leads with the curated overlay. Overlay wins: it is
     hand-verified, the leads are not. Sorted by id so regenerating the asset
@@ -250,9 +263,11 @@ def build():
     leads_doc = _load_json(LEADS_PATH, {"chambers": [], "sources": []})
     overlay_doc = _load_json(OVERLAY_PATH, {"chambers": [], "sources": []})
 
-    chambers = merge_rows(
-        canonicalize_ids(leads_doc.get("chambers", [])),
-        canonicalize_ids(overlay_doc.get("chambers", [])),
+    chambers = drop_redundant_emergency_lines(
+        merge_rows(
+            canonicalize_ids(leads_doc.get("chambers", [])),
+            canonicalize_ids(overlay_doc.get("chambers", [])),
+        )
     )
     sources = leads_doc.get("sources", []) + overlay_doc.get("sources", [])
 

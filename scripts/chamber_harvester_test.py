@@ -132,6 +132,25 @@ class DescribePhoneShapeTest(unittest.TestCase):
         self.assertNotIn("1234", joined)
 
 
+class DropRedundantEmergencyLinesTest(unittest.TestCase):
+    def test_a_duplicate_emergency_line_is_removed(self):
+        rows = chamber_harvester.drop_redundant_emergency_lines(
+            [_row(phone="+39-02-1234-5678", emergencyPhone="+39-02-1234-5678")]
+        )
+        self.assertNotIn("emergencyPhone", rows[0])
+        self.assertEqual(rows[0]["phone"], "+39-02-1234-5678")
+
+    def test_a_genuinely_different_emergency_line_is_kept(self):
+        rows = chamber_harvester.drop_redundant_emergency_lines(
+            [_row(phone="+39-02-1234-5678", emergencyPhone="+39-02-9999-9999")]
+        )
+        self.assertEqual(rows[0]["emergencyPhone"], "+39-02-9999-9999")
+
+    def test_a_row_without_an_emergency_line_is_untouched(self):
+        rows = chamber_harvester.drop_redundant_emergency_lines([_row()])
+        self.assertNotIn("emergencyPhone", rows[0])
+
+
 class MergeRowsTest(unittest.TestCase):
     def test_overlay_rows_win_over_harvested_leads(self):
         lead = _row(phone="+39-02-0000-0000")
