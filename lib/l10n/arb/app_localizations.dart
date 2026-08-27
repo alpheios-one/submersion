@@ -20999,6 +20999,150 @@ abstract class AppLocalizations {
   /// **'Search species...'**
   String get marineLife_speciesManage_searchHint;
 
+  /// No description provided for @marineLife_speciesPage_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Species'**
+  String get marineLife_speciesPage_title;
+
+  /// No description provided for @marineLife_speciesPage_searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search species you have seen'**
+  String get marineLife_speciesPage_searchHint;
+
+  /// No description provided for @marineLife_speciesPage_clearSearchTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get marineLife_speciesPage_clearSearchTooltip;
+
+  /// No description provided for @marineLife_speciesPage_manageCatalogTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage catalog'**
+  String get marineLife_speciesPage_manageCatalogTooltip;
+
+  /// No description provided for @marineLife_speciesPage_sortTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get marineLife_speciesPage_sortTooltip;
+
+  /// No description provided for @marineLife_speciesPage_sort_mostSightings.
+  ///
+  /// In en, this message translates to:
+  /// **'Most sightings'**
+  String get marineLife_speciesPage_sort_mostSightings;
+
+  /// No description provided for @marineLife_speciesPage_sort_recentlySeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently seen'**
+  String get marineLife_speciesPage_sort_recentlySeen;
+
+  /// No description provided for @marineLife_speciesPage_sort_firstSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'First seen'**
+  String get marineLife_speciesPage_sort_firstSeen;
+
+  /// No description provided for @marineLife_speciesPage_sort_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get marineLife_speciesPage_sort_name;
+
+  /// No description provided for @marineLife_speciesPage_speciesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 species} other{{count} species}}'**
+  String marineLife_speciesPage_speciesCount(int count);
+
+  /// No description provided for @marineLife_speciesPage_sightingsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 sighting} other{{count} sightings}}'**
+  String marineLife_speciesPage_sightingsCount(int count);
+
+  /// No description provided for @marineLife_speciesPage_divesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive} other{{count} dives}}'**
+  String marineLife_speciesPage_divesCount(int count);
+
+  /// No description provided for @marineLife_speciesPage_lastSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Last seen {date}'**
+  String marineLife_speciesPage_lastSeen(String date);
+
+  /// No description provided for @marineLife_speciesPage_emptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No species yet'**
+  String get marineLife_speciesPage_emptyTitle;
+
+  /// No description provided for @marineLife_speciesPage_emptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Marine life sightings added to a dive will show up here.'**
+  String get marineLife_speciesPage_emptyHint;
+
+  /// No description provided for @marineLife_speciesPage_noMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No species match your search'**
+  String get marineLife_speciesPage_noMatch;
+
+  /// No description provided for @marineLife_speciesPage_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your species: {error}'**
+  String marineLife_speciesPage_error(String error);
+
+  /// No description provided for @marineLife_speciesPage_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get marineLife_speciesPage_retry;
+
+  /// No description provided for @marineLife_speciesDetail_sightingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sightings ({count})'**
+  String marineLife_speciesDetail_sightingsTitle(Object count);
+
+  /// No description provided for @marineLife_speciesDetail_sightingsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load sightings: {error}'**
+  String marineLife_speciesDetail_sightingsError(String error);
+
+  /// No description provided for @marineLife_speciesDetail_showAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all ({count})'**
+  String marineLife_speciesDetail_showAll(Object count);
+
+  /// No description provided for @marineLife_speciesDetail_showFewer.
+  ///
+  /// In en, this message translates to:
+  /// **'Show fewer'**
+  String get marineLife_speciesDetail_showFewer;
+
+  /// No description provided for @marineLife_speciesDetail_unknownSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown site'**
+  String get marineLife_speciesDetail_unknownSite;
+
+  /// No description provided for @marineLife_speciesDetail_countTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'× {count}'**
+  String marineLife_speciesDetail_countTimes(Object count);
+
   /// No description provided for @marineLife_speciesPicker_allFilter.
   ///
   /// In en, this message translates to:
@@ -28991,6 +29135,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Species Spotted'**
   String get statistics_marineLife_speciesSpotted;
+
+  /// No description provided for @statistics_marineLife_seeAllSpecies_title.
+  ///
+  /// In en, this message translates to:
+  /// **'See all species'**
+  String get statistics_marineLife_seeAllSpecies_title;
+
+  /// No description provided for @statistics_marineLife_seeAllSpecies_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Every species you have logged, searchable'**
+  String get statistics_marineLife_seeAllSpecies_subtitle;
 
   /// No description provided for @statistics_profile_appBar_title.
   ///

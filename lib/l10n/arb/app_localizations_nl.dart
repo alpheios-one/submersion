@@ -12271,6 +12271,117 @@ class AppLocalizationsNl extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'Soorten zoeken...';
 
   @override
+  String get marineLife_speciesPage_title => 'Soorten';
+
+  @override
+  String get marineLife_speciesPage_searchHint =>
+      'Zoek soorten die je hebt gezien';
+
+  @override
+  String get marineLife_speciesPage_clearSearchTooltip => 'Zoekopdracht wissen';
+
+  @override
+  String get marineLife_speciesPage_manageCatalogTooltip => 'Catalogus beheren';
+
+  @override
+  String get marineLife_speciesPage_sortTooltip => 'Sorteren';
+
+  @override
+  String get marineLife_speciesPage_sort_mostSightings => 'Meeste waarnemingen';
+
+  @override
+  String get marineLife_speciesPage_sort_recentlySeen => 'Recent gezien';
+
+  @override
+  String get marineLife_speciesPage_sort_firstSeen => 'Eerst gezien';
+
+  @override
+  String get marineLife_speciesPage_sort_name => 'Naam';
+
+  @override
+  String marineLife_speciesPage_speciesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count soorten',
+      one: '1 soort',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_sightingsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count waarnemingen',
+      one: '1 waarneming',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_divesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken',
+      one: '1 duik',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_lastSeen(String date) {
+    return 'Laatst gezien $date';
+  }
+
+  @override
+  String get marineLife_speciesPage_emptyTitle => 'Nog geen soorten';
+
+  @override
+  String get marineLife_speciesPage_emptyHint =>
+      'Waarnemingen van zeeleven die aan een duik zijn toegevoegd, verschijnen hier.';
+
+  @override
+  String get marineLife_speciesPage_noMatch =>
+      'Geen soorten komen overeen met je zoekopdracht';
+
+  @override
+  String marineLife_speciesPage_error(String error) {
+    return 'Je soorten konden niet worden geladen: $error';
+  }
+
+  @override
+  String get marineLife_speciesPage_retry => 'Opnieuw proberen';
+
+  @override
+  String marineLife_speciesDetail_sightingsTitle(Object count) {
+    return 'Waarnemingen ($count)';
+  }
+
+  @override
+  String marineLife_speciesDetail_sightingsError(String error) {
+    return 'Waarnemingen konden niet worden geladen: $error';
+  }
+
+  @override
+  String marineLife_speciesDetail_showAll(Object count) {
+    return 'Alles tonen ($count)';
+  }
+
+  @override
+  String get marineLife_speciesDetail_showFewer => 'Minder tonen';
+
+  @override
+  String get marineLife_speciesDetail_unknownSite => 'Onbekende duikstek';
+
+  @override
+  String marineLife_speciesDetail_countTimes(Object count) {
+    return '× $count';
+  }
+
+  @override
   String get marineLife_speciesPicker_allFilter => 'Alle';
 
   @override
@@ -17134,6 +17245,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get statistics_marineLife_speciesSpotted => 'Soorten waargenomen';
+
+  @override
+  String get statistics_marineLife_seeAllSpecies_title =>
+      'Alle soorten bekijken';
+
+  @override
+  String get statistics_marineLife_seeAllSpecies_subtitle =>
+      'Elke soort die je hebt gelogd, doorzoekbaar';
 
   @override
   String get statistics_profile_appBar_title => 'Profielanalyse';

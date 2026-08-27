@@ -12325,6 +12325,117 @@ class AppLocalizationsHu extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'Fajok keresese...';
 
   @override
+  String get marineLife_speciesPage_title => 'Fajok';
+
+  @override
+  String get marineLife_speciesPage_searchHint => 'Látott fajok keresése';
+
+  @override
+  String get marineLife_speciesPage_clearSearchTooltip => 'Keresés törlése';
+
+  @override
+  String get marineLife_speciesPage_manageCatalogTooltip =>
+      'Katalógus kezelése';
+
+  @override
+  String get marineLife_speciesPage_sortTooltip => 'Rendezés';
+
+  @override
+  String get marineLife_speciesPage_sort_mostSightings => 'Legtöbb észlelés';
+
+  @override
+  String get marineLife_speciesPage_sort_recentlySeen => 'Nemrég látott';
+
+  @override
+  String get marineLife_speciesPage_sort_firstSeen => 'Először látott';
+
+  @override
+  String get marineLife_speciesPage_sort_name => 'Név';
+
+  @override
+  String marineLife_speciesPage_speciesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count faj',
+      one: '1 faj',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_sightingsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count észlelés',
+      one: '1 észlelés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_divesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés',
+      one: '1 merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_lastSeen(String date) {
+    return 'Utoljára látva: $date';
+  }
+
+  @override
+  String get marineLife_speciesPage_emptyTitle => 'Még nincsenek fajok';
+
+  @override
+  String get marineLife_speciesPage_emptyHint =>
+      'A merüléshez hozzáadott tengeri élőlény-észlelések itt jelennek meg.';
+
+  @override
+  String get marineLife_speciesPage_noMatch =>
+      'Nincs a keresésnek megfelelő faj';
+
+  @override
+  String marineLife_speciesPage_error(String error) {
+    return 'Nem sikerült betölteni a fajokat: $error';
+  }
+
+  @override
+  String get marineLife_speciesPage_retry => 'Újra';
+
+  @override
+  String marineLife_speciesDetail_sightingsTitle(Object count) {
+    return 'Észlelések ($count)';
+  }
+
+  @override
+  String marineLife_speciesDetail_sightingsError(String error) {
+    return 'Nem sikerült betölteni az észleléseket: $error';
+  }
+
+  @override
+  String marineLife_speciesDetail_showAll(Object count) {
+    return 'Összes mutatása ($count)';
+  }
+
+  @override
+  String get marineLife_speciesDetail_showFewer => 'Kevesebb mutatása';
+
+  @override
+  String get marineLife_speciesDetail_unknownSite => 'Ismeretlen merülőhely';
+
+  @override
+  String marineLife_speciesDetail_countTimes(Object count) {
+    return '× $count';
+  }
+
+  @override
   String get marineLife_speciesPicker_allFilter => 'Mind';
 
   @override
@@ -17223,6 +17334,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_marineLife_speciesSpotted => 'Eszlelt fajok';
+
+  @override
+  String get statistics_marineLife_seeAllSpecies_title =>
+      'Összes faj megtekintése';
+
+  @override
+  String get statistics_marineLife_seeAllSpecies_subtitle =>
+      'Minden naplózott faj, kereshetően';
 
   @override
   String get statistics_profile_appBar_title => 'Profil elemzes';

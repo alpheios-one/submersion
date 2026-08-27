@@ -12362,6 +12362,118 @@ class AppLocalizationsPt extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'Buscar especies...';
 
   @override
+  String get marineLife_speciesPage_title => 'Espécies';
+
+  @override
+  String get marineLife_speciesPage_searchHint =>
+      'Pesquisar espécies que você viu';
+
+  @override
+  String get marineLife_speciesPage_clearSearchTooltip => 'Limpar pesquisa';
+
+  @override
+  String get marineLife_speciesPage_manageCatalogTooltip =>
+      'Gerenciar catálogo';
+
+  @override
+  String get marineLife_speciesPage_sortTooltip => 'Ordenar';
+
+  @override
+  String get marineLife_speciesPage_sort_mostSightings => 'Mais avistamentos';
+
+  @override
+  String get marineLife_speciesPage_sort_recentlySeen => 'Vistas recentemente';
+
+  @override
+  String get marineLife_speciesPage_sort_firstSeen => 'Primeiro avistamento';
+
+  @override
+  String get marineLife_speciesPage_sort_name => 'Nome';
+
+  @override
+  String marineLife_speciesPage_speciesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count espécies',
+      one: '1 espécie',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_sightingsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count avistamentos',
+      one: '1 avistamento',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_divesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos',
+      one: '1 mergulho',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_lastSeen(String date) {
+    return 'Visto pela última vez em $date';
+  }
+
+  @override
+  String get marineLife_speciesPage_emptyTitle => 'Ainda não há espécies';
+
+  @override
+  String get marineLife_speciesPage_emptyHint =>
+      'Os avistamentos de vida marinha adicionados a um mergulho aparecerão aqui.';
+
+  @override
+  String get marineLife_speciesPage_noMatch =>
+      'Nenhuma espécie corresponde à sua pesquisa';
+
+  @override
+  String marineLife_speciesPage_error(String error) {
+    return 'Não foi possível carregar suas espécies: $error';
+  }
+
+  @override
+  String get marineLife_speciesPage_retry => 'Tentar novamente';
+
+  @override
+  String marineLife_speciesDetail_sightingsTitle(Object count) {
+    return 'Avistamentos ($count)';
+  }
+
+  @override
+  String marineLife_speciesDetail_sightingsError(String error) {
+    return 'Não foi possível carregar os avistamentos: $error';
+  }
+
+  @override
+  String marineLife_speciesDetail_showAll(Object count) {
+    return 'Mostrar tudo ($count)';
+  }
+
+  @override
+  String get marineLife_speciesDetail_showFewer => 'Mostrar menos';
+
+  @override
+  String get marineLife_speciesDetail_unknownSite => 'Local desconhecido';
+
+  @override
+  String marineLife_speciesDetail_countTimes(Object count) {
+    return '× $count';
+  }
+
+  @override
   String get marineLife_speciesPicker_allFilter => 'Todas';
 
   @override
@@ -17282,6 +17394,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_marineLife_speciesSpotted => 'Especies Avistadas';
+
+  @override
+  String get statistics_marineLife_seeAllSpecies_title =>
+      'Ver todas as espécies';
+
+  @override
+  String get statistics_marineLife_seeAllSpecies_subtitle =>
+      'Todas as espécies que você registrou, com pesquisa';
 
   @override
   String get statistics_profile_appBar_title => 'Analise de Perfil';
