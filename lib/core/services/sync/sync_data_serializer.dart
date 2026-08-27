@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
+import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
@@ -982,8 +983,13 @@ class SyncDataSerializer {
     Future<Directory> Function()? tempDir,
   }) async {
     final dir = await (tempDir?.call() ?? resolveSyncTempDir());
-    final path =
-        '${dir.path}/ssv1_base_${deviceId}_${seq ?? 0}.${_baseTempUuid.v4()}.json';
+    // p.join, not a literal '/': on Windows the temp dir is backslashed, and a
+    // path mixing both separators is what broke the move into the publish
+    // directory in #1304.
+    final path = p.join(
+      dir.path,
+      'ssv1_base_${deviceId}_${seq ?? 0}.${_baseTempUuid.v4()}.json',
+    );
     final raf = await File(path).open(mode: FileMode.write);
     final digestSink = _Sha256DigestSink();
     final dataHash = sha256.startChunkedConversion(digestSink);
@@ -5463,6 +5469,9 @@ class SyncDataSerializer {
   /// old spelling.
   static const Map<String, Map<String, String>> _renamedWireKeys = {
     'serviceRecords': {'serviceType': 'serviceCategory'},
+    // v170: the SAC unit toggle became the gas-consumption display. The value
+    // is remapped in _applyDiverSettingDefaults.
+    'diverSettings': {'sacUnit': 'gasConsumptionDisplay'},
   };
 
   Map<String, dynamic> _withRenamedKeys(
@@ -5568,7 +5577,7 @@ class SyncDataSerializer {
       'volumeUnit': 'liters',
       'weightUnit': 'kilograms',
       'altitudeUnit': 'meters',
-      'sacUnit': 'litersPerMin',
+      'gasConsumptionDisplay': 'both',
       // Issue #828. Added in v155; seed it so a payload from a pre-v155 peer
       // hydrates to the documented default rather than null.
       'gasModel': 'real',
@@ -5663,6 +5672,9 @@ class SyncDataSerializer {
       // v161: seed it so payloads predating the column hydrate instead of
       // throwing in DiverSetting.fromJson.
       'defaultShowO2CellMv': false,
+      // v166: seed it so payloads predating the column hydrate instead of
+      // throwing in DiverSetting.fromJson (issue #1187).
+      'placeNameLanguage': 'en',
       // Dive profile default-visible metrics. Non-nullable bool added in v91;
       // seed it so payloads predating the column hydrate instead of throwing in
       // DiverSetting.fromJson.
@@ -5703,6 +5715,13 @@ class SyncDataSerializer {
         data['showDepthColoredDiveCards'] == true &&
         !data.containsKey('cardColorAttribute')) {
       merged['cardColorAttribute'] = 'depth';
+    }
+    // A pre-170 peer spells the value as a unit. _withRenamedKeys moved the
+    // key; the value still needs the lane it meant.
+    const legacyLanes = {'litersPerMin': 'rmv', 'pressurePerMin': 'sac'};
+    final display = merged['gasConsumptionDisplay'];
+    if (display is String && legacyLanes.containsKey(display)) {
+      merged['gasConsumptionDisplay'] = legacyLanes[display];
     }
     return merged;
   }

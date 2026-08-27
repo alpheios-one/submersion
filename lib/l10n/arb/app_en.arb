@@ -472,6 +472,10 @@
   "accessibility_label_listPane": "{title} list pane",
   "accessibility_label_mapPane": "{title} map pane",
   "accessibility_label_mapViewTitle": "{title} map view",
+  "accessibility_label_resizeMasterPane": "Resize master pane",
+  "@accessibility_label_resizeMasterPane": {
+    "description": "Semantics label for the draggable divider between the master and detail panes in master-detail scaffold"
+  },
   "accessibility_label_sharedWithAllProfiles": "Shared with all dive profiles",
   "@accessibility_label_sharedWithAllProfiles": {
     "description": "Screen-reader / tooltip label for the people icon shown on trip and site list tiles when a record is shared across dive profiles. Descriptive form (state), distinct from the imperative form used on the edit-page switch."
@@ -2788,7 +2792,8 @@
   "diveLog_detail_label_lowTide": "Low Tide",
   "diveLog_detail_label_ppO2AtPoint": "ppO₂ at selected point:",
   "diveLog_detail_label_rateOfChange": "Rate of Change",
-  "diveLog_detail_label_sacRate": "SAC Rate",
+  "diveLog_detail_label_rmv": "RMV",
+  "diveLog_detail_label_sac": "SAC",
   "diveLog_detail_label_state": "State",
   "diveLog_detail_label_surfaceInterval": "Surface Interval",
   "diveLog_detail_label_surfacePressure": "Surface Pressure",
@@ -2813,7 +2818,7 @@
   "diveLog_detail_section_marineLife": "Marine Life",
   "diveLog_detail_section_notes": "Notes",
   "diveLog_detail_section_oxygenToxicity": "Oxygen Toxicity",
-  "diveLog_detail_section_sacRateBySegment": "SAC Rate by Segment",
+  "diveLog_detail_section_sacRateBySegment": "Gas consumption by segment",
   "diveLog_detail_section_tags": "Tags",
   "diveLog_detail_section_cylinders": "Cylinders",
   "diveLog_detail_section_tide": "Tide",
@@ -3201,6 +3206,7 @@
   "diveLog_filter_clearAll": "Clear All",
   "diveLog_filter_clearDates": "Clear dates",
   "diveLog_filter_clearRating": "Clear rating filter",
+  "diveLog_filter_clearWeekdays": "Clear weekdays",
   "diveLog_filter_dateSeparator": "to",
   "diveLog_filter_endDate": "End Date",
   "diveLog_filter_errorLoadingSites": "Error loading sites",
@@ -3226,6 +3232,7 @@
   "diveLog_filter_sectionGasMix": "Gas Mix (O₂%)",
   "diveLog_filter_sectionMinRating": "Minimum Rating",
   "diveLog_filter_sectionTags": "Tags",
+  "diveLog_filter_sectionWeekdays": "Weekdays",
   "diveLog_filter_showOnlyFavorites": "Show only favorite dives",
   "diveLog_filter_showOnlyNoBuddy": "Show only dives without a buddy",
   "diveLog_filter_startDate": "Start Date",
@@ -3257,7 +3264,7 @@
   "diveLog_legend_label_ppO2": "ppO2",
   "diveLog_legend_label_pressure": "Pressure",
   "diveLog_legend_label_pressureThresholds": "Pressure Thresholds",
-  "diveLog_legend_label_sacRate": "SAC Rate",
+  "diveLog_legend_label_sacRate": "Consumption",
   "diveLog_legend_label_showGas": "Gases",
   "diveLog_legend_label_surfaceGf": "Surface GF",
   "diveLog_legend_label_temp": "Temp",
@@ -3293,6 +3300,63 @@
   "diveLog_listPage_menuAdvancedSearch": "Advanced Search",
   "diveLog_listPage_menuDiveNumbering": "Dive Numbering",
   "diveLog_listPage_menuMatchSites": "Match Dives to Sites",
+  "diveLog_listPage_menuFetchConditions": "Fetch Conditions for All Dives",
+  "diveLog_fetchConditions_confirmTitle": "Fetch conditions?",
+  "diveLog_fetchConditions_confirmBody": "{count, plural, =1{1 dive is missing conditions.} other{{count} dives are missing conditions.}} Only empty fields are filled, so nothing you have already entered will change.",
+  "@diveLog_fetchConditions_confirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveLog_fetchConditions_confirmAction": "Fetch",
+  "diveLog_fetchConditions_noneNeeded": "No dives are missing conditions.",
+  "diveLog_fetchConditions_progressTitle": "Fetching conditions",
+  "diveLog_fetchConditions_progressCount": "{completed} of {total}",
+  "@diveLog_fetchConditions_progressCount": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "diveLog_fetchConditions_summaryTitle": "Conditions fetched",
+  "diveLog_fetchConditions_summaryFilled": "{count, plural, =1{1 dive updated} other{{count} dives updated}}",
+  "@diveLog_fetchConditions_summaryFilled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveLog_fetchConditions_summaryUnavailable": "{count, plural, =1{1 dive had no data available} other{{count} dives had no data available}}",
+  "@diveLog_fetchConditions_summaryUnavailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveLog_fetchConditions_summaryUnchanged": "{count, plural, =1{1 dive had nothing to fill} other{{count} dives had nothing to fill}}",
+  "@diveLog_fetchConditions_summaryUnchanged": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveLog_fetchConditions_summaryCancelled": "{count, plural, =1{Stopped early; 1 dive was processed.} other{Stopped early; {count} dives were processed.}}",
+  "@diveLog_fetchConditions_summaryCancelled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "diveLog_sighting_decreaseCount": "Decrease count",
   "@diveLog_sighting_decreaseCount": {
     "description": "Tooltip: decrease the sighting count"
@@ -3556,7 +3620,7 @@
   "setup_units_imperial": "Imperial",
   "setup_units_metric": "Metric",
   "setup_units_pressure": "Pressure",
-  "setup_units_sac": "SAC rate",
+  "setup_units_gasConsumption": "Gas consumption",
   "setup_units_subtitle": "Choose how measurements are displayed. You can fine-tune each unit.",
   "setup_units_temperature": "Temperature",
   "setup_units_timeFormat": "Time format",
@@ -3761,7 +3825,6 @@
   "diveLog_rangeStats_label_minDepth": "Min Depth",
   "diveLog_rangeStats_label_minHR": "Min HR",
   "diveLog_rangeStats_label_minTemp": "Min Temp",
-  "diveLog_rangeStats_label_sacRate": "SAC Rate",
   "diveLog_rangeStats_title": "Range Stats",
   "diveLog_rangeStats_tooltip_close": "Close range analysis",
   "diveLog_scr_calculatedLoopFo2": "Calculated loop FO₂: {value}%",
@@ -3791,7 +3854,9 @@
   "diveLog_search_errorLoadingCenters": "Error loading dive centers",
   "diveLog_search_errorLoadingDiveTypes": "Error loading dive types",
   "diveLog_search_errorLoadingTrips": "Error loading trips",
+  "diveLog_search_filter_any": "Any",
   "diveLog_search_gasTrimix": "Trimix (<21% O₂)",
+  "diveLog_search_label_deco": "Decompression",
   "diveLog_search_label_depthRange": "Depth Range (m)",
   "diveLog_search_label_diveCenter": "Dive Center",
   "diveLog_search_label_diveSite": "Dive Site",
@@ -3911,7 +3976,8 @@
   "diveLog_tooltip_ppO2": "ppO2",
   "diveLog_tooltip_press": "Press",
   "diveLog_tooltip_rate": "Rate",
-  "diveLog_tooltip_sac": "SAC",
+  "gasConsumption_rmv": "RMV",
+  "gasConsumption_sac": "SAC",
   "diveLog_tooltip_sensor": "Sensor",
   "diveLog_legend_label_o2Cells": "O2 cells",
   "diveLog_tooltip_o2CellsTight": "tight",
@@ -4591,7 +4657,7 @@
   "divePlanner_label_remaining": "Remaining",
   "divePlanner_label_reserve": "Reserve:",
   "divePlanner_label_runtime": "Runtime",
-  "divePlanner_label_sacRate": "SAC Rate:",
+  "divePlanner_label_sacRate": "RMV:",
   "divePlanner_label_status": "Status",
   "divePlanner_label_tanks": "Tanks",
   "divePlanner_label_time": "Time",
@@ -4801,7 +4867,7 @@
     }
   },
   "diveSites_edit_gps_gettingLocation": "Getting...",
-  "diveSites_edit_gps_helperText": "Choose a location method - coordinates will auto-fill country and region",
+  "diveSites_edit_gps_helperText": "Choose a location method or look up the coordinates to auto-fill country, region, town and body of water",
   "diveSites_edit_gps_latitude_hint": "e.g., 21.4225",
   "diveSites_edit_gps_latitude_label": "Latitude",
   "diveSites_edit_gps_latitude_validation": "Invalid latitude",
@@ -4809,6 +4875,13 @@
   "diveSites_edit_gps_longitude_label": "Longitude",
   "diveSites_edit_gps_longitude_validation": "Invalid longitude",
   "diveSites_edit_gps_pickFromMap": "Pick from Map",
+  "diveSites_edit_gps_lookupFromCoordinates": "Look up from coordinates",
+  "diveSites_edit_snackbar_lookupNothingFound": "No location details found for these coordinates",
+  "diveSites_edit_snackbar_lookupFailed": "Location lookup failed. Check your connection and try again.",
+  "diveSites_edit_lookupReplace_title": "Replace location details?",
+  "diveSites_edit_lookupReplace_body": "The lookup found different values for these fields:",
+  "diveSites_edit_lookupReplace_replace": "Replace",
+  "diveSites_edit_lookupReplace_keep": "Keep",
   "diveSites_edit_gps_useMyLocation": "Use My Location",
   "diveSites_edit_hazards_helperText": "List any hazards or safety considerations",
   "diveSites_edit_hazards_hint": "e.g., Strong currents, boat traffic, jellyfish, sharp coral",
@@ -4935,6 +5008,49 @@
   "diveSites_list_error_retry": "Retry",
   "diveSites_list_menu_import": "Import",
   "diveSites_list_menu_select": "Select sites",
+  "diveSites_list_menu_fillLocationDetails": "Fill in missing location details",
+  "diveSites_backfill_confirm_title": "Fill in missing location details?",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 site with coordinates has an empty country, region, town or body of water.} other{{count} sites with coordinates have an empty country, region, town or body of water.}} Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about {minutes, plural, =1{1 minute} other{{minutes} minutes}}.",
+  "@diveSites_backfill_confirm_body": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_confirm_start": "Start",
+  "diveSites_backfill_nothingToFill": "Every site with coordinates already has its location details.",
+  "diveSites_backfill_progress_title": "Filling in location details",
+  "diveSites_backfill_progress_count": "{done} of {total}",
+  "@diveSites_backfill_progress_count": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_cancel": "Cancel",
+  "diveSites_backfill_summary": "Updated {updated}, unchanged {unchanged}, failed {failed}",
+  "@diveSites_backfill_summary": {
+    "placeholders": {
+      "updated": {
+        "type": "int"
+      },
+      "unchanged": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_offline": "Location lookup is unavailable. Check your connection and try again.",
   "diveSites_list_search_backTooltip": "Back",
   "diveSites_list_search_clearTooltip": "Clear Search",
   "diveSites_list_search_emptyHint": "Search by site name, country, or region",
@@ -5762,8 +5878,8 @@
   "enum_profileMetric_ppO2_short": "ppO2",
   "enum_profileMetric_pressure": "Pressure",
   "enum_profileMetric_pressure_short": "Press",
-  "enum_profileMetric_sacRate": "SAC Rate",
-  "enum_profileMetric_sacRate_short": "SAC",
+  "enum_profileMetric_sacRate": "Gas consumption",
+  "enum_profileMetric_sacRate_short": "Usage",
   "enum_profileMetric_surfaceGf": "Surface GF",
   "enum_profileMetric_surfaceGf_short": "SrfGF",
   "enum_profileMetric_temperature": "Temperature",
@@ -6715,7 +6831,7 @@
   "gasCalculators_mnd_resultTitle": "Maximum Narcotic Depth",
   "gasCalculators_ppO2Limit": "ppO₂ Limit",
   "gasCalculators_resetAll": "Reset all calculators",
-  "gasCalculators_sacRate": "SAC Rate",
+  "gasCalculators_sacRate": "RMV",
   "gasCalculators_tab_bestMix": "Best Mix",
   "gasCalculators_tab_consumption": "Consumption",
   "gasCalculators_tab_mnd": "MND/END",
@@ -6892,6 +7008,93 @@
   "marineLife_speciesManage_resetSuccess": "Built-in species restored to defaults",
   "marineLife_speciesManage_resetToDefaults": "Reset to Defaults",
   "marineLife_speciesManage_searchHint": "Search species...",
+  "marineLife_speciesPage_title": "Species",
+  "marineLife_speciesPage_searchHint": "Search species you have seen",
+  "marineLife_speciesPage_clearSearchTooltip": "Clear search",
+  "marineLife_speciesPage_manageCatalogTooltip": "Manage catalog",
+  "marineLife_speciesPage_sortTooltip": "Sort",
+  "marineLife_speciesPage_sort_mostSightings": "Most sightings",
+  "marineLife_speciesPage_sort_recentlySeen": "Recently seen",
+  "marineLife_speciesPage_sort_firstSeen": "First seen",
+  "marineLife_speciesPage_sort_name": "Name",
+  "marineLife_speciesPage_speciesCount": "{count, plural, =1{1 species} other{{count} species}}",
+  "@marineLife_speciesPage_speciesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marineLife_speciesPage_sightingsCount": "{count, plural, =1{1 sighting} other{{count} sightings}}",
+  "@marineLife_speciesPage_sightingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marineLife_speciesPage_divesCount": "{count, plural, =1{1 dive} other{{count} dives}}",
+  "@marineLife_speciesPage_divesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marineLife_speciesPage_lastSeen": "Last seen {date}",
+  "@marineLife_speciesPage_lastSeen": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "marineLife_speciesPage_emptyTitle": "No species yet",
+  "marineLife_speciesPage_emptyHint": "Marine life sightings added to a dive will show up here.",
+  "marineLife_speciesPage_noMatch": "No species match your search",
+  "marineLife_speciesPage_error": "Could not load your species: {error}",
+  "@marineLife_speciesPage_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "marineLife_speciesPage_retry": "Retry",
+  "marineLife_speciesDetail_sightingsTitle": "Sightings ({count})",
+  "@marineLife_speciesDetail_sightingsTitle": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "marineLife_speciesDetail_sightingsError": "Could not load sightings: {error}",
+  "@marineLife_speciesDetail_sightingsError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "marineLife_speciesDetail_showAll": "Show all ({count})",
+  "@marineLife_speciesDetail_showAll": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "marineLife_speciesDetail_showFewer": "Show fewer",
+  "marineLife_speciesDetail_unknownSite": "Unknown site",
+  "marineLife_speciesDetail_countTimes": "× {count}",
+  "@marineLife_speciesDetail_countTimes": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
   "marineLife_speciesPicker_allFilter": "All",
   "marineLife_speciesPicker_cancelButton": "Cancel",
   "marineLife_speciesPicker_clearSearchTooltip": "Clear search",
@@ -7171,6 +7374,51 @@
   "media_photoPicker_showingPhotosFromRange": "Showing photos from {rangeText}",
   "media_photoPicker_thumbnailToggleLabel": "Toggle selection for photo",
   "media_photoPicker_thumbnailToggleSelectedLabel": "Toggle selection for photo, selected",
+  "media_photoPicker_files_pickFilesButton": "Pick files…",
+  "media_photoPicker_files_pickFolderButton": "Pick a folder…",
+  "media_photoPicker_files_autoMatchLabel": "Auto-match photos and videos to dives by date",
+  "media_photoPicker_files_emptyHint": "Pick files or a folder to start.",
+  "media_photoPicker_files_linkButton": "{count, plural, =1{Link 1 item} other{Link {count} items}}",
+  "@media_photoPicker_files_linkButton": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_attachToSiteButton": "{count, plural, =1{Attach 1 item to this site} other{Attach {count} items to this site}}",
+  "@media_photoPicker_files_attachToSiteButton": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_summary": "{fileCount, plural, =1{1 file} other{{fileCount} files}}, {diveCount, plural, =1{1 dive} other{{diveCount} dives}}, {unmatchedCount} unmatched",
+  "@media_photoPicker_files_summary": {"placeholders": {"fileCount": {"type": "int"}, "diveCount": {"type": "int"}, "unmatchedCount": {"type": "Object"}}},
+  "media_photoPicker_files_itemCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "@media_photoPicker_files_itemCount": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_diveGroupTitle": "Dive {diveId}",
+  "@media_photoPicker_files_diveGroupTitle": {"placeholders": {"diveId": {"type": "String"}}},
+  "media_photoPicker_files_groupCount": "{count, plural, =1{1 file} other{{count} files}}",
+  "@media_photoPicker_files_groupCount": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_unmatchedGroupTitle": "Unmatched",
+  "media_photoPicker_files_addAllToDive": "{count, plural, =1{Add 1 to this dive} other{Add all {count} to this dive}}",
+  "@media_photoPicker_files_addAllToDive": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_addToDiveTooltip": "Add to this dive",
+  "media_photoPicker_files_chooseDiveTooltip": "Choose a dive",
+  "media_photoPicker_files_removeTooltip": "Remove from selection",
+  "media_photoPicker_files_sourceExif": "from EXIF",
+  "media_photoPicker_files_sourceContainer": "from file metadata",
+  "media_photoPicker_files_sourceFileDate": "from file date",
+  "media_photoPicker_files_sourceNone": "no date found",
+  "media_photoPicker_files_shiftedTime": "{shifted} (was {original})",
+  "@media_photoPicker_files_shiftedTime": {"placeholders": {"shifted": {"type": "String"}, "original": {"type": "String"}}},
+  "media_photoPicker_files_reasonNoTimestamp": "No capture time could be read",
+  "media_photoPicker_files_reasonBeforeDive": "{gap} before the nearest dive",
+  "@media_photoPicker_files_reasonBeforeDive": {"placeholders": {"gap": {"type": "String"}}},
+  "media_photoPicker_files_reasonAfterDive": "{gap} after the nearest dive",
+  "@media_photoPicker_files_reasonAfterDive": {"placeholders": {"gap": {"type": "String"}}},
+  "media_photoPicker_files_reasonNoDives": "No dives to match against",
+  "media_photoPicker_files_offsetLabel": "Shift capture times by",
+  "media_photoPicker_files_offsetResetTooltip": "Reset to no shift",
+  "media_photoPicker_files_offsetBackTooltip": "Shift {amount} earlier",
+  "@media_photoPicker_files_offsetBackTooltip": {"placeholders": {"amount": {"type": "String"}}},
+  "media_photoPicker_files_offsetForwardTooltip": "Shift {amount} later",
+  "@media_photoPicker_files_offsetForwardTooltip": {"placeholders": {"amount": {"type": "String"}}},
+  "media_photoPicker_files_linkedCount": "{count, plural, =1{Linked 1 item} other{Linked {count} items}}",
+  "@media_photoPicker_files_linkedCount": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_attachedToSiteCount": "{count, plural, =1{Attached 1 item to this site} other{Attached {count} items to this site}}",
+  "@media_photoPicker_files_attachedToSiteCount": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_undo": "Undo",
   "media_photoPicker_thumbnailAlreadyLinkedLabel": "Photo already linked to this dive",
   "media_perdixOverlay_labelCns": "CNS",
   "media_perdixOverlay_labelDepth": "DEPTH",
@@ -8458,6 +8706,46 @@
   },
   "safetyReview_dismiss": "Dismiss",
   "safetyReview_restore": "Restore",
+  "safetyReview_dismissAll": "Dismiss all",
+  "safetyReview_restoreAll": "Restore all",
+  "safetySettings_dismissAll": "Dismiss all observations",
+  "safetySettings_dismissAll_subtitle": "Mark every observation in this logbook as reviewed",
+  "safetySettings_dismissAll_confirmTitle": "Dismiss all observations?",
+  "safetySettings_dismissAll_confirmBody": "Every observation on every analyzed dive is marked as reviewed. You can restore them one dive at a time from that dive’s safety review section.",
+  "safetySettings_dismissAll_confirm": "Dismiss all",
+  "safetySettings_dismissAll_cancel": "Cancel",
+  "safetySettings_dismissAll_progress": "Checked {done} of {total} dives",
+  "@safetySettings_dismissAll_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_done": "{count, plural, =0{No observations to dismiss} =1{1 observation dismissed} other{{count} observations dismissed}}",
+  "@safetySettings_dismissAll_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{No observations dismissed} =1{1 observation dismissed} other{{count} observations dismissed}}, {failed, plural, =1{1 dive could not be updated} other{{failed} dives could not be updated}}",
+  "@safetySettings_dismissAll_doneWithErrors": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    },
+    "failed": {
+      "type": "int"
+    }
+  }
+},
+  "safetySettings_dismissAll_failed": "Could not read your dive list. No dives were changed.",
+  "safetySettings_analyzeAll_failed": "Could not analyze your dives.",
   "safetyReview_details": "Details",
   "@safetyReview_details": {
     "description": "Link in the chart finding callout that scrolls to the full safety review section"
@@ -8515,8 +8803,8 @@
       }
     }
   },
-  "diveDetailSection_sacSegments_name": "SAC Rate by Segment",
-  "diveDetailSection_sacSegments_description": "Phase/time SAC segmentation",
+  "diveDetailSection_sacSegments_name": "Gas consumption by segment",
+  "diveDetailSection_sacSegments_description": "SAC and RMV by phase or time",
   "diveDetailSection_details_name": "Details",
   "diveDetailSection_details_description": "Type, location, trip, dive center, interval",
   "diveDetailSection_environment_name": "Environment",
@@ -8631,7 +8919,7 @@
     }
   },
   "diveDetailSection_tanks_name": "Cylinders",
-  "diveDetailSection_tanks_description": "Cylinder list, gas mixes, pressures, MOD/MND, per-tank SAC",
+  "diveDetailSection_tanks_description": "Cylinder list, gas mixes, pressures, MOD/MND, per-tank consumption",
   "diveDetailSection_buddies_name": "Buddies",
   "diveDetailSection_buddies_description": "Buddy list with roles",
   "diveDetailSection_signatures_name": "Signatures",
@@ -8685,7 +8973,7 @@
   "settings_appearance_metric_ppN2": "ppN2",
   "settings_appearance_metric_ppO2": "ppO2",
   "settings_appearance_metric_pressure": "Pressure",
-  "settings_appearance_metric_sacRate": "SAC Rate",
+  "settings_appearance_metric_sacRate": "Gas consumption",
   "settings_appearance_metric_surfaceGf": "Surface GF",
   "settings_appearance_metric_temperature": "Temperature",
   "settings_appearance_metric_tts": "TTS (Time to Surface)",
@@ -8968,6 +9256,42 @@
   "settings_conflict_noConflicts_title": "No Conflicts",
   "settings_conflict_noDataAvailable": "No data available",
   "settings_conflict_previous_tooltip": "Previous conflict",
+  "settings_conflict_ref_buddy": "Buddy",
+  "settings_conflict_ref_certification": "Certification",
+  "settings_conflict_ref_checklistTemplate": "Checklist template",
+  "settings_conflict_ref_connectedAccount": "Connected account",
+  "settings_conflict_ref_course": "Course",
+  "settings_conflict_ref_courseRequirement": "Course requirement",
+  "settings_conflict_ref_cylinderConfig": "Cylinder configuration",
+  "settings_conflict_ref_dataSource": "Data source",
+  "settings_conflict_ref_dive": "Dive",
+  "settings_conflict_ref_diveCenter": "Dive center",
+  "settings_conflict_ref_diveComputer": "Dive computer",
+  "settings_conflict_ref_divePlan": "Dive plan",
+  "settings_conflict_ref_diveSite": "Dive site",
+  "settings_conflict_ref_diveType": "Dive type",
+  "settings_conflict_ref_diver": "Diver",
+  "settings_conflict_ref_equipment": "Equipment",
+  "settings_conflict_ref_equipmentSet": "Equipment set",
+  "settings_conflict_ref_finding": "Finding",
+  "settings_conflict_ref_instructor": "Instructor",
+  "settings_conflict_ref_linkedDive": "Linked dive",
+  "settings_conflict_ref_media": "Media",
+  "settings_conflict_ref_mediaSubscription": "Media subscription",
+  "settings_conflict_ref_missing": "No longer in this library",
+  "settings_conflict_ref_named": "{name} ({date})",
+  "settings_conflict_ref_plannedTank": "Planned tank",
+  "settings_conflict_ref_preDiveChecklistTemplate": "Pre-dive checklist template",
+  "settings_conflict_ref_preDiveSession": "Pre-dive checklist run",
+  "settings_conflict_ref_relatedDive": "Related dive",
+  "settings_conflict_ref_serviceKind": "Service type",
+  "settings_conflict_ref_sighting": "Sighting",
+  "settings_conflict_ref_signer": "Signed by",
+  "settings_conflict_ref_sourceDive": "Source dive",
+  "settings_conflict_ref_species": "Species",
+  "settings_conflict_ref_tag": "Tag",
+  "settings_conflict_ref_tank": "Tank",
+  "settings_conflict_ref_trip": "Trip",
   "settings_conflict_remoteVersion": "Remote Version",
   "settings_conflict_resolved": "Resolved {count, plural, =1{1 conflict} other{{count} conflicts}}",
   "settings_conflict_title": "Resolve Conflicts",
@@ -9357,13 +9681,12 @@
   "settings_units_dialog_dateFormat": "Date Format",
   "settings_units_dialog_depthUnit": "Depth Unit",
   "settings_units_dialog_pressureUnit": "Pressure Unit",
-  "settings_units_dialog_sacRateUnit": "SAC Rate Unit",
   "settings_units_gasModel": "Gas calculations",
   "settings_units_gasModel_real": "Real gas",
   "settings_units_gasModel_real_subtitle": "Accounts for compressibility. A 12 L cylinder at 200 bar holds about 2317 L.",
   "settings_units_gasModel_ideal": "Ideal gas",
   "settings_units_gasModel_ideal_subtitle": "Matches hand calculation and dive tables. A 12 L cylinder at 200 bar holds 2400 L.",
-  "settings_units_gasModel_explanation": "How cylinder pressure is converted to gas volume. This affects SAC rate, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for SAC.",
+  "settings_units_gasModel_explanation": "How cylinder pressure is converted to gas volume. This affects RMV, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for RMV.",
   "settings_units_dialog_gasModel": "Gas calculations",
   "settings_units_dialog_temperatureUnit": "Temperature Unit",
   "settings_units_dialog_timeFormat": "Time Format",
@@ -9378,13 +9701,14 @@
   "settings_units_pressure_bar": "Bar",
   "settings_units_pressure_psi": "PSI",
   "settings_units_quickSelect": "Quick Select",
-  "settings_units_sacRate": "SAC Rate",
+  "settings_units_gasConsumption_both_subtitle": "Show SAC and RMV side by side.",
+  "settings_units_gasConsumption_both": "Both",
+  "settings_units_gasConsumption_rmv_subtitle": "Gas volume breathed per minute at the surface ({unit}). Needs a tank volume.",
+  "settings_units_gasConsumption_sac_subtitle": "Tank pressure drop per minute ({unit}). Works with any logged pressures.",
+  "settings_units_dialog_gasConsumption": "Gas consumption display",
+  "settings_units_gasConsumption": "Gas consumption",
   "settings_units_defaultCurrency": "Default Currency",
   "settings_units_dialog_defaultCurrency": "Default Currency",
-  "settings_units_sac_pressurePerMinute": "Pressure per minute",
-  "settings_units_sac_pressurePerMinute_subtitle": "No tank volume needed (bar/min or psi/min)",
-  "settings_units_sac_volumePerMinute": "Volume per minute",
-  "settings_units_sac_volumePerMinute_subtitle": "Requires tank volume (L/min or cuft/min)",
   "settings_units_temperature": "Temperature",
   "settings_units_temperature_celsius": "Celsius (°C)",
   "settings_units_temperature_fahrenheit": "Fahrenheit (°F)",
@@ -9554,6 +9878,16 @@
         "type": "Object"
       },
       "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "@settings_conflict_ref_named": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      },
+      "date": {
         "type": "Object"
       }
     }
@@ -9937,7 +10271,7 @@
   "statistics_category_conditions_title": "Conditions",
   "statistics_category_equipment_subtitle": "Gear usage & weight",
   "statistics_category_equipment_title": "Equipment",
-  "statistics_category_gas_subtitle": "SAC rates & gas mixes",
+  "statistics_category_gas_subtitle": "Gas consumption & gas mixes",
   "statistics_category_gas_title": "Air Consumption",
   "statistics_category_geographic_subtitle": "Countries & regions",
   "statistics_category_geographic_title": "Geographic",
@@ -10000,18 +10334,20 @@
   "statistics_gas_gasMix_subtitle": "Dives by gas type",
   "statistics_gas_gasMix_title": "Gas Mix Distribution",
   "statistics_gas_sacByRole_empty": "No multi-tank data available",
-  "statistics_gas_sacByRole_error": "Failed to load SAC by role",
+  "statistics_gas_sacByRole_error": "Failed to load consumption by role",
   "statistics_gas_sacByRole_subtitle": "Average consumption by tank type",
-  "statistics_gas_sacByRole_title": "SAC by Tank Role",
-  "statistics_gas_sacRecords_best": "Best SAC Rate",
-  "statistics_gas_sacRecords_empty": "No SAC data available yet",
-  "statistics_gas_sacRecords_error": "Failed to load SAC records",
-  "statistics_gas_sacRecords_highest": "Highest SAC Rate",
+  "statistics_gas_sacByRole_title": "Gas consumption by tank role",
+  "statistics_gas_sacRecords_empty": "No consumption data yet",
+  "statistics_gas_sacRecords_error": "Failed to load consumption records",
+  "statistics_gas_sacRecords_highestRmv": "Highest RMV",
+  "statistics_gas_sacRecords_highestSac": "Highest SAC",
+  "statistics_gas_sacRecords_bestRmv": "Best RMV",
+  "statistics_gas_sacRecords_bestSac": "Best SAC",
   "statistics_gas_sacRecords_subtitle": "Best and worst air consumption",
-  "statistics_gas_sacRecords_title": "SAC Rate Records",
-  "statistics_gas_sacTrend_error": "Failed to load SAC trend",
+  "statistics_gas_sacRecords_title": "Gas consumption records",
+  "statistics_gas_sacTrend_error": "Failed to load consumption trend",
   "statistics_gas_sacTrend_subtitle": "Monthly average over 5 years",
-  "statistics_gas_sacTrend_title": "SAC Rate Trend",
+  "statistics_gas_sacTrend_title": "Gas consumption trend",
   "statistics_gas_tankRole_backGas": "Back Gas",
   "statistics_gas_tankRole_bailout": "Bailout",
   "statistics_gas_tankRole_deco": "Deco",
@@ -10050,6 +10386,8 @@
   "statistics_marineLife_mostCommon_summary": "{count} species. Most common: {topName} with {topCount} sightings",
   "statistics_marineLife_mostCommon_title": "Most Common Sightings",
   "statistics_marineLife_speciesSpotted": "Species Spotted",
+  "statistics_marineLife_seeAllSpecies_title": "See all species",
+  "statistics_marineLife_seeAllSpecies_subtitle": "Every species you have logged, searchable",
   "statistics_profile_appBar_title": "Profile Analysis",
   "statistics_profile_ascentDescent_empty": "No profile data available",
   "statistics_profile_ascentDescent_error": "Failed to load rate data",
@@ -10885,6 +11223,50 @@
   "tags_empty": "No tags yet. Create tags when editing dives.",
   "tags_hint_addMoreTags": "Add more tags...",
   "importWizard_tagsLabel": "Tags",
+  "importWizard_photos_stepLabel": "Photos",
+  "@importWizard_photos_stepLabel": {
+    "description": "Wizard step label for resolving photos referenced by an imported logbook"
+  },
+  "importWizard_photos_foundCount": "{count, plural, one{1 photo referenced in this logbook} other{{count} photos referenced in this logbook}}",
+  "@importWizard_photos_foundCount": {
+    "description": "Count of photos the imported logbook refers to",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importWizard_photos_chooseFolder": "Choose photo folder...",
+  "@importWizard_photos_chooseFolder": {
+    "description": "Button that opens a folder picker for locating referenced photos"
+  },
+  "importWizard_photos_scanning": "Scanning folder...",
+  "@importWizard_photos_scanning": {
+    "description": "Progress label while the picked folder is being scanned"
+  },
+  "importWizard_photos_matchSummary": "{matched} matched, {byName} by filename only, {missing} not found",
+  "@importWizard_photos_matchSummary": {
+    "description": "Result of resolving referenced photos against the picked folder",
+    "placeholders": {
+      "matched": {
+        "type": "int"
+      },
+      "byName": {
+        "type": "int"
+      },
+      "missing": {
+        "type": "int"
+      }
+    }
+  },
+  "importWizard_photos_skip": "Skip photos",
+  "@importWizard_photos_skip": {
+    "description": "Button to continue the import without photos"
+  },
+  "importWizard_photos_mobileUnsupported": "Importing photos needs a folder on this device's disk. Run this import on a computer to include them. Dives and sites import normally.",
+  "@importWizard_photos_mobileUnsupported": {
+    "description": "Shown on mobile, where a photo folder cannot be picked"
+  },
   "importWizard_review_olderDivesSkipped": "{count, plural, one{1 older dive skipped — already in your log} other{{count} older dives skipped — already in your log}}",
   "@importWizard_review_olderDivesSkipped": {
     "description": "Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff",
@@ -11653,8 +12035,6 @@
   "units_profileMetric_min": "min",
   "units_profileMetric_percent": "%",
   "units_profileMetric_millivolts": "mV",
-  "units_sac_litersPerMin": "L/min",
-  "units_sac_pressurePerMin": "pressure/min",
   "units_temperature_celsius": "C",
   "units_temperature_fahrenheit": "F",
   "units_timeFormat_twelveHour": "12-hour",
@@ -11714,12 +12094,6 @@
   "@units_profileMetric_percent": {
     "description": "Percent unit symbol"
   },
-  "@units_sac_litersPerMin": {
-    "description": "Symbol for SAC rate in liters per minute"
-  },
-  "@units_sac_pressurePerMin": {
-    "description": "Symbol for SAC rate in pressure units per minute"
-  },
   "@units_temperature_celsius": {
     "description": "Symbol for Celsius temperature unit"
   },
@@ -11766,6 +12140,11 @@
   "universalImport_triage_noneImportable": "None of the selected files can be imported.",
   "universalImport_review_inBatchDuplicate": "Duplicate of another dive in this import batch.",
   "universalImport_summary_filesTitle": "Files",
+  "universalImport_summary_noticesTitle": "Not in the file",
+  "universalImport_summary_noticeNoTankPressureTitle": "Tank pressure not recorded",
+  "universalImport_summary_noticeNoTankPressureBody": "Air consumption and SAC cannot be calculated. You can add start and end pressure by editing the dive.",
+  "universalImport_summary_noticeAffectedDives": "{count, plural, =1{Affects 1 dive} other{Affects {count} dives}}",
+  "@universalImport_summary_noticeAffectedDives": {"placeholders": {"count": {"type": "int"}}},
   "universalImport_summary_fileImported": "{count, plural, =1{1 dive imported} other{{count} dives imported}}",
   "universalImport_summary_fileNeedsIndividualImport": "Needs individual import",
   "universalImport_summary_fileUnsupported": "Unsupported format",
@@ -13396,6 +13775,10 @@
   "diveImport_uddf_tabTrips": "Trips",
   "diveImport_uddf_tabTypes": "Types",
   "diveImport_uddf_tags": "Tags",
+  "diveImport_uddf_media": "Photos",
+  "@diveImport_uddf_media": {
+    "description": "Entity type label for photos referenced by an imported logbook"
+  },
   "diveImport_uddf_title": "Import from UDDF",
   "diveImport_uddf_toggleDiveSelection": "Toggle selection for dive",
   "diveImport_uddf_toggleEntitySelection": "Toggle selection for {name}",
@@ -13522,7 +13905,7 @@
   "divePlanner_segmentType_gasSwitch": "Gas Switch",
   "divePlanner_segmentType_safetyStop": "Safety Stop",
   "divePlanner_undo": "Undo",
-  "gasCalculators_rockBottom_aboutDescription": "Rock bottom is the minimum gas reserve for an emergency ascent while sharing air with your buddy.\n\n• Uses stressed SAC rates (2-3x normal)\n• Assumes both divers on one tank\n• Includes safety stop when enabled\n\nAlways turn the dive BEFORE reaching rock bottom!",
+  "gasCalculators_rockBottom_aboutDescription": "Rock bottom is the minimum gas reserve for an emergency ascent while sharing air with your buddy.\n\n• Uses a stressed RMV (2-3x normal)\n• Assumes both divers on one tank\n• Includes safety stop when enabled\n\nAlways turn the dive BEFORE reaching rock bottom!",
   "gasCalculators_rockBottom_aboutTitle": "About Rock Bottom",
   "gasCalculators_rockBottom_ascentGasRequired": "Ascent gas required",
   "gasCalculators_rockBottom_ascentRate": "Ascent Rate",
@@ -13538,8 +13921,8 @@
     }
   },
   "gasCalculators_rockBottom_ascentTimeToSurface": "Ascent time to surface",
-  "gasCalculators_rockBottom_buddySac": "Buddy SAC",
-  "gasCalculators_rockBottom_combinedStressedSac": "Combined stressed SAC",
+  "gasCalculators_rockBottom_buddySac": "Buddy RMV",
+  "gasCalculators_rockBottom_combinedStressedSac": "Combined stressed RMV",
   "gasCalculators_rockBottom_emergencyAscentBreakdown": "Emergency Ascent Breakdown",
   "gasCalculators_rockBottom_emergencyScenario": "Emergency Scenario",
   "gasCalculators_rockBottom_includeSafetyStop": "Include Safety Stop",
@@ -13584,8 +13967,8 @@
       }
     }
   },
-  "gasCalculators_rockBottom_stressedSacHint": "Use higher SAC rates to account for stress during emergency",
-  "gasCalculators_rockBottom_stressedSacRates": "Stressed SAC Rates",
+  "gasCalculators_rockBottom_stressedSacHint": "Use a higher RMV to account for stress during an emergency",
+  "gasCalculators_rockBottom_stressedSacRates": "Stressed RMV",
   "gasCalculators_rockBottom_tankSize": "Tank Size",
   "gasCalculators_rockBottom_totalReserveNeeded": "Total reserve needed",
   "gasCalculators_rockBottom_turnDive": "Turn the dive when reaching {pressure} {pressureUnit} remaining",
@@ -13599,7 +13982,7 @@
       }
     }
   },
-  "gasCalculators_rockBottom_yourSac": "Your SAC",
+  "gasCalculators_rockBottom_yourSac": "Your RMV",
   "gpsLogger_androidNotificationText": "Recording your surface track",
   "gpsLogger_androidNotificationTitle": "Submersion GPS Logger",
   "gpsLogger_deleteTrackMessage": "This removes the recorded GPS track. Positions already stamped on dives are kept.",
@@ -13649,6 +14032,9 @@
       }
     }
   },
+  "gpsLogger_summary_tracks": "Tracks",
+  "gpsLogger_summary_recordedTime": "Recorded time",
+  "gpsLogger_summary_divesCovered": "Dives covered",
   "gpsLogger_trackSubtitle": "{count, plural, one{{count} point} other{{count} points}}, {duration}",
   "@gpsLogger_trackSubtitle": {
     "placeholders": {
@@ -14132,6 +14518,8 @@
   "settings_section_dataSources_subtitle": "Health data integration",
   "settings_siteMatch_title": "Auto site matching",
   "settings_siteMatch_subtitle": "How aggressively downloaded dives are matched to sites",
+  "settings_tankPressureAtSurfacing_title": "Tank pressure at surfacing",
+  "settings_tankPressureAtSurfacing_subtitle": "Read end pressure when you reached the surface, not when the computer stopped recording",
   "settings_siteMatch_strict": "Strict",
   "settings_siteMatch_balanced": "Balanced",
   "settings_siteMatch_relaxed": "Relaxed",
@@ -15037,6 +15425,34 @@
   "@dive3d_metric_heartRate": {},
   "dive3d_metric_tankPressure": "Pressure",
   "@dive3d_metric_tankPressure": {},
+  "dive3d_zAxis": "Z axis",
+  "@dive3d_zAxis": {},
+  "dive3d_zAxis_none": "None",
+  "@dive3d_zAxis_none": {},
+  "dive3d_overlay_shadows": "Wall shadows",
+  "@dive3d_overlay_shadows": {},
+  "dive3d_metric_tts": "TTS",
+  "@dive3d_metric_tts": {},
+  "dive3d_axis_depth": "Depth ({unitSymbol})",
+  "@dive3d_axis_depth": {"placeholders": {"unitSymbol": {"type": "String"}}},
+  "dive3d_axis_time": "Run time (min)",
+  "@dive3d_axis_time": {},
+  "dive3d_pose_menu": "Camera",
+  "@dive3d_pose_menu": {},
+  "dive3d_pose_default": "Default view",
+  "@dive3d_pose_default": {},
+  "dive3d_pose_front": "Front (depth vs time)",
+  "@dive3d_pose_front": {},
+  "dive3d_pose_side": "Side (depth vs metric)",
+  "@dive3d_pose_side": {},
+  "dive3d_pose_top": "Top (metric vs time)",
+  "@dive3d_pose_top": {},
+  "dive3d_readout_runTime": "Run time",
+  "@dive3d_readout_runTime": {},
+  "dive3d_readout_ceiling": "Ceiling",
+  "@dive3d_readout_ceiling": {},
+  "dive3d_readout_tank": "Tank {n}",
+  "@dive3d_readout_tank": {"placeholders": {"n": {"type": "int"}}},
   "dive3d_scene_dive": "Dive",
   "@dive3d_scene_dive": {},
   "dive3d_scene_tissue": "Tissues",
@@ -15418,6 +15834,7 @@
   "safetyHub_noFly_disclaimer": "DAN/UHMS guideline intervals from your last dive. Not a substitute for your dive computer's no-fly time.",
   "diveLog_detail_altitudeMismatch_title": "Site is at altitude",
   "diveLog_detail_altitudeMismatch_subtitle": "This site records an altitude but the dive has none set, so decompression analysis assumed sea level. Set the dive's altitude to correct it.",
+  "diveLog_detail_sacVolumeHint": "Add a cylinder volume to show RMV in {unit}/min",
   "safetyHub_alert_noFly": "No-fly: {remaining} remaining",
   "@safetyHub_alert_noFly": {
     "placeholders": {
@@ -15486,6 +15903,35 @@
     "placeholders": {
       "date": {
         "type": "String"
+      }
+    }
+  },
+  "emergencyCard_chambersNearby": "Nearest chambers",
+  "emergencyCard_chamberViewAll": "View all {count} chambers",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "No chamber listed within range. Call the diver emergency hotline: they will route you to the nearest facility that can treat you.",
+  "emergencyCard_chamberCapability_divingEmergency": "Treats diving injuries",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "Hospital hyperbaric unit",
+  "emergencyCard_chamberCapability_elective": "Elective therapy only",
+  "emergencyCard_chamberCapability_unknown": "Capability unconfirmed",
+  "emergencyCard_chamberAvailability_h24": "24h",
+  "emergencyCard_chamberAvailability_onCall": "On call",
+  "emergencyCard_chamberAvailability_businessHours": "Business hours",
+  "emergencyCard_chamberUnverified": "Not confirmed with the facility",
+  "chambersDirectory_title": "Hyperbaric chambers",
+  "chambersDirectory_search": "Search by name, city or country",
+  "chambersDirectory_empty": "No chamber matches that search.",
+  "chambersDirectory_count": "{count, plural, =1{1 chamber} other{{count} chambers}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   },
@@ -16092,6 +16538,8 @@
   },
   "settings_coordinateFormat_title": "Coordinate format",
   "settings_coordinateFormat_subtitle": "How GPS positions are shown and entered",
+  "settings_placeNameLanguage_title": "Place name language",
+  "settings_placeNameLanguage_subtitle": "Used when country, region, town and body of water are looked up from coordinates. Existing sites are not changed.",
   "settings_coordinateFormat_decimalDegrees": "Decimal degrees",
   "settings_coordinateFormat_degreesDecimalMinutes": "Degrees and decimal minutes",
   "settings_coordinateFormat_degreesMinutesSeconds": "Degrees, minutes, seconds",
@@ -16206,7 +16654,8 @@
   "enum_diveField_tankCount": "Tank Count",
   "enum_diveField_startPressure": "Start Pressure",
   "enum_diveField_endPressure": "End Pressure",
-  "enum_diveField_sacRate": "SAC Rate",
+  "enum_diveField_rmv": "RMV (volume rate)",
+  "enum_diveField_sac": "SAC (pressure rate)",
   "enum_diveField_gasConsumed": "Gas Consumed",
   "enum_diveField_totalWeight": "Total Weight",
   "enum_diveField_diveComputerModel": "Dive Computer",
@@ -16264,7 +16713,8 @@
   "enum_diveField_tankCount_short": "Tanks",
   "enum_diveField_startPressure_short": "Start P",
   "enum_diveField_endPressure_short": "End P",
-  "enum_diveField_sacRate_short": "SAC",
+  "enum_diveField_rmv_short": "RMV",
+  "enum_diveField_sac_short": "SAC",
   "enum_diveField_gasConsumed_short": "Gas Used",
   "enum_diveField_totalWeight_short": "Wt",
   "enum_diveField_diveComputerModel_short": "Computer",
@@ -16347,6 +16797,12 @@
   "enum_siteField_notes_short": "Notes",
   "enum_siteField_latitude_short": "Lat",
   "enum_siteField_longitude_short": "Lon",
+  "enum_siteField_depthRange": "Depth Range",
+  "enum_siteField_depthRange_short": "Depth",
+  "enum_siteField_lastDived": "Last Dived",
+  "enum_siteField_lastDived_short": "Last dived",
+  "enum_siteField_maxDepthReached": "Your Max Depth",
+  "enum_siteField_maxDepthReached_short": "Your max",
   "enum_buddyField_buddyName": "Name",
   "enum_buddyField_email": "Email",
   "enum_buddyField_phone": "Phone",
@@ -16361,6 +16817,8 @@
   "enum_buddyField_certificationAgency_short": "Agency",
   "enum_buddyField_diveCount_short": "Dives",
   "enum_buddyField_notes_short": "Notes",
+  "enum_buddyField_lastDive": "Last Dive",
+  "enum_buddyField_lastDive_short": "Last dive",
   "enum_tripField_tripName": "Name",
   "enum_tripField_startDate": "Start Date",
   "enum_tripField_endDate": "End Date",
@@ -17980,7 +18438,7 @@
   "divePlanner_quickPlan_previewBottomTime": "Bottom time: {minutes} min",
   "divePlanner_quickPlan_previewAscent": "Ascent with safety stop",
   "divePlanner_quickPlan_create": "Create",
-  "divePlanner_semantics_sacRate": "SAC Rate: {value} {volumeSymbol} per minute",
+  "divePlanner_semantics_sacRate": "RMV: {value} {volumeSymbol} per minute",
   "divePlanner_semantics_reservePressure": "Reserve pressure in {pressureSymbol}",
   "divePlanner_semantics_altitudeGroup": "Altitude group: {group}",
   "diveSites_import_detail_maxDepth": "Max {depth}",
@@ -18524,6 +18982,49 @@
       }
     }
   },
+  "media_timeInDive_label": "Time in dive",
+  "@media_timeInDive_label": {"description": "Media info row label and Set-time dialog title: the moment in the dive a media item was taken."},
+  "media_timeInDive_unknown": "Time in dive unknown",
+  "@media_timeInDive_unknown": {"description": "Viewer chip shown when a media item's capture time falls outside its dive; tapping it opens the Set-time dialog."},
+  "media_timeInDive_setAction": "Set time in dive",
+  "@media_timeInDive_setAction": {"description": "Button and tooltip that opens the dialog to pin a media item to a moment in the dive."},
+  "media_timeInDive_manual": "{time} (set manually)",
+  "@media_timeInDive_manual": {
+    "description": "Media info row value for a position the diver set themselves; {time} is a minutes:seconds offset.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "media_timeInDive_fieldLabel": "Time from dive start",
+  "@media_timeInDive_fieldLabel": {"description": "Set-time dialog: label of the minutes:seconds field."},
+  "media_timeInDive_fieldHint": "mm:ss",
+  "@media_timeInDive_fieldHint": {"description": "Set-time dialog: placeholder showing the minutes:seconds format."},
+  "media_timeInDive_range": "Between 0:00 and {max}",
+  "@media_timeInDive_range": {
+    "description": "Set-time dialog: helper text under the field; {max} is the dive length as minutes:seconds.",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "media_timeInDive_invalid": "Enter a time between 0:00 and {max}",
+  "@media_timeInDive_invalid": {
+    "description": "Set-time dialog: error shown for malformed or out-of-range input; {max} is the dive length as minutes:seconds.",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "media_timeInDive_save": "Save",
+  "@media_timeInDive_save": {"description": "Set-time dialog: confirm button."},
+  "media_timeInDive_cancel": "Cancel",
+  "@media_timeInDive_cancel": {"description": "Set-time dialog: dismiss button."},
+  "media_timeInDive_reset": "Reset to automatic",
+  "@media_timeInDive_reset": {"description": "Set-time dialog: button that removes the diver's pin so the position derives from the capture time again."},
   "media_info_backupSection": "Backup",
   "media_info_store": "Cloud store",
   "media_info_storeNotConnected": "No cloud store connected",
@@ -18645,5 +19146,8 @@
   "@settings_dataSources_appleHealth_dataTypeDepth": {"description": "HealthKit data type disclosure: underwater depth."},
   "@settings_dataSources_appleHealth_dataTypeWaterTemp": {"description": "HealthKit data type disclosure: water temperature."},
   "@settings_dataSources_appleHealth_permissionManagedInHealth": {"description": "Permission row shown when the platform will not disclose read access."},
-  "@settings_dataSources_appleHealth_permissionUnsupported": {"description": "Permission row shown when HealthKit is unavailable on this device."}
+  "@settings_dataSources_appleHealth_permissionUnsupported": {"description": "Permission row shown when HealthKit is unavailable on this device."},
+  "@settings_units_gasConsumption_sac_subtitle": {"placeholders": {"unit": {"type": "String"}}},
+  "@settings_units_gasConsumption_rmv_subtitle": {"placeholders": {"unit": {"type": "String"}}},
+  "@diveLog_detail_sacVolumeHint": {"placeholders": {"unit": {"type": "String"}}}
 }

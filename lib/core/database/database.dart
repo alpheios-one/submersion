@@ -1334,6 +1334,11 @@ class Media extends Table {
   // where it is true. Synced with the row like every other media column.
   BoolColumn get retainInLibrary =>
       boolean().withDefault(const Constant(false))();
+  // v164: the moment in the dive the diver pinned this item to, in seconds
+  // from the dive start (issue #1090). Null means the position derives from
+  // taken_at. Lives on the media row, not on media_enrichment, so it syncs
+  // with the row and survives every enrichment recompute.
+  IntColumn get manualElapsedSeconds => integer().nullable()();
   // coverage:ignore-end
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -1605,8 +1610,13 @@ class DiverSettings extends Table {
   TextColumn get weightUnit =>
       text().withDefault(const Constant('kilograms'))();
   TextColumn get altitudeUnit => text().withDefault(const Constant('meters'))();
-  TextColumn get sacUnit =>
-      text().withDefault(const Constant('litersPerMin'))();
+
+  /// v170: renamed from sacUnit. Holds a GasConsumptionDisplay name (sac,
+  /// rmv, both). The Drift getter name is also the sync wire key, so this
+  /// rename raises minimumCompatibleSchemaVersion; see
+  /// SyncDataSerializer._renamedWireKeys for the receiving-side tolerance.
+  TextColumn get gasConsumptionDisplay =>
+      text().withDefault(const Constant('both'))();
 
   /// v155: which equation of state converts cylinder pressure to gas volume.
   ///
@@ -1664,6 +1674,9 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(false))();
   // Locale (language preference: 'system', 'en', 'es', 'fr', etc.)
   TextColumn get locale => text().withDefault(const Constant('system'))();
+  // Language for reverse-geocoded place names, ISO 639-1 (issue #1187, v166)
+  TextColumn get placeNameLanguage =>
+      text().withDefault(const Constant('en'))();
   // Defaults
   TextColumn get defaultDiveType =>
       text().withDefault(const Constant('recreational'))();
@@ -1771,6 +1784,10 @@ class DiverSettings extends Table {
   // Auto site matching sensitivity (v76): strict | balanced | relaxed
   TextColumn get siteMatchSensitivity =>
       text().withDefault(const Constant('balanced'))();
+  // Read cylinder end pressure at surfacing rather than at the end of the
+  // recording (v165, issue #1092).
+  BoolColumn get trimTankPressureAtSurfacing =>
+      boolean().withDefault(const Constant(true))();
   // Dive profile chart defaults
   TextColumn get defaultRightAxisMetric =>
       text().withDefault(const Constant('temperature'))();
@@ -1887,6 +1904,7 @@ class Buddies extends Table {
   TextColumn get phone => text().nullable()();
   TextColumn get photoPath => text().nullable()();
   TextColumn get notes => text().withDefault(const Constant(''))();
+  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -3175,7 +3193,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 163;
+  static const int currentSchemaVersion = 170;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3203,7 +3221,14 @@ class AppDatabase extends _$AppDatabase {
   /// until they update. Note the gate is one-directional, so this does NOT
   /// protect us from THEIR payloads; SyncDataSerializer._withRenamedKeys
   /// carries the receiving-side tolerance.
-  static const int minimumCompatibleSchemaVersion = 160;
+  ///
+  /// Raised 160 -> 170 by the SAC/RMV split: v170 renames the synced column
+  /// diver_settings.sac_unit to gas_consumption_display and replaces its
+  /// unit spellings with lane names, which the first two rules classify as
+  /// breaking. Peers below 170 are held until they update. Their payloads
+  /// still arrive here; _renamedWireKeys plus the value map in
+  /// _applyDiverSettingDefaults carry the receiving-side tolerance.
+  static const int minimumCompatibleSchemaVersion = 170;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3463,10 +3488,39 @@ class AppDatabase extends _$AppDatabase {
     // v163: diver_settings.default_show_estimated_tank_pressure, the switch
     // that suppresses synthesized "(est.)" tank pressure lines on the profile
     // chart (issue #731). v162 is skipped rather than missing: main was at
-    // v161 when this branch was cut, and the open PR #1287 (issue #1090) had
-    // already written 162 on its own branch. Two branches writing the same
-    // scalar auto-merge with no conflict marker, so 163 was taken instead.
+    // v161 when that branch was cut, and this branch had already written 162.
+    // Two branches writing the same scalar auto-merge with no conflict
+    // marker, so #731 took 163 instead and 162 stays permanently unused.
     163,
+    // v164: media.manual_elapsed_seconds, the diver's own placement of a
+    // media item in the dive when its capture time is wrong (issue #1090).
+    // Renumbered from 162, which #731 landed past while this branch was open.
+    164,
+    // v165: diver_settings.trim_tank_pressure_at_surfacing, which decides
+    // whether an import reads cylinder end pressure at the moment of
+    // surfacing rather than at the end of the recording (issue #1092).
+    // Renumbered from 163, which #731 landed on main while this branch
+    // was open. Main reserved this number while the branch was open, so it
+    // lands here without renumbering.
+    165,
+    // v166: diver_settings.place_name_language, the synced language used for
+    // reverse-geocoded country/region/town/body of water (issue #1187).
+    // Renumbered from 162, which #731 landed past while this branch was open.
+    166,
+    // v167 is likewise absent: it is claimed by issue #1269 (PR #1276) on a
+    // branch that is still open.
+    // v168 (issue #638): buddies.is_favorite, so frequently-dived buddies can
+    // be pinned to the top of the "Add buddy" picker regardless of sort.
+    // Renumbered from 161, which #1235 landed on main while this branch was
+    // open.
+    168,
+    // v170: diver_settings.sac_unit -> gas_consumption_display (a lane
+    // choice: sac, rmv, both) plus the rewrite of saved dive-table layouts
+    // that named the old sacRate column (discussions #354, #803). 167 and 169
+    // are deliberately absent, not missing: 167 is permanently skipped (main
+    // landed 168 past it, so PR #1276 moved its rung up), and 169 belongs to
+    // PR #1320 (dive-computer gear twins).
+    170,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4219,6 +4273,21 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// v164: media.manual_elapsed_seconds (issue #1090). Idempotent; safe to
+  /// call from both onUpgrade and the beforeOpen backstop. Nullable with no
+  /// default, so every pre-existing row reads back as "position from
+  /// taken_at".
+  Future<void> _assertMediaManualElapsedColumn() async {
+    final cols = await customSelect("PRAGMA table_info('media')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('manual_elapsed_seconds')) {
+      await customStatement(
+        'ALTER TABLE media ADD COLUMN manual_elapsed_seconds INTEGER',
+      );
+    }
+  }
+
   /// v111: equipment_sets.is_default column + equipment_set_geofences table.
   /// Idempotent (createTable is IF NOT EXISTS; the ALTER is PRAGMA-guarded) so
   /// it is safe to call from both onUpgrade and the beforeOpen backstop.
@@ -4965,6 +5034,42 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// v165: trim_tank_pressure_at_surfacing on diver_settings (issue #1092).
+  /// Dive computers keep recording after the diver surfaces, so the last
+  /// pressure in the profile is not the pressure at the end of the dive. On
+  /// by default, because the reading it prefers can only ever be the higher,
+  /// earlier one.
+  Future<void> _assertSurfacingPressureColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('trim_tank_pressure_at_surfacing')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN trim_tank_pressure_at_surfacing '
+        'INTEGER NOT NULL DEFAULT 1 '
+        'CHECK (trim_tank_pressure_at_surfacing IN (0, 1))',
+      );
+    }
+  }
+
+  /// v166: place_name_language on diver_settings (issue #1187). Defaults to
+  /// 'en', the language every pre-v166 row was geocoded in (issue #214).
+  Future<void> _assertPlaceNameLanguageColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('place_name_language')) {
+      await customStatement(
+        "ALTER TABLE diver_settings ADD COLUMN place_name_language TEXT "
+        "NOT NULL DEFAULT 'en'",
+      );
+    }
+  }
+
   /// Default service price columns on service_kinds and service_schedules
   /// (issue #829). PRAGMA-guarded so a healthy database no-ops. The
   /// cols.isEmpty guard matters: minimal migration fixtures build databases
@@ -5013,6 +5118,72 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// v170: diver_settings.sac_unit becomes gas_consumption_display and its
+  /// values move from a unit choice to a lane choice (discussions #354 and
+  /// #803). Guarded like the v160 rename, so a database that reaches 170 by
+  /// restore or sync-adopt (neither runs onUpgrade) heals in beforeOpen. The
+  /// value rewrite is idempotent: it only touches the two retired spellings
+  /// and anything that is not a known lane name.
+  Future<void> _assertGasConsumptionDisplayColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('sac_unit') &&
+        !names.contains('gas_consumption_display')) {
+      await customStatement(
+        'ALTER TABLE diver_settings '
+        'RENAME COLUMN sac_unit TO gas_consumption_display',
+      );
+    } else if (!names.contains('gas_consumption_display')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN gas_consumption_display '
+        "TEXT NOT NULL DEFAULT 'both'",
+      );
+      return;
+    }
+    await customStatement(
+      'UPDATE diver_settings SET gas_consumption_display = '
+      'CASE gas_consumption_display '
+      "WHEN 'litersPerMin' THEN 'rmv' "
+      "WHEN 'pressurePerMin' THEN 'sac' "
+      "WHEN 'sac' THEN 'sac' WHEN 'rmv' THEN 'rmv' WHEN 'both' THEN 'both' "
+      "ELSE 'both' END "
+      "WHERE gas_consumption_display NOT IN ('sac', 'rmv', 'both')",
+    );
+  }
+
+  /// v170, rung only: a saved dive-table layout names its columns by enum
+  /// value, and the sacRate column split into sac and rmv. Point each
+  /// diver's layout at the lane they were seeing. Runs after
+  /// [_assertGasConsumptionDisplayColumn] so the lane names are final.
+  ///
+  /// Never called from beforeOpen: DiveFieldAdapter.fieldFromName aliases
+  /// sacRate to sac for layouts that arrive later by sync, and re-running
+  /// this on every open would rewrite rows the diver has since changed. No
+  /// HLC bump: every device applies the same deterministic rewrite to its
+  /// own rows, so there is nothing to push.
+  Future<void> _rewriteLegacySacRateLayouts() async {
+    final tables = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type = 'table' "
+      "AND name IN ('view_configs', 'diver_settings')",
+    ).get();
+    if (tables.length < 2) return;
+    await customStatement('''
+      UPDATE view_configs
+        SET config_json = REPLACE(config_json, '"sacRate"', '"rmv"')
+        WHERE config_json LIKE '%"sacRate"%'
+          AND diver_id IN (SELECT diver_id FROM diver_settings
+                           WHERE gas_consumption_display = 'rmv')
+    ''');
+    await customStatement('''
+      UPDATE view_configs
+        SET config_json = REPLACE(config_json, '"sacRate"', '"sac"')
+        WHERE config_json LIKE '%"sacRate"%'
+    ''');
+  }
+
   Future<void> _assertServiceCostColumns() async {
     for (final table in const ['service_kinds', 'service_schedules']) {
       final cols = await customSelect("PRAGMA table_info('$table')").get();
@@ -5028,6 +5199,21 @@ class AppDatabase extends _$AppDatabase {
           'ALTER TABLE $table ADD COLUMN default_currency TEXT',
         );
       }
+    }
+  }
+
+  /// Idempotent DDL for the v168 buddies.is_favorite column (issue #638),
+  /// letting frequently-dived buddies be pinned to the top of the "Add
+  /// buddy" picker regardless of sort. Self-guards on the table existing, and
+  /// defaults every pre-existing row to not-favorited.
+  Future<void> _assertBuddyFavoriteColumn() async {
+    final cols = await customSelect("PRAGMA table_info('buddies')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('is_favorite')) {
+      await customStatement(
+        'ALTER TABLE buddies ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0',
+      );
     }
   }
 
@@ -8586,6 +8772,36 @@ class AppDatabase extends _$AppDatabase {
           await _assertEstimatedTankPressureDefaultColumn();
         }
         if (from < 163) await reportProgress();
+        // v164: media.manual_elapsed_seconds (issue #1090).
+        if (from < 164) {
+          await _assertMediaManualElapsedColumn();
+        }
+        if (from < 164) await reportProgress();
+        // v165: trim_tank_pressure_at_surfacing on diver_settings (#1092).
+        if (from < 165) {
+          await _assertSurfacingPressureColumn();
+        }
+        if (from < 165) await reportProgress();
+        // v166: place_name_language on diver_settings (issue #1187).
+        if (from < 166) {
+          await _assertPlaceNameLanguageColumn();
+        }
+        if (from < 166) await reportProgress();
+        // v168 (issue #638): buddies.is_favorite, so frequently-dived buddies
+        // can be pinned to the top of the "Add buddy" picker regardless of
+        // sort.
+        if (from < 168) {
+          await _assertBuddyFavoriteColumn();
+        }
+        if (from < 168) await reportProgress();
+        // v170: diver_settings.sac_unit -> gas_consumption_display and the
+        // saved dive-table layouts that named the old sacRate column
+        // (discussions #354, #803).
+        if (from < 170) {
+          await _assertGasConsumptionDisplayColumn();
+          await _rewriteLegacySacRateLayouts();
+        }
+        if (from < 170) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8784,6 +9000,23 @@ class AppDatabase extends _$AppDatabase {
         // diver_settings.default_show_estimated_tank_pressure (issue #731;
         // same parallel-branch version-collision self-heal).
         await _assertEstimatedTankPressureDefaultColumn();
+
+        // v164 backstop: re-assert media.manual_elapsed_seconds (issue
+        // #1090; same parallel-branch version-collision self-heal). The
+        // media row mapper reads it on every hydration.
+        await _assertMediaManualElapsedColumn();
+        // v165 backstop: re-assert diver_settings.trim_tank_pressure_at_
+        // surfacing (issue #1092; same parallel-branch collision self-heal).
+        await _assertSurfacingPressureColumn();
+
+        // v168 backstop: re-assert buddies.is_favorite (issue #638). A
+        // database that arrives by restore or sync-adopt never runs
+        // onUpgrade, and every read of a buddy would throw without it.
+        await _assertBuddyFavoriteColumn();
+        // v170 backstop: re-assert the diver_settings.sac_unit rename and
+        // value map (discussions #354, #803; same restore / sync-adopt
+        // self-heal as v160). The layout rewrite deliberately stays rung-only.
+        await _assertGasConsumptionDisplayColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

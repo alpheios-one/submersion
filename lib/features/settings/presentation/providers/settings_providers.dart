@@ -4,6 +4,7 @@ import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
+import 'package:submersion/core/constants/place_name_language.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/core/utils/log_failure.dart';
@@ -17,6 +18,7 @@ import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/core/constants/gas_model.dart';
+import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/presentation/startup_brightness.dart';
@@ -54,7 +56,6 @@ class SettingsKeys {
   static const String pressureUnit = 'pressure_unit';
   static const String volumeUnit = 'volume_unit';
   static const String weightUnit = 'weight_unit';
-  static const String sacUnit = 'sac_unit';
   static const String defaultCurrency = 'default_currency';
   static const String unitPreset = 'unit_preset';
   static const String themeMode = 'theme_mode';
@@ -124,7 +125,11 @@ class AppSettings {
   final VolumeUnit volumeUnit;
   final WeightUnit weightUnit;
   final AltitudeUnit altitudeUnit;
-  final SacUnit sacUnit;
+
+  /// Which gas-consumption lanes the single-value surfaces show: SAC
+  /// (tank-pressure rate), RMV (surface volume rate), or both. Replaces the
+  /// SAC unit toggle; each lane now has a fixed unit family.
+  final GasConsumptionDisplay gasConsumptionDisplay;
 
   /// Equation of state used everywhere the app converts cylinder pressure to
   /// gas volume: logged SAC, gas statistics, the planner, and the gas
@@ -179,6 +184,10 @@ class AppSettings {
   /// Color accents: tint leading icons in lists and settings pages.
   final bool accentListIcons;
   final String locale;
+
+  /// ISO 639-1 code for reverse-geocoded place names (issue #1187). Synced
+  /// with the diver so every device stores the same spelling.
+  final String placeNameLanguage;
   final String defaultDiveType;
   final double defaultTankVolume;
   final int defaultStartPressure;
@@ -300,6 +309,10 @@ class AppSettings {
 
   /// How aggressively downloaded dives are auto-matched to sites.
   final SiteMatchSensitivity siteMatchSensitivity;
+
+  /// Whether an import reads cylinder end pressure at the moment of surfacing
+  /// rather than at the end of the recording (issue #1092).
+  final bool trimTankPressureAtSurfacing;
 
   /// Name of the selected gradient preset ('ocean', 'thermal', etc.)
   final String cardColorGradientPreset;
@@ -475,7 +488,7 @@ class AppSettings {
     this.volumeUnit = VolumeUnit.liters,
     this.weightUnit = WeightUnit.kilograms,
     this.altitudeUnit = AltitudeUnit.meters,
-    this.sacUnit = SacUnit.pressurePerMin,
+    this.gasConsumptionDisplay = GasConsumptionDisplay.both,
     this.gasModel = GasModel.real,
     this.defaultCurrency = 'USD',
     this.visibilityScalePreset = VisibilityScalePreset.tropical,
@@ -491,6 +504,7 @@ class AppSettings {
     this.accentSectionHeaders = false,
     this.accentListIcons = false,
     this.locale = 'system',
+    this.placeNameLanguage = PlaceNameLanguage.defaultCode,
     this.defaultDiveType = 'recreational',
     this.defaultTankVolume = 12.0,
     this.defaultStartPressure = 200,
@@ -535,6 +549,7 @@ class AppSettings {
     this.diveCenterListViewMode = ListViewMode.detailed,
     this.mapStyle = MapStyle.openStreetMap,
     this.siteMatchSensitivity = SiteMatchSensitivity.balanced,
+    this.trimTankPressureAtSurfacing = true,
     this.cardColorGradientPreset = 'ocean',
     this.cardColorGradientStart,
     this.cardColorGradientEnd,
@@ -636,7 +651,7 @@ class AppSettings {
     VolumeUnit? volumeUnit,
     WeightUnit? weightUnit,
     AltitudeUnit? altitudeUnit,
-    SacUnit? sacUnit,
+    GasConsumptionDisplay? gasConsumptionDisplay,
     GasModel? gasModel,
     String? defaultCurrency,
     VisibilityScalePreset? visibilityScalePreset,
@@ -652,6 +667,7 @@ class AppSettings {
     bool? accentSectionHeaders,
     bool? accentListIcons,
     String? locale,
+    String? placeNameLanguage,
     String? defaultDiveType,
     double? defaultTankVolume,
     int? defaultStartPressure,
@@ -696,6 +712,7 @@ class AppSettings {
     ListViewMode? diveCenterListViewMode,
     MapStyle? mapStyle,
     SiteMatchSensitivity? siteMatchSensitivity,
+    bool? trimTankPressureAtSurfacing,
     String? cardColorGradientPreset,
     int? cardColorGradientStart,
     int? cardColorGradientEnd,
@@ -763,7 +780,8 @@ class AppSettings {
       volumeUnit: volumeUnit ?? this.volumeUnit,
       weightUnit: weightUnit ?? this.weightUnit,
       altitudeUnit: altitudeUnit ?? this.altitudeUnit,
-      sacUnit: sacUnit ?? this.sacUnit,
+      gasConsumptionDisplay:
+          gasConsumptionDisplay ?? this.gasConsumptionDisplay,
       gasModel: gasModel ?? this.gasModel,
       defaultCurrency: defaultCurrency ?? this.defaultCurrency,
       visibilityScalePreset:
@@ -782,6 +800,7 @@ class AppSettings {
       accentSectionHeaders: accentSectionHeaders ?? this.accentSectionHeaders,
       accentListIcons: accentListIcons ?? this.accentListIcons,
       locale: locale ?? this.locale,
+      placeNameLanguage: placeNameLanguage ?? this.placeNameLanguage,
       defaultDiveType: defaultDiveType ?? this.defaultDiveType,
       defaultTankVolume: defaultTankVolume ?? this.defaultTankVolume,
       defaultStartPressure: defaultStartPressure ?? this.defaultStartPressure,
@@ -834,6 +853,8 @@ class AppSettings {
           diveCenterListViewMode ?? this.diveCenterListViewMode,
       mapStyle: mapStyle ?? this.mapStyle,
       siteMatchSensitivity: siteMatchSensitivity ?? this.siteMatchSensitivity,
+      trimTankPressureAtSurfacing:
+          trimTankPressureAtSurfacing ?? this.trimTankPressureAtSurfacing,
       cardColorGradientPreset:
           cardColorGradientPreset ?? this.cardColorGradientPreset,
       cardColorGradientStart: clearCardColorGradientStart
@@ -1280,8 +1301,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
-  Future<void> setSacUnit(SacUnit unit) async {
-    state = state.copyWith(sacUnit: unit);
+  Future<void> setGasConsumptionDisplay(GasConsumptionDisplay display) async {
+    state = state.copyWith(gasConsumptionDisplay: display);
     await _saveSettings();
   }
 
@@ -1362,6 +1383,13 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setLocale(String locale) async {
     state = state.copyWith(locale: locale);
+    await _saveSettings();
+  }
+
+  Future<void> setPlaceNameLanguage(String code) async {
+    state = state.copyWith(
+      placeNameLanguage: PlaceNameLanguage.normalize(code),
+    );
     await _saveSettings();
   }
 
@@ -1651,6 +1679,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setSiteMatchSensitivity(SiteMatchSensitivity value) async {
     state = state.copyWith(siteMatchSensitivity: value);
+    await _saveSettings();
+  }
+
+  Future<void> setTrimTankPressureAtSurfacing(bool value) async {
+    state = state.copyWith(trimTankPressureAtSurfacing: value);
     await _saveSettings();
   }
 
@@ -1988,8 +2021,8 @@ final gasModelProvider = Provider<GasModel>((ref) {
   return ref.watch(settingsProvider.select((s) => s.gasModel));
 });
 
-final sacUnitProvider = Provider<SacUnit>((ref) {
-  return ref.watch(settingsProvider.select((s) => s.sacUnit));
+final gasConsumptionDisplayProvider = Provider<GasConsumptionDisplay>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.gasConsumptionDisplay));
 });
 
 final defaultCurrencyProvider = Provider<String>((ref) {
@@ -2015,6 +2048,11 @@ final themePresetProvider = Provider<AppThemePreset>((ref) {
 
 final localeProvider = Provider<String>((ref) {
   return ref.watch(settingsProvider.select((s) => s.locale));
+});
+
+/// The language new reverse-geocode results are stored in (issue #1187).
+final placeNameLanguageProvider = Provider<String>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.placeNameLanguage));
 });
 
 /// Color accent toggles. Narrow selects so each surface rebuilds only when

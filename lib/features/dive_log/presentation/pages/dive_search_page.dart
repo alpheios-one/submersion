@@ -12,6 +12,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/weekday_filter_selector.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
@@ -44,6 +45,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
   // Date Range
   DateTime? _startDate;
   DateTime? _endDate;
+  List<int> _selectedWeekdays = [];
 
   // Location
   String? _siteId;
@@ -55,6 +57,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
   double? _maxDepth;
   int? _minDurationMinutes;
   int? _maxDurationMinutes;
+  bool? _decoOnly;
 
   // Gas & Equipment
   String? _diveTypeId;
@@ -110,6 +113,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     final filter = ref.read(_filterProvider);
     _startDate = filter.startDate;
     _endDate = filter.endDate;
+    _selectedWeekdays = List.from(filter.weekdays);
     _siteId = filter.siteId;
     _tripId = filter.tripId;
     _diveCenterId = filter.diveCenterId;
@@ -117,6 +121,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     _maxDepth = filter.maxDepth;
     _minDurationMinutes = filter.minBottomTimeMinutes;
     _maxDurationMinutes = filter.maxBottomTimeMinutes;
+    _decoOnly = filter.decoOnly;
     _diveTypeId = filter.diveTypeId;
     _minO2Percent = filter.minO2Percent;
     _maxO2Percent = filter.maxO2Percent;
@@ -138,14 +143,19 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     _buddyNameController.text = _buddyNameFilter ?? '';
 
     // Auto-expand sections with active filters
-    if (_startDate != null || _endDate != null) _expanded['date'] = true;
+    if (_startDate != null ||
+        _endDate != null ||
+        _selectedWeekdays.isNotEmpty) {
+      _expanded['date'] = true;
+    }
     if (_siteId != null || _tripId != null || _diveCenterId != null) {
       _expanded['location'] = true;
     }
     if (_minDepth != null ||
         _maxDepth != null ||
         _minDurationMinutes != null ||
-        _maxDurationMinutes != null) {
+        _maxDurationMinutes != null ||
+        _decoOnly != null) {
       _expanded['conditions'] = true;
     }
     if (_diveTypeId != null ||
@@ -375,6 +385,31 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
             ),
           ),
         ],
+        const SizedBox(height: 16),
+
+        // Weekdays. ANDs with the date range above: when both are set, only
+        // dives inside the range AND on one of these weekdays match.
+        Text(
+          context.l10n.diveLog_filter_sectionWeekdays,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        const SizedBox(height: 8),
+        WeekdayFilterSelector(
+          selectedWeekdays: _selectedWeekdays,
+          onChanged: (weekdays) {
+            setState(() => _selectedWeekdays = weekdays);
+          },
+        ),
+        if (_selectedWeekdays.isNotEmpty)
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: TextButton(
+              onPressed: () {
+                setState(() => _selectedWeekdays = []);
+              },
+              child: Text(context.l10n.diveLog_filter_clearWeekdays),
+            ),
+          ),
       ],
     );
   }
@@ -538,6 +573,41 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
                 keyboardType: TextInputType.number,
                 onChanged: (value) => _maxDurationMinutes = parseUserInt(value),
               ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // Decompression
+        Text(
+          context.l10n.diveLog_search_label_deco,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ChoiceChip(
+              label: Text(context.l10n.diveLog_search_filter_any),
+              selected: _decoOnly == null,
+              onSelected: (selected) {
+                if (selected) setState(() => _decoOnly = null);
+              },
+            ),
+            ChoiceChip(
+              label: Text(context.l10n.attr_flagYes),
+              selected: _decoOnly == true,
+              onSelected: (selected) {
+                if (selected) setState(() => _decoOnly = true);
+              },
+            ),
+            ChoiceChip(
+              label: Text(context.l10n.attr_flagNo),
+              selected: _decoOnly == false,
+              onSelected: (selected) {
+                if (selected) setState(() => _decoOnly = false);
+              },
             ),
           ],
         ),
@@ -807,6 +877,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     setState(() {
       _startDate = null;
       _endDate = null;
+      _selectedWeekdays = [];
       _siteId = null;
       _tripId = null;
       _diveCenterId = null;
@@ -814,6 +885,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
       _maxDepth = null;
       _minDurationMinutes = null;
       _maxDurationMinutes = null;
+      _decoOnly = null;
       _diveTypeId = null;
       _minO2Percent = null;
       _maxO2Percent = null;
@@ -840,6 +912,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     ref.read(_filterProvider.notifier).state = DiveFilterState(
       startDate: _startDate,
       endDate: _endDate,
+      weekdays: _selectedWeekdays,
       siteId: _siteId,
       tripId: _tripId,
       diveCenterId: _diveCenterId,
@@ -847,6 +920,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
       maxDepth: _maxDepth,
       minBottomTimeMinutes: _minDurationMinutes,
       maxBottomTimeMinutes: _maxDurationMinutes,
+      decoOnly: _decoOnly,
       diveTypeId: _diveTypeId,
       minO2Percent: _minO2Percent,
       maxO2Percent: _maxO2Percent,
