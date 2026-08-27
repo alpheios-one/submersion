@@ -21,6 +21,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/export/export_service.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/tide/entities/tide_extremes.dart';
+import 'package:submersion/core/utils/share_anchor.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
@@ -170,6 +171,17 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
   /// Key for capturing the entire dive details page as an image for PNG export
   final GlobalKey _pageExportKey = GlobalKey();
+
+  /// The overflow buttons that open the export sheet, so the iPad share
+  /// popover can point at one of them.
+  ///
+  /// The sheet pops before the export runs, so it cannot anchor the popover
+  /// itself; the button that opened it is still mounted and is where iOS
+  /// normally points a toolbar-initiated share sheet. Two keys because the
+  /// standalone page and the embedded master-detail header each render their
+  /// own button, and a GlobalKey may only be mounted once.
+  final GlobalKey _appBarMenuKey = GlobalKey();
+  final GlobalKey _headerMenuKey = GlobalKey();
 
   /// Whether an export is currently in progress
   bool _isExportingProfile = false;
@@ -923,10 +935,16 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             onPressed: () => context.push('/dives/$diveId/edit'),
           ),
           PopupMenuButton<String>(
+            key: _appBarMenuKey,
             onSelected: (value) {
               switch (value) {
                 case 'export':
-                  _showExportOptions(context, ref, dive);
+                  _showExportOptions(
+                    context,
+                    ref,
+                    dive,
+                    shareAnchorFrom(_appBarMenuKey.currentContext),
+                  );
                   break;
                 case 'reparse':
                   _reparseDive(context, ref, dive);
@@ -1101,12 +1119,18 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           ),
           // More options
           PopupMenuButton<String>(
+            key: _headerMenuKey,
             icon: const Icon(Icons.more_vert, size: 20),
             padding: EdgeInsets.zero,
             onSelected: (value) {
               switch (value) {
                 case 'export':
-                  _showExportOptions(context, ref, dive);
+                  _showExportOptions(
+                    context,
+                    ref,
+                    dive,
+                    shareAnchorFrom(_headerMenuKey.currentContext),
+                  );
                   break;
                 case 'reparse':
                   _reparseDive(context, ref, dive);
@@ -1805,21 +1829,31 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                               ),
                             ),
                     const SizedBox(width: 8),
-                    IconButton(
-                      icon: _isExportingProfile
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.share),
-                      tooltip: context
-                          .l10n
-                          .diveLog_detail_tooltip_exportProfileImage,
-                      visualDensity: VisualDensity.compact,
-                      onPressed: _isExportingProfile
-                          ? null
-                          : () => _exportProfileChart(dive),
+                    // A Builder so the share anchor resolves to this button
+                    // rather than the whole profile card; it contributes no
+                    // render object, so the lookup descends to the IconButton.
+                    Builder(
+                      builder: (shareContext) => IconButton(
+                        icon: _isExportingProfile
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.share),
+                        tooltip: context
+                            .l10n
+                            .diveLog_detail_tooltip_exportProfileImage,
+                        visualDensity: VisualDensity.compact,
+                        onPressed: _isExportingProfile
+                            ? null
+                            : () => _exportProfileChart(
+                                dive,
+                                shareAnchorFrom(shareContext),
+                              ),
+                      ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.fullscreen),
@@ -2734,7 +2768,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   }
 
   /// Export the profile chart as a PNG image and share it
-  Future<void> _exportProfileChart(Dive dive) async {
+  Future<void> _exportProfileChart(Dive dive, Rect? shareAnchor) async {
     // Show options bottom sheet
     final action = await showModalBottomSheet<_ProfileExportAction>(
       context: context,
@@ -2858,7 +2892,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             );
           }
         case _ProfileExportAction.share:
-          await exportService.exportImageAsPng(pngBytes, fileName);
+          await exportService.exportImageAsPng(
+            pngBytes,
+            fileName,
+            sharePositionOrigin: shareAnchor,
+          );
       }
     } catch (e) {
       if (mounted) {
@@ -2876,7 +2914,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   }
 
   /// Export the entire dive details page as a PNG image
-  Future<void> _exportDiveDetailsPage(Dive dive) async {
+  Future<void> _exportDiveDetailsPage(Dive dive, Rect? shareAnchor) async {
     // Show options bottom sheet
     final action = await showModalBottomSheet<_ProfileExportAction>(
       context: context,
@@ -3000,7 +3038,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             );
           }
         case _ProfileExportAction.share:
-          await exportService.exportImageAsPng(pngBytes, fileName);
+          await exportService.exportImageAsPng(
+            pngBytes,
+            fileName,
+            sharePositionOrigin: shareAnchor,
+          );
       }
     } catch (e) {
       if (mounted) {
@@ -3018,7 +3060,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   }
 
   /// Export the dive as a PDF with save/share options
-  Future<void> _exportDivePdf(Dive dive) async {
+  Future<void> _exportDivePdf(Dive dive, Rect? shareAnchor) async {
     // Show options bottom sheet
     final action = await showModalBottomSheet<_PdfExportAction>(
       context: context,
@@ -3111,7 +3153,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             );
           }
         case _PdfExportAction.share:
-          await exportService.sharePdfBytes(result.bytes, result.fileName);
+          await exportService.sharePdfBytes(
+            result.bytes,
+            result.fileName,
+            sharePositionOrigin: shareAnchor,
+          );
       }
     } catch (e) {
       // Try to close loading dialog if it's still open
@@ -5424,7 +5470,17 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
   }
 
-  void _showExportOptions(BuildContext context, WidgetRef ref, Dive dive) {
+  /// [shareAnchor] is the overflow button this sheet was opened from.
+  ///
+  /// The sheet pops itself before either export runs, so it cannot be the
+  /// anchor for the iPad popover. The button that opened it is still mounted,
+  /// which is also where iOS normally points a toolbar-initiated share sheet.
+  void _showExportOptions(
+    BuildContext context,
+    WidgetRef ref,
+    Dive dive,
+    Rect? shareAnchor,
+  ) {
     showModalBottomSheet(
       context: context,
       builder: (sheetContext) => SafeArea(
@@ -5447,7 +5503,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               subtitle: Text(context.l10n.diveLog_export_pdfDescription),
               onTap: () {
                 Navigator.of(sheetContext).pop();
-                _exportDivePdf(dive);
+                _exportDivePdf(dive, shareAnchor);
               },
             ),
             ListTile(
@@ -5506,7 +5562,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   ? null
                   : () {
                       Navigator.of(sheetContext).pop();
-                      _exportDiveDetailsPage(dive);
+                      _exportDiveDetailsPage(dive, shareAnchor);
                     },
             ),
             const SizedBox(height: 8),
