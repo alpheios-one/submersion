@@ -6,6 +6,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_provide
 import 'package:submersion/features/dive_sites/data/services/site_matching_service.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_suggestion_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -85,21 +86,13 @@ class SiteMatchReviewNotifier extends StateNotifier<SiteMatchReviewState> {
     try {
       final diverId = await _ref.read(validatedCurrentDiverIdProvider.future);
       final diveRepo = _ref.read(diveRepositoryProvider);
-      final sensitivity = _ref.read(settingsProvider).siteMatchSensitivity;
 
       final dives = await diveRepo.getDivesNeedingSiteMatch(
         diverId: diverId,
         limitToIds: _diveIds,
       );
 
-      _service = SiteMatchingService(
-        siteRepository: _ref.read(siteRepositoryProvider),
-        apiService: _ref.read(diveSiteApiServiceProvider),
-        diveRepository: diveRepo,
-        mediaRepository: _ref.read(mediaRepositoryProvider),
-        diverId: diverId,
-        thresholds: sensitivity.thresholds,
-      );
+      _service = _ref.read(siteMatchingServiceFactoryProvider)(diverId);
 
       final proposals = await _service!.computeProposals(dives);
       if (!mounted) return;

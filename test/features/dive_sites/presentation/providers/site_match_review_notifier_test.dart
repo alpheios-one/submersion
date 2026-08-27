@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
@@ -14,6 +16,7 @@ import 'package:submersion/features/dive_sites/presentation/providers/site_match
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_database.dart';
@@ -121,6 +124,9 @@ void main() {
           (ref) => MockCurrentDiverIdNotifier(),
         ),
         settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+        weatherHttpClientProvider.overrideWithValue(
+          MockClient((_) async => http.Response('', 500)),
+        ),
       ],
     );
     addTearDown(container.dispose);
