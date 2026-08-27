@@ -52,7 +52,8 @@ class MediaImportView extends ConsumerWidget {
   /// Imports the resolved assets, one service call per dive and per site.
   /// A failing group never blocks another: a throw inside one group is
   /// recorded against that group's assets and the loop moves on.
-  @visibleForTesting
+  ///
+  /// Shared with the species import, which tags the rows this creates.
   static Future<ImportReviewResult> importResolved({
     required MediaImportService service,
     required DiveRepository diveRepository,

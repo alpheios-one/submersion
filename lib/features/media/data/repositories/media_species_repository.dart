@@ -234,6 +234,8 @@ class MediaSpeciesRepository {
   }
 
   /// The species tagged on one photo, in tag order, with what a chip needs.
+  /// `rowid` breaks same-millisecond ties in insertion order; the uuid id
+  /// would shuffle them.
   Future<List<SpeciesTagChip>> getTagChipsForMedia(String mediaId) async {
     final rows = await _db
         .customSelect(
@@ -242,7 +244,7 @@ class MediaSpeciesRepository {
       FROM media_species ms
       JOIN species sp ON sp.id = ms.species_id
       WHERE ms.media_id = ?
-      ORDER BY ms.created_at ASC, ms.id ASC
+      ORDER BY ms.created_at ASC, ms.rowid ASC
     ''',
           variables: [Variable.withString(mediaId)],
         )
@@ -316,7 +318,7 @@ class MediaSpeciesRepository {
     final items = await _getMediaByIds(coverIdBySpecies.values.toList());
     return {
       for (final entry in coverIdBySpecies.entries)
-        if (items[entry.value] case final item?) entry.key: item,
+        entry.key: ?items[entry.value],
     };
   }
 
