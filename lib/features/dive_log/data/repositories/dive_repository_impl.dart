@@ -796,12 +796,18 @@ class DiveRepository {
           final hasDiveGps =
               (t.entryLatitude.isNotNull() & t.entryLongitude.isNotNull()) |
               (t.exitLatitude.isNotNull() & t.exitLongitude.isNotNull());
+          // Mirrors MediaRepository.getBestPhotoGpsForDives exactly, taken_at
+          // included: that query picks the photo nearest the dive's entry
+          // time, so a row without one yields no point. Counting it here
+          // would inflate the post-import offer and then hand the review
+          // page a dive it cannot place.
           final hasPhotoGps = existsQuery(
             _db.select(_db.media)..where(
               (m) =>
                   m.diveId.equalsExp(t.id) &
                   m.latitude.isNotNull() &
                   m.longitude.isNotNull() &
+                  m.takenAt.isNotNull() &
                   (m.latitude.equals(0) & m.longitude.equals(0)).not(),
             ),
           );

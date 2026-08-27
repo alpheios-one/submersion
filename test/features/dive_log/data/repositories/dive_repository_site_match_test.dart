@@ -205,6 +205,34 @@ void main() {
       expect(ids, contains('sitedNoCoords'));
     });
 
+    test('excludes a dive whose only GPS photo has no capture time', () async {
+      // getBestPhotoGpsForDives needs taken_at to pick the photo nearest
+      // entry, so such a dive yields no point. Counting it here would
+      // inflate the post-import offer and then show an empty review.
+      await insertDive('noCaptureTime');
+      await insertPhotoWithGps('p1', 'noCaptureTime');
+      await db.customStatement(
+        "UPDATE media SET taken_at = NULL WHERE id = 'p1'",
+      );
+
+      final ids = (await repo.getDivesNeedingSiteMatch()).map((d) => d.id);
+
+      expect(ids, isNot(contains('noCaptureTime')));
+    });
+
+    test('still includes the dive when another GPS photo is dated', () async {
+      await insertDive('mixed');
+      await insertPhotoWithGps('undated', 'mixed');
+      await insertPhotoWithGps('dated', 'mixed');
+      await db.customStatement(
+        "UPDATE media SET taken_at = NULL WHERE id = 'undated'",
+      );
+
+      final ids = (await repo.getDivesNeedingSiteMatch()).map((d) => d.id);
+
+      expect(ids, contains('mixed'));
+    });
+
     test('excludes a dive whose site has coordinates', () async {
       final located = await insertSite('located', lat: 5, lng: 6);
       await insertDive('sited', lat: 1, lng: 2, siteId: located);
