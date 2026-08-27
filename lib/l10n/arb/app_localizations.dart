@@ -39330,6 +39330,90 @@ abstract class AppLocalizations {
   /// **'Pressure'**
   String get dive3d_metric_tankPressure;
 
+  /// No description provided for @dive3d_zAxis.
+  ///
+  /// In en, this message translates to:
+  /// **'Z axis'**
+  String get dive3d_zAxis;
+
+  /// No description provided for @dive3d_zAxis_none.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get dive3d_zAxis_none;
+
+  /// No description provided for @dive3d_overlay_shadows.
+  ///
+  /// In en, this message translates to:
+  /// **'Wall shadows'**
+  String get dive3d_overlay_shadows;
+
+  /// No description provided for @dive3d_metric_tts.
+  ///
+  /// In en, this message translates to:
+  /// **'TTS'**
+  String get dive3d_metric_tts;
+
+  /// No description provided for @dive3d_axis_depth.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth ({unitSymbol})'**
+  String dive3d_axis_depth(String unitSymbol);
+
+  /// No description provided for @dive3d_axis_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Run time (min)'**
+  String get dive3d_axis_time;
+
+  /// No description provided for @dive3d_pose_menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get dive3d_pose_menu;
+
+  /// No description provided for @dive3d_pose_default.
+  ///
+  /// In en, this message translates to:
+  /// **'Default view'**
+  String get dive3d_pose_default;
+
+  /// No description provided for @dive3d_pose_front.
+  ///
+  /// In en, this message translates to:
+  /// **'Front (depth vs time)'**
+  String get dive3d_pose_front;
+
+  /// No description provided for @dive3d_pose_side.
+  ///
+  /// In en, this message translates to:
+  /// **'Side (depth vs metric)'**
+  String get dive3d_pose_side;
+
+  /// No description provided for @dive3d_pose_top.
+  ///
+  /// In en, this message translates to:
+  /// **'Top (metric vs time)'**
+  String get dive3d_pose_top;
+
+  /// No description provided for @dive3d_readout_runTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Run time'**
+  String get dive3d_readout_runTime;
+
+  /// No description provided for @dive3d_readout_ceiling.
+  ///
+  /// In en, this message translates to:
+  /// **'Ceiling'**
+  String get dive3d_readout_ceiling;
+
+  /// No description provided for @dive3d_readout_tank.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank {n}'**
+  String dive3d_readout_tank(int n);
+
   /// No description provided for @dive3d_scene_dive.
   ///
   /// In en, this message translates to:

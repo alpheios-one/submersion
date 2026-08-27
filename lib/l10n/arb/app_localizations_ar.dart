@@ -23342,6 +23342,52 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dive3d_metric_tankPressure => 'الضغط';
 
   @override
+  String get dive3d_zAxis => 'المحور Z';
+
+  @override
+  String get dive3d_zAxis_none => 'بدون';
+
+  @override
+  String get dive3d_overlay_shadows => 'ظلال الجدران';
+
+  @override
+  String get dive3d_metric_tts => 'TTS';
+
+  @override
+  String dive3d_axis_depth(String unitSymbol) {
+    return 'العمق ($unitSymbol)';
+  }
+
+  @override
+  String get dive3d_axis_time => 'زمن الغوص (دقيقة)';
+
+  @override
+  String get dive3d_pose_menu => 'الكاميرا';
+
+  @override
+  String get dive3d_pose_default => 'العرض الافتراضي';
+
+  @override
+  String get dive3d_pose_front => 'أمامي (العمق مقابل الزمن)';
+
+  @override
+  String get dive3d_pose_side => 'جانبي (العمق مقابل القياس)';
+
+  @override
+  String get dive3d_pose_top => 'علوي (القياس مقابل الزمن)';
+
+  @override
+  String get dive3d_readout_runTime => 'زمن الغوص';
+
+  @override
+  String get dive3d_readout_ceiling => 'السقف';
+
+  @override
+  String dive3d_readout_tank(int n) {
+    return 'أسطوانة $n';
+  }
+
+  @override
   String get dive3d_scene_dive => 'الغوص';
 
   @override

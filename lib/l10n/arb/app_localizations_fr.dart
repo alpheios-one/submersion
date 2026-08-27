@@ -23838,6 +23838,52 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dive3d_metric_tankPressure => 'Pression';
 
   @override
+  String get dive3d_zAxis => 'Axe Z';
+
+  @override
+  String get dive3d_zAxis_none => 'Aucun';
+
+  @override
+  String get dive3d_overlay_shadows => 'Ombres sur les parois';
+
+  @override
+  String get dive3d_metric_tts => 'TTS';
+
+  @override
+  String dive3d_axis_depth(String unitSymbol) {
+    return 'Profondeur ($unitSymbol)';
+  }
+
+  @override
+  String get dive3d_axis_time => 'Temps de plongée (min)';
+
+  @override
+  String get dive3d_pose_menu => 'Caméra';
+
+  @override
+  String get dive3d_pose_default => 'Vue par défaut';
+
+  @override
+  String get dive3d_pose_front => 'Face (profondeur / temps)';
+
+  @override
+  String get dive3d_pose_side => 'Côté (profondeur / mesure)';
+
+  @override
+  String get dive3d_pose_top => 'Dessus (mesure / temps)';
+
+  @override
+  String get dive3d_readout_runTime => 'Temps de plongée';
+
+  @override
+  String get dive3d_readout_ceiling => 'Plafond';
+
+  @override
+  String dive3d_readout_tank(int n) {
+    return 'Bloc $n';
+  }
+
+  @override
   String get dive3d_scene_dive => 'Plongée';
 
   @override

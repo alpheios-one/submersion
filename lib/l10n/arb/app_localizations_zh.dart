@@ -22554,6 +22554,52 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_metric_tankPressure => '压力';
 
   @override
+  String get dive3d_zAxis => 'Z 轴';
+
+  @override
+  String get dive3d_zAxis_none => '无';
+
+  @override
+  String get dive3d_overlay_shadows => '壁面投影';
+
+  @override
+  String get dive3d_metric_tts => 'TTS';
+
+  @override
+  String dive3d_axis_depth(String unitSymbol) {
+    return '深度（$unitSymbol）';
+  }
+
+  @override
+  String get dive3d_axis_time => '潜水时间（分钟）';
+
+  @override
+  String get dive3d_pose_menu => '相机';
+
+  @override
+  String get dive3d_pose_default => '默认视图';
+
+  @override
+  String get dive3d_pose_front => '正面（深度/时间）';
+
+  @override
+  String get dive3d_pose_side => '侧面（深度/指标）';
+
+  @override
+  String get dive3d_pose_top => '顶部（指标/时间）';
+
+  @override
+  String get dive3d_readout_runTime => '潜水时间';
+
+  @override
+  String get dive3d_readout_ceiling => '减压天花板';
+
+  @override
+  String dive3d_readout_tank(int n) {
+    return '气瓶 $n';
+  }
+
+  @override
   String get dive3d_scene_dive => '潜水';
 
   @override

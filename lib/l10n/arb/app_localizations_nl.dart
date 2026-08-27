@@ -23584,6 +23584,52 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_metric_tankPressure => 'Druk';
 
   @override
+  String get dive3d_zAxis => 'Z-as';
+
+  @override
+  String get dive3d_zAxis_none => 'Geen';
+
+  @override
+  String get dive3d_overlay_shadows => 'Wandschaduwen';
+
+  @override
+  String get dive3d_metric_tts => 'TTS';
+
+  @override
+  String dive3d_axis_depth(String unitSymbol) {
+    return 'Diepte ($unitSymbol)';
+  }
+
+  @override
+  String get dive3d_axis_time => 'Duiktijd (min)';
+
+  @override
+  String get dive3d_pose_menu => 'Camera';
+
+  @override
+  String get dive3d_pose_default => 'Standaardweergave';
+
+  @override
+  String get dive3d_pose_front => 'Voor (diepte vs. tijd)';
+
+  @override
+  String get dive3d_pose_side => 'Zijkant (diepte vs. meetwaarde)';
+
+  @override
+  String get dive3d_pose_top => 'Boven (meetwaarde vs. tijd)';
+
+  @override
+  String get dive3d_readout_runTime => 'Duiktijd';
+
+  @override
+  String get dive3d_readout_ceiling => 'Plafond';
+
+  @override
+  String dive3d_readout_tank(int n) {
+    return 'Fles $n';
+  }
+
+  @override
   String get dive3d_scene_dive => 'Duik';
 
   @override
