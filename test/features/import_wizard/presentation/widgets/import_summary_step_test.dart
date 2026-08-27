@@ -77,6 +77,9 @@ Widget _buildWidget(
   return ProviderScope(
     overrides: [importWizardNotifierProvider.overrideWith((_) => notifier)],
     child: MaterialApp(
+      // Pinned so the English assertions in this file do not depend on the host
+      // machine's locale, which flutter_test forwards to the app.
+      locale: const Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(

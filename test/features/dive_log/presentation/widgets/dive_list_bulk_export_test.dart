@@ -327,6 +327,9 @@ void main() {
 
     await tester.pumpWidget(
       testAppInShell(
+        // Pinned so the English menu and dialog labels this test taps do not
+        // depend on the host machine's locale, which flutter_test forwards.
+        locale: const Locale('en'),
         overrides: [
           ...base,
           diveListViewModeProvider.overrideWith((ref) => ListViewMode.detailed),

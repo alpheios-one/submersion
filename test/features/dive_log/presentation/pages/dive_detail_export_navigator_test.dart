@@ -105,15 +105,12 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
-    final originalOnError = FlutterError.onError;
-    FlutterError.onError = (d) {
-      if (d.toString().contains('overflowed')) return;
-      originalOnError?.call(d);
-    };
-
     await tester.pumpWidget(
       testAppInShell(
         navigatorKey: shellKey,
+        // Pinned so the English menu and dialog labels this test taps do not
+        // depend on the host machine's locale, which flutter_test forwards.
+        locale: const Locale('en'),
         overrides: [
           ...base,
           diveProvider(dive.id).overrideWith((ref) async => dive),
@@ -127,7 +124,6 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
-    FlutterError.onError = originalOnError;
 
     return shellKey;
   }
