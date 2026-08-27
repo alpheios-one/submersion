@@ -33,8 +33,9 @@ class SiteSuggestionCard extends ConsumerWidget {
   final DiveSite? currentSite;
 
   /// Fires with the site the dive now has after assign / addLocation /
-  /// create, so an edit form can update its unsaved state.
-  final void Function(DiveSite? site)? onSiteChanged;
+  /// create, so an edit form can update its unsaved state. Always the site
+  /// the dive actually ended up linked to, re-read from the repository.
+  final void Function(DiveSite site)? onSiteChanged;
 
   /// Refreshes the dive and site lists after a write. Injectable for tests.
   final Future<void> Function()? refreshLists;
@@ -79,14 +80,20 @@ class SiteSuggestionCard extends ConsumerWidget {
           ? null
           : () => _run(context, ref, (l10n) async {
               await actions.assign(recommended.id);
-              final site = DiveSite(
-                id: recommended.id,
-                name: recommended.name,
-                location: recommended.location,
-                country: recommended.country,
-                region: recommended.region,
+              // The candidate id is NOT necessarily the id the dive ends up
+              // with: a bundled candidate materialises a new row, and the
+              // coincidence guard can link an existing site nearby instead.
+              // Re-read the dive so the form gets the real, fully hydrated
+              // site rather than a partial entity built from the candidate.
+              final linked = await ref
+                  .read(diveRepositoryProvider)
+                  .getDiveById(diveId);
+              return (
+                linked?.site,
+                l10n.siteSuggestion_assignedSnack(
+                  linked?.site?.name ?? recommended.name,
+                ),
               );
-              return (site, l10n.siteSuggestion_assignedSnack(site.name));
             }),
       onChooseNearby: () => context.push('/dives/match-sites', extra: [diveId]),
       onCreate: () => _create(context, ref, actions, suggestion),
@@ -123,12 +130,15 @@ class SiteSuggestionCard extends ConsumerWidget {
     });
   }
 
-  /// Runs a write, then refreshes what depends on it and reports the result.
+  /// Runs a write, then refreshes what depends on it and reports the result:
+  /// a message to show, and the site the dive now has (null when the write
+  /// changed no site, or when re-reading it failed, in which case the form
+  /// keeps what it had rather than adopting a guess).
   /// A failure keeps the banner up and shows the shared apply error.
   Future<void> _run(
     BuildContext context,
     WidgetRef ref,
-    Future<(DiveSite, String)?> Function(AppLocalizations l10n) write,
+    Future<(DiveSite?, String)?> Function(AppLocalizations l10n) write,
   ) async {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
@@ -138,7 +148,8 @@ class SiteSuggestionCard extends ConsumerWidget {
       ref.invalidate(diveProvider(diveId));
       await (refreshLists ?? () => _defaultRefresh(ref))();
       if (result != null) {
-        onSiteChanged?.call(result.$1);
+        final site = result.$1;
+        if (site != null) onSiteChanged?.call(site);
         messenger.showSnackBar(
           SnackBar(
             content: Text(result.$2),

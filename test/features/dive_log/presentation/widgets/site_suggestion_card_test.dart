@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/site_suggestion_card.dart';
 import 'package:submersion/features/dive_sites/data/services/site_matching_service.dart';
@@ -12,12 +13,25 @@ import '../../../media/presentation/support/media_widget_harness.dart';
 import '../support/fake_matching_service.dart';
 
 class _StubDiveRepository implements DiveRepository {
+  _StubDiveRepository({this.linkedSite});
+
+  /// The site the dive is linked to when the card re-reads it after a write.
+  final DiveSite? linkedSite;
   final dismissed = <String>[];
 
   @override
   Future<void> setSiteSuggestionDismissed(String diveId, bool value) async {
     if (value) dismissed.add(diveId);
   }
+
+  @override
+  Future<Dive?> getDiveById(String id) async => Dive(
+    id: id,
+    diveNumber: 1,
+    dateTime: DateTime(2026, 1, 1),
+    maxDepth: 18,
+    site: linkedSite,
+  );
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -37,7 +51,7 @@ void main() {
   Future<Widget> host(
     SiteSuggestion? suggestion, {
     DiveSite? currentSite,
-    void Function(DiveSite?)? onSiteChanged,
+    void Function(DiveSite)? onSiteChanged,
   }) => mediaTestApp(
     overrides: [
       siteSuggestionForDiveProvider(
@@ -62,7 +76,58 @@ void main() {
     expect(find.textContaining('Location'), findsNothing);
   });
 
-  testWidgets('assign applies and reports the assigned site', (tester) async {
+  testWidgets(
+    'assign reports the site the dive was actually linked to, not the candidate',
+    (tester) async {
+      // A bundled candidate's id is its externalId; applyConfirmed
+      // materialises a user site with a different database id (or the
+      // coincidence guard links an existing one). The card must report the
+      // dive's real site, or the edit form would save a site id that does
+      // not exist.
+      const linked = DiveSite(
+        id: 'materialised-uuid',
+        name: 'Blue Hole',
+        location: GeoPoint(0, 0),
+        maxDepth: 40,
+      );
+      dives = _StubDiveRepository(linkedSite: linked);
+      final s = suggestionFor(
+        service,
+        recommended: 'osm_1',
+        candidates: const [
+          MatchCandidateView(
+            id: 'osm_1',
+            name: 'Blue Hole',
+            isExisting: false,
+            distanceMeters: 40,
+            location: GeoPoint(0, 0),
+          ),
+        ],
+      );
+      DiveSite? reported;
+      await tester.pumpWidget(
+        await host(s, onSiteChanged: (site) => reported = site),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Assign Blue Hole'));
+      await tester.pumpAndSettle();
+
+      expect(service.applied.single.candidateId, 'osm_1');
+      expect(
+        reported?.id,
+        'materialised-uuid',
+        reason: 'the bundled externalId must never reach the form',
+      );
+      expect(reported?.maxDepth, 40, reason: 'and it must be fully hydrated');
+      expect(refreshed, 1);
+      expect(find.text('Assigned Blue Hole'), findsOneWidget);
+    },
+  );
+
+  testWidgets('assign leaves the form alone when the dive has no site', (
+    tester,
+  ) async {
+    dives = _StubDiveRepository();
     final s = suggestionFor(
       service,
       recommended: 's1',
@@ -76,16 +141,15 @@ void main() {
         ),
       ],
     );
-    DiveSite? reported;
+    var reportedCount = 0;
     await tester.pumpWidget(
-      await host(s, onSiteChanged: (site) => reported = site),
+      await host(s, onSiteChanged: (_) => reportedCount++),
     );
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Assign Blue Hole'));
     await tester.pumpAndSettle();
-    expect(service.applied.single.candidateId, 's1');
-    expect(reported?.id, 's1');
-    expect(refreshed, 1);
+
+    expect(reportedCount, 0);
     expect(find.text('Assigned Blue Hole'), findsOneWidget);
   });
 
