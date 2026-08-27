@@ -119,6 +119,33 @@ void main() {
       expect(stored[day1.millisecondsSinceEpoch]!.airTemp, 25);
     });
 
+    test('a date with a time component is stored under local midnight', () {
+      // The repository owns the (trip, date) uniqueness invariant, so it
+      // normalizes rather than trusting every caller to. A row keyed on a
+      // stray time would be invisible to midnight-keyed lookups and would
+      // refetch forever.
+      return () async {
+        await repository.upsert(sample(date: DateTime(2026, 3, 8, 17, 30)));
+
+        final stored = await repository.getForTrip(testTripId);
+
+        expect(stored.keys.single, day1.millisecondsSinceEpoch);
+        expect(stored[day1.millisecondsSinceEpoch]!.date, day1);
+      }();
+    });
+
+    test('the same day at two times of day stays one row', () async {
+      await repository.upsert(sample(date: DateTime(2026, 3, 8, 6)));
+      await repository.upsert(
+        sample(id: 'w2', date: DateTime(2026, 3, 8, 23), airTemp: 25),
+      );
+
+      final stored = await repository.getForTrip(testTripId);
+
+      expect(stored, hasLength(1));
+      expect(stored[day1.millisecondsSinceEpoch]!.airTemp, 25);
+    });
+
     test('two different days both persist', () async {
       await repository.upsert(sample());
       await repository.upsert(sample(id: 'w2', date: day2, airTemp: 19));

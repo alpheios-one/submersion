@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
 import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart';
@@ -28,8 +29,17 @@ void main() {
     );
   }
 
-  Dive diveWith({double? airTemp}) =>
-      Dive(id: 'd1', dateTime: DateTime(2026, 3, 8, 9), airTemp: airTemp);
+  Dive diveWith({
+    double? airTemp,
+    CloudCover? cloudCover,
+    Precipitation? precipitation,
+  }) => Dive(
+    id: 'd1',
+    dateTime: DateTime(2026, 3, 8, 9),
+    airTemp: airTemp,
+    cloudCover: cloudCover,
+    precipitation: precipitation,
+  );
 
   TripStoryDay day({
     required int index,
@@ -194,6 +204,55 @@ void main() {
         DateTime(2026, 3, 9),
         DateTime(2026, 3, 10),
       ]);
+    });
+
+    test(
+      'a dive carrying only Precipitation.none does NOT count as weather',
+      () {
+        // WeatherMapper never returns null precipitation, so a dive whose
+        // lookup resolved nothing still stores `none`. The header draws no
+        // glyph for it, so treating it as "this day has weather" would skip the
+        // backfill and leave the day permanently badge-free.
+        final story = storyWith(
+          [
+            day(index: 0, dives: [diveWith(precipitation: Precipitation.none)]),
+          ],
+          points: [pointFor(0)],
+        );
+
+        expect(
+          TripDayWeatherBackfill.targetsFor(story: story, stored: const {}),
+          hasLength(1),
+        );
+      },
+    );
+
+    test('a dive carrying active precipitation DOES count as weather', () {
+      final story = storyWith(
+        [
+          day(index: 0, dives: [diveWith(precipitation: Precipitation.rain)]),
+        ],
+        points: [pointFor(0)],
+      );
+
+      expect(
+        TripDayWeatherBackfill.targetsFor(story: story, stored: const {}),
+        isEmpty,
+      );
+    });
+
+    test('a dive carrying only cloud cover counts as weather', () {
+      final story = storyWith(
+        [
+          day(index: 0, dives: [diveWith(cloudCover: CloudCover.overcast)]),
+        ],
+        points: [pointFor(0)],
+      );
+
+      expect(
+        TripDayWeatherBackfill.targetsFor(story: story, stored: const {}),
+        isEmpty,
+      );
     });
 
     test('a day date with a time component is normalized to midnight', () {

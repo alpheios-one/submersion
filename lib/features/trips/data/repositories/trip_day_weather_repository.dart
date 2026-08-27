@@ -19,6 +19,17 @@ class TripDayWeatherRepository {
   final SyncRepository _syncRepository = SyncRepository();
   final _log = LoggerService.forClass(TripDayWeatherRepository);
 
+  /// Local midnight for [date], as epoch milliseconds.
+  ///
+  /// The day is the identity, so normalizing here is what actually enforces
+  /// the (trip, date) uniqueness intent. A caller that passes a DateTime with
+  /// a time component would otherwise store a second row for the same
+  /// calendar day, invisible to every midnight-keyed lookup and refetched on
+  /// every view. Reads normalize too, because a row can also arrive through
+  /// sync from a peer, bypassing this class entirely.
+  static int _dayKey(DateTime date) =>
+      DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+
   /// Emits whenever `trip_day_weather` changes, so the display provider
   /// refreshes after a backfill write or a sync import.
   Stream<void> watchWeatherChanges() =>
@@ -30,7 +41,10 @@ class TripDayWeatherRepository {
       final rows = await (_db.select(
         _db.tripDayWeather,
       )..where((t) => t.tripId.equals(tripId))).get();
-      return {for (final row in rows) row.date: _mapRow(row)};
+      return {
+        for (final row in rows)
+          _dayKey(DateTime.fromMillisecondsSinceEpoch(row.date)): _mapRow(row),
+      };
     } catch (e, stackTrace) {
       _log.error(
         'Failed to read weather for trip: $tripId',
@@ -45,7 +59,7 @@ class TripDayWeatherRepository {
   Future<void> upsert(domain.TripDayWeather weather) async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
-      final dateMillis = weather.date.millisecondsSinceEpoch;
+      final dateMillis = _dayKey(weather.date);
 
       // Reuse the stored row's id when the day already has one: a peer may
       // have written its own uuid for this day, and replacing it under a new

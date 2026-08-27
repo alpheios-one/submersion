@@ -65,15 +65,10 @@ class TripDayWeather extends Equatable {
   /// carrying only those renders as nothing and would suppress the retry that
   /// a later archive update would satisfy.
   ///
-  /// [Precipitation.none] does not count. `WeatherMapper.mapPrecipitation`
-  /// returns non-null always, defaulting a missing reading to `none`, so
-  /// `none` cannot be read as evidence that the fetch resolved anything. It
-  /// also earns no glyph of its own in `weatherIconFor`, which falls through
-  /// to cloud cover.
-  bool get hasRenderableWeather =>
-      airTemp != null ||
-      cloudCover != null ||
-      (precipitation != null && precipitation != Precipitation.none);
+  /// Delegates to [TripStoryDayWeather.isRenderable] so the rule that decides
+  /// what is worth storing is the same one that decides what the header can
+  /// draw, and the same one the backfill uses to judge a day's dive weather.
+  bool get hasRenderableWeather => toStoryWeather().isRenderable;
 
   /// The compact view model the day header consumes.
   TripStoryDayWeather toStoryWeather() => TripStoryDayWeather(

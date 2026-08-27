@@ -45,7 +45,13 @@ class TripDayWeatherBackfill {
 
       // A dive that logged weather is the better source: it is what the diver
       // recorded. Never override it with a fetched summary.
-      if (day.weather != null) continue;
+      //
+      // Renderability, not mere presence, is the test. A dive whose weather
+      // lookup resolved nothing still stores Precipitation.none, because
+      // WeatherMapper never returns null precipitation, and that renders as a
+      // blank badge. Skipping on presence alone would leave such a day
+      // permanently badge-free.
+      if (day.weather?.isRenderable ?? false) continue;
 
       // A historical archive has nothing for a day that has not happened.
       if (day.kind == TripStoryDayKind.future) continue;
