@@ -47,6 +47,7 @@ class SyncRepository {
     'trips': (table: 'trips', pk: 'id'),
     'liveaboardDetails': (table: 'liveaboard_detail_records', pk: 'id'),
     'itineraryDays': (table: 'trip_itinerary_days', pk: 'id'),
+    'tripDayWeather': (table: 'trip_day_weather', pk: 'id'),
     'checklistTemplates': (table: 'checklist_templates', pk: 'id'),
     'checklistTemplateItems': (table: 'checklist_template_items', pk: 'id'),
     'tripChecklistItems': (table: 'trip_checklist_items', pk: 'id'),

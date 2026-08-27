@@ -136,6 +136,65 @@ class TripItineraryDays extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Fetched historical weather for one trip day, stored for days whose dives
+/// supply no weather of their own (surface days and dive-free itinerary days).
+///
+/// A separate table rather than columns on `trips` or `trip_itinerary_days` on
+/// purpose: HLC conflicts resolve per row, so parking an automatic, derived
+/// write on a row the diver also edits by hand would let a weather write race
+/// a trip rename or an itinerary note edit and lose it. Weather owns its own
+/// row and its own clock.
+///
+/// Metric storage throughout (celsius, m/s, bar); conversion to the diver's
+/// units happens at display time.
+class TripDayWeather extends Table {
+  // coverage:ignore-start
+  TextColumn get id => text()();
+  TextColumn get tripId => text().references(Trips, #id)();
+
+  /// UTC midnight for the day, as epoch milliseconds (milliseconds being the
+  /// convention TripItineraryDays.date is written with).
+  ///
+  /// UTC rather than local: this column is half the row identity, and it
+  /// feeds the derived id. A local midnight epoch differs in every timezone,
+  /// so two devices would key the same trip day differently and never
+  /// converge. Write it through tripDayMillis.
+  IntColumn get date => integer()();
+
+  /// The coordinates the lookup actually used, so a row records what it was
+  /// fetched for even if the trip's sites later move.
+  RealColumn get latitude => real()();
+  RealColumn get longitude => real()();
+
+  RealColumn get airTemp => real().nullable()(); // celsius
+  TextColumn get cloudCover => text().nullable()(); // enum: CloudCover.name
+  TextColumn get precipitation =>
+      text().nullable()(); // enum: Precipitation.name
+  RealColumn get windSpeed => real().nullable()(); // m/s
+  TextColumn get windDirection =>
+      text().nullable()(); // enum: CurrentDirection.name
+  RealColumn get humidity => real().nullable()(); // 0-100
+  RealColumn get surfacePressure => real().nullable()(); // bar
+
+  /// Raw WMO weather code, kept so the description renders in the diver's
+  /// locale at display time rather than frozen as English prose at fetch time.
+  IntColumn get weatherCode => integer().nullable()();
+
+  TextColumn get weatherSource =>
+      text().withDefault(const Constant('openMeteo'))();
+  IntColumn get fetchedAt => integer()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  /// Hybrid Logical Clock for cross-device conflict resolution
+  /// (nullable: rows written before HLC rollout fall back to updatedAt).
+  TextColumn get hlc => text().nullable()();
+  // coverage:ignore-end
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 /// Reusable checklist templates for trip planning (issue #164)
 class ChecklistTemplates extends Table {
   // coverage:ignore-start
@@ -3154,6 +3213,7 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     // Liveaboard tracking (v2.0)
     LiveaboardDetailRecords,
     TripItineraryDays,
+    TripDayWeather,
     ChecklistTemplates,
     ChecklistTemplateItems,
     TripChecklistItems,
@@ -3193,7 +3253,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 170;
+  static const int currentSchemaVersion = 171;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3521,6 +3581,17 @@ class AppDatabase extends _$AppDatabase {
     // landed 168 past it, so PR #1276 moved its rung up), and 169 belongs to
     // PR #1320 (dive-computer gear twins).
     170,
+    // v171: trip_day_weather, fetched historical weather for trip days whose
+    // dives supply none. Renumbered from 168, which PR #1237 (issue #638,
+    // buddies.is_favorite) had already claimed and pushed; that claim was
+    // local and unpushed when this branch picked its number, so an open-PR
+    // scan could not see it.
+    // 165, 167 and 169 are deliberately absent, not missing: 165 is claimed by
+    // PR #1290, while 167 and 169 are permanently skipped. main landed past
+    // both while their branches were open, so PR #1276 moved to 173 and
+    // PR #1320 to 175. This ladder is non-contiguous by design; the audit
+    // asserts monotonic, unique, and scalar == max, never contiguous.
+    171,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -3974,6 +4045,41 @@ class AppDatabase extends _$AppDatabase {
   /// v129: quality_findings table for the Data Quality Assistant.
   /// Idempotent so it is safe to call from both onUpgrade and the
   /// beforeOpen backstop.
+  /// v171: fetched per-day trip weather.
+  ///
+  /// Idempotent, so it doubles as the beforeOpen backstop for a database
+  /// stranded at 171 by a parallel branch that never created the table.
+  Future<void> _assertTripDayWeatherSchema() async {
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS trip_day_weather (
+        id TEXT NOT NULL PRIMARY KEY,
+        trip_id TEXT NOT NULL REFERENCES trips (id),
+        date INTEGER NOT NULL,
+        latitude REAL NOT NULL,
+        longitude REAL NOT NULL,
+        air_temp REAL,
+        cloud_cover TEXT,
+        precipitation TEXT,
+        wind_speed REAL,
+        wind_direction TEXT,
+        humidity REAL,
+        surface_pressure REAL,
+        weather_code INTEGER,
+        weather_source TEXT NOT NULL DEFAULT 'openMeteo',
+        fetched_at INTEGER NOT NULL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        hlc TEXT
+      )
+    ''');
+    // The day is the identity: two devices that both fetch it must converge
+    // on one row rather than accumulating duplicates.
+    await customStatement(
+      'CREATE UNIQUE INDEX IF NOT EXISTS idx_trip_day_weather_trip_date '
+      'ON trip_day_weather (trip_id, date)',
+    );
+  }
+
   Future<void> _assertQualityFindingsSchema() async {
     await customStatement('''
       CREATE TABLE IF NOT EXISTS quality_findings (
@@ -8802,6 +8908,12 @@ class AppDatabase extends _$AppDatabase {
           await _rewriteLegacySacRateLayouts();
         }
         if (from < 170) await reportProgress();
+        // v171: trip_day_weather, fetched per-day weather for trip days whose
+        // dives supply none.
+        if (from < 171) {
+          await _assertTripDayWeatherSchema();
+        }
+        if (from < 171) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9017,6 +9129,11 @@ class AppDatabase extends _$AppDatabase {
         // value map (discussions #354, #803; same restore / sync-adopt
         // self-heal as v160). The layout rewrite deliberately stays rung-only.
         await _assertGasConsumptionDisplayColumn();
+        // v171 backstop: re-assert trip_day_weather (same parallel-branch
+        // version-collision self-heal). The helper is CREATE TABLE IF NOT
+        // EXISTS plus CREATE UNIQUE INDEX IF NOT EXISTS, so it is a no-op on
+        // every open after the first.
+        await _assertTripDayWeatherSchema();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
