@@ -215,6 +215,59 @@ void main() {
       expect(repository.upserts.single.date, DateTime(2026, 3, 9));
     });
 
+    test('a miss is retried when the trip is viewed again', () async {
+      // The documented policy is that a miss writes nothing and is retried on
+      // the next view. A provider that stays alive for the container's
+      // lifetime would serve its completed state instead, so a transient
+      // failure would not be retried until the app restarted.
+      var calls = 0;
+      final repository = FakeTripDayWeatherRepository();
+      final container = containerWith(
+        client: MockClient((_) async {
+          calls++;
+          return http.Response('', 500);
+        }),
+        repository: repository,
+      );
+
+      // First visit: the view mounts, watches, and the pass runs.
+      final first = container.listen(
+        tripDayWeatherBackfillProvider('trip-1'),
+        (_, _) {},
+      );
+      await container.read(tripDayWeatherBackfillProvider('trip-1').future);
+      expect(calls, 2, reason: 'two days, both missing');
+
+      // Leaving the trip drops the last listener.
+      first.close();
+      await Future<void>.delayed(Duration.zero);
+
+      // Returning to the trip must run the pass again.
+      container.listen(tripDayWeatherBackfillProvider('trip-1'), (_, _) {});
+      await container.read(tripDayWeatherBackfillProvider('trip-1').future);
+
+      expect(calls, 4);
+    });
+
+    test('the pass does not re-run while the view stays mounted', () async {
+      var calls = 0;
+      final repository = FakeTripDayWeatherRepository();
+      final container = containerWith(
+        client: MockClient((_) async {
+          calls++;
+          return http.Response('', 500);
+        }),
+        repository: repository,
+      );
+
+      container.listen(tripDayWeatherBackfillProvider('trip-1'), (_, _) {});
+      await container.read(tripDayWeatherBackfillProvider('trip-1').future);
+      // A rebuild re-watches; that must not start another pass.
+      await container.read(tripDayWeatherBackfillProvider('trip-1').future);
+
+      expect(calls, 2);
+    });
+
     test('fetches run one at a time', () async {
       final gate = Completer<void>();
       var started = 0;
