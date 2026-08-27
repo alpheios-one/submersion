@@ -6,6 +6,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/marine_life/domain/entities/seen_species.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart'
     as domain;
+import 'package:submersion/features/marine_life/domain/entities/species_sighting_record.dart';
 
 /// Read-only queries behind the Species page: which species the diver has
 /// seen, and where each one was seen.
@@ -45,6 +46,53 @@ class SeenSpeciesRepository {
         )
         .get();
     return rows.map(_seenSpeciesFromRow).toList();
+  }
+
+  /// Every sighting of [speciesId], newest dive first, with the dive and
+  /// site facts the detail page's Sightings list shows.
+  ///
+  /// `LEFT JOIN dive_sites` keeps dives that have no site; their
+  /// [SpeciesSightingRecord.siteName] is null.
+  Future<List<SpeciesSightingRecord>> getSightingsForSpecies(
+    String speciesId, {
+    String? diverId,
+  }) async {
+    final diverClause = diverId != null ? 'AND d.diver_id = ?' : '';
+    final rows = await _db
+        .customSelect(
+          '''
+      SELECT s.id AS sighting_id, s.dive_id, s.count, s.notes,
+             d.dive_number, d.dive_date_time, d.max_depth, d.site_id,
+             ds.name AS site_name
+      FROM sightings s
+      JOIN dives d ON d.id = s.dive_id
+      LEFT JOIN dive_sites ds ON ds.id = d.site_id
+      WHERE s.species_id = ? $diverClause
+      ORDER BY d.dive_date_time DESC, s.id ASC
+    ''',
+          variables: [
+            Variable.withString(speciesId),
+            if (diverId != null) Variable.withString(diverId),
+          ],
+        )
+        .get();
+    return rows.map(_sightingRecordFromRow).toList();
+  }
+
+  SpeciesSightingRecord _sightingRecordFromRow(QueryRow row) {
+    return SpeciesSightingRecord(
+      sightingId: row.read<String>('sighting_id'),
+      diveId: row.read<String>('dive_id'),
+      diveNumber: row.read<int?>('dive_number'),
+      diveDateTime: DateTime.fromMillisecondsSinceEpoch(
+        row.read<int>('dive_date_time'),
+      ),
+      siteId: row.read<String?>('site_id'),
+      siteName: row.read<String?>('site_name'),
+      maxDepthMeters: row.read<double?>('max_depth'),
+      count: row.read<int>('count'),
+      notes: row.read<String?>('notes') ?? '',
+    );
   }
 
   SeenSpecies _seenSpeciesFromRow(QueryRow row) {

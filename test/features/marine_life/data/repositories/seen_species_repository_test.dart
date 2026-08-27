@@ -286,4 +286,61 @@ void main() {
       expect(await repository.getSeenSpecies(diverId: 'nobody'), isEmpty);
     });
   });
+  group('getSightingsForSpecies', () {
+    test("lists the diver's sightings newest dive first", () async {
+      final records = await repository.getSightingsForSpecies(
+        'sp_whale_shark',
+        diverId: 'diver-a',
+      );
+
+      expect(records.map((r) => r.diveId).toList(), ['d4', 'd2', 'd1']);
+    });
+
+    test('carries dive number, date, depth, count and notes', () async {
+      final records = await repository.getSightingsForSpecies(
+        'sp_whale_shark',
+        diverId: 'diver-a',
+      );
+      final first = records.last; // d1, the oldest
+
+      expect(first.sightingId, 'sg1');
+      expect(first.diveNumber, 101);
+      expect(first.diveDateTime, DateTime(2024, 1, 10));
+      expect(first.maxDepthMeters, 18.0);
+      expect(first.count, 2);
+      expect(first.notes, 'Juvenile under the ledge');
+    });
+
+    test(
+      'resolves the site name and leaves it null for a site-less dive',
+      () async {
+        final records = await repository.getSightingsForSpecies(
+          'sp_whale_shark',
+          diverId: 'diver-a',
+        );
+        final atSite = records.singleWhere((r) => r.diveId == 'd1');
+        final noSite = records.singleWhere((r) => r.diveId == 'd4');
+
+        expect(atSite.siteId, 's1');
+        expect(atSite.siteName, 'Blue Hole');
+        expect(noSite.siteId, isNull);
+        expect(noSite.siteName, isNull);
+      },
+    );
+
+    test('scopes to the diver when given and to everyone otherwise', () async {
+      final mine = await repository.getSightingsForSpecies(
+        'c1',
+        diverId: 'diver-a',
+      );
+      final everyone = await repository.getSightingsForSpecies('c1');
+
+      expect(mine.map((r) => r.diveId).toList(), ['d1']);
+      expect(everyone.map((r) => r.diveId).toList(), ['d5', 'd1']);
+    });
+
+    test('returns an empty list for a species never seen', () async {
+      expect(await repository.getSightingsForSpecies('sp_unseen'), isEmpty);
+    });
+  });
 }
