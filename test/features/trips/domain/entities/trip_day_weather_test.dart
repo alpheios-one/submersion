@@ -28,6 +28,50 @@ void main() {
     );
   }
 
+  group('tripDayMillis', () {
+    test('is the calendar day in UTC, not the device local midnight', () {
+      // The key must not depend on where the device is standing. A local
+      // DateTime(y, m, d) has a different epoch value in every timezone, so
+      // two devices would derive different row ids for the same calendar day
+      // and never converge.
+      expect(
+        tripDayMillis(DateTime(2026, 3, 8, 17, 30)),
+        DateTime.utc(2026, 3, 8).millisecondsSinceEpoch,
+      );
+    });
+
+    test('takes the calendar fields as given, never shifting the day', () {
+      // Guards the wrong fix: converting with toUtc() would move a late
+      // evening local time onto the following calendar day.
+      expect(
+        tripDayMillis(DateTime(2026, 3, 8, 23, 59)),
+        tripDayMillis(DateTime.utc(2026, 3, 8, 0, 1)),
+      );
+    });
+
+    test('distinct days stay distinct', () {
+      expect(
+        tripDayMillis(DateTime(2026, 3, 8)),
+        isNot(tripDayMillis(DateTime(2026, 3, 9))),
+      );
+    });
+  });
+
+  group('tripDayWeatherRowId', () {
+    test('is stable for one calendar day regardless of the time given', () {
+      expect(
+        tripDayWeatherRowId(
+          tripId: 't1',
+          dayMillis: tripDayMillis(DateTime(2026, 3, 8, 1)),
+        ),
+        tripDayWeatherRowId(
+          tripId: 't1',
+          dayMillis: tripDayMillis(DateTime(2026, 3, 8, 22)),
+        ),
+      );
+    });
+  });
+
   group('hasRenderableWeather', () {
     test('air temperature alone counts', () {
       expect(weather(airTemp: 24).hasRenderableWeather, isTrue);

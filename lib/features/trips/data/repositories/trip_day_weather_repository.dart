@@ -10,7 +10,7 @@ import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart'
     as domain;
 import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart'
-    show tripDayMillis, tripDayWeatherRowId;
+    show tripDayDate, tripDayMillis, tripDayWeatherRowId;
 
 /// Reads and writes stored per-day trip weather.
 ///
@@ -22,7 +22,7 @@ class TripDayWeatherRepository {
   final SyncRepository _syncRepository = SyncRepository();
   final _log = LoggerService.forClass(TripDayWeatherRepository);
 
-  /// Local midnight for [date], as epoch milliseconds.
+  /// The UTC-midnight day key for [date], as epoch milliseconds.
   ///
   /// The day is the identity, so normalizing here is what actually enforces
   /// the (trip, date) uniqueness intent. A caller that passes a DateTime with
@@ -50,7 +50,7 @@ class TripDayWeatherRepository {
 
       final winners = <int, TripDayWeatherData>{};
       for (final row in rows) {
-        final day = _dayKey(DateTime.fromMillisecondsSinceEpoch(row.date));
+        final day = _dayKey(tripDayDate(row.date));
         final held = winners[day];
         winners[day] = held == null
             ? row
@@ -199,10 +199,12 @@ class TripDayWeatherRepository {
 
   /// Every stored row for this trip that falls on [dayMillis]'s calendar day.
   ///
-  /// Filtered in Dart rather than SQL: local midnight is not something SQLite
-  /// can derive from the stored epoch millis without knowing the zone and its
-  /// DST history. A trip holds one row per day, so the scan is a few dozen
-  /// rows at most.
+  /// Filtered in Dart rather than SQL. It could be pushed down now that the
+  /// key is UTC, since the day is plain integer arithmetic on the stored
+  /// millis with no zone or DST to consult, but there is nothing to gain: a
+  /// trip holds one row per day, so the scan is a few dozen rows, and keeping
+  /// the rule in one Dart function is what stops it drifting from
+  /// [tripDayMillis].
   Future<List<TripDayWeatherData>> _rowsForDay({
     required String tripId,
     required int dayMillis,
@@ -211,10 +213,7 @@ class TripDayWeatherRepository {
       _db.tripDayWeather,
     )..where((t) => t.tripId.equals(tripId))).get();
     return rows
-        .where(
-          (r) =>
-              _dayKey(DateTime.fromMillisecondsSinceEpoch(r.date)) == dayMillis,
-        )
+        .where((r) => _dayKey(tripDayDate(r.date)) == dayMillis)
         .toList();
   }
 
@@ -255,9 +254,7 @@ class TripDayWeatherRepository {
       // written by an older build or an out-of-date peer can still carry a
       // time component, and handing that back would put time-bearing dates
       // into downstream logic.
-      date: DateTime.fromMillisecondsSinceEpoch(
-        _dayKey(DateTime.fromMillisecondsSinceEpoch(row.date)),
-      ),
+      date: tripDayDate(_dayKey(tripDayDate(row.date))),
       latitude: row.latitude,
       longitude: row.longitude,
       airTemp: row.airTemp,
