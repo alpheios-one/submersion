@@ -4,7 +4,10 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
+import 'package:submersion/features/marine_life/domain/entities/species_lookup.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
+import 'package:submersion/features/marine_life/presentation/providers/species_lookup_providers.dart';
+import 'package:submersion/features/marine_life/presentation/widgets/species_lookup_sheet.dart';
 import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_color.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
@@ -178,15 +181,63 @@ class _NearbySpeciesTierState extends ConsumerState<NearbySpeciesTier> {
     );
   }
 
+  /// A GBIF name the catalog lacks. The chip looks it up and adds it: this
+  /// list is, in effect, the species missing from the catalog at this site.
   Widget _unmatchedChip(BuildContext context, String scientificName) {
     final theme = Theme.of(context);
 
-    return Chip(
+    return ActionChip(
       avatar: const ExcludeSemantics(child: Icon(Icons.help_outline, size: 16)),
       label: Text(scientificName, style: theme.textTheme.bodySmall),
+      tooltip: context.l10n.reef_species_addFromLookup,
+      onPressed: () => _addFromLookup(scientificName),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: VisualDensity.compact,
       padding: const EdgeInsets.symmetric(horizontal: 4),
     );
+  }
+
+  /// One resolvable hit whose scientific name is the GBIF name goes straight
+  /// through; anything else (none, several, a lookup failure) opens the
+  /// sheet with the name prefilled so the diver decides.
+  Future<void> _addFromLookup(String scientificName) async {
+    final lookup = ref.read(speciesLookupServiceProvider);
+    final locale = ref.read(speciesLookupLocaleProvider);
+    SpeciesLookupResult? result;
+    try {
+      final hits = await lookup.search(scientificName, locale: locale);
+      final exact = hits
+          .where(
+            (h) =>
+                h.isResolvable &&
+                h.scientificName.toLowerCase() == scientificName.toLowerCase(),
+          )
+          .toList();
+      if (exact.length == 1) {
+        result = await lookup.resolve(exact.single.taxonId, locale: locale);
+      }
+    } on SpeciesLookupException {
+      result = null;
+    }
+    if (!mounted) return;
+    result ??= await showSpeciesLookupSheet(
+      context,
+      initialQuery: scientificName,
+    );
+    if (result == null || !mounted) return;
+
+    final repository = ref.read(speciesRepositoryProvider);
+    final species =
+        await repository.findSpeciesByScientificName(result.scientificName) ??
+        await repository.createSpecies(
+          commonName: result.commonName,
+          scientificName: result.scientificName,
+          category: result.category,
+          taxonomyClass: result.taxonomyClass,
+        );
+    if (!mounted) return;
+    await ref
+        .read(siteExpectedSpeciesNotifierProvider(widget.siteId).notifier)
+        .addSpecies(species.id);
   }
 }
