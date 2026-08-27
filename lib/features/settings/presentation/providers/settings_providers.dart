@@ -310,6 +310,10 @@ class AppSettings {
   /// How aggressively downloaded dives are auto-matched to sites.
   final SiteMatchSensitivity siteMatchSensitivity;
 
+  /// Whether an import reads cylinder end pressure at the moment of surfacing
+  /// rather than at the end of the recording (issue #1092).
+  final bool trimTankPressureAtSurfacing;
+
   /// Name of the selected gradient preset ('ocean', 'thermal', etc.)
   final String cardColorGradientPreset;
 
@@ -545,6 +549,7 @@ class AppSettings {
     this.diveCenterListViewMode = ListViewMode.detailed,
     this.mapStyle = MapStyle.openStreetMap,
     this.siteMatchSensitivity = SiteMatchSensitivity.balanced,
+    this.trimTankPressureAtSurfacing = true,
     this.cardColorGradientPreset = 'ocean',
     this.cardColorGradientStart,
     this.cardColorGradientEnd,
@@ -707,6 +712,7 @@ class AppSettings {
     ListViewMode? diveCenterListViewMode,
     MapStyle? mapStyle,
     SiteMatchSensitivity? siteMatchSensitivity,
+    bool? trimTankPressureAtSurfacing,
     String? cardColorGradientPreset,
     int? cardColorGradientStart,
     int? cardColorGradientEnd,
@@ -847,6 +853,8 @@ class AppSettings {
           diveCenterListViewMode ?? this.diveCenterListViewMode,
       mapStyle: mapStyle ?? this.mapStyle,
       siteMatchSensitivity: siteMatchSensitivity ?? this.siteMatchSensitivity,
+      trimTankPressureAtSurfacing:
+          trimTankPressureAtSurfacing ?? this.trimTankPressureAtSurfacing,
       cardColorGradientPreset:
           cardColorGradientPreset ?? this.cardColorGradientPreset,
       cardColorGradientStart: clearCardColorGradientStart
@@ -1671,6 +1679,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setSiteMatchSensitivity(SiteMatchSensitivity value) async {
     state = state.copyWith(siteMatchSensitivity: value);
+    await _saveSettings();
+  }
+
+  Future<void> setTrimTankPressureAtSurfacing(bool value) async {
+    state = state.copyWith(trimTankPressureAtSurfacing: value);
     await _saveSettings();
   }
 

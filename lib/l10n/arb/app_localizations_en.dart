@@ -22388,6 +22388,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'How aggressively downloaded dives are matched to sites';
 
   @override
+  String get settings_tankPressureAtSurfacing_title =>
+      'Tank pressure at surfacing';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      'Read end pressure when you reached the surface, not when the computer stopped recording';
+
+  @override
   String get settings_siteMatch_strict => 'Strict';
 
   @override

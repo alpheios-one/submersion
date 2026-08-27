@@ -14519,6 +14519,8 @@
   "settings_section_dataSources_subtitle": "Health data integration",
   "settings_siteMatch_title": "Auto site matching",
   "settings_siteMatch_subtitle": "How aggressively downloaded dives are matched to sites",
+  "settings_tankPressureAtSurfacing_title": "Tank pressure at surfacing",
+  "settings_tankPressureAtSurfacing_subtitle": "Read end pressure when you reached the surface, not when the computer stopped recording",
   "settings_siteMatch_strict": "Strict",
   "settings_siteMatch_balanced": "Balanced",
   "settings_siteMatch_relaxed": "Relaxed",

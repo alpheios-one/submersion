@@ -22850,6 +22850,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'À quel point les plongées téléchargées sont associées aux sites';
 
   @override
+  String get settings_tankPressureAtSurfacing_title =>
+      'Pression du bloc à l\'arrivée en surface';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      'Relever la pression finale à l\'arrivée en surface, et non à la fin de l\'enregistrement';
+
+  @override
   String get settings_siteMatch_strict => 'Strict';
 
   @override

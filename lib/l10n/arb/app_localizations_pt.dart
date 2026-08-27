@@ -22769,6 +22769,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Com que intensidade os mergulhos baixados são associados aos pontos';
 
   @override
+  String get settings_tankPressureAtSurfacing_title =>
+      'Pressão da garrafa à superfície';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      'Usar a pressão final ao chegar à superfície, não no fim da gravação';
+
+  @override
   String get settings_siteMatch_strict => 'Rigoroso';
 
   @override

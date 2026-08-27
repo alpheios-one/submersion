@@ -22691,6 +22691,14 @@ class AppLocalizationsHu extends AppLocalizations {
       'Mennyire agresszíven rendelődnek a letöltött merülések a helyekhez';
 
   @override
+  String get settings_tankPressureAtSurfacing_title =>
+      'Palacknyomás felbukkanáskor';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      'A végnyomás a felszínre érkezéskor legyen leolvasva, ne a rögzítés végén';
+
+  @override
   String get settings_siteMatch_strict => 'Szigorú';
 
   @override
