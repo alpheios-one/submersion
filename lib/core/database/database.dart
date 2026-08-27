@@ -763,6 +763,10 @@ class Dives extends Table {
   /// (nullable: rows written before HLC rollout fall back to updatedAt).
   TextColumn get hlc => text().nullable()();
 
+  /// When the diver dismissed the site suggestion for this dive (photo GPS or
+  /// dive-computer GPS). Null = never dismissed. Synced with the row.
+  IntColumn get siteSuggestionDismissedAt => integer().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -3183,7 +3187,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 166;
+  static const int currentSchemaVersion = 172;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3487,6 +3491,11 @@ class AppDatabase extends _$AppDatabase {
     // reverse-geocoded country/region/town/body of water (issue #1187).
     // Renumbered from 162, which #731 landed past while this branch was open.
     166,
+    // v172: dives.site_suggestion_dismissed_at, the synced per-dive dismissal
+    // of the photo / dive-computer site suggestion. 167 through 171 are
+    // reserved by PRs that were open when this branch was cut, so this rung is
+    // deliberately non-contiguous, not missing.
+    172,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4960,6 +4969,19 @@ class AppDatabase extends _$AppDatabase {
           'ALTER TABLE dive_profiles ADD COLUMN o2_sensor_mv$n INTEGER',
         );
       }
+    }
+  }
+
+  /// v172: site_suggestion_dismissed_at on dives. Null means the site
+  /// suggestion (from photo GPS or dive-computer GPS) was never dismissed.
+  Future<void> _assertSiteSuggestionDismissedAtColumn() async {
+    final cols = await customSelect("PRAGMA table_info('dives')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('site_suggestion_dismissed_at')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN site_suggestion_dismissed_at INTEGER',
+      );
     }
   }
 
@@ -8647,6 +8669,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertPlaceNameLanguageColumn();
         }
         if (from < 166) await reportProgress();
+        // v172: dives.site_suggestion_dismissed_at (site suggestion dismissal).
+        if (from < 172) {
+          await _assertSiteSuggestionDismissedAtColumn();
+        }
+        if (from < 172) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8845,6 +8872,10 @@ class AppDatabase extends _$AppDatabase {
         // diver_settings.default_show_estimated_tank_pressure (issue #731;
         // same parallel-branch version-collision self-heal).
         await _assertEstimatedTankPressureDefaultColumn();
+
+        // v172 backstop: re-assert dives.site_suggestion_dismissed_at (same
+        // parallel-branch version-collision self-heal).
+        await _assertSiteSuggestionDismissedAtColumn();
 
         // v164 backstop: re-assert media.manual_elapsed_seconds (issue
         // #1090; same parallel-branch version-collision self-heal). The
