@@ -102,11 +102,24 @@ class DiveComputerGearResolver {
               updatedAt: now,
             ),
           );
-      await _syncRepository.markRecordPending(
-        entityType: 'equipment',
-        recordId: derivedId,
-        localUpdatedAt: now,
-      );
+
+      // Only mark pending when the insert actually inserted. If it was ignored
+      // because a peer's twin or another isolate landed in the race window
+      // above, this row is not our write: markRecordPending stamps an HLC on
+      // the entity row, so marking it would bump someone else's row to our
+      // clock and queue it for export, letting our unchanged copy win a later
+      // conflict against a genuine edit from the device that created it.
+      // Same `SELECT changes()` idiom the imported-computer heal uses.
+      final inserted = await _db
+          .customSelect('SELECT changes() AS changed')
+          .getSingle();
+      if (inserted.read<int>('changed') > 0) {
+        await _syncRepository.markRecordPending(
+          entityType: 'equipment',
+          recordId: derivedId,
+          localUpdatedAt: now,
+        );
+      }
       return derivedId;
     } catch (e, stackTrace) {
       _log.error(

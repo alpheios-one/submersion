@@ -186,4 +186,34 @@ void main() {
 
     expect(await resolver.resolveGearTwin(computer()), isNull);
   });
+
+  Future<int> pendingCountFor(String equipmentId) async {
+    final row = await db
+        .customSelect(
+          "SELECT COUNT(*) AS c FROM sync_records "
+          "WHERE entity_type = 'equipment' AND record_id = ?",
+          variables: [Variable<String>(equipmentId)],
+        )
+        .getSingle();
+    return row.read<int>('c');
+  }
+
+  test('marks the twin pending when it actually mints one', () async {
+    final id = await resolver.resolveGearTwin(computer());
+
+    expect(await pendingCountFor(id!), 1);
+  });
+
+  test('adopting an existing row queues no sync work', () async {
+    // Adoption is not a local edit. markRecordPending stamps an HLC on the
+    // entity row, so marking an adopted row would bump someone else's row to
+    // our clock and push it, which is how an unchanged copy wins a conflict it
+    // should have lost.
+    await insertGear('hand-made', brand: 'Shearwater', model: 'Perdix 2');
+
+    final id = await resolver.resolveGearTwin(computer());
+
+    expect(id, 'hand-made');
+    expect(await pendingCountFor('hand-made'), 0);
+  });
 }
