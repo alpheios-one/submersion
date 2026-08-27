@@ -8878,28 +8878,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveTypes_deleteTooltip => '删除潜水类型';
 
   @override
-  String get diveTypes_editDialog_builtInNameHelper =>
-      'Built-in names can\'t be changed';
+  String get diveTypes_editDialog_builtInNameHelper => '内置名称无法更改';
 
   @override
-  String get diveTypes_editDialog_saveButton => 'Save';
+  String get diveTypes_editDialog_saveButton => '保存';
 
   @override
-  String get diveTypes_editDialog_title => 'Edit Dive Type';
+  String get diveTypes_editDialog_title => '编辑潜水类型';
 
   @override
-  String get diveTypes_showInHeaderLabel => 'Header';
+  String get diveTypes_showInHeaderLabel => '标题栏';
 
   @override
-  String get diveTypes_showInHeaderTooltip =>
-      'Show this type\'s badge in the dive detail header';
+  String get diveTypes_showInHeaderTooltip => '在潜水详情标题栏中显示此类型的徽章';
 
   @override
-  String get diveTypes_showInListLabel => 'List';
+  String get diveTypes_showInListLabel => '列表';
 
   @override
-  String get diveTypes_showInListTooltip =>
-      'Show this type\'s badge in the dive list';
+  String get diveTypes_showInListTooltip => '在潜水列表中显示此类型的徽章';
 
   @override
   String diveTypes_snackbar_added(Object name) {
@@ -8928,12 +8925,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String diveTypes_snackbar_errorUpdating(Object error) {
-    return 'Error updating dive type: $error';
+    return '更新潜水类型时出错：$error';
   }
 
   @override
   String diveTypes_snackbar_updated(Object name) {
-    return 'Updated \"$name\"';
+    return '已更新“$name”';
   }
 
   @override

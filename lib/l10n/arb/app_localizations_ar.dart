@@ -9159,27 +9159,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveTypes_editDialog_builtInNameHelper =>
-      'Built-in names can\'t be changed';
+      'لا يمكن تغيير الأسماء المدمجة';
 
   @override
-  String get diveTypes_editDialog_saveButton => 'Save';
+  String get diveTypes_editDialog_saveButton => 'حفظ';
 
   @override
-  String get diveTypes_editDialog_title => 'Edit Dive Type';
+  String get diveTypes_editDialog_title => 'تعديل نوع الغوص';
 
   @override
-  String get diveTypes_showInHeaderLabel => 'Header';
+  String get diveTypes_showInHeaderLabel => 'الترويسة';
 
   @override
   String get diveTypes_showInHeaderTooltip =>
-      'Show this type\'s badge in the dive detail header';
+      'إظهار شارة هذا النوع في ترويسة تفاصيل الغطسة';
 
   @override
-  String get diveTypes_showInListLabel => 'List';
+  String get diveTypes_showInListLabel => 'القائمة';
 
   @override
   String get diveTypes_showInListTooltip =>
-      'Show this type\'s badge in the dive list';
+      'إظهار شارة هذا النوع في قائمة الغطسات';
 
   @override
   String diveTypes_snackbar_added(Object name) {
@@ -9208,12 +9208,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String diveTypes_snackbar_errorUpdating(Object error) {
-    return 'Error updating dive type: $error';
+    return 'خطأ في تحديث نوع الغوص: $error';
   }
 
   @override
   String diveTypes_snackbar_updated(Object name) {
-    return 'Updated \"$name\"';
+    return 'تم تحديث \"$name\"';
   }
 
   @override

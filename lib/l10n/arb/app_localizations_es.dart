@@ -9332,27 +9332,27 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveTypes_editDialog_builtInNameHelper =>
-      'Built-in names can\'t be changed';
+      'Los nombres integrados no se pueden cambiar';
 
   @override
-  String get diveTypes_editDialog_saveButton => 'Save';
+  String get diveTypes_editDialog_saveButton => 'Guardar';
 
   @override
-  String get diveTypes_editDialog_title => 'Edit Dive Type';
+  String get diveTypes_editDialog_title => 'Editar tipo de inmersión';
 
   @override
-  String get diveTypes_showInHeaderLabel => 'Header';
+  String get diveTypes_showInHeaderLabel => 'Encabezado';
 
   @override
   String get diveTypes_showInHeaderTooltip =>
-      'Show this type\'s badge in the dive detail header';
+      'Mostrar la insignia de este tipo en el encabezado de detalles de la inmersión';
 
   @override
-  String get diveTypes_showInListLabel => 'List';
+  String get diveTypes_showInListLabel => 'Lista';
 
   @override
   String get diveTypes_showInListTooltip =>
-      'Show this type\'s badge in the dive list';
+      'Mostrar la insignia de este tipo en la lista de inmersiones';
 
   @override
   String diveTypes_snackbar_added(Object name) {
@@ -9381,12 +9381,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String diveTypes_snackbar_errorUpdating(Object error) {
-    return 'Error updating dive type: $error';
+    return 'Error al actualizar el tipo de inmersión: $error';
   }
 
   @override
   String diveTypes_snackbar_updated(Object name) {
-    return 'Updated \"$name\"';
+    return '\"$name\" actualizado';
   }
 
   @override

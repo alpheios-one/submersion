@@ -9305,27 +9305,27 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveTypes_editDialog_builtInNameHelper =>
-      'Built-in names can\'t be changed';
+      'A beépített nevek nem módosíthatók';
 
   @override
-  String get diveTypes_editDialog_saveButton => 'Save';
+  String get diveTypes_editDialog_saveButton => 'Mentés';
 
   @override
-  String get diveTypes_editDialog_title => 'Edit Dive Type';
+  String get diveTypes_editDialog_title => 'Merülési típus szerkesztése';
 
   @override
-  String get diveTypes_showInHeaderLabel => 'Header';
+  String get diveTypes_showInHeaderLabel => 'Fejléc';
 
   @override
   String get diveTypes_showInHeaderTooltip =>
-      'Show this type\'s badge in the dive detail header';
+      'Ezen típus jelvényének megjelenítése a merülés részleteinek fejlécében';
 
   @override
-  String get diveTypes_showInListLabel => 'List';
+  String get diveTypes_showInListLabel => 'Lista';
 
   @override
   String get diveTypes_showInListTooltip =>
-      'Show this type\'s badge in the dive list';
+      'Ezen típus jelvényének megjelenítése a merülési listában';
 
   @override
   String diveTypes_snackbar_added(Object name) {
@@ -9354,12 +9354,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String diveTypes_snackbar_errorUpdating(Object error) {
-    return 'Error updating dive type: $error';
+    return 'Hiba a merülési típus frissítésekor: $error';
   }
 
   @override
   String diveTypes_snackbar_updated(Object name) {
-    return 'Updated \"$name\"';
+    return '\"$name\" frissítve';
   }
 
   @override

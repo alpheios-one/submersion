@@ -9365,27 +9365,27 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveTypes_editDialog_builtInNameHelper =>
-      'Built-in names can\'t be changed';
+      'Les noms intégrés ne peuvent pas être modifiés';
 
   @override
-  String get diveTypes_editDialog_saveButton => 'Save';
+  String get diveTypes_editDialog_saveButton => 'Enregistrer';
 
   @override
-  String get diveTypes_editDialog_title => 'Edit Dive Type';
+  String get diveTypes_editDialog_title => 'Modifier le type de plongée';
 
   @override
-  String get diveTypes_showInHeaderLabel => 'Header';
+  String get diveTypes_showInHeaderLabel => 'En-tête';
 
   @override
   String get diveTypes_showInHeaderTooltip =>
-      'Show this type\'s badge in the dive detail header';
+      'Afficher le badge de ce type dans l\'en-tête des détails de la plongée';
 
   @override
-  String get diveTypes_showInListLabel => 'List';
+  String get diveTypes_showInListLabel => 'Liste';
 
   @override
   String get diveTypes_showInListTooltip =>
-      'Show this type\'s badge in the dive list';
+      'Afficher le badge de ce type dans la liste des plongées';
 
   @override
   String diveTypes_snackbar_added(Object name) {
@@ -9414,12 +9414,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String diveTypes_snackbar_errorUpdating(Object error) {
-    return 'Error updating dive type: $error';
+    return 'Erreur lors de la mise à jour du type de plongée : $error';
   }
 
   @override
   String diveTypes_snackbar_updated(Object name) {
-    return 'Updated \"$name\"';
+    return '\"$name\" mis à jour';
   }
 
   @override
