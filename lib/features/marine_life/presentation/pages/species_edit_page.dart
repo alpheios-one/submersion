@@ -4,7 +4,9 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
+import 'package:submersion/features/marine_life/domain/entities/species_lookup.dart';
 import 'package:submersion/features/marine_life/presentation/species_display.dart';
+import 'package:submersion/features/marine_life/presentation/widgets/species_lookup_sheet.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 class SpeciesEditPage extends ConsumerStatefulWidget {
@@ -140,6 +142,15 @@ class _SpeciesEditPageState extends ConsumerState<SpeciesEditPage> {
                         return null;
                       },
                     ),
+                    Align(
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: TextButton.icon(
+                        key: const ValueKey('species_lookup_online'),
+                        icon: const Icon(Icons.travel_explore),
+                        label: Text(context.l10n.marineLife_lookup_button),
+                        onPressed: _lookUpOnline,
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _scientificNameController,
@@ -154,6 +165,7 @@ class _SpeciesEditPageState extends ConsumerState<SpeciesEditPage> {
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<SpeciesCategory>(
+                      key: ValueKey('species_category_${_category.name}'),
                       initialValue: _category,
                       decoration: InputDecoration(
                         labelText:
@@ -201,6 +213,25 @@ class _SpeciesEditPageState extends ConsumerState<SpeciesEditPage> {
               ),
             ),
     );
+  }
+
+  Future<void> _lookUpOnline() async {
+    final result = await showSpeciesLookupSheet(
+      context,
+      initialQuery: _commonNameController.text.trim(),
+    );
+    if (result != null && mounted) _applyLookup(result);
+  }
+
+  /// Fills what the lookup knows and leaves the description alone; the
+  /// diver can still edit any field before saving.
+  void _applyLookup(SpeciesLookupResult result) {
+    setState(() {
+      _commonNameController.text = result.commonName;
+      _scientificNameController.text = result.scientificName;
+      _taxonomyClassController.text = result.taxonomyClass ?? '';
+      _category = result.category;
+    });
   }
 
   Future<void> _save() async {
