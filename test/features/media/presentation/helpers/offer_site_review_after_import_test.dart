@@ -13,6 +13,7 @@ void main() {
     WidgetTester tester,
     List<String> eligible, {
     required List<String> imported,
+    List<String>? overrideKey,
   }) async {
     final pushed = <Object?>[];
     final router = GoRouter(
@@ -43,7 +44,7 @@ void main() {
         router: router,
         overrides: [
           eligibleImportedDivesProvider(
-            ImportedDiveIds(imported),
+            ImportedDiveIds(overrideKey ?? imported),
           ).overrideWith((ref) async => eligible),
         ],
       ),
@@ -78,5 +79,27 @@ void main() {
     await tester.tap(find.text('done'));
     await tester.pumpAndSettle();
     expect(find.byType(SnackBar), findsNothing);
+  });
+
+  testWidgets('the provider key is canonical regardless of import order', (
+    tester,
+  ) async {
+    // ImportedDiveIds is an Equatable over the list, so an unsorted key would
+    // miss this override entirely and address a second family entry.
+    final pushed = await pump(
+      tester,
+      ['d1', 'd2'],
+      imported: ['d2', 'd1', 'd2'],
+      overrideKey: ['d1', 'd2'],
+    );
+    await tester.tap(find.text('done'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('2 dives could get a site from their photos'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Review sites'));
+    await tester.pumpAndSettle();
+    expect(pushed.single, ['d1', 'd2']);
   });
 }

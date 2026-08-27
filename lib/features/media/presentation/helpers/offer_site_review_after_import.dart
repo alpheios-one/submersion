@@ -16,7 +16,12 @@ Future<void> offerSiteReviewAfterImport(
   Iterable<String> diveIds, {
   ScaffoldMessengerState? messenger,
 }) async {
-  final ids = diveIds.toSet().toList();
+  // Sorted so the same dive set always produces the same
+  // [ImportedDiveIds] key: it is an Equatable over the list, so two callers
+  // holding the ids in different orders would otherwise address two separate
+  // autoDispose family entries and repeat the query. The offer's own ordering
+  // is unaffected, since the repository returns dives newest-first regardless.
+  final ids = diveIds.toSet().toList()..sort();
   if (ids.isEmpty) return;
   final l10n = context.l10n;
   final scaffold = messenger ?? ScaffoldMessenger.of(context);
