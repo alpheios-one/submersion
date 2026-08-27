@@ -7,6 +7,7 @@ import 'package:native_exif/native_exif.dart';
 import 'package:submersion/core/util/wall_clock_utc.dart';
 import 'package:submersion/features/media/data/services/capture_time_reader.dart';
 import 'package:submersion/features/media/data/services/exif_date_parser.dart';
+import 'package:submersion/features/media/data/services/local_gps_reader.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_metadata.dart';
 
 const _isolateThresholdBytes = 5 * 1024 * 1024;
@@ -16,8 +17,9 @@ const _isolateThresholdBytes = 5 * 1024 * 1024;
 /// `native_exif` is the primary reader on iOS/Android (it also handles HEIC).
 /// It has no macOS/Windows/Linux implementation, so on desktop `Exif.fromPath`
 /// throws `MissingPluginException`; the extractor then reads the capture time
-/// straight from the file's own container metadata with a pure-Dart parser
-/// ([readLocalCaptureTime]) that works on every platform. Only if that also
+/// and position straight from the file's own container metadata with
+/// pure-Dart parsers ([readLocalCaptureTime], [readLocalGps]) that work on
+/// every platform. Only if that also
 /// yields nothing does `takenAt` fall back to the file mtime — which is the
 /// copy-to-disk time and would not match the dive window.
 ///
@@ -99,6 +101,17 @@ Future<MediaSourceMetadata?> _extract(String path) async {
   // MP4/MOV mvhd) so it lands inside the dive window instead of defaulting to
   // the copy-to-disk mtime.
   takenAt ??= readLocalCaptureTime(file, mime);
+
+  // Same fallback for position: native_exif filled lat/lon on mobile stills;
+  // everything else (desktop stills, video on every platform) reads the
+  // file's own GPS IFD, QuickTime location atom, or GoPro telemetry.
+  if (lat == null || lon == null) {
+    final fix = readLocalGps(file, mime);
+    if (fix != null) {
+      lat = fix.latitude;
+      lon = fix.longitude;
+    }
+  }
 
   return MediaSourceMetadata(
     takenAt: takenAt ?? mtime,

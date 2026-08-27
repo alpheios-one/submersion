@@ -141,4 +141,38 @@ void main() {
       );
     });
   });
+
+  group('readLocalGps for video', () {
+    late Directory tempDir;
+    setUp(() async {
+      tempDir = await Directory.systemTemp.createTemp('local_gps_video_');
+    });
+    tearDown(() async {
+      if (tempDir.existsSync()) await tempDir.delete(recursive: true);
+    });
+
+    List<int> xyz(String text) =>
+        box('©xyz', [...u16(text.length), ...u16(0), ...text.codeUnits]);
+
+    test('QuickTime location wins for a MOV', () {
+      final f = File('${tempDir.path}/a.mov')
+        ..writeAsBytesSync([
+          ...box('ftyp', 'qt  '.codeUnits),
+          ...box('moov', box('udta', xyz('+37.3323-122.0312/'))),
+        ]);
+      expect(
+        readLocalGps(f, 'video/quicktime')?.latitude,
+        closeTo(37.3323, 1e-6),
+      );
+    });
+
+    test('a video with neither location atom nor telemetry yields null', () {
+      final f = File('${tempDir.path}/b.mp4')
+        ..writeAsBytesSync([
+          ...box('ftyp', 'isom'.codeUnits),
+          ...box('moov', box('mvhd', [])),
+        ]);
+      expect(readLocalGps(f, 'video/mp4'), isNull);
+    });
+  });
 }

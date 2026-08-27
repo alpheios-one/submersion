@@ -2,12 +2,15 @@ import 'dart:io';
 
 import 'package:image/image.dart' as img;
 
+import 'package:submersion/features/media/data/services/gpmf_gps_reader.dart';
 import 'package:submersion/features/media/data/services/gps_fix.dart';
 import 'package:submersion/features/media/data/services/local_exif_loader.dart';
+import 'package:submersion/features/media/data/services/quicktime_location_reader.dart';
 
 /// Reads a position from a media file's own metadata with pure Dart, for the
-/// platforms and files where `native_exif` yields nothing. Returns null when
-/// the file carries no plausible fix.
+/// platforms and files where `native_exif` yields nothing: the EXIF GPS IFD
+/// for stills, the QuickTime location atom or GoPro telemetry for video.
+/// Returns null when the file carries no plausible fix.
 GpsFix? readLocalGps(File file, String mime) {
   try {
     switch (mime) {
@@ -16,6 +19,12 @@ GpsFix? readLocalGps(File file, String mime) {
       case 'image/heif':
         final exif = readLocalExif(file, mime);
         return exif == null ? null : gpsFromExif(exif);
+      case 'video/mp4':
+      case 'video/quicktime':
+      case 'video/x-m4v':
+        // Phones and most cameras write a location atom; GoPro writes
+        // telemetry instead. Try the cheap atom first.
+        return readQuickTimeLocation(file) ?? readGpmfGps(file);
       default:
         return null;
     }

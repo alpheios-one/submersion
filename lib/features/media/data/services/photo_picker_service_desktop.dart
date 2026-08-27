@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:submersion/features/media/data/services/capture_time_reader.dart';
+import 'package:submersion/features/media/data/services/local_gps_reader.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_metadata.dart';
 
@@ -90,6 +91,10 @@ class PhotoPickerServiceDesktop implements PhotoPickerService {
   /// consumers such as `TripMediaScanner.toWallClockUtc` reinterpret). The
   /// components are therefore carried across verbatim into a local DateTime;
   /// returning the UTC value directly would double-convert it.
+  ///
+  /// Position comes from the same container metadata via [readLocalGps]
+  /// (EXIF GPS IFD for stills, the QuickTime location atom or GoPro
+  /// telemetry for video).
   AssetInfo? assetInfoForFile(File ioFile) {
     final asset = _assetInfoForPath(ioFile.path);
     if (asset != null) _filePathCache[asset.id] = asset.filePath!;
@@ -177,6 +182,7 @@ AssetInfo? _assetInfoForPath(String path) {
         );
 
   final size = _dimensionsOf(ioFile, mime);
+  final fix = readLocalGps(ioFile, mime);
 
   return AssetInfo(
     // Keyed on mtime + path so re-picking the same file in one session reuses
@@ -189,8 +195,8 @@ AssetInfo? _assetInfoForPath(String path) {
     width: size?.width ?? 0,
     height: size?.height ?? 0,
     durationSeconds: null,
-    latitude: null,
-    longitude: null,
+    latitude: fix?.latitude,
+    longitude: fix?.longitude,
     filename: p.basename(path),
     filePath: path,
   );
