@@ -133,7 +133,7 @@ class _QuickSiteFromGpsDialogState
               ),
               const SizedBox(height: 16),
               Semantics(
-                label: 'GPS coordinates: $coordinates',
+                label: context.l10n.media_gpsBanner_coordinates(coordinates),
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(

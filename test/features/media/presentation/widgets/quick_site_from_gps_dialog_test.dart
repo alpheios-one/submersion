@@ -82,4 +82,14 @@ void main() {
     expect(site?.country, isNull);
     expect(site?.city, isNull);
   });
+
+  testWidgets('the coordinates semantics label is localized', (tester) async {
+    final geocoder = FakeLocationService(const PlaceLookup.empty());
+    await open(tester, geocoder);
+
+    // The label reuses media_gpsBanner_coordinates rather than an English
+    // literal, so a screen reader follows the app's language.
+    expect(find.bySemanticsLabel(RegExp(r'^Coordinates: ')), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('GPS coordinates:')), findsNothing);
+  });
 }
