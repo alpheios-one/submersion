@@ -7,11 +7,13 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/media/data/repositories/media_row_mapper.dart';
 import 'package:submersion/features/media/data/services/repair/media_repair_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart'
     as domain;
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
+import 'package:submersion/features/media/domain/services/photo_gps_point_selector.dart';
 
 class MediaRepository {
   AppDatabase get _db => DatabaseService.instance.database;
@@ -1056,8 +1058,7 @@ class MediaRepository {
         WHERE dive_id = ?
         AND latitude IS NOT NULL
         AND longitude IS NOT NULL
-        AND latitude != 0
-        AND longitude != 0
+        AND NOT (latitude = 0 AND longitude = 0)
         ORDER BY taken_at ASC
         ''',
             variables: [Variable.withString(diveId)],
@@ -1071,6 +1072,7 @@ class MediaRepository {
               longitude: row.data['longitude'] as double,
               takenAt: DateTime.fromMillisecondsSinceEpoch(
                 row.data['taken_at'] as int,
+                isUtc: true,
               ),
             ),
           )
@@ -1085,21 +1087,74 @@ class MediaRepository {
     }
   }
 
-  /// Get the best GPS coordinates from a dive's media.
-  ///
-  /// Returns the GPS from the earliest photo with coordinates, or null if
-  /// no photos have GPS data. The earliest photo is typically taken at the
-  /// dive site before entering the water.
+  /// The best photo fix for each of [diveIds]: the GPS-tagged media row whose
+  /// capture time is nearest the dive's entry time (see
+  /// [selectBestPhotoGps]). One join query, no dive hydration. Dives with no
+  /// usable fix are absent from the map.
+  Future<Map<String, PhotoGpsPoint>> getBestPhotoGpsForDives(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return const {};
+    try {
+      final samplesByDive = <String, List<PhotoGpsPoint>>{};
+      final entryByDive = <String, DateTime>{};
+      // SQLite caps bound variables; chunk generously below the limit.
+      for (var i = 0; i < diveIds.length; i += 500) {
+        final chunk = diveIds.sublist(
+          i,
+          i + 500 > diveIds.length ? diveIds.length : i + 500,
+        );
+        final m = _db.media;
+        final d = _db.dives;
+        final query =
+            _db.select(m).join([innerJoin(d, d.id.equalsExp(m.diveId))])..where(
+              m.diveId.isIn(chunk) &
+                  m.latitude.isNotNull() &
+                  m.longitude.isNotNull() &
+                  m.takenAt.isNotNull() &
+                  (m.latitude.equals(0) & m.longitude.equals(0)).not(),
+            );
+        for (final row in await query.get()) {
+          final media = row.readTable(m);
+          final dive = row.readTable(d);
+          final diveId = media.diveId!;
+          entryByDive[diveId] = DateTime.fromMillisecondsSinceEpoch(
+            dive.entryTime ?? dive.diveDateTime,
+            isUtc: true,
+          );
+          samplesByDive.putIfAbsent(diveId, () => []).add((
+            mediaId: media.id,
+            location: GeoPoint(media.latitude!, media.longitude!),
+            takenAt: DateTime.fromMillisecondsSinceEpoch(
+              media.takenAt!,
+              isUtc: true,
+            ),
+          ));
+        }
+      }
+      return {
+        for (final e in samplesByDive.entries)
+          e.key: ?selectBestPhotoGps(e.value, entryByDive[e.key]!),
+      };
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get best photo GPS for dives',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// The best photo fix for one dive, or null. See [getBestPhotoGpsForDives].
   Future<({double latitude, double longitude})?> getBestGpsFromDiveMedia(
     String diveId,
   ) async {
-    final gpsPoints = await getGpsFromDiveMedia(diveId);
-    if (gpsPoints.isEmpty) return null;
-
-    // Return the first (earliest) GPS point
+    final best = (await getBestPhotoGpsForDives([diveId]))[diveId];
+    if (best == null) return null;
     return (
-      latitude: gpsPoints.first.latitude,
-      longitude: gpsPoints.first.longitude,
+      latitude: best.location.latitude,
+      longitude: best.location.longitude,
     );
   }
 
