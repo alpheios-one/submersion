@@ -426,7 +426,7 @@ void main() {
       tester,
       story,
       tripDayWeather: {
-        surfaceDate.millisecondsSinceEpoch: TripDayWeather(
+        tripDayMillis(surfaceDate): TripDayWeather(
           id: 'w1',
           tripId: trip.id,
           date: surfaceDate,

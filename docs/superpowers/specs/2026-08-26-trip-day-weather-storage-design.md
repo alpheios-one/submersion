@@ -63,9 +63,9 @@ New table `TripDayWeather` in `lib/core/database/database.dart`:
 
 | Column | Type | Notes |
 | --- | --- | --- |
-| `id` | text, pk | uuid v4 |
+| `id` | text, pk | deterministic UUIDv5 over (`tripId`, day), via `tripDayWeatherRowId` |
 | `tripId` | text | references `Trips(#id)` |
-| `date` | int | epoch **milliseconds** at local midnight, matching what `ItineraryDayRepository` writes for `trip_itinerary_days.date` (the column comment there says "Unix timestamp", but the repository writes `millisecondsSinceEpoch`) |
+| `date` | int | epoch **milliseconds** at **UTC** midnight for the calendar day, via `tripDayMillis`. Milliseconds because that is what `ItineraryDayRepository` writes for `trip_itinerary_days.date`, despite that column comment saying "Unix timestamp". UTC rather than local midnight because the value is part of the row identity: a local midnight epoch differs in every timezone, so two devices would key the same trip day differently and never converge |
 | `latitude` | real | the coordinate the lookup used |
 | `longitude` | real | the coordinate the lookup used |
 | `airTemp` | real, nullable | celsius |
@@ -83,6 +83,15 @@ New table `TripDayWeather` in `lib/core/database/database.dart`:
 | `hlc` | text, nullable | matches every other synced table |
 
 Unique index on (`tripId`, `date`).
+
+The id is **not** a v4 uuid. It is derived from the day it describes,
+`UUIDv5(namespace, "$tripId|$dayMillis")`, following the same convention as
+`importedDiveComputerId` and `qualityFindingId`. A per-device v4 would let two
+devices store the same day under different primary keys; the serializer upserts
+by primary key, so the peer's row would miss the `ON CONFLICT` target and hit
+the unique index instead, throwing inside the merge transaction and aborting
+the whole sync pull. The repository derives the id itself and ignores whatever
+a caller passes.
 
 The stored field set is the full `WeatherData` payload, not just the three
 fields the day header renders. The API returns them in one response at no

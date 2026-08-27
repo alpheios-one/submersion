@@ -249,9 +249,11 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
     Map<int, TripDayWeather> storedWeather,
   ) {
     final day = story.days[index];
-    // Stored rows are keyed on local midnight millis.
-    final dayDate = DateTime(day.date.year, day.date.month, day.date.day);
-    final stored = storedWeather[dayDate.millisecondsSinceEpoch];
+    // Keyed through the same helper the repository stores under, so the
+    // lookup cannot drift from the write. Computing the key inline here was
+    // how the two came apart: it silently found nothing and every badge
+    // disappeared.
+    final stored = storedWeather[tripDayMillis(day.date)];
     final showTodayDivider = todayIndex != null && index == todayIndex;
     const divider = SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 16),

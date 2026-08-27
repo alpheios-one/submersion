@@ -89,14 +89,15 @@ void main() {
       final stored = await repository.getForTrip(testTripId);
 
       expect(stored, hasLength(1));
-      final row = stored[day1.millisecondsSinceEpoch]!;
+      final row = stored[tripDayMillis(day1)]!;
       expect(row.airTemp, 21.5);
       expect(row.cloudCover, CloudCover.clear);
       expect(row.windDirection, CurrentDirection.north);
       expect(row.weatherCode, 0);
       expect(row.weatherSource, WeatherSource.openMeteo);
       expect(row.latitude, 12.16);
-      expect(row.date, day1);
+      // A calendar day in a device-independent frame, so UTC.
+      expect(row.date, DateTime.utc(2026, 3, 8));
     });
 
     test('a null payload field round-trips as null', () async {
@@ -104,7 +105,7 @@ void main() {
 
       final row = (await repository.getForTrip(
         testTripId,
-      ))[day1.millisecondsSinceEpoch]!;
+      ))[tripDayMillis(day1)]!;
 
       expect(row.airTemp, isNull);
       expect(row.cloudCover, isNull);
@@ -120,21 +121,21 @@ void main() {
       final stored = await repository.getForTrip(testTripId);
 
       expect(stored, hasLength(1));
-      expect(stored[day1.millisecondsSinceEpoch]!.airTemp, 25);
+      expect(stored[tripDayMillis(day1)]!.airTemp, 25);
     });
 
-    test('a date with a time component is stored under local midnight', () {
+    test('a date with a time component is stored under UTC midnight', () {
       // The repository owns the (trip, date) uniqueness invariant, so it
       // normalizes rather than trusting every caller to. A row keyed on a
-      // stray time would be invisible to midnight-keyed lookups and would
-      // refetch forever.
+      // stray time would be invisible to day-keyed lookups and would refetch
+      // forever. UTC, so the key does not move with the device timezone.
       return () async {
         await repository.upsert(sample(date: DateTime(2026, 3, 8, 17, 30)));
 
         final stored = await repository.getForTrip(testTripId);
 
-        expect(stored.keys.single, day1.millisecondsSinceEpoch);
-        expect(stored[day1.millisecondsSinceEpoch]!.date, day1);
+        expect(stored.keys.single, tripDayMillis(day1));
+        expect(stored[tripDayMillis(day1)]!.date, DateTime.utc(2026, 3, 8));
       }();
     });
 
@@ -147,7 +148,7 @@ void main() {
       final stored = await repository.getForTrip(testTripId);
 
       expect(stored, hasLength(1));
-      expect(stored[day1.millisecondsSinceEpoch]!.airTemp, 25);
+      expect(stored[tripDayMillis(day1)]!.airTemp, 25);
     });
 
     test('two different days both persist', () async {
@@ -157,7 +158,7 @@ void main() {
       final stored = await repository.getForTrip(testTripId);
 
       expect(stored, hasLength(2));
-      expect(stored[day2.millisecondsSinceEpoch]!.airTemp, 19);
+      expect(stored[tripDayMillis(day2)]!.airTemp, 19);
     });
 
     test('getForTrip is scoped to one trip', () async {
@@ -271,7 +272,7 @@ void main() {
 
       final rows = await allRows();
       expect(rows, hasLength(1));
-      expect(rows.single.date, day1.millisecondsSinceEpoch);
+      expect(rows.single.date, tripDayMillis(day1));
       expect(rows.single.airTemp, 25);
     });
 
@@ -333,20 +334,23 @@ void main() {
         final stored = await repository.getForTrip(testTripId);
 
         expect(stored, hasLength(1));
-        expect(stored[day1.millisecondsSinceEpoch]!.airTemp, 25);
+        expect(stored[tripDayMillis(day1)]!.airTemp, 25);
       },
     );
 
     test('getForTrip falls back to the most recently updated stray', () async {
+      // Off-midnight strays within the same UTC day. "Same day" is a UTC
+      // question now: a row stored at 23:00 local on a negative offset falls
+      // on the following UTC day and is genuinely a different day's row.
       await insertRaw(
         id: 'peer-a',
-        date: DateTime(2026, 3, 8, 6),
+        date: DateTime.utc(2026, 3, 8, 6),
         airTemp: 10,
         updatedAt: 100,
       );
       await insertRaw(
         id: 'peer-b',
-        date: DateTime(2026, 3, 8, 23),
+        date: DateTime.utc(2026, 3, 8, 23),
         airTemp: 20,
         updatedAt: 200,
       );
@@ -354,7 +358,7 @@ void main() {
       final stored = await repository.getForTrip(testTripId);
 
       expect(stored, hasLength(1));
-      expect(stored[day1.millisecondsSinceEpoch]!.airTemp, 20);
+      expect(stored[tripDayMillis(day1)]!.airTemp, 20);
     });
 
     test('getForTrip does not write while resolving strays', () async {

@@ -8,14 +8,36 @@ import 'package:submersion/features/trips/domain/entities/trip_story_day.dart';
 /// Never change: the ids already stored depend on it.
 const String kTripDayWeatherNamespace = '3f1c8a52-9e47-4d6b-8b3a-16c9d0f27e45';
 
-/// Local midnight for [date], as epoch milliseconds.
+/// The calendar day of [date] as epoch milliseconds at UTC midnight.
 ///
 /// The day is the identity of a weather row, so this is what turns a
 /// DateTime into one. Shared rather than reimplemented per caller: the row
 /// id, the repository's storage key, and the map key reads come back under
 /// all have to agree, and three copies of the same two lines would drift.
+///
+/// UTC, not local midnight, and the distinction is the whole point. A local
+/// `DateTime(y, m, d)` has a different epoch value in every timezone, so two
+/// devices looking at the same trip day would derive different keys, and
+/// therefore different row ids, and never converge: each would store and
+/// refetch its own copy of the day. Divers cross timezones by definition, and
+/// one diver flying home is enough to trigger it.
+///
+/// The calendar fields are taken as given rather than converted. `toUtc()`
+/// would shift a late evening onto the following day; the trip story already
+/// hands over a date whose y/m/d is the day it means, matching the app's
+/// wall-clock-as-UTC convention for dive timestamps.
 int tripDayMillis(DateTime date) =>
-    DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+    DateTime.utc(date.year, date.month, date.day).millisecondsSinceEpoch;
+
+/// The calendar day [dayMillis] denotes, as a UTC DateTime at midnight.
+///
+/// The inverse of [tripDayMillis], and the only correct way to read a stored
+/// day back. `DateTime.fromMillisecondsSinceEpoch` without `isUtc` returns a
+/// LOCAL DateTime, so re-extracting y/m/d from it reads the calendar fields in
+/// the device's frame: on any negative UTC offset, UTC midnight is the
+/// previous evening locally, and the day walks backwards on every round trip.
+DateTime tripDayDate(int dayMillis) =>
+    DateTime.fromMillisecondsSinceEpoch(dayMillis, isUtc: true);
 
 /// Deterministic row id for one trip day.
 ///
