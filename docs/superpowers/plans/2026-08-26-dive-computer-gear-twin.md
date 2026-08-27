@@ -10,6 +10,12 @@
 
 **Spec:** `docs/superpowers/specs/2026-08-26-dive-computer-gear-twin-design.md`
 
+> **Schema number, after the fact:** this plan was written against v169 and
+> every snippet below says so. The claim ended up at **v175**, renumbered when
+> main was merged into the branch on 2026-08-27 after #1322 and others landed.
+> The snippets are left as written, since this document records the steps as
+> they were executed; the shipped numbers live in the design doc and the code.
+
 ## Global Constraints
 
 - **Schema version is v169.** Verified by diffing open PRs, not by grepping main: v165 (#1290), v166 (#1300), v167 (#1276) and v168 (#1237) are claimed by open PRs, and main is at v164. This plan originally claimed v168; #1237 renumbered onto it mid-implementation. Do NOT renumber without re-running that scan.

@@ -4,7 +4,7 @@
 **Issue:** none yet. Related to #1020 (equipment set keyed on the downloading
 computer), which this does not implement and does not block.
 **Branch:** `worktree-dive-computer-gear-twin`
-**Schema:** claims v169.
+**Schema:** claims v175.
 
 ## Problem
 
@@ -137,12 +137,20 @@ awaits resolve in microtasks, and an unbroken microtask chain never reaches the
 vsync queue, freezing the migration spinner (`database.dart:3696-3726`, fixed
 with `if (processed++ % 25 == 24) await Future<void>.delayed(Duration.zero);`).
 
-**F13. v169 is the next free schema version.** Main is at v164
+**F13. The schema claim has moved twice; it is now v175.** Main is at v164
 (`database.dart:3183`). A loop over open PR diffs returns v165 (#1290), v166
 (#1300), v167 (#1276) and v168 (#1237); v138 (#603) is stale. Grepping main
 alone would have said v165 was free and walked into a silent auto-merge.
 
-**Renumbered from v168 during implementation.** The first scan saw #1237 at
+**Renumbered twice.** v168 -> v169 during implementation, then v169 -> v175 when
+main was merged in on 2026-08-27 and #1322 (v170) and others had landed. The
+scalar, the ladder entry, the assert docstring, the `if (from < N)` guard and its
+`reportProgress` twin, the beforeOpen backstop comment, and the migration test
+filename with its assertions all move together; verified after the second
+renumber that the ladder is monotonic, unique, and that the scalar equals its
+maximum.
+
+**Originally renumbered from v168 during implementation.** The first scan saw #1237 at
 v161. That PR was renumbered to v168 and pushed while this design was being
 written, so the claim was invisible to both the main grep and the open-PR scan
 at the moment they ran. Two branches writing the same scalar auto-merge with no
@@ -307,7 +315,7 @@ samples. A file-imported dive registered by #1288 can have `computer_id` stamped
 and a data-source row while having no samples at all, and reusing the helper
 would have silently failed to link exactly the file-import case this feature was
 extended to cover. The linker owns a private query applying the same union the
-v169 backfill uses, so the migration and the runtime path cannot disagree.
+v175 backfill uses, so the migration and the runtime path cannot disagree.
 
 It performs no resolution and no minting. That is what makes deletion permanent:
 creation happens once at registration, linking happens per dive, and a cleared
@@ -341,9 +349,9 @@ sets entirely. This ordering gets a regression test, not a comment.
 | Consolidation | covered for free, per F6 |
 | `importProfile` replaceSource branch (`isNewDive == false`) | new, per F7; idempotent through `insertOnConflictUpdate` |
 
-### D8. Migration v169
+### D8. Migration v175
 
-Two passes in the `if (from < 169)` block, both PRAGMA-guarded like every
+Two passes in the `if (from < 175)` block, both PRAGMA-guarded like every
 neighbouring helper.
 
 **Pass 1** resolves every existing `dive_computers` row through D3 and stamps
@@ -375,14 +383,14 @@ pass 1 writes.
 The claim touches six places, all of which must move together if the number is
 renumbered before merge: the `currentSchemaVersion` scalar, the
 `migrationVersions` ladder entry, the `_assert*` helper docstring, the
-`if (from < 169)` guard and its `reportProgress` twin, the `beforeOpen` backstop
+`if (from < 175)` guard and its `reportProgress` twin, the `beforeOpen` backstop
 comment, and the migration test filename with its version assertions. The ladder
 is monotonic and unique but **not** contiguous by design (162 is permanently
 skipped, and 165 through 168 are reserved by open PRs); the audit must not
 "fix" that.
 
 A `beforeOpen` column assert is still required, per the F11 rule that a database
-arriving already stamped at or above v169 enters no ladder block. That assert is
+arriving already stamped at or above v175 enters no ladder block. That assert is
 schema-only. It adds the column if missing; it does not backfill.
 
 ### D9. Sync
@@ -394,7 +402,7 @@ The runtime paths mark pending and replicate: the resolver when it mints a twin,
 `createComputer` when it stamps `equipment_id`, and `bulkAddEquipment` for every
 link the linker adds.
 
-The **v169 backfill is local-only and HLC-neutral**, like `_backfillDiveComputerIds`.
+The **v175 backfill is local-only and HLC-neutral**, like `_backfillDiveComputerIds`.
 It stamps no HLC and marks nothing pending, so its writes never go out on an
 incremental sync. This is correct rather than an oversight: every input is
 already synced (`dive_computers`, `dives`, `dive_data_sources`) and the twin id
@@ -408,7 +416,7 @@ The original reasoning claimed two things that do not hold:
 
 1. *"A peer can receive a `dive_computers` row whose `equipment_id` points at a
    twin it never minted."* It cannot. A peer still on the previous schema has no
-   `equipment_id` column, so the field is dropped on apply; a peer at v169 has
+   `equipment_id` column, so the field is dropped on apply; a peer at v175 has
    run its own ladder and derived the same twin.
 2. *"Sync adopt bypasses the ladder, so the rows must replicate."* A base or full
    export passes `hlcSince == null` and therefore carries every row regardless of
@@ -488,7 +496,7 @@ Tests first, per the project guide.
 * null-serial computers match on brand plus model
 * a computer whose twin was deleted resolves to nothing and does not re-mint
 
-**Migration v169**
+**Migration v175**
 * stranded-database fixture at v168 with computers, dives, and data sources
 * twins minted, `equipment_id` stamped, join rows inserted
 * a multi-source dive links **both** computers (the F2 case)
