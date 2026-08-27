@@ -17129,7 +17129,7 @@ abstract class AppLocalizations {
   /// No description provided for @enum_profileMetric_sacRate_short.
   ///
   /// In en, this message translates to:
-  /// **'Consumption'**
+  /// **'Usage'**
   String get enum_profileMetric_sacRate_short;
 
   /// No description provided for @enum_profileMetric_surfaceGf.

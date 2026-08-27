@@ -9927,7 +9927,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_profileMetric_sacRate => 'Gas consumption';
 
   @override
-  String get enum_profileMetric_sacRate_short => 'Consumption';
+  String get enum_profileMetric_sacRate_short => 'Usage';
 
   @override
   String get enum_profileMetric_surfaceGf => 'Surface GF';

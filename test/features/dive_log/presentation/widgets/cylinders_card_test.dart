@@ -96,7 +96,14 @@ Widget _buildCard({
   UnitFormatter units = _units,
   AppSettings settings = _settings,
   GasConsumptionDisplay display = GasConsumptionDisplay.sac,
+  VisualDensity? visualDensity,
 }) {
+  final card = CylindersCard(
+    dive: dive,
+    units: units,
+    settings: settings,
+    display: display,
+  );
   return testApp(
     overrides: [
       cylinderSacProvider.overrideWith((ref, id) async => cylinderSacs),
@@ -104,12 +111,12 @@ Widget _buildCard({
       diveDataSourcesProvider.overrideWith((ref, id) async => dataSources),
     ],
     child: SingleChildScrollView(
-      child: CylindersCard(
-        dive: dive,
-        units: units,
-        settings: settings,
-        display: display,
-      ),
+      child: visualDensity == null
+          ? card
+          : Theme(
+              data: ThemeData(visualDensity: visualDensity),
+              child: card,
+            ),
     ),
   );
 }
@@ -127,14 +134,16 @@ void main() {
       expect(find.text('Cylinders'), findsOneWidget);
       expect(find.textContaining('Tank 1 (EAN32)'), findsOneWidget);
       expect(
-        find.textContaining('200 bar → 50 bar (150 bar used)'),
+        find.textContaining('200 bar → 50 bar (150 bar / 1665 L used)'),
         findsOneWidget,
       );
       expect(find.textContaining('MOD:'), findsOneWidget);
       expect(find.textContaining('MND:'), findsOneWidget);
     });
 
-    testWidgets('shows SAC and gas used on a single-tank dive', (tester) async {
+    testWidgets('shows the SAC rate and the gas used on a single-tank dive', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _buildCard(dive: _makeDive([_makeTank()]), cylinderSacs: [_makeSac()]),
       );
@@ -142,8 +151,9 @@ void main() {
 
       // sacRate 2.0 bar/min, SAC lane, metric.
       expect(find.text('SAC 2.0 bar/min'), findsOneWidget);
-      // gasUsedLiters = (200 - 50) * 11.1 = 1665 L.
-      expect(find.text('1665 L used'), findsOneWidget);
+      // gasUsedLiters = (200 - 50) * 11.1 = 1665 L, shown in the subtitle
+      // beside the pressure drop it restates.
+      expect(find.textContaining('(150 bar / 1665 L used)'), findsOneWidget);
     });
 
     testWidgets('omits the SAC block when SAC is not computable', (
@@ -227,6 +237,31 @@ void main() {
 
       expect(find.text('SAC 2.0 bar/min'), findsOneWidget);
       expect(find.text('RMV 22.2 L/min'), findsOneWidget);
+    });
+
+    testWidgets('both fits its two trailing lanes at desktop density', (
+      tester,
+    ) async {
+      // The trailing block lives in a ListTile slot whose height the tile
+      // caps at 56px minus the density adjustment. Desktop defaults to
+      // compact, making that 48px: exactly 8px short of the three lines
+      // Both used to render (SAC, RMV, gas used), which is what the macOS
+      // screenshot run reported. Widget tests run at standard density, so
+      // the default harness never saw it. The gas used now lives in the
+      // subtitle, so the slot holds only the two lanes.
+      await tester.pumpWidget(
+        _buildCard(
+          dive: _makeDive([_makeTank()]),
+          cylinderSacs: [_makeSac()],
+          display: GasConsumptionDisplay.both,
+          visualDensity: VisualDensity.compact,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('SAC 2.0 bar/min'), findsOneWidget);
+      expect(find.text('RMV 22.2 L/min'), findsOneWidget);
+      expect(find.textContaining('(150 bar / 1665 L used)'), findsOneWidget);
     });
 
     testWidgets('both omits the RMV line for a cylinder without a volume', (

@@ -5820,7 +5820,7 @@
   "enum_profileMetric_pressure": "Pressure",
   "enum_profileMetric_pressure_short": "Press",
   "enum_profileMetric_sacRate": "Gas consumption",
-  "enum_profileMetric_sacRate_short": "Consumption",
+  "enum_profileMetric_sacRate_short": "Usage",
   "enum_profileMetric_surfaceGf": "Surface GF",
   "enum_profileMetric_surfaceGf_short": "SrfGF",
   "enum_profileMetric_temperature": "Temperature",

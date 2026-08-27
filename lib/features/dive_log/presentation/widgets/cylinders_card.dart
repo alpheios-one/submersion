@@ -101,8 +101,17 @@ class CylindersCard extends ConsumerWidget {
     final pressureUsed = pressures.$1 != null && pressures.$2 != null
         ? pressures.$1! - pressures.$2!
         : null;
+    // The pressure drop and the gas volume are one fact in two units, so
+    // they read together. It also keeps the trailing slot to the rates:
+    // ListTile caps leading and trailing at 56px minus the density
+    // adjustment, which is 48px on desktop, and three lines do not fit.
+    final gasUsedLiters = cylinderSac?.gasUsedLiters;
+    final volumeUsed = gasUsedLiters != null
+        ? ' / ${units.convertVolume(gasUsedLiters).round()} '
+              '${units.volumeSymbol}'
+        : '';
     final used = pressureUsed != null && pressureUsed > 0
-        ? ' (${units.formatPressure(pressureUsed)} used)'
+        ? ' (${units.formatPressure(pressureUsed)}$volumeUsed used)'
         : '';
 
     // Preset display name, falling back to formatted volume.
@@ -179,9 +188,11 @@ class CylindersCard extends ConsumerWidget {
     );
   }
 
-  /// Trailing column: attribution badge, one consumption line per visible
-  /// lane, gas used (converted to the diver's volume unit). Returns null
-  /// when there is nothing to show so the tile keeps its natural width.
+  /// Trailing column: attribution badge and one consumption line per
+  /// visible lane. Returns null when there is nothing to show so the tile
+  /// keeps its natural width. The gas used lives in the subtitle, beside
+  /// the pressure drop it restates: ListTile caps this slot at two lines on
+  /// desktop, and Both already needs both of them.
   Widget? _trailingBlock(
     AppLocalizations l10n,
     ThemeData theme,
@@ -203,14 +214,6 @@ class CylindersCard extends ConsumerWidget {
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.primary,
-              ),
-            ),
-          if (cylinderSac.gasUsedLiters != null)
-            Text(
-              '${units.convertVolume(cylinderSac.gasUsedLiters!).round()} '
-              '${units.volumeSymbol} used',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
         ],
