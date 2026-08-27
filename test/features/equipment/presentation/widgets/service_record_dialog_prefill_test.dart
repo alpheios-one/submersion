@@ -50,6 +50,11 @@ void main() {
     ServiceRecord? existingRecord,
     Future<void> Function(ServiceRecord)? onSave,
   }) async {
+    // The dialog body is a scroll view and does not fit an 800x600 surface,
+    // so a tap on a lower field would land outside the viewport.
+    await tester.binding.setSurfaceSize(const Size(800, 4000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
       ProviderScope(
@@ -100,7 +105,7 @@ void main() {
     final existing = ServiceRecord(
       id: 'r1',
       equipmentId: 'e1',
-      serviceType: ServiceType.cleaning,
+      serviceCategory: ServiceCategory.cleaning,
       serviceKindId: 'scrubber-repack',
       serviceDate: t0,
       createdAt: t0,
@@ -200,7 +205,7 @@ void main() {
       final existing = ServiceRecord(
         id: 'r1',
         equipmentId: 'e1',
-        serviceType: ServiceType.cleaning,
+        serviceCategory: ServiceCategory.cleaning,
         serviceKindId: 'scrubber-repack',
         serviceDate: t0,
         nextServiceDue: DateTime(2026, 6, 14),
@@ -232,7 +237,7 @@ void main() {
       final overdue = ServiceRecord(
         id: 'r1',
         equipmentId: 'e1',
-        serviceType: ServiceType.cleaning,
+        serviceCategory: ServiceCategory.cleaning,
         serviceKindId: 'scrubber-repack',
         serviceDate: DateTime(2024, 1, 10),
         nextServiceDue: DateTime(2024, 7, 10),
@@ -253,7 +258,7 @@ void main() {
       final overdue = ServiceRecord(
         id: 'r1',
         equipmentId: 'e1',
-        serviceType: ServiceType.cleaning,
+        serviceCategory: ServiceCategory.cleaning,
         serviceKindId: 'scrubber-repack',
         serviceDate: DateTime(2024, 1, 10),
         nextServiceDue: DateTime(2024, 7, 10),
@@ -290,7 +295,7 @@ void main() {
 
       // Force a real rebuild: the service-type dropdown calls setState, which
       // typing into a TextFormField does not.
-      await tester.tap(find.byType(DropdownButtonFormField<ServiceType>));
+      await tester.tap(find.byType(DropdownButtonFormField<ServiceCategory>));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Repair').last);
       await tester.pumpAndSettle();

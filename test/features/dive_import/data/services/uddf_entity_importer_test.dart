@@ -3206,7 +3206,7 @@ void main() {
             'serviceDate': DateTime(2025, 5, 12),
             'provider': 'Seals Watersports',
             'notes': 'Swapped yoke to DIN',
-            'serviceType': 'annual',
+            'serviceCategory': 'annual',
           },
         ]),
         selections: const UddfImportSelections(equipment: {0}),
@@ -3221,7 +3221,7 @@ void main() {
       final record = captured.single as ServiceRecord;
       expect(record.provider, 'Seals Watersports');
       expect(record.serviceDate, DateTime(2025, 5, 12));
-      expect(record.serviceType, ServiceType.annual);
+      expect(record.serviceCategory, ServiceCategory.annual);
       expect(record.notes, 'Swapped yoke to DIN');
 
       // The record must point at the newly created equipment row, not at the

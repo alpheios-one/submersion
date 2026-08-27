@@ -4,8 +4,10 @@ import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
+import 'package:submersion/core/constants/place_name_language.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/theme/app_theme_preset.dart';
@@ -58,6 +60,10 @@ class SettingsKeys {
   static const String unitPreset = 'unit_preset';
   static const String themeMode = 'theme_mode';
   static const String displayZoom = 'display_zoom';
+
+  /// Device-local: whether media grids draw a provenance badge on every
+  /// thumbnail. Health badges are not covered by it.
+  static const String mediaProvenanceBadges = 'media_provenance_badges';
   static const String defaultDiveType = 'default_dive_type';
   static const String defaultTankVolume = 'default_tank_volume';
   static const String defaultStartPressure = 'default_start_pressure';
@@ -174,6 +180,10 @@ class AppSettings {
   /// Color accents: tint leading icons in lists and settings pages.
   final bool accentListIcons;
   final String locale;
+
+  /// ISO 639-1 code for reverse-geocoded place names (issue #1187). Synced
+  /// with the diver so every device stores the same spelling.
+  final String placeNameLanguage;
   final String defaultDiveType;
   final double defaultTankVolume;
   final int defaultStartPressure;
@@ -386,6 +396,14 @@ class AppSettings {
   /// Default visibility for the gas-usage timeline strip on the dive profile
   final bool defaultShowGasTimeline;
 
+  /// Default visibility for the per-cell O2 mV traces on the dive profile
+  final bool defaultShowO2CellMv;
+
+  /// Whether synthesized ("(est.)") tank pressure lines are drawn on the dive
+  /// profile at all. Off means the estimate is never built, so no legend chip,
+  /// tooltip row, or chart-options entry appears for it (issue #731).
+  final bool defaultShowEstimatedTankPressure;
+
   /// Default visibility for the separate ascent-rate magnitude line on the
   /// dive profile (distinct from [showAscentRateColors], which tints the depth
   /// line by velocity band).
@@ -478,6 +496,7 @@ class AppSettings {
     this.accentSectionHeaders = false,
     this.accentListIcons = false,
     this.locale = 'system',
+    this.placeNameLanguage = PlaceNameLanguage.defaultCode,
     this.defaultDiveType = 'recreational',
     this.defaultTankVolume = 12.0,
     this.defaultStartPressure = 200,
@@ -552,6 +571,8 @@ class AppSettings {
     this.defaultShowGasSwitchMarkers = true,
     this.defaultShowPhotoMarkers = true,
     this.defaultShowGasTimeline = false,
+    this.defaultShowO2CellMv = false,
+    this.defaultShowEstimatedTankPressure = true,
     this.defaultShowAscentRateLine = false,
     // Notification defaults
     this.notificationsEnabled = true,
@@ -637,6 +658,7 @@ class AppSettings {
     bool? accentSectionHeaders,
     bool? accentListIcons,
     String? locale,
+    String? placeNameLanguage,
     String? defaultDiveType,
     double? defaultTankVolume,
     int? defaultStartPressure,
@@ -711,6 +733,8 @@ class AppSettings {
     bool? defaultShowGasSwitchMarkers,
     bool? defaultShowPhotoMarkers,
     bool? defaultShowGasTimeline,
+    bool? defaultShowO2CellMv,
+    bool? defaultShowEstimatedTankPressure,
     bool? defaultShowAscentRateLine,
     bool? notificationsEnabled,
     List<int>? serviceReminderDays,
@@ -765,6 +789,7 @@ class AppSettings {
       accentSectionHeaders: accentSectionHeaders ?? this.accentSectionHeaders,
       accentListIcons: accentListIcons ?? this.accentListIcons,
       locale: locale ?? this.locale,
+      placeNameLanguage: placeNameLanguage ?? this.placeNameLanguage,
       defaultDiveType: defaultDiveType ?? this.defaultDiveType,
       defaultTankVolume: defaultTankVolume ?? this.defaultTankVolume,
       defaultStartPressure: defaultStartPressure ?? this.defaultStartPressure,
@@ -859,6 +884,10 @@ class AppSettings {
           defaultShowPhotoMarkers ?? this.defaultShowPhotoMarkers,
       defaultShowGasTimeline:
           defaultShowGasTimeline ?? this.defaultShowGasTimeline,
+      defaultShowO2CellMv: defaultShowO2CellMv ?? this.defaultShowO2CellMv,
+      defaultShowEstimatedTankPressure:
+          defaultShowEstimatedTankPressure ??
+          this.defaultShowEstimatedTankPressure,
       defaultShowAscentRateLine:
           defaultShowAscentRateLine ?? this.defaultShowAscentRateLine,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
@@ -977,6 +1006,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   SettingsNotifier(this._repository, this._ref) : super(const AppSettings()) {
     _initialLoad = _initializeAndLoad();
+    logFailure(_initialLoad, SettingsNotifier, 'load diver settings');
 
     // Listen for diver changes and reload settings
     _ref.listen<String?>(currentDiverIdProvider, (previous, next) {
@@ -985,7 +1015,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         _validatedDiverId = null;
         _isLoading =
             false; // Allow loading even if previous load was in progress
-        _initializeAndLoad();
+        logFailure(
+          _initializeAndLoad(),
+          SettingsNotifier,
+          'reload settings after a diver change',
+        );
       }
     });
   }
@@ -1336,6 +1370,13 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setLocale(String locale) async {
     state = state.copyWith(locale: locale);
+    await _saveSettings();
+  }
+
+  Future<void> setPlaceNameLanguage(String code) async {
+    state = state.copyWith(
+      placeNameLanguage: PlaceNameLanguage.normalize(code),
+    );
     await _saveSettings();
   }
 
@@ -1778,6 +1819,16 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setDefaultShowO2CellMv(bool value) async {
+    state = state.copyWith(defaultShowO2CellMv: value);
+    await _saveSettings();
+  }
+
+  Future<void> setDefaultShowEstimatedTankPressure(bool value) async {
+    state = state.copyWith(defaultShowEstimatedTankPressure: value);
+    await _saveSettings();
+  }
+
   Future<void> setDefaultShowAscentRateLine(bool value) async {
     state = state.copyWith(defaultShowAscentRateLine: value);
     await _saveSettings();
@@ -1979,6 +2030,11 @@ final themePresetProvider = Provider<AppThemePreset>((ref) {
 
 final localeProvider = Provider<String>((ref) {
   return ref.watch(settingsProvider.select((s) => s.locale));
+});
+
+/// The language new reverse-geocode results are stored in (issue #1187).
+final placeNameLanguageProvider = Provider<String>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.placeNameLanguage));
 });
 
 /// Color accent toggles. Narrow selects so each surface rebuilds only when

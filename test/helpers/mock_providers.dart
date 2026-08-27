@@ -114,6 +114,9 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setLocale(String locale) async =>
       state = state.copyWith(locale: locale);
   @override
+  Future<void> setPlaceNameLanguage(String code) async =>
+      state = state.copyWith(placeNameLanguage: code);
+  @override
   Future<void> setDefaultDiveType(String diveType) async =>
       state = state.copyWith(defaultDiveType: diveType);
   @override
@@ -380,6 +383,12 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultShowPhotoMarkers(bool value) async =>
       state = state.copyWith(defaultShowPhotoMarkers: value);
+  @override
+  Future<void> setDefaultShowO2CellMv(bool value) async =>
+      state = state.copyWith(defaultShowO2CellMv: value);
+  @override
+  Future<void> setDefaultShowEstimatedTankPressure(bool value) async =>
+      state = state.copyWith(defaultShowEstimatedTankPressure: value);
   @override
   Future<void> setDefaultShowGasTimeline(bool value) async =>
       state = state.copyWith(defaultShowGasTimeline: value);

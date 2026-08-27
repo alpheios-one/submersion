@@ -4,6 +4,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_reposit
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/dive_types/data/repositories/dive_type_repository.dart';
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 
 /// Repository provider
 final diveTypeRepositoryProvider = Provider<DiveTypeRepository>((ref) {
@@ -83,7 +84,11 @@ class DiveTypeListNotifier
 
   DiveTypeListNotifier(this._repository, this._ref)
     : super(const AsyncValue.loading()) {
-    _initializeAndLoad();
+    logFailure(
+      _initializeAndLoad(),
+      DiveTypeListNotifier,
+      'initialize and load',
+    );
 
     // Listen for diver changes and reload
     _ref.listen<String?>(currentDiverIdProvider, (previous, next) {
@@ -96,7 +101,11 @@ class DiveTypeListNotifier
         _ref.invalidate(diveTypesProvider);
         _ref.invalidate(customDiveTypesProvider);
         _ref.invalidate(diveTypeStatisticsProvider);
-        _initializeAndLoad();
+        logFailure(
+          _initializeAndLoad(),
+          DiveTypeListNotifier,
+          'initialize and load',
+        );
       }
     });
 

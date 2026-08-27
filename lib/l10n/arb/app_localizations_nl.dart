@@ -361,6 +361,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_bulkEdit_fieldFavorite => 'Favoriet';
 
   @override
+  String get diveLog_bulkEdit_fieldMyRole => 'Mijn rol';
+
+  @override
+  String get diveLog_bulkEdit_buddyRoleMixed => 'Gemengd';
+
+  @override
   String get diveLog_bulkEdit_collectionWeights => 'Loodgewichten';
 
   @override
@@ -789,6 +795,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String accessibility_label_mapViewTitle(Object title) {
     return '$title kaartweergave';
   }
+
+  @override
+  String get accessibility_label_resizeMasterPane =>
+      'Hoofdvenster formaat aanpassen';
 
   @override
   String get accessibility_label_sharedWithAllProfiles =>
@@ -4556,6 +4566,39 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_deco_label_tts => 'TTS';
 
   @override
+  String diveLog_deco_gf_chip(Object low, Object high) {
+    return 'GF: $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_chipFromSettings(Object low, Object high) {
+    return 'GF: $low/$high · jouw instellingen';
+  }
+
+  @override
+  String diveLog_deco_gf_chipRecordedAlgorithm(
+    Object algorithm,
+    Object low,
+    Object high,
+  ) {
+    return '$algorithm · geanalyseerd met GF $low/$high';
+  }
+
+  @override
+  String diveLog_deco_gf_semantics(Object low, Object high) {
+    return 'Gradiëntfactoren: laag $low, hoog $high';
+  }
+
+  @override
+  String get diveLog_deco_gf_tooltipFromSettings =>
+      'Deze duikcomputer heeft zijn gradiëntfactoren niet vastgelegd, dus deze duik wordt geanalyseerd met die uit jouw instellingen.';
+
+  @override
+  String diveLog_deco_gf_tooltipRecordedAlgorithm(Object algorithm) {
+    return 'Deze duik is berekend met $algorithm, dat geen gradiëntfactoren gebruikt. Submersion analyseert hem met die uit jouw instellingen.';
+  }
+
+  @override
   String get diveLog_deco_sectionDecoStops => 'Decostops';
 
   @override
@@ -5671,6 +5714,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get diveLog_filterChip_noBuddy => 'Geen buddy';
+
+  @override
   String diveLog_filterChip_until(Object date) {
     return 'Tot $date';
   }
@@ -5698,6 +5744,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveLog_filter_clearRating => 'Beoordelingsfilter wissen';
+
+  @override
+  String get diveLog_filter_clearWeekdays => 'Weekdagen wissen';
 
   @override
   String get diveLog_filter_dateSeparator => 'tot';
@@ -5728,6 +5777,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveLog_filter_min => 'Min';
+
+  @override
+  String get diveLog_filter_noBuddyOnly => 'Geen buddy toegewezen';
 
   @override
   String get diveLog_filter_noTagsYet => 'Nog geen tags aangemaakt';
@@ -5772,7 +5824,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_filter_sectionTags => 'Tags';
 
   @override
+  String get diveLog_filter_sectionWeekdays => 'Weekdagen';
+
+  @override
   String get diveLog_filter_showOnlyFavorites => 'Toon alleen favoriete duiken';
+
+  @override
+  String get diveLog_filter_showOnlyNoBuddy =>
+      'Toon alleen duiken zonder buddy';
 
   @override
   String get diveLog_filter_startDate => 'Startdatum';
@@ -6981,7 +7040,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => 'Fout bij laden van reizen';
 
   @override
+  String get diveLog_search_filter_any => 'Alle';
+
+  @override
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
+
+  @override
+  String get diveLog_search_label_deco => 'Decompressie';
 
   @override
   String get diveLog_search_label_depthRange => 'Dieptebereik (m)';
@@ -7598,7 +7663,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get divePlanner_label_runtime => 'Looptijd';
 
   @override
-  String get divePlanner_label_sacRate => 'SAC tempo:';
+  String get divePlanner_label_sacRate => 'RMV:';
 
   @override
   String get divePlanner_label_status => 'Status';
@@ -8142,7 +8207,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'Kies een locatiemethode - coordinaten vullen automatisch land en regio in';
+      'Kies een locatiemethode of zoek de coördinaten op om land, regio, plaats en water automatisch in te vullen';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'bijv. 21.4225';
@@ -8164,6 +8229,31 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'Kies op de kaart';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'Opzoeken op coördinaten';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'Geen locatiegegevens gevonden voor deze coördinaten';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'Locatie opzoeken mislukt. Controleer je verbinding en probeer het opnieuw.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => 'Locatiegegevens vervangen?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'Het opzoeken vond andere waarden voor deze velden:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'Vervangen';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'Behouden';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'Gebruik mijn locatie';
@@ -8524,17 +8614,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String diveSites_list_activeFilter_depthRangeBoth(Object min, Object max) {
-    return '$min-${max}m';
+    return '$min-$max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMax(Object max) {
-    return 'Tot ${max}m';
+    return 'Tot $max';
   }
 
   @override
   String diveSites_list_activeFilter_depthRangeMin(Object min) {
-    return '${min}m+';
+    return '$min+';
   }
 
   @override
@@ -8642,6 +8732,60 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_list_menu_select => 'Duikstekken selecteren';
+
+  @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Ontbrekende locatiegegevens aanvullen';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      'Ontbrekende locatiegegevens aanvullen?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count duikstekken met coördinaten hebben geen land, regio, plaats of water.',
+      one:
+          '1 duikstek met coördinaten heeft geen land, regio, plaats of water.',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minuten',
+      one: '1 minuut',
+    );
+    return '$_temp0 Submersion zoekt elke stek op via OpenStreetMap en vult alleen lege velden in. Dit duurt ongeveer $_temp1.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Starten';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Elke duikstek met coördinaten heeft al locatiegegevens.';
+
+  @override
+  String get diveSites_backfill_progress_title => 'Locatiegegevens aanvullen';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done van $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Annuleren';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Bijgewerkt $updated, ongewijzigd $unchanged, mislukt $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'Locatie opzoeken is niet beschikbaar. Controleer je verbinding en probeer het opnieuw.';
 
   @override
   String get diveSites_list_search_backTooltip => 'Terug';
@@ -9955,6 +10099,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_sortField_dateIssued => 'Datum uitgegeven';
 
   @override
+  String get enum_sortField_dateTaken => 'Opnamedatum';
+
+  @override
   String get enum_sortField_difficulty => 'Moeilijkheid';
 
   @override
@@ -9968,6 +10115,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_sortField_endDate => 'Einddatum';
+
+  @override
+  String get enum_sortField_fileName => 'Bestandsnaam';
+
+  @override
+  String get enum_sortField_fileSize => 'Bestandsgrootte';
 
   @override
   String get enum_sortField_lastServiceDate => 'Laatste onderhoud';
@@ -10974,6 +11127,28 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_serviceDialog_serviceTypeLabel => 'Type service';
 
   @override
+  String get equipment_serviceDialog_serviceTypeHelper =>
+      'Dit vastleggen zet de teller van dit servicetype terug';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeRequired =>
+      'Kies een servicetype';
+
+  @override
+  String get equipment_serviceDialog_serviceTypeNotSet => 'Niet ingesteld';
+
+  @override
+  String get equipment_serviceDialog_categoryHelper =>
+      'Gebruikt voor filteren en exporteren';
+
+  @override
+  String get equipment_serviceDialog_manageServiceTypes =>
+      'Servicetypes beheren';
+
+  @override
+  String get equipment_serviceDialog_categoryLabel => 'Categorie';
+
+  @override
   String get equipment_serviceDialog_snackbar_added =>
       'Servicerecord toegevoegd';
 
@@ -10990,34 +11165,34 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_serviceDialog_updateButton => 'Bijwerken';
 
   @override
-  String get equipment_serviceType_annual => 'Jaarlijkse service';
+  String get equipment_serviceCategory_annual => 'Jaarlijkse service';
 
   @override
-  String get equipment_serviceType_repair => 'Reparatie';
+  String get equipment_serviceCategory_repair => 'Reparatie';
 
   @override
-  String get equipment_serviceType_inspection => 'Inspectie';
+  String get equipment_serviceCategory_inspection => 'Inspectie';
 
   @override
-  String get equipment_serviceType_overhaul => 'Revisie';
+  String get equipment_serviceCategory_overhaul => 'Revisie';
 
   @override
-  String get equipment_serviceType_replacement => 'Onderdeelvervanging';
+  String get equipment_serviceCategory_replacement => 'Onderdeelvervanging';
 
   @override
-  String get equipment_serviceType_cleaning => 'Reiniging';
+  String get equipment_serviceCategory_cleaning => 'Reiniging';
 
   @override
-  String get equipment_serviceType_calibration => 'Kalibratie';
+  String get equipment_serviceCategory_calibration => 'Kalibratie';
 
   @override
-  String get equipment_serviceType_warranty => 'Garantieservice';
+  String get equipment_serviceCategory_warranty => 'Garantieservice';
 
   @override
-  String get equipment_serviceType_recall => 'Terugroepactie/Veiligheid';
+  String get equipment_serviceCategory_recall => 'Terugroepactie/Veiligheid';
 
   @override
-  String get equipment_serviceType_other => 'Overig';
+  String get equipment_serviceCategory_other => 'Overig';
 
   @override
   String get equipment_service_addButton => 'Toevoegen';
@@ -11078,6 +11253,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String equipment_service_filterMatchCount(int count, int total) {
     return '$count van $total getoond';
   }
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryLabel =>
+      'Standaardcategorie';
+
+  @override
+  String get equipment_serviceKinds_defaultCategoryNone => 'Geen standaard';
 
   @override
   String get equipment_serviceKinds_defaultCostLabel => 'Standaardprijs';
@@ -11623,7 +11805,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_resetAll => 'Alle calculators resetten';
 
   @override
-  String get gasCalculators_sacRate => 'SAC tempo';
+  String get gasCalculators_sacRate => 'RMV';
 
   @override
   String get gasCalculators_tab_bestMix => 'Beste mengsel';
@@ -11635,7 +11817,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
-  String get gasCalculators_tab_blender => 'Mixer';
+  String get gasCalculators_tab_blender => 'Trimix-menger';
 
   @override
   String get gasCalculators_blender_cylinder => 'Fles';
@@ -11726,11 +11908,194 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deze vulgassen bereiken het doelmengsel niet exact. Controleer de vulgassen en hun volgorde.';
 
   @override
+  String get gasCalculators_blender_error_implausibleStartMix =>
+      'De fles staat onder druk maar bevat geen zuurstof en geen helium, dus pure stikstof. Controleer het mengsel dat al in de fles zit.';
+
+  @override
   String get gasCalculators_blender_about => 'Over het mengen';
 
   @override
   String get gasCalculators_blender_aboutBody =>
-      'Partiaaldrukmenging voor het doelmengsel, met reëel gasgedrag (Van der Waals). Voeg elk vulgas op volgorde toe, tot de getoonde druk. Vulgassen en hun volgorde zijn instelbaar; analyseer het eindmengsel altijd voordat je ermee duikt.';
+      'Partiaaldrukmenging voor het doelmengsel. Voeg elk vulgas op volgorde toe tot de getoonde druk en laat de fles daarna stabiliseren. Vulgassen en hun volgorde zijn instelbaar: zet je het laatste gas op 32/0, dan wordt met EAN32 in plaats van lucht afgevuld. Analyseer het uiteindelijke mengsel altijd voordat je ermee duikt.';
+
+  @override
+  String get gasCalculators_blender_conditions => 'Mengcondities';
+
+  @override
+  String get gasCalculators_blender_fillTemp => 'Vultemperatuur';
+
+  @override
+  String get gasCalculators_blender_fillTempHelp =>
+      'De temperatuur van de fles tijdens het vullen. Elke druk in de procedure is de manometerwaarde bij deze temperatuur.';
+
+  @override
+  String get gasCalculators_blender_settledTemp => 'Rusttemperatuur';
+
+  @override
+  String get gasCalculators_blender_settledTempHelp =>
+      'De temperatuur waarop de fles uiteindelijk uitkomt. De doeldruk is wat hij dan aangeeft.';
+
+  @override
+  String get gasCalculators_blender_gasModel => 'Gasmodel';
+
+  @override
+  String get gasCalculators_blender_modelIdeal => 'Ideaal gas';
+
+  @override
+  String get gasCalculators_blender_modelVanDerWaals => 'Van der Waals';
+
+  @override
+  String get gasCalculators_blender_modelZFactor => 'Reëel gas (Z-factor)';
+
+  @override
+  String get gasCalculators_blender_modelRecommended => 'Aanbevolen';
+
+  @override
+  String get gasCalculators_blender_modelHelp =>
+      'Reëel gas (Z-factor) is het nauwkeurigst bij flesdrukken. Ideaal gas komt overeen met de meeste gepubliceerde mengtabellen. Van der Waals is bedoeld voor vergelijking met andere mengsoftware en wijkt bij vuldruk enkele procenten af.';
+
+  @override
+  String gasCalculators_blender_stepAdd(String gas) {
+    return '$gas toevoegen';
+  }
+
+  @override
+  String get gasCalculators_blender_stepStartLabel => 'Start';
+
+  @override
+  String gasCalculators_blender_settlesTo(String pressure, String temperature) {
+    return 'Stabiliseert op $pressure bij $temperature';
+  }
+
+  @override
+  String get gasCalculators_blender_templates => 'Sjablonen';
+
+  @override
+  String get gasCalculators_blender_templatesTitle =>
+      'Sjablonen voor doelmengsels';
+
+  @override
+  String get gasCalculators_blender_saveTemplate => 'Huidig mengsel opslaan';
+
+  @override
+  String get gasCalculators_blender_manageTemplates => 'Sjablonen beheren';
+
+  @override
+  String gasCalculators_blender_templateSaved(String mix) {
+    return '$mix opgeslagen';
+  }
+
+  @override
+  String get gasCalculators_blender_templateExists =>
+      'Dat mengsel is al opgeslagen.';
+
+  @override
+  String get gasCalculators_blender_templateInvalid =>
+      'O₂ + He mag niet meer dan 100% zijn.';
+
+  @override
+  String get gasCalculators_blender_templateNeedsNumbers =>
+      'Voer zowel O₂ als He als getal in.';
+
+  @override
+  String gasCalculators_blender_templateLimit(int count) {
+    return 'Je kunt maximaal $count sjablonen opslaan.';
+  }
+
+  @override
+  String get gasCalculators_blender_templateNone =>
+      'Nog geen sjablonen. Sla een doelmengsel op om het hier opnieuw te gebruiken.';
+
+  @override
+  String gasCalculators_blender_templateDelete(String mix) {
+    return '$mix verwijderen';
+  }
+
+  @override
+  String get gasCalculators_blender_templateAdd => 'Sjabloon toevoegen';
+
+  @override
+  String get gasCalculators_blender_billing => 'Kosten';
+
+  @override
+  String get gasCalculators_blender_cylinderVolume => 'Waterinhoud van de fles';
+
+  @override
+  String get gasCalculators_blender_cylinderPresets => 'Voorinstellingen';
+
+  @override
+  String gasCalculators_blender_unitPrice(String unit) {
+    return 'Prijs per 100 $unit';
+  }
+
+  @override
+  String get gasCalculators_blender_currency => 'Valuta';
+
+  @override
+  String get gasCalculators_blender_costTotal => 'Totaal';
+
+  @override
+  String get gasCalculators_blender_costBasis =>
+      'Er wordt afgerekend op de geleverde druk (waterinhoud van de fles × toegevoegde bar), zoals een vulstation meet.';
+
+  @override
+  String get gasCalculators_blender_costMissingPrice =>
+      'Voer voor elk gas een prijs in om het totaal te zien.';
+
+  @override
+  String get gasCalculators_blender_saveFill => 'Deze vulling opslaan';
+
+  @override
+  String get gasCalculators_blender_billed => 'Gefactureerd';
+
+  @override
+  String get gasCalculators_blender_billedNone =>
+      'Nog niets gefactureerd. Rond een vulling af en sla die hier op.';
+
+  @override
+  String get gasCalculators_blender_billedTo => 'Gefactureerd aan';
+
+  @override
+  String get gasCalculators_blender_addManualLine => 'Regel toevoegen';
+
+  @override
+  String get gasCalculators_blender_lineDescription => 'Omschrijving';
+
+  @override
+  String get gasCalculators_blender_lineAmount => 'Bedrag';
+
+  @override
+  String get gasCalculators_blender_clearBilled => 'Wissen';
+
+  @override
+  String get gasCalculators_blender_clearBilledTitle => 'Factuur wissen?';
+
+  @override
+  String gasCalculators_blender_clearBilledBody(int count) {
+    return 'Dit verwijdert alle $count opgeslagen vullingen.';
+  }
+
+  @override
+  String gasCalculators_blender_editLine(String label) {
+    return '$label bewerken';
+  }
+
+  @override
+  String gasCalculators_blender_deleteLine(String label) {
+    return '$label verwijderen';
+  }
+
+  @override
+  String gasCalculators_blender_fillAdded(String mix) {
+    return '$mix toegevoegd aan de factuur';
+  }
+
+  @override
+  String get gasCalculators_blender_billedIncomplete =>
+      'Een of meer regels hebben geen prijs, dus dit totaal is onvolledig.';
+
+  @override
+  String get gasCalculators_blender_billedTotal => 'Totaal';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
@@ -12062,28 +12427,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_diveMediaSection_title => 'Foto\'s & video';
 
   @override
-  String get media_diveMediaSection_deleteButton => 'Verwijderen';
-
-  @override
-  String media_diveMediaSection_deleteError(Object error) {
-    return 'Verwijderen mislukt: $error';
-  }
-
-  @override
-  String get media_diveMediaSection_deleteSelectedContent =>
-      'Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.';
-
-  @override
-  String media_diveMediaSection_deleteSelectedSuccess(int count) {
-    return '$count items verwijderd';
-  }
-
-  @override
-  String media_diveMediaSection_deleteSelectedTitle(int count) {
-    return '$count items verwijderen?';
-  }
-
-  @override
   String get media_diveMediaSection_replaceButton => 'Opnieuw koppelen';
 
   @override
@@ -12098,13 +12441,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_diveMediaSection_unlinkButton => 'Ontkoppelen';
 
   @override
-  String get media_diveMediaSection_unlinkDialogContent =>
-      'Deze foto van de duik verwijderen? De foto blijft in je galerij staan.';
-
-  @override
-  String get media_diveMediaSection_unlinkDialogTitle => 'Foto ontkoppelen';
-
-  @override
   String media_diveMediaSection_unlinkError(Object error) {
     return 'Ontkoppelen mislukt: $error';
   }
@@ -12116,7 +12452,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String media_diveMediaSection_unlinkSelectedContent(int count) {
-    return 'Dit verwijdert $count media-items van deze duik. De originele bestanden worden niet verwijderd.';
+    return 'Verwijdert $count media-items uit je bibliotheek, samen met hun cloudkopieen en miniaturen. Items die een duikstek nog gebruikt blijven behouden. Je originele bestanden blijven ongemoeid.';
   }
 
   @override
@@ -12130,7 +12466,31 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get media_diveMediaSection_unlinkSuccess => 'Foto ontkoppeld';
+  String media_library_unlinkConfirmTitle(int count) {
+    return '$count items ontkoppelen?';
+  }
+
+  @override
+  String media_siteMediaSection_unlinkError(Object error) {
+    return 'Ontkoppelen mislukt: $error';
+  }
+
+  @override
+  String get media_library_unlinkConfirmBody =>
+      'Ze verdwijnen uit je bibliotheek, samen met hun cloudkopieën en miniaturen. Je originele bestanden blijven ongemoeid. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String media_library_unlinkMetadataNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count daarvan hebben een bijschrift of favoriet opgeslagen in Submersion, en die details gaan verloren.',
+      one:
+          'Een daarvan heeft een bijschrift of favoriet opgeslagen in Submersion, en die details gaan verloren.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get media_siteMediaSection_title => 'Media van de duikstek';
@@ -12156,16 +12516,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return '$count bijlagen verwijderen?';
+    return '$count items ontkoppelen?';
   }
 
   @override
-  String get media_siteMediaSection_unlinkSelectedContent =>
-      'De geselecteerde items worden van deze duikstek verwijderd. Bestanden in je fotobibliotheek of op schijf worden niet gewist.';
+  String media_siteMediaSection_unlinkSelectedContent(int count) {
+    return 'Verwijdert $count items uit je bibliotheek, inclusief cloudkopieën en miniaturen. Media die een duik nog gebruikt, blijven bewaard. Je originele bestanden blijven onaangetast.';
+  }
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return '$count bijlagen verwijderd';
+    return '$count items ontkoppeld';
   }
 
   @override
@@ -12382,7 +12743,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Submersion heeft toegang tot je fotobibliotheek nodig om duikfoto\'s toe te voegen.';
 
   @override
-  String get media_photoPicker_permissionTitle => 'Fototoegang vereist';
+  String get media_photoPicker_permissionTitle => 'Duikfoto\'s';
 
   @override
   String get media_photoPicker_selectAllButton => 'Alles selecteren';
@@ -12404,6 +12765,193 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get media_photoPicker_thumbnailToggleSelectedLabel =>
       'Selectie voor foto aan/uit, geselecteerd';
+
+  @override
+  String get media_photoPicker_files_pickFilesButton => 'Bestanden kiezen…';
+
+  @override
+  String get media_photoPicker_files_pickFolderButton => 'Een map kiezen…';
+
+  @override
+  String get media_photoPicker_files_autoMatchLabel =>
+      'Foto\'s en video\'s automatisch op datum aan duiken koppelen';
+
+  @override
+  String get media_photoPicker_files_emptyHint =>
+      'Kies bestanden of een map om te beginnen.';
+
+  @override
+  String media_photoPicker_files_linkButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items koppelen',
+      one: '1 item koppelen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachToSiteButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items aan deze duiklocatie koppelen',
+      one: '1 item aan deze duiklocatie koppelen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount bestanden',
+      one: '1 bestand',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount duiken',
+      one: '1 duik',
+    );
+    return '$_temp0, $_temp1, $unmatchedCount niet gekoppeld';
+  }
+
+  @override
+  String media_photoPicker_files_itemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_diveGroupTitle(String diveId) {
+    return 'Duik $diveId';
+  }
+
+  @override
+  String media_photoPicker_files_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bestanden',
+      one: '1 bestand',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_unmatchedGroupTitle => 'Niet gekoppeld';
+
+  @override
+  String media_photoPicker_files_addAllToDive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Alle $count aan deze duik toevoegen',
+      one: '1 aan deze duik toevoegen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_addToDiveTooltip =>
+      'Aan deze duik toevoegen';
+
+  @override
+  String get media_photoPicker_files_chooseDiveTooltip => 'Een duik kiezen';
+
+  @override
+  String get media_photoPicker_files_removeTooltip =>
+      'Uit de selectie verwijderen';
+
+  @override
+  String get media_photoPicker_files_sourceExif => 'uit EXIF';
+
+  @override
+  String get media_photoPicker_files_sourceContainer => 'uit bestandsmetadata';
+
+  @override
+  String get media_photoPicker_files_sourceFileDate => 'uit bestandsdatum';
+
+  @override
+  String get media_photoPicker_files_sourceNone => 'geen datum gevonden';
+
+  @override
+  String media_photoPicker_files_shiftedTime(String shifted, String original) {
+    return '$shifted (was $original)';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoTimestamp =>
+      'Opnametijd kon niet worden gelezen';
+
+  @override
+  String media_photoPicker_files_reasonBeforeDive(String gap) {
+    return '$gap voor de dichtstbijzijnde duik';
+  }
+
+  @override
+  String media_photoPicker_files_reasonAfterDive(String gap) {
+    return '$gap na de dichtstbijzijnde duik';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoDives =>
+      'Geen duiken om mee te vergelijken';
+
+  @override
+  String get media_photoPicker_files_offsetLabel =>
+      'Opnametijden verschuiven met';
+
+  @override
+  String get media_photoPicker_files_offsetResetTooltip =>
+      'Verschuiving herstellen';
+
+  @override
+  String media_photoPicker_files_offsetBackTooltip(String amount) {
+    return '$amount eerder verschuiven';
+  }
+
+  @override
+  String media_photoPicker_files_offsetForwardTooltip(String amount) {
+    return '$amount later verschuiven';
+  }
+
+  @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items gekoppeld',
+      one: '1 item gekoppeld',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items aan deze duiklocatie gekoppeld',
+      one: '1 item aan deze duiklocatie gekoppeld',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'Ongedaan maken';
 
   @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
@@ -12644,6 +13192,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_writeMetadata_keepOriginalVideo => 'Originele video bewaren';
 
   @override
+  String get media_writeMetadata_livePhotoUnsupported =>
+      'Live Photos worden nog niet ondersteund. Dupliceer deze als stilstaande foto en schrijf de duikgegevens vervolgens naar de kopie.';
+
+  @override
   String get media_writeMetadata_noDataAvailable =>
       'Geen duikgegevens beschikbaar om te schrijven.';
 
@@ -12709,8 +13261,47 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_import_launch => 'Media importeren...';
 
   @override
+  String get media_import_review_title => 'Import controleren';
+
+  @override
+  String media_import_review_confirm(int count) {
+    return '$count items importeren';
+  }
+
+  @override
+  String media_import_review_result(int linked, int skipped, int failed) {
+    return '$linked gekoppeld, $skipped overgeslagen, $failed mislukt';
+  }
+
+  @override
+  String get media_import_review_chooseSite => 'Site kiezen';
+
+  @override
+  String get media_import_review_ambiguous => 'Meerdere duiken komen overeen';
+
+  @override
+  String get media_import_review_noMatch => 'Geen overeenkomende duik';
+
+  @override
+  String get media_import_review_skipped => 'Niet geïmporteerd';
+
+  @override
+  String media_import_review_linkChip(int number) {
+    return 'Koppelen aan #$number';
+  }
+
+  @override
+  String get media_import_review_linkToDive => 'Aan duik koppelen';
+
+  @override
+  String get media_import_review_linkToSite => 'Aan duikstek koppelen';
+
+  @override
+  String get media_import_review_chooseDive => 'Duik kiezen';
+
+  @override
   String get media_import_intro =>
-      'Geïmporteerde media blijft in je bibliotheek en kan automatisch aan duiken worden gekoppeld.';
+      'Foto\'s worden tijdens het importeren aan een duik of duiksite gekoppeld.';
 
   @override
   String get media_console_sources => 'Bronnen';
@@ -12823,9 +13414,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get media_console_missing => 'Ontbrekend';
-
-  @override
   String get media_missing_empty => 'Geen ontbrekende bestanden';
 
   @override
@@ -12888,45 +13476,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get media_console_unlinked => 'Niet gekoppeld';
-
-  @override
-  String get media_import_linkTitle => 'Geïmporteerde media koppelen';
-
-  @override
-  String media_import_linkConfirm(int count) {
-    return '$count items koppelen';
-  }
-
-  @override
-  String get media_import_staysUnlinked => 'Blijft bij Niet gekoppeld';
-
-  @override
-  String media_import_linkedResult(int count) {
-    return '$count items gekoppeld';
-  }
-
-  @override
-  String get media_inbox_chooseDive => 'Duik kiezen';
-
-  @override
-  String get media_inbox_empty => 'Geen niet-gekoppelde media';
-
-  @override
-  String get media_inbox_keep => 'Behouden';
-
-  @override
-  String media_inbox_linkChip(int number) {
-    return 'Koppelen aan #$number';
-  }
-
-  @override
-  String get media_inbox_linkToDive => 'Aan duik koppelen';
-
-  @override
-  String get media_inbox_linkToSite => 'Aan duikstek koppelen';
-
-  @override
   String get media_library_empty => 'Nog geen media';
 
   @override
@@ -12948,7 +13497,30 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_library_filter_dates => 'Datums';
 
   @override
+  String get media_library_filter_missing => 'Ontbrekende bestanden';
+
+  @override
+  String media_library_filter_missingCount(int count) {
+    return 'Ontbrekende bestanden ($count)';
+  }
+
+  @override
   String get media_library_filter_clear => 'Filters wissen';
+
+  @override
+  String get media_library_filter_any => 'Alle';
+
+  @override
+  String get media_library_filter_title => 'Media filteren';
+
+  @override
+  String get media_library_filter_apply => 'Toepassen';
+
+  @override
+  String get media_library_sort_title => 'Media sorteren';
+
+  @override
+  String get media_smartAlbum_load => 'Album laden';
 
   @override
   String get media_divePicker_title => 'Naar duik verplaatsen';
@@ -12957,22 +13529,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_divePicker_search => 'Duiken zoeken';
 
   @override
-  String get media_library_deleteConfirmBody =>
-      'Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.';
-
-  @override
-  String media_library_deleteConfirmTitle(int count) {
-    return '$count items verwijderen?';
-  }
-
-  @override
   String get media_library_moveToDive => 'Naar duik verplaatsen';
 
   @override
-  String get media_library_unlinkFromSite => 'Loskoppelen van duikstek';
-
-  @override
-  String get media_library_unlinkSelected => 'Loskoppelen';
+  String get media_library_unlinkSelected => 'Ontkoppelen';
 
   @override
   String media_library_selectedCount(int count) {
@@ -13683,6 +14243,76 @@ class AppLocalizationsNl extends AppLocalizations {
   String get safetyReview_restore => 'Herstellen';
 
   @override
+  String get safetyReview_dismissAll => 'Alles negeren';
+
+  @override
+  String get safetyReview_restoreAll => 'Alles herstellen';
+
+  @override
+  String get safetySettings_dismissAll => 'Alle observaties negeren';
+
+  @override
+  String get safetySettings_dismissAll_subtitle =>
+      'Alle observaties in dit logboek als beoordeeld markeren';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle =>
+      'Alle observaties negeren?';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      'Elke observatie bij elke geanalyseerde duik wordt als beoordeeld gemarkeerd. Je kunt ze per duik herstellen in de sectie veiligheidscontrole.';
+
+  @override
+  String get safetySettings_dismissAll_confirm => 'Alles negeren';
+
+  @override
+  String get safetySettings_dismissAll_cancel => 'Annuleren';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return '$done van $total duiken gecontroleerd';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observaties genegeerd',
+      one: '1 observatie genegeerd',
+      zero: 'Geen observaties om te negeren',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observaties genegeerd',
+      one: '1 observatie genegeerd',
+      zero: 'Geen observaties genegeerd',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: '$failed duiken konden niet worden bijgewerkt',
+      one: '1 duik kon niet worden bijgewerkt',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed =>
+      'Kan de duiklijst niet lezen. Er is niets gewijzigd.';
+
+  @override
+  String get safetySettings_analyzeAll_failed =>
+      'Kan de duiken niet analyseren.';
+
+  @override
   String get safetyReview_details => 'Details';
 
   @override
@@ -13949,6 +14579,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Koppel een duikpak aan deze duik voor een vollediger beeld';
 
   @override
+  String get buoyancy_noLeadHint =>
+      'Geen lood vastgelegd: voeg lood toe aan deze duik of een drooggewicht aan je loodmateriaal';
+
+  @override
   String get buoyancy_chartNet => 'Netto';
 
   @override
@@ -14139,6 +14773,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_events => 'Gebeurtenissen';
+
+  @override
+  String get settings_appearance_metric_estimatedTankPressure =>
+      'Geschatte flesdruk';
 
   @override
   String get settings_appearance_metric_gasDensity => 'Gasdichtheid';
@@ -14851,6 +15489,117 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_conflict_previous_tooltip => 'Vorig conflict';
 
   @override
+  String get settings_conflict_ref_buddy => 'Buddy';
+
+  @override
+  String get settings_conflict_ref_certification => 'Certificering';
+
+  @override
+  String get settings_conflict_ref_checklistTemplate => 'Checklistsjabloon';
+
+  @override
+  String get settings_conflict_ref_connectedAccount => 'Gekoppeld account';
+
+  @override
+  String get settings_conflict_ref_course => 'Cursus';
+
+  @override
+  String get settings_conflict_ref_courseRequirement => 'Cursusvereiste';
+
+  @override
+  String get settings_conflict_ref_cylinderConfig => 'Flesconfiguratie';
+
+  @override
+  String get settings_conflict_ref_dataSource => 'Gegevensbron';
+
+  @override
+  String get settings_conflict_ref_dive => 'Duik';
+
+  @override
+  String get settings_conflict_ref_diveCenter => 'Duikcentrum';
+
+  @override
+  String get settings_conflict_ref_diveComputer => 'Duikcomputer';
+
+  @override
+  String get settings_conflict_ref_divePlan => 'Duikplan';
+
+  @override
+  String get settings_conflict_ref_diveSite => 'Duikstek';
+
+  @override
+  String get settings_conflict_ref_diveType => 'Duiktype';
+
+  @override
+  String get settings_conflict_ref_diver => 'Duiker';
+
+  @override
+  String get settings_conflict_ref_equipment => 'Uitrusting';
+
+  @override
+  String get settings_conflict_ref_equipmentSet => 'Uitrustingsset';
+
+  @override
+  String get settings_conflict_ref_finding => 'Bevinding';
+
+  @override
+  String get settings_conflict_ref_instructor => 'Instructeur';
+
+  @override
+  String get settings_conflict_ref_linkedDive => 'Gekoppelde duik';
+
+  @override
+  String get settings_conflict_ref_media => 'Media';
+
+  @override
+  String get settings_conflict_ref_mediaSubscription => 'Media-abonnement';
+
+  @override
+  String get settings_conflict_ref_missing => 'Niet meer in deze bibliotheek';
+
+  @override
+  String settings_conflict_ref_named(Object name, Object date) {
+    return '$name ($date)';
+  }
+
+  @override
+  String get settings_conflict_ref_plannedTank => 'Geplande fles';
+
+  @override
+  String get settings_conflict_ref_preDiveChecklistTemplate =>
+      'Sjabloon voor checklist voor de duik';
+
+  @override
+  String get settings_conflict_ref_preDiveSession => 'Checklist voor de duik';
+
+  @override
+  String get settings_conflict_ref_relatedDive => 'Gerelateerde duik';
+
+  @override
+  String get settings_conflict_ref_serviceKind => 'Onderhoudstype';
+
+  @override
+  String get settings_conflict_ref_sighting => 'Waarneming';
+
+  @override
+  String get settings_conflict_ref_signer => 'Ondertekend door';
+
+  @override
+  String get settings_conflict_ref_sourceDive => 'Bronduik';
+
+  @override
+  String get settings_conflict_ref_species => 'Soorten';
+
+  @override
+  String get settings_conflict_ref_tag => 'Tag';
+
+  @override
+  String get settings_conflict_ref_tank => 'Fles';
+
+  @override
+  String get settings_conflict_ref_trip => 'Reis';
+
+  @override
   String get settings_conflict_remoteVersion => 'Externe versie';
 
   @override
@@ -15426,6 +16175,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Aangepaste flesconfiguraties beheren';
 
   @override
+  String get settings_manage_serviceTypes => 'Servicetypes';
+
+  @override
+  String get settings_manage_serviceTypes_subtitle =>
+      'Welk onderhoud je uitrusting nodig heeft, en hoe vaak';
+
+  @override
   String get settings_migrationProgress_doNotClose => 'Sluit de app niet';
 
   @override
@@ -15461,7 +16217,15 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get settings_notifications_disabled_enableButton => 'Inschakelen';
+  String get settings_notifications_disabled_continueButton => 'Doorgaan';
+
+  @override
+  String get settings_notifications_disabled_openSettingsButton =>
+      'Instellingen openen';
+
+  @override
+  String get settings_notifications_disabled_subtitleUnrequested =>
+      'Serviceherinneringen hebben toestemming nodig om meldingen te sturen';
 
   @override
   String get settings_notifications_disabled_subtitle =>
@@ -16004,7 +16768,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_units_gasModel_explanation =>
-      'Hoe flesdruk wordt omgerekend naar gasvolume. Dit beïnvloedt het SAC, de gasstatistieken, de planner en de gasrekenmachines. Ideaal gas komt overeen met de berekening die opleidingen leren; reëel gas is fysisch nauwkeurig en geeft een ongeveer 5% lager SAC.';
+      'Hoe flesdruk wordt omgerekend naar gasvolume. Dit beïnvloedt het RMV, de gasstatistieken, de planner en de gasrekenmachines. Ideaal gas komt overeen met de berekening die opleidingen leren; reëel gas is fysisch nauwkeurig en geeft een ongeveer 5% lager RMV.';
 
   @override
   String get settings_units_dialog_gasModel => 'Gasberekeningen';
@@ -17569,6 +18333,40 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tags_action_createTag => 'Tag aanmaken';
 
   @override
+  String get tags_action_browse => 'Bladeren';
+
+  @override
+  String get tags_picker_title => 'Tags kiezen';
+
+  @override
+  String get tags_picker_empty =>
+      'Nog geen tags. Typ een tagnaam om je eerste aan te maken.';
+
+  @override
+  String tags_picker_errorLoading(String error) {
+    return 'Fout bij het laden van tags: $error';
+  }
+
+  @override
+  String get tags_picker_allAdded => 'Alle tags zijn al toegevoegd.';
+
+  @override
+  String get tags_picker_noMatches =>
+      'Geen tags komen overeen met je zoekopdracht.';
+
+  @override
+  String tags_picker_addCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tags toevoegen',
+      one: '1 tag toevoegen',
+      zero: 'Tags toevoegen',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_action_deleteTag => 'Tag verwijderen';
 
   @override
@@ -17588,6 +18386,42 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => 'Tags';
+
+  @override
+  String get importWizard_photos_stepLabel => 'Foto\'s';
+
+  @override
+  String importWizard_photos_foundCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto\'s waarnaar dit logboek verwijst',
+      one: '1 foto waarnaar dit logboek verwijst',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseFolder => 'Fotomap kiezen...';
+
+  @override
+  String get importWizard_photos_scanning => 'Map wordt gescand...';
+
+  @override
+  String importWizard_photos_matchSummary(
+    int matched,
+    int byName,
+    int missing,
+  ) {
+    return '$matched gekoppeld, $byName alleen op bestandsnaam, $missing niet gevonden';
+  }
+
+  @override
+  String get importWizard_photos_skip => 'Foto\'s overslaan';
+
+  @override
+  String get importWizard_photos_mobileUnsupported =>
+      'Voor het importeren van foto\'s is een map op de schijf van dit apparaat nodig. Voer deze import uit op een computer om ze mee te nemen. Duiken en duikstekken worden normaal geïmporteerd.';
 
   @override
   String importWizard_review_olderDivesSkipped(int count) {
@@ -19225,6 +20059,28 @@ class AppLocalizationsNl extends AppLocalizations {
   String get universalImport_summary_filesTitle => 'Bestanden';
 
   @override
+  String get universalImport_summary_noticesTitle => 'Niet in het bestand';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureTitle =>
+      'Flesdruk niet vastgelegd';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureBody =>
+      'Luchtverbruik en SAC kunnen niet worden berekend. Je kunt de begin- en einddruk toevoegen door de duik te bewerken.';
+
+  @override
+  String universalImport_summary_noticeAffectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Geldt voor $count duiken',
+      one: 'Geldt voor 1 duik',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String universalImport_summary_fileImported(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20393,8 +21249,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Submersion uses Apple HealthKit to read underwater diving workout data, including depth, duration, water temperature, and heart rate, to create detailed dive logs.';
 
   @override
-  String get diveImport_healthkit_accessRequired =>
-      'Apple HealthKit Access Required';
+  String get diveImport_healthkit_accessRequired => 'Apple HealthKit';
 
   @override
   String get diveImport_healthkit_attribution =>
@@ -20639,6 +21494,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveImport_uddf_tags => 'Tags';
 
   @override
+  String get diveImport_uddf_media => 'Foto\'s';
+
+  @override
   String get diveImport_uddf_title => 'Importeren vanuit UDDF';
 
   @override
@@ -20765,7 +21623,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_aboutDescription =>
-      'Rock bottom is de minimale gasreserve voor een noodopstijging terwijl je lucht deelt met je buddy.\n\n• Gebruikt verhoogde SAC-waarden (2-3x normaal)\n• Gaat ervan uit dat beide duikers op een fles zitten\n• Inclusief veiligheidsstop indien ingeschakeld\n\nKeer de duik altijd om VOOR je rock bottom bereikt!';
+      'Rock bottom is de minimale gasreserve voor een noodopstijging terwijl je lucht deelt met je buddy.\n\n• Gebruikt verhoogde RMV-waarden (2-3x normaal)\n• Gaat ervan uit dat beide duikers op een fles zitten\n• Inclusief veiligheidsstop indien ingeschakeld\n\nKeer de duik altijd om VOOR je rock bottom bereikt!';
 
   @override
   String get gasCalculators_rockBottom_aboutTitle => 'Over Rock Bottom';
@@ -20790,11 +21648,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Stijgtijd naar oppervlak';
 
   @override
-  String get gasCalculators_rockBottom_buddySac => 'SAC buddy';
+  String get gasCalculators_rockBottom_buddySac => 'RMV buddy';
 
   @override
   String get gasCalculators_rockBottom_combinedStressedSac =>
-      'Gecombineerde stress-SAC';
+      'Gecombineerde stress-RMV';
 
   @override
   String get gasCalculators_rockBottom_emergencyAscentBreakdown =>
@@ -20838,10 +21696,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_stressedSacHint =>
-      'Gebruik hogere SAC-waarden om rekening te houden met stress tijdens een noodsituatie';
+      'Gebruik een hogere RMV om rekening te houden met stress tijdens een noodsituatie';
 
   @override
-  String get gasCalculators_rockBottom_stressedSacRates => 'Stress-SAC-waarden';
+  String get gasCalculators_rockBottom_stressedSacRates => 'Stress-RMV';
 
   @override
   String get gasCalculators_rockBottom_tankSize => 'Flesgrootte';
@@ -20859,7 +21717,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get gasCalculators_rockBottom_yourSac => 'Jouw SAC';
+  String get gasCalculators_rockBottom_yourSac => 'Jouw RMV';
 
   @override
   String get gpsLogger_androidNotificationText =>
@@ -20939,6 +21797,15 @@ class AppLocalizationsNl extends AppLocalizations {
     );
     return 'GPS-track wordt opgenomen · $_temp0';
   }
+
+  @override
+  String get gpsLogger_summary_tracks => 'Tracks';
+
+  @override
+  String get gpsLogger_summary_recordedTime => 'Opgenomen tijd';
+
+  @override
+  String get gpsLogger_summary_divesCovered => 'Gedekte duiken';
 
   @override
   String gpsLogger_trackSubtitle(num count, String duration) {
@@ -22822,6 +23689,52 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_metric_tankPressure => 'Druk';
 
   @override
+  String get dive3d_zAxis => 'Z-as';
+
+  @override
+  String get dive3d_zAxis_none => 'Geen';
+
+  @override
+  String get dive3d_overlay_shadows => 'Wandschaduwen';
+
+  @override
+  String get dive3d_metric_tts => 'TTS';
+
+  @override
+  String dive3d_axis_depth(String unitSymbol) {
+    return 'Diepte ($unitSymbol)';
+  }
+
+  @override
+  String get dive3d_axis_time => 'Duiktijd (min)';
+
+  @override
+  String get dive3d_pose_menu => 'Camera';
+
+  @override
+  String get dive3d_pose_default => 'Standaardweergave';
+
+  @override
+  String get dive3d_pose_front => 'Voor (diepte vs. tijd)';
+
+  @override
+  String get dive3d_pose_side => 'Zijkant (diepte vs. meetwaarde)';
+
+  @override
+  String get dive3d_pose_top => 'Boven (meetwaarde vs. tijd)';
+
+  @override
+  String get dive3d_readout_runTime => 'Duiktijd';
+
+  @override
+  String get dive3d_readout_ceiling => 'Plafond';
+
+  @override
+  String dive3d_readout_tank(int n) {
+    return 'Fles $n';
+  }
+
+  @override
   String get dive3d_scene_dive => 'Duik';
 
   @override
@@ -22995,6 +23908,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_photosMedia_accountsHeader => 'Accounts';
 
   @override
+  String get settings_photosMedia_displayHeader => 'Weergave';
+
+  @override
   String get settings_photosMedia_guidedSetup => 'Begeleide installatie';
 
   @override
@@ -23093,6 +24009,14 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get media_unavailablePlaceholder_volumeOffline =>
       'Volume niet gekoppeld';
+
+  @override
+  String get media_unavailablePlaceholder_stillFetching =>
+      'Nog aan het laden. Tik om opnieuw te proberen.';
+
+  @override
+  String get media_unavailablePlaceholder_accessDenied =>
+      'Geen toegang tot fotobibliotheek';
 
   @override
   String get attrLabel_size => 'Maat';
@@ -23594,6 +24518,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deze stek heeft een hoogte geregistreerd maar de duik niet, dus de deco-analyse ging uit van zeeniveau. Stel de hoogte van de duik in om dit te corrigeren.';
 
   @override
+  String diveLog_detail_sacVolumeHint(String unit) {
+    return 'Voeg een flesvolume toe om het SAC-verbruik in $unit/min te tonen';
+  }
+
+  @override
   String safetyHub_alert_noFly(String remaining) {
     return 'Vliegverbod: nog $remaining';
   }
@@ -23654,6 +24583,68 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String emergencyCard_chamberVerified(String date) {
     return 'Gegevens gecontroleerd $date';
+  }
+
+  @override
+  String get emergencyCard_chambersNearby => 'Dichtstbijzijnde caissons';
+
+  @override
+  String emergencyCard_chamberViewAll(int count) {
+    return 'Alle $count caissons bekijken';
+  }
+
+  @override
+  String get emergencyCard_chambersNoneNearby =>
+      'Geen caisson binnen bereik. Bel de duikers-noodlijn: zij verwijzen u door naar de dichtstbijzijnde instelling die u kan behandelen.';
+
+  @override
+  String get emergencyCard_chamberCapability_divingEmergency =>
+      'Behandelt duikongevallen';
+
+  @override
+  String get emergencyCard_chamberCapability_hyperbaricUnit =>
+      'Hyperbare afdeling ziekenhuis';
+
+  @override
+  String get emergencyCard_chamberCapability_elective =>
+      'Alleen electieve therapie';
+
+  @override
+  String get emergencyCard_chamberCapability_unknown =>
+      'Mogelijkheden niet bevestigd';
+
+  @override
+  String get emergencyCard_chamberAvailability_h24 => '24 uur';
+
+  @override
+  String get emergencyCard_chamberAvailability_onCall => 'Oproepbaar';
+
+  @override
+  String get emergencyCard_chamberAvailability_businessHours => 'Kantooruren';
+
+  @override
+  String get emergencyCard_chamberUnverified =>
+      'Niet bevestigd bij de instelling';
+
+  @override
+  String get chambersDirectory_title => 'Hyperbare caissons';
+
+  @override
+  String get chambersDirectory_search => 'Zoeken op naam, stad of land';
+
+  @override
+  String get chambersDirectory_empty =>
+      'Geen caisson komt overeen met die zoekopdracht.';
+
+  @override
+  String chambersDirectory_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count caissons',
+      one: '1 caisson',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -24585,6 +25576,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Hoe GPS-posities worden weergegeven en ingevoerd';
 
   @override
+  String get settings_placeNameLanguage_title => 'Taal van plaatsnamen';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Gebruikt wanneer land, regio, plaats en water uit coördinaten worden opgezocht. Bestaande duikstekken worden niet gewijzigd.';
+
+  @override
   String get settings_coordinateFormat_decimalDegrees => 'Decimale graden';
 
   @override
@@ -25197,6 +26195,24 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_siteField_longitude_short => 'Lengte';
 
   @override
+  String get enum_siteField_depthRange => 'Dieptebereik';
+
+  @override
+  String get enum_siteField_depthRange_short => 'Diepte';
+
+  @override
+  String get enum_siteField_lastDived => 'Laatst gedoken';
+
+  @override
+  String get enum_siteField_lastDived_short => 'Laatst';
+
+  @override
+  String get enum_siteField_maxDepthReached => 'Jouw max. diepte';
+
+  @override
+  String get enum_siteField_maxDepthReached_short => 'Jouw max.';
+
+  @override
   String get enum_buddyField_buddyName => 'Naam';
 
   @override
@@ -25237,6 +26253,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_buddyField_notes_short => 'Notities';
+
+  @override
+  String get enum_buddyField_lastDive => 'Laatste duik';
+
+  @override
+  String get enum_buddyField_lastDive_short => 'Laatste';
 
   @override
   String get enum_tripField_tripName => 'Naam';
@@ -29636,6 +30658,33 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaSources_checkAll => 'Alle media controleren';
+
+  @override
+  String settings_mediaSources_checkAllResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items bijgewerkt',
+      one: '$count item bijgewerkt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_mediaSources_checkAllBlocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Geen van de $count items kon worden gecontroleerd. Hun bronnen zijn momenteel niet bereikbaar.',
+      one:
+          'Het item kon niet worden gecontroleerd. De bron is momenteel niet bereikbaar.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_mediaSources_title => 'Mediabronnen';
 
   @override
@@ -30382,6 +31431,35 @@ class AppLocalizationsNl extends AppLocalizations {
       'Bibliotheek publiceren';
 
   @override
+  String get settings_cloudSync_adopt_progressTitle =>
+      'Herstelde bibliotheek overnemen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_progressTitle =>
+      'Cloudbibliotheek vervangen';
+
+  @override
+  String settings_syncDevices_nameWithId(String name, String shortId) {
+    return '$name ($shortId)';
+  }
+
+  @override
+  String get settings_syncMaintenance_phase_applyingLibrary =>
+      'Bibliotheek toepassen';
+
+  @override
+  String get settings_syncMaintenance_phase_backingUp =>
+      'Back-up van dit apparaat maken';
+
+  @override
+  String get settings_syncMaintenance_phase_repairing =>
+      'Lokale synchronisatiestatus wissen';
+
+  @override
+  String get settings_troubleshootSync_repair_progressTitle =>
+      'Synchronisatie herstellen';
+
+  @override
   String get settings_syncMaintenance_phase_working => 'Bezig...';
 
   @override
@@ -30772,7 +31850,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
-    return 'SAC-verbruik: $value $volumeSymbol per minuut';
+    return 'RMV: $value $volumeSymbol per minuut';
   }
 
   @override
@@ -31142,10 +32220,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveImport_healthkit_requesting => 'Aanvragen...';
-
-  @override
-  String get diveImport_healthkit_grantAccessButton =>
-      'HealthKit-toegang verlenen';
 
   @override
   String get diveImport_healthkit_selectDateRange => 'Datumbereik selecteren';
@@ -32269,6 +33343,45 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get media_timeInDive_label => 'Tijdstip in de duik';
+
+  @override
+  String get media_timeInDive_unknown => 'Tijdstip in de duik onbekend';
+
+  @override
+  String get media_timeInDive_setAction => 'Tijdstip in de duik instellen';
+
+  @override
+  String media_timeInDive_manual(String time) {
+    return '$time (handmatig ingesteld)';
+  }
+
+  @override
+  String get media_timeInDive_fieldLabel => 'Tijd sinds het begin van de duik';
+
+  @override
+  String get media_timeInDive_fieldHint => 'mm:ss';
+
+  @override
+  String media_timeInDive_range(String max) {
+    return 'Tussen 0:00 en $max';
+  }
+
+  @override
+  String media_timeInDive_invalid(String max) {
+    return 'Voer een tijd in tussen 0:00 en $max';
+  }
+
+  @override
+  String get media_timeInDive_save => 'Opslaan';
+
+  @override
+  String get media_timeInDive_cancel => 'Annuleren';
+
+  @override
+  String get media_timeInDive_reset => 'Terugzetten naar automatisch';
+
+  @override
   String get media_info_backupSection => 'Back-up';
 
   @override
@@ -32411,6 +33524,39 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_status_broken => 'Ontbreekt en geen back-up';
+
+  @override
+  String get media_servedFrom_localDisk => 'Op dit apparaat';
+
+  @override
+  String get media_servedFrom_platformGallery => 'Fotobibliotheek';
+
+  @override
+  String get media_servedFrom_storeCache => 'Cloudopslag, hier in cache';
+
+  @override
+  String get media_servedFrom_storeNetwork => 'Cloudopslag';
+
+  @override
+  String get media_servedFrom_networkUrl => 'Weblink';
+
+  @override
+  String get media_servedFrom_connectorCache =>
+      'Verbonden service, hier in cache';
+
+  @override
+  String get media_servedFrom_connectorNetwork => 'Verbonden service';
+
+  @override
+  String get media_servedFrom_embedded => 'Opgeslagen in dit logboek';
+
+  @override
+  String get settings_media_provenanceBadges =>
+      'Bronbadges op miniaturen tonen';
+
+  @override
+  String get settings_media_provenanceBadgesSubtitle =>
+      'Een klein pictogram dat laat zien waar elk item vandaan komt. Probleembadges blijven altijd zichtbaar.';
 
   @override
   String get media_status_transferFailed => 'Uploaden mislukt';

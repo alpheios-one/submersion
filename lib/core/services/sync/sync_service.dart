@@ -12,6 +12,7 @@ import 'package:submersion/core/database/database.dart'
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/sync/conflict_reference.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_json_stream_reader.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_parse_client.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_part_file_sink.dart';
@@ -70,8 +71,8 @@ class SyncResult {
   final Set<String> skippedPeerDeviceIds;
 
   /// Display names for the entries in [skippedPeerDeviceIds] that published
-  /// one. An absent entry means the peer is on an older manifest, or its
-  /// hostname identifies nothing; render a short id instead.
+  /// one. An absent entry means the peer is on an older manifest, or nothing
+  /// identifies it by name; render a short id instead.
   final Map<String, String> skippedPeerNames;
 
   /// Peers held because their declared compatibility floor exceeds this
@@ -157,6 +158,16 @@ class SyncConflict {
   final DateTime localModified;
   final DateTime remoteModified;
 
+  /// Foreign keys of [localData], resolved to the referenced rows' names and
+  /// dates. Junction entities carry nothing but ids, so this is the only thing
+  /// that lets the resolution dialog describe them (#1031). Empty when the
+  /// entity has no foreign keys, or when resolution could not run.
+  final List<ConflictReference> localReferences;
+
+  /// The same for [remoteData]. Resolved separately because a junction row's
+  /// foreign keys are usually exactly what the two sides disagree about.
+  final List<ConflictReference> remoteReferences;
+
   const SyncConflict({
     required this.entityType,
     required this.recordId,
@@ -164,6 +175,8 @@ class SyncConflict {
     required this.remoteData,
     required this.localModified,
     required this.remoteModified,
+    this.localReferences = const [],
+    this.remoteReferences = const [],
   });
 
   String get displayName {
@@ -343,6 +356,10 @@ class SyncService {
   Future<List<SyncConflict>> getConflicts() async {
     final conflictRecords = await _syncRepository.getConflictRecords();
     final conflicts = <SyncConflict>[];
+    // One resolver for the whole batch: a restore raises many conflicts
+    // pointing at the same diver, dive or site, and the resolver caches the
+    // rows it has already read.
+    final resolver = ConflictReferenceResolver(_serializer);
 
     for (final record in conflictRecords) {
       if (record.conflictData != null) {
@@ -365,6 +382,16 @@ class SyncService {
                   localModified ??
                   DateTime.fromMillisecondsSinceEpoch(record.localUpdatedAt),
               remoteModified: remoteModified ?? DateTime.now(),
+              localReferences: await _resolveReferences(
+                resolver,
+                record.entityType,
+                localData ?? {},
+              ),
+              remoteReferences: await _resolveReferences(
+                resolver,
+                record.entityType,
+                remoteData,
+              ),
             ),
           );
         } catch (e) {
@@ -377,6 +404,26 @@ class SyncService {
     }
 
     return conflicts;
+  }
+
+  /// Resolves a conflicting record's foreign keys for display. A lookup
+  /// failure degrades to an unresolved preview rather than dropping the whole
+  /// conflict, which would leave the user unable to resolve it at all.
+  Future<List<ConflictReference>> _resolveReferences(
+    ConflictReferenceResolver resolver,
+    String entityType,
+    Map<String, dynamic> data,
+  ) async {
+    if (data.isEmpty) return const [];
+    try {
+      return await resolver.resolve(entityType, data);
+    } catch (e) {
+      _log.warning(
+        'Could not resolve display references for $entityType',
+        error: e,
+      );
+      return const [];
+    }
   }
 
   Map<String, dynamic> _parseConflictData(String json) {
@@ -785,9 +832,9 @@ class SyncService {
   bool _deviceNameResolved = false;
 
   /// The name published on this device's manifest so peers can name it in the
-  /// "still needs to adopt" banner. Resolved once per service lifetime: the
-  /// hostname does not change while the app runs, and publish is on the sync
-  /// hot path. Null when the hostname identifies nothing.
+  /// "still needs to adopt" banner. Resolved once per service lifetime: a
+  /// device is not renamed while the app runs, and publish is on the sync hot
+  /// path. Null when nothing on this platform identifies the device.
   Future<String?> _deviceNameForManifest() async {
     if (_deviceNameResolved) return _cachedDeviceName;
     _cachedDeviceName = (await SyncDeviceMetadata(
@@ -2008,6 +2055,7 @@ class SyncService {
     'diveProfiles': [
       (field: 'diveId', parent: 'dives', nullable: false),
       (field: 'computerId', parent: 'diveComputers', nullable: true),
+      (field: 'sourceId', parent: 'diveDataSources', nullable: true),
     ],
     'diveTanks': [
       (field: 'diveId', parent: 'dives', nullable: false),

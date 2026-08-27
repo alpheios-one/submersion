@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
+import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
@@ -982,8 +983,13 @@ class SyncDataSerializer {
     Future<Directory> Function()? tempDir,
   }) async {
     final dir = await (tempDir?.call() ?? resolveSyncTempDir());
-    final path =
-        '${dir.path}/ssv1_base_${deviceId}_${seq ?? 0}.${_baseTempUuid.v4()}.json';
+    // p.join, not a literal '/': on Windows the temp dir is backslashed, and a
+    // path mixing both separators is what broke the move into the publish
+    // directory in #1304.
+    final path = p.join(
+      dir.path,
+      'ssv1_base_${deviceId}_${seq ?? 0}.${_baseTempUuid.v4()}.json',
+    );
     final raf = await File(path).open(mode: FileMode.write);
     final digestSink = _Sha256DigestSink();
     final dataHash = sha256.startChunkedConversion(digestSink);
@@ -2371,7 +2377,10 @@ class SyncDataSerializer {
   ) async {
     data = _withSchemaDefaults(
       entityType,
-      _withoutDeviceLocalFields(data, entityType: entityType),
+      _withRenamedKeys(
+        entityType,
+        _withoutDeviceLocalFields(data, entityType: entityType),
+      ),
     );
     switch (entityType) {
       case 'divers':
@@ -2861,7 +2870,10 @@ class SyncDataSerializer {
         .map(
           (record) => _withSchemaDefaults(
             entityType,
-            _withoutDeviceLocalFields(record, entityType: entityType),
+            _withRenamedKeys(
+              entityType,
+              _withoutDeviceLocalFields(record, entityType: entityType),
+            ),
           ),
         )
         .toList();
@@ -5441,6 +5453,42 @@ class SyncDataSerializer {
   /// history through `fromJson`). Filling the column's own default mirrors
   /// what the `ALTER TABLE ... DEFAULT` migration produced for that row on
   /// the exporting device, so this is a faithful reconstruction, not a guess.
+  /// Wire keys this build renamed, as oldKey -> newKey per entity type.
+  ///
+  /// Payloads published by peers below schema 160, and backups written by
+  /// them, spell the maintenance category 'serviceType'. The compatibility
+  /// floor stops those peers applying OUR payloads, but the gate is
+  /// one-directional (changeset_reader.dart compares the writer's floor to
+  /// the reader's schema), so their payloads still arrive here and would hit
+  /// a NOT NULL column with no key, throwing in the generated fromJson.
+  ///
+  /// [_withSchemaDefaults] cannot cover this: it only fills NOT NULL columns
+  /// carrying a constant SQL default, and service_category has none.
+  ///
+  /// Delete this once the floor moves past the last build that published the
+  /// old spelling.
+  static const Map<String, Map<String, String>> _renamedWireKeys = {
+    'serviceRecords': {'serviceType': 'serviceCategory'},
+  };
+
+  Map<String, dynamic> _withRenamedKeys(
+    String entityType,
+    Map<String, dynamic> data,
+  ) {
+    final renames = _renamedWireKeys[entityType];
+    if (renames == null) return data;
+    Map<String, dynamic>? patched;
+    for (final entry in renames.entries) {
+      if (!data.containsKey(entry.key)) continue;
+      // A payload carrying both keys came from a build that knows the new
+      // name, so the new one wins and the stale alias is dropped.
+      final map = patched ??= Map.of(data);
+      final legacy = map.remove(entry.key);
+      map.putIfAbsent(entry.value, () => legacy);
+    }
+    return patched ?? data;
+  }
+
   Map<String, dynamic> _withSchemaDefaults(
     String entityType,
     Map<String, dynamic> data,
@@ -5618,6 +5666,12 @@ class SyncDataSerializer {
       'defaultShowOtu': false,
       'defaultShowGasSwitchMarkers': true,
       'defaultShowGasTimeline': false,
+      // v161: seed it so payloads predating the column hydrate instead of
+      // throwing in DiverSetting.fromJson.
+      'defaultShowO2CellMv': false,
+      // v166: seed it so payloads predating the column hydrate instead of
+      // throwing in DiverSetting.fromJson (issue #1187).
+      'placeNameLanguage': 'en',
       // Dive profile default-visible metrics. Non-nullable bool added in v91;
       // seed it so payloads predating the column hydrate instead of throwing in
       // DiverSetting.fromJson.

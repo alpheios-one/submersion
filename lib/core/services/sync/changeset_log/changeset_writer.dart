@@ -55,7 +55,7 @@ class ChangesetWriter {
     String? uploadNonce,
 
     /// Display name published on the manifest so peers can name this device.
-    /// Null when the hostname identifies nothing; readers fall back to the id.
+    /// Null when nothing identifies it by name; readers fall back to the id.
     String? deviceName,
     Map<String, String> appliedPeerHlc = const {},
 
@@ -263,7 +263,7 @@ class ChangesetWriter {
           deviceId: ownManifest.deviceId,
           // A heartbeat is also the cheapest way a renamed device republishes
           // its name; keep the previously published one when this build
-          // cannot resolve a usable hostname.
+          // cannot resolve a usable name at all.
           deviceName: deviceName ?? ownManifest.deviceName,
           provider: ownManifest.provider,
           baseSeq: ownManifest.baseSeq,
@@ -506,8 +506,7 @@ class ChangesetWriter {
     String? uploadNonce,
   ) async {
     final dir = await _resumable.directory;
-    final target =
-        '${dir.path}/${base.path.split(Platform.pathSeparator).last}';
+    final target = basePublishTargetPath(dir.path, base.path);
     final source = File(base.path);
     try {
       await source.rename(target);

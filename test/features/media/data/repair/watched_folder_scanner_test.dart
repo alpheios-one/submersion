@@ -11,6 +11,7 @@ import 'package:submersion/features/media/data/repositories/media_repository.dar
 import 'package:submersion/features/media/data/repositories/watched_folder_repository.dart';
 import 'package:submersion/features/media/data/services/repair/media_repair_service.dart';
 import 'package:submersion/features/media/data/services/repair/watched_folder_scanner.dart';
+import 'package:submersion/features/media/data/services/repair/watched_folder_walk.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
@@ -306,6 +307,213 @@ void main() {
 
       expect((await watched.indexForRoot(root.path)).keys, ['a.jpg']);
       await root.create(recursive: true);
+    });
+
+    group('the walk is delegated, not performed here', () {
+      test('the scanner does no filesystem work of its own', () async {
+        await writeFile('a.jpg', 'aaaa');
+        // A walk that reports a file the scanner can never have seen: if the
+        // scanner still listed the root itself, 'a.jpg' would show up in the
+        // index alongside (or instead of) this.
+        final scanned = <WatchedFolderWalkRequest>[];
+        final report = await WatchedFolderScanner(
+          watched: watched,
+          repair: repair,
+          loadMissingRows: () async => const [],
+          isAutoApplyEnabled: () async => false,
+          walk: (request) async {
+            scanned.add(request);
+            return const WatchedFolderWalkResult(
+              changed: [
+                WalkedFile(
+                  relativePath: 'from-the-walk.jpg',
+                  sizeBytes: 7,
+                  mtimeMillis: 1234,
+                  contentHash: 'walk-hash',
+                ),
+              ],
+              vanished: {},
+              filesSeen: 1,
+              listingComplete: true,
+              hashBudgetExhausted: false,
+            );
+          },
+        ).scan(now: DateTime(2026, 6, 12));
+
+        expect(scanned.single.rootPath, root.path);
+        expect(report.filesIndexed, 1);
+        expect(report.rehashed, 1);
+        final index = await watched.indexForRoot(root.path);
+        expect(index.keys, ['from-the-walk.jpg']);
+        expect(index['from-the-walk.jpg']!.contentHash, 'walk-hash');
+      });
+
+      test(
+        'the stored index is handed to the walk so it can skip hashes',
+        () async {
+          await writeFile('a.jpg', 'aaaa');
+          await scanner().scan(now: DateTime(2026, 6, 12));
+
+          WatchedFolderWalkRequest? seenRequest;
+          await WatchedFolderScanner(
+            watched: watched,
+            repair: repair,
+            loadMissingRows: () async => const [],
+            isAutoApplyEnabled: () async => false,
+            walk: (request) async {
+              seenRequest = request;
+              return const WatchedFolderWalkResult(
+                changed: [],
+                vanished: {},
+                filesSeen: 1,
+                listingComplete: true,
+                hashBudgetExhausted: false,
+              );
+            },
+          ).scan(now: DateTime(2026, 6, 13));
+
+          final known = seenRequest!.known['a.jpg']!;
+          expect(known.contentHash, isNotNull);
+          expect(known.sizeBytes, 4);
+        },
+      );
+
+      test('the configured hash budget reaches the walk', () async {
+        WatchedFolderWalkRequest? seenRequest;
+        await WatchedFolderScanner(
+          watched: watched,
+          repair: repair,
+          loadMissingRows: () async => const [],
+          isAutoApplyEnabled: () async => false,
+          hashBudget: const Duration(seconds: 7),
+          walk: (request) async {
+            seenRequest = request;
+            return const WatchedFolderWalkResult(
+              changed: [],
+              vanished: {},
+              filesSeen: 0,
+              listingComplete: true,
+              hashBudgetExhausted: false,
+            );
+          },
+        ).scan(now: DateTime(2026, 6, 12));
+
+        expect(seenRequest!.hashBudget, const Duration(seconds: 7));
+      });
+    });
+
+    group('hash budget', () {
+      Future<WatcherScanReport> scanWith(
+        WatchedFolderWalkResult result, {
+        DateTime? now,
+      }) => WatchedFolderScanner(
+        watched: watched,
+        repair: repair,
+        loadMissingRows: () async => const [],
+        isAutoApplyEnabled: () async => false,
+        walk: (_) async => result,
+      ).scan(now: now ?? DateTime(2026, 6, 13));
+
+      test(
+        'an exhausted budget still prunes, because the listing was whole',
+        () async {
+          await writeFile('a.jpg', 'aaaa');
+          await writeFile('gone.jpg', 'zzzz');
+          await scanner().scan(now: DateTime(2026, 6, 12));
+
+          final report = await scanWith(
+            const WatchedFolderWalkResult(
+              changed: [],
+              vanished: {'gone.jpg'},
+              filesSeen: 1,
+              listingComplete: true,
+              hashBudgetExhausted: true,
+            ),
+          );
+
+          expect(report.hashBudgetExhausted, isTrue);
+          expect((await watched.indexForRoot(root.path)).keys, ['a.jpg']);
+        },
+      );
+
+      test(
+        'an incomplete listing prunes nothing, budget or no budget',
+        () async {
+          await writeFile('a.jpg', 'aaaa');
+          await writeFile('b.jpg', 'bbbb');
+          await scanner().scan(now: DateTime(2026, 6, 12));
+
+          await scanWith(
+            const WatchedFolderWalkResult(
+              changed: [],
+              // The walk names 'b.jpg' as vanished, but its listing threw
+              // part-way, so that claim is not trustworthy.
+              vanished: {'b.jpg'},
+              filesSeen: 1,
+              listingComplete: false,
+              hashBudgetExhausted: false,
+            ),
+          );
+
+          // 'b.jpg' was never listed, so it must survive: a partial listing
+          // that pruned would delete the index rows of files that still exist.
+          expect((await watched.indexForRoot(root.path)).keys.toSet(), {
+            'a.jpg',
+            'b.jpg',
+          });
+        },
+      );
+
+      test('a truncated pass is still stamped, so the cadence holds', () async {
+        await scanWith(
+          const WatchedFolderWalkResult(
+            changed: [],
+            vanished: {},
+            filesSeen: 0,
+            listingComplete: true,
+            hashBudgetExhausted: true,
+          ),
+          now: DateTime(2026, 6, 14),
+        );
+
+        expect(await watched.lastScanAt(root.path), DateTime(2026, 6, 14));
+      });
+
+      test(
+        'a hash the budget denied is written back as null, not left stale',
+        () async {
+          await writeFile('a.jpg', 'aaaa');
+          await scanner().scan(now: DateTime(2026, 6, 12));
+          final before = (await watched.indexForRoot(root.path))['a.jpg']!;
+          expect(before.contentHash, isNotNull);
+
+          await scanWith(
+            const WatchedFolderWalkResult(
+              changed: [
+                WalkedFile(
+                  relativePath: 'a.jpg',
+                  sizeBytes: 99,
+                  mtimeMillis: 4321,
+                  contentHash: null,
+                ),
+              ],
+              vanished: {},
+              filesSeen: 1,
+              listingComplete: true,
+              hashBudgetExhausted: true,
+            ),
+          );
+
+          final after = (await watched.indexForRoot(root.path))['a.jpg']!;
+          // The digest no longer describes the bytes, and auto-repair rewrites
+          // media.local_path on an exact hash match -- so it must not survive.
+          expect(after.contentHash, isNull);
+          expect(after.sizeBytes, 99);
+          // Null hashes never match the repair lookup (SQL IN never matches
+          // NULL), so the row is inert until it is hashed again.
+          expect(await watched.pathsForHashes([before.contentHash!]), isEmpty);
+        },
+      );
     });
   });
 }

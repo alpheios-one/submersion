@@ -89,6 +89,12 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setDefaultShowGasTimeline(bool value) async =>
       state = state.copyWith(defaultShowGasTimeline: value);
   @override
+  Future<void> setDefaultShowO2CellMv(bool value) async =>
+      state = state.copyWith(defaultShowO2CellMv: value);
+  @override
+  Future<void> setDefaultShowEstimatedTankPressure(bool value) async =>
+      state = state.copyWith(defaultShowEstimatedTankPressure: value);
+  @override
   Future<void> setDefaultShowAscentRateLine(bool value) async =>
       state = state.copyWith(defaultShowAscentRateLine: value);
   @override
@@ -153,6 +159,9 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setLocale(String locale) async =>
       state = state.copyWith(locale: locale);
+  @override
+  Future<void> setPlaceNameLanguage(String code) async =>
+      state = state.copyWith(placeNameLanguage: code);
   @override
   Future<void> setDefaultDiveType(String diveType) async =>
       state = state.copyWith(defaultDiveType: diveType);
@@ -1345,6 +1354,10 @@ void main() {
             path: '/checklist-templates',
             builder: (context, state) => const Text('Checklist Templates Stub'),
           ),
+          GoRoute(
+            path: '/equipment/service-types',
+            builder: (context, state) => const Text('Service Types Stub'),
+          ),
         ],
       );
 
@@ -1375,6 +1388,27 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Checklist Templates Stub'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    // The service type catalog used to be reachable only from the add-a-clock
+    // flow on an equipment item, which is why nobody could find it.
+    testWidgets('renders the service types tile and navigates on tap', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildManageWidget(getOverrides()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Service types'), findsOneWidget);
+      expect(
+        find.text('Maintenance your gear needs, and how often'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Service types'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Service Types Stub'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

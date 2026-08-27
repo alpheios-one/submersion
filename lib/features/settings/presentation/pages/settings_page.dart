@@ -5,16 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
+import 'package:submersion/core/utils/app_version.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/providers/provider.dart';
 
+import 'package:submersion/features/settings/presentation/widgets/notification_permission_card.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/security_settings_page.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/widgets/coordinate_format_picker.dart';
+import 'package:submersion/features/settings/presentation/widgets/place_name_language_picker.dart';
 import 'package:submersion/features/settings/presentation/widgets/visibility_scale_picker.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
@@ -553,6 +556,27 @@ class _UnitsSectionContent extends ConsumerWidget {
                   ),
                   onTap: () =>
                       showCoordinateFormatPicker(context, ref, settings),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  title: Text(context.l10n.settings_placeNameLanguage_title),
+                  subtitle: Text(
+                    context.l10n.settings_placeNameLanguage_subtitle,
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        placeNameLanguageLabel(settings.placeNameLanguage),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right),
+                    ],
+                  ),
+                  onTap: () =>
+                      showPlaceNameLanguagePicker(context, ref, settings),
                 ),
               ],
             ),
@@ -2066,32 +2090,7 @@ class _NotificationsSectionContent extends ConsumerWidget {
                   permissionAsync.when(
                     data: (granted) {
                       if (!granted) {
-                        return ListTile(
-                          leading: const Icon(
-                            Icons.warning,
-                            color: Colors.orange,
-                          ),
-                          title: Text(
-                            context.l10n.settings_notifications_disabled_title,
-                          ),
-                          subtitle: Text(
-                            context
-                                .l10n
-                                .settings_notifications_disabled_subtitle,
-                          ),
-                          trailing: TextButton(
-                            onPressed: () async {
-                              await NotificationService.instance
-                                  .requestPermission();
-                              ref.invalidate(notificationPermissionProvider);
-                            },
-                            child: Text(
-                              context
-                                  .l10n
-                                  .settings_notifications_disabled_enableButton,
-                            ),
-                          ),
-                        );
+                        return const NotificationPermissionCard();
                       }
                       return const SizedBox.shrink();
                     },
@@ -2264,6 +2263,16 @@ class _ManageSectionContent extends StatelessWidget {
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => context.push('/tank-presets'),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.build_circle_outlined),
+                  title: Text(context.l10n.settings_manage_serviceTypes),
+                  subtitle: Text(
+                    context.l10n.settings_manage_serviceTypes_subtitle,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/equipment/service-types'),
                 ),
                 const Divider(height: 1),
                 ListTile(
@@ -3012,9 +3021,7 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
         ref.watch(releaseChannelProvider) == ReleaseChannel.beta;
     final versionString = packageInfoAsync.when(
       data: (info) {
-        final version = info.version.endsWith('.${info.buildNumber}')
-            ? info.version
-            : '${info.version}.${info.buildNumber}';
+        final version = formatAppVersion(info);
         final base = context.l10n.settings_about_version(version);
         return isBetaChannel
             ? context.l10n.settings_updates_channelBadgeBeta(base)
@@ -3053,9 +3060,9 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
                 ),
                 // Beta enrollment signpost for store builds: the app cannot
                 // switch channels itself there, so link to the store's beta
-                // program. Hidden until the enrollment links exist.
-                if (!UpdateChannelConfig.isAutoUpdateEnabled &&
-                    _betaEnrollUrl.isNotEmpty) ...[
+                // program. Null on every build that has its own updater, and
+                // on platforms whose program is not live.
+                if (betaEnrollUrl case final enrollUrl?) ...[
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.science_outlined),
@@ -3064,7 +3071,7 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
                       context.l10n.settings_updates_joinBetaSubtitle,
                     ),
                     onTap: () => launchUrl(
-                      Uri.parse(_betaEnrollUrl),
+                      Uri.parse(enrollUrl),
                       mode: LaunchMode.externalApplication,
                     ),
                   ),
@@ -3216,13 +3223,6 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
         ],
       ),
     );
-  }
-
-  /// The store beta-program URL for this platform ('' hides the signpost).
-  String get _betaEnrollUrl {
-    if (Platform.isIOS || Platform.isMacOS) return kTestFlightBetaUrl;
-    if (Platform.isAndroid) return kPlayBetaOptInUrl;
-    return '';
   }
 
   Future<void> _showChannelPicker(BuildContext context) async {

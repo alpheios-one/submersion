@@ -1,3 +1,4 @@
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
 import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
 
@@ -43,4 +44,22 @@ DefaultServiceCost resolveDefaultServiceCost({
     cost: schedule?.defaultCost ?? kind?.defaultCost,
     currency: schedule?.defaultCurrency ?? kind?.defaultCurrency,
   );
+}
+
+/// Resolves the category to prefill when logging maintenance.
+///
+/// Unlike the price, this has no per-item level: a schedule carries no
+/// category, because a category describes what kind of work a service type
+/// is, which does not vary from one item to the next the way a shop's price
+/// does. Returns null when nothing is selected, when the selected type has no
+/// opinion, or when the id names a type no longer in the catalog.
+ServiceCategory? resolveDefaultServiceCategory({
+  required String? serviceKindId,
+  required List<ServiceKind> kinds,
+}) {
+  if (serviceKindId == null) return null;
+  for (final candidate in kinds) {
+    if (candidate.id == serviceKindId) return candidate.defaultCategory;
+  }
+  return null;
 }

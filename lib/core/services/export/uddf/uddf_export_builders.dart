@@ -1131,8 +1131,8 @@ class UddfExportBuilders {
                           nest: 'equip_${record.equipmentId}',
                         );
                         builder.element(
-                          'servicetype',
-                          nest: record.serviceType.name,
+                          'servicecategory',
+                          nest: record.serviceCategory.name,
                         );
                         builder.element(
                           'servicedate',

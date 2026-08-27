@@ -6,6 +6,10 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 ///
 /// Declaration order defines the default display order. The two fixed sections
 /// (Header and Dive Profile Chart) are not included — they always render first.
+///
+/// Sections that pair side by side on a wide pane are declared adjacently, in
+/// left-then-right order (see `kDiveDetailSectionPairs`), so the default order
+/// already reads the way the paired layout renders.
 enum DiveDetailSectionId {
   decoO2,
   safetyReview,
@@ -13,12 +17,12 @@ enum DiveDetailSectionId {
   details,
   environment,
   altitude,
+  surfaceGps,
   tide,
   reefHealth,
-  surfaceGps,
+  tanks,
   weights,
   buoyancy,
-  tanks,
   buddies,
   signatures,
   equipment,
@@ -186,12 +190,12 @@ class DiveDetailSectionConfig {
     DiveDetailSectionConfig(id: DiveDetailSectionId.details, visible: true),
     DiveDetailSectionConfig(id: DiveDetailSectionId.environment, visible: true),
     DiveDetailSectionConfig(id: DiveDetailSectionId.altitude, visible: true),
+    DiveDetailSectionConfig(id: DiveDetailSectionId.surfaceGps, visible: true),
     DiveDetailSectionConfig(id: DiveDetailSectionId.tide, visible: true),
     DiveDetailSectionConfig(id: DiveDetailSectionId.reefHealth, visible: true),
-    DiveDetailSectionConfig(id: DiveDetailSectionId.surfaceGps, visible: true),
+    DiveDetailSectionConfig(id: DiveDetailSectionId.tanks, visible: true),
     DiveDetailSectionConfig(id: DiveDetailSectionId.weights, visible: true),
     DiveDetailSectionConfig(id: DiveDetailSectionId.buoyancy, visible: true),
-    DiveDetailSectionConfig(id: DiveDetailSectionId.tanks, visible: true),
     DiveDetailSectionConfig(id: DiveDetailSectionId.buddies, visible: true),
     DiveDetailSectionConfig(id: DiveDetailSectionId.signatures, visible: true),
     DiveDetailSectionConfig(id: DiveDetailSectionId.equipment, visible: true),

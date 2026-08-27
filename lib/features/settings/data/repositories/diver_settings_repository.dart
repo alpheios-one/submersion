@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:submersion/core/constants/place_name_language.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -99,6 +100,7 @@ class DiverSettingsRepository {
               accentSectionHeaders: Value(s.accentSectionHeaders),
               accentListIcons: Value(s.accentListIcons),
               locale: Value(s.locale),
+              placeNameLanguage: Value(s.placeNameLanguage),
               defaultDiveType: Value(s.defaultDiveType),
               defaultTankVolume: Value(s.defaultTankVolume),
               defaultStartPressure: Value(s.defaultStartPressure),
@@ -177,6 +179,10 @@ class DiverSettingsRepository {
               defaultShowGasSwitchMarkers: Value(s.defaultShowGasSwitchMarkers),
               defaultShowPhotoMarkers: Value(s.defaultShowPhotoMarkers),
               defaultShowGasTimeline: Value(s.defaultShowGasTimeline),
+              defaultShowO2CellMv: Value(s.defaultShowO2CellMv),
+              defaultShowEstimatedTankPressure: Value(
+                s.defaultShowEstimatedTankPressure,
+              ),
               defaultShowAscentRateLine: Value(s.defaultShowAscentRateLine),
               notificationsEnabled: Value(s.notificationsEnabled),
               serviceReminderDays: Value(
@@ -258,6 +264,7 @@ class DiverSettingsRepository {
           accentSectionHeaders: Value(settings.accentSectionHeaders),
           accentListIcons: Value(settings.accentListIcons),
           locale: Value(settings.locale),
+          placeNameLanguage: Value(settings.placeNameLanguage),
           defaultDiveType: Value(settings.defaultDiveType),
           defaultTankVolume: Value(settings.defaultTankVolume),
           defaultStartPressure: Value(settings.defaultStartPressure),
@@ -340,6 +347,10 @@ class DiverSettingsRepository {
           ),
           defaultShowPhotoMarkers: Value(settings.defaultShowPhotoMarkers),
           defaultShowGasTimeline: Value(settings.defaultShowGasTimeline),
+          defaultShowO2CellMv: Value(settings.defaultShowO2CellMv),
+          defaultShowEstimatedTankPressure: Value(
+            settings.defaultShowEstimatedTankPressure,
+          ),
           defaultShowAscentRateLine: Value(settings.defaultShowAscentRateLine),
           notificationsEnabled: Value(settings.notificationsEnabled),
           serviceReminderDays: Value(
@@ -461,6 +472,7 @@ class DiverSettingsRepository {
       accentSectionHeaders: row.accentSectionHeaders,
       accentListIcons: row.accentListIcons,
       locale: row.locale,
+      placeNameLanguage: PlaceNameLanguage.normalize(row.placeNameLanguage),
       defaultDiveType: row.defaultDiveType,
       defaultTankVolume: row.defaultTankVolume,
       defaultStartPressure: row.defaultStartPressure,
@@ -541,6 +553,8 @@ class DiverSettingsRepository {
       defaultShowGasSwitchMarkers: row.defaultShowGasSwitchMarkers,
       defaultShowPhotoMarkers: row.defaultShowPhotoMarkers,
       defaultShowGasTimeline: row.defaultShowGasTimeline,
+      defaultShowO2CellMv: row.defaultShowO2CellMv,
+      defaultShowEstimatedTankPressure: row.defaultShowEstimatedTankPressure,
       defaultShowAscentRateLine: row.defaultShowAscentRateLine,
       notificationsEnabled: row.notificationsEnabled,
       serviceReminderDays: _parseReminderDays(row.serviceReminderDays),
