@@ -196,6 +196,23 @@ points at nothing would hold a dangling reference.
 The `onDelete: setNull` is load-bearing. It is the mechanism, not a
 convenience: it implements half of the deletion semantics in D6.
 
+**Correction, found in review.** Declaring it on the table class alone is not
+enough. A fresh database gets the FK from that declaration through `onCreate`,
+but an upgraded one gets whatever the migration's `ALTER TABLE` says, and a bare
+`ADD COLUMN equipment_id TEXT` carries no constraint. That would have left
+`setNull` true only for new installs while existing users, the population this
+feature exists for, kept `equipment_id` pointing at deleted rows. The assert
+helper must spell out `REFERENCES equipment(id) ON DELETE SET NULL`, matching
+the v158 `_assertProfileSourceIdColumn` precedent.
+
+A second trap sits behind the first: SQLite accepts a reference to a table that
+does not exist at `ALTER` time, then fails *every subsequent write* to
+`dive_computers` with `no such table: main.equipment` once foreign keys are on.
+The v66 migration test, whose fixture has no `equipment` table, is what surfaced
+this. So the clause is added only when `equipment` is present. Every real
+database has it, so production always takes the FK branch; where the bare
+fallback applies there are no gear rows for the FK to act on anyway.
+
 ### D2. Deterministic twin id
 
 ```dart

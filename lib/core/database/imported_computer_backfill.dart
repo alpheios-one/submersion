@@ -69,6 +69,8 @@ Future<void> backfillImportedDiveComputers(DatabaseConnectionUser db) async {
   // v169 gear twins: absent on an older fixture, in which case the mint
   // below is skipped and the ladder seeds the twins instead.
   final equipmentCols = await columnsOf('equipment');
+  // Every column the mint below writes. This runs unguarded inside beforeOpen,
+  // so a throw here does not degrade a feature, it fails app startup.
   final hasGearColumn =
       computerCols.contains('equipment_id') &&
       equipmentCols.containsAll({
@@ -76,6 +78,13 @@ Future<void> backfillImportedDiveComputers(DatabaseConnectionUser db) async {
         'diver_id',
         'name',
         'type',
+        'brand',
+        'model',
+        'serial_number',
+        'status',
+        'purchase_currency',
+        'notes',
+        'is_active',
         'created_at',
         'updated_at',
       });

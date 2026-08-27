@@ -4256,17 +4256,40 @@ class AppDatabase extends _$AppDatabase {
   /// from both onUpgrade and the beforeOpen backstop. Nullable with no default,
   /// because a null means "this computer has no gear item", which is also what
   /// a user deleting the gear item leaves behind.
+  ///
+  /// The REFERENCES clause is not decoration. Without it an upgraded database
+  /// gets a bare TEXT column while a freshly created one gets the FK from the
+  /// table definition, so `onDelete: setNull` would hold only for new installs
+  /// and existing users would be left with `equipment_id` pointing at a deleted
+  /// row. SQLite permits a REFERENCES clause on ADD COLUMN precisely because
+  /// this column is nullable and defaults to NULL. Mirrors the v158
+  /// `_assertProfileSourceIdColumn` precedent.
+  ///
+  /// It is added ONLY when `equipment` actually exists. SQLite accepts a
+  /// reference to a missing table at ALTER time and then fails every later
+  /// write to `dive_computers` with "no such table: main.equipment" once
+  /// foreign keys are on, which would break minimal fixtures and any database
+  /// caught mid-upgrade. Every real database has `equipment`, so production
+  /// always takes the FK branch; the bare fallback is harmless where it
+  /// applies, because a database with no `equipment` table has no gear rows
+  /// whose deletion the FK would need to cascade.
   Future<void> _assertDiveComputerEquipmentColumn() async {
     final cols = await customSelect(
       "PRAGMA table_info('dive_computers')",
     ).get();
     if (cols.isEmpty) return;
     final names = cols.map((c) => c.read<String>('name')).toSet();
-    if (!names.contains('equipment_id')) {
-      await customStatement(
-        'ALTER TABLE dive_computers ADD COLUMN equipment_id TEXT',
-      );
-    }
+    if (names.contains('equipment_id')) return;
+
+    final equipmentCols = await customSelect(
+      "PRAGMA table_info('equipment')",
+    ).get();
+    final reference = equipmentCols.isEmpty
+        ? ''
+        : ' REFERENCES equipment(id) ON DELETE SET NULL';
+    await customStatement(
+      'ALTER TABLE dive_computers ADD COLUMN equipment_id TEXT$reference',
+    );
   }
 
   /// v164: media.manual_elapsed_seconds (issue #1090). Idempotent; safe to

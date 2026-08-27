@@ -36,6 +36,9 @@ Future<void> backfillDiveComputerGearTwins(DatabaseConnectionUser db) async {
   })) {
     return;
   }
+  // Every column the INSERT below writes, not a subset: a guard that passes
+  // and then throws on the insert is worse than no guard, because the caller
+  // reads it as proof the write is safe.
   final equipmentCols = await columnsOf('equipment');
   if (!equipmentCols.containsAll({
     'id',
@@ -45,6 +48,9 @@ Future<void> backfillDiveComputerGearTwins(DatabaseConnectionUser db) async {
     'brand',
     'model',
     'serial_number',
+    'status',
+    'purchase_currency',
+    'notes',
     'is_active',
     'created_at',
     'updated_at',

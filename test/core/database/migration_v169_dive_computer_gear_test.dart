@@ -102,4 +102,74 @@ void main() {
     final names = cols.map((c) => c.read<String>('name')).toSet();
     expect(names, contains('equipment_id'));
   });
+
+  test('an UPGRADED database carries the FK, not just a fresh one', () async {
+    // The bare `ALTER TABLE ... ADD COLUMN equipment_id TEXT` that an upgrade
+    // runs has no REFERENCES clause, so onDelete: setNull would exist only on
+    // databases created from scratch. That is backwards: existing users are
+    // the ones who upgrade. Without the FK, deleting a gear item leaves
+    // dive_computers.equipment_id pointing at a row that no longer exists, and
+    // the linker then tries to insert a dive_equipment row against a missing
+    // equipment id.
+    final db = AppDatabase(
+      NativeDatabase.memory(
+        setup: (rawDb) {
+          rawDb.execute('PRAGMA user_version = 168');
+          rawDb.execute(_preV169DiveComputers);
+          rawDb.execute('''
+            CREATE TABLE equipment (
+              id TEXT NOT NULL PRIMARY KEY,
+              diver_id TEXT,
+              name TEXT NOT NULL,
+              type TEXT NOT NULL,
+              brand TEXT,
+              model TEXT,
+              serial_number TEXT,
+              status TEXT NOT NULL DEFAULT 'active',
+              purchase_currency TEXT NOT NULL DEFAULT 'USD',
+              notes TEXT NOT NULL DEFAULT '',
+              is_active INTEGER NOT NULL DEFAULT 1,
+              created_at INTEGER NOT NULL,
+              updated_at INTEGER NOT NULL
+            )
+          ''');
+          rawDb.execute(
+            "INSERT INTO equipment (id, name, type, created_at, updated_at) "
+            "VALUES ('gear-1', 'gear-1', 'computer', 1, 1)",
+          );
+          rawDb.execute(
+            "INSERT INTO dive_computers (id, name, created_at, updated_at) "
+            "VALUES ('c1', 'My Perdix', 1, 1)",
+          );
+        },
+      ),
+    );
+    addTearDown(db.close);
+
+    // The declared FK is what carries the setNull behaviour.
+    final fks = await db
+        .customSelect("PRAGMA foreign_key_list('dive_computers')")
+        .get();
+    final toEquipment = fks.where(
+      (r) => r.read<String>('table') == 'equipment',
+    );
+    expect(
+      toEquipment,
+      isNotEmpty,
+      reason: 'upgraded dive_computers has no FK to equipment',
+    );
+    expect(toEquipment.first.read<String>('on_delete'), 'SET NULL');
+
+    // And the behaviour itself: deleting the gear item clears the link rather
+    // than stranding it.
+    await db.customStatement(
+      "UPDATE dive_computers SET equipment_id = 'gear-1' WHERE id = 'c1'",
+    );
+    await db.customStatement("DELETE FROM equipment WHERE id = 'gear-1'");
+
+    final row = await db
+        .customSelect("SELECT equipment_id FROM dive_computers WHERE id = 'c1'")
+        .getSingle();
+    expect(row.read<String?>('equipment_id'), isNull);
+  });
 }
