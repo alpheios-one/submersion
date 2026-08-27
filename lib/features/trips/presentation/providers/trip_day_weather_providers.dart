@@ -33,67 +33,72 @@ final tripDayWeatherProvider =
 /// stored and no dive to supply it, then writes what it finds.
 ///
 /// The story is its only reactive input, so assigning dives to a trip
-/// re-evaluates what is still missing. Not auto-disposed: one pass per trip
-/// per provider container lifetime.
-final tripDayWeatherBackfillProvider = FutureProvider.family<void, String>((
-  ref,
-  tripId,
-) async {
-  final story = await ref.watch(tripStoryProvider(tripId).future);
-  final repository = ref.watch(tripDayWeatherRepositoryProvider);
-  final service = ref.watch(weatherServiceProvider);
+/// re-evaluates what is still missing.
+///
+/// autoDispose is what makes the retry policy above true. A miss writes no
+/// row precisely so the day is tried again later; a provider that outlived
+/// the view would serve its completed state on every subsequent navigation
+/// and a transient failure would stand until the app restarted. Disposing
+/// with the view means returning to the trip runs the pass again, which skips
+/// the days that succeeded and retries only the ones still missing. While the
+/// view stays mounted the provider stays alive, so scrolling does not refetch.
+final tripDayWeatherBackfillProvider = FutureProvider.autoDispose
+    .family<void, String>((ref, tripId) async {
+      final story = await ref.watch(tripStoryProvider(tripId).future);
+      final repository = ref.watch(tripDayWeatherRepositoryProvider);
+      final service = ref.watch(weatherServiceProvider);
 
-  final stored = await repository.getForTrip(tripId);
-  final targets = TripDayWeatherBackfill.targetsFor(
-    story: story,
-    stored: stored,
-  );
-  if (targets.isEmpty) return;
+      final stored = await repository.getForTrip(tripId);
+      final targets = TripDayWeatherBackfill.targetsFor(
+        story: story,
+        stored: stored,
+      );
+      if (targets.isEmpty) return;
 
-  // Sequential on purpose: a two-week trip would otherwise open with a burst
-  // of parallel requests, and rows landing one at a time let the day headers
-  // fill in progressively.
-  for (final target in targets) {
-    final weather = await service.fetchWeather(
-      latitude: target.latitude,
-      longitude: target.longitude,
-      date: target.date,
-      entryTime: target.localNoon,
-      useLocationTimezone: true,
-    );
-    // A miss writes nothing and is retried on the next view, which is what
-    // makes this correct against the archive's few-day publication lag.
-    if (weather == null) continue;
+      // Sequential on purpose: a two-week trip would otherwise open with a burst
+      // of parallel requests, and rows landing one at a time let the day headers
+      // fill in progressively.
+      for (final target in targets) {
+        final weather = await service.fetchWeather(
+          latitude: target.latitude,
+          longitude: target.longitude,
+          date: target.date,
+          entryTime: target.localNoon,
+          useLocationTimezone: true,
+        );
+        // A miss writes nothing and is retried on the next view, which is what
+        // makes this correct against the archive's few-day publication lag.
+        if (weather == null) continue;
 
-    final now = DateTime.now();
-    final dayMillis = tripDayMillis(target.date);
-    final row = TripDayWeather(
-      // The repository derives this same id from (trip, day) and never takes
-      // the caller's, so every device converges on one row. Derived here too
-      // rather than left as a placeholder: an entity carrying an id that is
-      // not its own reaches logs and any future validation as a lie.
-      id: tripDayWeatherRowId(tripId: tripId, dayMillis: dayMillis),
-      tripId: tripId,
-      date: target.date,
-      latitude: target.latitude,
-      longitude: target.longitude,
-      airTemp: weather.airTemp,
-      cloudCover: weather.cloudCover,
-      precipitation: weather.precipitation,
-      windSpeed: weather.windSpeed,
-      windDirection: weather.windDirection,
-      humidity: weather.humidity,
-      surfacePressure: weather.surfacePressure,
-      weatherCode: weather.weatherCode,
-      fetchedAt: now,
-      createdAt: now,
-      updatedAt: now,
-    );
+        final now = DateTime.now();
+        final dayMillis = tripDayMillis(target.date);
+        final row = TripDayWeather(
+          // The repository derives this same id from (trip, day) and never takes
+          // the caller's, so every device converges on one row. Derived here too
+          // rather than left as a placeholder: an entity carrying an id that is
+          // not its own reaches logs and any future validation as a lie.
+          id: tripDayWeatherRowId(tripId: tripId, dayMillis: dayMillis),
+          tripId: tripId,
+          date: target.date,
+          latitude: target.latitude,
+          longitude: target.longitude,
+          airTemp: weather.airTemp,
+          cloudCover: weather.cloudCover,
+          precipitation: weather.precipitation,
+          windSpeed: weather.windSpeed,
+          windDirection: weather.windDirection,
+          humidity: weather.humidity,
+          surfacePressure: weather.surfacePressure,
+          weatherCode: weather.weatherCode,
+          fetchedAt: now,
+          createdAt: now,
+          updatedAt: now,
+        );
 
-    // A row the header could render nothing from is worse than no row: it
-    // would suppress the retry that a later archive update would satisfy.
-    if (!row.hasRenderableWeather) continue;
+        // A row the header could render nothing from is worse than no row: it
+        // would suppress the retry that a later archive update would satisfy.
+        if (!row.hasRenderableWeather) continue;
 
-    await repository.upsert(row);
-  }
-});
+        await repository.upsert(row);
+      }
+    });
