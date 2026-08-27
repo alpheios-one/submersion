@@ -8,8 +8,6 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_suggestion_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
-import 'package:submersion/features/media/presentation/providers/media_providers.dart';
-import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 class SiteMatchReviewState {
   final bool isLoading;
