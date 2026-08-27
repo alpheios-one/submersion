@@ -34,4 +34,4 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
-            --allowedTools "Bash(flutter pub get:*),Bash(flutter analyze:*),Bash(flutter test:*),Bash(dart format:*),Bash(git fetch:*),Bash(git merge:*),Bash(git rebase:*),Bash(git push:*),Bash(gh pr:*),Bash(gh issue comment:*),Bash(gh issue close:*)"
+            --allowedTools "Bash(flutter pub get:*),Bash(flutter analyze:*),Bash(flutter test:*),Bash(dart format:*),Bash(dart run build_runner:*),Bash(git fetch:*),Bash(git merge:*),Bash(git rebase:*),Bash(git push:*),Bash(git rm:*),Bash(gh pr:*),Bash(gh issue comment:*),Bash(gh issue close:*)"
