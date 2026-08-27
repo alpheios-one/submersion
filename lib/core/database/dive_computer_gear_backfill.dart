@@ -3,7 +3,7 @@ import 'package:drift/drift.dart';
 import 'package:submersion/core/database/dive_computer_gear_identity.dart';
 
 /// Seed a gear twin for every registered dive computer and link it to the dives
-/// that computer logged (v169).
+/// that computer logged (v175).
 ///
 /// Ladder-only, never a `beforeOpen` backstop, for two independent reasons: it
 /// is a full-table pass over every dive, and re-running it on every open would

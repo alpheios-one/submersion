@@ -66,7 +66,7 @@ Future<void> backfillImportedDiveComputers(DatabaseConnectionUser db) async {
   })) {
     return;
   }
-  // v169 gear twins: absent on an older fixture, in which case the mint
+  // v175 gear twins: absent on an older fixture, in which case the mint
   // below is skipped and the ladder seeds the twins instead.
   final equipmentCols = await columnsOf('equipment');
   // Every column the mint below writes. This runs unguarded inside beforeOpen,

@@ -256,7 +256,7 @@ class DiveComputerRepository {
       );
 
       // Seed the gear twin once, here, because this is the only repository
-      // path that genuinely inserts a registry row (v169). Minting nowhere
+      // path that genuinely inserts a registry row (v175). Minting nowhere
       // else is what makes a user-deleted twin permanent. Pass the resolved
       // id: the caller's may have been empty and minted just above.
       final twinId = await DiveComputerGearResolver().resolveGearTwin(

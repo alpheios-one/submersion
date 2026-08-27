@@ -393,7 +393,7 @@ void main() {
 
   group('dive computers', () {
     test('contribute no dry mass', () {
-      // Gear twins (v169) put a computer on every downloaded dive. The
+      // Gear twins (v175) put a computer on every downloaded dive. The
       // _typeDryMass fallthrough of 0.5 kg would silently move every diver's
       // rig by that much per computer.
       final feature = GearFeature.fromEquipment(

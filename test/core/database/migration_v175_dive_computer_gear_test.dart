@@ -3,12 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/database/database.dart';
 
-/// v169 adds `dive_computers.equipment_id`: the equipment row that represents a
+/// v175 adds `dive_computers.equipment_id`: the equipment row that represents a
 /// registered computer as gear, so a downloaded dive lists the computer that
 /// logged it alongside the rest of the diver's kit. Nullable with no default,
 /// because a cleared value means the user deleted that gear item and it must
 /// not come back.
-const String _preV169DiveComputers = '''
+const String _preV175DiveComputers = '''
   CREATE TABLE dive_computers (
     id TEXT NOT NULL PRIMARY KEY,
     diver_id TEXT,
@@ -28,7 +28,7 @@ NativeDatabase _dbAt168() {
   return NativeDatabase.memory(
     setup: (rawDb) {
       rawDb.execute('PRAGMA user_version = 168');
-      rawDb.execute(_preV169DiveComputers);
+      rawDb.execute(_preV175DiveComputers);
       rawDb.execute(
         "INSERT INTO dive_computers (id, name, created_at, updated_at) "
         "VALUES ('c1', 'My Perdix', 1, 1)",
@@ -38,9 +38,9 @@ NativeDatabase _dbAt168() {
 }
 
 void main() {
-  test('v169 is in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(169));
-    expect(AppDatabase.migrationVersions, contains(169));
+  test('v175 is in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(175));
+    expect(AppDatabase.migrationVersions, contains(175));
   });
 
   test('a fresh database has dive_computers.equipment_id', () async {
@@ -83,14 +83,14 @@ void main() {
     expect(row.read<String?>('equipment_id'), isNull);
   });
 
-  test('a database stranded at a parallel-branch v169 gains the column via '
+  test('a database stranded at a parallel-branch v175 gains the column via '
       'beforeOpen', () async {
-    // Stamped AT 169 but without the column: the onUpgrade block never runs,
+    // Stamped AT 175 but without the column: the onUpgrade block never runs,
     // so only the beforeOpen backstop can add it.
     final nativeDb = NativeDatabase.memory(
       setup: (rawDb) {
-        rawDb.execute('PRAGMA user_version = 169');
-        rawDb.execute(_preV169DiveComputers);
+        rawDb.execute('PRAGMA user_version = 175');
+        rawDb.execute(_preV175DiveComputers);
       },
     );
     final db = AppDatabase(nativeDb);
@@ -115,7 +115,7 @@ void main() {
       NativeDatabase.memory(
         setup: (rawDb) {
           rawDb.execute('PRAGMA user_version = 168');
-          rawDb.execute(_preV169DiveComputers);
+          rawDb.execute(_preV175DiveComputers);
           rawDb.execute('''
             CREATE TABLE equipment (
               id TEXT NOT NULL PRIMARY KEY,

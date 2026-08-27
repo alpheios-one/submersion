@@ -659,7 +659,7 @@ class DeviceDetailPage extends ConsumerWidget {
   }
 }
 
-/// The equipment row representing this device as gear, its gear twin (v169).
+/// The equipment row representing this device as gear, its gear twin (v175).
 ///
 /// Absent when the computer has no `equipmentId`, which is what deleting the
 /// gear item leaves behind and is permanent by design: only a genuine

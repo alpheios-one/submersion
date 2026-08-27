@@ -47,7 +47,7 @@ class DiveComputer extends Equatable {
   /// Additional notes
   final String notes;
 
-  /// The equipment row representing this device as gear, its gear twin (v169).
+  /// The equipment row representing this device as gear, its gear twin (v175).
   ///
   /// Null when the user has deleted that gear item, which is permanent: only a
   /// genuine computer registration mints a twin, so nothing re-creates it.

@@ -5,7 +5,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 
-/// Attaches the gear twins of the dive computers that logged a dive (v169).
+/// Attaches the gear twins of the dive computers that logged a dive (v175).
 ///
 /// Used by the non-interactive creation seams (dive-computer download, file
 /// import), alongside `DiveEquipmentDefaulter`, `ChecklistDiveLinker` and
@@ -69,7 +69,7 @@ class DiveComputerGearLinker {
   ///
   /// `dives.computer_id` alone is not enough either: it holds only the primary,
   /// so a dive logged on two computers would list one. This is the same union
-  /// the v169 backfill applies, so the migration and the runtime path agree.
+  /// the v175 backfill applies, so the migration and the runtime path agree.
   Future<List<String>> _computerIdsForDive(String diveId) async {
     final rows = await _db
         .customSelect(

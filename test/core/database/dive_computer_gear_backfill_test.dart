@@ -5,7 +5,7 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/dive_computer_gear_backfill.dart';
 import 'package:submersion/core/database/dive_computer_gear_identity.dart';
 
-/// The v169 backfill mints a gear twin per registered computer and links it to
+/// The v175 backfill mints a gear twin per registered computer and links it to
 /// every dive that computer logged. The fixture is stamped at 168 so the ladder
 /// runs the real migration.
 NativeDatabase _seeded() {
