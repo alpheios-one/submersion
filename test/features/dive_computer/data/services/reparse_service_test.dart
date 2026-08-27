@@ -1663,6 +1663,104 @@ void main() {
       expect(tank.endPressure, 90.0);
     });
 
+    test('keeps both transmitters when a sample reports two tank pressures '
+        '(issue #1223)', () async {
+      // A CCR dive with an O2 and a diluent transmitter: libdivecomputer
+      // reports both on the same sample. The wrapper used to keep only the last
+      // one, so the O2 tank ended up with no readings at all and the chart drew
+      // it as a flat "(est.)" line between its start and end pressure.
+      await insertDive('dive-1');
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+      );
+
+      final parsed = makeParsedDive(
+        tanks: [
+          pigeon.TankInfo(index: 0, gasMixIndex: 0, usage: 1),
+          pigeon.TankInfo(index: 1, gasMixIndex: 1, usage: 2),
+        ],
+        gasMixes: [
+          pigeon.GasMix(index: 0, o2Percent: 100.0, hePercent: 0.0),
+          pigeon.GasMix(index: 1, o2Percent: 21.0, hePercent: 0.0),
+        ],
+        samples: [
+          // pressureBar/tankIndex still carry the last reading of each sample;
+          // the per-tank list is the complete record.
+          pigeon.ProfileSample(
+            timeSeconds: 0,
+            depthMeters: 0.0,
+            pressureBar: 191.0,
+            tankIndex: 1,
+            tankPressuresBar: const [193.0, 191.0],
+          ),
+          pigeon.ProfileSample(
+            timeSeconds: 60,
+            depthMeters: 18.0,
+            pressureBar: 150.0,
+            tankIndex: 1,
+            tankPressuresBar: const [188.0, 150.0],
+          ),
+          // The diluent transmitter drops out: the O2 tank keeps reporting and
+          // must not inherit the gap.
+          pigeon.ProfileSample(
+            timeSeconds: 120,
+            depthMeters: 5.0,
+            pressureBar: 185.0,
+            tankIndex: 0,
+            tankPressuresBar: const [185.0],
+          ),
+        ],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: parsed,
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      final tanks =
+          await (db.select(db.diveTanks)
+                ..where((t) => t.diveId.equals('dive-1'))
+                ..orderBy([(t) => OrderingTerm.asc(t.tankOrder)]))
+              .get();
+      expect(tanks, hasLength(2));
+
+      Future<List<double>> pressuresFor(String tankId) async {
+        final rows =
+            await (db.select(db.tankPressureProfiles)
+                  ..where((t) => t.tankId.equals(tankId))
+                  ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+                .get();
+        return [for (final r in rows) r.pressure];
+      }
+
+      expect(await pressuresFor(tanks[0].id), [
+        193.0,
+        188.0,
+        185.0,
+      ], reason: 'the O2 transmitter must keep every reading it reported');
+      expect(
+        await pressuresFor(tanks[1].id),
+        [191.0, 150.0],
+        reason: 'the diluent transmitter keeps its own readings, gap included',
+      );
+
+      // Start/end pressure is backfilled per tank from its own series, so the
+      // O2 tank no longer borrows the diluent's numbers.
+      expect(tanks[0].startPressure, 193.0);
+      expect(tanks[0].endPressure, 185.0);
+      expect(tanks[1].startPressure, 191.0);
+      expect(tanks[1].endPressure, 150.0);
+    });
+
     test('derives and inserts gas switches from per-sample gas-mix '
         'transitions on a single-source primary re-parse', () async {
       // Shearwater-style multi-gas dive: transmitter tank 0 breathes 32%, then
