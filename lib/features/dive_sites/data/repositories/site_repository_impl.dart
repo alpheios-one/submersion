@@ -6,11 +6,13 @@ import 'package:submersion/core/data/visibility/visibility_filter.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/performance/perf_timer.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/geocoding/place_lookup.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_sites/data/mappers/dive_site_row_mapper.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
+import 'package:submersion/features/dive_sites/domain/services/site_location_merge.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
@@ -256,6 +258,62 @@ class SiteRepository {
       altitude: altitude == null ? const Value.absent() : Value(altitude),
     ),
   );
+
+  /// Fills whichever of country, region, city and body of water are still
+  /// empty on [siteId] from [found], leaving every other column untouched
+  /// (issue #1187). Returns true when a column was written. The row is
+  /// marked pending for sync only when something changed.
+  Future<bool> fillMissingLocationDetails(
+    String siteId,
+    PlaceLookup found,
+  ) async {
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final changed = await _db.transaction(() async {
+        final row = await (_db.select(
+          _db.diveSites,
+        )..where((t) => t.id.equals(siteId))).getSingleOrNull();
+        if (row == null) return false;
+
+        final merged = mergeMissingLocationDetails(
+          current: SiteLocationDetails.ofSite(_mapRowToSite(row)),
+          found: found,
+        );
+        if (merged == null) return false;
+
+        Value<String?> column(String? value) =>
+            value == null ? const Value.absent() : Value(value);
+        await (_db.update(
+          _db.diveSites,
+        )..where((t) => t.id.equals(siteId))).write(
+          DiveSitesCompanion(
+            country: column(merged.country),
+            region: column(merged.region),
+            city: column(merged.city),
+            bodyOfWater: column(merged.bodyOfWater),
+            updatedAt: Value(now),
+          ),
+        );
+        return true;
+      });
+      if (!changed) return false;
+
+      await _syncRepository.markRecordPending(
+        entityType: 'diveSites',
+        recordId: siteId,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+      return true;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to fill location details for site: $siteId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
 
   /// Only columns set on [patch] are written; others are left untouched.
   /// Marks the row pending for sync.

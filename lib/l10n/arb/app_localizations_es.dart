@@ -8262,7 +8262,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'Elige un metodo de ubicacion - las coordenadas completaran automaticamente el pais y la region';
+      'Elige un método de ubicación o consulta las coordenadas para rellenar país, región, localidad y masa de agua';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'p. ej., 21.4225';
@@ -8284,6 +8284,32 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'Elegir del mapa';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'Consultar por coordenadas';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'No se encontraron datos de ubicación para estas coordenadas';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'La consulta de ubicación falló. Comprueba tu conexión e inténtalo de nuevo.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title =>
+      '¿Reemplazar los datos de ubicación?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'La consulta encontró valores distintos para estos campos:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'Reemplazar';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'Mantener';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'Usar mi ubicacion';
@@ -8765,6 +8791,61 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveSites_list_menu_select => 'Seleccionar puntos';
+
+  @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Completar datos de ubicación que faltan';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      '¿Completar los datos de ubicación que faltan?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count puntos de buceo con coordenadas no tienen país, región, localidad o masa de agua.',
+      one:
+          '1 punto de buceo con coordenadas no tiene país, región, localidad o masa de agua.',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'unos $minutes minutos',
+      one: 'alrededor de 1 minuto',
+    );
+    return '$_temp0 Submersion consultará cada uno en OpenStreetMap y rellenará solo los campos vacíos. Tarda $_temp1.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Iniciar';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Todos los puntos de buceo con coordenadas ya tienen sus datos de ubicación.';
+
+  @override
+  String get diveSites_backfill_progress_title =>
+      'Completando datos de ubicación';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done de $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Cancelar';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Actualizados $updated, sin cambios $unchanged, fallidos $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'La consulta de ubicación no está disponible. Comprueba tu conexión e inténtalo de nuevo.';
 
   @override
   String get diveSites_list_search_backTooltip => 'Atras';
@@ -25214,6 +25295,14 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_coordinateFormat_subtitle =>
       'Cómo se muestran e introducen las posiciones GPS';
+
+  @override
+  String get settings_placeNameLanguage_title =>
+      'Idioma de los nombres de lugar';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Se usa al obtener país, región, localidad y masa de agua a partir de las coordenadas. Los puntos de buceo existentes no cambian.';
 
   @override
   String get settings_coordinateFormat_decimalDegrees => 'Grados decimales';

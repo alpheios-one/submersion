@@ -1669,6 +1669,9 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(false))();
   // Locale (language preference: 'system', 'en', 'es', 'fr', etc.)
   TextColumn get locale => text().withDefault(const Constant('system'))();
+  // Language for reverse-geocoded place names, ISO 639-1 (issue #1187, v166)
+  TextColumn get placeNameLanguage =>
+      text().withDefault(const Constant('en'))();
   // Defaults
   TextColumn get defaultDiveType =>
       text().withDefault(const Constant('recreational'))();
@@ -3180,7 +3183,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 164;
+  static const int currentSchemaVersion = 166;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3476,6 +3479,14 @@ class AppDatabase extends _$AppDatabase {
     // media item in the dive when its capture time is wrong (issue #1090).
     // Renumbered from 162, which #731 landed past while this branch was open.
     164,
+    // v165 is deliberately absent, not missing: it is claimed by issue #1092
+    // (PR #1290, diver_settings.trim_tank_pressure_at_surfacing) on a branch
+    // that is still open. This ladder is monotonic and unique, not
+    // contiguous, so do not "fix" the gap by renumbering downwards.
+    // v166: diver_settings.place_name_language, the synced language used for
+    // reverse-geocoded country/region/town/body of water (issue #1187).
+    // Renumbered from 162, which #731 landed past while this branch was open.
+    166,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4985,6 +4996,22 @@ class AppDatabase extends _$AppDatabase {
         'default_show_estimated_tank_pressure '
         'INTEGER NOT NULL DEFAULT 1 '
         'CHECK (default_show_estimated_tank_pressure IN (0, 1))',
+      );
+    }
+  }
+
+  /// v166: place_name_language on diver_settings (issue #1187). Defaults to
+  /// 'en', the language every pre-v166 row was geocoded in (issue #214).
+  Future<void> _assertPlaceNameLanguageColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('place_name_language')) {
+      await customStatement(
+        "ALTER TABLE diver_settings ADD COLUMN place_name_language TEXT "
+        "NOT NULL DEFAULT 'en'",
       );
     }
   }
@@ -8615,6 +8642,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertMediaManualElapsedColumn();
         }
         if (from < 164) await reportProgress();
+        // v166: place_name_language on diver_settings (issue #1187).
+        if (from < 166) {
+          await _assertPlaceNameLanguageColumn();
+        }
+        if (from < 166) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys

@@ -8294,7 +8294,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'Choisissez une methode de localisation - les coordonnees rempliront automatiquement le pays et la region';
+      'Choisissez une méthode de localisation ou recherchez les coordonnées pour remplir le pays, la région, la ville et le plan d\'eau';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'ex. 21.4225';
@@ -8316,6 +8316,32 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'Choisir sur la carte';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'Rechercher depuis les coordonnées';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'Aucune information de lieu trouvée pour ces coordonnées';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'La recherche de lieu a échoué. Vérifiez votre connexion et réessayez.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title =>
+      'Remplacer les informations de lieu ?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'La recherche a trouvé des valeurs différentes pour ces champs :';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'Remplacer';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'Conserver';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'Utiliser ma position';
@@ -8797,6 +8823,61 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveSites_list_menu_select => 'Sélectionner des sites';
+
+  @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Compléter les informations de lieu manquantes';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      'Compléter les informations de lieu manquantes ?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count sites avec coordonnées n\'ont pas de pays, de région, de ville ou de plan d\'eau.',
+      one:
+          '1 site avec coordonnées n\'a pas de pays, de région, de ville ou de plan d\'eau.',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutes',
+      one: '1 minute',
+    );
+    return '$_temp0 Submersion recherchera chacun sur OpenStreetMap et ne remplira que les champs vides. Cela prend environ $_temp1.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Démarrer';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Tous les sites avec coordonnées ont déjà leurs informations de lieu.';
+
+  @override
+  String get diveSites_backfill_progress_title =>
+      'Complément des informations de lieu';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done sur $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Annuler';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Mis à jour $updated, inchangés $unchanged, échoués $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'La recherche de lieu est indisponible. Vérifiez votre connexion et réessayez.';
 
   @override
   String get diveSites_list_search_backTooltip => 'Retour';
@@ -25276,6 +25357,13 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_coordinateFormat_subtitle =>
       'Comment les positions GPS sont affichées et saisies';
+
+  @override
+  String get settings_placeNameLanguage_title => 'Langue des noms de lieux';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Utilisée lorsque le pays, la région, la ville et le plan d\'eau sont déduits des coordonnées. Les sites existants ne sont pas modifiés.';
 
   @override
   String get settings_coordinateFormat_decimalDegrees => 'Degrés décimaux';

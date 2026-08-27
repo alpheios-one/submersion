@@ -8195,7 +8195,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'Kies een locatiemethode - coordinaten vullen automatisch land en regio in';
+      'Kies een locatiemethode of zoek de coördinaten op om land, regio, plaats en water automatisch in te vullen';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'bijv. 21.4225';
@@ -8217,6 +8217,31 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'Kies op de kaart';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'Opzoeken op coördinaten';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'Geen locatiegegevens gevonden voor deze coördinaten';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'Locatie opzoeken mislukt. Controleer je verbinding en probeer het opnieuw.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => 'Locatiegegevens vervangen?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'Het opzoeken vond andere waarden voor deze velden:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'Vervangen';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'Behouden';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'Gebruik mijn locatie';
@@ -8695,6 +8720,60 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_list_menu_select => 'Duikstekken selecteren';
+
+  @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Ontbrekende locatiegegevens aanvullen';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      'Ontbrekende locatiegegevens aanvullen?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count duikstekken met coördinaten hebben geen land, regio, plaats of water.',
+      one:
+          '1 duikstek met coördinaten heeft geen land, regio, plaats of water.',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minuten',
+      one: '1 minuut',
+    );
+    return '$_temp0 Submersion zoekt elke stek op via OpenStreetMap en vult alleen lege velden in. Dit duurt ongeveer $_temp1.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Starten';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Elke duikstek met coördinaten heeft al locatiegegevens.';
+
+  @override
+  String get diveSites_backfill_progress_title => 'Locatiegegevens aanvullen';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done van $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Annuleren';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Bijgewerkt $updated, ongewijzigd $unchanged, mislukt $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'Locatie opzoeken is niet beschikbaar. Controleer je verbinding en probeer het opnieuw.';
 
   @override
   String get diveSites_list_search_backTooltip => 'Terug';
@@ -25013,6 +25092,13 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_coordinateFormat_subtitle =>
       'Hoe GPS-posities worden weergegeven en ingevoerd';
+
+  @override
+  String get settings_placeNameLanguage_title => 'Taal van plaatsnamen';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Gebruikt wanneer land, regio, plaats en water uit coördinaten worden opgezocht. Bestaande duikstekken worden niet gewijzigd.';
 
   @override
   String get settings_coordinateFormat_decimalDegrees => 'Decimale graden';

@@ -7870,7 +7870,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_edit_gps_gettingLocation => '获取中...';
 
   @override
-  String get diveSites_edit_gps_helperText => '选择定位方式 - 坐标将自动填充国家和地区';
+  String get diveSites_edit_gps_helperText => '选择定位方式或根据坐标查找，以自动填写国家、地区、城镇和水域';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'e.g., 21.4225';
@@ -7892,6 +7892,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => '选择从地图';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates => '根据坐标查找';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound => '未找到这些坐标的地点信息';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed => '地点查找失败。请检查网络连接后重试。';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => '替换地点信息？';
+
+  @override
+  String get diveSites_edit_lookupReplace_body => '查找结果中以下字段的值不同：';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => '替换';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => '保留';
 
   @override
   String get diveSites_edit_gps_useMyLocation => '使用我的位置';
@@ -8350,6 +8371,48 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveSites_list_menu_select => '选择潜水点';
+
+  @override
+  String get diveSites_list_menu_fillLocationDetails => '补全缺失的地点信息';
+
+  @override
+  String get diveSites_backfill_confirm_title => '补全缺失的地点信息？';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个有坐标的潜点缺少国家、地区、城镇或水域。',
+      one: '1 个有坐标的潜点缺少国家、地区、城镇或水域。',
+    );
+    return '$_temp0 Submersion 将在 OpenStreetMap 上逐个查找，并仅填写空白字段。大约需要 $minutes 分钟。';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => '开始';
+
+  @override
+  String get diveSites_backfill_nothingToFill => '所有有坐标的潜点都已有地点信息。';
+
+  @override
+  String get diveSites_backfill_progress_title => '正在补全地点信息';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done / $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => '取消';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return '已更新 $updated，未变 $unchanged，失败 $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline => '地点查找不可用。请检查网络连接后重试。';
 
   @override
   String get diveSites_list_search_backTooltip => '返回';
@@ -23937,6 +24000,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_coordinateFormat_subtitle => 'GPS 位置的显示和输入方式';
+
+  @override
+  String get settings_placeNameLanguage_title => '地名语言';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      '根据坐标查找国家、地区、城镇和水域时使用。现有潜点不会更改。';
 
   @override
   String get settings_coordinateFormat_decimalDegrees => '十进制度';
