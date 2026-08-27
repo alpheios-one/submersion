@@ -249,12 +249,6 @@ class DiveComputerRepository {
             ),
           );
 
-      await _syncRepository.markRecordPending(
-        entityType: 'diveComputers',
-        recordId: id,
-        localUpdatedAt: now,
-      );
-
       // Seed the gear twin once, here, because this is the only repository
       // path that genuinely inserts a registry row (v175). Minting nowhere
       // else is what makes a user-deleted twin permanent. Pass the resolved
@@ -267,12 +261,18 @@ class DiveComputerRepository {
           'UPDATE dive_computers SET equipment_id = ? WHERE id = ?',
           [twinId, id],
         );
-        await _syncRepository.markRecordPending(
-          entityType: 'diveComputers',
-          recordId: id,
-          localUpdatedAt: now,
-        );
       }
+
+      // Marked pending ONCE, after the optional equipment_id write, so the row
+      // carries a single HLC representing its final state. Marking on either
+      // side of that update would spend two clock ticks on one logical
+      // creation. Unconditional: a computer whose twin failed to resolve is
+      // still a registered computer and still has to sync.
+      await _syncRepository.markRecordPending(
+        entityType: 'diveComputers',
+        recordId: id,
+        localUpdatedAt: now,
+      );
 
       // If a computer with this hardware identity was deleted earlier, its
       // dives kept provenance snapshots; give them their link back.

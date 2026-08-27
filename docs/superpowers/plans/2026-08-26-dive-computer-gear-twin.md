@@ -4,21 +4,23 @@
 
 **Goal:** A dive computer that downloaded a dive appears as a piece of equipment on that dive.
 
-**Architecture:** A nullable `dive_computers.equipment_id` bridges the device registry to a real `equipment` row of type `computer` (its "gear twin"). The twin is created exactly once, at computer registration, at a deterministic UUID v5 id so a synced fleet converges on one row. A link-only service then attaches that twin to each dive at the non-interactive creation seams. A v169 migration backfills existing logbooks.
+**Architecture:** A nullable `dive_computers.equipment_id` bridges the device registry to a real `equipment` row of type `computer` (its "gear twin"). The twin is created exactly once, at computer registration, at a deterministic UUID v5 id so a synced fleet converges on one row. A link-only service then attaches that twin to each dive at the non-interactive creation seams. A v175 migration backfills existing logbooks.
 
 **Tech Stack:** Flutter, Dart, Drift ORM, SQLite, Riverpod, `uuid` package.
 
 **Spec:** `docs/superpowers/specs/2026-08-26-dive-computer-gear-twin-design.md`
 
-> **Schema number, after the fact:** this plan was written against v169 and
-> every snippet below says so. The claim ended up at **v175**, renumbered when
-> main was merged into the branch on 2026-08-27 after #1322 and others landed.
-> The snippets are left as written, since this document records the steps as
-> they were executed; the shipped numbers live in the design doc and the code.
+> **Schema number, after the fact:** the shipped claim is **v175**. The Goal,
+> Architecture and Global Constraints above state that, because they describe
+> what was built. The numbered task steps below still say v169, and are left
+> that way deliberately: they record the instructions as they were executed,
+> and rewriting snippets that were accurate when written would misrepresent
+> the history. The code and the design doc are the authority on the shipped
+> number.
 
 ## Global Constraints
 
-- **Schema version is v169.** Verified by diffing open PRs, not by grepping main: v165 (#1290), v166 (#1300), v167 (#1276) and v168 (#1237) are claimed by open PRs, and main is at v164. This plan originally claimed v168; #1237 renumbered onto it mid-implementation. Do NOT renumber without re-running that scan.
+- **Schema version is v175.** It moved twice: v168 to v169 when #1237 was renumbered onto v168 mid-implementation, then v169 to v175 when main was merged in on 2026-08-27 after #1322 (v170) and others landed. Do NOT pick a number from the open-PR diff scan alone; it cannot see unpushed renumbers or local-only worktree claims, so scan every worktree's `currentSchemaVersion` as well.
 - **`minimumCompatibleSchemaVersion` stays at 160.** The rule at `database.dart:3211` says not to raise it for a new nullable column.
 - **Never use em-dashes (U+2014)** in any output: code, comments, docs, commit messages. En-dashes as prose punctuation and spaced hyphens are equally forbidden. Use commas, colons, semicolons, or two sentences.
 - **No emojis** in code, comments, or documentation.
