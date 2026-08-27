@@ -353,4 +353,36 @@ void main() {
       expect(row.defaultShowEstimatedTankPressure, isTrue);
     },
   );
+
+  test(
+    'applies a pre-v166 diver_settings payload missing placeNameLanguage',
+    () async {
+      await db.customStatement('PRAGMA foreign_keys = OFF');
+
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await db
+          .into(db.diverSettings)
+          .insert(
+            DiverSettingsCompanion.insert(
+              id: 'ds-166',
+              diverId: 'diver-1',
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      final exported = await serializer.fetchRecord('diverSettings', 'ds-166');
+      final legacy = Map<String, dynamic>.from(exported!)
+        ..remove('placeNameLanguage');
+      await (db.delete(
+        db.diverSettings,
+      )..where((t) => t.id.equals('ds-166'))).go();
+
+      await serializer.upsertRecord('diverSettings', legacy);
+
+      final row = await (db.select(
+        db.diverSettings,
+      )..where((t) => t.id.equals('ds-166'))).getSingle();
+      expect(row.placeNameLanguage, 'en');
+    },
+  );
 }

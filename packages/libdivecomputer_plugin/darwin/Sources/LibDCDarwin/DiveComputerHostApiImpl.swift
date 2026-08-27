@@ -734,6 +734,7 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
                     temperatureCelsius: s.temperature.isNaN ? nil : s.temperature,
                     pressureBar: s.pressure.isNaN ? nil : s.pressure,
                     tankIndex: s.tank == UInt32.max ? nil : Int64(s.tank),
+                    tankPressuresBar: tankPressures(of: s),
                     heartRate: s.heartbeat == UInt32.max ? nil : Int64(s.heartbeat),
                     heading: s.heading == UInt32.max ? nil : Double(s.heading),
                     setpoint: s.setpoint.isNaN ? nil : s.setpoint,
@@ -986,6 +987,25 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             )) { _ in }
         }
     }
+}
+
+/// Every tank's pressure at one sample, indexed by tank index, NAN unpacked to
+/// nil. Trailing nils are trimmed and an all-nil sample returns nil, so the
+/// common single-transmitter dive marshals a one-element list per sample rather
+/// than a full LIBDC_MAX_TANKS one. See issue #1223: a sample can carry a
+/// reading per air-integrated transmitter, and `pressure`/`tank` hold only the
+/// last of them.
+private func tankPressures(of sample: libdc_sample_t) -> [Double?]? {
+    let capacity = Int(LIBDC_MAX_TANKS)
+    var values = withUnsafePointer(to: sample.tank_pressure) { tuplePtr in
+        tuplePtr.withMemoryRebound(to: Double.self, capacity: capacity) { buffer in
+            (0..<capacity).map { buffer[$0].isNaN ? nil : buffer[$0] }
+        }
+    }
+    while let last = values.last, last == nil {
+        values.removeLast()
+    }
+    return values.isEmpty ? nil : values
 }
 
 private final class BlePeripheralResolver: NSObject, CBCentralManagerDelegate {

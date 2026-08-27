@@ -13,7 +13,7 @@ QualityUnitFormatters qualityUnitFormattersFor(
   pressure: (bar) => units.formatPressure(bar),
   temperature: (c) => units.formatTemperature(c),
   // Surface air consumption is a volume rate; honor the volume unit
-  // preference (L/min vs cuft/min) rather than the pressure-based SAC mode.
+  // preference (L/min vs cuft/min); this is an RMV, never a pressure rate.
   sac: (lpm) =>
       '${units.convertVolume(lpm).toStringAsFixed(1)} ${units.volumeSymbol}/min',
   date: (d) => units.formatDate(d),

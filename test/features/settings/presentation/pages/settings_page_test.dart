@@ -160,6 +160,9 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setLocale(String locale) async =>
       state = state.copyWith(locale: locale);
   @override
+  Future<void> setPlaceNameLanguage(String code) async =>
+      state = state.copyWith(placeNameLanguage: code);
+  @override
   Future<void> setDefaultDiveType(String diveType) async =>
       state = state.copyWith(defaultDiveType: diveType);
   @override

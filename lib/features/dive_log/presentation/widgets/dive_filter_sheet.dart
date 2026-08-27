@@ -13,6 +13,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/weekday_filter_selector.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 
 /// Filter sheet for dive list
@@ -59,6 +60,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
   late double? _maxDepth;
   late bool _favoritesOnly;
   late List<String> _selectedTagIds;
+  late List<int> _selectedWeekdays;
 
   // v1.5 filters
   late String? _buddyNameFilter;
@@ -91,6 +93,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
     _maxDepth = filter.maxDepth;
     _favoritesOnly = filter.favoritesOnly ?? false;
     _selectedTagIds = List.from(filter.tagIds);
+    _selectedWeekdays = List.from(filter.weekdays);
     // Depth bounds live in meters; the fields show and accept the diver's
     // configured depth unit.
     final units = UnitFormatter(widget.ref.read(settingsProvider));
@@ -324,6 +327,34 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                               });
                             },
                             child: Text(context.l10n.diveLog_filter_clearDates),
+                          ),
+                        ),
+                      const SizedBox(height: 24),
+
+                      // Weekday Section. ANDs with the date range above: when
+                      // both are set, only dives inside the range AND on one
+                      // of these weekdays match.
+                      Text(
+                        context.l10n.diveLog_filter_sectionWeekdays,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      WeekdayFilterSelector(
+                        selectedWeekdays: _selectedWeekdays,
+                        onChanged: (weekdays) {
+                          setState(() => _selectedWeekdays = weekdays);
+                        },
+                      ),
+                      if (_selectedWeekdays.isNotEmpty)
+                        Align(
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() => _selectedWeekdays = []);
+                            },
+                            child: Text(
+                              context.l10n.diveLog_filter_clearWeekdays,
+                            ),
                           ),
                         ),
                       const SizedBox(height: 24),
@@ -1131,6 +1162,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
       maxDepth: _maxDepth,
       favoritesOnly: _favoritesOnly ? true : null,
       tagIds: _selectedTagIds,
+      weekdays: _selectedWeekdays,
       // v1.5 filters
       buddyNameFilter: _buddyNameFilter,
       noBuddyOnly: _noBuddyOnly ? true : null,

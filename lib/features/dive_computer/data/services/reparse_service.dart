@@ -6,6 +6,7 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/dive_computer/data/services/libdc_dive_mode.dart';
 import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_computer/data/services/parsed_tank_resolver.dart';
+import 'package:submersion/features/dive_log/domain/services/tank_pressure_series.dart';
 
 /// Service responsible for applying re-parsed dive computer data back to the
 /// database while respecting the computer-authored vs user-authored field
@@ -756,18 +757,18 @@ class ReparseService {
   }) async {
     if (tankIdsByIndex.isEmpty) return;
 
-    // Group sample pressures by tank index.
-    final pressuresByTank = <int, List<({int timestamp, double pressure})>>{};
-    for (final s in parsed.samples) {
-      final pressure = s.pressureBar;
-      if (pressure != null) {
-        final idx = s.tankIndex ?? 0;
-        pressuresByTank.putIfAbsent(idx, () => []).add((
-          timestamp: s.timeSeconds,
-          pressure: pressure,
-        ));
-      }
-    }
+    // Group sample pressures by tank index. A sample can carry a reading per
+    // air-integrated transmitter (issue #1223), so this walks tankPressuresBar
+    // rather than the single pressureBar/tankIndex pair.
+    final pressuresByTank = groupPressuresByTank([
+      for (final s in parsed.samples)
+        (
+          timeSeconds: s.timeSeconds,
+          pressureBar: s.pressureBar,
+          tankIndex: s.tankIndex,
+          tankPressuresBar: s.tankPressuresBar,
+        ),
+    ]);
     if (pressuresByTank.isEmpty) return;
 
     // Insert the pressure time-series for each known tank.
