@@ -16,6 +16,7 @@ import 'package:submersion/features/dive_sites/presentation/providers/site_provi
 import 'package:submersion/features/dive_sites/presentation/widgets/compact_site_list_tile.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/dense_site_list_tile.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_list_content.dart';
+import 'package:submersion/features/dive_sites/presentation/widgets/site_list_tile.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -858,14 +859,19 @@ void main() {
       await tester.pumpWidget(
         testApp(
           overrides: [
-            settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+            ...await getBaseOverrides(),
             showMapBackgroundOnSiteCardsProvider.overrideWithValue(true),
           ],
           child: const SiteListTile(
-            name: 'Blue Hole',
-            location: 'Belize',
-            latitude: 17.3155,
-            longitude: -87.5346,
+            entry: SiteWithDiveCount(
+              site: DiveSite(
+                id: 'blue-hole',
+                name: 'Blue Hole',
+                country: 'Belize',
+                location: GeoPoint(17.3155, -87.5346),
+              ),
+              diveCount: 0,
+            ),
           ),
         ),
       );
@@ -883,8 +889,8 @@ void main() {
         final p = await SharedPreferences.getInstance();
 
         final sites = [
-          SiteWithDiveCount(
-            site: const DiveSite(
+          const SiteWithDiveCount(
+            site: DiveSite(
               id: 's1',
               name: 'Located Reef',
               location: GeoPoint(17.3155, -87.5346),

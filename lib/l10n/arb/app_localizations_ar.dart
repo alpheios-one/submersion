@@ -25723,6 +25723,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_siteField_longitude_short => 'الطول';
 
   @override
+  String get enum_siteField_depthRange => 'نطاق العمق';
+
+  @override
+  String get enum_siteField_depthRange_short => 'العمق';
+
+  @override
+  String get enum_siteField_lastDived => 'آخر غوص';
+
+  @override
+  String get enum_siteField_lastDived_short => 'الأخير';
+
+  @override
+  String get enum_siteField_maxDepthReached => 'أقصى عمق لك';
+
+  @override
+  String get enum_siteField_maxDepthReached_short => 'أقصاك';
+
+  @override
   String get enum_buddyField_buddyName => 'الاسم';
 
   @override
@@ -25763,6 +25781,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_buddyField_notes_short => 'ملاحظات';
+
+  @override
+  String get enum_buddyField_lastDive => 'آخر غوصة';
+
+  @override
+  String get enum_buddyField_lastDive_short => 'الأخيرة';
 
   @override
   String get enum_tripField_tripName => 'الاسم';

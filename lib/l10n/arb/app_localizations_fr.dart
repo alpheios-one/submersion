@@ -26248,6 +26248,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get enum_siteField_longitude_short => 'Long';
 
   @override
+  String get enum_siteField_depthRange => 'Plage de profondeur';
+
+  @override
+  String get enum_siteField_depthRange_short => 'Prof.';
+
+  @override
+  String get enum_siteField_lastDived => 'Dernière plongée';
+
+  @override
+  String get enum_siteField_lastDived_short => 'Dernière';
+
+  @override
+  String get enum_siteField_maxDepthReached => 'Votre prof. max';
+
+  @override
+  String get enum_siteField_maxDepthReached_short => 'Votre max';
+
+  @override
   String get enum_buddyField_buddyName => 'Nom';
 
   @override
@@ -26289,6 +26307,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get enum_buddyField_notes_short => 'Notes';
+
+  @override
+  String get enum_buddyField_lastDive => 'Dernière plongée';
+
+  @override
+  String get enum_buddyField_lastDive_short => 'Dernière';
 
   @override
   String get enum_tripField_tripName => 'Nom';

@@ -26075,6 +26075,24 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_siteField_longitude_short => 'Hossz';
 
   @override
+  String get enum_siteField_depthRange => 'Mélységtartomány';
+
+  @override
+  String get enum_siteField_depthRange_short => 'Mélység';
+
+  @override
+  String get enum_siteField_lastDived => 'Utolsó merülés';
+
+  @override
+  String get enum_siteField_lastDived_short => 'Utolsó';
+
+  @override
+  String get enum_siteField_maxDepthReached => 'Saját max. mélység';
+
+  @override
+  String get enum_siteField_maxDepthReached_short => 'Saját max.';
+
+  @override
   String get enum_buddyField_buddyName => 'Név';
 
   @override
@@ -26115,6 +26133,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_buddyField_notes_short => 'Jegyz.';
+
+  @override
+  String get enum_buddyField_lastDive => 'Utolsó merülés';
+
+  @override
+  String get enum_buddyField_lastDive_short => 'Utolsó';
 
   @override
   String get enum_tripField_tripName => 'Név';
