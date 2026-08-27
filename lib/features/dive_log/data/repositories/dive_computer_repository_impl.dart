@@ -26,6 +26,7 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     show GeoPoint;
 import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
+import 'package:submersion/features/dive_log/domain/services/tank_pressure_series.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -1393,6 +1394,9 @@ class DiveComputerRepository {
                 diveId: Value(diveId),
                 computerId: Value(computerId),
                 volume: Value(tank.volumeLiters),
+                workingPressure: Value.absentIfNull(tank.workingPressure),
+                tankMaterial: Value.absentIfNull(tank.material),
+                presetName: Value.absentIfNull(tank.presetName),
                 startPressure: Value(tank.startPressure),
                 endPressure: Value(tank.endPressure),
                 o2Percent: Value(tank.o2Percent),
@@ -1423,19 +1427,18 @@ class DiveComputerRepository {
 
       // Insert per-tank pressure time-series data (batch insert, no individual sync)
       if (tankIdsByIndex.isNotEmpty) {
-        // Group pressure readings by tank index
-        final pressuresByTank =
-            <int, List<({int timestamp, double pressure})>>{};
-        for (final point in points) {
-          if (point.pressure != null) {
-            final tankIdx = point.tankIndex ?? 0;
-            pressuresByTank.putIfAbsent(tankIdx, () => []);
-            pressuresByTank[tankIdx]!.add((
-              timestamp: point.timestamp,
-              pressure: point.pressure!,
-            ));
-          }
-        }
+        // Group pressure readings by tank index. A sample can carry a reading
+        // per air-integrated transmitter (issue #1223), so this walks
+        // tankPressures rather than the single pressure/tankIndex pair.
+        final pressuresByTank = groupPressuresByTank([
+          for (final point in points)
+            (
+              timeSeconds: point.timestamp,
+              pressureBar: point.pressure,
+              tankIndex: point.tankIndex,
+              tankPressuresBar: point.tankPressures,
+            ),
+        ]);
 
         // Batch insert pressure data for each tank
         // No individual sync records - parent dive sync covers child data
@@ -2072,6 +2075,13 @@ class ProfilePointData {
   /// Tank index for pressure (0-based), used for multi-tank pressure tracking
   final int? tankIndex;
 
+  /// Every tank's pressure in bar at this sample, indexed by tank index, with
+  /// null where that tank reported nothing. A dive computer reports one
+  /// pressure per air-integrated transmitter, so a single sample can carry
+  /// several; [pressure]/[tankIndex] hold only the last of them (issue #1223).
+  /// Null for sources that report at most one pressure per sample.
+  final List<double?>? tankPressures;
+
   /// CCR setpoint in bar
   final double? setpoint;
 
@@ -2130,6 +2140,7 @@ class ProfilePointData {
     this.heartRate,
     this.heading,
     this.tankIndex,
+    this.tankPressures,
     this.setpoint,
     this.ppO2,
     this.cns,
@@ -2187,6 +2198,16 @@ class TankData {
   final double? endPressure;
   final double? volumeLiters;
 
+  /// Rated working pressure in bar, when known (from the default tank preset;
+  /// computers do not report it).
+  final double? workingPressure;
+
+  /// Cylinder material (a `TankMaterial` name), when known.
+  final String? material;
+
+  /// The tank preset the physical attributes came from, when they did.
+  final String? presetName;
+
   /// Inferred cylinder role (a [TankRole] name), or null for the default.
   final String? role;
 
@@ -2197,6 +2218,9 @@ class TankData {
     this.startPressure,
     this.endPressure,
     this.volumeLiters,
+    this.workingPressure,
+    this.material,
+    this.presetName,
     this.role,
   });
 }

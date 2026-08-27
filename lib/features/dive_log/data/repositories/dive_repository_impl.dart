@@ -1981,6 +1981,54 @@ class DiveRepository {
     }
   }
 
+  /// The ids of every dive whose recorded profile signal classifies it as
+  /// deco ([wantDeco] true) or no-deco ([wantDeco] false).
+  ///
+  /// The in-memory filter path ([DiveFilterState.apply]) cannot answer this:
+  /// [getAllDives] deliberately skips profile hydration for list views, and
+  /// deco-stop events never reach the entity at all. So the surfaces built on
+  /// that path (the table view, the activity and heat maps) resolve the deco
+  /// axis through this query instead, reusing [decoSignalCondition] so they
+  /// classify dives exactly as the paginated SQL list does.
+  ///
+  /// Only called while the deco filter is active, which keeps the scan over
+  /// `dive_profiles` off the default dive-list load.
+  Future<Set<String>> getDiveIdsWithDecoSignal({
+    required bool wantDeco,
+    String? diverId,
+  }) async {
+    try {
+      return await PerfTimer.measure('getDiveIdsWithDecoSignal', () async {
+        final whereClauses = <String>[
+          decoSignalCondition(wantDeco: wantDeco, diveIdRef: 'd.id'),
+        ];
+        final args = <Variable<Object>>[];
+
+        if (diverId != null) {
+          whereClauses.add('d.diver_id = ?');
+          args.add(Variable(diverId));
+        }
+
+        final rows = await _db
+            .customSelect(
+              'SELECT d.id AS id FROM dives d '
+              'WHERE ${whereClauses.join(' AND ')}',
+              variables: args,
+              readsFrom: {_db.dives, _db.diveProfiles, _db.diveProfileEvents},
+            )
+            .get();
+        return rows.map((r) => r.read<String>('id')).toSet();
+      });
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to resolve deco-signal dive ids',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Build SQL WHERE clauses from a [DiveFilterState].
   ///
   /// Builds the SQL ORDER BY clause from the sort state.
@@ -2059,6 +2107,11 @@ class DiveRepository {
     if (filter.favoritesOnly == true) {
       clauses.add('d.is_favorite = 1');
     }
+    if (filter.decoOnly != null) {
+      clauses.add(
+        decoSignalCondition(wantDeco: filter.decoOnly!, diveIdRef: 'd.id'),
+      );
+    }
     if (filter.noBuddyOnly == true) {
       clauses.add(
         "(d.buddy IS NULL OR d.buddy = '') AND "
@@ -2073,6 +2126,20 @@ class DiveRepository {
       );
       for (final tagId in filter.tagIds) {
         args.add(Variable(tagId));
+      }
+    }
+    if (filter.weekdays.isNotEmpty) {
+      // d.dive_date_time is wall-clock-as-UTC epoch ms, so strftime('%w', ...)
+      // (0=Sunday..6=Saturday) already lines up with the wall-clock day.
+      // Converting DateTime.weekday (1=Monday..7=Sunday) via `% 7` matches
+      // that numbering, mirroring buildFilteredDiveIdSubquery.
+      final placeholders = List.filled(filter.weekdays.length, '?').join(', ');
+      clauses.add(
+        "CAST(strftime('%w', d.dive_date_time / 1000, 'unixepoch') AS INTEGER) "
+        'IN ($placeholders)',
+      );
+      for (final weekday in filter.weekdays) {
+        args.add(Variable(weekday % 7));
       }
     }
     if (filter.equipmentIds.isNotEmpty) {

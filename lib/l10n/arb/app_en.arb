@@ -3205,6 +3205,7 @@
   "diveLog_filter_clearAll": "Clear All",
   "diveLog_filter_clearDates": "Clear dates",
   "diveLog_filter_clearRating": "Clear rating filter",
+  "diveLog_filter_clearWeekdays": "Clear weekdays",
   "diveLog_filter_dateSeparator": "to",
   "diveLog_filter_endDate": "End Date",
   "diveLog_filter_errorLoadingSites": "Error loading sites",
@@ -3230,6 +3231,7 @@
   "diveLog_filter_sectionGasMix": "Gas Mix (O₂%)",
   "diveLog_filter_sectionMinRating": "Minimum Rating",
   "diveLog_filter_sectionTags": "Tags",
+  "diveLog_filter_sectionWeekdays": "Weekdays",
   "diveLog_filter_showOnlyFavorites": "Show only favorite dives",
   "diveLog_filter_showOnlyNoBuddy": "Show only dives without a buddy",
   "diveLog_filter_startDate": "Start Date",
@@ -3795,7 +3797,9 @@
   "diveLog_search_errorLoadingCenters": "Error loading dive centers",
   "diveLog_search_errorLoadingDiveTypes": "Error loading dive types",
   "diveLog_search_errorLoadingTrips": "Error loading trips",
+  "diveLog_search_filter_any": "Any",
   "diveLog_search_gasTrimix": "Trimix (<21% O₂)",
+  "diveLog_search_label_deco": "Decompression",
   "diveLog_search_label_depthRange": "Depth Range (m)",
   "diveLog_search_label_diveCenter": "Dive Center",
   "diveLog_search_label_diveSite": "Dive Site",
@@ -4595,7 +4599,7 @@
   "divePlanner_label_remaining": "Remaining",
   "divePlanner_label_reserve": "Reserve:",
   "divePlanner_label_runtime": "Runtime",
-  "divePlanner_label_sacRate": "SAC Rate:",
+  "divePlanner_label_sacRate": "RMV:",
   "divePlanner_label_status": "Status",
   "divePlanner_label_tanks": "Tanks",
   "divePlanner_label_time": "Time",
@@ -4805,7 +4809,7 @@
     }
   },
   "diveSites_edit_gps_gettingLocation": "Getting...",
-  "diveSites_edit_gps_helperText": "Choose a location method - coordinates will auto-fill country and region",
+  "diveSites_edit_gps_helperText": "Choose a location method or look up the coordinates to auto-fill country, region, town and body of water",
   "diveSites_edit_gps_latitude_hint": "e.g., 21.4225",
   "diveSites_edit_gps_latitude_label": "Latitude",
   "diveSites_edit_gps_latitude_validation": "Invalid latitude",
@@ -4813,6 +4817,13 @@
   "diveSites_edit_gps_longitude_label": "Longitude",
   "diveSites_edit_gps_longitude_validation": "Invalid longitude",
   "diveSites_edit_gps_pickFromMap": "Pick from Map",
+  "diveSites_edit_gps_lookupFromCoordinates": "Look up from coordinates",
+  "diveSites_edit_snackbar_lookupNothingFound": "No location details found for these coordinates",
+  "diveSites_edit_snackbar_lookupFailed": "Location lookup failed. Check your connection and try again.",
+  "diveSites_edit_lookupReplace_title": "Replace location details?",
+  "diveSites_edit_lookupReplace_body": "The lookup found different values for these fields:",
+  "diveSites_edit_lookupReplace_replace": "Replace",
+  "diveSites_edit_lookupReplace_keep": "Keep",
   "diveSites_edit_gps_useMyLocation": "Use My Location",
   "diveSites_edit_hazards_helperText": "List any hazards or safety considerations",
   "diveSites_edit_hazards_hint": "e.g., Strong currents, boat traffic, jellyfish, sharp coral",
@@ -4939,6 +4950,49 @@
   "diveSites_list_error_retry": "Retry",
   "diveSites_list_menu_import": "Import",
   "diveSites_list_menu_select": "Select sites",
+  "diveSites_list_menu_fillLocationDetails": "Fill in missing location details",
+  "diveSites_backfill_confirm_title": "Fill in missing location details?",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 site with coordinates has an empty country, region, town or body of water.} other{{count} sites with coordinates have an empty country, region, town or body of water.}} Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about {minutes, plural, =1{1 minute} other{{minutes} minutes}}.",
+  "@diveSites_backfill_confirm_body": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_confirm_start": "Start",
+  "diveSites_backfill_nothingToFill": "Every site with coordinates already has its location details.",
+  "diveSites_backfill_progress_title": "Filling in location details",
+  "diveSites_backfill_progress_count": "{done} of {total}",
+  "@diveSites_backfill_progress_count": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_cancel": "Cancel",
+  "diveSites_backfill_summary": "Updated {updated}, unchanged {unchanged}, failed {failed}",
+  "@diveSites_backfill_summary": {
+    "placeholders": {
+      "updated": {
+        "type": "int"
+      },
+      "unchanged": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_offline": "Location lookup is unavailable. Check your connection and try again.",
   "diveSites_list_search_backTooltip": "Back",
   "diveSites_list_search_clearTooltip": "Clear Search",
   "diveSites_list_search_emptyHint": "Search by site name, country, or region",
@@ -6719,7 +6773,7 @@
   "gasCalculators_mnd_resultTitle": "Maximum Narcotic Depth",
   "gasCalculators_ppO2Limit": "ppO₂ Limit",
   "gasCalculators_resetAll": "Reset all calculators",
-  "gasCalculators_sacRate": "SAC Rate",
+  "gasCalculators_sacRate": "RMV",
   "gasCalculators_tab_bestMix": "Best Mix",
   "gasCalculators_tab_consumption": "Consumption",
   "gasCalculators_tab_mnd": "MND/END",
@@ -7175,6 +7229,51 @@
   "media_photoPicker_showingPhotosFromRange": "Showing photos from {rangeText}",
   "media_photoPicker_thumbnailToggleLabel": "Toggle selection for photo",
   "media_photoPicker_thumbnailToggleSelectedLabel": "Toggle selection for photo, selected",
+  "media_photoPicker_files_pickFilesButton": "Pick files…",
+  "media_photoPicker_files_pickFolderButton": "Pick a folder…",
+  "media_photoPicker_files_autoMatchLabel": "Auto-match photos and videos to dives by date",
+  "media_photoPicker_files_emptyHint": "Pick files or a folder to start.",
+  "media_photoPicker_files_linkButton": "{count, plural, =1{Link 1 item} other{Link {count} items}}",
+  "@media_photoPicker_files_linkButton": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_attachToSiteButton": "{count, plural, =1{Attach 1 item to this site} other{Attach {count} items to this site}}",
+  "@media_photoPicker_files_attachToSiteButton": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_summary": "{fileCount, plural, =1{1 file} other{{fileCount} files}}, {diveCount, plural, =1{1 dive} other{{diveCount} dives}}, {unmatchedCount} unmatched",
+  "@media_photoPicker_files_summary": {"placeholders": {"fileCount": {"type": "int"}, "diveCount": {"type": "int"}, "unmatchedCount": {"type": "Object"}}},
+  "media_photoPicker_files_itemCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "@media_photoPicker_files_itemCount": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_diveGroupTitle": "Dive {diveId}",
+  "@media_photoPicker_files_diveGroupTitle": {"placeholders": {"diveId": {"type": "String"}}},
+  "media_photoPicker_files_groupCount": "{count, plural, =1{1 file} other{{count} files}}",
+  "@media_photoPicker_files_groupCount": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_unmatchedGroupTitle": "Unmatched",
+  "media_photoPicker_files_addAllToDive": "{count, plural, =1{Add 1 to this dive} other{Add all {count} to this dive}}",
+  "@media_photoPicker_files_addAllToDive": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_addToDiveTooltip": "Add to this dive",
+  "media_photoPicker_files_chooseDiveTooltip": "Choose a dive",
+  "media_photoPicker_files_removeTooltip": "Remove from selection",
+  "media_photoPicker_files_sourceExif": "from EXIF",
+  "media_photoPicker_files_sourceContainer": "from file metadata",
+  "media_photoPicker_files_sourceFileDate": "from file date",
+  "media_photoPicker_files_sourceNone": "no date found",
+  "media_photoPicker_files_shiftedTime": "{shifted} (was {original})",
+  "@media_photoPicker_files_shiftedTime": {"placeholders": {"shifted": {"type": "String"}, "original": {"type": "String"}}},
+  "media_photoPicker_files_reasonNoTimestamp": "No capture time could be read",
+  "media_photoPicker_files_reasonBeforeDive": "{gap} before the nearest dive",
+  "@media_photoPicker_files_reasonBeforeDive": {"placeholders": {"gap": {"type": "String"}}},
+  "media_photoPicker_files_reasonAfterDive": "{gap} after the nearest dive",
+  "@media_photoPicker_files_reasonAfterDive": {"placeholders": {"gap": {"type": "String"}}},
+  "media_photoPicker_files_reasonNoDives": "No dives to match against",
+  "media_photoPicker_files_offsetLabel": "Shift capture times by",
+  "media_photoPicker_files_offsetResetTooltip": "Reset to no shift",
+  "media_photoPicker_files_offsetBackTooltip": "Shift {amount} earlier",
+  "@media_photoPicker_files_offsetBackTooltip": {"placeholders": {"amount": {"type": "String"}}},
+  "media_photoPicker_files_offsetForwardTooltip": "Shift {amount} later",
+  "@media_photoPicker_files_offsetForwardTooltip": {"placeholders": {"amount": {"type": "String"}}},
+  "media_photoPicker_files_linkedCount": "{count, plural, =1{Linked 1 item} other{Linked {count} items}}",
+  "@media_photoPicker_files_linkedCount": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_attachedToSiteCount": "{count, plural, =1{Attached 1 item to this site} other{Attached {count} items to this site}}",
+  "@media_photoPicker_files_attachedToSiteCount": {"placeholders": {"count": {"type": "int"}}},
+  "media_photoPicker_files_undo": "Undo",
   "media_photoPicker_thumbnailAlreadyLinkedLabel": "Photo already linked to this dive",
   "media_perdixOverlay_labelCns": "CNS",
   "media_perdixOverlay_labelDepth": "DEPTH",
@@ -8462,6 +8561,46 @@
   },
   "safetyReview_dismiss": "Dismiss",
   "safetyReview_restore": "Restore",
+  "safetyReview_dismissAll": "Dismiss all",
+  "safetyReview_restoreAll": "Restore all",
+  "safetySettings_dismissAll": "Dismiss all observations",
+  "safetySettings_dismissAll_subtitle": "Mark every observation in this logbook as reviewed",
+  "safetySettings_dismissAll_confirmTitle": "Dismiss all observations?",
+  "safetySettings_dismissAll_confirmBody": "Every observation on every analyzed dive is marked as reviewed. You can restore them one dive at a time from that dive’s safety review section.",
+  "safetySettings_dismissAll_confirm": "Dismiss all",
+  "safetySettings_dismissAll_cancel": "Cancel",
+  "safetySettings_dismissAll_progress": "Checked {done} of {total} dives",
+  "@safetySettings_dismissAll_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_done": "{count, plural, =0{No observations to dismiss} =1{1 observation dismissed} other{{count} observations dismissed}}",
+  "@safetySettings_dismissAll_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{No observations dismissed} =1{1 observation dismissed} other{{count} observations dismissed}}, {failed, plural, =1{1 dive could not be updated} other{{failed} dives could not be updated}}",
+  "@safetySettings_dismissAll_doneWithErrors": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    },
+    "failed": {
+      "type": "int"
+    }
+  }
+},
+  "safetySettings_dismissAll_failed": "Could not read your dive list. No dives were changed.",
+  "safetySettings_analyzeAll_failed": "Could not analyze your dives.",
   "safetyReview_details": "Details",
   "@safetyReview_details": {
     "description": "Link in the chart finding callout that scrolls to the full safety review section"
@@ -9403,7 +9542,7 @@
   "settings_units_gasModel_real_subtitle": "Accounts for compressibility. A 12 L cylinder at 200 bar holds about 2317 L.",
   "settings_units_gasModel_ideal": "Ideal gas",
   "settings_units_gasModel_ideal_subtitle": "Matches hand calculation and dive tables. A 12 L cylinder at 200 bar holds 2400 L.",
-  "settings_units_gasModel_explanation": "How cylinder pressure is converted to gas volume. This affects SAC rate, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for SAC.",
+  "settings_units_gasModel_explanation": "How cylinder pressure is converted to gas volume. This affects RMV, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for RMV.",
   "settings_units_dialog_gasModel": "Gas calculations",
   "settings_units_dialog_temperatureUnit": "Temperature Unit",
   "settings_units_dialog_timeFormat": "Time Format",
@@ -11860,6 +11999,11 @@
   "universalImport_triage_noneImportable": "None of the selected files can be imported.",
   "universalImport_review_inBatchDuplicate": "Duplicate of another dive in this import batch.",
   "universalImport_summary_filesTitle": "Files",
+  "universalImport_summary_noticesTitle": "Not in the file",
+  "universalImport_summary_noticeNoTankPressureTitle": "Tank pressure not recorded",
+  "universalImport_summary_noticeNoTankPressureBody": "Air consumption and SAC cannot be calculated. You can add start and end pressure by editing the dive.",
+  "universalImport_summary_noticeAffectedDives": "{count, plural, =1{Affects 1 dive} other{Affects {count} dives}}",
+  "@universalImport_summary_noticeAffectedDives": {"placeholders": {"count": {"type": "int"}}},
   "universalImport_summary_fileImported": "{count, plural, =1{1 dive imported} other{{count} dives imported}}",
   "universalImport_summary_fileNeedsIndividualImport": "Needs individual import",
   "universalImport_summary_fileUnsupported": "Unsupported format",
@@ -13620,7 +13764,7 @@
   "divePlanner_segmentType_gasSwitch": "Gas Switch",
   "divePlanner_segmentType_safetyStop": "Safety Stop",
   "divePlanner_undo": "Undo",
-  "gasCalculators_rockBottom_aboutDescription": "Rock bottom is the minimum gas reserve for an emergency ascent while sharing air with your buddy.\n\n• Uses stressed SAC rates (2-3x normal)\n• Assumes both divers on one tank\n• Includes safety stop when enabled\n\nAlways turn the dive BEFORE reaching rock bottom!",
+  "gasCalculators_rockBottom_aboutDescription": "Rock bottom is the minimum gas reserve for an emergency ascent while sharing air with your buddy.\n\n• Uses a stressed RMV (2-3x normal)\n• Assumes both divers on one tank\n• Includes safety stop when enabled\n\nAlways turn the dive BEFORE reaching rock bottom!",
   "gasCalculators_rockBottom_aboutTitle": "About Rock Bottom",
   "gasCalculators_rockBottom_ascentGasRequired": "Ascent gas required",
   "gasCalculators_rockBottom_ascentRate": "Ascent Rate",
@@ -13636,8 +13780,8 @@
     }
   },
   "gasCalculators_rockBottom_ascentTimeToSurface": "Ascent time to surface",
-  "gasCalculators_rockBottom_buddySac": "Buddy SAC",
-  "gasCalculators_rockBottom_combinedStressedSac": "Combined stressed SAC",
+  "gasCalculators_rockBottom_buddySac": "Buddy RMV",
+  "gasCalculators_rockBottom_combinedStressedSac": "Combined stressed RMV",
   "gasCalculators_rockBottom_emergencyAscentBreakdown": "Emergency Ascent Breakdown",
   "gasCalculators_rockBottom_emergencyScenario": "Emergency Scenario",
   "gasCalculators_rockBottom_includeSafetyStop": "Include Safety Stop",
@@ -13682,8 +13826,8 @@
       }
     }
   },
-  "gasCalculators_rockBottom_stressedSacHint": "Use higher SAC rates to account for stress during emergency",
-  "gasCalculators_rockBottom_stressedSacRates": "Stressed SAC Rates",
+  "gasCalculators_rockBottom_stressedSacHint": "Use a higher RMV to account for stress during an emergency",
+  "gasCalculators_rockBottom_stressedSacRates": "Stressed RMV",
   "gasCalculators_rockBottom_tankSize": "Tank Size",
   "gasCalculators_rockBottom_totalReserveNeeded": "Total reserve needed",
   "gasCalculators_rockBottom_turnDive": "Turn the dive when reaching {pressure} {pressureUnit} remaining",
@@ -13697,7 +13841,7 @@
       }
     }
   },
-  "gasCalculators_rockBottom_yourSac": "Your SAC",
+  "gasCalculators_rockBottom_yourSac": "Your RMV",
   "gpsLogger_androidNotificationText": "Recording your surface track",
   "gpsLogger_androidNotificationTitle": "Submersion GPS Logger",
   "gpsLogger_deleteTrackMessage": "This removes the recorded GPS track. Positions already stamped on dives are kept.",
@@ -13747,6 +13891,9 @@
       }
     }
   },
+  "gpsLogger_summary_tracks": "Tracks",
+  "gpsLogger_summary_recordedTime": "Recorded time",
+  "gpsLogger_summary_divesCovered": "Dives covered",
   "gpsLogger_trackSubtitle": "{count, plural, one{{count} point} other{{count} points}}, {duration}",
   "@gpsLogger_trackSubtitle": {
     "placeholders": {
@@ -15135,6 +15282,34 @@
   "@dive3d_metric_heartRate": {},
   "dive3d_metric_tankPressure": "Pressure",
   "@dive3d_metric_tankPressure": {},
+  "dive3d_zAxis": "Z axis",
+  "@dive3d_zAxis": {},
+  "dive3d_zAxis_none": "None",
+  "@dive3d_zAxis_none": {},
+  "dive3d_overlay_shadows": "Wall shadows",
+  "@dive3d_overlay_shadows": {},
+  "dive3d_metric_tts": "TTS",
+  "@dive3d_metric_tts": {},
+  "dive3d_axis_depth": "Depth ({unitSymbol})",
+  "@dive3d_axis_depth": {"placeholders": {"unitSymbol": {"type": "String"}}},
+  "dive3d_axis_time": "Run time (min)",
+  "@dive3d_axis_time": {},
+  "dive3d_pose_menu": "Camera",
+  "@dive3d_pose_menu": {},
+  "dive3d_pose_default": "Default view",
+  "@dive3d_pose_default": {},
+  "dive3d_pose_front": "Front (depth vs time)",
+  "@dive3d_pose_front": {},
+  "dive3d_pose_side": "Side (depth vs metric)",
+  "@dive3d_pose_side": {},
+  "dive3d_pose_top": "Top (metric vs time)",
+  "@dive3d_pose_top": {},
+  "dive3d_readout_runTime": "Run time",
+  "@dive3d_readout_runTime": {},
+  "dive3d_readout_ceiling": "Ceiling",
+  "@dive3d_readout_ceiling": {},
+  "dive3d_readout_tank": "Tank {n}",
+  "@dive3d_readout_tank": {"placeholders": {"n": {"type": "int"}}},
   "dive3d_scene_dive": "Dive",
   "@dive3d_scene_dive": {},
   "dive3d_scene_tissue": "Tissues",
@@ -15516,6 +15691,7 @@
   "safetyHub_noFly_disclaimer": "DAN/UHMS guideline intervals from your last dive. Not a substitute for your dive computer's no-fly time.",
   "diveLog_detail_altitudeMismatch_title": "Site is at altitude",
   "diveLog_detail_altitudeMismatch_subtitle": "This site records an altitude but the dive has none set, so decompression analysis assumed sea level. Set the dive's altitude to correct it.",
+  "diveLog_detail_sacVolumeHint": "Add a cylinder volume to show SAC in {unit}/min",
   "safetyHub_alert_noFly": "No-fly: {remaining} remaining",
   "@safetyHub_alert_noFly": {
     "placeholders": {
@@ -15584,6 +15760,35 @@
     "placeholders": {
       "date": {
         "type": "String"
+      }
+    }
+  },
+  "emergencyCard_chambersNearby": "Nearest chambers",
+  "emergencyCard_chamberViewAll": "View all {count} chambers",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "No chamber listed within range. Call the diver emergency hotline: they will route you to the nearest facility that can treat you.",
+  "emergencyCard_chamberCapability_divingEmergency": "Treats diving injuries",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "Hospital hyperbaric unit",
+  "emergencyCard_chamberCapability_elective": "Elective therapy only",
+  "emergencyCard_chamberCapability_unknown": "Capability unconfirmed",
+  "emergencyCard_chamberAvailability_h24": "24h",
+  "emergencyCard_chamberAvailability_onCall": "On call",
+  "emergencyCard_chamberAvailability_businessHours": "Business hours",
+  "emergencyCard_chamberUnverified": "Not confirmed with the facility",
+  "chambersDirectory_title": "Hyperbaric chambers",
+  "chambersDirectory_search": "Search by name, city or country",
+  "chambersDirectory_empty": "No chamber matches that search.",
+  "chambersDirectory_count": "{count, plural, =1{1 chamber} other{{count} chambers}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   },
@@ -16190,6 +16395,8 @@
   },
   "settings_coordinateFormat_title": "Coordinate format",
   "settings_coordinateFormat_subtitle": "How GPS positions are shown and entered",
+  "settings_placeNameLanguage_title": "Place name language",
+  "settings_placeNameLanguage_subtitle": "Used when country, region, town and body of water are looked up from coordinates. Existing sites are not changed.",
   "settings_coordinateFormat_decimalDegrees": "Decimal degrees",
   "settings_coordinateFormat_degreesDecimalMinutes": "Degrees and decimal minutes",
   "settings_coordinateFormat_degreesMinutesSeconds": "Degrees, minutes, seconds",
@@ -16445,6 +16652,12 @@
   "enum_siteField_notes_short": "Notes",
   "enum_siteField_latitude_short": "Lat",
   "enum_siteField_longitude_short": "Lon",
+  "enum_siteField_depthRange": "Depth Range",
+  "enum_siteField_depthRange_short": "Depth",
+  "enum_siteField_lastDived": "Last Dived",
+  "enum_siteField_lastDived_short": "Last dived",
+  "enum_siteField_maxDepthReached": "Your Max Depth",
+  "enum_siteField_maxDepthReached_short": "Your max",
   "enum_buddyField_buddyName": "Name",
   "enum_buddyField_email": "Email",
   "enum_buddyField_phone": "Phone",
@@ -16459,6 +16672,8 @@
   "enum_buddyField_certificationAgency_short": "Agency",
   "enum_buddyField_diveCount_short": "Dives",
   "enum_buddyField_notes_short": "Notes",
+  "enum_buddyField_lastDive": "Last Dive",
+  "enum_buddyField_lastDive_short": "Last dive",
   "enum_tripField_tripName": "Name",
   "enum_tripField_startDate": "Start Date",
   "enum_tripField_endDate": "End Date",
@@ -18078,7 +18293,7 @@
   "divePlanner_quickPlan_previewBottomTime": "Bottom time: {minutes} min",
   "divePlanner_quickPlan_previewAscent": "Ascent with safety stop",
   "divePlanner_quickPlan_create": "Create",
-  "divePlanner_semantics_sacRate": "SAC Rate: {value} {volumeSymbol} per minute",
+  "divePlanner_semantics_sacRate": "RMV: {value} {volumeSymbol} per minute",
   "divePlanner_semantics_reservePressure": "Reserve pressure in {pressureSymbol}",
   "divePlanner_semantics_altitudeGroup": "Altitude group: {group}",
   "diveSites_import_detail_maxDepth": "Max {depth}",
@@ -18786,5 +19001,6 @@
   "@settings_dataSources_appleHealth_dataTypeDepth": {"description": "HealthKit data type disclosure: underwater depth."},
   "@settings_dataSources_appleHealth_dataTypeWaterTemp": {"description": "HealthKit data type disclosure: water temperature."},
   "@settings_dataSources_appleHealth_permissionManagedInHealth": {"description": "Permission row shown when the platform will not disclose read access."},
-  "@settings_dataSources_appleHealth_permissionUnsupported": {"description": "Permission row shown when HealthKit is unavailable on this device."}
+  "@settings_dataSources_appleHealth_permissionUnsupported": {"description": "Permission row shown when HealthKit is unavailable on this device."},
+  "@diveLog_detail_sacVolumeHint": {"placeholders": {"unit": {"type": "String"}}}
 }

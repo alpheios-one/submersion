@@ -11,6 +11,7 @@ import 'package:submersion/features/dive_3d/application/site_seascape_providers.
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
+import 'package:submersion/features/dive_3d/presentation/renderer/hover_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
@@ -128,10 +129,9 @@ void main() {
     expect(viewport.axisLabels, isNotNull);
     expect(viewport.chromeStyle, isNotNull);
     // Hover inspection: pick lattice + notifier wired, tissue chrome not.
-    expect(viewport.surfaceGrid, isNotNull);
-    expect(viewport.surfaceGrid!.isEmpty, isFalse);
+    expect(viewport.picker, isA<GridHoverPicker>());
     expect(viewport.hoverPick, isNotNull);
-    expect(viewport.axisChromeOnly, isTrue);
+    expect(viewport.chromeMode, SceneChromeMode.axesOnly);
   });
 
   testWidgets('contours default on, chip toggles them off', (tester) async {

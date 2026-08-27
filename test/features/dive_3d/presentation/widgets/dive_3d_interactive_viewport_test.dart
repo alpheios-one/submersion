@@ -11,6 +11,9 @@ import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/scene_geometry_service.dart';
 import 'package:submersion/features/dive_3d/domain/tissue/subsurface_tissue_builder.dart';
 import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_picker.dart';
+import 'package:submersion/features/dive_3d/domain/geometry/dive_axes.dart';
+import 'package:submersion/features/dive_3d/presentation/renderer/camera_pose.dart';
+import 'package:submersion/features/dive_3d/presentation/renderer/hover_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/renderer/preview_painter.dart';
 import 'package:submersion/features/dive_3d/presentation/renderer/scene_projector.dart';
 import 'package:submersion/features/dive_3d/presentation/renderer/tissue_chrome_painters.dart';
@@ -75,7 +78,8 @@ void main() {
     bool chartMode = false,
     AxisFrame? axisFrame,
     TissueChromeStyle? chromeStyle,
-    bool axisChromeOnly = false,
+    SceneChromeMode chromeMode = SceneChromeMode.none,
+    bool showPosePresets = false,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -91,7 +95,8 @@ void main() {
             chartMode: chartMode,
             axisFrame: axisFrame,
             chromeStyle: chromeStyle,
-            axisChromeOnly: axisChromeOnly,
+            chromeMode: chromeMode,
+            showPosePresets: showPosePresets,
           ),
         ),
       ),
@@ -116,7 +121,7 @@ void main() {
       tester,
       scene: buildScene(),
       chartMode: true,
-      axisChromeOnly: true,
+      chromeMode: SceneChromeMode.axesOnly,
       axisFrame: const AxisFrame([]),
       chromeStyle: style,
     );
@@ -378,7 +383,7 @@ void main() {
       colorFn: thermalColor,
     );
     final frame = AxisFrame.build(result.scene.bounds, referenceY: 3.0);
-    final hoverPick = ValueNotifier<TissuePick?>(null);
+    final hoverPick = ValueNotifier<ScenePick?>(null);
     const style = TissueChromeStyle(
       axisX: Color(0xFFFFB300),
       axisY: Color(0xFF66BB6A),
@@ -403,6 +408,8 @@ void main() {
                 scene: result.scene,
                 scrubPosition: ValueNotifier<double>(0),
                 visibleOverlays: const {},
+                chromeMode: SceneChromeMode.tissue,
+                picker: GridHoverPicker(result.grid),
                 surfaceGrid: result.grid,
                 axisFrame: frame,
                 chromeStyle: style,
@@ -429,8 +436,9 @@ void main() {
     await tester.pump();
 
     expect(hoverPick.value, isNotNull);
-    expect(hoverPick.value!.col, col);
-    expect(hoverPick.value!.comp, comp);
+    final tissue = hoverPick.value!.payload as TissuePick;
+    expect(tissue.col, col);
+    expect(tissue.comp, comp);
   });
 
   testWidgets('published pick screenPos tracks the vertex after panning', (
@@ -445,7 +453,7 @@ void main() {
       colorFn: thermalColor,
     );
     final frame = AxisFrame.build(result.scene.bounds, referenceY: 3.0);
-    final hoverPick = ValueNotifier<TissuePick?>(null);
+    final hoverPick = ValueNotifier<ScenePick?>(null);
     const style = TissueChromeStyle(
       axisX: Color(0xFFFFB300),
       axisY: Color(0xFF66BB6A),
@@ -469,6 +477,8 @@ void main() {
                 scene: result.scene,
                 scrubPosition: ValueNotifier<double>(0),
                 visibleOverlays: const {},
+                chromeMode: SceneChromeMode.tissue,
+                picker: GridHoverPicker(result.grid),
                 surfaceGrid: result.grid,
                 axisFrame: frame,
                 chromeStyle: style,
@@ -515,8 +525,9 @@ void main() {
     await tester.pump();
 
     expect(hoverPick.value, isNotNull);
-    expect(hoverPick.value!.col, col);
-    expect(hoverPick.value!.comp, comp);
+    final tissue = hoverPick.value!.payload as TissuePick;
+    expect(tissue.col, col);
+    expect(tissue.comp, comp);
     // screenPos is in viewport-local space, i.e. on the visual vertex, not the
     // untranslated projection (this is the pan-drift fix).
     expect((hoverPick.value!.screenPos - visualLocal).distance, lessThan(1.0));
@@ -534,7 +545,7 @@ void main() {
       colorFn: thermalColor,
     );
     final frame = AxisFrame.build(result.scene.bounds, referenceY: 3.0);
-    final hoverPick = ValueNotifier<TissuePick?>(null);
+    final hoverPick = ValueNotifier<ScenePick?>(null);
     const style = TissueChromeStyle(
       axisX: Color(0xFFFFB300),
       axisY: Color(0xFF66BB6A),
@@ -558,6 +569,8 @@ void main() {
                 scene: result.scene,
                 scrubPosition: ValueNotifier<double>(0),
                 visibleOverlays: const {},
+                chromeMode: SceneChromeMode.tissue,
+                picker: GridHoverPicker(result.grid),
                 surfaceGrid: result.grid,
                 axisFrame: frame,
                 chromeStyle: style,
@@ -597,13 +610,118 @@ void main() {
       zoom: newZoom,
     );
     final expected = projZoomed.project(x, y, z); // pan is zero here
-    expect(hoverPick.value!.col, col);
-    expect(hoverPick.value!.comp, comp);
+    final tissue = hoverPick.value!.payload as TissuePick;
+    expect(tissue.col, col);
+    expect(tissue.comp, comp);
     expect((hoverPick.value!.screenPos - expected).distance, lessThan(1.0));
     // And it genuinely moved (an off-center vertex re-projects under zoom).
     expect(
       (hoverPick.value!.screenPos - screenPosBefore).distance,
       greaterThan(1.0),
     );
+  });
+
+  testWidgets('framed mode paints the frame behind and axis chrome in front', (
+    tester,
+  ) async {
+    final scene = buildScene();
+    final axes = buildDiveAxes(
+      bounds: scene.bounds,
+      depthTicks: depthAxisTicks(
+        maxDepthMeters: 18,
+        stepMeters: 10,
+        toDisplay: (m) => m,
+      ),
+      timeTicks: timeAxisTicks(120),
+      depthTitle: 'Depth (m)',
+      timeTitle: 'Run time (min)',
+    );
+    const style = TissueChromeStyle(
+      axisX: Color(0xFFFFFFFF),
+      axisY: Color(0xFFFFFFFF),
+      axisZ: Color(0xFFFFFFFF),
+      grid: Color(0x33FFFFFF),
+      wireframe: Color(0x00000000),
+      marker: Color(0xFFFFFFFF),
+      markerOutline: Color(0xFF000000),
+      label: Color(0xFFFFFFFF),
+    );
+    final hoverPick = ValueNotifier<ScenePick?>(null);
+    addTearDown(hoverPick.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: Dive3dInteractiveViewport(
+            scene: scene,
+            scrubPosition: ValueNotifier<double>(0),
+            visibleOverlays: SceneOverlay.values.toSet(),
+            chromeMode: SceneChromeMode.framed,
+            axisFrame: axes.frame,
+            axisLabels: axes.labels,
+            chromeStyle: style,
+            picker: PathHoverPicker(scene.scrubPath!),
+            hoverPick: hoverPick,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    final paints = tester.widgetList<CustomPaint>(
+      find.descendant(
+        of: find.byType(Dive3dInteractiveViewport),
+        matching: find.byType(CustomPaint),
+      ),
+    );
+    expect(
+      paints.map((p) => p.painter).whereType<TissueFramePainter>(),
+      hasLength(1),
+    );
+    final chrome = paints
+        .map((p) => p.foregroundPainter)
+        .whereType<AxisChromePainter>()
+        .single;
+    expect(chrome.hoverGuides, isTrue);
+    expect(chrome.showCompass, isFalse);
+    expect(chrome.markerLabels, isNotNull);
+    // Hovering the middle path sample publishes a PathPick.
+    final viewportFinder = find.byType(Dive3dInteractiveViewport);
+    final projector = SceneProjector(
+      size: tester.getSize(viewportFinder),
+      bounds: scene.bounds,
+    );
+    final path = scene.scrubPath!;
+    final origin = tester.getTopLeft(viewportFinder);
+    final target =
+        origin + projector.project(path.xs[1], path.ys[1], path.zs![1]);
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: Offset.zero);
+    addTearDown(mouse.removePointer);
+    await mouse.moveTo(target);
+    await tester.pump();
+    expect((hoverPick.value!.payload as PathPick).index, 1);
+  });
+
+  testWidgets('pose presets snap the camera and reset returns to default', (
+    tester,
+  ) async {
+    await pumpViewport(tester, scene: buildScene(), showPosePresets: true);
+    final menuFinder = find.byKey(const ValueKey('dive3dPoseMenu'));
+    expect(menuFinder, findsOneWidget);
+    // Drive the selection directly: the popup's placement on the small test
+    // surface is Flutter's concern, the camera plumbing is ours.
+    tester.widget<PopupMenuButton<CameraPose>>(menuFinder).onSelected!(
+      CameraPose.side,
+    );
+    await tester.pump();
+    var painter = scenePainterOf(tester);
+    expect(painter.yawDegrees, CameraPose.side.yawDegrees);
+    expect(painter.pitchDegrees, CameraPose.side.pitchDegrees);
+    await tester.tap(find.byIcon(Icons.center_focus_strong));
+    await tester.pump();
+    painter = scenePainterOf(tester);
+    expect(painter.yawDegrees, -32);
+    expect(painter.pitchDegrees, 22);
   });
 }

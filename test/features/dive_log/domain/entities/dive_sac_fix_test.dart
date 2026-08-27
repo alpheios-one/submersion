@@ -36,6 +36,7 @@ const _singleTank = DiveTank(
 );
 
 void main() {
+  sacReferenceTankTests();
   // ─────────────────────────────────────────────────────────────────────────
   // Dive.sac (L/min at surface)
   // ─────────────────────────────────────────────────────────────────────────
@@ -411,6 +412,36 @@ void main() {
       // Verifies runtime (70 min) is used, not bottomTime (50 min)
       // With bottomTime: 95 / 50 / 2.5 = 0.76 (the old buggy value)
       expect(dive.sacPressure!, closeTo(0.543, 0.05));
+    });
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Dive.sacReferenceTank (the cylinder the pressure lane reads)
+// ─────────────────────────────────────────────────────────────────────────
+void sacReferenceTankTests() {
+  group('Dive.sacReferenceTank', () {
+    const backGas = DiveTank(id: 'bg', role: TankRole.backGas);
+    const stage = DiveTank(id: 'st', role: TankRole.stage, volume: 11.1);
+
+    test('is null with no cylinders', () {
+      expect(_sacDive().sacReferenceTank, isNull);
+    });
+
+    test('is the only cylinder on a single-tank dive, whatever its role', () {
+      expect(_sacDive(tanks: const [stage]).sacReferenceTank?.id, 'st');
+    });
+
+    test('is the back gas on a multi-tank dive even when listed later', () {
+      expect(
+        _sacDive(tanks: const [stage, backGas]).sacReferenceTank?.id,
+        'bg',
+      );
+    });
+
+    test('falls back to the first cylinder when none is back gas', () {
+      const deco = DiveTank(id: 'dc', role: TankRole.deco);
+      expect(_sacDive(tanks: const [stage, deco]).sacReferenceTank?.id, 'st');
     });
   });
 }

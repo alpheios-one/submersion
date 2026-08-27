@@ -17,6 +17,10 @@ import 'package:submersion/features/dive_computer/domain/services/first_sync_cut
 import 'package:submersion/features/dive_computer/presentation/providers/discovery_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
+import 'package:submersion/features/tank_presets/domain/services/default_tank_preset_resolver.dart';
+import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 
 /// Provider for the dive computer repository.
 final diveComputerRepositoryProvider = Provider<DiveComputerRepository>((ref) {
@@ -31,8 +35,24 @@ final diveImportServiceProvider = Provider<DiveImportService>((ref) {
     repository: repository,
     diveRepository: diveRepository,
     gpsTrackMatchService: ref.watch(gpsTrackMatchServiceProvider),
+    // Read at import time, not provider build time, so a toggle flipped in
+    // Settings applies to the very next download (issue #386).
+    defaultTankPresetForImports: () => loadDefaultTankPresetForDownloads(ref),
   );
 });
+
+/// The default tank preset to fill downloaded cylinders with, or null when
+/// the diver has not opted in ("Also apply to imported dives" off) or the
+/// configured preset no longer exists.
+@visibleForTesting
+Future<TankPresetEntity?> loadDefaultTankPresetForDownloads(Ref ref) async {
+  final settings = ref.read(settingsProvider);
+  if (!settings.applyDefaultTankToImports) return null;
+  final resolver = DefaultTankPresetResolver(
+    repository: ref.read(tankPresetRepositoryProvider),
+  );
+  return resolver.resolve(settings.defaultTankPreset);
+}
 
 /// Stream provider for download events from the service.
 final downloadEventsProvider = StreamProvider<pigeon.DownloadEvent>((ref) {

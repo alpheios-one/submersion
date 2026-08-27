@@ -27,9 +27,10 @@ import 'package:submersion/features/buddies/data/repositories/buddy_repository.d
 import 'package:submersion/features/buddies/domain/constants/buddy_field.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
+import 'package:submersion/features/buddies/presentation/widgets/buddy_list_tile.dart';
+import 'package:submersion/features/buddies/presentation/widgets/compact_buddy_list_tile.dart';
 import 'package:submersion/features/buddies/presentation/widgets/dense_buddy_list_tile.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
-import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/widgets/debounced_search_results.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
 
@@ -614,14 +615,8 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
         final settings = ref.watch(settingsProvider);
         final units = UnitFormatter(settings);
 
-        // Convert BuddyWithDiveCount (class) to BuddyWithCount (record) as
-        // required by BuddyFieldAdapter.
-        final buddyRecords = buddies
-            .map((b) => (buddy: b.buddy, diveCount: b.diveCount))
-            .toList();
-
         return EntityTableView<BuddyWithCount, BuddyField>(
-          entities: buddyRecords,
+          entities: buddies,
           idExtractor: (b) => b.buddy.id,
           adapter: BuddyFieldAdapter.instance,
           config: config,
@@ -644,7 +639,7 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
           onEntityTap: (id) {
             // Table mode honours modifier and shift clicks too, so selection
             // works the same way as in the list view modes.
-            final orderedIds = buddyRecords.map((b) => b.buddy.id).toList();
+            final orderedIds = buddies.map((b) => b.buddy.id).toList();
             if (SelectableListScope.isShiftPressed()) {
               _selectRangeTo(id, orderedIds);
             } else if (SelectableListScope.isModifierPressed()) {
@@ -836,12 +831,18 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
           final isChecked = _selectedIds.contains(buddy.id);
           final viewMode = ref.watch(buddyListViewModeProvider);
           return switch (viewMode) {
-            ListViewMode.detailed || ListViewMode.compact => BuddyListTile(
-              buddy: buddy,
-              diveCount: buddyWithCount.diveCount,
+            ListViewMode.detailed => BuddyListTile(
+              entry: buddyWithCount,
               isSelected: isSelected,
               isChecked: isChecked,
               isSelectionMode: _isSelectionMode,
+              onTap: () => _handleRowTap(buddy.id, buddies),
+            ),
+            ListViewMode.compact => CompactBuddyListTile(
+              entry: buddyWithCount,
+              isSelectionMode: _isSelectionMode,
+              isSelected: isChecked,
+              isHighlighted: !_isSelectionMode && isHighlighted,
               onTap: () => _handleRowTap(buddy.id, buddies),
             ),
             ListViewMode.dense || ListViewMode.table => DenseBuddyListTile(
@@ -918,107 +919,6 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
   }
 }
 
-/// List item widget for displaying a buddy
-class BuddyListTile extends StatelessWidget {
-  final Buddy buddy;
-  final int? diveCount;
-  final bool isSelected;
-  final bool isChecked;
-  final bool isSelectionMode;
-  final VoidCallback? onTap;
-
-  const BuddyListTile({
-    super.key,
-    required this.buddy,
-    this.diveCount,
-    this.isSelected = false,
-    this.isChecked = false,
-    this.isSelectionMode = false,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      color: isChecked
-          ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
-          : isSelected
-          ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
-          : null,
-      child: ListTile(
-        onTap: onTap,
-        leading: SizedBox(
-          width: 40,
-          height: 40,
-          child: Center(
-            child: SelectionLeading(
-              isSelectionMode: isSelectionMode,
-              isChecked: isChecked,
-              onChanged: (_) => onTap?.call(),
-              child: CircleAvatar(
-                backgroundColor: theme.colorScheme.primaryContainer,
-                backgroundImage: buddy.photoPath != null
-                    ? AssetImage(buddy.photoPath!)
-                    : null,
-                child: buddy.photoPath == null
-                    ? Text(
-                        buddy.initials,
-                        style: TextStyle(
-                          color: theme.colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    : null,
-              ),
-            ),
-          ),
-        ),
-        title: Text(buddy.name),
-        subtitle: _buildSubtitle(context),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (diveCount != null)
-              Text(
-                context.l10n.buddies_label_diveCount(diveCount!),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            if (diveCount != null) const SizedBox(width: 8),
-            ExcludeSemantics(
-              child: Icon(
-                Icons.chevron_right,
-                color: theme.colorScheme.outline,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget? _buildSubtitle(BuildContext context) {
-    final parts = <String>[];
-
-    if (buddy.certificationLevel != null) {
-      parts.add(buddy.certificationLevel!.displayName);
-    }
-    if (buddy.certificationAgency != null) {
-      parts.add(buddy.certificationAgency!.displayName);
-    }
-
-    if (parts.isEmpty) {
-      return null;
-    }
-
-    return Text(parts.join(' - '));
-  }
-}
-
 /// Search delegate for buddies
 class BuddySearchDelegate extends SearchDelegate<Buddy?> {
   final WidgetRef ref;
@@ -1092,7 +992,7 @@ class BuddySearchDelegate extends SearchDelegate<Buddy?> {
           itemBuilder: (context, index) {
             final buddy = buddies[index];
             return BuddyListTile(
-              buddy: buddy,
+              entry: BuddyWithDiveCount(buddy: buddy, diveCount: 0),
               onTap: () {
                 close(context, buddy);
                 context.push('/buddies/${buddy.id}');

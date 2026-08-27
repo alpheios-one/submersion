@@ -9,6 +9,16 @@
   "settings_units_defaultCurrency": "Standardwährung",
   "settings_units_dialog_defaultCurrency": "Standardwährung",
   "diveSites_list_menu_select": "Tauchplätze auswählen",
+  "diveSites_list_menu_fillLocationDetails": "Fehlende Ortsangaben ergänzen",
+  "diveSites_backfill_confirm_title": "Fehlende Ortsangaben ergänzen?",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 Tauchplatz mit Koordinaten hat kein Land, keine Region, keinen Ort oder kein Gewässer.} other{{count} Tauchplätze mit Koordinaten haben kein Land, keine Region, keinen Ort oder kein Gewässer.}} Submersion sucht jeden auf OpenStreetMap und füllt nur die leeren Felder aus. Das dauert etwa {minutes, plural, =1{1 Minute} other{{minutes} Minuten}}.",
+  "diveSites_backfill_confirm_start": "Starten",
+  "diveSites_backfill_nothingToFill": "Alle Tauchplätze mit Koordinaten haben bereits ihre Ortsangaben.",
+  "diveSites_backfill_progress_title": "Ortsangaben werden ergänzt",
+  "diveSites_backfill_progress_count": "{done} von {total}",
+  "diveSites_backfill_cancel": "Abbrechen",
+  "diveSites_backfill_summary": "Aktualisiert {updated}, unverändert {unchanged}, fehlgeschlagen {failed}",
+  "diveSites_backfill_offline": "Die Ortssuche ist nicht verfügbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
   "diveLog_edit_flightWindowWarning": "Dieser Tauchgang endet nach der letzten sicheren Auftauchzeit für deinen Flug ({time})",
   "@diveLog_edit_flightWindowWarning": {
     "placeholders": {
@@ -2049,6 +2059,7 @@
   "diveLog_filter_clearAll": "Alle zurücksetzen",
   "diveLog_filter_clearDates": "Daten zurücksetzen",
   "diveLog_filter_clearRating": "Bewertungsfilter zurücksetzen",
+  "diveLog_filter_clearWeekdays": "Wochentage zurücksetzen",
   "diveLog_filter_dateSeparator": "bis",
   "diveLog_filter_endDate": "Enddatum",
   "diveLog_filter_errorLoadingSites": "Fehler beim Laden der Tauchplätze",
@@ -2074,6 +2085,7 @@
   "diveLog_filter_sectionGasMix": "Gasgemisch (O₂%)",
   "diveLog_filter_sectionMinRating": "Mindestbewertung",
   "diveLog_filter_sectionTags": "Tags",
+  "diveLog_filter_sectionWeekdays": "Wochentage",
   "diveLog_filter_showOnlyFavorites": "Nur Favoriten anzeigen",
   "diveLog_filter_showOnlyNoBuddy": "Nur Tauchgänge ohne Buddy anzeigen",
   "diveLog_filter_startDate": "Startdatum",
@@ -2365,7 +2377,9 @@
   "diveLog_search_errorLoadingCenters": "Fehler beim Laden der Tauchbasen",
   "diveLog_search_errorLoadingDiveTypes": "Fehler beim Laden der Tauchgangstypen",
   "diveLog_search_errorLoadingTrips": "Fehler beim Laden der Reisen",
+  "diveLog_search_filter_any": "Beliebig",
   "diveLog_search_gasTrimix": "Trimix (<21% O₂)",
+  "diveLog_search_label_deco": "Dekompression",
   "diveLog_search_label_depthRange": "Tiefenbereich (m)",
   "diveLog_search_label_diveCenter": "Tauchbasis",
   "diveLog_search_label_diveSite": "Tauchplatz",
@@ -2727,7 +2741,7 @@
   "diveSites_similarSite_useHint": "Ähnelt vorhandenem Tauchplatz „{siteName}“. Zum Verwenden tippen.",
   "diveSites_similarSite_warning": "Ein ähnlicher Tauchplatz existiert bereits: „{siteName}“",
   "diveSites_edit_gps_gettingLocation": "Wird ermittelt...",
-  "diveSites_edit_gps_helperText": "Wählen Sie eine Standortmethode - Koordinaten füllen Land und Region automatisch aus",
+  "diveSites_edit_gps_helperText": "Wählen Sie eine Standortmethode oder suchen Sie die Koordinaten, um Land, Region, Ort und Gewässer automatisch auszufüllen",
   "diveSites_edit_gps_latitude_hint": "z. B. 21,4225",
   "diveSites_edit_gps_latitude_label": "Breitengrad",
   "diveSites_edit_gps_latitude_validation": "Ungültiger Breitengrad",
@@ -2735,6 +2749,13 @@
   "diveSites_edit_gps_longitude_label": "Längengrad",
   "diveSites_edit_gps_longitude_validation": "Ungültiger Längengrad",
   "diveSites_edit_gps_pickFromMap": "Auf Karte auswählen",
+  "diveSites_edit_gps_lookupFromCoordinates": "Aus Koordinaten ermitteln",
+  "diveSites_edit_snackbar_lookupNothingFound": "Keine Ortsangaben für diese Koordinaten gefunden",
+  "diveSites_edit_snackbar_lookupFailed": "Ortssuche fehlgeschlagen. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+  "diveSites_edit_lookupReplace_title": "Ortsangaben ersetzen?",
+  "diveSites_edit_lookupReplace_body": "Die Suche hat für diese Felder andere Werte gefunden:",
+  "diveSites_edit_lookupReplace_replace": "Ersetzen",
+  "diveSites_edit_lookupReplace_keep": "Behalten",
   "diveSites_edit_gps_useMyLocation": "Meinen Standort verwenden",
   "diveSites_edit_hazards_helperText": "Listen Sie alle Gefahren oder Sicherheitshinweise auf",
   "diveSites_edit_hazards_hint": "z. B. Starke Strömungen, Bootsverkehr, Quallen, scharfe Korallen",
@@ -3781,6 +3802,9 @@
   "gpsLogger_startButton": "Aufzeichnung starten",
   "gpsLogger_stopButton": "Aufzeichnung beenden",
   "gpsLogger_stripStatus": "GPS-Track wird aufgezeichnet · {count, plural, one{{count} Punkt} other{{count} Punkte}}",
+  "gpsLogger_summary_tracks": "Tracks",
+  "gpsLogger_summary_recordedTime": "Aufgezeichnete Zeit",
+  "gpsLogger_summary_divesCovered": "Erfasste Tauchgänge",
   "gpsLogger_trackSubtitle": "{count, plural, one{{count} Punkt} other{{count} Punkte}}, {duration}",
   "gpsLogger_trackSubtitleTrimmed": "Gekürzt, {duration}",
   "gpsLogger_tracksHeader": "Aufgezeichnete Tracks",
@@ -4066,6 +4090,37 @@
   "media_photoPicker_thumbnailAlreadyLinkedLabel": "Foto bereits mit diesem Tauchgang verknüpft",
   "media_photoPicker_thumbnailToggleLabel": "Auswahl für Foto umschalten",
   "media_photoPicker_thumbnailToggleSelectedLabel": "Auswahl für Foto umschalten, ausgewählt",
+  "media_photoPicker_files_pickFilesButton": "Dateien auswählen…",
+  "media_photoPicker_files_pickFolderButton": "Ordner auswählen…",
+  "media_photoPicker_files_autoMatchLabel": "Fotos und Videos automatisch nach Datum den Tauchgängen zuordnen",
+  "media_photoPicker_files_emptyHint": "Wähle Dateien oder einen Ordner aus, um zu beginnen.",
+  "media_photoPicker_files_linkButton": "{count, plural, =1{1 Element verknüpfen} other{{count} Elemente verknüpfen}}",
+  "media_photoPicker_files_attachToSiteButton": "{count, plural, =1{1 Element diesem Tauchplatz zuordnen} other{{count} Elemente diesem Tauchplatz zuordnen}}",
+  "media_photoPicker_files_summary": "{fileCount, plural, =1{1 Datei} other{{fileCount} Dateien}}, {diveCount, plural, =1{1 Tauchgang} other{{diveCount} Tauchgänge}}, {unmatchedCount} nicht zugeordnet",
+  "media_photoPicker_files_itemCount": "{count, plural, =1{1 Element} other{{count} Elemente}}",
+  "media_photoPicker_files_diveGroupTitle": "Tauchgang {diveId}",
+  "media_photoPicker_files_groupCount": "{count, plural, =1{1 Datei} other{{count} Dateien}}",
+  "media_photoPicker_files_unmatchedGroupTitle": "Nicht zugeordnet",
+  "media_photoPicker_files_addAllToDive": "{count, plural, =1{1 zu diesem Tauchgang hinzufügen} other{Alle {count} zu diesem Tauchgang hinzufügen}}",
+  "media_photoPicker_files_addToDiveTooltip": "Zu diesem Tauchgang hinzufügen",
+  "media_photoPicker_files_chooseDiveTooltip": "Tauchgang auswählen",
+  "media_photoPicker_files_removeTooltip": "Aus der Auswahl entfernen",
+  "media_photoPicker_files_sourceExif": "aus EXIF",
+  "media_photoPicker_files_sourceContainer": "aus Dateimetadaten",
+  "media_photoPicker_files_sourceFileDate": "aus Dateidatum",
+  "media_photoPicker_files_sourceNone": "kein Datum gefunden",
+  "media_photoPicker_files_shiftedTime": "{shifted} (war {original})",
+  "media_photoPicker_files_reasonNoTimestamp": "Keine Aufnahmezeit lesbar",
+  "media_photoPicker_files_reasonBeforeDive": "{gap} vor dem nächsten Tauchgang",
+  "media_photoPicker_files_reasonAfterDive": "{gap} nach dem nächsten Tauchgang",
+  "media_photoPicker_files_reasonNoDives": "Keine Tauchgänge zum Abgleichen",
+  "media_photoPicker_files_offsetLabel": "Aufnahmezeiten verschieben um",
+  "media_photoPicker_files_offsetResetTooltip": "Verschiebung zurücksetzen",
+  "media_photoPicker_files_offsetBackTooltip": "Um {amount} früher verschieben",
+  "media_photoPicker_files_offsetForwardTooltip": "Um {amount} später verschieben",
+  "media_photoPicker_files_linkedCount": "{count, plural, =1{1 Element verknüpft} other{{count} Elemente verknüpft}}",
+  "media_photoPicker_files_attachedToSiteCount": "{count, plural, =1{1 Element diesem Tauchplatz zugeordnet} other{{count} Elemente diesem Tauchplatz zugeordnet}}",
+  "media_photoPicker_files_undo": "Rückgängig",
   "media_perdixOverlay_labelCns": "CNS",
   "media_perdixOverlay_labelDepth": "TIEFE",
   "media_perdixOverlay_labelGas": "GAS",
@@ -5948,6 +6003,10 @@
   "universalImport_triage_noneImportable": "Keine der ausgewählten Dateien kann importiert werden.",
   "universalImport_review_inBatchDuplicate": "Duplikat eines anderen Tauchgangs in diesem Import-Stapel.",
   "universalImport_summary_filesTitle": "Dateien",
+  "universalImport_summary_noticesTitle": "Nicht in der Datei",
+  "universalImport_summary_noticeNoTankPressureTitle": "Flaschendruck nicht aufgezeichnet",
+  "universalImport_summary_noticeNoTankPressureBody": "Luftverbrauch und AMV können nicht berechnet werden. Anfangs- und Enddruck lassen sich beim Bearbeiten des Tauchgangs ergänzen.",
+  "universalImport_summary_noticeAffectedDives": "{count, plural, =1{Betrifft 1 Tauchgang} other{Betrifft {count} Tauchgänge}}",
   "universalImport_summary_fileImported": "{count, plural, =1{1 Tauchgang importiert} other{{count} Tauchgänge importiert}}",
   "universalImport_summary_fileNeedsIndividualImport": "Muss einzeln importiert werden",
   "universalImport_summary_fileUnsupported": "Nicht unterstütztes Format",
@@ -6768,6 +6827,20 @@
   "@dive3d_metric_heartRate": {},
   "dive3d_metric_tankPressure": "Druck",
   "@dive3d_metric_tankPressure": {},
+  "dive3d_zAxis": "Z-Achse",
+  "dive3d_zAxis_none": "Keine",
+  "dive3d_overlay_shadows": "Wandschatten",
+  "dive3d_metric_tts": "TTS",
+  "dive3d_axis_depth": "Tiefe ({unitSymbol})",
+  "dive3d_axis_time": "Laufzeit (min)",
+  "dive3d_pose_menu": "Kamera",
+  "dive3d_pose_default": "Standardansicht",
+  "dive3d_pose_front": "Vorne (Tiefe vs. Zeit)",
+  "dive3d_pose_side": "Seite (Tiefe vs. Messwert)",
+  "dive3d_pose_top": "Oben (Messwert vs. Zeit)",
+  "dive3d_readout_runTime": "Laufzeit",
+  "dive3d_readout_ceiling": "Ceiling",
+  "dive3d_readout_tank": "Flasche {n}",
   "dive3d_scene_dive": "Tauchgang",
   "@dive3d_scene_dive": {},
   "dive3d_scene_tissue": "Gewebe",
@@ -7128,6 +7201,46 @@
   },
   "safetyReview_dismiss": "Ausblenden",
   "safetyReview_restore": "Wiederherstellen",
+  "safetyReview_dismissAll": "Alle ausblenden",
+  "safetyReview_restoreAll": "Alle wiederherstellen",
+  "safetySettings_dismissAll": "Alle Beobachtungen ausblenden",
+  "safetySettings_dismissAll_subtitle": "Alle Beobachtungen in diesem Logbuch als geprüft markieren",
+  "safetySettings_dismissAll_confirmTitle": "Alle Beobachtungen ausblenden?",
+  "safetySettings_dismissAll_confirmBody": "Jede Beobachtung zu jedem analysierten Tauchgang wird als geprüft markiert. Du kannst sie im Abschnitt Sicherheitsüberprüfung eines Tauchgangs einzeln wiederherstellen.",
+  "safetySettings_dismissAll_confirm": "Alle ausblenden",
+  "safetySettings_dismissAll_cancel": "Abbrechen",
+  "safetySettings_dismissAll_progress": "{done} von {total} Tauchgängen geprüft",
+  "@safetySettings_dismissAll_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_done": "{count, plural, =0{Keine Beobachtungen zum Ausblenden} =1{1 Beobachtung ausgeblendet} other{{count} Beobachtungen ausgeblendet}}",
+  "@safetySettings_dismissAll_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{Keine Beobachtungen ausgeblendet} =1{1 Beobachtung ausgeblendet} other{{count} Beobachtungen ausgeblendet}}, {failed, plural, =1{1 Tauchgang konnte nicht aktualisiert werden} other{{failed} Tauchgänge konnten nicht aktualisiert werden}}",
+  "@safetySettings_dismissAll_doneWithErrors": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    },
+    "failed": {
+      "type": "int"
+    }
+  }
+},
+  "safetySettings_dismissAll_failed": "Die Tauchgangsliste konnte nicht gelesen werden. Es wurde nichts geändert.",
+  "safetySettings_analyzeAll_failed": "Die Tauchgänge konnten nicht analysiert werden.",
   "safetyReview_details": "Details",
   "safetyReview_clearHighlight": "Hervorhebung entfernen",
   "safetyReview_findingGroupSemantics": "{count, plural, =1{1 Sicherheitshinweis} other{{count} Sicherheitshinweise}}",
@@ -7261,6 +7374,7 @@
   },
   "diveLog_detail_altitudeMismatch_title": "Tauchplatz liegt in Höhenlage",
   "diveLog_detail_altitudeMismatch_subtitle": "Für diesen Platz ist eine Höhe hinterlegt, der Tauchgang hat jedoch keine, daher ging die Deko-Analyse von Meereshöhe aus. Höhe des Tauchgangs setzen, um dies zu korrigieren.",
+  "diveLog_detail_sacVolumeHint": "Flaschenvolumen eintragen, um den AMV in {unit}/min anzuzeigen",
   "emergencyCard_title": "Notfall",
   "emergencyCard_callDan": "{name} anrufen",
   "@emergencyCard_callDan": {
@@ -7321,6 +7435,35 @@
     "placeholders": {
       "date": {
         "type": "String"
+      }
+    }
+  },
+  "emergencyCard_chambersNearby": "Nächstgelegene Druckkammern",
+  "emergencyCard_chamberViewAll": "Alle {count} Druckkammern anzeigen",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "Keine Druckkammer in Reichweite gelistet. Rufen Sie die Notfall-Hotline für Taucher an: Sie vermittelt Ihnen die nächste Einrichtung, die Sie behandeln kann.",
+  "emergencyCard_chamberCapability_divingEmergency": "Behandelt Tauchunfälle",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "Klinische Druckkammer",
+  "emergencyCard_chamberCapability_elective": "Nur elektive Therapie",
+  "emergencyCard_chamberCapability_unknown": "Leistungsumfang unbestätigt",
+  "emergencyCard_chamberAvailability_h24": "24 Std.",
+  "emergencyCard_chamberAvailability_onCall": "Rufbereitschaft",
+  "emergencyCard_chamberAvailability_businessHours": "Geschäftszeiten",
+  "emergencyCard_chamberUnverified": "Nicht mit der Einrichtung bestätigt",
+  "chambersDirectory_title": "Druckkammern",
+  "chambersDirectory_search": "Nach Name, Stadt oder Land suchen",
+  "chambersDirectory_empty": "Keine Druckkammer entspricht dieser Suche.",
+  "chambersDirectory_count": "{count, plural, =1{1 Druckkammer} other{{count} Druckkammern}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   },
@@ -7601,6 +7744,8 @@
   "visibility_range_under": "unter {max} {unit}",
   "settings_coordinateFormat_title": "Koordinatenformat",
   "settings_coordinateFormat_subtitle": "Wie GPS-Positionen angezeigt und eingegeben werden",
+  "settings_placeNameLanguage_title": "Sprache der Ortsnamen",
+  "settings_placeNameLanguage_subtitle": "Wird verwendet, wenn Land, Region, Ort und Gewässer aus Koordinaten ermittelt werden. Bestehende Tauchplätze werden nicht geändert.",
   "settings_coordinateFormat_decimalDegrees": "Dezimalgrad",
   "settings_coordinateFormat_degreesDecimalMinutes": "Grad und Dezimalminuten",
   "settings_coordinateFormat_degreesMinutesSeconds": "Grad, Minuten, Sekunden",
@@ -7794,6 +7939,12 @@
   "enum_siteField_notes_short": "Notizen",
   "enum_siteField_latitude_short": "Breite",
   "enum_siteField_longitude_short": "Länge",
+  "enum_siteField_depthRange": "Tiefenbereich",
+  "enum_siteField_depthRange_short": "Tiefe",
+  "enum_siteField_lastDived": "Zuletzt getaucht",
+  "enum_siteField_lastDived_short": "Zuletzt",
+  "enum_siteField_maxDepthReached": "Deine max. Tiefe",
+  "enum_siteField_maxDepthReached_short": "Dein Max.",
   "enum_buddyField_buddyName": "Name",
   "enum_buddyField_email": "E-Mail",
   "enum_buddyField_phone": "Telefon",
@@ -7808,6 +7959,8 @@
   "enum_buddyField_certificationAgency_short": "Verband",
   "enum_buddyField_diveCount_short": "Tauchg.",
   "enum_buddyField_notes_short": "Notizen",
+  "enum_buddyField_lastDive": "Letzter Tauchgang",
+  "enum_buddyField_lastDive_short": "Letzter TG",
   "enum_tripField_tripName": "Name",
   "enum_tripField_startDate": "Startdatum",
   "enum_tripField_endDate": "Enddatum",

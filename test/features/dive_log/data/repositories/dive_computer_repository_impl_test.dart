@@ -846,6 +846,39 @@ void main() {
       expect(tank.o2Percent, 99.0);
     });
 
+    test('persists the preset-derived cylinder attributes', () async {
+      // The default tank preset fills size, rated pressure, material and the
+      // preset label on downloaded cylinders (issue #386); the insert must
+      // carry all four, not just the volume.
+      final computerId = await insertComputer();
+
+      final diveId = await repository.importProfile(
+        computerId: computerId,
+        profileStartTime: DateTime(2026, 5, 3, 10, 0),
+        points: const [ProfilePointData(timestamp: 0, depth: 0.0)],
+        durationSeconds: 1800,
+        maxDepth: 18.0,
+        tanks: const [
+          TankData(
+            index: 0,
+            o2Percent: 21.0,
+            volumeLiters: 11.1,
+            workingPressure: 207.0,
+            material: 'aluminum',
+            presetName: 'al80',
+          ),
+        ],
+      );
+
+      final tank = await (db.select(
+        db.diveTanks,
+      )..where((t) => t.diveId.equals(diveId))).getSingle();
+      expect(tank.volume, 11.1);
+      expect(tank.workingPressure, 207.0);
+      expect(tank.tankMaterial, 'aluminum');
+      expect(tank.presetName, 'al80');
+    });
+
     test('replace-source: links a gas switch by gas mix even when the stored '
         'tank order differs from the parsed cylinder index', () async {
       // Regression for the re-download path: existing cylinders are kept (not

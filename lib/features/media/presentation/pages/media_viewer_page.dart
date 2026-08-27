@@ -11,6 +11,7 @@ import 'package:video_player/video_player.dart';
 
 import 'package:submersion/core/constants/feature_flags.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/share_anchor.dart';
 import 'package:submersion/core/router/section_navigation.dart';
 import 'package:submersion/core/services/lightroom/lightroom_api_client.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -474,7 +475,8 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                     currentIndex: currentIndex,
                     totalCount: mediaList.length,
                     onClose: () => Navigator.of(context).pop(),
-                    onShare: () => _shareCurrentPhoto(currentItem),
+                    onShare: (anchor) =>
+                        _shareCurrentPhoto(currentItem, anchor),
                     onWriteMetadata: () => _writeMetadataToPhoto(currentItem),
                     // The viewer is deliberately NOT popped first: leaving it
                     // on the stack is what lets Back return the user to the
@@ -638,9 +640,9 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
     return LightroomApiClient.assetWebUrl(catalogId, item.remoteAssetId!);
   }
 
-  Future<void> _shareCurrentPhoto(MediaItem item) async {
+  Future<void> _shareCurrentPhoto(MediaItem item, Rect? anchor) async {
     // Shared resolve-and-share flow (also used by the library selection bar).
-    await shareMediaItems(context, ref, [item]);
+    await shareMediaItems(context, ref, [item], anchor: anchor);
   }
 
   void _showError(String message) {
@@ -1325,7 +1327,7 @@ class _TopOverlay extends StatelessWidget {
   final int currentIndex;
   final int totalCount;
   final VoidCallback onClose;
-  final VoidCallback onShare;
+  final void Function(Rect? anchor) onShare;
   final VoidCallback onWriteMetadata;
   final bool hasEnrichment;
 
@@ -1437,10 +1439,15 @@ class _TopOverlay extends StatelessWidget {
                   tooltip: context.l10n.media_info_title,
                   onPressed: () => showMediaInfoSheet(context, item),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.share, color: Colors.white),
-                  tooltip: context.l10n.media_photoViewer_shareTooltip,
-                  onPressed: onShare,
+                // Builder so the iPad share popover anchors to this
+                // button: findRenderObject from a Builder's context descends
+                // to the IconButton rather than yielding the whole overlay.
+                Builder(
+                  builder: (buttonContext) => IconButton(
+                    icon: const Icon(Icons.share, color: Colors.white),
+                    tooltip: context.l10n.media_photoViewer_shareTooltip,
+                    onPressed: () => onShare(shareAnchorFrom(buttonContext)),
+                  ),
                 ),
                 MediaReuploadButton(item: item, color: Colors.white),
               ],

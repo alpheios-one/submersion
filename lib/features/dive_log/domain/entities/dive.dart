@@ -415,6 +415,19 @@ class Dive extends Equatable {
     return totalGasLiters / minutes / avgPressureBar;
   }
 
+  /// The cylinder the pressure lane ([sacPressure]) reads, and the one whose
+  /// volume converts an unattributed SAC segment to L/min: on a multi-tank
+  /// dive the back gas, else the first cylinder; the only cylinder on a
+  /// single-tank dive whatever its role. Null when the dive has no cylinders.
+  DiveTank? get sacReferenceTank {
+    if (tanks.isEmpty) return null;
+    if (tanks.length == 1) return tanks.first;
+    return tanks.firstWhere(
+      (t) => t.role == TankRole.backGas,
+      orElse: () => tanks.first,
+    );
+  }
+
   /// Air consumption rate in pressure units per minute (bar/min or psi/min)
   /// This is a simpler calculation that doesn't require tank volume.
   /// It calculates the average pressure drop per minute adjusted for depth.
@@ -428,17 +441,7 @@ class Dive extends Equatable {
 
     final avgPressureAtm = (avgDepth! / 10) + 1; // Convert depth to ATM
 
-    // For multi-tank dives use back gas only; single-tank dives use that tank.
-    // If no tank has TankRole.backGas, fall back to the first tank.
-    final DiveTank referenceTank;
-    if (tanks.length == 1) {
-      referenceTank = tanks.first;
-    } else {
-      referenceTank = tanks.firstWhere(
-        (t) => t.role == TankRole.backGas,
-        orElse: () => tanks.first,
-      );
-    }
+    final referenceTank = sacReferenceTank!;
 
     if (referenceTank.startPressure == null ||
         referenceTank.endPressure == null) {

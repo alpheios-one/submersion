@@ -556,6 +556,12 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
     // Saving opens the native save panel, which must not be raised while a
     // modal route is up - so that path drops the progress dialog first.
+    //
+    // Every pop below passes rootNavigator: true. showDialog defaults to
+    // useRootNavigator: true, while a bare Navigator.of(context) resolves to
+    // the ShellRoute's navigator; on master-detail layouts that navigator
+    // holds a single route, so a bare pop blanks the screen and strands the
+    // dialog.
     final keepDialogForDelivery = destination == ExportDestination.share;
     var dialogVisible = true;
 
@@ -592,7 +598,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
       if (!keepDialogForDelivery) {
         if (!mounted) return;
-        Navigator.of(context).pop();
+        Navigator.of(context, rootNavigator: true).pop();
         dialogVisible = false;
       }
 
@@ -626,7 +632,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
       if (!mounted) return;
       if (dialogVisible) {
-        Navigator.of(context).pop();
+        Navigator.of(context, rootNavigator: true).pop();
         dialogVisible = false;
       }
       // A null path means the save panel was dismissed - not a failure.
@@ -642,7 +648,9 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       );
     } catch (e) {
       if (mounted) {
-        if (dialogVisible) Navigator.of(context).pop();
+        if (dialogVisible) {
+          Navigator.of(context, rootNavigator: true).pop();
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(context.l10n.diveLog_bulkExport_failed(e.toString())),
