@@ -24,11 +24,6 @@ final tripDayWeatherProvider =
       return repository.getForTrip(tripId);
     });
 
-// no-tick: a side-effecting pass, not a cached query. It renders nothing (the
-// value is void), and subscribing to the weather tick would make every row it
-// writes invalidate the pass that wrote it. Its rows reach the UI through
-// [tripDayWeatherProvider], which does subscribe. A stale read costs nothing:
-// a row it misses is simply not refetched, and a stored day is skipped anyway.
 /// Fills the gaps: fetches historical weather for trip days that have none
 /// stored and no dive to supply it, then writes what it finds.
 ///
@@ -42,6 +37,11 @@ final tripDayWeatherProvider =
 /// with the view means returning to the trip runs the pass again, which skips
 /// the days that succeeded and retries only the ones still missing. While the
 /// view stays mounted the provider stays alive, so scrolling does not refetch.
+// no-tick: a side-effecting pass, not a cached query. It renders nothing (the
+// value is void), and subscribing to the weather tick would make every row it
+// writes invalidate the pass that wrote it. Its rows reach the UI through
+// [tripDayWeatherProvider], which does subscribe. A stale read costs nothing:
+// a row it misses is simply not refetched, and a stored day is skipped anyway.
 final tripDayWeatherBackfillProvider = FutureProvider.autoDispose
     .family<void, String>((ref, tripId) async {
       final story = await ref.watch(tripStoryProvider(tripId).future);

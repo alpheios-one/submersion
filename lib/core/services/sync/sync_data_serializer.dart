@@ -5525,6 +5525,9 @@ class SyncDataSerializer {
   /// old spelling.
   static const Map<String, Map<String, String>> _renamedWireKeys = {
     'serviceRecords': {'serviceType': 'serviceCategory'},
+    // v170: the SAC unit toggle became the gas-consumption display. The value
+    // is remapped in _applyDiverSettingDefaults.
+    'diverSettings': {'sacUnit': 'gasConsumptionDisplay'},
   };
 
   Map<String, dynamic> _withRenamedKeys(
@@ -5630,7 +5633,7 @@ class SyncDataSerializer {
       'volumeUnit': 'liters',
       'weightUnit': 'kilograms',
       'altitudeUnit': 'meters',
-      'sacUnit': 'litersPerMin',
+      'gasConsumptionDisplay': 'both',
       // Issue #828. Added in v155; seed it so a payload from a pre-v155 peer
       // hydrates to the documented default rather than null.
       'gasModel': 'real',
@@ -5768,6 +5771,13 @@ class SyncDataSerializer {
         data['showDepthColoredDiveCards'] == true &&
         !data.containsKey('cardColorAttribute')) {
       merged['cardColorAttribute'] = 'depth';
+    }
+    // A pre-170 peer spells the value as a unit. _withRenamedKeys moved the
+    // key; the value still needs the lane it meant.
+    const legacyLanes = {'litersPerMin': 'rmv', 'pressurePerMin': 'sac'};
+    final display = merged['gasConsumptionDisplay'];
+    if (display is String && legacyLanes.containsKey(display)) {
+      merged['gasConsumptionDisplay'] = legacyLanes[display];
     }
     return merged;
   }
