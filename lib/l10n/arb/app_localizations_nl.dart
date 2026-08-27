@@ -24435,6 +24435,68 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get emergencyCard_chambersNearby => 'Dichtstbijzijnde caissons';
+
+  @override
+  String emergencyCard_chamberViewAll(int count) {
+    return 'Alle $count caissons bekijken';
+  }
+
+  @override
+  String get emergencyCard_chambersNoneNearby =>
+      'Geen caisson binnen bereik. Bel de duikers-noodlijn: zij verwijzen u door naar de dichtstbijzijnde instelling die u kan behandelen.';
+
+  @override
+  String get emergencyCard_chamberCapability_divingEmergency =>
+      'Behandelt duikongevallen';
+
+  @override
+  String get emergencyCard_chamberCapability_hyperbaricUnit =>
+      'Hyperbare afdeling ziekenhuis';
+
+  @override
+  String get emergencyCard_chamberCapability_elective =>
+      'Alleen electieve therapie';
+
+  @override
+  String get emergencyCard_chamberCapability_unknown =>
+      'Mogelijkheden niet bevestigd';
+
+  @override
+  String get emergencyCard_chamberAvailability_h24 => '24 uur';
+
+  @override
+  String get emergencyCard_chamberAvailability_onCall => 'Oproepbaar';
+
+  @override
+  String get emergencyCard_chamberAvailability_businessHours => 'Kantooruren';
+
+  @override
+  String get emergencyCard_chamberUnverified =>
+      'Niet bevestigd bij de instelling';
+
+  @override
+  String get chambersDirectory_title => 'Hyperbare caissons';
+
+  @override
+  String get chambersDirectory_search => 'Zoeken op naam, stad of land';
+
+  @override
+  String get chambersDirectory_empty =>
+      'Geen caisson komt overeen met die zoekopdracht.';
+
+  @override
+  String chambersDirectory_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count caissons',
+      one: '1 caisson',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get emergencyCard_hideChamber => 'Verbergen';
 
   @override

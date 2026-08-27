@@ -7420,6 +7420,35 @@
       }
     }
   },
+  "emergencyCard_chambersNearby": "أقرب غرف الضغط",
+  "emergencyCard_chamberViewAll": "عرض جميع غرف الضغط ({count})",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "لا توجد غرفة ضغط ضمن النطاق. اتصل بخط الطوارئ للغواصين: سيحيلونك إلى أقرب منشأة قادرة على علاجك.",
+  "emergencyCard_chamberCapability_divingEmergency": "يعالج إصابات الغوص",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "وحدة ضغط عالٍ بمستشفى",
+  "emergencyCard_chamberCapability_elective": "علاج مجدول فقط",
+  "emergencyCard_chamberCapability_unknown": "القدرة غير مؤكدة",
+  "emergencyCard_chamberAvailability_h24": "٢٤ ساعة",
+  "emergencyCard_chamberAvailability_onCall": "تحت الطلب",
+  "emergencyCard_chamberAvailability_businessHours": "ساعات العمل",
+  "emergencyCard_chamberUnverified": "غير مؤكد مع المنشأة",
+  "chambersDirectory_title": "غرف الضغط العالي",
+  "chambersDirectory_search": "ابحث بالاسم أو المدينة أو الدولة",
+  "chambersDirectory_empty": "لا توجد غرفة ضغط تطابق البحث.",
+  "chambersDirectory_count": "{count, plural, =1{غرفة ضغط واحدة} other{{count} غرف ضغط}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "emergencyCard_hideChamber": "إخفاء",
   "emergencyCard_chamberHidden": "تم إخفاء الغرفة",
   "emergencyCard_undo": "تراجع",

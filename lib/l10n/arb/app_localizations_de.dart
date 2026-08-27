@@ -24573,6 +24573,69 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get emergencyCard_chambersNearby => 'Nächstgelegene Druckkammern';
+
+  @override
+  String emergencyCard_chamberViewAll(int count) {
+    return 'Alle $count Druckkammern anzeigen';
+  }
+
+  @override
+  String get emergencyCard_chambersNoneNearby =>
+      'Keine Druckkammer in Reichweite gelistet. Rufen Sie die Notfall-Hotline für Taucher an: Sie vermittelt Ihnen die nächste Einrichtung, die Sie behandeln kann.';
+
+  @override
+  String get emergencyCard_chamberCapability_divingEmergency =>
+      'Behandelt Tauchunfälle';
+
+  @override
+  String get emergencyCard_chamberCapability_hyperbaricUnit =>
+      'Klinische Druckkammer';
+
+  @override
+  String get emergencyCard_chamberCapability_elective =>
+      'Nur elektive Therapie';
+
+  @override
+  String get emergencyCard_chamberCapability_unknown =>
+      'Leistungsumfang unbestätigt';
+
+  @override
+  String get emergencyCard_chamberAvailability_h24 => '24 Std.';
+
+  @override
+  String get emergencyCard_chamberAvailability_onCall => 'Rufbereitschaft';
+
+  @override
+  String get emergencyCard_chamberAvailability_businessHours =>
+      'Geschäftszeiten';
+
+  @override
+  String get emergencyCard_chamberUnverified =>
+      'Nicht mit der Einrichtung bestätigt';
+
+  @override
+  String get chambersDirectory_title => 'Druckkammern';
+
+  @override
+  String get chambersDirectory_search => 'Nach Name, Stadt oder Land suchen';
+
+  @override
+  String get chambersDirectory_empty =>
+      'Keine Druckkammer entspricht dieser Suche.';
+
+  @override
+  String chambersDirectory_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Druckkammern',
+      one: '1 Druckkammer',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get emergencyCard_hideChamber => 'Ausblenden';
 
   @override

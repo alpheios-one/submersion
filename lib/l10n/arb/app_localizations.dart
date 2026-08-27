@@ -40866,6 +40866,96 @@ abstract class AppLocalizations {
   /// **'Details verified {date}'**
   String emergencyCard_chamberVerified(String date);
 
+  /// No description provided for @emergencyCard_chambersNearby.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest chambers'**
+  String get emergencyCard_chambersNearby;
+
+  /// No description provided for @emergencyCard_chamberViewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all {count} chambers'**
+  String emergencyCard_chamberViewAll(int count);
+
+  /// No description provided for @emergencyCard_chambersNoneNearby.
+  ///
+  /// In en, this message translates to:
+  /// **'No chamber listed within range. Call the diver emergency hotline: they will route you to the nearest facility that can treat you.'**
+  String get emergencyCard_chambersNoneNearby;
+
+  /// No description provided for @emergencyCard_chamberCapability_divingEmergency.
+  ///
+  /// In en, this message translates to:
+  /// **'Treats diving injuries'**
+  String get emergencyCard_chamberCapability_divingEmergency;
+
+  /// No description provided for @emergencyCard_chamberCapability_hyperbaricUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Hospital hyperbaric unit'**
+  String get emergencyCard_chamberCapability_hyperbaricUnit;
+
+  /// No description provided for @emergencyCard_chamberCapability_elective.
+  ///
+  /// In en, this message translates to:
+  /// **'Elective therapy only'**
+  String get emergencyCard_chamberCapability_elective;
+
+  /// No description provided for @emergencyCard_chamberCapability_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Capability unconfirmed'**
+  String get emergencyCard_chamberCapability_unknown;
+
+  /// No description provided for @emergencyCard_chamberAvailability_h24.
+  ///
+  /// In en, this message translates to:
+  /// **'24h'**
+  String get emergencyCard_chamberAvailability_h24;
+
+  /// No description provided for @emergencyCard_chamberAvailability_onCall.
+  ///
+  /// In en, this message translates to:
+  /// **'On call'**
+  String get emergencyCard_chamberAvailability_onCall;
+
+  /// No description provided for @emergencyCard_chamberAvailability_businessHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Business hours'**
+  String get emergencyCard_chamberAvailability_businessHours;
+
+  /// No description provided for @emergencyCard_chamberUnverified.
+  ///
+  /// In en, this message translates to:
+  /// **'Not confirmed with the facility'**
+  String get emergencyCard_chamberUnverified;
+
+  /// No description provided for @chambersDirectory_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Hyperbaric chambers'**
+  String get chambersDirectory_title;
+
+  /// No description provided for @chambersDirectory_search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name, city or country'**
+  String get chambersDirectory_search;
+
+  /// No description provided for @chambersDirectory_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No chamber matches that search.'**
+  String get chambersDirectory_empty;
+
+  /// No description provided for @chambersDirectory_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 chamber} other{{count} chambers}}'**
+  String chambersDirectory_count(int count);
+
   /// No description provided for @emergencyCard_hideChamber.
   ///
   /// In en, this message translates to:

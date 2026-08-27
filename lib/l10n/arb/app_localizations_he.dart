@@ -24012,6 +24012,64 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get emergencyCard_chambersNearby => 'תאי לחץ קרובים';
+
+  @override
+  String emergencyCard_chamberViewAll(int count) {
+    return 'הצג את כל $count תאי הלחץ';
+  }
+
+  @override
+  String get emergencyCard_chambersNoneNearby =>
+      'אין תא לחץ בטווח. התקשר לקו החירום לצוללנים: הם יפנו אותך למתקן הקרוב ביותר שיכול לטפל בך.';
+
+  @override
+  String get emergencyCard_chamberCapability_divingEmergency =>
+      'מטפל בתאונות צלילה';
+
+  @override
+  String get emergencyCard_chamberCapability_hyperbaricUnit =>
+      'יחידה היפרברית בבית חולים';
+
+  @override
+  String get emergencyCard_chamberCapability_elective => 'טיפול אלקטיבי בלבד';
+
+  @override
+  String get emergencyCard_chamberCapability_unknown => 'היכולת לא אומתה';
+
+  @override
+  String get emergencyCard_chamberAvailability_h24 => '24 שעות';
+
+  @override
+  String get emergencyCard_chamberAvailability_onCall => 'כוננות';
+
+  @override
+  String get emergencyCard_chamberAvailability_businessHours => 'שעות פעילות';
+
+  @override
+  String get emergencyCard_chamberUnverified => 'לא אומת מול המתקן';
+
+  @override
+  String get chambersDirectory_title => 'תאי לחץ';
+
+  @override
+  String get chambersDirectory_search => 'חיפוש לפי שם, עיר או מדינה';
+
+  @override
+  String get chambersDirectory_empty => 'אין תא לחץ התואם לחיפוש.';
+
+  @override
+  String chambersDirectory_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תאי לחץ',
+      one: 'תא לחץ אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get emergencyCard_hideChamber => 'הסתר';
 
   @override

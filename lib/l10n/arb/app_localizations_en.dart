@@ -24208,6 +24208,68 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get emergencyCard_chambersNearby => 'Nearest chambers';
+
+  @override
+  String emergencyCard_chamberViewAll(int count) {
+    return 'View all $count chambers';
+  }
+
+  @override
+  String get emergencyCard_chambersNoneNearby =>
+      'No chamber listed within range. Call the diver emergency hotline: they will route you to the nearest facility that can treat you.';
+
+  @override
+  String get emergencyCard_chamberCapability_divingEmergency =>
+      'Treats diving injuries';
+
+  @override
+  String get emergencyCard_chamberCapability_hyperbaricUnit =>
+      'Hospital hyperbaric unit';
+
+  @override
+  String get emergencyCard_chamberCapability_elective =>
+      'Elective therapy only';
+
+  @override
+  String get emergencyCard_chamberCapability_unknown =>
+      'Capability unconfirmed';
+
+  @override
+  String get emergencyCard_chamberAvailability_h24 => '24h';
+
+  @override
+  String get emergencyCard_chamberAvailability_onCall => 'On call';
+
+  @override
+  String get emergencyCard_chamberAvailability_businessHours =>
+      'Business hours';
+
+  @override
+  String get emergencyCard_chamberUnverified =>
+      'Not confirmed with the facility';
+
+  @override
+  String get chambersDirectory_title => 'Hyperbaric chambers';
+
+  @override
+  String get chambersDirectory_search => 'Search by name, city or country';
+
+  @override
+  String get chambersDirectory_empty => 'No chamber matches that search.';
+
+  @override
+  String chambersDirectory_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count chambers',
+      one: '1 chamber',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get emergencyCard_hideChamber => 'Hide';
 
   @override

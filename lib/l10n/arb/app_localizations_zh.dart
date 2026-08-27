@@ -23377,6 +23377,61 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get emergencyCard_chambersNearby => '最近的高压氧舱';
+
+  @override
+  String emergencyCard_chamberViewAll(int count) {
+    return '查看全部 $count 个高压氧舱';
+  }
+
+  @override
+  String get emergencyCard_chambersNoneNearby =>
+      '范围内没有收录的高压氧舱。请拨打潜水员紧急热线：他们会为您转介最近的可救治机构。';
+
+  @override
+  String get emergencyCard_chamberCapability_divingEmergency => '可处理潜水伤病';
+
+  @override
+  String get emergencyCard_chamberCapability_hyperbaricUnit => '医院高压氧科';
+
+  @override
+  String get emergencyCard_chamberCapability_elective => '仅择期治疗';
+
+  @override
+  String get emergencyCard_chamberCapability_unknown => '能力未确认';
+
+  @override
+  String get emergencyCard_chamberAvailability_h24 => '24 小时';
+
+  @override
+  String get emergencyCard_chamberAvailability_onCall => '随叫随到';
+
+  @override
+  String get emergencyCard_chamberAvailability_businessHours => '工作时间';
+
+  @override
+  String get emergencyCard_chamberUnverified => '未向该机构核实';
+
+  @override
+  String get chambersDirectory_title => '高压氧舱';
+
+  @override
+  String get chambersDirectory_search => '按名称、城市或国家搜索';
+
+  @override
+  String get chambersDirectory_empty => '没有符合该搜索的高压氧舱。';
+
+  @override
+  String chambersDirectory_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个高压氧舱',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get emergencyCard_hideChamber => '隐藏';
 
   @override

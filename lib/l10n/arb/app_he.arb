@@ -7420,6 +7420,35 @@
       }
     }
   },
+  "emergencyCard_chambersNearby": "תאי לחץ קרובים",
+  "emergencyCard_chamberViewAll": "הצג את כל {count} תאי הלחץ",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "אין תא לחץ בטווח. התקשר לקו החירום לצוללנים: הם יפנו אותך למתקן הקרוב ביותר שיכול לטפל בך.",
+  "emergencyCard_chamberCapability_divingEmergency": "מטפל בתאונות צלילה",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "יחידה היפרברית בבית חולים",
+  "emergencyCard_chamberCapability_elective": "טיפול אלקטיבי בלבד",
+  "emergencyCard_chamberCapability_unknown": "היכולת לא אומתה",
+  "emergencyCard_chamberAvailability_h24": "24 שעות",
+  "emergencyCard_chamberAvailability_onCall": "כוננות",
+  "emergencyCard_chamberAvailability_businessHours": "שעות פעילות",
+  "emergencyCard_chamberUnverified": "לא אומת מול המתקן",
+  "chambersDirectory_title": "תאי לחץ",
+  "chambersDirectory_search": "חיפוש לפי שם, עיר או מדינה",
+  "chambersDirectory_empty": "אין תא לחץ התואם לחיפוש.",
+  "chambersDirectory_count": "{count, plural, =1{תא לחץ אחד} other{{count} תאי לחץ}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "emergencyCard_hideChamber": "הסתר",
   "emergencyCard_chamberHidden": "התא הוסתר",
   "emergencyCard_undo": "בטל",

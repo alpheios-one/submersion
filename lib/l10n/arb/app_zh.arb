@@ -7420,6 +7420,35 @@
       }
     }
   },
+  "emergencyCard_chambersNearby": "最近的高压氧舱",
+  "emergencyCard_chamberViewAll": "查看全部 {count} 个高压氧舱",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "范围内没有收录的高压氧舱。请拨打潜水员紧急热线：他们会为您转介最近的可救治机构。",
+  "emergencyCard_chamberCapability_divingEmergency": "可处理潜水伤病",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "医院高压氧科",
+  "emergencyCard_chamberCapability_elective": "仅择期治疗",
+  "emergencyCard_chamberCapability_unknown": "能力未确认",
+  "emergencyCard_chamberAvailability_h24": "24 小时",
+  "emergencyCard_chamberAvailability_onCall": "随叫随到",
+  "emergencyCard_chamberAvailability_businessHours": "工作时间",
+  "emergencyCard_chamberUnverified": "未向该机构核实",
+  "chambersDirectory_title": "高压氧舱",
+  "chambersDirectory_search": "按名称、城市或国家搜索",
+  "chambersDirectory_empty": "没有符合该搜索的高压氧舱。",
+  "chambersDirectory_count": "{count, plural, other{{count} 个高压氧舱}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "emergencyCard_hideChamber": "隐藏",
   "emergencyCard_chamberHidden": "已隐藏氧舱",
   "emergencyCard_undo": "撤消",

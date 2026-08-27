@@ -24527,6 +24527,68 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get emergencyCard_chambersNearby => 'Legközelebbi kamrák';
+
+  @override
+  String emergencyCard_chamberViewAll(int count) {
+    return 'Mind a(z) $count kamra megtekintése';
+  }
+
+  @override
+  String get emergencyCard_chambersNoneNearby =>
+      'Nincs kamra a közelben. Hívja a búvár vészhelyzeti vonalat: a legközelebbi ellátásra képes intézménybe irányítják.';
+
+  @override
+  String get emergencyCard_chamberCapability_divingEmergency =>
+      'Búvárbaleseteket lát el';
+
+  @override
+  String get emergencyCard_chamberCapability_hyperbaricUnit =>
+      'Kórházi hiperbár egység';
+
+  @override
+  String get emergencyCard_chamberCapability_elective =>
+      'Csak tervezett kezelés';
+
+  @override
+  String get emergencyCard_chamberCapability_unknown =>
+      'Ellátási kör nem megerősített';
+
+  @override
+  String get emergencyCard_chamberAvailability_h24 => '24 óra';
+
+  @override
+  String get emergencyCard_chamberAvailability_onCall => 'Készenlét';
+
+  @override
+  String get emergencyCard_chamberAvailability_businessHours => 'Munkaidőben';
+
+  @override
+  String get emergencyCard_chamberUnverified =>
+      'Az intézmény nem erősítette meg';
+
+  @override
+  String get chambersDirectory_title => 'Hiperbár kamrák';
+
+  @override
+  String get chambersDirectory_search =>
+      'Keresés név, város vagy ország szerint';
+
+  @override
+  String get chambersDirectory_empty => 'Nincs a keresésnek megfelelő kamra.';
+
+  @override
+  String chambersDirectory_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kamra',
+      one: '1 kamra',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get emergencyCard_hideChamber => 'Elrejtés';
 
   @override
