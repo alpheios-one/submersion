@@ -22,7 +22,7 @@ class CylinderSac extends Equatable {
   /// Role of this tank (back gas, stage, deco, etc.)
   final TankRole role;
 
-  /// Tank volume in liters (required for L/min SAC conversion)
+  /// Tank volume in liters (required for the per-cylinder RMV, [rmv])
   final double? tankVolume;
 
   /// SAC rate in bar/min at surface

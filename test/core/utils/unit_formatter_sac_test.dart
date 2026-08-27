@@ -53,6 +53,33 @@ void main() {
     });
   });
 
+  group('lane decimals', () {
+    // The chart axis draws the bare number and reads these, so they are the
+    // single source of truth for how each lane rounds.
+    test('SAC drops the decimal in psi, keeps it in bar', () {
+      expect(metric.sacDecimals, 1);
+      expect(imperial.sacDecimals, 0);
+    });
+
+    test('RMV keeps two decimals in cuft, one in liters', () {
+      expect(metric.rmvDecimals, 1);
+      expect(imperial.rmvDecimals, 2);
+    });
+
+    test('the formatted value uses exactly those decimals', () {
+      for (final units in [metric, imperial]) {
+        expect(
+          units.formatSac(1.47).split(' ').first,
+          units.convertSac(1.47).toStringAsFixed(units.sacDecimals),
+        );
+        expect(
+          units.formatRmv(16.77).split(' ').first,
+          units.convertRmv(16.77).toStringAsFixed(units.rmvDecimals),
+        );
+      }
+    });
+  });
+
   test('the lanes ignore the display preference', () {
     const rmvOnly = UnitFormatter(
       AppSettings(gasConsumptionDisplay: GasConsumptionDisplay.rmv),

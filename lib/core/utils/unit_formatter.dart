@@ -261,19 +261,24 @@ class UnitFormatter {
   /// Convert an RMV in L/min (from [Dive.rmvFor]) to the volume unit.
   double convertRmv(double litersPerMin) => convertVolume(litersPerMin);
 
-  /// "1.5 bar/min" or "21 psi/min". psi/min values run in the hundreds, so
-  /// a decimal there is noise.
-  String formatSac(double barPerMin) {
-    final decimals = settings.pressureUnit == PressureUnit.bar ? 1 : 0;
-    return '${convertSac(barPerMin).toStringAsFixed(decimals)} $sacSymbol';
-  }
+  /// Decimals a SAC value is rendered with. psi/min values run in the
+  /// hundreds, so a decimal there is noise. Exposed so a caller that draws
+  /// the bare number (a chart axis) rounds it the same way the labelled
+  /// value does.
+  int get sacDecimals => settings.pressureUnit == PressureUnit.bar ? 1 : 0;
 
-  /// "16.8 L/min" or "0.59 cuft/min". cuft/min values sit below 1, so one
-  /// decimal would render every imperial RMV as 0.5 or 0.6.
-  String formatRmv(double litersPerMin) {
-    final decimals = settings.volumeUnit == VolumeUnit.liters ? 1 : 2;
-    return '${convertRmv(litersPerMin).toStringAsFixed(decimals)} $rmvSymbol';
-  }
+  /// Decimals an RMV value is rendered with. cuft/min values sit below 1, so
+  /// one decimal would render every imperial RMV as 0.5 or 0.6. Exposed for
+  /// the same reason as [sacDecimals].
+  int get rmvDecimals => settings.volumeUnit == VolumeUnit.liters ? 1 : 2;
+
+  /// "1.5 bar/min" or "21 psi/min".
+  String formatSac(double barPerMin) =>
+      '${convertSac(barPerMin).toStringAsFixed(sacDecimals)} $sacSymbol';
+
+  /// "16.8 L/min" or "0.59 cuft/min".
+  String formatRmv(double litersPerMin) =>
+      '${convertRmv(litersPerMin).toStringAsFixed(rmvDecimals)} $rmvSymbol';
 
   // ============================================================================
   // Weight

@@ -93,6 +93,10 @@ class StatisticsGasPage extends ConsumerWidget {
     String format(double v) => isRmv ? units.formatRmv(v) : units.formatSac(v);
     double convert(double v) =>
         isRmv ? units.convertRmv(v) : units.convertSac(v);
+    // The axis draws the bare number, so it has to round the way the
+    // tooltip's labelled value does or the two disagree (an imperial RMV
+    // tick read 0.5 where its tooltip said 0.53).
+    final decimals = isRmv ? units.rmvDecimals : units.sacDecimals;
 
     return StatSectionCard(
       title: context.l10n.statistics_gas_sacTrend_title,
@@ -104,7 +108,7 @@ class StatisticsGasPage extends ConsumerWidget {
             lineColor: Colors.blue,
             yAxisLabel: unitSymbol,
             valueFormatter: format,
-            yAxisFormatter: (value) => convert(value).toStringAsFixed(1),
+            yAxisFormatter: (value) => convert(value).toStringAsFixed(decimals),
           );
         },
         loading: () => const SizedBox(
