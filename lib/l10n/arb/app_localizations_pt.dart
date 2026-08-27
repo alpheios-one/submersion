@@ -7093,7 +7093,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => 'Erro ao carregar viagens';
 
   @override
+  String get diveLog_search_filter_any => 'Qualquer';
+
+  @override
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
+
+  @override
+  String get diveLog_search_label_deco => 'Descompressão';
 
   @override
   String get diveLog_search_label_depthRange => 'Faixa de Profundidade (m)';
@@ -8265,7 +8271,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'Escolha um metodo de localizacao - as coordenadas preencherao automaticamente pais e regiao';
+      'Escolha um método de localização ou consulte as coordenadas para preencher país, região, cidade e corpo de água';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'ex., 21.4225';
@@ -8287,6 +8293,32 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'Escolher no Mapa';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'Consultar pelas coordenadas';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'Nenhum detalhe de localização encontrado para estas coordenadas';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'A consulta de localização falhou. Verifique a sua ligação e tente novamente.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title =>
+      'Substituir os detalhes de localização?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'A consulta encontrou valores diferentes para estes campos:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'Substituir';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'Manter';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'Usar Minha Localizacao';
@@ -8771,6 +8803,61 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_list_menu_select => 'Selecionar pontos';
+
+  @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Preencher detalhes de localização em falta';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      'Preencher os detalhes de localização em falta?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count locais com coordenadas não têm país, região, cidade ou corpo de água.',
+      one:
+          '1 local com coordenadas não tem país, região, cidade ou corpo de água.',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutos',
+      one: '1 minuto',
+    );
+    return '$_temp0 O Submersion consultará cada um no OpenStreetMap e preencherá apenas os campos vazios. Demora cerca de $_temp1.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Iniciar';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Todos os locais com coordenadas já têm os seus detalhes de localização.';
+
+  @override
+  String get diveSites_backfill_progress_title =>
+      'A preencher detalhes de localização';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done de $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Cancelar';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Atualizados $updated, inalterados $unchanged, falhados $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'A consulta de localização não está disponível. Verifique a sua ligação e tente novamente.';
 
   @override
   String get diveSites_list_search_backTooltip => 'Voltar';
@@ -21524,6 +21611,15 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get gpsLogger_summary_tracks => 'Trilhas';
+
+  @override
+  String get gpsLogger_summary_recordedTime => 'Tempo gravado';
+
+  @override
+  String get gpsLogger_summary_divesCovered => 'Mergulhos cobertos';
+
+  @override
   String gpsLogger_trackSubtitle(num count, String duration) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -25193,6 +25289,13 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_coordinateFormat_subtitle =>
       'Como as posições GPS são apresentadas e introduzidas';
+
+  @override
+  String get settings_placeNameLanguage_title => 'Idioma dos nomes de lugares';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Usado quando país, região, cidade e corpo de água são obtidos a partir das coordenadas. Os locais existentes não são alterados.';
 
   @override
   String get settings_coordinateFormat_decimalDegrees => 'Graus decimais';

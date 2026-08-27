@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:submersion/core/constants/place_name_language.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -100,6 +101,7 @@ class DiverSettingsRepository {
               accentSectionHeaders: Value(s.accentSectionHeaders),
               accentListIcons: Value(s.accentListIcons),
               locale: Value(s.locale),
+              placeNameLanguage: Value(s.placeNameLanguage),
               defaultDiveType: Value(s.defaultDiveType),
               defaultTankVolume: Value(s.defaultTankVolume),
               defaultStartPressure: Value(s.defaultStartPressure),
@@ -263,6 +265,7 @@ class DiverSettingsRepository {
           accentSectionHeaders: Value(settings.accentSectionHeaders),
           accentListIcons: Value(settings.accentListIcons),
           locale: Value(settings.locale),
+          placeNameLanguage: Value(settings.placeNameLanguage),
           defaultDiveType: Value(settings.defaultDiveType),
           defaultTankVolume: Value(settings.defaultTankVolume),
           defaultStartPressure: Value(settings.defaultStartPressure),
@@ -472,6 +475,7 @@ class DiverSettingsRepository {
       accentSectionHeaders: row.accentSectionHeaders,
       accentListIcons: row.accentListIcons,
       locale: row.locale,
+      placeNameLanguage: PlaceNameLanguage.normalize(row.placeNameLanguage),
       defaultDiveType: row.defaultDiveType,
       defaultTankVolume: row.defaultTankVolume,
       defaultStartPressure: row.defaultStartPressure,

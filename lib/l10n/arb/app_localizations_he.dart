@@ -6908,7 +6908,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => 'שגיאה בטעינת טיולים';
 
   @override
+  String get diveLog_search_filter_any => 'הכול';
+
+  @override
   String get diveLog_search_gasTrimix => 'טריימיקס (<21% O₂)';
+
+  @override
+  String get diveLog_search_label_deco => 'דקומפרסיה';
 
   @override
   String get diveLog_search_label_depthRange => 'טווח עומק (m)';
@@ -8060,7 +8066,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'בחר שיטת מיקום - הקואורדינטות ימלאו אוטומטית את המדינה והאזור';
+      'בחרו שיטת מיקום או חפשו את הקואורדינטות כדי למלא אוטומטית מדינה, אזור, עיר וגוף מים';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'לדוגמה, 21.4225';
@@ -8082,6 +8088,31 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'בחר מהמפה';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'חיפוש לפי קואורדינטות';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'לא נמצאו פרטי מיקום לקואורדינטות אלה';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'חיפוש המיקום נכשל. בדקו את החיבור ונסו שוב.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => 'להחליף את פרטי המיקום?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'החיפוש מצא ערכים שונים לשדות אלה:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'החלפה';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'שמירה';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'השתמש במיקום שלי';
@@ -8551,6 +8582,57 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveSites_list_menu_select => 'בחירת אתרים';
+
+  @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'השלמת פרטי מיקום חסרים';
+
+  @override
+  String get diveSites_backfill_confirm_title => 'להשלים פרטי מיקום חסרים?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ל-$count אתרים עם קואורדינטות חסרים מדינה, אזור, עיר או גוף מים.',
+      one: 'לאתר אחד עם קואורדינטות חסרים מדינה, אזור, עיר או גוף מים.',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'כ-$minutes דקות',
+      one: 'כדקה',
+    );
+    return '$_temp0 Submersion יחפש כל אחד מהם ב-OpenStreetMap וימלא רק שדות ריקים. זה נמשך $_temp1.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'התחלה';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'לכל האתרים עם קואורדינטות כבר יש פרטי מיקום.';
+
+  @override
+  String get diveSites_backfill_progress_title => 'משלים פרטי מיקום';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done מתוך $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'ביטול';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'עודכנו $updated, ללא שינוי $unchanged, נכשלו $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'חיפוש המיקום אינו זמין. בדקו את החיבור ונסו שוב.';
 
   @override
   String get diveSites_list_search_backTooltip => 'חזרה';
@@ -20986,6 +21068,15 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get gpsLogger_summary_tracks => 'מסלולים';
+
+  @override
+  String get gpsLogger_summary_recordedTime => 'זמן מוקלט';
+
+  @override
+  String get gpsLogger_summary_divesCovered => 'צלילות מכוסות';
+
+  @override
   String gpsLogger_trackSubtitle(num count, String duration) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -24572,6 +24663,13 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_coordinateFormat_subtitle =>
       'כיצד מוצגים ומוזנים מיקומי GPS';
+
+  @override
+  String get settings_placeNameLanguage_title => 'שפת שמות המקומות';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'בשימוש כאשר מדינה, אזור, עיר וגוף מים נשלפים מהקואורדינטות. אתרים קיימים אינם משתנים.';
 
   @override
   String get settings_coordinateFormat_decimalDegrees => 'מעלות עשרוניות';

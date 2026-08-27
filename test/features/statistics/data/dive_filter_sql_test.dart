@@ -225,6 +225,46 @@ void main() {
         );
   }
 
+  Future<void> insertProfilePoint(
+    String diveId,
+    String id, {
+    int timestamp = 0,
+    double depth = 30,
+    int? decoType,
+    double? ceiling,
+  }) async {
+    await db
+        .into(db.diveProfiles)
+        .insert(
+          DiveProfilesCompanion(
+            id: Value(id),
+            diveId: Value(diveId),
+            timestamp: Value(timestamp),
+            depth: Value(depth),
+            decoType: Value(decoType),
+            ceiling: Value(ceiling),
+          ),
+        );
+  }
+
+  Future<void> insertProfileEvent(
+    String diveId,
+    String id, {
+    String eventType = 'decoStopStart',
+  }) async {
+    await db
+        .into(db.diveProfileEvents)
+        .insert(
+          DiveProfileEventsCompanion(
+            id: Value(id),
+            diveId: Value(diveId),
+            timestamp: const Value(0),
+            eventType: Value(eventType),
+            createdAt: Value(now),
+          ),
+        );
+  }
+
   Future<void> insertCustomField(
     String diveId,
     String key,
@@ -305,6 +345,37 @@ void main() {
       'a',
     });
   });
+
+  test(
+    'decoOnly axis: recorded signal (stop, no-stop, ceiling-only, event-only, '
+    'unrecorded)',
+    () async {
+      await insertDive('stop'); // deco: a deco_type = 2 point
+      await insertDive('noStop'); // no-deco: has deco_type, none is 2
+      await insertDive('ceilingOnly'); // deco: positive ceiling, no deco_type
+      await insertDive('eventOnly'); // deco: decoStopStart event only
+      await insertDive('none'); // unrecorded: no profile data at all
+
+      await insertProfilePoint('stop', 'p-stop-1', decoType: 0);
+      await insertProfilePoint('stop', 'p-stop-2', decoType: 2);
+
+      await insertProfilePoint('noStop', 'p-noStop-1', decoType: 0);
+
+      await insertProfilePoint('ceilingOnly', 'p-ceiling-1', ceiling: 3.0);
+
+      await insertProfilePoint('eventOnly', 'p-event-1');
+      await insertProfileEvent('eventOnly', 'e-event-1');
+
+      expect(await idsMatching(const DiveFilterState(decoOnly: true)), {
+        'stop',
+        'ceilingOnly',
+        'eventOnly',
+      });
+      expect(await idsMatching(const DiveFilterState(decoOnly: false)), {
+        'noStop',
+      });
+    },
+  );
 
   test(
     'noBuddyOnly excludes both legacy and junction-linked buddies',
@@ -399,6 +470,13 @@ void main() {
     // multi-axis combinations. That "SQL mirrors apply()" property is what
     // lets getStatistics/getSacVolumeTrend/etc. push filtering into SQL
     // instead of loading every dive into Dart.
+    //
+    // decoOnly is the one axis deliberately left out of the battery: it is
+    // SQL-only. getAllDives does not hydrate profiles and deco-stop events
+    // never reach the entity, so apply() cannot classify a dive and does not
+    // try. Its own coverage is the decoOnly test above plus
+    // deco_filter_providers_test.dart, which pins the entity-backed surfaces
+    // to the SQL answer via decoFilteredDiveIdsProvider.
 
     // --- Parents (FK=ON: must precede the dives that reference them) ---
     await insertSite('s1');

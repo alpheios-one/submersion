@@ -236,13 +236,18 @@ class UddfEntityImporter {
   final int _defaultStartPressure;
   final bool _applyDefaultTankToImports;
 
+  /// ISO 639-1 code for reverse-geocoded country/region (issue #1187).
+  final String _placeNameLanguage;
+
   UddfEntityImporter({
     TankPresetEntity? defaultTankPreset,
     int defaultStartPressure = 200,
     bool applyDefaultTankToImports = false,
+    String placeNameLanguage = LocationService.defaultLanguageCode,
   }) : _defaultTankPreset = defaultTankPreset,
        _defaultStartPressure = defaultStartPressure,
-       _applyDefaultTankToImports = applyDefaultTankToImports;
+       _applyDefaultTankToImports = applyDefaultTankToImports,
+       _placeNameLanguage = placeNameLanguage;
 
   /// Parse a value that may be either an enum instance or a string matching
   /// an enum name. Returns null if the value is null or unrecognised.
@@ -1044,6 +1049,7 @@ class UddfEntityImporter {
           final geocodeResult = await LocationService.instance.reverseGeocode(
             lat,
             lon,
+            languageCode: _placeNameLanguage,
           );
           country ??= geocodeResult.country;
           region ??= geocodeResult.region;
@@ -1117,6 +1123,7 @@ class UddfEntityImporter {
           final geocodeResult = await LocationService.instance.reverseGeocode(
             lat,
             lon,
+            languageCode: _placeNameLanguage,
           );
           country ??= geocodeResult.country;
           region ??= geocodeResult.region;

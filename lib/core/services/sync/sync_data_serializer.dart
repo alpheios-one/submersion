@@ -5672,6 +5672,9 @@ class SyncDataSerializer {
       // v161: seed it so payloads predating the column hydrate instead of
       // throwing in DiverSetting.fromJson.
       'defaultShowO2CellMv': false,
+      // v166: seed it so payloads predating the column hydrate instead of
+      // throwing in DiverSetting.fromJson (issue #1187).
+      'placeNameLanguage': 'en',
       // Dive profile default-visible metrics. Non-nullable bool added in v91;
       // seed it so payloads predating the column hydrate instead of throwing in
       // DiverSetting.fromJson.
