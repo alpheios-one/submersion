@@ -1114,7 +1114,6 @@ class DiveListTile extends ConsumerWidget {
                             final value = fullDive != null
                                 ? field.extractFromDive(
                                     fullDive!,
-                                    sacUnit: units.sacUnit,
                                     gasModel: units.settings.gasModel,
                                     diveTypeLabel: diveTypeLabelResolver,
                                   )
@@ -1267,7 +1266,6 @@ class DiveListTile extends ConsumerWidget {
     dynamic value = fullDive != null
         ? field.extractFromDive(
             fullDive!,
-            sacUnit: units.sacUnit,
             gasModel: units.settings.gasModel,
             diveTypeLabel: diveTypeLabelResolver,
           )

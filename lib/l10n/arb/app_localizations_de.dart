@@ -4846,7 +4846,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_detail_label_rateOfChange => 'Änderungsrate';
 
   @override
-  String get diveLog_detail_label_sacRate => 'AMV';
+  String get diveLog_detail_label_rmv => 'AMV';
+
+  @override
+  String get diveLog_detail_label_sac => 'Druckverbrauch';
 
   @override
   String get diveLog_detail_label_state => 'Zustand';
@@ -4923,7 +4926,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_detail_section_oxygenToxicity => 'Sauerstofftoxizität';
 
   @override
-  String get diveLog_detail_section_sacRateBySegment => 'AMV nach Segment';
+  String get diveLog_detail_section_sacRateBySegment =>
+      'Gasverbrauch nach Segment';
 
   @override
   String get diveLog_detail_section_tags => 'Tags';
@@ -5966,7 +5970,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_legend_label_pressureThresholds => 'Druckschwellen';
 
   @override
-  String get diveLog_legend_label_sacRate => 'AMV';
+  String get diveLog_legend_label_sacRate => 'Verbrauch';
 
   @override
   String get diveLog_legend_label_showGas => 'Gase';
@@ -6594,7 +6598,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get setup_units_pressure => 'Druck';
 
   @override
-  String get setup_units_sac => 'AMV';
+  String get setup_units_gasConsumption => 'Gasverbrauch';
 
   @override
   String get setup_units_subtitle =>
@@ -7079,9 +7083,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_rangeStats_label_minTemp => 'Min Temp';
 
   @override
-  String get diveLog_rangeStats_label_sacRate => 'AMV';
-
-  @override
   String get diveLog_rangeStats_title => 'Bereichsstatistik';
 
   @override
@@ -7552,7 +7553,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_tooltip_rate => 'Rate';
 
   @override
-  String get diveLog_tooltip_sac => 'AMV';
+  String get gasConsumption_rmv => 'AMV';
+
+  @override
+  String get gasConsumption_sac => 'Druckverbrauch';
 
   @override
   String get diveLog_tooltip_sensor => 'Sensor';
@@ -10168,10 +10172,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_profileMetric_pressure_short => 'Druck';
 
   @override
-  String get enum_profileMetric_sacRate => 'AMV';
+  String get enum_profileMetric_sacRate => 'Gasverbrauch';
 
   @override
-  String get enum_profileMetric_sacRate_short => 'AMV';
+  String get enum_profileMetric_sacRate_short => 'Verbrauch';
 
   @override
   String get enum_profileMetric_surfaceGf => 'Oberflächenm GF';
@@ -14573,11 +14577,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get diveDetailSection_sacSegments_name => 'AMV nach Segment';
+  String get diveDetailSection_sacSegments_name => 'Gasverbrauch nach Segment';
 
   @override
   String get diveDetailSection_sacSegments_description =>
-      'AMV-Segmentierung nach Phase/Zeit';
+      'Druckverbrauch und AMV nach Phase oder Zeit';
 
   @override
   String get diveDetailSection_details_name => 'Details';
@@ -14809,7 +14813,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveDetailSection_tanks_description =>
-      'Flaschenliste, Gasmischungen, Drucke, Flaschen-AMV';
+      'Flaschenliste, Gasmischungen, Drucke, Flaschen-Verbrauch';
 
   @override
   String get diveDetailSection_buddies_name => 'Buddies';
@@ -14978,7 +14982,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_appearance_metric_pressure => 'Druck';
 
   @override
-  String get settings_appearance_metric_sacRate => 'AMV';
+  String get settings_appearance_metric_sacRate => 'Gasverbrauch';
 
   @override
   String get settings_appearance_metric_surfaceGf => 'Oberflächenfaktor GF';
@@ -16938,9 +16942,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_units_dialog_pressureUnit => 'Druckeinheit';
 
   @override
-  String get settings_units_dialog_sacRateUnit => 'AMV-Einheit';
-
-  @override
   String get settings_units_gasModel => 'Gasberechnungen';
 
   @override
@@ -17004,27 +17005,34 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_units_quickSelect => 'Schnellauswahl';
 
   @override
-  String get settings_units_sacRate => 'AMV';
+  String get settings_units_gasConsumption_both_subtitle =>
+      'Druckverbrauch und AMV nebeneinander anzeigen.';
+
+  @override
+  String get settings_units_gasConsumption_both => 'Beide';
+
+  @override
+  String settings_units_gasConsumption_rmv_subtitle(String unit) {
+    return 'An der Oberfläche geatmetes Gasvolumen pro Minute ($unit). Erfordert ein Flaschenvolumen.';
+  }
+
+  @override
+  String settings_units_gasConsumption_sac_subtitle(String unit) {
+    return 'Flaschendruckabfall pro Minute ($unit). Funktioniert mit allen protokollierten Drücken.';
+  }
+
+  @override
+  String get settings_units_dialog_gasConsumption =>
+      'Anzeige des Gasverbrauchs';
+
+  @override
+  String get settings_units_gasConsumption => 'Gasverbrauch';
 
   @override
   String get settings_units_defaultCurrency => 'Standardwährung';
 
   @override
   String get settings_units_dialog_defaultCurrency => 'Standardwährung';
-
-  @override
-  String get settings_units_sac_pressurePerMinute => 'Druck pro Minute';
-
-  @override
-  String get settings_units_sac_pressurePerMinute_subtitle =>
-      'Kein Flaschenvolumen erforderlich (bar/min oder psi/min)';
-
-  @override
-  String get settings_units_sac_volumePerMinute => 'Volumen pro Minute';
-
-  @override
-  String get settings_units_sac_volumePerMinute_subtitle =>
-      'Erfordert Flaschenvolumen (L/min oder cuft/min)';
 
   @override
   String get settings_units_temperature => 'Temperatur';
@@ -17272,7 +17280,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get statistics_category_equipment_title => 'Ausrüstung';
 
   @override
-  String get statistics_category_gas_subtitle => 'AMV & Gasgemische';
+  String get statistics_category_gas_subtitle => 'Gasverbrauch & Gasgemische';
 
   @override
   String get statistics_category_gas_title => 'Luftverbrauch';
@@ -17485,46 +17493,53 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get statistics_gas_sacByRole_error =>
-      'AMV nach Rolle konnte nicht geladen werden';
+      'Verbrauch nach Rolle konnte nicht geladen werden';
 
   @override
   String get statistics_gas_sacByRole_subtitle =>
       'Durchschnittlicher Verbrauch nach Flaschentyp';
 
   @override
-  String get statistics_gas_sacByRole_title => 'AMV nach Flaschenrolle';
-
-  @override
-  String get statistics_gas_sacRecords_best => 'Bestes AMV';
+  String get statistics_gas_sacByRole_title =>
+      'Gasverbrauch nach Flaschenrolle';
 
   @override
   String get statistics_gas_sacRecords_empty =>
-      'Noch keine AMV-Daten verfügbar';
+      'Noch keine Verbrauchsdaten verfügbar';
 
   @override
   String get statistics_gas_sacRecords_error =>
-      'AMV-Rekorde konnten nicht geladen werden';
+      'Verbrauchsrekorde konnten nicht geladen werden';
 
   @override
-  String get statistics_gas_sacRecords_highest => 'Höchstes AMV';
+  String get statistics_gas_sacRecords_highestRmv => 'Höchstes AMV';
+
+  @override
+  String get statistics_gas_sacRecords_highestSac => 'Höchster Druckverbrauch';
+
+  @override
+  String get statistics_gas_sacRecords_bestRmv => 'Bestes AMV';
+
+  @override
+  String get statistics_gas_sacRecords_bestSac => 'Niedrigster Druckverbrauch';
 
   @override
   String get statistics_gas_sacRecords_subtitle =>
       'Bester und schlechtester Luftverbrauch';
 
   @override
-  String get statistics_gas_sacRecords_title => 'AMV-Rekorde';
+  String get statistics_gas_sacRecords_title => 'Gasverbrauchsrekorde';
 
   @override
   String get statistics_gas_sacTrend_error =>
-      'AMV-Trend konnte nicht geladen werden';
+      'Verbrauchstrend konnte nicht geladen werden';
 
   @override
   String get statistics_gas_sacTrend_subtitle =>
       'Monatlicher Durchschnitt über 5 Jahre';
 
   @override
-  String get statistics_gas_sacTrend_title => 'AMV-Trend';
+  String get statistics_gas_sacTrend_title => 'Gasverbrauchstrend';
 
   @override
   String get statistics_gas_tankRole_backGas => 'Rückengas';
@@ -20054,12 +20069,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get units_profileMetric_millivolts => 'mV';
-
-  @override
-  String get units_sac_litersPerMin => 'L/min';
-
-  @override
-  String get units_sac_pressurePerMin => 'Druck/min';
 
   @override
   String get units_temperature_celsius => 'C';
@@ -25934,7 +25943,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_diveField_endPressure => 'Enddruck';
 
   @override
-  String get enum_diveField_sacRate => 'AMV';
+  String get enum_diveField_rmv => 'AMV';
+
+  @override
+  String get enum_diveField_sac => 'Druckverbrauch';
 
   @override
   String get enum_diveField_gasConsumed => 'Gasverbrauch';
@@ -26108,7 +26120,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_diveField_endPressure_short => 'End-Dr.';
 
   @override
-  String get enum_diveField_sacRate_short => 'AMV';
+  String get enum_diveField_rmv_short => 'AMV';
+
+  @override
+  String get enum_diveField_sac_short => 'Druckverbr.';
 
   @override
   String get enum_diveField_gasConsumed_short => 'Gasverbr.';

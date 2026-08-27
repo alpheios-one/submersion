@@ -4748,7 +4748,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_detail_label_rateOfChange => 'معدل التغير';
 
   @override
-  String get diveLog_detail_label_sacRate => 'معدل SAC';
+  String get diveLog_detail_label_rmv => 'RMV';
+
+  @override
+  String get diveLog_detail_label_sac => 'SAC';
 
   @override
   String get diveLog_detail_label_state => 'الحالة';
@@ -4825,7 +4828,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_detail_section_oxygenToxicity => 'سمية الأكسجين';
 
   @override
-  String get diveLog_detail_section_sacRateBySegment => 'معدل SAC حسب القطاع';
+  String get diveLog_detail_section_sacRateBySegment =>
+      'استهلاك الغاز حسب المقطع';
 
   @override
   String get diveLog_detail_section_tags => 'الوسوم';
@@ -5845,7 +5849,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_legend_label_pressureThresholds => 'عتبات الضغط';
 
   @override
-  String get diveLog_legend_label_sacRate => 'معدل SAC';
+  String get diveLog_legend_label_sacRate => 'الاستهلاك';
 
   @override
   String get diveLog_legend_label_showGas => 'الغازات';
@@ -6459,7 +6463,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get setup_units_pressure => 'الضغط';
 
   @override
-  String get setup_units_sac => 'معدل SAC';
+  String get setup_units_gasConsumption => 'استهلاك الغاز';
 
   @override
   String get setup_units_subtitle =>
@@ -6937,9 +6941,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_rangeStats_label_minTemp => 'Min Temp';
 
   @override
-  String get diveLog_rangeStats_label_sacRate => 'SAC Rate';
-
-  @override
   String get diveLog_rangeStats_title => 'إحصائيات النطاق';
 
   @override
@@ -7406,7 +7407,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_tooltip_rate => 'المعدل';
 
   @override
-  String get diveLog_tooltip_sac => 'SAC';
+  String get gasConsumption_rmv => 'RMV';
+
+  @override
+  String get gasConsumption_sac => 'SAC';
 
   @override
   String get diveLog_tooltip_sensor => 'المستشعر';
@@ -9988,10 +9992,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_profileMetric_pressure_short => 'ضغط';
 
   @override
-  String get enum_profileMetric_sacRate => 'معدل SAC';
+  String get enum_profileMetric_sacRate => 'استهلاك الغاز';
 
   @override
-  String get enum_profileMetric_sacRate_short => 'SAC';
+  String get enum_profileMetric_sacRate_short => 'الاستهلاك';
 
   @override
   String get enum_profileMetric_surfaceGf => 'GF السطح';
@@ -14330,11 +14334,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get diveDetailSection_sacSegments_name => 'معدل SAC حسب المقطع';
+  String get diveDetailSection_sacSegments_name => 'استهلاك الغاز حسب المقطع';
 
   @override
   String get diveDetailSection_sacSegments_description =>
-      'تقسيم SAC حسب المراحل/الوقت';
+      'SAC و RMV حسب المرحلة أو الوقت';
 
   @override
   String get diveDetailSection_details_name => 'التفاصيل';
@@ -14567,7 +14571,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveDetailSection_tanks_description =>
-      'قائمة الأسطوانات، خلطات الغاز، الضغوط، SAC لكل أسطوانة';
+      'قائمة الأسطوانات، خلطات الغاز، الضغوط، الاستهلاك لكل أسطوانة';
 
   @override
   String get diveDetailSection_buddies_name => 'الرفقاء';
@@ -14735,7 +14739,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_appearance_metric_pressure => 'الضغط';
 
   @override
-  String get settings_appearance_metric_sacRate => 'معدل SAC';
+  String get settings_appearance_metric_sacRate => 'استهلاك الغاز';
 
   @override
   String get settings_appearance_metric_surfaceGf => 'GF السطح';
@@ -16660,9 +16664,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_units_dialog_pressureUnit => 'وحدة الضغط';
 
   @override
-  String get settings_units_dialog_sacRateUnit => 'وحدة معدل SAC';
-
-  @override
   String get settings_units_gasModel => 'حسابات الغاز';
 
   @override
@@ -16726,27 +16727,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_units_quickSelect => 'اختيار سريع';
 
   @override
-  String get settings_units_sacRate => 'معدل SAC';
+  String get settings_units_gasConsumption_both_subtitle =>
+      'عرض SAC و RMV جنبًا إلى جنب.';
+
+  @override
+  String get settings_units_gasConsumption_both => 'كلاهما';
+
+  @override
+  String settings_units_gasConsumption_rmv_subtitle(String unit) {
+    return 'حجم الغاز المتنفس في الدقيقة عند السطح ($unit). يتطلب حجم الأسطوانة.';
+  }
+
+  @override
+  String settings_units_gasConsumption_sac_subtitle(String unit) {
+    return 'انخفاض ضغط الأسطوانة في الدقيقة ($unit). يعمل مع أي ضغوط مسجلة.';
+  }
+
+  @override
+  String get settings_units_dialog_gasConsumption => 'عرض استهلاك الغاز';
+
+  @override
+  String get settings_units_gasConsumption => 'استهلاك الغاز';
 
   @override
   String get settings_units_defaultCurrency => 'العملة الافتراضية';
 
   @override
   String get settings_units_dialog_defaultCurrency => 'العملة الافتراضية';
-
-  @override
-  String get settings_units_sac_pressurePerMinute => 'الضغط في الدقيقة';
-
-  @override
-  String get settings_units_sac_pressurePerMinute_subtitle =>
-      'لا يتطلب حجم الأسطوانة (bar/min أو psi/min)';
-
-  @override
-  String get settings_units_sac_volumePerMinute => 'الحجم في الدقيقة';
-
-  @override
-  String get settings_units_sac_volumePerMinute_subtitle =>
-      'يتطلب حجم الأسطوانة (L/min أو cuft/min)';
 
   @override
   String get settings_units_temperature => 'درجة الحرارة';
@@ -16989,7 +16996,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statistics_category_equipment_title => 'المعدات';
 
   @override
-  String get statistics_category_gas_subtitle => 'معدلات SAC وخلطات الغاز';
+  String get statistics_category_gas_subtitle => 'استهلاك الغاز وخلطات الغاز';
 
   @override
   String get statistics_category_gas_title => 'استهلاك الهواء';
@@ -17200,42 +17207,49 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا توجد بيانات أسطوانات متعددة متاحة';
 
   @override
-  String get statistics_gas_sacByRole_error => 'فشل تحميل SAC حسب الدور';
+  String get statistics_gas_sacByRole_error => 'فشل تحميل الاستهلاك حسب الدور';
 
   @override
   String get statistics_gas_sacByRole_subtitle =>
       'متوسط الاستهلاك حسب نوع الأسطوانة';
 
   @override
-  String get statistics_gas_sacByRole_title => 'SAC حسب دور الأسطوانة';
+  String get statistics_gas_sacByRole_title =>
+      'استهلاك الغاز حسب دور الأسطوانة';
 
   @override
-  String get statistics_gas_sacRecords_best => 'أفضل معدل SAC';
+  String get statistics_gas_sacRecords_empty => 'لا توجد بيانات استهلاك بعد';
 
   @override
-  String get statistics_gas_sacRecords_empty => 'لا توجد بيانات SAC متاحة بعد';
+  String get statistics_gas_sacRecords_error => 'فشل تحميل سجلات الاستهلاك';
 
   @override
-  String get statistics_gas_sacRecords_error => 'فشل تحميل سجلات SAC';
+  String get statistics_gas_sacRecords_highestRmv => 'أعلى RMV';
 
   @override
-  String get statistics_gas_sacRecords_highest => 'أعلى معدل SAC';
+  String get statistics_gas_sacRecords_highestSac => 'أعلى SAC';
+
+  @override
+  String get statistics_gas_sacRecords_bestRmv => 'أفضل RMV';
+
+  @override
+  String get statistics_gas_sacRecords_bestSac => 'أفضل SAC';
 
   @override
   String get statistics_gas_sacRecords_subtitle => 'أفضل وأسوأ استهلاك للهواء';
 
   @override
-  String get statistics_gas_sacRecords_title => 'سجلات معدل SAC';
+  String get statistics_gas_sacRecords_title => 'سجلات استهلاك الغاز';
 
   @override
-  String get statistics_gas_sacTrend_error => 'فشل تحميل اتجاه SAC';
+  String get statistics_gas_sacTrend_error => 'فشل تحميل اتجاه الاستهلاك';
 
   @override
   String get statistics_gas_sacTrend_subtitle =>
       'المتوسط الشهري على مدى 5 سنوات';
 
   @override
-  String get statistics_gas_sacTrend_title => 'اتجاه معدل SAC';
+  String get statistics_gas_sacTrend_title => 'اتجاه استهلاك الغاز';
 
   @override
   String get statistics_gas_tankRole_backGas => 'غاز رئيسي';
@@ -19735,12 +19749,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get units_profileMetric_millivolts => 'mV';
-
-  @override
-  String get units_sac_litersPerMin => 'L/min';
-
-  @override
-  String get units_sac_pressurePerMin => 'ضغط/min';
 
   @override
   String get units_temperature_celsius => 'C';
@@ -24264,7 +24272,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String diveLog_detail_sacVolumeHint(String unit) {
-    return 'أضف حجم الأسطوانة لعرض معدل SAC بوحدة $unit/min';
+    return 'أضف حجم الأسطوانة لعرض RMV بوحدة $unit/min';
   }
 
   @override
@@ -25523,7 +25531,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_diveField_endPressure => 'ضغط النهاية';
 
   @override
-  String get enum_diveField_sacRate => 'معدل SAC';
+  String get enum_diveField_rmv => 'RMV (معدل الحجم)';
+
+  @override
+  String get enum_diveField_sac => 'SAC (معدل الضغط)';
 
   @override
   String get enum_diveField_gasConsumed => 'الغاز المستهلك';
@@ -25697,7 +25708,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_diveField_endPressure_short => 'النهاية';
 
   @override
-  String get enum_diveField_sacRate_short => 'SAC';
+  String get enum_diveField_rmv_short => 'RMV';
+
+  @override
+  String get enum_diveField_sac_short => 'SAC';
 
   @override
   String get enum_diveField_gasConsumed_short => 'المستهلك';

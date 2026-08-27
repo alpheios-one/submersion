@@ -4601,7 +4601,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_label_rateOfChange => '变化率';
 
   @override
-  String get diveLog_detail_label_sacRate => '气体消耗率';
+  String get diveLog_detail_label_rmv => 'RMV';
+
+  @override
+  String get diveLog_detail_label_sac => 'SAC';
 
   @override
   String get diveLog_detail_label_state => '状态';
@@ -4678,7 +4681,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_section_oxygenToxicity => '氧中毒';
 
   @override
-  String get diveLog_detail_section_sacRateBySegment => '按分段的气体消耗率';
+  String get diveLog_detail_section_sacRateBySegment => '按分段的气体消耗';
 
   @override
   String get diveLog_detail_section_tags => '标签';
@@ -5672,7 +5675,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_legend_label_pressureThresholds => '压力阈值';
 
   @override
-  String get diveLog_legend_label_sacRate => '气体消耗率';
+  String get diveLog_legend_label_sacRate => '消耗';
 
   @override
   String get diveLog_legend_label_showGas => '气体';
@@ -6260,7 +6263,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get setup_units_pressure => '压力';
 
   @override
-  String get setup_units_sac => 'SAC 耗气率';
+  String get setup_units_gasConsumption => '气体消耗';
 
   @override
   String get setup_units_subtitle => '选择测量值的显示方式。每个单位都可以单独微调。';
@@ -6722,9 +6725,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_rangeStats_label_minTemp => '最低温度';
-
-  @override
-  String get diveLog_rangeStats_label_sacRate => '气体消耗率';
 
   @override
   String get diveLog_rangeStats_title => '范围统计';
@@ -7189,7 +7189,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_tooltip_rate => '速率';
 
   @override
-  String get diveLog_tooltip_sac => 'SAC';
+  String get gasConsumption_rmv => 'RMV';
+
+  @override
+  String get gasConsumption_sac => 'SAC';
 
   @override
   String get diveLog_tooltip_sensor => '传感器';
@@ -9698,10 +9701,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_profileMetric_pressure_short => '压力';
 
   @override
-  String get enum_profileMetric_sacRate => '气体消耗率';
+  String get enum_profileMetric_sacRate => '气体消耗';
 
   @override
-  String get enum_profileMetric_sacRate_short => 'SAC';
+  String get enum_profileMetric_sacRate_short => '消耗';
 
   @override
   String get enum_profileMetric_surfaceGf => '水面 GF';
@@ -13888,10 +13891,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get diveDetailSection_sacSegments_name => '分段耗气率';
+  String get diveDetailSection_sacSegments_name => '按分段的气体消耗';
 
   @override
-  String get diveDetailSection_sacSegments_description => '按阶段/时间的SAC分段';
+  String get diveDetailSection_sacSegments_description => '按阶段或时间的 SAC 和 RMV';
 
   @override
   String get diveDetailSection_details_name => '详情';
@@ -14265,7 +14268,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_appearance_metric_pressure => '压力';
 
   @override
-  String get settings_appearance_metric_sacRate => '气体消耗率';
+  String get settings_appearance_metric_sacRate => '气体消耗';
 
   @override
   String get settings_appearance_metric_surfaceGf => '水面梯度因子';
@@ -16102,9 +16105,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_units_dialog_pressureUnit => '压力单位';
 
   @override
-  String get settings_units_dialog_sacRateUnit => '耗气率单位';
-
-  @override
   String get settings_units_gasModel => '气体计算';
 
   @override
@@ -16168,27 +16168,32 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_units_quickSelect => '快速选择';
 
   @override
-  String get settings_units_sacRate => '气体消耗率';
+  String get settings_units_gasConsumption_both_subtitle => '并排显示 SAC 和 RMV。';
+
+  @override
+  String get settings_units_gasConsumption_both => '两者';
+
+  @override
+  String settings_units_gasConsumption_rmv_subtitle(String unit) {
+    return '水面每分钟呼吸的气体容量（$unit）。需要气瓶容量。';
+  }
+
+  @override
+  String settings_units_gasConsumption_sac_subtitle(String unit) {
+    return '每分钟气瓶压力下降（$unit）。适用于任何已记录的压力。';
+  }
+
+  @override
+  String get settings_units_dialog_gasConsumption => '气体消耗显示';
+
+  @override
+  String get settings_units_gasConsumption => '气体消耗';
 
   @override
   String get settings_units_defaultCurrency => '默认货币';
 
   @override
   String get settings_units_dialog_defaultCurrency => '默认货币';
-
-  @override
-  String get settings_units_sac_pressurePerMinute => '压力/分钟';
-
-  @override
-  String get settings_units_sac_pressurePerMinute_subtitle =>
-      '无需气瓶容量（bar/min 或 psi/min）';
-
-  @override
-  String get settings_units_sac_volumePerMinute => '容量/分钟';
-
-  @override
-  String get settings_units_sac_volumePerMinute_subtitle =>
-      '需要气瓶容量（L/min 或 cuft/min）';
 
   @override
   String get settings_units_temperature => '温度';
@@ -16426,7 +16431,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_category_equipment_title => '装备';
 
   @override
-  String get statistics_category_gas_subtitle => '耗气率与混合气';
+  String get statistics_category_gas_subtitle => '气体消耗和气体混合';
 
   @override
   String get statistics_category_gas_title => '空气消耗';
@@ -16619,40 +16624,46 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_gas_sacByRole_empty => '无可用多气瓶数据';
 
   @override
-  String get statistics_gas_sacByRole_error => '加载按用途分类的耗气率失败';
+  String get statistics_gas_sacByRole_error => '加载按用途分类的消耗失败';
 
   @override
   String get statistics_gas_sacByRole_subtitle => '按气瓶类型的平均耗气量';
 
   @override
-  String get statistics_gas_sacByRole_title => '按气瓶用途的耗气率';
+  String get statistics_gas_sacByRole_title => '按气瓶用途的气体消耗';
 
   @override
-  String get statistics_gas_sacRecords_best => '最佳耗气率';
+  String get statistics_gas_sacRecords_empty => '暂无消耗数据';
 
   @override
-  String get statistics_gas_sacRecords_empty => '暂无耗气率数据';
+  String get statistics_gas_sacRecords_error => '加载消耗记录失败';
 
   @override
-  String get statistics_gas_sacRecords_error => '加载耗气率记录失败';
+  String get statistics_gas_sacRecords_highestRmv => '最高 RMV';
 
   @override
-  String get statistics_gas_sacRecords_highest => '最高耗气率';
+  String get statistics_gas_sacRecords_highestSac => '最高 SAC';
+
+  @override
+  String get statistics_gas_sacRecords_bestRmv => '最佳 RMV';
+
+  @override
+  String get statistics_gas_sacRecords_bestSac => '最佳 SAC';
 
   @override
   String get statistics_gas_sacRecords_subtitle => '最佳和最差耗气量';
 
   @override
-  String get statistics_gas_sacRecords_title => '耗气率记录';
+  String get statistics_gas_sacRecords_title => '气体消耗记录';
 
   @override
-  String get statistics_gas_sacTrend_error => '加载耗气率趋势失败';
+  String get statistics_gas_sacTrend_error => '加载消耗趋势失败';
 
   @override
   String get statistics_gas_sacTrend_subtitle => '5年月均值';
 
   @override
-  String get statistics_gas_sacTrend_title => '耗气率趋势';
+  String get statistics_gas_sacTrend_title => '气体消耗趋势';
 
   @override
   String get statistics_gas_tankRole_backGas => '主气';
@@ -19066,12 +19077,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get units_profileMetric_millivolts => 'mV';
-
-  @override
-  String get units_sac_litersPerMin => 'L/分钟';
-
-  @override
-  String get units_sac_pressurePerMin => '压力/分';
 
   @override
   String get units_temperature_celsius => 'C';
@@ -23451,7 +23456,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String diveLog_detail_sacVolumeHint(String unit) {
-    return '添加气瓶容积以按 $unit/min 显示气体消耗率';
+    return '添加气瓶容积以按 $unit/min 显示 RMV';
   }
 
   @override
@@ -24651,7 +24656,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_diveField_endPressure => '结束压力';
 
   @override
-  String get enum_diveField_sacRate => 'SAC 耗气率';
+  String get enum_diveField_rmv => 'RMV（容量速率）';
+
+  @override
+  String get enum_diveField_sac => 'SAC（压力速率）';
 
   @override
   String get enum_diveField_gasConsumed => '气体消耗';
@@ -24825,7 +24833,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_diveField_endPressure_short => '终压';
 
   @override
-  String get enum_diveField_sacRate_short => 'SAC';
+  String get enum_diveField_rmv_short => 'RMV';
+
+  @override
+  String get enum_diveField_sac_short => 'SAC';
 
   @override
   String get enum_diveField_gasConsumed_short => '耗气';
