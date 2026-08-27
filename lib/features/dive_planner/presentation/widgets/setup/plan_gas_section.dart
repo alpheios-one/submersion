@@ -61,7 +61,7 @@ class PlanGasSection extends ConsumerWidget {
             ),
           ],
         ),
-        _LoggedRmvButton(currentSac: planState.sacRate, units: units),
+        _LoggedRmvButton(currentRmv: planState.sacRate, units: units),
         const SizedBox(height: 12),
         _ReservePressureInput(
           reservePressure: planState.reservePressure,
@@ -85,20 +85,20 @@ class PlanGasSection extends ConsumerWidget {
 /// One-tap RMV auto-fill from the diver's logged average ("from your log").
 /// Hidden when no logged average exists or it already matches the plan.
 class _LoggedRmvButton extends ConsumerWidget {
-  const _LoggedRmvButton({required this.currentSac, required this.units});
+  const _LoggedRmvButton({required this.currentRmv, required this.units});
 
-  final double currentSac;
+  final double currentRmv;
   final UnitFormatter units;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final loggedSac = ref.watch(loggedAverageSacProvider).valueOrNull;
-    if (loggedSac == null || (loggedSac - currentSac).abs() < 0.5) {
+    final loggedRmv = ref.watch(loggedAverageSacProvider).valueOrNull;
+    if (loggedRmv == null || (loggedRmv - currentRmv).abs() < 0.5) {
       return const SizedBox.shrink();
     }
 
     final display =
-        '${units.convertVolume(loggedSac).toStringAsFixed(1)} '
+        '${units.convertVolume(loggedRmv).toStringAsFixed(1)} '
         '${units.volumeSymbol}/min';
     return Align(
       alignment: Alignment.centerLeft,
@@ -107,7 +107,7 @@ class _LoggedRmvButton extends ConsumerWidget {
         label: Text(context.l10n.plannerCanvas_sac_useLogged(display)),
         onPressed: () => ref
             .read(divePlanNotifierProvider.notifier)
-            .updateSacRate(loggedSac.clamp(8.0, 30.0)),
+            .updateSacRate(loggedRmv.clamp(8.0, 30.0)),
       ),
     );
   }
