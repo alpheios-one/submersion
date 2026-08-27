@@ -111,6 +111,27 @@ class ValidateChambersTest(unittest.TestCase):
         self.assertTrue(any("at least 100" in e for e in errors))
 
 
+class DescribePhoneShapeTest(unittest.TestCase):
+    def test_reports_the_shape_without_the_number(self):
+        shape = chamber_harvester.describe_phone_shape("02 1234 5678")
+        self.assertIn("10 digits", shape)
+        self.assertIn("no leading +", shape)
+        self.assertNotIn("1234", shape)
+
+    def test_a_fused_pair_of_numbers_is_visible_from_the_digit_count(self):
+        shape = chamber_harvester.describe_phone_shape("+399572646110957264911")
+        self.assertIn("21 digits", shape)
+        self.assertIn("leading +", shape)
+
+    def test_a_validation_error_does_not_echo_the_number(self):
+        errors = chamber_harvester.validate_chambers(
+            [_row(phone="02 1234 5678")], min_count=1
+        )
+        joined = " ".join(errors)
+        self.assertIn("phone", joined)
+        self.assertNotIn("1234", joined)
+
+
 class MergeRowsTest(unittest.TestCase):
     def test_overlay_rows_win_over_harvested_leads(self):
         lead = _row(phone="+39-02-0000-0000")

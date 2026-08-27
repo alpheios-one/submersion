@@ -134,4 +134,28 @@ void main() {
 
     expect(find.textContaining('12 km'), findsOneWidget);
   });
+
+  testWidgets('shows a localized message when the directory fails to load', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+          chamberListingsProvider.overrideWith(
+            (ref) async => throw Exception('boom'),
+          ),
+        ],
+        child: const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: ChambersDirectoryPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('went wrong'), findsOneWidget);
+  });
 }

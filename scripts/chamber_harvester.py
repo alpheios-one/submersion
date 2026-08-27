@@ -42,6 +42,20 @@ E164_ISH = re.compile(r"^\+[0-9][0-9\-\s().]{5,}$")
 ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
+def describe_phone_shape(value):
+    """Describe why a number looks wrong without echoing the number itself.
+
+    The two failure modes this pipeline actually hits are a missing country
+    code and two numbers fused into one by a greedy match, and both are visible
+    from the digit count and the leading character alone. Reporting the shape
+    rather than the value also keeps published contact details out of build
+    logs, which is what code scanning objects to.
+    """
+    digits = sum(1 for character in value if character.isdigit())
+    lead = "leading +" if value.startswith("+") else "no leading +"
+    return f"{digits} digits, {lead}"
+
+
 def validate_chambers(chambers, min_count=MIN_CHAMBERS):
     """Return a list of human-readable errors. Empty means the dataset is fit
     to ship."""
@@ -74,14 +88,15 @@ def validate_chambers(chambers, min_count=MIN_CHAMBERS):
             errors.append(f"{where}: missing phone")
         elif not E164_ISH.match(phone):
             errors.append(
-                f"{where}: phone must be internationally dialable, got {phone!r}"
+                f"{where}: phone must be internationally dialable "
+                f"({describe_phone_shape(phone)})"
             )
 
         emergency_phone = chamber.get("emergencyPhone")
         if emergency_phone is not None and not E164_ISH.match(emergency_phone):
             errors.append(
-                f"{where}: emergencyPhone must be internationally dialable, "
-                f"got {emergency_phone!r}"
+                f"{where}: emergencyPhone must be internationally dialable "
+                f"({describe_phone_shape(emergency_phone)})"
             )
 
         lat = chamber.get("latitude")

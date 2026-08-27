@@ -57,6 +57,9 @@ class ChamberTile extends ConsumerWidget {
     ].join(' - ');
 
     final isElective = chamber.capability == ChamberCapability.elective;
+    // Empty for an unknown availability, which is the single place that decides
+    // whether the label is worth showing.
+    final availability = _availabilityLabel(l10n, chamber.availability);
 
     return Card(
       child: ListTile(
@@ -78,11 +81,8 @@ class ChamberTile extends ConsumerWidget {
                     text: _capabilityLabel(l10n, chamber.capability),
                     emphasized: isElective,
                   ),
-                if (chamber.availability != ChamberAvailability.unknown)
-                  Text(
-                    _availabilityLabel(l10n, chamber.availability),
-                    style: theme.textTheme.labelMedium,
-                  ),
+                if (availability.isNotEmpty)
+                  Text(availability, style: theme.textTheme.labelMedium),
               ],
             ),
             if (provenance.isNotEmpty)
