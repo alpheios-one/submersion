@@ -97,7 +97,7 @@ per the project convention, plus a mapping to the existing
 
 ## Schema version
 
-**v168.** Derived by scanning open PR diffs for the scalar, not by grepping
+**v171.** Renumbered from 168, which PR #1237 held. Derived by scanning open PR diffs for the scalar, not by grepping
 main: main is at v164, and v165, v166, v167 are claimed by PRs #1300, #1290,
 and #1276 respectively. Re-verify at implementation time, and re-grep the
 scalar after any merge from main, because two branches writing the same number
@@ -105,9 +105,9 @@ auto-merge with no conflict marker.
 
 The claim touches the six places the ladder requires: the
 `currentSchemaVersion` scalar, the `migrationVersions` ladder entry, the
-`_assertTripDayWeatherSchema()` helper docstring, the `if (from < 168)`
+`_assertTripDayWeatherSchema()` helper docstring, the `if (from < 171)`
 onUpgrade guard and its `reportProgress()` twin, the `beforeOpen` backstop
-comment, and the `migration_v168_trip_day_weather_test.dart` filename with its
+comment, and the `migration_v171_trip_day_weather_test.dart` filename with its
 version assertions. The ladder is non-contiguous by design (v162 is
 permanently skipped, and reserved rungs may be missing), so the migration
 audit asserts monotonic, unique, and scalar equals max, never contiguous.
@@ -204,7 +204,7 @@ Tests come first, per the project's TDD rule.
   future day, row already stored, no coordinate available), plus the two
   negative-result cases that must write no row (service returns null; service
   returns an all-null `WeatherData`).
-- **Migration:** `migration_v168_trip_day_weather_test.dart`, including a
+- **Migration:** `migration_v171_trip_day_weather_test.dart`, including a
   stranded-database fixture at the previous `PRAGMA user_version`, plus the
   existing ladder audit in `test/core/database/`.
 - **Sync:** a round trip proving a row exports and re-imports intact.

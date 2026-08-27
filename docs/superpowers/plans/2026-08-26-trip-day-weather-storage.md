@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - **Worktree:** all work happens in `/Users/ericgriffin/repos/submersion-app/submersion/.claude/worktrees/trip-day-weather` on branch `worktree-trip-day-weather`. The Bash working directory does NOT reliably persist across turns: put `cd <worktree> &&` in the same compound command as the work and echo `pwd`, or use absolute paths. A relative-path write from the wrong cwd silently edits the main checkout.
-- **Schema version is 168.** Verified by scanning open PR diffs: main is at 164, and 165/166/167 are claimed by PRs #1300, #1290, #1276. Re-verify with the scan in Task 1 before writing the number. Do NOT raise `minimumCompatibleSchemaVersion` (stays 160): a new table is additive.
+- **Schema version is 171.** Renumbered from 168: that number was already claimed and pushed by PR #1237 (issue #638), but the claim was local and unpushed when this branch picked its number, so an open-PR scan could not see it. 165-170 are claimed by #1290, #1300, #1276, #1237, the gear-twin branch, and #1322. Re-verify with BOTH scans (open-PR diffs AND every worktree's working-tree scalar) immediately before pushing, not just when picking the number. Do NOT raise `minimumCompatibleSchemaVersion` (stays 160): a new table is additive.
 - **No em-dashes** (`—`, U+2014) in any output: code, comments, docs, commit messages. En-dashes and " - " as prose punctuation are equally forbidden. A hyphen inside a compound word or CLI flag is fine.
 - **No emojis** in code, comments, or documentation.
 - **Timestamps are epoch MILLISECONDS** in these tables (`DateTime.millisecondsSinceEpoch`), matching `ItineraryDayRepository`. The `// Unix timestamp` comment on `trip_itinerary_days.date` is misleading; the repository writes milliseconds.
@@ -25,19 +25,19 @@
 
 ---
 
-### Task 1: Schema, entity, and the v168 migration
+### Task 1: Schema, entity, and the v171 migration
 
 **Files:**
 - Create: `lib/features/trips/domain/entities/trip_day_weather.dart`
 - Modify: `lib/core/database/database.dart` (table class near `TripItineraryDays` at line 117; `@DriftDatabase(tables: [...])` list; `currentSchemaVersion` at line 3183; `migrationVersions` list; a new `_assertTripDayWeatherSchema()` helper next to `_assertQualityFindingsSchema()` at line 3932; the `onUpgrade` ladder tail at line 8614; the `beforeOpen` backstop block around line 8823)
-- Test: `test/core/database/migration_v168_trip_day_weather_test.dart`
+- Test: `test/core/database/migration_v171_trip_day_weather_test.dart`
 
 **Interfaces:**
 - Consumes: nothing (first task).
 - Produces:
   - Drift table `TripDayWeather` -> generated row class `TripDayWeatherData`, accessor `_db.tripDayWeather`, companion `TripDayWeatherCompanion`.
   - Domain entity `TripDayWeather` (in the `features/trips` namespace; import it `as domain` wherever the Drift row class is also in scope, per the project's import-alias convention) with fields `id`, `tripId`, `date`, `latitude`, `longitude`, `airTemp`, `cloudCover`, `precipitation`, `windSpeed`, `windDirection`, `humidity`, `surfacePressure`, `weatherCode`, `weatherSource`, `fetchedAt`, `createdAt`, `updatedAt`; `copyWith`; and `TripStoryDayWeather toStoryWeather()`.
-  - `AppDatabase.currentSchemaVersion == 168`.
+  - `AppDatabase.currentSchemaVersion == 171`.
 
 - [ ] **Step 1: Re-verify the schema version claim**
 
@@ -51,11 +51,11 @@ cd /Users/ericgriffin/repos/submersion-app/submersion && \
   done
 ```
 
-Expected: claims at 165 (#1290), 166 (#1300), 167 (#1276), plus stale claims from #1237 and #603 that are far below main and do not count. Combined with `currentSchemaVersion = 164` on this branch, the next free rung is **168**. If the scan shows a claim at 168, use the next free number above every claim and substitute it everywhere `168` appears in this plan, including the test filename.
+Expected: claims at 165 (#1290), 166 (#1300), 167 (#1276), 168 (#1237), 169 (the dive-computer gear-twin branch, local only), 170 (#1322), plus a stale claim from #603 that is far below main and does not count. NOTE: the #1237 claim read as stale v161 when this plan was written and was in fact a live v168, because its renumber was resolved locally and not yet pushed. An open-PR scan cannot see an unpushed claim; also scan every worktree's working-tree scalar. The next free rung is **171**.
 
 - [ ] **Step 2: Write the failing migration test**
 
-Create `test/core/database/migration_v168_trip_day_weather_test.dart`. Model it on the other `migration_v*_test.dart` files in that directory: read one first to copy the exact in-memory database setup helper they use.
+Create `test/core/database/migration_v171_trip_day_weather_test.dart`. Model it on the other `migration_v*_test.dart` files in that directory: read one first to copy the exact in-memory database setup helper they use.
 
 ```dart
 import 'package:drift/drift.dart';
@@ -66,13 +66,13 @@ import 'package:submersion/core/database/database.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('v168 trip_day_weather', () {
-    test('the ladder claims 168', () {
+  group('v171 trip_day_weather', () {
+    test('the ladder claims 171', () {
       expect(
         AppDatabase.currentSchemaVersion,
-        greaterThanOrEqualTo(168),
+        greaterThanOrEqualTo(171),
       );
-      expect(AppDatabase.migrationVersions, contains(168));
+      expect(AppDatabase.migrationVersions, contains(171));
     });
 
     test('a new database has the trip_day_weather table with every column', () async {
@@ -149,10 +149,10 @@ Note on the last test: check how the sibling `migration_v*_test.dart` files buil
 ```bash
 cd /Users/ericgriffin/repos/submersion-app/submersion/.claude/worktrees/trip-day-weather && \
   echo "PWD: $(pwd)" && \
-  flutter test test/core/database/migration_v168_trip_day_weather_test.dart
+  flutter test test/core/database/migration_v171_trip_day_weather_test.dart
 ```
 
-Expected: FAIL. `migrationVersions` does not contain 168, and `PRAGMA table_info(trip_day_weather)` returns no rows.
+Expected: FAIL. `migrationVersions` does not contain 171, and `PRAGMA table_info(trip_day_weather)` returns no rows.
 
 - [ ] **Step 4: Add the Drift table**
 
@@ -219,7 +219,7 @@ Then add `TripDayWeather,` to the `tables: [...]` list in the `@DriftDatabase` a
 Next to `_assertQualityFindingsSchema()` (line 3932), which is the pattern to copy, add:
 
 ```dart
-  /// v168: fetched per-day trip weather. Idempotent, so it doubles as the
+  /// v171: fetched per-day trip weather. Idempotent, so it doubles as the
   /// beforeOpen backstop for a database that took the rung before the unique
   /// index existed.
   Future<void> _assertTripDayWeatherSchema() async {
@@ -254,24 +254,24 @@ Next to `_assertQualityFindingsSchema()` (line 3932), which is the pattern to co
 
 - [ ] **Step 6: Claim the rung in all six places**
 
-1. `static const int currentSchemaVersion = 168;` (was 164, line 3183).
-2. Append `168,` to the end of the `migrationVersions` list. The ladder is non-contiguous by design (162 is permanently skipped and reserved rungs may be missing); do not "fix" the gaps.
-3. The helper docstring above already names v168.
+1. `static const int currentSchemaVersion = 171;` (was 164, line 3183).
+2. Append `171,` to the end of the `migrationVersions` list. The ladder is non-contiguous by design (162 is permanently skipped and reserved rungs may be missing); do not "fix" the gaps.
+3. The helper docstring above already names v171.
 4. In `onUpgrade`, after the `if (from < 164) await reportProgress();` pair at line 8617, add both halves:
 
 ```dart
-        // v168: trip_day_weather, fetched per-day weather for trip days whose
+        // v171: trip_day_weather, fetched per-day weather for trip days whose
         // dives supply none.
-        if (from < 168) {
+        if (from < 171) {
           await _assertTripDayWeatherSchema();
         }
-        if (from < 168) await reportProgress();
+        if (from < 171) await reportProgress();
 ```
 
 5. In `beforeOpen`, alongside the other backstops (around line 8823), add:
 
 ```dart
-        // v168 backstop: re-assert the trip day weather table (the helper is
+        // v171 backstop: re-assert the trip day weather table (the helper is
         // CREATE TABLE IF NOT EXISTS, so it is safe on every open).
         await _assertTripDayWeatherSchema();
 ```
@@ -456,7 +456,7 @@ Expected: PASS, including the pre-existing ladder audit tests. Roughly 465 tests
 cd /Users/ericgriffin/repos/submersion-app/submersion/.claude/worktrees/trip-day-weather && \
   dart format . && \
   git add -A && \
-  git commit -m "feat(db): add trip_day_weather table at schema v168
+  git commit -m "feat(db): add trip_day_weather table at schema v171
 
 One row per trip day, holding fetched historical weather for days whose
 dives supply none. A separate table rather than columns on an existing
@@ -2011,7 +2011,7 @@ cd /Users/ericgriffin/repos/submersion-app/submersion/.claude/worktrees/trip-day
   grep -n "currentSchemaVersion = " lib/core/database/database.dart | head -1
 ```
 
-Expected: 168, and still above every claim found by the Task 1 scan. If another branch has landed on 168 since, renumber: the six places from Task 1 Step 6 plus the test filename, then re-run `flutter test test/core/database/`.
+Expected: 171, and still above every claim found by the Task 1 scan. Re-run BOTH scans immediately before pushing, not just when picking the number: a claim can land in between. If another branch has taken 171 since, renumber: the six places from Task 1 Step 6 plus the test filename and this plan, then re-run `flutter test test/core/database/`.
 
 - [ ] **Step 5: Commit anything the format pass touched**
 

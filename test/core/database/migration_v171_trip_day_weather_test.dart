@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/database/database.dart';
 
-/// v168 adds `trip_day_weather`: fetched historical weather for trip days
+/// v171 adds `trip_day_weather`: fetched historical weather for trip days
 /// whose dives supply none of their own (surface days and dive-free itinerary
 /// days). Its own table rather than columns on `trips` or `trip_itinerary_days`
 /// because HLC conflicts resolve per row, and an automatic derived write must
@@ -36,9 +36,9 @@ Future<Set<String>> _columnsOf(AppDatabase db, String table) async {
 }
 
 void main() {
-  test('v168 is in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(168));
-    expect(AppDatabase.migrationVersions, contains(168));
+  test('v171 is in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(171));
+    expect(AppDatabase.migrationVersions, contains(171));
   });
 
   test('a fresh database has trip_day_weather with every column', () async {
@@ -123,13 +123,13 @@ void main() {
     expect(trip.read<String>('name'), 'Bonaire');
   });
 
-  test('a database stranded at a parallel-branch v168 gains the table via '
+  test('a database stranded at a parallel-branch v171 gains the table via '
       'beforeOpen', () async {
-    // Stamped AT 168 but without the table: the onUpgrade block never runs,
+    // Stamped AT 171 but without the table: the onUpgrade block never runs,
     // so only the beforeOpen backstop can create it.
     final nativeDb = NativeDatabase.memory(
       setup: (rawDb) {
-        rawDb.execute('PRAGMA user_version = 168');
+        rawDb.execute('PRAGMA user_version = 171');
       },
     );
     final db = AppDatabase(nativeDb);

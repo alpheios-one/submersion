@@ -3235,7 +3235,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 168;
+  static const int currentSchemaVersion = 171;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3531,11 +3531,16 @@ class AppDatabase extends _$AppDatabase {
     // media item in the dive when its capture time is wrong (issue #1090).
     // Renumbered from 162, which #731 landed past while this branch was open.
     164,
-    // v168: trip_day_weather, fetched historical weather for trip days whose
-    // dives supply none. 165, 166, and 167 are claimed by open PRs (#1290,
-    // #1300, #1276), so this ladder is non-contiguous by design; the audit
+    // v171: trip_day_weather, fetched historical weather for trip days whose
+    // dives supply none. Renumbered from 168, which PR #1237 (issue #638,
+    // buddies.is_favorite) had already claimed and pushed; that claim was
+    // local and unpushed when this branch picked its number, so an open-PR
+    // scan could not see it.
+    // 165 through 170 are deliberately absent, not missing: 165 #1290,
+    // 166 #1300, 167 #1276, 168 #1237, 169 the dive-computer gear-twin
+    // branch, 170 #1322. This ladder is non-contiguous by design; the audit
     // asserts monotonic, unique, and scalar == max, never contiguous.
-    168,
+    171,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -3989,10 +3994,10 @@ class AppDatabase extends _$AppDatabase {
   /// v129: quality_findings table for the Data Quality Assistant.
   /// Idempotent so it is safe to call from both onUpgrade and the
   /// beforeOpen backstop.
-  /// v168: fetched per-day trip weather.
+  /// v171: fetched per-day trip weather.
   ///
   /// Idempotent, so it doubles as the beforeOpen backstop for a database
-  /// stranded at 168 by a parallel branch that never created the table.
+  /// stranded at 171 by a parallel branch that never created the table.
   Future<void> _assertTripDayWeatherSchema() async {
     await customStatement('''
       CREATE TABLE IF NOT EXISTS trip_day_weather (
@@ -8710,12 +8715,12 @@ class AppDatabase extends _$AppDatabase {
           await _assertMediaManualElapsedColumn();
         }
         if (from < 164) await reportProgress();
-        // v168: trip_day_weather, fetched per-day weather for trip days whose
+        // v171: trip_day_weather, fetched per-day weather for trip days whose
         // dives supply none.
-        if (from < 168) {
+        if (from < 171) {
           await _assertTripDayWeatherSchema();
         }
-        if (from < 168) await reportProgress();
+        if (from < 171) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8920,7 +8925,7 @@ class AppDatabase extends _$AppDatabase {
         // media row mapper reads it on every hydration.
         await _assertMediaManualElapsedColumn();
 
-        // v168 backstop: re-assert trip_day_weather (same parallel-branch
+        // v171 backstop: re-assert trip_day_weather (same parallel-branch
         // version-collision self-heal). The helper is CREATE TABLE IF NOT
         // EXISTS plus CREATE UNIQUE INDEX IF NOT EXISTS, so it is a no-op on
         // every open after the first.
