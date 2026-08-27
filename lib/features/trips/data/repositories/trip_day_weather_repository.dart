@@ -8,6 +8,8 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart'
     as domain;
+import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart'
+    show tripDayWeatherRowId;
 
 /// Reads and writes stored per-day trip weather.
 ///
@@ -61,16 +63,19 @@ class TripDayWeatherRepository {
       final now = DateTime.now().millisecondsSinceEpoch;
       final dateMillis = _dayKey(weather.date);
 
-      // Reuse the stored row's id when the day already has one: a peer may
-      // have written its own uuid for this day, and replacing it under a new
-      // id would violate the unique index and orphan the peer's sync record.
-      final existing =
-          await (_db.select(_db.tripDayWeather)..where(
-                (t) =>
-                    t.tripId.equals(weather.tripId) & t.date.equals(dateMillis),
-              ))
-              .getSingleOrNull();
-      final id = existing?.id ?? weather.id;
+      // The id is derived from (trip, day), never taken from the caller, so
+      // every device writing this day produces the same primary key and sync
+      // merges by id instead of colliding on the unique index.
+      final id = tripDayWeatherRowId(
+        tripId: weather.tripId,
+        dayMillis: dateMillis,
+      );
+
+      // Only to preserve createdAt across an update; insertOnConflictUpdate
+      // would otherwise overwrite it with this write's timestamp.
+      final existing = await (_db.select(
+        _db.tripDayWeather,
+      )..where((t) => t.id.equals(id))).getSingleOrNull();
 
       await _db
           .into(_db.tripDayWeather)
@@ -149,7 +154,13 @@ class TripDayWeatherRepository {
     return domain.TripDayWeather(
       id: row.id,
       tripId: row.tripId,
-      date: DateTime.fromMillisecondsSinceEpoch(row.date),
+      // Normalized, matching the map key getForTrip returns it under: a row
+      // written by an older build or an out-of-date peer can still carry a
+      // time component, and handing that back would put time-bearing dates
+      // into downstream logic.
+      date: DateTime.fromMillisecondsSinceEpoch(
+        _dayKey(DateTime.fromMillisecondsSinceEpoch(row.date)),
+      ),
       latitude: row.latitude,
       longitude: row.longitude,
       airTemp: row.airTemp,

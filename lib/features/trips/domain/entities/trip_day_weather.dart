@@ -1,7 +1,27 @@
 import 'package:equatable/equatable.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/trips/domain/entities/trip_story_day.dart';
+
+/// Fixed namespace for deterministic trip-day-weather ids (UUIDv5).
+/// Never change: the ids already stored depend on it.
+const String kTripDayWeatherNamespace = '3f1c8a52-9e47-4d6b-8b3a-16c9d0f27e45';
+
+/// Deterministic row id for one trip day.
+///
+/// The day is the identity, so the id must be derived from it rather than
+/// minted per device. Two devices that both fetch the same day would
+/// otherwise insert two rows, and the unique (trip_id, date) index turns the
+/// second one into an inbound-sync failure rather than a merge: the
+/// serializer upserts by primary key, so a differing id misses the conflict
+/// target entirely and hits the index instead. That throws inside the merge
+/// transaction and aborts the whole sync pull.
+///
+/// [dayMillis] must already be normalized to local midnight; the repository
+/// does that before calling here.
+String tripDayWeatherRowId({required String tripId, required int dayMillis}) =>
+    const Uuid().v5(kTripDayWeatherNamespace, '$tripId|$dayMillis');
 
 /// Stored historical weather for one trip day.
 ///
