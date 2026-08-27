@@ -7008,6 +7008,93 @@
   "marineLife_speciesManage_resetSuccess": "Built-in species restored to defaults",
   "marineLife_speciesManage_resetToDefaults": "Reset to Defaults",
   "marineLife_speciesManage_searchHint": "Search species...",
+  "marineLife_speciesPage_title": "Species",
+  "marineLife_speciesPage_searchHint": "Search species you have seen",
+  "marineLife_speciesPage_clearSearchTooltip": "Clear search",
+  "marineLife_speciesPage_manageCatalogTooltip": "Manage catalog",
+  "marineLife_speciesPage_sortTooltip": "Sort",
+  "marineLife_speciesPage_sort_mostSightings": "Most sightings",
+  "marineLife_speciesPage_sort_recentlySeen": "Recently seen",
+  "marineLife_speciesPage_sort_firstSeen": "First seen",
+  "marineLife_speciesPage_sort_name": "Name",
+  "marineLife_speciesPage_speciesCount": "{count, plural, =1{1 species} other{{count} species}}",
+  "@marineLife_speciesPage_speciesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marineLife_speciesPage_sightingsCount": "{count, plural, =1{1 sighting} other{{count} sightings}}",
+  "@marineLife_speciesPage_sightingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marineLife_speciesPage_divesCount": "{count, plural, =1{1 dive} other{{count} dives}}",
+  "@marineLife_speciesPage_divesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marineLife_speciesPage_lastSeen": "Last seen {date}",
+  "@marineLife_speciesPage_lastSeen": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "marineLife_speciesPage_emptyTitle": "No species yet",
+  "marineLife_speciesPage_emptyHint": "Marine life sightings added to a dive will show up here.",
+  "marineLife_speciesPage_noMatch": "No species match your search",
+  "marineLife_speciesPage_error": "Could not load your species: {error}",
+  "@marineLife_speciesPage_error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "marineLife_speciesPage_retry": "Retry",
+  "marineLife_speciesDetail_sightingsTitle": "Sightings ({count})",
+  "@marineLife_speciesDetail_sightingsTitle": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "marineLife_speciesDetail_sightingsError": "Could not load sightings: {error}",
+  "@marineLife_speciesDetail_sightingsError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "marineLife_speciesDetail_showAll": "Show all ({count})",
+  "@marineLife_speciesDetail_showAll": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "marineLife_speciesDetail_showFewer": "Show fewer",
+  "marineLife_speciesDetail_unknownSite": "Unknown site",
+  "marineLife_speciesDetail_countTimes": "× {count}",
+  "@marineLife_speciesDetail_countTimes": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
   "marineLife_speciesPicker_allFilter": "All",
   "marineLife_speciesPicker_cancelButton": "Cancel",
   "marineLife_speciesPicker_clearSearchTooltip": "Clear search",
@@ -10299,6 +10386,8 @@
   "statistics_marineLife_mostCommon_summary": "{count} species. Most common: {topName} with {topCount} sightings",
   "statistics_marineLife_mostCommon_title": "Most Common Sightings",
   "statistics_marineLife_speciesSpotted": "Species Spotted",
+  "statistics_marineLife_seeAllSpecies_title": "See all species",
+  "statistics_marineLife_seeAllSpecies_subtitle": "Every species you have logged, searchable",
   "statistics_profile_appBar_title": "Profile Analysis",
   "statistics_profile_ascentDescent_empty": "No profile data available",
   "statistics_profile_ascentDescent_error": "Failed to load rate data",

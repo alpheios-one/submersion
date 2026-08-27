@@ -11940,6 +11940,114 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => '搜索物种...';
 
   @override
+  String get marineLife_speciesPage_title => '物种';
+
+  @override
+  String get marineLife_speciesPage_searchHint => '搜索你见过的物种';
+
+  @override
+  String get marineLife_speciesPage_clearSearchTooltip => '清除搜索';
+
+  @override
+  String get marineLife_speciesPage_manageCatalogTooltip => '管理目录';
+
+  @override
+  String get marineLife_speciesPage_sortTooltip => '排序';
+
+  @override
+  String get marineLife_speciesPage_sort_mostSightings => '目击次数最多';
+
+  @override
+  String get marineLife_speciesPage_sort_recentlySeen => '最近见到';
+
+  @override
+  String get marineLife_speciesPage_sort_firstSeen => '首次见到';
+
+  @override
+  String get marineLife_speciesPage_sort_name => '名称';
+
+  @override
+  String marineLife_speciesPage_speciesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个物种',
+      one: '1 个物种',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_sightingsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次目击',
+      one: '1 次目击',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_divesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水',
+      one: '1 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_lastSeen(String date) {
+    return '最后见到 $date';
+  }
+
+  @override
+  String get marineLife_speciesPage_emptyTitle => '还没有物种';
+
+  @override
+  String get marineLife_speciesPage_emptyHint => '添加到潜水记录中的海洋生物目击会显示在这里。';
+
+  @override
+  String get marineLife_speciesPage_noMatch => '没有符合搜索条件的物种';
+
+  @override
+  String marineLife_speciesPage_error(String error) {
+    return '无法加载你的物种：$error';
+  }
+
+  @override
+  String get marineLife_speciesPage_retry => '重试';
+
+  @override
+  String marineLife_speciesDetail_sightingsTitle(Object count) {
+    return '目击 ($count)';
+  }
+
+  @override
+  String marineLife_speciesDetail_sightingsError(String error) {
+    return '无法加载目击记录：$error';
+  }
+
+  @override
+  String marineLife_speciesDetail_showAll(Object count) {
+    return '显示全部 ($count)';
+  }
+
+  @override
+  String get marineLife_speciesDetail_showFewer => '显示更少';
+
+  @override
+  String get marineLife_speciesDetail_unknownSite => '未知潜点';
+
+  @override
+  String marineLife_speciesDetail_countTimes(Object count) {
+    return '× $count';
+  }
+
+  @override
   String get marineLife_speciesPicker_allFilter => '全部';
 
   @override
@@ -16808,6 +16916,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get statistics_marineLife_speciesSpotted => '已发现物种';
+
+  @override
+  String get statistics_marineLife_seeAllSpecies_title => '查看所有物种';
+
+  @override
+  String get statistics_marineLife_seeAllSpecies_subtitle => '你记录过的所有物种，可搜索';
 
   @override
   String get statistics_profile_appBar_title => '轮廓分析';

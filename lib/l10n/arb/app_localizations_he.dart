@@ -12226,6 +12226,115 @@ class AppLocalizationsHe extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'חיפוש מינים...';
 
   @override
+  String get marineLife_speciesPage_title => 'מינים';
+
+  @override
+  String get marineLife_speciesPage_searchHint => 'חיפוש מינים שראית';
+
+  @override
+  String get marineLife_speciesPage_clearSearchTooltip => 'ניקוי החיפוש';
+
+  @override
+  String get marineLife_speciesPage_manageCatalogTooltip => 'ניהול הקטלוג';
+
+  @override
+  String get marineLife_speciesPage_sortTooltip => 'מיון';
+
+  @override
+  String get marineLife_speciesPage_sort_mostSightings => 'הכי הרבה תצפיות';
+
+  @override
+  String get marineLife_speciesPage_sort_recentlySeen => 'נראו לאחרונה';
+
+  @override
+  String get marineLife_speciesPage_sort_firstSeen => 'נראו לראשונה';
+
+  @override
+  String get marineLife_speciesPage_sort_name => 'שם';
+
+  @override
+  String marineLife_speciesPage_speciesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count מינים',
+      one: 'מין אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_sightingsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תצפיות',
+      one: 'תצפית אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_divesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות',
+      one: 'צלילה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPage_lastSeen(String date) {
+    return 'נראה לאחרונה $date';
+  }
+
+  @override
+  String get marineLife_speciesPage_emptyTitle => 'אין מינים עדיין';
+
+  @override
+  String get marineLife_speciesPage_emptyHint =>
+      'תצפיות של חיים ימיים שנוספו לצלילה יופיעו כאן.';
+
+  @override
+  String get marineLife_speciesPage_noMatch => 'אין מינים שתואמים לחיפוש';
+
+  @override
+  String marineLife_speciesPage_error(String error) {
+    return 'לא ניתן לטעון את המינים: $error';
+  }
+
+  @override
+  String get marineLife_speciesPage_retry => 'ניסיון חוזר';
+
+  @override
+  String marineLife_speciesDetail_sightingsTitle(Object count) {
+    return 'תצפיות ($count)';
+  }
+
+  @override
+  String marineLife_speciesDetail_sightingsError(String error) {
+    return 'לא ניתן לטעון את התצפיות: $error';
+  }
+
+  @override
+  String marineLife_speciesDetail_showAll(Object count) {
+    return 'הצגת הכול ($count)';
+  }
+
+  @override
+  String get marineLife_speciesDetail_showFewer => 'הצגת פחות';
+
+  @override
+  String get marineLife_speciesDetail_unknownSite => 'אתר לא ידוע';
+
+  @override
+  String marineLife_speciesDetail_countTimes(Object count) {
+    return '× $count';
+  }
+
+  @override
   String get marineLife_speciesPicker_allFilter => 'הכל';
 
   @override
@@ -17265,6 +17374,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get statistics_marineLife_speciesSpotted => 'מינים שנצפו';
+
+  @override
+  String get statistics_marineLife_seeAllSpecies_title => 'הצגת כל המינים';
+
+  @override
+  String get statistics_marineLife_seeAllSpecies_subtitle =>
+      'כל המינים שתיעדת, עם חיפוש';
 
   @override
   String get statistics_profile_appBar_title => 'ניתוח פרופיל';
