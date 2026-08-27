@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 import 'package:submersion/features/media/data/services/exif_date_parser.dart';
+import 'package:submersion/features/media/data/services/isobmff_boxes.dart';
 
 /// Reads the capture time from a media file's own container metadata using
 /// pure-Dart parsers (no native plugins), for the platforms and files where
@@ -73,7 +74,7 @@ DateTime? _readHeicExifDate(File file) {
   try {
     raf = file.openSync();
     final end = raf.lengthSync();
-    final meta = _findBox(raf, 0, end, 'meta');
+    final meta = findBox(raf, 0, end, 'meta');
     if (meta == null) return null;
     // `meta` is a FullBox: its child boxes start 4 (version+flags) bytes in.
     // Bound the read: reject a too-small box (nothing to parse / underflow) or
@@ -85,8 +86,8 @@ DateTime? _readHeicExifDate(File file) {
     raf.setPositionSync(meta.start + 4);
     final metaBytes = raf.readSync(metaLen);
 
-    final iinf = _findBoxInBytes(metaBytes, 0, metaBytes.length, 'iinf');
-    final iloc = _findBoxInBytes(metaBytes, 0, metaBytes.length, 'iloc');
+    final iinf = findBoxInBytes(metaBytes, 0, metaBytes.length, 'iinf');
+    final iloc = findBoxInBytes(metaBytes, 0, metaBytes.length, 'iloc');
     if (iinf == null || iloc == null) return null;
 
     final itemId = _heicExifItemId(metaBytes, iinf.start, iinf.end);
@@ -127,24 +128,24 @@ int? _heicExifItemId(Uint8List b, int start, int end) {
   var p = start + 4; // skip version + flags
   final int count;
   if (version == 0) {
-    count = _beU16(b, p);
+    count = beU16(b, p);
     p += 2;
   } else {
-    count = _beU32(b, p);
+    count = beU32(b, p);
     p += 4;
   }
   for (var i = 0; i < count && p + 8 <= end; i++) {
-    final size = _beU32(b, p);
+    final size = beU32(b, p);
     if (size < 8 || p + size > end) return null;
     final infeEnd = p + size;
     final infeVersion = b[p + 8];
     final idBytes = infeVersion >= 3 ? 4 : 2; // item_ID width
-    final itemId = infeVersion >= 3 ? _beU32(b, p + 12) : _beU16(b, p + 12);
+    final itemId = infeVersion >= 3 ? beU32(b, p + 12) : beU16(b, p + 12);
     // item_type follows: infe header (8) + version/flags (4) + item_ID +
     // item_protection_index (2). Bound the read to THIS infe box so a corrupt
     // size can't match an 'Exif' fourCC that belongs to a following entry.
     final typePos = p + 12 + idBytes + 2;
-    if (typePos + 4 <= infeEnd && _fourCC(b, typePos) == 'Exif') return itemId;
+    if (typePos + 4 <= infeEnd && fourCC(b, typePos) == 'Exif') return itemId;
     p += size;
   }
   return null;
@@ -162,10 +163,10 @@ _Extent? _heicExifExtent(Uint8List b, int start, int end, int wantId) {
   p += 2;
   final int itemCount;
   if (version < 2) {
-    itemCount = _beU16(b, p);
+    itemCount = beU16(b, p);
     p += 2;
   } else {
-    itemCount = _beU32(b, p);
+    itemCount = beU32(b, p);
     p += 4;
   }
 
@@ -179,12 +180,12 @@ _Extent? _heicExifExtent(Uint8List b, int start, int end, int wantId) {
   }
 
   for (var i = 0; i < itemCount && p < end; i++) {
-    final id = version < 2 ? _beU16(b, p) : _beU32(b, p);
+    final id = version < 2 ? beU16(b, p) : beU32(b, p);
     p += version < 2 ? 2 : 4;
     if (version == 1 || version == 2) p += 2; // construction_method
     p += 2; // data_reference_index
     final baseOffset = readSized(baseOffsetSize);
-    final extentCount = _beU16(b, p);
+    final extentCount = beU16(b, p);
     p += 2;
     for (var e = 0; e < extentCount; e++) {
       if ((version == 1 || version == 2) && indexSize > 0) readSized(indexSize);
@@ -203,7 +204,7 @@ _Extent? _heicExifExtent(Uint8List b, int start, int end, int wantId) {
 /// mis-locating an earlier byte sequence.
 int? _tiffHeaderOffset(Uint8List b) {
   if (b.length >= 8) {
-    final declared = 4 + _beU32(b, 0);
+    final declared = 4 + beU32(b, 0);
     if (declared + 4 <= b.length && _isTiffHeader(b, declared)) return declared;
   }
   for (var i = 0; i + 4 <= b.length; i++) {
@@ -220,38 +221,11 @@ bool _isTiffHeader(Uint8List b, int o) =>
         b[o + 3] == 0x00) ||
     (b[o] == 0x4d && b[o + 1] == 0x4d && b[o + 2] == 0x00 && b[o + 3] == 0x2a);
 
-/// Byte-buffer twin of [_findBox], for walking sub-boxes already read into
-/// memory (e.g. inside a `meta` box).
-_BoxRange? _findBoxInBytes(Uint8List b, int start, int end, String type) {
-  var pos = start;
-  while (pos + 8 <= end) {
-    var size = _beU32(b, pos);
-    var headerLen = 8;
-    if (size == 1) {
-      if (pos + 16 > end) return null;
-      size = _beU64(b, pos + 8);
-      headerLen = 16;
-    } else if (size == 0) {
-      size = end - pos;
-    }
-    if (size < headerLen || pos + size > end) return null;
-    if (_fourCC(b, pos + 4) == type) {
-      return _BoxRange(pos + headerLen, pos + size);
-    }
-    pos += size;
-  }
-  return null;
-}
-
 class _Extent {
   const _Extent(this.offset, this.length);
   final int offset;
   final int length;
 }
-
-int _beU16(Uint8List b, int o) => (b[o] << 8) | b[o + 1];
-
-String _fourCC(Uint8List b, int o) => String.fromCharCodes(b, o, o + 4);
 
 // Seconds between the QuickTime/ISO-BMFF epoch (1904-01-01) and the Unix epoch.
 // This is a whole number of days, so the epoch shift preserves the time-of-day
@@ -266,20 +240,20 @@ DateTime? _readMp4CreationTime(File file) {
     // The movie header (mvhd) lives inside moov. Cameras such as GoPro place
     // moov AFTER the multi-hundred-MB mdat, so we walk top-level boxes by size,
     // seeking past mdat without ever reading its bytes.
-    final moov = _findBox(raf, 0, end, 'moov');
+    final moov = findBox(raf, 0, end, 'moov');
     if (moov == null) return null;
-    final mvhd = _findBox(raf, moov.start, moov.end, 'mvhd');
+    final mvhd = findBox(raf, moov.start, moov.end, 'mvhd');
     if (mvhd == null) return null;
 
-    final version = raf.readByteAt(mvhd.start);
+    final version = readByteAt(raf, mvhd.start);
     // Only v0/v1 mvhd headers exist. Bail on anything else rather than
     // mis-reading a corrupt byte as v0 and emitting a bogus timestamp.
     if (version != 0 && version != 1) return null;
     // creation_time follows the 1-byte version + 3 flag bytes. It is uint32 in
     // a v0 header and uint64 in a v1 header.
     final creation = version == 1
-        ? _readU64(raf, mvhd.start + 4)
-        : _readU32(raf, mvhd.start + 4);
+        ? readU64At(raf, mvhd.start + 4)
+        : readU32At(raf, mvhd.start + 4);
     if (creation == 0) return null; // 0 == "unknown"; caller uses mtime.
 
     // GoPro (and most cameras) write the LOCAL wall clock into creation_time.
@@ -295,59 +269,3 @@ DateTime? _readMp4CreationTime(File file) {
     raf?.closeSync();
   }
 }
-
-/// Half-open byte range [start, end) of a box's content (payload).
-class _BoxRange {
-  const _BoxRange(this.start, this.end);
-  final int start;
-  final int end;
-}
-
-/// Returns the content range of the first sibling box of [type] within
-/// [start, end), or null. Handles the 64-bit size form (size field == 1) and
-/// the "extends to end of file" form (size field == 0).
-_BoxRange? _findBox(RandomAccessFile raf, int start, int end, String type) {
-  var pos = start;
-  while (pos + 8 <= end) {
-    raf.setPositionSync(pos);
-    final header = raf.readSync(8);
-    if (header.length < 8) return null;
-    var size = _beU32(header, 0);
-    var headerLen = 8;
-    if (size == 1) {
-      final ext = raf.readSync(8);
-      if (ext.length < 8) return null;
-      size = _beU64(ext, 0);
-      headerLen = 16;
-    } else if (size == 0) {
-      size = end - pos;
-    }
-    if (size < headerLen || pos + size > end) return null;
-    final boxType = String.fromCharCodes(header, 4, 8);
-    if (boxType == type) return _BoxRange(pos + headerLen, pos + size);
-    pos += size;
-  }
-  return null;
-}
-
-extension _ReadAt on RandomAccessFile {
-  int readByteAt(int position) {
-    setPositionSync(position);
-    return readSync(1).first;
-  }
-}
-
-int _readU32(RandomAccessFile raf, int position) {
-  raf.setPositionSync(position);
-  return _beU32(raf.readSync(4), 0);
-}
-
-int _readU64(RandomAccessFile raf, int position) {
-  raf.setPositionSync(position);
-  return _beU64(raf.readSync(8), 0);
-}
-
-int _beU32(Uint8List b, int o) =>
-    (b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3];
-
-int _beU64(Uint8List b, int o) => (_beU32(b, o) << 32) | _beU32(b, o + 4);
