@@ -79,9 +79,17 @@ class DiveComputerGearResolver {
       if (match != null) return match.id;
 
       final now = DateTime.now().millisecondsSinceEpoch;
+      // insertOrIgnore, never upsert. This is a seed: if a row already holds
+      // the derived id, it is the twin and it belongs to the user. An upsert
+      // would rewrite their name, brand, model and serial from the registry.
+      // The step-2 check above normally prevents reaching here with a row
+      // present, but the two are not atomic: sync applies equipment rows
+      // concurrently, and this database is opened by two isolates, so a peer's
+      // twin can land between the check and this write.
       await _db
           .into(_db.equipment)
-          .insertOnConflictUpdate(
+          .insert(
+            mode: InsertMode.insertOrIgnore,
             EquipmentCompanion.insert(
               id: derivedId,
               diverId: Value(computer.diverId),

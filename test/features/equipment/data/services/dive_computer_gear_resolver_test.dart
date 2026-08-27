@@ -122,6 +122,16 @@ void main() {
 
     expect(id, diveComputerGearId('c1'));
     expect(await equipmentCount(), 1);
+
+    // Adopted, not rewritten. "Seed once, then owned by the user" means the
+    // resolver must never mutate a row that already holds the derived id, so
+    // the mint is insertOrIgnore rather than an upsert: an upsert would put
+    // the registry's Shearwater / Perdix 2 back over the user's own text.
+    final row = await (db.select(
+      db.equipment,
+    )..where((t) => t.id.equals(id!))).getSingle();
+    expect(row.brand, 'Totally');
+    expect(row.model, 'Renamed');
   });
 
   test('adopts an unambiguous hand-created gear item', () async {

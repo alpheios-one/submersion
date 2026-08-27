@@ -84,7 +84,7 @@ class DiveComputerGearLinker {
         )
         .get();
     return rows
-        .map((row) => row.data['computer_id'] as String?)
+        .map((row) => row.read<String?>('computer_id'))
         .whereType<String>()
         .toList();
   }
