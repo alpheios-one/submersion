@@ -553,22 +553,42 @@ class DiveRepository {
     }
   }
 
-  /// Dives that have entry or exit GPS but no assigned site.
-  /// When [limitToIds] is provided, restricts to that id set (post-download
-  /// seed); otherwise returns the whole eligible backlog.
+  /// Dives that could be given a site from a GPS point (dive-computer entry
+  /// or exit fix, or a GPS-tagged photo) and still need one: no site, or a
+  /// site without coordinates. Dives whose suggestion was dismissed are
+  /// excluded. When [limitToIds] is provided, restricts to that id set.
   Future<List<domain.Dive>> getDivesNeedingSiteMatch({
     String? diverId,
     List<String>? limitToIds,
   }) async {
-    // An explicit empty id set means "match nothing" — skip the query.
+    // An explicit empty id set means "match nothing"; skip the query.
     if (limitToIds != null && limitToIds.isEmpty) return [];
     try {
       final query = _db.select(_db.dives)
         ..where((t) {
-          final hasGps =
+          final hasDiveGps =
               (t.entryLatitude.isNotNull() & t.entryLongitude.isNotNull()) |
               (t.exitLatitude.isNotNull() & t.exitLongitude.isNotNull());
-          var cond = t.siteId.isNull() & hasGps;
+          final hasPhotoGps = existsQuery(
+            _db.select(_db.media)..where(
+              (m) =>
+                  m.diveId.equalsExp(t.id) &
+                  m.latitude.isNotNull() &
+                  m.longitude.isNotNull() &
+                  (m.latitude.equals(0) & m.longitude.equals(0)).not(),
+            ),
+          );
+          final siteLacksCoordinates = existsQuery(
+            _db.select(_db.diveSites)..where(
+              (s) =>
+                  s.id.equalsExp(t.siteId) &
+                  (s.latitude.isNull() | s.longitude.isNull()),
+            ),
+          );
+          var cond =
+              (t.siteId.isNull() | siteLacksCoordinates) &
+              (hasDiveGps | hasPhotoGps) &
+              t.siteSuggestionDismissedAt.isNull();
           if (diverId != null) cond = cond & t.diverId.equals(diverId);
           if (limitToIds != null) cond = cond & t.id.isIn(limitToIds);
           return cond;

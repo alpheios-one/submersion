@@ -4,6 +4,8 @@ import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media/domain/entities/media_item.dart';
 
 import '../../../../helpers/test_database.dart';
 
@@ -42,7 +44,7 @@ void main() {
         );
   }
 
-  Future<String> insertSite(String id) async {
+  Future<String> insertSite(String id, {double? lat, double? lng}) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     await db
         .into(db.diveSites)
@@ -50,11 +52,30 @@ void main() {
           DiveSitesCompanion(
             id: Value(id),
             name: Value('Site $id'),
+            latitude: Value(lat),
+            longitude: Value(lng),
             createdAt: Value(now),
             updatedAt: Value(now),
           ),
         );
     return id;
+  }
+
+  Future<void> insertPhotoWithGps(String id, String diveId) async {
+    final now = DateTime.now();
+    await MediaRepository().createMedia(
+      MediaItem(
+        id: id,
+        diveId: diveId,
+        filePath: '/photos/$id.jpg',
+        mediaType: MediaType.photo,
+        latitude: 20.5,
+        longitude: -87.25,
+        takenAt: now,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
   }
 
   test('setSite assigns and clears a dive site id', () async {
@@ -71,7 +92,7 @@ void main() {
   test('getDivesNeedingSiteMatch returns only GPS + unsited dives', () async {
     await insertDive('withGps', lat: 1, lng: 2);
     await insertDive('noGps');
-    final siteId = await insertSite('s1');
+    final siteId = await insertSite('s1', lat: 3, lng: 4);
     await insertDive('sited', lat: 3, lng: 4, siteId: siteId);
 
     final result = await repo.getDivesNeedingSiteMatch();
@@ -167,5 +188,37 @@ void main() {
       isNotNull,
       reason: 'the dismissal must ride the dive row to other devices',
     );
+  });
+
+  group('getDivesNeedingSiteMatch (unified predicate)', () {
+    test('includes a siteless dive whose only GPS is a photo', () async {
+      await insertDive('photoOnly');
+      await insertPhotoWithGps('p1', 'photoOnly');
+      final ids = (await repo.getDivesNeedingSiteMatch()).map((d) => d.id);
+      expect(ids, contains('photoOnly'));
+    });
+
+    test('includes a dive whose site lacks coordinates', () async {
+      final bare = await insertSite('bare');
+      await insertDive('sitedNoCoords', lat: 1, lng: 2, siteId: bare);
+      final ids = (await repo.getDivesNeedingSiteMatch()).map((d) => d.id);
+      expect(ids, contains('sitedNoCoords'));
+    });
+
+    test('excludes a dive whose site has coordinates', () async {
+      final located = await insertSite('located', lat: 5, lng: 6);
+      await insertDive('sited', lat: 1, lng: 2, siteId: located);
+      final ids = (await repo.getDivesNeedingSiteMatch()).map((d) => d.id);
+      expect(ids, isNot(contains('sited')));
+    });
+
+    test('excludes a dismissed dive and a dive with no point at all', () async {
+      await insertDive('dismissed', lat: 1, lng: 2);
+      await repo.setSiteSuggestionDismissed('dismissed', true);
+      await insertDive('nothing');
+      final ids = (await repo.getDivesNeedingSiteMatch()).map((d) => d.id);
+      expect(ids, isNot(contains('dismissed')));
+      expect(ids, isNot(contains('nothing')));
+    });
   });
 }
