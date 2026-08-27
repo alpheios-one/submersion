@@ -14162,6 +14162,76 @@ class AppLocalizationsIt extends AppLocalizations {
   String get safetyReview_restore => 'Ripristina';
 
   @override
+  String get safetyReview_dismissAll => 'Ignora tutto';
+
+  @override
+  String get safetyReview_restoreAll => 'Ripristina tutto';
+
+  @override
+  String get safetySettings_dismissAll => 'Ignora tutte le osservazioni';
+
+  @override
+  String get safetySettings_dismissAll_subtitle =>
+      'Contrassegna come riviste tutte le osservazioni di questo diario';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle =>
+      'Ignorare tutte le osservazioni?';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      'Tutte le osservazioni di ogni immersione analizzata verranno contrassegnate come riviste. Puoi ripristinarle una immersione alla volta dalla sua sezione revisione di sicurezza.';
+
+  @override
+  String get safetySettings_dismissAll_confirm => 'Ignora tutto';
+
+  @override
+  String get safetySettings_dismissAll_cancel => 'Annulla';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return '$done di $total immersioni controllate';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count osservazioni ignorate',
+      one: '1 osservazione ignorata',
+      zero: 'Nessuna osservazione da ignorare',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count osservazioni ignorate',
+      one: '1 osservazione ignorata',
+      zero: 'Nessuna osservazione ignorata',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: '$failed immersioni non sono state aggiornate',
+      one: '1 immersione non è stata aggiornata',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed =>
+      'Impossibile leggere l’elenco delle immersioni. Nulla è stato modificato.';
+
+  @override
+  String get safetySettings_analyzeAll_failed =>
+      'Impossibile analizzare le immersioni.';
+
+  @override
   String get safetyReview_details => 'Dettagli';
 
   @override

@@ -23878,6 +23878,84 @@ abstract class AppLocalizations {
   /// **'Restore'**
   String get safetyReview_restore;
 
+  /// No description provided for @safetyReview_dismissAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss all'**
+  String get safetyReview_dismissAll;
+
+  /// No description provided for @safetyReview_restoreAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore all'**
+  String get safetyReview_restoreAll;
+
+  /// No description provided for @safetySettings_dismissAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss all observations'**
+  String get safetySettings_dismissAll;
+
+  /// No description provided for @safetySettings_dismissAll_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark every observation in this logbook as reviewed'**
+  String get safetySettings_dismissAll_subtitle;
+
+  /// No description provided for @safetySettings_dismissAll_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss all observations?'**
+  String get safetySettings_dismissAll_confirmTitle;
+
+  /// No description provided for @safetySettings_dismissAll_confirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every observation on every analyzed dive is marked as reviewed. You can restore them one dive at a time from that dive’s safety review section.'**
+  String get safetySettings_dismissAll_confirmBody;
+
+  /// No description provided for @safetySettings_dismissAll_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss all'**
+  String get safetySettings_dismissAll_confirm;
+
+  /// No description provided for @safetySettings_dismissAll_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get safetySettings_dismissAll_cancel;
+
+  /// No description provided for @safetySettings_dismissAll_progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked {done} of {total} dives'**
+  String safetySettings_dismissAll_progress(int done, int total);
+
+  /// No description provided for @safetySettings_dismissAll_done.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No observations to dismiss} =1{1 observation dismissed} other{{count} observations dismissed}}'**
+  String safetySettings_dismissAll_done(int count);
+
+  /// No description provided for @safetySettings_dismissAll_doneWithErrors.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No observations dismissed} =1{1 observation dismissed} other{{count} observations dismissed}}, {failed, plural, =1{1 dive could not be updated} other{{failed} dives could not be updated}}'**
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed);
+
+  /// No description provided for @safetySettings_dismissAll_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read your dive list. No dives were changed.'**
+  String get safetySettings_dismissAll_failed;
+
+  /// No description provided for @safetySettings_analyzeAll_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not analyze your dives.'**
+  String get safetySettings_analyzeAll_failed;
+
   /// Link in the chart finding callout that scrolls to the full safety review section
   ///
   /// In en, this message translates to:

@@ -7152,6 +7152,46 @@
   },
   "safetyReview_dismiss": "忽略",
   "safetyReview_restore": "恢复",
+  "safetyReview_dismissAll": "全部忽略",
+  "safetyReview_restoreAll": "全部恢复",
+  "safetySettings_dismissAll": "忽略所有观察",
+  "safetySettings_dismissAll_subtitle": "将此日志中的所有观察标记为已查看",
+  "safetySettings_dismissAll_confirmTitle": "忽略所有观察？",
+  "safetySettings_dismissAll_confirmBody": "所有已分析潜水的每一条观察都会被标记为已查看。你可以在各次潜水的安全回顾部分逐条恢复。",
+  "safetySettings_dismissAll_confirm": "全部忽略",
+  "safetySettings_dismissAll_cancel": "取消",
+  "safetySettings_dismissAll_progress": "已检查 {done} / {total} 次潜水",
+  "@safetySettings_dismissAll_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_done": "{count, plural, =0{没有可忽略的观察} =1{已忽略 1 条观察} other{已忽略 {count} 条观察}}",
+  "@safetySettings_dismissAll_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{没有忽略任何观察} =1{已忽略 1 条观察} other{已忽略 {count} 条观察}}，{failed, plural, other{{failed} 次潜水无法更新}}",
+  "@safetySettings_dismissAll_doneWithErrors": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    },
+    "failed": {
+      "type": "int"
+    }
+  }
+},
+  "safetySettings_dismissAll_failed": "无法读取潜水列表，未做任何更改。",
+  "safetySettings_analyzeAll_failed": "无法分析潜水记录。",
   "safetyReview_details": "详情",
   "safetyReview_clearHighlight": "清除高亮",
   "safetyReview_findingGroupSemantics": "{count, plural, =1{1 条安全提示} other{{count} 条安全提示}}",

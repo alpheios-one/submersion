@@ -8516,6 +8516,46 @@
   },
   "safetyReview_dismiss": "Dismiss",
   "safetyReview_restore": "Restore",
+  "safetyReview_dismissAll": "Dismiss all",
+  "safetyReview_restoreAll": "Restore all",
+  "safetySettings_dismissAll": "Dismiss all observations",
+  "safetySettings_dismissAll_subtitle": "Mark every observation in this logbook as reviewed",
+  "safetySettings_dismissAll_confirmTitle": "Dismiss all observations?",
+  "safetySettings_dismissAll_confirmBody": "Every observation on every analyzed dive is marked as reviewed. You can restore them one dive at a time from that dive’s safety review section.",
+  "safetySettings_dismissAll_confirm": "Dismiss all",
+  "safetySettings_dismissAll_cancel": "Cancel",
+  "safetySettings_dismissAll_progress": "Checked {done} of {total} dives",
+  "@safetySettings_dismissAll_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_done": "{count, plural, =0{No observations to dismiss} =1{1 observation dismissed} other{{count} observations dismissed}}",
+  "@safetySettings_dismissAll_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{No observations dismissed} =1{1 observation dismissed} other{{count} observations dismissed}}, {failed, plural, =1{1 dive could not be updated} other{{failed} dives could not be updated}}",
+  "@safetySettings_dismissAll_doneWithErrors": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    },
+    "failed": {
+      "type": "int"
+    }
+  }
+},
+  "safetySettings_dismissAll_failed": "Could not read your dive list. No dives were changed.",
+  "safetySettings_analyzeAll_failed": "Could not analyze your dives.",
   "safetyReview_details": "Details",
   "@safetyReview_details": {
     "description": "Link in the chart finding callout that scrolls to the full safety review section"

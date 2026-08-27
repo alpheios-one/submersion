@@ -13497,6 +13497,71 @@ class AppLocalizationsZh extends AppLocalizations {
   String get safetyReview_restore => '恢复';
 
   @override
+  String get safetyReview_dismissAll => '全部忽略';
+
+  @override
+  String get safetyReview_restoreAll => '全部恢复';
+
+  @override
+  String get safetySettings_dismissAll => '忽略所有观察';
+
+  @override
+  String get safetySettings_dismissAll_subtitle => '将此日志中的所有观察标记为已查看';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle => '忽略所有观察？';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      '所有已分析潜水的每一条观察都会被标记为已查看。你可以在各次潜水的安全回顾部分逐条恢复。';
+
+  @override
+  String get safetySettings_dismissAll_confirm => '全部忽略';
+
+  @override
+  String get safetySettings_dismissAll_cancel => '取消';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return '已检查 $done / $total 次潜水';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已忽略 $count 条观察',
+      one: '已忽略 1 条观察',
+      zero: '没有可忽略的观察',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已忽略 $count 条观察',
+      one: '已忽略 1 条观察',
+      zero: '没有忽略任何观察',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: '$failed 次潜水无法更新',
+    );
+    return '$_temp0，$_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed => '无法读取潜水列表，未做任何更改。';
+
+  @override
+  String get safetySettings_analyzeAll_failed => '无法分析潜水记录。';
+
+  @override
   String get safetyReview_details => '详情';
 
   @override

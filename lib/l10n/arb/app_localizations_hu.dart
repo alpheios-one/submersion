@@ -14107,6 +14107,76 @@ class AppLocalizationsHu extends AppLocalizations {
   String get safetyReview_restore => 'Visszaállítás';
 
   @override
+  String get safetyReview_dismissAll => 'Összes elvetése';
+
+  @override
+  String get safetyReview_restoreAll => 'Összes visszaállítása';
+
+  @override
+  String get safetySettings_dismissAll => 'Összes megfigyelés elvetése';
+
+  @override
+  String get safetySettings_dismissAll_subtitle =>
+      'A naplóban szereplő összes megfigyelés megjelölése átnézettként';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle =>
+      'Elveted az összes megfigyelést?';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      'Minden elemzett merülés minden megfigyelése átnézettként lesz megjelölve. Merülésenként visszaállíthatod őket az adott merülés biztonsági áttekintés szakaszában.';
+
+  @override
+  String get safetySettings_dismissAll_confirm => 'Összes elvetése';
+
+  @override
+  String get safetySettings_dismissAll_cancel => 'Mégse';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return '$done / $total merülés ellenőrizve';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count megfigyelés elvetve',
+      one: '1 megfigyelés elvetve',
+      zero: 'Nincs elvetendő megfigyelés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count megfigyelés elvetve',
+      one: '1 megfigyelés elvetve',
+      zero: 'Nem lett megfigyelés elvetve',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: '$failed merülést nem sikerült frissíteni',
+      one: '1 merülést nem sikerült frissíteni',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed =>
+      'A merüléslista nem olvasható. Semmi sem változott.';
+
+  @override
+  String get safetySettings_analyzeAll_failed =>
+      'A merüléseket nem sikerült elemezni.';
+
+  @override
   String get safetyReview_details => 'Részletek';
 
   @override

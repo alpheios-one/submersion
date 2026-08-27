@@ -7152,6 +7152,46 @@
   },
   "safetyReview_dismiss": "התעלם",
   "safetyReview_restore": "שחזר",
+  "safetyReview_dismissAll": "התעלם מהכול",
+  "safetyReview_restoreAll": "שחזר הכול",
+  "safetySettings_dismissAll": "התעלם מכל התצפיות",
+  "safetySettings_dismissAll_subtitle": "סמן את כל התצפיות ביומן זה כנסקרו",
+  "safetySettings_dismissAll_confirmTitle": "להתעלם מכל התצפיות?",
+  "safetySettings_dismissAll_confirmBody": "כל תצפית בכל צלילה שנותחה תסומן כנסקרה. אפשר לשחזר אותן צלילה אחר צלילה במקטע סקירת הבטיחות שלה.",
+  "safetySettings_dismissAll_confirm": "התעלם מהכול",
+  "safetySettings_dismissAll_cancel": "ביטול",
+  "safetySettings_dismissAll_progress": "נבדקו {done} מתוך {total} צלילות",
+  "@safetySettings_dismissAll_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_done": "{count, plural, =0{אין תצפיות להתעלם מהן} =1{בוצעה התעלמות מתצפית אחת} other{בוצעה התעלמות מ-{count} תצפיות}}",
+  "@safetySettings_dismissAll_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{לא בוצעה התעלמות מתצפיות} =1{בוצעה התעלמות מתצפית אחת} other{בוצעה התעלמות מ-{count} תצפיות}}, {failed, plural, =1{לא ניתן היה לעדכן צלילה אחת} other{לא ניתן היה לעדכן {failed} צלילות}}",
+  "@safetySettings_dismissAll_doneWithErrors": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    },
+    "failed": {
+      "type": "int"
+    }
+  }
+},
+  "safetySettings_dismissAll_failed": "לא ניתן לקרוא את רשימת הצלילות. דבר לא שונה.",
+  "safetySettings_analyzeAll_failed": "לא ניתן לנתח את הצלילות.",
   "safetyReview_details": "פרטים",
   "safetyReview_clearHighlight": "ניקוי הדגשה",
   "safetyReview_findingGroupSemantics": "{count, plural, =1{ממצא בטיחות אחד} other{{count} ממצאי בטיחות}}",

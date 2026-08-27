@@ -13912,6 +13912,74 @@ class AppLocalizationsAr extends AppLocalizations {
   String get safetyReview_restore => 'استعادة';
 
   @override
+  String get safetyReview_dismissAll => 'تجاهل الكل';
+
+  @override
+  String get safetyReview_restoreAll => 'استعادة الكل';
+
+  @override
+  String get safetySettings_dismissAll => 'تجاهل جميع الملاحظات';
+
+  @override
+  String get safetySettings_dismissAll_subtitle =>
+      'وضع علامة مراجَعة على جميع الملاحظات في هذا السجل';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle => 'تجاهل جميع الملاحظات؟';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      'ستوضع علامة مراجَعة على كل ملاحظة في كل غطسة تم تحليلها. يمكنك استعادتها غطسة بغطسة من قسم مراجعة السلامة الخاص بها.';
+
+  @override
+  String get safetySettings_dismissAll_confirm => 'تجاهل الكل';
+
+  @override
+  String get safetySettings_dismissAll_cancel => 'إلغاء';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return 'تم فحص $done من $total غطسة';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تجاهل $count ملاحظات',
+      one: 'تم تجاهل ملاحظة واحدة',
+      zero: 'لا توجد ملاحظات لتجاهلها',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تجاهل $count ملاحظات',
+      one: 'تم تجاهل ملاحظة واحدة',
+      zero: 'لم يتم تجاهل أي ملاحظة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: 'تعذّر تحديث $failed غطسات',
+      one: 'تعذّر تحديث غطسة واحدة',
+    );
+    return '$_temp0، $_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed =>
+      'تعذّرت قراءة قائمة الغطسات. لم يتم تغيير أي شيء.';
+
+  @override
+  String get safetySettings_analyzeAll_failed => 'تعذّر تحليل الغطسات.';
+
+  @override
   String get safetyReview_details => 'التفاصيل';
 
   @override

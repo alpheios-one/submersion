@@ -14056,6 +14056,76 @@ class AppLocalizationsNl extends AppLocalizations {
   String get safetyReview_restore => 'Herstellen';
 
   @override
+  String get safetyReview_dismissAll => 'Alles negeren';
+
+  @override
+  String get safetyReview_restoreAll => 'Alles herstellen';
+
+  @override
+  String get safetySettings_dismissAll => 'Alle observaties negeren';
+
+  @override
+  String get safetySettings_dismissAll_subtitle =>
+      'Alle observaties in dit logboek als beoordeeld markeren';
+
+  @override
+  String get safetySettings_dismissAll_confirmTitle =>
+      'Alle observaties negeren?';
+
+  @override
+  String get safetySettings_dismissAll_confirmBody =>
+      'Elke observatie bij elke geanalyseerde duik wordt als beoordeeld gemarkeerd. Je kunt ze per duik herstellen in de sectie veiligheidscontrole.';
+
+  @override
+  String get safetySettings_dismissAll_confirm => 'Alles negeren';
+
+  @override
+  String get safetySettings_dismissAll_cancel => 'Annuleren';
+
+  @override
+  String safetySettings_dismissAll_progress(int done, int total) {
+    return '$done van $total duiken gecontroleerd';
+  }
+
+  @override
+  String safetySettings_dismissAll_done(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observaties genegeerd',
+      one: '1 observatie genegeerd',
+      zero: 'Geen observaties om te negeren',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String safetySettings_dismissAll_doneWithErrors(int count, int failed) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observaties genegeerd',
+      one: '1 observatie genegeerd',
+      zero: 'Geen observaties genegeerd',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      failed,
+      locale: localeName,
+      other: '$failed duiken konden niet worden bijgewerkt',
+      one: '1 duik kon niet worden bijgewerkt',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String get safetySettings_dismissAll_failed =>
+      'Kan de duiklijst niet lezen. Er is niets gewijzigd.';
+
+  @override
+  String get safetySettings_analyzeAll_failed =>
+      'Kan de duiken niet analyseren.';
+
+  @override
   String get safetyReview_details => 'Details';
 
   @override
