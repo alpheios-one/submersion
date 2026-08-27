@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' hide isNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -108,7 +109,8 @@ NativeDatabase _seeded() {
 Future<Set<String>> _equipmentOn(AppDatabase db, String diveId) async {
   final rows = await db
       .customSelect(
-        "SELECT equipment_id FROM dive_equipment WHERE dive_id = '$diveId'",
+        'SELECT equipment_id FROM dive_equipment WHERE dive_id = ?',
+        variables: [Variable<String>(diveId)],
       )
       .get();
   return rows.map((r) => r.read<String>('equipment_id')).toSet();
@@ -142,8 +144,8 @@ void main() {
 
       final row = await db
           .customSelect(
-            "SELECT name, type, brand, model FROM equipment "
-            "WHERE id = '${diveComputerGearId('c1')}'",
+            'SELECT name, type, brand, model FROM equipment WHERE id = ?',
+            variables: [Variable<String>(diveComputerGearId('c1'))],
           )
           .getSingle();
       expect(row.read<String>('type'), 'computer');
