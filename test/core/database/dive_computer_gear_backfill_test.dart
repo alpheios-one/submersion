@@ -65,7 +65,8 @@ NativeDatabase _seeded() {
           notes TEXT NOT NULL DEFAULT '',
           is_active INTEGER NOT NULL DEFAULT 1,
           created_at INTEGER NOT NULL,
-          updated_at INTEGER NOT NULL
+          updated_at INTEGER NOT NULL,
+          hlc TEXT
         )
       ''');
 
@@ -240,6 +241,29 @@ void main() {
           .customSelect('SELECT COUNT(*) AS c FROM equipment')
           .getSingle();
       expect(count.read<int>('c'), 1);
+    },
+  );
+  test(
+    'is local-only: minted rows carry no HLC and never go out incrementally',
+    () async {
+      // Deliberate, and load-bearing. Every input is already synced and the twin
+      // id is derived, so each device produces identical rows when its own ladder
+      // runs. Stamping an HLC here would push one record per computer plus one
+      // per (dive, computer) pair from every device in the fleet, to make peers
+      // agree on rows they each derive anyway. Incremental export filters
+      // equipment on `hlc > watermark`, so a null HLC is exactly what keeps these
+      // writes off the wire; a base export ignores the watermark and still
+      // carries them.
+      final db = AppDatabase(_seeded());
+      addTearDown(db.close);
+
+      final rows = await db
+          .customSelect("SELECT hlc FROM equipment WHERE type = 'computer'")
+          .get();
+      expect(rows, hasLength(2));
+      for (final row in rows) {
+        expect(row.read<String?>('hlc'), isNull);
+      }
     },
   );
 }

@@ -14,6 +14,30 @@ import 'package:submersion/core/database/dive_computer_gear_identity.dart';
 /// New rows land on a deterministic id ([diveComputerGearId]), so every device
 /// in a synced fleet derives the same primary key and they converge under sync
 /// upsert rather than duplicating.
+///
+/// LOCAL-ONLY AND HLC-NEUTRAL, deliberately. Nothing here marks a record
+/// pending or stamps an HLC, so these writes never go out on an incremental
+/// sync. That is the `_backfillDiveComputerIds` pattern and it is correct here
+/// for the same reason: every input is already synced (`dive_computers`,
+/// `dives`, `dive_data_sources`) and the twin id is derived, so every device
+/// produces identical rows independently when its own ladder runs. Marking
+/// them pending would push one record per computer plus one per (dive,
+/// computer) pair from every device in the fleet, to make peers agree on rows
+/// they will each derive anyway.
+///
+/// Two consequences worth knowing before "fixing" this:
+///
+///  * A base/full export passes `hlcSince == null` and therefore DOES carry
+///    these rows, so a device adopting the cloud base is not missing them.
+///  * A dive downloaded by a peer still on the previous schema and synced to an
+///    already-migrated device is not linked on that device: its ladder has run,
+///    the runtime linker fires only at local creation seams, and the peer's own
+///    later backfill is HLC-neutral so it does not push. That is a missing join
+///    row on one device during the rollout window, not divergence in the twin
+///    itself, and it resolves the moment anyone edits that dive's gear.
+///
+/// The runtime paths are the opposite and mark pending as usual: the resolver
+/// when it mints a twin, and `bulkAddEquipment` for every link the linker adds.
 Future<void> backfillDiveComputerGearTwins(DatabaseConnectionUser db) async {
   // PRAGMA-guarded like every other backfill helper: the ladder runs against
   // minimal fixtures and against databases caught mid-upgrade. PRAGMA

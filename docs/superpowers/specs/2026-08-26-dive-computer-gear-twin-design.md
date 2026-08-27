@@ -387,24 +387,44 @@ schema-only. It adds the column if missing; it does not backfill.
 
 ### D9. Sync
 
-Both the minted twin rows and the `dive_equipment` join rows are marked pending
-and replicate.
+**Corrected in review. The original D9 said the opposite and was wrong on both
+of its stated reasons.**
 
-This deliberately departs from #1064's local-only, HLC-neutral heal. Two reasons
-specific to this feature:
+The runtime paths mark pending and replicate: the resolver when it mints a twin,
+`createComputer` when it stamps `equipment_id`, and `bulkAddEquipment` for every
+link the linker adds.
 
-1. A device can receive a `dive_computers` row by sync whose `equipmentId`
-   points at a twin it never minted. That is a dangling reference, not a missing
-   convenience. The twin row must travel.
-2. Per F11, sync adopt bypasses the ladder. A dive downloaded by a peer still on
-   v164 and synced to an already-migrated device would otherwise never be
-   linked on that device, because the ladder has already run and the linker only
-   fires at local creation seams. Replicating closes the window.
+The **v169 backfill is local-only and HLC-neutral**, like `_backfillDiveComputerIds`.
+It stamps no HLC and marks nothing pending, so its writes never go out on an
+incremental sync. This is correct rather than an oversight: every input is
+already synced (`dive_computers`, `dives`, `dive_data_sources`) and the twin id
+is derived, so every device produces identical rows independently when its own
+ladder runs. Marking them pending would push one record per computer plus one
+per (dive, computer) pair from every device in the fleet, to make peers agree on
+rows they will each derive anyway. That fleet-wide re-sync is precisely the cost
+F12 cites as the reason the #1064 heal stayed local-only.
 
-The cost is one small composite-key record per (dive, computer) pair, once,
-comparable to a single bulk gear edit the app already supports. Convergence is
-safe because the twin id is deterministic (D2) and `dive_equipment` has a
-composite natural key, so two devices deriving the same rows upsert to one.
+The original reasoning claimed two things that do not hold:
+
+1. *"A peer can receive a `dive_computers` row whose `equipment_id` points at a
+   twin it never minted."* It cannot. A peer still on the previous schema has no
+   `equipment_id` column, so the field is dropped on apply; a peer at v169 has
+   run its own ladder and derived the same twin.
+2. *"Sync adopt bypasses the ladder, so the rows must replicate."* A base or full
+   export passes `hlcSince == null` and therefore carries every row regardless of
+   HLC, so a device adopting the cloud base receives the backfilled twins.
+
+**Known limitation, accepted.** A dive downloaded by a peer still on the previous
+schema and synced to an already-migrated device is not linked on that device: its
+ladder has run, the runtime linker fires only at local creation seams, and the
+peer's own later backfill is HLC-neutral so it does not push. That is a missing
+join row on one device during the rollout window, not divergence in the twin
+itself, and it resolves the moment anyone edits that dive's gear. Closing it
+would require either a fleet-wide re-sync or a link step on the sync-apply path,
+and neither is worth that cost.
+
+`dive_computer_gear_backfill_test.dart` asserts the HLC-neutrality directly, so
+the choice cannot be silently reversed.
 
 ### D10. Buoyancy
 
