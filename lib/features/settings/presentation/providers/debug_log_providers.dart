@@ -155,10 +155,15 @@ Future<Uint8List> _exportBytes(File file, String header) async {
 ///
 /// Shares a header-prefixed copy rather than the log file itself, so the
 /// recipient sees which build and device produced the lines.
+///
+/// [sharePositionOrigin] anchors the iPad share popover; this function has no
+/// [BuildContext] of its own, so the caller resolves it from the share button
+/// (see `shareAnchorFrom`). Ignored on every other platform.
 Future<void> shareLogFile(
   LogFileService service,
   AppLocalizations l10n, {
   LogEnvironment? environment,
+  Rect? sharePositionOrigin,
 }) async {
   final file = File(service.logFilePath);
   if (!file.existsSync()) return;
@@ -178,6 +183,7 @@ Future<void> shareLogFile(
     ShareParams(
       files: [XFile(export.path, mimeType: 'text/plain')],
       subject: l10n.settings_debugLog_shareSubject,
+      sharePositionOrigin: sharePositionOrigin,
     ),
   );
 }

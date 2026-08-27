@@ -1,7 +1,9 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/database/database.dart' as db;
+import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/database_service.dart';
 
@@ -30,6 +32,17 @@ Buddy _makeBuddy({
     diverId: diverId,
     createdAt: now,
     updatedAt: now,
+  );
+}
+
+BuddyWithDiveCount _withCount(
+  String name, {
+  int diveCount = 0,
+  bool isFavorite = false,
+}) {
+  return BuddyWithDiveCount(
+    buddy: _makeBuddy(id: name, name: name).copyWith(isFavorite: isFavorite),
+    diveCount: diveCount,
   );
 }
 
@@ -240,6 +253,109 @@ void main() {
             'BuddyListNotifier should silently reload after a direct DB write '
             'without any manual refresh() call',
       );
+    });
+
+    test('toggleFavorite flips the flag and refreshes the list', () async {
+      final diver = await seedCurrentDiver();
+      final buddy = await buddyRepo.createBuddy(
+        _makeBuddy(name: 'Fave Buddy', diverId: diver.id),
+      );
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+
+      await container
+          .read(buddyListNotifierProvider.notifier)
+          .toggleFavorite(buddy.id);
+
+      final updated = await buddyRepo.getBuddyById(buddy.id);
+      expect(updated!.isFavorite, isTrue);
+    });
+  });
+
+  group('applyBuddyWithDiveCountSorting (issue #638)', () {
+    test('sorts by dive count descending by default', () {
+      final buddies = [
+        _withCount('Low', diveCount: 1),
+        _withCount('High', diveCount: 10),
+        _withCount('Mid', diveCount: 5),
+      ];
+
+      final sorted = applyBuddyWithDiveCountSorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.diveCount,
+          direction: SortDirection.descending,
+        ),
+      );
+
+      expect(sorted.map((b) => b.buddy.name), ['High', 'Mid', 'Low']);
+    });
+
+    test('dive count ascending reverses the order', () {
+      final buddies = [
+        _withCount('Low', diveCount: 1),
+        _withCount('High', diveCount: 10),
+        _withCount('Mid', diveCount: 5),
+      ];
+
+      final sorted = applyBuddyWithDiveCountSorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.diveCount,
+          direction: SortDirection.ascending,
+        ),
+      );
+
+      expect(sorted.map((b) => b.buddy.name), ['Low', 'Mid', 'High']);
+    });
+
+    test('name sort is alphabetical regardless of dive count', () {
+      final buddies = [
+        _withCount('Charlie', diveCount: 99),
+        _withCount('Alice', diveCount: 0),
+        _withCount('Bob', diveCount: 50),
+      ];
+
+      final sorted = applyBuddyWithDiveCountSorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.name,
+          direction: SortDirection.descending,
+        ),
+      );
+
+      expect(sorted.map((b) => b.buddy.name), ['Alice', 'Bob', 'Charlie']);
+    });
+
+    test('does not mutate the input list', () {
+      final buddies = [
+        _withCount('Low', diveCount: 1),
+        _withCount('High', diveCount: 10),
+      ];
+      final original = List.of(buddies);
+
+      applyBuddyWithDiveCountSorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.diveCount,
+          direction: SortDirection.descending,
+        ),
+      );
+
+      expect(buddies, original);
+    });
+  });
+
+  group('buddyPickerSortProvider (issue #638)', () {
+    test('defaults to dive count descending, not alphabetical', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final sort = container.read(buddyPickerSortProvider);
+
+      expect(sort.field, BuddySortField.diveCount);
+      expect(sort.direction, SortDirection.descending);
     });
   });
 

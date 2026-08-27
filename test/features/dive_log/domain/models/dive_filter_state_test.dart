@@ -79,6 +79,7 @@ void main() {
         expect(filter.decoOnly, isNull);
         expect(filter.noBuddyOnly, isNull);
         expect(filter.tagIds, isEmpty);
+        expect(filter.weekdays, isEmpty);
         expect(filter.equipmentIds, isEmpty);
         expect(filter.buddyNameFilter, isNull);
         expect(filter.buddyId, isNull);
@@ -185,6 +186,12 @@ void main() {
         expect(filter.hasActiveFilters, isTrue);
       });
 
+      test('returns true when weekdays is non-empty', () {
+        const filter = DiveFilterState(weekdays: [1, 3]);
+
+        expect(filter.hasActiveFilters, isTrue);
+      });
+
       test('returns true when buddyNameFilter is set and non-empty', () {
         const filter = DiveFilterState(buddyNameFilter: 'John');
 
@@ -265,6 +272,22 @@ void main() {
         final updated = original.copyWith(clearNoBuddyOnly: true);
 
         expect(updated.noBuddyOnly, isNull);
+      });
+
+      test('sets weekdays', () {
+        const original = DiveFilterState();
+
+        final updated = original.copyWith(weekdays: [1, 2]);
+
+        expect(updated.weekdays, [1, 2]);
+      });
+
+      test('clears weekdays with clearWeekdays', () {
+        const original = DiveFilterState(weekdays: [1, 2]);
+
+        final updated = original.copyWith(clearWeekdays: true);
+
+        expect(updated.weekdays, isEmpty);
       });
 
       test('sets and clears multiple fields simultaneously', () {
@@ -479,6 +502,61 @@ void main() {
 
         expect(result, hasLength(1));
         expect(result.first.id, 'd1');
+      });
+
+      group('weekdays', () {
+        test('filters by matching weekday', () {
+          final monday = DateTime(2026, 3, 16);
+          final tuesday = DateTime(2026, 3, 17);
+          final filter = DiveFilterState(weekdays: [monday.weekday]);
+          final dives = [
+            _makeDive(id: 'd1', dateTime: monday),
+            _makeDive(id: 'd2', dateTime: tuesday),
+          ];
+
+          final result = filter.apply(dives);
+
+          expect(result.map((d) => d.id), ['d1']);
+        });
+
+        test('matches ANY selected weekday', () {
+          final monday = DateTime(2026, 3, 16);
+          final tuesday = DateTime(2026, 3, 17);
+          final wednesday = DateTime(2026, 3, 18);
+          final filter = DiveFilterState(
+            weekdays: [monday.weekday, wednesday.weekday],
+          );
+          final dives = [
+            _makeDive(id: 'd1', dateTime: monday),
+            _makeDive(id: 'd2', dateTime: tuesday),
+            _makeDive(id: 'd3', dateTime: wednesday),
+          ];
+
+          final result = filter.apply(dives);
+
+          expect(result.map((d) => d.id), containsAll(['d1', 'd3']));
+          expect(result, hasLength(2));
+        });
+
+        test('combines with date range as AND', () {
+          final insideRangeMonday = DateTime(2026, 3, 16);
+          final outsideRangeMonday = DateTime(2026, 4, 6);
+          final insideRangeTuesday = DateTime(2026, 3, 17);
+          final filter = DiveFilterState(
+            startDate: DateTime(2026, 3, 1),
+            endDate: DateTime(2026, 3, 31),
+            weekdays: [insideRangeMonday.weekday],
+          );
+          final dives = [
+            _makeDive(id: 'd1', dateTime: insideRangeMonday),
+            _makeDive(id: 'd2', dateTime: outsideRangeMonday),
+            _makeDive(id: 'd3', dateTime: insideRangeTuesday),
+          ];
+
+          final result = filter.apply(dives);
+
+          expect(result.map((d) => d.id), ['d1']);
+        });
       });
 
       test('filters by diveIds', () {

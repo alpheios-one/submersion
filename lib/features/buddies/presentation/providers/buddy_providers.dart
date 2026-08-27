@@ -14,6 +14,7 @@ import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/shared/models/entity_card_view_config.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
+import 'package:submersion/shared/providers/entity_card_config_providers.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 import 'package:submersion/core/utils/log_failure.dart';
 
@@ -61,6 +62,34 @@ final allBuddiesWithDiveCountProvider =
       return repository.getAllBuddiesWithDiveCount(diverId: validatedDiverId);
     });
 
+/// Search results with dive counts, for the "Add buddy" picker sheet, which
+/// sorts by dive count and needs that even while a search query is active.
+final buddySearchWithDiveCountProvider =
+    FutureProvider.family<List<BuddyWithDiveCount>, String>((ref, query) async {
+      if (query.isEmpty) {
+        return ref.watch(allBuddiesWithDiveCountProvider).value ?? [];
+      }
+      final repository = ref.watch(buddyRepositoryProvider);
+      final validatedDiverId = await ref.watch(
+        validatedCurrentDiverIdProvider.future,
+      );
+      ref.invalidateSelfWhen(repository.watchBuddiesChanges());
+      return repository.getAllBuddiesWithDiveCount(
+        diverId: validatedDiverId,
+        query: query,
+      );
+    });
+
+/// Sort state for the "Add buddy" picker sheet. Defaults to dive count
+/// descending (issue #638): divers with many buddies on file mostly care
+/// about who they dive with often, not the full alphabet.
+final buddyPickerSortProvider = StateProvider<SortState<BuddySortField>>(
+  (ref) => const SortState(
+    field: BuddySortField.diveCount,
+    direction: SortDirection.descending,
+  ),
+);
+
 /// Apply sorting to a list of buddies with dive counts
 List<BuddyWithDiveCount> applyBuddyWithDiveCountSorting(
   List<BuddyWithDiveCount> buddies,
@@ -68,26 +97,29 @@ List<BuddyWithDiveCount> applyBuddyWithDiveCountSorting(
 ) {
   final sorted = List<BuddyWithDiveCount>.from(buddies);
 
-  sorted.sort((a, b) {
-    int comparison;
-    // For text fields, invert direction (user expects descending = A→Z)
-    final invertForText = sort.field == BuddySortField.name;
+  int byNameAscending(BuddyWithDiveCount a, BuddyWithDiveCount b) =>
+      a.buddy.name.toLowerCase().compareTo(b.buddy.name.toLowerCase());
 
+  sorted.sort((a, b) {
     switch (sort.field) {
       case BuddySortField.name:
-        comparison = a.buddy.name.toLowerCase().compareTo(
-          b.buddy.name.toLowerCase(),
-        );
+        final comparison = byNameAscending(a, b);
+        // For text fields, invert direction (user expects descending = A→Z)
+        return sort.direction == SortDirection.ascending
+            ? -comparison
+            : comparison;
       case BuddySortField.diveCount:
-        comparison = a.diveCount.compareTo(b.diveCount);
+        final comparison = a.diveCount.compareTo(b.diveCount);
+        if (comparison == 0) {
+          // Ties (very common -- most buddies share 0 dives) break
+          // alphabetically, so the order is deterministic instead of left to
+          // an unstable sort.
+          return byNameAscending(a, b);
+        }
+        return sort.direction == SortDirection.ascending
+            ? comparison
+            : -comparison;
     }
-
-    if (invertForText) {
-      return sort.direction == SortDirection.ascending
-          ? -comparison
-          : comparison;
-    }
-    return sort.direction == SortDirection.ascending ? comparison : -comparison;
   });
 
   return sorted;
@@ -347,6 +379,14 @@ class BuddyListNotifier extends StateNotifier<AsyncValue<List<Buddy>>> {
     await refresh();
   }
 
+  /// Toggle favorite status for a buddy (issue #638)
+  Future<void> toggleFavorite(String buddyId) async {
+    await _repository.toggleFavorite(buddyId);
+    _ref.invalidate(buddyByIdProvider(buddyId));
+    _ref.invalidate(allBuddiesWithDiveCountProvider);
+    await refresh();
+  }
+
   Future<BuddyMergeSnapshot?> mergeBuddies(
     Buddy mergedBuddy,
     List<String> buddyIds,
@@ -530,35 +570,56 @@ final buddyTableConfigProvider =
 // Buddy Card View Config
 // ============================================================================
 
-/// Default card slot configuration for the detailed buddy card view.
+/// Detailed buddy card slots. Persisted per diver under
+/// `card_detailed_buddies`.
 final buddyDetailedCardConfigProvider =
-    StateProvider<EntityCardViewConfig<BuddyField>>(
-      (ref) => const EntityCardViewConfig<BuddyField>(
-        slots: [
-          EntityCardSlotConfig(slotId: 'title', field: BuddyField.buddyName),
-          EntityCardSlotConfig(slotId: 'subtitle', field: BuddyField.email),
-          EntityCardSlotConfig(
-            slotId: 'stat1',
-            field: BuddyField.certificationLevel,
-          ),
-          EntityCardSlotConfig(slotId: 'stat2', field: BuddyField.diveCount),
-        ],
-        extraFields: [],
-      ),
-    );
+    StateNotifierProvider<
+      EntityCardConfigNotifier<BuddyField>,
+      EntityCardViewConfig<BuddyField>
+    >((ref) {
+      final notifier = EntityCardConfigNotifier<BuddyField>(
+        defaultConfig: const EntityCardViewConfig<BuddyField>(
+          slots: [
+            EntityCardSlotConfig(slotId: 'title', field: BuddyField.buddyName),
+            EntityCardSlotConfig(slotId: 'subtitle', field: BuddyField.email),
+            EntityCardSlotConfig(slotId: 'stat1', field: BuddyField.diveCount),
+            EntityCardSlotConfig(slotId: 'stat2', field: BuddyField.lastDive),
+          ],
+        ),
+        fieldFromName: BuddyFieldAdapter.instance.fieldFromName,
+      );
+      final diverId = ref.watch(currentDiverIdProvider);
+      if (diverId != null) {
+        final repo = ref.watch(viewConfigRepositoryProvider);
+        notifier.init(repo, diverId, 'card_detailed_buddies');
+      }
+      return notifier;
+    });
 
-/// Default card slot configuration for the compact buddy card view.
+/// Compact buddy card slots. Persisted per diver under `card_compact_buddies`.
 final buddyCompactCardConfigProvider =
-    StateProvider<EntityCardViewConfig<BuddyField>>(
-      (ref) => const EntityCardViewConfig<BuddyField>(
-        slots: [
-          EntityCardSlotConfig(slotId: 'title', field: BuddyField.buddyName),
-          EntityCardSlotConfig(slotId: 'subtitle', field: BuddyField.email),
-          EntityCardSlotConfig(
-            slotId: 'stat1',
-            field: BuddyField.certificationLevel,
-          ),
-          EntityCardSlotConfig(slotId: 'stat2', field: BuddyField.diveCount),
-        ],
-      ),
-    );
+    StateNotifierProvider<
+      EntityCardConfigNotifier<BuddyField>,
+      EntityCardViewConfig<BuddyField>
+    >((ref) {
+      final notifier = EntityCardConfigNotifier<BuddyField>(
+        defaultConfig: const EntityCardViewConfig<BuddyField>(
+          slots: [
+            EntityCardSlotConfig(slotId: 'title', field: BuddyField.buddyName),
+            EntityCardSlotConfig(
+              slotId: 'subtitle',
+              field: BuddyField.certificationLevel,
+            ),
+            EntityCardSlotConfig(slotId: 'stat1', field: BuddyField.diveCount),
+            EntityCardSlotConfig(slotId: 'stat2', field: BuddyField.lastDive),
+          ],
+        ),
+        fieldFromName: BuddyFieldAdapter.instance.fieldFromName,
+      );
+      final diverId = ref.watch(currentDiverIdProvider);
+      if (diverId != null) {
+        final repo = ref.watch(viewConfigRepositoryProvider);
+        notifier.init(repo, diverId, 'card_compact_buddies');
+      }
+      return notifier;
+    });
