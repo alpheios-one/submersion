@@ -7008,6 +7008,70 @@
   "marineLife_speciesManage_resetSuccess": "Built-in species restored to defaults",
   "marineLife_speciesManage_resetToDefaults": "Reset to Defaults",
   "marineLife_speciesManage_searchHint": "Search species...",
+  "marineLife_speciesPhotos_title": "Photos ({count})",
+  "@marineLife_speciesPhotos_title": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "marineLife_speciesPhotos_empty": "Photos tagged with this species appear here.",
+  "marineLife_speciesPhotos_tagPhotos": "Tag photos",
+  "marineLife_speciesPhotos_addPhotos": "Add photos",
+  "marineLife_speciesPhotos_thumbnailLabel": "Species photo",
+  "marineLife_speciesPhotos_importAdded": "{count, plural, =1{1 photo added} other{{count} photos added}}",
+  "@marineLife_speciesPhotos_importAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marineLife_speciesPhotos_importSkipped": "{count, plural, =1{1 skipped} other{{count} skipped}}",
+  "@marineLife_speciesPhotos_importSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marineLife_speciesPhotos_importFailed": "{count, plural, =1{1 failed} other{{count} failed}}",
+  "@marineLife_speciesPhotos_importFailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marineLife_tagPicker_title": "Tag photos",
+  "marineLife_tagPicker_empty": "No untagged photos on dives where you logged this species.",
+  "marineLife_tagPicker_emptyHint": "Use Add photos to import pictures from your camera roll.",
+  "marineLife_tagPicker_selectAll": "Select all",
+  "marineLife_tagPicker_confirm": "{count, plural, =1{Tag 1 photo} other{Tag {count} photos}}",
+  "@marineLife_tagPicker_confirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marineLife_tagPicker_tagged": "{count, plural, =1{Tagged 1 photo} other{Tagged {count} photos}}",
+  "@marineLife_tagPicker_tagged": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marineLife_tagPicker_diveLabel": "Dive {number}",
+  "@marineLife_tagPicker_diveLabel": {
+    "placeholders": {
+      "number": {
+        "type": "Object"
+      }
+    }
+  },
   "marineLife_speciesPage_title": "Species",
   "marineLife_speciesPage_searchHint": "Search species you have seen",
   "marineLife_speciesPage_clearSearchTooltip": "Clear search",
@@ -18955,6 +19019,12 @@
   "@diveLog_detail_view3d": {},
   "setup_sync_icloudUnavailable": "iCloud is not available on this device",
   "media_info_title": "Media info",
+  "media_species_actionTooltip": "Species",
+  "media_species_sheetTitle": "Species in this photo",
+  "media_species_sightedOnDive": "Sighted on this dive",
+  "media_species_otherSpecies": "Other species...",
+  "media_species_noDiveHint": "This photo is not linked to a dive. Search for a species to tag it.",
+  "media_species_chipsLabel": "Species tags",
   "media_info_fileSection": "File",
   "media_info_filename": "Filename",
   "media_info_type": "Type",

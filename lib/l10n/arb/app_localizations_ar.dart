@@ -12311,6 +12311,98 @@ class AppLocalizationsAr extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'البحث في الأنواع...';
 
   @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return 'الصور ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty =>
+      'الصور الموسومة بهذا النوع تظهر هنا.';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => 'وسم الصور';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => 'إضافة صور';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => 'صورة النوع';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تمت إضافة $count صور',
+      one: 'تمت إضافة صورة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تخطي $count',
+      one: 'تم تخطي صورة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'فشل $count',
+      one: 'فشلت صورة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => 'وسم الصور';
+
+  @override
+  String get marineLife_tagPicker_empty =>
+      'لا توجد صور غير موسومة في الغوصات التي سجلت فيها هذا النوع.';
+
+  @override
+  String get marineLife_tagPicker_emptyHint =>
+      'استخدم إضافة صور لاستيراد الصور من ألبوم الكاميرا.';
+
+  @override
+  String get marineLife_tagPicker_selectAll => 'تحديد الكل';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'وسم $count صور',
+      one: 'وسم صورة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم وسم $count صور',
+      one: 'تم وسم صورة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return 'الغوصة $number';
+  }
+
+  @override
   String get marineLife_speciesPage_title => 'الأنواع';
 
   @override
@@ -33323,6 +33415,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_info_title => 'معلومات الوسائط';
+
+  @override
+  String get media_species_actionTooltip => 'الأنواع';
+
+  @override
+  String get media_species_sheetTitle => 'الأنواع في هذه الصورة';
+
+  @override
+  String get media_species_sightedOnDive => 'شوهدت في هذه الغوصة';
+
+  @override
+  String get media_species_otherSpecies => 'أنواع أخرى...';
+
+  @override
+  String get media_species_noDiveHint =>
+      'هذه الصورة غير مرتبطة بغوصة. ابحث عن نوع لوسمها.';
+
+  @override
+  String get media_species_chipsLabel => 'وسوم الأنواع';
 
   @override
   String get media_info_fileSection => 'الملف';

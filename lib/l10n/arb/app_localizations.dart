@@ -21203,6 +21203,96 @@ abstract class AppLocalizations {
   /// **'Search species...'**
   String get marineLife_speciesManage_searchHint;
 
+  /// No description provided for @marineLife_speciesPhotos_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos ({count})'**
+  String marineLife_speciesPhotos_title(Object count);
+
+  /// No description provided for @marineLife_speciesPhotos_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos tagged with this species appear here.'**
+  String get marineLife_speciesPhotos_empty;
+
+  /// No description provided for @marineLife_speciesPhotos_tagPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag photos'**
+  String get marineLife_speciesPhotos_tagPhotos;
+
+  /// No description provided for @marineLife_speciesPhotos_addPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photos'**
+  String get marineLife_speciesPhotos_addPhotos;
+
+  /// No description provided for @marineLife_speciesPhotos_thumbnailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Species photo'**
+  String get marineLife_speciesPhotos_thumbnailLabel;
+
+  /// No description provided for @marineLife_speciesPhotos_importAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 photo added} other{{count} photos added}}'**
+  String marineLife_speciesPhotos_importAdded(int count);
+
+  /// No description provided for @marineLife_speciesPhotos_importSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 skipped} other{{count} skipped}}'**
+  String marineLife_speciesPhotos_importSkipped(int count);
+
+  /// No description provided for @marineLife_speciesPhotos_importFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 failed} other{{count} failed}}'**
+  String marineLife_speciesPhotos_importFailed(int count);
+
+  /// No description provided for @marineLife_tagPicker_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag photos'**
+  String get marineLife_tagPicker_title;
+
+  /// No description provided for @marineLife_tagPicker_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No untagged photos on dives where you logged this species.'**
+  String get marineLife_tagPicker_empty;
+
+  /// No description provided for @marineLife_tagPicker_emptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Add photos to import pictures from your camera roll.'**
+  String get marineLife_tagPicker_emptyHint;
+
+  /// No description provided for @marineLife_tagPicker_selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get marineLife_tagPicker_selectAll;
+
+  /// No description provided for @marineLife_tagPicker_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Tag 1 photo} other{Tag {count} photos}}'**
+  String marineLife_tagPicker_confirm(int count);
+
+  /// No description provided for @marineLife_tagPicker_tagged.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Tagged 1 photo} other{Tagged {count} photos}}'**
+  String marineLife_tagPicker_tagged(int count);
+
+  /// No description provided for @marineLife_tagPicker_diveLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive {number}'**
+  String marineLife_tagPicker_diveLabel(Object number);
+
   /// No description provided for @marineLife_speciesPage_title.
   ///
   /// In en, this message translates to:
@@ -55291,6 +55381,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Media info'**
   String get media_info_title;
+
+  /// No description provided for @media_species_actionTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Species'**
+  String get media_species_actionTooltip;
+
+  /// No description provided for @media_species_sheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Species in this photo'**
+  String get media_species_sheetTitle;
+
+  /// No description provided for @media_species_sightedOnDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Sighted on this dive'**
+  String get media_species_sightedOnDive;
+
+  /// No description provided for @media_species_otherSpecies.
+  ///
+  /// In en, this message translates to:
+  /// **'Other species...'**
+  String get media_species_otherSpecies;
+
+  /// No description provided for @media_species_noDiveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo is not linked to a dive. Search for a species to tag it.'**
+  String get media_species_noDiveHint;
+
+  /// No description provided for @media_species_chipsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Species tags'**
+  String get media_species_chipsLabel;
 
   /// No description provided for @media_info_fileSection.
   ///

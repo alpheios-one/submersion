@@ -12526,6 +12526,98 @@ class AppLocalizationsEs extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'Buscar especies...';
 
   @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return 'Fotos ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty =>
+      'Las fotos etiquetadas con esta especie aparecen aquí.';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => 'Etiquetar fotos';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => 'Añadir fotos';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => 'Foto de la especie';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos añadidas',
+      one: '1 foto añadida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count omitidas',
+      one: '1 omitida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count con error',
+      one: '1 con error',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => 'Etiquetar fotos';
+
+  @override
+  String get marineLife_tagPicker_empty =>
+      'No hay fotos sin etiquetar en las inmersiones donde registraste esta especie.';
+
+  @override
+  String get marineLife_tagPicker_emptyHint =>
+      'Usa Añadir fotos para importar imágenes de tu carrete.';
+
+  @override
+  String get marineLife_tagPicker_selectAll => 'Seleccionar todo';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Etiquetar $count fotos',
+      one: 'Etiquetar 1 foto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos etiquetadas',
+      one: '1 foto etiquetada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return 'Inmersión $number';
+  }
+
+  @override
   String get marineLife_speciesPage_title => 'Especies';
 
   @override
@@ -33695,6 +33787,25 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_info_title => 'Información del medio';
+
+  @override
+  String get media_species_actionTooltip => 'Especies';
+
+  @override
+  String get media_species_sheetTitle => 'Especies en esta foto';
+
+  @override
+  String get media_species_sightedOnDive => 'Avistadas en esta inmersión';
+
+  @override
+  String get media_species_otherSpecies => 'Otras especies...';
+
+  @override
+  String get media_species_noDiveHint =>
+      'Esta foto no está vinculada a una inmersión. Busca una especie para etiquetarla.';
+
+  @override
+  String get media_species_chipsLabel => 'Etiquetas de especies';
 
   @override
   String get media_info_fileSection => 'Archivo';
