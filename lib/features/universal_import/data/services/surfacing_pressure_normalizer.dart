@@ -68,13 +68,24 @@ Map<String, dynamic> _trimDive(Map<String, dynamic> dive) {
 }
 
 /// Reduce payload profile points to what the surfacing rule reads. A point
-/// without a depth cannot place the surfacing moment, so it is skipped.
+/// missing either a depth or a timestamp cannot place the surfacing moment, so
+/// it is skipped.
+///
+/// Skipping the untimed ones matters as much as skipping the depthless ones.
+/// The rule takes surfacing to be the latest deep sample, so reading a missing
+/// timestamp as zero would rank every untimed sample ahead of the whole dive:
+/// a profile that stamped only its tail would place surfacing at the start and
+/// promote a mid-dive pressure into the end pressure. Dropping them instead
+/// leaves such a dive uncorrected, which is what this rule does whenever it
+/// cannot tell where the dive ended.
 List<SurfacingProfilePoint> _points(List<dynamic> profile) {
   final points = <SurfacingProfilePoint>[];
   for (final raw in profile) {
     if (raw is! Map<String, dynamic>) continue;
     final depth = (raw['depth'] as num?)?.toDouble();
     if (depth == null) continue;
+    final timeSeconds = (raw['timestamp'] as num?)?.toInt();
+    if (timeSeconds == null) continue;
 
     final pressures = <int, double>{};
     final all = raw['allTankPressures'];
@@ -91,7 +102,7 @@ List<SurfacingProfilePoint> _points(List<dynamic> profile) {
 
     points.add(
       SurfacingProfilePoint(
-        timeSeconds: (raw['timestamp'] as num?)?.toInt() ?? 0,
+        timeSeconds: timeSeconds,
         depthMeters: depth,
         tankPressuresBar: pressures,
       ),

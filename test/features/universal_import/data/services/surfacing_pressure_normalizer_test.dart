@@ -187,4 +187,65 @@ void main() {
       payload.entitiesOf(ImportEntityType.sites),
     );
   });
+
+  test('leaves a dive whose deep samples carry no timestamp untouched', () {
+    // A source that stamps only some of its samples cannot place surfacing.
+    // Reading the unstamped ones as time zero would rank them before every
+    // stamped sample, moving surfacing to the start of the dive and promoting
+    // a mid-dive pressure into the end pressure.
+    final dive = {
+      'tanks': <Map<String, dynamic>>[
+        {'order': 0, 'startPressure': 200.0, 'endPressure': 4.0},
+      ],
+      'profile': <Map<String, dynamic>>[
+        {
+          'depth': 51.0,
+          'allTankPressures': [
+            {'tankIndex': 0, 'pressure': 120.0},
+          ],
+        },
+        {
+          'depth': 30.0,
+          'allTankPressures': [
+            {'tankIndex': 0, 'pressure': 100.0},
+          ],
+        },
+        {
+          'timestamp': 3970,
+          'depth': 0.5,
+          'allTankPressures': [
+            {'tankIndex': 0, 'pressure': 41.0},
+          ],
+        },
+        {
+          'timestamp': 4140,
+          'depth': 0.0,
+          'allTankPressures': [
+            {'tankIndex': 0, 'pressure': 4.0},
+          ],
+        },
+      ],
+    };
+
+    final result = trimTankPressuresAtSurfacing(payloadWith(dive));
+
+    expect(firstTank(result)['endPressure'], 4.0);
+  });
+
+  test('ignores an unstamped sample when reading the surfacing pressure', () {
+    // The unstamped sample sits in the middle of the descent. Dropping it
+    // leaves the stamped samples to place surfacing, so the correction still
+    // lands on the reading at 1.2 m rather than on the mid-dive value.
+    final dive = bleedingOxygenDive();
+    (dive['profile'] as List<Map<String, dynamic>>).insert(1, {
+      'depth': 30.0,
+      'allTankPressures': [
+        {'tankIndex': 0, 'pressure': 100.0},
+      ],
+    });
+
+    final result = trimTankPressuresAtSurfacing(payloadWith(dive));
+
+    expect(firstTank(result)['endPressure'], 41.0);
+  });
 }
