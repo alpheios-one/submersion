@@ -105,7 +105,7 @@ Widget _harness(_FakeLookup lookup, _RecordingRepository repository) =>
     ProviderScope(
       overrides: [
         reefSnapshotProvider(
-          ReefSnapshotRequest(location: _location),
+          const ReefSnapshotRequest(location: _location),
         ).overrideWith(
           (ref) async => _snapshotWithUnmatched(['Aplysina archeri']),
         ),
@@ -124,7 +124,7 @@ Widget _harness(_FakeLookup lookup, _RecordingRepository repository) =>
       ],
       child: localizedMaterialApp(
         locale: const Locale('en'),
-        home: Scaffold(
+        home: const Scaffold(
           body: NearbySpeciesTier(siteId: 'site-1', location: _location),
         ),
       ),
