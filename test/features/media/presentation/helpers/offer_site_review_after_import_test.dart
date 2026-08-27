@@ -42,6 +42,9 @@ void main() {
     await tester.pumpWidget(
       testAppRouter(
         router: router,
+        // flutter_test forwards the host's locale list, so pin English or the
+        // string assertions below fail on a non-English machine.
+        locale: const Locale('en'),
         overrides: [
           eligibleImportedDivesProvider(
             ImportedDiveIds(overrideKey ?? imported),

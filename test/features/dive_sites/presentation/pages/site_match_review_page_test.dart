@@ -78,6 +78,8 @@ Widget _harness(SiteMatchReviewState seeded, {ApplyResult? confirmResult}) =>
         ),
       ],
       child: const MaterialApp(
+        // Same reason as elsewhere: these tests assert English strings.
+        locale: Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: SiteMatchReviewPage(),
