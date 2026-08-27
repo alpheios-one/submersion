@@ -6550,6 +6550,45 @@ class AppLocalizationsHu extends AppLocalizations {
   String get siteMatchReview_empty => 'Nincs mit hozzárendelni.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'Helyszín található a fotókban';
+
+  @override
+  String get siteSuggestion_titleDiveComputer => 'Helyszín a búvárkomputerből';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return '$name hozzárendelése';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'Közeli helyszín választása ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'Helyszín hozzáadása: $name';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return '$name hozzárendelve';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'fotóból';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'búvárkomputerből';
+
+  @override
+  String get siteMatchReview_currentSiteCard =>
+      'Helyszín hozzáadása ehhez a helyhez';
+
+  @override
+  String get siteMatchReview_createHereButton => 'Helyszín létrehozása itt';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected kiválasztva · $review ellenőrzendő · $none nincs találat';
   }
@@ -6581,8 +6620,8 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '$dives merülés összekapcsolva · $sites hely hozzáadva';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '$dives merülés összekapcsolva · $sites hely hozzáadva · $located helyszín elhelyezve';
   }
 
   @override
@@ -12648,6 +12687,39 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'GPS javaslat elvetese';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count merülés kaphat helyszínt a fotóiból';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'Helyszínek áttekintése';
+
+  @override
+  String filesTab_linkedItems(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem összekapcsolva',
+      one: '1 elem összekapcsolva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String filesTab_attachedToSite(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem csatolva ehhez a helyhez',
+      one: '1 elem csatolva ehhez a helyhez',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filesTab_undo => 'Visszavonás';
 
   @override
   String get media_gpsBanner_title => 'GPS adat talalhato a fotokban';

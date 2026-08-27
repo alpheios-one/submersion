@@ -6571,6 +6571,45 @@ class AppLocalizationsDe extends AppLocalizations {
   String get siteMatchReview_empty => 'Nichts zuzuordnen.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'Standort in Fotos gefunden';
+
+  @override
+  String get siteSuggestion_titleDiveComputer => 'Standort vom Tauchcomputer';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return '$name zuweisen';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'Nahegelegenen Tauchplatz wählen ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'Standort zu $name hinzufügen';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return '$name zugewiesen';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'aus Foto';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'vom Tauchcomputer';
+
+  @override
+  String get siteMatchReview_currentSiteCard =>
+      'Standort zu diesem Tauchplatz hinzufügen';
+
+  @override
+  String get siteMatchReview_createHereButton => 'Tauchplatz hier erstellen';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected ausgewählt · $review zu prüfen · $none ohne Treffer';
   }
@@ -6603,8 +6642,8 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '$dives Tauchgänge verknüpft · $sites Tauchplätze hinzugefügt';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '$dives Tauchgänge verknüpft · $sites Tauchplätze hinzugefügt · $located Tauchplätze verortet';
   }
 
   @override
@@ -12686,6 +12725,39 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'GPS-Vorschlag schließen';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count Tauchgänge könnten aus ihren Fotos einen Tauchplatz erhalten';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'Tauchplätze prüfen';
+
+  @override
+  String filesTab_linkedItems(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente verknüpft',
+      one: '1 Element verknüpft',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String filesTab_attachedToSite(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente an diesen Tauchplatz angehängt',
+      one: '1 Element an diesen Tauchplatz angehängt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filesTab_undo => 'Rückgängig';
 
   @override
   String get media_gpsBanner_title => 'GPS in Fotos gefunden';

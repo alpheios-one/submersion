@@ -35,6 +35,7 @@ class SiteMatchReviewPage extends ConsumerWidget {
             l10n.siteMatchReview_appliedSnack(
               result.divesLinked,
               result.sitesCreated,
+              result.sitesLocated,
             ),
           ),
         ),

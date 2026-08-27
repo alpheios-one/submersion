@@ -6573,6 +6573,46 @@ class AppLocalizationsIt extends AppLocalizations {
   String get siteMatchReview_empty => 'Niente da associare.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'Posizione trovata nelle foto';
+
+  @override
+  String get siteSuggestion_titleDiveComputer =>
+      'Posizione dal computer subacqueo';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return 'Assegna $name';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'Scegli sito vicino ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'Aggiungi posizione a $name';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return 'Assegnato $name';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'da foto';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'dal computer subacqueo';
+
+  @override
+  String get siteMatchReview_currentSiteCard =>
+      'Aggiungi posizione a questo sito';
+
+  @override
+  String get siteMatchReview_createHereButton => 'Crea sito qui';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected selezionate · $review da rivedere · $none senza corrispondenza';
   }
@@ -6604,8 +6644,8 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '$dives immersioni associate · $sites siti aggiunti';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '$dives immersioni associate · $sites siti aggiunti · $located siti localizzati';
   }
 
   @override
@@ -12697,6 +12737,39 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'Ignora suggerimento GPS';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count immersioni potrebbero ottenere un sito dalle foto';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'Rivedi siti';
+
+  @override
+  String filesTab_linkedItems(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementi collegati',
+      one: '1 elemento collegato',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String filesTab_attachedToSite(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementi allegati a questo sito',
+      one: '1 elemento allegato a questo sito',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filesTab_undo => 'Annulla';
 
   @override
   String get media_gpsBanner_title => 'GPS trovato nelle foto';
