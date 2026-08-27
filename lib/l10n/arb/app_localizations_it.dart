@@ -12277,6 +12277,32 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gasCalculators_blender_billedTotal => 'Totale';
 
   @override
+  String get gasCalculators_blender_defaults =>
+      'Impostazioni predefinite e fatturazione';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplates => 'Misure bombola';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateName => 'Nome';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateNone =>
+      'Nessuna misura di bombola salvata.';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateInvalid =>
+      'Inserisci un nome e una misura maggiore di zero.';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateExists =>
+      'Questa misura di bombola è già salvata.';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateLimit =>
+      'Hai raggiunto il limite di misure di bombola salvate.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

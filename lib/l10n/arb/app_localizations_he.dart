@@ -11974,6 +11974,31 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_billedTotal => 'סה\"כ';
 
   @override
+  String get gasCalculators_blender_defaults => 'הגדרות ברירת מחדל וחיוב';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplates => 'גדלי בלונים';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateName => 'שם';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateNone =>
+      'עדיין לא נשמרו גדלי בלונים.';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateInvalid =>
+      'הזן שם וגודל גדול מאפס.';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateExists =>
+      'גודל בלון זה כבר שמור.';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateLimit =>
+      'הגעת למגבלת גדלי הבלונים השמורים.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

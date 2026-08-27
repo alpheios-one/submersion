@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/cylinder_template.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billing_card.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -110,5 +111,25 @@ void main() {
     for (final label in ['2 L', '3 L', '24 L']) {
       expect(find.text(label), findsOneWidget);
     }
+  });
+
+  testWidgets('a saved cylinder template joins the preset list', (
+    tester,
+  ) async {
+    // Issue #1335: the diver's own saved cylinder sizes feed the same
+    // dropdown as the static blending-bench presets.
+    final ref = await _pump(tester);
+    ref.read(blenderCylinderTemplatesProvider.notifier).state = const [
+      CylinderTemplate(name: 'Deco bottle', liters: 5),
+    ];
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Deco bottle'), findsOneWidget);
+
+    await tester.tap(find.textContaining('Deco bottle'));
+    await tester.pumpAndSettle();
+    expect(ref.read(blenderCylinderLitersProvider), closeTo(5, 0.01));
   });
 }

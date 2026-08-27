@@ -98,6 +98,12 @@ void main() {
     );
   });
 
+  test('cylinder templates start empty', () {
+    // Unlike mix templates, there is nothing to seed: the static presets
+    // already cover a first run (issue #1335).
+    expect(container.read(blenderCylinderTemplatesProvider), isEmpty);
+  });
+
   test('reset restores the defaults and bumps the epoch', () {
     container.read(blenderTargetPressureProvider.notifier).state = 300;
     container.read(blenderFillTempProvider.notifier).state = 5;

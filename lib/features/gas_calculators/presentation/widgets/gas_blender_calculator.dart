@@ -3,16 +3,16 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_about_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billing_card.dart';
-import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_conditions_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_cylinder_card.dart';
-import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_invoice_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_procedure_card.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Real-gas partial-pressure blender: given what's in the cylinder and the
 /// target fill, it lists the gases to add and the pressures to top up to.
@@ -60,8 +60,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
   late final TextEditingController _targetP;
   late final TextEditingController _targetO2;
   late final TextEditingController _targetHe;
-  late final List<TextEditingController> _gasO2;
-  late final List<TextEditingController> _gasHe;
 
   @override
   void initState() {
@@ -80,9 +78,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
 
     final startMix = ref.read(blenderStartMixProvider);
     final targetMix = ref.read(blenderTargetMixProvider);
-    final g1 = ref.read(blenderFillGas1Provider);
-    final g2 = ref.read(blenderFillGas2Provider);
-    final g3 = ref.read(blenderFillGas3Provider);
 
     _startP = TextEditingController(
       text: p(ref.read(blenderStartPressureProvider)),
@@ -94,16 +89,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
     );
     _targetO2 = TextEditingController(text: n(targetMix.o2));
     _targetHe = TextEditingController(text: n(targetMix.he));
-    _gasO2 = [
-      TextEditingController(text: n(g1.o2)),
-      TextEditingController(text: n(g2.o2)),
-      TextEditingController(text: n(g3.o2)),
-    ];
-    _gasHe = [
-      TextEditingController(text: n(g1.he)),
-      TextEditingController(text: n(g2.he)),
-      TextEditingController(text: n(g3.he)),
-    ];
   }
 
   @override
@@ -115,8 +100,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
       _targetP,
       _targetO2,
       _targetHe,
-      ..._gasO2,
-      ..._gasHe,
     ]) {
       c.dispose();
     }
@@ -136,6 +119,22 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Fill gases, mixing conditions and billing defaults live
+              // behind the gear now (issue #1335); only the fields a diver
+              // retypes every fill stay on this always-visible screen.
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  key: const Key('blender-settings'),
+                  icon: const Icon(Icons.settings_outlined),
+                  tooltip: context.l10n.nav_settings,
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (context) => const BlenderSettingsPage(),
+                    ),
+                  ),
+                ),
+              ),
               BlenderCylinderCard(
                 startPressure: _startP,
                 startO2: _startO2,
@@ -144,13 +143,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
                 targetO2: _targetO2,
                 targetHe: _targetHe,
               ),
-              const SizedBox(height: 16),
-              BlenderFillGasesCard(
-                o2Controllers: _gasO2,
-                heControllers: _gasHe,
-              ),
-              const SizedBox(height: 16),
-              const BlenderConditionsCard(),
               const SizedBox(height: 16),
               const BlenderProcedureCard(),
               const SizedBox(height: 16),

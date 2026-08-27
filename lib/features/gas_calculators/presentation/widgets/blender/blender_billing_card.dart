@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/number_input.dart';
@@ -11,17 +10,19 @@ import 'package:submersion/features/gas_calculators/domain/tank_spec.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_volume_conversion.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Cubic feet in a litre, matching `VolumeUnit.convert`.
-///
-/// Storage is canonical: litres for volumes, currency per 100 litres for
-/// prices. Every conversion to and from the diver's unit happens at the text
-/// field, and nowhere else. Adding a second conversion path is what let the
-/// volume column convert twice while the price never converted at all
-/// (PR #1215 review).
-const double _cubicFeetPerLiter = 0.0353147;
+/// One entry in the cylinder-size dropdown: a static preset or a diver's own
+/// saved cylinder template, reduced to just what the row needs to show and
+/// select.
+class _CylinderChoice {
+  const _CylinderChoice({required this.label, required this.liters});
+
+  final String label;
+  final double liters;
+}
 
 /// What the blend costs at the fill station's prices.
 ///
@@ -37,7 +38,6 @@ class BlenderBillingCard extends ConsumerStatefulWidget {
 
 class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
   late final TextEditingController _cylinder;
-  late final List<TextEditingController> _prices;
 
   @override
   void initState() {
@@ -45,46 +45,18 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     final settings = ref.read(settingsProvider);
     final liters = ref.read(blenderCylinderLitersProvider);
     _cylinder = TextEditingController(
-      text: formatRoundedForInput(_toDisplayVolume(liters, settings), 2),
+      text: formatRoundedForInput(
+        litersToDisplayVolume(liters, settings),
+        2,
+      ),
     );
-    _prices = [
-      for (final p in ref.read(blenderGasPricesProvider))
-        TextEditingController(
-          text: p == null
-              ? ''
-              : formatRoundedForInput(_toDisplayPrice(p, settings), 2),
-        ),
-    ];
   }
 
   @override
   void dispose() {
     _cylinder.dispose();
-    for (final c in _prices) {
-      c.dispose();
-    }
     super.dispose();
   }
-
-  static bool _metric(AppSettings s) => s.volumeUnit == VolumeUnit.liters;
-
-  /// Litres to the diver's volume unit, for seeding the cylinder field.
-  static double _toDisplayVolume(double liters, AppSettings s) =>
-      _metric(s) ? liters : liters * _cubicFeetPerLiter;
-
-  static double _toLiters(double shown, AppSettings s) =>
-      _metric(s) ? shown : shown / _cubicFeetPerLiter;
-
-  /// A price per 100 litres, shown as a price per 100 of the diver's unit.
-  ///
-  /// Gas priced at 7.99 per 100 cu ft is 0.28 per 100 L: the same gas, the
-  /// same money, a unit that is 28 times larger. Storing the entered number
-  /// without this conversion charged a cubic-foot diver 28 times over.
-  static double _toDisplayPrice(double per100Liters, AppSettings s) =>
-      _metric(s) ? per100Liters : per100Liters / _cubicFeetPerLiter;
-
-  static double _toPricePer100Liters(double shown, AppSettings s) =>
-      _metric(s) ? shown : shown * _cubicFeetPerLiter;
 
   @override
   Widget build(BuildContext context) {
@@ -120,18 +92,6 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
               ],
             ),
             _cylinderRow(context, settings, units),
-            const SizedBox(height: 16),
-            _currencyField(context, currency),
-            const SizedBox(height: 16),
-            // One field per configured bank, always, rather than one per
-            // step of this particular blend. A blend that skips a bank would
-            // otherwise slide the labels along and charge the next gas at the
-            // wrong rate (PR #1215 review), and prices belong to the banks
-            // anyway, not to today's fill.
-            for (var slot = 0; slot < 3; slot++) ...[
-              if (slot > 0) const SizedBox(height: 12),
-              _priceField(context, slot, units),
-            ],
             if (billing.lines.isNotEmpty) ...[
               const Divider(height: 28),
               for (final line in billing.lines)
@@ -189,10 +149,27 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     AppSettings settings,
     UnitFormatter units,
   ) {
-    // The blending-bench list, not the dive-planning one: the same presets
-    // serve both unit systems because formatTankVolume renders them in the
-    // diver's own unit (issue #1100 review).
-    final choices = blenderTankChoices();
+    // The blending-bench presets, not the dive-planning ones, plus whatever
+    // the diver has saved under Settings -> Default settings and billing
+    // (issue #1335). The same presets serve both unit systems because
+    // formatTankVolume renders them in the diver's own unit (issue #1100
+    // review).
+    final choices = [
+      for (final preset in blenderTankChoices())
+        _CylinderChoice(
+          label: units.formatTankVolume(
+            preset.waterVolumeLiters,
+            preset.workingPressureBar,
+            ratedCapacityCuft: preset.ratedCapacityCuft,
+          ),
+          liters: preset.waterVolumeLiters,
+        ),
+      for (final t in ref.watch(blenderCylinderTemplatesProvider))
+        _CylinderChoice(
+          label: '${t.name} (${units.formatTankVolume(t.liters, null)})',
+          liters: t.liters,
+        ),
+    ];
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,7 +190,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
             ),
             onChanged: (v) =>
                 ref.read(blenderCylinderLitersProvider.notifier).state =
-                    _toLiters(parseUserDecimal(v) ?? 0, settings),
+                    displayVolumeToLiters(parseUserDecimal(v) ?? 0, settings),
             onEditingComplete: () => saveBlenderPreferences(ref),
             onSubmitted: (_) => saveBlenderPreferences(ref),
           ),
@@ -221,28 +198,22 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         const SizedBox(width: 8),
         // A cubic-foot diver does not know their cylinder's water capacity in
         // cubic feet (an AL80 is 0.39), so the presets fill it for them.
-        PopupMenuButton<TankSpec>(
+        PopupMenuButton<_CylinderChoice>(
           key: const Key('blender-cylinder-presets'),
           tooltip: context.l10n.gasCalculators_blender_cylinderPresets,
           position: PopupMenuPosition.under,
           itemBuilder: (context) => [
             for (final choice in choices)
-              PopupMenuItem<TankSpec>(
+              PopupMenuItem<_CylinderChoice>(
                 value: choice,
-                child: Text(
-                  units.formatTankVolume(
-                    choice.waterVolumeLiters,
-                    choice.workingPressureBar,
-                    ratedCapacityCuft: choice.ratedCapacityCuft,
-                  ),
-                ),
+                child: Text(choice.label),
               ),
           ],
           onSelected: (choice) {
             ref.read(blenderCylinderLitersProvider.notifier).state =
-                choice.waterVolumeLiters;
+                choice.liters;
             _cylinder.text = formatRoundedForInput(
-              _toDisplayVolume(choice.waterVolumeLiters, settings),
+              litersToDisplayVolume(choice.liters, settings),
               2,
             );
             saveBlenderPreferences(ref);
@@ -259,67 +230,6 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _currencyField(BuildContext context, String currency) {
-    // Controlled so a stored currency arriving from the async preference load
-    // moves the dropdown with it (PR #1215 review).
-    return DropdownButtonFormField<String>(
-      key: const Key('blender-currency'),
-      initialValue: currency,
-      isExpanded: true,
-      decoration: InputDecoration(
-        labelText: context.l10n.gasCalculators_blender_currency,
-        isDense: true,
-        border: const OutlineInputBorder(),
-      ),
-      items: [
-        for (final code in currencyCodesWith(currency))
-          DropdownMenuItem(
-            value: code,
-            child: Text('$code  ${currencySymbol(code)}'),
-          ),
-      ],
-      onChanged: (code) {
-        if (code == null) return;
-        ref.read(blenderCurrencyProvider.notifier).state = code;
-        saveBlenderPreferences(ref);
-      },
-    );
-  }
-
-  Widget _priceField(BuildContext context, int slot, UnitFormatter units) {
-    final gas = ref.watch(
-      [
-        blenderFillGas1Provider,
-        blenderFillGas2Provider,
-        blenderFillGas3Provider,
-      ][slot],
-    );
-    return TextField(
-      controller: _prices[slot],
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
-      decoration: InputDecoration(
-        labelText:
-            '${formatPreciseGasName(context, gas)}  '
-            '${context.l10n.gasCalculators_blender_unitPrice(units.volumeSymbol)}',
-        isDense: true,
-        border: const OutlineInputBorder(),
-      ),
-      onChanged: (_) {
-        final settings = ref.read(settingsProvider);
-        ref.read(blenderGasPricesProvider.notifier).state = [
-          for (final c in _prices)
-            switch (parseUserDecimal(c.text)) {
-              final double entered => _toPricePer100Liters(entered, settings),
-              null => null,
-            },
-        ];
-      },
-      onEditingComplete: () => saveBlenderPreferences(ref),
-      onSubmitted: (_) => saveBlenderPreferences(ref),
     );
   }
 

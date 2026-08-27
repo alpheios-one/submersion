@@ -52,6 +52,7 @@ class BlenderFillGasesCard extends ConsumerWidget {
                     he: mixPercentOrKeep(heControllers[i].text, current.he),
                   );
                 },
+                onSave: () => saveBlenderPreferences(ref),
               ),
             ],
           ],

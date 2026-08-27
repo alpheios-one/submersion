@@ -12073,6 +12073,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_blender_billedTotal => 'Total';
 
   @override
+  String get gasCalculators_blender_defaults => 'Default settings and billing';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplates => 'Cylinder sizes';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateName => 'Name';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateNone =>
+      'No saved cylinder sizes yet.';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateInvalid =>
+      'Enter a name and a size greater than zero.';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateExists =>
+      'This cylinder size is already saved.';
+
+  @override
+  String get gasCalculators_blender_cylinderTemplateLimit =>
+      'You\'ve reached the saved cylinder size limit.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

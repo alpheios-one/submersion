@@ -19,6 +19,7 @@ class BlenderMixRow extends StatelessWidget {
     required this.heController,
     required this.onMix,
     required this.pressureSymbol,
+    this.onSave,
   });
 
   static const double _stackBelow = 420;
@@ -30,6 +31,11 @@ class BlenderMixRow extends StatelessWidget {
   final TextEditingController heController;
   final VoidCallback onMix;
   final String pressureSymbol;
+
+  /// Fired on blur/submit of any field in the row, not per keystroke -- the
+  /// same debounce every other persisted blender field uses. Null when the
+  /// row's values are not persisted.
+  final VoidCallback? onSave;
 
   @override
   Widget build(BuildContext context) {
@@ -120,6 +126,8 @@ class BlenderMixRow extends StatelessWidget {
         border: const OutlineInputBorder(),
       ),
       onChanged: onChanged,
+      onEditingComplete: onSave,
+      onSubmitted: onSave == null ? null : (_) => onSave!(),
     );
   }
 }

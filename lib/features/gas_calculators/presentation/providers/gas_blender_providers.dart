@@ -5,6 +5,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/cylinder_template.dart';
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
@@ -73,6 +74,13 @@ final blenderTemplatesProvider = StateProvider<List<MixTemplate>>(
   (ref) => BlenderPreferences.seedTemplates,
 );
 
+/// User-managed cylinder sizes, offered alongside [blenderTankChoices] in the
+/// cylinder dropdown. Empty until the diver adds one -- unlike templates,
+/// there is nothing to seed here.
+final blenderCylinderTemplatesProvider = StateProvider<List<CylinderTemplate>>(
+  (ref) => const [],
+);
+
 /// Cylinders already finished and put on the bill, oldest first.
 final blenderBilledFillsProvider = StateProvider<List<BilledFill>>(
   (ref) => const [],
@@ -135,11 +143,12 @@ final blenderBillingProvider = Provider<BillingResult>((ref) {
 });
 
 // no-tick: a one-shot SEED with side effects, not a cached query. Re-running
-// it rewrites seven StateProviders and bumps the reset epoch, so a tick from
-// the blender's own save would re-seed every text field while the diver was
-// still typing in it. The trade is deliberate and bounded: preferences changed
-// on another device arrive on the next open of the calculator rather than
-// mid-session, and nothing here renders a stale query result.
+// it rewrites every StateProvider the blender persists and bumps the reset
+// epoch, so a tick from the blender's own save would re-seed every text field
+// while the diver was still typing in it. The trade is deliberate and
+// bounded: preferences changed on another device arrive on the next open of
+// the calculator rather than mid-session, and nothing here renders a stale
+// query result.
 /// Loads the saved preferences once and pushes them into the state providers.
 ///
 /// A first run has no stored blob, which is exactly what seeds the default
@@ -162,6 +171,17 @@ final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
   if (stored.currencyCode != null) {
     ref.read(blenderCurrencyProvider.notifier).state = stored.currencyCode!;
   }
+  ref.read(blenderStartPressureProvider.notifier).state =
+      stored.startPressureBar;
+  ref.read(blenderStartMixProvider.notifier).state = stored.startMix;
+  ref.read(blenderTargetPressureProvider.notifier).state =
+      stored.targetPressureBar;
+  ref.read(blenderTargetMixProvider.notifier).state = stored.targetMix;
+  ref.read(blenderFillGas1Provider.notifier).state = stored.fillGas1;
+  ref.read(blenderFillGas2Provider.notifier).state = stored.fillGas2;
+  ref.read(blenderFillGas3Provider.notifier).state = stored.fillGas3;
+  ref.read(blenderCylinderTemplatesProvider.notifier).state =
+      stored.cylinderTemplates;
   // The input fields hold their own text, seeded once in initState. Without
   // this the cylinder volume and price boxes keep showing defaults over
   // freshly loaded preferences, and the next edit saves those defaults back
@@ -194,6 +214,14 @@ Future<void> saveBlenderPreferences(WidgetRef ref) async {
             model: ref.read(blenderGasModelProvider),
             billedFills: ref.read(blenderBilledFillsProvider),
             billedTo: ref.read(blenderBilledToProvider),
+            startPressureBar: ref.read(blenderStartPressureProvider),
+            startMix: ref.read(blenderStartMixProvider),
+            targetPressureBar: ref.read(blenderTargetPressureProvider),
+            targetMix: ref.read(blenderTargetMixProvider),
+            fillGas1: ref.read(blenderFillGas1Provider),
+            fillGas2: ref.read(blenderFillGas2Provider),
+            fillGas3: ref.read(blenderFillGas3Provider),
+            cylinderTemplates: ref.read(blenderCylinderTemplatesProvider),
           ),
         );
   } catch (e, stackTrace) {
