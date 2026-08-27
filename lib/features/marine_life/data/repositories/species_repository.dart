@@ -572,15 +572,25 @@ class SpeciesRepository {
     SyncEventBus.notifyLocalChange();
   }
 
-  /// Delete a species. Throws if the species is referenced by sightings.
+  /// Delete a species. Throws if the species is referenced by sightings or
+  /// photo tags.
   Future<void> deleteSpecies(String id) async {
     if (await isSpeciesInUse(id)) {
-      throw Exception('Cannot delete species that is referenced by sightings');
+      throw Exception(
+        'Cannot delete species that is referenced by sightings or photo tags',
+      );
     }
 
     // Also remove from site_species
     await (_db.delete(
       _db.siteSpecies,
+    )..where((t) => t.speciesId.equals(id))).go();
+
+    // Tags of an unused species are stale rows (the in-use check above
+    // refuses while any exist); clear them the way site_species is cleared,
+    // relying on the species tombstone downstream.
+    await (_db.delete(
+      _db.mediaSpecies,
     )..where((t) => t.speciesId.equals(id))).go();
 
     await (_db.delete(_db.species)..where((t) => t.id.equals(id))).go();
@@ -608,11 +618,17 @@ class SpeciesRepository {
     };
   }
 
+  /// Whether anything references the species: a sighting on a dive or a
+  /// tag on a photo. Both are diver data, so both block deletion.
   Future<bool> isSpeciesInUse(String id) async {
     final result = await _db
         .customSelect(
-          'SELECT COUNT(*) as count FROM sightings WHERE species_id = ?',
-          variables: [Variable.withString(id)],
+          '''
+      SELECT
+        (SELECT COUNT(*) FROM sightings WHERE species_id = ?) +
+        (SELECT COUNT(*) FROM media_species WHERE species_id = ?) AS count
+    ''',
+          variables: [Variable.withString(id), Variable.withString(id)],
         )
         .getSingle();
     return (result.data['count'] as int) > 0;

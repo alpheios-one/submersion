@@ -47,7 +47,11 @@ class MediaRepository {
   /// since linking is precisely when the enrichment does not exist yet.
   Stream<void> watchMediaChanges() => _db
       .tableUpdates(
-        TableUpdateQuery.onAllTables([_db.media, _db.mediaEnrichment]),
+        TableUpdateQuery.onAllTables([
+          _db.media,
+          _db.mediaEnrichment,
+          _db.mediaSpecies,
+        ]),
       )
       .debounce(changeTickDebounce);
 
@@ -1560,12 +1564,10 @@ class MediaRepository {
   }
 
   /// Of [mediaIds], those carrying metadata a user typed or set that no
-  /// source file holds: a caption, or the favorite flag.
+  /// source file holds: a caption, the favorite flag, or a species tag.
   ///
   /// Used to decide whether an unlink needs to warn before it removes the
-  /// rows. Deliberately no join against `media_species`: that table is
-  /// declared but nothing in the app reads or writes it, so joining it
-  /// would cost a scan to always return nothing.
+  /// rows.
   Future<Set<String>> idsWithUserMetadata(List<String> mediaIds) async {
     if (mediaIds.isEmpty) return {};
     final rows =
@@ -1576,7 +1578,15 @@ class MediaRepository {
                       (t.caption.isNotNull() & t.caption.equals('').not())),
             ))
             .get();
-    return {for (final row in rows) row.id};
+    final tagged =
+        await (_db.selectOnly(_db.mediaSpecies)
+              ..addColumns([_db.mediaSpecies.mediaId])
+              ..where(_db.mediaSpecies.mediaId.isIn(mediaIds)))
+            .get();
+    return {
+      for (final row in rows) row.id,
+      for (final row in tagged) row.read(_db.mediaSpecies.mediaId)!,
+    };
   }
 
   /// Moves media to [newDiveId] (also the link path for unlinked rows).
