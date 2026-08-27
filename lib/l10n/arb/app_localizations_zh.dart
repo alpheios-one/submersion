@@ -7358,7 +7358,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get divePlanner_label_runtime => '运行时间';
 
   @override
-  String get divePlanner_label_sacRate => '气体消耗率:';
+  String get divePlanner_label_sacRate => 'RMV:';
 
   @override
   String get divePlanner_label_status => '状态';
@@ -11333,7 +11333,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_resetAll => '重置所有计算器';
 
   @override
-  String get gasCalculators_sacRate => '气体消耗率';
+  String get gasCalculators_sacRate => 'RMV';
 
   @override
   String get gasCalculators_tab_bestMix => '最佳混合气';
@@ -15880,7 +15880,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_units_gasModel_explanation =>
-      '如何将气瓶压力换算为气体体积。这会影响 SAC 耗气率、气体统计、计划器和气体计算器。理想气体与各潜水机构教授的算法一致；真实气体在物理上更准确，SAC 约低 5%。';
+      '如何将气瓶压力换算为气体体积。这会影响 RMV 耗气率、气体统计、计划器和气体计算器。理想气体与各潜水机构教授的算法一致；真实气体在物理上更准确，RMV 约低 5%。';
 
   @override
   String get settings_units_dialog_gasModel => '气体计算';
@@ -20430,10 +20430,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_rockBottom_ascentTimeToSurface => '上升时间到水面';
 
   @override
-  String get gasCalculators_rockBottom_buddySac => '潜伴 SAC';
+  String get gasCalculators_rockBottom_buddySac => '潜伴 RMV';
 
   @override
-  String get gasCalculators_rockBottom_combinedStressedSac => '合计应激耗气率';
+  String get gasCalculators_rockBottom_combinedStressedSac => '合计应激 RMV';
 
   @override
   String get gasCalculators_rockBottom_emergencyAscentBreakdown => '紧急上升分解';
@@ -20474,10 +20474,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get gasCalculators_rockBottom_stressedSacHint => '使用较高的耗气率以应对紧急情况下的压力';
+  String get gasCalculators_rockBottom_stressedSacHint =>
+      '使用较高的 RMV 以应对紧急情况下的压力';
 
   @override
-  String get gasCalculators_rockBottom_stressedSacRates => '应激耗气率';
+  String get gasCalculators_rockBottom_stressedSacRates => '应激 RMV';
 
   @override
   String get gasCalculators_rockBottom_tankSize => '气瓶大小';
@@ -20494,7 +20495,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get gasCalculators_rockBottom_yourSac => '您的 SAC';
+  String get gasCalculators_rockBottom_yourSac => '您的 RMV';
 
   @override
   String get gpsLogger_androidNotificationText => '正在记录水面轨迹';
@@ -29850,7 +29851,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
-    return 'SAC 速率：每分钟 $value $volumeSymbol';
+    return 'RMV：每分钟 $value $volumeSymbol';
   }
 
   @override

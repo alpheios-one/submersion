@@ -7755,7 +7755,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get divePlanner_label_runtime => 'Durée totale';
 
   @override
-  String get divePlanner_label_sacRate => 'Taux CAS :';
+  String get divePlanner_label_sacRate => 'RMV :';
 
   @override
   String get divePlanner_label_status => 'État';
@@ -11932,7 +11932,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_resetAll => 'Réinitialiser tous les calculateurs';
 
   @override
-  String get gasCalculators_sacRate => 'Taux CAS';
+  String get gasCalculators_sacRate => 'RMV';
 
   @override
   String get gasCalculators_tab_bestMix => 'Meilleur mélange';
@@ -16771,7 +16771,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_units_gasModel_explanation =>
-      'Comment la pression du bloc est convertie en volume de gaz. Cela concerne la consommation (SAC), les statistiques de gaz, le planificateur et les calculatrices. Le gaz parfait correspond au calcul enseigné par les fédérations ; le gaz réel est physiquement exact et donne un SAC environ 5 % plus bas.';
+      'Comment la pression du bloc est convertie en volume de gaz. Cela concerne la consommation (RMV), les statistiques de gaz, le planificateur et les calculatrices. Le gaz parfait correspond au calcul enseigné par les fédérations ; le gaz réel est physiquement exact et donne un RMV environ 5 % plus bas.';
 
   @override
   String get settings_units_dialog_gasModel => 'Calculs de gaz';
@@ -21597,11 +21597,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Temps de remontee jusqu\'a la surface';
 
   @override
-  String get gasCalculators_rockBottom_buddySac => 'SAC du binome';
+  String get gasCalculators_rockBottom_buddySac => 'RMV du binome';
 
   @override
   String get gasCalculators_rockBottom_combinedStressedSac =>
-      'SAC majoree combinee';
+      'RMV majore combine';
 
   @override
   String get gasCalculators_rockBottom_emergencyAscentBreakdown =>
@@ -21646,11 +21646,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get gasCalculators_rockBottom_stressedSacHint =>
-      'Utilisez des consommations majorees pour tenir compte du stress en urgence';
+      'Utilisez un RMV majore pour tenir compte du stress en urgence';
 
   @override
-  String get gasCalculators_rockBottom_stressedSacRates =>
-      'Consommations majorees';
+  String get gasCalculators_rockBottom_stressedSacRates => 'RMV majore';
 
   @override
   String get gasCalculators_rockBottom_tankSize => 'Taille du bloc';
@@ -21668,7 +21667,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get gasCalculators_rockBottom_yourSac => 'Votre SAC';
+  String get gasCalculators_rockBottom_yourSac => 'Votre RMV';
 
   @override
   String get gpsLogger_androidNotificationText =>
@@ -31722,7 +31721,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String divePlanner_semantics_sacRate(Object value, Object volumeSymbol) {
-    return 'Consommation SAC : $value $volumeSymbol par minute';
+    return 'RMV : $value $volumeSymbol par minute';
   }
 
   @override

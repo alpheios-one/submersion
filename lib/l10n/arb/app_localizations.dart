@@ -13064,7 +13064,7 @@ abstract class AppLocalizations {
   /// No description provided for @divePlanner_label_sacRate.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate:'**
+  /// **'RMV:'**
   String get divePlanner_label_sacRate;
 
   /// No description provided for @divePlanner_label_status.
@@ -20227,7 +20227,7 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_sacRate.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate'**
+  /// **'RMV'**
   String get gasCalculators_sacRate;
 
   /// No description provided for @gasCalculators_tab_bestMix.
@@ -27988,7 +27988,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_units_gasModel_explanation.
   ///
   /// In en, this message translates to:
-  /// **'How cylinder pressure is converted to gas volume. This affects SAC rate, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for SAC.'**
+  /// **'How cylinder pressure is converted to gas volume. This affects RMV, gas statistics, the planner, and the gas calculators. Ideal gas matches the arithmetic taught by training agencies; real gas is physically accurate and reads roughly 5% lower for RMV.'**
   String get settings_units_gasModel_explanation;
 
   /// No description provided for @settings_units_dialog_gasModel.
@@ -35726,7 +35726,7 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_rockBottom_aboutDescription.
   ///
   /// In en, this message translates to:
-  /// **'Rock bottom is the minimum gas reserve for an emergency ascent while sharing air with your buddy.\n\n• Uses stressed SAC rates (2-3x normal)\n• Assumes both divers on one tank\n• Includes safety stop when enabled\n\nAlways turn the dive BEFORE reaching rock bottom!'**
+  /// **'Rock bottom is the minimum gas reserve for an emergency ascent while sharing air with your buddy.\n\n• Uses a stressed RMV (2-3x normal)\n• Assumes both divers on one tank\n• Includes safety stop when enabled\n\nAlways turn the dive BEFORE reaching rock bottom!'**
   String get gasCalculators_rockBottom_aboutDescription;
 
   /// No description provided for @gasCalculators_rockBottom_aboutTitle.
@@ -35762,13 +35762,13 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_rockBottom_buddySac.
   ///
   /// In en, this message translates to:
-  /// **'Buddy SAC'**
+  /// **'Buddy RMV'**
   String get gasCalculators_rockBottom_buddySac;
 
   /// No description provided for @gasCalculators_rockBottom_combinedStressedSac.
   ///
   /// In en, this message translates to:
-  /// **'Combined stressed SAC'**
+  /// **'Combined stressed RMV'**
   String get gasCalculators_rockBottom_combinedStressedSac;
 
   /// No description provided for @gasCalculators_rockBottom_emergencyAscentBreakdown.
@@ -35830,13 +35830,13 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_rockBottom_stressedSacHint.
   ///
   /// In en, this message translates to:
-  /// **'Use higher SAC rates to account for stress during emergency'**
+  /// **'Use a higher RMV to account for stress during an emergency'**
   String get gasCalculators_rockBottom_stressedSacHint;
 
   /// No description provided for @gasCalculators_rockBottom_stressedSacRates.
   ///
   /// In en, this message translates to:
-  /// **'Stressed SAC Rates'**
+  /// **'Stressed RMV'**
   String get gasCalculators_rockBottom_stressedSacRates;
 
   /// No description provided for @gasCalculators_rockBottom_tankSize.
@@ -35863,7 +35863,7 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_rockBottom_yourSac.
   ///
   /// In en, this message translates to:
-  /// **'Your SAC'**
+  /// **'Your RMV'**
   String get gasCalculators_rockBottom_yourSac;
 
   /// No description provided for @gpsLogger_androidNotificationText.
@@ -52461,7 +52461,7 @@ abstract class AppLocalizations {
   /// No description provided for @divePlanner_semantics_sacRate.
   ///
   /// In en, this message translates to:
-  /// **'SAC Rate: {value} {volumeSymbol} per minute'**
+  /// **'RMV: {value} {volumeSymbol} per minute'**
   String divePlanner_semantics_sacRate(Object value, Object volumeSymbol);
 
   /// No description provided for @divePlanner_semantics_reservePressure.
