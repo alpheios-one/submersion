@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:drift/drift.dart' hide isNull, isNotNull;
@@ -32,6 +33,36 @@ String _payload() {
       'weathercode': [for (var _ in times) 0],
     },
   });
+}
+
+/// Fails the initial count, to exercise the flow's error path.
+class _CountFailsService extends BulkConditionsService {
+  _CountFailsService({
+    required super.diveRepository,
+    required super.weatherService,
+  });
+
+  @override
+  Future<int> countCandidates({String? diverId}) async =>
+      throw StateError('count exploded');
+}
+
+/// Counts fine, then fails the run itself.
+class _RunFailsService extends BulkConditionsService {
+  _RunFailsService({
+    required super.diveRepository,
+    required super.weatherService,
+  });
+
+  @override
+  Future<int> countCandidates({String? diverId}) async => 1;
+
+  @override
+  Future<BulkConditionsResult> run({
+    String? diverId,
+    void Function(BulkConditionsProgress)? onProgress,
+    bool Function()? isCancelled,
+  }) async => throw StateError('run exploded');
 }
 
 void main() {
@@ -78,6 +109,23 @@ void main() {
         );
   }
 
+  /// A page whose only button starts the flow against [service].
+  /// The locale is pinned so assertions read the English strings.
+  Widget hostFor(BulkConditionsService service) => MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('en'),
+    home: Scaffold(
+      body: Builder(
+        builder: (context) => ElevatedButton(
+          onPressed: () =>
+              showFetchAllConditionsFlow(context: context, service: service),
+          child: const Text('go'),
+        ),
+      ),
+    ),
+  );
+
   ({Widget widget, List<Uri> requests}) harness() {
     final requests = <Uri>[];
     final client = MockClient((request) async {
@@ -89,26 +137,7 @@ void main() {
       weatherService: WeatherService(client: client),
       requestDelay: Duration.zero,
     );
-    return (
-      widget: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        // Pin the locale so assertions read the English strings.
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => ElevatedButton(
-              onPressed: () => showFetchAllConditionsFlow(
-                context: context,
-                service: service,
-              ),
-              child: const Text('go'),
-            ),
-          ),
-        ),
-      ),
-      requests: requests,
-    );
+    return (widget: hostFor(service), requests: requests);
   }
 
   group('FetchConditionsProgressController', () {
@@ -204,5 +233,181 @@ void main() {
     expect(find.text('Fetch conditions?'), findsNothing);
     expect(find.text('No dives are missing conditions.'), findsOneWidget);
     expect(requests, isEmpty);
+  });
+
+  testWidgets('progress dialog shows the count and Cancel stops the run', (
+    tester,
+  ) async {
+    await insertSite('s1', 12.5, -68.25);
+    for (var i = 0; i < 3; i++) {
+      await insertDive('d$i', 's1', DateTime.utc(2024, 6, 15 + i, 9));
+    }
+
+    // Hold each response open so the run can be inspected mid-flight; without
+    // a gate it finishes before the first pump and the dialog never renders.
+    final gates = <Completer<void>>[];
+    final requests = <Uri>[];
+    final client = MockClient((request) async {
+      requests.add(request.url);
+      final gate = Completer<void>();
+      gates.add(gate);
+      await gate.future;
+      return http.Response(_payload(), 200);
+    });
+    final service = BulkConditionsService(
+      diveRepository: repository,
+      weatherService: WeatherService(client: client),
+      requestDelay: Duration.zero,
+    );
+
+    await tester.pumpWidget(hostFor(service));
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Fetch'));
+    // Settle so the confirm dialog has finished leaving; the run itself stays
+    // parked on the gate, so nothing advances past the first request.
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fetching conditions'), findsOneWidget);
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+    expect(find.text('0 of 3'), findsOneWidget);
+
+    await tester.tap(find.text('Cancel'));
+    await tester.pump();
+
+    // The first dive is already in flight and still completes; the loop then
+    // sees the cancellation and never asks for the second day.
+    gates.first.complete();
+    await tester.pumpAndSettle();
+
+    expect(requests, hasLength(1));
+    expect(find.text('Conditions fetched'), findsOneWidget);
+    expect(find.textContaining('1 dive updated'), findsOneWidget);
+    expect(find.textContaining('Stopped early'), findsOneWidget);
+  });
+
+  testWidgets('summary reports dives the archive had no data for', (
+    tester,
+  ) async {
+    await insertSite('s1', 12.5, -68.25);
+    await insertDive('d1', 's1', DateTime.utc(2024, 6, 15, 9));
+
+    final client = MockClient((_) async => http.Response('{}', 500));
+    final service = BulkConditionsService(
+      diveRepository: repository,
+      weatherService: WeatherService(client: client),
+      requestDelay: Duration.zero,
+    );
+
+    await tester.pumpWidget(hostFor(service));
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Fetch'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('1 dive had no data available'), findsOneWidget);
+
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(find.text('Conditions fetched'), findsNothing);
+  });
+
+  testWidgets('summary reports a dive whose one gap had no value', (
+    tester,
+  ) async {
+    await insertSite('s1', 12.5, -68.25);
+    // Everything but airTemp is already recorded, and the payload has no
+    // temperature, so the fetch succeeds and fills nothing.
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db
+        .into(db.dives)
+        .insert(
+          DivesCompanion.insert(
+            id: 'd1',
+            diveDateTime: DateTime.utc(2024, 6, 15, 10).millisecondsSinceEpoch,
+            createdAt: now,
+            updatedAt: now,
+            siteId: const Value('s1'),
+            windSpeed: const Value(4.0),
+            windDirection: const Value('north'),
+            cloudCover: const Value('clear'),
+            precipitation: const Value('none'),
+            humidity: const Value(70.0),
+            weatherCode: const Value(0),
+            surfacePressure: const Value(1.013),
+          ),
+        );
+
+    final client = MockClient(
+      (_) async => http.Response(
+        jsonEncode({
+          'hourly': {
+            'time': ['2024-06-15T10:00'],
+            'temperature_2m': [null],
+            'relative_humidity_2m': [70.0],
+            'precipitation': [0.0],
+            'cloud_cover': [10.0],
+            'wind_speed_10m': [18.0],
+            'wind_direction_10m': [90.0],
+            'surface_pressure': [1013.0],
+            'weathercode': [0],
+          },
+        }),
+        200,
+      ),
+    );
+    final service = BulkConditionsService(
+      diveRepository: repository,
+      weatherService: WeatherService(client: client),
+      requestDelay: Duration.zero,
+    );
+
+    await tester.pumpWidget(hostFor(service));
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Fetch'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('1 dive had nothing to fill'), findsOneWidget);
+  });
+
+  testWidgets('a failing count is reported instead of opening the dialog', (
+    tester,
+  ) async {
+    final service = _CountFailsService(
+      diveRepository: repository,
+      weatherService: WeatherService(
+        client: MockClient((_) async {
+          return http.Response(_payload(), 200);
+        }),
+      ),
+    );
+
+    await tester.pumpWidget(hostFor(service));
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fetch conditions?'), findsNothing);
+    expect(find.textContaining('count exploded'), findsOneWidget);
+  });
+
+  testWidgets('a failing run is reported instead of a summary', (tester) async {
+    final service = _RunFailsService(
+      diveRepository: repository,
+      weatherService: WeatherService(
+        client: MockClient((_) async {
+          return http.Response(_payload(), 200);
+        }),
+      ),
+    );
+
+    await tester.pumpWidget(hostFor(service));
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Fetch'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Conditions fetched'), findsNothing);
+    expect(find.textContaining('run exploded'), findsOneWidget);
   });
 }

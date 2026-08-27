@@ -215,6 +215,46 @@ void main() {
       expect((await readRow('d1')).airTemp, 9.0);
     });
 
+    test('paces the requests it makes when a delay is configured', () async {
+      await insertSite('s1', 12.5, -68.25);
+      await insertDive('d1', siteId: 's1', at: DateTime.utc(2024, 6, 15, 9));
+      await insertDive('d2', siteId: 's1', at: DateTime.utc(2024, 6, 16, 9));
+
+      final requests = <Uri>[];
+      final client = MockClient((request) async {
+        requests.add(request.url);
+        return http.Response(_payload(), 200);
+      });
+      final service = BulkConditionsService(
+        diveRepository: repository,
+        weatherService: WeatherService(client: client),
+        requestDelay: const Duration(milliseconds: 1),
+      );
+
+      final result = await service.run();
+
+      expect(requests, hasLength(2));
+      expect(result.filled, 2);
+    });
+
+    test('processed counts every bucket the run filled out', () async {
+      await insertSite('s1', 12.5, -68.25);
+      await insertDive('d1', siteId: 's1', at: DateTime.utc(2024, 6, 15, 9));
+      await insertSite('s2', 36.7, -4.4);
+      await insertDive('d2', siteId: 's2', at: DateTime.utc(2024, 6, 15, 9));
+
+      final (:service, :requests) = buildService(
+        respond: (request) => request.url.queryParameters['latitude'] == '12.5'
+            ? http.Response('{}', 500)
+            : http.Response(_payload(), 200),
+      );
+      final result = await service.run();
+
+      expect(result.filled, 1);
+      expect(result.unavailable, 1);
+      expect(result.processed, 2);
+    });
+
     test('reuses one response for dives sharing a site and a day', () async {
       await insertSite('s1', 12.5, -68.25);
       await insertDive('d1', siteId: 's1', at: DateTime.utc(2024, 6, 15, 9));

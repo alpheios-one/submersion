@@ -1,5 +1,3 @@
-import 'dart:developer' as developer;
-
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/weather/data/services/weather_service.dart';
@@ -183,24 +181,19 @@ class BulkConditionsService {
     longitude: candidate.longitude.toStringAsFixed(5),
   );
 
-  /// One dive's fetch. A failure here is per-day, not per-run: the archive
-  /// being unhelpful about one place and date must not strand the rest of
-  /// the logbook.
-  Future<WeatherData?> _fetch(ConditionsCandidate candidate) async {
+  /// One dive's fetch. A failure here is per-day, not per-run: [WeatherService]
+  /// already degrades every network and parse failure to null and logs it, so
+  /// the archive being unhelpful about one place and date is reported as
+  /// unavailable rather than stranding the rest of the logbook. No second
+  /// catch here: it would be unreachable, and swallowing a genuinely
+  /// unexpected error would only hide it.
+  Future<WeatherData?> _fetch(ConditionsCandidate candidate) {
     final wallClock = diveWallClockToLocal(candidate.dateTime);
-    try {
-      return await _weatherService.fetchWeather(
-        latitude: candidate.latitude,
-        longitude: candidate.longitude,
-        date: DateTime(wallClock.year, wallClock.month, wallClock.day),
-        entryTime: wallClock,
-      );
-    } catch (e) {
-      developer.log(
-        'Bulk conditions fetch failed for dive ${candidate.id}: $e',
-        name: 'BulkConditionsService',
-      );
-      return null;
-    }
+    return _weatherService.fetchWeather(
+      latitude: candidate.latitude,
+      longitude: candidate.longitude,
+      date: DateTime(wallClock.year, wallClock.month, wallClock.day),
+      entryTime: wallClock,
+    );
   }
 }
