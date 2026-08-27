@@ -374,6 +374,27 @@ class SiteMatchingService {
     );
   }
 
+  /// Creates [site] for this diver, links [diveId] to it, and fills the
+  /// altitude best-effort. The single write path behind both the banner's
+  /// "Create site" and the review page's "Create site here". A previous
+  /// coordinate-less site on the dive is left as it was.
+  Future<DiveSite> createAndLink(String diveId, DiveSite site) async {
+    late DiveSite created;
+    await _runInTransaction(() async {
+      created = await _siteRepository.createSite(
+        site.copyWith(diverId: diverId),
+      );
+      await _diveRepository.setSite(diveId, created.id);
+    });
+    _locatedThisPass.clear();
+    final point = created.location;
+    if (point != null && created.altitude == null) {
+      _locatedThisPass[created.id] = point;
+    }
+    await _fillAltitudes();
+    return created;
+  }
+
   /// Best-effort altitude for every site that gained coordinates in this
   /// pass. Runs after the transaction commits so a network stall can never
   /// hold a DB lock, and never throws.

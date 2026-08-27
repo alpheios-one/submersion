@@ -87,6 +87,11 @@ void main() {
     when(
       sites.getAllSites(diverId: anyNamed('diverId')),
     ).thenAnswer((_) async => const []);
+    when(sites.createSite(any)).thenAnswer(
+      (inv) async =>
+          (inv.positionalArguments.first as DiveSite).copyWith(id: 'created'),
+    );
+    when(sites.updateSiteAltitude(any, any)).thenAnswer((_) async {});
     // The dive/site list notifiers (rebuilt by confirm()'s refresh) and the
     // base providers subscribe to these table-change ticks; strict mocks throw
     // MissingStubError unless every called method is stubbed.
@@ -418,4 +423,25 @@ void main() {
       expect(empty, isEmpty);
     },
   );
+
+  test('createSiteHere links the dive and drops its proposal', () async {
+    final container = makeContainer([_dive('d1', _eastMeters(0))]);
+    await _settle();
+    final notifier = container.read(siteMatchReviewProvider(null).notifier);
+    expect(
+      container.read(siteMatchReviewProvider(null)).proposals,
+      hasLength(1),
+    );
+
+    final created = await notifier.createSiteHere(
+      'd1',
+      const DiveSite(id: '', name: 'Wall', location: GeoPoint(0, 0)),
+    );
+
+    expect(created?.id, 'created');
+    verify(dives.setSite('d1', 'created')).called(1);
+    final state = container.read(siteMatchReviewProvider(null));
+    expect(state.proposals, isEmpty);
+    expect(state.selections, isEmpty);
+  });
 }

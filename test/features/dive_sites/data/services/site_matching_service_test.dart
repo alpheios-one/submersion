@@ -410,4 +410,40 @@ void main() {
       verifyNever(sites.updateSiteAltitude(any, any));
     });
   });
+
+  group('createAndLink', () {
+    setUp(() {
+      when(sites.createSite(any)).thenAnswer((inv) async {
+        final s = inv.positionalArguments.first as DiveSite;
+        return s.copyWith(id: 'new-${s.name}');
+      });
+      when(sites.updateSiteAltitude(any, any)).thenAnswer((_) async {});
+    });
+
+    test(
+      'creates the site under the diver, links the dive, fills altitude',
+      () async {
+        final s = SiteMatchingService(
+          siteRepository: sites,
+          apiService: api,
+          diveRepository: dives,
+          mediaRepository: media,
+          diverId: 'diver-1',
+          thresholds: SiteMatchSensitivity.balanced.thresholds,
+          runInTransaction: (body) => body(),
+          fetchElevation: (_) async => 3.0,
+        );
+        final created = await s.createAndLink(
+          'd1',
+          const DiveSite(id: 'x', name: 'Wall', location: GeoPoint(1, 2)),
+        );
+        expect(created.id, 'new-Wall');
+        final saved =
+            verify(sites.createSite(captureAny)).captured.single as DiveSite;
+        expect(saved.diverId, 'diver-1');
+        verify(dives.setSite('d1', 'new-Wall')).called(1);
+        verify(sites.updateSiteAltitude('new-Wall', 3.0)).called(1);
+      },
+    );
+  });
 }

@@ -4,6 +4,7 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/data/services/site_matching_service.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
@@ -33,13 +34,14 @@ class SiteMatchReviewState {
     String? focusedDiveId,
     Map<String, String>? selections,
     bool? isApplying,
+    bool clearFocus = false,
   }) => SiteMatchReviewState(
     isLoading: isLoading ?? this.isLoading,
     // Preserve a set (fatal) error unless a new one is passed; transient
     // state changes (focus/select/apply) must not silently clear it.
     errorMessage: errorMessage ?? this.errorMessage,
     proposals: proposals ?? this.proposals,
-    focusedDiveId: focusedDiveId ?? this.focusedDiveId,
+    focusedDiveId: clearFocus ? null : (focusedDiveId ?? this.focusedDiveId),
     selections: selections ?? this.selections,
     isApplying: isApplying ?? this.isApplying,
   );
@@ -177,6 +179,35 @@ class SiteMatchReviewNotifier extends StateNotifier<SiteMatchReviewState> {
       // (confirm returns null) and keeps the review screen so the user can
       // retry. Don't set the fatal errorMessage, which replaces the whole UI.
       if (mounted) state = state.copyWith(isApplying: false);
+      return null;
+    }
+  }
+
+  /// Creates a brand-new site at the dive's point and links the dive right
+  /// away (a created site is a named user object, so it is not held as a
+  /// pending selection). Returns null on failure; the page shows a snackbar.
+  Future<DiveSite?> createSiteHere(String diveId, DiveSite site) async {
+    final service = _service;
+    if (service == null) return null;
+    try {
+      final created = await service.createAndLink(diveId, site);
+      if (!mounted) return created;
+      final selections = Map<String, String>.from(state.selections)
+        ..remove(diveId);
+      state = state.copyWith(
+        proposals: [
+          for (final p in state.proposals)
+            if (p.dive.id != diveId) p,
+        ],
+        selections: selections,
+        clearFocus: state.focusedDiveId == diveId,
+      );
+      await _ref.read(diveListNotifierProvider.notifier).refresh();
+      await _ref.read(paginatedDiveListProvider.notifier).refresh();
+      _ref.invalidate(diveProvider(diveId));
+      await _ref.read(siteListNotifierProvider.notifier).refresh();
+      return created;
+    } catch (e) {
       return null;
     }
   }
