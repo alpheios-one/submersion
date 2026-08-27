@@ -9,6 +9,7 @@ import 'package:submersion/features/media/data/services/capture_time_reader.dart
 import 'package:submersion/features/media/data/services/exif_date_parser.dart';
 import 'package:submersion/features/media/data/services/local_gps_reader.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_metadata.dart';
+import 'package:submersion/features/media/domain/value_objects/taken_at_source.dart';
 
 const _isolateThresholdBytes = 5 * 1024 * 1024;
 
@@ -26,6 +27,10 @@ const _isolateThresholdBytes = 5 * 1024 * 1024;
 /// Files larger than 5 MB run in a background isolate via `compute()` so the UI
 /// thread stays responsive during folder picks of large libraries. Returns null
 /// only if the file does not exist.
+///
+/// Whichever tier wins is recorded on [MediaSourceMetadata.takenAtSource], so
+/// the review pane can tell the user a filesystem date apart from a real
+/// capture time instead of presenting both as an unqualified timestamp.
 class ExifExtractor {
   Future<MediaSourceMetadata?> extract(File file) async {
     if (!file.existsSync()) return null;
@@ -52,6 +57,7 @@ Future<MediaSourceMetadata?> _extract(String path) async {
   final mime = _mimeFromExtension(ext);
 
   DateTime? takenAt;
+  var takenAtSource = TakenAtSource.none;
   double? lat;
   double? lon;
   int? width;
@@ -71,6 +77,7 @@ Future<MediaSourceMetadata?> _extract(String path) async {
       takenAt = parseExifDateTimeOriginal(
         attrs['DateTimeOriginal']?.toString(),
       );
+      if (takenAt != null) takenAtSource = TakenAtSource.nativeExif;
 
       // GPS values are returned as doubles by native_exif; refs are strings.
       final rawLat = attrs['GPSLatitude'];
@@ -100,7 +107,10 @@ Future<MediaSourceMetadata?> _extract(String path) async {
   // capture time from the file's own container metadata (JPEG EXIF or the
   // MP4/MOV mvhd) so it lands inside the dive window instead of defaulting to
   // the copy-to-disk mtime.
-  takenAt ??= readLocalCaptureTime(file, mime);
+  if (takenAt == null) {
+    takenAt = readLocalCaptureTime(file, mime);
+    if (takenAt != null) takenAtSource = TakenAtSource.containerMetadata;
+  }
 
   // Same fallback for position: native_exif filled lat/lon on mobile stills;
   // everything else (desktop stills, video on every platform) reads the
@@ -115,6 +125,9 @@ Future<MediaSourceMetadata?> _extract(String path) async {
 
   return MediaSourceMetadata(
     takenAt: takenAt ?? mtime,
+    takenAtSource: takenAt == null
+        ? TakenAtSource.fileModifiedTime
+        : takenAtSource,
     latitude: lat,
     longitude: lon,
     width: width,

@@ -14,10 +14,12 @@ import 'package:submersion/features/dive_sites/domain/constants/site_field.dart'
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
 import 'package:submersion/features/dive_sites/domain/models/entry_exit_suggestion.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/shared/models/entity_card_view_config.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
+import 'package:submersion/shared/providers/entity_card_config_providers.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 import 'package:submersion/core/utils/log_failure.dart';
 
@@ -200,6 +202,11 @@ final sitesWithCountsProvider = FutureProvider<List<SiteWithDiveCount>>((
   );
   ref.invalidateSelfWhen(repository.watchSitesChanges());
   ref.invalidateSelfWhen(ref.read(diveRepositoryProvider).watchDivesChanges());
+  // Feature chips on the list card come from site_features, so a feature
+  // placed on the site map must refresh the list too.
+  ref.invalidateSelfWhen(
+    ref.read(siteFeatureRepositoryProvider).watchFeatureChanges(),
+  );
   return repository.getSitesWithDiveCounts(diverId: validatedDiverId);
 });
 
@@ -761,29 +768,53 @@ final siteTableConfigProvider =
 // Site Card View Config
 // ============================================================================
 
-/// Default card slot configuration for the detailed site card view.
+/// Detailed site card slots. Persisted per diver under `card_detailed_sites`.
 final siteDetailedCardConfigProvider =
-    StateProvider<EntityCardViewConfig<SiteField>>(
-      (ref) => const EntityCardViewConfig<SiteField>(
-        slots: [
-          EntityCardSlotConfig(slotId: 'title', field: SiteField.siteName),
-          EntityCardSlotConfig(slotId: 'subtitle', field: SiteField.location),
-          EntityCardSlotConfig(slotId: 'stat1', field: SiteField.maxDepth),
-          EntityCardSlotConfig(slotId: 'stat2', field: SiteField.diveCount),
-        ],
-        extraFields: [],
-      ),
-    );
+    StateNotifierProvider<
+      EntityCardConfigNotifier<SiteField>,
+      EntityCardViewConfig<SiteField>
+    >((ref) {
+      final notifier = EntityCardConfigNotifier<SiteField>(
+        defaultConfig: const EntityCardViewConfig<SiteField>(
+          slots: [
+            EntityCardSlotConfig(slotId: 'title', field: SiteField.siteName),
+            EntityCardSlotConfig(slotId: 'subtitle', field: SiteField.location),
+            EntityCardSlotConfig(slotId: 'stat1', field: SiteField.depthRange),
+            EntityCardSlotConfig(slotId: 'stat2', field: SiteField.diveCount),
+          ],
+          extraFields: [SiteField.lastDived, SiteField.maxDepthReached],
+        ),
+        fieldFromName: SiteFieldAdapter.instance.fieldFromName,
+      );
+      final diverId = ref.watch(currentDiverIdProvider);
+      if (diverId != null) {
+        final repo = ref.watch(viewConfigRepositoryProvider);
+        notifier.init(repo, diverId, 'card_detailed_sites');
+      }
+      return notifier;
+    });
 
-/// Default card slot configuration for the compact site card view.
+/// Compact site card slots. Persisted per diver under `card_compact_sites`.
 final siteCompactCardConfigProvider =
-    StateProvider<EntityCardViewConfig<SiteField>>(
-      (ref) => const EntityCardViewConfig<SiteField>(
-        slots: [
-          EntityCardSlotConfig(slotId: 'title', field: SiteField.siteName),
-          EntityCardSlotConfig(slotId: 'subtitle', field: SiteField.location),
-          EntityCardSlotConfig(slotId: 'stat1', field: SiteField.maxDepth),
-          EntityCardSlotConfig(slotId: 'stat2', field: SiteField.diveCount),
-        ],
-      ),
-    );
+    StateNotifierProvider<
+      EntityCardConfigNotifier<SiteField>,
+      EntityCardViewConfig<SiteField>
+    >((ref) {
+      final notifier = EntityCardConfigNotifier<SiteField>(
+        defaultConfig: const EntityCardViewConfig<SiteField>(
+          slots: [
+            EntityCardSlotConfig(slotId: 'title', field: SiteField.siteName),
+            EntityCardSlotConfig(slotId: 'subtitle', field: SiteField.location),
+            EntityCardSlotConfig(slotId: 'stat1', field: SiteField.diveCount),
+            EntityCardSlotConfig(slotId: 'stat2', field: SiteField.depthRange),
+          ],
+        ),
+        fieldFromName: SiteFieldAdapter.instance.fieldFromName,
+      );
+      final diverId = ref.watch(currentDiverIdProvider);
+      if (diverId != null) {
+        final repo = ref.watch(viewConfigRepositoryProvider);
+        notifier.init(repo, diverId, 'card_compact_sites');
+      }
+      return notifier;
+    });

@@ -2573,7 +2573,7 @@
   "divePlanner_label_reserve": "Reserve:",
   "divePlanner_label_resultsWithWarnings": "Resultaten, {count} waarschuwingen",
   "divePlanner_label_runtime": "Looptijd",
-  "divePlanner_label_sacRate": "SAC tempo:",
+  "divePlanner_label_sacRate": "RMV:",
   "divePlanner_label_status": "Status",
   "divePlanner_label_tanks": "Flessen",
   "divePlanner_label_time": "Tijd",
@@ -3764,14 +3764,14 @@
   "gasCalculators_mod_ppO2Standard": "Standaard werkgrens voor recreatief duiken",
   "gasCalculators_ppO2Limit": "ppO₂ limiet",
   "gasCalculators_resetAll": "Alle calculators resetten",
-  "gasCalculators_rockBottom_aboutDescription": "Rock bottom is de minimale gasreserve voor een noodopstijging terwijl je lucht deelt met je buddy.\n\n• Gebruikt verhoogde SAC-waarden (2-3x normaal)\n• Gaat ervan uit dat beide duikers op een fles zitten\n• Inclusief veiligheidsstop indien ingeschakeld\n\nKeer de duik altijd om VOOR je rock bottom bereikt!",
+  "gasCalculators_rockBottom_aboutDescription": "Rock bottom is de minimale gasreserve voor een noodopstijging terwijl je lucht deelt met je buddy.\n\n• Gebruikt verhoogde RMV-waarden (2-3x normaal)\n• Gaat ervan uit dat beide duikers op een fles zitten\n• Inclusief veiligheidsstop indien ingeschakeld\n\nKeer de duik altijd om VOOR je rock bottom bereikt!",
   "gasCalculators_rockBottom_aboutTitle": "Over Rock Bottom",
   "gasCalculators_rockBottom_ascentGasRequired": "Benodigd gas voor opstijging",
   "gasCalculators_rockBottom_ascentRate": "Stijgsnelheid",
   "gasCalculators_rockBottom_ascentTimeToDepth": "Stijgtijd naar {depth}{unit}",
   "gasCalculators_rockBottom_ascentTimeToSurface": "Stijgtijd naar oppervlak",
-  "gasCalculators_rockBottom_buddySac": "SAC buddy",
-  "gasCalculators_rockBottom_combinedStressedSac": "Gecombineerde stress-SAC",
+  "gasCalculators_rockBottom_buddySac": "RMV buddy",
+  "gasCalculators_rockBottom_combinedStressedSac": "Gecombineerde stress-RMV",
   "gasCalculators_rockBottom_emergencyAscentBreakdown": "Noodopstijging uitsplitsing",
   "gasCalculators_rockBottom_emergencyScenario": "Noodscenario",
   "gasCalculators_rockBottom_includeSafetyStop": "Veiligheidsstop meenemen",
@@ -3780,13 +3780,13 @@
   "gasCalculators_rockBottom_resultSemantics": "Minimale reserve: {pressure} {pressureUnit}, {volume} {volumeUnit}. Keer de duik om bij {pressure} {pressureUnit} resterend",
   "gasCalculators_rockBottom_safetyStopDuration": "3 minuten op {depth}{unit}",
   "gasCalculators_rockBottom_safetyStopGas": "Gas veiligheidsstop (3 min @ {depth}{unit})",
-  "gasCalculators_rockBottom_stressedSacHint": "Gebruik hogere SAC-waarden om rekening te houden met stress tijdens een noodsituatie",
-  "gasCalculators_rockBottom_stressedSacRates": "Stress-SAC-waarden",
+  "gasCalculators_rockBottom_stressedSacHint": "Gebruik een hogere RMV om rekening te houden met stress tijdens een noodsituatie",
+  "gasCalculators_rockBottom_stressedSacRates": "Stress-RMV",
   "gasCalculators_rockBottom_tankSize": "Flesgrootte",
   "gasCalculators_rockBottom_totalReserveNeeded": "Totale benodigde reserve",
   "gasCalculators_rockBottom_turnDive": "Keer de duik om bij {pressure} {pressureUnit} resterend",
-  "gasCalculators_rockBottom_yourSac": "Jouw SAC",
-  "gasCalculators_sacRate": "SAC tempo",
+  "gasCalculators_rockBottom_yourSac": "Jouw RMV",
+  "gasCalculators_sacRate": "RMV",
   "gasCalculators_tab_bestMix": "Beste mengsel",
   "gasCalculators_tab_consumption": "Verbruik",
   "gasCalculators_tab_mnd": "MND/END",
@@ -4067,9 +4067,6 @@
   "media_gpsBanner_dismissTooltip": "GPS-suggestie sluiten",
   "mediaImport_offerSiteReview": "{count} duiken kunnen een stek krijgen uit hun foto's",
   "mediaImport_reviewSitesAction": "Stekken bekijken",
-  "filesTab_linkedItems": "{count, plural, =1{1 item gekoppeld} other{{count} items gekoppeld}}",
-  "filesTab_attachedToSite": "{count, plural, =1{1 item aan deze stek gekoppeld} other{{count} items aan deze stek gekoppeld}}",
-  "filesTab_undo": "Ongedaan maken",
   "media_gpsBanner_title": "GPS gevonden in foto's",
   "media_import_allAlreadyLinked": "{count, plural, =1{1 foto al gekoppeld aan deze duik} other{{count} foto's al gekoppeld aan deze duik}}",
   "media_import_failedToImport": "Kan {count, plural, =1{foto} other{foto's}} niet importeren",
@@ -4105,6 +4102,37 @@
   "media_photoPicker_thumbnailAlreadyLinkedLabel": "Foto al gekoppeld aan deze duik",
   "media_photoPicker_thumbnailToggleLabel": "Selectie voor foto aan/uit",
   "media_photoPicker_thumbnailToggleSelectedLabel": "Selectie voor foto aan/uit, geselecteerd",
+  "media_photoPicker_files_pickFilesButton": "Bestanden kiezen…",
+  "media_photoPicker_files_pickFolderButton": "Een map kiezen…",
+  "media_photoPicker_files_autoMatchLabel": "Foto's en video's automatisch op datum aan duiken koppelen",
+  "media_photoPicker_files_emptyHint": "Kies bestanden of een map om te beginnen.",
+  "media_photoPicker_files_linkButton": "{count, plural, =1{1 item koppelen} other{{count} items koppelen}}",
+  "media_photoPicker_files_attachToSiteButton": "{count, plural, =1{1 item aan deze duiklocatie koppelen} other{{count} items aan deze duiklocatie koppelen}}",
+  "media_photoPicker_files_summary": "{fileCount, plural, =1{1 bestand} other{{fileCount} bestanden}}, {diveCount, plural, =1{1 duik} other{{diveCount} duiken}}, {unmatchedCount} niet gekoppeld",
+  "media_photoPicker_files_itemCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "media_photoPicker_files_diveGroupTitle": "Duik {diveId}",
+  "media_photoPicker_files_groupCount": "{count, plural, =1{1 bestand} other{{count} bestanden}}",
+  "media_photoPicker_files_unmatchedGroupTitle": "Niet gekoppeld",
+  "media_photoPicker_files_addAllToDive": "{count, plural, =1{1 aan deze duik toevoegen} other{Alle {count} aan deze duik toevoegen}}",
+  "media_photoPicker_files_addToDiveTooltip": "Aan deze duik toevoegen",
+  "media_photoPicker_files_chooseDiveTooltip": "Een duik kiezen",
+  "media_photoPicker_files_removeTooltip": "Uit de selectie verwijderen",
+  "media_photoPicker_files_sourceExif": "uit EXIF",
+  "media_photoPicker_files_sourceContainer": "uit bestandsmetadata",
+  "media_photoPicker_files_sourceFileDate": "uit bestandsdatum",
+  "media_photoPicker_files_sourceNone": "geen datum gevonden",
+  "media_photoPicker_files_shiftedTime": "{shifted} (was {original})",
+  "media_photoPicker_files_reasonNoTimestamp": "Opnametijd kon niet worden gelezen",
+  "media_photoPicker_files_reasonBeforeDive": "{gap} voor de dichtstbijzijnde duik",
+  "media_photoPicker_files_reasonAfterDive": "{gap} na de dichtstbijzijnde duik",
+  "media_photoPicker_files_reasonNoDives": "Geen duiken om mee te vergelijken",
+  "media_photoPicker_files_offsetLabel": "Opnametijden verschuiven met",
+  "media_photoPicker_files_offsetResetTooltip": "Verschuiving herstellen",
+  "media_photoPicker_files_offsetBackTooltip": "{amount} eerder verschuiven",
+  "media_photoPicker_files_offsetForwardTooltip": "{amount} later verschuiven",
+  "media_photoPicker_files_linkedCount": "{count, plural, =1{1 item gekoppeld} other{{count} items gekoppeld}}",
+  "media_photoPicker_files_attachedToSiteCount": "{count, plural, =1{1 item aan deze duiklocatie gekoppeld} other{{count} items aan deze duiklocatie gekoppeld}}",
+  "media_photoPicker_files_undo": "Ongedaan maken",
   "media_perdixOverlay_labelCns": "CNS",
   "media_perdixOverlay_labelDepth": "DIEPTE",
   "media_perdixOverlay_labelGas": "GAS",
@@ -5016,7 +5044,7 @@
   "settings_units_gasModel_real_subtitle": "Houdt rekening met samendrukbaarheid. Een 12 L-fles op 200 bar bevat ongeveer 2317 L.",
   "settings_units_gasModel_ideal": "Ideaal gas",
   "settings_units_gasModel_ideal_subtitle": "Komt overeen met handmatige berekening en duiktabellen. Een 12 L-fles op 200 bar bevat 2400 L.",
-  "settings_units_gasModel_explanation": "Hoe flesdruk wordt omgerekend naar gasvolume. Dit beïnvloedt het SAC, de gasstatistieken, de planner en de gasrekenmachines. Ideaal gas komt overeen met de berekening die opleidingen leren; reëel gas is fysisch nauwkeurig en geeft een ongeveer 5% lager SAC.",
+  "settings_units_gasModel_explanation": "Hoe flesdruk wordt omgerekend naar gasvolume. Dit beïnvloedt het RMV, de gasstatistieken, de planner en de gasrekenmachines. Ideaal gas komt overeen met de berekening die opleidingen leren; reëel gas is fysisch nauwkeurig en geeft een ongeveer 5% lager RMV.",
   "settings_units_dialog_gasModel": "Gasberekeningen",
   "settings_units_dialog_temperatureUnit": "Temperatuureenheid",
   "settings_units_dialog_timeFormat": "Tijdnotatie",
@@ -6807,6 +6835,20 @@
   "@dive3d_metric_heartRate": {},
   "dive3d_metric_tankPressure": "Druk",
   "@dive3d_metric_tankPressure": {},
+  "dive3d_zAxis": "Z-as",
+  "dive3d_zAxis_none": "Geen",
+  "dive3d_overlay_shadows": "Wandschaduwen",
+  "dive3d_metric_tts": "TTS",
+  "dive3d_axis_depth": "Diepte ({unitSymbol})",
+  "dive3d_axis_time": "Duiktijd (min)",
+  "dive3d_pose_menu": "Camera",
+  "dive3d_pose_default": "Standaardweergave",
+  "dive3d_pose_front": "Voor (diepte vs. tijd)",
+  "dive3d_pose_side": "Zijkant (diepte vs. meetwaarde)",
+  "dive3d_pose_top": "Boven (meetwaarde vs. tijd)",
+  "dive3d_readout_runTime": "Duiktijd",
+  "dive3d_readout_ceiling": "Plafond",
+  "dive3d_readout_tank": "Fles {n}",
   "dive3d_scene_dive": "Duik",
   "@dive3d_scene_dive": {},
   "dive3d_scene_tissue": "Weefsels",
@@ -7167,6 +7209,46 @@
   },
   "safetyReview_dismiss": "Negeren",
   "safetyReview_restore": "Herstellen",
+  "safetyReview_dismissAll": "Alles negeren",
+  "safetyReview_restoreAll": "Alles herstellen",
+  "safetySettings_dismissAll": "Alle observaties negeren",
+  "safetySettings_dismissAll_subtitle": "Alle observaties in dit logboek als beoordeeld markeren",
+  "safetySettings_dismissAll_confirmTitle": "Alle observaties negeren?",
+  "safetySettings_dismissAll_confirmBody": "Elke observatie bij elke geanalyseerde duik wordt als beoordeeld gemarkeerd. Je kunt ze per duik herstellen in de sectie veiligheidscontrole.",
+  "safetySettings_dismissAll_confirm": "Alles negeren",
+  "safetySettings_dismissAll_cancel": "Annuleren",
+  "safetySettings_dismissAll_progress": "{done} van {total} duiken gecontroleerd",
+  "@safetySettings_dismissAll_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_done": "{count, plural, =0{Geen observaties om te negeren} =1{1 observatie genegeerd} other{{count} observaties genegeerd}}",
+  "@safetySettings_dismissAll_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{Geen observaties genegeerd} =1{1 observatie genegeerd} other{{count} observaties genegeerd}}, {failed, plural, =1{1 duik kon niet worden bijgewerkt} other{{failed} duiken konden niet worden bijgewerkt}}",
+  "@safetySettings_dismissAll_doneWithErrors": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    },
+    "failed": {
+      "type": "int"
+    }
+  }
+},
+  "safetySettings_dismissAll_failed": "Kan de duiklijst niet lezen. Er is niets gewijzigd.",
+  "safetySettings_analyzeAll_failed": "Kan de duiken niet analyseren.",
   "safetyReview_details": "Details",
   "safetyReview_clearHighlight": "Markering wissen",
   "safetyReview_findingGroupSemantics": "{count, plural, =1{1 veiligheidsbevinding} other{{count} veiligheidsbevindingen}}",
@@ -7361,6 +7443,35 @@
     "placeholders": {
       "date": {
         "type": "String"
+      }
+    }
+  },
+  "emergencyCard_chambersNearby": "Dichtstbijzijnde caissons",
+  "emergencyCard_chamberViewAll": "Alle {count} caissons bekijken",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "Geen caisson binnen bereik. Bel de duikers-noodlijn: zij verwijzen u door naar de dichtstbijzijnde instelling die u kan behandelen.",
+  "emergencyCard_chamberCapability_divingEmergency": "Behandelt duikongevallen",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "Hyperbare afdeling ziekenhuis",
+  "emergencyCard_chamberCapability_elective": "Alleen electieve therapie",
+  "emergencyCard_chamberCapability_unknown": "Mogelijkheden niet bevestigd",
+  "emergencyCard_chamberAvailability_h24": "24 uur",
+  "emergencyCard_chamberAvailability_onCall": "Oproepbaar",
+  "emergencyCard_chamberAvailability_businessHours": "Kantooruren",
+  "emergencyCard_chamberUnverified": "Niet bevestigd bij de instelling",
+  "chambersDirectory_title": "Hyperbare caissons",
+  "chambersDirectory_search": "Zoeken op naam, stad of land",
+  "chambersDirectory_empty": "Geen caisson komt overeen met die zoekopdracht.",
+  "chambersDirectory_count": "{count, plural, =1{1 caisson} other{{count} caissons}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   },
@@ -7836,6 +7947,12 @@
   "enum_siteField_notes_short": "Notities",
   "enum_siteField_latitude_short": "Breedte",
   "enum_siteField_longitude_short": "Lengte",
+  "enum_siteField_depthRange": "Dieptebereik",
+  "enum_siteField_depthRange_short": "Diepte",
+  "enum_siteField_lastDived": "Laatst gedoken",
+  "enum_siteField_lastDived_short": "Laatst",
+  "enum_siteField_maxDepthReached": "Jouw max. diepte",
+  "enum_siteField_maxDepthReached_short": "Jouw max.",
   "enum_buddyField_buddyName": "Naam",
   "enum_buddyField_email": "E-mail",
   "enum_buddyField_phone": "Telefoon",
@@ -7850,6 +7967,8 @@
   "enum_buddyField_certificationAgency_short": "Org.",
   "enum_buddyField_diveCount_short": "Duiken",
   "enum_buddyField_notes_short": "Notities",
+  "enum_buddyField_lastDive": "Laatste duik",
+  "enum_buddyField_lastDive_short": "Laatste",
   "enum_tripField_tripName": "Naam",
   "enum_tripField_startDate": "Startdatum",
   "enum_tripField_endDate": "Einddatum",
@@ -9347,7 +9466,7 @@
   "divePlanner_quickPlan_previewBottomTime": "Bodemtijd: {minutes} min",
   "divePlanner_quickPlan_previewAscent": "Opstijging met veiligheidsstop",
   "divePlanner_quickPlan_create": "Maken",
-  "divePlanner_semantics_sacRate": "SAC-verbruik: {value} {volumeSymbol} per minuut",
+  "divePlanner_semantics_sacRate": "RMV: {value} {volumeSymbol} per minuut",
   "divePlanner_semantics_reservePressure": "Reservedruk in {pressureSymbol}",
   "divePlanner_semantics_altitudeGroup": "Hoogtegroep: {group}",
   "diveSites_import_detail_maxDepth": "Max {depth}",

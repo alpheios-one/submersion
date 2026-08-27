@@ -1899,6 +1899,7 @@ class Buddies extends Table {
   TextColumn get phone => text().nullable()();
   TextColumn get photoPath => text().nullable()();
   TextColumn get notes => text().withDefault(const Constant(''))();
+  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -3491,8 +3492,15 @@ class AppDatabase extends _$AppDatabase {
     // reverse-geocoded country/region/town/body of water (issue #1187).
     // Renumbered from 162, which #731 landed past while this branch was open.
     166,
+    // v167 is likewise absent: it is claimed by issue #1269 (PR #1276) on a
+    // branch that is still open.
+    // v168 (issue #638): buddies.is_favorite, so frequently-dived buddies can
+    // be pinned to the top of the "Add buddy" picker regardless of sort.
+    // Renumbered from 161, which #1235 landed on main while this branch was
+    // open.
+    168,
     // v172: dives.site_suggestion_dismissed_at, the synced per-dive dismissal
-    // of the photo / dive-computer site suggestion. 167 through 171 are
+    // of the photo / dive-computer site suggestion. 169 through 171 are
     // reserved by PRs that were open when this branch was cut, so this rung is
     // deliberately non-contiguous, not missing.
     172,
@@ -5101,6 +5109,21 @@ class AppDatabase extends _$AppDatabase {
           'ALTER TABLE $table ADD COLUMN default_currency TEXT',
         );
       }
+    }
+  }
+
+  /// Idempotent DDL for the v168 buddies.is_favorite column (issue #638),
+  /// letting frequently-dived buddies be pinned to the top of the "Add
+  /// buddy" picker regardless of sort. Self-guards on the table existing, and
+  /// defaults every pre-existing row to not-favorited.
+  Future<void> _assertBuddyFavoriteColumn() async {
+    final cols = await customSelect("PRAGMA table_info('buddies')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('is_favorite')) {
+      await customStatement(
+        'ALTER TABLE buddies ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0',
+      );
     }
   }
 
@@ -8669,6 +8692,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertPlaceNameLanguageColumn();
         }
         if (from < 166) await reportProgress();
+        // v168 (issue #638): buddies.is_favorite, so frequently-dived buddies
+        // can be pinned to the top of the "Add buddy" picker regardless of
+        // sort.
+        if (from < 168) {
+          await _assertBuddyFavoriteColumn();
+        }
+        if (from < 168) await reportProgress();
         // v172: dives.site_suggestion_dismissed_at (site suggestion dismissal).
         if (from < 172) {
           await _assertSiteSuggestionDismissedAtColumn();
@@ -8881,6 +8911,11 @@ class AppDatabase extends _$AppDatabase {
         // #1090; same parallel-branch version-collision self-heal). The
         // media row mapper reads it on every hydration.
         await _assertMediaManualElapsedColumn();
+
+        // v168 backstop: re-assert buddies.is_favorite (issue #638). A
+        // database that arrives by restore or sync-adopt never runs
+        // onUpgrade, and every read of a buddy would throw without it.
+        await _assertBuddyFavoriteColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

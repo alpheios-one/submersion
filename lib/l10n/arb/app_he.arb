@@ -2500,7 +2500,7 @@
   "divePlanner_label_reserve": "עתודה:",
   "divePlanner_label_resultsWithWarnings": "תוצאות, {count} אזהרות",
   "divePlanner_label_runtime": "זמן ריצה",
-  "divePlanner_label_sacRate": "קצב SAC:",
+  "divePlanner_label_sacRate": "RMV:",
   "divePlanner_label_status": "סטטוס",
   "divePlanner_label_tanks": "מיכלים",
   "divePlanner_label_time": "זמן",
@@ -3691,14 +3691,14 @@
   "gasCalculators_mod_ppO2Standard": "מגבלת עבודה סטנדרטית לצלילה פנאי",
   "gasCalculators_ppO2Limit": "מגבלת ppO₂",
   "gasCalculators_resetAll": "אפס את כל המחשבונים",
-  "gasCalculators_rockBottom_aboutDescription": "Rock Bottom הוא מינימום עתודת הגז הנדרש לעלייה חירומית תוך שיתוף אוויר עם השותף שלך.\n\n• משתמש בקצבי SAC במצב לחץ (2-3 כפול מהרגיל)\n• מניח ששני הצוללים על מיכל אחד\n• כולל עצירת בטיחות כשמופעלת\n\nתמיד סיים את הצלילה לפני שמגיעים ל-Rock Bottom!",
+  "gasCalculators_rockBottom_aboutDescription": "Rock Bottom הוא מינימום עתודת הגז הנדרש לעלייה חירומית תוך שיתוף אוויר עם השותף שלך.\n\n• משתמש בקצבי RMV במצב לחץ (2-3 כפול מהרגיל)\n• מניח ששני הצוללים על מיכל אחד\n• כולל עצירת בטיחות כשמופעלת\n\nתמיד סיים את הצלילה לפני שמגיעים ל-Rock Bottom!",
   "gasCalculators_rockBottom_aboutTitle": "אודות Rock Bottom",
   "gasCalculators_rockBottom_ascentGasRequired": "גז נדרש לעלייה",
   "gasCalculators_rockBottom_ascentRate": "קצב עלייה",
   "gasCalculators_rockBottom_ascentTimeToDepth": "זמן עלייה ל-{depth}{unit}",
   "gasCalculators_rockBottom_ascentTimeToSurface": "זמן עלייה לפני השטח",
-  "gasCalculators_rockBottom_buddySac": "SAC השותף",
-  "gasCalculators_rockBottom_combinedStressedSac": "SAC משולב במצב לחץ",
+  "gasCalculators_rockBottom_buddySac": "RMV השותף",
+  "gasCalculators_rockBottom_combinedStressedSac": "RMV משולב במצב לחץ",
   "gasCalculators_rockBottom_emergencyAscentBreakdown": "פירוט עלייה חירומית",
   "gasCalculators_rockBottom_emergencyScenario": "תרחיש חירום",
   "gasCalculators_rockBottom_includeSafetyStop": "כלול עצירת בטיחות",
@@ -3707,13 +3707,13 @@
   "gasCalculators_rockBottom_resultSemantics": "עתודה מינימלית: {pressure} {pressureUnit}, {volume} {volumeUnit}. סיים את הצלילה כשנשארים {pressure} {pressureUnit}",
   "gasCalculators_rockBottom_safetyStopDuration": "3 דקות ב-{depth}{unit}",
   "gasCalculators_rockBottom_safetyStopGas": "גז עצירת בטיחות (3 min @ {depth}{unit})",
-  "gasCalculators_rockBottom_stressedSacHint": "השתמש בקצבי SAC גבוהים יותר לפיצוי על לחץ במצב חירום",
-  "gasCalculators_rockBottom_stressedSacRates": "קצבי SAC במצב לחץ",
+  "gasCalculators_rockBottom_stressedSacHint": "השתמש ב-RMV גבוה יותר לפיצוי על לחץ במצב חירום",
+  "gasCalculators_rockBottom_stressedSacRates": "RMV במצב לחץ",
   "gasCalculators_rockBottom_tankSize": "גודל מיכל",
   "gasCalculators_rockBottom_totalReserveNeeded": "סך עתודה נדרשת",
   "gasCalculators_rockBottom_turnDive": "סיים את הצלילה כשנשארים {pressure} {pressureUnit}",
-  "gasCalculators_rockBottom_yourSac": "ה-SAC שלך",
-  "gasCalculators_sacRate": "קצב SAC",
+  "gasCalculators_rockBottom_yourSac": "ה-RMV שלך",
+  "gasCalculators_sacRate": "RMV",
   "gasCalculators_tab_bestMix": "תערובת מיטבית",
   "gasCalculators_tab_consumption": "צריכה",
   "gasCalculators_tab_mnd": "MND/END",
@@ -3994,9 +3994,6 @@
   "media_gpsBanner_dismissTooltip": "סגור הצעת GPS",
   "mediaImport_offerSiteReview": "{count} צלילות יכולות לקבל אתר מהתמונות שלהן",
   "mediaImport_reviewSitesAction": "סקירת אתרים",
-  "filesTab_linkedItems": "{count, plural, =1{פריט אחד קושר} other{{count} פריטים קושרו}}",
-  "filesTab_attachedToSite": "{count, plural, =1{פריט אחד צורף לאתר זה} other{{count} פריטים צורפו לאתר זה}}",
-  "filesTab_undo": "ביטול",
   "media_gpsBanner_title": "נמצא GPS בתמונות",
   "media_import_allAlreadyLinked": "{count, plural, =1{תמונה אחת כבר מקושרת לצלילה זו} other{{count} תמונות כבר מקושרות לצלילה זו}}",
   "media_import_failedToImport": "ייבוא {count, plural, =1{תמונה} other{תמונות}} נכשל",
@@ -4032,6 +4029,37 @@
   "media_photoPicker_thumbnailAlreadyLinkedLabel": "תמונה כבר מקושרת לצלילה זו",
   "media_photoPicker_thumbnailToggleLabel": "החלף מצב בחירה לתמונה",
   "media_photoPicker_thumbnailToggleSelectedLabel": "החלף מצב בחירה לתמונה, נבחרה",
+  "media_photoPicker_files_pickFilesButton": "בחירת קבצים…",
+  "media_photoPicker_files_pickFolderButton": "בחירת תיקייה…",
+  "media_photoPicker_files_autoMatchLabel": "התאמה אוטומטית של תמונות וסרטונים לצלילות לפי תאריך",
+  "media_photoPicker_files_emptyHint": "בחר קבצים או תיקייה כדי להתחיל.",
+  "media_photoPicker_files_linkButton": "{count, plural, =1{קישור פריט אחד} other{קישור {count} פריטים}}",
+  "media_photoPicker_files_attachToSiteButton": "{count, plural, =1{צירוף פריט אחד לאתר זה} other{צירוף {count} פריטים לאתר זה}}",
+  "media_photoPicker_files_summary": "{fileCount, plural, =1{קובץ אחד} other{{fileCount} קבצים}}, {diveCount, plural, =1{צלילה אחת} other{{diveCount} צלילות}}, {unmatchedCount} ללא התאמה",
+  "media_photoPicker_files_itemCount": "{count, plural, =1{פריט אחד} other{{count} פריטים}}",
+  "media_photoPicker_files_diveGroupTitle": "צלילה {diveId}",
+  "media_photoPicker_files_groupCount": "{count, plural, =1{קובץ אחד} other{{count} קבצים}}",
+  "media_photoPicker_files_unmatchedGroupTitle": "ללא התאמה",
+  "media_photoPicker_files_addAllToDive": "{count, plural, =1{הוספת פריט אחד לצלילה זו} other{הוספת כל {count} הפריטים לצלילה זו}}",
+  "media_photoPicker_files_addToDiveTooltip": "הוספה לצלילה זו",
+  "media_photoPicker_files_chooseDiveTooltip": "בחירת צלילה",
+  "media_photoPicker_files_removeTooltip": "הסרה מהבחירה",
+  "media_photoPicker_files_sourceExif": "מ-EXIF",
+  "media_photoPicker_files_sourceContainer": "ממטא-נתוני הקובץ",
+  "media_photoPicker_files_sourceFileDate": "מתאריך הקובץ",
+  "media_photoPicker_files_sourceNone": "לא נמצא תאריך",
+  "media_photoPicker_files_shiftedTime": "{shifted} (היה {original})",
+  "media_photoPicker_files_reasonNoTimestamp": "לא ניתן לקרוא את זמן הצילום",
+  "media_photoPicker_files_reasonBeforeDive": "{gap} לפני הצלילה הקרובה ביותר",
+  "media_photoPicker_files_reasonAfterDive": "{gap} אחרי הצלילה הקרובה ביותר",
+  "media_photoPicker_files_reasonNoDives": "אין צלילות להשוואה",
+  "media_photoPicker_files_offsetLabel": "הסטת זמני הצילום ב-",
+  "media_photoPicker_files_offsetResetTooltip": "איפוס ההסטה",
+  "media_photoPicker_files_offsetBackTooltip": "הסטה של {amount} אחורה",
+  "media_photoPicker_files_offsetForwardTooltip": "הסטה של {amount} קדימה",
+  "media_photoPicker_files_linkedCount": "{count, plural, =1{פריט אחד קושר} other{{count} פריטים קושרו}}",
+  "media_photoPicker_files_attachedToSiteCount": "{count, plural, =1{פריט אחד צורף לאתר זה} other{{count} פריטים צורפו לאתר זה}}",
+  "media_photoPicker_files_undo": "ביטול",
   "media_perdixOverlay_labelCns": "CNS",
   "media_perdixOverlay_labelDepth": "עומק",
   "media_perdixOverlay_labelGas": "GAS",
@@ -6807,6 +6835,20 @@
   "@dive3d_metric_heartRate": {},
   "dive3d_metric_tankPressure": "לחץ",
   "@dive3d_metric_tankPressure": {},
+  "dive3d_zAxis": "ציר Z",
+  "dive3d_zAxis_none": "ללא",
+  "dive3d_overlay_shadows": "צללי קירות",
+  "dive3d_metric_tts": "TTS",
+  "dive3d_axis_depth": "עומק ({unitSymbol})",
+  "dive3d_axis_time": "זמן צלילה (דק')",
+  "dive3d_pose_menu": "מצלמה",
+  "dive3d_pose_default": "תצוגת ברירת מחדל",
+  "dive3d_pose_front": "חזית (עומק מול זמן)",
+  "dive3d_pose_side": "צד (עומק מול מדד)",
+  "dive3d_pose_top": "מלמעלה (מדד מול זמן)",
+  "dive3d_readout_runTime": "זמן צלילה",
+  "dive3d_readout_ceiling": "תקרה",
+  "dive3d_readout_tank": "מיכל {n}",
   "dive3d_scene_dive": "צלילה",
   "@dive3d_scene_dive": {},
   "dive3d_scene_tissue": "רקמות",
@@ -7167,6 +7209,46 @@
   },
   "safetyReview_dismiss": "התעלם",
   "safetyReview_restore": "שחזר",
+  "safetyReview_dismissAll": "התעלם מהכול",
+  "safetyReview_restoreAll": "שחזר הכול",
+  "safetySettings_dismissAll": "התעלם מכל התצפיות",
+  "safetySettings_dismissAll_subtitle": "סמן את כל התצפיות ביומן זה כנסקרו",
+  "safetySettings_dismissAll_confirmTitle": "להתעלם מכל התצפיות?",
+  "safetySettings_dismissAll_confirmBody": "כל תצפית בכל צלילה שנותחה תסומן כנסקרה. אפשר לשחזר אותן צלילה אחר צלילה במקטע סקירת הבטיחות שלה.",
+  "safetySettings_dismissAll_confirm": "התעלם מהכול",
+  "safetySettings_dismissAll_cancel": "ביטול",
+  "safetySettings_dismissAll_progress": "נבדקו {done} מתוך {total} צלילות",
+  "@safetySettings_dismissAll_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_done": "{count, plural, =0{אין תצפיות להתעלם מהן} =1{בוצעה התעלמות מתצפית אחת} other{בוצעה התעלמות מ-{count} תצפיות}}",
+  "@safetySettings_dismissAll_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{לא בוצעה התעלמות מתצפיות} =1{בוצעה התעלמות מתצפית אחת} other{בוצעה התעלמות מ-{count} תצפיות}}, {failed, plural, =1{לא ניתן היה לעדכן צלילה אחת} other{לא ניתן היה לעדכן {failed} צלילות}}",
+  "@safetySettings_dismissAll_doneWithErrors": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    },
+    "failed": {
+      "type": "int"
+    }
+  }
+},
+  "safetySettings_dismissAll_failed": "לא ניתן לקרוא את רשימת הצלילות. דבר לא שונה.",
+  "safetySettings_analyzeAll_failed": "לא ניתן לנתח את הצלילות.",
   "safetyReview_details": "פרטים",
   "safetyReview_clearHighlight": "ניקוי הדגשה",
   "safetyReview_findingGroupSemantics": "{count, plural, =1{ממצא בטיחות אחד} other{{count} ממצאי בטיחות}}",
@@ -7361,6 +7443,35 @@
     "placeholders": {
       "date": {
         "type": "String"
+      }
+    }
+  },
+  "emergencyCard_chambersNearby": "תאי לחץ קרובים",
+  "emergencyCard_chamberViewAll": "הצג את כל {count} תאי הלחץ",
+  "@emergencyCard_chamberViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emergencyCard_chambersNoneNearby": "אין תא לחץ בטווח. התקשר לקו החירום לצוללנים: הם יפנו אותך למתקן הקרוב ביותר שיכול לטפל בך.",
+  "emergencyCard_chamberCapability_divingEmergency": "מטפל בתאונות צלילה",
+  "emergencyCard_chamberCapability_hyperbaricUnit": "יחידה היפרברית בבית חולים",
+  "emergencyCard_chamberCapability_elective": "טיפול אלקטיבי בלבד",
+  "emergencyCard_chamberCapability_unknown": "היכולת לא אומתה",
+  "emergencyCard_chamberAvailability_h24": "24 שעות",
+  "emergencyCard_chamberAvailability_onCall": "כוננות",
+  "emergencyCard_chamberAvailability_businessHours": "שעות פעילות",
+  "emergencyCard_chamberUnverified": "לא אומת מול המתקן",
+  "chambersDirectory_title": "תאי לחץ",
+  "chambersDirectory_search": "חיפוש לפי שם, עיר או מדינה",
+  "chambersDirectory_empty": "אין תא לחץ התואם לחיפוש.",
+  "chambersDirectory_count": "{count, plural, =1{תא לחץ אחד} other{{count} תאי לחץ}}",
+  "@chambersDirectory_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   },
@@ -7836,6 +7947,12 @@
   "enum_siteField_notes_short": "הערות",
   "enum_siteField_latitude_short": "רוחב",
   "enum_siteField_longitude_short": "אורך",
+  "enum_siteField_depthRange": "טווח עומק",
+  "enum_siteField_depthRange_short": "עומק",
+  "enum_siteField_lastDived": "צלילה אחרונה",
+  "enum_siteField_lastDived_short": "אחרונה",
+  "enum_siteField_maxDepthReached": "העומק המרבי שלך",
+  "enum_siteField_maxDepthReached_short": "המרבי שלך",
   "enum_buddyField_buddyName": "שם",
   "enum_buddyField_email": "דוא\"ל",
   "enum_buddyField_phone": "טלפון",
@@ -7850,6 +7967,8 @@
   "enum_buddyField_certificationAgency_short": "גוף",
   "enum_buddyField_diveCount_short": "צלילות",
   "enum_buddyField_notes_short": "הערות",
+  "enum_buddyField_lastDive": "צלילה אחרונה",
+  "enum_buddyField_lastDive_short": "אחרונה",
   "enum_tripField_tripName": "שם",
   "enum_tripField_startDate": "תאריך התחלה",
   "enum_tripField_endDate": "תאריך סיום",
@@ -9347,7 +9466,7 @@
   "divePlanner_quickPlan_previewBottomTime": "זמן תחתית: {minutes} דקות",
   "divePlanner_quickPlan_previewAscent": "עלייה עם עצירת בטיחות",
   "divePlanner_quickPlan_create": "יצירה",
-  "divePlanner_semantics_sacRate": "קצב SAC: {value} {volumeSymbol} לדקה",
+  "divePlanner_semantics_sacRate": "RMV: {value} {volumeSymbol} לדקה",
   "divePlanner_semantics_reservePressure": "לחץ רזרבה ביחידות {pressureSymbol}",
   "divePlanner_semantics_altitudeGroup": "קבוצת גובה: {group}",
   "diveSites_import_detail_maxDepth": "מקסימום {depth}",
