@@ -18,7 +18,13 @@ class ReparseService {
   final AppDatabase db;
   final _uuid = const Uuid();
 
-  ReparseService({required this.db});
+  /// The diver's preference for reading cylinder end pressure at the moment of
+  /// surfacing rather than at the end of the recording (issue #1092). Reparse
+  /// is how an already-imported dive picks the rule up, so it has to agree
+  /// with the live download path.
+  final bool trimTankPressureAtSurfacing;
+
+  ReparseService({required this.db, this.trimTankPressureAtSurfacing = true});
 
   /// Apply a freshly parsed dive to the database, updating only
   /// computer-authored fields and preserving user-authored fields.
@@ -672,7 +678,10 @@ class ReparseService {
     // Gas-mix linking and tankless synthesis (computers that report gas
     // mixes but no tank records) live in the shared resolver so this path
     // cannot drift from the live-download mapper.
-    for (final tank in resolveParsedTanks(parsed)) {
+    for (final tank in resolveParsedTanks(
+      parsed,
+      trimAtSurfacing: trimTankPressureAtSurfacing,
+    )) {
       newTankOrders.add(tank.index);
 
       final existing = existingByOrder[tank.index];

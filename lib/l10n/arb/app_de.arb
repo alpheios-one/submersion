@@ -6232,6 +6232,8 @@
   "settings_section_dataSources_subtitle": "Connected services & integrations",
   "settings_siteMatch_title": "Automatische Tauchplatzzuordnung",
   "settings_siteMatch_subtitle": "Wie aggressiv heruntergeladene Tauchgänge Tauchplätzen zugeordnet werden",
+  "settings_tankPressureAtSurfacing_title": "Flaschendruck beim Auftauchen",
+  "settings_tankPressureAtSurfacing_subtitle": "Enddruck beim Erreichen der Oberfläche übernehmen, nicht am Ende der Aufzeichnung",
   "settings_siteMatch_strict": "Streng",
   "settings_siteMatch_balanced": "Ausgewogen",
   "settings_siteMatch_relaxed": "Locker",

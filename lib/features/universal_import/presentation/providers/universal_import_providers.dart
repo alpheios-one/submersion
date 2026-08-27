@@ -38,6 +38,7 @@ import 'package:submersion/features/universal_import/data/services/garmin_device
 import 'package:submersion/features/universal_import/data/services/macdive_db_reader.dart';
 import 'package:submersion/features/universal_import/data/services/payload_merger.dart';
 import 'package:submersion/features/universal_import/data/services/shearwater_db_reader.dart';
+import 'package:submersion/features/universal_import/data/services/surfacing_pressure_normalizer.dart';
 import 'package:submersion/features/universal_import/data/services/import_duplicate_checker.dart';
 import 'package:submersion/features/universal_import/data/services/zip_expansion_service.dart';
 import 'package:submersion/features/universal_import/domain/services/import_media_resolver.dart';
@@ -781,7 +782,9 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
       return;
     }
 
-    final payload = const PayloadMerger().merge(result.parsed);
+    final payload = _applySurfacingPressureRule(
+      const PayloadMerger().merge(result.parsed),
+    );
     final dupResult = await _checkDuplicates(payload);
     final selections = _defaultSelections(payload, dupResult);
 
@@ -809,17 +812,18 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
           ? await _buildPresetRegistry()
           : null;
       final parser = _parserFor(opts.format, registry: registry);
-      final ImportPayload payload;
+      final ImportPayload parsed;
       if (parser is CsvImportParser) {
-        payload = await parser.parse(
+        parsed = await parser.parse(
           bytes,
           options: opts,
           customMappingOverride: state.fieldMapping,
           profileFileBytes: state.additionalFileBytes,
         );
       } else {
-        payload = await parser.parse(bytes, options: opts);
+        parsed = await parser.parse(bytes, options: opts);
       }
+      final payload = _applySurfacingPressureRule(parsed);
 
       if (payload.isEmpty) {
         final errorMsg = payload.warnings.isNotEmpty
@@ -882,6 +886,16 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
       }
     }
     return selections;
+  }
+
+  /// Read cylinder end pressure at the moment of surfacing rather than at the
+  /// end of the recording, when the diver has that on (issue #1092). Applied
+  /// to the finished payload so every format is covered at one seam, and after
+  /// the parsers have run so a parser that derives other figures from the
+  /// source's own start/end pair (FIT cylinder volume) still sees them.
+  ImportPayload _applySurfacingPressureRule(ImportPayload payload) {
+    final trim = _ref.read(settingsProvider).trimTankPressureAtSurfacing;
+    return trim ? trimTankPressuresAtSurfacing(payload) : payload;
   }
 
   Future<ImportDuplicateResult> _checkDuplicates(ImportPayload payload) async {

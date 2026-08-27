@@ -22765,6 +22765,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Con quanta intensità le immersioni scaricate vengono associate ai siti';
 
   @override
+  String get settings_tankPressureAtSurfacing_title =>
+      'Pressione della bombola in superficie';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      'Rileva la pressione finale quando raggiungi la superficie, non a fine registrazione';
+
+  @override
   String get settings_siteMatch_strict => 'Rigoroso';
 
   @override

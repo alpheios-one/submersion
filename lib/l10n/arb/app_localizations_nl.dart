@@ -22590,6 +22590,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Hoe agressief gedownloade duiken aan stekken worden gekoppeld';
 
   @override
+  String get settings_tankPressureAtSurfacing_title =>
+      'Flesdruk bij bovenkomen';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      'Neem de einddruk op het moment van bovenkomen, niet aan het einde van de opname';
+
+  @override
   String get settings_siteMatch_strict => 'Strikt';
 
   @override

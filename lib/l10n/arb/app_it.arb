@@ -6155,6 +6155,8 @@
   "settings_section_dataSources_subtitle": "Connected services & integrations",
   "settings_siteMatch_title": "Associazione automatica dei siti",
   "settings_siteMatch_subtitle": "Con quanta intensità le immersioni scaricate vengono associate ai siti",
+  "settings_tankPressureAtSurfacing_title": "Pressione della bombola in superficie",
+  "settings_tankPressureAtSurfacing_subtitle": "Rileva la pressione finale quando raggiungi la superficie, non a fine registrazione",
   "settings_siteMatch_strict": "Rigoroso",
   "settings_siteMatch_balanced": "Bilanciato",
   "settings_siteMatch_relaxed": "Rilassato",

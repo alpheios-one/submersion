@@ -1784,6 +1784,10 @@ class DiverSettings extends Table {
   // Auto site matching sensitivity (v76): strict | balanced | relaxed
   TextColumn get siteMatchSensitivity =>
       text().withDefault(const Constant('balanced'))();
+  // Read cylinder end pressure at surfacing rather than at the end of the
+  // recording (v165, issue #1092).
+  BoolColumn get trimTankPressureAtSurfacing =>
+      boolean().withDefault(const Constant(true))();
   // Dive profile chart defaults
   TextColumn get defaultRightAxisMetric =>
       text().withDefault(const Constant('temperature'))();
@@ -3492,10 +3496,13 @@ class AppDatabase extends _$AppDatabase {
     // media item in the dive when its capture time is wrong (issue #1090).
     // Renumbered from 162, which #731 landed past while this branch was open.
     164,
-    // v165 is deliberately absent, not missing: it is claimed by issue #1092
-    // (PR #1290, diver_settings.trim_tank_pressure_at_surfacing) on a branch
-    // that is still open. This ladder is monotonic and unique, not
-    // contiguous, so do not "fix" the gap by renumbering downwards.
+    // v165: diver_settings.trim_tank_pressure_at_surfacing, which decides
+    // whether an import reads cylinder end pressure at the moment of
+    // surfacing rather than at the end of the recording (issue #1092).
+    // Renumbered from 163, which #731 landed on main while this branch
+    // was open. Main reserved this number while the branch was open, so it
+    // lands here without renumbering.
+    165,
     // v166: diver_settings.place_name_language, the synced language used for
     // reverse-geocoded country/region/town/body of water (issue #1187).
     // Renumbered from 162, which #731 landed past while this branch was open.
@@ -5023,6 +5030,26 @@ class AppDatabase extends _$AppDatabase {
         'default_show_estimated_tank_pressure '
         'INTEGER NOT NULL DEFAULT 1 '
         'CHECK (default_show_estimated_tank_pressure IN (0, 1))',
+      );
+    }
+  }
+
+  /// v165: trim_tank_pressure_at_surfacing on diver_settings (issue #1092).
+  /// Dive computers keep recording after the diver surfaces, so the last
+  /// pressure in the profile is not the pressure at the end of the dive. On
+  /// by default, because the reading it prefers can only ever be the higher,
+  /// earlier one.
+  Future<void> _assertSurfacingPressureColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('trim_tank_pressure_at_surfacing')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN trim_tank_pressure_at_surfacing '
+        'INTEGER NOT NULL DEFAULT 1 '
+        'CHECK (trim_tank_pressure_at_surfacing IN (0, 1))',
       );
     }
   }
@@ -8750,6 +8777,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertMediaManualElapsedColumn();
         }
         if (from < 164) await reportProgress();
+        // v165: trim_tank_pressure_at_surfacing on diver_settings (#1092).
+        if (from < 165) {
+          await _assertSurfacingPressureColumn();
+        }
+        if (from < 165) await reportProgress();
         // v166: place_name_language on diver_settings (issue #1187).
         if (from < 166) {
           await _assertPlaceNameLanguageColumn();
@@ -8973,6 +9005,9 @@ class AppDatabase extends _$AppDatabase {
         // #1090; same parallel-branch version-collision self-heal). The
         // media row mapper reads it on every hydration.
         await _assertMediaManualElapsedColumn();
+        // v165 backstop: re-assert diver_settings.trim_tank_pressure_at_
+        // surfacing (issue #1092; same parallel-branch collision self-heal).
+        await _assertSurfacingPressureColumn();
 
         // v168 backstop: re-assert buddies.is_favorite (issue #638). A
         // database that arrives by restore or sync-adopt never runs

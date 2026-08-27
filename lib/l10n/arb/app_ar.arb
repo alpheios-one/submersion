@@ -6232,6 +6232,8 @@
   "settings_section_dataSources_subtitle": "Connected services & integrations",
   "settings_siteMatch_title": "مطابقة المواقع تلقائيًا",
   "settings_siteMatch_subtitle": "مدى صرامة مطابقة الغوصات التي تم تنزيلها بالمواقع",
+  "settings_tankPressureAtSurfacing_title": "ضغط الأسطوانة عند الصعود إلى السطح",
+  "settings_tankPressureAtSurfacing_subtitle": "قراءة ضغط النهاية عند الوصول إلى السطح، وليس عند انتهاء التسجيل",
   "settings_siteMatch_strict": "صارم",
   "settings_siteMatch_balanced": "متوازن",
   "settings_siteMatch_relaxed": "متساهل",

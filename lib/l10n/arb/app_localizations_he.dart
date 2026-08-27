@@ -22199,6 +22199,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'באיזו מידה צלילות שהורדו מותאמות לאתרים';
 
   @override
+  String get settings_tankPressureAtSurfacing_title =>
+      'לחץ המיכל בעלייה לפני השטח';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      'קריאת לחץ הסיום ברגע ההגעה לפני השטח, ולא בסוף ההקלטה';
+
+  @override
   String get settings_siteMatch_strict => 'קפדני';
 
   @override

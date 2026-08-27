@@ -2608,6 +2608,20 @@ class _DataSectionContent extends ConsumerWidget {
               ),
             ),
           ),
+          const SizedBox(height: 8),
+          Card(
+            child: SwitchListTile(
+              secondary: const Icon(Icons.compress),
+              title: Text(context.l10n.settings_tankPressureAtSurfacing_title),
+              subtitle: Text(
+                context.l10n.settings_tankPressureAtSurfacing_subtitle,
+              ),
+              value: ref.watch(settingsProvider).trimTankPressureAtSurfacing,
+              onChanged: (value) => ref
+                  .read(settingsProvider.notifier)
+                  .setTrimTankPressureAtSurfacing(value),
+            ),
+          ),
           const SizedBox(height: 16),
           _buildSectionHeader(
             context,
