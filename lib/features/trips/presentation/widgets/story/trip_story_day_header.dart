@@ -61,9 +61,15 @@ class TripStoryDayHeader extends ConsumerWidget {
       ...day.siteNames,
     ].map((part) => part.trim()).where((part) => part.isNotEmpty).toList();
 
-    // Dive-logged weather always wins: it is what the diver recorded, and a
-    // stored day summary is only ever a stand-in for days that logged none.
-    final weather = day.weather ?? storedWeather;
+    // Dive-logged weather wins: it is what the diver recorded, and a stored
+    // day summary is only ever a stand-in for days that logged none. It wins
+    // only when it can actually draw something, though: a dive whose weather
+    // lookup resolved nothing still carries Precipitation.none, and letting
+    // that mask a stored row would render the day blank.
+    final diveWeather = day.weather;
+    final weather = (diveWeather != null && diveWeather.isRenderable)
+        ? diveWeather
+        : (storedWeather ?? diveWeather);
     final units = UnitFormatter(ref.watch(settingsProvider));
     final weatherBadge = _weatherBadge(context, theme, units, weather);
 

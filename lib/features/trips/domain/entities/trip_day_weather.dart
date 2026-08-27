@@ -1,7 +1,36 @@
 import 'package:equatable/equatable.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/trips/domain/entities/trip_story_day.dart';
+
+/// Fixed namespace for deterministic trip-day-weather ids (UUIDv5).
+/// Never change: the ids already stored depend on it.
+const String kTripDayWeatherNamespace = '3f1c8a52-9e47-4d6b-8b3a-16c9d0f27e45';
+
+/// Local midnight for [date], as epoch milliseconds.
+///
+/// The day is the identity of a weather row, so this is what turns a
+/// DateTime into one. Shared rather than reimplemented per caller: the row
+/// id, the repository's storage key, and the map key reads come back under
+/// all have to agree, and three copies of the same two lines would drift.
+int tripDayMillis(DateTime date) =>
+    DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+
+/// Deterministic row id for one trip day.
+///
+/// The day is the identity, so the id must be derived from it rather than
+/// minted per device. Two devices that both fetch the same day would
+/// otherwise insert two rows, and the unique (trip_id, date) index turns the
+/// second one into an inbound-sync failure rather than a merge: the
+/// serializer upserts by primary key, so a differing id misses the conflict
+/// target entirely and hits the index instead. That throws inside the merge
+/// transaction and aborts the whole sync pull.
+///
+/// [dayMillis] must already be normalized to local midnight; pass it through
+/// [tripDayMillis].
+String tripDayWeatherRowId({required String tripId, required int dayMillis}) =>
+    const Uuid().v5(kTripDayWeatherNamespace, '$tripId|$dayMillis');
 
 /// Stored historical weather for one trip day.
 ///
@@ -65,15 +94,10 @@ class TripDayWeather extends Equatable {
   /// carrying only those renders as nothing and would suppress the retry that
   /// a later archive update would satisfy.
   ///
-  /// [Precipitation.none] does not count. `WeatherMapper.mapPrecipitation`
-  /// returns non-null always, defaulting a missing reading to `none`, so
-  /// `none` cannot be read as evidence that the fetch resolved anything. It
-  /// also earns no glyph of its own in `weatherIconFor`, which falls through
-  /// to cloud cover.
-  bool get hasRenderableWeather =>
-      airTemp != null ||
-      cloudCover != null ||
-      (precipitation != null && precipitation != Precipitation.none);
+  /// Delegates to [TripStoryDayWeather.isRenderable] so the rule that decides
+  /// what is worth storing is the same one that decides what the header can
+  /// draw, and the same one the backfill uses to judge a day's dive weather.
+  bool get hasRenderableWeather => toStoryWeather().isRenderable;
 
   /// The compact view model the day header consumes.
   TripStoryDayWeather toStoryWeather() => TripStoryDayWeather(

@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/trips/data/repositories/trip_day_weather_repository.dart';
 import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart';
@@ -52,8 +50,6 @@ final tripDayWeatherBackfillProvider = FutureProvider.family<void, String>((
   );
   if (targets.isEmpty) return;
 
-  const uuid = Uuid();
-
   // Sequential on purpose: a two-week trip would otherwise open with a burst
   // of parallel requests, and rows landing one at a time let the day headers
   // fill in progressively.
@@ -70,8 +66,13 @@ final tripDayWeatherBackfillProvider = FutureProvider.family<void, String>((
     if (weather == null) continue;
 
     final now = DateTime.now();
+    final dayMillis = tripDayMillis(target.date);
     final row = TripDayWeather(
-      id: uuid.v4(),
+      // The repository derives this same id from (trip, day) and never takes
+      // the caller's, so every device converges on one row. Derived here too
+      // rather than left as a placeholder: an entity carrying an id that is
+      // not its own reaches logs and any future validation as a lie.
+      id: tripDayWeatherRowId(tripId: tripId, dayMillis: dayMillis),
       tripId: tripId,
       date: target.date,
       latitude: target.latitude,

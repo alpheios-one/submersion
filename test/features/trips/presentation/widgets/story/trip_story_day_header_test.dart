@@ -291,6 +291,37 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
+    testWidgets('stored weather wins when the dive weather renders nothing', (
+      tester,
+    ) async {
+      // A dive whose lookup resolved nothing still carries
+      // Precipitation.none, which draws no glyph. The stored row is the only
+      // thing that can render, so it must not be masked.
+      final day = TripStoryDay(
+        date: DateTime(2026, 3, 8),
+        dayNumber: 2,
+        kind: TripStoryDayKind.past,
+        dives: [
+          Dive(
+            id: 'd1',
+            dateTime: DateTime(2026, 3, 8, 9),
+            precipitation: Precipitation.none,
+          ),
+        ],
+      );
+
+      await pumpHeader(
+        tester,
+        day,
+        storedWeather: const TripStoryDayWeather(
+          airTemp: 22,
+          cloudCover: CloudCover.clear,
+        ),
+      );
+
+      expect(find.text('22°C'), findsOneWidget);
+    });
+
     testWidgets('dive-logged weather wins over stored weather', (tester) async {
       // What the diver recorded outranks a fetched day summary.
       final day = TripStoryDay(
