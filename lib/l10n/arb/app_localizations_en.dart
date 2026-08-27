@@ -5965,6 +5965,86 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_listPage_menuMatchSites => 'Match Dives to Sites';
 
   @override
+  String get diveLog_listPage_menuFetchConditions =>
+      'Fetch Conditions for All Dives';
+
+  @override
+  String get diveLog_fetchConditions_confirmTitle => 'Fetch conditions?';
+
+  @override
+  String diveLog_fetchConditions_confirmBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives are missing conditions.',
+      one: '1 dive is missing conditions.',
+    );
+    return '$_temp0 Only empty fields are filled, so nothing you have already entered will change.';
+  }
+
+  @override
+  String get diveLog_fetchConditions_confirmAction => 'Fetch';
+
+  @override
+  String get diveLog_fetchConditions_noneNeeded =>
+      'No dives are missing conditions.';
+
+  @override
+  String get diveLog_fetchConditions_progressTitle => 'Fetching conditions';
+
+  @override
+  String diveLog_fetchConditions_progressCount(int completed, int total) {
+    return '$completed of $total';
+  }
+
+  @override
+  String get diveLog_fetchConditions_summaryTitle => 'Conditions fetched';
+
+  @override
+  String diveLog_fetchConditions_summaryFilled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives updated',
+      one: '1 dive updated',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnavailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives had no data available',
+      one: '1 dive had no data available',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryUnchanged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives had nothing to fill',
+      one: '1 dive had nothing to fill',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveLog_fetchConditions_summaryCancelled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Stopped early; $count dives were processed.',
+      one: 'Stopped early; 1 dive was processed.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_sighting_decreaseCount => 'Decrease count';
 
   @override

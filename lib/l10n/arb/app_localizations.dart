@@ -10151,6 +10151,78 @@ abstract class AppLocalizations {
   /// **'Match Dives to Sites'**
   String get diveLog_listPage_menuMatchSites;
 
+  /// No description provided for @diveLog_listPage_menuFetchConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch Conditions for All Dives'**
+  String get diveLog_listPage_menuFetchConditions;
+
+  /// No description provided for @diveLog_fetchConditions_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch conditions?'**
+  String get diveLog_fetchConditions_confirmTitle;
+
+  /// No description provided for @diveLog_fetchConditions_confirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive is missing conditions.} other{{count} dives are missing conditions.}} Only empty fields are filled, so nothing you have already entered will change.'**
+  String diveLog_fetchConditions_confirmBody(int count);
+
+  /// No description provided for @diveLog_fetchConditions_confirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch'**
+  String get diveLog_fetchConditions_confirmAction;
+
+  /// No description provided for @diveLog_fetchConditions_noneNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'No dives are missing conditions.'**
+  String get diveLog_fetchConditions_noneNeeded;
+
+  /// No description provided for @diveLog_fetchConditions_progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching conditions'**
+  String get diveLog_fetchConditions_progressTitle;
+
+  /// No description provided for @diveLog_fetchConditions_progressCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} of {total}'**
+  String diveLog_fetchConditions_progressCount(int completed, int total);
+
+  /// No description provided for @diveLog_fetchConditions_summaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Conditions fetched'**
+  String get diveLog_fetchConditions_summaryTitle;
+
+  /// No description provided for @diveLog_fetchConditions_summaryFilled.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive updated} other{{count} dives updated}}'**
+  String diveLog_fetchConditions_summaryFilled(int count);
+
+  /// No description provided for @diveLog_fetchConditions_summaryUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive had no data available} other{{count} dives had no data available}}'**
+  String diveLog_fetchConditions_summaryUnavailable(int count);
+
+  /// No description provided for @diveLog_fetchConditions_summaryUnchanged.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive had nothing to fill} other{{count} dives had nothing to fill}}'**
+  String diveLog_fetchConditions_summaryUnchanged(int count);
+
+  /// No description provided for @diveLog_fetchConditions_summaryCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Stopped early; 1 dive was processed.} other{Stopped early; {count} dives were processed.}}'**
+  String diveLog_fetchConditions_summaryCancelled(int count);
+
   /// Tooltip: decrease the sighting count
   ///
   /// In en, this message translates to:
