@@ -25,6 +25,21 @@ SeenSpecies _whaleShark() => SeenSpecies(
 );
 
 void main() {
+  // The tile dates itself through UnitFormatter.formatDate, which resolves
+  // against Intl.defaultLocale, a process global that app.dart sets from the
+  // app locale, NOT the MaterialApp.locale pinned below. Pin it so the
+  // "Jan 15, 2024" assertion states its real dependency instead of riding on
+  // intl's implicit en_US fallback, and restore it so the global stays
+  // contained.
+  late String? previousLocale;
+
+  setUp(() {
+    previousLocale = Intl.defaultLocale;
+    Intl.defaultLocale = 'en';
+  });
+
+  tearDown(() => Intl.defaultLocale = previousLocale);
+
   testWidgets('shows name, scientific name, counts and last seen', (
     tester,
   ) async {
