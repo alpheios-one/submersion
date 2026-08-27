@@ -102,5 +102,25 @@ class Dive3dSceneData {
     if (_any(cnss)) SceneMetric.cns,
     if (_any(heartRates)) SceneMetric.heartRate,
     if (tankPressures.values.any((l) => l.isNotEmpty)) SceneMetric.tankPressure,
+    if (_any(ttsSeconds)) SceneMetric.tts,
+  };
+
+  /// The tts series as doubles (seconds), for the metric pipeline.
+  List<double?> get ttsSeconds => [for (final t in ttss) t?.toDouble()];
+
+  int _finiteCount(List<double?> series) =>
+      series.where((v) => v != null && v.isFinite).length;
+
+  /// Metrics that can drive the Z axis: at least two finite samples so a
+  /// path exists between them. Depth is the Y axis and never offered.
+  Set<SceneMetric> get zAxisMetrics => {
+    if (_finiteCount(temperatures) >= 2) SceneMetric.temperature,
+    if (_finiteCount(ascentRates) >= 2) SceneMetric.ascentRate,
+    if (_finiteCount(ppO2s) >= 2) SceneMetric.ppO2,
+    if (_finiteCount(cnss) >= 2) SceneMetric.cns,
+    if (_finiteCount(heartRates) >= 2) SceneMetric.heartRate,
+    if (tankPressures.values.any((l) => l.length >= 2))
+      SceneMetric.tankPressure,
+    if (_finiteCount(ttsSeconds) >= 2) SceneMetric.tts,
   };
 }

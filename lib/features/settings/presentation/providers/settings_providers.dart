@@ -4,6 +4,7 @@ import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
+import 'package:submersion/core/constants/place_name_language.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/core/utils/log_failure.dart';
@@ -179,6 +180,10 @@ class AppSettings {
   /// Color accents: tint leading icons in lists and settings pages.
   final bool accentListIcons;
   final String locale;
+
+  /// ISO 639-1 code for reverse-geocoded place names (issue #1187). Synced
+  /// with the diver so every device stores the same spelling.
+  final String placeNameLanguage;
   final String defaultDiveType;
   final double defaultTankVolume;
   final int defaultStartPressure;
@@ -491,6 +496,7 @@ class AppSettings {
     this.accentSectionHeaders = false,
     this.accentListIcons = false,
     this.locale = 'system',
+    this.placeNameLanguage = PlaceNameLanguage.defaultCode,
     this.defaultDiveType = 'recreational',
     this.defaultTankVolume = 12.0,
     this.defaultStartPressure = 200,
@@ -652,6 +658,7 @@ class AppSettings {
     bool? accentSectionHeaders,
     bool? accentListIcons,
     String? locale,
+    String? placeNameLanguage,
     String? defaultDiveType,
     double? defaultTankVolume,
     int? defaultStartPressure,
@@ -782,6 +789,7 @@ class AppSettings {
       accentSectionHeaders: accentSectionHeaders ?? this.accentSectionHeaders,
       accentListIcons: accentListIcons ?? this.accentListIcons,
       locale: locale ?? this.locale,
+      placeNameLanguage: placeNameLanguage ?? this.placeNameLanguage,
       defaultDiveType: defaultDiveType ?? this.defaultDiveType,
       defaultTankVolume: defaultTankVolume ?? this.defaultTankVolume,
       defaultStartPressure: defaultStartPressure ?? this.defaultStartPressure,
@@ -1362,6 +1370,13 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setLocale(String locale) async {
     state = state.copyWith(locale: locale);
+    await _saveSettings();
+  }
+
+  Future<void> setPlaceNameLanguage(String code) async {
+    state = state.copyWith(
+      placeNameLanguage: PlaceNameLanguage.normalize(code),
+    );
     await _saveSettings();
   }
 
@@ -2015,6 +2030,11 @@ final themePresetProvider = Provider<AppThemePreset>((ref) {
 
 final localeProvider = Provider<String>((ref) {
   return ref.watch(settingsProvider.select((s) => s.locale));
+});
+
+/// The language new reverse-geocode results are stored in (issue #1187).
+final placeNameLanguageProvider = Provider<String>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.placeNameLanguage));
 });
 
 /// Color accent toggles. Narrow selects so each surface rebuilds only when

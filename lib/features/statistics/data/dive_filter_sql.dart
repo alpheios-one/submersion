@@ -58,6 +58,19 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
     params.addAll(filter.tagIds);
   }
 
+  // Weekdays: match ANY selected weekday. dive_date_time is wall-clock-as-UTC
+  // epoch ms, so strftime('%w', ...) (0=Sunday..6=Saturday) already lines up
+  // with the wall-clock day -- no 'utc' modifier needed. Converting
+  // DateTime.weekday (1=Monday..7=Sunday) via `% 7` matches that numbering.
+  if (filter.weekdays.isNotEmpty) {
+    final ph = List.filled(filter.weekdays.length, '?').join(', ');
+    conditions.add(
+      "CAST(strftime('%w', dive_date_time / 1000, 'unixepoch') AS INTEGER) "
+      'IN ($ph)',
+    );
+    params.addAll(filter.weekdays.map((w) => w % 7));
+  }
+
   // Equipment: match ANY selected item.
   if (filter.equipmentIds.isNotEmpty) {
     final ph = List.filled(filter.equipmentIds.length, '?').join(', ');
@@ -114,6 +127,12 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
 
   if (filter.favoritesOnly == true) {
     conditions.add('is_favorite = 1');
+  }
+
+  if (filter.decoOnly != null) {
+    conditions.add(
+      decoSignalCondition(wantDeco: filter.decoOnly!, diveIdRef: 'dives.id'),
+    );
   }
 
   // No buddy: neither the legacy scalar column nor a junction-linked buddy
@@ -214,4 +233,50 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
     subquery: 'SELECT id FROM dives WHERE ${conditions.join(' AND ')}',
     params: params,
   );
+}
+
+/// Recorded deco-signal SQL condition (no bind params), shared by
+/// [buildFilteredDiveIdSubquery], `DiveRepository._buildFilterWhereClauses`
+/// and `DiveRepository.getDiveIdsWithDecoSignal` so the three SQL paths
+/// (Statistics, the paginated dive list, and the id set the entity-backed
+/// surfaces intersect with) can't drift apart. Mirrors
+/// `StatisticsRepository.scanRecordedDecoSignals`:
+///
+/// - A deco-stop profile point (`deco_type = 2`) or a `decoStopStart` event
+///   means deco.
+/// - A profile that carries `deco_type` values, none of which is 2, means
+///   no-deco: the computer recorded obligations and reported none.
+/// - A positive `ceiling` on a profile with no `deco_type` at all also means
+///   deco (some import sources only ever write a stop depth).
+/// - A dive with no qualifying profile data matches neither branch; it is
+///   only classifiable via the computed fallback, which this SQL-only axis
+///   does not have access to.
+///
+/// This is the only place the deco axis is evaluated. `DiveFilterState.apply`
+/// deliberately skips it, because list-view entities carry neither profile
+/// points nor deco-stop events.
+///
+/// [diveIdRef] must be a reference to the enclosing query's `dives.id`
+/// resolvable from inside these correlated subqueries (e.g. `d.id` when the
+/// caller aliases `dives` as `d`, or `dives.id` when it does not).
+String decoSignalCondition({
+  required bool wantDeco,
+  required String diveIdRef,
+}) {
+  final hasDecoStop =
+      'EXISTS (SELECT 1 FROM dive_profiles p '
+      'WHERE p.dive_id = $diveIdRef AND p.deco_type = 2) '
+      "OR EXISTS (SELECT 1 FROM dive_profile_events e "
+      "WHERE e.dive_id = $diveIdRef AND e.event_type = 'decoStopStart')";
+  final hasDecoType =
+      'EXISTS (SELECT 1 FROM dive_profiles p '
+      'WHERE p.dive_id = $diveIdRef AND p.deco_type IS NOT NULL)';
+  final hasPositiveCeiling =
+      'EXISTS (SELECT 1 FROM dive_profiles p '
+      'WHERE p.dive_id = $diveIdRef AND p.ceiling > 0)';
+
+  if (wantDeco) {
+    return '($hasDecoStop OR (NOT ($hasDecoType) AND $hasPositiveCeiling))';
+  }
+  return '($hasDecoType AND NOT ($hasDecoStop))';
 }

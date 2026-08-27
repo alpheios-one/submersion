@@ -43,6 +43,7 @@ import 'package:submersion/features/import_wizard/domain/models/unified_import_r
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
 import 'package:submersion/shared/widgets/wizard/wizard_step_def.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/import_wizard/data/adapters/import_notice_grouper.dart';
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
 import 'package:submersion/features/tank_presets/domain/services/default_tank_preset_resolver.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
@@ -572,6 +573,7 @@ class UniversalAdapter implements ImportSourceAdapter {
       defaultTankPreset: defaultTankPreset,
       defaultStartPressure: settings.defaultStartPressure,
       applyDefaultTankToImports: settings.applyDefaultTankToImports,
+      placeNameLanguage: settings.placeNameLanguage,
     );
 
     final result = await importer.import(
@@ -730,7 +732,10 @@ class UniversalAdapter implements ImportSourceAdapter {
     // Queue a data-quality scan of the imported dives (fire-and-forget).
     scheduleQualityScan(netImportedDiveIds);
 
+    final notices = groupImportNotices(payload.warnings, netDives);
+
     return UnifiedImportResult(
+      notices: notices,
       importedCounts: counts,
       consolidatedCount: consolidated,
       skippedCount: skipped + cleanedUpFailures,

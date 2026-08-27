@@ -114,6 +114,7 @@ class BuddyMergeRepository {
       certificationAgency: null,
       photoPath: row.photoPath,
       notes: row.notes,
+      isFavorite: row.isFavorite,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
     );
@@ -444,6 +445,7 @@ class BuddyMergeRepository {
                   phone: Value(buddy.phone),
                   photoPath: Value(buddy.photoPath),
                   notes: Value(buddy.notes),
+                  isFavorite: Value(buddy.isFavorite),
                   createdAt: Value(buddy.createdAt.millisecondsSinceEpoch),
                   updatedAt: Value(buddy.updatedAt.millisecondsSinceEpoch),
                 ),
@@ -591,6 +593,7 @@ class BuddyMergeRepository {
         phone: Value(buddy.phone),
         photoPath: Value(buddy.photoPath),
         notes: Value(buddy.notes),
+        isFavorite: Value(buddy.isFavorite),
         updatedAt: Value(now),
       ),
     );

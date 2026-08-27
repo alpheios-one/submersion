@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/database/database.dart' show AppDatabase;
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
@@ -10,9 +11,10 @@ import '../../../../helpers/test_database.dart';
 
 void main() {
   late BuddyRepository repository;
+  late AppDatabase db;
 
   setUp(() async {
-    await setUpTestDatabase();
+    db = await setUpTestDatabase();
     repository = BuddyRepository();
   });
 
@@ -255,6 +257,108 @@ void main() {
 
         expect(count, equals(0));
       });
+    });
+
+    group('getAllBuddiesWithDiveCount (issue #638)', () {
+      Future<void> insertDive(String id) async {
+        final db = DatabaseService.instance.database;
+        await db.customStatement(
+          "INSERT INTO dives (id, dive_date_time, created_at, updated_at) "
+          "VALUES ('$id', 1000, 1000, 1000)",
+        );
+      }
+
+      test('reports the correct dive count per buddy', () async {
+        await insertDive('d1');
+        await insertDive('d2');
+        final frequent = await repository.createBuddy(
+          createTestBuddy(id: 'frequent', name: 'Frequent Buddy'),
+        );
+        final rare = await repository.createBuddy(
+          createTestBuddy(id: 'rare', name: 'Rare Buddy'),
+        );
+        await repository.addBuddyToDive('d1', frequent.id, DiveRole.buddyId);
+        await repository.addBuddyToDive('d2', frequent.id, DiveRole.buddyId);
+        await repository.addBuddyToDive('d1', rare.id, DiveRole.buddyId);
+
+        final results = await repository.getAllBuddiesWithDiveCount();
+        final byId = {for (final r in results) r.buddy.id: r.diveCount};
+
+        expect(byId['frequent'], equals(2));
+        expect(byId['rare'], equals(1));
+      });
+
+      test('carries the isFavorite flag through', () async {
+        await repository.createBuddy(
+          createTestBuddy(id: 'fav', name: 'Favorite Buddy'),
+        );
+        await repository.toggleFavorite('fav');
+
+        final results = await repository.getAllBuddiesWithDiveCount();
+        final fav = results.firstWhere((r) => r.buddy.id == 'fav');
+
+        expect(fav.buddy.isFavorite, isTrue);
+      });
+
+      test('query filters by name, matching the picker search box', () async {
+        await repository.createBuddy(
+          createTestBuddy(id: 'alice', name: 'Alice'),
+        );
+        await repository.createBuddy(createTestBuddy(id: 'bob', name: 'Bob'));
+
+        final results = await repository.getAllBuddiesWithDiveCount(
+          query: 'ali',
+        );
+
+        expect(results.map((r) => r.buddy.id), equals(['alice']));
+      });
+    });
+
+    group('favorites (issue #638)', () {
+      test('toggleFavorite flips false to true and back', () async {
+        final buddy = await repository.createBuddy(
+          createTestBuddy(name: 'Toggle Buddy'),
+        );
+        expect(buddy.isFavorite, isFalse);
+
+        await repository.toggleFavorite(buddy.id);
+        expect((await repository.getBuddyById(buddy.id))!.isFavorite, isTrue);
+
+        await repository.toggleFavorite(buddy.id);
+        expect((await repository.getBuddyById(buddy.id))!.isFavorite, isFalse);
+      });
+
+      test('setFavorite sets the flag explicitly', () async {
+        final buddy = await repository.createBuddy(
+          createTestBuddy(name: 'Set Favorite Buddy'),
+        );
+
+        await repository.setFavorite(buddy.id, true);
+        expect((await repository.getBuddyById(buddy.id))!.isFavorite, isTrue);
+
+        await repository.setFavorite(buddy.id, false);
+        expect((await repository.getBuddyById(buddy.id))!.isFavorite, isFalse);
+      });
+
+      test(
+        'setFavorite on an unknown id leaves no pending sync record',
+        () async {
+          await repository.setFavorite('does-not-exist', true);
+
+          final pending = await db.select(db.syncRecords).get();
+          expect(pending, isEmpty);
+        },
+      );
+
+      test(
+        'toggleFavorite on an unknown id leaves no pending sync record',
+        () async {
+          await repository.toggleFavorite('does-not-exist');
+
+          final pending = await db.select(db.syncRecords).get();
+          expect(pending, isEmpty);
+        },
+      );
     });
 
     group('getBuddyStats', () {
