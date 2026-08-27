@@ -76,7 +76,12 @@ class TripDayWeather extends Equatable {
   final String id;
   final String tripId;
 
-  /// Local midnight for the day this describes.
+  /// The calendar day this describes, as UTC midnight.
+  ///
+  /// UTC rather than local because the day is part of the row identity: a
+  /// local-midnight instant differs in every timezone, so two devices would
+  /// key the same trip day differently and never converge. See
+  /// [tripDayMillis].
   final DateTime date;
 
   /// The coordinates the lookup used.
