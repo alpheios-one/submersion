@@ -70,13 +70,18 @@ class EntityCardConfigNotifier<F extends EntityField>
   // Mutations
   // -------------------------------------------------------------------------
 
-  /// Assign [field] to the slot with [slotId]; unknown slot ids are ignored.
+  /// Assign [field] to the slot with [slotId].
+  ///
+  /// An unknown [slotId], or one that already holds [field], returns without
+  /// touching the state. StateNotifier notifies on identity rather than
+  /// equality, so rebuilding the slot list regardless would repaint every
+  /// card in the list and schedule a database write for a no-op.
   void setSlotField(String slotId, F field) {
-    state = state.copyWith(
-      slots: state.slots
-          .map((s) => s.slotId == slotId ? s.copyWith(field: field) : s)
-          .toList(),
-    );
+    final index = state.slots.indexWhere((s) => s.slotId == slotId);
+    if (index < 0 || state.slots[index].field == field) return;
+    final slots = List<EntityCardSlotConfig<F>>.from(state.slots);
+    slots[index] = slots[index].copyWith(field: field);
+    state = state.copyWith(slots: slots);
     _save();
   }
 

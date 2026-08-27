@@ -6,7 +6,12 @@ import 'package:submersion/shared/constants/entity_field.dart';
 
 /// The configurable "extra fields" grid under a detailed list card: a
 /// two-column wrap of `label: value` pairs (one column under 250 px), the
-/// same shape the dive card uses. Fields without a value are skipped.
+/// same shape the dive card uses.
+///
+/// Fields without a value are skipped, including ones whose value is non-null
+/// but formats to nothing: an empty String extracts as non-null and its
+/// adapter renders it as the placeholder, which would show here as a dangling
+/// "Notes: --".
 class EntityCardExtraFields<T, F extends EntityField> extends StatelessWidget {
   final EntityFieldAdapter<T, F> adapter;
   final T entity;
@@ -31,7 +36,9 @@ class EntityCardExtraFields<T, F extends EntityField> extends StatelessWidget {
     for (final field in fields) {
       final value = adapter.extractValue(field, entity);
       if (value == null) continue;
-      entries.add((field, adapter.formatValue(field, value, units)));
+      final formatted = adapter.formatValue(field, value, units);
+      if (isBlankFieldValue(formatted)) continue;
+      entries.add((field, formatted));
     }
     if (entries.isEmpty) return const SizedBox.shrink();
 

@@ -8,7 +8,10 @@ import 'package:submersion/shared/constants/entity_field.dart';
 ///
 /// Renders nothing when the field has no value, so a card never shows a
 /// dangling "--" for a stat that does not apply (a site never dived, a
-/// buddy with no last dive).
+/// buddy with no last dive). A value that is non-null but formats to
+/// nothing counts as absent too: a buddy's notes is a non-nullable String,
+/// so an empty one survives the null check and its adapter renders it as
+/// [kFieldValuePlaceholder], which only a table cell wants.
 class EntityCardStat<T, F extends EntityField> extends StatelessWidget {
   final EntityFieldAdapter<T, F> adapter;
   final T entity;
@@ -38,6 +41,7 @@ class EntityCardStat<T, F extends EntityField> extends StatelessWidget {
     final formatted =
         formatter?.call(field, value) ??
         adapter.formatValue(field, value, units);
+    if (isBlankFieldValue(formatted)) return const SizedBox.shrink();
     final style = Theme.of(
       context,
     ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600, color: color);

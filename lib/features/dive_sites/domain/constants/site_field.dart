@@ -631,7 +631,7 @@ class SiteFieldAdapter extends EntityFieldAdapter<SiteWithCount, SiteField> {
 
   @override
   String formatValue(SiteField field, dynamic value, UnitFormatter units) {
-    if (value == null) return '--';
+    if (value == null) return kFieldValuePlaceholder;
     switch (field) {
       case SiteField.siteName:
       case SiteField.location:

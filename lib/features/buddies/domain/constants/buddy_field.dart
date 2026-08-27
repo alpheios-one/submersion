@@ -173,7 +173,7 @@ class BuddyFieldAdapter extends EntityFieldAdapter<BuddyWithCount, BuddyField> {
 
   @override
   String formatValue(BuddyField field, dynamic value, UnitFormatter units) {
-    if (value == null) return '--';
+    if (value == null) return kFieldValuePlaceholder;
     return switch (field) {
       BuddyField.certificationLevel =>
         (value as CertificationLevel).displayName,
@@ -181,7 +181,10 @@ class BuddyFieldAdapter extends EntityFieldAdapter<BuddyWithCount, BuddyField> {
         (value as CertificationAgency).displayName,
       BuddyField.diveCount => (value as int).toString(),
       BuddyField.lastDive => units.formatDate(value as DateTime),
-      _ => value is String ? (value.isEmpty ? '--' : value) : value.toString(),
+      _ =>
+        value is String
+            ? (value.isEmpty ? kFieldValuePlaceholder : value)
+            : value.toString(),
     };
   }
 

@@ -75,6 +75,18 @@ void main() {
       expect(notifier.state.slots[1].field, TestField.fieldC);
     });
 
+    test('setSlotField on an unknown slot leaves the state identical', () {
+      final before = notifier.state;
+      notifier.setSlotField('nosuchslot', TestField.fieldC);
+      expect(identical(notifier.state, before), isTrue);
+    });
+
+    test('setSlotField with the field already in the slot is a no-op', () {
+      final before = notifier.state;
+      notifier.setSlotField('stat1', TestField.fieldB);
+      expect(identical(notifier.state, before), isTrue);
+    });
+
     test('addExtraField appends and ignores duplicates', () {
       notifier.addExtraField(TestField.fieldC);
       notifier.addExtraField(TestField.fieldC);
@@ -175,6 +187,17 @@ void main() {
       await notifier.init(repository, diverId, 'card_test');
 
       expect(notifier.state, _defaultConfig);
+    });
+
+    test('a no-op setSlotField never writes', () async {
+      final notifier = _makeNotifier();
+      addTearDown(notifier.dispose);
+      await notifier.init(repository, diverId, 'card_test');
+
+      notifier.setSlotField('nosuchslot', TestField.fieldC);
+      await Future<void>.delayed(const Duration(milliseconds: 700));
+
+      expect(await repository.getRawConfig(diverId, 'card_test'), isNull);
     });
 
     test('a mutation is persisted after the debounce', () async {
