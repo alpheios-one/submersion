@@ -167,4 +167,13 @@ void main() {
     expect(first, second);
     expect(await equipmentCount(), 1);
   });
+
+  test('returns null instead of throwing when the write fails', () async {
+    // Registration must not fail because gear seeding did: a computer with no
+    // twin is still a correctly registered computer. Dropping the table is the
+    // cheapest way to make every query in the resolver throw.
+    await db.customStatement('DROP TABLE equipment');
+
+    expect(await resolver.resolveGearTwin(computer()), isNull);
+  });
 }

@@ -130,4 +130,15 @@ void main() {
 
     expect(await equipmentOn('dive1'), {'gear-1'});
   });
+
+  test('returns false instead of throwing when the read fails', () async {
+    // Best-effort by contract: gear linking must never abort a download or
+    // import that has already persisted the dive.
+    await insertGear('gear-1');
+    await insertComputer('c1', equipmentId: 'gear-1');
+    await linkSource('dive1', 'c1');
+    await db.customStatement('DROP TABLE dive_data_sources');
+
+    expect(await linker.linkComputerGearForDive(diveId: 'dive1'), isFalse);
+  });
 }

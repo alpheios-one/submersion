@@ -14,7 +14,7 @@
 
 - **Schema version is v169.** Verified by diffing open PRs, not by grepping main: v165 (#1290), v166 (#1300), v167 (#1276) and v168 (#1237) are claimed by open PRs, and main is at v164. This plan originally claimed v168; #1237 renumbered onto it mid-implementation. Do NOT renumber without re-running that scan.
 - **`minimumCompatibleSchemaVersion` stays at 160.** The rule at `database.dart:3211` says not to raise it for a new nullable column.
-- **Never use em-dashes (`—`, U+2014)** in any output: code, comments, docs, commit messages. En-dashes as prose punctuation and spaced hyphens are equally forbidden. Use commas, colons, semicolons, or two sentences.
+- **Never use em-dashes (U+2014)** in any output: code, comments, docs, commit messages. En-dashes as prose punctuation and spaced hyphens are equally forbidden. Use commas, colons, semicolons, or two sentences.
 - **No emojis** in code, comments, or documentation.
 - **TDD.** Write the failing test first, watch it fail, then implement.
 - **Immutability.** Never mutate objects or arrays in place.

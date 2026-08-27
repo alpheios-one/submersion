@@ -2,7 +2,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/database/imported_computer_identity.dart';
 
-/// Namespace for deterministic gear-twin ids (v168).
+/// Namespace for deterministic gear-twin ids (v169).
 ///
 /// Frozen: every device must derive the same equipment id for the same
 /// registered computer, so changing this would fork one gear item into one per
@@ -24,7 +24,7 @@ String diveComputerGearId(String computerId) => const Uuid().v5(
 /// An equipment row reduced to the fields the gear-twin match needs.
 ///
 /// Lets the rule live in one place: the repository builds these from Drift
-/// rows, the v168 migration backfill from raw rows.
+/// rows, the v169 migration backfill from raw rows.
 class GearTwinCandidate {
   const GearTwinCandidate({
     required this.id,

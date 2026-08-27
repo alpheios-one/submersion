@@ -2057,7 +2057,7 @@ class SyncService {
       (field: 'computerId', parent: 'diveComputers', nullable: true),
       (field: 'sourceId', parent: 'diveDataSources', nullable: true),
     ],
-    // v168 gear twins: a peer's live computer whose gear item we deleted
+    // v169 gear twins: a peer's live computer whose gear item we deleted
     // locally would otherwise dangle this FK and abort the whole sync at
     // COMMIT. Nullable, so the computer survives with the reference cleared.
     'diveComputers': [
