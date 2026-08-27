@@ -13,6 +13,8 @@ import 'package:submersion/features/media/domain/value_objects/media_attach_targ
 import 'package:submersion/features/media/presentation/providers/files_tab_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/file_review_pane.dart';
+import 'package:submersion/features/media/presentation/helpers/offer_site_review_after_import.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Files tab in the photo picker.
 ///
@@ -325,34 +327,50 @@ class FilesTab extends ConsumerWidget {
   // exercised by manual desktop smoke tests + by the notifier unit tests.
   Future<void> _commit(BuildContext context, WidgetRef ref) async {
     final notifier = ref.read(filesTabNotifierProvider.notifier);
+    final l10n = context.l10n;
     // The picker uses a bare Scaffold, so this resolves to the root
     // ScaffoldMessenger, which outlives the pop below and shows the snackbar
     // on the dive-detail view we return to.
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
+    // commit() clears the staged state, so snapshot the dives first.
+    final diveIds = ref
+        .read(filesTabNotifierProvider)
+        .match
+        .matched
+        .keys
+        .toList();
     final created = await notifier.commit(target: target);
+    if (!context.mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          _isSiteSession
+              ? l10n.filesTab_attachedToSite(created.length)
+              : l10n.filesTab_linkedItems(created.length),
+        ),
+        action: SnackBarAction(
+          label: l10n.filesTab_undo,
+          onPressed: () => notifier.undoCommit(created),
+        ),
+      ),
+    );
+    // Offer the batch site review before popping: the helper resolves the
+    // router from this context, and the snackbar goes to the root messenger.
+    if (!_isSiteSession) {
+      await offerSiteReviewAfterImport(
+        context,
+        ref,
+        diveIds,
+        messenger: messenger,
+      );
+    }
     if (!context.mounted) return;
     // Return to the detail view now that the files are linked; the grid
     // refreshes reactively via mediaForDiveProvider's watchDiveDetailChanges,
     // and mediaForSiteProvider's invalidateSelfWhen(watchMediaChanges) does
     // the same for a site.
     navigator.pop();
-    // TODO(media): l10n
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          _isSiteSession
-              ? 'Attached ${created.length} '
-                    'item${created.length == 1 ? '' : 's'} to this site'
-              // TODO(media): pluralization
-              : 'Linked ${created.length} items',
-        ),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () => notifier.undoCommit(created),
-        ),
-      ),
-    );
   }
 
   // coverage:ignore-end
