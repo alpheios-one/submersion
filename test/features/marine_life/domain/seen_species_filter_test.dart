@@ -169,6 +169,42 @@ void main() {
     });
   });
 
+  group('name tie-breaks are total', () {
+    test('identical names fall back to the species id', () {
+      final a = _entry(id: 'b-second', name: 'Grouper');
+      final b = _entry(id: 'a-first', name: 'Grouper');
+      List<String> sortedIds(List<SeenSpecies> input) => _ids(
+        filterSeenSpecies(
+          input,
+          query: '',
+          sort: SeenSpeciesSort.name,
+          nameOf: _english,
+        ),
+      );
+      // Same result whichever order the query happened to return them in.
+      expect(sortedIds([a, b]), ['a-first', 'b-second']);
+      expect(sortedIds([b, a]), ['a-first', 'b-second']);
+    });
+
+    test('scientific names compare case-insensitively', () {
+      final upper = _entry(id: 'u', name: 'Grouper', scientific: 'Epinephelus');
+      final lower = _entry(
+        id: 'l',
+        name: 'Grouper',
+        scientific: 'aethaloperca',
+      );
+      final sorted = filterSeenSpecies(
+        [upper, lower],
+        query: '',
+        sort: SeenSpeciesSort.name,
+        nameOf: _english,
+      );
+      // A case-sensitive compare would put "Epinephelus" before
+      // "aethaloperca" because uppercase sorts first in ASCII.
+      expect(_ids(sorted), ['l', 'u']);
+    });
+  });
+
   test('does not mutate the input list', () {
     final input = [whaleShark, anemone, turtle];
     final snapshot = List<SeenSpecies>.of(input);

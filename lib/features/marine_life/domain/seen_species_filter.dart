@@ -44,14 +44,21 @@ bool _matches(Species species, String needle, SpeciesNameOf nameOf) {
   return scientific != null && scientific.toLowerCase().contains(needle);
 }
 
+/// Total order on displayed name, then scientific name, then species id.
+///
+/// The final id tie-break matters: `List.sort` is not stable and the
+/// repository query has no `ORDER BY`, so two species sharing a name would
+/// otherwise swap places between loads.
 int _byName(SeenSpecies a, SeenSpecies b, SpeciesNameOf nameOf) {
   final byName = nameOf(
     a.species,
   ).toLowerCase().compareTo(nameOf(b.species).toLowerCase());
   if (byName != 0) return byName;
-  return (a.species.scientificName ?? '').compareTo(
-    b.species.scientificName ?? '',
+  final byScientific = (a.species.scientificName ?? '').toLowerCase().compareTo(
+    (b.species.scientificName ?? '').toLowerCase(),
   );
+  if (byScientific != 0) return byScientific;
+  return a.species.id.compareTo(b.species.id);
 }
 
 Comparator<SeenSpecies> _comparator(
