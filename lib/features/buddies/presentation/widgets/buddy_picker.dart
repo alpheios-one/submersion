@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/constants/sort_options.dart';
+import 'package:submersion/core/constants/sort_options_display.dart';
+import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,6 +12,8 @@ import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/dive_roles/presentation/dive_role_display.dart';
 import 'package:submersion/features/dive_roles/presentation/providers/dive_role_providers.dart';
+import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart'
+    show BuddyWithDiveCount;
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
@@ -311,7 +316,7 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
   String _searchQuery = '';
   String _debouncedQuery = '';
   Timer? _debounceTimer;
-  List<Buddy>? _lastSearchResults;
+  List<BuddyWithDiveCount>? _lastSearchResults;
   late List<BuddyWithRole> _localSelectedBuddies;
   Map<String, List<Certification>> _certsByBuddy =
       const <String, List<Certification>>{};
@@ -345,8 +350,9 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
   @override
   Widget build(BuildContext context) {
     final buddiesAsync = _debouncedQuery.isEmpty
-        ? ref.watch(allBuddiesProvider)
-        : ref.watch(buddySearchProvider(_debouncedQuery));
+        ? ref.watch(allBuddiesWithDiveCountProvider)
+        : ref.watch(buddySearchWithDiveCountProvider(_debouncedQuery));
+    final sort = ref.watch(buddyPickerSortProvider);
 
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
@@ -435,6 +441,7 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
                   if (result != null) {
                     // New buddy was created, refresh the list so they can select it
                     ref.invalidate(allBuddiesProvider);
+                    ref.invalidate(allBuddiesWithDiveCountProvider);
                   }
                 },
                 icon: const Icon(Icons.person_add),
@@ -444,8 +451,40 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
-            const Divider(),
+            const SizedBox(height: 4),
+
+            // Sort toggle (issue #638): alternates between dive-count-desc
+            // (the default -- who do I dive with most) and alphabetical.
+            // Favorites are pinned to the top regardless of this choice.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: () {
+                    final next = sort.field == BuddySortField.diveCount
+                        // Text fields invert direction throughout this
+                        // codebase: descending is what renders A->Z. Ascending
+                        // here would flip the alphabetical toggle to Z->A.
+                        ? const SortState(
+                            field: BuddySortField.name,
+                            direction: SortDirection.descending,
+                          )
+                        : const SortState(
+                            field: BuddySortField.diveCount,
+                            direction: SortDirection.descending,
+                          );
+                    ref.read(buddyPickerSortProvider.notifier).state = next;
+                  },
+                  icon: Icon(sort.field.icon, size: 18),
+                  label: Text(
+                    '${context.l10n.buddies_action_sort}: '
+                    '${sort.field.localizedName(context.l10n)}',
+                  ),
+                ),
+              ),
+            ),
+            const Divider(height: 1),
 
             // Buddy list
             Expanded(
@@ -484,6 +523,7 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
                     scrollController,
                     buddies,
                     _certsByBuddy,
+                    sort,
                   );
                 },
                 loading: () {
@@ -497,6 +537,7 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
                             scrollController,
                             _lastSearchResults!,
                             _certsByBuddy,
+                            sort,
                           ),
                         ),
                       ],
@@ -517,14 +558,51 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
 
   Widget _buildBuddyListView(
     ScrollController scrollController,
-    List<Buddy> buddies,
+    List<BuddyWithDiveCount> buddies,
     Map<String, List<Certification>> certsByBuddy,
+    SortState<BuddySortField> sort,
   ) {
+    // Favorites are pinned to the top regardless of the chosen sort field
+    // (issue #638); each partition is sorted independently so the toggle
+    // still reorders within both groups.
+    final favorites = applyBuddyWithDiveCountSorting(
+      buddies.where((b) => b.buddy.isFavorite).toList(),
+      sort,
+    );
+    final others = applyBuddyWithDiveCountSorting(
+      buddies.where((b) => !b.buddy.isFavorite).toList(),
+      sort,
+    );
+
+    final rows = <_PickerRow>[
+      if (favorites.isNotEmpty)
+        _PickerRow.header(context.l10n.diveLog_filterChip_favorites),
+      ...favorites.map(_PickerRow.entry),
+      if (favorites.isNotEmpty && others.isNotEmpty) const _PickerRow.divider(),
+      ...others.map(_PickerRow.entry),
+    ];
+
     return ListView.builder(
       controller: scrollController,
-      itemCount: buddies.length,
+      itemCount: rows.length,
       itemBuilder: (context, index) {
-        final buddy = buddies[index];
+        final row = rows[index];
+        if (row.isDivider) return const Divider(height: 1);
+        if (row.header != null) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Text(
+              row.header!,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          );
+        }
+
+        final buddy = row.entry!.buddy;
+        final diveCount = row.entry!.diveCount;
         final isSelected = _localSelectedBuddies.any(
           (b) => b.buddy.id == buddy.id,
         );
@@ -555,15 +633,45 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
           subtitle: buddy.certificationLevel == null
               ? null
               : Text(buddy.certificationLevel!.displayName),
-          trailing: isSelected
-              ? Chip(
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (diveCount > 0)
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Text(
+                    context.l10n.buddies_label_diveCount(diveCount),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              IconButton(
+                icon: Icon(
+                  buddy.isFavorite ? Icons.star : Icons.star_border,
+                  size: 20,
+                  color: buddy.isFavorite
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                tooltip: buddy.isFavorite
+                    ? context.l10n.diveLog_detail_tooltip_removeFromFavorites
+                    : context.l10n.diveLog_detail_tooltip_addToFavorites,
+                visualDensity: VisualDensity.compact,
+                onPressed: () => ref
+                    .read(buddyListNotifierProvider.notifier)
+                    .toggleFavorite(buddy.id),
+              ),
+              if (isSelected)
+                Chip(
                   label: Text(
                     selectedRole?.localizedName(context.l10n) ??
                         context.l10n.diveRole_builtin_buddy,
                   ),
                   visualDensity: VisualDensity.compact,
-                )
-              : null,
+                ),
+            ],
+          ),
           onTap: () {
             if (isSelected) {
               _removeBuddy(buddy.id);
@@ -662,4 +770,21 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
       return null;
     }
   }
+}
+
+/// A single row in the Add-buddy list: a section header, a divider between
+/// the favorites section and the rest, or a buddy entry.
+class _PickerRow {
+  final String? header;
+  final bool isDivider;
+  final BuddyWithDiveCount? entry;
+
+  const _PickerRow.header(this.header) : isDivider = false, entry = null;
+
+  const _PickerRow.divider() : header = null, isDivider = true, entry = null;
+
+  const _PickerRow.entry(BuddyWithDiveCount value)
+    : header = null,
+      isDivider = false,
+      entry = value;
 }

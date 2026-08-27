@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
+import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
@@ -982,8 +983,13 @@ class SyncDataSerializer {
     Future<Directory> Function()? tempDir,
   }) async {
     final dir = await (tempDir?.call() ?? resolveSyncTempDir());
-    final path =
-        '${dir.path}/ssv1_base_${deviceId}_${seq ?? 0}.${_baseTempUuid.v4()}.json';
+    // p.join, not a literal '/': on Windows the temp dir is backslashed, and a
+    // path mixing both separators is what broke the move into the publish
+    // directory in #1304.
+    final path = p.join(
+      dir.path,
+      'ssv1_base_${deviceId}_${seq ?? 0}.${_baseTempUuid.v4()}.json',
+    );
     final raf = await File(path).open(mode: FileMode.write);
     final digestSink = _Sha256DigestSink();
     final dataHash = sha256.startChunkedConversion(digestSink);
@@ -5663,6 +5669,9 @@ class SyncDataSerializer {
       // v161: seed it so payloads predating the column hydrate instead of
       // throwing in DiverSetting.fromJson.
       'defaultShowO2CellMv': false,
+      // v166: seed it so payloads predating the column hydrate instead of
+      // throwing in DiverSetting.fromJson (issue #1187).
+      'placeNameLanguage': 'en',
       // Dive profile default-visible metrics. Non-nullable bool added in v91;
       // seed it so payloads predating the column hydrate instead of throwing in
       // DiverSetting.fromJson.

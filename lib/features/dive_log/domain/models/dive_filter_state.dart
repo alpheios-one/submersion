@@ -17,10 +17,28 @@ class DiveFilterState {
   final double? maxDepth;
   final bool? favoritesOnly;
 
+  /// Decompression status, derived from the recorded profile signal: a
+  /// deco-stop profile point, a `decoStopStart` event, or a positive ceiling
+  /// on a profile carrying no deco-type data at all (mirroring
+  /// `scanRecordedDecoSignals` in StatisticsRepository). Null means no filter;
+  /// true/false restrict to deco/no-deco dives. Dives whose status is
+  /// unrecorded (no profile, or a profile needing the computed fallback)
+  /// match neither.
+  ///
+  /// This axis is SQL-only. It is applied by `decoSignalCondition` in the
+  /// query paths and deliberately NOT by [apply]; see the note there.
+  final bool? decoOnly;
+
   /// True to restrict the list to dives with no buddy assigned: neither the
   /// legacy free-text `buddy` field nor a linked buddy is set.
   final bool? noBuddyOnly;
   final List<String> tagIds;
+
+  /// Restricts results to dives whose [Dive.dateTime] falls on one of these
+  /// weekdays, using [DateTime.weekday] numbering (1 = Monday, 7 = Sunday).
+  /// ANDs with [startDate]/[endDate] when both are set, like every other
+  /// axis in this filter.
+  final List<int> weekdays;
 
   // v1.5: Additional filter criteria
   final List<String> equipmentIds;
@@ -60,8 +78,10 @@ class DiveFilterState {
     this.minDepth,
     this.maxDepth,
     this.favoritesOnly,
+    this.decoOnly,
     this.noBuddyOnly,
     this.tagIds = const [],
+    this.weekdays = const [],
     this.equipmentIds = const [],
     this.buddyNameFilter,
     this.buddyId,
@@ -90,8 +110,10 @@ class DiveFilterState {
       minDepth != null ||
       maxDepth != null ||
       favoritesOnly == true ||
+      decoOnly != null ||
       noBuddyOnly == true ||
       tagIds.isNotEmpty ||
+      weekdays.isNotEmpty ||
       equipmentIds.isNotEmpty ||
       (buddyNameFilter != null && buddyNameFilter!.isNotEmpty) ||
       buddyId != null ||
@@ -115,8 +137,10 @@ class DiveFilterState {
     double? minDepth,
     double? maxDepth,
     bool? favoritesOnly,
+    bool? decoOnly,
     bool? noBuddyOnly,
     List<String>? tagIds,
+    List<int>? weekdays,
     List<String>? equipmentIds,
     String? buddyNameFilter,
     String? buddyId,
@@ -142,8 +166,10 @@ class DiveFilterState {
     bool clearMinDepth = false,
     bool clearMaxDepth = false,
     bool clearFavoritesOnly = false,
+    bool clearDecoOnly = false,
     bool clearNoBuddyOnly = false,
     bool clearTagIds = false,
+    bool clearWeekdays = false,
     bool clearEquipmentIds = false,
     bool clearBuddyNameFilter = false,
     bool clearBuddyId = false,
@@ -172,8 +198,10 @@ class DiveFilterState {
       favoritesOnly: clearFavoritesOnly
           ? null
           : (favoritesOnly ?? this.favoritesOnly),
+      decoOnly: clearDecoOnly ? null : (decoOnly ?? this.decoOnly),
       noBuddyOnly: clearNoBuddyOnly ? null : (noBuddyOnly ?? this.noBuddyOnly),
       tagIds: clearTagIds ? const [] : (tagIds ?? this.tagIds),
+      weekdays: clearWeekdays ? const [] : (weekdays ?? this.weekdays),
       equipmentIds: clearEquipmentIds
           ? const []
           : (equipmentIds ?? this.equipmentIds),
@@ -225,6 +253,13 @@ class DiveFilterState {
   /// buildFilteredDiveIdSubquery), so non-paginated views stay consistent with
   /// the SQL-backed list. It relies on dive.equipment being hydrated with its
   /// curated attributes (getAllDives does this).
+  ///
+  /// [decoOnly] is the one axis this method does NOT apply. getAllDives skips
+  /// profile hydration for list views and deco-stop events never reach the
+  /// entity, so there is nothing here to classify a dive from; evaluating it
+  /// anyway would silently match no dive at all. Callers that honour the deco
+  /// axis intersect this result with `decoFilteredDiveIdsProvider`, which
+  /// resolves it through the same SQL condition the paginated list uses.
   List<Dive> apply(List<Dive> dives) {
     return dives.where((dive) {
       if (startDate != null && dive.dateTime.isBefore(startDate!)) {
@@ -274,6 +309,9 @@ class DiveFilterState {
         if (!tagIds.any((tagId) => diveTagIds.contains(tagId))) {
           return false;
         }
+      }
+      if (weekdays.isNotEmpty && !weekdays.contains(dive.dateTime.weekday)) {
+        return false;
       }
       if (buddyNameFilter != null && buddyNameFilter!.isNotEmpty) {
         final filters = buddyNameFilter!

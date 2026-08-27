@@ -17,6 +17,7 @@ import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.da
 import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_3d/presentation/seascape_chrome.dart';
+import 'package:submersion/features/dive_3d/presentation/renderer/hover_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/seascape_depth_legend.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/seascape_hover_tooltip.dart';
@@ -51,7 +52,7 @@ class SiteTerrainPane extends ConsumerStatefulWidget {
 class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
   // No timeline at site level: the scrub cursor stays parked.
   final ValueNotifier<double> _scrub = ValueNotifier(0);
-  final ValueNotifier<TissuePick?> _hoverPick = ValueNotifier(null);
+  final ValueNotifier<ScenePick?> _hoverPick = ValueNotifier(null);
   final Set<SceneOverlay> _visible = {
     SceneOverlay.markers,
     SceneOverlay.paths,
@@ -176,10 +177,9 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                             axisFrame: axes.frame,
                             axisLabels: axes.labels,
                             chromeStyle: seascapeChromeStyle(context),
-                            axisChromeOnly: true,
-                            surfaceGrid: seascapePickGrid(
-                              grid,
-                              scene.layers.first.mesh,
+                            chromeMode: SceneChromeMode.axesOnly,
+                            picker: GridHoverPicker(
+                              seascapePickGrid(grid, scene.layers.first.mesh),
                             ),
                             hoverPick: _hoverPick,
                             onMarkerTap: _onMarkerTap,
@@ -263,13 +263,16 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
   Widget _hoverTooltip(BathymetryGrid grid) {
     return Positioned.fill(
       child: IgnorePointer(
-        child: ValueListenableBuilder<TissuePick?>(
+        child: ValueListenableBuilder<ScenePick?>(
           valueListenable: _hoverPick,
           builder: (context, pick, _) {
-            if (pick == null) return const SizedBox.shrink();
+            final payload = pick?.payload;
+            if (pick == null || payload is! TissuePick) {
+              return const SizedBox.shrink();
+            }
             return CustomSingleChildLayout(
               delegate: TissueTooltipLayoutDelegate(pick.screenPos),
-              child: SeascapeHoverTooltip(pick: pick, grid: grid),
+              child: SeascapeHoverTooltip(pick: payload, grid: grid),
             );
           },
         ),
