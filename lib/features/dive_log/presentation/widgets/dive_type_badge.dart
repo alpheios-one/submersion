@@ -27,12 +27,19 @@ import 'package:submersion/shared/utils/ink_centered_text_style.dart';
 class DiveTypeBadge extends StatelessWidget {
   final String label;
 
-  const DiveTypeBadge({super.key, required this.label});
+  /// Tighter padding and type scale for list rows, matching
+  /// [DiveModeBadge]'s own `dense` variant so the two badge families read as
+  /// the same size next to each other in a dive-list card.
+  final bool dense;
 
-  /// Matches [DiveModeBadge]'s non-dense font size: close to the header's
-  /// titleMedium rating number, but a touch under it.
-  static double fontSizeOf(BuildContext context) =>
-      (Theme.of(context).textTheme.titleMedium?.fontSize ?? 16) - 3;
+  const DiveTypeBadge({super.key, required this.label, this.dense = false});
+
+  /// Matches [DiveModeBadge]'s font size for the same [dense] value: close to
+  /// the header's titleMedium rating number (a touch under it) when not
+  /// dense, or the fixed 10.0 list-row size when dense.
+  static double fontSizeOf(BuildContext context, {bool dense = false}) => dense
+      ? 10.0
+      : (Theme.of(context).textTheme.titleMedium?.fontSize ?? 16) - 3;
 
   /// Midpoint between outlineVariant and onSurfaceVariant: dim enough not to
   /// shout next to the mode badge, but still legible as text (outlineVariant
@@ -49,10 +56,16 @@ class DiveTypeBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      // Matches DiveModeBadge's padding, including the asymmetric vertical
-      // split that compensates for the ink sitting a hair low within the
-      // tight ascent/descent box textHeightBehavior forces.
-      padding: const EdgeInsets.only(left: 4, right: 4, top: 2.5, bottom: 3.5),
+      // Matches DiveModeBadge's padding for the same dense value, including
+      // the asymmetric vertical split that compensates for the ink sitting a
+      // hair low within the tight ascent/descent box textHeightBehavior
+      // forces.
+      padding: EdgeInsets.only(
+        left: dense ? 3 : 4,
+        right: dense ? 3 : 4,
+        top: dense ? 1.5 : 2.5,
+        bottom: dense ? 2.5 : 3.5,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.surface.withValues(alpha: 0.3),
         border: Border.all(color: colorScheme.outlineVariant),
@@ -62,7 +75,7 @@ class DiveTypeBadge extends StatelessWidget {
         label,
         style: Theme.of(context).textTheme.labelSmall
             ?.copyWith(
-              fontSize: fontSizeOf(context),
+              fontSize: fontSizeOf(context, dense: dense),
               color: _textColor(colorScheme),
               fontWeight: FontWeight.bold,
             )

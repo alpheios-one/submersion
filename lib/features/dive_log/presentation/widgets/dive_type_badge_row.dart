@@ -13,20 +13,26 @@ import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badg
 class DiveTypeBadgeRow extends StatelessWidget {
   final List<String> labels;
 
-  const DiveTypeBadgeRow({super.key, required this.labels});
+  /// Renders every badge (including the "+N" overflow badge) in
+  /// [DiveTypeBadge]'s dense size, matching [DiveModeBadge]'s own `dense`
+  /// variant for list rows.
+  final bool dense;
+
+  const DiveTypeBadgeRow({super.key, required this.labels, this.dense = false});
 
   static const _spacing = 6.0;
 
-  // DiveTypeBadge's horizontal padding (4 each side) plus its 1px border
-  // each side -- the width a badge adds on top of its text.
-  static const _badgeChrome = 4.0 * 2 + 1.0 * 2;
+  // DiveTypeBadge's horizontal padding each side (dense: 3, non-dense: 4)
+  // plus its 1px border each side -- the width a badge adds on top of its
+  // text.
+  static double _badgeChrome(bool dense) => (dense ? 3.0 : 4.0) * 2 + 1.0 * 2;
 
   @override
   Widget build(BuildContext context) {
     if (labels.isEmpty) return const SizedBox.shrink();
 
     final style = Theme.of(context).textTheme.labelSmall?.copyWith(
-      fontSize: DiveTypeBadge.fontSizeOf(context),
+      fontSize: DiveTypeBadge.fontSizeOf(context, dense: dense),
       fontWeight: FontWeight.bold,
     );
     final direction = Directionality.of(context);
@@ -37,7 +43,7 @@ class DiveTypeBadgeRow extends StatelessWidget {
         textDirection: direction,
         maxLines: 1,
       )..layout();
-      return painter.width + _badgeChrome;
+      return painter.width + _badgeChrome(dense);
     }
 
     return LayoutBuilder(
@@ -65,13 +71,13 @@ class DiveTypeBadgeRow extends StatelessWidget {
           children: [
             for (var i = 0; i < visibleCount; i++) ...[
               if (i > 0) const SizedBox(width: _spacing),
-              DiveTypeBadge(label: labels[i]),
+              DiveTypeBadge(label: labels[i], dense: dense),
             ],
             if (hidden.isNotEmpty) ...[
               if (visibleCount > 0) const SizedBox(width: _spacing),
               Tooltip(
                 message: hidden.join(', '),
-                child: DiveTypeBadge(label: '+${hidden.length}'),
+                child: DiveTypeBadge(label: '+${hidden.length}', dense: dense),
               ),
             ],
           ],

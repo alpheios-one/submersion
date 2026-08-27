@@ -35,3 +35,18 @@ DiveTypeLabelResolver watchDiveTypeLabelResolver(
   };
   return (id) => diveTypeLabel(l10n, id, typesById: typesById);
 }
+
+/// Short-form counterpart to [watchDiveTypeLabelResolver], for space
+/// -constrained surfaces like list-row type badges. Same call-once-per-list
+/// contract and empty-map-before-load fallback.
+DiveTypeLabelResolver watchDiveTypeShortLabelResolver(
+  WidgetRef ref,
+  AppLocalizations l10n,
+) {
+  final typesById = {
+    for (final t
+        in ref.watch(diveTypesProvider).value ?? const <DiveTypeEntity>[])
+      t.id: t,
+  };
+  return (id) => diveTypeShortLabel(l10n, id, typesById: typesById);
+}

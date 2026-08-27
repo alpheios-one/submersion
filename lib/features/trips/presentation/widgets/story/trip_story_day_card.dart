@@ -36,6 +36,10 @@ class TripStoryDayCard extends ConsumerWidget {
 
     // Built once for the day's dives rather than per row.
     final diveTypeLabelResolver = watchDiveTypeLabelResolver(ref, context.l10n);
+    final diveTypeShortLabelResolver = watchDiveTypeShortLabelResolver(
+      ref,
+      context.l10n,
+    );
 
     // The day title, subtitle, and Planned chip live in the sticky
     // TripStoryDayHeader above this card; the card is body-only. A planned
@@ -84,6 +88,7 @@ class TripStoryDayCard extends ConsumerWidget {
                   (index, dive) => DiveListItem(
                     summary: DiveSummary.fromDive(dive),
                     diveTypeLabelResolver: diveTypeLabelResolver,
+                    diveTypeShortLabelResolver: diveTypeShortLabelResolver,
                     // The story already holds the full Dive; pass it so the
                     // configurable card can resolve fields absent from the
                     // summary (tanks, SAC, buddies, weights).

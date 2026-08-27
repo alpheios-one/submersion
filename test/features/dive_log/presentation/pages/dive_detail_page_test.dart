@@ -1603,5 +1603,22 @@ void main() {
 
       expect(find.byType(DiveTypeBadge), findsNothing);
     });
+
+    testWidgets(
+      'spells out more badges instead of collapsing when the header is wide',
+      (tester) async {
+        // The cap scales with the header's own width (issue #1269 follow-up)
+        // rather than a flat constant, so a comfortably wide header should
+        // show several real labels, not immediately fall back to "+N".
+        final dive = createTestDiveWithBottomTime().copyWith(
+          diveTypeIds: ['wreck', 'night', 'drift', 'cave'],
+        );
+        await _pumpDetailPage(tester, dive);
+
+        expect(find.text('Wreck'), findsOneWidget);
+        expect(find.text('Night'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }

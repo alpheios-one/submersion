@@ -1237,151 +1237,166 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: colorScheme.primaryContainer,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      '#${dive.diveNumber ?? '-'}',
-                      maxLines: 1,
-                      style: TextStyle(
-                        color: colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold,
-                        // Pin the pre-scale size (CircleAvatar's implicit
-                        // titleMedium default) so FittedBox scales from a
-                        // theme-independent baseline.
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      dive.effectiveName ??
-                          dive.site?.name ??
-                          context.l10n.diveLog_listPage_unknownSite,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    Consumer(
-                      builder: (context, ref, _) {
-                        final count =
-                            ref
-                                .watch(diveOpenFindingsCountProvider(dive.id))
-                                .value ??
-                            0;
-                        if (count == 0) return const SizedBox.shrink();
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: ActionChip(
-                            avatar: Icon(
-                              Icons.rule,
-                              size: 16,
-                              color: colorScheme.tertiary,
-                            ),
-                            label: Text(
-                              context.l10n.dataQuality_detail_chipCount(count),
-                            ),
-                            onPressed: () =>
-                                context.push('/dives/quality?dive=${dive.id}'),
-                          ),
-                        );
-                      },
-                    ),
-                    if (dive.effectiveName != null && dive.site != null)
-                      Text(
-                        dive.site!.name,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    if (dive.site?.locationString.isNotEmpty == true)
-                      Text(
-                        dive.site!.locationString,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    Text(
-                      '${context.l10n.diveLog_detail_label_entry} ${units.formatDateTimeBullet(dive.effectiveEntryTime)}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    if (dive.exitTime != null)
-                      Text(
-                        '${context.l10n.diveLog_detail_label_exit} ${units.formatDateTimeBullet(dive.exitTime!)}',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
+          LayoutBuilder(
+            builder: (context, headerConstraints) {
+              // Scales with the header's own width instead of a flat cap, so
+              // a wide detail pane can spell out more type badges before
+              // collapsing to "+N" while a narrow one still reserves enough
+              // room for the site name/dates column on the left.
+              final badgeMaxWidth = (headerConstraints.maxWidth * 0.35).clamp(
+                120.0,
+                280.0,
+              );
+              return Row(
                 children: [
-                  Row(
-                    children: [
-                      if (dive.rating != null) ...[
-                        ExcludeSemantics(
-                          child: Icon(
-                            Icons.star,
-                            color: Colors.amber.shade600,
-                            size: 20,
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: colorScheme.primaryContainer,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          '#${dive.diveNumber ?? '-'}',
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: colorScheme.onPrimaryContainer,
+                            fontWeight: FontWeight.bold,
+                            // Pin the pre-scale size (CircleAvatar's implicit
+                            // titleMedium default) so FittedBox scales from a
+                            // theme-independent baseline.
+                            fontSize: 16,
                           ),
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${dive.rating}',
-                          // Same ink-centering fix as DiveModeBadge: without
-                          // it this number's default line leading isn't
-                          // split evenly around its own glyph, so it
-                          // doesn't sit on the same visual line as the star
-                          // icon next to it.
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleMedium?.inkCentered,
-                          textHeightBehavior: inkCenteredTextHeightBehavior,
-                        ),
-                        const SizedBox(width: 8),
-                      ],
-                      DiveModeBadge(mode: dive.diveMode),
-                    ],
+                      ),
+                    ),
                   ),
-                  if (dive.diveTypeIds.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    // Capped rather than left unbounded: Row hands a
-                    // non-flex child unbounded width, which would let a
-                    // long run of type badges grow without limit instead of
-                    // wrapping under the rating/mode row.
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 200),
-                      child: DiveTypeBadgeRow(
-                        labels: [
-                          for (final typeId in dive.diveTypeIds)
-                            diveTypeShortLabel(
-                              context.l10n,
-                              typeId,
-                              typesById: diveTypesById,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          dive.effectiveName ??
+                              dive.site?.name ??
+                              context.l10n.diveLog_listPage_unknownSite,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final count =
+                                ref
+                                    .watch(
+                                      diveOpenFindingsCountProvider(dive.id),
+                                    )
+                                    .value ??
+                                0;
+                            if (count == 0) return const SizedBox.shrink();
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: ActionChip(
+                                avatar: Icon(
+                                  Icons.rule,
+                                  size: 16,
+                                  color: colorScheme.tertiary,
+                                ),
+                                label: Text(
+                                  context.l10n.dataQuality_detail_chipCount(
+                                    count,
+                                  ),
+                                ),
+                                onPressed: () => context.push(
+                                  '/dives/quality?dive=${dive.id}',
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        if (dive.effectiveName != null && dive.site != null)
+                          Text(
+                            dive.site!.name,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: colorScheme.onSurfaceVariant),
+                          ),
+                        if (dive.site?.locationString.isNotEmpty == true)
+                          Text(
+                            dive.site!.locationString,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: colorScheme.onSurfaceVariant),
+                          ),
+                        Text(
+                          '${context.l10n.diveLog_detail_label_entry} ${units.formatDateTimeBullet(dive.effectiveEntryTime)}',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: colorScheme.onSurfaceVariant),
+                        ),
+                        if (dive.exitTime != null)
+                          Text(
+                            '${context.l10n.diveLog_detail_label_exit} ${units.formatDateTimeBullet(dive.exitTime!)}',
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: colorScheme.onSurfaceVariant),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          if (dive.rating != null) ...[
+                            ExcludeSemantics(
+                              child: Icon(
+                                Icons.star,
+                                color: Colors.amber.shade600,
+                                size: 20,
+                              ),
                             ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${dive.rating}',
+                              // Same ink-centering fix as DiveModeBadge: without
+                              // it this number's default line leading isn't
+                              // split evenly around its own glyph, so it
+                              // doesn't sit on the same visual line as the star
+                              // icon next to it.
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.inkCentered,
+                              textHeightBehavior: inkCenteredTextHeightBehavior,
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+                          DiveModeBadge(mode: dive.diveMode),
                         ],
                       ),
-                    ),
-                  ],
+                      if (dive.diveTypeIds.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        // Capped rather than left unbounded: Row hands a
+                        // non-flex child unbounded width, which would let a
+                        // long run of type badges grow without limit instead of
+                        // wrapping under the rating/mode row. The cap itself
+                        // scales with the header's width (see badgeMaxWidth)
+                        // rather than a flat constant.
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: badgeMaxWidth),
+                          child: DiveTypeBadgeRow(
+                            labels: [
+                              for (final typeId in dive.diveTypeIds)
+                                diveTypeShortLabel(
+                                  context.l10n,
+                                  typeId,
+                                  typesById: diveTypesById,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ],
-              ),
-            ],
+              );
+            },
           ),
           const SizedBox(height: 16),
           Row(

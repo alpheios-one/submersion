@@ -91,6 +91,10 @@ class RecentDivesCard extends ConsumerWidget {
               ref,
               context.l10n,
             );
+            final diveTypeShortLabelResolver = watchDiveTypeShortLabelResolver(
+              ref,
+              context.l10n,
+            );
 
             final list = Column(
               children: dives.asMap().entries.map((entry) {
@@ -103,6 +107,7 @@ class RecentDivesCard extends ConsumerWidget {
                 return DiveListItem(
                   summary: DiveSummary.fromDive(dive),
                   diveTypeLabelResolver: diveTypeLabelResolver,
+                  diveTypeShortLabelResolver: diveTypeShortLabelResolver,
                   fullDive: dive,
                   diveNumber: dive.diveNumber ?? index + 1,
                   colorValue: getCardColorValueFromDive(dive, colorAttribute),

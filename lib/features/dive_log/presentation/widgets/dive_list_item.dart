@@ -59,11 +59,19 @@ class DiveListItem extends ConsumerWidget {
   /// names, which is the bug #643 fixed.
   final DiveTypeLabelResolver diveTypeLabelResolver;
 
+  /// Resolves a dive-type slug to its short-form abbreviation, for the
+  /// compact and detailed cards' type-badge row (issue #1269 follow-up).
+  /// Required for the same reason as [diveTypeLabelResolver]: a badge row
+  /// falling back to English slugs under a non-English locale is the exact
+  /// bug #643 fixed for the Dive Type slot.
+  final DiveTypeLabelResolver diveTypeShortLabelResolver;
+
   const DiveListItem({
     super.key,
     required this.summary,
     required this.diveNumber,
     required this.diveTypeLabelResolver,
+    required this.diveTypeShortLabelResolver,
     this.fullDive,
     this.colorValue,
     this.minValueInList,
@@ -118,6 +126,7 @@ class DiveListItem extends ConsumerWidget {
           stat1Field: _slotField(slots, 'stat1', DiveField.maxDepth),
           stat2Field: _slotField(slots, 'stat2', DiveField.bottomTime),
           diveTypeLabelResolver: diveTypeLabelResolver,
+          diveTypeShortLabelResolver: diveTypeShortLabelResolver,
           onTap: onTap,
         );
       case ListViewMode.detailed:
@@ -150,6 +159,7 @@ class DiveListItem extends ConsumerWidget {
           summary: summary,
           fullDive: fullDive,
           diveTypeLabelResolver: diveTypeLabelResolver,
+          diveTypeShortLabelResolver: diveTypeShortLabelResolver,
         );
     }
   }
