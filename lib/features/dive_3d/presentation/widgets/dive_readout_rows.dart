@@ -24,12 +24,20 @@ class DiveReadoutLookups {
   final Dive3dSceneData data;
   final ProfileLookup profile;
 
+  /// The nullable views the interpolator needs. `cast` allocates a wrapper
+  /// and [Dive3dSceneData.ttsSeconds] rebuilds the whole series, so both are
+  /// held here rather than re-derived on every tick.
+  final List<double?> depths;
+  final List<double?> ttsSeconds;
+
   /// One entry per tank in [Dive3dSceneData.tankPressures] order; null where
   /// that tank logged no pressure samples.
   final List<ProfileLookupOverPressure?> tankPressure;
 
   DiveReadoutLookups(this.data)
     : profile = ProfileLookup(data.times),
+      depths = data.depths.cast<double?>(),
+      ttsSeconds = data.ttsSeconds,
       tankPressure = [
         for (final points in data.tankPressures.values)
           if (points.isEmpty) null else ProfileLookupOverPressure(points),
@@ -64,7 +72,7 @@ List<ReadoutRow> diveReadoutRows({
     );
   }
 
-  final depth = at(data.depths.cast<double?>());
+  final depth = at(lookups.depths);
   add(
     SceneMetric.depth,
     l10n.dive3d_metric_depth,
@@ -105,7 +113,7 @@ List<ReadoutRow> diveReadoutRows({
     l10n.dive3d_readout_ceiling,
     ceiling == null || ceiling <= 0 ? null : units.formatDepth(ceiling),
   );
-  final tts = at(data.ttsSeconds);
+  final tts = at(lookups.ttsSeconds);
   add(
     SceneMetric.tts,
     l10n.dive3d_metric_tts,

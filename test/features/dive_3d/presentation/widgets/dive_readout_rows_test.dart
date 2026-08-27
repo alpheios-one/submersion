@@ -166,4 +166,15 @@ void main() {
       expect(labels, isNot(contains('Tank 1')));
     },
   );
+
+  test('the per-tick series are derived once, not per call', () {
+    final lookups = DiveReadoutLookups(data);
+    // Same instances on every read: the row builder must only interpolate.
+    expect(identical(lookups.depths, lookups.depths), isTrue);
+    expect(identical(lookups.ttsSeconds, lookups.ttsSeconds), isTrue);
+    // And they are NOT the getter, which rebuilds the series each time.
+    expect(identical(data.ttsSeconds, data.ttsSeconds), isFalse);
+    expect(lookups.ttsSeconds, data.ttsSeconds);
+    expect(lookups.depths, data.depths);
+  });
 }
