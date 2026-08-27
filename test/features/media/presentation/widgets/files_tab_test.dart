@@ -424,6 +424,10 @@ void main() {
 
       expect(find.textContaining('to this dive'), findsNothing);
       expect(find.text('Unmatched'), findsNothing);
+      // The assign affordances are icon buttons carrying only a tooltip, so a
+      // visible-text assertion alone passes vacuously.
+      expect(find.byTooltip('Choose a dive'), findsNothing);
+      expect(find.byTooltip('Add to this dive'), findsNothing);
     });
 
     testWidgets('counts staged files as items, not photos', (tester) async {

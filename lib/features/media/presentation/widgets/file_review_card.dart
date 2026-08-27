@@ -41,6 +41,14 @@ class FileReviewCard extends ConsumerWidget {
   /// time next to the one actually read from the file.
   final Duration captureTimeOffset;
 
+  /// Whether this file can be routed to a dive at all.
+  ///
+  /// False for a site session, where [FilesTabNotifier.commit] persists every
+  /// staged file against the site id and ignores dive grouping outright. A
+  /// dive-assignment action there would appear to do something and in fact do
+  /// nothing.
+  final bool allowDiveAssignment;
+
   const FileReviewCard({
     super.key,
     required this.file,
@@ -48,13 +56,15 @@ class FileReviewCard extends ConsumerWidget {
     this.assignableDiveId,
     this.diagnostic,
     this.captureTimeOffset = Duration.zero,
+    this.allowDiveAssignment = true,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final assignTo = assignableDiveId;
-    final canAssign = assignTo != null && assignTo != targetDiveId;
+    final canAssign =
+        allowDiveAssignment && assignTo != null && assignTo != targetDiveId;
     final reason = diagnostic;
 
     return ListTile(
@@ -88,7 +98,7 @@ class FileReviewCard extends ConsumerWidget {
                   .read(filesTabNotifierProvider.notifier)
                   .assignToDive(file.sourcePath, assignTo),
             )
-          else if (targetDiveId == null)
+          else if (allowDiveAssignment && targetDiveId == null)
             IconButton(
               icon: const Icon(Icons.add_link),
               tooltip: l10n.media_photoPicker_files_chooseDiveTooltip,

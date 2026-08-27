@@ -163,6 +163,11 @@ class FileReviewPane extends ConsumerWidget {
                   file: f,
                   targetDiveId: null,
                   captureTimeOffset: state.captureTimeOffset,
+                  // A site owns every staged file, so there is no dive to
+                  // route one to. Without this the card falls through to its
+                  // "choose a dive" branch, contradicting this method's
+                  // contract below.
+                  allowDiveAssignment: false,
                 ),
             ],
           ),

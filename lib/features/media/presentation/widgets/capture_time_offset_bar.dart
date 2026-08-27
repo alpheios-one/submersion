@@ -59,7 +59,7 @@ class CaptureTimeOffsetBar extends ConsumerWidget {
             tooltip: context.l10n.media_photoPicker_files_offsetResetTooltip,
             onPressed: state.captureTimeOffset == Duration.zero
                 ? null
-                : () => _apply(ref, Duration.zero),
+                : () => _apply(ref, (_) => Duration.zero),
           ),
         ],
       ),
@@ -78,7 +78,7 @@ class CaptureTimeOffsetBar extends ConsumerWidget {
       tooltip: delta.isNegative
           ? context.l10n.media_photoPicker_files_offsetBackTooltip(amount)
           : context.l10n.media_photoPicker_files_offsetForwardTooltip(amount),
-      onPressed: () => _apply(ref, state.captureTimeOffset + delta),
+      onPressed: () => _apply(ref, (current) => current + delta),
     );
   }
 
@@ -87,10 +87,24 @@ class CaptureTimeOffsetBar extends ConsumerWidget {
   ///
   /// Reads [diveBoundsProvider] rather than deriving bounds here so the rule
   /// stays in one place and the picker never has to be reopened to re-match.
-  Future<void> _apply(WidgetRef ref, Duration offset) async {
+  ///
+  /// [nextOffset] receives the offset current *after* the bounds resolve, and
+  /// the files are re-read at the same moment, because awaiting the provider
+  /// opens a window the user can act inside (it reads the database on first
+  /// use). Matching against this widget's build-time [state] instead would
+  /// mean a file removed during that window reappears, since
+  /// [FilesTabNotifier.setCaptureTimeOffset] replaces `match` but not `files`,
+  /// and a second stepper tap would recompute from a stale offset and lose a
+  /// step.
+  Future<void> _apply(
+    WidgetRef ref,
+    Duration Function(Duration current) nextOffset,
+  ) async {
     final bounds = await ref.read(diveBoundsProvider.future);
+    final current = ref.read(filesTabNotifierProvider);
+    final offset = nextOffset(current.captureTimeOffset);
     final match = const DivePhotoMatcher().match(
-      files: state.files,
+      files: current.files,
       dives: bounds,
       offset: offset,
     );

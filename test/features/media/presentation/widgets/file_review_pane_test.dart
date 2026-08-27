@@ -101,4 +101,17 @@ void main() {
 
     expect(find.byType(CaptureTimeOffsetBar), findsNothing);
   });
+
+  testWidgets('the site variant offers no dive assignment affordance', (
+    tester,
+  ) async {
+    // commit() for a site persists every staged file with the site id and
+    // ignores dive grouping outright, so a "choose a dive" action there does
+    // nothing and misleads.
+    await _pumpPane(tester, _staged(), flat: true);
+
+    expect(find.byTooltip('Choose a dive'), findsNothing);
+    expect(find.byTooltip('Add to this dive'), findsNothing);
+    expect(find.byIcon(Icons.add_link), findsNothing);
+  });
 }

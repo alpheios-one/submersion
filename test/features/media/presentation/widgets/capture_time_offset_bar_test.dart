@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -155,5 +156,92 @@ void main() {
       find.widgetWithIcon(IconButton, Icons.restart_alt),
     );
     expect(reset.onPressed, isNull);
+  });
+
+  testWidgets('a file removed while the bounds load is not resurrected', (
+    tester,
+  ) async {
+    // diveBoundsProvider hits the database on first use, so the await in
+    // _apply is a real window. setCaptureTimeOffset replaces `match` but not
+    // `files`; matching against a stale file list would put a removed file
+    // back into a rendered group.
+    final keep = _ef('/keep.jpg', DateTime.utc(2025, 12, 27, 16, 47));
+    final doomed = _ef('/doomed.jpg', DateTime.utc(2025, 12, 27, 16, 50));
+    final seed = FilesTabState.initial().copyWith(
+      files: [keep, doomed],
+      match: MatchedSelection(matched: const {}, unmatched: [keep, doomed]),
+    );
+    final notifier = _SeededFilesTabNotifier(seed);
+    final gate = Completer<List<Dive>>();
+
+    await tester.pumpWidget(
+      testApp(
+        locale: const Locale('en'),
+        overrides: [
+          divesProvider.overrideWith((ref) => gate.future),
+          filesTabNotifierProvider.overrideWith((ref) => notifier),
+        ],
+        child: Consumer(
+          builder: (context, ref, _) =>
+              CaptureTimeOffsetBar(state: ref.watch(filesTabNotifierProvider)),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    // Start the shift, then remove a file before the bounds resolve.
+    await tester.tap(find.byTooltip('Shift 1h 00m earlier'));
+    await tester.pump();
+    notifier.removeFile('/doomed.jpg');
+    expect(notifier.state.files, [keep]);
+
+    gate.complete([_dive]);
+    await tester.pumpAndSettle();
+
+    final everywhere = [
+      ...notifier.state.match.unmatched,
+      ...notifier.state.match.matched.values.expand((l) => l),
+    ].map((f) => f.sourcePath);
+    expect(everywhere, isNot(contains('/doomed.jpg')));
+    expect(notifier.state.files, [keep]);
+  });
+
+  testWidgets('two quick steps both count', (tester) async {
+    // Each tap computed its new offset from the widget's build-time state, so
+    // a second tap landing before the first resolved based its arithmetic on
+    // the same stale value and silently lost a step.
+    final file = _ef('/a.jpg', DateTime.utc(2025, 12, 27, 16, 47));
+    final notifier = _SeededFilesTabNotifier(
+      FilesTabState.initial().copyWith(
+        files: [file],
+        match: MatchedSelection(matched: const {}, unmatched: [file]),
+      ),
+    );
+    final gate = Completer<List<Dive>>();
+
+    await tester.pumpWidget(
+      testApp(
+        locale: const Locale('en'),
+        overrides: [
+          divesProvider.overrideWith((ref) => gate.future),
+          filesTabNotifierProvider.overrideWith((ref) => notifier),
+        ],
+        child: Consumer(
+          builder: (context, ref, _) =>
+              CaptureTimeOffsetBar(state: ref.watch(filesTabNotifierProvider)),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('Shift 1h 00m earlier'));
+    await tester.pump();
+    await tester.tap(find.byTooltip('Shift 1h 00m earlier'));
+    await tester.pump();
+
+    gate.complete([_dive]);
+    await tester.pumpAndSettle();
+
+    expect(notifier.state.captureTimeOffset, const Duration(hours: -2));
   });
 }
