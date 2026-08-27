@@ -131,10 +131,28 @@ Future<AppDataMigrationReport> migrateCompanyDirectory({
       );
     } catch (_) {
       // Rename can fail across volumes or when another process holds a handle
-      // on something in the tree. Fall back to a copy, and deliberately keep
-      // the legacy tree: a copy is not atomic, so leaving the original in place
-      // guarantees one intact copy survives a crash mid-copy.
-      await _copyTree(legacyDir, targetDir);
+      // on something in the tree. Fall back to a copy.
+      //
+      // The copy lands in a staging sibling and is renamed into place, never
+      // directly into the target. A copy is not atomic, and a half-copied
+      // target would look populated to the next launch: the migration would
+      // report targetAlreadyPopulated forever while the app ran on partial
+      // data and the real settings sat stranded under the legacy name. Staging
+      // keeps the target all-or-nothing. The promotion is also a rename WITHIN
+      // the new company directory, so it is same-volume even when the original
+      // rename failed because it crossed volumes.
+      final staging = Directory('$targetPath.migrating');
+      await _deleteQuietly(staging); // leftover from an interrupted attempt
+      try {
+        await _copyTree(legacyDir, staging);
+        await staging.rename(targetPath);
+      } catch (_) {
+        await _deleteQuietly(staging);
+        rethrow;
+      }
+      // The legacy tree is deliberately retained. The target is now complete,
+      // so the next launch no-ops on it; keeping the source costs disk and
+      // buys a manual recovery path.
       return AppDataMigrationReport(
         outcome: AppDataMigrationOutcome.copied,
         legacyPath: legacyPath,
@@ -148,6 +166,16 @@ Future<AppDataMigrationReport> migrateCompanyDirectory({
       targetPath: targetPath,
       error: e,
     );
+  }
+}
+
+/// Best effort removal. Used only for staging leftovers, where a failure to
+/// clean up must not mask the real error or abort the migration.
+Future<void> _deleteQuietly(Directory dir) async {
+  try {
+    if (await dir.exists()) await dir.delete(recursive: true);
+  } catch (_) {
+    // A stale staging directory is harmless; the next attempt overwrites it.
   }
 }
 
