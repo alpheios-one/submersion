@@ -8,6 +8,7 @@ import 'package:submersion/features/marine_life/presentation/utils/species_categ
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/species_sightings_section.dart';
+import 'package:submersion/features/media/presentation/widgets/species_photos_section.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/statistics/domain/entities/species_statistics.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
@@ -74,6 +75,7 @@ class SpeciesDetailPage extends ConsumerWidget {
                 ],
                 const SizedBox(height: 24),
                 _buildStatisticsSection(context, ref),
+                SpeciesPhotosSection(speciesId: speciesId),
                 SpeciesSightingsSection(speciesId: speciesId),
               ],
             ),
