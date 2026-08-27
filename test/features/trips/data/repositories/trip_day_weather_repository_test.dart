@@ -1,5 +1,9 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/data/repositories/sync_repository.dart';
+import 'package:submersion/core/database/database.dart' as db;
+import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/trips/data/repositories/trip_day_weather_repository.dart';
 import 'package:submersion/features/trips/data/repositories/trip_repository.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
@@ -201,6 +205,167 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       expect(emissions, isNotEmpty);
+    });
+  });
+
+  group('rows upsert did not write', () {
+    // Every row in this group goes straight into the table, because that is
+    // the only way one can carry an id other than the derived one: a peer on
+    // an older build of this feature, or a database written before the id
+    // became deterministic. Reconciling rows it did not create is exactly
+    // what the repository is being asked to do here.
+    Future<void> insertRaw({
+      required String id,
+      required DateTime date,
+      double? airTemp,
+      int updatedAt = 0,
+      int createdAt = 0,
+    }) async {
+      await DatabaseService.instance.database
+          .into(DatabaseService.instance.database.tripDayWeather)
+          .insert(
+            db.TripDayWeatherCompanion(
+              id: Value(id),
+              tripId: Value(testTripId),
+              date: Value(date.millisecondsSinceEpoch),
+              latitude: const Value(12.16),
+              longitude: const Value(-68.28),
+              airTemp: Value(airTemp),
+              weatherSource: Value(WeatherSource.openMeteo.name),
+              fetchedAt: const Value(0),
+              createdAt: Value(createdAt),
+              updatedAt: Value(updatedAt),
+            ),
+          );
+    }
+
+    Future<List<db.TripDayWeatherData>> allRows() => DatabaseService
+        .instance
+        .database
+        .select(DatabaseService.instance.database.tripDayWeather)
+        .get();
+
+    test('upsert replaces a same-day row stored under a foreign id', () async {
+      // The unique index is on (trip_id, date) but insertOnConflictUpdate
+      // targets the primary key, so a foreign-id row on the same midnight
+      // makes the canonical insert miss the conflict target and hit the
+      // index. Without cleanup this throws rather than merging.
+      await insertRaw(id: 'from-a-peer', date: day1, airTemp: 10);
+
+      await repository.upsert(sample(airTemp: 25));
+
+      final rows = await allRows();
+      expect(rows, hasLength(1));
+      expect(rows.single.airTemp, 25);
+      expect(rows.single.id, isNot('from-a-peer'));
+    });
+
+    test('upsert replaces a same-day row stored off midnight', () async {
+      await insertRaw(
+        id: 'from-an-older-build',
+        date: DateTime(2026, 3, 8, 17, 30),
+        airTemp: 10,
+      );
+
+      await repository.upsert(sample(airTemp: 25));
+
+      final rows = await allRows();
+      expect(rows, hasLength(1));
+      expect(rows.single.date, day1.millisecondsSinceEpoch);
+      expect(rows.single.airTemp, 25);
+    });
+
+    test('a row for another day is left alone', () async {
+      await insertRaw(id: 'other-day', date: day2, airTemp: 10);
+
+      await repository.upsert(sample());
+
+      final rows = await allRows();
+      expect(rows, hasLength(2));
+      expect(rows.map((r) => r.id), contains('other-day'));
+    });
+
+    test('replacing a stray logs its deletion for sync', () async {
+      // A stray is a synced record. Dropping it without a tombstone lets the
+      // peer that sent it hand it straight back on the next pull.
+      await insertRaw(id: 'from-a-peer', date: day1);
+
+      await repository.upsert(sample());
+
+      final deletions = await SyncRepository().getAllDeletions();
+      expect(
+        deletions.where(
+          (d) =>
+              d.entityType == 'tripDayWeather' && d.recordId == 'from-a-peer',
+        ),
+        hasLength(1),
+      );
+    });
+
+    test('upsert keeps the createdAt of the stray it absorbs', () async {
+      // The stray is this day's row under an old id, not a different record,
+      // so the day keeps the age it already had.
+      await insertRaw(
+        id: 'from-a-peer',
+        date: DateTime(2026, 3, 8, 17, 30),
+        createdAt: 1000,
+      );
+
+      await repository.upsert(sample());
+
+      expect((await allRows()).single.createdAt, 1000);
+    });
+
+    test(
+      'getForTrip prefers the canonical row over a same-day stray',
+      () async {
+        // Reads land between a sync import and the next upsert, so the choice
+        // cannot wait for the write side to tidy up, and it cannot depend on
+        // the order SQLite happens to return rows in.
+        await repository.upsert(sample(airTemp: 25));
+        await insertRaw(
+          id: 'from-a-peer',
+          date: DateTime(2026, 3, 8, 17, 30),
+          airTemp: 10,
+          updatedAt: 9999999,
+        );
+
+        final stored = await repository.getForTrip(testTripId);
+
+        expect(stored, hasLength(1));
+        expect(stored[day1.millisecondsSinceEpoch]!.airTemp, 25);
+      },
+    );
+
+    test('getForTrip falls back to the most recently updated stray', () async {
+      await insertRaw(
+        id: 'peer-a',
+        date: DateTime(2026, 3, 8, 6),
+        airTemp: 10,
+        updatedAt: 100,
+      );
+      await insertRaw(
+        id: 'peer-b',
+        date: DateTime(2026, 3, 8, 23),
+        airTemp: 20,
+        updatedAt: 200,
+      );
+
+      final stored = await repository.getForTrip(testTripId);
+
+      expect(stored, hasLength(1));
+      expect(stored[day1.millisecondsSinceEpoch]!.airTemp, 20);
+    });
+
+    test('getForTrip does not write while resolving strays', () async {
+      // Reads stay pure: a cleanup here would fire the table tick and
+      // invalidate the provider that just read.
+      await insertRaw(id: 'peer-a', date: DateTime(2026, 3, 8, 6));
+      await insertRaw(id: 'peer-b', date: DateTime(2026, 3, 8, 23));
+
+      await repository.getForTrip(testTripId);
+
+      expect(await allRows(), hasLength(2));
     });
   });
 }

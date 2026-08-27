@@ -66,10 +66,13 @@ final tripDayWeatherBackfillProvider = FutureProvider.family<void, String>((
     if (weather == null) continue;
 
     final now = DateTime.now();
+    final dayMillis = tripDayMillis(target.date);
     final row = TripDayWeather(
-      // Ignored by the repository, which derives the id from (trip, day) so
-      // every device converges on one row.
-      id: '',
+      // The repository derives this same id from (trip, day) and never takes
+      // the caller's, so every device converges on one row. Derived here too
+      // rather than left as a placeholder: an entity carrying an id that is
+      // not its own reaches logs and any future validation as a lie.
+      id: tripDayWeatherRowId(tripId: tripId, dayMillis: dayMillis),
       tripId: tripId,
       date: target.date,
       latitude: target.latitude,

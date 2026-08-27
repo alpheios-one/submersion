@@ -8,6 +8,15 @@ import 'package:submersion/features/trips/domain/entities/trip_story_day.dart';
 /// Never change: the ids already stored depend on it.
 const String kTripDayWeatherNamespace = '3f1c8a52-9e47-4d6b-8b3a-16c9d0f27e45';
 
+/// Local midnight for [date], as epoch milliseconds.
+///
+/// The day is the identity of a weather row, so this is what turns a
+/// DateTime into one. Shared rather than reimplemented per caller: the row
+/// id, the repository's storage key, and the map key reads come back under
+/// all have to agree, and three copies of the same two lines would drift.
+int tripDayMillis(DateTime date) =>
+    DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+
 /// Deterministic row id for one trip day.
 ///
 /// The day is the identity, so the id must be derived from it rather than
@@ -18,8 +27,8 @@ const String kTripDayWeatherNamespace = '3f1c8a52-9e47-4d6b-8b3a-16c9d0f27e45';
 /// target entirely and hits the index instead. That throws inside the merge
 /// transaction and aborts the whole sync pull.
 ///
-/// [dayMillis] must already be normalized to local midnight; the repository
-/// does that before calling here.
+/// [dayMillis] must already be normalized to local midnight; pass it through
+/// [tripDayMillis].
 String tripDayWeatherRowId({required String tripId, required int dayMillis}) =>
     const Uuid().v5(kTripDayWeatherNamespace, '$tripId|$dayMillis');
 

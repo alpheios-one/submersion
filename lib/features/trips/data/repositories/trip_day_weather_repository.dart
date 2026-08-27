@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/constants/enums.dart';
@@ -9,7 +10,7 @@ import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart'
     as domain;
 import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart'
-    show tripDayWeatherRowId;
+    show tripDayMillis, tripDayWeatherRowId;
 
 /// Reads and writes stored per-day trip weather.
 ///
@@ -29,8 +30,7 @@ class TripDayWeatherRepository {
   /// calendar day, invisible to every midnight-keyed lookup and refetched on
   /// every view. Reads normalize too, because a row can also arrive through
   /// sync from a peer, bypassing this class entirely.
-  static int _dayKey(DateTime date) =>
-      DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+  static int _dayKey(DateTime date) => tripDayMillis(date);
 
   /// Emits whenever `trip_day_weather` changes, so the display provider
   /// refreshes after a backfill write or a sync import.
@@ -38,15 +38,26 @@ class TripDayWeatherRepository {
       _db.tableUpdates(TableUpdateQuery.onTable(_db.tripDayWeather));
 
   /// Stored weather for a trip, keyed by `date.millisecondsSinceEpoch`.
+  ///
+  /// One entry per calendar day. Where more than one row lands on the same
+  /// day, [_preferred] picks which one shows, and explains how a second row
+  /// gets there in the first place.
   Future<Map<int, domain.TripDayWeather>> getForTrip(String tripId) async {
     try {
       final rows = await (_db.select(
         _db.tripDayWeather,
       )..where((t) => t.tripId.equals(tripId))).get();
-      return {
-        for (final row in rows)
-          _dayKey(DateTime.fromMillisecondsSinceEpoch(row.date)): _mapRow(row),
-      };
+
+      final winners = <int, TripDayWeatherData>{};
+      for (final row in rows) {
+        final day = _dayKey(DateTime.fromMillisecondsSinceEpoch(row.date));
+        final held = winners[day];
+        winners[day] = held == null
+            ? row
+            : _preferred(held, row, tripId: tripId, dayMillis: day);
+      }
+
+      return winners.map((day, row) => MapEntry(day, _mapRow(row)));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to read weather for trip: $tripId',
@@ -71,37 +82,67 @@ class TripDayWeatherRepository {
         dayMillis: dateMillis,
       );
 
+      final sameDay = await _rowsForDay(
+        tripId: weather.tripId,
+        dayMillis: dateMillis,
+      );
       // Only to preserve createdAt across an update; insertOnConflictUpdate
-      // would otherwise overwrite it with this write's timestamp.
-      final existing = await (_db.select(
-        _db.tripDayWeather,
-      )..where((t) => t.id.equals(id))).getSingleOrNull();
+      // would otherwise overwrite it with this write's timestamp. A stray is
+      // this day under an old id rather than a different record, so the day
+      // keeps the age it already had when one is absorbed.
+      final createdAt = sameDay.map((r) => r.createdAt).minOrNull;
+      final strays = sameDay.where((r) => r.id != id).map((r) => r.id).toList();
 
-      await _db
-          .into(_db.tripDayWeather)
-          .insertOnConflictUpdate(
-            TripDayWeatherCompanion(
-              id: Value(id),
-              tripId: Value(weather.tripId),
-              date: Value(dateMillis),
-              latitude: Value(weather.latitude),
-              longitude: Value(weather.longitude),
-              airTemp: Value(weather.airTemp),
-              cloudCover: Value(weather.cloudCover?.name),
-              precipitation: Value(weather.precipitation?.name),
-              windSpeed: Value(weather.windSpeed),
-              windDirection: Value(weather.windDirection?.name),
-              humidity: Value(weather.humidity),
-              surfacePressure: Value(weather.surfacePressure),
-              weatherCode: Value(weather.weatherCode),
-              weatherSource: Value(weather.weatherSource.name),
-              fetchedAt: Value(weather.fetchedAt.millisecondsSinceEpoch),
-              createdAt: Value(
-                existing?.createdAt ?? weather.createdAt.millisecondsSinceEpoch,
+      await _db.transaction(() async {
+        // Strays go before the insert, not after. insertOnConflictUpdate
+        // targets the primary key, so a stray sitting on this same
+        // (trip_id, date) is not a conflict it can absorb: the insert misses
+        // the ON CONFLICT target and hits the unique index instead, which
+        // throws and fails the whole write. One transaction, so a day is
+        // never left with its old row deleted and no new one in its place.
+        if (strays.isNotEmpty) {
+          await (_db.delete(
+            _db.tripDayWeather,
+          )..where((t) => t.id.isIn(strays))).go();
+        }
+
+        await _db
+            .into(_db.tripDayWeather)
+            .insertOnConflictUpdate(
+              TripDayWeatherCompanion(
+                id: Value(id),
+                tripId: Value(weather.tripId),
+                date: Value(dateMillis),
+                latitude: Value(weather.latitude),
+                longitude: Value(weather.longitude),
+                airTemp: Value(weather.airTemp),
+                cloudCover: Value(weather.cloudCover?.name),
+                precipitation: Value(weather.precipitation?.name),
+                windSpeed: Value(weather.windSpeed),
+                windDirection: Value(weather.windDirection?.name),
+                humidity: Value(weather.humidity),
+                surfacePressure: Value(weather.surfacePressure),
+                weatherCode: Value(weather.weatherCode),
+                weatherSource: Value(weather.weatherSource.name),
+                fetchedAt: Value(weather.fetchedAt.millisecondsSinceEpoch),
+                createdAt: Value(
+                  createdAt ?? weather.createdAt.millisecondsSinceEpoch,
+                ),
+                updatedAt: Value(now),
               ),
-              updatedAt: Value(now),
-            ),
-          );
+            );
+      });
+
+      // After the row is in place, so a failed write leaves no tombstone for
+      // a day that still has its original row. A stray is a synced record:
+      // dropping it without one lets the peer that sent it hand it back on
+      // the next pull.
+      for (final stray in strays) {
+        await _syncRepository.logDeletion(
+          entityType: 'tripDayWeather',
+          recordId: stray,
+        );
+      }
 
       await _syncRepository.markRecordPending(
         entityType: 'tripDayWeather',
@@ -148,6 +189,56 @@ class TripDayWeatherRepository {
       );
       rethrow;
     }
+  }
+
+  /// Every stored row for this trip that falls on [dayMillis]'s calendar day.
+  ///
+  /// Filtered in Dart rather than SQL: local midnight is not something SQLite
+  /// can derive from the stored epoch millis without knowing the zone and its
+  /// DST history. A trip holds one row per day, so the scan is a few dozen
+  /// rows at most.
+  Future<List<TripDayWeatherData>> _rowsForDay({
+    required String tripId,
+    required int dayMillis,
+  }) async {
+    final rows = await (_db.select(
+      _db.tripDayWeather,
+    )..where((t) => t.tripId.equals(tripId))).get();
+    return rows
+        .where(
+          (r) =>
+              _dayKey(DateTime.fromMillisecondsSinceEpoch(r.date)) == dayMillis,
+        )
+        .toList();
+  }
+
+  /// Which of two rows for the same calendar day to show.
+  ///
+  /// Two rows reach one day only when [upsert] did not write one of them: a
+  /// peer on a build that predates the derived id, or a database written
+  /// before this class normalized. [upsert] clears them out, but a read can
+  /// land between a sync import and the next write, and it cannot tidy up
+  /// itself: a delete here would fire the table tick that the display
+  /// provider subscribes to and invalidate the read in flight. So it chooses.
+  ///
+  /// The canonical row wins, so what shows now is what the next upsert keeps.
+  /// Failing that the most recently updated wins, and an exact tie falls back
+  /// to the id, so the answer never depends on the order SQLite returned the
+  /// rows in.
+  TripDayWeatherData _preferred(
+    TripDayWeatherData a,
+    TripDayWeatherData b, {
+    required String tripId,
+    required int dayMillis,
+  }) {
+    final canonicalId = tripDayWeatherRowId(
+      tripId: tripId,
+      dayMillis: dayMillis,
+    );
+    if (a.id == canonicalId) return a;
+    if (b.id == canonicalId) return b;
+    if (a.updatedAt != b.updatedAt) return a.updatedAt > b.updatedAt ? a : b;
+    return a.id.compareTo(b.id) <= 0 ? a : b;
   }
 
   domain.TripDayWeather _mapRow(TripDayWeatherData row) {
