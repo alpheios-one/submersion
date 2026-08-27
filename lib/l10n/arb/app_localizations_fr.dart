@@ -21486,7 +21486,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Utilisez un RMV majore pour tenir compte du stress en urgence';
 
   @override
-  String get gasCalculators_rockBottom_stressedSacRates => 'RMV majoree';
+  String get gasCalculators_rockBottom_stressedSacRates => 'RMV majore';
 
   @override
   String get gasCalculators_rockBottom_tankSize => 'Taille du bloc';

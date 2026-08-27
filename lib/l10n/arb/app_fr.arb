@@ -3677,7 +3677,7 @@
   "gasCalculators_rockBottom_safetyStopDuration": "3 minutes a {depth}{unit}",
   "gasCalculators_rockBottom_safetyStopGas": "Gaz du palier de securite (3 min @ {depth}{unit})",
   "gasCalculators_rockBottom_stressedSacHint": "Utilisez un RMV majore pour tenir compte du stress en urgence",
-  "gasCalculators_rockBottom_stressedSacRates": "RMV majoree",
+  "gasCalculators_rockBottom_stressedSacRates": "RMV majore",
   "gasCalculators_rockBottom_tankSize": "Taille du bloc",
   "gasCalculators_rockBottom_totalReserveNeeded": "Reserve totale necessaire",
   "gasCalculators_rockBottom_turnDive": "Faites demi-tour a {pressure} {pressureUnit} restants",

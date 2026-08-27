@@ -13,7 +13,7 @@ void main() {
       home: Scaffold(
         body: UnitSlider(
           icon: Icons.air,
-          label: 'Your SAC',
+          label: 'Your RMV',
           value: value,
           axis: axis,
           onChanged: onChanged,
@@ -22,7 +22,7 @@ void main() {
     );
   }
 
-  testWidgets('renders imperial SAC with two decimals', (tester) async {
+  testWidgets('renders imperial RMV with two decimals', (tester) async {
     final axis = UnitAxis.stressedRmv(
       const UnitFormatter(AppSettings(volumeUnit: VolumeUnit.cubicFeet)),
     );
@@ -46,7 +46,7 @@ void main() {
     expect(emitted, greaterThan(30));
   });
 
-  testWidgets('metric SAC renders whole numbers', (tester) async {
+  testWidgets('metric RMV renders whole numbers', (tester) async {
     final axis = UnitAxis.stressedRmv(const UnitFormatter(AppSettings()));
     await tester.pumpWidget(host(axis, 20, (_) {}));
     expect(find.text('20 L/min'), findsOneWidget);
@@ -66,6 +66,6 @@ void main() {
   testWidgets('exposes the readout to accessibility', (tester) async {
     final axis = UnitAxis.stressedRmv(const UnitFormatter(AppSettings()));
     await tester.pumpWidget(host(axis, 20, (_) {}));
-    expect(find.bySemanticsLabel('Your SAC: 20 L/min'), findsOneWidget);
+    expect(find.bySemanticsLabel('Your RMV: 20 L/min'), findsOneWidget);
   });
 }

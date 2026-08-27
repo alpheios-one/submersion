@@ -61,7 +61,7 @@ class PlanGasSection extends ConsumerWidget {
             ),
           ],
         ),
-        _LoggedSacButton(currentSac: planState.sacRate, units: units),
+        _LoggedRmvButton(currentSac: planState.sacRate, units: units),
         const SizedBox(height: 12),
         _ReservePressureInput(
           reservePressure: planState.reservePressure,
@@ -84,8 +84,8 @@ class PlanGasSection extends ConsumerWidget {
 
 /// One-tap RMV auto-fill from the diver's logged average ("from your log").
 /// Hidden when no logged average exists or it already matches the plan.
-class _LoggedSacButton extends ConsumerWidget {
-  const _LoggedSacButton({required this.currentSac, required this.units});
+class _LoggedRmvButton extends ConsumerWidget {
+  const _LoggedRmvButton({required this.currentSac, required this.units});
 
   final double currentSac;
   final UnitFormatter units;
