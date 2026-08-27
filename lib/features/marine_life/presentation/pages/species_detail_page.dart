@@ -8,6 +8,8 @@ import 'package:submersion/features/marine_life/presentation/utils/species_categ
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/species_sightings_section.dart';
+import 'package:submersion/features/media/data/services/species_tagging_service.dart';
+import 'package:submersion/features/media/presentation/pages/species_tag_picker_page.dart';
 import 'package:submersion/features/media/presentation/widgets/species_photos_section.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/statistics/domain/entities/species_statistics.dart';
@@ -75,7 +77,10 @@ class SpeciesDetailPage extends ConsumerWidget {
                 ],
                 const SizedBox(height: 24),
                 _buildStatisticsSection(context, ref),
-                SpeciesPhotosSection(speciesId: speciesId),
+                SpeciesPhotosSection(
+                  speciesId: speciesId,
+                  onTagPhotos: () => _openTagPicker(context),
+                ),
                 SpeciesSightingsSection(speciesId: speciesId),
               ],
             ),
@@ -388,5 +393,20 @@ class SpeciesDetailPage extends ConsumerWidget {
       case SpeciesCategory.other:
         return Colors.grey;
     }
+  }
+
+  Future<void> _openTagPicker(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final result = await Navigator.of(context).push<TagPhotosResult>(
+      MaterialPageRoute<TagPhotosResult>(
+        fullscreenDialog: true,
+        builder: (_) => SpeciesTagPickerPage(speciesId: speciesId),
+      ),
+    );
+    if (result == null) return;
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.marineLife_tagPicker_tagged(result.tagged))),
+    );
   }
 }
