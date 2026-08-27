@@ -5811,6 +5811,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_filter_clearRating => 'Effacer le filtre d\'evaluation';
 
   @override
+  String get diveLog_filter_clearWeekdays => 'Effacer les jours de la semaine';
+
+  @override
   String get diveLog_filter_dateSeparator => 'au';
 
   @override
@@ -5886,6 +5889,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionTags => 'Tags';
+
+  @override
+  String get diveLog_filter_sectionWeekdays => 'Jours de la semaine';
 
   @override
   String get diveLog_filter_showOnlyFavorites =>

@@ -5769,6 +5769,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_clearRating => 'Ertekeles szuro torlese';
 
   @override
+  String get diveLog_filter_clearWeekdays => 'Het napjai torlese';
+
+  @override
   String get diveLog_filter_dateSeparator => 'tol';
 
   @override
@@ -5843,6 +5846,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionTags => 'Cimkek';
+
+  @override
+  String get diveLog_filter_sectionWeekdays => 'Het napjai';
 
   @override
   String get diveLog_filter_showOnlyFavorites =>
