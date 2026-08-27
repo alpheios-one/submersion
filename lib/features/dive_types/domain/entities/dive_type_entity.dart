@@ -72,6 +72,16 @@ class DiveTypeEntity extends Equatable {
         .replaceAll(RegExp(r'\s+'), '_');
   }
 
+  /// Sentinel marking a `copyWith` parameter as "not provided". Lets callers
+  /// distinguish omitting [shortName] (keep the current value) from passing
+  /// `null` (clear it) -- plain `value ?? this.value` cannot express a clear,
+  /// which broke the edit dialog's "remove an existing short name" flow.
+  /// Mirrors [Diver.copyWith]'s `_unset`/`_resolve` pattern.
+  static const Object _unset = Object();
+
+  static T _resolve<T>(Object? value, T current) =>
+      identical(value, _unset) ? current : value as T;
+
   DiveTypeEntity copyWith({
     String? id,
     String? diverId,
@@ -80,7 +90,7 @@ class DiveTypeEntity extends Equatable {
     int? sortOrder,
     DateTime? createdAt,
     DateTime? updatedAt,
-    String? shortName,
+    Object? shortName = _unset,
     bool? showInDetailHeader,
     bool? showInListView,
   }) {
@@ -92,7 +102,7 @@ class DiveTypeEntity extends Equatable {
       sortOrder: sortOrder ?? this.sortOrder,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      shortName: shortName ?? this.shortName,
+      shortName: _resolve<String?>(shortName, this.shortName),
       showInDetailHeader: showInDetailHeader ?? this.showInDetailHeader,
       showInListView: showInListView ?? this.showInListView,
     );

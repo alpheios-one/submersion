@@ -245,7 +245,13 @@ class DiveTypesPage extends ConsumerWidget {
     DiveTypeEntity diveType,
   ) async {
     final canEditName = !diveType.isBuiltIn;
-    final nameController = TextEditingController(text: diveType.name);
+    // Built-in names are disabled for editing, so show the localized name
+    // (matching the list tile) rather than the seeded English DB value --
+    // otherwise a German-locale diver would see "Wreck" instead of
+    // "Wracktauchen" in a field they can't even change.
+    final nameController = TextEditingController(
+      text: canEditName ? diveType.name : diveType.localizedName(context.l10n),
+    );
     final shortNameController = TextEditingController(
       text: diveType.shortName ?? '',
     );

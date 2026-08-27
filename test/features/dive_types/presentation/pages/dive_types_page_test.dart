@@ -154,6 +154,25 @@ void main() {
     });
 
     testWidgets(
+      'a built-in type\'s disabled name field shows the localized name, '
+      'not the seeded English value',
+      (tester) async {
+        await tester.pumpWidget(
+          _buildPage(diverIdNotifier, const Locale('de')),
+        );
+        await tester.pumpAndSettle();
+
+        await openEditDialogFor(tester, 'Wracktauchen');
+
+        final nameField = tester.widget<TextFormField>(
+          find.byType(TextFormField).first,
+        );
+        expect(nameField.controller?.text, 'Wracktauchen');
+        expect(nameField.controller?.text, isNot('Wreck'));
+      },
+    );
+
+    testWidgets(
       'unchecking "Header" and saving persists and survives a rebuild',
       (tester) async {
         await tester.pumpWidget(
@@ -247,6 +266,30 @@ void main() {
       );
       final saved = dive.firstWhere((t) => t.name == 'Cave System');
       expect(saved.shortName, 'Cave');
+    });
+
+    testWidgets('clearing a custom type\'s short name field removes it '
+        '(regression: copyWith could not clear shortName)', (tester) async {
+      await tester.pumpWidget(_buildPage(diverIdNotifier, const Locale('en')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField).at(0), 'Cenote');
+      await tester.enterText(find.byType(TextFormField).at(1), 'Cen');
+      await tester.tap(find.widgetWithText(FilledButton, 'Add'));
+      await tester.pumpAndSettle();
+
+      var dive = await DiveTypeRepository().getAllDiveTypes(diverId: 'diver-1');
+      expect(dive.firstWhere((t) => t.name == 'Cenote').shortName, 'Cen');
+
+      await openEditDialogFor(tester, 'Cenote');
+      await tester.enterText(find.byType(TextFormField).at(1), '');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      dive = await DiveTypeRepository().getAllDiveTypes(diverId: 'diver-1');
+      expect(dive.firstWhere((t) => t.name == 'Cenote').shortName, isNull);
     });
   });
 }
