@@ -53,7 +53,7 @@ Future<void> showFetchAllConditionsFlow({
   );
   if (confirmed != true || !context.mounted) return;
 
-  final controller = _RunController(total: candidates);
+  final controller = FetchConditionsProgressController(total: candidates);
   final progressDialog = showDialog<void>(
     context: context,
     barrierDismissible: false,
@@ -94,10 +94,14 @@ Future<void> showFetchAllConditionsFlow({
 
 /// Shared state between the run and its progress dialog: the dialog listens
 /// for counts, the run polls [cancelled].
-class _RunController extends ChangeNotifier {
-  _RunController({required this.total});
+class FetchConditionsProgressController extends ChangeNotifier {
+  FetchConditionsProgressController({required this.total});
 
-  final int total;
+  /// Seeded from the count shown in the confirm dialog, then replaced by the
+  /// total the run itself reports. The two are separate reads of the candidate
+  /// set, so anything that changed in between would otherwise leave the bar
+  /// short of, or past, the end.
+  int total;
   int completed = 0;
   bool cancelled = false;
   bool _disposed = false;
@@ -105,6 +109,7 @@ class _RunController extends ChangeNotifier {
   void report(BulkConditionsProgress progress) {
     if (_disposed) return;
     completed = progress.completed;
+    total = progress.total;
     notifyListeners();
   }
 
@@ -124,7 +129,7 @@ class _RunController extends ChangeNotifier {
 class _ProgressDialog extends StatelessWidget {
   const _ProgressDialog({required this.controller});
 
-  final _RunController controller;
+  final FetchConditionsProgressController controller;
 
   @override
   Widget build(BuildContext context) {

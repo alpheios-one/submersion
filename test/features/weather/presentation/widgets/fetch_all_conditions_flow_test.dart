@@ -111,6 +111,28 @@ void main() {
     );
   }
 
+  group('FetchConditionsProgressController', () {
+    test('adopts the total the run reports, not the pre-count', () {
+      // The confirm dialog's count and the run's own candidate query are two
+      // separate reads. If anything changed in between, the run's total is the
+      // truthful one, otherwise the bar never reaches the end.
+      final controller = FetchConditionsProgressController(total: 5);
+
+      controller.report(const BulkConditionsProgress(completed: 2, total: 2));
+
+      expect(controller.completed, 2);
+      expect(controller.total, 2);
+    });
+
+    test('ignores a report that arrives after disposal', () {
+      final controller = FetchConditionsProgressController(total: 3)..dispose();
+
+      controller.report(const BulkConditionsProgress(completed: 1, total: 3));
+
+      expect(controller.completed, 0);
+    });
+  });
+
   testWidgets('confirm dialog names how many dives are missing conditions', (
     tester,
   ) async {

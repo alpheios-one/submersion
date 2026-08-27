@@ -607,6 +607,10 @@ class DiveRepository {
   /// currently NULL. Anything the diver already recorded survives untouched:
   /// an absent [Value] is left out of the UPDATE entirely rather than rewritten.
   ///
+  /// The read and the write run in one transaction. Deciding what to fill needs
+  /// the current row, so without it another write landing in the await gap
+  /// could fill a column between the two and have this update overwrite it.
+  ///
   /// The provenance stamp is only applied when the dive carries no
   /// [WeatherSource] yet, so hand-entered weather is never relabelled as
   /// provider data. Returns whether anything was written.
@@ -624,65 +628,72 @@ class DiveRepository {
     required DateTime fetchedAt,
   }) async {
     try {
-      final row = await (_db.select(
-        _db.dives,
-      )..where((t) => t.id.equals(diveId))).getSingleOrNull();
-      if (row == null) return false;
+      final wrote = await _db.transaction(() async {
+        final row = await (_db.select(
+          _db.dives,
+        )..where((t) => t.id.equals(diveId))).getSingleOrNull();
+        if (row == null) return false;
 
-      Value<T> fill<T extends Object>(T? current, T? incoming) =>
-          current == null && incoming != null
-          ? Value(incoming)
-          : const Value.absent();
+        Value<T> fill<T extends Object>(T? current, T? incoming) =>
+            current == null && incoming != null
+            ? Value(incoming)
+            : const Value.absent();
 
-      final wind = fill(row.windSpeed, windSpeed);
-      final windDir = fill(row.windDirection, windDirection?.name);
-      final cloud = fill(row.cloudCover, cloudCover?.name);
-      final precip = fill(row.precipitation, precipitation?.name);
-      final hum = fill(row.humidity, humidity);
-      final code = fill(row.weatherCode, weatherCode);
-      final air = fill(row.airTemp, airTemp);
-      final pressure = fill(row.surfacePressure, surfacePressure);
+        final wind = fill(row.windSpeed, windSpeed);
+        final windDir = fill(row.windDirection, windDirection?.name);
+        final cloud = fill(row.cloudCover, cloudCover?.name);
+        final precip = fill(row.precipitation, precipitation?.name);
+        final hum = fill(row.humidity, humidity);
+        final code = fill(row.weatherCode, weatherCode);
+        final air = fill(row.airTemp, airTemp);
+        final pressure = fill(row.surfacePressure, surfacePressure);
 
-      final wrote = [
-        wind,
-        windDir,
-        cloud,
-        precip,
-        hum,
-        code,
-        air,
-        pressure,
-      ].any((value) => value.present);
-      if (!wrote) return false;
+        final filledAny = [
+          wind,
+          windDir,
+          cloud,
+          precip,
+          hum,
+          code,
+          air,
+          pressure,
+        ].any((value) => value.present);
+        if (!filledAny) return false;
 
-      final stampProvenance = row.weatherSource == null;
-      final now = DateTime.now().millisecondsSinceEpoch;
-      await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
-        DivesCompanion(
-          windSpeed: wind,
-          windDirection: windDir,
-          cloudCover: cloud,
-          precipitation: precip,
-          humidity: hum,
-          weatherCode: code,
-          airTemp: air,
-          surfacePressure: pressure,
-          weatherSource: stampProvenance
-              ? Value(source.name)
-              : const Value.absent(),
-          weatherFetchedAt: stampProvenance
-              ? Value(fetchedAt.millisecondsSinceEpoch)
-              : const Value.absent(),
-          updatedAt: Value(now),
-        ),
-      );
-      await _syncRepository.markRecordPending(
-        entityType: 'dives',
-        recordId: diveId,
-        localUpdatedAt: now,
-      );
-      SyncEventBus.notifyLocalChange();
-      return true;
+        final stampProvenance = row.weatherSource == null;
+        final now = DateTime.now().millisecondsSinceEpoch;
+        await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
+          DivesCompanion(
+            windSpeed: wind,
+            windDirection: windDir,
+            cloudCover: cloud,
+            precipitation: precip,
+            humidity: hum,
+            weatherCode: code,
+            airTemp: air,
+            surfacePressure: pressure,
+            weatherSource: stampProvenance
+                ? Value(source.name)
+                : const Value.absent(),
+            weatherFetchedAt: stampProvenance
+                ? Value(fetchedAt.millisecondsSinceEpoch)
+                : const Value.absent(),
+            updatedAt: Value(now),
+          ),
+        );
+        // Inside the transaction so the row and its pending marker either both
+        // land or neither does.
+        await _syncRepository.markRecordPending(
+          entityType: 'dives',
+          recordId: diveId,
+          localUpdatedAt: now,
+        );
+        return true;
+      });
+
+      // In-memory notification: only meaningful once the write has committed.
+      if (wrote) SyncEventBus.notifyLocalChange();
+      return wrote;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to fill conditions on dive: $diveId',
