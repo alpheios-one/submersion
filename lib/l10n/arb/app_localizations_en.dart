@@ -19794,6 +19794,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get universalImport_summary_filesTitle => 'Files';
 
   @override
+  String get universalImport_summary_noticesTitle => 'Not in the file';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureTitle =>
+      'Tank pressure not recorded';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureBody =>
+      'Air consumption and SAC cannot be calculated. You can add start and end pressure by editing the dive.';
+
+  @override
+  String universalImport_summary_noticeAffectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Affects $count dives',
+      one: 'Affects 1 dive',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String universalImport_summary_fileImported(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

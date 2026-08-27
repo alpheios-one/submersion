@@ -33450,6 +33450,30 @@ abstract class AppLocalizations {
   /// **'Files'**
   String get universalImport_summary_filesTitle;
 
+  /// No description provided for @universalImport_summary_noticesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in the file'**
+  String get universalImport_summary_noticesTitle;
+
+  /// No description provided for @universalImport_summary_noticeNoTankPressureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank pressure not recorded'**
+  String get universalImport_summary_noticeNoTankPressureTitle;
+
+  /// No description provided for @universalImport_summary_noticeNoTankPressureBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Air consumption and SAC cannot be calculated. You can add start and end pressure by editing the dive.'**
+  String get universalImport_summary_noticeNoTankPressureBody;
+
+  /// No description provided for @universalImport_summary_noticeAffectedDives.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Affects 1 dive} other{Affects {count} dives}}'**
+  String universalImport_summary_noticeAffectedDives(int count);
+
   /// Per-file summary line for a successfully imported file
   ///
   /// In en, this message translates to:

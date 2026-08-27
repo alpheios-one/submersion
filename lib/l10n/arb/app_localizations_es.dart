@@ -20154,6 +20154,28 @@ class AppLocalizationsEs extends AppLocalizations {
   String get universalImport_summary_filesTitle => 'Archivos';
 
   @override
+  String get universalImport_summary_noticesTitle => 'No está en el archivo';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureTitle =>
+      'Presión de la botella no registrada';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureBody =>
+      'No se pueden calcular el consumo de aire ni el SAC. Puedes añadir la presión inicial y final editando la inmersión.';
+
+  @override
+  String universalImport_summary_noticeAffectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Afecta a $count inmersiones',
+      one: 'Afecta a 1 inmersión',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String universalImport_summary_fileImported(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

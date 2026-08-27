@@ -19775,6 +19775,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get universalImport_summary_filesTitle => 'الملفات';
 
   @override
+  String get universalImport_summary_noticesTitle => 'غير موجود في الملف';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureTitle =>
+      'لم يتم تسجيل ضغط الأسطوانة';
+
+  @override
+  String get universalImport_summary_noticeNoTankPressureBody =>
+      'لا يمكن حساب استهلاك الهواء و SAC. يمكنك إضافة ضغط البداية والنهاية بتعديل الغطسة.';
+
+  @override
+  String universalImport_summary_noticeAffectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'يؤثر على $count غطسات',
+      one: 'يؤثر على غطسة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String universalImport_summary_fileImported(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
