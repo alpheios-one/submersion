@@ -74,6 +74,7 @@ class MediaImportView extends ConsumerWidget {
     }
 
     var linked = 0;
+    final importedIds = <String>[];
     final failures = <String, String>{};
 
     void failGroup(List<AssetInfo> group, Object reason) {
@@ -94,6 +95,7 @@ class MediaImportView extends ConsumerWidget {
           dive: dive,
         );
         linked += result.imported.length;
+        importedIds.addAll(result.imported.map((m) => m.id));
         failures.addAll(result.failures);
       } catch (e) {
         failGroup(value, e);
@@ -106,6 +108,7 @@ class MediaImportView extends ConsumerWidget {
           siteId: key,
         );
         linked += result.imported.length;
+        importedIds.addAll(result.imported.map((m) => m.id));
         failures.addAll(result.failures);
       } catch (e) {
         failGroup(value, e);
@@ -115,6 +118,7 @@ class MediaImportView extends ConsumerWidget {
       linked: linked,
       skipped: assets.length - targets.length,
       failures: failures,
+      importedIds: importedIds,
     );
   }
 

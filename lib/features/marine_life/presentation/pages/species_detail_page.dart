@@ -10,6 +10,7 @@ import 'package:submersion/features/marine_life/presentation/providers/species_p
 import 'package:submersion/features/marine_life/presentation/widgets/species_sightings_section.dart';
 import 'package:submersion/features/media/data/services/species_tagging_service.dart';
 import 'package:submersion/features/media/presentation/pages/species_tag_picker_page.dart';
+import 'package:submersion/features/media/presentation/helpers/species_photo_import_helper.dart';
 import 'package:submersion/features/media/presentation/widgets/species_photos_section.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/statistics/domain/entities/species_statistics.dart';
@@ -80,6 +81,12 @@ class SpeciesDetailPage extends ConsumerWidget {
                 SpeciesPhotosSection(
                   speciesId: speciesId,
                   onTagPhotos: () => _openTagPicker(context),
+                  onAddPhotos: () =>
+                      SpeciesPhotoImportHelper.importPhotosForSpecies(
+                        context,
+                        ref,
+                        speciesId: speciesId,
+                      ),
                 ),
                 SpeciesSightingsSection(speciesId: speciesId),
               ],
