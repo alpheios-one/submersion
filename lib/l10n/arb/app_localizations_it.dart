@@ -12864,6 +12864,193 @@ class AppLocalizationsIt extends AppLocalizations {
       'Attiva/disattiva selezione foto, selezionata';
 
   @override
+  String get media_photoPicker_files_pickFilesButton => 'Scegli file…';
+
+  @override
+  String get media_photoPicker_files_pickFolderButton => 'Scegli una cartella…';
+
+  @override
+  String get media_photoPicker_files_autoMatchLabel =>
+      'Associa automaticamente foto e video alle immersioni per data';
+
+  @override
+  String get media_photoPicker_files_emptyHint =>
+      'Scegli file o una cartella per iniziare.';
+
+  @override
+  String media_photoPicker_files_linkButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Collega $count elementi',
+      one: 'Collega 1 elemento',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachToSiteButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Allega $count elementi a questo sito',
+      one: 'Allega 1 elemento a questo sito',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount file',
+      one: '1 file',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount immersioni',
+      one: '1 immersione',
+    );
+    return '$_temp0, $_temp1, $unmatchedCount non associati';
+  }
+
+  @override
+  String media_photoPicker_files_itemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementi',
+      one: '1 elemento',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_diveGroupTitle(String diveId) {
+    return 'Immersione $diveId';
+  }
+
+  @override
+  String media_photoPicker_files_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count file',
+      one: '1 file',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_unmatchedGroupTitle => 'Non associati';
+
+  @override
+  String media_photoPicker_files_addAllToDive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Aggiungi tutti i $count a questa immersione',
+      one: 'Aggiungi 1 a questa immersione',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_addToDiveTooltip =>
+      'Aggiungi a questa immersione';
+
+  @override
+  String get media_photoPicker_files_chooseDiveTooltip =>
+      'Scegli un\'immersione';
+
+  @override
+  String get media_photoPicker_files_removeTooltip => 'Rimuovi dalla selezione';
+
+  @override
+  String get media_photoPicker_files_sourceExif => 'da EXIF';
+
+  @override
+  String get media_photoPicker_files_sourceContainer => 'dai metadati del file';
+
+  @override
+  String get media_photoPicker_files_sourceFileDate => 'dalla data del file';
+
+  @override
+  String get media_photoPicker_files_sourceNone => 'nessuna data trovata';
+
+  @override
+  String media_photoPicker_files_shiftedTime(String shifted, String original) {
+    return '$shifted (era $original)';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoTimestamp =>
+      'Impossibile leggere l\'ora di scatto';
+
+  @override
+  String media_photoPicker_files_reasonBeforeDive(String gap) {
+    return '$gap prima dell\'immersione più vicina';
+  }
+
+  @override
+  String media_photoPicker_files_reasonAfterDive(String gap) {
+    return '$gap dopo l\'immersione più vicina';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoDives =>
+      'Nessuna immersione con cui confrontare';
+
+  @override
+  String get media_photoPicker_files_offsetLabel =>
+      'Sposta gli orari di scatto di';
+
+  @override
+  String get media_photoPicker_files_offsetResetTooltip =>
+      'Azzera lo spostamento';
+
+  @override
+  String media_photoPicker_files_offsetBackTooltip(String amount) {
+    return 'Sposta di $amount prima';
+  }
+
+  @override
+  String media_photoPicker_files_offsetForwardTooltip(String amount) {
+    return 'Sposta di $amount dopo';
+  }
+
+  @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementi collegati',
+      one: '1 elemento collegato',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementi allegati a questo sito',
+      one: '1 elemento allegato a questo sito',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'Annulla';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'Foto gia collegata a questa immersione';
 

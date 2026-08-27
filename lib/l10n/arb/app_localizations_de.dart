@@ -12852,6 +12852,193 @@ class AppLocalizationsDe extends AppLocalizations {
       'Auswahl für Foto umschalten, ausgewählt';
 
   @override
+  String get media_photoPicker_files_pickFilesButton => 'Dateien auswählen…';
+
+  @override
+  String get media_photoPicker_files_pickFolderButton => 'Ordner auswählen…';
+
+  @override
+  String get media_photoPicker_files_autoMatchLabel =>
+      'Fotos und Videos automatisch nach Datum den Tauchgängen zuordnen';
+
+  @override
+  String get media_photoPicker_files_emptyHint =>
+      'Wähle Dateien oder einen Ordner aus, um zu beginnen.';
+
+  @override
+  String media_photoPicker_files_linkButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente verknüpfen',
+      one: '1 Element verknüpfen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachToSiteButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente diesem Tauchplatz zuordnen',
+      one: '1 Element diesem Tauchplatz zuordnen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount Dateien',
+      one: '1 Datei',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount Tauchgänge',
+      one: '1 Tauchgang',
+    );
+    return '$_temp0, $_temp1, $unmatchedCount nicht zugeordnet';
+  }
+
+  @override
+  String media_photoPicker_files_itemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente',
+      one: '1 Element',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_diveGroupTitle(String diveId) {
+    return 'Tauchgang $diveId';
+  }
+
+  @override
+  String media_photoPicker_files_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Dateien',
+      one: '1 Datei',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_unmatchedGroupTitle => 'Nicht zugeordnet';
+
+  @override
+  String media_photoPicker_files_addAllToDive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Alle $count zu diesem Tauchgang hinzufügen',
+      one: '1 zu diesem Tauchgang hinzufügen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_addToDiveTooltip =>
+      'Zu diesem Tauchgang hinzufügen';
+
+  @override
+  String get media_photoPicker_files_chooseDiveTooltip => 'Tauchgang auswählen';
+
+  @override
+  String get media_photoPicker_files_removeTooltip =>
+      'Aus der Auswahl entfernen';
+
+  @override
+  String get media_photoPicker_files_sourceExif => 'aus EXIF';
+
+  @override
+  String get media_photoPicker_files_sourceContainer => 'aus Dateimetadaten';
+
+  @override
+  String get media_photoPicker_files_sourceFileDate => 'aus Dateidatum';
+
+  @override
+  String get media_photoPicker_files_sourceNone => 'kein Datum gefunden';
+
+  @override
+  String media_photoPicker_files_shiftedTime(String shifted, String original) {
+    return '$shifted (war $original)';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoTimestamp =>
+      'Keine Aufnahmezeit lesbar';
+
+  @override
+  String media_photoPicker_files_reasonBeforeDive(String gap) {
+    return '$gap vor dem nächsten Tauchgang';
+  }
+
+  @override
+  String media_photoPicker_files_reasonAfterDive(String gap) {
+    return '$gap nach dem nächsten Tauchgang';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoDives =>
+      'Keine Tauchgänge zum Abgleichen';
+
+  @override
+  String get media_photoPicker_files_offsetLabel =>
+      'Aufnahmezeiten verschieben um';
+
+  @override
+  String get media_photoPicker_files_offsetResetTooltip =>
+      'Verschiebung zurücksetzen';
+
+  @override
+  String media_photoPicker_files_offsetBackTooltip(String amount) {
+    return 'Um $amount früher verschieben';
+  }
+
+  @override
+  String media_photoPicker_files_offsetForwardTooltip(String amount) {
+    return 'Um $amount später verschieben';
+  }
+
+  @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente verknüpft',
+      one: '1 Element verknüpft',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente diesem Tauchplatz zugeordnet',
+      one: '1 Element diesem Tauchplatz zugeordnet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'Rückgängig';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'Foto bereits mit diesem Tauchgang verknüpft';
 

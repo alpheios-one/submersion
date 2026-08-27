@@ -12814,6 +12814,195 @@ class AppLocalizationsHu extends AppLocalizations {
       'Foto kivalasztasanak valtoztatas, kivalasztva';
 
   @override
+  String get media_photoPicker_files_pickFilesButton => 'Fájlok kiválasztása…';
+
+  @override
+  String get media_photoPicker_files_pickFolderButton => 'Mappa kiválasztása…';
+
+  @override
+  String get media_photoPicker_files_autoMatchLabel =>
+      'Fényképek és videók automatikus hozzárendelése merülésekhez dátum alapján';
+
+  @override
+  String get media_photoPicker_files_emptyHint =>
+      'Válassz fájlokat vagy egy mappát a kezdéshez.';
+
+  @override
+  String media_photoPicker_files_linkButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem összekapcsolása',
+      one: '1 elem összekapcsolása',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachToSiteButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem csatolása ehhez a helyszínhez',
+      one: '1 elem csatolása ehhez a helyszínhez',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount fájl',
+      one: '1 fájl',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount merülés',
+      one: '1 merülés',
+    );
+    return '$_temp0, $_temp1, $unmatchedCount nincs hozzárendelve';
+  }
+
+  @override
+  String media_photoPicker_files_itemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem',
+      one: '1 elem',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_diveGroupTitle(String diveId) {
+    return 'Merülés $diveId';
+  }
+
+  @override
+  String media_photoPicker_files_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fájl',
+      one: '1 fájl',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_unmatchedGroupTitle =>
+      'Nincs hozzárendelve';
+
+  @override
+  String media_photoPicker_files_addAllToDive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Mind a $count hozzáadása ehhez a merüléshez',
+      one: '1 hozzáadása ehhez a merüléshez',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_addToDiveTooltip =>
+      'Hozzáadás ehhez a merüléshez';
+
+  @override
+  String get media_photoPicker_files_chooseDiveTooltip =>
+      'Merülés kiválasztása';
+
+  @override
+  String get media_photoPicker_files_removeTooltip =>
+      'Eltávolítás a kijelölésből';
+
+  @override
+  String get media_photoPicker_files_sourceExif => 'EXIF-ből';
+
+  @override
+  String get media_photoPicker_files_sourceContainer => 'fájl metaadatokból';
+
+  @override
+  String get media_photoPicker_files_sourceFileDate => 'fájl dátumából';
+
+  @override
+  String get media_photoPicker_files_sourceNone => 'nincs dátum';
+
+  @override
+  String media_photoPicker_files_shiftedTime(String shifted, String original) {
+    return '$shifted (eredetileg $original)';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoTimestamp =>
+      'A felvétel ideje nem olvasható';
+
+  @override
+  String media_photoPicker_files_reasonBeforeDive(String gap) {
+    return '$gap a legközelebbi merülés előtt';
+  }
+
+  @override
+  String media_photoPicker_files_reasonAfterDive(String gap) {
+    return '$gap a legközelebbi merülés után';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoDives =>
+      'Nincs merülés az összevetéshez';
+
+  @override
+  String get media_photoPicker_files_offsetLabel =>
+      'Felvételi idők eltolása ennyivel:';
+
+  @override
+  String get media_photoPicker_files_offsetResetTooltip =>
+      'Eltolás visszaállítása';
+
+  @override
+  String media_photoPicker_files_offsetBackTooltip(String amount) {
+    return 'Eltolás $amount korábbra';
+  }
+
+  @override
+  String media_photoPicker_files_offsetForwardTooltip(String amount) {
+    return 'Eltolás $amount későbbre';
+  }
+
+  @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem összekapcsolva',
+      one: '1 elem összekapcsolva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem csatolva ehhez a helyszínhez',
+      one: '1 elem csatolva ehhez a helyszínhez',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'Visszavonás';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'A fotó már hozzá van kapcsolva ehhez a merüléshez';
 

@@ -12655,6 +12655,189 @@ class AppLocalizationsEn extends AppLocalizations {
       'Toggle selection for photo, selected';
 
   @override
+  String get media_photoPicker_files_pickFilesButton => 'Pick files…';
+
+  @override
+  String get media_photoPicker_files_pickFolderButton => 'Pick a folder…';
+
+  @override
+  String get media_photoPicker_files_autoMatchLabel =>
+      'Auto-match photos and videos to dives by date';
+
+  @override
+  String get media_photoPicker_files_emptyHint =>
+      'Pick files or a folder to start.';
+
+  @override
+  String media_photoPicker_files_linkButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Link $count items',
+      one: 'Link 1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachToSiteButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Attach $count items to this site',
+      one: 'Attach 1 item to this site',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount files',
+      one: '1 file',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount dives',
+      one: '1 dive',
+    );
+    return '$_temp0, $_temp1, $unmatchedCount unmatched';
+  }
+
+  @override
+  String media_photoPicker_files_itemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_diveGroupTitle(String diveId) {
+    return 'Dive $diveId';
+  }
+
+  @override
+  String media_photoPicker_files_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count files',
+      one: '1 file',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_unmatchedGroupTitle => 'Unmatched';
+
+  @override
+  String media_photoPicker_files_addAllToDive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Add all $count to this dive',
+      one: 'Add 1 to this dive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_addToDiveTooltip => 'Add to this dive';
+
+  @override
+  String get media_photoPicker_files_chooseDiveTooltip => 'Choose a dive';
+
+  @override
+  String get media_photoPicker_files_removeTooltip => 'Remove from selection';
+
+  @override
+  String get media_photoPicker_files_sourceExif => 'from EXIF';
+
+  @override
+  String get media_photoPicker_files_sourceContainer => 'from file metadata';
+
+  @override
+  String get media_photoPicker_files_sourceFileDate => 'from file date';
+
+  @override
+  String get media_photoPicker_files_sourceNone => 'no date found';
+
+  @override
+  String media_photoPicker_files_shiftedTime(String shifted, String original) {
+    return '$shifted (was $original)';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoTimestamp =>
+      'No capture time could be read';
+
+  @override
+  String media_photoPicker_files_reasonBeforeDive(String gap) {
+    return '$gap before the nearest dive';
+  }
+
+  @override
+  String media_photoPicker_files_reasonAfterDive(String gap) {
+    return '$gap after the nearest dive';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoDives =>
+      'No dives to match against';
+
+  @override
+  String get media_photoPicker_files_offsetLabel => 'Shift capture times by';
+
+  @override
+  String get media_photoPicker_files_offsetResetTooltip => 'Reset to no shift';
+
+  @override
+  String media_photoPicker_files_offsetBackTooltip(String amount) {
+    return 'Shift $amount earlier';
+  }
+
+  @override
+  String media_photoPicker_files_offsetForwardTooltip(String amount) {
+    return 'Shift $amount later';
+  }
+
+  @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Linked $count items',
+      one: 'Linked 1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Attached $count items to this site',
+      one: 'Attached 1 item to this site',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'Undo';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'Photo already linked to this dive';
 

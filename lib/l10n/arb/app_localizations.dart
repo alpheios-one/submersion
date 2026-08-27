@@ -21676,6 +21676,196 @@ abstract class AppLocalizations {
   /// **'Toggle selection for photo, selected'**
   String get media_photoPicker_thumbnailToggleSelectedLabel;
 
+  /// No description provided for @media_photoPicker_files_pickFilesButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick files…'**
+  String get media_photoPicker_files_pickFilesButton;
+
+  /// No description provided for @media_photoPicker_files_pickFolderButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a folder…'**
+  String get media_photoPicker_files_pickFolderButton;
+
+  /// No description provided for @media_photoPicker_files_autoMatchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-match photos and videos to dives by date'**
+  String get media_photoPicker_files_autoMatchLabel;
+
+  /// No description provided for @media_photoPicker_files_emptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick files or a folder to start.'**
+  String get media_photoPicker_files_emptyHint;
+
+  /// No description provided for @media_photoPicker_files_linkButton.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Link 1 item} other{Link {count} items}}'**
+  String media_photoPicker_files_linkButton(int count);
+
+  /// No description provided for @media_photoPicker_files_attachToSiteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Attach 1 item to this site} other{Attach {count} items to this site}}'**
+  String media_photoPicker_files_attachToSiteButton(int count);
+
+  /// No description provided for @media_photoPicker_files_summary.
+  ///
+  /// In en, this message translates to:
+  /// **'{fileCount, plural, =1{1 file} other{{fileCount} files}}, {diveCount, plural, =1{1 dive} other{{diveCount} dives}}, {unmatchedCount} unmatched'**
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  );
+
+  /// No description provided for @media_photoPicker_files_itemCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item} other{{count} items}}'**
+  String media_photoPicker_files_itemCount(int count);
+
+  /// No description provided for @media_photoPicker_files_diveGroupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive {diveId}'**
+  String media_photoPicker_files_diveGroupTitle(String diveId);
+
+  /// No description provided for @media_photoPicker_files_groupCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 file} other{{count} files}}'**
+  String media_photoPicker_files_groupCount(int count);
+
+  /// No description provided for @media_photoPicker_files_unmatchedGroupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmatched'**
+  String get media_photoPicker_files_unmatchedGroupTitle;
+
+  /// No description provided for @media_photoPicker_files_addAllToDive.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Add 1 to this dive} other{Add all {count} to this dive}}'**
+  String media_photoPicker_files_addAllToDive(int count);
+
+  /// No description provided for @media_photoPicker_files_addToDiveTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to this dive'**
+  String get media_photoPicker_files_addToDiveTooltip;
+
+  /// No description provided for @media_photoPicker_files_chooseDiveTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a dive'**
+  String get media_photoPicker_files_chooseDiveTooltip;
+
+  /// No description provided for @media_photoPicker_files_removeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from selection'**
+  String get media_photoPicker_files_removeTooltip;
+
+  /// No description provided for @media_photoPicker_files_sourceExif.
+  ///
+  /// In en, this message translates to:
+  /// **'from EXIF'**
+  String get media_photoPicker_files_sourceExif;
+
+  /// No description provided for @media_photoPicker_files_sourceContainer.
+  ///
+  /// In en, this message translates to:
+  /// **'from file metadata'**
+  String get media_photoPicker_files_sourceContainer;
+
+  /// No description provided for @media_photoPicker_files_sourceFileDate.
+  ///
+  /// In en, this message translates to:
+  /// **'from file date'**
+  String get media_photoPicker_files_sourceFileDate;
+
+  /// No description provided for @media_photoPicker_files_sourceNone.
+  ///
+  /// In en, this message translates to:
+  /// **'no date found'**
+  String get media_photoPicker_files_sourceNone;
+
+  /// No description provided for @media_photoPicker_files_shiftedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'{shifted} (was {original})'**
+  String media_photoPicker_files_shiftedTime(String shifted, String original);
+
+  /// No description provided for @media_photoPicker_files_reasonNoTimestamp.
+  ///
+  /// In en, this message translates to:
+  /// **'No capture time could be read'**
+  String get media_photoPicker_files_reasonNoTimestamp;
+
+  /// No description provided for @media_photoPicker_files_reasonBeforeDive.
+  ///
+  /// In en, this message translates to:
+  /// **'{gap} before the nearest dive'**
+  String media_photoPicker_files_reasonBeforeDive(String gap);
+
+  /// No description provided for @media_photoPicker_files_reasonAfterDive.
+  ///
+  /// In en, this message translates to:
+  /// **'{gap} after the nearest dive'**
+  String media_photoPicker_files_reasonAfterDive(String gap);
+
+  /// No description provided for @media_photoPicker_files_reasonNoDives.
+  ///
+  /// In en, this message translates to:
+  /// **'No dives to match against'**
+  String get media_photoPicker_files_reasonNoDives;
+
+  /// No description provided for @media_photoPicker_files_offsetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift capture times by'**
+  String get media_photoPicker_files_offsetLabel;
+
+  /// No description provided for @media_photoPicker_files_offsetResetTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to no shift'**
+  String get media_photoPicker_files_offsetResetTooltip;
+
+  /// No description provided for @media_photoPicker_files_offsetBackTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift {amount} earlier'**
+  String media_photoPicker_files_offsetBackTooltip(String amount);
+
+  /// No description provided for @media_photoPicker_files_offsetForwardTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift {amount} later'**
+  String media_photoPicker_files_offsetForwardTooltip(String amount);
+
+  /// No description provided for @media_photoPicker_files_linkedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Linked 1 item} other{Linked {count} items}}'**
+  String media_photoPicker_files_linkedCount(int count);
+
+  /// No description provided for @media_photoPicker_files_attachedToSiteCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Attached 1 item to this site} other{Attached {count} items to this site}}'**
+  String media_photoPicker_files_attachedToSiteCount(int count);
+
+  /// No description provided for @media_photoPicker_files_undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get media_photoPicker_files_undo;
+
   /// No description provided for @media_photoPicker_thumbnailAlreadyLinkedLabel.
   ///
   /// In en, this message translates to:

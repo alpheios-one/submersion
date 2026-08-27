@@ -12630,6 +12630,191 @@ class AppLocalizationsAr extends AppLocalizations {
       'تبديل اختيار الصورة، محددة';
 
   @override
+  String get media_photoPicker_files_pickFilesButton => 'اختيار الملفات…';
+
+  @override
+  String get media_photoPicker_files_pickFolderButton => 'اختيار مجلد…';
+
+  @override
+  String get media_photoPicker_files_autoMatchLabel =>
+      'مطابقة الصور ومقاطع الفيديو تلقائيًا مع الغوصات حسب التاريخ';
+
+  @override
+  String get media_photoPicker_files_emptyHint => 'اختر ملفات أو مجلدًا للبدء.';
+
+  @override
+  String media_photoPicker_files_linkButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ربط $count عناصر',
+      one: 'ربط عنصر واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachToSiteButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'إرفاق $count عناصر بهذا الموقع',
+      one: 'إرفاق عنصر واحد بهذا الموقع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount ملفات',
+      one: 'ملف واحد',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount غوصات',
+      one: 'غوصة واحدة',
+    );
+    return '$_temp0، $_temp1، $unmatchedCount غير مطابق';
+  }
+
+  @override
+  String media_photoPicker_files_itemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count عناصر',
+      one: 'عنصر واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_diveGroupTitle(String diveId) {
+    return 'الغوصة $diveId';
+  }
+
+  @override
+  String media_photoPicker_files_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ملفات',
+      one: 'ملف واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_unmatchedGroupTitle => 'غير مطابق';
+
+  @override
+  String media_photoPicker_files_addAllToDive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'إضافة كل الـ $count إلى هذه الغوصة',
+      one: 'إضافة عنصر واحد إلى هذه الغوصة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_addToDiveTooltip => 'إضافة إلى هذه الغوصة';
+
+  @override
+  String get media_photoPicker_files_chooseDiveTooltip => 'اختيار غوصة';
+
+  @override
+  String get media_photoPicker_files_removeTooltip => 'إزالة من التحديد';
+
+  @override
+  String get media_photoPicker_files_sourceExif => 'من EXIF';
+
+  @override
+  String get media_photoPicker_files_sourceContainer =>
+      'من بيانات الملف الوصفية';
+
+  @override
+  String get media_photoPicker_files_sourceFileDate => 'من تاريخ الملف';
+
+  @override
+  String get media_photoPicker_files_sourceNone => 'لم يُعثر على تاريخ';
+
+  @override
+  String media_photoPicker_files_shiftedTime(String shifted, String original) {
+    return '$shifted (كان $original)';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoTimestamp =>
+      'تعذّرت قراءة وقت الالتقاط';
+
+  @override
+  String media_photoPicker_files_reasonBeforeDive(String gap) {
+    return '$gap قبل أقرب غوصة';
+  }
+
+  @override
+  String media_photoPicker_files_reasonAfterDive(String gap) {
+    return '$gap بعد أقرب غوصة';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoDives =>
+      'لا توجد غوصات للمطابقة معها';
+
+  @override
+  String get media_photoPicker_files_offsetLabel =>
+      'إزاحة أوقات الالتقاط بمقدار';
+
+  @override
+  String get media_photoPicker_files_offsetResetTooltip =>
+      'إعادة تعيين الإزاحة';
+
+  @override
+  String media_photoPicker_files_offsetBackTooltip(String amount) {
+    return 'إزاحة $amount للخلف';
+  }
+
+  @override
+  String media_photoPicker_files_offsetForwardTooltip(String amount) {
+    return 'إزاحة $amount للأمام';
+  }
+
+  @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم ربط $count عناصر',
+      one: 'تم ربط عنصر واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم إرفاق $count عناصر بهذا الموقع',
+      one: 'تم إرفاق عنصر واحد بهذا الموقع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'تراجع';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'الصورة مرتبطة بالفعل بهذه الغوصة';
 

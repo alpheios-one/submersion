@@ -12545,6 +12545,188 @@ class AppLocalizationsHe extends AppLocalizations {
       'החלף מצב בחירה לתמונה, נבחרה';
 
   @override
+  String get media_photoPicker_files_pickFilesButton => 'בחירת קבצים…';
+
+  @override
+  String get media_photoPicker_files_pickFolderButton => 'בחירת תיקייה…';
+
+  @override
+  String get media_photoPicker_files_autoMatchLabel =>
+      'התאמה אוטומטית של תמונות וסרטונים לצלילות לפי תאריך';
+
+  @override
+  String get media_photoPicker_files_emptyHint =>
+      'בחר קבצים או תיקייה כדי להתחיל.';
+
+  @override
+  String media_photoPicker_files_linkButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'קישור $count פריטים',
+      one: 'קישור פריט אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachToSiteButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'צירוף $count פריטים לאתר זה',
+      one: 'צירוף פריט אחד לאתר זה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount קבצים',
+      one: 'קובץ אחד',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount צלילות',
+      one: 'צלילה אחת',
+    );
+    return '$_temp0, $_temp1, $unmatchedCount ללא התאמה';
+  }
+
+  @override
+  String media_photoPicker_files_itemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטים',
+      one: 'פריט אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_diveGroupTitle(String diveId) {
+    return 'צלילה $diveId';
+  }
+
+  @override
+  String media_photoPicker_files_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count קבצים',
+      one: 'קובץ אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_unmatchedGroupTitle => 'ללא התאמה';
+
+  @override
+  String media_photoPicker_files_addAllToDive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'הוספת כל $count הפריטים לצלילה זו',
+      one: 'הוספת פריט אחד לצלילה זו',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_addToDiveTooltip => 'הוספה לצלילה זו';
+
+  @override
+  String get media_photoPicker_files_chooseDiveTooltip => 'בחירת צלילה';
+
+  @override
+  String get media_photoPicker_files_removeTooltip => 'הסרה מהבחירה';
+
+  @override
+  String get media_photoPicker_files_sourceExif => 'מ-EXIF';
+
+  @override
+  String get media_photoPicker_files_sourceContainer => 'ממטא-נתוני הקובץ';
+
+  @override
+  String get media_photoPicker_files_sourceFileDate => 'מתאריך הקובץ';
+
+  @override
+  String get media_photoPicker_files_sourceNone => 'לא נמצא תאריך';
+
+  @override
+  String media_photoPicker_files_shiftedTime(String shifted, String original) {
+    return '$shifted (היה $original)';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoTimestamp =>
+      'לא ניתן לקרוא את זמן הצילום';
+
+  @override
+  String media_photoPicker_files_reasonBeforeDive(String gap) {
+    return '$gap לפני הצלילה הקרובה ביותר';
+  }
+
+  @override
+  String media_photoPicker_files_reasonAfterDive(String gap) {
+    return '$gap אחרי הצלילה הקרובה ביותר';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoDives => 'אין צלילות להשוואה';
+
+  @override
+  String get media_photoPicker_files_offsetLabel => 'הסטת זמני הצילום ב-';
+
+  @override
+  String get media_photoPicker_files_offsetResetTooltip => 'איפוס ההסטה';
+
+  @override
+  String media_photoPicker_files_offsetBackTooltip(String amount) {
+    return 'הסטה של $amount אחורה';
+  }
+
+  @override
+  String media_photoPicker_files_offsetForwardTooltip(String amount) {
+    return 'הסטה של $amount קדימה';
+  }
+
+  @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטים קושרו',
+      one: 'פריט אחד קושר',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטים צורפו לאתר זה',
+      one: 'פריט אחד צורף לאתר זה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'ביטול';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'תמונה כבר מקושרת לצלילה זו';
 

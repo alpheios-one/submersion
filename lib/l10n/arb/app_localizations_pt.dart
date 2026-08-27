@@ -12861,6 +12861,194 @@ class AppLocalizationsPt extends AppLocalizations {
       'Alternar selecao da foto, selecionada';
 
   @override
+  String get media_photoPicker_files_pickFilesButton => 'Escolher arquivos…';
+
+  @override
+  String get media_photoPicker_files_pickFolderButton => 'Escolher uma pasta…';
+
+  @override
+  String get media_photoPicker_files_autoMatchLabel =>
+      'Associar automaticamente fotos e vídeos aos mergulhos por data';
+
+  @override
+  String get media_photoPicker_files_emptyHint =>
+      'Escolha arquivos ou uma pasta para começar.';
+
+  @override
+  String media_photoPicker_files_linkButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Vincular $count itens',
+      one: 'Vincular 1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachToSiteButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Anexar $count itens a este ponto',
+      one: 'Anexar 1 item a este ponto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_summary(
+    int fileCount,
+    int diveCount,
+    Object unmatchedCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fileCount,
+      locale: localeName,
+      other: '$fileCount arquivos',
+      one: '1 arquivo',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount mergulhos',
+      one: '1 mergulho',
+    );
+    return '$_temp0, $_temp1, $unmatchedCount sem associação';
+  }
+
+  @override
+  String media_photoPicker_files_itemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count itens',
+      one: '1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_diveGroupTitle(String diveId) {
+    return 'Mergulho $diveId';
+  }
+
+  @override
+  String media_photoPicker_files_groupCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count arquivos',
+      one: '1 arquivo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_unmatchedGroupTitle => 'Sem associação';
+
+  @override
+  String media_photoPicker_files_addAllToDive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Adicionar todos os $count a este mergulho',
+      one: 'Adicionar 1 a este mergulho',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_addToDiveTooltip =>
+      'Adicionar a este mergulho';
+
+  @override
+  String get media_photoPicker_files_chooseDiveTooltip =>
+      'Escolher um mergulho';
+
+  @override
+  String get media_photoPicker_files_removeTooltip => 'Remover da seleção';
+
+  @override
+  String get media_photoPicker_files_sourceExif => 'do EXIF';
+
+  @override
+  String get media_photoPicker_files_sourceContainer =>
+      'dos metadados do arquivo';
+
+  @override
+  String get media_photoPicker_files_sourceFileDate => 'da data do arquivo';
+
+  @override
+  String get media_photoPicker_files_sourceNone => 'nenhuma data encontrada';
+
+  @override
+  String media_photoPicker_files_shiftedTime(String shifted, String original) {
+    return '$shifted (era $original)';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoTimestamp =>
+      'Não foi possível ler a hora de captura';
+
+  @override
+  String media_photoPicker_files_reasonBeforeDive(String gap) {
+    return '$gap antes do mergulho mais próximo';
+  }
+
+  @override
+  String media_photoPicker_files_reasonAfterDive(String gap) {
+    return '$gap depois do mergulho mais próximo';
+  }
+
+  @override
+  String get media_photoPicker_files_reasonNoDives =>
+      'Nenhum mergulho para comparar';
+
+  @override
+  String get media_photoPicker_files_offsetLabel =>
+      'Deslocar as horas de captura em';
+
+  @override
+  String get media_photoPicker_files_offsetResetTooltip =>
+      'Redefinir sem deslocamento';
+
+  @override
+  String media_photoPicker_files_offsetBackTooltip(String amount) {
+    return 'Deslocar $amount antes';
+  }
+
+  @override
+  String media_photoPicker_files_offsetForwardTooltip(String amount) {
+    return 'Deslocar $amount depois';
+  }
+
+  @override
+  String media_photoPicker_files_linkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count itens vinculados',
+      one: '1 item vinculado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String media_photoPicker_files_attachedToSiteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count itens anexados a este ponto',
+      one: '1 item anexado a este ponto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get media_photoPicker_files_undo => 'Desfazer';
+
+  @override
   String get media_photoPicker_thumbnailAlreadyLinkedLabel =>
       'Foto ja vinculada a este mergulho';
 
