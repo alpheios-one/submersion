@@ -166,6 +166,46 @@ void main() {
     expect(find.text('Assigned Blue Hole'), findsOneWidget);
   });
 
+  testWidgets('hides when the edit form already holds a located site', (
+    tester,
+  ) async {
+    // The dive is still siteless in the database, so the provider yields a
+    // suggestion, but the diver has already picked a site with coordinates
+    // and not saved it yet. Offering to place one would be noise.
+    await tester.pumpWidget(
+      await host(
+        suggestionFor(service, status: ProposalStatus.none),
+        currentSite: const DiveSite(
+          id: 's1',
+          name: 'Blue Hole',
+          location: GeoPoint(0, 0),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Location'), findsNothing);
+  });
+
+  testWidgets('hides when the form holds a site the dive was not saved with', (
+    tester,
+  ) async {
+    // addLocation writes to the dive's persisted site, so labelling the
+    // button with the unsaved one would point at the wrong site entirely.
+    await tester.pumpWidget(
+      await host(
+        suggestionFor(
+          service,
+          site: const DiveSite(id: 'persisted', name: 'Persisted'),
+        ),
+        currentSite: const DiveSite(id: 'unsaved', name: 'Elsewhere'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Location'), findsNothing);
+  });
+
   testWidgets('dismiss writes the flag', (tester) async {
     await tester.pumpWidget(
       await host(suggestionFor(service, status: ProposalStatus.none)),

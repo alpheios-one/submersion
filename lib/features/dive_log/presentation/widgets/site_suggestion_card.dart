@@ -46,6 +46,15 @@ class SiteSuggestionCard extends ConsumerWidget {
     if (suggestion == null) return const SizedBox.shrink();
 
     final proposal = suggestion.proposal;
+    // The suggestion describes what is persisted, but an edit form can hold a
+    // site the diver has not saved yet. If that one already has coordinates,
+    // or is simply a different site, the banner would offer to place a site
+    // it is not actually going to write to. Wait until the form and the
+    // database agree again.
+    if (currentSite?.hasCoordinates == true) return const SizedBox.shrink();
+    if (currentSite?.id != proposal.dive.site?.id) {
+      return const SizedBox.shrink();
+    }
     final units = UnitFormatter(ref.watch(settingsProvider));
     final hasSite = currentSite != null || proposal.dive.site != null;
     final recommended = proposal.recommendedCandidateId == null
