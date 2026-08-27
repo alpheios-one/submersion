@@ -3205,6 +3205,7 @@
   "diveLog_filter_clearAll": "Clear All",
   "diveLog_filter_clearDates": "Clear dates",
   "diveLog_filter_clearRating": "Clear rating filter",
+  "diveLog_filter_clearWeekdays": "Clear weekdays",
   "diveLog_filter_dateSeparator": "to",
   "diveLog_filter_endDate": "End Date",
   "diveLog_filter_errorLoadingSites": "Error loading sites",
@@ -3230,6 +3231,7 @@
   "diveLog_filter_sectionGasMix": "Gas Mix (O₂%)",
   "diveLog_filter_sectionMinRating": "Minimum Rating",
   "diveLog_filter_sectionTags": "Tags",
+  "diveLog_filter_sectionWeekdays": "Weekdays",
   "diveLog_filter_showOnlyFavorites": "Show only favorite dives",
   "diveLog_filter_showOnlyNoBuddy": "Show only dives without a buddy",
   "diveLog_filter_startDate": "Start Date",
@@ -3795,7 +3797,9 @@
   "diveLog_search_errorLoadingCenters": "Error loading dive centers",
   "diveLog_search_errorLoadingDiveTypes": "Error loading dive types",
   "diveLog_search_errorLoadingTrips": "Error loading trips",
+  "diveLog_search_filter_any": "Any",
   "diveLog_search_gasTrimix": "Trimix (<21% O₂)",
+  "diveLog_search_label_deco": "Decompression",
   "diveLog_search_label_depthRange": "Depth Range (m)",
   "diveLog_search_label_diveCenter": "Dive Center",
   "diveLog_search_label_diveSite": "Dive Site",
@@ -4805,7 +4809,7 @@
     }
   },
   "diveSites_edit_gps_gettingLocation": "Getting...",
-  "diveSites_edit_gps_helperText": "Choose a location method - coordinates will auto-fill country and region",
+  "diveSites_edit_gps_helperText": "Choose a location method or look up the coordinates to auto-fill country, region, town and body of water",
   "diveSites_edit_gps_latitude_hint": "e.g., 21.4225",
   "diveSites_edit_gps_latitude_label": "Latitude",
   "diveSites_edit_gps_latitude_validation": "Invalid latitude",
@@ -4813,6 +4817,13 @@
   "diveSites_edit_gps_longitude_label": "Longitude",
   "diveSites_edit_gps_longitude_validation": "Invalid longitude",
   "diveSites_edit_gps_pickFromMap": "Pick from Map",
+  "diveSites_edit_gps_lookupFromCoordinates": "Look up from coordinates",
+  "diveSites_edit_snackbar_lookupNothingFound": "No location details found for these coordinates",
+  "diveSites_edit_snackbar_lookupFailed": "Location lookup failed. Check your connection and try again.",
+  "diveSites_edit_lookupReplace_title": "Replace location details?",
+  "diveSites_edit_lookupReplace_body": "The lookup found different values for these fields:",
+  "diveSites_edit_lookupReplace_replace": "Replace",
+  "diveSites_edit_lookupReplace_keep": "Keep",
   "diveSites_edit_gps_useMyLocation": "Use My Location",
   "diveSites_edit_hazards_helperText": "List any hazards or safety considerations",
   "diveSites_edit_hazards_hint": "e.g., Strong currents, boat traffic, jellyfish, sharp coral",
@@ -4939,6 +4950,49 @@
   "diveSites_list_error_retry": "Retry",
   "diveSites_list_menu_import": "Import",
   "diveSites_list_menu_select": "Select sites",
+  "diveSites_list_menu_fillLocationDetails": "Fill in missing location details",
+  "diveSites_backfill_confirm_title": "Fill in missing location details?",
+  "diveSites_backfill_confirm_body": "{count, plural, =1{1 site with coordinates has an empty country, region, town or body of water.} other{{count} sites with coordinates have an empty country, region, town or body of water.}} Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about {minutes, plural, =1{1 minute} other{{minutes} minutes}}.",
+  "@diveSites_backfill_confirm_body": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_confirm_start": "Start",
+  "diveSites_backfill_nothingToFill": "Every site with coordinates already has its location details.",
+  "diveSites_backfill_progress_title": "Filling in location details",
+  "diveSites_backfill_progress_count": "{done} of {total}",
+  "@diveSites_backfill_progress_count": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_cancel": "Cancel",
+  "diveSites_backfill_summary": "Updated {updated}, unchanged {unchanged}, failed {failed}",
+  "@diveSites_backfill_summary": {
+    "placeholders": {
+      "updated": {
+        "type": "int"
+      },
+      "unchanged": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "diveSites_backfill_offline": "Location lookup is unavailable. Check your connection and try again.",
   "diveSites_list_search_backTooltip": "Back",
   "diveSites_list_search_clearTooltip": "Clear Search",
   "diveSites_list_search_emptyHint": "Search by site name, country, or region",
@@ -13747,6 +13801,9 @@
       }
     }
   },
+  "gpsLogger_summary_tracks": "Tracks",
+  "gpsLogger_summary_recordedTime": "Recorded time",
+  "gpsLogger_summary_divesCovered": "Dives covered",
   "gpsLogger_trackSubtitle": "{count, plural, one{{count} point} other{{count} points}}, {duration}",
   "@gpsLogger_trackSubtitle": {
     "placeholders": {
@@ -16191,6 +16248,8 @@
   },
   "settings_coordinateFormat_title": "Coordinate format",
   "settings_coordinateFormat_subtitle": "How GPS positions are shown and entered",
+  "settings_placeNameLanguage_title": "Place name language",
+  "settings_placeNameLanguage_subtitle": "Used when country, region, town and body of water are looked up from coordinates. Existing sites are not changed.",
   "settings_coordinateFormat_decimalDegrees": "Decimal degrees",
   "settings_coordinateFormat_degreesDecimalMinutes": "Degrees and decimal minutes",
   "settings_coordinateFormat_degreesMinutesSeconds": "Degrees, minutes, seconds",

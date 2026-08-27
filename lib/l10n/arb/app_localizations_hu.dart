@@ -5769,6 +5769,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_clearRating => 'Ertekeles szuro torlese';
 
   @override
+  String get diveLog_filter_clearWeekdays => 'Het napjai torlese';
+
+  @override
   String get diveLog_filter_dateSeparator => 'tol';
 
   @override
@@ -5843,6 +5846,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionTags => 'Cimkek';
+
+  @override
+  String get diveLog_filter_sectionWeekdays => 'Het napjai';
 
   @override
   String get diveLog_filter_showOnlyFavorites =>
@@ -7067,7 +7073,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Hiba az utazasok betoltesekor';
 
   @override
+  String get diveLog_search_filter_any => 'Bármely';
+
+  @override
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
+
+  @override
+  String get diveLog_search_label_deco => 'Dekompresszio';
 
   @override
   String get diveLog_search_label_depthRange => 'Melyseg tartomany (m)';
@@ -8242,7 +8254,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'Valasszon helymeghatarozoasi modszert - a koordinatak automatikusan kitoltik az orszagot es a regiot';
+      'Válasszon helymeghatározási módot, vagy kérdezze le a koordinátákat az ország, régió, település és víztest automatikus kitöltéséhez';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'pl. 21.4225';
@@ -8264,6 +8276,31 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'Kivalasztas terkeprol';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'Lekérdezés a koordinátákból';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'Nem található helyadat ezekhez a koordinátákhoz';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'A helylekérdezés nem sikerült. Ellenőrizze a kapcsolatot, és próbálja újra.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => 'Lecseréli a helyadatokat?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'A lekérdezés eltérő értékeket talált ezekhez a mezőkhöz:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'Csere';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'Megtartás';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'Sajat helyzet hasznalata';
@@ -8743,6 +8780,54 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveSites_list_menu_select => 'Merülőhelyek kiválasztása';
+
+  @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Hiányzó helyadatok kitöltése';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      'Kitölti a hiányzó helyadatokat?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count koordinátával rendelkező merülőhelynek üres az országa, régiója, települése vagy víztestje.',
+      one:
+          '1 koordinátával rendelkező merülőhelynek üres az országa, régiója, települése vagy víztestje.',
+    );
+    return '$_temp0 A Submersion mindegyiket lekérdezi az OpenStreetMapról, és csak az üres mezőket tölti ki. Ez körülbelül $minutes percet vesz igénybe.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Indítás';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Minden koordinátával rendelkező merülőhelynek megvannak a helyadatai.';
+
+  @override
+  String get diveSites_backfill_progress_title => 'Helyadatok kitöltése';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done / $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Mégse';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Frissítve $updated, változatlan $unchanged, sikertelen $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'A helylekérdezés nem érhető el. Ellenőrizze a kapcsolatot, és próbálja újra.';
 
   @override
   String get diveSites_list_search_backTooltip => 'Vissza';
@@ -21447,6 +21532,15 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get gpsLogger_summary_tracks => 'Útvonalak';
+
+  @override
+  String get gpsLogger_summary_recordedTime => 'Rögzített idő';
+
+  @override
+  String get gpsLogger_summary_divesCovered => 'Lefedett merülések';
+
+  @override
   String gpsLogger_trackSubtitle(num count, String duration) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -25103,6 +25197,13 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_coordinateFormat_subtitle =>
       'Hogyan jelennek meg és hogyan adhatók meg a GPS-pozíciók';
+
+  @override
+  String get settings_placeNameLanguage_title => 'Helynevek nyelve';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Akkor használjuk, amikor az ország, régió, település és víztest a koordinátákból kerül lekérdezésre. A meglévő merülőhelyek nem változnak.';
 
   @override
   String get settings_coordinateFormat_decimalDegrees => 'Tizedes fok';

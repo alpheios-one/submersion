@@ -9605,6 +9605,12 @@ abstract class AppLocalizations {
   /// **'Clear rating filter'**
   String get diveLog_filter_clearRating;
 
+  /// No description provided for @diveLog_filter_clearWeekdays.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear weekdays'**
+  String get diveLog_filter_clearWeekdays;
+
   /// No description provided for @diveLog_filter_dateSeparator.
   ///
   /// In en, this message translates to:
@@ -9754,6 +9760,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tags'**
   String get diveLog_filter_sectionTags;
+
+  /// No description provided for @diveLog_filter_sectionWeekdays.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekdays'**
+  String get diveLog_filter_sectionWeekdays;
 
   /// No description provided for @diveLog_filter_showOnlyFavorites.
   ///
@@ -11909,11 +11921,23 @@ abstract class AppLocalizations {
   /// **'Error loading trips'**
   String get diveLog_search_errorLoadingTrips;
 
+  /// No description provided for @diveLog_search_filter_any.
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get diveLog_search_filter_any;
+
   /// No description provided for @diveLog_search_gasTrimix.
   ///
   /// In en, this message translates to:
   /// **'Trimix (<21% O₂)'**
   String get diveLog_search_gasTrimix;
+
+  /// No description provided for @diveLog_search_label_deco.
+  ///
+  /// In en, this message translates to:
+  /// **'Decompression'**
+  String get diveLog_search_label_deco;
 
   /// No description provided for @diveLog_search_label_depthRange.
   ///
@@ -13948,7 +13972,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveSites_edit_gps_helperText.
   ///
   /// In en, this message translates to:
-  /// **'Choose a location method - coordinates will auto-fill country and region'**
+  /// **'Choose a location method or look up the coordinates to auto-fill country, region, town and body of water'**
   String get diveSites_edit_gps_helperText;
 
   /// No description provided for @diveSites_edit_gps_latitude_hint.
@@ -13992,6 +14016,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick from Map'**
   String get diveSites_edit_gps_pickFromMap;
+
+  /// No description provided for @diveSites_edit_gps_lookupFromCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up from coordinates'**
+  String get diveSites_edit_gps_lookupFromCoordinates;
+
+  /// No description provided for @diveSites_edit_snackbar_lookupNothingFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No location details found for these coordinates'**
+  String get diveSites_edit_snackbar_lookupNothingFound;
+
+  /// No description provided for @diveSites_edit_snackbar_lookupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Location lookup failed. Check your connection and try again.'**
+  String get diveSites_edit_snackbar_lookupFailed;
+
+  /// No description provided for @diveSites_edit_lookupReplace_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace location details?'**
+  String get diveSites_edit_lookupReplace_title;
+
+  /// No description provided for @diveSites_edit_lookupReplace_body.
+  ///
+  /// In en, this message translates to:
+  /// **'The lookup found different values for these fields:'**
+  String get diveSites_edit_lookupReplace_body;
+
+  /// No description provided for @diveSites_edit_lookupReplace_replace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get diveSites_edit_lookupReplace_replace;
+
+  /// No description provided for @diveSites_edit_lookupReplace_keep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep'**
+  String get diveSites_edit_lookupReplace_keep;
 
   /// No description provided for @diveSites_edit_gps_useMyLocation.
   ///
@@ -14752,6 +14818,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select sites'**
   String get diveSites_list_menu_select;
+
+  /// No description provided for @diveSites_list_menu_fillLocationDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in missing location details'**
+  String get diveSites_list_menu_fillLocationDetails;
+
+  /// No description provided for @diveSites_backfill_confirm_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in missing location details?'**
+  String get diveSites_backfill_confirm_title;
+
+  /// No description provided for @diveSites_backfill_confirm_body.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 site with coordinates has an empty country, region, town or body of water.} other{{count} sites with coordinates have an empty country, region, town or body of water.}} Submersion will look each one up on OpenStreetMap and fill only the empty fields. This takes about {minutes, plural, =1{1 minute} other{{minutes} minutes}}.'**
+  String diveSites_backfill_confirm_body(int count, int minutes);
+
+  /// No description provided for @diveSites_backfill_confirm_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get diveSites_backfill_confirm_start;
+
+  /// No description provided for @diveSites_backfill_nothingToFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Every site with coordinates already has its location details.'**
+  String get diveSites_backfill_nothingToFill;
+
+  /// No description provided for @diveSites_backfill_progress_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Filling in location details'**
+  String get diveSites_backfill_progress_title;
+
+  /// No description provided for @diveSites_backfill_progress_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total}'**
+  String diveSites_backfill_progress_count(int done, int total);
+
+  /// No description provided for @diveSites_backfill_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get diveSites_backfill_cancel;
+
+  /// No description provided for @diveSites_backfill_summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {updated}, unchanged {unchanged}, failed {failed}'**
+  String diveSites_backfill_summary(int updated, int unchanged, int failed);
+
+  /// No description provided for @diveSites_backfill_offline.
+  ///
+  /// In en, this message translates to:
+  /// **'Location lookup is unavailable. Check your connection and try again.'**
+  String get diveSites_backfill_offline;
 
   /// No description provided for @diveSites_list_search_backTooltip.
   ///
@@ -35770,6 +35896,24 @@ abstract class AppLocalizations {
   /// **'Recording GPS track · {count, plural, one{{count} point} other{{count} points}}'**
   String gpsLogger_stripStatus(num count);
 
+  /// No description provided for @gpsLogger_summary_tracks.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracks'**
+  String get gpsLogger_summary_tracks;
+
+  /// No description provided for @gpsLogger_summary_recordedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded time'**
+  String get gpsLogger_summary_recordedTime;
+
+  /// No description provided for @gpsLogger_summary_divesCovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives covered'**
+  String get gpsLogger_summary_divesCovered;
+
   /// No description provided for @gpsLogger_trackSubtitle.
   ///
   /// In en, this message translates to:
@@ -41947,6 +42091,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How GPS positions are shown and entered'**
   String get settings_coordinateFormat_subtitle;
+
+  /// No description provided for @settings_placeNameLanguage_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Place name language'**
+  String get settings_placeNameLanguage_title;
+
+  /// No description provided for @settings_placeNameLanguage_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Used when country, region, town and body of water are looked up from coordinates. Existing sites are not changed.'**
+  String get settings_placeNameLanguage_subtitle;
 
   /// No description provided for @settings_coordinateFormat_decimalDegrees.
   ///

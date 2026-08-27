@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
@@ -34,6 +36,7 @@ import 'package:submersion/features/dive_sites/presentation/providers/site_provi
 import 'package:submersion/features/dive_sites/presentation/widgets/compact_site_list_tile.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/dense_site_list_tile.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_filter_sheet.dart';
+import 'package:submersion/features/dive_sites/presentation/widgets/site_location_backfill_dialog.dart';
 import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/widgets/debounced_search_results.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
@@ -519,6 +522,8 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                           _selection.enterExplicit();
                         } else if (value == 'import') {
                           context.push('/sites/import');
+                        } else if (value == 'fill_location_details') {
+                          unawaited(showSiteLocationBackfillFlow(context, ref));
                         } else if (value.startsWith('view_')) {
                           final mode = ListViewMode.fromName(
                             value.replaceFirst('view_', ''),
@@ -556,6 +561,18 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                               leading: const Icon(Icons.download),
                               title: Text(
                                 context.l10n.diveSites_list_menu_import,
+                              ),
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'fill_location_details',
+                            child: ListTile(
+                              leading: const Icon(Icons.travel_explore),
+                              title: Text(
+                                context
+                                    .l10n
+                                    .diveSites_list_menu_fillLocationDetails,
                               ),
                               contentPadding: EdgeInsets.zero,
                             ),
@@ -781,6 +798,8 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                 _selection.enterExplicit();
               } else if (value == 'import') {
                 context.push('/sites/import');
+              } else if (value == 'fill_location_details') {
+                unawaited(showSiteLocationBackfillFlow(context, ref));
               } else if (value.startsWith('view_')) {
                 final mode = ListViewMode.fromName(
                   value.replaceFirst('view_', ''),
@@ -808,6 +827,16 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                 PopupMenuItem(
                   value: 'import',
                   child: Text(context.l10n.diveSites_list_menu_import),
+                ),
+                PopupMenuItem(
+                  value: 'fill_location_details',
+                  child: ListTile(
+                    leading: const Icon(Icons.travel_explore),
+                    title: Text(
+                      context.l10n.diveSites_list_menu_fillLocationDetails,
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
                 ),
               ];
             },

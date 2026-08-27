@@ -572,6 +572,7 @@ class UniversalAdapter implements ImportSourceAdapter {
       defaultTankPreset: defaultTankPreset,
       defaultStartPressure: settings.defaultStartPressure,
       applyDefaultTankToImports: settings.applyDefaultTankToImports,
+      placeNameLanguage: settings.placeNameLanguage,
     );
 
     final result = await importer.import(

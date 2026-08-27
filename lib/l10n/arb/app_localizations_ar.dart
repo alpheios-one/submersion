@@ -5668,6 +5668,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filter_clearRating => 'مسح تصفية التقييم';
 
   @override
+  String get diveLog_filter_clearWeekdays => 'مسح أيام الأسبوع';
+
+  @override
   String get diveLog_filter_dateSeparator => 'إلى';
 
   @override
@@ -5741,6 +5744,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionTags => 'الوسوم';
+
+  @override
+  String get diveLog_filter_sectionWeekdays => 'أيام الأسبوع';
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'عرض الغوصات المفضلة فقط';
@@ -6944,7 +6950,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => 'خطأ في تحميل الرحلات';
 
   @override
+  String get diveLog_search_filter_any => 'أي';
+
+  @override
   String get diveLog_search_gasTrimix => 'ترايمكس (<21% O₂)';
+
+  @override
+  String get diveLog_search_label_deco => 'تخفيف الضغط';
 
   @override
   String get diveLog_search_label_depthRange => 'نطاق العمق (m)';
@@ -8102,7 +8114,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'اختر طريقة تحديد الموقع - سيتم ملء الدولة والمنطقة تلقائياً';
+      'اختر طريقة لتحديد الموقع أو ابحث عن الإحداثيات لملء البلد والمنطقة والبلدة والمسطح المائي تلقائيًا';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'مثال: 21.4225';
@@ -8124,6 +8136,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'اختيار من الخريطة';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates => 'البحث من الإحداثيات';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'لم يتم العثور على تفاصيل موقع لهذه الإحداثيات';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'فشل البحث عن الموقع. تحقق من الاتصال وحاول مرة أخرى.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => 'استبدال تفاصيل الموقع؟';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'عثر البحث على قيم مختلفة لهذه الحقول:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'استبدال';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'إبقاء';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'استخدام موقعي';
@@ -8599,6 +8635,60 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveSites_list_menu_select => 'تحديد المواقع';
+
+  @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'إكمال تفاصيل الموقع الناقصة';
+
+  @override
+  String get diveSites_backfill_confirm_title => 'إكمال تفاصيل الموقع الناقصة؟';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count مواقع غوص لها إحداثيات ينقصها البلد أو المنطقة أو البلدة أو المسطح المائي.',
+      one:
+          'موقع غوص واحد له إحداثيات ينقصه البلد أو المنطقة أو البلدة أو المسطح المائي.',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes دقائق',
+      two: 'دقيقتين',
+      one: 'دقيقة واحدة',
+    );
+    return '$_temp0 سيبحث Submersion عن كل منها في OpenStreetMap ويملأ الحقول الفارغة فقط. يستغرق ذلك نحو $_temp1.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'بدء';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'كل مواقع الغوص التي لها إحداثيات لديها تفاصيل الموقع بالفعل.';
+
+  @override
+  String get diveSites_backfill_progress_title => 'جارٍ إكمال تفاصيل الموقع';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done من $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'إلغاء';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'تم تحديث $updated، بدون تغيير $unchanged، فشل $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'البحث عن الموقع غير متاح. تحقق من الاتصال وحاول مرة أخرى.';
 
   @override
   String get diveSites_list_search_backTooltip => 'رجوع';
@@ -21133,6 +21223,15 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get gpsLogger_summary_tracks => 'المسارات';
+
+  @override
+  String get gpsLogger_summary_recordedTime => 'الوقت المسجّل';
+
+  @override
+  String get gpsLogger_summary_divesCovered => 'الغطسات المغطاة';
+
+  @override
   String gpsLogger_trackSubtitle(num count, String duration) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -24744,6 +24843,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_coordinateFormat_subtitle =>
       'كيفية عرض مواقع GPS وإدخالها';
+
+  @override
+  String get settings_placeNameLanguage_title => 'لغة أسماء الأماكن';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'تُستخدم عند البحث عن البلد والمنطقة والبلدة والمسطح المائي من الإحداثيات. لا يتم تغيير المواقع الحالية.';
 
   @override
   String get settings_coordinateFormat_decimalDegrees => 'درجات عشرية';

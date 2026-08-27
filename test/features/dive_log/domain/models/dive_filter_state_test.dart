@@ -22,6 +22,7 @@ Dive _makeDive({
   String? tripId,
   List<DiveCustomField> customFields = const [],
   List<EquipmentItem> equipment = const [],
+  List<DiveProfilePoint> profile = const [],
 }) {
   return Dive(
     id: id,
@@ -35,7 +36,7 @@ Dive _makeDive({
     bottomTime: duration,
     tripId: tripId,
     tanks: const [],
-    profile: const [],
+    profile: profile,
     equipment: equipment,
     notes: '',
     photoIds: const [],
@@ -75,8 +76,10 @@ void main() {
         expect(filter.minDepth, isNull);
         expect(filter.maxDepth, isNull);
         expect(filter.favoritesOnly, isNull);
+        expect(filter.decoOnly, isNull);
         expect(filter.noBuddyOnly, isNull);
         expect(filter.tagIds, isEmpty);
+        expect(filter.weekdays, isEmpty);
         expect(filter.equipmentIds, isEmpty);
         expect(filter.buddyNameFilter, isNull);
         expect(filter.buddyId, isNull);
@@ -153,6 +156,18 @@ void main() {
         expect(filter.hasActiveFilters, isFalse);
       });
 
+      test('returns true when decoOnly is true', () {
+        const filter = DiveFilterState(decoOnly: true);
+
+        expect(filter.hasActiveFilters, isTrue);
+      });
+
+      test('returns true when decoOnly is false', () {
+        const filter = DiveFilterState(decoOnly: false);
+
+        expect(filter.hasActiveFilters, isTrue);
+      });
+
       test('returns true when noBuddyOnly is true', () {
         const filter = DiveFilterState(noBuddyOnly: true);
 
@@ -167,6 +182,12 @@ void main() {
 
       test('returns true when diveIds is non-empty', () {
         const filter = DiveFilterState(diveIds: ['d1', 'd2']);
+
+        expect(filter.hasActiveFilters, isTrue);
+      });
+
+      test('returns true when weekdays is non-empty', () {
+        const filter = DiveFilterState(weekdays: [1, 3]);
 
         expect(filter.hasActiveFilters, isTrue);
       });
@@ -221,6 +242,22 @@ void main() {
         expect(updated.computerId, isNull);
       });
 
+      test('sets decoOnly', () {
+        const original = DiveFilterState();
+
+        final updated = original.copyWith(decoOnly: true);
+
+        expect(updated.decoOnly, isTrue);
+      });
+
+      test('clears decoOnly with clearDecoOnly', () {
+        const original = DiveFilterState(decoOnly: false);
+
+        final updated = original.copyWith(clearDecoOnly: true);
+
+        expect(updated.decoOnly, isNull);
+      });
+
       test('sets noBuddyOnly', () {
         const original = DiveFilterState();
 
@@ -235,6 +272,22 @@ void main() {
         final updated = original.copyWith(clearNoBuddyOnly: true);
 
         expect(updated.noBuddyOnly, isNull);
+      });
+
+      test('sets weekdays', () {
+        const original = DiveFilterState();
+
+        final updated = original.copyWith(weekdays: [1, 2]);
+
+        expect(updated.weekdays, [1, 2]);
+      });
+
+      test('clears weekdays with clearWeekdays', () {
+        const original = DiveFilterState(weekdays: [1, 2]);
+
+        final updated = original.copyWith(clearWeekdays: true);
+
+        expect(updated.weekdays, isEmpty);
       });
 
       test('sets and clears multiple fields simultaneously', () {
@@ -449,6 +502,61 @@ void main() {
 
         expect(result, hasLength(1));
         expect(result.first.id, 'd1');
+      });
+
+      group('weekdays', () {
+        test('filters by matching weekday', () {
+          final monday = DateTime(2026, 3, 16);
+          final tuesday = DateTime(2026, 3, 17);
+          final filter = DiveFilterState(weekdays: [monday.weekday]);
+          final dives = [
+            _makeDive(id: 'd1', dateTime: monday),
+            _makeDive(id: 'd2', dateTime: tuesday),
+          ];
+
+          final result = filter.apply(dives);
+
+          expect(result.map((d) => d.id), ['d1']);
+        });
+
+        test('matches ANY selected weekday', () {
+          final monday = DateTime(2026, 3, 16);
+          final tuesday = DateTime(2026, 3, 17);
+          final wednesday = DateTime(2026, 3, 18);
+          final filter = DiveFilterState(
+            weekdays: [monday.weekday, wednesday.weekday],
+          );
+          final dives = [
+            _makeDive(id: 'd1', dateTime: monday),
+            _makeDive(id: 'd2', dateTime: tuesday),
+            _makeDive(id: 'd3', dateTime: wednesday),
+          ];
+
+          final result = filter.apply(dives);
+
+          expect(result.map((d) => d.id), containsAll(['d1', 'd3']));
+          expect(result, hasLength(2));
+        });
+
+        test('combines with date range as AND', () {
+          final insideRangeMonday = DateTime(2026, 3, 16);
+          final outsideRangeMonday = DateTime(2026, 4, 6);
+          final insideRangeTuesday = DateTime(2026, 3, 17);
+          final filter = DiveFilterState(
+            startDate: DateTime(2026, 3, 1),
+            endDate: DateTime(2026, 3, 31),
+            weekdays: [insideRangeMonday.weekday],
+          );
+          final dives = [
+            _makeDive(id: 'd1', dateTime: insideRangeMonday),
+            _makeDive(id: 'd2', dateTime: outsideRangeMonday),
+            _makeDive(id: 'd3', dateTime: insideRangeTuesday),
+          ];
+
+          final result = filter.apply(dives);
+
+          expect(result.map((d) => d.id), ['d1']);
+        });
       });
 
       test('filters by diveIds', () {
@@ -678,6 +786,70 @@ void main() {
 
         expect(result, hasLength(2));
         expect(result.map((d) => d.id), containsAll(['d1', 'd2']));
+      });
+
+      group('decoOnly axis', () {
+        // decoOnly is a SQL-only axis: getAllDives skips profile hydration for
+        // list views and deco-stop events never reach the entity, so apply()
+        // has nothing to classify from and deliberately ignores it. Consumers
+        // intersect with decoFilteredDiveIdsProvider instead. Filtering here
+        // would silently return nothing on every real (unhydrated) list.
+        test('apply() ignores decoOnly: true', () {
+          final dives = [_makeDive(id: 'd1'), _makeDive(id: 'd2')];
+
+          expect(
+            const DiveFilterState(decoOnly: true).apply(dives).map((d) => d.id),
+            ['d1', 'd2'],
+          );
+        });
+
+        test('apply() ignores decoOnly: false', () {
+          final dives = [_makeDive(id: 'd1'), _makeDive(id: 'd2')];
+
+          expect(
+            const DiveFilterState(
+              decoOnly: false,
+            ).apply(dives).map((d) => d.id),
+            ['d1', 'd2'],
+          );
+        });
+
+        test('apply() ignores decoOnly even when a profile is hydrated', () {
+          final dives = [
+            _makeDive(
+              id: 'deco',
+              profile: const [
+                DiveProfilePoint(timestamp: 0, depth: 30, decoType: 2),
+              ],
+            ),
+            _makeDive(
+              id: 'noDeco',
+              profile: const [
+                DiveProfilePoint(timestamp: 0, depth: 18, decoType: 0),
+              ],
+            ),
+          ];
+
+          expect(
+            const DiveFilterState(decoOnly: true).apply(dives).map((d) => d.id),
+            ['deco', 'noDeco'],
+          );
+        });
+
+        test('decoOnly still combines with the axes apply() does own', () {
+          final dives = [
+            _makeDive(id: 'shallow', maxDepth: 12),
+            _makeDive(id: 'deep', maxDepth: 40),
+          ];
+
+          expect(
+            const DiveFilterState(
+              decoOnly: true,
+              minDepth: 30,
+            ).apply(dives).map((d) => d.id),
+            ['deep'],
+          );
+        });
       });
 
       group('equipmentAttr axis', () {

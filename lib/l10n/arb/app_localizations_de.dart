@@ -5786,6 +5786,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_filter_clearRating => 'Bewertungsfilter zurücksetzen';
 
   @override
+  String get diveLog_filter_clearWeekdays => 'Wochentage zurücksetzen';
+
+  @override
   String get diveLog_filter_dateSeparator => 'bis';
 
   @override
@@ -5860,6 +5863,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionTags => 'Tags';
+
+  @override
+  String get diveLog_filter_sectionWeekdays => 'Wochentage';
 
   @override
   String get diveLog_filter_showOnlyFavorites => 'Nur Favoriten anzeigen';
@@ -7087,7 +7093,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => 'Fehler beim Laden der Reisen';
 
   @override
+  String get diveLog_search_filter_any => 'Beliebig';
+
+  @override
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
+
+  @override
+  String get diveLog_search_label_deco => 'Dekompression';
 
   @override
   String get diveLog_search_label_depthRange => 'Tiefenbereich (m)';
@@ -8252,7 +8264,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_helperText =>
-      'Wählen Sie eine Standortmethode - Koordinaten füllen Land und Region automatisch aus';
+      'Wählen Sie eine Standortmethode oder suchen Sie die Koordinaten, um Land, Region, Ort und Gewässer automatisch auszufüllen';
 
   @override
   String get diveSites_edit_gps_latitude_hint => 'z. B. 21,4225';
@@ -8274,6 +8286,31 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveSites_edit_gps_pickFromMap => 'Auf Karte auswählen';
+
+  @override
+  String get diveSites_edit_gps_lookupFromCoordinates =>
+      'Aus Koordinaten ermitteln';
+
+  @override
+  String get diveSites_edit_snackbar_lookupNothingFound =>
+      'Keine Ortsangaben für diese Koordinaten gefunden';
+
+  @override
+  String get diveSites_edit_snackbar_lookupFailed =>
+      'Ortssuche fehlgeschlagen. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.';
+
+  @override
+  String get diveSites_edit_lookupReplace_title => 'Ortsangaben ersetzen?';
+
+  @override
+  String get diveSites_edit_lookupReplace_body =>
+      'Die Suche hat für diese Felder andere Werte gefunden:';
+
+  @override
+  String get diveSites_edit_lookupReplace_replace => 'Ersetzen';
+
+  @override
+  String get diveSites_edit_lookupReplace_keep => 'Behalten';
 
   @override
   String get diveSites_edit_gps_useMyLocation => 'Meinen Standort verwenden';
@@ -8758,6 +8795,60 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveSites_list_menu_select => 'Tauchplätze auswählen';
+
+  @override
+  String get diveSites_list_menu_fillLocationDetails =>
+      'Fehlende Ortsangaben ergänzen';
+
+  @override
+  String get diveSites_backfill_confirm_title =>
+      'Fehlende Ortsangaben ergänzen?';
+
+  @override
+  String diveSites_backfill_confirm_body(int count, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Tauchplätze mit Koordinaten haben kein Land, keine Region, keinen Ort oder kein Gewässer.',
+      one:
+          '1 Tauchplatz mit Koordinaten hat kein Land, keine Region, keinen Ort oder kein Gewässer.',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes Minuten',
+      one: '1 Minute',
+    );
+    return '$_temp0 Submersion sucht jeden auf OpenStreetMap und füllt nur die leeren Felder aus. Das dauert etwa $_temp1.';
+  }
+
+  @override
+  String get diveSites_backfill_confirm_start => 'Starten';
+
+  @override
+  String get diveSites_backfill_nothingToFill =>
+      'Alle Tauchplätze mit Koordinaten haben bereits ihre Ortsangaben.';
+
+  @override
+  String get diveSites_backfill_progress_title => 'Ortsangaben werden ergänzt';
+
+  @override
+  String diveSites_backfill_progress_count(int done, int total) {
+    return '$done von $total';
+  }
+
+  @override
+  String get diveSites_backfill_cancel => 'Abbrechen';
+
+  @override
+  String diveSites_backfill_summary(int updated, int unchanged, int failed) {
+    return 'Aktualisiert $updated, unverändert $unchanged, fehlgeschlagen $failed';
+  }
+
+  @override
+  String get diveSites_backfill_offline =>
+      'Die Ortssuche ist nicht verfügbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.';
 
   @override
   String get diveSites_list_search_backTooltip => 'Zurück';
@@ -21477,6 +21568,15 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get gpsLogger_summary_tracks => 'Tracks';
+
+  @override
+  String get gpsLogger_summary_recordedTime => 'Aufgezeichnete Zeit';
+
+  @override
+  String get gpsLogger_summary_divesCovered => 'Erfasste Tauchgänge';
+
+  @override
   String gpsLogger_trackSubtitle(num count, String duration) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -25148,6 +25248,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_coordinateFormat_subtitle =>
       'Wie GPS-Positionen angezeigt und eingegeben werden';
+
+  @override
+  String get settings_placeNameLanguage_title => 'Sprache der Ortsnamen';
+
+  @override
+  String get settings_placeNameLanguage_subtitle =>
+      'Wird verwendet, wenn Land, Region, Ort und Gewässer aus Koordinaten ermittelt werden. Bestehende Tauchplätze werden nicht geändert.';
 
   @override
   String get settings_coordinateFormat_decimalDegrees => 'Dezimalgrad';
