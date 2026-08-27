@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
-import 'package:submersion/features/dive_3d/domain/entities/dive_3d_scene_data.dart';
 import 'package:submersion/features/dive_3d/domain/metric_palette.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_readout_rows.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -12,14 +11,18 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// Live metric readout at the scrub instant. Listens to the frame-rate
 /// ValueListenable directly (NOT via Riverpod) so playback never rebuilds
 /// the page tree above it. Shares its rows with the hover tooltip.
+///
+/// [lookups] is injected rather than built here: its builder runs on every
+/// playback tick, and rebuilding the tank-pressure lookups there would
+/// allocate a copy of each tank series per frame.
 class SceneReadoutPanel extends ConsumerWidget {
-  final Dive3dSceneData data;
+  final DiveReadoutLookups lookups;
   final ValueListenable<double> position;
   final SceneMetric? emphasize;
 
   const SceneReadoutPanel({
     super.key,
-    required this.data,
+    required this.lookups,
     required this.position,
     this.emphasize,
   });
@@ -34,8 +37,8 @@ class SceneReadoutPanel extends ConsumerWidget {
       valueListenable: position,
       builder: (context, value, _) {
         final rows = diveReadoutRows(
-          data: data,
-          timestampSeconds: value * data.durationSeconds,
+          lookups: lookups,
+          timestampSeconds: value * lookups.data.durationSeconds,
           units: units,
           l10n: l10n,
           emphasize: emphasize,

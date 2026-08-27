@@ -78,6 +78,17 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
     SceneOverlay.shadows,
   };
 
+  // One set of readout lookups per scene data: the tank-pressure lookups
+  // copy their series, and both the scrub panel (frame rate) and the hover
+  // tooltip (every mouse move) read through them.
+  DiveReadoutLookups? _readoutLookups;
+
+  DiveReadoutLookups _lookupsFor(Dive3dSceneData data) {
+    final cached = _readoutLookups;
+    if (cached != null && identical(cached.data, data)) return cached;
+    return _readoutLookups = DiveReadoutLookups(data);
+  }
+
   void _initZ(Dive3dSceneData data) {
     if (_zInitialized) return;
     _zInitialized = true;
@@ -179,15 +190,16 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
       zTitle: zAxis == null ? null : _zTitle(zAxis),
     );
     final scrubPath = scene.scrubPath!;
+    final lookups = _lookupsFor(sceneData);
     return _sceneScaffold(
       scene: scene,
       readout: SceneReadoutPanel(
-        data: sceneData,
+        lookups: lookups,
         position: _position,
         emphasize: _zMetric,
       ),
       controls: _buildDiveControls(sceneData),
-      onMarkerTap: (marker) => _showMarkerSheet(context, sceneData, marker),
+      onMarkerTap: (marker) => _showMarkerSheet(context, lookups, marker),
       chromeMode: SceneChromeMode.framed,
       picker: PathHoverPicker(scrubPath),
       axisFrame: axes.frame,
@@ -207,7 +219,7 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
           return CustomSingleChildLayout(
             delegate: TissueTooltipLayoutDelegate(pick.screenPos),
             child: DiveHoverTooltip(
-              data: sceneData,
+              lookups: lookups,
               timestampSeconds: t,
               emphasize: _zMetric,
             ),
@@ -496,11 +508,11 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
 
   void _showMarkerSheet(
     BuildContext context,
-    Dive3dSceneData data,
+    DiveReadoutLookups lookups,
     SceneMarker marker,
   ) {
     final rows = diveReadoutRows(
-      data: data,
+      lookups: lookups,
       timestampSeconds: marker.timestampSeconds.toDouble(),
       units: UnitFormatter(ref.read(settingsProvider)),
       l10n: context.l10n,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
-import 'package:submersion/features/dive_3d/domain/entities/dive_3d_scene_data.dart';
 import 'package:submersion/features/dive_3d/domain/metric_palette.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_readout_rows.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -11,13 +10,15 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// Compact readout for a hovered or tapped path sample: every metric the
 /// dive carries at that instant, with the Z-axis metric emphasized.
 class DiveHoverTooltip extends ConsumerWidget {
-  final Dive3dSceneData data;
+  /// Shared with the readout panel: the tooltip rebuilds on every hover
+  /// move, so it must not rebuild the tank-pressure lookups either.
+  final DiveReadoutLookups lookups;
   final double timestampSeconds;
   final SceneMetric? emphasize;
 
   const DiveHoverTooltip({
     super.key,
-    required this.data,
+    required this.lookups,
     required this.timestampSeconds,
     this.emphasize,
   });
@@ -26,7 +27,7 @@ class DiveHoverTooltip extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final units = UnitFormatter(ref.watch(settingsProvider));
     final rows = diveReadoutRows(
-      data: data,
+      lookups: lookups,
       timestampSeconds: timestampSeconds,
       units: units,
       l10n: context.l10n,

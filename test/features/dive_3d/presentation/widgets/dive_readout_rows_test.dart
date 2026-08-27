@@ -41,7 +41,7 @@ void main() {
   test('rows at mid-dive, tank row and emphasis', () async {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     final rows = diveReadoutRows(
-      data: data,
+      lookups: DiveReadoutLookups(data),
       timestampSeconds: 50,
       units: const UnitFormatter(AppSettings()),
       l10n: l10n,
@@ -65,7 +65,7 @@ void main() {
   test('ceiling and tts appear once both neighbors carry values', () async {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     final rows = diveReadoutRows(
-      data: data,
+      lookups: DiveReadoutLookups(data),
       timestampSeconds: 100,
       units: const UnitFormatter(AppSettings()),
       l10n: l10n,
@@ -74,4 +74,96 @@ void main() {
     expect(byLabel['Ceiling']!.value, startsWith('6.0'));
     expect(byLabel['TTS']!.value, '10 min');
   });
+
+  test('lookups hold one entry per tank, null for an empty series', () {
+    const twoTanks = Dive3dSceneData(
+      diveId: 'd1',
+      times: [0, 100],
+      depths: [0, 20],
+      temperatures: [20, 10],
+      ascentRates: [null, null],
+      ppO2s: [null, null],
+      cnss: [null, null],
+      heartRates: [null, null],
+      ceilings: [null, null],
+      ttss: [null, null],
+      tankPressures: {
+        'empty': [],
+        't2': [
+          TankPressurePoint(
+            id: 'p1',
+            tankId: 't2',
+            timestamp: 0,
+            pressure: 200,
+          ),
+          TankPressurePoint(
+            id: 'p2',
+            tankId: 't2',
+            timestamp: 100,
+            pressure: 100,
+          ),
+        ],
+      },
+      gasSwitches: [],
+      bookmarkEvents: [],
+      photos: [],
+      durationSeconds: 100,
+      maxDepthMeters: 20,
+    );
+    final lookups = DiveReadoutLookups(twoTanks);
+    expect(identical(lookups.data, twoTanks), isTrue);
+    expect(lookups.tankPressure, hasLength(2));
+    expect(lookups.tankPressure[0], isNull);
+    expect(lookups.tankPressure[1], isNotNull);
+  });
+
+  test(
+    'an empty tank still consumes its number so labels stay stable',
+    () async {
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+      const twoTanks = Dive3dSceneData(
+        diveId: 'd1',
+        times: [0, 100],
+        depths: [0, 20],
+        temperatures: [null, null],
+        ascentRates: [null, null],
+        ppO2s: [null, null],
+        cnss: [null, null],
+        heartRates: [null, null],
+        ceilings: [null, null],
+        ttss: [null, null],
+        tankPressures: {
+          'empty': [],
+          't2': [
+            TankPressurePoint(
+              id: 'p1',
+              tankId: 't2',
+              timestamp: 0,
+              pressure: 200,
+            ),
+            TankPressurePoint(
+              id: 'p2',
+              tankId: 't2',
+              timestamp: 100,
+              pressure: 100,
+            ),
+          ],
+        },
+        gasSwitches: [],
+        bookmarkEvents: [],
+        photos: [],
+        durationSeconds: 100,
+        maxDepthMeters: 20,
+      );
+      final rows = diveReadoutRows(
+        lookups: DiveReadoutLookups(twoTanks),
+        timestampSeconds: 50,
+        units: const UnitFormatter(AppSettings()),
+        l10n: l10n,
+      );
+      final labels = rows.map((r) => r.label).toList();
+      expect(labels, contains('Tank 2'));
+      expect(labels, isNot(contains('Tank 1')));
+    },
+  );
 }

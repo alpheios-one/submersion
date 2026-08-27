@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_3d/domain/metric_palette.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_hover_tooltip.dart';
+import 'package:submersion/features/dive_3d/presentation/widgets/dive_readout_rows.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_app.dart';
@@ -15,7 +16,7 @@ void main() {
       testApp(
         overrides: overrides,
         child: DiveHoverTooltip(
-          data: readoutSceneData(),
+          lookups: DiveReadoutLookups(readoutSceneData()),
           timestampSeconds: 50,
           emphasize: SceneMetric.temperature,
         ),

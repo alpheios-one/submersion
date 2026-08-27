@@ -14,19 +14,41 @@ class ReadoutRow {
   const ReadoutRow(this.label, this.value, {this.emphasized = false});
 }
 
+/// The interpolation lookups one dive's readout needs, built once and
+/// reused. [ProfileLookupOverPressure] copies each tank series into flat
+/// arrays, so constructing these inside a frame-rate builder would allocate
+/// on every playback tick; hold one of these per [Dive3dSceneData] instead
+/// and hand it to the readout panel, the hover tooltip, and the marker
+/// sheet alike.
+class DiveReadoutLookups {
+  final Dive3dSceneData data;
+  final ProfileLookup profile;
+
+  /// One entry per tank in [Dive3dSceneData.tankPressures] order; null where
+  /// that tank logged no pressure samples.
+  final List<ProfileLookupOverPressure?> tankPressure;
+
+  DiveReadoutLookups(this.data)
+    : profile = ProfileLookup(data.times),
+      tankPressure = [
+        for (final points in data.tankPressures.values)
+          if (points.isEmpty) null else ProfileLookupOverPressure(points),
+      ];
+}
+
 /// The single source of truth for what the tooltip, the scrub readout
 /// panel, and the marker sheet show at an instant. Interpolates the
 /// FULL-resolution series so geometry decimation never affects readouts.
 List<ReadoutRow> diveReadoutRows({
-  required Dive3dSceneData data,
+  required DiveReadoutLookups lookups,
   required double timestampSeconds,
   required UnitFormatter units,
   required AppLocalizations l10n,
   SceneMetric? emphasize,
 }) {
+  final data = lookups.data;
   final t = timestampSeconds;
-  final lookup = ProfileLookup(data.times);
-  double? at(List<double?> series) => lookup.interpolate(series, t);
+  double? at(List<double?> series) => lookups.profile.interpolate(series, t);
   final total = t.round();
   final clock = '${total ~/ 60}:${(total % 60).toString().padLeft(2, '0')}';
 
@@ -89,14 +111,11 @@ List<ReadoutRow> diveReadoutRows({
     l10n.dive3d_metric_tts,
     tts == null ? null : '${(tts / 60).round()} min',
   );
-  var n = 0;
-  for (final points in data.tankPressures.values) {
-    n++;
-    if (points.isEmpty) continue;
-    final bar = ProfileLookupOverPressure(points).at(t);
+  for (var i = 0; i < lookups.tankPressure.length; i++) {
+    final bar = lookups.tankPressure[i]?.at(t);
     add(
       SceneMetric.tankPressure,
-      l10n.dive3d_readout_tank(n),
+      l10n.dive3d_readout_tank(i + 1),
       bar == null ? null : units.formatPressure(bar),
     );
   }
