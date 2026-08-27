@@ -11909,11 +11909,23 @@ abstract class AppLocalizations {
   /// **'Error loading trips'**
   String get diveLog_search_errorLoadingTrips;
 
+  /// No description provided for @diveLog_search_filter_any.
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get diveLog_search_filter_any;
+
   /// No description provided for @diveLog_search_gasTrimix.
   ///
   /// In en, this message translates to:
   /// **'Trimix (<21% O₂)'**
   String get diveLog_search_gasTrimix;
+
+  /// No description provided for @diveLog_search_label_deco.
+  ///
+  /// In en, this message translates to:
+  /// **'Decompression'**
+  String get diveLog_search_label_deco;
 
   /// No description provided for @diveLog_search_label_depthRange.
   ///

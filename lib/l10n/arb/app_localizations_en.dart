@@ -6957,7 +6957,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => 'Error loading trips';
 
   @override
+  String get diveLog_search_filter_any => 'Any';
+
+  @override
   String get diveLog_search_gasTrimix => 'Trimix (<21% O₂)';
+
+  @override
+  String get diveLog_search_label_deco => 'Decompression';
 
   @override
   String get diveLog_search_label_depthRange => 'Depth Range (m)';

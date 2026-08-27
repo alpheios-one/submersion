@@ -6908,7 +6908,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_search_errorLoadingTrips => 'שגיאה בטעינת טיולים';
 
   @override
+  String get diveLog_search_filter_any => 'הכול';
+
+  @override
   String get diveLog_search_gasTrimix => 'טריימיקס (<21% O₂)';
+
+  @override
+  String get diveLog_search_label_deco => 'דקומפרסיה';
 
   @override
   String get diveLog_search_label_depthRange => 'טווח עומק (m)';

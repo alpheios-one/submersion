@@ -22,6 +22,7 @@ Dive _makeDive({
   String? tripId,
   List<DiveCustomField> customFields = const [],
   List<EquipmentItem> equipment = const [],
+  List<DiveProfilePoint> profile = const [],
 }) {
   return Dive(
     id: id,
@@ -35,7 +36,7 @@ Dive _makeDive({
     bottomTime: duration,
     tripId: tripId,
     tanks: const [],
-    profile: const [],
+    profile: profile,
     equipment: equipment,
     notes: '',
     photoIds: const [],
@@ -75,6 +76,7 @@ void main() {
         expect(filter.minDepth, isNull);
         expect(filter.maxDepth, isNull);
         expect(filter.favoritesOnly, isNull);
+        expect(filter.decoOnly, isNull);
         expect(filter.noBuddyOnly, isNull);
         expect(filter.tagIds, isEmpty);
         expect(filter.equipmentIds, isEmpty);
@@ -153,6 +155,18 @@ void main() {
         expect(filter.hasActiveFilters, isFalse);
       });
 
+      test('returns true when decoOnly is true', () {
+        const filter = DiveFilterState(decoOnly: true);
+
+        expect(filter.hasActiveFilters, isTrue);
+      });
+
+      test('returns true when decoOnly is false', () {
+        const filter = DiveFilterState(decoOnly: false);
+
+        expect(filter.hasActiveFilters, isTrue);
+      });
+
       test('returns true when noBuddyOnly is true', () {
         const filter = DiveFilterState(noBuddyOnly: true);
 
@@ -219,6 +233,22 @@ void main() {
         );
 
         expect(updated.computerId, isNull);
+      });
+
+      test('sets decoOnly', () {
+        const original = DiveFilterState();
+
+        final updated = original.copyWith(decoOnly: true);
+
+        expect(updated.decoOnly, isTrue);
+      });
+
+      test('clears decoOnly with clearDecoOnly', () {
+        const original = DiveFilterState(decoOnly: false);
+
+        final updated = original.copyWith(clearDecoOnly: true);
+
+        expect(updated.decoOnly, isNull);
       });
 
       test('sets noBuddyOnly', () {
@@ -678,6 +708,70 @@ void main() {
 
         expect(result, hasLength(2));
         expect(result.map((d) => d.id), containsAll(['d1', 'd2']));
+      });
+
+      group('decoOnly axis', () {
+        // decoOnly is a SQL-only axis: getAllDives skips profile hydration for
+        // list views and deco-stop events never reach the entity, so apply()
+        // has nothing to classify from and deliberately ignores it. Consumers
+        // intersect with decoFilteredDiveIdsProvider instead. Filtering here
+        // would silently return nothing on every real (unhydrated) list.
+        test('apply() ignores decoOnly: true', () {
+          final dives = [_makeDive(id: 'd1'), _makeDive(id: 'd2')];
+
+          expect(
+            const DiveFilterState(decoOnly: true).apply(dives).map((d) => d.id),
+            ['d1', 'd2'],
+          );
+        });
+
+        test('apply() ignores decoOnly: false', () {
+          final dives = [_makeDive(id: 'd1'), _makeDive(id: 'd2')];
+
+          expect(
+            const DiveFilterState(
+              decoOnly: false,
+            ).apply(dives).map((d) => d.id),
+            ['d1', 'd2'],
+          );
+        });
+
+        test('apply() ignores decoOnly even when a profile is hydrated', () {
+          final dives = [
+            _makeDive(
+              id: 'deco',
+              profile: const [
+                DiveProfilePoint(timestamp: 0, depth: 30, decoType: 2),
+              ],
+            ),
+            _makeDive(
+              id: 'noDeco',
+              profile: const [
+                DiveProfilePoint(timestamp: 0, depth: 18, decoType: 0),
+              ],
+            ),
+          ];
+
+          expect(
+            const DiveFilterState(decoOnly: true).apply(dives).map((d) => d.id),
+            ['deco', 'noDeco'],
+          );
+        });
+
+        test('decoOnly still combines with the axes apply() does own', () {
+          final dives = [
+            _makeDive(id: 'shallow', maxDepth: 12),
+            _makeDive(id: 'deep', maxDepth: 40),
+          ];
+
+          expect(
+            const DiveFilterState(
+              decoOnly: true,
+              minDepth: 30,
+            ).apply(dives).map((d) => d.id),
+            ['deep'],
+          );
+        });
       });
 
       group('equipmentAttr axis', () {

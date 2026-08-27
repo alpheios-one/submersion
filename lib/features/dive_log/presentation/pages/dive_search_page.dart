@@ -55,6 +55,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
   double? _maxDepth;
   int? _minDurationMinutes;
   int? _maxDurationMinutes;
+  bool? _decoOnly;
 
   // Gas & Equipment
   String? _diveTypeId;
@@ -117,6 +118,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     _maxDepth = filter.maxDepth;
     _minDurationMinutes = filter.minBottomTimeMinutes;
     _maxDurationMinutes = filter.maxBottomTimeMinutes;
+    _decoOnly = filter.decoOnly;
     _diveTypeId = filter.diveTypeId;
     _minO2Percent = filter.minO2Percent;
     _maxO2Percent = filter.maxO2Percent;
@@ -145,7 +147,8 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     if (_minDepth != null ||
         _maxDepth != null ||
         _minDurationMinutes != null ||
-        _maxDurationMinutes != null) {
+        _maxDurationMinutes != null ||
+        _decoOnly != null) {
       _expanded['conditions'] = true;
     }
     if (_diveTypeId != null ||
@@ -541,6 +544,41 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
             ),
           ],
         ),
+        const SizedBox(height: 24),
+
+        // Decompression
+        Text(
+          context.l10n.diveLog_search_label_deco,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ChoiceChip(
+              label: Text(context.l10n.diveLog_search_filter_any),
+              selected: _decoOnly == null,
+              onSelected: (selected) {
+                if (selected) setState(() => _decoOnly = null);
+              },
+            ),
+            ChoiceChip(
+              label: Text(context.l10n.attr_flagYes),
+              selected: _decoOnly == true,
+              onSelected: (selected) {
+                if (selected) setState(() => _decoOnly = true);
+              },
+            ),
+            ChoiceChip(
+              label: Text(context.l10n.attr_flagNo),
+              selected: _decoOnly == false,
+              onSelected: (selected) {
+                if (selected) setState(() => _decoOnly = false);
+              },
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -814,6 +852,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
       _maxDepth = null;
       _minDurationMinutes = null;
       _maxDurationMinutes = null;
+      _decoOnly = null;
       _diveTypeId = null;
       _minO2Percent = null;
       _maxO2Percent = null;
@@ -847,6 +886,7 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
       maxDepth: _maxDepth,
       minBottomTimeMinutes: _minDurationMinutes,
       maxBottomTimeMinutes: _maxDurationMinutes,
+      decoOnly: _decoOnly,
       diveTypeId: _diveTypeId,
       minO2Percent: _minO2Percent,
       maxO2Percent: _maxO2Percent,
