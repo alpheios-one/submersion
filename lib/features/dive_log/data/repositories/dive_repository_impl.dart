@@ -551,41 +551,89 @@ class DiveRepository {
       t.airTemp.isNull() |
       t.surfacePressure.isNull();
 
+  /// Restricts a conditions query to dives that can still be filled: the dive
+  /// has a site with coordinates and at least one empty weather column.
+  ///
+  /// Shared by the candidate list and its count so the two can never disagree
+  /// about what "needs conditions" means.
+  Expression<bool> _needsConditions($DiveSitesTable sites, {String? diverId}) {
+    var condition =
+        sites.latitude.isNotNull() &
+        sites.longitude.isNotNull() &
+        _hasConditionsGap(_db.dives);
+    if (diverId != null) {
+      condition = condition & _db.dives.diverId.equals(diverId);
+    }
+    return condition;
+  }
+
+  /// How many dives a conditions fetch could still fill something in for.
+  ///
+  /// A COUNT rather than `getDivesNeedingConditions().length`: the confirm
+  /// dialog only needs the number, and a large logbook should not be
+  /// materialised to produce it.
+  Future<int> countDivesNeedingConditions({String? diverId}) async {
+    try {
+      final sites = _db.diveSites;
+      final countExpr = _db.dives.id.count();
+      final query = _db.selectOnly(_db.dives)
+        ..addColumns([countExpr])
+        ..where(_needsConditions(sites, diverId: diverId));
+      query.join([innerJoin(sites, sites.id.equalsExp(_db.dives.siteId))]);
+
+      final row = await query.getSingle();
+      final int total = row.read(countExpr) ?? 0;
+      return total;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to count dives needing conditions',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Dives a conditions fetch can still fill something in for: the dive has a
   /// site with coordinates and at least one empty weather column.
   ///
-  /// Returns coordinates and a sample time rather than hydrated [domain.Dive]
-  /// entities, so scanning a large logbook stays cheap.
+  /// Projects only the id, sample time and coordinates rather than selecting
+  /// whole `dives` and `dive_sites` rows, so scanning a large logbook neither
+  /// transfers nor deserialises columns nobody reads.
   Future<List<ConditionsCandidate>> getDivesNeedingConditions({
     String? diverId,
   }) async {
     try {
       final sites = _db.diveSites;
-      final query = _db.select(_db.dives).join([
-        innerJoin(sites, sites.id.equalsExp(_db.dives.siteId)),
-      ]);
-      query.where(
-        sites.latitude.isNotNull() &
-            sites.longitude.isNotNull() &
-            _hasConditionsGap(_db.dives),
-      );
-      if (diverId != null) {
-        query.where(_db.dives.diverId.equals(diverId));
-      }
-      query.orderBy([OrderingTerm.desc(_db.dives.diveDateTime)]);
+      final query = _db.selectOnly(_db.dives)
+        ..addColumns([
+          _db.dives.id,
+          _db.dives.entryTime,
+          _db.dives.diveDateTime,
+          sites.latitude,
+          sites.longitude,
+        ])
+        ..where(_needsConditions(sites, diverId: diverId))
+        ..orderBy([OrderingTerm.desc(_db.dives.diveDateTime)]);
+      query.join([innerJoin(sites, sites.id.equalsExp(_db.dives.siteId))]);
 
       final rows = await query.get();
       final candidates = <ConditionsCandidate>[];
       for (final row in rows) {
-        final dive = row.readTable(_db.dives);
-        final site = row.readTable(sites);
-        final latitude = site.latitude;
-        final longitude = site.longitude;
-        if (latitude == null || longitude == null) continue;
+        final id = row.read(_db.dives.id);
+        final diveDateTime = row.read(_db.dives.diveDateTime);
+        final latitude = row.read(sites.latitude);
+        final longitude = row.read(sites.longitude);
+        if (id == null ||
+            diveDateTime == null ||
+            latitude == null ||
+            longitude == null) {
+          continue;
+        }
         candidates.add((
-          id: dive.id,
+          id: id,
           dateTime: DateTime.fromMillisecondsSinceEpoch(
-            dive.entryTime ?? dive.diveDateTime,
+            row.read(_db.dives.entryTime) ?? diveDateTime,
             isUtc: true,
           ),
           latitude: latitude,

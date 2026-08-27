@@ -84,13 +84,11 @@ class BulkConditionsService {
   /// from the cache are not delayed.
   final Duration requestDelay;
 
-  /// How many dives a run would attempt. Does not contact the network.
-  Future<int> countCandidates({String? diverId}) async {
-    final candidates = await _diveRepository.getDivesNeedingConditions(
-      diverId: diverId,
-    );
-    return candidates.length;
-  }
+  /// How many dives a run would attempt. Does not contact the network, and
+  /// counts in the database rather than materialising the candidate list: the
+  /// confirm dialog wants the number, not the dives.
+  Future<int> countCandidates({String? diverId}) =>
+      _diveRepository.countDivesNeedingConditions(diverId: diverId);
 
   /// Fetches and fills conditions for every dive that still has a gap.
   ///
@@ -128,7 +126,10 @@ class BulkConditionsService {
       } else {
         weather = await _fetch(candidate);
         cache[key] = weather;
-        if (requestDelay > Duration.zero) {
+        // The pacing exists to space out the NEXT request. A run cancelled
+        // while this one was in flight has no next request, so waiting would
+        // only make the button feel unresponsive.
+        if (requestDelay > Duration.zero && !(isCancelled?.call() ?? false)) {
           await Future<void>.delayed(requestDelay);
         }
       }

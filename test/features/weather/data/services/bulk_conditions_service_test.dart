@@ -237,6 +237,36 @@ void main() {
       expect(result.filled, 2);
     });
 
+    test('does not sit through the pacing delay once cancelled', () async {
+      await insertSite('s1', 12.5, -68.25);
+      await insertDive('d1', siteId: 's1', at: DateTime.utc(2024, 6, 15, 9));
+      await insertDive('d2', siteId: 's1', at: DateTime.utc(2024, 6, 16, 9));
+
+      // Cancel arrives while the first request is in flight, which is what a
+      // diver tapping the button actually does.
+      var cancelled = false;
+      final requests = <Uri>[];
+      final client = MockClient((request) async {
+        requests.add(request.url);
+        cancelled = true;
+        return http.Response(_payload(), 200);
+      });
+      final service = BulkConditionsService(
+        diveRepository: repository,
+        weatherService: WeatherService(client: client),
+        // Long enough that waiting it out hangs the test rather than passing
+        // slowly: the pacing exists to space out the NEXT request, and a
+        // cancelled run has no next request to space out.
+        requestDelay: const Duration(minutes: 5),
+      );
+
+      final result = await service.run(isCancelled: () => cancelled);
+
+      expect(result.cancelled, isTrue);
+      expect(result.filled, 1);
+      expect(requests, hasLength(1));
+    });
+
     test('processed counts every bucket the run filled out', () async {
       await insertSite('s1', 12.5, -68.25);
       await insertDive('d1', siteId: 's1', at: DateTime.utc(2024, 6, 15, 9));

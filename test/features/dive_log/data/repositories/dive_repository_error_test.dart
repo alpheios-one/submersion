@@ -59,6 +59,10 @@ void main() {
         throwsA(anything),
       );
       await expectLater(
+        repository.countDivesNeedingConditions(),
+        throwsA(anything),
+      );
+      await expectLater(
         repository.fillDiveConditions(
           'test-id',
           humidity: 70,

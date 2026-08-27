@@ -8,6 +8,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/constants/map_tile_config.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/slippy_tiles.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -264,7 +265,11 @@ class _DiveListPageState extends ConsumerState<DiveListPage> {
               } else if (value == 'data_quality') {
                 context.push('/dives/quality');
               } else if (value == 'fetch_conditions') {
-                _fetchAllConditions();
+                logFailure(
+                  _fetchAllConditions(),
+                  _DiveListPageState,
+                  'fetch conditions for all dives',
+                );
               } else if (value.startsWith('view_')) {
                 final mode = ListViewMode.fromName(
                   value.replaceFirst('view_', ''),

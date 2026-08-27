@@ -201,6 +201,62 @@ void main() {
     });
   });
 
+  group('DiveRepository.countDivesNeedingConditions', () {
+    test('counts the same dives the candidate query returns', () async {
+      await insertSite('s1', latitude: 12.5, longitude: -68.25);
+      await insertSite('s2');
+      await insertDive('d1', siteId: 's1');
+      await insertDive('d2', siteId: 's1');
+      await insertDive('d3', siteId: 's2'); // site has no coordinates
+      await insertDive('d4'); // no site
+
+      expect(await repository.countDivesNeedingConditions(), 2);
+    });
+
+    test('counts zero when every fillable column is populated', () async {
+      await insertSite('s1', latitude: 12.5, longitude: -68.25);
+      await insertDive(
+        'd1',
+        siteId: 's1',
+        weather: const DivesCompanion(
+          windSpeed: Value(4.0),
+          windDirection: Value('north'),
+          cloudCover: Value('clear'),
+          precipitation: Value('none'),
+          humidity: Value(70.0),
+          weatherCode: Value(0),
+          airTemp: Value(28.0),
+          surfacePressure: Value(1.013),
+        ),
+      );
+
+      expect(await repository.countDivesNeedingConditions(), 0);
+    });
+
+    test('restricts to the requested diver', () async {
+      await insertSite('s1', latitude: 12.5, longitude: -68.25);
+      for (final id in ['diver-a', 'diver-b']) {
+        await db
+            .into(db.divers)
+            .insert(
+              DiversCompanion.insert(
+                id: id,
+                name: id,
+                createdAt: DateTime.now().millisecondsSinceEpoch,
+                updatedAt: DateTime.now().millisecondsSinceEpoch,
+              ),
+            );
+      }
+      await insertDive('d1', siteId: 's1', diverId: 'diver-a');
+      await insertDive('d2', siteId: 's1', diverId: 'diver-b');
+
+      expect(
+        await repository.countDivesNeedingConditions(diverId: 'diver-a'),
+        1,
+      );
+    });
+  });
+
   group('DiveRepository.fillDiveConditions (fills only NULL columns)', () {
     final fetchedAt = DateTime.utc(2024, 5, 1, 12);
 
