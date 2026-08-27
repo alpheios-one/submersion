@@ -52,6 +52,7 @@ void main() {
     'dive_custom_fields': 'diveCustomFields',
     'dive_data_sources': 'diveDataSources',
     'site_species': 'siteSpecies',
+    'media_species': 'mediaSpecies',
     'site_features': 'siteFeatures',
     'csv_presets': 'csvPresets',
     'view_configs': 'viewConfigs',
