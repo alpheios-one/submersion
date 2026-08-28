@@ -827,46 +827,39 @@ class StatisticsRepository {
   // Dive Progression Statistics
   // ============================================================================
 
-  /// Get maximum depth progression by month (last 5 years)
-  Future<List<TrendDataPoint>> getDepthProgressionTrend({
+  /// Maximum depth of every dive in scope, ordered by date.
+  ///
+  /// One point per dive. Scope comes entirely from [filter]; there is
+  /// deliberately no built-in window, because a hardcoded five-year cutoff
+  /// used to make "lifetime" unreachable (issue #299).
+  Future<List<TrendDataPoint>> getDepthPerDive({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
   }) async {
     try {
-      final fiveYearsAgo = DateTime.now().subtract(
-        const Duration(days: 365 * 5),
-      );
-      final cutoff = fiveYearsAgo.millisecondsSinceEpoch;
-
       final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
       final df = _diveFilter(filter, alias: 'dives');
-      final params = diverId != null
-          ? [cutoff, diverId, ...df.params]
-          : [cutoff, ...df.params];
+      final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
-        SELECT
-          strftime('%Y', dive_date_time / 1000, 'unixepoch') AS year,
-          strftime('%m', dive_date_time / 1000, 'unixepoch') AS month,
-          MAX(max_depth) AS max_depth
+        SELECT dive_date_time, max_depth
         FROM dives
-        WHERE dive_date_time >= ? AND max_depth IS NOT NULL $diverFilter ${df.clause}
-        GROUP BY year, month
-        ORDER BY year, month
+        WHERE max_depth IS NOT NULL $diverFilter ${df.clause}
+        ORDER BY dive_date_time
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
       return results.map((row) {
-        final year = int.parse(row.read<String>('year'));
-        final month = int.parse(row.read<String>('month'));
         return TrendDataPoint(
-          date: DateTime(year, month),
+          date: DateTime.fromMillisecondsSinceEpoch(
+            row.read<int>('dive_date_time'),
+            isUtc: true,
+          ),
           value: row.read<double>('max_depth'),
-          label: '${_monthAbbr(month)} $year',
         );
       }).toList();
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to get depth progression trend',
+        'Failed to get per-dive max depth',
         error: e,
         stackTrace: stackTrace,
       );
@@ -874,46 +867,35 @@ class StatisticsRepository {
     }
   }
 
-  /// Get average bottom time trend by month (last 5 years)
-  Future<List<TrendDataPoint>> getBottomTimeTrend({
+  /// Bottom time in minutes for every dive in scope, ordered by date.
+  Future<List<TrendDataPoint>> getBottomTimePerDive({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
   }) async {
     try {
-      final fiveYearsAgo = DateTime.now().subtract(
-        const Duration(days: 365 * 5),
-      );
-      final cutoff = fiveYearsAgo.millisecondsSinceEpoch;
-
       final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
       final df = _diveFilter(filter, alias: 'dives');
-      final params = diverId != null
-          ? [cutoff, diverId, ...df.params]
-          : [cutoff, ...df.params];
+      final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
-        SELECT
-          strftime('%Y', dive_date_time / 1000, 'unixepoch') AS year,
-          strftime('%m', dive_date_time / 1000, 'unixepoch') AS month,
-          AVG(bottom_time / 60.0) AS avg_duration
+        SELECT dive_date_time, bottom_time / 60.0 AS minutes
         FROM dives
-        WHERE dive_date_time >= ? AND bottom_time IS NOT NULL $diverFilter ${df.clause}
-        GROUP BY year, month
-        ORDER BY year, month
+        WHERE bottom_time IS NOT NULL $diverFilter ${df.clause}
+        ORDER BY dive_date_time
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
       return results.map((row) {
-        final year = int.parse(row.read<String>('year'));
-        final month = int.parse(row.read<String>('month'));
         return TrendDataPoint(
-          date: DateTime(year, month),
-          value: row.read<double>('avg_duration'),
-          label: '${_monthAbbr(month)} $year',
+          date: DateTime.fromMillisecondsSinceEpoch(
+            row.read<int>('dive_date_time'),
+            isUtc: true,
+          ),
+          value: row.read<double>('minutes'),
         );
       }).toList();
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to get bottom time trend',
+        'Failed to get per-dive bottom time',
         error: e,
         stackTrace: stackTrace,
       );

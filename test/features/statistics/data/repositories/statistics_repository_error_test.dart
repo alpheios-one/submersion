@@ -28,8 +28,8 @@ void main() {
       expect(await repository.getSacPressureTrend(), isEmpty);
       expect(await repository.getGasMixDistribution(), isEmpty);
       expect(await repository.getDiveTypeDistribution(), isEmpty);
-      expect(await repository.getDepthProgressionTrend(), isEmpty);
-      expect(await repository.getBottomTimeTrend(), isEmpty);
+      expect(await repository.getDepthPerDive(), isEmpty);
+      expect(await repository.getBottomTimePerDive(), isEmpty);
       expect(await repository.getDivesPerYear(), isEmpty);
       expect(await repository.getCumulativeDiveCount(), isEmpty);
       expect(
