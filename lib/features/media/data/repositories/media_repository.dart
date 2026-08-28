@@ -1766,11 +1766,18 @@ class MediaRepository {
   /// gain protection soonest. Scoped to rows linked to a dive or site so
   /// orphaned rows are never uploaded (orphan-prevention spec section 4.1).
   Future<List<String>> getBackfillCandidateIds() async {
+    // A row another device imported is that device's to upload: this one
+    // cannot read its path, so enqueueing it only manufactures a "source
+    // unavailable" failure. Rows from before origin tracking carry no id
+    // and keep today's verdict.
+    final thisDevice = await _syncRepository.getDeviceId();
     final id = _db.media.id;
     final query = _db.selectOnly(_db.media)
       ..addColumns([id])
       ..where(
         isLinkedToDiveOrSite(_db.media) &
+            (_db.media.originDeviceId.isNull() |
+                _db.media.originDeviceId.equals(thisDevice)) &
             // Photos from any uploadable source.
             ((_db.media.remoteUploadedAt.isNull() &
                     _db.media.remoteCompressedUploadedAt.isNull() &
