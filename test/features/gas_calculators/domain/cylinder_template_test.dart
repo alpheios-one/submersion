@@ -29,6 +29,17 @@ void main() {
         expect(t.isValid, isTrue, reason: t.toString());
       }
     });
+
+    test('equal templates hash the same, so a Set dedupes them', () {
+      const a = CylinderTemplate(name: 'Deco bottle', liters: 3);
+      // Built from a decoded map rather than a second const literal, so this
+      // is a distinct instance rather than the same canonicalized constant --
+      // otherwise a Set of the two would trivially hold one element even with
+      // a broken hashCode.
+      final b = CylinderTemplate.fromJson(a.toJson())!;
+      expect(a.hashCode, b.hashCode);
+      expect({a, b}, hasLength(1));
+    });
   });
 
   group('cylinderTemplateRejectionFor', () {

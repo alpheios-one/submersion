@@ -89,6 +89,33 @@ void main() {
     expect(ref.read(blenderCylinderTemplatesProvider), hasLength(1));
   });
 
+  testWidgets('the cap is refused with a reason', (tester) async {
+    final ref = await _pump(tester);
+    ref.read(blenderCylinderTemplatesProvider.notifier).state = List.generate(
+      kMaxCylinderTemplates,
+      (i) => CylinderTemplate(name: 'Bottle $i', liters: 3 + i * 0.1),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, 'One more');
+    await tester.enterText(find.byType(TextField).last, '5');
+    // 50 saved sizes push the Add button well past the default test
+    // viewport, so it has to be scrolled into view before it can be tapped.
+    await tester.ensureVisible(find.byTooltip('Add'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Add'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text("You've reached the saved cylinder size limit."),
+      findsOneWidget,
+    );
+    expect(
+      ref.read(blenderCylinderTemplatesProvider),
+      hasLength(kMaxCylinderTemplates),
+    );
+  });
+
   testWidgets('a blank size is refused', (tester) async {
     await _pump(tester);
     await tester.enterText(find.byType(TextField).first, 'Deco bottle');

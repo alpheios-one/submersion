@@ -7,6 +7,8 @@ import 'package:submersion/features/gas_calculators/presentation/widgets/blender
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import '../../support/fake_app_settings_repository.dart';
+
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
   _TestSettingsNotifier(super.settings);
@@ -15,7 +17,13 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-Future<WidgetRef> _pump(WidgetTester tester) async {
+// The Riverpod `Override` type is sealed and not re-exported, so overrides
+// are threaded through as `dynamic` and cast at the `ProviderScope` boundary
+// (see test/helpers/test_app.dart).
+Future<WidgetRef> _pump(
+  WidgetTester tester, {
+  List<dynamic> overrides = const [],
+}) async {
   late WidgetRef captured;
   await tester.pumpWidget(
     ProviderScope(
@@ -24,7 +32,8 @@ Future<WidgetRef> _pump(WidgetTester tester) async {
           (ref) =>
               _TestSettingsNotifier(const AppSettings(defaultCurrency: 'CHF')),
         ),
-      ],
+        ...overrides,
+      ].cast(),
       child: MaterialApp(
         locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -149,5 +158,22 @@ void main() {
 
     expect(find.text('Default settings and billing'), findsOneWidget);
     expect(find.text('Cylinder sizes'), findsOneWidget);
+  });
+
+  testWidgets('submitting a typed cylinder volume saves the preferences', (
+    tester,
+  ) async {
+    final repo = FakeAppSettingsRepository();
+    final ref = await _pump(
+      tester,
+      overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
+    );
+
+    await tester.enterText(find.byType(TextField).first, '15');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(ref.read(blenderCylinderLitersProvider), closeTo(15, 0.001));
+    expect(repo.blenderPreferences?.cylinderWaterLiters, closeTo(15, 0.001));
   });
 }

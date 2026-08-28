@@ -10,6 +10,8 @@ import 'package:submersion/features/gas_calculators/presentation/widgets/gas_ble
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import '../../support/fake_app_settings_repository.dart';
+
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
   _TestSettingsNotifier(super.settings);
@@ -25,12 +27,21 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
 /// the next.
 late _TestSettingsNotifier _settings;
 
-Future<WidgetRef> _pump(WidgetTester tester) async {
+// The Riverpod `Override` type is sealed and not re-exported, so overrides
+// are threaded through as `dynamic` and cast at the `ProviderScope` boundary
+// (see test/helpers/test_app.dart).
+Future<WidgetRef> _pump(
+  WidgetTester tester, {
+  List<dynamic> overrides = const [],
+}) async {
   _settings = _TestSettingsNotifier(const AppSettings());
   late WidgetRef captured;
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [settingsProvider.overrideWith((ref) => _settings)],
+      overrides: [
+        settingsProvider.overrideWith((ref) => _settings),
+        ...overrides,
+      ].cast(),
       child: MaterialApp(
         // flutter_test forwards the host machine's locale list, so an unpinned
         // MaterialApp renders translated on a non-English dev machine and every
@@ -290,5 +301,41 @@ void main() {
     expect(find.text('Fill procedure'), findsOneWidget);
     // Z-factor: 10.2 / 86.9 / 62.8, in line with Multideco and arcusblender.
     expect(find.textContaining('+86.9'), findsWidgets);
+  });
+
+  testWidgets('submitting the start cylinder row saves the preferences', (
+    tester,
+  ) async {
+    // Issue #1335: the cylinder now persists across restarts, the same as
+    // fill gases and mixing conditions already did.
+    final repo = FakeAppSettingsRepository();
+    await _pump(
+      tester,
+      overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
+    );
+    final fields = find.byType(TextField);
+
+    await tester.enterText(fields.at(0), '150');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(repo.blenderPreferences?.startPressureBar, closeTo(150, 0.001));
+  });
+
+  testWidgets('submitting the target fill row saves the preferences', (
+    tester,
+  ) async {
+    final repo = FakeAppSettingsRepository();
+    await _pump(
+      tester,
+      overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
+    );
+    final fields = find.byType(TextField);
+
+    await tester.enterText(fields.at(3), '220');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(repo.blenderPreferences?.targetPressureBar, closeTo(220, 0.001));
   });
 }
