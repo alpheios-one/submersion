@@ -1,6 +1,13 @@
+import 'dart:math' as math;
+
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import 'package:submersion/core/ui/chart_viewport.dart';
+import 'package:submersion/core/ui/trackpad_zoom_recognizer.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/chart_touch_recognizer.dart';
 
 import 'package:submersion/features/statistics/domain/trend_aggregation.dart';
 import 'package:submersion/features/statistics/presentation/widgets/chart_axis.dart';
@@ -21,7 +28,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 ///
 /// fl_chart's ScatterChart is deliberately not used: it cannot carry the
 /// overlay line series alongside the points.
-class DiveTrendChart extends StatelessWidget {
+class DiveTrendChart extends StatefulWidget {
   const DiveTrendChart({
     super.key,
     required this.points,
@@ -51,25 +58,240 @@ class DiveTrendChart extends StatelessWidget {
   final String Function(double)? valueFormatter;
   final String Function(double)? yAxisFormatter;
 
+  @override
+  State<DiveTrendChart> createState() => _DiveTrendChartState();
+}
+
+class _DiveTrendChartState extends State<DiveTrendChart> {
+  /// Visible window over the time axis. Y is never zoomed: a trend chart's
+  /// interesting axis is time, and holding the value axis still keeps the
+  /// grid readable while panning.
+  ChartViewport _viewport = ChartViewport.reset;
+
+  ChartViewport _gestureStartViewport = ChartViewport.reset;
+  PointerDeviceKind _activePointerKind = PointerDeviceKind.mouse;
+  int _activePointerCount = 0;
+  Offset? _lastPointerLocal;
+  bool _touchDragClaimed = false;
+  final Map<int, Offset> _touchPositions = {};
+  List<int> _pinchPointers = const [];
+  double _pinchStartDistance = 1;
+  Offset _pinchStartFocal = Offset.zero;
+
+  /// Axis gutters reserved by `_titles`. The focal fraction has to be taken
+  /// against the inner plot rect, not the whole widget.
+  static const _insets = (left: 50.0, right: 0.0, top: 0.0, bottom: 30.0);
+
   static double _x(DateTime date) => date.millisecondsSinceEpoch.toDouble();
+
+  double _focalX(Offset localPos, Size box) => chartFocalFraction(
+    localPos,
+    box,
+    left: _insets.left,
+    right: _insets.right,
+    top: _insets.top,
+    bottom: _insets.bottom,
+  ).fx;
+
+  double _plotWidth(Size box) =>
+      (box.width - _insets.left - _insets.right).clamp(1.0, double.infinity);
+
+  void _zoomAt(Offset localPosition, double zoomDelta, Size box) {
+    if (zoomDelta == 0) return;
+    setState(() {
+      _activePointerKind = PointerDeviceKind.trackpad;
+      _viewport = _viewport.zoomedAt(
+        _focalX(localPosition, box),
+        0,
+        math.pow(2, zoomDelta).toDouble(),
+      );
+    });
+  }
+
+  void _beginPinch() {
+    _pinchPointers = _touchPositions.keys.take(2).toList(growable: false);
+    final p0 = _touchPositions[_pinchPointers[0]]!;
+    final p1 = _touchPositions[_pinchPointers[1]]!;
+    _pinchStartDistance = (p0 - p1).distance.clamp(1.0, double.infinity);
+    _pinchStartFocal = (p0 + p1) / 2;
+    _gestureStartViewport = _viewport;
+  }
+
+  void _updatePinch(Size box) {
+    if (_pinchPointers.length < 2) return;
+    final p0 = _touchPositions[_pinchPointers[0]];
+    final p1 = _touchPositions[_pinchPointers[1]];
+    if (p0 == null || p1 == null) return;
+    setState(() {
+      final scale =
+          (p0 - p1).distance.clamp(1.0, double.infinity) / _pinchStartDistance;
+      var vp = _gestureStartViewport.zoomedAt(
+        _focalX(_pinchStartFocal, box),
+        0,
+        scale,
+      );
+      final panPx = (p0 + p1) / 2 - _pinchStartFocal;
+      vp = vp.pannedBy(-panPx.dx / _plotWidth(box) / vp.zoom, 0);
+      _viewport = vp;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (points.isEmpty) {
-      return _EmptyChart(height: height);
+    if (widget.points.isEmpty) {
+      return _EmptyChart(height: widget.height);
     }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final box = Size(constraints.maxWidth, widget.height);
+        return RawGestureDetector(
+          gestures: {
+            TrackpadZoomGestureRecognizer:
+                GestureRecognizerFactoryWithHandlers<
+                  TrackpadZoomGestureRecognizer
+                >(
+                  () => TrackpadZoomGestureRecognizer(debugOwner: this),
+                  (recognizer) =>
+                      recognizer.onZoom = (pos, delta) =>
+                          _zoomAt(pos, delta, box),
+                ),
+          },
+          child: Listener(
+            onPointerDown: (event) {
+              _activePointerCount++;
+              _activePointerKind = event.kind;
+              _lastPointerLocal = event.localPosition;
+              if (event.kind == PointerDeviceKind.touch) {
+                _touchPositions[event.pointer] = event.localPosition;
+                if (_touchPositions.length == 2) _beginPinch();
+              }
+            },
+            onPointerMove: (event) {
+              final prev = _lastPointerLocal;
+              _lastPointerLocal = event.localPosition;
+              if (event.kind == PointerDeviceKind.touch) {
+                _touchPositions[event.pointer] = event.localPosition;
+              }
+              if (prev == null) return;
+              final intent = chartDragIntent(
+                kind: _activePointerKind,
+                pointerCount: _activePointerCount,
+                isZoomed: _viewport.isZoomed,
+              );
+              if (intent == ChartDragIntent.zoomPan &&
+                  _activePointerKind == PointerDeviceKind.touch) {
+                _updatePinch(box);
+                return;
+              }
+              if (intent != ChartDragIntent.pan) return;
+              // A touch drag only pans once the claim recognizer has won the
+              // arena, so a scrub is never fought by a pan.
+              if (_activePointerKind == PointerDeviceKind.touch &&
+                  !_touchDragClaimed) {
+                return;
+              }
+              setState(() {
+                final d = event.localPosition - prev;
+                _viewport = _viewport.pannedBy(
+                  -d.dx / _plotWidth(box) / _viewport.zoom,
+                  0,
+                );
+              });
+            },
+            onPointerUp: (event) {
+              if (_activePointerCount > 0) _activePointerCount--;
+              _lastPointerLocal = null;
+              _touchPositions.remove(event.pointer);
+              if (_pinchPointers.contains(event.pointer)) {
+                _touchPositions.length >= 2
+                    ? _beginPinch()
+                    : _pinchPointers = const [];
+              }
+            },
+            onPointerCancel: (event) {
+              if (_activePointerCount > 0) _activePointerCount--;
+              _lastPointerLocal = null;
+              _touchPositions.remove(event.pointer);
+              _pinchPointers = const [];
+            },
+            // Trackpad pan-zoom is claimed by the recognizer above so it does
+            // not also scroll the enclosing page.
+            onPointerSignal: (event) {
+              if (event is! PointerScrollEvent) return;
+              setState(() {
+                _activePointerKind = PointerDeviceKind.mouse;
+                final factor = event.scrollDelta.dy < 0 ? 1.1 : 1 / 1.1;
+                _viewport = _viewport.zoomedAt(
+                  _focalX(event.localPosition, box),
+                  0,
+                  factor,
+                );
+              });
+            },
+            child: Stack(
+              children: [
+                _buildChart(context),
+                Positioned.fill(
+                  child: RawGestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    gestures: {
+                      ChartTouchClaimRecognizer:
+                          GestureRecognizerFactoryWithHandlers<
+                            ChartTouchClaimRecognizer
+                          >(
+                            () => ChartTouchClaimRecognizer(
+                              isZoomed: () => _viewport.isZoomed,
+                              debugOwner: this,
+                            ),
+                            (recognizer) {
+                              recognizer.onClaimed = () {
+                                _touchDragClaimed = true;
+                              };
+                              recognizer.onReleased = () {
+                                _touchDragClaimed = false;
+                              };
+                            },
+                          ),
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildChart(BuildContext context) {
+    final points = widget.points;
+    final aggregation = widget.aggregation;
+    final height = widget.height;
+    final yAxisLabel = widget.yAxisLabel;
 
     final theme = Theme.of(context);
-    final color = pointColor ?? theme.colorScheme.primary;
+    final color = widget.pointColor ?? theme.colorScheme.primary;
 
     final buckets = aggregate(points, aggregation);
-    final dateAxis = DateAxis.forRange(buckets.first.date, buckets.last.date);
+
+    // The window the viewport exposes, not the whole series. Ticks are chosen
+    // from the visible span so a chart zoomed into a few weeks stops being
+    // labelled by year.
+    final fullMin = _x(buckets.first.date);
+    final fullMax = _x(buckets.last.date);
+    final fullSpan = (fullMax - fullMin).clamp(1.0, double.infinity);
+    final visibleMin = fullMin + _viewport.offsetX * fullSpan;
+    final visibleMax = visibleMin + fullSpan * _viewport.visibleWidth;
+    final dateAxis = DateAxis.forRange(
+      DateTime.fromMillisecondsSinceEpoch(visibleMin.toInt(), isUtc: true),
+      DateTime.fromMillisecondsSinceEpoch(visibleMax.toInt(), isUtc: true),
+    );
 
     // The fits can run outside the bucket range, so the axis has to see them.
-    final smoothed = showRollingMean
+    final smoothed = widget.showRollingMean
         ? rollingMean(points)
         : const <TrendDataPoint>[];
-    final fit = showLinearFit ? linearFit(points) : null;
+    final fit = widget.showLinearFit ? linearFit(points) : null;
     final yAxis = ChartAxis.forTrend(<double>[
       ...buckets.expand((b) => [b.min, b.max]),
       ...smoothed.map((p) => p.value),
@@ -86,15 +308,17 @@ class DiveTrendChart extends StatelessWidget {
       label: yAxisLabel != null
           ? context.l10n.statistics_chart_trendSemanticLabelWithAxis(
               points.length,
-              yAxisLabel!,
+              yAxisLabel,
             )
           : context.l10n.statistics_chart_trendSemanticLabel(points.length),
       child: SizedBox(
         height: height,
         child: LineChart(
+          duration: Duration.zero,
           LineChartData(
-            minX: dateAxis.min,
-            maxX: dateAxis.max,
+            minX: visibleMin,
+            maxX: visibleMax,
+            clipData: const FlClipData.horizontal(),
             minY: yAxis.min,
             maxY: yAxis.max,
             lineTouchData: _touchData(context, bars.first),
@@ -173,8 +397,8 @@ class DiveTrendChart extends StatelessWidget {
     // means would smooth twice, and the line would visibly move when the
     // dropdown changed, implying the underlying trend had changed when only
     // the drawing did.
-    if (showRollingMean) {
-      final smoothed = rollingMean(points);
+    if (widget.showRollingMean) {
+      final smoothed = rollingMean(widget.points);
       if (smoothed.isNotEmpty) {
         bars.add(
           LineChartBarData(
@@ -182,7 +406,7 @@ class DiveTrendChart extends StatelessWidget {
                 .map((p) => FlSpot(_x(p.date), p.value))
                 .toList(growable: false),
             isCurved: false,
-            color: rollingColor ?? Theme.of(context).colorScheme.primary,
+            color: widget.rollingColor ?? Theme.of(context).colorScheme.primary,
             barWidth: 2.2,
             isStrokeCapRound: true,
             dotData: const FlDotData(show: false),
@@ -191,8 +415,8 @@ class DiveTrendChart extends StatelessWidget {
       }
     }
 
-    if (showLinearFit) {
-      final fit = linearFit(points);
+    if (widget.showLinearFit) {
+      final fit = linearFit(widget.points);
       if (fit != null) {
         final first = buckets.first.date;
         final last = buckets.last.date;
@@ -203,7 +427,7 @@ class DiveTrendChart extends StatelessWidget {
               FlSpot(_x(last), fit.valueAt(last)),
             ],
             isCurved: false,
-            color: rateColor ?? Theme.of(context).colorScheme.tertiary,
+            color: widget.rateColor ?? Theme.of(context).colorScheme.tertiary,
             barWidth: 1.8,
             dashArray: const [6, 4],
             dotData: const FlDotData(show: false),
@@ -219,7 +443,7 @@ class DiveTrendChart extends StatelessWidget {
   /// the spread. Smoothing must not put back the hiding this issue is about.
   List<BetweenBarsData> _bands(BuildContext context, bool isRaw) {
     if (isRaw) return const [];
-    final color = pointColor ?? Theme.of(context).colorScheme.primary;
+    final color = widget.pointColor ?? Theme.of(context).colorScheme.primary;
     return [
       BetweenBarsData(
         fromIndex: 1,
@@ -262,7 +486,8 @@ class DiveTrendChart extends StatelessWidget {
               isUtc: true,
             );
             final value =
-                valueFormatter?.call(spot.y) ?? spot.y.toStringAsFixed(1);
+                widget.valueFormatter?.call(spot.y) ??
+                spot.y.toStringAsFixed(1);
             return LineTooltipItem(
               '${DateFormat.yMMMd().format(date)}\n$value',
               // Matches the dive profile chart's readout: monospace with
@@ -306,16 +531,19 @@ class DiveTrendChart extends StatelessWidget {
         ),
       ),
       leftTitles: AxisTitles(
-        axisNameWidget: yAxisLabel != null
-            ? Text(yAxisLabel!, style: Theme.of(context).textTheme.bodySmall)
+        axisNameWidget: widget.yAxisLabel != null
+            ? Text(
+                widget.yAxisLabel!,
+                style: Theme.of(context).textTheme.bodySmall,
+              )
             : null,
-        axisNameSize: yAxisLabel != null ? 20 : 0,
+        axisNameSize: widget.yAxisLabel != null ? 20 : 0,
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 50,
           interval: yAxis.interval,
           getTitlesWidget: (value, meta) {
-            final formatter = yAxisFormatter ?? valueFormatter;
+            final formatter = widget.yAxisFormatter ?? widget.valueFormatter;
             return Text(
               formatter?.call(value) ?? value.toStringAsFixed(0),
               style: Theme.of(context).textTheme.bodySmall,

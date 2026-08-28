@@ -37,7 +37,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_o
 import 'package:submersion/features/dive_log/presentation/widgets/safety_findings_overlay.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
-import 'package:submersion/features/dive_log/presentation/widgets/profile_chart_viewport.dart';
+import 'package:submersion/core/ui/chart_viewport.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_event_labels.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_highlight_range.dart';
 import 'package:submersion/core/ui/trackpad_zoom_recognizer.dart';
@@ -844,12 +844,12 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       ? ' ${context.l10n.diveLog_pressure_estimatedSuffix}'
       : '';
 
-  // Zoom/pan state — see profile_chart_viewport.dart.
-  ProfileChartViewport _viewport = ProfileChartViewport.reset;
+  // Zoom/pan state; see core/ui/chart_viewport.dart.
+  ChartViewport _viewport = ChartViewport.reset;
 
   // Snapshot of the viewport at the start of a continuous gesture; continuous
   // gestures report cumulative scale/pan, so we apply them against this.
-  ProfileChartViewport _gestureStartViewport = ProfileChartViewport.reset;
+  ChartViewport _gestureStartViewport = ChartViewport.reset;
 
   // Active pointer kind, corrected on the first real pointer event. Chooses
   // pan-vs-scrub for single-pointer drags and is set by trackpad gestures.
@@ -1147,7 +1147,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   }
 
   void _resetZoom() {
-    setState(() => _viewport = ProfileChartViewport.reset);
+    setState(() => _viewport = ChartViewport.reset);
   }
 
   /// Build and emit [TooltipRow] data for external rendering when
@@ -1911,8 +1911,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                   child: DiveProfileLegend(
                     config: legendConfig,
                     zoomLevel: _viewport.zoom,
-                    minZoom: ProfileChartViewport.minZoom,
-                    maxZoom: ProfileChartViewport.maxZoom,
+                    minZoom: ChartViewport.minZoom,
+                    maxZoom: ChartViewport.maxZoom,
                     onZoomIn: _zoomIn,
                     onZoomOut: _zoomOut,
                     onResetZoom: _resetZoom,
@@ -2258,7 +2258,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   ) {
     setState(() {
       if (_viewport.isZoomed) {
-        _viewport = ProfileChartViewport.reset;
+        _viewport = ChartViewport.reset;
       } else {
         final box = constraints.biggest;
         final insets = _plotInsets(constraints.maxWidth, units);
@@ -2387,7 +2387,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       ...overlayPoints.map((p) => p.timestamp),
     ].reduce(math.max).toDouble();
 
-    // Apply zoom and pan to calculate visible bounds (see ProfileChartViewport).
+    // Apply zoom and pan to calculate visible bounds (see ChartViewport).
     final visibleRangeX = totalMaxTime * _viewport.visibleWidth;
     final visibleRangeY = totalMaxDepth * _viewport.visibleHeight;
 

@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/statistics/domain/trend_aggregation.dart';
@@ -536,6 +537,124 @@ void main() {
           reason: 'series $i drew an indicator',
         );
       }
+    });
+  });
+
+  group('zoom and pan', () {
+    List<TrendDataPoint> longSeries() => List.generate(
+      60,
+      (i) => TrendDataPoint(
+        date: DateTime.utc(2022, 1, 1).add(Duration(days: i * 20)),
+        value: 10.0 + (i % 7),
+      ),
+    );
+
+    testWidgets('renders instantly so panning does not smear', (tester) async {
+      // fl_chart's LineChart is an ImplicitlyAnimatedWidget defaulting to
+      // 150ms. Any chart rebuilt from pointer events lerps old data to new,
+      // smearing bars while panning (PR #879).
+      await tester.pumpWidget(host(DiveTrendChart(points: longSeries())));
+
+      final chart = tester.widget<LineChart>(find.byType(LineChart));
+
+      expect(chart.duration, Duration.zero);
+    });
+
+    testWidgets('starts unzoomed, spanning the whole range', (tester) async {
+      final points = longSeries();
+      await tester.pumpWidget(host(DiveTrendChart(points: points)));
+
+      final data = readData(tester);
+
+      expect(data.minX, points.first.date.millisecondsSinceEpoch.toDouble());
+      expect(data.maxX, points.last.date.millisecondsSinceEpoch.toDouble());
+    });
+
+    testWidgets('a scroll wheel tick narrows the visible span', (tester) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: longSeries())));
+      final before = readData(tester);
+      final beforeSpan = before.maxX - before.minX;
+
+      final center = tester.getCenter(find.byType(LineChart));
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      tester.binding.handlePointerEvent(pointer.hover(center));
+      tester.binding.handlePointerEvent(pointer.scroll(const Offset(0, -100)));
+      await tester.pump();
+
+      final after = readData(tester);
+      expect(after.maxX - after.minX, lessThan(beforeSpan));
+    });
+
+    testWidgets('clips data outside the visible window', (tester) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: longSeries())));
+
+      expect(readData(tester).clipData.any, isTrue);
+    });
+
+    testWidgets('a trackpad pinch zooms', (tester) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: longSeries())));
+      final before = readData(tester);
+      final beforeSpan = before.maxX - before.minX;
+
+      final center = tester.getCenter(find.byType(LineChart));
+      final gesture = await tester.createGesture(
+        kind: PointerDeviceKind.trackpad,
+      );
+      await gesture.panZoomStart(center);
+      await gesture.panZoomUpdate(center, scale: 2.5);
+      await tester.pump();
+
+      final after = readData(tester);
+      expect(after.maxX - after.minX, lessThan(beforeSpan));
+
+      await gesture.panZoomEnd();
+      await tester.pump();
+    });
+
+    testWidgets('a mouse drag pans once zoomed', (tester) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: longSeries())));
+
+      final center = tester.getCenter(find.byType(LineChart));
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      tester.binding.handlePointerEvent(pointer.hover(center));
+      tester.binding.handlePointerEvent(pointer.scroll(const Offset(0, -100)));
+      await tester.pump();
+      final zoomed = readData(tester);
+
+      tester.binding.handlePointerEvent(pointer.down(center));
+      tester.binding.handlePointerEvent(
+        pointer.move(center - const Offset(60, 0)),
+      );
+      tester.binding.handlePointerEvent(pointer.up());
+      await tester.pump();
+
+      final panned = readData(tester);
+      expect(panned.minX, greaterThan(zoomed.minX));
+      // The span is unchanged: panning moves the window, it does not resize it.
+      expect(panned.maxX - panned.minX, closeTo(zoomed.maxX - zoomed.minX, 1));
+    });
+
+    testWidgets('the axis relabels for the zoomed window', (tester) async {
+      // Zoomed into a few weeks, year ticks would say nothing.
+      await tester.pumpWidget(host(DiveTrendChart(points: longSeries())));
+      final wide = readData(tester);
+
+      final center = tester.getCenter(find.byType(LineChart));
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      tester.binding.handlePointerEvent(pointer.hover(center));
+      for (var i = 0; i < 12; i++) {
+        tester.binding.handlePointerEvent(
+          pointer.scroll(const Offset(0, -100)),
+        );
+      }
+      await tester.pump();
+
+      final narrow = readData(tester);
+      expect(narrow.maxX - narrow.minX, lessThan(wide.maxX - wide.minX));
+      expect(
+        narrow.titlesData.bottomTitles.sideTitles.interval,
+        lessThan(wide.titlesData.bottomTitles.sideTitles.interval!),
+      );
     });
   });
 }
