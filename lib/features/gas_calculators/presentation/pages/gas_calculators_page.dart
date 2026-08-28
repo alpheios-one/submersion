@@ -12,10 +12,14 @@ import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.d
 /// beside it.
 ///
 /// This is a hub one level below Planning and is built the same way, so the
-/// two read as the same kind of surface. It is a full-window push rather than
-/// a Planning detail pane, for the reason the dive planner is: a split view
-/// cannot be nested inside what is left of the window beside a 440px master
-/// pane. See [PlanningTool.fullPage].
+/// two read as the same kind of surface. It takes the whole window rather
+/// than a Planning detail pane, for the reason the dive planner does: a split
+/// view cannot be nested inside what is left of the window beside a 440px
+/// master pane.
+///
+/// Planning enters it with `go`, not `push`, because the scaffold below
+/// selects with `go` and the two verbs key the page differently. See
+/// [PlanningToolPresentation.splitViewPage].
 ///
 /// The six calculators used to be tabs here. The strip cost the pane roughly
 /// 72px of height on every calculator and crowded six icon-and-text labels

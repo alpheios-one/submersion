@@ -51,8 +51,9 @@ class PlanningPage extends ConsumerWidget {
     switch (toolId) {
       case 'deco-calculator':
         return const DecoCalculatorPage(embedded: true);
-      // Gas Calculators is deliberately absent: it is a full-page push with a
-      // split view of its own. See PlanningTool.fullPage.
+      // Gas Calculators is deliberately absent: it takes the whole window and
+      // runs a split view of its own. See
+      // PlanningToolPresentation.splitViewPage.
       case 'weight-calculator':
         return const WeightPlannerPage(embedded: true);
       case 'surface-interval':

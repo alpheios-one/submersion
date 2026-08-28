@@ -4,7 +4,7 @@
 
 **Goal:** Replace the six-tab `TabBar` inside Gas Calculators with a nested master-detail layout: the six calculators become a list on the left, the selected one fills the pane on the right, and the whole thing is a full-window page pushed from Planning rather than a tool loaded into Planning's detail pane.
 
-**Architecture:** `GasCalculatorsPage` becomes a second consumer of the existing `MasterDetailScaffold`, structured exactly like `PlanningPage`: split view at >=1100px, bare list below that. The six calculator widgets and every provider in `gas_calculators_providers.dart` are untouched, because calculator state already lives in top-level `StateProvider`s rather than in the tab widgets. `PlanningTool` and `PlanningTile` are reused rather than copied, so the two lists are identical by construction; `PlanningTool` gains a `routePrefix` and a `fullPage` flag, which also generalizes the hardcoded dive-planner exception that exists today.
+**Architecture:** `GasCalculatorsPage` becomes a second consumer of the existing `MasterDetailScaffold`, structured exactly like `PlanningPage`: split view at >=1100px, bare list below that. The six calculator widgets and every provider in `gas_calculators_providers.dart` are untouched, because calculator state already lives in top-level `StateProvider`s rather than in the tab widgets. `PlanningTool` and `PlanningTile` are reused rather than copied, so the two lists are identical by construction; `PlanningTool` gains a `routePrefix` and a `presentation` (`PlanningToolPresentation`), which also generalizes the hardcoded dive-planner exception that exists today and carries the entry verb each presentation needs.
 
 **Tech Stack:** Flutter, Riverpod (`StateProvider` via `package:submersion/core/providers/provider.dart`), go_router (nested `GoRoute` children), `flutter gen-l10n` (11 arb files), `flutter_test` widget tests with `testApp`/`ProviderScope` overrides.
 
@@ -60,12 +60,12 @@ Deleted: nothing.
 
 Note: the six titles reuse the existing `gasCalculators_tab_*` values. Do not add new title keys.
 
-## Task 2: `PlanningTool` gains `routePrefix` and `fullPage`
+## Task 2: `PlanningTool` gains `routePrefix` and `presentation`
 
-- [x] Write a test in `test/features/planning/planning_page_test.dart` asserting that a `PlanningTool` with `routePrefix: '/planning/gas-calculators'` and id `mod` produces the route `/planning/gas-calculators/mod`, and that one with `fullPage: true` is rendered by `PlanningTile` with a push rather than a selection callback. Run it and see it fail.
+- [x] Write a test in `test/features/planning/planning_page_test.dart` asserting that a `PlanningTool` with `routePrefix: '/planning/gas-calculators'` and id `mod` produces the route `/planning/gas-calculators/mod`, and that one with a non-default `presentation` is rendered by `PlanningTile` with navigation rather than a selection callback. Run it and see it fail.
 - [x] Add both fields to `PlanningTool` in `lib/features/planning/presentation/planning_tools.dart`, defaulting to `'/planning'` and `false`. Update the `route` getter to use `routePrefix`.
-- [x] In `planning_list_content.dart`, have `PlanningTile` treat `tool.fullPage` as "push, do not select" by ignoring `onToolSelected` when it is set. Document that this generalizes the `kDivePlannerToolId` exception.
-- [x] Set `fullPage: true` on the `gas-calculators` entry in `planningToolsOf`.
+- [x] In `planning_list_content.dart`, have `PlanningTile` treat a non-default `tool.presentation` as "navigate, do not select" by ignoring `onToolSelected`, and pick the entry verb from it: `go` for `splitViewPage`, `push` otherwise. Document that this generalizes the `kDivePlannerToolId` exception.
+- [x] Set `presentation: PlanningToolPresentation.splitViewPage` on the `gas-calculators` entry in `planningToolsOf`.
 - [x] Run the test and see it pass. Run `flutter test test/features/planning/` and see it pass.
 - [x] Commit.
 

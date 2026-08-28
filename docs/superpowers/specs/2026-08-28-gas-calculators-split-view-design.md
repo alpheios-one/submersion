@@ -182,8 +182,8 @@ Changed:
 | File | Change |
 | --- | --- |
 | `pages/gas_calculators_page.dart` | Rewritten as a `MasterDetailScaffold` consumer; `TabController`, `TabBar`, `TabBarView`, and the `embedded` flag all removed |
-| `planning/presentation/planning_tools.dart` | `routePrefix` and `fullPage` fields; Gas Calculators sets both |
-| `planning/presentation/widgets/planning_list_content.dart` | `PlanningTile` honours `fullPage` |
+| `planning/presentation/planning_tools.dart` | `PlanningToolPresentation`, plus `routePrefix` and `presentation` fields; Gas Calculators sets both |
+| `planning/presentation/widgets/planning_list_content.dart` | `PlanningTile` honours `presentation`, for both the pane-vs-page choice and the entry verb |
 | `planning/presentation/widgets/planning_tool_pane.dart` | Optional `leading` |
 | `planning/presentation/pages/planning_page.dart` | Drop the `gas-calculators` case from `_buildTool` |
 | `core/router/app_router.dart` | Six child routes under `gas-calculators` |
