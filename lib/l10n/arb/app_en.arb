@@ -18953,6 +18953,7 @@
   "settings_cloudSync_result_adoptFailed": "Failed to adopt the restored library: {error}",
   "settings_cloudSync_result_previousLibraryUnreadable": "The previous library could not be read; re-established this backend from this device's library.",
   "settings_cloudSync_result_replacementStillUploading": "The replaced library is still uploading. Try again shortly.",
+  "settings_cloudSync_result_cloudLibraryNewerSchema": "The cloud library was published by a newer version of Submersion. Update this device, then try again.",
   "settings_cloudSync_result_recordsFailed": "{count, plural, =1{1 record failed to apply} other{{count} records failed to apply}}",
   "settings_cloudSync_result_adoptedFreshIdentity": "Another device was syncing with this device's identity. This device adopted a new identity and merged the cloud data.",
   "settings_cloudSync_launchCheck_unavailable": "{provider} is not available on this device",
