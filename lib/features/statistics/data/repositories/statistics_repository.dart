@@ -12,6 +12,10 @@ import 'package:submersion/features/dive_log/data/repositories/dive_repository_i
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/features/statistics/data/dive_filter_sql.dart';
 import 'package:submersion/features/statistics/domain/entities/species_statistics.dart';
+import 'package:submersion/features/statistics/domain/trend_aggregation.dart';
+
+export 'package:submersion/features/statistics/domain/trend_aggregation.dart'
+    show TrendDataPoint;
 
 /// Per-dive outcome of the recorded (non-computed) deco classification.
 ///
@@ -27,19 +31,6 @@ typedef DecoSignalScan = ({
   Map<String, int> needsCompute,
   Set<String> noProfile,
 });
-
-/// Data point for line chart trends
-class TrendDataPoint {
-  final DateTime date;
-  final double value;
-  final String label;
-
-  TrendDataPoint({
-    required this.date,
-    required this.value,
-    required this.label,
-  });
-}
 
 /// Ranking item for lists
 class RankingItem {
