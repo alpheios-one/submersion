@@ -39130,9 +39130,12 @@ abstract class AppLocalizations {
   /// No description provided for @settings_mediaStorage_verify_summary.
   ///
   /// In en, this message translates to:
-  /// **'Checked {checked} objects: removed {removed} orphans, queued {repaired} repairs, aborted {aborted} stale uploads'**
+  /// **'Checked {checked} cloud objects ({originals} originals, {thumbs} thumbnails, {renditions} compressed versions): removed {removed} orphans, queued {repaired} repairs, aborted {aborted} stale uploads'**
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,

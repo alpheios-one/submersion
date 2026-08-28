@@ -15229,10 +15229,19 @@
   },
   "settings_mediaStorage_verify_action": "Verify library",
   "settings_mediaStorage_verify_running": "Verifying media library...",
-  "settings_mediaStorage_verify_summary": "Checked {checked} objects: removed {removed} orphans, queued {repaired} repairs, aborted {aborted} stale uploads",
+  "settings_mediaStorage_verify_summary": "Checked {checked} cloud objects ({originals} originals, {thumbs} thumbnails, {renditions} compressed versions): removed {removed} orphans, queued {repaired} repairs, aborted {aborted} stale uploads",
   "@settings_mediaStorage_verify_summary": {
     "placeholders": {
       "checked": {
+        "type": "int"
+      },
+      "originals": {
+        "type": "int"
+      },
+      "thumbs": {
+        "type": "int"
+      },
+      "renditions": {
         "type": "int"
       },
       "removed": {

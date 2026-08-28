@@ -714,6 +714,9 @@ void main() {
               runs++;
               return const VerifyLibraryReport(
                 objectsChecked: 12,
+                originalsChecked: 7,
+                thumbsChecked: 4,
+                renditionsChecked: 1,
                 orphansRemoved: 3,
                 bytesReclaimed: 999,
                 sessionsAborted: 1,
@@ -735,7 +738,15 @@ void main() {
     });
 
     expect(runs, 1);
-    expect(find.textContaining('Checked 12 objects'), findsOneWidget);
+    // A photo is stored as an original plus a thumbnail (plus a rendition
+    // when compressed), so the object count exceeds the photo count; the
+    // summary says so rather than leaving the reader to count twice.
+    expect(
+      find.textContaining(
+        'Checked 12 cloud objects (7 originals, 4 thumbnails, 1 compressed versions)',
+      ),
+      findsOneWidget,
+    );
   });
 
   Widget throwingVerifyApp(Object error) => app(

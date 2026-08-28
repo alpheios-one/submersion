@@ -23377,11 +23377,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return 'Checked $checked objects: removed $removed orphans, queued $repaired repairs, aborted $aborted stale uploads';
+    return 'Checked $checked cloud objects ($originals originals, $thumbs thumbnails, $renditions compressed versions): removed $removed orphans, queued $repaired repairs, aborted $aborted stale uploads';
   }
 
   @override
