@@ -254,16 +254,20 @@ class DiveTrendChart extends StatelessWidget {
     DateAxis dateAxis,
     ChartAxis yAxis,
   ) {
-    final tickMs = dateAxis.ticks.map((t) => t.millisecondsSinceEpoch).toSet();
-
     return FlTitlesData(
       show: true,
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 30,
+          // fl_chart samples this interval to decide where to ask for a
+          // label. Leaving it null lets fl_chart pick its own values, which
+          // then never match a nominated tick and the axis renders blank.
+          interval: dateAxis.labelInterval,
           getTitlesWidget: (value, meta) {
-            if (!tickMs.contains(value.toInt())) return const Text('');
+            if (value < dateAxis.min || value > dateAxis.max) {
+              return const Text('');
+            }
             final date = DateTime.fromMillisecondsSinceEpoch(
               value.toInt(),
               isUtc: true,

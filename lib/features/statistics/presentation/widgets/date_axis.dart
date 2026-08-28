@@ -17,6 +17,7 @@ class DateAxis {
     required this.max,
     required this.ticks,
     required this.granularity,
+    required this.labelInterval,
   });
 
   /// Lower bound, as `millisecondsSinceEpoch`, for fl_chart's `minX`.
@@ -29,6 +30,15 @@ class DateAxis {
   final List<DateTime> ticks;
 
   final DateAxisGranularity granularity;
+
+  /// Spacing, in milliseconds, to hand fl_chart as `SideTitles.interval`.
+  ///
+  /// fl_chart calls `getTitlesWidget` only at values it derives from this
+  /// interval, so a label drawn by matching a nominated tick timestamp exactly
+  /// would essentially never render. Deriving a uniform step from the tick
+  /// count and formatting whatever value arrives is what actually puts labels
+  /// on the axis (issue #299 smoke check).
+  final double labelInterval;
 
   /// Chooses a granularity from the span, then walks ticks across it.
   ///
@@ -50,11 +60,17 @@ class DateAxis {
         ? DateAxisGranularity.month
         : DateAxisGranularity.day;
 
+    final ticks = _ticksFor(start, end, granularity);
+    final minMs = start.millisecondsSinceEpoch.toDouble();
+    final maxMs = end.millisecondsSinceEpoch.toDouble();
+    final steps = ticks.length > 1 ? ticks.length - 1 : 1;
+
     return DateAxis(
-      min: start.millisecondsSinceEpoch.toDouble(),
-      max: end.millisecondsSinceEpoch.toDouble(),
-      ticks: _ticksFor(start, end, granularity),
+      min: minMs,
+      max: maxMs,
+      ticks: ticks,
       granularity: granularity,
+      labelInterval: (maxMs - minMs) / steps,
     );
   }
 

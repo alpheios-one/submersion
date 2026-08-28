@@ -301,4 +301,60 @@ void main() {
       expect(aggregated, raw);
     });
   });
+
+  group('x axis labels', () {
+    // These assert RENDERED text. Every LineChartData assertion above passed
+    // while the axis drew nothing, because fl_chart calls getTitlesWidget at
+    // values IT chooses, not at values we nominate. Matching those values
+    // exactly against our tick timestamps essentially never hits, so only the
+    // endpoints that happened to coincide ever rendered.
+    List<String> yearLabels(WidgetTester tester) => tester
+        .widgetList<Text>(find.byType(Text))
+        .map((t) => t.data)
+        .whereType<String>()
+        .where((t) => RegExp(r'^20\d\d$').hasMatch(t))
+        .toList();
+
+    List<TrendDataPoint> multiYear() => List.generate(
+      24,
+      (i) => TrendDataPoint(
+        date: DateTime.utc(2020 + i ~/ 4, (i % 4) * 3 + 1, 1),
+        value: 10.0 + i,
+      ),
+    );
+
+    testWidgets('gives fl_chart an explicit bottom-axis interval', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: multiYear())));
+
+      final interval = readData(
+        tester,
+      ).titlesData.bottomTitles.sideTitles.interval;
+
+      expect(interval, isNotNull);
+      expect(interval, greaterThan(0));
+    });
+
+    testWidgets('draws several year labels across a multi-year span', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: multiYear())));
+
+      expect(yearLabels(tester).length, greaterThanOrEqualTo(3));
+    });
+
+    testWidgets('draws year labels in aggregated mode too', (tester) async {
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(
+            points: multiYear(),
+            aggregation: TrendAggregation.monthly,
+          ),
+        ),
+      );
+
+      expect(yearLabels(tester).length, greaterThanOrEqualTo(3));
+    });
+  });
 }
