@@ -137,6 +137,48 @@ void main() {
       expect(gtr[4]!, closeTo(3320, 1));
     });
 
+    test('truncates rather than rounds, so a countdown never overstates', () {
+      // 200.99 bar at t = 600 s: usable 146.99 bar at 3 bar/min is 2939.8 s.
+      // Rounding to 2940 would display 49 min for 48 min 59.8 s remaining.
+      final p = steady(startBar: 230.99);
+      final gtr = calculateGtrCurve(
+        depths: p.depths,
+        timestamps: p.timestamps,
+        pressures: p.pressures,
+        reserveBar: 50.0,
+      );
+
+      expect(gtr[60], 2939);
+    });
+
+    test('prices the window at its mean depth, not the current depth', () {
+      // Window at t = 180 s spans samples 1..3 (10, 20, 30 m): mean 20 m, so
+      // SAC = (156 - 150) bar over 2 min / 3.0 bar ambient = 1.0 bar/min.
+      // Ascent from 30 m: 1.0 * 3 min * 2.5 bar = 7.5 bar; usable
+      // 150 - 50 - 7.5 = 92.5 bar at 4.0 bar ambient = 23.125 min.
+      final gtr = calculateGtrCurve(
+        depths: const [5.0, 10.0, 20.0, 30.0],
+        timestamps: const [0, 60, 120, 180],
+        pressures: const [160.0, 156.0, 153.0, 150.0],
+        reserveBar: 50.0,
+      );
+
+      expect(gtr[3], 1387);
+    });
+
+    test('keeps the window bounded when timestamps do not advance', () {
+      // Corrupt profiles repeat a timestamp. No window ever spans any time,
+      // so every sample is blank rather than dividing by a zero duration.
+      final gtr = calculateGtrCurve(
+        depths: List<double>.filled(400, 20.0),
+        timestamps: List<int>.filled(400, 300),
+        pressures: List<double>.generate(400, (i) => 200.0 - i * 0.01),
+        reserveBar: 50.0,
+      );
+
+      expect(gtr.every((v) => v == null), isTrue);
+    });
+
     test('throws on mismatched series lengths', () {
       expect(
         () => calculateGtrCurve(

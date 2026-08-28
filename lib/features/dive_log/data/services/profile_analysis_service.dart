@@ -416,8 +416,10 @@ class ProfileAnalysis {
   /// Whether TTS curve data is available
   bool get hasTtsData => ttsCurve != null && ttsCurve!.isNotEmpty;
 
-  /// Whether GTR curve data is available
-  bool get hasGtrData => gtrCurve != null && gtrCurve!.isNotEmpty;
+  /// Whether any sample carries a gas time remaining value. A curve of
+  /// nothing but blanks is not data, and the chart's own availability check
+  /// agrees; the two must not disagree about whether to offer the metric.
+  bool get hasGtrData => gtrCurve?.any((v) => v != null) ?? false;
 
   /// Whether CNS curve data is available
   bool get hasCnsData => cnsCurve != null && cnsCurve!.isNotEmpty;

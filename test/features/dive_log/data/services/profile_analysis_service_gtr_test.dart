@@ -52,6 +52,16 @@ void main() {
       expect(bigger.gtrCurve![60], closeTo(2920 - 600, 1));
     });
 
+    test('reports no GTR data when every sample is blank', () {
+      // A curve of nothing but blanks is not GTR data, and the chart's own
+      // availability check agrees; the two must not disagree.
+      final analysis = ProfileAnalysis.empty().copyWith(
+        gtrCurve: const [null, null, null],
+      );
+
+      expect(analysis.hasGtrData, isFalse);
+    });
+
     test('is absent without pressure data', () {
       final p = square(depth: 20.0, minutes: 15);
       final result = service.analyze(

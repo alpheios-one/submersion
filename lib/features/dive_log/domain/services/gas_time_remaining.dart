@@ -38,6 +38,10 @@ const double _surfaceDepthMeters = 1.0;
 /// [timestamps] (seconds). [reserveBar] is the pressure the diver wants to
 /// surface with. Once the reserve plus the gas needed for the ascent exceeds
 /// the current pressure the value is 0, never negative.
+///
+/// Seconds are truncated, not rounded: displays floor these to whole minutes,
+/// so rounding 2939.8 s up to 2940 would read 49 min for 48 min 59.8 s left,
+/// and a countdown must never say there is more gas time than there is.
 List<int?> calculateGtrCurve({
   required List<double> depths,
   required List<int> timestamps,
@@ -60,29 +64,32 @@ List<int?> calculateGtrCurve({
   }
 
   final result = List<int?>.filled(n, null);
-  // The window anchor only moves forward, so a single cursor over the whole
-  // pass keeps this O(n) rather than searching back from every sample.
+  // Both window bounds only move forward, so one cursor and a running depth
+  // sum keep the whole pass O(n). Re-summing the window per sample instead
+  // costs O(n * samples-per-window), which on a densely sampled or merged
+  // profile is the entire profile at every sample. The cursor advances on
+  // every iteration, including ones the guards below skip, so that the sum
+  // stays in step with it.
   var anchor = 0;
+  var windowDepthSum = 0.0;
   for (var i = 0; i < n; i++) {
+    windowDepthSum += depths[i];
+    final windowStart = timestamps[i] - sacWindowSeconds;
+    while (anchor + 1 < i && timestamps[anchor + 1] <= windowStart) {
+      windowDepthSum -= depths[anchor];
+      anchor++;
+    }
+
     final depth = depths[i];
     if (depth < _surfaceDepthMeters) continue;
     if (ceilings != null && ceilings[i] > 0) continue;
-
-    final windowStart = timestamps[i] - sacWindowSeconds;
     if (timestamps[0] > windowStart) continue;
-    while (anchor + 1 < i && timestamps[anchor + 1] <= windowStart) {
-      anchor++;
-    }
 
     final durationSeconds = timestamps[i] - timestamps[anchor];
     final pressureDrop = pressures[anchor] - pressures[i];
     if (durationSeconds <= 0 || pressureDrop <= 0) continue;
 
-    var depthSum = 0.0;
-    for (var j = anchor; j <= i; j++) {
-      depthSum += depths[j];
-    }
-    final meanDepth = depthSum / (i - anchor + 1);
+    final meanDepth = windowDepthSum / (i - anchor + 1);
     final consumptionAtDepth = pressureDrop / (durationSeconds / 60.0);
     final sac = consumptionAtDepth / _ambientBar(meanDepth);
     if (sac <= 0) continue;
@@ -97,7 +104,7 @@ List<int?> calculateGtrCurve({
       continue;
     }
     final minutesAtDepth = usableBar / (sac * _ambientBar(depth));
-    result[i] = (minutesAtDepth * 60).round();
+    result[i] = (minutesAtDepth * 60).floor();
   }
   return result;
 }
