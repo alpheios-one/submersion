@@ -193,3 +193,24 @@ Map<String, String> localizedNamesFromTaxon(
           : best(_localeCandidates[locale]!) ?? english,
   };
 }
+
+/// The seed's curated English name replaces the taxon's English name
+/// everywhere it was used: iNaturalist prefers regional or split-taxon
+/// names ("Florida Bass", "Amur Carp") that divers do not use, and every
+/// locale that fell back to English should fall back to the curated one.
+/// [overrides] (locale -> name, hand-authored) then wins over both.
+Map<String, String> applyCuratedNames(
+  Map<String, String> names,
+  String curatedEnglish, {
+  Map<String, dynamic> overrides = const {},
+}) {
+  final taxonEnglish = names['en'];
+  return {
+    for (final entry in names.entries)
+      entry.key: overrides[entry.key] is String
+          ? overrides[entry.key] as String
+          : (entry.key == 'en' || entry.value == taxonEnglish)
+          ? curatedEnglish
+          : entry.value,
+  };
+}

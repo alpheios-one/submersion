@@ -118,4 +118,24 @@ void main() {
     expect(names['en'], 'Pike');
     expect(names['he'], 'Pike');
   });
+
+  test('applyCuratedNames restores the seed English and honours overrides', () {
+    final names = {
+      'en': 'Florida Bass',
+      'de': 'Forellenbarsch',
+      'he': 'Florida Bass',
+      'ar': 'Florida Bass',
+    };
+
+    final out = applyCuratedNames(
+      names,
+      'Largemouth Bass',
+      overrides: {'he': 'בס גדול פה'},
+    );
+
+    expect(out['en'], 'Largemouth Bass');
+    expect(out['de'], 'Forellenbarsch');
+    expect(out['ar'], 'Largemouth Bass');
+    expect(out['he'], 'בס גדול פה');
+  });
 }

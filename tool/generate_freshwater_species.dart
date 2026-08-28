@@ -1,4 +1,6 @@
-// Turns tool/data/freshwater_species_seed.json into catalog rows.
+// Turns tool/data/freshwater_species_seed.json into catalog rows. Names come
+// from iNaturalist, then tool/data/freshwater_species_name_overrides.json
+// (hand-authored, locale by locale) fills or corrects them.
 //
 //   dart run tool/generate_freshwater_species.dart
 //
@@ -50,6 +52,13 @@ Future<void> main() async {
     }
   }
 
+  final overridesFile = File(
+    'tool/data/freshwater_species_name_overrides.json',
+  );
+  final overrides = overridesFile.existsSync()
+      ? (jsonDecode(await overridesFile.readAsString()) as Map<String, dynamic>)
+      : const <String, dynamic>{};
+
   final client = InaturalistNamesClient();
   final localized = <Map<String, dynamic>>[];
   final added = <Map<String, dynamic>>[];
@@ -61,9 +70,12 @@ Future<void> main() async {
         taxonId: entry['inaturalistTaxonId'] as int?,
       );
       if (taxon == null) stderr.writeln('No iNaturalist taxon for $scientific');
-      final names = localizedNamesFromTaxon(
-        taxon ?? const {},
-        englishFallback: entry['commonName'] as String,
+      final commonName = entry['commonName'] as String;
+      final names = applyCuratedNames(
+        localizedNamesFromTaxon(taxon ?? const {}, englishFallback: commonName),
+        commonName,
+        overrides:
+            (overrides[entry['id']] as Map<String, dynamic>?) ?? const {},
       );
       added.add({
         'id': entry['id'],

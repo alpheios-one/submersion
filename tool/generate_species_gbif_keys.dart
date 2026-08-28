@@ -28,6 +28,25 @@ const Set<String> _straddlingTaxa = {
   'Elapidae',
   // The marine iguana, alongside the green iguana and its tree-dwelling kin.
   'Iguanidae',
+  // Freshwater catalog members whose families or orders hold land relatives.
+  // The beaver and capybara, alongside every rat, squirrel and porcupine.
+  'Rodentia',
+  // The capybara's own family, shared with the guinea pig and the mara.
+  'Caviidae',
+  // The muskrat, alongside voles, lemmings and hamsters.
+  'Cricetidae',
+  // Pond turtles and sliders, alongside the box turtles.
+  'Emydidae',
+  // Water snakes, alongside most of the world's land snakes.
+  'Colubridae',
+  // The anaconda, alongside the tree and ground boas.
+  'Boidae',
+  // Newts, alongside the fire salamander and its land-dwelling kin.
+  'Salamandridae',
+  // The axolotl, alongside the burrowing mole salamanders.
+  'Ambystomatidae',
+  // The common reed, alongside every grass; the whitelist takes the genus.
+  'Poaceae',
 };
 
 Future<void> main() async {

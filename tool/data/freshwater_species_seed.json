@@ -181,7 +181,7 @@
   },
   {
     "id": "sp_largemouth_bass",
-    "scientificName": "Micropterus salmoides",
+    "scientificName": "Micropterus nigricans",
     "category": "fish",
     "taxonomyClass": "Actinopterygii",
     "commonName": "Largemouth Bass",
@@ -497,26 +497,6 @@
       "zh": "银鲑，牙龈白色，斑点仅分布于尾鳍上半部，在小型沿海溪流中产卵。",
       "ar": "سلمون فضي بلثة بيضاء وبقع على الجزء العلوي من الذيل فقط، يتكاثر في الجداول الساحلية الصغيرة.",
       "he": "סלמון כסוף עם חניכיים לבנות ונקודות רק בחלק העליון של הזנב, מטיל בנחלי חוף קטנים."
-    }
-  },
-  {
-    "id": "sp_kokanee",
-    "scientificName": "Oncorhynchus nerka kokanee",
-    "category": "fish",
-    "taxonomyClass": "Actinopterygii",
-    "commonName": "Kokanee",
-    "description": {
-      "en": "Landlocked sockeye that never goes to sea, schooling in deep clear lakes and turning red each autumn.",
-      "de": "Binnenlandform des Rotlachses, die nie ins Meer zieht, schwärmt in tiefen klaren Seen und färbt sich jeden Herbst rot.",
-      "es": "Salmón rojo confinado a agua dulce que nunca va al mar, forma bancos en lagos profundos y claros y enrojece cada otoño.",
-      "fr": "Saumon rouge cantonné en eau douce qui ne rejoint jamais la mer, en bancs dans les lacs profonds et clairs, rougissant chaque automne.",
-      "it": "Salmone rosso confinato in acqua dolce che non raggiunge mai il mare, in banchi nei laghi profondi e limpidi, si arrossa ogni autunno.",
-      "pt": "Salmão vermelho confinado à água doce que nunca vai ao mar, em cardumes em lagos profundos e claros, ficando vermelho a cada outono.",
-      "nl": "Rode zalm die in zoet water opgesloten zit en nooit naar zee gaat, scholen in diepe heldere meren en kleurt elke herfst rood.",
-      "hu": "Édesvízbe zárt vörös lazac, amely sosem jut a tengerre, mély, tiszta tavakban rajzik és minden ősszel vörösre színeződik.",
-      "zh": "陆封型红鲑，终生不入海，在深邃清澈的湖泊中成群生活，每年秋季变红。",
-      "ar": "سلمون أحمر محبوس في المياه العذبة لا يذهب إلى البحر أبداً، يعيش في أسراب في البحيرات العميقة الصافية ويحمرّ كل خريف.",
-      "he": "סלמון אדום כלוא במים מתוקים שלעולם אינו יוצא לים, נע בלהקות באגמים עמוקים וצלולים ומאדים בכל סתיו."
     }
   },
   {
@@ -2041,7 +2021,7 @@
   },
   {
     "id": "sp_australian_bass",
-    "scientificName": "Percalates novemaculeata",
+    "scientificName": "Macquaria novemaculeata",
     "category": "fish",
     "taxonomyClass": "Actinopterygii",
     "commonName": "Australian Bass",

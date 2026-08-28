@@ -24,7 +24,7 @@ void main() {
       final resolved = (keys['speciesKeys'] as Map).length;
       expect(
         resolved,
-        greaterThan((catalog.length * 0.75).floor()),
+        greaterThan((catalog.length * 0.9).floor()),
         reason: 'Too few species resolved to GBIF keys; regenerate the asset',
       );
     });

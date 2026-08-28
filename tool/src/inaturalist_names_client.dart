@@ -11,8 +11,10 @@ class InaturalistNamesClient {
 
   final HttpClient _client;
 
-  /// The taxon whose `name` equals [scientificName] (or the taxon [taxonId]
-  /// when given), or null when iNaturalist has no such species.
+  /// The taxon whose `name` or `matched_term` equals [scientificName] (or
+  /// the taxon [taxonId] when given), or null when iNaturalist has no such
+  /// species. No rank filter, so a subspecies such as the red-eared slider
+  /// resolves too.
   Future<Map<String, dynamic>?> taxonByScientificName(
     String scientificName, {
     int? taxonId,
@@ -24,7 +26,7 @@ class InaturalistNamesClient {
         : Uri.parse(
             'https://api.inaturalist.org/v1/taxa'
             '?q=${Uri.encodeQueryComponent(scientificName)}'
-            '&rank=species&all_names=true&per_page=5',
+            '&all_names=true&per_page=5',
           );
     for (var attempt = 1; attempt <= 3; attempt++) {
       final request = await _client.getUrl(uri);
@@ -35,8 +37,14 @@ class InaturalistNamesClient {
         final results =
             ((jsonDecode(body) as Map<String, dynamic>)['results'] as List)
                 .cast<Map<String, dynamic>>();
+        // A synonym query (a genus iNaturalist has since split, say) comes
+        // back under the accepted name with the query in matched_term.
         for (final r in results) {
-          if (taxonId != null || r['name'] == scientificName) return r;
+          if (taxonId != null ||
+              r['name'] == scientificName ||
+              r['matched_term'] == scientificName) {
+            return r;
+          }
         }
         return null;
       }
