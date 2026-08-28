@@ -2367,6 +2367,31 @@ class SyncDataSerializer {
         );
   }
 
+  /// Applies one incoming `dive_dive_types` row.
+  ///
+  /// `dive_dive_types` carries a unique index on (dive, type) since v178, and
+  /// its primary key is a surrogate uuid minted per device. A peer's row for a
+  /// pair this device already has is therefore NOT a primary-key conflict:
+  /// `insertOnConflictUpdate` targets the PK, misses, hits the index, and
+  /// throws SqliteException(2067) -- failing the whole merge.
+  ///
+  /// An empty `target` means plain `ON CONFLICT DO NOTHING`, which absorbs a
+  /// conflict on ANY uniqueness constraint. Dropping the peer's row loses
+  /// nothing: the pair is the entire meaning of a junction row, and this table
+  /// carries no other mutable column. Before that index existed, keeping both
+  /// rows is exactly how one dive came to show the same type twice on every
+  /// device in the fleet (issue #1360).
+  Future<void> _applyDiveDiveTypeRecord(DiveDiveType record) async {
+    await _db
+        .into(_db.diveDiveTypes)
+        .insert(
+          record,
+          onConflict: DoNothing<$DiveDiveTypesTable, DiveDiveType>(
+            target: const [],
+          ),
+        );
+  }
+
   /// Applies one incoming record.
   ///
   /// HLC-bearing entities (`entityHasUpdatedAt == true`) apply via
@@ -2724,9 +2749,7 @@ class SyncDataSerializer {
         await _applyDiveTagRecord(DiveTag.fromJson(_withTagAlias(data)));
         return;
       case 'diveDiveTypes':
-        await _db
-            .into(_db.diveDiveTypes)
-            .insertOnConflictUpdate(DiveDiveType.fromJson(data));
+        await _applyDiveDiveTypeRecord(DiveDiveType.fromJson(data));
         return;
       case 'diveTypes':
         await _db
@@ -3404,10 +3427,15 @@ class SyncDataSerializer {
         );
         return;
       case 'diveDiveTypes':
+        // DoNothing, not insertAllOnConflictUpdate: see
+        // [_applyDiveDiveTypeRecord].
         await _db.batch(
-          (b) => b.insertAllOnConflictUpdate(
+          (b) => b.insertAll(
             _db.diveDiveTypes,
             records.map((r) => DiveDiveType.fromJson(r)).toList(),
+            onConflict: DoNothing<$DiveDiveTypesTable, DiveDiveType>(
+              target: const [],
+            ),
           ),
         );
         return;
@@ -5728,6 +5756,11 @@ class SyncDataSerializer {
       // v161: seed it so payloads predating the column hydrate instead of
       // throwing in DiverSetting.fromJson.
       'defaultShowO2CellMv': false,
+      // v177: GTR settings; seed them so payloads predating the columns
+      // hydrate instead of throwing in DiverSetting.fromJson.
+      'defaultShowGtr': false,
+      'defaultGtrSource': 1,
+      'gtrReservePressure': 50.0,
       // v166: seed it so payloads predating the column hydrate instead of
       // throwing in DiverSetting.fromJson (issue #1187).
       'placeNameLanguage': 'en',

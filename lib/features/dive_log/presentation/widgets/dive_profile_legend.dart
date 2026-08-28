@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/core/theme/app_colors.dart';
+import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_legend_provider.dart';
@@ -351,6 +352,14 @@ class DiveProfileLegend extends ConsumerWidget {
       color: const Color(0xFFAD1457),
       isActive: state.showTts,
       onTap: notifier.toggleTts,
+    );
+    add(
+      present: config.hasGtrData,
+      id: 'gtr',
+      label: l10n.diveLog_legend_label_gtr,
+      color: ProfileRightAxisMetric.gtr.color!,
+      isActive: state.showGtr,
+      onTap: notifier.toggleGtr,
     );
     add(
       present: config.hasCnsData,

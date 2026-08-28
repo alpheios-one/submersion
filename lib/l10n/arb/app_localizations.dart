@@ -9989,6 +9989,12 @@ abstract class AppLocalizations {
   /// **'TTS'**
   String get diveLog_legend_label_tts;
 
+  /// No description provided for @diveLog_legend_label_gtr.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR'**
+  String get diveLog_legend_label_gtr;
+
   /// No description provided for @diveLog_legend_source_dc.
   ///
   /// In en, this message translates to:
@@ -12748,6 +12754,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'TTS'**
   String get diveLog_tooltip_tts;
+
+  /// No description provided for @diveLog_tooltip_gtr.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR'**
+  String get diveLog_tooltip_gtr;
 
   /// No description provided for @diveLog_sources_row_metric.
   ///
@@ -17413,6 +17425,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'TTS'**
   String get enum_profileMetric_tts_short;
+
+  /// No description provided for @enum_profileMetric_gtr.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR'**
+  String get enum_profileMetric_gtr;
+
+  /// No description provided for @enum_profileMetric_gtr_short.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR'**
+  String get enum_profileMetric_gtr_short;
 
   /// No description provided for @enum_scrType_cmf.
   ///
@@ -25417,6 +25441,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'TTS (Time to Surface)'**
   String get settings_appearance_metric_tts;
+
+  /// No description provided for @settings_appearance_metric_gtr.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR (Gas Time Remaining)'**
+  String get settings_appearance_metric_gtr;
 
   /// No description provided for @settings_appearance_metric_cns.
   ///
@@ -52498,6 +52528,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'TTS Source'**
   String get settings_decompression_ttsSource;
+
+  /// No description provided for @settings_decompression_gtrSource.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR Source'**
+  String get settings_decompression_gtrSource;
+
+  /// No description provided for @settings_decompression_gtrReserve.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR reserve pressure'**
+  String get settings_decompression_gtrReserve;
+
+  /// No description provided for @settings_decompression_gtrReserve_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank pressure the gas time remaining counts down to. The calculated GTR assumes a direct ascent at 10 m/min with no stops.'**
+  String get settings_decompression_gtrReserve_subtitle;
 
   /// Snackbar after the offset is applied. hours is the signed offset as text; hoursAbs drives the hour/hours plural.
   ///

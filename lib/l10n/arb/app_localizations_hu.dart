@@ -5968,6 +5968,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -7566,6 +7569,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_gtr => 'GTR';
 
   @override
   String get diveLog_sources_row_metric => 'Adat';
@@ -10255,6 +10261,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => 'Allando tomegaram';
@@ -15182,6 +15194,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (Ido a felszinig)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (Hátralévő gázidő)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (O2 toxicitás)';
@@ -31470,6 +31485,16 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_decompression_ttsSource => 'TTS forrása';
+
+  @override
+  String get settings_decompression_gtrSource => 'GTR forrása';
+
+  @override
+  String get settings_decompression_gtrReserve => 'GTR tartaléknyomás';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'Az a palacknyomás, amelyig a hátralévő gázidő visszaszámol. A számított GTR 10 m/perc sebességű, megállás nélküli közvetlen felemelkedést feltételez.';
 
   @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {

@@ -808,18 +808,11 @@ void main() {
         await seedEquipment(diveId: 's', equipmentId: 'eq-1');
         await seedEquipment(diveId: 's', equipmentId: 'eq-2');
 
-        // Dive types: target has 'recreational'; secondary has the same
-        // (must NOT duplicate) plus 'wreck' (must be added).
-        await seedDiveTypeRow(
-          'dtype-t1',
-          diveId: 't',
-          diveTypeId: 'recreational',
-        );
-        await seedDiveTypeRow(
-          'dtype-s1',
-          diveId: 's',
-          diveTypeId: 'recreational',
-        );
+        // Dive types: seedDive already gives BOTH dives the auto
+        // 'recreational' row, which is the shared type this scenario needs
+        // (it must NOT duplicate). Seeding a second 'recreational' row on
+        // top would be a duplicate the (dive, type) unique index forbids
+        // since v178. Only the secondary-only 'wreck' has to be added here.
         await seedDiveTypeRow('dtype-s2', diveId: 's', diveTypeId: 'wreck');
 
         // Sightings: target and secondary both saw 'fish' (one sighting,
@@ -913,6 +906,7 @@ void main() {
           'recreational',
           'wreck',
         });
+        expect(diveTypes, hasLength(2)); // no duplicate for recreational
 
         final sightings = await (db.select(
           db.sightings,
