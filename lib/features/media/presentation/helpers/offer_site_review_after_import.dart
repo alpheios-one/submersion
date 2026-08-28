@@ -10,6 +10,11 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// with a GPS point, not dismissed). Silent when there is nothing to offer.
 /// Pass [messenger] when the calling page is about to pop, so the snackbar
 /// lands on the page underneath.
+///
+/// Best-effort throughout: a missing router, a failed eligibility lookup, a
+/// page that went away mid-lookup, or a messenger with nothing to present to
+/// all mean "no offer", never a thrown error. Callers invoke this from inside
+/// the try that reports an import failure.
 Future<void> offerSiteReviewAfterImport(
   BuildContext context,
   WidgetRef ref,
@@ -38,14 +43,23 @@ Future<void> offerSiteReviewAfterImport(
     return;
   }
   if (eligible.isEmpty) return;
-  scaffold.showSnackBar(
-    SnackBar(
-      content: Text(l10n.mediaImport_offerSiteReview(eligible.length)),
-      duration: const Duration(seconds: 8),
-      action: SnackBarAction(
-        label: l10n.mediaImport_reviewSitesAction,
-        onPressed: () => router.push('/dives/match-sites', extra: eligible),
+  // The lookup is async, so the importing page may be gone by now. Callers
+  // run this inside the try that reports an import failure, so a throw here
+  // would tell the diver the import broke when it actually succeeded.
+  if (!context.mounted) return;
+  try {
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Text(l10n.mediaImport_offerSiteReview(eligible.length)),
+        duration: const Duration(seconds: 8),
+        action: SnackBarAction(
+          label: l10n.mediaImport_reviewSitesAction,
+          onPressed: () => router.push('/dives/match-sites', extra: eligible),
+        ),
       ),
-    ),
-  );
+    );
+  } catch (_) {
+    // A messenger with nothing left to present to. The offer is a
+    // convenience; losing it is not worth failing an import that worked.
+  }
 }

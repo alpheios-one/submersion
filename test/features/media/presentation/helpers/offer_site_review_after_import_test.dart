@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -104,5 +106,53 @@ void main() {
     await tester.tap(find.text('Review sites'));
     await tester.pumpAndSettle();
     expect(pushed.single, ['d1', 'd2']);
+  });
+
+  testWidgets('stays silent when the importing page goes away mid-lookup', (
+    tester,
+  ) async {
+    // Callers run this inside the try that reports an import failure, so a
+    // throw here would claim a successful import broke.
+    final gate = Completer<List<String>>();
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => Scaffold(
+            body: Consumer(
+              builder: (context, ref, _) => TextButton(
+                onPressed: () =>
+                    offerSiteReviewAfterImport(context, ref, const ['d1']),
+                child: const Text('done'),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      testAppRouter(
+        router: router,
+        locale: const Locale('en'),
+        overrides: [
+          eligibleImportedDivesProvider(
+            const ImportedDiveIds(['d1']),
+          ).overrideWith((ref) => gate.future),
+        ],
+      ),
+    );
+    await tester.tap(find.text('done'));
+    await tester.pump();
+
+    // Tear the importing page down, then let the eligibility query land.
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: SizedBox())),
+    );
+    await tester.pumpAndSettle();
+    gate.complete(const ['d1']);
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(SnackBar), findsNothing);
   });
 }
