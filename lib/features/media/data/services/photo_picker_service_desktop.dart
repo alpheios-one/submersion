@@ -6,8 +6,7 @@ import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:submersion/features/media/data/services/capture_time_reader.dart';
-import 'package:submersion/features/media/data/services/local_gps_reader.dart';
+import 'package:submersion/features/media/data/services/local_media_metadata.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_metadata.dart';
 
@@ -78,23 +77,21 @@ class PhotoPickerServiceDesktop implements PhotoPickerService {
   ///
   /// Returns null when [ioFile] does not exist.
   ///
-  /// The capture time comes from the file's own container metadata (JPEG /
-  /// HEIC EXIF `DateTimeOriginal`, or the MP4/MOV `mvhd`) via
-  /// [readLocalCaptureTime], falling back to the mtime only when the file
-  /// carries no capture time at all. Reporting the mtime unconditionally --
+  /// The capture time and the position both come from the file's own
+  /// container metadata, read in one pass by [readLocalMediaMetadata]: EXIF
+  /// `DateTimeOriginal` and the GPS IFD for stills, the `mvhd` creation time
+  /// and the QuickTime location atom (or GoPro telemetry) for video. The
+  /// capture time falls back to the mtime only when the file carries none at
+  /// all. Reporting the mtime unconditionally --
   /// as this service used to -- dates a photo to when it was copied off the
   /// camera card rather than when it was shot, which pushes it outside the
   /// dive window and leaves it unmatched.
   ///
-  /// [readLocalCaptureTime] returns wall-clock-UTC, but [AssetInfo] is
+  /// That capture time is wall-clock-UTC, but [AssetInfo] is
   /// contractually LOCAL (photo_manager's convention on mobile, which
   /// consumers such as `TripMediaScanner.toWallClockUtc` reinterpret). The
   /// components are therefore carried across verbatim into a local DateTime;
   /// returning the UTC value directly would double-convert it.
-  ///
-  /// Position comes from the same container metadata via [readLocalGps]
-  /// (EXIF GPS IFD for stills, the QuickTime location atom or GoPro
-  /// telemetry for video).
   AssetInfo? assetInfoForFile(File ioFile) {
     final asset = _assetInfoForPath(ioFile.path);
     if (asset != null) _filePathCache[asset.id] = asset.filePath!;
@@ -163,7 +160,10 @@ AssetInfo? _assetInfoForPath(String path) {
   final modified = ioFile.lastModifiedSync();
   final mime = _mimeFromExtension(p.extension(path).toLowerCase());
 
-  final capturedUtc = readLocalCaptureTime(ioFile, mime);
+  // One read for both answers: a still's EXIF block is parsed once and
+  // serves the capture time and the position together.
+  final meta = readLocalMediaMetadata(ioFile, mime);
+  final capturedUtc = meta.capturedUtc;
   final createDateTime = capturedUtc == null
       ? modified
       : DateTime(
@@ -182,7 +182,6 @@ AssetInfo? _assetInfoForPath(String path) {
         );
 
   final size = _dimensionsOf(ioFile, mime);
-  final fix = readLocalGps(ioFile, mime);
 
   return AssetInfo(
     // Keyed on mtime + path so re-picking the same file in one session reuses
@@ -195,8 +194,8 @@ AssetInfo? _assetInfoForPath(String path) {
     width: size?.width ?? 0,
     height: size?.height ?? 0,
     durationSeconds: null,
-    latitude: fix?.latitude,
-    longitude: fix?.longitude,
+    latitude: meta.fix?.latitude,
+    longitude: meta.fix?.longitude,
     filename: p.basename(path),
     filePath: path,
   );

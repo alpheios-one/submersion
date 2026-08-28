@@ -5,9 +5,8 @@ import 'package:flutter/foundation.dart' show compute;
 import 'package:native_exif/native_exif.dart';
 
 import 'package:submersion/core/util/wall_clock_utc.dart';
-import 'package:submersion/features/media/data/services/capture_time_reader.dart';
 import 'package:submersion/features/media/data/services/exif_date_parser.dart';
-import 'package:submersion/features/media/data/services/local_gps_reader.dart';
+import 'package:submersion/features/media/data/services/local_media_metadata.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_metadata.dart';
 import 'package:submersion/features/media/domain/value_objects/taken_at_source.dart';
 
@@ -19,7 +18,7 @@ const _isolateThresholdBytes = 5 * 1024 * 1024;
 /// It has no macOS/Windows/Linux implementation, so on desktop `Exif.fromPath`
 /// throws `MissingPluginException`; the extractor then reads the capture time
 /// and position straight from the file's own container metadata with
-/// pure-Dart parsers ([readLocalCaptureTime], [readLocalGps]) that work on
+/// pure-Dart parsers ([readLocalMediaMetadata]) that work on
 /// every platform. Only if that also
 /// yields nothing does `takenAt` fall back to the file mtime — which is the
 /// copy-to-disk time and would not match the dive window.
@@ -103,21 +102,19 @@ Future<MediaSourceMetadata?> _extract(String path) async {
     // pure-Dart fallback below recovers takenAt where possible.
   }
 
-  // On desktop (and for any file native_exif could not date), recover the
-  // capture time from the file's own container metadata (JPEG EXIF or the
-  // MP4/MOV mvhd) so it lands inside the dive window instead of defaulting to
-  // the copy-to-disk mtime.
-  if (takenAt == null) {
-    takenAt = readLocalCaptureTime(file, mime);
-    if (takenAt != null) takenAtSource = TakenAtSource.containerMetadata;
-  }
-
-  // Same fallback for position: native_exif filled lat/lon on mobile stills;
-  // everything else (desktop stills, video on every platform) reads the
-  // file's own GPS IFD, QuickTime location atom, or GoPro telemetry.
-  if (lat == null || lon == null) {
-    final fix = readLocalGps(file, mime);
-    if (fix != null) {
+  // On desktop (and for any file native_exif could not date or place),
+  // recover both from the file's own container metadata -- JPEG/HEIC EXIF,
+  // or the MP4/MOV mvhd and location atom -- so the capture time lands inside
+  // the dive window instead of defaulting to the copy-to-disk mtime. One pass
+  // covers both: reading them separately parses a still's EXIF twice.
+  if (takenAt == null || lat == null || lon == null) {
+    final local = readLocalMediaMetadata(file, mime);
+    if (takenAt == null && local.capturedUtc != null) {
+      takenAt = local.capturedUtc;
+      takenAtSource = TakenAtSource.containerMetadata;
+    }
+    final fix = local.fix;
+    if ((lat == null || lon == null) && fix != null) {
       lat = fix.latitude;
       lon = fix.longitude;
     }

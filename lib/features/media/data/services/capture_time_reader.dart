@@ -23,7 +23,7 @@ DateTime? readLocalCaptureTime(File file, String mime) {
     case 'image/heic':
     case 'image/heif':
       final exif = readLocalExif(file, mime);
-      return exif == null ? null : _dateFromExif(exif);
+      return exif == null ? null : captureTimeFromExif(exif);
     case 'video/mp4':
     case 'video/quicktime':
     case 'video/x-m4v':
@@ -36,7 +36,11 @@ DateTime? readLocalCaptureTime(File file, String mime) {
 /// Pulls a wall-clock-UTC date from a parsed [img.ExifData]. EXIF date tags are
 /// ASCII "YYYY:MM:DD HH:MM:SS"; prefer the shutter time (DateTimeOriginal),
 /// then when it was digitized, then the basic file DateTime.
-DateTime? _dateFromExif(img.ExifData exif) {
+///
+/// Public so a caller that has already parsed the EXIF for another reason can
+/// reuse it instead of reading and parsing the file a second time; see
+/// `readLocalMediaMetadata`.
+DateTime? captureTimeFromExif(img.ExifData exif) {
   final raw =
       exif.exifIfd['DateTimeOriginal'] ??
       exif.exifIfd['DateTimeDigitized'] ??
