@@ -37,7 +37,12 @@ class TripDayWeatherRepository {
   Stream<void> watchWeatherChanges() =>
       _db.tableUpdates(TableUpdateQuery.onTable(_db.tripDayWeather));
 
-  /// Stored weather for a trip, keyed by `date.millisecondsSinceEpoch`.
+  /// Stored weather for a trip, keyed by `tripDayMillis(date)`: the calendar
+  /// day at UTC midnight, not `date.millisecondsSinceEpoch`.
+  ///
+  /// The distinction is the contract. Local-midnight millis differ in every
+  /// timezone, so a caller keying a lookup that way silently misses every
+  /// stored row rather than failing.
   ///
   /// One entry per calendar day. Where more than one row lands on the same
   /// day, [_preferred] picks which one shows, and explains how a second row

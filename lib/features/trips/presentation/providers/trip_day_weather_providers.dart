@@ -9,7 +9,12 @@ final tripDayWeatherRepositoryProvider = Provider<TripDayWeatherRepository>(
   (ref) => TripDayWeatherRepository(),
 );
 
-/// Stored weather for a trip, keyed by `date.millisecondsSinceEpoch`.
+/// Stored weather for a trip, keyed by `tripDayMillis(date)`: the calendar
+/// day at UTC midnight, not `date.millisecondsSinceEpoch`.
+///
+/// Stated precisely because getting it wrong is silent. A caller that keys a
+/// lookup with local-midnight millis finds nothing on any device that is not
+/// on UTC, and the day simply renders no badge.
 ///
 /// Subscribes to the table tick, so a row written by the backfill or arriving
 /// through sync re-renders the day headers without the widget knowing a fetch
