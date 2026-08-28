@@ -206,4 +206,99 @@ void main() {
       expect(data.maxY, greaterThanOrEqualTo(60));
     });
   });
+
+  group('overlays', () {
+    testWidgets('draws neither overlay by default', (tester) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: series(20))));
+
+      expect(readData(tester).lineBarsData, hasLength(1));
+    });
+
+    testWidgets('draws a rolling mean series when asked', (tester) async {
+      await tester.pumpWidget(
+        host(DiveTrendChart(points: series(20), showRollingMean: true)),
+      );
+
+      final bars = readData(tester).lineBarsData;
+
+      expect(bars, hasLength(2));
+      expect(bars.last.spots, hasLength(20));
+      expect(bars.last.barWidth, greaterThan(0));
+    });
+
+    testWidgets('draws the linear fit as exactly two endpoints', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(DiveTrendChart(points: series(20), showLinearFit: true)),
+      );
+
+      final bars = readData(tester).lineBarsData;
+
+      expect(bars, hasLength(2));
+      expect(bars.last.spots, hasLength(2));
+    });
+
+    testWidgets('draws both overlays together', (tester) async {
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(
+            points: series(20),
+            showRollingMean: true,
+            showLinearFit: true,
+          ),
+        ),
+      );
+
+      expect(readData(tester).lineBarsData, hasLength(3));
+    });
+
+    testWidgets('draws no overlay below the minimum point count', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(
+            points: series(4),
+            showRollingMean: true,
+            showLinearFit: true,
+          ),
+        ),
+      );
+
+      expect(readData(tester).lineBarsData, hasLength(1));
+    });
+
+    testWidgets('the rolling mean is unchanged by the aggregation mode', (
+      tester,
+    ) async {
+      // Both fits read the raw dives. If they read the buckets instead,
+      // changing the dropdown would move the trend line and wrongly imply the
+      // underlying trend had changed.
+      await tester.pumpWidget(
+        host(DiveTrendChart(points: series(20), showRollingMean: true)),
+      );
+      final raw = readData(
+        tester,
+      ).lineBarsData.last.spots.map((s) => s.y).toList();
+
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(
+            points: series(20),
+            showRollingMean: true,
+            aggregation: TrendAggregation.monthly,
+          ),
+        ),
+      );
+      final aggregated = readData(tester).lineBarsData
+          .where((b) => b.barWidth > 0)
+          .last
+          .spots
+          .map((s) => s.y)
+          .toList();
+
+      expect(aggregated, raw);
+    });
+  });
 }

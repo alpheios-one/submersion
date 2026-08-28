@@ -64,7 +64,20 @@ class DiveTrendChart extends StatelessWidget {
 
     final buckets = aggregate(points, aggregation);
     final dateAxis = DateAxis.forRange(buckets.first.date, buckets.last.date);
-    final yAxis = ChartAxis.forTrend(buckets.expand((b) => [b.min, b.max]));
+
+    // The fits can run outside the bucket range, so the axis has to see them.
+    final smoothed = showRollingMean
+        ? rollingMean(points)
+        : const <TrendDataPoint>[];
+    final fit = showLinearFit ? linearFit(points) : null;
+    final yAxis = ChartAxis.forTrend(<double>[
+      ...buckets.expand((b) => [b.min, b.max]),
+      ...smoothed.map((p) => p.value),
+      if (fit != null) ...[
+        fit.valueAt(buckets.first.date),
+        fit.valueAt(buckets.last.date),
+      ],
+    ]);
 
     final isRaw = aggregation == TrendAggregation.none;
 
@@ -146,6 +159,49 @@ class DiveTrendChart extends StatelessWidget {
             isCurved: false,
             barWidth: 0,
             color: Colors.transparent,
+            dotData: const FlDotData(show: false),
+          ),
+        );
+      }
+    }
+
+    // Both fits read the RAW dives, never the buckets. Fitting over monthly
+    // means would smooth twice, and the line would visibly move when the
+    // dropdown changed, implying the underlying trend had changed when only
+    // the drawing did.
+    if (showRollingMean) {
+      final smoothed = rollingMean(points);
+      if (smoothed.isNotEmpty) {
+        bars.add(
+          LineChartBarData(
+            spots: smoothed
+                .map((p) => FlSpot(_x(p.date), p.value))
+                .toList(growable: false),
+            isCurved: false,
+            color: rollingColor ?? Theme.of(context).colorScheme.primary,
+            barWidth: 2.2,
+            isStrokeCapRound: true,
+            dotData: const FlDotData(show: false),
+          ),
+        );
+      }
+    }
+
+    if (showLinearFit) {
+      final fit = linearFit(points);
+      if (fit != null) {
+        final first = buckets.first.date;
+        final last = buckets.last.date;
+        bars.add(
+          LineChartBarData(
+            spots: [
+              FlSpot(_x(first), fit.valueAt(first)),
+              FlSpot(_x(last), fit.valueAt(last)),
+            ],
+            isCurved: false,
+            color: rateColor ?? Theme.of(context).colorScheme.tertiary,
+            barWidth: 1.8,
+            dashArray: const [6, 4],
             dotData: const FlDotData(show: false),
           ),
         );
