@@ -9830,6 +9830,7 @@
   "backup_operation_backupFailed": "Échec de la sauvegarde : {error}",
   "backup_operation_restoring": "Restauration de la sauvegarde...",
   "backup_operation_restoreFailed": "Échec de la restauration : {error}",
+  "backup_operation_restoreSourceMissing": "Rien n'a été restauré : le fichier de sauvegarde est introuvable. Vos données actuelles sont inchangées.",
   "backup_operation_deleting": "Suppression de la sauvegarde...",
   "backup_operation_deleted": "Sauvegarde supprimée",
   "backup_operation_deleteFailed": "Échec de la suppression : {error}",

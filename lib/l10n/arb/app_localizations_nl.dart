@@ -33260,6 +33260,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Er is niets hersteld: het back-upbestand is niet gevonden. Uw huidige gegevens zijn ongewijzigd.';
+
+  @override
   String get backup_operation_deleting => 'Back-up verwijderen...';
 
   @override

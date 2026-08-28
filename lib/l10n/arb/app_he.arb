@@ -9830,6 +9830,7 @@
   "backup_operation_backupFailed": "הגיבוי נכשל: {error}",
   "backup_operation_restoring": "משחזר גיבוי...",
   "backup_operation_restoreFailed": "השחזור נכשל: {error}",
+  "backup_operation_restoreSourceMissing": "לא שוחזר דבר: קובץ הגיבוי לא נמצא. הנתונים הנוכחיים שלך לא השתנו.",
   "backup_operation_deleting": "מוחק גיבוי...",
   "backup_operation_deleted": "הגיבוי נמחק",
   "backup_operation_deleteFailed": "המחיקה נכשלה: {error}",

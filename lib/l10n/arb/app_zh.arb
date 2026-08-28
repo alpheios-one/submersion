@@ -9830,6 +9830,7 @@
   "backup_operation_backupFailed": "备份失败：{error}",
   "backup_operation_restoring": "正在恢复备份...",
   "backup_operation_restoreFailed": "恢复失败：{error}",
+  "backup_operation_restoreSourceMissing": "未恢复任何内容：找不到备份文件。当前数据未发生变化。",
   "backup_operation_deleting": "正在删除备份...",
   "backup_operation_deleted": "备份已删除",
   "backup_operation_deleteFailed": "删除失败：{error}",

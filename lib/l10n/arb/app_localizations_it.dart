@@ -33488,6 +33488,10 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Nessun dato ripristinato: il file di backup non è stato trovato. I dati correnti sono invariati.';
+
+  @override
   String get backup_operation_deleting => 'Eliminazione del backup...';
 
   @override

@@ -55136,6 +55136,12 @@ abstract class AppLocalizations {
   /// **'Restore failed: {error}'**
   String backup_operation_restoreFailed(String error);
 
+  /// No description provided for @backup_operation_restoreSourceMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was restored: the backup file could not be found. Your current data is unchanged.'**
+  String get backup_operation_restoreSourceMissing;
+
   /// No description provided for @backup_operation_deleting.
   ///
   /// In en, this message translates to:

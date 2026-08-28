@@ -18917,6 +18917,7 @@
   "backup_operation_backupFailed": "Backup failed: {error}",
   "backup_operation_restoring": "Restoring backup...",
   "backup_operation_restoreFailed": "Restore failed: {error}",
+  "backup_operation_restoreSourceMissing": "Nothing was restored: the backup file could not be found. Your current data is unchanged.",
   "backup_operation_deleting": "Deleting backup...",
   "backup_operation_deleted": "Backup deleted",
   "backup_operation_deleteFailed": "Delete failed: {error}",

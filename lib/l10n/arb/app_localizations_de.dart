@@ -33420,6 +33420,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Es wurde nichts wiederhergestellt: Die Sicherungsdatei wurde nicht gefunden. Ihre aktuellen Daten sind unverändert.';
+
+  @override
   String get backup_operation_deleting => 'Sicherung wird gelöscht...';
 
   @override
