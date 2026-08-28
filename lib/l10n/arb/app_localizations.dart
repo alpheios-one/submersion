@@ -20987,7 +20987,7 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_blender_cylinderTemplateLimit.
   ///
   /// In en, this message translates to:
-  /// **'You've reached the saved cylinder size limit.'**
+  /// **'You\'ve reached the saved cylinder size limit.'**
   String get gasCalculators_blender_cylinderTemplateLimit;
 
   /// No description provided for @gasCalculators_tab_mod.
