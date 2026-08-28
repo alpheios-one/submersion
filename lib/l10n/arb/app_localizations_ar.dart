@@ -33153,6 +33153,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'لم تتم استعادة أي شيء: تعذر العثور على ملف النسخة الاحتياطية. بياناتك الحالية لم تتغير.';
+
+  @override
   String get backup_operation_deleting => 'جارٍ حذف النسخة الاحتياطية...';
 
   @override

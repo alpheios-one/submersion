@@ -9830,6 +9830,7 @@
   "backup_operation_backupFailed": "Backup non riuscito: {error}",
   "backup_operation_restoring": "Ripristino del backup in corso...",
   "backup_operation_restoreFailed": "Ripristino non riuscito: {error}",
+  "backup_operation_restoreSourceMissing": "Nessun dato ripristinato: il file di backup non è stato trovato. I dati correnti sono invariati.",
   "backup_operation_deleting": "Eliminazione del backup...",
   "backup_operation_deleted": "Backup eliminato",
   "backup_operation_deleteFailed": "Eliminazione non riuscita: {error}",

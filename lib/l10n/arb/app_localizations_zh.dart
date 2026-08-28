@@ -31554,6 +31554,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      '未恢复任何内容：找不到备份文件。当前数据未发生变化。';
+
+  @override
   String get backup_operation_deleting => '正在删除备份...';
 
   @override

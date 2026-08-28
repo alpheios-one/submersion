@@ -9830,6 +9830,7 @@
   "backup_operation_backupFailed": "Error en la copia de seguridad: {error}",
   "backup_operation_restoring": "Restaurando la copia de seguridad...",
   "backup_operation_restoreFailed": "Error al restaurar: {error}",
+  "backup_operation_restoreSourceMissing": "No se restauró nada: no se encontró el archivo de copia de seguridad. Sus datos actuales no han cambiado.",
   "backup_operation_deleting": "Eliminando la copia de seguridad...",
   "backup_operation_deleted": "Copia de seguridad eliminada",
   "backup_operation_deleteFailed": "Error al eliminar: {error}",

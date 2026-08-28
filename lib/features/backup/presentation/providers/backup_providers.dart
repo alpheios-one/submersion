@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/restore_source_missing_exception.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
@@ -364,6 +365,15 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
       // would swallow it into an error state and close the dialog on success.
       state = const BackupOperationState(status: BackupOperationStatus.idle);
       rethrow;
+    } on RestoreSourceMissingException {
+      // The source was gone by the time the swap ran, so DatabaseService left
+      // the live database untouched (issue #1344). Say exactly that: the
+      // generic "Restore failed: ..." below reads as a botched restore, and
+      // restoreComplete would read as a restore of an empty library.
+      state = BackupOperationState(
+        status: BackupOperationStatus.error,
+        message: _l10n.backup_operation_restoreSourceMissing,
+      );
     } catch (e) {
       state = BackupOperationState(
         status: BackupOperationStatus.error,
@@ -552,6 +562,12 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
       // would swallow it into an error state and close the dialog on success.
       state = const BackupOperationState(status: BackupOperationStatus.idle);
       rethrow;
+    } on RestoreSourceMissingException {
+      // Nothing was restored; see restoreFromBackup (issue #1344).
+      state = BackupOperationState(
+        status: BackupOperationStatus.error,
+        message: _l10n.backup_operation_restoreSourceMissing,
+      );
     } catch (e) {
       state = BackupOperationState(
         status: BackupOperationStatus.error,

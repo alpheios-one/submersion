@@ -9830,6 +9830,7 @@
   "backup_operation_backupFailed": "Falha no backup: {error}",
   "backup_operation_restoring": "Restaurando backup...",
   "backup_operation_restoreFailed": "Falha na restauração: {error}",
+  "backup_operation_restoreSourceMissing": "Nada foi restaurado: o arquivo de backup não foi encontrado. Seus dados atuais permanecem inalterados.",
   "backup_operation_deleting": "Excluindo backup...",
   "backup_operation_deleted": "Backup excluído",
   "backup_operation_deleteFailed": "Falha ao excluir: {error}",

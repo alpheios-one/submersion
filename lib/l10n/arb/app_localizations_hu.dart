@@ -33363,6 +33363,10 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Nem történt visszaállítás: a biztonsági mentés fájlja nem található. A jelenlegi adatok változatlanok.';
+
+  @override
   String get backup_operation_deleting => 'Biztonsági mentés törlése...';
 
   @override

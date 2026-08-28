@@ -9830,6 +9830,7 @@
   "backup_operation_backupFailed": "A biztonsági mentés nem sikerült: {error}",
   "backup_operation_restoring": "Biztonsági mentés visszaállítása...",
   "backup_operation_restoreFailed": "A visszaállítás nem sikerült: {error}",
+  "backup_operation_restoreSourceMissing": "Nem történt visszaállítás: a biztonsági mentés fájlja nem található. A jelenlegi adatok változatlanok.",
   "backup_operation_deleting": "Biztonsági mentés törlése...",
   "backup_operation_deleted": "A biztonsági mentés törölve",
   "backup_operation_deleteFailed": "A törlés nem sikerült: {error}",

@@ -9830,6 +9830,7 @@
   "backup_operation_backupFailed": "Back-up mislukt: {error}",
   "backup_operation_restoring": "Back-up herstellen...",
   "backup_operation_restoreFailed": "Herstellen mislukt: {error}",
+  "backup_operation_restoreSourceMissing": "Er is niets hersteld: het back-upbestand is niet gevonden. Uw huidige gegevens zijn ongewijzigd.",
   "backup_operation_deleting": "Back-up verwijderen...",
   "backup_operation_deleted": "Back-up verwijderd",
   "backup_operation_deleteFailed": "Verwijderen mislukt: {error}",

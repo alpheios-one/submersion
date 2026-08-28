@@ -33533,6 +33533,10 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'No se restauró nada: no se encontró el archivo de copia de seguridad. Sus datos actuales no han cambiado.';
+
+  @override
   String get backup_operation_deleting => 'Eliminando la copia de seguridad...';
 
   @override

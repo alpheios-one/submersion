@@ -9830,6 +9830,7 @@
   "backup_operation_backupFailed": "Sicherung fehlgeschlagen: {error}",
   "backup_operation_restoring": "Sicherung wird wiederhergestellt...",
   "backup_operation_restoreFailed": "Wiederherstellung fehlgeschlagen: {error}",
+  "backup_operation_restoreSourceMissing": "Es wurde nichts wiederhergestellt: Die Sicherungsdatei wurde nicht gefunden. Ihre aktuellen Daten sind unverändert.",
   "backup_operation_deleting": "Sicherung wird gelöscht...",
   "backup_operation_deleted": "Sicherung gelöscht",
   "backup_operation_deleteFailed": "Löschen fehlgeschlagen: {error}",

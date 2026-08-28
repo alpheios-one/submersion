@@ -9830,6 +9830,7 @@
   "backup_operation_backupFailed": "فشل النسخ الاحتياطي: {error}",
   "backup_operation_restoring": "جارٍ استعادة النسخة الاحتياطية...",
   "backup_operation_restoreFailed": "فشلت الاستعادة: {error}",
+  "backup_operation_restoreSourceMissing": "لم تتم استعادة أي شيء: تعذر العثور على ملف النسخة الاحتياطية. بياناتك الحالية لم تتغير.",
   "backup_operation_deleting": "جارٍ حذف النسخة الاحتياطية...",
   "backup_operation_deleted": "تم حذف النسخة الاحتياطية",
   "backup_operation_deleteFailed": "فشل الحذف: {error}",

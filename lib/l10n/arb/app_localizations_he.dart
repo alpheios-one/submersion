@@ -32816,6 +32816,10 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'לא שוחזר דבר: קובץ הגיבוי לא נמצא. הנתונים הנוכחיים שלך לא השתנו.';
+
+  @override
   String get backup_operation_deleting => 'מוחק גיבוי...';
 
   @override

@@ -33585,6 +33585,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Rien n\'a été restauré : le fichier de sauvegarde est introuvable. Vos données actuelles sont inchangées.';
+
+  @override
   String get backup_operation_deleting => 'Suppression de la sauvegarde...';
 
   @override

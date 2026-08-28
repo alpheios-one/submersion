@@ -33501,6 +33501,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Nada foi restaurado: o arquivo de backup não foi encontrado. Seus dados atuais permanecem inalterados.';
+
+  @override
   String get backup_operation_deleting => 'Excluindo backup...';
 
   @override

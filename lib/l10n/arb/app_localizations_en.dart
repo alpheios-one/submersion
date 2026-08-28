@@ -32970,6 +32970,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Nothing was restored: the backup file could not be found. Your current data is unchanged.';
+
+  @override
   String get backup_operation_deleting => 'Deleting backup...';
 
   @override
