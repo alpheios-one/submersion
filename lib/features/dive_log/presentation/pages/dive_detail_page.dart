@@ -2007,6 +2007,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                         surfaceGfCurve: analysis?.surfaceGfCurve,
                         meanDepthCurve: analysis?.meanDepthCurve,
                         ttsCurve: analysis?.ttsCurve,
+                        gtrCurve: analysis?.gtrCurve,
                         cnsCurve: analysis?.cnsCurve,
                         otuCurve: analysis?.otuCurve,
                         tankVolume: dive.tanks

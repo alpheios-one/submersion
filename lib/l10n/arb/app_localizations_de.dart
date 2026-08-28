@@ -5985,6 +5985,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -7584,6 +7587,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_gtr => 'GTR';
 
   @override
   String get diveLog_sources_row_metric => 'Messwert';
@@ -10283,6 +10289,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => 'Konstanter Massenstrom';
@@ -15191,6 +15203,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (Zeit zur Oberfläche)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (Verbleibende Gaszeit)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (O2-Toxizität)';
@@ -31498,6 +31513,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_decompression_ttsSource => 'TTS-Quelle';
+
+  @override
+  String get settings_decompression_gtrSource => 'GTR-Quelle';
+
+  @override
+  String get settings_decompression_gtrReserve => 'GTR-Reservedruck';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'Flaschendruck, auf den die verbleibende Gaszeit herunterzählt. Die berechnete GTR geht von einem direkten Aufstieg mit 10 m/min ohne Stopps aus.';
 
   @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
