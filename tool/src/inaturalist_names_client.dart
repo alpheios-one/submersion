@@ -42,6 +42,14 @@ class InaturalistNamesClient {
         // its matched_term and outrank it. Then a synonym query (a genus
         // iNaturalist has since split, say), which comes back under the
         // accepted name with the query in matched_term.
+        // Among exact matches, a species-level rank beats a "complex" or a
+        // genus that shares the name (Micropterus dolomieu has both).
+        const speciesRanks = {'species', 'subspecies', 'variety', 'form'};
+        for (final r in results) {
+          if (r['name'] == scientificName && speciesRanks.contains(r['rank'])) {
+            return r;
+          }
+        }
         for (final r in results) {
           if (r['name'] == scientificName) return r;
         }
