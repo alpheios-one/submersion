@@ -2081,47 +2081,82 @@ class StatisticsRepository {
     }
   }
 
-  /// Get weight trend by month
-  Future<List<TrendDataPoint>> getWeightTrend({
+  /// Total lead carried on every dive in scope, in kilograms, ordered by date.
+  ///
+  /// Sums the dive's weight rows. The monthly version this replaced averaged
+  /// across rows, so a 4 kg belt plus 2 kg of trim weights was reported as
+  /// 3 kg rather than the 6 kg actually carried.
+  Future<List<TrendDataPoint>> getWeightPerDive({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
   }) async {
     try {
-      final fiveYearsAgo = DateTime.now().subtract(
-        const Duration(days: 365 * 5),
-      );
-      final cutoff = fiveYearsAgo.millisecondsSinceEpoch;
-
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
       final df = _diveFilter(filter, alias: 'd');
-      final params = diverId != null
-          ? [cutoff, diverId, ...df.params]
-          : [cutoff, ...df.params];
+      final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
-        SELECT
-          strftime('%Y', d.dive_date_time / 1000, 'unixepoch') AS year,
-          strftime('%m', d.dive_date_time / 1000, 'unixepoch') AS month,
-          AVG(dw.amount_kg) AS avg_weight
+        SELECT d.dive_date_time AS dive_date_time,
+               SUM(dw.amount_kg) AS total_kg
         FROM dives d
         JOIN dive_weights dw ON dw.dive_id = d.id
-        WHERE d.dive_date_time >= ? $diverFilter ${df.clause}
-        GROUP BY year, month
-        ORDER BY year, month
+        WHERE 1 = 1 $diverFilter ${df.clause}
+        GROUP BY d.id
+        HAVING total_kg IS NOT NULL
+        ORDER BY d.dive_date_time
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
       return results.map((row) {
-        final year = int.parse(row.read<String>('year'));
-        final month = int.parse(row.read<String>('month'));
         return TrendDataPoint(
-          date: DateTime(year, month),
-          value: row.read<double>('avg_weight'),
-          label: '${_monthAbbr(month)} $year',
+          date: DateTime.fromMillisecondsSinceEpoch(
+            row.read<int>('dive_date_time'),
+            isUtc: true,
+          ),
+          value: row.read<double>('total_kg'),
         );
       }).toList();
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to get weight trend',
+        'Failed to get per-dive weight',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return [];
+    }
+  }
+
+  /// Water temperature of every dive in scope, in Celsius, ordered by date.
+  ///
+  /// Distinct from [getTemperatureByMonth], which collapses all years into
+  /// twelve calendar buckets to show a season. This one is a time series.
+  Future<List<TrendDataPoint>> getWaterTempPerDive({
+    String? diverId,
+    DiveFilterState filter = const DiveFilterState(),
+  }) async {
+    try {
+      final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
+      final df = _diveFilter(filter, alias: 'dives');
+      final params = diverId != null ? [diverId, ...df.params] : [...df.params];
+
+      final results = await _db.customSelect('''
+        SELECT dive_date_time, water_temp
+        FROM dives
+        WHERE water_temp IS NOT NULL $diverFilter ${df.clause}
+        ORDER BY dive_date_time
+        ''', variables: params.map((p) => Variable(p)).toList()).get();
+
+      return results.map((row) {
+        return TrendDataPoint(
+          date: DateTime.fromMillisecondsSinceEpoch(
+            row.read<int>('dive_date_time'),
+            isUtc: true,
+          ),
+          value: row.read<double>('water_temp'),
+        );
+      }).toList();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get per-dive water temperature',
         error: e,
         stackTrace: stackTrace,
       );

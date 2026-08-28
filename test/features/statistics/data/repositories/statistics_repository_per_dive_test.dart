@@ -124,4 +124,99 @@ void main() {
       expect(await repository.getBottomTimePerDive(), hasLength(1));
     });
   });
+
+  Future<void> insertWeight({
+    required String diveId,
+    required String id,
+    required double amountKg,
+    String weightType = 'Belt',
+  }) async {
+    await db
+        .into(db.diveWeights)
+        .insert(
+          DiveWeightsCompanion(
+            id: Value(id),
+            diveId: Value(diveId),
+            weightType: Value(weightType),
+            amountKg: Value(amountKg),
+            createdAt: Value(DateTime.now().millisecondsSinceEpoch),
+          ),
+        );
+  }
+
+  group('getWeightPerDive', () {
+    test('sums every weight row on a dive into one point', () async {
+      // The old monthly query averaged across weight ROWS, so a diver with a
+      // 4 kg belt plus 2 kg of trim weights was recorded as 3 kg rather than
+      // the 6 kg actually carried.
+      await insertDive(id: 'a', at: DateTime.utc(2024, 5, 10));
+      await insertWeight(diveId: 'a', id: 'w1', amountKg: 4.0);
+      await insertWeight(
+        diveId: 'a',
+        id: 'w2',
+        amountKg: 2.0,
+        weightType: 'Trim',
+      );
+
+      final points = await repository.getWeightPerDive();
+
+      expect(points, hasLength(1));
+      expect(points.single.value, closeTo(6.0, 1e-9));
+    });
+
+    test('returns one point per dive, ordered by date', () async {
+      await insertDive(id: 'b', at: DateTime.utc(2024, 5, 20));
+      await insertWeight(diveId: 'b', id: 'w2', amountKg: 5.0);
+      await insertDive(id: 'a', at: DateTime.utc(2024, 5, 10));
+      await insertWeight(diveId: 'a', id: 'w1', amountKg: 7.0);
+
+      final points = await repository.getWeightPerDive();
+
+      expect(points.map((p) => p.value), [7.0, 5.0]);
+    });
+
+    test('skips dives with no weight rows', () async {
+      await insertDive(id: 'a', at: DateTime.utc(2024, 5, 10));
+
+      expect(await repository.getWeightPerDive(), isEmpty);
+    });
+
+    test('includes a dive far older than five years', () async {
+      final longAgo = DateTime.now().toUtc().subtract(
+        const Duration(days: 365 * 8),
+      );
+      await insertDive(id: 'ancient', at: longAgo);
+      await insertWeight(diveId: 'ancient', id: 'w1', amountKg: 6.0);
+
+      expect(await repository.getWeightPerDive(), hasLength(1));
+    });
+  });
+
+  group('getWaterTempPerDive', () {
+    test('returns one point per dive with a recorded temperature', () async {
+      await insertDive(id: 'a', at: DateTime.utc(2024, 5, 10), waterTemp: 12.5);
+      await insertDive(id: 'b', at: DateTime.utc(2024, 8, 10), waterTemp: 28.0);
+
+      final points = await repository.getWaterTempPerDive();
+
+      expect(points.map((p) => p.value), [12.5, 28.0]);
+    });
+
+    test('skips dives with no recorded temperature', () async {
+      await insertDive(id: 'a', at: DateTime.utc(2024, 5, 10));
+
+      expect(await repository.getWaterTempPerDive(), isEmpty);
+    });
+
+    test('does not collapse different years into one calendar month', () async {
+      // The seasonal chart deliberately does collapse years; this one must not.
+      await insertDive(id: 'a', at: DateTime.utc(2023, 7, 10), waterTemp: 10.0);
+      await insertDive(id: 'b', at: DateTime.utc(2024, 7, 10), waterTemp: 29.0);
+
+      final points = await repository.getWaterTempPerDive();
+
+      expect(points, hasLength(2));
+      expect(points.map((p) => p.value), [10.0, 29.0]);
+    });
+  });
 }

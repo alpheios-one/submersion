@@ -41,6 +41,7 @@ void main() {
       expect(await repository.getWaterTypeDistribution(), isEmpty);
       expect(await repository.getEntryMethodDistribution(), isEmpty);
       expect(await repository.getTemperatureByMonth(), isEmpty);
+      expect(await repository.getWaterTempPerDive(), isEmpty);
       expect(await repository.getTopBuddies(), isEmpty);
       expect(await repository.getTopDiveCenters(), isEmpty);
       expect(await repository.getCountriesVisited(), isEmpty);
@@ -52,7 +53,7 @@ void main() {
       expect(await repository.getDivesByTimeOfDay(), isEmpty);
       expect(await repository.getDivesBySeason(), isEmpty);
       expect(await repository.getMostUsedGear(), isEmpty);
-      expect(await repository.getWeightTrend(), isEmpty);
+      expect(await repository.getWeightPerDive(), isEmpty);
       expect(await repository.getTimeAtDepthRanges(), isEmpty);
 
       // Methods that return zero
