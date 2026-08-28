@@ -51390,6 +51390,2094 @@ abstract class AppLocalizations {
   /// **'Largest living reptile, found in coastal and estuarine waters of the Indo-Pacific.'**
   String get species_saltwater_crocodile_desc;
 
+  /// No description provided for @species_northern_pike_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Northern Pike'**
+  String get species_northern_pike_name;
+
+  /// No description provided for @species_northern_pike_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-bodied ambush predator with a duckbill snout, hanging motionless among weeds at lake margins.'**
+  String get species_northern_pike_desc;
+
+  /// No description provided for @species_muskellunge_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Muskellunge'**
+  String get species_muskellunge_name;
+
+  /// No description provided for @species_muskellunge_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest pike, a barred or spotted giant of clear northern lakes, rarely seen and never forgotten.'**
+  String get species_muskellunge_desc;
+
+  /// No description provided for @species_chain_pickerel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Chain Pickerel'**
+  String get species_chain_pickerel_name;
+
+  /// No description provided for @species_chain_pickerel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slender pike of weedy eastern North American ponds, named for the chain-like pattern along its flanks.'**
+  String get species_chain_pickerel_desc;
+
+  /// No description provided for @species_walleye_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Walleye'**
+  String get species_walleye_name;
+
+  /// No description provided for @species_walleye_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden-olive perch relative with large reflective eyes, hunting at dusk over rocky and sandy lake bottoms.'**
+  String get species_walleye_desc;
+
+  /// No description provided for @species_sauger_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sauger'**
+  String get species_sauger_name;
+
+  /// No description provided for @species_sauger_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Smaller, blotchier cousin of the walleye that favours turbid rivers and reservoirs.'**
+  String get species_sauger_desc;
+
+  /// No description provided for @species_yellow_perch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow Perch'**
+  String get species_yellow_perch_name;
+
+  /// No description provided for @species_yellow_perch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Schooling golden perch with dark vertical bars, common around docks and weed beds across North America.'**
+  String get species_yellow_perch_desc;
+
+  /// No description provided for @species_european_perch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'European Perch'**
+  String get species_european_perch_name;
+
+  /// No description provided for @species_european_perch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striped, spiny-finned perch with red-orange lower fins, found in nearly every European lake and slow river.'**
+  String get species_european_perch_desc;
+
+  /// No description provided for @species_zander_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Zander'**
+  String get species_zander_name;
+
+  /// No description provided for @species_zander_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large pale predator with glassy eyes and fanged jaws, patrolling murky European lakes and rivers after dark.'**
+  String get species_zander_desc;
+
+  /// No description provided for @species_ruffe_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruffe'**
+  String get species_ruffe_name;
+
+  /// No description provided for @species_ruffe_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small mottled perch with a spiny joined dorsal fin, abundant on soft bottoms of European lakes.'**
+  String get species_ruffe_desc;
+
+  /// No description provided for @species_largemouth_bass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Largemouth Bass'**
+  String get species_largemouth_bass_name;
+
+  /// No description provided for @species_largemouth_bass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Green-backed bass with a dark side stripe and a huge mouth, lurking beside logs and weed edges in warm lakes.'**
+  String get species_largemouth_bass_desc;
+
+  /// No description provided for @species_smallmouth_bass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Smallmouth Bass'**
+  String get species_smallmouth_bass_name;
+
+  /// No description provided for @species_smallmouth_bass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bronze bass with faint vertical bars, holding over rock and gravel in clear, cool lakes and rivers.'**
+  String get species_smallmouth_bass_desc;
+
+  /// No description provided for @species_rock_bass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Rock Bass'**
+  String get species_rock_bass_name;
+
+  /// No description provided for @species_rock_bass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Chunky red-eyed sunfish with rows of dark spots, sheltering among boulders in clear streams and lakes.'**
+  String get species_rock_bass_desc;
+
+  /// No description provided for @species_bluegill_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluegill'**
+  String get species_bluegill_name;
+
+  /// No description provided for @species_bluegill_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Disc-shaped sunfish with a blue-black ear flap and orange breast, nesting in colonies on shallow sandy bottoms.'**
+  String get species_bluegill_desc;
+
+  /// No description provided for @species_pumpkinseed_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pumpkinseed'**
+  String get species_pumpkinseed_name;
+
+  /// No description provided for @species_pumpkinseed_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brightly speckled sunfish with a red-tipped ear flap and wavy blue cheek lines, common in weedy shallows.'**
+  String get species_pumpkinseed_desc;
+
+  /// No description provided for @species_black_crappie_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Black Crappie'**
+  String get species_black_crappie_name;
+
+  /// No description provided for @species_black_crappie_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silvery, deep-bodied panfish speckled with black, schooling around submerged brush and pilings.'**
+  String get species_black_crappie_desc;
+
+  /// No description provided for @species_white_crappie_name.
+  ///
+  /// In en, this message translates to:
+  /// **'White Crappie'**
+  String get species_white_crappie_name;
+
+  /// No description provided for @species_white_crappie_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Paler crappie with faint vertical bands, favouring turbid reservoirs and slow rivers.'**
+  String get species_white_crappie_desc;
+
+  /// No description provided for @species_brown_trout_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown Trout'**
+  String get species_brown_trout_name;
+
+  /// No description provided for @species_brown_trout_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden-brown trout with red and black spots, holding in the current of cool, clear rivers and lakes.'**
+  String get species_brown_trout_desc;
+
+  /// No description provided for @species_rainbow_trout_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Rainbow Trout'**
+  String get species_rainbow_trout_name;
+
+  /// No description provided for @species_rainbow_trout_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silvery trout with a pink lateral band and fine black speckling, stocked and wild in cold waters worldwide.'**
+  String get species_rainbow_trout_desc;
+
+  /// No description provided for @species_brook_trout_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Brook Trout'**
+  String get species_brook_trout_name;
+
+  /// No description provided for @species_brook_trout_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Char with worm-like markings on its back, red spots in blue halos and white-edged fins, in cold headwater streams.'**
+  String get species_brook_trout_desc;
+
+  /// No description provided for @species_lake_trout_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Lake Trout'**
+  String get species_lake_trout_name;
+
+  /// No description provided for @species_lake_trout_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Big grey char covered in pale spots with a forked tail, cruising the deep cold water of northern lakes.'**
+  String get species_lake_trout_desc;
+
+  /// No description provided for @species_arctic_char_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Arctic Char'**
+  String get species_arctic_char_name;
+
+  /// No description provided for @species_arctic_char_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Northernmost freshwater fish, a slender char whose belly flushes orange-red in autumn spawning colours.'**
+  String get species_arctic_char_desc;
+
+  /// No description provided for @species_atlantic_salmon_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Atlantic Salmon'**
+  String get species_atlantic_salmon_name;
+
+  /// No description provided for @species_atlantic_salmon_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver sea-run salmon with black X-shaped spots, leaping falls on its return to natal rivers to spawn.'**
+  String get species_atlantic_salmon_desc;
+
+  /// No description provided for @species_chinook_salmon_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Chinook Salmon'**
+  String get species_chinook_salmon_name;
+
+  /// No description provided for @species_chinook_salmon_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest Pacific salmon, blue-green backed with black gums, ascending big western rivers to spawn.'**
+  String get species_chinook_salmon_desc;
+
+  /// No description provided for @species_sockeye_salmon_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sockeye Salmon'**
+  String get species_sockeye_salmon_name;
+
+  /// No description provided for @species_sockeye_salmon_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Salmon that turns brilliant red with a green head at spawning, crowding gravel beds of lake-fed rivers.'**
+  String get species_sockeye_salmon_desc;
+
+  /// No description provided for @species_coho_salmon_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Coho Salmon'**
+  String get species_coho_salmon_name;
+
+  /// No description provided for @species_coho_salmon_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver salmon with white gums and spots only on the upper tail, spawning in small coastal streams.'**
+  String get species_coho_salmon_desc;
+
+  /// No description provided for @species_lake_whitefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Lake Whitefish'**
+  String get species_lake_whitefish_name;
+
+  /// No description provided for @species_lake_whitefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silvery, small-mouthed whitefish of deep cold lakes, feeding on the bottom in large schools.'**
+  String get species_lake_whitefish_desc;
+
+  /// No description provided for @species_cisco_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Cisco'**
+  String get species_cisco_name;
+
+  /// No description provided for @species_cisco_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slender herring-like whitefish that shoals in open water of cold northern lakes, prey for lake trout.'**
+  String get species_cisco_desc;
+
+  /// No description provided for @species_european_grayling_name.
+  ///
+  /// In en, this message translates to:
+  /// **'European Grayling'**
+  String get species_european_grayling_name;
+
+  /// No description provided for @species_european_grayling_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver-grey river fish with a tall, sail-like dorsal fin edged in purple, holding in fast clean gravel runs.'**
+  String get species_european_grayling_desc;
+
+  /// No description provided for @species_common_carp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Carp'**
+  String get species_common_carp_name;
+
+  /// No description provided for @species_common_carp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy bronze carp with large scales and two barbels, rooting through soft bottoms of warm lakes and rivers.'**
+  String get species_common_carp_desc;
+
+  /// No description provided for @species_grass_carp_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Grass Carp'**
+  String get species_grass_carp_name;
+
+  /// No description provided for @species_grass_carp_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Torpedo-shaped Asian carp introduced worldwide to graze on aquatic weeds, often seen in clear quarry lakes.'**
+  String get species_grass_carp_desc;
+
+  /// No description provided for @species_tench_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tench'**
+  String get species_tench_name;
+
+  /// No description provided for @species_tench_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Olive-green fish with tiny scales, red eyes and rounded fins, sliding through mud and reeds of still waters.'**
+  String get species_tench_desc;
+
+  /// No description provided for @species_common_bream_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Bream'**
+  String get species_common_bream_name;
+
+  /// No description provided for @species_common_bream_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep, laterally flattened bronze fish that feeds head-down in muddy shoals, common across European lowlands.'**
+  String get species_common_bream_desc;
+
+  /// No description provided for @species_roach_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Roach'**
+  String get species_roach_name;
+
+  /// No description provided for @species_roach_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver shoaling fish with red fins and a red iris, the most abundant fish in many European lakes and canals.'**
+  String get species_roach_desc;
+
+  /// No description provided for @species_rudd_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Rudd'**
+  String get species_rudd_name;
+
+  /// No description provided for @species_rudd_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden-flanked relative of the roach with bright red fins and an upturned mouth, feeding just under the surface.'**
+  String get species_rudd_desc;
+
+  /// No description provided for @species_chub_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Chub'**
+  String get species_chub_name;
+
+  /// No description provided for @species_chub_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Thick-set river fish with a broad head, large dark-edged scales and a big mouth, holding under overhanging trees.'**
+  String get species_chub_desc;
+
+  /// No description provided for @species_barbel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Barbel'**
+  String get species_barbel_name;
+
+  /// No description provided for @species_barbel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Streamlined bottom-dweller with four barbels and an underslung mouth, hugging gravel in fast European rivers.'**
+  String get species_barbel_desc;
+
+  /// No description provided for @species_european_eel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'European Eel'**
+  String get species_european_eel_name;
+
+  /// No description provided for @species_european_eel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Snake-like fish that spends decades in rivers and lakes before migrating to the Sargasso Sea to spawn once.'**
+  String get species_european_eel_desc;
+
+  /// No description provided for @species_american_eel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'American Eel'**
+  String get species_american_eel_name;
+
+  /// No description provided for @species_american_eel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'North American eel that hides under rocks by day in rivers and lakes and returns to the Sargasso Sea to breed.'**
+  String get species_american_eel_desc;
+
+  /// No description provided for @species_burbot_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Burbot'**
+  String get species_burbot_name;
+
+  /// No description provided for @species_burbot_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The only freshwater cod, a mottled eel-like fish with a single chin barbel, hiding in cold deep water by day.'**
+  String get species_burbot_desc;
+
+  /// No description provided for @species_channel_catfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel Catfish'**
+  String get species_channel_catfish_name;
+
+  /// No description provided for @species_channel_catfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey catfish with scattered dark spots, a forked tail and eight barbels, common in rivers and reservoirs across North America.'**
+  String get species_channel_catfish_desc;
+
+  /// No description provided for @species_flathead_catfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Flathead Catfish'**
+  String get species_flathead_catfish_name;
+
+  /// No description provided for @species_flathead_catfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Huge mottled brown catfish with a flattened head and protruding lower jaw, lying in deep river holes.'**
+  String get species_flathead_catfish_desc;
+
+  /// No description provided for @species_brown_bullhead_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown Bullhead'**
+  String get species_brown_bullhead_name;
+
+  /// No description provided for @species_brown_bullhead_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small stocky catfish with dark barbels and a squared tail, tolerating muddy, warm and low-oxygen ponds.'**
+  String get species_brown_bullhead_desc;
+
+  /// No description provided for @species_wels_catfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Wels Catfish'**
+  String get species_wels_catfish_name;
+
+  /// No description provided for @species_wels_catfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Europe\'s largest freshwater fish, a scaleless giant with a broad flat head and long whiskers, lying in deep river holes.'**
+  String get species_wels_catfish_desc;
+
+  /// No description provided for @species_white_sturgeon_name.
+  ///
+  /// In en, this message translates to:
+  /// **'White Sturgeon'**
+  String get species_white_sturgeon_name;
+
+  /// No description provided for @species_white_sturgeon_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'North America\'s largest freshwater fish, an armoured grey giant with a shark-like tail cruising big western rivers.'**
+  String get species_white_sturgeon_desc;
+
+  /// No description provided for @species_lake_sturgeon_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Lake Sturgeon'**
+  String get species_lake_sturgeon_name;
+
+  /// No description provided for @species_lake_sturgeon_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow-growing armoured sturgeon of the Great Lakes and Mississippi basin, vacuuming the bottom with its tube mouth.'**
+  String get species_lake_sturgeon_desc;
+
+  /// No description provided for @species_european_sturgeon_name.
+  ///
+  /// In en, this message translates to:
+  /// **'European Sturgeon'**
+  String get species_european_sturgeon_name;
+
+  /// No description provided for @species_european_sturgeon_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Critically endangered armoured sturgeon of Atlantic rivers, now bred and released in the Garonne and Elbe.'**
+  String get species_european_sturgeon_desc;
+
+  /// No description provided for @species_alligator_gar_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Alligator Gar'**
+  String get species_alligator_gar_name;
+
+  /// No description provided for @species_alligator_gar_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Prehistoric giant with a broad toothy snout and diamond-shaped armour scales, surfacing to gulp air in southern rivers.'**
+  String get species_alligator_gar_desc;
+
+  /// No description provided for @species_longnose_gar_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Longnose Gar'**
+  String get species_longnose_gar_name;
+
+  /// No description provided for @species_longnose_gar_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slender armoured fish with a needle-like snout, hanging motionless just below the surface of warm rivers.'**
+  String get species_longnose_gar_desc;
+
+  /// No description provided for @species_bowfin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Bowfin'**
+  String get species_bowfin_name;
+
+  /// No description provided for @species_bowfin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Living fossil with a long undulating dorsal fin and a bony head, guarding its fry in weedy backwaters.'**
+  String get species_bowfin_desc;
+
+  /// No description provided for @species_american_paddlefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'American Paddlefish'**
+  String get species_american_paddlefish_name;
+
+  /// No description provided for @species_american_paddlefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter-feeding giant with a paddle-shaped snout a third of its length, swimming open-mouthed through big rivers.'**
+  String get species_american_paddlefish_desc;
+
+  /// No description provided for @species_sea_lamprey_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Lamprey'**
+  String get species_sea_lamprey_name;
+
+  /// No description provided for @species_sea_lamprey_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Jawless eel-like parasite with a sucker mouth ringed with teeth, spawning in gravel streams after feeding at sea or in lakes.'**
+  String get species_sea_lamprey_desc;
+
+  /// No description provided for @species_freshwater_drum_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Freshwater Drum'**
+  String get species_freshwater_drum_name;
+
+  /// No description provided for @species_freshwater_drum_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silvery humpbacked fish that grunts audibly and crushes mussels with throat teeth, common in big rivers and lakes.'**
+  String get species_freshwater_drum_desc;
+
+  /// No description provided for @species_white_sucker_name.
+  ///
+  /// In en, this message translates to:
+  /// **'White Sucker'**
+  String get species_white_sucker_name;
+
+  /// No description provided for @species_white_sucker_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Cylindrical bottom-feeder with a fleshy downturned mouth, running up streams in spring spawning crowds.'**
+  String get species_white_sucker_desc;
+
+  /// No description provided for @species_common_minnow_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Minnow'**
+  String get species_common_minnow_name;
+
+  /// No description provided for @species_common_minnow_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny striped shoaling fish of clear cool streams and lakes, the males turning red and green in spring.'**
+  String get species_common_minnow_desc;
+
+  /// No description provided for @species_three_spined_stickleback_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Three-spined Stickleback'**
+  String get species_three_spined_stickleback_name;
+
+  /// No description provided for @species_three_spined_stickleback_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny armoured fish with three dorsal spines whose red-throated males build and guard nests of plant fibres.'**
+  String get species_three_spined_stickleback_desc;
+
+  /// No description provided for @species_alewife_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Alewife'**
+  String get species_alewife_name;
+
+  /// No description provided for @species_alewife_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver herring that runs up rivers in spring and now fills the Great Lakes in vast schools.'**
+  String get species_alewife_desc;
+
+  /// No description provided for @species_nile_perch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Nile Perch'**
+  String get species_nile_perch_name;
+
+  /// No description provided for @species_nile_perch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive silver predator with a black-rimmed eye, introduced into Lake Victoria where it dominates open water.'**
+  String get species_nile_perch_desc;
+
+  /// No description provided for @species_nile_tilapia_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Nile Tilapia'**
+  String get species_nile_tilapia_name;
+
+  /// No description provided for @species_nile_tilapia_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey cichlid with vertical tail bars that broods its young in its mouth, farmed and feral in warm waters worldwide.'**
+  String get species_nile_tilapia_desc;
+
+  /// No description provided for @species_african_tigerfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'African Tigerfish'**
+  String get species_african_tigerfish_name;
+
+  /// No description provided for @species_african_tigerfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Striped silver predator with interlocking dagger teeth, hunting in fast African rivers such as the Zambezi.'**
+  String get species_african_tigerfish_desc;
+
+  /// No description provided for @species_marbled_lungfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Marbled Lungfish'**
+  String get species_marbled_lungfish_name;
+
+  /// No description provided for @species_marbled_lungfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Eel-shaped air-breathing fish with thread-like fins that survives droughts sealed in a mud cocoon.'**
+  String get species_marbled_lungfish_desc;
+
+  /// No description provided for @species_electric_catfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Electric Catfish'**
+  String get species_electric_catfish_name;
+
+  /// No description provided for @species_electric_catfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Plump grey catfish of the Nile and Congo that stuns prey with shocks of several hundred volts.'**
+  String get species_electric_catfish_desc;
+
+  /// No description provided for @species_zebra_mbuna_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Zebra Mbuna'**
+  String get species_zebra_mbuna_name;
+
+  /// No description provided for @species_zebra_mbuna_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue-barred rock cichlid of Lake Malawi, grazing algae from boulders in dense territorial crowds.'**
+  String get species_zebra_mbuna_desc;
+
+  /// No description provided for @species_malawi_butterfly_peacock_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Malawi Butterfly Peacock'**
+  String get species_malawi_butterfly_peacock_name;
+
+  /// No description provided for @species_malawi_butterfly_peacock_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Iridescent blue peacock cichlid of Lake Malawi caves, the males glowing with white-edged fins.'**
+  String get species_malawi_butterfly_peacock_desc;
+
+  /// No description provided for @species_fuelleborn_cichlid_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuelleborn\'s Cichlid'**
+  String get species_fuelleborn_cichlid_name;
+
+  /// No description provided for @species_fuelleborn_cichlid_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Blunt-nosed Lake Malawi mbuna with a fleshy overhanging snout for scraping algae in the surf zone.'**
+  String get species_fuelleborn_cichlid_desc;
+
+  /// No description provided for @species_princess_of_burundi_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Princess of Burundi'**
+  String get species_princess_of_burundi_name;
+
+  /// No description provided for @species_princess_of_burundi_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Elegant Lake Tanganyika cichlid with lyre-shaped fins, living in extended families that share nest duties.'**
+  String get species_princess_of_burundi_desc;
+
+  /// No description provided for @species_frontosa_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Frontosa'**
+  String get species_frontosa_name;
+
+  /// No description provided for @species_frontosa_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep-water Tanganyika cichlid with bold blue-white bands and a humped forehead, moving slowly in groups over rocks.'**
+  String get species_frontosa_desc;
+
+  /// No description provided for @species_tropheus_moorii_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Blunthead Cichlid'**
+  String get species_tropheus_moorii_name;
+
+  /// No description provided for @species_tropheus_moorii_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Stocky Tanganyika rock cichlid in dozens of colour forms, each confined to its own stretch of shore.'**
+  String get species_tropheus_moorii_desc;
+
+  /// No description provided for @species_arapaima_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Arapaima'**
+  String get species_arapaima_name;
+
+  /// No description provided for @species_arapaima_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'One of the largest freshwater fish, an armoured Amazon giant with a red-flecked tail that rises to gulp air.'**
+  String get species_arapaima_desc;
+
+  /// No description provided for @species_silver_arowana_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver Arowana'**
+  String get species_silver_arowana_name;
+
+  /// No description provided for @species_silver_arowana_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ribbon-like silver Amazon fish with two chin barbels that leaps clear of the water to snatch insects from branches.'**
+  String get species_silver_arowana_desc;
+
+  /// No description provided for @species_red_bellied_piranha_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Red-bellied Piranha'**
+  String get species_red_bellied_piranha_name;
+
+  /// No description provided for @species_red_bellied_piranha_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep-bodied silver fish with a crimson belly and razor teeth, moving in shoals through Amazon backwaters.'**
+  String get species_red_bellied_piranha_desc;
+
+  /// No description provided for @species_black_piranha_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Black Piranha'**
+  String get species_black_piranha_name;
+
+  /// No description provided for @species_black_piranha_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large solitary piranha with red eyes and a dark diamond-shaped body, lurking in clear rocky Amazon tributaries.'**
+  String get species_black_piranha_desc;
+
+  /// No description provided for @species_red_bellied_pacu_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Red-bellied Pacu'**
+  String get species_red_bellied_pacu_name;
+
+  /// No description provided for @species_red_bellied_pacu_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Piranha-like fruit eater with flat crushing teeth and a red belly, gathering under flooded forest trees.'**
+  String get species_red_bellied_pacu_desc;
+
+  /// No description provided for @species_tambaqui_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tambaqui'**
+  String get species_tambaqui_name;
+
+  /// No description provided for @species_tambaqui_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Huge dark pacu of the Amazon that crunches fallen nuts and seeds beneath flooded forest canopy.'**
+  String get species_tambaqui_desc;
+
+  /// No description provided for @species_electric_eel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Electric Eel'**
+  String get species_electric_eel_name;
+
+  /// No description provided for @species_electric_eel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Not an eel but a knifefish, a long dark air-breather that stuns prey with shocks of up to 600 volts.'**
+  String get species_electric_eel_desc;
+
+  /// No description provided for @species_redtail_catfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Redtail Catfish'**
+  String get species_redtail_catfish_name;
+
+  /// No description provided for @species_redtail_catfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Big Amazon catfish with a dark back, white belly and bright orange-red tail, resting in deep river pools.'**
+  String get species_redtail_catfish_desc;
+
+  /// No description provided for @species_tiger_shovelnose_catfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiger Shovelnose Catfish'**
+  String get species_tiger_shovelnose_catfish_name;
+
+  /// No description provided for @species_tiger_shovelnose_catfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleek striped catfish with a long flattened snout, hunting along sandy South American river channels at night.'**
+  String get species_tiger_shovelnose_catfish_desc;
+
+  /// No description provided for @species_peacock_bass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Peacock Bass'**
+  String get species_peacock_bass_name;
+
+  /// No description provided for @species_peacock_bass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Aggressive Amazon cichlid with three dark bars and a tail eyespot, ambushing fish along sunken timber.'**
+  String get species_peacock_bass_desc;
+
+  /// No description provided for @species_oscar_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Oscar'**
+  String get species_oscar_name;
+
+  /// No description provided for @species_oscar_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Stout dark cichlid with orange marbling and a tail eyespot, patrolling slow Amazon waters and flooded margins.'**
+  String get species_oscar_desc;
+
+  /// No description provided for @species_freshwater_angelfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Freshwater Angelfish'**
+  String get species_freshwater_angelfish_name;
+
+  /// No description provided for @species_freshwater_angelfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tall, disc-shaped Amazon cichlid with trailing fins and vertical stripes, drifting among submerged roots.'**
+  String get species_freshwater_angelfish_desc;
+
+  /// No description provided for @species_discus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Discus'**
+  String get species_discus_name;
+
+  /// No description provided for @species_discus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Round, laterally flattened cichlid with wavy blue lines that feeds its fry on mucus from its own skin.'**
+  String get species_discus_desc;
+
+  /// No description provided for @species_sailfin_pleco_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sailfin Pleco'**
+  String get species_sailfin_pleco_name;
+
+  /// No description provided for @species_sailfin_pleco_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Armoured suckermouth catfish with a tall dorsal fin and leopard spots, rasping algae from wood and rock.'**
+  String get species_sailfin_pleco_desc;
+
+  /// No description provided for @species_cardinal_tetra_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardinal Tetra'**
+  String get species_cardinal_tetra_name;
+
+  /// No description provided for @species_cardinal_tetra_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny tetra with a neon blue stripe over a full-length red band, shoaling in the dark waters of the Rio Negro.'**
+  String get species_cardinal_tetra_desc;
+
+  /// No description provided for @species_mexican_tetra_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Mexican Tetra'**
+  String get species_mexican_tetra_name;
+
+  /// No description provided for @species_mexican_tetra_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver tetra of Mexican rivers whose cave populations are blind and pale, a favourite of cenote divers.'**
+  String get species_mexican_tetra_desc;
+
+  /// No description provided for @species_mekong_giant_catfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Mekong Giant Catfish'**
+  String get species_mekong_giant_catfish_name;
+
+  /// No description provided for @species_mekong_giant_catfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Critically endangered toothless giant of the Mekong, grey and barbel-less, once reaching three metres.'**
+  String get species_mekong_giant_catfish_desc;
+
+  /// No description provided for @species_giant_barb_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Barb'**
+  String get species_giant_barb_name;
+
+  /// No description provided for @species_giant_barb_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest carp in the world, a big-scaled Mekong giant with a huge head, now rare in deep river pools.'**
+  String get species_giant_barb_desc;
+
+  /// No description provided for @species_asian_arowana_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Asian Arowana'**
+  String get species_asian_arowana_name;
+
+  /// No description provided for @species_asian_arowana_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Metallic red or gold dragon fish of Southeast Asian blackwater rivers, gliding just under the surface.'**
+  String get species_asian_arowana_desc;
+
+  /// No description provided for @species_striped_snakehead_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Striped Snakehead'**
+  String get species_striped_snakehead_name;
+
+  /// No description provided for @species_striped_snakehead_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Torpedo-shaped air-breathing predator with a flat snake-like head, guarding its fry in weedy Asian ponds.'**
+  String get species_striped_snakehead_desc;
+
+  /// No description provided for @species_giant_snakehead_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Snakehead'**
+  String get species_giant_snakehead_name;
+
+  /// No description provided for @species_giant_snakehead_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large fierce snakehead, striped when young and dark when grown, defending its bright red fry in Southeast Asian lakes.'**
+  String get species_giant_snakehead_desc;
+
+  /// No description provided for @species_climbing_perch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Climbing Perch'**
+  String get species_climbing_perch_name;
+
+  /// No description provided for @species_climbing_perch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hardy olive fish that breathes air and crawls overland on its spiny gill covers between drying pools.'**
+  String get species_climbing_perch_desc;
+
+  /// No description provided for @species_golden_mahseer_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden Mahseer'**
+  String get species_golden_mahseer_name;
+
+  /// No description provided for @species_golden_mahseer_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden-scaled carp of Himalayan rivers, a powerful swimmer holding in fast clear pools below rapids.'**
+  String get species_golden_mahseer_desc;
+
+  /// No description provided for @species_koi_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Koi'**
+  String get species_koi_name;
+
+  /// No description provided for @species_koi_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ornamental carp bred in Japan in white, red, black and gold patterns, at home in ponds and warm clear lakes.'**
+  String get species_koi_desc;
+
+  /// No description provided for @species_goldfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Goldfish'**
+  String get species_goldfish_name;
+
+  /// No description provided for @species_goldfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Domesticated Asian carp that reverts to olive-bronze in the wild, forming large feral schools in warm lakes.'**
+  String get species_goldfish_desc;
+
+  /// No description provided for @species_giant_gourami_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Gourami'**
+  String get species_giant_gourami_name;
+
+  /// No description provided for @species_giant_gourami_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Broad, humped Southeast Asian fish with thread-like pelvic fins that builds bubble nests in slow weedy water.'**
+  String get species_giant_gourami_desc;
+
+  /// No description provided for @species_clown_knifefish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Clown Knifefish'**
+  String get species_clown_knifefish_name;
+
+  /// No description provided for @species_clown_knifefish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver blade-shaped fish with ocellated spots along a long rippling anal fin, hovering under Asian river snags.'**
+  String get species_clown_knifefish_desc;
+
+  /// No description provided for @species_walking_catfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Walking Catfish'**
+  String get species_walking_catfish_name;
+
+  /// No description provided for @species_walking_catfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slender air-breathing catfish that wriggles across wet ground between ponds, now feral in Florida.'**
+  String get species_walking_catfish_desc;
+
+  /// No description provided for @species_japanese_eel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Japanese Eel'**
+  String get species_japanese_eel_name;
+
+  /// No description provided for @species_japanese_eel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'East Asian eel that grows up in rivers and lakes and migrates to the western Pacific to spawn.'**
+  String get species_japanese_eel_desc;
+
+  /// No description provided for @species_ayu_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayu'**
+  String get species_ayu_name;
+
+  /// No description provided for @species_ayu_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slender silver Japanese sweetfish that grazes algae from stones in clear rivers and defends a feeding territory.'**
+  String get species_ayu_desc;
+
+  /// No description provided for @species_baikal_omul_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Baikal Omul'**
+  String get species_baikal_omul_name;
+
+  /// No description provided for @species_baikal_omul_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver whitefish found only in Lake Baikal, schooling in the cold open water and running up rivers to spawn.'**
+  String get species_baikal_omul_desc;
+
+  /// No description provided for @species_baikal_oilfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Baikal Oilfish'**
+  String get species_baikal_oilfish_name;
+
+  /// No description provided for @species_baikal_oilfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Translucent, scaleless fish of Lake Baikal\'s depths, so rich in oil it is nearly see-through, giving birth to live young.'**
+  String get species_baikal_oilfish_desc;
+
+  /// No description provided for @species_murray_cod_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Murray Cod'**
+  String get species_murray_cod_name;
+
+  /// No description provided for @species_murray_cod_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Australia\'s largest freshwater fish, a mottled green giant with a white belly, holding beside snags in the Murray-Darling.'**
+  String get species_murray_cod_desc;
+
+  /// No description provided for @species_golden_perch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden Perch'**
+  String get species_golden_perch_name;
+
+  /// No description provided for @species_golden_perch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep-bodied golden-olive perch of Australian inland rivers, sheltering by fallen timber and rock ledges.'**
+  String get species_golden_perch_desc;
+
+  /// No description provided for @species_australian_bass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Australian Bass'**
+  String get species_australian_bass_name;
+
+  /// No description provided for @species_australian_bass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bronze-green bass of eastern Australian coastal rivers that migrates downstream to spawn in brackish estuaries.'**
+  String get species_australian_bass_desc;
+
+  /// No description provided for @species_barramundi_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Barramundi'**
+  String get species_barramundi_name;
+
+  /// No description provided for @species_barramundi_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver, hump-backed perch of northern Australian rivers and estuaries, changing sex from male to female with age.'**
+  String get species_barramundi_desc;
+
+  /// No description provided for @species_silver_perch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver Perch'**
+  String get species_silver_perch_name;
+
+  /// No description provided for @species_silver_perch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver-grey grunter of the Murray-Darling with a small mouth and forked tail, once schooling in huge numbers.'**
+  String get species_silver_perch_desc;
+
+  /// No description provided for @species_gulf_saratoga_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Gulf Saratoga'**
+  String get species_gulf_saratoga_name;
+
+  /// No description provided for @species_gulf_saratoga_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bronze Australian arowana with red-flecked scales that broods its eggs in its mouth in northern billabongs.'**
+  String get species_gulf_saratoga_desc;
+
+  /// No description provided for @species_sooty_grunter_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Sooty Grunter'**
+  String get species_sooty_grunter_name;
+
+  /// No description provided for @species_sooty_grunter_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark, thickset grunter of northern Australian rivers, grazing algae and fruit around rocks and rapids.'**
+  String get species_sooty_grunter_desc;
+
+  /// No description provided for @species_eel_tailed_catfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Eel-tailed Catfish'**
+  String get species_eel_tailed_catfish_name;
+
+  /// No description provided for @species_eel_tailed_catfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Australian catfish with a tapering eel-like tail that builds and guards a gravel nest in clear river shallows.'**
+  String get species_eel_tailed_catfish_desc;
+
+  /// No description provided for @species_spangled_perch_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spangled Perch'**
+  String get species_spangled_perch_name;
+
+  /// No description provided for @species_spangled_perch_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small silver-spotted grunter found across inland Australia, colonising any waterhole a flood connects.'**
+  String get species_spangled_perch_desc;
+
+  /// No description provided for @species_eastern_rainbowfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Eastern Rainbowfish'**
+  String get species_eastern_rainbowfish_name;
+
+  /// No description provided for @species_eastern_rainbowfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small iridescent fish of eastern Australian creeks, the males flashing red and blue stripes in the sun.'**
+  String get species_eastern_rainbowfish_desc;
+
+  /// No description provided for @species_signal_crayfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Signal Crayfish'**
+  String get species_signal_crayfish_name;
+
+  /// No description provided for @species_signal_crayfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large brown crayfish with a white patch at the claw joint, an invasive North American species spreading through European rivers.'**
+  String get species_signal_crayfish_desc;
+
+  /// No description provided for @species_red_swamp_crayfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Red Swamp Crayfish'**
+  String get species_red_swamp_crayfish_name;
+
+  /// No description provided for @species_red_swamp_crayfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark red crayfish with bumpy claws from Louisiana marshes, now burrowing into warm wetlands on every continent.'**
+  String get species_red_swamp_crayfish_desc;
+
+  /// No description provided for @species_noble_crayfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Noble Crayfish'**
+  String get species_noble_crayfish_name;
+
+  /// No description provided for @species_noble_crayfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Europe\'s native crayfish, dark brown with red-undersided claws, hiding in bank burrows of clean cool streams and lakes.'**
+  String get species_noble_crayfish_desc;
+
+  /// No description provided for @species_white_clawed_crayfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'White-clawed Crayfish'**
+  String get species_white_clawed_crayfish_name;
+
+  /// No description provided for @species_white_clawed_crayfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small olive crayfish with pale claw undersides, a threatened native of clean limestone streams in western Europe.'**
+  String get species_white_clawed_crayfish_desc;
+
+  /// No description provided for @species_tasmanian_giant_freshwater_crayfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasmanian Giant Freshwater Crayfish'**
+  String get species_tasmanian_giant_freshwater_crayfish_name;
+
+  /// No description provided for @species_tasmanian_giant_freshwater_crayfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The world\'s largest freshwater invertebrate, a slow-growing blue-brown crayfish of shaded Tasmanian rivers.'**
+  String get species_tasmanian_giant_freshwater_crayfish_desc;
+
+  /// No description provided for @species_zebra_mussel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Zebra Mussel'**
+  String get species_zebra_mussel_name;
+
+  /// No description provided for @species_zebra_mussel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnail-sized striped mussel that carpets rocks, wrecks and pipes by the thousand, clearing the water as it spreads.'**
+  String get species_zebra_mussel_desc;
+
+  /// No description provided for @species_quagga_mussel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Quagga Mussel'**
+  String get species_quagga_mussel_name;
+
+  /// No description provided for @species_quagga_mussel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Rounder, paler relative of the zebra mussel that colonises soft bottoms and deep cold water the zebra cannot.'**
+  String get species_quagga_mussel_desc;
+
+  /// No description provided for @species_freshwater_pearl_mussel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Freshwater Pearl Mussel'**
+  String get species_freshwater_pearl_mussel_name;
+
+  /// No description provided for @species_freshwater_pearl_mussel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark, elongated mussel that can live over a century half-buried in clean gravel of fast salmon rivers.'**
+  String get species_freshwater_pearl_mussel_desc;
+
+  /// No description provided for @species_swan_mussel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Swan Mussel'**
+  String get species_swan_mussel_name;
+
+  /// No description provided for @species_swan_mussel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large thin-shelled mussel of muddy lakes and canals, filtering water with its siphons just above the silt.'**
+  String get species_swan_mussel_desc;
+
+  /// No description provided for @species_chinese_pond_mussel_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Chinese Pond Mussel'**
+  String get species_chinese_pond_mussel_name;
+
+  /// No description provided for @species_chinese_pond_mussel_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Very large invasive Asian mussel with a glossy brown shell, arriving with farmed fish and spreading through warm lakes.'**
+  String get species_chinese_pond_mussel_desc;
+
+  /// No description provided for @species_freshwater_sponge_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Freshwater Sponge'**
+  String get species_freshwater_sponge_name;
+
+  /// No description provided for @species_freshwater_sponge_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Green or grey branching sponge encrusting sticks and stones in clear lakes, coloured by algae living inside it.'**
+  String get species_freshwater_sponge_desc;
+
+  /// No description provided for @species_freshwater_jellyfish_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Freshwater Jellyfish'**
+  String get species_freshwater_jellyfish_name;
+
+  /// No description provided for @species_freshwater_jellyfish_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Coin-sized transparent jellyfish that appears in swarms in warm quarry lakes and reservoirs in late summer.'**
+  String get species_freshwater_jellyfish_desc;
+
+  /// No description provided for @species_great_pond_snail_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Great Pond Snail'**
+  String get species_great_pond_snail_name;
+
+  /// No description provided for @species_great_pond_snail_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large pointed-shelled snail gliding over plants and glass-clear surfaces of still European waters, breathing air at the surface.'**
+  String get species_great_pond_snail_desc;
+
+  /// No description provided for @species_great_ramshorn_snail_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Great Ramshorn Snail'**
+  String get species_great_ramshorn_snail_name;
+
+  /// No description provided for @species_great_ramshorn_snail_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat, coiled snail like a tiny ram\'s horn, grazing algae from leaves and stones in weedy ponds.'**
+  String get species_great_ramshorn_snail_desc;
+
+  /// No description provided for @species_channeled_apple_snail_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Channeled Apple Snail'**
+  String get species_channeled_apple_snail_name;
+
+  /// No description provided for @species_channeled_apple_snail_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large golden-brown snail that lays bright pink egg clusters above the waterline, invasive in warm wetlands and rice fields.'**
+  String get species_channeled_apple_snail_desc;
+
+  /// No description provided for @species_magnificent_bryozoan_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Magnificent Bryozoan'**
+  String get species_magnificent_bryozoan_name;
+
+  /// No description provided for @species_magnificent_bryozoan_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Jelly-like colony the size of a football, studded with tiny animals, clinging to branches and ropes in warm still water.'**
+  String get species_magnificent_bryozoan_desc;
+
+  /// No description provided for @species_chinese_mitten_crab_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Chinese Mitten Crab'**
+  String get species_chinese_mitten_crab_name;
+
+  /// No description provided for @species_chinese_mitten_crab_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Burrowing crab with furry claws that spends years in rivers before walking downstream to breed in estuaries.'**
+  String get species_chinese_mitten_crab_desc;
+
+  /// No description provided for @species_giant_freshwater_prawn_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Freshwater Prawn'**
+  String get species_giant_freshwater_prawn_name;
+
+  /// No description provided for @species_giant_freshwater_prawn_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Big blue-clawed prawn of Asian and Australian rivers with claws longer than its body in old males.'**
+  String get species_giant_freshwater_prawn_desc;
+
+  /// No description provided for @species_common_snapping_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Snapping Turtle'**
+  String get species_common_snapping_turtle_name;
+
+  /// No description provided for @species_common_snapping_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy, rough-shelled turtle with a long saw-toothed tail, lying in the mud of ponds and slow rivers with its head out.'**
+  String get species_common_snapping_turtle_desc;
+
+  /// No description provided for @species_alligator_snapping_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Alligator Snapping Turtle'**
+  String get species_alligator_snapping_turtle_name;
+
+  /// No description provided for @species_alligator_snapping_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Prehistoric-looking giant with three ridged keels and a worm-like tongue lure, waiting open-mouthed on southern river bottoms.'**
+  String get species_alligator_snapping_turtle_desc;
+
+  /// No description provided for @species_painted_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Painted Turtle'**
+  String get species_painted_turtle_name;
+
+  /// No description provided for @species_painted_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth dark turtle with red and yellow stripes on its neck and shell rim, basking in rows on logs across North America.'**
+  String get species_painted_turtle_desc;
+
+  /// No description provided for @species_red_eared_slider_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Red-eared Slider'**
+  String get species_red_eared_slider_name;
+
+  /// No description provided for @species_red_eared_slider_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Green-striped pond turtle with a red stripe behind each eye, the pet-trade turtle now feral in warm waters worldwide.'**
+  String get species_red_eared_slider_desc;
+
+  /// No description provided for @species_northern_map_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Northern Map Turtle'**
+  String get species_northern_map_turtle_name;
+
+  /// No description provided for @species_northern_map_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Olive turtle with map-like yellow lines on its shell and a low keel, basking on rocks along clear rivers and large lakes.'**
+  String get species_northern_map_turtle_desc;
+
+  /// No description provided for @species_spiny_softshell_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiny Softshell Turtle'**
+  String get species_spiny_softshell_turtle_name;
+
+  /// No description provided for @species_spiny_softshell_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat, leathery pancake of a turtle with a snorkel snout, buried in sand in shallow rivers with only its head showing.'**
+  String get species_spiny_softshell_turtle_desc;
+
+  /// No description provided for @species_florida_softshell_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Florida Softshell Turtle'**
+  String get species_florida_softshell_turtle_name;
+
+  /// No description provided for @species_florida_softshell_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large dark softshell with a long tubular snout, common in Florida springs, canals and lakes.'**
+  String get species_florida_softshell_turtle_desc;
+
+  /// No description provided for @species_pig_nosed_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Pig-nosed Turtle'**
+  String get species_pig_nosed_turtle_name;
+
+  /// No description provided for @species_pig_nosed_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Unique river turtle of New Guinea and northern Australia with sea-turtle flippers and a fleshy pig-like snout.'**
+  String get species_pig_nosed_turtle_desc;
+
+  /// No description provided for @species_mary_river_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Mary River Turtle'**
+  String get species_mary_river_turtle_name;
+
+  /// No description provided for @species_mary_river_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Rare Australian turtle that breathes through its cloaca and grows a green algae mohawk, found in a single Queensland river.'**
+  String get species_mary_river_turtle_desc;
+
+  /// No description provided for @species_yellow_spotted_river_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow-spotted River Turtle'**
+  String get species_yellow_spotted_river_turtle_name;
+
+  /// No description provided for @species_yellow_spotted_river_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Amazon side-necked turtle with yellow head spots, basking in groups on logs and sandbanks of large rivers.'**
+  String get species_yellow_spotted_river_turtle_desc;
+
+  /// No description provided for @species_european_pond_turtle_name.
+  ///
+  /// In en, this message translates to:
+  /// **'European Pond Turtle'**
+  String get species_european_pond_turtle_name;
+
+  /// No description provided for @species_european_pond_turtle_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark turtle speckled with yellow dots, Europe\'s native freshwater turtle, slipping off sunny banks into weedy ponds.'**
+  String get species_european_pond_turtle_desc;
+
+  /// No description provided for @species_american_alligator_name.
+  ///
+  /// In en, this message translates to:
+  /// **'American Alligator'**
+  String get species_american_alligator_name;
+
+  /// No description provided for @species_american_alligator_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Broad-snouted armoured reptile of southeastern US swamps, springs and rivers, floating with only eyes and nostrils showing.'**
+  String get species_american_alligator_desc;
+
+  /// No description provided for @species_spectacled_caiman_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Spectacled Caiman'**
+  String get species_spectacled_caiman_name;
+
+  /// No description provided for @species_spectacled_caiman_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small olive caiman with a bony ridge between its eyes, abundant in slow rivers and lagoons across Central and South America.'**
+  String get species_spectacled_caiman_desc;
+
+  /// No description provided for @species_black_caiman_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Black Caiman'**
+  String get species_black_caiman_name;
+
+  /// No description provided for @species_black_caiman_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The Amazon\'s largest predator, a black armoured caiman up to five metres long, hunting at night in lakes and flooded forest.'**
+  String get species_black_caiman_desc;
+
+  /// No description provided for @species_freshwater_crocodile_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Freshwater Crocodile'**
+  String get species_freshwater_crocodile_name;
+
+  /// No description provided for @species_freshwater_crocodile_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Slender-snouted Australian crocodile of northern rivers and gorges, shy and far smaller than the saltwater crocodile.'**
+  String get species_freshwater_crocodile_desc;
+
+  /// No description provided for @species_northern_water_snake_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Northern Water Snake'**
+  String get species_northern_water_snake_name;
+
+  /// No description provided for @species_northern_water_snake_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Thick-bodied banded brown snake basking on rocks and branches over eastern North American streams, harmless but quick to bite.'**
+  String get species_northern_water_snake_desc;
+
+  /// No description provided for @species_green_anaconda_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Green Anaconda'**
+  String get species_green_anaconda_name;
+
+  /// No description provided for @species_green_anaconda_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The heaviest snake on earth, an olive giant with black blotches, lying submerged in Amazon swamps and slow rivers.'**
+  String get species_green_anaconda_desc;
+
+  /// No description provided for @species_hellbender_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Hellbender'**
+  String get species_hellbender_name;
+
+  /// No description provided for @species_hellbender_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant flat-headed salamander with wrinkled skin folds, hiding under big rocks in cold clear Appalachian rivers.'**
+  String get species_hellbender_desc;
+
+  /// No description provided for @species_mudpuppy_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Mudpuppy'**
+  String get species_mudpuppy_name;
+
+  /// No description provided for @species_mudpuppy_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown spotted salamander that keeps its feathery red gills for life, crawling over lake and river bottoms at night.'**
+  String get species_mudpuppy_desc;
+
+  /// No description provided for @species_axolotl_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Axolotl'**
+  String get species_axolotl_name;
+
+  /// No description provided for @species_axolotl_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Smiling gilled salamander that never leaves the water, critically endangered in the canals of Xochimilco near Mexico City.'**
+  String get species_axolotl_desc;
+
+  /// No description provided for @species_chinese_giant_salamander_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Chinese Giant Salamander'**
+  String get species_chinese_giant_salamander_name;
+
+  /// No description provided for @species_chinese_giant_salamander_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest amphibian alive, a wrinkled brown giant nearly two metres long, hiding in cool rocky mountain streams.'**
+  String get species_chinese_giant_salamander_desc;
+
+  /// No description provided for @species_smooth_newt_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth Newt'**
+  String get species_smooth_newt_name;
+
+  /// No description provided for @species_smooth_newt_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Small olive newt that returns to ponds each spring, the males growing a wavy crest and spotted orange belly.'**
+  String get species_smooth_newt_desc;
+
+  /// No description provided for @species_great_crested_newt_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Great Crested Newt'**
+  String get species_great_crested_newt_name;
+
+  /// No description provided for @species_great_crested_newt_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large black warty newt with a fiery orange belly, the breeding males sporting a jagged dragon-like crest.'**
+  String get species_great_crested_newt_desc;
+
+  /// No description provided for @species_american_bullfrog_name.
+  ///
+  /// In en, this message translates to:
+  /// **'American Bullfrog'**
+  String get species_american_bullfrog_name;
+
+  /// No description provided for @species_american_bullfrog_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Huge green frog with a bass bellow, sitting among lily pads in warm ponds and now invasive on several continents.'**
+  String get species_american_bullfrog_desc;
+
+  /// No description provided for @species_common_frog_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Frog'**
+  String get species_common_frog_name;
+
+  /// No description provided for @species_common_frog_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown frog with a dark eye mask that gathers in noisy spring crowds to spawn in European ponds and ditches.'**
+  String get species_common_frog_desc;
+
+  /// No description provided for @species_north_american_river_otter_name.
+  ///
+  /// In en, this message translates to:
+  /// **'North American River Otter'**
+  String get species_north_american_river_otter_name;
+
+  /// No description provided for @species_north_american_river_otter_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleek playful otter that hunts fish and crayfish in rivers and lakes across North America, leaving mud slides on banks.'**
+  String get species_north_american_river_otter_desc;
+
+  /// No description provided for @species_eurasian_otter_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Eurasian Otter'**
+  String get species_eurasian_otter_name;
+
+  /// No description provided for @species_eurasian_otter_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Shy brown otter of European rivers, lakes and coasts, recovering across its range after decades of decline.'**
+  String get species_eurasian_otter_desc;
+
+  /// No description provided for @species_giant_otter_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Giant Otter'**
+  String get species_giant_otter_name;
+
+  /// No description provided for @species_giant_otter_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearly two-metre otter with a cream throat patch, living in noisy family groups on Amazon rivers and oxbow lakes.'**
+  String get species_giant_otter_desc;
+
+  /// No description provided for @species_north_american_beaver_name.
+  ///
+  /// In en, this message translates to:
+  /// **'North American Beaver'**
+  String get species_north_american_beaver_name;
+
+  /// No description provided for @species_north_american_beaver_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Large flat-tailed rodent that dams streams into ponds and swims beneath the ice with a lodge of sticks for shelter.'**
+  String get species_north_american_beaver_desc;
+
+  /// No description provided for @species_eurasian_beaver_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Eurasian Beaver'**
+  String get species_eurasian_beaver_name;
+
+  /// No description provided for @species_eurasian_beaver_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Europe\'s largest rodent, reintroduced across the continent, felling riverside trees and building dams and lodges.'**
+  String get species_eurasian_beaver_desc;
+
+  /// No description provided for @species_muskrat_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Muskrat'**
+  String get species_muskrat_name;
+
+  /// No description provided for @species_muskrat_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Rat-sized brown rodent with a scaly flattened tail, swimming through cattail marshes and building domed reed lodges.'**
+  String get species_muskrat_desc;
+
+  /// No description provided for @species_platypus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Platypus'**
+  String get species_platypus_name;
+
+  /// No description provided for @species_platypus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Egg-laying mammal with a duck bill and webbed feet, foraging with closed eyes along eastern Australian creeks at dawn and dusk.'**
+  String get species_platypus_desc;
+
+  /// No description provided for @species_amazonian_manatee_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Amazonian Manatee'**
+  String get species_amazonian_manatee_name;
+
+  /// No description provided for @species_amazonian_manatee_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The smallest manatee, a smooth dark grazer with a white chest patch, browsing water plants in Amazon lakes and rivers.'**
+  String get species_amazonian_manatee_desc;
+
+  /// No description provided for @species_amazon_river_dolphin_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Amazon River Dolphin'**
+  String get species_amazon_river_dolphin_name;
+
+  /// No description provided for @species_amazon_river_dolphin_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink long-beaked dolphin with a flexible neck, weaving between trunks of flooded forest in the Amazon and Orinoco.'**
+  String get species_amazon_river_dolphin_desc;
+
+  /// No description provided for @species_baikal_seal_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Baikal Seal'**
+  String get species_baikal_seal_name;
+
+  /// No description provided for @species_baikal_seal_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The world\'s only freshwater seal, a small silver-grey seal that hauls out on Lake Baikal\'s ice and rocky shores.'**
+  String get species_baikal_seal_desc;
+
+  /// No description provided for @species_capybara_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Capybara'**
+  String get species_capybara_name;
+
+  /// No description provided for @species_capybara_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The largest rodent, a barrel-shaped grazer that wades and swims in South American rivers and wetlands in calm herds.'**
+  String get species_capybara_desc;
+
+  /// No description provided for @species_hippopotamus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Hippopotamus'**
+  String get species_hippopotamus_name;
+
+  /// No description provided for @species_hippopotamus_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive African river giant that spends the day submerged in pods and walks the bottom rather than swims; dangerous to approach.'**
+  String get species_hippopotamus_desc;
+
+  /// No description provided for @species_white_water_lily_name.
+  ///
+  /// In en, this message translates to:
+  /// **'White Water Lily'**
+  String get species_white_water_lily_name;
+
+  /// No description provided for @species_white_water_lily_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Floating round leaves and large white flowers rising from thick rhizomes rooted in the mud of still European waters.'**
+  String get species_white_water_lily_desc;
+
+  /// No description provided for @species_yellow_pond_lily_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow Pond Lily'**
+  String get species_yellow_pond_lily_name;
+
+  /// No description provided for @species_yellow_pond_lily_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Heart-shaped floating leaves and cup-like yellow flowers, with large translucent underwater leaves visible to divers below.'**
+  String get species_yellow_pond_lily_desc;
+
+  /// No description provided for @species_american_eelgrass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'American Eelgrass'**
+  String get species_american_eelgrass_name;
+
+  /// No description provided for @species_american_eelgrass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ribbon-like leaves up to two metres long swaying in the current of clear rivers and springs, a favourite of manatees.'**
+  String get species_american_eelgrass_desc;
+
+  /// No description provided for @species_coontail_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Coontail'**
+  String get species_coontail_name;
+
+  /// No description provided for @species_coontail_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Rootless submerged plant with whorls of stiff forked leaves like a raccoon\'s tail, drifting in dense masses in still water.'**
+  String get species_coontail_desc;
+
+  /// No description provided for @species_eurasian_watermilfoil_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Eurasian Watermilfoil'**
+  String get species_eurasian_watermilfoil_name;
+
+  /// No description provided for @species_eurasian_watermilfoil_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Feathery submerged plant with whorls of finely divided leaves that forms thick mats near the surface, invasive in many lakes.'**
+  String get species_eurasian_watermilfoil_desc;
+
+  /// No description provided for @species_muskgrass_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Muskgrass'**
+  String get species_muskgrass_name;
+
+  /// No description provided for @species_muskgrass_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Brittle, musky-smelling green alga with whorled branches, often crusted with lime, carpeting the bottom of clear hard-water lakes.'**
+  String get species_muskgrass_desc;
+
+  /// No description provided for @species_canadian_waterweed_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Canadian Waterweed'**
+  String get species_canadian_waterweed_name;
+
+  /// No description provided for @species_canadian_waterweed_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dense submerged plant with whorls of three small dark green leaves, spreading by fragments through cool lakes and canals worldwide.'**
+  String get species_canadian_waterweed_desc;
+
+  /// No description provided for @species_curly_leaf_pondweed_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Curly-leaf Pondweed'**
+  String get species_curly_leaf_pondweed_name;
+
+  /// No description provided for @species_curly_leaf_pondweed_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Submerged plant with wavy-edged reddish-green leaves like crinkled lasagne, growing early in spring before other weeds.'**
+  String get species_curly_leaf_pondweed_desc;
+
+  /// No description provided for @species_water_hyacinth_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Hyacinth'**
+  String get species_water_hyacinth_name;
+
+  /// No description provided for @species_water_hyacinth_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Floating plant with glossy leaves on air-filled stalks and spikes of lavender flowers, choking warm waterways worldwide.'**
+  String get species_water_hyacinth_desc;
+
+  /// No description provided for @species_common_reed_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Common Reed'**
+  String get species_common_reed_name;
+
+  /// No description provided for @species_common_reed_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tall feathery-headed grass forming dense beds along lake shores, its submerged stems sheltering fry and dragonfly larvae.'**
+  String get species_common_reed_desc;
+
   /// Dismiss a finished operation
   ///
   /// In en, this message translates to:

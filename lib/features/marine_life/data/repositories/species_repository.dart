@@ -6,6 +6,7 @@ import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/marine_life/data/services/builtin_species_seed_version_store.dart';
 import 'package:submersion/features/marine_life/data/services/species_seed_service.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart'
     as domain;
@@ -430,28 +431,50 @@ class SpeciesRepository {
 
   /// Seed built-in species from the bundled JSON asset.
   ///
-  /// Uses INSERT OR IGNORE keyed on stable sp_ IDs for idempotent seeding.
-  /// Safe to call on every app launch.
-  Future<void> seedBuiltInSpecies() async {
-    final builtInSpecies = await SpeciesSeedService.loadBundledSpecies();
+  /// Every launch runs the cheap INSERT OR IGNORE batch keyed on the stable
+  /// sp_ ids, which refills a wiped table. When [versionStore] reports a
+  /// version below the asset's, the batch becomes an upsert that also
+  /// rewrites rows the diver never touched (`hlc IS NULL`: every edit path
+  /// stamps an hlc, the seed never does), so catalog corrections reach
+  /// existing installs while edits survive. A built-in row the diver deleted
+  /// comes back at the next catalog version.
+  Future<void> seedBuiltInSpecies({
+    BuiltInSpeciesSeedVersionStore? versionStore,
+  }) async {
+    final catalog = await SpeciesSeedService.loadBundledCatalog();
+    final store = versionStore;
+    final upgrade =
+        store != null && await store.appliedVersion() < catalog.version;
 
     await _db.batch((batch) {
-      for (final species in builtInSpecies) {
-        batch.insert(
-          _db.species,
-          SpeciesCompanion(
-            id: Value(species.id),
-            commonName: Value(species.commonName),
-            scientificName: Value(species.scientificName),
-            category: Value(species.category.name),
-            taxonomyClass: Value(species.taxonomyClass),
-            description: Value(species.description),
-            isBuiltIn: const Value(true),
-          ),
-          mode: InsertMode.insertOrIgnore,
+      for (final species in catalog.species) {
+        final companion = SpeciesCompanion(
+          id: Value(species.id),
+          commonName: Value(species.commonName),
+          scientificName: Value(species.scientificName),
+          category: Value(species.category.name),
+          taxonomyClass: Value(species.taxonomyClass),
+          description: Value(species.description),
+          isBuiltIn: const Value(true),
         );
+        if (upgrade) {
+          batch.insert(
+            _db.species,
+            companion,
+            onConflict: DoUpdate<$SpeciesTable, Specy>(
+              (old) => companion,
+              where: (old) => old.hlc.isNull(),
+            ),
+          );
+        } else {
+          batch.insert(_db.species, companion, mode: InsertMode.insertOrIgnore);
+        }
       }
     });
+
+    if (upgrade) {
+      await store.markApplied(catalog.version);
+    }
   }
 
   /// Reset built-in species to their default values.
@@ -473,6 +496,16 @@ class SpeciesRepository {
         .map((r) => r.data['species_id'] as String)
         .toSet();
 
+    // Built-in rows never export (the serializer filters them out), so any
+    // pending record a past edit left is a permanent no-op; drop them all
+    // in one go, for the rows about to be deleted as well as the restored
+    // ones.
+    await _db.customStatement('''
+      DELETE FROM sync_records
+      WHERE entity_type = 'species'
+      AND record_id IN (SELECT id FROM species WHERE is_built_in = 1)
+    ''');
+
     // Delete built-in species not referenced by sightings
     await _db.customStatement('''
       DELETE FROM species
@@ -493,6 +526,9 @@ class SpeciesRepository {
             taxonomyClass: Value(species.taxonomyClass),
             description: Value(species.description),
             isBuiltIn: const Value(true),
+            // Restored to the bundle means untouched again, so the next
+            // catalog version may update it.
+            hlc: const Value(null),
           ),
         );
       }
