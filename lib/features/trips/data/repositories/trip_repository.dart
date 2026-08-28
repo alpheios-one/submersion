@@ -12,6 +12,7 @@ import 'package:submersion/features/checklists/data/repositories/trip_checklist_
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/trips/data/repositories/itinerary_day_repository.dart';
 import 'package:submersion/features/trips/data/repositories/liveaboard_details_repository.dart';
+import 'package:submersion/features/trips/data/repositories/trip_day_weather_repository.dart';
 import 'package:submersion/features/trips/domain/entities/dive_candidate.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart' as domain;
 
@@ -265,6 +266,7 @@ class TripRepository {
         await LiveaboardDetailsRepository().deleteByTripId(id);
         await ItineraryDayRepository().deleteByTripId(id);
         await TripChecklistRepository().deleteByTripId(id);
+        await TripDayWeatherRepository().deleteByTripId(id);
 
         // Remove trip association from dives (nullable FK)
         await _db.customUpdate(

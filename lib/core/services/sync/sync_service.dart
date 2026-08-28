@@ -1211,6 +1211,11 @@ class SyncService {
             hasUpdatedAt: true,
           ),
           (
+            type: 'tripDayWeather',
+            records: data.tripDayWeather,
+            hasUpdatedAt: true,
+          ),
+          (
             type: 'checklistTemplates',
             records: data.checklistTemplates,
             hasUpdatedAt: true,
@@ -1957,6 +1962,7 @@ class SyncService {
     'trips': true,
     'liveaboardDetails': true,
     'itineraryDays': true,
+    'tripDayWeather': true,
     'checklistTemplates': true,
     'checklistTemplateItems': true,
     'tripChecklistItems': true,
@@ -2124,6 +2130,7 @@ class SyncService {
     'siteFeatures': [(field: 'siteId', parent: 'diveSites', nullable: false)],
     'liveaboardDetails': [(field: 'tripId', parent: 'trips', nullable: false)],
     'itineraryDays': [(field: 'tripId', parent: 'trips', nullable: false)],
+    'tripDayWeather': [(field: 'tripId', parent: 'trips', nullable: false)],
     'checklistTemplateItems': [
       (field: 'templateId', parent: 'checklistTemplates', nullable: false),
     ],

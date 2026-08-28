@@ -1365,6 +1365,12 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     // Built once for the whole list, not per row: the lookup map is shared by
     // every tile and only this widget subscribes to the dive-type list.
     final diveTypeLabelResolver = watchDiveTypeLabelResolver(ref, context.l10n);
+    final diveTypeShortLabelResolver = watchDiveTypeShortLabelResolver(
+      ref,
+      context.l10n,
+    );
+    final diveTypeListVisibilityPredicate =
+        watchDiveTypeListVisibilityPredicate(ref);
 
     // Check if detailed mode needs full Dive objects for non-summary fields
     final detailedConfig = ref.watch(detailedCardConfigProvider);
@@ -1418,6 +1424,9 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                 return DiveListItem(
                   summary: dive,
                   diveTypeLabelResolver: diveTypeLabelResolver,
+                  diveTypeShortLabelResolver: diveTypeShortLabelResolver,
+                  diveTypeListVisibilityPredicate:
+                      diveTypeListVisibilityPredicate,
                   fullDive: fullDiveLookup[dive.id],
                   diveNumber: dive.diveNumber ?? index + 1,
                   colorValue: getCardColorValue(dive, colorAttribute),
