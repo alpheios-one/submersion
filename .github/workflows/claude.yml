@@ -19,6 +19,10 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/submersion-app/submersion.git || true
+          git fetch upstream main
       - name: Read Flutter version
         id: flutter-ver
         run: echo "version=$(cat .github/flutter-version.txt)" >> "$GITHUB_OUTPUT"
@@ -26,12 +30,20 @@ jobs:
         with:
           flutter-version: ${{ steps.flutter-ver.outputs.version }}
           channel: 'stable'
+          cache: true
       - name: Install dependencies
         run: flutter pub get
+      - name: Cache build_runner output
+        uses: actions/cache@v4
+        with:
+          path: .dart_tool/build
+          key: build-runner-${{ runner.os }}-${{ steps.flutter-ver.outputs.version }}-${{ hashFiles('**/pubspec.lock') }}-${{ github.sha }}
+          restore-keys: |
+            build-runner-${{ runner.os }}-${{ steps.flutter-ver.outputs.version }}-${{ hashFiles('**/pubspec.lock') }}-
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
       - uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
-            --allowedTools "Bash(flutter pub get:*),Bash(flutter analyze:*),Bash(flutter test:*),Bash(dart format:*),Bash(dart run:*),Bash(dart:*),Bash(git fetch:*),Bash(git merge:*),Bash(git rebase:*),Bash(git push:*),Bash(git rm:*),Bash(gh pr:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh issue close:*),WebFetch(domain:github.com)"
+            --allowedTools "Bash(flutter pub get:*),Bash(flutter analyze:*),Bash(flutter test:*),Bash(dart format:*),Bash(dart run:*),Bash(dart:*),Bash(git fetch:*),Bash(git remote:*),Bash(git merge:*),Bash(git rebase:*),Bash(git checkout:*),Bash(git switch:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git push:*),Bash(git rm:*),Bash(gh pr:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh issue close:*),WebFetch(domain:github.com)"
