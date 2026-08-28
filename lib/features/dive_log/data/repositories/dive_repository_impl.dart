@@ -1440,6 +1440,8 @@ class DiveRepository {
               weightingFeedbackKg: Value(dive.weightingFeedbackKg),
               // Favorite flag
               isFavorite: Value(dive.isFavorite),
+              excludedFromStats: Value(dive.excludedFromStats),
+              excludedFromGasStats: Value(dive.excludedFromGasStats),
               // CCR/SCR rebreather fields (v1.5)
               diveMode: Value(dive.diveMode.code),
               setpointLow: Value(dive.setpointLow),
@@ -1695,6 +1697,8 @@ class DiveRepository {
           weightingFeedbackKg: Value(dive.weightingFeedbackKg),
           // Favorite flag
           isFavorite: Value(dive.isFavorite),
+          excludedFromStats: Value(dive.excludedFromStats),
+          excludedFromGasStats: Value(dive.excludedFromGasStats),
           // CCR/SCR rebreather fields (v1.5)
           diveMode: Value(dive.diveMode.code),
           setpointLow: Value(dive.setpointLow),
@@ -2121,7 +2125,8 @@ class DiveRepository {
             'd.id, d.dive_number, d.name AS dive_name, '
             'd.dive_date_time, d.entry_time, '
             'd.max_depth, d.bottom_time, d.runtime, d.water_temp, d.rating, '
-            'd.is_favorite, d.dive_type, d.dive_mode, '
+            'd.is_favorite, d.excluded_from_stats, d.excluded_from_gas_stats, '
+          'd.dive_type, d.dive_mode, '
             'COALESCE(d.entry_time, d.dive_date_time) AS sort_timestamp, '
             's.name AS site_name, s.country AS site_country, '
             's.region AS site_region, s.latitude AS site_latitude, '
@@ -2784,7 +2789,8 @@ class DiveRepository {
           'd.id, d.dive_number, d.name AS dive_name, '
           'd.dive_date_time, d.entry_time, '
           'd.max_depth, d.bottom_time, d.runtime, d.water_temp, d.rating, '
-          'd.is_favorite, d.dive_type, d.dive_mode, '
+          'd.is_favorite, d.excluded_from_stats, d.excluded_from_gas_stats, '
+          'd.dive_type, d.dive_mode, '
           'COALESCE(d.entry_time, d.dive_date_time) AS sort_timestamp, '
           's.name AS site_name, s.country AS site_country, '
           's.region AS site_region, s.latitude AS site_latitude, '
@@ -2847,6 +2853,8 @@ class DiveRepository {
         waterTemp: row.readNullable<double>('water_temp'),
         rating: row.readNullable<int>('rating'),
         isFavorite: row.read<int>('is_favorite') == 1,
+        excludedFromStats: row.read<int>('excluded_from_stats') == 1,
+        excludedFromGasStats: row.read<int>('excluded_from_gas_stats') == 1,
         diveMode: DiveMode.fromCode(row.read<String>('dive_mode')),
         diveTypeIds: diveTypesByDive[id] ?? [row.read<String>('dive_type')],
         tags: tagsByDive[id] ?? [],
@@ -3587,6 +3595,8 @@ class DiveRepository {
       equipment: equipment,
       weights: const [], // Weights not loaded for list views (use detail view)
       isFavorite: row.isFavorite,
+      excludedFromStats: row.excludedFromStats,
+      excludedFromGasStats: row.excludedFromGasStats,
       tags: tags,
       // CCR/SCR rebreather fields (v1.5)
       diveMode: DiveMode.fromCode(row.diveMode),
@@ -3969,6 +3979,8 @@ class DiveRepository {
       equipment: hydratedEquipmentItems,
       weights: weights,
       isFavorite: row.isFavorite,
+      excludedFromStats: row.excludedFromStats,
+      excludedFromGasStats: row.excludedFromGasStats,
       tags: tags,
       // CCR/SCR rebreather fields (v1.5)
       diveMode: DiveMode.fromCode(row.diveMode),
