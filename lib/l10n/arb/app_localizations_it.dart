@@ -33670,6 +33670,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'La libreria sostituita è ancora in fase di caricamento. Riprova tra poco.';
 
   @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'La libreria cloud è stata pubblicata da una versione più recente di Submersion. Aggiorna questo dispositivo e riprova.';
+
+  @override
   String settings_cloudSync_result_recordsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

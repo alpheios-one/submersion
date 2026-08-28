@@ -31720,6 +31720,10 @@ class AppLocalizationsZh extends AppLocalizations {
       '被替换的资料库仍在上传中。请稍后重试。';
 
   @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      '云端资料库由较新版本的 Submersion 发布。请更新此设备后重试。';
+
+  @override
   String settings_cloudSync_result_recordsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

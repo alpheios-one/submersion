@@ -9866,6 +9866,7 @@
   "settings_cloudSync_result_adoptFailed": "אימוץ הספרייה המשוחזרת נכשל: {error}",
   "settings_cloudSync_result_previousLibraryUnreadable": "לא ניתן היה לקרוא את הספרייה הקודמת; השירות הזה הוקם מחדש מהספרייה של מכשיר זה.",
   "settings_cloudSync_result_replacementStillUploading": "הספרייה שהוחלפה עדיין בהעלאה. נסה שוב בעוד רגע.",
+  "settings_cloudSync_result_cloudLibraryNewerSchema": "ספריית הענן פורסמה על ידי גרסה חדשה יותר של Submersion. עדכן מכשיר זה ונסה שוב.",
   "settings_cloudSync_result_recordsFailed": "{count, plural, one{החלת רשומה אחת נכשלה} two{החלת שתי רשומות נכשלה} many{החלת {count} רשומות נכשלה} other{החלת {count} רשומות נכשלה}}",
   "settings_cloudSync_result_adoptedFreshIdentity": "מכשיר אחר סנכרן באמצעות הזהות של מכשיר זה. מכשיר זה אימץ זהות חדשה ומיזג את נתוני הענן.",
   "settings_cloudSync_launchCheck_unavailable": "{provider} אינו זמין במכשיר זה",

@@ -9866,6 +9866,7 @@
   "settings_cloudSync_result_adoptFailed": "Nem sikerült átvenni a visszaállított könyvtárat: {error}",
   "settings_cloudSync_result_previousLibraryUnreadable": "A korábbi könyvtár nem volt olvasható; ez a szolgáltató ennek az eszköznek a könyvtárából lett újra létrehozva.",
   "settings_cloudSync_result_replacementStillUploading": "A lecserélt könyvtár feltöltése még folyamatban van. Próbálja újra rövidesen.",
+  "settings_cloudSync_result_cloudLibraryNewerSchema": "A felhőkönyvtárat a Submersion egy újabb verziója tette közzé. Frissítse ezt az eszközt, majd próbálja újra.",
   "settings_cloudSync_result_recordsFailed": "{count, plural, =1{1 rekordot nem sikerült alkalmazni} other{{count} rekordot nem sikerült alkalmazni}}",
   "settings_cloudSync_result_adoptedFreshIdentity": "Egy másik eszköz ennek az eszköznek az azonosságával szinkronizált. Ez az eszköz új azonosságot vett fel, és egyesítette a felhőben lévő adatokat.",
   "settings_cloudSync_launchCheck_unavailable": "A(z) {provider} nem érhető el ezen az eszközön",

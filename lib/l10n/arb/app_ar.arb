@@ -9866,6 +9866,7 @@
   "settings_cloudSync_result_adoptFailed": "فشل اعتماد المكتبة المستعادة: {error}",
   "settings_cloudSync_result_previousLibraryUnreadable": "تعذّرت قراءة المكتبة السابقة؛ وأُعيد إنشاء هذه الخدمة من مكتبة هذا الجهاز.",
   "settings_cloudSync_result_replacementStillUploading": "لا يزال رفع المكتبة المستبدَلة جاريًا. حاول مرة أخرى بعد قليل.",
+  "settings_cloudSync_result_cloudLibraryNewerSchema": "تم نشر مكتبة السحابة بواسطة إصدار أحدث من Submersion. حدِّث هذا الجهاز ثم حاول مرة أخرى.",
   "settings_cloudSync_result_recordsFailed": "{count, plural, zero{فشل تطبيق {count} سجل} one{فشل تطبيق سجل واحد} two{فشل تطبيق سجلين} few{فشل تطبيق {count} سجلات} many{فشل تطبيق {count} سجلًا} other{فشل تطبيق {count} سجل}}",
   "settings_cloudSync_result_adoptedFreshIdentity": "كان جهاز آخر يتزامن باستخدام هوية هذا الجهاز. اعتمد هذا الجهاز هوية جديدة ودمج بيانات السحابة.",
   "settings_cloudSync_launchCheck_unavailable": "{provider} غير متاح على هذا الجهاز",

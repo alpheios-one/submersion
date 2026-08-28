@@ -9866,6 +9866,7 @@
   "settings_cloudSync_result_adoptFailed": "Impossibile adottare la libreria ripristinata: {error}",
   "settings_cloudSync_result_previousLibraryUnreadable": "Non è stato possibile leggere la libreria precedente; questo servizio è stato ristabilito dalla libreria di questo dispositivo.",
   "settings_cloudSync_result_replacementStillUploading": "La libreria sostituita è ancora in fase di caricamento. Riprova tra poco.",
+  "settings_cloudSync_result_cloudLibraryNewerSchema": "La libreria cloud è stata pubblicata da una versione più recente di Submersion. Aggiorna questo dispositivo e riprova.",
   "settings_cloudSync_result_recordsFailed": "{count, plural, =1{1 record non è stato applicato} other{{count} record non sono stati applicati}}",
   "settings_cloudSync_result_adoptedFreshIdentity": "Un altro dispositivo si stava sincronizzando con l’identità di questo dispositivo. Questo dispositivo ha adottato una nuova identità e ha unito i dati del cloud.",
   "settings_cloudSync_launchCheck_unavailable": "{provider} non è disponibile su questo dispositivo",

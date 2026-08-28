@@ -32995,6 +32995,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'הספרייה שהוחלפה עדיין בהעלאה. נסה שוב בעוד רגע.';
 
   @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'ספריית הענן פורסמה על ידי גרסה חדשה יותר של Submersion. עדכן מכשיר זה ונסה שוב.';
+
+  @override
   String settings_cloudSync_result_recordsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

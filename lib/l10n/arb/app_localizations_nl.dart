@@ -33441,6 +33441,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'De vervangen bibliotheek wordt nog geüpload. Probeer het zo meteen opnieuw.';
 
   @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'De cloudbibliotheek is gepubliceerd door een nieuwere versie van Submersion. Werk dit apparaat bij en probeer het daarna opnieuw.';
+
+  @override
   String settings_cloudSync_result_recordsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
