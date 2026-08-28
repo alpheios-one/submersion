@@ -5942,6 +5942,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -7530,6 +7533,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_gtr => 'GTR';
 
   @override
   String get diveLog_sources_row_metric => 'Meting';
@@ -10206,6 +10212,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => 'Constant massadebiet';
@@ -15099,6 +15111,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (Tijd tot oppervlak)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (Resterende gastijd)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (O2-toxiciteit)';
@@ -31342,6 +31357,16 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_decompression_ttsSource => 'TTS-bron';
+
+  @override
+  String get settings_decompression_gtrSource => 'GTR-bron';
+
+  @override
+  String get settings_decompression_gtrReserve => 'GTR-reservedruk';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'Flesdruk waarnaar de resterende gastijd aftelt. De berekende GTR gaat uit van een directe opstijging met 10 m/min zonder stops.';
 
   @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {

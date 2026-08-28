@@ -1780,6 +1780,11 @@ class DiverSettings extends Table {
       integer().withDefault(const Constant(1))();
   IntColumn get defaultTtsSource => integer().withDefault(const Constant(1))();
   IntColumn get defaultCnsSource => integer().withDefault(const Constant(1))();
+  // Gas time remaining on the profile chart (v177). Source is a
+  // MetricDataSource index: 0 = computer, 1 = calculated. Reserve is bar.
+  IntColumn get defaultGtrSource => integer().withDefault(const Constant(1))();
+  RealColumn get gtrReservePressure =>
+      real().withDefault(const Constant(50.0))();
   // CNS calculation method: 'classic' | 'shearwater' | 'subsurface' (v113)
   TextColumn get cnsCalculationMethod =>
       text().withDefault(const Constant('shearwater'))();
@@ -1877,6 +1882,8 @@ class DiverSettings extends Table {
   BoolColumn get defaultShowMeanDepth =>
       boolean().withDefault(const Constant(false))();
   BoolColumn get defaultShowTts =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get defaultShowGtr =>
       boolean().withDefault(const Constant(false))();
   BoolColumn get defaultShowCns =>
       boolean().withDefault(const Constant(false))();
@@ -3664,13 +3671,16 @@ class AppDatabase extends _$AppDatabase {
     // comment already reserves for it. 169 is now permanently skipped, as are
     // 162 and 167.
     175,
+    // v177: GTR settings on diver_settings and the dive_profiles.rbt
+    // minutes-to-seconds repair.
+    177,
     // v178: one dive_dive_types row per (dive, type), collapsing the
     // duplicates the unguarded v92 seed minted on every device and the sync
-    // merge then unioned by row id. Issue #1360. 176 (PR #1328, photo-GPS
-    // site suggestions) and 177 (PR #1361, the GTR profile metric) are claimed
-    // by branches that are still open, so this takes the next free rung rather
-    // than one of theirs -- a rung below main's scalar never runs its
-    // onUpgrade step.
+    // merge then unioned by row id. Issue #1360. 176 is claimed by PR #1328
+    // (photo-GPS site suggestions), still open; 177 above landed while this
+    // branch was open. This stays above main's scalar deliberately -- a rung
+    // at or below it merges with no conflict marker and its onUpgrade step
+    // then never runs.
     178,
   ];
 
@@ -5239,6 +5249,60 @@ class AppDatabase extends _$AppDatabase {
         'CHECK (default_show_o2_cell_mv IN (0, 1))',
       );
     }
+  }
+
+  /// v177: the GTR (gas time remaining) settings on diver_settings: default
+  /// visibility, computer-vs-calculated source, and the reserve pressure
+  /// (bar) the calculated value counts down to.
+  Future<void> _assertGtrSettingsColumns() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('default_show_gtr')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN default_show_gtr '
+        'INTEGER NOT NULL DEFAULT 0 '
+        'CHECK (default_show_gtr IN (0, 1))',
+      );
+    }
+    if (!names.contains('default_gtr_source')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN default_gtr_source '
+        'INTEGER NOT NULL DEFAULT 1',
+      );
+    }
+    if (!names.contains('gtr_reserve_pressure')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN gtr_reserve_pressure '
+        'REAL NOT NULL DEFAULT 50.0',
+      );
+    }
+  }
+
+  /// v177: dive_profiles.rbt is documented in seconds, and the Subsurface and
+  /// UDDF importers store seconds, but libdivecomputer reports RBT/GTR in
+  /// minutes and every libdc path (download, reparse, raw-log import) wrote
+  /// the raw value. Rows that came through libdc on a download, reparse or
+  /// raw-log import carry raw bytes on their data source, so scale only
+  /// them. Shearwater Cloud and MacDive imports also parse through libdc but
+  /// persist no raw bytes and no format marker, so their existing rbt rows
+  /// cannot be told apart from file imports here; re-importing them writes
+  /// seconds.
+  Future<void> _scaleLibdcRbtMinutesToSeconds() async {
+    final tables = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type = 'table' "
+      "AND name IN ('dive_profiles', 'dive_data_sources')",
+    ).get();
+    if (tables.length < 2) return;
+    final cols = await customSelect("PRAGMA table_info('dive_profiles')").get();
+    if (!cols.any((c) => c.read<String>('name') == 'rbt')) return;
+    await customStatement(
+      'UPDATE dive_profiles SET rbt = rbt * 60 '
+      'WHERE rbt IS NOT NULL AND dive_id IN '
+      '(SELECT dive_id FROM dive_data_sources WHERE raw_data IS NOT NULL)',
+    );
   }
 
   /// v163: default_show_estimated_tank_pressure on diver_settings (issue
@@ -9100,11 +9164,19 @@ class AppDatabase extends _$AppDatabase {
           await backfillDiveComputerGearTwins(this);
         }
         if (from < 175) await reportProgress();
+        // v177: GTR (gas time remaining) settings on diver_settings, and a
+        // one-time repair of dive_profiles.rbt for rows that came through
+        // libdivecomputer, which reports minutes into a seconds column.
+        if (from < 177) {
+          await _assertGtrSettingsColumns();
+          await _scaleLibdcRbtMinutesToSeconds();
+        }
+        if (from < 177) await reportProgress();
         if (from < 178) {
           // Duplicate dive types (issue #1360). The helper dedupes BEFORE
-          // creating the unique index and its dedupe is total (rowid
+          // creating the unique index and its dedupe is total (`id`
           // tie-breaks), so no tie can survive to abort the index creation --
-          // the failure mode v148 documents. Self-guarding on the table
+          // the failure mode v148 documents. Self-guarding on the tables
           // existing.
           await assertDiveTypeUniqueness(this);
         }
@@ -9302,6 +9374,11 @@ class AppDatabase extends _$AppDatabase {
         // v161 backstop: re-assert diver_settings.default_show_o2_cell_mv
         // (issue #1235; same parallel-branch version-collision self-heal).
         await _assertO2CellMvDefaultColumn();
+
+        // v177 backstop: re-assert the GTR settings columns (same
+        // parallel-branch version-collision self-heal). The rbt repair is
+        // deliberately NOT re-run here: it is a one-shot data fix.
+        await _assertGtrSettingsColumns();
 
         // v163 backstop: re-assert
         // diver_settings.default_show_estimated_tank_pressure (issue #731;
