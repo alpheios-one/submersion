@@ -81,7 +81,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
                 BlenderSectionTitle(
                   context.l10n.gasCalculators_blender_billing,
                 ),
-                // Wrap, not Row: the gear plus "Save fill" together are also
+                // Wrap, not Row: the link plus "Save fill" together are also
                 // a few pixels too wide for the narrowest phone, so this
                 // group wraps onto its own second line the same way the
                 // title and this group already wrap against each other.
@@ -89,18 +89,21 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     // Opens the settings page scrolled straight to "Default
-                    // settings and billing" rather than to its top, since
-                    // that section's cylinder templates are what this card's
-                    // dropdown reads (issue #1335 follow-up).
-                    IconButton(
-                      key: const Key('blender-billing-settings'),
-                      icon: const Icon(Icons.settings_outlined),
-                      tooltip: context.l10n.nav_settings,
+                    // settings and billing", where the cylinder-size
+                    // templates this card's dropdown reads are managed
+                    // (issue #1335 follow-up: replaces the second settings
+                    // gear with a link straight to that one setting).
+                    TextButton.icon(
+                      key: const Key('blender-cylinder-sizes-link'),
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (context) =>
                               const BlenderSettingsPage(scrollToDefaults: true),
                         ),
+                      ),
+                      icon: const Icon(Icons.straighten, size: 18),
+                      label: Text(
+                        context.l10n.gasCalculators_blender_manageCylinderSizes,
                       ),
                     ),
                     if (billing.lines.isNotEmpty)

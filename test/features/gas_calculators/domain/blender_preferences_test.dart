@@ -35,7 +35,6 @@ void main() {
     test('starts unpriced at the reference temperature', () {
       final prefs = BlenderPreferences.defaults(cylinderWaterLiters: 12);
       expect(prefs.gasPrices, [null, null, null]);
-      expect(prefs.currencyCode, isNull);
       expect(prefs.fillTempC, kReferenceTempC);
       expect(prefs.settledTempC, kReferenceTempC);
       expect(prefs.cylinderWaterLiters, 12);
@@ -74,7 +73,6 @@ void main() {
           .copyWith(
             templates: const [MixTemplate(o2: 21, he: 35)],
             gasPrices: const [2.55, 7.99, 0.01],
-            currencyCode: 'CHF',
             fillTempC: 5,
             settledTempC: 25,
             cylinderWaterLiters: 3,
@@ -95,7 +93,6 @@ void main() {
       );
       expect(decoded.templates, prefs.templates);
       expect(decoded.gasPrices, prefs.gasPrices);
-      expect(decoded.currencyCode, 'CHF');
       expect(decoded.fillTempC, 5);
       expect(decoded.settledTempC, 25);
       expect(decoded.cylinderWaterLiters, 3);
@@ -148,13 +145,11 @@ void main() {
       final decoded = BlenderPreferences.fromJson({
         'templates': 'not a list',
         'gasPrices': [2.55, 'nope', null],
-        'currencyCode': 'CHF',
         'fillTempC': 'cold',
         'model': 'newtonian',
       });
       expect(decoded.templates, isEmpty);
       expect(decoded.gasPrices, [2.55, null, null]);
-      expect(decoded.currencyCode, 'CHF');
       expect(decoded.fillTempC, kReferenceTempC);
       expect(decoded.model, BlendGasModel.zFactor);
     });
@@ -181,26 +176,6 @@ void main() {
       expect(capped.templates, hasLength(BlenderPreferences.maxTemplates));
     });
   });
-  group('copyWith', () {
-    test('can clear the currency back to the diver default', () {
-      // Raised in review on PR #1215. Null is meaningful here (inherit the
-      // diver's setting), so a plain `?? this.currencyCode` could never
-      // express it.
-      final prefs = BlenderPreferences.defaults(
-        cylinderWaterLiters: 12,
-      ).copyWith(currencyCode: 'CHF');
-      expect(prefs.currencyCode, 'CHF');
-      expect(prefs.copyWith(clearCurrencyCode: true).currencyCode, isNull);
-    });
-
-    test('leaves the currency alone when it is not named', () {
-      final prefs = BlenderPreferences.defaults(
-        cylinderWaterLiters: 12,
-      ).copyWith(currencyCode: 'CHF');
-      expect(prefs.copyWith(fillTempC: 5).currencyCode, 'CHF');
-    });
-  });
-
   group('rejectionFor', () {
     test('accepts a fresh, valid mix', () {
       expect(rejectionFor(const [], const MixTemplate(o2: 18, he: 45)), isNull);

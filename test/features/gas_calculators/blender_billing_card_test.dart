@@ -149,16 +149,17 @@ void main() {
     expect(ref.read(blenderCylinderLitersProvider), closeTo(5, 0.01));
   });
 
-  testWidgets('a second gear opens settings scrolled to billing defaults', (
-    tester,
-  ) async {
-    await _pump(tester);
-    await tester.tap(find.byKey(const Key('blender-billing-settings')));
-    await tester.pumpAndSettle();
+  testWidgets(
+    'the cylinder-sizes link opens settings scrolled to billing defaults',
+    (tester) async {
+      await _pump(tester);
+      await tester.tap(find.byKey(const Key('blender-cylinder-sizes-link')));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Default settings and billing'), findsOneWidget);
-    expect(find.text('Cylinder sizes'), findsOneWidget);
-  });
+      expect(find.text('Default settings and billing'), findsOneWidget);
+      expect(find.text('Cylinder sizes'), findsOneWidget);
+    },
+  );
 
   testWidgets('submitting a typed cylinder volume saves the preferences', (
     tester,

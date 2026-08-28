@@ -33,11 +33,12 @@ Future<void> _pump(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('the gear opens the settings page', (tester) async {
+  testWidgets('the gear opens the Trimix Mixer settings page', (tester) async {
     await _pump(tester);
     await tester.tap(find.byKey(const Key('blender-settings')));
     await tester.pumpAndSettle();
 
+    expect(find.text('Trimix Mixer'), findsOneWidget);
     expect(find.text('Fill gases'), findsOneWidget);
     expect(find.text('Blending conditions'), findsOneWidget);
     expect(find.text('Default settings and billing'), findsOneWidget);
@@ -57,11 +58,11 @@ void main() {
     tester,
   ) async {
     await _pump(tester);
-    expect(find.byKey(const Key('blender-currency')), findsNothing);
+    expect(find.byKey(const Key('blender-currency-display')), findsNothing);
 
     await tester.tap(find.byKey(const Key('blender-settings')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('blender-currency')), findsOneWidget);
+    expect(find.byKey(const Key('blender-currency-display')), findsOneWidget);
   });
 
   testWidgets('the cylinder template manager lives in settings', (
@@ -77,18 +78,18 @@ void main() {
     expect(find.text('AL80'), findsOneWidget);
   });
 
-  testWidgets('the billing card gear also opens settings, scrolled down', (
+  testWidgets('the cylinder-sizes link also opens settings, scrolled down', (
     tester,
   ) async {
     await _pump(tester);
     // The billing card sits below the fold on the default test surface, so
-    // its gear has to be scrolled into view before it can be tapped, same
+    // its link has to be scrolled into view before it can be tapped, same
     // as a diver would need to scroll down to reach it.
     await tester.ensureVisible(
-      find.byKey(const Key('blender-billing-settings')),
+      find.byKey(const Key('blender-cylinder-sizes-link')),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('blender-billing-settings')));
+    await tester.tap(find.byKey(const Key('blender-cylinder-sizes-link')));
     await tester.pumpAndSettle();
 
     expect(find.text('Default settings and billing'), findsOneWidget);

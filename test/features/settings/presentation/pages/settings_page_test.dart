@@ -1651,6 +1651,7 @@ void main() {
         '/settings',
         reason: 'the fallback clears the selected-section query parameter',
       );
+      await tester.scrollUntilVisible(find.text('Units'), 100);
       expect(find.text('Units'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

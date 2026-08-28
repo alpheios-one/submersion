@@ -94,30 +94,19 @@ class _BlenderDefaultsCardState extends ConsumerState<BlenderDefaultsCard> {
     );
   }
 
+  /// Read-only: issue #1335 follow-up removes the blender's own currency
+  /// choice, so this always mirrors Settings -> Units -> Default currency
+  /// rather than something edited here.
   Widget _currencyField(BuildContext context, String currency) {
-    // Controlled so a stored currency arriving from the async preference load
-    // moves the dropdown with it (PR #1215 review).
-    return DropdownButtonFormField<String>(
-      key: const Key('blender-currency'),
-      initialValue: currency,
-      isExpanded: true,
+    return InputDecorator(
+      key: const Key('blender-currency-display'),
       decoration: InputDecoration(
         labelText: context.l10n.gasCalculators_blender_currency,
+        helperText: context.l10n.gasCalculators_blender_currencyFollowsUnits,
         isDense: true,
         border: const OutlineInputBorder(),
       ),
-      items: [
-        for (final code in currencyCodesWith(currency))
-          DropdownMenuItem(
-            value: code,
-            child: Text('$code  ${currencySymbol(code)}'),
-          ),
-      ],
-      onChanged: (code) {
-        if (code == null) return;
-        ref.read(blenderCurrencyProvider.notifier).state = code;
-        saveBlenderPreferences(ref);
-      },
+      child: Text('$currency  ${currencySymbol(currency)}'),
     );
   }
 

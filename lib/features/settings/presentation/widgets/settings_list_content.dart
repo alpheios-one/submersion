@@ -104,6 +104,12 @@ const settingsSections = [
     subtitle: 'Share sites and trips across profiles',
   ),
   SettingsSection(
+    id: 'trimixMixer',
+    icon: Icons.gas_meter,
+    title: 'Trimix Mixer',
+    subtitle: 'Fill gases, conditions & billing defaults',
+  ),
+  SettingsSection(
     id: 'units',
     icon: Icons.straighten,
     title: 'Units',
@@ -300,6 +306,8 @@ class _SettingsSectionTile extends StatelessWidget {
         return context.l10n.settings_section_security_title;
       case 'debug':
         return context.l10n.settings_section_debug_title;
+      case 'trimixMixer':
+        return context.l10n.settings_section_trimixMixer_title;
       default:
         return section.title;
     }
@@ -333,6 +341,8 @@ class _SettingsSectionTile extends StatelessWidget {
         return context.l10n.settings_section_security_subtitle;
       case 'debug':
         return context.l10n.settings_section_debug_subtitle;
+      case 'trimixMixer':
+        return context.l10n.settings_section_trimixMixer_subtitle;
       default:
         return section.subtitle;
     }

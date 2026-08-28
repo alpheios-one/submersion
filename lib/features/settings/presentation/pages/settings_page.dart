@@ -45,6 +45,7 @@ import 'package:submersion/features/settings/presentation/widgets/settings_summa
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_import/domain/services/health_import_service.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
 import 'package:submersion/features/dive_import/presentation/providers/dive_import_providers.dart';
 import 'package:submersion/features/auto_update/domain/beta_program_links.dart';
 import 'package:submersion/features/auto_update/domain/entities/release_channel.dart';
@@ -175,6 +176,8 @@ class SettingsPage extends ConsumerWidget {
         return const SharedDataSectionContent();
       case 'debug':
         return const DebugLogViewerPage();
+      case 'trimixMixer':
+        return const BlenderSettingsPage();
       default:
         return Center(child: Text('Unknown section: $sectionId'));
     }
@@ -245,6 +248,7 @@ const settingsSectionDedicatedRoutes = <String, String>{
   'appearance': '/settings/appearance',
   'safety': '/settings/safety',
   'debug': '/settings/debug-logs',
+  'trimixMixer': '/settings/trimix-mixer',
 };
 
 /// Mobile detail page for a single settings section.
@@ -297,6 +301,7 @@ class SettingsSectionDetailPage extends ConsumerWidget {
       'dataSources' => context.l10n.settings_section_dataSources_title,
       'sharedData' => context.l10n.settings_sharedData_sectionTitle,
       'debug' => context.l10n.settings_section_debug_title,
+      'trimixMixer' => context.l10n.settings_section_trimixMixer_title,
       _ => context.l10n.settings_appBar_title,
     };
   }
@@ -329,6 +334,8 @@ class SettingsSectionDetailPage extends ConsumerWidget {
         return const SharedDataSectionContent();
       case 'debug':
         return const DebugLogViewerPage();
+      case 'trimixMixer':
+        return const BlenderSettingsPage();
       default:
         return Center(child: Text('Unknown section: $sectionId'));
     }

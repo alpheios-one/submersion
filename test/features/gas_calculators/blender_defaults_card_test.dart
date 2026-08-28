@@ -73,27 +73,18 @@ void main() {
     expect(find.widgetWithText(TextField, '12.5'), findsOneWidget);
   });
 
-  testWidgets('choosing a currency writes and persists it', (tester) async {
-    final repo = FakeAppSettingsRepository();
-    final ref = await _pump(
-      tester,
-      overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
-    );
+  testWidgets(
+    'the currency display follows the diver default and is read-only',
+    (tester) async {
+      // Issue #1335 follow-up: the blender no longer has its own currency
+      // choice, so this always mirrors Settings -> Units -> Default currency.
+      final ref = await _pump(tester);
 
-    await tester.tap(find.byKey(const Key('blender-currency')));
-    await tester.pumpAndSettle();
-    // The open menu only builds items near the selected one (CHF), and even a
-    // built neighbour can render outside the popup's visible viewport, so it
-    // has to be scrolled into view before the tap will actually hit it.
-    final gbpItem = find.text('GBP  £').last;
-    await tester.ensureVisible(gbpItem);
-    await tester.pumpAndSettle();
-    await tester.tap(gbpItem);
-    await tester.pumpAndSettle();
-
-    expect(ref.read(blenderCurrencyProvider), 'GBP');
-    expect(repo.blenderPreferences?.currencyCode, 'GBP');
-  });
+      expect(find.byKey(const Key('blender-currency-display')), findsOneWidget);
+      expect(find.textContaining('CHF'), findsOneWidget);
+      expect(ref.read(blenderCurrencyProvider), 'CHF');
+    },
+  );
 
   testWidgets('submitting a price field saves the preferences', (tester) async {
     final repo = FakeAppSettingsRepository();

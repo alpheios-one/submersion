@@ -120,14 +120,15 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Fill gases, mixing conditions and billing defaults live
-              // behind the gear now (issue #1335); only the fields a diver
-              // retypes every fill stay on this always-visible screen.
+              // under Settings -> Trimix Mixer now (issue #1335 follow-up);
+              // only the fields a diver retypes every fill stay on this
+              // always-visible screen.
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(
                   key: const Key('blender-settings'),
                   icon: const Icon(Icons.settings_outlined),
-                  tooltip: context.l10n.nav_settings,
+                  tooltip: context.l10n.settings_section_trimixMixer_title,
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (context) => const BlenderSettingsPage(),

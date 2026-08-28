@@ -20864,6 +20864,18 @@ abstract class AppLocalizations {
   /// **'Currency'**
   String get gasCalculators_blender_currency;
 
+  /// No description provided for @gasCalculators_blender_currencyFollowsUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Follows Settings > Units > Default currency'**
+  String get gasCalculators_blender_currencyFollowsUnits;
+
+  /// No description provided for @gasCalculators_blender_manageCylinderSizes.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage cylinder sizes'**
+  String get gasCalculators_blender_manageCylinderSizes;
+
   /// No description provided for @gasCalculators_blender_costTotal.
   ///
   /// In en, this message translates to:
@@ -41909,6 +41921,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'App lock & database encryption'**
   String get settings_section_security_subtitle;
+
+  /// No description provided for @settings_section_trimixMixer_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Trimix Mixer'**
+  String get settings_section_trimixMixer_title;
+
+  /// No description provided for @settings_section_trimixMixer_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill gases, conditions & billing defaults'**
+  String get settings_section_trimixMixer_subtitle;
 
   /// No description provided for @settings_security_appLock.
   ///

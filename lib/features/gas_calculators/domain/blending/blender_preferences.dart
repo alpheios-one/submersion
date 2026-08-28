@@ -80,7 +80,6 @@ class BlenderPreferences {
   const BlenderPreferences({
     required this.templates,
     required this.gasPrices,
-    required this.currencyCode,
     required this.fillTempC,
     required this.settledTempC,
     required this.cylinderWaterLiters,
@@ -116,9 +115,6 @@ class BlenderPreferences {
   /// Price per 100 litres of free gas, positional against the three fill gas
   /// slots. Null means the diver has not priced that gas.
   final List<double?> gasPrices;
-
-  /// Null inherits the diver's `defaultCurrency` setting.
-  final String? currencyCode;
 
   final double fillTempC;
   final double settledTempC;
@@ -164,7 +160,6 @@ class BlenderPreferences {
       BlenderPreferences(
         templates: seedTemplates,
         gasPrices: const [null, null, null],
-        currencyCode: null,
         fillTempC: kReferenceTempC,
         settledTempC: kReferenceTempC,
         cylinderWaterLiters: cylinderWaterLiters,
@@ -184,8 +179,6 @@ class BlenderPreferences {
   BlenderPreferences copyWith({
     List<MixTemplate>? templates,
     List<double?>? gasPrices,
-    String? currencyCode,
-    bool clearCurrencyCode = false,
     double? fillTempC,
     double? settledTempC,
     double? cylinderWaterLiters,
@@ -203,11 +196,6 @@ class BlenderPreferences {
   }) => BlenderPreferences(
     templates: (templates ?? this.templates).take(maxTemplates).toList(),
     gasPrices: gasPrices ?? this.gasPrices,
-    // clearCurrencyCode is how it gets removed: null is meaningful here
-    // (inherit the diver's default) and `??` cannot express it.
-    currencyCode: clearCurrencyCode
-        ? null
-        : (currencyCode ?? this.currencyCode),
     fillTempC: fillTempC ?? this.fillTempC,
     settledTempC: settledTempC ?? this.settledTempC,
     cylinderWaterLiters: cylinderWaterLiters ?? this.cylinderWaterLiters,
@@ -231,7 +219,6 @@ class BlenderPreferences {
   Map<String, dynamic> toJson() => {
     'templates': templates.map((t) => t.toJson()).toList(),
     'gasPrices': gasPrices,
-    'currencyCode': currencyCode,
     'fillTempC': fillTempC,
     'settledTempC': settledTempC,
     'cylinderWaterLiters': cylinderWaterLiters,
@@ -268,8 +255,6 @@ class BlenderPreferences {
       }
     }
 
-    final currency = json['currencyCode'];
-
     final rawFills = json['billedFills'];
     final fills = rawFills is List
         ? rawFills
@@ -293,9 +278,6 @@ class BlenderPreferences {
     return BlenderPreferences(
       templates: templates,
       gasPrices: prices,
-      currencyCode: currency is String && currency.trim().isNotEmpty
-          ? currency.trim().toUpperCase()
-          : null,
       fillTempC: _toDouble(json['fillTempC']) ?? kReferenceTempC,
       settledTempC: _toDouble(json['settledTempC']) ?? kReferenceTempC,
       cylinderWaterLiters: _toDouble(json['cylinderWaterLiters']) ?? 12.0,

@@ -5,12 +5,15 @@ import 'package:submersion/features/gas_calculators/presentation/providers/gas_b
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_conditions_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_defaults_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/mix_template_manager.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// The blender's settings gear: fill gases, mixing conditions, and billing
-/// defaults, moved off the always-visible calculator so the fields a diver
-/// sets once per session don't compete with the ones they retype every fill
-/// (issue #1335). Each card keeps its existing internal layout unchanged.
+/// The Trimix Mixer's own settings, reached both from the calculator's
+/// settings gear and from the global Settings page (issue #1335 follow-up):
+/// fill gases, mixing conditions, saved target-fill mixes, and billing
+/// defaults, kept off the always-visible calculator so the fields a diver
+/// sets once per session don't compete with the ones they retype every fill.
+/// Each card keeps its existing internal layout unchanged.
 class BlenderSettingsPage extends ConsumerStatefulWidget {
   const BlenderSettingsPage({super.key, this.scrollToDefaults = false});
 
@@ -75,7 +78,9 @@ class _BlenderSettingsPageState extends ConsumerState<BlenderSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.nav_settings)),
+      appBar: AppBar(
+        title: Text(context.l10n.settings_section_trimixMixer_title),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Center(
@@ -90,6 +95,13 @@ class _BlenderSettingsPageState extends ConsumerState<BlenderSettingsPage> {
                 ),
                 const SizedBox(height: 16),
                 const BlenderConditionsCard(),
+                const SizedBox(height: 16),
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: MixTemplateManager(),
+                  ),
+                ),
                 const SizedBox(height: 16),
                 KeyedSubtree(
                   key: _defaultsKey,

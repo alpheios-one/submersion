@@ -58,9 +58,11 @@ final blenderGasPricesProvider = StateProvider<List<double?>>(
   (ref) => const [null, null, null],
 );
 
-/// Currency the prices are in, defaulting to the diver's own.
-final blenderCurrencyProvider = StateProvider<String>(
-  (ref) => ref.read(settingsProvider).defaultCurrency,
+/// Currency the prices are shown in. Always the diver's global default
+/// (Settings -> Units -> Default currency): issue #1335 follow-up removes the
+/// blender's own currency choice, so it can no longer drift from that setting.
+final blenderCurrencyProvider = Provider<String>(
+  (ref) => ref.watch(defaultCurrencyProvider),
 );
 
 /// Cylinder water capacity in litres, for costing only. Partial-pressure
@@ -168,9 +170,6 @@ final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
   ref.read(blenderGasModelProvider.notifier).state = stored.model;
   ref.read(blenderBilledFillsProvider.notifier).state = stored.billedFills;
   ref.read(blenderBilledToProvider.notifier).state = stored.billedTo;
-  if (stored.currencyCode != null) {
-    ref.read(blenderCurrencyProvider.notifier).state = stored.currencyCode!;
-  }
   ref.read(blenderStartPressureProvider.notifier).state =
       stored.startPressureBar;
   ref.read(blenderStartMixProvider.notifier).state = stored.startMix;
@@ -207,7 +206,6 @@ Future<void> saveBlenderPreferences(WidgetRef ref) async {
           BlenderPreferences(
             templates: ref.read(blenderTemplatesProvider),
             gasPrices: ref.read(blenderGasPricesProvider),
-            currencyCode: ref.read(blenderCurrencyProvider),
             fillTempC: ref.read(blenderFillTempProvider),
             settledTempC: ref.read(blenderSettledTempProvider),
             cylinderWaterLiters: ref.read(blenderCylinderLitersProvider),
