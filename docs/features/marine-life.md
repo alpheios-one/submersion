@@ -11,6 +11,12 @@ Submersion includes a pre-seeded species database with 511 species, plus you can
   <em>Browsable species database with categories</em>
 </div>
 
+The catalog covers freshwater species too (lakes, rivers, springs and
+cenotes: pike, trout, cichlids, crayfish, turtles, otters and water plants
+among them). Catalog corrections and additions reach existing installs on
+the next launch after an update; a species you edited yourself is left as
+you set it.
+
 ## Species Categories
 
 | Category | Examples |
@@ -153,6 +159,26 @@ Add reference photos:
 <div class="tip">
 <strong>Coming Soon:</strong> Photo management with per-sighting images will be available in v2.0.
 </div>
+
+## Growing the Catalog (maintainers)
+
+The bundled catalog is `assets/data/species.json`; its `version` gates a
+one-time upgrade pass on each device that rewrites rows the diver never
+edited. To add species:
+
+1. Add entries to `tool/data/freshwater_species_seed.json` (or a sibling seed)
+   with descriptions in all 11 locales, and any locale names iNaturalist lacks
+   to `tool/data/freshwater_species_name_overrides.json`.
+2. `dart run tool/generate_freshwater_species.dart` (network) writes the
+   catalog rows and the localized names file and bumps the version.
+3. `dart run tool/generate_species_arb_keys.dart`, `flutter gen-l10n`,
+   `dart run tool/generate_species_lookups.dart`,
+   `dart run tool/generate_species_gbif_keys.dart` (network).
+4. Run `test/features/marine_life/presentation/species_lookup_coverage_test.dart`.
+
+Suggestions filed through the in-app "Suggest for the catalog" action arrive
+as GitHub issues labelled `species-suggestion`; they land in the seed the same
+way.
 
 ## Identification Tips
 
