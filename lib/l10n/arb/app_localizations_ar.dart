@@ -33345,6 +33345,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يزال رفع المكتبة المستبدَلة جاريًا. حاول مرة أخرى بعد قليل.';
 
   @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'تم نشر مكتبة السحابة بواسطة إصدار أحدث من Submersion. حدِّث هذا الجهاز ثم حاول مرة أخرى.';
+
+  @override
   String settings_cloudSync_result_recordsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

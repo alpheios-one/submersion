@@ -9868,6 +9868,7 @@
   "settings_cloudSync_result_adoptFailed": "Wiederhergestellte Bibliothek konnte nicht übernommen werden: {error}",
   "settings_cloudSync_result_previousLibraryUnreadable": "Die vorherige Bibliothek konnte nicht gelesen werden; dieses Backend wurde aus der Bibliothek dieses Geräts neu eingerichtet.",
   "settings_cloudSync_result_replacementStillUploading": "Die ersetzte Bibliothek wird noch hochgeladen. Versuchen Sie es in Kürze erneut.",
+  "settings_cloudSync_result_cloudLibraryNewerSchema": "Die Cloud-Bibliothek wurde von einer neueren Version von Submersion veröffentlicht. Aktualisieren Sie dieses Gerät und versuchen Sie es dann erneut.",
   "settings_cloudSync_result_recordsFailed": "{count, plural, =1{1 Datensatz konnte nicht angewendet werden} other{{count} Datensätze konnten nicht angewendet werden}}",
   "settings_cloudSync_result_adoptedFreshIdentity": "Ein anderes Gerät hat mit der Identität dieses Geräts synchronisiert. Dieses Gerät hat eine neue Identität übernommen und die Cloud-Daten zusammengeführt.",
   "settings_cloudSync_launchCheck_unavailable": "{provider} ist auf diesem Gerät nicht verfügbar",

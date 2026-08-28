@@ -33553,6 +33553,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'A lecserélt könyvtár feltöltése még folyamatban van. Próbálja újra rövidesen.';
 
   @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'A felhőkönyvtárat a Submersion egy újabb verziója tette közzé. Frissítse ezt az eszközt, majd próbálja újra.';
+
+  @override
   String settings_cloudSync_result_recordsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -9868,6 +9868,7 @@
   "settings_cloudSync_result_adoptFailed": "采用恢复的资料库失败：{error}",
   "settings_cloudSync_result_previousLibraryUnreadable": "无法读取先前的资料库；已根据本设备的资料库重新建立此后端。",
   "settings_cloudSync_result_replacementStillUploading": "被替换的资料库仍在上传中。请稍后重试。",
+  "settings_cloudSync_result_cloudLibraryNewerSchema": "云端资料库由较新版本的 Submersion 发布。请更新此设备后重试。",
   "settings_cloudSync_result_recordsFailed": "{count, plural, other{{count} 条记录应用失败}}",
   "settings_cloudSync_result_adoptedFreshIdentity": "另一台设备正在使用本设备的身份同步。本设备已采用新身份，并合并了云端数据。",
   "settings_cloudSync_launchCheck_unavailable": "{provider} 在此设备上不可用",

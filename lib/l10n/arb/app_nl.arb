@@ -9868,6 +9868,7 @@
   "settings_cloudSync_result_adoptFailed": "Kan de herstelde bibliotheek niet overnemen: {error}",
   "settings_cloudSync_result_previousLibraryUnreadable": "De vorige bibliotheek kon niet worden gelezen; deze provider is opnieuw ingericht vanuit de bibliotheek van dit apparaat.",
   "settings_cloudSync_result_replacementStillUploading": "De vervangen bibliotheek wordt nog geüpload. Probeer het zo meteen opnieuw.",
+  "settings_cloudSync_result_cloudLibraryNewerSchema": "De cloudbibliotheek is gepubliceerd door een nieuwere versie van Submersion. Werk dit apparaat bij en probeer het daarna opnieuw.",
   "settings_cloudSync_result_recordsFailed": "{count, plural, =1{1 record kon niet worden toegepast} other{{count} records konden niet worden toegepast}}",
   "settings_cloudSync_result_adoptedFreshIdentity": "Een ander apparaat synchroniseerde met de identiteit van dit apparaat. Dit apparaat heeft een nieuwe identiteit overgenomen en de cloudgegevens samengevoegd.",
   "settings_cloudSync_launchCheck_unavailable": "{provider} is niet beschikbaar op dit apparaat",

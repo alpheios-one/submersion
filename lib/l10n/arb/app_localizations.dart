@@ -55382,6 +55382,12 @@ abstract class AppLocalizations {
   /// **'The replaced library is still uploading. Try again shortly.'**
   String get settings_cloudSync_result_replacementStillUploading;
 
+  /// No description provided for @settings_cloudSync_result_cloudLibraryNewerSchema.
+  ///
+  /// In en, this message translates to:
+  /// **'The cloud library was published by a newer version of Submersion. Update this device, then try again.'**
+  String get settings_cloudSync_result_cloudLibraryNewerSchema;
+
   /// No description provided for @settings_cloudSync_result_recordsFailed.
   ///
   /// In en, this message translates to:

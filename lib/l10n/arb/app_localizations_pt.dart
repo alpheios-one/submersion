@@ -33691,6 +33691,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'A biblioteca substituída ainda está sendo enviada. Tente novamente em instantes.';
 
   @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'A biblioteca na nuvem foi publicada por uma versão mais recente do Submersion. Atualize este dispositivo e tente novamente.';
+
+  @override
   String settings_cloudSync_result_recordsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
