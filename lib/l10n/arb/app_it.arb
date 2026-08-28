@@ -3990,7 +3990,6 @@
   "marineLife_lookup_errorServer": "iNaturalist ha restituito un errore. Riprova più tardi.",
   "marineLife_lookup_errorMalformed": "Risposta inattesa da iNaturalist.",
   "marineLife_lookup_retry": "Riprova",
-  "marineLife_lookup_resolving": "Caricamento dei dettagli...",
   "marineLife_lookup_observations": "{count, plural, =1{1 osservazione} other{{count} osservazioni}}",
   "marineLife_lookup_unresolvableRank": "{rank}: scegli una specie",
   "marineLife_speciesDetail_suggestForCatalog": "Suggerisci per il catalogo",

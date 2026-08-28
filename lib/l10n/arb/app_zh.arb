@@ -4217,7 +4217,6 @@
   "marineLife_lookup_errorServer": "iNaturalist 返回了错误。请稍后重试。",
   "marineLife_lookup_errorMalformed": "来自 iNaturalist 的意外响应。",
   "marineLife_lookup_retry": "重试",
-  "marineLife_lookup_resolving": "正在加载详情...",
   "marineLife_lookup_observations": "{count, plural, =1{1 条观察记录} other{{count} 条观察记录}}",
   "marineLife_lookup_unresolvableRank": "{rank}：请选择一个物种",
   "marineLife_speciesDetail_suggestForCatalog": "推荐加入目录",

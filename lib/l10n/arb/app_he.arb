@@ -3990,7 +3990,6 @@
   "marineLife_lookup_errorServer": "iNaturalist החזיר שגיאה. נסו שוב מאוחר יותר.",
   "marineLife_lookup_errorMalformed": "תגובה לא צפויה מ-iNaturalist.",
   "marineLife_lookup_retry": "ניסיון חוזר",
-  "marineLife_lookup_resolving": "טוען פרטים...",
   "marineLife_lookup_observations": "{count, plural, =1{תצפית אחת} other{{count} תצפיות}}",
   "marineLife_lookup_unresolvableRank": "{rank}: בחרו מין",
   "marineLife_speciesDetail_suggestForCatalog": "הצעה לקטלוג",

@@ -61,6 +61,37 @@ void main() {
     expect(_bodyJson(uri)['scientificName'], 'Aplysina archeri');
   });
 
+  test('keeps the URL under the cap when the name is the oversized field', () {
+    final long = _species.copyWith(commonName: 'x' * 20000, description: '');
+
+    final uri = buildSpeciesSuggestionUrl(
+      species: long,
+      locale: 'en',
+      appVersion: '1.0.0.1',
+    );
+
+    expect(uri.toString().length, lessThanOrEqualTo(8000));
+    // The scientific name is what identifies the species, so it survives.
+    expect(_bodyJson(uri)['scientificName'], 'Aplysina archeri');
+    expect(uri.queryParameters['title'], startsWith('Species suggestion: xxx'));
+  });
+
+  test('truncates the description before the name', () {
+    final long = _species.copyWith(
+      commonName: 'Stove-pipe Sponge',
+      description: 'y' * 20000,
+    );
+
+    final uri = buildSpeciesSuggestionUrl(
+      species: long,
+      locale: 'en',
+      appVersion: '1.0.0.1',
+    );
+
+    expect(uri.toString().length, lessThanOrEqualTo(8000));
+    expect(_bodyJson(uri)['commonName'], 'Stove-pipe Sponge');
+  });
+
   test('encodes non-ASCII names', () {
     final uri = buildSpeciesSuggestionUrl(
       species: _species.copyWith(commonName: 'Süßwasser Grundel'),

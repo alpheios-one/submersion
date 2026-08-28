@@ -12671,9 +12671,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get marineLife_lookup_retry => 'Reintentar';
 
   @override
-  String get marineLife_lookup_resolving => 'Cargando detalles...';
-
-  @override
   String marineLife_lookup_observations(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

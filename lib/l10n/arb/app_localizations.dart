@@ -21467,12 +21467,6 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get marineLife_lookup_retry;
 
-  /// No description provided for @marineLife_lookup_resolving.
-  ///
-  /// In en, this message translates to:
-  /// **'Loading details...'**
-  String get marineLife_lookup_resolving;
-
   /// No description provided for @marineLife_lookup_observations.
   ///
   /// In en, this message translates to:

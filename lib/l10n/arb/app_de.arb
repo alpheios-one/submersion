@@ -4063,7 +4063,6 @@
   "marineLife_lookup_errorServer": "iNaturalist hat einen Fehler gemeldet. Versuchen Sie es später erneut.",
   "marineLife_lookup_errorMalformed": "Unerwartete Antwort von iNaturalist.",
   "marineLife_lookup_retry": "Erneut versuchen",
-  "marineLife_lookup_resolving": "Details werden geladen...",
   "marineLife_lookup_observations": "{count, plural, =1{1 Beobachtung} other{{count} Beobachtungen}}",
   "marineLife_lookup_unresolvableRank": "{rank}: wählen Sie eine Art",
   "marineLife_speciesDetail_suggestForCatalog": "Für den Katalog vorschlagen",

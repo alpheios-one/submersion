@@ -3990,7 +3990,6 @@
   "marineLife_lookup_errorServer": "Az iNaturalist hibát adott vissza. Próbáld újra később.",
   "marineLife_lookup_errorMalformed": "Váratlan válasz az iNaturalisttól.",
   "marineLife_lookup_retry": "Újra",
-  "marineLife_lookup_resolving": "Részletek betöltése...",
   "marineLife_lookup_observations": "{count, plural, =1{1 megfigyelés} other{{count} megfigyelés}}",
   "marineLife_lookup_unresolvableRank": "{rank}: válassz egy fajt",
   "marineLife_speciesDetail_suggestForCatalog": "Javaslat a katalógusba",

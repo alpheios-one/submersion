@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -27,15 +29,24 @@ ReefSnapshot _snapshotWithUnmatched(List<String> names) => ReefSnapshot(
 );
 
 class _FakeLookup implements SpeciesLookupService {
-  _FakeLookup(this.hits);
+  _FakeLookup(this.hits, {this.gate});
+
   final List<SpeciesLookupHit> hits;
   final List<int> resolved = [];
+  final List<String> searched = [];
+
+  /// When set, `search` parks on it so a test can tap again mid-lookup.
+  final Completer<void>? gate;
 
   @override
   Future<List<SpeciesLookupHit>> search(
     String query, {
     required String locale,
-  }) async => hits;
+  }) async {
+    searched.add(query);
+    if (gate != null) await gate!.future;
+    return hits;
+  }
 
   @override
   Future<SpeciesLookupResult> resolve(
@@ -154,6 +165,29 @@ void main() {
     expect(repository.created, ['Aplysina archeri']);
     expect(repository.added, ['new-1']);
     expect(find.text('Look up a species'), findsNothing);
+  });
+
+  testWidgets('a second tap while the lookup is in flight adds the species '
+      'once', (tester) async {
+    final gate = Completer<void>();
+    final lookup = _FakeLookup(const [_exact], gate: gate);
+    final repository = _RecordingRepository();
+    await tester.pumpWidget(_harness(lookup, repository));
+    await tester.pumpAndSettle();
+
+    // The lookup is a network call, so a second tap easily lands before the
+    // first one has created anything.
+    await tester.tap(find.text('Aplysina archeri'));
+    await tester.pump();
+    await tester.tap(find.text('Aplysina archeri'));
+    await tester.pump();
+
+    gate.complete();
+    await tester.pumpAndSettle();
+
+    expect(lookup.searched, ['Aplysina archeri']);
+    expect(repository.created, ['Aplysina archeri']);
+    expect(repository.added, ['new-1']);
   });
 
   testWidgets('an ambiguous answer opens the sheet prefilled', (tester) async {

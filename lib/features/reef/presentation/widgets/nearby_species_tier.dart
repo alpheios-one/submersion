@@ -51,6 +51,12 @@ class _NearbySpeciesTierState extends ConsumerState<NearbySpeciesTier> {
 
   bool _expanded = false;
 
+  /// GBIF names with a lookup in flight. The lookup is a network call, so a
+  /// second tap on the same chip lands long before the first has created
+  /// anything; without this it would run its own lookup and add a second
+  /// site_species row for the same species.
+  final Set<String> _lookingUp = {};
+
   @override
   Widget build(BuildContext context) {
     final part = ref
@@ -201,6 +207,15 @@ class _NearbySpeciesTierState extends ConsumerState<NearbySpeciesTier> {
   /// through; anything else (none, several, a lookup failure) opens the
   /// sheet with the name prefilled so the diver decides.
   Future<void> _addFromLookup(String scientificName) async {
+    if (!_lookingUp.add(scientificName)) return;
+    try {
+      await _lookUpAndAdd(scientificName);
+    } finally {
+      _lookingUp.remove(scientificName);
+    }
+  }
+
+  Future<void> _lookUpAndAdd(String scientificName) async {
     final lookup = ref.read(speciesLookupServiceProvider);
     final locale = ref.read(speciesLookupLocaleProvider);
     SpeciesLookupResult? result;
@@ -236,6 +251,12 @@ class _NearbySpeciesTierState extends ConsumerState<NearbySpeciesTier> {
           taxonomyClass: result.taxonomyClass,
         );
     if (!mounted) return;
+    // The chip stays up until the snapshot refreshes, so the species may
+    // already be expected here; site_species has no uniqueness constraint.
+    final expected = ref.read(
+      siteExpectedSpeciesNotifierProvider(widget.siteId),
+    );
+    if (expected.any((e) => e.speciesId == species.id)) return;
     await ref
         .read(siteExpectedSpeciesNotifierProvider(widget.siteId).notifier)
         .addSpecies(species.id);

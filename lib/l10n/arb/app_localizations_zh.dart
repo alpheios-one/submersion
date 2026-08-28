@@ -12078,9 +12078,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_lookup_retry => '重试';
 
   @override
-  String get marineLife_lookup_resolving => '正在加载详情...';
-
-  @override
   String marineLife_lookup_observations(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -4063,7 +4063,6 @@
   "marineLife_lookup_errorServer": "أعاد iNaturalist خطأ. حاول مرة أخرى لاحقًا.",
   "marineLife_lookup_errorMalformed": "استجابة غير متوقعة من iNaturalist.",
   "marineLife_lookup_retry": "إعادة المحاولة",
-  "marineLife_lookup_resolving": "جارٍ تحميل التفاصيل...",
   "marineLife_lookup_observations": "{count, plural, =1{مشاهدة واحدة} other{{count} مشاهدات}}",
   "marineLife_lookup_unresolvableRank": "{rank}: اختر نوعًا",
   "marineLife_speciesDetail_suggestForCatalog": "اقتراح للفهرس",

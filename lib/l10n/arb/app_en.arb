@@ -7073,7 +7073,6 @@
   "marineLife_lookup_errorServer": "iNaturalist returned an error. Try again later.",
   "marineLife_lookup_errorMalformed": "Unexpected response from iNaturalist.",
   "marineLife_lookup_retry": "Retry",
-  "marineLife_lookup_resolving": "Loading details...",
   "marineLife_lookup_observations": "{count, plural, =1{1 observation} other{{count} observations}}",
   "@marineLife_lookup_observations": {
     "placeholders": {
