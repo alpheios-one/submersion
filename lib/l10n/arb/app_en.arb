@@ -5440,24 +5440,42 @@
     }
   },
   "diveType_builtin_altitude": "Altitude",
+  "diveType_builtin_altitude_short": "Alt",
   "diveType_builtin_boat": "Boat",
+  "diveType_builtin_boat_short": "Boat",
   "diveType_builtin_cave": "Cave",
+  "diveType_builtin_cave_short": "Cave",
   "diveType_builtin_cavern": "Cavern",
+  "diveType_builtin_cavern_short": "Cavern",
   "diveType_builtin_deep": "Deep",
+  "diveType_builtin_deep_short": "Deep",
   "diveType_builtin_drift": "Drift",
+  "diveType_builtin_drift_short": "Drift",
   "diveType_builtin_freedive": "Freedive",
+  "diveType_builtin_freedive_short": "Free",
   "diveType_builtin_ice": "Ice",
+  "diveType_builtin_ice_short": "Ice",
   "diveType_builtin_liveaboard": "Liveaboard",
+  "diveType_builtin_liveaboard_short": "Live",
   "diveType_builtin_night": "Night",
+  "diveType_builtin_night_short": "Night",
   "diveType_builtin_recreational": "Recreational",
+  "diveType_builtin_recreational_short": "Rec",
   "diveType_builtin_shore": "Shore",
+  "diveType_builtin_shore_short": "Shore",
   "diveType_builtin_technical": "Technical",
+  "diveType_builtin_technical_short": "Tec",
   "diveType_builtin_training": "Training",
+  "diveType_builtin_training_short": "Training",
   "diveType_builtin_wreck": "Wreck",
+  "diveType_builtin_wreck_short": "Wreck",
   "diveTypes_addDialog_addButton": "Add",
   "diveTypes_addDialog_nameHint": "e.g., Search & Recovery",
   "diveTypes_addDialog_nameLabel": "Dive Type Name",
   "diveTypes_addDialog_nameValidation": "Please enter a name",
+  "diveTypes_addDialog_shortNameHelper": "Shown on the dive detail header when space is tight",
+  "diveTypes_addDialog_shortNameHint": "e.g., S&R",
+  "diveTypes_addDialog_shortNameLabel": "Short name (optional)",
   "diveTypes_addDialog_title": "Add Custom Dive Type",
   "diveTypes_addTooltip": "Add dive type",
   "diveTypes_appBar_title": "Dive Types",
@@ -5468,11 +5486,34 @@
   "diveTypes_deleteDialog_content": "Are you sure you want to delete \"{name}\"?",
   "diveTypes_deleteDialog_title": "Delete Dive Type?",
   "diveTypes_deleteTooltip": "Delete dive type",
+  "diveTypes_editDialog_builtInNameHelper": "Built-in names can't be changed",
+  "diveTypes_editDialog_saveButton": "Save",
+  "diveTypes_editDialog_title": "Edit Dive Type",
+  "diveTypes_showInHeaderLabel": "Header",
+  "diveTypes_showInHeaderTooltip": "Show this type's badge in the dive detail header",
+  "diveTypes_showInListLabel": "List",
+  "diveTypes_showInListTooltip": "Show this type's badge in the dive list",
   "diveTypes_snackbar_added": "Added dive type: {name}",
   "diveTypes_snackbar_cannotDelete": "Cannot delete \"{name}\" - it is used by existing dives",
   "diveTypes_snackbar_deleted": "Deleted \"{name}\"",
   "diveTypes_snackbar_errorAdding": "Error adding dive type: {error}",
   "diveTypes_snackbar_errorDeleting": "Error deleting dive type: {error}",
+  "diveTypes_snackbar_errorUpdating": "Error updating dive type: {error}",
+  "diveTypes_snackbar_updated": "Updated \"{name}\"",
+  "@diveTypes_snackbar_errorUpdating": {
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "@diveTypes_snackbar_updated": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
   "@diveTypes_deleteDialog_content": {
     "placeholders": {
       "name": {
@@ -13254,6 +13295,7 @@
   "diveComputer_detail_labelModel": "Model",
   "diveComputer_detail_labelName": "Name",
   "diveComputer_detail_lastDownload": "Last Download",
+  "diveComputer_detail_linkedGear": "Gear item",
   "diveComputer_detail_notesTitle": "Notes",
   "diveComputer_detail_reimportAllButton": "Re-import all dives",
   "diveComputer_detail_reimportDialogBody": "Download every dive from {computerName} and review them against your log. This may take several minutes.",
@@ -18882,6 +18924,7 @@
   "backup_operation_backupFailed": "Backup failed: {error}",
   "backup_operation_restoring": "Restoring backup...",
   "backup_operation_restoreFailed": "Restore failed: {error}",
+  "backup_operation_restoreSourceMissing": "Nothing was restored: the backup file could not be found. Your current data is unchanged.",
   "backup_operation_deleting": "Deleting backup...",
   "backup_operation_deleted": "Backup deleted",
   "backup_operation_deleteFailed": "Delete failed: {error}",
@@ -18919,6 +18962,7 @@
   "settings_cloudSync_result_adoptFailed": "Failed to adopt the restored library: {error}",
   "settings_cloudSync_result_previousLibraryUnreadable": "The previous library could not be read; re-established this backend from this device's library.",
   "settings_cloudSync_result_replacementStillUploading": "The replaced library is still uploading. Try again shortly.",
+  "settings_cloudSync_result_cloudLibraryNewerSchema": "The cloud library was published by a newer version of Submersion. Update this device, then try again.",
   "settings_cloudSync_result_recordsFailed": "{count, plural, =1{1 record failed to apply} other{{count} records failed to apply}}",
   "settings_cloudSync_result_adoptedFreshIdentity": "Another device was syncing with this device's identity. This device adopted a new identity and merged the cloud data.",
   "settings_cloudSync_launchCheck_unavailable": "{provider} is not available on this device",

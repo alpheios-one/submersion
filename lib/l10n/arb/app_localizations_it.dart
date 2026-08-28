@@ -9188,46 +9188,91 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveType_builtin_altitude => 'Altitudine';
 
   @override
+  String get diveType_builtin_altitude_short => 'Altitudine';
+
+  @override
   String get diveType_builtin_boat => 'Da barca';
+
+  @override
+  String get diveType_builtin_boat_short => 'Barca';
 
   @override
   String get diveType_builtin_cave => 'Grotta';
 
   @override
+  String get diveType_builtin_cave_short => 'Grotta';
+
+  @override
   String get diveType_builtin_cavern => 'Caverna';
+
+  @override
+  String get diveType_builtin_cavern_short => 'Caverna';
 
   @override
   String get diveType_builtin_deep => 'Profonda';
 
   @override
+  String get diveType_builtin_deep_short => 'Profonda';
+
+  @override
   String get diveType_builtin_drift => 'Corrente';
+
+  @override
+  String get diveType_builtin_drift_short => 'Corrente';
 
   @override
   String get diveType_builtin_freedive => 'Apnea';
 
   @override
+  String get diveType_builtin_freedive_short => 'Apnea';
+
+  @override
   String get diveType_builtin_ice => 'Sotto ghiaccio';
+
+  @override
+  String get diveType_builtin_ice_short => 'Ghiaccio';
 
   @override
   String get diveType_builtin_liveaboard => 'Crociera subacquea';
 
   @override
+  String get diveType_builtin_liveaboard_short => 'Crociera';
+
+  @override
   String get diveType_builtin_night => 'Notturna';
+
+  @override
+  String get diveType_builtin_night_short => 'Notturna';
 
   @override
   String get diveType_builtin_recreational => 'Ricreativa';
 
   @override
+  String get diveType_builtin_recreational_short => 'Rec';
+
+  @override
   String get diveType_builtin_shore => 'Da riva';
+
+  @override
+  String get diveType_builtin_shore_short => 'Riva';
 
   @override
   String get diveType_builtin_technical => 'Tecnica';
 
   @override
+  String get diveType_builtin_technical_short => 'Tec';
+
+  @override
   String get diveType_builtin_training => 'Addestramento';
 
   @override
+  String get diveType_builtin_training_short => 'Addestramento';
+
+  @override
   String get diveType_builtin_wreck => 'Relitto';
+
+  @override
+  String get diveType_builtin_wreck_short => 'Relitto';
 
   @override
   String get diveTypes_addDialog_addButton => 'Aggiungi';
@@ -9240,6 +9285,16 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_nameValidation => 'Inserisci un nome';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper =>
+      'Mostrato nell\'intestazione del dettaglio immersione quando lo spazio è limitato';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => 'es. RR';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => 'Nome breve (opzionale)';
 
   @override
   String get diveTypes_addDialog_title =>
@@ -9275,6 +9330,30 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveTypes_deleteTooltip => 'Elimina tipo immersione';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper =>
+      'I nomi predefiniti non possono essere modificati';
+
+  @override
+  String get diveTypes_editDialog_saveButton => 'Salva';
+
+  @override
+  String get diveTypes_editDialog_title => 'Modifica tipo di immersione';
+
+  @override
+  String get diveTypes_showInHeaderLabel => 'Intestazione';
+
+  @override
+  String get diveTypes_showInHeaderTooltip =>
+      'Mostra il badge di questo tipo nell\'intestazione dei dettagli dell\'immersione';
+
+  @override
+  String get diveTypes_showInListLabel => 'Elenco';
+
+  @override
+  String get diveTypes_showInListTooltip =>
+      'Mostra il badge di questo tipo nell\'elenco delle immersioni';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return 'Tipo immersione aggiunto: $name';
   }
@@ -9297,6 +9376,16 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return 'Errore durante l\'eliminazione del tipo immersione: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return 'Errore durante l\'aggiornamento del tipo di immersione: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return '\"$name\" aggiornato';
   }
 
   @override
@@ -20890,6 +20979,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveComputer_detail_lastDownload => 'Ultimo download';
+
+  @override
+  String get diveComputer_detail_linkedGear => 'Attrezzatura';
 
   @override
   String get diveComputer_detail_notesTitle => 'Note';
@@ -33422,6 +33514,10 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Nessun dato ripristinato: il file di backup non è stato trovato. I dati correnti sono invariati.';
+
+  @override
   String get backup_operation_deleting => 'Eliminazione del backup...';
 
   @override
@@ -33605,6 +33701,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_cloudSync_result_replacementStillUploading =>
       'La libreria sostituita è ancora in fase di caricamento. Riprova tra poco.';
+
+  @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'La libreria cloud è stata pubblicata da una versione più recente di Submersion. Aggiorna questo dispositivo e riprova.';
 
   @override
   String settings_cloudSync_result_recordsFailed(int count) {

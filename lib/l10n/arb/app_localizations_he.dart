@@ -8959,46 +8959,91 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveType_builtin_altitude => 'גובה רב';
 
   @override
+  String get diveType_builtin_altitude_short => 'גובה';
+
+  @override
   String get diveType_builtin_boat => 'מסירה';
+
+  @override
+  String get diveType_builtin_boat_short => 'מסירה';
 
   @override
   String get diveType_builtin_cave => 'מערה';
 
   @override
+  String get diveType_builtin_cave_short => 'מערה';
+
+  @override
   String get diveType_builtin_cavern => 'מערה פתוחה';
+
+  @override
+  String get diveType_builtin_cavern_short => 'מערה פתוחה';
 
   @override
   String get diveType_builtin_deep => 'עמוקה';
 
   @override
+  String get diveType_builtin_deep_short => 'עמוקה';
+
+  @override
   String get diveType_builtin_drift => 'סחף';
+
+  @override
+  String get diveType_builtin_drift_short => 'סחף';
 
   @override
   String get diveType_builtin_freedive => 'צלילה חופשית';
 
   @override
+  String get diveType_builtin_freedive_short => 'חופשית';
+
+  @override
   String get diveType_builtin_ice => 'קרח';
+
+  @override
+  String get diveType_builtin_ice_short => 'קרח';
 
   @override
   String get diveType_builtin_liveaboard => 'שייט צלילה';
 
   @override
+  String get diveType_builtin_liveaboard_short => 'שייט';
+
+  @override
   String get diveType_builtin_night => 'לילה';
+
+  @override
+  String get diveType_builtin_night_short => 'לילה';
 
   @override
   String get diveType_builtin_recreational => 'ספורטיבי';
 
   @override
+  String get diveType_builtin_recreational_short => 'ספורט';
+
+  @override
   String get diveType_builtin_shore => 'מהחוף';
+
+  @override
+  String get diveType_builtin_shore_short => 'מהחוף';
 
   @override
   String get diveType_builtin_technical => 'טכני';
 
   @override
+  String get diveType_builtin_technical_short => 'טכני';
+
+  @override
   String get diveType_builtin_training => 'הכשרה';
 
   @override
+  String get diveType_builtin_training_short => 'הכשרה';
+
+  @override
   String get diveType_builtin_wreck => 'ספינה טבועה';
+
+  @override
+  String get diveType_builtin_wreck_short => 'טבועה';
 
   @override
   String get diveTypes_addDialog_addButton => 'הוסף';
@@ -9011,6 +9056,16 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_nameValidation => 'נא להזין שם';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper =>
+      'מוצג בכותרת פרטי הצלילה כשאין הרבה מקום';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => 'לדוגמה: ח.ש';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => 'שם קצר (אופציונלי)';
 
   @override
   String get diveTypes_addDialog_title => 'הוסף סוג צלילה מותאם';
@@ -9045,6 +9100,30 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveTypes_deleteTooltip => 'מחק סוג צלילה';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper =>
+      'לא ניתן לשנות שמות מובנים';
+
+  @override
+  String get diveTypes_editDialog_saveButton => 'שמירה';
+
+  @override
+  String get diveTypes_editDialog_title => 'עריכת סוג צלילה';
+
+  @override
+  String get diveTypes_showInHeaderLabel => 'כותרת';
+
+  @override
+  String get diveTypes_showInHeaderTooltip =>
+      'הצג את התג של סוג זה בכותרת פרטי הצלילה';
+
+  @override
+  String get diveTypes_showInListLabel => 'רשימה';
+
+  @override
+  String get diveTypes_showInListTooltip =>
+      'הצג את התג של סוג זה ברשימת הצלילות';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return 'סוג צלילה נוסף: $name';
   }
@@ -9067,6 +9146,16 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return 'שגיאה במחיקת סוג צלילה: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return 'שגיאה בעדכון סוג הצלילה: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return '\"$name\" עודכן';
   }
 
   @override
@@ -20367,6 +20456,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveComputer_detail_lastDownload => 'הורדה אחרונה';
+
+  @override
+  String get diveComputer_detail_linkedGear => 'פריט ציוד';
 
   @override
   String get diveComputer_detail_notesTitle => 'הערות';
@@ -32749,6 +32841,10 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'לא שוחזר דבר: קובץ הגיבוי לא נמצא. הנתונים הנוכחיים שלך לא השתנו.';
+
+  @override
   String get backup_operation_deleting => 'מוחק גיבוי...';
 
   @override
@@ -32929,6 +33025,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_cloudSync_result_replacementStillUploading =>
       'הספרייה שהוחלפה עדיין בהעלאה. נסה שוב בעוד רגע.';
+
+  @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'ספריית הענן פורסמה על ידי גרסה חדשה יותר של Submersion. עדכן מכשיר זה ונסה שוב.';
 
   @override
   String settings_cloudSync_result_recordsFailed(int count) {
