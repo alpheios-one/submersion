@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/map_style.dart';
@@ -9,6 +9,7 @@ import 'package:submersion/features/deco_calculator/presentation/providers/deco_
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_repository_providers.dart';
 import 'package:submersion/features/planning/presentation/pages/planning_page.dart';
+import 'package:submersion/features/planning/presentation/planning_tools.dart';
 import 'package:submersion/features/planning/presentation/widgets/planning_summary_widget.dart';
 import 'package:submersion/features/planning/presentation/widgets/planning_tool_pane.dart';
 import 'package:submersion/features/safety/presentation/providers/flight_window_providers.dart';
@@ -30,6 +31,35 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
 }
 
 void main() {
+  group('PlanningTool routes', () {
+    test('a tool routes under the hub by default', () {
+      const tool = PlanningTool(
+        id: 'deco-calculator',
+        icon: Icons.calculate,
+        color: Color(0xFF000000),
+        title: 'Deco Calculator',
+        subtitle: 'NDL and deco stops',
+      );
+
+      expect(tool.route, '/planning/deco-calculator');
+    });
+
+    // Gas Calculators owns a second level of tools, so its calculators have
+    // to route under it rather than under the hub.
+    test('a nested tool routes under its own prefix', () {
+      const tool = PlanningTool(
+        id: 'mod',
+        icon: Icons.arrow_downward,
+        color: Color(0xFF000000),
+        title: 'MOD',
+        subtitle: 'Deepest safe depth for a mix',
+        routePrefix: '/planning/gas-calculators',
+      );
+
+      expect(tool.route, '/planning/gas-calculators/mod');
+    });
+  });
+
   testWidgets('hub leads with New plan and recent saved plans', (tester) async {
     final summaries = [
       DivePlanSummary(
@@ -165,6 +195,10 @@ void main() {
               GoRoute(
                 path: 'dive-planner',
                 builder: (_, _) => const Text('dive planner page'),
+              ),
+              GoRoute(
+                path: 'gas-calculators',
+                builder: (_, _) => const Text('gas calculators page'),
               ),
             ],
           ),
@@ -337,6 +371,19 @@ void main() {
 
       expect(find.text('dive planner page'), findsOneWidget);
       // The hub is covered, not split.
+      expect(find.text('Deco Calculator'), findsNothing);
+    });
+
+    // Gas Calculators is the second full-page tool. It has six calculators of
+    // its own and renders them as a split view, which cannot be nested inside
+    // what is left of the window beside a 440px master pane.
+    testWidgets('gas calculators takes the whole window', (tester) async {
+      await pumpWide(tester);
+
+      await tester.tap(find.text('Gas Calculators'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('gas calculators page'), findsOneWidget);
       expect(find.text('Deco Calculator'), findsNothing);
     });
   });

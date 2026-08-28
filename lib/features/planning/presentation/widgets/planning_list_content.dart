@@ -192,6 +192,11 @@ class PlanningTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    // A full-page tool pushes even in split view, where every other row loads
+    // the detail pane. This is the general form of the rule the dive planner
+    // has always followed; see [PlanningTool.fullPage].
+    final onSelected = tool.fullPage ? null : onToolSelected;
+
     return Semantics(
       button: true,
       selected: selected,
@@ -226,8 +231,8 @@ class PlanningTile extends StatelessWidget {
           Icons.chevron_right,
           color: colorScheme.onSurfaceVariant,
         ).excludeFromSemantics(),
-        onTap: onToolSelected != null
-            ? () => onToolSelected!(tool.id)
+        onTap: onSelected != null
+            ? () => onSelected(tool.id)
             // PUSH (not go): tools are sub-pages of the planning hub and must
             // stay poppable (#647).
             : () => context.push(tool.route),
