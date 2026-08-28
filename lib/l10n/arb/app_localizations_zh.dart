@@ -11801,6 +11801,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_title => '气体计算器';
 
   @override
+  String get gasCalculators_desc_mod => '混合气体的最大安全深度';
+
+  @override
+  String get gasCalculators_desc_bestMix => '目标深度的最佳富氧混合气';
+
+  @override
+  String get gasCalculators_desc_consumption => '计划潜水的耗气量';
+
+  @override
+  String get gasCalculators_desc_rockBottom => '两名潜水员上升所需的储备气';
+
+  @override
+  String get gasCalculators_desc_mnd => '混合气体的麻醉深度极限';
+
+  @override
+  String get gasCalculators_desc_blender => '目标混合气的充填流程';
+
+  @override
+  String get gasCalculators_summary_prompt => '选择一个计算器开始';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip => '编辑预期物种';
 
   @override

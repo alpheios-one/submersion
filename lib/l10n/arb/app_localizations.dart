@@ -20996,6 +20996,48 @@ abstract class AppLocalizations {
   /// **'Gas Calculators'**
   String get gasCalculators_title;
 
+  /// No description provided for @gasCalculators_desc_mod.
+  ///
+  /// In en, this message translates to:
+  /// **'Deepest safe depth for a mix'**
+  String get gasCalculators_desc_mod;
+
+  /// No description provided for @gasCalculators_desc_bestMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Richest mix for a target depth'**
+  String get gasCalculators_desc_bestMix;
+
+  /// No description provided for @gasCalculators_desc_consumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas a planned dive will use'**
+  String get gasCalculators_desc_consumption;
+
+  /// No description provided for @gasCalculators_desc_rockBottom.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserve to bring two divers up'**
+  String get gasCalculators_desc_rockBottom;
+
+  /// No description provided for @gasCalculators_desc_mnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Narcosis depth limit for a mix'**
+  String get gasCalculators_desc_mnd;
+
+  /// No description provided for @gasCalculators_desc_blender.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill procedure for a target mix'**
+  String get gasCalculators_desc_blender;
+
+  /// No description provided for @gasCalculators_summary_prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a calculator to get started'**
+  String get gasCalculators_summary_prompt;
+
   /// No description provided for @marineLife_siteSection_editExpectedTooltip.
   ///
   /// In en, this message translates to:

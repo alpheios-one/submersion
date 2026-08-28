@@ -12186,6 +12186,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_title => 'Gas Calculators';
 
   @override
+  String get gasCalculators_desc_mod => 'Deepest safe depth for a mix';
+
+  @override
+  String get gasCalculators_desc_bestMix => 'Richest mix for a target depth';
+
+  @override
+  String get gasCalculators_desc_consumption => 'Gas a planned dive will use';
+
+  @override
+  String get gasCalculators_desc_rockBottom => 'Reserve to bring two divers up';
+
+  @override
+  String get gasCalculators_desc_mnd => 'Narcosis depth limit for a mix';
+
+  @override
+  String get gasCalculators_desc_blender => 'Fill procedure for a target mix';
+
+  @override
+  String get gasCalculators_summary_prompt =>
+      'Select a calculator to get started';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip =>
       'Edit expected species';
 

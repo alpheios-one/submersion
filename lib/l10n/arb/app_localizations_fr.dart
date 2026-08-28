@@ -12424,6 +12424,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_title => 'Calculateurs de gaz';
 
   @override
+  String get gasCalculators_desc_mod =>
+      'Profondeur maximale sûre pour un mélange';
+
+  @override
+  String get gasCalculators_desc_bestMix =>
+      'Mélange le plus riche pour une profondeur cible';
+
+  @override
+  String get gasCalculators_desc_consumption =>
+      'Gaz qu\'une plongée planifiée consommera';
+
+  @override
+  String get gasCalculators_desc_rockBottom =>
+      'Réserve pour remonter à deux plongeurs';
+
+  @override
+  String get gasCalculators_desc_mnd =>
+      'Profondeur narcotique limite d\'un mélange';
+
+  @override
+  String get gasCalculators_desc_blender =>
+      'Procédure de remplissage d\'un mélange cible';
+
+  @override
+  String get gasCalculators_summary_prompt =>
+      'Sélectionnez un calculateur pour commencer';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip =>
       'Modifier les especes attendues';
 

@@ -12294,6 +12294,32 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_title => 'Gascalculators';
 
   @override
+  String get gasCalculators_desc_mod =>
+      'Grootste veilige diepte voor een mengsel';
+
+  @override
+  String get gasCalculators_desc_bestMix =>
+      'Rijkste mengsel voor een doeldiepte';
+
+  @override
+  String get gasCalculators_desc_consumption =>
+      'Gas dat een geplande duik verbruikt';
+
+  @override
+  String get gasCalculators_desc_rockBottom =>
+      'Reserve om twee duikers op te brengen';
+
+  @override
+  String get gasCalculators_desc_mnd => 'Narcosediepte-limiet voor een mengsel';
+
+  @override
+  String get gasCalculators_desc_blender => 'Vulprocedure voor een doelmengsel';
+
+  @override
+  String get gasCalculators_summary_prompt =>
+      'Selecteer een calculator om te beginnen';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip =>
       'Verwachte soorten bewerken';
 
