@@ -25,6 +25,19 @@ Diver _makeDiver({
   );
 }
 
+/// Polls [condition] every 10ms for up to a second.
+///
+/// [CurrentDiverIdNotifier] validates asynchronously (in its constructor and
+/// again on every divers-table tick), so tests wait for the state to settle
+/// instead of racing it. A never-met condition simply returns, and the
+/// caller's following expect reports the actual state.
+Future<void> _pollUntil(bool Function() condition) async {
+  for (var i = 0; i < 100; i++) {
+    if (condition()) return;
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+  }
+}
+
 void main() {
   late SharedPreferences prefs;
   late DiverRepository repo;
@@ -292,6 +305,109 @@ void main() {
       expect(container.read(currentDiverIdProvider), isNull);
       expect(prefs.getString(currentDiverIdKey), isNull);
     });
+
+    test('clears a dangling id from state and prefs when no diver resolves '
+        '(issue #1342)', () async {
+      // The pref names a diver that no longer exists, the settings table
+      // names nothing, and there is no diver to fall back to. Retaining the
+      // id would scope every dive query to a diver that cannot exist.
+      await prefs.setString(currentDiverIdKey, 'ghost');
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+
+      // The synchronous seed exposes the raw pref before validation runs.
+      expect(container.read(currentDiverIdProvider), equals('ghost'));
+
+      await _pollUntil(() => container.read(currentDiverIdProvider) == null);
+
+      expect(container.read(currentDiverIdProvider), isNull);
+      expect(prefs.getString(currentDiverIdKey), isNull);
+    });
+
+    test(
+      'replaces a dangling id with the default diver in every store',
+      () async {
+        final fallback = await repo.createDiver(
+          _makeDiver(name: 'Default', isDefault: true),
+        );
+        await prefs.setString(currentDiverIdKey, 'ghost');
+
+        final container = makeContainer();
+        addTearDown(container.dispose);
+
+        await _pollUntil(
+          () => container.read(currentDiverIdProvider) == fallback.id,
+        );
+
+        expect(container.read(currentDiverIdProvider), equals(fallback.id));
+        expect(prefs.getString(currentDiverIdKey), equals(fallback.id));
+        expect(await repo.getActiveDiverIdFromSettings(), equals(fallback.id));
+      },
+    );
+
+    test('revalidates when the active diver is deleted straight from the DB '
+        '(sync-applied deletion)', () async {
+      final survivor = await repo.createDiver(
+        _makeDiver(name: 'Survivor', isDefault: true),
+      );
+      final active = await repo.createDiver(_makeDiver(name: 'Active'));
+      await prefs.setString(currentDiverIdKey, active.id);
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+      // An active listener mirrors any screen that watches the diver.
+      final sub = container.listen(currentDiverIdProvider, (_, _) {});
+      addTearDown(sub.close);
+
+      await _pollUntil(
+        () => container.read(currentDiverIdProvider) == active.id,
+      );
+
+      // No notifier call: the row disappears the way a sync tombstone
+      // removes it, so only the divers-table tick can repair the id.
+      await repo.deleteDiverWithReassignment(active.id);
+
+      await _pollUntil(
+        () => container.read(currentDiverIdProvider) == survivor.id,
+      );
+
+      expect(container.read(currentDiverIdProvider), equals(survivor.id));
+      expect(prefs.getString(currentDiverIdKey), equals(survivor.id));
+    });
+
+    test(
+      'follows a merge to the keeper when the active diver was the duplicate',
+      () async {
+        // The keeper is neither default nor oldest, so only the merge's own
+        // settings repoint can select it; the default fallback alone would
+        // land on "Other" instead.
+        await repo.createDiver(_makeDiver(name: 'Other', isDefault: true));
+        final keeper = await repo.createDiver(_makeDiver(name: 'Alex'));
+        final duplicate = await repo.createDiver(_makeDiver(name: 'Alex'));
+        await prefs.setString(currentDiverIdKey, duplicate.id);
+        await repo.setActiveDiverIdInSettings(duplicate.id);
+
+        final container = makeContainer();
+        addTearDown(container.dispose);
+        final sub = container.listen(currentDiverIdProvider, (_, _) {});
+        addTearDown(sub.close);
+        await _pollUntil(
+          () => container.read(currentDiverIdProvider) == duplicate.id,
+        );
+
+        await container
+            .read(diverMergeRepositoryProvider)
+            .mergeDivers(keeperId: keeper.id, duplicateId: duplicate.id);
+
+        await _pollUntil(
+          () => container.read(currentDiverIdProvider) == keeper.id,
+        );
+
+        expect(container.read(currentDiverIdProvider), equals(keeper.id));
+        expect(prefs.getString(currentDiverIdKey), equals(keeper.id));
+      },
+    );
   });
 
   group('DiverListNotifier', () {
@@ -387,14 +503,16 @@ void main() {
       expect(byId[b.id]!.isDefault, isTrue);
     });
 
-    test('deleteDiver returns a DeleteDiverResult and clears current selection '
-        'when the deleted diver was current', () async {
+    test('deleteDiver returns a DeleteDiverResult and moves the selection to '
+        'the surviving diver when the deleted diver was current', () async {
       final a = await repo.createDiver(_makeDiver(name: 'A'));
-      await repo.createDiver(_makeDiver(name: 'B'));
+      final b = await repo.createDiver(_makeDiver(name: 'B'));
       await prefs.setString(currentDiverIdKey, a.id);
 
       final container = makeContainer();
       addTearDown(container.dispose);
+      final sub = container.listen(currentDiverIdProvider, (_, _) {});
+      addTearDown(sub.close);
 
       // Wait for init.
       while (container.read(diverListNotifierProvider).isLoading) {
@@ -406,8 +524,10 @@ void main() {
           .deleteDiver(a.id);
       expect(result.hasReassignments, isFalse);
 
-      // Current diver id cleared once its diver was deleted.
-      expect(container.read(currentDiverIdProvider), isNull);
+      // The selection is not left dangling or null: deleteDiver re-resolves
+      // before returning, so the survivor is current already (#1342).
+      expect(container.read(currentDiverIdProvider), equals(b.id));
+      expect(prefs.getString(currentDiverIdKey), equals(b.id));
     });
 
     test('updateDiver persists changes via notifier', () async {
@@ -448,6 +568,48 @@ void main() {
       // The notifier should resolve to the id from the Settings table.
       expect(container.read(currentDiverIdProvider), equals(d.id));
     });
+  });
+
+  group('realignActiveDiverAfterDataReplace', () {
+    test(
+      'removes a dangling pref when nothing resolves (issue #1342)',
+      () async {
+        // A restore swapped the database file but SharedPreferences still
+        // names a diver from the previous library, and the restored library
+        // has no diver to fall back to. Leaving the pref in place would seed
+        // the next launch with an id that scopes every dive query to nothing.
+        await prefs.setString(currentDiverIdKey, 'ghost');
+
+        await realignActiveDiverAfterDataReplace(prefs);
+
+        expect(prefs.getString(currentDiverIdKey), isNull);
+      },
+    );
+
+    test('replaces a dangling pref with the default diver', () async {
+      final fallback = await repo.createDiver(
+        _makeDiver(name: 'Default', isDefault: true),
+      );
+      await prefs.setString(currentDiverIdKey, 'ghost');
+
+      await realignActiveDiverAfterDataReplace(prefs);
+
+      expect(prefs.getString(currentDiverIdKey), equals(fallback.id));
+    });
+
+    test(
+      'prefers the restored settings active diver over the default',
+      () async {
+        await repo.createDiver(_makeDiver(name: 'Default', isDefault: true));
+        final restored = await repo.createDiver(_makeDiver(name: 'Restored'));
+        await repo.setActiveDiverIdInSettings(restored.id);
+        await prefs.setString(currentDiverIdKey, 'ghost');
+
+        await realignActiveDiverAfterDataReplace(prefs);
+
+        expect(prefs.getString(currentDiverIdKey), equals(restored.id));
+      },
+    );
   });
 
   group('diverMergeRepositoryProvider & duplicateDiverGroupsProvider', () {
