@@ -150,7 +150,12 @@ class TrendLineChart extends StatelessWidget {
                 sideTitles: SideTitles(showTitles: false),
               ),
             ),
-            borderData: FlBorderData(show: false),
+            borderData: FlBorderData(
+              show: true,
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
+            ),
             gridData: FlGridData(
               show: true,
               drawVerticalLine: false,
@@ -527,7 +532,12 @@ class CategoryBarChart extends StatelessWidget {
             sideTitles: SideTitles(showTitles: false),
           ),
         ),
-        borderData: FlBorderData(show: false),
+        borderData: FlBorderData(
+          show: true,
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
+        ),
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
@@ -696,7 +706,12 @@ class MultiTrendLineChart extends StatelessWidget {
                     sideTitles: SideTitles(showTitles: false),
                   ),
                 ),
-                borderData: FlBorderData(show: false),
+                borderData: FlBorderData(
+                  show: true,
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                ),
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,

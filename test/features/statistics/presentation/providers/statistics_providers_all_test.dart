@@ -70,6 +70,7 @@ void main() {
       isEmpty,
     );
     expect(await container.read(temperatureByMonthProvider.future), isEmpty);
+    expect(await container.read(waterTempTrendProvider.future), isEmpty);
     expect(await container.read(topBuddiesProvider.future), isEmpty);
     final soloVsBuddy = await container.read(soloVsBuddyCountProvider.future);
     expect(soloVsBuddy.solo, 0);

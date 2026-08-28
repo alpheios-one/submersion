@@ -26,15 +26,20 @@ class ImportCandidate {
   final ImportPreview? preview;
 }
 
-/// What confirming did, for the result snackbar.
+/// What confirming did, for the result snackbar and for callers that need
+/// the rows themselves (a species import tags what was created).
 class ImportReviewResult {
   const ImportReviewResult({
     required this.linked,
     required this.skipped,
     this.failures = const {},
+    this.importedIds = const [],
   });
 
   final int linked;
   final int skipped;
   final Map<String, String> failures;
+
+  /// Ids of the media rows the import created, in import order.
+  final List<String> importedIds;
 }
