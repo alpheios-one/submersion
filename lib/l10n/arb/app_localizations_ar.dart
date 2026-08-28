@@ -12216,6 +12216,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_title => 'حاسبات الغاز';
 
   @override
+  String get gasCalculators_desc_mod => 'أقصى عمق آمن للخليط';
+
+  @override
+  String get gasCalculators_desc_bestMix => 'أغنى خليط لعمق مستهدف';
+
+  @override
+  String get gasCalculators_desc_consumption =>
+      'الغاز الذي ستستهلكه غطسة مخططة';
+
+  @override
+  String get gasCalculators_desc_rockBottom => 'احتياطي لصعود غطاسين';
+
+  @override
+  String get gasCalculators_desc_mnd => 'حد عمق التخدير للخليط';
+
+  @override
+  String get gasCalculators_desc_blender => 'إجراء التعبئة لخليط مستهدف';
+
+  @override
+  String get gasCalculators_summary_prompt => 'اختر حاسبة للبدء';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip =>
       'تعديل الأنواع المتوقعة';
 

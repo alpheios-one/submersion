@@ -12136,6 +12136,27 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_title => 'מחשבוני גז';
 
   @override
+  String get gasCalculators_desc_mod => 'העומק הבטוח המרבי לתערובת';
+
+  @override
+  String get gasCalculators_desc_bestMix => 'התערובת העשירה ביותר לעומק היעד';
+
+  @override
+  String get gasCalculators_desc_consumption => 'כמות הגז שצלילה מתוכננת תצרוך';
+
+  @override
+  String get gasCalculators_desc_rockBottom => 'רזרבה להעלאת שני צוללנים';
+
+  @override
+  String get gasCalculators_desc_mnd => 'גבול עומק הנרקוזה לתערובת';
+
+  @override
+  String get gasCalculators_desc_blender => 'נוהל מילוי לתערובת היעד';
+
+  @override
+  String get gasCalculators_summary_prompt => 'בחר מחשבון כדי להתחיל';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip => 'ערוך מינים צפויים';
 
   @override

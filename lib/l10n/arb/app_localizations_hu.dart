@@ -12396,6 +12396,33 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_title => 'Gáz kalkulátorok';
 
   @override
+  String get gasCalculators_desc_mod =>
+      'Legnagyobb biztonságos mélység egy keverékhez';
+
+  @override
+  String get gasCalculators_desc_bestMix =>
+      'Leggazdagabb keverék a célmélységhez';
+
+  @override
+  String get gasCalculators_desc_consumption =>
+      'Egy tervezett merülés gázfogyasztása';
+
+  @override
+  String get gasCalculators_desc_rockBottom =>
+      'Tartalék két búvár felhozatalához';
+
+  @override
+  String get gasCalculators_desc_mnd =>
+      'Narkózis szerinti mélységhatár egy keverékhez';
+
+  @override
+  String get gasCalculators_desc_blender => 'Töltési eljárás a célkeverékhez';
+
+  @override
+  String get gasCalculators_summary_prompt =>
+      'Válasszon egy számológépet a kezdéshez';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip =>
       'Vart fajok szerkesztese';
 

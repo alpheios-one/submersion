@@ -12425,6 +12425,31 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_title => 'Gasrechner';
 
   @override
+  String get gasCalculators_desc_mod => 'Größte sichere Tiefe für ein Gemisch';
+
+  @override
+  String get gasCalculators_desc_bestMix =>
+      'Sauerstoffreichstes Gemisch für eine Zieltiefe';
+
+  @override
+  String get gasCalculators_desc_consumption =>
+      'Gasverbrauch eines geplanten Tauchgangs';
+
+  @override
+  String get gasCalculators_desc_rockBottom =>
+      'Reserve für den Aufstieg zu zweit';
+
+  @override
+  String get gasCalculators_desc_mnd => 'Narkosetiefe-Grenze für ein Gemisch';
+
+  @override
+  String get gasCalculators_desc_blender => 'Füllvorgang für ein Zielgemisch';
+
+  @override
+  String get gasCalculators_summary_prompt =>
+      'Wählen Sie einen Rechner aus, um zu beginnen';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip =>
       'Erwartete Arten bearbeiten';
 
