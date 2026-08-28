@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/statistics/domain/trend_aggregation.dart';
 import 'package:submersion/features/statistics/presentation/pages/statistics_gas_page.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_gas_lane_provider.dart';
+import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
+import 'package:submersion/features/statistics/presentation/widgets/dive_trend_chart.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -60,5 +63,38 @@ void main() {
       const AppSettings(gasConsumptionDisplay: GasConsumptionDisplay.rmv),
     );
     expect(chip, findsNothing);
+  });
+
+  testWidgets('the consumption trend renders as a per-dive chart', (
+    tester,
+  ) async {
+    final overrides = await getBaseOverrides();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...overrides,
+          sacTrendProvider.overrideWith(
+            (ref) async => List.generate(
+              20,
+              (i) => TrendDataPoint(
+                date: DateTime.utc(2024, 1, 1).add(Duration(days: i * 7)),
+                value: 15.0 + i,
+              ),
+            ),
+          ),
+        ].cast(),
+        child: const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: StatisticsGasPage(embedded: true)),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.byType(DiveTrendChart), findsOneWidget);
+    expect(find.byKey(const ValueKey('trend-aggregation-sac')), findsOneWidget);
   });
 }

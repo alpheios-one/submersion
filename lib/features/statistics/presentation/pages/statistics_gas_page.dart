@@ -9,9 +9,11 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_gas_lane_provider.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
+import 'package:submersion/features/statistics/presentation/providers/trend_chart_settings_provider.dart';
 import 'package:submersion/features/statistics/presentation/widgets/ranking_list.dart';
 import 'package:submersion/features/statistics/presentation/widgets/stat_charts.dart';
 import 'package:submersion/features/statistics/presentation/widgets/stat_section_card.dart';
+import 'package:submersion/features/statistics/presentation/widgets/trend_chart_section.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 class StatisticsGasPage extends ConsumerWidget {
@@ -86,7 +88,6 @@ class StatisticsGasPage extends ConsumerWidget {
     WidgetRef ref,
     UnitFormatter units,
   ) {
-    final sacTrendAsync = ref.watch(sacTrendProvider);
     final lane = ref.watch(statisticsGasLaneProvider);
     final isRmv = lane == GasConsumptionLane.rmv;
     final unitSymbol = isRmv ? units.rmvSymbol : units.sacSymbol;
@@ -98,28 +99,17 @@ class StatisticsGasPage extends ConsumerWidget {
     // tick read 0.5 where its tooltip said 0.53).
     final decimals = isRmv ? units.rmvDecimals : units.sacDecimals;
 
-    return StatSectionCard(
+    return TrendChartSection(
+      chartId: TrendChartIds.sac,
       title: context.l10n.statistics_gas_sacTrend_title,
       subtitle: context.l10n.statistics_gas_sacTrend_subtitle,
-      child: sacTrendAsync.when(
-        data: (data) {
-          return TrendLineChart(
-            data: data,
-            lineColor: Colors.blue,
-            yAxisLabel: unitSymbol,
-            valueFormatter: format,
-            yAxisFormatter: (value) => convert(value).toStringAsFixed(decimals),
-          );
-        },
-        loading: () => const SizedBox(
-          height: 200,
-          child: Center(child: CircularProgressIndicator()),
-        ),
-        error: (_, _) => StatEmptyState(
-          icon: Icons.error_outline,
-          message: context.l10n.statistics_gas_sacTrend_error,
-        ),
-      ),
+      pointsAsync: ref.watch(sacTrendProvider),
+      errorMessage: context.l10n.statistics_gas_sacTrend_error,
+      lineColor: Colors.blue,
+      yAxisLabel: unitSymbol,
+      valueFormatter: format,
+      yAxisFormatter: (value) => convert(value).toStringAsFixed(decimals),
+      rateFormatter: format,
     );
   }
 
