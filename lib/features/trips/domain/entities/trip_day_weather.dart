@@ -76,12 +76,25 @@ class TripDayWeather extends Equatable {
   final String id;
   final String tripId;
 
-  /// The calendar day this describes, as UTC midnight.
+  /// The calendar day this describes.
   ///
-  /// UTC rather than local because the day is part of the row identity: a
-  /// local-midnight instant differs in every timezone, so two devices would
-  /// key the same trip day differently and never converge. See
+  /// Read as calendar fields, not as an instant: identity is
+  /// `tripDayMillis(date)`, which takes y/m/d and pins them to UTC midnight.
+  /// UTC because the day is part of the row identity, and a local-midnight
+  /// instant has a different epoch value in every timezone, so two devices
+  /// would key the same trip day differently and never converge. See
   /// [tripDayMillis].
+  ///
+  /// So `isUtc` is not enforced here, and varies by provenance: the
+  /// repository hands back a normalized UTC-midnight instant, while a row
+  /// built from a freshly fetched day carries the backfill target's local
+  /// `DateTime(y, m, d)`. Both name the same day and derive the same key, and
+  /// no path that stores, keys, or looks a row up reads anything else.
+  ///
+  /// Except `==`. DateTime compares its epoch value and `isUtc`, and this
+  /// field is in [props], so two entities for the same day compare unequal
+  /// across provenance. Compare day keys, or normalize both sides, rather
+  /// than the entities.
   final DateTime date;
 
   /// The coordinates the lookup used.
