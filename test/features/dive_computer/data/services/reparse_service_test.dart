@@ -308,6 +308,53 @@ void main() {
       expect(dive.gradientFactorHigh, 70);
     });
 
+    test('stores libdc RBT minutes as seconds on the profile', () async {
+      await insertDive(
+        'dive-1',
+        maxDepth: 20.0,
+        avgDepth: 10.0,
+        runtime: 2400,
+        waterTemp: 22.0,
+        diveMode: 'oc',
+        decoAlgorithm: 'rgbm',
+        gradientFactorLow: 40,
+        gradientFactorHigh: 85,
+      );
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+        maxDepth: 20.0,
+        avgDepth: 10.0,
+        duration: 2400,
+        waterTemp: 22.0,
+      );
+
+      // libdc's DC_SAMPLE_RBT is minutes; the profile column is seconds.
+      final parsed = makeParsedDive(
+        samples: [
+          pigeon.ProfileSample(timeSeconds: 60, depthMeters: 10.0, rbt: 25),
+        ],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: parsed,
+        descriptorVendor: 'Shearwater',
+        descriptorProduct: 'Perdix',
+        descriptorModel: 42,
+        libdivecomputerVersion: '0.8.0',
+      );
+
+      final profiles = await (db.select(
+        db.diveProfiles,
+      )..where((t) => t.diveId.equals('dive-1'))).get();
+      expect(profiles.single.rbt, 25 * 60);
+    });
+
     test(
       'writes new entry/exit GPS to dives + source when source is primary',
       () async {

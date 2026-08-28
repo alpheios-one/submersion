@@ -162,15 +162,20 @@ Each dive site shows:
 
 ### Species Photos
 
-Add reference photos:
+Tag the photos on your dives with the species in them, and see every photo of
+a species in one place.
 
-- Database photos for ID
-- Your photos for personal sightings
-- Before/after comparisons
+- On a species page, the **Photos** section shows every photo tagged with it.
+  **Tag photos** offers the untagged photos from the dives where you logged
+  the species; **Add photos** imports pictures from your camera roll, matches
+  each one to a dive as the media importer does, and tags it.
+- In the photo viewer, the **Species** action lists the dive's sightings as
+  chips you can toggle, plus a search for any other species. Tagging a species
+  that is not yet logged on that dive adds the sighting for you.
+- Tagged species appear as chips under the photo; tap one to open the species.
 
-<div class="tip">
-<strong>Coming Soon:</strong> Photo management with per-sighting images will be available in v2.0.
-</div>
+A species with tagged photos cannot be deleted from the catalog until the
+tags are removed, the same rule as for sightings.
 
 ## Identification Tips
 

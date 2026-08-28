@@ -9989,6 +9989,12 @@ abstract class AppLocalizations {
   /// **'TTS'**
   String get diveLog_legend_label_tts;
 
+  /// No description provided for @diveLog_legend_label_gtr.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR'**
+  String get diveLog_legend_label_gtr;
+
   /// No description provided for @diveLog_legend_source_dc.
   ///
   /// In en, this message translates to:
@@ -12749,6 +12755,12 @@ abstract class AppLocalizations {
   /// **'TTS'**
   String get diveLog_tooltip_tts;
 
+  /// No description provided for @diveLog_tooltip_gtr.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR'**
+  String get diveLog_tooltip_gtr;
+
   /// No description provided for @diveLog_sources_row_metric.
   ///
   /// In en, this message translates to:
@@ -15350,11 +15362,23 @@ abstract class AppLocalizations {
   /// **'Altitude'**
   String get diveType_builtin_altitude;
 
+  /// No description provided for @diveType_builtin_altitude_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Alt'**
+  String get diveType_builtin_altitude_short;
+
   /// No description provided for @diveType_builtin_boat.
   ///
   /// In en, this message translates to:
   /// **'Boat'**
   String get diveType_builtin_boat;
+
+  /// No description provided for @diveType_builtin_boat_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Boat'**
+  String get diveType_builtin_boat_short;
 
   /// No description provided for @diveType_builtin_cave.
   ///
@@ -15362,11 +15386,23 @@ abstract class AppLocalizations {
   /// **'Cave'**
   String get diveType_builtin_cave;
 
+  /// No description provided for @diveType_builtin_cave_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Cave'**
+  String get diveType_builtin_cave_short;
+
   /// No description provided for @diveType_builtin_cavern.
   ///
   /// In en, this message translates to:
   /// **'Cavern'**
   String get diveType_builtin_cavern;
+
+  /// No description provided for @diveType_builtin_cavern_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Cavern'**
+  String get diveType_builtin_cavern_short;
 
   /// No description provided for @diveType_builtin_deep.
   ///
@@ -15374,11 +15410,23 @@ abstract class AppLocalizations {
   /// **'Deep'**
   String get diveType_builtin_deep;
 
+  /// No description provided for @diveType_builtin_deep_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep'**
+  String get diveType_builtin_deep_short;
+
   /// No description provided for @diveType_builtin_drift.
   ///
   /// In en, this message translates to:
   /// **'Drift'**
   String get diveType_builtin_drift;
+
+  /// No description provided for @diveType_builtin_drift_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Drift'**
+  String get diveType_builtin_drift_short;
 
   /// No description provided for @diveType_builtin_freedive.
   ///
@@ -15386,11 +15434,23 @@ abstract class AppLocalizations {
   /// **'Freedive'**
   String get diveType_builtin_freedive;
 
+  /// No description provided for @diveType_builtin_freedive_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get diveType_builtin_freedive_short;
+
   /// No description provided for @diveType_builtin_ice.
   ///
   /// In en, this message translates to:
   /// **'Ice'**
   String get diveType_builtin_ice;
+
+  /// No description provided for @diveType_builtin_ice_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Ice'**
+  String get diveType_builtin_ice_short;
 
   /// No description provided for @diveType_builtin_liveaboard.
   ///
@@ -15398,11 +15458,23 @@ abstract class AppLocalizations {
   /// **'Liveaboard'**
   String get diveType_builtin_liveaboard;
 
+  /// No description provided for @diveType_builtin_liveaboard_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get diveType_builtin_liveaboard_short;
+
   /// No description provided for @diveType_builtin_night.
   ///
   /// In en, this message translates to:
   /// **'Night'**
   String get diveType_builtin_night;
+
+  /// No description provided for @diveType_builtin_night_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get diveType_builtin_night_short;
 
   /// No description provided for @diveType_builtin_recreational.
   ///
@@ -15410,11 +15482,23 @@ abstract class AppLocalizations {
   /// **'Recreational'**
   String get diveType_builtin_recreational;
 
+  /// No description provided for @diveType_builtin_recreational_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Rec'**
+  String get diveType_builtin_recreational_short;
+
   /// No description provided for @diveType_builtin_shore.
   ///
   /// In en, this message translates to:
   /// **'Shore'**
   String get diveType_builtin_shore;
+
+  /// No description provided for @diveType_builtin_shore_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Shore'**
+  String get diveType_builtin_shore_short;
 
   /// No description provided for @diveType_builtin_technical.
   ///
@@ -15422,17 +15506,35 @@ abstract class AppLocalizations {
   /// **'Technical'**
   String get diveType_builtin_technical;
 
+  /// No description provided for @diveType_builtin_technical_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Tec'**
+  String get diveType_builtin_technical_short;
+
   /// No description provided for @diveType_builtin_training.
   ///
   /// In en, this message translates to:
   /// **'Training'**
   String get diveType_builtin_training;
 
+  /// No description provided for @diveType_builtin_training_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Training'**
+  String get diveType_builtin_training_short;
+
   /// No description provided for @diveType_builtin_wreck.
   ///
   /// In en, this message translates to:
   /// **'Wreck'**
   String get diveType_builtin_wreck;
+
+  /// No description provided for @diveType_builtin_wreck_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Wreck'**
+  String get diveType_builtin_wreck_short;
 
   /// No description provided for @diveTypes_addDialog_addButton.
   ///
@@ -15457,6 +15559,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter a name'**
   String get diveTypes_addDialog_nameValidation;
+
+  /// No description provided for @diveTypes_addDialog_shortNameHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown on the dive detail header when space is tight'**
+  String get diveTypes_addDialog_shortNameHelper;
+
+  /// No description provided for @diveTypes_addDialog_shortNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., S&R'**
+  String get diveTypes_addDialog_shortNameHint;
+
+  /// No description provided for @diveTypes_addDialog_shortNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Short name (optional)'**
+  String get diveTypes_addDialog_shortNameLabel;
 
   /// No description provided for @diveTypes_addDialog_title.
   ///
@@ -15518,6 +15638,48 @@ abstract class AppLocalizations {
   /// **'Delete dive type'**
   String get diveTypes_deleteTooltip;
 
+  /// No description provided for @diveTypes_editDialog_builtInNameHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in names can\'t be changed'**
+  String get diveTypes_editDialog_builtInNameHelper;
+
+  /// No description provided for @diveTypes_editDialog_saveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get diveTypes_editDialog_saveButton;
+
+  /// No description provided for @diveTypes_editDialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Dive Type'**
+  String get diveTypes_editDialog_title;
+
+  /// No description provided for @diveTypes_showInHeaderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Header'**
+  String get diveTypes_showInHeaderLabel;
+
+  /// No description provided for @diveTypes_showInHeaderTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Show this type\'s badge in the dive detail header'**
+  String get diveTypes_showInHeaderTooltip;
+
+  /// No description provided for @diveTypes_showInListLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get diveTypes_showInListLabel;
+
+  /// No description provided for @diveTypes_showInListTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Show this type\'s badge in the dive list'**
+  String get diveTypes_showInListTooltip;
+
   /// No description provided for @diveTypes_snackbar_added.
   ///
   /// In en, this message translates to:
@@ -15547,6 +15709,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error deleting dive type: {error}'**
   String diveTypes_snackbar_errorDeleting(Object error);
+
+  /// No description provided for @diveTypes_snackbar_errorUpdating.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating dive type: {error}'**
+  String diveTypes_snackbar_errorUpdating(Object error);
+
+  /// No description provided for @diveTypes_snackbar_updated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated \"{name}\"'**
+  String diveTypes_snackbar_updated(Object name);
 
   /// No description provided for @divers_detail_activeDiver.
   ///
@@ -17251,6 +17425,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'TTS'**
   String get enum_profileMetric_tts_short;
+
+  /// No description provided for @enum_profileMetric_gtr.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR'**
+  String get enum_profileMetric_gtr;
+
+  /// No description provided for @enum_profileMetric_gtr_short.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR'**
+  String get enum_profileMetric_gtr_short;
 
   /// No description provided for @enum_scrType_cmf.
   ///
@@ -21317,6 +21503,96 @@ abstract class AppLocalizations {
   /// **'Copy link'**
   String get marineLife_suggest_copyLink;
 
+  /// No description provided for @marineLife_speciesPhotos_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos ({count})'**
+  String marineLife_speciesPhotos_title(Object count);
+
+  /// No description provided for @marineLife_speciesPhotos_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos tagged with this species appear here.'**
+  String get marineLife_speciesPhotos_empty;
+
+  /// No description provided for @marineLife_speciesPhotos_tagPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag photos'**
+  String get marineLife_speciesPhotos_tagPhotos;
+
+  /// No description provided for @marineLife_speciesPhotos_addPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photos'**
+  String get marineLife_speciesPhotos_addPhotos;
+
+  /// No description provided for @marineLife_speciesPhotos_thumbnailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Species photo'**
+  String get marineLife_speciesPhotos_thumbnailLabel;
+
+  /// No description provided for @marineLife_speciesPhotos_importAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 photo added} other{{count} photos added}}'**
+  String marineLife_speciesPhotos_importAdded(int count);
+
+  /// No description provided for @marineLife_speciesPhotos_importSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 skipped} other{{count} skipped}}'**
+  String marineLife_speciesPhotos_importSkipped(int count);
+
+  /// No description provided for @marineLife_speciesPhotos_importFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 failed} other{{count} failed}}'**
+  String marineLife_speciesPhotos_importFailed(int count);
+
+  /// No description provided for @marineLife_tagPicker_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag photos'**
+  String get marineLife_tagPicker_title;
+
+  /// No description provided for @marineLife_tagPicker_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No untagged photos on dives where you logged this species.'**
+  String get marineLife_tagPicker_empty;
+
+  /// No description provided for @marineLife_tagPicker_emptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Add photos to import pictures from your camera roll.'**
+  String get marineLife_tagPicker_emptyHint;
+
+  /// No description provided for @marineLife_tagPicker_selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get marineLife_tagPicker_selectAll;
+
+  /// No description provided for @marineLife_tagPicker_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Tag 1 photo} other{Tag {count} photos}}'**
+  String marineLife_tagPicker_confirm(int count);
+
+  /// No description provided for @marineLife_tagPicker_tagged.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Tagged 1 photo} other{Tagged {count} photos}}'**
+  String marineLife_tagPicker_tagged(int count);
+
+  /// No description provided for @marineLife_tagPicker_diveLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive {number}'**
+  String marineLife_tagPicker_diveLabel(Object number);
+
   /// No description provided for @marineLife_speciesPage_title.
   ///
   /// In en, this message translates to:
@@ -25327,6 +25603,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'TTS (Time to Surface)'**
   String get settings_appearance_metric_tts;
+
+  /// No description provided for @settings_appearance_metric_gtr.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR (Gas Time Remaining)'**
+  String get settings_appearance_metric_gtr;
 
   /// No description provided for @settings_appearance_metric_cns.
   ///
@@ -34617,6 +34899,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last Download'**
   String get diveComputer_detail_lastDownload;
+
+  /// No description provided for @diveComputer_detail_linkedGear.
+  ///
+  /// In en, this message translates to:
+  /// **'Gear item'**
+  String get diveComputer_detail_linkedGear;
 
   /// No description provided for @diveComputer_detail_notesTitle.
   ///
@@ -52409,6 +52697,24 @@ abstract class AppLocalizations {
   /// **'TTS Source'**
   String get settings_decompression_ttsSource;
 
+  /// No description provided for @settings_decompression_gtrSource.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR Source'**
+  String get settings_decompression_gtrSource;
+
+  /// No description provided for @settings_decompression_gtrReserve.
+  ///
+  /// In en, this message translates to:
+  /// **'GTR reserve pressure'**
+  String get settings_decompression_gtrReserve;
+
+  /// No description provided for @settings_decompression_gtrReserve_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank pressure the gas time remaining counts down to. The calculated GTR assumes a direct ascent at 10 m/min with no stops.'**
+  String get settings_decompression_gtrReserve_subtitle;
+
   /// Snackbar after the offset is applied. hours is the signed offset as text; hoursAbs drives the hour/hours plural.
   ///
   /// In en, this message translates to:
@@ -55088,6 +55394,12 @@ abstract class AppLocalizations {
   /// **'Restore failed: {error}'**
   String backup_operation_restoreFailed(String error);
 
+  /// No description provided for @backup_operation_restoreSourceMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was restored: the backup file could not be found. Your current data is unchanged.'**
+  String get backup_operation_restoreSourceMissing;
+
   /// No description provided for @backup_operation_deleting.
   ///
   /// In en, this message translates to:
@@ -55328,6 +55640,12 @@ abstract class AppLocalizations {
   /// **'The replaced library is still uploading. Try again shortly.'**
   String get settings_cloudSync_result_replacementStillUploading;
 
+  /// No description provided for @settings_cloudSync_result_cloudLibraryNewerSchema.
+  ///
+  /// In en, this message translates to:
+  /// **'The cloud library was published by a newer version of Submersion. Update this device, then try again.'**
+  String get settings_cloudSync_result_cloudLibraryNewerSchema;
+
   /// No description provided for @settings_cloudSync_result_recordsFailed.
   ///
   /// In en, this message translates to:
@@ -55411,6 +55729,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Media info'**
   String get media_info_title;
+
+  /// No description provided for @media_species_actionTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Species'**
+  String get media_species_actionTooltip;
+
+  /// No description provided for @media_species_sheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Species in this photo'**
+  String get media_species_sheetTitle;
+
+  /// No description provided for @media_species_sightedOnDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Sighted on this dive'**
+  String get media_species_sightedOnDive;
+
+  /// No description provided for @media_species_otherSpecies.
+  ///
+  /// In en, this message translates to:
+  /// **'Other species...'**
+  String get media_species_otherSpecies;
+
+  /// No description provided for @media_species_noDiveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo is not linked to a dive. Search for a species to tag it.'**
+  String get media_species_noDiveHint;
+
+  /// No description provided for @media_species_chipsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Species tags'**
+  String get media_species_chipsLabel;
 
   /// No description provided for @media_info_fileSection.
   ///

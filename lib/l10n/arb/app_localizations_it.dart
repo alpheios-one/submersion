@@ -5989,6 +5989,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -7592,6 +7595,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_tooltip_tts => 'TTS';
 
   @override
+  String get diveLog_tooltip_gtr => 'GTR';
+
+  @override
   String get diveLog_sources_row_metric => 'Misura';
 
   @override
@@ -9188,46 +9194,91 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveType_builtin_altitude => 'Altitudine';
 
   @override
+  String get diveType_builtin_altitude_short => 'Altitudine';
+
+  @override
   String get diveType_builtin_boat => 'Da barca';
+
+  @override
+  String get diveType_builtin_boat_short => 'Barca';
 
   @override
   String get diveType_builtin_cave => 'Grotta';
 
   @override
+  String get diveType_builtin_cave_short => 'Grotta';
+
+  @override
   String get diveType_builtin_cavern => 'Caverna';
+
+  @override
+  String get diveType_builtin_cavern_short => 'Caverna';
 
   @override
   String get diveType_builtin_deep => 'Profonda';
 
   @override
+  String get diveType_builtin_deep_short => 'Profonda';
+
+  @override
   String get diveType_builtin_drift => 'Corrente';
+
+  @override
+  String get diveType_builtin_drift_short => 'Corrente';
 
   @override
   String get diveType_builtin_freedive => 'Apnea';
 
   @override
+  String get diveType_builtin_freedive_short => 'Apnea';
+
+  @override
   String get diveType_builtin_ice => 'Sotto ghiaccio';
+
+  @override
+  String get diveType_builtin_ice_short => 'Ghiaccio';
 
   @override
   String get diveType_builtin_liveaboard => 'Crociera subacquea';
 
   @override
+  String get diveType_builtin_liveaboard_short => 'Crociera';
+
+  @override
   String get diveType_builtin_night => 'Notturna';
+
+  @override
+  String get diveType_builtin_night_short => 'Notturna';
 
   @override
   String get diveType_builtin_recreational => 'Ricreativa';
 
   @override
+  String get diveType_builtin_recreational_short => 'Rec';
+
+  @override
   String get diveType_builtin_shore => 'Da riva';
+
+  @override
+  String get diveType_builtin_shore_short => 'Riva';
 
   @override
   String get diveType_builtin_technical => 'Tecnica';
 
   @override
+  String get diveType_builtin_technical_short => 'Tec';
+
+  @override
   String get diveType_builtin_training => 'Addestramento';
 
   @override
+  String get diveType_builtin_training_short => 'Addestramento';
+
+  @override
   String get diveType_builtin_wreck => 'Relitto';
+
+  @override
+  String get diveType_builtin_wreck_short => 'Relitto';
 
   @override
   String get diveTypes_addDialog_addButton => 'Aggiungi';
@@ -9240,6 +9291,16 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_nameValidation => 'Inserisci un nome';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper =>
+      'Mostrato nell\'intestazione del dettaglio immersione quando lo spazio è limitato';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => 'es. RR';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => 'Nome breve (opzionale)';
 
   @override
   String get diveTypes_addDialog_title =>
@@ -9275,6 +9336,30 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveTypes_deleteTooltip => 'Elimina tipo immersione';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper =>
+      'I nomi predefiniti non possono essere modificati';
+
+  @override
+  String get diveTypes_editDialog_saveButton => 'Salva';
+
+  @override
+  String get diveTypes_editDialog_title => 'Modifica tipo di immersione';
+
+  @override
+  String get diveTypes_showInHeaderLabel => 'Intestazione';
+
+  @override
+  String get diveTypes_showInHeaderTooltip =>
+      'Mostra il badge di questo tipo nell\'intestazione dei dettagli dell\'immersione';
+
+  @override
+  String get diveTypes_showInListLabel => 'Elenco';
+
+  @override
+  String get diveTypes_showInListTooltip =>
+      'Mostra il badge di questo tipo nell\'elenco delle immersioni';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return 'Tipo immersione aggiunto: $name';
   }
@@ -9297,6 +9382,16 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return 'Errore durante l\'eliminazione del tipo immersione: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return 'Errore durante l\'aggiornamento del tipo di immersione: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return '\"$name\" aggiornato';
   }
 
   @override
@@ -10193,6 +10288,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => 'Flusso di massa costante';
@@ -12613,6 +12714,98 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get marineLife_suggest_copyLink => 'Copia link';
+
+  @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return 'Foto ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty =>
+      'Le foto taggate con questa specie compaiono qui.';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => 'Tagga foto';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => 'Aggiungi foto';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => 'Foto della specie';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto aggiunte',
+      one: '1 foto aggiunta',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saltate',
+      one: '1 saltata',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count non riuscite',
+      one: '1 non riuscita',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => 'Tagga foto';
+
+  @override
+  String get marineLife_tagPicker_empty =>
+      'Nessuna foto senza tag nelle immersioni in cui hai registrato questa specie.';
+
+  @override
+  String get marineLife_tagPicker_emptyHint =>
+      'Usa Aggiungi foto per importare immagini dal rullino.';
+
+  @override
+  String get marineLife_tagPicker_selectAll => 'Seleziona tutto';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tagga $count foto',
+      one: 'Tagga 1 foto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto taggate',
+      one: '1 foto taggata',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return 'Immersione $number';
+  }
 
   @override
   String get marineLife_speciesPage_title => 'Specie';
@@ -15196,6 +15389,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (Tempo per la superficie)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (Tempo gas rimanente)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (Tossicita O2)';
@@ -20937,6 +21133,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveComputer_detail_lastDownload => 'Ultimo download';
+
+  @override
+  String get diveComputer_detail_linkedGear => 'Attrezzatura';
 
   @override
   String get diveComputer_detail_notesTitle => 'Note';
@@ -31554,6 +31753,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_decompression_ttsSource => 'Fonte TTS';
 
   @override
+  String get settings_decompression_gtrSource => 'Fonte GTR';
+
+  @override
+  String get settings_decompression_gtrReserve => 'Pressione di riserva GTR';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'Pressione della bombola a cui il tempo gas rimanente fa il conto alla rovescia. Il GTR calcolato presume una risalita diretta a 10 m/min senza soste.';
+
+  @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -33472,6 +33681,10 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Nessun dato ripristinato: il file di backup non è stato trovato. I dati correnti sono invariati.';
+
+  @override
   String get backup_operation_deleting => 'Eliminazione del backup...';
 
   @override
@@ -33657,6 +33870,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'La libreria sostituita è ancora in fase di caricamento. Riprova tra poco.';
 
   @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'La libreria cloud è stata pubblicata da una versione più recente di Submersion. Aggiorna questo dispositivo e riprova.';
+
+  @override
   String settings_cloudSync_result_recordsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -33724,6 +33941,25 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get media_info_title => 'Info media';
+
+  @override
+  String get media_species_actionTooltip => 'Specie';
+
+  @override
+  String get media_species_sheetTitle => 'Specie in questa foto';
+
+  @override
+  String get media_species_sightedOnDive => 'Avvistate in questa immersione';
+
+  @override
+  String get media_species_otherSpecies => 'Altre specie...';
+
+  @override
+  String get media_species_noDiveHint =>
+      'Questa foto non è collegata a un\'immersione. Cerca una specie per taggarla.';
+
+  @override
+  String get media_species_chipsLabel => 'Tag delle specie';
 
   @override
   String get media_info_fileSection => 'File';

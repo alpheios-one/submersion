@@ -248,6 +248,7 @@ class SyncData {
   final List<Map<String, dynamic>> trips;
   final List<Map<String, dynamic>> liveaboardDetails;
   final List<Map<String, dynamic>> itineraryDays;
+  final List<Map<String, dynamic>> tripDayWeather;
   final List<Map<String, dynamic>> checklistTemplates;
   final List<Map<String, dynamic>> checklistTemplateItems;
   final List<Map<String, dynamic>> tripChecklistItems;
@@ -282,6 +283,7 @@ class SyncData {
   final List<Map<String, dynamic>> diveCustomFields;
   final List<Map<String, dynamic>> diveDataSources;
   final List<Map<String, dynamic>> siteSpecies;
+  final List<Map<String, dynamic>> mediaSpecies;
   final List<Map<String, dynamic>> siteFeatures;
   final List<Map<String, dynamic>> csvPresets;
   final List<Map<String, dynamic>> viewConfigs;
@@ -323,6 +325,7 @@ class SyncData {
     this.trips = const [],
     this.liveaboardDetails = const [],
     this.itineraryDays = const [],
+    this.tripDayWeather = const [],
     this.checklistTemplates = const [],
     this.checklistTemplateItems = const [],
     this.tripChecklistItems = const [],
@@ -357,6 +360,7 @@ class SyncData {
     this.diveCustomFields = const [],
     this.diveDataSources = const [],
     this.siteSpecies = const [],
+    this.mediaSpecies = const [],
     this.siteFeatures = const [],
     this.csvPresets = const [],
     this.viewConfigs = const [],
@@ -399,6 +403,7 @@ class SyncData {
     'trips': trips,
     'liveaboardDetails': liveaboardDetails,
     'itineraryDays': itineraryDays,
+    'tripDayWeather': tripDayWeather,
     'checklistTemplates': checklistTemplates,
     'checklistTemplateItems': checklistTemplateItems,
     'tripChecklistItems': tripChecklistItems,
@@ -433,6 +438,7 @@ class SyncData {
     'diveCustomFields': diveCustomFields,
     'diveDataSources': diveDataSources,
     'siteSpecies': siteSpecies,
+    'mediaSpecies': mediaSpecies,
     'siteFeatures': siteFeatures,
     'csvPresets': csvPresets,
     'viewConfigs': viewConfigs,
@@ -476,6 +482,7 @@ class SyncData {
       trips: _parseList(json['trips']),
       liveaboardDetails: _parseList(json['liveaboardDetails']),
       itineraryDays: _parseList(json['itineraryDays']),
+      tripDayWeather: _parseList(json['tripDayWeather']),
       checklistTemplates: _parseList(json['checklistTemplates']),
       checklistTemplateItems: _parseList(json['checklistTemplateItems']),
       tripChecklistItems: _parseList(json['tripChecklistItems']),
@@ -512,6 +519,7 @@ class SyncData {
       diveCustomFields: _parseList(json['diveCustomFields']),
       diveDataSources: _parseList(json['diveDataSources']),
       siteSpecies: _parseList(json['siteSpecies']),
+      mediaSpecies: _parseList(json['mediaSpecies']),
       siteFeatures: _parseList(json['siteFeatures']),
       csvPresets: _parseList(json['csvPresets']),
       viewConfigs: _parseList(json['viewConfigs']),
@@ -765,6 +773,7 @@ class SyncDataSerializer {
       blob: false,
       full: null,
     ),
+    (key: 'tripDayWeather', table: _db.tripDayWeather, blob: false, full: null),
     (
       key: 'checklistTemplates',
       table: _db.checklistTemplates,
@@ -913,6 +922,7 @@ class SyncDataSerializer {
       full: null,
     ),
     (key: 'siteSpecies', table: _db.siteSpecies, blob: false, full: null),
+    (key: 'mediaSpecies', table: _db.mediaSpecies, blob: false, full: null),
     (key: 'siteFeatures', table: _db.siteFeatures, blob: false, full: null),
     (key: 'csvPresets', table: _db.csvPresets, blob: false, full: null),
     (key: 'viewConfigs', table: _db.viewConfigs, blob: false, full: null),
@@ -1275,6 +1285,10 @@ class SyncDataSerializer {
         'itineraryDays',
         () => _exportItineraryDays(hlcSince),
       ),
+      tripDayWeather: await _safeExport(
+        'tripDayWeather',
+        () => _exportTripDayWeather(hlcSince),
+      ),
       checklistTemplates: await _safeExport(
         'checklistTemplates',
         () => _exportChecklistTemplates(hlcSince),
@@ -1398,6 +1412,10 @@ class SyncDataSerializer {
       siteSpecies: await _safeExport(
         'siteSpecies',
         () => _exportSiteSpecies(hlcSince),
+      ),
+      mediaSpecies: await _safeExport(
+        'mediaSpecies',
+        () => _exportMediaSpecies(hlcSince),
       ),
       siteFeatures: await _safeExport(
         'siteFeatures',
@@ -1715,6 +1733,11 @@ class SyncDataSerializer {
           _db.tripItineraryDays,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
+      case 'tripDayWeather':
+        final row = await (_db.select(
+          _db.tripDayWeather,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
       case 'checklistTemplates':
         final row = await (_db.select(
           _db.checklistTemplates,
@@ -1890,6 +1913,11 @@ class SyncDataSerializer {
           _db.siteSpecies,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
+      case 'mediaSpecies':
+        final row = await (_db.select(
+          _db.mediaSpecies,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
       case 'siteFeatures':
         final row = await (_db.select(
           _db.siteFeatures,
@@ -2038,6 +2066,11 @@ class SyncDataSerializer {
       case 'itineraryDays':
         final rows = await (_db.select(
           _db.tripItineraryDays,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'tripDayWeather':
+        final rows = await (_db.select(
+          _db.tripDayWeather,
         )..where((t) => t.id.isIn(idList))).get();
         return {for (final r in rows) r.id: r.toJson()};
       case 'checklistTemplates':
@@ -2348,6 +2381,31 @@ class SyncDataSerializer {
         );
   }
 
+  /// Applies one incoming `dive_dive_types` row.
+  ///
+  /// `dive_dive_types` carries a unique index on (dive, type) since v178, and
+  /// its primary key is a surrogate uuid minted per device. A peer's row for a
+  /// pair this device already has is therefore NOT a primary-key conflict:
+  /// `insertOnConflictUpdate` targets the PK, misses, hits the index, and
+  /// throws SqliteException(2067) -- failing the whole merge.
+  ///
+  /// An empty `target` means plain `ON CONFLICT DO NOTHING`, which absorbs a
+  /// conflict on ANY uniqueness constraint. Dropping the peer's row loses
+  /// nothing: the pair is the entire meaning of a junction row, and this table
+  /// carries no other mutable column. Before that index existed, keeping both
+  /// rows is exactly how one dive came to show the same type twice on every
+  /// device in the fleet (issue #1360).
+  Future<void> _applyDiveDiveTypeRecord(DiveDiveType record) async {
+    await _db
+        .into(_db.diveDiveTypes)
+        .insert(
+          record,
+          onConflict: DoNothing<$DiveDiveTypesTable, DiveDiveType>(
+            target: const [],
+          ),
+        );
+  }
+
   /// Applies one incoming record.
   ///
   /// HLC-bearing entities (`entityHasUpdatedAt == true`) apply via
@@ -2602,6 +2660,13 @@ class SyncDataSerializer {
               TripItineraryDay.fromJson(data).toCompanion(false),
             );
         return;
+      case 'tripDayWeather':
+        await _db
+            .into(_db.tripDayWeather)
+            .insertOnConflictUpdate(
+              TripDayWeatherData.fromJson(data).toCompanion(false),
+            );
+        return;
       case 'checklistTemplates':
         await _db
             .into(_db.checklistTemplates)
@@ -2698,9 +2763,7 @@ class SyncDataSerializer {
         await _applyDiveTagRecord(DiveTag.fromJson(_withTagAlias(data)));
         return;
       case 'diveDiveTypes':
-        await _db
-            .into(_db.diveDiveTypes)
-            .insertOnConflictUpdate(DiveDiveType.fromJson(data));
+        await _applyDiveDiveTypeRecord(DiveDiveType.fromJson(data));
         return;
       case 'diveTypes':
         await _db
@@ -2819,6 +2882,13 @@ class SyncDataSerializer {
             .into(_db.siteSpecies)
             .insertOnConflictUpdate(
               SiteSpecy.fromJson(_withTimestampDefaults(data)),
+            );
+        return;
+      case 'mediaSpecies':
+        await _db
+            .into(_db.mediaSpecies)
+            .insertOnConflictUpdate(
+              MediaSpecy.fromJson(_withTimestampDefaults(data)),
             );
         return;
       case 'siteFeatures':
@@ -3209,6 +3279,16 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'tripDayWeather':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.tripDayWeather,
+            records
+                .map((r) => TripDayWeatherData.fromJson(r).toCompanion(false))
+                .toList(),
+          ),
+        );
+        return;
       case 'checklistTemplates':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
@@ -3368,10 +3448,15 @@ class SyncDataSerializer {
         );
         return;
       case 'diveDiveTypes':
+        // DoNothing, not insertAllOnConflictUpdate: see
+        // [_applyDiveDiveTypeRecord].
         await _db.batch(
-          (b) => b.insertAllOnConflictUpdate(
+          (b) => b.insertAll(
             _db.diveDiveTypes,
             records.map((r) => DiveDiveType.fromJson(r)).toList(),
+            onConflict: DoNothing<$DiveDiveTypesTable, DiveDiveType>(
+              target: const [],
+            ),
           ),
         );
         return;
@@ -3547,6 +3632,16 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'mediaSpecies':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.mediaSpecies,
+            records
+                .map((r) => MediaSpecy.fromJson(_withTimestampDefaults(r)))
+                .toList(),
+          ),
+        );
+        return;
       case 'siteFeatures':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
@@ -3686,6 +3781,8 @@ class SyncDataSerializer {
         );
       case 'itineraryDays':
         return plain(_db.tripItineraryDays, _db.tripItineraryDays.id);
+      case 'tripDayWeather':
+        return plain(_db.tripDayWeather, _db.tripDayWeather.id);
       case 'checklistTemplates':
         return plain(_db.checklistTemplates, _db.checklistTemplates.id);
       case 'checklistTemplateItems':
@@ -3780,6 +3877,8 @@ class SyncDataSerializer {
         return plain(_db.diveDataSources, _db.diveDataSources.id);
       case 'siteSpecies':
         return plain(_db.siteSpecies, _db.siteSpecies.id);
+      case 'mediaSpecies':
+        return plain(_db.mediaSpecies, _db.mediaSpecies.id);
       case 'siteFeatures':
         return plain(_db.siteFeatures, _db.siteFeatures.id);
       case 'csvPresets':
@@ -3919,6 +4018,8 @@ class SyncDataSerializer {
         return _db.liveaboardDetailRecords;
       case 'itineraryDays':
         return _db.tripItineraryDays;
+      case 'tripDayWeather':
+        return _db.tripDayWeather;
       case 'checklistTemplates':
         return _db.checklistTemplates;
       case 'checklistTemplateItems':
@@ -4007,6 +4108,8 @@ class SyncDataSerializer {
         return _db.diveDataSources;
       case 'siteSpecies':
         return _db.siteSpecies;
+      case 'mediaSpecies':
+        return _db.mediaSpecies;
       case 'siteFeatures':
         return _db.siteFeatures;
       case 'csvPresets':
@@ -4230,6 +4333,11 @@ class SyncDataSerializer {
           _db.tripItineraryDays,
         )..where((t) => t.id.equals(recordId))).go();
         return;
+      case 'tripDayWeather':
+        await (_db.delete(
+          _db.tripDayWeather,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
       case 'checklistTemplates':
         await (_db.delete(
           _db.checklistTemplates,
@@ -4386,6 +4494,11 @@ class SyncDataSerializer {
       case 'siteSpecies':
         await (_db.delete(
           _db.siteSpecies,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'mediaSpecies':
+        await (_db.delete(
+          _db.mediaSpecies,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'siteFeatures':
@@ -4906,6 +5019,17 @@ class SyncDataSerializer {
     return rows.map((r) => r.toJson()).toList();
   }
 
+  Future<List<Map<String, dynamic>>> _exportTripDayWeather(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.tripDayWeather);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
   Future<List<Map<String, dynamic>>> _exportChecklistTemplates(
     String? hlcSince,
   ) async {
@@ -5288,12 +5412,57 @@ class SyncDataSerializer {
       final siteIds = modifiedSites.map((s) => s.id).toSet();
       if (siteIds.isEmpty) return [];
 
-      final rows = await (_db.select(
-        _db.siteSpecies,
-      )..where((t) => t.siteId.isIn(siteIds))).get();
-      return rows.map((r) => r.toJson()).toList();
+      return _childRowsOf(
+        siteIds,
+        (chunk) => (_db.select(
+          _db.siteSpecies,
+        )..where((t) => t.siteId.isIn(chunk))).get(),
+      );
     }
     final rows = await _db.select(_db.siteSpecies).get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// Rows of a clockless child table for [parentIds], fetched in chunks so
+  /// a large changeset (every photo modified since the cursor, say) cannot
+  /// overflow SQLite's bound-variable limit in one `IN (...)`.
+  Future<List<Map<String, dynamic>>> _childRowsOf<R extends DataClass>(
+    Set<String> parentIds,
+    Future<List<R>> Function(List<String> chunk) select,
+  ) async {
+    const idChunk = 900;
+    final ids = parentIds.toList();
+    final out = <Map<String, dynamic>>[];
+    for (var i = 0; i < ids.length; i += idChunk) {
+      final end = i + idChunk < ids.length ? i + idChunk : ids.length;
+      for (final r in await select(ids.sublist(i, end))) {
+        out.add(r.toJson());
+      }
+    }
+    return out;
+  }
+
+  /// `media_species` has no clock of its own, so an incremental export
+  /// ships the tags of every photo whose `media.hlc` advanced; a full export
+  /// ships the table.
+  Future<List<Map<String, dynamic>>> _exportMediaSpecies(
+    String? hlcSince,
+  ) async {
+    if (hlcSince != null) {
+      final modifiedMedia = await (_db.select(
+        _db.media,
+      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
+      final mediaIds = modifiedMedia.map((m) => m.id).toSet();
+      if (mediaIds.isEmpty) return [];
+
+      return _childRowsOf(
+        mediaIds,
+        (chunk) => (_db.select(
+          _db.mediaSpecies,
+        )..where((t) => t.mediaId.isIn(chunk))).get(),
+      );
+    }
+    final rows = await _db.select(_db.mediaSpecies).get();
     return rows.map((r) => r.toJson()).toList();
   }
 
@@ -5672,6 +5841,11 @@ class SyncDataSerializer {
       // v161: seed it so payloads predating the column hydrate instead of
       // throwing in DiverSetting.fromJson.
       'defaultShowO2CellMv': false,
+      // v177: GTR settings; seed them so payloads predating the columns
+      // hydrate instead of throwing in DiverSetting.fromJson.
+      'defaultShowGtr': false,
+      'defaultGtrSource': 1,
+      'gtrReservePressure': 50.0,
       // v166: seed it so payloads predating the column hydrate instead of
       // throwing in DiverSetting.fromJson (issue #1187).
       'placeNameLanguage': 'en',

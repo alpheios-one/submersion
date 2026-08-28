@@ -5313,7 +5313,14 @@ class DiveRepository {
     final rows =
         await (_db.select(_db.diveDiveTypes)
               ..where((t) => t.diveId.isIn(diveIds))
-              ..orderBy([(t) => OrderingTerm(expression: t.createdAt)]))
+              // `id` breaks the tie: rows written in the same millisecond
+              // (a seed pass, a multi-type save) would otherwise read back in
+              // an order SQLite is free to vary, and the FIRST row is the
+              // dive's representative type.
+              ..orderBy([
+                (t) => OrderingTerm(expression: t.createdAt),
+                (t) => OrderingTerm(expression: t.id),
+              ]))
             .get();
     final map = <String, List<String>>{};
     for (final r in rows) {
@@ -5338,12 +5345,23 @@ class DiveRepository {
   /// Replace [diveId]'s dive-type rows with exactly [typeIds] (>= 1 enforced),
   /// and write the representative `dives.dive_type` column. Fresh UUIDs per row
   /// so a reinsert never collides with a replaced row's tombstone (#347).
+  ///
+  /// [typeIds] is deduped first, keeping the first occurrence so the
+  /// representative type (the first row written) is unchanged. The junction
+  /// carries a unique index on (dive, type) since v178, so a repeated id here
+  /// would throw rather than duplicate -- and a caller passing one is asking
+  /// for a set it already believes it has (issue #1360).
   Future<void> _replaceDiveTypeRows(
     String diveId,
     List<String> typeIds,
     int now,
   ) async {
-    final types = typeIds.isEmpty ? const ['recreational'] : typeIds;
+    // `Iterable.toSet()` builds a LinkedHashSet, which iterates in insertion
+    // order, so this keeps the FIRST occurrence of each id. That ordering is
+    // load-bearing, not incidental: the first row written becomes the dive's
+    // representative type. Do not swap in an unordered Set implementation.
+    final deduped = typeIds.toSet().toList();
+    final types = deduped.isEmpty ? const ['recreational'] : deduped;
     final existing = await (_db.select(
       _db.diveDiveTypes,
     )..where((t) => t.diveId.equals(diveId))).get();
