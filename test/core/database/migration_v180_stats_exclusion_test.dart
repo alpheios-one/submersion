@@ -2,12 +2,12 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 
-/// Minimal pre-v178 shape: a dives table without either exclusion column,
-/// stamped at v175 so the upgrade to 178 runs.
-NativeDatabase _dbAt175() {
+/// Minimal pre-v180 shape: a dives table without either exclusion column,
+/// stamped at v179 so the upgrade to 180 runs.
+NativeDatabase _dbAt179() {
   return NativeDatabase.memory(
     setup: (rawDb) {
-      rawDb.execute('PRAGMA user_version = 175');
+      rawDb.execute('PRAGMA user_version = 179');
       rawDb.execute('''
         CREATE TABLE dives (
           id TEXT NOT NULL PRIMARY KEY,
@@ -29,9 +29,9 @@ Future<Set<String>> _diveColumns(AppDatabase db) async {
 
 void main() {
   test(
-    'v178 adds both statistics-exclusion columns to an existing table',
+    'v180 adds both statistics-exclusion columns to an existing table',
     () async {
-      final db = AppDatabase(_dbAt175());
+      final db = AppDatabase(_dbAt179());
       addTearDown(db.close);
 
       final names = await _diveColumns(db);
@@ -41,7 +41,7 @@ void main() {
   );
 
   test('pre-existing dives default to included', () async {
-    final db = AppDatabase(_dbAt175());
+    final db = AppDatabase(_dbAt179());
     addTearDown(db.close);
 
     final row = await db
@@ -68,7 +68,7 @@ void main() {
     // backstop runs the same assert on every open, including on the stripped
     // databases other migration tests build.
     final native = NativeDatabase.memory(
-      setup: (rawDb) => rawDb.execute('PRAGMA user_version = 175'),
+      setup: (rawDb) => rawDb.execute('PRAGMA user_version = 179'),
     );
     final db = AppDatabase(native);
     addTearDown(db.close);
@@ -79,7 +79,7 @@ void main() {
   test('the backstop is idempotent across repeated opens', () async {
     // Reopening the same file-backed schema re-runs beforeOpen. The assert
     // must not attempt a second ALTER TABLE and fail with "duplicate column".
-    final db = AppDatabase(_dbAt175());
+    final db = AppDatabase(_dbAt179());
     addTearDown(db.close);
     await db.customSelect('SELECT 1').get();
 
@@ -95,8 +95,8 @@ void main() {
     );
   });
 
-  test('v178 is present in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(178));
-    expect(AppDatabase.migrationVersions, contains(178));
+  test('v180 is present in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(180));
+    expect(AppDatabase.migrationVersions, contains(180));
   });
 }

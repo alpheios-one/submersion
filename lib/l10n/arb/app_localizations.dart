@@ -58523,7 +58523,7 @@ abstract class AppLocalizations {
   /// Bulk edit field label
   ///
   /// In en, this message translates to:
-  /// **'Excluded from statistics'**
+  /// **'Exclude from statistics'**
   String get diveLog_bulkEdit_fieldExcludeFromStats;
 
   /// Bulk edit field label

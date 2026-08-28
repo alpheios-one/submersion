@@ -104,8 +104,8 @@ void main() {
       expect(rows.last.value, nonGasInScope.toDouble());
     });
 
-    test('getDepthProgressionTrend', () async {
-      final rows = await repository.getDepthProgressionTrend();
+    test('getDepthPerDive', () async {
+      final rows = await repository.getDepthPerDive();
       expect(rows, isNotEmpty);
       // One monthly bucket; every seeded dive has the same max depth, so the
       // assertion that bites is the count behind the average, checked above.
@@ -138,8 +138,8 @@ void main() {
       );
     });
 
-    test('getSacVolumeTrend', () async {
-      final rows = await repository.getSacVolumeTrend();
+    test('getSacVolumePerDive', () async {
+      final rows = await repository.getSacVolumePerDive();
       expect(rows, isNotEmpty, reason: 'the included dive has tank volume');
       // One month bucket holding exactly the in-scope dives.
       expect(rows.length, 1);

@@ -35027,7 +35027,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_bulkEdit_fieldExcludeFromStats =>
-      'Excluded from statistics';
+      'Exclude from statistics';
 
   @override
   String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
