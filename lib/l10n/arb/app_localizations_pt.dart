@@ -17744,11 +17744,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'Temperaturas min/media/max';
+      'Mín, média e máx por mês do calendário, em todos os anos';
 
   @override
   String get statistics_conditions_temperature_title =>
-      'Temperatura da Agua por Mes';
+      'Temperatura da água por estação';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17794,7 +17794,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'Peso medio ao longo do tempo';
+      'Chumbo total por mergulho';
 
   @override
   String get statistics_equipment_weightTrend_title => 'Tendencia de Peso';
@@ -17877,8 +17877,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Falha ao carregar tendencia de consumo';
 
   @override
-  String get statistics_gas_sacTrend_subtitle =>
-      'Media mensal ao longo de 5 anos';
+  String get statistics_gas_sacTrend_subtitle => 'Cada mergulho no período';
 
   @override
   String get statistics_gas_sacTrend_title => 'Tendência do consumo de gás';
@@ -18138,7 +18137,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_progression_bottomTime_subtitle =>
-      'Duracao media por mes';
+      'Cada mergulho no período';
 
   @override
   String get statistics_progression_bottomTime_title =>
@@ -18162,7 +18161,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'Profundidade maxima mensal ao longo de 5 anos';
+      'Cada mergulho no período';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -35445,4 +35444,60 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'O HealthKit não está disponível neste dispositivo';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'Média mensal';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'Cada mergulho';
+
+  @override
+  String get statistics_trend_aggregation_tooltip =>
+      'Como os mergulhos são agrupados';
+
+  @override
+  String get statistics_trend_aggregation_weekly => 'Média semanal';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'A faixa sombreada abrange o valor mais baixo e mais alto de cada grupo';
+
+  @override
+  String get statistics_trend_legend_rate => 'Tendência geral';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => 'Média móvel';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/ano';
+  }
+
+  @override
+  String get statistics_conditions_tempTrend_title =>
+      'Evolução da temperatura da água';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle =>
+      'Cada mergulho no período';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'Sem dados de temperatura disponíveis';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'Falha ao carregar a evolução da temperatura';
+
+  @override
+  String get diveLog_filter_presetLast5Years => 'Últimos 5 anos';
+
+  @override
+  String get diveLog_filter_presetLast10Years => 'Últimos 10 anos';
+
+  @override
+  String get statistics_trend_tooltip_lowest => 'Mínimo';
+
+  @override
+  String get statistics_trend_tooltip_highest => 'Máximo';
 }

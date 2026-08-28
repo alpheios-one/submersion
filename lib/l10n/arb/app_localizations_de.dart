@@ -17708,11 +17708,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'Min/Durchschn./Max Temperaturen';
+      'Min, Mittel und Max nach Kalendermonat, über alle Jahre';
 
   @override
   String get statistics_conditions_temperature_title =>
-      'Wassertemperatur nach Monat';
+      'Saisonale Wassertemperatur';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17757,7 +17757,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'Durchschnittliches Gewicht im Zeitverlauf';
+      'Gesamtes Blei pro Tauchgang';
 
   @override
   String get statistics_equipment_weightTrend_title => 'Gewichtstrend';
@@ -17841,8 +17841,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Verbrauchstrend konnte nicht geladen werden';
 
   @override
-  String get statistics_gas_sacTrend_subtitle =>
-      'Monatlicher Durchschnitt über 5 Jahre';
+  String get statistics_gas_sacTrend_subtitle => 'Jeder Tauchgang im Zeitraum';
 
   @override
   String get statistics_gas_sacTrend_title => 'Gasverbrauchstrend';
@@ -18098,7 +18097,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get statistics_progression_bottomTime_subtitle =>
-      'Durchschnittliche Dauer nach Monat';
+      'Jeder Tauchgang im Zeitraum';
 
   @override
   String get statistics_progression_bottomTime_title => 'Grundzeit-Trend';
@@ -18121,7 +18120,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'Monatliche Maximaltiefe über 5 Jahre';
+      'Jeder Tauchgang im Zeitraum';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -35364,4 +35363,62 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'HealthKit ist auf diesem Gerät nicht verfügbar';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'Monatlicher Durchschnitt';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'Jeder Tauchgang';
+
+  @override
+  String get statistics_trend_aggregation_tooltip =>
+      'Wie Tauchgänge gruppiert werden';
+
+  @override
+  String get statistics_trend_aggregation_weekly =>
+      'Wöchentlicher Durchschnitt';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'Der schattierte Bereich umfasst den niedrigsten und höchsten Wert jeder Gruppe';
+
+  @override
+  String get statistics_trend_legend_rate => 'Gesamttrend';
+
+  @override
+  String get statistics_trend_legend_rollingAverage =>
+      'Gleitender Durchschnitt';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/Jahr';
+  }
+
+  @override
+  String get statistics_conditions_tempTrend_title =>
+      'Wassertemperatur-Verlauf';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle =>
+      'Jeder Tauchgang im Zeitraum';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'Keine Temperaturdaten verfügbar';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'Temperaturverlauf konnte nicht geladen werden';
+
+  @override
+  String get diveLog_filter_presetLast5Years => 'Letzte 5 Jahre';
+
+  @override
+  String get diveLog_filter_presetLast10Years => 'Letzte 10 Jahre';
+
+  @override
+  String get statistics_trend_tooltip_lowest => 'Niedrigster';
+
+  @override
+  String get statistics_trend_tooltip_highest => 'Höchster';
 }

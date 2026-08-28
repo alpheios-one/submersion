@@ -17295,10 +17295,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'טמפרטורות מינ\'/ממוצע/מקס\'';
+      'מינימום, ממוצע ומקסימום לפי חודש קלנדרי, על פני כל השנים';
 
   @override
-  String get statistics_conditions_temperature_title => 'טמפרטורת מים לפי חודש';
+  String get statistics_conditions_temperature_title => 'טמפרטורת מים עונתית';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17341,7 +17341,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'משקל ממוצע לאורך זמן';
+      'סך המשקולות לכל צלילה';
 
   @override
   String get statistics_equipment_weightTrend_title => 'מגמת משקל';
@@ -17416,7 +17416,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get statistics_gas_sacTrend_error => 'שגיאה בטעינת מגמת הצריכה';
 
   @override
-  String get statistics_gas_sacTrend_subtitle => 'ממוצע חודשי על פני 5 שנים';
+  String get statistics_gas_sacTrend_subtitle => 'כל צלילה בטווח';
 
   @override
   String get statistics_gas_sacTrend_title => 'מגמת צריכת גז';
@@ -17665,7 +17665,7 @@ class AppLocalizationsHe extends AppLocalizations {
       'שגיאה בטעינת מגמת זמן תחתית';
 
   @override
-  String get statistics_progression_bottomTime_subtitle => 'משך ממוצע לפי חודש';
+  String get statistics_progression_bottomTime_subtitle => 'כל צלילה בטווח';
 
   @override
   String get statistics_progression_bottomTime_title => 'מגמת זמן תחתית';
@@ -17687,7 +17687,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'עומק מקסימלי חודשי על פני 5 שנים';
+      'כל צלילה בטווח';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -34743,4 +34743,57 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'HealthKit אינו זמין במכשיר הזה';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'ממוצע חודשי';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'כל צלילה';
+
+  @override
+  String get statistics_trend_aggregation_tooltip => 'כיצד הצלילות מקובצות';
+
+  @override
+  String get statistics_trend_aggregation_weekly => 'ממוצע שבועי';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'הרצועה המוצללת משתרעת בין הערך הנמוך לגבוה ביותר בכל קבוצה';
+
+  @override
+  String get statistics_trend_legend_rate => 'מגמה כללית';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => 'ממוצע נע';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/שנה';
+  }
+
+  @override
+  String get statistics_conditions_tempTrend_title => 'מגמת טמפרטורת המים';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle => 'כל צלילה בטווח';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'אין נתוני טמפרטורה זמינים';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'טעינת מגמת הטמפרטורה נכשלה';
+
+  @override
+  String get diveLog_filter_presetLast5Years => '5 השנים האחרונות';
+
+  @override
+  String get diveLog_filter_presetLast10Years => '10 השנים האחרונות';
+
+  @override
+  String get statistics_trend_tooltip_lowest => 'הנמוך ביותר';
+
+  @override
+  String get statistics_trend_tooltip_highest => 'הגבוה ביותר';
 }

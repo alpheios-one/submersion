@@ -87,12 +87,12 @@ final sacTrendProvider = FutureProvider<List<TrendDataPoint>>((ref) async {
   final filter = ref.watch(statisticsFilterProvider);
 
   if (lane == GasConsumptionLane.rmv) {
-    return repository.getSacVolumeTrend(
+    return repository.getSacVolumePerDive(
       diverId: currentDiverId,
       filter: filter,
     );
   } else {
-    return repository.getSacPressureTrend(
+    return repository.getSacPressurePerDive(
       diverId: currentDiverId,
       filter: filter,
     );
@@ -183,10 +183,7 @@ final depthProgressionTrendProvider = FutureProvider<List<TrendDataPoint>>((
   final repository = ref.watch(statisticsRepositoryProvider);
   final currentDiverId = ref.watch(currentDiverIdProvider);
   final filter = ref.watch(statisticsFilterProvider);
-  return repository.getDepthProgressionTrend(
-    diverId: currentDiverId,
-    filter: filter,
-  );
+  return repository.getDepthPerDive(diverId: currentDiverId, filter: filter);
 });
 
 final bottomTimeTrendProvider = FutureProvider<List<TrendDataPoint>>((
@@ -196,7 +193,10 @@ final bottomTimeTrendProvider = FutureProvider<List<TrendDataPoint>>((
   final repository = ref.watch(statisticsRepositoryProvider);
   final currentDiverId = ref.watch(currentDiverIdProvider);
   final filter = ref.watch(statisticsFilterProvider);
-  return repository.getBottomTimeTrend(diverId: currentDiverId, filter: filter);
+  return repository.getBottomTimePerDive(
+    diverId: currentDiverId,
+    filter: filter,
+  );
 });
 
 final divesPerYearProvider = FutureProvider<List<({int year, int count})>>((
@@ -293,6 +293,24 @@ final temperatureByMonthProvider =
         filter: filter,
       );
     });
+
+/// Water temperature as a per-dive time series.
+///
+/// Sibling of [temperatureByMonthProvider], which stays a twelve-bucket
+/// seasonal climatology. A travelling diver needs the series; a diver with one
+/// home region gets real value from the season (issue #299).
+final waterTempTrendProvider = FutureProvider<List<TrendDataPoint>>((
+  ref,
+) async {
+  _keepAliveWithExpiry(ref);
+  final repository = ref.watch(statisticsRepositoryProvider);
+  final currentDiverId = ref.watch(currentDiverIdProvider);
+  final filter = ref.watch(statisticsFilterProvider);
+  return repository.getWaterTempPerDive(
+    diverId: currentDiverId,
+    filter: filter,
+  );
+});
 
 // ============================================================================
 // Social & Buddies Providers
@@ -487,7 +505,7 @@ final weightTrendProvider = FutureProvider<List<TrendDataPoint>>((ref) async {
   final repository = ref.watch(statisticsRepositoryProvider);
   final currentDiverId = ref.watch(currentDiverIdProvider);
   final filter = ref.watch(statisticsFilterProvider);
-  return repository.getWeightTrend(diverId: currentDiverId, filter: filter);
+  return repository.getWeightPerDive(diverId: currentDiverId, filter: filter);
 });
 
 // ============================================================================

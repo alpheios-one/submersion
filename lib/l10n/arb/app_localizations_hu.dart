@@ -17677,11 +17677,11 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'Min/Atl/Max homersekletek';
+      'Min, átlag és max naptári hónap szerint, minden évre összevonva';
 
   @override
   String get statistics_conditions_temperature_title =>
-      'Vizhomerseklet honaponkent';
+      'Szezonális vízhőmérséklet';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17726,7 +17726,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'Atlagos suly az ido fuggvenyeben';
+      'Összes ólom merülésenként';
 
   @override
   String get statistics_equipment_weightTrend_title => 'Suly trend';
@@ -17809,7 +17809,8 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerult a fogyasztasi trend betoltese';
 
   @override
-  String get statistics_gas_sacTrend_subtitle => 'Havi atlag 5 even at';
+  String get statistics_gas_sacTrend_subtitle =>
+      'Minden merülés a tartományban';
 
   @override
   String get statistics_gas_sacTrend_title => 'Gázfogyasztási trend';
@@ -18073,7 +18074,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_progression_bottomTime_subtitle =>
-      'Atlagos idotartam honaponkent';
+      'Minden merülés a tartományban';
 
   @override
   String get statistics_progression_bottomTime_title => 'Fenekido trend';
@@ -18096,7 +18097,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'Havi max melyseg 5 even at';
+      'Minden merülés a tartományban';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -35298,4 +35299,60 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'A HealthKit nem érhető el ezen az eszközön';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'Havi átlag';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'Minden merülés';
+
+  @override
+  String get statistics_trend_aggregation_tooltip =>
+      'Hogyan csoportosulnak a merülések';
+
+  @override
+  String get statistics_trend_aggregation_weekly => 'Heti átlag';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'Az árnyékolt sáv az egyes csoportok legalacsonyabb és legmagasabb értékét fogja át';
+
+  @override
+  String get statistics_trend_legend_rate => 'Általános trend';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => 'Mozgóátlag';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/év';
+  }
+
+  @override
+  String get statistics_conditions_tempTrend_title =>
+      'Vízhőmérséklet alakulása';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle =>
+      'Minden merülés a tartományban';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'Nincs elérhető hőmérsékleti adat';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'A hőmérséklet alakulása nem tölthető be';
+
+  @override
+  String get diveLog_filter_presetLast5Years => 'Elmúlt 5 év';
+
+  @override
+  String get diveLog_filter_presetLast10Years => 'Elmúlt 10 év';
+
+  @override
+  String get statistics_trend_tooltip_lowest => 'Legalacsonyabb';
+
+  @override
+  String get statistics_trend_tooltip_highest => 'Legmagasabb';
 }

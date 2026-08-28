@@ -16844,10 +16844,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_conditions_temperature_seriesMin => '最低';
 
   @override
-  String get statistics_conditions_temperature_subtitle => '最低/平均/最高温度';
+  String get statistics_conditions_temperature_subtitle =>
+      '按日历月份统计的最低、平均和最高值，涵盖所有年份';
 
   @override
-  String get statistics_conditions_temperature_title => '每月水温';
+  String get statistics_conditions_temperature_title => '季节性水温';
 
   @override
   String get statistics_conditions_visibility_error => '加载能见度数据失败';
@@ -16883,7 +16884,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_equipment_weightTrend_error => '加载配重趋势失败';
 
   @override
-  String get statistics_equipment_weightTrend_subtitle => '平均配重随时间变化';
+  String get statistics_equipment_weightTrend_subtitle => '每次潜水携带的总配重';
 
   @override
   String get statistics_equipment_weightTrend_title => '配重趋势';
@@ -16957,7 +16958,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_gas_sacTrend_error => '加载消耗趋势失败';
 
   @override
-  String get statistics_gas_sacTrend_subtitle => '5年月均值';
+  String get statistics_gas_sacTrend_subtitle => '范围内的每次潜水';
 
   @override
   String get statistics_gas_sacTrend_title => '气体消耗趋势';
@@ -17194,7 +17195,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_progression_bottomTime_error => '加载潜水时间趋势失败';
 
   @override
-  String get statistics_progression_bottomTime_subtitle => '月均潜水时长';
+  String get statistics_progression_bottomTime_subtitle => '范围内的每次潜水';
 
   @override
   String get statistics_progression_bottomTime_title => '潜水时间趋势';
@@ -17212,7 +17213,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_progression_depthProgression_error => '加载深度进展失败';
 
   @override
-  String get statistics_progression_depthProgression_subtitle => '5年月度最大深度';
+  String get statistics_progression_depthProgression_subtitle => '范围内的每次潜水';
 
   @override
   String get statistics_progression_depthProgression_title => '最大深度进展';
@@ -33364,4 +33365,54 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       '此设备不支持 HealthKit';
+
+  @override
+  String get statistics_trend_aggregation_monthly => '每月平均';
+
+  @override
+  String get statistics_trend_aggregation_perDive => '每次潜水';
+
+  @override
+  String get statistics_trend_aggregation_tooltip => '潜水的分组方式';
+
+  @override
+  String get statistics_trend_aggregation_weekly => '每周平均';
+
+  @override
+  String get statistics_trend_band_semanticLabel => '阴影区间涵盖每组的最低值和最高值';
+
+  @override
+  String get statistics_trend_legend_rate => '总体趋势';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => '滑动平均';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/年';
+  }
+
+  @override
+  String get statistics_conditions_tempTrend_title => '水温趋势';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle => '范围内的每次潜水';
+
+  @override
+  String get statistics_conditions_tempTrend_empty => '没有可用的温度数据';
+
+  @override
+  String get statistics_conditions_tempTrend_error => '无法加载水温趋势';
+
+  @override
+  String get diveLog_filter_presetLast5Years => '最近 5 年';
+
+  @override
+  String get diveLog_filter_presetLast10Years => '最近 10 年';
+
+  @override
+  String get statistics_trend_tooltip_lowest => '最低';
+
+  @override
+  String get statistics_trend_tooltip_highest => '最高';
 }

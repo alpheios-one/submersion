@@ -282,6 +282,44 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                               });
                             },
                           ),
+                          _datePresetChip(
+                            context,
+                            context.l10n.diveLog_filter_presetLast5Years,
+                            () {
+                              final now = DateTime.now();
+                              setState(() {
+                                _startDate = DateTime(
+                                  now.year - 5,
+                                  now.month,
+                                  now.day,
+                                );
+                                _endDate = DateTime(
+                                  now.year,
+                                  now.month,
+                                  now.day,
+                                );
+                              });
+                            },
+                          ),
+                          _datePresetChip(
+                            context,
+                            context.l10n.diveLog_filter_presetLast10Years,
+                            () {
+                              final now = DateTime.now();
+                              setState(() {
+                                _startDate = DateTime(
+                                  now.year - 10,
+                                  now.month,
+                                  now.day,
+                                );
+                                _endDate = DateTime(
+                                  now.year,
+                                  now.month,
+                                  now.day,
+                                );
+                              });
+                            },
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
