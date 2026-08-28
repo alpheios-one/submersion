@@ -56035,6 +56035,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'HealthKit is not available on this device'**
   String get settings_dataSources_appleHealth_permissionUnsupported;
+
+  /// No description provided for @statistics_trend_aggregation_monthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get statistics_trend_aggregation_monthly;
+
+  /// No description provided for @statistics_trend_aggregation_perDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Per dive'**
+  String get statistics_trend_aggregation_perDive;
+
+  /// No description provided for @statistics_trend_aggregation_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Group dives'**
+  String get statistics_trend_aggregation_tooltip;
+
+  /// No description provided for @statistics_trend_aggregation_weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get statistics_trend_aggregation_weekly;
+
+  /// No description provided for @statistics_trend_band_semanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Shaded band spans the lowest and highest value in each group'**
+  String get statistics_trend_band_semanticLabel;
+
+  /// No description provided for @statistics_trend_legend_rate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate'**
+  String get statistics_trend_legend_rate;
+
+  /// No description provided for @statistics_trend_legend_rollingAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Rolling avg'**
+  String get statistics_trend_legend_rollingAverage;
+
+  /// Linear trend rate shown beside the rate legend entry. The value already carries its unit symbol, for example '+4.4 m'.
+  ///
+  /// In en, this message translates to:
+  /// **'{value}/yr'**
+  String statistics_trend_rate_perYear(String value);
 }
 
 class _AppLocalizationsDelegate

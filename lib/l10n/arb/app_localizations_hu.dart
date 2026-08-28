@@ -33932,4 +33932,31 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'A HealthKit nem érhető el ezen az eszközön';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'Havi';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'Merülésenként';
+
+  @override
+  String get statistics_trend_aggregation_tooltip => 'Merülések csoportosítása';
+
+  @override
+  String get statistics_trend_aggregation_weekly => 'Heti';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'Az árnyékolt sáv az egyes csoportok legalacsonyabb és legmagasabb értékét fogja át';
+
+  @override
+  String get statistics_trend_legend_rate => 'Ütem';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => 'Mozgóátlag';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/év';
+  }
 }

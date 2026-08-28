@@ -9978,5 +9978,13 @@
   "settings_dataSources_appleHealth_dataTypeDepth": "Profondeur sous l'eau - mesures de profondeur enregistrées pendant les plongées",
   "settings_dataSources_appleHealth_dataTypeWaterTemp": "Température de l'eau - mesures de température enregistrées pendant les plongées",
   "settings_dataSources_appleHealth_permissionManagedInHealth": "L'accès à HealthKit se gère dans l'app Santé",
-  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit n'est pas disponible sur cet appareil"
+  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit n'est pas disponible sur cet appareil",
+  "statistics_trend_aggregation_monthly": "Mensuel",
+  "statistics_trend_aggregation_perDive": "Par plongée",
+  "statistics_trend_aggregation_tooltip": "Grouper les plongées",
+  "statistics_trend_aggregation_weekly": "Hebdomadaire",
+  "statistics_trend_band_semanticLabel": "La bande ombrée couvre la valeur la plus basse et la plus haute de chaque groupe",
+  "statistics_trend_legend_rate": "Taux",
+  "statistics_trend_legend_rollingAverage": "Moyenne glissante",
+  "statistics_trend_rate_perYear": "{value}/an"
 }

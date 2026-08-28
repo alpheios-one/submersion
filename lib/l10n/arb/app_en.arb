@@ -19190,5 +19190,21 @@
   "@settings_dataSources_appleHealth_permissionUnsupported": {"description": "Permission row shown when HealthKit is unavailable on this device."},
   "@settings_units_gasConsumption_sac_subtitle": {"placeholders": {"unit": {"type": "String"}}},
   "@settings_units_gasConsumption_rmv_subtitle": {"placeholders": {"unit": {"type": "String"}}},
-  "@diveLog_detail_sacVolumeHint": {"placeholders": {"unit": {"type": "String"}}}
+  "@diveLog_detail_sacVolumeHint": {"placeholders": {"unit": {"type": "String"}}},
+  "statistics_trend_aggregation_monthly": "Monthly",
+  "statistics_trend_aggregation_perDive": "Per dive",
+  "statistics_trend_aggregation_tooltip": "Group dives",
+  "statistics_trend_aggregation_weekly": "Weekly",
+  "statistics_trend_band_semanticLabel": "Shaded band spans the lowest and highest value in each group",
+  "statistics_trend_legend_rate": "Rate",
+  "statistics_trend_legend_rollingAverage": "Rolling avg",
+  "statistics_trend_rate_perYear": "{value}/yr",
+  "@statistics_trend_rate_perYear": {
+    "description": "Linear trend rate shown beside the rate legend entry. The value already carries its unit symbol, for example '+4.4 m'.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  }
 }

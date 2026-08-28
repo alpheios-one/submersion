@@ -9978,5 +9978,13 @@
   "settings_dataSources_appleHealth_dataTypeDepth": "水下深度 - 潜水过程中记录的深度采样",
   "settings_dataSources_appleHealth_dataTypeWaterTemp": "水温 - 潜水过程中记录的水温采样",
   "settings_dataSources_appleHealth_permissionManagedInHealth": "HealthKit 访问权限在“健康”App 中管理",
-  "settings_dataSources_appleHealth_permissionUnsupported": "此设备不支持 HealthKit"
+  "settings_dataSources_appleHealth_permissionUnsupported": "此设备不支持 HealthKit",
+  "statistics_trend_aggregation_monthly": "按月",
+  "statistics_trend_aggregation_perDive": "每次潜水",
+  "statistics_trend_aggregation_tooltip": "分组潜水",
+  "statistics_trend_aggregation_weekly": "按周",
+  "statistics_trend_band_semanticLabel": "阴影区间涵盖每组的最低值和最高值",
+  "statistics_trend_legend_rate": "变化率",
+  "statistics_trend_legend_rollingAverage": "滑动平均",
+  "statistics_trend_rate_perYear": "{value}/年"
 }

@@ -9978,5 +9978,13 @@
   "settings_dataSources_appleHealth_dataTypeDepth": "Profundidad bajo el agua - muestras de profundidad registradas durante las inmersiones",
   "settings_dataSources_appleHealth_dataTypeWaterTemp": "Temperatura del agua - muestras de temperatura registradas durante las inmersiones",
   "settings_dataSources_appleHealth_permissionManagedInHealth": "El acceso a HealthKit se gestiona en la app Salud",
-  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit no está disponible en este dispositivo"
+  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit no está disponible en este dispositivo",
+  "statistics_trend_aggregation_monthly": "Mensual",
+  "statistics_trend_aggregation_perDive": "Por inmersión",
+  "statistics_trend_aggregation_tooltip": "Agrupar inmersiones",
+  "statistics_trend_aggregation_weekly": "Semanal",
+  "statistics_trend_band_semanticLabel": "La banda sombreada abarca el valor más bajo y más alto de cada grupo",
+  "statistics_trend_legend_rate": "Tasa",
+  "statistics_trend_legend_rollingAverage": "Media móvil",
+  "statistics_trend_rate_perYear": "{value}/año"
 }

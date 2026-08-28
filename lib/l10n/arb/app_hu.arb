@@ -9978,5 +9978,13 @@
   "settings_dataSources_appleHealth_dataTypeDepth": "Vízmélység - a merülések során rögzített mélységadatok",
   "settings_dataSources_appleHealth_dataTypeWaterTemp": "Vízhőmérséklet - a merülések során rögzített hőmérsékleti adatok",
   "settings_dataSources_appleHealth_permissionManagedInHealth": "A HealthKit hozzáférést a Health alkalmazásban kezelheted",
-  "settings_dataSources_appleHealth_permissionUnsupported": "A HealthKit nem érhető el ezen az eszközön"
+  "settings_dataSources_appleHealth_permissionUnsupported": "A HealthKit nem érhető el ezen az eszközön",
+  "statistics_trend_aggregation_monthly": "Havi",
+  "statistics_trend_aggregation_perDive": "Merülésenként",
+  "statistics_trend_aggregation_tooltip": "Merülések csoportosítása",
+  "statistics_trend_aggregation_weekly": "Heti",
+  "statistics_trend_band_semanticLabel": "Az árnyékolt sáv az egyes csoportok legalacsonyabb és legmagasabb értékét fogja át",
+  "statistics_trend_legend_rate": "Ütem",
+  "statistics_trend_legend_rollingAverage": "Mozgóátlag",
+  "statistics_trend_rate_perYear": "{value}/év"
 }

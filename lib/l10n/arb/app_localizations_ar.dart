@@ -33726,4 +33726,31 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'HealthKit غير متوفر على هذا الجهاز';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'شهري';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'لكل غطسة';
+
+  @override
+  String get statistics_trend_aggregation_tooltip => 'تجميع الغطسات';
+
+  @override
+  String get statistics_trend_aggregation_weekly => 'أسبوعي';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'يمتد النطاق المظلل بين أدنى وأعلى قيمة في كل مجموعة';
+
+  @override
+  String get statistics_trend_legend_rate => 'المعدل';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => 'المتوسط المتحرك';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/سنة';
+  }
 }

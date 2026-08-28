@@ -33825,4 +33825,32 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'HealthKit is niet beschikbaar op dit apparaat';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'Maandelijks';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'Per duik';
+
+  @override
+  String get statistics_trend_aggregation_tooltip => 'Duiken groeperen';
+
+  @override
+  String get statistics_trend_aggregation_weekly => 'Wekelijks';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'De gearceerde band omvat de laagste en hoogste waarde van elke groep';
+
+  @override
+  String get statistics_trend_legend_rate => 'Tempo';
+
+  @override
+  String get statistics_trend_legend_rollingAverage =>
+      'Voortschrijdend gemiddelde';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/jr';
+  }
 }

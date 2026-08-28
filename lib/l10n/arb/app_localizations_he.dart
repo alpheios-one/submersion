@@ -33377,4 +33377,31 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'HealthKit אינו זמין במכשיר הזה';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'חודשי';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'לפי צלילה';
+
+  @override
+  String get statistics_trend_aggregation_tooltip => 'קיבוץ צלילות';
+
+  @override
+  String get statistics_trend_aggregation_weekly => 'שבועי';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'הרצועה המוצללת משתרעת בין הערך הנמוך לגבוה ביותר בכל קבוצה';
+
+  @override
+  String get statistics_trend_legend_rate => 'קצב';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => 'ממוצע נע';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/שנה';
+  }
 }

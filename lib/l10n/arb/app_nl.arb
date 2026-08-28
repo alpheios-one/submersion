@@ -9978,5 +9978,13 @@
   "settings_dataSources_appleHealth_dataTypeDepth": "Waterdiepte - dieptemetingen die tijdens duiken zijn vastgelegd",
   "settings_dataSources_appleHealth_dataTypeWaterTemp": "Watertemperatuur - temperatuurmetingen die tijdens duiken zijn vastgelegd",
   "settings_dataSources_appleHealth_permissionManagedInHealth": "HealthKit-toegang beheer je in de app Gezondheid",
-  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit is niet beschikbaar op dit apparaat"
+  "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit is niet beschikbaar op dit apparaat",
+  "statistics_trend_aggregation_monthly": "Maandelijks",
+  "statistics_trend_aggregation_perDive": "Per duik",
+  "statistics_trend_aggregation_tooltip": "Duiken groeperen",
+  "statistics_trend_aggregation_weekly": "Wekelijks",
+  "statistics_trend_band_semanticLabel": "De gearceerde band omvat de laagste en hoogste waarde van elke groep",
+  "statistics_trend_legend_rate": "Tempo",
+  "statistics_trend_legend_rollingAverage": "Voortschrijdend gemiddelde",
+  "statistics_trend_rate_perYear": "{value}/jr"
 }

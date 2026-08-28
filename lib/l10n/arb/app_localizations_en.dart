@@ -33530,4 +33530,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'HealthKit is not available on this device';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'Monthly';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'Per dive';
+
+  @override
+  String get statistics_trend_aggregation_tooltip => 'Group dives';
+
+  @override
+  String get statistics_trend_aggregation_weekly => 'Weekly';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'Shaded band spans the lowest and highest value in each group';
+
+  @override
+  String get statistics_trend_legend_rate => 'Rate';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => 'Rolling avg';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/yr';
+  }
 }

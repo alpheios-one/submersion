@@ -34057,4 +34057,31 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'HealthKit non è disponibile su questo dispositivo';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'Mensile';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'Per immersione';
+
+  @override
+  String get statistics_trend_aggregation_tooltip => 'Raggruppa immersioni';
+
+  @override
+  String get statistics_trend_aggregation_weekly => 'Settimanale';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'La banda ombreggiata copre il valore minimo e massimo di ogni gruppo';
+
+  @override
+  String get statistics_trend_legend_rate => 'Tasso';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => 'Media mobile';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/anno';
+  }
 }

@@ -32091,4 +32091,30 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       '此设备不支持 HealthKit';
+
+  @override
+  String get statistics_trend_aggregation_monthly => '按月';
+
+  @override
+  String get statistics_trend_aggregation_perDive => '每次潜水';
+
+  @override
+  String get statistics_trend_aggregation_tooltip => '分组潜水';
+
+  @override
+  String get statistics_trend_aggregation_weekly => '按周';
+
+  @override
+  String get statistics_trend_band_semanticLabel => '阴影区间涵盖每组的最低值和最高值';
+
+  @override
+  String get statistics_trend_legend_rate => '变化率';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => '滑动平均';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/年';
+  }
 }

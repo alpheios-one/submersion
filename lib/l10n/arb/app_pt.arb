@@ -9978,5 +9978,13 @@
   "settings_dataSources_appleHealth_dataTypeDepth": "Profundidade subaquática - amostras de profundidade registadas durante os mergulhos",
   "settings_dataSources_appleHealth_dataTypeWaterTemp": "Temperatura da água - amostras de temperatura registadas durante os mergulhos",
   "settings_dataSources_appleHealth_permissionManagedInHealth": "O acesso ao HealthKit é gerido na app Saúde",
-  "settings_dataSources_appleHealth_permissionUnsupported": "O HealthKit não está disponível neste dispositivo"
+  "settings_dataSources_appleHealth_permissionUnsupported": "O HealthKit não está disponível neste dispositivo",
+  "statistics_trend_aggregation_monthly": "Mensal",
+  "statistics_trend_aggregation_perDive": "Por mergulho",
+  "statistics_trend_aggregation_tooltip": "Agrupar mergulhos",
+  "statistics_trend_aggregation_weekly": "Semanal",
+  "statistics_trend_band_semanticLabel": "A faixa sombreada abrange o valor mais baixo e mais alto de cada grupo",
+  "statistics_trend_legend_rate": "Taxa",
+  "statistics_trend_legend_rollingAverage": "Média móvel",
+  "statistics_trend_rate_perYear": "{value}/ano"
 }
