@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/statistics/data/repositories/statistics_repository.dart';
 
 import '../../../../helpers/test_database.dart';
@@ -163,6 +164,79 @@ void main() {
       final records = await repository.getSacVolumeRecords();
       expect(records.best?.id, isNot('excluded'));
       expect(records.worst?.id, isNot('excluded'));
+    });
+  });
+
+  group('DiveRepository aggregates', () {
+    late DiveRepository diveRepo;
+
+    setUp(() {
+      diveRepo = DiveRepository();
+    });
+
+    test('getStatistics counts only dives in scope', () async {
+      final stats = await diveRepo.getStatistics();
+      expect(stats.totalDives, nonGasInScope);
+    });
+
+    test('getRecords never surfaces an excluded dive', () async {
+      // Make the excluded dive the deepest and the planned dive the longest,
+      // so a leak is unmissable rather than a tie broken the lucky way.
+      await db.customStatement(
+        "UPDATE dives SET max_depth = 99.0 WHERE id = 'excluded'",
+      );
+      await db.customStatement(
+        "UPDATE dives SET bottom_time = 99999 WHERE id = 'planned'",
+      );
+
+      final records = await diveRepo.getRecords();
+      expect(records.deepestDive?.diveId, isNot('excluded'));
+      expect(records.longestDive?.diveId, isNot('planned'));
+      expect(records.deepestDive?.diveId, isNotNull);
+    });
+
+    test('getPersonalRecordIds never surfaces an excluded dive', () async {
+      await db.customStatement(
+        "UPDATE dives SET max_depth = 99.0 WHERE id = 'excluded'",
+      );
+      final ids = await diveRepo.getPersonalRecordIds();
+      final winners = [
+        ids.deepestId,
+        ids.longestId,
+        ids.coldestId,
+        ids.warmestId,
+      ];
+      expect(winners, isNot(contains('excluded')));
+      expect(winners, isNot(contains('planned')));
+    });
+
+    test('countDivesSince counts only dives in scope', () async {
+      final count = await diveRepo.countDivesSince(DateTime.utc(2020));
+      expect(count, nonGasInScope);
+    });
+
+    test('getOnThisDayDiveIds skips excluded dives', () async {
+      final ids = await diveRepo.getOnThisDayDiveIds(
+        month: 1,
+        day: 1,
+        excludeYear: 2030,
+      );
+      expect(ids, isNot(contains('excluded')));
+      expect(ids, isNot(contains('planned')));
+      expect(ids, contains('included'));
+    });
+
+    test('getDiveCount deliberately still counts excluded dives', () async {
+      final count = await diveRepo.getDiveCount();
+      expect(
+        count,
+        5,
+        reason:
+            'the logbook list header counts what is in the logbook, and '
+            'an excluded dive is still in the logbook. If this ever starts '
+            'returning 3, someone applied DiveStatsScope where the design '
+            'deliberately does not.',
+      );
     });
   });
 }

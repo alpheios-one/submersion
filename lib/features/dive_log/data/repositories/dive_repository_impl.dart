@@ -6,6 +6,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/performance/perf_timer.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
@@ -2232,6 +2233,12 @@ class DiveRepository {
   /// Get total count of dives matching the given filters.
   ///
   /// Used to display "X dives" in the UI header without loading all data.
+  ///
+  /// Deliberately does NOT apply [DiveStatsScope]: an excluded dive is still
+  /// in the logbook and the list still shows it, so the header still counts
+  /// it. Only descriptive *statistics* honour the exclusion. Do not "fix"
+  /// this; see the design doc and the census test's exemption list.
+  // stats-scope-exempt: logbook list header, not a statistic
   Future<int> getDiveCount({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -2892,12 +2899,20 @@ class DiveRepository {
       final df = buildFilteredDiveIdSubquery(filter);
       // params are always non-null so `p!` is safe.
       final filterVars = df.params.map((p) => Variable<Object>(p!)).toList();
-      // Clause fragments per table alias used below.
-      final fBare = df.subquery.isEmpty ? '' : 'AND id IN (${df.subquery})';
-      final fAliasD = df.subquery.isEmpty ? '' : 'AND d.id IN (${df.subquery})';
+      // Clause fragments per table alias used below. The statistics scope is
+      // unconditional; the diver's view filter is appended only when active.
+      final scopeBare = DiveStatsScope.and(alias: 'dives');
+      final scopeAliasD = DiveStatsScope.and(alias: 'd');
+      final fBare = df.subquery.isEmpty
+          ? scopeBare
+          : '$scopeBare AND id IN (${df.subquery})';
+      final fAliasD = df.subquery.isEmpty
+          ? scopeAliasD
+          : '$scopeAliasD AND d.id IN (${df.subquery})';
       // WHERE-prefix helpers so an empty base WHERE still starts correctly.
+      // Always emits a WHERE now, because the scope is never empty.
       final basicWhere = whereClause.isEmpty
-          ? (df.subquery.isEmpty ? '' : 'WHERE id IN (${df.subquery})')
+          ? 'WHERE 1=1 $fBare'
           : '$whereClause $fBare';
       vars.addAll(filterVars);
 
@@ -2990,7 +3005,7 @@ class DiveRepository {
       // Top sites
       final siteWhereClause = diverId != null
           ? 'WHERE d.diver_id = ? $fAliasD'
-          : (df.subquery.isEmpty ? '' : 'WHERE 1=1 $fAliasD');
+          : 'WHERE 1=1 $fAliasD';
       final siteStats = await _db.customSelect('''
       SELECT
         s.id as site_id,
@@ -3061,18 +3076,22 @@ class DiveRepository {
       // Every statement below binds the same `vars` list, so the diver `?` must
       // always precede the filter `?`s -- hence the fixed clause order.
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
+      // The statistics scope is unconditional: an excluded dive must never
+      // surface as a personal record. The view filter is appended only when
+      // the diver has active axes.
       final filterClause = df.subquery.isEmpty
-          ? ''
-          : 'AND d.id IN (${df.subquery})';
+          ? DiveStatsScope.and(alias: 'd')
+          : '${DiveStatsScope.and(alias: 'd')} '
+                'AND d.id IN (${df.subquery})';
       // The first/last statements have no WHERE of their own, so their scope
-      // clauses have to open one.
+      // clauses have to open one. The scope predicate binds no placeholders,
+      // so listing it first cannot disturb the fixed `?` order.
       final scopeConditions = [
+        DiveStatsScope.predicate(alias: 'd'),
         if (diverId != null) 'd.diver_id = ?',
         if (df.subquery.isNotEmpty) 'd.id IN (${df.subquery})',
       ];
-      final diverFilterFirst = scopeConditions.isEmpty
-          ? ''
-          : 'WHERE ${scopeConditions.join(' AND ')}';
+      final diverFilterFirst = 'WHERE ${scopeConditions.join(' AND ')}';
 
       // Deepest dive
       final deepestResult = await _db.customSelect('''
@@ -3201,7 +3220,8 @@ class DiveRepository {
     final row = await _db
         .customSelect(
           'SELECT COUNT(*) AS c FROM dives '
-          'WHERE dive_date_time > ? $diverFilter',
+          'WHERE dive_date_time > ? $diverFilter'
+          '${DiveStatsScope.and(alias: 'dives')}',
           variables: [
             Variable<int>(since.millisecondsSinceEpoch),
             if (diverId != null) Variable<String>(diverId),
@@ -3231,6 +3251,7 @@ class DiveRepository {
           "AND CAST(strftime('%Y', dive_date_time / 1000, 'unixepoch') "
           "AS INTEGER) != ? "
           "$diverFilter"
+          "${DiveStatsScope.and(alias: 'dives')} "
           "ORDER BY dive_date_time DESC LIMIT ?",
           variables: [
             Variable<String>(monthDay),
@@ -3287,7 +3308,12 @@ class DiveRepository {
     final vars = diverId != null
         ? [Variable<String>(diverId)]
         : <Variable<Object>>[];
-    final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
+    // The statistics scope rides along with the diver filter, which every
+    // statement below already interpolates: an excluded or planned dive must
+    // never win a personal record.
+    final diverFilter = diverId != null
+        ? 'AND d.diver_id = ?${DiveStatsScope.and(alias: 'd')}'
+        : DiveStatsScope.and(alias: 'd');
 
     Future<String?> winner(String where, String orderBy) async {
       final row = await _db
