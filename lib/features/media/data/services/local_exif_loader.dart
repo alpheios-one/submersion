@@ -28,10 +28,18 @@ img.ExifData? readLocalExif(File file, String mime) {
 }
 
 // Upper bounds on HEIC reads. Real `meta` boxes and `Exif` items are tens of
-// KB (the meta box carries no pixel data); these caps only exist to reject a
-// corrupt/crafted length before it triggers a large allocation.
-const _maxMetaBytes = 64 * 1024 * 1024;
-const _maxExifItemBytes = 64 * 1024 * 1024;
+// KB (the meta box carries no pixel data), so these leave ~100x headroom for
+// multi-image HEICs and cameras with fat MakerNotes while keeping the worst
+// case small.
+//
+// Neither cap is the primary guard: findBox refuses any box whose declared
+// size runs past EOF, and the extent check below rejects offset + length
+// past EOF, so a small crafted file cannot ask for a large read in the first
+// place. What the caps bound is the honest-but-hostile case -- a genuinely
+// large file whose meta box or Exif extent is correspondingly large -- which
+// matters because a folder import runs this over every picked file.
+const _maxMetaBytes = 8 * 1024 * 1024;
+const _maxExifItemBytes = 4 * 1024 * 1024;
 
 /// Reads EXIF from a HEIC/HEIF file. HEIC is ISO-BMFF: the EXIF lives in a
 /// metadata item declared by the `meta > iinf` box (type `Exif`) and located
