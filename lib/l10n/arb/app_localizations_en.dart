@@ -4826,6 +4826,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_detail_section_marineLife => 'Marine Life';
 
   @override
+  String diveLog_detail_sightingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos',
+      one: '1 photo',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_section_notes => 'Notes';
 
   @override
@@ -13650,6 +13661,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_library_filter_site => 'Site';
+
+  @override
+  String get media_library_filter_species => 'Species';
 
   @override
   String get media_library_filter_trip => 'Trip';

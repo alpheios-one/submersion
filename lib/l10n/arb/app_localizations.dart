@@ -8183,6 +8183,12 @@ abstract class AppLocalizations {
   /// **'Marine Life'**
   String get diveLog_detail_section_marineLife;
 
+  /// No description provided for @diveLog_detail_sightingPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 photo} other{{count} photos}}'**
+  String diveLog_detail_sightingPhotos(int count);
+
   /// No description provided for @diveLog_detail_section_notes.
   ///
   /// In en, this message translates to:
@@ -23113,6 +23119,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Site'**
   String get media_library_filter_site;
+
+  /// No description provided for @media_library_filter_species.
+  ///
+  /// In en, this message translates to:
+  /// **'Species'**
+  String get media_library_filter_species;
 
   /// Library filter chip: pick a trip
   ///
