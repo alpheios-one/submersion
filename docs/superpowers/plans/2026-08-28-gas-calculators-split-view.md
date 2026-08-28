@@ -1,0 +1,146 @@
+# Gas Calculators Split View Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Replace the six-tab `TabBar` inside Gas Calculators with a nested master-detail layout: the six calculators become a list on the left, the selected one fills the pane on the right, and the whole thing is a full-window page pushed from Planning rather than a tool loaded into Planning's detail pane.
+
+**Architecture:** `GasCalculatorsPage` becomes a second consumer of the existing `MasterDetailScaffold`, structured exactly like `PlanningPage`: split view at >=1100px, bare list below that. The six calculator widgets and every provider in `gas_calculators_providers.dart` are untouched, because calculator state already lives in top-level `StateProvider`s rather than in the tab widgets. `PlanningTool` and `PlanningTile` are reused rather than copied, so the two lists are identical by construction; `PlanningTool` gains a `routePrefix` and a `fullPage` flag, which also generalizes the hardcoded dive-planner exception that exists today.
+
+**Tech Stack:** Flutter, Riverpod (`StateProvider` via `package:submersion/core/providers/provider.dart`), go_router (nested `GoRoute` children), `flutter gen-l10n` (11 arb files), `flutter_test` widget tests with `testApp`/`ProviderScope` overrides.
+
+**Spec:** `docs/superpowers/specs/2026-08-28-gas-calculators-split-view-design.md`
+
+## Global Constraints
+
+- Work only in the worktree. Every shell command starts with `cd /Users/ericgriffin/repos/submersion-app/submersion/.claude/worktrees/gas-calculators-split-view` and every file path below is relative to that root. Read/Edit/Write tools need the absolute worktree path; the main checkout must not be touched.
+- Never write an em-dash (U+2014) anywhere: code, comments, docs, arb values, commit messages. Use commas, colons, or two sentences.
+- No emojis in code, comments, or documentation. No `Co-Authored-By` trailer and no session URL in commit messages.
+- TDD: write the failing test, run it and see it fail, implement, run it and see it pass, commit.
+- Files stay at or below 800 lines; 200 to 400 is the target. Every new file below is well under that.
+- New user-facing strings get a key in all 11 arb files (`ar, de, en, es, fr, he, hu, it, nl, pt, zh`), then `flutter gen-l10n`. Check with `grep -c '"<key>"' lib/l10n/arb/app_en.arb` that a key does not already exist before adding it.
+- Riverpod imports come from `package:submersion/core/providers/provider.dart`, not `flutter_riverpod` directly.
+- Run `dart format .` from the worktree root before every commit. Run `flutter test <file>` directly, never piped into `grep`/`tail` (the pipe returns grep's exit code, not the suite's).
+- Anything displaying a depth or a volume goes through `UnitFormatter`. This plan adds no numeric display of its own; the calculators keep their existing formatting.
+- Widget tests that need the split-view branch must set a surface size at or above 1100px wide before pumping, and reset it in a tear-down.
+
+---
+
+## File Structure
+
+New files (one responsibility each):
+
+| File | Responsibility |
+| --- | --- |
+| `lib/features/gas_calculators/presentation/gas_calculator_tools.dart` | `gasCalculatorToolsOf(context)`: the six entries in display order |
+| `lib/features/gas_calculators/presentation/widgets/gas_calculators_list_content.dart` | The master list: header, tiles, disclaimer |
+| `lib/features/gas_calculators/presentation/widgets/gas_calculators_summary_widget.dart` | The empty right pane |
+| `lib/features/gas_calculators/presentation/pages/gas_calculator_detail_page.dart` | Id to calculator widget, with pane or full-page chrome |
+| `test/features/gas_calculators/gas_calculators_page_test.dart` | Layout and routing tests for the new page |
+
+Modified: `gas_calculators_page.dart`, `planning_tools.dart`, `planning_list_content.dart`, `planning_tool_pane.dart`, `planning_page.dart`, `app_router.dart`, the 11 arb files, `planning_tool_embedding_test.dart`, `planning_page_test.dart`.
+
+Deleted: nothing.
+
+---
+
+## Task 1: Localization keys
+
+- [ ] Confirm none of the seven keys exist yet: `grep -c '"gasCalculators_desc_mod"' lib/l10n/arb/app_en.arb` and the same for `_bestMix`, `_consumption`, `_rockBottom`, `_mnd`, `_blender`, and `gasCalculators_summary_prompt`.
+- [ ] Add all seven to `lib/l10n/arb/app_en.arb` with a `@key` description entry each, then translate into the other ten arb files. English values:
+  - `gasCalculators_desc_mod`: "Deepest safe depth for a gas mix"
+  - `gasCalculators_desc_bestMix`: "Richest mix for a target depth"
+  - `gasCalculators_desc_consumption`: "Gas a planned dive will use"
+  - `gasCalculators_desc_rockBottom`: "Reserve to bring two divers up"
+  - `gasCalculators_desc_mnd`: "Narcosis depth for a mix"
+  - `gasCalculators_desc_blender`: "Partial-pressure fill procedure"
+  - `gasCalculators_summary_prompt`: "Select a calculator to get started"
+- [ ] Run `flutter gen-l10n`.
+- [ ] Run `flutter test test/l10n/` (the arb parity suite) and see it pass.
+- [ ] Commit.
+
+Note: the six titles reuse the existing `gasCalculators_tab_*` values. Do not add new title keys.
+
+## Task 2: `PlanningTool` gains `routePrefix` and `fullPage`
+
+- [ ] Write a test in `test/features/planning/planning_page_test.dart` asserting that a `PlanningTool` with `routePrefix: '/planning/gas-calculators'` and id `mod` produces the route `/planning/gas-calculators/mod`, and that one with `fullPage: true` is rendered by `PlanningTile` with a push rather than a selection callback. Run it and see it fail.
+- [ ] Add both fields to `PlanningTool` in `lib/features/planning/presentation/planning_tools.dart`, defaulting to `'/planning'` and `false`. Update the `route` getter to use `routePrefix`.
+- [ ] In `planning_list_content.dart`, have `PlanningTile` treat `tool.fullPage` as "push, do not select" by ignoring `onToolSelected` when it is set. Document that this generalizes the `kDivePlannerToolId` exception.
+- [ ] Set `fullPage: true` on the `gas-calculators` entry in `planningToolsOf`.
+- [ ] Run the test and see it pass. Run `flutter test test/features/planning/` and see it pass.
+- [ ] Commit.
+
+## Task 3: `PlanningToolPane` gains a `leading` slot
+
+- [ ] Write a test in `test/features/planning/planning_tool_embedding_test.dart` asserting that a `PlanningToolPane` given a `leading` widget renders it before the title, and that omitting it changes nothing about the existing layout. Run it and see it fail.
+- [ ] Add the optional `leading` parameter to `PlanningToolPane`, rendered ahead of the title and replacing the current fixed `SizedBox(width: 8)` when present. Keep the title the row's only flexible child, per the existing comment.
+- [ ] Run the test and see it pass.
+- [ ] Commit.
+
+## Task 4: The six calculator entries
+
+- [ ] Write `lib/features/gas_calculators/presentation/gas_calculator_tools.dart` with `gasCalculatorToolsOf(BuildContext)` returning six `PlanningTool`s in this order and with these ids, icons, and title keys:
+
+  | id | icon | title key | subtitle key |
+  | --- | --- | --- | --- |
+  | `mod` | `Icons.arrow_downward` | `gasCalculators_tab_mod` | `gasCalculators_desc_mod` |
+  | `best-mix` | `Icons.science` | `gasCalculators_tab_bestMix` | `gasCalculators_desc_bestMix` |
+  | `consumption` | `Icons.local_gas_station` | `gasCalculators_tab_consumption` | `gasCalculators_desc_consumption` |
+  | `rock-bottom` | `Icons.warning_amber` | `gasCalculators_tab_rockBottom` | `gasCalculators_desc_rockBottom` |
+  | `mnd` | `Icons.psychology` | `gasCalculators_tab_mnd` | `gasCalculators_desc_mnd` |
+  | `blender` | `Icons.gas_meter` | `gasCalculators_tab_blender` | `gasCalculators_desc_blender` |
+
+  Every entry sets `routePrefix: '/planning/gas-calculators'`. Icons are the current tab icons, so the calculators keep the glyphs users already associate with them. Colors come from the active `ColorScheme`, following `planningToolsOf`.
+- [ ] Add a `kGasCalculatorIds` constant (the six ids in order) so the router, the detail page, and the tests share one source of truth.
+- [ ] Commit.
+
+## Task 5: The detail page
+
+- [ ] Write a test asserting that `GasCalculatorDetailPage` renders the right calculator widget for each of the six ids, wraps it in `PlanningToolPane` when embedded and in a `Scaffold` with an `AppBar` when not, and falls back to the summary for an unknown id (ids arrive from the URL, so a stale link must land somewhere useful, matching `PlanningPage._buildTool`). Run it and see it fail.
+- [ ] Write `lib/features/gas_calculators/presentation/pages/gas_calculator_detail_page.dart` with an `embedded` flag, mirroring the chrome contract the other planning tools follow.
+- [ ] Run the test and see it pass.
+- [ ] Commit.
+
+## Task 6: The list and summary
+
+- [ ] Write a test asserting `GasCalculatorsListContent` renders six tiles in the documented order, shows the safety disclaimer, renders its own `AppBar` when `showAppBar` is true, and renders a `PlanningToolPane` header with a back button and the reset action when it is false. Run it and see it fail.
+- [ ] Write `gas_calculators_list_content.dart` and `gas_calculators_summary_widget.dart`. The summary shows the page title, `gasCalculators_summary_prompt`, and the safety disclaimer; it deliberately carries no calculator shortcuts, since the list sits permanently to its left (the reasoning `PlanningSummaryWidget` records).
+- [ ] The reset action calls the existing `resetGasCalculators(ref)` and lives only in the master header, never in the detail pane, because it resets all six.
+- [ ] Run the test and see it pass.
+- [ ] Commit.
+
+## Task 7: Rewrite `GasCalculatorsPage`
+
+- [ ] Write `test/features/gas_calculators/gas_calculators_page_test.dart`: below 1100px the page shows the six rows and no `TabBar`; at 1400px it shows the list and the summary side by side; selecting a row shows that calculator and still no `TabBar` anywhere in the tree. Run it and see it fail.
+- [ ] Rewrite `gas_calculators_page.dart` as a `MasterDetailScaffold` consumer with `sectionId: 'gas-calculators'`, `queryParamKey: 'calc'`, and `mobileDetailRoute: (id) => '/planning/gas-calculators/$id'`, falling back to bare `GasCalculatorsListContent` below the breakpoint. Delete the `TabController`, the `TabBar`, the `TabBarView`, and the `embedded` field.
+- [ ] Run the test and see it pass.
+- [ ] Commit.
+
+## Task 8: Routing and the Planning hand-off
+
+- [ ] Update `test/features/planning/planning_tool_embedding_test.dart`: remove Gas Calculators from the embedded-tools table (it no longer has an embedded form) and assert instead that its Planning tile pushes. Run it and see it fail on the current code.
+- [ ] In `app_router.dart`, add six child `GoRoute`s under `gas-calculators`, each building `GasCalculatorDetailPage(toolId: <id>)`.
+- [ ] In `planning_page.dart`, delete the `gas-calculators` case from `_buildTool` and its now-unused import.
+- [ ] Run the updated tests and see them pass.
+- [ ] Commit.
+
+## Task 9: Blender width check
+
+- [ ] Pump `GasCalculatorDetailPage(toolId: 'blender', embedded: true)` at 400px wide, the detail pane's reserved minimum (`_kDetailPaneReservedWidth`), and assert no overflow.
+- [ ] If it overflows, fix it in the blender's own layout and note the fix in the PR body. If it does not, say so explicitly rather than silently dropping the check.
+- [ ] Commit.
+
+## Task 10: Verification
+
+- [ ] `dart format .` from the worktree root.
+- [ ] `flutter analyze` over the whole project, treating infos as failures (CI does).
+- [ ] One full `flutter test` run. Cross-check any failure against `INDEX_FLAKY_TESTS.md` before treating it as real, and rerun a suspected flake as a lone file.
+- [ ] Launch the macOS app and confirm by hand: Planning to Gas Calculators pushes; the six rows are there; selecting one fills the pane with no tab strip; back returns to Planning; the window narrowed below 1100px shows the list alone and a row pushes one calculator.
+- [ ] Open the PR. No attribution line, no session URL.
+
+---
+
+## Notes for the implementer
+
+- Do not touch the six calculator widgets or `gas_calculators_providers.dart`. If a task seems to need a change there, stop: it means an assumption in the spec (F4) is wrong, and that is worth reporting rather than working around.
+- `MasterDetailScaffold` selects with `router.go`, not `push`. That is correct here: `go` rebuilds the stack as `[/planning, /planning/gas-calculators]`, so the back gesture still returns to Planning.
+- The schema version ladder is not involved. This change touches no database code and must not bump `schemaVersion`.
