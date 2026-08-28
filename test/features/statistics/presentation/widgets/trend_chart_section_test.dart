@@ -72,7 +72,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(
-      find.byKey(ValueKey('trend-aggregation-${TrendChartIds.depth}')),
+      find.byKey(const ValueKey('trend-aggregation-${TrendChartIds.depth}')),
     );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Monthly').last);
@@ -89,7 +89,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(
-      find.byKey(ValueKey('trend-legend-rate-${TrendChartIds.depth}')),
+      find.byKey(const ValueKey('trend-legend-rate-${TrendChartIds.depth}')),
     );
     await tester.pumpAndSettle();
 
@@ -102,7 +102,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(
-      find.byKey(ValueKey('trend-legend-rate-${TrendChartIds.depth}')),
+      find.byKey(const ValueKey('trend-legend-rate-${TrendChartIds.depth}')),
     );
     await tester.pumpAndSettle();
 
@@ -110,7 +110,9 @@ void main() {
   });
 
   testWidgets('shows the error message on failure', (tester) async {
-    await tester.pumpWidget(host(AsyncValue.error('boom', StackTrace.empty)));
+    await tester.pumpWidget(
+      host(const AsyncValue.error('boom', StackTrace.empty)),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Failed to load depth progression'), findsOneWidget);

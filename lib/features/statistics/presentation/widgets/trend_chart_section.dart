@@ -4,7 +4,6 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/statistics/domain/trend_aggregation.dart';
 import 'package:submersion/features/statistics/presentation/providers/trend_chart_settings_provider.dart';
 import 'package:submersion/features/statistics/presentation/widgets/dive_trend_chart.dart';
-import 'package:submersion/features/statistics/presentation/widgets/stat_charts.dart';
 import 'package:submersion/features/statistics/presentation/widgets/stat_section_card.dart';
 import 'package:submersion/features/statistics/presentation/widgets/trend_control_strip.dart';
 
