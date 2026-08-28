@@ -5,9 +5,11 @@ import 'package:submersion/core/constants/dive_field.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/dive_type_label_resolver.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_mode_badge.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge_row.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/selection_leading.dart';
@@ -58,6 +60,15 @@ class CompactDiveListTile extends ConsumerWidget {
   /// capitalization, matching the locale-independent export path.
   final DiveTypeLabelResolver? diveTypeLabelResolver;
 
+  /// Resolves a dive-type slug to its short-form abbreviation, for the badge
+  /// row on the stat line (mirrors the dive detail header's type badges).
+  /// When omitted, badges fall back to the slug's capitalization.
+  final DiveTypeLabelResolver? diveTypeShortLabelResolver;
+
+  /// Whether a dive-type slug's badge should appear in the badge row
+  /// (issue #1269 follow-up). When omitted, every type is shown.
+  final DiveTypeListVisibilityPredicate? diveTypeListVisibilityPredicate;
+
   const CompactDiveListTile({
     super.key,
     required this.diveId,
@@ -82,6 +93,8 @@ class CompactDiveListTile extends ConsumerWidget {
     this.stat1Field = DiveField.maxDepth,
     this.stat2Field = DiveField.bottomTime,
     this.diveTypeLabelResolver,
+    this.diveTypeShortLabelResolver,
+    this.diveTypeListVisibilityPredicate,
   });
 
   Color? _getAttributeBackgroundColor() {
@@ -245,6 +258,12 @@ class CompactDiveListTile extends ConsumerWidget {
               ? duration != null
               : maxDepth != null);
 
+    final diveTypeLabels = [
+      for (final id in summary?.diveTypeIds ?? const <String>[])
+        if (diveTypeListVisibilityPredicate?.call(id) ?? true)
+          (diveTypeShortLabelResolver ?? Dive.diveTypeDisplayName)(id),
+    ];
+
     // The highlight is the fill above, not an edge stripe -- the key marks the
     // row for tests without decorating it.
     return Container(
@@ -366,6 +385,16 @@ class CompactDiveListTile extends ConsumerWidget {
                             stat2HasValue ? accentColor : secondaryTextColor,
                           ),
                         ),
+                        if (diveTypeLabels.isNotEmpty)
+                          Expanded(
+                            child: Align(
+                              alignment: AlignmentDirectional.centerEnd,
+                              child: DiveTypeBadgeRow(
+                                labels: diveTypeLabels,
+                                dense: true,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),

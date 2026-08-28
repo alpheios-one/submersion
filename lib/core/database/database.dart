@@ -2130,6 +2130,23 @@ class DiveTypes extends Table {
   /// (nullable: rows written before HLC rollout fall back to updatedAt).
   TextColumn get hlc => text().nullable()();
 
+  /// Abbreviated display form for a custom type (v173). Built-in types never
+  /// set this -- they use the fixed translated abbreviation in
+  /// builtInDiveTypeShortName instead. Null means the diver hasn't set one.
+  TextColumn get shortName => text().nullable()();
+
+  /// Whether this type's badge appears in the dive detail header's type-badge
+  /// row (v174). Defaults to shown, so existing dives keep their current
+  /// badges after the upgrade.
+  BoolColumn get showInDetailHeader =>
+      boolean().withDefault(const Constant(true))();
+
+  /// Whether this type's badge appears in the dive list card's type-badge
+  /// row (v174). Independent of [showInDetailHeader] -- a diver may want a
+  /// type visible in the detail header but not cluttering every list row.
+  BoolColumn get showInListView =>
+      boolean().withDefault(const Constant(true))();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -3253,7 +3270,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 171;
+  static const int currentSchemaVersion = 174;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3592,6 +3609,17 @@ class AppDatabase extends _$AppDatabase {
     // PR #1320 to 175. This ladder is non-contiguous by design; the audit
     // asserts monotonic, unique, and scalar == max, never contiguous.
     171,
+    // v173: dive_types.short_name, an optional diver-set abbreviation for
+    // custom dive types (mirrors the fixed built-in abbreviations). Issue
+    // #1269 (this PR). Renumbered up from 167, then 171, as main kept
+    // landing past this branch's claim while it was open; main's own v171
+    // comment above already reserves 173 for this PR, so that's the number
+    // landed here directly.
+    173,
+    // v174: dive_types.show_in_detail_header and dive_types.show_in_list_view,
+    // per-type toggles for which badge rows a diver's types appear in.
+    // Issue #1269 follow-up.
+    174,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -5387,6 +5415,47 @@ class AppDatabase extends _$AppDatabase {
       'ALTER TABLE dive_profiles ADD COLUMN source_id TEXT '
       'REFERENCES dive_data_sources(id) ON DELETE SET NULL',
     );
+  }
+
+  /// Idempotent DDL for the v173 dive_types.short_name column: an optional
+  /// abbreviation a diver can set on a custom dive type (built-ins use the
+  /// fixed translated abbreviation in builtInDiveTypeShortName instead).
+  /// Called from the v173 onUpgrade step and the beforeOpen backstop,
+  /// matching the _assertTripReturnFlightColumn pattern so a schema-version
+  /// collision cannot strand a database without it. Self-guarding when the
+  /// table is absent (minimal migration-test fixtures).
+  Future<void> _assertDiveTypeShortNameColumn() async {
+    final cols = await customSelect("PRAGMA table_info('dive_types')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('short_name')) return;
+    await customStatement('ALTER TABLE dive_types ADD COLUMN short_name TEXT');
+  }
+
+  /// Idempotent DDL for the v174 dive_types.show_in_detail_header and
+  /// dive_types.show_in_list_view columns: per-type toggles for which
+  /// badge rows a diver's types appear in (issue #1269 follow-up). Both
+  /// default to shown (1) so existing dives keep their current badges.
+  /// Called from the v174 onUpgrade step and the beforeOpen backstop,
+  /// matching the _assertDiveTypeShortNameColumn pattern so a schema-version
+  /// collision cannot strand a database without them. Self-guarding when the
+  /// table is absent (minimal migration-test fixtures).
+  Future<void> _assertDiveTypeVisibilityColumns() async {
+    final cols = await customSelect("PRAGMA table_info('dive_types')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('show_in_detail_header')) {
+      await customStatement(
+        'ALTER TABLE dive_types ADD COLUMN show_in_detail_header '
+        'INTEGER NOT NULL DEFAULT 1 CHECK (show_in_detail_header IN (0, 1))',
+      );
+    }
+    if (!names.contains('show_in_list_view')) {
+      await customStatement(
+        'ALTER TABLE dive_types ADD COLUMN show_in_list_view '
+        'INTEGER NOT NULL DEFAULT 1 CHECK (show_in_list_view IN (0, 1))',
+      );
+    }
   }
 
   /// One-time attribution of existing dive_profiles rows to their owning
@@ -8914,6 +8983,18 @@ class AppDatabase extends _$AppDatabase {
           await _assertTripDayWeatherSchema();
         }
         if (from < 171) await reportProgress();
+        // v173: dive_types.short_name, an optional diver-set abbreviation
+        // for custom dive types.
+        if (from < 173) {
+          await _assertDiveTypeShortNameColumn();
+        }
+        if (from < 173) await reportProgress();
+        // v174: dive_types.show_in_detail_header and
+        // dive_types.show_in_list_view, per-type badge-row visibility.
+        if (from < 174) {
+          await _assertDiveTypeVisibilityColumns();
+        }
+        if (from < 174) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9134,6 +9215,15 @@ class AppDatabase extends _$AppDatabase {
         // EXISTS plus CREATE UNIQUE INDEX IF NOT EXISTS, so it is a no-op on
         // every open after the first.
         await _assertTripDayWeatherSchema();
+
+        // v173 backstop: re-assert dive_types.short_name (same
+        // parallel-branch version-collision self-heal).
+        await _assertDiveTypeShortNameColumn();
+
+        // v174 backstop: re-assert dive_types.show_in_detail_header and
+        // dive_types.show_in_list_view (same parallel-branch
+        // version-collision self-heal).
+        await _assertDiveTypeVisibilityColumns();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
