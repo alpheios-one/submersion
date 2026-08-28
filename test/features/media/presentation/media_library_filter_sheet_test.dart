@@ -3,6 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/marine_life/domain/entities/species.dart';
+import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -23,6 +26,13 @@ void main() {
     updatedAt: DateTime(2026, 1, 1),
   );
 
+  const species = Species(
+    id: 'sp1',
+    commonName: 'Blue Grouper',
+    category: SpeciesCategory.fish,
+    isBuiltIn: false,
+  );
+
   late ProviderContainer container;
 
   setUp(() {
@@ -30,6 +40,7 @@ void main() {
       overrides: [
         sitesProvider.overrideWith((ref) async => [site]),
         allTripsProvider.overrideWith((ref) async => [trip]),
+        allSpeciesProvider.overrideWith((ref) async => [species]),
         missingCountProvider.overrideWith((ref) async => 3),
       ],
     );
@@ -117,6 +128,23 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(container.read(mediaLibraryFilterProvider).siteId, 'site-1');
+  });
+
+  testWidgets('picking a species drafts it and Apply commits the id', (
+    tester,
+  ) async {
+    await openSheet(tester);
+
+    await tester.tap(find.text('Species'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Blue Grouper'));
+    await tester.pumpAndSettle();
+    expect(container.read(mediaLibraryFilterProvider).speciesId, isNull);
+
+    await tester.tap(find.text('Apply'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(mediaLibraryFilterProvider).speciesId, 'sp1');
   });
 
   testWidgets('Apply preserves facets the sheet does not own', (tester) async {
