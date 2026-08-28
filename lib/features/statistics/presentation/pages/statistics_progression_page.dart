@@ -6,6 +6,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
 import 'package:submersion/features/statistics/presentation/providers/trend_chart_settings_provider.dart';
 import 'package:submersion/features/statistics/presentation/widgets/stat_charts.dart';
+import 'package:submersion/features/statistics/presentation/widgets/dive_trend_chart.dart';
 import 'package:submersion/features/statistics/presentation/widgets/stat_section_card.dart';
 import 'package:submersion/features/statistics/presentation/widgets/statistics_filter_bar.dart';
 import 'package:submersion/features/statistics/presentation/widgets/statistics_filter_action.dart';
@@ -208,9 +209,12 @@ class StatisticsProgressionPage extends ConsumerWidget {
       title: context.l10n.statistics_progression_cumulative_title,
       subtitle: context.l10n.statistics_progression_cumulative_subtitle,
       child: cumulativeAsync.when(
-        data: (data) => TrendLineChart(
-          data: data,
-          lineColor: Colors.green,
+        // A date axis, not the index axis: the count now steps once per dive,
+        // so a trip is a run of steps rather than one. No aggregation or fit
+        // controls, because a mean of a running total says nothing.
+        data: (data) => DiveTrendChart(
+          points: data,
+          pointColor: Colors.green,
           valueFormatter: (value) => value.toStringAsFixed(0),
         ),
         loading: () => const SizedBox(

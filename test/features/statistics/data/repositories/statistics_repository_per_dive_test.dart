@@ -219,4 +219,47 @@ void main() {
       expect(points.map((p) => p.value), [10.0, 29.0]);
     });
   });
+
+  group('getCumulativeDiveCount', () {
+    test('steps once per dive rather than once per month', () async {
+      // Month bucketing collapsed a whole trip into a single step, so a
+      // liveaboard week showed as one point.
+      await insertDive(id: 'a', at: DateTime.utc(2024, 5, 10), maxDepth: 18);
+      await insertDive(id: 'b', at: DateTime.utc(2024, 5, 11), maxDepth: 20);
+      await insertDive(id: 'c', at: DateTime.utc(2024, 5, 12), maxDepth: 22);
+
+      final points = await repository.getCumulativeDiveCount();
+
+      expect(points, hasLength(3));
+      expect(points.map((p) => p.value), [1, 2, 3]);
+    });
+
+    test('keeps each dive on its own date', () async {
+      await insertDive(id: 'a', at: DateTime.utc(2024, 5, 10));
+      await insertDive(id: 'b', at: DateTime.utc(2024, 8, 2));
+
+      final points = await repository.getCumulativeDiveCount();
+
+      expect(points[0].date, DateTime.utc(2024, 5, 10));
+      expect(points[1].date, DateTime.utc(2024, 8, 2));
+    });
+
+    test('counts dives with no recorded depth', () async {
+      await insertDive(id: 'a', at: DateTime.utc(2024, 5, 10));
+
+      expect(await repository.getCumulativeDiveCount(), hasLength(1));
+    });
+
+    test('honours a date filter', () async {
+      await insertDive(id: 'a', at: DateTime.utc(2020, 5, 10));
+      await insertDive(id: 'b', at: DateTime.utc(2024, 5, 10));
+
+      final points = await repository.getCumulativeDiveCount(
+        filter: DiveFilterState(startDate: DateTime.utc(2023, 1, 1)),
+      );
+
+      expect(points, hasLength(1));
+      expect(points.single.value, 1);
+    });
+  });
 }

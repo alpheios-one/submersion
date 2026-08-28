@@ -53,7 +53,9 @@ void main() {
   ) async {
     await pumpPage(tester);
 
-    expect(find.byType(DiveTrendChart), findsNWidgets(2));
+    // Three charts: depth, bottom time, and the cumulative count. Only the
+    // first two carry controls; a mean of a running total says nothing.
+    expect(find.byType(DiveTrendChart), findsNWidgets(3));
     expect(find.byType(TrendControlStrip), findsNWidgets(2));
   });
 
@@ -67,6 +69,17 @@ void main() {
     for (final chart in charts) {
       expect(chart.aggregation, TrendAggregation.none);
     }
+  });
+
+  testWidgets('the cumulative count draws no fitted overlays', (tester) async {
+    await pumpPage(tester);
+
+    final cumulative = tester
+        .widgetList<DiveTrendChart>(find.byType(DiveTrendChart))
+        .last;
+
+    expect(cumulative.showRollingMean, isFalse);
+    expect(cumulative.showLinearFit, isFalse);
   });
 
   testWidgets('the two charts hold independent aggregation settings', (

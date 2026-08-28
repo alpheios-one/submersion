@@ -997,7 +997,10 @@ class StatisticsRepository {
     }
   }
 
-  /// Get cumulative dive count over time
+  /// Running dive count, stepping once per dive, ordered by date.
+  ///
+  /// Was bucketed by month in SQL, which collapsed a whole trip into a single
+  /// step and left nothing to zoom into (issue #299).
   Future<List<TrendDataPoint>> getCumulativeDiveCount({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -1008,25 +1011,21 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
-        SELECT
-          strftime('%Y', dive_date_time / 1000, 'unixepoch') AS year,
-          strftime('%m', dive_date_time / 1000, 'unixepoch') AS month,
-          COUNT(*) AS count
+        SELECT dive_date_time
         FROM dives
-        WHERE 1=1 $diverFilter ${df.clause}
-        GROUP BY year, month
-        ORDER BY year, month
+        WHERE 1 = 1 $diverFilter ${df.clause}
+        ORDER BY dive_date_time
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
-      int runningTotal = 0;
+      var runningTotal = 0;
       return results.map((row) {
-        final year = int.parse(row.read<String>('year'));
-        final month = int.parse(row.read<String>('month'));
-        runningTotal += row.read<int>('count');
+        runningTotal++;
         return TrendDataPoint(
-          date: DateTime(year, month),
+          date: DateTime.fromMillisecondsSinceEpoch(
+            row.read<int>('dive_date_time'),
+            isUtc: true,
+          ),
           value: runningTotal.toDouble(),
-          label: '${_monthAbbr(month)} $year',
         );
       }).toList();
     } catch (e, stackTrace) {
@@ -2504,24 +2503,6 @@ class StatisticsRepository {
   // ============================================================================
   // Helpers
   // ============================================================================
-
-  String _monthAbbr(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return months[month - 1];
-  }
 }
 
 /// Aggregates for one calendar year (dashboard year-in-review card).

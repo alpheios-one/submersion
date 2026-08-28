@@ -80,6 +80,7 @@ class DiveTrendChart extends StatelessWidget {
     ]);
 
     final isRaw = aggregation == TrendAggregation.none;
+    final bars = _bars(context, buckets, color, isRaw);
 
     return Semantics(
       label: yAxisLabel != null
@@ -96,7 +97,7 @@ class DiveTrendChart extends StatelessWidget {
             maxX: dateAxis.max,
             minY: yAxis.min,
             maxY: yAxis.max,
-            lineTouchData: _touchData(context),
+            lineTouchData: _touchData(context, bars.first),
             titlesData: _titles(context, dateAxis, yAxis),
             borderData: FlBorderData(show: false),
             gridData: FlGridData(
@@ -108,7 +109,7 @@ class DiveTrendChart extends StatelessWidget {
                 strokeWidth: 1,
               ),
             ),
-            lineBarsData: _bars(context, buckets, color, isRaw),
+            lineBarsData: bars,
             betweenBarsData: _bands(context, isRaw),
           ),
         ),
@@ -228,9 +229,24 @@ class DiveTrendChart extends StatelessWidget {
     ];
   }
 
-  LineTouchData _touchData(BuildContext context) {
+  LineTouchData _touchData(BuildContext context, LineChartBarData dataBar) {
+    final colorScheme = Theme.of(context).colorScheme;
     return LineTouchData(
+      touchSpotThreshold: 20,
+      // Highlight the touched point on the data series only. The band bounds
+      // and the fitted overlays would each contribute their own dot and line,
+      // stacking several markers on one touch.
+      getTouchedSpotIndicator: (barData, spotIndexes) {
+        if (!identical(barData, dataBar)) {
+          return List<TouchedSpotIndicatorData?>.filled(
+            spotIndexes.length,
+            null,
+          );
+        }
+        return defaultTouchedIndicators(barData, spotIndexes);
+      },
       touchTooltipData: LineTouchTooltipData(
+        getTooltipColor: (_) => colorScheme.inverseSurface,
         // A phone-width card clips the tooltip at both edges without these.
         fitInsideHorizontally: true,
         fitInsideVertically: true,
@@ -249,9 +265,13 @@ class DiveTrendChart extends StatelessWidget {
                 valueFormatter?.call(spot.y) ?? spot.y.toStringAsFixed(1);
             return LineTooltipItem(
               '${DateFormat.yMMMd().format(date)}\n$value',
+              // Matches the dive profile chart's readout: monospace with
+              // tabular figures so digits line up between rows.
               TextStyle(
-                color: Theme.of(context).colorScheme.onPrimary,
-                fontWeight: FontWeight.bold,
+                fontFamily: 'RobotoMono',
+                fontSize: 14,
+                color: colorScheme.onInverseSurface,
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
             );
           }).toList();

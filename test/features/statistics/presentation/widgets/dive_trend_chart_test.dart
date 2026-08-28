@@ -472,4 +472,70 @@ void main() {
       expect(items.where((i) => i != null), hasLength(1));
     });
   });
+
+  group('touch indicator', () {
+    final spread = <TrendDataPoint>[
+      for (var m = 0; m < 6; m++)
+        TrendDataPoint(date: DateTime.utc(2025, 9 + m, 5), value: 10.0 + m),
+      for (var m = 0; m < 6; m++)
+        TrendDataPoint(date: DateTime.utc(2025, 9 + m, 20), value: 30.0 + m),
+    ];
+
+    testWidgets('uses the same tooltip type as the dive profile chart', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: spread)));
+
+      final data = readData(tester);
+      final bars = data.lineBarsData;
+      final items = data.lineTouchData.touchTooltipData.getTooltipItems([
+        LineBarSpot(bars[0], 0, bars[0].spots.first),
+      ]);
+      final style = items.whereType<LineTooltipItem>().single.textStyle;
+
+      expect(style.fontSize, 14);
+      expect(style.fontFamily, 'RobotoMono');
+      expect(style.fontFeatures, isNotEmpty);
+    });
+
+    testWidgets('marks the touched point on the data series', (tester) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: spread)));
+
+      final data = readData(tester);
+      final bars = data.lineBarsData;
+      final indicators = data.lineTouchData.getTouchedSpotIndicator(bars[0], [
+        0,
+      ]);
+
+      expect(indicators.whereType<TouchedSpotIndicatorData>(), hasLength(1));
+    });
+
+    testWidgets('marks nothing on the band and overlay series', (tester) async {
+      // One highlight per series would stack several dots and lines on a
+      // single touch.
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(
+            points: spread,
+            aggregation: TrendAggregation.monthly,
+            showRollingMean: true,
+          ),
+        ),
+      );
+
+      final data = readData(tester);
+      final bars = data.lineBarsData;
+
+      for (var i = 1; i < bars.length; i++) {
+        final indicators = data.lineTouchData.getTouchedSpotIndicator(bars[i], [
+          0,
+        ]);
+        expect(
+          indicators.every((d) => d == null),
+          isTrue,
+          reason: 'series $i drew an indicator',
+        );
+      }
+    });
+  });
 }
