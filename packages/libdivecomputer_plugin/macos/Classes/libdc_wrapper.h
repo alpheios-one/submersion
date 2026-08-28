@@ -174,7 +174,7 @@ typedef struct {
     double o2_sensor[6];       // per-cell ppO2 in bar (NAN if that cell absent)
     unsigned int o2_sensor_mv[6]; // per-cell raw output in mV (UINT32_MAX if absent)
     double cns;                // percentage 0-100 (NAN if unavailable)
-    unsigned int rbt;          // remaining bottom time in seconds (UINT32_MAX if unavailable)
+    unsigned int rbt;          // remaining bottom time in MINUTES as libdc reports it (UINT32_MAX if unavailable); Dart converts to seconds
     // Decompression status at this sample
     unsigned int deco_type;    // 0=NDL, 1=safetystop, 2=decostop, 3=deepstop (UINT32_MAX if unavailable)
     unsigned int deco_time;    // seconds (NDL seconds or stop time remaining)

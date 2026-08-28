@@ -11,6 +11,7 @@ import 'package:submersion/core/deco/constants/buhlmann_coefficients.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/deco/entities/deco_status.dart';
 import 'package:submersion/core/deco/entities/dive_environment.dart';
+import 'package:submersion/features/dive_log/domain/services/gas_time_remaining.dart';
 import 'package:submersion/core/deco/entities/gradient_factor_source.dart';
 import 'package:submersion/core/deco/entities/o2_exposure.dart';
 import 'package:submersion/core/deco/entities/profile_gas_segment.dart';
@@ -289,6 +290,12 @@ class ProfileAnalysis {
   /// Time To Surface at each profile point (seconds)
   final List<int>? ttsCurve;
 
+  /// Gas time remaining at each profile point (seconds); null entries are
+  /// where an air-integrated computer would blank the display (surface, SAC
+  /// window not yet full, pressure not falling, deco ceiling). Null when the
+  /// dive has no pressure data. See [calculateGtrCurve].
+  final List<int?>? gtrCurve;
+
   /// Cumulative CNS% at each profile point (includes residual from prior dives)
   final List<double>? cnsCurve;
 
@@ -348,6 +355,7 @@ class ProfileAnalysis {
     this.surfaceGfCurve,
     this.meanDepthCurve,
     this.ttsCurve,
+    this.gtrCurve,
     this.cnsCurve,
     this.otuCurve,
     required this.maxDepth,
@@ -408,6 +416,9 @@ class ProfileAnalysis {
   /// Whether TTS curve data is available
   bool get hasTtsData => ttsCurve != null && ttsCurve!.isNotEmpty;
 
+  /// Whether GTR curve data is available
+  bool get hasGtrData => gtrCurve != null && gtrCurve!.isNotEmpty;
+
   /// Whether CNS curve data is available
   bool get hasCnsData => cnsCurve != null && cnsCurve!.isNotEmpty;
 
@@ -440,6 +451,7 @@ class ProfileAnalysis {
     List<double>? surfaceGfCurve,
     List<double>? meanDepthCurve,
     List<int>? ttsCurve,
+    List<int?>? gtrCurve,
     List<double>? cnsCurve,
     List<double>? otuCurve,
     double? maxDepth,
@@ -474,6 +486,7 @@ class ProfileAnalysis {
       surfaceGfCurve: surfaceGfCurve ?? this.surfaceGfCurve,
       meanDepthCurve: meanDepthCurve ?? this.meanDepthCurve,
       ttsCurve: ttsCurve ?? this.ttsCurve,
+      gtrCurve: gtrCurve ?? this.gtrCurve,
       cnsCurve: cnsCurve ?? this.cnsCurve,
       otuCurve: otuCurve ?? this.otuCurve,
       maxDepth: maxDepth ?? this.maxDepth,
@@ -615,6 +628,7 @@ class ProfileAnalysisService {
     List<ProfileGasSegment>? gasSegments,
     AscentGasPlan? ascentGasPlan,
     List<double>? rebreatherPpO2Curve,
+    double gtrReserveBar = defaultGtrReserveBar,
   }) {
     if (depths.isEmpty || depths.length != timestamps.length) {
       // Still an answer from a configured service, so it can say which
@@ -936,6 +950,18 @@ class ProfileAnalysisService {
     final surfaceGfCurve = _calculateSurfaceGfCurve(decoStatuses);
     final meanDepthCurve = _calculateMeanDepthCurve(depths);
     final ttsCurve = decoStatuses.map((s) => s.ttsSeconds).toList();
+    // Same pressure track as the SAC curve, blanked by this analysis's own
+    // ceiling so GTR and the deco band never disagree about deco being in
+    // force.
+    final gtrCurve = pressures != null && pressures.length == depths.length
+        ? calculateGtrCurve(
+            depths: depths,
+            timestamps: timestamps,
+            pressures: pressures,
+            reserveBar: gtrReserveBar,
+            ceilings: ceilingCurve,
+          )
+        : null;
     final cnsCurve =
         ocGasMetrics?.cnsCurve ??
         _calculateCnsCurve(
@@ -969,6 +995,7 @@ class ProfileAnalysisService {
       surfaceGfCurve: surfaceGfCurve,
       meanDepthCurve: meanDepthCurve,
       ttsCurve: ttsCurve,
+      gtrCurve: gtrCurve,
       cnsCurve: cnsCurve,
       otuCurve: otuCurve,
       maxDepth: maxDepth,
