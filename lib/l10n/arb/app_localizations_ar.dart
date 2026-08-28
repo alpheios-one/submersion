@@ -23353,11 +23353,14 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return 'تم فحص $checked عنصرًا: أزيل $removed يتيمًا، وأُدرج $repaired إصلاحًا في قائمة الانتظار، وأُلغي $aborted رفعًا قديمًا';
+    return 'تم فحص $checked عنصرًا سحابيًا ($originals أصلية، $thumbs صور مصغرة، $renditions نسخ مضغوطة): أزيل $removed يتيمًا، وأُدرج $repaired إصلاحًا في قائمة الانتظار، وأُلغي $aborted رفعًا قديمًا';
   }
 
   @override

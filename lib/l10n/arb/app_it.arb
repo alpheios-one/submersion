@@ -6717,7 +6717,7 @@
   "settings_mediaStorage_transfers_waitingRetry": "{count} in attesa di riprovare",
   "settings_mediaStorage_verify_action": "Verifica libreria",
   "settings_mediaStorage_verify_running": "Verifica della libreria multimediale...",
-  "settings_mediaStorage_verify_summary": "Controllati {checked} oggetti: {removed} orfani rimossi, {repaired} riparazioni in coda, {aborted} caricamenti obsoleti annullati",
+  "settings_mediaStorage_verify_summary": "Controllati {checked} oggetti nel cloud ({originals} originali, {thumbs} miniature, {renditions} versioni compresse): {removed} orfani rimossi, {repaired} riparazioni in coda, {aborted} caricamenti obsoleti annullati",
   "settings_mediaStorage_backfill_action": "Carica libreria esistente",
   "settings_mediaStorage_backfill_enqueued": "{count} caricamenti in coda",
   "settings_mediaStorage_policy_autoUpload": "Carica foto automaticamente",

@@ -23772,11 +23772,14 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '$checked objetos verificados: $removed órfãos removidos, $repaired reparos na fila, $aborted envios obsoletos cancelados';
+    return '$checked objetos na nuvem verificados ($originals originais, $thumbs miniaturas, $renditions versões comprimidas): $removed órfãos removidos, $repaired reparos na fila, $aborted envios obsoletos cancelados';
   }
 
   @override

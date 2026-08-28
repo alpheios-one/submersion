@@ -23773,11 +23773,14 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return 'Controllati $checked oggetti: $removed orfani rimossi, $repaired riparazioni in coda, $aborted caricamenti obsoleti annullati';
+    return 'Controllati $checked oggetti nel cloud ($originals originali, $thumbs miniature, $renditions versioni compresse): $removed orfani rimossi, $repaired riparazioni in coda, $aborted caricamenti obsoleti annullati';
   }
 
   @override

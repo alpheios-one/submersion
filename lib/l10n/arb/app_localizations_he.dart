@@ -23183,11 +23183,14 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return 'נבדקו $checked אובייקטים: הוסרו $removed יתומים, $repaired תיקונים נוספו לתור, $aborted העלאות ישנות בוטלו';
+    return 'נבדקו $checked אובייקטים בענן ($originals מקוריים, $thumbs תמונות ממוזערות, $renditions גרסאות דחוסות): הוסרו $removed יתומים, $repaired תיקונים נוספו לתור, $aborted העלאות ישנות בוטלו';
   }
 
   @override

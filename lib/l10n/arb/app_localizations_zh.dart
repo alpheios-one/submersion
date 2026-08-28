@@ -22549,11 +22549,14 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '已检查 $checked 个对象：移除 $removed 个孤立文件，排队 $repaired 个修复，中止 $aborted 个过期上传';
+    return '已检查 $checked 个云端对象（$originals 个原图、$thumbs 个缩略图、$renditions 个压缩版本）：移除 $removed 个孤立文件，排队 $repaired 个修复，中止 $aborted 个过期上传';
   }
 
   @override

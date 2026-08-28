@@ -23591,11 +23591,14 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '$checked objecten gecontroleerd: $removed wezen verwijderd, $repaired reparaties in wachtrij, $aborted verouderde uploads afgebroken';
+    return '$checked cloudobjecten gecontroleerd ($originals originelen, $thumbs miniaturen, $renditions gecomprimeerde versies): $removed wezen verwijderd, $repaired reparaties in wachtrij, $aborted verouderde uploads afgebroken';
   }
 
   @override

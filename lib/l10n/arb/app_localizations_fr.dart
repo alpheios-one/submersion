@@ -23852,11 +23852,14 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '$checked objets vérifiés : $removed orphelins supprimés, $repaired réparations en file, $aborted envois périmés annulés';
+    return '$checked objets cloud vérifiés ($originals originaux, $thumbs miniatures, $renditions versions compressées) : $removed orphelins supprimés, $repaired réparations en file, $aborted envois périmés annulés';
   }
 
   @override
