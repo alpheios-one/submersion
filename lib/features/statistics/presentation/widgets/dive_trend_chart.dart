@@ -539,6 +539,11 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
       // Generous, so the readout follows the pointer anywhere over the plot
       // rather than only within a few pixels of a dot.
       touchSpotThreshold: 1000,
+      // Full-height hover line. fl_chart's default stops at the touched spot,
+      // so for a series sitting near zero it is a few pixels tall and reads as
+      // no line at all.
+      getTouchLineStart: (_, _) => double.negativeInfinity,
+      getTouchLineEnd: (_, _) => double.infinity,
       // Highlight the touched point on the data series only. The band bounds
       // and the fitted overlays would each contribute their own dot and line,
       // stacking several markers on one touch.
@@ -566,6 +571,10 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
         if (diveId != null) onDiveSelected(diveId);
       },
       touchTooltipData: LineTouchTooltipData(
+        // Wide enough for a labelled row such as "Rolling avg 85 psi/min"
+        // without wrapping. Narrower readouts still size to their content;
+        // this is only a cap, matching the dive profile chart.
+        maxContentWidth: 320,
         getTooltipColor: (_) => colorScheme.inverseSurface,
         // Above the plot rather than over it: the bubble used to land on the
         // very point it was describing.

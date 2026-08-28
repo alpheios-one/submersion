@@ -784,4 +784,45 @@ void main() {
     expect(border.border.left.width, greaterThan(0));
     expect(border.border.right.width, greaterThan(0));
   });
+
+  testWidgets('caps the tooltip width so a value cannot wrap mid-row', (
+    tester,
+  ) async {
+    // Without a cap the bubble sized to its container and broke rows like
+    // "Rolling avg 85 psi/min" across two lines.
+    await tester.pumpWidget(host(DiveTrendChart(points: series(20))));
+
+    final tooltip = readData(tester).lineTouchData.touchTooltipData;
+
+    expect(tooltip.maxContentWidth, greaterThanOrEqualTo(300));
+  });
+
+  group('hover line', () {
+    testWidgets('spans the full plot height, not just up to the point', (
+      tester,
+    ) async {
+      // fl_chart's default line stops at the touched spot, so for a series
+      // sitting near zero it is a few pixels tall and reads as absent.
+      await tester.pumpWidget(host(DiveTrendChart(points: series(20))));
+
+      final touch = readData(tester).lineTouchData;
+      final bar = readData(tester).lineBarsData.first;
+
+      expect(touch.getTouchLineStart(bar, 0), double.negativeInfinity);
+      expect(touch.getTouchLineEnd(bar, 0), double.infinity);
+    });
+
+    testWidgets('draws the line on the data series', (tester) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: series(20))));
+
+      final data = readData(tester);
+      final indicator = data.lineTouchData.getTouchedSpotIndicator(
+        data.lineBarsData.first,
+        [0],
+      ).single;
+
+      expect(indicator, isNotNull);
+      expect(indicator!.indicatorBelowLine.strokeWidth, greaterThan(0));
+    });
+  });
 }
