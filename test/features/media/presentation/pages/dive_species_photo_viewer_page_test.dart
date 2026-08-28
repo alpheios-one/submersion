@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/media/presentation/pages/dive_species_photo_viewer_page.dart';
 import 'package:submersion/features/media/presentation/pages/media_viewer_page.dart';
@@ -67,5 +68,9 @@ void main() {
 
     expect(find.byType(MediaViewerPage), findsNothing);
     expect(find.text('No photos available'), findsOneWidget);
+    // The back affordance must stay visible on the black scaffold under the
+    // light theme too.
+    final bar = tester.widget<AppBar>(find.byType(AppBar));
+    expect(bar.foregroundColor, Colors.white);
   });
 }

@@ -35,7 +35,14 @@ class DiveSpeciesPhotoViewerPage extends ConsumerWidget {
           // other viewers, rather than showing a blank screen.
           return Scaffold(
             backgroundColor: Colors.black,
-            appBar: AppBar(backgroundColor: Colors.transparent),
+            // The route is a full-screen dialog, so the bar carries the only
+            // way back; the light theme's default foreground would vanish
+            // against the black scaffold.
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              foregroundColor: Colors.white,
+              surfaceTintColor: Colors.transparent,
+            ),
             body: Center(
               child: Text(
                 context.l10n.media_photoViewer_noPhotosAvailable,
