@@ -721,6 +721,50 @@ class MediaRepository {
     }
   }
 
+  /// Records the outcome of an explicit check on one row: `lastVerifiedAt`
+  /// always, and the orphan flag only when the check actually learned it
+  /// ([isOrphaned] non-null).
+  ///
+  /// Narrow for the same reason [markVerified] is. `MediaItemVerifier`'s
+  /// callers hold a snapshot of the row, and an upload that completes after
+  /// the snapshot was taken stamps `remoteUploadedAt` on the row; a whole-row
+  /// write from the snapshot ([updateMedia]) would roll that stamp back to
+  /// null, and the pending mark would then sync the rollback fleet-wide.
+  ///
+  /// Unlike [markVerified] this always writes: the user asked for a check
+  /// and the date of that check is the answer, whether or not the flag moved.
+  Future<void> stampVerification(
+    String id, {
+    required DateTime verifiedAt,
+    bool? isOrphaned,
+  }) async {
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
+        MediaCompanion(
+          isOrphaned: isOrphaned == null
+              ? const Value.absent()
+              : Value(isOrphaned),
+          lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
+          updatedAt: Value(now),
+        ),
+      );
+      await _syncRepository.markRecordPending(
+        entityType: 'media',
+        recordId: id,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to stamp verification: $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Get all orphaned media
   /// Includes enrichment data (depth, temperature) if available
   Future<List<domain.MediaItem>> getOrphanedMedia() async {
