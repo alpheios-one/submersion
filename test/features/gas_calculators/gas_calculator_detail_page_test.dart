@@ -92,6 +92,29 @@ void main() {
     });
   }
 
+  // MasterDetailScaffold reserves 400px for the detail pane
+  // (_kDetailPaneReservedWidth), so that is the narrowest a calculator ever
+  // renders in split view. The five simple calculators are single-column
+  // forms and gain height in the pane; the blender has a wider layout and is
+  // the one that could lose by the move off the full-width tabbed page.
+  for (final id in kGasCalculatorIds) {
+    testWidgets('$id fits the narrowest detail pane', (tester) async {
+      tester.view.physicalSize = const Size(400, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: base.cast(),
+          child: GasCalculatorDetailPage(toolId: id, embedded: true),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('an unknown id falls back to the summary', (tester) async {
     await pump(
       tester,
