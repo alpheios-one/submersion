@@ -6529,6 +6529,7 @@
   "diveComputer_detail_labelModel": "Modell",
   "diveComputer_detail_labelName": "Nev",
   "diveComputer_detail_lastDownload": "Utolso letoltes",
+  "diveComputer_detail_linkedGear": "Felszerelés",
   "diveComputer_detail_notesTitle": "Megjegyzesek",
   "diveComputer_detail_statisticsTitle": "Statisztikak",
   "diveComputer_detail_unknown": "Ismeretlen",

@@ -20791,6 +20791,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveComputer_detail_lastDownload => 'Laatste download';
 
   @override
+  String get diveComputer_detail_linkedGear => 'Uitrustingsstuk';
+
+  @override
   String get diveComputer_detail_notesTitle => 'Notities';
 
   @override

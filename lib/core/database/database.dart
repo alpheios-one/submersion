@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 
 import 'package:drift/drift.dart';
 
+import 'package:submersion/core/database/dive_computer_gear_backfill.dart';
 import 'package:submersion/core/database/imported_computer_backfill.dart';
 import 'package:submersion/core/database/performance_indexes.dart';
 import 'package:submersion/core/database/tag_uniqueness.dart';
@@ -2552,6 +2553,23 @@ class DiveComputers extends Table {
   /// (nullable: rows written before HLC rollout fall back to updatedAt).
   TextColumn get hlc => text().nullable()();
 
+  /// The equipment row representing this device as gear, its "gear twin"
+  /// (v175). Seeded once at registration, then owned by the user: renaming or
+  /// retiring the gear item never writes back here, and renaming the computer
+  /// never overwrites the gear name.
+  ///
+  /// Unlike [bluetoothAddress] this DOES synchronize, because equipment ids are
+  /// fleet-stable and a peer holding a null here would dangle the reference.
+  ///
+  /// setNull rather than cascade: deleting the gear item leaves the device
+  /// registered. The cleared column is also what makes that deletion permanent,
+  /// because only a genuine computer insert ever mints a twin.
+  TextColumn get equipmentId => text().nullable().references(
+    Equipment,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -3270,7 +3288,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 174;
+  static const int currentSchemaVersion = 175;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3620,6 +3638,17 @@ class AppDatabase extends _$AppDatabase {
     // per-type toggles for which badge rows a diver's types appear in.
     // Issue #1269 follow-up.
     174,
+    // v175 (gear twins): dive_computers.equipment_id, the equipment row that
+    // represents a registered computer as gear, so a downloaded dive lists the
+    // computer that logged it alongside the rest of the diver's kit. Issue
+    // #1320. Renumbered from 169: main reserved 169 for this branch but landed
+    // 170 past it, and a rung below the shipped version never runs its
+    // onUpgrade step, so the gear-twin backfill would silently never execute.
+    // 171, 173 and 174 then landed as well (trip_day_weather and the two
+    // dive_types columns above), so this takes 175, which main's own v171
+    // comment already reserves for it. 169 is now permanently skipped, as are
+    // 162 and 167.
+    175,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4405,6 +4434,46 @@ class AppDatabase extends _$AppDatabase {
         'INTEGER NOT NULL DEFAULT 0 CHECK (retain_in_library IN (0, 1))',
       );
     }
+  }
+
+  /// v175: dive_computers.equipment_id (gear twins). Idempotent; safe to call
+  /// from both onUpgrade and the beforeOpen backstop. Nullable with no default,
+  /// because a null means "this computer has no gear item", which is also what
+  /// a user deleting the gear item leaves behind.
+  ///
+  /// The REFERENCES clause is not decoration. Without it an upgraded database
+  /// gets a bare TEXT column while a freshly created one gets the FK from the
+  /// table definition, so `onDelete: setNull` would hold only for new installs
+  /// and existing users would be left with `equipment_id` pointing at a deleted
+  /// row. SQLite permits a REFERENCES clause on ADD COLUMN precisely because
+  /// this column is nullable and defaults to NULL. Mirrors the v158
+  /// `_assertProfileSourceIdColumn` precedent.
+  ///
+  /// It is added ONLY when `equipment` actually exists. SQLite accepts a
+  /// reference to a missing table at ALTER time and then fails every later
+  /// write to `dive_computers` with "no such table: main.equipment" once
+  /// foreign keys are on, which would break minimal fixtures and any database
+  /// caught mid-upgrade. Every real database has `equipment`, so production
+  /// always takes the FK branch; the bare fallback is harmless where it
+  /// applies, because a database with no `equipment` table has no gear rows
+  /// whose deletion the FK would need to cascade.
+  Future<void> _assertDiveComputerEquipmentColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('dive_computers')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('equipment_id')) return;
+
+    final equipmentCols = await customSelect(
+      "PRAGMA table_info('equipment')",
+    ).get();
+    final reference = equipmentCols.isEmpty
+        ? ''
+        : ' REFERENCES equipment(id) ON DELETE SET NULL';
+    await customStatement(
+      'ALTER TABLE dive_computers ADD COLUMN equipment_id TEXT$reference',
+    );
   }
 
   /// v164: media.manual_elapsed_seconds (issue #1090). Idempotent; safe to
@@ -8995,6 +9064,14 @@ class AppDatabase extends _$AppDatabase {
           await _assertDiveTypeVisibilityColumns();
         }
         if (from < 174) await reportProgress();
+        // v175: dive_computers.equipment_id (gear twins). The backfill that
+        // seeds the twins and links existing dives runs on the same rung; the
+        // column has to land first. Renumbered from 169, which main overtook.
+        if (from < 175) {
+          await _assertDiveComputerEquipmentColumn();
+          await backfillDiveComputerGearTwins(this);
+        }
+        if (from < 175) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9224,6 +9301,13 @@ class AppDatabase extends _$AppDatabase {
         // dive_types.show_in_list_view (same parallel-branch
         // version-collision self-heal).
         await _assertDiveTypeVisibilityColumns();
+
+        // v175 backstop: re-assert dive_computers.equipment_id (gear twins;
+        // same parallel-branch version-collision self-heal). Column only:
+        // backfillDiveComputerGearTwins is a full-table pass that belongs to
+        // the ladder, and re-running it on every open would resurrect a gear
+        // item the user deleted.
+        await _assertDiveComputerEquipmentColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

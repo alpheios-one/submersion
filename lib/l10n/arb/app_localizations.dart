@@ -34666,6 +34666,12 @@ abstract class AppLocalizations {
   /// **'Last Download'**
   String get diveComputer_detail_lastDownload;
 
+  /// No description provided for @diveComputer_detail_linkedGear.
+  ///
+  /// In en, this message translates to:
+  /// **'Gear item'**
+  String get diveComputer_detail_linkedGear;
+
   /// No description provided for @diveComputer_detail_notesTitle.
   ///
   /// In en, this message translates to:

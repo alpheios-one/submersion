@@ -19870,6 +19870,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveComputer_detail_lastDownload => '上次下载';
 
   @override
+  String get diveComputer_detail_linkedGear => '装备';
+
+  @override
   String get diveComputer_detail_notesTitle => '备注';
 
   @override

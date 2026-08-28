@@ -20580,6 +20580,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveComputer_detail_lastDownload => 'آخر تنزيل';
 
   @override
+  String get diveComputer_detail_linkedGear => 'قطعة المعدات';
+
+  @override
   String get diveComputer_detail_notesTitle => 'الملاحظات';
 
   @override

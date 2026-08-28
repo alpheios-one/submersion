@@ -20606,6 +20606,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveComputer_detail_lastDownload => 'Last Download';
 
   @override
+  String get diveComputer_detail_linkedGear => 'Gear item';
+
+  @override
   String get diveComputer_detail_notesTitle => 'Notes';
 
   @override
