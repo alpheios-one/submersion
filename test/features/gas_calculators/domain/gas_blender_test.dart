@@ -580,4 +580,213 @@ void main() {
       expect(added[2], closeTo(61.6, 0.05));
     });
   });
+
+  group('MultiDeco reference dataset (issue #1335 / fork issue #17)', () {
+    // Real-world rows relayed in a trigger comment on PR #23, exported from
+    // the MultiDeco app at a 20 C fill temperature. MultiDeco's own topups
+    // are recorded only in each test's description, not asserted: neither
+    // zFactor (the app default) nor vanDerWaals reproduces them, and the
+    // `ideal` model fits noticeably closer on every row where a comparison is
+    // possible (see the Part 2 analysis comment on this PR). Three rows
+    // (1, 4, 11) even call for a *negative* topup of one gas; this solver
+    // deliberately refuses that with BlendError.negativeAmountRequired
+    // rather than reporting a fill nobody can dispense, so those rows assert
+    // the exception instead of a pressure.
+    //
+    // What is pinned below is this solver's own actual output for zFactor
+    // and vanDerWaals on these real inputs, tight enough to catch either
+    // model silently drifting or collapsing onto the other.
+
+    GasBlenderInputs multiDecoInputs(
+      double startBar,
+      GasMix start,
+      double targetBar,
+      GasMix target,
+      BlendGasModel model,
+    ) => GasBlenderInputs(
+      startPressureBar: startBar,
+      start: start,
+      targetPressureBar: targetBar,
+      target: target,
+      fillGas1: _o2,
+      fillGas2: _he,
+      fillGas3: _air,
+      model: model,
+    );
+
+    (double, double, double) tops(BlendResult r) {
+      var o2 = 0.0, he = 0.0, air = 0.0;
+      for (final s in r.steps) {
+        if (s.fillGas == _o2) o2 = s.addedBar;
+        if (s.fillGas == _he) he = s.addedBar;
+        if (s.fillGas == _air) air = s.addedBar;
+      }
+      return (o2, he, air);
+    }
+
+    void expectTops(
+      double startBar,
+      GasMix start,
+      double targetBar,
+      GasMix target,
+      BlendGasModel model,
+      (double, double, double)? expected,
+    ) {
+      if (expected == null) {
+        expect(
+          () => computeBlend(
+            multiDecoInputs(startBar, start, targetBar, target, model),
+          ),
+          throwsA(
+            isA<BlendException>().having(
+              (e) => e.error,
+              'error',
+              BlendError.negativeAmountRequired,
+            ),
+          ),
+        );
+        return;
+      }
+      final (o2, he, air) = tops(
+        computeBlend(
+          multiDecoInputs(startBar, start, targetBar, target, model),
+        ),
+      );
+      expect(o2, closeTo(expected.$1, 0.01));
+      expect(he, closeTo(expected.$2, 0.01));
+      expect(air, closeTo(expected.$3, 0.01));
+    }
+
+    test('row 1 (210 bar 14.4/58.4 -> 220 bar 15/55): '
+        'MultiDeco ref O2 0.4 / He -1.7 / air 11.3', () {
+      const start = GasMix(o2: 14.4, he: 58.4);
+      const target = GasMix(o2: 15, he: 55);
+      expectTops(210, start, 220, target, BlendGasModel.zFactor, null);
+      expectTops(210, start, 220, target, BlendGasModel.vanDerWaals, null);
+    });
+
+    test('row 2 (15 bar 14.4/58.4 -> 220 bar 15/55): '
+        'MultiDeco ref O2 14.7 / He 114.6 / air 75.7', () {
+      const start = GasMix(o2: 14.4, he: 58.4);
+      const target = GasMix(o2: 15, he: 55);
+      expectTops(15, start, 220, target, BlendGasModel.zFactor, (
+        13.128,
+        111.023,
+        80.849,
+      ));
+      expectTops(15, start, 220, target, BlendGasModel.vanDerWaals, (
+        12.056,
+        109.579,
+        83.365,
+      ));
+    });
+
+    test('row 3 (135.2 bar 14.4/58.4 -> 220 bar 15/55): '
+        'MultiDeco ref O2 5.9 / He 43.0 / air 36.0', () {
+      const start = GasMix(o2: 14.4, he: 58.4);
+      const target = GasMix(o2: 15, he: 55);
+      expectTops(135.2, start, 220, target, BlendGasModel.zFactor, (
+        5.060,
+        42.112,
+        37.628,
+      ));
+      expectTops(135.2, start, 220, target, BlendGasModel.vanDerWaals, (
+        4.838,
+        42.752,
+        37.210,
+      ));
+    });
+
+    test('row 4 (120 bar 25.0/50.0 -> 220 bar 7/75): '
+        'MultiDeco ref O2 -16.7 / He 106.6 / air 10.1', () {
+      const start = GasMix(o2: 25.0, he: 50.0);
+      const target = GasMix(o2: 7, he: 75);
+      expectTops(120, start, 220, target, BlendGasModel.zFactor, null);
+      expectTops(120, start, 220, target, BlendGasModel.vanDerWaals, null);
+    });
+
+    test('row 5 (54 bar 22.4/35.8 -> 220 bar 21/35): '
+        'MultiDeco ref O2 14.5 / He 59.4 / air 92.1', () {
+      const start = GasMix(o2: 22.4, he: 35.8);
+      const target = GasMix(o2: 21, he: 35);
+      expectTops(54, start, 220, target, BlendGasModel.zFactor, (
+        12.840,
+        57.058,
+        96.102,
+      ));
+      expectTops(54, start, 220, target, BlendGasModel.vanDerWaals, (
+        11.924,
+        59.318,
+        94.758,
+      ));
+    });
+
+    test('row 6 (40 bar 21.0/0.0 -> 200 bar 7/75): '
+        'MultiDeco ref O2 4.9 / He 152.7 / air 2.4', () {
+      const start = GasMix(o2: 21.0);
+      const target = GasMix(o2: 7, he: 75);
+      expectTops(40, start, 200, target, BlendGasModel.zFactor, (
+        3.988,
+        153.815,
+        2.198,
+      ));
+      expectTops(40, start, 200, target, BlendGasModel.vanDerWaals, null);
+    });
+
+    test('row 7 (40 bar 21.6/39.4 -> 220 bar 7/75): '
+        'MultiDeco ref O2 0.8 / He 151.6 / air 27.6', () {
+      const start = GasMix(o2: 21.6, he: 39.4);
+      const target = GasMix(o2: 7, he: 75);
+      expectTops(40, start, 220, target, BlendGasModel.zFactor, null);
+      expectTops(40, start, 220, target, BlendGasModel.vanDerWaals, null);
+    });
+
+    test('row 8 (180 bar 21.6/39.4 -> 220 bar 21/35): '
+        'MultiDeco ref O2 0.3 / He 6.2 / air 33.5', () {
+      const start = GasMix(o2: 21.6, he: 39.4);
+      const target = GasMix(o2: 21, he: 35);
+      expectTops(180, start, 220, target, BlendGasModel.zFactor, null);
+      expectTops(180, start, 220, target, BlendGasModel.vanDerWaals, null);
+    });
+
+    test('row 9 (40 bar 9.5/64.1 -> 220 bar 7/75): '
+        'MultiDeco ref O2 4.3 / He 141.3 / air 34.4', () {
+      const start = GasMix(o2: 9.5, he: 64.1);
+      const target = GasMix(o2: 7, he: 75);
+      expectTops(40, start, 220, target, BlendGasModel.zFactor, (
+        3.441,
+        139.199,
+        37.360,
+      ));
+      expectTops(40, start, 220, target, BlendGasModel.vanDerWaals, (
+        3.158,
+        137.530,
+        39.312,
+      ));
+    });
+
+    test('row 10 (94 bar 21.6/39.4 -> 220 bar 21/35): '
+        'MultiDeco ref O2 9.9 / He 41.2 / air 74.9', () {
+      const start = GasMix(o2: 21.6, he: 39.4);
+      const target = GasMix(o2: 21, he: 35);
+      expectTops(94, start, 220, target, BlendGasModel.zFactor, (
+        8.659,
+        39.561,
+        77.780,
+      ));
+      expectTops(94, start, 220, target, BlendGasModel.vanDerWaals, (
+        8.072,
+        41.817,
+        76.112,
+      ));
+    });
+
+    test('row 11 (120 bar 8.4/79.2 -> 220 bar 7/75): '
+        'MultiDeco ref O2 -1.0 / He 70.8 / air 30.2', () {
+      const start = GasMix(o2: 8.4, he: 79.2);
+      const target = GasMix(o2: 7, he: 75);
+      expectTops(120, start, 220, target, BlendGasModel.zFactor, null);
+      expectTops(120, start, 220, target, BlendGasModel.vanDerWaals, null);
+    });
+  });
 }
