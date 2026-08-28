@@ -107,4 +107,42 @@ void main() {
     expect(find.byType(TabBar), findsOneWidget);
     expect(find.byType(TabBarView), findsOneWidget);
   });
+
+  // A pushed split view needs a back affordance the nav rail does not supply,
+  // and it has to sit in the same compact header the detail pane uses, or the
+  // two halves stop lining up.
+  group('PlanningToolPane leading', () {
+    testWidgets('renders a leading widget ahead of the title', (tester) async {
+      await pump(
+        tester,
+        const Scaffold(
+          body: PlanningToolPane(
+            leading: BackButton(),
+            title: 'Gas Calculators',
+            child: SizedBox.shrink(),
+          ),
+        ),
+      );
+
+      expect(find.byType(BackButton), findsOneWidget);
+      final backX = tester.getCenter(find.byType(BackButton)).dx;
+      final titleX = tester.getCenter(find.text('Gas Calculators')).dx;
+      expect(backX, lessThan(titleX));
+    });
+
+    testWidgets('omitting it leaves the header unchanged', (tester) async {
+      await pump(
+        tester,
+        const Scaffold(
+          body: PlanningToolPane(
+            title: 'Gas Calculators',
+            child: SizedBox.shrink(),
+          ),
+        ),
+      );
+
+      expect(find.byType(BackButton), findsNothing);
+      expect(find.text('Gas Calculators'), findsOneWidget);
+    });
+  });
 }
