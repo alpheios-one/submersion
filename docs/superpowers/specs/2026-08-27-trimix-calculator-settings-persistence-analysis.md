@@ -7,10 +7,13 @@ Branch: `claude/issue-18-20260827-2101`
 
 ## Scope
 
-This is analysis only, as requested for "Teil 1" of issue #18. No implementation,
-migration, or UI change is made in this branch. It documents the current
-architecture the blender calculator sits on, so that "Teil 2" can build on
-accurate ground rather than assumptions.
+This document was originally written as analysis only, for "Teil 1" of issue
+#18, before any implementation existed. It documents the current architecture
+the blender calculator sits on, so that "Teil 2" could build on accurate
+ground rather than assumptions. The "Teil 2" implementation (persistence,
+settings gear, cylinder-size templates) has since been added on top of this
+same branch/PR; this document reflects the state of the codebase as it was
+at the start of that work, not the final state.
 
 ## Summary of the request (issue #1335)
 
