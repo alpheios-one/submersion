@@ -206,6 +206,26 @@ void main() {
     expect(find.textContaining('Location'), findsNothing);
   });
 
+  testWidgets('hides when the host reports no site but the dive has one', (
+    tester,
+  ) async {
+    // currentSite is the site the HOST shows, not an optional override: a
+    // null means "this page is showing no site". It never falls back to the
+    // dive's own site, or a page that forgot to pass one would offer to
+    // place coordinates on a site it is not displaying.
+    await tester.pumpWidget(
+      await host(
+        suggestionFor(
+          service,
+          site: const DiveSite(id: 'persisted', name: 'Persisted'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Location'), findsNothing);
+  });
+
   testWidgets('add location reports the site as the repository has it', (
     tester,
   ) async {

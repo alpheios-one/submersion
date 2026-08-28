@@ -28,8 +28,14 @@ class SiteSuggestionCard extends ConsumerWidget {
 
   final String diveId;
 
-  /// The site the host page currently shows for the dive (unsaved form
-  /// state on the edit page); falls back to the dive's own site.
+  /// The site the host page currently shows for the dive: unsaved form state
+  /// on the edit page, the persisted site on the detail pages.
+  ///
+  /// Null means the page is showing no site, not "unset, fall back to the
+  /// dive's own": the guard in [build] hides the card whenever this
+  /// disagrees with what is persisted, so a caller that omits a site the
+  /// dive actually has gets no suggestion rather than one aimed at a site it
+  /// is not displaying.
   final DiveSite? currentSite;
 
   /// Fires with the site the dive now has after assign / addLocation /
@@ -56,17 +62,15 @@ class SiteSuggestionCard extends ConsumerWidget {
       return const SizedBox.shrink();
     }
     final units = UnitFormatter(ref.watch(settingsProvider));
-    final hasSite = currentSite != null || proposal.dive.site != null;
+    // Past the guard the form and the database agree, so the shown site is
+    // the persisted one; no fallback to proposal.dive.site is reachable.
+    final hasSite = currentSite != null;
     final recommended = proposal.recommendedCandidateId == null
         ? null
         : proposal.candidates
               .where((c) => c.id == proposal.recommendedCandidateId)
               .firstOrNull;
-    final siteName =
-        currentSite?.name ??
-        proposal.dive.site?.name ??
-        recommended?.name ??
-        '';
+    final siteName = currentSite?.name ?? recommended?.name ?? '';
 
     final actions = SiteSuggestionActions(
       diveId: diveId,
@@ -114,10 +118,9 @@ class SiteSuggestionCard extends ConsumerWidget {
               // partially hydrated (issue #1187). Falls back to the local
               // copy only when the re-read finds nothing, since the write
               // itself did land.
-              final base = currentSite ?? proposal.dive.site!;
               final site =
                   await actions.linkedSite() ??
-                  base.copyWith(location: suggestion.point);
+                  currentSite!.copyWith(location: suggestion.point);
               return (site, l10n.diveLog_edit_addedGps(site.name));
             }),
       onDismiss: () => _run(context, ref, (_) async {
