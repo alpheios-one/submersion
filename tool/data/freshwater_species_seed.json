@@ -2198,5 +2198,1305 @@
       "ar": "سمكة صغيرة متقزحة من جداول شرق أستراليا، تلمع ذكورها بخطوط حمراء وزرقاء تحت الشمس.",
       "he": "דג קטן ונוצץ מנחלי מזרח אוסטרליה, הזכרים מבזיקים פסים אדומים וכחולים בשמש."
     }
+  },
+  {
+    "id": "sp_signal_crayfish",
+    "scientificName": "Pacifastacus leniusculus",
+    "category": "invertebrate",
+    "taxonomyClass": "Malacostraca",
+    "commonName": "Signal Crayfish",
+    "description": {
+      "en": "Large brown crayfish with a white patch at the claw joint, an invasive North American species spreading through European rivers.",
+      "de": "Großer brauner Flusskrebs mit weißem Fleck am Scherengelenk, eine invasive nordamerikanische Art, die sich in europäischen Flüssen ausbreitet.",
+      "es": "Cangrejo de río pardo y grande con una mancha blanca en la articulación de la pinza, especie invasora norteamericana que se extiende por los ríos europeos.",
+      "fr": "Grande écrevisse brune à la tache blanche à l'articulation de la pince, espèce nord-américaine envahissante qui gagne les rivières d'Europe.",
+      "it": "Grande gambero bruno con una macchia bianca all'articolazione della chela, specie invasiva nordamericana in espansione nei fiumi europei.",
+      "pt": "Lagostim castanho e grande com uma mancha branca na articulação da pinça, espécie invasora norte-americana em expansão pelos rios europeus.",
+      "nl": "Grote bruine rivierkreeft met een witte vlek bij het schaargewricht, een invasieve Noord-Amerikaanse soort die zich door Europese rivieren verspreidt.",
+      "hu": "Nagy, barna folyami rák fehér folttal az olló ízületénél, invazív észak-amerikai faj, amely Európa folyóiban terjed.",
+      "zh": "大型褐色螯虾，螯关节处有白斑，是正在欧洲河流中蔓延的北美入侵物种。",
+      "ar": "جراد نهر بني كبير ببقعة بيضاء عند مفصل المخلب، نوع غازٍ من أمريكا الشمالية ينتشر في أنهار أوروبا.",
+      "he": "סרטן נהרות חום גדול עם כתם לבן במפרק הצבת, מין פולש צפון אמריקאי המתפשט בנהרות אירופה."
+    }
+  },
+  {
+    "id": "sp_red_swamp_crayfish",
+    "scientificName": "Procambarus clarkii",
+    "category": "invertebrate",
+    "taxonomyClass": "Malacostraca",
+    "commonName": "Red Swamp Crayfish",
+    "description": {
+      "en": "Dark red crayfish with bumpy claws from Louisiana marshes, now burrowing into warm wetlands on every continent.",
+      "de": "Dunkelroter Flusskrebs mit höckerigen Scheren aus den Sümpfen Louisianas, gräbt sich heute in warme Feuchtgebiete auf allen Kontinenten ein.",
+      "es": "Cangrejo rojo oscuro de pinzas rugosas originario de los pantanos de Luisiana, hoy excava en humedales cálidos de todos los continentes.",
+      "fr": "Écrevisse rouge sombre aux pinces granuleuses des marais de Louisiane, qui creuse aujourd'hui les zones humides chaudes de tous les continents.",
+      "it": "Gambero rosso scuro con chele bitorzolute delle paludi della Louisiana, oggi scava nelle zone umide calde di ogni continente.",
+      "pt": "Lagostim vermelho-escuro de pinças rugosas dos pântanos do Luisiana, hoje escava em zonas húmidas quentes de todos os continentes.",
+      "nl": "Donkerrode rivierkreeft met bobbelige scharen uit de moerassen van Louisiana die zich nu ingraaft in warme wetlands op elk continent.",
+      "hu": "Sötétvörös folyami rák dudoros ollókkal Louisiana mocsaraiból, ma minden kontinens meleg vizes élőhelyeibe ássa be magát.",
+      "zh": "来自路易斯安那沼泽的深红色螯虾，螯上有瘤突，如今在各大洲的温暖湿地中掘穴扩散。",
+      "ar": "جراد نهر أحمر داكن بمخالب خشنة من مستنقعات لويزيانا، يحفر الآن في الأراضي الرطبة الدافئة في كل قارة.",
+      "he": "סרטן נהרות אדום כהה עם צבתות מחוספסות מביצות לואיזיאנה, חופר כיום באזורי ביצה חמים בכל יבשת."
+    }
+  },
+  {
+    "id": "sp_noble_crayfish",
+    "scientificName": "Astacus astacus",
+    "category": "invertebrate",
+    "taxonomyClass": "Malacostraca",
+    "commonName": "Noble Crayfish",
+    "description": {
+      "en": "Europe's native crayfish, dark brown with red-undersided claws, hiding in bank burrows of clean cool streams and lakes.",
+      "de": "Europas heimischer Edelkrebs, dunkelbraun mit rot unterseitigen Scheren, versteckt sich in Uferhöhlen sauberer kühler Bäche und Seen.",
+      "es": "Cangrejo de río autóctono de Europa, pardo oscuro con pinzas de cara inferior roja, se esconde en galerías de la orilla de arroyos y lagos limpios y frescos.",
+      "fr": "Écrevisse indigène d'Europe, brun sombre aux pinces rouges dessous, cachée dans les terriers de berge des ruisseaux et lacs propres et frais.",
+      "it": "Gambero autoctono d'Europa, bruno scuro con chele rosse sotto, si nasconde nelle tane di riva di torrenti e laghi puliti e freschi.",
+      "pt": "Lagostim nativo da Europa, castanho-escuro com pinças vermelhas por baixo, esconde-se em tocas nas margens de riachos e lagos limpos e frescos.",
+      "nl": "Europa's inheemse rivierkreeft, donkerbruin met scharen die van onderen rood zijn, verborgen in oeverholen van schone koele beken en meren.",
+      "hu": "Európa őshonos folyami rákja, sötétbarna, alul vörös ollókkal, tiszta, hűvös patakok és tavak parti üregeiben rejtőzik.",
+      "zh": "欧洲本土螯虾，深褐色，螯的下面呈红色，藏身于洁净凉爽溪流湖泊的岸边洞穴中。",
+      "ar": "جراد النهر الأصلي في أوروبا، بني داكن بمخالب حمراء من الأسفل، يختبئ في جحور الضفاف في الجداول والبحيرات النظيفة الباردة.",
+      "he": "סרטן הנהרות המקומי של אירופה, חום כהה עם צבתות אדומות מלמטה, מסתתר במחילות גדה של נחלים ואגמים נקיים וקרירים."
+    }
+  },
+  {
+    "id": "sp_white_clawed_crayfish",
+    "scientificName": "Austropotamobius pallipes",
+    "category": "invertebrate",
+    "taxonomyClass": "Malacostraca",
+    "commonName": "White-clawed Crayfish",
+    "description": {
+      "en": "Small olive crayfish with pale claw undersides, a threatened native of clean limestone streams in western Europe.",
+      "de": "Kleiner olivfarbener Flusskrebs mit hellen Scherenunterseiten, ein bedrohter Bewohner sauberer Kalksteinbäche Westeuropas.",
+      "es": "Pequeño cangrejo de río oliva con la cara inferior de las pinzas pálida, especie amenazada de arroyos calcáreos limpios de Europa occidental.",
+      "fr": "Petite écrevisse olive aux pinces pâles dessous, espèce menacée des ruisseaux calcaires propres d'Europe de l'Ouest.",
+      "it": "Piccolo gambero oliva con chele chiare sotto, specie minacciata dei puliti torrenti calcarei dell'Europa occidentale.",
+      "pt": "Pequeno lagostim oliva com pinças pálidas por baixo, espécie ameaçada de riachos calcários limpos da Europa ocidental.",
+      "nl": "Kleine olijfkleurige rivierkreeft met bleke onderkant van de scharen, een bedreigde soort van schone kalksteenbeken in West-Europa.",
+      "hu": "Kis, olajzöld folyami rák halvány ollóaljjal, Nyugat-Európa tiszta mészkőpatakjainak veszélyeztetett őshonos faja.",
+      "zh": "小型橄榄色螯虾，螯下面颜色淡，是西欧洁净石灰岩溪流中受威胁的本土物种。",
+      "ar": "جراد نهر زيتوني صغير بمخالب شاحبة من الأسفل، نوع مهدد أصلي في جداول الحجر الجيري النظيفة في غرب أوروبا.",
+      "he": "סרטן נהרות קטן בצבע זית עם צבתות חיוורות מלמטה, מין מקומי מאוים של נחלי גיר נקיים במערב אירופה."
+    }
+  },
+  {
+    "id": "sp_tasmanian_giant_freshwater_crayfish",
+    "scientificName": "Astacopsis gouldi",
+    "category": "invertebrate",
+    "taxonomyClass": "Malacostraca",
+    "commonName": "Tasmanian Giant Freshwater Crayfish",
+    "description": {
+      "en": "The world's largest freshwater invertebrate, a slow-growing blue-brown crayfish of shaded Tasmanian rivers.",
+      "de": "Das größte Süßwasser-Wirbellose der Welt, ein langsam wachsender blaubrauner Flusskrebs beschatteter tasmanischer Flüsse.",
+      "es": "El invertebrado de agua dulce más grande del mundo, un cangrejo azul pardo de crecimiento lento de los ríos umbríos de Tasmania.",
+      "fr": "Le plus grand invertébré d'eau douce du monde, écrevisse bleu-brun à croissance lente des rivières ombragées de Tasmanie.",
+      "it": "Il più grande invertebrato d'acqua dolce del mondo, un gambero blu-bruno a crescita lenta dei fiumi ombreggiati della Tasmania.",
+      "pt": "O maior invertebrado de água doce do mundo, um lagostim azul-acastanhado de crescimento lento dos rios sombreados da Tasmânia.",
+      "nl": "Het grootste zoetwaterongewervelde ter wereld, een traag groeiende blauwbruine rivierkreeft van beschaduwde Tasmaanse rivieren.",
+      "hu": "A világ legnagyobb édesvízi gerinctelenje, lassan növő kékesbarna folyami rák Tasmania árnyékos folyóiból.",
+      "zh": "世界上最大的淡水无脊椎动物，塔斯马尼亚荫蔽河流中生长缓慢的蓝褐色螯虾。",
+      "ar": "أكبر لافقاريات المياه العذبة في العالم، جراد نهر أزرق بني بطيء النمو من أنهار تسمانيا المظللة.",
+      "he": "חסר החוליות הגדול ביותר במים מתוקים בעולם, סרטן נהרות כחול-חום איטי גדילה מנהרות מוצלים בטסמניה."
+    }
+  },
+  {
+    "id": "sp_zebra_mussel",
+    "scientificName": "Dreissena polymorpha",
+    "category": "invertebrate",
+    "taxonomyClass": "Bivalvia",
+    "commonName": "Zebra Mussel",
+    "description": {
+      "en": "Thumbnail-sized striped mussel that carpets rocks, wrecks and pipes by the thousand, clearing the water as it spreads.",
+      "de": "Daumennagelgroße gestreifte Muschel, die Felsen, Wracks und Rohre zu Tausenden überzieht und das Wasser klärt, während sie sich ausbreitet.",
+      "es": "Mejillón rayado del tamaño de una uña que tapiza rocas, pecios y tuberías por miles, aclarando el agua a medida que se extiende.",
+      "fr": "Moule rayée de la taille d'un ongle qui tapisse par milliers rochers, épaves et canalisations, clarifiant l'eau en s'étendant.",
+      "it": "Mitilo striato grande come un'unghia che ricopre a migliaia rocce, relitti e tubature, rendendo l'acqua più limpida mentre si diffonde.",
+      "pt": "Mexilhão listrado do tamanho de uma unha que reveste rochas, naufrágios e tubagens aos milhares, clarificando a água à medida que se espalha.",
+      "nl": "Duimnagelgrote gestreepte mossel die rotsen, wrakken en leidingen met duizenden bedekt en het water helderder maakt terwijl hij zich verspreidt.",
+      "hu": "Hüvelykujjköröm méretű, csíkos kagyló, ezrével borítja be a sziklákat, roncsokat és csöveket, terjedése közben kitisztítja a vizet.",
+      "zh": "指甲大小的条纹贻贝，成千上万地覆盖岩石、沉船和管道，扩散的同时使水变清。",
+      "ar": "بلح بحر مخطط بحجم ظفر الإبهام يغطي الصخور والحطام والأنابيب بالآلاف، ويصفّي الماء مع انتشاره.",
+      "he": "צדפה מפוספסת בגודל ציפורן המכסה סלעים, ספינות טרופות וצינורות באלפים ומצלילה את המים תוך התפשטותה."
+    }
+  },
+  {
+    "id": "sp_quagga_mussel",
+    "scientificName": "Dreissena bugensis",
+    "category": "invertebrate",
+    "taxonomyClass": "Bivalvia",
+    "commonName": "Quagga Mussel",
+    "description": {
+      "en": "Rounder, paler relative of the zebra mussel that colonises soft bottoms and deep cold water the zebra cannot.",
+      "de": "Rundere, blassere Verwandte der Zebramuschel, die weiche Böden und tiefes kaltes Wasser besiedelt, wo die Zebramuschel nicht kann.",
+      "es": "Pariente más redondeado y pálido del mejillón cebra que coloniza fondos blandos y aguas frías y profundas donde aquel no puede.",
+      "fr": "Cousine plus ronde et plus pâle de la moule zébrée, colonisant les fonds meubles et les eaux froides et profondes inaccessibles à celle-ci.",
+      "it": "Parente più rotondo e pallido del mitilo zebrato che colonizza fondali molli e acque fredde e profonde dove questo non arriva.",
+      "pt": "Parente mais arredondado e pálido do mexilhão-zebra que coloniza fundos moles e águas frias e profundas onde aquele não consegue.",
+      "nl": "Rondere, blekere verwant van de driehoeksmossel die zachte bodems en diep koud water koloniseert waar die niet kan.",
+      "hu": "A vándorkagyló kerekebb, halványabb rokona, puha aljzatot és mély, hideg vizet népesít be, ahová a vándorkagyló nem jut el.",
+      "zh": "斑马贻贝更圆更淡的近亲，能在斑马贻贝无法生存的软底和深冷水域定居。",
+      "ar": "قريب أكثر استدارة وشحوباً لبلح البحر المخطط، يستوطن القيعان الطرية والمياه العميقة الباردة التي لا يستطيع الآخر بلوغها.",
+      "he": "קרוב עגול וחיוור יותר של צדפת הזברה המאכלס קרקעיות רכות ומים עמוקים וקרים שהזברה אינה יכולה."
+    }
+  },
+  {
+    "id": "sp_freshwater_pearl_mussel",
+    "scientificName": "Margaritifera margaritifera",
+    "category": "invertebrate",
+    "taxonomyClass": "Bivalvia",
+    "commonName": "Freshwater Pearl Mussel",
+    "description": {
+      "en": "Dark, elongated mussel that can live over a century half-buried in clean gravel of fast salmon rivers.",
+      "de": "Dunkle, längliche Muschel, die über ein Jahrhundert halb eingegraben im sauberen Kies schneller Lachsflüsse leben kann.",
+      "es": "Mejillón oscuro y alargado que puede vivir más de un siglo semienterrado en la grava limpia de ríos salmoneros rápidos.",
+      "fr": "Moule sombre et allongée pouvant vivre plus d'un siècle à demi enfouie dans le gravier propre des rivières à saumons rapides.",
+      "it": "Mitilo scuro e allungato che può vivere oltre un secolo semisepolto nella ghiaia pulita dei veloci fiumi a salmoni.",
+      "pt": "Mexilhão escuro e alongado que pode viver mais de um século meio enterrado no cascalho limpo de rios rápidos de salmão.",
+      "nl": "Donkere, langwerpige mossel die meer dan een eeuw half ingegraven kan leven in schoon grind van snelle zalmrivieren.",
+      "hu": "Sötét, megnyúlt kagyló, amely több mint egy évszázadig élhet félig beásva a gyors lazacos folyók tiszta kavicsába.",
+      "zh": "深色长形的贻贝，可在湍急鲑鱼河流的洁净砾石中半埋生活一个多世纪。",
+      "ar": "بلح بحر داكن مستطيل يمكنه العيش أكثر من قرن نصف مدفون في الحصى النظيف لأنهار السلمون السريعة.",
+      "he": "צדפה כהה ומוארכת שיכולה לחיות יותר ממאה שנה חצי קבורה בחצץ נקי של נהרות סלמון מהירים."
+    }
+  },
+  {
+    "id": "sp_swan_mussel",
+    "scientificName": "Anodonta cygnea",
+    "category": "invertebrate",
+    "taxonomyClass": "Bivalvia",
+    "commonName": "Swan Mussel",
+    "description": {
+      "en": "Large thin-shelled mussel of muddy lakes and canals, filtering water with its siphons just above the silt.",
+      "de": "Große dünnschalige Muschel schlammiger Seen und Kanäle, filtert mit ihren Siphonen knapp über dem Schlick das Wasser.",
+      "es": "Gran mejillón de concha fina de lagos y canales fangosos, filtra el agua con sus sifones justo por encima del limo.",
+      "fr": "Grande moule à coquille fine des lacs et canaux vaseux, filtrant l'eau par ses siphons juste au-dessus du limon.",
+      "it": "Grande mitilo dalla conchiglia sottile di laghi e canali fangosi, filtra l'acqua con i sifoni appena sopra il limo.",
+      "pt": "Grande mexilhão de concha fina de lagos e canais lodosos, filtra a água com os sifões logo acima do lodo.",
+      "nl": "Grote dunschalige zwanenmossel van modderige meren en kanalen die met zijn sifons vlak boven het slib water filtert.",
+      "hu": "Nagy, vékony héjú kagyló iszapos tavakból és csatornákból, szifóival közvetlenül az iszap fölött szűri a vizet.",
+      "zh": "大型薄壳贻贝，生活在泥底湖泊和运河中，用水管在淤泥上方过滤水体。",
+      "ar": "بلح بحر كبير رقيق الصدفة يعيش في البحيرات والقنوات الطينية، يرشح الماء بسيفوناته فوق الطمي مباشرة.",
+      "he": "צדפה גדולה דקת קונכייה מאגמים ותעלות בוציים, מסננת מים בסיפונים שלה ממש מעל הטין."
+    }
+  },
+  {
+    "id": "sp_chinese_pond_mussel",
+    "scientificName": "Sinanodonta woodiana",
+    "category": "invertebrate",
+    "taxonomyClass": "Bivalvia",
+    "commonName": "Chinese Pond Mussel",
+    "description": {
+      "en": "Very large invasive Asian mussel with a glossy brown shell, arriving with farmed fish and spreading through warm lakes.",
+      "de": "Sehr große invasive asiatische Muschel mit glänzend brauner Schale, mit Zuchtfischen eingeschleppt und in warmen Seen verbreitet.",
+      "es": "Mejillón asiático invasor muy grande de concha marrón brillante, llegado con peces de cultivo y extendido por lagos cálidos.",
+      "fr": "Très grande moule asiatique envahissante à la coquille brune brillante, arrivée avec les poissons d'élevage et gagnant les lacs chauds.",
+      "it": "Mitilo asiatico invasivo molto grande con conchiglia bruna lucida, arrivato con i pesci d'allevamento e diffuso nei laghi caldi.",
+      "pt": "Mexilhão asiático invasor muito grande de concha castanha brilhante, chegado com peixes de aquicultura e espalhado por lagos quentes.",
+      "nl": "Zeer grote invasieve Aziatische mossel met een glanzend bruine schelp, meegekomen met kweekvis en verspreid over warme meren.",
+      "hu": "Nagyon nagy, invazív ázsiai kagyló fényes barna héjjal, tenyésztett halakkal érkezett és meleg tavakban terjed.",
+      "zh": "体型极大的亚洲入侵贻贝，壳呈亮褐色，随养殖鱼类传入并在温暖湖泊中扩散。",
+      "ar": "بلح بحر آسيوي غازٍ كبير جداً بصدفة بنية لامعة، وصل مع الأسماك المستزرعة وينتشر في البحيرات الدافئة.",
+      "he": "צדפה אסייתית פולשת גדולה מאוד עם קונכייה חומה מבריקה, הגיעה עם דגי חווה ומתפשטת באגמים חמימים."
+    }
+  },
+  {
+    "id": "sp_freshwater_sponge",
+    "scientificName": "Spongilla lacustris",
+    "category": "invertebrate",
+    "taxonomyClass": "Demospongiae",
+    "commonName": "Freshwater Sponge",
+    "description": {
+      "en": "Green or grey branching sponge encrusting sticks and stones in clear lakes, coloured by algae living inside it.",
+      "de": "Grüner oder grauer verzweigter Schwamm, der Äste und Steine in klaren Seen überzieht, gefärbt von Algen, die in ihm leben.",
+      "es": "Esponja ramificada verde o gris que recubre ramas y piedras en lagos claros, coloreada por las algas que viven en su interior.",
+      "fr": "Éponge ramifiée verte ou grise encroûtant branches et pierres dans les lacs clairs, colorée par les algues qui vivent en elle.",
+      "it": "Spugna ramificata verde o grigia che incrosta rami e pietre nei laghi limpidi, colorata dalle alghe che vivono al suo interno.",
+      "pt": "Esponja ramificada verde ou cinzenta que reveste ramos e pedras em lagos claros, colorida pelas algas que vivem no seu interior.",
+      "nl": "Groene of grijze vertakte spons die takken en stenen in heldere meren bedekt, gekleurd door algen die erin leven.",
+      "hu": "Zöld vagy szürke, elágazó szivacs, tiszta tavakban ágakat és köveket von be, színét a benne élő algák adják.",
+      "zh": "绿色或灰色的分枝状海绵，附着在清澈湖泊的树枝和石头上，颜色来自体内共生的藻类。",
+      "ar": "إسفنج متفرع أخضر أو رمادي يغطي الأغصان والحجارة في البحيرات الصافية، تلوّنه الطحالب التي تعيش داخله.",
+      "he": "ספוג מסתעף ירוק או אפור המצפה ענפים ואבנים באגמים צלולים, צבוע על ידי אצות החיות בתוכו."
+    }
+  },
+  {
+    "id": "sp_freshwater_jellyfish",
+    "scientificName": "Craspedacusta sowerbii",
+    "category": "invertebrate",
+    "taxonomyClass": "Hydrozoa",
+    "commonName": "Freshwater Jellyfish",
+    "description": {
+      "en": "Coin-sized transparent jellyfish that appears in swarms in warm quarry lakes and reservoirs in late summer.",
+      "de": "Münzgroße durchsichtige Qualle, die im Spätsommer in Schwärmen in warmen Baggerseen und Stauseen auftaucht.",
+      "es": "Medusa transparente del tamaño de una moneda que aparece en enjambres en lagos de cantera cálidos y embalses a finales del verano.",
+      "fr": "Méduse transparente de la taille d'une pièce qui apparaît en essaims dans les lacs de carrière chauds et les réservoirs à la fin de l'été.",
+      "it": "Medusa trasparente grande come una moneta che compare in sciami nei caldi laghi di cava e nei bacini a fine estate.",
+      "pt": "Medusa transparente do tamanho de uma moeda que surge em enxames em lagos de pedreira quentes e represas no fim do verão.",
+      "nl": "Muntgrote doorzichtige kwal die in de nazomer in zwermen verschijnt in warme groevemeren en stuwmeren.",
+      "hu": "Érme méretű, átlátszó medúza, nyár végén rajokban jelenik meg meleg bányatavakban és víztározókban.",
+      "zh": "硬币大小的透明水母，夏末在温暖的采石场湖泊和水库中成群出现。",
+      "ar": "قنديل بحر شفاف بحجم عملة معدنية يظهر في أسراب في بحيرات المحاجر الدافئة والخزانات في أواخر الصيف.",
+      "he": "מדוזה שקופה בגודל מטבע המופיעה בנחילים באגמי מחצבה חמימים ובמאגרים בסוף הקיץ."
+    }
+  },
+  {
+    "id": "sp_great_pond_snail",
+    "scientificName": "Lymnaea stagnalis",
+    "category": "invertebrate",
+    "taxonomyClass": "Gastropoda",
+    "commonName": "Great Pond Snail",
+    "description": {
+      "en": "Large pointed-shelled snail gliding over plants and glass-clear surfaces of still European waters, breathing air at the surface.",
+      "de": "Große Schnecke mit spitzem Gehäuse, gleitet über Pflanzen und glasklare Flächen stiller europäischer Gewässer und atmet Luft an der Oberfläche.",
+      "es": "Gran caracol de concha puntiaguda que se desliza sobre plantas y superficies en aguas quietas europeas y respira aire en la superficie.",
+      "fr": "Grand escargot à la coquille pointue glissant sur les plantes des eaux calmes d'Europe et respirant l'air à la surface.",
+      "it": "Grande chiocciola dalla conchiglia appuntita che scivola su piante e superfici nelle acque ferme europee e respira aria in superficie.",
+      "pt": "Grande caracol de concha pontiaguda que desliza sobre plantas em águas paradas europeias e respira ar à superfície.",
+      "nl": "Grote poelslak met een spits huisje die over planten in stilstaand Europees water glijdt en aan het oppervlak lucht ademt.",
+      "hu": "Nagy, hegyes házú csiga, az európai állóvizek növényein siklik és a felszínen levegőt lélegzik.",
+      "zh": "大型尖壳螺，在欧洲静水的植物上滑行，浮到水面呼吸空气。",
+      "ar": "حلزون كبير بصدفة مدببة ينساب فوق النباتات في المياه الراكدة الأوروبية ويتنفس الهواء عند السطح.",
+      "he": "חילזון גדול עם קונכייה מחודדת המחליק על צמחים במים עומדים באירופה ונושם אוויר על פני המים."
+    }
+  },
+  {
+    "id": "sp_great_ramshorn_snail",
+    "scientificName": "Planorbarius corneus",
+    "category": "invertebrate",
+    "taxonomyClass": "Gastropoda",
+    "commonName": "Great Ramshorn Snail",
+    "description": {
+      "en": "Flat, coiled snail like a tiny ram's horn, grazing algae from leaves and stones in weedy ponds.",
+      "de": "Flache, spiralig gewundene Schnecke wie ein winziges Widderhorn, weidet Algen von Blättern und Steinen in verkrauteten Teichen.",
+      "es": "Caracol plano y enrollado como un diminuto cuerno de carnero, raspa algas de hojas y piedras en lagunas con vegetación.",
+      "fr": "Escargot plat et enroulé comme une minuscule corne de bélier, broutant les algues des feuilles et des pierres des étangs herbeux.",
+      "it": "Chiocciola piatta e avvolta come un minuscolo corno d'ariete, bruca le alghe da foglie e pietre negli stagni erbosi.",
+      "pt": "Caracol achatado e enrolado como um minúsculo corno de carneiro, raspa algas de folhas e pedras em lagoas com vegetação.",
+      "nl": "Platte, opgerolde posthoornslak als een piepkleine ramshoorn die algen van bladeren en stenen in begroeide vijvers graast.",
+      "hu": "Lapos, kosszarvra emlékeztető tekercses csiga, hínáros tavak levelein és kövein legeli az algát.",
+      "zh": "扁平盘曲如小羊角的螺，在水草茂密的池塘中刮食叶片和石头上的藻类。",
+      "ar": "حلزون مسطح ملتف مثل قرن كبش صغير، يرعى الطحالب من الأوراق والحجارة في البرك العشبية.",
+      "he": "חילזון שטוח ומפותל כמו קרן איל זעירה, רועה אצות מעלים ואבנים בבריכות עשירות בצמחייה."
+    }
+  },
+  {
+    "id": "sp_channeled_apple_snail",
+    "scientificName": "Pomacea canaliculata",
+    "category": "invertebrate",
+    "taxonomyClass": "Gastropoda",
+    "commonName": "Channeled Apple Snail",
+    "description": {
+      "en": "Large golden-brown snail that lays bright pink egg clusters above the waterline, invasive in warm wetlands and rice fields.",
+      "de": "Große goldbraune Schnecke, die leuchtend rosa Eigelege über der Wasserlinie ablegt, invasiv in warmen Feuchtgebieten und Reisfeldern.",
+      "es": "Gran caracol pardo dorado que deposita racimos de huevos rosa brillante sobre la línea de agua, invasor en humedales cálidos y arrozales.",
+      "fr": "Grand escargot brun doré qui dépose des grappes d'œufs rose vif au-dessus de la ligne d'eau, envahissant dans les zones humides chaudes et les rizières.",
+      "it": "Grande chiocciola bruno dorata che depone grappoli di uova rosa acceso sopra la linea dell'acqua, invasiva nelle zone umide calde e nelle risaie.",
+      "pt": "Grande caracol castanho-dourado que deposita cachos de ovos rosa vivo acima da linha de água, invasor em zonas húmidas quentes e arrozais.",
+      "nl": "Grote goudbruine appelslak die felroze eiclusters boven de waterlijn afzet, invasief in warme wetlands en rijstvelden.",
+      "hu": "Nagy, aranybarna csiga, élénk rózsaszín petecsomóit a vízvonal fölé rakja, invazív a meleg vizes élőhelyeken és rizsföldeken.",
+      "zh": "大型金褐色螺，在水线上方产下亮粉色卵块，在温暖湿地和稻田中为入侵物种。",
+      "ar": "حلزون كبير بني ذهبي يضع عناقيد بيض وردية زاهية فوق خط الماء، غازٍ في الأراضي الرطبة الدافئة وحقول الأرز.",
+      "he": "חילזון גדול חום-זהוב המטיל אשכולות ביצים ורודות בוהקות מעל קו המים, פולש באזורי ביצה חמים ובשדות אורז."
+    }
+  },
+  {
+    "id": "sp_magnificent_bryozoan",
+    "scientificName": "Pectinatella magnifica",
+    "category": "invertebrate",
+    "taxonomyClass": "Phylactolaemata",
+    "commonName": "Magnificent Bryozoan",
+    "description": {
+      "en": "Jelly-like colony the size of a football, studded with tiny animals, clinging to branches and ropes in warm still water.",
+      "de": "Gallertartige Kolonie von Fußballgröße, besetzt mit winzigen Tieren, haftet an Ästen und Seilen in warmem stillem Wasser.",
+      "es": "Colonia gelatinosa del tamaño de un balón, tachonada de diminutos animales, adherida a ramas y cuerdas en aguas cálidas y quietas.",
+      "fr": "Colonie gélatineuse de la taille d'un ballon, constellée de minuscules animaux, accrochée aux branches et cordages des eaux chaudes et calmes.",
+      "it": "Colonia gelatinosa grande come un pallone, costellata di minuscoli animali, aggrappata a rami e corde in acque calde e ferme.",
+      "pt": "Colónia gelatinosa do tamanho de uma bola, cravejada de minúsculos animais, agarrada a ramos e cordas em água quente e parada.",
+      "nl": "Geleiachtige kolonie zo groot als een voetbal, bezet met piepkleine diertjes, vastgeklampt aan takken en touwen in warm stilstaand water.",
+      "hu": "Focilabda méretű, kocsonyás telep, apró állatokkal telehintve, ágakon és köteleken tapad meleg, csendes vízben.",
+      "zh": "足球大小的胶状群体，表面布满微小动物，附着在温暖静水中的树枝和绳索上。",
+      "ar": "مستعمرة هلامية بحجم كرة القدم مرصعة بحيوانات دقيقة، تتشبث بالأغصان والحبال في المياه الدافئة الساكنة.",
+      "he": "מושבה דמוית ג'לי בגודל כדורגל, משובצת בבעלי חיים זעירים, נצמדת לענפים ולחבלים במים חמים ושקטים."
+    }
+  },
+  {
+    "id": "sp_chinese_mitten_crab",
+    "scientificName": "Eriocheir sinensis",
+    "category": "invertebrate",
+    "taxonomyClass": "Malacostraca",
+    "commonName": "Chinese Mitten Crab",
+    "description": {
+      "en": "Burrowing crab with furry claws that spends years in rivers before walking downstream to breed in estuaries.",
+      "de": "Grabende Krabbe mit behaarten Scheren, die Jahre in Flüssen verbringt, bevor sie flussabwärts zum Laichen in Ästuare wandert.",
+      "es": "Cangrejo excavador de pinzas peludas que pasa años en los ríos antes de bajar a reproducirse en los estuarios.",
+      "fr": "Crabe fouisseur aux pinces velues qui passe des années en rivière avant de descendre se reproduire dans les estuaires.",
+      "it": "Granchio scavatore con chele pelose che trascorre anni nei fiumi prima di scendere a riprodursi negli estuari.",
+      "pt": "Caranguejo escavador de pinças peludas que passa anos nos rios antes de descer para se reproduzir nos estuários.",
+      "nl": "Gravende krab met harige scharen die jaren in rivieren doorbrengt voordat hij stroomafwaarts loopt om in estuaria te paaien.",
+      "hu": "Üregásó rák szőrös ollókkal, éveket tölt folyókban, mielőtt a torkolatokba vándorol szaporodni.",
+      "zh": "掘穴的螃蟹，螯上长有绒毛，在河流中生活数年后顺流而下到河口繁殖。",
+      "ar": "سرطان حفّار بمخالب مشعرة يقضي سنوات في الأنهار قبل أن يسير مع مجرى النهر للتكاثر في المصبات.",
+      "he": "סרטן חופר עם צבתות שעירות המבלה שנים בנהרות לפני שהוא הולך במורד הזרם להתרבות בשפכים."
+    }
+  },
+  {
+    "id": "sp_giant_freshwater_prawn",
+    "scientificName": "Macrobrachium rosenbergii",
+    "category": "invertebrate",
+    "taxonomyClass": "Malacostraca",
+    "commonName": "Giant Freshwater Prawn",
+    "description": {
+      "en": "Big blue-clawed prawn of Asian and Australian rivers with claws longer than its body in old males.",
+      "de": "Große Garnele mit blauen Scheren aus asiatischen und australischen Flüssen, deren alte Männchen Scheren länger als der Körper haben.",
+      "es": "Gran langostino de pinzas azules de los ríos de Asia y Australia, con pinzas más largas que el cuerpo en los machos viejos.",
+      "fr": "Grande crevette aux pinces bleues des rivières d'Asie et d'Australie, aux pinces plus longues que le corps chez les vieux mâles.",
+      "it": "Grande gambero dalle chele blu dei fiumi asiatici e australiani, con chele più lunghe del corpo nei maschi anziani.",
+      "pt": "Grande camarão de pinças azuis dos rios da Ásia e da Austrália, com pinças mais compridas do que o corpo nos machos velhos.",
+      "nl": "Grote garnaal met blauwe scharen uit Aziatische en Australische rivieren, waarvan oude mannetjes scharen langer dan hun lichaam hebben.",
+      "hu": "Nagy, kék ollójú garnéla Ázsia és Ausztrália folyóiból, az idős hímek ollói hosszabbak a testüknél.",
+      "zh": "亚洲和澳大利亚河流中的大型蓝螯虾，老年雄性的螯比身体还长。",
+      "ar": "روبيان كبير بمخالب زرقاء من أنهار آسيا وأستراليا، مخالب الذكور المسنة أطول من أجسامها.",
+      "he": "שרימפס גדול עם צבתות כחולות מנהרות אסיה ואוסטרליה, שצבתותיהם של הזכרים הזקנים ארוכות מגופם."
+    }
+  },
+  {
+    "id": "sp_common_snapping_turtle",
+    "scientificName": "Chelydra serpentina",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Common Snapping Turtle",
+    "description": {
+      "en": "Heavy, rough-shelled turtle with a long saw-toothed tail, lying in the mud of ponds and slow rivers with its head out.",
+      "de": "Schwere Schildkröte mit rauem Panzer und langem gezacktem Schwanz, liegt mit herausgestrecktem Kopf im Schlamm von Teichen und langsamen Flüssen.",
+      "es": "Tortuga pesada de caparazón rugoso y larga cola aserrada, reposa en el lodo de lagunas y ríos lentos con la cabeza fuera.",
+      "fr": "Tortue massive à la carapace rugueuse et à la longue queue dentelée, couchée dans la vase des étangs et rivières lentes, la tête sortie.",
+      "it": "Tartaruga pesante dal carapace ruvido e lunga coda seghettata, giace nel fango di stagni e fiumi lenti con la testa fuori.",
+      "pt": "Tartaruga pesada de carapaça rugosa e longa cauda serrilhada, repousa na lama de lagoas e rios lentos com a cabeça de fora.",
+      "nl": "Zware schildpad met een ruw schild en een lange gezaagde staart die met de kop naar buiten in de modder van vijvers en trage rivieren ligt.",
+      "hu": "Nehéz, érdes páncélú teknős hosszú, fűrészes farokkal, kidugott fejjel fekszik tavak és lassú folyók iszapjában.",
+      "zh": "体重壳糙的龟，尾长带锯齿，伏在池塘和缓流河流的泥中，头部露出。",
+      "ar": "سلحفاة ثقيلة خشنة الدرع بذيل طويل مسنن، ترقد في طين البرك والأنهار البطيئة ورأسها خارج الطين.",
+      "he": "צב כבד עם שריון מחוספס וזנב ארוך משונן, רובץ בבוץ של בריכות ונהרות איטיים כשראשו בחוץ."
+    }
+  },
+  {
+    "id": "sp_alligator_snapping_turtle",
+    "scientificName": "Macrochelys temminckii",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Alligator Snapping Turtle",
+    "description": {
+      "en": "Prehistoric-looking giant with three ridged keels and a worm-like tongue lure, waiting open-mouthed on southern river bottoms.",
+      "de": "Urzeitlich wirkender Riese mit drei gezackten Kielen und wurmartigem Zungenköder, wartet mit offenem Maul auf südlichen Flussgründen.",
+      "es": "Gigante de aspecto prehistórico con tres quillas crestadas y un señuelo lingual en forma de gusano, espera con la boca abierta en el fondo de los ríos del sur.",
+      "fr": "Géant d'allure préhistorique aux trois carènes crénelées et au leurre lingual en forme de ver, attendant bouche ouverte sur le fond des rivières du sud.",
+      "it": "Gigante dall'aspetto preistorico con tre carene dentellate e un'esca linguale a forma di verme, attende a bocca aperta sul fondo dei fiumi meridionali.",
+      "pt": "Gigante de aspeto pré-histórico com três quilhas cristadas e um isco lingual em forma de verme, espera de boca aberta no fundo dos rios do sul.",
+      "nl": "Prehistorisch ogende reus met drie getande kielen en een wormvormig tonglokaas die met open bek op zuidelijke rivierbodems wacht.",
+      "hu": "Őskori külsejű óriás három tarajos gerinccel és féregszerű nyelvcsalival, nyitott szájjal várakozik a déli folyók fenekén.",
+      "zh": "外形似史前生物的巨龟，背甲有三道脊棱，舌上有蠕虫状诱饵，张口静待于南方河底。",
+      "ar": "عملاق ذو مظهر ما قبل التاريخ بثلاثة أعراف مسننة وطعم لساني يشبه الدودة، ينتظر بفم مفتوح على قيعان الأنهار الجنوبية.",
+      "he": "ענק בעל מראה פרהיסטורי עם שלוש שדרות משוננות ופיתיון לשון דמוי תולעת, ממתין בפה פתוח על קרקעיות נהרות הדרום."
+    }
+  },
+  {
+    "id": "sp_painted_turtle",
+    "scientificName": "Chrysemys picta",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Painted Turtle",
+    "description": {
+      "en": "Smooth dark turtle with red and yellow stripes on its neck and shell rim, basking in rows on logs across North America.",
+      "de": "Glatte dunkle Schildkröte mit roten und gelben Streifen an Hals und Panzerrand, sonnt sich in Reihen auf Baumstämmen in ganz Nordamerika.",
+      "es": "Tortuga lisa y oscura con rayas rojas y amarillas en el cuello y el borde del caparazón, toma el sol en fila sobre troncos por toda Norteamérica.",
+      "fr": "Tortue lisse et sombre aux rayures rouges et jaunes sur le cou et le bord de la carapace, se chauffant en rangs sur les troncs dans toute l'Amérique du Nord.",
+      "it": "Tartaruga liscia e scura con strisce rosse e gialle su collo e bordo del carapace, si crogiola in fila sui tronchi in tutto il Nord America.",
+      "pt": "Tartaruga lisa e escura com riscas vermelhas e amarelas no pescoço e na orla da carapaça, apanha sol em fila sobre troncos por toda a América do Norte.",
+      "nl": "Gladde donkere schildpad met rode en gele strepen op de hals en schildrand die in rijen op boomstammen zont in heel Noord-Amerika.",
+      "hu": "Sima, sötét teknős vörös és sárga csíkokkal a nyakán és a páncél szegélyén, sorban napozik fatörzseken Észak-Amerika-szerte.",
+      "zh": "壳光滑的深色龟，颈部和甲缘有红黄条纹，在北美各地成排趴在倒木上晒太阳。",
+      "ar": "سلحفاة داكنة ملساء بخطوط حمراء وصفراء على العنق وحافة الدرع، تتشمس في صفوف على جذوع الأشجار في أنحاء أمريكا الشمالية.",
+      "he": "צב כהה וחלק עם פסים אדומים וצהובים על הצוואר ושולי השריון, מתחמם בשורות על גזעים ברחבי צפון אמריקה."
+    }
+  },
+  {
+    "id": "sp_red_eared_slider",
+    "scientificName": "Trachemys scripta elegans",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Red-eared Slider",
+    "description": {
+      "en": "Green-striped pond turtle with a red stripe behind each eye, the pet-trade turtle now feral in warm waters worldwide.",
+      "de": "Grün gestreifte Wasserschildkröte mit rotem Streifen hinter jedem Auge, die Heimtierschildkröte, heute weltweit in warmen Gewässern verwildert.",
+      "es": "Tortuga de agua de rayas verdes con una franja roja tras cada ojo, la tortuga de mascota hoy asilvestrada en aguas cálidas de todo el mundo.",
+      "fr": "Tortue aquatique aux rayures vertes et à la bande rouge derrière chaque œil, tortue d'animalerie aujourd'hui naturalisée dans les eaux chaudes du monde entier.",
+      "it": "Tartaruga palustre a strisce verdi con una striscia rossa dietro ogni occhio, la tartaruga da negozio oggi inselvatichita nelle acque calde di tutto il mondo.",
+      "pt": "Tartaruga de lagoa de riscas verdes com uma faixa vermelha atrás de cada olho, a tartaruga de estimação hoje asselvajada em águas quentes de todo o mundo.",
+      "nl": "Groengestreepte roodwangschildpad met een rode streep achter elk oog, de huisdierschildpad die nu verwilderd is in warm water wereldwijd.",
+      "hu": "Zöld csíkos mocsári teknős vörös sávval mindkét szeme mögött, a kedvtelésből tartott teknős, ma világszerte elvadult a meleg vizekben.",
+      "zh": "带绿色条纹的池龟，每只眼后有一道红纹，作为宠物流行，如今在全球温暖水域野化。",
+      "ar": "سلحفاة برك بخطوط خضراء وشريط أحمر خلف كل عين، سلحفاة تجارة الحيوانات الأليفة التي باتت متوحشة في المياه الدافئة حول العالم.",
+      "he": "צב בריכות מפוספס ירוק עם פס אדום מאחורי כל עין, צב חיות המחמד שכיום משוטט חופשי במים חמים ברחבי העולם."
+    }
+  },
+  {
+    "id": "sp_northern_map_turtle",
+    "scientificName": "Graptemys geographica",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Northern Map Turtle",
+    "description": {
+      "en": "Olive turtle with map-like yellow lines on its shell and a low keel, basking on rocks along clear rivers and large lakes.",
+      "de": "Olivfarbene Schildkröte mit landkartenartigen gelben Linien auf dem Panzer und niedrigem Kiel, sonnt sich auf Felsen an klaren Flüssen und großen Seen.",
+      "es": "Tortuga oliva con líneas amarillas como un mapa en el caparazón y una quilla baja, toma el sol en rocas de ríos claros y grandes lagos.",
+      "fr": "Tortue olive aux lignes jaunes en forme de carte sur la carapace et à la carène basse, se chauffant sur les rochers des rivières claires et grands lacs.",
+      "it": "Tartaruga oliva con linee gialle a mappa sul carapace e una carena bassa, si crogiola sulle rocce lungo fiumi limpidi e grandi laghi.",
+      "pt": "Tartaruga oliva com linhas amarelas em forma de mapa na carapaça e uma quilha baixa, apanha sol nas rochas de rios claros e grandes lagos.",
+      "nl": "Olijfkleurige schildpad met kaartachtige gele lijnen op het schild en een lage kiel die op rotsen langs heldere rivieren en grote meren zont.",
+      "hu": "Olajzöld teknős térképszerű sárga vonalakkal a páncélján és alacsony gerinccel, tiszta folyók és nagy tavak szikláin napozik.",
+      "zh": "橄榄色的龟，甲壳上有地图状黄线，脊棱较低，在清澈河流和大湖的岩石上晒太阳。",
+      "ar": "سلحفاة زيتونية بخطوط صفراء تشبه الخريطة على درعها وعرف منخفض، تتشمس على الصخور بمحاذاة الأنهار الصافية والبحيرات الكبيرة.",
+      "he": "צב זית עם קווים צהובים דמויי מפה על שריונו ושדרה נמוכה, מתחמם על סלעים לאורך נהרות צלולים ואגמים גדולים."
+    }
+  },
+  {
+    "id": "sp_spiny_softshell_turtle",
+    "scientificName": "Apalone spinifera",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Spiny Softshell Turtle",
+    "description": {
+      "en": "Flat, leathery pancake of a turtle with a snorkel snout, buried in sand in shallow rivers with only its head showing.",
+      "de": "Flache, lederartige Pfannkuchenschildkröte mit Schnorchelschnauze, im Sand flacher Flüsse eingegraben, nur der Kopf schaut heraus.",
+      "es": "Tortuga plana y correosa como una tortita con hocico de esnórquel, enterrada en la arena de ríos someros con solo la cabeza fuera.",
+      "fr": "Tortue plate et coriace comme une crêpe au museau en tuba, enfouie dans le sable des rivières peu profondes, seule la tête dépassant.",
+      "it": "Tartaruga piatta e coriacea come una frittella con muso a boccaglio, sepolta nella sabbia dei fiumi bassi con solo la testa in vista.",
+      "pt": "Tartaruga achatada e coriácea como uma panqueca com focinho de snorkel, enterrada na areia de rios rasos com apenas a cabeça de fora.",
+      "nl": "Platte, leerachtige pannenkoek van een schildpad met een snorkelsnuit, ingegraven in het zand van ondiepe rivieren met alleen de kop zichtbaar.",
+      "hu": "Lapos, bőrszerű, palacsintára emlékeztető teknős szipkaszerű orral, sekély folyók homokjába ásva, csak a feje látszik ki.",
+      "zh": "扁平如薄饼的软壳龟，吻部如呼吸管，埋在浅河的沙中只露出头部。",
+      "ar": "سلحفاة مسطحة جلدية كالفطيرة بخطم يشبه أنبوب التنفس، مدفونة في رمال الأنهار الضحلة ولا يظهر منها سوى رأسها.",
+      "he": "צב שטוח ועורי כפנקייק עם חרטום דמוי שנורקל, קבור בחול בנהרות רדודים כשרק ראשו נראה."
+    }
+  },
+  {
+    "id": "sp_florida_softshell_turtle",
+    "scientificName": "Apalone ferox",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Florida Softshell Turtle",
+    "description": {
+      "en": "Large dark softshell with a long tubular snout, common in Florida springs, canals and lakes.",
+      "de": "Große dunkle Weichschildkröte mit langer röhrenförmiger Schnauze, häufig in Floridas Quellen, Kanälen und Seen.",
+      "es": "Gran tortuga de caparazón blando y oscuro con largo hocico tubular, común en manantiales, canales y lagos de Florida.",
+      "fr": "Grande tortue à carapace molle et sombre au long museau tubulaire, courante dans les sources, canaux et lacs de Floride.",
+      "it": "Grande tartaruga dal guscio molle e scuro con lungo muso tubolare, comune nelle sorgenti, canali e laghi della Florida.",
+      "pt": "Grande tartaruga de carapaça mole e escura com longo focinho tubular, comum nas nascentes, canais e lagos da Florida.",
+      "nl": "Grote donkere weekschildpad met een lange buisvormige snuit, algemeen in de bronnen, kanalen en meren van Florida.",
+      "hu": "Nagy, sötét lágyhéjú teknős hosszú, csőszerű orral, gyakori Florida forrásaiban, csatornáiban és tavaiban.",
+      "zh": "大型深色软壳龟，吻部长而呈管状，常见于佛罗里达的泉水、运河和湖泊。",
+      "ar": "سلحفاة كبيرة داكنة رخوة الدرع بخطم أنبوبي طويل، شائعة في ينابيع فلوريدا وقنواتها وبحيراتها.",
+      "he": "צב רך שריון גדול וכהה עם חרטום צינורי ארוך, נפוץ במעיינות, בתעלות ובאגמים של פלורידה."
+    }
+  },
+  {
+    "id": "sp_pig_nosed_turtle",
+    "scientificName": "Carettochelys insculpta",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Pig-nosed Turtle",
+    "description": {
+      "en": "Unique river turtle of New Guinea and northern Australia with sea-turtle flippers and a fleshy pig-like snout.",
+      "de": "Einzigartige Flussschildkröte Neuguineas und Nordaustraliens mit Meeresschildkrötenflossen und fleischiger schweineartiger Schnauze.",
+      "es": "Tortuga fluvial única de Nueva Guinea y el norte de Australia con aletas de tortuga marina y hocico carnoso de cerdo.",
+      "fr": "Tortue de rivière unique de Nouvelle-Guinée et du nord de l'Australie aux nageoires de tortue marine et au museau charnu de cochon.",
+      "it": "Tartaruga di fiume unica della Nuova Guinea e dell'Australia settentrionale con pinne da tartaruga marina e muso carnoso da maiale.",
+      "pt": "Tartaruga de rio única da Nova Guiné e do norte da Austrália com barbatanas de tartaruga marinha e focinho carnudo de porco.",
+      "nl": "Unieke rivierschildpad uit Nieuw-Guinea en Noord-Australië met zeeschildpadflippers en een vlezige varkenssnuit.",
+      "hu": "Egyedülálló folyami teknős Új-Guineából és Észak-Ausztráliából tengeri teknősre emlékeztető uszonyokkal és húsos, disznószerű orral.",
+      "zh": "新几内亚和澳大利亚北部特有的河龟，具有海龟般的鳍足和肉质猪鼻状吻部。",
+      "ar": "سلحفاة نهرية فريدة من غينيا الجديدة وشمال أستراليا بزعانف كسلاحف البحر وخطم لحمي يشبه أنف الخنزير.",
+      "he": "צב נהר ייחודי מגינאה החדשה וצפון אוסטרליה עם סנפירי צב ים וחרטום בשרני דמוי חזיר."
+    }
+  },
+  {
+    "id": "sp_mary_river_turtle",
+    "scientificName": "Elusor macrurus",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Mary River Turtle",
+    "description": {
+      "en": "Rare Australian turtle that breathes through its cloaca and grows a green algae mohawk, found in a single Queensland river.",
+      "de": "Seltene australische Schildkröte, die über ihre Kloake atmet und einen grünen Algen-Irokesenschnitt trägt, nur in einem einzigen Fluss in Queensland.",
+      "es": "Rara tortuga australiana que respira por la cloaca y luce una cresta de algas verdes, presente en un solo río de Queensland.",
+      "fr": "Rare tortue australienne qui respire par le cloaque et arbore une crête d'algues vertes, présente dans une seule rivière du Queensland.",
+      "it": "Rara tartaruga australiana che respira attraverso la cloaca e sfoggia una cresta di alghe verdi, presente in un solo fiume del Queensland.",
+      "pt": "Rara tartaruga australiana que respira pela cloaca e ostenta uma crista de algas verdes, encontrada num único rio de Queensland.",
+      "nl": "Zeldzame Australische schildpad die door zijn cloaca ademt en een groene algenhanenkam draagt, alleen in één rivier in Queensland.",
+      "hu": "Ritka ausztrál teknős, kloákáján át lélegzik és zöld algataréjt visel, egyetlen queenslandi folyóban él.",
+      "zh": "稀有的澳大利亚龟，能通过泄殖腔呼吸，头顶长着绿藻莫西干发型，仅见于昆士兰的一条河流。",
+      "ar": "سلحفاة أسترالية نادرة تتنفس عبر المذرق وتنمو على رأسها عرف من الطحالب الخضراء، توجد في نهر واحد في كوينزلاند.",
+      "he": "צב אוסטרלי נדיר הנושם דרך הביב שלו ומגדל ציצת אצות ירוקה, מצוי בנהר יחיד בקווינסלנד."
+    }
+  },
+  {
+    "id": "sp_yellow_spotted_river_turtle",
+    "scientificName": "Podocnemis unifilis",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Yellow-spotted River Turtle",
+    "description": {
+      "en": "Amazon side-necked turtle with yellow head spots, basking in groups on logs and sandbanks of large rivers.",
+      "de": "Amazonas-Halswender-Schildkröte mit gelben Kopfflecken, sonnt sich in Gruppen auf Baumstämmen und Sandbänken großer Flüsse.",
+      "es": "Tortuga de cuello lateral del Amazonas con manchas amarillas en la cabeza, toma el sol en grupos sobre troncos y bancos de arena de grandes ríos.",
+      "fr": "Tortue pleurodire de l'Amazone aux taches jaunes sur la tête, se chauffant en groupes sur les troncs et bancs de sable des grands fleuves.",
+      "it": "Tartaruga pleurodira dell'Amazzonia con macchie gialle sulla testa, si crogiola in gruppi su tronchi e banchi di sabbia dei grandi fiumi.",
+      "pt": "Tartaruga de pescoço lateral do Amazonas com manchas amarelas na cabeça, apanha sol em grupos sobre troncos e bancos de areia de grandes rios.",
+      "nl": "Amazone-halswenderschildpad met gele kopvlekken die in groepen op boomstammen en zandbanken van grote rivieren zont.",
+      "hu": "Amazonasi nyakfordító teknős sárga fejfoltokkal, csoportosan napozik nagy folyók fatörzsein és homokpadjain.",
+      "zh": "亚马逊侧颈龟，头部有黄斑，成群在大河的倒木和沙洲上晒太阳。",
+      "ar": "سلحفاة أمازونية جانبية العنق ببقع صفراء على الرأس، تتشمس في مجموعات على الجذوع والضفاف الرملية للأنهار الكبيرة.",
+      "he": "צב אמזונס מטה צוואר עם כתמים צהובים בראש, מתחמם בקבוצות על גזעים ושרטונות חול של נהרות גדולים."
+    }
+  },
+  {
+    "id": "sp_european_pond_turtle",
+    "scientificName": "Emys orbicularis",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "European Pond Turtle",
+    "description": {
+      "en": "Dark turtle speckled with yellow dots, Europe's native freshwater turtle, slipping off sunny banks into weedy ponds.",
+      "de": "Dunkle, gelb gepunktete Schildkröte, Europas heimische Sumpfschildkröte, gleitet von sonnigen Ufern in verkrautete Teiche.",
+      "es": "Tortuga oscura salpicada de puntos amarillos, la tortuga de agua dulce autóctona de Europa, se desliza desde orillas soleadas a lagunas con vegetación.",
+      "fr": "Tortue sombre mouchetée de points jaunes, la tortue d'eau douce indigène d'Europe, glissant des berges ensoleillées vers les étangs herbeux.",
+      "it": "Tartaruga scura punteggiata di giallo, la tartaruga d'acqua dolce autoctona d'Europa, scivola dalle rive soleggiate negli stagni erbosi.",
+      "pt": "Tartaruga escura salpicada de pontos amarelos, a tartaruga de água doce nativa da Europa, escorrega das margens soalheiras para lagoas com vegetação.",
+      "nl": "Donkere schildpad met gele stippen, Europa's inheemse moerasschildpad, die van zonnige oevers in begroeide vijvers glijdt.",
+      "hu": "Sárga pöttyökkel hintett sötét teknős, Európa őshonos mocsári teknőse, napos partokról hínáros tavakba csusszan.",
+      "zh": "布满黄色斑点的深色龟，欧洲本土淡水龟，从向阳的岸边滑入水草茂密的池塘。",
+      "ar": "سلحفاة داكنة منقطة بنقاط صفراء، سلحفاة المياه العذبة الأصلية في أوروبا، تنزلق من الضفاف المشمسة إلى البرك العشبية.",
+      "he": "צב כהה מנוקד בנקודות צהובות, צב המים המתוקים המקומי של אירופה, מחליק מגדות שטופות שמש לבריכות עשירות בצמחייה."
+    }
+  },
+  {
+    "id": "sp_american_alligator",
+    "scientificName": "Alligator mississippiensis",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "American Alligator",
+    "description": {
+      "en": "Broad-snouted armoured reptile of southeastern US swamps, springs and rivers, floating with only eyes and nostrils showing.",
+      "de": "Breitschnauziges gepanzertes Reptil der Sümpfe, Quellen und Flüsse im Südosten der USA, treibt mit nur Augen und Nasenlöchern über Wasser.",
+      "es": "Reptil acorazado de hocico ancho de los pantanos, manantiales y ríos del sureste de EE. UU., flota mostrando solo ojos y fosas nasales.",
+      "fr": "Reptile cuirassé au museau large des marais, sources et rivières du sud-est des États-Unis, flottant en ne montrant que les yeux et les narines.",
+      "it": "Rettile corazzato dal muso largo delle paludi, sorgenti e fiumi del sud-est degli Stati Uniti, galleggia mostrando solo occhi e narici.",
+      "pt": "Réptil couraçado de focinho largo dos pântanos, nascentes e rios do sudeste dos EUA, flutua mostrando apenas os olhos e as narinas.",
+      "nl": "Breedsnuitig gepantserd reptiel van moerassen, bronnen en rivieren in het zuidoosten van de VS dat drijft met alleen ogen en neusgaten boven water.",
+      "hu": "Széles orrú páncélos hüllő az USA délkeleti mocsaraiból, forrásaiból és folyóiból, csak a szeme és az orrlyukai látszanak ki a vízből.",
+      "zh": "美国东南部沼泽、泉水和河流中的宽吻披甲爬行动物，漂浮时仅露出眼睛和鼻孔。",
+      "ar": "زاحف مدرع عريض الخطم من مستنقعات وينابيع وأنهار جنوب شرق الولايات المتحدة، يطفو ولا يظهر منه سوى العينين والمنخرين.",
+      "he": "זוחל משוריין רחב חרטום מביצות, מעיינות ונהרות בדרום-מזרח ארה\"ב, צף כשרק עיניו ונחיריו נראים."
+    }
+  },
+  {
+    "id": "sp_spectacled_caiman",
+    "scientificName": "Caiman crocodilus",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Spectacled Caiman",
+    "description": {
+      "en": "Small olive caiman with a bony ridge between its eyes, abundant in slow rivers and lagoons across Central and South America.",
+      "de": "Kleiner olivfarbener Kaiman mit knöchernem Grat zwischen den Augen, häufig in langsamen Flüssen und Lagunen Mittel- und Südamerikas.",
+      "es": "Pequeño caimán oliva con una cresta ósea entre los ojos, abundante en ríos lentos y lagunas de Centro y Sudamérica.",
+      "fr": "Petit caïman olive à la crête osseuse entre les yeux, abondant dans les rivières lentes et lagunes d'Amérique centrale et du Sud.",
+      "it": "Piccolo caimano oliva con una cresta ossea tra gli occhi, abbondante nei fiumi lenti e nelle lagune di Centro e Sud America.",
+      "pt": "Pequeno jacaré oliva com uma crista óssea entre os olhos, abundante em rios lentos e lagoas da América Central e do Sul.",
+      "nl": "Kleine olijfkleurige kaaiman met een benige richel tussen de ogen, talrijk in trage rivieren en lagunes in Midden- en Zuid-Amerika.",
+      "hu": "Kis, olajzöld kajmán csontos taréjjal a szemei között, gyakori Közép- és Dél-Amerika lassú folyóiban és lagúnáiban.",
+      "zh": "小型橄榄色凯门鳄，两眼间有骨质脊，在中南美洲的缓流河流和潟湖中数量众多。",
+      "ar": "كيمن زيتوني صغير بحافة عظمية بين عينيه، وفير في الأنهار البطيئة والبحيرات الساحلية في أمريكا الوسطى والجنوبية.",
+      "he": "קיימן זית קטן עם רכס גרמי בין עיניו, שכיח בנהרות איטיים ובלגונות ברחבי מרכז ודרום אמריקה."
+    }
+  },
+  {
+    "id": "sp_black_caiman",
+    "scientificName": "Melanosuchus niger",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Black Caiman",
+    "description": {
+      "en": "The Amazon's largest predator, a black armoured caiman up to five metres long, hunting at night in lakes and flooded forest.",
+      "de": "Der größte Räuber des Amazonas, ein schwarzer gepanzerter Kaiman von bis zu fünf Metern, jagt nachts in Seen und überflutetem Wald.",
+      "es": "El mayor depredador del Amazonas, un caimán negro acorazado de hasta cinco metros, caza de noche en lagos y bosque inundado.",
+      "fr": "Le plus grand prédateur de l'Amazone, caïman noir cuirassé atteignant cinq mètres, chassant la nuit dans les lacs et la forêt inondée.",
+      "it": "Il più grande predatore dell'Amazzonia, un caimano nero corazzato lungo fino a cinque metri, caccia di notte in laghi e foresta allagata.",
+      "pt": "O maior predador do Amazonas, um jacaré negro couraçado de até cinco metros, caça à noite em lagos e floresta inundada.",
+      "nl": "De grootste roofdier van de Amazone, een zwarte gepantserde kaaiman tot vijf meter lang die 's nachts in meren en overstroomd bos jaagt.",
+      "hu": "Az Amazonas legnagyobb ragadozója, akár öt méteres fekete páncélos kajmán, éjjel vadászik tavakban és elárasztott erdőben.",
+      "zh": "亚马逊最大的掠食者，黑色披甲凯门鳄，体长可达五米，夜间在湖泊和淹没森林中捕食。",
+      "ar": "أكبر مفترس في الأمازون، كيمن أسود مدرع يصل طوله إلى خمسة أمتار، يصطاد ليلاً في البحيرات والغابات المغمورة.",
+      "he": "הטורף הגדול ביותר באמזונס, קיימן שחור משוריין באורך עד חמישה מטרים, צד בלילה באגמים וביער מוצף."
+    }
+  },
+  {
+    "id": "sp_freshwater_crocodile",
+    "scientificName": "Crocodylus johnstoni",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Freshwater Crocodile",
+    "description": {
+      "en": "Slender-snouted Australian crocodile of northern rivers and gorges, shy and far smaller than the saltwater crocodile.",
+      "de": "Schmalschnauziges australisches Krokodil der nördlichen Flüsse und Schluchten, scheu und weit kleiner als das Leistenkrokodil.",
+      "es": "Cocodrilo australiano de hocico estrecho de los ríos y gargantas del norte, tímido y mucho menor que el cocodrilo marino.",
+      "fr": "Crocodile australien au museau étroit des rivières et gorges du nord, timide et bien plus petit que le crocodile marin.",
+      "it": "Coccodrillo australiano dal muso sottile dei fiumi e delle gole settentrionali, timido e molto più piccolo del coccodrillo marino.",
+      "pt": "Crocodilo australiano de focinho estreito dos rios e desfiladeiros do norte, tímido e muito menor do que o crocodilo-de-água-salgada.",
+      "nl": "Smalsnuitige Australische krokodil van noordelijke rivieren en kloven, schuw en veel kleiner dan de zoutwaterkrokodil.",
+      "hu": "Keskeny orrú ausztrál krokodil az északi folyókból és szurdokokból, félénk és jóval kisebb a bordás krokodilnál.",
+      "zh": "吻部细长的澳大利亚鳄鱼，栖息于北部河流和峡谷，性情胆怯，体型远小于湾鳄。",
+      "ar": "تمساح أسترالي نحيل الخطم من أنهار وأخاديد الشمال، خجول وأصغر بكثير من تمساح المياه المالحة.",
+      "he": "תנין אוסטרלי צר חרטום מנהרות ומקניונים בצפון, ביישן וקטן בהרבה מתנין המים המלוחים."
+    }
+  },
+  {
+    "id": "sp_northern_water_snake",
+    "scientificName": "Nerodia sipedon",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Northern Water Snake",
+    "description": {
+      "en": "Thick-bodied banded brown snake basking on rocks and branches over eastern North American streams, harmless but quick to bite.",
+      "de": "Dickleibige, gebänderte braune Schlange, sonnt sich auf Felsen und Ästen über Bächen im Osten Nordamerikas, harmlos, aber bissig.",
+      "es": "Serpiente parda robusta con bandas que toma el sol en rocas y ramas sobre arroyos del este de Norteamérica, inofensiva pero rápida en morder.",
+      "fr": "Serpent brun massif à bandes se chauffant sur les rochers et branches au-dessus des ruisseaux de l'est de l'Amérique du Nord, inoffensif mais prompt à mordre.",
+      "it": "Serpente bruno robusto a bande che si crogiola su rocce e rami sopra i torrenti del Nord America orientale, innocuo ma pronto a mordere.",
+      "pt": "Serpente castanha robusta com bandas que apanha sol em rochas e ramos sobre riachos do leste da América do Norte, inofensiva mas pronta a morder.",
+      "nl": "Dikke gebandeerde bruine slang die op rotsen en takken boven beken in oostelijk Noord-Amerika zont, ongevaarlijk maar snel met bijten.",
+      "hu": "Vaskos testű, sávos barna kígyó, Észak-Amerika keleti patakjai fölött sziklákon és ágakon napozik, ártalmatlan, de gyorsan harap.",
+      "zh": "身体粗壮、带环纹的褐色蛇，在北美东部溪流上方的岩石和树枝上晒太阳，无毒但易咬人。",
+      "ar": "ثعبان بني سميك الجسم بأشرطة يتشمس على الصخور والأغصان فوق جداول شرق أمريكا الشمالية، غير سام لكنه سريع العض.",
+      "he": "נחש חום עבה גוף ומפוספס המתחמם על סלעים וענפים מעל נחלים במזרח צפון אמריקה, לא מסוכן אך מהיר לנשוך."
+    }
+  },
+  {
+    "id": "sp_green_anaconda",
+    "scientificName": "Eunectes murinus",
+    "category": "other",
+    "taxonomyClass": "Reptilia",
+    "commonName": "Green Anaconda",
+    "description": {
+      "en": "The heaviest snake on earth, an olive giant with black blotches, lying submerged in Amazon swamps and slow rivers.",
+      "de": "Die schwerste Schlange der Erde, ein olivfarbener Riese mit schwarzen Flecken, liegt untergetaucht in Sümpfen und langsamen Flüssen des Amazonas.",
+      "es": "La serpiente más pesada del mundo, un gigante oliva con manchas negras que permanece sumergido en pantanos y ríos lentos del Amazonas.",
+      "fr": "Le serpent le plus lourd du monde, géant olive aux taches noires, immergé dans les marais et rivières lentes de l'Amazone.",
+      "it": "Il serpente più pesante della terra, un gigante oliva con macchie nere, giace sommerso nelle paludi e nei fiumi lenti dell'Amazzonia.",
+      "pt": "A serpente mais pesada do mundo, um gigante oliva com manchas pretas, jaz submersa em pântanos e rios lentos do Amazonas.",
+      "nl": "De zwaarste slang op aarde, een olijfkleurige reus met zwarte vlekken die ondergedoken in Amazonemoerassen en trage rivieren ligt.",
+      "hu": "A Föld legnehezebb kígyója, olajzöld óriás fekete foltokkal, az Amazonas mocsaraiban és lassú folyóiban fekszik a víz alatt.",
+      "zh": "世界上最重的蛇，橄榄色巨蟒，身上有黑斑，潜伏在亚马逊沼泽和缓流河流中。",
+      "ar": "أثقل ثعبان على وجه الأرض، عملاق زيتوني ببقع سوداء، يرقد مغموراً في مستنقعات الأمازون وأنهاره البطيئة.",
+      "he": "הנחש הכבד ביותר על פני האדמה, ענק בצבע זית עם כתמים שחורים, רובץ שקוע בביצות האמזונס ובנהרות איטיים."
+    }
+  },
+  {
+    "id": "sp_hellbender",
+    "scientificName": "Cryptobranchus alleganiensis",
+    "category": "other",
+    "taxonomyClass": "Amphibia",
+    "commonName": "Hellbender",
+    "description": {
+      "en": "Giant flat-headed salamander with wrinkled skin folds, hiding under big rocks in cold clear Appalachian rivers.",
+      "de": "Riesiger flachköpfiger Salamander mit faltiger Haut, versteckt sich unter großen Steinen in kalten klaren Flüssen der Appalachen.",
+      "es": "Salamandra gigante de cabeza plana con pliegues de piel arrugada, se esconde bajo grandes rocas en ríos fríos y claros de los Apalaches.",
+      "fr": "Salamandre géante à tête plate et à la peau plissée, cachée sous les gros rochers des rivières froides et claires des Appalaches.",
+      "it": "Salamandra gigante dalla testa piatta con pieghe di pelle rugosa, si nasconde sotto grandi rocce nei fiumi freddi e limpidi degli Appalachi.",
+      "pt": "Salamandra gigante de cabeça achatada com pregas de pele enrugada, esconde-se sob grandes rochas em rios frios e claros dos Apalaches.",
+      "nl": "Reusachtige salamander met platte kop en gerimpelde huidplooien die zich onder grote stenen in koude heldere Appalachen-rivieren verbergt.",
+      "hu": "Óriási, lapos fejű szalamandra ráncos bőrredőkkel, az Appalache-hegység hideg, tiszta folyóiban nagy kövek alatt rejtőzik.",
+      "zh": "头部扁平、皮肤褶皱的巨型蝾螈，藏身于阿巴拉契亚寒冷清澈河流的大石头下。",
+      "ar": "سلمندر عملاق مسطح الرأس بطيات جلدية مجعدة، يختبئ تحت الصخور الكبيرة في أنهار الأبالاش الباردة الصافية.",
+      "he": "סלמנדרה ענקית שטוחת ראש עם קפלי עור מקומטים, מסתתרת מתחת לסלעים גדולים בנהרות קרים וצלולים בהרי האפלצ'ים."
+    }
+  },
+  {
+    "id": "sp_mudpuppy",
+    "scientificName": "Necturus maculosus",
+    "category": "other",
+    "taxonomyClass": "Amphibia",
+    "commonName": "Mudpuppy",
+    "description": {
+      "en": "Brown spotted salamander that keeps its feathery red gills for life, crawling over lake and river bottoms at night.",
+      "de": "Brauner gefleckter Salamander, der seine gefiederten roten Kiemen lebenslang behält und nachts über See- und Flussgründe kriecht.",
+      "es": "Salamandra parda moteada que conserva sus branquias rojas plumosas toda la vida y recorre de noche los fondos de lagos y ríos.",
+      "fr": "Salamandre brune tachetée qui garde toute sa vie ses branchies rouges plumeuses, rampant la nuit sur le fond des lacs et rivières.",
+      "it": "Salamandra bruna maculata che conserva per tutta la vita le branchie rosse piumose, striscia di notte sui fondali di laghi e fiumi.",
+      "pt": "Salamandra castanha manchada que mantém as brânquias vermelhas plumosas toda a vida, rasteja à noite pelos fundos de lagos e rios.",
+      "nl": "Bruine gevlekte salamander die zijn gevederde rode kieuwen levenslang behoudt en 's nachts over meer- en rivierbodems kruipt.",
+      "hu": "Barna, foltos szalamandra, tollas vörös kopoltyúit egész életében megtartja, éjjel tó- és folyófenéken mászik.",
+      "zh": "褐色带斑点的蝾螈，终生保留羽状红鳃，夜间在湖底和河底爬行。",
+      "ar": "سلمندر بني مرقط يحتفظ بخياشيمه الحمراء الريشية طوال حياته، يزحف ليلاً فوق قيعان البحيرات والأنهار.",
+      "he": "סלמנדרה חומה מנוקדת השומרת על זימיה האדומים הנוצתיים לכל חייה, זוחלת בלילה על קרקעיות אגמים ונהרות."
+    }
+  },
+  {
+    "id": "sp_axolotl",
+    "scientificName": "Ambystoma mexicanum",
+    "category": "other",
+    "taxonomyClass": "Amphibia",
+    "commonName": "Axolotl",
+    "description": {
+      "en": "Smiling gilled salamander that never leaves the water, critically endangered in the canals of Xochimilco near Mexico City.",
+      "de": "Lächelnder Kiemensalamander, der das Wasser nie verlässt, vom Aussterben bedroht in den Kanälen von Xochimilco bei Mexiko-Stadt.",
+      "es": "Salamandra branquial de aspecto sonriente que nunca sale del agua, en peligro crítico en los canales de Xochimilco cerca de Ciudad de México.",
+      "fr": "Salamandre à branchies au sourire figé qui ne quitte jamais l'eau, en danger critique dans les canaux de Xochimilco près de Mexico.",
+      "it": "Salamandra branchiata dal sorriso perenne che non lascia mai l'acqua, in pericolo critico nei canali di Xochimilco presso Città del Messico.",
+      "pt": "Salamandra com brânquias e ar sorridente que nunca sai da água, criticamente ameaçada nos canais de Xochimilco perto da Cidade do México.",
+      "nl": "Glimlachende salamander met kieuwen die het water nooit verlaat, ernstig bedreigd in de kanalen van Xochimilco bij Mexico-Stad.",
+      "hu": "Mosolygós, kopoltyús szalamandra, sosem hagyja el a vizet, kritikusan veszélyeztetett Xochimilco csatornáiban Mexikóváros mellett.",
+      "zh": "面带微笑的有鳃蝾螈，终生不离开水，在墨西哥城附近霍奇米尔科的运河中极度濒危。",
+      "ar": "سلمندر مبتسم ذو خياشيم لا يغادر الماء أبداً، مهدد بالانقراض بشدة في قنوات خوتشيميلكو قرب مكسيكو سيتي.",
+      "he": "סלמנדרה מחייכת עם זימים שלעולם אינה עוזבת את המים, בסכנת הכחדה חמורה בתעלות שוצ'ימילקו ליד מקסיקו סיטי."
+    }
+  },
+  {
+    "id": "sp_chinese_giant_salamander",
+    "scientificName": "Andrias davidianus",
+    "category": "other",
+    "taxonomyClass": "Amphibia",
+    "commonName": "Chinese Giant Salamander",
+    "description": {
+      "en": "The largest amphibian alive, a wrinkled brown giant nearly two metres long, hiding in cool rocky mountain streams.",
+      "de": "Die größte lebende Amphibie, ein faltiger brauner Riese von fast zwei Metern, versteckt sich in kühlen felsigen Gebirgsbächen.",
+      "es": "El anfibio vivo más grande, un gigante pardo arrugado de casi dos metros, se esconde en arroyos de montaña frescos y rocosos.",
+      "fr": "Le plus grand amphibien vivant, géant brun ridé de près de deux mètres, caché dans les torrents de montagne frais et rocheux.",
+      "it": "Il più grande anfibio vivente, un gigante bruno rugoso lungo quasi due metri, si nasconde nei freschi torrenti rocciosi di montagna.",
+      "pt": "O maior anfíbio vivo, um gigante castanho enrugado com quase dois metros, escondido em riachos de montanha frescos e rochosos.",
+      "nl": "De grootste levende amfibie, een gerimpelde bruine reus van bijna twee meter die zich in koele rotsachtige bergbeken verbergt.",
+      "hu": "A legnagyobb élő kétéltű, ráncos, barna, közel két méteres óriás, hűvös, sziklás hegyi patakokban rejtőzik.",
+      "zh": "现存最大的两栖动物，皮肤褶皱的褐色巨物，体长近两米，藏身于凉爽多石的山溪中。",
+      "ar": "أكبر برمائي حي، عملاق بني مجعد يبلغ طوله نحو مترين، يختبئ في جداول الجبال الباردة الصخرية.",
+      "he": "הדו-חי הגדול ביותר החי כיום, ענק חום מקומט באורך כמעט שני מטרים, מסתתר בנחלי הרים קרירים וסלעיים."
+    }
+  },
+  {
+    "id": "sp_smooth_newt",
+    "scientificName": "Lissotriton vulgaris",
+    "category": "other",
+    "taxonomyClass": "Amphibia",
+    "commonName": "Smooth Newt",
+    "description": {
+      "en": "Small olive newt that returns to ponds each spring, the males growing a wavy crest and spotted orange belly.",
+      "de": "Kleiner olivfarbener Molch, der jedes Frühjahr in die Teiche zurückkehrt, die Männchen bilden einen gewellten Kamm und einen gefleckten orangen Bauch.",
+      "es": "Pequeño tritón oliva que vuelve a las charcas cada primavera, los machos desarrollan una cresta ondulada y un vientre naranja moteado.",
+      "fr": "Petit triton olive qui revient aux mares chaque printemps, les mâles développant une crête ondulée et un ventre orange tacheté.",
+      "it": "Piccolo tritone oliva che torna agli stagni ogni primavera, i maschi sviluppano una cresta ondulata e un ventre arancione maculato.",
+      "pt": "Pequeno tritão oliva que regressa às charcas a cada primavera, os machos desenvolvem uma crista ondulada e um ventre laranja manchado.",
+      "nl": "Kleine olijfkleurige watersalamander die elk voorjaar naar vijvers terugkeert, waarbij de mannetjes een golvende kam en een gevlekte oranje buik krijgen.",
+      "hu": "Kis, olajzöld gőte, minden tavasszal visszatér a tavakba, a hímek hullámos tarajt és foltos narancssárga hasat növesztenek.",
+      "zh": "小型橄榄色蝾螈，每年春季回到池塘，雄性长出波状背嵴和带斑点的橙色腹部。",
+      "ar": "سمندل زيتوني صغير يعود إلى البرك كل ربيع، تنمو للذكور قمة متموجة وبطن برتقالي مرقط.",
+      "he": "טריטון זית קטן החוזר לבריכות בכל אביב, הזכרים מגדלים ציצה גלית ובטן כתומה מנוקדת."
+    }
+  },
+  {
+    "id": "sp_great_crested_newt",
+    "scientificName": "Triturus cristatus",
+    "category": "other",
+    "taxonomyClass": "Amphibia",
+    "commonName": "Great Crested Newt",
+    "description": {
+      "en": "Large black warty newt with a fiery orange belly, the breeding males sporting a jagged dragon-like crest.",
+      "de": "Großer schwarzer warziger Molch mit feuerorangem Bauch, die Männchen tragen zur Paarungszeit einen gezackten drachenartigen Kamm.",
+      "es": "Gran tritón negro verrugoso de vientre naranja intenso, los machos en celo lucen una cresta dentada de dragón.",
+      "fr": "Grand triton noir verruqueux au ventre orange vif, les mâles reproducteurs arborant une crête dentelée de dragon.",
+      "it": "Grande tritone nero verrucoso dal ventre arancione acceso, i maschi riproduttori sfoggiano una cresta seghettata da drago.",
+      "pt": "Grande tritão preto verrugoso de ventre laranja vivo, os machos reprodutores ostentam uma crista dentada de dragão.",
+      "nl": "Grote zwarte wrattige kamsalamander met een vurig oranje buik, waarbij de paaiende mannetjes een gekartelde drakenkam dragen.",
+      "hu": "Nagy, fekete, szemölcsös gőte tűznarancs hassal, a nászruhás hímek csipkézett, sárkányszerű tarajt viselnek.",
+      "zh": "大型黑色疣皮蝾螈，腹部呈火橙色，繁殖期雄性长出锯齿状的龙形背嵴。",
+      "ar": "سمندل أسود كبير ثؤلولي ببطن برتقالي ناري، تحمل الذكور في موسم التزاوج قمة مسننة تشبه التنين.",
+      "he": "טריטון שחור גדול ומיובל עם בטן כתומה לוהטת, הזכרים בעונת הרבייה נושאים ציצה משוננת דמוית דרקון."
+    }
+  },
+  {
+    "id": "sp_american_bullfrog",
+    "scientificName": "Lithobates catesbeianus",
+    "category": "other",
+    "taxonomyClass": "Amphibia",
+    "commonName": "American Bullfrog",
+    "description": {
+      "en": "Huge green frog with a bass bellow, sitting among lily pads in warm ponds and now invasive on several continents.",
+      "de": "Riesiger grüner Frosch mit tiefem Brüllen, sitzt zwischen Seerosenblättern warmer Teiche und ist heute auf mehreren Kontinenten invasiv.",
+      "es": "Enorme rana verde de croar grave, posada entre nenúfares en lagunas cálidas y hoy invasora en varios continentes.",
+      "fr": "Énorme grenouille verte au coassement grave, posée parmi les nénuphars des étangs chauds et aujourd'hui envahissante sur plusieurs continents.",
+      "it": "Enorme rana verde dal richiamo profondo, siede tra le ninfee degli stagni caldi ed è oggi invasiva in diversi continenti.",
+      "pt": "Enorme rã verde de coaxar grave, pousada entre nenúfares em lagoas quentes e hoje invasora em vários continentes.",
+      "nl": "Enorme groene kikker met een diep gebrul die tussen waterlelies in warme vijvers zit en nu invasief is op meerdere continenten.",
+      "hu": "Hatalmas zöld béka mély, bőgő hanggal, meleg tavak tavirózsái között ül, ma több kontinensen invazív.",
+      "zh": "体型巨大的绿色蛙，叫声低沉如牛吼，栖息在温暖池塘的睡莲叶间，如今在多个大洲成为入侵物种。",
+      "ar": "ضفدع أخضر ضخم بنقيق جهير عميق، يجلس بين أوراق زنابق الماء في البرك الدافئة وأصبح غازياً في عدة قارات.",
+      "he": "צפרדע ירוקה ענקית עם געייה עמוקה, יושבת בין עלי נופר בבריכות חמימות וכיום פולשת בכמה יבשות."
+    }
+  },
+  {
+    "id": "sp_common_frog",
+    "scientificName": "Rana temporaria",
+    "category": "other",
+    "taxonomyClass": "Amphibia",
+    "commonName": "Common Frog",
+    "description": {
+      "en": "Brown frog with a dark eye mask that gathers in noisy spring crowds to spawn in European ponds and ditches.",
+      "de": "Brauner Frosch mit dunkler Augenmaske, versammelt sich im Frühjahr in lauten Scharen zum Laichen in europäischen Teichen und Gräben.",
+      "es": "Rana parda con antifaz oscuro que se reúne en ruidosas multitudes primaverales para desovar en lagunas y acequias de Europa.",
+      "fr": "Grenouille brune au masque oculaire sombre qui se rassemble en foules bruyantes au printemps pour frayer dans les mares et fossés d'Europe.",
+      "it": "Rana bruna con maschera oculare scura che si raduna in rumorose folle primaverili per deporre le uova in stagni e fossi europei.",
+      "pt": "Rã castanha com máscara ocular escura que se reúne em ruidosas multidões primaveris para desovar em lagoas e valas da Europa.",
+      "nl": "Bruine kikker met een donker oogmasker die zich in het voorjaar in luidruchtige groepen verzamelt om te paaien in Europese vijvers en sloten.",
+      "hu": "Barna béka sötét szemmaszkkal, tavasszal hangos tömegekben gyűlik össze petézni az európai tavakban és árkokban.",
+      "zh": "褐色的蛙，眼部有深色面罩纹，春季成群喧闹地聚集在欧洲池塘和沟渠中产卵。",
+      "ar": "ضفدع بني بقناع عيني داكن يتجمع في حشود ربيعية صاخبة للتكاثر في البرك والخنادق الأوروبية.",
+      "he": "צפרדע חומה עם מסכת עין כהה המתקבצת בהמונים רועשים באביב להטיל בבריכות ובתעלות באירופה."
+    }
+  },
+  {
+    "id": "sp_north_american_river_otter",
+    "scientificName": "Lontra canadensis",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "North American River Otter",
+    "description": {
+      "en": "Sleek playful otter that hunts fish and crayfish in rivers and lakes across North America, leaving mud slides on banks.",
+      "de": "Schlanker verspielter Otter, der in Flüssen und Seen Nordamerikas Fische und Krebse jagt und Schlammrutschen an den Ufern hinterlässt.",
+      "es": "Nutria esbelta y juguetona que caza peces y cangrejos en ríos y lagos de Norteamérica, dejando toboganes de barro en las orillas.",
+      "fr": "Loutre élancée et joueuse qui chasse poissons et écrevisses dans les rivières et lacs d'Amérique du Nord, laissant des toboggans de boue sur les berges.",
+      "it": "Lontra slanciata e giocosa che caccia pesci e gamberi in fiumi e laghi del Nord America, lasciando scivoli di fango sulle rive.",
+      "pt": "Lontra esguia e brincalhona que caça peixes e lagostins em rios e lagos da América do Norte, deixando escorregas de lama nas margens.",
+      "nl": "Slanke speelse otter die op vis en rivierkreeft jaagt in rivieren en meren in heel Noord-Amerika en modderglijbanen op oevers achterlaat.",
+      "hu": "Karcsú, játékos vidra, Észak-Amerika folyóiban és tavaiban halakra és rákokra vadászik, a partokon sárcsúszdákat hagy.",
+      "zh": "身姿矫健、爱嬉戏的水獭，在北美的河流湖泊中捕食鱼类和螯虾，在岸边留下泥滑道。",
+      "ar": "قضاعة رشيقة مرحة تصطاد الأسماك وجراد النهر في أنهار وبحيرات أمريكا الشمالية، تاركة منزلقات طينية على الضفاف.",
+      "he": "לוטרה חלקה ושובבה הצדה דגים וסרטני נהרות בנהרות ובאגמים ברחבי צפון אמריקה ומשאירה מגלשות בוץ על הגדות."
+    }
+  },
+  {
+    "id": "sp_eurasian_otter",
+    "scientificName": "Lutra lutra",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "Eurasian Otter",
+    "description": {
+      "en": "Shy brown otter of European rivers, lakes and coasts, recovering across its range after decades of decline.",
+      "de": "Scheuer brauner Fischotter europäischer Flüsse, Seen und Küsten, erholt sich nach Jahrzehnten des Rückgangs in seinem gesamten Verbreitungsgebiet.",
+      "es": "Nutria parda esquiva de ríos, lagos y costas de Europa, en recuperación en toda su área tras décadas de declive.",
+      "fr": "Loutre brune discrète des rivières, lacs et côtes d'Europe, en reconquête de son aire après des décennies de déclin.",
+      "it": "Lontra bruna schiva di fiumi, laghi e coste europee, in ripresa in tutto il suo areale dopo decenni di declino.",
+      "pt": "Lontra castanha esquiva de rios, lagos e costas da Europa, em recuperação em toda a sua área após décadas de declínio.",
+      "nl": "Schuwe bruine otter van Europese rivieren, meren en kusten die zich na decennia van achteruitgang in zijn hele verspreidingsgebied herstelt.",
+      "hu": "Félénk, barna vidra Európa folyóiból, tavaiból és partjairól, évtizedes hanyatlás után egész elterjedési területén erősödik.",
+      "zh": "胆怯的褐色水獭，栖息于欧洲的河流、湖泊和海岸，在数十年衰退后正于整个分布区恢复。",
+      "ar": "قضاعة بنية خجولة تعيش في أنهار وبحيرات وسواحل أوروبا، تتعافى في كامل نطاقها بعد عقود من التراجع.",
+      "he": "לוטרה חומה ביישנית מנהרות, אגמים וחופים באירופה, המתאוששת בכל תחום תפוצתה אחרי עשורים של דעיכה."
+    }
+  },
+  {
+    "id": "sp_giant_otter",
+    "scientificName": "Pteronura brasiliensis",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "Giant Otter",
+    "description": {
+      "en": "Nearly two-metre otter with a cream throat patch, living in noisy family groups on Amazon rivers and oxbow lakes.",
+      "de": "Fast zwei Meter langer Otter mit cremefarbenem Kehlfleck, lebt in lauten Familiengruppen an Amazonasflüssen und Altwasserseen.",
+      "es": "Nutria de casi dos metros con una mancha crema en la garganta, vive en ruidosos grupos familiares en ríos y lagunas del Amazonas.",
+      "fr": "Loutre de près de deux mètres à la tache crème sur la gorge, vivant en bruyants groupes familiaux sur les rivières et lacs en croissant de l'Amazone.",
+      "it": "Lontra lunga quasi due metri con una macchia crema sulla gola, vive in rumorosi gruppi familiari sui fiumi e sulle lanche dell'Amazzonia.",
+      "pt": "Lontra de quase dois metros com uma mancha creme na garganta, vive em ruidosos grupos familiares nos rios e lagos de meandro do Amazonas.",
+      "nl": "Bijna twee meter lange otter met een crèmekleurige keelvlek die in luidruchtige familiegroepen op Amazonerivieren en hoefijzermeren leeft.",
+      "hu": "Közel két méteres vidra krémszínű torokfolttal, zajos családi csoportokban él az Amazonas folyóin és morotvatavain.",
+      "zh": "体长近两米的水獭，喉部有乳白色斑块，在亚马逊河流和牛轭湖中以喧闹的家族群体生活。",
+      "ar": "قضاعة يقارب طولها مترين ببقعة كريمية على الحلق، تعيش في مجموعات عائلية صاخبة على أنهار الأمازون وبحيراته الهلالية.",
+      "he": "לוטרה באורך כמעט שני מטרים עם כתם קרם בגרון, החיה בקבוצות משפחתיות רועשות בנהרות האמזונס ובאגמי פרסה."
+    }
+  },
+  {
+    "id": "sp_north_american_beaver",
+    "scientificName": "Castor canadensis",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "North American Beaver",
+    "description": {
+      "en": "Large flat-tailed rodent that dams streams into ponds and swims beneath the ice with a lodge of sticks for shelter.",
+      "de": "Großes Nagetier mit flachem Schwanz, das Bäche zu Teichen aufstaut und unter dem Eis schwimmt, mit einer Burg aus Ästen als Unterschlupf.",
+      "es": "Gran roedor de cola plana que embalsa arroyos formando lagunas y nada bajo el hielo, con una madriguera de ramas como refugio.",
+      "fr": "Grand rongeur à queue plate qui barre les ruisseaux en étangs et nage sous la glace, une hutte de branchages pour abri.",
+      "it": "Grande roditore dalla coda piatta che sbarra i torrenti in stagni e nuota sotto il ghiaccio, con una tana di rami come rifugio.",
+      "pt": "Grande roedor de cauda achatada que represa riachos em lagoas e nada sob o gelo, com uma toca de ramos como abrigo.",
+      "nl": "Groot knaagdier met platte staart dat beken tot vijvers afdamt en onder het ijs zwemt met een burcht van takken als schuilplaats.",
+      "hu": "Nagy, lapos farkú rágcsáló, patakokat duzzaszt tavakká és a jég alatt úszik, ágakból épített várában húzza meg magát.",
+      "zh": "尾巴扁平的大型啮齿动物，筑坝将溪流变成池塘，在冰下游动，以树枝巢穴为庇护。",
+      "ar": "قارض كبير مسطح الذيل يسد الجداول ليحولها إلى برك ويسبح تحت الجليد، ويتخذ من كوخ الأغصان مأوى.",
+      "he": "מכרסם גדול שטוח זנב הסוכר נחלים לבריכות ושוחה מתחת לקרח, עם מאורת ענפים למחסה."
+    }
+  },
+  {
+    "id": "sp_eurasian_beaver",
+    "scientificName": "Castor fiber",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "Eurasian Beaver",
+    "description": {
+      "en": "Europe's largest rodent, reintroduced across the continent, felling riverside trees and building dams and lodges.",
+      "de": "Europas größtes Nagetier, auf dem ganzen Kontinent wieder angesiedelt, fällt Uferbäume und baut Dämme und Burgen.",
+      "es": "El mayor roedor de Europa, reintroducido en todo el continente, tala árboles de ribera y construye presas y madrigueras.",
+      "fr": "Le plus grand rongeur d'Europe, réintroduit sur tout le continent, abattant les arbres de berge et bâtissant barrages et huttes.",
+      "it": "Il più grande roditore d'Europa, reintrodotto in tutto il continente, abbatte gli alberi rivieraschi e costruisce dighe e tane.",
+      "pt": "O maior roedor da Europa, reintroduzido por todo o continente, derruba árvores ribeirinhas e constrói barragens e tocas.",
+      "nl": "Europa's grootste knaagdier, over het hele continent geherintroduceerd, dat oeverbomen velt en dammen en burchten bouwt.",
+      "hu": "Európa legnagyobb rágcsálója, a kontinens egészén visszatelepítették, parti fákat dönt ki, gátakat és várakat épít.",
+      "zh": "欧洲最大的啮齿动物，已在全洲重新引入，啃倒河边树木，修筑水坝和巢穴。",
+      "ar": "أكبر قوارض أوروبا، أعيد إدخاله في أنحاء القارة، يقطع أشجار ضفاف الأنهار ويبني السدود والأكواخ.",
+      "he": "המכרסם הגדול ביותר באירופה, שהושב לרחבי היבשת, מפיל עצי גדה ובונה סכרים ומאורות."
+    }
+  },
+  {
+    "id": "sp_muskrat",
+    "scientificName": "Ondatra zibethicus",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "Muskrat",
+    "description": {
+      "en": "Rat-sized brown rodent with a scaly flattened tail, swimming through cattail marshes and building domed reed lodges.",
+      "de": "Rattengroßes braunes Nagetier mit schuppigem, seitlich abgeflachtem Schwanz, schwimmt durch Rohrkolbensümpfe und baut kuppelförmige Schilfburgen.",
+      "es": "Roedor pardo del tamaño de una rata con cola escamosa aplanada, nada entre marismas de espadañas y construye madrigueras abovedadas de carrizo.",
+      "fr": "Rongeur brun de la taille d'un rat à la queue écailleuse aplatie, nageant dans les marais de massettes et bâtissant des huttes de roseaux en dôme.",
+      "it": "Roditore bruno grande come un ratto con coda squamosa appiattita, nuota tra le paludi di tife e costruisce tane a cupola di canne.",
+      "pt": "Roedor castanho do tamanho de um rato com cauda escamosa achatada, nada por pântanos de tabuas e constrói tocas abobadadas de caniço.",
+      "nl": "Ratgrote bruine knaagdier met een geschubde afgeplatte staart dat door lisdoddemoerassen zwemt en koepelvormige rietburchten bouwt.",
+      "hu": "Patkány méretű, barna rágcsáló pikkelyes, lapított farokkal, gyékényes mocsarakban úszik és kupolás nádvárakat épít.",
+      "zh": "鼠大小的褐色啮齿动物，尾巴有鳞且侧扁，在香蒲沼泽中游动，用芦苇筑圆顶巢。",
+      "ar": "قارض بني بحجم الجرذ بذيل حرشفي مفلطح، يسبح عبر مستنقعات البردي ويبني أكواخاً قبابية من القصب.",
+      "he": "מכרסם חום בגודל חולדה עם זנב קשקשי ושטוח, שוחה בביצות סוף ובונה מאורות קנים כיפתיות."
+    }
+  },
+  {
+    "id": "sp_platypus",
+    "scientificName": "Ornithorhynchus anatinus",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "Platypus",
+    "description": {
+      "en": "Egg-laying mammal with a duck bill and webbed feet, foraging with closed eyes along eastern Australian creeks at dawn and dusk.",
+      "de": "Eierlegendes Säugetier mit Entenschnabel und Schwimmfüßen, sucht mit geschlossenen Augen in der Dämmerung an ostaustralischen Bächen nach Nahrung.",
+      "es": "Mamífero ovíparo con pico de pato y patas palmeadas, busca alimento con los ojos cerrados en arroyos del este de Australia al amanecer y al anochecer.",
+      "fr": "Mammifère ovipare au bec de canard et aux pattes palmées, fourrageant les yeux fermés le long des ruisseaux de l'est de l'Australie à l'aube et au crépuscule.",
+      "it": "Mammifero oviparo con becco d'anatra e zampe palmate, cerca cibo a occhi chiusi lungo i torrenti dell'Australia orientale all'alba e al tramonto.",
+      "pt": "Mamífero ovíparo com bico de pato e patas palmadas, procura alimento de olhos fechados ao longo dos ribeiros do leste da Austrália ao amanhecer e ao anoitecer.",
+      "nl": "Eierleggend zoogdier met een eendensnavel en zwemvliezen dat met gesloten ogen foerageert langs beken in oostelijk Australië bij zonsopgang en schemering.",
+      "hu": "Tojásrakó emlős kacsacsőrrel és úszóhártyás lábakkal, csukott szemmel keres táplálékot Kelet-Ausztrália patakjaiban hajnalban és alkonyatkor.",
+      "zh": "卵生哺乳动物，长着鸭嘴和蹼足，黎明和黄昏时闭着眼睛在澳大利亚东部溪流中觅食。",
+      "ar": "ثديي بيوض بمنقار بط وأقدام مكففة، يبحث عن الطعام مغمض العينين على طول جداول شرق أستراليا عند الفجر والغسق.",
+      "he": "יונק מטיל ביצים עם מקור ברווז ורגליים בעלות קרום שחייה, מלקט מזון בעיניים עצומות לאורך נחלי מזרח אוסטרליה עם שחר ודמדומים."
+    }
+  },
+  {
+    "id": "sp_amazonian_manatee",
+    "scientificName": "Trichechus inunguis",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "Amazonian Manatee",
+    "description": {
+      "en": "The smallest manatee, a smooth dark grazer with a white chest patch, browsing water plants in Amazon lakes and rivers.",
+      "de": "Die kleinste Seekuh, ein glatter dunkler Pflanzenfresser mit weißem Brustfleck, weidet Wasserpflanzen in Seen und Flüssen des Amazonas.",
+      "es": "El manatí más pequeño, un herbívoro liso y oscuro con una mancha blanca en el pecho, pasta plantas acuáticas en lagos y ríos del Amazonas.",
+      "fr": "Le plus petit des lamantins, brouteur lisse et sombre à la tache blanche sur la poitrine, paissant les plantes aquatiques des lacs et rivières de l'Amazone.",
+      "it": "Il più piccolo dei lamantini, un erbivoro liscio e scuro con una macchia bianca sul petto, bruca le piante acquatiche nei laghi e fiumi dell'Amazzonia.",
+      "pt": "O mais pequeno dos peixes-boi, um herbívoro liso e escuro com uma mancha branca no peito, pasta plantas aquáticas em lagos e rios do Amazonas.",
+      "nl": "De kleinste zeekoe, een gladde donkere grazer met een witte borstvlek die waterplanten begraast in Amazonemeren en -rivieren.",
+      "hu": "A legkisebb manátusz, sima, sötét növényevő fehér mellfolttal, az Amazonas tavaiban és folyóiban vízinövényeket legel.",
+      "zh": "最小的海牛，皮肤光滑深色，胸部有白斑，在亚马逊湖河中啃食水生植物。",
+      "ar": "أصغر أنواع خراف البحر، عاشب أملس داكن ببقعة بيضاء على الصدر، يرعى النباتات المائية في بحيرات الأمازون وأنهاره.",
+      "he": "פרת הים הקטנה ביותר, אוכלת עשב חלקה וכהה עם כתם לבן בחזה, הרועה צמחי מים באגמים ובנהרות האמזונס."
+    }
+  },
+  {
+    "id": "sp_amazon_river_dolphin",
+    "scientificName": "Inia geoffrensis",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "Amazon River Dolphin",
+    "description": {
+      "en": "Pink long-beaked dolphin with a flexible neck, weaving between trunks of flooded forest in the Amazon and Orinoco.",
+      "de": "Rosafarbener Delfin mit langer Schnauze und beweglichem Hals, schlängelt sich in Amazonas und Orinoco zwischen Stämmen überfluteter Wälder.",
+      "es": "Delfín rosado de hocico largo y cuello flexible, serpentea entre los troncos del bosque inundado en el Amazonas y el Orinoco.",
+      "fr": "Dauphin rose au long bec et au cou souple, se faufilant entre les troncs de la forêt inondée en Amazonie et sur l'Orénoque.",
+      "it": "Delfino rosa dal lungo rostro e dal collo flessibile, si insinua tra i tronchi della foresta allagata nell'Amazzonia e nell'Orinoco.",
+      "pt": "Golfinho cor-de-rosa de bico longo e pescoço flexível, serpenteia entre os troncos da floresta inundada no Amazonas e no Orinoco.",
+      "nl": "Roze dolfijn met lange snuit en soepele nek die tussen boomstammen van overstroomd bos in de Amazone en Orinoco zwemt.",
+      "hu": "Rózsaszín, hosszú csőrű delfin hajlékony nyakkal, az Amazonas és az Orinoco elárasztott erdőinek fatörzsei között kanyarog.",
+      "zh": "长喙的粉红色河豚，颈部灵活，在亚马逊和奥里诺科河淹没森林的树干间穿梭。",
+      "ar": "دلفين وردي طويل المنقار بعنق مرن، يتلوى بين جذوع الغابة المغمورة في الأمازون والأورينوكو.",
+      "he": "דולפין ורוד ארוך מקור עם צוואר גמיש, מתפתל בין גזעי יער מוצף באמזונס ובאורינוקו."
+    }
+  },
+  {
+    "id": "sp_baikal_seal",
+    "scientificName": "Pusa sibirica",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "Baikal Seal",
+    "description": {
+      "en": "The world's only freshwater seal, a small silver-grey seal that hauls out on Lake Baikal's ice and rocky shores.",
+      "de": "Die einzige Süßwasserrobbe der Welt, eine kleine silbergraue Robbe, die sich auf dem Eis und den Felsufern des Baikalsees ausruht.",
+      "es": "La única foca de agua dulce del mundo, una pequeña foca gris plateada que descansa sobre el hielo y las orillas rocosas del lago Baikal.",
+      "fr": "Le seul phoque d'eau douce au monde, petit phoque gris argenté qui se hisse sur la glace et les rives rocheuses du lac Baïkal.",
+      "it": "L'unica foca d'acqua dolce del mondo, una piccola foca grigio argento che si riposa sul ghiaccio e sulle rive rocciose del lago Baikal.",
+      "pt": "A única foca de água doce do mundo, uma pequena foca cinzento-prateada que descansa no gelo e nas margens rochosas do lago Baikal.",
+      "nl": "De enige zoetwaterzeehond ter wereld, een kleine zilvergrijze zeehond die op het ijs en de rotsachtige oevers van het Baikalmeer rust.",
+      "hu": "A világ egyetlen édesvízi fókája, kis, ezüstszürke fóka, a Bajkál-tó jegén és sziklás partjain pihen.",
+      "zh": "世界上唯一的淡水海豹，体型小巧呈银灰色，在贝加尔湖的冰面和岩岸上休息。",
+      "ar": "الفقمة الوحيدة في المياه العذبة في العالم، فقمة صغيرة رمادية فضية تستلقي على جليد بحيرة بايكال وشواطئها الصخرية.",
+      "he": "כלב הים היחיד בעולם במים מתוקים, כלב ים קטן אפור-כסוף העולה לנוח על הקרח והחופים הסלעיים של אגם באיקל."
+    }
+  },
+  {
+    "id": "sp_capybara",
+    "scientificName": "Hydrochoerus hydrochaeris",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "Capybara",
+    "description": {
+      "en": "The largest rodent, a barrel-shaped grazer that wades and swims in South American rivers and wetlands in calm herds.",
+      "de": "Das größte Nagetier, ein tonnenförmiger Pflanzenfresser, der in ruhigen Herden in südamerikanischen Flüssen und Feuchtgebieten watet und schwimmt.",
+      "es": "El roedor más grande, un herbívoro de cuerpo redondeado que vadea y nada en ríos y humedales sudamericanos en tranquilas manadas.",
+      "fr": "Le plus grand rongeur, brouteur en forme de tonneau qui patauge et nage dans les rivières et zones humides d'Amérique du Sud en troupeaux paisibles.",
+      "it": "Il più grande roditore, un erbivoro tozzo che guada e nuota nei fiumi e nelle zone umide sudamericane in tranquilli branchi.",
+      "pt": "O maior roedor, um herbívoro em forma de barril que vadeia e nada em rios e zonas húmidas sul-americanas em manadas tranquilas.",
+      "nl": "Het grootste knaagdier, een tonvormige grazer die in kalme kuddes waadt en zwemt in Zuid-Amerikaanse rivieren en wetlands.",
+      "hu": "A legnagyobb rágcsáló, hordó alakú növényevő, nyugodt csordákban gázol és úszik Dél-Amerika folyóiban és vizes élőhelyein.",
+      "zh": "最大的啮齿动物，体型如桶的食草动物，成群安静地在南美河流和湿地中涉水游泳。",
+      "ar": "أكبر القوارض، عاشب برميلي الشكل يخوض ويسبح في أنهار أمريكا الجنوبية وأراضيها الرطبة في قطعان هادئة.",
+      "he": "המכרסם הגדול ביותר, אוכל עשב דמוי חבית הבוסס ושוחה בנהרות ובאזורי ביצה בדרום אמריקה בעדרים רגועים."
+    }
+  },
+  {
+    "id": "sp_hippopotamus",
+    "scientificName": "Hippopotamus amphibius",
+    "category": "mammal",
+    "taxonomyClass": "Mammalia",
+    "commonName": "Hippopotamus",
+    "description": {
+      "en": "Massive African river giant that spends the day submerged in pods and walks the bottom rather than swims; dangerous to approach.",
+      "de": "Massiger afrikanischer Flussriese, der den Tag in Gruppen untergetaucht verbringt und über den Grund läuft statt zu schwimmen; gefährlich in der Nähe.",
+      "es": "Enorme gigante fluvial africano que pasa el día sumergido en grupos y camina por el fondo en lugar de nadar; peligroso al acercarse.",
+      "fr": "Énorme géant des fleuves africains qui passe la journée immergé en groupes et marche sur le fond plutôt que de nager ; dangereux à approcher.",
+      "it": "Enorme gigante dei fiumi africani che trascorre il giorno sommerso in gruppi e cammina sul fondo anziché nuotare; pericoloso da avvicinare.",
+      "pt": "Enorme gigante dos rios africanos que passa o dia submerso em grupos e caminha no fundo em vez de nadar; perigoso de abordar.",
+      "nl": "Massieve Afrikaanse rivierreus die de dag ondergedoken in groepen doorbrengt en over de bodem loopt in plaats van te zwemmen; gevaarlijk om te benaderen.",
+      "hu": "Hatalmas afrikai folyami óriás, a napot csoportokban a víz alatt tölti, és inkább jár a fenéken, mint úszik; veszélyes megközelíteni.",
+      "zh": "庞大的非洲河流巨兽，白天成群潜伏水中，在水底行走而非游泳；靠近极为危险。",
+      "ar": "عملاق نهري أفريقي ضخم يقضي النهار مغموراً في مجموعات ويمشي على القاع بدلاً من السباحة؛ الاقتراب منه خطير.",
+      "he": "ענק נהרות אפריקאי עצום המבלה את היום שקוע בלהקות והולך על הקרקעית במקום לשחות; מסוכן להתקרב אליו."
+    }
+  },
+  {
+    "id": "sp_white_water_lily",
+    "scientificName": "Nymphaea alba",
+    "category": "plant",
+    "taxonomyClass": "Magnoliopsida",
+    "commonName": "White Water Lily",
+    "description": {
+      "en": "Floating round leaves and large white flowers rising from thick rhizomes rooted in the mud of still European waters.",
+      "de": "Schwimmende runde Blätter und große weiße Blüten, die aus dicken, im Schlamm stiller europäischer Gewässer verwurzelten Rhizomen aufsteigen.",
+      "es": "Hojas redondas flotantes y grandes flores blancas que surgen de gruesos rizomas enraizados en el lodo de aguas quietas europeas.",
+      "fr": "Feuilles rondes flottantes et grandes fleurs blanches jaillissant d'épais rhizomes ancrés dans la vase des eaux calmes d'Europe.",
+      "it": "Foglie rotonde galleggianti e grandi fiori bianchi che sorgono da spessi rizomi radicati nel fango delle acque ferme europee.",
+      "pt": "Folhas redondas flutuantes e grandes flores brancas que emergem de rizomas espessos enraizados na lama de águas paradas europeias.",
+      "nl": "Drijvende ronde bladeren en grote witte bloemen die opstijgen uit dikke wortelstokken in de modder van stilstaand Europees water.",
+      "hu": "Úszó, kerek levelek és nagy fehér virágok, amelyek az európai állóvizek iszapjában gyökerező vastag rizómákból emelkednek ki.",
+      "zh": "圆形浮叶和大朵白花，从扎根于欧洲静水淤泥中的粗壮根茎抽出。",
+      "ar": "أوراق مستديرة طافية وأزهار بيضاء كبيرة تنبثق من جذامير سميكة متجذرة في طين المياه الراكدة الأوروبية.",
+      "he": "עלים עגולים צפים ופרחים לבנים גדולים העולים מקני שורש עבים המושרשים בבוץ של מים עומדים באירופה."
+    }
+  },
+  {
+    "id": "sp_yellow_pond_lily",
+    "scientificName": "Nuphar lutea",
+    "category": "plant",
+    "taxonomyClass": "Magnoliopsida",
+    "commonName": "Yellow Pond Lily",
+    "description": {
+      "en": "Heart-shaped floating leaves and cup-like yellow flowers, with large translucent underwater leaves visible to divers below.",
+      "de": "Herzförmige Schwimmblätter und becherförmige gelbe Blüten, mit großen durchscheinenden Unterwasserblättern, die Taucher von unten sehen.",
+      "es": "Hojas flotantes acorazonadas y flores amarillas en forma de copa, con grandes hojas sumergidas translúcidas visibles para los buceadores.",
+      "fr": "Feuilles flottantes en cœur et fleurs jaunes en coupe, avec de grandes feuilles immergées translucides visibles des plongeurs.",
+      "it": "Foglie galleggianti a cuore e fiori gialli a coppa, con grandi foglie sommerse traslucide visibili ai subacquei.",
+      "pt": "Folhas flutuantes em forma de coração e flores amarelas em taça, com grandes folhas submersas translúcidas visíveis aos mergulhadores.",
+      "nl": "Hartvormige drijvende bladeren en bekervormige gele bloemen, met grote doorschijnende onderwaterbladeren die duikers van onderaf zien.",
+      "hu": "Szív alakú úszólevelek és kehelyszerű sárga virágok, nagy, áttetsző víz alatti levelekkel, amelyeket a búvárok alulról látnak.",
+      "zh": "心形浮叶和杯状黄花，水下还有潜水者可见的大型半透明沉水叶。",
+      "ar": "أوراق طافية قلبية الشكل وأزهار صفراء كأسية، مع أوراق كبيرة شفافة تحت الماء يراها الغواصون من الأسفل.",
+      "he": "עלים צפים בצורת לב ופרחים צהובים דמויי גביע, עם עלים תת-מימיים גדולים ושקופים למחצה הנראים לצוללנים מלמטה."
+    }
+  },
+  {
+    "id": "sp_american_eelgrass",
+    "scientificName": "Vallisneria americana",
+    "category": "plant",
+    "taxonomyClass": "Liliopsida",
+    "commonName": "American Eelgrass",
+    "description": {
+      "en": "Ribbon-like leaves up to two metres long swaying in the current of clear rivers and springs, a favourite of manatees.",
+      "de": "Bandförmige, bis zu zwei Meter lange Blätter, die in der Strömung klarer Flüsse und Quellen wiegen, ein Lieblingsfutter der Seekühe.",
+      "es": "Hojas acintadas de hasta dos metros que ondean en la corriente de ríos y manantiales claros, favoritas de los manatíes.",
+      "fr": "Feuilles rubanées pouvant atteindre deux mètres ondulant dans le courant des rivières et sources claires, mets favori des lamantins.",
+      "it": "Foglie nastriformi lunghe fino a due metri che ondeggiano nella corrente di fiumi e sorgenti limpide, predilette dai lamantini.",
+      "pt": "Folhas em fita com até dois metros que ondulam na corrente de rios e nascentes claros, favoritas dos peixes-boi.",
+      "nl": "Lintvormige bladeren tot twee meter lang die wiegen in de stroming van heldere rivieren en bronnen, een favoriet van zeekoeien.",
+      "hu": "Szalagszerű, akár két méter hosszú levelek, tiszta folyók és források sodrában ringatóznak, a manátuszok kedvence.",
+      "zh": "带状叶片可长达两米，在清澈河流和泉水的水流中摇曳，是海牛最爱的食物。",
+      "ar": "أوراق شريطية يصل طولها إلى مترين تتمايل في تيار الأنهار والينابيع الصافية، مفضلة لدى خراف البحر.",
+      "he": "עלים דמויי סרט באורך עד שני מטרים המתנועעים בזרם של נהרות ומעיינות צלולים, מאכל אהוב על פרות ים."
+    }
+  },
+  {
+    "id": "sp_coontail",
+    "scientificName": "Ceratophyllum demersum",
+    "category": "plant",
+    "taxonomyClass": "Magnoliopsida",
+    "commonName": "Coontail",
+    "description": {
+      "en": "Rootless submerged plant with whorls of stiff forked leaves like a raccoon's tail, drifting in dense masses in still water.",
+      "de": "Wurzellose Unterwasserpflanze mit Quirlen steifer gegabelter Blätter wie ein Waschbärschwanz, treibt in dichten Massen in stillem Wasser.",
+      "es": "Planta sumergida sin raíces con verticilos de hojas rígidas y ahorquilladas como la cola de un mapache, flota en densas masas en aguas quietas.",
+      "fr": "Plante immergée sans racines aux verticilles de feuilles rigides et fourchues comme une queue de raton laveur, dérivant en masses denses dans les eaux calmes.",
+      "it": "Pianta sommersa senza radici con verticilli di foglie rigide e biforcute come la coda di un procione, fluttua in masse dense nelle acque ferme.",
+      "pt": "Planta submersa sem raízes com verticilos de folhas rígidas e bifurcadas como a cauda de um guaxinim, flutua em massas densas em água parada.",
+      "nl": "Wortelloze onderwaterplant met kransen van stijve gevorkte bladeren als een wasbeerstaart die in dichte massa's in stilstaand water drijft.",
+      "hu": "Gyökértelen, alámerült növény merev, villás levelekből álló örvökkel, mint egy mosómedve farka, sűrű tömegekben sodródik az állóvízben.",
+      "zh": "无根的沉水植物，硬而分叉的叶片轮生如浣熊尾巴，在静水中成团漂浮。",
+      "ar": "نبات مغمور بلا جذور بحلقات من أوراق صلبة متشعبة تشبه ذيل الراكون، ينجرف في كتل كثيفة في المياه الساكنة.",
+      "he": "צמח שקוע חסר שורשים עם דורים של עלים קשיחים ומפוצלים כזנב דביבון, נסחף בגושים צפופים במים עומדים."
+    }
+  },
+  {
+    "id": "sp_eurasian_watermilfoil",
+    "scientificName": "Myriophyllum spicatum",
+    "category": "plant",
+    "taxonomyClass": "Magnoliopsida",
+    "commonName": "Eurasian Watermilfoil",
+    "description": {
+      "en": "Feathery submerged plant with whorls of finely divided leaves that forms thick mats near the surface, invasive in many lakes.",
+      "de": "Federartige Unterwasserpflanze mit Quirlen fein geteilter Blätter, die dichte Matten nahe der Oberfläche bildet, in vielen Seen invasiv.",
+      "es": "Planta sumergida plumosa con verticilos de hojas finamente divididas que forma densas esteras cerca de la superficie, invasora en muchos lagos.",
+      "fr": "Plante immergée plumeuse aux verticilles de feuilles finement divisées formant d'épais tapis près de la surface, envahissante dans de nombreux lacs.",
+      "it": "Pianta sommersa piumosa con verticilli di foglie finemente divise che forma fitti tappeti vicino alla superficie, invasiva in molti laghi.",
+      "pt": "Planta submersa plumosa com verticilos de folhas finamente divididas que forma densos tapetes perto da superfície, invasora em muitos lagos.",
+      "nl": "Veerachtige onderwaterplant met kransen van fijn verdeelde bladeren die dikke matten nabij het oppervlak vormt, invasief in veel meren.",
+      "hu": "Tollszerű, alámerült növény finoman szeldelt levelekből álló örvökkel, a felszín közelében vastag szőnyeget alkot, sok tóban invazív.",
+      "zh": "羽状沉水植物，细裂的叶片轮生，在水面附近形成厚垫，在许多湖泊中为入侵物种。",
+      "ar": "نبات مغمور ريشي بحلقات من أوراق دقيقة التقسيم يشكل حصائر كثيفة قرب السطح، غازٍ في كثير من البحيرات.",
+      "he": "צמח שקוע נוצתי עם דורים של עלים מחולקים דק היוצר מחצלות עבות ליד פני המים, פולש באגמים רבים."
+    }
+  },
+  {
+    "id": "sp_muskgrass",
+    "scientificName": "Chara vulgaris",
+    "category": "plant",
+    "taxonomyClass": "Charophyceae",
+    "commonName": "Muskgrass",
+    "description": {
+      "en": "Brittle, musky-smelling green alga with whorled branches, often crusted with lime, carpeting the bottom of clear hard-water lakes.",
+      "de": "Brüchige, moschusartig riechende Grünalge mit quirligen Ästen, oft mit Kalk überkrustet, bedeckt den Grund klarer kalkreicher Seen.",
+      "es": "Alga verde quebradiza con olor almizclado y ramas verticiladas, a menudo incrustada de cal, que tapiza el fondo de lagos claros de aguas duras.",
+      "fr": "Algue verte cassante à l'odeur musquée aux rameaux verticillés, souvent incrustée de calcaire, tapissant le fond des lacs clairs à eau dure.",
+      "it": "Alga verde fragile dall'odore muschiato con rami verticillati, spesso incrostata di calcare, tappezza il fondo dei limpidi laghi ad acque dure.",
+      "pt": "Alga verde quebradiça de cheiro almiscarado com ramos verticilados, muitas vezes incrustada de cal, que atapeta o fundo de lagos claros de água dura.",
+      "nl": "Broos, muskusgeurend groenwier met kransvormige takken, vaak met kalk bedekt, dat de bodem van heldere hardwatermeren bedekt.",
+      "hu": "Törékeny, pézsmaillatú zöldalga örvös ágakkal, gyakran mészkéreggel borítva, tiszta, kemény vizű tavak fenekét szőnyegezi be.",
+      "zh": "质脆、有麝香味的绿藻，枝条轮生，常附有石灰结壳，铺满清澈硬水湖泊的湖底。",
+      "ar": "طحلب أخضر هش برائحة المسك وفروع حلقية، غالباً مغطى بقشرة كلسية، يفرش قاع البحيرات الصافية ذات المياه العسرة.",
+      "he": "אצה ירוקה שבירה בעלת ריח מושק עם ענפים דוריים, לעיתים קרובות מצופה בגיר, מרפדת את קרקעית אגמים צלולים בעלי מים קשים."
+    }
+  },
+  {
+    "id": "sp_canadian_waterweed",
+    "scientificName": "Elodea canadensis",
+    "category": "plant",
+    "taxonomyClass": "Liliopsida",
+    "commonName": "Canadian Waterweed",
+    "description": {
+      "en": "Dense submerged plant with whorls of three small dark green leaves, spreading by fragments through cool lakes and canals worldwide.",
+      "de": "Dichte Unterwasserpflanze mit Quirlen aus drei kleinen dunkelgrünen Blättern, verbreitet sich durch Bruchstücke in kühlen Seen und Kanälen weltweit.",
+      "es": "Planta sumergida densa con verticilos de tres hojitas verde oscuro, se propaga por fragmentos en lagos y canales frescos de todo el mundo.",
+      "fr": "Plante immergée dense aux verticilles de trois petites feuilles vert foncé, se propageant par fragments dans les lacs et canaux frais du monde entier.",
+      "it": "Pianta sommersa densa con verticilli di tre piccole foglie verde scuro, si diffonde per frammenti in laghi e canali freschi di tutto il mondo.",
+      "pt": "Planta submersa densa com verticilos de três pequenas folhas verde-escuras, propaga-se por fragmentos em lagos e canais frescos de todo o mundo.",
+      "nl": "Dichte onderwaterplant met kransen van drie kleine donkergroene bladeren die zich via fragmenten verspreidt door koele meren en kanalen wereldwijd.",
+      "hu": "Sűrű, alámerült növény három kis sötétzöld levélből álló örvökkel, töredékekkel terjed hűvös tavakban és csatornákban világszerte.",
+      "zh": "茂密的沉水植物，三片深绿色小叶轮生，靠断枝在全球凉爽的湖泊和运河中扩散。",
+      "ar": "نبات مغمور كثيف بحلقات من ثلاث أوراق صغيرة خضراء داكنة، ينتشر بالشظايا في البحيرات والقنوات الباردة حول العالم.",
+      "he": "צמח שקוע צפוף עם דורים של שלושה עלים קטנים ירוקים כהים, מתפשט בשברים באגמים ובתעלות קרירים ברחבי העולם."
+    }
+  },
+  {
+    "id": "sp_curly_leaf_pondweed",
+    "scientificName": "Potamogeton crispus",
+    "category": "plant",
+    "taxonomyClass": "Liliopsida",
+    "commonName": "Curly-leaf Pondweed",
+    "description": {
+      "en": "Submerged plant with wavy-edged reddish-green leaves like crinkled lasagne, growing early in spring before other weeds.",
+      "de": "Unterwasserpflanze mit wellig gerandeten rötlich-grünen Blättern wie gekräuselte Lasagne, wächst im zeitigen Frühjahr vor anderen Wasserpflanzen.",
+      "es": "Planta sumergida de hojas verde rojizas con bordes ondulados como lasaña rizada, crece a principios de primavera antes que otras plantas.",
+      "fr": "Plante immergée aux feuilles vert rougeâtre à bords ondulés comme des lasagnes froissées, poussant tôt au printemps avant les autres herbiers.",
+      "it": "Pianta sommersa con foglie verde rossastro dai bordi ondulati come lasagne arricciate, cresce all'inizio della primavera prima delle altre piante.",
+      "pt": "Planta submersa com folhas verde-avermelhadas de bordos ondulados como lasanha enrugada, cresce no início da primavera antes das outras plantas.",
+      "nl": "Onderwaterplant met golvend gerande roodgroene bladeren als gekreukte lasagne die vroeg in het voorjaar groeit vóór andere waterplanten.",
+      "hu": "Alámerült növény hullámos szélű, vörösesnek tűnő zöld levelekkel, mint a fodros lasagne, kora tavasszal nő, más hínárok előtt.",
+      "zh": "沉水植物，叶缘波状呈红绿色，形似皱褶的千层面，早春时先于其他水草生长。",
+      "ar": "نبات مغمور بأوراق خضراء محمرة متموجة الحواف تشبه اللازانيا المجعدة، ينمو مبكراً في الربيع قبل الأعشاب الأخرى.",
+      "he": "צמח שקוע עם עלים ירוקים-אדמדמים בשוליים גליים כמו לזניה מקומטת, הצומח מוקדם באביב לפני צמחי מים אחרים."
+    }
+  },
+  {
+    "id": "sp_water_hyacinth",
+    "scientificName": "Pontederia crassipes",
+    "category": "plant",
+    "taxonomyClass": "Liliopsida",
+    "commonName": "Water Hyacinth",
+    "description": {
+      "en": "Floating plant with glossy leaves on air-filled stalks and spikes of lavender flowers, choking warm waterways worldwide.",
+      "de": "Schwimmpflanze mit glänzenden Blättern an luftgefüllten Stielen und Ähren lavendelfarbener Blüten, verstopft warme Wasserwege weltweit.",
+      "es": "Planta flotante de hojas brillantes sobre pecíolos llenos de aire y espigas de flores lavanda, que asfixia cursos de agua cálidos en todo el mundo.",
+      "fr": "Plante flottante aux feuilles luisantes sur des pétioles renflés d'air et aux épis de fleurs lavande, étouffant les voies d'eau chaudes du monde entier.",
+      "it": "Pianta galleggiante con foglie lucide su piccioli pieni d'aria e spighe di fiori lavanda, soffoca i corsi d'acqua caldi di tutto il mondo.",
+      "pt": "Planta flutuante de folhas brilhantes sobre pecíolos cheios de ar e espigas de flores lilás, que sufoca cursos de água quentes em todo o mundo.",
+      "nl": "Drijfplant met glanzende bladeren op met lucht gevulde stelen en aren van lavendelkleurige bloemen die warme waterwegen wereldwijd verstikt.",
+      "hu": "Úszó növény fényes levelekkel levegővel telt szárakon és levendulaszínű virágfüzérekkel, világszerte elfojtja a meleg vízi utakat.",
+      "zh": "浮水植物，叶片光亮、叶柄膨大充气，开淡紫色穗状花，在全球温暖水道中大量堵塞水面。",
+      "ar": "نبات طافٍ بأوراق لامعة على سيقان مملوءة بالهواء وسنابل من أزهار بنفسجية فاتحة، يخنق الممرات المائية الدافئة حول العالم.",
+      "he": "צמח צף עם עלים מבריקים על גבעולים מלאי אוויר ושיבולים של פרחי לבנדר, החונק נתיבי מים חמים ברחבי העולם."
+    }
+  },
+  {
+    "id": "sp_common_reed",
+    "scientificName": "Phragmites australis",
+    "category": "plant",
+    "taxonomyClass": "Liliopsida",
+    "commonName": "Common Reed",
+    "description": {
+      "en": "Tall feathery-headed grass forming dense beds along lake shores, its submerged stems sheltering fry and dragonfly larvae.",
+      "de": "Hohes Gras mit federartigen Rispen, das dichte Bestände an Seeufern bildet; seine untergetauchten Halme beherbergen Brut und Libellenlarven.",
+      "es": "Gramínea alta de penachos plumosos que forma densos carrizales en las orillas de los lagos; sus tallos sumergidos refugian alevines y larvas de libélula.",
+      "fr": "Grande graminée à panicules plumeuses formant des roselières denses sur les rives des lacs, ses tiges immergées abritant alevins et larves de libellules.",
+      "it": "Alta graminacea dai pennacchi piumosi che forma fitti canneti lungo le rive dei laghi; i suoi fusti sommersi riparano avannotti e larve di libellula.",
+      "pt": "Gramínea alta de panículas plumosas que forma densos caniçais nas margens dos lagos; os seus caules submersos abrigam alevins e larvas de libélula.",
+      "nl": "Hoog gras met pluimvormige toppen dat dichte rietkragen langs meeroevers vormt; de ondergedoken stengels beschutten jonge vis en libellenlarven.",
+      "hu": "Magas, tollas bugájú fűféle, sűrű nádasokat alkot a tópartokon; víz alatti szárai ivadékoknak és szitakötőlárváknak adnak menedéket.",
+      "zh": "高大的芦苇草，顶端有羽状花序，在湖岸形成茂密苇丛，水下茎干为幼鱼和蜻蜓幼虫提供庇护。",
+      "ar": "عشب طويل بعناقيد ريشية يشكل أحراشاً كثيفة على شواطئ البحيرات، وتؤوي سيقانه المغمورة صغار الأسماك ويرقات اليعسوب.",
+      "he": "עשב גבוה בעל ראשים נוצתיים היוצר סבכים צפופים לאורך חופי אגמים, וגבעוליו השקועים מספקים מחסה לדגיגים ולזחלי שפיריות."
+    }
   }
 ]
