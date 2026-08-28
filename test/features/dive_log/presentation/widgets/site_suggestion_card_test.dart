@@ -206,6 +206,40 @@ void main() {
     expect(find.textContaining('Location'), findsNothing);
   });
 
+  testWidgets('add location reports the site as the repository has it', (
+    tester,
+  ) async {
+    // The post-commit altitude pass can fill a field the local copy cannot
+    // know about, so this path reads back like the assign path does.
+    const persisted = DiveSite(id: 'bare', name: 'Typed Twice');
+    dives = _StubDiveRepository(
+      linkedSite: const DiveSite(
+        id: 'bare',
+        name: 'Typed Twice',
+        location: GeoPoint(20.5, -87.25),
+        altitude: 12,
+      ),
+    );
+    DiveSite? reported;
+    await tester.pumpWidget(
+      await host(
+        suggestionFor(service, site: persisted),
+        currentSite: persisted,
+        onSiteChanged: (site) => reported = site,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Add location to Typed Twice'));
+    await tester.pumpAndSettle();
+
+    expect(reported?.location, const GeoPoint(20.5, -87.25));
+    expect(
+      reported?.altitude,
+      12,
+      reason: 'the altitude pass ran; a local copyWith would have missed it',
+    );
+  });
+
   testWidgets('dismiss writes the flag', (tester) async {
     await tester.pumpWidget(
       await host(suggestionFor(service, status: ProposalStatus.none)),

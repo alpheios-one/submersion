@@ -108,8 +108,16 @@ class SiteSuggestionCard extends ConsumerWidget {
           ? null
           : () => _run(context, ref, (l10n) async {
               await actions.addLocation();
+              // Read back what was written, exactly as the assign path does:
+              // the post-commit altitude pass may have filled a field the
+              // local copy cannot know about, and the dive's site can be
+              // partially hydrated (issue #1187). Falls back to the local
+              // copy only when the re-read finds nothing, since the write
+              // itself did land.
               final base = currentSite ?? proposal.dive.site!;
-              final site = base.copyWith(location: suggestion.point);
+              final site =
+                  await actions.linkedSite() ??
+                  base.copyWith(location: suggestion.point);
               return (site, l10n.diveLog_edit_addedGps(site.name));
             }),
       onDismiss: () => _run(context, ref, (_) async {
