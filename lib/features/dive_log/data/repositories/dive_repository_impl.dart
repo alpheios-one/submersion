@@ -2178,6 +2178,7 @@ class DiveRepository {
   ///
   /// Used to compute previous/next navigation from the detail page. Distinct
   /// from [getPreviousDive], which is the chronological surface-interval query.
+  // stats-scope-exempt: drives detail-page next/prev over the displayed list
   Future<List<String>> getOrderedDiveIds({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -2286,6 +2287,7 @@ class DiveRepository {
   ///
   /// Only called while the deco filter is active, which keeps the scan over
   /// `dive_profiles` off the default dive-list load.
+  // stats-scope-exempt: backs a view-filter axis; consumers apply the scope themselves
   Future<Set<String>> getDiveIdsWithDecoSignal({
     required bool wantDeco,
     String? diverId,
@@ -2356,6 +2358,7 @@ class DiveRepository {
 
   /// Translates each active filter field into parameterized SQL.
   /// Junction-table filters (tags, equipment, buddies) use EXISTS subqueries.
+  // stats-scope-exempt: this IS the view filter; the scope is applied alongside it
   void _buildFilterWhereClauses(
     DiveFilterState filter,
     List<String> clauses,
@@ -2646,6 +2649,7 @@ class DiveRepository {
   /// Note: This returns the next number after the highest existing number,
   /// which may not be chronologically correct. Use [getDiveNumberForDate]
   /// for chronologically-based numbering.
+  // stats-scope-exempt: numbering integrity, must see every dive or it reuses a number
   Future<int> getNextDiveNumber({String? diverId}) async {
     try {
       final String sql;
@@ -2700,6 +2704,7 @@ class DiveRepository {
   /// hydrating search whose roughly-ten-queries-per-match N+1 dominated
   /// search cost on large databases (docs/superpowers/specs/2026-07-10-
   /// large-db-performance-findings.md).
+  // stats-scope-exempt: search results are a displayed list, like the logbook
   Future<List<DiveSummary>> searchDiveSummaries(
     String query, {
     String? diverId,
@@ -4673,6 +4678,7 @@ class DiveRepository {
   /// classifier: end time (exit time, else entry/date + runtime) plus a
   /// had-deco flag derived from the recorded profile (any sample with
   /// deco_type = 2 or a positive ceiling).
+  // stats-scope-exempt: flying-after-diving safety, an excluded dive still off-gassed
   Future<List<NoFlyDiveInput>> getNoFlyDiveInputs({
     required DateTime since,
     String? diverId,
@@ -4767,6 +4773,7 @@ class DiveRepository {
   /// [getPreviousDiveTimes]) rather than full hydration: the formula needs
   /// only timestamps and effective runtime, and this method sits on the
   /// residual-decompression lookback hot path (WS2, large-DB performance).
+  // stats-scope-exempt: physiological interval between real dives, not a statistic
   Future<Duration?> getSurfaceInterval(String diveId) async {
     try {
       final current = await getDiveTimes(diveId);
@@ -5185,6 +5192,7 @@ class DiveRepository {
   /// [diverId] - If non-null, only operates on that diver's dives. The
   /// MIN(dive_number) used as the starting point is also scoped, so each
   /// diver preserves their own numbering baseline.
+  // stats-scope-exempt: renumbering integrity, must see every dive
   Future<void> assignMissingDiveNumbers({String? diverId}) async {
     try {
       _log.info(
@@ -6223,6 +6231,7 @@ class DiveRepository {
   /// When [diverId] is provided, the result is restricted to that diver's
   /// dives — callers that have already scoped `existingDives` to a single
   /// diver should pass it here so the key map shares the same scope.
+  // stats-scope-exempt: import dedupe fingerprints, must see every dive or it re-imports
   Future<Map<String, Set<String>>> getSourceKeysByDiveId({
     String? diverId,
   }) async {

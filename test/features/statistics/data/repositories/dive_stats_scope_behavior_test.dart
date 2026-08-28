@@ -1,7 +1,11 @@
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
+import 'package:submersion/features/dive_centers/data/repositories/dive_center_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
+import 'package:submersion/features/divers/data/repositories/diver_repository.dart';
 import 'package:submersion/features/statistics/data/repositories/statistics_repository.dart';
 
 import '../../../../helpers/test_database.dart';
@@ -237,6 +241,99 @@ void main() {
             'returning 3, someone applied DiveStatsScope where the design '
             'deliberately does not.',
       );
+    });
+  });
+
+  group('per-entity descriptive counts', () {
+    setUp(() async {
+      // Link the included dive AND the out-of-scope dives to the same buddy,
+      // site and centre, so a leak shows up as 3 where 1 is correct.
+      final at = DateTime.utc(2026, 1, 1).millisecondsSinceEpoch;
+      await db
+          .into(db.buddies)
+          .insert(
+            BuddiesCompanion(
+              id: const Value('b1'),
+              name: const Value('Test Buddy'),
+              createdAt: Value(at),
+              updatedAt: Value(at),
+            ),
+          );
+      await db
+          .into(db.diveSites)
+          .insert(
+            DiveSitesCompanion(
+              id: const Value('s1'),
+              name: const Value('Test Site'),
+              createdAt: Value(at),
+              updatedAt: Value(at),
+            ),
+          );
+      for (final id in ['included', 'excluded', 'planned']) {
+        await db
+            .into(db.diveBuddies)
+            .insert(
+              DiveBuddiesCompanion(
+                id: Value('db-$id'),
+                diveId: Value(id),
+                buddyId: const Value('b1'),
+                createdAt: Value(at),
+              ),
+            );
+        await db.customStatement(
+          "UPDATE dives SET site_id = 's1' WHERE id = '$id'",
+        );
+      }
+    });
+
+    test('getDiveCountForBuddy ignores excluded and planned dives', () async {
+      expect(await BuddyRepository().getDiveCountForBuddy('b1'), 1);
+    });
+
+    test(
+      'getDiveAggregatesBySite ignores excluded and planned dives',
+      () async {
+        final agg = await SiteRepository().getDiveAggregatesBySite();
+        expect(agg['s1']?.diveCount, 1);
+      },
+    );
+
+    test('getDiveCountForDiver ignores excluded and planned dives', () async {
+      final at = DateTime.utc(2026, 1, 1).millisecondsSinceEpoch;
+      await db
+          .into(db.divers)
+          .insert(
+            DiversCompanion(
+              id: const Value('diver-1'),
+              name: const Value('Test Diver'),
+              createdAt: Value(at),
+              updatedAt: Value(at),
+            ),
+          );
+      await db.customStatement("UPDATE dives SET diver_id = 'diver-1'");
+      expect(
+        await DiverRepository().getDiveCountForDiver('diver-1'),
+        nonGasInScope,
+      );
+    });
+
+    test('getDiveCountForCenter ignores excluded and planned dives', () async {
+      final at = DateTime.utc(2026, 1, 1).millisecondsSinceEpoch;
+      await db
+          .into(db.diveCenters)
+          .insert(
+            DiveCentersCompanion(
+              id: const Value('c1'),
+              name: const Value('Test Centre'),
+              createdAt: Value(at),
+              updatedAt: Value(at),
+            ),
+          );
+      await db.customStatement(
+        "UPDATE dives SET dive_center_id = 'c1' "
+        "WHERE id IN ('included', 'excluded')",
+      );
+      expect(await DiveCenterRepository().getDiveCountForCenter('c1'), 1);
     });
   });
 }

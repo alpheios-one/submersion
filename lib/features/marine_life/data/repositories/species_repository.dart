@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/marine_life/data/services/builtin_species_seed_version_store.dart';
@@ -684,7 +685,7 @@ class SpeciesRepository {
       FROM sightings s
       JOIN species sp ON s.species_id = sp.id
       JOIN dives d ON s.dive_id = d.id
-      WHERE d.site_id = ?
+      WHERE d.site_id = ?${DiveStatsScope.and(alias: 'd')}
       GROUP BY sp.id
       ORDER BY sighting_count DESC, sp.common_name ASC
     ''',
