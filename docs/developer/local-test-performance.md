@@ -11,8 +11,10 @@ measure application performance, see the Performance Tests section of
 
 Local test runs are limited by disk throughput, not by CPU. `flutter test`
 writes and copies a large kernel file for every test file, so a run moves tens
-of gigabytes through `$TMPDIR`. Pointing `$TMPDIR` at a RAM disk measured close
-to a 2x speedup and stops concurrent worktrees from fighting over the SSD.
+of gigabytes through `$TMPDIR`. Pointing `$TMPDIR` at a RAM disk measured
+between 1.3x and 2x faster, and stops concurrent worktrees from fighting over
+the SSD. The benefit scales with how busy the machine is: nearer 1.3x when
+little else is running, nearer 2x when several worktrees are testing at once.
 
 The tuning is machine-local by design. Only these instructions live in the
 repository; the scripts, shell config, and launch agent all sit outside it, in
@@ -175,6 +177,7 @@ Create `~/.local/bin/ft` so you do not have to remember the flags:
 #!/usr/bin/env bash
 # `flutter test` with this machine's tuning applied.
 # Usage: ft [paths/flags...]      Env: FT_JOBS (default 18)
+# Measured 1.3x to 2x on a 48-file run, widening with concurrent load.
 set -uo pipefail
 
 if [ -x "${HOME}/.local/bin/flutter-ramtmp" ]; then
@@ -199,10 +202,17 @@ load drifting during the measurement:
 | Default, on the internal SSD | 38.1s, 43.2s, 53.0s, 58.8s |
 | RAM disk | 29.7s, 28.8s |
 
-The shape matters as much as the average. RAM disk runs stayed flat near 29s
-while SSD runs degraded from 38s to 59s as other worktrees started their own
-test runs. Moving the temp traffic off the SSD is what decouples concurrent
-worktrees from each other.
+That is a range of 1.3x (38.1s against 29.7s) to 2.0x (58.8s against 28.8s),
+not a flat 2x. The spread is the interesting part rather than noise to average
+away: RAM disk runs stayed flat near 29s while SSD runs degraded from 38s to
+59s as other worktrees started their own test runs. Moving temp traffic off the
+SSD is what decouples concurrent worktrees from each other, so the busier the
+machine, the more it is worth.
+
+Two caveats on these numbers. They come from one machine, and no run was taken
+on a genuinely idle system, since another worktree was testing throughout the
+measurement window. The 1.3x figure is therefore a floor observed under light
+load rather than a clean unloaded baseline, and a quiet machine may see less.
 
 ## Do not run multiple invocations in one worktree
 
