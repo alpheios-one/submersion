@@ -13,6 +13,8 @@ import 'package:submersion/features/statistics/presentation/providers/trend_char
 import 'package:submersion/features/statistics/presentation/widgets/ranking_list.dart';
 import 'package:submersion/features/statistics/presentation/widgets/stat_charts.dart';
 import 'package:submersion/features/statistics/presentation/widgets/stat_section_card.dart';
+import 'package:submersion/features/statistics/presentation/widgets/statistics_filter_bar.dart';
+import 'package:submersion/features/statistics/presentation/widgets/statistics_filter_action.dart';
 import 'package:submersion/features/statistics/presentation/widgets/trend_chart_section.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -52,8 +54,18 @@ class StatisticsGasPage extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.statistics_gas_appBar_title)),
-      body: content,
+      appBar: AppBar(
+        title: Text(context.l10n.statistics_gas_appBar_title),
+        actions: const [StatisticsFilterAction()],
+      ),
+      // Expanded is required: content is a SingleChildScrollView, and a
+      // Column would otherwise hand it unbounded height.
+      body: Column(
+        children: [
+          const StatisticsFilterBar(),
+          Expanded(child: content),
+        ],
+      ),
     );
   }
 

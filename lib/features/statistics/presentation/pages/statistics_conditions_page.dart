@@ -10,6 +10,8 @@ import 'package:submersion/features/statistics/presentation/providers/statistics
 import 'package:submersion/features/statistics/presentation/providers/trend_chart_settings_provider.dart';
 import 'package:submersion/features/statistics/presentation/widgets/stat_charts.dart';
 import 'package:submersion/features/statistics/presentation/widgets/stat_section_card.dart';
+import 'package:submersion/features/statistics/presentation/widgets/statistics_filter_bar.dart';
+import 'package:submersion/features/statistics/presentation/widgets/statistics_filter_action.dart';
 import 'package:submersion/features/statistics/presentation/widgets/trend_chart_section.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -48,8 +50,16 @@ class StatisticsConditionsPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(context.l10n.statistics_conditions_appBar_title),
+        actions: const [StatisticsFilterAction()],
       ),
-      body: content,
+      // Expanded is required: content is a SingleChildScrollView, and a
+      // Column would otherwise hand it unbounded height.
+      body: Column(
+        children: [
+          const StatisticsFilterBar(),
+          Expanded(child: content),
+        ],
+      ),
     );
   }
 
