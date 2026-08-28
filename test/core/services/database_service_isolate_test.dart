@@ -564,11 +564,20 @@ void main() {
       await expectLater(
         DatabaseService.instance.restore(missingPath),
         throwsA(
-          isA<RestoreSourceMissingException>().having(
-            (e) => e.backupPath,
-            'backupPath',
-            missingPath,
-          ),
+          isA<RestoreSourceMissingException>()
+              .having((e) => e.backupPath, 'backupPath', missingPath)
+              // Two callers (startup recovery, settings export) render '$e'
+              // to the user unlocalized, so the text must read as a sentence
+              // that names the file, not as a class name.
+              .having(
+                (e) => '$e',
+                'toString',
+                allOf(
+                  contains(missingPath),
+                  contains('Nothing was restored'),
+                  isNot(contains('Exception')),
+                ),
+              ),
         ),
       );
 

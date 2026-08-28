@@ -16,7 +16,14 @@ class RestoreSourceMissingException implements Exception {
 
   const RestoreSourceMissingException(this.backupPath);
 
+  /// Written to be shown as-is. The backup flow maps this exception to a
+  /// localized message, but the startup recovery restore and the settings
+  /// export restore render `'$e'` unlocalized, so the text is a sentence
+  /// rather than a class name. It names the file because at those two call
+  /// sites the path is the user's own pick or the app's recovery backup, and
+  /// "which file" is the one detail that helps.
   @override
   String toString() =>
-      'RestoreSourceMissingException: backup file not found: $backupPath';
+      'Nothing was restored: the backup file could not be found at '
+      '$backupPath';
 }
