@@ -573,7 +573,8 @@ class SpeciesRepository {
   }
 
   /// Delete a species. Throws if the species is referenced by sightings or
-  /// photo tags.
+  /// photo tags, so no `media_species` row can exist by the time the row
+  /// goes (unlike `site_species`, which is derived and cleared here).
   Future<void> deleteSpecies(String id) async {
     if (await isSpeciesInUse(id)) {
       throw Exception(
@@ -584,13 +585,6 @@ class SpeciesRepository {
     // Also remove from site_species
     await (_db.delete(
       _db.siteSpecies,
-    )..where((t) => t.speciesId.equals(id))).go();
-
-    // Tags of an unused species are stale rows (the in-use check above
-    // refuses while any exist); clear them the way site_species is cleared,
-    // relying on the species tombstone downstream.
-    await (_db.delete(
-      _db.mediaSpecies,
     )..where((t) => t.speciesId.equals(id))).go();
 
     await (_db.delete(_db.species)..where((t) => t.id.equals(id))).go();

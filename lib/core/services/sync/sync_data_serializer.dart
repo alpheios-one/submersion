@@ -5328,13 +5328,34 @@ class SyncDataSerializer {
       final siteIds = modifiedSites.map((s) => s.id).toSet();
       if (siteIds.isEmpty) return [];
 
-      final rows = await (_db.select(
-        _db.siteSpecies,
-      )..where((t) => t.siteId.isIn(siteIds))).get();
-      return rows.map((r) => r.toJson()).toList();
+      return _childRowsOf(
+        siteIds,
+        (chunk) => (_db.select(
+          _db.siteSpecies,
+        )..where((t) => t.siteId.isIn(chunk))).get(),
+      );
     }
     final rows = await _db.select(_db.siteSpecies).get();
     return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// Rows of a clockless child table for [parentIds], fetched in chunks so
+  /// a large changeset (every photo modified since the cursor, say) cannot
+  /// overflow SQLite's bound-variable limit in one `IN (...)`.
+  Future<List<Map<String, dynamic>>> _childRowsOf<R extends DataClass>(
+    Set<String> parentIds,
+    Future<List<R>> Function(List<String> chunk) select,
+  ) async {
+    const idChunk = 900;
+    final ids = parentIds.toList();
+    final out = <Map<String, dynamic>>[];
+    for (var i = 0; i < ids.length; i += idChunk) {
+      final end = i + idChunk < ids.length ? i + idChunk : ids.length;
+      for (final r in await select(ids.sublist(i, end))) {
+        out.add(r.toJson());
+      }
+    }
+    return out;
   }
 
   /// `media_species` has no clock of its own, so an incremental export
@@ -5350,10 +5371,12 @@ class SyncDataSerializer {
       final mediaIds = modifiedMedia.map((m) => m.id).toSet();
       if (mediaIds.isEmpty) return [];
 
-      final rows = await (_db.select(
-        _db.mediaSpecies,
-      )..where((t) => t.mediaId.isIn(mediaIds))).get();
-      return rows.map((r) => r.toJson()).toList();
+      return _childRowsOf(
+        mediaIds,
+        (chunk) => (_db.select(
+          _db.mediaSpecies,
+        )..where((t) => t.mediaId.isIn(chunk))).get(),
+      );
     }
     final rows = await _db.select(_db.mediaSpecies).get();
     return rows.map((r) => r.toJson()).toList();
