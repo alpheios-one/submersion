@@ -191,23 +191,19 @@ class StatisticsRepository {
   // Gas Statistics
   // ============================================================================
 
-  /// Get SAC rate trend by month in L/min (last 5 years)
-  /// Requires tank volume data
-  Future<List<TrendDataPoint>> getSacVolumeTrend({
+  /// SAC rate of every dive in scope, in L/min at surface pressure, ordered by
+  /// date. Requires tank volume data.
+  ///
+  /// Gas used is summed across a dive's tanks first, so a twinset or a stage
+  /// dive yields one SAC value rather than one per cylinder.
+  Future<List<TrendDataPoint>> getSacVolumePerDive({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
   }) async {
     try {
-      final fiveYearsAgo = DateTime.now().subtract(
-        const Duration(days: 365 * 5),
-      );
-      final cutoff = fiveYearsAgo.millisecondsSinceEpoch;
-
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
       final df = _diveFilter(filter, alias: 'd');
-      final params = diverId != null
-          ? [cutoff, diverId, ...df.params]
-          : [cutoff, ...df.params];
+      final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
         SELECT
@@ -222,7 +218,7 @@ class StatisticsRepository {
           t.he_percent
         FROM dives d
         JOIN dive_tanks t ON t.dive_id = d.id
-        WHERE d.dive_date_time >= ? AND d.dive_mode <> 'gauge' $diverFilter ${df.clause}
+        WHERE d.dive_mode <> 'gauge' $diverFilter ${df.clause}
           AND COALESCE(d.runtime, d.bottom_time) > 0
           AND d.avg_depth > 0
           AND t.start_pressure > t.end_pressure
@@ -230,7 +226,8 @@ class StatisticsRepository {
         ORDER BY d.dive_date_time
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
-      // Group by dive, compute SAC per dive, then average by month
+      // Sum gas across each dive's tanks before dividing, so a twinset is one
+      // SAC value and not two.
       final Map<
         String,
         ({double gas, DateTime dateTime, int durationSec, double avgDepth})
@@ -284,39 +281,19 @@ class StatisticsRepository {
         }
       }
 
-      // Compute SAC per dive and group by month
-      final Map<String, List<double>> monthSacs = {};
+      final points = <TrendDataPoint>[];
       for (final entry in diveSacs.entries) {
         final d = entry.value;
         final sac =
             d.gas / (d.durationSec / 60.0) / ((d.avgDepth / 10.0) + 1.0);
         if (sac <= 0) continue;
-
-        final dt = d.dateTime;
-        final key = '${dt.year}-${dt.month.toString().padLeft(2, '0')}';
-        monthSacs.putIfAbsent(key, () => []).add(sac);
+        points.add(TrendDataPoint(date: d.dateTime, value: sac));
       }
-
-      // Average per month
-      final trend = <TrendDataPoint>[];
-      for (final entry in monthSacs.entries) {
-        final parts = entry.key.split('-');
-        final year = int.parse(parts[0]);
-        final month = int.parse(parts[1]);
-        final avg = entry.value.reduce((a, b) => a + b) / entry.value.length;
-        trend.add(
-          TrendDataPoint(
-            date: DateTime(year, month),
-            value: avg,
-            label: '${_monthAbbr(month)} $year',
-          ),
-        );
-      }
-      trend.sort((a, b) => a.date.compareTo(b.date));
-      return trend;
+      points.sort((a, b) => a.date.compareTo(b.date));
+      return points;
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to get SAC volume trend',
+        'Failed to get per-dive SAC volume',
         error: e,
         stackTrace: stackTrace,
       );
@@ -324,31 +301,23 @@ class StatisticsRepository {
     }
   }
 
-  /// Get SAC rate trend by month in pressure/min (last 5 years)
-  /// Does not require tank volume - uses pressure drop normalized to surface
-  Future<List<TrendDataPoint>> getSacPressureTrend({
+  /// SAC rate of every dive in scope, in pressure per minute, ordered by date.
+  ///
+  /// Does not require tank volume: uses the pressure drop of the dive's single
+  /// back-gas tank normalised to surface pressure.
+  Future<List<TrendDataPoint>> getSacPressurePerDive({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
   }) async {
     try {
-      final fiveYearsAgo = DateTime.now().subtract(
-        const Duration(days: 365 * 5),
-      );
-      final cutoff = fiveYearsAgo.millisecondsSinceEpoch;
-
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
       final df = _diveFilter(filter, alias: 'd');
-      final params = diverId != null
-          ? [cutoff, diverId, ...df.params]
-          : [cutoff, ...df.params];
+      final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
         SELECT
-          strftime('%Y', d.dive_date_time / 1000, 'unixepoch') AS year,
-          strftime('%m', d.dive_date_time / 1000, 'unixepoch') AS month,
-          AVG(
-            (t.start_pressure - t.end_pressure) / (COALESCE(d.runtime, d.bottom_time) / 60.0) / ((d.avg_depth / 10.0) + 1)
-          ) AS avg_sac
+          d.dive_date_time AS dive_date_time,
+          (t.start_pressure - t.end_pressure) / (COALESCE(d.runtime, d.bottom_time) / 60.0) / ((d.avg_depth / 10.0) + 1) AS sac
         FROM dives d
         JOIN dive_tanks t ON t.id = (
           SELECT t2.id FROM dive_tanks t2
@@ -364,26 +333,26 @@ class StatisticsRepository {
           ORDER BY t2.tank_order, t2.rowid
           LIMIT 1
         )
-        WHERE d.dive_date_time >= ? AND d.dive_mode <> 'gauge' $diverFilter ${df.clause}
+        WHERE d.dive_mode <> 'gauge' $diverFilter ${df.clause}
           AND COALESCE(d.runtime, d.bottom_time) > 0
           AND d.avg_depth > 0
-        GROUP BY year, month
-        HAVING avg_sac IS NOT NULL
-        ORDER BY year, month
+        ORDER BY d.dive_date_time
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
-      return results.map((row) {
-        final year = int.parse(row.read<String>('year'));
-        final month = int.parse(row.read<String>('month'));
-        return TrendDataPoint(
-          date: DateTime(year, month),
-          value: row.read<double>('avg_sac'),
-          label: '${_monthAbbr(month)} $year',
-        );
-      }).toList();
+      return results
+          .map(
+            (row) => TrendDataPoint(
+              date: DateTime.fromMillisecondsSinceEpoch(
+                row.read<int>('dive_date_time'),
+                isUtc: true,
+              ),
+              value: row.read<double>('sac'),
+            ),
+          )
+          .toList();
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to get SAC pressure trend',
+        'Failed to get per-dive SAC pressure',
         error: e,
         stackTrace: stackTrace,
       );

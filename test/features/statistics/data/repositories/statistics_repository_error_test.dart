@@ -24,8 +24,8 @@ void main() {
       DatabaseService.instance.resetForTesting();
 
       // Methods that return empty list
-      expect(await repository.getSacVolumeTrend(), isEmpty);
-      expect(await repository.getSacPressureTrend(), isEmpty);
+      expect(await repository.getSacVolumePerDive(), isEmpty);
+      expect(await repository.getSacPressurePerDive(), isEmpty);
       expect(await repository.getGasMixDistribution(), isEmpty);
       expect(await repository.getDiveTypeDistribution(), isEmpty);
       expect(await repository.getDepthPerDive(), isEmpty);
