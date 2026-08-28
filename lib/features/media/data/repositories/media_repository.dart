@@ -733,6 +733,8 @@ class MediaRepository {
   ///
   /// Unlike [markVerified] this always writes: the user asked for a check
   /// and the date of that check is the answer, whether or not the flag moved.
+  /// Like it, a row that is gone by the time the check lands (deleted during
+  /// a Check all media pass) gets no pending record pointing at nothing.
   Future<void> stampVerification(
     String id, {
     required DateTime verifiedAt,
@@ -740,15 +742,17 @@ class MediaRepository {
   }) async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
-      await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
-        MediaCompanion(
-          isOrphaned: isOrphaned == null
-              ? const Value.absent()
-              : Value(isOrphaned),
-          lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
-          updatedAt: Value(now),
-        ),
-      );
+      final rowsWritten =
+          await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
+            MediaCompanion(
+              isOrphaned: isOrphaned == null
+                  ? const Value.absent()
+                  : Value(isOrphaned),
+              lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
+              updatedAt: Value(now),
+            ),
+          );
+      if (rowsWritten == 0) return;
       await _syncRepository.markRecordPending(
         entityType: 'media',
         recordId: id,

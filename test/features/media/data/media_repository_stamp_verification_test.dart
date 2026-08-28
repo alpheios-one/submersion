@@ -93,6 +93,22 @@ void main() {
     expect(row.lastVerifiedAt, DateTime(2026, 3, 2));
   });
 
+  test('a row that is gone by the time the check lands leaves nothing '
+      'pending', () async {
+    // Check all media runs asynchronously over a snapshot of rows; a row
+    // deleted meanwhile must not gain a pending sync record pointing at
+    // nothing (markVerified guards the same way).
+    await SyncRepository().clearPendingRecords();
+
+    await repo.stampVerification(
+      'no-such-row',
+      verifiedAt: DateTime(2026, 3),
+      isOrphaned: true,
+    );
+
+    expect(await SyncRepository().getPendingRecords(), isEmpty);
+  });
+
   test('the write is sync-visible', () async {
     final photo = await stampedPhoto();
     // createMedia and the stamps above already queued the row; clear that
