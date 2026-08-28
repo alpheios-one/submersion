@@ -34842,4 +34842,50 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => 'הגבוה ביותר';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'החרג מהסטטיסטיקות';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'השאר את הצלילה ביומן, אך החרג אותה מכל סטטיסטיקה, כולל מספר הצלילות שלך.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats => 'החרג מסטטיסטיקות הגז';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'החרג את הצלילה מסטטיסטיקות SAC, RMV ותערובת גז בלבד. שימושי כאשר ערך הגז אינו מייצג.';
+
+  @override
+  String get diveLog_badge_excludedFromStats => 'מוחרגת מהסטטיסטיקות';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats => 'מוחרגת מסטטיסטיקות הגז';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats => 'החרג מהסטטיסטיקות';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'החרג מסטטיסטיקות הגז';
+
+  @override
+  String get diveLog_filter_excludedOnly => 'רק המוחרגות מהסטטיסטיקות';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'מוחרגת';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות מוחרגות מהסטטיסטיקות',
+      many: '$count צלילות מוחרגות מהסטטיסטיקות',
+      two: 'שתי צלילות מוחרגות מהסטטיסטיקות',
+      one: 'צלילה אחת מוחרגת מהסטטיסטיקות',
+    );
+    return '$_temp0';
+  }
 }

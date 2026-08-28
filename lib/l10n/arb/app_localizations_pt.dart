@@ -35548,4 +35548,52 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => 'Máximo';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'Excluir das estatísticas';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'Mantenha este mergulho no seu registo, mas deixe-o fora de todas as estatísticas, incluindo a sua contagem de mergulhos.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats =>
+      'Excluir das estatísticas de gás';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'Deixe este mergulho fora apenas das estatísticas de SAC, RMV e mistura de gás. Útil quando o valor de gás não é representativo.';
+
+  @override
+  String get diveLog_badge_excludedFromStats => 'Excluído das estatísticas';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats =>
+      'Excluído das estatísticas de gás';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats =>
+      'Excluir das estatísticas';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'Excluir das estatísticas de gás';
+
+  @override
+  String get diveLog_filter_excludedOnly =>
+      'Apenas os excluídos das estatísticas';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'Excluído';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos excluídos das estatísticas',
+      one: '1 mergulho excluído das estatísticas',
+    );
+    return '$_temp0';
+  }
 }

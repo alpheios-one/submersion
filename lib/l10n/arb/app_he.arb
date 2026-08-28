@@ -7331,15 +7331,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{לא בוצעה התעלמות מתצפיות} =1{בוצעה התעלמות מתצפית אחת} other{בוצעה התעלמות מ-{count} תצפיות}}, {failed, plural, =1{לא ניתן היה לעדכן צלילה אחת} other{לא ניתן היה לעדכן {failed} צלילות}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "לא ניתן לקרוא את רשימת הצלילות. דבר לא שונה.",
   "safetySettings_analyzeAll_failed": "לא ניתן לנתח את הצלילות.",
   "safetyReview_details": "פרטים",
@@ -10386,5 +10386,16 @@
   "diveLog_filter_presetLast5Years": "5 השנים האחרונות",
   "diveLog_filter_presetLast10Years": "10 השנים האחרונות",
   "statistics_trend_tooltip_lowest": "הנמוך ביותר",
-  "statistics_trend_tooltip_highest": "הגבוה ביותר"
+  "statistics_trend_tooltip_highest": "הגבוה ביותר",
+  "diveLog_edit_excludeFromStats": "החרג מהסטטיסטיקות",
+  "diveLog_edit_excludeFromStatsHelp": "השאר את הצלילה ביומן, אך החרג אותה מכל סטטיסטיקה, כולל מספר הצלילות שלך.",
+  "diveLog_edit_excludeFromGasStats": "החרג מסטטיסטיקות הגז",
+  "diveLog_edit_excludeFromGasStatsHelp": "החרג את הצלילה מסטטיסטיקות SAC, RMV ותערובת גז בלבד. שימושי כאשר ערך הגז אינו מייצג.",
+  "diveLog_badge_excludedFromStats": "מוחרגת מהסטטיסטיקות",
+  "diveLog_badge_excludedFromGasStats": "מוחרגת מסטטיסטיקות הגז",
+  "diveLog_bulkEdit_fieldExcludeFromStats": "החרג מהסטטיסטיקות",
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "החרג מסטטיסטיקות הגז",
+  "diveLog_filter_excludedOnly": "רק המוחרגות מהסטטיסטיקות",
+  "diveLog_edit_summary_excluded": "מוחרגת",
+  "statistics_excludedDivesFootnote": "{count, plural, one{צלילה אחת מוחרגת מהסטטיסטיקות} two{שתי צלילות מוחרגות מהסטטיסטיקות} many{{count} צלילות מוחרגות מהסטטיסטיקות} other{{count} צלילות מוחרגות מהסטטיסטיקות}}"
 }

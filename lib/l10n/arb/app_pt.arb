@@ -7331,15 +7331,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{Nenhuma observação dispensada} =1{1 observação dispensada} other{{count} observações dispensadas}}, {failed, plural, =1{1 mergulho não pôde ser atualizado} other{{failed} mergulhos não puderam ser atualizados}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "Não foi possível ler a lista de mergulhos. Nada foi alterado.",
   "safetySettings_analyzeAll_failed": "Não foi possível analisar os mergulhos.",
   "safetyReview_details": "Detalhes",
@@ -10386,5 +10386,16 @@
   "diveLog_filter_presetLast5Years": "Últimos 5 anos",
   "diveLog_filter_presetLast10Years": "Últimos 10 anos",
   "statistics_trend_tooltip_lowest": "Mínimo",
-  "statistics_trend_tooltip_highest": "Máximo"
+  "statistics_trend_tooltip_highest": "Máximo",
+  "diveLog_edit_excludeFromStats": "Excluir das estatísticas",
+  "diveLog_edit_excludeFromStatsHelp": "Mantenha este mergulho no seu registo, mas deixe-o fora de todas as estatísticas, incluindo a sua contagem de mergulhos.",
+  "diveLog_edit_excludeFromGasStats": "Excluir das estatísticas de gás",
+  "diveLog_edit_excludeFromGasStatsHelp": "Deixe este mergulho fora apenas das estatísticas de SAC, RMV e mistura de gás. Útil quando o valor de gás não é representativo.",
+  "diveLog_badge_excludedFromStats": "Excluído das estatísticas",
+  "diveLog_badge_excludedFromGasStats": "Excluído das estatísticas de gás",
+  "diveLog_bulkEdit_fieldExcludeFromStats": "Excluir das estatísticas",
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "Excluir das estatísticas de gás",
+  "diveLog_filter_excludedOnly": "Apenas os excluídos das estatísticas",
+  "diveLog_edit_summary_excluded": "Excluído",
+  "statistics_excludedDivesFootnote": "{count, plural, one{1 mergulho excluído das estatísticas} other{{count} mergulhos excluídos das estatísticas}}"
 }

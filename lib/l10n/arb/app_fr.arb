@@ -7331,15 +7331,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{Aucune observation ignorée} =1{1 observation ignorée} other{{count} observations ignorées}}, {failed, plural, =1{1 plongée n’a pas pu être mise à jour} other{{failed} plongées n’ont pas pu être mises à jour}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "Impossible de lire la liste des plongées. Rien n’a été modifié.",
   "safetySettings_analyzeAll_failed": "Impossible d’analyser les plongées.",
   "safetyReview_details": "Détails",
@@ -10386,5 +10386,16 @@
   "diveLog_filter_presetLast5Years": "5 dernières années",
   "diveLog_filter_presetLast10Years": "10 dernières années",
   "statistics_trend_tooltip_lowest": "Minimum",
-  "statistics_trend_tooltip_highest": "Maximum"
+  "statistics_trend_tooltip_highest": "Maximum",
+  "diveLog_edit_excludeFromStats": "Exclure des statistiques",
+  "diveLog_edit_excludeFromStatsHelp": "Conservez cette plongée dans votre carnet, mais laissez-la en dehors de toutes les statistiques, y compris votre nombre de plongées.",
+  "diveLog_edit_excludeFromGasStats": "Exclure des statistiques de gaz",
+  "diveLog_edit_excludeFromGasStatsHelp": "Laissez cette plongée en dehors des seules statistiques SAC, RMV et mélange gazeux. Utile lorsque la valeur de gaz n'est pas représentative.",
+  "diveLog_badge_excludedFromStats": "Exclue des statistiques",
+  "diveLog_badge_excludedFromGasStats": "Exclue des statistiques de gaz",
+  "diveLog_bulkEdit_fieldExcludeFromStats": "Exclure des statistiques",
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "Exclure des statistiques de gaz",
+  "diveLog_filter_excludedOnly": "Uniquement les exclues des statistiques",
+  "diveLog_edit_summary_excluded": "Exclue",
+  "statistics_excludedDivesFootnote": "{count, plural, one{1 plongée exclue des statistiques} other{{count} plongées exclues des statistiques}}"
 }

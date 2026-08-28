@@ -2204,7 +2204,13 @@
   "dashboard_recentDives_noProfileData": "No profile data for this dive",
   "dashboard_recentDives_profileLoadError": "Couldn't load the dive profile",
   "dashboard_recentDives_profileMinutes": "{minutes} min",
-  "@dashboard_recentDives_profileMinutes": {"placeholders": {"minutes": {"type": "int"}}},
+  "@dashboard_recentDives_profileMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "dashboard_recentDives_logFirst": "Log Your First Dive",
   "dashboard_recentDives_sectionTitle": "Recent Dives",
   "dashboard_recentDives_viewAll": "View All",
@@ -6936,16 +6942,26 @@
   "gasCalculators_blender_stepStart": "Start with {pressure} {gas}",
   "@gasCalculators_blender_stepStart": {
     "placeholders": {
-      "pressure": { "type": "String" },
-      "gas": { "type": "String" }
+      "pressure": {
+        "type": "String"
+      },
+      "gas": {
+        "type": "String"
+      }
     }
   },
   "gasCalculators_blender_stepFill": "Fill {gas} to {pressure} → {mix}",
   "@gasCalculators_blender_stepFill": {
     "placeholders": {
-      "gas": { "type": "String" },
-      "pressure": { "type": "String" },
-      "mix": { "type": "String" }
+      "gas": {
+        "type": "String"
+      },
+      "pressure": {
+        "type": "String"
+      },
+      "mix": {
+        "type": "String"
+      }
     }
   },
   "gasCalculators_blender_error_targetPressure": "Target pressure must be higher than the starting pressure.",
@@ -6956,7 +6972,9 @@
   "gasCalculators_blender_error_drainTo": "Too much gas in the cylinder for this blend. Drain to {pressure} first, then blend.",
   "@gasCalculators_blender_error_drainTo": {
     "placeholders": {
-      "pressure": { "type": "String" }
+      "pressure": {
+        "type": "String"
+      }
     }
   },
   "gasCalculators_blender_error_drainEmpty": "None of the gas in the cylinder can be used for this blend. Empty it first, then blend.",
@@ -7015,16 +7033,79 @@
   "gasCalculators_blender_fillAdded": "{mix} added to the bill",
   "gasCalculators_blender_billedIncomplete": "One or more lines have no price, so this total is incomplete.",
   "gasCalculators_blender_billedTotal": "Total",
-  "@gasCalculators_blender_clearBilledBody": {"placeholders": {"count": {"type": "int"}}},
-  "@gasCalculators_blender_editLine": {"placeholders": {"label": {"type": "String"}}},
-  "@gasCalculators_blender_deleteLine": {"placeholders": {"label": {"type": "String"}}},
-  "@gasCalculators_blender_fillAdded": {"placeholders": {"mix": {"type": "String"}}},
-  "@gasCalculators_blender_stepAdd": {"placeholders": {"gas": {"type": "String"}}},
-  "@gasCalculators_blender_settlesTo": {"placeholders": {"pressure": {"type": "String"}, "temperature": {"type": "String"}}},
-  "@gasCalculators_blender_templateSaved": {"placeholders": {"mix": {"type": "String"}}},
-  "@gasCalculators_blender_templateLimit": {"placeholders": {"count": {"type": "int"}}},
-  "@gasCalculators_blender_templateDelete": {"placeholders": {"mix": {"type": "String"}}},
-  "@gasCalculators_blender_unitPrice": {"placeholders": {"unit": {"type": "String"}}},
+  "@gasCalculators_blender_clearBilledBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@gasCalculators_blender_editLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "@gasCalculators_blender_deleteLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "@gasCalculators_blender_fillAdded": {
+    "placeholders": {
+      "mix": {
+        "type": "String"
+      }
+    }
+  },
+  "@gasCalculators_blender_stepAdd": {
+    "placeholders": {
+      "gas": {
+        "type": "String"
+      }
+    }
+  },
+  "@gasCalculators_blender_settlesTo": {
+    "placeholders": {
+      "pressure": {
+        "type": "String"
+      },
+      "temperature": {
+        "type": "String"
+      }
+    }
+  },
+  "@gasCalculators_blender_templateSaved": {
+    "placeholders": {
+      "mix": {
+        "type": "String"
+      }
+    }
+  },
+  "@gasCalculators_blender_templateLimit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@gasCalculators_blender_templateDelete": {
+    "placeholders": {
+      "mix": {
+        "type": "String"
+      }
+    }
+  },
+  "@gasCalculators_blender_unitPrice": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "gasCalculators_tab_mod": "MOD",
   "gasCalculators_tab_rockBottom": "Rock Bottom",
   "gasCalculators_tankSize": "Tank Size",
@@ -7451,7 +7532,6 @@
       }
     }
   },
-  
   "media_siteMediaSection_unlinkSelectedSuccess": "Unlinked {count} items",
   "media_documentViewer_title": "Document",
   "media_documentViewer_unavailable": "This document is not available on this device",
@@ -7538,20 +7618,68 @@
   "media_photoPicker_files_autoMatchLabel": "Auto-match photos and videos to dives by date",
   "media_photoPicker_files_emptyHint": "Pick files or a folder to start.",
   "media_photoPicker_files_linkButton": "{count, plural, =1{Link 1 item} other{Link {count} items}}",
-  "@media_photoPicker_files_linkButton": {"placeholders": {"count": {"type": "int"}}},
+  "@media_photoPicker_files_linkButton": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "media_photoPicker_files_attachToSiteButton": "{count, plural, =1{Attach 1 item to this site} other{Attach {count} items to this site}}",
-  "@media_photoPicker_files_attachToSiteButton": {"placeholders": {"count": {"type": "int"}}},
+  "@media_photoPicker_files_attachToSiteButton": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "media_photoPicker_files_summary": "{fileCount, plural, =1{1 file} other{{fileCount} files}}, {diveCount, plural, =1{1 dive} other{{diveCount} dives}}, {unmatchedCount} unmatched",
-  "@media_photoPicker_files_summary": {"placeholders": {"fileCount": {"type": "int"}, "diveCount": {"type": "int"}, "unmatchedCount": {"type": "Object"}}},
+  "@media_photoPicker_files_summary": {
+    "placeholders": {
+      "fileCount": {
+        "type": "int"
+      },
+      "diveCount": {
+        "type": "int"
+      },
+      "unmatchedCount": {
+        "type": "Object"
+      }
+    }
+  },
   "media_photoPicker_files_itemCount": "{count, plural, =1{1 item} other{{count} items}}",
-  "@media_photoPicker_files_itemCount": {"placeholders": {"count": {"type": "int"}}},
+  "@media_photoPicker_files_itemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "media_photoPicker_files_diveGroupTitle": "Dive {diveId}",
-  "@media_photoPicker_files_diveGroupTitle": {"placeholders": {"diveId": {"type": "String"}}},
+  "@media_photoPicker_files_diveGroupTitle": {
+    "placeholders": {
+      "diveId": {
+        "type": "String"
+      }
+    }
+  },
   "media_photoPicker_files_groupCount": "{count, plural, =1{1 file} other{{count} files}}",
-  "@media_photoPicker_files_groupCount": {"placeholders": {"count": {"type": "int"}}},
+  "@media_photoPicker_files_groupCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "media_photoPicker_files_unmatchedGroupTitle": "Unmatched",
   "media_photoPicker_files_addAllToDive": "{count, plural, =1{Add 1 to this dive} other{Add all {count} to this dive}}",
-  "@media_photoPicker_files_addAllToDive": {"placeholders": {"count": {"type": "int"}}},
+  "@media_photoPicker_files_addAllToDive": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "media_photoPicker_files_addToDiveTooltip": "Add to this dive",
   "media_photoPicker_files_chooseDiveTooltip": "Choose a dive",
   "media_photoPicker_files_removeTooltip": "Remove from selection",
@@ -7560,23 +7688,68 @@
   "media_photoPicker_files_sourceFileDate": "from file date",
   "media_photoPicker_files_sourceNone": "no date found",
   "media_photoPicker_files_shiftedTime": "{shifted} (was {original})",
-  "@media_photoPicker_files_shiftedTime": {"placeholders": {"shifted": {"type": "String"}, "original": {"type": "String"}}},
+  "@media_photoPicker_files_shiftedTime": {
+    "placeholders": {
+      "shifted": {
+        "type": "String"
+      },
+      "original": {
+        "type": "String"
+      }
+    }
+  },
   "media_photoPicker_files_reasonNoTimestamp": "No capture time could be read",
   "media_photoPicker_files_reasonBeforeDive": "{gap} before the nearest dive",
-  "@media_photoPicker_files_reasonBeforeDive": {"placeholders": {"gap": {"type": "String"}}},
+  "@media_photoPicker_files_reasonBeforeDive": {
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
   "media_photoPicker_files_reasonAfterDive": "{gap} after the nearest dive",
-  "@media_photoPicker_files_reasonAfterDive": {"placeholders": {"gap": {"type": "String"}}},
+  "@media_photoPicker_files_reasonAfterDive": {
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
   "media_photoPicker_files_reasonNoDives": "No dives to match against",
   "media_photoPicker_files_offsetLabel": "Shift capture times by",
   "media_photoPicker_files_offsetResetTooltip": "Reset to no shift",
   "media_photoPicker_files_offsetBackTooltip": "Shift {amount} earlier",
-  "@media_photoPicker_files_offsetBackTooltip": {"placeholders": {"amount": {"type": "String"}}},
+  "@media_photoPicker_files_offsetBackTooltip": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "media_photoPicker_files_offsetForwardTooltip": "Shift {amount} later",
-  "@media_photoPicker_files_offsetForwardTooltip": {"placeholders": {"amount": {"type": "String"}}},
+  "@media_photoPicker_files_offsetForwardTooltip": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "media_photoPicker_files_linkedCount": "{count, plural, =1{Linked 1 item} other{Linked {count} items}}",
-  "@media_photoPicker_files_linkedCount": {"placeholders": {"count": {"type": "int"}}},
+  "@media_photoPicker_files_linkedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "media_photoPicker_files_attachedToSiteCount": "{count, plural, =1{Attached 1 item to this site} other{Attached {count} items to this site}}",
-  "@media_photoPicker_files_attachedToSiteCount": {"placeholders": {"count": {"type": "int"}}},
+  "@media_photoPicker_files_attachedToSiteCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "media_photoPicker_files_undo": "Undo",
   "media_photoPicker_thumbnailAlreadyLinkedLabel": "Photo already linked to this dive",
   "media_perdixOverlay_labelCns": "CNS",
@@ -7992,17 +8165,6 @@
   "@media_import_review_chooseDive": {
     "description": "Review row menu: pick a dive"
   },
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   "media_import_intro": "Photos are linked to a dive or a dive site as you import them.",
   "@media_import_intro": {
     "description": "Import section intro text"
@@ -8114,14 +8276,20 @@
   "media_sources_lastScanned": "Last scanned {date}",
   "@media_sources_lastScanned": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "media_sources_scanResult": "{indexed} files indexed, {repaired} re-linked",
   "@media_sources_scanResult": {
     "placeholders": {
-      "indexed": { "type": "int" },
-      "repaired": { "type": "int" }
+      "indexed": {
+        "type": "int"
+      },
+      "repaired": {
+        "type": "int"
+      }
     }
   },
   "media_repairHistory_sourceFolder": "folder scan",
@@ -8147,7 +8315,9 @@
   "media_repairHistory_source": "via {source}",
   "@media_repairHistory_source": {
     "placeholders": {
-      "source": { "type": "String" }
+      "source": {
+        "type": "String"
+      }
     }
   },
   "media_missing_empty": "No missing files",
@@ -8293,8 +8463,6 @@
       }
     }
   },
-  
-  
   "media_library_filter_clear": "Clear filters",
   "media_library_filter_any": "Any",
   "@media_library_filter_any": {
@@ -8894,15 +9062,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{No observations dismissed} =1{1 observation dismissed} other{{count} observations dismissed}}, {failed, plural, =1{1 dive could not be updated} other{{failed} dives could not be updated}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "Could not read your dive list. No dives were changed.",
   "safetySettings_analyzeAll_failed": "Could not analyze your dives.",
   "safetyReview_details": "Details",
@@ -12304,7 +12472,13 @@
   "universalImport_summary_noticeNoTankPressureTitle": "Tank pressure not recorded",
   "universalImport_summary_noticeNoTankPressureBody": "Air consumption and SAC cannot be calculated. You can add start and end pressure by editing the dive.",
   "universalImport_summary_noticeAffectedDives": "{count, plural, =1{Affects 1 dive} other{Affects {count} dives}}",
-  "@universalImport_summary_noticeAffectedDives": {"placeholders": {"count": {"type": "int"}}},
+  "@universalImport_summary_noticeAffectedDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "universalImport_summary_fileImported": "{count, plural, =1{1 dive imported} other{{count} dives imported}}",
   "universalImport_summary_fileNeedsIndividualImport": "Needs individual import",
   "universalImport_summary_fileUnsupported": "Unsupported format",
@@ -15595,7 +15769,13 @@
   "dive3d_metric_tts": "TTS",
   "@dive3d_metric_tts": {},
   "dive3d_axis_depth": "Depth ({unitSymbol})",
-  "@dive3d_axis_depth": {"placeholders": {"unitSymbol": {"type": "String"}}},
+  "@dive3d_axis_depth": {
+    "placeholders": {
+      "unitSymbol": {
+        "type": "String"
+      }
+    }
+  },
   "dive3d_axis_time": "Run time (min)",
   "@dive3d_axis_time": {},
   "dive3d_pose_menu": "Camera",
@@ -15613,7 +15793,13 @@
   "dive3d_readout_ceiling": "Ceiling",
   "@dive3d_readout_ceiling": {},
   "dive3d_readout_tank": "Tank {n}",
-  "@dive3d_readout_tank": {"placeholders": {"n": {"type": "int"}}},
+  "@dive3d_readout_tank": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "dive3d_scene_dive": "Dive",
   "@dive3d_scene_dive": {},
   "dive3d_scene_tissue": "Tissues",
@@ -16645,7 +16831,9 @@
   "@reef_species_showAll": {
     "description": "Expands the capped nearby-species chip list to its full length",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "reef_species_showFewer": "Show fewer",
@@ -18596,100 +18784,609 @@
   "statistics_timePatterns_timeOfDay_morning": "Morning",
   "statistics_timePatterns_timeOfDay_night": "Night",
   "statistics_timePatterns_timeOfDay_semanticLabel": "Pie chart. Dives by time of day. {description}",
-  "@common_action_done": {"description": "Dismiss a finished operation"},
-  "@common_action_more": {"description": "Overflow menu tooltip"},
-  "@common_label_displayName": {"description": "Text field label for a user-chosen display name"},
-  "@common_relativeTime_daysAgo": {"description": "Relative past time in whole days (abbreviated)", "placeholders": {"count": {"type": "int"}}},
-  "@common_relativeTime_hoursAgo": {"description": "Relative past time in whole hours (abbreviated)", "placeholders": {"count": {"type": "int"}}},
-  "@common_relativeTime_inDays": {"description": "Relative future time in whole days (abbreviated)", "placeholders": {"count": {"type": "int"}}},
-  "@common_relativeTime_inHours": {"description": "Relative future time in whole hours (abbreviated)", "placeholders": {"count": {"type": "int"}}},
-  "@common_relativeTime_inLessThanMinute": {"description": "Relative future time, under one minute"},
-  "@common_relativeTime_inMinutes": {"description": "Relative future time in whole minutes (abbreviated)", "placeholders": {"count": {"type": "int"}}},
-  "@common_relativeTime_justNow": {"description": "Relative past time, under one minute"},
-  "@common_relativeTime_minutesAgo": {"description": "Relative past time in whole minutes (abbreviated)", "placeholders": {"count": {"type": "int"}}},
-  "@common_relativeTime_monthsAgo": {"description": "Relative past time in whole months (abbreviated)", "placeholders": {"count": {"type": "int"}}},
-  "@common_relativeTime_overdue": {"description": "Relative future time that is already in the past"},
-  "@media_cache_calculating": {"description": "Network Sources: cache size is still being measured"},
-  "@media_cache_cardTitle": {"description": "Network Sources: cache card header"},
-  "@media_cache_clearAction": {"description": "Network Sources: clear the network image cache action"},
-  "@media_cache_clearBody": {"description": "Network Sources: clear cache confirmation body"},
-  "@media_cache_clearConfirm": {"description": "Network Sources: confirm button on the clear cache dialog"},
-  "@media_cache_clearError": {"description": "Network Sources: clearing the cache threw", "placeholders": {"error": {"type": "String"}}},
-  "@media_cache_clearTitle": {"description": "Network Sources: clear cache confirmation title"},
-  "@media_cache_cleared": {"description": "Network Sources: cache cleared confirmation"},
-  "@media_cache_diskCache": {"description": "Network Sources: on-disk network image cache row"},
-  "@media_cache_error": {"description": "Network Sources: measuring the cache size threw", "placeholders": {"error": {"type": "String"}}},
-  "@media_credentials_actionTest": {"description": "Network Sources: probe a saved host with its credentials"},
-  "@media_credentials_authLabel": {"description": "Network Sources: saved host auth scheme (basic, bearer, ...)", "placeholders": {"authType": {"type": "String"}}},
-  "@media_credentials_deleteBody": {"description": "Network Sources: delete saved host confirmation body"},
-  "@media_credentials_deleteError": {"description": "Network Sources: removing a saved host threw", "placeholders": {"error": {"type": "String"}}},
-  "@media_credentials_deleteTitle": {"description": "Network Sources: delete saved host confirmation title", "placeholders": {"host": {"type": "String"}}},
-  "@media_credentials_deleted": {"description": "Network Sources: saved host removed confirmation", "placeholders": {"host": {"type": "String"}}},
-  "@media_credentials_editTitle": {"description": "Network Sources: rename saved host dialog title", "placeholders": {"host": {"type": "String"}}},
-  "@media_credentials_emptySubtitle": {"description": "Network Sources: saved-hosts empty-state explanation"},
-  "@media_credentials_emptyTitle": {"description": "Network Sources: no per-host credentials stored"},
-  "@media_credentials_lastUsed": {"description": "Network Sources: relative time a saved host was last used", "placeholders": {"when": {"type": "String"}}},
-  "@media_credentials_loadError": {"description": "Network Sources: saved-hosts query failed"},
-  "@media_credentials_loading": {"description": "Network Sources: saved-hosts list is loading"},
-  "@media_credentials_saveError": {"description": "Network Sources: saving a host display name threw", "placeholders": {"error": {"type": "String"}}},
-  "@media_credentials_savedHostsTitle": {"description": "Network Sources: saved-hosts card header"},
-  "@media_credentials_testError": {"description": "Network Sources: credential probe threw", "placeholders": {"error": {"type": "String"}}},
-  "@media_credentials_testFailed": {"description": "Network Sources: credential probe was rejected", "placeholders": {"host": {"type": "String"}}},
-  "@media_credentials_testOk": {"description": "Network Sources: credential probe succeeded", "placeholders": {"host": {"type": "String"}}},
-  "@media_manifest_actionPollNow": {"description": "Network Sources: fetch a subscription immediately"},
-  "@media_manifest_cardTitle": {"description": "Network Sources: manifest subscriptions card header"},
-  "@media_manifest_deleteBody": {"description": "Network Sources: delete subscription confirmation body"},
-  "@media_manifest_deleteError": {"description": "Network Sources: deleting a subscription threw", "placeholders": {"error": {"type": "String"}}},
-  "@media_manifest_deleteTitle": {"description": "Network Sources: delete subscription confirmation title", "placeholders": {"name": {"type": "String"}}},
-  "@media_manifest_editTitle": {"description": "Network Sources: edit subscription dialog title"},
-  "@media_manifest_emptySubtitle": {"description": "Network Sources: subscriptions empty-state explanation"},
-  "@media_manifest_emptyTitle": {"description": "Network Sources: no subscriptions configured"},
-  "@media_manifest_lastError": {"description": "Network Sources: the last poll of this subscription failed", "placeholders": {"error": {"type": "String"}}},
-  "@media_manifest_lastPolled": {"description": "Network Sources: relative time of the last successful poll", "placeholders": {"when": {"type": "String"}}},
-  "@media_manifest_loadError": {"description": "Network Sources: subscriptions query failed"},
-  "@media_manifest_loading": {"description": "Network Sources: subscriptions list is loading"},
-  "@media_manifest_neverPolled": {"description": "Network Sources: subscription has never been fetched"},
-  "@media_manifest_nextPoll": {"description": "Network Sources: relative time of the next scheduled poll", "placeholders": {"when": {"type": "String"}}},
-  "@media_manifest_notFound": {"description": "Network Sources: the polled subscription row no longer exists"},
-  "@media_manifest_pollError": {"description": "Network Sources: a manual poll threw", "placeholders": {"error": {"type": "String"}}},
-  "@media_manifest_polled": {"description": "Network Sources: a manual poll finished", "placeholders": {"name": {"type": "String"}}},
-  "@media_manifest_polling": {"description": "Network Sources: a manual poll has started", "placeholders": {"name": {"type": "String"}}},
-  "@media_manifest_saveError": {"description": "Network Sources: saving subscription edits threw", "placeholders": {"error": {"type": "String"}}},
-  "@media_manifest_updateError": {"description": "Network Sources: toggling a subscription active flag threw", "placeholders": {"error": {"type": "String"}}},
-  "@media_manifest_urlLabel": {"description": "Network Sources: manifest URL text field label"},
-  "@media_scan_failed": {"description": "Network scan dialog: the scan stream emitted an error", "placeholders": {"error": {"type": "String"}}},
-  "@media_scan_progressItems": {"description": "Network scan dialog: running item counter", "placeholders": {"done": {"type": "int"}, "total": {"type": "int"}}},
-  "@media_scan_progressReachability": {"description": "Network scan dialog: running reachable/unreachable counters", "placeholders": {"available": {"type": "int"}, "unreachable": {"type": "int"}}},
-  "@media_scan_summary": {"description": "Network scan dialog: final summary line", "placeholders": {"total": {"type": "int"}, "seconds": {"type": "String"}, "available": {"type": "int"}, "unreachable": {"type": "int"}}},
-  "@media_scan_summarySkipped": {"description": "Network scan dialog: summary line extended with the skipped-rows tail", "placeholders": {"base": {"type": "String"}, "count": {"type": "int"}}},
-  "@media_scan_title": {"description": "Network Sources: scan-all action label and scan dialog title"},
-  "@settings_mediaSources_androidUriTitle": {"description": "Media Sources: Android persistable URI gauge title"},
-  "@settings_mediaSources_androidUriUsage": {"description": "Media Sources: Android persistable URI gauge value", "placeholders": {"used": {"type": "int"}, "limit": {"type": "int"}}},
-  "@settings_mediaSources_counting": {"description": "Media Sources: local-file diagnostics still counting"},
-  "@settings_mediaSources_error": {"description": "Media Sources: a diagnostics provider failed", "placeholders": {"error": {"type": "String"}}},
-  "@settings_mediaSources_loading": {"description": "Media Sources: a diagnostics provider is still loading"},
-  "@settings_mediaSources_localFilesCounts": {"description": "Media Sources: local-file diagnostics counts", "placeholders": {"available": {"type": "int"}, "unavailable": {"type": "int"}}},
-  "@settings_mediaSources_photoLibrarySubtitle": {"description": "Media Sources: platform photo library row subtitle"},
-  "@settings_mediaSources_reverifyAll": {"description": "Media Sources: re-verify every local file action"},
-  "@settings_mediaSources_reverifyFailed": {"description": "Media Sources: the re-verify pass threw", "placeholders": {"error": {"type": "String"}}},
-  "@settings_mediaSources_reverifyResult": {"description": "Media Sources: how many rows the re-verify pass updated", "placeholders": {"count": {"type": "int"}}},
-  "@settings_mediaSources_checkAll": {"description": "Media Sources: verify every media row regardless of source type"},
-  "@settings_mediaSources_checkAllResult": {"description": "Media Sources: how many rows the check-all pass updated", "placeholders": {"count": {"type": "int"}}},
-  "@settings_mediaSources_checkAllBlocked": {"description": "Media Sources: the check-all pass reached none of the rows sources", "placeholders": {"count": {"type": "int"}}},
-  "@settings_mediaSources_title": {"description": "Media Sources settings page app bar title"},
-  "@settings_networkSources_scanDescription": {"description": "Network Sources: explanation under the scan-all button"},
-  "@statistics_conditions_entryMethod_semanticLabel": {"description": "Screen-reader summary of the entry method bar chart", "placeholders": {"description": {"type": "String", "example": "Boat Entry: 12 dives"}}},
-  "@statistics_conditions_visibility_semanticLabel": {"description": "Screen-reader summary of the visibility distribution pie chart", "placeholders": {"description": {"type": "String", "example": "Excellent: 40%"}}},
-  "@statistics_conditions_waterType_semanticLabel": {"description": "Screen-reader summary of the water type distribution pie chart", "placeholders": {"description": {"type": "String", "example": "Salt Water: 80%"}}},
-  "@statistics_progression_divesBySuitThickness_semanticLabel": {"description": "Screen-reader summary of the dives-by-suit-thickness bar chart", "placeholders": {"description": {"type": "String", "example": "5 mm: 12"}}},
-  "@statistics_progression_divesPerYear_countInYear": {"description": "One entry of the dives-per-year screen-reader summary", "placeholders": {"count": {"type": "int", "example": "42"}, "year": {"type": "String", "example": "2025"}}},
-  "@statistics_progression_divesPerYear_semanticLabel": {"description": "Screen-reader summary of the dives-per-year bar chart", "placeholders": {"description": {"type": "String", "example": "42 dives in 2025"}}},
-  "@statistics_summary_depthBucket_over": {"description": "Depth-distribution legend for the open-ended deepest bucket; unit is the diver's depth symbol", "placeholders": {"min": {"type": "String", "example": "30"}, "unit": {"type": "String", "example": "m"}}},
-  "@statistics_summary_depthBucket_range": {"description": "Depth-distribution legend for a closed depth bucket; unit is the diver's depth symbol", "placeholders": {"min": {"type": "String", "example": "10"}, "max": {"type": "String", "example": "20"}, "unit": {"type": "String", "example": "m"}}},
-  "@statistics_timePatterns_dayOfWeek_semanticLabel": {"description": "Screen-reader summary of the dives-by-day-of-week bar chart", "placeholders": {"description": {"type": "String", "example": "Mon: 3, Tue: 5"}}},
-  "@statistics_timePatterns_seasonal_semanticLabel": {"description": "Screen-reader summary of the dives-by-month bar chart", "placeholders": {"description": {"type": "String", "example": "Jan: 3, Feb: 5"}}},
-  "@statistics_timePatterns_surfaceInterval_statLabel": {"description": "Screen-reader label for one surface-interval statistic tile", "placeholders": {"label": {"type": "String", "example": "Average"}, "value": {"type": "String", "example": "1h 20m"}}},
-  "@statistics_timePatterns_timeOfDay_semanticLabel": {"description": "Screen-reader summary of the dives-by-time-of-day pie chart", "placeholders": {"description": {"type": "String", "example": "Morning: 40%"}}},
+  "@common_action_done": {
+    "description": "Dismiss a finished operation"
+  },
+  "@common_action_more": {
+    "description": "Overflow menu tooltip"
+  },
+  "@common_label_displayName": {
+    "description": "Text field label for a user-chosen display name"
+  },
+  "@common_relativeTime_daysAgo": {
+    "description": "Relative past time in whole days (abbreviated)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@common_relativeTime_hoursAgo": {
+    "description": "Relative past time in whole hours (abbreviated)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@common_relativeTime_inDays": {
+    "description": "Relative future time in whole days (abbreviated)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@common_relativeTime_inHours": {
+    "description": "Relative future time in whole hours (abbreviated)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@common_relativeTime_inLessThanMinute": {
+    "description": "Relative future time, under one minute"
+  },
+  "@common_relativeTime_inMinutes": {
+    "description": "Relative future time in whole minutes (abbreviated)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@common_relativeTime_justNow": {
+    "description": "Relative past time, under one minute"
+  },
+  "@common_relativeTime_minutesAgo": {
+    "description": "Relative past time in whole minutes (abbreviated)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@common_relativeTime_monthsAgo": {
+    "description": "Relative past time in whole months (abbreviated)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@common_relativeTime_overdue": {
+    "description": "Relative future time that is already in the past"
+  },
+  "@media_cache_calculating": {
+    "description": "Network Sources: cache size is still being measured"
+  },
+  "@media_cache_cardTitle": {
+    "description": "Network Sources: cache card header"
+  },
+  "@media_cache_clearAction": {
+    "description": "Network Sources: clear the network image cache action"
+  },
+  "@media_cache_clearBody": {
+    "description": "Network Sources: clear cache confirmation body"
+  },
+  "@media_cache_clearConfirm": {
+    "description": "Network Sources: confirm button on the clear cache dialog"
+  },
+  "@media_cache_clearError": {
+    "description": "Network Sources: clearing the cache threw",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_cache_clearTitle": {
+    "description": "Network Sources: clear cache confirmation title"
+  },
+  "@media_cache_cleared": {
+    "description": "Network Sources: cache cleared confirmation"
+  },
+  "@media_cache_diskCache": {
+    "description": "Network Sources: on-disk network image cache row"
+  },
+  "@media_cache_error": {
+    "description": "Network Sources: measuring the cache size threw",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_credentials_actionTest": {
+    "description": "Network Sources: probe a saved host with its credentials"
+  },
+  "@media_credentials_authLabel": {
+    "description": "Network Sources: saved host auth scheme (basic, bearer, ...)",
+    "placeholders": {
+      "authType": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_credentials_deleteBody": {
+    "description": "Network Sources: delete saved host confirmation body"
+  },
+  "@media_credentials_deleteError": {
+    "description": "Network Sources: removing a saved host threw",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_credentials_deleteTitle": {
+    "description": "Network Sources: delete saved host confirmation title",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_credentials_deleted": {
+    "description": "Network Sources: saved host removed confirmation",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_credentials_editTitle": {
+    "description": "Network Sources: rename saved host dialog title",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_credentials_emptySubtitle": {
+    "description": "Network Sources: saved-hosts empty-state explanation"
+  },
+  "@media_credentials_emptyTitle": {
+    "description": "Network Sources: no per-host credentials stored"
+  },
+  "@media_credentials_lastUsed": {
+    "description": "Network Sources: relative time a saved host was last used",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_credentials_loadError": {
+    "description": "Network Sources: saved-hosts query failed"
+  },
+  "@media_credentials_loading": {
+    "description": "Network Sources: saved-hosts list is loading"
+  },
+  "@media_credentials_saveError": {
+    "description": "Network Sources: saving a host display name threw",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_credentials_savedHostsTitle": {
+    "description": "Network Sources: saved-hosts card header"
+  },
+  "@media_credentials_testError": {
+    "description": "Network Sources: credential probe threw",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_credentials_testFailed": {
+    "description": "Network Sources: credential probe was rejected",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_credentials_testOk": {
+    "description": "Network Sources: credential probe succeeded",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_manifest_actionPollNow": {
+    "description": "Network Sources: fetch a subscription immediately"
+  },
+  "@media_manifest_cardTitle": {
+    "description": "Network Sources: manifest subscriptions card header"
+  },
+  "@media_manifest_deleteBody": {
+    "description": "Network Sources: delete subscription confirmation body"
+  },
+  "@media_manifest_deleteError": {
+    "description": "Network Sources: deleting a subscription threw",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_manifest_deleteTitle": {
+    "description": "Network Sources: delete subscription confirmation title",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_manifest_editTitle": {
+    "description": "Network Sources: edit subscription dialog title"
+  },
+  "@media_manifest_emptySubtitle": {
+    "description": "Network Sources: subscriptions empty-state explanation"
+  },
+  "@media_manifest_emptyTitle": {
+    "description": "Network Sources: no subscriptions configured"
+  },
+  "@media_manifest_lastError": {
+    "description": "Network Sources: the last poll of this subscription failed",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_manifest_lastPolled": {
+    "description": "Network Sources: relative time of the last successful poll",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_manifest_loadError": {
+    "description": "Network Sources: subscriptions query failed"
+  },
+  "@media_manifest_loading": {
+    "description": "Network Sources: subscriptions list is loading"
+  },
+  "@media_manifest_neverPolled": {
+    "description": "Network Sources: subscription has never been fetched"
+  },
+  "@media_manifest_nextPoll": {
+    "description": "Network Sources: relative time of the next scheduled poll",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_manifest_notFound": {
+    "description": "Network Sources: the polled subscription row no longer exists"
+  },
+  "@media_manifest_pollError": {
+    "description": "Network Sources: a manual poll threw",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_manifest_polled": {
+    "description": "Network Sources: a manual poll finished",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_manifest_polling": {
+    "description": "Network Sources: a manual poll has started",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_manifest_saveError": {
+    "description": "Network Sources: saving subscription edits threw",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_manifest_updateError": {
+    "description": "Network Sources: toggling a subscription active flag threw",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_manifest_urlLabel": {
+    "description": "Network Sources: manifest URL text field label"
+  },
+  "@media_scan_failed": {
+    "description": "Network scan dialog: the scan stream emitted an error",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@media_scan_progressItems": {
+    "description": "Network scan dialog: running item counter",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_scan_progressReachability": {
+    "description": "Network scan dialog: running reachable/unreachable counters",
+    "placeholders": {
+      "available": {
+        "type": "int"
+      },
+      "unreachable": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_scan_summary": {
+    "description": "Network scan dialog: final summary line",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "String"
+      },
+      "available": {
+        "type": "int"
+      },
+      "unreachable": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_scan_summarySkipped": {
+    "description": "Network scan dialog: summary line extended with the skipped-rows tail",
+    "placeholders": {
+      "base": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_scan_title": {
+    "description": "Network Sources: scan-all action label and scan dialog title"
+  },
+  "@settings_mediaSources_androidUriTitle": {
+    "description": "Media Sources: Android persistable URI gauge title"
+  },
+  "@settings_mediaSources_androidUriUsage": {
+    "description": "Media Sources: Android persistable URI gauge value",
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_mediaSources_counting": {
+    "description": "Media Sources: local-file diagnostics still counting"
+  },
+  "@settings_mediaSources_error": {
+    "description": "Media Sources: a diagnostics provider failed",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_mediaSources_loading": {
+    "description": "Media Sources: a diagnostics provider is still loading"
+  },
+  "@settings_mediaSources_localFilesCounts": {
+    "description": "Media Sources: local-file diagnostics counts",
+    "placeholders": {
+      "available": {
+        "type": "int"
+      },
+      "unavailable": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_mediaSources_photoLibrarySubtitle": {
+    "description": "Media Sources: platform photo library row subtitle"
+  },
+  "@settings_mediaSources_reverifyAll": {
+    "description": "Media Sources: re-verify every local file action"
+  },
+  "@settings_mediaSources_reverifyFailed": {
+    "description": "Media Sources: the re-verify pass threw",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_mediaSources_reverifyResult": {
+    "description": "Media Sources: how many rows the re-verify pass updated",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_mediaSources_checkAll": {
+    "description": "Media Sources: verify every media row regardless of source type"
+  },
+  "@settings_mediaSources_checkAllResult": {
+    "description": "Media Sources: how many rows the check-all pass updated",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_mediaSources_checkAllBlocked": {
+    "description": "Media Sources: the check-all pass reached none of the rows sources",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_mediaSources_title": {
+    "description": "Media Sources settings page app bar title"
+  },
+  "@settings_networkSources_scanDescription": {
+    "description": "Network Sources: explanation under the scan-all button"
+  },
+  "@statistics_conditions_entryMethod_semanticLabel": {
+    "description": "Screen-reader summary of the entry method bar chart",
+    "placeholders": {
+      "description": {
+        "type": "String",
+        "example": "Boat Entry: 12 dives"
+      }
+    }
+  },
+  "@statistics_conditions_visibility_semanticLabel": {
+    "description": "Screen-reader summary of the visibility distribution pie chart",
+    "placeholders": {
+      "description": {
+        "type": "String",
+        "example": "Excellent: 40%"
+      }
+    }
+  },
+  "@statistics_conditions_waterType_semanticLabel": {
+    "description": "Screen-reader summary of the water type distribution pie chart",
+    "placeholders": {
+      "description": {
+        "type": "String",
+        "example": "Salt Water: 80%"
+      }
+    }
+  },
+  "@statistics_progression_divesBySuitThickness_semanticLabel": {
+    "description": "Screen-reader summary of the dives-by-suit-thickness bar chart",
+    "placeholders": {
+      "description": {
+        "type": "String",
+        "example": "5 mm: 12"
+      }
+    }
+  },
+  "@statistics_progression_divesPerYear_countInYear": {
+    "description": "One entry of the dives-per-year screen-reader summary",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "42"
+      },
+      "year": {
+        "type": "String",
+        "example": "2025"
+      }
+    }
+  },
+  "@statistics_progression_divesPerYear_semanticLabel": {
+    "description": "Screen-reader summary of the dives-per-year bar chart",
+    "placeholders": {
+      "description": {
+        "type": "String",
+        "example": "42 dives in 2025"
+      }
+    }
+  },
+  "@statistics_summary_depthBucket_over": {
+    "description": "Depth-distribution legend for the open-ended deepest bucket; unit is the diver's depth symbol",
+    "placeholders": {
+      "min": {
+        "type": "String",
+        "example": "30"
+      },
+      "unit": {
+        "type": "String",
+        "example": "m"
+      }
+    }
+  },
+  "@statistics_summary_depthBucket_range": {
+    "description": "Depth-distribution legend for a closed depth bucket; unit is the diver's depth symbol",
+    "placeholders": {
+      "min": {
+        "type": "String",
+        "example": "10"
+      },
+      "max": {
+        "type": "String",
+        "example": "20"
+      },
+      "unit": {
+        "type": "String",
+        "example": "m"
+      }
+    }
+  },
+  "@statistics_timePatterns_dayOfWeek_semanticLabel": {
+    "description": "Screen-reader summary of the dives-by-day-of-week bar chart",
+    "placeholders": {
+      "description": {
+        "type": "String",
+        "example": "Mon: 3, Tue: 5"
+      }
+    }
+  },
+  "@statistics_timePatterns_seasonal_semanticLabel": {
+    "description": "Screen-reader summary of the dives-by-month bar chart",
+    "placeholders": {
+      "description": {
+        "type": "String",
+        "example": "Jan: 3, Feb: 5"
+      }
+    }
+  },
+  "@statistics_timePatterns_surfaceInterval_statLabel": {
+    "description": "Screen-reader label for one surface-interval statistic tile",
+    "placeholders": {
+      "label": {
+        "type": "String",
+        "example": "Average"
+      },
+      "value": {
+        "type": "String",
+        "example": "1h 20m"
+      }
+    }
+  },
+  "@statistics_timePatterns_timeOfDay_semanticLabel": {
+    "description": "Screen-reader summary of the dives-by-time-of-day pie chart",
+    "placeholders": {
+      "description": {
+        "type": "String",
+        "example": "Morning: 40%"
+      }
+    }
+  },
   "columnConfig_displayOptions": "Display Options",
   "columnConfig_noExtraFields": "No extra fields configured. Add fields below.",
   "columnConfig_savePresetTitle": "Save Preset",
@@ -18879,34 +19576,326 @@
   "settings_troubleshootSync_wipeAll_title": "Wipe all sync data on this backend",
   "tableMode_tooltip_toggleDetailPane": "Toggle detail pane",
   "tableMode_tooltip_toggleProfilePanel": "Toggle profile panel",
-  "@diveLog_filterChip_dateRange": {"description": "Active-filter chip showing a closed date range.", "placeholders": {"end": {"type": "String"}, "start": {"type": "String"}}},
-  "@diveLog_filterChip_equipmentCount": {"description": "Active-filter chip when more than one equipment item is selected.", "placeholders": {"count": {"type": "int"}}},
-  "@diveLog_filter_sectionDepthRangeUnit": {"description": "Depth-range filter section header; {unit} is the diver's depth unit symbol (m or ft).", "placeholders": {"unit": {"type": "String"}}},
-  "@diveLog_listPage_semanticsDiveAtSite": {"description": "Screen-reader label for a dive row in the dive list.", "placeholders": {"diveNumber": {"type": "int"}, "siteName": {"type": "String"}}},
-  "@settings_fixDiveTimes_applied": {"description": "Snackbar after the offset is applied. hours is the signed offset as text; hoursAbs drives the hour/hours plural.", "placeholders": {"count": {"type": "int"}, "hours": {"type": "String"}, "hoursAbs": {"type": "int"}}},
-  "@settings_fixDiveTimes_apply": {"description": "Apply bar button label", "placeholders": {"count": {"type": "int"}}},
-  "@settings_fixDiveTimes_confirmBody": {"description": "Confirmation body. hours is the signed offset as text; hoursAbs drives the hour/hours plural.", "placeholders": {"count": {"type": "int"}, "hours": {"type": "String"}, "hoursAbs": {"type": "int"}}},
-  "@settings_fixDiveTimes_diveNumber": {"description": "List row title for a numbered dive", "placeholders": {"number": {"type": "int"}}},
-  "@settings_fixDiveTimes_loadError": {"description": "Snackbar shown when the dive list fails to load", "placeholders": {"error": {"type": "String"}}},
-  "@settings_fixDiveTimes_preview": {"description": "Preview banner. hours is the signed offset as text (e.g. +7); hoursAbs drives the hour/hours plural.", "placeholders": {"count": {"type": "int"}, "hours": {"type": "String"}, "hoursAbs": {"type": "int"}}},
-  "@settings_syncDevices_readError": {"description": "Shown when the sync backend listing could not be read.", "placeholders": {"error": {"example": "Network error", "type": "String"}}},
-  "@settings_syncDevices_removeDialog_bodyRisky": {"description": "Confirmation body when the peer is still an active syncer.", "placeholders": {"count": {"example": "42", "type": "int"}, "name": {"example": "Eric’s iPhone", "type": "String"}, "size": {"example": "1.4 MB", "type": "String"}}},
-  "@settings_syncDevices_removeDialog_bodySafe": {"description": "Confirmation body when the peer is safe to remove.", "placeholders": {"count": {"example": "42", "type": "int"}, "name": {"example": "Eric’s iPhone", "type": "String"}, "size": {"example": "1.4 MB", "type": "String"}}},
-  "@settings_syncDevices_removeDialog_title": {"placeholders": {"name": {"example": "Eric’s iPhone", "type": "String"}}},
-  "@settings_syncDevices_removeProgressTitle": {"placeholders": {"name": {"example": "Eric’s iPhone", "type": "String"}}},
-  "@settings_syncDevices_summary": {"description": "Totals header: how many devices, how many files, and their combined size. {size} is a preformatted size such as \"1.4 MB\".", "placeholders": {"deviceCount": {"example": "3", "type": "int"}, "fileCount": {"example": "412", "type": "int"}, "size": {"example": "1.4 MB", "type": "String"}}},
-  "@settings_syncDevices_summary_removable": {"description": "How many of the listed devices are safe to remove, and how much space they hold.", "placeholders": {"count": {"example": "2", "type": "int"}, "size": {"example": "900 KB", "type": "String"}}},
-  "@settings_syncDevices_tile_filesSize": {"description": "Device row subtitle when no timestamp is known.", "placeholders": {"count": {"example": "42", "type": "int"}, "size": {"example": "1.4 MB", "type": "String"}}},
-  "@settings_syncDevices_tile_filesSizeSeen": {"description": "Device row subtitle including the publish/modify timestamp.", "placeholders": {"count": {"example": "42", "type": "int"}, "size": {"example": "1.4 MB", "type": "String"}, "when": {"example": "Jan 3, 2026 4:15 PM", "type": "String"}}},
-  "@settings_syncDevices_unnamedDevice": {"description": "Title-case fallback name for a device that published no name. The mid-sentence lowercase form is settings_cloudSync_peerNeedsAdopt_unnamedDevice.", "placeholders": {"shortId": {"example": "a1b2c3", "type": "String"}}},
-  "@settings_syncDevices_nameWithId": {"description": "Device name qualified by its short id, used only when two devices published the same name (two phones of one model, or iOS 16+ handing out the model as the name).", "placeholders": {"name": {"example": "iPhone", "type": "String"}, "shortId": {"example": "a1b2c3d4", "type": "String"}}},
-  "@settings_syncMaintenance_progress_filesOfTotal": {"description": "Progress counter inside the sync maintenance dialog, e.g. \"12 of 400 files\".", "placeholders": {"done": {"example": "12", "type": "int"}, "total": {"example": "400", "type": "int"}}},
-  "@settings_syncMaintenance_removedFiles": {"description": "Snackbar after a fully successful cloud file removal.", "placeholders": {"count": {"example": "12", "type": "int"}}},
-  "@settings_syncMaintenance_removedFilesPartial": {"description": "Snackbar after a partially successful removal. {trouble} is an already localized clause built from the trouble_* keys.", "placeholders": {"count": {"example": "12", "type": "int"}, "trouble": {"example": "3 could not be deleted", "type": "String"}}},
-  "@settings_syncMaintenance_trouble_failed": {"description": "Clause spliced into the *Partial messages when some files could not be deleted.", "placeholders": {"count": {"example": "3", "type": "int"}}},
-  "@settings_syncMaintenance_wipedFiles": {"description": "Snackbar after a fully successful full-backend wipe.", "placeholders": {"count": {"example": "412", "type": "int"}}},
-  "@settings_syncMaintenance_wipedFilesPartial": {"description": "Snackbar after a partially successful wipe. {trouble} is an already localized clause built from the trouble_* keys.", "placeholders": {"count": {"example": "412", "type": "int"}, "trouble": {"example": "3 could not be deleted", "type": "String"}}},
-  "@settings_troubleshootSync_wipeAll_confirmBody": {"description": "Body of the typed-confirmation wipe dialog. {word} is the literal, never-translated sentinel the user must type (WIPE); it must match the hint and the button comparison exactly.", "placeholders": {"word": {"example": "WIPE", "type": "String"}}},
+  "@diveLog_filterChip_dateRange": {
+    "description": "Active-filter chip showing a closed date range.",
+    "placeholders": {
+      "end": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      }
+    }
+  },
+  "@diveLog_filterChip_equipmentCount": {
+    "description": "Active-filter chip when more than one equipment item is selected.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@diveLog_filter_sectionDepthRangeUnit": {
+    "description": "Depth-range filter section header; {unit} is the diver's depth unit symbol (m or ft).",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "@diveLog_listPage_semanticsDiveAtSite": {
+    "description": "Screen-reader label for a dive row in the dive list.",
+    "placeholders": {
+      "diveNumber": {
+        "type": "int"
+      },
+      "siteName": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_fixDiveTimes_applied": {
+    "description": "Snackbar after the offset is applied. hours is the signed offset as text; hoursAbs drives the hour/hours plural.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "String"
+      },
+      "hoursAbs": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_fixDiveTimes_apply": {
+    "description": "Apply bar button label",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_fixDiveTimes_confirmBody": {
+    "description": "Confirmation body. hours is the signed offset as text; hoursAbs drives the hour/hours plural.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "String"
+      },
+      "hoursAbs": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_fixDiveTimes_diveNumber": {
+    "description": "List row title for a numbered dive",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_fixDiveTimes_loadError": {
+    "description": "Snackbar shown when the dive list fails to load",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_fixDiveTimes_preview": {
+    "description": "Preview banner. hours is the signed offset as text (e.g. +7); hoursAbs drives the hour/hours plural.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "String"
+      },
+      "hoursAbs": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_syncDevices_readError": {
+    "description": "Shown when the sync backend listing could not be read.",
+    "placeholders": {
+      "error": {
+        "example": "Network error",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncDevices_removeDialog_bodyRisky": {
+    "description": "Confirmation body when the peer is still an active syncer.",
+    "placeholders": {
+      "count": {
+        "example": "42",
+        "type": "int"
+      },
+      "name": {
+        "example": "Eric’s iPhone",
+        "type": "String"
+      },
+      "size": {
+        "example": "1.4 MB",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncDevices_removeDialog_bodySafe": {
+    "description": "Confirmation body when the peer is safe to remove.",
+    "placeholders": {
+      "count": {
+        "example": "42",
+        "type": "int"
+      },
+      "name": {
+        "example": "Eric’s iPhone",
+        "type": "String"
+      },
+      "size": {
+        "example": "1.4 MB",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncDevices_removeDialog_title": {
+    "placeholders": {
+      "name": {
+        "example": "Eric’s iPhone",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncDevices_removeProgressTitle": {
+    "placeholders": {
+      "name": {
+        "example": "Eric’s iPhone",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncDevices_summary": {
+    "description": "Totals header: how many devices, how many files, and their combined size. {size} is a preformatted size such as \"1.4 MB\".",
+    "placeholders": {
+      "deviceCount": {
+        "example": "3",
+        "type": "int"
+      },
+      "fileCount": {
+        "example": "412",
+        "type": "int"
+      },
+      "size": {
+        "example": "1.4 MB",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncDevices_summary_removable": {
+    "description": "How many of the listed devices are safe to remove, and how much space they hold.",
+    "placeholders": {
+      "count": {
+        "example": "2",
+        "type": "int"
+      },
+      "size": {
+        "example": "900 KB",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncDevices_tile_filesSize": {
+    "description": "Device row subtitle when no timestamp is known.",
+    "placeholders": {
+      "count": {
+        "example": "42",
+        "type": "int"
+      },
+      "size": {
+        "example": "1.4 MB",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncDevices_tile_filesSizeSeen": {
+    "description": "Device row subtitle including the publish/modify timestamp.",
+    "placeholders": {
+      "count": {
+        "example": "42",
+        "type": "int"
+      },
+      "size": {
+        "example": "1.4 MB",
+        "type": "String"
+      },
+      "when": {
+        "example": "Jan 3, 2026 4:15 PM",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncDevices_unnamedDevice": {
+    "description": "Title-case fallback name for a device that published no name. The mid-sentence lowercase form is settings_cloudSync_peerNeedsAdopt_unnamedDevice.",
+    "placeholders": {
+      "shortId": {
+        "example": "a1b2c3",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncDevices_nameWithId": {
+    "description": "Device name qualified by its short id, used only when two devices published the same name (two phones of one model, or iOS 16+ handing out the model as the name).",
+    "placeholders": {
+      "name": {
+        "example": "iPhone",
+        "type": "String"
+      },
+      "shortId": {
+        "example": "a1b2c3d4",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncMaintenance_progress_filesOfTotal": {
+    "description": "Progress counter inside the sync maintenance dialog, e.g. \"12 of 400 files\".",
+    "placeholders": {
+      "done": {
+        "example": "12",
+        "type": "int"
+      },
+      "total": {
+        "example": "400",
+        "type": "int"
+      }
+    }
+  },
+  "@settings_syncMaintenance_removedFiles": {
+    "description": "Snackbar after a fully successful cloud file removal.",
+    "placeholders": {
+      "count": {
+        "example": "12",
+        "type": "int"
+      }
+    }
+  },
+  "@settings_syncMaintenance_removedFilesPartial": {
+    "description": "Snackbar after a partially successful removal. {trouble} is an already localized clause built from the trouble_* keys.",
+    "placeholders": {
+      "count": {
+        "example": "12",
+        "type": "int"
+      },
+      "trouble": {
+        "example": "3 could not be deleted",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_syncMaintenance_trouble_failed": {
+    "description": "Clause spliced into the *Partial messages when some files could not be deleted.",
+    "placeholders": {
+      "count": {
+        "example": "3",
+        "type": "int"
+      }
+    }
+  },
+  "@settings_syncMaintenance_wipedFiles": {
+    "description": "Snackbar after a fully successful full-backend wipe.",
+    "placeholders": {
+      "count": {
+        "example": "412",
+        "type": "int"
+      }
+    }
+  },
+  "@settings_syncMaintenance_wipedFilesPartial": {
+    "description": "Snackbar after a partially successful wipe. {trouble} is an already localized clause built from the trouble_* keys.",
+    "placeholders": {
+      "count": {
+        "example": "412",
+        "type": "int"
+      },
+      "trouble": {
+        "example": "3 could not be deleted",
+        "type": "String"
+      }
+    }
+  },
+  "@settings_troubleshootSync_wipeAll_confirmBody": {
+    "description": "Body of the typed-confirmation wipe dialog. {word} is the literal, never-translated sentinel the user must type (WIPE); it must match the hint and the button comparison exactly.",
+    "placeholders": {
+      "word": {
+        "example": "WIPE",
+        "type": "String"
+      }
+    }
+  },
   "maps_regionDownload_title": "Download Region",
   "maps_regionDownload_nameRequired": "Please enter a name for this region",
   "maps_regionDownload_nameLabel": "Region Name",
@@ -19056,76 +20045,421 @@
   "universalImport_entityAction_consolidateBadge": "CONSOLIDATE",
   "diveCenters_import_quickSearch_egypt": "Egypt",
   "diveCenters_import_quickSearch_mexico": "Mexico",
-  "@maps_regionDownload_minZoom": {"placeholders": {"zoom": {"type": "int"}}},
-  "@maps_regionDownload_minZoomSemantics": {"placeholders": {"zoom": {"type": "int"}}},
-  "@maps_regionDownload_maxZoom": {"placeholders": {"zoom": {"type": "int"}}},
-  "@maps_regionDownload_maxZoomSemantics": {"placeholders": {"zoom": {"type": "int"}}},
-  "@maps_regionDownload_estimateSemantics": {"placeholders": {"count": {"type": "int"}, "size": {"type": "Object"}}},
-  "@maps_regionDownload_tileCount": {"placeholders": {"count": {"type": "int"}}},
-  "@diveLog_map_infoCard_minutes": {"placeholders": {"minutes": {"type": "int"}}},
-  "@trips_gallery_diveSection_subtitle": {"placeholders": {"date": {"type": "Object"}, "count": {"type": "int"}, "photoLabel": {"type": "Object"}}},
-  "@trips_picker_suggestedSemantics": {"placeholders": {"name": {"type": "Object"}}},
-  "@trips_picker_tileSemantics": {"placeholders": {"name": {"type": "Object"}, "startDate": {"type": "Object"}, "endDate": {"type": "Object"}}},
-  "@trips_picker_tileSemanticsSelected": {"placeholders": {"name": {"type": "Object"}, "startDate": {"type": "Object"}, "endDate": {"type": "Object"}}},
-  "@divePlanner_quickPlan_depthSemantics": {"placeholders": {"depth": {"type": "Object"}}},
-  "@divePlanner_quickPlan_bottomTimeSemantics": {"placeholders": {"minutes": {"type": "int"}}},
-  "@divePlanner_quickPlan_minutes": {"placeholders": {"minutes": {"type": "int"}}},
-  "@divePlanner_quickPlan_previewSemantics": {"placeholders": {"depth": {"type": "Object"}, "minutes": {"type": "int"}}},
-  "@divePlanner_quickPlan_previewDescent": {"placeholders": {"depth": {"type": "Object"}}},
-  "@divePlanner_quickPlan_previewBottomTime": {"placeholders": {"minutes": {"type": "int"}}},
-  "@divePlanner_semantics_sacRate": {"placeholders": {"value": {"type": "Object"}, "volumeSymbol": {"type": "Object"}}},
-  "@divePlanner_semantics_reservePressure": {"placeholders": {"pressureSymbol": {"type": "Object"}}},
-  "@divePlanner_semantics_altitudeGroup": {"placeholders": {"group": {"type": "Object"}}},
-  "@diveSites_import_detail_maxDepth": {"placeholders": {"depth": {"type": "Object"}}},
-  "@settings_cloudSync_provider_icloud_subtitle": {"description": "Subtitle of the iCloud provider tile on the Cloud Sync page."},
-  "@settings_debugLog_search_hint": {"description": "Hint text of the search field in the debug log viewer app bar."},
-  "@settings_debugLog_appBar_title": {"description": "App bar title of the debug log viewer page."},
-  "@settings_debugLog_disableDebugMode": {"description": "Overflow menu item that turns debug mode off."},
-  "@settings_debugLog_clearLogs": {"description": "Overflow menu item that erases the log file."},
-  "@settings_debugLog_empty": {"description": "Shown when every log entry is filtered out."},
-  "@settings_debugLog_loadError": {"description": "Shown when the log file cannot be read.", "placeholders": {"error": {"type": "Object"}}},
-  "@settings_debugLog_copiedSnack": {"description": "Snack bar confirming the visible log entries were copied."},
-  "@settings_debugLog_savedSnack": {"description": "Snack bar confirming where the log file was written.", "placeholders": {"path": {"type": "String"}}},
-  "@common_action_copy": {"description": "Generic Copy button label, sibling of common_action_share/save."},
-  "@settings_appearance_customGradient_title": {"description": "Title of the dialog for picking a two-colour card gradient."},
-  "@settings_appearance_customGradient_start": {"description": "Label of the gradient's first (start) colour well."},
-  "@settings_appearance_customGradient_end": {"description": "Label of the gradient's second (end) colour well."},
-  "@settings_appearance_customGradient_hue": {"description": "Label of the HSV hue slider."},
-  "@settings_appearance_customGradient_saturation": {"description": "Label of the HSV saturation slider."},
-  "@settings_appearance_customGradient_brightness": {"description": "Label of the HSV brightness (value) slider."},
-  "@settings_appearance_customGradient_preview": {"description": "Caption under the gradient preview bar."},
-  "@common_action_apply": {"description": "Generic Apply button label, sibling of common_action_save/cancel."},
-  "@settings_cloudSync_message_loadStateFailed": {"description": "Sync status detail when the stored sync state cannot be read.", "placeholders": {"error": {"type": "Object"}}},
-  "@settings_cloudSync_message_noProviderConfigured": {"description": "Sync status detail when no cloud backend has been chosen."},
-  "@settings_cloudSync_message_adopting": {"description": "Sync status detail while the replaced cloud library is being adopted."},
-  "@settings_cloudSync_message_adoptFailed": {"description": "Sync status detail when adopting the replaced cloud library failed."},
-  "@settings_cloudSync_message_firstSyncNeedsConfirm": {"description": "Sync status detail when an automatic sync deferred the first library merge."},
-  "@settings_cloudSync_message_startingSync": {"description": "Sync status detail at the start of a sync run."},
-  "@settings_cloudSync_message_replacePaused": {"description": "Sync status detail when another device replaced the cloud library."},
-  "@settings_cloudSync_message_encryptedPaused": {"description": "Sync status detail when the cloud library needs the encryption passphrase."},
-  "@settings_cloudSync_message_completedWithConflicts": {"description": "Sync status detail after a sync that produced conflicts."},
-  "@settings_cloudSync_message_completedSuccessfully": {"description": "Sync status detail after a clean sync."},
-  "@settings_cloudSync_message_syncFailed": {"description": "Sync status detail when the sync service reported a failure with no message."},
-  "@settings_cloudSync_message_phaseDefault": {"description": "Fallback name for the sync phase named inside settings_cloudSync_message_syncErrorDuring."},
-  "@settings_cloudSync_message_syncErrorDuring": {"description": "Sync status detail when a sync threw. {phase} is the previous, already localized status message.", "placeholders": {"phase": {"type": "String"}, "error": {"type": "Object"}}},
-  "@settings_section_debug_title": {"description": "Settings list row for the debug/diagnostics section."},
-  "@settings_section_debug_subtitle": {"description": "Subtitle of the debug settings row."},
-  "@settings_debugLog_minSeverityLabel": {"description": "Label before the minimum-severity dropdown in the debug log filter bar."},
-  "@settings_debugLog_shareSubject": {"description": "Subject line used when sharing the debug log file."},
-  "@settings_debugLog_saveDialogTitle": {"description": "Title of the system save dialog for the debug log file."},
-  "@universalImport_preset_signatureHeaders": {"description": "Count of CSV headers stored as the preset match signature.", "placeholders": {"count": {"type": "int"}}},
-  "@universalImport_preset_loadFailed": {"description": "Error shown when the saved CSV preset list cannot be read.", "placeholders": {"error": {"type": "String"}}},
-  "@universalImport_preset_deleteConfirm": {"description": "Confirmation body for deleting a user-saved CSV preset.", "placeholders": {"name": {"type": "String"}}},
-  "@universalImport_preset_headersMatched": {"description": "How well the current CSV headers match a preset signature.", "placeholders": {"matched": {"type": "int"}, "total": {"type": "int"}, "percent": {"type": "int"}}},
-  "@universalImport_preset_savedSnackbar": {"description": "Snackbar confirming a CSV column-mapping preset was saved.", "placeholders": {"name": {"type": "String"}}},
-  "@universalImport_counts_new": {"description": "Review bar fragment: how many items will be imported as new.", "placeholders": {"count": {"type": "int"}}},
-  "@universalImport_counts_merging": {"description": "Review bar fragment: how many items will be consolidated into existing records.", "placeholders": {"count": {"type": "int"}}},
-  "@universalImport_counts_replacing": {"description": "Review bar fragment: how many items will replace existing source data.", "placeholders": {"count": {"type": "int"}}},
-  "@universalImport_counts_skipped": {"description": "Review bar fragment: how many items will be skipped.", "placeholders": {"count": {"type": "int"}}},
-  "@universalImport_count_duplicates": {"description": "Header count of duplicate rows in an import review tab.", "placeholders": {"count": {"type": "int"}}},
-  "@diveImport_healthkit_fetchFailedBody": {"description": "Body text shown when reading dives from Apple Health throws.", "placeholders": {"error": {"type": "String"}}},
-  "@diveImport_healthkit_foundDives": {"description": "Result headline after fetching dives from Apple Health.", "placeholders": {"count": {"type": "int"}}},
-  "@importWizard_dc_knownComputerBody": {"description": "Badge body shown when the connected dive computer is already saved in the library.", "placeholders": {"name": {"type": "String"}}},
+  "@maps_regionDownload_minZoom": {
+    "placeholders": {
+      "zoom": {
+        "type": "int"
+      }
+    }
+  },
+  "@maps_regionDownload_minZoomSemantics": {
+    "placeholders": {
+      "zoom": {
+        "type": "int"
+      }
+    }
+  },
+  "@maps_regionDownload_maxZoom": {
+    "placeholders": {
+      "zoom": {
+        "type": "int"
+      }
+    }
+  },
+  "@maps_regionDownload_maxZoomSemantics": {
+    "placeholders": {
+      "zoom": {
+        "type": "int"
+      }
+    }
+  },
+  "@maps_regionDownload_estimateSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "Object"
+      }
+    }
+  },
+  "@maps_regionDownload_tileCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@diveLog_map_infoCard_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@trips_gallery_diveSection_subtitle": {
+    "placeholders": {
+      "date": {
+        "type": "Object"
+      },
+      "count": {
+        "type": "int"
+      },
+      "photoLabel": {
+        "type": "Object"
+      }
+    }
+  },
+  "@trips_picker_suggestedSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "@trips_picker_tileSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      },
+      "startDate": {
+        "type": "Object"
+      },
+      "endDate": {
+        "type": "Object"
+      }
+    }
+  },
+  "@trips_picker_tileSemanticsSelected": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      },
+      "startDate": {
+        "type": "Object"
+      },
+      "endDate": {
+        "type": "Object"
+      }
+    }
+  },
+  "@divePlanner_quickPlan_depthSemantics": {
+    "placeholders": {
+      "depth": {
+        "type": "Object"
+      }
+    }
+  },
+  "@divePlanner_quickPlan_bottomTimeSemantics": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@divePlanner_quickPlan_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@divePlanner_quickPlan_previewSemantics": {
+    "placeholders": {
+      "depth": {
+        "type": "Object"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@divePlanner_quickPlan_previewDescent": {
+    "placeholders": {
+      "depth": {
+        "type": "Object"
+      }
+    }
+  },
+  "@divePlanner_quickPlan_previewBottomTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@divePlanner_semantics_sacRate": {
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      },
+      "volumeSymbol": {
+        "type": "Object"
+      }
+    }
+  },
+  "@divePlanner_semantics_reservePressure": {
+    "placeholders": {
+      "pressureSymbol": {
+        "type": "Object"
+      }
+    }
+  },
+  "@divePlanner_semantics_altitudeGroup": {
+    "placeholders": {
+      "group": {
+        "type": "Object"
+      }
+    }
+  },
+  "@diveSites_import_detail_maxDepth": {
+    "placeholders": {
+      "depth": {
+        "type": "Object"
+      }
+    }
+  },
+  "@settings_cloudSync_provider_icloud_subtitle": {
+    "description": "Subtitle of the iCloud provider tile on the Cloud Sync page."
+  },
+  "@settings_debugLog_search_hint": {
+    "description": "Hint text of the search field in the debug log viewer app bar."
+  },
+  "@settings_debugLog_appBar_title": {
+    "description": "App bar title of the debug log viewer page."
+  },
+  "@settings_debugLog_disableDebugMode": {
+    "description": "Overflow menu item that turns debug mode off."
+  },
+  "@settings_debugLog_clearLogs": {
+    "description": "Overflow menu item that erases the log file."
+  },
+  "@settings_debugLog_empty": {
+    "description": "Shown when every log entry is filtered out."
+  },
+  "@settings_debugLog_loadError": {
+    "description": "Shown when the log file cannot be read.",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "@settings_debugLog_copiedSnack": {
+    "description": "Snack bar confirming the visible log entries were copied."
+  },
+  "@settings_debugLog_savedSnack": {
+    "description": "Snack bar confirming where the log file was written.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "@common_action_copy": {
+    "description": "Generic Copy button label, sibling of common_action_share/save."
+  },
+  "@settings_appearance_customGradient_title": {
+    "description": "Title of the dialog for picking a two-colour card gradient."
+  },
+  "@settings_appearance_customGradient_start": {
+    "description": "Label of the gradient's first (start) colour well."
+  },
+  "@settings_appearance_customGradient_end": {
+    "description": "Label of the gradient's second (end) colour well."
+  },
+  "@settings_appearance_customGradient_hue": {
+    "description": "Label of the HSV hue slider."
+  },
+  "@settings_appearance_customGradient_saturation": {
+    "description": "Label of the HSV saturation slider."
+  },
+  "@settings_appearance_customGradient_brightness": {
+    "description": "Label of the HSV brightness (value) slider."
+  },
+  "@settings_appearance_customGradient_preview": {
+    "description": "Caption under the gradient preview bar."
+  },
+  "@common_action_apply": {
+    "description": "Generic Apply button label, sibling of common_action_save/cancel."
+  },
+  "@settings_cloudSync_message_loadStateFailed": {
+    "description": "Sync status detail when the stored sync state cannot be read.",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "@settings_cloudSync_message_noProviderConfigured": {
+    "description": "Sync status detail when no cloud backend has been chosen."
+  },
+  "@settings_cloudSync_message_adopting": {
+    "description": "Sync status detail while the replaced cloud library is being adopted."
+  },
+  "@settings_cloudSync_message_adoptFailed": {
+    "description": "Sync status detail when adopting the replaced cloud library failed."
+  },
+  "@settings_cloudSync_message_firstSyncNeedsConfirm": {
+    "description": "Sync status detail when an automatic sync deferred the first library merge."
+  },
+  "@settings_cloudSync_message_startingSync": {
+    "description": "Sync status detail at the start of a sync run."
+  },
+  "@settings_cloudSync_message_replacePaused": {
+    "description": "Sync status detail when another device replaced the cloud library."
+  },
+  "@settings_cloudSync_message_encryptedPaused": {
+    "description": "Sync status detail when the cloud library needs the encryption passphrase."
+  },
+  "@settings_cloudSync_message_completedWithConflicts": {
+    "description": "Sync status detail after a sync that produced conflicts."
+  },
+  "@settings_cloudSync_message_completedSuccessfully": {
+    "description": "Sync status detail after a clean sync."
+  },
+  "@settings_cloudSync_message_syncFailed": {
+    "description": "Sync status detail when the sync service reported a failure with no message."
+  },
+  "@settings_cloudSync_message_phaseDefault": {
+    "description": "Fallback name for the sync phase named inside settings_cloudSync_message_syncErrorDuring."
+  },
+  "@settings_cloudSync_message_syncErrorDuring": {
+    "description": "Sync status detail when a sync threw. {phase} is the previous, already localized status message.",
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      },
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "@settings_section_debug_title": {
+    "description": "Settings list row for the debug/diagnostics section."
+  },
+  "@settings_section_debug_subtitle": {
+    "description": "Subtitle of the debug settings row."
+  },
+  "@settings_debugLog_minSeverityLabel": {
+    "description": "Label before the minimum-severity dropdown in the debug log filter bar."
+  },
+  "@settings_debugLog_shareSubject": {
+    "description": "Subject line used when sharing the debug log file."
+  },
+  "@settings_debugLog_saveDialogTitle": {
+    "description": "Title of the system save dialog for the debug log file."
+  },
+  "@universalImport_preset_signatureHeaders": {
+    "description": "Count of CSV headers stored as the preset match signature.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@universalImport_preset_loadFailed": {
+    "description": "Error shown when the saved CSV preset list cannot be read.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@universalImport_preset_deleteConfirm": {
+    "description": "Confirmation body for deleting a user-saved CSV preset.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@universalImport_preset_headersMatched": {
+    "description": "How well the current CSV headers match a preset signature.",
+    "placeholders": {
+      "matched": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@universalImport_preset_savedSnackbar": {
+    "description": "Snackbar confirming a CSV column-mapping preset was saved.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@universalImport_counts_new": {
+    "description": "Review bar fragment: how many items will be imported as new.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@universalImport_counts_merging": {
+    "description": "Review bar fragment: how many items will be consolidated into existing records.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@universalImport_counts_replacing": {
+    "description": "Review bar fragment: how many items will replace existing source data.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@universalImport_counts_skipped": {
+    "description": "Review bar fragment: how many items will be skipped.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@universalImport_count_duplicates": {
+    "description": "Header count of duplicate rows in an import review tab.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@diveImport_healthkit_fetchFailedBody": {
+    "description": "Body text shown when reading dives from Apple Health throws.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@diveImport_healthkit_foundDives": {
+    "description": "Result headline after fetching dives from Apple Health.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@importWizard_dc_knownComputerBody": {
+    "description": "Badge body shown when the connected dive computer is already saved in the library.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "accessibility_shortcut_switchDiver": "Switch diver",
   "lock_recoveryCode_title": "Use recovery code",
   "lock_recoveryCode_body": "Enter the 8-word recovery code you saved when you set up the app password.",
@@ -19262,72 +20596,335 @@
   "diveLog_detail_errorLoadingSignature": "Error loading signature: {error}",
   "diveLog_profilePanel_selectDive": "Select a dive to view its profile",
   "diveLog_profilePanel_noProfileData": "No profile data for this dive",
-  "@lock_startFresh_body": {"description": "Body of the start-fresh confirmation dialog. {token} is the untranslated ASCII confirmation word the diver must type.", "placeholders": {"token": {"type": "Object", "example": "START FRESH"}}},
-  "@startup_migrating_progress": {"description": "Splash progress line during a schema migration", "placeholders": {"currentStep": {"type": "Object", "example": "3"}, "totalSteps": {"type": "Object", "example": "12"}}},
-  "@startup_recovery_sqliteCode": {"description": "Diagnostic line under the recovery screen. Object, not int, so the raw SQLite extended result code is never group-separated.", "placeholders": {"code": {"type": "Object", "example": "1032"}}},
-  "@startup_versionMismatch_body": {"description": "Explains a database written by a newer app build. Object, not int, so schema numbers are never group-separated.", "placeholders": {"databaseVersion": {"type": "Object", "example": "142"}, "appVersion": {"type": "Object", "example": "138"}}},
-  "@startup_error_title": {"description": "Terminal startup screen title when the failure could not be classified. Deliberately neutral: it must NOT claim the database upgrade failed, since most failures reach this screen without a migration having been attempted."},
-  "@startup_error_body": {"description": "Body for an unclassified terminal startup failure."},
-  "@startup_engineUnavailable_title": {"description": "Terminal startup screen title when the app's native database engine is missing or is not a SQLCipher build. The diver's database was never opened."},
-  "@startup_engineUnavailable_body": {"description": "Explains that an engine failure happens before the database is opened, so no dive data is at risk."},
-  "@startup_engineUnavailable_guidance": {"description": "Tells the diver that reinstalling or restoring cannot fix a broken app package, and asks them to report it."},
-  "@startup_migrationFailed_title": {"description": "Terminal startup screen title when the schema upgrade ladder genuinely failed. This is the ONLY class that may say the upgrade failed."},
-  "@startup_migrationFailed_body": {"description": "Explains a failed schema upgrade and points at the pre-migration safety copy."},
-  "@startup_dataUnreadable_title": {"description": "Terminal startup screen title when the database file was reached but is corrupt or unreadable."},
-  "@startup_dataUnreadable_body": {"description": "Explains a damaged database file and points at restoring a backup."},
-  "@startup_databaseBusy_title": {"description": "Terminal startup screen title when another connection held the database lock. Must NOT imply damage: the write never started."},
-  "@startup_databaseBusy_body": {"description": "Explains a lock, reassures that nothing was written, and gives the one action that fixes it: fully close and reopen the app."},
-  "@startup_failure_technicalDetails": {"description": "Label above the raw error text on the terminal startup failure screen."},
-  "@startup_failure_backupAvailable_title": {"description": "Heading of the recovery card offering a backup found on disk during a failed startup."},
-  "@startup_failure_backupAvailable_taken": {"description": "When the offered backup was taken.", "placeholders": {"timestamp": {"type": "Object", "example": "17 Aug 2026 12:00"}}},
-  "@startup_failure_backupAvailable_preMigration": {"description": "Extra line shown when the offered backup is the automatic pre-migration safety copy. Object, not int, so schema numbers are never group-separated.", "placeholders": {"fromVersion": {"type": "Object", "example": "141"}, "toVersion": {"type": "Object", "example": "142"}}},
-  "@startup_failure_restoreAction": {"description": "Button that swaps the offered backup in for the live database and restarts startup."},
-  "@startup_failure_restoring": {"description": "Progress label while the offered backup is being restored."},
-  "@startup_failure_restoreFailed": {"description": "Shown when the restore failed. Reassures the diver that the live database was rolled back untouched."},
-  "@startup_failure_backupsFolder": {"description": "Label before the filesystem path where backups are kept."},
-  "@startup_failure_showBackupsFolder": {"description": "Desktop-only button that opens the backups folder in the system file manager."},
-  "@startup_failure_downgrade_title": {"description": "Heading of the guided-downgrade section on a failed schema upgrade."},
-  "@startup_failure_downgrade_body": {"description": "Explains how to go back to the previous app version, and why Submersion never downgrades itself."},
-  "@startup_failure_downgrade_action": {"description": "Button opening the app's releases page so the diver can pick the previous version."},
-  "@universalImport_compare_sameFields": {"description": "Summary line listing the fields that match between the existing and incoming dive.", "placeholders": {"fields": {"type": "Object", "example": "date/time, max depth, duration"}}},
-  "@universalImport_compare_serial": {"description": "Dive computer serial number in a compact label", "placeholders": {"serial": {"type": "Object", "example": "A1B2C3"}}},
-  "@diveLog_tooltip_ndlOverMax": {"description": "Profile readout NDL value when the no-decompression limit is longer than the chart tracks (over one hour). NDL is a diving acronym and is not translated."},
-  "@diveLog_tooltip_interpolated": {"description": "Profile readout value carried over from the first sample rather than measured at the surface lead-in.", "placeholders": {"value": {"type": "String", "example": "21.5 C"}}},
-  "@enum_profileMetric_ascentRate_short": {"description": "Short form of the ascent-rate metric, shown on the chart axis."},
-  "@enum_profileMetric_cns_short": {"description": "Short form of the CNS metric, shown on the chart axis. Not translated."},
-  "@enum_profileMetric_otu_short": {"description": "Short form of the OTU metric, shown on the chart axis. Not translated."},
-  "@diveLog_profileEditor_depthPlusOneMeter": {"description": "Profile editor button: shift the selected segment 1 metre shallower. The shift is always exactly one metre because dive profiles are stored in metres, so keep the metric unit in the translation."},
-  "@diveLog_profileEditor_depthMinusOneMeter": {"description": "Profile editor button: shift the selected segment 1 metre deeper. The shift is always exactly one metre, so keep the metric unit."},
-  "@diveLog_profileEditor_smoothLight": {"description": "Profile editor smoothing strength: the weakest setting."},
-  "@diveLog_profileEditor_smoothMedium": {"description": "Profile editor smoothing strength: the middle setting."},
-  "@diveLog_profileEditor_smoothHeavy": {"description": "Profile editor smoothing strength: the strongest setting."},
-  "@diveLog_profileEditor_outliersDetected": {"description": "Number of suspect depth samples the profile editor found.", "placeholders": {"count": {"type": "int"}}},
-  "@diveLog_profileEditor_clearWaypoints": {"description": "Profile editor button: remove every drawn waypoint."},
-  "@diveLog_profileEditor_mode_smooth": {"description": "Profile editor mode and range action: smooth the depth curve."},
-  "@diveLog_profileEditor_saveFailed": {"description": "Snackbar shown when saving an edited dive profile fails.", "placeholders": {"error": {"type": "String"}}},
-  "@diveLog_profileEditor_errorLoadingDive": {"description": "Shown when the dive being edited cannot be loaded.", "placeholders": {"error": {"type": "String"}}},
-  "@diveLog_profileEditor_undo": {"description": "Tooltip for the profile editor's undo button."},
-  "@diveLog_profileEditor_mode_select": {"description": "Profile editor mode: select a range of the depth curve."},
-  "@diveLog_profileEditor_mode_outlier": {"description": "Profile editor mode: find and remove suspect depth samples."},
-  "@diveLog_profileEditor_mode_draw": {"description": "Profile editor mode: draw the depth curve by placing waypoints."},
-  "@diveLog_profileEditor_mode_trim": {"description": "Profile editor mode: trim samples off the ends of the profile."},
-  "@diveLog_sources_sectionTitle": {"description": "Header of the dive-detail section listing where a dive's data came from (dive computers, imported files, manual entry).", "placeholders": {"count": {"type": "int"}}},
-  "@diveLog_sources_badge_manual": {"description": "Badge on a dive whose data was typed in rather than downloaded."},
-  "@diveLog_sources_badge_viewing": {"description": "Badge on the data source currently being previewed on the chart."},
-  "@diveLog_sources_badge_secondary": {"description": "Badge on a data source that is not the dive's primary source."},
-  "@diveLog_sources_created": {"description": "When a manually entered dive record was created.", "placeholders": {"date": {"type": "String", "example": "12 Mar 2026"}}},
-  "@diveLog_sources_detail_serial": {"description": "Serial number of the dive computer a dive was downloaded from."},
-  "@diveLog_sources_detail_format": {"description": "File format a dive was imported from, e.g. UDDF or DL7."},
-  "@diveLog_sources_detail_imported": {"description": "Date a dive's data was imported into the app."},
-  "@diveLog_detail_semantics_viewDiveComputer": {"description": "Screen-reader label for the row that opens a linked dive computer.", "placeholders": {"name": {"type": "String", "example": "Perdix 2"}}},
-  "@diveLog_detail_semantics_viewTrip": {"description": "Screen-reader label for the row that opens the dive's trip.", "placeholders": {"name": {"type": "String", "example": "Red Sea 2026"}}},
-  "@diveLog_detail_semantics_viewDiveCenter": {"description": "Screen-reader label for the row that opens the dive's dive center.", "placeholders": {"name": {"type": "String"}}},
-  "@diveLog_detail_semantics_viewSpecies": {"description": "Screen-reader label for a marine life sighting that opens the species page. Uses the same localized species name shown on screen.", "placeholders": {"name": {"type": "String", "example": "Whale Shark"}}},
-  "@diveLog_detail_semantics_viewCourse": {"description": "Screen-reader label for the chip that opens the dive's course.", "placeholders": {"name": {"type": "String"}}},
-  "@diveLog_detail_serialNumber": {"description": "Serial number of the dive computer, shown under its name.", "placeholders": {"serial": {"type": "String", "example": "12345678"}}},
-  "@diveLog_detail_errorLoadingSignature": {"description": "Shown when the instructor signature attached to a dive fails to load.", "placeholders": {"error": {"type": "String"}}},
-  "@diveLog_profilePanel_selectDive": {"description": "Placeholder in the profile panel when no dive is highlighted."},
-  "@diveLog_profilePanel_noProfileData": {"description": "Placeholder in the profile panel when the highlighted dive has no depth samples."},
+  "@lock_startFresh_body": {
+    "description": "Body of the start-fresh confirmation dialog. {token} is the untranslated ASCII confirmation word the diver must type.",
+    "placeholders": {
+      "token": {
+        "type": "Object",
+        "example": "START FRESH"
+      }
+    }
+  },
+  "@startup_migrating_progress": {
+    "description": "Splash progress line during a schema migration",
+    "placeholders": {
+      "currentStep": {
+        "type": "Object",
+        "example": "3"
+      },
+      "totalSteps": {
+        "type": "Object",
+        "example": "12"
+      }
+    }
+  },
+  "@startup_recovery_sqliteCode": {
+    "description": "Diagnostic line under the recovery screen. Object, not int, so the raw SQLite extended result code is never group-separated.",
+    "placeholders": {
+      "code": {
+        "type": "Object",
+        "example": "1032"
+      }
+    }
+  },
+  "@startup_versionMismatch_body": {
+    "description": "Explains a database written by a newer app build. Object, not int, so schema numbers are never group-separated.",
+    "placeholders": {
+      "databaseVersion": {
+        "type": "Object",
+        "example": "142"
+      },
+      "appVersion": {
+        "type": "Object",
+        "example": "138"
+      }
+    }
+  },
+  "@startup_error_title": {
+    "description": "Terminal startup screen title when the failure could not be classified. Deliberately neutral: it must NOT claim the database upgrade failed, since most failures reach this screen without a migration having been attempted."
+  },
+  "@startup_error_body": {
+    "description": "Body for an unclassified terminal startup failure."
+  },
+  "@startup_engineUnavailable_title": {
+    "description": "Terminal startup screen title when the app's native database engine is missing or is not a SQLCipher build. The diver's database was never opened."
+  },
+  "@startup_engineUnavailable_body": {
+    "description": "Explains that an engine failure happens before the database is opened, so no dive data is at risk."
+  },
+  "@startup_engineUnavailable_guidance": {
+    "description": "Tells the diver that reinstalling or restoring cannot fix a broken app package, and asks them to report it."
+  },
+  "@startup_migrationFailed_title": {
+    "description": "Terminal startup screen title when the schema upgrade ladder genuinely failed. This is the ONLY class that may say the upgrade failed."
+  },
+  "@startup_migrationFailed_body": {
+    "description": "Explains a failed schema upgrade and points at the pre-migration safety copy."
+  },
+  "@startup_dataUnreadable_title": {
+    "description": "Terminal startup screen title when the database file was reached but is corrupt or unreadable."
+  },
+  "@startup_dataUnreadable_body": {
+    "description": "Explains a damaged database file and points at restoring a backup."
+  },
+  "@startup_databaseBusy_title": {
+    "description": "Terminal startup screen title when another connection held the database lock. Must NOT imply damage: the write never started."
+  },
+  "@startup_databaseBusy_body": {
+    "description": "Explains a lock, reassures that nothing was written, and gives the one action that fixes it: fully close and reopen the app."
+  },
+  "@startup_failure_technicalDetails": {
+    "description": "Label above the raw error text on the terminal startup failure screen."
+  },
+  "@startup_failure_backupAvailable_title": {
+    "description": "Heading of the recovery card offering a backup found on disk during a failed startup."
+  },
+  "@startup_failure_backupAvailable_taken": {
+    "description": "When the offered backup was taken.",
+    "placeholders": {
+      "timestamp": {
+        "type": "Object",
+        "example": "17 Aug 2026 12:00"
+      }
+    }
+  },
+  "@startup_failure_backupAvailable_preMigration": {
+    "description": "Extra line shown when the offered backup is the automatic pre-migration safety copy. Object, not int, so schema numbers are never group-separated.",
+    "placeholders": {
+      "fromVersion": {
+        "type": "Object",
+        "example": "141"
+      },
+      "toVersion": {
+        "type": "Object",
+        "example": "142"
+      }
+    }
+  },
+  "@startup_failure_restoreAction": {
+    "description": "Button that swaps the offered backup in for the live database and restarts startup."
+  },
+  "@startup_failure_restoring": {
+    "description": "Progress label while the offered backup is being restored."
+  },
+  "@startup_failure_restoreFailed": {
+    "description": "Shown when the restore failed. Reassures the diver that the live database was rolled back untouched."
+  },
+  "@startup_failure_backupsFolder": {
+    "description": "Label before the filesystem path where backups are kept."
+  },
+  "@startup_failure_showBackupsFolder": {
+    "description": "Desktop-only button that opens the backups folder in the system file manager."
+  },
+  "@startup_failure_downgrade_title": {
+    "description": "Heading of the guided-downgrade section on a failed schema upgrade."
+  },
+  "@startup_failure_downgrade_body": {
+    "description": "Explains how to go back to the previous app version, and why Submersion never downgrades itself."
+  },
+  "@startup_failure_downgrade_action": {
+    "description": "Button opening the app's releases page so the diver can pick the previous version."
+  },
+  "@universalImport_compare_sameFields": {
+    "description": "Summary line listing the fields that match between the existing and incoming dive.",
+    "placeholders": {
+      "fields": {
+        "type": "Object",
+        "example": "date/time, max depth, duration"
+      }
+    }
+  },
+  "@universalImport_compare_serial": {
+    "description": "Dive computer serial number in a compact label",
+    "placeholders": {
+      "serial": {
+        "type": "Object",
+        "example": "A1B2C3"
+      }
+    }
+  },
+  "@diveLog_tooltip_ndlOverMax": {
+    "description": "Profile readout NDL value when the no-decompression limit is longer than the chart tracks (over one hour). NDL is a diving acronym and is not translated."
+  },
+  "@diveLog_tooltip_interpolated": {
+    "description": "Profile readout value carried over from the first sample rather than measured at the surface lead-in.",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "21.5 C"
+      }
+    }
+  },
+  "@enum_profileMetric_ascentRate_short": {
+    "description": "Short form of the ascent-rate metric, shown on the chart axis."
+  },
+  "@enum_profileMetric_cns_short": {
+    "description": "Short form of the CNS metric, shown on the chart axis. Not translated."
+  },
+  "@enum_profileMetric_otu_short": {
+    "description": "Short form of the OTU metric, shown on the chart axis. Not translated."
+  },
+  "@diveLog_profileEditor_depthPlusOneMeter": {
+    "description": "Profile editor button: shift the selected segment 1 metre shallower. The shift is always exactly one metre because dive profiles are stored in metres, so keep the metric unit in the translation."
+  },
+  "@diveLog_profileEditor_depthMinusOneMeter": {
+    "description": "Profile editor button: shift the selected segment 1 metre deeper. The shift is always exactly one metre, so keep the metric unit."
+  },
+  "@diveLog_profileEditor_smoothLight": {
+    "description": "Profile editor smoothing strength: the weakest setting."
+  },
+  "@diveLog_profileEditor_smoothMedium": {
+    "description": "Profile editor smoothing strength: the middle setting."
+  },
+  "@diveLog_profileEditor_smoothHeavy": {
+    "description": "Profile editor smoothing strength: the strongest setting."
+  },
+  "@diveLog_profileEditor_outliersDetected": {
+    "description": "Number of suspect depth samples the profile editor found.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@diveLog_profileEditor_clearWaypoints": {
+    "description": "Profile editor button: remove every drawn waypoint."
+  },
+  "@diveLog_profileEditor_mode_smooth": {
+    "description": "Profile editor mode and range action: smooth the depth curve."
+  },
+  "@diveLog_profileEditor_saveFailed": {
+    "description": "Snackbar shown when saving an edited dive profile fails.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@diveLog_profileEditor_errorLoadingDive": {
+    "description": "Shown when the dive being edited cannot be loaded.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@diveLog_profileEditor_undo": {
+    "description": "Tooltip for the profile editor's undo button."
+  },
+  "@diveLog_profileEditor_mode_select": {
+    "description": "Profile editor mode: select a range of the depth curve."
+  },
+  "@diveLog_profileEditor_mode_outlier": {
+    "description": "Profile editor mode: find and remove suspect depth samples."
+  },
+  "@diveLog_profileEditor_mode_draw": {
+    "description": "Profile editor mode: draw the depth curve by placing waypoints."
+  },
+  "@diveLog_profileEditor_mode_trim": {
+    "description": "Profile editor mode: trim samples off the ends of the profile."
+  },
+  "@diveLog_sources_sectionTitle": {
+    "description": "Header of the dive-detail section listing where a dive's data came from (dive computers, imported files, manual entry).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@diveLog_sources_badge_manual": {
+    "description": "Badge on a dive whose data was typed in rather than downloaded."
+  },
+  "@diveLog_sources_badge_viewing": {
+    "description": "Badge on the data source currently being previewed on the chart."
+  },
+  "@diveLog_sources_badge_secondary": {
+    "description": "Badge on a data source that is not the dive's primary source."
+  },
+  "@diveLog_sources_created": {
+    "description": "When a manually entered dive record was created.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "12 Mar 2026"
+      }
+    }
+  },
+  "@diveLog_sources_detail_serial": {
+    "description": "Serial number of the dive computer a dive was downloaded from."
+  },
+  "@diveLog_sources_detail_format": {
+    "description": "File format a dive was imported from, e.g. UDDF or DL7."
+  },
+  "@diveLog_sources_detail_imported": {
+    "description": "Date a dive's data was imported into the app."
+  },
+  "@diveLog_detail_semantics_viewDiveComputer": {
+    "description": "Screen-reader label for the row that opens a linked dive computer.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Perdix 2"
+      }
+    }
+  },
+  "@diveLog_detail_semantics_viewTrip": {
+    "description": "Screen-reader label for the row that opens the dive's trip.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Red Sea 2026"
+      }
+    }
+  },
+  "@diveLog_detail_semantics_viewDiveCenter": {
+    "description": "Screen-reader label for the row that opens the dive's dive center.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@diveLog_detail_semantics_viewSpecies": {
+    "description": "Screen-reader label for a marine life sighting that opens the species page. Uses the same localized species name shown on screen.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Whale Shark"
+      }
+    }
+  },
+  "@diveLog_detail_semantics_viewCourse": {
+    "description": "Screen-reader label for the chip that opens the dive's course.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@diveLog_detail_serialNumber": {
+    "description": "Serial number of the dive computer, shown under its name.",
+    "placeholders": {
+      "serial": {
+        "type": "String",
+        "example": "12345678"
+      }
+    }
+  },
+  "@diveLog_detail_errorLoadingSignature": {
+    "description": "Shown when the instructor signature attached to a dive fails to load.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@diveLog_profilePanel_selectDive": {
+    "description": "Placeholder in the profile panel when no dive is highlighted."
+  },
+  "@diveLog_profilePanel_noProfileData": {
+    "description": "Placeholder in the profile panel when the highlighted dive has no depth samples."
+  },
   "settings_export_progress_divesCsv": "Exporting dives to CSV...",
   "settings_export_progress_sitesCsv": "Exporting sites to CSV...",
   "settings_export_progress_equipmentCsv": "Exporting equipment to CSV...",
@@ -19436,33 +21033,234 @@
   "settings_cloudSync_launchCheck_updatesAvailable": "Updates available from cloud",
   "settings_cloudSync_launchCheck_upToDate": "Everything is up to date",
   "settings_cloudSync_launchCheck_failed": "Sync check failed: {error}",
-  "@settings_export_progress_templatePdf": {"placeholders": {"template": {"type": "String"}}},
-  "@settings_export_saveFailed": {"placeholders": {"error": {"type": "String"}}},
-  "@settings_export_backupFailed": {"placeholders": {"error": {"type": "String"}}},
-  "@settings_export_restoreFailed": {"placeholders": {"error": {"type": "String"}}},
-  "@settings_export_success_kml": {"placeholders": {"count": {"type": "int"}}},
-  "@settings_export_saved_kml": {"placeholders": {"count": {"type": "int"}}},
-  "@backup_operation_created": {"placeholders": {"size": {"type": "String"}}},
-  "@backup_operation_backupFailed": {"placeholders": {"error": {"type": "String"}}},
-  "@backup_operation_restoreFailed": {"placeholders": {"error": {"type": "String"}}},
-  "@backup_operation_deleteFailed": {"placeholders": {"error": {"type": "String"}}},
-  "@backup_operation_exported": {"placeholders": {"size": {"type": "String"}}},
-  "@backup_operation_exportFailed": {"placeholders": {"error": {"type": "String"}}},
-  "@backup_operation_upgrading": {"placeholders": {"step": {"type": "int"}, "total": {"type": "int"}}},
-  "@backup_restore_dialog_counts": {"placeholders": {"diveCount": {"type": "int"}, "siteCount": {"type": "int"}}},
-  "@backup_restore_preMigration_incompleteMetadata": {"placeholders": {"timestamp": {"type": "String"}, "appVersion": {"type": "String"}}},
-  "@backup_restore_preMigration_newerApp": {"placeholders": {"timestamp": {"type": "String"}, "appVersion": {"type": "String"}, "fromVersion": {"type": "int"}}},
-  "@backup_restore_preMigration_safe": {"placeholders": {"timestamp": {"type": "String"}, "appVersion": {"type": "String"}, "fromVersion": {"type": "int"}, "toVersion": {"type": "int"}}},
-  "@backup_restore_preMigration_warning": {"placeholders": {"timestamp": {"type": "String"}, "appVersion": {"type": "String"}, "fromVersion": {"type": "int"}, "toVersion": {"type": "int"}, "currentVersion": {"type": "int"}}},
-  "@settings_cloudSync_progress_uploadingLibrary": {"placeholders": {"uploaded": {"type": "int"}, "total": {"type": "int"}}},
-  "@settings_cloudSync_result_rebuildFailed": {"placeholders": {"error": {"type": "String"}}},
-  "@settings_cloudSync_result_libraryReplaceFailed": {"placeholders": {"error": {"type": "String"}}},
-  "@settings_cloudSync_result_adoptFailed": {"placeholders": {"error": {"type": "String"}}},
-  "@settings_cloudSync_result_recordsFailed": {"placeholders": {"count": {"type": "int"}}},
-  "@settings_cloudSync_launchCheck_unavailable": {"placeholders": {"provider": {"type": "String"}}},
-  "@settings_cloudSync_launchCheck_notSignedIn": {"placeholders": {"provider": {"type": "String"}}},
-  "@settings_cloudSync_launchCheck_localChanges": {"placeholders": {"count": {"type": "int"}}},
-  "@settings_cloudSync_launchCheck_failed": {"placeholders": {"error": {"type": "String"}}},
+  "@settings_export_progress_templatePdf": {
+    "placeholders": {
+      "template": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_export_saveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_export_backupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_export_restoreFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_export_success_kml": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_export_saved_kml": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@backup_operation_created": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "@backup_operation_backupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@backup_operation_restoreFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@backup_operation_deleteFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@backup_operation_exported": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "@backup_operation_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@backup_operation_upgrading": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@backup_restore_dialog_counts": {
+    "placeholders": {
+      "diveCount": {
+        "type": "int"
+      },
+      "siteCount": {
+        "type": "int"
+      }
+    }
+  },
+  "@backup_restore_preMigration_incompleteMetadata": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      },
+      "appVersion": {
+        "type": "String"
+      }
+    }
+  },
+  "@backup_restore_preMigration_newerApp": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      },
+      "appVersion": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "int"
+      }
+    }
+  },
+  "@backup_restore_preMigration_safe": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      },
+      "appVersion": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "int"
+      },
+      "toVersion": {
+        "type": "int"
+      }
+    }
+  },
+  "@backup_restore_preMigration_warning": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      },
+      "appVersion": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "int"
+      },
+      "toVersion": {
+        "type": "int"
+      },
+      "currentVersion": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_cloudSync_progress_uploadingLibrary": {
+    "placeholders": {
+      "uploaded": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_cloudSync_result_rebuildFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_cloudSync_result_libraryReplaceFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_cloudSync_result_adoptFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_cloudSync_result_recordsFailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_cloudSync_launchCheck_unavailable": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_cloudSync_launchCheck_notSignedIn": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_cloudSync_launchCheck_localChanges": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_cloudSync_launchCheck_failed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_detail_viewMap": "Map",
   "@diveLog_detail_viewMap": {},
   "diveLog_detail_view3d": "3D",
@@ -19503,11 +21301,17 @@
     }
   },
   "media_timeInDive_label": "Time in dive",
-  "@media_timeInDive_label": {"description": "Media info row label and Set-time dialog title: the moment in the dive a media item was taken."},
+  "@media_timeInDive_label": {
+    "description": "Media info row label and Set-time dialog title: the moment in the dive a media item was taken."
+  },
   "media_timeInDive_unknown": "Time in dive unknown",
-  "@media_timeInDive_unknown": {"description": "Viewer chip shown when a media item's capture time falls outside its dive; tapping it opens the Set-time dialog."},
+  "@media_timeInDive_unknown": {
+    "description": "Viewer chip shown when a media item's capture time falls outside its dive; tapping it opens the Set-time dialog."
+  },
   "media_timeInDive_setAction": "Set time in dive",
-  "@media_timeInDive_setAction": {"description": "Button and tooltip that opens the dialog to pin a media item to a moment in the dive."},
+  "@media_timeInDive_setAction": {
+    "description": "Button and tooltip that opens the dialog to pin a media item to a moment in the dive."
+  },
   "media_timeInDive_manual": "{time} (set manually)",
   "@media_timeInDive_manual": {
     "description": "Media info row value for a position the diver set themselves; {time} is a minutes:seconds offset.",
@@ -19518,9 +21322,13 @@
     }
   },
   "media_timeInDive_fieldLabel": "Time from dive start",
-  "@media_timeInDive_fieldLabel": {"description": "Set-time dialog: label of the minutes:seconds field."},
+  "@media_timeInDive_fieldLabel": {
+    "description": "Set-time dialog: label of the minutes:seconds field."
+  },
   "media_timeInDive_fieldHint": "mm:ss",
-  "@media_timeInDive_fieldHint": {"description": "Set-time dialog: placeholder showing the minutes:seconds format."},
+  "@media_timeInDive_fieldHint": {
+    "description": "Set-time dialog: placeholder showing the minutes:seconds format."
+  },
   "media_timeInDive_range": "Between 0:00 and {max}",
   "@media_timeInDive_range": {
     "description": "Set-time dialog: helper text under the field; {max} is the dive length as minutes:seconds.",
@@ -19540,11 +21348,17 @@
     }
   },
   "media_timeInDive_save": "Save",
-  "@media_timeInDive_save": {"description": "Set-time dialog: confirm button."},
+  "@media_timeInDive_save": {
+    "description": "Set-time dialog: confirm button."
+  },
   "media_timeInDive_cancel": "Cancel",
-  "@media_timeInDive_cancel": {"description": "Set-time dialog: dismiss button."},
+  "@media_timeInDive_cancel": {
+    "description": "Set-time dialog: dismiss button."
+  },
   "media_timeInDive_reset": "Reset to automatic",
-  "@media_timeInDive_reset": {"description": "Set-time dialog: button that removes the diver's pin so the position derives from the capture time again."},
+  "@media_timeInDive_reset": {
+    "description": "Set-time dialog: button that removes the diver's pin so the position derives from the capture time again."
+  },
   "media_info_backupSection": "Backup",
   "media_info_store": "Cloud store",
   "media_info_storeNotConnected": "No cloud store connected",
@@ -19661,15 +21475,45 @@
   "settings_dataSources_appleHealth_dataTypeWaterTemp": "Water Temperature - water temperature samples recorded during dives",
   "settings_dataSources_appleHealth_permissionManagedInHealth": "HealthKit access is managed in the Health app",
   "settings_dataSources_appleHealth_permissionUnsupported": "HealthKit is not available on this device",
-  "@diveImport_healthkit_accessGrantedHint": {"description": "Hint under the HealthKit access headline explaining that iOS will not confirm read access."},
-  "@diveImport_healthkit_foundNoDivesHint": {"description": "Hint shown when a HealthKit fetch returned zero dives."},
-  "@settings_dataSources_appleHealth_dataTypeDepth": {"description": "HealthKit data type disclosure: underwater depth."},
-  "@settings_dataSources_appleHealth_dataTypeWaterTemp": {"description": "HealthKit data type disclosure: water temperature."},
-  "@settings_dataSources_appleHealth_permissionManagedInHealth": {"description": "Permission row shown when the platform will not disclose read access."},
-  "@settings_dataSources_appleHealth_permissionUnsupported": {"description": "Permission row shown when HealthKit is unavailable on this device."},
-  "@settings_units_gasConsumption_sac_subtitle": {"placeholders": {"unit": {"type": "String"}}},
-  "@settings_units_gasConsumption_rmv_subtitle": {"placeholders": {"unit": {"type": "String"}}},
-  "@diveLog_detail_sacVolumeHint": {"placeholders": {"unit": {"type": "String"}}},
+  "@diveImport_healthkit_accessGrantedHint": {
+    "description": "Hint under the HealthKit access headline explaining that iOS will not confirm read access."
+  },
+  "@diveImport_healthkit_foundNoDivesHint": {
+    "description": "Hint shown when a HealthKit fetch returned zero dives."
+  },
+  "@settings_dataSources_appleHealth_dataTypeDepth": {
+    "description": "HealthKit data type disclosure: underwater depth."
+  },
+  "@settings_dataSources_appleHealth_dataTypeWaterTemp": {
+    "description": "HealthKit data type disclosure: water temperature."
+  },
+  "@settings_dataSources_appleHealth_permissionManagedInHealth": {
+    "description": "Permission row shown when the platform will not disclose read access."
+  },
+  "@settings_dataSources_appleHealth_permissionUnsupported": {
+    "description": "Permission row shown when HealthKit is unavailable on this device."
+  },
+  "@settings_units_gasConsumption_sac_subtitle": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "@settings_units_gasConsumption_rmv_subtitle": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "@diveLog_detail_sacVolumeHint": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "statistics_trend_aggregation_monthly": "Monthly average",
   "statistics_trend_aggregation_perDive": "Every dive",
   "statistics_trend_aggregation_tooltip": "How dives are grouped",
@@ -19693,5 +21537,54 @@
   "diveLog_filter_presetLast5Years": "Last 5 years",
   "diveLog_filter_presetLast10Years": "Last 10 years",
   "statistics_trend_tooltip_lowest": "Lowest",
-  "statistics_trend_tooltip_highest": "Highest"
+  "statistics_trend_tooltip_highest": "Highest",
+  "diveLog_edit_excludeFromStats": "Exclude from statistics",
+  "@diveLog_edit_excludeFromStats": {
+    "description": "Checkbox: exclude this dive from all statistics"
+  },
+  "diveLog_edit_excludeFromStatsHelp": "Keep this dive in your logbook, but leave it out of every statistic, including your dive count.",
+  "@diveLog_edit_excludeFromStatsHelp": {
+    "description": "Help text under the exclude-from-statistics checkbox"
+  },
+  "diveLog_edit_excludeFromGasStats": "Exclude from gas statistics",
+  "@diveLog_edit_excludeFromGasStats": {
+    "description": "Checkbox: exclude this dive from gas statistics only"
+  },
+  "diveLog_edit_excludeFromGasStatsHelp": "Leave this dive out of SAC, RMV and gas mix statistics only. Useful when the gas reading is not representative.",
+  "@diveLog_edit_excludeFromGasStatsHelp": {
+    "description": "Help text under the exclude-from-gas-statistics checkbox"
+  },
+  "diveLog_badge_excludedFromStats": "Excluded from statistics",
+  "@diveLog_badge_excludedFromStats": {
+    "description": "Tooltip on the excluded-from-statistics badge"
+  },
+  "diveLog_badge_excludedFromGasStats": "Excluded from gas statistics",
+  "@diveLog_badge_excludedFromGasStats": {
+    "description": "Tooltip on the excluded-from-gas-statistics badge"
+  },
+  "diveLog_bulkEdit_fieldExcludeFromStats": "Excluded from statistics",
+  "@diveLog_bulkEdit_fieldExcludeFromStats": {
+    "description": "Bulk edit field label"
+  },
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "Exclude from gas statistics",
+  "@diveLog_bulkEdit_fieldExcludeFromGasStats": {
+    "description": "Bulk edit field label"
+  },
+  "diveLog_filter_excludedOnly": "Excluded from statistics only",
+  "@diveLog_filter_excludedOnly": {
+    "description": "Filter axis: show only dives excluded from statistics"
+  },
+  "diveLog_edit_summary_excluded": "Excluded",
+  "@diveLog_edit_summary_excluded": {
+    "description": "Collapsed summary fragment: dive excluded from statistics"
+  },
+  "statistics_excludedDivesFootnote": "{count, plural, one{1 dive excluded from statistics} other{{count} dives excluded from statistics}}",
+  "@statistics_excludedDivesFootnote": {
+    "description": "Overview footnote naming how many dives are excluded",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

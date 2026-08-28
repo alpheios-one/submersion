@@ -7331,15 +7331,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{Keine Beobachtungen ausgeblendet} =1{1 Beobachtung ausgeblendet} other{{count} Beobachtungen ausgeblendet}}, {failed, plural, =1{1 Tauchgang konnte nicht aktualisiert werden} other{{failed} Tauchgänge konnten nicht aktualisiert werden}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "Die Tauchgangsliste konnte nicht gelesen werden. Es wurde nichts geändert.",
   "safetySettings_analyzeAll_failed": "Die Tauchgänge konnten nicht analysiert werden.",
   "safetyReview_details": "Details",
@@ -10386,5 +10386,16 @@
   "diveLog_filter_presetLast5Years": "Letzte 5 Jahre",
   "diveLog_filter_presetLast10Years": "Letzte 10 Jahre",
   "statistics_trend_tooltip_lowest": "Niedrigster",
-  "statistics_trend_tooltip_highest": "Höchster"
+  "statistics_trend_tooltip_highest": "Höchster",
+  "diveLog_edit_excludeFromStats": "Von Statistiken ausschließen",
+  "diveLog_edit_excludeFromStatsHelp": "Behalte diesen Tauchgang im Logbuch, lasse ihn aber aus jeder Statistik heraus, einschließlich der Tauchgangszahl.",
+  "diveLog_edit_excludeFromGasStats": "Von Gasstatistiken ausschließen",
+  "diveLog_edit_excludeFromGasStatsHelp": "Lasse diesen Tauchgang nur aus AMV-, RMV- und Gasgemisch-Statistiken heraus. Nützlich, wenn der Gaswert nicht repräsentativ ist.",
+  "diveLog_badge_excludedFromStats": "Von Statistiken ausgeschlossen",
+  "diveLog_badge_excludedFromGasStats": "Von Gasstatistiken ausgeschlossen",
+  "diveLog_bulkEdit_fieldExcludeFromStats": "Von Statistiken ausschließen",
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "Von Gasstatistiken ausschließen",
+  "diveLog_filter_excludedOnly": "Nur von Statistiken ausgeschlossene",
+  "diveLog_edit_summary_excluded": "Ausgeschlossen",
+  "statistics_excludedDivesFootnote": "{count, plural, one{1 Tauchgang von Statistiken ausgeschlossen} other{{count} Tauchgänge von Statistiken ausgeschlossen}}"
 }

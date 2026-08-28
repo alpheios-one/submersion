@@ -7331,15 +7331,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{没有忽略任何观察} =1{已忽略 1 条观察} other{已忽略 {count} 条观察}}，{failed, plural, other{{failed} 次潜水无法更新}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "无法读取潜水列表，未做任何更改。",
   "safetySettings_analyzeAll_failed": "无法分析潜水记录。",
   "safetyReview_details": "详情",
@@ -10386,5 +10386,16 @@
   "diveLog_filter_presetLast5Years": "最近 5 年",
   "diveLog_filter_presetLast10Years": "最近 10 年",
   "statistics_trend_tooltip_lowest": "最低",
-  "statistics_trend_tooltip_highest": "最高"
+  "statistics_trend_tooltip_highest": "最高",
+  "diveLog_edit_excludeFromStats": "从统计中排除",
+  "diveLog_edit_excludeFromStatsHelp": "将此潜水保留在日志中，但将其排除在所有统计之外，包括潜水次数。",
+  "diveLog_edit_excludeFromGasStats": "从气体统计中排除",
+  "diveLog_edit_excludeFromGasStatsHelp": "仅将此潜水排除在 SAC、RMV 和气体混合统计之外。当气体数值不具代表性时很有用。",
+  "diveLog_badge_excludedFromStats": "已从统计中排除",
+  "diveLog_badge_excludedFromGasStats": "已从气体统计中排除",
+  "diveLog_bulkEdit_fieldExcludeFromStats": "从统计中排除",
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "从气体统计中排除",
+  "diveLog_filter_excludedOnly": "仅显示已排除的潜水",
+  "diveLog_edit_summary_excluded": "已排除",
+  "statistics_excludedDivesFootnote": "{count, plural, other{{count} 次潜水已从统计中排除}}"
 }

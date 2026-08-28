@@ -58483,6 +58483,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Highest'**
   String get statistics_trend_tooltip_highest;
+
+  /// Checkbox: exclude this dive from all statistics
+  ///
+  /// In en, this message translates to:
+  /// **'Exclude from statistics'**
+  String get diveLog_edit_excludeFromStats;
+
+  /// Help text under the exclude-from-statistics checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this dive in your logbook, but leave it out of every statistic, including your dive count.'**
+  String get diveLog_edit_excludeFromStatsHelp;
+
+  /// Checkbox: exclude this dive from gas statistics only
+  ///
+  /// In en, this message translates to:
+  /// **'Exclude from gas statistics'**
+  String get diveLog_edit_excludeFromGasStats;
+
+  /// Help text under the exclude-from-gas-statistics checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this dive out of SAC, RMV and gas mix statistics only. Useful when the gas reading is not representative.'**
+  String get diveLog_edit_excludeFromGasStatsHelp;
+
+  /// Tooltip on the excluded-from-statistics badge
+  ///
+  /// In en, this message translates to:
+  /// **'Excluded from statistics'**
+  String get diveLog_badge_excludedFromStats;
+
+  /// Tooltip on the excluded-from-gas-statistics badge
+  ///
+  /// In en, this message translates to:
+  /// **'Excluded from gas statistics'**
+  String get diveLog_badge_excludedFromGasStats;
+
+  /// Bulk edit field label
+  ///
+  /// In en, this message translates to:
+  /// **'Excluded from statistics'**
+  String get diveLog_bulkEdit_fieldExcludeFromStats;
+
+  /// Bulk edit field label
+  ///
+  /// In en, this message translates to:
+  /// **'Exclude from gas statistics'**
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats;
+
+  /// Filter axis: show only dives excluded from statistics
+  ///
+  /// In en, this message translates to:
+  /// **'Excluded from statistics only'**
+  String get diveLog_filter_excludedOnly;
+
+  /// Collapsed summary fragment: dive excluded from statistics
+  ///
+  /// In en, this message translates to:
+  /// **'Excluded'**
+  String get diveLog_edit_summary_excluded;
+
+  /// Overview footnote naming how many dives are excluded
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 dive excluded from statistics} other{{count} dives excluded from statistics}}'**
+  String statistics_excludedDivesFootnote(int count);
 }
 
 class _AppLocalizationsDelegate

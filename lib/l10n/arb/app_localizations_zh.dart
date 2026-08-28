@@ -33461,4 +33461,46 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => '最高';
+
+  @override
+  String get diveLog_edit_excludeFromStats => '从统计中排除';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      '将此潜水保留在日志中，但将其排除在所有统计之外，包括潜水次数。';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats => '从气体统计中排除';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      '仅将此潜水排除在 SAC、RMV 和气体混合统计之外。当气体数值不具代表性时很有用。';
+
+  @override
+  String get diveLog_badge_excludedFromStats => '已从统计中排除';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats => '已从气体统计中排除';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats => '从统计中排除';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats => '从气体统计中排除';
+
+  @override
+  String get diveLog_filter_excludedOnly => '仅显示已排除的潜水';
+
+  @override
+  String get diveLog_edit_summary_excluded => '已排除';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水已从统计中排除',
+    );
+    return '$_temp0';
+  }
 }
