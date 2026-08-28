@@ -37,7 +37,13 @@ class DiverRepository {
   final SyncRepository _syncRepository = SyncRepository();
   static const _uuid = Uuid();
   static final _log = LoggerService.forClass(DiverRepository);
-  static const _activeDiverIdKey = 'active_diver_id';
+
+  /// Settings-table key holding the device-local active diver id.
+  ///
+  /// Public so writers outside this repository that must keep the pointer
+  /// valid in the same transaction as their own change (diver merge) target
+  /// the same row the readers here consult.
+  static const activeDiverIdSettingsKey = 'active_diver_id';
 
   /// Get all divers ordered by name
   Future<List<domain.Diver>> getAllDivers() async {
@@ -609,7 +615,7 @@ class DiverRepository {
   Future<String?> getActiveDiverIdFromSettings() async {
     try {
       final query = _db.select(_db.settings)
-        ..where((t) => t.key.equals(_activeDiverIdKey));
+        ..where((t) => t.key.equals(activeDiverIdSettingsKey));
       final row = await query.getSingleOrNull();
       return row?.value;
     } catch (e, stackTrace) {
@@ -630,13 +636,13 @@ class DiverRepository {
       if (diverId == null) {
         await (_db.delete(
           _db.settings,
-        )..where((t) => t.key.equals(_activeDiverIdKey))).go();
+        )..where((t) => t.key.equals(activeDiverIdSettingsKey))).go();
       } else {
         await _db
             .into(_db.settings)
             .insertOnConflictUpdate(
               SettingsCompanion(
-                key: const Value(_activeDiverIdKey),
+                key: const Value(activeDiverIdSettingsKey),
                 value: Value(diverId),
                 updatedAt: Value(now),
               ),
