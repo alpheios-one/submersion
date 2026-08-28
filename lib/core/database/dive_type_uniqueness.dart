@@ -44,7 +44,7 @@ const String kCreateDiveDiveTypesUniqueIndexSql =
     'CREATE UNIQUE INDEX IF NOT EXISTS $kDiveDiveTypesUniqueIndexName '
     'ON dive_dive_types(dive_id, dive_type_id)';
 
-/// Keeps one junction row per (dive, type): the oldest, `rowid` breaking ties.
+/// Keeps one junction row per (dive, type): the oldest, `id` breaking ties.
 ///
 /// The survivor's `created_at` is load-bearing rather than arbitrary. A dive's
 /// types read back ordered by it, and the FIRST is the dive's representative
@@ -53,7 +53,18 @@ const String kCreateDiveDiveTypesUniqueIndexSql =
 /// whichever copy this device happened to insert first, which for a row that
 /// arrived by sync is unrelated to when the type was actually put on the dive.
 ///
-/// `rowid` as the second key is what makes the dedupe total. Ordering on
+/// The tie-break is `id` and NOT `rowid` because it has to be a property of the
+/// ROWS rather than of this device, so every device that runs this lands on the
+/// same survivor. `rowid` is local insertion order: two devices holding the
+/// same two rows can have received them in opposite orders, and each would keep
+/// a different id. Both would then show one badge and look repaired -- but sync
+/// deletions are keyed on `id`, so a later "remove this type" would tombstone
+/// an id the peer does not have and the removal would never propagate. This is
+/// the same reasoning `tag_uniqueness.dart` gives for collapsing `tags` onto
+/// the lexically lowest id.
+///
+/// `id` is the primary key, so it is unique and the ordering is a total one:
+/// no tie can survive. That matters beyond determinism. Ordering on
 /// `created_at` alone leaves ties, and ties here are the norm, not an edge
 /// case: the column is epoch MILLISECONDS and the v92 seed writes all of its
 /// rows inside a single `strftime('now')` second. Every tied row would survive
@@ -68,7 +79,7 @@ const String _collapseDuplicateDiveTypesSql = '''
     SELECT rowid FROM (
       SELECT rowid, ROW_NUMBER() OVER (
         PARTITION BY dive_id, dive_type_id
-        ORDER BY created_at ASC, rowid ASC
+        ORDER BY created_at ASC, id ASC
       ) AS rn FROM dive_dive_types
     ) WHERE rn = 1
   )

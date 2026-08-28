@@ -138,6 +138,32 @@ void main() {
     expect(await rowIds(db), ['older']);
   });
 
+  test('the survivor does not depend on local insertion order', () async {
+    // Convergence, not cosmetics. `rowid` is device-local: two devices that
+    // hold the SAME two rows can have inserted them in opposite orders, so a
+    // rowid tie-break leaves each keeping a different id. Both would then
+    // display one badge and look fixed -- but sync deletions are keyed on id,
+    // so a later "remove this type" tombstones an id the peer does not have
+    // and the removal never propagates. The tie-break must be a property of
+    // the rows themselves.
+    Future<String> survivorFor(List<String> insertionOrder) async {
+      final db = AppDatabase(
+        setupDb((rawDb) {
+          for (final id in insertionOrder) {
+            insertRow(rawDb, id, 'dive-1', 'shore', createdAt: 1000);
+          }
+        }),
+      );
+      addTearDown(db.close);
+      return (await rowIds(db)).single;
+    }
+
+    expect(
+      await survivorFor(['id-aaa', 'id-zzz']),
+      await survivorFor(['id-zzz', 'id-aaa']),
+    );
+  });
+
   test('different types on one dive all survive', () async {
     final db = AppDatabase(
       setupDb((rawDb) {
