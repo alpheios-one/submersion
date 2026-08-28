@@ -214,9 +214,11 @@ mussels to `invertebrate`.
 2. for each entry with `inaturalistTaxonId`, calls
    `https://api.inaturalist.org/v1/taxa/{id}?locale=<code>` once per app
    locale (`en de es fr it pt nl hu zh ar he`; iNaturalist's `zh-CN` for
-   `zh`), takes `preferred_common_name`, falls back to the seed's
-   `commonName` for that locale (the marine catalog ships English names in
-   locales that lack one, so this matches existing behaviour), and rate-limits
+   `zh`), takes the best name per app locale from the `all_names` list,
+   keeps the seed's curated English name for `en`, and fills any locale
+   iNaturalist lacks from `tool/data/freshwater_species_name_overrides.json`,
+   a hand-authored file (the marine catalog ships no English fallback in any
+   locale, so neither does this; the overrides cover 653 names); rate-limited
    to one request per second with the part 3 user agent;
 3. appends the entries to `species.json` (`commonName` = English name,
    `description` = English description) and bumps `version` to 2;
