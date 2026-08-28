@@ -30255,6 +30255,1231 @@ class AppLocalizationsAr extends AppLocalizations {
       'أكبر الزواحف الحية، ويوجد في المياه الساحلية ومصبات الأنهار بالمحيطين الهندي والهادئ.';
 
   @override
+  String get species_northern_pike_name => 'الكراكي الشمالي';
+
+  @override
+  String get species_northern_pike_desc =>
+      'مفترس طويل الجسم بخطم يشبه منقار البط، يترصد بلا حراك بين نباتات حواف البحيرات.';
+
+  @override
+  String get species_muskellunge_name => 'ماسكلانج';
+
+  @override
+  String get species_muskellunge_desc =>
+      'أكبر أنواع الكراكي، عملاق مخطط أو مرقط في البحيرات الشمالية الصافية، نادر الرؤية ولا يُنسى.';
+
+  @override
+  String get species_chain_pickerel_name => 'الكراكي المسلسل';
+
+  @override
+  String get species_chain_pickerel_desc =>
+      'كراكي نحيل يعيش في برك شرق أمريكا الشمالية العشبية، سُمي بذلك بسبب النمط الشبيه بالسلسلة على جانبيه.';
+
+  @override
+  String get species_walleye_name => 'الوالاي';
+
+  @override
+  String get species_walleye_desc =>
+      'قريب للفرخ بلون زيتوني ذهبي وعينين كبيرتين عاكستين، يصطاد عند الغسق فوق قيعان البحيرات الصخرية والرملية.';
+
+  @override
+  String get species_sauger_name => 'الساوغر';
+
+  @override
+  String get species_sauger_desc =>
+      'ابن عم أصغر وأكثر تبقعاً لسمك الوالاي، يفضل الأنهار العكرة والخزانات.';
+
+  @override
+  String get species_yellow_perch_name => 'الفرخ الأصفر';
+
+  @override
+  String get species_yellow_perch_desc =>
+      'فرخ ذهبي يعيش في أسراب بخطوط عمودية داكنة، شائع حول الأرصفة ونباتات المياه في أمريكا الشمالية.';
+
+  @override
+  String get species_european_perch_name => 'الفرخ الأوروبي';
+
+  @override
+  String get species_european_perch_desc =>
+      'فرخ مخطط بزعانف شوكية وزعانف سفلية حمراء برتقالية، يوجد في كل بحيرة ونهر بطيء تقريباً في أوروبا.';
+
+  @override
+  String get species_zander_name => 'الزاندر';
+
+  @override
+  String get species_zander_desc =>
+      'مفترس كبير شاحب اللون بعينين زجاجيتين وفكين ذوي أنياب، يجوب بحيرات وأنهار أوروبا العكرة بعد حلول الظلام.';
+
+  @override
+  String get species_ruffe_name => 'الرف';
+
+  @override
+  String get species_ruffe_desc =>
+      'فرخ صغير مرقط بزعنفة ظهرية شوكية متصلة، وفير على القيعان الطرية في بحيرات أوروبا.';
+
+  @override
+  String get species_largemouth_bass_name => 'القاروص كبير الفم';
+
+  @override
+  String get species_largemouth_bass_desc =>
+      'قاروص أخضر الظهر بخط جانبي داكن وفم ضخم، يترصد قرب جذوع الأشجار وحواف النباتات في البحيرات الدافئة.';
+
+  @override
+  String get species_smallmouth_bass_name => 'القاروص صغير الفم';
+
+  @override
+  String get species_smallmouth_bass_desc =>
+      'قاروص برونزي بخطوط عمودية باهتة، يستقر فوق الصخور والحصى في البحيرات والأنهار الصافية الباردة.';
+
+  @override
+  String get species_rock_bass_name => 'قاروص الصخور';
+
+  @override
+  String get species_rock_bass_desc =>
+      'سمكة شمس ممتلئة بعينين حمراوين وصفوف من البقع الداكنة، تحتمي بين الصخور الكبيرة في الجداول والبحيرات الصافية.';
+
+  @override
+  String get species_bluegill_name => 'البلوجيل';
+
+  @override
+  String get species_bluegill_desc =>
+      'سمكة شمس قرصية الشكل بغطاء خيشومي أزرق مسوّد وصدر برتقالي، تعشش في مستعمرات على القيعان الرملية الضحلة.';
+
+  @override
+  String get species_pumpkinseed_name => 'سمكة الشمس القرعية';
+
+  @override
+  String get species_pumpkinseed_desc =>
+      'سمكة شمس منقطة بألوان زاهية بغطاء خيشومي ذي طرف أحمر وخطوط زرقاء متموجة على الخدين، شائعة في المياه الضحلة العشبية.';
+
+  @override
+  String get species_black_crappie_name => 'الكرابي الأسود';
+
+  @override
+  String get species_black_crappie_desc =>
+      'سمكة فضية عالية الجسم مرقطة بالأسود، تتجمع في أسراب حول الأغصان الغارقة والأعمدة.';
+
+  @override
+  String get species_white_crappie_name => 'الكرابي الأبيض';
+
+  @override
+  String get species_white_crappie_desc =>
+      'كرابي أكثر شحوباً بأشرطة عمودية باهتة، يفضل الخزانات العكرة والأنهار البطيئة.';
+
+  @override
+  String get species_brown_trout_name => 'التروتة البنية';
+
+  @override
+  String get species_brown_trout_desc =>
+      'تروتة بنية ذهبية ببقع حمراء وسوداء، تستقر في تيار الأنهار والبحيرات الباردة الصافية.';
+
+  @override
+  String get species_rainbow_trout_name => 'تروات قوس قزح';
+
+  @override
+  String get species_rainbow_trout_desc =>
+      'تروتة فضية بشريط جانبي وردي ونقاط سوداء دقيقة، تُستزرع وتعيش برياً في المياه الباردة حول العالم.';
+
+  @override
+  String get species_brook_trout_name => 'تروتة الجداول';
+
+  @override
+  String get species_brook_trout_desc =>
+      'شار بعلامات دودية الشكل على ظهره وبقع حمراء بهالات زرقاء وزعانف بحواف بيضاء، في جداول المنبع الباردة.';
+
+  @override
+  String get species_lake_trout_name => 'تروتة البحيرات';
+
+  @override
+  String get species_lake_trout_desc =>
+      'شار رمادي كبير مغطى ببقع باهتة وذيل متشعب، يجوب المياه العميقة الباردة في البحيرات الشمالية.';
+
+  @override
+  String get species_arctic_char_name => 'الشار القطبي';
+
+  @override
+  String get species_arctic_char_desc =>
+      'أقصى أسماك المياه العذبة شمالاً، شار نحيل يتورد بطنه باللون الأحمر البرتقالي في ألوان التزاوج الخريفية.';
+
+  @override
+  String get species_atlantic_salmon_name => 'سلمون الأطلسي';
+
+  @override
+  String get species_atlantic_salmon_desc =>
+      'سلمون فضي مهاجر ببقع سوداء على شكل X، يقفز فوق الشلالات عند عودته إلى أنهار مولده للتكاثر.';
+
+  @override
+  String get species_chinook_salmon_name => 'سلمون الشينوك';
+
+  @override
+  String get species_chinook_salmon_desc =>
+      'أكبر سلمون المحيط الهادئ، بظهر أزرق مخضر ولثة سوداء، يصعد الأنهار الغربية الكبيرة للتكاثر.';
+
+  @override
+  String get species_sockeye_salmon_name => 'السلمون الأحمر';
+
+  @override
+  String get species_sockeye_salmon_desc =>
+      'سلمون يتحول عند التكاثر إلى الأحمر الزاهي برأس أخضر، ويزدحم على قيعان الحصى في الأنهار التي تغذيها البحيرات.';
+
+  @override
+  String get species_coho_salmon_name => 'سلمون الكوهو';
+
+  @override
+  String get species_coho_salmon_desc =>
+      'سلمون فضي بلثة بيضاء وبقع على الجزء العلوي من الذيل فقط، يتكاثر في الجداول الساحلية الصغيرة.';
+
+  @override
+  String get species_lake_whitefish_name => 'السمك الأبيض البحيري';
+
+  @override
+  String get species_lake_whitefish_desc =>
+      'سمكة بيضاء فضية صغيرة الفم تعيش في البحيرات العميقة الباردة، تتغذى على القاع في أسراب كبيرة.';
+
+  @override
+  String get species_cisco_name => 'السيسكو';
+
+  @override
+  String get species_cisco_desc =>
+      'سمكة بيضاء نحيلة تشبه الرنجة تتجمع في أسراب في المياه المفتوحة للبحيرات الشمالية الباردة، فريسة لتروتة البحيرات.';
+
+  @override
+  String get species_european_grayling_name => 'الغرايلينغ الأوروبي';
+
+  @override
+  String get species_european_grayling_desc =>
+      'سمكة نهرية رمادية فضية بزعنفة ظهرية عالية تشبه الشراع بحافة أرجوانية، تستقر في المجاري السريعة النظيفة ذات الحصى.';
+
+  @override
+  String get species_common_carp_name => 'شبوط شائع';
+
+  @override
+  String get species_common_carp_desc =>
+      'شبوط ثقيل برونزي اللون بحراشف كبيرة وزوجين من الزوائد اللمسية، ينبش القيعان الطرية في البحيرات والأنهار الدافئة.';
+
+  @override
+  String get species_grass_carp_name => 'شبوط الحشائش';
+
+  @override
+  String get species_grass_carp_desc =>
+      'شبوط آسيوي على شكل طوربيد أُدخل حول العالم لرعي الأعشاب المائية، يُشاهد كثيراً في بحيرات المحاجر الصافية.';
+
+  @override
+  String get species_tench_name => 'التنش';
+
+  @override
+  String get species_tench_desc =>
+      'سمكة خضراء زيتونية بحراشف دقيقة وعينين حمراوين وزعانف مستديرة، تنساب بين الطين والقصب في المياه الراكدة.';
+
+  @override
+  String get species_common_bream_name => 'أبراميس شائع';
+
+  @override
+  String get species_common_bream_desc =>
+      'سمكة برونزية عالية الجسم مفلطحة الجانبين تتغذى ورأسها إلى الأسفل في أسراب على القيعان الطينية، شائعة في سهول أوروبا.';
+
+  @override
+  String get species_roach_name => 'الروش';
+
+  @override
+  String get species_roach_desc =>
+      'سمكة فضية تعيش في أسراب بزعانف حمراء وقزحية حمراء، أكثر الأسماك وفرة في كثير من بحيرات أوروبا وقنواتها.';
+
+  @override
+  String get species_rudd_name => 'الرود';
+
+  @override
+  String get species_rudd_desc =>
+      'قريب للروش بجوانب ذهبية وزعانف حمراء زاهية وفم متجه للأعلى، يتغذى تحت السطح مباشرة.';
+
+  @override
+  String get species_chub_name => 'الشوب الأوروبي';
+
+  @override
+  String get species_chub_desc =>
+      'سمكة نهرية ممتلئة برأس عريض وحراشف كبيرة ذات حواف داكنة وفم كبير، تستقر تحت الأشجار المتدلية فوق الماء.';
+
+  @override
+  String get species_barbel_name => 'بربل شائع';
+
+  @override
+  String get species_barbel_desc =>
+      'سمكة قاعية انسيابية بأربع زوائد لمسية وفم سفلي، تلتصق بالحصى في أنهار أوروبا السريعة.';
+
+  @override
+  String get species_european_eel_name => 'ثعبان الماء الأوروبي';
+
+  @override
+  String get species_european_eel_desc =>
+      'سمكة تشبه الثعبان تقضي عقوداً في الأنهار والبحيرات قبل أن تهاجر إلى بحر سارجاسو لتتكاثر مرة واحدة.';
+
+  @override
+  String get species_american_eel_name => 'ثعبان الماء الأمريكي';
+
+  @override
+  String get species_american_eel_desc =>
+      'ثعبان ماء أمريكي شمالي يختبئ نهاراً تحت الصخور في الأنهار والبحيرات ويعود إلى بحر سارجاسو للتكاثر.';
+
+  @override
+  String get species_burbot_name => 'البربوت';
+
+  @override
+  String get species_burbot_desc =>
+      'سمك القد الوحيد في المياه العذبة، سمكة مرقطة تشبه ثعبان الماء بزائدة لمسية واحدة على الذقن، تختبئ نهاراً في المياه العميقة الباردة.';
+
+  @override
+  String get species_channel_catfish_name => 'سلور القنوات';
+
+  @override
+  String get species_channel_catfish_desc =>
+      'سمكة سلور رمادية ببقع داكنة متناثرة وذيل متشعب وثماني زوائد لمسية، شائعة في أنهار وخزانات أمريكا الشمالية.';
+
+  @override
+  String get species_flathead_catfish_name => 'السلور مسطح الرأس';
+
+  @override
+  String get species_flathead_catfish_desc =>
+      'سلور بني مرقط ضخم برأس مسطح وفك سفلي بارز، يرقد في الحفر النهرية العميقة.';
+
+  @override
+  String get species_brown_bullhead_name => 'البولهيد البني';
+
+  @override
+  String get species_brown_bullhead_desc =>
+      'سلور صغير ممتلئ بزوائد لمسية داكنة وذيل مربع، يتحمل البرك الطينية الدافئة قليلة الأكسجين.';
+
+  @override
+  String get species_wels_catfish_name => 'سلور ويلس';
+
+  @override
+  String get species_wels_catfish_desc =>
+      'أكبر أسماك المياه العذبة في أوروبا، عملاق بلا حراشف برأس عريض مسطح وشوارب طويلة، يرقد في الحفر النهرية العميقة.';
+
+  @override
+  String get species_white_sturgeon_name => 'الحفش الأبيض';
+
+  @override
+  String get species_white_sturgeon_desc =>
+      'أكبر أسماك المياه العذبة في أمريكا الشمالية، عملاق رمادي مدرع بذيل يشبه ذيل القرش يجوب الأنهار الغربية الكبيرة.';
+
+  @override
+  String get species_lake_sturgeon_name => 'حفش البحيرات';
+
+  @override
+  String get species_lake_sturgeon_desc =>
+      'حفش مدرع بطيء النمو من البحيرات العظمى وحوض المسيسيبي، يكنس القاع بفمه الأنبوبي.';
+
+  @override
+  String get species_european_sturgeon_name => 'حفش البحر الأوربي';
+
+  @override
+  String get species_european_sturgeon_desc =>
+      'حفش مدرع مهدد بالانقراض بشدة من الأنهار الأطلسية، يُربى اليوم ويُطلق في نهري غارون وإلبه.';
+
+  @override
+  String get species_alligator_gar_name => 'سمكة التمساح';
+
+  @override
+  String get species_alligator_gar_desc =>
+      'عملاق ما قبل التاريخ بخطم عريض مسنن وحراشف مدرعة معينية الشكل، يصعد لابتلاع الهواء في الأنهار الجنوبية.';
+
+  @override
+  String get species_longnose_gar_name => 'الغار طويل الأنف';
+
+  @override
+  String get species_longnose_gar_desc =>
+      'سمكة مدرعة نحيلة بخطم يشبه الإبرة، تتعلق بلا حراك تحت سطح الأنهار الدافئة مباشرة.';
+
+  @override
+  String get species_bowfin_name => 'البوفين';
+
+  @override
+  String get species_bowfin_desc =>
+      'أحفورة حية بزعنفة ظهرية طويلة متموجة ورأس عظمي، يحرس صغاره في المياه الراكدة العشبية.';
+
+  @override
+  String get species_american_paddlefish_name => 'سمك المجداف الأميريكي';
+
+  @override
+  String get species_american_paddlefish_desc =>
+      'عملاق مرشح للغذاء بخطم يشبه المجداف يبلغ ثلث طوله، يسبح بفم مفتوح في الأنهار الكبيرة.';
+
+  @override
+  String get species_sea_lamprey_name => 'جلكى بحرية';
+
+  @override
+  String get species_sea_lamprey_desc =>
+      'طفيلي عديم الفكين يشبه ثعبان الماء بفم ماص محاط بالأسنان، يتكاثر في جداول الحصى بعد التغذي في البحر أو البحيرات.';
+
+  @override
+  String get species_freshwater_drum_name => 'الطبال النهري';
+
+  @override
+  String get species_freshwater_drum_desc =>
+      'سمكة فضية محدبة الظهر تصدر أصوات همهمة مسموعة وتسحق بلح البحر بأسنان بلعومية، شائعة في الأنهار والبحيرات الكبيرة.';
+
+  @override
+  String get species_white_sucker_name => 'الماص الأبيض';
+
+  @override
+  String get species_white_sucker_desc =>
+      'سمكة قاعية أسطوانية بفم لحمي متجه للأسفل، تصعد الجداول في الربيع في حشود التكاثر.';
+
+  @override
+  String get species_common_minnow_name => 'المنوة الأوروبية';
+
+  @override
+  String get species_common_minnow_desc =>
+      'سمكة صغيرة جداً مخططة تعيش في أسراب في الجداول والبحيرات الصافية الباردة، يتحول ذكورها إلى الأحمر والأخضر في الربيع.';
+
+  @override
+  String get species_three_spined_stickleback_name => 'أبو شوكة ثلاثي الأشواك';
+
+  @override
+  String get species_three_spined_stickleback_desc =>
+      'سمكة صغيرة جداً مدرعة بثلاث أشواك ظهرية، يبني ذكورها ذوو الحلق الأحمر أعشاشاً من الألياف النباتية ويحرسونها.';
+
+  @override
+  String get species_alewife_name => 'الألوايف';
+
+  @override
+  String get species_alewife_desc =>
+      'رنجة فضية تصعد الأنهار في الربيع وتملأ اليوم البحيرات العظمى بأسراب هائلة.';
+
+  @override
+  String get species_nile_perch_name => 'قشر البياض';
+
+  @override
+  String get species_nile_perch_desc =>
+      'مفترس فضي ضخم بعين محاطة بحافة سوداء، أُدخل إلى بحيرة فيكتوريا حيث يهيمن على المياه المفتوحة.';
+
+  @override
+  String get species_nile_tilapia_name => 'بلطي نيلي';
+
+  @override
+  String get species_nile_tilapia_desc =>
+      'بلطي رمادي بخطوط عمودية على الذيل يحضن صغاره في فمه، يُستزرع ويعيش متوحشاً في المياه الدافئة حول العالم.';
+
+  @override
+  String get species_african_tigerfish_name => 'سمكة النمر الأفريقية';
+
+  @override
+  String get species_african_tigerfish_desc =>
+      'مفترس فضي مخطط بأسنان خنجرية متشابكة، يصطاد في الأنهار الأفريقية السريعة مثل الزامبيزي.';
+
+  @override
+  String get species_marbled_lungfish_name => 'Samak el teen';
+
+  @override
+  String get species_marbled_lungfish_desc =>
+      'سمكة ثعبانية الشكل تتنفس الهواء بزعانف خيطية، تنجو من الجفاف محبوسة في شرنقة طينية.';
+
+  @override
+  String get species_electric_catfish_name => 'السلور الكهربائي';
+
+  @override
+  String get species_electric_catfish_desc =>
+      'سلور رمادي ممتلئ من النيل والكونغو يصعق فرائسه بصدمات تبلغ عدة مئات من الفولتات.';
+
+  @override
+  String get species_zebra_mbuna_name => 'مبونا الزرد';
+
+  @override
+  String get species_zebra_mbuna_desc =>
+      'بلطي صخري بخطوط زرقاء من بحيرة ملاوي، يرعى الطحالب من الصخور الكبيرة في حشود إقليمية كثيفة.';
+
+  @override
+  String get species_malawi_butterfly_peacock_name => 'بلطي الطاووس الفراشي';
+
+  @override
+  String get species_malawi_butterfly_peacock_desc =>
+      'بلطي طاووسي أزرق متقزح من كهوف بحيرة ملاوي، تتوهج ذكوره بزعانف ذات حواف بيضاء.';
+
+  @override
+  String get species_fuelleborn_cichlid_name => 'بلطي فولبورن';
+
+  @override
+  String get species_fuelleborn_cichlid_desc =>
+      'مبونا من بحيرة ملاوي بأنف مسطح لحمي بارز لكشط الطحالب في منطقة الأمواج.';
+
+  @override
+  String get species_princess_of_burundi_name => 'أميرة بوروندي';
+
+  @override
+  String get species_princess_of_burundi_desc =>
+      'بلطي أنيق من بحيرة تنجانيقا بزعانف على شكل قيثارة، يعيش في عائلات ممتدة تتقاسم رعاية العش.';
+
+  @override
+  String get species_frontosa_name => 'الفرونتوزا';
+
+  @override
+  String get species_frontosa_desc =>
+      'بلطي من المياه العميقة في تنجانيقا بأشرطة زرقاء وبيضاء بارزة وجبهة محدبة، يتحرك ببطء في مجموعات فوق الصخور.';
+
+  @override
+  String get species_tropheus_moorii_name => 'تروفيوس موري';
+
+  @override
+  String get species_tropheus_moorii_desc =>
+      'بلطي صخري ممتلئ من تنجانيقا بعشرات الأشكال اللونية، كل منها محصور في امتداد شاطئه الخاص.';
+
+  @override
+  String get species_arapaima_name => 'أربيمة عملاقة';
+
+  @override
+  String get species_arapaima_desc =>
+      'من أكبر أسماك المياه العذبة، عملاق مدرع من الأمازون بذيل مرقط بالأحمر يصعد لابتلاع الهواء.';
+
+  @override
+  String get species_silver_arowana_name => 'أروانا فضية';
+
+  @override
+  String get species_silver_arowana_desc =>
+      'سمكة فضية شريطية من الأمازون بزائدتين لمسيتين على الذقن، تقفز خارج الماء لخطف الحشرات من الأغصان.';
+
+  @override
+  String get species_red_bellied_piranha_name => 'البيرانا حمراء البطن';
+
+  @override
+  String get species_red_bellied_piranha_desc =>
+      'سمكة فضية عالية الجسم ببطن قرمزي وأسنان حادة كالشفرة، تتنقل في أسراب عبر المياه الراكدة للأمازون.';
+
+  @override
+  String get species_black_piranha_name => 'البيرانا السوداء';
+
+  @override
+  String get species_black_piranha_desc =>
+      'بيرانا كبيرة انفرادية بعينين حمراوين وجسم داكن معيني الشكل، تترصد في روافد الأمازون الصافية الصخرية.';
+
+  @override
+  String get species_red_bellied_pacu_name => 'الباكو أحمر البطن';
+
+  @override
+  String get species_red_bellied_pacu_desc =>
+      'آكل فاكهة يشبه البيرانا بأسنان مسطحة ساحقة وبطن أحمر، يتجمع تحت أشجار الغابة المغمورة.';
+
+  @override
+  String get species_tambaqui_name => 'التامباكي';
+
+  @override
+  String get species_tambaqui_desc =>
+      'باكو ضخم داكن من الأمازون يطحن المكسرات والبذور المتساقطة تحت مظلة الغابة المغمورة.';
+
+  @override
+  String get species_electric_eel_name => 'أنقليس رعاد';
+
+  @override
+  String get species_electric_eel_desc =>
+      'ليس ثعبان ماء بل سمكة سكين، طويلة داكنة تتنفس الهواء وتصعق فرائسها بصدمات تصل إلى 600 فولت.';
+
+  @override
+  String get species_redtail_catfish_name => 'السلور أحمر الذيل';
+
+  @override
+  String get species_redtail_catfish_desc =>
+      'سلور أمازوني كبير بظهر داكن وبطن أبيض وذيل برتقالي أحمر زاهٍ، يستريح في برك الأنهار العميقة.';
+
+  @override
+  String get species_tiger_shovelnose_catfish_name => 'السلور النمري';
+
+  @override
+  String get species_tiger_shovelnose_catfish_desc =>
+      'سلور مخطط انسيابي بخطم طويل مسطح، يصطاد ليلاً على طول القنوات الرملية لأنهار أمريكا الجنوبية.';
+
+  @override
+  String get species_peacock_bass_name => 'قاروص الطاووس';
+
+  @override
+  String get species_peacock_bass_desc =>
+      'بلطي أمازوني عدواني بثلاثة أشرطة داكنة وبقعة عينية على الذيل، يكمن للأسماك بجوار الأخشاب الغارقة.';
+
+  @override
+  String get species_oscar_name => 'أوسكار';
+
+  @override
+  String get species_oscar_desc =>
+      'بلطي داكن ممتلئ برخامية برتقالية وبقعة عينية على الذيل، يجوب مياه الأمازون البطيئة والحواف المغمورة.';
+
+  @override
+  String get species_freshwater_angelfish_name => 'سمكة الملاك النهرية';
+
+  @override
+  String get species_freshwater_angelfish_desc =>
+      'بلطي أمازوني عالٍ قرصي الشكل بزعانف طويلة وخطوط عمودية، ينساب بين الجذور المغمورة.';
+
+  @override
+  String get species_discus_name => 'سمكة الديسكس';
+
+  @override
+  String get species_discus_desc =>
+      'بلطي دائري مفلطح الجانبين بخطوط زرقاء متموجة يطعم صغاره بالمخاط من جلده.';
+
+  @override
+  String get species_sailfin_pleco_name => 'البليكو الشراعي';
+
+  @override
+  String get species_sailfin_pleco_desc =>
+      'سلور مدرع ذو فم ماص بزعنفة ظهرية عالية وبقع كالفهد، يكشط الطحالب عن الخشب والصخر.';
+
+  @override
+  String get species_cardinal_tetra_name => 'التترا الكاردينال';
+
+  @override
+  String get species_cardinal_tetra_desc =>
+      'تترا صغيرة جداً بخط أزرق نيوني فوق شريط أحمر على طول الجسم، تعيش في أسراب في مياه ريو نيغرو الداكنة.';
+
+  @override
+  String get species_mexican_tetra_name => 'تترا مكسيكية';
+
+  @override
+  String get species_mexican_tetra_desc =>
+      'تترا فضية من أنهار المكسيك، مجموعاتها الكهفية عمياء وشاحبة، مفضلة لدى غواصي السينوتي.';
+
+  @override
+  String get species_mekong_giant_catfish_name => 'سلور الميكونغ العملاق';
+
+  @override
+  String get species_mekong_giant_catfish_desc =>
+      'عملاق بلا أسنان من نهر الميكونغ مهدد بالانقراض بشدة، رمادي وبلا زوائد لمسية، كان يبلغ ثلاثة أمتار.';
+
+  @override
+  String get species_giant_barb_name => 'البربل العملاق';
+
+  @override
+  String get species_giant_barb_desc =>
+      'أكبر شبوط في العالم، عملاق الميكونغ بحراشف كبيرة ورأس ضخم، أصبح نادراً في برك الأنهار العميقة.';
+
+  @override
+  String get species_asian_arowana_name => 'أروانا آسيوية';
+
+  @override
+  String get species_asian_arowana_desc =>
+      'سمكة التنين الحمراء أو الذهبية المعدنية من أنهار المياه السوداء في جنوب شرق آسيا، تنساب تحت السطح مباشرة.';
+
+  @override
+  String get species_striped_snakehead_name => 'رأس الثعبان المخطط';
+
+  @override
+  String get species_striped_snakehead_desc =>
+      'مفترس على شكل طوربيد يتنفس الهواء برأس مسطح يشبه الثعبان، يحرس صغاره في البرك الآسيوية العشبية.';
+
+  @override
+  String get species_giant_snakehead_name => 'رأس الثعبان العملاق';
+
+  @override
+  String get species_giant_snakehead_desc =>
+      'رأس ثعبان كبير شرس، مخطط في صغره وداكن عند البلوغ، يدافع عن صغاره الحمراء الزاهية في بحيرات جنوب شرق آسيا.';
+
+  @override
+  String get species_climbing_perch_name => 'فرخ متسلّق';
+
+  @override
+  String get species_climbing_perch_desc =>
+      'سمكة زيتونية صلبة تتنفس الهواء وتزحف على اليابسة بأغطيتها الخيشومية الشوكية بين البرك الجافة.';
+
+  @override
+  String get species_golden_mahseer_name => 'الماهسير الذهبي';
+
+  @override
+  String get species_golden_mahseer_desc =>
+      'شبوط ذهبي الحراشف من أنهار الهيمالايا، سبّاح قوي يستقر في البرك الصافية السريعة أسفل المنحدرات.';
+
+  @override
+  String get species_koi_name => 'كوي';
+
+  @override
+  String get species_koi_desc =>
+      'شبوط للزينة استُولد في اليابان بأنماط بيضاء وحمراء وسوداء وذهبية، يعيش في البرك والبحيرات الدافئة الصافية.';
+
+  @override
+  String get species_goldfish_name => 'سمك ذهبي';
+
+  @override
+  String get species_goldfish_desc =>
+      'شبوط آسيوي مستأنس يعود إلى اللون الزيتوني البرونزي في البرية، مكوّناً أسراباً متوحشة كبيرة في البحيرات الدافئة.';
+
+  @override
+  String get species_giant_gourami_name => 'الغورامي العملاق';
+
+  @override
+  String get species_giant_gourami_desc =>
+      'سمكة عريضة محدبة من جنوب شرق آسيا بزعانف حوضية خيطية تبني أعشاشاً من الفقاعات في المياه البطيئة العشبية.';
+
+  @override
+  String get species_clown_knifefish_name => 'سمكة السكين المهرج';
+
+  @override
+  String get species_clown_knifefish_desc =>
+      'سمكة فضية على شكل نصل ببقع عينية على طول زعنفة شرجية طويلة متموجة، تحوم تحت جذوع أنهار آسيا.';
+
+  @override
+  String get species_walking_catfish_name => 'السلور الماشي';
+
+  @override
+  String get species_walking_catfish_desc =>
+      'سلور نحيل يتنفس الهواء ويتلوى عبر الأرض الرطبة بين البرك، أصبح الآن متوحشاً في فلوريدا.';
+
+  @override
+  String get species_japanese_eel_name => 'ثعبان الماء الياباني';
+
+  @override
+  String get species_japanese_eel_desc =>
+      'ثعبان ماء من شرق آسيا ينمو في الأنهار والبحيرات ويهاجر إلى غرب المحيط الهادئ للتكاثر.';
+
+  @override
+  String get species_ayu_name => 'الآيو';
+
+  @override
+  String get species_ayu_desc =>
+      'سمكة يابانية فضية نحيلة ترعى الطحالب من الحجارة في الأنهار الصافية وتدافع عن منطقة تغذيتها.';
+
+  @override
+  String get species_baikal_omul_name => 'أومول بايكال';
+
+  @override
+  String get species_baikal_omul_desc =>
+      'سمكة بيضاء فضية لا توجد إلا في بحيرة بايكال، تتجمع في أسراب في المياه المفتوحة الباردة وتصعد الأنهار للتكاثر.';
+
+  @override
+  String get species_baikal_oilfish_name => 'غولوميانكا';
+
+  @override
+  String get species_baikal_oilfish_desc =>
+      'سمكة شفافة بلا حراشف من أعماق بايكال، غنية بالزيت لدرجة تكاد تكون شفافة، وتلد صغاراً أحياء.';
+
+  @override
+  String get species_murray_cod_name => 'قد نهر موراي';
+
+  @override
+  String get species_murray_cod_desc =>
+      'أكبر أسماك المياه العذبة في أستراليا، عملاق أخضر مرقط ببطن أبيض، يستقر بجوار الجذوع في نهر موراي دارلينغ.';
+
+  @override
+  String get species_golden_perch_name => 'الفرخ الذهبي';
+
+  @override
+  String get species_golden_perch_desc =>
+      'فرخ ذهبي زيتوني عالي الجسم من أنهار أستراليا الداخلية، يحتمي بجوار الأخشاب الساقطة والحواف الصخرية.';
+
+  @override
+  String get species_australian_bass_name => 'القاروص الأسترالي';
+
+  @override
+  String get species_australian_bass_desc =>
+      'قاروص أخضر برونزي من أنهار شرق أستراليا الساحلية يهاجر مع مجرى النهر للتكاثر في مصبات المياه المالحة قليلاً.';
+
+  @override
+  String get species_barramundi_name => 'الباراموندي';
+
+  @override
+  String get species_barramundi_desc =>
+      'فرخ فضي محدب الظهر من أنهار ومصبات شمال أستراليا، يتحول من ذكر إلى أنثى مع التقدم في العمر.';
+
+  @override
+  String get species_silver_perch_name => 'الفرخ الفضي';
+
+  @override
+  String get species_silver_perch_desc =>
+      'سمكة رمادية فضية من نهر موراي دارلينغ بفم صغير وذيل متشعب، كانت تتجمع في أسراب هائلة.';
+
+  @override
+  String get species_gulf_saratoga_name => 'أروانا لؤلؤية';
+
+  @override
+  String get species_gulf_saratoga_desc =>
+      'أروانا أسترالية برونزية بحراشف مرقطة بالأحمر تحضن بيضها في فمها في برك الشمال.';
+
+  @override
+  String get species_sooty_grunter_name => 'المزمجر الأسود';
+
+  @override
+  String get species_sooty_grunter_desc =>
+      'سمكة داكنة ممتلئة من أنهار شمال أستراليا، ترعى الطحالب والفاكهة حول الصخور والمنحدرات.';
+
+  @override
+  String get species_eel_tailed_catfish_name => 'السلور ثعباني الذيل';
+
+  @override
+  String get species_eel_tailed_catfish_desc =>
+      'سلور أسترالي بذيل مدبب يشبه ثعبان الماء يبني عش حصى في المياه الضحلة الصافية ويحرسه.';
+
+  @override
+  String get species_spangled_perch_name => 'الفرخ المرصع';
+
+  @override
+  String get species_spangled_perch_desc =>
+      'سمكة صغيرة مرقطة بالفضي منتشرة في أنحاء داخل أستراليا، تستوطن أي بركة يصلها الفيضان.';
+
+  @override
+  String get species_eastern_rainbowfish_name => 'سمكة قوس قزح الشرقية';
+
+  @override
+  String get species_eastern_rainbowfish_desc =>
+      'سمكة صغيرة متقزحة من جداول شرق أستراليا، تلمع ذكورها بخطوط حمراء وزرقاء تحت الشمس.';
+
+  @override
+  String get species_signal_crayfish_name => 'جراد النهر الإشاري';
+
+  @override
+  String get species_signal_crayfish_desc =>
+      'جراد نهر بني كبير ببقعة بيضاء عند مفصل المخلب، نوع غازٍ من أمريكا الشمالية ينتشر في أنهار أوروبا.';
+
+  @override
+  String get species_red_swamp_crayfish_name => 'جراد المستنقعات الأحمر';
+
+  @override
+  String get species_red_swamp_crayfish_desc =>
+      'جراد نهر أحمر داكن بمخالب خشنة من مستنقعات لويزيانا، يحفر الآن في الأراضي الرطبة الدافئة في كل قارة.';
+
+  @override
+  String get species_noble_crayfish_name => 'جراد النهر النبيل';
+
+  @override
+  String get species_noble_crayfish_desc =>
+      'جراد النهر الأصلي في أوروبا، بني داكن بمخالب حمراء من الأسفل، يختبئ في جحور الضفاف في الجداول والبحيرات النظيفة الباردة.';
+
+  @override
+  String get species_white_clawed_crayfish_name => 'جراد النهر أبيض المخالب';
+
+  @override
+  String get species_white_clawed_crayfish_desc =>
+      'جراد نهر زيتوني صغير بمخالب شاحبة من الأسفل، نوع مهدد أصلي في جداول الحجر الجيري النظيفة في غرب أوروبا.';
+
+  @override
+  String get species_tasmanian_giant_freshwater_crayfish_name =>
+      'جراد النهر التسماني العملاق';
+
+  @override
+  String get species_tasmanian_giant_freshwater_crayfish_desc =>
+      'أكبر لافقاريات المياه العذبة في العالم، جراد نهر أزرق بني بطيء النمو من أنهار تسمانيا المظللة.';
+
+  @override
+  String get species_zebra_mussel_name => 'بلح البحر المخطط';
+
+  @override
+  String get species_zebra_mussel_desc =>
+      'بلح بحر مخطط بحجم ظفر الإبهام يغطي الصخور والحطام والأنابيب بالآلاف، ويصفّي الماء مع انتشاره.';
+
+  @override
+  String get species_quagga_mussel_name => 'بلح البحر الكواجا';
+
+  @override
+  String get species_quagga_mussel_desc =>
+      'قريب أكثر استدارة وشحوباً لبلح البحر المخطط، يستوطن القيعان الطرية والمياه العميقة الباردة التي لا يستطيع الآخر بلوغها.';
+
+  @override
+  String get species_freshwater_pearl_mussel_name =>
+      'بلح المياه العذبة اللؤلؤي';
+
+  @override
+  String get species_freshwater_pearl_mussel_desc =>
+      'بلح بحر داكن مستطيل يمكنه العيش أكثر من قرن نصف مدفون في الحصى النظيف لأنهار السلمون السريعة.';
+
+  @override
+  String get species_swan_mussel_name => 'بلح البجع';
+
+  @override
+  String get species_swan_mussel_desc =>
+      'بلح بحر كبير رقيق الصدفة يعيش في البحيرات والقنوات الطينية، يرشح الماء بسيفوناته فوق الطمي مباشرة.';
+
+  @override
+  String get species_chinese_pond_mussel_name => 'بلح البحر البركة الصيني';
+
+  @override
+  String get species_chinese_pond_mussel_desc =>
+      'بلح بحر آسيوي غازٍ كبير جداً بصدفة بنية لامعة، وصل مع الأسماك المستزرعة وينتشر في البحيرات الدافئة.';
+
+  @override
+  String get species_freshwater_sponge_name => 'الإسفنج النهري';
+
+  @override
+  String get species_freshwater_sponge_desc =>
+      'إسفنج متفرع أخضر أو رمادي يغطي الأغصان والحجارة في البحيرات الصافية، تلوّنه الطحالب التي تعيش داخله.';
+
+  @override
+  String get species_freshwater_jellyfish_name =>
+      'قنديل البحر المياه العذبة الشائع';
+
+  @override
+  String get species_freshwater_jellyfish_desc =>
+      'قنديل بحر شفاف بحجم عملة معدنية يظهر في أسراب في بحيرات المحاجر الدافئة والخزانات في أواخر الصيف.';
+
+  @override
+  String get species_great_pond_snail_name => 'حلزون البرك الكبير';
+
+  @override
+  String get species_great_pond_snail_desc =>
+      'حلزون كبير بصدفة مدببة ينساب فوق النباتات في المياه الراكدة الأوروبية ويتنفس الهواء عند السطح.';
+
+  @override
+  String get species_great_ramshorn_snail_name => 'حلزون قرن الكبش الكبير';
+
+  @override
+  String get species_great_ramshorn_snail_desc =>
+      'حلزون مسطح ملتف مثل قرن كبش صغير، يرعى الطحالب من الأوراق والحجارة في البرك العشبية.';
+
+  @override
+  String get species_channeled_apple_snail_name => 'حلزون التفاح الذهبي';
+
+  @override
+  String get species_channeled_apple_snail_desc =>
+      'حلزون كبير بني ذهبي يضع عناقيد بيض وردية زاهية فوق خط الماء، غازٍ في الأراضي الرطبة الدافئة وحقول الأرز.';
+
+  @override
+  String get species_magnificent_bryozoan_name => 'الطحلبيات الرائعة';
+
+  @override
+  String get species_magnificent_bryozoan_desc =>
+      'مستعمرة هلامية بحجم كرة القدم مرصعة بحيوانات دقيقة، تتشبث بالأغصان والحبال في المياه الدافئة الساكنة.';
+
+  @override
+  String get species_chinese_mitten_crab_name => 'سرطان القفاز الصيني';
+
+  @override
+  String get species_chinese_mitten_crab_desc =>
+      'سرطان حفّار بمخالب مشعرة يقضي سنوات في الأنهار قبل أن يسير مع مجرى النهر للتكاثر في المصبات.';
+
+  @override
+  String get species_giant_freshwater_prawn_name => 'الروبيان النهري العملاق';
+
+  @override
+  String get species_giant_freshwater_prawn_desc =>
+      'روبيان كبير بمخالب زرقاء من أنهار آسيا وأستراليا، مخالب الذكور المسنة أطول من أجسامها.';
+
+  @override
+  String get species_common_snapping_turtle_name => 'سلحفاة نهاشة شائعة';
+
+  @override
+  String get species_common_snapping_turtle_desc =>
+      'سلحفاة ثقيلة خشنة الدرع بذيل طويل مسنن، ترقد في طين البرك والأنهار البطيئة ورأسها خارج الطين.';
+
+  @override
+  String get species_alligator_snapping_turtle_name => 'سلحفاة القاطور النهاشة';
+
+  @override
+  String get species_alligator_snapping_turtle_desc =>
+      'عملاق ذو مظهر ما قبل التاريخ بثلاثة أعراف مسننة وطعم لساني يشبه الدودة، ينتظر بفم مفتوح على قيعان الأنهار الجنوبية.';
+
+  @override
+  String get species_painted_turtle_name => 'سلحفاة مزركشة';
+
+  @override
+  String get species_painted_turtle_desc =>
+      'سلحفاة داكنة ملساء بخطوط حمراء وصفراء على العنق وحافة الدرع، تتشمس في صفوف على جذوع الأشجار في أنحاء أمريكا الشمالية.';
+
+  @override
+  String get species_red_eared_slider_name => 'سلحفاة حمراء الأذنين';
+
+  @override
+  String get species_red_eared_slider_desc =>
+      'سلحفاة برك بخطوط خضراء وشريط أحمر خلف كل عين، سلحفاة تجارة الحيوانات الأليفة التي باتت متوحشة في المياه الدافئة حول العالم.';
+
+  @override
+  String get species_northern_map_turtle_name => 'سلحفاة الخريطة الشمالية';
+
+  @override
+  String get species_northern_map_turtle_desc =>
+      'سلحفاة زيتونية بخطوط صفراء تشبه الخريطة على درعها وعرف منخفض، تتشمس على الصخور بمحاذاة الأنهار الصافية والبحيرات الكبيرة.';
+
+  @override
+  String get species_spiny_softshell_turtle_name =>
+      'سلحفاة لينة الدرقة الشائكة';
+
+  @override
+  String get species_spiny_softshell_turtle_desc =>
+      'سلحفاة مسطحة جلدية كالفطيرة بخطم يشبه أنبوب التنفس، مدفونة في رمال الأنهار الضحلة ولا يظهر منها سوى رأسها.';
+
+  @override
+  String get species_florida_softshell_turtle_name =>
+      'سلحفاة لينة الدرقة الفلوريدية';
+
+  @override
+  String get species_florida_softshell_turtle_desc =>
+      'سلحفاة كبيرة داكنة رخوة الدرع بخطم أنبوبي طويل، شائعة في ينابيع فلوريدا وقنواتها وبحيراتها.';
+
+  @override
+  String get species_pig_nosed_turtle_name => 'سلحفاة ذات أنف الخنزير';
+
+  @override
+  String get species_pig_nosed_turtle_desc =>
+      'سلحفاة نهرية فريدة من غينيا الجديدة وشمال أستراليا بزعانف كسلاحف البحر وخطم لحمي يشبه أنف الخنزير.';
+
+  @override
+  String get species_mary_river_turtle_name => 'سلحفاة نهر ماري';
+
+  @override
+  String get species_mary_river_turtle_desc =>
+      'سلحفاة أسترالية نادرة تتنفس عبر المذرق وتنمو على رأسها عرف من الطحالب الخضراء، توجد في نهر واحد في كوينزلاند.';
+
+  @override
+  String get species_yellow_spotted_river_turtle_name =>
+      'سلحفاة النهر صفراء النقط';
+
+  @override
+  String get species_yellow_spotted_river_turtle_desc =>
+      'سلحفاة أمازونية جانبية العنق ببقع صفراء على الرأس، تتشمس في مجموعات على الجذوع والضفاف الرملية للأنهار الكبيرة.';
+
+  @override
+  String get species_european_pond_turtle_name => 'سلحفاة البرك الأوروبية';
+
+  @override
+  String get species_european_pond_turtle_desc =>
+      'سلحفاة داكنة منقطة بنقاط صفراء، سلحفاة المياه العذبة الأصلية في أوروبا، تنزلق من الضفاف المشمسة إلى البرك العشبية.';
+
+  @override
+  String get species_american_alligator_name => 'قاطور أمريكي';
+
+  @override
+  String get species_american_alligator_desc =>
+      'زاحف مدرع عريض الخطم من مستنقعات وينابيع وأنهار جنوب شرق الولايات المتحدة، يطفو ولا يظهر منه سوى العينين والمنخرين.';
+
+  @override
+  String get species_spectacled_caiman_name => 'كايمن ذو النظارات';
+
+  @override
+  String get species_spectacled_caiman_desc =>
+      'كيمن زيتوني صغير بحافة عظمية بين عينيه، وفير في الأنهار البطيئة والبحيرات الساحلية في أمريكا الوسطى والجنوبية.';
+
+  @override
+  String get species_black_caiman_name => 'كايمن أسود';
+
+  @override
+  String get species_black_caiman_desc =>
+      'أكبر مفترس في الأمازون، كيمن أسود مدرع يصل طوله إلى خمسة أمتار، يصطاد ليلاً في البحيرات والغابات المغمورة.';
+
+  @override
+  String get species_freshwater_crocodile_name => 'تمساح أسترالي';
+
+  @override
+  String get species_freshwater_crocodile_desc =>
+      'تمساح أسترالي نحيل الخطم من أنهار وأخاديد الشمال، خجول وأصغر بكثير من تمساح المياه المالحة.';
+
+  @override
+  String get species_northern_water_snake_name => 'ثعبان الماء الشمالي';
+
+  @override
+  String get species_northern_water_snake_desc =>
+      'ثعبان بني سميك الجسم بأشرطة يتشمس على الصخور والأغصان فوق جداول شرق أمريكا الشمالية، غير سام لكنه سريع العض.';
+
+  @override
+  String get species_green_anaconda_name => 'الأناكوندا الخضراء';
+
+  @override
+  String get species_green_anaconda_desc =>
+      'أثقل ثعبان على وجه الأرض، عملاق زيتوني ببقع سوداء، يرقد مغموراً في مستنقعات الأمازون وأنهاره البطيئة.';
+
+  @override
+  String get species_hellbender_name => 'هلبندر';
+
+  @override
+  String get species_hellbender_desc =>
+      'سلمندر عملاق مسطح الرأس بطيات جلدية مجعدة، يختبئ تحت الصخور الكبيرة في أنهار الأبالاش الباردة الصافية.';
+
+  @override
+  String get species_mudpuppy_name => 'جرو الطين الشائع';
+
+  @override
+  String get species_mudpuppy_desc =>
+      'سلمندر بني مرقط يحتفظ بخياشيمه الحمراء الريشية طوال حياته، يزحف ليلاً فوق قيعان البحيرات والأنهار.';
+
+  @override
+  String get species_axolotl_name => 'سمندل المكسيك';
+
+  @override
+  String get species_axolotl_desc =>
+      'سلمندر مبتسم ذو خياشيم لا يغادر الماء أبداً، مهدد بالانقراض بشدة في قنوات خوتشيميلكو قرب مكسيكو سيتي.';
+
+  @override
+  String get species_chinese_giant_salamander_name => 'سمندل صيني عملاق';
+
+  @override
+  String get species_chinese_giant_salamander_desc =>
+      'أكبر برمائي حي، عملاق بني مجعد يبلغ طوله نحو مترين، يختبئ في جداول الجبال الباردة الصخرية.';
+
+  @override
+  String get species_smooth_newt_name => 'السمندل الأملس';
+
+  @override
+  String get species_smooth_newt_desc =>
+      'سمندل زيتوني صغير يعود إلى البرك كل ربيع، تنمو للذكور قمة متموجة وبطن برتقالي مرقط.';
+
+  @override
+  String get species_great_crested_newt_name => 'نيوط متوج كبير';
+
+  @override
+  String get species_great_crested_newt_desc =>
+      'سمندل أسود كبير ثؤلولي ببطن برتقالي ناري، تحمل الذكور في موسم التزاوج قمة مسننة تشبه التنين.';
+
+  @override
+  String get species_american_bullfrog_name => 'ضفدع الثور الأمريكي';
+
+  @override
+  String get species_american_bullfrog_desc =>
+      'ضفدع أخضر ضخم بنقيق جهير عميق، يجلس بين أوراق زنابق الماء في البرك الدافئة وأصبح غازياً في عدة قارات.';
+
+  @override
+  String get species_common_frog_name => 'الضفدع الشائع';
+
+  @override
+  String get species_common_frog_desc =>
+      'ضفدع بني بقناع عيني داكن يتجمع في حشود ربيعية صاخبة للتكاثر في البرك والخنادق الأوروبية.';
+
+  @override
+  String get species_north_american_river_otter_name =>
+      'قضاعة الأنهار الشمالية';
+
+  @override
+  String get species_north_american_river_otter_desc =>
+      'قضاعة رشيقة مرحة تصطاد الأسماك وجراد النهر في أنهار وبحيرات أمريكا الشمالية، تاركة منزلقات طينية على الضفاف.';
+
+  @override
+  String get species_eurasian_otter_name => 'قضاعة أوراسية';
+
+  @override
+  String get species_eurasian_otter_desc =>
+      'قضاعة بنية خجولة تعيش في أنهار وبحيرات وسواحل أوروبا، تتعافى في كامل نطاقها بعد عقود من التراجع.';
+
+  @override
+  String get species_giant_otter_name => 'قضاعة عملاقة';
+
+  @override
+  String get species_giant_otter_desc =>
+      'قضاعة يقارب طولها مترين ببقعة كريمية على الحلق، تعيش في مجموعات عائلية صاخبة على أنهار الأمازون وبحيراته الهلالية.';
+
+  @override
+  String get species_north_american_beaver_name => 'قندس أمريكي';
+
+  @override
+  String get species_north_american_beaver_desc =>
+      'قارض كبير مسطح الذيل يسد الجداول ليحولها إلى برك ويسبح تحت الجليد، ويتخذ من كوخ الأغصان مأوى.';
+
+  @override
+  String get species_eurasian_beaver_name => 'قندس أوراسي';
+
+  @override
+  String get species_eurasian_beaver_desc =>
+      'أكبر قوارض أوروبا، أعيد إدخاله في أنحاء القارة، يقطع أشجار ضفاف الأنهار ويبني السدود والأكواخ.';
+
+  @override
+  String get species_muskrat_name => 'فأر المسك';
+
+  @override
+  String get species_muskrat_desc =>
+      'قارض بني بحجم الجرذ بذيل حرشفي مفلطح، يسبح عبر مستنقعات البردي ويبني أكواخاً قبابية من القصب.';
+
+  @override
+  String get species_platypus_name => 'خلد الماء';
+
+  @override
+  String get species_platypus_desc =>
+      'ثديي بيوض بمنقار بط وأقدام مكففة، يبحث عن الطعام مغمض العينين على طول جداول شرق أستراليا عند الفجر والغسق.';
+
+  @override
+  String get species_amazonian_manatee_name => 'خروف البحر الأمازوني';
+
+  @override
+  String get species_amazonian_manatee_desc =>
+      'أصغر أنواع خراف البحر، عاشب أملس داكن ببقعة بيضاء على الصدر، يرعى النباتات المائية في بحيرات الأمازون وأنهاره.';
+
+  @override
+  String get species_amazon_river_dolphin_name => 'دلفين الأمازون';
+
+  @override
+  String get species_amazon_river_dolphin_desc =>
+      'دلفين وردي طويل المنقار بعنق مرن، يتلوى بين جذوع الغابة المغمورة في الأمازون والأورينوكو.';
+
+  @override
+  String get species_baikal_seal_name => 'فقمة بايكال';
+
+  @override
+  String get species_baikal_seal_desc =>
+      'الفقمة الوحيدة في المياه العذبة في العالم، فقمة صغيرة رمادية فضية تستلقي على جليد بحيرة بايكال وشواطئها الصخرية.';
+
+  @override
+  String get species_capybara_name => 'خنزير الماء';
+
+  @override
+  String get species_capybara_desc =>
+      'أكبر القوارض، عاشب برميلي الشكل يخوض ويسبح في أنهار أمريكا الجنوبية وأراضيها الرطبة في قطعان هادئة.';
+
+  @override
+  String get species_hippopotamus_name => 'فرس النهر';
+
+  @override
+  String get species_hippopotamus_desc =>
+      'عملاق نهري أفريقي ضخم يقضي النهار مغموراً في مجموعات ويمشي على القاع بدلاً من السباحة؛ الاقتراب منه خطير.';
+
+  @override
+  String get species_white_water_lily_name => 'زنبق الماء الأبيض';
+
+  @override
+  String get species_white_water_lily_desc =>
+      'أوراق مستديرة طافية وأزهار بيضاء كبيرة تنبثق من جذامير سميكة متجذرة في طين المياه الراكدة الأوروبية.';
+
+  @override
+  String get species_yellow_pond_lily_name => 'زنبق الماء الأصفر';
+
+  @override
+  String get species_yellow_pond_lily_desc =>
+      'أوراق طافية قلبية الشكل وأزهار صفراء كأسية، مع أوراق كبيرة شفافة تحت الماء يراها الغواصون من الأسفل.';
+
+  @override
+  String get species_american_eelgrass_name => 'الفاليسنيريا الأمريكية';
+
+  @override
+  String get species_american_eelgrass_desc =>
+      'أوراق شريطية يصل طولها إلى مترين تتمايل في تيار الأنهار والينابيع الصافية، مفضلة لدى خراف البحر.';
+
+  @override
+  String get species_coontail_name => 'شمبلان مغمور';
+
+  @override
+  String get species_coontail_desc =>
+      'نبات مغمور بلا جذور بحلقات من أوراق صلبة متشعبة تشبه ذيل الراكون، ينجرف في كتل كثيفة في المياه الساكنة.';
+
+  @override
+  String get species_eurasian_watermilfoil_name => 'عديد الورق الأوراسي';
+
+  @override
+  String get species_eurasian_watermilfoil_desc =>
+      'نبات مغمور ريشي بحلقات من أوراق دقيقة التقسيم يشكل حصائر كثيفة قرب السطح، غازٍ في كثير من البحيرات.';
+
+  @override
+  String get species_muskgrass_name => 'الخارا';
+
+  @override
+  String get species_muskgrass_desc =>
+      'طحلب أخضر هش برائحة المسك وفروع حلقية، غالباً مغطى بقشرة كلسية، يفرش قاع البحيرات الصافية ذات المياه العسرة.';
+
+  @override
+  String get species_canadian_waterweed_name => 'الإيلوديا الكندية';
+
+  @override
+  String get species_canadian_waterweed_desc =>
+      'نبات مغمور كثيف بحلقات من ثلاث أوراق صغيرة خضراء داكنة، ينتشر بالشظايا في البحيرات والقنوات الباردة حول العالم.';
+
+  @override
+  String get species_curly_leaf_pondweed_name => 'عشب البرك مجعد الأوراق';
+
+  @override
+  String get species_curly_leaf_pondweed_desc =>
+      'نبات مغمور بأوراق خضراء محمرة متموجة الحواف تشبه اللازانيا المجعدة، ينمو مبكراً في الربيع قبل الأعشاب الأخرى.';
+
+  @override
+  String get species_water_hyacinth_name => 'ورد النيل سميك الساق';
+
+  @override
+  String get species_water_hyacinth_desc =>
+      'نبات طافٍ بأوراق لامعة على سيقان مملوءة بالهواء وسنابل من أزهار بنفسجية فاتحة، يخنق الممرات المائية الدافئة حول العالم.';
+
+  @override
+  String get species_common_reed_name => 'قيصوب جنوبي';
+
+  @override
+  String get species_common_reed_desc =>
+      'عشب طويل بعناقيد ريشية يشكل أحراشاً كثيفة على شواطئ البحيرات، وتؤوي سيقانه المغمورة صغار الأسماك ويرقات اليعسوب.';
+
+  @override
   String get common_action_done => 'تم';
 
   @override
