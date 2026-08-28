@@ -5356,7 +5356,10 @@ class DiveRepository {
     List<String> typeIds,
     int now,
   ) async {
-    // A set literal is insertion-ordered, so this keeps first occurrences.
+    // `Iterable.toSet()` builds a LinkedHashSet, which iterates in insertion
+    // order, so this keeps the FIRST occurrence of each id. That ordering is
+    // load-bearing, not incidental: the first row written becomes the dive's
+    // representative type. Do not swap in an unordered Set implementation.
     final deduped = typeIds.toSet().toList();
     final types = deduped.isEmpty ? const ['recreational'] : deduped;
     final existing = await (_db.select(
