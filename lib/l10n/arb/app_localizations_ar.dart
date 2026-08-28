@@ -5864,6 +5864,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -7476,6 +7479,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_gtr => 'GTR';
 
   @override
   String get diveLog_sources_row_metric => 'المقياس';
@@ -10141,6 +10147,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => 'تدفق كتلة ثابت';
@@ -14993,6 +15005,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (الوقت إلى السطح)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (الوقت المتبقي للغاز)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (سمية الأكسجين)';
@@ -31194,6 +31209,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_decompression_ttsSource => 'مصدر TTS';
 
   @override
+  String get settings_decompression_gtrSource => 'مصدر GTR';
+
+  @override
+  String get settings_decompression_gtrReserve => 'ضغط احتياطي GTR';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'ضغط الأسطوانة الذي يعد الوقت المتبقي للغاز تنازلياً إليه. يفترض GTR المحسوب صعوداً مباشراً بسرعة 10 م/دقيقة دون توقفات.';
+
+  @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -33199,6 +33224,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'لم تتم استعادة أي شيء: تعذر العثور على ملف النسخة الاحتياطية. بياناتك الحالية لم تتغير.';
+
+  @override
   String get backup_operation_deleting => 'جارٍ حذف النسخة الاحتياطية...';
 
   @override
@@ -33385,6 +33414,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_cloudSync_result_replacementStillUploading =>
       'لا يزال رفع المكتبة المستبدَلة جاريًا. حاول مرة أخرى بعد قليل.';
+
+  @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'تم نشر مكتبة السحابة بواسطة إصدار أحدث من Submersion. حدِّث هذا الجهاز ثم حاول مرة أخرى.';
 
   @override
   String settings_cloudSync_result_recordsFailed(int count) {

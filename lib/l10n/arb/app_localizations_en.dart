@@ -5878,6 +5878,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -7490,6 +7493,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_gtr => 'GTR';
 
   @override
   String get diveLog_sources_row_metric => 'Metric';
@@ -10159,6 +10165,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => 'Constant Mass Flow';
@@ -15014,6 +15026,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (Time to Surface)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (Gas Time Remaining)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (O2 Toxicity)';
@@ -31149,6 +31164,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_decompression_ttsSource => 'TTS Source';
 
   @override
+  String get settings_decompression_gtrSource => 'GTR Source';
+
+  @override
+  String get settings_decompression_gtrReserve => 'GTR reserve pressure';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'Tank pressure the gas time remaining counts down to. The calculated GTR assumes a direct ascent at 10 m/min with no stops.';
+
+  @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -33016,6 +33041,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Nothing was restored: the backup file could not be found. Your current data is unchanged.';
+
+  @override
   String get backup_operation_deleting => 'Deleting backup...';
 
   @override
@@ -33194,6 +33223,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_cloudSync_result_replacementStillUploading =>
       'The replaced library is still uploading. Try again shortly.';
+
+  @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'The cloud library was published by a newer version of Submersion. Update this device, then try again.';
 
   @override
   String settings_cloudSync_result_recordsFailed(int count) {

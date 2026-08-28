@@ -5690,6 +5690,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => '潜水电脑';
 
   @override
@@ -7258,6 +7261,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_gtr => 'GTR';
 
   @override
   String get diveLog_sources_row_metric => '指标';
@@ -9846,6 +9852,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => '剩余气体时间';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => '恒定质量流';
@@ -14517,6 +14529,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => '到达水面时间';
+
+  @override
+  String get settings_appearance_metric_gtr => '剩余气体时间 (GTR)';
 
   @override
   String get settings_appearance_metric_cns => '中枢神经系统% (O2 毒性)';
@@ -29854,6 +29869,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_decompression_ttsSource => 'TTS 来源';
 
   @override
+  String get settings_decompression_gtrSource => 'GTR 来源';
+
+  @override
+  String get settings_decompression_gtrReserve => 'GTR 储备压力';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      '剩余气体时间倒计时到的气瓶压力。计算的 GTR 假设以 10 米/分钟直接上升且不停留。';
+
+  @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -31600,6 +31625,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      '未恢复任何内容：找不到备份文件。当前数据未发生变化。';
+
+  @override
   String get backup_operation_deleting => '正在删除备份...';
 
   @override
@@ -31767,6 +31796,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_cloudSync_result_replacementStillUploading =>
       '被替换的资料库仍在上传中。请稍后重试。';
+
+  @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      '云端资料库由较新版本的 Submersion 发布。请更新此设备后重试。';
 
   @override
   String settings_cloudSync_result_recordsFailed(int count) {

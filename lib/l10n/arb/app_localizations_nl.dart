@@ -5942,6 +5942,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -7569,6 +7572,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_gtr => 'GTR';
 
   @override
   String get diveLog_sources_row_metric => 'Meting';
@@ -10245,6 +10251,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => 'Constant massadebiet';
@@ -15146,6 +15158,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (Tijd tot oppervlak)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (Resterende gastijd)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (O2-toxiciteit)';
@@ -31391,6 +31406,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_decompression_ttsSource => 'TTS-bron';
 
   @override
+  String get settings_decompression_gtrSource => 'GTR-bron';
+
+  @override
+  String get settings_decompression_gtrReserve => 'GTR-reservedruk';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'Flesdruk waarnaar de resterende gastijd aftelt. De berekende GTR gaat uit van een directe opstijging met 10 m/min zonder stops.';
+
+  @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -33307,6 +33332,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Er is niets hersteld: het back-upbestand is niet gevonden. Uw huidige gegevens zijn ongewijzigd.';
+
+  @override
   String get backup_operation_deleting => 'Back-up verwijderen...';
 
   @override
@@ -33489,6 +33518,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_cloudSync_result_replacementStillUploading =>
       'De vervangen bibliotheek wordt nog geüpload. Probeer het zo meteen opnieuw.';
+
+  @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'De cloudbibliotheek is gepubliceerd door een nieuwere versie van Submersion. Werk dit apparaat bij en probeer het daarna opnieuw.';
 
   @override
   String settings_cloudSync_result_recordsFailed(int count) {

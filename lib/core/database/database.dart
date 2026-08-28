@@ -1783,6 +1783,11 @@ class DiverSettings extends Table {
       integer().withDefault(const Constant(1))();
   IntColumn get defaultTtsSource => integer().withDefault(const Constant(1))();
   IntColumn get defaultCnsSource => integer().withDefault(const Constant(1))();
+  // Gas time remaining on the profile chart (v177). Source is a
+  // MetricDataSource index: 0 = computer, 1 = calculated. Reserve is bar.
+  IntColumn get defaultGtrSource => integer().withDefault(const Constant(1))();
+  RealColumn get gtrReservePressure =>
+      real().withDefault(const Constant(50.0))();
   // CNS calculation method: 'classic' | 'shearwater' | 'subsurface' (v113)
   TextColumn get cnsCalculationMethod =>
       text().withDefault(const Constant('shearwater'))();
@@ -1880,6 +1885,8 @@ class DiverSettings extends Table {
   BoolColumn get defaultShowMeanDepth =>
       boolean().withDefault(const Constant(false))();
   BoolColumn get defaultShowTts =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get defaultShowGtr =>
       boolean().withDefault(const Constant(false))();
   BoolColumn get defaultShowCns =>
       boolean().withDefault(const Constant(false))();
@@ -3292,7 +3299,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 176;
+  static const int currentSchemaVersion = 179;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3653,14 +3660,19 @@ class AppDatabase extends _$AppDatabase {
     // comment already reserves for it. 169 is now permanently skipped, as are
     // 162 and 167.
     175,
-    // v176: dives.site_suggestion_dismissed_at, the synced per-dive dismissal
-    // of the photo / dive-computer site suggestion. Renumbered from 172 when
-    // main landed 173, 174 and 175 past it while this branch was open: a rung
-    // below the shipped version never runs its onUpgrade step, so a database
-    // already at 175 would never gain the column through the ladder (the
-    // beforeOpen backstop would be its only route). 162, 167 and 169 remain
-    // permanently skipped; this ladder is non-contiguous by design.
-    176,
+    // v177: GTR settings on diver_settings and the dive_profiles.rbt
+    // minutes-to-seconds repair.
+    177,
+    // v179: dives.site_suggestion_dismissed_at, the synced per-dive dismissal
+    // of the photo / dive-computer site suggestion. Renumbered twice while
+    // this branch was open -- from 172 when main landed 173-175, then from
+    // 176 when main landed 177 (GTR) -- because a rung below the shipped
+    // version never runs its onUpgrade step: a database already at 177 would
+    // gain the column only through the beforeOpen backstop. 178 belongs to
+    // the open dive-type uniqueness work, so this takes the next free rung.
+    // 162, 167, 169 and 178 are skipped here; the ladder is non-contiguous
+    // by design.
+    179,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -5212,7 +5224,7 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  /// v176: site_suggestion_dismissed_at on dives. Null means the site
+  /// v179: site_suggestion_dismissed_at on dives. Null means the site
   /// suggestion (from photo GPS or dive-computer GPS) was never dismissed.
   Future<void> _assertSiteSuggestionDismissedAtColumn() async {
     final cols = await customSelect("PRAGMA table_info('dives')").get();
@@ -5241,6 +5253,60 @@ class AppDatabase extends _$AppDatabase {
         'CHECK (default_show_o2_cell_mv IN (0, 1))',
       );
     }
+  }
+
+  /// v177: the GTR (gas time remaining) settings on diver_settings: default
+  /// visibility, computer-vs-calculated source, and the reserve pressure
+  /// (bar) the calculated value counts down to.
+  Future<void> _assertGtrSettingsColumns() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('default_show_gtr')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN default_show_gtr '
+        'INTEGER NOT NULL DEFAULT 0 '
+        'CHECK (default_show_gtr IN (0, 1))',
+      );
+    }
+    if (!names.contains('default_gtr_source')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN default_gtr_source '
+        'INTEGER NOT NULL DEFAULT 1',
+      );
+    }
+    if (!names.contains('gtr_reserve_pressure')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN gtr_reserve_pressure '
+        'REAL NOT NULL DEFAULT 50.0',
+      );
+    }
+  }
+
+  /// v177: dive_profiles.rbt is documented in seconds, and the Subsurface and
+  /// UDDF importers store seconds, but libdivecomputer reports RBT/GTR in
+  /// minutes and every libdc path (download, reparse, raw-log import) wrote
+  /// the raw value. Rows that came through libdc on a download, reparse or
+  /// raw-log import carry raw bytes on their data source, so scale only
+  /// them. Shearwater Cloud and MacDive imports also parse through libdc but
+  /// persist no raw bytes and no format marker, so their existing rbt rows
+  /// cannot be told apart from file imports here; re-importing them writes
+  /// seconds.
+  Future<void> _scaleLibdcRbtMinutesToSeconds() async {
+    final tables = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type = 'table' "
+      "AND name IN ('dive_profiles', 'dive_data_sources')",
+    ).get();
+    if (tables.length < 2) return;
+    final cols = await customSelect("PRAGMA table_info('dive_profiles')").get();
+    if (!cols.any((c) => c.read<String>('name') == 'rbt')) return;
+    await customStatement(
+      'UPDATE dive_profiles SET rbt = rbt * 60 '
+      'WHERE rbt IS NOT NULL AND dive_id IN '
+      '(SELECT dive_id FROM dive_data_sources WHERE raw_data IS NOT NULL)',
+    );
   }
 
   /// v163: default_show_estimated_tank_pressure on diver_settings (issue
@@ -9097,11 +9163,19 @@ class AppDatabase extends _$AppDatabase {
           await backfillDiveComputerGearTwins(this);
         }
         if (from < 175) await reportProgress();
-        // v176: dives.site_suggestion_dismissed_at (site suggestion dismissal).
-        if (from < 176) {
+        // v177: GTR (gas time remaining) settings on diver_settings, and a
+        // one-time repair of dive_profiles.rbt for rows that came through
+        // libdivecomputer, which reports minutes into a seconds column.
+        if (from < 177) {
+          await _assertGtrSettingsColumns();
+          await _scaleLibdcRbtMinutesToSeconds();
+        }
+        if (from < 177) await reportProgress();
+        // v179: dives.site_suggestion_dismissed_at (site suggestion dismissal).
+        if (from < 179) {
           await _assertSiteSuggestionDismissedAtColumn();
         }
-        if (from < 176) await reportProgress();
+        if (from < 179) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9296,12 +9370,17 @@ class AppDatabase extends _$AppDatabase {
         // (issue #1235; same parallel-branch version-collision self-heal).
         await _assertO2CellMvDefaultColumn();
 
+        // v177 backstop: re-assert the GTR settings columns (same
+        // parallel-branch version-collision self-heal). The rbt repair is
+        // deliberately NOT re-run here: it is a one-shot data fix.
+        await _assertGtrSettingsColumns();
+
         // v163 backstop: re-assert
         // diver_settings.default_show_estimated_tank_pressure (issue #731;
         // same parallel-branch version-collision self-heal).
         await _assertEstimatedTankPressureDefaultColumn();
 
-        // v176 backstop: re-assert dives.site_suggestion_dismissed_at (same
+        // v179 backstop: re-assert dives.site_suggestion_dismissed_at (same
         // parallel-branch version-collision self-heal).
         await _assertSiteSuggestionDismissedAtColumn();
 

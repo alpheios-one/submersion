@@ -7,7 +7,13 @@ import 'package:submersion/features/trips/domain/entities/trip_story_day.dart';
 /// One trip day that needs a weather lookup, with the coordinates to look it
 /// up at.
 class TripDayWeatherTarget extends Equatable {
-  /// Local midnight for the day.
+  /// The day to look up, at local midnight.
+  ///
+  /// Local is right here and irrelevant to identity: [localNoon] reads the
+  /// calendar fields to ask the archive for that day's noon at the dive site,
+  /// and the storage key is derived separately by `tripDayMillis`, which
+  /// takes the same calendar fields and pins them to UTC. Nothing keys a
+  /// stored row off this instant.
   final DateTime date;
   final double latitude;
   final double longitude;

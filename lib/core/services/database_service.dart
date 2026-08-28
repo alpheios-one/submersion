@@ -16,6 +16,7 @@ import 'package:submersion/core/database/sqlcipher_setup.dart'
     as sqlcipher_setup;
 import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/restore_source_missing_exception.dart';
 import 'package:submersion/core/services/security/database_encryption_migrator.dart';
 import 'package:submersion/core/services/security/database_locked_exception.dart';
 import 'package:submersion/core/services/security/database_security_sidecar.dart';
@@ -733,6 +734,10 @@ class DatabaseService {
   /// [onMigrationProgress] is forwarded to the post-swap [initialize]: when
   /// the restored file carries an older schema, the reopen runs the upgrade
   /// ladder, and this callback is the only feedback the user gets during it.
+  ///
+  /// Throws [RestoreSourceMissingException] when [backupPath] does not exist.
+  /// The live database is left open and untouched in that case; the throw is
+  /// what lets callers tell "nothing happened" from a completed restore.
   Future<void> restore(
     String backupPath, {
     void Function(int currentStep, int totalSteps)? onMigrationProgress,
@@ -745,12 +750,22 @@ class DatabaseService {
     // effective no-op that still opened a needless "database unavailable"
     // window — during which a provider rebuild caches a fatal
     // "Database not initialized" error.
+    //
+    // Leaving the data alone is right; returning normally was not. Every
+    // caller treated the void return as a completed restore and showed
+    // "Restore Complete", so a user recovering from data loss could not tell a
+    // restore that did nothing from a restore of an empty library (issue
+    // #1344). The absence is reported as a typed failure instead.
     if (!await backupFile.exists()) {
       // Still sweep any temp files a prior restore may have stranded (e.g. a
       // large .pre-restore copy left by a best-effort cleanup that failed), so
       // they don't accumulate on disk. Best-effort; the live DB is untouched.
       await _sweepRestoreTempFiles(destinationPath);
-      return;
+      _log.warning(
+        'Restore source not found at $backupPath; the live database was left '
+        'untouched',
+      );
+      throw RestoreSourceMissingException(backupPath);
     }
 
     // Copy the backup to a staging file NEXT TO the destination while the live

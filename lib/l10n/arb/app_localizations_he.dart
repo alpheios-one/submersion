@@ -5833,6 +5833,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -7436,6 +7439,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_gtr => 'GTR';
 
   @override
   String get diveLog_sources_row_metric => 'מדד';
@@ -10081,6 +10087,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => 'זרימת מסה קבועה';
@@ -14890,6 +14902,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (זמן לשטח)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (זמן גז שנותר)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (רעילות חמצן)';
@@ -30950,6 +30965,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_decompression_ttsSource => 'מקור TTS';
 
   @override
+  String get settings_decompression_gtrSource => 'מקור GTR';
+
+  @override
+  String get settings_decompression_gtrReserve => 'לחץ רזרבה GTR';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'לחץ המיכל שאליו זמן הגז שנותר סופר לאחור. ה-GTR המחושב מניח עלייה ישירה בקצב 10 מ׳/דקה ללא עצירות.';
+
+  @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -32862,6 +32887,10 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'לא שוחזר דבר: קובץ הגיבוי לא נמצא. הנתונים הנוכחיים שלך לא השתנו.';
+
+  @override
   String get backup_operation_deleting => 'מוחק גיבוי...';
 
   @override
@@ -33042,6 +33071,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_cloudSync_result_replacementStillUploading =>
       'הספרייה שהוחלפה עדיין בהעלאה. נסה שוב בעוד רגע.';
+
+  @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'ספריית הענן פורסמה על ידי גרסה חדשה יותר של Submersion. עדכן מכשיר זה ונסה שוב.';
 
   @override
   String settings_cloudSync_result_recordsFailed(int count) {

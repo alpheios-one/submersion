@@ -2,8 +2,8 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 
-/// Minimal pre-v176 shape: a dives table without the dismissal column,
-/// stamped at v175 so the 175 to 176 upgrade runs.
+/// Minimal pre-v179 shape: a dives table without the dismissal column,
+/// stamped at v175 so the ladder runs up through the 179 rung.
 NativeDatabase _dbAt175() {
   return NativeDatabase.memory(
     setup: (rawDb) {
@@ -25,7 +25,7 @@ NativeDatabase _dbAt175() {
 }
 
 void main() {
-  test('v176 adds site_suggestion_dismissed_at defaulting to NULL', () async {
+  test('v179 adds site_suggestion_dismissed_at defaulting to NULL', () async {
     final db = AppDatabase(_dbAt175());
     addTearDown(() => db.close());
 
@@ -56,8 +56,8 @@ void main() {
     await expectLater(db.customSelect('SELECT 1').get(), completes);
   });
 
-  test('v176 is present in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(176));
-    expect(AppDatabase.migrationVersions, contains(176));
+  test('v179 is present in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(179));
+    expect(AppDatabase.migrationVersions, contains(179));
   });
 }
