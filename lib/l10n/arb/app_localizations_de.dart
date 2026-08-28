@@ -8106,6 +8106,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => 'Schwierigkeitsgrad';
 
   @override
+  String get diveSites_detail_section_diveStatistics => 'Tauchstatistik';
+
+  @override
   String get diveSites_detail_section_divesAtSite =>
       'Tauchgänge an diesem Platz';
 
@@ -8120,6 +8123,28 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => 'Bewertung';
+
+  @override
+  String get diveSites_detail_stats_avgDuration =>
+      'Durchschnittliche Tauchzeit';
+
+  @override
+  String get diveSites_detail_stats_firstDive => 'Erster Tauchgang';
+
+  @override
+  String get diveSites_detail_stats_lastDive => 'Letzter Tauchgang';
+
+  @override
+  String get diveSites_detail_stats_longestDive => 'Längster Tauchgang';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => 'Tiefster Tauchgang';
+
+  @override
+  String get diveSites_detail_stats_minDepth => 'Flachster Tauchgang';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => 'Nicht verfügbar';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {

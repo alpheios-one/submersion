@@ -10,6 +10,7 @@ import 'package:submersion/core/utils/gas_compressibility.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
+import 'package:submersion/features/dive_sites/domain/entities/site_dive_statistics.dart';
 import 'package:submersion/features/statistics/data/dive_filter_sql.dart';
 import 'package:submersion/features/statistics/domain/entities/species_statistics.dart';
 
@@ -1330,6 +1331,70 @@ class StatisticsRepository {
         stackTrace: stackTrace,
       );
       return [];
+    }
+  }
+
+  /// Auto-computed dive statistics for a single site (submersion-app/submersion#1018,
+  /// #1038): dive count, depth range, duration range/average, and first/last
+  /// dive dates, aggregated over the dives actually logged at [siteId].
+  ///
+  /// Duration is approximated as `COALESCE(runtime, bottom_time)`, a
+  /// deliberate simplification of [Dive.effectiveRuntime]'s 4-step fallback
+  /// chain: the entry/exit-time-difference and profile-derived steps cannot
+  /// be expressed in SQL, so dives that only carry those will slightly
+  /// undercount the duration stats.
+  ///
+  /// Returns [SiteDiveStatistics.empty] (diveCount 0, all other fields null)
+  /// when the site has no matching dives, or on error.
+  Future<SiteDiveStatistics> getSiteDiveStatistics({
+    required String siteId,
+    String? diverId,
+  }) async {
+    try {
+      final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
+      final params = diverId != null ? [siteId, diverId] : [siteId];
+
+      final result = await _db.customSelect('''
+        SELECT
+          COUNT(*) AS dive_count,
+          MAX(max_depth) AS max_depth_reached,
+          MIN(max_depth) AS min_depth_reached,
+          MAX(COALESCE(runtime, bottom_time)) AS longest_dive_seconds,
+          AVG(COALESCE(runtime, bottom_time)) AS average_duration_seconds,
+          MIN(dive_date_time) AS first_dive_at,
+          MAX(dive_date_time) AS last_dive_at
+        FROM dives
+        WHERE site_id = ? $diverFilter
+        ''', variables: params.map((p) => Variable(p)).toList()).getSingle();
+
+      final diveCount = result.read<int>('dive_count');
+      if (diveCount == 0) return SiteDiveStatistics.empty;
+
+      final firstDiveMs = result.read<int?>('first_dive_at');
+      final lastDiveMs = result.read<int?>('last_dive_at');
+
+      return SiteDiveStatistics(
+        diveCount: diveCount,
+        maxDepthReached: result.read<double?>('max_depth_reached'),
+        minDepthReached: result.read<double?>('min_depth_reached'),
+        longestDiveSeconds: result.read<int?>('longest_dive_seconds'),
+        averageDurationSeconds: result.read<double?>(
+          'average_duration_seconds',
+        ),
+        firstDiveAt: firstDiveMs != null
+            ? DateTime.fromMillisecondsSinceEpoch(firstDiveMs)
+            : null,
+        lastDiveAt: lastDiveMs != null
+            ? DateTime.fromMillisecondsSinceEpoch(lastDiveMs)
+            : null,
+      );
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get dive statistics for site: $siteId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return SiteDiveStatistics.empty;
     }
   }
 

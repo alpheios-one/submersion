@@ -7728,6 +7728,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => '难度等级';
 
   @override
+  String get diveSites_detail_section_diveStatistics => '潜水统计';
+
+  @override
   String get diveSites_detail_section_divesAtSite => '此潜水点的潜水记录';
 
   @override
@@ -7741,6 +7744,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => '评分';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => '平均时长';
+
+  @override
+  String get diveSites_detail_stats_firstDive => '首次潜水';
+
+  @override
+  String get diveSites_detail_stats_lastDive => '最近潜水';
+
+  @override
+  String get diveSites_detail_stats_longestDive => '最长潜水';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => '最深潜水';
+
+  @override
+  String get diveSites_detail_stats_minDepth => '最浅潜水';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => '不可用';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {

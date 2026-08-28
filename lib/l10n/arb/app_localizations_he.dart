@@ -7912,6 +7912,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => 'רמת קושי';
 
   @override
+  String get diveSites_detail_section_diveStatistics => 'סטטיסטיקת צלילה';
+
+  @override
   String get diveSites_detail_section_divesAtSite => 'צלילות באתר זה';
 
   @override
@@ -7925,6 +7928,27 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => 'דירוג';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => 'משך ממוצע';
+
+  @override
+  String get diveSites_detail_stats_firstDive => 'צלילה ראשונה';
+
+  @override
+  String get diveSites_detail_stats_lastDive => 'צלילה אחרונה';
+
+  @override
+  String get diveSites_detail_stats_longestDive => 'הצלילה הארוכה ביותר';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => 'הצלילה העמוקה ביותר';
+
+  @override
+  String get diveSites_detail_stats_minDepth => 'הצלילה הרדודה ביותר';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => 'לא זמין';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
