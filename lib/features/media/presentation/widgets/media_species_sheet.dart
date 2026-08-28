@@ -136,11 +136,20 @@ class MediaSpeciesSheet extends ConsumerWidget {
         expand: false,
         builder: (_, controller) => SpeciesPickerSheet(
           scrollController: controller,
-          onSpeciesSelected: (species, count, notes) {
+          onSpeciesSelected: (species, count, notes) async {
             Navigator.of(sheetContext).pop();
-            ref
-                .read(speciesTaggingServiceProvider)
-                .tagPhoto(mediaId: item.id, speciesId: species.id);
+            try {
+              await ref
+                  .read(speciesTaggingServiceProvider)
+                  .tagPhoto(mediaId: item.id, speciesId: species.id);
+            } catch (_) {
+              // The picker is gone by now; tell the diver the tag did not
+              // stick instead of failing silently.
+              if (!context.mounted) return;
+              ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+                SnackBar(content: Text(context.l10n.common_error_tryAgain)),
+              );
+            }
           },
         ),
       ),
