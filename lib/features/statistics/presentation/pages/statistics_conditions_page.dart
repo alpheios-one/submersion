@@ -7,8 +7,10 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/statistics/data/repositories/statistics_repository.dart';
 import 'package:submersion/features/statistics/presentation/formatters/distribution_labels.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
+import 'package:submersion/features/statistics/presentation/providers/trend_chart_settings_provider.dart';
 import 'package:submersion/features/statistics/presentation/widgets/stat_charts.dart';
 import 'package:submersion/features/statistics/presentation/widgets/stat_section_card.dart';
+import 'package:submersion/features/statistics/presentation/widgets/trend_chart_section.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 class StatisticsConditionsPage extends ConsumerWidget {
@@ -31,6 +33,8 @@ class StatisticsConditionsPage extends ConsumerWidget {
           _buildWaterTypeSection(context, ref),
           const SizedBox(height: 16),
           _buildEntryMethodSection(context, ref),
+          const SizedBox(height: 16),
+          _buildTemperatureTrendSection(context, ref, units),
           const SizedBox(height: 16),
           _buildTemperatureSection(context, ref, units),
         ],
@@ -187,6 +191,29 @@ class StatisticsConditionsPage extends ConsumerWidget {
           message: context.l10n.statistics_conditions_entryMethod_error,
         ),
       ),
+    );
+  }
+
+  /// Water temperature as a time series, one point per dive.
+  ///
+  /// The sibling seasonal chart collapses every year into twelve calendar
+  /// buckets, which is meaningful for a diver with one home region and
+  /// meaningless for one who travels between cold and warm water (issue #299).
+  /// Both are kept because both readings are legitimate.
+  Widget _buildTemperatureTrendSection(
+    BuildContext context,
+    WidgetRef ref,
+    UnitFormatter units,
+  ) {
+    return TrendChartSection(
+      chartId: TrendChartIds.waterTemp,
+      title: context.l10n.statistics_conditions_tempTrend_title,
+      subtitle: context.l10n.statistics_conditions_tempTrend_subtitle,
+      pointsAsync: ref.watch(waterTempTrendProvider),
+      errorMessage: context.l10n.statistics_conditions_tempTrend_error,
+      lineColor: Colors.teal,
+      valueFormatter: (value) => units.formatTemperature(value),
+      rateFormatter: (value) => units.formatTemperature(value),
     );
   }
 
