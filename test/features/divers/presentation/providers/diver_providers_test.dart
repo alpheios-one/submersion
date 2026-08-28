@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -23,6 +25,46 @@ Diver _makeDiver({
     createdAt: now,
     updatedAt: now,
   );
+}
+
+/// A [SharedPreferences] that holds its FIRST `setString` open until [release]
+/// completes, then forwards it. Every later call forwards at once, so a write
+/// issued while the first one is in flight lands BEFORE it: the ordering that
+/// lets a validation write clobber a user's diver switch. [forwarded] records
+/// every value that reached the real store, in order, so a test can wait for
+/// the held write to land instead of racing it.
+class _GatedPrefs implements SharedPreferences {
+  _GatedPrefs(this._inner);
+
+  final SharedPreferences _inner;
+  final firstWriteStarted = Completer<void>();
+  final release = Completer<void>();
+  final forwarded = <String>[];
+  bool _gateArmed = true;
+
+  @override
+  Future<bool> setString(String key, String value) async {
+    if (_gateArmed) {
+      _gateArmed = false;
+      firstWriteStarted.complete();
+      await release.future;
+    }
+    final ok = await _inner.setString(key, value);
+    forwarded.add(value);
+    return ok;
+  }
+
+  @override
+  String? getString(String key) => _inner.getString(key);
+
+  @override
+  Future<bool> remove(String key) => _inner.remove(key);
+
+  @override
+  bool containsKey(String key) => _inner.containsKey(key);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 /// Polls [condition] every 10ms for up to a second.
@@ -374,6 +416,51 @@ void main() {
 
       expect(container.read(currentDiverIdProvider), equals(survivor.id));
       expect(prefs.getString(currentDiverIdKey), equals(survivor.id));
+    });
+
+    test('a diver switch made while the validation write is in flight wins in '
+        'prefs as well as in state', () async {
+      final fallback = await repo.createDiver(
+        _makeDiver(name: 'Default', isDefault: true),
+      );
+      final chosen = await repo.createDiver(_makeDiver(name: 'Chosen'));
+      await prefs.setString(currentDiverIdKey, 'ghost');
+      final gated = _GatedPrefs(prefs);
+
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(gated)],
+      );
+      addTearDown(container.dispose);
+      final notifier = container.read(currentDiverIdProvider.notifier);
+
+      // Validation resolves the default diver and starts persisting it; the
+      // gate holds that write open.
+      await gated.firstWriteStarted.future.timeout(const Duration(seconds: 2));
+      expect(container.read(currentDiverIdProvider), equals('ghost'));
+
+      // The user switches while that write is in flight. Their write goes
+      // straight through, so the validation's write lands after it.
+      await notifier.setCurrentDiver(chosen.id);
+      expect(gated.forwarded, equals([chosen.id]));
+      gated.release.complete();
+
+      // Wait for the held write to land (it clobbers prefs) and for the
+      // notifier's reconcile to put the chosen id back.
+      await _pollUntil(
+        () =>
+            gated.forwarded.contains(fallback.id) &&
+            prefs.getString(currentDiverIdKey) == chosen.id,
+      );
+      expect(gated.forwarded, contains(fallback.id));
+
+      expect(container.read(currentDiverIdProvider), equals(chosen.id));
+      expect(
+        prefs.getString(currentDiverIdKey),
+        equals(chosen.id),
+        reason:
+            'the validation write for ${fallback.id} landed after the '
+            'switch and must not be what prefs keeps',
+      );
     });
 
     test(

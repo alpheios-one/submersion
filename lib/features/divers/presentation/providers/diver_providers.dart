@@ -199,14 +199,20 @@ class CurrentDiverIdNotifier extends StateNotifier<String?> {
             'Active diver id $startedFrom matches no diver and none can be '
             'resolved; clearing it',
           );
-          await _prefs.remove(currentDiverIdKey);
         } else {
           _activeDiverLog.info(
             'Active diver id resolved to $resolvedId (was $startedFrom)',
           );
-          await _prefs.setString(currentDiverIdKey, resolvedId);
         }
-        if (!mounted || state != startedFrom) return;
+        await _persist(resolvedId);
+        if (!mounted) return;
+        if (state != startedFrom) {
+          // The user switched diver while that write was in flight, and
+          // their own write may have landed first. Re-persist the newer state
+          // so prefs do not keep the answer computed for the old one.
+          await _persist(state);
+          return;
+        }
         state = resolvedId;
       }
 
@@ -230,6 +236,10 @@ class CurrentDiverIdNotifier extends StateNotifier<String?> {
       );
     }
   }
+
+  Future<void> _persist(String? id) => id == null
+      ? _prefs.remove(currentDiverIdKey)
+      : _prefs.setString(currentDiverIdKey, id);
 
   Future<void> setCurrentDiver(String diverId) async {
     await _prefs.setString(currentDiverIdKey, diverId);
