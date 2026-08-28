@@ -162,6 +162,9 @@ class TheDiveSection extends StatelessWidget {
             label: l10n.diveLog_edit_excludeFromStats,
             value: excludedFromStats,
             onChanged: onExcludedFromStatsChanged!,
+            // The label alone does not say the dive count is affected, which
+            // is the part that surprises people later.
+            helpText: l10n.diveLog_edit_excludeFromStatsHelp,
           ),
         if (onExcludedFromGasStatsChanged != null)
           FormRow.toggle(
@@ -171,6 +174,7 @@ class TheDiveSection extends StatelessWidget {
             value: excludedFromStats || excludedFromGasStats,
             onChanged: onExcludedFromGasStatsChanged!,
             enabled: !excludedFromStats,
+            helpText: l10n.diveLog_edit_excludeFromGasStatsHelp,
           ),
       ],
     );

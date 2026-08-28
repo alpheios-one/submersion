@@ -46,6 +46,7 @@ class FormRow extends StatefulWidget {
     this.profileSuggestion,
   }) : _kind = _RowKind.text,
        enabled = true,
+       helpText = null,
        value = null,
        onTap = null,
        onClear = null,
@@ -64,6 +65,7 @@ class FormRow extends StatefulWidget {
     this.onClear,
   }) : _kind = _RowKind.picker,
        enabled = true,
+       helpText = null,
        profileSuggestion = null,
        decoration = null,
        controller = null,
@@ -83,6 +85,7 @@ class FormRow extends StatefulWidget {
   const FormRow.display({super.key, required this.label, required this.value})
     : _kind = _RowKind.display,
       enabled = true,
+      helpText = null,
       profileSuggestion = null,
       decoration = null,
       controller = null,
@@ -111,6 +114,7 @@ class FormRow extends StatefulWidget {
     required bool value,
     required ValueChanged<bool> onChanged,
     this.enabled = true,
+    this.helpText,
   }) : _kind = _RowKind.toggle,
        profileSuggestion = null,
        decoration = null,
@@ -140,6 +144,7 @@ class FormRow extends StatefulWidget {
     this.onClear,
   }) : _kind = _RowKind.rating,
        enabled = true,
+       helpText = null,
        profileSuggestion = null,
        decoration = null,
        inputFormatters = null,
@@ -162,6 +167,7 @@ class FormRow extends StatefulWidget {
   const FormRow.custom({super.key, required this.label, required this.child})
     : _kind = _RowKind.custom,
       enabled = true,
+      helpText = null,
       profileSuggestion = null,
       decoration = null,
       controller = null,
@@ -183,6 +189,10 @@ class FormRow extends StatefulWidget {
 
   /// Toggle rows only: false renders the switch inert.
   final bool enabled;
+
+  /// Optional explanatory line rendered under the row, for a control whose
+  /// label cannot carry the whole meaning on its own.
+  final String? helpText;
 
   final _RowKind _kind;
   final String label;
@@ -279,8 +289,30 @@ class _FormRowState extends State<FormRow> {
         ],
       ),
     );
-    if (onTap == null) return row;
-    return InkWell(onTap: onTap, child: row);
+    final help = widget.helpText;
+    final content = help == null
+        ? row
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              row,
+              Padding(
+                padding: EdgeInsets.only(
+                  left: FormStyle.rowPadding.left,
+                  right: FormStyle.rowPadding.right,
+                  bottom: FormStyle.rowPadding.vertical,
+                ),
+                child: Text(
+                  help,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          );
+    if (onTap == null) return content;
+    return InkWell(onTap: onTap, child: content);
   }
 
   @override

@@ -123,4 +123,50 @@ void main() {
     await tester.pumpAndSettle();
     expect(reported, isTrue);
   });
+
+  testWidgets('each toggle renders its explanatory help text', (tester) async {
+    await tester.pumpWidget(
+      host(excludedFromStats: false, excludedFromGasStats: false),
+    );
+    await tester.pumpAndSettle();
+
+    // The labels alone do not say the dive count is affected, which is the
+    // part that surprises people months later.
+    expect(
+      find.textContaining('including your dive count'),
+      findsOneWidget,
+      reason: 'the master toggle must spell out that the count changes too',
+    );
+    expect(
+      find.textContaining('SAC, RMV and gas mix statistics only'),
+      findsOneWidget,
+      reason: 'the gas toggle must say it is narrower than the master flag',
+    );
+  });
+
+  testWidgets('the help text is a wrapping paragraph, not a fixed line', (
+    tester,
+  ) async {
+    // The help lines are long, so they must be free to wrap rather than being
+    // clipped to one line. Asserted on the widget rather than by measuring
+    // overflow: FormRow's own label is not Flexible, so under the test font
+    // (one fontSize-wide glyph per character) the ROW overflows at narrow
+    // widths independently of anything this feature added.
+    await tester.pumpWidget(
+      host(excludedFromStats: false, excludedFromGasStats: false),
+    );
+    await tester.pumpAndSettle();
+
+    final help = tester.widget<Text>(
+      find.textContaining('including your dive count'),
+    );
+    expect(
+      help.maxLines,
+      isNull,
+      reason:
+          'an unset maxLines lets the paragraph wrap to as many lines as '
+          'the locale needs; German and Hungarian run materially longer',
+    );
+    expect(help.overflow, anyOf(isNull, TextOverflow.clip));
+  });
 }
