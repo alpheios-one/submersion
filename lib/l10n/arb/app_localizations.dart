@@ -29315,13 +29315,13 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_conditions_temperature_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Min/Avg/Max temperatures'**
+  /// **'Min, average and max by calendar month, across every year'**
   String get statistics_conditions_temperature_subtitle;
 
   /// No description provided for @statistics_conditions_temperature_title.
   ///
   /// In en, this message translates to:
-  /// **'Water Temperature by Month'**
+  /// **'Seasonal Water Temperature'**
   String get statistics_conditions_temperature_title;
 
   /// No description provided for @statistics_conditions_visibility_error.
@@ -29393,7 +29393,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_equipment_weightTrend_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Average weight over time'**
+  /// **'Total lead carried per dive'**
   String get statistics_equipment_weightTrend_subtitle;
 
   /// No description provided for @statistics_equipment_weightTrend_title.
@@ -29525,7 +29525,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_gas_sacTrend_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Monthly average over 5 years'**
+  /// **'Every dive in range'**
   String get statistics_gas_sacTrend_subtitle;
 
   /// No description provided for @statistics_gas_sacTrend_title.
@@ -29947,7 +29947,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_progression_bottomTime_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Average duration by month'**
+  /// **'Every dive in range'**
   String get statistics_progression_bottomTime_subtitle;
 
   /// No description provided for @statistics_progression_bottomTime_title.
@@ -29983,7 +29983,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_progression_depthProgression_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Monthly max depth over 5 years'**
+  /// **'Every dive in range'**
   String get statistics_progression_depthProgression_subtitle;
 
   /// No description provided for @statistics_progression_depthProgression_title.
@@ -56083,6 +56083,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{value}/yr'**
   String statistics_trend_rate_perYear(String value);
+
+  /// No description provided for @statistics_conditions_tempTrend_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Temperature Trend'**
+  String get statistics_conditions_tempTrend_title;
+
+  /// No description provided for @statistics_conditions_tempTrend_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Every dive in range'**
+  String get statistics_conditions_tempTrend_subtitle;
+
+  /// No description provided for @statistics_conditions_tempTrend_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No temperature data available'**
+  String get statistics_conditions_tempTrend_empty;
+
+  /// No description provided for @statistics_conditions_tempTrend_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load temperature trend'**
+  String get statistics_conditions_tempTrend_error;
+
+  /// No description provided for @diveLog_filter_presetLast5Years.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 5 Years'**
+  String get diveLog_filter_presetLast5Years;
+
+  /// No description provided for @diveLog_filter_presetLast10Years.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 10 Years'**
+  String get diveLog_filter_presetLast10Years;
 }
 
 class _AppLocalizationsDelegate

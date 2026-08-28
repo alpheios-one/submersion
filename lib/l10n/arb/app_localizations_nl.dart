@@ -17488,11 +17488,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'Min/Gem./Max temperaturen';
+      'Min, gemiddelde en max per kalendermaand, over alle jaren';
 
   @override
   String get statistics_conditions_temperature_title =>
-      'Watertemperatuur per maand';
+      'Seizoensgebonden watertemperatuur';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17537,7 +17537,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'Gemiddeld gewicht over tijd';
+      'Totaal lood per duik';
 
   @override
   String get statistics_equipment_weightTrend_title => 'Gewichtstrend';
@@ -17617,8 +17617,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get statistics_gas_sacTrend_error => 'Kan verbruikstrend niet laden';
 
   @override
-  String get statistics_gas_sacTrend_subtitle =>
-      'Maandelijks gemiddelde over 5 jaar';
+  String get statistics_gas_sacTrend_subtitle => 'Elke duik in het bereik';
 
   @override
   String get statistics_gas_sacTrend_title => 'Gasverbruikstrend';
@@ -17875,7 +17874,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get statistics_progression_bottomTime_subtitle =>
-      'Gemiddelde duur per maand';
+      'Elke duik in het bereik';
 
   @override
   String get statistics_progression_bottomTime_title => 'Bodemtijdtrend';
@@ -17898,7 +17897,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'Maandelijkse max diepte over 5 jaar';
+      'Elke duik in het bereik';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -33853,4 +33852,26 @@ class AppLocalizationsNl extends AppLocalizations {
   String statistics_trend_rate_perYear(String value) {
     return '$value/jr';
   }
+
+  @override
+  String get statistics_conditions_tempTrend_title =>
+      'Verloop van de watertemperatuur';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle =>
+      'Elke duik in het bereik';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'Geen temperatuurgegevens beschikbaar';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'Kan het temperatuurverloop niet laden';
+
+  @override
+  String get diveLog_filter_presetLast5Years => 'Afgelopen 5 jaar';
+
+  @override
+  String get diveLog_filter_presetLast10Years => 'Afgelopen 10 jaar';
 }

@@ -17335,11 +17335,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'Min/Avg/Max temperatures';
+      'Min, average and max by calendar month, across every year';
 
   @override
   String get statistics_conditions_temperature_title =>
-      'Water Temperature by Month';
+      'Seasonal Water Temperature';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17384,7 +17384,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'Average weight over time';
+      'Total lead carried per dive';
 
   @override
   String get statistics_equipment_weightTrend_title => 'Weight Trend';
@@ -17463,7 +17463,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to load consumption trend';
 
   @override
-  String get statistics_gas_sacTrend_subtitle => 'Monthly average over 5 years';
+  String get statistics_gas_sacTrend_subtitle => 'Every dive in range';
 
   @override
   String get statistics_gas_sacTrend_title => 'Gas consumption trend';
@@ -17717,7 +17717,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statistics_progression_bottomTime_subtitle =>
-      'Average duration by month';
+      'Every dive in range';
 
   @override
   String get statistics_progression_bottomTime_title => 'Bottom Time Trend';
@@ -17739,7 +17739,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'Monthly max depth over 5 years';
+      'Every dive in range';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -33557,4 +33557,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String statistics_trend_rate_perYear(String value) {
     return '$value/yr';
   }
+
+  @override
+  String get statistics_conditions_tempTrend_title => 'Water Temperature Trend';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle => 'Every dive in range';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'No temperature data available';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'Failed to load temperature trend';
+
+  @override
+  String get diveLog_filter_presetLast5Years => 'Last 5 Years';
+
+  @override
+  String get diveLog_filter_presetLast10Years => 'Last 10 Years';
 }

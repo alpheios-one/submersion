@@ -17570,11 +17570,11 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'Min/Atl/Max homersekletek';
+      'Min, átlag és max naptári hónap szerint, minden évre összevonva';
 
   @override
   String get statistics_conditions_temperature_title =>
-      'Vizhomerseklet honaponkent';
+      'Szezonális vízhőmérséklet';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17619,7 +17619,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'Atlagos suly az ido fuggvenyeben';
+      'Összes ólom merülésenként';
 
   @override
   String get statistics_equipment_weightTrend_title => 'Suly trend';
@@ -17702,7 +17702,8 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerult a fogyasztasi trend betoltese';
 
   @override
-  String get statistics_gas_sacTrend_subtitle => 'Havi atlag 5 even at';
+  String get statistics_gas_sacTrend_subtitle =>
+      'Minden merülés a tartományban';
 
   @override
   String get statistics_gas_sacTrend_title => 'Gázfogyasztási trend';
@@ -17966,7 +17967,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_progression_bottomTime_subtitle =>
-      'Atlagos idotartam honaponkent';
+      'Minden merülés a tartományban';
 
   @override
   String get statistics_progression_bottomTime_title => 'Fenekido trend';
@@ -17989,7 +17990,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'Havi max melyseg 5 even at';
+      'Minden merülés a tartományban';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -33959,4 +33960,26 @@ class AppLocalizationsHu extends AppLocalizations {
   String statistics_trend_rate_perYear(String value) {
     return '$value/év';
   }
+
+  @override
+  String get statistics_conditions_tempTrend_title =>
+      'Vízhőmérséklet alakulása';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle =>
+      'Minden merülés a tartományban';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'Nincs elérhető hőmérsékleti adat';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'A hőmérséklet alakulása nem tölthető be';
+
+  @override
+  String get diveLog_filter_presetLast5Years => 'Elmúlt 5 év';
+
+  @override
+  String get diveLog_filter_presetLast10Years => 'Elmúlt 10 év';
 }

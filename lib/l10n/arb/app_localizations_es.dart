@@ -17636,11 +17636,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'Temperaturas min/prom/max';
+      'Mín, media y máx por mes natural, en todos los años';
 
   @override
   String get statistics_conditions_temperature_title =>
-      'Temperatura del agua por mes';
+      'Temperatura del agua por temporada';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17685,7 +17685,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'Peso promedio a lo largo del tiempo';
+      'Plomo total por inmersión';
 
   @override
   String get statistics_equipment_weightTrend_title => 'Tendencia de peso';
@@ -17768,7 +17768,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Error al cargar la tendencia de consumo';
 
   @override
-  String get statistics_gas_sacTrend_subtitle => 'Promedio mensual en 5 anos';
+  String get statistics_gas_sacTrend_subtitle => 'Cada inmersión del periodo';
 
   @override
   String get statistics_gas_sacTrend_title => 'Tendencia del consumo de gas';
@@ -18031,7 +18031,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get statistics_progression_bottomTime_subtitle =>
-      'Duracion promedio por mes';
+      'Cada inmersión del periodo';
 
   @override
   String get statistics_progression_bottomTime_title =>
@@ -18055,7 +18055,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'Profundidad maxima mensual en 5 anos';
+      'Cada inmersión del periodo';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -34131,4 +34131,26 @@ class AppLocalizationsEs extends AppLocalizations {
   String statistics_trend_rate_perYear(String value) {
     return '$value/año';
   }
+
+  @override
+  String get statistics_conditions_tempTrend_title =>
+      'Evolución de la temperatura del agua';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle =>
+      'Cada inmersión del periodo';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'No hay datos de temperatura disponibles';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'No se pudo cargar la evolución de la temperatura';
+
+  @override
+  String get diveLog_filter_presetLast5Years => 'Últimos 5 años';
+
+  @override
+  String get diveLog_filter_presetLast10Years => 'Últimos 10 años';
 }

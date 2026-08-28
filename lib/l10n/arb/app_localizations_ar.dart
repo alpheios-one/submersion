@@ -17318,10 +17318,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'أدنى/متوسط/أقصى درجات الحرارة';
+      'الحد الأدنى والمتوسط والأقصى حسب الشهر الميلادي عبر كل السنوات';
 
   @override
-  String get statistics_conditions_temperature_title => 'حرارة الماء حسب الشهر';
+  String get statistics_conditions_temperature_title =>
+      'درجة حرارة الماء الموسمية';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17366,7 +17367,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'متوسط الوزن عبر الزمن';
+      'إجمالي الرصاص لكل غطسة';
 
   @override
   String get statistics_equipment_weightTrend_title => 'اتجاه الأوزان';
@@ -17443,8 +17444,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statistics_gas_sacTrend_error => 'فشل تحميل اتجاه الاستهلاك';
 
   @override
-  String get statistics_gas_sacTrend_subtitle =>
-      'المتوسط الشهري على مدى 5 سنوات';
+  String get statistics_gas_sacTrend_subtitle => 'كل غطسة ضمن النطاق';
 
   @override
   String get statistics_gas_sacTrend_title => 'اتجاه استهلاك الغاز';
@@ -17693,8 +17693,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'فشل تحميل اتجاه وقت القاع';
 
   @override
-  String get statistics_progression_bottomTime_subtitle =>
-      'متوسط المدة حسب الشهر';
+  String get statistics_progression_bottomTime_subtitle => 'كل غطسة ضمن النطاق';
 
   @override
   String get statistics_progression_bottomTime_title => 'اتجاه وقت القاع';
@@ -17717,7 +17716,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'أقصى عمق شهري على مدى 5 سنوات';
+      'كل غطسة ضمن النطاق';
 
   @override
   String get statistics_progression_depthProgression_title => 'تقدم أقصى عمق';
@@ -33753,4 +33752,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String statistics_trend_rate_perYear(String value) {
     return '$value/سنة';
   }
+
+  @override
+  String get statistics_conditions_tempTrend_title => 'اتجاه درجة حرارة الماء';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle => 'كل غطسة ضمن النطاق';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'لا تتوفر بيانات درجة الحرارة';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'تعذر تحميل اتجاه درجة الحرارة';
+
+  @override
+  String get diveLog_filter_presetLast5Years => 'آخر 5 سنوات';
+
+  @override
+  String get diveLog_filter_presetLast10Years => 'آخر 10 سنوات';
 }

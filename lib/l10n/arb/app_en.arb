@@ -10352,8 +10352,8 @@
   "statistics_conditions_temperature_seriesAvg": "Avg",
   "statistics_conditions_temperature_seriesMax": "Max",
   "statistics_conditions_temperature_seriesMin": "Min",
-  "statistics_conditions_temperature_subtitle": "Min/Avg/Max temperatures",
-  "statistics_conditions_temperature_title": "Water Temperature by Month",
+  "statistics_conditions_temperature_subtitle": "Min, average and max by calendar month, across every year",
+  "statistics_conditions_temperature_title": "Seasonal Water Temperature",
   "statistics_conditions_visibility_error": "Failed to load visibility data",
   "statistics_conditions_visibility_subtitle": "Dives by visibility condition",
   "statistics_conditions_visibility_title": "Visibility Distribution",
@@ -10365,7 +10365,7 @@
   "statistics_equipment_mostUsedGear_subtitle": "Equipment by dive count",
   "statistics_equipment_mostUsedGear_title": "Most Used Gear",
   "statistics_equipment_weightTrend_error": "Failed to load weight trend",
-  "statistics_equipment_weightTrend_subtitle": "Average weight over time",
+  "statistics_equipment_weightTrend_subtitle": "Total lead carried per dive",
   "statistics_equipment_weightTrend_title": "Weight Trend",
   "statistics_error_loadingStatistics": "Error loading statistics",
   "statistics_filterBar_clear": "Clear filter",
@@ -10387,7 +10387,7 @@
   "statistics_gas_sacRecords_subtitle": "Best and worst air consumption",
   "statistics_gas_sacRecords_title": "Gas consumption records",
   "statistics_gas_sacTrend_error": "Failed to load consumption trend",
-  "statistics_gas_sacTrend_subtitle": "Monthly average over 5 years",
+  "statistics_gas_sacTrend_subtitle": "Every dive in range",
   "statistics_gas_sacTrend_title": "Gas consumption trend",
   "statistics_gas_tankRole_backGas": "Back Gas",
   "statistics_gas_tankRole_bailout": "Bailout",
@@ -10454,13 +10454,13 @@
   "statistics_profile_timeAtDepth_valueFormat": "{value} min",
   "statistics_progression_appBar_title": "Dive Progression",
   "statistics_progression_bottomTime_error": "Failed to load bottom time trend",
-  "statistics_progression_bottomTime_subtitle": "Average duration by month",
+  "statistics_progression_bottomTime_subtitle": "Every dive in range",
   "statistics_progression_bottomTime_title": "Bottom Time Trend",
   "statistics_progression_cumulative_error": "Failed to load cumulative data",
   "statistics_progression_cumulative_subtitle": "Total dives over time",
   "statistics_progression_cumulative_title": "Cumulative Dive Count",
   "statistics_progression_depthProgression_error": "Failed to load depth progression",
-  "statistics_progression_depthProgression_subtitle": "Monthly max depth over 5 years",
+  "statistics_progression_depthProgression_subtitle": "Every dive in range",
   "statistics_progression_depthProgression_title": "Maximum Depth Progression",
   "statistics_progression_divesPerYear_empty": "No yearly data available",
   "statistics_progression_divesPerYear_error": "Failed to load yearly data",
@@ -19206,5 +19206,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "statistics_conditions_tempTrend_title": "Water Temperature Trend",
+  "statistics_conditions_tempTrend_subtitle": "Every dive in range",
+  "statistics_conditions_tempTrend_empty": "No temperature data available",
+  "statistics_conditions_tempTrend_error": "Failed to load temperature trend",
+  "diveLog_filter_presetLast5Years": "Last 5 Years",
+  "diveLog_filter_presetLast10Years": "Last 10 Years"
 }
