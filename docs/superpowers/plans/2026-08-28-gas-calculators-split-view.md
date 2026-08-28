@@ -186,3 +186,31 @@ still reports the last `go`. The split-view assertions use `uri` because
   calling widget rather than nothing", which is the known flake recorded as
   `share-bytes` and passes when the file is run alone. Nothing in this branch
   touches media sharing.
+
+## Follow-up: the first-selection re-animation
+
+Found by hand after the first implementation, and fixed before merge.
+
+**Symptom:** tapping a calculator for the first time slid the whole Gas
+Calculators page in from the right again. Every later tap was instant.
+
+**Root cause**, from page keys dumped either side of the first selection:
+`PlanningTile` entered the page with `context.push`, which go_router keys with
+a generated string, while `MasterDetailScaffold._onItemSelected` selects with
+`router.go`, which rebuilds the stack from the declarative match and keys the
+page by its path. The first selection therefore changed the page key, and
+Flutter's Navigator animated what it saw as a different page. Mid-transition
+both copies of the list were mounted; afterwards the key was stable, so
+nothing animated again.
+
+**Fix:** `fullPage` became `PlanningToolPresentation`, and a `splitViewPage`
+tool is entered with `go`. Verified that `go` on a nested child route still
+leaves the hub on the stack, so the back button keeps working. The dive
+planner keeps its `push`; it drives no URL after arrival and #647 wants it
+poppable.
+
+**Guarded by:** `planning_page_test.dart` asserts the entry verb and the
+resulting declarative page key, plus that the planner still pushes;
+`gas_calculators_page_test.dart` counts the mounted lists mid-transition,
+which is what distinguishes the two behaviours. That assertion was confirmed
+to fail against the old `push` entry before being kept.

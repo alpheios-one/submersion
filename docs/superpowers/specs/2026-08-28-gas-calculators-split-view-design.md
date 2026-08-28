@@ -131,12 +131,31 @@ a `showAppBar` flag exactly as `PlanningListContent` does.
 
 - `routePrefix`, defaulting to `/planning`, so a nested tool can build
   `/planning/gas-calculators/mod` from the same `route` getter.
-- `fullPage`, defaulting to `false`. `PlanningTile` passes `null` for
-  `onToolSelected` when it is set, which is already the tile's "push, do not
-  select" path.
+- `presentation`, a `PlanningToolPresentation` defaulting to `detailPane`.
+  `PlanningTile` passes `null` for `onToolSelected` for any value other than
+  the default, which is already the tile's "navigate, do not select" path.
 
 This generalizes the hardcoded planner exception in F3 rather than adding a
 second special case beside it.
+
+The enum has three values rather than a `fullPage` boolean, because the cases
+differ in navigation verb as well as layout:
+
+| Value | Layout | Verb |
+| --- | --- | --- |
+| `detailPane` | Planning's detail pane | `push` below the breakpoint |
+| `pushedPage` | Whole window | `push` (the dive planner) |
+| `splitViewPage` | Whole window, hosts its own split view | `go` (Gas Calculators) |
+
+The verb on the third row is load-bearing. A `MasterDetailScaffold` selects by
+calling `go`, which rebuilds the stack from the declarative route match and
+keys the page by its path. Entering on a `push` leaves the route carrying a
+generated page key, so the first selection swaps one page for another and
+Flutter animates the whole page in from the right a second time, once, before
+settling. `go` on a nested child route still leaves the hub beneath it, so the
+tool stays poppable either way. This was found by hand after the first
+implementation shipped a `fullPage` boolean that could not express the
+difference.
 
 ### Reuse over duplication
 

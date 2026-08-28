@@ -65,7 +65,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    router.push('/planning/gas-calculators');
+    // GO, mirroring what the Planning tile does for a split-view tool. The
+    // verb matters here: see 'the first selection does not re-animate'.
+    router.go('/planning/gas-calculators');
     await tester.pumpAndSettle();
 
     return router;
@@ -139,8 +141,29 @@ void main() {
       );
     });
 
-    // The page is pushed from Planning and the nav rail does not highlight it,
-    // so the master pane header carries the only way back.
+    // Regression: the first calculator tapped used to slide the whole page in
+    // from the right a second time, then never again. MasterDetailScaffold
+    // selects with go(), which keys the page by its path; entering on a push
+    // left a generated key, so that first go() swapped one page for another
+    // and Flutter animated the swap. Mid-transition both copies are mounted,
+    // so counting the list is what tells the two behaviours apart.
+    testWidgets('the first selection does not re-animate the page', (
+      tester,
+    ) async {
+      await pumpAt(tester, wide);
+
+      await tester.tap(find.text('Rock Bottom'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.byType(GasCalculatorsListContent), findsOneWidget);
+
+      await tester.pumpAndSettle();
+      expect(find.byType(RockBottomCalculator), findsOneWidget);
+    });
+
+    // The page is entered from Planning and the nav rail does not highlight
+    // it, so the master pane header carries the only way back.
     testWidgets('the master pane offers a way back', (tester) async {
       await pumpAt(tester, wide);
 

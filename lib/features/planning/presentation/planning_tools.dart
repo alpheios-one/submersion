@@ -2,6 +2,35 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
 
+/// How a planning tool opens when its row is tapped.
+///
+/// The three cases differ in more than layout: they differ in the navigation
+/// verb, and getting that wrong is visible. See [splitViewPage].
+enum PlanningToolPresentation {
+  /// Opens in the Planning detail pane on desktop, as a pushed page below the
+  /// master-detail breakpoint. The default, and what most tools do.
+  detailPane,
+
+  /// Always takes the whole window, entered with `push`.
+  ///
+  /// For a tool whose own layout cannot be nested inside what is left beside
+  /// a 440px master pane, and that drives no URL of its own once open. The
+  /// dive planner is the example; it must stay poppable (#647).
+  pushedPage,
+
+  /// Always takes the whole window and hosts a [MasterDetailScaffold] of its
+  /// own, entered with `go`.
+  ///
+  /// The `go` is load-bearing, not a style choice. A [MasterDetailScaffold]
+  /// selects by calling `go`, which rebuilds the stack from the declarative
+  /// route match and keys the page by its path. Entering on a `push` leaves
+  /// the route carrying a generated key instead, so the first selection swaps
+  /// one page for another and Flutter animates the whole page in from the
+  /// right again, once, before settling. `go` on a nested child route still
+  /// leaves the hub beneath it, so the tool stays poppable either way.
+  splitViewPage,
+}
+
 /// A tool listed on the Planning hub.
 class PlanningTool {
   /// Stable identifier, also the last path segment of [route] and the value
@@ -19,13 +48,8 @@ class PlanningTool {
   /// its six calculators pass `/planning/gas-calculators` and route under it.
   final String routePrefix;
 
-  /// Whether this tool always takes the whole window instead of opening in a
-  /// detail pane.
-  ///
-  /// Set by the tools that run their own multi-pane layout, which cannot be
-  /// nested inside what is left of the window beside a 440px master pane.
-  /// See [kDivePlannerToolId].
-  final bool fullPage;
+  /// How this tool opens. See [PlanningToolPresentation].
+  final PlanningToolPresentation presentation;
 
   const PlanningTool({
     required this.id,
@@ -34,10 +58,13 @@ class PlanningTool {
     required this.title,
     required this.subtitle,
     this.routePrefix = '/planning',
-    this.fullPage = false,
+    this.presentation = PlanningToolPresentation.detailPane,
   });
 
   String get route => '$routePrefix/$id';
+
+  /// Whether this tool takes the whole window rather than the detail pane.
+  bool get isFullPage => presentation != PlanningToolPresentation.detailPane;
 }
 
 /// Id of the dive planner.
@@ -50,16 +77,17 @@ class PlanningTool {
 ///
 /// Gas Calculators is the other tool in that position, for the same reason:
 /// it renders its six calculators as a split view of its own. It says so with
-/// [PlanningTool.fullPage] rather than by being rendered separately, because
-/// unlike the planner it is an ordinary row in the tools list.
+/// [PlanningToolPresentation.splitViewPage] rather than by being rendered
+/// separately, because unlike the planner it is an ordinary row in the tools
+/// list, and it needs the other entry verb besides.
 const String kDivePlannerToolId = 'dive-planner';
 
 /// Id of the gas calculators hub, which owns a second level of tools.
 const String kGasCalculatorsToolId = 'gas-calculators';
 
 /// The calculators and readouts listed under the planner, in display order.
-/// Each of these opens in the detail pane on desktop, unless it is marked
-/// [PlanningTool.fullPage].
+/// Each of these opens in the detail pane on desktop unless it declares
+/// another [PlanningTool.presentation].
 List<PlanningTool> planningToolsOf(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;
 
@@ -77,7 +105,7 @@ List<PlanningTool> planningToolsOf(BuildContext context) {
       color: colorScheme.tertiary,
       title: context.l10n.planning_card_gasCalculators_title,
       subtitle: context.l10n.planning_card_gasCalculators_subtitle,
-      fullPage: true,
+      presentation: PlanningToolPresentation.splitViewPage,
     ),
     PlanningTool(
       id: 'weight-calculator',

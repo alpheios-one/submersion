@@ -387,6 +387,56 @@ void main() {
       expect(find.text('gas calculators page'), findsOneWidget);
       expect(find.text('Deco Calculator'), findsNothing);
     });
+
+    // A tool that hosts its own split view has to be entered with go(), not
+    // push(). Its MasterDetailScaffold selects with go(), and go() rebuilds
+    // the stack from the declarative route match; arriving on an imperative
+    // push leaves the route carrying a generated page key, so the first
+    // selection swaps the key and Flutter animates the whole page in again.
+    testWidgets('a split-view tool is entered declaratively', (tester) async {
+      final router = await pumpWide(tester);
+
+      await tester.tap(find.text('Gas Calculators'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        '/planning/gas-calculators',
+      );
+      expect(
+        router.routerDelegate.currentConfiguration.last.pageKey,
+        const ValueKey('/planning/gas-calculators'),
+      );
+    });
+
+    // go() on a nested child route still leaves the hub on the stack, so the
+    // tool stays poppable. This is what makes the declarative entry safe.
+    testWidgets('a split-view tool stays poppable', (tester) async {
+      final router = await pumpWide(tester);
+
+      await tester.tap(find.text('Gas Calculators'));
+      await tester.pumpAndSettle();
+
+      expect(router.routerDelegate.currentConfiguration.matches.length, 2);
+    });
+
+    // The dive planner keeps the push. It drives no URL of its own after
+    // arrival, so it has nothing to re-key, and #647 wants it poppable.
+    testWidgets('the dive planner is still entered with a push', (
+      tester,
+    ) async {
+      final router = await pumpWide(tester);
+
+      await tester.tap(find.text('Dive Planner'));
+      await tester.pumpAndSettle();
+
+      // An imperative push does not move currentConfiguration.uri.
+      expect(router.routerDelegate.currentConfiguration.uri.path, '/planning');
+      expect(
+        router.routerDelegate.currentConfiguration.last.matchedLocation,
+        '/planning/dive-planner',
+      );
+    });
   });
 
   test('deco calculator environment defaults to legacy standard water', () {
