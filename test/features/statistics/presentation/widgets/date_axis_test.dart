@@ -86,4 +86,36 @@ void main() {
       expect(axis.ticks[i].isAfter(axis.ticks[i - 1]), isTrue);
     }
   });
+
+  group('showsLabelAt', () {
+    final axis = DateAxis.forRange(
+      DateTime.utc(2024, 1, 1),
+      DateTime.utc(2024, 9, 15),
+    );
+
+    test('labels both bounds', () {
+      expect(axis.showsLabelAt(axis.min), isTrue);
+      expect(axis.showsLabelAt(axis.max), isTrue);
+    });
+
+    test('refuses anything outside the bounds', () {
+      expect(axis.showsLabelAt(axis.min - 1), isFalse);
+      expect(axis.showsLabelAt(axis.max + 1), isFalse);
+    });
+
+    test('suppresses a label that would crowd the upper bound', () {
+      // fl_chart draws the max label regardless, so a derived label a sliver
+      // before it renders as one run of jammed text.
+      expect(axis.showsLabelAt(axis.max - axis.labelInterval * 0.1), isFalse);
+    });
+
+    test('suppresses a label that would crowd the lower bound', () {
+      expect(axis.showsLabelAt(axis.min + axis.labelInterval * 0.1), isFalse);
+    });
+
+    test('keeps a label a full interval clear of the bounds', () {
+      expect(axis.showsLabelAt(axis.min + axis.labelInterval), isTrue);
+      expect(axis.showsLabelAt(axis.max - axis.labelInterval), isTrue);
+    });
+  });
 }

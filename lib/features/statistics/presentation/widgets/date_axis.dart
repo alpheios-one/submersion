@@ -40,6 +40,19 @@ class DateAxis {
   /// on the axis (issue #299 smoke check).
   final double labelInterval;
 
+  /// Whether a label should be drawn at [value].
+  ///
+  /// fl_chart draws a label at [max] on top of the ones it derives from
+  /// [labelInterval], so the last derived label can land almost on top of it
+  /// and the two render as one run of jammed text ("AprMay"). Suppress any
+  /// derived label that crowds a bound; the bound's own label stands.
+  bool showsLabelAt(double value) {
+    if (value < min || value > max) return false;
+    if (value == min || value == max) return true;
+    final crowding = labelInterval * 0.6;
+    return (max - value) >= crowding && (value - min) >= crowding;
+  }
+
   /// Chooses a granularity from the span, then walks ticks across it.
   ///
   /// A degenerate range (one dive, or several on one day) is widened to a day

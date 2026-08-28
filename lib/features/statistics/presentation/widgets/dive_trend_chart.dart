@@ -265,9 +265,7 @@ class DiveTrendChart extends StatelessWidget {
           // then never match a nominated tick and the axis renders blank.
           interval: dateAxis.labelInterval,
           getTitlesWidget: (value, meta) {
-            if (value < dateAxis.min || value > dateAxis.max) {
-              return const Text('');
-            }
+            if (!dateAxis.showsLabelAt(value)) return const Text('');
             final date = DateTime.fromMillisecondsSinceEpoch(
               value.toInt(),
               isUtc: true,
