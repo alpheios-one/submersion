@@ -112,4 +112,98 @@ void main() {
 
     expect(data.maxX, greaterThan(data.minX));
   });
+
+  group('min/max band', () {
+    final spread = <TrendDataPoint>[
+      TrendDataPoint(date: DateTime.utc(2024, 1, 5), value: 10),
+      TrendDataPoint(date: DateTime.utc(2024, 1, 20), value: 30),
+      TrendDataPoint(date: DateTime.utc(2024, 2, 5), value: 40),
+      TrendDataPoint(date: DateTime.utc(2024, 2, 25), value: 60),
+    ];
+
+    testWidgets('draws no band in raw mode', (tester) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: spread)));
+
+      expect(readData(tester).betweenBarsData, isEmpty);
+    });
+
+    testWidgets('draws one band between the min and max series when monthly', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(points: spread, aggregation: TrendAggregation.monthly),
+        ),
+      );
+
+      final data = readData(tester);
+
+      expect(data.betweenBarsData, hasLength(1));
+      expect(data.betweenBarsData.first.fromIndex, 1);
+      expect(data.betweenBarsData.first.toIndex, 2);
+    });
+
+    testWidgets('the band series carry the bucket min and max', (tester) async {
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(points: spread, aggregation: TrendAggregation.monthly),
+        ),
+      );
+
+      final bars = readData(tester).lineBarsData;
+
+      expect(bars[1].spots.map((s) => s.y), [10, 40]);
+      expect(bars[2].spots.map((s) => s.y), [30, 60]);
+    });
+
+    testWidgets('the band series are not stroked or dotted', (tester) async {
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(points: spread, aggregation: TrendAggregation.monthly),
+        ),
+      );
+
+      final bars = readData(tester).lineBarsData;
+
+      expect(bars[1].barWidth, 0);
+      expect(bars[1].dotData.show, isFalse);
+      expect(bars[2].barWidth, 0);
+      expect(bars[2].dotData.show, isFalse);
+    });
+
+    testWidgets('a bucket holding one dive yields a zero-height band', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(
+            points: [
+              TrendDataPoint(date: DateTime.utc(2024, 1, 5), value: 10),
+              TrendDataPoint(date: DateTime.utc(2024, 2, 5), value: 40),
+            ],
+            aggregation: TrendAggregation.monthly,
+          ),
+        ),
+      );
+
+      final bars = readData(tester).lineBarsData;
+
+      expect(bars[1].spots.map((s) => s.y), bars[2].spots.map((s) => s.y));
+    });
+
+    testWidgets('the y bounds cover the band, not just the means', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(points: spread, aggregation: TrendAggregation.monthly),
+        ),
+      );
+
+      final data = readData(tester);
+
+      expect(data.minY, lessThanOrEqualTo(10));
+      expect(data.maxY, greaterThanOrEqualTo(60));
+    });
+  });
 }

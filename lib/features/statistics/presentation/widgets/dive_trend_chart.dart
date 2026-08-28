@@ -96,20 +96,22 @@ class DiveTrendChart extends StatelessWidget {
               ),
             ),
             lineBarsData: _bars(context, buckets, color, isRaw),
+            betweenBarsData: _bands(context, isRaw),
           ),
         ),
       ),
     );
   }
 
-  /// Index 0 is always the data series.
+  /// Index 0 is always the data series. When aggregating, indices 1 and 2 are
+  /// the invisible bucket min and max that [_bands] fills between.
   List<LineChartBarData> _bars(
     BuildContext context,
     List<TrendBucket> buckets,
     Color color,
     bool isRaw,
   ) {
-    return <LineChartBarData>[
+    final bars = <LineChartBarData>[
       LineChartBarData(
         spots: buckets
             .map((b) => FlSpot(_x(b.date), b.mean))
@@ -128,6 +130,41 @@ class DiveTrendChart extends StatelessWidget {
             strokeWidth: 0,
           ),
         ),
+      ),
+    ];
+
+    if (!isRaw) {
+      for (final selector in <double Function(TrendBucket)>[
+        (b) => b.min,
+        (b) => b.max,
+      ]) {
+        bars.add(
+          LineChartBarData(
+            spots: buckets
+                .map((b) => FlSpot(_x(b.date), selector(b)))
+                .toList(growable: false),
+            isCurved: false,
+            barWidth: 0,
+            color: Colors.transparent,
+            dotData: const FlDotData(show: false),
+          ),
+        );
+      }
+    }
+
+    return bars;
+  }
+
+  /// Fills between the min and max series so an aggregated chart still shows
+  /// the spread. Smoothing must not put back the hiding this issue is about.
+  List<BetweenBarsData> _bands(BuildContext context, bool isRaw) {
+    if (isRaw) return const [];
+    final color = pointColor ?? Theme.of(context).colorScheme.primary;
+    return [
+      BetweenBarsData(
+        fromIndex: 1,
+        toIndex: 2,
+        color: color.withValues(alpha: 0.15),
       ),
     ];
   }
