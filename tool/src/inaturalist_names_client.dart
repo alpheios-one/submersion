@@ -26,7 +26,7 @@ class InaturalistNamesClient {
         : Uri.parse(
             'https://api.inaturalist.org/v1/taxa'
             '?q=${Uri.encodeQueryComponent(scientificName)}'
-            '&all_names=true&per_page=5',
+            '&all_names=true&per_page=30',
           );
     for (var attempt = 1; attempt <= 3; attempt++) {
       final request = await _client.getUrl(uri);
@@ -37,14 +37,16 @@ class InaturalistNamesClient {
         final results =
             ((jsonDecode(body) as Map<String, dynamic>)['results'] as List)
                 .cast<Map<String, dynamic>>();
-        // A synonym query (a genus iNaturalist has since split, say) comes
-        // back under the accepted name with the query in matched_term.
+        if (taxonId != null) return results.firstOrNull;
+        // The exact name first: a subspecies can carry the species name as
+        // its matched_term and outrank it. Then a synonym query (a genus
+        // iNaturalist has since split, say), which comes back under the
+        // accepted name with the query in matched_term.
         for (final r in results) {
-          if (taxonId != null ||
-              r['name'] == scientificName ||
-              r['matched_term'] == scientificName) {
-            return r;
-          }
+          if (r['name'] == scientificName) return r;
+        }
+        for (final r in results) {
+          if (r['matched_term'] == scientificName) return r;
         }
         return null;
       }
