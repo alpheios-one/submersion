@@ -37,13 +37,17 @@ class INaturalistSpeciesLookupService implements SpeciesLookupService {
     required String locale,
   }) async {
     final term = query.trim();
-    final key = '${locale.toLowerCase()}|${term.toLowerCase()}';
+    // One normalized code for both the cache key and the request, or a
+    // caller passing 'DE' would read 'de''s cached answer while asking
+    // iNaturalist for a different localization.
+    final code = locale.toLowerCase();
+    final key = '$code|${term.toLowerCase()}';
     final cached = _searchCache[key];
     if (cached != null) return cached;
 
     final uri = Uri.https(_host, _autocompletePath, {
       'q': term,
-      'locale': locale,
+      'locale': code,
       'per_page': '10',
       'is_active': 'true',
     });
@@ -57,11 +61,12 @@ class INaturalistSpeciesLookupService implements SpeciesLookupService {
     int taxonId, {
     required String locale,
   }) async {
-    final key = '${locale.toLowerCase()}|$taxonId';
+    final code = locale.toLowerCase();
+    final key = '$code|$taxonId';
     final cached = _resolveCache[key];
     if (cached != null) return cached;
 
-    final uri = Uri.https(_host, '$_taxonPath/$taxonId', {'locale': locale});
+    final uri = Uri.https(_host, '$_taxonPath/$taxonId', {'locale': code});
     final detail = parseTaxonDetail(await _get(uri));
     final taxonomyClass = detail.ancestors
         .where((a) => a.rank == 'class')

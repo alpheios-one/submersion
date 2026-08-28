@@ -314,12 +314,25 @@ class SiteExpectedSpeciesNotifier
     state = entries;
   }
 
+  /// Species with an insert in flight. `site_species` has no uniqueness
+  /// constraint, and `state` only gains the entry once the write returns, so
+  /// two calls that start together would both find the species absent.
+  /// Claiming the id here is what makes the check hold: nothing else runs
+  /// between reading `state` and adding to this set.
+  final Set<String> _adding = {};
+
   Future<void> addSpecies(String speciesId) async {
-    final entry = await _repository.addExpectedSpecies(
-      siteId: _siteId,
-      speciesId: speciesId,
-    );
-    state = [...state, entry];
+    if (state.any((e) => e.speciesId == speciesId)) return;
+    if (!_adding.add(speciesId)) return;
+    try {
+      final entry = await _repository.addExpectedSpecies(
+        siteId: _siteId,
+        speciesId: speciesId,
+      );
+      state = [...state, entry];
+    } finally {
+      _adding.remove(speciesId);
+    }
   }
 
   Future<void> removeSpecies(String speciesId) async {

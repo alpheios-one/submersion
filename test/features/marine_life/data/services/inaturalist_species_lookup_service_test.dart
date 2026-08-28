@@ -15,6 +15,39 @@ Matcher _kind(SpeciesLookupErrorKind kind) =>
 
 void main() {
   test(
+    'a regioned or uppercase locale is normalized for request and cache',
+    () async {
+      final sent = <String?>[];
+      final client = MockClient((request) async {
+        sent.add(request.url.queryParameters['locale']);
+        return http.Response(_fixture('autocomplete_whale_shark_de.json'), 200);
+      });
+      final service = INaturalistSpeciesLookupService(client: client);
+
+      // The cache key already lowercases the tag, so 'DE' and 'de' share one
+      // entry. Sending the raw tag would have them share a single cached
+      // answer while asking iNaturalist for two different localizations.
+      await service.search('whale shark', locale: 'DE');
+      await service.search('whale shark', locale: 'de');
+
+      expect(sent, ['de']);
+    },
+  );
+
+  test('resolve normalizes the locale the same way', () async {
+    late http.Request captured;
+    final client = MockClient((request) async {
+      captured = request;
+      return http.Response(_fixture('taxon_52188_de.json'), 200);
+    });
+    final service = INaturalistSpeciesLookupService(client: client);
+
+    await service.resolve(52188, locale: 'DE');
+
+    expect(captured.url.queryParameters['locale'], 'de');
+  });
+
+  test(
     'search hits the autocomplete endpoint with query, locale and agent',
     () async {
       late http.Request captured;

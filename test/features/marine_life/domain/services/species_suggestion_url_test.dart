@@ -92,6 +92,62 @@ void main() {
     expect(_bodyJson(uri)['commonName'], 'Stove-pipe Sponge');
   });
 
+  test('holds the cap when every free-text field is oversized', () {
+    final long = _species.copyWith(
+      commonName: 'x' * 20000,
+      scientificName: 'y' * 20000,
+      taxonomyClass: 'z' * 20000,
+      description: 'w' * 20000,
+    );
+
+    final uri = buildSpeciesSuggestionUrl(
+      species: long,
+      locale: 'en',
+      appVersion: '1.0.0.1',
+    );
+
+    expect(uri.toString().length, lessThanOrEqualTo(8000));
+  });
+
+  test('cuts the description, class and name before the scientific name', () {
+    final long = _species.copyWith(
+      taxonomyClass: 'z' * 9000,
+      description: 'w' * 9000,
+    );
+
+    final json = _bodyJson(
+      buildSpeciesSuggestionUrl(
+        species: long,
+        locale: 'en',
+        appVersion: '1.0.0.1',
+      ),
+    );
+
+    // What identifies the species survives while the others give way.
+    expect(json['scientificName'], 'Aplysina archeri');
+    expect(json['commonName'], 'Stove-pipe Sponge');
+    expect((json['description'] as String).length, lessThan(9000));
+  });
+
+  test('a species with no scientific name or class keeps them null', () {
+    const bare = Species(
+      id: 'c2',
+      commonName: 'Unknown blenny',
+      category: SpeciesCategory.fish,
+    );
+
+    final json = _bodyJson(
+      buildSpeciesSuggestionUrl(
+        species: bare,
+        locale: 'en',
+        appVersion: '1.0.0.1',
+      ),
+    );
+
+    expect(json['scientificName'], isNull);
+    expect(json['taxonomyClass'], isNull);
+  });
+
   test('encodes non-ASCII names', () {
     final uri = buildSpeciesSuggestionUrl(
       species: _species.copyWith(commonName: 'Süßwasser Grundel'),
