@@ -37,6 +37,25 @@ void main() {
     return siteId;
   }
 
+  Future<String> insertDiver({String? id, String name = 'Test Diver'}) async {
+    final diverId = id ?? 'diver-${DateTime.now().microsecondsSinceEpoch}';
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db
+        .into(db.divers)
+        .insert(
+          DiversCompanion(
+            id: Value(diverId),
+            name: Value(name),
+            medicalNotes: const Value(''),
+            notes: const Value(''),
+            isDefault: const Value(false),
+            createdAt: Value(now),
+            updatedAt: Value(now),
+          ),
+        );
+    return diverId;
+  }
+
   Future<String> insertDive({
     String? id,
     required String siteId,
@@ -220,10 +239,12 @@ void main() {
       'filters dives by diverId, excluding another diver\'s dives',
       () async {
         final siteId = await insertSite();
+        final diverA = await insertDiver(id: 'diver-a');
+        final diverB = await insertDiver(id: 'diver-b');
         await insertDive(
           id: 'dive-diver-a',
           siteId: siteId,
-          diverId: 'diver-a',
+          diverId: diverA,
           diveDateTime: DateTime(2026, 1, 1),
           maxDepth: 10,
           runtime: 1200,
@@ -231,7 +252,7 @@ void main() {
         await insertDive(
           id: 'dive-diver-b',
           siteId: siteId,
-          diverId: 'diver-b',
+          diverId: diverB,
           diveDateTime: DateTime(2026, 1, 2),
           maxDepth: 40,
           runtime: 3600,
@@ -239,7 +260,7 @@ void main() {
 
         final stats = await repository.getSiteDiveStatistics(
           siteId: siteId,
-          diverId: 'diver-a',
+          diverId: diverA,
         );
 
         expect(stats.diveCount, equals(1));
