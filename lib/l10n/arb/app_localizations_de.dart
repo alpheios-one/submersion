@@ -12627,6 +12627,98 @@ class AppLocalizationsDe extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'Arten durchsuchen...';
 
   @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return 'Fotos ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty =>
+      'Fotos, die mit dieser Art markiert sind, erscheinen hier.';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => 'Fotos markieren';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => 'Fotos hinzufügen';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => 'Artenfoto';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos hinzugefügt',
+      one: '1 Foto hinzugefügt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count übersprungen',
+      one: '1 übersprungen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fehlgeschlagen',
+      one: '1 fehlgeschlagen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => 'Fotos markieren';
+
+  @override
+  String get marineLife_tagPicker_empty =>
+      'Keine unmarkierten Fotos bei Tauchgängen, bei denen Sie diese Art protokolliert haben.';
+
+  @override
+  String get marineLife_tagPicker_emptyHint =>
+      'Verwenden Sie Fotos hinzufügen, um Bilder aus Ihren Aufnahmen zu importieren.';
+
+  @override
+  String get marineLife_tagPicker_selectAll => 'Alle auswählen';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos markieren',
+      one: '1 Foto markieren',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos markiert',
+      one: '1 Foto markiert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return 'Tauchgang $number';
+  }
+
+  @override
   String get marineLife_speciesPage_title => 'Arten';
 
   @override
@@ -33706,6 +33798,25 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_info_title => 'Medieninfo';
+
+  @override
+  String get media_species_actionTooltip => 'Arten';
+
+  @override
+  String get media_species_sheetTitle => 'Arten auf diesem Foto';
+
+  @override
+  String get media_species_sightedOnDive => 'Bei diesem Tauchgang gesichtet';
+
+  @override
+  String get media_species_otherSpecies => 'Andere Arten...';
+
+  @override
+  String get media_species_noDiveHint =>
+      'Dieses Foto ist keinem Tauchgang zugeordnet. Suchen Sie eine Art, um es zu markieren.';
+
+  @override
+  String get media_species_chipsLabel => 'Artenmarkierungen';
 
   @override
   String get media_info_fileSection => 'Datei';

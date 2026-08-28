@@ -1380,10 +1380,10 @@ class SyncService {
             hasUpdatedAt: false,
           ),
           (type: 'gasSwitches', records: data.gasSwitches, hasUpdatedAt: false),
-          // Extra entities added in the SyncData expansion. Four are
+          // Extra entities added in the SyncData expansion. Five are
           // append-only and use the blind-upsert merge path (no updatedAt
           // column: diveCustomFields, diveDataSources, siteSpecies,
-          // fieldPresets). Two carry updatedAt and use the standard
+          // mediaSpecies, fieldPresets). Two carry updatedAt and use the standard
           // conflict-detection path (csvPresets, viewConfigs). FK ordering
           // is handled by the deferred-FK transaction wrapping this loop.
           (
@@ -1397,6 +1397,11 @@ class SyncService {
             hasUpdatedAt: false,
           ),
           (type: 'siteSpecies', records: data.siteSpecies, hasUpdatedAt: false),
+          (
+            type: 'mediaSpecies',
+            records: data.mediaSpecies,
+            hasUpdatedAt: false,
+          ),
           (
             type: 'siteFeatures',
             records: data.siteFeatures,
@@ -2027,6 +2032,7 @@ class SyncService {
     'diveCustomFields': false,
     'diveDataSources': false,
     'siteSpecies': false,
+    'mediaSpecies': false,
     'siteFeatures': true,
     'csvPresets': true,
     'viewConfigs': true,
@@ -2140,6 +2146,10 @@ class SyncService {
     ],
     'siteSpecies': [
       (field: 'siteId', parent: 'diveSites', nullable: false),
+      (field: 'speciesId', parent: 'species', nullable: false),
+    ],
+    'mediaSpecies': [
+      (field: 'mediaId', parent: 'media', nullable: false),
       (field: 'speciesId', parent: 'species', nullable: false),
     ],
     'siteFeatures': [(field: 'siteId', parent: 'diveSites', nullable: false)],

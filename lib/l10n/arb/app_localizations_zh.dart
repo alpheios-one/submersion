@@ -12037,6 +12037,95 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => '搜索物种...';
 
   @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return '照片 ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty => '标记为该物种的照片会显示在这里。';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => '标记照片';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => '添加照片';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => '物种照片';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已添加 $count 张照片',
+      one: '已添加 1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '跳过 $count 张',
+      one: '跳过 1 张',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 张失败',
+      one: '1 张失败',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => '标记照片';
+
+  @override
+  String get marineLife_tagPicker_empty => '在记录过该物种的潜水中没有未标记的照片。';
+
+  @override
+  String get marineLife_tagPicker_emptyHint => '使用“添加照片”从相册导入图片。';
+
+  @override
+  String get marineLife_tagPicker_selectAll => '全选';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '标记 $count 张照片',
+      one: '标记 1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已标记 $count 张照片',
+      one: '已标记 1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return '第 $number 次潜水';
+  }
+
+  @override
   String get marineLife_speciesPage_title => '物种';
 
   @override
@@ -31817,6 +31906,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_info_title => '媒体信息';
+
+  @override
+  String get media_species_actionTooltip => '物种';
+
+  @override
+  String get media_species_sheetTitle => '这张照片中的物种';
+
+  @override
+  String get media_species_sightedOnDive => '本次潜水目击';
+
+  @override
+  String get media_species_otherSpecies => '其他物种...';
+
+  @override
+  String get media_species_noDiveHint => '这张照片未关联到潜水记录。搜索物种以添加标签。';
+
+  @override
+  String get media_species_chipsLabel => '物种标签';
 
   @override
   String get media_info_fileSection => '文件';

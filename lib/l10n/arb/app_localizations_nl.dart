@@ -12546,6 +12546,98 @@ class AppLocalizationsNl extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'Soorten zoeken...';
 
   @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return 'Foto\'s ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty =>
+      'Foto\'s die met deze soort zijn getagd verschijnen hier.';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => 'Foto\'s taggen';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => 'Foto\'s toevoegen';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => 'Soortfoto';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto\'s toegevoegd',
+      one: '1 foto toegevoegd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count overgeslagen',
+      one: '1 overgeslagen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mislukt',
+      one: '1 mislukt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => 'Foto\'s taggen';
+
+  @override
+  String get marineLife_tagPicker_empty =>
+      'Geen ongetagde foto\'s bij duiken waar je deze soort hebt gelogd.';
+
+  @override
+  String get marineLife_tagPicker_emptyHint =>
+      'Gebruik Foto\'s toevoegen om beelden uit je camerarol te importeren.';
+
+  @override
+  String get marineLife_tagPicker_selectAll => 'Alles selecteren';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto\'s taggen',
+      one: '1 foto taggen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto\'s getagd',
+      one: '1 foto getagd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return 'Duik $number';
+  }
+
+  @override
   String get marineLife_speciesPage_title => 'Soorten';
 
   @override
@@ -33544,6 +33636,25 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_info_title => 'Media-info';
+
+  @override
+  String get media_species_actionTooltip => 'Soorten';
+
+  @override
+  String get media_species_sheetTitle => 'Soorten op deze foto';
+
+  @override
+  String get media_species_sightedOnDive => 'Gezien tijdens deze duik';
+
+  @override
+  String get media_species_otherSpecies => 'Andere soorten...';
+
+  @override
+  String get media_species_noDiveHint =>
+      'Deze foto is niet aan een duik gekoppeld. Zoek een soort om de foto te taggen.';
+
+  @override
+  String get media_species_chipsLabel => 'Soorttags';
 
   @override
   String get media_info_fileSection => 'Bestand';

@@ -12594,6 +12594,98 @@ class AppLocalizationsHu extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'Fajok keresese...';
 
   @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return 'Fotók ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty =>
+      'Az ezzel a fajjal címkézett fotók itt jelennek meg.';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => 'Fotók címkézése';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => 'Fotók hozzáadása';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => 'Fajfotó';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó hozzáadva',
+      one: '1 fotó hozzáadva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kihagyva',
+      one: '1 kihagyva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sikertelen',
+      one: '1 sikertelen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => 'Fotók címkézése';
+
+  @override
+  String get marineLife_tagPicker_empty =>
+      'Nincs címkézetlen fotó azokon a merüléseken, ahol ezt a fajt naplóztad.';
+
+  @override
+  String get marineLife_tagPicker_emptyHint =>
+      'Használd a Fotók hozzáadása gombot képek importálásához a kameratekercsből.';
+
+  @override
+  String get marineLife_tagPicker_selectAll => 'Összes kijelölése';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó címkézése',
+      one: '1 fotó címkézése',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó címkézve',
+      one: '1 fotó címkézve',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return '$number. merülés';
+  }
+
+  @override
   String get marineLife_speciesPage_title => 'Fajok';
 
   @override
@@ -33649,6 +33741,25 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_info_title => 'Média infó';
+
+  @override
+  String get media_species_actionTooltip => 'Fajok';
+
+  @override
+  String get media_species_sheetTitle => 'Fajok ezen a fotón';
+
+  @override
+  String get media_species_sightedOnDive => 'Ezen a merülésen észlelve';
+
+  @override
+  String get media_species_otherSpecies => 'Más fajok...';
+
+  @override
+  String get media_species_noDiveHint =>
+      'Ez a fotó nincs merüléshez kapcsolva. Keress egy fajt a címkézéshez.';
+
+  @override
+  String get media_species_chipsLabel => 'Fajcímkék';
 
   @override
   String get media_info_fileSection => 'Fájl';

@@ -12327,6 +12327,98 @@ class AppLocalizationsHe extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'חיפוש מינים...';
 
   @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return 'תמונות ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty =>
+      'תמונות שתויגו במין זה יופיעו כאן.';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => 'תיוג תמונות';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => 'הוספת תמונות';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => 'תמונת מין';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תמונות נוספו',
+      one: 'תמונה אחת נוספה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count דולגו',
+      one: 'אחת דולגה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נכשלו',
+      one: 'אחת נכשלה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => 'תיוג תמונות';
+
+  @override
+  String get marineLife_tagPicker_empty =>
+      'אין תמונות ללא תגית בצלילות שבהן תיעדתם מין זה.';
+
+  @override
+  String get marineLife_tagPicker_emptyHint =>
+      'השתמשו בהוספת תמונות כדי לייבא תמונות מגלריית המצלמה.';
+
+  @override
+  String get marineLife_tagPicker_selectAll => 'בחירת הכול';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'תיוג $count תמונות',
+      one: 'תיוג תמונה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תמונות תויגו',
+      one: 'תמונה אחת תויגה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return 'צלילה $number';
+  }
+
+  @override
   String get marineLife_speciesPage_title => 'מינים';
 
   @override
@@ -33101,6 +33193,25 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_info_title => 'פרטי מדיה';
+
+  @override
+  String get media_species_actionTooltip => 'מינים';
+
+  @override
+  String get media_species_sheetTitle => 'מינים בתמונה זו';
+
+  @override
+  String get media_species_sightedOnDive => 'נצפו בצלילה זו';
+
+  @override
+  String get media_species_otherSpecies => 'מינים אחרים...';
+
+  @override
+  String get media_species_noDiveHint =>
+      'התמונה אינה מקושרת לצלילה. חפשו מין כדי לתייג אותה.';
+
+  @override
+  String get media_species_chipsLabel => 'תגיות מינים';
 
   @override
   String get media_info_fileSection => 'קובץ';
