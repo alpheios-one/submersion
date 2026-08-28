@@ -2,12 +2,12 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 
-/// Minimal pre-v172 shape: a dives table without the dismissal column,
-/// stamped at v171 so the 171 to 172 upgrade runs.
-NativeDatabase _dbAt171() {
+/// Minimal pre-v176 shape: a dives table without the dismissal column,
+/// stamped at v175 so the 175 to 176 upgrade runs.
+NativeDatabase _dbAt175() {
   return NativeDatabase.memory(
     setup: (rawDb) {
-      rawDb.execute('PRAGMA user_version = 171');
+      rawDb.execute('PRAGMA user_version = 175');
       rawDb.execute('''
         CREATE TABLE dives (
           id TEXT NOT NULL PRIMARY KEY,
@@ -25,8 +25,8 @@ NativeDatabase _dbAt171() {
 }
 
 void main() {
-  test('v172 adds site_suggestion_dismissed_at defaulting to NULL', () async {
-    final db = AppDatabase(_dbAt171());
+  test('v176 adds site_suggestion_dismissed_at defaulting to NULL', () async {
+    final db = AppDatabase(_dbAt175());
     addTearDown(() => db.close());
 
     final cols = await db.customSelect("PRAGMA table_info('dives')").get();
@@ -49,15 +49,15 @@ void main() {
 
   test('the helper no-ops when dives is absent', () async {
     final native = NativeDatabase.memory(
-      setup: (rawDb) => rawDb.execute('PRAGMA user_version = 171'),
+      setup: (rawDb) => rawDb.execute('PRAGMA user_version = 175'),
     );
     final db = AppDatabase(native);
     addTearDown(db.close);
     await expectLater(db.customSelect('SELECT 1').get(), completes);
   });
 
-  test('v172 is present in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(172));
-    expect(AppDatabase.migrationVersions, contains(172));
+  test('v176 is present in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(176));
+    expect(AppDatabase.migrationVersions, contains(176));
   });
 }

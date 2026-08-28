@@ -9156,46 +9156,91 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveType_builtin_altitude => 'Hoogte';
 
   @override
+  String get diveType_builtin_altitude_short => 'Hoogte';
+
+  @override
   String get diveType_builtin_boat => 'Vanaf boot';
+
+  @override
+  String get diveType_builtin_boat_short => 'Boot';
 
   @override
   String get diveType_builtin_cave => 'Grot';
 
   @override
+  String get diveType_builtin_cave_short => 'Grot';
+
+  @override
   String get diveType_builtin_cavern => 'Cavern';
+
+  @override
+  String get diveType_builtin_cavern_short => 'Cavern';
 
   @override
   String get diveType_builtin_deep => 'Diep';
 
   @override
+  String get diveType_builtin_deep_short => 'Diep';
+
+  @override
   String get diveType_builtin_drift => 'Stroming';
+
+  @override
+  String get diveType_builtin_drift_short => 'Stroming';
 
   @override
   String get diveType_builtin_freedive => 'Vrijduiken';
 
   @override
+  String get diveType_builtin_freedive_short => 'Vrij';
+
+  @override
   String get diveType_builtin_ice => 'IJs';
+
+  @override
+  String get diveType_builtin_ice_short => 'IJs';
 
   @override
   String get diveType_builtin_liveaboard => 'Liveaboard';
 
   @override
+  String get diveType_builtin_liveaboard_short => 'Liveaboard';
+
+  @override
   String get diveType_builtin_night => 'Nacht';
+
+  @override
+  String get diveType_builtin_night_short => 'Nacht';
 
   @override
   String get diveType_builtin_recreational => 'Recreatief';
 
   @override
+  String get diveType_builtin_recreational_short => 'Rec';
+
+  @override
   String get diveType_builtin_shore => 'Vanaf de kant';
+
+  @override
+  String get diveType_builtin_shore_short => 'Kant';
 
   @override
   String get diveType_builtin_technical => 'Technisch';
 
   @override
+  String get diveType_builtin_technical_short => 'Tec';
+
+  @override
   String get diveType_builtin_training => 'Opleiding';
 
   @override
+  String get diveType_builtin_training_short => 'Opleiding';
+
+  @override
   String get diveType_builtin_wreck => 'Wrak';
+
+  @override
+  String get diveType_builtin_wreck_short => 'Wrak';
 
   @override
   String get diveTypes_addDialog_addButton => 'Toevoegen';
@@ -9208,6 +9253,16 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_nameValidation => 'Voer een naam in';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper =>
+      'Wordt getoond in de duik-header wanneer er weinig ruimte is';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => 'bijv. Z&B';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => 'Korte naam (optioneel)';
 
   @override
   String get diveTypes_addDialog_title => 'Aangepast duiktype toevoegen';
@@ -9242,6 +9297,30 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveTypes_deleteTooltip => 'Duiktype verwijderen';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper =>
+      'Ingebouwde namen kunnen niet worden gewijzigd';
+
+  @override
+  String get diveTypes_editDialog_saveButton => 'Opslaan';
+
+  @override
+  String get diveTypes_editDialog_title => 'Duiktype bewerken';
+
+  @override
+  String get diveTypes_showInHeaderLabel => 'Koptekst';
+
+  @override
+  String get diveTypes_showInHeaderTooltip =>
+      'Toon de badge van dit type in de duikdetailkop';
+
+  @override
+  String get diveTypes_showInListLabel => 'Lijst';
+
+  @override
+  String get diveTypes_showInListTooltip =>
+      'Toon de badge van dit type in de duiklijst';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return 'Duiktype toegevoegd: $name';
   }
@@ -9264,6 +9343,16 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return 'Fout bij verwijderen duiktype: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return 'Fout bij het bijwerken van het duiktype: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return '\"$name\" bijgewerkt';
   }
 
   @override
@@ -20747,6 +20836,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveComputer_detail_lastDownload => 'Laatste download';
+
+  @override
+  String get diveComputer_detail_linkedGear => 'Uitrustingsstuk';
 
   @override
   String get diveComputer_detail_notesTitle => 'Notities';

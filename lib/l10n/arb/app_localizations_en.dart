@@ -9073,46 +9073,91 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveType_builtin_altitude => 'Altitude';
 
   @override
+  String get diveType_builtin_altitude_short => 'Alt';
+
+  @override
   String get diveType_builtin_boat => 'Boat';
+
+  @override
+  String get diveType_builtin_boat_short => 'Boat';
 
   @override
   String get diveType_builtin_cave => 'Cave';
 
   @override
+  String get diveType_builtin_cave_short => 'Cave';
+
+  @override
   String get diveType_builtin_cavern => 'Cavern';
+
+  @override
+  String get diveType_builtin_cavern_short => 'Cavern';
 
   @override
   String get diveType_builtin_deep => 'Deep';
 
   @override
+  String get diveType_builtin_deep_short => 'Deep';
+
+  @override
   String get diveType_builtin_drift => 'Drift';
+
+  @override
+  String get diveType_builtin_drift_short => 'Drift';
 
   @override
   String get diveType_builtin_freedive => 'Freedive';
 
   @override
+  String get diveType_builtin_freedive_short => 'Free';
+
+  @override
   String get diveType_builtin_ice => 'Ice';
+
+  @override
+  String get diveType_builtin_ice_short => 'Ice';
 
   @override
   String get diveType_builtin_liveaboard => 'Liveaboard';
 
   @override
+  String get diveType_builtin_liveaboard_short => 'Live';
+
+  @override
   String get diveType_builtin_night => 'Night';
+
+  @override
+  String get diveType_builtin_night_short => 'Night';
 
   @override
   String get diveType_builtin_recreational => 'Recreational';
 
   @override
+  String get diveType_builtin_recreational_short => 'Rec';
+
+  @override
   String get diveType_builtin_shore => 'Shore';
+
+  @override
+  String get diveType_builtin_shore_short => 'Shore';
 
   @override
   String get diveType_builtin_technical => 'Technical';
 
   @override
+  String get diveType_builtin_technical_short => 'Tec';
+
+  @override
   String get diveType_builtin_training => 'Training';
 
   @override
+  String get diveType_builtin_training_short => 'Training';
+
+  @override
   String get diveType_builtin_wreck => 'Wreck';
+
+  @override
+  String get diveType_builtin_wreck_short => 'Wreck';
 
   @override
   String get diveTypes_addDialog_addButton => 'Add';
@@ -9125,6 +9170,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_nameValidation => 'Please enter a name';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper =>
+      'Shown on the dive detail header when space is tight';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => 'e.g., S&R';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => 'Short name (optional)';
 
   @override
   String get diveTypes_addDialog_title => 'Add Custom Dive Type';
@@ -9159,6 +9214,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveTypes_deleteTooltip => 'Delete dive type';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper =>
+      'Built-in names can\'t be changed';
+
+  @override
+  String get diveTypes_editDialog_saveButton => 'Save';
+
+  @override
+  String get diveTypes_editDialog_title => 'Edit Dive Type';
+
+  @override
+  String get diveTypes_showInHeaderLabel => 'Header';
+
+  @override
+  String get diveTypes_showInHeaderTooltip =>
+      'Show this type\'s badge in the dive detail header';
+
+  @override
+  String get diveTypes_showInListLabel => 'List';
+
+  @override
+  String get diveTypes_showInListTooltip =>
+      'Show this type\'s badge in the dive list';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return 'Added dive type: $name';
   }
@@ -9181,6 +9260,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return 'Error deleting dive type: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return 'Error updating dive type: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return 'Updated \"$name\"';
   }
 
   @override
@@ -20561,6 +20650,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveComputer_detail_lastDownload => 'Last Download';
+
+  @override
+  String get diveComputer_detail_linkedGear => 'Gear item';
 
   @override
   String get diveComputer_detail_notesTitle => 'Notes';

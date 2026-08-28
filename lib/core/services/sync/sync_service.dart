@@ -1211,6 +1211,11 @@ class SyncService {
             hasUpdatedAt: true,
           ),
           (
+            type: 'tripDayWeather',
+            records: data.tripDayWeather,
+            hasUpdatedAt: true,
+          ),
+          (
             type: 'checklistTemplates',
             records: data.checklistTemplates,
             hasUpdatedAt: true,
@@ -1957,6 +1962,7 @@ class SyncService {
     'trips': true,
     'liveaboardDetails': true,
     'itineraryDays': true,
+    'tripDayWeather': true,
     'checklistTemplates': true,
     'checklistTemplateItems': true,
     'tripChecklistItems': true,
@@ -2057,6 +2063,12 @@ class SyncService {
       (field: 'computerId', parent: 'diveComputers', nullable: true),
       (field: 'sourceId', parent: 'diveDataSources', nullable: true),
     ],
+    // v175 gear twins: a peer's live computer whose gear item we deleted
+    // locally would otherwise dangle this FK and abort the whole sync at
+    // COMMIT. Nullable, so the computer survives with the reference cleared.
+    'diveComputers': [
+      (field: 'equipmentId', parent: 'equipment', nullable: true),
+    ],
     'diveTanks': [
       (field: 'diveId', parent: 'dives', nullable: false),
       (field: 'equipmentId', parent: 'equipment', nullable: true),
@@ -2118,6 +2130,7 @@ class SyncService {
     'siteFeatures': [(field: 'siteId', parent: 'diveSites', nullable: false)],
     'liveaboardDetails': [(field: 'tripId', parent: 'trips', nullable: false)],
     'itineraryDays': [(field: 'tripId', parent: 'trips', nullable: false)],
+    'tripDayWeather': [(field: 'tripId', parent: 'trips', nullable: false)],
     'checklistTemplateItems': [
       (field: 'templateId', parent: 'checklistTemplates', nullable: false),
     ],

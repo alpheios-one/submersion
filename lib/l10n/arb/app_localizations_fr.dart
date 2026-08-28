@@ -9262,46 +9262,91 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveType_builtin_altitude => 'Altitude';
 
   @override
+  String get diveType_builtin_altitude_short => 'Altitude';
+
+  @override
   String get diveType_builtin_boat => 'Depuis un bateau';
+
+  @override
+  String get diveType_builtin_boat_short => 'Bateau';
 
   @override
   String get diveType_builtin_cave => 'Grotte';
 
   @override
+  String get diveType_builtin_cave_short => 'Grotte';
+
+  @override
   String get diveType_builtin_cavern => 'Caverne';
+
+  @override
+  String get diveType_builtin_cavern_short => 'Caverne';
 
   @override
   String get diveType_builtin_deep => 'Profonde';
 
   @override
+  String get diveType_builtin_deep_short => 'Profonde';
+
+  @override
   String get diveType_builtin_drift => 'Dérive';
+
+  @override
+  String get diveType_builtin_drift_short => 'Dérive';
 
   @override
   String get diveType_builtin_freedive => 'Apnée';
 
   @override
+  String get diveType_builtin_freedive_short => 'Apnée';
+
+  @override
   String get diveType_builtin_ice => 'Sous glace';
+
+  @override
+  String get diveType_builtin_ice_short => 'Glace';
 
   @override
   String get diveType_builtin_liveaboard => 'Croisière plongée';
 
   @override
+  String get diveType_builtin_liveaboard_short => 'Croisière';
+
+  @override
   String get diveType_builtin_night => 'Nuit';
+
+  @override
+  String get diveType_builtin_night_short => 'Nuit';
 
   @override
   String get diveType_builtin_recreational => 'Loisir';
 
   @override
+  String get diveType_builtin_recreational_short => 'Rec';
+
+  @override
   String get diveType_builtin_shore => 'Depuis la côte';
+
+  @override
+  String get diveType_builtin_shore_short => 'Côte';
 
   @override
   String get diveType_builtin_technical => 'Technique';
 
   @override
+  String get diveType_builtin_technical_short => 'Tec';
+
+  @override
   String get diveType_builtin_training => 'Formation';
 
   @override
+  String get diveType_builtin_training_short => 'Formation';
+
+  @override
   String get diveType_builtin_wreck => 'Épave';
+
+  @override
+  String get diveType_builtin_wreck_short => 'Épave';
 
   @override
   String get diveTypes_addDialog_addButton => 'Ajouter';
@@ -9314,6 +9359,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_nameValidation => 'Veuillez entrer un nom';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper =>
+      'Affiché dans l\'en-tête du détail de plongée quand la place manque';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => 'ex. RR';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => 'Nom court (facultatif)';
 
   @override
   String get diveTypes_addDialog_title =>
@@ -9349,6 +9404,30 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveTypes_deleteTooltip => 'Supprimer le type de plongée';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper =>
+      'Les noms intégrés ne peuvent pas être modifiés';
+
+  @override
+  String get diveTypes_editDialog_saveButton => 'Enregistrer';
+
+  @override
+  String get diveTypes_editDialog_title => 'Modifier le type de plongée';
+
+  @override
+  String get diveTypes_showInHeaderLabel => 'En-tête';
+
+  @override
+  String get diveTypes_showInHeaderTooltip =>
+      'Afficher le badge de ce type dans l\'en-tête des détails de la plongée';
+
+  @override
+  String get diveTypes_showInListLabel => 'Liste';
+
+  @override
+  String get diveTypes_showInListTooltip =>
+      'Afficher le badge de ce type dans la liste des plongées';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return 'Type de plongée ajouté : $name';
   }
@@ -9371,6 +9450,16 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return 'Erreur lors de la suppression du type de plongée : $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return 'Erreur lors de la mise à jour du type de plongée : $error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return '\"$name\" mis à jour';
   }
 
   @override
@@ -20992,6 +21081,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveComputer_detail_lastDownload => 'Dernier telechargement';
+
+  @override
+  String get diveComputer_detail_linkedGear => 'Équipement';
 
   @override
   String get diveComputer_detail_notesTitle => 'Notes';

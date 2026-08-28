@@ -5,6 +5,7 @@ import 'package:submersion/core/database/database.dart'
     show DiveDataSourcesCompanion, DiveSitesCompanion, DivesCompanion;
 import 'package:submersion/core/services/export/export_service.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
+import 'package:submersion/features/equipment/data/services/dive_computer_gear_linker.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
 import 'package:submersion/core/services/location_service.dart';
@@ -1726,6 +1727,10 @@ class UddfEntityImporter {
       await DiveEquipmentDefaulter().applyForImportedDive(dive);
       await ChecklistDiveLinker().applyForImportedDive(dive);
       await altitudeEnricher.applyForImportedDive(dive);
+      // After the defaulter, never before: the defaulter bails on a dive
+      // that already has equipment, so linking first would suppress the
+      // diver's default and geofenced sets.
+      await DiveComputerGearLinker().linkComputerGearForDive(diveId: dive.id);
       importedDiveIds.add(diveId);
       diveIdByIndex[i] = diveId;
 

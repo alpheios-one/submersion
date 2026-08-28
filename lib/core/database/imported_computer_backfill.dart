@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import 'package:submersion/core/database/dive_computer_gear_identity.dart';
 import 'package:submersion/core/database/imported_computer_identity.dart';
 
 /// Register the dive computers that file-imported dives name, and attribute
@@ -65,6 +66,29 @@ Future<void> backfillImportedDiveComputers(DatabaseConnectionUser db) async {
   })) {
     return;
   }
+  // v175 gear twins: absent on an older fixture, in which case the mint
+  // below is skipped and the ladder seeds the twins instead.
+  final equipmentCols = await columnsOf('equipment');
+  // Every column the mint below writes. This runs unguarded inside beforeOpen,
+  // so a throw here does not degrade a feature, it fails app startup.
+  final hasGearColumn =
+      computerCols.contains('equipment_id') &&
+      equipmentCols.containsAll({
+        'id',
+        'diver_id',
+        'name',
+        'type',
+        'brand',
+        'model',
+        'serial_number',
+        'status',
+        'purchase_currency',
+        'notes',
+        'is_active',
+        'created_at',
+        'updated_at',
+      });
+
   final sourceCols = await columnsOf('dive_data_sources');
   if (!sourceCols.containsAll({'dive_id', 'source_format'})) return;
 
@@ -136,6 +160,41 @@ Future<void> backfillImportedDiveComputers(DatabaseConnectionUser db) async {
           now,
         ],
       );
+
+      // Seed the gear twin, but ONLY when that insert actually inserted. If
+      // INSERT OR IGNORE no-opped because the computer already exists, the
+      // user may have deleted its gear item deliberately, and re-minting here
+      // would resurrect it on every app open. Same rule that keeps
+      // _backfillLegacyServiceSchedules out of beforeOpen.
+      if (hasGearColumn) {
+        final inserted = await db
+            .customSelect('SELECT changes() AS changed')
+            .getSingle();
+        if (inserted.read<int>('changed') > 0) {
+          final twinId = diveComputerGearId(computerId);
+          await db.customStatement(
+            'INSERT OR IGNORE INTO equipment '
+            '(id, diver_id, name, type, brand, model, serial_number, status, '
+            'purchase_currency, notes, is_active, created_at, updated_at) '
+            "VALUES (?, ?, ?, 'computer', NULL, ?, ?, 'active', 'USD', '', 1, "
+            '?, ?)',
+            [
+              twinId,
+              diverId,
+              trimmedModel,
+              trimmedModel,
+              (trimmedSerial?.isEmpty ?? true) ? null : trimmedSerial,
+              now,
+              now,
+            ],
+          );
+          await db.customStatement(
+            'UPDATE dive_computers SET equipment_id = ? WHERE id = ?',
+            [twinId, computerId],
+          );
+        }
+      }
+
       // Re-read so a later identity that normalizes onto this same device
       // adopts it instead of racing to insert it again.
       candidates = await _candidates(db);

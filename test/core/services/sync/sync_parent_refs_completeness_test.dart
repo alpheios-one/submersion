@@ -24,6 +24,7 @@ void main() {
     'trips': 'trips',
     'liveaboard_detail_records': 'liveaboardDetails',
     'trip_itinerary_days': 'itineraryDays',
+    'trip_day_weather': 'tripDayWeather',
     'checklist_templates': 'checklistTemplates',
     'checklist_template_items': 'checklistTemplateItems',
     'trip_checklist_items': 'tripChecklistItems',
