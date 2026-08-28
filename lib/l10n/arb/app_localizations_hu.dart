@@ -20886,6 +20886,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveComputer_detail_lastDownload => 'Utolso letoltes';
 
   @override
+  String get diveComputer_detail_linkedGear => 'Felszerelés';
+
+  @override
   String get diveComputer_detail_notesTitle => 'Megjegyzesek';
 
   @override

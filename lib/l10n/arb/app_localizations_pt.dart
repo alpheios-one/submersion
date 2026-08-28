@@ -20958,6 +20958,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveComputer_detail_lastDownload => 'Ultimo download';
 
   @override
+  String get diveComputer_detail_linkedGear => 'Equipamento';
+
+  @override
   String get diveComputer_detail_notesTitle => 'Notas';
 
   @override

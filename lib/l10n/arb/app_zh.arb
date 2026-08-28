@@ -6529,6 +6529,7 @@
   "diveComputer_detail_labelModel": "型号",
   "diveComputer_detail_labelName": "名称",
   "diveComputer_detail_lastDownload": "上次下载",
+  "diveComputer_detail_linkedGear": "装备",
   "diveComputer_detail_notesTitle": "备注",
   "diveComputer_detail_statisticsTitle": "统计",
   "diveComputer_detail_unknown": "未知",

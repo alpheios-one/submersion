@@ -6529,6 +6529,7 @@
   "diveComputer_detail_labelModel": "Modelo",
   "diveComputer_detail_labelName": "Nome",
   "diveComputer_detail_lastDownload": "Ultimo download",
+  "diveComputer_detail_linkedGear": "Equipamento",
   "diveComputer_detail_notesTitle": "Notas",
   "diveComputer_detail_statisticsTitle": "Estatisticas",
   "diveComputer_detail_unknown": "Desconhecido",
