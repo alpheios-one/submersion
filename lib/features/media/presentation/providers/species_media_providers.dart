@@ -114,11 +114,15 @@ typedef DiveSpeciesKey = ({String diveId, String speciesId});
 /// same photos the Species page would.
 final mediaForDiveSpeciesProvider =
     FutureProvider.family<List<MediaItem>, DiveSpeciesKey>((ref, key) async {
-      final items = await ref.watch(
-        mediaForSpeciesProvider(key.speciesId).future,
+      final repository = ref.watch(mediaSpeciesRepositoryProvider);
+      final diverId = ref.watch(currentDiverIdProvider);
+      ref.invalidateSelfWhen(repository.watchTagChanges());
+      ref.invalidateSelfWhen(
+        ref.watch(mediaRepositoryProvider).watchMediaChanges(),
       );
-      return [
-        for (final item in items)
-          if (item.diveId == key.diveId) item,
-      ];
+      return repository.getMediaForSpecies(
+        key.speciesId,
+        diverId: diverId,
+        diveId: key.diveId,
+      );
     });

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/species_display.dart';
+import 'package:submersion/features/marine_life/presentation/utils/species_category_color.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -53,7 +54,10 @@ class DiveSightingRow extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundColor: _categoryColor(sighting.speciesCategory),
+                backgroundColor: colorForSpeciesCategory(
+                  sighting.speciesCategory,
+                  theme.brightness,
+                ),
                 child: Icon(
                   iconForSpeciesCategory(
                     sighting.speciesCategory ?? SpeciesCategory.other,
@@ -122,29 +126,5 @@ class DiveSightingRow extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-Color _categoryColor(SpeciesCategory? category) {
-  switch (category) {
-    case SpeciesCategory.fish:
-      return Colors.blue;
-    case SpeciesCategory.shark:
-      return Colors.grey.shade700;
-    case SpeciesCategory.ray:
-      return Colors.indigo;
-    case SpeciesCategory.mammal:
-      return Colors.brown;
-    case SpeciesCategory.turtle:
-      return Colors.green.shade700;
-    case SpeciesCategory.invertebrate:
-      return Colors.purple;
-    case SpeciesCategory.coral:
-      return Colors.pink;
-    case SpeciesCategory.plant:
-      return Colors.green;
-    case SpeciesCategory.other:
-    case null:
-      return Colors.grey;
   }
 }

@@ -23120,7 +23120,7 @@ abstract class AppLocalizations {
   /// **'Site'**
   String get media_library_filter_site;
 
-  /// No description provided for @media_library_filter_species.
+  /// Library filter chip: pick a species tag
   ///
   /// In en, this message translates to:
   /// **'Species'**

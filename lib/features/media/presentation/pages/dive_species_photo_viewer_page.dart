@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/presentation/pages/media_viewer_page.dart';
 import 'package:submersion/features/media/presentation/providers/species_media_providers.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Opens one dive's photos of one species: the gallery a sighting row's
 /// photo chip leads to. Resolves the list reactively, then hands off to
@@ -30,10 +31,17 @@ class DiveSpeciesPhotoViewerPage extends ConsumerWidget {
       data: (mediaList) {
         if (mediaList.isEmpty) {
           // The chip only shows for a positive count, so this is the tag
-          // being removed while the row was on screen. Close quietly.
+          // being removed while the row was on screen: say so, like the
+          // other viewers, rather than showing a blank screen.
           return Scaffold(
             backgroundColor: Colors.black,
             appBar: AppBar(backgroundColor: Colors.transparent),
+            body: Center(
+              child: Text(
+                context.l10n.media_photoViewer_noPhotosAvailable,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
           );
         }
         return MediaViewerPage(

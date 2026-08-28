@@ -66,5 +66,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(MediaViewerPage), findsNothing);
+    expect(find.text('No photos available'), findsOneWidget);
   });
 }

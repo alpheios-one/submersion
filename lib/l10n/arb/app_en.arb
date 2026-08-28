@@ -8186,6 +8186,9 @@
     "description": "Library filter chip: pick a dive site"
   },
   "media_library_filter_species": "Species",
+  "@media_library_filter_species": {
+    "description": "Library filter chip: pick a species tag"
+  },
   "media_library_filter_trip": "Trip",
   "@media_library_filter_trip": {
     "description": "Library filter chip: pick a trip"

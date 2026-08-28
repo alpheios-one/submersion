@@ -121,10 +121,12 @@ class MediaSpeciesRepository {
   ///
   /// Scoped to [diverId] through the photo's dive while keeping site-only
   /// photos, the library's own rule (`media.dive_id IS NULL OR
-  /// dives.diver_id = ?`).
+  /// dives.diver_id = ?`). [diveId] narrows to that dive's photos in SQL,
+  /// same ordering, for the viewer a sighting row opens.
   Future<List<MediaItem>> getMediaForSpecies(
     String speciesId, {
     String? diverId,
+    String? diveId,
   }) async {
     final m = _db.media;
     final query =
@@ -145,7 +147,11 @@ class MediaSpeciesRepository {
             ),
           ])
           ..where(
-            _db.mediaSpecies.speciesId.equals(speciesId) & _diverScope(diverId),
+            _db.mediaSpecies.speciesId.equals(speciesId) &
+                _diverScope(diverId) &
+                (diveId == null
+                    ? const Constant(true)
+                    : m.diveId.equals(diveId)),
           )
           ..orderBy([OrderingTerm.desc(m.takenAt), OrderingTerm.asc(m.id)]);
     final rows = await query.get();
