@@ -118,4 +118,66 @@ void main() {
       expect(axis.showsLabelAt(axis.max - axis.labelInterval), isTrue);
     });
   });
+
+  group('labelFor', () {
+    /// Every label fl_chart would draw: the bounds plus each interval slot.
+    List<String> drawnLabels(DateAxis axis) {
+      final out = <String>[];
+      for (var v = axis.min; v <= axis.max; v += axis.labelInterval) {
+        final label = axis.labelFor(v);
+        if (label != null) out.add(label);
+      }
+      final last = axis.labelFor(axis.max);
+      if (last != null && (out.isEmpty || out.last != last)) out.add(last);
+      return out;
+    }
+
+    test('never repeats a month across adjacent slots', () {
+      // Sep through May. labelInterval is uniform but months are not, so the
+      // step drifts and two adjacent slots land in the same month.
+      final axis = DateAxis.forRange(
+        DateTime.utc(2025, 9, 1),
+        DateTime.utc(2026, 5, 1),
+      );
+
+      final labels = drawnLabels(axis);
+
+      expect(labels, isNotEmpty);
+      expect(
+        labels.length,
+        labels.toSet().length,
+        reason: 'duplicate labels: $labels',
+      );
+    });
+
+    test('never repeats a year across adjacent slots', () {
+      final axis = DateAxis.forRange(
+        DateTime.utc(2019, 4, 1),
+        DateTime.utc(2026, 8, 1),
+      );
+
+      final labels = drawnLabels(axis);
+
+      expect(labels.length, labels.toSet().length, reason: '$labels');
+    });
+
+    test('returns null outside the bounds', () {
+      final axis = DateAxis.forRange(
+        DateTime.utc(2024, 1, 1),
+        DateTime.utc(2024, 9, 1),
+      );
+
+      expect(axis.labelFor(axis.min - 1), isNull);
+      expect(axis.labelFor(axis.max + 1), isNull);
+    });
+
+    test('labels the lower bound', () {
+      final axis = DateAxis.forRange(
+        DateTime.utc(2024, 1, 1),
+        DateTime.utc(2024, 9, 1),
+      );
+
+      expect(axis.labelFor(axis.min), isNotNull);
+    });
+  });
 }

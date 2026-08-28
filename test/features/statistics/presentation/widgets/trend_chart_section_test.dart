@@ -124,4 +124,20 @@ void main() {
 
     expect(find.byType(TrendControlStrip), findsNothing);
   });
+
+  testWidgets('the rolling mean is drawn in a different colour to the data', (
+    tester,
+  ) async {
+    // Same colour for both makes the smoother indistinguishable from the
+    // series it smooths, and the legend swatch stops identifying anything.
+    await tester.pumpWidget(host(AsyncValue.data(series(20))));
+    await tester.pumpAndSettle();
+
+    final chart = tester.widget<DiveTrendChart>(find.byType(DiveTrendChart));
+
+    expect(chart.rollingColor, isNotNull);
+    expect(chart.rollingColor, isNot(chart.pointColor));
+    expect(chart.rateColor, isNot(chart.pointColor));
+    expect(chart.rateColor, isNot(chart.rollingColor));
+  });
 }

@@ -357,4 +357,119 @@ void main() {
       expect(yearLabels(tester).length, greaterThanOrEqualTo(3));
     });
   });
+
+  group('no duplicate adjacent labels', () {
+    testWidgets('a nine-month monthly span labels each month once', (
+      tester,
+    ) async {
+      // A uniform interval drifts off real month boundaries, so two adjacent
+      // slots can format to the same month abbreviation ("Sep Sep").
+      final points = <TrendDataPoint>[
+        for (var m = 0; m < 9; m++)
+          TrendDataPoint(date: DateTime.utc(2025, 9 + m, 15), value: 10.0 + m),
+      ];
+
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(points: points, aggregation: TrendAggregation.monthly),
+        ),
+      );
+
+      const months = {
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      };
+      final labels = tester
+          .widgetList<Text>(find.byType(Text))
+          .map((t) => t.data)
+          .whereType<String>()
+          .where(months.contains)
+          .toList();
+
+      expect(labels, isNotEmpty);
+      expect(
+        labels.length,
+        labels.toSet().length,
+        reason: 'duplicate month labels: $labels',
+      );
+    });
+  });
+
+  group('readability', () {
+    final spread = <TrendDataPoint>[
+      for (var m = 0; m < 6; m++)
+        TrendDataPoint(date: DateTime.utc(2025, 9 + m, 5), value: 10.0 + m),
+      for (var m = 0; m < 6; m++)
+        TrendDataPoint(date: DateTime.utc(2025, 9 + m, 20), value: 30.0 + m),
+    ];
+
+    testWidgets('marks each aggregated bucket with a dot', (tester) async {
+      // Without dots an aggregated series is a smooth line and the only way
+      // to find a data point is to hover for it.
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(points: spread, aggregation: TrendAggregation.monthly),
+        ),
+      );
+
+      expect(readData(tester).lineBarsData.first.dotData.show, isTrue);
+    });
+
+    testWidgets('keeps the band series free of dots', (tester) async {
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(points: spread, aggregation: TrendAggregation.monthly),
+        ),
+      );
+
+      final bars = readData(tester).lineBarsData;
+
+      expect(bars[1].dotData.show, isFalse);
+      expect(bars[2].dotData.show, isFalse);
+    });
+
+    testWidgets('keeps the tooltip inside the chart on a narrow surface', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(DiveTrendChart(points: spread)));
+
+      final tooltip = readData(tester).lineTouchData.touchTooltipData;
+
+      expect(tooltip.fitInsideHorizontally, isTrue);
+      expect(tooltip.fitInsideVertically, isTrue);
+    });
+
+    testWidgets('the tooltip reports the data series only', (tester) async {
+      // Aggregated mode carries three series; touching drew one unlabelled
+      // line per series, so a bucket read as three mystery numbers.
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(points: spread, aggregation: TrendAggregation.monthly),
+        ),
+      );
+
+      final data = readData(tester);
+      final bars = data.lineBarsData;
+      final touched = [
+        for (var i = 0; i < bars.length; i++)
+          LineBarSpot(bars[i], i, bars[i].spots.first),
+      ];
+
+      final items = data.lineTouchData.touchTooltipData.getTooltipItems(
+        touched,
+      );
+
+      expect(items.where((i) => i != null), hasLength(1));
+    });
+  });
 }

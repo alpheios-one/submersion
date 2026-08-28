@@ -9,6 +9,8 @@
 /// widget, which has a BuildContext. This file only decides where ticks go.
 library;
 
+import 'package:intl/intl.dart';
+
 enum DateAxisGranularity { day, month, quarter, year }
 
 class DateAxis {
@@ -51,6 +53,50 @@ class DateAxis {
     if (value == min || value == max) return true;
     final crowding = labelInterval * 0.6;
     return (max - value) >= crowding && (value - min) >= crowding;
+  }
+
+  /// The text to draw at [value], or null when nothing should be drawn.
+  ///
+  /// Beyond the bound-crowding rule, this drops a label that repeats the one
+  /// in the preceding slot. The step is uniform but months and years are not,
+  /// so it drifts off real calendar boundaries and two adjacent slots can land
+  /// in the same month ("Sep Sep").
+  ///
+  /// [step] must be the spacing fl_chart actually applied
+  /// (`TitleMeta.appliedInterval`), not the [labelInterval] we requested.
+  /// fl_chart is free to use a different one, and comparing against a value it
+  /// never drew silently defeats the check.
+  String? labelFor(double value, {double? step}) {
+    if (!showsLabelAt(value)) return null;
+
+    final text = _format(_dateOf(value));
+
+    // The previously drawn label is one step back, or the lower bound when
+    // that step would fall outside the axis. fl_chart does not anchor its
+    // step sequence at min, so the first derived label can sit less than a
+    // step from the bound: without the clamp that pair goes uncompared, which
+    // is exactly how "Sep Sep" survived.
+    var previous = value - (step ?? labelInterval);
+    if (previous < min) previous = min;
+    if (previous < value && showsLabelAt(previous)) {
+      if (_format(_dateOf(previous)) == text) return null;
+    }
+    return text;
+  }
+
+  static DateTime _dateOf(double ms) =>
+      DateTime.fromMillisecondsSinceEpoch(ms.toInt(), isUtc: true);
+
+  String _format(DateTime date) {
+    switch (granularity) {
+      case DateAxisGranularity.year:
+        return DateFormat.y().format(date);
+      case DateAxisGranularity.quarter:
+      case DateAxisGranularity.month:
+        return DateFormat.MMM().format(date);
+      case DateAxisGranularity.day:
+        return DateFormat.Md().format(date);
+    }
   }
 
   /// Chooses a granularity from the span, then walks ticks across it.

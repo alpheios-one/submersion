@@ -135,11 +135,14 @@ class DiveTrendChart extends StatelessWidget {
         // apart would assert something happened in between.
         barWidth: isRaw ? 0 : 2,
         isStrokeCapRound: true,
+        // Dotted in both modes. An aggregated series drawn as a bare line
+        // hides where the buckets actually are, leaving hovering as the only
+        // way to find one.
         dotData: FlDotData(
-          show: isRaw,
+          show: true,
           getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-            radius: 2.2,
-            color: color.withValues(alpha: 0.7),
+            radius: isRaw ? 2.2 : 3,
+            color: color.withValues(alpha: isRaw ? 0.7 : 1),
             strokeWidth: 0,
           ),
         ),
@@ -228,8 +231,16 @@ class DiveTrendChart extends StatelessWidget {
   LineTouchData _touchData(BuildContext context) {
     return LineTouchData(
       touchTooltipData: LineTouchTooltipData(
+        // A phone-width card clips the tooltip at both edges without these.
+        fitInsideHorizontally: true,
+        fitInsideVertically: true,
         getTooltipItems: (touchedSpots) {
           return touchedSpots.map((spot) {
+            // Index 0 is the data series; the rest are the invisible band
+            // bounds and the fitted overlays. Reporting all of them drew one
+            // unlabelled number per series, so a bucket read as three mystery
+            // values.
+            if (spot.barIndex != 0) return null;
             final date = DateTime.fromMillisecondsSinceEpoch(
               spot.x.toInt(),
               isUtc: true,
@@ -265,17 +276,11 @@ class DiveTrendChart extends StatelessWidget {
           // then never match a nominated tick and the axis renders blank.
           interval: dateAxis.labelInterval,
           getTitlesWidget: (value, meta) {
-            if (!dateAxis.showsLabelAt(value)) return const Text('');
-            final date = DateTime.fromMillisecondsSinceEpoch(
-              value.toInt(),
-              isUtc: true,
-            );
+            final label = dateAxis.labelFor(value, step: meta.appliedInterval);
+            if (label == null) return const Text('');
             return Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: Text(
-                _formatTick(date, dateAxis.granularity),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              child: Text(label, style: Theme.of(context).textTheme.bodySmall),
             );
           },
         ),
@@ -301,18 +306,6 @@ class DiveTrendChart extends StatelessWidget {
       topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
       rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
     );
-  }
-
-  String _formatTick(DateTime date, DateAxisGranularity granularity) {
-    switch (granularity) {
-      case DateAxisGranularity.year:
-        return DateFormat.y().format(date);
-      case DateAxisGranularity.quarter:
-      case DateAxisGranularity.month:
-        return DateFormat.MMM().format(date);
-      case DateAxisGranularity.day:
-        return DateFormat.Md().format(date);
-    }
   }
 }
 

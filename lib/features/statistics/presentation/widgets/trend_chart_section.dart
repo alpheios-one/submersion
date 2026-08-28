@@ -46,7 +46,14 @@ class TrendChartSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(trendChartSettingsProvider(chartId));
     final theme = Theme.of(context);
-    final rateColor = theme.colorScheme.tertiary;
+    final isDark = theme.brightness == Brightness.dark;
+
+    // The three layers must be told apart at a glance, so the overlays do NOT
+    // reuse the chart's identity colour. Drawing the rolling mean in the same
+    // blue as the series it smooths made the two indistinguishable and left
+    // the legend swatch identifying nothing.
+    final rollingColor = isDark ? Colors.amber.shade300 : Colors.amber.shade800;
+    final rateColor = theme.colorScheme.onSurface.withValues(alpha: 0.75);
 
     return StatSectionCard(
       title: title,
@@ -67,7 +74,7 @@ class TrendChartSection extends ConsumerWidget {
                 showRollingMean: settings.showRollingMean,
                 showLinearFit: settings.showLinearFit,
                 pointColor: lineColor,
-                rollingColor: lineColor,
+                rollingColor: rollingColor,
                 rateColor: rateColor,
                 yAxisLabel: yAxisLabel,
                 valueFormatter: valueFormatter,
@@ -88,7 +95,7 @@ class TrendChartSection extends ConsumerWidget {
                   ref,
                   settings.copyWith(showLinearFit: !settings.showLinearFit),
                 ),
-                rollingColor: lineColor,
+                rollingColor: rollingColor,
                 rateColor: rateColor,
                 rateLabel: rate,
               ),
