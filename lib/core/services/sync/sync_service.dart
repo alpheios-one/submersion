@@ -8,7 +8,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart'
-    show SyncRecord, DeletionLogData;
+    show AppDatabase, SyncRecord, DeletionLogData;
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -1211,6 +1211,11 @@ class SyncService {
             hasUpdatedAt: true,
           ),
           (
+            type: 'tripDayWeather',
+            records: data.tripDayWeather,
+            hasUpdatedAt: true,
+          ),
+          (
             type: 'checklistTemplates',
             records: data.checklistTemplates,
             hasUpdatedAt: true,
@@ -1874,8 +1879,9 @@ class SyncService {
           }
           final local = await _serializer.fetchRecord(entityType, recordId);
           // _extractUpdatedAtMillis falls back to createdAt, so a row created
-          // locally after our last sync is protected from a stale remote
-          // tombstone even on append-only child tables that have a createdAt.
+          // locally after our last sync (or after the tombstone itself) is
+          // protected from a stale remote tombstone even on append-only child
+          // tables that have a createdAt.
           // Clockless child tables with neither updatedAt nor createdAt
           // (dive_profiles, dive_tanks, tank_pressure_profiles, sightings) have
           // no age signal: the uuid-keyed ones regenerate with fresh ids on
@@ -1888,10 +1894,24 @@ class SyncService {
               ? deletion.deletedAt
               : remoteExportedAt;
 
-          final hasConflict =
+          // Two independent guards; either one routes to a conflict:
+          //  * edited since our last sync (three-way; needs a horizon), and
+          //  * the tombstone's own age: a local row edited AFTER the peer
+          //    deleted it is newer than the deletion. This mirrors the
+          //    remote-live-vs-local-tombstone rule in _mergeEntity.
+          // The age guard is the ONLY protection when there is no horizon,
+          // which is exactly the state every recovery action leaves behind
+          // (restore, Reset Sync State, adopt, rejoin, backend switch):
+          // lastSyncMs is null there, and without this guard a peer tombstone
+          // deleted every matching row unconditionally, so a freshly restored
+          // library silently undid itself on the next sync (#1340).
+          final editedSinceLastSync =
               localUpdatedAt != null &&
               lastSyncMs != null &&
               localUpdatedAt > lastSyncMs;
+          final newerThanTombstone =
+              localUpdatedAt != null && localUpdatedAt > deletionTimestamp;
+          final hasConflict = editedSinceLastSync || newerThanTombstone;
 
           if (hasConflict) {
             conflicts += 1;
@@ -1957,6 +1977,7 @@ class SyncService {
     'trips': true,
     'liveaboardDetails': true,
     'itineraryDays': true,
+    'tripDayWeather': true,
     'checklistTemplates': true,
     'checklistTemplateItems': true,
     'tripChecklistItems': true,
@@ -2057,6 +2078,12 @@ class SyncService {
       (field: 'computerId', parent: 'diveComputers', nullable: true),
       (field: 'sourceId', parent: 'diveDataSources', nullable: true),
     ],
+    // v175 gear twins: a peer's live computer whose gear item we deleted
+    // locally would otherwise dangle this FK and abort the whole sync at
+    // COMMIT. Nullable, so the computer survives with the reference cleared.
+    'diveComputers': [
+      (field: 'equipmentId', parent: 'equipment', nullable: true),
+    ],
     'diveTanks': [
       (field: 'diveId', parent: 'dives', nullable: false),
       (field: 'equipmentId', parent: 'equipment', nullable: true),
@@ -2118,6 +2145,7 @@ class SyncService {
     'siteFeatures': [(field: 'siteId', parent: 'diveSites', nullable: false)],
     'liveaboardDetails': [(field: 'tripId', parent: 'trips', nullable: false)],
     'itineraryDays': [(field: 'tripId', parent: 'trips', nullable: false)],
+    'tripDayWeather': [(field: 'tripId', parent: 'trips', nullable: false)],
     'checklistTemplateItems': [
       (field: 'templateId', parent: 'checklistTemplates', nullable: false),
     ],
@@ -2974,6 +3002,23 @@ class SyncService {
       currentEpochId,
       excludeDeviceIds: retiredPeers,
     );
+    if (sources.newerSchemaPeerDeviceIds.isNotEmpty) {
+      // Held (#1341): stay fenced. The cloud library exists but was published
+      // from a newer schema, so rebuilding from it would apply what pull
+      // holds, and the re-establish below would push the stale rows the fence
+      // exists to keep out. Marker and local state are left as they are; the
+      // rejoin runs once this device updates.
+      _log.warning(
+        'Retirement fence held: the cloud library was published from a newer '
+        'schema by ${sources.newerSchemaPeerDeviceIds}',
+      );
+      return SyncResult(
+        status: SyncResultStatus.error,
+        message: _l10n.settings_cloudSync_result_cloudLibraryNewerSchema,
+        newerSchemaPeerDeviceIds: sources.newerSchemaPeerDeviceIds,
+        newerSchemaPeerNames: sources.newerSchemaPeerNames,
+      );
+    }
     if (sources.baseFilePaths.isEmpty) {
       // No readable library to rebuild from. Re-establish from the local
       // library instead of bricking (mirrors _recoverUnreadableEpoch): drop
@@ -3128,6 +3173,23 @@ class SyncService {
         folderId,
         marker.epochId,
       );
+      if (sources.newerSchemaPeerDeviceIds.isNotEmpty) {
+        // Held (#1341): the epoch library was published across a breaking
+        // schema change this build predates, so adopting it would apply what
+        // pull holds. Decided before the empty-set branch below, which would
+        // otherwise read a held library as unreadable and re-establish from
+        // local. Nothing changes locally; adopt succeeds after the update.
+        _log.warning(
+          'Adopt held: epoch ${marker.epochId} was published from a newer '
+          'schema by ${sources.newerSchemaPeerDeviceIds}',
+        );
+        return SyncResult(
+          status: SyncResultStatus.error,
+          message: _l10n.settings_cloudSync_result_cloudLibraryNewerSchema,
+          newerSchemaPeerDeviceIds: sources.newerSchemaPeerDeviceIds,
+          newerSchemaPeerNames: sources.newerSchemaPeerNames,
+        );
+      }
       if (sources.baseFilePaths.isEmpty) {
         // No current-format library for this epoch. If the marker is stale
         // (old-format backend or an orphaned replace), re-establish from the
@@ -3418,12 +3480,23 @@ class SyncService {
   /// Replaces the old in-memory collect that decoded every device's whole base
   /// into RAM and OOM-crashed iOS adopting a large library (#358). The caller
   /// owns the returned temp files and must delete them.
+  ///
+  /// Compatibility floor (#1341): an epoch device whose declared floor exceeds
+  /// this build's schema is held exactly as ChangesetReader.pull holds it and
+  /// reported in `newerSchemaPeerDeviceIds`. Pull can hold one peer and merge
+  /// the rest because it is additive; both callers here are delete-all-refill,
+  /// so a partial refill would drop every row that lives only in the held
+  /// base. A held peer therefore voids the whole collection: no bases are
+  /// returned (any already assembled are deleted here), and the caller must
+  /// abort rather than read the empty set as "no library".
   Future<
     ({
       List<String> baseFilePaths,
       List<int> baseExportedAt,
       List<SyncPayload> changesets,
       List<({String deviceId, int baseSeq, int appliedThrough})> cursors,
+      Set<String> newerSchemaPeerDeviceIds,
+      Map<String, String> newerSchemaPeerNames,
     })
   >
   _collectEpochBaseSources(
@@ -3446,6 +3519,8 @@ class SyncService {
     final baseExportedAt = <int>[];
     final changesets = <SyncPayload>[];
     final cursors = <({String deviceId, int baseSeq, int appliedThrough})>[];
+    final newerSchemaPeerDeviceIds = <String>{};
+    final newerSchemaPeerNames = <String, String>{};
     for (final deviceId in deviceIds) {
       if (excludeDeviceIds.contains(deviceId)) continue;
       final manifestFile = byName[ChangesetLogLayout.manifestName(deviceId)];
@@ -3461,6 +3536,23 @@ class SyncService {
       if (manifest.epochId != epochId) continue;
       final baseSeq = manifest.baseSeq;
       if (baseSeq == null) continue;
+      // Compatibility-floor filter, the adopt-side twin of the one in
+      // ChangesetReader.pull: a manifest's schemaVersion is its writer's
+      // AppDatabase.minimumCompatibleSchemaVersion. Checked after the base
+      // check because a base-less peer contributes nothing to adopt either
+      // way (pull holds its changesets on its own).
+      final peerSchema = manifest.schemaVersion;
+      if (peerSchema != null && peerSchema > AppDatabase.currentSchemaVersion) {
+        newerSchemaPeerDeviceIds.add(deviceId);
+        final name = manifest.deviceName;
+        if (name != null && name.isNotEmpty) {
+          newerSchemaPeerNames[deviceId] = name;
+        }
+        continue;
+      }
+      // Once any peer is held the collection is void: keep scanning manifests
+      // only to name every held peer, and fetch no more bases.
+      if (newerSchemaPeerDeviceIds.isNotEmpty) continue;
       final partCount = manifest.basePartCount ?? 0;
       if (partCount <= 0) continue;
       final path = await _baseSink.assemble(
@@ -3496,11 +3588,26 @@ class SyncService {
         appliedThrough: appliedThrough,
       ));
     }
+    if (newerSchemaPeerDeviceIds.isNotEmpty) {
+      for (final path in baseFilePaths) {
+        await _baseSink.deleteQuietly(path);
+      }
+      return (
+        baseFilePaths: const <String>[],
+        baseExportedAt: const <int>[],
+        changesets: const <SyncPayload>[],
+        cursors: const <({String deviceId, int baseSeq, int appliedThrough})>[],
+        newerSchemaPeerDeviceIds: newerSchemaPeerDeviceIds,
+        newerSchemaPeerNames: newerSchemaPeerNames,
+      );
+    }
     return (
       baseFilePaths: baseFilePaths,
       baseExportedAt: baseExportedAt,
       changesets: changesets,
       cursors: cursors,
+      newerSchemaPeerDeviceIds: newerSchemaPeerDeviceIds,
+      newerSchemaPeerNames: newerSchemaPeerNames,
     );
   }
 

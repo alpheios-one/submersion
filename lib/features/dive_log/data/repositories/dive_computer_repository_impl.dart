@@ -27,6 +27,8 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
 import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
 import 'package:submersion/features/dive_log/domain/services/tank_pressure_series.dart';
+import 'package:submersion/features/equipment/data/services/dive_computer_gear_linker.dart';
+import 'package:submersion/features/equipment/data/services/dive_computer_gear_resolver.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -247,6 +249,25 @@ class DiveComputerRepository {
             ),
           );
 
+      // Seed the gear twin once, here, because this is the only repository
+      // path that genuinely inserts a registry row (v175). Minting nowhere
+      // else is what makes a user-deleted twin permanent. Pass the resolved
+      // id: the caller's may have been empty and minted just above.
+      final twinId = await DiveComputerGearResolver().resolveGearTwin(
+        computer.copyWith(id: id),
+      );
+      if (twinId != null) {
+        await _db.customStatement(
+          'UPDATE dive_computers SET equipment_id = ? WHERE id = ?',
+          [twinId, id],
+        );
+      }
+
+      // Marked pending ONCE, after the optional equipment_id write, so the row
+      // carries a single HLC representing its final state. Marking on either
+      // side of that update would spend two clock ticks on one logical
+      // creation. Unconditional: a computer whose twin failed to resolve is
+      // still a registered computer and still has to sync.
       await _syncRepository.markRecordPending(
         entityType: 'diveComputers',
         recordId: id,
@@ -261,6 +282,7 @@ class DiveComputerRepository {
       _log.info('Created dive computer with id: $id');
       return computer.copyWith(
         id: id,
+        equipmentId: twinId,
         createdAt: DateTime.fromMillisecondsSinceEpoch(now),
         updatedAt: DateTime.fromMillisecondsSinceEpoch(now),
       );
@@ -1209,6 +1231,11 @@ class DiveComputerRepository {
           divePoints: defaultPoints,
         );
 
+        // After the defaulter, never before: the defaulter bails on a dive
+        // that already has equipment, so linking first would suppress the
+        // diver's default and geofenced sets.
+        await DiveComputerGearLinker().linkComputerGearForDive(diveId: diveId);
+
         // Auto-link a pre-dive checklist session started shortly before
         // this dive's entry time.
         await ChecklistDiveLinker().autoLinkForDive(
@@ -1587,6 +1614,13 @@ class DiveComputerRepository {
           recordId: diveId,
           localUpdatedAt: now,
         );
+
+        // The replaceSource path clears this dive's data source on the way in
+        // and importProfile re-creates it above, so the linker can see this
+        // computer again by here. The creation-seam trio does not run for an
+        // existing dive, but the computer did log it. Idempotent through
+        // insertOnConflictUpdate.
+        await DiveComputerGearLinker().linkComputerGearForDive(diveId: diveId);
       }
 
       // Note: Computer stats (incrementDiveCount, updateLastDownload) are
@@ -1949,6 +1983,7 @@ class DiveComputerRepository {
       diveCount: row.diveCount,
       isFavorite: row.isFavorite,
       notes: row.notes,
+      equipmentId: row.equipmentId,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
     );

@@ -9017,46 +9017,91 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveType_builtin_altitude => 'ارتفاع';
 
   @override
+  String get diveType_builtin_altitude_short => 'ارتفاع';
+
+  @override
   String get diveType_builtin_boat => 'من القارب';
+
+  @override
+  String get diveType_builtin_boat_short => 'قارب';
 
   @override
   String get diveType_builtin_cave => 'كهف';
 
   @override
+  String get diveType_builtin_cave_short => 'كهف';
+
+  @override
   String get diveType_builtin_cavern => 'كهف ضحل';
+
+  @override
+  String get diveType_builtin_cavern_short => 'كهف ضحل';
 
   @override
   String get diveType_builtin_deep => 'عميق';
 
   @override
+  String get diveType_builtin_deep_short => 'عميق';
+
+  @override
   String get diveType_builtin_drift => 'انجراف';
+
+  @override
+  String get diveType_builtin_drift_short => 'انجراف';
 
   @override
   String get diveType_builtin_freedive => 'غطس حر';
 
   @override
+  String get diveType_builtin_freedive_short => 'غطس حر';
+
+  @override
   String get diveType_builtin_ice => 'جليد';
+
+  @override
+  String get diveType_builtin_ice_short => 'جليد';
 
   @override
   String get diveType_builtin_liveaboard => 'رحلة غوص بحرية';
 
   @override
+  String get diveType_builtin_liveaboard_short => 'رحلة غوص';
+
+  @override
   String get diveType_builtin_night => 'ليلي';
+
+  @override
+  String get diveType_builtin_night_short => 'ليلي';
 
   @override
   String get diveType_builtin_recreational => 'ترفيهي';
 
   @override
+  String get diveType_builtin_recreational_short => 'ترفيه';
+
+  @override
   String get diveType_builtin_shore => 'من الشاطئ';
+
+  @override
+  String get diveType_builtin_shore_short => 'شاطئ';
 
   @override
   String get diveType_builtin_technical => 'تقني';
 
   @override
+  String get diveType_builtin_technical_short => 'تقني';
+
+  @override
   String get diveType_builtin_training => 'تدريب';
 
   @override
+  String get diveType_builtin_training_short => 'تدريب';
+
+  @override
   String get diveType_builtin_wreck => 'حطام';
+
+  @override
+  String get diveType_builtin_wreck_short => 'حطام';
 
   @override
   String get diveTypes_addDialog_addButton => 'إضافة';
@@ -9069,6 +9114,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_nameValidation => 'الرجاء إدخال اسم';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper =>
+      'يظهر في رأس تفاصيل الغطسة عند ضيق المساحة';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => 'مثال: ب.إ';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => 'اسم مختصر (اختياري)';
 
   @override
   String get diveTypes_addDialog_title => 'إضافة نوع غوص مخصص';
@@ -9103,6 +9158,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveTypes_deleteTooltip => 'حذف نوع الغوص';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper =>
+      'لا يمكن تغيير الأسماء المدمجة';
+
+  @override
+  String get diveTypes_editDialog_saveButton => 'حفظ';
+
+  @override
+  String get diveTypes_editDialog_title => 'تعديل نوع الغوص';
+
+  @override
+  String get diveTypes_showInHeaderLabel => 'الترويسة';
+
+  @override
+  String get diveTypes_showInHeaderTooltip =>
+      'إظهار شارة هذا النوع في ترويسة تفاصيل الغطسة';
+
+  @override
+  String get diveTypes_showInListLabel => 'القائمة';
+
+  @override
+  String get diveTypes_showInListTooltip =>
+      'إظهار شارة هذا النوع في قائمة الغطسات';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return 'تمت إضافة نوع الغوص: $name';
   }
@@ -9125,6 +9204,16 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return 'خطأ في حذف نوع الغوص: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return 'خطأ في تحديث نوع الغوص: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return 'تم تحديث \"$name\"';
   }
 
   @override
@@ -20489,6 +20578,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveComputer_detail_lastDownload => 'آخر تنزيل';
+
+  @override
+  String get diveComputer_detail_linkedGear => 'قطعة المعدات';
 
   @override
   String get diveComputer_detail_notesTitle => 'الملاحظات';
@@ -33061,6 +33153,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'لم تتم استعادة أي شيء: تعذر العثور على ملف النسخة الاحتياطية. بياناتك الحالية لم تتغير.';
+
+  @override
   String get backup_operation_deleting => 'جارٍ حذف النسخة الاحتياطية...';
 
   @override
@@ -33247,6 +33343,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_cloudSync_result_replacementStillUploading =>
       'لا يزال رفع المكتبة المستبدَلة جاريًا. حاول مرة أخرى بعد قليل.';
+
+  @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'تم نشر مكتبة السحابة بواسطة إصدار أحدث من Submersion. حدِّث هذا الجهاز ثم حاول مرة أخرى.';
 
   @override
   String settings_cloudSync_result_recordsFailed(int count) {
