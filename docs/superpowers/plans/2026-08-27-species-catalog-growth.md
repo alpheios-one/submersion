@@ -4,7 +4,7 @@
 
 **Goal:** Make the bundled species catalog versioned (corrections reach existing installs without touching diver edits), generate the two id-keyed lookup switches from the asset with a coverage test, and add about 150 curated freshwater species with iNaturalist-localized names and hand-written descriptions in all 11 locales.
 
-**Architecture:** `species.json`'s `version` drives a one-time upsert pass guarded by `hlc IS NULL`, with the applied version in SharedPreferences (cleared by restore). Three `tool/` scripts share pure functions in `tool/lib/species_tool_support.dart`: a lookup-switch renderer, an ARB key inserter, and an iNaturalist name merger; the freshwater seed lives in `tool/data/` and every generated artifact is committed. No schema change.
+**Architecture:** `species.json`'s `version` drives a one-time upsert pass guarded by `hlc IS NULL`, with the applied version in SharedPreferences (cleared by restore). Three `tool/` scripts share pure functions in `tool/src/species_tool_support.dart`: a lookup-switch renderer, an ARB key inserter, and an iNaturalist name merger; the freshwater seed lives in `tool/data/` and every generated artifact is committed. No schema change.
 
 **Tech Stack:** Flutter, Drift 2.34 (`DoUpdate(where:)`), SharedPreferences, `dart:io` HttpClient in tools, `flutter gen-l10n`, `flutter_test`.
 
@@ -651,8 +651,8 @@ Provider: add `seedVersionStore: PrefsBuiltInSpeciesSeedVersionStore(ref.watch(s
 ### Task 5: Tool support library (pure functions) with tests
 
 **Files:**
-- Create: `tool/lib/species_tool_support.dart`
-- Test: `test/tool/species_tool_support_test.dart` (imports the library by relative path: `import '../../tool/lib/species_tool_support.dart';`)
+- Create: `tool/src/species_tool_support.dart`
+- Test: `test/tool/species_tool_support_test.dart` (imports the library by relative path: `import '../../tool/src/species_tool_support.dart';`)
 - Fixture (already saved): `test/fixtures/inaturalist/taxa_esox_lucius_all_names.json`
 
 **Interfaces:**
@@ -674,7 +674,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../tool/lib/species_tool_support.dart';
+import '../../tool/src/species_tool_support.dart';
 
 void main() {
   final rows = [
@@ -763,7 +763,7 @@ void main() {
 ```
 
 - [ ] **Step 2: Run it red.**
-- [ ] **Step 3: Implement** `tool/lib/species_tool_support.dart`:
+- [ ] **Step 3: Implement** `tool/src/species_tool_support.dart`:
 
 ```dart
 // Pure helpers shared by the species catalog tools. Kept free of dart:io and
@@ -1030,7 +1030,7 @@ The version assertion fails until Task 11 bumps the asset; until then run the fi
 import 'dart:convert';
 import 'dart:io';
 
-import 'lib/species_tool_support.dart';
+import 'src/species_tool_support.dart';
 
 Future<void> main() async {
   final catalog =
@@ -1067,7 +1067,7 @@ Future<void> main() async {
 **Files:**
 - Create: `tool/generate_species_arb_keys.dart`
 - Create: `tool/generate_freshwater_species.dart`
-- Create: `tool/lib/inaturalist_names_client.dart`
+- Create: `tool/src/inaturalist_names_client.dart`
 
 `generate_species_arb_keys.dart`:
 
@@ -1081,7 +1081,7 @@ Future<void> main() async {
 import 'dart:convert';
 import 'dart:io';
 
-import 'lib/species_tool_support.dart';
+import 'src/species_tool_support.dart';
 
 Future<void> main(List<String> args) async {
   final source = args.isEmpty
@@ -1111,7 +1111,7 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-`tool/lib/inaturalist_names_client.dart`:
+`tool/src/inaturalist_names_client.dart`:
 
 ```dart
 import 'dart:convert';
@@ -1171,8 +1171,8 @@ class InaturalistNamesClient {
 import 'dart:convert';
 import 'dart:io';
 
-import 'lib/inaturalist_names_client.dart';
-import 'lib/species_tool_support.dart';
+import 'src/inaturalist_names_client.dart';
+import 'src/species_tool_support.dart';
 
 Future<void> main() async {
   final seed = (jsonDecode(

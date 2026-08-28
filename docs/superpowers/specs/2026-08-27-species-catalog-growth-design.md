@@ -290,6 +290,6 @@ for maintainers and a line telling divers freshwater species are included.
 - Create: `lib/features/marine_life/data/services/builtin_species_seed_version_store.dart`,
   `lib/features/marine_life/domain/entities/bundled_species_catalog.dart`,
   `tool/generate_species_lookups.dart`, `tool/generate_species_arb_keys.dart`,
-  `tool/generate_freshwater_species.dart`, `tool/lib/species_tool_support.dart`
+  `tool/generate_freshwater_species.dart`, `tool/src/species_tool_support.dart`
   (shared pure functions the tool tests import), `tool/data/freshwater_species_seed.json`,
   `tool/data/freshwater_species_localized.json`, the tests in 4.5.
