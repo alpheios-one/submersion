@@ -4,6 +4,7 @@ import 'dart:developer' as developer;
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/dive_computer_gear_backfill.dart';
+import 'package:submersion/core/database/dive_type_uniqueness.dart';
 import 'package:submersion/core/database/imported_computer_backfill.dart';
 import 'package:submersion/core/database/performance_indexes.dart';
 import 'package:submersion/core/database/tag_uniqueness.dart';
@@ -2183,6 +2184,17 @@ class DiveDiveTypes extends Table {
 
 /// Seeds one junction row per existing dive from its representative dive_type
 /// slug. Used by the v92 migration and asserted directly in tests.
+///
+/// The `NOT EXISTS` guard makes a second run a no-op, which its sibling
+/// [kSeedBuiltInDiveTypesSql] has always had via `INSERT OR IGNORE` on stable
+/// slug ids. This one mints a RANDOM id per row, so it had nothing to conflict
+/// with and a re-run simply doubled every dive's types -- issue #1360. Because
+/// the sync merge keys junction rows on that id, each device's own seed pass
+/// produced rows the fleet then unioned rather than deduplicated.
+///
+/// The guard is keyed on the dive having ANY junction row, not on the exact
+/// pair: this seed's job is to give a dive its first type, so a dive that
+/// already has one (a synced peer's, or a later edit) needs nothing.
 const String kSeedDiveDiveTypesSql = '''
   INSERT INTO dive_dive_types (id, dive_id, dive_type_id, created_at)
   SELECT
@@ -2191,6 +2203,9 @@ const String kSeedDiveDiveTypesSql = '''
     COALESCE(NULLIF(dive_type, ''), 'recreational'),
     CAST(strftime('%s','now') AS INTEGER) * 1000
   FROM dives
+  WHERE NOT EXISTS (
+    SELECT 1 FROM dive_dive_types j WHERE j.dive_id = dives.id
+  )
 ''';
 
 /// Seeds the built-in dive types. Used by BOTH [onCreate] (fresh installs) and
@@ -3288,7 +3303,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 175;
+  static const int currentSchemaVersion = 178;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3649,6 +3664,14 @@ class AppDatabase extends _$AppDatabase {
     // comment already reserves for it. 169 is now permanently skipped, as are
     // 162 and 167.
     175,
+    // v178: one dive_dive_types row per (dive, type), collapsing the
+    // duplicates the unguarded v92 seed minted on every device and the sync
+    // merge then unioned by row id. Issue #1360. 176 (PR #1328, photo-GPS
+    // site suggestions) and 177 (PR #1361, the GTR profile metric) are claimed
+    // by branches that are still open, so this takes the next free rung rather
+    // than one of theirs -- a rung below main's scalar never runs its
+    // onUpgrade step.
+    178,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -5829,6 +5852,11 @@ class AppDatabase extends _$AppDatabase {
         // raw-SQL indexes, so a fresh install would otherwise be the one
         // device in the library without them.
         await assertTagUniqueness(this);
+
+        // Dive-type junction uniqueness index (v178, issue #1360): same
+        // reason as the tag indexes above -- createAll() does not build
+        // raw-SQL indexes.
+        await assertDiveTypeUniqueness(this);
       },
       onUpgrade: (Migrator m, int from, int to) async {
         int completedSteps = 0;
@@ -9072,6 +9100,15 @@ class AppDatabase extends _$AppDatabase {
           await backfillDiveComputerGearTwins(this);
         }
         if (from < 175) await reportProgress();
+        if (from < 178) {
+          // Duplicate dive types (issue #1360). The helper dedupes BEFORE
+          // creating the unique index and its dedupe is total (rowid
+          // tie-breaks), so no tie can survive to abort the index creation --
+          // the failure mode v148 documents. Self-guarding on the table
+          // existing.
+          await assertDiveTypeUniqueness(this);
+        }
+        if (from < 178) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9463,6 +9500,13 @@ class AppDatabase extends _$AppDatabase {
         // arrives by restore or sync-adopt never runs onUpgrade, and that is
         // exactly the second device the duplicate tags came from.
         await assertTagUniqueness(this);
+
+        // v178 backstop (issue #1360): re-assert the dive-type junction
+        // uniqueness index, deduping first so the creation cannot abort. Same
+        // reasoning as the tag backstop above -- a database that arrives by
+        // restore or sync-adopt never runs onUpgrade, and that is exactly the
+        // second device the duplicate types came from.
+        await assertDiveTypeUniqueness(this);
 
         // Data self-heal: backfill a primary dive_data_sources row for dives
         // that have profile samples but no source row (legacy file imports).
