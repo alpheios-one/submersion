@@ -33826,16 +33826,17 @@ class AppLocalizationsNl extends AppLocalizations {
       'HealthKit is niet beschikbaar op dit apparaat';
 
   @override
-  String get statistics_trend_aggregation_monthly => 'Maandelijks';
+  String get statistics_trend_aggregation_monthly => 'Maandgemiddelde';
 
   @override
-  String get statistics_trend_aggregation_perDive => 'Per duik';
+  String get statistics_trend_aggregation_perDive => 'Elke duik';
 
   @override
-  String get statistics_trend_aggregation_tooltip => 'Duiken groeperen';
+  String get statistics_trend_aggregation_tooltip =>
+      'Hoe duiken worden gegroepeerd';
 
   @override
-  String get statistics_trend_aggregation_weekly => 'Wekelijks';
+  String get statistics_trend_aggregation_weekly => 'Weekgemiddelde';
 
   @override
   String get statistics_trend_band_semanticLabel =>

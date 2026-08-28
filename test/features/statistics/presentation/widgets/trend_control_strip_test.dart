@@ -38,7 +38,7 @@ void main() {
   testWidgets('shows the active aggregation mode', (tester) async {
     await tester.pumpWidget(host(aggregation: TrendAggregation.monthly));
 
-    expect(find.text('Monthly'), findsOneWidget);
+    expect(find.text('Monthly average'), findsOneWidget);
   });
 
   testWidgets('opening the dropdown and choosing weekly reports the change', (
@@ -49,7 +49,7 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('trend-aggregation-depth')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Weekly').last);
+    await tester.tap(find.text('Weekly average').last);
     await tester.pumpAndSettle();
 
     expect(chosen, TrendAggregation.weekly);

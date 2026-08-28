@@ -32094,16 +32094,16 @@ class AppLocalizationsZh extends AppLocalizations {
       '此设备不支持 HealthKit';
 
   @override
-  String get statistics_trend_aggregation_monthly => '按月';
+  String get statistics_trend_aggregation_monthly => '每月平均';
 
   @override
   String get statistics_trend_aggregation_perDive => '每次潜水';
 
   @override
-  String get statistics_trend_aggregation_tooltip => '分组潜水';
+  String get statistics_trend_aggregation_tooltip => '潜水的分组方式';
 
   @override
-  String get statistics_trend_aggregation_weekly => '按周';
+  String get statistics_trend_aggregation_weekly => '每周平均';
 
   @override
   String get statistics_trend_band_semanticLabel => '阴影区间涵盖每组的最低值和最高值';

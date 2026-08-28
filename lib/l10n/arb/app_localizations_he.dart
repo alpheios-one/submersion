@@ -33379,16 +33379,16 @@ class AppLocalizationsHe extends AppLocalizations {
       'HealthKit אינו זמין במכשיר הזה';
 
   @override
-  String get statistics_trend_aggregation_monthly => 'חודשי';
+  String get statistics_trend_aggregation_monthly => 'ממוצע חודשי';
 
   @override
-  String get statistics_trend_aggregation_perDive => 'לפי צלילה';
+  String get statistics_trend_aggregation_perDive => 'כל צלילה';
 
   @override
-  String get statistics_trend_aggregation_tooltip => 'קיבוץ צלילות';
+  String get statistics_trend_aggregation_tooltip => 'כיצד הצלילות מקובצות';
 
   @override
-  String get statistics_trend_aggregation_weekly => 'שבועי';
+  String get statistics_trend_aggregation_weekly => 'ממוצע שבועי';
 
   @override
   String get statistics_trend_band_semanticLabel =>

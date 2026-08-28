@@ -33532,16 +33532,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'HealthKit is not available on this device';
 
   @override
-  String get statistics_trend_aggregation_monthly => 'Monthly';
+  String get statistics_trend_aggregation_monthly => 'Monthly average';
 
   @override
-  String get statistics_trend_aggregation_perDive => 'Per dive';
+  String get statistics_trend_aggregation_perDive => 'Every dive';
 
   @override
-  String get statistics_trend_aggregation_tooltip => 'Group dives';
+  String get statistics_trend_aggregation_tooltip => 'How dives are grouped';
 
   @override
-  String get statistics_trend_aggregation_weekly => 'Weekly';
+  String get statistics_trend_aggregation_weekly => 'Weekly average';
 
   @override
   String get statistics_trend_band_semanticLabel =>

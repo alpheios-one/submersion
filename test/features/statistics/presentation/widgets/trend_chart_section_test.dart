@@ -27,7 +27,7 @@ Widget host(AsyncValue<List<TrendDataPoint>> value) {
           child: TrendChartSection(
             chartId: TrendChartIds.depth,
             title: 'Maximum Depth Progression',
-            subtitle: 'Every dive',
+            subtitle: 'Depth per dive in range',
             pointsAsync: value,
             errorMessage: 'Failed to load depth progression',
             lineColor: Colors.indigo,
@@ -58,7 +58,7 @@ void main() {
     await tester.pumpWidget(host(AsyncValue.data(series(20))));
     await tester.pumpAndSettle();
 
-    expect(find.text('Per dive'), findsOneWidget);
+    expect(find.text('Every dive'), findsOneWidget);
     final chart = tester.widget<DiveTrendChart>(find.byType(DiveTrendChart));
     expect(chart.aggregation, TrendAggregation.none);
     expect(chart.showRollingMean, isTrue);
@@ -75,7 +75,7 @@ void main() {
       find.byKey(const ValueKey('trend-aggregation-${TrendChartIds.depth}')),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Monthly').last);
+    await tester.tap(find.text('Monthly average').last);
     await tester.pumpAndSettle();
 
     final chart = tester.widget<DiveTrendChart>(find.byType(DiveTrendChart));

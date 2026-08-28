@@ -34106,16 +34106,17 @@ class AppLocalizationsEs extends AppLocalizations {
       'HealthKit no está disponible en este dispositivo';
 
   @override
-  String get statistics_trend_aggregation_monthly => 'Mensual';
+  String get statistics_trend_aggregation_monthly => 'Media mensual';
 
   @override
-  String get statistics_trend_aggregation_perDive => 'Por inmersión';
+  String get statistics_trend_aggregation_perDive => 'Cada inmersión';
 
   @override
-  String get statistics_trend_aggregation_tooltip => 'Agrupar inmersiones';
+  String get statistics_trend_aggregation_tooltip =>
+      'Cómo se agrupan las inmersiones';
 
   @override
-  String get statistics_trend_aggregation_weekly => 'Semanal';
+  String get statistics_trend_aggregation_weekly => 'Media semanal';
 
   @override
   String get statistics_trend_band_semanticLabel =>

@@ -34159,16 +34159,17 @@ class AppLocalizationsFr extends AppLocalizations {
       'HealthKit n\'est pas disponible sur cet appareil';
 
   @override
-  String get statistics_trend_aggregation_monthly => 'Mensuel';
+  String get statistics_trend_aggregation_monthly => 'Moyenne mensuelle';
 
   @override
-  String get statistics_trend_aggregation_perDive => 'Par plongée';
+  String get statistics_trend_aggregation_perDive => 'Chaque plongée';
 
   @override
-  String get statistics_trend_aggregation_tooltip => 'Grouper les plongées';
+  String get statistics_trend_aggregation_tooltip =>
+      'Regroupement des plongées';
 
   @override
-  String get statistics_trend_aggregation_weekly => 'Hebdomadaire';
+  String get statistics_trend_aggregation_weekly => 'Moyenne hebdomadaire';
 
   @override
   String get statistics_trend_band_semanticLabel =>

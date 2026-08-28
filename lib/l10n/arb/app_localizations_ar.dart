@@ -33727,16 +33727,16 @@ class AppLocalizationsAr extends AppLocalizations {
       'HealthKit غير متوفر على هذا الجهاز';
 
   @override
-  String get statistics_trend_aggregation_monthly => 'شهري';
+  String get statistics_trend_aggregation_monthly => 'المتوسط الشهري';
 
   @override
-  String get statistics_trend_aggregation_perDive => 'لكل غطسة';
+  String get statistics_trend_aggregation_perDive => 'كل غطسة';
 
   @override
-  String get statistics_trend_aggregation_tooltip => 'تجميع الغطسات';
+  String get statistics_trend_aggregation_tooltip => 'كيفية تجميع الغطسات';
 
   @override
-  String get statistics_trend_aggregation_weekly => 'أسبوعي';
+  String get statistics_trend_aggregation_weekly => 'المتوسط الأسبوعي';
 
   @override
   String get statistics_trend_band_semanticLabel =>

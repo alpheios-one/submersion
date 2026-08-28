@@ -33935,16 +33935,17 @@ class AppLocalizationsHu extends AppLocalizations {
       'A HealthKit nem érhető el ezen az eszközön';
 
   @override
-  String get statistics_trend_aggregation_monthly => 'Havi';
+  String get statistics_trend_aggregation_monthly => 'Havi átlag';
 
   @override
-  String get statistics_trend_aggregation_perDive => 'Merülésenként';
+  String get statistics_trend_aggregation_perDive => 'Minden merülés';
 
   @override
-  String get statistics_trend_aggregation_tooltip => 'Merülések csoportosítása';
+  String get statistics_trend_aggregation_tooltip =>
+      'Hogyan csoportosulnak a merülések';
 
   @override
-  String get statistics_trend_aggregation_weekly => 'Heti';
+  String get statistics_trend_aggregation_weekly => 'Heti átlag';
 
   @override
   String get statistics_trend_band_semanticLabel =>

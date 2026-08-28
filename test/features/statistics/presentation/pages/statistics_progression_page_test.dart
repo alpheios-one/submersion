@@ -76,7 +76,7 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('trend-aggregation-depth')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Monthly').last);
+    await tester.tap(find.text('Monthly average').last);
     await tester.pumpAndSettle();
 
     final charts = tester

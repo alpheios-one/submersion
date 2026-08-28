@@ -56039,25 +56039,25 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_trend_aggregation_monthly.
   ///
   /// In en, this message translates to:
-  /// **'Monthly'**
+  /// **'Monthly average'**
   String get statistics_trend_aggregation_monthly;
 
   /// No description provided for @statistics_trend_aggregation_perDive.
   ///
   /// In en, this message translates to:
-  /// **'Per dive'**
+  /// **'Every dive'**
   String get statistics_trend_aggregation_perDive;
 
   /// No description provided for @statistics_trend_aggregation_tooltip.
   ///
   /// In en, this message translates to:
-  /// **'Group dives'**
+  /// **'How dives are grouped'**
   String get statistics_trend_aggregation_tooltip;
 
   /// No description provided for @statistics_trend_aggregation_weekly.
   ///
   /// In en, this message translates to:
-  /// **'Weekly'**
+  /// **'Weekly average'**
   String get statistics_trend_aggregation_weekly;
 
   /// No description provided for @statistics_trend_band_semanticLabel.
