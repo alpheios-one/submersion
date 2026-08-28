@@ -203,23 +203,28 @@ class MediaSpeciesRepository {
       ..addColumns([_db.mediaSpecies.mediaId])
       ..where(_db.mediaSpecies.speciesId.equals(speciesId));
     final m = _db.media;
-    final mediaQuery =
-        _db.select(m).join([
-            leftOuterJoin(
-              _db.mediaEnrichment,
-              _db.mediaEnrichment.mediaId.equalsExp(m.id),
-            ),
-          ])
-          ..where(m.diveId.isIn(diveIds) & m.id.isNotInQuery(taggedIds))
-          ..orderBy([OrderingTerm.asc(m.takenAt), OrderingTerm.asc(m.id)]);
+    // Chunked like the id lookups above: a species logged on many dives
+    // would otherwise push `IN (...)` past SQLite's bound-variable limit.
     final byDive = <String, List<MediaItem>>{};
-    for (final row in await mediaQuery.get()) {
-      final item = mediaItemFromRow(
-        row.readTable(m),
-        row.readTableOrNull(_db.mediaEnrichment),
-      );
-      if (item.isDocument) continue;
-      byDive.putIfAbsent(item.diveId!, () => []).add(item);
+    for (var i = 0; i < diveIds.length; i += _chunkSize) {
+      final chunk = diveIds.sublist(i, min(i + _chunkSize, diveIds.length));
+      final mediaQuery =
+          _db.select(m).join([
+              leftOuterJoin(
+                _db.mediaEnrichment,
+                _db.mediaEnrichment.mediaId.equalsExp(m.id),
+              ),
+            ])
+            ..where(m.diveId.isIn(chunk) & m.id.isNotInQuery(taggedIds))
+            ..orderBy([OrderingTerm.asc(m.takenAt), OrderingTerm.asc(m.id)]);
+      for (final row in await mediaQuery.get()) {
+        final item = mediaItemFromRow(
+          row.readTable(m),
+          row.readTableOrNull(_db.mediaEnrichment),
+        );
+        if (item.isDocument) continue;
+        byDive.putIfAbsent(item.diveId!, () => []).add(item);
+      }
     }
 
     return [

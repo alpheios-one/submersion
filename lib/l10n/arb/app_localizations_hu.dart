@@ -5979,6 +5979,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -7579,6 +7582,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_tooltip_tts => 'TTS';
 
   @override
+  String get diveLog_tooltip_gtr => 'GTR';
+
+  @override
   String get diveLog_sources_row_metric => 'Adat';
 
   @override
@@ -9174,46 +9180,91 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveType_builtin_altitude => 'Magaslati';
 
   @override
+  String get diveType_builtin_altitude_short => 'Magaslati';
+
+  @override
   String get diveType_builtin_boat => 'Hajóról';
+
+  @override
+  String get diveType_builtin_boat_short => 'Hajó';
 
   @override
   String get diveType_builtin_cave => 'Barlang';
 
   @override
+  String get diveType_builtin_cave_short => 'Barlang';
+
+  @override
   String get diveType_builtin_cavern => 'Barlangbejárat';
+
+  @override
+  String get diveType_builtin_cavern_short => 'Bejárat';
 
   @override
   String get diveType_builtin_deep => 'Mély';
 
   @override
+  String get diveType_builtin_deep_short => 'Mély';
+
+  @override
   String get diveType_builtin_drift => 'Sodrásos';
+
+  @override
+  String get diveType_builtin_drift_short => 'Sodrásos';
 
   @override
   String get diveType_builtin_freedive => 'Szabadtüdős';
 
   @override
+  String get diveType_builtin_freedive_short => 'Szabad';
+
+  @override
   String get diveType_builtin_ice => 'Jég';
+
+  @override
+  String get diveType_builtin_ice_short => 'Jég';
 
   @override
   String get diveType_builtin_liveaboard => 'Búvárhajós';
 
   @override
+  String get diveType_builtin_liveaboard_short => 'Szafari';
+
+  @override
   String get diveType_builtin_night => 'Éjszakai';
+
+  @override
+  String get diveType_builtin_night_short => 'Éjszakai';
 
   @override
   String get diveType_builtin_recreational => 'Szabadidős';
 
   @override
+  String get diveType_builtin_recreational_short => 'Rec';
+
+  @override
   String get diveType_builtin_shore => 'Partról';
+
+  @override
+  String get diveType_builtin_shore_short => 'Part';
 
   @override
   String get diveType_builtin_technical => 'Technikai';
 
   @override
+  String get diveType_builtin_technical_short => 'Tec';
+
+  @override
   String get diveType_builtin_training => 'Képzés';
 
   @override
+  String get diveType_builtin_training_short => 'Képzés';
+
+  @override
   String get diveType_builtin_wreck => 'Roncs';
+
+  @override
+  String get diveType_builtin_wreck_short => 'Roncs';
 
   @override
   String get diveTypes_addDialog_addButton => 'Hozzáadás';
@@ -9226,6 +9277,16 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_nameValidation => 'Adj meg egy nevet';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper =>
+      'A merülés részletek fejlécében jelenik meg, ha kevés a hely';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => 'pl. K&M';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => 'Rövid név (opcionális)';
 
   @override
   String get diveTypes_addDialog_title => 'Egyedi merülés típus hozzáadása';
@@ -9260,6 +9321,30 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveTypes_deleteTooltip => 'Merülés típus törlése';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper =>
+      'A beépített nevek nem módosíthatók';
+
+  @override
+  String get diveTypes_editDialog_saveButton => 'Mentés';
+
+  @override
+  String get diveTypes_editDialog_title => 'Merülési típus szerkesztése';
+
+  @override
+  String get diveTypes_showInHeaderLabel => 'Fejléc';
+
+  @override
+  String get diveTypes_showInHeaderTooltip =>
+      'Ezen típus jelvényének megjelenítése a merülés részleteinek fejlécében';
+
+  @override
+  String get diveTypes_showInListLabel => 'Lista';
+
+  @override
+  String get diveTypes_showInListTooltip =>
+      'Ezen típus jelvényének megjelenítése a merülési listában';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return 'Merülés típus hozzáadva: $name';
   }
@@ -9282,6 +9367,16 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return 'Hiba a merülés típus törlésekor: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return 'Hiba a merülési típus frissítésekor: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return '\"$name\" frissítve';
   }
 
   @override
@@ -10177,6 +10272,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => 'Allando tomegaram';
@@ -15173,6 +15274,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (Ido a felszinig)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (Hátralévő gázidő)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (O2 toxicitás)';
@@ -20901,6 +21005,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveComputer_detail_lastDownload => 'Utolso letoltes';
+
+  @override
+  String get diveComputer_detail_linkedGear => 'Felszerelés';
 
   @override
   String get diveComputer_detail_notesTitle => 'Megjegyzesek';
@@ -31460,6 +31567,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_decompression_ttsSource => 'TTS forrása';
 
   @override
+  String get settings_decompression_gtrSource => 'GTR forrása';
+
+  @override
+  String get settings_decompression_gtrReserve => 'GTR tartaléknyomás';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'Az a palacknyomás, amelyig a hátralévő gázidő visszaszámol. A számított GTR 10 m/perc sebességű, megállás nélküli közvetlen felemelkedést feltételez.';
+
+  @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -33377,6 +33494,10 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Nem történt visszaállítás: a biztonsági mentés fájlja nem található. A jelenlegi adatok változatlanok.';
+
+  @override
   String get backup_operation_deleting => 'Biztonsági mentés törlése...';
 
   @override
@@ -33561,6 +33682,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_cloudSync_result_replacementStillUploading =>
       'A lecserélt könyvtár feltöltése még folyamatban van. Próbálja újra rövidesen.';
+
+  @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'A felhőkönyvtárat a Submersion egy újabb verziója tette közzé. Frissítse ezt az eszközt, majd próbálja újra.';
 
   @override
   String settings_cloudSync_result_recordsFailed(int count) {

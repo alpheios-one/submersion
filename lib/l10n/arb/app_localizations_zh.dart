@@ -5701,6 +5701,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => '潜水电脑';
 
   @override
@@ -7233,6 +7236,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_tooltip_tts => 'TTS';
 
   @override
+  String get diveLog_tooltip_gtr => 'GTR';
+
+  @override
   String get diveLog_sources_row_metric => '指标';
 
   @override
@@ -8749,46 +8755,91 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveType_builtin_altitude => '高原潜水';
 
   @override
+  String get diveType_builtin_altitude_short => '高原';
+
+  @override
   String get diveType_builtin_boat => '船潜';
+
+  @override
+  String get diveType_builtin_boat_short => '船潜';
 
   @override
   String get diveType_builtin_cave => '洞穴潜水';
 
   @override
+  String get diveType_builtin_cave_short => '洞穴';
+
+  @override
   String get diveType_builtin_cavern => '洞厅潜水';
+
+  @override
+  String get diveType_builtin_cavern_short => '洞厅';
 
   @override
   String get diveType_builtin_deep => '深潜';
 
   @override
+  String get diveType_builtin_deep_short => '深潜';
+
+  @override
   String get diveType_builtin_drift => '流潜';
+
+  @override
+  String get diveType_builtin_drift_short => '流潜';
 
   @override
   String get diveType_builtin_freedive => '自由潜水';
 
   @override
+  String get diveType_builtin_freedive_short => '自由';
+
+  @override
   String get diveType_builtin_ice => '冰潜';
+
+  @override
+  String get diveType_builtin_ice_short => '冰潜';
 
   @override
   String get diveType_builtin_liveaboard => '船宿潜水';
 
   @override
+  String get diveType_builtin_liveaboard_short => '船宿';
+
+  @override
   String get diveType_builtin_night => '夜潜';
+
+  @override
+  String get diveType_builtin_night_short => '夜潜';
 
   @override
   String get diveType_builtin_recreational => '休闲潜水';
 
   @override
+  String get diveType_builtin_recreational_short => '休闲';
+
+  @override
   String get diveType_builtin_shore => '岸潜';
+
+  @override
+  String get diveType_builtin_shore_short => '岸潜';
 
   @override
   String get diveType_builtin_technical => '技术潜水';
 
   @override
+  String get diveType_builtin_technical_short => '技术';
+
+  @override
   String get diveType_builtin_training => '训练潜水';
 
   @override
+  String get diveType_builtin_training_short => '训练';
+
+  @override
   String get diveType_builtin_wreck => '沉船潜水';
+
+  @override
+  String get diveType_builtin_wreck_short => '沉船';
 
   @override
   String get diveTypes_addDialog_addButton => '添加';
@@ -8801,6 +8852,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_nameValidation => '请输入名称';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper => '空间不足时显示在潜水详情标题中';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => '例如：搜救';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => '简称（可选）';
 
   @override
   String get diveTypes_addDialog_title => '添加自定义潜水类型';
@@ -8835,6 +8895,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveTypes_deleteTooltip => '删除潜水类型';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper => '内置名称无法更改';
+
+  @override
+  String get diveTypes_editDialog_saveButton => '保存';
+
+  @override
+  String get diveTypes_editDialog_title => '编辑潜水类型';
+
+  @override
+  String get diveTypes_showInHeaderLabel => '标题栏';
+
+  @override
+  String get diveTypes_showInHeaderTooltip => '在潜水详情标题栏中显示此类型的徽章';
+
+  @override
+  String get diveTypes_showInListLabel => '列表';
+
+  @override
+  String get diveTypes_showInListTooltip => '在潜水列表中显示此类型的徽章';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return '已添加潜水类型：$name';
   }
@@ -8857,6 +8938,16 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return '删除出错潜水类型: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return '更新潜水类型时出错：$error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return '已更新“$name”';
   }
 
   @override
@@ -9734,6 +9825,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => '剩余气体时间';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => '恒定质量流';
@@ -14489,6 +14586,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => '到达水面时间';
+
+  @override
+  String get settings_appearance_metric_gtr => '剩余气体时间 (GTR)';
 
   @override
   String get settings_appearance_metric_cns => '中枢神经系统% (O2 毒性)';
@@ -19886,6 +19986,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveComputer_detail_lastDownload => '上次下载';
+
+  @override
+  String get diveComputer_detail_linkedGear => '装备';
 
   @override
   String get diveComputer_detail_notesTitle => '备注';
@@ -29823,6 +29926,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_decompression_ttsSource => 'TTS 来源';
 
   @override
+  String get settings_decompression_gtrSource => 'GTR 来源';
+
+  @override
+  String get settings_decompression_gtrReserve => 'GTR 储备压力';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      '剩余气体时间倒计时到的气瓶压力。计算的 GTR 假设以 10 米/分钟直接上升且不停留。';
+
+  @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -31569,6 +31682,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      '未恢复任何内容：找不到备份文件。当前数据未发生变化。';
+
+  @override
   String get backup_operation_deleting => '正在删除备份...';
 
   @override
@@ -31736,6 +31853,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_cloudSync_result_replacementStillUploading =>
       '被替换的资料库仍在上传中。请稍后重试。';
+
+  @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      '云端资料库由较新版本的 Submersion 发布。请更新此设备后重试。';
 
   @override
   String settings_cloudSync_result_recordsFailed(int count) {

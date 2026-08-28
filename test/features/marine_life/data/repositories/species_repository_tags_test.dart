@@ -37,9 +37,7 @@ void main() {
     expect(() => species.deleteSpecies('c1'), throwsException);
   });
 
-  test('deleteSpecies removes stale tag rows of an unused species', () async {
-    // Simulate a tag that outlived the in-use check (foreign keys are off
-    // in tests, so the cascade cannot do it for us).
+  test('deleteSpecies succeeds once the tag is removed', () async {
     await tags.addTag(mediaId: 'p1', speciesId: 'c1');
     await tags.removeTag(mediaId: 'p1', speciesId: 'c1');
     final db = DatabaseService.instance.database;

@@ -28,6 +28,9 @@ import 'package:submersion/features/dive_log/presentation/widgets/compact_tissue
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge.dart';
+import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
+import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/field_attribution_badge.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/o2_toxicity_card.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -48,6 +51,7 @@ Widget _buildDetailPage(Dive dive, List<Override> overrides) {
       ).overrideWith((ref) async => <DiveDataSource>[]),
     ],
     child: MaterialApp(
+      locale: const Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: DiveDetailPage(diveId: dive.id, embedded: true),
@@ -1582,5 +1586,69 @@ void main() {
 
       expect(find.text('OC'), findsOneWidget);
     });
+  });
+
+  group('DiveDetailPage dive type badges', () {
+    testWidgets('shows a badge for each of the dive\'s types', (tester) async {
+      final dive = createTestDiveWithBottomTime().copyWith(
+        diveTypeIds: ['wreck', 'night'],
+      );
+      await _pumpDetailPage(tester, dive);
+
+      expect(find.text('Wreck'), findsOneWidget);
+      expect(find.text('Night'), findsOneWidget);
+    });
+
+    testWidgets('shows no badges for a dive with no types', (tester) async {
+      final dive = createTestDiveWithBottomTime().copyWith(diveTypeIds: []);
+      await _pumpDetailPage(tester, dive);
+
+      expect(find.byType(DiveTypeBadge), findsNothing);
+    });
+
+    testWidgets(
+      'spells out more badges instead of collapsing when the header is wide',
+      (tester) async {
+        // The cap scales with the header's own width (issue #1269 follow-up)
+        // rather than a flat constant, so a comfortably wide header should
+        // show several real labels, not immediately fall back to "+N".
+        final dive = createTestDiveWithBottomTime().copyWith(
+          diveTypeIds: ['wreck', 'night', 'drift', 'cave'],
+        );
+        await _pumpDetailPage(tester, dive);
+
+        expect(find.text('Wreck'), findsOneWidget);
+        expect(find.text('Night'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'hides a type whose showInDetailHeader is false, keeps the rest',
+      (tester) async {
+        final dive = createTestDiveWithBottomTime().copyWith(
+          diveTypeIds: ['wreck', 'night'],
+        );
+        final hiddenWreck = DiveTypeEntity(
+          id: 'wreck',
+          name: 'Wreck',
+          isBuiltIn: true,
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+          showInDetailHeader: false,
+        );
+        final overrides = await getBaseOverrides();
+        await tester.pumpWidget(
+          _buildDetailPage(dive, [
+            ...overrides,
+            diveTypesProvider.overrideWith((ref) async => [hiddenWreck]),
+          ]),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Wreck'), findsNothing);
+        expect(find.text('Night'), findsOneWidget);
+      },
+    );
   });
 }

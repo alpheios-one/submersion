@@ -1570,23 +1570,33 @@ class MediaRepository {
   /// rows.
   Future<Set<String>> idsWithUserMetadata(List<String> mediaIds) async {
     if (mediaIds.isEmpty) return {};
-    final rows =
-        await (_db.select(_db.media)..where(
-              (t) =>
-                  t.id.isIn(mediaIds) &
-                  (t.isFavorite.equals(true) |
-                      (t.caption.isNotNull() & t.caption.equals('').not())),
-            ))
-            .get();
-    final tagged =
-        await (_db.selectOnly(_db.mediaSpecies)
-              ..addColumns([_db.mediaSpecies.mediaId])
-              ..where(_db.mediaSpecies.mediaId.isIn(mediaIds)))
-            .get();
-    return {
-      for (final row in rows) row.id,
-      for (final row in tagged) row.read(_db.mediaSpecies.mediaId)!,
-    };
+    // Chunked: a "select all" in the library can pass thousands of ids,
+    // past SQLite's bound-variable limit for a single IN (...).
+    const chunkSize = 500;
+    final out = <String>{};
+    for (var i = 0; i < mediaIds.length; i += chunkSize) {
+      final chunk = mediaIds.sublist(
+        i,
+        i + chunkSize < mediaIds.length ? i + chunkSize : mediaIds.length,
+      );
+      final rows =
+          await (_db.select(_db.media)..where(
+                (t) =>
+                    t.id.isIn(chunk) &
+                    (t.isFavorite.equals(true) |
+                        (t.caption.isNotNull() & t.caption.equals('').not())),
+              ))
+              .get();
+      final tagged =
+          await (_db.selectOnly(_db.mediaSpecies)
+                ..addColumns([_db.mediaSpecies.mediaId])
+                ..where(_db.mediaSpecies.mediaId.isIn(chunk)))
+              .get();
+      out
+        ..addAll(rows.map((row) => row.id))
+        ..addAll(tagged.map((row) => row.read(_db.mediaSpecies.mediaId)!));
+    }
+    return out;
   }
 
   /// Moves media to [newDiveId] (also the link path for unlinked rows).

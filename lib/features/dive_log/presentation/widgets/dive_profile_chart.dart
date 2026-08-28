@@ -9,6 +9,7 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
+import 'package:submersion/features/dive_log/presentation/utils/gtr_format.dart';
 import 'package:submersion/core/theme/app_colors.dart';
 import 'package:submersion/core/deco/ascent_rate_calculator.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -274,6 +275,10 @@ class DiveProfileChart extends ConsumerStatefulWidget {
 
   /// TTS (Time To Surface) curve in seconds
   final List<int>? ttsCurve;
+
+  /// Gas time remaining curve in seconds; a null sample is a blank (the
+  /// line breaks there rather than dropping to zero)
+  final List<int?>? gtrCurve;
 
   /// Cumulative CNS% curve (includes residual from prior dives)
   final List<double>? cnsCurve;
@@ -558,6 +563,7 @@ class DiveProfileChart extends ConsumerStatefulWidget {
     this.surfaceGfCurve,
     this.meanDepthCurve,
     this.ttsCurve,
+    this.gtrCurve,
     this.cnsCurve,
     this.otuCurve,
     this.overlays,
@@ -616,6 +622,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   bool _showSurfaceGf = false;
   bool _showMeanDepth = false;
   bool _showTts = false;
+  bool _showGtr = false;
   bool _showCns = false;
   bool _showOtu = false;
 
@@ -1511,6 +1518,22 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       );
     }
 
+    // GTR
+    if (_showGtr &&
+        widget.gtrCurve != null &&
+        spot.spotIndex < widget.gtrCurve!.length) {
+      rows.add(
+        TooltipRow(
+          label: l10n.diveLog_tooltip_gtr,
+          value: formatGtrMinutes(
+            widget.gtrCurve![spot.spotIndex],
+            minuteUnit: l10n.units_profileMetric_min,
+          ),
+          bulletColor: ProfileRightAxisMetric.gtr.color!,
+        ),
+      );
+    }
+
     // CNS%
     if (_showCns &&
         widget.cnsCurve != null &&
@@ -1744,6 +1767,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     _showSurfaceGf = legendState.showSurfaceGf;
     _showMeanDepth = legendState.showMeanDepth;
     _showTts = legendState.showTts;
+    _showGtr = legendState.showGtr;
     _showCns = legendState.showCns;
     _showOtu = legendState.showOtu;
     // Sync per-tank pressure visibility
@@ -1804,6 +1828,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       identityHashCode(widget.surfaceGfCurve),
       identityHashCode(widget.meanDepthCurve),
       identityHashCode(widget.ttsCurve),
+      identityHashCode(widget.gtrCurve),
       identityHashCode(widget.cnsCurve),
       identityHashCode(widget.otuCurve),
       identityHashCode(widget.o2CellMvCurves),
@@ -1834,6 +1859,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final hasMeanDepthData =
         widget.meanDepthCurve != null && widget.meanDepthCurve!.isNotEmpty;
     final hasTtsData = widget.ttsCurve != null && widget.ttsCurve!.isNotEmpty;
+    final hasGtrData =
+        widget.gtrCurve != null && widget.gtrCurve!.any((v) => v != null);
     final hasCnsData = widget.cnsCurve != null && widget.cnsCurve!.isNotEmpty;
     final hasOtuData = widget.otuCurve != null && widget.otuCurve!.isNotEmpty;
 
@@ -1874,6 +1901,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       hasSurfaceGfData: hasSurfaceGfData,
       hasMeanDepthData: hasMeanDepthData,
       hasTtsData: hasTtsData,
+      hasGtrData: hasGtrData,
       hasCnsData: hasCnsData,
       hasOtuData: hasOtuData,
     );
@@ -2808,6 +2836,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     if (_showTts && widget.ttsCurve != null)
                       _buildTtsLine(metricBand),
 
+                    // GTR line (if showing)
+                    if (_showGtr && widget.gtrCurve != null)
+                      _buildGtrLine(metricBand),
+
                     // CNS% curve (if showing)
                     if (_showCns && widget.cnsCurve != null)
                       _buildCnsLine(metricBand),
@@ -3451,6 +3483,23 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                         context.l10n.diveLog_tooltip_tts,
                         ttsValue,
                         const Color(0xFFAD1457),
+                      );
+                    }
+
+                    // GTR (if enabled)
+                    if (_showGtr) {
+                      String gtrValue = '--';
+                      if (widget.gtrCurve != null &&
+                          spot.spotIndex < widget.gtrCurve!.length) {
+                        gtrValue = formatGtrMinutes(
+                          widget.gtrCurve![spot.spotIndex],
+                          minuteUnit: minUnit,
+                        );
+                      }
+                      addRow(
+                        context.l10n.diveLog_tooltip_gtr,
+                        gtrValue,
+                        ProfileRightAxisMetric.gtr.color!,
                       );
                     }
 
@@ -5404,6 +5453,56 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     );
   }
 
+  /// Build the gas time remaining line.
+  ///
+  /// Null samples are where the computer (or the calculation) blanked the
+  /// value, so the line breaks there instead of dropping to zero. No surface
+  /// lead-in: GTR is blank on the surface by definition.
+  LineChartBarData _buildGtrLine(MetricBand band) {
+    final gtrData = widget.gtrCurve!;
+    // Same 0-60 min band as NDL and TTS so the three read on one scale.
+    const maxGtrSeconds = 3600.0;
+
+    // Gaps are excluded before decimation (a blank must never be sampled as
+    // a zero), then the line is broken wherever consecutive kept samples are
+    // not adjacent in the raw curve with only blanks between them.
+    final spots = <FlSpot>[];
+    var previous = -1;
+    for (final i in _decimatedNullableCurveIndices(gtrData)) {
+      if (previous >= 0 && _gtrGapBetween(gtrData, previous, i)) {
+        spots.add(FlSpot.nullSpot);
+      }
+      final normalized =
+          gtrData[i]!.toDouble().clamp(0, maxGtrSeconds) / maxGtrSeconds;
+      final yValue = band.mapNormalized(normalized);
+      spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
+      previous = i;
+    }
+
+    return LineChartBarData(
+      spots: spots,
+      isCurved: true,
+      curveSmoothness: 0.2,
+      color: ProfileRightAxisMetric.gtr.color!,
+      barWidth: 2,
+      isStrokeCapRound: true,
+      dotData: const FlDotData(show: false),
+      dashArray: [2, 4],
+    );
+  }
+
+  /// Whether every raw sample strictly between kept indices [from] and [to]
+  /// is blank, i.e. the line should break rather than bridge them. Decimation
+  /// also skips present samples, so a gap is only a gap when nothing present
+  /// was dropped in between.
+  static bool _gtrGapBetween(List<int?> curve, int from, int to) {
+    if (to - from < 2) return false;
+    for (var j = from + 1; j < to; j++) {
+      if (curve[j] != null) return false;
+    }
+    return true;
+  }
+
   /// Compute dynamic max scale for CNS curve based on actual data.
   double _getCnsMaxScale() {
     if (widget.cnsCurve == null || widget.cnsCurve!.isEmpty) return 100.0;
@@ -5902,6 +6001,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
             widget.meanDepthCurve!.isNotEmpty;
       case ProfileRightAxisMetric.tts:
         return widget.ttsCurve != null && widget.ttsCurve!.isNotEmpty;
+      case ProfileRightAxisMetric.gtr:
+        return widget.gtrCurve != null &&
+            widget.gtrCurve!.any((v) => v != null);
       case ProfileRightAxisMetric.cns:
         return widget.cnsCurve != null && widget.cnsCurve!.isNotEmpty;
       case ProfileRightAxisMetric.otu:
@@ -6026,6 +6128,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         return (min: 0.0, max: depths.reduce(math.max) * 1.1);
 
       case ProfileRightAxisMetric.tts:
+      case ProfileRightAxisMetric.gtr:
         return (min: 0.0, max: 3600.0); // 0-60 minutes
 
       case ProfileRightAxisMetric.cns:
@@ -6085,6 +6188,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         return value.toStringAsFixed(1);
       case ProfileRightAxisMetric.ndl:
       case ProfileRightAxisMetric.tts:
+      case ProfileRightAxisMetric.gtr:
         return (value / 60).round().toString();
       case ProfileRightAxisMetric.cns:
       case ProfileRightAxisMetric.otu:
@@ -6141,6 +6245,7 @@ String profileMetricName(
   ProfileRightAxisMetric.surfaceGf => l10n.enum_profileMetric_surfaceGf,
   ProfileRightAxisMetric.meanDepth => l10n.enum_profileMetric_meanDepth,
   ProfileRightAxisMetric.tts => l10n.enum_profileMetric_tts,
+  ProfileRightAxisMetric.gtr => l10n.enum_profileMetric_gtr,
   ProfileRightAxisMetric.cns => l10n.enum_profileMetric_cns,
   ProfileRightAxisMetric.otu => l10n.enum_profileMetric_otu,
   ProfileRightAxisMetric.o2CellMv => l10n.enum_profileMetric_o2CellMv,
@@ -6167,6 +6272,7 @@ String profileMetricShortName(
   ProfileRightAxisMetric.surfaceGf => l10n.enum_profileMetric_surfaceGf_short,
   ProfileRightAxisMetric.meanDepth => l10n.enum_profileMetric_meanDepth_short,
   ProfileRightAxisMetric.tts => l10n.enum_profileMetric_tts_short,
+  ProfileRightAxisMetric.gtr => l10n.enum_profileMetric_gtr_short,
   ProfileRightAxisMetric.cns => l10n.enum_profileMetric_cns_short,
   ProfileRightAxisMetric.otu => l10n.enum_profileMetric_otu_short,
   ProfileRightAxisMetric.o2CellMv => l10n.enum_profileMetric_o2CellMv_short,
@@ -6182,7 +6288,8 @@ String? profileMetricUnitSuffix(
 ) => switch (metric) {
   ProfileRightAxisMetric.heartRate => l10n.units_profileMetric_bpm,
   ProfileRightAxisMetric.ndl ||
-  ProfileRightAxisMetric.tts => l10n.units_profileMetric_min,
+  ProfileRightAxisMetric.tts ||
+  ProfileRightAxisMetric.gtr => l10n.units_profileMetric_min,
   ProfileRightAxisMetric.ppO2 ||
   ProfileRightAxisMetric.ppN2 ||
   ProfileRightAxisMetric.ppHe => l10n.units_pressure_bar,

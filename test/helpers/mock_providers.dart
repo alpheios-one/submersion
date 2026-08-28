@@ -28,6 +28,8 @@ import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.da
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart';
+import 'package:submersion/features/trips/presentation/providers/trip_day_weather_providers.dart';
 import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
 
 typedef Override = riverpod.Override;
@@ -390,6 +392,18 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultShowO2CellMv(bool value) async =>
       state = state.copyWith(defaultShowO2CellMv: value);
+
+  @override
+  Future<void> setDefaultShowGtr(bool value) async =>
+      state = state.copyWith(defaultShowGtr: value);
+
+  @override
+  Future<void> setDefaultGtrSource(MetricDataSource value) async =>
+      state = state.copyWith(defaultGtrSource: value);
+
+  @override
+  Future<void> setGtrReservePressure(double value) async =>
+      state = state.copyWith(gtrReservePressure: value);
   @override
   Future<void> setDefaultShowEstimatedTankPressure(bool value) async =>
       state = state.copyWith(defaultShowEstimatedTankPressure: value);
@@ -544,6 +558,7 @@ Future<List<Override>> getBaseOverrides({
   MockSettingsNotifier? settingsNotifier,
   http.Client? weatherHttpClient,
   PreDiveSession? linkedPreDiveSession,
+  Map<int, TripDayWeather>? tripDayWeather,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -574,5 +589,13 @@ Future<List<Override>> getBaseOverrides({
     weatherHttpClientProvider.overrideWithValue(
       weatherHttpClient ?? MockClient((_) async => http.Response('', 500)),
     ),
+    // Stored trip day weather reaches the real repository and a database
+    // widget tests do not have; the backfill would additionally walk the
+    // story and fetch. Both default to inert here, so a test that cares about
+    // the badge overrides tripDayWeatherProvider with its own rows.
+    tripDayWeatherProvider.overrideWith(
+      (ref, tripId) async => tripDayWeather ?? const {},
+    ),
+    tripDayWeatherBackfillProvider.overrideWith((ref, tripId) async {}),
   ];
 }
