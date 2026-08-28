@@ -2,7 +2,7 @@
 ///
 /// GPMF is a binary telemetry format and the QuickTime meta layout differs
 /// between writers, so synthetic fixtures alone do not prove the readers.
-/// Point these env vars at real clips (kept OUTSIDE the repo, e.g. in the
+/// Point these dart-defines at real clips (kept OUTSIDE the repo, e.g. in the
 /// "submersion data" samples folder) and pass their expected positions:
 ///
 ///   flutter test \
@@ -15,7 +15,7 @@
 ///     --run-skipped --tags=real-data \
 ///     test/features/media/data/services/video_gps_real_sample_test.dart
 ///
-/// Without the env vars (or when a file is missing) every test skips so CI
+/// Without the dart-defines (or when a file is missing) every test skips so CI
 /// and fresh clones stay green.
 @Tags(['real-data'])
 library;
