@@ -161,4 +161,30 @@ void main() {
       expect(pending, isEmpty);
     },
   );
+
+  test(
+    'resetBuiltInSpecies drops the pending record of an unused edited row',
+    () async {
+      SpeciesSeedService.overrideCatalog(
+        _catalog(1, [_row('sp_a', 'A'), _row('sp_b', 'B')]),
+      );
+      await repository.seedBuiltInSpecies(
+        versionStore: InMemorySeedVersionStore(),
+      );
+      await repository.updateSpecies(
+        (await repository.getSpeciesById('sp_b'))!.copyWith(commonName: 'Mine'),
+      );
+
+      await repository.resetBuiltInSpecies();
+
+      expect((await read('sp_b')).commonName, 'B');
+      final pending = await db
+          .customSelect(
+            "SELECT record_id FROM sync_records "
+            "WHERE entity_type = 'species'",
+          )
+          .get();
+      expect(pending, isEmpty);
+    },
+  );
 }

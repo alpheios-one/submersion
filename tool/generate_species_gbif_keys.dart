@@ -49,6 +49,9 @@ const Set<String> _straddlingTaxa = {
   'Poaceae',
 };
 
+/// GBIF ranks a usage key may carry to count as a species key.
+const Set<String> _speciesRanks = {'SPECIES', 'SUBSPECIES', 'VARIETY', 'FORM'};
+
 Future<void> main() async {
   final catalog =
       jsonDecode(await File('assets/data/species.json').readAsString())
@@ -84,6 +87,16 @@ Future<void> main() async {
 
       final match = jsonDecode(body) as Map<String, dynamic>;
       final usageKey = match['usageKey'];
+
+      // A name GBIF does not know comes back as a HIGHERRANK match on the
+      // nearest ancestor (Micropterus nigricans resolved to Animalia, key
+      // 1); only a species-level usage is a species key, and such a match
+      // contributes nothing to the whitelist either.
+      if (match['matchType'] == 'HIGHERRANK' ||
+          !_speciesRanks.contains(match['rank'])) {
+        unmatched.add(scientificName);
+        continue;
+      }
 
       if (usageKey is int) {
         // The catalog contains a handful of duplicate scientific names whose

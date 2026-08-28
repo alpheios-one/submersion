@@ -77,6 +77,14 @@ void main() {
       expect(taxa, contains(2459538), reason: 'Amblyrhynchus, marine iguana');
     });
 
+    test('no species key is a kingdom or phylum usage', () {
+      // A HIGHERRANK match on an unknown name once wrote Animalia (key 1)
+      // as a species key; GBIF's kingdom and phylum keys are all below 100.
+      for (final key in (keys['speciesKeys'] as Map).keys) {
+        expect(int.parse(key as String), greaterThan(100), reason: key);
+      }
+    });
+
     test('every mapped key points at a real catalog species id', () {
       final ids = catalog.map((s) => s['id'] as String).toSet();
       final mapped = (keys['speciesKeys'] as Map).values.cast<String>();

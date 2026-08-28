@@ -496,6 +496,16 @@ class SpeciesRepository {
         .map((r) => r.data['species_id'] as String)
         .toSet();
 
+    // Built-in rows never export (the serializer filters them out), so any
+    // pending record a past edit left is a permanent no-op; drop them all
+    // in one go, for the rows about to be deleted as well as the restored
+    // ones.
+    await _db.customStatement('''
+      DELETE FROM sync_records
+      WHERE entity_type = 'species'
+      AND record_id IN (SELECT id FROM species WHERE is_built_in = 1)
+    ''');
+
     // Delete built-in species not referenced by sightings
     await _db.customStatement('''
       DELETE FROM species
@@ -521,12 +531,6 @@ class SpeciesRepository {
             hlc: const Value(null),
           ),
         );
-        await (_db.delete(_db.syncRecords)..where(
-              (t) =>
-                  t.entityType.equals('species') &
-                  t.recordId.equals(species.id),
-            ))
-            .go();
       }
     }
 
