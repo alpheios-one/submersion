@@ -338,5 +338,31 @@ Named explicitly so the work does not drift:
   what SAC *means*, orthogonal to how it is plotted.
 - **#641**, depth distribution capped at 40 m.
 - **#526**, excluding shallow or short dives from statistics.
-- Navigating from a chart point to the dive it represents.
 - Persisting per-chart settings across app restarts.
+
+## Added after the design was written
+
+Feedback on the running app pulled several things in that this document had
+either excluded or never considered. Recorded here so the spec matches what
+shipped:
+
+- **Navigating from a chart point to the dive it represents**, listed above as
+  out of scope. `TrendDataPoint` gained a `diveId`, every per-dive query
+  selects it, and tapping a point in per-dive mode opens that dive. A bucket
+  carries no id, because it stands for several dives.
+- **Zoom and pan** over the time axis, matching the dive profile chart:
+  wheel, trackpad, drag and pinch, plus a shared `ChartZoomControls` extracted
+  from the profile legend. The viewport maths moved to
+  `lib/core/ui/chart_viewport.dart` and lost its `Profile` prefix.
+- **A readout matching the profile chart**: monospace label and value columns,
+  every series named, drawn above the plot so it cannot cover the point it
+  describes, and a full-height hover line.
+- **Framed plot areas** on all four statistics chart types.
+- **Denser cumulative dive count**, stepping once per dive rather than once
+  per month.
+- **Self-describing aggregation values** ("Every dive", "Weekly average",
+  "Monthly average") and an abbreviated year on every axis label.
+
+Two things this document proposed were dropped: pulling the date range out of
+the filter sheet into the statistics top bar, and spelling the axis year only
+where it changes.

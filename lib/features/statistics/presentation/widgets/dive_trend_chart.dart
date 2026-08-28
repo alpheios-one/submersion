@@ -335,6 +335,10 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
     );
 
     // The fits can run outside the bucket range, so the axis has to see them.
+    // Computed once here and threaded into the axis, the legend labels and
+    // the bars. Each of the three used to recompute them, so a large logbook
+    // paid for the same O(n) fit three times on every rebuild, and pan/zoom
+    // rebuilds on every pointer move.
     final smoothed = widget.showRollingMean
         ? rollingMean(points)
         : const <TrendDataPoint>[];
@@ -349,8 +353,8 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
     ]);
 
     final isRaw = aggregation == TrendAggregation.none;
-    final bars = _bars(context, buckets, color, isRaw);
-    final seriesLabels = _seriesLabels(context, isRaw);
+    final bars = _bars(context, buckets, color, isRaw, smoothed, fit);
+    final seriesLabels = _seriesLabels(context, isRaw, smoothed, fit);
 
     return Semantics(
       label: yAxisLabel != null
@@ -396,7 +400,12 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
 
   /// Names every series in the order [_bars] builds them, so the tooltip can
   /// label each value instead of listing bare numbers.
-  List<String> _seriesLabels(BuildContext context, bool isRaw) {
+  List<String> _seriesLabels(
+    BuildContext context,
+    bool isRaw,
+    List<TrendDataPoint> smoothed,
+    LinearFit? fit,
+  ) {
     final l10n = context.l10n;
     final mode = switch (widget.aggregation) {
       TrendAggregation.none => l10n.statistics_trend_aggregation_perDive,
@@ -409,10 +418,8 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
         l10n.statistics_trend_tooltip_lowest,
         l10n.statistics_trend_tooltip_highest,
       ],
-      if (widget.showRollingMean && rollingMean(widget.points).isNotEmpty)
-        l10n.statistics_trend_legend_rollingAverage,
-      if (widget.showLinearFit && linearFit(widget.points) != null)
-        l10n.statistics_trend_legend_rate,
+      if (smoothed.isNotEmpty) l10n.statistics_trend_legend_rollingAverage,
+      if (fit != null) l10n.statistics_trend_legend_rate,
     ];
   }
 
@@ -423,6 +430,8 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
     List<TrendBucket> buckets,
     Color color,
     bool isRaw,
+    List<TrendDataPoint> smoothed,
+    LinearFit? fit,
   ) {
     final bars = <LineChartBarData>[
       LineChartBarData(
@@ -472,9 +481,8 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
     // means would smooth twice, and the line would visibly move when the
     // dropdown changed, implying the underlying trend had changed when only
     // the drawing did.
-    if (widget.showRollingMean) {
-      final smoothed = rollingMean(widget.points);
-      if (smoothed.isNotEmpty) {
+    if (smoothed.isNotEmpty) {
+      {
         bars.add(
           LineChartBarData(
             spots: smoothed
@@ -490,9 +498,8 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
       }
     }
 
-    if (widget.showLinearFit) {
-      final fit = linearFit(widget.points);
-      if (fit != null) {
+    if (fit != null) {
+      {
         final first = buckets.first.date;
         final last = buckets.last.date;
         bars.add(
