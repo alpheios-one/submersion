@@ -170,8 +170,7 @@ class DiveSummary extends Equatable {
       rating: rating ?? this.rating,
       isFavorite: isFavorite ?? this.isFavorite,
       excludedFromStats: excludedFromStats ?? this.excludedFromStats,
-      excludedFromGasStats:
-          excludedFromGasStats ?? this.excludedFromGasStats,
+      excludedFromGasStats: excludedFromGasStats ?? this.excludedFromGasStats,
       diveMode: diveMode ?? this.diveMode,
       diveTypeIds: diveTypeIds ?? this.diveTypeIds,
       tags: tags ?? this.tags,

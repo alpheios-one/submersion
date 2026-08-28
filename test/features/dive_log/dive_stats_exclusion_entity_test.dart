@@ -16,7 +16,8 @@ void main() {
     expect(
       dive.copyWith(excludedFromStats: true).excludedFromGasStats,
       isFalse,
-      reason: 'the master flag must not write through to the gas flag; '
+      reason:
+          'the master flag must not write through to the gas flag; '
           'the implication lives in SQL, not in the entity',
     );
     expect(

@@ -694,8 +694,7 @@ class Dive extends Equatable {
       weightingFeedbackKg: weightingFeedbackKg ?? this.weightingFeedbackKg,
       isFavorite: isFavorite ?? this.isFavorite,
       excludedFromStats: excludedFromStats ?? this.excludedFromStats,
-      excludedFromGasStats:
-          excludedFromGasStats ?? this.excludedFromGasStats,
+      excludedFromGasStats: excludedFromGasStats ?? this.excludedFromGasStats,
       tags: tags ?? this.tags,
       // CCR/SCR fields
       diveMode: diveMode ?? this.diveMode,

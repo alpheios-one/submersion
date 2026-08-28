@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/deco/ascent_rate_calculator.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -176,15 +177,33 @@ class StatisticsRepository {
   /// sample while cutting anything an order of magnitude larger down to size.
   static const int _maxSampleGapFactor = 4;
 
-  /// Builds the `AND <alias>.id IN (<subquery>)` fragment + raw params for a
-  /// stats filter. Empty (no-op) when the filter has no active axes.
+  /// Builds the always-on statistics scope plus, when the diver has active
+  /// filter axes, the `AND <alias>.id IN (<subquery>)` fragment and its raw
+  /// params.
+  ///
+  /// The scope is emitted unconditionally and the user filter conditionally.
+  /// They are deliberately separate: [buildFilteredDiveIdSubquery] is the
+  /// diver's transient view filter and no-ops when nothing is selected, while
+  /// [DiveStatsScope] is a persistent property of the dive. Folding the scope
+  /// into the subquery would make the exclusion evaporate for every diver who
+  /// never opens the filter sheet.
+  ///
+  /// Pass `gas: true` for SAC/RMV and gas-mix aggregates, which additionally
+  /// drop per-dive gas exclusions and gauge-mode dives.
   ({String clause, List<Object?> params}) _diveFilter(
     DiveFilterState filter, {
     String alias = 'dives',
+    bool gas = false,
   }) {
+    final scope = DiveStatsScope.and(alias: alias, gas: gas);
     final f = buildFilteredDiveIdSubquery(filter);
-    if (f.subquery.isEmpty) return (clause: '', params: const <Object?>[]);
-    return (clause: 'AND $alias.id IN (${f.subquery})', params: f.params);
+    if (f.subquery.isEmpty) {
+      return (clause: scope, params: const <Object?>[]);
+    }
+    return (
+      clause: '$scope AND $alias.id IN (${f.subquery})',
+      params: f.params,
+    );
   }
 
   // ============================================================================
@@ -202,7 +221,7 @@ class StatisticsRepository {
   }) async {
     try {
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
-      final df = _diveFilter(filter, alias: 'd');
+      final df = _diveFilter(filter, alias: 'd', gas: true);
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
@@ -218,7 +237,7 @@ class StatisticsRepository {
           t.he_percent
         FROM dives d
         JOIN dive_tanks t ON t.dive_id = d.id
-        WHERE d.dive_mode <> 'gauge' $diverFilter ${df.clause}
+        WHERE 1 = 1 $diverFilter ${df.clause}
           AND COALESCE(d.runtime, d.bottom_time) > 0
           AND d.avg_depth > 0
           AND t.start_pressure > t.end_pressure
@@ -313,7 +332,7 @@ class StatisticsRepository {
   }) async {
     try {
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
-      final df = _diveFilter(filter, alias: 'd');
+      final df = _diveFilter(filter, alias: 'd', gas: true);
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
@@ -336,7 +355,7 @@ class StatisticsRepository {
           ORDER BY t2.tank_order, t2.rowid
           LIMIT 1
         )
-        WHERE d.dive_mode <> 'gauge' $diverFilter ${df.clause}
+        WHERE 1 = 1 $diverFilter ${df.clause}
           AND COALESCE(d.runtime, d.bottom_time) > 0
           AND d.avg_depth > 0
         ORDER BY d.dive_date_time
@@ -371,7 +390,7 @@ class StatisticsRepository {
   }) async {
     try {
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
-      final df = _diveFilter(filter, alias: 'd');
+      final df = _diveFilter(filter, alias: 'd', gas: true);
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
@@ -384,7 +403,7 @@ class StatisticsRepository {
           COUNT(DISTINCT d.id) AS dive_count
         FROM dives d
         JOIN dive_tanks t ON t.dive_id = d.id
-        WHERE 1=1 AND d.dive_mode <> 'gauge' $diverFilter ${df.clause}
+        WHERE 1=1 $diverFilter ${df.clause}
         GROUP BY gas_type
         ORDER BY dive_count DESC
         ''', variables: params.map((p) => Variable(p)).toList()).get();
@@ -421,7 +440,7 @@ class StatisticsRepository {
   }) async {
     try {
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
-      final df = _diveFilter(filter, alias: 'd');
+      final df = _diveFilter(filter, alias: 'd', gas: true);
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
@@ -444,7 +463,7 @@ class StatisticsRepository {
           AND d.avg_depth > 0
           AND t.start_pressure > t.end_pressure
           AND t.volume > 0
-          AND d.dive_mode <> 'gauge'
+         
           $diverFilter ${df.clause}
         ORDER BY d.dive_date_time
         ''', variables: params.map((p) => Variable(p)).toList()).get();
@@ -548,7 +567,7 @@ class StatisticsRepository {
   }) async {
     try {
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
-      final df = _diveFilter(filter, alias: 'd');
+      final df = _diveFilter(filter, alias: 'd', gas: true);
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
@@ -576,7 +595,7 @@ class StatisticsRepository {
         LEFT JOIN dive_sites ds ON ds.id = d.site_id
         WHERE COALESCE(d.runtime, d.bottom_time) > 0
           AND d.avg_depth > 0
-          AND d.dive_mode <> 'gauge'
+         
           $diverFilter ${df.clause}
         ORDER BY sac ASC
         ''', variables: params.map((p) => Variable(p)).toList()).get();
@@ -618,7 +637,7 @@ class StatisticsRepository {
   }) async {
     try {
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
-      final df = _diveFilter(filter, alias: 'd');
+      final df = _diveFilter(filter, alias: 'd', gas: true);
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
@@ -639,7 +658,7 @@ class StatisticsRepository {
           AND COALESCE(d.runtime, d.bottom_time) > 0
           AND d.avg_depth > 0
           AND t.volume > 0
-          AND d.dive_mode <> 'gauge'
+         
           $diverFilter ${df.clause}
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
@@ -701,7 +720,7 @@ class StatisticsRepository {
   }) async {
     try {
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
-      final df = _diveFilter(filter, alias: 'd');
+      final df = _diveFilter(filter, alias: 'd', gas: true);
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
@@ -720,7 +739,7 @@ class StatisticsRepository {
           AND t.end_pressure IS NOT NULL
           AND COALESCE(d.runtime, d.bottom_time) > 0
           AND d.avg_depth > 0
-          AND d.dive_mode <> 'gauge'
+         
           $diverFilter ${df.clause}
         GROUP BY t.tank_role
         HAVING avg_sac IS NOT NULL
@@ -938,7 +957,7 @@ class StatisticsRepository {
           MAX(max_depth) AS max_depth
         FROM dives
         WHERE dive_date_time >= ? AND dive_date_time < ?
-        $diverFilter
+        $diverFilter${DiveStatsScope.and(alias: 'dives')}
         ''',
             variables: [
               Variable<int>(startMs),
@@ -1259,6 +1278,7 @@ class StatisticsRepository {
         FROM dives
         WHERE site_id = ?
           AND entry_method IS NOT NULL AND entry_method != '' $diverFilter
+          ${DiveStatsScope.and(alias: 'dives')}
         GROUP BY entry_method, exit_method
         ORDER BY count DESC
         ''', variables: params.map((p) => Variable(p)).toList()).get();
@@ -1974,6 +1994,11 @@ class StatisticsRepository {
                     WHERE d2.diver_id = d.diver_id
                       AND d2.exit_time IS NOT NULL
                       AND d2.exit_time < d.entry_time
+                      -- The scope applies to the preceding dive as well: a
+                      -- surface interval measured from an excluded dive is
+                      -- as wrong as one measured to it. The user filter has
+                      -- never reached this inner alias.
+                      ${DiveStatsScope.and(alias: 'd2')}
                   )
                 ) / 1000.0
                 ELSE NULL
@@ -2495,6 +2520,7 @@ class StatisticsRepository {
       FROM dives d
       JOIN dive_sites ds ON d.site_id = ds.id
       WHERE LOWER(ds.name) = LOWER(?) AND d.diver_id = ?
+            ${DiveStatsScope.and(alias: 'd')}
     ''',
           variables: [
             Variable.withString(siteName),

@@ -28,15 +28,17 @@ Future<Set<String>> _diveColumns(AppDatabase db) async {
 }
 
 void main() {
-  test('v178 adds both statistics-exclusion columns to an existing table',
-      () async {
-    final db = AppDatabase(_dbAt175());
-    addTearDown(db.close);
+  test(
+    'v178 adds both statistics-exclusion columns to an existing table',
+    () async {
+      final db = AppDatabase(_dbAt175());
+      addTearDown(db.close);
 
-    final names = await _diveColumns(db);
-    expect(names, contains('excluded_from_stats'));
-    expect(names, contains('excluded_from_gas_stats'));
-  });
+      final names = await _diveColumns(db);
+      expect(names, contains('excluded_from_stats'));
+      expect(names, contains('excluded_from_gas_stats'));
+    },
+  );
 
   test('pre-existing dives default to included', () async {
     final db = AppDatabase(_dbAt175());

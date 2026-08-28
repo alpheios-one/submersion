@@ -2126,7 +2126,7 @@ class DiveRepository {
             'd.dive_date_time, d.entry_time, '
             'd.max_depth, d.bottom_time, d.runtime, d.water_temp, d.rating, '
             'd.is_favorite, d.excluded_from_stats, d.excluded_from_gas_stats, '
-          'd.dive_type, d.dive_mode, '
+            'd.dive_type, d.dive_mode, '
             'COALESCE(d.entry_time, d.dive_date_time) AS sort_timestamp, '
             's.name AS site_name, s.country AS site_country, '
             's.region AS site_region, s.latitude AS site_latitude, '
