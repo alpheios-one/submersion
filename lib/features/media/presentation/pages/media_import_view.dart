@@ -13,6 +13,7 @@ import 'package:submersion/features/media/presentation/pages/media_import_review
 import 'package:submersion/features/media/presentation/pages/photo_picker_page.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/features/media/presentation/helpers/offer_site_review_after_import.dart';
 
 /// The Import console section: launches the three-tab picker with no dive
 /// context, then hands the picked assets to [MediaImportReviewPage]. Nothing
@@ -117,6 +118,7 @@ class MediaImportView extends ConsumerWidget {
     }
     return ImportReviewResult(
       linked: linked,
+      linkedDiveIds: byDive.keys.toList(),
       skipped: assets.length - targets.length,
       failures: failures,
       importedIds: importedIds,
@@ -141,12 +143,22 @@ class MediaImportView extends ConsumerWidget {
       MaterialPageRoute<void>(
         builder: (_) => MediaImportReviewPage(
           candidates: candidates,
-          onConfirm: (targets) => importResolved(
-            service: ref.read(mediaImportServiceProvider),
-            diveRepository: ref.read(diveRepositoryProvider),
-            assets: assets,
-            targets: targets,
-          ),
+          onConfirm: (targets) async {
+            final result = await importResolved(
+              service: ref.read(mediaImportServiceProvider),
+              diveRepository: ref.read(diveRepositoryProvider),
+              assets: assets,
+              targets: targets,
+            );
+            if (context.mounted) {
+              await offerSiteReviewAfterImport(
+                context,
+                ref,
+                result.linkedDiveIds,
+              );
+            }
+            return result;
+          },
         ),
       ),
     );

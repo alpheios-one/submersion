@@ -296,6 +296,27 @@ void main() {
       return img.encodeJpg(image);
     }
 
+    test('reads GPS from JPEG bytes when native_exif is absent', () async {
+      final image = img.Image(width: 4, height: 4);
+      image.exif.gpsIfd.gpsLatitude = 20.5;
+      image.exif.gpsIfd.gpsLatitudeRef = 'N';
+      image.exif.gpsIfd.gpsLongitude = 87.25;
+      image.exif.gpsIfd.gpsLongitudeRef = 'W';
+      final f = File('${tempDir.path}/gps.jpg')
+        ..writeAsBytesSync(img.encodeJpg(image));
+      final meta = await ExifExtractor().extract(f);
+      expect(meta?.latitude, closeTo(20.5, 1e-6));
+      expect(meta?.longitude, closeTo(-87.25, 1e-6));
+    });
+
+    test('leaves GPS null for a JPEG without a GPS IFD', () async {
+      final f = File('${tempDir.path}/nogps.jpg')
+        ..writeAsBytesSync(jpegWithDateTimeOriginal('2025:12:27 12:08:19'));
+      final meta = await ExifExtractor().extract(f);
+      expect(meta?.latitude, isNull);
+      expect(meta?.longitude, isNull);
+    });
+
     test(
       'reads DateTimeOriginal from JPEG bytes when native_exif is absent',
       () async {

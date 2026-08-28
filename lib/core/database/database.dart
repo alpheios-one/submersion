@@ -824,6 +824,10 @@ class Dives extends Table {
   /// (nullable: rows written before HLC rollout fall back to updatedAt).
   TextColumn get hlc => text().nullable()();
 
+  /// When the diver dismissed the site suggestion for this dive (photo GPS or
+  /// dive-computer GPS). Null = never dismissed. Synced with the row.
+  IntColumn get siteSuggestionDismissedAt => integer().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -3310,7 +3314,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 178;
+  static const int currentSchemaVersion = 179;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3676,12 +3680,20 @@ class AppDatabase extends _$AppDatabase {
     177,
     // v178: one dive_dive_types row per (dive, type), collapsing the
     // duplicates the unguarded v92 seed minted on every device and the sync
-    // merge then unioned by row id. Issue #1360. 176 is claimed by PR #1328
-    // (photo-GPS site suggestions), still open; 177 above landed while this
-    // branch was open. This stays above main's scalar deliberately -- a rung
-    // at or below it merges with no conflict marker and its onUpgrade step
-    // then never runs.
+    // merge then unioned by row id. Issue #1360. (That comment originally
+    // recorded PR #1328 as holding 176; #1328 has since moved to 179, the
+    // rung below.)
     178,
+    // v179: dives.site_suggestion_dismissed_at, the synced per-dive dismissal
+    // of the photo / dive-computer site suggestion. Renumbered twice while
+    // this branch was open -- from 172 when main landed 173-175, then from
+    // 176 when main landed 177 (GTR) -- because a rung below the shipped
+    // version never runs its onUpgrade step: a database already at the
+    // shipped version gains the column only through the beforeOpen backstop.
+    // 178 shipped with the dive-type uniqueness work while this branch was
+    // open, so this sits above it. 162, 167, 169 and 176 are skipped; the
+    // ladder is non-contiguous by design.
+    179,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -5230,6 +5242,19 @@ class AppDatabase extends _$AppDatabase {
           'ALTER TABLE dive_profiles ADD COLUMN o2_sensor_mv$n INTEGER',
         );
       }
+    }
+  }
+
+  /// v179: site_suggestion_dismissed_at on dives. Null means the site
+  /// suggestion (from photo GPS or dive-computer GPS) was never dismissed.
+  Future<void> _assertSiteSuggestionDismissedAtColumn() async {
+    final cols = await customSelect("PRAGMA table_info('dives')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('site_suggestion_dismissed_at')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN site_suggestion_dismissed_at INTEGER',
+      );
     }
   }
 
@@ -9181,6 +9206,11 @@ class AppDatabase extends _$AppDatabase {
           await assertDiveTypeUniqueness(this);
         }
         if (from < 178) await reportProgress();
+        // v179: dives.site_suggestion_dismissed_at (site suggestion dismissal).
+        if (from < 179) {
+          await _assertSiteSuggestionDismissedAtColumn();
+        }
+        if (from < 179) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9384,6 +9414,10 @@ class AppDatabase extends _$AppDatabase {
         // diver_settings.default_show_estimated_tank_pressure (issue #731;
         // same parallel-branch version-collision self-heal).
         await _assertEstimatedTankPressureDefaultColumn();
+
+        // v179 backstop: re-assert dives.site_suggestion_dismissed_at (same
+        // parallel-branch version-collision self-heal).
+        await _assertSiteSuggestionDismissedAtColumn();
 
         // v164 backstop: re-assert media.manual_elapsed_seconds (issue
         // #1090; same parallel-branch version-collision self-heal). The
