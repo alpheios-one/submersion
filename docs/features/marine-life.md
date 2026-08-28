@@ -161,6 +161,10 @@ a species in one place.
   chips you can toggle, plus a search for any other species. Tagging a species
   that is not yet logged on that dive adds the sighting for you.
 - Tagged species appear as chips under the photo; tap one to open the species.
+- The Species page shows each species' newest tagged photo in place of its
+  category icon. On a dive, each sighting row shows how many of the dive's
+  photos carry the species; tap the count to view them. The media library's
+  filter has a **Species** facet, which smart albums keep too.
 
 A species with tagged photos cannot be deleted from the catalog until the
 tags are removed, the same rule as for sightings.

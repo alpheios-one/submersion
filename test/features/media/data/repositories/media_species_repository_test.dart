@@ -92,4 +92,17 @@ void main() {
     final db = DatabaseService.instance.database;
     expect(await db.select(db.mediaSpecies).get(), hasLength(1));
   });
+
+  test('getMediaForSpecies narrows to one dive in SQL when asked', () async {
+    await insertTestDive(id: 'd2', at: DateTime(2024, 2, 10));
+    await insertTestMedia(id: 'm3', diveId: 'd2');
+    await repository.addTag(mediaId: 'm1', speciesId: 'c1');
+    await repository.addTag(mediaId: 'm3', speciesId: 'c1');
+
+    final all = await repository.getMediaForSpecies('c1');
+    final onDive = await repository.getMediaForSpecies('c1', diveId: 'd2');
+
+    expect(all.map((m) => m.id).toSet(), {'m1', 'm3'});
+    expect(onDive.map((m) => m.id).toList(), ['m3']);
+  });
 }

@@ -4675,6 +4675,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_section_marineLife => '海洋生物';
 
   @override
+  String diveLog_detail_sightingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 张照片',
+      one: '1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_section_notes => '备注';
 
   @override
@@ -13363,6 +13374,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_library_filter_site => '潜点';
+
+  @override
+  String get media_library_filter_species => '物种';
 
   @override
   String get media_library_filter_trip => '行程';

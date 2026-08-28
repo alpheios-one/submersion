@@ -77,3 +77,52 @@ final mediaTagChipsProvider =
       );
       return repository.getTagChipsForMedia(mediaId);
     });
+
+/// Newest tagged photo per species, for the Species page's tile avatars.
+/// One query for the whole list; derived, never chosen (built-in species
+/// rows never sync, so a chosen cover could not follow the diver).
+final speciesCoverMediaProvider = FutureProvider<Map<String, MediaItem>>((
+  ref,
+) async {
+  final repository = ref.watch(mediaSpeciesRepositoryProvider);
+  final diverId = ref.watch(currentDiverIdProvider);
+  ref.invalidateSelfWhen(repository.watchTagChanges());
+  ref.invalidateSelfWhen(
+    ref.watch(mediaRepositoryProvider).watchMediaChanges(),
+  );
+  return repository.getCoverMediaBySpecies(diverId: diverId);
+});
+
+/// How many photos on one dive carry each species tag, for the sighting
+/// rows' photo chips.
+final diveSpeciesPhotoCountsProvider =
+    FutureProvider.family<Map<String, int>, String>((ref, diveId) async {
+      final repository = ref.watch(mediaSpeciesRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchTagChanges());
+      ref.invalidateSelfWhen(
+        ref.watch(mediaRepositoryProvider).watchMediaChanges(),
+      );
+      return repository.getPhotoCountsBySpeciesForDive(diveId);
+    });
+
+/// Identifies one dive's photos of one species.
+typedef DiveSpeciesKey = ({String diveId, String speciesId});
+
+/// The photos on [DiveSpeciesKey.diveId] tagged with
+/// [DiveSpeciesKey.speciesId], in the species gallery's order: that gallery
+/// narrowed to one dive, so the viewer opened from a sighting row shows the
+/// same photos the Species page would.
+final mediaForDiveSpeciesProvider =
+    FutureProvider.family<List<MediaItem>, DiveSpeciesKey>((ref, key) async {
+      final repository = ref.watch(mediaSpeciesRepositoryProvider);
+      final diverId = ref.watch(currentDiverIdProvider);
+      ref.invalidateSelfWhen(repository.watchTagChanges());
+      ref.invalidateSelfWhen(
+        ref.watch(mediaRepositoryProvider).watchMediaChanges(),
+      );
+      return repository.getMediaForSpecies(
+        key.speciesId,
+        diverId: diverId,
+        diveId: key.diveId,
+      );
+    });

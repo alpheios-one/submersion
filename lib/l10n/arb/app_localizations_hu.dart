@@ -4897,6 +4897,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_section_marineLife => 'Tengeri elet';
 
   @override
+  String diveLog_detail_sightingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó',
+      one: '1 fotó',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_section_notes => 'Jegyzetek';
 
   @override
@@ -13975,6 +13986,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_library_filter_site => 'Merülőhely';
+
+  @override
+  String get media_library_filter_species => 'Faj';
 
   @override
   String get media_library_filter_trip => 'Utazás';

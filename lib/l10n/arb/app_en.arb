@@ -2816,6 +2816,14 @@
   "diveLog_detail_section_diveProfile": "Dive Profile",
   "diveLog_detail_section_equipment": "Equipment",
   "diveLog_detail_section_marineLife": "Marine Life",
+  "diveLog_detail_sightingPhotos": "{count, plural, =1{1 photo} other{{count} photos}}",
+  "@diveLog_detail_sightingPhotos": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "diveLog_detail_section_notes": "Notes",
   "diveLog_detail_section_oxygenToxicity": "Oxygen Toxicity",
   "diveLog_detail_section_sacRateBySegment": "Gas consumption by segment",
@@ -8271,6 +8279,10 @@
   "media_library_filter_site": "Site",
   "@media_library_filter_site": {
     "description": "Library filter chip: pick a dive site"
+  },
+  "media_library_filter_species": "Species",
+  "@media_library_filter_species": {
+    "description": "Library filter chip: pick a species tag"
   },
   "media_library_filter_trip": "Trip",
   "@media_library_filter_trip": {
