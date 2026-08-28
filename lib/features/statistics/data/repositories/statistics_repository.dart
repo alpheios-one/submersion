@@ -2536,6 +2536,29 @@ class StatisticsRepository {
     );
   }
 
+  /// Counts the dives the diver has explicitly excluded from statistics, for
+  /// the Overview footnote.
+  ///
+  /// Deliberately counts only `excluded_from_stats`, not the whole
+  /// [DiveStatsScope]: this footnote exists to explain the diver's own choice
+  /// back to them. A planned dive is not something they chose to exclude, so
+  /// folding it in would make the number confusing rather than clarifying.
+  // stats-scope-exempt: counts the excluded, by definition
+  Future<int> countExcludedDives({String? diverId}) async {
+    final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
+    final row = await _db
+        .customSelect(
+          'SELECT COUNT(*) AS c FROM dives '
+          'WHERE excluded_from_stats = 1 $diverFilter',
+          variables: diverId != null
+              ? [Variable<String>(diverId)]
+              : const <Variable<Object>>[],
+          readsFrom: {_db.dives},
+        )
+        .getSingle();
+    return row.read<int>('c');
+  }
+
   // ============================================================================
   // Helpers
   // ============================================================================

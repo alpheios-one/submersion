@@ -2403,6 +2403,9 @@ class DiveRepository {
     if (filter.favoritesOnly == true) {
       clauses.add('d.is_favorite = 1');
     }
+    if (filter.excludedFromStatsOnly == true) {
+      clauses.add('d.excluded_from_stats = 1');
+    }
     if (filter.decoOnly != null) {
       clauses.add(
         decoSignalCondition(wantDeco: filter.decoOnly!, diveIdRef: 'd.id'),
