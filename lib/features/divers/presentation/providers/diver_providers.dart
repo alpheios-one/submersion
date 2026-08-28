@@ -85,8 +85,8 @@ Future<String?> _resolveActiveDiverId(
 /// `current_diver_id` lives in SharedPreferences, which a database swap never
 /// touches, so a leftover id from the previous library would seed the next
 /// launch with a diver that no longer exists and scope every dive query to
-/// nothing (issue #1342). No id means "unscoped", the reading every other
-/// diver-scoped repository already gives a null diver id.
+/// nothing (issue #1342). With no id the queries run unscoped, which is how
+/// every other diver-scoped repository already treats a null diver id.
 ///
 /// Callers that keep running without a restart need not invalidate
 /// [currentDiverIdProvider]: the live notifier re-validates itself on the
@@ -176,10 +176,11 @@ class CurrentDiverIdNotifier extends StateNotifier<String?> {
   /// Settings-table id (survives a restore) if its diver exists, then the
   /// default diver. Syncs the result to both stores.
   ///
-  /// When nothing resolves the id is cleared from state and prefs. Null means
-  /// "unscoped", the reading every other diver-scoped repository gives a null
-  /// diver id; keeping an id that matches no row would instead scope the
-  /// logbook to a diver that cannot exist and empty it for good.
+  /// When nothing resolves the id is cleared from state and prefs. A null id
+  /// runs the queries unscoped, which is how every other diver-scoped
+  /// repository already treats a null diver id; keeping an id that matches no
+  /// row would instead scope the logbook to a diver that cannot exist and
+  /// empty it for good.
   Future<void> _validateAndSync() async {
     // Everything below awaits; if the user switches diver meanwhile, an
     // answer computed from the old id must not overwrite their choice.
