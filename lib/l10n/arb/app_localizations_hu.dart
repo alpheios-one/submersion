@@ -23851,11 +23851,14 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '$checked objektum ellenőrizve: $removed árva eltávolítva, $repaired javítás sorba állítva, $aborted elavult feltöltés megszakítva';
+    return '$checked felhőobjektum ellenőrizve ($originals eredeti, $thumbs bélyegkép, $renditions tömörített változat): $removed árva eltávolítva, $repaired javítás sorba állítva, $aborted elavult feltöltés megszakítva';
   }
 
   @override

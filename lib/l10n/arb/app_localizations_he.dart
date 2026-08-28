@@ -23333,11 +23333,32 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return 'נבדקו $checked אובייקטים: הוסרו $removed יתומים, $repaired תיקונים נוספו לתור, $aborted העלאות ישנות בוטלו';
+    String _temp0 = intl.Intl.pluralLogic(
+      originals,
+      locale: localeName,
+      other: '$originals מקוריים',
+      one: 'מקורי אחד',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      thumbs,
+      locale: localeName,
+      other: '$thumbs תמונות ממוזערות',
+      one: 'תמונה ממוזערת אחת',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      renditions,
+      locale: localeName,
+      other: '$renditions גרסאות דחוסות',
+      one: 'גרסה דחוסה אחת',
+    );
+    return 'נבדקו $checked אובייקטים בענן ($_temp0, $_temp1, $_temp2): הוסרו $removed יתומים, $repaired תיקונים נוספו לתור, $aborted העלאות ישנות בוטלו';
   }
 
   @override

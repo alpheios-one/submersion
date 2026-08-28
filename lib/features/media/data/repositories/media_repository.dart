@@ -723,6 +723,140 @@ class MediaRepository {
     }
   }
 
+  /// Records the outcome of an explicit check on one row: `lastVerifiedAt`
+  /// always, and the orphan flag only when the check actually learned it
+  /// ([isOrphaned] non-null).
+  ///
+  /// Narrow for the same reason [markVerified] is. `MediaItemVerifier`'s
+  /// callers hold a snapshot of the row, and an upload that completes after
+  /// the snapshot was taken stamps `remoteUploadedAt` on the row; a whole-row
+  /// write from the snapshot ([updateMedia]) would roll that stamp back to
+  /// null, and the pending mark would then sync the rollback fleet-wide.
+  ///
+  /// Unlike [markVerified] this always writes: the user asked for a check
+  /// and the date of that check is the answer, whether or not the flag moved.
+  /// Like it, a row that is gone by the time the check lands (deleted during
+  /// a Check all media pass) gets no pending record pointing at nothing.
+  Future<void> stampVerification(
+    String id, {
+    required DateTime verifiedAt,
+    bool? isOrphaned,
+  }) async {
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final rowsWritten =
+          await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
+            MediaCompanion(
+              isOrphaned: isOrphaned == null
+                  ? const Value.absent()
+                  : Value(isOrphaned),
+              lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
+              updatedAt: Value(now),
+            ),
+          );
+      if (rowsWritten == 0) return;
+      await _syncRepository.markRecordPending(
+        entityType: 'media',
+        recordId: id,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to stamp verification: $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Rows this device imported that carry the "missing" flag.
+  ///
+  /// Feeds the one-time origin republish: before the origin-device fix a
+  /// peer could flag a row it never had, and that flag synced back to the
+  /// device that does have the file. Re-checking these here is the only way
+  /// to find out; a peer's rows are that peer's to judge.
+  Future<List<domain.MediaItem>> getOrphanedMediaOwnedBy(
+    String deviceId,
+  ) async {
+    try {
+      final query =
+          _db.select(_db.media).join([
+            leftOuterJoin(
+              _db.mediaEnrichment,
+              _db.mediaEnrichment.mediaId.equalsExp(_db.media.id),
+            ),
+          ])..where(
+            _db.media.isOrphaned.equals(true) &
+                _db.media.originDeviceId.equals(deviceId),
+          );
+      final rows = await query.get();
+      return rows.map((row) {
+        final mediaRow = row.readTable(_db.media);
+        final enrichmentRow = row.readTableOrNull(_db.mediaEnrichment);
+        return mediaItemFromRow(mediaRow, enrichmentRow);
+      }).toList();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get orphaned media for device $deviceId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Ids of rows this device imported that carry any media store stamp.
+  ///
+  /// These are the rows whose stamps a peer may have dropped (the
+  /// pending-skip in sync's merge); republishing them hands the stamps back.
+  Future<List<String>> getStoreStampedMediaIdsOwnedBy(String deviceId) async {
+    final id = _db.media.id;
+    final query = _db.selectOnly(_db.media)
+      ..addColumns([id])
+      ..where(
+        _db.media.originDeviceId.equals(deviceId) &
+            (_db.media.remoteUploadedAt.isNotNull() |
+                _db.media.remoteThumbUploadedAt.isNotNull() |
+                _db.media.remoteCompressedUploadedAt.isNotNull()),
+      );
+    final rows = await query.get();
+    return [for (final row in rows) row.read(id)!];
+  }
+
+  /// Marks [ids] pending for sync without changing a column, so the next
+  /// changeset carries the rows exactly as they are. Returns how many.
+  ///
+  /// One transaction: markRecordPending's own per-row transaction nests as a
+  /// savepoint, so a library with thousands of stamped rows commits once.
+  Future<int> republishForSync(Iterable<String> ids) async {
+    final list = ids.toList();
+    if (list.isEmpty) return 0;
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await _db.transaction(() async {
+        for (final id in list) {
+          await _syncRepository.markRecordPending(
+            entityType: 'media',
+            recordId: id,
+            localUpdatedAt: now,
+          );
+        }
+      });
+      SyncEventBus.notifyLocalChange();
+      _log.info('Republished ${list.length} media rows for sync');
+      return list.length;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to republish ${list.length} media rows',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Get all orphaned media
   /// Includes enrichment data (depth, temperature) if available
   Future<List<domain.MediaItem>> getOrphanedMedia() async {
@@ -1821,11 +1955,18 @@ class MediaRepository {
   /// gain protection soonest. Scoped to rows linked to a dive or site so
   /// orphaned rows are never uploaded (orphan-prevention spec section 4.1).
   Future<List<String>> getBackfillCandidateIds() async {
+    // A row another device imported is that device's to upload: this one
+    // cannot read its path, so enqueueing it only manufactures a "source
+    // unavailable" failure. Rows from before origin tracking carry no id
+    // and keep today's verdict.
+    final thisDevice = await _syncRepository.getDeviceId();
     final id = _db.media.id;
     final query = _db.selectOnly(_db.media)
       ..addColumns([id])
       ..where(
         isLinkedToDiveOrSite(_db.media) &
+            (_db.media.originDeviceId.isNull() |
+                _db.media.originDeviceId.equals(thisDevice)) &
             // Photos from any uploadable source.
             ((_db.media.remoteUploadedAt.isNull() &
                     _db.media.remoteCompressedUploadedAt.isNull() &

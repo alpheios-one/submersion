@@ -6756,7 +6756,7 @@
   "settings_mediaStorage_transfers_waitingRetry": "{count} 个等待重试",
   "settings_mediaStorage_verify_action": "验证媒体库",
   "settings_mediaStorage_verify_running": "正在验证媒体库...",
-  "settings_mediaStorage_verify_summary": "已检查 {checked} 个对象：移除 {removed} 个孤立文件，排队 {repaired} 个修复，中止 {aborted} 个过期上传",
+  "settings_mediaStorage_verify_summary": "已检查 {checked} 个云端对象（{originals} 个原图、{thumbs} 个缩略图、{renditions} 个压缩版本）：移除 {removed} 个孤立文件，排队 {repaired} 个修复，中止 {aborted} 个过期上传",
   "settings_mediaStorage_backfill_action": "上传现有媒体库",
   "settings_mediaStorage_backfill_enqueued": "已排队 {count} 个上传",
   "settings_mediaStorage_policy_autoUpload": "自动上传照片",
