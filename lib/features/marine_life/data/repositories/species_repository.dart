@@ -138,7 +138,6 @@ class SpeciesRepository {
     );
   }
 
-  /// Add sighting to a dive
   /// The species whose scientific name equals [scientificName], ignoring
   /// case, or null. Lets a lookup select an existing row (built-in or
   /// custom) instead of creating a twin.
@@ -157,6 +156,7 @@ class SpeciesRepository {
     return getSpeciesById(row.data['id'] as String);
   }
 
+  /// Add sighting to a dive
   Future<domain.Sighting> addSighting({
     required String diveId,
     required String speciesId,

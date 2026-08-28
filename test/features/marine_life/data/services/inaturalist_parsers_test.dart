@@ -97,4 +97,51 @@ void main() {
       expect(detail.ancestors.last.rank, 'genus');
     });
   });
+
+  group('typed failures', () {
+    test('a non-numeric id string is a malformed response, not a leak', () {
+      const body =
+          '{"results": [{"id": "abc", "name": "Rhincodon typus", '
+          '"rank": "species", "rank_level": 10}]}';
+
+      expect(
+        () => parseAutocomplete(body),
+        throwsA(
+          isA<SpeciesLookupException>().having(
+            (e) => e.kind,
+            'kind',
+            SpeciesLookupErrorKind.malformed,
+          ),
+        ),
+      );
+    });
+
+    test('a taxon detail with a wrongly typed field is malformed', () {
+      const body =
+          '{"results": [{"id": 52188, "name": "Rhincodon typus", '
+          '"rank": 5, "ancestors": []}]}';
+
+      expect(
+        () => parseTaxonDetail(body),
+        throwsA(
+          isA<SpeciesLookupException>().having(
+            (e) => e.kind,
+            'kind',
+            SpeciesLookupErrorKind.malformed,
+          ),
+        ),
+      );
+    });
+
+    test('a taxon detail with a non-numeric id is malformed', () {
+      const body =
+          '{"results": [{"id": "x", "name": "Rhincodon typus", '
+          '"rank": "species"}]}';
+
+      expect(
+        () => parseTaxonDetail(body),
+        throwsA(isA<SpeciesLookupException>()),
+      );
+    });
+  });
 }

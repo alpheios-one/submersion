@@ -19,18 +19,27 @@ TaxonDetail parseTaxonDetail(String body) {
     );
   }
   final r = results.first;
-  final ancestors = <TaxonAncestor>[
-    for (final a in (r['ancestors'] as List?) ?? const [])
-      if (a is Map && a['rank'] is String && a['name'] is String)
-        TaxonAncestor(a['rank'] as String, a['name'] as String),
-  ];
-  return TaxonDetail(
-    taxonId: _int(r['id']),
-    scientificName: r['name'] as String,
-    commonName: _commonName(r),
-    rank: r['rank'] as String,
-    ancestors: ancestors,
-  );
+  try {
+    final ancestors = <TaxonAncestor>[
+      for (final a in (r['ancestors'] as List?) ?? const [])
+        if (a is Map && a['rank'] is String && a['name'] is String)
+          TaxonAncestor(a['rank'] as String, a['name'] as String),
+    ];
+    return TaxonDetail(
+      taxonId: _int(r['id']),
+      scientificName: r['name'] as String,
+      commonName: _commonName(r),
+      rank: r['rank'] as String,
+      ancestors: ancestors,
+    );
+  } on TypeError catch (e) {
+    throw SpeciesLookupException(
+      SpeciesLookupErrorKind.malformed,
+      e.toString(),
+    );
+  } on FormatException catch (e) {
+    throw SpeciesLookupException(SpeciesLookupErrorKind.malformed, e.message);
+  }
 }
 
 List<Map<String, dynamic>> _results(String body) {
@@ -68,6 +77,8 @@ SpeciesLookupHit _hit(Map<String, dynamic> r) {
       SpeciesLookupErrorKind.malformed,
       e.toString(),
     );
+  } on FormatException catch (e) {
+    throw SpeciesLookupException(SpeciesLookupErrorKind.malformed, e.message);
   }
 }
 
@@ -92,6 +103,9 @@ SpeciesLookupPhoto? _photo(Object? raw) {
   );
 }
 
+/// A numeric field, whatever JSON type iNaturalist used for it. A string
+/// that is not a number throws [FormatException] and a non-numeric type
+/// [TypeError]; both callers turn either into the malformed lookup error.
 int _int(Object? value) => switch (value) {
   final int i => i,
   final double d => d.round(),
