@@ -81,8 +81,12 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
                 BlenderSectionTitle(
                   context.l10n.gasCalculators_blender_billing,
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+                // Wrap, not Row: the gear plus "Save fill" together are also
+                // a few pixels too wide for the narrowest phone, so this
+                // group wraps onto its own second line the same way the
+                // title and this group already wrap against each other.
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     // Opens the settings page scrolled straight to "Default
                     // settings and billing" rather than to its top, since
