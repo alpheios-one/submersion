@@ -49,7 +49,11 @@ class MediaRepository {
   /// since linking is precisely when the enrichment does not exist yet.
   Stream<void> watchMediaChanges() => _db
       .tableUpdates(
-        TableUpdateQuery.onAllTables([_db.media, _db.mediaEnrichment]),
+        TableUpdateQuery.onAllTables([
+          _db.media,
+          _db.mediaEnrichment,
+          _db.mediaSpecies,
+        ]),
       )
       .debounce(changeTickDebounce);
 
@@ -1615,23 +1619,39 @@ class MediaRepository {
   }
 
   /// Of [mediaIds], those carrying metadata a user typed or set that no
-  /// source file holds: a caption, or the favorite flag.
+  /// source file holds: a caption, the favorite flag, or a species tag.
   ///
   /// Used to decide whether an unlink needs to warn before it removes the
-  /// rows. Deliberately no join against `media_species`: that table is
-  /// declared but nothing in the app reads or writes it, so joining it
-  /// would cost a scan to always return nothing.
+  /// rows.
   Future<Set<String>> idsWithUserMetadata(List<String> mediaIds) async {
     if (mediaIds.isEmpty) return {};
-    final rows =
-        await (_db.select(_db.media)..where(
-              (t) =>
-                  t.id.isIn(mediaIds) &
-                  (t.isFavorite.equals(true) |
-                      (t.caption.isNotNull() & t.caption.equals('').not())),
-            ))
-            .get();
-    return {for (final row in rows) row.id};
+    // Chunked: a "select all" in the library can pass thousands of ids,
+    // past SQLite's bound-variable limit for a single IN (...).
+    const chunkSize = 500;
+    final out = <String>{};
+    for (var i = 0; i < mediaIds.length; i += chunkSize) {
+      final chunk = mediaIds.sublist(
+        i,
+        i + chunkSize < mediaIds.length ? i + chunkSize : mediaIds.length,
+      );
+      final rows =
+          await (_db.select(_db.media)..where(
+                (t) =>
+                    t.id.isIn(chunk) &
+                    (t.isFavorite.equals(true) |
+                        (t.caption.isNotNull() & t.caption.equals('').not())),
+              ))
+              .get();
+      final tagged =
+          await (_db.selectOnly(_db.mediaSpecies)
+                ..addColumns([_db.mediaSpecies.mediaId])
+                ..where(_db.mediaSpecies.mediaId.isIn(chunk)))
+              .get();
+      out
+        ..addAll(rows.map((row) => row.id))
+        ..addAll(tagged.map((row) => row.read(_db.mediaSpecies.mediaId)!));
+    }
+    return out;
   }
 
   /// Moves media to [newDiveId] (also the link path for unlinked rows).

@@ -53,7 +53,8 @@ class MediaImportView extends ConsumerWidget {
   /// Imports the resolved assets, one service call per dive and per site.
   /// A failing group never blocks another: a throw inside one group is
   /// recorded against that group's assets and the loop moves on.
-  @visibleForTesting
+  ///
+  /// Shared with the species import, which tags the rows this creates.
   static Future<ImportReviewResult> importResolved({
     required MediaImportService service,
     required DiveRepository diveRepository,
@@ -75,6 +76,7 @@ class MediaImportView extends ConsumerWidget {
     }
 
     var linked = 0;
+    final importedIds = <String>[];
     final failures = <String, String>{};
 
     void failGroup(List<AssetInfo> group, Object reason) {
@@ -95,6 +97,7 @@ class MediaImportView extends ConsumerWidget {
           dive: dive,
         );
         linked += result.imported.length;
+        importedIds.addAll(result.imported.map((m) => m.id));
         failures.addAll(result.failures);
       } catch (e) {
         failGroup(value, e);
@@ -107,6 +110,7 @@ class MediaImportView extends ConsumerWidget {
           siteId: key,
         );
         linked += result.imported.length;
+        importedIds.addAll(result.imported.map((m) => m.id));
         failures.addAll(result.failures);
       } catch (e) {
         failGroup(value, e);
@@ -117,6 +121,7 @@ class MediaImportView extends ConsumerWidget {
       linkedDiveIds: byDive.keys.toList(),
       skipped: assets.length - targets.length,
       failures: failures,
+      importedIds: importedIds,
     );
   }
 
