@@ -300,7 +300,7 @@ class _FormRowState extends State<FormRow> {
                 padding: EdgeInsets.only(
                   left: FormStyle.rowPadding.left,
                   right: FormStyle.rowPadding.right,
-                  bottom: FormStyle.rowPadding.vertical,
+                  bottom: FormStyle.rowPadding.bottom,
                 ),
                 child: Text(
                   help,
