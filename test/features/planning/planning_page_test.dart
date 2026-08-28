@@ -326,7 +326,8 @@ void main() {
     testWidgets('every tool id resolves to its own pane', (tester) async {
       const expected = {
         'deco-calculator': 'Deco Calculator',
-        'gas-calculators': 'Gas Calculators',
+        // Gas Calculators is absent on purpose: it is a full-page push now,
+        // so ?tool=gas-calculators has no pane to resolve to.
         'weight-calculator': 'Weight Calculator',
         'surface-interval': 'Surface Interval',
         'no-fly': 'Flying after diving',
