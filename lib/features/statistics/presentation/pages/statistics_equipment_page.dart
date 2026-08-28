@@ -87,6 +87,7 @@ class StatisticsEquipmentPage extends ConsumerWidget {
   ) {
     return TrendChartSection(
       chartId: TrendChartIds.weight,
+      onDiveSelected: (diveId) => context.push('/dives/$diveId'),
       title: context.l10n.statistics_equipment_weightTrend_title,
       subtitle: context.l10n.statistics_equipment_weightTrend_subtitle,
       pointsAsync: ref.watch(weightTrendProvider),

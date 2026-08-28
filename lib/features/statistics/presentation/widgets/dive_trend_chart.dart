@@ -5,9 +5,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'package:submersion/core/presentation/widgets/chart_zoom_controls.dart';
 import 'package:submersion/core/ui/chart_viewport.dart';
 import 'package:submersion/core/ui/trackpad_zoom_recognizer.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/chart_touch_recognizer.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
 
 import 'package:submersion/features/statistics/domain/trend_aggregation.dart';
 import 'package:submersion/features/statistics/presentation/widgets/chart_axis.dart';
@@ -42,6 +44,8 @@ class DiveTrendChart extends StatefulWidget {
     this.height = 200,
     this.valueFormatter,
     this.yAxisFormatter,
+    this.chartId,
+    this.onDiveSelected,
   });
 
   /// Raw per-dive points, in any order. Never pre-aggregated by the caller.
@@ -58,6 +62,14 @@ class DiveTrendChart extends StatefulWidget {
   final String Function(double)? valueFormatter;
   final String Function(double)? yAxisFormatter;
 
+  /// Distinguishes this chart's zoom controls from others on the page.
+  final String? chartId;
+
+  /// Called with the dive behind a tapped point. Only ever fires in raw
+  /// mode: a bucket stands for several dives, so there is nothing single to
+  /// open. Null leaves points inert.
+  final void Function(String diveId)? onDiveSelected;
+
   @override
   State<DiveTrendChart> createState() => _DiveTrendChartState();
 }
@@ -69,6 +81,10 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
   ChartViewport _viewport = ChartViewport.reset;
 
   ChartViewport _gestureStartViewport = ChartViewport.reset;
+
+  /// Buckets as last drawn, so a tap on the data series can resolve which
+  /// dive it landed on.
+  List<TrendBucket> _drawnBuckets = const [];
   PointerDeviceKind _activePointerKind = PointerDeviceKind.mouse;
   int _activePointerCount = 0;
   Offset? _lastPointerLocal;
@@ -81,6 +97,10 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
   /// Axis gutters reserved by `_titles`. The focal fraction has to be taken
   /// against the inner plot rect, not the whole widget.
   static const _insets = (left: 50.0, right: 0.0, top: 0.0, bottom: 30.0);
+
+  /// Column widths for the monospace tooltip rows, as on the profile chart.
+  static const _tooltipLabelWidth = 16;
+  static const _tooltipValueWidth = 12;
 
   static double _x(DateTime date) => date.millisecondsSinceEpoch.toDouble();
 
@@ -144,122 +164,148 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final box = Size(constraints.maxWidth, widget.height);
-        return RawGestureDetector(
-          gestures: {
-            TrackpadZoomGestureRecognizer:
-                GestureRecognizerFactoryWithHandlers<
-                  TrackpadZoomGestureRecognizer
-                >(
-                  () => TrackpadZoomGestureRecognizer(debugOwner: this),
-                  (recognizer) =>
-                      recognizer.onZoom = (pos, delta) =>
-                          _zoomAt(pos, delta, box),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _interactiveChart(context, box),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: ChartZoomControls(
+                keyPrefix: widget.chartId == null
+                    ? null
+                    : 'trend-${widget.chartId}',
+                zoomLevel: _viewport.zoom,
+                minZoom: ChartViewport.minZoom,
+                maxZoom: ChartViewport.maxZoom,
+                // No cursor to anchor on, so the buttons zoom about the middle
+                // of the visible window.
+                onZoomIn: () =>
+                    setState(() => _viewport = _viewport.zoomedAt(0.5, 0, 1.5)),
+                onZoomOut: () => setState(
+                  () => _viewport = _viewport.zoomedAt(0.5, 0, 1 / 1.5),
                 ),
-          },
-          child: Listener(
-            onPointerDown: (event) {
-              _activePointerCount++;
-              _activePointerKind = event.kind;
-              _lastPointerLocal = event.localPosition;
-              if (event.kind == PointerDeviceKind.touch) {
-                _touchPositions[event.pointer] = event.localPosition;
-                if (_touchPositions.length == 2) _beginPinch();
-              }
-            },
-            onPointerMove: (event) {
-              final prev = _lastPointerLocal;
-              _lastPointerLocal = event.localPosition;
-              if (event.kind == PointerDeviceKind.touch) {
-                _touchPositions[event.pointer] = event.localPosition;
-              }
-              if (prev == null) return;
-              final intent = chartDragIntent(
-                kind: _activePointerKind,
-                pointerCount: _activePointerCount,
-                isZoomed: _viewport.isZoomed,
-              );
-              if (intent == ChartDragIntent.zoomPan &&
-                  _activePointerKind == PointerDeviceKind.touch) {
-                _updatePinch(box);
-                return;
-              }
-              if (intent != ChartDragIntent.pan) return;
-              // A touch drag only pans once the claim recognizer has won the
-              // arena, so a scrub is never fought by a pan.
-              if (_activePointerKind == PointerDeviceKind.touch &&
-                  !_touchDragClaimed) {
-                return;
-              }
-              setState(() {
-                final d = event.localPosition - prev;
-                _viewport = _viewport.pannedBy(
-                  -d.dx / _plotWidth(box) / _viewport.zoom,
-                  0,
-                );
-              });
-            },
-            onPointerUp: (event) {
-              if (_activePointerCount > 0) _activePointerCount--;
-              _lastPointerLocal = null;
-              _touchPositions.remove(event.pointer);
-              if (_pinchPointers.contains(event.pointer)) {
-                _touchPositions.length >= 2
-                    ? _beginPinch()
-                    : _pinchPointers = const [];
-              }
-            },
-            onPointerCancel: (event) {
-              if (_activePointerCount > 0) _activePointerCount--;
-              _lastPointerLocal = null;
-              _touchPositions.remove(event.pointer);
-              _pinchPointers = const [];
-            },
-            // Trackpad pan-zoom is claimed by the recognizer above so it does
-            // not also scroll the enclosing page.
-            onPointerSignal: (event) {
-              if (event is! PointerScrollEvent) return;
-              setState(() {
-                _activePointerKind = PointerDeviceKind.mouse;
-                final factor = event.scrollDelta.dy < 0 ? 1.1 : 1 / 1.1;
-                _viewport = _viewport.zoomedAt(
-                  _focalX(event.localPosition, box),
-                  0,
-                  factor,
-                );
-              });
-            },
-            child: Stack(
-              children: [
-                _buildChart(context),
-                Positioned.fill(
-                  child: RawGestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    gestures: {
-                      ChartTouchClaimRecognizer:
-                          GestureRecognizerFactoryWithHandlers<
-                            ChartTouchClaimRecognizer
-                          >(
-                            () => ChartTouchClaimRecognizer(
-                              isZoomed: () => _viewport.isZoomed,
-                              debugOwner: this,
-                            ),
-                            (recognizer) {
-                              recognizer.onClaimed = () {
-                                _touchDragClaimed = true;
-                              };
-                              recognizer.onReleased = () {
-                                _touchDragClaimed = false;
-                              };
-                            },
-                          ),
-                    },
-                  ),
-                ),
-              ],
+                onResetZoom: () =>
+                    setState(() => _viewport = ChartViewport.reset),
+              ),
             ),
-          ),
+          ],
         );
       },
+    );
+  }
+
+  Widget _interactiveChart(BuildContext context, Size box) {
+    return RawGestureDetector(
+      gestures: {
+        TrackpadZoomGestureRecognizer:
+            GestureRecognizerFactoryWithHandlers<TrackpadZoomGestureRecognizer>(
+              () => TrackpadZoomGestureRecognizer(debugOwner: this),
+              (recognizer) =>
+                  recognizer.onZoom = (pos, delta) => _zoomAt(pos, delta, box),
+            ),
+      },
+      child: Listener(
+        onPointerDown: (event) {
+          _activePointerCount++;
+          _activePointerKind = event.kind;
+          _lastPointerLocal = event.localPosition;
+          if (event.kind == PointerDeviceKind.touch) {
+            _touchPositions[event.pointer] = event.localPosition;
+            if (_touchPositions.length == 2) _beginPinch();
+          }
+        },
+        onPointerMove: (event) {
+          final prev = _lastPointerLocal;
+          _lastPointerLocal = event.localPosition;
+          if (event.kind == PointerDeviceKind.touch) {
+            _touchPositions[event.pointer] = event.localPosition;
+          }
+          if (prev == null) return;
+          final intent = chartDragIntent(
+            kind: _activePointerKind,
+            pointerCount: _activePointerCount,
+            isZoomed: _viewport.isZoomed,
+          );
+          if (intent == ChartDragIntent.zoomPan &&
+              _activePointerKind == PointerDeviceKind.touch) {
+            _updatePinch(box);
+            return;
+          }
+          if (intent != ChartDragIntent.pan) return;
+          // A touch drag only pans once the claim recognizer has won the
+          // arena, so a scrub is never fought by a pan.
+          if (_activePointerKind == PointerDeviceKind.touch &&
+              !_touchDragClaimed) {
+            return;
+          }
+          setState(() {
+            final d = event.localPosition - prev;
+            _viewport = _viewport.pannedBy(
+              -d.dx / _plotWidth(box) / _viewport.zoom,
+              0,
+            );
+          });
+        },
+        onPointerUp: (event) {
+          if (_activePointerCount > 0) _activePointerCount--;
+          _lastPointerLocal = null;
+          _touchPositions.remove(event.pointer);
+          if (_pinchPointers.contains(event.pointer)) {
+            _touchPositions.length >= 2
+                ? _beginPinch()
+                : _pinchPointers = const [];
+          }
+        },
+        onPointerCancel: (event) {
+          if (_activePointerCount > 0) _activePointerCount--;
+          _lastPointerLocal = null;
+          _touchPositions.remove(event.pointer);
+          _pinchPointers = const [];
+        },
+        // Trackpad pan-zoom is claimed by the recognizer above so it does
+        // not also scroll the enclosing page.
+        onPointerSignal: (event) {
+          if (event is! PointerScrollEvent) return;
+          setState(() {
+            _activePointerKind = PointerDeviceKind.mouse;
+            final factor = event.scrollDelta.dy < 0 ? 1.1 : 1 / 1.1;
+            _viewport = _viewport.zoomedAt(
+              _focalX(event.localPosition, box),
+              0,
+              factor,
+            );
+          });
+        },
+        child: Stack(
+          children: [
+            _buildChart(context),
+            Positioned.fill(
+              child: RawGestureDetector(
+                behavior: HitTestBehavior.translucent,
+                gestures: {
+                  ChartTouchClaimRecognizer:
+                      GestureRecognizerFactoryWithHandlers<
+                        ChartTouchClaimRecognizer
+                      >(
+                        () => ChartTouchClaimRecognizer(
+                          isZoomed: () => _viewport.isZoomed,
+                          debugOwner: this,
+                        ),
+                        (recognizer) {
+                          recognizer.onClaimed = () {
+                            _touchDragClaimed = true;
+                          };
+                          recognizer.onReleased = () {
+                            _touchDragClaimed = false;
+                          };
+                        },
+                      ),
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -273,6 +319,7 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
     final color = widget.pointColor ?? theme.colorScheme.primary;
 
     final buckets = aggregate(points, aggregation);
+    _drawnBuckets = buckets;
 
     // The window the viewport exposes, not the whole series. Ticks are chosen
     // from the visible span so a chart zoomed into a few weeks stops being
@@ -303,6 +350,7 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
 
     final isRaw = aggregation == TrendAggregation.none;
     final bars = _bars(context, buckets, color, isRaw);
+    final seriesLabels = _seriesLabels(context, isRaw);
 
     return Semantics(
       label: yAxisLabel != null
@@ -321,7 +369,7 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
             clipData: const FlClipData.horizontal(),
             minY: yAxis.min,
             maxY: yAxis.max,
-            lineTouchData: _touchData(context, bars.first),
+            lineTouchData: _touchData(context, bars, seriesLabels),
             titlesData: _titles(context, dateAxis, yAxis),
             borderData: FlBorderData(show: false),
             gridData: FlGridData(
@@ -339,6 +387,28 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
         ),
       ),
     );
+  }
+
+  /// Names every series in the order [_bars] builds them, so the tooltip can
+  /// label each value instead of listing bare numbers.
+  List<String> _seriesLabels(BuildContext context, bool isRaw) {
+    final l10n = context.l10n;
+    final mode = switch (widget.aggregation) {
+      TrendAggregation.none => l10n.statistics_trend_aggregation_perDive,
+      TrendAggregation.weekly => l10n.statistics_trend_aggregation_weekly,
+      TrendAggregation.monthly => l10n.statistics_trend_aggregation_monthly,
+    };
+    return <String>[
+      mode,
+      if (!isRaw) ...[
+        l10n.statistics_trend_tooltip_lowest,
+        l10n.statistics_trend_tooltip_highest,
+      ],
+      if (widget.showRollingMean && rollingMean(widget.points).isNotEmpty)
+        l10n.statistics_trend_legend_rollingAverage,
+      if (widget.showLinearFit && linearFit(widget.points) != null)
+        l10n.statistics_trend_legend_rate,
+    ];
   }
 
   /// Index 0 is always the data series. When aggregating, indices 1 and 2 are
@@ -453,10 +523,17 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
     ];
   }
 
-  LineTouchData _touchData(BuildContext context, LineChartBarData dataBar) {
+  LineTouchData _touchData(
+    BuildContext context,
+    List<LineChartBarData> bars,
+    List<String> seriesLabels,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
+    final dataBar = bars.first;
     return LineTouchData(
-      touchSpotThreshold: 20,
+      // Generous, so the readout follows the pointer anywhere over the plot
+      // rather than only within a few pixels of a dot.
+      touchSpotThreshold: 1000,
       // Highlight the touched point on the data series only. The band bounds
       // and the fitted overlays would each contribute their own dot and line,
       // stacking several markers on one touch.
@@ -469,37 +546,62 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
         }
         return defaultTouchedIndicators(barData, spotIndexes);
       },
+      touchCallback: (event, response) {
+        if (event is! FlTapUpEvent) return;
+        final onDiveSelected = widget.onDiveSelected;
+        if (onDiveSelected == null) return;
+        final spot = response?.lineBarSpots?.firstOrNull;
+        if (spot == null || spot.barIndex != 0) return;
+        if (spot.spotIndex < 0 || spot.spotIndex >= _drawnBuckets.length) {
+          return;
+        }
+        // Only a bucket standing for exactly one dive can be opened; an
+        // aggregated bucket has no single dive behind it.
+        final diveId = _drawnBuckets[spot.spotIndex].diveId;
+        if (diveId != null) onDiveSelected(diveId);
+      },
       touchTooltipData: LineTouchTooltipData(
         getTooltipColor: (_) => colorScheme.inverseSurface,
-        // A phone-width card clips the tooltip at both edges without these.
+        // Above the plot rather than over it: the bubble used to land on the
+        // very point it was describing.
+        showOnTopOfTheChartBoxArea: true,
+        tooltipMargin: 0,
         fitInsideHorizontally: true,
-        fitInsideVertically: true,
+        fitInsideVertically: false,
         getTooltipItems: (touchedSpots) {
-          return touchedSpots.map((spot) {
-            // Index 0 is the data series; the rest are the invisible band
-            // bounds and the fitted overlays. Reporting all of them drew one
-            // unlabelled number per series, so a bucket read as three mystery
-            // values.
-            if (spot.barIndex != 0) return null;
-            final date = DateTime.fromMillisecondsSinceEpoch(
-              spot.x.toInt(),
-              isUtc: true,
-            );
-            final value =
-                widget.valueFormatter?.call(spot.y) ??
-                spot.y.toStringAsFixed(1);
-            return LineTooltipItem(
-              '${DateFormat.yMMMd().format(date)}\n$value',
-              // Matches the dive profile chart's readout: monospace with
-              // tabular figures so digits line up between rows.
-              TextStyle(
-                fontFamily: 'RobotoMono',
-                fontSize: 14,
-                color: colorScheme.onInverseSurface,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
-            );
-          }).toList();
+          if (touchedSpots.isEmpty) return const <LineTooltipItem?>[];
+          // Matches the dive profile chart's readout: monospace with tabular
+          // figures so the value column lines up between rows.
+          final style = TextStyle(
+            fontFamily: 'RobotoMono',
+            fontSize: 14,
+            color: colorScheme.onInverseSurface,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          );
+          final date = DateTime.fromMillisecondsSinceEpoch(
+            touchedSpots.first.x.toInt(),
+            isUtc: true,
+          );
+
+          return [
+            for (var i = 0; i < touchedSpots.length; i++)
+              if (i == 0)
+                LineTooltipItem(
+                  DateFormat.yMMMd().format(date),
+                  style,
+                  children: [
+                    for (final spot in touchedSpots)
+                      TextSpan(
+                        text:
+                            '\n${DiveProfileChart.tooltipRowText(spot.barIndex < seriesLabels.length ? seriesLabels[spot.barIndex] : '', widget.valueFormatter?.call(spot.y) ?? spot.y.toStringAsFixed(1), _tooltipLabelWidth, _tooltipValueWidth)}',
+                        style: style,
+                      ),
+                  ],
+                  textAlign: TextAlign.start,
+                )
+              else
+                null,
+          ];
         },
       ),
     );

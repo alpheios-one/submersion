@@ -287,7 +287,9 @@ class StatisticsRepository {
         final sac =
             d.gas / (d.durationSec / 60.0) / ((d.avgDepth / 10.0) + 1.0);
         if (sac <= 0) continue;
-        points.add(TrendDataPoint(date: d.dateTime, value: sac));
+        points.add(
+          TrendDataPoint(date: d.dateTime, value: sac, diveId: entry.key),
+        );
       }
       points.sort((a, b) => a.date.compareTo(b.date));
       return points;
@@ -316,6 +318,7 @@ class StatisticsRepository {
 
       final results = await _db.customSelect('''
         SELECT
+          d.id AS dive_id,
           d.dive_date_time AS dive_date_time,
           (t.start_pressure - t.end_pressure) / (COALESCE(d.runtime, d.bottom_time) / 60.0) / ((d.avg_depth / 10.0) + 1) AS sac
         FROM dives d
@@ -347,6 +350,7 @@ class StatisticsRepository {
                 isUtc: true,
               ),
               value: row.read<double>('sac'),
+              diveId: row.read<String>('dive_id'),
             ),
           )
           .toList();
@@ -811,7 +815,7 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
-        SELECT dive_date_time, max_depth
+        SELECT id, dive_date_time, max_depth
         FROM dives
         WHERE max_depth IS NOT NULL $diverFilter ${df.clause}
         ORDER BY dive_date_time
@@ -824,6 +828,7 @@ class StatisticsRepository {
             isUtc: true,
           ),
           value: row.read<double>('max_depth'),
+          diveId: row.read<String>('id'),
         );
       }).toList();
     } catch (e, stackTrace) {
@@ -847,7 +852,7 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
-        SELECT dive_date_time, bottom_time / 60.0 AS minutes
+        SELECT id, dive_date_time, bottom_time / 60.0 AS minutes
         FROM dives
         WHERE bottom_time IS NOT NULL $diverFilter ${df.clause}
         ORDER BY dive_date_time
@@ -860,6 +865,7 @@ class StatisticsRepository {
             isUtc: true,
           ),
           value: row.read<double>('minutes'),
+          diveId: row.read<String>('id'),
         );
       }).toList();
     } catch (e, stackTrace) {
@@ -1011,7 +1017,7 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
-        SELECT dive_date_time
+        SELECT id, dive_date_time
         FROM dives
         WHERE 1 = 1 $diverFilter ${df.clause}
         ORDER BY dive_date_time
@@ -1026,6 +1032,7 @@ class StatisticsRepository {
             isUtc: true,
           ),
           value: runningTotal.toDouble(),
+          diveId: row.read<String>('id'),
         );
       }).toList();
     } catch (e, stackTrace) {
@@ -2064,7 +2071,8 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
-        SELECT d.dive_date_time AS dive_date_time,
+        SELECT d.id AS dive_id,
+               d.dive_date_time AS dive_date_time,
                SUM(dw.amount_kg) AS total_kg
         FROM dives d
         JOIN dive_weights dw ON dw.dive_id = d.id
@@ -2081,6 +2089,7 @@ class StatisticsRepository {
             isUtc: true,
           ),
           value: row.read<double>('total_kg'),
+          diveId: row.read<String>('dive_id'),
         );
       }).toList();
     } catch (e, stackTrace) {
@@ -2107,7 +2116,7 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
-        SELECT dive_date_time, water_temp
+        SELECT id, dive_date_time, water_temp
         FROM dives
         WHERE water_temp IS NOT NULL $diverFilter ${df.clause}
         ORDER BY dive_date_time
@@ -2120,6 +2129,7 @@ class StatisticsRepository {
             isUtc: true,
           ),
           value: row.read<double>('water_temp'),
+          diveId: row.read<String>('id'),
         );
       }).toList();
     } catch (e, stackTrace) {

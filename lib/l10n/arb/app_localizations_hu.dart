@@ -33983,4 +33983,10 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveLog_filter_presetLast10Years => 'Elmúlt 10 év';
+
+  @override
+  String get statistics_trend_tooltip_lowest => 'Legalacsonyabb';
+
+  @override
+  String get statistics_trend_tooltip_highest => 'Legmagasabb';
 }

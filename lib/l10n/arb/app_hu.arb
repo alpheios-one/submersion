@@ -9992,5 +9992,7 @@
   "statistics_conditions_tempTrend_empty": "Nincs elérhető hőmérsékleti adat",
   "statistics_conditions_tempTrend_error": "A hőmérséklet alakulása nem tölthető be",
   "diveLog_filter_presetLast5Years": "Elmúlt 5 év",
-  "diveLog_filter_presetLast10Years": "Elmúlt 10 év"
+  "diveLog_filter_presetLast10Years": "Elmúlt 10 év",
+  "statistics_trend_tooltip_lowest": "Legalacsonyabb",
+  "statistics_trend_tooltip_highest": "Legmagasabb"
 }

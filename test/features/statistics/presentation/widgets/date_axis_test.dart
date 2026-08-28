@@ -181,7 +181,7 @@ void main() {
     });
   });
 
-  group('year disambiguation', () {
+  group('year on every label', () {
     List<String> drawn(DateAxis axis) {
       final out = <String>[];
       for (var v = axis.min; v <= axis.max; v += axis.labelInterval) {
@@ -191,45 +191,49 @@ void main() {
       return out;
     }
 
-    test('carries the year on the first month label', () {
-      // "Oct" alone never says which October.
-      final axis = DateAxis.forRange(
-        DateTime.utc(2025, 9, 1),
-        DateTime.utc(2026, 5, 1),
-      );
-
-      expect(drawn(axis).first, contains('2025'));
-    });
-
-    test('repeats the year only when it changes', () {
+    test('every month label carries an abbreviated year', () {
+      // Spelling the year only where it changed left one long label among
+      // short ones, which read as ragged.
       final axis = DateAxis.forRange(
         DateTime.utc(2025, 9, 1),
         DateTime.utc(2026, 5, 1),
       );
 
       final labels = drawn(axis);
-      final withYear = labels.where(
-        (l) => l.contains('2025') || l.contains('2026'),
-      );
 
-      // One for the opening month, one for the January the year turns over.
-      expect(withYear, hasLength(2));
+      expect(labels, isNotEmpty);
+      for (final label in labels) {
+        expect(
+          RegExp(r"'\d{2}$").hasMatch(label),
+          isTrue,
+          reason: 'no year on $label',
+        );
+      }
     });
 
-    test('a span inside a single year names the year once', () {
+    test('the year is two digits, not four', () {
       final axis = DateAxis.forRange(
-        DateTime.utc(2025, 2, 1),
-        DateTime.utc(2025, 11, 1),
+        DateTime.utc(2025, 9, 1),
+        DateTime.utc(2026, 5, 1),
+      );
+
+      for (final label in drawn(axis)) {
+        expect(label.contains('2025'), isFalse, reason: label);
+        expect(label.contains('2026'), isFalse, reason: label);
+      }
+    });
+
+    test('labels stay distinct across a year boundary', () {
+      final axis = DateAxis.forRange(
+        DateTime.utc(2025, 9, 1),
+        DateTime.utc(2026, 5, 1),
       );
 
       final labels = drawn(axis);
-      final withYear = labels.where((l) => l.contains('2025'));
-
-      expect(withYear, hasLength(1));
-      expect(labels.first, contains('2025'));
+      expect(labels.length, labels.toSet().length, reason: '$labels');
     });
 
-    test('year granularity is untouched', () {
+    test('year granularity stays a plain four-digit year', () {
       final axis = DateAxis.forRange(
         DateTime.utc(2019, 1, 1),
         DateTime.utc(2026, 1, 1),

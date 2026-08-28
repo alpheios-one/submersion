@@ -69,8 +69,7 @@ class DateAxis {
   String? labelFor(double value, {double? step}) {
     if (!showsLabelAt(value)) return null;
 
-    final date = _dateOf(value);
-    final text = _format(date);
+    final text = _format(_dateOf(value));
 
     // The previously drawn label is one step back, or the lower bound when
     // that step would fall outside the axis. fl_chart does not anchor its
@@ -79,48 +78,36 @@ class DateAxis {
     // is exactly how "Sep Sep" survived.
     var previous = value - (step ?? labelInterval);
     if (previous < min) previous = min;
-    final hasPrevious = previous < value && showsLabelAt(previous);
-
-    if (hasPrevious) {
-      final previousDate = _dateOf(previous);
-      if (_format(previousDate) == text) return null;
-      // A bare "Oct" never says which October, so the year is spelled out
-      // wherever it changes. Repeating it on every tick would just crowd the
-      // axis, which is what makes labels collide.
-      if (previousDate.year == date.year) return text;
+    if (previous < value && showsLabelAt(previous)) {
+      if (_format(_dateOf(previous)) == text) return null;
     }
-    return _formatWithYear(date);
+    return text;
   }
 
   static DateTime _dateOf(double ms) =>
       DateTime.fromMillisecondsSinceEpoch(ms.toInt(), isUtc: true);
 
-  /// The label without a year. Also the key the duplicate check compares on,
-  /// so "Sep 2025" and "Sep" still count as the same month.
+  /// Every label carries its year. A bare "Oct" never says which October, and
+  /// spelling the year out only where it changes left the axis looking ragged,
+  /// with one long label among short ones.
+  ///
+  /// The year is abbreviated to two digits to keep labels narrow: a wide label
+  /// is what crowds the axis and makes neighbours collide. The apostrophe form
+  /// is not reordered per locale, which is the compromise a compact axis takes.
   String _format(DateTime date) {
     switch (granularity) {
       case DateAxisGranularity.year:
         return DateFormat.y().format(date);
       case DateAxisGranularity.quarter:
       case DateAxisGranularity.month:
-        return DateFormat.MMM().format(date);
+        return "${DateFormat.MMM().format(date)} '${_shortYear(date)}";
       case DateAxisGranularity.day:
-        return DateFormat.Md().format(date);
+        return "${DateFormat.Md().format(date)} '${_shortYear(date)}";
     }
   }
 
-  String _formatWithYear(DateTime date) {
-    switch (granularity) {
-      case DateAxisGranularity.year:
-        // Already a year.
-        return DateFormat.y().format(date);
-      case DateAxisGranularity.quarter:
-      case DateAxisGranularity.month:
-        return DateFormat.yMMM().format(date);
-      case DateAxisGranularity.day:
-        return DateFormat.yMd().format(date);
-    }
-  }
+  static String _shortYear(DateTime date) =>
+      (date.year % 100).toString().padLeft(2, '0');
 
   /// Chooses a granularity from the span, then walks ticks across it.
   ///

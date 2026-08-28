@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -68,6 +69,7 @@ class StatisticsProgressionPage extends ConsumerWidget {
   ) {
     return TrendChartSection(
       chartId: TrendChartIds.depth,
+      onDiveSelected: (diveId) => context.push('/dives/$diveId'),
       title: context.l10n.statistics_progression_depthProgression_title,
       subtitle: context.l10n.statistics_progression_depthProgression_subtitle,
       pointsAsync: ref.watch(depthProgressionTrendProvider),
@@ -84,6 +86,7 @@ class StatisticsProgressionPage extends ConsumerWidget {
 
     return TrendChartSection(
       chartId: TrendChartIds.bottomTime,
+      onDiveSelected: (diveId) => context.push('/dives/$diveId'),
       title: context.l10n.statistics_progression_bottomTime_title,
       subtitle: context.l10n.statistics_progression_bottomTime_subtitle,
       pointsAsync: ref.watch(bottomTimeTrendProvider),

@@ -56119,6 +56119,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last 10 years'**
   String get diveLog_filter_presetLast10Years;
+
+  /// No description provided for @statistics_trend_tooltip_lowest.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest'**
+  String get statistics_trend_tooltip_lowest;
+
+  /// No description provided for @statistics_trend_tooltip_highest.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest'**
+  String get statistics_trend_tooltip_highest;
 }
 
 class _AppLocalizationsDelegate

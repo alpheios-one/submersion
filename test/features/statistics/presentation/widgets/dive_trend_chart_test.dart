@@ -376,25 +376,13 @@ void main() {
         ),
       );
 
-      const months = {
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      };
+      // Month labels now read "Sep '25": every one carries its year.
+      final monthLabel = RegExp(r"^[A-Za-z]{3,} '\d{2}$");
       final labels = tester
           .widgetList<Text>(find.byType(Text))
           .map((t) => t.data)
           .whereType<String>()
-          .where(months.contains)
+          .where(monthLabel.hasMatch)
           .toList();
 
       expect(labels, isNotEmpty);
@@ -447,7 +435,10 @@ void main() {
       final tooltip = readData(tester).lineTouchData.touchTooltipData;
 
       expect(tooltip.fitInsideHorizontally, isTrue);
-      expect(tooltip.fitInsideVertically, isTrue);
+      // Drawn above the plot rather than over it, so it can never land on the
+      // point it is describing. That is also why it does not fit vertically.
+      expect(tooltip.showOnTopOfTheChartBoxArea, isTrue);
+      expect(tooltip.tooltipMargin, 0);
     });
 
     testWidgets('the tooltip reports the data series only', (tester) async {
@@ -655,6 +646,127 @@ void main() {
         narrow.titlesData.bottomTitles.sideTitles.interval,
         lessThan(wide.titlesData.bottomTitles.sideTitles.interval!),
       );
+    });
+  });
+
+  group('zoom controls', () {
+    testWidgets('offers zoom in, zoom out and a level readout', (tester) async {
+      await tester.pumpWidget(
+        host(DiveTrendChart(points: series(20), chartId: 'depth')),
+      );
+
+      expect(find.byKey(const ValueKey('trend-depth-zoom-in')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('trend-depth-zoom-out')),
+        findsOneWidget,
+      );
+      expect(find.text('1.0x'), findsOneWidget);
+    });
+
+    testWidgets('the reset button appears only once zoomed', (tester) async {
+      // Zooming in with no way back out is the state this prevents.
+      await tester.pumpWidget(
+        host(DiveTrendChart(points: series(20), chartId: 'depth')),
+      );
+
+      expect(
+        find.byKey(const ValueKey('trend-depth-zoom-reset')),
+        findsNothing,
+      );
+
+      await tester.tap(find.byKey(const ValueKey('trend-depth-zoom-in')));
+      await tester.pump();
+
+      expect(
+        find.byKey(const ValueKey('trend-depth-zoom-reset')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('zoom in narrows the window and reset restores it', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(DiveTrendChart(points: series(20), chartId: 'depth')),
+      );
+      final full = readData(tester);
+      final fullSpan = full.maxX - full.minX;
+
+      await tester.tap(find.byKey(const ValueKey('trend-depth-zoom-in')));
+      await tester.pump();
+      expect(readData(tester).maxX - readData(tester).minX, lessThan(fullSpan));
+
+      await tester.tap(find.byKey(const ValueKey('trend-depth-zoom-reset')));
+      await tester.pump();
+      expect(
+        readData(tester).maxX - readData(tester).minX,
+        closeTo(fullSpan, 1),
+      );
+    });
+  });
+
+  group('tapping a dive', () {
+    List<TrendDataPoint> withIds() => List.generate(
+      20,
+      (i) => TrendDataPoint(
+        date: DateTime.utc(2024, 1, 1).add(Duration(days: i * 7)),
+        value: 10.0 + i,
+        diveId: 'dive-$i',
+      ),
+    );
+
+    testWidgets('reports the dive behind a tapped raw point', (tester) async {
+      String? tapped;
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(
+            points: withIds(),
+            onDiveSelected: (id) => tapped = id,
+          ),
+        ),
+      );
+
+      final data = readData(tester);
+      final bars = data.lineBarsData;
+      data.lineTouchData.touchCallback!(
+        FlTapUpEvent(TapUpDetails(kind: PointerDeviceKind.mouse)),
+        LineTouchResponse(
+          touchLocation: Offset.zero,
+          touchChartCoordinate: Offset.zero,
+          lineBarSpots: [TouchLineBarSpot(bars[0], 0, bars[0].spots[3], 0)],
+        ),
+      );
+      await tester.pump();
+
+      expect(tapped, 'dive-3');
+    });
+
+    testWidgets('reports nothing for an aggregated bucket', (tester) async {
+      // A bucket stands for several dives, so there is no single one to open.
+      String? tapped;
+      await tester.pumpWidget(
+        host(
+          DiveTrendChart(
+            points: withIds(),
+            aggregation: TrendAggregation.monthly,
+            onDiveSelected: (id) => tapped = id,
+          ),
+        ),
+      );
+
+      final data = readData(tester);
+      final bars = data.lineBarsData;
+      data.lineTouchData.touchCallback!(
+        FlTapUpEvent(TapUpDetails(kind: PointerDeviceKind.mouse)),
+        LineTouchResponse(
+          touchLocation: Offset.zero,
+          touchChartCoordinate: Offset.zero,
+          lineBarSpots: [TouchLineBarSpot(bars[0], 0, bars[0].spots.first, 0)],
+        ),
+      );
+      await tester.pump();
+
+      expect(tapped, isNull);
     });
   });
 }

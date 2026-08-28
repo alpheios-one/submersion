@@ -9992,5 +9992,7 @@
   "statistics_conditions_tempTrend_empty": "没有可用的温度数据",
   "statistics_conditions_tempTrend_error": "无法加载水温趋势",
   "diveLog_filter_presetLast5Years": "最近 5 年",
-  "diveLog_filter_presetLast10Years": "最近 10 年"
+  "diveLog_filter_presetLast10Years": "最近 10 年",
+  "statistics_trend_tooltip_lowest": "最低",
+  "statistics_trend_tooltip_highest": "最高"
 }

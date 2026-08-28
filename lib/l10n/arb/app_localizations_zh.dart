@@ -32136,4 +32136,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_filter_presetLast10Years => '最近 10 年';
+
+  @override
+  String get statistics_trend_tooltip_lowest => '最低';
+
+  @override
+  String get statistics_trend_tooltip_highest => '最高';
 }

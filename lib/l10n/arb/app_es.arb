@@ -9992,5 +9992,7 @@
   "statistics_conditions_tempTrend_empty": "No hay datos de temperatura disponibles",
   "statistics_conditions_tempTrend_error": "No se pudo cargar la evolución de la temperatura",
   "diveLog_filter_presetLast5Years": "Últimos 5 años",
-  "diveLog_filter_presetLast10Years": "Últimos 10 años"
+  "diveLog_filter_presetLast10Years": "Últimos 10 años",
+  "statistics_trend_tooltip_lowest": "Mínimo",
+  "statistics_trend_tooltip_highest": "Máximo"
 }

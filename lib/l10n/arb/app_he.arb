@@ -9992,5 +9992,7 @@
   "statistics_conditions_tempTrend_empty": "אין נתוני טמפרטורה זמינים",
   "statistics_conditions_tempTrend_error": "טעינת מגמת הטמפרטורה נכשלה",
   "diveLog_filter_presetLast5Years": "5 השנים האחרונות",
-  "diveLog_filter_presetLast10Years": "10 השנים האחרונות"
+  "diveLog_filter_presetLast10Years": "10 השנים האחרונות",
+  "statistics_trend_tooltip_lowest": "הנמוך ביותר",
+  "statistics_trend_tooltip_highest": "הגבוה ביותר"
 }

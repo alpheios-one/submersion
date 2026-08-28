@@ -9992,5 +9992,7 @@
   "statistics_conditions_tempTrend_empty": "لا تتوفر بيانات درجة الحرارة",
   "statistics_conditions_tempTrend_error": "تعذر تحميل اتجاه درجة الحرارة",
   "diveLog_filter_presetLast5Years": "آخر 5 سنوات",
-  "diveLog_filter_presetLast10Years": "آخر 10 سنوات"
+  "diveLog_filter_presetLast10Years": "آخر 10 سنوات",
+  "statistics_trend_tooltip_lowest": "الأدنى",
+  "statistics_trend_tooltip_highest": "الأعلى"
 }

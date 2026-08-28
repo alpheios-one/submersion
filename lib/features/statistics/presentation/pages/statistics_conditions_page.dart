@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -217,6 +218,7 @@ class StatisticsConditionsPage extends ConsumerWidget {
   ) {
     return TrendChartSection(
       chartId: TrendChartIds.waterTemp,
+      onDiveSelected: (diveId) => context.push('/dives/$diveId'),
       title: context.l10n.statistics_conditions_tempTrend_title,
       subtitle: context.l10n.statistics_conditions_tempTrend_subtitle,
       pointsAsync: ref.watch(waterTempTrendProvider),

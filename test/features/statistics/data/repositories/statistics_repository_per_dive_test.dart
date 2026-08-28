@@ -262,4 +262,34 @@ void main() {
       expect(points.single.value, 1);
     });
   });
+
+  group('dive identity', () {
+    test('a per-dive point carries the dive it came from', () async {
+      await insertDive(id: 'a', at: DateTime.utc(2024, 5, 10), maxDepth: 18.0);
+
+      final points = await repository.getDepthPerDive();
+
+      expect(points.single.diveId, 'a');
+    });
+
+    test('bottom time, temperature and weight carry it too', () async {
+      await insertDive(
+        id: 'a',
+        at: DateTime.utc(2024, 5, 10),
+        bottomTimeSeconds: 40 * 60,
+        waterTemp: 21,
+      );
+      await insertWeight(diveId: 'a', id: 'w1', amountKg: 6);
+
+      expect((await repository.getBottomTimePerDive()).single.diveId, 'a');
+      expect((await repository.getWaterTempPerDive()).single.diveId, 'a');
+      expect((await repository.getWeightPerDive()).single.diveId, 'a');
+    });
+
+    test('the cumulative count carries it', () async {
+      await insertDive(id: 'a', at: DateTime.utc(2024, 5, 10));
+
+      expect((await repository.getCumulativeDiveCount()).single.diveId, 'a');
+    });
+  });
 }

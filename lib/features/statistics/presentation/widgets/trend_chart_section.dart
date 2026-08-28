@@ -24,6 +24,7 @@ class TrendChartSection extends ConsumerWidget {
     this.valueFormatter,
     this.yAxisFormatter,
     this.rateFormatter,
+    this.onDiveSelected,
   });
 
   /// Key into [trendChartSettingsProvider]. Use a [TrendChartIds] constant.
@@ -41,6 +42,9 @@ class TrendChartSection extends ConsumerWidget {
   /// Formats the fitted per-year rate with its unit symbol. Null hides the
   /// numeric rate and leaves the legend entry as a plain toggle.
   final String Function(double)? rateFormatter;
+
+  /// Opens the dive behind a tapped point. Only fires in per-dive mode.
+  final void Function(String diveId)? onDiveSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -69,7 +73,9 @@ class TrendChartSection extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DiveTrendChart(
+                chartId: chartId,
                 points: points,
+                onDiveSelected: onDiveSelected,
                 aggregation: settings.aggregation,
                 showRollingMean: settings.showRollingMean,
                 showLinearFit: settings.showLinearFit,

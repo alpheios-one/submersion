@@ -33772,4 +33772,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_filter_presetLast10Years => 'آخر 10 سنوات';
+
+  @override
+  String get statistics_trend_tooltip_lowest => 'الأدنى';
+
+  @override
+  String get statistics_trend_tooltip_highest => 'الأعلى';
 }

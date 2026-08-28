@@ -113,6 +113,7 @@ class StatisticsGasPage extends ConsumerWidget {
 
     return TrendChartSection(
       chartId: TrendChartIds.sac,
+      onDiveSelected: (diveId) => context.push('/dives/$diveId'),
       title: context.l10n.statistics_gas_sacTrend_title,
       subtitle: context.l10n.statistics_gas_sacTrend_subtitle,
       pointsAsync: ref.watch(sacTrendProvider),

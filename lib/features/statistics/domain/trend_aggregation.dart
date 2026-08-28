@@ -16,7 +16,16 @@ class TrendDataPoint {
   final double value;
   final String label;
 
-  TrendDataPoint({required this.date, required this.value, this.label = ''});
+  /// The dive this point came from, when it came from exactly one. Null for a
+  /// bucket, which stands for several dives, so nothing can be navigated to.
+  final String? diveId;
+
+  TrendDataPoint({
+    required this.date,
+    required this.value,
+    this.label = '',
+    this.diveId,
+  });
 }
 
 /// How a per-dive series is folded before drawing. [none] is the default: one
@@ -32,7 +41,12 @@ class TrendBucket {
     required this.min,
     required this.max,
     required this.count,
+    this.diveId,
   });
+
+  /// The dive behind a single-dive bucket, carried through so a raw point can
+  /// be tapped. Null whenever the bucket folds more than one dive.
+  final String? diveId;
 
   /// Start of the bucket, or the dive's own timestamp when not aggregating.
   final DateTime date;
@@ -60,6 +74,7 @@ List<TrendBucket> aggregate(
             min: p.value,
             max: p.value,
             count: 1,
+            diveId: p.diveId,
           ),
         )
         .toList(growable: false);
