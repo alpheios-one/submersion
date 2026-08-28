@@ -155,4 +155,33 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byType(SnackBar), findsNothing);
   });
+
+  testWidgets('a host with no messenger, router or l10n is a silent no-op', (
+    tester,
+  ) async {
+    // Callers run this inside the try that reports an import failure, so a
+    // bare host must not turn a successful import into an error.
+    late BuildContext hostContext;
+    late WidgetRef hostRef;
+    await tester.pumpWidget(
+      ProviderScope(
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Consumer(
+            builder: (context, ref, _) {
+              hostContext = context;
+              hostRef = ref;
+              return const SizedBox();
+            },
+          ),
+        ),
+      ),
+    );
+
+    await expectLater(
+      offerSiteReviewAfterImport(hostContext, hostRef, const ['d1']),
+      completes,
+    );
+    expect(tester.takeException(), isNull);
+  });
 }

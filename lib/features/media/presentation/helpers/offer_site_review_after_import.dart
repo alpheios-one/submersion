@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_match_review_notifier.dart';
-import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 /// After a multi-dive photo import, offers the batch site review for the
 /// dives that just became eligible (siteless or coordinate-less site, now
@@ -28,12 +28,13 @@ Future<void> offerSiteReviewAfterImport(
   // is unaffected, since the repository returns dives newest-first regardless.
   final ids = diveIds.toSet().toList()..sort();
   if (ids.isEmpty) return;
-  final l10n = context.l10n;
-  final scaffold = messenger ?? ScaffoldMessenger.of(context);
-  // Best-effort: no router (embedded hosts, tests) or a failed eligibility
-  // lookup means no offer, never a failed import.
+  // Every context lookup is nullable on purpose. An embedded host or a test
+  // tree may carry no messenger, router or localizations, and none of that
+  // may become the reason an import reports failure.
+  final scaffold = messenger ?? ScaffoldMessenger.maybeOf(context);
   final router = GoRouter.maybeOf(context);
-  if (router == null) return;
+  final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations);
+  if (scaffold == null || router == null || l10n == null) return;
   final List<String> eligible;
   try {
     eligible = await ref.read(
